@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.m,v 1.16 2002/11/28 23:24:15 massiot Exp $
+ * $Id: aout.m,v 1.17 2003/01/01 11:14:50 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -32,15 +32,86 @@
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
+
 #include "aout_internal.h"
-#include "asystm.h"
 
 #include <Carbon/Carbon.h>
-#include <CoreAudio/AudioHardware.h>
 #include <CoreAudio/HostTime.h>
-#include <AudioToolbox/AudioConverter.h>
+#include <CoreAudio/AudioHardware.h>
 
 #define A52_FRAME_NB 1536
+
+/*****************************************************************************
+ * aout_class_t 
+ ****************************************************************************/
+enum AudioDeviceClass
+{
+    AudioDeviceClassA52     = 1 << 0,
+    AudioDeviceClassPCM2    = 1 << 1,
+    AudioDeviceClassPCM6    = 1 << 2
+};
+
+static struct aout_class_t
+{
+    UInt32 mFormatID;
+    UInt32 mChannelsPerFrame;
+    enum AudioDeviceClass class;
+    const char *psz_class;
+}
+aout_classes[] =
+{
+    { /* old A/52 format type */
+        'IAC3', 
+        0, 
+        AudioDeviceClassA52, 
+        "Digital A/52" 
+    },
+
+    { /* new A/52 format type */
+        kAudioFormat60958AC3, 
+        0, 
+        AudioDeviceClassA52, 
+        "Digital A/52"
+    },
+
+    {
+        kAudioFormatLinearPCM, 
+        2, 
+        AudioDeviceClassPCM2, 
+        "Stereo PCM"
+    },
+
+    {
+        kAudioFormatLinearPCM, 
+        6, 
+        AudioDeviceClassPCM6, 
+        "6 Channel PCM"
+    }
+}; 
+
+#define N_AOUT_CLASSES (sizeof(aout_classes)/sizeof(aout_classes[0]))
+
+/*****************************************************************************
+ * aout_option_t
+ ****************************************************************************/
+struct aout_option_t
+{
+    char sz_option[64];
+    UInt32 i_dev, i_idx;
+    UInt32 i_sdx, i_cdx;
+    AudioStreamID i_sid;
+};
+
+/*****************************************************************************
+ * aout_dev_t
+ ****************************************************************************/
+struct aout_dev_t
+{
+    AudioDeviceID devid;
+    char *psz_device_name;
+    UInt32 i_streams;
+    AudioStreamBasicDescription ** pp_streams;
+};
 
 /*****************************************************************************
  * aout_sys_t: private audio output method descriptor
@@ -50,17 +121,34 @@
  *****************************************************************************/
 struct aout_sys_t
 {
-    AudioDeviceID       device;         // the audio device
+    UInt32                      i_devices;
+    struct aout_dev_t *         p_devices;
+    UInt32                      i_options;
+    struct aout_option_t *      p_options;   
 
+    AudioDeviceID               devid;
     AudioStreamBasicDescription stream_format;
 
-    UInt32              i_buffer_size;  // audio device buffer size
-    mtime_t             clock_diff;
+    UInt32                      i_buffer_size;
+    mtime_t                     clock_diff;
 };
 
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
+static int      InitHardware    ( aout_instance_t *p_aout );
+static int      InitDevice      ( UInt32 i_dev, aout_instance_t *p_aout ); 
+static void     FreeDevice      ( UInt32 i_dev, aout_instance_t *p_aout ); 
+static void     FreeHardware    ( aout_instance_t *p_aout );
+static int      GetDevice       ( aout_instance_t *p_aout, 
+                                  AudioDeviceID *p_devid );
+static int      GetStreamID     ( AudioDeviceID devid, UInt32 i_idx,
+                                  AudioStreamID * p_sid );
+static int      InitStream      ( UInt32 i_dev, aout_instance_t *p_aout,
+                                  UInt32 i_idx );
+static void     FreeStream      ( UInt32 i_dev, aout_instance_t *p_aout,
+                                  UInt32 i_idx );
+
 static void     Play            ( aout_instance_t *p_aout );
 
 static OSStatus IOCallback      ( AudioDeviceID inDevice,
@@ -74,212 +162,213 @@ static OSStatus IOCallback      ( AudioDeviceID inDevice,
 /*****************************************************************************
  * Open: open a CoreAudio HAL device
  *****************************************************************************/
-extern MacOSXAudioSystem *gTheMacOSXAudioSystem; // Remove this global, access audio system froma aout some other way
-
 int E_(OpenAudio)( vlc_object_t * p_this )
 {
     OSStatus err;
-    UInt32 i_param_size;
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    UInt32 i, i_param_size;
     struct aout_sys_t * p_sys;
-    
-    /* Allocate instance */
-    p_sys = p_aout->output.p_sys = malloc( sizeof( struct aout_sys_t ) );
-    memset( p_sys, 0, sizeof( struct aout_sys_t ) );
-    if( p_aout->output.p_sys == NULL )
+    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+
+    /* Allocate structure */
+    p_sys = (struct aout_sys_t *)malloc( sizeof( struct aout_sys_t ) );
+    if( p_sys == NULL )
     {
         msg_Err( p_aout, "out of memory" );
-        return( 1 );
+        return( VLC_ENOMEM );
     }
 
-    /* Get the default output device */
-    // We now ask the GUI for the selected device
-    p_sys->device=[gTheMacOSXAudioSystem getSelectedDeviceSetToRate:p_aout->output.output.i_rate];
-    if(p_sys->device==0)
+    memset( p_sys, 0, sizeof( struct aout_sys_t ) );
+    p_aout->output.p_sys = p_sys;
+
+    if( InitHardware( p_aout ) )
     {
-        msg_Err( p_aout, "couldn't get output device");
-        return( -1 );
+        msg_Err( p_aout, "InitHardware failed" );
+        free( (void *)p_sys );
+        return( VLC_EGENERIC );
+    } 
+
+    if( var_Type( p_aout, "audio-device" ) == 0 )
+    {
+        vlc_value_t val;
+
+        var_Create( p_aout, "audio-device", VLC_VAR_STRING | 
+                                            VLC_VAR_HASCHOICE );
+
+        for( i = 0; i < p_sys->i_options; i++ )
+        {
+            val.psz_string = p_sys->p_options[i].sz_option;
+            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+        }
+
+        val.b_bool = VLC_TRUE;
+        var_Set( p_aout, "intf-change", val );
     }
-    msg_Dbg(p_aout, "device returned: %ld", p_sys->device);
+
+    /* Get selected device */
+    if( GetDevice( p_aout, &p_sys->devid ) )
+    {
+        msg_Err( p_aout, "GetDevice failed" );
+        FreeHardware( p_aout );
+        free( (void *)p_sys );
+        return( VLC_EGENERIC );
+    } 
 
     p_aout->output.pf_play = Play;
     aout_VolumeSoftInit( p_aout );
 
-    /* Get a description of the data format used by the device */
-    i_param_size = sizeof(AudioStreamBasicDescription); 
-    err = AudioDeviceGetProperty(p_sys->device, 0, false, kAudioDevicePropertyStreamFormat,
-				 &i_param_size, &p_sys->stream_format );
+    /* Get a description of the stream format */
+    i_param_size = sizeof( AudioStreamBasicDescription ); 
+    err = AudioDeviceGetProperty( p_sys->devid, 0, false, 
+                                  kAudioDevicePropertyStreamFormat,
+                                  &i_param_size, &p_sys->stream_format );
     if( err != noErr )
     {
-        msg_Err( p_aout, "failed to get stream format: %4.4s", &err );
-        return -1 ;
+        msg_Err( p_aout, "failed to get stream format: [%4.4s]", 
+                 (char *)&err );
+        FreeHardware( p_aout );
+        free( (void *)p_sys );
+        return( VLC_EGENERIC );
     }
 
-    /* Now we know the sample rate of the device */
-    p_aout->output.output.i_rate = p_sys->stream_format.mSampleRate;
+    /* Set the output sample rate */
+    p_aout->output.output.i_rate = 
+        (unsigned int)p_sys->stream_format.mSampleRate;
 
-    msg_Dbg( p_aout, "mSampleRate %ld, mFormatID %4.4s, mFormatFlags %ld, mBytesPerPacket %ld, mFramesPerPacket %ld, mBytesPerFrame %ld, mChannelsPerFrame %ld, mBitsPerChannel %ld",
-           (UInt32)p_sys->stream_format.mSampleRate, &p_sys->stream_format.mFormatID,
-           p_sys->stream_format.mFormatFlags, p_sys->stream_format.mBytesPerPacket,
-           p_sys->stream_format.mFramesPerPacket, p_sys->stream_format.mBytesPerFrame,
-           p_sys->stream_format.mChannelsPerFrame, p_sys->stream_format.mBitsPerChannel );
+    msg_Dbg( p_aout, "format: [%ld][%4.4s][%ld][%ld][%ld][%ld][%ld][%ld]",
+             (UInt32)p_sys->stream_format.mSampleRate,
+             (char *)&p_sys->stream_format.mFormatID,
+             p_sys->stream_format.mFormatFlags,
+             p_sys->stream_format.mBytesPerPacket,
+             p_sys->stream_format.mFramesPerPacket,
+             p_sys->stream_format.mBytesPerFrame,
+             p_sys->stream_format.mChannelsPerFrame,
+             p_sys->stream_format.mBitsPerChannel );                  
 
-    msg_Dbg( p_aout, "vlc format %4.4s, mac output format '%4.4s'",
-             (char *)&p_aout->output.output.i_format, &p_sys->stream_format.mFormatID );
-    
-    /* Get the buffer size that the device uses for IO */
-    // If we do PCM, use the device's given buffer size
-    // If we do raw AC3, we could use the devices given size too
-    // If we do AC3 over SPDIF, force the size of one AC3 frame
-    // (I think we need to do that because of the packetizer)
+    /* Get the buffer size */
     i_param_size = sizeof( p_sys->i_buffer_size );
-    err = AudioDeviceGetProperty( p_sys->device, 0, false, 
+    err = AudioDeviceGetProperty( p_sys->devid, 0, false, 
                                   kAudioDevicePropertyBufferSize, 
                                   &i_param_size, &p_sys->i_buffer_size );
-    if(err) {
-	msg_Err(p_aout, "failed to get buffer size - err %4.4s, device %ld", &err, p_sys->device);
-	return -1;
-    }
-    else msg_Dbg( p_aout, "native buffer Size: %d", p_sys->i_buffer_size );
-    
-    if((p_sys->stream_format.mFormatID==kAudioFormat60958AC3
-       || p_sys->stream_format.mFormatID=='IAC3')
-       && p_sys->i_buffer_size != AOUT_SPDIF_SIZE)
-    {
-	p_sys->i_buffer_size = AOUT_SPDIF_SIZE;
-	i_param_size = sizeof( p_sys->i_buffer_size );
-	err = AudioDeviceSetProperty( p_sys->device, 0, 0, false,
-			       kAudioDevicePropertyBufferSize,
-			       i_param_size, &p_sys->i_buffer_size );
-	if( err != noErr )
-	{
-	    msg_Err( p_aout, "failed to set device buffer size: %4.4s", &err );
-	    return -1;
-	}
-	else msg_Dbg(p_aout, "bufferSize set to %d", p_sys->i_buffer_size);
-    };
-
-
-    // We now know the buffer size in bytes. Set the values for the vlc converters.
-    switch(p_sys->stream_format.mFormatID)
-    {
-	case 0:
-	case kAudioFormatLinearPCM:
-	    p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
-	    if ( p_sys->stream_format.mChannelsPerFrame < 6 )
-		p_aout->output.output.i_physical_channels
-		    = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-	    else
-		p_aout->output.output.i_physical_channels
-		    = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-		    | AOUT_CHAN_CENTER | AOUT_CHAN_REARRIGHT
-		    | AOUT_CHAN_REARLEFT | AOUT_CHAN_LFE;
-
-	    p_aout->output.i_nb_samples = p_sys->i_buffer_size / p_sys->stream_format.mBytesPerFrame;
-	    break;
-
-	case kAudioFormat60958AC3:
-	case 'IAC3':
-	    p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
-	    msg_Dbg(p_aout, "phychan %d, ochan %d, bytes/fr %d, frlen %d",
-	     p_aout->output.output.i_physical_channels,
-	     p_aout->output.output.i_original_channels,
-	     p_aout->output.output.i_bytes_per_frame,
-	     p_aout->output.output.i_frame_length);
-
-	    p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE; //p_sys->stream_format.mBytesPerFrame;
-	    p_aout->output.output.i_frame_length = A52_FRAME_NB; //p_sys->stream_format.mFramesPerPacket;
-	    p_aout->output.i_nb_samples = p_aout->output.output.i_frame_length;
-	    
-	    
-	     //Probably not needed after all
-	    
-	    // Some more settings to make the SPDIF device work... Other SPDIF Devices might need additional
-	    // values here. But don't change these, in order to not break existing devices. Either add values
-	    // which are not being set here, or check if the SetProperty was successful, and try another version
-	    // if not.
-//	    p_sys->stream_format.mBytesPerFrame=4;	// usually set to 0 for AC3 by the system
-//	    p_sys->stream_format.mFormatFlags|=kAudioFormatFlagIsBigEndian;
-//		+kAudioFormatFlagIsPacked
-//		+kAudioFormatFlagIsNonInterleaved;
-//	    p_sys->stream_format.mBytesPerPacket=6144;
-//	    p_sys->stream_format.mFramesPerPacket=1536;
-	    
-	    break;
-
-	default:
-	    msg_Err( p_aout, "Unknown hardware format '%4.4s'. Go ask Heiko.", &p_sys->stream_format.mFormatID );
-	    return -1;
-    }
-
-
-    // Now tell the device how many sample frames to expect in each buffer
-    i_param_size=sizeof(p_aout->output.i_nb_samples);
-#if 0
-    err = AudioDeviceGetProperty( p_sys->device, 0, false,
-                                  kAudioDevicePropertyBufferFrameSize,
-                                  &i_param_size, &p_aout->output.i_nb_samples);
-    if(err) {
-	msg_Err(p_aout, "failed to get BufferFrameSize - err %4.4s, device %ld", &err, p_sys->device);
-	return -1;
-    }
-    else msg_Dbg( p_aout, "native BufferFrameSize: %d", p_aout->output.i_nb_samples);
-#else
-    err = AudioDeviceSetProperty( p_sys->device, 0, 0, false,
-                                  kAudioDevicePropertyBufferFrameSize,
-                                  i_param_size, &p_aout->output.i_nb_samples);
     if( err != noErr )
     {
-        msg_Err( p_aout, "failed to set BufferFrameSize: %4.4s", &err );
-        return -1;
+        msg_Err( p_aout, "failed to get buffer size: [%4.4s]", 
+                 (char *)&err );
+        FreeHardware( p_aout );
+        free( (void *)p_sys );
+        return( VLC_EGENERIC );
     }
-    else msg_Dbg(p_aout, "bufferFrameSize set to %d", p_aout->output.i_nb_samples);
-#endif
 
-/*    
-    // And set the device format, since we might have changed some of it above
-    i_param_size = sizeof(AudioStreamBasicDescription);
-    err = AudioDeviceSetProperty(p_sys->device, 0, 0, false, kAudioDevicePropertyStreamFormat,
-				 i_param_size, &p_sys->stream_format );
+    msg_Dbg( p_aout, "device buffer size: [%ld]", p_sys->i_buffer_size );
+
+    /* If we do AC3 over SPDIF, set buffer size to one AC3 frame */
+    if( ( p_sys->stream_format.mFormatID == kAudioFormat60958AC3 ||
+          p_sys->stream_format.mFormatID == 'IAC3' ) &&
+        p_sys->i_buffer_size != AOUT_SPDIF_SIZE )
+    {
+        p_sys->i_buffer_size = AOUT_SPDIF_SIZE;
+        i_param_size = sizeof( p_sys->i_buffer_size );
+        err = AudioDeviceSetProperty( p_sys->devid, 0, 0, false,
+                                      kAudioDevicePropertyBufferSize,
+                                      i_param_size, &p_sys->i_buffer_size );
+        if( err != noErr )
+        {
+            msg_Err( p_aout, "failed to set buffer size: [%4.4s]", 
+                     (char *)&err );
+            FreeHardware( p_aout );
+            free( (void *)p_sys );
+            return( VLC_EGENERIC );
+        }
+
+        msg_Dbg( p_aout, "device buffer size set to: [%ld]", 
+                 p_sys->i_buffer_size );
+    }
+
+    switch( p_sys->stream_format.mFormatID )
+    {
+    case kAudioFormatLinearPCM:
+        p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
+
+        if( p_sys->stream_format.mChannelsPerFrame < 6 )
+        {
+            p_aout->output.output.i_physical_channels =
+                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+        }
+        else
+        {
+            p_aout->output.output.i_physical_channels =
+                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                AOUT_CHAN_CENTER | AOUT_CHAN_REARRIGHT |
+                AOUT_CHAN_REARLEFT | AOUT_CHAN_LFE;
+        }
+
+        p_aout->output.i_nb_samples = (int)( p_sys->i_buffer_size /
+                                      p_sys->stream_format.mBytesPerFrame );
+        break;
+
+    case 'IAC3':
+    case kAudioFormat60958AC3:
+        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
+        p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
+        p_aout->output.output.i_frame_length = A52_FRAME_NB;
+        p_aout->output.i_nb_samples = p_aout->output.output.i_frame_length;
+        break;
+
+    default:
+        msg_Err( p_aout, "unknown hardware format: [%4.4s]", 
+                 (char *)&p_sys->stream_format.mFormatID );
+        FreeHardware( p_aout );
+        free( (void *)p_sys );
+        return( VLC_EGENERIC );
+    }
+
+    /* Set buffer frame size */
+    i_param_size = sizeof( p_aout->output.i_nb_samples );
+    err = AudioDeviceSetProperty( p_sys->devid, 0, 0, false,
+                                  kAudioDevicePropertyBufferFrameSize,
+                                  i_param_size,
+                                  &p_aout->output.i_nb_samples );
     if( err != noErr )
     {
-        msg_Err( p_aout, "failed to set stream format: %4.4s", &err );
-        return -1 ;
+        msg_Err( p_aout, "failed to set buffer frame size: [%4.4s]", 
+                 (char *)&err );
+        FreeHardware( p_aout );
+        free( (void *)p_sys );
+        return( VLC_EGENERIC );
     }
-    else
-	msg_Dbg( p_aout, "set: mSampleRate %ld, mFormatID %4.4s, mFormatFlags %ld, mBytesPerPacket %ld, mFramesPerPacket %ld, mBytesPerFrame %ld, mChannelsPerFrame %ld, mBitsPerChannel %ld",
-	  (UInt32)p_sys->stream_format.mSampleRate, &p_sys->stream_format.mFormatID,
-	  p_sys->stream_format.mFormatFlags, p_sys->stream_format.mBytesPerPacket,
-	  p_sys->stream_format.mFramesPerPacket, p_sys->stream_format.mBytesPerFrame,
-	  p_sys->stream_format.mChannelsPerFrame, p_sys->stream_format.mBitsPerChannel );
-  */  
-    
-    
+
+    msg_Dbg( p_aout, "device buffer frame size set to: [%d]",
+             p_aout->output.i_nb_samples );
+
     /* Add callback */
-    err = AudioDeviceAddIOProc( p_sys->device,
+    err = AudioDeviceAddIOProc( p_sys->devid,
                                 (AudioDeviceIOProc)IOCallback,
                                 (void *)p_aout );
     if( err != noErr )
     {
-        msg_Err( p_aout, "AudioDeviceAddIOProc failed: %4.4s", &err );
-	return -1;
+        msg_Err( p_aout, "AudioDeviceAddIOProc failed: [%4.4s]",
+                 (char *)&err );
+        FreeHardware( p_aout );
+        free( (void *)p_sys );
+        return( VLC_EGENERIC );
     }
-    
-    /* Open the output with callback IOCallback */
-    err = AudioDeviceStart( p_sys->device,
-                            (AudioDeviceIOProc)IOCallback );
+ 
+    /* Start device */
+    err = AudioDeviceStart( p_sys->devid, (AudioDeviceIOProc)IOCallback ); 
     if( err != noErr )
     {
-        msg_Err( p_aout, "AudioDeviceStart failed: %d", err );
-        return -1;
+        msg_Err( p_aout, "AudioDeviceStart failed: [%4.4s]",
+                 (char *)&err );
+        FreeHardware( p_aout );
+        free( (void *)p_sys );
+        return( VLC_EGENERIC );
     }
 
     /* Let's pray for the following operation to be atomic... */
-    p_sys->clock_diff = - (mtime_t)AudioConvertHostTimeToNanos(
-                                 AudioGetCurrentHostTime()) / 1000;
+    p_sys->clock_diff = - (mtime_t)
+        AudioConvertHostTimeToNanos( AudioGetCurrentHostTime() ) / 1000; 
     p_sys->clock_diff += mdate();
 
-    return 0;
+    return( VLC_SUCCESS );
 }
 
 /*****************************************************************************
@@ -287,23 +376,33 @@ int E_(OpenAudio)( vlc_object_t * p_this )
  *****************************************************************************/
 void E_(CloseAudio)( aout_instance_t * p_aout )
 {
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
     OSStatus err; 
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
-    /* Stop playing sound through the device */
-    err = AudioDeviceStop( p_sys->device,
-                           (AudioDeviceIOProc)IOCallback ); 
+    /* Stop device */
+    err = AudioDeviceStop( p_sys->devid, (AudioDeviceIOProc)IOCallback ); 
     if( err != noErr )
     {
-        msg_Err( p_aout, "AudioDeviceStop failed: %4.4s", &err );
+        msg_Err( p_aout, "AudioDeviceStop failed: [%4.4s]", (char *)&err );
     }
 
-    err = AudioDeviceRemoveIOProc( p_sys->device,
-                                (AudioDeviceIOProc)IOCallback );
+    /* Remove callback */
+    err = AudioDeviceRemoveIOProc( p_sys->devid,
+                                   (AudioDeviceIOProc)IOCallback );
     if( err != noErr )
     {
-        msg_Err( p_aout, "AudioDeviceRemoveIOProc failed: %4.4s", &err );
+        msg_Err( p_aout, "AudioDeviceRemoveIOProc failed: [%4.4s]",
+                 (char *)&err );
     }
+
+    err = AudioHardwareUnload();
+    if( err != noErr )
+    {
+        msg_Err( p_aout, "AudioHardwareUnload failed: [%4.4s]", 
+                 (char *)&err );
+    }
+
+    FreeHardware( p_aout );
 
     free( p_sys );
 }
@@ -315,9 +414,8 @@ static void Play( aout_instance_t * p_aout )
 {
 }
 
-#include <syslog.h>
 /*****************************************************************************
- * IOCallback : callback for audio output
+ * IOCallback: callback for audio output
  *****************************************************************************/
 static OSStatus IOCallback( AudioDeviceID inDevice,
                             const AudioTimeStamp *inNow, 
@@ -327,36 +425,499 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
                             const AudioTimeStamp *inOutputTime, 
                             void *threadGlobals )
 {
+    aout_buffer_t * p_buffer;
+    AudioTimeStamp  host_time;
+    mtime_t         current_date;
+
     aout_instance_t * p_aout = (aout_instance_t *)threadGlobals;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
-    mtime_t         current_date;
-    AudioTimeStamp  host_time;
-    aout_buffer_t * p_buffer;
-    
+
     host_time.mFlags = kAudioTimeStampHostTimeValid;
     AudioDeviceTranslateTime( inDevice, inOutputTime, &host_time );
-    current_date = p_sys->clock_diff
-                 + AudioConvertHostTimeToNanos(host_time.mHostTime) / 1000;
+    current_date = p_sys->clock_diff +
+                   AudioConvertHostTimeToNanos( host_time.mHostTime ) / 1000;
 
-    p_buffer = aout_OutputNextBuffer( p_aout, current_date, (p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i')) );
+#define B_SPDI (p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i'))
+    p_buffer = aout_OutputNextBuffer( p_aout, current_date, B_SPDI );
+#undef B_SPDI
 
-    /* move data into output data buffer */
-    if ( p_buffer != NULL )
+    if( p_buffer != NULL )
     {
-	BlockMoveData( p_buffer->p_buffer,
+        /* move data into output data buffer */
+        BlockMoveData( p_buffer->p_buffer, 
                        outOutputData->mBuffers[ 0 ].mData, 
                        p_sys->i_buffer_size );
-//	syslog(LOG_INFO, "convert: %08lX %08lX %08lX", ((long*)p_buffer->p_buffer)[0], ((long*)p_buffer->p_buffer)[1], ((long*)p_buffer->p_buffer)[2]);
-	aout_BufferFree( p_buffer );
+
+        aout_BufferFree( p_buffer );
     }
     else
     {
-        memset(outOutputData->mBuffers[ 0 ].mData, 0, p_sys->i_buffer_size);
+        memset( outOutputData->mBuffers[ 0 ].mData, 
+                0, p_sys->i_buffer_size );
     }
 
-
-//    outOutputData->mBuffers[0].mDataByteSize=p_sys->i_buffer_size;
-    
-    return noErr;     
+    return( noErr );     
 }
 
+/*****************************************************************************
+ * InitHardware 
+ *****************************************************************************/
+static int InitHardware( aout_instance_t * p_aout )
+{
+    OSStatus err;
+    UInt32 i, i_param_size;
+    AudioDeviceID * p_devices;
+
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+
+    /* Get number of devices */
+    err = AudioHardwareGetPropertyInfo( kAudioHardwarePropertyDevices,
+                                        &i_param_size, NULL );
+    if( err != noErr )
+    {
+        msg_Err( p_aout, "AudioHardwareGetPropertyInfo failed: [%4.4s]",
+                 (char *)&err );
+        return( VLC_EGENERIC );
+    }
+
+    p_sys->i_devices = i_param_size / sizeof( AudioDeviceID );
+
+    if( p_sys->i_devices < 1 )
+    {
+        msg_Err( p_aout, "no devices found" );
+        return( VLC_EGENERIC );
+    }
+
+    msg_Dbg( p_aout, "system has [%ld] device(s)", p_sys->i_devices );
+
+    /* Allocate DeviceID array */
+    p_devices = (AudioDeviceID *)malloc( i_param_size );
+    if( p_devices == NULL )
+    {
+        msg_Err( p_aout, "out of memory" );
+        return( VLC_ENOMEM );
+    }
+
+    /* Populate DeviceID array */
+    err = AudioHardwareGetProperty( kAudioHardwarePropertyDevices,
+                                    &i_param_size, (void *)p_devices );
+    if( err != noErr )
+    {
+        msg_Err( p_aout, "AudioHardwareGetProperty failed: [%4.4s]",
+                 (char *)&err );
+        free( (void *)p_devices );
+        return( VLC_EGENERIC );
+    }
+
+    p_sys->p_devices = (struct aout_dev_t *)
+        malloc( sizeof( struct aout_dev_t ) * p_sys->i_devices ); 
+    if( p_sys->p_devices == NULL )
+    {
+        msg_Err( p_aout, "out of memory" );
+        free( (void *)p_devices );
+        return( VLC_ENOMEM );
+    }    
+
+    for( i = 0; i < p_sys->i_devices; i++ )
+    {
+        p_sys->p_devices[i].devid = p_devices[i];
+
+        if( InitDevice( i, p_aout ) )
+        {
+            UInt32 j;
+
+            msg_Err( p_aout, "InitDevice(%ld) failed", i );
+
+            for( j = 0; j < i; j++ )
+            {
+                FreeDevice( j, p_aout );
+            }
+    
+            free( (void *)p_sys->p_devices );
+            free( (void *)p_devices );
+
+            return( VLC_EGENERIC );
+        }
+    }
+
+    free( (void *)p_devices );
+
+    return( VLC_SUCCESS );
+}
+
+/*****************************************************************************
+ * InitDevice
+ *****************************************************************************/
+static int InitDevice( UInt32 i_dev, aout_instance_t * p_aout ) 
+{
+    OSStatus err;
+    UInt32 i, i_param_size;
+    AudioBufferList *p_buffer_list;
+
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    struct aout_dev_t * p_dev = &p_sys->p_devices[i_dev];
+
+    /* Get length of device name */
+    err = AudioDeviceGetPropertyInfo( p_dev->devid, 0, FALSE, 
+                                      kAudioDevicePropertyDeviceName,
+                                      &i_param_size, NULL ); 
+    if( err != noErr )
+    {
+        msg_Err( p_aout, "AudioDeviceGetPropertyInfo failed: [%4.4s]",
+                 (char *)&err ); 
+        return( VLC_EGENERIC );
+    }
+
+    /* Allocate memory for device name */
+    p_dev->psz_device_name = (char *)malloc( i_param_size );
+    if( p_dev->psz_device_name == NULL )
+    {
+        msg_Err( p_aout, "out of memory" );
+        return( VLC_ENOMEM );
+    }
+
+    /* Get device name */
+    err = AudioDeviceGetProperty( p_dev->devid, 0, FALSE,
+                                  kAudioDevicePropertyDeviceName,
+                                  &i_param_size, p_dev->psz_device_name ); 
+    if( err != noErr )
+    {
+        msg_Err( p_aout, "AudioDeviceGetProperty failed: [%4.4s]",
+                 (char *)&err );
+        free( (void *)p_dev->psz_device_name );
+        return( VLC_EGENERIC );
+    }
+
+    msg_Dbg( p_aout, "device [%ld] has name [%s]",
+             i_dev, p_dev->psz_device_name );
+
+    err = AudioDeviceGetPropertyInfo( p_dev->devid, 0, FALSE,
+                                      kAudioDevicePropertyStreamConfiguration,
+                                      &i_param_size, NULL );
+    if( err != noErr )
+    {
+        msg_Err( p_aout, "AudioDeviceGetPropertyInfo failed: [%4.4s]",
+                 (char *)&err );
+        free( (void *)p_dev->psz_device_name );
+        return( VLC_EGENERIC );
+    }
+
+    p_buffer_list = (AudioBufferList *)malloc( i_param_size );
+    if( p_buffer_list == NULL )
+    {
+        msg_Err( p_aout, "out of memory" );
+        free( (void *)p_dev->psz_device_name );
+        return( VLC_ENOMEM );
+    }
+
+    err = AudioDeviceGetProperty( p_dev->devid, 0, FALSE,
+                                  kAudioDevicePropertyStreamConfiguration,
+                                  &i_param_size, p_buffer_list );
+    if( err != noErr )
+    {
+        msg_Err( p_aout, "AudioDeviceGetProperty failed: [%4.4s]",
+                 (char *)&err );
+        free( (void *)p_dev->psz_device_name );
+        free( (void *)p_buffer_list );
+        return( VLC_EGENERIC );
+    }
+
+    p_dev->i_streams = p_buffer_list->mNumberBuffers;
+    free( (void *)p_buffer_list );
+
+    msg_Dbg( p_aout, "device [%ld] has [%ld] streams", 
+             i_dev, p_dev->i_streams ); 
+
+    p_dev->pp_streams = (AudioStreamBasicDescription **) 
+                        malloc( p_dev->i_streams * 
+                                sizeof( *p_dev->pp_streams ) );
+    if( p_dev->pp_streams == NULL )
+    {
+        msg_Err( p_aout, "out of memory" );
+        free( (void *)p_dev->psz_device_name );
+        return( VLC_ENOMEM );
+    } 
+
+    for( i = 0; i < p_dev->i_streams; i++ )
+    {
+        if( InitStream( i_dev, p_aout, i ) )
+        {
+            UInt32 j;
+
+            msg_Err( p_aout, "InitStream(%ld, %ld) failed", i_dev, i );
+
+            for( j = 0; j < i; j++ )
+            {
+                FreeStream( i_dev, p_aout, j );
+            }
+
+            free( (void *)p_dev->psz_device_name );
+            free( (void *)p_dev->pp_streams );
+
+            return( VLC_EGENERIC );
+        }
+    }
+
+    return( VLC_SUCCESS );
+}
+
+/*****************************************************************************
+ * FreeDevice 
+ *****************************************************************************/
+static void FreeDevice( UInt32 i_dev, aout_instance_t * p_aout )
+{
+    UInt32 i;
+
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    struct aout_dev_t * p_dev = &p_sys->p_devices[i_dev];
+
+    for( i = 0; i < p_dev->i_streams; i++ )
+    {
+        FreeStream( i_dev, p_aout, i );
+    }
+
+    free( (void *)p_dev->pp_streams );
+    free( (void *)p_dev->psz_device_name );
+}
+
+/*****************************************************************************
+ * FreeHardware 
+ *****************************************************************************/
+static void FreeHardware( aout_instance_t * p_aout )
+{
+    UInt32 i;
+
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+
+    for( i = 0; i < p_sys->i_devices; i++ )
+    {
+        FreeDevice( i, p_aout );
+    }
+
+    free( (void *)p_sys->p_options );
+    free( (void *)p_sys->p_devices );
+}
+
+/*****************************************************************************
+ * GetStreamID 
+ *****************************************************************************/
+static int GetStreamID( AudioDeviceID devid, UInt32 i_idx,
+                        AudioStreamID * p_sid )
+{
+    OSStatus err;
+    UInt32 i_param_size;
+    AudioStreamID * p_stream_list;
+
+    err = AudioDeviceGetPropertyInfo( devid, 0, FALSE,
+                                      kAudioDevicePropertyStreams,
+                                      &i_param_size, NULL );
+    if( err != noErr )
+    {
+        return( VLC_EGENERIC );
+    }
+
+    p_stream_list = (AudioStreamID *)malloc( i_param_size );
+    if( p_stream_list == NULL )
+    {
+        return( VLC_ENOMEM );
+    }
+
+    err = AudioDeviceGetProperty( devid, 0, FALSE,
+                                  kAudioDevicePropertyStreams,
+                                  &i_param_size, p_stream_list );
+    if( err != noErr )
+    {
+        free( (void *)p_stream_list );
+        return( VLC_EGENERIC );
+    }
+
+    *p_sid = p_stream_list[i_idx - 1];
+
+    free( (void *)p_stream_list );
+
+    return( VLC_SUCCESS );
+}
+
+/*****************************************************************************
+ * InitStream
+ *****************************************************************************/
+static int InitStream( UInt32 i_dev, aout_instance_t *p_aout,
+                       UInt32 i_idx )
+{
+    OSStatus err;
+    AudioStreamID i_sid;
+    UInt32 i, i_streams;
+    UInt32 j, i_param_size;
+
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    struct aout_dev_t * p_dev = &p_sys->p_devices[i_dev];
+
+    if( GetStreamID( p_dev->devid, i_idx + 1, &i_sid ) )
+    {
+        msg_Err( p_aout, "GetStreamID(%ld, %ld) failed", i_dev, i_idx );
+        return( VLC_EGENERIC );
+    }
+
+    err = AudioStreamGetPropertyInfo( i_sid, 0,
+                                      kAudioStreamPropertyPhysicalFormats,
+                                      &i_param_size, NULL );
+    if( err != noErr )
+    {
+        msg_Err( p_aout, "AudioStreamGetPropertyInfo failed: [%4.4s]",
+                 (char *)&err );
+        return( VLC_EGENERIC );
+    }
+
+    i_streams = i_param_size / sizeof( AudioStreamBasicDescription );
+
+#define P_STREAMS p_dev->pp_streams[i_idx]
+
+    P_STREAMS = (AudioStreamBasicDescription *)malloc( i_param_size );
+    if( P_STREAMS == NULL )
+    {
+        msg_Err( p_aout, "out of memory" );
+        return( VLC_ENOMEM );
+    }
+
+    err = AudioStreamGetProperty( i_sid, 0,
+                                  kAudioStreamPropertyPhysicalFormats,
+                                  &i_param_size, P_STREAMS );
+    if( err != noErr )
+    {
+        msg_Err( p_aout, "AudioStreamGetProperty failed: [%4.4s]",
+                 (char *)&err );
+        free( (void *)P_STREAMS );
+        return( VLC_EGENERIC );
+    }
+
+    for( j = 0; j < N_AOUT_CLASSES; j++ )
+    {
+        vlc_bool_t b_found = 0;
+        UInt32 i_channels = 0xFFFFFFFF;
+        UInt32 i_sdx = 0;
+
+        for( i = 0; i < i_streams; i++ )
+        {
+            if( ( P_STREAMS[i].mFormatID != aout_classes[j].mFormatID ) ||
+                ( P_STREAMS[i].mChannelsPerFrame < 
+                  aout_classes[j].mChannelsPerFrame ) )
+            {
+                continue;
+            }
+
+            if( P_STREAMS[i].mChannelsPerFrame < i_channels )
+            {
+                i_channels = P_STREAMS[i].mChannelsPerFrame;
+                i_sdx = i;
+                b_found = 1;
+            }
+        }
+
+        if( b_found )
+        {
+            p_sys->p_options = (struct aout_option_t *)
+                               realloc( p_sys->p_options, 
+                                        ( p_sys->i_options + 1 ) *
+                                        sizeof( struct aout_option_t ) ); 
+            if( p_sys->p_options == NULL )
+            {
+                msg_Err( p_aout, "out of memory" );
+                free( (void *)P_STREAMS );
+                return( VLC_ENOMEM );
+            }
+
+#define AOUT_OPTION p_sys->p_options[p_sys->i_options]
+
+            snprintf( AOUT_OPTION.sz_option,
+                      sizeof( AOUT_OPTION.sz_option ) / 
+                      sizeof( AOUT_OPTION.sz_option[0] ) - 1,
+                      "%ld: %s (%s)", 
+                      p_sys->i_options,
+                      p_dev->psz_device_name, 
+                      aout_classes[j].psz_class );
+
+            AOUT_OPTION.i_sid = i_sid;
+            AOUT_OPTION.i_dev = i_dev; 
+            AOUT_OPTION.i_idx = i_idx;
+            AOUT_OPTION.i_sdx = i_sdx;
+            AOUT_OPTION.i_cdx = j;
+
+#undef AOUT_OPTION
+
+            p_sys->i_options++;
+        } 
+    }
+
+#undef P_STREAMS
+
+    return( VLC_SUCCESS );
+}
+
+/*****************************************************************************
+ * FreeStream 
+ *****************************************************************************/
+static void FreeStream( UInt32 i_dev, aout_instance_t *p_aout,
+                        UInt32 i_idx )
+{
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    struct aout_dev_t * p_dev = &p_sys->p_devices[i_dev];
+
+    free( (void *)p_dev->pp_streams[i_idx] );
+}
+
+/*****************************************************************************
+ * GetDevice 
+ *****************************************************************************/
+static int GetDevice( aout_instance_t *p_aout, AudioDeviceID *p_devid ) 
+{
+    OSStatus err;
+    char *psz_tmp;
+    vlc_value_t val;
+    UInt32 i_option;
+
+    struct aout_dev_t * p_dev;
+    struct aout_option_t * p_option;
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+
+    if( var_Get( p_aout, "audio-device", &val ) < 0 )
+    {
+        msg_Err( p_aout, "audio-device var does not exist" );
+        return( VLC_ENOVAR );
+    }
+
+    psz_tmp = strchr( val.psz_string, ':' );
+    if( psz_tmp == NULL )
+    {
+        msg_Err( p_aout, "audio-device value missing seperator" );
+        free( (void *)val.psz_string );
+        return( VLC_EGENERIC );
+    }
+
+    *psz_tmp = '\0';
+    i_option = atol( val.psz_string );
+    free( (void *)val.psz_string );
+
+    p_option = &p_sys->p_options[i_option];
+    p_dev = &p_sys->p_devices[p_option->i_dev];
+
+#define P_STREAMS p_dev->pp_streams[p_option->i_idx]
+
+    err = AudioStreamSetProperty( p_option->i_sid, 0, 0,
+                                  kAudioStreamPropertyPhysicalFormat,
+                                  sizeof( P_STREAMS[p_option->i_sdx] ),
+                                  &P_STREAMS[p_option->i_sdx] ); 
+    if( err != noErr )
+    {
+        msg_Err( p_aout, "AudioStreamSetProperty failed: [%4.4s]",
+                 (char *)&err );
+        return( VLC_EGENERIC );
+    }
+
+#undef P_STREAMS
+
+    msg_Dbg( p_aout, "getting device [%ld]", p_option->i_dev );
+
+    *p_devid = p_dev->devid;
+
+    return( VLC_SUCCESS );
+} 

@@ -2,7 +2,7 @@
  * darwin_specific.m: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.m,v 1.2 2002/12/31 01:54:36 massiot Exp $
+ * $Id: darwin_specific.m,v 1.3 2003/01/01 11:14:50 jlj Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -118,26 +118,31 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
     /* Check if $LANG is set. */
     if ( (p_char = getenv("LANG")) == NULL )
     {
+        vlc_bool_t b_found = 0;
         NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-        /* Retrieve user's preferences. */
-        NSUserDefaults * p_defs =
-            [[NSUserDefaults standardUserDefaults] autorelease];
-        NSArray * p_languages =
-            [[p_defs objectForKey:@"AppleLanguages"] autorelease];
-        NSEnumerator * p_enumerator =
-            [[p_languages objectEnumerator] autorelease];
-        NSString * p_lang;
 
-        while ( (p_lang = [[p_enumerator nextObject] autorelease]) )
+        /* Retrieve user's preferences. */
+        NSUserDefaults * o_defs = [NSUserDefaults standardUserDefaults]; 
+        NSArray * o_languages = [o_defs objectForKey:@"AppleLanguages"]; 
+        NSEnumerator * o_enumerator = [o_languages objectEnumerator]; 
+        NSString * o_lang;
+
+        while ( (o_lang = [o_enumerator nextObject]) )
         {
-            const char * psz_string = [p_lang lossyCString];
-            if ( FindLanguage( psz_string ) )
-            {
-                break;
+            if( !b_found )
+            { 
+                const char * psz_string = [o_lang lossyCString];
+                if ( FindLanguage( psz_string ) )
+                {
+                    b_found = 1;
+                }
             }
+
+            [o_lang release];
         }
-        /* FIXME : why does it segfault ??? */
-        //[o_pool release];
+
+        [o_languages release];
+        [o_pool release];
     }
 }
 

@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.13 2002/12/29 01:16:28 massiot Exp $
+ * $Id: intf.m,v 1.14 2003/01/01 11:14:50 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -35,7 +35,6 @@
 #include "vout.h"
 #include "prefs.h"
 #include "playlist.h"
-#include "asystm.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -258,11 +257,6 @@ static void Run( intf_thread_t *p_intf )
     [[NSRunLoop currentRunLoop] 
         addPort: p_intf->p_sys->o_sendport
         forMode: NSDefaultRunLoopMode];
-
-    // Since we need the sound menu now, it's a good time to create the sound system class
-    asystm=[[MacOSXAudioSystem alloc] initWithGUI:self];
-    [asystm retain];
-    
 }
 
 - (void)noopAction:(id)sender {
@@ -493,8 +487,6 @@ static void Run( intf_thread_t *p_intf )
                 context: [NSGraphicsContext currentContext] eventNumber: 1
                 clickCount: 1 pressure: 0.0];
     [NSApp postEvent: pEvent atStart: YES];
-
-    [asystm release];
 }
 
 - (void)manageMode
