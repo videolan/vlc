@@ -9,9 +9,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "vlc.h"
-
-/*
 #include <errno.h>
 #include <pthread.h>
 #include <errno.h>
@@ -37,10 +34,9 @@
 #include "audio_output.h"
 #include "video.h"
 #include "video_output.h"
-#include "xconsole.h"
 #include "interface.h"
 
-#include "pgm_data.h"*/
+#include "main.h"
 
 /*
  * Precalculated 32-bits CRC table, shared by all instances of the PSI decoder

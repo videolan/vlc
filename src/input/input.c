@@ -9,9 +9,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "vlc.h"
-
-/*
 #include <errno.h>
 #include <sys/uio.h>
 #include <string.h>
@@ -42,8 +39,18 @@
 
 #include "video.h"
 #include "video_output.h"
+#include "vdec_idct.h"
+#include "vdec_motion.h"
 #include "video_decoder.h"
-*/
+#include "vpar_blocks.h"
+#include "vpar_headers.h"
+#include "vpar_synchro.h"
+#include "video_parser.h"
+
+#include "ac3_decoder.h"
+#include "spu_decoder.h"
+
+#include "main.h"
 
 /*****************************************************************************
  * Local prototypes

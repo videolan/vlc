@@ -205,7 +205,6 @@ interface_obj =  		interface/main.o \
 						interface/intf_msg.o \
 						interface/intf_cmd.o \
 						interface/intf_ctrl.o \
-						interface/control.o \
 						interface/intf_console.o \
 						$(video:%=interface/intf_%.o)
 

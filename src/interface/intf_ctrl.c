@@ -24,8 +24,26 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "vlc.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/uio.h>
+
+/* Common headers */
+#include "config.h"
+#include "common.h"
+#include "mtime.h"
+#include "vlc_thread.h"
+#include "debug.h"
+#include "intf_msg.h"
+
+#include "input.h"
+#include "audio_output.h"
+#include "intf_cmd.h"
+#include "interface.h"
+#include "main.h"
 
 /*
  * Local prototypes

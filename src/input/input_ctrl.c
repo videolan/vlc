@@ -10,9 +10,6 @@
  * Preamble
  *****************************************************************************/
 
-#include "vlc.h"
-
-#if 0
 #include <errno.h>
 #include <sys/uio.h>                                                /* iovec */
 #include <stdlib.h>                              /* atoi(), malloc(), free() */
@@ -35,14 +32,20 @@
 #include "decoder_fifo.h"
 
 #include "audio_output.h"
-#include "audio_dsp.h"
 #include "audio_decoder.h"
+#include "ac3_decoder.h"
 
 #include "video.h"
 #include "video_output.h"
-#include "video_decoder.h"
+#include "vdec_idct.h"
+//#include "video_decoder.h"
+#include "vdec_motion.h"
+#include "vpar_blocks.h"
+#include "vpar_headers.h"
+#include "vpar_synchro.h"
+#include "video_parser.h"
 
-#endif
+#include "spu_decoder.h"
 
 /*****************************************************************************
  * input_AddPgrmElem: Start the extraction and the decoding of a program element
