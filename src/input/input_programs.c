@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.122 2003/11/24 00:39:02 fenrir Exp $
+ * $Id: input_programs.c,v 1.123 2003/11/24 03:27:28 rocky Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -472,7 +472,7 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
         switch( p_new_prg->pp_es[i_es_index]->i_cat )
         {
             case VIDEO_ES:
-                msg_Dbg( p_input, "selecting ES %x",
+                msg_Dbg( p_input, "selecting video ES %x",
                          p_new_prg->pp_es[i_es_index]->i_id );
                 input_SelectES( p_input, p_new_prg->pp_es[i_es_index] );
                 break;
@@ -480,7 +480,7 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
                 i_audio_es += 1;
                 if( i_audio_es <= i_required_audio_es )
                 {
-                    msg_Dbg( p_input, "selecting ES %x",
+                    msg_Dbg( p_input, "selecting audio ES %x",
                              p_new_prg->pp_es[i_es_index]->i_id );
                     input_SelectES( p_input, p_new_prg->pp_es[i_es_index]);
                 }
@@ -490,7 +490,7 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
                 i_spu_es += 1;
                 if( i_spu_es <= i_required_spu_es )
                 {
-                    msg_Dbg( p_input, "selecting ES %x",
+                    msg_Dbg( p_input, "selecting spu ES %x",
                              p_new_prg->pp_es[i_es_index]->i_id );
                     input_SelectES( p_input, p_new_prg->pp_es[i_es_index] );
                 }
