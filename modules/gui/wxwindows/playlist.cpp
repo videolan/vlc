@@ -355,8 +355,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     updown_sizer->Add( down_button, 0, wxALIGN_LEFT|wxLEFT, 3);
     updown_sizer->Layout();
 
-    wxBoxSizer *checkbox_sizer = new wxBoxSizer( wxHORIZONTAL );
 #if 0
+    wxBoxSizer *checkbox_sizer = new wxBoxSizer( wxHORIZONTAL );
     //checkbox_sizer->Add( random_checkbox, 0,
       //                   wxEXPAND | wxALIGN_RIGHT | wxALL, 5);
     //checkbox_sizer->Add( loop_checkbox, 0,

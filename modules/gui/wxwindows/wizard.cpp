@@ -34,9 +34,9 @@
 
 #include "wxwindows.h"
 
-#include <wx/statline.h>
+#include "streamdata.h"
 
-#include "stream.h"
+#include <wx/statline.h>
 
 class wizHelloPage;
 class wizInputPage;
@@ -72,16 +72,6 @@ enum
 #define TEXTWIDTH 55
 #define ACTION_STREAM 0
 #define ACTION_TRANSCODE 1
-
-#define MUX_PS          0
-#define MUX_TS          1
-#define MUX_MPEG        2
-#define MUX_OGG         3
-#define MUX_RAW         4
-#define MUX_ASF         5
-#define MUX_AVI         6
-#define MUX_MP4         7
-#define MUX_MOV         8
 
 BEGIN_EVENT_TABLE(WizardDialog, wxWizard)
 END_EVENT_TABLE()
@@ -167,122 +157,6 @@ END_EVENT_TABLE()
 #define EXTRASTREAMING_TEXT _("In this page, you will define a few " \
                               "additionnal parameters for your stream" )
 
-
-/*****************************************************************************
- * Helper structures
- *****************************************************************************/
-struct codec {
-    char *psz_display;
-    char *psz_codec;
-    char *psz_descr;
-    int muxers[9];
-};
-
-struct codec vcodecs_array[] =
-{
-    { "MPEG-1 Video" , "mp1v" , "MPEG-1 Video codec",
-       {MUX_PS, MUX_TS, MUX_MPEG, MUX_OGG, MUX_AVI, MUX_RAW, -1,-1,-1 } },
-    { "MPEG-2 Video" , "mp2v" , "MPEG-2 Video codec",
-       {MUX_PS, MUX_TS, MUX_MPEG, MUX_OGG, MUX_AVI, MUX_RAW, -1,-1,-1 } },
-    { "MPEG-4 Video" , "mp4v" , "MPEG-4 Video codec",
-       {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_MP4,MUX_OGG,MUX_AVI,MUX_RAW, -1} },
-    { "DIVX 1" ,"DIV1","Divx first version" ,
-       {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , MUX_AVI , -1,-1,-1,-1 } },
-    { "DIVX 2" ,"DIV2","Divx second version" ,
-       {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , MUX_AVI , -1,-1,-1,-1 } },
-    { "DIVX 3" ,"DIV3","Divx third version" ,
-       {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , MUX_AVI , -1,-1,-1,-1 } },
-    { "H 263" , "H263" , "H263 is ..." ,
-       { MUX_TS, MUX_AVI, -1,-1,-1,-1,-1,-1,-1 } },
-    { "I 263", "I263", "I263 is ..." ,
-       { MUX_TS, MUX_AVI, -1,-1,-1,-1,-1,-1,-1 } },
-    { "WMV 1" , "WMV1", "First version of WMV" ,
-       {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , MUX_AVI , -1,-1,-1,-1 } },
-    { "WMV 2" , "WMV2", "2 version of WMV" ,
-       {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , MUX_AVI , -1,-1,-1,-1 } },
-    { "MJPEG" , "MJPG", "MJPEG consists of a series of JPEG pictures" ,
-       {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , MUX_AVI , -1,-1,-1,-1 } },
-    { "Theora" , "theo", "Experimental free codec",
-       {MUX_TS, -1,-1,-1,-1,-1,-1,-1,-1} },
-    { "Dummy", "dummy", "Dummy codec (do not transcode)" ,
-      {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_MP4,MUX_OGG,MUX_AVI,MUX_RAW,MUX_MOV}},
-    { NULL,NULL,NULL , {-1,-1,-1,-1,-1,-1,-1,-1,-1}} /* Do not remove me */
-};
-
-struct codec acodecs_array[] =
-{
-    { "MPEG Audio" , "mpga" , "The standard MPEG audio (1/2) format" ,
-       {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_OGG,MUX_AVI,MUX_RAW, -1,-1} },
-    { "MP3" , "mp3" , "MPEG Audio Layer 3" ,
-       {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_OGG,MUX_AVI,MUX_RAW, -1,-1} },
-    { "MPEG 4 Audio" , "mp4a" , "Audio format for MPEG4" ,
-       {MUX_TS, MUX_MP4, -1,-1,-1,-1,-1,-1,-1 } },
-    { "A/52" , "a52" , "DVD audio format" ,
-       {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_OGG,MUX_AVI,MUX_RAW, -1,-1} },
-    { "Vorbis" , "vorb" , "This is a free audio codec" ,
-       {MUX_OGG, -1,-1,-1,-1,-1,-1,-1,-1} },
-    { "FLAC" , "flac" , "This is an audio codec" ,
-       {MUX_OGG , MUX_RAW, -1,-1,-1,-1,-1,-1,-1} },
-    { "Speex" , "spx" , "An audio codec dedicated to compression of voice" ,
-       {MUX_OGG, -1,-1,-1,-1,-1,-1,-1,-1} },
-    { "Dummy", "dummy", "Dummy codec (do not transcode)" ,
-     {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_MP4,MUX_OGG,MUX_AVI,MUX_RAW,MUX_MOV}},
-    { NULL,NULL,NULL , {-1,-1,-1,-1,-1,-1,-1,-1,-1}} /* Do not remove me */
-};
-
-struct method {
-    char *psz_access;
-    char *psz_method;
-    char *psz_descr;
-    char *psz_address;
-    int   muxers[9];
-};
-
-struct method methods_array[] =
-{
-    {"udp:","UDP Unicast", "Use this to stream to a single computer",
-     "Enter the address of the computer to stream to",
-     { MUX_TS, -1,-1,-1,-1,-1,-1,-1,-1 } },
-    {"udp:","UDP Multicast",
-     "Use this to stream to a dynamic group of computers on a "
-     "multicast-enabled network. This is the most efficient method "
-     "to stream to several computers, but it does not work over Internet.",
-     "Enter the multicast address to stream to in this field. "
-     "This must be an IP address between 224.0.0.0 an 239.255.255.255 "
-     "For a private use, enter an address beginning with 239.255.",
-     { MUX_TS, -1,-1,-1,-1,-1,-1,-1,-1 } },
-    {"http://","HTTP",
-            "Use this to stream to several computers. This method is "
-     "less efficient, as the server needs to send several times the "
-     "stream.",
-     "Enter the local addresses you want to listen to. Do not enter "
-     "anything if you want to listen to all adresses or if you don't "
-     "understand. This is generally the best thing to do. Other computers "
-     "can then access the stream at http://yourip:8080 by default",
-     { MUX_TS, MUX_PS, MUX_MPEG, MUX_OGG, MUX_RAW, MUX_ASF, -1,-1,-1} },
-    { NULL, NULL,NULL,NULL , {-1,-1,-1,-1,-1,-1,-1,-1,-1}} /* Do not remove me */
-};
-
-struct encap {
-    int   id;
-    char *psz_mux;
-    char *psz_encap;
-    char *psz_descr;
-};
-
-struct encap encaps_array[] =
-{
-    { MUX_PS, "ps","MPEG PS", "MPEG Program Stream" },
-    { MUX_TS, "ts","MPEG TS", "MPEG Transport Stream" },
-    { MUX_MPEG, "ps", "MPEG 1", "MPEG 1 Format" },
-    { MUX_OGG, "ogg", "OGG", "OGG" },
-    { MUX_RAW, "raw", "RAW", "RAW" },
-    { MUX_ASF, "asf","ASF", "ASF" },
-    { MUX_AVI, "avi","AVI", "AVI" },
-    { MUX_MP4, "mp4","MP4", "MPEG4" },
-    { MUX_MOV, "mov","MOV", "MOV" },
-    { -1 , NULL,NULL , NULL } /* Do not remove me */
-};
 
 /*****************************************************************************
  * All the pages of the wizard, declaration
@@ -521,7 +395,10 @@ END_EVENT_TABLE()
 static int ismult( char *psz_uri );
 
 static void pageHeader( wxWindow *window, wxBoxSizer *sizer,
-                       char *psz_title, char *psz_text)
+                       char *psz_title, char *psz_text);
+
+static void pageHeader( wxWindow *window, wxBoxSizer *sizer,
+                        char *psz_title, char *psz_text)
 {
     wxStaticText *wtitle = new wxStaticText( window, -1, wxU( psz_title ) );
     wxFont font = wtitle->GetFont();
@@ -589,7 +466,7 @@ wizHelloPage::wizHelloPage( wxWizard *parent) : wxWizardPageSimple(parent)
 void wizHelloPage::OnMoreInfo(wxCommandEvent& event)
 {
     wxString msg;
-    msg.Printf( wxString( wxT( event.GetId() == MoreInfoStreaming_Event ?
+    msg.Printf( wxString( wxU( event.GetId() == MoreInfoStreaming_Event ?
                                     MOREINFO_STREAM :
                                     MOREINFO_TRANSCODE ) ) );
     wxMessageBox( msg, wxU(_("More information")),
@@ -794,7 +671,7 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
         }
         else
         {
-            p_parent->SetMrl( (const char *)mrl_text->GetValue().c_str() );
+            p_parent->SetMrl( (const char *)mrl_text->GetValue().mb_str() );
         }
     }
     else
@@ -807,7 +684,7 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
             listitem.SetId( i );
             listitem.SetColumn( 1 );
             listview->GetItem( listitem );
-            p_parent->SetMrl( (const char*) listitem.GetText().c_str() );
+            p_parent->SetMrl( (const char*) listitem.GetText().mb_str() );
         }
     }
     if( enable_checkbox->IsChecked() )
@@ -1033,12 +910,12 @@ void wizTranscodeCodecPage::OnWizardPageChanging(wxWizardEvent& event)
                                        audio_combo->GetSelection() : i_audio_codec ));
     acodec = strdup(c->psz_codec);
 
-    int vb = atoi(vb_combo->GetValue().c_str() );
+    int vb = atoi(vb_combo->GetValue().mb_str() );
     if( vb == 0 )
     {
          vb = 1024;
     }
-    int ab = atoi(ab_combo->GetValue().c_str() );
+    int ab = atoi(ab_combo->GetValue().mb_str() );
     if( ab == 0)
     {
         ab = 192;
@@ -1131,7 +1008,7 @@ void wizStreamingMethodPage::OnWizardPageChanging(wxWizardEvent& event)
     if( !event.GetDirection() ) return;
 
     /* Check valid address */
-    if( i_method == 1 && !ismult((char *) address_txtctrl->GetValue().c_str()) )
+    if( i_method == 1 && !ismult((char *) address_txtctrl->GetValue().mb_str()) )
     {
         wxMessageBox( wxU( INVALID_MCAST_ADDRESS ) , wxU( ERROR_MSG ),
                       wxICON_WARNING | wxOK, this->p_parent );
@@ -1156,7 +1033,7 @@ void wizStreamingMethodPage::OnWizardPageChanging(wxWizardEvent& event)
         }
     }
     p_parent->SetStream( methods_array[i_method].psz_access ,
-                         (char *)address_txtctrl->GetValue().c_str() );
+                         (char *)address_txtctrl->GetValue().mb_str() );
 
     /* Set the action for the muxer page */
     ((wizEncapPage*)GetNext())->SetAction( p_parent->GetAction() );
@@ -1304,7 +1181,7 @@ void wizTranscodeExtraPage::OnSelectFile( wxCommandEvent &event)
         if( file_dialog->GetFilename().mb_str() )
         {
             p_parent->SetTranscodeOut( (char*)file_dialog->GetFilename().
-                                                  c_str() );
+                                                  mb_str() );
         }
     }
 

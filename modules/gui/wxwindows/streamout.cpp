@@ -36,6 +36,8 @@
 #include <wx/combobox.h>
 #include <wx/statline.h>
 
+#include "streamdata.h"
+
 #ifndef wxRB_SINGLE
 #   define wxRB_SINGLE 0
 #endif
@@ -624,7 +626,7 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
                                                           wxVERTICAL );
 
     /* Create video transcoding checkox */
-    static const wxString vcodecs_array[] =
+    static const wxString wxvcodecs_array[] =
     {
         wxT("mp1v"),
         wxT("mp2v"),
@@ -639,32 +641,34 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
         wxT("MJPG"),
         wxT("theo")
     };
+    /*
     static const wxString vbitrates_array[] =
     {
-        wxT("3072"),
-        wxT("2048"),
-        wxT("1024"),
-        wxT("768"),
-        wxT("512"),
-        wxT("384"),
-        wxT("256"),
-        wxT("192"),
-        wxT("128"),
-        wxT("96"),
-        wxT("64"),
-        wxT("32"),
-        wxT("16")
+            wxT("3072"),
+            wxT("2048"),
+            wxT("1024"),
+            wxT("768"),
+            wxT("512"),
+            wxT("384"),
+            wxT("256"),
+            wxT("192"),
+            wxT("128"),
+            wxT("96"),
+            wxT("64"),
+            wxT("32"),
+            wxT("16")
     };
+*/
     static const wxString vscales_array[] =
     {
-        wxT("0.25"),
-        wxT("0.5"),
-        wxT("0.75"),
-        wxT("1"),
-        wxT("1.25"),
-        wxT("1.5"),
-        wxT("1.75"),
-        wxT("2")
+            wxT("0.25"),
+            wxT("0.5"),
+            wxT("0.75"),
+            wxT("1"),
+            wxT("1.25"),
+            wxT("1.5"),
+            wxT("1.75"),
+            wxT("2")
     };
 
     wxFlexGridSizer *video_sizer = new wxFlexGridSizer( 6, 1, 20 );
@@ -672,8 +676,9 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
         new wxCheckBox( panel, VideoTranscEnable_Event, wxU(_("Video codec")));
     video_codec_combo =
         new wxComboBox( panel, VideoTranscCodec_Event, wxT(""),
-                        wxPoint(20,25), wxDefaultSize, WXSIZEOF(vcodecs_array),
-                        vcodecs_array, wxCB_READONLY );
+                        wxPoint(20,25), wxDefaultSize,
+                        WXSIZEOF(wxvcodecs_array),
+                        wxvcodecs_array, wxCB_READONLY );
     video_codec_combo->SetSelection(2);
     wxStaticText *bitrate_label =
         new wxStaticText( panel, -1, wxU(_("Bitrate (kb/s)")));
@@ -701,7 +706,7 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
                       wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
 
     /* Create audio transcoding checkox */
-    static const wxString acodecs_array[] =
+    static const wxString wxacodecs_array[] =
     {
         wxT("mpga"),
         wxT("mp3"),
@@ -711,17 +716,6 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
         wxT("flac"),
         wxT("spx")
     };
-    static const wxString abitrates_array[] =
-    {
-        wxT("512"),
-        wxT("256"),
-        wxT("192"),
-        wxT("128"),
-        wxT("96"),
-        wxT("64"),
-        wxT("32"),
-        wxT("16")
-    };
     static const wxString achannels_array[] =
     {
         wxT("1"),
@@ -729,14 +723,27 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
         wxT("4"),
         wxT("6")
     };
-
+/*
+    static const wxString abitrates_array[] =
+    {
+            wxT("512"),
+            wxT("256"),
+            wxT("192"),
+            wxT("128"),
+            wxT("96"),
+            wxT("64"),
+            wxT("32"),
+            wxT("16")
+    };
+*/
     wxFlexGridSizer *audio_sizer = new wxFlexGridSizer( 3, 1, 20 );
     audio_transc_checkbox =
         new wxCheckBox( panel, AudioTranscEnable_Event, wxU(_("Audio codec")));
     audio_codec_combo =
         new wxComboBox( panel, AudioTranscCodec_Event, wxT(""),
-                        wxPoint(10,25), wxDefaultSize, WXSIZEOF(acodecs_array),
-                        acodecs_array, wxCB_READONLY );
+                        wxPoint(10,25), wxDefaultSize,
+                        WXSIZEOF(wxacodecs_array),
+                        wxacodecs_array, wxCB_READONLY );
     audio_codec_combo->SetSelection(0);
 #if defined( __WXMSW__ )
     wxFlexGridSizer *audio_sub_sizer = new wxFlexGridSizer( 4, 5, 20 );
