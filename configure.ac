@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.34 2003/07/17 17:30:39 gbazin Exp $
+dnl $Id: configure.ac,v 1.35 2003/07/18 23:41:09 hartman Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -768,7 +768,7 @@ dnl
 #AX_ADD_BUILTINS([mpeg_video_old idct idctclassic motion])
 AX_ADD_PLUGINS([dummy rc logger gestures memcpy])
 AX_ADD_PLUGINS([es audio m4v mpeg_system ps ts avi asf aac mp4 rawdv])
-AX_ADD_PLUGINS([spudec mpeg_audio lpcm a52 dts cinepak])
+AX_ADD_PLUGINS([mpeg_audio lpcm a52 dts cinepak])
 AX_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 AX_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32])
 AX_ADD_PLUGINS([trivial_resampler ugly_resampler linear_resampler bandlimited_resampler])
@@ -1947,6 +1947,14 @@ You also need to check that you have a libogg posterior to the 1.0 release.])],
 fi
 
 dnl
+dnl   spudec support
+dnl
+AC_CHECK_HEADERS(iconv.h, [
+    AX_ADD_LDFLAGS([spudec],[-liconv])
+    AX_ADD_PLUGINS([spudec])])
+
+
+dnl
 dnl  Video Filters
 dnl
 
@@ -2132,6 +2140,8 @@ then
     AX_ADD_PLUGINS([freetype])
     AX_ADD_CFLAGS([freetype],[`${FREETYPE_CONFIG} --cflags`])
     AX_ADD_LDFLAGS([freetype],[`${FREETYPE_CONFIG} --libs`])
+    AC_CHECK_HEADERS(Carbon/Carbon.h,
+      [AX_ADD_LDFLAGS([freetype],[-framework Carbon])])
     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_freetype}"
   elif test "${enable_freetype}" =  "yes"
   then
