@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.56 2001/07/18 15:21:51 massiot Exp $
+ * $Id: mpeg_system.c,v 1.57 2001/09/06 18:21:02 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1256,6 +1256,18 @@ void input_DemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
             {
                 /* This was the last section of PSI */
                 p_psi->b_is_complete = 1;
+
+                switch( p_demux_data->i_psi_type)
+                {
+                case PSI_IS_PAT:
+                    input_DecodePAT( p_input, p_es );
+                    break;
+                case PSI_IS_PMT:
+                    input_DecodePMT( p_input, p_es );
+                    break;
+                default:
+                    intf_WarnMsg(2, "Received unknown PSI in demuxPSI");
+                }
             }
         }
         else
@@ -1267,22 +1279,10 @@ void input_DemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
         }
     }
 
-    if ( p_psi->b_is_complete )
-    {
-        switch( p_demux_data->i_psi_type)
-        {
-            case PSI_IS_PAT:
-                input_DecodePAT( p_input, p_es );
-                break;
-            case PSI_IS_PMT:
-                input_DecodePMT( p_input, p_es );
-                break;
-            default:
-                intf_WarnMsg(2, "Received unknown PSI in demuxPSI");
-        }
-    }
 #undef p_psi    
 #undef p
+   
+    p_input->pf_delete_packet( p_input->p_method_data, p_data );
     
     return ;
 }

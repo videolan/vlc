@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.32 2001/08/27 16:13:20 massiot Exp $
+ * $Id: input_ts.c,v 1.33 2001/09/06 18:21:02 henri Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -280,14 +280,6 @@ static int TSRead( input_thread_t * p_input,
     struct iovec  * p_iovec;
     struct timeval  timeout;
 
-    /* Get iovecs */
-    p_iovec = input_NetlistGetiovec( p_input->p_method_data );
-
-    if ( p_iovec == NULL )
-    {
-        return( -1 ); /* empty netlist */
-    }
-
     /* Init */
     p_method = ( thread_ts_data_t * )p_input->p_plugin_data;
 
@@ -316,9 +308,17 @@ static int TSRead( input_thread_t * p_input,
         intf_ErrMsg( "input error: TS select error (%s)", strerror(errno) );
         return( -1 );
     }
-
+    
     if( i_data )
     {
+        /* Get iovecs */
+        p_iovec = input_NetlistGetiovec( p_input->p_method_data );
+
+        if ( p_iovec == NULL )
+        {
+            return( -1 ); /* empty netlist */
+        }
+
 #if defined( WIN32 )
         if( p_input->stream.b_pace_control )
         {

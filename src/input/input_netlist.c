@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.41 2001/07/30 00:53:05 sam Exp $
+ * $Id: input_netlist.c,v 1.42 2001/09/06 18:21:02 henri Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -212,7 +212,7 @@ struct iovec * input_NetlistGetiovec( void * p_method_data )
      ( (p_netlist->i_data_end - p_netlist->i_data_start + p_netlist->i_nb_data)
      & ( p_netlist->i_nb_data -1 ) ) < p_netlist->i_read_once )
     {
-        intf_ErrMsg("Empty iovec FIFO. Unable to allocate memory");
+        intf_ErrMsg("Empty iovec FIFO.");
         return (NULL);
     }
 
@@ -303,7 +303,7 @@ struct data_packet_s * input_NetlistNewPacket( void * p_method_data,
     /* check */
     if ( p_netlist->i_data_start == p_netlist->i_data_end )
     {
-        intf_ErrMsg("Empty Data FIFO in netlist. Unable to allocate memory");
+        intf_ErrMsg("Empty Data FIFO in netlist.");
         return ( NULL );
     }
     
@@ -342,7 +342,7 @@ struct pes_packet_s * input_NetlistNewPES( void * p_method_data )
     /* check */
     if ( p_netlist->i_pes_start == p_netlist->i_pes_end )
     {
-        intf_ErrMsg("Empty PES FIFO in netlist - Unable to allocate memory");
+        intf_ErrMsg("Empty PES FIFO in netlist");
         return ( NULL );
     }
 
