@@ -1,4 +1,24 @@
-$Id: NEWS,v 1.23 2003/02/17 18:58:46 hartman Exp $
+$Id: NEWS,v 1.24 2003/03/02 12:10:46 gbazin Exp $
+
+Changes between 0.5.1a and 0.5.2:
+--------------------------------
+
+Core support:
+ * advanced config options are now hidden by default.
+ * new --spdif option to use the S/PDIF audio output by default.
+
+Codecs:
+ * support for DV audio through the ffmpeg library.
+ * new but basic MPEG video decoder based on libmpeg2.
+
+UNIX ports:
+ * fixed the GNU-pth support.
+
+Win32 port:
+ * multi-channel audio and S/PDIF support for both the DirectX
+   and Waveout plugins.
+ * localization support via gettext is now fully working.
+ * rc interface is now fully useable.
 
 Changes between 0.5.1 and 0.5.1a:
 --------------------------------
