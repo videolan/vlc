@@ -698,11 +698,19 @@ package-win32-base-exe-cygwin:
 	C:/Program\ Files/NSIS/makensis.exe \
              /DVERSION=${VERSION} $(top_builddir)/vlc-${VERSION}/vlc.win32.nsi
 
+package-win32-base-exe-linux:
+# Create package
+	makensis -DVERSION=${VERSION} $(top_builddir)/vlc-${VERSION}/vlc.win32.nsi
+
 package-win32-base-zip:
 # Create package 
 	zip -r vlc-${VERSION}-win32.zip vlc-${VERSION}
 
 package-win32-exe: package-win32-base package-win32-base-exe
+# Clean up
+	rm -Rf $(top_builddir)/vlc-${VERSION}
+
+package-win32-exe-linux: package-win32-base package-win32-base-exe-linux
 # Clean up
 	rm -Rf $(top_builddir)/vlc-${VERSION}
 
