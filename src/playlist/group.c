@@ -2,7 +2,7 @@
  * playlist.c : Playlist groups management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: group.c,v 1.3 2003/11/25 00:56:35 fenrir Exp $
+ * $Id: group.c,v 1.4 2003/12/11 11:30:37 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -49,7 +49,7 @@ playlist_group_t * playlist_CreateGroup(playlist_t * p_playlist, char *psz_name)
         if( !strcasecmp( p_playlist->pp_groups[i]->psz_name , psz_name ) )
         {
             msg_Info( p_playlist, "This group already exists !");
-            return NULL;
+            return p_playlist->pp_groups[i];
         }
     }
 
