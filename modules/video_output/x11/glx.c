@@ -57,8 +57,6 @@ static void SwitchContext( vout_thread_t *p_vout );
 
 static inline int GetAlignedSize( int i_size );
 
-#define MAX_TEXTURE_SIZE 512
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -79,6 +77,9 @@ struct vout_sys_t
 {
     uint8_t     *p_buffer;
     int         i_index;
+
+    int         i_tex_width;
+    int         i_tex_height;
 
     int         i_width;
     int         i_height;
@@ -124,7 +125,7 @@ static int Create( vlc_object_t *p_this )
         msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
-    
+
     //XXX set to 0 to disable the cube effect
     p_vout->p_sys->i_effect = 1;
 
@@ -132,16 +133,14 @@ static int Create( vlc_object_t *p_this )
     p_vout->p_sys->i_height = p_vout->i_window_height; */
     p_vout->p_sys->i_width = 700;
     p_vout->p_sys->i_height = 700;
-
     p_vout->p_sys->b_fullscreen = 0;
 
     /* A texture must have a size aligned on a power of 2 */
-    p_vout->output.i_width  = GetAlignedSize( p_vout->render.i_width );
-    p_vout->output.i_height = GetAlignedSize( p_vout->render.i_height );
-    p_vout->output.i_aspect = p_vout->render.i_aspect;
+    p_vout->p_sys->i_tex_width  = GetAlignedSize( p_vout->render.i_width );
+    p_vout->p_sys->i_tex_height = GetAlignedSize( p_vout->render.i_height );
 
-    msg_Dbg( p_vout, "Texture size: %dx%d",  p_vout->output.i_width,
-             p_vout->output.i_height );
+    msg_Dbg( p_vout, "Texture size: %dx%d", p_vout->p_sys->i_tex_width,
+             p_vout->p_sys->i_tex_height );
 
     /* Open and initialize device */
     if( OpenDisplay( p_vout ) )
@@ -174,6 +173,10 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_gmask = 0x0000ff00;
     p_vout->output.i_bmask = 0x00ff0000;
 
+    p_vout->output.i_width  = p_vout->render.i_width;
+    p_vout->output.i_height = p_vout->render.i_height;
+    p_vout->output.i_aspect = p_vout->render.i_aspect;
+
     I_OUTPUTPICTURES = 0;
 
     p_pic = NULL;
@@ -197,9 +200,13 @@ static int Init( vout_thread_t *p_vout )
      * directly by the decoder */
     p_pic->i_planes = 1;
 
-    p_pic->p->p_pixels = p_vout->p_sys->p_buffer;
+
+    p_pic->p->p_pixels = p_vout->p_sys->p_buffer
+        + 2 * p_vout->p_sys->i_tex_width *
+          (p_vout->p_sys->i_tex_height - p_vout->output.i_height)
+        + 2 * (p_vout->p_sys->i_tex_width - p_vout->output.i_width);
     p_pic->p->i_lines = p_vout->output.i_height;
-    p_pic->p->i_pitch = p_vout->output.i_width * 4;
+    p_pic->p->i_pitch = p_vout->p_sys->i_tex_width * 4;
     p_pic->p->i_pixel_pitch = 4;
     p_pic->p->i_visible_pitch = p_vout->output.i_width * 4;
 
@@ -311,8 +318,11 @@ static int Manage( vout_thread_t *p_vout )
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     glClear(GL_COLOR_BUFFER_BIT);
-    glTexImage2D (GL_TEXTURE_2D, 0, 3, p_vout->output.i_width,
+    /*glTexImage2D (GL_TEXTURE_2D, 0, 3, p_vout->output.i_width,
                   p_vout->output.i_height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                  p_vout->p_sys->p_buffer);*/
+    glTexImage2D (GL_TEXTURE_2D, 0, 3, p_vout->p_sys->i_tex_width,
+                  p_vout->p_sys->i_tex_height , 0, GL_RGBA, GL_UNSIGNED_BYTE,
                   p_vout->p_sys->p_buffer);
 
     if( !p_vout->p_sys->i_effect )
@@ -327,74 +337,86 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     }
     else
     {
-        glRotatef( 2.0, 3.3, 1.5, 2.7 );
+        glRotatef( 1.0, 0.3, 0.5, 0.7 );
 
         glEnable( GL_TEXTURE_2D);
         glBegin( GL_QUADS );
+
+        float f_width = p_vout->output.i_width;
+        float f_height = p_vout->output.i_height;
+
+        /* Correct the aspect ratio */
+ /*       float f_aspect = (float)p_vout->output.i_aspect / VOUT_ASPECT_FACTOR;
+        if( f_aspect > 1.0 )
+        {
+            f_height *= f_aspect;
+        }
+        else
+        {
+            f_width *= f_aspect;
+        }*/
+
+        float f_offset_x = (1.0 - f_width / p_vout->p_sys->i_tex_width) / 2.0;
+        float f_offset_y = (1.0 - f_height / p_vout->p_sys->i_tex_height) / 2.0;
+
         /* Front */
-        glTexCoord2f( 0.0, 0.0 );
+        glTexCoord2f( f_offset_x, f_offset_y );
         glVertex3f( - 1.0, 1.0, 1.0 );
-        glTexCoord2f( 0.0, 1.0 );
+        glTexCoord2f( f_offset_x, 1.0 - f_offset_y );
         glVertex3f( - 1.0, - 1.0, 1.0 );
-        glTexCoord2f( 1.0,
-                      1.0 );
+        glTexCoord2f( 1.0 - f_offset_x, 1.0 - f_offset_y );
         glVertex3f( 1.0, - 1.0, 1.0 );
-        glTexCoord2f( 1.0, 0.0 );
+        glTexCoord2f( 1.0 - f_offset_x, f_offset_y );
         glVertex3f( 1.0, 1.0, 1.0 );
 
         /* Left */
-        glTexCoord2f( 0.0, 0.0 );
+        glTexCoord2f( f_offset_x, f_offset_y );
         glVertex3f( - 1.0, 1.0, - 1.0 );
-        glTexCoord2f( 0.0, 1.0 );
+        glTexCoord2f( f_offset_x, 1.0 - f_offset_y );
         glVertex3f( - 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( 1.0,
-                      1.0 );
+        glTexCoord2f( 1.0 - f_offset_x, 1.0 - f_offset_y );
         glVertex3f( - 1.0, - 1.0, 1.0 );
-        glTexCoord2f( 1.0, 0.0 );
+        glTexCoord2f( 1.0 - f_offset_x, f_offset_y );
         glVertex3f( - 1.0, 1.0, 1.0 );
 
         /* Back */
-        glTexCoord2f( 0.0, 0.0 );
+        glTexCoord2f( f_offset_x, f_offset_y );
         glVertex3f( 1.0, 1.0, - 1.0 );
-        glTexCoord2f( 0.0, 1.0 );
+        glTexCoord2f( f_offset_x, 1.0 - f_offset_y );
         glVertex3f( 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( 1.0,
-                      1.0 );
+        glTexCoord2f( 1.0 - f_offset_x, 1.0 - f_offset_y );
         glVertex3f( - 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( 1.0, 0.0 );
+        glTexCoord2f( 1.0 - f_offset_x, f_offset_y );
         glVertex3f( - 1.0, 1.0, - 1.0 );
 
         /* Right */
-        glTexCoord2f( 0.0, 0.0 );
+        glTexCoord2f( f_offset_x, f_offset_y );
         glVertex3f( 1.0, 1.0, 1.0 );
-        glTexCoord2f( 0.0, 1.0 );
+        glTexCoord2f( f_offset_x, 1.0 - f_offset_y );
         glVertex3f( 1.0, - 1.0, 1.0 );
-        glTexCoord2f( 1.0,
-                      1.0 );
+        glTexCoord2f( 1.0 - f_offset_x, 1.0 - f_offset_y );
         glVertex3f( 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( 1.0, 0.0 );
+        glTexCoord2f( 1.0 - f_offset_x, f_offset_y );
         glVertex3f( 1.0, 1.0, - 1.0 );
 
         /* Top */
-        glTexCoord2f( 0.0, 0.0 );
+        glTexCoord2f( f_offset_x, f_offset_y );
         glVertex3f( - 1.0, 1.0, - 1.0 );
-        glTexCoord2f( 0.0, 1.0 );
+        glTexCoord2f( f_offset_x, 1.0 - f_offset_y );
         glVertex3f( - 1.0, 1.0, 1.0 );
-        glTexCoord2f( 1.0,
-                      1.0 );
+        glTexCoord2f( 1.0 - f_offset_x, 1.0 - f_offset_y );
         glVertex3f( 1.0, 1.0, 1.0 );
-        glTexCoord2f( 1.0, 0.0 );
+        glTexCoord2f( 1.0 - f_offset_x, f_offset_y );
         glVertex3f( 1.0, 1.0, - 1.0 );
 
         /* Bottom */
-        glTexCoord2f( 0.0, 0.0 );
+        glTexCoord2f( f_offset_x, f_offset_y );
         glVertex3f( - 1.0, - 1.0, 1.0 );
-        glTexCoord2f( 0.0, 1.0 );
+        glTexCoord2f( f_offset_x, 1.0 - f_offset_y );
         glVertex3f( - 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( 1.0,
-                      1.0 );
+        glTexCoord2f( 1.0 - f_offset_x, 1.0 - f_offset_y );
         glVertex3f( 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( 1.0, 0.0 );
+        glTexCoord2f( 1.0 - f_offset_x, f_offset_y );
         glVertex3f( 1.0, - 1.0, 1.0 );
         glEnd();
     }
@@ -486,7 +508,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     /* Allocate the texture buffer */
     p_vout->p_sys->p_buffer =
-        malloc( p_vout->output.i_width * p_vout->output.i_height * 4 );
+        malloc( p_vout->p_sys->i_tex_width * p_vout->p_sys->i_tex_height * 4 );
     if( !p_vout->p_sys->p_buffer )
     {
         msg_Err( p_vout, "Out of memory" );
