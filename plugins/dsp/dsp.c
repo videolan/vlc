@@ -80,7 +80,7 @@ plugin_info_t * GetConfig( void )
 
     /* Test if the device can be opened */
     if ( (i_fd = open( main_GetPszVariable( AOUT_DSP_VAR, AOUT_DSP_DEFAULT ),
-                       O_WRONLY )) < 0 )
+                       O_WRONLY|O_NONBLOCK )) < 0 )
     {
         p_info->i_score = 0;
     }
