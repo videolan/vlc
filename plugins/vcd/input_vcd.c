@@ -53,8 +53,6 @@
 #include "input_ext-dec.h"
 #include "input_ext-plugins.h"
 
-#include "debug.h"
-
 #include "input_vcd.h"
 #include "cdrom_tools.h"
 

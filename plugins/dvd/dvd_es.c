@@ -1,7 +1,7 @@
 /* dvd_es.c: functions to find and select ES
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_es.c,v 1.8 2002/04/23 20:58:23 sam Exp $
+ * $Id: dvd_es.c,v 1.9 2002/04/25 21:52:42 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -58,8 +58,6 @@
 #include "dvd_ifo.h"
 #include "dvd_summary.h"
 #include "iso_lang.h"
-
-#include "debug.h"
 
 /*****************************************************************************
  * Local prototypes

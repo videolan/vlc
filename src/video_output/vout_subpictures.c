@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.12 2002/04/05 01:05:22 gbazin Exp $
+ * $Id: vout_subpictures.c,v 1.13 2002/04/25 21:52:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -139,7 +139,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
     }
 
     p_free_subpic->p_sys =
-        vlc_memalign( 16, i_size, &p_free_subpic->p_sys_orig );
+        vlc_memalign( &p_free_subpic->p_sys_orig, 16, i_size );
 
     if( p_free_subpic->p_sys != NULL )
     {

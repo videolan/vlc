@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.21 2002/04/15 23:04:08 massiot Exp $
+ * $Id: vout_pictures.c,v 1.22 2002/04/25 21:52:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -34,6 +34,11 @@
 
 #include "video.h"
 #include "video_output.h"
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static void vout_CopyPicture( picture_t *p_src, picture_t *p_dest );
 
 /*****************************************************************************
  * vout_DisplayPicture: display a picture
@@ -517,7 +522,7 @@ void vout_AllocatePicture( picture_t *p_pic,
         i_bytes += p_pic->p[ i_index ].i_lines * p_pic->p[ i_index ].i_pitch;
     }
 
-    p_pic->p_data = vlc_memalign( 16, i_bytes, &p_pic->p_data_orig );
+    p_pic->p_data = vlc_memalign( &p_pic->p_data_orig, 16, i_bytes );
 
     if( p_pic->p_data == NULL )
     {
@@ -534,5 +539,67 @@ void vout_AllocatePicture( picture_t *p_pic,
                                           + p_pic->p[i_index-1].i_lines
                                              * p_pic->p[i_index-1].i_pitch;
     }
+}
+
+/* Following functions are local */
+
+/*****************************************************************************
+ * vout_CopyPicture: copy a picture to another one
+ *****************************************************************************
+ * This function takes advantage of the image format, and reduces the
+ * number of calls to memcpy() to the minimum. Source and destination
+ * images must have same width, height, and chroma.
+ *****************************************************************************/
+static void vout_CopyPicture( picture_t *p_src, picture_t *p_dest )
+{
+#if 0
+    int i;
+
+    for( i = 0; i < p_src->i_planes ; i++ )
+    {
+        if( p_src->p[i].i_pitch == p_dest->p[i].i_pitch )
+        {
+            if( p_src->p[i].b_margin )
+            {
+                /* If p_src->b_margin is set, p_dest->b_margin must be set */
+                if( p_dest->p[i].b_hidden )
+                {
+                    /* There are margins, but they are hidden : perfect ! */
+                    FAST_MEMCPY( p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
+                                 p_src->p[i].i_pitch * p_src->p[i].i_lines );
+                    continue;
+                }
+                else
+                {
+                    /* We can't directly copy the margin. Too bad. */
+                }
+            }
+            else
+            {
+                /* Same pitch, no margins : perfect ! */
+                FAST_MEMCPY( p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
+                             p_src->p[i].i_pitch * p_src->p[i].i_lines );
+                continue;
+            }
+        }
+        else
+        {
+            /* Pitch values are different */
+        }
+
+        /* We need to proceed line by line */
+        {
+            u8 *p_in = p_src->p[i].p_pixels, *p_out = p_dest->p[i].p_pixels;
+            int i_line;
+
+            for( i_line = p_src->p[i].i_lines; i_line--; )
+            {
+                FAST_MEMCPY( p_out, p_in, p_src->p[i].i_visible_bytes );
+                p_in += p_src->p[i].i_pitch;
+                p_out += p_dest->p[i].i_pitch;
+            }
+        }
+    }
+#endif
 }
 

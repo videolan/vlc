@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.49 2002/04/15 23:04:08 massiot Exp $
+ * $Id: video.h,v 1.50 2002/04/25 21:52:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -142,38 +142,124 @@ typedef struct picture_heap_s
 #define DESTROYED_PICTURE       6              /* allocated but no more used */
 
 /*****************************************************************************
- * Flags used to describe picture format - see http://www.webartz.com/fourcc/
+ * Codes used to describe picture format - see http://www.webartz.com/fourcc/
  *****************************************************************************/
+#define MAKEFOURCC( a, b, c, d ) \
+    ( ((u32)a) | ( ((u32)b) << 8 ) | ( ((u32)c) << 16 ) | ( ((u32)d) << 24 ) )
 
-/* Packed RGB formats */
-#define FOURCC_BI_RGB        0x00000000                      /* RGB for 8bpp */
-#define FOURCC_RGB2          0x32424752                  /* alias for BI_RGB */
-#define FOURCC_BI_BITFIELDS  0x00000003            /* RGB, for 16, 24, 32bpp */
-#define FOURCC_RV15          0x35315652    /* RGB 15bpp, 0x1f, 0x7e0, 0xf800 */
-#define FOURCC_RV16          0x36315652    /* RGB 16bpp, 0x1f, 0x3e0, 0x7c00 */
-#define FOURCC_RV24          0x34325652 /* RGB 24bpp, 0xff, 0xff00, 0xff0000 */
-#define FOURCC_RV32          0x32335652 /* RGB 32bpp, 0xff, 0xff00, 0xff0000 */
+#define MAKETWOCC( a, b ) \
+    ( (u16)(a) | ( (u16)(b) << 8 ) )
 
-/* Planar YUV formats */
-#define FOURCC_I420          0x30323449               /* Planar 4:2:0, Y:U:V */
-#define FOURCC_IYUV          0x56555949                    /* alias for I420 */
-#define FOURCC_YV12          0x32315659               /* Planar 4:2:0, Y:V:U */
+/* AVI stuff */
+#define FOURCC_RIFF         MAKEFOURCC('R','I','F','F')
+#define FOURCC_LIST         MAKEFOURCC('L','I','S','T')
+#define FOURCC_JUNK         MAKEFOURCC('J','U','N','K')
+#define FOURCC_AVI          MAKEFOURCC('A','V','I',' ')
+#define FOURCC_WAVE         MAKEFOURCC('W','A','V','E')
 
-/* Packed YUV formats */
-#define FOURCC_IUYV          0x56595549 /* Packed 4:2:2, U:Y:V:Y, interlaced */
-#define FOURCC_UYVY          0x59565955             /* Packed 4:2:2, U:Y:V:Y */
-#define FOURCC_UYNV          0x564e5955                    /* alias for UYVY */
-#define FOURCC_Y422          0x32323459                    /* alias for UYVY */
-#define FOURCC_cyuv          0x76757963   /* Packed 4:2:2, U:Y:V:Y, reverted */
-#define FOURCC_YUY2          0x32595559             /* Packed 4:2:2, Y:U:Y:V */
-#define FOURCC_YUNV          0x564e5559                    /* alias for YUY2 */
-#define FOURCC_YVYU          0x55585659             /* Packed 4:2:2, Y:V:Y:U */
-#define FOURCC_Y211          0x31313259             /* Packed 2:1:1, Y:U:Y:V */
+#define FOURCC_avih         MAKEFOURCC('a','v','i','h')
+#define FOURCC_hdrl         MAKEFOURCC('h','d','r','l')
+#define FOURCC_movi         MAKEFOURCC('m','o','v','i')
+#define FOURCC_idx1         MAKEFOURCC('i','d','x','1')
+
+#define FOURCC_strl         MAKEFOURCC('s','t','r','l')
+#define FOURCC_strh         MAKEFOURCC('s','t','r','h')
+#define FOURCC_strf         MAKEFOURCC('s','t','r','f')
+#define FOURCC_strd         MAKEFOURCC('s','t','r','d')
+
+#define FOURCC_rec          MAKEFOURCC('r','e','c',' ')
+#define FOURCC_auds         MAKEFOURCC('a','u','d','s')
+#define FOURCC_vids         MAKEFOURCC('v','i','d','s')
+
+#define TWOCC_wb            MAKETWOCC('w','b')
+#define TWOCC_db            MAKETWOCC('d','b')
+#define TWOCC_dc            MAKETWOCC('d','c')
+#define TWOCC_pc            MAKETWOCC('p','c')
+
+/* MPEG4 (opendivx) codec */
+#define FOURCC_DIVX         MAKEFOURCC('D','I','V','X')
+#define FOURCC_divx         MAKEFOURCC('d','i','v','x')
+#define FOURCC_DX50         MAKEFOURCC('D','X','5','0')
+#define FOURCC_MP4S         MAKEFOURCC('M','P','4','S')
+#define FOURCC_MPG4         MAKEFOURCC('M','P','G','4')
+#define FOURCC_mpg4         MAKEFOURCC('m','p','g','4')
+#define FOURCC_mp4v         MAKEFOURCC('m','p','4','v')
+
+/* msmepg (divx v3) codec */
+#define FOURCC_DIV3         MAKEFOURCC('D','I','V','3')
+#define FOURCC_div3         MAKEFOURCC('d','i','v','3')
+#define FOURCC_DIV4         MAKEFOURCC('D','I','V','4')
+#define FOURCC_div4         MAKEFOURCC('d','i','v','4')
+#define FOURCC_DIV5         MAKEFOURCC('D','I','V','5')
+#define FOURCC_div5         MAKEFOURCC('d','i','v','5')
+#define FOURCC_DIV6         MAKEFOURCC('D','I','V','6')
+#define FOURCC_div6         MAKEFOURCC('d','i','v','6')
+#define FOURCC_3IV1         MAKEFOURCC('3','I','V','1')
+#define FOURCC_AP41         MAKEFOURCC('A','P','4','1')
+#define FOURCC_MP43         MAKEFOURCC('M','P','4','3')
+#define FOURCC_mp43         MAKEFOURCC('m','p','4','3')
+
+/* Packed RGB for 8bpp */
+#define FOURCC_BI_RGB       MAKEFOURCC( 0 , 0 , 0 , 0 )
+#define FOURCC_RGB2         MAKEFOURCC('R','G','B','2')
+
+/* Packed RGB for 16, 24, 32bpp */
+#define FOURCC_BI_BITFIELDS MAKEFOURCC( 0 , 0 , 0 , 3 )
+
+/* Packed RGB 15bpp, 0x1f, 0x7e0, 0xf800 */
+#define FOURCC_RV15         MAKEFOURCC('R','V','1','5')
+
+/* Packed RGB 16bpp, 0x1f, 0x3e0, 0x7c00 */
+#define FOURCC_RV16         MAKEFOURCC('R','V','1','6')
+
+/* Packed RGB 24bpp, 0xff, 0xff00, 0xff0000 */
+#define FOURCC_RV24         MAKEFOURCC('R','V','2','4')
+
+/* Packed RGB 32bpp, 0xff, 0xff00, 0xff0000 */
+#define FOURCC_RV32         MAKEFOURCC('R','V','3','2')
+
+/* Planar YUV 4:2:0, Y:U:V */
+#define FOURCC_I420         MAKEFOURCC('I','4','2','0')
+#define FOURCC_IYUV         MAKEFOURCC('I','Y','U','V')
+
+/* Planar YUV 4:2:0, Y:V:U */
+#define FOURCC_YV12         MAKEFOURCC('Y','V','1','2')
+
+/* Packed YUV 4:2:2, U:Y:V:Y, interlaced */
+#define FOURCC_IUYV         MAKEFOURCC('I','U','Y','V')
+
+/* Packed YUV 4:2:2, U:Y:V:Y */
+#define FOURCC_UYVY         MAKEFOURCC('U','Y','V','Y')
+#define FOURCC_UYNV         MAKEFOURCC('U','Y','N','V')
+#define FOURCC_Y422         MAKEFOURCC('Y','4','2','2')
+
+/* Packed YUV 4:2:2, U:Y:V:Y, reverted */
+#define FOURCC_cyuv         MAKEFOURCC('c','y','u','v')
+
+/* Packed YUV 4:2:2, Y:U:Y:V */
+#define FOURCC_YUY2         MAKEFOURCC('Y','U','Y','2')
+#define FOURCC_YUNV         MAKEFOURCC('Y','U','N','V')
+
+/* Packed YUV 4:2:2, Y:V:Y:U */
+#define FOURCC_YVYU         MAKEFOURCC('Y','V','Y','U')
+
+/* Packed YUV 2:1:1, Y:U:Y:V */
+#define FOURCC_Y211         MAKEFOURCC('Y','2','1','1')
 
 /* Custom formats which we use but which don't exist in the fourcc database */
-#define FOURCC_YMGA          0x41474d59  /* Planar Y, packed UV, from Matrox */
-#define FOURCC_I422          0x32323449               /* Planar 4:2:2, Y:U:V */
-#define FOURCC_I444          0x34343449               /* Planar 4:4:4, Y:U:V */
+
+/* Planar Y, packed UV, from Matrox */
+#define FOURCC_YMGA         MAKEFOURCC('Y','M','G','A')
+
+/* Planar 4:2:2, Y:U:V */
+#define FOURCC_I422         MAKEFOURCC('I','4','2','2')
+
+/* Planar 4:4:4, Y:U:V */
+#define FOURCC_I444         MAKEFOURCC('I','4','4','4')
+
+/*****************************************************************************
+ * Shortcuts to access image components
+ *****************************************************************************/
 
 /* Plane indices */
 #define Y_PLANE      0
@@ -187,120 +273,6 @@ typedef struct picture_heap_s
 #define U_PITCH      p[U_PLANE].i_pitch
 #define V_PIXELS     p[V_PLANE].p_pixels
 #define V_PITCH      p[V_PLANE].i_pitch
-
-static __inline__ int vout_ChromaCmp( u32 i_chroma, u32 i_amorhc )
-{
-    /* If they are the same, they are the same ! */
-    if( i_chroma == i_amorhc )
-    {
-        return 1;
-    }
-
-    /* Check for equivalence classes */
-    switch( i_chroma )
-    {
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-        case FOURCC_YV12:
-            switch( i_amorhc )
-            {
-                case FOURCC_I420:
-                case FOURCC_IYUV:
-                case FOURCC_YV12:
-                    return 1;
-
-                default:
-                    return 0;
-            }
-
-        case FOURCC_UYVY:
-        case FOURCC_UYNV:
-        case FOURCC_Y422:
-            switch( i_amorhc )
-            {
-                case FOURCC_UYVY:
-                case FOURCC_UYNV:
-                case FOURCC_Y422:
-                    return 1;
-
-                default:
-                    return 0;
-            }
-
-        case FOURCC_YUY2:
-        case FOURCC_YUNV:
-            switch( i_amorhc )
-            {
-                case FOURCC_YUY2:
-                case FOURCC_YUNV:
-                    return 1;
-
-                default:
-                    return 0;
-            }
-
-        default:
-            return 0;
-    }
-}
-
-/*****************************************************************************
- * vout_CopyPicture: copy a picture to another one
- *****************************************************************************
- * This function takes advantage of the image format, and reduces the
- * number of calls to memcpy() to the minimum. Source and destination
- * images must have same width, height, and chroma.
- *****************************************************************************/
-static __inline__ void vout_CopyPicture( picture_t *p_src, picture_t *p_dest )
-{
-    int i;
-
-    for( i = 0; i < p_src->i_planes ; i++ )
-    {
-        if( p_src->p[i].i_pitch == p_dest->p[i].i_pitch )
-        {
-            if( p_src->p[i].b_margin )
-            {
-                /* If p_src->b_margin is set, p_dest->b_margin must be set */
-                if( p_dest->p[i].b_hidden )
-                {
-                    /* There are margins, but they are hidden : perfect ! */
-                    FAST_MEMCPY( p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
-                                 p_src->p[i].i_pitch * p_src->p[i].i_lines );
-                    continue;
-                }
-                else
-                {
-                    /* We can't directly copy the margin. Too bad. */
-                }
-            }
-            else
-            {
-                /* Same pitch, no margins : perfect ! */
-                FAST_MEMCPY( p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
-                             p_src->p[i].i_pitch * p_src->p[i].i_lines );
-                continue;
-            }
-        }
-        else
-        {
-            /* Pitch values are different */
-        }
-
-        /* We need to proceed line by line */
-        {
-            u8 *p_in = p_src->p[i].p_pixels, *p_out = p_dest->p[i].p_pixels;
-            int i_line;
-
-            for( i_line = p_src->p[i].i_lines; i_line--; )
-            {
-                FAST_MEMCPY( p_out, p_in, p_src->p[i].i_visible_bytes );
-                p_in += p_src->p[i].i_pitch;
-                p_out += p_dest->p[i].i_pitch;
-            }
-        }
-    }
-}
 
 /*****************************************************************************
  * subpicture_t: video subtitle

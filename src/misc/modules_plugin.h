@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.20 2002/04/25 02:10:33 jobi Exp $
+ * $Id: modules_plugin.h,v 1.21 2002/04/25 21:52:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -248,6 +248,7 @@ module_error( char *psz_buffer )
     (p_symbols)->input_DemuxPS = input_DemuxPS; \
     (p_symbols)->input_ReadTS = input_ReadTS; \
     (p_symbols)->input_DemuxTS = input_DemuxTS; \
+    (p_symbols)->input_ClockManageRef = input_ClockManageRef; \
     (p_symbols)->input_ClockManageControl = input_ClockManageControl; \
     (p_symbols)->input_FDSeek = input_FDSeek; \
     (p_symbols)->input_FDClose = input_FDClose; \
@@ -283,6 +284,7 @@ module_error( char *psz_buffer )
     (p_symbols)->vout_LinkPicture = vout_LinkPicture; \
     (p_symbols)->vout_UnlinkPicture = vout_UnlinkPicture; \
     (p_symbols)->vout_PlacePicture = vout_PlacePicture; \
+    (p_symbols)->vout_ChromaCmp = vout_ChromaCmp; \
     (p_symbols)->UnalignedGetBits = UnalignedGetBits; \
     (p_symbols)->UnalignedRemoveBits = UnalignedRemoveBits; \
     (p_symbols)->UnalignedShowBits = UnalignedShowBits; \

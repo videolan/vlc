@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_programs.c,v 1.82 2002/04/23 23:44:36 fenrir Exp $
+ * $Id: input_programs.c,v 1.83 2002/04/25 21:52:42 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -34,8 +34,6 @@
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
 #include "input_ext-plugins.h"
-
-#include "debug.h"
 
 /*
  * NOTICE : all of these functions expect you to have taken the lock on

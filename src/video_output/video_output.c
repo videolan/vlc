@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.172 2002/04/21 11:23:03 gbazin Exp $
+ * $Id: video_output.c,v 1.173 2002/04/25 21:52:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -262,6 +262,68 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
             msleep( THREAD_SLEEP );
         } while( (i_status != THREAD_OVER) && (i_status != THREAD_ERROR)
                  && (i_status != THREAD_FATAL) );
+    }
+}
+
+/*****************************************************************************
+ * vout_ChromaCmp: compare two chroma values
+ *****************************************************************************
+ * This function returns 1 if the two fourcc values given as argument are
+ * the same format (eg. UYVY / UYNV) or almost the same format (eg. I420/YV12)
+ *****************************************************************************/
+int vout_ChromaCmp( u32 i_chroma, u32 i_amorhc )
+{
+    /* If they are the same, they are the same ! */
+    if( i_chroma == i_amorhc )
+    {
+        return 1;
+    }
+
+    /* Check for equivalence classes */
+    switch( i_chroma )
+    {
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+        case FOURCC_YV12:
+            switch( i_amorhc )
+            {
+                case FOURCC_I420:
+                case FOURCC_IYUV:
+                case FOURCC_YV12:
+                    return 1;
+
+                default:
+                    return 0;
+            }
+
+        case FOURCC_UYVY:
+        case FOURCC_UYNV:
+        case FOURCC_Y422:
+            switch( i_amorhc )
+            {
+                case FOURCC_UYVY:
+                case FOURCC_UYNV:
+                case FOURCC_Y422:
+                    return 1;
+
+                default:
+                    return 0;
+            }
+
+        case FOURCC_YUY2:
+        case FOURCC_YUNV:
+            switch( i_amorhc )
+            {
+                case FOURCC_YUY2:
+                case FOURCC_YUNV:
+                    return 1;
+
+                default:
+                    return 0;
+            }
+
+        default:
+            return 0;
     }
 }
 

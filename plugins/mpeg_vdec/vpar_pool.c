@@ -2,7 +2,7 @@
  * vpar_pool.c : management of the pool of decoder threads
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vpar_pool.c,v 1.7 2002/04/05 01:05:22 gbazin Exp $
+ * $Id: vpar_pool.c,v 1.8 2002/04/25 21:52:42 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -89,8 +89,8 @@ void vpar_InitPool( vpar_thread_t * p_vpar )
     for( j = 0; j < 12; j++ )
     {
         p_vpar->pool.mb.p_idcts[j].pi_block =
-            vlc_memalign( 16, 64 * sizeof(dctelem_t),
-                          &p_vpar->pool.mb.p_idcts[j].pi_block_orig );
+            vlc_memalign( &p_vpar->pool.mb.p_idcts[j].pi_block_orig,
+                          16, 64 * sizeof(dctelem_t) );
     }
 }
 
@@ -168,8 +168,8 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
                 for( j = 0; j < 12; j++ )
                 {
                     p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block =
-                        vlc_memalign( 16, 64 * sizeof(dctelem_t),
-                                      &p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block_orig );
+                        vlc_memalign( &p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block_orig,
+                                      16, 64 * sizeof(dctelem_t) );
                 }
 
                 p_vpar->pool.pp_vdec[i] = vdec_CreateThread( &p_vpar->pool );

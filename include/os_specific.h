@@ -2,7 +2,7 @@
  * os_specific.h: OS specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: os_specific.h,v 1.2 2002/04/24 00:36:24 sam Exp $
+ * $Id: os_specific.h,v 1.3 2002/04/25 21:52:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -22,19 +22,23 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifdef SYS_BEOS
-#   include "beos_specific.h"
-#endif
-#ifdef SYS_DARWIN
-#   include "darwin_specific.h"
-#endif
-#ifdef WIN32
-#   include "win32_specific.h"
+#ifndef _NEED_OS_SPECIFIC_H
+#   define _NEED_OS_SPECIFIC_H 1
 #endif
 
-#ifdef __cplusplus
-extern "C" {
+#if defined( SYS_BEOS )
+#   include "beos_specific.h"
+#elif defined( SYS_DARWIN )
+#   include "darwin_specific.h"
+#elif defined( WIN32 )
+#   include "win32_specific.h"
+#else
+#   undef _NEED_OS_SPECIFIC_H
 #endif
+
+#   ifdef __cplusplus
+extern "C" {
+#   endif
 
 /*****************************************************************************
  * main_sys_t: system specific descriptor
@@ -42,19 +46,25 @@ extern "C" {
 struct main_sys_s;
 
 #ifndef __PLUGIN__
-extern struct main_sys_s *p_main_sys;
+    extern struct main_sys_s *p_main_sys;
 #else
 #   define p_main_sys (p_symbols->p_main_sys)
 #endif
 
-
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void system_Init ( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] );
-void system_Configure  ( void );
-void system_End  ( void );
-
-#ifdef __cplusplus
-}
+#ifdef _NEED_OS_SPECIFIC_H
+    void system_Init ( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] );
+    void system_Configure  ( void );
+    void system_End  ( void );
+#else
+#   define system_Init(...) {}
+#   define system_Configure(...) {}
+#   define system_End(...) {}
 #endif
+
+#   ifdef __cplusplus
+}
+#   endif
+

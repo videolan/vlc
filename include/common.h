@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.98 2002/04/25 02:10:33 jobi Exp $
+ * $Id: common.h,v 1.99 2002/04/25 21:52:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -378,13 +378,15 @@ struct intf_subscription_s;
     /* Some systems have memalign() but no declaration for it */
     void * memalign( size_t align, size_t size );
 
-#   define vlc_memalign(align,size,pp_orig) \
+#   define vlc_memalign(pp_orig,align,size) \
     ( *(pp_orig) = memalign( align, size ) )
 
 #else /* We don't have any choice but to align manually */
-#   define vlc_memalign(align,size,pp_orig) \
-    (( *(pp_orig) = malloc( size + align - 1 )) ? \
-        (void *)( (((unsigned long)*(pp_orig)) + 15) & ~0xFUL ) : NULL )
+#   define vlc_memalign(pp_orig,align,size) \
+    (( *(pp_orig) = malloc( size + align - 1 )) \
+        ? (void *)( (((unsigned long)*(pp_orig)) + (unsigned long)(align-1) ) \
+                       % (unsigned long)align ) \
+        : NULL )
 
 #endif
 
@@ -498,6 +500,22 @@ typedef __int64 off_t;
 #elif !defined( MODULE_NAME_IS_gnome )
 #   define _(String) (String)
 #   define N_(String) (String)
+#endif
+
+/*****************************************************************************
+ * Debug macros
+ *****************************************************************************/
+/* ASSERT: this macro is used to test that a pointer is not nul. It inserts
+ * the needed code when the program is compiled with the debug option, but
+ * does nothing when not in debug mode. */
+#ifdef DEBUG
+#   define ASSERT(p_Mem)                                                      \
+    if (!(p_Mem))                                                             \
+        intf_ErrMsg("Void pointer error: "                                    \
+                    "%s line %d (variable %s at address %p)\n",               \
+                     __FILE__, __LINE__, #p_Mem, &p_Mem);
+#else
+#   define ASSERT(p_Mem)
 #endif
 
 /*****************************************************************************
@@ -615,6 +633,9 @@ typedef struct module_symbols_s
                                              struct data_packet_s  *,
                                              struct es_descriptor_s *,
                                              boolean_t ) );
+    void ( * input_ClockManageRef )      ( struct input_thread_s *,
+                                           struct pgrm_descriptor_s *,
+                                           mtime_t );
     int ( * input_ClockManageControl )   ( struct input_thread_s *,
                                            struct pgrm_descriptor_s *,
                                            mtime_t );
@@ -664,6 +685,7 @@ typedef struct module_symbols_s
                                       struct picture_s *, mtime_t );
     void  ( * vout_PlacePicture )   ( struct vout_thread_s *, int, int,
                                       int *, int *, int *, int * );
+    int   ( * vout_ChromaCmp )      ( u32, u32 );
 
     struct subpicture_s * (* vout_CreateSubPicture)
                                         ( struct vout_thread_s *, int, int );

@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.7 2002/04/24 00:36:24 sam Exp $
+ * $Id: vlc.h,v 1.8 2002/04/25 21:52:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -26,7 +26,7 @@
 /*****************************************************************************
  * Required vlc headers
  *****************************************************************************/
-#if defined( __VLC__ ) || defined( __PLUGIN__ ) || defined( __BUILTIN__ )
+#if defined( __VLC__ )
 #   include "defs.h"
 #   include "config.h"
 

@@ -47,8 +47,6 @@
 #include "input_ext-dec.h"
 #include "input_ext-plugins.h"
 
-#include "debug.h"
-
 #include "satellite_tools.h"
 
 #define SATELLITE_READ_ONCE 3

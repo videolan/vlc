@@ -1,7 +1,7 @@
 /* dvd_demux.c: DVD demux functions.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_demux.c,v 1.4 2002/03/18 19:14:52 sam Exp $
+ * $Id: dvd_demux.c,v 1.5 2002/04/25 21:52:42 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -47,8 +47,6 @@
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
 #include "input_ext-plugins.h"
-
-#include "debug.h"
 
 /* how many packets DVDDemux will read in each loop */
 #define DVD_READ_ONCE 64

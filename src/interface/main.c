@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.187 2002/04/24 00:36:24 sam Exp $
+ * $Id: main.c,v 1.188 2002/04/25 21:52:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -79,8 +79,6 @@
 
 #include "video.h"
 #include "video_output.h"
-
-#include "debug.h"
 
 /*****************************************************************************
  * Configuration options for the main program. Each module will also separatly
@@ -679,9 +677,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * System specific configuration
      */
-#if defined( WIN32 )
     system_Configure();
-#endif
 
     /* p_main inititalization. FIXME ? */
     p_main->i_warning_level = config_GetIntVariable( "warning" );
@@ -844,10 +840,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * System specific cleaning code
      */
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN ) || defined( WIN32 )
     system_End();
-#endif
-
 
     /*
      * Terminate messages interface and program

@@ -1,7 +1,7 @@
 /* dvd_seek.c: functions to navigate through DVD.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_seek.c,v 1.4 2002/04/03 06:23:08 sam Exp $
+ * $Id: dvd_seek.c,v 1.5 2002/04/25 21:52:42 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -57,8 +57,6 @@
 #include "dvd.h"
 #include "dvd_seek.h"
 #include "dvd_ifo.h"
-
-#include "debug.h"
 
 #define title \
     p_dvd->p_ifo->vts.title_unit.p_title[p_dvd->i_title_id-1].title

@@ -2,7 +2,7 @@
  * avi.h : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.h,v 1.1 2002/04/23 23:44:36 fenrir Exp $
+ * $Id: avi.h,v 1.2 2002/04/25 21:52:42 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,13 @@
 #define AVIIF_KEYFRAME      0x00000010L /* this frame is a key frame.*/
 #define AVIIF_NOTIME        0x00000100L /* this frame doesn't take any time */
 #define AVIIF_COMPUSE       0x0FFF0000L /* these bits are for compressor use */
+
+/* Sound formats */
+#define WAVE_FORMAT_UNKNOWN         0x0000
+#define WAVE_FORMAT_PCM             0x0001
+#define WAVE_FORMAT_MPEG            0x0050
+#define WAVE_FORMAT_MPEGLAYER3      0x0055
+#define WAVE_FORMAT_AC3             0x2000
 
 typedef struct bitmapinfoheader_s
 {

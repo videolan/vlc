@@ -3,7 +3,7 @@
  * found in .ifo.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_summary.c,v 1.16 2002/04/03 06:23:08 sam Exp $
+ * $Id: dvd_summary.c,v 1.17 2002/04/25 21:52:42 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -56,8 +56,6 @@
 #include "dvd.h"
 #include "dvd_ifo.h"
 #include "iso_lang.h"
-
-#include "debug.h"
 
 /*
  * Local tools to decode some data in ifo

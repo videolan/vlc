@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.14 2002/04/23 14:16:20 sam Exp $
+ * $Id: dvd_access.c,v 1.15 2002/04/25 21:52:42 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -67,8 +67,6 @@
 #include "dvd_ifo.h"
 #include "dvd_summary.h"
 #include "iso_lang.h"
-
-#include "debug.h"
 
 /*****************************************************************************
  * Local prototypes

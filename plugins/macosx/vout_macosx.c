@@ -640,8 +640,8 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p_sys->i_size = sizeof(PlanarPixmapInfoYUV420);
 
             /* Allocate the memory buffer */
-            p_pic->p_data = vlc_memalign( 16, i_width * i_height * 3 / 2,
-                                          &p_pic->p_data_orig );
+            p_pic->p_data = vlc_memalign( &p_pic->p_data_orig,
+                                          16, i_width * i_height * 3 / 2 );
 
             /* Y buffer */
             p_pic->Y_PIXELS = p_pic->p_data; 

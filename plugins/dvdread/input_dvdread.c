@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.36 2002/04/23 14:16:20 sam Exp $
+ * $Id: input_dvdread.c,v 1.37 2002/04/25 21:52:42 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -75,8 +75,6 @@
 #include "input_dvdread.h"
 
 #include "iso_lang.h"
-
-#include "debug.h"
 
 /* how many blocks DVDRead will read in each loop */
 #define DVD_BLOCK_READ_ONCE 64

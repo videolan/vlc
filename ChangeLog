@@ -4,6 +4,57 @@
 
 HEAD
 
+  * ./src/misc/modules_plugin.h: exported input_ClockManageRef for fenrir.
+  * ./include/video.h: moved vout_CopyPicture out of the way, an inline
+    function did not make sense here.
+  * ./include/video.h: moved vout_ChromaCmp out of the way.
+  * ./plugins/avi/fourcc.h, ./include/video.h: merged these two files into
+    video.h.
+  * ./include/os_specific.h: this file is now always included.
+  * ./include/debug.h: removed this file which was almost useless, and moved
+    ASSERT to common.h.
+  * ./include/common.h: fixed vlc_memalign and changed its prototype to
+    follow posix_memalign's.
+  * ./configure.in: dropped usage of $withval and $enableval in favor of the
+    safer variants $with_foo and $enable_foo.
+  * ./plugins/avi/avi.c: will not segfault when no audio is found/supported.
+  * ./plugins/ffmpeg/ffmpeg.c: with empty frame(data_packet) it won't segfault.
+  * ./plugins/avi/avi.c: use KeyFrame to seek, so video will not be bad as
+    before.
+  * ./plugins/mpeg_system/mpeg_ts.c: moved Program Specific Information
+    decoder to the ts demux module.
+  * ./plugins/mpeg_system/Makefile: added a mpeg_ts_dvbpsi module tha uses
+    libdvbpsi to decode PSIs. It is used by default if the lib is found. It
+    shares much code with mpeg_ts.
+  * ./plugins/directx/vout_events.c: fixed typo. You have to double click on
+    the video window to switch to fullscreen.
+  * ./src/misc/configuration.c: on Win32 the config file is now stored under
+    the "Application Data" folder belonging to the user. (this works if at
+    least IE4 is installed, otherwise the old method is used to get the
+    config directory)
+  * ./configure.in: fixed MacOS X module linking problem.
+  * ./src/interface/main.c: we no longer segfault if argc == 0.  
+  * ALL: renamed PLUGINS to __PLUGINS__ to avoid conflicts with libraries
+    defining it. Grmbl.
+  * ./src/input/input_ext-plugins.c: cosmetic change.
+  * ./plugins/ac3_adec/*: use of _M to avoid conflict with libavcodec.a.
+  * ./plugins/avi/*: a light AVI demux.
+  * ./plugins/ffmpeg/*: a video decoder for divx v3 and opendivx.
+  * ./plugins/win32/preferences.cpp: fixed a compilation bug
+  * ./plugins/avi, ./plugins/ffmpeg: created empty directories for fenrir's
+    upcoming work.
+  * ./plugins/spudec/spu_decoder.c: fixed the spu decoder to take the pitch
+    of the destination picture into account when rendering the subtitles
+    (Implemented only for the YUV modes).
+  * ./plugins/directx/vout_events.c: fixed the mouse autohidding feature in
+    the DirectX plugin (at least partially).
+  * ./plugins/directx/vout_directx.c: fixed the DirectX video output for
+    non-overlay modes. It was only working in RGB16 before.
+  * ./plugins/directx/vout_directx.c: DirectX video output plugin now uses
+    triple buffering for YUV overlay. This improves the video quality a lot
+    (no tearing) without affecting performance. (I knew double buffering
+    sucked but I just discovered why triple buffering is better: you don't
+    have to wait for the vsync to flip the buffers).
   * ./plugins/spudec/spu_decoder.c, ./plugins/dvd/dvd_es.c: temporary fix
     to avoid retrieving the spu palette from a network stream as if it was
     a DVD.

@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.28 2002/04/23 23:44:36 fenrir Exp $
+ * $Id: ac3_adec.c,v 1.29 2002/04/25 21:52:42 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -120,7 +120,7 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
      */
     p_ac3thread->p_fifo = p_ac3thread->p_config->p_decoder_fifo;
     p_ac3thread->ac3_decoder =
-        vlc_memalign( 16, sizeof(ac3dec_t), &p_ac3thread->ac3_decoder_orig );
+        vlc_memalign( &p_ac3thread->ac3_decoder_orig, 16, sizeof(ac3dec_t) );
 
     /*
      * Choose the best downmix module
@@ -153,7 +153,7 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
      * Choose the best IMDCT module
      */
     p_ac3thread->ac3_decoder->imdct =
-    vlc_memalign( 16, sizeof(imdct_t), &p_ac3thread->ac3_decoder->imdct_orig );
+    vlc_memalign( &p_ac3thread->ac3_decoder->imdct_orig, 16, sizeof(imdct_t) );
     
 #define IMDCT p_ac3thread->ac3_decoder->imdct
     psz_name = config_GetPszVariable( IMDCT_METHOD_VAR );
@@ -180,39 +180,39 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
 
     /* Initialize the ac3 decoder structures */
     p_ac3thread->ac3_decoder->samples =
-        vlc_memalign( 16, 6 * 256 * sizeof(float),
-                      &p_ac3thread->ac3_decoder->samples_orig );
+        vlc_memalign( &p_ac3thread->ac3_decoder->samples_orig,
+                      16, 6 * 256 * sizeof(float) );
 
-    IMDCT->buf    = vlc_memalign( 16, N/4 * sizeof(complex_t),
-                                  &IMDCT->buf_orig );
-    IMDCT->delay  = vlc_memalign( 16, 6 * 256 * sizeof(float),
-                                  &IMDCT->delay_orig );
-    IMDCT->delay1 = vlc_memalign( 16, 6 * 256 * sizeof(float),
-                                  &IMDCT->delay1_orig );
-    IMDCT->xcos1  = vlc_memalign( 16, N/4 * sizeof(float),
-                                  &IMDCT->xcos1_orig );
-    IMDCT->xsin1  = vlc_memalign( 16, N/4 * sizeof(float),
-                                  &IMDCT->xsin1_orig );
-    IMDCT->xcos2  = vlc_memalign( 16, N/8 * sizeof(float),
-                                  &IMDCT->xcos2_orig );
-    IMDCT->xsin2  = vlc_memalign( 16, N/8 * sizeof(float),
-                                  &IMDCT->xsin2_orig );
-    IMDCT->xcos_sin_sse = vlc_memalign( 16, 128 * 4 * sizeof(float),
-                                        &IMDCT->xcos_sin_sse_orig );
-    IMDCT->w_1    = vlc_memalign( 16, 1  * sizeof(complex_t),
-                                  &IMDCT->w_1_orig );
-    IMDCT->w_2    = vlc_memalign( 16, 2  * sizeof(complex_t),
-                                  &IMDCT->w_2_orig );
-    IMDCT->w_4    = vlc_memalign( 16, 4  * sizeof(complex_t),
-                                  &IMDCT->w_4_orig );
-    IMDCT->w_8    = vlc_memalign( 16, 8  * sizeof(complex_t),
-                                  &IMDCT->w_8_orig );
-    IMDCT->w_16   = vlc_memalign( 16, 16 * sizeof(complex_t),
-                                  &IMDCT->w_16_orig );
-    IMDCT->w_32   = vlc_memalign( 16, 32 * sizeof(complex_t),
-                                  &IMDCT->w_32_orig );
-    IMDCT->w_64   = vlc_memalign( 16, 64 * sizeof(complex_t),
-                                  &IMDCT->w_64_orig );
+    IMDCT->buf    = vlc_memalign( &IMDCT->buf_orig,
+                                  16, N/4 * sizeof(complex_t) );
+    IMDCT->delay  = vlc_memalign( &IMDCT->delay_orig,
+                                  16, 6 * 256 * sizeof(float) );
+    IMDCT->delay1 = vlc_memalign( &IMDCT->delay1_orig,
+                                  16, 6 * 256 * sizeof(float) );
+    IMDCT->xcos1  = vlc_memalign( &IMDCT->xcos1_orig,
+                                  16, N/4 * sizeof(float) );
+    IMDCT->xsin1  = vlc_memalign( &IMDCT->xsin1_orig,
+                                  16, N/4 * sizeof(float) );
+    IMDCT->xcos2  = vlc_memalign( &IMDCT->xcos2_orig,
+                                  16, N/8 * sizeof(float) );
+    IMDCT->xsin2  = vlc_memalign( &IMDCT->xsin2_orig,
+                                  16, N/8 * sizeof(float) );
+    IMDCT->xcos_sin_sse = vlc_memalign( &IMDCT->xcos_sin_sse_orig,
+                                        16, 128 * 4 * sizeof(float) );
+    IMDCT->w_1    = vlc_memalign( &IMDCT->w_1_orig,
+                                  16, 1  * sizeof(complex_t) );
+    IMDCT->w_2    = vlc_memalign( &IMDCT->w_2_orig,
+                                  16, 2  * sizeof(complex_t) );
+    IMDCT->w_4    = vlc_memalign( &IMDCT->w_4_orig,
+                                  16, 4  * sizeof(complex_t) );
+    IMDCT->w_8    = vlc_memalign( &IMDCT->w_8_orig,
+                                  16, 8  * sizeof(complex_t) );
+    IMDCT->w_16   = vlc_memalign( &IMDCT->w_16_orig,
+                                  16, 16 * sizeof(complex_t) );
+    IMDCT->w_32   = vlc_memalign( &IMDCT->w_32_orig,
+                                  16, 32 * sizeof(complex_t) );
+    IMDCT->w_64   = vlc_memalign( &IMDCT->w_64_orig,
+                                  16, 64 * sizeof(complex_t) );
 
     _M( ac3_init )( p_ac3thread->ac3_decoder );
 
@@ -241,8 +241,8 @@ static int decoder_Run ( decoder_config_t * p_config )
     boolean_t           b_sync = 0;
 
     /* Allocate the memory needed to store the thread's structure */
-    p_ac3thread = (ac3dec_thread_t *)vlc_memalign( 16,
-                      sizeof(ac3dec_thread_t), &p_ac3thread_orig );
+    p_ac3thread = (ac3dec_thread_t *)vlc_memalign( &p_ac3thread_orig, 16,
+                                                   sizeof(ac3dec_thread_t) );
 
     if( p_ac3thread == NULL )
     {

@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.74 2002/04/24 00:36:24 sam Exp $
+ * $Id: video_output.h,v 1.75 2002/04/25 21:52:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -200,6 +200,8 @@ vout_fifo_t *   vout_CreateFifo     ( void );
 void            vout_DestroyFifo    ( vout_fifo_t * );
 void            vout_FreeFifo       ( vout_fifo_t * );
 
+int             vout_ChromaCmp          ( u32, u32 );
+
 picture_t *     vout_CreatePicture  ( vout_thread_t *,
                                       boolean_t, boolean_t, boolean_t );
 void            vout_AllocatePicture( picture_t *, int, int, u32 );
@@ -233,5 +235,6 @@ void            vout_RenderSubPictures  ( vout_thread_t *, picture_t *,
 #   define vout_LinkPicture p_symbols->vout_LinkPicture
 #   define vout_UnlinkPicture p_symbols->vout_UnlinkPicture
 #   define vout_PlacePicture p_symbols->vout_PlacePicture
+#   define vout_ChromaCmp p_symbols->vout_ChromaCmp
 #endif
 
