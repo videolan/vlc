@@ -2,7 +2,7 @@
  * gtk_main.c : Gtk+ wrapper for gtk_main
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: gtk_main.c,v 1.9 2002/10/04 18:07:21 sam Exp $
+ * $Id: gtk_main.c,v 1.10 2002/10/15 08:35:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -43,22 +43,10 @@ static void Close   ( vlc_object_t * );
 static void GtkMain ( vlc_object_t * );
 
 /*****************************************************************************
- * The gtk_main_t object.
- *****************************************************************************/
-#define MAX_ATEXIT 10
-
-typedef struct gtk_main_t
-{
-    VLC_COMMON_MEMBERS
-
-} gtk_main_t;
-
-/*****************************************************************************
  * Local variables (mutex-protected).
  *****************************************************************************/
-static vlc_mutex_t * p_gtklock;
-static int           i_refcount = 0;
-static gtk_main_t *  p_gtk_main = NULL;
+static int            i_refcount = 0;
+static vlc_object_t * p_gtk_main = NULL;
 
 /*****************************************************************************
  * Module descriptor
@@ -81,20 +69,23 @@ vlc_module_end();
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    /* FIXME: put this in the module (de)initialization ASAP */
-    p_gtklock = vlc_mutex_need( p_this, "gtk" );
+    vlc_value_t lockval;
 
-    vlc_mutex_lock( p_gtklock );
+    /* FIXME: put this in the module (de)initialization ASAP */
+    var_Create( p_this->p_libvlc, "gtk", VLC_VAR_MUTEX );
+
+    var_Get( p_this->p_libvlc, "gtk", &lockval );
+    vlc_mutex_lock( lockval.p_address );
 
     if( i_refcount > 0 )
     {
         i_refcount++;
-        vlc_mutex_unlock( p_gtklock );
+        vlc_mutex_unlock( lockval.p_address );
 
         return VLC_SUCCESS;
     }
 
-    p_gtk_main = vlc_object_create( p_this, sizeof(gtk_main_t) );
+    p_gtk_main = vlc_object_create( p_this, VLC_OBJECT_GENERIC );
 
     /* Only initialize gthreads if it's the first time we do it */
     if( !g_thread_supported() )
@@ -109,13 +100,13 @@ static int Open( vlc_object_t *p_this )
     {
         vlc_object_destroy( p_gtk_main );
         i_refcount--;
-        vlc_mutex_unlock( p_gtklock );
-        vlc_mutex_unneed( p_this, "gtk" );
+        vlc_mutex_unlock( lockval.p_address );
+        var_Destroy( p_this->p_libvlc, "gtk" );
         return VLC_ETHREAD;
     }
 
     i_refcount++;
-    vlc_mutex_unlock( p_gtklock );
+    vlc_mutex_unlock( lockval.p_address );
 
     return VLC_SUCCESS;
 }
@@ -125,14 +116,17 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    vlc_mutex_lock( p_gtklock );
+    vlc_value_t lockval;
+
+    var_Get( p_this->p_libvlc, "gtk", &lockval );
+    vlc_mutex_lock( lockval.p_address );
 
     i_refcount--;
 
     if( i_refcount > 0 )
     {
-        vlc_mutex_unlock( p_gtklock );
-        vlc_mutex_unneed( p_this, "gtk" );
+        vlc_mutex_unlock( lockval.p_address );
+        var_Destroy( p_this->p_libvlc, "gtk" );
         return;
     }
 
@@ -142,8 +136,8 @@ static void Close( vlc_object_t *p_this )
     vlc_object_destroy( p_gtk_main );
     p_gtk_main = NULL;
 
-    vlc_mutex_unlock( p_gtklock );
-    vlc_mutex_unneed( p_this, "gtk" );
+    vlc_mutex_unlock( lockval.p_address );
+    var_Destroy( p_this->p_libvlc, "gtk" );
 }
 
 static gint foo( gpointer bar ) { return TRUE; }

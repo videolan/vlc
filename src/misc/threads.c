@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.21 2002/10/04 18:07:22 sam Exp $
+ * $Id: threads.c,v 1.22 2002/10/15 08:35:24 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -319,99 +319,6 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
     return B_OK;
 
 #endif
-}
-
-/*****************************************************************************
- * vlc_mutex_need: create a global mutex from its name
- *****************************************************************************/
-vlc_mutex_t * __vlc_mutex_need( vlc_object_t *p_this, char *psz_name )
-{
-    vlc_namedmutex_t *p_named;
-
-    vlc_mutex_lock( &named_lock );
-
-    p_named = p_named_list;
-    while( p_named )
-    {
-        if( !strcmp( psz_name, p_named->psz_name ) )
-        {
-            break;
-        }
-        p_named = p_named->p_next;
-    }
-
-    if( p_named )
-    {
-        p_named->i_usage++;
-    }
-    else
-    {
-        p_named = malloc( sizeof( vlc_namedmutex_t ) );
-        vlc_mutex_init( p_this, &p_named->lock );
-        p_named->psz_name = strdup( psz_name );
-        p_named->i_usage = 1;
-        p_named->p_next = p_named_list;
-        p_named_list = p_named;
-    }
-
-    vlc_mutex_unlock( &named_lock );
-
-    return &p_named->lock;
-}
-
-/*****************************************************************************
- * vlc_mutex_unneed: destroy a global mutex from its name
- *****************************************************************************/
-void __vlc_mutex_unneed( vlc_object_t *p_this, char *psz_name )
-{
-    vlc_namedmutex_t *p_named, *p_prev;
-
-    vlc_mutex_lock( &named_lock );
-
-    p_named = p_named_list;
-    p_prev = NULL;
-    while( p_named )
-    {
-        if( !strcmp( psz_name, p_named->psz_name ) )
-        {
-            break;
-        }
-        p_prev = p_named;
-        p_named = p_named->p_next;
-    }
-
-    if( p_named )
-    {
-        p_named->i_usage--;
-
-        if( p_named->i_usage <= 0 )
-        {
-            /* Unlink named mutex */
-            if( p_prev )
-            {
-                p_prev->p_next = p_named->p_next;
-            }
-            else
-            {
-                p_named_list = p_named->p_next;
-            }
-
-            /* Release this lock as soon as possible */
-            vlc_mutex_unlock( &named_lock );
-
-            vlc_mutex_destroy( &p_named->lock );
-            free( p_named->psz_name );
-            free( p_named );
-
-            return;
-        }
-    }
-    else
-    {
-        msg_Err( p_this, "no named mutex called %s", psz_name );
-    }
-
-    vlc_mutex_unlock( &named_lock );
 }
 
 /*****************************************************************************

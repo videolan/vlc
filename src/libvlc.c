@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.39 2002/10/14 16:46:55 sam Exp $
+ * $Id: libvlc.c,v 1.40 2002/10/15 08:35:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -125,7 +125,7 @@ int VLC_Create( void )
 {
     int i_ret;
     vlc_t * p_vlc = NULL;
-    vlc_mutex_t * p_libvlc_lock;
+    vlc_value_t lockval;
 
     /* vlc_threads_init *must* be the first internal call! No other call is
      * allowed before the thread system has been initialized. */
@@ -136,9 +136,10 @@ int VLC_Create( void )
     }
 
     /* Now that the thread system is initialized, we don't have much, but
-     * at least we have vlc_mutex_need */
-    p_libvlc_lock = vlc_mutex_need( &libvlc, "libvlc" );
-    vlc_mutex_lock( p_libvlc_lock );
+     * at least we have var_Create */
+    var_Create( &libvlc, "libvlc", VLC_VAR_MUTEX );
+    var_Get( &libvlc, "libvlc", &lockval );
+    vlc_mutex_lock( lockval.p_address );
     if( !libvlc.b_ready )
     {
         char *psz_env;
@@ -172,8 +173,8 @@ int VLC_Create( void )
 
         libvlc.b_ready = VLC_TRUE;
     }
-    vlc_mutex_unlock( p_libvlc_lock );
-    vlc_mutex_unneed( &libvlc, "libvlc" );
+    vlc_mutex_unlock( lockval.p_address );
+    var_Destroy( &libvlc, "libvlc" );
 
     /* Allocate a vlc object */
     p_vlc = vlc_object_create( &libvlc, VLC_OBJECT_VLC );

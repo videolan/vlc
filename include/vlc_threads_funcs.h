@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads_funcs.h,v 1.5 2002/10/04 18:07:21 sam Exp $
+ * $Id: vlc_threads_funcs.h,v 1.6 2002/10/15 08:35:24 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -38,9 +38,6 @@ VLC_EXPORT( int,  __vlc_thread_create, ( vlc_object_t *, char *, int, char *, vo
 VLC_EXPORT( void, __vlc_thread_ready,  ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, char *, int ) );
 
-VLC_EXPORT( vlc_mutex_t *, __vlc_mutex_need,   ( vlc_object_t *, char * ) );
-VLC_EXPORT( void         , __vlc_mutex_unneed, ( vlc_object_t *, char * ) );
-
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
  *****************************************************************************/
@@ -58,12 +55,6 @@ VLC_EXPORT( void         , __vlc_mutex_unneed, ( vlc_object_t *, char * ) );
  *****************************************************************************/
 #define vlc_mutex_init( P_THIS, P_MUTEX )                                   \
     __vlc_mutex_init( VLC_OBJECT(P_THIS), P_MUTEX )
-
-/*****************************************************************************
- * vlc_mutex_need: create a global mutex from its name
- *****************************************************************************/
-#define vlc_mutex_need( P_THIS, P_NAME )                                    \
-    __vlc_mutex_need( VLC_OBJECT(P_THIS), P_NAME )
 
 /*****************************************************************************
  * vlc_mutex_lock: lock a mutex
@@ -200,12 +191,6 @@ static inline int __vlc_mutex_unlock( char * psz_file, int i_line,
 
     return i_result;
 }
-
-/*****************************************************************************
- * vlc_mutex_unneed: destroycreate a global mutex from its name
- *****************************************************************************/
-#define vlc_mutex_unneed( P_THIS, P_NAME )                                  \
-    __vlc_mutex_unneed( VLC_OBJECT(P_THIS), P_NAME )
 
 /*****************************************************************************
  * vlc_mutex_destroy: destroy a mutex
