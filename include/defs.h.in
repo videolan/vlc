@@ -1,4 +1,4 @@
-/* include/defs.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
+/* include/defs.h.in.  Generated automatically from configure.in by autoheader.  */
 
 /* Define if using alloca.c.  */
 #undef C_ALLOCA
@@ -226,6 +226,9 @@
 /* Define if you have the <linux/fb.h> header file.  */
 #undef HAVE_LINUX_FB_H
 
+/* Define if you have the <linux/version.h> header file.  */
+#undef HAVE_LINUX_VERSION_H
+
 /* Define if you have the <locale.h> header file.  */
 #undef HAVE_LOCALE_H
 
@@ -255,9 +258,6 @@
 
 /* Define if you have the <pthread.h> header file.  */
 #undef HAVE_PTHREAD_H
-
-/* Define if you have the <scsi/scsi_ioctl.h> header file.  */
-#undef HAVE_SCSI_SCSI_IOCTL_H
 
 /* Define if you have the <soundcard.h> header file.  */
 #undef HAVE_SOUNDCARD_H

@@ -2,7 +2,7 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.8 2002/04/04 05:08:05 sam Exp $
+ * $Id: intf_eject.c,v 1.9 2002/04/04 22:08:05 massiot Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
@@ -41,7 +41,7 @@
 #   include <dvd.h>
 #endif
 
-#ifdef SYS_LINUX
+#if defined(SYS_LINUX) && defined(HAVE_LINUX_VERSION_H)
 #   include <linux/version.h>
     /* handy macro found in 2.1 kernels, but not in older ones */
 #   ifndef KERNEL_VERSION
@@ -60,17 +60,15 @@
 #       include <linux/ucdrom.h>
 #   endif
 
-#   ifdef HAVE_SCSI_SCSI_IOCTL_H
-#      include <scsi/scsi.h>
-#      include <scsi/sg.h>
-#      include <scsi/scsi_ioctl.h>
-#   endif
+#   include <scsi/scsi.h>
+#   include <scsi/sg.h>
+#   include <scsi/scsi_ioctl.h>
 #endif
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-#if defined(SYS_LINUX) && defined(HAVE_SCSI_SCSI_IOCTL_H)
+#if defined(SYS_LINUX) && defined(HAVE_LINUX_VERSION_H)
 static int EjectSCSI ( int i_fd );
 #endif
 
@@ -141,16 +139,14 @@ int intf_Eject( const char *psz_device )
         return 1;
     }
 
-#ifdef SYS_LINUX
+#if defined(SYS_LINUX) && defined(HAVE_LINUX_VERSION_H)
     /* Try a simple ATAPI eject */
     i_ret = ioctl( i_fd, CDROMEJECT, 0 );
 
-#ifdef HAVE_SCSI_SCSI_IOCTL_H
     if( i_ret != 0 )
     {
         i_ret = EjectSCSI( i_fd );
     }
-#endif
 
     if( i_ret != 0 )
     {
@@ -172,7 +168,7 @@ int intf_Eject( const char *psz_device )
 
 /* The following functions are local */
 
-#if defined(SYS_LINUX) && defined(HAVE_SCSI_SCSI_IOCTL_H)
+#if defined(SYS_LINUX) && defined(HAVE_LINUX_VERSION_H)
 /*****************************************************************************
  * Eject using SCSI commands. Return 0 if successful
  *****************************************************************************/

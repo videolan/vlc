@@ -166,7 +166,7 @@ AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/time.h sys/times.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
 AC_CHECK_HEADERS(machine/param.h sys/shm.h)
-AC_CHECK_HEADERS(scsi/scsi_ioctl.h)
+AC_CHECK_HEADERS(linux/version.h)
 
 AC_HEADER_TIME
 
@@ -378,9 +378,9 @@ MMX_MODULES="memcpymmx idctmmx motionmmx chroma_i420_rgb_mmx chroma_i420_yuy2_mm
 MMXEXT_MODULES="memcpymmxext idctmmxext motionmmxext"
 THREEDNOW_MODULES="memcpy3dn imdct3dn downmix3dn"
 if test x$SYS != xmingw32; then
-SSE_MODULES="imdctsse downmixsse"
+  SSE_MODULES="imdctsse downmixsse"
 fi
-ALTIVEC_MODULES="idctaltivec motionaltivec"
+ALTIVEC_MODULES="idctaltivec motionaltivec memcpyaltivec"
 
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
     [ac_cv_mmx_inline],
@@ -435,6 +435,7 @@ if test x"$ac_cv_altivec_inline" != x"no"; then
   if test x"$ac_cv_altivec_inline" != x"yes"; then
     CFLAGS_IDCTALTIVEC="$CFLAGS_IDCTALTIVEC $ac_cv_altivec_inline"
     CFLAGS_MOTIONALTIVEC="$CFLAGS_MOTIONALTIVEC $ac_cv_altivec_inline"
+    CFLAGS_MEMCPYALTIVEC="$CFLAGS_MEMCPYALTIVEC $ac_cv_altivec_inline"
     CFLAGS_VLC="$CFLAGS_VLC $ac_cv_altivec_inline"
   fi
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
@@ -460,7 +461,7 @@ if test x"$ac_cv_c_altivec" != x"no"; then
   CFLAGS_MOTIONALTIVEC="$CFLAGS_MOTIONALTIVEC $ac_cv_c_altivec"
   CFLAGS_MEMCPYALTIVEC="$CFLAGS_MEMCPYALTIVEC $ac_cv_c_altivec"
   CFLAGS_VLC="$CFLAGS_VLC $ac_cv_c_altivec"
-  ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES} memcpyaltivec"
+  ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
 
 AC_CACHE_CHECK([if linker needs -framework vecLib],
