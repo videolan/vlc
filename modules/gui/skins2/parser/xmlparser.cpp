@@ -2,7 +2,7 @@
  * xmlparser.cpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: xmlparser.cpp,v 1.4 2004/01/25 23:04:01 asmax Exp $
+ * $Id: xmlparser.cpp,v 1.5 2004/02/01 14:44:11 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -64,6 +64,10 @@ bool XMLParser::parse()
     int ret = xmlTextReaderRead( m_pReader );
     while (ret == 1)
     {
+        if( m_errors )
+        {
+            return false;
+        }
         // Get the node type
         int type = xmlTextReaderNodeType( m_pReader );
         switch (type )

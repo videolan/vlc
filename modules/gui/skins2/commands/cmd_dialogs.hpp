@@ -2,7 +2,7 @@
  * cmd_dialogs.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cmd_dialogs.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: cmd_dialogs.hpp,v 1.2 2004/02/01 14:44:11 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -41,8 +41,9 @@ typedef CmdDialogs<5> CmdDlgNet;
 typedef CmdDialogs<6> CmdDlgMessages;
 typedef CmdDialogs<7> CmdDlgPrefs;
 typedef CmdDialogs<8> CmdDlgFileInfo;
-typedef CmdDialogs<9> CmdDlgPopupMenu;
-typedef CmdDialogs<10> CmdDlgAdd;
+typedef CmdDialogs<9> CmdDlgShowPopupMenu;
+typedef CmdDialogs<10> CmdDlgHidePopupMenu;
+typedef CmdDialogs<11> CmdDlgAdd;
 
 
 /// Generic "Open dialog" command
@@ -93,6 +94,9 @@ class CmdDialogs: public CmdGeneric
                     pDialogs->showPopupMenu( true );
                     break;
                 case 10:
+                    pDialogs->showPopupMenu( false );
+                    break;
+                case 11:
                     pDialogs->showFile( false );
                     break;
                 default:

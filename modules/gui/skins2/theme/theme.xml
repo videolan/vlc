@@ -64,21 +64,9 @@
   <Font id="default_font" font="FreeSansBold.ttf" size="15"/> 
   <Font id="playlist_font" font="FreeSansBold.ttf" size="12"/> 
 
-<!--
-  <Event id="mouseoverclose" event="CTRL_ID_VISIBLE(mouseimg,TRUE)"/>
-  <Event id="mouseoutclose" event="CTRL_ID_VISIBLE(mouseimg,FALSE)"/>
-  <Event id="move" event="WINDOW_MOVE(mainwindow)"/>
-  <Event id="move_playlist" event="WINDOW_MOVE(playlist_window)"/>
-  <Event id="hide_playlist" event="WINDOW_CLOSE(playlist_window)"/>
-  <Event id="show_playlist" event="WINDOW_OPEN(playlist_window)"/>
-
-
-  <Event id="item_add" event="VLC_PLAYLIST_ADD_FILE"/>
-  <Event id="item_del" event="PLAYLIST_ID_DEL(playlist)"/>
--->
   <Window id="mainwindow" x="230" y="250" dragdrop="true">
 
-   <Layout id="testlayout" width="424" height="152">
+    <Layout id="testlayout" width="424" height="152">
     <Group x="0" y="0">
       <Image x="0" y="0" image="mainbody" onclick="move"/>
       <Button x="8" y="5" up="close" down="close_onclick" over="close_mouseover" action="vlc.quit()" tooltiptext="Quit VLC"/>

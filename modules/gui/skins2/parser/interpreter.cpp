@@ -2,7 +2,7 @@
  * interpreter.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: interpreter.cpp,v 1.4 2004/01/18 19:54:46 asmax Exp $
+ * $Id: interpreter.cpp,v 1.5 2004/02/01 14:44:11 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -51,7 +51,7 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_CMD( "dialogs.messages()", CmdDlgMessages )
     REGISTER_CMD( "dialogs.prefs()", CmdDlgPrefs )
     REGISTER_CMD( "dialogs.fileInfo()", CmdDlgFileInfo )
-    REGISTER_CMD( "dialogs.popup()", CmdDlgPopupMenu )
+    REGISTER_CMD( "dialogs.popup()", CmdDlgShowPopupMenu )
     REGISTER_CMD( "playlist.add()", CmdDlgAdd )
     VarList &rVar = VlcProc::instance( getIntf() )->getPlaylistVar();
     m_commandMap["playlist.del()"] =
