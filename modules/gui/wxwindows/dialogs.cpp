@@ -304,7 +304,7 @@ void DialogsProvider::OnOpenFileGeneric( wxCommandEvent& event )
     }
 
     if( p_file_generic_dialog == NULL )
-        p_file_generic_dialog = new wxFileDialog( this );
+        p_file_generic_dialog = new wxFileDialog( NULL );
 
     if( p_file_generic_dialog )
     {
@@ -376,7 +376,7 @@ void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )
     }
 
     if( p_file_dialog == NULL )
-        p_file_dialog = new wxFileDialog( this, wxU(_("Open File")),
+        p_file_dialog = new wxFileDialog( NULL, wxU(_("Open File")),
             wxT(""), wxT(""), wxT("*"), wxOPEN | wxMULTIPLE );
 
     if( p_file_dialog && p_file_dialog->ShowModal() == wxID_OK )
