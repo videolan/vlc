@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -503,6 +503,8 @@ static int DecoderThread( decoder_t * p_dec )
  */
 static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 {
+    int i_rate = p_block->i_rate;
+
     if( p_block->i_buffer <= 0 )
     {
         block_Release( p_block );
@@ -519,7 +521,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             {
                 es_format_Copy( &p_dec->p_owner->sout, &p_dec->fmt_out );
 
-                p_dec->p_owner->sout.i_group =p_dec->fmt_in.i_group;
+                p_dec->p_owner->sout.i_group = p_dec->fmt_in.i_group;
                 p_dec->p_owner->sout.i_id = p_dec->fmt_in.i_id;
                 if( p_dec->fmt_in.psz_language )
                 {
@@ -548,9 +550,10 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 
             while( p_sout_block )
             {
-                block_t       *p_next = p_sout_block->p_next;
+                block_t *p_next = p_sout_block->p_next;
 
                 p_sout_block->p_next = NULL;
+                p_sout_block->i_rate = i_rate;
 
                 sout_InputSendBuffer( p_dec->p_owner->p_sout_input,
                                       p_sout_block );
@@ -589,6 +592,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 {
                     block_t *p_next = p_packetized_block->p_next;
                     p_packetized_block->p_next = NULL;
+                    p_packetized_block->i_rate = i_rate;
 
                     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec,
                                                        &p_packetized_block )) )
@@ -624,6 +628,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 {
                     block_t *p_next = p_packetized_block->p_next;
                     p_packetized_block->p_next = NULL;
+                    p_packetized_block->i_rate = i_rate;
 
                     while( (p_pic = p_dec->pf_decode_video( p_dec,
                                                        &p_packetized_block )) )
