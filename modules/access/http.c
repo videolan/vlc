@@ -68,7 +68,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("HTTP input") );
-    set_capability( "access2", 1 );
+    set_capability( "access2", 0 );
 
     add_string( "http-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT,
                 VLC_FALSE );
@@ -269,11 +269,9 @@ static int  Open ( vlc_object_t *p_this )
 
     if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "video/x-ms-asf" ) )
     {
-        char *p = strcasestr( p_access->psz_path, "asx" );
-
-        if( p == NULL )
+        if( !strcasestr( p_access->psz_path, "asx" ) )
         {
-            msg_Dbg( p_access, "This isn't http, it's mms" );
+            msg_Dbg( p_access, "this isn't http, it's mms" );
             goto error;
         }
     }
