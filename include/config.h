@@ -129,22 +129,11 @@
 #define VOLUME_MAX                      1024
 #define VOLUME_MIN                      0
 
-/* Number of audio output frames contained in an audio output fifo.
- * (AOUT_FIFO_SIZE + 1) must be a power of 2, in order to optimise the
- * %(AOUT_FIFO_SIZE + 1) operation with an &AOUT_FIFO_SIZE.
- * With 255 we have at least 255*384/2/48000=1 second of sound */
-#define AOUT_FIFO_SIZE                  255
+/* Max number of pre-filters per input, and max-number of post-filters */
+#define AOUT_MAX_FILTERS                10
 
-/* Maximum number of audio fifos. The value of AOUT_MAX_FIFOS should be a power
- * of two, in order to optimize the '/AOUT_MAX_FIFOS' and '*AOUT_MAX_FIFOS'
- * operations with '>>' and '<<' (gcc changes this at compilation-time) */
-#define AOUT_MAX_FIFOS                  2
-
-/* Duration (in microseconds) of an audio output buffer should be :
- * - short, in order to be able to play a new song very quickly (especially a
- *   song from the interface)
- * - long, in order to perform the buffer calculations as few as possible */
-#define AOUT_BUFFER_DURATION            90000
+/* Max number of inputs */
+#define AOUT_MAX_INPUTS                 5
 
 /*****************************************************************************
  * Video configuration

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * aout_dummy.c : dummy audio output plugin
+ * float32tos16.c : trivial mixer plug-in (1 input, no downmixing)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.c,v 1.2 2002/08/07 21:36:56 massiot Exp $
+ * $Id: float32tos16.c,v 1.1 2002/08/07 21:36:55 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -24,47 +24,75 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <errno.h>
+#include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
-#include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
-
+#include "audio_output.h"
 #include "aout_internal.h"
 
 /*****************************************************************************
- * Local prototypes.
+ * Local prototypes
  *****************************************************************************/
-static int     SetFormat   ( aout_instance_t * );
-static void    Play        ( aout_instance_t *, aout_buffer_t * );
+static int  Create    ( vlc_object_t * );
+
+static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
+                        aout_buffer_t * );
 
 /*****************************************************************************
- * OpenAudio: open a dummy audio device
+ * Module descriptor
  *****************************************************************************/
-int E_(OpenAudio) ( vlc_object_t * p_this )
-{
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
-
-    p_aout->output.pf_setformat = SetFormat;
-    p_aout->output.pf_play = Play;
-
-    return VLC_SUCCESS;
-}
+vlc_module_begin();
+    set_description( _("aout filter for float32->s16 conversion") );
+    set_capability( "audio filter", 1 );
+    set_callbacks( Create, NULL );
+vlc_module_end();
 
 /*****************************************************************************
- * SetFormat: pretend to set the dsp output format
+ * Create: allocate trivial mixer
+ *****************************************************************************
+ * This function allocates and initializes a Crop vout method.
  *****************************************************************************/
-static int SetFormat( aout_instance_t * p_aout )
+static int Create( vlc_object_t *p_this )
 {
-    p_aout->output.i_nb_samples = 2048;
+    aout_filter_t * p_filter = (aout_filter_t *)p_this;
+
+    if ( p_filter->input.i_format != AOUT_FMT_FLOAT32
+          && p_filter->output.i_format != AOUT_FMT_S16_NE )
+    {
+        return -1;
+    }
+
+    if ( p_filter->input.i_rate != p_filter->output.i_rate
+          || p_filter->input.i_channels != p_filter->output.i_channels )
+    {
+        return -1;
+    }
+
+
+    p_filter->pf_do_work = DoWork;
+    p_filter->b_in_place = 1;
+
     return 0;
 }
 
 /*****************************************************************************
- * Play: pretend to play a sound
+ * DoWork: convert a buffer
  *****************************************************************************/
-static void Play( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
+static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
+                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
-    aout_BufferFree( p_buffer );
+    int i;
+    float * p_in = (float *)p_in_buf->p_buffer;
+    s16 * p_out = (s16 *)p_out_buf->p_buffer;
+
+    for ( i = 0; i < p_in_buf->i_nb_samples * p_filter->input.i_channels; i++ )
+    {
+        if ( *p_in >= 1.0 ) *p_out = 32767;
+        else if ( *p_in < -1.0 ) *p_out = -32768;
+        else *p_out = *p_in * 32768.0;
+        p_in++; p_out++;
+    }
 }
 

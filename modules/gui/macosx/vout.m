@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.m,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: vout.m,v 1.2 2002/08/07 21:36:56 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -58,7 +58,6 @@ struct picture_sys_t
 static int  vout_Init      ( vout_thread_t * );
 static void vout_End       ( vout_thread_t * );
 static int  vout_Manage    ( vout_thread_t * );
-static void vout_Render    ( vout_thread_t *, picture_t * );
 static void vout_Display   ( vout_thread_t *, picture_t * );
 
 static int  CoSendRequest      ( vout_thread_t *, long );
@@ -719,6 +718,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     switch( key )
     {
+#if 0
         case (unichar)0xf700: /* up-arrow */
         { 
             aout_thread_t * p_aout = vlc_object_find( p_vout, VLC_OBJECT_AOUT,
@@ -750,6 +750,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
             }
         }
         break;
+#endif
 
         case 'f': case 'F':
             [self toggleFullscreen];

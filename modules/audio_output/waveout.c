@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: waveout.c,v 1.1 2002/08/07 21:36:55 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      

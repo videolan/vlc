@@ -22,7 +22,7 @@ INTERFACE := interface intf_eject
 PLAYLIST := playlist
 INPUT := input input_ext-plugins input_ext-dec input_ext-intf input_dec input_programs input_clock input_info
 VIDEO_OUTPUT := video_output video_text vout_pictures vout_subpictures
-AUDIO_OUTPUT := audio_output aout_ext-dec aout_pcm aout_spdif
+AUDIO_OUTPUT := audio_output filters input mixer output
 MISC := mtime modules threads cpu configuration netutils iso_lang messages objects extras
 
 LIBVLC_OBJ :=	$(LIBVLC:%=src/%.o) \

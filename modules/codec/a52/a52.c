@@ -3,10 +3,11 @@
  *   This plugin makes use of liba52 to decode A/52 audio
  *   (http://liba52.sf.net/).
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * Copyright (C) 2001, 2002 VideoLAN
+ * $Id: a52.c,v 1.2 2002/08/07 21:36:56 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,30 +49,15 @@
 
 #define A52DEC_FRAME_SIZE 1536 
 
-/*
- * Global lock for accessing liba52 functions.
- * Currently, liba52 isn't thread-safe. So to prevent two threads from
- * using liba52 at the same time, we have to set up a global lock.
- * I know static variables aren't a good idea in multi-threaded programs,
- * but believe me, this is the way to go.
- * --Meuuh 2002-07-19
- */
-static vlc_mutex_t a52_lock;
-static vlc_bool_t  b_liba52_initialized = 0;
-
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  OpenDecoder    ( vlc_object_t * );
 static int  RunDecoder     ( decoder_fifo_t * );
-static int  DecodeFrame    ( a52_adec_thread_t * );
-static int  InitThread     ( a52_adec_thread_t * );
-static void EndThread      ( a52_adec_thread_t * );
-
-static void               BitstreamCallback ( bit_stream_t *, vlc_bool_t );
-static void               float2s16_2       ( float *, int16_t * );
-static inline int16_t     convert   ( int32_t );
+static int  DecodeFrame    ( a52_thread_t *, u8 * );
+static int  InitThread     ( a52_thread_t *, decoder_fifo_t * );
+static void EndThread      ( a52_thread_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -116,208 +102,211 @@ static int OpenDecoder( vlc_object_t *p_this )
  *****************************************************************************/
 static int RunDecoder( decoder_fifo_t *p_fifo )
 {
-    a52_adec_thread_t *p_a52_adec;
+    a52_thread_t *p_a52;
 
     /* Allocate the memory needed to store the thread's structure */
-    p_a52_adec = (a52_adec_thread_t *)malloc( sizeof(a52_adec_thread_t) );
-    if (p_a52_adec == NULL)
+    p_a52 = (a52_thread_t *)malloc( sizeof(a52_thread_t) );
+    if( p_a52 == NULL )
     {
         msg_Err( p_fifo, "out of memory" );
         DecoderError( p_fifo );
-        return( -1 );
+        return -1;
     }
 
-    /* FIXME */
-    p_a52_adec->i_channels = 2;
-
-    /*
-     * Initialize the thread properties
-     */
-    p_a52_adec->p_aout_fifo = NULL;
-    p_a52_adec->p_fifo = p_fifo;
-
-    if( InitThread( p_a52_adec ) )
+    if( InitThread( p_a52, p_fifo ) )
     {
-        msg_Err( p_a52_adec->p_fifo, "could not initialize thread" );
+        msg_Err( p_a52->p_fifo, "could not initialize thread" );
         DecoderError( p_fifo );
-        free( p_a52_adec );
-        return( -1 );
+        free( p_a52 );
+        return -1;
     }
 
     /* liba52 decoder thread's main loop */
-    while( !p_a52_adec->p_fifo->b_die && !p_a52_adec->p_fifo->b_error )
+    while( !p_a52->p_fifo->b_die && !p_a52->p_fifo->b_error )
     {
+        int i_frame_size, i_flags, i_rate, i_bit_rate;
+        mtime_t pts;
+        /* Temporary buffer to store the raw frame to be decoded */
+        u8  p_frame_buffer[3840];
 
-        /* look for sync word - should be 0x0b77 */
-        RealignBits(&p_a52_adec->bit_stream);
-        while( (ShowBits( &p_a52_adec->bit_stream, 16 ) ) != 0x0b77 && 
-               (!p_a52_adec->p_fifo->b_die) && (!p_a52_adec->p_fifo->b_error))
+        /* Look for sync word - should be 0x0b77 */
+        RealignBits(&p_a52->bit_stream);
+        while( (ShowBits( &p_a52->bit_stream, 16 ) ) != 0x0b77 && 
+               (!p_a52->p_fifo->b_die) && (!p_a52->p_fifo->b_error))
         {
-            RemoveBits( &p_a52_adec->bit_stream, 8 );
+            RemoveBits( &p_a52->bit_stream, 8 );
         }
 
-        /* get a52 frame header */
-        GetChunk( &p_a52_adec->bit_stream, p_a52_adec->p_frame_buffer, 7 );
-        if( p_a52_adec->p_fifo->b_die ) break;
+        /* Get A/52 frame header */
+        GetChunk( &p_a52->bit_stream, p_frame_buffer, 7 );
+        if( p_a52->p_fifo->b_die ) break;
 
-        /* check if frame is valid and get frame info */
-        vlc_mutex_lock( &a52_lock );
-        p_a52_adec->frame_size = a52_syncinfo( p_a52_adec->p_frame_buffer,
-                                               &p_a52_adec->flags,
-                                               &p_a52_adec->sample_rate,
-                                               &p_a52_adec->bit_rate );
-        vlc_mutex_unlock( &a52_lock );
+        /* Check if frame is valid and get frame info */
+        i_frame_size = a52_syncinfo( p_frame_buffer, &i_flags, &i_rate,
+                                     &i_bit_rate );
 
-        if( !p_a52_adec->frame_size )
+        if( !i_frame_size )
         {
-            msg_Warn( p_a52_adec->p_fifo, "a52_syncinfo failed" );
+            msg_Warn( p_a52->p_fifo, "a52_syncinfo failed" );
             continue;
         }
 
-        if( DecodeFrame( p_a52_adec ) && !p_a52_adec->p_fifo->b_die )
+        if( (p_a52->p_aout_input != NULL) &&
+            ( (p_a52->output_format.i_rate != i_rate)
+               /* || (p_a52->output_format.i_channels != i_channels) */ ) )
         {
-            DecoderError( p_fifo );
-            free( p_a52_adec );
-            return( -1 );
+            /* Parameters changed - this should not happen. */
+            aout_InputDelete( p_a52->p_aout, p_a52->p_aout_input );
+            p_a52->p_aout_input = NULL;
         }
 
+        /* Creating the audio input if not created yet. */
+        if( p_a52->p_aout_input == NULL )
+        {
+            p_a52->output_format.i_rate = i_rate;
+            /* p_a52->output_format.i_channels = i_channels; */
+            p_a52->p_aout_input = aout_InputNew( p_a52->p_fifo,
+                                                 &p_a52->p_aout,
+                                                 &p_a52->output_format );
+
+            if ( p_a52->p_aout_input == NULL )
+            {
+                p_a52->p_fifo->b_error = 1;
+                break;
+            }
+        }
+
+        /* Set the Presentation Time Stamp */
+        CurrentPTS( &p_a52->bit_stream, &pts, NULL );
+        if ( pts != 0 )
+        {
+            p_a52->last_date = pts;
+        }
+
+        /* Get the complete frame */
+        GetChunk( &p_a52->bit_stream, p_frame_buffer + 7,
+                  i_frame_size - 7 );
+        if( p_a52->p_fifo->b_die ) break;
+
+        if( DecodeFrame( p_a52, p_frame_buffer ) )
+        {
+            p_a52->p_fifo->b_error = 1;
+            break;
+        }
     }
 
     /* If b_error is set, the decoder thread enters the error loop */
-    if( p_a52_adec->p_fifo->b_error )
+    if( p_a52->p_fifo->b_error )
     {
-        DecoderError( p_a52_adec->p_fifo );
+        DecoderError( p_a52->p_fifo );
     }
 
     /* End of the liba52 decoder thread */
-    EndThread( p_a52_adec );
+    EndThread( p_a52 );
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
  * InitThread: initialize data before entering main loop
  *****************************************************************************/
-static int InitThread( a52_adec_thread_t * p_a52_adec )
+static int InitThread( a52_thread_t * p_a52, decoder_fifo_t * p_fifo )
 {
-    /* Initialize the global lock */
-    vlc_mutex_lock( p_a52_adec->p_fifo->p_vlc->p_global_lock );
-    if ( !b_liba52_initialized )
-    {
-        vlc_mutex_init( p_a52_adec->p_fifo, &a52_lock );
-        b_liba52_initialized = 1;
-    }
-    vlc_mutex_unlock( p_a52_adec->p_fifo->p_vlc->p_global_lock );
+    /* Initialize the thread properties */
+    p_a52->p_aout = NULL;
+    p_a52->p_aout_input = NULL;
+    p_a52->p_fifo = p_fifo;
+    p_a52->output_format.i_format = AOUT_FMT_FLOAT32;
+    p_a52->output_format.i_channels = 2; /* FIXME ! */
+    p_a52->last_date = 0;
 
     /* Initialize liba52 */
-    vlc_mutex_lock( &a52_lock );
-    p_a52_adec->p_a52_state = a52_init( 0 );
-    vlc_mutex_unlock( &a52_lock );
-    if( p_a52_adec->p_a52_state == NULL )
+    p_a52->p_a52_state = a52_init( 0 );
+    if( p_a52->p_a52_state == NULL )
     {
-        msg_Err( p_a52_adec->p_fifo, "unable to initialize liba52" );
+        msg_Err( p_a52->p_fifo, "unable to initialize liba52" );
         return -1;
     }
 
-    p_a52_adec->b_dynrng = config_GetInt( p_a52_adec->p_fifo, "a52-dynrng" );
+    p_a52->b_dynrng = config_GetInt( p_a52->p_fifo, "a52-dynrng" );
 
     /* Init the BitStream */
-    InitBitstream( &p_a52_adec->bit_stream,
-                   p_a52_adec->p_fifo,
-                   BitstreamCallback, NULL );
+    InitBitstream( &p_a52->bit_stream, p_a52->p_fifo,
+                   NULL, NULL );
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
- * DecodeFrame: decodes an ATSC A/52 frame.
+ * Interleave: helper function to interleave channels
  *****************************************************************************/
-static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
+static void Interleave( float * p_out, float * p_in, int i_channels )
 {
-    sample_t sample_level = 1;
-    byte_t   *p_buffer;
-    int i;
+    int i, j;
 
-    if( ( p_a52_adec->p_aout_fifo != NULL ) &&
-        ( p_a52_adec->p_aout_fifo->i_rate != p_a52_adec->sample_rate ) )
+    for ( j = 0; j < i_channels; j++ )
     {
-        /* Make sure the output thread leaves the NextFrame() function */
-        vlc_mutex_lock (&(p_a52_adec->p_aout_fifo->data_lock));
-        aout_DestroyFifo (p_a52_adec->p_aout_fifo);
-        vlc_cond_signal (&(p_a52_adec->p_aout_fifo->data_wait));
-        vlc_mutex_unlock (&(p_a52_adec->p_aout_fifo->data_lock));
-
-        p_a52_adec->p_aout_fifo = NULL;
-    }
-
-    /* Creating the audio output fifo if not created yet */
-    if( p_a52_adec->p_aout_fifo == NULL )
-    {
-        p_a52_adec->p_aout_fifo = aout_CreateFifo( p_a52_adec->p_fifo,
-                                    AOUT_FIFO_PCM, p_a52_adec->i_channels,
-                                    p_a52_adec->sample_rate,
-                                    A52DEC_FRAME_SIZE * p_a52_adec->i_channels,
-                                    NULL );
-
-        if ( p_a52_adec->p_aout_fifo == NULL )
-        { 
-            return( -1 );
+        for ( i = 0; i < 256; i++ )
+        {
+            p_out[i * i_channels + j] = p_in[j * 256 + i];
         }
     }
+}
 
-    /* Set the Presentation Time Stamp */
-    CurrentPTS( &p_a52_adec->bit_stream,
-                &p_a52_adec->p_aout_fifo->date[
-                    p_a52_adec->p_aout_fifo->i_end_frame],
-                NULL );
+/*****************************************************************************
+ * DecodeFrame: decode an ATSC A/52 frame.
+ *****************************************************************************/
+static int DecodeFrame( a52_thread_t * p_a52, u8 * p_frame_buffer )
+{
+    sample_t        i_sample_level = 1;
+    aout_buffer_t * p_buffer;
+    int             i, i_flags;
+    int             i_bytes_per_block = 256 * p_a52->output_format.i_channels
+                      * sizeof(float);
 
-    if( !p_a52_adec->p_aout_fifo->date[
-            p_a52_adec->p_aout_fifo->i_end_frame] )
+    if( !p_a52->last_date )
     {
-        p_a52_adec->p_aout_fifo->date[
-            p_a52_adec->p_aout_fifo->i_end_frame] = LAST_MDATE;
+        /* We've just started the stream, wait for the first PTS. */
+        return 0;
     }
 
-
-
-    p_buffer = ((byte_t *)p_a52_adec->p_aout_fifo->buffer) +
-        ( p_a52_adec->p_aout_fifo->i_end_frame * A52DEC_FRAME_SIZE *
-          p_a52_adec->i_channels * sizeof(s16) );
+    p_buffer = aout_BufferNew( p_a52->p_aout, p_a52->p_aout_input,
+                               A52DEC_FRAME_SIZE );
+    if ( p_buffer == NULL ) return -1;
+    p_buffer->start_date = p_a52->last_date;
+    p_a52->last_date += (mtime_t)(A52DEC_FRAME_SIZE * 1000000)
+                          / p_a52->output_format.i_rate;
+    p_buffer->end_date = p_a52->last_date;
 
     /* FIXME */
-    p_a52_adec->flags = A52_STEREO | A52_ADJUST_LEVEL;
+    i_flags = A52_STEREO | A52_ADJUST_LEVEL;
 
-    /* Get the complete frame */
-    GetChunk( &p_a52_adec->bit_stream, p_a52_adec->p_frame_buffer + 7,
-              p_a52_adec->frame_size - 7 );
-    if( p_a52_adec->p_fifo->b_die ) return( -1 );
+    /* Do the actual decoding now */
+    a52_frame( p_a52->p_a52_state, p_frame_buffer,
+               &i_flags, &i_sample_level, 0 );
 
-    /* do the actual decoding now */
-    vlc_mutex_lock( &a52_lock );
-    a52_frame( p_a52_adec->p_a52_state, p_a52_adec->p_frame_buffer,
-               &p_a52_adec->flags, &sample_level, 384 );
-
-    if( !p_a52_adec->b_dynrng )
-        a52_dynrng( p_a52_adec->p_a52_state, NULL, NULL );
-
-    for( i = 0; i < 6; i++ )
+    if( !p_a52->b_dynrng )
     {
-        if( a52_block( p_a52_adec->p_a52_state ) )
+        a52_dynrng( p_a52->p_a52_state, NULL, NULL );
+    }
+
+    for ( i = 0; i < 6; i++ )
+    {
+        sample_t * p_samples;
+
+        if( a52_block( p_a52->p_a52_state ) )
         {
-            msg_Warn( p_a52_adec->p_fifo, "a52_block failed for block %i", i );
+            msg_Warn( p_a52->p_fifo, "a52_block failed for block %i", i );
         }
 
-        float2s16_2( a52_samples( p_a52_adec->p_a52_state ),
-                     ((int16_t *)p_buffer) + i * 256 * p_a52_adec->i_channels );
+        p_samples = a52_samples( p_a52->p_a52_state );
+
+        /* Interleave the *$£%ù samples */
+        Interleave( (float *)(p_buffer->p_buffer + i * i_bytes_per_block),
+                    p_samples, p_a52->output_format.i_channels );
     }
-    vlc_mutex_unlock( &a52_lock );
 
-
-    vlc_mutex_lock( &p_a52_adec->p_aout_fifo->data_lock );
-    p_a52_adec->p_aout_fifo->i_end_frame = 
-      (p_a52_adec->p_aout_fifo->i_end_frame + 1) & AOUT_FIFO_SIZE;
-    vlc_cond_signal (&p_a52_adec->p_aout_fifo->data_wait);
-    vlc_mutex_unlock (&p_a52_adec->p_aout_fifo->data_lock);
+    aout_BufferPlay( p_a52->p_aout, p_a52->p_aout_input, p_buffer );
 
     return 0;
 }
@@ -325,62 +314,14 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
 /*****************************************************************************
  * EndThread : liba52 decoder thread destruction
  *****************************************************************************/
-static void EndThread (a52_adec_thread_t *p_a52_adec)
+static void EndThread (a52_thread_t *p_a52)
 {
-    /* If the audio output fifo was created, we destroy it */
-    if (p_a52_adec->p_aout_fifo != NULL)
+    if ( p_a52->p_aout_input != NULL )
     {
-        aout_DestroyFifo (p_a52_adec->p_aout_fifo);
-
-        /* Make sure the output thread leaves the NextFrame() function */
-        vlc_mutex_lock (&(p_a52_adec->p_aout_fifo->data_lock));
-        vlc_cond_signal (&(p_a52_adec->p_aout_fifo->data_wait));
-        vlc_mutex_unlock (&(p_a52_adec->p_aout_fifo->data_lock));
+        aout_InputDelete( p_a52->p_aout, p_a52->p_aout_input );
     }
 
-    vlc_mutex_lock( &a52_lock );
-    a52_free( p_a52_adec->p_a52_state );
-    vlc_mutex_unlock( &a52_lock );
-    free( p_a52_adec );
-
+    a52_free( p_a52->p_a52_state );
+    free( p_a52 );
 }
 
-/*****************************************************************************
- * float2s16_2 : converts floats to ints using a trick based on the IEEE
- *               floating-point format
- *****************************************************************************/
-static inline int16_t convert (int32_t i)
-{
-    if (i > 0x43c07fff)
-        return 32767;
-    else if (i < 0x43bf8000)
-        return -32768;
-    else
-        return i - 0x43c00000;
-}
-
-static void float2s16_2 (float * _f, int16_t * s16)
-{
-    int i;
-    int32_t * f = (int32_t *) _f;
-
-    for (i = 0; i < 256; i++) {
-      s16[2*i] = convert (f[i]);
-        s16[2*i+1] = convert (f[i+256]);
-    }
-}
-
-/*****************************************************************************
- * BitstreamCallback: Import parameters from the new data/PES packet
- *****************************************************************************
- * This function is called by input's NextDataPacket.
- *****************************************************************************/
-static void BitstreamCallback ( bit_stream_t * p_bit_stream,
-                                vlc_bool_t b_new_pes )
-{
-    if( b_new_pes )
-    {
-        /* Drop special A52 header */
-/*        p_bit_stream->p_byte += 3; */
-    }
-}

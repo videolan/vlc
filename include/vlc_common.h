@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.14 2002/08/07 00:29:36 sam Exp $
+ * $Id: vlc_common.h,v 1.15 2002/08/07 21:36:55 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -173,9 +173,10 @@ VLC_DECLARE_STRUCT(stream_descriptor_t)
 VLC_DECLARE_STRUCT(stream_sys_t)
 
 /* Audio */
-VLC_DECLARE_STRUCT(aout_thread_t)
-VLC_DECLARE_STRUCT(aout_sys_t)
-VLC_DECLARE_STRUCT(aout_fifo_t)
+VLC_DECLARE_STRUCT(aout_instance_t)
+VLC_DECLARE_STRUCT(aout_input_t)
+VLC_DECLARE_STRUCT(aout_buffer_t)
+VLC_DECLARE_STRUCT(audio_sample_format_t)
 
 /* Video */
 VLC_DECLARE_STRUCT(vout_thread_t)

@@ -2,7 +2,10 @@
 
 struct module_symbols_t
 {
-    aout_fifo_t * (* __aout_CreateFifo_inner) ( vlc_object_t *, int, int, int, int, void * ) ;
+    aout_buffer_t * (* aout_BufferNew_inner) ( aout_instance_t *, aout_input_t *, size_t ) ;
+    aout_buffer_t * (* aout_OutputNextBuffer_inner) ( aout_instance_t *, mtime_t ) ;
+    aout_input_t * (* __aout_InputNew_inner) ( vlc_object_t *, aout_instance_t **, audio_sample_format_t * ) ;
+    aout_instance_t * (* __aout_NewInstance_inner) ( vlc_object_t * ) ;
     char * (* __config_GetPsz_inner) (vlc_object_t *, const char *) ;
     char * (* config_GetHomeDir_inner) ( void ) ;
     char * (* input_OffsetToTime_inner) ( input_thread_t *, char *, off_t ) ;
@@ -95,7 +98,10 @@ struct module_symbols_t
     void (* __vlc_object_yield_inner) ( vlc_object_t * ) ;
     void (* __vlc_thread_join_inner) ( vlc_object_t *, char *, int ) ;
     void (* __vlc_thread_ready_inner) ( vlc_object_t * ) ;
-    void (* aout_DestroyFifo_inner) ( aout_fifo_t *p_fifo ) ;
+    void (* aout_BufferDelete_inner) ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) ;
+    void (* aout_BufferPlay_inner) ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) ;
+    void (* aout_DeleteInstance_inner) ( aout_instance_t * ) ;
+    void (* aout_InputDelete_inner) ( aout_instance_t *, aout_input_t * ) ;
     void (* config_Duplicate_inner) ( module_t *, module_config_t * ) ;
     void (* config_SetCallbacks_inner) ( module_config_t *, module_config_t * ) ;
     void (* config_UnsetCallbacks_inner) ( module_config_t * ) ;
@@ -146,7 +152,8 @@ struct module_symbols_t
 #   define UnalignedGetBits p_symbols->UnalignedGetBits_inner
 #   define UnalignedRemoveBits p_symbols->UnalignedRemoveBits_inner
 #   define UnalignedShowBits p_symbols->UnalignedShowBits_inner
-#   define __aout_CreateFifo p_symbols->__aout_CreateFifo_inner
+#   define __aout_InputNew p_symbols->__aout_InputNew_inner
+#   define __aout_NewInstance p_symbols->__aout_NewInstance_inner
 #   define __config_GetFloat p_symbols->__config_GetFloat_inner
 #   define __config_GetInt p_symbols->__config_GetInt_inner
 #   define __config_GetPsz p_symbols->__config_GetPsz_inner
@@ -193,7 +200,12 @@ struct module_symbols_t
 #   define __vlc_threads_end p_symbols->__vlc_threads_end_inner
 #   define __vlc_threads_init p_symbols->__vlc_threads_init_inner
 #   define __vout_CreateThread p_symbols->__vout_CreateThread_inner
-#   define aout_DestroyFifo p_symbols->aout_DestroyFifo_inner
+#   define aout_BufferDelete p_symbols->aout_BufferDelete_inner
+#   define aout_BufferNew p_symbols->aout_BufferNew_inner
+#   define aout_BufferPlay p_symbols->aout_BufferPlay_inner
+#   define aout_DeleteInstance p_symbols->aout_DeleteInstance_inner
+#   define aout_InputDelete p_symbols->aout_InputDelete_inner
+#   define aout_OutputNextBuffer p_symbols->aout_OutputNextBuffer_inner
 #   define config_Duplicate p_symbols->config_Duplicate_inner
 #   define config_FindConfig p_symbols->config_FindConfig_inner
 #   define config_GetHomeDir p_symbols->config_GetHomeDir_inner

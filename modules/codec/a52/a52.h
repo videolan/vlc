@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: a52.h,v 1.2 2002/08/07 21:36:56 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -24,19 +24,15 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * a52_adec_thread_t : a52 decoder thread descriptor
+ * a52_thread_t : a52 decoder thread descriptor
  *****************************************************************************/
-typedef struct a52_adec_thread_s
+typedef struct a52_thread_s
 {
     /*
      * liba52 properties
      */
-    a52_state_t *p_a52_state;
-    int         frame_size;
-    int         flags;
-    int         sample_rate;
-    int         bit_rate;
-    vlc_bool_t  b_dynrng;
+    a52_state_t *       p_a52_state;
+    vlc_bool_t          b_dynrng;
 
     /* The bit stream structure handles the PES stream at the bit level */
     bit_stream_t        bit_stream;
@@ -44,16 +40,14 @@ typedef struct a52_adec_thread_s
     /*
      * Input properties
      */
-    decoder_fifo_t     *p_fifo;                /* stores the PES stream data */
-    data_packet_t      *p_data;
+    decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
+    data_packet_t *     p_data;
 
     /*
      * Output properties
      */
-    aout_fifo_t        *p_aout_fifo; /* stores the decompressed audio frames */
-    int                i_channels;
-
-    /* temporary buffer to store the raw frame to be decoded */
-    u8 p_frame_buffer[3840];
-
-} a52_adec_thread_t;
+    aout_instance_t *   p_aout; /* opaque */
+    aout_input_t *      p_aout_input; /* opaque */
+    audio_sample_format_t output_format;
+    mtime_t             last_date;
+} a52_thread_t;

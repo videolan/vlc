@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: dummy.c,v 1.2 2002/08/07 21:36:56 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -56,10 +56,10 @@ vlc_module_begin();
         set_capability( "decoder", 0 );
         set_callbacks( E_(OpenDecoder), NULL );
     add_submodule();
-        set_capability( "audio output", 0 );
+        set_capability( "audio output", 1 );
         set_callbacks( E_(OpenAudio), NULL );
     add_submodule();
-        set_capability( "video output", 0 );
+        set_capability( "video output", 1 );
         set_callbacks( E_(OpenVideo), NULL );
         add_category_hint( N_("Video"), NULL );
         add_string( "dummy-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT );

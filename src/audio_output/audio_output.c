@@ -1,11 +1,10 @@
 /*****************************************************************************
- * audio_output.c : audio output thread
+ * audio_output.c : audio output instance
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.89 2002/08/04 20:04:11 sam Exp $
+ * Copyright (C) 2002 VideoLAN
+ * $Id: audio_output.c,v 1.90 2002/08/07 21:36:56 massiot Exp $
  *
- * Authors: Michel Kaempf <maxx@via.ecp.fr>
- *          Cyril Deguet <asmax@via.ecp.fr>
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,93 +29,37 @@
 
 #include <vlc/vlc.h>
 
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>                                           /* getpid() */
-#endif
-
-#ifdef WIN32                   /* getpid() for win32 is located in process.h */
-#   include <process.h>
+#ifdef HAVE_ALLOCA_H
+#   include <alloca.h>
 #endif
 
 #include "audio_output.h"
-
-#include "aout_pcm.h"
-#include "aout_spdif.h"
+#include "aout_internal.h"
 
 /*****************************************************************************
- * Local prototypes
+ * aout_NewInstance: initialize aout structure
  *****************************************************************************/
-static int  aout_SpawnThread ( aout_thread_t * p_aout );
-
-/*****************************************************************************
- * aout_CreateThread: initialize audio thread
- *****************************************************************************/
-aout_thread_t *aout_CreateThread( vlc_object_t *p_parent,
-                                  int i_channels, int i_rate )
+aout_instance_t * __aout_NewInstance( vlc_object_t * p_parent )
 {
-    aout_thread_t * p_aout;                             /* thread descriptor */
-    int             i_format;
+    aout_instance_t * p_aout;
 
-    /* Allocate descriptor */
+    /* Allocate descriptor. */
     p_aout = vlc_object_create( p_parent, VLC_OBJECT_AOUT );
     if( p_aout == NULL )
     {
         return NULL;
     }
 
-    p_aout->i_latency = 0;
-    p_aout->i_rate = config_GetInt( p_aout, "rate" );
-    p_aout->i_channels = config_GetInt( p_aout, "mono" ) ? 1 : 2;
+    /* Initialize members. */
+    vlc_mutex_init( p_parent, &p_aout->input_lock );
+    vlc_cond_init( p_parent, &p_aout->input_signal );
+    p_aout->i_inputs_active = 0;
+    p_aout->b_change_requested = 0;
+    p_aout->i_nb_inputs = 0;
 
-    i_format = config_GetInt( p_aout, "audio-format" );
-    if( ( !i_format ) || ( i_format > 8 ) )
-    {
-        p_aout->i_format = AOUT_FMT_S16_NE;
-    }
-    else
-    {
-        p_aout->i_format = 1 << ( i_format + 2 );
-    }
-
-    if( p_aout->i_rate == 0 )
-    {
-        msg_Err( p_aout, "null sample rate" );
-        vlc_object_destroy( p_aout );
-        return NULL;
-    }
-
-    /* Choose the best module */
-    p_aout->p_module = module_Need( p_aout, "audio output", "$aout" );
-    if( p_aout->p_module == NULL )
-    {
-        msg_Err( p_aout, "no suitable aout module" );
-        vlc_object_destroy( p_aout );
-        return NULL;
-    }
-
-    /*
-     * Initialize audio device
-     */
-    if ( p_aout->pf_setformat( p_aout ) )
-    {
-        module_Unneed( p_aout, p_aout->p_module );
-        vlc_object_destroy( p_aout );
-        return NULL;
-    }
-
-    /* Initialize the volume level */
-    p_aout->i_volume = config_GetInt( p_aout, "volume" );
-    p_aout->i_savedvolume = 0;
-    
-    /* FIXME: maybe it would be cleaner to change SpawnThread prototype
-     * see vout to handle status correctly ?? however, it is not critical since
-     * this thread is only called in main and all calls are blocking */
-    if( aout_SpawnThread( p_aout ) )
-    {
-        module_Unneed( p_aout, p_aout->p_module );
-        vlc_object_destroy( p_aout );
-        return NULL;
-    }
+    vlc_mutex_init( p_parent, &p_aout->mixer_lock );
+    vlc_cond_init( p_parent, &p_aout->mixer_signal );
+    p_aout->b_mixer_active = 0;
 
     vlc_object_attach( p_aout, p_parent->p_vlc );
 
@@ -124,135 +67,132 @@ aout_thread_t *aout_CreateThread( vlc_object_t *p_parent,
 }
 
 /*****************************************************************************
- * aout_SpawnThread
+ * aout_DeleteInstance: destroy aout structure
  *****************************************************************************/
-static int aout_SpawnThread( aout_thread_t * p_aout )
+void aout_DeleteInstance( aout_instance_t * p_aout )
 {
-    int     i_index, i_bytes;
-    void (* pf_aout_thread)( aout_thread_t * ) = NULL;
-    char   *psz_format;
+    vlc_mutex_destroy( &p_aout->input_lock );
+    vlc_cond_destroy( &p_aout->input_signal );
+    vlc_mutex_destroy( &p_aout->mixer_lock );
+    vlc_cond_destroy( &p_aout->mixer_signal );
 
-    /* Initialize the fifos lock */
-    vlc_mutex_init( p_aout, &p_aout->fifos_lock );
-
-    /* Initialize audio fifos : set all fifos as empty and initialize locks */
-    for ( i_index = 0; i_index < AOUT_MAX_FIFOS; i_index++ )
-    {
-        p_aout->fifo[i_index].i_format = AOUT_FIFO_NONE;
-        vlc_mutex_init( p_aout, &p_aout->fifo[i_index].data_lock );
-        vlc_cond_init( p_aout, &p_aout->fifo[i_index].data_wait );
-    }
-
-    /* Compute the size (in audio units) of the audio output buffer. Although
-     * AOUT_BUFFER_DURATION is given in microseconds, the output rate is given
-     * in Hz, that's why we need to divide by 10^6 microseconds (1 second) */
-    p_aout->i_units = (s64)p_aout->i_rate * AOUT_BUFFER_DURATION / 1000000;
-
-    /* Make pf_aout_thread point to the right thread function, and compute the
-     * byte size of the audio output buffer */
-    switch ( p_aout->i_format )
-    {
-        case AOUT_FMT_U8:
-            pf_aout_thread = aout_PCMThread;
-            psz_format = "unsigned 8 bits";
-            i_bytes = p_aout->i_units * p_aout->i_channels;
-            break;
-
-        case AOUT_FMT_S8:
-            pf_aout_thread = aout_PCMThread;
-            psz_format = "signed 8 bits";
-            i_bytes = p_aout->i_units * p_aout->i_channels;
-            break;
-
-        case AOUT_FMT_U16_LE:
-        case AOUT_FMT_U16_BE:
-            pf_aout_thread = aout_PCMThread;
-            psz_format = "unsigned 16 bits";
-            i_bytes = 2 * p_aout->i_units * p_aout->i_channels;
-            break;
-
-        case AOUT_FMT_S16_LE:
-        case AOUT_FMT_S16_BE:
-            pf_aout_thread = aout_PCMThread;
-            psz_format = "signed 16 bits";
-            i_bytes = 2 * p_aout->i_units * p_aout->i_channels;
-            break;
-
-        case AOUT_FMT_A52:
-            pf_aout_thread = aout_SpdifThread;
-            psz_format = "A52 pass-through";
-            i_bytes = SPDIF_FRAME_SIZE;
-            break;
-
-        default:
-            msg_Err( p_aout, "unknown audio output format %i",
-                             p_aout->i_format );
-            return( -1 );
-    }
-
-    /* Allocate the memory needed by the audio output buffers, and set to zero
-     * the s32 buffer's memory */
-    p_aout->buffer = malloc( i_bytes );
-    if ( p_aout->buffer == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
-        return( -1 );
-    }
-
-    p_aout->s32_buffer = (s32 *)calloc( p_aout->i_units,
-                                        sizeof(s32) * p_aout->i_channels );
-    if ( p_aout->s32_buffer == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
-        free( p_aout->buffer );
-        return( -1 );
-    }
-
-    /* Rough estimate of the playing date */
-    p_aout->date = mdate() + p_aout->p_vlc->i_desync;
-
-    /* Launch the thread */
-    if ( vlc_thread_create( p_aout, "audio output", pf_aout_thread, 0 ) )
-    {
-        msg_Err( p_aout, "cannot spawn audio output thread" );
-        free( p_aout->buffer );
-        free( p_aout->s32_buffer );
-        return( -1 );
-    }
-
-    msg_Dbg( p_aout, "%s thread spawned, %i channels, rate %i",
-                     psz_format, p_aout->i_channels, p_aout->i_rate );
-    return( 0 );
+    /* Free structure. */
+    vlc_object_detach_all( p_aout );
+    vlc_object_destroy( p_aout );
 }
 
 /*****************************************************************************
- * aout_DestroyThread
+ * aout_BufferNew : ask for a new empty buffer
  *****************************************************************************/
-void aout_DestroyThread( aout_thread_t * p_aout )
+aout_buffer_t * aout_BufferNew( aout_instance_t * p_aout,
+                                aout_input_t * p_input,
+                                size_t i_nb_samples )
 {
-    int i_index;
-    
-    /* Ask thread to kill itself and wait until it's done */
-    p_aout->b_die = 1;
+    aout_buffer_t * p_buffer;
 
-    vlc_thread_join( p_aout );
+    /* This necessarily allocates in the heap. */
+    aout_BufferAlloc( &p_input->input_alloc, (u64)(1000000 * i_nb_samples)
+                                         / p_input->input.i_rate,
+                      NULL, p_buffer );
+    p_buffer->i_nb_samples = i_nb_samples;
 
-    /* Free the allocated memory */
-    free( p_aout->buffer );
-    free( p_aout->s32_buffer );
-
-    /* Destroy the condition and mutex locks */
-    for ( i_index = 0; i_index < AOUT_MAX_FIFOS; i_index++ )
+    if ( p_buffer == NULL )
     {
-        vlc_mutex_destroy( &p_aout->fifo[i_index].data_lock );
-        vlc_cond_destroy( &p_aout->fifo[i_index].data_wait );
+        msg_Err( p_aout, "NULL buffer !" );
     }
-    vlc_mutex_destroy( &p_aout->fifos_lock );
-    
-    /* Release the aout module */
-    module_Unneed( p_aout, p_aout->p_module );
+    else
+    {
+        p_buffer->start_date = p_buffer->end_date = 0;
+    }
 
-    /* Free structure */
-    vlc_object_destroy( p_aout );
+    return p_buffer;
+}
+
+/*****************************************************************************
+ * aout_BufferDelete : destroy an undecoded buffer
+ *****************************************************************************/
+void aout_BufferDelete( aout_instance_t * p_aout, aout_input_t * p_input,
+                        aout_buffer_t * p_buffer )
+{
+    aout_BufferFree( p_buffer );
+}
+
+/*****************************************************************************
+ * aout_BufferPlay : filter & mix the decoded buffer
+ *****************************************************************************/
+void aout_BufferPlay( aout_instance_t * p_aout, aout_input_t * p_input,
+                      aout_buffer_t * p_buffer )
+{
+    vlc_bool_t b_run_mixer = 0;
+
+    if ( p_buffer->start_date == 0 )
+    {
+        msg_Warn( p_aout, "non-dated buffer received" );
+        aout_BufferFree( p_buffer );
+    }
+    else
+    {
+        p_buffer->end_date = p_buffer->start_date
+                                + (mtime_t)(p_buffer->i_nb_samples * 1000000)
+                                    / p_input->input.i_rate;
+    }
+
+    aout_InputPlay( p_aout, p_input, p_buffer );
+
+    /* Run the mixer if it is able to run. */
+    vlc_mutex_lock( &p_aout->mixer_lock );
+    if ( !p_aout->b_mixer_active )
+    {
+        p_aout->b_mixer_active = 1;
+        b_run_mixer = 1;
+    }
+    vlc_mutex_unlock( &p_aout->mixer_lock );
+
+    if ( b_run_mixer )
+    {
+        aout_MixerRun( p_aout );
+        vlc_mutex_lock( &p_aout->mixer_lock );
+        p_aout->b_mixer_active = 0;
+        vlc_cond_broadcast( &p_aout->mixer_signal );
+        vlc_mutex_unlock( &p_aout->mixer_lock );
+    }
+}
+
+/*****************************************************************************
+ * aout_FormatToBytes : return the number bytes/sample for format
+ * (didn't know where else to put it)
+ *****************************************************************************/
+int aout_FormatToBytes( audio_sample_format_t * p_format )
+{
+    int i_result;
+
+    switch ( p_format->i_format )
+    {
+    case AOUT_FMT_U8:
+    case AOUT_FMT_S8:
+        i_result = 1;
+        break;
+
+    case AOUT_FMT_U16_LE:
+    case AOUT_FMT_U16_BE:
+    case AOUT_FMT_S16_LE:
+    case AOUT_FMT_S16_BE:
+        i_result = 2;
+        break;
+
+    case AOUT_FMT_FLOAT32:
+    case AOUT_FMT_FIXED32:
+        i_result = 4;
+        break;
+
+    case AOUT_FMT_A52:
+        i_result = 1; /* This is a bit special... sample == byte */
+        break;
+
+    default:
+        i_result = 0; /* will segfault much sooner... */
+    }
+
+    return i_result * p_format->i_channels;
 }
 

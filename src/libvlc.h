@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.10 2002/08/04 17:23:44 sam Exp $
+ * $Id: libvlc.h,v 1.11 2002/08/07 21:36:56 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -92,10 +92,15 @@
     "7 -> MPEG2 audio (unsupported)\n"              \
     "8 -> A52 pass-through")
 
-#define RATE_TEXT N_("audio output frequency (Hz)")
-#define RATE_LONGTEXT N_( \
+#define AOUT_RATE_TEXT N_("audio output frequency (Hz)")
+#define AOUT_RATE_LONGTEXT N_( \
     "You can force the audio output frequency here. Common values are " \
     "48000, 44100, 32000, 22050, 16000, 11025, 8000.")
+
+#define AOUT_CHANNELS_TEXT N_("number of channels of audio output")
+#define AOUT_CHANNELS_LONGTEXT N_( \
+    "Mono is 1, stereo is 2. Higher value (used for 5.1) may not be " \
+    "supported by your audio output module.")
 
 #define DESYNC_TEXT N_("compensate desynchronization of audio (in ms)")
 #define DESYNC_LONGTEXT N_( \
@@ -346,9 +351,10 @@ vlc_module_begin();
     add_module_with_short( "aout", 'A', "audio output", NULL, NULL,
                            AOUT_TEXT, AOUT_LONGTEXT );
     add_bool( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT );
-    add_bool( "mono", 0, NULL, MONO_TEXT, MONO_LONGTEXT );
     add_integer( "volume", VOLUME_DEFAULT, NULL, VOLUME_TEXT, VOLUME_LONGTEXT );
-    add_integer( "rate", 44100, NULL, RATE_TEXT, RATE_LONGTEXT );
+    add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT, AOUT_RATE_LONGTEXT );
+    add_integer( "aout-channels", -1, NULL,
+                 AOUT_CHANNELS_TEXT, AOUT_CHANNELS_LONGTEXT );
     add_integer( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT );
     add_integer( "audio-format", 0, NULL, FORMAT_TEXT, FORMAT_LONGTEXT );
 

@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.13 2002/08/04 18:39:41 sam Exp $
+ * $Id: objects.c,v 1.14 2002/08/07 21:36:56 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -38,6 +38,7 @@
 #include "video_output.h"
 
 #include "audio_output.h"
+#include "aout_internal.h"
 
 #include "vlc_playlist.h"
 #include "interface.h"
@@ -93,7 +94,7 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             psz_type = "video output";
             break;
         case VLC_OBJECT_AOUT:
-            i_size = sizeof(aout_thread_t);
+            i_size = sizeof(aout_instance_t);
             psz_type = "audio output";
             break;
         default:

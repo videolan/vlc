@@ -1,11 +1,12 @@
 /*****************************************************************************
- * dsp.c : OSS /dev/dsp module for vlc
+ * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: dsp.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * Copyright (C) 2000-2002 VideoLAN
+ * $Id: oss.c,v 1.1 2002/08/07 21:36:55 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +34,13 @@
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 
 #include <vlc/vlc.h>
+
+#ifdef HAVE_ALLOCA_H
+#   include <alloca.h>
+#endif
+
 #include <vlc/aout.h>
+#include "aout_internal.h"
 
 /* SNDCTL_DSP_RESET, SNDCTL_DSP_SETFMT, SNDCTL_DSP_STEREO, SNDCTL_DSP_SPEED,
  * SNDCTL_DSP_GETOSPACE */
@@ -46,19 +53,18 @@
 #endif
 
 /*****************************************************************************
- * aout_sys_t: dsp audio output method descriptor
+ * aout_sys_t: OSS audio output method descriptor
  *****************************************************************************
  * This structure is part of the audio output thread descriptor.
  * It describes the dsp specific properties of an audio device.
  *****************************************************************************/
 struct aout_sys_t
 {
-    audio_buf_info        audio_buf;
-
-    /* Path to the audio output device */
-    char *                psz_device;
     int                   i_fd;
+    volatile vlc_bool_t   b_die;
 };
+
+#define DEFAULT_FRAME_SIZE 2048
 
 /*****************************************************************************
  * Local prototypes
@@ -66,15 +72,15 @@ struct aout_sys_t
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
-static int  SetFormat    ( aout_thread_t * );
-static int  GetBufInfo   ( aout_thread_t *, int );
-static void Play         ( aout_thread_t *, byte_t *, int );
+static int  SetFormat    ( aout_instance_t * );
+static void Play         ( aout_instance_t *, aout_buffer_t * );
+static int  OSSThread    ( aout_instance_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    add_category_hint( N_("Miscellaneous"), NULL );
+    add_category_hint( N_("Audio"), NULL );
     add_file( "dspdev", "/dev/dsp", NULL, N_("OSS dsp device"), NULL );
     set_description( _("Linux OSS /dev/dsp module") );
     set_capability( "audio output", 100 );
@@ -82,121 +88,162 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
- * Open: opens the audio device (the digital sound processor)
+ * Open: open the audio device (the digital sound processor)
  *****************************************************************************
  * This function opens the dsp as a usual non-blocking write-only file, and
  * modifies the p_aout->p_sys->i_fd with the file's descriptor.
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    aout_thread_t *p_aout = (aout_thread_t *)p_this;
+    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    struct aout_sys_t * p_sys;
+    char * psz_device;
 
     /* Allocate structure */
-    p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
-    if( p_aout->p_sys == NULL )
+    p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
+    if( p_sys == NULL )
     {
         msg_Err( p_aout, "out of memory" );
-        return( 1 );
+        return 1;
     }
 
     /* Initialize some variables */
-    if( !(p_aout->p_sys->psz_device = config_GetPsz( p_aout, "dspdev" )) )
+    if( (psz_device = config_GetPsz( p_aout, "dspdev" )) == NULL )
     {
-        msg_Err( p_aout, "don't know which audio device to open" );
+        msg_Err( p_aout, "no audio device given (maybe /dev/dsp ?)" );
         free( p_aout->p_sys );
-        return( -1 );
+        return -1;
+    }
+
+    /* Open the sound device */
+    if( (p_sys->i_fd = open( psz_device, O_WRONLY )) < 0 )
+    {
+        msg_Err( p_aout, "cannot open audio device (%s)",
+                          psz_device );
+        free( psz_device );
+        free( p_sys );
+        return -1;
+    }
+    free( psz_device );
+
+    /* Create OSS thread and wait for its readiness. */
+    p_sys->b_die = 0;
+    if( vlc_thread_create( p_aout, "aout", OSSThread, VLC_TRUE ) )
+    {
+        msg_Err( p_input, "cannot create OSS thread (%s)", strerror(errno) );
+        free( p_aout->p_sys->psz_device );
+        free( p_aout->p_sys );
+        return -1;
     }
 
     p_aout->pf_setformat = SetFormat;
-    p_aout->pf_getbufinfo = GetBufInfo;
     p_aout->pf_play = Play;
 
-    /* Open the sound device */
-    if( (p_aout->p_sys->i_fd = open( p_aout->p_sys->psz_device, O_WRONLY ))
-        < 0 )
-    {
-        msg_Err( p_aout, "cannot open audio device (%s)",
-                          p_aout->p_sys->psz_device );
-        free( p_aout->p_sys->psz_device );
-        free( p_aout->p_sys );
-        return( -1 );
-    }
-
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
- * SetFormat: resets the dsp and sets its format
+ * SetFormat: reset the dsp and set its format
  *****************************************************************************
  * This functions resets the DSP device, tries to initialize the output
  * format with the value contained in the dsp structure, and if this value
  * could not be set, the default value returned by ioctl is set. It then
  * does the same for the stereo mode, and for the output rate.
  *****************************************************************************/
-static int SetFormat( aout_thread_t *p_aout )
+static int SetFormat( aout_instance_t *p_aout )
 {
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
     int i_format;
     int i_rate;
     vlc_bool_t b_stereo;
 
     /* Reset the DSP device */
-    if( ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
+    if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
     {
-        msg_Err( p_aout, "cannot reset audio device (%s)",
-                          p_aout->p_sys->psz_device );
-        return( -1 );
+        msg_Err( p_aout, "cannot reset OSS audio device" );
+        return -1;
     }
 
     /* Set the output format */
-    i_format = p_aout->i_format;
-    if( ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0 )
+    i_format = AOUT_FMT_S16_NE;
+    if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
+         || i_format != AOUT_FMT_S16_NE )
     {
         msg_Err( p_aout, "cannot set audio output format (%i)",
-                          p_aout->i_format );
-        return( -1 );
+                          i_format );
+        return -1;
     }
+    p_aout->output.output.i_format = AOUT_FMT_S16_NE;
 
-    if( i_format != p_aout->i_format )
+    /* FIXME */
+    if ( p_aout->output.output.i_channels > 2 )
     {
-        msg_Warn( p_aout, "audio output format not supported (%i)",
-                              p_aout->i_format );
-        p_aout->i_format = i_format;
+        msg_Warn( p_aout, "only two channels are supported at the moment" );
+        /* Trigger downmixing */
+        p_aout->output.output.i_channels = 2;
     }
 
     /* Set the number of channels */
-    b_stereo = ( p_aout->i_channels >= 2 );
+    b_stereo = p_aout->output.output.i_channels - 1;
 
-    if( ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_STEREO, &b_stereo ) < 0 )
+    if( ioctl( p_sys->i_fd, SNDCTL_DSP_STEREO, &b_stereo ) < 0 )
     {
         msg_Err( p_aout, "cannot set number of audio channels (%i)",
-                          p_aout->i_channels );
-        return( -1 );
+                          p_aout->output.output.i_channels );
+        return -1;
     }
 
-    if( (1 + b_stereo) != p_aout->i_channels )
+    if ( b_stereo + 1 != p_aout->output.output.i_channels )
     {
-        msg_Warn( p_aout, "%i audio channels not supported",
-                           p_aout->i_channels );
-        p_aout->i_channels = 1 + b_stereo;
+        msg_Warn( p_aout, "driver forced up/downmixing %li->%li",
+                          p_aout->output.output.i_channels,
+                          b_stereo + 1 );
+        p_aout->output.output.i_channels = b_stereo + 1;
     }
 
     /* Set the output rate */
-    i_rate = p_aout->i_rate;
+    i_rate = p_aout->output.output.i_rate;
     if( ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_SPEED, &i_rate ) < 0 )
     {
         msg_Err( p_aout, "cannot set audio output rate (%i)", p_aout->i_rate );
-        return( -1 );
+        return -1;
     }
 
-    if( i_rate != p_aout->i_rate )
+    if( i_rate != p_aout->output.output.i_rate )
     {
-        msg_Warn( p_aout, "audio output rate not supported (%li)",
-                          p_aout->i_rate );
-        p_aout->i_rate = i_rate;
+        msg_Warn( p_aout, "driver forced resampling %li->%li",
+                          p_aout->output.output.i_rate, i_rate );
+        p_aout->output.output.i_rate = i_rate;
     }
 
-    return( 0 );
+    p_aout->output.i_nb_samples = DEFAULT_FRAME_SIZE;
+
+    return 0;
 }
+
+/*****************************************************************************
+ * Play: queue a buffer for playing by OSSThread
+ *****************************************************************************/
+static void Play( aout_instance_t *p_aout, aout_buffer_t * p_buffer )
+{
+    aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
+}
+
+/*****************************************************************************
+ * Close: close the dsp audio device
+ *****************************************************************************/
+static void Close( vlc_object_t * p_this )
+{
+    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+
+    p_sys->b_die = 1;
+    vlc_thread_join( p_aout );
+
+    close( p_aout->p_sys->i_fd );
+    free( p_aout->p_sys );
+}
+
 
 /*****************************************************************************
  * GetBufInfo: buffer status query
@@ -208,40 +255,64 @@ static int SetFormat( aout_thread_t *p_aout )
  * - int bytes : available space in bytes (includes partially used fragments)
  * Note! 'bytes' could be more than fragments*fragsize
  *****************************************************************************/
-static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static int GetBufInfo( aout_instance_t * p_aout )
 {
-    ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_GETOSPACE,
-           &p_aout->p_sys->audio_buf );
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    audio_buf_info audio_buf;
+
+    ioctl( p_sys->i_fd, SNDCTL_DSP_GETOSPACE, &audio_buf );
 
     /* returns the allocated space in bytes */
-    return ( (p_aout->p_sys->audio_buf.fragstotal
-                 * p_aout->p_sys->audio_buf.fragsize)
-            - p_aout->p_sys->audio_buf.bytes );
+    return ( (audio_buf.fragstotal * audio_buf.fragsize) - audio_buf.bytes );
 }
 
 /*****************************************************************************
- * Play: plays a sound samples buffer
- *****************************************************************************
- * This function writes a buffer of i_length bytes in the dsp
+ * OSSThread: asynchronous thread used to DMA the data to the device
  *****************************************************************************/
-static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static int OSSThread( aout_instance_t * p_aout )
 {
-    int i_tmp;
-    i_tmp = write( p_aout->p_sys->i_fd, buffer, i_size );
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
-    if( i_tmp < 0 )
+    while ( !p_sys->b_die )
     {
-        msg_Err( p_aout, "write failed (%s)", strerror(errno) );
+        int i_bytes_per_sample = aout_FormatToBytes( &p_aout->output.output );
+        aout_buffer_t * p_buffer;
+        mtime_t next_date;
+        int i_tmp;
+        char * p_bytes;
+
+        /* Get the presentation date of the next write() operation. It
+         * is equal to the current date + duration of buffered samples.
+         * Order is important here, since GetBufInfo is believed to take
+         * more time than mdate(). */
+        next_date = (mtime_t)GetBufInfo( p_aout ) * 1000000
+                      / i_bytes_per_sample
+                      / p_aout->output.output.i_rate;
+        next_date += mdate();
+
+        p_buffer = aout_OutputNextBuffer( p_aout, next_date );
+
+        if ( p_buffer != NULL )
+        {
+            p_bytes = p_buffer->p_buffer;
+        }
+        else
+        {
+            p_bytes = alloca( DEFAULT_FRAME_SIZE * i_bytes_per_sample );
+            memset( p_bytes, 0, DEFAULT_FRAME_SIZE * i_bytes_per_sample );
+        }
+
+        i_tmp = write( p_sys->i_fd, p_bytes,
+                       DEFAULT_FRAME_SIZE * i_bytes_per_sample );
+
+        if( i_tmp < 0 )
+        {
+            msg_Err( p_aout, "write failed (%s)", strerror(errno) );
+        }
+
+        if ( p_buffer != NULL )
+        {
+            aout_BufferFree( p_buffer );
+        }
     }
-}
-
-/*****************************************************************************
- * Close: closes the dsp audio device
- *****************************************************************************/
-static void Close( vlc_object_t *p_this )
-{
-    aout_thread_t *p_aout = (aout_thread_t *)p_this;
-
-    close( p_aout->p_sys->i_fd );
-    free( p_aout->p_sys->psz_device );
 }

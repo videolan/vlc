@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.20 2002/08/04 20:04:11 sam Exp $
+ * $Id: libvlc.c,v 1.21 2002/08/07 21:36:56 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -608,7 +608,7 @@ vlc_error_t vlc_stop_r( vlc_t *p_vlc )
     intf_thread_t *p_intf;
     playlist_t    *p_playlist;
     vout_thread_t *p_vout;
-    aout_thread_t *p_aout;
+    aout_instance_t *p_aout;
 
     /* Check that the handle is valid */
     if( !p_vlc || p_vlc->i_status != VLC_STATUS_RUNNING )
@@ -658,9 +658,9 @@ vlc_error_t vlc_stop_r( vlc_t *p_vlc )
     msg_Dbg( p_vlc, "removing all audio outputs" );
     while( (p_aout = vlc_object_find( p_vlc, VLC_OBJECT_AOUT, FIND_CHILD )) )
     {
-        vlc_object_detach_all( p_aout );
-        vlc_object_release( p_aout );
-        aout_DestroyThread( p_aout );
+        vlc_object_detach_all( (vlc_object_t *)p_aout );
+        vlc_object_release( (vlc_object_t *)p_aout );
+        aout_DeleteInstance( p_aout );
     }
 
     /* Update the handle status */
