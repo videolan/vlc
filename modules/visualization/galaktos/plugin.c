@@ -5,6 +5,9 @@
  * $Id$
  *
  * Authors: Cyril Deguet <asmax@videolan.org>
+ *          Implementation of the winamp plugin MilkDrop
+ *          based on projectM http://xmms-projectm.sourceforge.net
+ *          and SciVi http://xmms-scivi.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +27,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
 #include "plugin.h"
 #include "glx.h"
 #include "main.h"
+#include "PCM.h"
+#include "video_init.h"
+#include <GL/glu.h>
 
 #include <vlc/input.h>
 #include <vlc/vout.h>
@@ -60,6 +67,9 @@ static void DoWork   ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 static void Thread   ( vlc_object_t * );
 
 static char *TitleGet( vlc_object_t * );
+
+
+extern GLuint RenderTargetTextureID;
 
 /*****************************************************************************
  * Open: open a scope effect plugin
@@ -100,12 +110,12 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_thread, "galaktos-height", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
     var_Get( p_thread, "galaktos-height", &height );
 */
-    vlc_mutex_init( p_filter, &p_thread->lock );
-    vlc_cond_init( p_filter, &p_thread->wait );
+    p_thread->i_cur_sample = 0;
+    bzero( p_thread->p_data, 2*2*512 );
 
-    p_thread->i_blocks = 0;
-    aout_DateInit( &p_thread->date, p_filter->output.i_rate );
-    aout_DateSet( &p_thread->date, 0 );
+    galaktos_glx_init( p_thread, 600, 600, 0 );
+    galaktos_init( p_thread );
+
     p_thread->i_channels = aout_FormatNbChannels( &p_filter->input );
 
     p_thread->psz_title = TitleGet( VLC_OBJECT( p_filter ) );
@@ -114,9 +124,6 @@ static int Open( vlc_object_t *p_this )
                            VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
     {
         msg_Err( p_filter, "cannot lauch galaktos thread" );
-        vout_Destroy( p_thread->p_vout );
-        vlc_mutex_destroy( &p_thread->lock );
-        vlc_cond_destroy( &p_thread->wait );
         if( p_thread->psz_title ) free( p_thread->psz_title );
         vlc_object_detach( p_thread );
         vlc_object_destroy( p_thread );
@@ -127,38 +134,6 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * DoWork: process samples buffer
- *****************************************************************************
- * This function queues the audio buffer to be processed by the galaktos thread
- *****************************************************************************/
-static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
-{
-    aout_filter_sys_t *p_sys = p_filter->p_sys;
-    block_t *p_block;
-
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
-
-    /* Queue sample */
-    vlc_mutex_lock( &p_sys->p_thread->lock );
-    if( p_sys->p_thread->i_blocks == MAX_BLOCKS )
-    {
-        vlc_mutex_unlock( &p_sys->p_thread->lock );
-        return;
-    }
-
-    p_block = block_New( p_sys->p_thread, p_in_buf->i_nb_bytes );
-    if( !p_block ) return;
-    memcpy( p_block->p_buffer, p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
-    p_block->i_pts = p_in_buf->start_date;
-
-    p_sys->p_thread->pp_blocks[p_sys->p_thread->i_blocks++] = p_block;
-
-    vlc_cond_signal( &p_sys->p_thread->wait );
-    vlc_mutex_unlock( &p_sys->p_thread->lock );
-}
 
 /*****************************************************************************
  * float to s16 conversion
@@ -173,61 +148,43 @@ static inline int16_t FloatToInt16( float f )
         return (int16_t)( f * 32768.0 );
 }
 
+
 /*****************************************************************************
- * Fill buffer
+ * DoWork: process samples buffer
+ *****************************************************************************
+ * This function queues the audio buffer to be processed by the galaktos thread
  *****************************************************************************/
-static int FillBuffer( int16_t *p_data, int *pi_data,
-                       audio_date_t *pi_date, audio_date_t *pi_date_end,
-                       galaktos_thread_t *p_this )
+static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
+                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
-    int i_samples = 0;
-    block_t *p_block;
+    int i_samples;
+    int i_channels;
+    float *p_float;
+    galaktos_thread_t *p_thread = p_filter->p_sys->p_thread;
 
-    while( *pi_data < 512 )
+    p_float = (float *)p_in_buf->p_buffer;
+    i_channels = p_thread->i_channels;
+
+    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
+
+    for( i_samples = p_in_buf->i_nb_samples; i_samples > 0; i_samples-- )
     {
-        if( !p_this->i_blocks ) return VLC_EGENERIC;
+        int i_cur_sample = p_thread->i_cur_sample;
 
-        p_block = p_this->pp_blocks[0];
-        i_samples = __MIN( 512 - *pi_data, p_block->i_buffer /
-                           sizeof(float) / p_this->i_channels );
-
-        /* Date management */
-        if( p_block->i_pts > 0 &&
-            p_block->i_pts != aout_DateGet( pi_date_end ) )
+        p_thread->p_data[0][i_cur_sample] = FloatToInt16( p_float[0] );
+        if( i_channels > 1 )
         {
-           aout_DateSet( pi_date_end, p_block->i_pts );
+            p_thread->p_data[1][i_cur_sample] = FloatToInt16( p_float[1] );
         }
-        p_block->i_pts = 0;
+        p_float += i_channels;
 
-        aout_DateIncrement( pi_date_end, i_samples );
-
-        while( i_samples > 0 )
+        if( ++(p_thread->i_cur_sample) == 512 )
         {
-            float *p_float = (float *)p_block->p_buffer;
-
-            p_data[*pi_data] = FloatToInt16( p_float[0] );
-            if( p_this->i_channels > 1 )
-                p_data[512 + *pi_data] = FloatToInt16( p_float[1] );
-
-            (*pi_data)++;
-            p_block->p_buffer += (sizeof(float) * p_this->i_channels);
-            p_block->i_buffer -= (sizeof(float) * p_this->i_channels);
-            i_samples--;
-        }
-
-        if( !p_block->i_buffer )
-        {
-            block_Release( p_block );
-            p_this->i_blocks--;
-            if( p_this->i_blocks )
-                memmove( p_this->pp_blocks, p_this->pp_blocks + 1,
-                         p_this->i_blocks * sizeof(block_t *) );
+            addPCM( p_thread->p_data );
+            p_thread->i_cur_sample = 0;
         }
     }
-
-    *pi_date = *pi_date_end;
-    *pi_data = 0;
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -236,35 +193,45 @@ static int FillBuffer( int16_t *p_data, int *pi_data,
 static void Thread( vlc_object_t *p_this )
 {
     galaktos_thread_t *p_thread = (galaktos_thread_t*)p_this;
-    vlc_value_t width, height, speed;
-    audio_date_t i_pts;
-    int16_t p_data[2][512];
-    int i_data = 0, i_count = 0;
-    int i;
 
-    galaktos_glx_init( p_thread, 512, 512 );
+    int count=0;
+    double realfps=0,fpsstart=0;
+    int timed=0;
+    int timestart=0;
+    int mspf=0;
+    int w = 600, h = 600;
+
+    galaktos_glx_activate_window( p_thread );
+    setup_opengl( w, h );
+    CreateRenderTarget(512, &RenderTargetTextureID, NULL);
+
+    timestart=mdate()/1000;
 
     while( !p_thread->b_die )
     {
-        /* goom_update is damn slow, so just copy data and release the lock */
-        vlc_mutex_lock( &p_thread->lock );
-        if( FillBuffer( (int16_t *)p_data, &i_data, &i_pts,
-                        &p_thread->date, p_thread ) != VLC_SUCCESS )
-            vlc_cond_wait( &p_thread->wait, &p_thread->lock );
-        vlc_mutex_unlock( &p_thread->lock );
-
-        if( galaktos_update( p_thread, p_data ) == 1 )
+        mspf = 1000 / 60;
+        if( galaktos_update( p_thread ) == 1 )
         {
             p_thread->b_die = 1;
         }
-
         if( p_thread->psz_title )
         {
             free( p_thread->psz_title );
             p_thread->psz_title = NULL;
         }
 
-        msleep( VOUT_OUTMEM_SLEEP );
+        if (++count%100==0)
+        {
+            realfps=100/((mdate()/1000-fpsstart)/1000);
+ //           printf("%f\n",realfps);
+            fpsstart=mdate()/1000;
+        }
+        //framerate limiter
+        timed=mspf-(mdate()/1000-timestart);
+      //   printf("%d,%d\n",time,mspf);
+        if (timed>0) msleep(1000*timed);
+    //     printf("Limiter %d\n",(mdate()/1000-timestart));
+        timestart=mdate()/1000;
     }
 
     galaktos_glx_done( p_thread );
@@ -281,22 +248,12 @@ static void Close( vlc_object_t *p_this )
     /* Stop galaktos Thread */
     p_sys->p_thread->b_die = VLC_TRUE;
 
-    vlc_mutex_lock( &p_sys->p_thread->lock );
-    vlc_cond_signal( &p_sys->p_thread->wait );
-    vlc_mutex_unlock( &p_sys->p_thread->lock );
+    galaktos_done( p_sys->p_thread );
 
     vlc_thread_join( p_sys->p_thread );
 
     /* Free data */
-    vout_Request( p_filter, p_sys->p_thread->p_vout, 0, 0, 0, 0 );
-    vlc_mutex_destroy( &p_sys->p_thread->lock );
-    vlc_cond_destroy( &p_sys->p_thread->wait );
     vlc_object_detach( p_sys->p_thread );
-
-    while( p_sys->p_thread->i_blocks-- )
-    {
-        block_Release( p_sys->p_thread->pp_blocks[p_sys->p_thread->i_blocks] );
-    }
 
     vlc_object_destroy( p_sys->p_thread );
 

@@ -26,9 +26,29 @@
 
 #include "plugin.h"
 
-int galaktos_glx_init( galaktos_thread_t *p_thread, int i_width, int i_height );
+int galaktos_glx_init( galaktos_thread_t *p_thread, int i_width, int i_height,
+                       int b_fullscreen );
 void galaktos_glx_done( galaktos_thread_t *p_thread );
 int galaktos_glx_handle_events( galaktos_thread_t *p_thread );
+void galaktos_glx_activate_pbuffer( galaktos_thread_t *p_thread );
+void galaktos_glx_activate_window( galaktos_thread_t *p_thread );
 void galaktos_glx_swap( galaktos_thread_t *p_thread );
+
+/*****************************************************************************
+ * mwmhints_t: window manager hints
+ *****************************************************************************
+ * Fullscreen needs to be able to hide the wm decorations so we provide
+ * this structure to make it easier.
+ *****************************************************************************/
+#define MWM_HINTS_DECORATIONS   (1L << 1)
+#define PROP_MWM_HINTS_ELEMENTS 5
+typedef struct mwmhints_t
+{
+    uint32_t flags;
+    uint32_t functions;
+    uint32_t decorations;
+    int32_t  input_mode;
+    uint32_t status;
+} mwmhints_t;
 
 #endif

@@ -24,6 +24,8 @@
 #ifndef _GALAKTOS_MAIN_H_
 #define _GALAKTOS_MAIN_H_
 
-int galaktos_update( galaktos_thread_t *p_thread, int16_t p_data[2][512] );
+int galaktos_init( galaktos_thread_t *p_thread );
+void galaktos_done( galaktos_thread_t *p_thread );
+int galaktos_update( galaktos_thread_t *p_thread );
 
 #endif

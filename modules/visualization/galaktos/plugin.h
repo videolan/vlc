@@ -32,21 +32,14 @@
 typedef struct
 {
     VLC_COMMON_MEMBERS
-    vout_thread_t *p_vout;
 
     char          *psz_title;
 
-    vlc_mutex_t   lock;
-    vlc_cond_t    wait;
-
     /* Audio properties */
-    int i_channels;
+    int           i_channels;
 
-    /* Audio samples queue */
-    block_t       *pp_blocks[MAX_BLOCKS];
-    int           i_blocks;
-
-    audio_date_t  date;
+    int16_t       p_data[2][512];
+    int           i_cur_sample;
 
     /* OS specific data */
     void          *p_os_data;

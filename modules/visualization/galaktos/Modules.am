@@ -3,4 +3,23 @@ SOURCES_galaktos = plugin.c \
                    glx.c \
                    glx.h \
                    main.c \
-                   main.h
+                   main.h \
+                   preset.c \
+                   preset.h \
+                   beat_detect.c \
+                   param.c \
+                   engine_vars.c \
+                   parser.c \
+                   builtin_funcs.c \
+                   eval.c \
+                   init_cond.c \
+                   PCM.c \
+                   fftsg.c \
+                   per_frame_eqn.c \
+                   splaytree.c \
+                   custom_shape.c \
+                   func.c \
+                   per_pixel_eqn.c \
+                   tree_types.c \
+                   custom_wave.c \
+                   video_init.c

@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Cyril Deguet <asmax@videolan.org>
+ *          based on Scivi http://xmms-scivi.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +28,8 @@
 #include <GL/glx.h>
 
 /* Local prototypes */
-static int CreateWindow( galaktos_thread_t *p_thread, XVisualInfo *p_vi,
-                         int i_width, int i_height );
+static void CreateWindow( galaktos_thread_t *p_thread, XVisualInfo *p_vi,
+                          int i_width, int i_height, int b_fullscreen );
 
 
 typedef struct
@@ -45,20 +46,28 @@ glx_data_t;
 #define OS_DATA ((glx_data_t*)(p_thread->p_os_data))
 
 
-int galaktos_glx_init( galaktos_thread_t *p_thread, int i_width, int i_height )
+int galaktos_glx_init( galaktos_thread_t *p_thread, int i_width, int i_height,
+                       int b_fullscreen )
 {
     Display *p_display;
     int i_opcode, i_evt, i_err;
     int i_maj, i_min;
     int i_nbelem;
     GLXFBConfig *p_fbconfs, fbconf;
+    XSetWindowAttributes xattr;
     XVisualInfo *p_vi;
     GLXContext gwctx;
     int i;
     GLXPbuffer gpbuf;
+#if 1
     int p_attr[] = { GLX_RED_SIZE, 5, GLX_GREEN_SIZE, 5,
                      GLX_BLUE_SIZE, 5, GLX_DOUBLEBUFFER, True,
                      GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT, 0 };
+#else
+    int p_attr[] = { GLX_RGBA, GLX_RED_SIZE, 5, GLX_GREEN_SIZE, 5,
+                     GLX_BLUE_SIZE, 5, GLX_DOUBLEBUFFER,
+                     0 };
+#endif
 
     /* Initialize OS data */
     p_thread->p_os_data = malloc( sizeof( glx_data_t ) );
@@ -89,6 +98,7 @@ int galaktos_glx_init( galaktos_thread_t *p_thread, int i_width, int i_height )
         msg_Err( p_thread, "glXQueryVersion failed" );
         return -1;
     }
+#if 1
     if( i_maj <= 0 || ((i_maj == 1) && (i_min < 3)) )
     {
         msg_Err( p_thread, "GLX 1.3 is needed" );
@@ -116,16 +126,21 @@ int galaktos_glx_init( galaktos_thread_t *p_thread, int i_width, int i_height )
         XFree( p_fbconfs );
         return -1;
     }
-
-    /* Create the window */
-    if( CreateWindow( p_thread, p_vi, i_width, i_height ) == -1 )
+#else
+    p_vi = glXChooseVisual( p_display, DefaultScreen( p_display), p_attr );
+    if(! p_vi )
     {
-        XFree( p_fbconfs );
-        XFree( p_vi );
+        msg_Err( p_thread, "Cannot get GLX 1.2 visual" );
         return -1;
     }
+#endif
+
+    /* Create the window */
+    CreateWindow( p_thread, p_vi, i_width, i_height, b_fullscreen );
+
     XFree( p_vi );
 
+#if 1
     /* Create the GLX window */
     OS_DATA->gwnd = glXCreateWindow( p_display, fbconf, OS_DATA->wnd, NULL );
     if( OS_DATA->gwnd == None )
@@ -191,10 +206,26 @@ int galaktos_glx_init( galaktos_thread_t *p_thread, int i_width, int i_height )
     }
 
     XFree( p_fbconfs );
+#else
+     /* Create an OpenGL context */
+    OS_DATA->gwctx = gwctx = glXCreateContext( p_display, p_vi, 0, True );
+    if( !gwctx )
+    {
+        msg_Err( p_thread, "Cannot create OpenGL context");
+        XFree( p_fbconfs );
+        return -1;
+    }
+    XFree( p_vi );
+#endif
 
     XMapWindow( p_display, OS_DATA->wnd );
+    if( b_fullscreen )
+    {
+        XMoveWindow( p_display, OS_DATA->wnd, 0, 0 );
+    }
     XFlush( p_display );
-    glXMakeContextCurrent( p_display, OS_DATA->gwnd, OS_DATA->gwnd, gwctx );
+//    glXMakeContextCurrent( p_display, OS_DATA->gwnd, OS_DATA->gwnd, gwctx );
+//    glXMakeCurrent( p_display, OS_DATA->wnd, OS_DATA->gwctx );
 
     return 0;
 }
@@ -229,6 +260,21 @@ int galaktos_glx_handle_events( galaktos_thread_t *p_thread )
 }
 
 
+void galaktos_glx_activate_pbuffer( galaktos_thread_t *p_thread )
+{
+    glXMakeContextCurrent( OS_DATA->p_display, OS_DATA->gpbuf, OS_DATA->gpbuf,
+                           OS_DATA->gpctx );
+}
+
+
+void galaktos_glx_activate_window( galaktos_thread_t *p_thread )
+{
+    glXMakeContextCurrent( OS_DATA->p_display, OS_DATA->gwnd, OS_DATA->gwnd,
+                           OS_DATA->gwctx );
+//    glXMakeCurrent( OS_DATA->p_display, OS_DATA->wnd, OS_DATA->gwctx );
+}
+
+
 void galaktos_glx_swap( galaktos_thread_t *p_thread )
 {
     glXSwapBuffers( OS_DATA->p_display, OS_DATA->gwnd );
@@ -249,13 +295,15 @@ void galaktos_glx_done( galaktos_thread_t *p_thread )
 }
 
 
-int CreateWindow( galaktos_thread_t *p_thread, XVisualInfo *p_vi,
-                  int i_width, int i_height )
+void CreateWindow( galaktos_thread_t *p_thread, XVisualInfo *p_vi,
+                  int i_width, int i_height, int b_fullscreen )
 {
     Display *p_display;
     XSetWindowAttributes xattr;
     Window wnd;
     XSizeHints* p_size_hints;
+    Atom prop;
+    mwmhints_t mwmhints;
 
     p_display = OS_DATA->p_display;
     /* Create the window */
@@ -269,17 +317,26 @@ int CreateWindow( galaktos_thread_t *p_thread, XVisualInfo *p_vi,
     OS_DATA->wm_delete = XInternAtom( p_display, "WM_DELETE_WINDOW", False );
     XSetWMProtocols( p_display, wnd, &OS_DATA->wm_delete, 1 );
 
-    /* Prevent the window from being resized */
-    p_size_hints = XAllocSizeHints();
-    p_size_hints->flags = PMinSize | PMaxSize;
-    p_size_hints->min_width = i_width;
-    p_size_hints->min_height = i_height;
-    p_size_hints->max_width = i_width;
-    p_size_hints->max_height = i_height;
-    XSetWMNormalHints( p_display, wnd, p_size_hints );
-    XFree( p_size_hints );
+    if( b_fullscreen )
+    {
+        mwmhints.flags = MWM_HINTS_DECORATIONS;
+        mwmhints.decorations = False;
 
+        prop = XInternAtom( p_display, "_MOTIF_WM_HINTS", False );
+        XChangeProperty( p_display, wnd, prop, prop, 32, PropModeReplace,
+                         (unsigned char *)&mwmhints, PROP_MWM_HINTS_ELEMENTS );
+    }
+    else
+    {
+        /* Prevent the window from being resized */
+        p_size_hints = XAllocSizeHints();
+        p_size_hints->flags = PMinSize | PMaxSize;
+        p_size_hints->min_width = i_width;
+        p_size_hints->min_height = i_height;
+        p_size_hints->max_width = i_width;
+        p_size_hints->max_height = i_height;
+        XSetWMNormalHints( p_display, wnd, p_size_hints );
+        XFree( p_size_hints );
+    }
     XSelectInput( p_display, wnd, KeyPressMask );
-
-    return 0;
 }
