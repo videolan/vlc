@@ -389,7 +389,7 @@ static int Open( vlc_object_t *p_this )
 
         char *psz_rtpmap;
         char access[100];
-        char url[strlen( p_sys->psz_destination ) + 1 + 12 + 1];
+        char url[p_sys->psz_destination ? strlen( p_sys->psz_destination ) + 1 + 12+1 : 14];
 
         /* Check muxer type */
         if( !strncasecmp( val.psz_string, "ps", 2 ) || !strncasecmp( val.psz_string, "mpeg1", 5 ) )
