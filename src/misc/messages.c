@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.32 2003/05/09 00:58:25 titer Exp $
+ * $Id: messages.c,v 1.33 2003/06/13 03:21:40 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -43,10 +43,21 @@
 #endif
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>                                      /* close(), write() */
+#   include <unistd.h>                                   /* close(), write() */
 #endif
 
 #include "interface.h"
+
+/*****************************************************************************
+ * Local macros
+ *****************************************************************************/
+#if defined(HAVE_VA_COPY)
+#   define vlc_va_copy(dest,src) va_copy(dest,src)
+#elif defined(HAVE___VA_COPY)
+#   define vlc_va_copy(dest,src) __va_copy(dest,src)
+#else
+#   define vlc_va_copy(dest,src) (dest)=(src)
+#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -244,10 +255,11 @@ DECLARE_MSG_FN( __msg_Dbg,  VLC_MSG_DBG );
  * a warning.
  *****************************************************************************/
 static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
-                      const char *psz_format, va_list args )
+                      const char *psz_format, va_list _args )
 {
     msg_bank_t * p_bank = &p_this->p_libvlc->msg_bank;       /* message bank */
     char *       psz_str = NULL;                 /* formatted message string */
+    va_list      args;
     msg_item_t * p_item = NULL;                        /* pointer to message */
     msg_item_t   item;                    /* message in case of a full queue */
 
@@ -259,7 +271,9 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
      * Convert message to string
      */
 #if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN) && !defined( SYS_BEOS )
+    vlc_va_copy( args, _args );
     vasprintf( &psz_str, psz_format, args );
+    va_end( args );
 #else
     psz_str = (char*) malloc( i_size * sizeof(char) );
 #endif
@@ -272,13 +286,17 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
 #else
         fprintf( stderr, "main warning: can't store message: " );
 #endif
+        vlc_va_copy( args, _args );
         vfprintf( stderr, psz_format, args );
+        va_end( args );
         fprintf( stderr, "\n" );
         return;
     }
 
 #if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN) || defined(SYS_BEOS)
+    vlc_va_copy( args, _args );
     vsnprintf( psz_str, i_size, psz_format, args );
+    va_end( args );
     psz_str[ i_size - 1 ] = 0; /* Just in case */
 #endif
 

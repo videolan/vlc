@@ -310,8 +310,27 @@ AC_CACHE_CHECK([for socklen_t], ac_cv_type_socklen_t,
      ac_cv_type_socklen_t=yes,
      ac_cv_type_socklen_t=no)])
 if test x$ac_cv_type_socklen_t != xno; then
-  AC_DEFINE(HAVE_SOCKLEN_T, 1,
-            Define if <sys/socket.h> defines socklen_t.)
+  AC_DEFINE(HAVE_SOCKLEN_T, 1, [Define if <sys/socket.h> defines socklen_t.])
+fi
+
+dnl Check for va_copy
+AC_CACHE_CHECK([for va_copy], ac_cv_c_va_copy,
+  AC_TRY_LINK(
+    [#include <stdarg.h>],
+    [va_list ap1, ap2; va_copy(ap1,ap2);],
+    [ac_cv_c_va_copy="yes"],
+    [ac_cv_c_va_copy="no"]))
+if test "$ac_cv_c_va_copy" = "yes"; then
+  AC_DEFINE(HAVE_VA_COPY, 1, [Define if <stdarg.h> defines va_copy.])
+fi
+AC_CACHE_CHECK([for __va_copy], ac_cv_c___va_copy,
+  AC_TRY_LINK(
+    [#include <stdarg.h>],
+    [va_list ap1, ap2; __va_copy(ap1,ap2);],
+    [ac_cv_c___va_copy="yes"],
+    [ac_cv_c___va_copy="no"]))
+if test "$ac_cv_c___va_copy" = "yes"; then
+  AC_DEFINE(HAVE___VA_COPY, 1, [Define if <stdarg.h> defines __va_copy.])
 fi
 
 AC_CHECK_FUNCS(inet_aton,,[
