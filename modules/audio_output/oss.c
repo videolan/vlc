@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.41 2002/12/23 13:58:46 massiot Exp $
+ * $Id: oss.c,v 1.42 2003/01/07 14:58:33 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -91,11 +91,18 @@ static mtime_t BufferDuration( aout_instance_t * p_aout );
     "are completely filled (the sound gets heavily hashed). If you have one " \
     "of these drivers, then you need to enable this option." )
 
+#define SPDIF_TEXT N_("Try to use S/PDIF output")
+#define SPDIF_LONGTEXT N_( \
+    "Sometimes we attempt to use the S/PDIF output, even if nothing is " \
+    "connected to it. Un-checking this option disables this behaviour, " \
+    "and permanently selects analog PCM output." )
+
 vlc_module_begin();
     add_category_hint( N_("OSS"), NULL );
     add_file( "dspdev", "/dev/dsp", aout_FindAndRestart,
               N_("OSS dsp device"), NULL );
     add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT );
+    add_bool( "spdif", 1, NULL, SPDIF_TEXT, SPDIF_LONGTEXT );
     set_description( _("Linux OSS /dev/dsp module") );
     set_capability( "audio output", 100 );
     add_shortcut( "oss" );
@@ -120,7 +127,8 @@ static void Probe( aout_instance_t * p_aout )
         return;
     }
 
-    if ( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
+    if ( config_GetInt( p_aout, "spdif" )
+          && AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
     {
         i_format = AFMT_AC3;
 
@@ -263,7 +271,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if ( !strcmp( val.psz_string, N_("S/PDIF") ) )
+    if ( !strcmp( val.psz_string, N_("A/52 over S/PDIF") ) )
     {
         p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
     }
