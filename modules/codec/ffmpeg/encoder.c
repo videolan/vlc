@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.2 2003/10/27 17:50:54 gbazin Exp $
+ * $Id: encoder.c,v 1.3 2003/10/27 19:48:16 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -224,7 +224,11 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         frame.linesize[i_plane] = p_pict->p[i_plane].i_pitch;
     }
 
-    frame.pts = p_pict->date;
+    /* Set the pts of the frame being encoded (segfaults with mpeg4!)*/
+    if( p_enc->i_fourcc == VLC_FOURCC( 'm', 'p', 'g', 'v' ) )
+        frame.pts = p_pict->date;
+    else
+        frame.pts = 0;
 
     /* Let ffmpeg select the frame type */
     frame.pict_type = 0;

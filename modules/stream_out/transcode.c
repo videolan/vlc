@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.45 2003/10/27 17:50:54 gbazin Exp $
+ * $Id: transcode.c,v 1.46 2003/10/27 19:48:16 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -729,7 +729,7 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
                          (int16_t*)id->p_buffer, &id->i_buffer_pos,
                          p_buffer, i_buffer );
 
-#if 1
+#if 0
             msg_Warn( p_stream, "avcodec_decode_audio: %d used on %d",
                       i_used, i_buffer );
 #endif
@@ -1273,13 +1273,6 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
             frame = id->p_ff_pic_tmp2;
         }
-
-        /* Set the pts of the frame being encoded (segfaults with mpeg4!)*/
-        if( id->p_encoder ||
-            id->f_dst.i_fourcc == VLC_FOURCC( 'm', 'p', 'g', 'v' ) )
-            frame->pts = p_sys->i_output_pts;
-        else
-            frame->pts = 0;
 
         /* Interpolate the next PTS
          * (needed by the mpeg video packetizer which can send pts <= 0 ) */
