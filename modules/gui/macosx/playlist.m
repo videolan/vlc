@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: playlist.m,v 1.8 2003/02/07 01:31:14 hartman Exp $
+ * $Id: playlist.m,v 1.9 2003/02/10 21:54:03 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -334,8 +334,8 @@
     }
 
     vlc_mutex_lock( &p_playlist->object_lock );
-    o_value = [NSString stringWithUTF8String: 
-        p_playlist->pp_items[i_row]->psz_name]; 
+    o_value = [[NSString stringWithUTF8String: 
+        p_playlist->pp_items[i_row]->psz_name] lastPathComponent]; 
     vlc_mutex_unlock( &p_playlist->object_lock ); 
 
     vlc_object_release( p_playlist );
