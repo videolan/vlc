@@ -1,11 +1,11 @@
 $Id$
 
-Changes between 0.8.0 and 0.8.1-svn:
+Changes between 0.8.0 and 0.8.1:
 -----------------------------------------------------
 
 Core support:
  * Include TLS/SSL API (on plaforms where libgnutls is available)
- * SSL support in the HTTP daemon
+ * SSL support in the HTTP daemon (HTTP stream output and HTTP interface)
 
 Windows port:
  * Fixed win32 multichannel audio output support (which was broken in 0.8.0)
@@ -26,8 +26,10 @@ Demuxers:
  * Fixed autodetection of VCD/SVCD bin files
 
 Stream Output:
- Encoders:
-  * Fixed aspect ratio and interlaced support in ffmpeg encoder module
+ * Encoders:
+   * Fixed aspect ratio and interlaced support in ffmpeg encoder module
+ * Stream output:
+   * Support of playlist group announcement
 
 Changes between 0.7.2 and 0.8.0:
 -----------------------------------------------------
