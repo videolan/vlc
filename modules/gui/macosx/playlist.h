@@ -43,10 +43,15 @@
     IBOutlet id o_tc_duration;
     IBOutlet id o_status_field;
     IBOutlet id o_search_field;
-    
+    IBOutlet id o_random_ckb;
+    IBOutlet id o_loop_popup;
+    IBOutlet id o_mi_save_playlist;
+
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;
 }
+
+- (IBAction)handlePopUp:(id)sender;
 
 - (void)initStrings;
 
@@ -54,5 +59,6 @@
 - (void)playItem:(id)sender;
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
+
 @end
 

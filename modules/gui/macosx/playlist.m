@@ -179,8 +179,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (void)initStrings
 {
-#if 0
     [o_mi_save_playlist setTitle: _NS("Save Playlist...")];
+#if 0
     [o_mi_play setTitle: _NS("Play")];
     [o_mi_delete setTitle: _NS("Delete")];
     [o_mi_selectall setTitle: _NS("Select All")];
@@ -192,16 +192,14 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [[o_tc_name headerCell] setStringValue:_NS("Name")];
     [[o_tc_author headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration headerCell] setStringValue:_NS("Duration")];
-#if 0
     [o_random_ckb setTitle: _NS("Random")];
+#if 0
     [o_search_button setTitle: _NS("Search")];
 #endif
     [o_btn_playlist setToolTip: _NS("Playlist")];
-#if 0    
     [[o_loop_popup itemAtIndex:0] setTitle: _NS("Standard Play")];
     [[o_loop_popup itemAtIndex:1] setTitle: _NS("Repeat One")];
     [[o_loop_popup itemAtIndex:2] setTitle: _NS("Repeat All")];
-#endif
 }
 
 - (void)playlistUpdated
@@ -319,6 +317,53 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     vlc_object_release( p_playlist );
 }
 
+- (IBAction)handlePopUp:(id)sender
+
+{
+             intf_thread_t * p_intf = VLCIntf;
+             vlc_value_t val1,val2;
+             playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                        FIND_ANYWHERE );
+             if( p_playlist == NULL )
+             {
+                 return;
+             }
+
+    switch ([o_loop_popup indexOfSelectedItem])
+    {
+        case 1:
+
+             val1.b_bool = 0;
+             var_Set( p_playlist, "loop", val1 );
+             val1.b_bool = 1;
+             var_Set( p_playlist, "repeat", val1 );
+             vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat One" ) );
+        break;
+
+        case 2:
+             val1.b_bool = 0;
+             var_Set( p_playlist, "repeat", val1 );
+             val1.b_bool = 1;
+             var_Set( p_playlist, "loop", val1 );
+             vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat All" ) );
+        break;
+
+        default:
+             var_Get( p_playlist, "repeat", &val1 );
+             var_Get( p_playlist, "loop", &val2 );
+             if (val1.b_bool || val2.b_bool)
+             {
+                  val1.b_bool = 0;
+                  var_Set( p_playlist, "repeat", val1 );
+                  var_Set( p_playlist, "loop", val1 );
+                  vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat Off" ) );
+             }
+         break;
+     }
+     vlc_object_release( p_playlist );
+     [self playlistUpdated];
+}
+
 @end
 
 @implementation VLCPlaylist (NSOutlineViewDataSource)
@@ -349,6 +394,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     vlc_object_release( p_playlist );
     if( i_return == -1 ) i_return = 0;
     msg_Dbg( p_playlist, "I have %d children", i_return );
+    [o_status_field setStringValue: [NSString stringWithFormat:
+                                _NS("%i items in playlist"), i_return]];
     return i_return;
 }
 
