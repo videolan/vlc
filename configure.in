@@ -4,7 +4,7 @@ AC_CONFIG_HEADER(include/defs.h)
 AC_CANONICAL_SYSTEM
 
 PACKAGE="vlc"
-VERSION="0.4.0"
+VERSION="0.4.6"
 CODENAME=Ourumov
 
 dnl Save CFLAGS and LDFLAGS
@@ -20,6 +20,8 @@ AC_PROG_CPP
 dnl Find the right ranlib, even when cross-compiling
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 AC_CHECK_TOOL(STRIP, strip, :)
+AC_CHECK_TOOL(AR, ar, :)
+AC_CHECK_TOOL(LD, ld, :)
 
 dnl Check for GNU make
 AC_PATH_PROG(GMAKE, gmake, no)
@@ -75,7 +77,7 @@ case x"${target_os}" in
   x*mingw32*)
     SYS=mingw32
     AC_CHECK_TOOL(WINDRES, windres, :)
-    save_CFLAGS="${save_CFLAGS} -fnative-struct -D_OFF_T_ -D_off_t=long"
+    save_CFLAGS="${save_CFLAGS} -D_OFF_T_ -D_off_t=long"
     vlc_LDFLAGS="${vlc_LDFLAGS} -mwindows -Xlinker --force-exe-suffix"
     vlc_LDFLAGS="${vlc_LDFLAGS} -lws2_32 -lnetapi32"
     ipv4_LDFLAGS="${ipv4_LDFLAGS} -lws2_32"
@@ -93,7 +95,7 @@ case x"${target_os}" in
     save_CFLAGS="${save_CFLAGS} -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual"
     vlc_LDFLAGS="${vlc_LDFLAGS} -lbe"
     plugins_LDFLAGS="${plugins_LDFLAGS} -nostart"
-    beos_LDFLAGS="${beos_LDFLAGS} -lbe -lgame -lroot -ltracker"
+    beos_LDFLAGS="${beos_LDFLAGS} -lbe -lgame -lroot -ltracker -ltranslation -lstdc++.r4"
     ipv4_LDFLAGS="${ipv4_LDFLAGS} -lbind"
     ;;
   x*)
@@ -102,18 +104,25 @@ case x"${target_os}" in
 esac
 
 dnl Flags for plugin compilation
-if test x"${SYS}" = xmingw32
-then
-  plugins_CFLAGS="${plugins_CFLAGS} -fnative-struct"
-else
+if test x"${SYS}" != xmingw32; then
   plugins_CFLAGS="${plugins_CFLAGS} -fPIC"
+fi
+
+dnl Check for the need to include the mingwex lib for mingw32
+if test x$SYS = xmingw32
+then
+    AC_CHECK_LIB(mingwex,opendir,
+        AC_CHECK_LIB(mingw32,opendir,vlc_LDFLAGS="${vlc_LDFLAGS}",
+            [vlc_LDFLAGS="${vlc_LDFLAGS} -lmingwex"
+             gtk_LDFLAGS="${gtk_LDFLAGS} -lmingwex"])
+    )
 fi
 
 dnl The -DSYS_FOO flag
 save_CFLAGS="${save_CFLAGS} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcdefghijklmnopqrstuvwxyz.' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'`"
 
 dnl Check for system libs needed
-AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2)
+AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2 atoll)
 
 AC_CHECK_FUNC(connect,,[
   AC_CHECK_LIB(socket,connect,
@@ -126,13 +135,18 @@ AC_CHECK_FUNC(gethostbyname,,[
 AC_CHECK_FUNC(gethostbyname,,[
   AC_CHECK_LIB(bind,gethostbyname,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lbind")
 ])
-AC_CHECK_FUNCS(nanosleep,,[
+have_nanosleep=0
+AC_CHECK_FUNC(nanosleep,have_nanosleep=1,[
   AC_CHECK_LIB(rt,nanosleep,
-    [vlc_LDFLAGS="${vlc_LDFLAGS} -lrt"],
+    [vlc_LDFLAGS="${vlc_LDFLAGS} -lrt"; have_nanosleep=1],
     [AC_CHECK_LIB(posix4,nanosleep,
-        [vlc_LDFLAGS="${vlc_LDFLAGS} -lposix4"])]
+        [vlc_LDFLAGS="${vlc_LDFLAGS} -lposix4"; have_nanosleep=1])]
   )
 ])
+if test x$have_nanosleep = x1; then
+  AC_DEFINE(HAVE_NANOSLEEP, 1,
+            Define if nanosleep is available.)
+fi
 AC_CHECK_FUNC(inet_aton,,[
   AC_CHECK_LIB(resolv,inet_aton,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lresolv")
 ])
@@ -188,7 +202,7 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
             Define if <strings.h> defines strncasecmp.)])
 
 dnl Check for headers
-AC_CHECK_HEADERS(getopt.h strings.h)
+AC_CHECK_HEADERS(stdint.h getopt.h strings.h inttypes.h sys/int_types.h)
 AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
@@ -329,6 +343,23 @@ if test x"$ac_cv_c_omit_frame_pointer" != x"no"; then
     CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fomit-frame-pointer"
 fi
 
+dnl Check for fnative-struct or mms-bitfields support for mingw32
+if test x$SYS = xmingw32
+then
+    AC_CACHE_CHECK([if \$CC accepts -mms-bitfields],
+        [ac_cv_c_mms_bitfields],
+        [CFLAGS="${save_CFLAGS} -mms-bitfields"
+         AC_TRY_COMPILE([],,ac_cv_c_mms_bitfields=yes,
+                        ac_cv_c_mms_bitfields=no)])
+    if test x"$ac_cv_c_mms_bitfields" != x"no"; then
+        save_CFLAGS="${save_CFLAGS} -mms-bitfields"
+        plugins_CFLAGS="${plugins_CFLAGS} -mms-bitfields"
+    else
+        save_CFLAGS="${save_CFLAGS} -fnative-struct"
+        plugins_CFLAGS="${plugins_CFLAGS} -fnative-struct"
+    fi
+fi
+
 dnl Check for Darwin plugin linking flags
 AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error -lcc_dynamic],
     [ac_cv_ld_darwin],
@@ -422,7 +453,12 @@ dnl
 dnl  default modules
 dnl
 BUILTINS="${BUILTINS} idct idctclassic motion imdct downmix chroma_i420_rgb chroma_i420_yuy2 chroma_i422_yuy2 chroma_i420_ymga mpeg_adec ac3_adec mpeg_vdec"
-PLUGINS="${PLUGINS} dummy null rc logger mpeg_es mpeg_ps mpeg_ts mpeg_audio file udp http ipv4 memcpy lpcm_adec ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort filter_clone fx_scope"
+PLUGINS="${PLUGINS} dummy null rc logger mpeg_es mpeg_ps mpeg_ts mpeg_audio file memcpy lpcm_adec ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort filter_clone filter_crop fx_scope"
+
+dnl
+dnl  Network modules
+dnl
+NETWORK_MODULES="udp http rtp ipv4"
 
 dnl
 dnl  Accelerated modules
@@ -432,6 +468,11 @@ MMXEXT_MODULES="memcpymmxext idctmmxext motionmmxext"
 THREEDNOW_MODULES="memcpy3dn imdct3dn downmix3dn"
 SSE_MODULES="imdctsse downmixsse"
 ALTIVEC_MODULES="idctaltivec motionaltivec memcpyaltivec"
+
+if test x$SYS != xbeos
+then
+    PLUGINS="${PLUGINS} ${NETWORK_MODULES}"
+fi
 
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
     [ac_cv_mmx_inline],
@@ -719,28 +760,68 @@ if test "x$enable_dvbpsi" != "xno"
 then
   AC_ARG_WITH(dvbpsi, 
   [    --with-dvbpsi=PATH    libdvbpsi headers and libraries])
-  if test "x$with_dvbpsi" = x
-  then
-    test_LDFLAGS=""
-    test_CFLAGS=""
-  else
-    test_LDFLAGS="-L${with_dvbpsi}/lib"
-    test_CFLAGS="-I${with_dvbpsi}/include"
-  fi
-  CPPFLAGS="$save_CPPFLAGS $test_CFLAGS"
-  AC_CHECK_HEADER([dvbpsi/dr.h],[
-    PLUGINS="${PLUGINS} mpeg_ts_dvbpsi"
-    mpeg_ts_dvbpsi_LDFLAGS="${mpeg_ts_dvbpsi_LDFLAGS} ${test_LDFLAGS} -ldvbpsi"
-    mpeg_ts_dvbpsi_CFLAGS="${mpeg_ts_dvbpsi_CFLAGS} ${test_CFLAGS}"
-    ],[
-    if test "x$enable_dvbpsi" != x
+  AC_ARG_WITH(dvbpsi,
+  [    --with-dvbpsi-tree=PATH libdvbpsi tree for static linking])
+  case "x$with_dvbpsi" in
+  x|xyes)
+    if test "x$with_dvbpsi_tree" = x
     then
-      AC_MSG_ERROR([Could not find libdvbpsi on your system: you may get it from www.videolan.org, you'll need at least version 0.1.1])
+      AC_CHECK_HEADERS(dvbpsi/dr.h,
+        [ PLUGINS="${PLUGINS} mpeg_ts_dvbpsi"
+          mpeg_ts_dvbpsi_LDFLAGS="${mpeg_ts_dvbpsi_LDFLAGS} -ldvbpsi" ], [],
+        [  AC_MSG_ERROR([cannot find libdvbpsi headers]) ])
+    else
+      AC_MSG_CHECKING(for libdvbpsi.a in ${with_dvbpsi_tree})
+      real_dvbpsi_tree="`cd ${with_dvbpsi_tree} 2>/dev/null && pwd`"
+      if test "x$real_dvbpsi_tree" = x
+      then
+        dnl  The given directory can't be found
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([cannot cd to ${with_dvbpsi_tree}])
+      fi
+      if test -f "${real_dvbpsi_tree}/src/.libs/libdvbpsi.a"
+      then
+        dnl  Use a custom libdvbpsi
+        AC_MSG_RESULT(${real_dvbpsi_tree}/src/.libs/libdvbpsi.a)
+        BUILTINS="${BUILTINS} mpeg_ts_dvbpsi"
+        mpeg_ts_dvbpsi_LDFLAGS="${mpeg_ts_dvbpsi_LDFLAGS} ${real_dvbpsi_tree}/src/.libs/libdvbpsi.a"
+        mpeg_ts_dvbpsi_CFLAGS="${mpeg_ts_dvbpsi_CFLAGS} -I${real_dvbpsi_tree}/src"
+      else
+        dnl  The given libdvbpsi wasn't built
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([cannot find ${real_dvbpsi_tree}/src/.libs/libdvbpsi.a, make sure you compiled libdvbpsi in ${with_dvbpsi_tree}])
+      fi
     fi
-  ])
-  CPPFLAGS="$save_CPPFLAGS"
+  ;;
+  xno)
+    dnl  Compile without dvbpsi (dlopen version, works only under Linux)
+  ;;
+  *)
+    AC_MSG_CHECKING(for dvbpsi headers in ${with_dvbpsi})
+    if test "x$with_dvbpsi" = x
+    then
+      test_LDFLAGS=""
+      test_CFLAGS=""
+    else
+      test_LDFLAGS="-L${with_dvbpsi}/lib"
+      test_CFLAGS="-I${with_dvbpsi}/include"
+    fi
+    CPPFLAGS="$save_CPPFLAGS $test_CFLAGS"
+    AC_CHECK_HEADER([dvbpsi/dr.h],[
+      PLUGINS="${PLUGINS} mpeg_ts_dvbpsi"
+      mpeg_ts_dvbpsi_LDFLAGS="${mpeg_ts_dvbpsi_LDFLAGS} ${test_LDFLAGS} -ldvbpsi"
+      mpeg_ts_dvbpsi_CFLAGS="${mpeg_ts_dvbpsi_CFLAGS} ${test_CFLAGS}"
+      ],[
+      if test "x$enable_dvbpsi" != x
+      then
+        AC_MSG_ERROR([Could not find libdvbpsi on your system: you may get it from www.videolan.org, you'll need at least version 0.1.1])
+      fi
+    ])
+    CPPFLAGS="$save_CPPFLAGS"
+  ;;
+  esac
 fi
- 
+
 dnl
 dnl  VCD module
 dnl
@@ -765,7 +846,7 @@ then
 
   if test "x${SYS}" = "xdarwin"
   then
-    # No need to add vcd to PLUGINS, Darwin is already based on FreeBSD
+    PLUGINS="${PLUGINS} vcd"
     vcd_LDFLAGS="${vcd_LDFLAGS} -framework IOKit -framework CoreFoundation" 
   fi
 fi
@@ -903,7 +984,11 @@ then
       dnl  Use a custom libffmpeg
       AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
       BUILTINS="${BUILTINS} ffmpeg"
-      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} ${real_ffmpeg_tree}/libavcodec/libavcodec.a -lm"
+      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} ${real_ffmpeg_tree}/libavcodec/libavcodec.a"
+      if test x$SYS != xbeos
+      then
+        ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lm"
+      fi
       ffmpeg_CFLAGS="${ffmpeg_CFLAGS} -I${real_ffmpeg_tree}/libavcodec"
     else
       dnl  The given libavcodec wasn't built
@@ -914,10 +999,18 @@ then
     save_CFLAGS=$CFLAGS
     save_LDFLAGS=$LDFLAGS
     CFLAGS="$CFLAGS $ffmpeg_CFLAGS"
-    LDFLAGS="$LDFLAGS $ffmpeg_LDFLAGS -lm"
+    LDFLAGS="$LDFLAGS $ffmpeg_LDFLAGS"
+    if test x$SYS != xbeos
+    then
+      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lm"
+    fi
     AC_CHECK_LIB(avcodec, avcodec_init, [
       BUILTINS="${BUILTINS} ffmpeg"
-      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lavcodec -lm" ],
+      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lavcodec"
+      if test x$SYS != xbeos
+      then
+        ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lm"
+      fi ],
       [ AC_MSG_ERROR([Cannot find libavcodec library...]) ])
     CFLAGS=$save_CFLAGS
     LDFLAGS=$save_LDFLAGS
@@ -1090,11 +1183,21 @@ then
     AC_PATH_PROG(SDL_CONFIG, sdl-config, no, $SDL_PATH)
     SDL_HEADER="SDL/SDL.h"
   fi
+  # check for cross-compiling
+  SDL_PREFIX=
+  AC_ARG_WITH(sdl,
+    [    --with-sdl-prefix=PATH path to libsdl (needed for cross-compiling),
+                               e.g use as:
+                               --with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
+  if test "x$with_sdl_prefix" != "xno" -a "x$with_sdl_prefix" != "x"
+  then
+    SDL_PREFIX="--prefix=$with_sdl_prefix"
+  fi
   if test x${SDL_CONFIG} != xno
   then
     PLUGINS="${PLUGINS} sdl"
-    sdl_CFLAGS="${sdl_CFLAGS} `${SDL_CONFIG} --cflags`"
-    sdl_LDFLAGS="${sdl_LDFLAGS} `${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
+    sdl_CFLAGS="${sdl_CFLAGS} `${SDL_CONFIG} ${SDL_PREFIX} --cflags`"
+    sdl_LDFLAGS="${sdl_LDFLAGS} `${SDL_CONFIG} ${SDL_PREFIX} --libs | sed 's,-rdynamic,,'`"
     CPPFLAGS="$save_CPPFLAGS $sdl_CFLAGS"
     AC_CHECK_HEADERS(${SDL_HEADER}, AC_DEFINE_UNQUOTED(SDL_INCLUDE_FILE,
       <${SDL_HEADER}>, Indicate whether we should use SDL/SDL.h or SDL11/SDL.h),
@@ -1115,6 +1218,39 @@ Please install it and try again. Alternatively you can also configure with
 from http://www.libsdl.org/, or configure with --disable-sdl. Have a nice day.
     ])
   fi
+fi
+
+dnl
+dnl  Qt Embedded module
+dnl  (disabled by default)
+dnl
+AC_ARG_ENABLE(qte,
+  [  --enable-qte            QT Embedded support (default disabled)])
+if test "x${enable_qte}" != "xno"
+then
+  AC_ARG_WITH(qte,
+  [    --with-qte=PATH       Qt Embedded headers and libraries])
+  if test "x${with_qte}" = "x"
+  then
+    test_LDFLAGS="-L${QTDIR}/lib"
+    test_CFLAGS="-I${QTDIR}/include"
+  else
+    test_LDFLAGS="-L${with_qte}/lib"
+    test_CFLAGS="-I${with_qte}/include"
+  fi
+
+  CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
+  AC_CHECK_HEADERS(qt.h, [
+    qte_CFLAGS="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
+    qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -lqpe -lqte"
+    if test "x${with_qte}" = "x"
+    then
+      PLUGINS="${PLUGINS} qte"
+    else
+      BUILTINS="${BUILTINS} qte"
+    fi
+  ])
+  CPPFLAGS="${save_CPPFLAGS}"
 fi
 
 dnl
@@ -1354,6 +1490,90 @@ then
 fi
 
 dnl
+dnl  Familiar module uses Gtk+ library
+dnl
+AC_ARG_ENABLE(familiar,
+  [  --enable-familiar       Familiar Gtk+ support (default disabled)])
+if test "x${enable_familiar}" = "xyes"
+then
+  GTK_PATH="${PATH}"
+  AC_ARG_WITH(gtk-config-path,
+    [    --with-gtk-config-path=PATH gtk-config path (default search in \$PATH)],
+    [ if test "x${with_gtk_config_path}" != "xno"
+      then
+        GTK_PATH="${with_gtk_config_path}:${PATH}"
+      fi ])
+  # look for gtk-config
+  AC_PATH_PROG(GTK12_CONFIG, gtk12-config, no, ${GTK_PATH})
+  GTK_CONFIG=${GTK12_CONFIG}
+  if test "x${GTK_CONFIG}" = "xno"
+  then
+    AC_PATH_PROG(GTK_CONFIG, gtk-config, no, ${GTK_PATH})
+  fi
+  # check for cross-compiling
+  GTK_PREFIX=
+  AC_ARG_WITH(gtk,
+    [    --with-gtk-prefix=PATH path to libgtk (needed for cross-compiling),
+                          e.g use as:
+                          --with-gtk-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
+  if test "x$with_gtk_prefix" != "xno" -a "x$with_gtk_prefix" != "x"
+  then
+    GTK_PREFIX="--prefix=$with_gtk_prefix"
+  fi
+  if test "x${GTK_CONFIG}" != "xno"
+  then
+    if expr 1.2.0 \> `${GTK_CONFIG} --version` >/dev/null
+    then
+      AC_MSG_ERROR([Your development package for Gtk+ is too old, you need at least version 1.2.0. Please upgrade and try again. Alternatively you can also configure with --disable-familiar.])
+    fi
+    familiar_CFLAGS="${familiar_CFLAGS} `${GTK_CONFIG} ${GTK_PREFIX} --cflags gtk gthread`"
+    familiar_LDFLAGS="${familiar_LDFLAGS} `${GTK_CONFIG} ${GTK_PREFIX} --libs gtk gthread | sed 's,-rdynamic,,'`"
+    # now look for the gtk.h header
+    CPPFLAGS="${save_CPPFLAGS} ${familiar_CFLAGS}"
+    ac_cv_gtk_headers=yes
+    AC_CHECK_HEADERS(gtk/gtk.h glib.h gdk/gdk.h, , [
+      ac_cv_gtk_headers=no
+      echo "Cannot find gtk development headers."
+    ])
+
+    # now look for gpe support
+    AC_ARG_WITH(gpe-prefix,
+    [    --with-gpe-prefix=PATH gpe installation path prefix (default search in \$PATH)],[],[])
+    if test "x$with_gpe_prefix" != "xno"  -a "x$with_gpe_prefix" != "x"
+    then
+      gpe_CFLAGS="-I$with_gpe_prefix/include"
+      gpe_LDFLAGS="-lXi -lgdk_pixbuf -L$with_gpe_prefix/lib"
+
+      # now look for gpe/init.h header file
+      save_CFLAGS=$CFLAGS
+      save_LDFLAGS=$LDFLAGS
+#      CFLAGS="${familiar_CFLAGS} ${gpe_CFLAGS}"
+      LDFLAGS="${familiar_LDFLAGS} ${gpe_LDFLAGS}"
+      CPPFLAGS="${save_CPPFLAGS} ${familiar_CFLAGS} ${gpe_CFLAGS}"
+      ac_cv_gpe_headers=yes
+      AC_CHECK_HEADERS(gpe/init.h, ,
+        [ ac_cv_gpe_headers=no 
+          AC_MSG_ERROR([Cannot find development headers for libgpewidget...]) ])
+      AC_CHECK_LIB(gpewidget,  gpe_application_init, 
+        [ gpe_LDFLAGS="${gpe_LDFLAGS} -lgpewidget" ],
+        [ AC_MSG_ERROR([Cannot find libgpewidget library...]) ])
+      CFLAGS=$save_CFLAGS
+      LDFLAGS=$save_LDFLAG 
+      if test "x${ac_cv_gpe_headers}" = "xyes"
+      then
+        familiar_CFLAGS="${familiar_CFLAGS} ${gpe_CFLAGS}"
+        familiar_LDFLAGS="${familiar_LDFLAGS} ${gpe_LDFLAGS}" 
+      fi
+    fi 
+    if test "x${ac_cv_gtk_headers}" = "xyes"
+    then
+      PLUGINS="${PLUGINS} familiar"
+    fi
+    CPPFLAGS="${save_CPPFLAGS}"
+  fi
+fi
+
+dnl
 dnl  Gnome module
 dnl
 AC_ARG_ENABLE(gnome,
@@ -1407,6 +1627,34 @@ AC_ARG_ENABLE(kde,
      kde_LDFLAGS="${kde_LDFLAGS} -L${KDEDIR}/lib -lkfile"
      kde_CFLAGS="${kde_CFLAGS} -I/usr/include/kde -I/usr/include/qt"
      kde_CFLAGS="${kde_CFLAGS} -I${KDEDIR}/include -I${QTDIR}/include"
+     if test -x ${QTDIR}/bin/moc
+     then
+       MOC=${QTDIR}/bin/moc
+     else
+       MOC=moc
+     fi
+   fi])
+
+dnl
+dnl  Opie QT embedded module
+dnl
+AC_ARG_ENABLE(opie,
+  [  --enable-opie           Qt embedded interface support (default disabled)],
+  [if test "x${enable_opie}" = "xyes"; then
+     AC_ARG_WITH(qte,
+  [    --with-qte=PATH       Qt Embedded headers and libraries])
+     if test "x${with_qte}" = "x"
+     then
+       test_LDFLAGS="-L${QTDIR}/lib"
+       test_CFLAGS="-I${QTDIR}/include"
+     else
+       test_LDFLAGS="-L${with_qte}/lib"
+       test_CFLAGS="-I${with_qte}/include"
+     fi
+
+     PLUGINS="${PLUGINS} opie"
+     opie_LDFLAGS="${opie_LDFLAGS} ${test_LDFLAGS} -lqpe -lqte"
+     opie_CFLAGS="${opie_CFLAGS} ${test_CFLAGS}-DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
      if test -x ${QTDIR}/bin/moc
      then
        MOC=${QTDIR}/bin/moc
@@ -1666,6 +1914,7 @@ AC_SUBST(dvdread_CFLAGS)
 AC_SUBST(mpeg_ts_dvbpsi_CFLAGS)
 AC_SUBST(directx_CFLAGS)
 AC_SUBST(esd_CFLAGS)
+AC_SUBST(familiar_CFLAGS)
 AC_SUBST(ffmpeg_CFLAGS)
 AC_SUBST(glide_CFLAGS)
 AC_SUBST(gnome_CFLAGS)
@@ -1676,7 +1925,9 @@ AC_SUBST(macosx_CFLAGS)
 AC_SUBST(mad_CFLAGS)
 AC_SUBST(memcpyaltivec_CFLAGS)
 AC_SUBST(motionaltivec_CFLAGS)
+AC_SUBST(opie_CFLAGS)
 AC_SUBST(qt_CFLAGS)
+AC_SUBST(qte_CFLAGS)
 AC_SUBST(sdl_CFLAGS)
 AC_SUBST(x11_CFLAGS)
 AC_SUBST(xvideo_CFLAGS)
@@ -1697,6 +1948,7 @@ AC_SUBST(dvd_LDFLAGS)
 AC_SUBST(dvdread_LDFLAGS)
 AC_SUBST(mpeg_ts_dvbpsi_LDFLAGS)
 AC_SUBST(esd_LDFLAGS)
+AC_SUBST(familiar_LDFLAGS)
 AC_SUBST(filter_distort_LDFLAGS)
 AC_SUBST(ffmpeg_LDFLAGS)
 AC_SUBST(ggi_LDFLAGS)
@@ -1717,8 +1969,10 @@ AC_SUBST(mad_LDFLAGS)
 AC_SUBST(memcpyaltivec_LDFLAGS)
 AC_SUBST(motionaltivec_LDFLAGS)
 AC_SUBST(ncurses_LDFLAGS)
+AC_SUBST(opie_LDFLAGS)
 AC_SUBST(qnx_LDFLAGS)
 AC_SUBST(qt_LDFLAGS)
+AC_SUBST(qte_LDFLAGS)
 AC_SUBST(rc_LDFLAGS)
 AC_SUBST(sdl_LDFLAGS)
 AC_SUBST(vcd_LDFLAGS)

@@ -33,6 +33,7 @@ PLUGINS_DIR :=	a52 \
 		dvd \
 		dvdread \
 		esd \
+		familiar \
 		fb \
 		ffmpeg \
 		filter \
@@ -55,8 +56,10 @@ PLUGINS_DIR :=	a52 \
 		mpeg_vdec \
 		network \
 		ogg \
+		opie \
 		qnx \
 		qt \
+		qte \
 		satellite \
 		sdl \
 		spudec \
@@ -71,6 +74,7 @@ PLUGINS_TARGETS := a52/a52 \
 		ac3_spdif/ac3_spdif \
 		access/file \
 		access/udp \
+		access/rtp \
 		access/http \
 		alsa/alsa \
 		arts/arts \
@@ -94,6 +98,7 @@ PLUGINS_TARGETS := a52/a52 \
 		dvd/dvd \
 		dvdread/dvdread \
 		esd/esd \
+		familiar/familiar \
 		fb/fb \
 		ffmpeg/ffmpeg \
 		filter/filter_deinterlace \
@@ -102,6 +107,7 @@ PLUGINS_TARGETS := a52/a52 \
 		filter/filter_distort \
 		filter/filter_wall \
 		filter/filter_clone \
+		filter/filter_crop \
 		fx/fx_scope \
 		ggi/ggi \
 		glide/glide \
@@ -142,8 +148,10 @@ PLUGINS_TARGETS := a52/a52 \
 		network/ipv4 \
 		network/ipv6 \
 		ogg/vorbis \
+		opie/opie \
 		qnx/qnx \
 		qt/qt \
+		qte/qte \
 		satellite/satellite \
 		sdl/sdl \
 		spudec/spudec \
@@ -342,7 +350,7 @@ dist:
 		echo "OK."; mkdir tmp; \
 	fi
 	# Copy directory structure in tmp
-	find -type d | grep -v '\(\.dep\|snapshot\|CVS\)' | while read i ; \
+	find . -type d | grep -v '\(\.dep\|snapshot\|CVS\)' | while read i ; \
 		do mkdir -p tmp/vlc/$$i ; \
 	done
 	rm -Rf tmp/vlc/tmp
@@ -368,7 +376,7 @@ dist:
 	for i in Makefile.in.in POTFILES.in ; do cp po/$$i tmp/vlc/po ; done
 	# Copy misc files
 	cp FAQ AUTHORS COPYING TODO todo.pl ChangeLog* README* INSTALL* \
-		ABOUT-NLS BUGS MODULES vlc.spec \
+		ABOUT-NLS BUGS plugins/LIST vlc.spec \
 		Makefile Makefile.*.in Makefile.dep Makefile.modules \
 		configure configure.in install-sh install-win32 macosx-dmg \
 		config.sub config.guess aclocal.m4 mkinstalldirs \
@@ -379,8 +387,8 @@ dist:
 	for file in control changelog rules ; do \
 		cp debian/$$file tmp/vlc/debian/ ; done
 	# Copy ipkg control files
-	for file in control rules patch ; do \
-		cp ipkg/$$file tmp/vlc/ipkg/ ; done
+	for file in ipkg/* ; do \
+		cp $$file tmp/vlc/ipkg/ ; done
 	# Copy fonts and icons
 	for file in share/*vlc* share/*psf; do \
 		cp $$file tmp/vlc/share ; done
@@ -437,6 +445,7 @@ package-beos:
 	# Copy relevant files
 	cp vlc tmp/vlc/
 	strip tmp/vlc/vlc
+	xres -o tmp/vlc/vlc ./share/vlc_beos.rsrc
 	cp AUTHORS COPYING ChangeLog README FAQ TODO tmp/vlc/
 	for file in default8x16.psf default8x9.psf ; \
 		do cp share/$$file tmp/vlc/share/ ; done

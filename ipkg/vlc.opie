@@ -1,0 +1,4 @@
+#!/bin/sh
+export QTDIR=/opt/QtPalmtop
+export LD_LIBRARY_PATH=.:/usr/X11R6/lib:/opt/QtPalmtop/lib:/lib/videolan/vlc
+/usr/bin/vlc
