@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.14 2002/07/20 18:01:43 sam Exp $
+ * $Id: ipv6.c,v 1.15 2002/07/29 19:01:27 gbazin Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -58,6 +58,13 @@
 
 #if defined(WIN32)
 static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
+/* the following will have to be removed when w32api defines them */
+#ifndef IPPROTO_IPV6
+#   define IPPROTO_IPV6 41 
+#endif
+#ifndef IPV6_JOIN_GROUP
+#   define IPV6_JOIN_GROUP 20
+#endif
 #endif
 
 /*****************************************************************************
@@ -151,7 +158,13 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
 //X            msg_Dbg( p_this, "Interface name specified: \"%s\"",
 //                          psz_multicast_interface );
             /* now convert that interface name to an index */
+#if !defined( WIN32 )
             p_socket->sin6_scope_id = if_nametoindex(psz_multicast_interface);
+#else
+            /* FIXME: for now we always use the default interface */
+            p_socket->sin6_scope_id = 0;
+//X            msg_Warn( 3, "Using default interface. This has to be FIXED!");
+#endif
 //X            msg_Warn( p_this, " = #%i\n", p_socket->sin6_scope_id );
         }
         psz_address[strlen(psz_address) - 1] = '\0' ;
@@ -325,7 +338,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 
         imr.ipv6mr_interface = sock.sin6_scope_id;
         imr.ipv6mr_multiaddr = sock.sin6_addr;
-        res = setsockopt(i_handle, IPPROTO_IPV6, IPV6_JOIN_GROUP, &imr,
+        res = setsockopt(i_handle, IPPROTO_IPV6, IPV6_JOIN_GROUP, (void*) &imr,
                          sizeof(imr));
 
         if( res == -1 )
