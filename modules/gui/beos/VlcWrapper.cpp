@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.36 2003/07/23 01:13:47 gbazin Exp $
+ * $Id: VlcWrapper.cpp,v 1.37 2003/09/07 22:53:09 fenrir Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -314,12 +314,10 @@ bool VlcWrapper::IsPlaying()
 			case PLAYING_S:
 			case FORWARD_S:
 			case BACKWARD_S:
-			case START_S:
 				playing = true;
 	            break;
 			case PAUSE_S:
 			case UNDEF_S:
-			case NOT_STARTED_S:
 			default:
 				break;
 		}

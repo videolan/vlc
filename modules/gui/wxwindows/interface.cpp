@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.59 2003/08/30 13:59:15 gbazin Exp $
+ * $Id: interface.cpp,v 1.60 2003/09/07 22:53:09 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -669,6 +669,8 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
 
     if( p_playlist->i_size )
     {
+        vlc_value_t state;
+
         input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_intf,
                                                        VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
@@ -681,19 +683,21 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
             return;
         }
 
-        if( p_input->stream.control.i_status != PAUSE_S )
+        var_Get( p_input, "state", &state );
+
+        if( state.i_int != PAUSE_S )
         {
             /* A stream is being played, pause it */
-            input_SetStatus( p_input, INPUT_STATUS_PAUSE );
-            TogglePlayButton( PAUSE_S );
-            vlc_object_release( p_playlist );
-            vlc_object_release( p_input );
-            return;
+            state.i_int = PAUSE_S;
         }
+        else
+        {
+            /* Stream is paused, resume it */
+            state.i_int = PLAYING_S;
+        }
+        var_Set( p_input, "state", state );
 
-        /* Stream is paused, resume it */
-        input_SetStatus( p_input, INPUT_STATUS_PLAY );
-        TogglePlayButton( PLAYING_S );
+        TogglePlayButton( state.i_int );
         vlc_object_release( p_input );
         vlc_object_release( p_playlist );
     }
@@ -732,10 +736,10 @@ void Interface::OnSliderUpdate( wxScrollEvent& event )
         if( p_intf->p_sys->i_slider_pos != event.GetPosition()
             && p_intf->p_sys->p_input )
         {
-            p_intf->p_sys->i_slider_pos = event.GetPosition();
-            input_Seek( p_intf->p_sys->p_input, p_intf->p_sys->i_slider_pos *
-                        100 / SLIDER_MAX_POS,
-                        INPUT_SEEK_PERCENT | INPUT_SEEK_SET );
+            vlc_value_t pos;
+            pos.f_float = (float)event.GetPosition() / (float)SLIDER_MAX_POS;
+
+            var_Set( p_intf->p_sys->p_input, "position", pos );
         }
 
 #ifdef WIN32
@@ -835,7 +839,9 @@ void Interface::OnSlowStream( wxCommandEvent& WXUNUSED(event) )
                                            FIND_ANYWHERE );
     if( p_input )
     {
-        input_SetStatus( p_input, INPUT_STATUS_SLOWER );
+        vlc_value_t val; val.b_bool = VLC_TRUE;
+
+        var_Set( p_input, "rate-slower", val );
         vlc_object_release( p_input );
     }
 }
@@ -847,7 +853,9 @@ void Interface::OnFastStream( wxCommandEvent& WXUNUSED(event) )
                                            FIND_ANYWHERE );
     if( p_input )
     {
-        input_SetStatus( p_input, INPUT_STATUS_FASTER );
+        vlc_value_t val; val.b_bool = VLC_TRUE;
+
+        var_Set( p_input, "rate-faster", val );
         vlc_object_release( p_input );
     }
 }

@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.19 2003/06/22 00:40:18 titer Exp $
+ * $Id: MediaControlView.cpp,v 1.20 2003/09/07 22:53:09 fenrir Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -300,14 +300,12 @@ MediaControlView::SetStatus(int status, int rate)
         case PLAYING_S:
         case FORWARD_S:
         case BACKWARD_S:
-        case START_S:
             fPlayPause->SetPlaying();
             break;
         case PAUSE_S:
             fPlayPause->SetPaused();
             break;
         case UNDEF_S:
-        case NOT_STARTED_S:
         default:
             fPlayPause->SetStopped();
             break;

@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.42 2003/06/22 00:40:18 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.43 2003/09/07 22:53:09 fenrir Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -416,7 +416,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             if (playback_status > UNDEF_S)
             {
                 p_wrapper->PlaylistStop();
-                p_mediaControl->SetStatus(NOT_STARTED_S, DEFAULT_RATE);
+                p_mediaControl->SetStatus(UNDEF_S, DEFAULT_RATE);
             }
             break;
     
@@ -722,7 +722,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 bool InterfaceWindow::QuitRequested()
 {
     p_wrapper->PlaylistStop();
-    p_mediaControl->SetStatus(NOT_STARTED_S, DEFAULT_RATE);
+    p_mediaControl->SetStatus(UNDEF_S, DEFAULT_RATE);
 
  	_StoreSettings();
    

@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.31 2003/08/28 15:59:04 gbazin Exp $
+ * $Id: timer.cpp,v 1.32 2003/09/07 22:53:09 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -36,7 +36,7 @@
 #include "wxwindows.h"
 #include <wx/timer.h>
 
-void DisplayStreamDate( wxControl *, intf_thread_t *, int );
+//void DisplayStreamDate( wxControl *, intf_thread_t *, int );
 
 /* Callback prototype */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
@@ -171,25 +171,32 @@ void Timer::Notify()
             /* Manage the slider */
             if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
             {
-                stream_position_t position;
-
                 /* Update the slider if the user isn't dragging it. */
                 if( p_intf->p_sys->b_slider_free )
                 {
+                    vlc_value_t pos;
+                    char psz_time[ OFFSETTOTIME_MAX_SIZE ];
+                    vlc_value_t time;
+                    mtime_t     i_seconds;
+
                     /* Update the value */
-                    vlc_mutex_unlock( &p_input->stream.stream_lock );
-                    input_Tell( p_input, &position );
-                    vlc_mutex_lock( &p_input->stream.stream_lock );
-                    if( position.i_size )
+                    var_Get( p_input, "position", &pos );
+                    if( pos.f_float >= 0.0 )
                     {
-                        p_intf->p_sys->i_slider_pos =
-                        ( SLIDER_MAX_POS * position.i_tell ) / position.i_size;
+                        p_intf->p_sys->i_slider_pos = (int)(SLIDER_MAX_POS * pos.f_float);
 
-                        p_main_interface->slider->SetValue(
-                            p_intf->p_sys->i_slider_pos );
+                        p_main_interface->slider->SetValue( p_intf->p_sys->i_slider_pos );
 
-                        DisplayStreamDate( p_main_interface->slider_box,p_intf,
-                                           p_intf->p_sys->i_slider_pos );
+                        var_Get( p_intf->p_sys->p_input, "time", &time );
+                        i_seconds = time.i_time / 1000000;
+
+                        sprintf( psz_time, "%d:%02d:%02d",
+                                 (int) (i_seconds / (60 * 60)),
+                                 (int) (i_seconds / 60 % 60),
+                                 (int) (i_seconds % 60) );
+
+
+                        p_main_interface->slider_box->SetLabel(wxU( psz_time ) );
                     }
                 }
             }
@@ -237,28 +244,6 @@ void Timer::Notify()
     }
 
     vlc_mutex_unlock( &p_intf->change_lock );
-}
-
-/*****************************************************************************
- * DisplayStreamDate: display stream date
- *****************************************************************************
- * This function displays the current date related to the position in
- * the stream. It is called whenever the slider changes its value.
- * The lock has to be taken before you call the function.
- *****************************************************************************/
-void DisplayStreamDate( wxControl *p_slider_frame, intf_thread_t * p_intf ,
-                        int i_pos )
-{
-    if( p_intf->p_sys->p_input )
-    {
-#define p_area p_intf->p_sys->p_input->stream.p_selected_area
-        char psz_time[ OFFSETTOTIME_MAX_SIZE ];
-
-        p_slider_frame->SetLabel(
-            wxU(input_OffsetToTime( p_intf->p_sys->p_input,
-                    psz_time, p_area->i_size * i_pos / SLIDER_MAX_POS )) );
-#undef p_area
-     }
 }
 
 /*****************************************************************************

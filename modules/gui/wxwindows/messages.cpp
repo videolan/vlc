@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: messages.cpp,v 1.15 2003/08/30 16:34:12 gbazin Exp $
+ * $Id: messages.cpp,v 1.16 2003/09/07 22:53:09 fenrir Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -70,6 +70,7 @@ Messages::Messages( intf_thread_t *_p_intf, wxWindow *p_parent ):
     b_verbose = VLC_FALSE;
     SetIcon( *p_intf->p_sys->p_icon );
     save_log_dialog = NULL;
+    b_verbose = VLC_FALSE;
 
     /* Create a panel to put everything in */
     wxPanel *messages_panel = new wxPanel( this, -1 );

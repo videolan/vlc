@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.37 2003/07/28 07:16:50 fenrir Exp $
+ * $Id: rc.c,v 1.38 2003/09/07 22:53:09 fenrir Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -510,6 +510,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
                   vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t * p_input;
+    vlc_value_t     val;
 
     p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
 
@@ -521,7 +522,9 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     /* Parse commands that only require an input */
     if( !strcmp( psz_cmd, "pause" ) )
     {
-        input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+        val.i_int = PAUSE_S;
+
+        var_Set( p_input, "state", val );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
@@ -530,13 +533,13 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0 &&
             newval.psz_string[strlen( newval.psz_string ) - 1] == '%' )
         {
-            input_Seek( p_input, atoi( newval.psz_string ),
-                        INPUT_SEEK_PERCENT | INPUT_SEEK_SET );
+            val.f_float = (float)atoi( newval.psz_string ) / 100.0;
+            var_Set( p_input, "position", val );
         }
         else
         {
-            input_Seek( p_input, atoi( newval.psz_string ),
-                        INPUT_SEEK_SECONDS | INPUT_SEEK_SET );
+            val.i_time = (int64_t)atoi( newval.psz_string ) * 1000000ULL;
+            var_Set( p_input, "time", val );
         }
         vlc_object_release( p_input );
         return VLC_SUCCESS;
@@ -545,53 +548,35 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
              !strcmp( psz_cmd, "chapter_n" ) ||
              !strcmp( psz_cmd, "chapter_p" ) )
     {
-        unsigned int i_chapter = 0;
-
         if( !strcmp( psz_cmd, "chapter" ) )
         {
             if ( *newval.psz_string )
             {
                 /* Set. */
-                i_chapter = atoi( newval.psz_string );
+                val.i_int = atoi( newval.psz_string );
+                var_Set( p_input, "chapter", val );
             }
             else
             {
-                /* Get. */
-                vlc_mutex_lock( &p_input->stream.stream_lock );
-                printf( "Currently playing chapter %d/%d\n",
-                        p_input->stream.p_selected_area->i_part,
-                        p_input->stream.p_selected_area->i_part_nb - 1 );
-                vlc_mutex_unlock( &p_input->stream.stream_lock );
+                vlc_value_t val_list;
 
-                vlc_object_release( p_input );
-                return VLC_SUCCESS;
+                /* Get. */
+                var_Get( p_input, "chapter", &val );
+                var_Change( p_input, "chapter", VLC_VAR_GETCHOICES, &val_list, NULL );
+                printf( "Currently playing chapter %d/%d\n", val.i_int, val_list.p_list->i_count );
+                var_Change( p_this, "chapter", VLC_VAR_FREELIST, &val_list, NULL );
             }
         }
         else if( !strcmp( psz_cmd, "chapter_n" ) )
         {
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-            i_chapter = p_input->stream.p_selected_area->i_part + 1;
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            val.b_bool = VLC_TRUE;
+            var_Set( p_input, "next-chapter", val );
         }
         else if( !strcmp( psz_cmd, "chapter_p" ) )
         {
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-            i_chapter = p_input->stream.p_selected_area->i_part - 1;
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            val.b_bool = VLC_TRUE;
+            var_Set( p_input, "prev-chapter", val );
         }
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        if( ( i_chapter > 0 ) && ( i_chapter <
-            p_input->stream.p_selected_area->i_part_nb ) )
-        {
-            input_area_t *p_area = p_input->stream.p_selected_area;
-            p_input->stream.p_selected_area->i_part = i_chapter;
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-            input_ChangeArea( p_input, p_area );
-            input_SetStatus( p_input, INPUT_STATUS_PLAY );
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-        }
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
 
         vlc_object_release( p_input );
         return VLC_SUCCESS;
@@ -600,51 +585,35 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
              !strcmp( psz_cmd, "title_n" ) ||
              !strcmp( psz_cmd, "title_p" ) )
     {
-        unsigned int i_title = 0;
-
         if( !strcmp( psz_cmd, "title" ) )
         {
             if ( *newval.psz_string )
             {
                 /* Set. */
-                i_title = atoi( newval.psz_string );
+                val.i_int = atoi( newval.psz_string );
+                var_Set( p_input, "title", val );
             }
             else
             {
-                /* Get. */
-                vlc_mutex_lock( &p_input->stream.stream_lock );
-                printf( "Currently playing title %d/%d\n",
-                        p_input->stream.p_selected_area->i_id,
-                        p_input->stream.i_area_nb - 1 );
-                vlc_mutex_unlock( &p_input->stream.stream_lock );
+                vlc_value_t val_list;
 
-                vlc_object_release( p_input );
-                return VLC_SUCCESS;
+                /* Get. */
+                var_Get( p_input, "title", &val );
+                var_Change( p_input, "title", VLC_VAR_GETCHOICES, &val_list, NULL );
+                printf( "Currently playing title %d/%d\n", val.i_int, val_list.p_list->i_count );
+                var_Change( p_this, "title", VLC_VAR_FREELIST, &val_list, NULL );
             }
         }
         else if( !strcmp( psz_cmd, "title_n" ) )
         {
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-            i_title = p_input->stream.p_selected_area->i_id + 1;
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            val.b_bool = VLC_TRUE;
+            var_Set( p_input, "next-title", val );
         }
         else if( !strcmp( psz_cmd, "title_p" ) )
         {
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-            i_title = p_input->stream.p_selected_area->i_id - 1;
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            val.b_bool = VLC_TRUE;
+            var_Set( p_input, "prev-title", val );
         }
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        if( ( i_title > 0 ) && ( i_title < p_input->stream.i_area_nb ) )
-        {
-            input_area_t *p_area = p_input->stream.pp_areas[i_title];
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-            input_ChangeArea( p_input, p_area );
-            input_SetStatus( p_input, INPUT_STATUS_PLAY );
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-        }
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
 
         vlc_object_release( p_input );
         return VLC_SUCCESS;
