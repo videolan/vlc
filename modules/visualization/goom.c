@@ -2,7 +2,7 @@
  * goom.c: based on libgoom (see http://ios.free.fr/?page=projet&quoi=1)
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: goom.c,v 1.3 2003/12/22 23:46:23 hartman Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar
  *
@@ -36,23 +36,27 @@
 
 #include "goom_core.h"
 
-#define GOOM_WIDTH 160
-#define GOOM_HEIGHT 120
-#define GOOM_ASPECT (VOUT_ASPECT_FACTOR*GOOM_WIDTH/GOOM_HEIGHT)
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
+#define WIDTH_TEXT N_("Goom display width")
+#define HEIGHT_TEXT N_("Goom display height")
+#define RES_LONGTEXT N_("Allows you to change the resolution of the " \
+    "goom display (bigger resolution will be prettier but more CPU intensive)")
+
 vlc_module_begin();
     set_description( _("goom effect") );
     set_capability( "audio filter", 0 );
+    add_integer( "goom-width", 320, NULL,
+                 WIDTH_TEXT, RES_LONGTEXT, VLC_FALSE );
+    add_integer( "goom-height", 240, NULL,
+                 HEIGHT_TEXT, RES_LONGTEXT, VLC_FALSE );
     set_callbacks( Open, Close );
     add_shortcut( "goom" );
 vlc_module_end();
-
 
 /*****************************************************************************
  * Local prototypes
@@ -79,10 +83,10 @@ typedef struct aout_filter_sys_t
 
 } aout_filter_sys_t;
 
-static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
-                        aout_buffer_t * );
+static void DoWork   ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
+                       aout_buffer_t * );
 
-static void Thread    ( vlc_object_t * );
+static void Thread   ( vlc_object_t * );
 
 static char *TitleGet( vlc_object_t * );
 
@@ -93,17 +97,19 @@ static int Open( vlc_object_t *p_this )
 {
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys;
+    goom_thread_t     *p_thread;
+    vlc_value_t       width, height;
 
     if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' )
          || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
     {
         msg_Warn( p_filter, "Bad input or output format" );
-        return -1;
+        return VLC_EGENERIC;
     }
     if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
     {
         msg_Warn( p_filter, "input and output formats are not similar" );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     p_filter->pf_do_work = DoWork;
@@ -113,43 +119,49 @@ static int Open( vlc_object_t *p_this )
     p_sys = p_filter->p_sys = malloc( sizeof( aout_filter_sys_t ) );
 
     /* Create goom thread */
-    p_sys->p_thread = vlc_object_create( p_filter,
-                                         sizeof( goom_thread_t ) );
-    p_sys->p_thread->p_vout = vout_Request( p_filter, NULL,
-                                           GOOM_WIDTH, GOOM_HEIGHT,
-                                           VLC_FOURCC('R','V','3','2'),
-                                           GOOM_ASPECT );
-    if( p_sys->p_thread->p_vout == NULL )
+    p_sys->p_thread = p_thread =
+        vlc_object_create( p_filter, sizeof( goom_thread_t ) );
+    vlc_object_attach( p_thread, p_this );
+
+    var_Create( p_thread, "goom-width", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    var_Get( p_thread, "goom-width", &width );
+    var_Create( p_thread, "goom-height", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    var_Get( p_thread, "goom-height", &height );
+
+    p_thread->p_vout =
+        vout_Request( p_filter, NULL, width.i_int, height.i_int,
+                      VLC_FOURCC('R','V','3','2'),
+                      VOUT_ASPECT_FACTOR * width.i_int/height.i_int );
+    if( p_thread->p_vout == NULL )
     {
         msg_Err( p_filter, "no suitable vout module" );
-        vlc_object_destroy( p_sys->p_thread );
-        free( p_filter->p_sys );
+        vlc_object_detach( p_thread );
+        vlc_object_destroy( p_thread );
+        free( p_sys );
         return VLC_EGENERIC;
     }
-    vlc_mutex_init( p_filter, &p_sys->p_thread->lock );
-    vlc_cond_init( p_filter, &p_sys->p_thread->wait );
+    vlc_mutex_init( p_filter, &p_thread->lock );
+    vlc_cond_init( p_filter, &p_thread->wait );
 
-    p_sys->p_thread->i_samples = 0;
-    memset( &p_sys->p_thread->samples, 0, 512*2*2 );
-    p_sys->p_thread->psz_title = TitleGet( VLC_OBJECT( p_filter ) );
+    p_thread->i_samples = 0;
+    memset( &p_thread->samples, 0, 512*2*2 );
+    p_thread->psz_title = TitleGet( VLC_OBJECT( p_filter ) );
 
-    if( vlc_thread_create( p_sys->p_thread, "Goom Update Thread", Thread,
+    if( vlc_thread_create( p_thread, "Goom Update Thread", Thread,
                            VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
     {
         msg_Err( p_filter, "cannot lauch goom thread" );
-        vout_Destroy( p_sys->p_thread->p_vout );
-        vlc_mutex_destroy( &p_sys->p_thread->lock );
-        vlc_cond_destroy( &p_sys->p_thread->wait );
-        if( p_sys->p_thread->psz_title )
-        {
-            free( p_sys->p_thread->psz_title );
-        }
-        vlc_object_destroy( p_sys->p_thread );
-        free( p_filter->p_sys );
+        vout_Destroy( p_thread->p_vout );
+        vlc_mutex_destroy( &p_thread->lock );
+        vlc_cond_destroy( &p_thread->wait );
+        if( p_thread->psz_title ) free( p_thread->psz_title );
+        vlc_object_detach( p_thread );
+        vlc_object_destroy( p_thread );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -176,7 +188,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     float   *p_fsample = (float*)p_in_buf->p_buffer;
     int     i_samples = 0;
     int     i_channels = aout_FormatNbChannels( &p_filter->input );
-
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
@@ -220,8 +231,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 static void Thread( vlc_object_t *p_this )
 {
     goom_thread_t *p_thread = (goom_thread_t*)p_this;
+    vlc_value_t width, height;
 
-    goom_init( GOOM_WIDTH, GOOM_HEIGHT, 0 );
+    var_Get( p_this, "goom-width", &width );
+    var_Get( p_this, "goom-height", &height );
+
+    goom_init( width.i_int, height.i_int, 0 );
     goom_set_font( NULL, NULL, NULL );
 
     while( !p_thread->b_die )
@@ -245,7 +260,7 @@ static void Thread( vlc_object_t *p_this )
             free( p_thread->psz_title );
             p_thread->psz_title = NULL;
         }
-        while( ( p_pic = vout_CreatePicture( p_thread->p_vout, 0, 0, 0 ) ) == NULL &&
+        while( !( p_pic = vout_CreatePicture( p_thread->p_vout, 0, 0, 0 ) ) &&
                !p_thread->b_die )
         {
             msleep( VOUT_OUTMEM_SLEEP );
@@ -256,7 +271,7 @@ static void Thread( vlc_object_t *p_this )
             break;
         }
 
-        memcpy( p_pic->p[0].p_pixels, plane, GOOM_WIDTH * GOOM_HEIGHT * 4 );
+        memcpy( p_pic->p[0].p_pixels, plane, width.i_int * height.i_int * 4 );
         vout_DatePicture( p_thread->p_vout, p_pic, i_pts );
         vout_DisplayPicture( p_thread->p_vout, p_pic );
 
@@ -287,6 +302,7 @@ static void Close( vlc_object_t *p_this )
     vout_Request( p_filter, p_sys->p_thread->p_vout, 0, 0, 0, 0 );
     vlc_mutex_destroy( &p_sys->p_thread->lock );
     vlc_cond_destroy( &p_sys->p_thread->wait );
+    vlc_object_detach( p_sys->p_thread );
     vlc_object_destroy( p_sys->p_thread );
 
     free( p_sys );
@@ -295,9 +311,9 @@ static void Close( vlc_object_t *p_this )
 
 static char *TitleGet( vlc_object_t *p_this )
 {
-    input_thread_t *p_input = vlc_object_find( p_this,
-                                               VLC_OBJECT_INPUT, FIND_ANYWHERE);
-    char           *psz_title = NULL;
+    char *psz_title = NULL;
+    input_thread_t *p_input =
+        vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
 
     if( p_input )
     {
@@ -320,4 +336,3 @@ static char *TitleGet( vlc_object_t *p_this )
 
     return psz_title;
 }
-
