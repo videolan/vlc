@@ -177,7 +177,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
         if( !w )                \
             w = N;              \
         w->SetSize( s );        \
-        w->SetPosition( p );    \
+        w->Move( p );           \
         w->S( true );           \
     }
 

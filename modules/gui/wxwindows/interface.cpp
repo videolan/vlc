@@ -311,7 +311,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
                    wxSystemSettings::GetMetric( wxSYS_SCREEN_Y ) );
 
     if( ws->GetSettings( WindowSettings::ID_MAIN, b_shown, p, s ) )
-        SetPosition( p );
+        Move( p );
 }
 
 Interface::~Interface()
