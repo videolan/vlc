@@ -2,7 +2,7 @@
  * ps.h: Program Stream demuxer helper
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ps.h,v 1.3 2004/01/18 16:02:40 gbazin Exp $
+ * $Id: ps.h,v 1.4 2004/01/29 18:37:05 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -54,7 +54,7 @@ static inline int ps_track_fill( ps_track_t *tk, int i_id )
         if( ( i_id&0xf8 ) == 0x88 )
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('d','t','s',' ') );
-            tk->i_skip = 1;
+            tk->i_skip = 4;
         }
         else if( ( i_id&0xf0 ) == 0x80 )
         {
