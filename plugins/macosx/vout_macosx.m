@@ -2,7 +2,7 @@
  * vout_macosx.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout_macosx.m,v 1.9 2002/07/15 02:09:57 jlj Exp $
+ * $Id: vout_macosx.m,v 1.10 2002/07/15 19:04:12 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -730,6 +730,38 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     switch( key )
     {
+        case (unichar)0xf700: /* up-arrow */
+        { 
+            aout_thread_t * p_aout = vlc_object_find( p_vout, VLC_OBJECT_AOUT,
+                                                      FIND_ANYWHERE );
+            if( p_aout != NULL )
+            {
+                if( p_aout->i_volume + VOLUME_STEP <= VOLUME_MAX )
+                {
+                    p_aout->i_volume += VOLUME_STEP;
+                }
+ 
+                vlc_object_release( p_aout ); 
+            } 
+        } 
+        break;
+
+        case (unichar)0xf701: /* down-arrow */
+        {
+            aout_thread_t * p_aout = vlc_object_find( p_vout, VLC_OBJECT_AOUT,
+                                                      FIND_ANYWHERE );
+            if( p_aout != NULL )
+            {
+                if( p_aout->i_volume - VOLUME_STEP >= VOLUME_MIN )
+                {
+                    p_aout->i_volume -= VOLUME_STEP;
+                }
+
+                vlc_object_release( p_aout );
+            }
+        }
+        break;
+
         case 'f': case 'F':
             [self toggleFullscreen];
             break;
