@@ -45,6 +45,8 @@ int screen_InitCapture( demux_t *p_demux )
     demux_sys_t   *p_sys = p_demux->p_sys;
     screen_data_t *p_data;
     BRect          rect;
+    int            i_chroma;
+    int            i_bits_per_pixel;
 
     p_sys->p_data = p_data =
         (screen_data_t *)malloc( sizeof( screen_data_t ) );
@@ -54,11 +56,28 @@ int screen_InitCapture( demux_t *p_demux )
 
     p_data->p_bitmap = new BBitmap( rect, p_data->p_screen->ColorSpace() );
 
-    /* FIXME */
-    es_format_Init( &p_sys->fmt, VIDEO_ES, VLC_FOURCC('R','V','3','2') );
+    switch( p_data->p_screen->ColorSpace() )
+    {
+        case B_RGB32:
+            i_chroma = VLC_FOURCC('R','V','3','2');
+            i_bits_per_pixel = 32;
+            break;
+        case B_RGB16:
+            i_chroma = VLC_FOURCC('R','V','1','6');
+            i_bits_per_pixel = 16;
+            break;
+        default:
+            msg_Err( p_demux, "screen depth %i unsupported",
+                     p_data->p_screen->ColorSpace() );
+            delete p_data->p_bitmap;
+            delete p_data->p_screen;
+            free( p_data );
+            return VLC_EGENERIC;
+    }
+    es_format_Init( &p_sys->fmt, VIDEO_ES, i_chroma );
     p_sys->fmt.video.i_width  = (int)rect.Width();
     p_sys->fmt.video.i_height = (int)rect.Height();
-    p_sys->fmt.video.i_bits_per_pixel = 32;
+    p_sys->fmt.video.i_bits_per_pixel = i_bits_per_pixel;
 
     return VLC_SUCCESS;
 }
@@ -81,17 +100,20 @@ block_t *screen_Capture( demux_t *p_demux )
     screen_data_t *p_data = p_sys->p_data;
     block_t       *p_block;
 
-    p_block = block_New( p_demux, 4 * p_sys->fmt.video.i_width *
-                         p_sys->fmt.video.i_height );
+    p_block = block_New( p_demux, p_sys->fmt.video.i_width *
+                         p_sys->fmt.video.i_height *
+                         p_sys->fmt.video.i_bits_per_pixel / 8 );
 
     p_data->p_screen->ReadBitmap( p_data->p_bitmap );
 
     for( unsigned i = 0; i < p_sys->fmt.video.i_height; i++ )
     {
-        memcpy( p_block->p_buffer + i * 4 * p_sys->fmt.video.i_width,
+        memcpy( p_block->p_buffer + i * p_sys->fmt.video.i_width *
+                    p_sys->fmt.video.i_bits_per_pixel / 8,
                 (uint8_t *) p_data->p_bitmap->Bits() +
                     i * p_data->p_bitmap->BytesPerRow(),
-                p_sys->fmt.video.i_width );
+                p_sys->fmt.video.i_width *
+                    p_sys->fmt.video.i_bits_per_pixel / 8 );
     }
     return p_block;
 }
