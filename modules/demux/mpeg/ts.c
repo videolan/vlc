@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.29 2003/07/13 12:35:13 massiot Exp $
+ * $Id: ts.c,v 1.30 2003/08/01 18:02:06 fenrir Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -298,11 +298,11 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
     {
         /* unit_start set to 1 -> presence of a pointer field
          * (see ISO/IEC 13818 (2.4.4.2) which should be set to 0x00 */
-        if( (u8)p[0] != 0x00 )
+        if( (uint8_t)p[0] != 0x00 )
         {
             msg_Warn( p_input,
                       "non-zero pointer field found, trying to continue" );
-            p+=(u8)p[0];
+            p+=(uint8_t)p[0];
         }
         else
         {
@@ -311,7 +311,7 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
 
         /* This is the begining of a new section */
 
-        if( ((u8)(p[1]) & 0xc0) != 0x80 )
+        if( ((uint8_t)(p[1]) & 0xc0) != 0x80 )
         {
             msg_Warn( p_input, "invalid PSI packet" );
             p_psi->b_trash = 1;
@@ -321,7 +321,7 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
             p_psi->i_section_length = ((p[1] & 0xF) << 8) | p[2];
             p_psi->b_section_complete = 0;
             p_psi->i_read_in_section = 0;
-            p_psi->i_section_number = (u8)p[6];
+            p_psi->i_section_number = (uint8_t)p[6];
 
             if( p_psi->b_is_complete || p_psi->i_section_number == 0 )
             {
@@ -329,7 +329,7 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
                 p_psi->b_is_complete = 0;
                 p_psi->b_trash = 0;
                 p_psi->i_version_number = ( p[5] >> 1 ) & 0x1f;
-                p_psi->i_last_section_number = (u8)p[7];
+                p_psi->i_last_section_number = (uint8_t)p[7];
 
                 /* We'll write at the begining of the buffer */
                 p_psi->p_current = p_psi->buffer;
@@ -347,7 +347,7 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
                                   "PSI version differs inside same PAT" );
                         p_psi->b_trash = 1;
                     }
-                    if( p_psi->i_section_number + 1 != (u8)p[6] )
+                    if( p_psi->i_section_number + 1 != (uint8_t)p[6] )
                     {
                         msg_Warn( p_input,
                                   "PSI Section discontinuity, packet lost?" );
@@ -446,17 +446,17 @@ static void TSDecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
 
         do
         {
-            i_section_length = ((u32)(p_current_data[1] & 0xF) << 8) |
+            i_section_length = ((uint32_t)(p_current_data[1] & 0xF) << 8) |
                                  p_current_data[2];
-            i_current_section = (u8)p_current_data[6];
+            i_current_section = (uint8_t)p_current_data[6];
 
             for( i_loop = 0;
                  ( i_loop < (i_section_length - 9) / 4 ) && !b_changed;
                  i_loop++ )
             {
-                i_program_id = ( (u32)*(p_current_data + i_loop * 4 + 8) << 8 )
+                i_program_id = ( (uint32_t)*(p_current_data + i_loop * 4 + 8) << 8 )
                                  | *(p_current_data + i_loop * 4 + 9);
-                i_pmt_pid = ( ((u32)*(p_current_data + i_loop * 4 + 10) & 0x1F)
+                i_pmt_pid = ( ((uint32_t)*(p_current_data + i_loop * 4 + 10) & 0x1F)
                                     << 8 )
                                | *(p_current_data + i_loop * 4 + 11);
 
@@ -508,15 +508,15 @@ static void TSDecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
 
         do
         {
-            i_section_length = ((u32)(p_current_data[1] & 0xF) << 8) |
+            i_section_length = ((uint32_t)(p_current_data[1] & 0xF) << 8) |
                                  p_current_data[2];
-            i_current_section = (u8)p_current_data[6];
+            i_current_section = (uint8_t)p_current_data[6];
 
             for( i_loop = 0; i_loop < (i_section_length - 9) / 4 ; i_loop++ )
             {
-                i_program_id = ( (u32)*(p_current_data + i_loop * 4 + 8) << 8 )
+                i_program_id = ( (uint32_t)*(p_current_data + i_loop * 4 + 8) << 8 )
                                  | *(p_current_data + i_loop * 4 + 9);
-                i_pmt_pid = ( ((u32)*(p_current_data + i_loop * 4 + 10) & 0x1F)
+                i_pmt_pid = ( ((uint32_t)*(p_current_data + i_loop * 4 + 10) & 0x1F)
                                     << 8 )
                                | *(p_current_data + i_loop * 4 + 11);
 
@@ -532,7 +532,7 @@ static void TSDecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
                     p_pgrm_demux->i_pmt_version = PMT_UNINITIALIZED;
 
                     /* Add the PMT ES to this program */
-                    p_current_es = input_AddES( p_input, p_pgrm,(u16)i_pmt_pid,
+                    p_current_es = input_AddES( p_input, p_pgrm,(uint16_t)i_pmt_pid,
                         UNKNOWN_ES, NULL, sizeof( es_ts_data_t) );
                     p_current_es->i_fourcc = VLC_FOURCC( 'p', 'm', 't', ' ' );
                     p_es_demux = (es_ts_data_t *)p_current_es->p_demux_data;
@@ -589,7 +589,7 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         p_current_section = p_psi->buffer;
         p_current_data = p_psi->buffer;
 
-        p_pgrm_data->i_pcr_pid = ( ((u32)*(p_current_section + 8) & 0x1F) << 8 ) |
+        p_pgrm_data->i_pcr_pid = ( ((uint32_t)*(p_current_section + 8) & 0x1F) << 8 ) |
                                     *(p_current_section + 9);
 
 
@@ -612,10 +612,10 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         /* Then add what we received in this PMT */
         do
         {
-            i_section_length = ( ((u32)*(p_current_data + 1) & 0xF) << 8 ) |
+            i_section_length = ( ((uint32_t)*(p_current_data + 1) & 0xF) << 8 ) |
                                   *(p_current_data + 2);
-            i_current_section = (u8)p_current_data[6];
-            i_prog_info_length = ( ((u32)*(p_current_data + 10) & 0xF) << 8 ) |
+            i_current_section = (uint8_t)p_current_data[6];
+            i_prog_info_length = ( ((uint32_t)*(p_current_data + 10) & 0xF) << 8 ) |
                                     *(p_current_data + 11);
 
             /* For the moment we ignore program descriptors */
@@ -626,9 +626,9 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
             while( p_current_data < p_current_section + i_section_length -1 )
             {
                 i_stream_type = (int)p_current_data[0];
-                i_pid = ( ((u32)*(p_current_data + 1) & 0x1F) << 8 ) |
+                i_pid = ( ((uint32_t)*(p_current_data + 1) & 0x1F) << 8 ) |
                            *(p_current_data + 2);
-                i_es_info_length = ( ((u32)*(p_current_data + 3) & 0xF) << 8 ) |
+                i_es_info_length = ( ((uint32_t)*(p_current_data + 3) & 0xF) << 8 ) |
                                       *(p_current_data + 4);
 
                 /* Tell the interface what kind of stream it is and select
@@ -711,7 +711,7 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                     }
 
                     /* Add this ES to the program */
-                    p_new_es = input_AddES( p_input, p_es->p_pgrm, (u16)i_pid,
+                    p_new_es = input_AddES( p_input, p_es->p_pgrm, (uint16_t)i_pid,
                                    i_cat, NULL, sizeof( es_ts_data_t ) );
 
                     ((es_ts_data_t *)p_new_es->p_demux_data)->i_continuity_counter = 0xFF;
@@ -737,7 +737,7 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         if( !p_input->stream.p_selected_program )
         {
             pgrm_descriptor_t *     p_pgrm_to_select;
-            u16 i_id = (u16)config_GetInt( p_input, "program" );
+            uint16_t i_id = (uint16_t)config_GetInt( p_input, "program" );
 
             if( i_id != 0 ) /* if user specified a program */
             {
@@ -1209,22 +1209,13 @@ static void TS_DVBPSI_HandlePAT( input_thread_t * p_input,
 
                 /* Add the PMT ES to this program */
                 p_current_es = input_AddES( p_input, p_new_pgrm,
-                                            (u16)p_pgrm->i_pid, UNKNOWN_ES,
+                                            (uint16_t)p_pgrm->i_pid, UNKNOWN_ES,
                                             NULL, sizeof(es_ts_data_t) );
                 p_current_es->i_fourcc = VLC_FOURCC( 'p', 'm', 't', ' ' );
                 p_es_demux = (es_ts_data_t *)p_current_es->p_demux_data;
                 p_es_demux->b_psi = 1;
                 p_es_demux->i_psi_type = PSI_IS_PMT;
-
-                p_es_demux->p_psi_section = malloc( sizeof( psi_section_t ) );
-                if ( p_es_demux->p_psi_section == NULL )
-                {
-                    msg_Err( p_input, "out of memory" );
-                    p_input->b_error = 1;
-                    return;
-                }
-
-                p_es_demux->p_psi_section->b_is_complete = 0;
+                p_es_demux->p_psi_section = NULL;
                 p_es_demux->i_continuity_counter = 0xFF;
 
                 /* Create a PMT decoder */
@@ -1280,6 +1271,26 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
           p_pgrm_demux->i_pmt_version == PMT_UNINITIALIZED )
     {
         dvbpsi_descriptor_t *p_dr = p_new_pmt->p_first_descriptor;
+        int i_loop;
+
+        msg_Dbg( p_input, "Processing PMT for program %d version %d",
+                 p_new_pmt->i_program_number, p_new_pmt->i_version );
+
+        /* Delete all ES in this program  except the PSI. We start from the
+         * end because i_es_number gets decremented after each deletion. */
+        for( i_loop = p_es->p_pgrm->i_es_number ; i_loop > 0 ; )
+        {
+            es_ts_data_t *              p_es_demux;
+
+            i_loop--;
+            p_es_demux = (es_ts_data_t *)
+                         p_es->p_pgrm->pp_es[i_loop]->p_demux_data;
+            if ( !p_es_demux->b_psi )
+            {
+                input_DelES( p_input, p_es->p_pgrm->pp_es[i_loop] );
+            }
+        }
+
         /* IOD */
         while( p_dr && ( p_dr->i_tag != 0x1d ) )
             p_dr = p_dr->p_next;
@@ -1612,7 +1623,7 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
             }
 
             /* Add this ES */
-            p_new_es = input_AddES( p_input, p_pgrm, (u16)p_es->i_pid,
+            p_new_es = input_AddES( p_input, p_pgrm, (uint16_t)p_es->i_pid,
                                     i_cat, psz_desc, sizeof( es_ts_data_t ) );
             if( p_new_es == NULL )
             {
@@ -1637,7 +1648,7 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
         if( !p_input->stream.p_selected_program )
         {
             pgrm_descriptor_t *     p_pgrm_to_select;
-            u16 i_id = (u16)config_GetInt( p_input, "program" );
+            uint16_t i_id = (uint16_t)config_GetInt( p_input, "program" );
 
             if( i_id != 0 ) /* if user specified a program */
             {
