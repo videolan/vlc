@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.22 2003/01/23 09:53:55 gbazin Exp $
+ * $Id: rc.c,v 1.23 2003/01/23 10:25:40 gbazin Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -217,7 +217,7 @@ static void Run( intf_thread_t *p_intf )
         tv.tv_sec = 0;
         tv.tv_usec = 50000;
         FD_ZERO( &fds );
-        FD_SET( descr_stdin, &fds );
+        FD_SET( STDIN_FILENO, &fds );
 
         i_dummy = select( STDIN_FILENO + 1, &fds, NULL, NULL, &tv );
         if( i_dummy > 0 )
