@@ -1662,10 +1662,16 @@ fi
 
 if test "${enable_vcdx}" = "yes"
 then
-  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.71,
+  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.72,
    [VLC_ADD_LDFLAGS([vcdx],[$LIBCDIO_LIBS])
     VLC_ADD_CFLAGS([vcdx],[$LIBCDIO_CFLAGS])],
     [AC_MSG_WARN(libcdio library not found)
+    HAVE_VCDX=no])
+
+  PKG_CHECK_MODULES(LIBCDIO, libiso9660 >= 0.72,
+   [VLC_ADD_LDFLAGS([vcdx],[$LIBISO9660_LIBS])
+    VLC_ADD_CFLAGS([vcdx],[$LIBISO9660_CFLAGS])],
+    [AC_MSG_WARN(libiso9660 library not found)
     HAVE_VCDX=no])
 
   PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.21,
