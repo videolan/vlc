@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: libvlc.c,v 1.110 2004/01/09 20:36:21 hartman Exp $
+ * $Id: libvlc.c,v 1.111 2004/01/25 11:32:32 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1286,6 +1286,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
     char psz_short[4];
     int i_index;
     int i_width = ConsoleWidth() - (PADDING_SPACES+LINE_START+1);
+    vlc_bool_t b_advanced = config_GetInt( p_this, "advanced" );
 
     memset( psz_spaces, ' ', PADDING_SPACES+LINE_START );
     psz_spaces[PADDING_SPACES+LINE_START] = '\0';
@@ -1318,6 +1319,22 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
             continue;
         }
 
+        /* Ignore modules with only advanced config options if requested */
+        if( !b_advanced )
+        {
+            for( p_item = p_parser->p_config;
+                 p_item->i_type != CONFIG_HINT_END;
+                 p_item++ )
+            {
+                if( (p_item->i_type & CONFIG_ITEM) &&
+                    !p_item->b_advanced ) break;
+            }
+            if( p_item->i_type == CONFIG_HINT_END ) continue;
+        }
+
+        /* Print name of module */
+        fprintf( stdout, "\n %s\n", p_parser->psz_longname );
+
         b_help_module = !strcmp( "help", p_parser->psz_object_name );
 
         /* Print module options */
@@ -1329,14 +1346,18 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
             char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
             char *psz_suf = "", *psz_prefix = NULL;
             int i;
-            if ( p_item->b_advanced && !config_GetInt( p_this, "advanced" ))
+
+            /* Skip advanced options if requested */
+            if( p_item->b_advanced && !b_advanced )
             {
                 continue;
             }
+
             switch( p_item->i_type )
             {
             case CONFIG_HINT_CATEGORY:
             case CONFIG_HINT_USAGE:
+                if( !strcmp( "main", p_parser->psz_object_name ) )
                 fprintf( stdout, "\n %s\n", p_item->psz_text );
                 break;
 
