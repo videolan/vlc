@@ -2,7 +2,7 @@
  * ntservice.c: Windows NT/2K/XP service interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ntservice.c,v 1.2 2003/08/14 11:47:32 gbazin Exp $
+ * $Id: ntservice.c,v 1.3 2003/11/15 10:38:01 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -55,10 +55,14 @@ static void Close   ( vlc_object_t * );
 vlc_module_begin();
     set_description( _("Windows NT/2K/XP service interface") );
     add_category_hint( N_("NT service"), NULL, VLC_TRUE );
-    add_bool( "ntservice-install", 0, NULL, INSTALL_TEXT, INSTALL_LONGTEXT, VLC_TRUE );
-    add_bool( "ntservice-uninstall", 0, NULL, INSTALL_TEXT, INSTALL_LONGTEXT, VLC_TRUE );
-    add_string ( "ntservice-name", VLCSERVICENAME, NULL, NAME_TEXT, NAME_LONGTEXT, VLC_TRUE );
-    add_string ( "ntservice-extraintf", NULL, NULL, EXTRAINTF_TEXT, EXTRAINTF_LONGTEXT, VLC_TRUE );
+    add_bool( "ntservice-install", 0, NULL,
+              INSTALL_TEXT, INSTALL_LONGTEXT, VLC_TRUE );
+    add_bool( "ntservice-uninstall", 0, NULL,
+              UNINSTALL_TEXT, UNINSTALL_LONGTEXT, VLC_TRUE );
+    add_string ( "ntservice-name", VLCSERVICENAME, NULL,
+                 NAME_TEXT, NAME_LONGTEXT, VLC_TRUE );
+    add_string ( "ntservice-extraintf", NULL, NULL,
+                 EXTRAINTF_TEXT, EXTRAINTF_LONGTEXT, VLC_TRUE );
 
     set_capability( "interface", 0 );
     set_callbacks( Activate, Close );
@@ -309,9 +313,9 @@ static void WINAPI ServiceDispatch( DWORD numArgs, char **args )
     }
 
     /* Initialization complete - report running status */
-    p_sys->status.dwCurrentState = SERVICE_RUNNING; 
-    p_sys->status.dwCheckPoint   = 0; 
-    p_sys->status.dwWaitHint     = 0; 
+    p_sys->status.dwCurrentState = SERVICE_RUNNING;
+    p_sys->status.dwCheckPoint   = 0;
+    p_sys->status.dwWaitHint     = 0;
 
     SetServiceStatus( p_sys->hStatus, &p_sys->status );
 }
