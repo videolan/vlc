@@ -126,8 +126,11 @@ on_toolbar_playlist_clicked            (GtkButton       *button,
     if( GTK_WIDGET_VISIBLE(p_intf->p_sys->p_playlist) ) {
         gtk_widget_hide( p_intf->p_sys->p_playlist);
     } else {        
+        GtkCList * clist;
         gtk_widget_show( p_intf->p_sys->p_playlist );
+        clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"clist1" ));
         gdk_window_raise( p_intf->p_sys->p_playlist->window );
+        rebuildCList( clist , p_main->p_playlist );
     }
 }
 
@@ -193,6 +196,50 @@ rebuildCList(GtkCList * clist, playlist_t * playlist_p)
       &red);
     gtk_clist_thaw( clist );
 }
+
+void
+on_invertselection_clicked (GtkMenuItem *item, gpointer user_data)
+{
+    int * selected, sel_l;
+    GtkCList    * clist;
+    playlist_t * playlist_p;
+    int dummy;
+    
+    /* catch the thread back */
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(item), "intf_playlist" );
+    playlist_p = p_main->p_playlist;
+    
+    /* lock the struct */
+    vlc_mutex_lock( &p_intf->p_sys->change_lock );
+    clist = GTK_CLIST( lookup_widget(p_intf->p_sys->p_playlist,"clist1") );
+    selected = malloc(sizeof(int)* g_list_length(clist->selection));
+
+    sel_l = g_list_length(clist->selection);
+     
+    for(dummy=0; dummy < sel_l; dummy++)
+    {
+        selected[dummy] = (int)g_list_nth_data(clist->selection,dummy);
+    }
+    gtk_clist_freeze( clist );
+    gtk_clist_select_all( clist );
+    for(dummy=0; dummy < sel_l; dummy++)
+    {
+        gtk_clist_unselect_row( clist, selected[dummy],0);
+        gtk_clist_unselect_row( clist, selected[dummy],1);
+    }
+    free( selected );
+    gtk_clist_thaw( clist );
+    vlc_mutex_unlock( &p_intf->p_sys->change_lock );
+}    
+
+void
+on_crop_activate                       (GtkMenuItem     *menuitem,
+                                       gpointer         user_data)
+{
+    on_invertselection_clicked (menuitem, user_data);
+    on_delete_clicked(menuitem, user_data);
+}
+
 
 void
 on_delete_clicked                      (GtkMenuItem       *item,

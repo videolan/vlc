@@ -478,6 +478,7 @@ on_intf_window_drag_data_received      (GtkWidget       *widget,
 {
     intf_thread_t * p_intf =  GetIntf( GTK_WIDGET(widget), "intf_window" );
     on_generic_drop_data_received( p_intf, data, info, 0);
+
      if( p_intf->p_input != NULL )
      {
         /* FIXME: temporary hack */
@@ -744,7 +745,6 @@ on_intf_window_destroy                 (GtkWidget       *widget,
         gtk_widget_hide(widget);
     } else {
         p_intf->b_die = 1;
-        gtk_widget_destroy(widget);
     }
   return TRUE;
 }

@@ -1174,6 +1174,8 @@ create_intf_playlist (void)
   GtkWidget *delete1_menu;
   GtkAccelGroup *delete1_menu_accels;
   guint tmp_key;
+  GtkWidget *crop1;
+  GtkWidget *invert1;
   GtkWidget *selection;
   GtkWidget *selection1;
   GtkWidget *scrolledwindow1;
@@ -1181,7 +1183,7 @@ create_intf_playlist (void)
   GtkWidget *label22;
   GtkWidget *label23;
 
-  intf_playlist = gtk_window_new (GTK_WINDOW_DIALOG);
+  intf_playlist = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_object_set_data (GTK_OBJECT (intf_playlist), "intf_playlist", intf_playlist);
   gtk_window_set_title (GTK_WINDOW (intf_playlist), _("Playlist"));
   gtk_window_set_default_size (GTK_WINDOW (intf_playlist), 386, 200);
@@ -1220,6 +1222,28 @@ create_intf_playlist (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (delete1), delete1_menu);
   delete1_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (delete1_menu));
+
+  crop1 = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (crop1)->child),
+                                   _("_crop"));
+  gtk_widget_add_accelerator (crop1, "activate_item", delete1_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (crop1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "crop1", crop1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (crop1);
+  gtk_container_add (GTK_CONTAINER (delete1_menu), crop1);
+
+  invert1 = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (invert1)->child),
+                                   _("_invert"));
+  gtk_widget_add_accelerator (invert1, "activate_item", delete1_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (invert1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "invert1", invert1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (invert1);
+  gtk_container_add (GTK_CONTAINER (delete1_menu), invert1);
 
   selection = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (selection)->child),
@@ -1274,6 +1298,12 @@ create_intf_playlist (void)
 
   gtk_signal_connect (GTK_OBJECT (intf_playlist), "delete_event",
                       GTK_SIGNAL_FUNC (on_intf_playlist_destroy_event),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (crop1), "activate",
+                      GTK_SIGNAL_FUNC (on_crop_activate),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (invert1), "activate",
+                      GTK_SIGNAL_FUNC (on_invertselection_clicked),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (selection), "activate",
                       GTK_SIGNAL_FUNC (on_delete_clicked),

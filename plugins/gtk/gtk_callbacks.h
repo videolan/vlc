@@ -268,3 +268,11 @@ on_main_window_toggle                  (GtkMenuItem     *menuitem,
 void
 on_delete_clicked                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
+
+void
+on_crop_activate                       (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_invertselection_clicked             (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);

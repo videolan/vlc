@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.6 2001/03/08 13:32:55 octplane Exp $
+ * $Id: intf_gtk.c,v 1.7 2001/03/08 15:48:14 octplane Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -204,6 +204,7 @@ static void intf_Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_popup = create_intf_popup( );
     p_intf->p_sys->p_playlist = create_intf_playlist( );
 
+    
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
                           VOUT_TITLE " (Gtk+ interface)");
@@ -215,6 +216,8 @@ static void intf_Run( intf_thread_t *p_intf )
 
     /* Accept file drops on the playlist window */
     temp = lookup_widget(p_intf->p_sys->p_playlist, "clist1"); 
+    
+    
     gtk_drag_dest_set( GTK_WIDGET( temp ),
                        GTK_DEST_DEFAULT_ALL, target_table,
                        1, GDK_ACTION_COPY );

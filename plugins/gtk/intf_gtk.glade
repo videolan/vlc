@@ -1283,7 +1283,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
     <last_modification_time>Thu, 08 Mar 2001 10:16:44 GMT</last_modification_time>
   </signal>
   <title>Playlist</title>
-  <type>GTK_WINDOW_DIALOG</type>
+  <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
   <modal>False</modal>
   <default_width>386</default_width>
@@ -1324,6 +1324,30 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
 	<widget>
 	  <class>GtkMenu</class>
 	  <name>delete1_menu</name>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>crop1</name>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_crop_activate</handler>
+	      <last_modification_time>Thu, 08 Mar 2001 15:12:17 GMT</last_modification_time>
+	    </signal>
+	    <label>_crop</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>invert1</name>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_invertselection_clicked</handler>
+	      <last_modification_time>Thu, 08 Mar 2001 15:12:17 GMT</last_modification_time>
+	    </signal>
+	    <label>_invert</label>
+	    <right_justify>False</right_justify>
+	  </widget>
 
 	  <widget>
 	    <class>GtkMenuItem</class>
