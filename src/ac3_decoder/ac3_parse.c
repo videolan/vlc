@@ -2,7 +2,7 @@
  * ac3_parse.c: ac3 parsing procedures
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_parse.c,v 1.23 2001/05/15 16:19:42 sam Exp $
+ * $Id: ac3_parse.c,v 1.24 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -103,7 +103,7 @@ static const struct frmsize_s frmsizecod_tbl[] =
 static const int fscod_tbl[] = {48000, 44100, 32000};
 
 /* Some internal functions */
-#ifdef STATS
+#ifdef TRACE
 static void parse_bsi_stats (ac3dec_t * p_ac3dec);
 static void parse_audblk_stats (ac3dec_t * p_ac3dec);
 #endif
@@ -308,7 +308,7 @@ int parse_bsi (ac3dec_t * p_ac3dec)
     }
     p_ac3dec->total_bits_read += 25;
     
-#ifdef STATS
+#ifdef TRACE
     parse_bsi_stats (p_ac3dec);
 #endif
 
@@ -785,7 +785,7 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
         p_ac3dec->total_bits_read += 8 * p_ac3dec->audblk.skipl + 9;
     }
     
-#ifdef STATS
+#ifdef TRACE
     parse_audblk_stats(p_ac3dec);
 #endif
     
@@ -814,7 +814,7 @@ void parse_auxdata (ac3dec_t * p_ac3dec)
     RemoveBits (&p_ac3dec->bit_stream,16);
 }
 
-#ifdef STATS
+#ifdef TRACE
 static void parse_bsi_stats (ac3dec_t * p_ac3dec) /* Some stats */
 {  
     struct mixlev_s

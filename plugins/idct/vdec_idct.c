@@ -2,7 +2,7 @@
  * vdec_idct.c : common IDCT functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_idct.c,v 1.3 2001/07/25 08:41:21 gbazin Exp $
+ * $Id: vdec_idct.c,v 1.4 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -46,25 +46,24 @@
 
 #include "modules.h"
 
-#include "vdec_ext-plugins.h"
 #include "vdec_idct.h"
 
 /*****************************************************************************
  * vdec_InitIDCT : initialize datas for vdec_SparseIDCT
  *****************************************************************************/
-void _M( vdec_InitIDCT ) ( vdec_thread_t * p_vdec )
+void _M( vdec_InitIDCT ) ( void ** pp_idct_data )
 {
     int i;
     dctelem_t * p_pre;
 
-    p_vdec->p_idct_data = malloc( sizeof(dctelem_t) * 64 * 64 );
-    p_pre = (dctelem_t *) p_vdec->p_idct_data;
+    *pp_idct_data = malloc( sizeof(dctelem_t) * 64 * 64 );
+    p_pre = (dctelem_t *) *pp_idct_data;
     memset( p_pre, 0, 64 * 64 * sizeof(dctelem_t) );
 
-    for( i=0 ; i < 64 ; i++ )
+    for( i = 0 ; i < 64 ; i++ )
     {
         p_pre[i*64+i] = 1 << SPARSE_SCALE_FACTOR;
-        _M( vdec_IDCT )( p_vdec, &p_pre[i*64], 0) ;
+        _M( vdec_IDCT )( NULL, &p_pre[i*64], 0) ;
     }
     return;
 }

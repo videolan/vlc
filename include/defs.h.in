@@ -1,4 +1,4 @@
-/* include/defs.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
+/* include/defs.h.in.  Generated automatically from configure.in by autoheader.  */
 
 /* Define to empty if the keyword does not work.  */
 #undef const
@@ -183,6 +183,9 @@
 
 /* Define if <cthreads.h> defines boolean_t. */
 #undef BOOLEAN_T_IN_CTHREADS_H
+
+/* Maximum supported data alignment */
+#undef ATTRIBUTE_ALIGNED_MAX
 
 /* Define if <sys/dvdio.h> defines dvd_struct. */
 #undef DVD_STRUCT_IN_SYS_DVDIO_H

@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.11 2001/07/18 14:21:00 massiot Exp $
+ * $Id: video_parser.h,v 1.12 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -30,60 +30,25 @@
 /*****************************************************************************
  * macroblock_parsing_t : macroblock context & predictors
  *****************************************************************************/
-typedef struct
+typedef struct motion_s
 {
-    unsigned char       i_quantizer_scale;        /* scale of the quantization
+    u8 *                pppi_ref[2][3];
+    int                 ppi_pmv[2][2];
+    int                 pi_f_code[2];
+} motion_t;
+
+typedef struct macroblock_parsing_s
+{
+    int                 i_offset;
+
+    motion_t            b_motion;
+    motion_t            f_motion;
+
+    /* Predictor for DC coefficients in intra blocks */
+    u16                 pi_dc_dct_pred[3];
+    u8                  i_quantizer_scale;        /* scale of the quantization
                                                    * matrices                */
-    int                 pi_dc_dct_pred[3];          /* ISO/IEC 13818-2 7.2.1 */
-    int                 pppi_pmv[2][2][2];  /* Motion vect predictors, 7.6.3 */
-    int                 i_motion_dir;/* Used for the next skipped macroblock */
-
-    /* Context used to optimize block parsing */
-    int                 i_motion_type, i_mv_count, i_mv_format;
-    boolean_t           b_dmv, b_dct_type;
-
-    /* Coordinates of the upper-left pixel of the macroblock, in lum and
-     * chroma */
-    int                 i_l_x, i_l_y, i_c_x, i_c_y;
 } macroblock_parsing_t;
-
-/*****************************************************************************
- * lookup_t : entry type for lookup tables                                   *
- *****************************************************************************/
-typedef struct lookup_s
-{
-    int    i_value;
-    int    i_length;
-} lookup_t;
-
-/*****************************************************************************
- * ac_lookup_t : special entry type for lookup tables about ac coefficients
- *****************************************************************************/
-typedef struct dct_lookup_s
-{
-    char   i_run;
-    char   i_level;
-    char   i_length;
-} dct_lookup_t;
-
-/*****************************************************************************
- * Standard codes
- *****************************************************************************/
-
-/* Macroblock Address Increment types */
-#define MB_ADDRINC_ESCAPE               8
-#define MB_ADDRINC_STUFFING             15
-
-/* Error constant for lookup tables */
-#define MB_ERROR                        (-1)
-
-/* Scan */
-#define SCAN_ZIGZAG                     0
-#define SCAN_ALT                        1
-
-/* Constant for block decoding */
-#define DCT_EOB                         64
-#define DCT_ESCAPE                      65
 
 /*****************************************************************************
  * Constants
@@ -95,18 +60,11 @@ extern u8       pi_scan[2][64];
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void vpar_InitCrop( struct vpar_thread_s* p_vpar );
-void vpar_InitMbAddrInc( struct vpar_thread_s * p_vpar );
-void vpar_InitPMBType( struct vpar_thread_s * p_vpar );
-void vpar_InitBMBType( struct vpar_thread_s * p_vpar );
-void vpar_InitCodedPattern( struct vpar_thread_s * p_vpar );
-void vpar_InitDCTTables( struct vpar_thread_s * p_vpar );
 void vpar_InitScanTable( struct vpar_thread_s * p_vpar );
 
-typedef void (*f_picture_data_t)( struct vpar_thread_s * p_vpar,
-                                  int i_mb_base );
+typedef void (*f_picture_data_t)( struct vpar_thread_s * p_vpar );
 #define PROTO_PICD( FUNCNAME )                                              \
-void FUNCNAME( struct vpar_thread_s * p_vpar, int i_mb_base );
+void FUNCNAME( struct vpar_thread_s * p_vpar );
 
 PROTO_PICD( vpar_PictureDataGENERIC )
 #if (VPAR_OPTIM_LEVEL > 0)
@@ -157,24 +115,14 @@ typedef struct sequence_s
                                             /* the same, in macroblock units */
     unsigned int        i_aspect_ratio;        /* height/width display ratio */
     unsigned int        i_matrix_coefficients;/* coeffs of the YUV transform */
+    int                 i_chroma_format, i_scalable_mode;
     int                 i_frame_rate;  /* theoritical frame rate in fps*1001 */
     boolean_t           b_mpeg2;                                    /* guess */
     boolean_t           b_progressive;              /* progressive (ie.
                                                      * non-interlaced) frame */
-    unsigned int        i_scalable_mode; /* scalability ; unsupported, but
-                                          * modifies the syntax of the binary
-                                          * stream.                          */
     quant_matrix_t      intra_quant, nonintra_quant;
     quant_matrix_t      chroma_intra_quant, chroma_nonintra_quant;
                                             /* current quantization matrices */
-
-    /* Chromatic information */
-    unsigned int        i_chroma_format;               /* see CHROMA_* below */
-    int                 i_chroma_nb_blocks;       /* number of chroma blocks */
-    u32                 i_chroma_width;/* width of a line of the chroma comp */
-    u32                 i_chroma_mb_width, i_chroma_mb_height;
-                                 /* size of a macroblock in the chroma buffer
-                                  * (eg. 8x8 or 8x16 or 16x16)               */
 
     /* Parser context */
     picture_t *         p_forward;        /* current forward reference frame */
@@ -200,31 +148,26 @@ typedef struct sequence_s
  *****************************************************************************/
 typedef struct picture_parsing_s
 {
-    /* ISO/CEI 11172-2 backward compatibility */
-    boolean_t           pb_full_pel_vector[2];
-    int                 i_forward_f_code, i_backward_f_code;
-
-    /* Values from the picture_coding_extension. Please refer to ISO/IEC
-     * 13818-2. */
+    /* Values from the picture_coding_extension. */
     int                 ppi_f_code[2][2];
     int                 i_intra_dc_precision;
     boolean_t           b_frame_pred_frame_dct, b_q_scale_type;
     boolean_t           b_intra_vlc_format;
-    boolean_t           b_alternate_scan, b_progressive;
+    boolean_t           b_progressive;
+    u8 *                pi_scan;
     boolean_t           b_top_field_first, b_concealment_mv;
     boolean_t           b_repeat_first_field;
     /* Relative to the current field */
     int                 i_coding_type, i_structure;
     boolean_t           b_frame_structure; /* i_structure == FRAME_STRUCTURE */
+    boolean_t           b_current_field;         /* i_structure == TOP_FIELD */
+    boolean_t           b_second_field;
 
     picture_t *         p_picture;               /* picture buffer from vout */
     int                 i_current_structure;   /* current parsed structure of
                                                 * p_picture (second field ?) */
+    int                 i_field_width;
     boolean_t           b_error;            /* parsing error, try to recover */
-
-    int                 i_l_stride, i_c_stride;
-                                    /* number of coeffs to jump when changing
-                                     * lines (different with field pictures) */
 } picture_parsing_t;
 
 /*****************************************************************************
@@ -269,6 +212,11 @@ typedef struct picture_parsing_s
 #define B_CODING_TYPE           3
 #define D_CODING_TYPE           4 /* MPEG-1 ONLY */
 /* other values are reserved */
+
+/* Structures */
+#define TOP_FIELD               1
+#define BOTTOM_FIELD            2
+#define FRAME_STRUCTURE         3
 
 /*****************************************************************************
  * Prototypes
@@ -373,19 +321,6 @@ typedef struct vpar_thread_s
     macroblock_parsing_t    mb;
     video_synchro_t         synchro;
 
-    /*
-     * Lookup tables
-     */
-    /* table for macroblock address increment */
-    lookup_t                pl_mb_addr_inc[2048];
-    /* tables for macroblock types 0=P 1=B */
-    lookup_t                ppl_mb_type[2][64];
-    /* table for coded_block_pattern */
-    lookup_t *              pl_coded_pattern;
-    /* variable length codes for the structure dct_dc_size for intra blocks */
-    lookup_t *              pppl_dct_dc_size[2][2];
-    /* Structure to store the tables B14 & B15 (ISO/IEC 13818-2 B.4) */
-    dct_lookup_t            ppl_dct_coef[2][16384];
     /* Scan table */
     u8                      ppi_scan[2][64];
     /* Default quantization matrices */
@@ -394,16 +329,12 @@ typedef struct vpar_thread_s
 
     /* Motion compensation plug-in used and shortcuts */
     struct module_s *       p_motion_module;
-    void ( * pppf_motion[4][2][4] )     ( struct macroblock_s * );
-    void ( * ppf_motion_skipped[4][4] ) ( struct macroblock_s * );
 
     /* IDCT plugin used and shortcuts */
-    struct module_s *           p_idct_module;
+    struct module_s *       p_idct_module;
     void ( * pf_sparse_idct ) ( void *, dctelem_t*, int );
     void ( * pf_idct )        ( void *, dctelem_t*, int );
     void ( * pf_norm_scan )   ( u8 ppi_scan[2][64] );
-    void ( * pf_decode_mb_c ) ( struct vdec_thread_s *, struct macroblock_s * );
-    void ( * pf_decode_mb_bw )( struct vdec_thread_s *, struct macroblock_s * );
 
 #ifdef STATS
     /* Statistics */
@@ -416,13 +347,6 @@ typedef struct vpar_thread_s
                                                 * during parsing             */
 #endif
 } vpar_thread_t;
-
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-
-/* Thread management functions - temporary ! */
-vlc_thread_t vpar_CreateThread       ( vdec_config_t * );
 
 /*****************************************************************************
  * NextStartCode : Find the next start code
@@ -447,29 +371,21 @@ static __inline__ void NextStartCode( bit_stream_t * p_bit_stream )
 static __inline__ void LoadQuantizerScale( struct vpar_thread_s * p_vpar )
 {
     /* Quantization coefficient table */
-    static u8   ppi_quantizer_scale[3][32] =
+    static u8   pi_non_linear_quantizer_scale[32] =
     {
-        /* MPEG-2 */
-        {
-            /* q_scale_type */
-            /* linear */
-            0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,
-            32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62
-        },
-        {
-            /* non-linear */
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 10,12,14,16,18,20, 22,
-            24,28,32,36,40,44,48,52,56,64,72,80,88,96,104,112
-        },
-        /* MPEG-1 */
-        {
-            0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
-            16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
-        }
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 10,12,14,16,18,20, 22,
+        24,28,32,36,40,44,48,52,56,64,72,80,88,96,104,112
     };
+    int         i_q_scale_code = GetBits( &p_vpar->bit_stream, 5 );
 
-    p_vpar->mb.i_quantizer_scale = ppi_quantizer_scale
-           [(!p_vpar->sequence.b_mpeg2 << 1) | p_vpar->picture.b_q_scale_type]
-           [GetBits( &p_vpar->bit_stream, 5 )];
+    if( p_vpar->picture.b_q_scale_type )
+    {
+        p_vpar->mb.i_quantizer_scale =
+                        pi_non_linear_quantizer_scale[i_q_scale_code];
+    }
+    else
+    {
+        p_vpar->mb.i_quantizer_scale = i_q_scale_code << 1;
+    }
 }
 

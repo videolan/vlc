@@ -2,7 +2,7 @@
  * idctmmxext.c : MMX EXT IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmxext.c,v 1.12 2001/07/17 09:48:07 massiot Exp $
+ * $Id: idctmmxext.c,v 1.13 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -26,6 +26,7 @@
  *****************************************************************************/
 
 #define MODULE_NAME idctmmxext
+#include "modules_inner.h"
 
 /*****************************************************************************
  * Preamble
@@ -40,20 +41,11 @@
 #include "mtime.h"
 #include "tests.h"                                              /* TestCPU() */
 
-#include "video.h"
-#include "video_output.h"
-
-#include "modules.h"
-#include "modules_inner.h"
-
-#include "vdec_ext-plugins.h"
-
-#include "vdec_block.h"
 #include "vdec_idct.h"
 
-#include "attributes.h"
 #include "mmx.h"
 
+#include "modules.h"
 #include "modules_export.h"
 
 /*****************************************************************************
@@ -98,8 +90,8 @@ static void idct_getfunctions( function_list_t * p_function_list )
     F.pf_idct = _M( vdec_IDCT );
     F.pf_norm_scan = vdec_NormScan;
     F.pf_decode_init = _M( vdec_InitDecode );
-    F.pf_decode_mb_c = _M( vdec_DecodeMacroblockC );
-    F.pf_decode_mb_bw = _M( vdec_DecodeMacroblockBW );
+    F.pf_addblock = _M( vdec_AddBlock );
+    F.pf_copyblock = _M( vdec_CopyBlock );
 #undef F
 }
 
@@ -418,7 +410,8 @@ static s32 rounder3[] ATTR_ALIGN(8) =
 static s32 rounder5[] ATTR_ALIGN(8) =
     rounder (-0.441341716183);  // C3*(-C5/C4+C5-C3)/2
 
-void _M( vdec_IDCT )( void * p_idct_data, dctelem_t * p_block, int i_idontcare )
+void _M( vdec_IDCT )( void * p_unused_data, dctelem_t * p_block,
+                      int i_idontcare )
 {
     static dctelem_t table04[] ATTR_ALIGN(16) =
         table (22725, 21407, 19266, 16384, 12873,  8867, 4520);

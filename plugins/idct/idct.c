@@ -2,7 +2,7 @@
  * idct.c : IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct.c,v 1.13 2001/07/17 09:48:07 massiot Exp $
+ * $Id: idct.c,v 1.14 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -37,12 +37,6 @@
 #include "mtime.h"
 #include "tests.h"
 
-#include "video.h"
-#include "video_output.h"
-
-#include "vdec_ext-plugins.h"
-
-#include "vdec_block.h"
 #include "vdec_idct.h"
 
 #include "modules.h"
@@ -91,8 +85,8 @@ static void idct_getfunctions( function_list_t * p_function_list )
     F.pf_idct = _M( vdec_IDCT );
     F.pf_norm_scan = vdec_NormScan;
     F.pf_decode_init = _M( vdec_InitDecode );
-    F.pf_decode_mb_c = _M( vdec_DecodeMacroblockC );
-    F.pf_decode_mb_bw = _M( vdec_DecodeMacroblockBW );
+    F.pf_addblock = _M( vdec_AddBlock );
+    F.pf_copyblock = _M( vdec_CopyBlock );
 #undef F
 }
 
@@ -121,7 +115,8 @@ static void vdec_NormScan( u8 ppi_scan[2][64] )
 /*****************************************************************************
  * vdec_IDCT : IDCT function for normal matrices
  *****************************************************************************/
-void _M( vdec_IDCT )( void * p_idct_data, dctelem_t * p_block, int i_idontcare )
+void _M( vdec_IDCT )( void * p_unused_data, dctelem_t * p_block,
+                      int i_idontcare )
 {
     s32 tmp0, tmp1, tmp2, tmp3;
     s32 tmp10, tmp11, tmp12, tmp13;

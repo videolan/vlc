@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.6 2001/07/26 11:36:52 massiot Exp $
+ * $Id: vpar_headers.c,v 1.7 2001/08/22 17:21:46 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -70,7 +70,7 @@ static void CopyrightExtension( vpar_thread_t * p_vpar );
 /*****************************************************************************
  * pi_default_intra_quant : default quantization matrix
  *****************************************************************************/
-u8 pi_default_intra_quant[] =
+u8 pi_default_intra_quant[] ATTR_ALIGN(16) =
 {
     8,  16, 19, 22, 26, 27, 29, 34,
     16, 16, 22, 24, 27, 29, 34, 37,
@@ -85,7 +85,7 @@ u8 pi_default_intra_quant[] =
 /*****************************************************************************
  * pi_default_nonintra_quant : default quantization matrix
  *****************************************************************************/
-u8 pi_default_nonintra_quant[] =
+u8 pi_default_nonintra_quant[] ATTR_ALIGN(16) =
 {
     16, 16, 16, 16, 16, 16, 16, 16,
     16, 16, 16, 16, 16, 16, 16, 16,
@@ -100,7 +100,7 @@ u8 pi_default_nonintra_quant[] =
 /*****************************************************************************
  * pi_scan : zig-zag and alternate scan patterns
  *****************************************************************************/
-u8 pi_scan[2][64] =
+u8 pi_scan[2][64] ATTR_ALIGN(16) =
 {
     { /* Zig-Zag pattern */
         0,1,8,16,9,2,3,10,17,24,32,25,18,11,4,5,
@@ -196,15 +196,9 @@ static __inline__ void LoadMatrix( vpar_thread_t * p_vpar,
 
     for( i_dummy = 0; i_dummy < 64; i_dummy++ )
     {
-        p_matrix->pi_matrix[p_vpar->ppi_scan[SCAN_ZIGZAG][i_dummy]]
+        p_matrix->pi_matrix[p_vpar->ppi_scan[0][i_dummy]]
              = GetBits( &p_vpar->bit_stream, 8 );
     }
-
-#ifdef VDEC_DFT
-    /* Discrete Fourier Transform requires the quantization matrices to
-     * be normalized before using them. */
-    vdec_NormQuantMatrix( p_matrix->pi_matrix );
-#endif
 }
 
 /*****************************************************************************
@@ -405,38 +399,11 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     p_vpar->sequence.i_size = p_vpar->sequence.i_width
                                         * p_vpar->sequence.i_height;
 
-    /* Update chromatic information. */
-    switch( p_vpar->sequence.i_chroma_format )
-    {
-    case CHROMA_420:
-        p_vpar->sequence.i_chroma_nb_blocks = 2;
-        p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width >> 1;
-        p_vpar->sequence.i_chroma_mb_width = 8;
-        p_vpar->sequence.i_chroma_mb_height = 8;
-        break;
-
-    case CHROMA_422:
-        p_vpar->sequence.i_chroma_nb_blocks = 4;
-        p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width >> 1;
-        p_vpar->sequence.i_chroma_mb_width = 8;
-        p_vpar->sequence.i_chroma_mb_height = 16;
-        break;
-
-    case CHROMA_444:
-        p_vpar->sequence.i_chroma_nb_blocks = 8;
-        p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width;
-        p_vpar->sequence.i_chroma_mb_width = 16;
-        p_vpar->sequence.i_chroma_mb_height = 16;
-    }
-
-    /* Reset scalable_mode. */
-    p_vpar->sequence.i_scalable_mode = SC_NONE;
-
 #if 0
     if(    p_vpar->sequence.i_width != i_width_save
         || p_vpar->sequence.i_height != i_height_save )
     {
-         /* FIXME: What do we do in case of a size change ?? */
+         /* FIXME: Warn the video output */
     }
 #endif
 
@@ -492,7 +459,6 @@ static void GroupHeader( vpar_thread_t * p_vpar )
 static void PictureHeader( vpar_thread_t * p_vpar )
 {
     int                 i_structure;
-    int                 i_mb_base;
     boolean_t           b_parsable;
 #ifdef VDEC_SMP
     int                 i_mb;
@@ -520,13 +486,15 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     if( p_vpar->picture.i_coding_type == P_CODING_TYPE
         || p_vpar->picture.i_coding_type == B_CODING_TYPE )
     {
-        p_vpar->picture.pb_full_pel_vector[0] = GetBits( &p_vpar->bit_stream, 1 );
-        p_vpar->picture.i_forward_f_code = GetBits( &p_vpar->bit_stream, 3 );
+        p_vpar->picture.ppi_f_code[0][1] = GetBits( &p_vpar->bit_stream, 1 );
+        p_vpar->picture.ppi_f_code[0][0] = GetBits( &p_vpar->bit_stream, 3 )
+                                            - 1;
     }
     if( p_vpar->picture.i_coding_type == B_CODING_TYPE )
     {
-        p_vpar->picture.pb_full_pel_vector[1] = GetBits( &p_vpar->bit_stream, 1 );
-        p_vpar->picture.i_backward_f_code = GetBits( &p_vpar->bit_stream, 3 );
+        p_vpar->picture.ppi_f_code[1][1] = GetBits( &p_vpar->bit_stream, 1 );
+        p_vpar->picture.ppi_f_code[1][0] = GetBits( &p_vpar->bit_stream, 3 )
+                                            - 1;
     }
 
     /* extra_information_picture */
@@ -546,10 +514,11 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         /* extension_start_code_identifier */
         RemoveBits( &p_vpar->bit_stream, 4 );
 
-        p_vpar->picture.ppi_f_code[0][0] = GetBits( &p_vpar->bit_stream, 4 );
-        p_vpar->picture.ppi_f_code[0][1] = GetBits( &p_vpar->bit_stream, 4 );
-        p_vpar->picture.ppi_f_code[1][0] = GetBits( &p_vpar->bit_stream, 4 );
-        p_vpar->picture.ppi_f_code[1][1] = GetBits( &p_vpar->bit_stream, 4 );
+        /* Pre-substract 1 for later use in MotionDelta(). */
+        p_vpar->picture.ppi_f_code[0][0] = GetBits( &p_vpar->bit_stream, 4 ) -1;
+        p_vpar->picture.ppi_f_code[0][1] = GetBits( &p_vpar->bit_stream, 4 ) -1;
+        p_vpar->picture.ppi_f_code[1][0] = GetBits( &p_vpar->bit_stream, 4 ) -1;
+        p_vpar->picture.ppi_f_code[1][1] = GetBits( &p_vpar->bit_stream, 4 ) -1;
         p_vpar->picture.i_intra_dc_precision = GetBits( &p_vpar->bit_stream, 2 );
         i_structure = GetBits( &p_vpar->bit_stream, 2 );
         p_vpar->picture.b_top_field_first = GetBits( &p_vpar->bit_stream, 1 );
@@ -558,7 +527,9 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         p_vpar->picture.b_concealment_mv = GetBits( &p_vpar->bit_stream, 1 );
         p_vpar->picture.b_q_scale_type = GetBits( &p_vpar->bit_stream, 1 );
         p_vpar->picture.b_intra_vlc_format = GetBits( &p_vpar->bit_stream, 1 );
-        p_vpar->picture.b_alternate_scan = GetBits( &p_vpar->bit_stream, 1 );
+        /* Alternate scan */
+        p_vpar->picture.pi_scan =
+            p_vpar->ppi_scan[ GetBits( &p_vpar->bit_stream, 1 ) ];
         p_vpar->picture.b_repeat_first_field = GetBits( &p_vpar->bit_stream, 1 );
         /* chroma_420_type (obsolete) */
         RemoveBits( &p_vpar->bit_stream, 1 );
@@ -582,10 +553,13 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         p_vpar->picture.b_concealment_mv = 0;
         p_vpar->picture.b_q_scale_type = 0;
         p_vpar->picture.b_intra_vlc_format = 0;
-        p_vpar->picture.b_alternate_scan = 0; /* zigzag */
+        p_vpar->picture.pi_scan = p_vpar->ppi_scan[0];
         p_vpar->picture.b_repeat_first_field = 0;
         p_vpar->picture.b_progressive = 1;
     }
+
+    /* Extension and User data. */
+    ExtensionAndUserData( p_vpar );
 
 #ifdef STATS
     p_vpar->pc_pictures[p_vpar->picture.i_coding_type]++;
@@ -611,7 +585,8 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     }
 
     /* Do we have the reference pictures ? */
-    b_parsable = !(((p_vpar->picture.i_coding_type == P_CODING_TYPE) &&
+    b_parsable = !(((p_vpar->picture.i_coding_type == P_CODING_TYPE ||
+                     p_vpar->picture.b_concealment_mv) &&
                     (p_vpar->sequence.p_backward == NULL)) ||
                      /* p_backward will become p_forward later */
                    ((p_vpar->picture.i_coding_type == B_CODING_TYPE) &&
@@ -738,10 +713,8 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         vpar_SynchroDecode( p_vpar, p_vpar->picture.i_coding_type, i_structure );
         P_picture->i_aspect_ratio = p_vpar->sequence.i_aspect_ratio;
         P_picture->i_matrix_coefficients = p_vpar->sequence.i_matrix_coefficients;
-        p_vpar->picture.i_l_stride = ( p_vpar->sequence.i_width
+        p_vpar->picture.i_field_width = ( p_vpar->sequence.i_width
                     << ( 1 - p_vpar->picture.b_frame_structure ) );
-        p_vpar->picture.i_c_stride = ( p_vpar->sequence.i_chroma_width
-                    << ( 1 - p_vpar->picture.b_frame_structure ));
 
 /* FIXME ! remove asap ?? */
 //memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
@@ -749,34 +722,15 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         /* Update the reference pointers. */
         ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, P_picture );
     }
-    p_vpar->picture.i_current_structure |= i_structure;
-    p_vpar->picture.i_structure = i_structure;
 
     /* Initialize picture data for decoding. */
-    if( i_structure == BOTTOM_FIELD )
-    {
-        i_mb_base = p_vpar->sequence.i_mb_size >> 1;
-        p_vpar->mb.i_l_y = 1;
-        p_vpar->mb.i_c_y = 1;
-    }
-    else
-    {
-        i_mb_base = 0;
-        p_vpar->mb.i_l_y = p_vpar->mb.i_c_y = 0;
-    }
-    p_vpar->mb.i_l_x = p_vpar->mb.i_c_x = 0;
+    p_vpar->picture.i_current_structure |= i_structure;
+    p_vpar->picture.i_structure = i_structure;
+    p_vpar->picture.b_second_field =
+        (i_structure != p_vpar->picture.i_current_structure);
+    p_vpar->picture.b_current_field =
+        (i_structure == BOTTOM_FIELD );
 
-    /* Extension and User data. */
-    ExtensionAndUserData( p_vpar );
-
-    /* This is an MP@ML decoder, please note that neither of the following
-     * assertions can be true :
-     *   p_vpar->sequence.i_chroma_format != CHROMA_420
-     *   p_vpar->sequence.i_height > 2800
-     *   p_vpar->sequence.i_scalable_mode == SC_DP
-     * Be cautious if you try to use the decoder for other profiles and
-     * levels.
-     */
     if( p_vpar->sequence.b_mpeg2 )
     {
         static f_picture_data_t ppf_picture_data[4][4] =
@@ -817,7 +771,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         };
 
         ppf_picture_data[p_vpar->picture.i_structure]
-                        [p_vpar->picture.i_coding_type]( p_vpar, i_mb_base );
+                        [p_vpar->picture.i_coding_type]( p_vpar );
     }
     else
     {
@@ -826,9 +780,9 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         { NULL, vpar_PictureData1I, vpar_PictureData1P, vpar_PictureData1B,
           vpar_PictureData1D };
 
-        pf_picture_data[p_vpar->picture.i_coding_type]( p_vpar, i_mb_base );
+        pf_picture_data[p_vpar->picture.i_coding_type]( p_vpar );
 #else
-        vpar_PictureDataGENERIC( p_vpar, i_mb_base );
+        vpar_PictureDataGENERIC( p_vpar );
 #endif
     }
 

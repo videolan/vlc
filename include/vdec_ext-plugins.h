@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vdec_common.h : structures from the video decoder exported to plug-ins
+ * vdec_ext-plugins.h : structures from the video decoder exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_ext-plugins.h,v 1.2 2001/07/18 14:21:00 massiot Exp $
+ * $Id: vdec_ext-plugins.h,v 1.3 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -22,76 +22,54 @@
  *****************************************************************************/
  
 /*****************************************************************************
- * Function pointers
- *****************************************************************************/
-typedef void (*f_motion_t)( struct macroblock_s * );
-
-/*****************************************************************************
  * macroblock_t : information on a macroblock passed to the video_decoder
  *                thread
  *****************************************************************************/
+typedef struct idct_inner_s
+{
+    dctelem_t               pi_block[64];                           /* block */
+    void                ( * pf_idct )   ( void *, dctelem_t*, int );
+                                                     /* sparse IDCT or not ? */
+    int                     i_sparse_pos;                  /* position of the
+                                                            * non-NULL coeff */
+    yuv_data_t *            p_dct_data;              /* pointer to the position
+                                                      * in the final picture */
+} idct_inner_t;
+
+typedef struct motion_inner_s
+{
+    boolean_t               b_average;                          /* 0 == copy */
+    int                     i_x_pred, i_y_pred;            /* motion vectors */
+    yuv_data_t *            pp_source[3];
+    int                     i_dest_offset, i_src_offset;
+    int                     i_stride, i_height;
+    boolean_t               b_second_half;
+} motion_inner_t;
+
 typedef struct macroblock_s
 {
-    picture_t *             p_picture;          /* current frame in progress */
-
-    int                     i_mb_type;                    /* macroblock type */
-    int                     i_coded_block_pattern;
-                                                 /* which blocks are coded ? */
-    int                     i_chroma_nb_blocks;         /* number of blocks for
-                                                         * chroma components */
+    int                     i_mb_modes;
 
     /* IDCT information */
-    dctelem_t               ppi_blocks[12][64];                    /* blocks */
-    void ( * pf_idct[12] )  ( void *, dctelem_t*, int );
-                                                     /* sparse IDCT or not ? */
-    int                     pi_sparse_pos[12];             /* position of the
-                                                            * non-NULL coeff */
+    idct_inner_t            p_idcts[6];
+    int                     i_coded_block_pattern;
+                                                 /* which blocks are coded ? */
+    int                     i_lum_dct_stride, i_chrom_dct_stride;
+                                 /* nb of coeffs to jump when changing lines */
 
     /* Motion compensation information */
-    f_motion_t              pf_motion;    /* function to use for motion comp */
-    picture_t *             p_backward;          /* backward reference frame */
-    picture_t *             p_forward;            /* forward reference frame */
-    int                     ppi_field_select[2][2];      /* field to use to
-                                                          * form predictions */
-    int                     pppi_motion_vectors[2][2][2];  /* motion vectors */
-    int                     ppi_dmv[2][2];    /* differential motion vectors */
-                            /* coordinates of the block in the picture */
-    int                     i_l_x, i_c_x;
-    int                     i_motion_l_y;
-    int                     i_motion_c_y;
-    int                     i_l_stride;         /* number of yuv_data_t to
-                                                 * ignore when changing line */
-    int                     i_c_stride;                  /* idem, for chroma */
-    boolean_t               b_P_second;  /* Second field of a P picture ?
-                                          * (used to determine the predicting
-                                          * frame)                           */
-    boolean_t               b_motion_field;  /* Field we are predicting
-                                              * (top field or bottom field) */
-
-    /* AddBlock information */
-    yuv_data_t *            p_data[12];              /* pointer to the position
-                                                      * in the final picture */
-    int                     i_addb_l_stride, i_addb_c_stride;
-                                 /* nb of coeffs to jump when changing lines */
+    motion_inner_t          p_motions[8];
+    int                     i_nb_motions;
+    yuv_data_t *            pp_dest[3];
 } macroblock_t;
 
-/* Macroblock types */
+/* Macroblock Modes */
 #define MB_INTRA                        1
 #define MB_PATTERN                      2
 #define MB_MOTION_BACKWARD              4
 #define MB_MOTION_FORWARD               8
 #define MB_QUANT                        16
-
-/* Motion types */
-#define MOTION_FIELD                    1
-#define MOTION_FRAME                    2
-#define MOTION_16X8                     2
-#define MOTION_DMV                      3
-
-/* Structures */
-#define TOP_FIELD               1
-#define BOTTOM_FIELD            2
-#define FRAME_STRUCTURE         3
+#define DCT_TYPE_INTERLACED             32
 
 /*****************************************************************************
  * vdec_thread_t: video decoder thread descriptor

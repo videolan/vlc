@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.27 2001/07/17 09:48:07 massiot Exp $
+ * $Id: modules.h,v 1.28 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -162,32 +162,21 @@ typedef struct function_list_s
         /* Motion compensation plugin */
         struct
         {
-#define motion_functions( yuv ) \
-            void ( * pf_field_field_##yuv ) ( struct macroblock_s * ); \
-            void ( * pf_field_16x8_##yuv )  ( struct macroblock_s * ); \
-            void ( * pf_field_dmv_##yuv )   ( struct macroblock_s * ); \
-            void ( * pf_frame_field_##yuv ) ( struct macroblock_s * ); \
-            void ( * pf_frame_frame_##yuv ) ( struct macroblock_s * ); \
-            void ( * pf_frame_dmv_##yuv )   ( struct macroblock_s * );
-            motion_functions( 420 )
-            motion_functions( 422 )
-            motion_functions( 444 )
-#undef motion_functions
+            void ( * ppppf_motion[2][2][4] ) ( yuv_data_t *, yuv_data_t *,
+                                               int, int );
         } motion;
 
         /* IDCT plugin */
         struct
         {
-            void ( * pf_idct_init )    ( struct vdec_thread_s * );
+            void ( * pf_idct_init )    ( void ** );
             void ( * pf_sparse_idct )  ( void *, dctelem_t *, int );
             void ( * pf_idct )         ( void *, dctelem_t *, int );
             void ( * pf_norm_scan )    ( u8 ppi_scan[2][64] );
 
-            void ( * pf_decode_init )  ( struct vdec_thread_s * );
-            void ( * pf_decode_mb_c )  ( struct vdec_thread_s *,
-                                         struct macroblock_s * );
-            void ( * pf_decode_mb_bw ) ( struct vdec_thread_s *,
-                                         struct macroblock_s * );
+            void ( * pf_decode_init )  ( );
+            void ( * pf_addblock )     ( dctelem_t *, yuv_data_t *, int );
+            void ( * pf_copyblock )    ( dctelem_t *, yuv_data_t *, int );
         } idct;
 
         /* YUV transformation plugin */

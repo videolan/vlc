@@ -2,7 +2,7 @@
  * vpar_pool.c : management of the pool of decoder threads
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: vpar_pool.c,v 1.1 2001/07/18 14:21:00 massiot Exp $
+ * $Id: vpar_pool.c,v 1.2 2001/08/22 17:21:46 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -186,11 +186,11 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
 
     if( !b_grayscale )
     {
-        p_vpar->pool.pf_vdec_decode = p_vpar->pf_decode_mb_c;
+        p_vpar->pool.pf_vdec_decode = vdec_DecodeMacroblockC;
     }
     else
     {
-        p_vpar->pool.pf_vdec_decode = p_vpar->pf_decode_mb_bw;
+        p_vpar->pool.pf_vdec_decode = vdec_DecodeMacroblockBW;
     }
 }
 

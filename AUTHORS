@@ -117,6 +117,11 @@ D: playlist and modules system
 D: Gnome and Gtk+ interfaces, Glide and fb video outputs, Esound audio output
 D: DVD subtitles decoder
 
+N: Aaron Holtzman
+E: aholtzma@ess.engr.uvic.ca
+D: AC3 decoder
+D: MPEG video decoder
+
 N: Eugenio Jarosiewicz
 E: ej0@cise.ufl.edu
 C: ej

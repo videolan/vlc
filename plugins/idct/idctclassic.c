@@ -2,7 +2,7 @@
  * idctclassic.c : Classic IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctclassic.c,v 1.13 2001/07/17 09:48:07 massiot Exp $
+ * $Id: idctclassic.c,v 1.14 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #define MODULE_NAME idctclassic
+#include "modules_inner.h"
 
 /*****************************************************************************
  * Preamble
@@ -36,17 +37,9 @@
 #include "mtime.h"
 #include "tests.h"
 
-#include "video.h"
-#include "video_output.h"
-
-#include "vdec_ext-plugins.h"
-
-#include "modules.h"
-#include "modules_inner.h"
-
-#include "vdec_block.h"
 #include "vdec_idct.h"
 
+#include "modules.h"
 #include "modules_export.h"
 
 /*****************************************************************************
@@ -93,8 +86,8 @@ static void idct_getfunctions( function_list_t * p_function_list )
     F.pf_idct = _M( vdec_IDCT );
     F.pf_norm_scan = vdec_NormScan;
     F.pf_decode_init = _M( vdec_InitDecode );
-    F.pf_decode_mb_c = _M( vdec_DecodeMacroblockC );
-    F.pf_decode_mb_bw = _M( vdec_DecodeMacroblockBW );
+    F.pf_addblock = _M( vdec_AddBlock );
+    F.pf_copyblock = _M( vdec_CopyBlock );
 #undef F
 }
 
@@ -123,7 +116,8 @@ static void vdec_NormScan( u8 ppi_scan[2][64] )
 /*****************************************************************************
  * vdec_IDCT : IDCT function for normal matrices
  *****************************************************************************/
-void _M( vdec_IDCT )( void * p_idct_data, dctelem_t * p_block, int i_idontcare )
+void _M( vdec_IDCT )( void * p_unused_data, dctelem_t * p_block,
+                      int i_idontcare )
 {
     /* dct classique: pour tester la meilleure entre la classique et la */
     /* no classique */
@@ -248,7 +242,7 @@ void _M( vdec_IDCT )( void * p_idct_data, dctelem_t * p_block, int i_idontcare )
      * may be commented out.
      */
 
-#ifndef NO_ZERO_COLUMN_TEST /*ajoute un test mais evite des calculs */
+#ifndef NO_ZERO_COLUMN_TEST /* Adds a test but avoids calculus */
         if ((dataptr[DCTSIZE*1] | dataptr[DCTSIZE*2] | dataptr[DCTSIZE*3] |
             dataptr[DCTSIZE*4] | dataptr[DCTSIZE*5] | dataptr[DCTSIZE*6] |
             dataptr[DCTSIZE*7]) == 0)

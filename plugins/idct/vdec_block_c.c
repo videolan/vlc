@@ -2,7 +2,7 @@
  * vdec_block_c.c: Macroblock copy functions in C
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: vdec_block_c.c,v 1.5 2001/07/17 09:48:07 massiot Exp $
+ * $Id: vdec_block_c.c,v 1.6 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -42,14 +42,7 @@
 
 #include "intf_msg.h"
 
-#include "input_ext-dec.h"
-
-#include "video.h"
-#include "video_output.h"
-
-#include "vdec_ext-plugins.h"
-
-#include "vdec_block.h"
+#include "vdec_idct.h"
 
 #include "modules.h"
 #include "modules_export.h"
@@ -65,7 +58,7 @@ static u8 *pi_crop;
 /*****************************************************************************
  * vdec_InitDecode: initialize video decoder thread
  *****************************************************************************/
-void _M( vdec_InitDecode ) ( vdec_thread_t *p_vdec )
+void _M( vdec_InitDecode ) ( )
 {
     int i_dummy;
 
@@ -89,88 +82,48 @@ void _M( vdec_InitDecode ) ( vdec_thread_t *p_vdec )
 }
 
 /*****************************************************************************
- * AddBlock : add a block
+ * vdec_AddBlock : add a block
  *****************************************************************************/
-static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                                 yuv_data_t * p_data, int i_incr )
+void _M( vdec_AddBlock ) ( dctelem_t * p_block, yuv_data_t * p_data,
+                           int i_incr )
 {
-    int i_x, i_y;
+    int i = 8;
 
-    for( i_y = 0; i_y < 8; i_y++ )
-    {
-        for( i_x = 0; i_x < 8; i_x++ )
-        {
-            *p_data = pi_crop[*p_data + *p_block++];
-            p_data++;
-        }
+    do {
+        p_data[0] = pi_crop[ p_data[0] + p_block[0] ];
+        p_data[1] = pi_crop[ p_data[1] + p_block[1] ];
+        p_data[2] = pi_crop[ p_data[2] + p_block[2] ];
+        p_data[3] = pi_crop[ p_data[3] + p_block[3] ];
+        p_data[4] = pi_crop[ p_data[4] + p_block[4] ];
+        p_data[5] = pi_crop[ p_data[5] + p_block[5] ];
+        p_data[6] = pi_crop[ p_data[6] + p_block[6] ];
+        p_data[7] = pi_crop[ p_data[7] + p_block[7] ];
+
         p_data += i_incr;
-    }
+        p_block += 8;
+    } while( --i );
 }
 
 /*****************************************************************************
- * CopyBlock : copy a block
+ * vdec_CopyBlock : copy a block
  *****************************************************************************/
-static __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                                  yuv_data_t * p_data, int i_incr )
+void _M( vdec_CopyBlock )( dctelem_t * p_block, yuv_data_t * p_data,
+                           int i_incr )
 {
-    int i_x, i_y;
+    int i = 8;
 
-    for( i_y = 0; i_y < 8; i_y++ )
-    {
-        for( i_x = 0; i_x < 8; i_x++ )
-        {
-            *p_data++ = pi_crop[*p_block++];
-        }
+    do {
+        p_data[0] = pi_crop[ p_block[0] ];
+        p_data[1] = pi_crop[ p_block[1] ];
+        p_data[2] = pi_crop[ p_block[2] ];
+        p_data[3] = pi_crop[ p_block[3] ];
+        p_data[4] = pi_crop[ p_block[4] ];
+        p_data[5] = pi_crop[ p_block[5] ];
+        p_data[6] = pi_crop[ p_block[6] ];
+        p_data[7] = pi_crop[ p_block[7] ];
+
         p_data += i_incr;
-    }
-}
-
-void _M( vdec_DecodeMacroblockC ) ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
-{
-    if( !(p_mb->i_mb_type & MB_INTRA) )
-    {
-        /*
-         * Motion Compensation (ISO/IEC 13818-2 section 7.6)
-         */
-        if( p_mb->pf_motion == 0 )
-        {
-            intf_WarnMsg( 2, "pf_motion set to NULL" );
-        }
-        else
-        {
-            p_mb->pf_motion( p_mb );
-        }
-
-        DECODEBLOCKSC( AddBlock )
-    }
-    else
-    {
-        DECODEBLOCKSC( CopyBlock )
-    }
-}
-
-void _M( vdec_DecodeMacroblockBW ) ( vdec_thread_t *p_vdec,
-                                     macroblock_t * p_mb )
-{
-    if( !(p_mb->i_mb_type & MB_INTRA) )
-    {
-        /*
-         * Motion Compensation (ISO/IEC 13818-2 section 7.6)
-         */
-        if( p_mb->pf_motion == 0 )
-        {
-            intf_WarnMsg( 2, "pf_motion set to NULL" );
-        }
-        else
-        {
-            p_mb->pf_motion( p_mb );
-        }
-
-        DECODEBLOCKSBW( AddBlock )
-    }
-    else
-    {
-        DECODEBLOCKSBW( CopyBlock )
-    }
+        p_block += 8;
+    } while( --i );
 }
 

@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.3 2001/07/18 14:21:00 massiot Exp $
+ * $Id: video_parser.c,v 1.4 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -134,58 +134,9 @@ static int InitThread( vpar_thread_t *p_vpar )
         return( 0 );
     }
 
-#define M ( p_vpar->pppf_motion )
-#define S ( p_vpar->ppf_motion_skipped )
-#define F ( p_vpar->p_motion_module->p_functions->motion.functions.motion )
-    M[0][0][0] = M[0][0][1] = M[0][0][2] = M[0][0][3] = NULL;
-    M[0][1][0] = M[0][1][1] = M[0][1][2] = M[0][1][3] = NULL;
-    M[1][0][0] = NULL;
-    M[1][1][0] = NULL;
-    M[2][0][0] = NULL;
-    M[2][1][0] = NULL;
-    M[3][0][0] = NULL;
-    M[3][1][0] = NULL;
-
-    M[1][0][1] = F.pf_field_field_420;
-    M[1][1][1] = F.pf_frame_field_420;
-    M[2][0][1] = F.pf_field_field_422;
-    M[2][1][1] = F.pf_frame_field_422;
-    M[3][0][1] = F.pf_field_field_444;
-    M[3][1][1] = F.pf_frame_field_444;
-
-    M[1][0][2] = F.pf_field_16x8_420;
-    M[1][1][2] = F.pf_frame_frame_420;
-    M[2][0][2] = F.pf_field_16x8_422;
-    M[2][1][2] = F.pf_frame_frame_422;
-    M[3][0][2] = F.pf_field_16x8_444;
-    M[3][1][2] = F.pf_frame_frame_444;
-
-    M[1][0][3] = F.pf_field_dmv_420;
-    M[1][1][3] = F.pf_frame_dmv_420;
-    M[2][0][3] = F.pf_field_dmv_422;
-    M[2][1][3] = F.pf_frame_dmv_422;
-    M[3][0][3] = F.pf_field_dmv_444;
-    M[3][1][3] = F.pf_frame_dmv_444;
-
-    S[0][0] = S[0][1] = S[0][2] = S[0][3] = NULL;
-    S[1][0] = NULL;
-    S[2][0] = NULL;
-    S[3][0] = NULL;
-
-    S[1][1] = F.pf_field_field_420;
-    S[2][1] = F.pf_field_field_422;
-    S[3][1] = F.pf_field_field_444;
-
-    S[1][2] = F.pf_field_field_420;
-    S[2][2] = F.pf_field_field_422;
-    S[3][2] = F.pf_field_field_444;
-
-    S[1][3] = F.pf_frame_frame_420;
-    S[2][3] = F.pf_frame_frame_422;
-    S[3][3] = F.pf_frame_frame_444;
-#undef F
-#undef S
-#undef M
+#define f ( p_vpar->p_motion_module->p_functions->motion.functions.motion )
+    memcpy( p_vpar->pool.ppppf_motion, f.ppppf_motion, sizeof(void *) * 16 );
+#undef f
 
     /*
      * Choose the best IDCT module
@@ -201,13 +152,13 @@ static int InitThread( vpar_thread_t *p_vpar )
     }
 
 #define f p_vpar->p_idct_module->p_functions->idct.functions.idct
-    p_vpar->pool.pf_idct_init    = f.pf_idct_init;
-    p_vpar->pf_sparse_idct  = f.pf_sparse_idct;
-    p_vpar->pf_idct         = f.pf_idct;
-    p_vpar->pf_norm_scan    = f.pf_norm_scan;
-    p_vpar->pool.pf_decode_init  = f.pf_decode_init;
-    p_vpar->pf_decode_mb_c  = f.pf_decode_mb_c;
-    p_vpar->pf_decode_mb_bw = f.pf_decode_mb_bw;
+    p_vpar->pool.pf_idct_init   = f.pf_idct_init;
+    p_vpar->pf_sparse_idct      = f.pf_sparse_idct;
+    p_vpar->pf_idct             = f.pf_idct;
+    p_vpar->pf_norm_scan        = f.pf_norm_scan;
+    p_vpar->pool.pf_decode_init = f.pf_decode_init;
+    p_vpar->pool.pf_addblock    = f.pf_addblock;
+    p_vpar->pool.pf_copyblock   = f.pf_copyblock;
 #undef f
 
     /* Initialize input bitstream */
@@ -244,13 +195,6 @@ static int InitThread( vpar_thread_t *p_vpar )
     memset(p_vpar->pc_malformed_pictures, 0,
            sizeof(p_vpar->pc_malformed_pictures));
 #endif
-
-    /* Initialize lookup tables */
-    vpar_InitMbAddrInc( p_vpar );
-    vpar_InitDCTTables( p_vpar );
-    vpar_InitPMBType( p_vpar );
-    vpar_InitBMBType( p_vpar );
-    vpar_InitDCTTables( p_vpar );
     vpar_InitScanTable( p_vpar );
 
     /*

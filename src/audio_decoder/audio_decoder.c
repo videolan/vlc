@@ -2,7 +2,7 @@
  * audio_decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_decoder.c,v 1.51 2001/05/31 01:37:08 sam Exp $
+ * $Id: audio_decoder.c,v 1.52 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -170,18 +170,6 @@ static void RunThread (adec_thread_t * p_adec)
         s16 * buffer;
         adec_sync_info_t sync_info;
 
-        if( DECODER_FIFO_START( *p_adec->p_fifo)->i_pts )
-        {
-            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] =
-                DECODER_FIFO_START( *p_adec->p_fifo )->i_pts;
-            DECODER_FIFO_START(*p_adec->p_fifo)->i_pts = 0;
-        }
-        else
-        {
-            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] =
-                LAST_MDATE;
-        }
-
         if( ! adec_SyncFrame (p_adec, &sync_info) )
         {
             sync = 1;
@@ -190,6 +178,18 @@ static void RunThread (adec_thread_t * p_adec)
 
             buffer = ((s16 *)p_adec->p_aout_fifo->buffer)
                         + (p_adec->p_aout_fifo->l_end_frame * ADEC_FRAME_SIZE);
+
+            if( DECODER_FIFO_START( *p_adec->p_fifo)->i_pts )
+            {
+                p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] =
+                    DECODER_FIFO_START( *p_adec->p_fifo )->i_pts;
+                DECODER_FIFO_START(*p_adec->p_fifo)->i_pts = 0;
+            }
+            else
+            {
+                p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] =
+                    LAST_MDATE;
+            }
 
             if( adec_DecodeFrame (p_adec, buffer) )
             {

@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-dec.c,v 1.17 2001/07/17 09:48:08 massiot Exp $
+ * $Id: input_ext-dec.c,v 1.18 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -150,10 +150,10 @@ void NextDataPacket( bit_stream_t * p_bit_stream )
 }
 
 /*****************************************************************************
- * UnalignedShowBits : return i_bits bits from the bit stream, even when
+ * UnalignedShowBits : places i_bits bits into the bit buffer, even when
  * not aligned on a word boundary
  *****************************************************************************/
-u32 UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
+void UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
 {
     /* We just fill in the bit buffer. */
     while( p_bit_stream->fifo.i_available < i_bits )
@@ -216,11 +216,8 @@ u32 UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
                     AlignWord( p_bit_stream );
                 }
             }
-
-            return( ShowBits( p_bit_stream, i_bits ) );
         }
     }
-    return( p_bit_stream->fifo.buffer >> (8 * sizeof(WORD_TYPE) - i_bits) );
 }
 
 /*****************************************************************************
@@ -283,7 +280,7 @@ u32 UnalignedGetBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
     {
         /* Get aligned on a word boundary. Otherwise it is safer
          * to do it the next time.
-         * NB : we _will_ get aligned, because we have at most 
+         * NB : we _will_ get aligned, because we have at most
          * sizeof(WORD_TYPE) - 1 bytes to store, and at least
          * sizeof(WORD_TYPE) - 1 empty bytes in the bit buffer. */
         AlignWord( p_bit_stream );

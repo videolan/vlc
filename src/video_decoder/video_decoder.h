@@ -2,7 +2,7 @@
  * video_decoder.h : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.h,v 1.4 2001/07/18 14:21:00 massiot Exp $
+ * $Id: video_decoder.h,v 1.5 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -24,18 +24,12 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-struct vpar_thread_s;
-struct macroblock_s;
-
-/* Thread management functions */
-void            vdec_InitThread         ( struct vdec_thread_s *p_vdec );
-void            vdec_EndThread          ( struct vdec_thread_s *p_vdec );
-void            vdec_DecodeMacroblock   ( struct vdec_thread_s *p_vdec,
-                                          struct macroblock_s *p_mb );
-void            vdec_DecodeMacroblockC  ( struct vdec_thread_s *p_vdec,
-                                          struct macroblock_s *p_mb );
-void            vdec_DecodeMacroblockBW ( struct vdec_thread_s *p_vdec,
-                                          struct macroblock_s *p_mb );
+void            vdec_InitThread         ( struct vdec_thread_s * );
+void            vdec_EndThread          ( struct vdec_thread_s * );
+void            vdec_DecodeMacroblockC  ( struct vdec_thread_s *,
+                                          struct macroblock_s * );
+void            vdec_DecodeMacroblockBW ( struct vdec_thread_s *,
+                                          struct macroblock_s * );
 struct vdec_thread_s * vdec_CreateThread( struct vdec_pool_s * );
-void            vdec_DestroyThread      ( struct vdec_thread_s *p_vdec );
+void            vdec_DestroyThread      ( struct vdec_thread_s * );
 

@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.33 2001/07/16 12:10:32 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.34 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -192,8 +192,10 @@ typedef struct bit_stream_s
 
 #if (WORD_TYPE == u32)
 #   define WORD_AT      U32_AT
+#   define WORD_SIGNED  s32
 #elif (WORD_TYPE == u64)
 #   define WORD_AT      U64_AT
+#   define WORD_SIGNED  s64
 #else
 #   error Unsupported WORD_TYPE
 #endif
@@ -201,7 +203,7 @@ typedef struct bit_stream_s
 /*****************************************************************************
  * Protoypes from input_ext-dec.c
  *****************************************************************************/
-u32  UnalignedShowBits( struct bit_stream_s *, unsigned int );
+void UnalignedShowBits( struct bit_stream_s *, unsigned int );
 void UnalignedRemoveBits( struct bit_stream_s * );
 u32  UnalignedGetBits( struct bit_stream_s *, unsigned int );
 
@@ -252,7 +254,26 @@ static __inline__ u32 ShowBits( bit_stream_t * p_bit_stream,
                     >> (8 * sizeof(WORD_TYPE) - i_bits) );
     }
 
-    return UnalignedShowBits( p_bit_stream, i_bits );
+    UnalignedShowBits( p_bit_stream, i_bits );
+    return( p_bit_stream->fifo.buffer >> (8 * sizeof(WORD_TYPE) - i_bits) );
+}
+
+/*****************************************************************************
+ * ShowSignedBits : return i_bits bits from the bit stream, using signed
+ *                  arithmetic
+ *****************************************************************************/
+static __inline__ s32 ShowSignedBits( bit_stream_t * p_bit_stream,
+                                      unsigned int i_bits )
+{
+    if( p_bit_stream->fifo.i_available >= i_bits )
+    {
+        return( (WORD_SIGNED)p_bit_stream->fifo.buffer
+                    >> (8 * sizeof(WORD_TYPE) - i_bits) );
+    }
+
+    /* You can probably do something a little faster, but now I'm tired. */
+    return( (WORD_SIGNED)(ShowBits( p_bit_stream, i_bits ) << (32 - i_bits))
+             >> (32 - i_bits) );
 }
 
 /*****************************************************************************
@@ -344,6 +365,30 @@ static __inline__ u32 GetBits( bit_stream_t * p_bit_stream,
     }
 
     return UnalignedGetBits( p_bit_stream, i_bits );
+}
+
+/*****************************************************************************
+ * GetSignedBits : returns i_bits bits from the bit stream and removes them,
+ *                 using signed arithmetic
+ *                 XXX: do not use for 32 bits
+ *****************************************************************************/
+static __inline__ s32 GetSignedBits( bit_stream_t * p_bit_stream,
+                                     unsigned int i_bits )
+{
+    if( p_bit_stream->fifo.i_available >= i_bits )
+    {
+        s32             i_result;
+
+        p_bit_stream->fifo.i_available -= i_bits;
+        i_result = (WORD_SIGNED)p_bit_stream->fifo.buffer
+                        >> (8 * sizeof(WORD_TYPE) - i_bits);
+        p_bit_stream->fifo.buffer <<= i_bits;
+        return( i_result );
+    }
+
+    /* You can probably do something a little faster, but now I'm tired. */
+    return( (WORD_SIGNED)(GetBits( p_bit_stream, i_bits ) << (32 - i_bits))
+             >> (32 - i_bits) );
 }
 
 /*****************************************************************************

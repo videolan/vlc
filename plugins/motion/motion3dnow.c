@@ -1,8 +1,8 @@
 /*****************************************************************************
- * motionmmxext.c : MMX EXT motion compensation module for vlc
+ * motion3dnow.c : 3DNow! motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionmmxext.c,v 1.10 2001/08/22 17:21:45 massiot Exp $
+ * $Id: motion3dnow.c,v 1.1 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME motionmmxext
+#define MODULE_NAME motion3dnow
 #include "modules_inner.h"
 
 /*****************************************************************************
@@ -52,14 +52,14 @@ static void motion_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for MMXEXT motion compensation module" )
+ADD_WINDOW( "Configuration for 3DNow! motion compensation module" )
     ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
                                 | MODULE_CAPABILITY_MOTION;
-    p_module->psz_longname = "MMXEXT motion compensation module";
+    p_module->psz_longname = "3DNow! motion compensation module";
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -74,13 +74,13 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int motion_Probe( probedata_t *p_data )
 {
-    if( !TestCPU( CPU_CAPABILITY_MMXEXT ) )
+    if( !TestCPU( CPU_CAPABILITY_3DNOW ) )
     {
         return( 0 );
     }
 
-    if( TestMethod( MOTION_METHOD_VAR, "motionmmxext" )
-         || TestMethod( MOTION_METHOD_VAR, "mmxext" ) )
+    if( TestMethod( MOTION_METHOD_VAR, "motion3dnow" )
+         || TestMethod( MOTION_METHOD_VAR, "3dnow" ) )
     {
         return( 999 );
     }
@@ -89,7 +89,7 @@ static int motion_Probe( probedata_t *p_data )
 }
 
 /*****************************************************************************
- * Motion compensation in MMXEXT (OK I know this does 3DNow too and it's ugly)
+ * Motion compensation in 3DNow (OK I know this does MMXEXT too and it's ugly)
  *****************************************************************************/
 
 #define CPU_MMXEXT 0
@@ -598,22 +598,22 @@ static void motion_getfunctions( function_list_t * p_function_list )
             /* Copying functions */
             {
                 /* Width == 16 */
-                MC_put_16_mmxext, MC_put_x16_mmxext, MC_put_y16_mmxext, MC_put_xy16_mmxext
+                MC_put_16_3dnow, MC_put_x16_3dnow, MC_put_y16_3dnow, MC_put_xy16_3dnow
             },
             {
                 /* Width == 8 */
-                MC_put_8_mmxext,  MC_put_x8_mmxext,  MC_put_y8_mmxext, MC_put_xy8_mmxext
+                MC_put_8_3dnow,  MC_put_x8_3dnow,  MC_put_y8_3dnow, MC_put_xy8_3dnow
             }
         },
         {
             /* Averaging functions */
             {
                 /* Width == 16 */
-                MC_avg_16_mmxext, MC_avg_x16_mmxext, MC_avg_y16_mmxext, MC_avg_xy16_mmxext
+                MC_avg_16_3dnow, MC_avg_x16_3dnow, MC_avg_y16_3dnow, MC_avg_xy16_3dnow
             },
             {
                 /* Width == 8 */
-                MC_avg_8_mmxext,  MC_avg_x8_mmxext,  MC_avg_y8_mmxext,  MC_avg_xy8_mmxext
+                MC_avg_8_3dnow,  MC_avg_x8_3dnow,  MC_avg_y8_3dnow,  MC_avg_xy8_3dnow
             }
         }
     };

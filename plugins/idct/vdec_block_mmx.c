@@ -2,9 +2,10 @@
  * vdec_block_mmx.c: Macroblock copy functions in MMX assembly
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: vdec_block_mmx.c,v 1.5 2001/07/17 09:48:07 massiot Exp $
+ * $Id: vdec_block_mmx.c,v 1.6 2001/08/22 17:21:45 massiot Exp $
  *
- * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
+ * Authors: Michel Lespinasse <walken@zoy.org>
+ *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,212 +48,89 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "vdec_ext-plugins.h"
-
-#include "vdec_block.h"
+#include "vdec_idct.h"
 
 #include "modules.h"
 #include "modules_export.h"
 
+#include "mmx.h"
+
 /*****************************************************************************
  * vdec_InitDecode: initialize video decoder thread
  *****************************************************************************/
-void _M( vdec_InitDecode ) ( vdec_thread_t *p_vdec )
+void _M( vdec_InitDecode ) ( )
 {
     ;
 }
 
 /*****************************************************************************
- * AddBlock : add a block
+ * vdec_AddBlock : add a block
  *****************************************************************************/
-static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                                 yuv_data_t * p_data, int i_incr )
+#define ADD_MMX(offset,r1,r2,r3,r4)                                         \
+    movq_m2r (*(p_data+2*i_incr), r1);                                      \
+    packuswb_r2r (r4, r3);                                                  \
+    movq_r2r (r1, r2);                                                      \
+    p_data += i_incr;                                                       \
+    movq_r2m (r3, *p_data);                                                 \
+    punpcklbw_r2r (mm0, r1);                                                \
+    paddsw_m2r (*(p_block+offset), r1);                                     \
+    punpckhbw_r2r (mm0, r2);                                                \
+    paddsw_m2r (*(p_block+offset+4), r2);
+
+void _M( vdec_AddBlock ) ( dctelem_t * p_block, yuv_data_t * p_data,
+                           int i_incr )
 {
-    asm __volatile__ ( 
-            "pxor       %%mm7,%%mm7\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      (%2),%%mm2\n\t"
-            "paddw      8(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-            "addl       %3,%0\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      16(%2),%%mm2\n\t"
-            "paddw      24(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-            "addl       %3,%0\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      32(%2),%%mm2\n\t"
-            "paddw      40(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-            "addl       %3,%0\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      48(%2),%%mm2\n\t"
-            "paddw      56(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-            "addl       %3,%0\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      64(%2),%%mm2\n\t"
-            "paddw      72(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-            "addl       %3,%0\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      80(%2),%%mm2\n\t"
-            "paddw      88(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-            "addl       %3,%0\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      96(%2),%%mm2\n\t"
-            "paddw      104(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-            "addl       %3,%0\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      112(%2),%%mm2\n\t"
-            "paddw      120(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-
-            //"emms"
-            : "=r" (p_data)
-            : "0" (p_data), "r" (p_block), "r" (i_incr + 8) );
+    movq_m2r (*p_data, mm1);
+    pxor_r2r (mm0, mm0);
+    movq_m2r (*(p_data + i_incr), mm3);
+    movq_r2r (mm1, mm2);
+    punpcklbw_r2r (mm0, mm1);
+    movq_r2r (mm3, mm4);
+    paddsw_m2r (*(p_block+0*8), mm1);
+    punpckhbw_r2r (mm0, mm2);
+    paddsw_m2r (*(p_block+0*8+4), mm2);
+    punpcklbw_r2r (mm0, mm3);
+    paddsw_m2r (*(p_block+1*8), mm3);
+    packuswb_r2r (mm2, mm1);
+    punpckhbw_r2r (mm0, mm4);
+    movq_r2m (mm1, *p_data);
+    paddsw_m2r (*(p_block+1*8+4), mm4);
+    ADD_MMX (2*8, mm1, mm2, mm3, mm4);
+    ADD_MMX (3*8, mm3, mm4, mm1, mm2);
+    ADD_MMX (4*8, mm1, mm2, mm3, mm4);
+    ADD_MMX (5*8, mm3, mm4, mm1, mm2);
+    ADD_MMX (6*8, mm1, mm2, mm3, mm4);
+    ADD_MMX (7*8, mm3, mm4, mm1, mm2);
+    packuswb_r2r (mm4, mm3);
+    movq_r2m (mm3, *(p_data + i_incr));
 }
 
 /*****************************************************************************
- * CopyBlock : copy a block
+ * vdec_CopyBlock : copy a block
  *****************************************************************************/
-static  __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                                   yuv_data_t * p_data, int i_incr )
+#define COPY_MMX(offset,r0,r1,r2)                                           \
+    movq_m2r (*(p_block+offset), r0);                                       \
+    p_data += i_incr;                                                       \
+    movq_m2r (*(p_block+offset+4), r1);                                     \
+    movq_r2m (r2, *p_data);                                                 \
+    packuswb_r2r (r1, r0);
+
+void _M( vdec_CopyBlock ) ( dctelem_t * p_block, yuv_data_t * p_data,
+                            int i_incr )
 {
-    asm __volatile__ (
-            "movq         (%2),%%mm0\n\t"
-            "packuswb   8(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-            "addl           %3,%0\n\t"
-
-            "movq        16(%2),%%mm0\n\t"
-            "packuswb   24(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-            "addl           %3,%0\n\t"
-
-            "movq        32(%2),%%mm0\n\t"
-            "packuswb   40(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-            "addl           %3,%0\n\t"
-
-            "movq        48(%2),%%mm0\n\t"
-            "packuswb   56(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-            "addl           %3,%0\n\t"
-
-            "movq        64(%2),%%mm0\n\t"
-            "packuswb   72(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-            "addl           %3,%0\n\t"
-
-            "movq        80(%2),%%mm0\n\t"
-            "packuswb   88(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-            "addl           %3,%0\n\t"
-
-            "movq        96(%2),%%mm0\n\t"
-            "packuswb   104(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-            "addl           %3,%0\n\t"
-
-            "movq        112(%2),%%mm0\n\t"
-            "packuswb   120(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-
-            //"emms"
-            : "=r" (p_data)
-            : "0" (p_data), "r" (p_block), "r" (i_incr + 8) );
-}
-
-void _M( vdec_DecodeMacroblockC ) ( vdec_thread_t *p_vdec,
-                                    macroblock_t * p_mb )
-{
-    if( !(p_mb->i_mb_type & MB_INTRA) )
-    {
-        /*
-         * Motion Compensation (ISO/IEC 13818-2 section 7.6)
-         */
-        if( p_mb->pf_motion == 0 )
-        {
-            intf_WarnMsg( 2, "pf_motion set to NULL" );
-        }
-        else
-        {
-            p_mb->pf_motion( p_mb );
-        }
-
-        DECODEBLOCKSC( AddBlock )
-    }
-    else
-    {
-        DECODEBLOCKSC( CopyBlock )
-    }
-}
-
-void _M( vdec_DecodeMacroblockBW ) ( vdec_thread_t *p_vdec,
-                                     macroblock_t * p_mb )
-{
-    if( !(p_mb->i_mb_type & MB_INTRA) )
-    {
-        /*
-         * Motion Compensation (ISO/IEC 13818-2 section 7.6)
-         */
-        if( p_mb->pf_motion == 0 )
-        {
-            intf_WarnMsg( 2, "pf_motion set to NULL" );
-        }
-        else
-        {
-            p_mb->pf_motion( p_mb );
-        }
-
-        DECODEBLOCKSBW( AddBlock )
-    }
-    else
-    {
-        DECODEBLOCKSBW( CopyBlock )
-    }
+    movq_m2r (*(p_block+0*8), mm0);
+    movq_m2r (*(p_block+0*8+4), mm1);
+    movq_m2r (*(p_block+1*8), mm2);
+    packuswb_r2r (mm1, mm0);
+    movq_m2r (*(p_block+1*8+4), mm3);
+    movq_r2m (mm0, *p_data);
+    packuswb_r2r (mm3, mm2);
+    COPY_MMX (2*8, mm0, mm1, mm2);
+    COPY_MMX (3*8, mm2, mm3, mm0);
+    COPY_MMX (4*8, mm0, mm1, mm2);
+    COPY_MMX (5*8, mm2, mm3, mm0);
+    COPY_MMX (6*8, mm0, mm1, mm2);
+    COPY_MMX (7*8, mm2, mm3, mm0);
+    movq_r2m (mm2, *(p_data + i_incr));
 }
 

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.38 2001/08/14 04:52:39 sam Exp $
+ * $Id: common.h,v 1.39 2001/08/22 17:21:45 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -66,11 +66,10 @@ typedef int                 ptrdiff_t;
 typedef unsigned long       count_t;
 
 /* DCT elements types */
-#ifndef VDEC_DFT
-typedef short dctelem_t;
-#else
-typedef int dctelem_t;
-#endif
+typedef s16                 dctelem_t;
+
+/* Video buffer types */
+typedef u8                  yuv_data_t;
 
 /*****************************************************************************
  * Classes declaration
@@ -192,6 +191,13 @@ struct pgrm_descriptor_s;
 #define U64_AT(p)   ( ntoh64 ( *( (u64 *)(p) ) ) )
 #define U32_AT(p)   ( ntoh32 ( *( (u32 *)(p) ) ) )
 #define U16_AT(p)   ( ntoh16 ( *( (u16 *)(p) ) ) )
+
+/* Alignment of critical static data structures */
+#ifdef ATTRIBUTE_ALIGNED_MAX
+#   define ATTR_ALIGN(align) __attribute__ ((__aligned__ ((ATTRIBUTE_ALIGNED_MAX < align) ? ATTRIBUTE_ALIGNED_MAX : align)))
+#else
+#   define ATTR_ALIGN(align)
+#endif
 
 /* win32, cl and icl support */
 #if defined( _MSC_VER )
