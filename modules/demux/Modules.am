@@ -8,3 +8,4 @@ SOURCES_au = au.c
 SOURCES_wav = wav.c
 SOURCES_aac = aac.c
 SOURCES_mkv = mkv.cpp
+SOURCES_sdp = sdp.c

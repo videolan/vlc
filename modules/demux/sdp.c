@@ -2,7 +2,7 @@
  * sdp.c: SDP parser and builtin UDP/RTP/RTSP
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sdp.c,v 1.9 2003/09/08 13:37:52 fenrir Exp $
+ * $Id: sdp.c,v 1.10 2003/09/10 11:51:00 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -244,7 +244,7 @@ static int SDPOpen( vlc_object_t * p_this )
     if( strncmp( p_peek, "v=0\r\n", 5 ) &&
         strncmp( p_peek, "v=0\n", 4 ) )
     {
-        msg_Err( p_input, "SDP module discarded" );
+        msg_Warn( p_input, "SDP module discarded" );
         return VLC_EGENERIC;
     }
 
