@@ -93,10 +93,9 @@ typedef struct intf_msg_s
 
 #ifdef DEBUG_LOG
     /* Log file */
-    int                     i_log_file;                          /* log file */
+    FILE *                  p_log_file;                          /* log file */
 #endif
 
-//#if 0
 #if !defined(INTF_MSG_QUEUE) && !defined(DEBUG_LOG)
     /* If neither messages queue, neither log file is used, then the structure
      * is empty. However, empty structures are not allowed in C. Therefore, a
@@ -152,14 +151,7 @@ p_intf_msg_t intf_MsgCreate( void )
         /* Log file initialization - on failure, file pointer will be null,
          * and no log will be issued, but this is not considered as an
          * error */
-        p_msg->i_log_file = open( DEBUG_LOG, O_CREAT | O_TRUNC |
-#ifndef SYS_BSD
-                                  O_SYNC |
-#else
-                                  O_ASYNC |
-#endif /* SYS_BSD */
-                                  O_WRONLY, 0666 );
-
+        p_msg->p_log_file = fopen( DEBUG_LOG, "w" );
 #endif
     }
     return( p_msg );
@@ -178,9 +170,9 @@ void intf_MsgDestroy( void )
 
 #ifdef DEBUG_LOG
     /* Close log file if any */
-    if( p_main->p_msg->i_log_file >= 0 )
+    if( p_main->p_msg->p_log_file != NULL )
     {
-        close( p_main->p_msg->i_log_file );
+        fclose( p_main->p_msg->p_log_file );
     }
 #endif
 
@@ -592,9 +584,9 @@ static void PrintMsg( intf_msg_item_t *p_msg )
 
 #ifdef DEBUG_LOG
     /* Append all messages to log file */
-    if( p_main->p_msg->i_log_file >= 0 )
+    if( p_main->p_msg->p_log_file != NULL )
     {
-        write( p_main->p_msg->i_log_file, psz_msg, strlen( psz_msg ) );
+        fwrite( psz_msg, strlen( psz_msg ), 1, p_main->p_msg->p_log_file );
     }
 #endif
 
