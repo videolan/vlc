@@ -55,6 +55,8 @@ static void BlendPalI420( filter_t *, picture_t *, picture_t *, picture_t *,
                           int, int );
 static void BlendPalYUY2( filter_t *, picture_t *, picture_t *, picture_t *,
                           int, int );
+static void BlendPalRV( filter_t *, picture_t *, picture_t *, picture_t *,
+                        int, int );
 
 /*****************************************************************************
  * Module descriptor
@@ -160,6 +162,15 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
                       i_x_offset, i_y_offset );
         return;
     }
+    if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','P') &&
+        ( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('R','V','1','6') ||
+          p_filter->fmt_out.video.i_chroma == VLC_FOURCC('R','V','2','4') ||
+          p_filter->fmt_out.video.i_chroma == VLC_FOURCC('R','V','3','2') ) )
+    {
+        BlendPalRV( p_filter, p_dst, p_dst_orig, p_src,
+                    i_x_offset, i_y_offset );
+        return;
+    }
 
     msg_Dbg( p_filter, "no matching alpha blending routine" );
 }
@@ -168,7 +179,6 @@ static void BlendI420( filter_t *p_filter, picture_t *p_dst,
                        picture_t *p_dst_orig, picture_t *p_src,
                        int i_x_offset, int i_y_offset )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_src1_y, *p_src2_y, *p_dst_y;
     uint8_t *p_src1_u, *p_src2_u, *p_dst_u;
@@ -313,7 +323,6 @@ static void BlendR16( filter_t *p_filter, picture_t *p_dst_pic,
                       picture_t *p_dst_orig, picture_t *p_src,
                       int i_x_offset, int i_y_offset )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_dst, *p_src1, *p_src2_y;
     uint8_t *p_src2_u, *p_src2_v;
@@ -400,7 +409,6 @@ static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
                       picture_t *p_dst_orig, picture_t *p_src,
                       int i_x_offset, int i_y_offset )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_dst, *p_src1, *p_src2_y;
     uint8_t *p_src2_u, *p_src2_v;
@@ -497,7 +505,6 @@ static void BlendYUY2( filter_t *p_filter, picture_t *p_dst_pic,
                        picture_t *p_dst_orig, picture_t *p_src,
                        int i_x_offset, int i_y_offset )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_dst, *p_src1, *p_src2_y;
     uint8_t *p_src2_u, *p_src2_v;
@@ -604,7 +611,6 @@ static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
                           picture_t *p_dst_orig, picture_t *p_src,
                           int i_x_offset, int i_y_offset )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_src1_y, *p_src2, *p_dst_y;
     uint8_t *p_src1_u, *p_dst_u;
@@ -716,7 +722,6 @@ static void BlendPalYUY2( filter_t *p_filter, picture_t *p_dst_pic,
                           picture_t *p_dst_orig, picture_t *p_src,
                           int i_x_offset, int i_y_offset )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_src1, *p_src2, *p_dst;
     int i_width, i_height, i_x, i_y, i_pix_pitch;
@@ -802,6 +807,110 @@ static void BlendPalYUY2( filter_t *p_filter, picture_t *p_dst_pic,
 #undef TRANS_BITS
 #undef p_trans
 #undef p_pal
+
+    return;
+}
+
+static void BlendPalRV( filter_t *p_filter, picture_t *p_dst_pic,
+                        picture_t *p_dst_orig, picture_t *p_src,
+                        int i_x_offset, int i_y_offset )
+{
+    int i_src1_pitch, i_src2_pitch, i_dst_pitch;
+    uint8_t *p_src1, *p_src2, *p_dst;
+    int i_width, i_height, i_x, i_y, i_pix_pitch;
+    int r, g, b;
+    video_palette_t rgbpalette;
+
+    i_pix_pitch = p_dst_pic->p->i_pixel_pitch;
+    i_dst_pitch = p_dst_pic->p->i_pitch;
+    p_dst = p_dst_pic->p->p_pixels + i_pix_pitch * (i_x_offset +
+            p_filter->fmt_out.video.i_x_offset) + p_dst_pic->p->i_pitch *
+            ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+
+    i_src1_pitch = p_dst_orig->p->i_pitch;
+    p_src1 = p_dst_orig->p->p_pixels + i_pix_pitch * (i_x_offset +
+             p_filter->fmt_out.video.i_x_offset) + p_dst_orig->p->i_pitch *
+             ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+
+    i_src2_pitch = p_src->p->i_pitch;
+    p_src2 = p_src->p->p_pixels + p_filter->fmt_in.video.i_x_offset +
+             i_src2_pitch * p_filter->fmt_in.video.i_y_offset;
+
+    i_width = __MIN( p_filter->fmt_out.video.i_visible_width - i_x_offset,
+                     p_filter->fmt_in.video.i_visible_width );
+
+    i_height = __MIN( p_filter->fmt_out.video.i_visible_height - i_y_offset,
+                      p_filter->fmt_in.video.i_visible_height );
+
+#define MAX_TRANS 255
+#define TRANS_BITS  8
+#define p_trans p_src2
+#define p_pal p_filter->fmt_in.video.p_palette->palette
+#define rgbpal rgbpalette.palette
+
+    /* Convert palette first */
+    for( i_y = 0; //i_y < p_filter->fmt_in.video.p_palette->i_dummy &&
+         i_y < 256; i_y++ )
+    {
+        yuv_to_rgb( &r, &g, &b, p_pal[i_y][0], p_pal[i_y][1], p_pal[i_y][2] );
+
+        if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('R','V','1','6') )
+        {
+            *(uint16_t *)rgbpal[i_y] =
+                ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
+        }
+        else
+        {
+            rgbpal[i_y][0] = r; rgbpal[i_y][1] = g; rgbpal[i_y][2] = b;
+        }
+    }
+
+    /* Draw until we reach the bottom of the subtitle */
+    for( i_y = 0; i_y < i_height; i_y++,
+         p_dst += i_dst_pitch, p_src1 += i_src1_pitch, p_src2 += i_src2_pitch )
+    {
+        /* Draw until we reach the end of the line */
+        for( i_x = 0; i_x < i_width; i_x++ )
+        {
+            if( !p_pal[p_trans[i_x]][3] )
+            {
+                /* Completely transparent. Don't change pixel */
+                continue;
+            }
+            else if( p_pal[p_trans[i_x]][3] == MAX_TRANS ||
+                     p_filter->fmt_out.video.i_chroma ==
+                     VLC_FOURCC('R','V','1','6') )
+            {
+                /* Completely opaque. Completely overwrite underlying pixel */
+                p_dst[i_x * i_pix_pitch]     = rgbpal[p_src2[i_x]][0];
+                p_dst[i_x * i_pix_pitch + 1] = rgbpal[p_src2[i_x]][1];
+                if( p_filter->fmt_out.video.i_chroma !=
+                    VLC_FOURCC('R','V','1','6') )
+                p_dst[i_x * i_pix_pitch + 2] = rgbpal[p_src2[i_x]][2];
+                continue;
+            }
+
+            /* Blending */
+            p_dst[i_x * i_pix_pitch]     = ( (uint16_t)rgbpal[p_src2[i_x]][0] *
+                p_pal[p_trans[i_x]][3] +
+                (uint16_t)p_src1[i_x * i_pix_pitch] *
+                (MAX_TRANS - p_pal[p_trans[i_x]][3]) ) >> TRANS_BITS;
+            p_dst[i_x * i_pix_pitch + 1] = ( (uint16_t)rgbpal[p_src2[i_x]][1] *
+                p_pal[p_trans[i_x]][3] +
+                (uint16_t)p_src1[i_x * i_pix_pitch + 1] *
+                (MAX_TRANS - p_pal[p_trans[i_x]][3]) ) >> TRANS_BITS;
+            p_dst[i_x * i_pix_pitch + 2] = ( (uint16_t)rgbpal[p_src2[i_x]][2] *
+                p_pal[p_trans[i_x]][3] +
+                (uint16_t)p_src1[i_x * i_pix_pitch + 2] *
+                (MAX_TRANS - p_pal[p_trans[i_x]][3]) ) >> TRANS_BITS;
+        }
+    }
+
+#undef MAX_TRANS
+#undef TRANS_BITS
+#undef p_trans
+#undef p_pal
+#undef rgbpal
 
     return;
 }
