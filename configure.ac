@@ -896,7 +896,7 @@ AX_ADD_PLUGINS([i420_rgb i420_yuy2 i422_yuy2 i420_ymga])
 AX_ADD_PLUGINS([id3 m3u playlist export sgimb])
 AX_ADD_PLUGINS([rawvideo])
 AX_ADD_PLUGINS([wav araw demuxdump demuxsub adpcm a52sys dtssys au])
-AX_ADD_PLUGINS([access_file access_udp access_tcp access_http ipv4 access_mms])
+AX_ADD_PLUGINS([access_file access_udp access_tcp access_http ipv4 access_mms access2])
 AX_ADD_PLUGINS([access_ftp access_directory sap http])
 
 dnl
