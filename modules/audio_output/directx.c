@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.10 2003/01/05 13:39:32 gbazin Exp $
+ * $Id: directx.c,v 1.11 2003/02/14 17:00:02 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -120,7 +120,7 @@ static int  DirectxFillBuffer            ( aout_instance_t *, int,
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("DirectX audio module") );
-    set_capability( "audio output", 100 );
+    set_capability( "audio output", 50 );
     add_shortcut( "directx" );
     set_callbacks( OpenAudio, CloseAudio );
 vlc_module_end();
