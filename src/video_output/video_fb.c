@@ -31,16 +31,6 @@
 #include "intf_msg.h"
 #include "main.h"
 
-//#define RGB_MIN 0
-//#define RGB_MAX 255
-#define RGB_MIN 0
-#define RGB_MAX 255
-#define SHIFT 20
-#define U_GREEN_COEF    ((int)(-0.391 * (1<<SHIFT) / 1.164))
-#define U_BLUE_COEF     ((int)(2.018 * (1<<SHIFT) / 1.164))
-#define V_RED_COEF      ((int)(1.596 * (1<<SHIFT) / 1.164))
-#define V_GREEN_COEF    ((int)(-0.813 * (1<<SHIFT) / 1.164))
-
 /******************************************************************************
  * vout_sys_t: video output framebuffer method descriptor
  ******************************************************************************
@@ -260,6 +250,21 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
         return( 1  );
         break;
     }
+
+    switch( p_vout->i_screen_depth )
+    {
+    case 15:
+    case 16:
+    case 24:
+    case 32:
+        p_vout->i_red_mask =    ( (1 << p_vout->p_sys->var_info.red.length) - 1 )
+                                    << p_vout->p_sys->var_info.red.offset;
+        p_vout->i_green_mask =    ( (1 << p_vout->p_sys->var_info.green.length) - 1 )
+                                    << p_vout->p_sys->var_info.green.offset;
+        p_vout->i_blue_mask =    ( (1 << p_vout->p_sys->var_info.blue.length) - 1 )
+                                    << p_vout->p_sys->var_info.blue.offset;
+    }
+
     p_vout->p_sys->i_page_size = p_vout->p_sys->var_info.xres *
                 p_vout->p_sys->var_info.yres * p_vout->i_bytes_per_pixel;
 
@@ -305,8 +310,9 @@ static void FBCloseDisplay( vout_thread_t *p_vout )
 /******************************************************************************
  * FBSetPalette: sets an 8 bpp palette
  ******************************************************************************
- * This function is just a prototype that does nothing. Architectures that
- * support palette allocation should override it.
+ * This function sets the palette given as an argument. It does not return
+ * anything, but could later send information on which colors it was unable
+ * to set.
  ******************************************************************************/
 static void    FBSetPalette   ( p_vout_thread_t p_vout,
                                 u16 *red, u16 *green, u16 *blue, u16 *transp )
