@@ -368,6 +368,9 @@ PLUGIN_IDCTMMX =	plugins/idct/idctmmx.o \
 PLUGIN_IDCTMMXEXT =	plugins/idct/idctmmxext.o \
 			plugins/idct/idct_common.o
 
+PLUGIN_IDCTALTIVEC =	plugins/idct/idctaltivec.o \
+			plugins/idct/idct_common.o
+
 PLUGIN_MACOSX =	plugins/macosx/macosx.o \
 		plugins/macosx/intf_macosx.o \
 		plugins/macosx/vout_macosx.o
@@ -451,7 +454,8 @@ NONSTD_PLUGIN_OBJ = \
 		$(PLUGIN_X11) \
 		$(PLUGIN_GLIDE) \
 		$(PLUGIN_GTK) \
-		$(PLUGIN_GNOME)
+		$(PLUGIN_GNOME) \
+		$(PLUGIN_IDCT_ALTIVEC)
 
 NONSTD_CPP_PLUGIN_OBJ = \
 		$(PLUGIN_BEOS) \
@@ -628,6 +632,11 @@ $(PLUGIN_BEOS): %.o: .dep/%.dpp
 $(PLUGIN_BEOS): %.o: %.cpp
 	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
 
+$(PLUGIN_IDCTALTIVEC): %.o: Makefile.dep
+$(PLUGIN_IDCTALTIVEC): %.o: .dep/%.d
+$(PLUGIN_IDCTALTIVEC): %.o: %.c
+	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $< -faltivec
+
 #
 # Main application target
 #
@@ -793,6 +802,9 @@ lib/idctmmx.so: $(PLUGIN_IDCTMMX)
 
 lib/idctmmxext.so: $(PLUGIN_IDCTMMXEXT)
 	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
+
+lib/idctaltivec.so: $(PLUGIN_IDCTALTIVEC)
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -framework VecLib
 endif
 
 ################################################################################
