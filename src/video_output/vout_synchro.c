@@ -129,6 +129,8 @@ vout_synchro_t * __vout_SynchroInit( vlc_object_t * p_object,
     }
     vlc_object_attach( p_synchro, p_object );
 
+    p_synchro->b_no_skip = !config_GetInt( p_object, "skip-frames" );
+
     /* We use a fake stream pattern, which is often right. */
     p_synchro->i_n_p = p_synchro->i_eta_p = DEFAULT_NB_P;
     p_synchro->i_n_b = p_synchro->i_eta_b = DEFAULT_NB_B;
@@ -175,10 +177,12 @@ vlc_bool_t vout_SynchroChoose( vout_synchro_t * p_synchro, int i_coding_type,
                                     + (p_synchro->p_tau[(coding_type)] >> 1) \
                                     + p_synchro->i_render_time)
 #define S (*p_synchro)
-    /* VPAR_SYNCHRO_DEFAULT */
     mtime_t         now, period;
     mtime_t         pts = 0;
     vlc_bool_t      b_decode = 0;
+
+    if ( p_synchro->b_no_skip )
+        return 1;
 
     now = mdate();
     period = 1000000 * 1001 / p_synchro->i_frame_rate

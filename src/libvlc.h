@@ -252,6 +252,10 @@ static char *ppsz_align_descriptions[] =
     "aspect, or a float value (1.25, 1.3333, etc.) expressing pixel " \
     "squareness.")
 
+#define SKIP_FRAMES_TEXT N_("Skip frames")
+#define SKIP_FRAMES_LONGTEXT N_( \
+    "Disable this option to disable frame drops on MPEG-2 streams.")
+
 #define INPUT_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the input " \
     "subsystem, such as the DVD or VCD device, the network interface " \
@@ -879,6 +883,8 @@ vlc_module_begin();
     add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT,
               FULLSCREEN_LONGTEXT, VLC_FALSE );
         change_short('f');
+    add_bool( "skip-frames", 1, NULL, SKIP_FRAMES_TEXT,
+              SKIP_FRAMES_LONGTEXT, VLC_FALSE );
 #ifndef SYS_DARWIN
     add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, VLC_TRUE );
 #endif
