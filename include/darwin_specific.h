@@ -2,7 +2,7 @@
  * darwin_specific.h: Darwin specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.h,v 1.8 2004/01/25 18:17:08 zorglub Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -20,4 +20,3 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-

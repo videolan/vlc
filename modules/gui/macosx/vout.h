@@ -75,28 +75,17 @@
 @end
 
 /*****************************************************************************
- * VLCVout interface
- *****************************************************************************/
-@interface VLCVout : NSObject
-{
-}
-
-- (void)createWindow:(NSValue *)o_value;
-- (void)destroyWindow:(NSValue *)o_value;
-
-@end
-
-/*****************************************************************************
  * vout_sys_t: MacOS X video output method descriptor
  *****************************************************************************/
 struct vout_sys_t
 {
-    int i_opengl;
-    
+    NSAutoreleasePool *o_pool;
     NSRect s_rect;
-    int b_pos_saved;
     VLCWindow * o_window;
 
+    int i_opengl;
+    int b_pos_saved;
+    
     vlc_bool_t b_mouse_moved;
     mtime_t i_time_mouse_last_moved;
 

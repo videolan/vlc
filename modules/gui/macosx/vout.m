@@ -68,7 +68,6 @@ static void vout_End       ( vout_thread_t * );
 static int  vout_Manage    ( vout_thread_t * );
 static void vout_Display   ( vout_thread_t *, picture_t * );
 
-static int  CoSendRequest      ( vout_thread_t *, SEL );
 static int  CoCreateWindow     ( vout_thread_t * );
 static int  CoDestroyWindow    ( vout_thread_t * );
 static int  CoToggleFullscreen ( vout_thread_t * );
@@ -119,6 +118,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         return( 1 );
     }
 
+    p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
     p_vout->p_sys->b_mouse_moved = VLC_TRUE;
     p_vout->p_sys->i_time_mouse_last_moved = mdate();
 
@@ -159,7 +159,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
             DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
             free( p_vout->p_sys );
             return( 1 );
-        } 
+        }
 
         /* Damn QT isn't thread safe. so keep a lock in the p_vlc object */
         vlc_mutex_lock( &p_vout->p_vlc->quicktime_lock );
@@ -168,6 +168,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
                             nil, &p_vout->p_sys->img_dc );
         
         vlc_mutex_unlock( &p_vout->p_vlc->quicktime_lock );
+        
         if( err == noErr && p_vout->p_sys->img_dc != 0 )
         {
             p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
@@ -192,7 +193,6 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         msg_Dbg( p_vout, "using OpenGL mode" );
     }
 
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     NSArray * o_screens = [NSScreen screens];
     if( [o_screens count] > 0 && var_Type( p_vout, "video-device" ) == 0 )
     {
@@ -236,7 +236,6 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         val.b_bool = VLC_TRUE;
         var_Set( p_vout, "intf-change", val );
     }
-    [o_pool release];
 
     if( CoCreateWindow( p_vout ) )
     {
@@ -432,7 +431,8 @@ static void vout_End( vout_thread_t *p_vout )
  * CloseVideo: destroy video thread output method
  *****************************************************************************/
 void E_(CloseVideo) ( vlc_object_t *p_this )
-{       
+{
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init]; 
     vout_thread_t * p_vout = (vout_thread_t *)p_this;     
 
     if( p_vout->p_sys->i_opengl )
@@ -457,6 +457,7 @@ void E_(CloseVideo) ( vlc_object_t *p_this )
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
     }
 
+    [o_pool release];
     free( p_vout->p_sys );
 }
 
@@ -570,52 +571,120 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*****************************************************************************
- * CoSendRequest: send request to interface thread
- *****************************************************************************
- * Returns 0 on success, 1 otherwise
- *****************************************************************************/
-static int CoSendRequest( vout_thread_t *p_vout, SEL sel )
-{
-    int i_ret = 0;
-    vlc_value_t val;
-    intf_thread_t * p_intf;
-
-    VLCVout * o_vlv = [[VLCVout alloc] init];
-
-    if( ( i_ret = ExecuteOnMainThread( o_vlv, sel, (void *)p_vout ) ) )
-    {
-        msg_Err( p_vout, "SendRequest: no way to communicate with mt" );
-    }
-
-    [o_vlv release];
-
-    /*This makes this function dependant of the presence of a macosx 
-    interface. We do not check if this interface exists, since it has 
-    already been done before.*/
-
-    /*p_intf = VLCIntf;
-
-    val.b_bool = VLC_TRUE;
-    var_Create(p_intf,"intf-change",VLC_VAR_BOOL);
-    var_Set(p_intf, "intf-change",val);
-*/
-    return( i_ret );
-}
-
-/*****************************************************************************
  * CoCreateWindow: create new window 
  *****************************************************************************
  * Returns 0 on success, 1 otherwise
  *****************************************************************************/
 static int CoCreateWindow( vout_thread_t *p_vout )
 {
-    if( CoSendRequest( p_vout, @selector(createWindow:) ) )
+    vlc_value_t val;
+    VLCQTView * o_view;
+    NSScreen * o_screen;
+    vlc_bool_t b_main_screen;
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+
+    p_vout->p_sys->o_window = [VLCWindow alloc];
+    [p_vout->p_sys->o_window setReleasedWhenClosed: YES];
+
+    if( var_Get( p_vout, "video-device", &val ) < 0 )
     {
-        msg_Err( p_vout, "CoSendRequest (createWindow) failed" );
-        return( 1 );
+        o_screen = [NSScreen mainScreen];
+        b_main_screen = 1;
+    }
+    else
+    {
+        NSArray *o_screens = [NSScreen screens];
+        unsigned int i_index = val.i_int;
+        
+        if( [o_screens count] < i_index )
+        {
+            o_screen = [NSScreen mainScreen];
+            b_main_screen = 1;
+        }
+        else
+        {
+            i_index--;
+            o_screen = [o_screens objectAtIndex: i_index];
+            config_PutInt( p_vout, "macosx-vdev", i_index );
+            b_main_screen = (i_index == 0);
+        }
+    } 
+
+    if( p_vout->b_fullscreen )
+    {
+        NSRect screen_rect = [o_screen frame];
+        screen_rect.origin.x = screen_rect.origin.y = 0;
+
+        if ( b_main_screen && p_vout->p_sys->p_fullscreen_state == NULL )
+            BeginFullScreen( &p_vout->p_sys->p_fullscreen_state, NULL, 0, 0,
+                             NULL, NULL, fullScreenAllowEvents );
+
+        [p_vout->p_sys->o_window 
+            initWithContentRect: screen_rect
+            styleMask: NSBorderlessWindowMask
+            backing: NSBackingStoreBuffered
+            defer: NO screen: o_screen];
+
+        [p_vout->p_sys->o_window setVout: p_vout];
+        p_vout->p_sys->b_mouse_moved = YES;
+        p_vout->p_sys->i_time_mouse_last_moved = mdate();
+    }
+    else
+    {
+        unsigned int i_stylemask = NSTitledWindowMask |
+                                   NSMiniaturizableWindowMask |
+                                   NSClosableWindowMask |
+                                   NSResizableWindowMask;
+        
+        if ( p_vout->p_sys->p_fullscreen_state != NULL )
+            EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
+        p_vout->p_sys->p_fullscreen_state = NULL;
+
+        [p_vout->p_sys->o_window 
+            initWithContentRect: p_vout->p_sys->s_rect
+            styleMask: i_stylemask
+            backing: NSBackingStoreBuffered
+            defer: NO screen: o_screen];
+
+        [p_vout->p_sys->o_window setVout: p_vout];
+        [p_vout->p_sys->o_window setAlphaValue: config_GetFloat( p_vout, "macosx-opaqueness" )];
+        
+        if( config_GetInt( p_vout, "video-on-top" ) )
+        {
+            [p_vout->p_sys->o_window setLevel: NSStatusWindowLevel];
+        }
+        
+        if( !p_vout->p_sys->b_pos_saved )   
+        {
+            [p_vout->p_sys->o_window center];
+        }
+    }
+
+    if( !p_vout->p_sys->i_opengl )
+    {
+        o_view = [[VLCQTView alloc] init];
+        /* FIXME: [o_view setMenu:] */
+        [p_vout->p_sys->o_window setContentView: o_view];
+        [o_view autorelease];
+
+        [o_view lockFocus];
+        p_vout->p_sys->p_qdport = [o_view qdPort];
+        [o_view unlockFocus];
+    }
+    else
+    {
+#define o_glview p_vout->p_sys->o_glview
+        o_glview = [[VLCGLView alloc] initWithFrame: p_vout->p_sys->s_rect vout: p_vout];
+        [p_vout->p_sys->o_window setContentView: o_glview];
+        [o_glview autorelease];
+#undef o_glview
     }
     
-    return( 0 );
+    [p_vout->p_sys->o_window updateTitle];
+    [p_vout->p_sys->o_window makeKeyAndOrderFront: nil];
+    
+    [o_pool release];
+    return( 0);
 }
 
 /*****************************************************************************
@@ -625,16 +694,27 @@ static int CoCreateWindow( vout_thread_t *p_vout )
  *****************************************************************************/
 static int CoDestroyWindow( vout_thread_t *p_vout )
 {
-
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     VLCHideMouse( p_vout, NO );
 
-    if( CoSendRequest( p_vout, @selector(destroyWindow:) ) )
+    if( !p_vout->b_fullscreen )
     {
-        msg_Err( p_vout, "CoSendRequest (destroyWindow) failed" );
-        return( 1 );
-    }
+        NSRect s_rect;
 
-    return( 0 );
+        s_rect = [[p_vout->p_sys->o_window contentView] frame];
+        p_vout->p_sys->s_rect.size = s_rect.size;
+
+        s_rect = [p_vout->p_sys->o_window frame];
+        p_vout->p_sys->s_rect.origin = s_rect.origin;
+
+        p_vout->p_sys->b_pos_saved = YES;
+    }
+    
+    p_vout->p_sys->p_qdport = nil;
+    [p_vout->p_sys->o_window close];
+    p_vout->p_sys->o_window = nil;
+    [o_pool release];
+    return 0;
 }
 
 /*****************************************************************************
@@ -644,6 +724,8 @@ static int CoDestroyWindow( vout_thread_t *p_vout )
  *****************************************************************************/
 static int CoToggleFullscreen( vout_thread_t *p_vout )
 {
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+
     if( !p_vout->p_sys->i_opengl )
     {
         QTDestroySequence( p_vout );
@@ -684,6 +766,7 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
         } 
     }
 
+    [o_pool release];
     return( 0 );
 }
 
@@ -1013,12 +1096,12 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     return( YES );
 }
-
+/*
 - (BOOL)performKeyEquivalent:(NSEvent *)o_event
 {
     return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event];
 }
-
+*/
 - (void)keyDown:(NSEvent *)o_event
 {
     unichar key = 0;
@@ -1735,149 +1818,6 @@ CATCH_MOUSE_EVENTS
     }
 
     [super mouseMoved: o_event];
-}
-
-@end
-
-/*****************************************************************************
- * VLCVout implementation
- *****************************************************************************/
-@implementation VLCVout
-
-- (void)createWindow:(NSValue *)o_value
-{
-    vlc_value_t val;
-    VLCQTView * o_view;
-    NSScreen * o_screen;
-    vout_thread_t * p_vout;
-    vlc_bool_t b_main_screen;
-    
-    p_vout = (vout_thread_t *)[o_value pointerValue];
-
-    p_vout->p_sys->o_window = [VLCWindow alloc];
-    [p_vout->p_sys->o_window setVout: p_vout];
-    [p_vout->p_sys->o_window setReleasedWhenClosed: YES];
-
-    if( var_Get( p_vout, "video-device", &val ) < 0 )
-    {
-        o_screen = [NSScreen mainScreen];
-        b_main_screen = 1;
-    }
-    else
-    {
-        NSArray *o_screens = [NSScreen screens];
-        unsigned int i_index = val.i_int;
-        
-        if( [o_screens count] < i_index )
-        {
-            o_screen = [NSScreen mainScreen];
-            b_main_screen = 1;
-        }
-        else
-        {
-            i_index--;
-            o_screen = [o_screens objectAtIndex: i_index];
-            config_PutInt( p_vout, "macosx-vdev", i_index );
-            b_main_screen = (i_index == 0);
-        }
-    } 
-
-    if( p_vout->b_fullscreen )
-    {
-        NSRect screen_rect = [o_screen frame];
-        screen_rect.origin.x = screen_rect.origin.y = 0;
-
-        if ( b_main_screen && p_vout->p_sys->p_fullscreen_state == NULL )
-            BeginFullScreen( &p_vout->p_sys->p_fullscreen_state, NULL, 0, 0,
-                             NULL, NULL, fullScreenAllowEvents );
-
-        [p_vout->p_sys->o_window 
-            initWithContentRect: screen_rect
-            styleMask: NSBorderlessWindowMask
-            backing: NSBackingStoreBuffered
-            defer: NO screen: o_screen];
-
-        //[p_vout->p_sys->o_window setLevel: NSPopUpMenuWindowLevel - 1];
-        p_vout->p_sys->b_mouse_moved = YES;
-        p_vout->p_sys->i_time_mouse_last_moved = mdate();
-    }
-    else
-    {
-        unsigned int i_stylemask = NSTitledWindowMask |
-                                   NSMiniaturizableWindowMask |
-                                   NSClosableWindowMask |
-                                   NSResizableWindowMask;
-        
-        if ( p_vout->p_sys->p_fullscreen_state != NULL )
-            EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
-        p_vout->p_sys->p_fullscreen_state = NULL;
-
-        [p_vout->p_sys->o_window 
-            initWithContentRect: p_vout->p_sys->s_rect
-            styleMask: i_stylemask
-            backing: NSBackingStoreBuffered
-            defer: NO screen: o_screen];
-
-        [p_vout->p_sys->o_window setAlphaValue: config_GetFloat( p_vout, "macosx-opaqueness" )];
-        
-        if( config_GetInt( p_vout, "video-on-top" ) )
-        {
-            [p_vout->p_sys->o_window setLevel: NSStatusWindowLevel];
-        }
-        
-        if( !p_vout->p_sys->b_pos_saved )   
-        {
-            [p_vout->p_sys->o_window center];
-        }
-    }
-
-    if( !p_vout->p_sys->i_opengl )
-    {
-        o_view = [[VLCQTView alloc] init];
-        /* FIXME: [o_view setMenu:] */
-        [p_vout->p_sys->o_window setContentView: o_view];
-        [o_view autorelease];
-
-        [o_view lockFocus];
-        p_vout->p_sys->p_qdport = [o_view qdPort];
-        [o_view unlockFocus];
-    }
-    else
-    {
-#define o_glview p_vout->p_sys->o_glview
-        o_glview = [[VLCGLView alloc] initWithFrame: p_vout->p_sys->s_rect vout: p_vout];
-        [p_vout->p_sys->o_window setContentView: o_glview];
-        [o_glview autorelease];
-#undef o_glview
-    }
-    
-    [p_vout->p_sys->o_window updateTitle];
-    [p_vout->p_sys->o_window makeKeyAndOrderFront: nil];
-
-}
-
-- (void)destroyWindow:(NSValue *)o_value
-{
-    vout_thread_t * p_vout;
-
-    p_vout = (vout_thread_t *)[o_value pointerValue];
-
-    if( !p_vout->b_fullscreen )
-    {
-        NSRect s_rect;
-
-        s_rect = [[p_vout->p_sys->o_window contentView] frame];
-        p_vout->p_sys->s_rect.size = s_rect.size;
-
-        s_rect = [p_vout->p_sys->o_window frame];
-        p_vout->p_sys->s_rect.origin = s_rect.origin;
-
-        p_vout->p_sys->b_pos_saved = YES;
-    }
-    
-    p_vout->p_sys->p_qdport = nil;
-    [p_vout->p_sys->o_window close];
-    p_vout->p_sys->o_window = nil;
 }
 
 @end

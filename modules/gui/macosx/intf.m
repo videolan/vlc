@@ -69,8 +69,6 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
     p_intf->b_play = VLC_TRUE;
     p_intf->pf_run = Run;
-    
-    [[VLCMain sharedInstance] setIntf: p_intf];
 
     return( 0 );
 }
@@ -86,7 +84,7 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
     
     [p_intf->p_sys->o_sendport release];
     [p_intf->p_sys->o_pool release];
-
+    
     free( p_intf->p_sys );
 }
 
@@ -99,21 +97,24 @@ static void Run( intf_thread_t *p_intf )
      * fails to go to real-time priority with the first launched thread
      * (???) --Meuuh */
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
+    [[VLCMain sharedInstance] setIntf: p_intf];
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
+    [NSApp run];
+    [[VLCMain sharedInstance] terminate];
 }
 
 int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 {
     int i_ret = 0;
 
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+    //NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
     if( [target respondsToSelector: @selector(performSelectorOnMainThread:
                                              withObject:waitUntilDone:)] )
     {
         [target performSelectorOnMainThread: sel
                 withObject: [NSValue valueWithPointer: p_arg]
-                waitUntilDone: YES];
+                waitUntilDone: NO];
     }
     else if( NSApp != nil && [[VLCMain sharedInstance] respondsToSelector: @selector(getIntf)] ) 
     {
@@ -161,7 +162,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         i_ret = 1;
     }
 
-    [o_pool release];
+    //[o_pool release];
 
     return( i_ret );
 }
@@ -290,7 +291,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)awakeFromNib
 {
     unsigned int i_key = 0;
-    intf_thread_t * p_intf = VLCIntf;
     playlist_t *p_playlist;
     vlc_value_t val;
 
@@ -527,7 +527,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
 }
-/*
+
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename
 {
     NSDictionary *o_dic = [NSDictionary dictionaryWithObjectsAndKeys: o_filename, @"ITEM_URL", nil];
@@ -536,7 +536,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             
     return( TRUE );
 }
-*/
+
 - (NSString *)localizedString:(char *)psz
 {
     NSString * o_str = nil;
@@ -637,7 +637,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     int i;
 
     val.i_int = 0;
-    p_hotkeys = VLCIntf->p_vlc->p_hotkeys;
+    p_hotkeys = p_intf->p_vlc->p_hotkeys;
 
     i_pressed_modifiers = [o_event modifierFlags];
 
@@ -658,7 +658,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         if( p_hotkeys[i].i_key == val.i_int )
         {
-            var_Set( VLCIntf->p_vlc, "key-pressed", val );
+            var_Set( p_intf->p_vlc, "key-pressed", val );
             return YES;
         }
     }
@@ -696,6 +696,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)manage
 {
     NSDate * o_sleep_date;
+    /* new thread requires a new pool */
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
@@ -809,7 +810,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             {
                 if( [[o_vout_wnd className] isEqualToString: @"VLCWindow"] )
                 {
-                    [o_vout_wnd updateTitle];
+                    ;//[o_vout_wnd updateTitle];
                 }
             }
             vlc_object_release( (vlc_object_t *)p_vout );
@@ -1134,7 +1135,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)timesliderUpdate:(id)sender
 {
-    intf_thread_t * p_intf;
     input_thread_t * p_input;
     float f_updated;
 

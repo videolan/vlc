@@ -60,6 +60,17 @@ static int SwitchIntfCallback( vlc_object_t *, char const *,
 static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
 
+#ifdef SYS_DARWIN
+/*****************************************************************************
+ * VLCApplication interface
+ *****************************************************************************/
+@interface VLCApplication : NSApplication
+{
+}
+
+@end
+#endif
+
 /*****************************************************************************
  * intf_Create: prepare interface before main loop
  *****************************************************************************
@@ -131,6 +142,8 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
 int intf_RunThread( intf_thread_t *p_intf )
 {
 #ifdef SYS_DARWIN
+    NSAutoreleasePool * o_pool;
+
     if( p_intf->b_block )
     {
         /* This is the primary intf */
@@ -143,28 +156,36 @@ int intf_RunThread( intf_thread_t *p_intf )
         }
     }
 
-    if( p_intf->b_block && !strncmp( p_intf->p_module->psz_shortname, "macosx" , 6 ) )
+    if( p_intf->b_block && strncmp( p_intf->p_module->psz_shortname, "clivlc", 6) )
     {
-	/* this is OSX, we are cheating :)
-           This is NOT I REPEAT NOT blocking since [NSApp run] is */
-	p_intf->b_block = VLC_FALSE;
-
-        RunInterface( p_intf );
-    	p_intf->b_block = VLC_TRUE;
+        o_pool = [[NSAutoreleasePool alloc] init];
+	[VLCApplication sharedApplication];
     }
-    else if( p_intf->b_block && !strncmp( p_intf->p_vlc->psz_object_name, "clivlc", 6 ) )
+
+    if( p_intf->b_block && ( !strncmp( p_intf->p_module->psz_shortname, "macosx" , 6 ) ||
+                             !strncmp( p_intf->p_vlc->psz_object_name, "clivlc", 6 ) ) )
     {
-        /* VLC OS X in cli mode ( no blocking [NSApp run] )
-           this is equal to running in normal non-OSX primary intf mode */
+        /* VLC in normal primary interface mode */
         RunInterface( p_intf );
         p_intf->b_die = VLC_TRUE;
     }
     else
     {
-        /* If anything else is the primary intf and we are not in cli mode,
-           then don't make it blocking ([NSApp run] will be blocking) 
-           but run it in a seperate thread. */
-        p_intf->b_block = VLC_FALSE;
+        /* Run the interface in a separate thread */
+        if( vlc_thread_create( p_intf, "interface", RunInterface,
+                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+        {
+            msg_Err( p_intf, "cannot spawn interface thread" );
+            return VLC_EGENERIC;
+        }
+
+        if( p_intf->b_block )
+        {
+            /* VLC in primary interface mode with a working macosx vout */
+            [NSApp run];
+            p_intf->b_die = VLC_TRUE;
+        }
+    }
 #else
     if( p_intf->b_block )
     {
@@ -183,7 +204,6 @@ int intf_RunThread( intf_thread_t *p_intf )
     }
     else
     {
-#endif
         /* Run the interface in a separate thread */
         if( vlc_thread_create( p_intf, "interface", RunInterface,
                                VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
@@ -192,6 +212,7 @@ int intf_RunThread( intf_thread_t *p_intf )
             return VLC_EGENERIC;
         }
     }
+#endif
 
     return VLC_SUCCESS;
 }
@@ -418,3 +439,37 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     return VLC_SUCCESS;
 }
+
+#ifdef SYS_DARWIN
+/*****************************************************************************
+ * VLCApplication implementation 
+ *****************************************************************************/
+@implementation VLCApplication 
+
+- (void)stop: (id)sender
+{
+    NSEvent *o_event;
+    NSAutoreleasePool *o_pool;
+    [super stop:sender];
+
+    o_pool = [[NSAutoreleasePool alloc] init];
+    /* send a dummy event to break out of the event loop */
+    o_event = [NSEvent mouseEventWithType: NSLeftMouseDown
+                location: NSMakePoint( 1, 1 ) modifierFlags: 0
+                timestamp: 1 windowNumber: [[NSApp mainWindow] windowNumber]
+                context: [NSGraphicsContext currentContext] eventNumber: 1
+                clickCount: 1 pressure: 0.0];
+    [NSApp postEvent: o_event atStart: YES];
+    [o_pool release];
+}
+
+- (void)terminate: (id)sender
+{
+    if( [NSApp isRunning] )
+        [NSApp stop:sender];
+    [super terminate: sender];
+}
+
+@end
+#endif
+

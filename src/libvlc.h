@@ -1316,3 +1316,4 @@ static struct hotkey p_hotkeys[] =
     { "key-history-forward", ACTIONID_HISTORY_FORWARD, 0},
     { NULL, 0, 0 }
 };
+
