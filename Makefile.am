@@ -7,7 +7,11 @@ NULL =
 # SUBDIRS stores the directories where a "make" is required when building
 # something. DIST_SUBDIRS stores the directories where nothing is built but
 # which have makefiles with distribution information.
-SUBDIRS = intl modules po mozilla share m4 .
+#  - intl should come before modules and . because all the code uses gettext
+#  - modules should come before . because vlc needs the builtins
+#  - . should come before mozilla because the plugin needs libvlc_pic.a
+#  - po should come before . because VLC.app needs the pofiles
+SUBDIRS = intl modules po . mozilla share m4
 DIST_SUBDIRS = $(SUBDIRS) src debian doc ipkg lib autotools
 
 EXTRA_DIST = \
