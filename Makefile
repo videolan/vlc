@@ -57,7 +57,7 @@ TRANSFORM=vdec_idct
 INCLUDE += -Iinclude
 
 ifeq ($(VIDEO),X11)
-INCLUDE += -I/usr/X11R6/include/X11
+INCLUDE += -I/usr/X11R6/include
 endif
 
 #
