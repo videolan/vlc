@@ -687,7 +687,6 @@ if BUILD_ACTIVEX
 	unix2dos $(top_builddir)/vlc-${VERSION}/activex/* ;
 
 	cp $(top_builddir)/activex/*$(LIBEXT) $(top_builddir)/vlc-${VERSION}/activex/ ;
-	cp $(top_builddir)/activex/*.reg $(top_builddir)/vlc-${VERSION}/activex/ ;
 	$(STRIP) $(top_builddir)/vlc-${VERSION}/activex/*$(LIBEXT);
 endif
 
