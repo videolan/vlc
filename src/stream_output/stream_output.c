@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.27 2003/04/29 21:32:21 fenrir Exp $
+ * $Id: stream_output.c,v 1.28 2003/04/29 22:38:56 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -39,6 +39,9 @@
  *****************************************************************************/
 #define sout_stream_url_to_chain( p, s ) _sout_stream_url_to_chain( VLC_OBJECT(p), s )
 static char *_sout_stream_url_to_chain( vlc_object_t *, char * );
+
+#define module_NeedStrict(a,b,c) __module_NeedStrict(VLC_OBJECT(a),b,c)
+static module_t *__module_NeedStrict( vlc_object_t *, const char *, const char * );
 
 /*
  * Generic MRL parser
@@ -248,9 +251,8 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
     p_access->pf_seek    = NULL;
     p_access->pf_write   = NULL;
 
-    p_access->p_module   = module_Need( p_access,
-                                        "sout access",
-                                        p_access->psz_access );;
+    p_access->p_module   =
+        module_NeedStrict( p_access, "sout access", p_access->psz_access );
 
     if( !p_access->p_module )
     {
@@ -324,9 +326,9 @@ sout_mux_t * sout_MuxNew         ( sout_instance_t *p_sout,
 
     p_mux->p_sys        = NULL;
 
-    p_mux->p_module     = module_Need( p_mux,
-                                       "sout mux",
-                                       p_mux->psz_mux );
+    p_mux->p_module     =
+        module_NeedStrict( p_mux, "sout mux", p_mux->psz_mux );
+
     if( p_mux->p_module == NULL )
     {
         FREE( p_mux->psz_mux );
@@ -938,7 +940,7 @@ char * sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
 
     *ppsz_name = _strndup( psz_chain, p - psz_chain );
 
-    //fprintf( stderr, "name=%s - rest=%s\n", *ppsz_name, p );
+    /* fprintf( stderr, "name=%s - rest=%s\n", *ppsz_name, p ); */
 
     SKIPSPACE( p );
 
@@ -961,7 +963,7 @@ char * sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
                 p++;
             }
 
-            //fprintf( stderr, "name=%s - rest=%s\n", psz_name, p );
+            /* fprintf( stderr, "name=%s - rest=%s\n", psz_name, p ); */
             if( p == psz_name )
             {
                 fprintf( stderr, "invalid options (empty)" );
@@ -989,7 +991,7 @@ char * sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
 
                     if( end )
                     {
-//                        fprintf( stderr, "##%s -- %s\n", p, end );
+/*                        fprintf( stderr, "##%s -- %s\n", p, end ); */
                         cfg.psz_value = _strndup( p, end - p );
                         p = end + 1;
                     }
@@ -1090,6 +1092,12 @@ sout_stream_t *sout_stream_new( sout_instance_t *p_sout,
 {
     sout_stream_t *p_stream;
 
+    if( !psz_chain )
+    {
+        msg_Err( p_sout, "invalid chain" );
+        return NULL;
+    }
+
     p_stream = vlc_object_create( p_sout, sizeof( sout_stream_t ) );
 
     if( !p_stream )
@@ -1105,7 +1113,7 @@ sout_stream_t *sout_stream_new( sout_instance_t *p_sout,
     msg_Dbg( p_sout, "stream=`%s'", p_stream->psz_name );
 
     p_stream->p_module =
-        module_Need( p_stream, "sout stream", p_stream->psz_name );
+        module_NeedStrict( p_stream, "sout stream", p_stream->psz_name );
 
     if( !p_stream->p_module )
     {
@@ -1207,4 +1215,28 @@ static char *_sout_stream_url_to_chain( vlc_object_t *p_this, char *psz_url )
 
     return( psz_chain );
 }
+
+/*****************************************************************************/
+static module_t *__module_NeedStrict( vlc_object_t *p_obj, const char *psz_capacity, const char *psz_name )
+{
+    module_t *p_module;
+
+    if( !psz_name || !*psz_name )
+    {
+        p_module = module_Need( p_obj, psz_capacity, psz_name );
+    }
+    else
+    {
+        char *psz_name_strict = malloc( strlen( psz_name ) + 6 );
+        strcpy( psz_name_strict, psz_name );
+        strcat( psz_name_strict, ",none" );
+
+        p_module = module_Need( p_obj, psz_capacity, psz_name_strict );
+
+        free( psz_name_strict );
+    }
+
+    return p_module;
+}
+
 
