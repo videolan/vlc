@@ -83,6 +83,10 @@ private:
 #define EMBED_TEXT N_("Embed video in interface")
 #define EMBED_LONGTEXT N_("Embed the video inside the interface instead " \
     "of having it in a separate window.")
+#define KEEP_SIZE_TEXT N_("Remember the size of the embedded video")
+#define KEEP_SIZE_LONGTEXT N_("Remember the size of the last embedded " \
+    "video and apply it to new videos. The default behaviour is to adjust " \
+    "the size of the embedded video to match the resolution of the video.")
 #define BOOKMARKS_TEXT N_("Show bookmarks dialog")
 #define BOOKMARKS_LONGTEXT N_("Show bookmarks dialog when the interface " \
     "starts.")
@@ -103,6 +107,8 @@ vlc_module_begin();
 
     add_bool( "wxwin-embed", 1, NULL,
               EMBED_TEXT, EMBED_LONGTEXT, VLC_FALSE );
+    add_bool( "wxwin-keep-size", 0, NULL,
+              KEEP_SIZE_TEXT, KEEP_SIZE_LONGTEXT, VLC_FALSE );
     add_bool( "wxwin-bookmarks", 0, NULL,
               BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, VLC_FALSE );
 

@@ -69,10 +69,13 @@ private:
 
     wxWindow *p_child_window;
 
+    vlc_bool_t b_remember_size;
+    wxSize video_size;
+
     void UpdateSize( wxSizeEvent & );
     void UpdateHide( wxSizeEvent & );
     void OnControlEvent( wxCommandEvent & );
-
+    void OnSizeEvent( wxSizeEvent& );
     DECLARE_EVENT_TABLE();
 };
 
@@ -81,6 +84,7 @@ DEFINE_LOCAL_EVENT_TYPE( wxEVT_VLC_VIDEO );
 BEGIN_EVENT_TABLE(VideoWindow, wxWindow)
     EVT_CUSTOM( wxEVT_SIZE, UpdateSize_Event, VideoWindow::UpdateSize )
     EVT_CUSTOM( wxEVT_SIZE, UpdateHide_Event, VideoWindow::UpdateHide )
+    EVT_SIZE( VideoWindow::OnSizeEvent )
     EVT_COMMAND( SetStayOnTop_Event, wxEVT_VLC_VIDEO,
                  VideoWindow::OnControlEvent )
 END_EVENT_TABLE()
@@ -119,7 +123,10 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
     p_intf->p_sys->p_video_sizer = new wxBoxSizer( wxHORIZONTAL );
     p_intf->p_sys->p_video_sizer->Add( this, 1, wxEXPAND );
 
+    b_remember_size = VLC_FALSE;
     ReleaseWindow( NULL );
+
+    b_remember_size = config_GetInt( p_intf, "wxwin-keep-size" );
 }
 
 VideoWindow::~VideoWindow()
@@ -176,6 +183,14 @@ void *VideoWindow::GetWindow( vout_thread_t *_p_vout,
 
     p_vout = _p_vout;
 
+    /* Force old size */
+    if( b_remember_size &&
+        video_size.GetWidth() && video_size.GetHeight() )
+    {
+        *pi_width_hint = video_size.GetWidth();
+        *pi_height_hint = video_size.GetHeight();
+    }
+
     wxSizeEvent event( wxSize(*pi_width_hint, *pi_height_hint),
                        UpdateSize_Event );
     AddPendingEvent( event );
@@ -214,6 +229,8 @@ void VideoWindow::ReleaseWindow( void *p_window )
 
     p_vout = NULL;
 
+    if( b_remember_size ) video_size = GetClientSize();
+
 #if defined(__WXGTK__) || defined(WIN32)
     wxSizeEvent event( wxSize(0, 0), UpdateHide_Event );
     AddPendingEvent( event );
@@ -230,6 +247,7 @@ void VideoWindow::UpdateSize( wxSizeEvent &event )
         p_intf->p_sys->p_video_sizer->Layout();
         SetFocus();
     }
+
     p_intf->p_sys->p_video_sizer->SetMinSize( event.GetSize() );
 
     wxCommandEvent intf_event( wxEVT_INTF, 0 );
@@ -259,6 +277,18 @@ void VideoWindow::OnControlEvent( wxCommandEvent &event )
         p_parent->AddPendingEvent( intf_event );
         break;
     }
+}
+
+void VideoWindow::OnSizeEvent( wxSizeEvent &event )
+{
+    /* Ignore if no vout */
+    if( p_vout )
+        p_intf->p_sys->p_video_sizer->SetMinSize( event.GetSize() );
+
+    if( b_remember_size )
+        video_size = GetClientSize();
+
+    event.Skip();
 }
 
 static int ControlWindow( intf_thread_t *p_intf, void *p_window,
