@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.62 2003/10/29 17:32:55 zorglub Exp $
+ * $Id: playlist.c,v 1.63 2003/11/02 23:13:30 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -91,7 +91,6 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
 
     playlist_CreateGroup( p_playlist, strdup("Normal") );
 
-    msg_Dbg(p_playlist,"pouet");
     if( vlc_thread_create( p_playlist, "playlist", RunThread,
                            VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
     {
@@ -100,7 +99,6 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
         return NULL;
     }
 
-    msg_Dbg(p_playlist,"pouet2");
     /* The object has been initialized, now attach it */
     vlc_object_attach( p_playlist, p_parent );
 
@@ -273,8 +271,6 @@ static void RunThread ( playlist_t *p_playlist )
 
     /* Tell above that we're ready */
     vlc_thread_ready( p_playlist );
-
-    msg_Dbg(p_playlist,"pouet3");
 
     while( !p_playlist->b_die )
     {
