@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.12 2003/11/27 05:41:19 fenrir Exp $
+ * $Id: livedotcom.cpp,v 1.13 2003/12/04 18:13:28 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -621,7 +621,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
 
         if( tk->p_es || tk->b_quicktime )
         {
-            TAB_APPEND( p_sys->i_track, (void**)p_sys->track, (void*)tk );
+            TAB_APPEND( p_sys->i_track, p_sys->track, tk );
             tk->readSource = sub->readSource();
             tk->rtpSource  = sub->rtpSource();
         }
