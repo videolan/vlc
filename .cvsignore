@@ -4,6 +4,9 @@ core
 dep
 gmon.out
 vlc
-vlc.init
 vlc-debug.log
 vlc-debug.ct
+config.log
+config.cache
+config.status
+Makefile
