@@ -260,11 +260,16 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/mpeg2.icns \
 	extras/MacOSX/Resources/mpeg4.icns \
 	extras/MacOSX/Resources/vlc.icns \
+	extras/MacOSX/Resources/back.png \
+	extras/MacOSX/Resources/begin.png \
+	extras/MacOSX/Resources/end.png \
+	extras/MacOSX/Resources/forw.png \
+	extras/MacOSX/Resources/list.png \
 	extras/MacOSX/Resources/pause.png \
 	extras/MacOSX/Resources/play.png \
+	extras/MacOSX/Resources/prefs.png \
 	extras/MacOSX/Resources/stop.png \
-	extras/MacOSX/Resources/stepf.png \
-	extras/MacOSX/Resources/stepr.png \
+	extras/MacOSX/Resources/vlc_hg.png \
 	extras/MacOSX/vlc.pbproj/project.pbxproj \
 	$(NULL)
 

@@ -7,7 +7,7 @@
 	objects = {
 		014CEA410018CDE011CA2923 = {
 			isa = PBXBundleReference;
-			path = "VLC Media Player.bundle";
+			path = vlc.bundle;
 			refType = 3;
 		};
 		014CEA420018CDE011CA2923 = {
@@ -94,7 +94,7 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = "VLC Media Player";
+				PRODUCT_NAME = vlc;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 				WRAPPER_EXTENSION = bundle;
@@ -231,6 +231,16 @@
 				F6E4F91402D2648B01A80112,
 				F6E4F91502D2648B01A80112,
 				F69B0CA802E24F6401A80112,
+				A064F9EA03CB9EE000B21232,
+				A064F9EB03CB9EE000B21232,
+				A064F9EC03CB9EE000B21232,
+				A064F9ED03CB9EE000B21232,
+				A064F9EE03CB9EE000B21232,
+				A064F9EF03CB9EE000B21232,
+				A064F9F003CB9EE000B21232,
+				A064F9F103CB9EE000B21232,
+				A064F9F203CB9EE000B21232,
+				A064F9F303CB9EE000B21232,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -267,6 +277,16 @@
 				F6E4F90D02D2648B01A80112,
 				F6E4F90E02D2648B01A80112,
 				F6E4F90F02D2648B01A80112,
+				A064F9E003CB9EE000B21232,
+				A064F9E103CB9EE000B21232,
+				A064F9E203CB9EE000B21232,
+				A064F9E303CB9EE000B21232,
+				A064F9E403CB9EE000B21232,
+				A064F9E503CB9EE000B21232,
+				A064F9E603CB9EE000B21232,
+				A064F9E703CB9EE000B21232,
+				A064F9E803CB9EE000B21232,
+				A064F9E903CB9EE000B21232,
 				F69B0CA602E24F6401A80112,
 			);
 			isa = PBXGroup;
@@ -348,6 +368,136 @@
 //192
 //193
 //194
+//A00
+//A01
+//A02
+//A03
+//A04
+		A064F9E003CB9EE000B21232 = {
+			isa = PBXFileReference;
+			name = prefs.png;
+			path = Resources/prefs.png;
+			refType = 4;
+		};
+		A064F9E103CB9EE000B21232 = {
+			isa = PBXFileReference;
+			name = end.png;
+			path = Resources/end.png;
+			refType = 4;
+		};
+		A064F9E203CB9EE000B21232 = {
+			isa = PBXFileReference;
+			name = pause.png;
+			path = Resources/pause.png;
+			refType = 4;
+		};
+		A064F9E303CB9EE000B21232 = {
+			isa = PBXFileReference;
+			name = list.png;
+			path = Resources/list.png;
+			refType = 4;
+		};
+		A064F9E403CB9EE000B21232 = {
+			isa = PBXFileReference;
+			name = forw.png;
+			path = Resources/forw.png;
+			refType = 4;
+		};
+		A064F9E503CB9EE000B21232 = {
+			isa = PBXFileReference;
+			name = vlc_hg.png;
+			path = Resources/vlc_hg.png;
+			refType = 4;
+		};
+		A064F9E603CB9EE000B21232 = {
+			isa = PBXFileReference;
+			name = stop.png;
+			path = Resources/stop.png;
+			refType = 4;
+		};
+		A064F9E703CB9EE000B21232 = {
+			isa = PBXFileReference;
+			name = begin.png;
+			path = Resources/begin.png;
+			refType = 4;
+		};
+		A064F9E803CB9EE000B21232 = {
+			isa = PBXFileReference;
+			name = back.png;
+			path = Resources/back.png;
+			refType = 4;
+		};
+		A064F9E903CB9EE000B21232 = {
+			isa = PBXFileReference;
+			name = play.png;
+			path = Resources/play.png;
+			refType = 4;
+		};
+		A064F9EA03CB9EE000B21232 = {
+			fileRef = A064F9E003CB9EE000B21232;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		A064F9EB03CB9EE000B21232 = {
+			fileRef = A064F9E103CB9EE000B21232;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		A064F9EC03CB9EE000B21232 = {
+			fileRef = A064F9E203CB9EE000B21232;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		A064F9ED03CB9EE000B21232 = {
+			fileRef = A064F9E303CB9EE000B21232;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		A064F9EE03CB9EE000B21232 = {
+			fileRef = A064F9E403CB9EE000B21232;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		A064F9EF03CB9EE000B21232 = {
+			fileRef = A064F9E503CB9EE000B21232;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		A064F9F003CB9EE000B21232 = {
+			fileRef = A064F9E603CB9EE000B21232;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		A064F9F103CB9EE000B21232 = {
+			fileRef = A064F9E703CB9EE000B21232;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		A064F9F203CB9EE000B21232 = {
+			fileRef = A064F9E803CB9EE000B21232;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		A064F9F303CB9EE000B21232 = {
+			fileRef = A064F9E903CB9EE000B21232;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+//A00
+//A01
+//A02
+//A03
+//A04
 //F60
 //F61
 //F62
