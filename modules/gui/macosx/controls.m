@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.15 2003/01/28 01:50:52 hartman Exp $
+ * $Id: controls.m,v 1.16 2003/01/28 16:47:46 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -33,6 +33,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/aout.h>
+#include <vlc/input.h>
 
 #include <Cocoa/Cocoa.h> 
 #include <CoreAudio/AudioHardware.h>
@@ -438,17 +439,84 @@
 - (IBAction)deinterlace:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
-    BOOL bEnable = [sender state] == NSOffState;
+    NSMenuItem *o_mi = (NSMenuItem *)sender;
+    NSString *mode = [o_mi title];
+    char *psz_filter;
+    unsigned int  i;
 
-    if( bEnable )
+    psz_filter = config_GetPsz( p_intf, "filter" );
+
+    if( [mode isEqualToString: @"none"] )
     {
-        config_PutPsz( p_intf, "filter", "deinterlace" );
-        config_PutPsz( p_intf, "deinterlace-mode", 
-                       [[sender title] lossyCString] );
+        config_PutPsz( p_intf, "filter", "" );
     }
     else
     {
-        config_PutPsz( p_intf, "filter", NULL );
+        if( !psz_filter || !*psz_filter )
+        {
+            config_PutPsz( p_intf, "filter", "deinterlace" );
+        }
+        else
+        {
+            if( strstr( psz_filter, "deinterlace" ) == NULL )
+            {
+                psz_filter = realloc( psz_filter, strlen( psz_filter ) + 20 );
+                strcat( psz_filter, ",deinterlace" );
+            }
+            config_PutPsz( p_intf, "filter", psz_filter );
+        }
+    }
+
+    if( psz_filter )
+        free( psz_filter );
+
+    /* now restart all video stream */
+    if( p_intf->p_sys->p_input )
+    {
+        vout_thread_t *p_vout;
+        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
+
+        /* Warn the vout we are about to change the filter chain */
+        p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                  FIND_ANYWHERE );
+        if( p_vout )
+        {
+            p_vout->b_filter_change = VLC_TRUE;
+            vlc_object_release( p_vout );
+        }
+
+#define ES p_intf->p_sys->p_input->stream.pp_es[i]
+        for( i = 0 ; i < p_intf->p_sys->p_input->stream.i_es_number ; i++ )
+        {
+            if( ( ES->i_cat == VIDEO_ES ) &&
+                    ES->p_decoder_fifo != NULL )
+            {
+                input_UnselectES( p_intf->p_sys->p_input, ES );
+                input_SelectES( p_intf->p_sys->p_input, ES );
+            }
+#undef ES
+        }
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+    }
+
+    if( ![mode isEqualToString: @"none"] )
+    {
+        vout_thread_t *p_vout;
+	p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+				  FIND_ANYWHERE );
+	if( p_vout )
+	{
+	    vlc_value_t val;
+
+	    val.psz_string = (char *)[mode cString];
+	    if( var_Set( p_vout, "deinterlace-mode", val ) != VLC_SUCCESS )
+                config_PutPsz( p_intf, "deinterlace-mode", (char *)[mode cString] );
+
+	    vlc_object_release( p_vout );
+	}
+	else {
+            config_PutPsz( p_intf, "deinterlace-mode", (char *)[mode cString] );
+        }
     }
 }
 
