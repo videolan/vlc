@@ -589,7 +589,7 @@ subpicture_t *vout_SortSubPictures( vout_thread_t *p_vout,
      * displayed */
     if( p_ephemer != NULL )
     {
-        if( p_ephemer->i_start < ephemer_date )
+        if( p_ephemer->i_start <= ephemer_date )
         {
             /* Ephemer subpicture has lived too long */
             vout_DestroySubPicture( p_vout, p_ephemer );
