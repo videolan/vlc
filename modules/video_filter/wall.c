@@ -93,6 +93,8 @@ struct vout_sys_t
         vlc_bool_t b_active;
         int i_width;
         int i_height;
+        int i_left;
+        int i_top;
         vout_thread_t *p_vout;
     } *pp_vout;
 };
@@ -220,8 +222,19 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static int Init( vout_thread_t *p_vout )
 {
-    int i_index, i_row, i_col, i_width, i_height;
+    int i_index, i_row, i_col, i_width, i_height, i_left, i_top;
+    unsigned int i_target_width,i_target_height;
     picture_t *p_pic;
+    int i_aspect = 4*VOUT_ASPECT_FACTOR/3;
+    int i_align = 0;
+    unsigned int i_hstart, i_hend, i_vstart, i_vend;
+    unsigned int w1,h1,w2,h2;
+    int i_xpos, i_ypos;
+
+    i_xpos = var_CreateGetInteger( p_vout, "video-x" );
+    i_ypos = var_CreateGetInteger( p_vout, "video-y" );
+    if( i_xpos < 0 ) i_xpos = 0;
+    if( i_ypos < 0 ) i_ypos = 0;
 
     I_OUTPUTPICTURES = 0;
 
@@ -230,49 +243,106 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_width  = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
+    var_Create( p_vout, "align", VLC_VAR_INTEGER );
+
+    w1 = p_vout->output.i_width / p_vout->p_sys->i_col;
+    h1 = w1 * VOUT_ASPECT_FACTOR / i_aspect;
+    
+    h2 = p_vout->output.i_height / p_vout->p_sys->i_row;
+    w2 = h2 * i_aspect / VOUT_ASPECT_FACTOR;
+    
+    if ( h1 * p_vout->p_sys->i_row < p_vout->output.i_height )
+    {
+        i_target_width = w2;        
+        i_target_height = h2;
+        i_vstart = 0;
+        i_vend = p_vout->output.i_height;
+        i_hstart = ( i_target_width * p_vout->p_sys->i_col
+                     - p_vout->output.i_width ) / 2;
+        i_hend = i_hstart + p_vout->output.i_width;
+    }
+    else
+    {
+        i_target_height = h1;
+        i_target_width = w1;
+        i_hstart = 0;
+        i_hend = p_vout->output.i_width;
+        i_vstart = ( i_target_height * p_vout->p_sys->i_row
+                     - p_vout->output.i_height ) / 2;
+        i_vend = i_vstart + p_vout->output.i_height;
+    }
+    msg_Dbg( p_vout, "target resolution %dx%d", i_target_width, i_target_height );
 
     /* Try to open the real video output */
     msg_Dbg( p_vout, "spawning the real video outputs" );
 
     p_vout->p_sys->i_vout = 0;
+    msg_Dbg( p_vout, "target window (%d,%d)-(%d,%d)", i_hstart,i_vstart,i_hend,i_vend );
+    
 
-    /* FIXME: use bresenham instead of those ugly divisions */
+    i_top = 0;
+    i_height = 0;
     for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
     {
+        i_left = 0;
+        i_top += i_height;
         for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
         {
-            if( i_col + 1 < p_vout->p_sys->i_col )
-            {
-                i_width = ( p_vout->render.i_width
-                             / p_vout->p_sys->i_col ) & ~0x1;
-            }
-            else
-            {
-                i_width = p_vout->render.i_width
-                           - ( ( p_vout->render.i_width
-                                  / p_vout->p_sys->i_col ) & ~0x1 ) * i_col;
-            }
+            i_align = 0;
 
-            if( i_row + 1 < p_vout->p_sys->i_row )
+            if( i_col*i_target_width >= i_hstart &&
+                (i_col+1)*i_target_width <= i_hend )
             {
-                i_height = ( p_vout->render.i_height
-                              / p_vout->p_sys->i_row ) & ~0x3;
+                i_width = i_target_width;
+            }
+            else if( ( i_col + 1 ) * i_target_width < i_hstart ||
+                     ( i_col * i_target_width ) > i_hend )
+            {
+                i_width = 0;                
             }
             else
             {
-                i_height = p_vout->render.i_height
-                            - ( ( p_vout->render.i_height
-                                   / p_vout->p_sys->i_row ) & ~0x3 ) * i_row;
+                i_width = i_target_width - i_hstart % i_target_width;
+                i_align |= i_col > ( p_vout->p_sys->i_col / 2 ) ?
+                    VOUT_ALIGN_LEFT : VOUT_ALIGN_RIGHT;
+            }
+            
+            if( i_row * i_target_height >= i_vstart &&
+                ( i_row + 1 ) * i_target_height <= i_vend )
+            {
+                i_height = i_target_height;
+            }
+            else if( ( i_row + 1 ) * i_target_height < i_vstart ||
+                     ( i_row * i_target_height ) > i_vend )
+            {
+                i_height = 0;
+            }
+            else
+            {
+                i_height = i_target_height -
+                             i_vstart%i_target_height;
+                i_align |= i_row > ( p_vout->p_sys->i_row / 2 ) ?
+                    VOUT_ALIGN_TOP : VOUT_ALIGN_BOTTOM;
+            }
+            if( i_height == 0 || i_width == 0 )
+            {
+                p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].b_active = VLC_FALSE;
             }
 
             p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].i_width = i_width;
             p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].i_height = i_height;
+            p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].i_left = i_left;
+            p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].i_top = i_top;
+            i_left += i_width;
 
             if( !p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].b_active )
             {
                 p_vout->p_sys->i_vout++;
                 continue;
             }
+            var_SetInteger( p_vout, "align", i_align );
+            var_SetInteger( p_vout, "video-x", i_left + i_xpos - i_width);
+            var_SetInteger( p_vout, "video-y", i_top + i_ypos );
 
             p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout =
                 vout_Create( p_vout, i_width, i_height,
@@ -290,7 +360,6 @@ static int Init( vout_thread_t *p_vout )
             ADD_CALLBACKS(
                 p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout,
                 SendEvents );
-
             p_vout->p_sys->i_vout++;
         }
     }
@@ -349,28 +418,18 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
     i_vout = 0;
 
-    for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
-    {
-        pi_top_skip[i_plane] = 0;
-    }
-
     for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
     {
-        for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
-        {
-            pi_left_skip[i_plane] = 0;
-        }
-
         for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
         {
+            for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
+            {
+                pi_left_skip[i_plane] = p_vout->p_sys->pp_vout[ i_vout ].i_left * p_pic->p[ i_plane ].i_pitch / p_vout->output.i_width;
+                pi_top_skip[i_plane] = (p_vout->p_sys->pp_vout[ i_vout ].i_top * p_pic->p[ i_plane ].i_lines / p_vout->output.i_height)*p_pic->p[i_plane].i_pitch;
+            }
+
             if( !p_vout->p_sys->pp_vout[ i_vout ].b_active )
             {
-                for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
-                {
-                    pi_left_skip[i_plane] +=
-		     p_vout->p_sys->pp_vout[ i_vout ].i_width
-                         * p_pic->p[i_plane].i_pitch / p_vout->output.i_width;
-                }
                 i_vout++;
                 continue;
             }
@@ -417,7 +476,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                     p_out += i_out_pitch;
                 }
 
-                pi_left_skip[i_plane] += i_copy_pitch;
+//                pi_left_skip[i_plane] += i_copy_pitch;
             }
 
             vout_UnlinkPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
@@ -428,13 +487,13 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             i_vout++;
         }
 
-        for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
-        {
-            pi_top_skip[i_plane] += p_vout->p_sys->pp_vout[ i_vout ].i_height
-                                     * p_pic->p[i_plane].i_visible_lines
-                                     / p_vout->output.i_height
-                                     * p_pic->p[i_plane].i_pitch;
-        }
+/*         for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ ) */
+/*         { */
+/*             pi_top_skip[i_plane] += p_vout->p_sys->pp_vout[ i_vout ].i_height */
+/*                                      * p_pic->p[i_plane].i_visible_lines */
+/*                                      / p_vout->output.i_height */
+/*                                      * p_pic->p[i_plane].i_pitch; */
+/*         } */
     }
 }
 
