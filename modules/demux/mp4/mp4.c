@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.55 2004/01/18 22:00:00 fenrir Exp $
+ * $Id: mp4.c,v 1.56 2004/01/23 08:07:17 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -575,11 +575,11 @@ static int   Seek     ( input_thread_t *p_input, mtime_t i_date )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int   Control  ( input_thread_t *p_input, int i_query, va_list args )
+static int Control( input_thread_t *p_input, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_input->p_demux_data;
 
-    double   f, *pf;
+    double f, *pf;
     int64_t i64, *pi64;
 
     switch( i_query )
@@ -598,17 +598,24 @@ static int   Control  ( input_thread_t *p_input, int i_query, va_list args )
 
         case DEMUX_SET_POSITION:
             f = (double)va_arg( args, double );
-            i64 = (int64_t)( f *
-                             (double)1000000 *
-                             (double)p_sys->i_duration /
-                             (double)p_sys->i_timescale );
-            return Seek( p_input, i64 );
+            if( p_sys->i_timescale > 0 )
+            {
+                i64 = (int64_t)( f * (double)1000000 *
+                                 (double)p_sys->i_duration /
+                                 (double)p_sys->i_timescale );
+                return Seek( p_input, i64 );
+            }
+            else return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = (mtime_t)1000000 *
-                    (mtime_t)p_sys->i_time /
-                    (mtime_t)p_sys->i_timescale;
+            if( p_sys->i_timescale > 0 )
+            {
+                *pi64 = (mtime_t)1000000 *
+                        (mtime_t)p_sys->i_time /
+                        (mtime_t)p_sys->i_timescale;
+            }
+            else *pi64 = 0;
             return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:
@@ -617,13 +624,19 @@ static int   Control  ( input_thread_t *p_input, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = (mtime_t)1000000 *
-                    (mtime_t)p_sys->i_duration /
-                    (mtime_t)p_sys->i_timescale;
+            if( p_sys->i_timescale > 0 )
+            {
+                *pi64 = (mtime_t)1000000 *
+                        (mtime_t)p_sys->i_duration /
+                        (mtime_t)p_sys->i_timescale;
+            }
+            else *pi64 = 0;
             return VLC_SUCCESS;
+
         case DEMUX_GET_FPS:
             msg_Warn( p_input, "DEMUX_GET_FPS unimplemented !!" );
             return VLC_EGENERIC;
+
         default:
             msg_Err( p_input, "control query unimplemented !!!" );
             return demux_vaControlDefault( p_input, i_query, args );
