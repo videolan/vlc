@@ -2,7 +2,7 @@
  * demux2 adaptation layer.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: demux2.c,v 1.1 2004/01/04 14:28:11 fenrir Exp $
+ * $Id: demux2.c,v 1.2 2004/01/04 15:32:13 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -37,7 +37,7 @@ static void Demux2Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("demux2 adaptation layer" ) );
-    set_capability( "demux", 0 );
+    set_capability( "demux", 2 );
     set_callbacks( Demux2Open, Demux2Close );
     add_shortcut( "demux2" );
 vlc_module_end();

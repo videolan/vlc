@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: es_out.c,v 1.11 2003/12/24 09:46:08 gbazin Exp $
+ * $Id: es_out.c,v 1.12 2004/01/04 15:32:13 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -658,7 +658,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             /* search program */
             if( ( p_prgm = input_FindProgram( p_sys->p_input, i_group ) ) )
             {
-                input_ClockManageRef( p_sys->p_input, p_prgm, i_pcr );
+                input_ClockManageRef( p_sys->p_input, p_prgm, i_pcr * 9 / 100);
             }
             p_sys->b_pcr_set = VLC_TRUE;
             return VLC_SUCCESS;
