@@ -2,6 +2,29 @@
 # ChangeLog for vlc #
 #===================#
 
+0.4.5
+**
+
+  * ./plugins/x11/xcommon.c: we include Xmd.h before dpms.h (compilation fix
+    for Solaris).
+  * ALL: many BeOS fixes and enhancements.
+  * ALL: VLC is now compliant with MPEG-2 TS standards embedding A/52
+    audio. It can still read from the old VLS with --vls-backwards-compat.
+  * ./plugins/familiar: interface for familiar Linux.
+  * ./plugins/qte: Qt/embedded video output.
+  * ./plugins/network/ipv4.c: added a --iface-addr option to select which
+    interface to use for multicast sockets.
+  * configure.in, configure: user -mms-bitfields instead of -fnative-struct
+    for mingw32 gcc-3.x.
+  * include/interface.h, plugins/dummy/intf_dummy.c, plugins/text/logger.c,
+    plugins/text/rc.c: display message on Win32 explaining how to get back
+    to the GUI mode.
+  * include/threads_funcs.h, src/misc/win32_specific.c: ignore the
+    win9x-cv-method config option on WinNT when fast-mutex is not enabled.
+  * plugins/access/rtp.c: backported RTP access module from HEAD.
+  * plugins/access/http.c: fixed a compile issue in the HTTP plug-in.
+  * configure.in: fixed bug with $(QTDIR).
+
 0.4.4
 Sun, 11 Aug 2002 01:18:13 +0200
 

@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: intf_msg.c,v 1.49.2.1 2002/08/10 19:40:04 sam Exp $
+ * $Id: intf_msg.c,v 1.49.2.2 2002/10/10 22:51:02 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -311,14 +311,14 @@ static void QueueMsg( int i_type, int i_level, char *psz_format, va_list ap )
 #ifdef WIN32
     char *                  psz_temp;
 #endif
-#ifndef HAVE_VASPRINTF
+#if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN)
     int                     i_size = strlen(psz_format) + INTF_MAX_MSG_SIZE;
 #endif
 
     /*
      * Convert message to string
      */
-#ifdef HAVE_VASPRINTF
+#if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN)
     vasprintf( &psz_str, psz_format, ap );
 #else
     psz_str = (char*) malloc( i_size * sizeof(char) );
@@ -333,7 +333,7 @@ static void QueueMsg( int i_type, int i_level, char *psz_format, va_list ap )
         return;
     }
 
-#ifndef HAVE_VASPRINTF
+#if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN)
 #   ifdef WIN32
     psz_temp = ConvertPrintfFormatString(psz_format);
     if( !psz_temp )

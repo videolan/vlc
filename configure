@@ -1151,7 +1151,7 @@ test -n "$target_alias" &&
   program_prefix=${target_alias}-
 
 PACKAGE="vlc"
-VERSION="0.4.4"
+VERSION="0.4.5"
 CODENAME=Ourumov
 
 save_CFLAGS="${CFLAGS}"
