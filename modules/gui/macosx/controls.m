@@ -534,8 +534,6 @@
             if( !strcmp( val.psz_string, val_list.p_list->p_values[i].psz_string ) && !( i_type & VLC_VAR_ISCOMMAND ) )
                 [o_lmi setState: TRUE ];
 
-            free( another_val.psz_string );
-
             break;
 
         case VLC_VAR_INTEGER:
