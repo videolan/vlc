@@ -700,6 +700,7 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
         else
         {
             httpd_MsgAdd( answer, "Content-Length", "%d", 0 );
+            answer->i_body_offset = 0;
         }
 
         if( !strcmp( stream->psz_mime, "video/x-ms-asf-stream" ) )
@@ -713,12 +714,12 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
             httpd_MsgAdd( answer, "Pragma", "no-cache" );
             httpd_MsgAdd( answer, "Pragma", "client-id=%d", rand()&0x7fff );
             httpd_MsgAdd( answer, "Pragma", "features=\"broadcast\"" );
-#if 0
+
             /* Check if there is a xPlayStrm=1 */
             for( i = 0; i < query->i_name; i++ )
             {
                 if( !strcasecmp( query->name[i],  "Pragma" ) &&
-                    !strcasecmp( query->value[i], "xPlayStrm=1" ) )
+                    strstr( query->value[i], "xPlayStrm=1" ) )
                 {
                     b_xplaystream = VLC_TRUE;
                 }
@@ -728,7 +729,6 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
             {
                 answer->i_body_offset = 0;
             }
-#endif
         }
         else
         {
@@ -2024,7 +2024,7 @@ static void httpd_HostThread( httpd_host_t *host )
             }
             else if( cl->i_state == HTTPD_CLIENT_SEND_DONE )
             {
-                if( cl->i_mode == HTTPD_CLIENT_FILE )
+                if( cl->i_mode == HTTPD_CLIENT_FILE || cl->answer.i_body_offset == 0 )
                 {
                     cl->url = NULL;
                     if( ( cl->query.i_proto == HTTPD_PROTO_HTTP &&
