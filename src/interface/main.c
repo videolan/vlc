@@ -426,6 +426,8 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->ppsz_env  = ppsz_env;
     SetDefaultConfiguration();
 
+    intf_MsgImm( COPYRIGHT_MESSAGE "\n" );
+
     /* Parse command line options */
     opterr = 0;
     while( ( c = getopt_long( i_argc, ppsz_argv, psz_shortopts, longopts, 0 ) ) != EOF )
@@ -546,8 +548,6 @@ static void Usage( int i_fashion )
         intf_Msg( "Try `vlc --help' for more information.\n" );
         return;
     }
-
-    intf_MsgImm( COPYRIGHT_MESSAGE "\n" );
 
     /* Options */
     intf_Msg( "\n"
