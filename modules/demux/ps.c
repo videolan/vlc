@@ -193,7 +193,8 @@ static int Demux( demux_t *p_demux )
     case 0x1ba:
         if( !ps_pkt_parse_pack( p_pkt, &p_sys->i_scr, &i_mux_rate ) )
         {
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_scr );
+            /* done later on to work around bad vcd/svcd streams */
+            /* es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_scr ); */
             if( i_mux_rate > 0 ) p_sys->i_mux_rate = i_mux_rate;
         }
         block_Release( p_pkt );
@@ -235,6 +236,21 @@ static int Demux( demux_t *p_demux )
                 }
                 tk->b_seen = VLC_TRUE;
             }
+
+            /* The popular VCD/SVCD subtitling WinSubMux does not
+             * renumber the SCRs when merging subtitles into the PES */
+            if( tk->b_seen &&
+                ( tk->fmt.i_codec == VLC_FOURCC('o','g','t',' ') ||
+                  tk->fmt.i_codec == VLC_FOURCC('c','v','d',' ') ) )
+            {
+                p_sys->i_scr = -1;
+            }
+
+            if( p_sys->i_scr > 0 )
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_scr );
+
+            p_sys->i_scr = -1;
+
             if( tk->b_seen && tk->es &&
                 !ps_pkt_parse_pes( p_pkt, tk->i_skip ) )
             {
