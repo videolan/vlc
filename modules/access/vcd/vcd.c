@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.23 2003/08/09 19:39:17 gbazin Exp $
+ * $Id: vcd.c,v 1.24 2003/08/10 13:35:03 gbazin Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -334,8 +334,15 @@ static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
             if( i_entry + 1 < p_vcd->i_entries_nb &&
                     p_vcd->i_sector >= p_vcd->p_entries[i_entry + 1] )
             {
+                vlc_value_t val;
+
                 msg_Dbg( p_input, "new chapter" );
                 p_input->stream.p_selected_area->i_part ++;
+
+                /* Update the navigation variables without triggering
+                 * a callback */
+                val.i_int = p_input->stream.p_selected_area->i_part;
+                var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
             }
             vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
@@ -453,12 +460,19 @@ static void VCDSeek( input_thread_t * p_input, off_t i_off )
     /* Find chapter */
     if( p_vcd->b_valid_ep )
     {
-        for( i_index = 0 ; i_index < p_area->i_part_nb - 1 ; i_index ++ )
+        for( i_index = 2 ; i_index <= p_area->i_part_nb; i_index ++ )
         {
             if( p_vcd->i_sector < p_vcd->p_entries[p_area->i_plugin_data
-                + i_index + 1] )
+                + i_index - 1] )
             {
-                p_area->i_part = i_index;
+                vlc_value_t val;
+
+                p_area->i_part = i_index - 1;
+
+                /* Update the navigation variables without triggering
+                 * a callback */
+                val.i_int = p_area->i_part;
+                var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
                 break;
             }
         }
@@ -527,6 +541,15 @@ static int VCDEntryPoints( input_thread_t * p_input )
     p_vcd->i_entries_nb = 0;
 
 #define i_track BCD_TO_BIN(entries.entry[i].i_track)
+    /* Reset the i_part_nb for each track */
+    for( i = 0 ; i < i_nb ; i++ )
+    {
+        if( i_track <= p_input->stream.i_area_nb )
+        {
+            p_input->stream.pp_areas[i_track-1]->i_part_nb = 0;
+        }
+    }
+
     for( i = 0 ; i < i_nb ; i++ )
     {
         if( i_track <= p_input->stream.i_area_nb )
@@ -544,6 +567,9 @@ static int VCDEntryPoints( input_thread_t * p_input )
                                                             i_entry_index;
                 i_previous_track = i_track;
             }
+            msg_Dbg( p_input, "entry point %i begins at LBA: %i",
+                     i_entry_index, p_vcd->p_entries[i_entry_index] );
+
             i_entry_index ++;
             p_vcd->i_entries_nb ++;
         }
