@@ -107,6 +107,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
             }
 
 	    p_vpar->synchro.p_count_predict = predict;
+            p_vpar->synchro.current_p_count = 0;
 
 
             /* update all the structures for B images */
@@ -134,6 +135,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
             }
 
 	    p_vpar->synchro.b_count_predict = predict;
+            p_vpar->synchro.current_b_count = 0;
 
 
             break;
@@ -150,6 +152,9 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 {
 //    return( 1 );
 //    return( i_coding_type == I_CODING_TYPE || i_coding_type == P_CODING_TYPE );
+    intf_DbgMsg("vpar debug: synchro image %i - modulo is %i\n", i_coding_type, p_vpar->synchro.modulo);
+    intf_DbgMsg("vpar debug: synchro predict P %e - predict B %e\n", p_vpar->synchro.p_count_predict, p_vpar->synchro.b_count_predict);
+
     return( i_coding_type == I_CODING_TYPE );
 }
 

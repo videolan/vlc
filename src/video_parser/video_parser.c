@@ -96,6 +96,29 @@ vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
     p_vpar->bit_stream.fifo.buffer = 0;
     p_vpar->bit_stream.fifo.i_available = 0;
 
+    /*
+     * Initialize the synchro properties
+     */
+    p_vpar->synchro.modulo = 0;
+    /* assume there were about 3 P and 4 B images between I's */
+    p_vpar->synchro.current_p_count = 1;
+    p_vpar->synchro.p_count_predict = 3;
+    p_vpar->synchro.current_b_count = 1;
+    p_vpar->synchro.b_count_predict = 4;
+    {
+        int i;
+        for( i=0; i<6; i++)
+        {
+            p_vpar->synchro.tab_p[i].mean = 3;
+            p_vpar->synchro.tab_p[i].deviation = 1;
+            p_vpar->synchro.tab_p[i].count = 0;
+
+            p_vpar->synchro.tab_b[i].mean = 4;
+            p_vpar->synchro.tab_b[i].deviation = 1;
+            p_vpar->synchro.tab_b[i].count = 0;
+        }
+    }
+
 /* FIXME !!!! */
 p_vpar->p_vout = p_main->p_intf->p_vout;
 
