@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.9 2003/04/15 01:19:11 ipkiss Exp $
+ * $Id: gtk2_window.cpp,v 1.10 2003/04/15 11:46:19 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -284,7 +284,7 @@ void GTK2Window::WindowManualMove()
 {
     // Get mouse cursor position
     int x, y;
-    gdk_display_get_pointer( gdk_display_get_default(), NULL, &x, &y, NULL );
+    gdk_window_get_pointer( gdk_get_default_root_window(), &x, &y, NULL );
 
     // Move window and chek for magnetism
     p_intf->p_sys->p_theme->MoveSkinMagnet( this,
@@ -295,8 +295,8 @@ void GTK2Window::WindowManualMove()
 //---------------------------------------------------------------------------
 void GTK2Window::WindowManualMoveInit()
 {
-    gdk_display_get_pointer( gdk_display_get_default(), NULL, &CursorX,
-                             &CursorY, NULL );
+    gdk_window_get_pointer( gdk_get_default_root_window(), &CursorX, &CursorY,
+                            NULL );
     WindowX = Left;
     WindowY = Top;
 }
