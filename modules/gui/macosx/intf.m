@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.69 2003/04/06 23:21:13 massiot Exp $
+ * $Id: intf.m,v 1.70 2003/04/15 14:05:13 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -412,9 +412,16 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename
 {
+    intf_thread_t * p_intf = [NSApp getIntf];
+    
     [o_playlist appendArray:
         [NSArray arrayWithObject: o_filename] atPos: -1 enqueue: NO];
-
+    
+    config_PutPsz( [NSApp getIntf], "sub-file", "" );
+    config_PutInt( p_intf, "sub-delay", 0 );
+    config_PutFloat( p_intf, "sub-fps", 0.0 );
+    config_PutPsz( p_intf, "sout", "" );
+            
     return( TRUE );
 }
 

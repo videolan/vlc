@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.28 2003/04/09 14:12:49 hartman Exp $
+ * $Id: open.m,v 1.29 2003/04/15 14:05:13 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -269,7 +269,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     int i_result;
 
     [o_tabview selectTabViewItemAtIndex: i_type];
-    [o_ckbox_enqueue setState: NSOnState];
     [o_file_sub_ckbox setState: NSOffState];
     
     i_result = [NSApp runModalForWindow: o_panel];
@@ -283,6 +282,10 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         if ( [o_sout_cbox state] )
         {
             config_PutPsz( p_intf, "sout", [o_sout lossyCString] );
+        }
+        else
+        {
+            config_PutPsz( p_intf, "sout", "" );
         }
 
         NSString *o_source = [o_mrl stringValue];
@@ -813,6 +816,10 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
                 sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
         
         [o_playlist appendArray: o_values atPos: -1 enqueue:NO];
+        config_PutPsz( p_intf, "sub-file", "" );
+        config_PutInt( p_intf, "sub-delay", 0 );
+        config_PutFloat( p_intf, "sub-fps", 0.0 );
+        config_PutPsz( p_intf, "sout", "" );
     }
 }
 

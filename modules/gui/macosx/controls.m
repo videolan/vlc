@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.30 2003/04/06 23:21:13 massiot Exp $
+ * $Id: controls.m,v 1.31 2003/04/15 14:05:13 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -32,6 +32,7 @@
 
 #include "intf.h"
 #include "vout.h"
+#include "open.h"
 #include "controls.h"
 
 /*****************************************************************************
@@ -65,7 +66,7 @@
         else
         {
             vlc_object_release( p_playlist );
-            [o_open openFile: nil];
+            [o_open openFileGeneric: nil];
         }
     }
 }
