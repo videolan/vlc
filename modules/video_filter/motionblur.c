@@ -2,7 +2,7 @@
  * motion_blur.c : motion blur filter for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: motionblur.c,v 1.1 2002/08/26 22:35:58 sigmunau Exp $
+ * $Id: motionblur.c,v 1.2 2002/08/27 21:53:54 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -291,10 +291,13 @@ static void RenderBlur( vout_thread_t *p_vout, picture_t *p_oldpic,
         p_old = p_oldpic->p[i_plane].p_pixels;
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch *
             p_outpic->p[i_plane].i_lines;
-        while ( p_out < p_out_end +4 )
+        while ( p_out < p_out_end )
         {
-            *p_out++ = (((*p_old++) * i_oldfactor) + ((*p_new++) * i_newfactor))>>7;
+            *p_out++ = (((*p_old++) * i_oldfactor) +
+                        ((*p_new++) * i_newfactor)) >> 7;
+            
 //            *p_out++ = (*p_old++ >> 1) + (*p_new++ >> 1);
+                
         }
     }
 }
