@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.63 2002/07/23 00:39:16 sam Exp $
+ * $Id: vout_beos.cpp,v 1.64 2002/07/28 01:46:26 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -108,6 +108,7 @@ VideoWindow::VideoWindow( int v_width, int v_height,
     /* set the VideoWindow variables */
     teardownwindow = false;
     is_zoomed = false;
+    vsync = false;
     i_buffer = 0;
 
     /* call ScreenChanged to set vsync correctly */
@@ -130,17 +131,17 @@ VideoWindow::VideoWindow( int v_width, int v_height,
     mode = SelectDrawingMode(v_width, v_height);
 
     // remember current settings
-    i_width = frame.IntegerWidth();
-    i_height = frame.IntegerHeight();
-    FrameResized(frame.IntegerWidth(), frame.IntegerHeight());
+    i_width = v_width;
+    i_height = v_height;
+    FrameResized(v_width, v_height);
 
     if (mode == OVERLAY)
     {
        overlay_restrictions r;
 
        bitmap[1]->GetOverlayRestrictions(&r);
-       SetSizeLimits((i_width * r.min_width_scale), i_width * r.max_width_scale,
-                     (i_height * r.min_height_scale), i_height * r.max_height_scale);
+       SetSizeLimits((i_width * r.min_width_scale) + 1, i_width * r.max_width_scale,
+                     (i_height * r.min_height_scale) + 1, i_height * r.max_height_scale);
     }
     Show();
 }
@@ -431,9 +432,9 @@ void VLCView::MouseDown(BPoint point)
            menu->AddItem(normWindItem);
            
 		   BMessage *winFloatFeel = new BMessage(WINDOW_FEEL);
-		   winFloatFeel->AddInt16("WinFeel", (int16)B_FLOATING_APP_WINDOW_FEEL);
+		   winFloatFeel->AddInt16("WinFeel", (int16)B_MODAL_ALL_WINDOW_FEEL);
            BMenuItem *onTopWindItem = new BMenuItem("App Top", winFloatFeel);
-           onTopWindItem->SetMarked(vWindow->Feel() == B_FLOATING_APP_WINDOW_FEEL);
+           onTopWindItem->SetMarked(vWindow->Feel() == B_MODAL_ALL_WINDOW_FEEL);
            menu->AddItem(onTopWindItem);
            
 		   BMessage *winAllFeel = new BMessage(WINDOW_FEEL);
