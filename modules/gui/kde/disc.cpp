@@ -28,23 +28,23 @@ KDiskDialog::KDiskDialog( QWidget *parent, const char *name )
 
     QHBox *deviceSelectHBox = new QHBox( pageVBox );
     deviceSelectHBox->setSpacing( 5 );
-    fButtonGroup = new QVButtonGroup( "Disk type", deviceSelectHBox );
+    fButtonGroup = new QVButtonGroup( _("Disk type"), deviceSelectHBox );
     fDVDButton = new QRadioButton( "DVD", fButtonGroup);
     fDVDButton->setChecked( true );
     fVCDButton = new QRadioButton( "VCD", fButtonGroup);
     fVCDButton->setEnabled( false );
 
-    QVGroupBox *startVBox = new QVGroupBox( "Starting position", deviceSelectHBox );
+    QVGroupBox *startVBox = new QVGroupBox( _("Starting position"), deviceSelectHBox );
 
     QHBox *titleHBox = new QHBox( startVBox );
-    new QLabel( "Title ", titleHBox );
+    new QLabel( _("Title "), titleHBox );
     fTitle = new QSpinBox( titleHBox );
     QHBox *chapterHBox = new QHBox( startVBox );
-    new QLabel( "Chapter ", chapterHBox );
+    new QLabel( _("Chapter "), chapterHBox );
     fChapter = new QSpinBox( chapterHBox );
 
     QHBox *deviceNameHBox = new QHBox( pageVBox );
-    new QLabel( "Device name ", deviceNameHBox );
+    new QLabel( _("Device name "), deviceNameHBox );
     fLineEdit = new KLineEdit( "/dev/dvd", deviceNameHBox );
 }
 

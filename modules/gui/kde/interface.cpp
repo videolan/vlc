@@ -86,7 +86,7 @@ KInterface::~KInterface()
 void KInterface::initActions()
 {
     languages = new KActionMenu( _( "Languages" ), actionCollection(),
-                                 "language" );
+                                 _("language") );
     languages->setEnabled( false );
     languageCollection = new KActionCollection( this );
     subtitleCollection = new KActionCollection( this );
@@ -107,28 +107,28 @@ void KInterface::initActions()
     viewStatusBar = KStdAction::showStatusbar(this, SLOT(slotViewStatusBar()),
                                               actionCollection());
 
-    diskOpen = new KAction( i18n( "Open &Disk" ), 0, 0, this,
+    diskOpen = new KAction( i18n( _("Open &Disk") ), 0, 0, this,
                             SLOT( slotOpenDisk() ), actionCollection(),
                             "open_disk" );
-    streamOpen = new KAction( i18n( "Open &Stream" ), 0, 0, this,
+    streamOpen = new KAction( i18n( _("Open &Stream") ), 0, 0, this,
                               SLOT( slotOpenStream() ), actionCollection(),
                               "open_stream" );
-    backward = new KAction( i18n( "&Backward" ), 0, 0, this,
+    backward = new KAction( i18n( _("&Backward") ), 0, 0, this,
                             SLOT( slotBackward() ), actionCollection(),
                             "backward" );
-    stop = new KAction( i18n( "&Stop" ), 0, 0, this,
+    stop = new KAction( i18n( _("&Stop") ), 0, 0, this,
                         SLOT( slotStop() ), actionCollection(), "stop" );
-    play = new KAction( i18n( "&Play" ), 0, 0, this,
+    play = new KAction( i18n( _("&Play") ), 0, 0, this,
                         SLOT( slotPlay() ), actionCollection(), "play" );
-    pause = new KAction( i18n( "P&ause" ), 0, 0, this,
+    pause = new KAction( i18n( _("P&ause") ), 0, 0, this,
                          SLOT( slotPause() ), actionCollection(), "pause" );
-    slow = new KAction( i18n( "&Slow" ), 0, 0, this,
+    slow = new KAction( i18n( _("&Slow") ), 0, 0, this,
                         SLOT( slotSlow() ), actionCollection(), "slow" );
-    fast = new KAction( i18n( "Fas&t" ), 0, 0, this,
+    fast = new KAction( i18n( _("Fas&t") ), 0, 0, this,
                         SLOT( slotFast() ), actionCollection(), "fast" );
-    prev = new KAction( i18n( "Prev" ), 0, 0, this,
+    prev = new KAction( i18n( _("Prev") ), 0, 0, this,
                         SLOT( slotPrev() ), actionCollection(), "prev" );
-    next = new KAction( i18n( "Next" ), 0, 0, this,
+    next = new KAction( i18n( _("Next") ), 0, 0, this,
                         SLOT( slotNext() ), actionCollection(), "next" );
     messages = new KAction( _( "Messages..." ), 0, 0, this,
                             SLOT( slotShowMessages() ), actionCollection(),
@@ -145,22 +145,22 @@ void KInterface::initActions()
     title->setEnabled( false );
     chapter = new KActionMenu( _( "Chapter" ), actionCollection(), "chapter" );
     chapter->setEnabled( false );
-    fileOpen->setStatusText(i18n("Opens an existing document"));
-    fileOpenRecent->setStatusText(i18n("Opens a recently used file"));
-    fileQuit->setStatusText(i18n("Quits the application"));
-    viewToolBar->setStatusText(i18n("Enables/disables the toolbar"));
-    viewStatusBar->setStatusText(i18n("Enables/disables the statusbar"));
+    fileOpen->setStatusText(i18n(_("Opens an existing document")));
+    fileOpenRecent->setStatusText(i18n(_("Opens a recently used file")));
+    fileQuit->setStatusText(i18n(_("Quits the application")));
+    viewToolBar->setStatusText(i18n(_("Enables/disables the toolbar")));
+    viewStatusBar->setStatusText(i18n(_("Enables/disables the statusbar")));
 
-    diskOpen->setStatusText( i18n( "Opens a disk") );
-    streamOpen->setStatusText( i18n( "Opens a network stream" ) );
-    backward->setStatusText( i18n( "Backward" ) );
-    stop->setStatusText( i18n( "Stops playback" ) );
-    play->setStatusText( i18n( "Starts playback" ) );
-    pause->setStatusText( i18n( "Pauses playback" ) );
-    slow->setStatusText( i18n( "Slow" ) );
-    fast->setStatusText( i18n( "Fast" ) );
-    prev->setStatusText( i18n( "Prev" ) );
-    next->setStatusText( i18n( "Next" ) );
+    diskOpen->setStatusText( i18n( _("Opens a disk") ) );
+    streamOpen->setStatusText( i18n( _("Opens a network stream") ) );
+    backward->setStatusText( i18n( _("Backward") ) );
+    stop->setStatusText( i18n( _("Stops playback") ) );
+    play->setStatusText( i18n( _("Starts playback") ) );
+    pause->setStatusText( i18n( _("Pauses playback") ) );
+    slow->setStatusText( i18n( _("Slow") ) );
+    fast->setStatusText( i18n( _("Fast") ) );
+    prev->setStatusText( i18n( _("Prev") ) );
+    next->setStatusText( i18n( _("Next") ) );
     // use the absolute path to your ktestui.rc file for testing purpose in createGUI();
     char *psz_uifile = config_GetPsz( p_intf, "kde-uirc" );
     createGUI( psz_uifile );
@@ -172,7 +172,7 @@ void KInterface::initStatusBar()
   ///////////////////////////////////////////////////////////////////
   // STATUSBAR
   // TODO: add your own items you need for displaying current application status.
-    statusBar()->insertItem(i18n("Ready."), ID_STATUS_MSG, 1, false);
+    statusBar()->insertItem(i18n(_("Ready.")), ID_STATUS_MSG, 1, false);
     statusBar()->setItemAlignment( ID_STATUS_MSG, AlignLeft | AlignVCenter );
     statusBar()->insertItem( "0:00:00", ID_DATE, 0, true );
 }
@@ -197,9 +197,9 @@ void KInterface::slotFileOpen()
 {
     playlist_t *p_playlist;
 
-    slotStatusMsg( i18n( "Opening file..." ) );
+    slotStatusMsg( i18n( _("Opening file...") ) );
     KURL url=KFileDialog::getOpenURL( QString::null,
-            i18n( "*|All files" ), this, i18n( "Open File..." ) );
+            i18n( "*|All files" ), this, i18n( _("Open File...") ) );
 
     if( !url.isEmpty() )
     {
@@ -214,25 +214,25 @@ void KInterface::slotFileOpen()
         }
     }
 
-    slotStatusMsg( i18n( "Ready." ) );
+    slotStatusMsg( i18n( _("Ready.") ) );
 }
 
 void KInterface::slotFileOpenRecent(const KURL& url)
 {
-  slotStatusMsg(i18n("Opening file..."));
-  slotStatusMsg(i18n("Ready."));
+  slotStatusMsg(i18n(_("Opening file...")));
+  slotStatusMsg(i18n(_("Ready.")));
 }
 
 void KInterface::slotFileQuit()
 {
-    slotStatusMsg(i18n("Exiting..."));
+    slotStatusMsg(i18n(_("Exiting...")));
     p_intf->p_vlc->b_die = VLC_TRUE;
-    slotStatusMsg(i18n("Ready."));
+    slotStatusMsg(i18n(_("Ready.")));
 }
 
 void KInterface::slotViewToolBar()
 {
-  slotStatusMsg(i18n("Toggling toolbar..."));
+  slotStatusMsg(i18n(_("Toggling toolbar...")));
   ///////////////////////////////////////////////////////////////////
   // turn Toolbar on or off
   if(!viewToolBar->isChecked())
@@ -244,12 +244,12 @@ void KInterface::slotViewToolBar()
     toolBar("mainToolBar")->show();
   }        
 
-  slotStatusMsg(i18n("Ready."));
+  slotStatusMsg(i18n(_("Ready.")));
 }
 
 void KInterface::slotViewStatusBar()
 {
-  slotStatusMsg(i18n("Toggle the statusbar..."));
+  slotStatusMsg(i18n(_("Toggle the statusbar...")));
   ///////////////////////////////////////////////////////////////////
   //turn Statusbar on or off
   if(!viewStatusBar->isChecked())
@@ -261,7 +261,7 @@ void KInterface::slotViewStatusBar()
     statusBar()->show();
   }
 
-  slotStatusMsg(i18n("Ready."));
+  slotStatusMsg(i18n(_("Ready.")));
 }
 
 void KInterface::slotShowPreferences()

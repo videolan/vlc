@@ -2,7 +2,7 @@
  * kde.cpp : KDE plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: kde.cpp,v 1.13 2003/12/04 16:02:54 sam Exp $
+ * $Id: kde.cpp,v 1.14 2004/01/25 15:42:57 kuehne Exp $
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001
  *
@@ -105,10 +105,10 @@ void run(intf_thread_t *p_intf)
 {
     p_intf->p_sys->p_about =
       new KAboutData( "kvlc", I18N_NOOP("Kvlc"), VERSION,
-         _("This is the VideoLAN Client, a DVD, MPEG and DivX player. It can "
+         _("This is the VLC media player, a DVD, MPEG and DivX player. It can "
            "play MPEG and MPEG2 files from a file or from a network source."),
          KAboutData::License_GPL,
-         _("(c) 1996-2003 the VideoLAN team"),
+         _("(c) 1996-2004 the VideoLAN team"),
          0, 0, "");
 
     p_intf->p_sys->p_about->addAuthor( "the VideoLAN team", 0,

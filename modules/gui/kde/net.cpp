@@ -28,7 +28,7 @@ KNetDialog::KNetDialog( QWidget *parent, const char *name )
 
     QHBox *layout = new QHBox( pageVBox );
     layout->setSpacing( 5 );
-    fButtonGroup = new QVButtonGroup( "Protocol", layout );
+    fButtonGroup = new QVButtonGroup( _("Protocol"), layout );
     fTSButton = new QRadioButton( "TS", fButtonGroup);
     fTSButton->setChecked( true );
     fRTPButton = new QRadioButton( "RTP", fButtonGroup);
@@ -36,13 +36,13 @@ KNetDialog::KNetDialog( QWidget *parent, const char *name )
     fHTTPButton = new QRadioButton( "HTTP", fButtonGroup);
     fHTTPButton->setEnabled( false );
 
-    QVGroupBox *serverVBox = new QVGroupBox( "Starting position", layout );
+    QVGroupBox *serverVBox = new QVGroupBox( _("Starting position"), layout );
 
     QHBox *titleHBox = new QHBox( serverVBox );
-    new QLabel( "Address ", titleHBox );
+    new QLabel( _("Address "), titleHBox );
     fAddress = new KLineEdit( "vls", titleHBox );
     QHBox *portHBox = new QHBox( serverVBox );
-    new QLabel( "Port ", portHBox );
+    new QLabel( _("Port "), portHBox );
     fPort = new QSpinBox( 0, 65535, 1, portHBox );
 }
 
