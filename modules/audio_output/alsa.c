@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.39 2004/01/25 18:53:07 gbazin Exp $
+ * $Id: alsa.c,v 1.40 2004/02/20 19:21:23 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -63,6 +63,8 @@ struct aout_sys_t
 
     vlc_mutex_t lock;
     vlc_cond_t  wait ;
+
+    snd_pcm_status_t *p_status;
 };
 
 #define A52_FRAME_NB 1536
@@ -282,6 +284,7 @@ static int Open( vlc_object_t *p_this )
     }
     p_sys->b_playing = VLC_FALSE;
     p_sys->start_date = 0;
+    p_sys->p_status = (snd_pcm_status_t *)malloc(snd_pcm_status_sizeof());
     vlc_cond_init( p_aout, &p_sys->wait );
     vlc_mutex_init( p_aout, &p_sys->lock );
 
@@ -644,6 +647,7 @@ static void Close( vlc_object_t *p_this )
     snd_output_close( p_sys->p_snd_stderr );
 #endif
 
+    free( p_sys->p_status );
     free( p_sys );
 }
 
@@ -677,12 +681,10 @@ static void ALSAFill( aout_instance_t * p_aout )
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
     aout_buffer_t * p_buffer;
-    snd_pcm_status_t * p_status;
+    snd_pcm_status_t * p_status = p_sys->p_status;
     snd_timestamp_t ts_next;
     int i_snd_rc;
     mtime_t next_date;
-
-    snd_pcm_status_alloca( &p_status );
 
     /* Fill in the buffer until space or audio output buffer shortage */
     {
