@@ -1,6 +1,16 @@
-vlc (0.5.0-0CVS) unstable; urgency=low
+vlc (0.5.0-1) unstable; urgency=low
 
-  * Current CVS - do NOT release as is!
+  * New upstream release (Closes: #157166).
+  * Audio MPEG and A52 decoders now use external libraries (libmad, liba52).
+  * Build-Depends are now valid (Closes: #147103).
+  * More robust AVI parser (Closes: #158037).
+  * An issue with X taking more and more CPU was fixed (Closes: #153286).
+  * Package now includes a NEWS file.
+  * New package containing a Mozilla plugin.
+  * New codec packages: Ogg/Vorbis, DV.
+  * New GUI package: wxvlc (wxWindows).
+  * New debian/woody-buildpackage file that can be used to build Woody
+    packages.
 
  -- Samuel Hocevar <sam@zoy.org>  Thu,  4 Jul 2002 17:44:25 +0200
 
