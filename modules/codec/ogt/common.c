@@ -2,7 +2,7 @@
  * Common SVCD and CVD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: common.c,v 1.12 2004/01/31 05:53:35 rocky Exp $
+ * $Id: common.c,v 1.13 2004/02/22 10:52:23 rocky Exp $
  *
  * Author: Rocky Bernstein <rocky@panix.com>
  *   based on code from:
@@ -76,6 +76,7 @@ void VCDSubClose( vlc_object_t *p_this )
         block_ChainRelease( p_sys->p_block );
     }
 
+    free(p_sys->subtitle_data);
     free( p_sys );
 }
 
