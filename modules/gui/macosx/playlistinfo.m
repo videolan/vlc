@@ -69,14 +69,16 @@
             [o_uri_txt setStringValue:
                 ([NSString stringWithUTF8String:p_playlist->
                     pp_items[i_item]->psz_uri] == nil ) ?
-                @"" :
+                [NSString stringWithCString:p_playlist->
+                    pp_items[i_item]->psz_uri] :
                 [NSString stringWithUTF8String:p_playlist->
                     pp_items[i_item]->psz_uri]];
 
             [o_title_txt setStringValue:
                 ([NSString stringWithUTF8String:p_playlist->
                     pp_items[i_item]->psz_name] == nil ) ?
-                @"" :
+                [NSString stringWithCString:p_playlist->
+                    pp_items[i_item]->psz_name] :
                 [NSString stringWithUTF8String:p_playlist->
                     pp_items[i_item]->psz_name]];
 
