@@ -1,3 +1,13 @@
+2003-08-13 Wednesday 01:45  gbazin
+
+ * modules/access/dvdplay/*: support for dvd menus navigation ("dvd_menus" object variable).
+ * modules/gui/wxwindows/menus.cpp: support for dvd menus navigation.
+ * src/input/input_programs.c: programs object var was not reset correctly.
+
+2003-08-12 Tuesday 18:34  gbazin
+
+ * ChangeLog: re-re-re-updated the changelog for the 0.6.2 release.
+
 2003-08-12 Tuesday 18:25  gbazin
 
  * po/de.po: update of the german translation by Felix Kühne.
