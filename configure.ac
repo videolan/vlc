@@ -1222,7 +1222,7 @@ then
   VLC_ADD_PLUGINS([packetizer_copy])
 
   VLC_ADD_PLUGINS([stream_out_dummy stream_out_standard stream_out_es stream_out_rtp stream_out_description vod_rtsp])
-  VLC_ADD_PLUGINS([stream_out_duplicate stream_out_gather stream_out_display stream_out_transcode])
+  VLC_ADD_PLUGINS([stream_out_duplicate stream_out_gather stream_out_display stream_out_transcode stream_out_bridge])
 #  VLC_ADD_PLUGINS([stream_out_transrate])
 
   AC_DEFINE(ENABLE_SOUT, 1, Define if you want the stream output support)
