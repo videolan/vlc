@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.23 2003/08/14 11:47:32 gbazin Exp $
+ * $Id: directx.c,v 1.24 2003/12/15 21:35:37 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -477,9 +477,12 @@ static void Probe( aout_instance_t * p_aout )
     case DSSPEAKER_QUAD:
         val.i_int = AOUT_VAR_2F2R;
         break;
+#if 0 /* Lots of people just get their settings wrong and complain that
+       * this is a problem with VLC so just don't ever set mono by default. */
     case DSSPEAKER_MONO:
         val.i_int = AOUT_VAR_MONO;
         break;
+#endif
     case DSSPEAKER_SURROUND:
     case DSSPEAKER_STEREO:
     default:
