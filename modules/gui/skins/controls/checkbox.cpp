@@ -2,7 +2,7 @@
  * checkbox.cpp: Checkbox control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: checkbox.cpp,v 1.8 2003/07/26 14:04:33 ipkiss Exp $
+ * $Id: checkbox.cpp,v 1.9 2003/07/26 15:36:46 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -324,7 +324,7 @@ bool ControlCheckBox::MouseMove( int x, int y, int button )
         CursorIn = false;
         return true;
     }
-    return false:
+    return false;
 }
 //---------------------------------------------------------------------------
 bool ControlCheckBox::MouseOver( int x, int y )
