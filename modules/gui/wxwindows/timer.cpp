@@ -104,17 +104,15 @@ void Timer::Notify()
         /* Show slider */
         if( p_intf->p_sys->p_input )
         {
-            p_main_interface->slider->SetValue( 0 );
-            p_main_interface->slider_frame->Show();
-            p_main_interface->frame_sizer->Show(
-                p_main_interface->slider_frame );
-            p_main_interface->frame_sizer->Layout();
-            p_main_interface->frame_sizer->Fit( p_main_interface );
-
             if( p_intf->p_sys->p_input->stream.b_seekable )
-                p_main_interface->slider->Enable();
-            else
-                p_main_interface->slider->Disable();
+            {
+                p_main_interface->slider->SetValue( 0 );
+                p_main_interface->slider_frame->Show();
+                p_main_interface->frame_sizer->Show(
+                    p_main_interface->slider_frame );
+                p_main_interface->frame_sizer->Layout();
+                p_main_interface->frame_sizer->Fit( p_main_interface );
+            }
 
             p_main_interface->statusbar->SetStatusText(
                 wxU(p_intf->p_sys->p_input->psz_source), 2 );
