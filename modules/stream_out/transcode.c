@@ -872,10 +872,16 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     /* Sanity check for audio channels */
     id->p_encoder->fmt_out.audio.i_channels =
         __MIN( id->p_encoder->fmt_out.audio.i_channels,
-               id->p_decoder->fmt_in.audio.i_channels );
-    id->p_encoder->fmt_out.audio.i_physical_channels =
-        id->p_encoder->fmt_out.audio.i_original_channels =
-            pi_channels_maps[id->p_encoder->fmt_out.audio.i_channels];
+               id->p_decoder->fmt_out.audio.i_channels );
+    if( id->p_decoder->fmt_out.audio.i_channels ==
+        id->p_encoder->fmt_out.audio.i_channels )
+        id->p_encoder->fmt_out.audio.i_physical_channels =
+            id->p_encoder->fmt_out.audio.i_original_channels =
+                id->p_decoder->fmt_out.audio.i_physical_channels;
+    else
+        id->p_encoder->fmt_out.audio.i_physical_channels =
+            id->p_encoder->fmt_out.audio.i_original_channels =
+                pi_channels_maps[id->p_encoder->fmt_out.audio.i_channels];
 
     /* Initialization of encoder format structures */
     es_format_Init( &id->p_encoder->fmt_in, AUDIO_ES, AOUT_FMT_S16_NE );
@@ -883,7 +889,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     id->p_encoder->fmt_in.audio.i_rate = id->p_encoder->fmt_out.audio.i_rate;
     id->p_encoder->fmt_in.audio.i_physical_channels =
         id->p_encoder->fmt_in.audio.i_original_channels =
-            pi_channels_maps[id->p_encoder->fmt_out.audio.i_channels];
+            id->p_encoder->fmt_out.audio.i_physical_channels;
     id->p_encoder->fmt_in.audio.i_channels =
         id->p_encoder->fmt_out.audio.i_channels;
     id->p_encoder->fmt_in.audio.i_bitspersample = 16;
