@@ -607,9 +607,19 @@ static int Connect( access_t *p_access, int64_t i_tell )
         {
             psz_path = "/";
         }
-        net_Printf( VLC_OBJECT(p_access), p_sys->fd,
-                    "GET %s HTTP/1.%d\r\nHost: %s\r\n",
-                    psz_path, p_sys->i_version, p_sys->url.psz_host );
+        if( p_sys->url.i_port != 80)
+        {
+            net_Printf( VLC_OBJECT(p_access), p_sys->fd,
+                        "GET %s HTTP/1.%d\r\nHost: %s:%d\r\n",
+                        psz_path, p_sys->i_version, p_sys->url.psz_host,
+                        p_sys->url.i_port );
+        }
+        else
+        {        
+            net_Printf( VLC_OBJECT(p_access), p_sys->fd,
+                        "GET %s HTTP/1.%d\r\nHost: %s\r\n",
+                        psz_path, p_sys->i_version, p_sys->url.psz_host );
+        }
     }
     /* User Agent */
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, "User-Agent: %s\r\n",
