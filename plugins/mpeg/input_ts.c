@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.6 2001/02/21 04:38:59 henri Exp $
+ * $Id: input_ts.c,v 1.7 2001/03/05 11:53:44 sam Exp $
  *
  * Authors: 
  *
@@ -32,9 +32,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <sys/uio.h>
 
 #include <sys/types.h>
+#include <sys/uio.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>

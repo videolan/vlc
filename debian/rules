@@ -95,9 +95,15 @@ binary-arch: build install
 	dh_installdeb
 #	dh_perl
 	dh_shlibdeps -Nvlc-glide
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
+	if [ $(DEB_BUILD_ARCH) = i386 ]; then \
+		dh_gencontrol ;\
+		dh_md5sums ;\
+		dh_builddeb ;\
+	else \
+		dh_gencontrol -Nvlc-glide ;\
+		dh_md5sums -Nvlc-glide ;\
+		dh_builddeb -Nvlc-glide ;\
+	fi
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install

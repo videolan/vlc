@@ -1,3 +1,9 @@
+vlc (0.2.63-2) unstable; urgency=low
+
+  * Glide shouldn't cause any non-x86 problems anymore (Closes: #88583).
+
+ -- Samuel Hocevar <sam@zoy.org>  Mon,  5 Mar 2001 12:50:28 +0100
+
 vlc (0.2.63-1) unstable; urgency=low
 
   * New upstream release.

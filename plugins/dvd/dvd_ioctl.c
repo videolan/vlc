@@ -2,7 +2,7 @@
  * dvd_ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.c,v 1.2 2001/02/26 12:16:28 sam Exp $
+ * $Id: dvd_ioctl.c,v 1.3 2001/03/05 11:53:44 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -27,6 +27,7 @@
  *****************************************************************************/
 #include "defs.h"
 
+#include <sys/types.h>
 #include <netinet/in.h>
 #ifdef HAVE_SYS_IOCTL_H
 #   include <sys/ioctl.h>
