@@ -1,5 +1,5 @@
 List of known vlc bugs
-$Id: BUGS,v 1.6 2002/01/28 16:51:22 sam Exp $
+$Id: BUGS,v 1.7 2002/03/17 21:59:52 sam Exp $
 
    Please try to keep this file up to date. Also, grep for FIXME in the
 source files for more and more bugs to fix.
@@ -17,6 +17,8 @@ Input:
 
   * DVD raw device support doesn't seem to work.
 
+  * HTTP input seems to lose packets during pre-parsing.
+
 
 Audio output:
 
@@ -28,12 +30,6 @@ Video output:
 
   * We don't render subtitles on RGB surfaces.
 
-  * Subtitle colors are just plain wrong.
-
-  * The DirectX video output plugin is broken because of vout4.
-
-  * The BeOS video output plugin is broken because of vout4.
-
   * The QNX video output plugin is broken because of vout4.
 
   * The MGA video output plugin makes the picture stutter when MGA_NUM_FRAMES
@@ -42,10 +38,10 @@ Video output:
   * The SPU decoder doesn't detect when the video output failed to launch
     itself, and we segfault.
 
-Chroma transformations:
+  * On-the-fly resizing doesn't work when using a chroma transformation.
 
-  * The only working YUV2RGB transformation function is the MMX version
-  of the 4:2:0 to RGB16 function.
+
+Chroma transformations:
 
   * Most chroma transformation modules completely ignore margins.
 
@@ -62,8 +58,6 @@ Gtk interface:
 
   * Playing like a madman with the `Playlist' button makes the interface
   crash.
-
-  * Saving preferences does not work at all.
 
 
 Misc:

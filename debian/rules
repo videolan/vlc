@@ -9,7 +9,7 @@
 export DH_COMPAT=3
 
 # Compilation options
-export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --with-ggi --enable-sdl --enable-esd --enable-qt --with-mad --enable-arts --enable-alsa --enable-lirc --enable-a52"
+export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52"
 export LIBDVDCSS_FLAGS="--with-dvdcss=local-shared"
 export VIDDIR="usr/share/videolan"
 export PIXDIR="usr/share/pixmaps"
@@ -25,7 +25,7 @@ build-stamp:
 
 	case $(DEB_BUILD_ARCH) in \
 	i386) \
-		ARCH_FLAGS="--with-glide" ;; \
+		ARCH_FLAGS="--enable-glide" ;; \
 	*) \
 		ARCH_FLAGS="" ;; \
 	esac ;\

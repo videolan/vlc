@@ -52,7 +52,7 @@ Configuring mad plugin
 =========================
 
 If libmad is installed in /usr (ie. you have /usr/include/mad.h and /usr/lib/libmad.a),
-then you just need --with-mad=/usr.
+then you just need --enable-mad --with-mad=/usr.
 
    make distclean; ./configure --prefix=/usr --enable-fb --enable-dsp --disable-sdl \
 	--enable-x11 --disable-xvideo --enable-mad --with-mad=/usr

@@ -350,9 +350,6 @@
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #undef HAVE_GETTEXT
 
-/* big endian system */
-#undef WORDS_BIGENDIAN
-
 /* long getopt support */
 #undef HAVE_GETOPT_LONG
 
@@ -425,12 +422,15 @@
 /* Define if FreeBSD-like dvd_struct is defined. */
 #undef HAVE_BSD_DVD_STRUCT
 
+/* Indicate whether we should use SDL/SDL.h or SDL11/SDL.h */
+#undef SDL_INCLUDE_FILE
+
+/* big endian system */
+#undef WORDS_BIGENDIAN
+
 /* Define if <pth.h> defines pth_init */
 #undef PTH_INIT_IN_PTH_H
 
 /* Define if <st.h> defines st_init */
 #undef ST_INIT_IN_ST_H
-
-/* Indicate whether we should use SDL/SDL.h or SDL11/SDL.h */
-#undef SDL_INCLUDE_FILE
 

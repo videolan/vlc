@@ -205,7 +205,7 @@ perl -pi -e "s|#CFLAGS \+= -mcpu=750|CFLAGS \+= -mcpu=750 -mtune=750|" Makefile
 	   --enable-esd --enable-alsa \
 	   --enable-fb --enable-mga \
 	   --enable-xvideo \
-	   --with-ggi \
+	   --enable-ggi \
 	   --enable-sdl 
 %endif
 # thier configure check if /dev/dsp exists...
