@@ -355,21 +355,11 @@ void Interface::CreateOurMenuBar()
                        wxU(_("Stream and Media &info...\tCtrl-I")),
                        wxU(_(HELP_FILEINFO)) );
 
-    /* Create the "Settings" menu */
-    p_settings_menu = new wxMenu;
-    b_settings_menu = 1;
-
-    /* Create the "Audio" menu */
-    p_audio_menu = new wxMenu;
-    b_audio_menu = 1;
-
-    /* Create the "Video" menu */
-    p_video_menu = new wxMenu;
-    b_video_menu = 1;
-
-    /* Create the "Navigation" menu */
-    p_navig_menu = new wxMenu;
-    b_navig_menu = 1;
+    /* Create the "Auto-generated" menus */
+    p_settings_menu = SettingsMenu( p_intf, this );
+    p_audio_menu = AudioMenu( p_intf, this );
+    p_video_menu = VideoMenu( p_intf, this );
+    p_navig_menu = NavigMenu( p_intf, this );
 
     /* Create the "Help" menu */
     wxMenu *help_menu = new wxMenu;
@@ -751,139 +741,44 @@ void Interface::UpdateAcceleratorTable()
 /*****************************************************************************
  * Event Handlers.
  *****************************************************************************/
-/* Work-around helper for buggy wxGTK */
-void RecursiveDestroy( wxMenu *menu )
-{
-    wxMenuItemList::Node *node = menu->GetMenuItems().GetFirst();
-    for( ; node; )
-    {
-        wxMenuItem *item = node->GetData();
-        node = node->GetNext();
-
-        /* Delete the submenus */
-        wxMenu *submenu = item->GetSubMenu();
-        if( submenu )
-        {
-            RecursiveDestroy( submenu );
-        }
-        menu->Delete( item );
-    }
-}
 
 void Interface::OnMenuOpen(wxMenuEvent& event)
 {
 #if !defined( __WXMSW__ )
     if( event.GetEventObject() == p_settings_menu )
-    {
-        if( b_settings_menu )
-        {
-            p_settings_menu = SettingsMenu( p_intf, this );
-
-            /* Add static items */
-            p_settings_menu->AppendCheckItem( Extended_Event,
-                             wxU(_("&Extended GUI") ), wxU(_(HELP_EXTENDED)) );
-            p_settings_menu->AppendCheckItem( Bookmarks_Event,
-                             wxU(_("&Bookmarks...") ), wxU(_(HELP_BOOKMARKS)) );
-            p_settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")),
-                                     wxU(_(HELP_PREFS)) );
-
-            /* Work-around for buggy wxGTK */
-            wxMenu *menu = GetMenuBar()->GetMenu( 2 );
-            RecursiveDestroy( menu );
-            /* End work-around */
-
-            menu = GetMenuBar()->Replace( 2, p_settings_menu,
-                                          wxU(_("&Settings")));
-            if( menu ) delete menu;
-
-            b_settings_menu = 0;
-        }
-        else b_settings_menu = 1;
-    }
-    else if( event.GetEventObject() == p_audio_menu )
-    {
-        if( b_audio_menu )
-        {
-            p_audio_menu = AudioMenu( p_intf, this );
-
-            /* Work-around for buggy wxGTK */
-            wxMenu *menu = GetMenuBar()->GetMenu( 3 );
-            RecursiveDestroy( menu );
-            /* End work-around */
-
-            menu =
-                GetMenuBar()->Replace( 3, p_audio_menu, wxU(_("&Audio")) );
-            if( menu ) delete menu;
-
-            b_audio_menu = 0;
-        }
-        else b_audio_menu = 1;
-    }
-    else if( event.GetEventObject() == p_video_menu )
-    {
-        if( b_video_menu )
-        {
-            p_video_menu = VideoMenu( p_intf, this );
-
-            /* Work-around for buggy wxGTK */
-            wxMenu *menu = GetMenuBar()->GetMenu( 4 );
-            RecursiveDestroy( menu );
-            /* End work-around */
-
-            menu =
-                GetMenuBar()->Replace( 4, p_video_menu, wxU(_("&Video")) );
-            if( menu ) delete menu;
-
-            b_video_menu = 0;
-        }
-        else b_video_menu = 1;
-    }
-    else if( event.GetEventObject() == p_navig_menu )
-    {
-        if( b_navig_menu )
-        {
-            p_navig_menu = NavigMenu( p_intf, this );
-
-            /* Work-around for buggy wxGTK */
-            wxMenu *menu = GetMenuBar()->GetMenu( 5 );
-            RecursiveDestroy( menu );
-            /* End work-around */
-
-            menu =
-                GetMenuBar()->Replace( 5, p_navig_menu, wxU(_("&Navigation")));
-            if( menu ) delete menu;
-
-            b_navig_menu = 0;
-        }
-        else b_navig_menu = 1;
-    }
-
-#else
-    p_settings_menu = SettingsMenu( p_intf, this );
-    /* Add static items */
-    p_settings_menu->AppendCheckItem( Extended_Event, wxU(_("&Extended GUI") ),
-                                      wxU(_(HELP_EXTENDED)) );
-    p_settings_menu->AppendCheckItem( Bookmarks_Event, wxU(_("&Bookmarks") ),
-                                      wxU(_(HELP_BOOKMARKS)) );
-    p_settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")),
-                             wxU(_(HELP_PREFS)) );
-    wxMenu *menu =
-        GetMenuBar()->Replace( 2, p_settings_menu, wxU(_("&Settings")) );
-    if( menu ) delete menu;
-
-    p_audio_menu = AudioMenu( p_intf, this );
-    menu = GetMenuBar()->Replace( 3, p_audio_menu, wxU(_("&Audio")) );
-    if( menu ) delete menu;
-
-    p_video_menu = VideoMenu( p_intf, this );
-    menu = GetMenuBar()->Replace( 4, p_video_menu, wxU(_("&Video")) );
-    if( menu ) delete menu;
-
-    p_navig_menu = NavigMenu( p_intf, this );
-    menu = GetMenuBar()->Replace( 5, p_navig_menu, wxU(_("&Navigation")) );
-    if( menu ) delete menu;
 #endif
+    {
+        p_settings_menu = SettingsMenu( p_intf, this, p_settings_menu );
 
+        /* Add static items */
+        p_settings_menu->AppendCheckItem( Extended_Event,
+            wxU(_("&Extended GUI") ), wxU(_(HELP_EXTENDED)) );
+        p_settings_menu->AppendCheckItem( Bookmarks_Event,
+            wxU(_("&Bookmarks...") ), wxU(_(HELP_BOOKMARKS)) );
+        p_settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")),
+            wxU(_(HELP_PREFS)) );
+    }
+
+#if !defined( __WXMSW__ )
+    else if( event.GetEventObject() == p_audio_menu )
+#endif
+    {
+        p_audio_menu = AudioMenu( p_intf, this, p_audio_menu );
+    }
+
+#if !defined( __WXMSW__ )
+    else if( event.GetEventObject() == p_video_menu )
+#endif
+    {
+        p_video_menu = VideoMenu( p_intf, this, p_video_menu );
+    }
+
+#if !defined( __WXMSW__ )
+    else if( event.GetEventObject() == p_navig_menu )
+#endif
+    {
+        p_navig_menu = NavigMenu( p_intf, this, p_navig_menu );
+    }
 }
 
 #if defined( __WXMSW__ ) || defined( __WXMAC__ )

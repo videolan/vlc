@@ -4,7 +4,7 @@
  * Copyright (C) 2000-2004 VideoLAN
  * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +52,34 @@ public:
 
 private:
 
+};
+
+class Menu: public wxMenu
+{
+public:
+    /* Constructor */
+    Menu( intf_thread_t *p_intf, wxWindow *p_parent, int i_start_id );
+    virtual ~Menu();
+
+    void Populate( int i_count, char **ppsz_names, int *pi_objects );
+    void Clear();
+
+private:
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnClose( wxCommandEvent& event );
+    void OnShowDialog( wxCommandEvent& event );
+    void OnEntrySelected( wxCommandEvent& event );
+
+    wxMenu *Menu::CreateDummyMenu();
+    void   Menu::CreateMenuItem( wxMenu *, char *, vlc_object_t * );
+    wxMenu *Menu::CreateChoicesMenu( char *, vlc_object_t *, bool );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+
+    int i_start_id;
+    int i_item_id;
 };
 
 /*****************************************************************************
@@ -214,8 +242,8 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     }
 
     /* Build menu */
-    Menu popupmenu( p_intf, p_parent, i,
-                     ppsz_varnames, pi_objects, PopupMenu_Events );
+    Menu popupmenu( p_intf, p_parent, PopupMenu_Events );
+    popupmenu.Populate( i, ppsz_varnames, pi_objects );
 
 #if 1
     /* Add static entries */
@@ -229,7 +257,7 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     p_intf->p_sys->p_popup_menu = NULL;
 }
 
-wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
+wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
 {
 #define MAX_AUDIO_ITEMS 10
 
@@ -264,11 +292,18 @@ wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
     }
 
     /* Build menu */
-    return new Menu( _p_intf, p_parent, i,
-                     ppsz_varnames, pi_objects, AudioMenu_Events );
+    Menu *p_vlc_menu = (Menu *)p_menu;
+    if( !p_vlc_menu )
+        p_vlc_menu = new Menu( _p_intf, p_parent, AudioMenu_Events );
+    else
+        p_vlc_menu->Clear();
+
+    p_vlc_menu->Populate( i, ppsz_varnames, pi_objects );
+
+    return p_vlc_menu;
 }
 
-wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
+wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
 {
 #define MAX_VIDEO_ITEMS 15
 
@@ -328,11 +363,18 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
     }
 
     /* Build menu */
-    return new Menu( _p_intf, p_parent, i,
-                     ppsz_varnames, pi_objects, VideoMenu_Events );
+    Menu *p_vlc_menu = (Menu *)p_menu;
+    if( !p_vlc_menu )
+        p_vlc_menu = new Menu( _p_intf, p_parent, VideoMenu_Events );
+    else
+        p_vlc_menu->Clear();
+
+    p_vlc_menu->Populate( i, ppsz_varnames, pi_objects );
+
+    return p_vlc_menu;
 }
 
-wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
+wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
 {
 #define MAX_NAVIG_ITEMS 10
 
@@ -374,11 +416,19 @@ wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
     }
 
     /* Build menu */
-    return new Menu( _p_intf, p_parent, i,
-                     ppsz_varnames, pi_objects, NavigMenu_Events );
+    Menu *p_vlc_menu = (Menu *)p_menu;
+    if( !p_vlc_menu )
+        p_vlc_menu = new Menu( _p_intf, p_parent, NavigMenu_Events );
+    else
+        p_vlc_menu->Clear();
+
+    p_vlc_menu->Populate( i, ppsz_varnames, pi_objects );
+
+    return p_vlc_menu;
 }
 
-wxMenu *SettingsMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
+wxMenu *SettingsMenu( intf_thread_t *_p_intf, wxWindow *p_parent,
+                      wxMenu *p_menu )
 {
 #define MAX_SETTINGS_ITEMS 10
 
@@ -402,23 +452,40 @@ wxMenu *SettingsMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
     }
 
     /* Build menu */
-    return new Menu( _p_intf, p_parent, i,
-                     ppsz_varnames, pi_objects, SettingsMenu_Events );
+    Menu *p_vlc_menu = (Menu *)p_menu;
+    if( !p_vlc_menu )
+        p_vlc_menu = new Menu( _p_intf, p_parent, SettingsMenu_Events );
+    else
+        p_vlc_menu->Clear();
+
+    p_vlc_menu->Populate( i, ppsz_varnames, pi_objects );
+
+    return p_vlc_menu;
 }
 
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-Menu::Menu( intf_thread_t *_p_intf, wxWindow *p_parent,
-            int i_count, char **ppsz_varnames, int *pi_objects,
-            int i_start_id ): wxMenu( )
+Menu::Menu( intf_thread_t *_p_intf, wxWindow *p_parent, int _i_start_id )
+  : wxMenu( )
+{
+    /* Initializations */
+    p_intf = _p_intf;
+    i_start_id = _i_start_id;
+}
+
+Menu::~Menu()
+{
+}
+
+/*****************************************************************************
+ * Public methods.
+ *****************************************************************************/
+void Menu::Populate( int i_count, char **ppsz_varnames, int *pi_objects )
 {
     vlc_object_t *p_object;
     vlc_bool_t b_section_empty = VLC_FALSE;
     int i;
-
-    /* Initializations */
-    p_intf = _p_intf;
 
     i_item_id = i_start_id;
 
@@ -460,8 +527,28 @@ Menu::Menu( intf_thread_t *_p_intf, wxWindow *p_parent,
     }
 }
 
-Menu::~Menu()
+/* Work-around helper for buggy wxGTK */
+static void RecursiveDestroy( wxMenu *menu )
 {
+    wxMenuItemList::Node *node = menu->GetMenuItems().GetFirst();
+    for( ; node; )
+    {
+        wxMenuItem *item = node->GetData();
+        node = node->GetNext();
+
+        /* Delete the submenus */
+        wxMenu *submenu = item->GetSubMenu();
+        if( submenu )
+        {
+            RecursiveDestroy( submenu );
+        }
+        menu->Delete( item );
+    }
+}
+
+void Menu::Clear( )
+{
+    RecursiveDestroy( this );
 }
 
 /*****************************************************************************

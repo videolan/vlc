@@ -262,13 +262,9 @@ private:
 
     /* For auto-generated menus */
     wxMenu *p_settings_menu;
-    vlc_bool_t b_settings_menu;
     wxMenu *p_audio_menu;
-    vlc_bool_t b_audio_menu;
     wxMenu *p_video_menu;
-    vlc_bool_t b_video_menu;
     wxMenu *p_navig_menu;
-    vlc_bool_t b_navig_menu;
 };
 
 /* Dialogs Provider */
@@ -949,12 +945,11 @@ private:
 } // end of wxvlc namespace
 
 /* Menus */
-void PopupMenu( intf_thread_t *_p_intf, wxWindow *p_parent,
-                const wxPoint& pos );
-wxMenu *SettingsMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
-wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
-wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
-wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
+void PopupMenu( intf_thread_t *, wxWindow *, const wxPoint& );
+wxMenu *SettingsMenu( intf_thread_t *, wxWindow *, wxMenu * = NULL );
+wxMenu *AudioMenu( intf_thread_t *, wxWindow *, wxMenu * = NULL );
+wxMenu *VideoMenu( intf_thread_t *, wxWindow *, wxMenu * = NULL );
+wxMenu *NavigMenu( intf_thread_t *, wxWindow *, wxMenu * = NULL );
 
 namespace wxvlc
 {
@@ -973,31 +968,6 @@ private:
 
     intf_thread_t *p_intf;
     Interface *p_main_interface;
-};
-
-class Menu: public wxMenu
-{
-public:
-    /* Constructor */
-    Menu( intf_thread_t *p_intf, wxWindow *p_parent, int i_count,
-          char **ppsz_names, int *pi_objects, int i_start_id );
-    virtual ~Menu();
-
-private:
-    /* Event handlers (these functions should _not_ be virtual) */
-    void OnClose( wxCommandEvent& event );
-    void OnShowDialog( wxCommandEvent& event );
-    void OnEntrySelected( wxCommandEvent& event );
-
-    wxMenu *Menu::CreateDummyMenu();
-    void   Menu::CreateMenuItem( wxMenu *, char *, vlc_object_t * );
-    wxMenu *Menu::CreateChoicesMenu( char *, vlc_object_t *, bool );
-
-    DECLARE_EVENT_TABLE();
-
-    intf_thread_t *p_intf;
-
-    int  i_item_id;
 };
 
 } // end of wxvlc namespace
