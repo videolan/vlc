@@ -89,6 +89,8 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_file_sub_align_pop;
     IBOutlet id o_file_sub_align_lbl;
     IBOutlet id o_file_sub_ok_btn;
+    IBOutlet id o_file_sub_font_box;
+    IBOutlet id o_file_sub_file_box;
 
     IBOutlet id o_output_ckbox;
     IBOutlet id o_sout_options;

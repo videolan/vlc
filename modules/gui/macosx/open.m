@@ -233,6 +233,8 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_file_sub_align_lbl setStringValue: _NS("Subtitles justification")];
     [o_file_sub_align_pop removeAllItems];
     [o_file_sub_ok_btn setStringValue: _NS("OK")];
+    [o_file_sub_font_box setTitle: _NS("Font Properties")];
+    [o_file_sub_file_box setTitle: _NS("Subtitle File")];
 
     p_item = config_FindConfig( VLC_OBJECT(p_intf), "subsdec-encoding" );
 

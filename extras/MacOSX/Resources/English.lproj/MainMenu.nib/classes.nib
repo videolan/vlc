@@ -303,6 +303,8 @@
                 "o_file_sub_delay_stp" = id; 
                 "o_file_sub_encoding_lbl" = id; 
                 "o_file_sub_encoding_pop" = id; 
+                "o_file_sub_file_box" = id; 
+                "o_file_sub_font_box" = id; 
                 "o_file_sub_fps" = id; 
                 "o_file_sub_fps_lbl" = id; 
                 "o_file_sub_fps_stp" = id; 
