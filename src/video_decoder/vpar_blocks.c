@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.6 2001/08/22 17:21:45 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.7 2001/08/23 10:08:26 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -171,10 +171,10 @@ static __inline__ int GetChromaDCDiff( vpar_thread_t * p_vpar )
 
 
 #define SATURATE(val)                                                       \
-    if( val > 2047 )                                                        \
-        val = 2047;                                                         \
-    else if( val < -2048 )                                                  \
-        val = -2048;
+    if ((u32)(val + 2048) > 4095)                                           \
+    {                                                                       \
+       val = (val > 0) ? 2047 : -2048;                                      \
+    }
 
 /*****************************************************************************
  * MPEG2IntraB14 : Decode an intra block according to ISO/IEC 13818-2 table B14
@@ -1261,8 +1261,9 @@ static void MotionFrameField( vpar_thread_t * p_vpar,
 
     i_motion_y = (p_motion->ppi_pmv[0][1] >> 1)
                         + MotionDelta( p_vpar, p_motion->pi_f_code[1] );
-    /* I have no idea why this is commented out, since walken doesn't put
-     * comments in its code. --Meuuh */
+    /* According to ISO/IEC 13818-2 section 7.6.3.2, the vertical motion
+     * vector is restricted to a range that implies it doesn't need to
+     * be bound. */
     /* i_motion_y = BoundMotionVector( i_motion_y, p_motion->pi_f_code[1] ); */
     p_motion->ppi_pmv[0][1] = i_motion_y << 1;
 
