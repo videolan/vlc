@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.cpp,v 1.55 2003/12/15 20:20:55 gbazin Exp $
+ * $Id: open.cpp,v 1.56 2003/12/16 03:21:47 rocky Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -234,6 +234,8 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     p_parent = _p_parent;
     SetIcon( *p_intf->p_sys->p_icon );
     file_dialog = NULL;
+    i_disc_type_selection = 0;
+    
 #ifndef WIN32
     v4l_dialog = NULL;
 #endif
@@ -476,7 +478,8 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
                                 wxDefaultPosition, wxDefaultSize,
                                 WXSIZEOF(disc_type_array), disc_type_array,
                                 WXSIZEOF(disc_type_array), wxRA_SPECIFY_COLS );
-    sizer_row->Add( disc_type, 0, wxEXPAND | wxALL, 5 );
+    
+    sizer_row->Add( disc_type, i_disc_type_selection, wxEXPAND | wxALL, 5 );
 
     wxStaticText *label = new wxStaticText( panel, -1, wxU(_("Device name")) );
     disc_device = new wxTextCtrl( panel, DiscDevice_Event, wxT(""),
@@ -678,7 +681,9 @@ void OpenDialog::UpdateMRL( int i_access_method )
         mrltemp = file_combo->GetValue();
         break;
     case DISC_ACCESS:
-      switch ( disc_type->GetSelection() ) 
+      i_disc_type_selection = disc_type->GetSelection();
+
+      switch ( i_disc_type_selection ) 
 	{
 	case 0:
 	  disc_chapter->Enable();

@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.80 2003/12/14 22:49:28 gbazin Exp $
+ * $Id: wxwindows.h,v 1.81 2003/12/16 03:21:47 rocky Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -362,6 +362,7 @@ private:
     intf_thread_t *p_intf;
     wxWindow *p_parent;
     int i_current_access_method;
+    int i_disc_type_selection;
 
     int i_method; /* Normal or for the stream dialog ? */
     wxComboBox *mrl_combo;
