@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.84 2003/10/04 18:55:12 gbazin Exp $
+dnl $Id: configure.ac,v 1.85 2003/10/05 21:29:23 sam Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -395,13 +395,16 @@ fi
 if test "${ac_cv_have_plugins}" = "no"; then
   AC_CHECK_LIB(kernel32, main,
    [AX_ADD_LDFLAGS([vlc],[-lkernel32])
+    AC_DEFINE(HAVE_DL_WINDOWS, 1, [Define if you have Windows' LoadLibrary])
     ac_cv_have_plugins=yes])
 fi
 
 # BeOS style
 if test "${ac_cv_have_plugins}" = "no"; then
-  AC_CHECK_HEADERS(image.h,
-   [ac_cv_have_plugins=yes])
+  AC_CHECK_HEADERS(image.h)
+  AC_CHECK_FUNCS(load_add_on,
+   [AC_DEFINE(HAVE_DL_BEOS, 1, [Define if you have the BeOS dl])
+    ac_cv_have_plugins=yes])
 fi
 
 # Only test for dlopen() if the others didn't work

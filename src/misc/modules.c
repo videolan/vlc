@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.135 2003/10/05 15:35:59 sam Exp $
+ * $Id: modules.c,v 1.136 2003/10/05 21:29:23 sam Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -54,23 +54,25 @@
 #endif
 
 #define HAVE_DYNAMIC_PLUGINS
-#if defined (HAVE_MACH_O_DYLD_H)
-#   include <mach-o/dyld.h>
-#elif defined (HAVE_IMAGE_H)                                         /* BeOS */
-#   include <image.h>
-#elif defined (UNDER_CE)
+#if defined(HAVE_DL_DYLD)
+#   if defined(HAVE_MACH_O_DYLD_H)
+#       include <mach-o/dyld.h>
+#   endif
+#elif defined(HAVE_DL_BEOS)
+#   if defined(HAVE_IMAGE_H)
+#       include <image.h>
+#   endif
+#elif defined(HAVE_DL_WINDOWS)
 #   include <windows.h>
-#elif defined (WIN32)
-#   include <windows.h>
-#elif defined (HAVE_DL_DLOPEN)
-#   if defined (HAVE_DLFCN_H)                            /* Linux, BSD, Hurd */
+#elif defined(HAVE_DL_DLOPEN)
+#   if defined(HAVE_DLFCN_H) /* Linux, BSD, Hurd */
 #       include <dlfcn.h>
 #   endif
-#   if defined (HAVE_SYS_DL_H)
+#   if defined(HAVE_SYS_DL_H)
 #       include <sys/dl.h>
 #   endif
-#elif defined (HAVE_DL_SHL_LOAD)
-#   if defined (HAVE_DL_H)
+#elif defined(HAVE_DL_SHL_LOAD)
+#   if defined(HAVE_DL_H)
 #       include <dl.h>
 #   endif
 #else
@@ -139,7 +141,7 @@ static void   UndupModule      ( module_t * );
 static int    CallEntry        ( module_t * );
 static void   CloseModule      ( module_handle_t );
 static void * GetSymbol        ( module_handle_t, const char * );
-#if defined(UNDER_CE) || defined(WIN32)
+#if defined(HAVE_DL_WINDOWS)
 static char * GetWindowsError  ( void );
 #endif
 #endif
@@ -835,7 +837,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
     /* Destroy our image, we won't need it */
     NSDestroyObjectFileImage( image );
 
-#elif defined(HAVE_IMAGE_H)
+#elif defined(HAVE_DL_BEOS)
     handle = load_add_on( psz_file );
     if( handle < 0 )
     {
@@ -843,7 +845,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
         return -1;
     }
 
-#elif defined(UNDER_CE)
+#elif defined(HAVE_DL_WINDOWS) && defined(UNDER_CE)
     char psz_filename[MAX_PATH];
     WideCharToMultiByte( CP_ACP, WC_DEFAULTCHAR, psz_file, -1,
                          psz_filename, MAX_PATH, NULL, NULL );
@@ -856,7 +858,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
         free( psz_error );
     }
 
-#elif defined(WIN32)
+#elif defined(HAVE_DL_WINDOWS) && defined(WIN32)
     handle = LoadLibrary( psz_file );
     if( handle == NULL )
     {
@@ -906,8 +908,12 @@ static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
         return -1;
     }
 
-#elif defined(HAVE_DL_DLOPEN) && defined(DL_LAZY)
+#elif defined(HAVE_DL_DLOPEN)
+#   if defined(DL_LAZY)
     handle = dlopen( psz_file, DL_LAZY );
+#   else
+    handle = dlopen( psz_file, 0 );
+#   endif
     if( handle == NULL )
     {
         msg_Warn( p_this, "cannot load module `%s' (%s)",
@@ -1132,10 +1138,10 @@ static int CallEntry( module_t * p_module )
 
     if( pf_symbol == NULL )
     {
-#if defined(HAVE_DL_DYLD) || defined(HAVE_IMAGE_H)
+#if defined(HAVE_DL_DYLD) || defined(HAVE_DL_BEOS)
         msg_Warn( p_module, "cannot find symbol \"%s\" in file `%s'",
                             psz_name, p_module->psz_filename );
-#elif defined(UNDER_CE) || defined(WIN32)
+#elif defined(HAVE_DL_WINDOWS)
         char *psz_error = GetWindowsError();
         msg_Warn( p_module, "cannot find symbol \"%s\" in file `%s' (%s)",
                             psz_name, p_module->psz_filename, psz_error );
@@ -1177,10 +1183,10 @@ static void CloseModule( module_handle_t handle )
 #if defined(HAVE_DL_DYLD)
     NSUnLinkModule( handle, FALSE );
 
-#elif defined(HAVE_IMAGE_H)
+#elif defined(HAVE_DL_BEOS)
     unload_add_on( handle );
 
-#elif defined(WIN32) || defined(UNDER_CE)
+#elif defined(HAVE_DL_WINDOWS)
     FreeLibrary( handle );
 
 #elif defined(HAVE_DL_DLOPEN)
@@ -1229,7 +1235,7 @@ static void * _module_getsymbol( module_handle_t handle,
     NSSymbol sym = NSLookupSymbolInModule( handle, psz_function );
     return NSAddressOfSymbol( sym );
 
-#elif defined(HAVE_IMAGE_H)
+#elif defined(HAVE_DL_BEOS)
     void * p_symbol;
     if( B_OK == get_image_symbol( handle, psz_function,
                                   B_SYMBOL_TYPE_TEXT, &p_symbol ) )
@@ -1241,13 +1247,13 @@ static void * _module_getsymbol( module_handle_t handle,
         return NULL;
     }
 
-#elif defined( UNDER_CE )
+#elif defined(HAVE_DL_WINDOWS) && defined(UNDER_CE)
     wchar_t psz_real[256];
     MultiByteToWideChar( CP_ACP, 0, psz_function, -1, psz_real, 256 );
 
     return (void *)GetProcAddress( handle, psz_real );
 
-#elif defined( WIN32 )
+#elif defined(HAVE_DL_WINDOWS) && defined(WIN32)
     return (void *)GetProcAddress( handle, (MYCHAR*)psz_function );
 
 #elif defined(HAVE_DL_DLOPEN)
@@ -1261,7 +1267,7 @@ static void * _module_getsymbol( module_handle_t handle,
 #endif
 }
 
-#if defined(UNDER_CE) || defined(WIN32)
+#if defined(HAVE_DL_WINDOWS)
 static char * GetWindowsError( void )
 {
 #if defined(UNDER_CE)
@@ -1305,6 +1311,6 @@ static char * GetWindowsError( void )
     return psz_tmp;
 #endif
 }
-#endif
+#endif /* HAVE_DL_WINDOWS */
 
 #endif /* HAVE_DYNAMIC_PLUGINS */
