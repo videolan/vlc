@@ -76,14 +76,12 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( _("satellite input module") )
-    ADD_CAPABILITY( DEMUX, 0 )
     ADD_CAPABILITY( ACCESS, 50 )
     ADD_SHORTCUT( "satellite" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
     _M( access_getfunctions )( &p_module->p_functions->access );
-    _M( demux_getfunctions )( &p_module->p_functions->demux );
 MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START

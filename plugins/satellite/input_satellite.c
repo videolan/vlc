@@ -54,16 +54,13 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  SatelliteOpen       ( input_thread_t * );
-static void SatelliteClose      ( input_thread_t * );
-static int  SatelliteSetArea    ( input_thread_t *, input_area_t * );
-static int  SatelliteSetProgram ( input_thread_t *, pgrm_descriptor_t * );
-static void SatelliteSeek       ( input_thread_t *, off_t );
-
-static int  SatelliteInit       ( input_thread_t * );
-static void SatelliteEnd        ( input_thread_t * );
-static int  SatelliteDemux      ( input_thread_t * );
-static int  SatelliteRewind     ( input_thread_t * );
+static int     SatelliteOpen       ( input_thread_t * );
+static void    SatelliteClose      ( input_thread_t * );
+static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
+                                     size_t i_len );
+static int     SatelliteSetArea    ( input_thread_t *, input_area_t * );
+static int     SatelliteSetProgram ( input_thread_t *, pgrm_descriptor_t * );
+static void    SatelliteSeek       ( input_thread_t *, off_t );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -74,26 +71,12 @@ void _M( access_getfunctions )( function_list_t * p_function_list )
 #define access p_function_list->functions.access
     access.pf_open             = SatelliteOpen;
     access.pf_close            = SatelliteClose;
-    access.pf_read             = input_FDRead;
+    access.pf_read             = SatelliteRead;
     access.pf_set_area         = SatelliteSetArea;
     access.pf_set_program      = SatelliteSetProgram;
     access.pf_seek             = SatelliteSeek;
 #undef access
 }
-
-
-void _M( demux_getfunctions )( function_list_t * p_function_list )
-{
-#define demux p_function_list->functions.demux
-    demux.pf_init             = SatelliteInit;
-    demux.pf_end              = SatelliteEnd;
-    demux.pf_demux            = SatelliteDemux;
-    demux.pf_rewind           = SatelliteRewind;
-#undef demux
-}
-
-
-
 
 /*****************************************************************************
  * SatelliteOpen : open the dvr device
@@ -233,7 +216,7 @@ static int SatelliteOpen( input_thread_t * p_input )
                         "FEC: %03f, Srate: %d",
                         i_freq, b_pol, f_fec, i_srate );
 
-    if ( ioctl_SECControl( i_freq * 1000, b_pol, i_lnb_slof * 1000, 
+    if ( ioctl_SECControl( i_freq * 1000, b_pol, i_lnb_slof * 1000,
                 b_diseqc ) < 0 )
     {
         intf_ErrMsg("input: satellite: An error occured when controling SEC");
@@ -315,7 +298,6 @@ static int SatelliteOpen( input_thread_t * p_input )
 
     p_input->i_mtu = SATELLITE_READ_ONCE * TS_PACKET_SIZE;
     p_input->stream.i_method = INPUT_METHOD_SATELLITE;
-    p_input->psz_demux = "satellite";
 
     return 0;
 }
@@ -347,6 +329,34 @@ static void SatelliteClose( input_thread_t * p_input )
     p_satellite = (input_socket_t *)p_input;
     close( p_satellite->i_handle );
 }
+
+
+/*****************************************************************************
+ * SatelliteRead: reads data from the satellite card
+ *****************************************************************************/
+static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
+                size_t i_len )
+{
+    int i;
+
+    /* if not set, set filters to the PMTs */
+    for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
+    {
+        if ( p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd == 0 )
+        {
+            intf_WarnMsg( 2, "input: satellite: setting filter on pmt pid %d",
+                        p_input->stream.pp_programs[i]->pp_es[0]->i_id);
+            ioctl_SetDMXFilter( p_input->stream.pp_programs[i]->pp_es[0]->i_id,
+                       &p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd,
+                       3 );
+        }
+    }
+
+    return input_FDRead( p_input, p_buffer, i_len );
+}
+
+
+
 
 /*****************************************************************************
  * SatelliteSetArea : Does nothing
@@ -428,94 +438,3 @@ static void SatelliteSeek( input_thread_t * p_input, off_t i_off )
 {
     return;
 }
-
-/*****************************************************************************
- * SatelliteInit: initializes TS structures
- *****************************************************************************/
-static int SatelliteInit( input_thread_t * p_input )
-{
-    es_descriptor_t     * p_pat_es;
-    es_ts_data_t        * p_demux_data;
-    stream_ts_data_t    * p_stream_data;
-
-    /* Initialize the stream */
-    input_InitStream( p_input, sizeof( stream_ts_data_t ) );
-
-
-    /* Init */
-    p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;
-    p_stream_data->i_pat_version = PAT_UNINITIALIZED ;
-
-    /* We'll have to catch the PAT in order to continue
-     * Then the input will catch the PMT and then the others ES
-     * The PAT es is indepedent of any program. */
-    p_pat_es = input_AddES( p_input, NULL,
-                           0x00, sizeof( es_ts_data_t ) );
-    p_demux_data=(es_ts_data_t *)p_pat_es->p_demux_data;
-    p_demux_data->b_psi = 1;
-    p_demux_data->i_psi_type = PSI_IS_PAT;
-    p_demux_data->p_psi_section = malloc(sizeof(psi_section_t));
-    p_demux_data->p_psi_section->b_is_complete = 1;
-
-    return 0;
-
-}
-
-/*****************************************************************************
- * SatelliteEnd: frees unused data
- *****************************************************************************/
-static void SatelliteEnd( input_thread_t * p_input )
-{
-}
-
-/*****************************************************************************
- * SatelliteDemux
- *****************************************************************************/
-static int SatelliteDemux( input_thread_t * p_input )
-{
-    int             i_read_once = (p_input->i_mtu ?
-                                   p_input->i_bufsize / TS_PACKET_SIZE :
-                                   SATELLITE_READ_ONCE);
-    int             i;
-
-    /* if not set, set filters to the PMTs */
-
-    for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
-    {
-        if ( p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd == 0 )
-        {
-            intf_WarnMsg( 2, "input: satellite: setting filter on pmt pid %d",
-                        p_input->stream.pp_programs[i]->pp_es[0]->i_id);
-            ioctl_SetDMXFilter( p_input->stream.pp_programs[i]->pp_es[0]->i_id,
-                       &p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd,
-                       3 );
-        }
-    }
-
-
-    for( i = 0; i < SATELLITE_READ_ONCE; i++ )
-    {
-        data_packet_t *     p_data;
-        ssize_t             i_result;
-
-        i_result = input_ReadTS( p_input, &p_data );
-
-        if( i_result <= 0 )
-        {
-            return( i_result );
-        }
-
-        input_DemuxTS( p_input, p_data );
-    }
-
-    return( i_read_once );
-}
-
-/*****************************************************************************
- * SatelliteRewind: Does nothing
- *****************************************************************************/
-static int SatelliteRewind( input_thread_t * p_input )
-{
-    return -1;
-}
-
