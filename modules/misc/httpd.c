@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.7 2003/03/06 11:09:56 fenrir Exp $
+ * $Id: httpd.c,v 1.8 2003/03/15 00:09:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -106,7 +106,8 @@ static void             UnregisterHost  ( httpd_t *, httpd_host_t * );
 static httpd_file_t     *RegisterFile   ( httpd_t *,
                                           char *psz_file, char *psz_mime,
                                           char *psz_user, char *psz_password,
-                                          httpd_file_callback pf_fill,
+                                          httpd_file_callback pf_get,
+                                          httpd_file_callback pf_post,
                                           httpd_file_callback_args_t *p_args );
 static void             UnregisterFile  ( httpd_t *, httpd_file_t * );
 
@@ -153,7 +154,8 @@ struct httpd_file_t
     vlc_bool_t  b_stream;               /* if false: httpd will retreive data by a callback
                                               true:  it's up to the program to give data to httpd */
     void                *p_sys;         /* provided for user */
-    httpd_file_callback pf_fill;       /* it should allocate and fill *pp_data and *pi_data */
+    httpd_file_callback pf_get;         /* it should allocate and fill *pp_data and *pi_data */
+    httpd_file_callback pf_post;        /* it should allocate and fill *pp_data and *pi_data */
 
     /* private */
 
@@ -173,7 +175,10 @@ struct httpd_file_t
 #define HTTPD_CONNECTION_SENDING_HEADER         2
 #define HTTPD_CONNECTION_SENDING_FILE           3
 #define HTTPD_CONNECTION_SENDING_STREAM         4
+#define HTTPD_CONNECTION_TO_BE_CLOSED           5
 
+#define HTTPD_CONNECTION_METHOD_GET             1
+#define HTTPD_CONNECTION_METHOD_POST            2
 typedef struct httpd_connection_s
 {
     struct httpd_connection_s *p_next;
@@ -184,11 +189,15 @@ typedef struct httpd_connection_s
     mtime_t i_last_activity_date;
 
     int    i_state;
+    int    i_method;       /* get/post */
 
     char    *psz_file;      // file to be send
     int     i_http_error;   // error to be send with the file
     char    *psz_user;      // if Authorization in the request header
     char    *psz_password;
+
+    uint8_t *p_request;     // whith get: ?<*>, with post: main data
+    int      i_request_size;
 
     httpd_file_t    *p_file;
 
@@ -611,7 +620,8 @@ static void __RegisterFile( httpd_sys_t *p_httpt, httpd_file_t *p_file )
 static httpd_file_t    *_RegisterFile( httpd_sys_t *p_httpt,
                                        char *psz_file, char *psz_mime,
                                        char *psz_user, char *psz_password,
-                                       httpd_file_callback pf_fill,
+                                       httpd_file_callback pf_get,
+                                       httpd_file_callback pf_post,
                                        httpd_file_callback_args_t *p_args )
 {
     httpd_file_t    *p_file;
@@ -651,7 +661,8 @@ static httpd_file_t    *_RegisterFile( httpd_sys_t *p_httpt,
 
     p_file->b_stream          = VLC_FALSE;
     p_file->p_sys             = p_args;
-    p_file->pf_fill           = pf_fill;
+    p_file->pf_get            = pf_get;
+    p_file->pf_post           = pf_post;
 
     p_file->i_buffer_size     = 0;
     p_file->i_buffer_last_pos = 0;
@@ -670,12 +681,13 @@ static httpd_file_t    *_RegisterFile( httpd_sys_t *p_httpt,
 static httpd_file_t     *RegisterFile( httpd_t *p_httpd,
                                        char *psz_file, char *psz_mime,
                                        char *psz_user, char *psz_password,
-                                       httpd_file_callback pf_fill,
+                                       httpd_file_callback pf_get,
+                                       httpd_file_callback pf_post,
                                        httpd_file_callback_args_t *p_args )
 {
     return( _RegisterFile( p_httpd->p_sys,
                            psz_file, psz_mime, psz_user, psz_password,
-                           pf_fill, p_args ) );
+                           pf_get, pf_post, p_args ) );
 }
 
 static httpd_stream_t  *_RegisterStream( httpd_sys_t *p_httpt,
@@ -719,7 +731,8 @@ static httpd_stream_t  *_RegisterStream( httpd_sys_t *p_httpt,
 
     p_stream->b_stream        = VLC_TRUE;
     p_stream->p_sys           = NULL;
-    p_stream->pf_fill         = NULL;
+    p_stream->pf_get          = NULL;
+    p_stream->pf_post         = NULL;
 
     p_stream->i_buffer_size   = 1024*1024*10;
     p_stream->i_buffer_pos      = 0;
@@ -901,7 +914,9 @@ static int             HeaderStream( httpd_t *p_httpd, httpd_stream_t *p_stream,
 /****************************************************************************/
 /****************************************************************************/
 
-static int  httpd_page_401_fill( httpd_file_callback_args_t *p_args, uint8_t **pp_data, int *pi_data )
+static int  httpd_page_401_get( httpd_file_callback_args_t *p_args,
+                                uint8_t *p_request, int i_request,
+                                uint8_t **pp_data, int *pi_data )
 {
     char *p;
 
@@ -922,7 +937,9 @@ static int  httpd_page_401_fill( httpd_file_callback_args_t *p_args, uint8_t **p
 
     return VLC_SUCCESS;
 }
-static int  httpd_page_404_fill( httpd_file_callback_args_t *p_args, uint8_t **pp_data, int *pi_data )
+static int  httpd_page_404_get( httpd_file_callback_args_t *p_args,
+                                uint8_t *p_request, int i_request,
+                                uint8_t **pp_data, int *pi_data )
 {
     char *p;
 
@@ -944,12 +961,14 @@ static int  httpd_page_404_fill( httpd_file_callback_args_t *p_args, uint8_t **p
     return VLC_SUCCESS;
 }
 
-static int  httpd_page_admin_fill( httpd_file_callback_args_t *p_args, uint8_t **pp_data, int *pi_data )
+
+static int _httpd_page_admin_get_status( httpd_file_callback_args_t *p_args,
+                                         uint8_t **pp_data, int *pi_data )
 {
     httpd_sys_t *p_httpt = (httpd_sys_t*)p_args;
     httpd_connection_t *p_con;
-    char *p;
     int i;
+    char *p;
 
     /* FIXME FIXME do not use static size FIXME FIXME*/
     p = *pp_data = malloc( 8096 );
@@ -1030,7 +1049,7 @@ static int  httpd_page_admin_fill( httpd_file_callback_args_t *p_args, uint8_t *
     /* XXX do not take lock on connection_lock */
     p += sprintf( p, "<h3>Connection list</h3>\n" );
     p += sprintf( p, "<table border=\"1\" cellspacing=\"0\" >\n" );
-    p += sprintf( p, "<tr>\n<th>IP</th><th>Requested File</th><th>Status</th>\n</tr>\n" );
+    p += sprintf( p, "<tr>\n<th>IP</th><th>Requested File</th><th>Status</th><th>Action</th>\n</tr>\n" );
 
     for( p_con = p_httpt->p_first_connection;p_con != NULL; p_con = p_con->p_next )
     {
@@ -1038,6 +1057,14 @@ static int  httpd_page_admin_fill( httpd_file_callback_args_t *p_args, uint8_t *
         p += sprintf( p, "<td>%s</td>\n", inet_ntoa( p_con->sock.sin_addr ) );
         p += sprintf( p, "<td>%s</td>\n", p_con->psz_file );
         p += sprintf( p, "<td>%d</td>\n", p_con->i_http_error );
+        p += sprintf( p, "<td><form method=\"get\" action=\"\">"
+                         "<select name=\"action\">"
+                         "<option selected>close_connection</option>"
+                         "<option>ban_ip</option>"
+                         "</select>"
+                         "<input type=\"hidden\" name=\"id\" value=\"%p\"/>"
+                         "<input type=\"submit\" value=\"Do it\" />"
+                              "</form></td>\n", p_con);
         p += sprintf( p, "</tr>\n" );
     }
     p += sprintf( p, "</table>\n" );
@@ -1050,6 +1077,149 @@ static int  httpd_page_admin_fill( httpd_file_callback_args_t *p_args, uint8_t *
     p += sprintf( p, "</html>\n" );
 
     *pi_data = strlen( *pp_data ) + 1;
+
+    return( VLC_SUCCESS );
+}
+
+static int _httpd_page_admin_get_success( httpd_file_callback_args_t *p_args,
+                                          uint8_t **pp_data, int *pi_data,
+                                          char *psz_msg )
+{
+    char *p;
+
+    p = *pp_data = malloc( 8096 );
+
+    p += sprintf( p, "<html>\n" );
+    p += sprintf( p, "<head>\n" );
+    p += sprintf( p, "<title>VideoLAN Client Stream Output</title>\n" );
+    p += sprintf( p, "</head>\n" );
+    p += sprintf( p, "<body>\n" );
+    p += sprintf( p, "<h1><center>VideoLAN Client Stream Output</center></h1>\n" );
+
+    p += sprintf( p, "<p>Success=`%s'</p>", psz_msg );
+
+    p += sprintf( p, "<hr />\n" );
+    p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
+    p += sprintf( p, "</body>\n" );
+    p += sprintf( p, "</html>\n" );
+
+    *pi_data = strlen( *pp_data ) + 1;
+
+    return( VLC_SUCCESS );
+}
+
+static int _httpd_page_admin_get_error( httpd_file_callback_args_t *p_args,
+                                        uint8_t **pp_data, int *pi_data,
+                                        char *psz_error )
+{
+    char *p;
+
+    p = *pp_data = malloc( 8096 );
+
+    p += sprintf( p, "<html>\n" );
+    p += sprintf( p, "<head>\n" );
+    p += sprintf( p, "<title>VideoLAN Client Stream Output</title>\n" );
+    p += sprintf( p, "</head>\n" );
+    p += sprintf( p, "<body>\n" );
+    p += sprintf( p, "<h1><center>VideoLAN Client Stream Output</center></h1>\n" );
+
+    p += sprintf( p, "<p>Error=`%s'</p>", psz_error );
+
+    p += sprintf( p, "<hr />\n" );
+    p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
+    p += sprintf( p, "</body>\n" );
+    p += sprintf( p, "</html>\n" );
+
+    *pi_data = strlen( *pp_data ) + 1;
+
+    return( VLC_SUCCESS );
+}
+
+static void _httpd_uri_extract_value( char *psz_uri, char *psz_name, char *psz_value, int i_value_max )
+{
+    char *p;
+
+    p = strstr( psz_uri, psz_name );
+    if( p )
+    {
+        int i_len;
+
+        p += strlen( psz_name );
+        if( *p == '=' ) p++;
+
+        if( strchr( p, '&' ) )
+        {
+            i_len = strchr( p, '&' ) - p;
+        }
+        else
+        {
+            i_len = strlen( p );
+        }
+        i_len = __MIN( i_value_max - 1, i_len );
+        if( i_len > 0 )
+        {
+            strncpy( psz_value, p, i_len );
+            psz_value[i_len] = '\0';
+        }
+        else
+        {
+            strncpy( psz_value, "", i_value_max );
+        }
+    }
+    else
+    {
+        strncpy( psz_value, "", i_value_max );
+    }
+}
+
+
+static int  httpd_page_admin_get( httpd_file_callback_args_t *p_args,
+                                  uint8_t *p_request, int i_request,
+                                  uint8_t **pp_data, int *pi_data )
+{
+    httpd_sys_t *p_httpt = (httpd_sys_t*)p_args;
+    httpd_connection_t *p_con;
+    int i;
+
+    if( i_request > 0)
+    {
+        char action[512];
+
+        _httpd_uri_extract_value( p_request, "action", action, 512 );
+
+        if( !strcmp( action, "close_connection" ) )
+        {
+            char id[128];
+            void *i_id;
+
+            _httpd_uri_extract_value( p_request, "id", id, 512 );
+            i_id = (void*)strtol( id, NULL, 0 );
+            msg_Dbg( p_httpt, "requested closing connection id=%s %p", id, i_id );
+            for( p_con = p_httpt->p_first_connection;p_con != NULL; p_con = p_con->p_next )
+            {
+                if( (void*)p_con == i_id )
+                {
+                    /* XXX don't free p_con as it could be the one that it is sending ... */
+                    p_con->i_state = HTTPD_CONNECTION_TO_BE_CLOSED;
+                    return( _httpd_page_admin_get_success( p_args, pp_data, pi_data, "connection closed" ) );
+                }
+            }
+            return( _httpd_page_admin_get_error( p_args, pp_data, pi_data, "invalid id" ) );
+        }
+        else if( !strcmp( action, "ban_ip" ) )
+        {
+            msg_Dbg( p_httpt, "requested banning ip" );
+            return( _httpd_page_admin_get_success( p_args, pp_data, pi_data, "ip banned" ) );
+        }
+        else
+        {
+            return( _httpd_page_admin_get_error( p_args, pp_data, pi_data, action ) );
+        }
+    }
+    else
+    {
+        return( _httpd_page_admin_get_status( p_args, pp_data, pi_data ) );
+    }
 
     return VLC_SUCCESS;
 }
@@ -1073,6 +1243,9 @@ static void httpd_ConnnectionNew( httpd_sys_t *p_httpt, int fd, struct sockaddr_
     p_con->psz_user = NULL;
     p_con->psz_password = NULL;
     p_con->p_file   = NULL;
+
+    p_con->i_request_size = 0;
+    p_con->p_request = NULL;
 
     p_con->i_buffer = 0;
     p_con->i_buffer_size = 8096;
@@ -1130,10 +1303,10 @@ static void httpd_ConnnectionClose( httpd_sys_t *p_httpt, httpd_connection_t *p_
     FREE( p_con->p_buffer );
     SOCKET_CLOSE( p_con->fd );
 
-
     FREE( p_con->psz_user );
     FREE( p_con->psz_password );
 
+    FREE( p_con->p_request );
     free( p_con );
 }
 
@@ -1251,6 +1424,7 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
 
     //msg_Dbg( p_httpt, "new request=\n%s", p_con->p_buffer );
 
+
     p = p_con->p_buffer;
     p_end = p + strlen( p ) + 1;
 
@@ -1259,10 +1433,21 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
     httpd_RequestGetWord( version, 32, &p, p_end );
     //msg_Dbg( p_httpt, "ask =%s= =%s= =%s=", command, url, version );
 
-    if( strcmp( command, "GET" ) )
+    p_con->p_request      = NULL;
+    p_con->i_request_size = 0;
+    if( !strcmp( command, "GET" ) )
+    {
+        p_con->i_method = HTTPD_CONNECTION_METHOD_GET;
+    }
+    else if( !strcmp( command, "POST" ))
+    {
+        p_con->i_method = HTTPD_CONNECTION_METHOD_POST;
+    }
+    else
     {
         /* unimplemented */
         p_con->psz_file = strdup( "/501.html" );
+        p_con->i_method = HTTPD_CONNECTION_METHOD_GET;
         p_con->i_http_error = 501;
         goto create_header;
     }
@@ -1288,6 +1473,10 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
         //msg_Dbg( p_httpt, "new line=%s", p );
 
         httpd_RequestGetWord( header, 1024, &p, p_end );
+        if( !strcmp( header, "\r\n" ) || !strcmp( header, "\n" ) )
+        {
+            break;
+        }
 
         if( !strcmp( header, "Authorization:" ) )
         {
@@ -1316,7 +1505,47 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
         }
     }
 
-    p_con->psz_file = strdup( url );
+    if( strchr( url, '?' ) )
+    {
+        char *p_request = strchr( url, '?' );
+        *p_request++ = '\0';
+        p_con->psz_file = strdup( url );
+        p_con->p_request = strdup( p_request );
+        p_con->i_request_size = strlen( p_con->p_request );
+    }
+    else
+    {
+        p_con->psz_file = strdup( url );
+    }
+
+    /* fix p_request */
+    if( p_con->i_method == HTTPD_CONNECTION_METHOD_POST )
+    {
+        char *p_request;
+        if( strstr( p_con->p_buffer, "\r\n\r\n" ) )
+        {
+            p_request = strstr( p_con->p_buffer, "\r\n\r\n" ) + 4;
+        }
+        else if( strstr( p_con->p_buffer, "\n\n" ) )
+        {
+            p_request = strstr( p_con->p_buffer, "\n\n" ) + 2;
+        }
+        else
+        {
+            p_request = NULL;
+        }
+        if( p_request && p_request < p_end )
+        {
+            p_con->i_request_size = p_end - p_request;
+            p_con->p_request = malloc( p_con->i_request_size + 1);
+
+            memcpy( p_con->p_request,
+                    p_request,
+                    p_con->i_request_size );
+
+            p_con->p_request[p_con->i_request_size] = '\0';
+        }
+    }
     p_con->i_http_error = 200;
 
 create_header:
@@ -1328,11 +1557,18 @@ create_header:
     //vlc_mutex_lock( &p_httpt->file_lock );
 search_file:
     /* search file */
-    for( i = 0, p_con->p_file = NULL; i < p_httpt->i_file_count; i++ )
+    p_con->p_file = NULL;
+    for( i = 0; i < p_httpt->i_file_count; i++ )
     {
         if( !strcmp( p_httpt->file[i]->psz_file, p_con->psz_file ) )
         {
-            p_con->p_file = p_httpt->file[i];
+            if( p_httpt->file[i]->b_stream ||
+                ( p_con->i_method == HTTPD_CONNECTION_METHOD_GET  && p_httpt->file[i]->pf_get ) ||
+                ( p_con->i_method == HTTPD_CONNECTION_METHOD_POST && p_httpt->file[i]->pf_post ) )
+            {
+                p_con->p_file = p_httpt->file[i];
+                break;
+            }
         }
     }
 
@@ -1422,17 +1658,20 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
     p_page_401 = _RegisterFile( p_httpt,
                                 "/401.html", "text/html",
                                 NULL, NULL,
-                                httpd_page_401_fill,
+                                httpd_page_401_get,
+                                NULL,
                                 (httpd_file_callback_args_t*)NULL );
     p_page_404 = _RegisterFile( p_httpt,
                                 "/404.html", "text/html",
                                 NULL, NULL,
-                                httpd_page_404_fill,
+                                httpd_page_404_get,
+                                NULL,
                                 (httpd_file_callback_args_t*)NULL );
     p_page_admin = _RegisterFile( p_httpt,
                                   "/admin.html", "text/html",
                                   "admin", "salut",
-                                  httpd_page_admin_fill,
+                                  httpd_page_admin_get,
+                                  NULL,
                                   (httpd_file_callback_args_t*)p_httpt );
 
     while( !p_httpt->b_die )
@@ -1463,7 +1702,8 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
         for( p_con = p_httpt->p_first_connection; p_con != NULL; )
         {
             /* no more than 10s of inactivity */
-            if( p_con->i_last_activity_date + (mtime_t)HTTPD_CONNECTION_MAX_UNUSED < mdate() )
+            if( p_con->i_last_activity_date + (mtime_t)HTTPD_CONNECTION_MAX_UNUSED < mdate() ||
+                p_con->i_state == HTTPD_CONNECTION_TO_BE_CLOSED)
             {
                 httpd_connection_t *p_next = p_con->p_next;
 
@@ -1598,8 +1838,14 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                 int i_len;
 
                 /* write data */
-                i_len = send( p_con->fd, p_con->p_buffer + p_con->i_buffer, p_con->i_buffer_size - p_con->i_buffer, 0 );
-
+                if( p_con->i_buffer_size - p_con->i_buffer > 0 )
+                {
+                    i_len = send( p_con->fd, p_con->p_buffer + p_con->i_buffer, p_con->i_buffer_size - p_con->i_buffer, 0 );
+                }
+                else
+                {
+                    i_len = 0;
+                }
 //                msg_Warn( p_httpt, "on %d send %d bytes %s", p_con->i_buffer_size, i_len, p_con->p_buffer + p_con->i_buffer );
 
                 if( ( i_len < 0 && errno != EAGAIN && errno != EINTR )||
@@ -1626,7 +1872,23 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                             if( !p_con->p_file->b_stream )
                             {
                                 p_con->i_state = HTTPD_CONNECTION_SENDING_FILE; // be sure to out from HTTPD_CONNECTION_SENDING_HEADER
-                                p_con->p_file->pf_fill( p_con->p_file->p_sys, &p_con->p_buffer, &p_con->i_buffer_size );
+                                if( p_con->i_method == HTTPD_CONNECTION_METHOD_GET )
+                                {
+                                    p_con->p_file->pf_get( p_con->p_file->p_sys,
+                                                           p_con->p_request, p_con->i_request_size,
+                                                           &p_con->p_buffer, &p_con->i_buffer_size );
+                                }
+                                else if( p_con->i_method == HTTPD_CONNECTION_METHOD_POST )
+                                {
+                                    p_con->p_file->pf_post( p_con->p_file->p_sys,
+                                                            p_con->p_request, p_con->i_request_size,
+                                                            &p_con->p_buffer, &p_con->i_buffer_size );
+                                }
+                                else
+                                {
+                                    p_con->p_buffer = NULL;
+                                    p_con->i_buffer_size = 0;
+                                }
                             }
                             else
                             {
@@ -1702,7 +1964,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                 p_con = p_con->p_next;
                 continue;   /* just for clarity */
             }
-            else
+            else if( p_con->i_state != HTTPD_CONNECTION_TO_BE_CLOSED )
             {
                 msg_Warn( p_httpt, "cannot occur (Invalid p_con->i_state)" );
                 p_con = p_con->p_next;
