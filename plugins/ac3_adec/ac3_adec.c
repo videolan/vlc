@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.8 2001/12/16 16:18:36 sam Exp $
+ * $Id: ac3_adec.c,v 1.9 2001/12/27 01:49:34 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -169,12 +169,12 @@ static int ac3_adec_Run ( decoder_config_t * p_config )
             sync = 1;
         }
 
-        if (DECODER_FIFO_START(*p_ac3thread->p_fifo)->i_pts)
+        if (p_ac3thread->p_fifo->p_first->i_pts)
         {
             p_ac3thread->p_aout_fifo->date[
                 p_ac3thread->p_aout_fifo->l_end_frame] =
-                DECODER_FIFO_START(*p_ac3thread->p_fifo)->i_pts;
-            DECODER_FIFO_START(*p_ac3thread->p_fifo)->i_pts = 0;
+                p_ac3thread->p_fifo->p_first->i_pts;
+            p_ac3thread->p_fifo->p_first->i_pts = 0;
         } else {
             p_ac3thread->p_aout_fifo->date[
                 p_ac3thread->p_aout_fifo->l_end_frame] =
@@ -384,13 +384,9 @@ static void ac3_adec_ErrorThread (ac3dec_thread_t * p_ac3thread)
     while (!p_ac3thread->p_fifo->b_die)
     {
         /* Trash all received PES packets */
-        while (!DECODER_FIFO_ISEMPTY(*p_ac3thread->p_fifo))
-        {
-            p_ac3thread->p_fifo->pf_delete_pes(
-                    p_ac3thread->p_fifo->p_packets_mgt,
-                    DECODER_FIFO_START(*p_ac3thread->p_fifo));
-            DECODER_FIFO_INCSTART (*p_ac3thread->p_fifo);
-        }
+        p_ac3thread->p_fifo->pf_delete_pes(
+                        p_ac3thread->p_fifo->p_packets_mgt,
+                        p_ac3thread->p_fifo->p_first );
 
         /* Waiting for the input thread to put new PES packets in the fifo */
         vlc_cond_wait (&p_ac3thread->p_fifo->data_wait,

@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.7 2001/12/10 04:53:10 sam Exp $
+ * $Id: ac3_spdif.c,v 1.8 2001/12/27 01:49:34 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -315,12 +315,9 @@ static void ac3_spdif_ErrorThread( ac3_spdif_thread_t * p_spdif )
     while( !p_spdif->p_fifo->b_die )
     {
         /* Trash all received PES packets */
-        while( !DECODER_FIFO_ISEMPTY( *p_spdif->p_fifo ) )
-        {
-            p_spdif->p_fifo->pf_delete_pes(p_spdif->p_fifo->p_packets_mgt,
-                    DECODER_FIFO_START( *p_spdif->p_fifo ) );
-            DECODER_FIFO_INCSTART( *p_spdif->p_fifo );
-        }
+        p_spdif->p_fifo->pf_delete_pes(
+                        p_spdif->p_fifo->p_packets_mgt,
+                        p_spdif->p_fifo->p_first );
 
         /* Waiting for the input thread to put new PES packets in the fifo */
         vlc_cond_wait( &p_spdif->p_fifo->data_wait,
@@ -374,7 +371,7 @@ static void BitstreamCallback ( bit_stream_t * p_bit_stream,
         p_bit_stream->p_byte += 3;
 
         p_spdif->i_pts =
-            DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->i_pts;
-        DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->i_pts = 0;
+            p_bit_stream->p_decoder_fifo->p_first->i_pts;
+        p_bit_stream->p_decoder_fifo->p_first->i_pts = 0;
     }
 }

@@ -2,8 +2,8 @@
  * input_ext-plugins.h: structures of the input not exported to other modules,
  *                      but exported to plug-ins
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: input_ext-plugins.h,v 1.11 2001/12/19 10:00:00 massiot Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: input_ext-plugins.h,v 1.12 2001/12/27 01:49:34 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -137,69 +137,6 @@ static __inline__ void input_NullPacket( input_thread_t * p_input,
 
 
 /*
- * Optional netlist management
- */
-
-/*****************************************************************************
- * netlist_t: structure to manage a netlist
- *****************************************************************************/
-typedef struct netlist_s
-{
-    vlc_mutex_t             lock;
-
-    size_t                  i_buffer_size;
-
-    /* Buffers */
-    byte_t *                p_buffers;                 /* Big malloc'ed area */
-    data_packet_t *         p_data;                        /* malloc'ed area */
-    pes_packet_t *          p_pes;                         /* malloc'ed area */
-
-    /* FIFOs of free packets */
-    data_packet_t **        pp_free_data;
-    pes_packet_t **         pp_free_pes;
-    struct iovec *          p_free_iovec;
-    
-    /* FIFO size */
-    unsigned int            i_nb_iovec;
-    unsigned int            i_nb_pes;
-    unsigned int            i_nb_data;
-
-    /* Index */
-    unsigned int            i_iovec_start, i_iovec_end;
-    unsigned int            i_data_start, i_data_end;
-    unsigned int            i_pes_start, i_pes_end;
-
-    /* Reference counters for iovec */
-    unsigned int *          pi_refcount;
-
-    /* Number of blocs read once by readv */
-    unsigned int            i_read_once;
-} netlist_t;
-
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-int                     input_NetlistInit( struct input_thread_s *,
-                                           int i_nb_iovec,
-                                           int i_nb_data,
-                                           int i_nb_pes,
-                                           size_t i_buffer_size,
-                                           int i_read_once );
-
-struct iovec * 	        input_NetlistGetiovec( void * p_method_data );
-void                    input_NetlistMviovec( void * , int,
-                                              struct data_packet_s **);
-struct data_packet_s *  input_NetlistNewPtr( void * );
-struct data_packet_s *  input_NetlistNewPacket( void *, size_t );
-struct pes_packet_s *   input_NetlistNewPES( void * );
-void                    input_NetlistDeletePacket( void *,
-                                                   struct data_packet_s * );
-void                    input_NetlistDeletePES( void *,
-                                                struct pes_packet_s * );
-void                    input_NetlistEnd( struct input_thread_s * );
-
-
-/*
  * Optional Next Generation buffer manager
  *
  * Either buffers can only be used in one data packet (PS case), or buffers
@@ -213,8 +150,7 @@ void                    input_NetlistEnd( struct input_thread_s * );
 
 /* Flags */
 #define BUFFERS_NOFLAGS         0
-#define BUFFERS_SHARED          1
-#define BUFFERS_UNIQUE_SIZE     2 /* Only with NB_LIFO == 1 */
+#define BUFFERS_UNIQUE_SIZE     1 /* Only with NB_LIFO == 1 */
 
 /*****************************************************************************
  * input_buffers_t: defines a LIFO per data type to keep
@@ -584,37 +520,45 @@ static __inline__ void _input_DeletePacket( void * _p_buffers,              \
     input_buffers_t *   p_buffers = (input_buffers_t *)_p_buffers;          \
     int                 i_select;                                           \
                                                                             \
-    EXTRA( FLAGS, NB_LIFO, DATA_CACHE_SIZE );                               \
-                                                                            \
-    for( i_select = 0; i_select < NB_LIFO - 1; i_select++ )                 \
+    while( p_data != NULL )                                                 \
     {                                                                       \
-        if( p_buf->i_size <= (2 * p_buffers->NAME[i_select].i_average_size  \
+        data_packet_t * p_next = p_data->p_next;                            \
+                                                                            \
+        EXTRA( FLAGS, NB_LIFO, DATA_CACHE_SIZE );                           \
+                                                                            \
+        for( i_select = 0; i_select < NB_LIFO - 1; i_select++ )             \
+        {                                                                   \
+            if( p_buf->i_size <=                                            \
+                   (2 * p_buffers->NAME[i_select].i_average_size            \
                       + p_buffers->NAME[i_select + 1].i_average_size) / 3 ) \
-        {                                                                   \
-            break;                                                          \
+            {                                                               \
+                break;                                                      \
+            }                                                               \
         }                                                                   \
-    }                                                                       \
                                                                             \
-    if( p_buffers->NAME[i_select].i_depth < DATA_CACHE_SIZE )               \
-    {                                                                       \
-        /* Cache not full : store the packet in it */                       \
-        p_buf->p_next = p_buffers->NAME[i_select].p_stack;                  \
-        p_buffers->NAME[i_select].p_stack = p_buf;                          \
-        p_buffers->NAME[i_select].i_depth++;                                \
-                                                                            \
-        if( !(FLAGS & BUFFERS_UNIQUE_SIZE) )                                \
+        if( p_buffers->NAME[i_select].i_depth < DATA_CACHE_SIZE )           \
         {                                                                   \
-            /* Update Bresenham mean (very approximative) */                \
-            p_buffers->NAME[i_select].i_average_size = ( p_buf->i_size      \
-                 + p_buffers->NAME[i_select].i_average_size                 \
-                   * (INPUT_BRESENHAM_NB - 1) )                             \
-                 / INPUT_BRESENHAM_NB;                                      \
+            /* Cache not full : store the packet in it */                   \
+            p_buf->p_next = p_buffers->NAME[i_select].p_stack;              \
+            p_buffers->NAME[i_select].p_stack = p_buf;                      \
+            p_buffers->NAME[i_select].i_depth++;                            \
+                                                                            \
+            if( !(FLAGS & BUFFERS_UNIQUE_SIZE) )                            \
+            {                                                               \
+                /* Update Bresenham mean (very approximative) */            \
+                p_buffers->NAME[i_select].i_average_size = ( p_buf->i_size  \
+                     + p_buffers->NAME[i_select].i_average_size             \
+                       * (INPUT_BRESENHAM_NB - 1) )                         \
+                     / INPUT_BRESENHAM_NB;                                  \
+            }                                                               \
         }                                                                   \
-    }                                                                       \
-    else                                                                    \
-    {                                                                       \
-        p_buffers->i_allocated -= p_buf->i_size;                            \
-        free( p_buf );                                                      \
+        else                                                                \
+        {                                                                   \
+            p_buffers->i_allocated -= p_buf->i_size;                        \
+            free( p_buf );                                                  \
+        }                                                                   \
+                                                                            \
+        p_data = p_next;                                                    \
     }                                                                       \
 }                                                                           \
                                                                             \
@@ -680,37 +624,64 @@ static pes_packet_t * input_NewPES( void * _p_buffers )                     \
 /*****************************************************************************
  * input_DeletePES: put a pes and all data packets back into the cache
  *****************************************************************************/
-#define DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, PES_CACHE_SIZE )         \
+#define BUFFERS_DELETEPES_EXTRA( FLAGS, NB_LIFO, DATA_CACHE_SIZE )          \
+    /* Small hopeless optimization */                                       \
+    if( (FLAGS & BUFFERS_UNIQUE_SIZE)                                       \
+           && p_buffers->data[0].i_depth < DATA_CACHE_SIZE )                \
+    {                                                                       \
+        p_buffers->data[0].i_depth += p_pes->i_nb_data;                     \
+        p_pes->p_last->p_next = p_buffers->data[0].p_stack;                 \
+        p_buffers->data[0].p_stack = p_pes->p_first;                        \
+    }                                                                       \
+    else /* No semicolon after this or you will die */ 
+
+#define BUFFERS_DELETEPES_EXTRA_SHARED( FLAGS, NB_LIFO, DATA_CACHE_SIZE )
+
+#define BUFFERS_DELETEPES( FLAGS, NB_LIFO, DATA_CACHE_SIZE, PES_CACHE_SIZE, \
+                           EXTRA )                                          \
 static void input_DeletePES( void * _p_buffers, pes_packet_t * p_pes )      \
 {                                                                           \
     input_buffers_t *   p_buffers = (input_buffers_t *)_p_buffers;          \
                                                                             \
     vlc_mutex_lock( &p_buffers->lock );                                     \
                                                                             \
+    while( p_pes != NULL )                                                  \
     {                                                                       \
-        data_packet_t *     p_data = p_pes->p_first;                        \
-        while( p_data != NULL )                                             \
-        {                                                                   \
-            data_packet_t * p_next = p_data->p_next;                        \
-            _input_DeletePacket( _p_buffers, p_data );                      \
-            p_data = p_next;                                                \
-        }                                                                   \
-    }                                                                       \
+        pes_packet_t * p_next = p_pes->p_next;                              \
                                                                             \
-    if( p_buffers->pes.i_depth < PES_CACHE_SIZE )                           \
-    {                                                                       \
-        /* Cache not full : store the packet in it */                       \
-        p_pes->p_next = p_buffers->pes.p_stack;                             \
-        p_buffers->pes.p_stack = p_pes;                                     \
-        p_buffers->pes.i_depth++;                                           \
-    }                                                                       \
-    else                                                                    \
-    {                                                                       \
-        free( p_pes );                                                      \
+        /* Delete all data packets - no semicolon, PLEASE */                \
+        EXTRA( FLAGS, NB_LIFO, DATA_CACHE_SIZE )                            \
+        {                                                                   \
+            _input_DeletePacket( _p_buffers, p_pes->p_first );              \
+        }                                                                   \
+                                                                            \
+        if( p_buffers->pes.i_depth < PES_CACHE_SIZE )                       \
+        {                                                                   \
+            /* Cache not full : store the packet in it */                   \
+            p_pes->p_next = p_buffers->pes.p_stack;                         \
+            p_buffers->pes.p_stack = p_pes;                                 \
+            p_buffers->pes.i_depth++;                                       \
+        }                                                                   \
+        else                                                                \
+        {                                                                   \
+            free( p_pes );                                                  \
+        }                                                                   \
+                                                                            \
+        p_pes = p_next;                                                     \
     }                                                                       \
                                                                             \
     vlc_mutex_unlock( &p_buffers->lock );                                   \
 }
+
+#define DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, DATA_CACHE_SIZE,         \
+                                   PES_CACHE_SIZE )                         \
+    BUFFERS_DELETEPES( FLAGS, NB_LIFO, DATA_CACHE_SIZE, PES_CACHE_SIZE,     \
+                       BUFFERS_DELETEPES_EXTRA )
+
+#define DECLARE_BUFFERS_DELETEPES_SHARED( FLAGS, NB_LIFO, DATA_CACHE_SIZE,  \
+                                          PES_CACHE_SIZE )                  \
+    BUFFERS_DELETEPES( FLAGS, NB_LIFO, DATA_CACHE_SIZE, PES_CACHE_SIZE,     \
+                       BUFFERS_DELETEPES_EXTRA_SHARED )
 
 /*****************************************************************************
  * input_BuffersToIO: return an io vector (only with BUFFERS_UNIQUE_SIZE)

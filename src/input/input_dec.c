@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.20 2001/12/09 17:01:37 sam Exp $
+ * $Id: input_dec.c,v 1.21 2001/12/27 01:49:34 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -143,21 +143,13 @@ void input_DecodePES( decoder_fifo_t * p_decoder_fifo, pes_packet_t * p_pes )
 {
     vlc_mutex_lock( &p_decoder_fifo->data_lock );
 
-    if( !DECODER_FIFO_ISFULL( *p_decoder_fifo ) )
-    {
-        p_decoder_fifo->buffer[p_decoder_fifo->i_end] = p_pes;
-        DECODER_FIFO_INCEND( *p_decoder_fifo );
+    p_pes->p_next = NULL;
+    *p_decoder_fifo->pp_last = p_pes;
+    p_decoder_fifo->pp_last = &p_pes->p_next;
+    p_decoder_fifo->i_depth++;
 
-        /* Warn the decoder that it's got work to do. */
-        vlc_cond_signal( &p_decoder_fifo->data_wait );
-    }
-    else
-    {
-        /* The FIFO is full !!! This should not happen. */
-        p_decoder_fifo->pf_delete_pes( p_decoder_fifo->p_packets_mgt,
-                                       p_pes );
-        intf_ErrMsg( "PES trashed - decoder fifo full !" );
-    }
+    /* Warn the decoder that it's got work to do. */
+    vlc_cond_signal( &p_decoder_fifo->data_wait );
     vlc_mutex_unlock( &p_decoder_fifo->data_lock );
 }
 
@@ -260,7 +252,9 @@ static decoder_config_t * CreateDecoderConfig( input_thread_t * p_input,
     p_config->i_type = p_es->i_type;
     p_config->p_stream_ctrl = &p_input->stream.control;
 
-    p_config->p_decoder_fifo->i_start = p_config->p_decoder_fifo->i_end = 0;
+    p_config->p_decoder_fifo->p_first = NULL;
+    p_config->p_decoder_fifo->pp_last = &p_config->p_decoder_fifo->p_first;
+    p_config->p_decoder_fifo->i_depth = 0;
     p_config->p_decoder_fifo->b_die = p_config->p_decoder_fifo->b_error = 0;
     p_config->p_decoder_fifo->p_packets_mgt = p_input->p_method_data;
     p_config->p_decoder_fifo->pf_delete_pes = p_input->pf_delete_pes;
@@ -273,14 +267,13 @@ static decoder_config_t * CreateDecoderConfig( input_thread_t * p_input,
  *****************************************************************************/
 static void DeleteDecoderConfig( decoder_config_t * p_config )
 {
+    intf_StatMsg( "input stats: killing decoder for 0x%x, type 0x%x, %d PES in FIFO",
+                  p_config->i_id, p_config->i_type,
+                  p_config->p_decoder_fifo->i_depth );
     /* Free all packets still in the decoder fifo. */
-    while( !DECODER_FIFO_ISEMPTY( *p_config->p_decoder_fifo ) )
-    {
-        p_config->p_decoder_fifo->pf_delete_pes(
-                            p_config->p_decoder_fifo->p_packets_mgt,
-                            DECODER_FIFO_START( *p_config->p_decoder_fifo ) );
-        DECODER_FIFO_INCSTART( *p_config->p_decoder_fifo );
-    }
+    p_config->p_decoder_fifo->pf_delete_pes(
+                        p_config->p_decoder_fifo->p_packets_mgt,
+                        p_config->p_decoder_fifo->p_first );
 
     /* Destroy the lock and cond */
     vlc_cond_destroy( &p_config->p_decoder_fifo->data_wait );

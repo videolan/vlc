@@ -237,13 +237,9 @@ static void mad_adec_ErrorThread (mad_adec_thread_t * p_mad_adec)
     while (!p_mad_adec->p_fifo->b_die)
     {
         /* Trash all received PES packets */
-        while (!DECODER_FIFO_ISEMPTY(*p_mad_adec->p_fifo))
-        {
-            p_mad_adec->p_fifo->pf_delete_pes(
-                    p_mad_adec->p_fifo->p_packets_mgt,
-                    DECODER_FIFO_START(*p_mad_adec->p_fifo));
-            DECODER_FIFO_INCSTART (*p_mad_adec->p_fifo);
-        }
+        p_mad_adec->p_fifo->pf_delete_pes(
+                        p_mad_adec->p_fifo->p_packets_mgt,
+                        p_mad_adec->p_fifo->p_first );
 
         /* Waiting for the input thread to put new PES packets in the fifo */
         vlc_cond_wait (&p_mad_adec->p_fifo->data_wait,

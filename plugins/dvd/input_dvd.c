@@ -9,7 +9,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.109 2001/12/19 23:19:20 sam Exp $
+ * $Id: input_dvd.c,v 1.110 2001/12/27 01:49:34 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -126,7 +126,7 @@ DECLARE_BUFFERS_END_SHARED( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_NEWPACKET_SHARED( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_DELETEPACKET_SHARED( FLAGS, NB_LIFO, 150 );
 DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
-DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150 );
+DECLARE_BUFFERS_DELETEPES_SHARED( FLAGS, NB_LIFO, 150, 150 );
 DECLARE_BUFFERS_TOIO( FLAGS, DVD_LB_SIZE );
 DECLARE_BUFFERS_SHAREBUFFER( FLAGS );
 
@@ -981,12 +981,7 @@ intf_WarnMsg( 2, "Sector: 0x%x Read: %d Chapter: %d", p_dvd->i_sector, i_block_o
 
     pp_packets[i_packet] = NULL;
 
-    while( p_data != NULL )
-    {
-        data_packet_t * p_next = p_data->p_next;
-        p_input->pf_delete_packet( p_input->p_method_data, p_data );
-        p_data = p_next;
-    }
+    p_input->pf_delete_packet( p_input->p_method_data, p_data );
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 

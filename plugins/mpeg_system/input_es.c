@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.6 2001/12/19 10:00:00 massiot Exp $
+ * $Id: input_es.c,v 1.7 2001/12/27 01:49:34 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -99,7 +99,7 @@ DECLARE_BUFFERS_END( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_NEWPACKET( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, 150 );
 DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
-DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150 );
+DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150, 150 );
 DECLARE_BUFFERS_TOIO( FLAGS, ES_PACKET_SIZE );
 
 /*****************************************************************************
@@ -222,11 +222,10 @@ static int ESRead( input_thread_t * p_input,
         p_data = p_data->p_next;
         pp_packets[i_loop]->p_next = NULL;
     }
+    /* Delete remaining packets */
+    input_DeletePacket( p_input->p_method_data, p_data );
     for( ; i_loop < INPUT_READ_ONCE ; i_loop++ )
     {
-        data_packet_t * p_next = p_data->p_next;
-        input_DeletePacket( p_input->p_method_data, p_data );
-        p_data = p_next;
         pp_packets[i_loop] = NULL;
     }
 
@@ -293,8 +292,7 @@ static void ESDemux( input_thread_t * p_input, data_packet_t * p_data )
     input_DecodePES( p_fifo, p_pes );
 
     vlc_mutex_lock( &p_fifo->data_lock );
-    if( ( (DECODER_FIFO_END( *p_fifo ) - DECODER_FIFO_START( *p_fifo ))
-            & FIFO_SIZE ) >= MAX_PACKETS_IN_FIFO )
+    if( p_fifo->i_depth >= MAX_PACKETS_IN_FIFO )
     {
         vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
     }
@@ -318,18 +316,23 @@ static void ESNextDataPacket( bit_stream_t * p_bit_stream )
          * time to jump to the next PES packet */
         if( p_bit_stream->p_data->p_next == NULL )
         {
-            /* We are going to read/write the start and end indexes of the
-             * decoder fifo and to use the fifo's conditional variable,
-             * that's why we need to take the lock before. */
+            pes_packet_t * p_next;
+
             vlc_mutex_lock( &p_fifo->data_lock );
 
             /* Free the previous PES packet. */
+            p_next = p_fifo->p_first->p_next;
+            p_fifo->p_first->p_next = NULL;
             p_fifo->pf_delete_pes( p_fifo->p_packets_mgt,
-                                   DECODER_FIFO_START( *p_fifo ) );
-            DECODER_FIFO_INCSTART( *p_fifo );
+                                   p_fifo->p_first );
+            p_fifo->p_first = p_next;
+            p_fifo->i_depth--;
 
-            if( DECODER_FIFO_ISEMPTY( *p_fifo ) )
+            if( p_fifo->p_first == NULL )
             {
+                /* No PES in the FIFO. p_last is no longer valid. */
+                p_fifo->pp_last = &p_fifo->p_first;
+
                 /* Signal the input thread we're waiting. */
                 vlc_cond_signal( &p_fifo->data_wait );
 
@@ -338,7 +341,7 @@ static void ESNextDataPacket( bit_stream_t * p_bit_stream )
             }
 
             /* The next byte could be found in the next PES packet */
-            p_bit_stream->p_data = DECODER_FIFO_START( *p_fifo )->p_first;
+            p_bit_stream->p_data = p_fifo->p_first->p_first;
 
             vlc_mutex_unlock( &p_fifo->data_lock );
 

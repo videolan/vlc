@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.3 2001/12/16 16:18:36 sam Exp $
+ * $Id: spu_decoder.c,v 1.4 2001/12/27 01:49:34 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -236,12 +236,9 @@ static void spudec_ErrorThread( spudec_thread_t *p_spudec )
     while( !p_spudec->p_fifo->b_die )
     {
         /* Trash all received PES packets */
-        while( !DECODER_FIFO_ISEMPTY(*p_spudec->p_fifo) )
-        {
-            p_spudec->p_fifo->pf_delete_pes( p_spudec->p_fifo->p_packets_mgt,
-                    DECODER_FIFO_START(*p_spudec->p_fifo) );
-            DECODER_FIFO_INCSTART( *p_spudec->p_fifo );
-        }
+        p_spudec->p_fifo->pf_delete_pes(
+                        p_spudec->p_fifo->p_packets_mgt,
+                        p_spudec->p_fifo->p_first );
 
         /* Waiting for the input thread to put new PES packets in the fifo */
         vlc_cond_wait( &p_spudec->p_fifo->data_wait,
@@ -308,7 +305,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
                   p_spudec->i_spu_size );
 
     /* We cannot display a subpicture with no date */
-    if( DECODER_FIFO_START(*p_spudec->p_fifo)->i_pts == 0 )
+    if( p_spudec->p_fifo->p_first->i_pts == 0 )
     {
         intf_WarnMsg( 3, "spudec error: subtitle without a date" );
         return;
@@ -328,7 +325,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
     }
 
     /* Get display time now. If we do it later, we may miss the PTS. */
-    p_spudec->i_pts = DECODER_FIFO_START(*p_spudec->p_fifo)->i_pts;
+    p_spudec->i_pts = p_spudec->p_fifo->p_first->i_pts;
 
     /* Allocate the temporary buffer we will parse */
     p_src = malloc( p_spudec->i_rle_size );

@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.5 2001/12/10 04:53:11 sam Exp $
+ * $Id: lpcm_adec.c,v 1.6 2001/12/27 01:49:34 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -184,11 +184,11 @@ void lpcm_adec_DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
     int i_loop;
     byte_t byte1, byte2;
 
-    if( DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts )
+    if( p_lpcmdec->p_fifo->p_first->i_pts )
     {
         p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->l_end_frame] =
-            DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts;
-        DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts = 0;
+            p_lpcmdec->p_fifo->p_first->i_pts;
+        p_lpcmdec->p_fifo->p_first->i_pts = 0;
     }
     else
     { 
@@ -246,12 +246,9 @@ static void lpcm_adec_ErrorThread( lpcmdec_thread_t * p_lpcmdec )
     while( !p_lpcmdec->p_fifo->b_die ) 
     {
         /* Trash all received PES packets */
-        while( !DECODER_FIFO_ISEMPTY(*p_lpcmdec->p_fifo) ) 
-        {
-            p_lpcmdec->p_fifo->pf_delete_pes( p_lpcmdec->p_fifo->p_packets_mgt,
-                    DECODER_FIFO_START(*p_lpcmdec->p_fifo ));
-            DECODER_FIFO_INCSTART( *p_lpcmdec->p_fifo );
-        }
+        p_lpcmdec->p_fifo->pf_delete_pes(
+                        p_lpcmdec->p_fifo->p_packets_mgt,
+                        p_lpcmdec->p_fifo->p_first );
 
         /* Waiting for the input thread to put new PES packets in the fifo */
         vlc_cond_wait ( &p_lpcmdec->p_fifo->data_wait, 

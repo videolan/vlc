@@ -75,15 +75,6 @@
     (p_symbols)->input_DemuxTS = input_DemuxTS; \
     (p_symbols)->input_DemuxPSI = input_DemuxPSI; \
     (p_symbols)->input_ClockManageControl = input_ClockManageControl; \
-    (p_symbols)->input_NetlistInit = input_NetlistInit; \
-    (p_symbols)->input_NetlistGetiovec = input_NetlistGetiovec; \
-    (p_symbols)->input_NetlistMviovec = input_NetlistMviovec; \
-    (p_symbols)->input_NetlistNewPacket = input_NetlistNewPacket; \
-    (p_symbols)->input_NetlistNewPtr = input_NetlistNewPtr; \
-    (p_symbols)->input_NetlistNewPES = input_NetlistNewPES; \
-    (p_symbols)->input_NetlistDeletePacket = input_NetlistDeletePacket; \
-    (p_symbols)->input_NetlistDeletePES = input_NetlistDeletePES; \
-    (p_symbols)->input_NetlistEnd = input_NetlistEnd; \
     (p_symbols)->aout_CreateFifo = aout_CreateFifo; \
     (p_symbols)->aout_DestroyFifo = aout_DestroyFifo; \
     (p_symbols)->vout_CreateThread = vout_CreateThread; \
@@ -184,16 +175,6 @@
 #   define input_DemuxPSI p_symbols->input_DemuxPSI
 
 #   define input_ClockManageControl p_symbols->input_ClockManageControl
-
-#   define input_NetlistInit p_symbols->input_NetlistInit
-#   define input_NetlistGetiovec p_symbols->input_NetlistGetiovec
-#   define input_NetlistMviovec p_symbols->input_NetlistMviovec
-#   define input_NetlistNewPacket p_symbols->input_NetlistNewPacket
-#   define input_NetlistNewPtr p_symbols->input_NetlistNewPtr
-#   define input_NetlistNewPES p_symbols->input_NetlistNewPES
-#   define input_NetlistDeletePacket p_symbols->input_NetlistDeletePacket
-#   define input_NetlistDeletePES p_symbols->input_NetlistDeletePES
-#   define input_NetlistEnd p_symbols->input_NetlistEnd
 
 #   define aout_CreateFifo p_symbols->aout_CreateFifo
 #   define aout_DestroyFifo p_symbols->aout_DestroyFifo

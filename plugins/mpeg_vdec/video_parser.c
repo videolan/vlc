@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.7 2001/12/10 04:53:11 sam Exp $
+ * $Id: video_parser.c,v 1.8 2001/12/27 01:49:34 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -298,12 +298,9 @@ static void mpeg_vdec_ErrorThread( vpar_thread_t *p_vpar )
     while( !p_vpar->p_fifo->b_die )
     {
         /* Trash all received PES packets */
-        while( !DECODER_FIFO_ISEMPTY(*p_vpar->p_fifo) )
-        {
-            p_vpar->p_fifo->pf_delete_pes( p_vpar->p_fifo->p_packets_mgt,
-                                  DECODER_FIFO_START(*p_vpar->p_fifo) );
-            DECODER_FIFO_INCSTART( *p_vpar->p_fifo );
-        }
+        p_vpar->p_fifo->pf_delete_pes(
+                        p_vpar->p_fifo->p_packets_mgt,
+                        p_vpar->p_fifo->p_first );
 
         /* Waiting for the input thread to put new PES packets in the fifo */
         vlc_cond_wait( &p_vpar->p_fifo->data_wait, &p_vpar->p_fifo->data_lock );
@@ -428,13 +425,13 @@ static void BitstreamCallback ( bit_stream_t * p_bit_stream,
     if( b_new_pes )
     {
         p_vpar->sequence.next_pts =
-            DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->i_pts;
+            p_bit_stream->p_decoder_fifo->p_first->i_pts;
         p_vpar->sequence.next_dts =
-            DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->i_dts;
+            p_bit_stream->p_decoder_fifo->p_first->i_dts;
         p_vpar->sequence.i_current_rate =
-            DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->i_rate;
+            p_bit_stream->p_decoder_fifo->p_first->i_rate;
 
-        if( DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->b_discontinuity )
+        if( p_bit_stream->p_decoder_fifo->p_first->b_discontinuity )
         {
 #ifdef TRACE_VPAR
             intf_DbgMsg( "Discontinuity in BitstreamCallback" );

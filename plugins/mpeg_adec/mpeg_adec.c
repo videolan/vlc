@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.7 2001/12/10 04:53:11 sam Exp $
+ * $Id: mpeg_adec.c,v 1.8 2001/12/27 01:49:34 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -202,11 +202,11 @@ static void adec_Decode( adec_thread_t * p_adec )
         buffer = ((s16 *)p_adec->p_aout_fifo->buffer)
                     + (p_adec->p_aout_fifo->l_end_frame * ADEC_FRAME_SIZE);
 
-        if( DECODER_FIFO_START( *p_adec->p_fifo)->i_pts )
+        if( p_adec->p_fifo->p_first->i_pts )
         {
             p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] =
-                DECODER_FIFO_START( *p_adec->p_fifo )->i_pts;
-            DECODER_FIFO_START(*p_adec->p_fifo)->i_pts = 0;
+                p_adec->p_fifo->p_first->i_pts;
+            p_adec->p_fifo->p_first->i_pts = 0;
         }
         else
         {
@@ -248,12 +248,9 @@ static void adec_ErrorThread ( adec_thread_t *p_adec )
     while ( !p_adec->p_fifo->b_die ) 
     {
         /* Trash all received PES packets */
-        while ( !DECODER_FIFO_ISEMPTY(*p_adec->p_fifo) ) 
-        {
-            p_adec->p_fifo->pf_delete_pes ( p_adec->p_fifo->p_packets_mgt,
-                                   DECODER_FIFO_START(*p_adec->p_fifo) );
-            DECODER_FIFO_INCSTART ( *p_adec->p_fifo );
-        }
+        p_adec->p_fifo->pf_delete_pes(
+                        p_adec->p_fifo->p_packets_mgt,
+                        p_adec->p_fifo->p_first );
 
         /* Waiting for the input thread to put new PES packets in the fifo */
         vlc_cond_wait ( &p_adec->p_fifo->data_wait, &p_adec->p_fifo->data_lock );

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.45 2001/12/19 10:00:00 massiot Exp $
+ * Copyright (C) 1999-2000 VideoLAN
+ * $Id: input_ext-dec.h,v 1.46 2001/12/27 01:49:34 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -42,9 +42,6 @@
  *****************************************************************************/
 typedef struct data_packet_s
 {
-    /* Nothing before this line, the code relies on that */
-    byte_t *                p_buffer;                     /* raw data packet */
-
     /* Decoders information */
     byte_t *                p_demux_start;   /* start of the PS or TS packet */
     byte_t *                p_payload_start;
@@ -52,12 +49,12 @@ typedef struct data_packet_s
     byte_t *                p_payload_end;                    /* guess ? :-) */
     boolean_t               b_discard_payload;  /* is the packet messed up ? */
 
-    int *                   pi_refcount;
-    unsigned int            i_size;                           /* buffer size */
-    long                    l_size;                           /* buffer size */
-
     /* Used to chain the TS packets that carry data for a same PES or PSI */
     struct data_packet_s *  p_next;
+
+    /* Buffer manager information */ 
+    byte_t *                p_buffer;                     /* raw data packet */
+    unsigned int            i_size;                           /* buffer size */
 } data_packet_t;
 
 /*****************************************************************************
@@ -81,13 +78,13 @@ typedef struct pes_packet_s
 
     int                     i_pes_size;    /* size of the current PES packet */
 
-    /* Pointers to packets (packets are then linked by the p_prev and
-       p_next fields of the data_packet_t struct) */
+    /* Chained list to packets */
     data_packet_t *         p_first;      /* The first packet contained by this
                                            * PES (used by decoders). */
     data_packet_t *         p_last;    /* The last packet contained by this
                                           PES (used by the buffer allocator) */
-    int                     i_nb_data;
+    int                     i_nb_data; /* Number of data packets in the chained
+                                                                        list */
 
     /* Chained list used by the input buffers manager */
     struct pes_packet_s *   p_next;
@@ -105,9 +102,9 @@ typedef struct decoder_fifo_s
     vlc_cond_t              data_wait;     /* fifo data conditional variable */
 
     /* Data */
-    pes_packet_t *          buffer[FIFO_SIZE + 1];
-    int                     i_start;
-    int                     i_end;
+    pes_packet_t *          p_first;
+    pes_packet_t **         pp_last;
+    int                     i_depth;   /* number of PES packets in the stack */
 
     /* Communication interface between input and decoders */
     boolean_t               b_die;          /* the decoder should return now */
@@ -117,18 +114,6 @@ typedef struct decoder_fifo_s
     void                 (* pf_delete_pes)( void *, pes_packet_t * );
                                      /* function to use when releasing a PES */
 } decoder_fifo_t;
-
-/* Macros to manage a decoder_fifo_t structure. Please remember to take
- * data_lock before using them. */
-#define DECODER_FIFO_ISEMPTY( fifo )  ( (fifo).i_start == (fifo).i_end )
-#define DECODER_FIFO_ISFULL( fifo )   ( ( ((fifo).i_end + 1 - (fifo).i_start)\
-                                          & FIFO_SIZE ) == 0 )
-#define DECODER_FIFO_START( fifo )    ( (fifo).buffer[ (fifo).i_start ] )
-#define DECODER_FIFO_INCSTART( fifo ) ( (fifo).i_start = ((fifo).i_start + 1)\
-                                                         & FIFO_SIZE )
-#define DECODER_FIFO_END( fifo )      ( (fifo).buffer[ (fifo).i_end ] )
-#define DECODER_FIFO_INCEND( fifo )   ( (fifo).i_end = ((fifo).i_end + 1) \
-                                                       & FIFO_SIZE )
 
 /*****************************************************************************
  * bit_fifo_t : bit fifo descriptor
