@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-02-02 02:35+0100\n"
+"POT-Creation-Date: 2003-02-02 03:07+0100\n"
 "PO-Revision-Date: 2002-04-20 16:58GMT\n"
 "Last-Translator: Derk-Jan Hartman <thedj@users.sourceforge.net>\n"
 "Language-Team: Nederlands <nl@li.org>\n"
@@ -2694,7 +2694,7 @@ msgstr "S_peel"
 msgid "Authors"
 msgstr "Auteurs"
 
-#: modules/gui/gtk/gtk_interface.c:1667
+#: modules/gui/gtk/gtk_interface.c:1667 modules/gui/win32/strings.cpp:11
 msgid "the VideoLAN team <videolan@videolan.org>"
 msgstr "het VideoLAN team <videolan@videolan.org>"
 
@@ -3101,11 +3101,6 @@ msgstr ""
 #: modules/gui/win32/win32.cpp:310
 msgid "Native Windows interface module"
 msgstr "Native Windows interface module"
-
-#: modules/gui/win32/strings.cpp:11
-#, fuzzy
-msgid "the VideoLAN Team <videolan@videolan.org>"
-msgstr "Het VideoLAN Team <videolan@videolan.org>"
 
 #: modules/gui/win32/strings.cpp:12
 msgid "Version x.y.z"
@@ -3994,6 +3989,10 @@ msgstr "XOSD module"
 #: modules/visualization/xosd/xosd.c:83
 msgid "xosd interface module"
 msgstr "xosd interface module"
+
+#, fuzzy
+#~ msgid "the VideoLAN Team <videolan@videolan.org>"
+#~ msgstr "Het VideoLAN Team <videolan@videolan.org>"
 
 #~ msgid ""
 #~ "the VideoLAN team <videolan@videolan.org>\n"

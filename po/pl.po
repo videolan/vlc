@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-02-02 02:35+0100\n"
+"POT-Creation-Date: 2003-02-02 03:07+0100\n"
 "PO-Revision-Date: 2002-07-12 11:49+0100\n"
 "Last-Translator: Arkadiusz Lipiec <alipiec@elka.pw.edu.pl>\n"
 "Language-Team: polish <pl@li.org>\n"
@@ -2669,7 +2669,7 @@ msgstr "_Odtwarzaj"
 msgid "Authors"
 msgstr "Autorzy"
 
-#: modules/gui/gtk/gtk_interface.c:1667
+#: modules/gui/gtk/gtk_interface.c:1667 modules/gui/win32/strings.cpp:11
 msgid "the VideoLAN team <videolan@videolan.org>"
 msgstr "Zespó³ VideoLAN <videolan@videolan.org>"
 
@@ -3102,13 +3102,6 @@ msgstr ""
 #, fuzzy
 msgid "Native Windows interface module"
 msgstr "modu³ interfejsu Win32"
-
-#: modules/gui/win32/strings.cpp:11
-#, fuzzy
-msgid "the VideoLAN Team <videolan@videolan.org>"
-msgstr ""
-"Zespó³ VideoLAN <videolan@videolan.org>\n"
-"http://www.videolan.org/"
 
 #: modules/gui/win32/strings.cpp:12
 msgid "Version x.y.z"
@@ -4083,6 +4076,12 @@ msgstr "modu³ QNX RTOS"
 #, fuzzy
 msgid "xosd interface module"
 msgstr "modu³ interfejsu"
+
+#, fuzzy
+#~ msgid "the VideoLAN Team <videolan@videolan.org>"
+#~ msgstr ""
+#~ "Zespó³ VideoLAN <videolan@videolan.org>\n"
+#~ "http://www.videolan.org/"
 
 #~ msgid ""
 #~ "the VideoLAN team <videolan@videolan.org>\n"

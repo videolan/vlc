@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-02-02 02:35+0100\n"
+"POT-Creation-Date: 2003-02-02 03:07+0100\n"
 "PO-Revision-Date: 2002-28-02 23.35+0100\n"
 "Last-Translator: Sigmund Augdal <sigmunau@idi.ntnu.no>.\n"
 "Language-Team: \n"
@@ -2574,7 +2574,7 @@ msgstr "_Spill"
 msgid "Authors"
 msgstr "Forfattere"
 
-#: modules/gui/gtk/gtk_interface.c:1667
+#: modules/gui/gtk/gtk_interface.c:1667 modules/gui/win32/strings.cpp:11
 msgid "the VideoLAN team <videolan@videolan.org>"
 msgstr ""
 
@@ -3012,10 +3012,6 @@ msgstr ""
 #, fuzzy
 msgid "Native Windows interface module"
 msgstr "Standard grensesnitt: "
-
-#: modules/gui/win32/strings.cpp:11
-msgid "the VideoLAN Team <videolan@videolan.org>"
-msgstr ""
 
 #: modules/gui/win32/strings.cpp:12
 msgid "Version x.y.z"
