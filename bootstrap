@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for the VLC media player
-##  $Id: bootstrap,v 1.61 2003/07/02 14:08:56 sam Exp $
+##  $Id: bootstrap,v 1.62 2003/07/03 11:23:09 sam Exp $
 ##
 ##  Authors: Sam Hocevar <sam@zoy.org>
 
@@ -129,12 +129,12 @@ all: all-${mod}
 
 all-${mod}:
 if BUILD_MOZILLA
-	if \$(VLC_CONFIG) --target plugin | grep "${dir}/lib${mod}_plugin" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}_plugin\$(LIBEXT); fi; \\
-	if \$(VLC_CONFIG) --target builtin | grep "${dir}/lib${mod}\\.a" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}.a; fi; \\
-	if \$(VLC_CONFIG) --target builtin pic | grep "${dir}/lib${mod}_pic\\.a" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}_pic.a; fi
+	@if test "\$(plugin)" != "no" && \$(VLC_CONFIG) --target plugin | grep "${dir}/lib${mod}_plugin" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}_plugin\$(LIBEXT); fi; \\
+	if test "\$(builtin)" != "no" && \$(VLC_CONFIG) --target builtin | grep "${dir}/lib${mod}\\.a" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}.a; fi; \\
+	if test "\$(pic)" != "no" && \$(VLC_CONFIG) --target builtin pic | grep "${dir}/lib${mod}_pic\\.a" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}_pic.a; fi
 else
-	if \$(VLC_CONFIG) --target plugin | grep "${dir}/lib${mod}_plugin" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}_plugin\$(LIBEXT); fi; \\
-	if \$(VLC_CONFIG) --target builtin | grep "${dir}/lib${mod}\\.a" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}.a; fi
+	@if test "\$(plugin)" != "no" && \$(VLC_CONFIG) --target plugin | grep "${dir}/lib${mod}_plugin" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}_plugin\$(LIBEXT); fi; \\
+	if test "\$(builtin)" != "no" && \$(VLC_CONFIG) --target builtin | grep "${dir}/lib${mod}\\.a" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}.a; fi
 endif
 
 if UNTRUE
@@ -196,10 +196,10 @@ lib${mod}_DATA = \$(D${count}p)
 lib${mod}dir = \$(libdir)/vlc/${topdir}
 ${PRIVATE}noinst_LIBRARIES += \$(L${count}p)
 ${PRIVATE}lib${mod}_plugin\$(LIBEXT): \$(lib${mod}_plugin_a_OBJECTS)
-${PRIVATE}	case \`\$(VLC_CONFIG) --linkage ${mod}\` in \\
-${PRIVATE}	  c++) \$(CXXLINK) \$(lib${mod}_plugin_a_OBJECTS) \`\$(VLC_CONFIG) --libs plugin ${mod}\` ;; \\
-${PRIVATE}	  objc) \$(OBJCLINK) \$(lib${mod}_plugin_a_OBJECTS) \`\$(VLC_CONFIG) --libs plugin ${mod}\` ;; \\
-${PRIVATE}	  c|*) \$(LINK) \$(lib${mod}_plugin_a_OBJECTS) \`\$(VLC_CONFIG) --libs plugin ${mod}\` ;; \\
+${PRIVATE}	@case \`\$(VLC_CONFIG) --linkage ${mod}\` in \\
+${PRIVATE}	  c++) echo \$(CXXLINK) \$(lib${mod}_plugin_a_OBJECTS) \\\`\$(VLC_CONFIG) --libs plugin ${mod}\\\` ; \$(CXXLINK) \$(lib${mod}_plugin_a_OBJECTS) \`\$(VLC_CONFIG) --libs plugin ${mod}\` ;; \\
+${PRIVATE}	  objc) echo \$(OBJCLINK) \$(lib${mod}_plugin_a_OBJECTS) \\\`\$(VLC_CONFIG) --libs plugin ${mod}\\\` ; \$(OBJCLINK) \$(lib${mod}_plugin_a_OBJECTS) \`\$(VLC_CONFIG) --libs plugin ${mod}\` ;; \\
+${PRIVATE}	  c|*) echo \$(LINK) \$(lib${mod}_plugin_a_OBJECTS) \\\`\$(VLC_CONFIG) --libs plugin ${mod}\\\` ; \$(LINK) \$(lib${mod}_plugin_a_OBJECTS) \`\$(VLC_CONFIG) --libs plugin ${mod}\` ;; \\
 ${PRIVATE}	esac
 
 

@@ -350,10 +350,10 @@ DEPENDENCIES_vlc = lib/libvlc.a $(DATA_win32_rc) $(LIB_intl)
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc) stamp-builtin
 	@rm -f $(top_builddir)/vlc$(EXEEXT)
-	case `$(VLC_CONFIG) --linkage vlc builtin` in \
-	  c++) $(CXXLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ;; \
-	  objc) $(OBJCLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ;; \
-	  c|*) $(LINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ;; \
+	@case `$(VLC_CONFIG) --linkage vlc builtin` in \
+	  c++) echo $(CXXLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ; $(CXXLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ;; \
+	  objc) echo $(OBJCLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ; $(OBJCLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ;; \
+	  c|*) echo $(LINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ; $(LINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ;; \
 	esac
 
 if HAVE_BEOS
@@ -370,8 +370,8 @@ endif
 # Install the modules and the symlinks
 install-exec-local:
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do if test -n "$$i" ; then \
-	  echo $(INSTALL) -m 755 "$$i$(LIBEXT)" "$(DESTDIR)$(libdir)/vlc/modules/`echo $$i | cut -f2 -d/`" ; \
-	  $(INSTALL) -m 755 "$$i$(LIBEXT)" "$(DESTDIR)$(libdir)/vlc/modules/`echo $$i | cut -f2 -d/`" ; \
+	  echo $(INSTALL) -m 755 "$$i$(LIBEXT)" "$(DESTDIR)$(libdir)/vlc/`echo $$i | cut -f2 -d/`" ; \
+	  $(INSTALL) -m 755 "$$i$(LIBEXT)" "$(DESTDIR)$(libdir)/vlc/`echo $$i | cut -f2 -d/`" ; \
 	fi ; done
 	for i in "" `$(VLC_CONFIG) --target builtin` `$(VLC_CONFIG) --target builtin pic` ; do if test -n "$$i" ; then \
 	  echo $(INSTALL) -m 644 "$$i" "$(DESTDIR)$(libdir)/vlc" ; \
