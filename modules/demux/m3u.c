@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse pls, m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.16 2003/03/22 14:35:03 gbazin Exp $
+ * $Id: m3u.c,v 1.17 2003/03/30 11:43:38 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -63,7 +63,7 @@ static int  Demux ( input_thread_t * );
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("playlist metademux") );
-    set_capability( "demux", 10 );
+    set_capability( "demux", 180 );
     set_callbacks( Activate, Deactivate );
     add_shortcut( "m3u" );
     add_shortcut( "asx" );

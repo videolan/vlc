@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.3 2003/03/30 02:58:36 gbazin Exp $
+ * $Id: preferences.cpp,v 1.4 2003/03/30 11:43:38 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -85,6 +85,7 @@ private:
     wxWindow *p_parent;
 
     wxTreeItemId root_item;
+    wxTreeItemId plugins_item;
 };
 
 struct ConfigData
@@ -119,6 +120,7 @@ public:
 
     PrefsPanel() { }
     PrefsPanel( wxWindow *parent, intf_thread_t *_p_intf,
+                PrefsDialog *_p_prefs_dialog,
                 module_t *p_module, char * );
     virtual ~PrefsPanel() {}
 
@@ -131,6 +133,8 @@ private:
     DECLARE_EVENT_TABLE()
 
     intf_thread_t *p_intf;
+    PrefsDialog *p_prefs_dialog;
+
     vlc_bool_t b_advanced;
 
     wxBoxSizer *config_sizer;
@@ -153,7 +157,7 @@ public:
 class ConfigEvtHandler : public wxEvtHandler
 {
 public:
-    ConfigEvtHandler( intf_thread_t *p_intf );
+    ConfigEvtHandler( intf_thread_t *p_intf, PrefsDialog *p_prefs_dialog );
     virtual ~ConfigEvtHandler();
 
     void ConfigEvtHandler::OnCommandEvent( wxCommandEvent& event );
@@ -163,6 +167,7 @@ private:
     DECLARE_EVENT_TABLE()
 
     intf_thread_t *p_intf;
+    PrefsDialog *p_prefs_dialog;
 };
 
 /*****************************************************************************
@@ -178,7 +183,7 @@ enum
     Advanced_Event,
 };
 
-BEGIN_EVENT_TABLE(PrefsDialog, wxDialog)
+BEGIN_EVENT_TABLE(PrefsDialog, wxFrame)
     /* Button events */
     EVT_BUTTON(wxID_OK, PrefsDialog::OnOk)
     EVT_BUTTON(wxID_CANCEL, PrefsDialog::OnCancel)
@@ -222,8 +227,8 @@ END_EVENT_TABLE()
  * Constructor.
  *****************************************************************************/
 PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, Interface *_p_main_interface)
-  :  wxDialog( _p_main_interface, -1, _("Preferences"), wxDefaultPosition,
-               wxSize(650,450), wxDEFAULT_FRAME_STYLE )
+  :  wxFrame( _p_main_interface, -1, _("Preferences"), wxDefaultPosition,
+              wxSize(650,450), wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
     p_intf = _p_intf;
@@ -351,7 +356,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
             case CONFIG_HINT_CATEGORY:
                 ConfigTreeData *config_data = new ConfigTreeData;
                 config_data->panel =
-                    new PrefsPanel( p_parent, p_intf,
+                    new PrefsPanel( p_parent, p_intf, p_prefs_dialog,
                                     p_module, p_item->psz_text );
                 config_data->panel->Hide();
 
@@ -369,7 +374,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     /*
      * Build a tree of all the plugins
      */
-    wxTreeItemId plugins_item = AppendItem( root_item, _("Plugins") );
+    plugins_item = AppendItem( root_item, _("Plugins") );
 
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
@@ -400,7 +405,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         /* Add the plugin to the tree */
         ConfigTreeData *config_data = new ConfigTreeData;
         config_data->panel =
-            new PrefsPanel( p_parent, p_intf, p_module, NULL );
+            new PrefsPanel( p_parent, p_intf, p_prefs_dialog, p_module, NULL );
         config_data->panel->Hide();
         AppendItem( capability_item, p_module->psz_object_name, -1, -1,
                     config_data );
@@ -434,12 +439,13 @@ PrefsTreeCtrl::~PrefsTreeCtrl()
 
 void PrefsTreeCtrl::ApplyChanges()
 {
-    long cookie; size_t i_child_index;
+    long cookie, cookie2;
     ConfigTreeData *config_data;
 
-    wxTreeItemId item = GetFirstChild( root_item, cookie);
-    for( i_child_index = 0;
-         i_child_index < GetChildrenCount( root_item, TRUE );
+    /* Apply changes to the main module */
+    wxTreeItemId item = GetFirstChild( root_item, cookie );
+    for( size_t i_child_index = 0;
+         i_child_index < GetChildrenCount( root_item, FALSE );
          i_child_index++ )
     {
         config_data = (ConfigTreeData *)GetItemData( item );
@@ -449,6 +455,29 @@ void PrefsTreeCtrl::ApplyChanges()
         }
 
         item = GetNextChild( root_item, cookie );
+    }
+
+    /* Apply changes to the plugins */
+    item = GetFirstChild( plugins_item, cookie);
+    for( size_t i_child_index = 0;
+         i_child_index < GetChildrenCount( plugins_item, TRUE );
+         i_child_index++ )
+    {
+        wxTreeItemId item2 = GetFirstChild( item, cookie2 );
+        for( size_t i_child_index = 0;
+             i_child_index < GetChildrenCount( item, FALSE );
+             i_child_index++ )
+        {
+            config_data = (ConfigTreeData *)GetItemData( item2 );
+            if( config_data )
+            {
+                config_data->panel->ApplyChanges();
+            }
+
+            item2 = GetNextChild( item, cookie2 );
+        }
+
+        item = GetNextChild( plugins_item, cookie );
     }
 }
 
@@ -476,6 +505,7 @@ void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
  * PrefsPanel class definition.
  *****************************************************************************/
 PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
+                        PrefsDialog *_p_prefs_dialog,
                         module_t *p_module, char *psz_section )
   :  wxPanel( parent, -1, wxDefaultPosition, wxDefaultSize )
 {
@@ -493,6 +523,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
     /* Initializations */
     p_intf = _p_intf;
+    p_prefs_dialog =_p_prefs_dialog,
+
     b_advanced = VLC_TRUE;
     SetAutoLayout( TRUE );
 
@@ -582,6 +614,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
         case CONFIG_ITEM_STRING:
         case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_DIRECTORY:
             label = new wxStaticText(panel, -1, p_item->psz_text);
             textctrl = new wxTextCtrl( panel, -1, p_item->psz_value,
                                        wxDefaultPosition, wxDefaultSize,
@@ -594,6 +627,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             {
                 button = new wxButton( panel, -1, _("Browse...") );
                 panel_sizer->Add( button, 0, wxALL, 5 );
+                button->SetClientData((void *)config_data);
             }
             break;
 
@@ -667,7 +701,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
     /* Intercept all menu events in our custom event handler */
     config_window->PushEventHandler(
-        new ConfigEvtHandler( p_intf ) );
+        new ConfigEvtHandler( p_intf, p_prefs_dialog ) );
 
     /* Update panel */
     wxCommandEvent dummy_event;
@@ -702,6 +736,7 @@ void PrefsPanel::ApplyChanges()
             break;
         case CONFIG_ITEM_STRING:
         case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_DIRECTORY:
             config_PutPsz( p_intf, config_data->option_name.c_str(),
                            config_data->control.textctrl->GetValue() );
             break;
@@ -768,10 +803,12 @@ void PrefsPanel::OnDirectoryBrowse( wxCommandEvent& WXUNUSED(event) )
 /*****************************************************************************
  * A small helper class which intercepts all events
  *****************************************************************************/
-ConfigEvtHandler::ConfigEvtHandler( intf_thread_t *_p_intf )
+ConfigEvtHandler::ConfigEvtHandler( intf_thread_t *_p_intf,
+                                    PrefsDialog *_p_prefs_dialog )
 {
     /* Initializations */
     p_intf = _p_intf;
+    p_prefs_dialog = _p_prefs_dialog;
 }
 
 ConfigEvtHandler::~ConfigEvtHandler()
@@ -795,13 +832,23 @@ void ConfigEvtHandler::OnCommandEvent( wxCommandEvent& event )
         return;
     }
 
-    msg_Err( p_intf, "%s", config_data->option_name.c_str() );
+    if( config_data->i_config_type == CONFIG_ITEM_FILE )
+    {
+        wxFileDialog dialog( p_prefs_dialog, _("Open file"), "", "", "*.*",
+                             wxOPEN | wxSAVE );
+
+        if( dialog.ShowModal() == wxID_OK )
+        {
+            config_data->control.textctrl->SetValue( dialog.GetPath() );      
+        }
+    }
 
     switch( config_data->i_config_type )
     {
     case CONFIG_ITEM_MODULE:
         break;
     case CONFIG_ITEM_STRING:
+        break;
     case CONFIG_ITEM_FILE:
         break;
     case CONFIG_ITEM_INTEGER:

@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.24 2003/02/20 01:52:45 sigmunau Exp $
+ * $Id: configuration.h,v 1.25 2003/03/30 11:43:38 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -43,6 +43,7 @@
 #define CONFIG_ITEM_INTEGER                 0x0040  /* Integer option */
 #define CONFIG_ITEM_BOOL                    0x0050  /* Bool option */
 #define CONFIG_ITEM_FLOAT                   0x0060  /* Float option */
+#define CONFIG_ITEM_DIRECTORY               0x0070  /* Directory option */
 
 #define CONFIG_ITEM                         0x00F0
 

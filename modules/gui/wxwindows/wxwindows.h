@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.13 2003/03/30 02:58:36 gbazin Exp $
+ * $Id: wxwindows.h,v 1.14 2003/03/30 11:43:38 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -155,7 +155,7 @@ private:
     Timer *timer;
     intf_thread_t *p_intf;
 
-    wxDialog *p_prefs_dialog;
+    wxFrame *p_prefs_dialog;
     wxFrame  *p_fileinfo_window;
 
     int i_old_playing_status;
@@ -312,7 +312,7 @@ private:
 
 /* Preferences Dialog */
 class PrefsTreeCtrl;
-class PrefsDialog: public wxDialog
+class PrefsDialog: public wxFrame
 {
 public:
     /* Constructor */
