@@ -1,6 +1,6 @@
 object NetworkDlg: TNetworkDlg
-  Left = 368
-  Top = 266
+  Left = 419
+  Top = 281
   BorderStyle = bsDialog
   Caption = 'Open network'
   ClientHeight = 209
@@ -306,6 +306,8 @@ object NetworkDlg: TNetworkDlg
       ItemHeight = 13
       TabOrder = 2
       Text = '138.195.131.10'
+      Items.Strings = (
+        '138.195.131.10')
     end
     object ComboBoxBroadcast: TComboBox
       Left = 96
@@ -316,6 +318,8 @@ object NetworkDlg: TNetworkDlg
       ItemHeight = 13
       TabOrder = 3
       Text = '138.195.143.255'
+      Items.Strings = (
+        '138.195.143.255')
     end
     object UpDownPort: TUpDown
       Left = 241
@@ -364,6 +368,8 @@ object NetworkDlg: TNetworkDlg
       ItemHeight = 13
       TabOrder = 1
       Text = '138.195.156.232'
+      Items.Strings = (
+        '138.195.156.232')
     end
     object EditPortCS: TEdit
       Left = 296

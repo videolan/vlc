@@ -46,6 +46,25 @@ extern struct intf_thread_s *p_intfGlobal;
 __fastcall TNetworkDlg::TNetworkDlg( TComponent* Owner )
         : TForm( Owner )
 {
+        char *psz_channel_server;
+
+        /* server port */
+        UpDownPort->Position = config_GetIntVariable( "server_port" );
+
+        /* channel server */
+        if( config_GetIntVariable( "network_channel" ) )
+        {
+            CheckBoxChannel->Checked = true;
+        }
+
+        psz_channel_server = config_GetPszVariable( "channel_server" );
+        if( psz_channel_server )
+        {
+            ComboBoxChannel->Text = psz_channel_server;
+            free( psz_channel_server );
+        }
+
+        UpDownPortCS->Position = config_GetIntVariable( "channel_port" );
 }
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::FormShow( TObject *Sender )

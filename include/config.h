@@ -49,9 +49,11 @@
 
 /* The configuration file and directory */
 #ifdef SYS_BEOS
-#define CONFIG_DIR                      "config/settings"
+#  define CONFIG_DIR                    "config/settings"
+#elif defined( WIN32 )
+#  define CONFIG_DIR			"videolan"
 #else
-#define CONFIG_DIR                      ".videolan"
+#  define CONFIG_DIR                    ".videolan"
 #endif
 #define CONFIG_FILE                     "vlcrc"
 
