@@ -104,6 +104,7 @@ private:
     "application/x-vlc-plugin::VLC plugin;" \
     /* windows media */ \
     "video/x-ms-asf-plugin:asf,asx:Windows Media Video;" \
+    "video/x-ms-asf:asf,asx:Windows Media Video;" \
     "application/x-mplayer2::Windows Media;" \
     "video/x-ms-wmv:wmv:Windows Media" \
 
