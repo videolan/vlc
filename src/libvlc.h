@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.119 2003/12/11 14:58:06 hartman Exp $
+ * $Id: libvlc.h,v 1.120 2003/12/11 20:21:12 bigben Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -831,7 +831,7 @@ vlc_module_begin();
     add_key( "key-quit", KEY_MODIFIER_COMMAND|'q', NULL, QUIT_KEY_TEXT, QUIT_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-up", KEY_MODIFIER_COMMAND|KEY_UP, NULL, VOL_UP_KEY_TEXT, VOL_UP_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-down", KEY_MODIFIER_COMMAND|KEY_DOWN, NULL, VOL_DOWN_KEY_TEXT, VOL_DOWN_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "key-vol-mute", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFTq|'m', NULL, VOL_MUTE_KEY_TEXT, VOL_MUTE_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-vol-mute", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'m', NULL, VOL_MUTE_KEY_TEXT, VOL_MUTE_KEY_LONGTEXT, VLC_FALSE );
 #else
     add_key( "key-fullscreen", 'f', NULL, FULLSCREEN_KEY_TEXT, FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-play-pause", KEY_SPACE, NULL, PLAY_PAUSE_KEY_TEXT, PLAY_PAUSE_KEY_LONGTEXT, VLC_FALSE );
