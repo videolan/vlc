@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.118 2001/10/13 15:34:21 stef Exp $
+ * $Id: main.c,v 1.119 2001/10/22 00:43:23 jobi Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -798,7 +798,7 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             ShowConsole();
             RedirectSTDOUT();
             intf_ErrMsg( "intf error: unknown option `%s'",
-                         ppsz_argv[optind - 1] );
+                         ppsz_argv[optind] );
             Usage( USAGE );
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
             if( strcmp( "", main_GetPszVariable( INTF_STDOUT_VAR,
