@@ -1181,19 +1181,9 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media, vlm_schedule_t *
             vlm_MessageAdd( message_media , vlm_MessageNew( "type" , "broadcast" ) );
         }
 
-        if( media->b_enabled == VLC_TRUE )
-        {
-            vlm_MessageAdd( message_media , vlm_MessageNew( "enabled" , "yes" ) );
-        }
-        else
-        {
-            vlm_MessageAdd( message_media , vlm_MessageNew( "enabled" , "no" ) );
-        }
+        vlm_MessageAdd( message_media , vlm_MessageNew( "enabled" , media->b_enabled ? "yes" : "no" ) );
 
-        if( media->b_loop == VLC_TRUE )
-        {
-            vlm_MessageAdd( message_media , vlm_MessageNew( "loop" , "yes" ) );
-        }
+        vlm_MessageAdd( message_media, vlm_MessageNew( "loop" , media->b_loop ? "yes" : "no" ) );
 
         message_child = vlm_MessageAdd( message_media , vlm_MessageNew( "inputs" , NULL ) );
 
@@ -1202,10 +1192,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media, vlm_schedule_t *
             vlm_MessageAdd( message_child , vlm_MessageNew( media->input[i] , NULL ) );
         }
 
-        if( media->psz_output != NULL )
-        {
-            vlm_MessageAdd( message_media , vlm_MessageNew( "output" , media->psz_output ) );
-        }
+        vlm_MessageAdd( message_media , vlm_MessageNew( "output" , media->psz_output ? media->psz_output : "" ) );
 
         message_child = vlm_MessageAdd( message_media , vlm_MessageNew( "options" , NULL ) );
 
