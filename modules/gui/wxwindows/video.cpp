@@ -161,7 +161,7 @@ void *VideoWindow::GetWindow( int *pi_x_hint, int *pi_y_hint,
     return (void *)gdk_x11_drawable_get_xid(
                gtk_widget_get_parent_window( p_widget ) );
 #elif defined(__WXGTK__)
-    return (void *)( (char *)gtk_widget_get_parent_window( p_widget )
+    return (void *)*(int *)( (char *)gtk_widget_get_parent_window( p_widget )
                + 2 * sizeof(void *) );
 #endif
 
