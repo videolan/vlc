@@ -2,7 +2,7 @@
  * x11_loop.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_loop.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: x11_loop.cpp,v 1.2 2004/01/18 00:25:02 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -348,9 +348,8 @@ void X11Loop::handleX11Event()
             // Get the message type
             string type = XGetAtomName( XDISPLAY, event.xclient.message_type );
 
-            // Find the D&D object for this window
-            X11DragDrop *pDnd = (X11DragDrop*)
-                    retrievePointer( event.xany.window, "DND_OBJECT" );
+            // Find the DnD object for this window
+            X11DragDrop *pDnd = pFactory->m_dndMap[event.xany.window];
             if( !pDnd )
             {
                 msg_Err( getIntf(), "No associated D&D object !!" );
@@ -381,28 +380,6 @@ void X11Loop::handleX11Event()
             fprintf(stderr, "unknown event: %d\n", event.type );
             break;
     }
-}
-
-
-void *X11Loop::retrievePointer( Window wnd, const char *pName )
-{
-    Atom typeRet;
-    int fmtRet;
-    unsigned long nRet, bRet;
-    unsigned char *propRet;
-    void *ptr;
-
-    // Retrieve the pointer on the generic window, which was
-    // stored as a window property
-    Atom prop = XInternAtom( XDISPLAY, pName, False );
-    Atom type = XInternAtom( XDISPLAY, "POINTER", False );
-    XGetWindowProperty( XDISPLAY, wnd, prop, 0,
-                        ((sizeof(void*)+3)/4), False, type,
-                        &typeRet, &fmtRet, &nRet, &bRet, &propRet );
-    memcpy( &ptr, propRet, sizeof(void*));
-    XFree( propRet );
-
-    return ptr;
 }
 
 #endif

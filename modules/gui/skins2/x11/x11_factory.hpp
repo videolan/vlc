@@ -2,7 +2,7 @@
  * x11_factory.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_factory.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: x11_factory.hpp,v 1.2 2004/01/18 00:25:02 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -31,6 +31,7 @@
 #include <map>
 
 class X11Display;
+class X11DragDrop;
 class X11TimerLoop;
 
 
@@ -38,6 +39,11 @@ class X11TimerLoop;
 class X11Factory: public OSFactory
 {
     public:
+        /// Map to find the GenericWindow associated to a X11Window
+        map<Window, GenericWindow*> m_windowMap;
+        /// Map to find the Dnd object associated to a X11Window
+        map<Window, X11DragDrop*> m_dndMap;
+
         X11Factory( intf_thread_t *pIntf );
         virtual ~X11Factory();
 
@@ -81,9 +87,6 @@ class X11Factory: public OSFactory
 
         /// Get the timer loop
         X11TimerLoop *getTimerLoop() const { return m_pTimerLoop; }
-
-        /// Map to find the GenericWindow associated with a X11Window
-        map<Window, GenericWindow*> m_windowMap;
 
     private:
         /// X11 display

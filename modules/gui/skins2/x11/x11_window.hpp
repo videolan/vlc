@@ -2,7 +2,7 @@
  * x11_window.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: x11_window.hpp,v 1.2 2004/01/18 00:25:02 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -72,9 +72,6 @@ class X11Window: public OSWindow
         bool m_dragDrop;
         /// Drop target
         X11DragDrop *m_pDropTarget;
-
-        /// Store a pointer in the window as a property
-        void storePointer( const char *pName, void *pPtr );
 };
 
 

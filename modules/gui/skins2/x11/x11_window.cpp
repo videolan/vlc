@@ -2,7 +2,7 @@
  * x11_window.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: x11_window.cpp,v 1.2 2004/01/18 00:25:02 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -72,17 +72,18 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     // Drag & drop
     if( m_dragDrop )
     {
-        // Register the window as a drop target
+        // Create a Dnd object for this window
         m_pDropTarget = new X11DragDrop( getIntf(), m_rDisplay, m_wnd,
                                          playOnDrop );
 
+        // Register the window as a drop target
         Atom xdndAtom = XInternAtom( XDISPLAY, "XdndAware", False );
         char xdndVersion = 4;
         XChangeProperty( XDISPLAY, m_wnd, xdndAtom, XA_ATOM, 32,
                          PropModeReplace, (unsigned char *)&xdndVersion, 1 );
 
-        // Store a pointer on the D&D object as a window property.
-        storePointer( "DND_OBJECT", (void*)m_pDropTarget );
+        // Store a pointer to be used in X11Loop
+        pFactory->m_dndMap[m_wnd] = m_pDropTarget;
     }
 
     // Change the window title XXX
@@ -94,6 +95,7 @@ X11Window::~X11Window()
 {
     X11Factory *pFactory = (X11Factory*)X11Factory::instance( getIntf() );
     pFactory->m_windowMap[m_wnd] = NULL;
+    pFactory->m_dndMap[m_wnd] = NULL;
 
     if( m_dragDrop )
     {
@@ -140,20 +142,6 @@ void X11Window::setOpacity( uint8_t value )
 void X11Window::toggleOnTop( bool onTop )
 {
     // XXX TODO
-}
-
-
-void X11Window::storePointer( const char *pName, void *pPtr )
-{
-    // We don't assume pointers are 32bits, so it's a bit tricky
-    unsigned char data[sizeof(void*)];
-    memcpy( data, &pPtr, sizeof(void*) );
-
-    // Store the pointer on the generic window as a window property.
-    Atom prop = XInternAtom( XDISPLAY, pName, False );
-    Atom type = XInternAtom( XDISPLAY, "POINTER", False );
-    XChangeProperty( XDISPLAY, m_wnd, prop, type, 8, PropModeReplace, data,
-                     sizeof(GenericWindow*) );
 }
 
 #endif

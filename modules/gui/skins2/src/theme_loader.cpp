@@ -2,7 +2,7 @@
  * theme_loader.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme_loader.cpp,v 1.3 2004/01/11 00:21:22 asmax Exp $
+ * $Id: theme_loader.cpp,v 1.4 2004/01/18 00:25:02 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -57,6 +57,7 @@ extern "C"
 {
     extern FILE *yyin;
     int yylex( void *pContext );
+    void yyrestart( FILE *input_file );
 }
 
 bool ThemeLoader::load( const string &fileName )
@@ -164,17 +165,16 @@ void ThemeLoader::deleteTempFiles( const string &path )
 
 bool ThemeLoader::parse( const string &xmlFile )
 {
-    // Things to do before loading theme
-//     getIntf()->p_sys->p_theme->OnLoadTheme();
     // Set the file to parse
-    yyin = fopen( xmlFile.c_str(), "r" );
-    if( yyin == NULL )
+    FILE *file = fopen( xmlFile.c_str(), "r" );
+    if( file == NULL )
     {
         // Skin cannot be opened
         msg_Err( getIntf(), "Cannot open the specified skin file: %s",
                  xmlFile.c_str() );
         return false;
     }
+    yyrestart( file );
 
     // File loaded
     msg_Dbg( getIntf(), "Using skin file: %s", xmlFile.c_str() );
@@ -195,7 +195,7 @@ bool ThemeLoader::parse( const string &xmlFile )
     // Start the parser
     ParserContext context( getIntf() );
     int lex = yylex( &context );
-    fclose( yyin );
+    fclose( file );
 
     if( lex )
     {

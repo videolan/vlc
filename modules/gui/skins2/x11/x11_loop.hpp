@@ -2,7 +2,7 @@
  * x11_loop.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_loop.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: x11_loop.hpp,v 1.2 2004/01/18 00:25:02 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -66,16 +66,12 @@ class X11Loop: public OSLoop
         /// internal vlc key codes
         map<KeySym, int> keysymToVlcKey;
 
-
         // Private because it's a singleton
         X11Loop( intf_thread_t *pIntf, X11Display &rDisplay );
         virtual ~X11Loop();
 
         /// Handle the next X11 event
         void handleX11Event();
-
-        /// Retrieve a pointer stored in the window as a property
-        void *retrievePointer( Window wnd, const char *pName );
 };
 
 #endif

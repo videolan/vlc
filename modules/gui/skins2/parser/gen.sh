@@ -7,5 +7,5 @@ sed -e 's/\([SE]Tag_.*\)(void)/\1(void*)/' \
     -e 's/\/\* XML processor entry point. \*\//#define YY_DECL int yylex(void *pContext)/' skin.h > skin.h.new && mv -f skin.h.new skin.h
 
 
-flex -oflex.c -BLs skin.l
+flex -oflex.c -B -L skin.l
 sed -e 's/\([SE]Tag_[^()]*\)()/\1(pContext)/g' flex.c > flex.c.new && mv -f flex.c.new flex.c 
