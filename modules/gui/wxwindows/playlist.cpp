@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.7 2003/04/01 16:11:43 gbazin Exp $
+ * $Id: playlist.cpp,v 1.8 2003/05/11 13:22:23 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -92,7 +92,7 @@ END_EVENT_TABLE()
  * Constructor.
  *****************************************************************************/
 Playlist::Playlist( intf_thread_t *_p_intf, Interface *_p_main_interface ):
-    wxFrame( _p_main_interface, -1, "Playlist", wxDefaultPosition,
+    wxFrame( _p_main_interface, -1, wxU(_("Playlist")), wxDefaultPosition,
              wxSize::wxSize( 400, 500 ), wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
@@ -102,21 +102,21 @@ Playlist::Playlist( intf_thread_t *_p_intf, Interface *_p_main_interface ):
 
     /* Create our "Manage" menu */
     wxMenu *manage_menu = new wxMenu;
-    manage_menu->Append( AddUrl_Event, _("Add &Url...") );
-    manage_menu->Append( AddDirectory_Event, _("Add &Directory...") );
+    manage_menu->Append( AddUrl_Event, wxU(_("Add &Url...")) );
+    manage_menu->Append( AddDirectory_Event, wxU(_("Add &Directory...")) );
     manage_menu->AppendSeparator();
-    manage_menu->Append( Close_Event, _("&Close") );
+    manage_menu->Append( Close_Event, wxU(_("&Close")) );
 
     /* Create our "Selection" menu */
     wxMenu *selection_menu = new wxMenu;
-    selection_menu->Append( InvertSelection_Event, _("&Invert") );
-    selection_menu->Append( DeleteSelection_Event, _("&Delete") );
-    selection_menu->Append( SelectAll_Event, _("&Select All") );
+    selection_menu->Append( InvertSelection_Event, wxU(_("&Invert")) );
+    selection_menu->Append( DeleteSelection_Event, wxU(_("&Delete")) );
+    selection_menu->Append( SelectAll_Event, wxU(_("&Select All")) );
 
     /* Append the freshly created menus to the menu bar */
     wxMenuBar *menubar = new wxMenuBar( wxMB_DOCKABLE );
-    menubar->Append( manage_menu, _("&Manage") );
-    menubar->Append( selection_menu, _("&Selection") );
+    menubar->Append( manage_menu, wxU(_("&Manage")) );
+    menubar->Append( selection_menu, wxU(_("&Selection")) );
 
     /* Attach the menu bar to the frame */
     SetMenuBar( menubar );
@@ -133,13 +133,13 @@ Playlist::Playlist( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     listview = new wxListView( playlist_panel, ListView_Event,
                                wxDefaultPosition, wxSize( 350, 300 ),
                                wxLC_REPORT | wxSUNKEN_BORDER );
-    listview->InsertColumn( 0, _("Url") );
-    listview->InsertColumn( 1, _("Duration") );
+    listview->InsertColumn( 0, wxU(_("Url")) );
+    listview->InsertColumn( 1, wxU(_("Duration")) );
     listview->SetColumnWidth( 0, 250 );
     listview->SetColumnWidth( 1, 100 );
 
     /* Create the OK button */
-    ok_button = new wxButton( playlist_panel, wxID_OK, _("OK") );
+    ok_button = new wxButton( playlist_panel, wxID_OK, wxU(_("OK")) );
     ok_button->SetDefault();
 
     /* Place everything in sizers */
@@ -187,10 +187,10 @@ void Playlist::Rebuild()
     vlc_mutex_lock( &p_playlist->object_lock );
     for( int i = 0; i < p_playlist->i_size; i++ )
     {
-        wxString filename = p_playlist->pp_items[i]->psz_name;
+        wxString filename = wxU(p_playlist->pp_items[i]->psz_name);
         listview->InsertItem( i, filename );
         /* FIXME: we should try to find the actual duration... */
-        listview->SetItem( i, 1, _("no info") );
+        listview->SetItem( i, 1, wxU(_("no info")) );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 

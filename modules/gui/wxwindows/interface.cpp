@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.23 2003/05/07 12:23:06 gbazin Exp $
+ * $Id: interface.cpp,v 1.24 2003/05/11 13:22:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -108,8 +108,6 @@ enum
     Logs_Event,
     FileInfo_Event,
 
-    Audio_Event,
-    Subtitles_Event,
     Prefs_Event,
 
     SliderScroll_Event,
@@ -159,7 +157,7 @@ END_EVENT_TABLE()
  * Constructor.
  *****************************************************************************/
 Interface::Interface( intf_thread_t *_p_intf ):
-    wxFrame( NULL, -1, VOUT_TITLE,
+    wxFrame( NULL, -1, wxT(VOUT_TITLE),
              wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
@@ -228,36 +226,42 @@ void Interface::CreateOurMenuBar()
 #define HELP_LOGS       N_("Show the program logs")
 #define HELP_FILEINFO       N_("Show information about the file being played")
 
-#define HELP_AUDIO N_("Change the current audio track")
-#define HELP_SUBS  N_("Change the current subtitles stream")
 #define HELP_PREFS N_("Go to the preferences menu")
 
 #define HELP_ABOUT N_("About this program")
 
     /* Create the "File" menu */
     wxMenu *file_menu = new wxMenu;
-    file_menu->Append( OpenFile_Event, _("&Open File..."), HELP_FILE );
-    file_menu->Append( OpenDisc_Event, _("Open &Disc..."), HELP_DISC );
-    file_menu->Append( OpenNet_Event, _("&Network Stream..."), HELP_NET );
+    file_menu->Append( OpenFile_Event, wxU(_("&Open File...")),
+                       wxU(_(HELP_FILE)) );
+    file_menu->Append( OpenDisc_Event, wxU(_("Open &Disc...")),
+                       wxU(_(HELP_DISC)) );
+    file_menu->Append( OpenNet_Event, wxU(_("&Network Stream...")),
+                       wxU(_(HELP_NET)) );
 #if 0
-    file_menu->Append( OpenSat_Event, _("&Satellite Stream..."), HELP_NET );
+    file_menu->Append( OpenSat_Event, wxU(_("&Satellite Stream...")),
+                       wxU(_(HELP_NET)) );
+#endif
+#if 0
+    file_menu->AppendSeparator();
+    file_menu->Append( EjectDisc_Event, wxU(_("&Eject Disc")),
+                       wxU(_(HELP_EJECT)) );
 #endif
     file_menu->AppendSeparator();
-    file_menu->Append( EjectDisc_Event, _("&Eject Disc"), HELP_EJECT );
-    file_menu->AppendSeparator();
-    file_menu->Append( Exit_Event, _("E&xit"), HELP_EXIT );
+    file_menu->Append( Exit_Event, wxU(_("E&xit")), wxU(_(HELP_EXIT)) );
 
     /* Create the "View" menu */
     wxMenu *view_menu = new wxMenu;
-    view_menu->Append( Playlist_Event, _("&Playlist..."), HELP_PLAYLIST );
-    view_menu->Append( Logs_Event, _("&Logs..."), HELP_LOGS );
-    view_menu->Append( FileInfo_Event, _("&File info..."), HELP_FILEINFO );
+    view_menu->Append( Playlist_Event, wxU(_("&Playlist...")),
+                       wxU(_(HELP_PLAYLIST)) );
+    view_menu->Append( Logs_Event, wxU(_("&Logs...")), wxU(_(HELP_LOGS)) );
+    view_menu->Append( FileInfo_Event, wxU(_("&File info...")),
+                       wxU(_(HELP_FILEINFO)) );
 
     /* Create the "Settings" menu */
     wxMenu *settings_menu = new wxMenu;
-    settings_menu->Append( Subtitles_Event, _("&Subtitles"), HELP_SUBS );
-    settings_menu->AppendSeparator();
-    settings_menu->Append( Prefs_Event, _("&Preferences..."), HELP_PREFS );
+    settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")),
+                           wxU(_(HELP_PREFS)) );
 
     /* Create the "Audio" menu */
     p_audio_menu = new wxMenu;
@@ -269,16 +273,16 @@ void Interface::CreateOurMenuBar()
 
     /* Create the "Help" menu */
     wxMenu *help_menu = new wxMenu;
-    help_menu->Append( About_Event, _("&About..."), HELP_ABOUT );
+    help_menu->Append( About_Event, wxU(_("&About...")), wxU(_(HELP_ABOUT)) );
 
     /* Append the freshly created menus to the menu bar... */
     wxMenuBar *menubar = new wxMenuBar( wxMB_DOCKABLE );
-    menubar->Append( file_menu, _("&File") );
-    menubar->Append( view_menu, _("&View") );
-    menubar->Append( settings_menu, _("&Settings") );
-    menubar->Append( p_audio_menu, _("&Audio") );
-    menubar->Append( p_video_menu, _("&Video") );
-    menubar->Append( help_menu, _("&Help") );
+    menubar->Append( file_menu, wxU(_("&File")) );
+    menubar->Append( view_menu, wxU(_("&View")) );
+    menubar->Append( settings_menu, wxU(_("&Settings")) );
+    menubar->Append( p_audio_menu, wxU(_("&Audio")) );
+    menubar->Append( p_video_menu, wxU(_("&Video")) );
+    menubar->Append( help_menu, wxU(_("&Help")) );
 
     /* Attach the menu bar to the frame */
     SetMenuBar( menubar );
@@ -309,28 +313,28 @@ void Interface::CreateOurToolBar()
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
-    toolbar->AddTool( OpenFile_Event, _("File"), wxBitmap( file_xpm ),
-                      HELP_FILE );
-    toolbar->AddTool( OpenDisc_Event, _("Disc"), wxBitmap( disc_xpm ),
-                      HELP_DISC );
-    toolbar->AddTool( OpenNet_Event, _("Net"), wxBitmap( net_xpm ),
-                      HELP_NET );
+    toolbar->AddTool( OpenFile_Event, wxU(_("File")), wxBitmap( file_xpm ),
+                      wxU(_(HELP_FILE)) );
+    toolbar->AddTool( OpenDisc_Event, wxU(_("Disc")), wxBitmap( disc_xpm ),
+                      wxU(_(HELP_DISC)) );
+    toolbar->AddTool( OpenNet_Event, wxU(_("Net")), wxBitmap( net_xpm ),
+                      wxU(_(HELP_NET)) );
 #if 0
-    toolbar->AddTool( OpenSat_Event, _("Sat"), wxBitmap( sat_xpm ),
-                      HELP_SAT );
+    toolbar->AddTool( OpenSat_Event, wxU(_("Sat")), wxBitmap( sat_xpm ),
+                      wxU(_(HELP_SAT)) );
 #endif
     toolbar->AddSeparator();
-    toolbar->AddTool( StopStream_Event, _("Stop"), wxBitmap( stop_xpm ),
-                      HELP_STOP );
-    toolbar->AddTool( PlayStream_Event, _("Play"), wxBitmap( play_xpm ),
-                      HELP_PLAY );
+    toolbar->AddTool( StopStream_Event, wxU(_("Stop")), wxBitmap( stop_xpm ),
+                      wxU(_(HELP_STOP)) );
+    toolbar->AddTool( PlayStream_Event, wxU(_("Play")), wxBitmap( play_xpm ),
+                      wxU(_(HELP_PLAY)) );
     toolbar->AddSeparator();
-    toolbar->AddTool( Playlist_Event, _("Playlist"), wxBitmap( playlist_xpm ),
-                      HELP_PLO );
-    toolbar->AddTool( PrevStream_Event, _("Prev"), wxBitmap( previous_xpm ),
-                      HELP_PLP );
-    toolbar->AddTool( NextStream_Event, _("Next"), wxBitmap( next_xpm ),
-                      HELP_PLN );
+    toolbar->AddTool( Playlist_Event, wxU(_("Playlist")),
+                      wxBitmap( playlist_xpm ), wxU(_(HELP_PLO)) );
+    toolbar->AddTool( PrevStream_Event, wxU(_("Prev")),
+                      wxBitmap( previous_xpm ), wxU(_(HELP_PLP)) );
+    toolbar->AddTool( NextStream_Event, wxU(_("Next")), wxBitmap( next_xpm ),
+                      wxU(_(HELP_PLN)) );
 
     toolbar->Realize();
 
@@ -360,7 +364,7 @@ void Interface::CreateOurSlider()
     slider_frame->SetAutoLayout( TRUE );
 
     /* Create static box to surround the slider */
-    slider_box = new wxStaticBox( slider_frame, -1, "" );
+    slider_box = new wxStaticBox( slider_frame, -1, wxT("") );
 
     /* Create sizer for slider frame */
     wxStaticBoxSizer *slider_sizer =
@@ -395,7 +399,7 @@ void Interface::Open( int i_access_method )
             return;
         }
 
-        playlist_Add( p_playlist, (char *)dialog.mrl.c_str(),
+        playlist_Add( p_playlist, (const char *)dialog.mrl.mb_str(),
                       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
         TogglePlayButton( PLAYING_S );
@@ -419,7 +423,7 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
         {
             p_audio_menu = AudioMenu( p_intf, this );
             wxMenu *menu =
-                GetMenuBar()->Replace( 3, p_audio_menu, _("&Audio") );
+                GetMenuBar()->Replace( 3, p_audio_menu, wxU(_("&Audio")) );
             if( menu ) delete menu;
 
             b_audio_menu = 0;
@@ -432,7 +436,7 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
         {
             p_video_menu = VideoMenu( p_intf, this );
             wxMenu *menu =
-                GetMenuBar()->Replace( 4, p_video_menu, _("&Video") );
+                GetMenuBar()->Replace( 4, p_video_menu, wxU(_("&Video")) );
             if( menu ) delete menu;
 
             b_video_menu = 0;
@@ -442,11 +446,11 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
 
 #else
     p_audio_menu = AudioMenu( p_intf, this );
-    wxMenu *menu = GetMenuBar()->Replace( 3, p_audio_menu, _("&Audio") );
+    wxMenu *menu = GetMenuBar()->Replace( 3, p_audio_menu, wxU(_("&Audio")) );
     if( menu ) delete menu;
 
     p_video_menu = VideoMenu( p_intf, this );
-    menu = GetMenuBar()->Replace( 4, p_video_menu, _("&Video") );
+    menu = GetMenuBar()->Replace( 4, p_video_menu, wxU(_("&Video")) );
     if( menu ) delete menu;
 
 #endif
@@ -473,15 +477,15 @@ void Interface::OnExit( wxCommandEvent& WXUNUSED(event) )
 void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
 {
     wxString msg;
-    msg.Printf( VOUT_TITLE + wxString(_(" (wxWindows interface)\n\n")) +
-        wxString(_("(C) 1996-2003 - the VideoLAN Team\n\n")) +
-        wxString(_("The VideoLAN team <videolan@videolan.org>\n"
-                   "http://www.videolan.org/\n\n")) +
-        wxString(_("This is the VideoLAN Client, a DVD, MPEG and DivX player."
-          "\nIt can play MPEG and MPEG2 files from a file or from a "
-          "network source.")) );
+    msg.Printf( wxT(VOUT_TITLE) + wxU(_(" (wxWindows interface)\n\n")) +
+        wxU(_("(C) 1996-2003 - the VideoLAN Team\n\n")) +
+        wxU(_("The VideoLAN team <videolan@videolan.org>\n"
+              "http://www.videolan.org/\n\n")) +
+        wxU(_("This is the VideoLAN Client, a DVD, MPEG and DivX player."
+              "\nIt can play MPEG and MPEG2 files from a file or from a "
+              "network source.")) );
 
-    wxMessageBox( msg, wxString::Format(_("About %s"), VOUT_TITLE),
+    wxMessageBox( msg, wxString::Format(wxU(_("About %s")), wxT(VOUT_TITLE)),
                   wxOK | wxICON_INFORMATION, this );
 }
 
@@ -650,10 +654,10 @@ void Interface::OnSliderUpdate( wxScrollEvent& event )
             char psz_time[ OFFSETTOTIME_MAX_SIZE ];
 
             slider_box->SetLabel(
-                input_OffsetToTime( p_intf->p_sys->p_input,
-                                    psz_time,
-                                    p_area->i_size * event.GetPosition()
-                                    / SLIDER_MAX_POS ) );
+                wxU(input_OffsetToTime( p_intf->p_sys->p_input,
+                                        psz_time,
+                                        p_area->i_size * event.GetPosition()
+                                        / SLIDER_MAX_POS )) );
 #undef p_area
         }
     }
@@ -699,12 +703,12 @@ void Interface::TogglePlayButton( int i_playing_status )
 
     if( i_playing_status == PLAYING_S )
     {
-        GetToolBar()->InsertTool( 5, PlayStream_Event, _("Pause"),
+        GetToolBar()->InsertTool( 5, PlayStream_Event, wxU(_("Pause")),
                                   wxBitmap( pause_xpm ) );
     }
     else
     {
-        GetToolBar()->InsertTool( 5, PlayStream_Event, _("Play"),
+        GetToolBar()->InsertTool( 5, PlayStream_Event, wxU(_("Play")),
                                   wxBitmap( play_xpm ) );
     }
 
@@ -738,7 +742,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
     }
 
     for( i = 0; i < filenames.GetCount(); i++ )
-        playlist_Add( p_playlist, (char *)filenames[i].c_str(),
+        playlist_Add( p_playlist, (const char *)filenames[i].mb_str(),
                       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
     /* Rebuild the playlist */

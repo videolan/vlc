@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.15 2003/05/07 12:23:06 gbazin Exp $
+ * $Id: timer.cpp,v 1.16 2003/05/11 13:22:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -140,7 +140,7 @@ void Timer::Notify()
             }
 
             p_main_interface->statusbar->SetStatusText(
-                p_intf->p_sys->p_input->psz_source, 1 );
+                wxU(p_intf->p_sys->p_input->psz_source), 1 );
 
             p_main_interface->TogglePlayButton( PLAYING_S );
             i_old_playing_status = PLAYING_S;
@@ -165,7 +165,7 @@ void Timer::Notify()
             i_old_playing_status = PAUSE_S;
         }
 
-        p_main_interface->statusbar->SetStatusText( "", 1 );
+        p_main_interface->statusbar->SetStatusText( wxT(""), 1 );
 
         vlc_object_release( p_intf->p_sys->p_input );
         p_intf->p_sys->p_input = NULL;
@@ -281,9 +281,8 @@ void DisplayStreamDate( wxControl *p_slider_frame, intf_thread_t * p_intf ,
         char psz_time[ OFFSETTOTIME_MAX_SIZE ];
 
         p_slider_frame->SetLabel(
-            input_OffsetToTime( p_intf->p_sys->p_input,
-                                psz_time,
-                                p_area->i_size * i_pos / SLIDER_MAX_POS ) );
+            wxU(input_OffsetToTime( p_intf->p_sys->p_input,
+                    psz_time, p_area->i_size * i_pos / SLIDER_MAX_POS )) );
 #undef p_area
      }
 }

@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: messages.cpp,v 1.4 2003/04/20 20:28:40 ipkiss Exp $
+ * $Id: messages.cpp,v 1.5 2003/05/11 13:22:23 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -77,7 +77,7 @@ END_EVENT_TABLE()
  * Constructor.
  *****************************************************************************/
 Messages::Messages( intf_thread_t *_p_intf, Interface *_p_main_interface ):
-    wxFrame( _p_main_interface, -1, "Messages", wxDefaultPosition,
+    wxFrame( _p_main_interface, -1, wxU(_("Messages")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
@@ -91,7 +91,7 @@ Messages::Messages( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     messages_panel->SetAutoLayout( TRUE );
 
     /* Create the textctrl and some text attributes */
-    textctrl = new wxTextCtrl( messages_panel, -1, "", wxDefaultPosition,
+    textctrl = new wxTextCtrl( messages_panel, -1, wxT(""), wxDefaultPosition,
         wxSize::wxSize( 400, 500 ), wxTE_MULTILINE | wxTE_READONLY |
                                     wxTE_RICH | wxTE_NOHIDESEL );
     info_attr = new wxTextAttr( wxColour::wxColour( 0, 128, 0 ) );
@@ -100,12 +100,12 @@ Messages::Messages( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     dbg_attr = new wxTextAttr( *wxBLACK );
 
     /* Create the OK button */
-    wxButton *ok_button = new wxButton( messages_panel, wxID_OK, _("OK") );
+    wxButton *ok_button = new wxButton( messages_panel, wxID_OK, wxU(_("OK")));
     ok_button->SetDefault();
 
     /* Create the Verbose checkbox */
     wxCheckBox *verbose_checkbox =
-        new wxCheckBox( messages_panel, Verbose_Event, _("Verbose") );
+        new wxCheckBox( messages_panel, Verbose_Event, wxU(_("Verbose")) );
 
     /* Place everything in sizers */
     wxBoxSizer *buttons_sizer = new wxBoxSizer( wxHORIZONTAL );
@@ -151,30 +151,30 @@ void Messages::UpdateLog()
 
             /* Append all messages to log window */
             textctrl->SetDefaultStyle( *dbg_attr );
-            (*textctrl) << p_sub->p_msg[i_start].psz_module;
+            (*textctrl) << wxU(p_sub->p_msg[i_start].psz_module);
 
             switch( p_sub->p_msg[i_start].i_type )
             {
             case VLC_MSG_INFO:
-                (*textctrl) << ": ";
+                (*textctrl) << wxT(": ");
                 textctrl->SetDefaultStyle( *info_attr );
                 break;
             case VLC_MSG_ERR:
-                (*textctrl) << " error: ";
+                (*textctrl) << wxT(" error: ");
                 textctrl->SetDefaultStyle( *err_attr );
                 break;
             case VLC_MSG_WARN:
-                (*textctrl) << " warning: ";
+                (*textctrl) << wxT(" warning: ");
                 textctrl->SetDefaultStyle( *warn_attr );
                 break;
             case VLC_MSG_DBG:
             default:
-                (*textctrl) << " debug: ";
+                (*textctrl) << wxT(" debug: ");
                 break;
             }
 
             /* Add message */
-            (*textctrl) << p_sub->p_msg[i_start].psz_msg << "\n";
+            (*textctrl) << wxU(p_sub->p_msg[i_start].psz_msg) << wxT("\n");
         }
 
         vlc_mutex_lock( p_sub->p_lock );

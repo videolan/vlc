@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.21 2003/05/07 15:54:49 gbazin Exp $
+ * $Id: wxwindows.h,v 1.22 2003/05/11 13:22:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -33,6 +33,13 @@ class Messages;
 class FileInfo;
 
 #define SLIDER_MAX_POS 10000
+
+/* wxU is used to convert ansi strings to unicode strings (wchar_t) */
+#if wxUSE_UNICODE
+#   define wxU(ansi) wxString(ansi, *wxConvCurrent)
+#else
+#   define wxU(ansi) ansi
+#endif
 
 /*****************************************************************************
  * intf_sys_t: description and status of wxwindows interface

@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.7 2003/05/07 12:23:06 gbazin Exp $
+ * $Id: streamout.cpp,v 1.8 2003/05/11 13:22:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -132,8 +132,8 @@ END_EVENT_TABLE()
  * Constructor.
  *****************************************************************************/
 SoutDialog::SoutDialog( intf_thread_t *_p_intf, Interface *_p_main_interface ):
-    wxDialog( _p_main_interface, -1, _("Stream output"), wxDefaultPosition,
-             wxDefaultSize, wxDEFAULT_FRAME_STYLE )
+    wxDialog( _p_main_interface, -1, wxU(_("Stream output")),
+             wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
     p_intf = _p_intf;
@@ -147,17 +147,16 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     /* Create MRL combobox */
     wxBoxSizer *mrl_sizer_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxStaticBox *mrl_box = new wxStaticBox( panel, -1,
-                               _("Stream output MRL") );
+                               wxU(_("Stream output MRL")) );
     wxStaticBoxSizer *mrl_sizer = new wxStaticBoxSizer( mrl_box,
                                                         wxHORIZONTAL );
     wxStaticText *mrl_label = new wxStaticText( panel, -1,
-                                                _("Destination Target:") );
+                                                wxU(_("Destination Target:")));
     mrl_combo = new wxComboBox( panel, MRL_Event, mrl,
-                                wxPoint(20,25), wxSize(120, -1),
-                                0, NULL );
-    mrl_combo->SetToolTip( _("You can use this field directly by typing the "
-        "full MRL you want to open.\n""Alternatively, the field will be "
-        "filled automatically when you use the controls below") );
+                                wxPoint(20,25), wxSize(120, -1), 0, NULL );
+    mrl_combo->SetToolTip( wxU(_("You can use this field directly by typing "
+        "the full MRL you want to open.\n""Alternatively, the field will be "
+        "filled automatically when you use the controls below")) );
 
     mrl_sizer->Add( mrl_label, 0, wxALL | wxALIGN_CENTER, 5 );
     mrl_sizer->Add( mrl_combo, 1, wxALL | wxALIGN_CENTER, 5 );
@@ -173,9 +172,10 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     wxStaticLine *static_line = new wxStaticLine( panel, wxID_OK );
 
     /* Create the buttons */
-    wxButton *ok_button = new wxButton( panel, wxID_OK, _("OK") );
+    wxButton *ok_button = new wxButton( panel, wxID_OK, wxU(_("OK")) );
     ok_button->SetDefault();
-    wxButton *cancel_button = new wxButton( panel, wxID_CANCEL, _("Cancel") );
+    wxButton *cancel_button = new wxButton( panel, wxID_CANCEL,
+                                            wxU(_("Cancel")) );
 
     /* Place everything in sizers */
     wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
@@ -214,39 +214,39 @@ void SoutDialog::UpdateMRL()
     switch( i_encapsulation_type )
     {
     case PS_ENCAPSULATION:
-        encapsulation = "/ps";
+        encapsulation = wxT("/ps");
         break;
     case AVI_ENCAPSULATION:
-        encapsulation = "/avi";
+        encapsulation = wxT("/avi");
         break;
     case OGG_ENCAPSULATION:
-        encapsulation = "/ogg";
+        encapsulation = wxT("/ogg");
         break;
     case TS_ENCAPSULATION:
     default:
-        encapsulation = "/ts";
+        encapsulation = wxT("/ts");
         break;
     }
 
     switch( i_access_type )
     {
     case FILE_ACCESS_OUT:
-        mrl = "file" + encapsulation + ":" + file_combo->GetValue();
+        mrl = wxT("file") + encapsulation + wxT(":") + file_combo->GetValue();
         break;
 
     case HTTP_ACCESS_OUT:
-        mrl = "http" + encapsulation + ":" + net_addr->GetLineText(0)
-              + wxString::Format( ":%d", net_port->GetValue() );
+        mrl = wxT("http") + encapsulation + wxT(":") + net_addr->GetLineText(0)
+              + wxString::Format( wxT(":%d"), net_port->GetValue() );
         break;
 
     case UDP_ACCESS_OUT:
     case RTP_ACCESS_OUT:
-        mrl = ( i_access_type == UDP_ACCESS_OUT ) ? "udp" : "rtp";
-	mrl += encapsulation + ":" + net_addr->GetLineText(0);
-	if( net_port->GetValue() != config_GetInt( p_intf, "server-port" ) )
-	{
-	    mrl += wxString::Format( ":%d", net_port->GetValue() );
-	}
+        mrl = ( i_access_type == UDP_ACCESS_OUT ) ? wxT("udp") : wxT("rtp");
+        mrl += encapsulation + wxT(":") + net_addr->GetLineText(0);
+        if( net_port->GetValue() != config_GetInt( p_intf, "server-port" ) )
+        {
+            mrl += wxString::Format( wxT(":%d"), net_port->GetValue() );
+        }
         break;
     }
 
@@ -260,16 +260,17 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
                                   wxSize(200, 200) );
 
     wxFlexGridSizer *sizer = new wxFlexGridSizer( 2, 4, 20 );
-    wxStaticBox *panel_box = new wxStaticBox( panel, -1, _("Output Method") );
+    wxStaticBox *panel_box = new wxStaticBox( panel, -1,
+                                              wxU(_("Output Method")) );
     wxStaticBoxSizer *panel_sizer = new wxStaticBoxSizer( panel_box,
                                                           wxHORIZONTAL );
 
     static const wxString access_output_array[] =
     {
-        _("File"),
-        _("HTTP"),
-        _("UDP"),
-        _("RTP")
+        wxU(_("File")),
+        wxU(_("HTTP")),
+        wxU(_("UDP")),
+        wxU(_("RTP"))
     };
 
     for( i=0; i<4; i++ )
@@ -287,11 +288,11 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
     wxFlexGridSizer *subpanel_sizer;
     wxStaticText *label;
     subpanel_sizer = new wxFlexGridSizer( 3, 1, 20 );
-    label = new wxStaticText( access_subpanels[0], -1, _("Filename") );
-    file_combo = new wxComboBox( access_subpanels[0], FileName_Event, "",
+    label = new wxStaticText( access_subpanels[0], -1, wxU(_("Filename")) );
+    file_combo = new wxComboBox( access_subpanels[0], FileName_Event, wxT(""),
                                  wxPoint(20,25), wxSize(200, -1), 0, NULL );
     wxButton *browse_button = new wxButton( access_subpanels[0],
-                                            FileBrowse_Event, _("Browse...") );
+                                  FileBrowse_Event, wxU(_("Browse...")) );
     subpanel_sizer->Add( label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     subpanel_sizer->Add( file_combo, 1,
                          wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
@@ -302,8 +303,8 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
 
     /* Net row */
     subpanel_sizer = new wxFlexGridSizer( 4, 1, 20 );
-    label = new wxStaticText( access_subpanels[2], -1, _("Address") );
-    net_addr = new wxTextCtrl( access_subpanels[2], NetAddr_Event, "",
+    label = new wxStaticText( access_subpanels[2], -1, wxU(_("Address")) );
+    net_addr = new wxTextCtrl( access_subpanels[2], NetAddr_Event, wxT(""),
                                wxDefaultPosition, wxSize( 200, -1 ),
                                wxTE_PROCESS_ENTER);
     subpanel_sizer->Add( label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
@@ -311,9 +312,9 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
                          wxEXPAND | wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
 
     int val = config_GetInt( p_intf, "server-port" );
-    label = new wxStaticText( access_subpanels[2], -1, _("Port") );
+    label = new wxStaticText( access_subpanels[2], -1, wxU(_("Port")) );
     net_port = new wxSpinCtrl( access_subpanels[2], NetPort_Event,
-                               wxString::Format("%d", val),
+                               wxString::Format(wxT("%d"), val),
                                wxDefaultPosition, wxDefaultSize,
                                wxSP_ARROW_KEYS,
                                0, 16000, val );
@@ -348,16 +349,16 @@ wxPanel *SoutDialog::EncapsulationPanel( wxWindow* parent )
                                   wxSize(200, 200) );
 
     wxStaticBox *panel_box = new wxStaticBox( panel, -1,
-                                              _("Encapsulation Method") );
+                                              wxU(_("Encapsulation Method")) );
     wxStaticBoxSizer *panel_sizer = new wxStaticBoxSizer( panel_box,
                                                           wxHORIZONTAL );
 
     static const wxString encapsulation_array[] =
     {
-        _("MPEG TS"),
-        _("MPEG PS"),
-        _("AVI"),
-        _("Ogg")
+        wxU(_("MPEG TS")),
+        wxU(_("MPEG PS")),
+        wxU(_("AVI")),
+        wxU(_("Ogg"))
     };
 
     /* Stuff everything into the main panel */
@@ -385,23 +386,23 @@ void SoutDialog::ParseMRL()
     char *psz_sout = config_GetPsz( p_intf, "sout" );
     if( psz_sout )
     {
-        mrl = psz_sout;
+        mrl = wxU(psz_sout);
         free( psz_sout );
     }
 
     /* Parse the MRL */
-    wxString access = mrl.BeforeFirst( '/' );
-    wxString encapsulation = mrl.BeforeFirst( ':' ).AfterFirst('/');
+    wxString access = mrl.BeforeFirst( wxT('/') );
+    wxString encapsulation = mrl.BeforeFirst( wxT(':') ).AfterFirst(wxT('/'));
 
-    if( !access.Cmp( "http" ) )
+    if( !access.Cmp( wxT("http") ) )
     {
         i_access_type = HTTP_ACCESS_OUT;
     }
-    else if( !access.Cmp( "udp" ) )
+    else if( !access.Cmp( wxT("udp") ) )
     {
         i_access_type = UDP_ACCESS_OUT;
     }
-    else if( !access.Cmp( "rtp" ) )
+    else if( !access.Cmp( wxT("rtp") ) )
     {
         i_access_type = RTP_ACCESS_OUT;
     }
@@ -410,15 +411,15 @@ void SoutDialog::ParseMRL()
         i_access_type = FILE_ACCESS_OUT;
     }
 
-    if( !encapsulation.Cmp( "ps" ) )
+    if( !encapsulation.Cmp( wxT("ps") ) )
     {
         i_encapsulation_type = PS_ENCAPSULATION;
     }
-    else if( !encapsulation.Cmp( "avi" ) )
+    else if( !encapsulation.Cmp( wxT("avi") ) )
     {
         i_encapsulation_type = AVI_ENCAPSULATION;
     }
-    else if( !encapsulation.Cmp( "ogg" ) )
+    else if( !encapsulation.Cmp( wxT("ogg") ) )
     {
         i_encapsulation_type = OGG_ENCAPSULATION;
     }
@@ -427,7 +428,7 @@ void SoutDialog::ParseMRL()
         i_encapsulation_type = TS_ENCAPSULATION;
     }
 
-    wxString second_part = mrl.AfterFirst( ':' );
+    wxString second_part = mrl.AfterFirst( wxT(':') );
 
     if( i_access_type == FILE_ACCESS_OUT )
     {
@@ -437,11 +438,11 @@ void SoutDialog::ParseMRL()
     else
     {
         /* we've got address:port */
-        wxString address = second_part.BeforeLast( ':' );
+        wxString address = second_part.BeforeLast( wxT(':') );
         net_addr->SetValue( address );
 
         long int i_port;
-        wxString port = second_part.AfterLast( ':' );
+        wxString port = second_part.AfterLast( wxT(':') );
         if( port.ToLong( &i_port ) )
         {
             net_port->SetValue( i_port );
@@ -542,7 +543,8 @@ void SoutDialog::OnFileChange( wxCommandEvent& WXUNUSED(event) )
 
 void SoutDialog::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
 {
-    wxFileDialog dialog( this, _("Save file"), "", "", "*.*", wxSAVE );
+    wxFileDialog dialog( this, wxU(_("Save file")),
+                         wxT(""), wxT(""), wxT("*.*"), wxSAVE );
 
     if( dialog.ShowModal() == wxID_OK )
     {

@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: fileinfo.cpp,v 1.11 2003/04/22 18:21:15 ipkiss Exp $
+ * $Id: fileinfo.cpp,v 1.12 2003/05/11 13:22:23 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -76,7 +76,7 @@ END_EVENT_TABLE()
  * Constructor.
  *****************************************************************************/
 FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
-    wxFrame( _p_main_interface, -1, "FileInfo", wxDefaultPosition,
+    wxFrame( _p_main_interface, -1, wxU(_("FileInfo")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
@@ -92,10 +92,10 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
         new wxTreeCtrl( panel, -1, wxDefaultPosition, wxSize( 350, 350 ),
                         wxTR_HAS_BUTTONS | wxTR_HIDE_ROOT | wxSUNKEN_BORDER );
 
-    fileinfo_root_label = "";
+    fileinfo_root_label = wxT("");
 
     /* Create the OK button */
-    wxButton *ok_button = new wxButton( panel, wxID_OK, _("OK") );
+    wxButton *ok_button = new wxButton( panel, wxID_OK, wxU(_("OK")) );
     ok_button->SetDefault();
 
     /* Place everything in sizers */
@@ -123,7 +123,7 @@ void FileInfo::UpdateFileInfo()
     {
         if( fileinfo_root )
         {
-            fileinfo_root_label = "";
+            fileinfo_root_label = wxT("");
             fileinfo_tree->DeleteChildren( fileinfo_root );
         }
         return;
@@ -135,17 +135,17 @@ void FileInfo::UpdateFileInfo()
          * retrieved with the GetItemText() method, but it doesn't work on
          * Windows when the wxTR_HIDE_ROOT style is set. That's why we need to
          * use the fileinfo_root_label variable... */
-        fileinfo_root = fileinfo_tree->AddRoot( p_input->psz_name );
-        fileinfo_root_label = p_input->psz_name;
+        fileinfo_root = fileinfo_tree->AddRoot( wxU(p_input->psz_name) );
+        fileinfo_root_label = wxU(p_input->psz_name);
     }
-    else if( fileinfo_root_label == (wxString)p_input->psz_name )
+    else if( fileinfo_root_label == wxU(p_input->psz_name) )
     {
         return;
     }
 
     /* We rebuild the tree from scratch */
     fileinfo_tree->DeleteChildren( fileinfo_root );
-    fileinfo_root_label = p_input->psz_name;
+    fileinfo_root_label = wxU(p_input->psz_name);
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -154,12 +154,12 @@ void FileInfo::UpdateFileInfo()
     while( p_cat )
     {
         wxTreeItemId cat = fileinfo_tree->AppendItem( fileinfo_root,
-                                                      p_cat->psz_name );
+                                                      wxU(p_cat->psz_name) );
         input_info_t *p_info = p_cat->p_info;
         while( p_info )
         {
-            fileinfo_tree->AppendItem( cat, wxString(p_info->psz_name) + ": "
-                                            + p_info->psz_value );
+            fileinfo_tree->AppendItem( cat, wxU(p_info->psz_name) +
+                                       wxT(": ") + wxU(p_info->psz_value) );
             p_info = p_info->p_next;
         }
         p_cat = p_cat->p_next;

@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.17 2003/05/07 12:23:06 gbazin Exp $
+ * $Id: open.cpp,v 1.18 2003/05/11 13:22:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -141,7 +141,7 @@ END_EVENT_TABLE()
  *****************************************************************************/
 OpenDialog::OpenDialog( intf_thread_t *_p_intf, Interface *_p_main_interface,
                         int i_access_method ):
-    wxDialog( _p_main_interface, -1, _("Open Target"), wxDefaultPosition,
+    wxDialog( _p_main_interface, -1, wxU(_("Open Target")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
@@ -156,17 +156,17 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, Interface *_p_main_interface,
     /* Create MRL combobox */
     wxBoxSizer *mrl_sizer_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxStaticBox *mrl_box = new wxStaticBox( panel, -1,
-                               _("Media Resource Locator (MRL)") );
+                               wxU(_("Media Resource Locator (MRL)")) );
     wxStaticBoxSizer *mrl_sizer = new wxStaticBoxSizer( mrl_box,
                                                         wxHORIZONTAL );
     wxStaticText *mrl_label = new wxStaticText( panel, -1,
-                                                _("Open Target:") );
+                                                wxU(_("Open Target:")) );
     mrl_combo = new wxComboBox( panel, MRL_Event, mrl,
                                 wxPoint(20,25), wxSize(120, -1),
                                 0, NULL );
-    mrl_combo->SetToolTip( _("You can use this field directly by typing the "
-        "full MRL you want to open.\n""Alternatively, the field will be "
-        "filled automatically when you use the controls below") );
+    mrl_combo->SetToolTip( wxU(_("You can use this field directly by typing "
+        "the full MRL you want to open.\n""Alternatively, the field will be "
+        "filled automatically when you use the controls below")) );
 
     mrl_sizer->Add( mrl_label, 0, wxALL | wxALIGN_CENTER, 5 );
     mrl_sizer->Add( mrl_combo, 1, wxALL | wxALIGN_CENTER, 5 );
@@ -175,17 +175,18 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, Interface *_p_main_interface,
 
     /* Create Static Text */
     wxStaticText *label = new wxStaticText( panel, -1,
-        _("Alternatively, you can build an MRL using one of the "
-          "following predefined targets:") );
+        wxU(_("Alternatively, you can build an MRL using one of the "
+              "following predefined targets:")) );
 
     /* Create Stream Output checkox */
     wxFlexGridSizer *sout_sizer = new wxFlexGridSizer( 2, 1, 20 );
     sout_checkbox = new wxCheckBox( panel, SoutEnable_Event,
-                                           _("Stream output") );
-    sout_checkbox->SetToolTip( _("Use VLC as a stream server") );
+                                    wxU(_("Stream output")) );
+    sout_checkbox->SetToolTip( wxU(_("Use VLC as a stream server")) );
     sout_sizer->Add( sout_checkbox, 0,
                      wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
-    sout_button = new wxButton( panel, SoutSettings_Event, _("Settings...") );
+    sout_button = new wxButton( panel, SoutSettings_Event,
+                                wxU(_("Settings...")) );
     sout_button->Disable();
 
     char *psz_sout = config_GetPsz( p_intf, "sout" );
@@ -201,19 +202,19 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, Interface *_p_main_interface,
     /* Create Demux Dump checkox */
     wxBoxSizer *demuxdump_sizer = new wxBoxSizer( wxHORIZONTAL );
     demuxdump_checkbox = new wxCheckBox( panel, DemuxDumpEnable_Event,
-                               _("Capture input stream") );
+                               wxU(_("Capture input stream")) );
     demuxdump_checkbox->SetToolTip(
-                           _("Capture the stream you are playing to a file") );
-    demuxdump_textctrl = new wxTextCtrl( panel, DemuxDump_Event,
-                                         "", wxDefaultPosition, wxDefaultSize,
+        wxU(_("Capture the stream you are playing to a file")) );
+    demuxdump_textctrl = new wxTextCtrl( panel, DemuxDump_Event, wxT(""),
+                                         wxDefaultPosition, wxDefaultSize,
                                          wxTE_PROCESS_ENTER);
     demuxdump_button = new wxButton( panel, DemuxDumpBrowse_Event,
-                                     _("Browse...") );
+                                     wxU(_("Browse...")) );
 
     char *psz_demuxdump = config_GetPsz( p_intf, "demuxdump-file" );
     if( psz_demuxdump && *psz_demuxdump )
     {
-        demuxdump_textctrl->SetValue( psz_demuxdump );
+        demuxdump_textctrl->SetValue( wxU(psz_demuxdump) );
     }
     if( psz_demuxdump ) free( psz_demuxdump );
 
@@ -229,22 +230,23 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, Interface *_p_main_interface,
     wxStaticLine *static_line = new wxStaticLine( panel, wxID_OK );
 
     /* Create the buttons */
-    wxButton *ok_button = new wxButton( panel, wxID_OK, _("OK") );
+    wxButton *ok_button = new wxButton( panel, wxID_OK, wxU(_("OK")) );
     ok_button->SetDefault();
-    wxButton *cancel_button = new wxButton( panel, wxID_CANCEL, _("Cancel") );
+    wxButton *cancel_button = new wxButton( panel, wxID_CANCEL,
+                                            wxU(_("Cancel")) );
 
     /* Create notebook */
     wxNotebook *notebook = new wxNotebook( panel, Notebook_Event );
     wxNotebookSizer *notebook_sizer = new wxNotebookSizer( notebook );
 
-    notebook->AddPage( FilePanel( notebook ), _("File"),
+    notebook->AddPage( FilePanel( notebook ), wxU(_("File")),
                        i_access_method == FILE_ACCESS );
-    notebook->AddPage( DiscPanel( notebook ), _("Disc"),
+    notebook->AddPage( DiscPanel( notebook ), wxU(_("Disc")),
                        i_access_method == DISC_ACCESS );
-    notebook->AddPage( NetPanel( notebook ), _("Network"),
+    notebook->AddPage( NetPanel( notebook ), wxU(_("Network")),
                        i_access_method == NET_ACCESS );
 #ifndef WIN32
-    notebook->AddPage( SatPanel( notebook ), _("Satellite"),
+    notebook->AddPage( SatPanel( notebook ), wxU(_("Satellite")),
                        i_access_method == SAT_ACCESS );
 #endif
 
@@ -295,10 +297,10 @@ wxPanel *OpenDialog::FilePanel( wxWindow* parent )
 
     wxBoxSizer *sizer = new wxBoxSizer( wxHORIZONTAL );
 
-    file_combo = new wxComboBox( panel, FileName_Event, "",
+    file_combo = new wxComboBox( panel, FileName_Event, wxT(""),
                                  wxPoint(20,25), wxSize(200, -1), 0, NULL );
     wxButton *browse_button = new wxButton( panel, FileBrowse_Event,
-                                            _("Browse...") );
+                                            wxU(_("Browse...")) );
     sizer->Add( file_combo, 1, wxALL, 5 );
     sizer->Add( browse_button, 0, wxALL, 5 );
 
@@ -316,32 +318,32 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
 
     static const wxString disc_type_array[] =
     {
-        _("DVD"),
-        _("DVD (menus support)"),
-        _("VCD")
+        wxU(_("DVD")),
+        wxU(_("DVD (menus support)")),
+        wxU(_("VCD"))
     };
 
-    disc_type = new wxRadioBox( panel, DiscType_Event, _("Disc type"),
+    disc_type = new wxRadioBox( panel, DiscType_Event, wxU(_("Disc type")),
                                 wxDefaultPosition, wxDefaultSize,
                                 WXSIZEOF(disc_type_array), disc_type_array,
                                 WXSIZEOF(disc_type_array), wxRA_SPECIFY_COLS );
     sizer_row->Add( disc_type, 0, wxEXPAND | wxALL, 5 );
 
-    wxStaticText *label = new wxStaticText( panel, -1, _("Device name") );
-    disc_device = new wxTextCtrl( panel, DiscDevice_Event, "",
+    wxStaticText *label = new wxStaticText( panel, -1, wxU(_("Device name")) );
+    disc_device = new wxTextCtrl( panel, DiscDevice_Event, wxT(""),
                                   wxDefaultPosition, wxDefaultSize,
                                   wxTE_PROCESS_ENTER);
 
     sizer->Add( label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer->Add( disc_device, 1, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
 
-    label = new wxStaticText( panel, -1, _("Title") );
+    label = new wxStaticText( panel, -1, wxU(_("Title")) );
     disc_title = new wxSpinCtrl( panel, DiscTitle_Event );
 
     sizer->Add( label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer->Add( disc_title, 1, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
 
-    label = new wxStaticText( panel, -1, _("Chapter") );
+    label = new wxStaticText( panel, -1, wxU(_("Chapter")) );
     disc_chapter = new wxSpinCtrl( panel, DiscChapter_Event );
     sizer->Add( label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer->Add( disc_chapter, 1, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
@@ -362,9 +364,9 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
 
     static const wxString net_type_array[] =
     {
-        _("UDP/RTP"),
-        _("UDP/RTP Multicast"),
-        _("HTTP/FTP/MMS")
+        wxU(_("UDP/RTP")),
+        wxU(_("UDP/RTP Multicast")),
+        wxU(_("HTTP/FTP/MMS"))
     };
 
     for( i=0; i<3; i++ )
@@ -383,9 +385,9 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
     wxStaticText *label;
     int val = config_GetInt( p_intf, "server-port" );
     subpanel_sizer = new wxFlexGridSizer( 2, 1, 20 );
-    label = new wxStaticText( net_subpanels[0], -1, _("Port") );
+    label = new wxStaticText( net_subpanels[0], -1, wxU(_("Port")) );
     net_ports[0] = new wxSpinCtrl( net_subpanels[0], NetPort1_Event,
-                                   wxString::Format("%d", val),
+                                   wxString::Format(wxT("%d"), val),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
                                    0, 16000, val);
@@ -398,17 +400,17 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
 
     /* UDP/RTP Multicast row */
     subpanel_sizer = new wxFlexGridSizer( 4, 1, 20 );
-    label = new wxStaticText( net_subpanels[1], -1, _("Address") );
-    net_addrs[1] = new wxTextCtrl( net_subpanels[1], NetAddr2_Event, "",
+    label = new wxStaticText( net_subpanels[1], -1, wxU(_("Address")) );
+    net_addrs[1] = new wxTextCtrl( net_subpanels[1], NetAddr2_Event, wxT(""),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxTE_PROCESS_ENTER);
     subpanel_sizer->Add( label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     subpanel_sizer->Add( net_addrs[1], 1,
                          wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
 
-    label = new wxStaticText( net_subpanels[1], -1, _("Port") );
+    label = new wxStaticText( net_subpanels[1], -1, wxU(_("Port")) );
     net_ports[1] = new wxSpinCtrl( net_subpanels[1], NetPort2_Event,
-                                   wxString::Format("%d", val),
+                                   wxString::Format(wxT("%d"), val),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
                                    0, 16000, val);
@@ -420,8 +422,8 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
 
     /* HTTP row */
     subpanel_sizer = new wxFlexGridSizer( 2, 1, 20 );
-    label = new wxStaticText( net_subpanels[2], -1, _("URL") );
-    net_addrs[2] = new wxTextCtrl( net_subpanels[2], NetAddr3_Event, "",
+    label = new wxStaticText( net_subpanels[2], -1, wxU(_("URL")) );
+    net_addrs[2] = new wxTextCtrl( net_subpanels[2], NetAddr3_Event, wxT(""),
                                    wxDefaultPosition, wxSize( 200, -1 ),
                                    wxTE_PROCESS_ENTER);
     subpanel_sizer->Add( label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
@@ -459,20 +461,20 @@ void OpenDialog::UpdateMRL( int i_access_method )
     /* Check if the user asked for demuxdump */
     if( demuxdump_checkbox->GetValue() )
     {
-        demux = "/demuxdump";
+        demux = wxT("/demuxdump");
     }
 
     switch( i_access_method )
     {
     case FILE_ACCESS:
-        mrl = "file" + demux + "://" + file_combo->GetValue();
+        mrl = wxT("file") + demux + wxT("://") + file_combo->GetValue();
         break;
     case DISC_ACCESS:
-        mrl = ( disc_type->GetSelection() == 0 ? "dvdold" :
-                disc_type->GetSelection() == 1 ? "dvd" : "vcd" )
-                  + demux + "://"
+        mrl = ( disc_type->GetSelection() == 0 ? wxT("dvdold") :
+                disc_type->GetSelection() == 1 ? wxT("dvd") : wxT("vcd") )
+                  + demux + wxT("://")
                   + disc_device->GetLineText(0)
-                  + wxString::Format( "@%d:%d",
+                  + wxString::Format( wxT("@%d:%d"),
                                       disc_title->GetValue(),
                                       disc_chapter->GetValue() );
         break;
@@ -483,33 +485,36 @@ void OpenDialog::UpdateMRL( int i_access_method )
             if( net_ports[0]->GetValue() !=
                 config_GetInt( p_intf, "server-port" ) )
             {
-                mrl = "udp" + demux +
-                       wxString::Format( "://@:%d", net_ports[0]->GetValue() );
+                mrl = wxT("udp") + demux +
+                       wxString::Format( wxT("://@:%d"),
+                                         net_ports[0]->GetValue() );
             }
             else
             {
-                mrl = "udp" + demux + "://";
+                mrl = wxT("udp") + demux + wxT("://");
             }
             break;
 
         case 1:
-            mrl = "udp" + demux + "://@" + net_addrs[1]->GetLineText(0);
+            mrl = wxT("udp") + demux + wxT("://@") +
+                  net_addrs[1]->GetLineText(0);
             if( net_ports[1]->GetValue() !=
                 config_GetInt( p_intf, "server-port" ) )
             {
-                mrl = mrl + wxString::Format( ":%d",
+                mrl = mrl + wxString::Format( wxT(":%d"),
                                               net_ports[1]->GetValue() );
             }
             break;
 
         case 2:
             /* http access */     
-            mrl = "http" + demux + "://" + net_addrs[2]->GetLineText(0);
+            mrl = wxT("http") + demux + wxT("://") +
+                  net_addrs[2]->GetLineText(0);
             break;
         }
         break;
     case SAT_ACCESS:
-        mrl = "satellite" + demux + "://";
+        mrl = wxT("satellite") + demux + wxT("://");
         break;
     default:
         break;
@@ -551,8 +556,8 @@ void OpenDialog::OnFilePanelChange( wxCommandEvent& WXUNUSED(event) )
 
 void OpenDialog::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
 {
-    wxFileDialog dialog( this, _("Open file"), "", "", "*.*",
-                         wxOPEN );
+    wxFileDialog dialog( this, wxU(_("Open file")),
+                         wxT(""), wxT(""), wxT("*.*"), wxOPEN );
 
     if( dialog.ShowModal() == wxID_OK )
     {
@@ -577,12 +582,12 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
     {
     case 2:
         psz_device = config_GetPsz( p_intf, "vcd" );
-        disc_device->SetValue( psz_device ? psz_device : "" );
+        disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
         break;
 
     default:
         psz_device = config_GetPsz( p_intf, "dvd" );
-        disc_device->SetValue( psz_device ? psz_device : "" );
+        disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
         break;
     }
 
@@ -656,7 +661,7 @@ void OpenDialog::OnSoutSettings( wxCommandEvent& WXUNUSED(event) )
 
     if( dialog.ShowModal() == wxID_OK )
     {
-        config_PutPsz( p_intf, "sout", (char *)dialog.mrl.c_str() );
+        config_PutPsz( p_intf, "sout", (const char *)dialog.mrl.mb_str() );
     }
 }
 
@@ -681,7 +686,8 @@ void OpenDialog::OnDemuxDumpEnable( wxCommandEvent& event )
 
 void OpenDialog::OnDemuxDumpBrowse( wxCommandEvent& WXUNUSED(event) )
 {
-    wxFileDialog dialog( this, _("Save file"), "", "", "*.*", wxSAVE );
+    wxFileDialog dialog( this, wxU(_("Save file")),
+                         wxT(""), wxT(""), wxT("*.*"), wxSAVE );
 
     if( dialog.ShowModal() == wxID_OK )
     {
@@ -694,5 +700,5 @@ void OpenDialog::OnDemuxDumpBrowse( wxCommandEvent& WXUNUSED(event) )
 void OpenDialog::OnDemuxDumpChange( wxCommandEvent& WXUNUSED(event) )
 {
     config_PutPsz( p_intf, "demuxdump-file",
-                   demuxdump_textctrl->GetValue() );
+                   demuxdump_textctrl->GetValue().mb_str() );
 }
