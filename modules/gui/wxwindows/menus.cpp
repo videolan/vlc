@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.24 2003/11/02 12:22:45 gbazin Exp $
+ * $Id: menus.cpp,v 1.25 2003/11/23 20:37:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -136,6 +136,8 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
                                                 FIND_ANYWHERE );
     if( p_object != NULL )
     {
+        vlc_object_t *p_dec_obj;
+
         ppsz_varnames[i] = "fullscreen";
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "deinterlace";
@@ -150,6 +152,17 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "x11-on-top";
         pi_objects[i++] = p_object->i_object_id;
+
+        p_dec_obj = (vlc_object_t *)vlc_object_find( p_object,
+                                                     VLC_OBJECT_DECODER,
+                                                     FIND_PARENT );
+        if( p_dec_obj != NULL )
+        {
+            ppsz_varnames[i] = "ffmpeg-pp-q";
+            pi_objects[i++] = p_dec_obj->i_object_id;
+            vlc_object_release( p_dec_obj );
+        }
+
         vlc_object_release( p_object );
     }
 
@@ -276,6 +289,8 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
                                                 FIND_ANYWHERE );
     if( p_object != NULL )
     {
+        vlc_object_t *p_dec_obj;
+
         ppsz_varnames[i] = "fullscreen";
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "deinterlace";
@@ -290,6 +305,18 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "x11-on-top";
         pi_objects[i++] = p_object->i_object_id;
+        vlc_object_release( p_object );
+
+        p_dec_obj = (vlc_object_t *)vlc_object_find( p_object,
+                                                     VLC_OBJECT_DECODER,
+                                                     FIND_PARENT );
+        if( p_dec_obj != NULL )
+        {
+            ppsz_varnames[i] = "ffmpeg-pp-q";
+            pi_objects[i++] = p_dec_obj->i_object_id;
+            vlc_object_release( p_dec_obj );
+        }
+
         vlc_object_release( p_object );
     }
 

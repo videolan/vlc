@@ -2,7 +2,7 @@
  * postprocess.c: video postprocessing using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: postprocess.c,v 1.3 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: postprocess.c,v 1.4 2003/11/23 20:37:04 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -51,61 +51,63 @@ typedef struct video_postproc_sys_t
     pp_context_t *pp_context;
     pp_mode_t    *pp_mode;
 
+    vlc_bool_t   *pb_pp;
+
     int i_width;
     int i_height;
 
 } video_postproc_sys_t;
 
+static int PPQCallback( vlc_object_t *p_this, char const *psz_cmd,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data );
+
 /*****************************************************************************
  * OpenPostproc: probe and open the postproc
  *****************************************************************************/
-int E_(OpenPostproc)( decoder_t *p_dec, void **pp_data )
+void *E_(OpenPostproc)( decoder_t *p_dec, vlc_bool_t *pb_pp )
 {
-    video_postproc_sys_t **pp_sys = (video_postproc_sys_t **)pp_data;
-    pp_mode_t *pp_mode;
-    vlc_value_t val;
+    video_postproc_sys_t *p_sys;
+    vlc_value_t val, val_orig, text;
+
+    p_sys = malloc( sizeof(video_postproc_sys_t) );
+    p_sys->pp_context = NULL;
+
+    *pb_pp = VLC_FALSE;
+    p_sys->pb_pp = pb_pp;
+
+    /* Create object variable if not already done */
+    if( var_Type( p_dec, "ffmpeg-pp-q" ) == 0 )
+    {
+        var_Create( p_dec, "ffmpeg-pp-q",
+                    VLC_VAR_INTEGER | VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT );
+        text.psz_string = _("Post-Processing");
+        var_Change( p_dec, "ffmpeg-pp-q", VLC_VAR_SETTEXT, &text, NULL );
+
+        var_Get( p_dec, "ffmpeg-pp-q", &val_orig );
+        var_Change( p_dec, "ffmpeg-pp-q", VLC_VAR_DELCHOICE, &val_orig, NULL );
+
+        val.i_int = 0; text.psz_string = _("Disable");
+        var_Change( p_dec, "ffmpeg-pp-q", VLC_VAR_ADDCHOICE, &val, &text );
+        val.i_int = 1; text.psz_string = _("1 (Lowest)");
+        var_Change( p_dec, "ffmpeg-pp-q", VLC_VAR_ADDCHOICE, &val, &text );
+        val.i_int = 2;
+        var_Change( p_dec, "ffmpeg-pp-q", VLC_VAR_ADDCHOICE, &val, NULL );
+        val.i_int = 3;
+        var_Change( p_dec, "ffmpeg-pp-q", VLC_VAR_ADDCHOICE, &val, NULL );
+        val.i_int = 4;
+        var_Change( p_dec, "ffmpeg-pp-q", VLC_VAR_ADDCHOICE, &val, NULL );
+        val.i_int = 5;
+        var_Change( p_dec, "ffmpeg-pp-q", VLC_VAR_ADDCHOICE, &val, NULL );
+        val.i_int = 6; text.psz_string = _("6 (Highest)");
+        var_Change( p_dec, "ffmpeg-pp-q", VLC_VAR_ADDCHOICE, &val, &text );
+        var_AddCallback( p_dec, "ffmpeg-pp-q", PPQCallback, p_sys );
+    }
 
     /* ***** Load post processing if enabled ***** */
-    var_Create( p_dec, "ffmpeg-pp-q", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "ffmpeg-pp-q", &val );
-    if( val.i_int > 0 )
-    {
-        int  i_quality = val.i_int;
-        char *psz_name = config_GetPsz( p_dec, "ffmpeg-pp-name" );
+    var_Set( p_dec, "ffmpeg-pp-q", val_orig );
 
-        if( !psz_name )
-        {
-            psz_name = strdup( "default" );
-        }
-        else if( *psz_name == '\0' )
-        {
-            free( psz_name );
-            psz_name = strdup( "default" );
-        }
-
-        pp_mode = pp_get_mode_by_name_and_quality( psz_name, i_quality );
-
-        if( !pp_mode )
-        {
-            msg_Err( p_dec, "failed geting mode for postproc" );
-        }
-        else
-        {
-            msg_Info( p_dec, "postprocessing activated" );
-        }
-        free( psz_name );
-
-        *pp_sys = malloc( sizeof(video_postproc_sys_t) );
-        (*pp_sys)->pp_context = NULL;
-        (*pp_sys)->pp_mode    = pp_mode;
-
-        return VLC_SUCCESS;
-    }
-    else
-    {
-        msg_Dbg( p_dec, "no postprocessing enabled" );
-        return VLC_EGENERIC;
-    }
+    return p_sys;
 }
 
 /*****************************************************************************
@@ -195,6 +197,59 @@ void E_(ClosePostproc)( decoder_t *p_dec, void *p_data )
         pp_free_mode( p_sys->pp_mode );
         if( p_sys->pp_context ) pp_free_context( p_sys->pp_context );
     }
+
+    var_DelCallback( p_dec, "ffmpeg-pp-q", PPQCallback, p_sys );
+}
+
+/*****************************************************************************
+ * object variables callbacks: a bunch of object variables are used by the
+ * interfaces to interact with the decoder.
+ *****************************************************************************/
+static int PPQCallback( vlc_object_t *p_this, char const *psz_cmd,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    decoder_t *p_dec = (decoder_t *)p_this;
+    video_postproc_sys_t *p_sys = (video_postproc_sys_t *)p_data;
+
+    if( newval.i_int > 0 )
+    {
+        int  i_quality = newval.i_int;
+        char *psz_name = config_GetPsz( p_dec, "ffmpeg-pp-name" );
+        pp_mode_t *pp_mode;
+
+        if( !psz_name )
+        {
+            psz_name = strdup( "default" );
+        }
+        else if( *psz_name == '\0' )
+        {
+            free( psz_name );
+            psz_name = strdup( "default" );
+        }
+
+        pp_mode = pp_get_mode_by_name_and_quality( psz_name, i_quality );
+
+        if( !pp_mode )
+        {
+            msg_Err( p_dec, "failed geting mode for postproc" );
+            newval.i_int = 0;
+        }
+        else
+        {
+            msg_Dbg( p_dec, "postprocessing enabled" );
+        }
+        free( psz_name );
+
+        p_sys->pp_mode = pp_mode;
+    }
+    else
+    {
+        msg_Dbg( p_dec, "postprocessing disabled" );
+    }
+
+    *p_sys->pb_pp = newval.i_int;
+
+    return VLC_SUCCESS;
 }
 
 #endif /* LIBAVCODEC_PP */

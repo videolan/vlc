@@ -2,7 +2,7 @@
  * ffmpeg.h: decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.28 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: ffmpeg.h,v 1.29 2003/11/23 20:37:04 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -62,7 +62,7 @@ int  E_(OpenAudioEncoder) ( vlc_object_t * );
 void E_(CloseAudioEncoder)( vlc_object_t * );
 
 /* Postprocessing module */
-int E_(OpenPostproc)( decoder_t *, void ** );
+void *E_(OpenPostproc)( decoder_t *, vlc_bool_t * );
 int E_(InitPostproc)( decoder_t *, void *, int, int, int );
 int E_(PostprocPict)( decoder_t *, void *, picture_t *, AVFrame * );
 void E_(ClosePostproc)( decoder_t *, void * );

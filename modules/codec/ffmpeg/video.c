@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.50 2003/11/23 13:15:27 gbazin Exp $
+ * $Id: video.c,v 1.51 2003/11/23 20:37:04 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -76,6 +76,8 @@ struct decoder_sys_t
 
     /* Postprocessing handle */
     void *p_pp;
+    vlc_bool_t b_pp;
+    vlc_bool_t b_pp_async;
     vlc_bool_t b_pp_init;
 };
 
@@ -161,7 +163,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
     p_pic = p_dec->pf_vout_buffer_new( p_dec );
 
 #ifdef LIBAVCODEC_PP
-    if( p_sys->p_pp && !p_sys->b_pp_init )
+    if( p_sys->p_pp && p_sys->b_pp && !p_sys->b_pp_init )
     {
         E_(InitPostproc)( p_dec, p_sys->p_pp, p_context->width,
                           p_context->height, p_context->pix_fmt );
@@ -254,12 +256,8 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
 
 #ifdef LIBAVCODEC_PP
     p_sys->p_pp = NULL;
-    p_dec->p_sys->b_pp_init = VLC_FALSE;
-    if( E_(OpenPostproc)( p_dec, &p_sys->p_pp ) == VLC_SUCCESS )
-    {
-        /* for now we cannot do postproc and dr */
-        p_sys->b_direct_rendering = 0;
-    }
+    p_sys->b_pp = p_sys->b_pp_async = p_sys->b_pp_init = VLC_FALSE;
+    p_sys->p_pp = E_(OpenPostproc)( p_dec, &p_sys->b_pp_async );
 #endif
 
     /* ffmpeg doesn't properly release old pictures when frames are skipped */
@@ -402,6 +400,9 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
      * Do the actual decoding now
      */
 
+    /* Check if post-processing was enabled */
+    p_sys->b_pp = p_sys->b_pp_async;
+
     /* Don't forget that ffmpeg requires a little more bytes
      * that the real frame size */
     if( p_block->i_buffer > 0 )
@@ -470,7 +471,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
             continue;
         }
 
-        if( !p_sys->b_direct_rendering )
+        if( !p_sys->b_direct_rendering || p_sys->b_pp )
         {
             /* Get a new picture */
             p_pic = ffmpeg_NewPictBuf( p_dec, p_sys->p_context );
@@ -558,7 +559,7 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
         int i_src_stride, i_dst_stride;
 
 #ifdef LIBAVCODEC_PP
-        if( p_sys->p_pp )
+        if( p_sys->p_pp && p_sys->b_pp )
             E_(PostprocPict)( p_dec, p_sys->p_pp, p_pic, p_ff_pic );
         else
 #endif
@@ -642,7 +643,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_sys->input_pts = p_sys->input_dts = 0;
 
     /* Not much to do in indirect rendering mode */
-    if( !p_sys->b_direct_rendering )
+    if( !p_sys->b_direct_rendering || p_sys->b_pp )
     {
         return avcodec_default_get_buffer( p_context, p_ff_pic );
     }
