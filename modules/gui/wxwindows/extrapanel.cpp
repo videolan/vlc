@@ -305,9 +305,9 @@ wxPanel *ExtraPanel::VideoPanel( wxWindow *parent )
     for( int i = 0 ; vfilters[i].psz_filter != NULL ; i++ )
     {
         wxCheckBox *box = new wxCheckBox( panel, Filter0_Event + i,
-                                          wxT( _( vfilters[i].psz_name ) ) );
+                                          wxU( _( vfilters[i].psz_name ) ) );
         t_col_sizer->Add( box );
-        box->SetToolTip( wxT( _( vfilters[i].psz_help ) ) );
+        box->SetToolTip( wxU( _( vfilters[i].psz_help ) ) );
     }
 
     filter_sizer->Add( t_col_sizer );
@@ -566,7 +566,7 @@ void ExtraPanel::OnIdle( wxIdleEvent &event )
                 i_values[i] = 400 - i_val;
                 sprintf( psz_val, "%.1f", f );
                 band_texts[i]->SetLabel( band_frequencies[i] + wxT("\n") +
-                                                wxT( psz_val ) + wxT("dB") );
+                                                wxU( psz_val ) + wxT("dB") );
                 if( p == NULL )
                 {
                     break;
@@ -580,7 +580,7 @@ void ExtraPanel::OnIdle( wxIdleEvent &event )
         sprintf( psz_val, "%.1f", f_preamp );
         preamp_slider->SetValue( 400 - i_val );
         const wxString preamp = wxT("Preamp\n");
-        preamp_text->SetLabel( preamp + wxT( psz_val ) + wxT( "dB" ) );
+        preamp_text->SetLabel( preamp + wxU( psz_val ) + wxT( "dB" ) );
         eq_chkbox->SetValue( TRUE );
         b_update = VLC_FALSE;
     }
@@ -659,7 +659,7 @@ void ExtraPanel::OnPreamp( wxScrollEvent &event )
 
     sprintf( psz_val, "%.1f", f );
     const wxString preamp = wxT("Preamp\n");
-    preamp_text->SetLabel( preamp + wxT( psz_val ) + wxT( "dB" ) );
+    preamp_text->SetLabel( preamp + wxU( psz_val ) + wxT( "dB" ) );
 
     if( p_aout == NULL )
     {
@@ -709,7 +709,7 @@ void ExtraPanel::OnChangeEqualizer( wxScrollEvent &event )
         sprintf( psz_values, "%s %f", psz_values, f_val );
         sprintf( psz_val, "%.1f", f_val );
         band_texts[i]->SetLabel( band_frequencies[i] + wxT("\n") +
-                        wxT( psz_val ) + wxT("dB" ) );
+                        wxU( psz_val ) + wxT("dB" ) );
     }
     if( p_aout == NULL )
     {
