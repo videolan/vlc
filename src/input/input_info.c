@@ -2,7 +2,7 @@
  * input_info.c: Convenient functions to handle the input info structures
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_info.c,v 1.6 2002/10/10 22:46:20 massiot Exp $
+ * $Id: input_info.c,v 1.7 2002/11/09 16:34:53 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -67,7 +67,7 @@ input_info_category_t * input_InfoCategory( input_thread_t * p_input,
         if ( !p_category )
         {
             msg_Err( p_input, "No mem" );
-            return 0;
+            return NULL;
         }
         p_category->psz_name = strdup( psz_name );
         p_category->p_next = NULL;

@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.27 2002/11/01 15:06:23 gbazin Exp $
+ * $Id: aout_internal.h,v 1.28 2002/11/09 16:34:52 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -34,6 +34,17 @@ typedef struct aout_alloc_t
 #define AOUT_ALLOC_STACK    1
 #define AOUT_ALLOC_HEAP     2
 
+#ifdef HAVE_ALLOCA
+#   define ALLOCA_TEST \
+        if ( (p_alloc)->i_alloc_type == AOUT_ALLOC_STACK )                  \
+        {                                                                   \
+            (p_new_buffer) = alloca( i_alloc_size + sizeof(aout_buffer_t) );\
+        }                                                                   \
+        else
+#else
+#   define ALLOCA_TEST
+#endif
+
 #define aout_BufferAlloc( p_alloc, i_nb_usec, p_previous_buffer,            \
                           p_new_buffer )                                    \
     if ( (p_alloc)->i_alloc_type == AOUT_ALLOC_NONE )                       \
@@ -45,11 +56,7 @@ typedef struct aout_alloc_t
         int i_alloc_size;                                                   \
         i_alloc_size = (u64)(p_alloc)->i_bytes_per_sec                      \
                                             * (i_nb_usec) / 1000000 + 1;    \
-        if ( (p_alloc)->i_alloc_type == AOUT_ALLOC_STACK )                  \
-        {                                                                   \
-            (p_new_buffer) = alloca( i_alloc_size + sizeof(aout_buffer_t) );\
-        }                                                                   \
-        else                                                                \
+        ALLOCA_TEST                                                         \
         {                                                                   \
             (p_new_buffer) = malloc( i_alloc_size + sizeof(aout_buffer_t) );\
         }                                                                   \

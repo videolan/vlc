@@ -1,6 +1,6 @@
 dnl Autoconf settings for vlc
 
-AC_INIT(vlc,0.5.0-cvs-am)
+AC_INIT(vlc,0.5.0-cvs)
 
 CONFIGURE_LINE="$0 $*"
 CODENAME="Natalya"
@@ -11,7 +11,7 @@ AC_CANONICAL_SYSTEM
 
 dnl XXX: we don't put any flags here, because automake 1.5 doesn't support
 dnl them. And we need the comma otherwize automake will choke on it.
-AM_INIT_AUTOMAKE(vlc,0.5.0-cvs-am)
+AM_INIT_AUTOMAKE(vlc,0.5.0-cvs)
 AM_CONFIG_HEADER(config.h)
 
 dnl
@@ -214,7 +214,12 @@ dnl The -DSYS_FOO flag
 CPPFLAGS_save="${CPPFLAGS_save} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcdefghijklmnopqrstuvwxyz.' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'`"; CPPFLAGS="${CPPFLAGS_save}"
 
 dnl Check for system libs needed
-AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2 atoll strndup)
+AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2 atoll)
+
+dnl Check for strndup
+need_strndup=false
+AC_CHECK_FUNC(strndup,,[need_strndup=:])
+AM_CONDITIONAL(BUILD_STRNDUP, ${need_strndup})
 
 AC_CHECK_FUNC(connect,,[
   AC_CHECK_LIB(socket,connect,
@@ -319,6 +324,11 @@ AC_CHECK_HEADERS(machine/param.h sys/shm.h)
 AC_CHECK_HEADERS(linux/version.h)
 
 AC_HEADER_TIME
+
+dnl Check for dirent
+need_dirent=false
+AC_CHECK_HEADER(dirent.h,,[need_dirent=:])
+AM_CONDITIONAL(BUILD_DIRENT, ${need_dirent})
 
 dnl Mac OS X and other OSes don't have declaration for nanosleep
 AC_EGREP_HEADER(nanosleep,time.h,[

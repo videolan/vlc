@@ -1,8 +1,8 @@
 /*****************************************************************************
- * extras.c: Extra libc functions for some systems.
+ * strndup.c: Extra strndup function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: extras.c,v 1.2 2002/11/06 09:26:25 sam Exp $
+ * $Id: strndup.c,v 1.1 2002/11/09 16:34:52 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -25,7 +25,6 @@
 
 #include <vlc/vlc.h>
 
-#ifndef HAVE_STRNDUP
 /*****************************************************************************
  * strndup: returns a malloc'd copy of at most n bytes of string 
  * Does anyone know whether or not it will be present in Jaguar?
@@ -46,4 +45,4 @@ char *strndup( const char *string, size_t n )
 
     return( psz );
 }
-#endif /* HAVE_STRNDUP */
+

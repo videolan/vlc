@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.75 2002/10/27 16:58:14 gbazin Exp $
+ * $Id: input_ext-dec.h,v 1.76 2002/11/09 16:34:52 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -252,7 +252,7 @@ static inline void AlignWord( bit_stream_t * p_bit_stream )
  *****************************************************************************/
 static inline u32 ShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
 {
-    if( p_bit_stream->fifo.i_available >= i_bits )
+    if( (unsigned int)p_bit_stream->fifo.i_available >= i_bits )
     {
         return( p_bit_stream->fifo.buffer >> (8 * sizeof(WORD_TYPE) - i_bits) );
     }
@@ -275,7 +275,7 @@ static inline u32 ShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
 static inline s32 ShowSignedBits( bit_stream_t * p_bit_stream,
                                   unsigned int i_bits )
 {
-    if( p_bit_stream->fifo.i_available >= i_bits )
+    if( (unsigned int)p_bit_stream->fifo.i_available >= i_bits )
     {
         return( (WORD_SIGNED)p_bit_stream->fifo.buffer
                     >> (8 * sizeof(WORD_TYPE) - i_bits) );
@@ -388,7 +388,7 @@ static inline u32 GetBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
 static inline s32 GetSignedBits( bit_stream_t * p_bit_stream,
                                  unsigned int i_bits )
 {
-    if( p_bit_stream->fifo.i_available >= i_bits )
+    if( (unsigned int)p_bit_stream->fifo.i_available >= i_bits )
     {
         s32             i_result;
 
@@ -479,8 +479,8 @@ static inline void GetChunk( bit_stream_t * p_bit_stream,
         p_bit_stream->fifo.i_available -= 8;
     }
 
-    if( (i_available = p_bit_stream->p_end - p_bit_stream->p_byte)
-            >= i_buf_len )
+    i_available = p_bit_stream->p_end - p_bit_stream->p_byte;
+    if( i_available >= (ptrdiff_t)i_buf_len )
     {
         p_bit_stream->p_decoder_fifo->p_vlc->pf_memcpy( p_buffer,
                                            p_bit_stream->p_byte, i_buf_len );
@@ -500,7 +500,7 @@ static inline void GetChunk( bit_stream_t * p_bit_stream,
                 return;
         }
         while( (i_available = p_bit_stream->p_end - p_bit_stream->p_byte)
-                <= i_buf_len );
+                <= (ptrdiff_t)i_buf_len );
 
         if( i_buf_len )
         {

@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.27 2002/10/29 13:22:48 sam Exp $
+ * $Id: objects.c,v 1.28 2002/11/09 16:34:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -208,12 +208,15 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 
     if( i_type == VLC_OBJECT_ROOT )
     {
+        vlc_value_t val;
+		val.p_address = DumpCommand;
+
         vlc_mutex_init( p_new, &structure_lock );
 
         var_Create( p_new, "list", VLC_VAR_COMMAND );
-        var_Set( p_new, "list", (vlc_value_t)(void*)DumpCommand );
+        var_Set( p_new, "list", val );
         var_Create( p_new, "tree", VLC_VAR_COMMAND );
-        var_Set( p_new, "tree", (vlc_value_t)(void*)DumpCommand );
+        var_Set( p_new, "tree", val );
     }
 
     return p_new;
