@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.19 2003/04/16 16:20:25 fenrir Exp $
+ * $Id: libmp4.c,v 1.20 2003/04/16 16:32:42 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -483,12 +483,11 @@ int MP4_ReadBoxCommon( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
         CreateUUID( &p_box->i_uuid, p_box->i_type );
     }
 #ifdef MP4_VERBOSE
-    /* FIXME how to write uint64_t ??? */
     if( p_box->i_size )
     {
-        msg_Dbg( p_stream->p_input, "Found Box: %4.4s size %d",
+        msg_Dbg( p_stream->p_input, "Found Box: %4.4s size "I64Fd,
                  (char*)&p_box->i_type,
-                 (uint32_t)p_box->i_size );
+                 p_box->i_size );
     }
 #endif
 
@@ -1251,7 +1250,7 @@ int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
         p_box->data.p_sample_soun->i_bytes_per_frame = 0;
         p_box->data.p_sample_soun->i_bytes_per_sample = 0;
 
-        msg_Dbg( p_stream->p_input, "Read Box: \"soun\" mp4 or qt1/2 (rest=%d)", i_read );
+        msg_Dbg( p_stream->p_input, "Read Box: \"soun\" mp4 or qt1/2 (rest="I64Fd")", i_read );
         MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) + 28 );
     }
     MP4_ReadBoxContainerRaw( p_stream, p_box ); /* esds */
