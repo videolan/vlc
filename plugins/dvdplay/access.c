@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.1 2002/07/23 19:56:19 stef Exp $
+ * $Id: access.c,v 1.2 2002/07/25 20:34:35 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -275,13 +275,16 @@ static int dvdplay_SetArea( input_thread_t * p_input, input_area_t * p_area )
     {
         int i_chapter;
         
+        /* prevent intf to try to seek */
+        p_input->stream.b_seekable = 0;
+        
         /* Store selected chapter */
         i_chapter = p_area->i_part;
 
         dvdNewArea( p_input, p_area );
         
         dvdplay_start( p_dvd->vmg, p_area->i_id );
-
+        
         p_area->i_part = i_chapter;
     } /* i_title >= 0 */
     else
@@ -385,6 +388,9 @@ static void pf_vmg_callback( void* p_args, dvdplay_event_t event )
 
         break;
     case NEW_PGC:
+        /* prevent intf to try to seek  by default */
+        p_input->stream.b_seekable = 0;
+
         if( ( i = dvdplay_title_cur( p_dvd->vmg ) ) != 
                 p_input->stream.p_selected_area->i_id )
         {
@@ -394,13 +400,11 @@ static void pf_vmg_callback( void* p_args, dvdplay_event_t event )
             dvdNewArea( p_input,
                         p_input->stream.pp_areas[i] );
         }
-        else
-        {
-            /* new pgc in same title: reinit ES */
-            dvdNewPGC( p_input );
-            
-            p_input->stream.b_changed = 1;
-        }
+
+        /* new pgc in same title: reinit ES */
+        dvdNewPGC( p_input );
+        
+        p_input->stream.b_changed = 1;
 
         break;
     case NEW_PG:
@@ -464,9 +468,9 @@ static int dvdNewArea( input_thread_t * p_input, input_area_t * p_area )
     }
     
     dvdplay_SetProgram( p_input,
-                       p_input->stream.pp_programs[i_angle-1] ); 
+                        p_input->stream.pp_programs[i_angle-1] ); 
 
-    dvdNewPGC( p_input );
+//    dvdNewPGC( p_input );
 
     /* No PSM to read in DVD mode, we already have all information */
     p_input->stream.p_selected_program->b_is_ok = 1;
