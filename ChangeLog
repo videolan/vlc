@@ -1,4 +1,53 @@
 ------------------------------------------------------------------------
+r9328 | gbazin | 2004-11-14 20:32:45 +0100 (Sun, 14 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/modules/codec/dmo/dmo.c
+
+* modules/codec/dmo/dmo.c: work around for buggy dmo implementations.
+------------------------------------------------------------------------
+r9326 | fkuehne | 2004-11-14 19:15:34 +0100 (Sun, 14 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/NEWS
+
+* ffixed typo
+------------------------------------------------------------------------
+r9325 | zorglub | 2004-11-14 19:10:58 +0100 (Sun, 14 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/po/fr.po
+
+Fix typo in french po
+
+------------------------------------------------------------------------
+r9323 | gbazin | 2004-11-14 19:01:01 +0100 (Sun, 14 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/Makefile.am
+
+* Makefile.am: fixed make dist.
+------------------------------------------------------------------------
+r9321 | gbazin | 2004-11-14 18:58:44 +0100 (Sun, 14 Nov 2004) | 3 lines
+Changed paths:
+   M /branches/0.8.1/ChangeLog
+   M /branches/0.8.1/modules/codec/quicktime.c
+   M /branches/0.8.1/po/da.po
+   M /branches/0.8.1/po/de.po
+   M /branches/0.8.1/po/en_GB.po
+   M /branches/0.8.1/po/es.po
+   M /branches/0.8.1/po/fr.po
+   M /branches/0.8.1/po/hu.po
+   M /branches/0.8.1/po/it.po
+   M /branches/0.8.1/po/ja.po
+   M /branches/0.8.1/po/nl.po
+   M /branches/0.8.1/po/no.po
+   M /branches/0.8.1/po/pl.po
+   M /branches/0.8.1/po/pt_BR.po
+   M /branches/0.8.1/po/ru.po
+   M /branches/0.8.1/po/sv.po
+   M /branches/0.8.1/po/vlc.pot
+
+* po/*, ChangeLog: update for 0.8.1 release.
+* modules/codec/quicktime.c: fixed small mem leak.
+
+------------------------------------------------------------------------
 r9320 | ipkiss | 2004-11-14 18:32:25 +0100 (Sun, 14 Nov 2004) | 2 lines
 Changed paths:
    M /branches/0.8.1/modules/gui/skins2/src/generic_window.hpp

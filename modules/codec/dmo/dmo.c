@@ -541,7 +541,7 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     IEnumDMO *p_enum_dmo = NULL;
     WCHAR *psz_dmo_name;
     GUID clsid_dmo;
-    DWORD i_dummy;
+    uint32_t i_dummy;
 #endif
 
     GETCLASS GetClass;
