@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.27 2002/06/07 14:30:40 sam Exp $
+ * $Id: gnome.c,v 1.28 2002/07/02 19:16:47 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -53,7 +53,7 @@ static gint GnomeManage      ( gpointer p_data );
 /*****************************************************************************
  * Local variables (mutex-protected).
  *****************************************************************************/
-static void ** pp_global_data;
+static void ** pp_global_data = NULL;
 
 /*****************************************************************************
  * Building configuration tree
@@ -112,8 +112,21 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 void g_atexit( GVoidFunc func )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)*pp_global_data;
+    intf_thread_t *p_intf;
+
     int i_dummy;
+
+    if( pp_global_data == NULL )
+    {
+        atexit( func );
+        return;
+    }
+
+    p_intf = (intf_thread_t *)*pp_global_data;
+    if( p_intf == NULL )
+    {
+        return;
+    }
 
     for( i_dummy = 0;
          i_dummy < MAX_ATEXIT && p_intf->p_sys->pf_callback[i_dummy] != NULL;
