@@ -2,7 +2,7 @@
  * gtk2_event.cpp: GTK2 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_event.cpp,v 1.6 2003/04/15 20:33:58 karibu Exp $
+ * $Id: gtk2_event.cpp,v 1.7 2003/04/15 20:54:58 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -80,12 +80,14 @@ bool GTK2Event::SendEvent()
             {
                 OSAPI_PostMessage( *win, Message, Param1, Param2 );
                 PostSynchroMessage();
+                return true;
             }
         }
+        OSAPI_PostMessage( NULL, Message, Param1, Param2 );
+        return true;
     }
 
-    OSAPI_PostMessage( NULL, Message, Param1, Param2 );
-    return true;
+    return false;
 }
 //---------------------------------------------------------------------------
 bool GTK2Event::IsEqual( Event *evt )

@@ -2,7 +2,7 @@
  * gtk2_api.cpp: Various gtk2-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_api.cpp,v 1.7 2003/04/15 20:33:58 karibu Exp $
+ * $Id: gtk2_api.cpp,v 1.8 2003/04/15 20:54:58 karibu Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -121,11 +121,7 @@ void OSAPI_GetScreenSize( int &w, int &h )
 //---------------------------------------------------------------------------
 void OSAPI_GetMousePos( int &x, int &y )
 {
-/*    LPPOINT MousePos = new POINT;
-    GetCursorPos( MousePos );
-    x = MousePos->x;
-    y = MousePos->y;
-    delete MousePos;*/
+    gdk_window_get_pointer( gdk_get_default_root_window(), &x, &y, NULL );
 }
 //---------------------------------------------------------------------------
 string OSAPI_GetWindowTitle( Window *win )
