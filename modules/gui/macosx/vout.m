@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.29 2003/02/10 22:18:41 hartman Exp $
+ * $Id: vout.m,v 1.30 2003/02/10 23:04:40 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -933,7 +933,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     VLCView * o_view;
     NSScreen * o_screen;
     vout_thread_t * p_vout;
-    id o_title;
+    NSMutableString *o_title;
     vlc_bool_t b_main_screen;
 
     intf_thread_t * p_intf = [NSApp getIntf];
@@ -1031,7 +1031,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     vlc_mutex_lock( &p_playlist->object_lock );
-    o_title = [NSString stringWithUTF8String: 
+    o_title = [NSMutableString stringWithUTF8String: 
         p_playlist->pp_items[p_playlist->i_index]->psz_name]; 
     vlc_mutex_unlock( &p_playlist->object_lock ); 
 
@@ -1039,7 +1039,11 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     if (o_title)
     {
-        [p_vout->p_sys->o_window setTitle: o_title];
+        NSRange prefixrange = [o_title rangeOfString: @"file:"];
+        if ( prefixrange.location != NSNotFound )
+            [o_title deleteCharactersInRange: prefixrange];
+
+        [p_vout->p_sys->o_window setTitleWithRepresentedFilename: o_title];
         [p_vout->p_sys->o_window makeKeyAndOrderFront: nil];
     }
     else
