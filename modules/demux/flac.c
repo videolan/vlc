@@ -86,16 +86,14 @@ static int Open( vlc_object_t * p_this )
     /* Have a peep at the show. */
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
-        if( p_meta ) vlc_meta_Delete( p_meta );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     if( p_peek[0]!='f' || p_peek[1]!='L' || p_peek[2]!='a' || p_peek[3]!='C' )
     {
         if( strncmp( p_demux->psz_demux, "flac", 4 ) )
         {
-            if( p_meta ) vlc_meta_Delete( p_meta );
-            return VLC_EGENERIC;
+            goto error;
         }
         /* User forced */
         msg_Err( p_demux, "this doesn't look like a flac stream, "
@@ -114,15 +112,13 @@ static int Open( vlc_object_t * p_this )
     if( p_peek[4] & 0x7F )
     {
         msg_Err( p_demux, "this isn't a STREAMINFO metadata block" );
-        if( p_meta ) vlc_meta_Delete( p_meta );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     if( ((p_peek[5]<<16)+(p_peek[6]<<8)+p_peek[7]) != (STREAMINFO_SIZE - 4) )
     {
         msg_Err( p_demux, "invalid size for a STREAMINFO metadata block" );
-        if( p_meta ) vlc_meta_Delete( p_meta );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     /*
@@ -154,18 +150,29 @@ static int Open( vlc_object_t * p_this )
         module_Need( p_sys->p_packetizer, "packetizer", NULL, 0 );
     if( !p_sys->p_packetizer->p_module )
     {
-        if( p_sys->p_packetizer->fmt_in.p_extra )
-            free( p_sys->p_packetizer->fmt_in.p_extra );
-
-        vlc_object_destroy( p_sys->p_packetizer );
         msg_Err( p_demux, "cannot find flac packetizer" );
-        if( p_meta ) vlc_meta_Delete( p_meta );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
 
     return VLC_SUCCESS;
+
+error:
+    if( p_sys != NULL && p_sys->p_packetizer )
+    {
+        if( p_sys->p_packetizer->fmt_in.p_extra )
+            free( p_sys->p_packetizer->fmt_in.p_extra );
+        vlc_object_destroy( p_sys->p_packetizer );
+    }
+    if( p_meta )
+    {
+        int b_seekable;
+        vlc_meta_Delete( p_meta );
+        stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
+        if( b_seekable ) stream_Seek( p_demux->s, 0 );
+    }
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
