@@ -2,7 +2,7 @@
  * preferences.cpp: preferences window for the kde gui
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.cpp,v 1.7 2002/10/13 14:26:47 sigmunau Exp $
+ * $Id: preferences.cpp,v 1.8 2002/10/16 23:34:27 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -38,13 +38,14 @@
 #include <klineedit.h>
 #include <klocale.h>
 #include <knuminput.h>
+#include <kurlrequester.h>
 
 #include "QConfigItem.h"
 #include "pluginsbox.h"
 #include "preferences.h"
 
 /*
- construct a new configuration window for the given module
+  construct a new configuration window for the given module
 */
 KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                            QWidget *parent, const QString &caption) :
@@ -69,7 +70,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
     {
 
         if( psz_module_name
-             && !strcmp( psz_module_name, (*pp_parser)->psz_object_name ) )
+            && !strcmp( psz_module_name, (*pp_parser)->psz_object_name ) )
         {
             break;
         }
@@ -112,118 +113,142 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
 
         case CONFIG_ITEM_MODULE:
 
+        {
+                
+            vlc_mutex_lock( p_item->p_lock );
+            KPluginsBox *item_frame =
+                new KPluginsBox( p_intf, p_item->psz_text,
+                                 p_item->psz_value ? p_item->psz_value :"",
+                                 category_table,
+                                 spacingHint(),
+                                 this );
+            QConfigItem *ci = new QConfigItem(this,
+                                              p_item->psz_name,
+                                              p_item->i_type,
+                                              p_item->psz_value);
+            connect(item_frame, SIGNAL(selectionChanged(const QString &)),
+                    ci, SLOT(setValue(const QString &)));
+
+                
+            /* build a list of available plugins */
+            for( pp_parser = (module_t **)p_list->pp_objects ;
+                 *pp_parser ;
+                 pp_parser++ )
             {
-                
-                vlc_mutex_lock( p_item->p_lock );
-                KPluginsBox *item_frame =
-                    new KPluginsBox( p_intf, p_item->psz_text,
-                                     p_item->psz_value ? p_item->psz_value :"",
-                                     category_table,
-                                     spacingHint(),
-                                     this );
-                QConfigItem *ci = new QConfigItem(this,
-                                                  p_item->psz_name,
-                                                  p_item->i_type,
-                                                  p_item->psz_value);
-                connect(item_frame, SIGNAL(selectionChanged(const QString &)),
-                        ci, SLOT(setValue(const QString &)));
-
-                
-                /* build a list of available plugins */
-                for( pp_parser = (module_t **)p_list->pp_objects ;
-                     *pp_parser ;
-                     pp_parser++ )
+                if( !strcmp( (*pp_parser)->psz_capability,
+                             p_item->psz_type ) )
                 {
-                    if( !strcmp( (*pp_parser)->psz_capability,
-                                 p_item->psz_type ) )
-                    {
-                        new QListViewItem(item_frame->getListView(),
-                                          (*pp_parser)->psz_object_name,
-                                          (*pp_parser)->psz_longname);
-                    }
+                    new QListViewItem(item_frame->getListView(),
+                                      (*pp_parser)->psz_object_name,
+                                      (*pp_parser)->psz_longname);
                 }
-
-                vlc_mutex_unlock( p_item->p_lock );
             }
-            break;
+
+            vlc_mutex_unlock( p_item->p_lock );
+        }
+        break;
 
         case CONFIG_ITEM_STRING:
+        {
+            QHBox *hb = new QHBox(category_table);
+            hb->setSpacing(spacingHint());
+            new QLabel(p_item->psz_text, hb);
+            /* add input box with default value */
+            vlc_mutex_lock( p_item->p_lock );
+            
+            KLineEdit *kl = new KLineEdit( p_item->psz_value ?
+                                           p_item->psz_value : "", hb);
+            QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
+                                              p_item->i_type,
+                                              p_item->psz_value ?
+                                              p_item->psz_value : "");
+            connect(kl, SIGNAL(textChanged ( const QString & )),
+                    ci, SLOT(setValue( const QString &)));
+            QToolTip::add(kl, p_item->psz_longtext);
+            kl->setMaxLength(40);
+            
+            vlc_mutex_unlock( p_item->p_lock );
+            
+        }
+        break;
+
         case CONFIG_ITEM_FILE:
-
-            {
-                QHBox *hb = new QHBox(category_table);
-                hb->setSpacing(spacingHint());
-                new QLabel(p_item->psz_text, hb);
-                /* add input box with default value */
-                vlc_mutex_lock( p_item->p_lock );
-                
-                KLineEdit *kl = new KLineEdit( p_item->psz_value ?
-                                               p_item->psz_value : "", hb);
-                QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
-                                                  p_item->i_type,
-                                                  p_item->psz_value ?
-                                                  p_item->psz_value : "");
-                connect(kl, SIGNAL(textChanged ( const QString & )),
-                        ci, SLOT(setValue( const QString &)));
-                QToolTip::add(kl, p_item->psz_longtext);
-                kl->setMaxLength(40);
-                
-                vlc_mutex_unlock( p_item->p_lock );
-                
-            }
-            break;
-
+        {
+            QHBox *hb = new QHBox(category_table);
+            hb->setSpacing(spacingHint());
+            new QLabel(p_item->psz_text, hb);
+            /* add input box with default value */
+            vlc_mutex_lock( p_item->p_lock );
+            
+//            KLineEdit *kl = new KLineEdit( p_item->psz_value ?
+//                                           p_item->psz_value : "", hb);
+            QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
+                                              p_item->i_type,
+                                              p_item->psz_value ?
+                                              p_item->psz_value : "");
+//            QPushButton *bbrowse = new QPushButton( _("Browse"), hb );
+            KURLRequester *kfile = new KURLRequester( p_item->psz_value ?
+                                                      p_item->psz_value : "",
+                                                      hb );
+            connect(kfile, SIGNAL(textChanged ( const QString & )),
+                    ci, SLOT(setValue( const QString &)));
+            QToolTip::add(kfile, p_item->psz_longtext);            
+            vlc_mutex_unlock( p_item->p_lock );
+            
+        }
+        break;
+        
         case CONFIG_ITEM_INTEGER:
             /* add input box with default value */
-            {
-                QHBox *hb = new QHBox(category_table);
-                hb->setSpacing(spacingHint());
-                new QLabel(p_item->psz_text, hb);                
-                QSpinBox *item_adj = new QSpinBox(-1, 99999, 1, hb);
-                QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
-                                                  p_item->i_type,
-                                                  p_item->i_value);
-                item_adj->setValue( p_item->i_value );
-                connect(item_adj, SIGNAL(valueChanged( int)),
-                        ci, SLOT(setValue(int)));
-                QToolTip::add(item_adj, p_item->psz_longtext);
-            }
-            break;
-
+        {
+            QHBox *hb = new QHBox(category_table);
+            hb->setSpacing(spacingHint());
+            new QLabel(p_item->psz_text, hb);                
+            QSpinBox *item_adj = new QSpinBox(-1, 99999, 1, hb);
+            QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
+                                              p_item->i_type,
+                                              p_item->i_value);
+            item_adj->setValue( p_item->i_value );
+            connect(item_adj, SIGNAL(valueChanged( int)),
+                    ci, SLOT(setValue(int)));
+            QToolTip::add(item_adj, p_item->psz_longtext);
+        }
+        break;
+        
         case CONFIG_ITEM_FLOAT:
-            {
-                QHBox *hb = new QHBox(category_table);
-                hb->setSpacing(spacingHint());
-                new QLabel(p_item->psz_text, hb);                
-                KDoubleNumInput *kdi= new KDoubleNumInput(p_item->f_value, hb);
-                kdi->setRange(-1, 99999, 0.01, false);
-                QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
-                                                  p_item->i_type,
-                                                  p_item->f_value);
-                connect(kdi, SIGNAL(valueChanged(double)),
-                        ci, SLOT(setValue(double)));
-                QToolTip::add(kdi, p_item->psz_longtext);
+        {
+            QHBox *hb = new QHBox(category_table);
+            hb->setSpacing(spacingHint());
+            new QLabel(p_item->psz_text, hb);                
+            KDoubleNumInput *kdi= new KDoubleNumInput(p_item->f_value, hb);
+            kdi->setRange(-1, 99999, 0.01, false);
+            QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
+                                              p_item->i_type,
+                                              p_item->f_value);
+            connect(kdi, SIGNAL(valueChanged(double)),
+                    ci, SLOT(setValue(double)));
+            QToolTip::add(kdi, p_item->psz_longtext);
                 
-            }
-            break;
+        }
+        break;
                                                   
                 
         case CONFIG_ITEM_BOOL:
 
             /* add check button */
-            {
-                QCheckBox *bool_checkbutton =
-                    new QCheckBox(QString(p_item->psz_text), category_table);
-                QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
-                                                  p_item->i_type,
-                                                  p_item->i_value);
-                bool_checkbutton->setChecked(p_item->i_value);
-                connect(bool_checkbutton, SIGNAL(stateChanged( int)),
-                        ci, SLOT(setValue(int)));
-                QToolTip::add(bool_checkbutton, p_item->psz_longtext);
+        {
+            QCheckBox *bool_checkbutton =
+                new QCheckBox(QString(p_item->psz_text), category_table);
+            QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
+                                              p_item->i_type,
+                                              p_item->i_value);
+            bool_checkbutton->setChecked(p_item->i_value);
+            connect(bool_checkbutton, SIGNAL(stateChanged( int)),
+                    ci, SLOT(setValue(int)));
+            QToolTip::add(bool_checkbutton, p_item->psz_longtext);
 
-            }
-            break;
+        }
+        break;
 
         }
 
@@ -314,7 +339,7 @@ void KPreferences::slotApply()
 }
 
 /*
- run when the Ok button is pressed
+  run when the Ok button is pressed
 */
 void KPreferences::slotOk()
 {
