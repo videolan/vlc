@@ -1,4 +1,5 @@
 dnl Autoconf settings for vlc
+dnl $Id: configure.ac,v 1.16 2003/06/28 14:31:40 sam Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -156,7 +157,7 @@ AM_GNU_GETTEXT_VERSION(0.11.5)
 AM_GNU_GETTEXT
 if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
   AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, Define if we use the local libintl)
-  INCLUDES="${INCLUDES} -I\\\$(top_srcdir)/intl"
+  INCLUDES="${INCLUDES} -I\$(top_builddir)/intl"
 else
   AC_CHECK_FUNCS(textdomain,,[
     AC_CHECK_LIB(intl,textdomain,

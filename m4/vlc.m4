@@ -1,4 +1,5 @@
 dnl  Macros needed for VLC
+dnl  $Id: vlc.m4,v 1.3 2003/06/28 14:31:40 sam Exp $
 
 dnl  Add plugins or builtins
 AC_DEFUN([AX_ADD_BUILTINS], [
