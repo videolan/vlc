@@ -388,8 +388,8 @@ static void IdentifyPES( gdec_thread_t *p_gdec, pes_packet_t *p_pes, int i_strea
     if( i_stream_id == 0xbd )
     {
         /* Dolby AC-3 stream - might be specific to DVD PS streams */
-        i_type = AC3_AUDIO_ES;
-        intf_DbgMsg("PES %p identified as AC3\n", p_pes);
+        i_type = MPEG2_AUDIO_ES;
+        intf_DbgMsg("PES %p identified as AUDIO AC3\n", p_pes);
     }
     else if( (i_stream_id & 0xe0) == 0xc0 ) 
     {
@@ -398,7 +398,7 @@ static void IdentifyPES( gdec_thread_t *p_gdec, pes_packet_t *p_pes, int i_strea
          * an ISO/IEC 13818-3 is capable of decoding an ISO/IEC 11172-3 stream,
          * the first one is used */
         i_type = MPEG2_AUDIO_ES;
-        intf_DbgMsg("PES %p identified as AUDIO\n", p_pes);
+        intf_DbgMsg("PES %p identified as AUDIO MPEG\n", p_pes);
     }
     else if( (i_stream_id & 0xf0) == 0xe0 )
     {
