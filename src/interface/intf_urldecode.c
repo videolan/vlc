@@ -19,9 +19,9 @@
  */
 
 #include "intf_urldecode.h"
-#include <malloc.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 /* URL-decode a file: URL path, return NULL if it's not what we expect */
 void urldecode_path(char *encoded_path)

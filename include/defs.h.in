@@ -52,6 +52,9 @@
 /* Define if you have the vasprintf function.  */
 #undef HAVE_VASPRINTF
 
+/* Define if you have the <SDL/SDL.h> header file.  */
+#undef HAVE_SDL_SDL_H
+
 /* Define if you have the <arpa/inet.h> header file.  */
 #undef HAVE_ARPA_INET_H
 
@@ -151,14 +154,14 @@
 /* Define if you have the threads library (-lthreads).  */
 #undef HAVE_LIBTHREADS
 
-/* Define if compiler accepts bswap x86 instruction. */
-#undef HAVE_X86_BSWAP
-
 /* Define if ntohl is in <sys/param.h>. */
 #undef NTOHL_IN_SYS_PARAM_H
 
 /* Define if <sys/types.h> defines boolean_t. */
 #undef BOOLEAN_T_IN_SYS_TYPES_H
+
+/* Define if <pthread.h> defines boolean_t. */
+#undef BOOLEAN_T_IN_PTHREAD_H
 
 /* DVD support for linux */
 #undef LINUX_DVD

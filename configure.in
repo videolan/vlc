@@ -25,11 +25,6 @@ dnl Check for compiler environment
 AC_C_CONST
 AC_C_BIGENDIAN
 
-AC_MSG_CHECKING([whether compiler accepts bswap x86 instruction])
-AC_TRY_COMPILE([unsigned int foo( unsigned int x )
-   { __asm__("bswap %0" : "=r" (x) : "0" (x)); return x; }],,
- AC_DEFINE(HAVE_X86_BSWAP, 1, Define if compiler accepts bswap x86 instruction.) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
-
 dnl Check for system libs needed
 AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol)
 AC_CHECK_FUNCS(setenv putenv)
@@ -79,7 +74,7 @@ void foo() { int meuh; ntohl(meuh); }],,
  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl Check for -rdynamic flag
-CFLAGS="${CFLAGS} -rdynamic"
+CFLAGS="${CFLAGS} -rdynamic -Wall -Werror"
 AC_MSG_CHECKING([if \$CC accepts -rdynamic])
 AC_TRY_COMPILE([],,
  DYNAMIC_FLAG="-rdynamic"
@@ -88,11 +83,16 @@ AC_TRY_COMPILE([],,
 dnl End of the bizarre compilation tests
 CFLAGS=$save_CFLAGS
 
-dnl Check for boolean_t in sys/types.h
+dnl Check for boolean_t
 AC_MSG_CHECKING([for boolean_t in sys/types.h])
 AC_TRY_COMPILE([#include <sys/types.h>
 void quux() { boolean_t foo; }],,
  AC_DEFINE(BOOLEAN_T_IN_SYS_TYPES_H, 1, Define if <sys/types.h> defines boolean_t.)
+ AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_MSG_CHECKING([for boolean_t in pthread.h])
+AC_TRY_COMPILE([#include <pthread.h>
+void quux() { boolean_t foo; }],,
+ AC_DEFINE(BOOLEAN_T_IN_PTHREAD_H, 1, Define if <pthread.h> defines boolean_t.)
  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -157,7 +157,11 @@ AC_ARG_ENABLE(null,
 if test x$enable_null != xno; then PLUGINS=${PLUGINS}"null "; fi
 AC_ARG_ENABLE(dsp,
   [  --disable-dsp           Linux /dev/dsp support (default enabled)])
-if test x$enable_dsp != xno; then PLUGINS=${PLUGINS}"dsp "; fi
+if test x$enable_dsp != xno; then
+  if test -f /dev/dsp; then
+    PLUGINS=${PLUGINS}"dsp "
+  fi
+fi
 AC_ARG_ENABLE(esd,
   [  --enable-esd            Esound library support (default disabled)],
   [if test x$enable_esd = xyes; then PLUGINS=${PLUGINS}"esd "; fi])
@@ -185,13 +189,15 @@ AC_ARG_WITH(sdl,
       then
         LIB_SDL="L/usr/X11R6/lib -l"$withval
       else
+        AC_CHECK_HEADERS(SDL/SDL.h, , [echo "Cannot find SDL headers !"; exit])
         LIB_SDL="-L/usr/X11R6/lib -lSDL"
       fi
     fi ])
     if test "x$withval" = "x";
     then
-      PLUGINS=${PLUGINS}"sdl "
-      LIB_SDL="-L/usr/X11R6/lib -lSDL"
+      AC_CHECK_HEADERS(SDL/SDL.h,
+      [PLUGINS=${PLUGINS}"sdl "
+       LIB_SDL="-L/usr/X11R6/lib -lSDL"])
     fi
 AC_ARG_WITH(glide,
   [  --with-glide[=name]     Glide (3dfx) support (default disabled)],
@@ -219,7 +225,12 @@ AC_ARG_ENABLE(gnome,
   [if test x$enable_gnome = xyes; then PLUGINS=${PLUGINS}"gnome "; GVLC=1; fi])
 AC_ARG_ENABLE(gtk,
   [  --disable-gtk           Gtk+ support (default enabled)])
-if test x$enable_gtk != xno; then PLUGINS=${PLUGINS}"gtk "; GVLC=1; fi
+if test x$enable_gtk != xno; then
+  if which gtk-config; then
+    PLUGINS=${PLUGINS}"gtk "
+    GVLC=1
+  fi
+fi
 AC_ARG_ENABLE(x11,
   [  --disable-x11           X11 support (default enabled)])
 if test x$enable_x11 != xno; then PLUGINS=${PLUGINS}"x11 "; fi

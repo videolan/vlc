@@ -40,6 +40,7 @@ module_load( char * psz_filename, module_handle_t * handle )
     /* Do not open modules with RTLD_GLOBAL, or we are going to get namespace
      * collisions when two modules have common public symbols */
     *handle = dlopen( psz_filename, RTLD_NOW );
+
     return( *handle == NULL );
 #endif
 }
@@ -85,6 +86,20 @@ module_getsymbol( module_handle_t handle, char * psz_function )
     {
         return( NULL );
     }
+
+#elif defined(SYS_DARWIN1_3)
+    /* MacOS X dl library expects symbols to begin with "_". That's
+     * really lame, but hey, what can we do ? */
+    char *  psz_call = malloc( strlen( psz_function ) + 2 );
+    void *  p_return;
+    strcpy( psz_call + 1, psz_function );
+    psz_call[ 0 ] = '_';
+
+    p_return = dlsym( handle, psz_call );
+
+    free( psz_call );
+    return( p_return );
+
 #else
     return( dlsym( handle, psz_function ) );
 #endif

@@ -73,7 +73,7 @@ endif
 #
 # C headers directories
 #
-INCLUDE += -Iinclude -I/usr/local/include -I/usr/X11R6/include
+INCLUDE += -Iinclude -I/usr/local/include
 
 #
 # Libraries
@@ -95,6 +95,10 @@ ifneq (,$(findstring solaris,$(SYS)))
 LIB += -ldl -lsocket -lnsl -lpthread
 endif
 
+ifneq (,$(findstring darwin,$(SYS)))
+LIB += -ldl -dyn
+endif
+
 ifeq ($(SYS),beos)
 LIB += -lbe -lroot -lgame
 else
@@ -112,6 +116,10 @@ CFLAGS += -D_GNU_SOURCE
 # flags needed for clean beos compilation
 ifeq ($(SYS),beos)
 CFLAGS += -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual
+endif
+
+ifneq (,$(findstring darwin,$(SYS)))
+CFLAGS += -traditional-cpp
 endif
 
 # Optimizations : don't compile debug versions with them
@@ -132,12 +140,7 @@ endif
 
 # Optimizations for PowerPC
 ifneq (,$(findstring powerpc,$(ARCH)))
-# 604e
-CFLAGS += -mcpu=604e -mmultiple -mhard-float -mstring
-# G3
-#CFLAGS += -mcpu=750 -mmultiple -mhard-float -mstring
-# G4
-#CFLAGS += -mcpu=7400 -mmultiple -mhard-float -mstring
+CFLAGS += -mmultiple -mhard-float -mstring
 endif
 
 # Optimizations for Sparc
@@ -156,7 +159,12 @@ endif
 #
 # C compiler flags: plugin compilation
 #
+ifneq (,$(findstring darwin,$(SYS)))
+PCFLAGS += -bundle -undefined suppress
+else
 PCFLAGS += -fPIC
+PLCFLAGS += -shared
+endif
 
 #
 # C compiler flags: dependancies
@@ -414,7 +422,6 @@ STD_PLUGIN_OBJ = \
 		$(PLUGIN_PS) \
 		$(PLUGIN_SDL) \
 		$(PLUGIN_TS) \
-		$(PLUGIN_X11) \
 		$(PLUGIN_YUV) \
 		$(PLUGIN_YUVMMX)
 
@@ -427,6 +434,7 @@ STD_PLUGIN_OBJ :=	$(filter-out $(STD_PLUGIN_COMMON), \
 				 $(STD_PLUGIN_OBJ)) $(STD_PLUGIN_COMMON)
 
 NONSTD_PLUGIN_OBJ = \
+		$(PLUGIN_X11) \
 		$(PLUGIN_GLIDE) \
 		$(PLUGIN_GTK) \
 		$(PLUGIN_GNOME)
@@ -569,6 +577,11 @@ $(STD_PLUGIN_OBJ): %.o: .dep/%.d
 $(STD_PLUGIN_OBJ): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
 
+$(PLUGIN_X11): %.o: Makefile.dep
+$(PLUGIN_X11): %.o: .dep/%.d
+$(PLUGIN_X11): %.o: %.c
+	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/X11R6/include -c -o $@ $<
+
 $(PLUGIN_GTK): %.o: Makefile.dep
 $(PLUGIN_GTK): %.o: .dep/%.d
 $(PLUGIN_GTK): %.o: %.c
@@ -623,49 +636,49 @@ lib/beos.so: $(PLUGIN_BEOS)
 
 lib/esd.so: $(PLUGIN_ESD)
 ifneq (,$(findstring bsd,$(SYS)))
-	$(CC) $(PCFLAGS) -shared -o $@ $^ -lesd
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -lesd
 else
-	$(CC) $(PCFLAGS) -shared -o $@ $^ -laudiofile -lesd
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -laudiofile -lesd
 endif
 
 lib/dsp.so: $(PLUGIN_DSP)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/qt.so: $(PLUGIN_QT)
-	$(CC) $(PCFLAGS) -shared -o $@ $^ -lqt
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -lqt
 
 lib/kde.so: $(PLUGIN_KDE)
-	$(CC) $(PCFLAGS) -shared -o $@ $^ -lkdeui -lkdecore -lqt -ldl
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -lkdeui -lkdecore -lqt -ldl
 
 lib/alsa.so: $(PLUGIN_ALSA)
-	$(CC) $(PCFLAGS) -shared -o $@ $^ -lasound
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -lasound
 
 lib/fb.so: $(PLUGIN_FB)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/x11.so: $(PLUGIN_X11)
-	$(CC) $(PCFLAGS) -shared -o $@ $^ -L/usr/X11R6/lib -lX11 -lXext
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -L/usr/X11R6/lib -lX11 -lXext
 
 lib/mga.so: $(PLUGIN_MGA)
-	$(CC) $(PCFLAGS) -shared -o $@ $^ -L/usr/X11R6/lib -lX11 -lXext
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -L/usr/X11R6/lib -lX11 -lXext
 
 lib/gtk.so: $(PLUGIN_GTK)
-	$(CC) $(PCFLAGS) -shared -o $@ $^ `gtk-config --libs gtk | sed 's,-rdynamic,,'`
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ `gtk-config --libs gtk | sed 's,-rdynamic,,'`
 
 lib/gnome.so: $(PLUGIN_GNOME)
-	$(CC) $(PCFLAGS) -shared -o $@ $^ `gnome-config --libs gnomeui | sed 's,-rdynamic,,'`
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ `gnome-config --libs gnomeui | sed 's,-rdynamic,,'`
 
 lib/glide.so: $(PLUGIN_GLIDE)
-	$(CC) $(PCFLAGS) -shared -o $@ $^ $(LIB_GLIDE)
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ $(LIB_GLIDE)
 
 lib/ggi.so: $(PLUGIN_GGI)
-	$(CC) $(PCFLAGS) -shared -o $@ $^ $(LIB_GGI)
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ $(LIB_GGI)
 
 lib/sdl.so: $(PLUGIN_SDL)
-	$(CC) $(PCFLAGS) -shared -o $@ $^ $(LIB_SDL)
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ $(LIB_SDL)
 
 lib/ncurses.so: $(PLUGIN_NCURSES)
-	$(CC) $(PCFLAGS) -shared -o $@ $^ -lncurses
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -lncurses
 
 ifeq ($(SYS),beos)
 lib/null.so: $(PLUGIN_NULL)
@@ -711,46 +724,46 @@ lib/idctmmxext.so: $(PLUGIN_IDCTMMXEXT)
 	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
 lib/null.so: $(PLUGIN_NULL)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/ps.so: $(PLUGIN_PS)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/ts.so: $(PLUGIN_TS)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/dvd.so: $(PLUGIN_DVD)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/dummy.so: $(PLUGIN_DUMMY)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/yuv.so: $(PLUGIN_YUV)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/yuvmmx.so: $(PLUGIN_YUVMMX)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/motion.so: $(PLUGIN_MOTION)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/motionmmx.so: $(PLUGIN_MOTIONMMX)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/motionmmxext.so: $(PLUGIN_MOTIONMMXEXT)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/idct.so: $(PLUGIN_IDCT)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/idctmmx.so: $(PLUGIN_IDCTMMX)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/idctmmxext.so: $(PLUGIN_IDCTMMXEXT)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 endif
 
 ################################################################################
