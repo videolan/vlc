@@ -1,5 +1,4 @@
 .*
-m4
 intl
 ABOUT-NLS
 core
@@ -17,9 +16,8 @@ conftest.cc
 autom4te.cache
 Makefile.in
 Makefile
-build-stamp
-configure-stamp
-stamp-h*
+*-stamp
+stamp-*
 aclocal.m4
 vlc-debug.*
 vlc-log.*
