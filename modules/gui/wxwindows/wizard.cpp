@@ -1526,42 +1526,51 @@ void WizardDialog::Run()
                                   mrl, address);
             msg_Dbg( p_intf,"Using %s (%i kbps) / %s (%i kbps),encap %s",
                                 vcodec,vb,acodec,ab,mux);
-            int i_tr_size = 0 ; /* 10 = ab + vb */
-            i_tr_size += vcodec ? strlen(vcodec) + strlen("vcodec=") +strlen("vb="): 0;
-            i_tr_size += acodec ? strlen(acodec) + strlen("acodec=") +strlen("ab=") : 0;
-
-            char *psz_transcode = (char *)malloc( i_tr_size * sizeof(char));
-            if( vcodec || acodec )
+            char *psz_transcode;
+ 
+            if( vcodec != NULL || acodec != NULL )
             {
-                sprintf( psz_transcode, "transcode{" );
+                int i_tr_size = 14;
+                if( vcodec != NULL )
+                    i_tr_size += strlen( vcodec ) + 17;
+                if( acodec != NULL )
+                    i_tr_size += strlen( acodec ) + 17;
+
+                if( vb > 999999 )
+                    vb = 999999;
+                else if( vb < 0 )
+                    vb = 0;
+
+                if( ab > 999999 )
+                    ab = 999999;
+                else if( ab < 0 )
+                    ab = 0;
+
+                psz_transcode = (char *)malloc( i_tr_size * sizeof(char) );
+
+                strcpy( psz_transcode, "transcode{" );
+                if( vcodec != NULL )
+                {
+                    sprintf( psz_transcode + strlen( psz_transcode ),
+                             "vcodec=%s,vb=%i%s", vcodec, vb,
+                             ( acodec != NULL ) ? "," : "}:" );
+                }
+                if( acodec != NULL )
+                {
+                    sprintf( psz_transcode + strlen( psz_transcode ),
+                             "acodec=%s,ab=%i}:", acodec, ab );
+                }
             }
             else
-            {
-                snprintf( psz_transcode, 1 , "%c", 0 );
-            }
-            if( vcodec )
-            {
-                i_tr_size += 5 + strlen(vcodec);
-                snprintf( psz_transcode, i_tr_size , "%svcodec=%s,vb=%i",
-                          psz_transcode, vcodec, vb );
-            }
-            if( acodec )
-            {
-                i_tr_size += 6 + strlen(acodec);
-                /* FIXME */
-                sprintf( psz_transcode, "%s%cacodec=%s,ab=%i",
-                          psz_transcode, vcodec ? ',' : ' ', acodec, ab );
-            }
-            if( vcodec || acodec )
-            {
-                i_tr_size +=2;
-                sprintf( psz_transcode , "%s}:", psz_transcode );
-            }
+                psz_transcode = "";
+
             i_size = 73 + strlen(mux) + strlen(address) + strlen(psz_transcode);
             psz_opt = (char *)malloc( i_size * sizeof(char) );
             snprintf( psz_opt, i_size, ":sout=#%sstandard{mux=%s,url=%s,"
-                      "access=file}",
-                       psz_transcode, mux, address );
+                      "access=file}", psz_transcode, mux, address );
+
+            if( *psz_transcode )
+                free( psz_transcode );
         }
         else
         {
@@ -1578,10 +1587,8 @@ void WizardDialog::Run()
                              "sap,name=\"%s\"",psz_sap_name );
                 }
                 else
-                {
-                    psz_sap_option = (char *) malloc( 5 );
-                    snprintf( psz_sap_option, 5, "sap" );
-                }
+                    psz_sap_option = strdup( "sap" );
+
                 i_size = 40 + strlen(mux) + strlen(address) +
                               strlen( psz_sap_option);
                 psz_opt = (char *)malloc( i_size * sizeof(char) );
