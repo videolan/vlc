@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.24 2003/03/02 12:10:46 gbazin Exp $
+$Id: NEWS,v 1.25 2003/03/03 19:39:48 hartman Exp $
 
 Changes between 0.5.1a and 0.5.2:
 --------------------------------
@@ -19,6 +19,17 @@ Win32 port:
    and Waveout plugins.
  * localization support via gettext is now fully working.
  * rc interface is now fully useable.
+
+Mac OS X port:
+ * several fixes for multi channel audio devices. AC3 over SPDIF with M-Audio Sonica Theater still does not work. this is most likely a driver bug and has been reported to M-Audio. ( Delta, Griffin iMate and MOTU firewire devices should work).
+ * new info panel.
+
+Linupy port:
+ * there is a whole new port for the linupy distribution used by o.a. the YOPY PDA. It is still experimental, please test it.
+
+Miscellaneous:
+ * improved ID3 tag detection.
+ * changed several errors into warnings. the frequently reported "this is not a PS stream, continuing" is one of these.
 
 Changes between 0.5.1 and 0.5.1a:
 --------------------------------
