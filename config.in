@@ -16,6 +16,7 @@ bool 'Skins2 module' CONFIG_SKINS2
 if [ "$CONFIG_SKINS2" = "y" ]; then
   string 'xml2-config path' CONFIG_WITHXML2CONFIGPATH ""
 fi
+bool 'Familiar GTK+ support' CONFIG_FAMILIAR
 # TODO: --enable-pda
 bool 'wxWindows support' CONFIG_WXWINDOWS
 if [ "$CONFIG_WXWINDOWS" = "y" ]; then
@@ -36,6 +37,7 @@ bool 'Goom visualization plugin' CONFIG_GOOM
 if [ "$CONFIG_GOOM" = "y" ]; then
   string 'goom tree for static linking' CONFIG_WITHGOOMTREE ""
 fi
+bool 'GaLaktos visualization plugin' CONFIG_GALAKTOS
 bool 'SLP service discovery support' CONFIG_SLP
 if [ "$CONFIG_SLP" = "y" ]; then
   string 'libslp headers and libraries' CONFIG_WITHSLP ""

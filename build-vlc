@@ -2,7 +2,8 @@
 
 FEATURES="
 SKINS skins
-SKINS2 skins2
+SKINS skins2
+FAMILIAR familiar
 WXWINDOWS wxwindows
 OPIE opie
 MACOSX macosx
@@ -80,6 +81,7 @@ RELEASE release
 SOUT sout
 WITHFFMPEGMP3LAME ffmpeg-mp3lame
 WITHFFMPEGFAAC ffmpeg-faac
+GALAKTOS galaktos
 "
 PATHS="
 WITHXML2CONFIGPATH xml2-config-path
@@ -136,25 +138,17 @@ do
    eval x="\$CONFIG_$1"
    if [ "$x" == "y" ]
    then
-      if [ "$1" == "WITHFFMPEGMP3LAME" ]
-      then 
-         echo -n "--with-$2 " >> .cmd
-      else if [ "$1" == "WITHFFMPEGFAAC" ]
+      if [ "$1" == "WITHFFMPEGMP3LAME" ] || [ "$1" == "WITHFFMPEGFAAC" ]
       then
          echo -n "--with-$2 " >> .cmd
       else
          echo -n "--enable-$2 " >> .cmd
-      fi fi
+      fi
    else
-      if [ "$1" == "WITHFFMPEGMP3LAME" ]
-      then 
-         echo -n "--without-$2 " >> .cmd
-      else if [ "$1" == "WITHFFMPEGFAAC" ]
+      if [ "$1" != "WITHFFMPEGMP3LAME" ] && [ "$1" != "WITHFFMPEGFAAC" ]
       then
-         echo -n "--without-$2 " >> .cmd
-      else
          echo -n "--disable-$2 " >> .cmd
-      fi fi
+      fi
    fi
    shift; shift
 done

@@ -122,6 +122,14 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
         }
 
+        /* Look for galaktos plugin */
+        p_module = config_FindModule( VLC_OBJECT(p_aout), "galaktos" );
+        if( p_module )
+        {
+            val.psz_string = "galaktos"; text.psz_string = _("GaLaktos");
+            var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
+        }
+
         if( var_Get( p_aout, "effect-list", &val ) == VLC_SUCCESS )
         {
             var_Set( p_aout, "visual", val );
@@ -563,6 +571,7 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
     {
         ChangeFiltersString( p_aout, "goom", VLC_FALSE );
         ChangeFiltersString( p_aout, "visual", VLC_FALSE );
+        ChangeFiltersString( p_aout, "galaktos", VLC_FALSE );
     }
     else
     {
@@ -570,6 +579,13 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
         {
             ChangeFiltersString( p_aout, "visual", VLC_FALSE );
             ChangeFiltersString( p_aout, "goom", VLC_TRUE );
+            ChangeFiltersString( p_aout, "galaktos", VLC_FALSE );
+        }
+        else if( !strcmp( "galaktos", psz_mode ) )
+        {
+            ChangeFiltersString( p_aout, "visual", VLC_FALSE );
+            ChangeFiltersString( p_aout, "goom", VLC_FALSE );
+            ChangeFiltersString( p_aout, "galaktos", VLC_TRUE );
         }
         else
         {
@@ -579,6 +595,7 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
 
             ChangeFiltersString( p_aout, "goom", VLC_FALSE );
             ChangeFiltersString( p_aout, "visual", VLC_TRUE );
+            ChangeFiltersString( p_aout, "galaktos", VLC_FALSE );
         }
     }
 

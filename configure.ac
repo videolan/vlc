@@ -3340,10 +3340,21 @@ dnl
 dnl Visualisation plugin
 dnl
 AC_ARG_ENABLE(visual,
-  [  --enable-visual          visualisation plugin (default enabled)])
+  [  --enable-visual         visualisation plugin (default enabled)])
 if test "${enable_visual}" != "no"
 then
     VLC_ADD_PLUGINS([visual])
+fi
+
+dnl
+dnl OpenGL visualisation plugin
+dnl
+AC_ARG_ENABLE(galaktos,
+  [  --enable-galaktos       OpenGL visualisation plugin (default disabled)])
+if test "${enable_galaktos}" = "yes"
+then
+    VLC_ADD_PLUGINS([galaktos])
+    VLC_ADD_LDFLAGS([galaktos],[-lGL -lGLU])
 fi
 
 dnl
@@ -3855,6 +3866,7 @@ AC_CONFIG_FILES([
   modules/video_output/x11/Makefile
   modules/visualization/Makefile
   modules/visualization/visual/Makefile
+  modules/visualization/galaktos/Makefile
 ])
 
 AC_CONFIG_FILES([vlc-config], [chmod 0755 vlc-config])
