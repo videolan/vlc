@@ -55,7 +55,7 @@
 #   include <unistd.h>
 #endif
 
-//#define HAVE_DYNAMIC_PLUGINS
+#define HAVE_DYNAMIC_PLUGINS
 #if defined(HAVE_DL_DYLD)
 #   if defined(HAVE_MACH_O_DYLD_H)
 #       include <mach-o/dyld.h>
