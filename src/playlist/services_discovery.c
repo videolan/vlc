@@ -102,6 +102,7 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
         vlc_mutex_unlock( &p_playlist->object_lock );
         p_sd->b_die = VLC_TRUE;
         vlc_thread_join( p_sd );
+        free( p_sd->psz_module );
         module_Unneed( p_sd, p_sd->p_module );
         vlc_mutex_lock( &p_playlist->object_lock );
         vlc_object_destroy( p_sd );

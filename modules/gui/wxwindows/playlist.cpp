@@ -508,6 +508,8 @@ void Playlist::UpdateTreeItem( playlist_t *p_playlist, wxTreeItemId item )
     char *psz_author = vlc_input_item_GetInfo( &p_item->input,
                                                      _("Meta-information"),
                                                      _("Artist"));
+    if( psz_author == NULL )
+        return;
     char psz_duration[MSTRTIME_MAX_SIZE];
     mtime_t dur = p_item->input.i_duration;
 
@@ -527,6 +529,7 @@ void Playlist::UpdateTreeItem( playlist_t *p_playlist, wxTreeItemId item )
         msg.Printf( wxString(wxU( psz_author )) + wxT(" - ") +
                     wxString(wxU(p_item->input.psz_name)) + duration );
     }
+    free( psz_author );
     treectrl->SetItemText( item , msg );
     treectrl->SetItemImage( item, p_item->input.i_type );
 
