@@ -14,3 +14,4 @@ SOURCES_mpeg_audio = mpeg_audio.c
 SOURCES_libmpeg2 = libmpeg2.c
 SOURCES_rawvideo = rawvideo.c
 SOURCES_quicktime = quicktime.c
+SOURCES_subsdec = subsdec.c
