@@ -2,7 +2,7 @@
  * wizard.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: streamwizard.cpp 6961 2004-03-05 17:34:23Z sam $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -48,7 +48,7 @@ enum
     MoreInfoStreaming_Event,
     MoreInfoTranscode_Event,
 
-    Open_Event,
+    Open_Event,Choose_Event,
     ListView_Event,
     InputRadio0_Event, InputRadio1_Event,
     PartialEnable_Event,
@@ -67,7 +67,7 @@ enum
 
 };
 
-#define TEXTWIDTH 50
+#define TEXTWIDTH 60
 #define ACTION_STREAM 0
 #define ACTION_TRANSCODE 1
 
@@ -114,6 +114,11 @@ END_EVENT_TABLE()
 
 #define CHOOSE_STREAM _("You must choose a stream")
 #define NO_PLAYLIST _("Uh Oh! Unable to find playlist !")
+
+#define PARTIAL _("Use this to read only a part of the stream. " \
+                  "You must be able to control the incoming stream " \
+                  "(for example, a file or a disc, but not an UDP " \
+                  "network stream.")
 
 #define INPUT_BUTTON _("Choose")
 
@@ -244,8 +249,9 @@ struct method methods_array[] =
      "less efficient, as the server needs to send several times the "
      "stream.",
      "Enter the local addresses you want to listen to. Do not enter "
-     "anything to listen to all adresses. This is generally the best "
-     "thing to do.",
+     "anything if you want to listen to all adresses or if you don't "
+     "understand. This is generally the best thing to do. Other computers "
+     "can then access the stream at http://yourip:8080 by default",
      { MUX_TS, MUX_PS, MUX_MPEG, MUX_OGG, MUX_RAW, MUX_ASF, -1,-1,-1} },
     { NULL, NULL,NULL,NULL , {-1,-1,-1,-1,-1,-1,-1,-1,-1}} /* Do not remove me */
 };
@@ -316,6 +322,8 @@ class wizInputPage : public wxWizardPage
         int i_action;
         int i_input;
 
+        void OnChoose( wxCommandEvent& event );
+
         WizardDialog *p_parent;
         wxRadioButton *input_radios[2];
         wxBoxSizer *mainSizer;
@@ -336,6 +344,7 @@ class wizInputPage : public wxWizardPage
 BEGIN_EVENT_TABLE(wizInputPage, wxWizardPageSimple)
     EVT_RADIOBUTTON( InputRadio0_Event, wizInputPage::OnInputChange)
     EVT_RADIOBUTTON( InputRadio1_Event, wizInputPage::OnInputChange)
+    EVT_BUTTON( Choose_Event, wizInputPage::OnChoose)
     EVT_CHECKBOX( PartialEnable_Event, wizInputPage::OnEnablePartial)
     EVT_WIZARD_PAGE_CHANGING(-1, wizInputPage::OnWizardPageChanging)
 END_EVENT_TABLE()
@@ -396,6 +405,7 @@ protected:
     DECLARE_EVENT_TABLE()
     int i_method;
     wxBoxSizer *mainSizer;
+    wxStaticBoxSizer *address_sizer;
     wxStaticText *address_text;
     wxTextCtrl *address_txtctrl;
     WizardDialog * p_parent;
@@ -524,24 +534,30 @@ wizHelloPage::wizHelloPage( wxWizard *parent) : wxWizardPageSimple(parent)
                                               wxU( HELLO_TRANSCODE ) );
         i_action = 0;
 
-        wxBoxSizer *stream_sizer = new wxBoxSizer( wxHORIZONTAL);
-        
+        wxFlexGridSizer *stream_sizer = new wxFlexGridSizer( 2,2,1 );
+
         stream_sizer->Add( action_radios[0], 0, wxALL, 5 );
         stream_sizer->Add( new wxButton( this, MoreInfoStreaming_Event,
-                 wxU( _("More Info")) ), 0, wxALL, 5 );
-        mainSizer->Add( stream_sizer, 0, wxALL, 5 );
+                                wxU( _("More Info")) ), 0, wxALL |
+                                wxEXPAND | wxALIGN_RIGHT, 5 );
+        mainSizer->Add( stream_sizer, 0, wxALL| wxEXPAND, 5 );
         mainSizer->Add( new wxStaticText(this, -1,
                  wxU( vlc_wraptext( HELLO_STREAMING_DESC ,TEXTWIDTH, false))),
-                        0, wxBOTTOM, 5 );
+                        0, wxLEFT, 5 );
 
-        mainSizer->Add( action_radios[1], 0, wxALL, 5 );
+        wxBoxSizer *transcode_sizer = new wxBoxSizer( wxHORIZONTAL);
+
+        transcode_sizer->Add( action_radios[1], 0, wxALL, 5 );
+        transcode_sizer->Add( new wxButton( this, MoreInfoTranscode_Event,
+                                wxU( _("More Info")) ), 0, wxALL |
+                                wxALIGN_RIGHT, 5 );
+        mainSizer->Add( transcode_sizer, 0, wxALL | wxEXPAND, 5 );
         mainSizer->Add( new wxStaticText(this, -1,
                  wxU( vlc_wraptext( HELLO_TRANSCODE_DESC ,TEXTWIDTH, false)))
                         , 0, wxBOTTOM, 5 );
-        mainSizer->Add( new wxButton( this, MoreInfoTranscode_Event,
-                 wxU( _("More Info")) ), 0, wxALL, 5 );
 
-        mainSizer->Add( new wxStaticLine(this, -1 ), 0, wxTOP|wxBOTTOM, 5 );
+        mainSizer->Add( new wxStaticLine(this, -1 ), 0, wxEXPAND| wxTOP|
+                        wxBOTTOM, 5 );
 
         mainSizer->Add( new wxStaticText(this, -1,
                         wxU( vlc_wraptext(HELLO_NOTICE , TEXTWIDTH , false ))),
@@ -573,8 +589,8 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
     p_prev = prev;
     p_intf = _p_intf;
     p_parent = (WizardDialog *)parent;
-    parent->SetModal(false);
     b_chosen = false;
+    p_open_dialog = NULL;
     mainSizer = new wxBoxSizer(wxVERTICAL);
 
     /* Create the texts */
@@ -596,10 +612,12 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
     /* Open Panel */
     open_panel = new wxPanel(this, -1);
     open_panel->SetAutoLayout( TRUE );
-    wxBoxSizer *openSizer = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer *openSizer = new wxBoxSizer(wxHORIZONTAL);
 
-    mrl_text = new wxTextCtrl( open_panel, -1, wxU( "" ) );
+    mrl_text = new wxTextCtrl( open_panel, -1, wxU( "" ), wxDefaultPosition,
+                              wxSize(200,25) );
     openSizer->Add( mrl_text, 0 , wxALL, 5 );
+    openSizer->Add( new wxButton( open_panel, Choose_Event, wxU(_("Choose...")) ), 0, wxALL, 5 );
     open_panel->SetSizer( openSizer );
     openSizer->Layout();
     openSizer->Fit(open_panel);
@@ -614,13 +632,14 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
         if( p_playlist->i_size > 0)
         {
             pl_panel = new wxPanel(this, -1);
-            wxBoxSizer *plSizer = new wxBoxSizer( wxVERTICAL );
+            wxBoxSizer *plSizer = new wxBoxSizer( wxHORIZONTAL );
             listview = new wxListView( pl_panel, ListView_Event,
-                                       wxDefaultPosition, wxDefaultSize,
+                                       wxDefaultPosition, wxSize(300,200),
                                        wxLC_REPORT | wxSUNKEN_BORDER );
             listview->InsertColumn( 0, wxU(_("Name")) );
             listview->InsertColumn( 1, wxU(_("URI")) );
-            listview->SetColumnWidth( 0, 300 );
+            listview->SetColumnWidth( 0, 250 );
+            listview->SetColumnWidth( 1, 50 );
             for( int i=0 ; i < p_playlist->i_size ; i++ )
             {
                 wxString filename = wxL2U( p_playlist->pp_items[i]->input.
@@ -630,11 +649,12 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
                                                             input.psz_uri) );
             }
             listview->Select( p_playlist->i_index , TRUE);
-            plSizer->Add( listview, 0, wxALL, 5 );
+            plSizer->Add( listview, 1, wxALL | wxEXPAND , 5 );
             pl_panel->SetSizer( plSizer );
             plSizer->Layout();
-            mainSizer->Add( pl_panel );
+            mainSizer->Add( pl_panel, 1, wxALL|wxEXPAND, 5 );
             pl_panel->Hide();
+            mainSizer->Layout();
         }
         else
         {
@@ -650,11 +670,14 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
     /* Partial Extract Box */
     wxStaticBox *partial_box = new wxStaticBox( this, -1,
                     wxU(_("Partial Extract")) );
+
     wxStaticBoxSizer *partial_sizer = new wxStaticBoxSizer( partial_box,
                                                           wxVERTICAL );
 
-    partial_sizer->Add( new wxCheckBox( this, PartialEnable_Event,
-                            wxU(_("Enable") ) ), 0 , wxLEFT , 5 );
+    wxCheckBox *enable_checkbox = new wxCheckBox( this, PartialEnable_Event,
+                                                wxU(_("Enable") ) );
+    enable_checkbox->SetToolTip(wxU(_(PARTIAL) ) ) ;
+    partial_sizer->Add( enable_checkbox, 0 , wxLEFT , 5 );
 
     wxFlexGridSizer *partial_sizer2 = new wxFlexGridSizer( 4,1,20 );
     partial_sizer2->Add( new wxStaticText(this, -1, wxU(_("From"))),0,wxLEFT ,5);
@@ -672,7 +695,6 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
 
     from_text->Disable();
     to_text->Disable();
-
     SetSizer(mainSizer);
     mainSizer->Fit(this);
     mainSizer->Layout();
@@ -680,6 +702,12 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
 
 wizInputPage::~wizInputPage()
 {
+    if( p_open_dialog )
+    {
+            fprintf(stderr,"CA CRAINT, %p\n",p_open_dialog);
+//        p_open_dialog->EndModal(wxID_CANCEL );
+  //      delete p_open_dialog;
+    }
 }
 
 void wizInputPage::OnInputChange(wxEvent& event)
@@ -712,11 +740,24 @@ void wizInputPage::OnEnablePartial(wxCommandEvent& event)
    to_text->Enable( event.IsChecked() );
 }
 
+
+void wizInputPage::OnChoose(wxCommandEvent& event)
+{
+    p_open_dialog = new OpenDialog( p_intf, this, -1, -1, OPEN_STREAM );
+    if( p_open_dialog->ShowModal() == wxID_OK )
+    {
+        mrl_text->SetValue(p_open_dialog->mrl[0] );
+    }
+    delete p_open_dialog;
+    p_open_dialog = NULL;
+}
+
 void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
 {
     if( i_input == 0)
     {
-        if( mrl_text->GetValue().IsSameAs( wxT(""), TRUE ) && event.GetDirection() )
+        if( mrl_text->GetValue().IsSameAs( wxT(""), TRUE ) &&
+                        event.GetDirection() )
         {
             wxMessageBox( wxU( CHOOSE_STREAM ), wxU( ERROR ),
                           wxICON_WARNING | wxOK, this );
@@ -991,20 +1032,40 @@ wizStreamingMethodPage::wizStreamingMethodPage( wxWizard *parent,
 
     i_method = 0;
 
+    wxStaticBox *method_box = new wxStaticBox( this, -1,
+                                               wxU(_("Streaming method")) );
+    wxStaticBoxSizer *method_sizer = new wxStaticBoxSizer(method_box,
+                                                          wxHORIZONTAL );
     for( i = 0 ; i< 3 ; i++ )
     {
         method_radios[i] = new wxRadioButton( this, MethodRadio0_Event + i,
                                wxU( methods_array[i].psz_method ) );
         method_radios[i]->SetToolTip( wxU(_( methods_array[i].psz_descr ) ) );
-        mainSizer->Add( method_radios[i], 0, wxALL, 5 );
+        method_sizer->Add( method_radios[i], 0, wxALL, 5 );
     }
+
+    method_sizer->Layout();
+
+    wxStaticBox *address_box = new wxStaticBox( this, -1,
+                    wxU(_("Destination")) );
+
+    address_sizer = new wxStaticBoxSizer(address_box,
+                                         wxVERTICAL );
+
     address_text = new wxStaticText(this, -1,
-                 wxU( vlc_wraptext( methods_array[0].psz_address,
-                                    TEXTWIDTH, false ) ) );
-    address_txtctrl = new wxTextCtrl( this, -1, wxU("") );
-    mainSizer->Add( address_text, 0, wxALL, 5 );
-    mainSizer->Add( address_txtctrl, 0, wxALL, 5 );
+                 wxU( vlc_wraptext( methods_array[2].psz_address,
+                                    TEXTWIDTH, false ) ), wxDefaultPosition,
+                  wxSize(200,25) );
+    address_txtctrl = new wxTextCtrl( this, -1, wxU(""), wxDefaultPosition,
+                                      wxSize(200,25));
+    address_sizer->Add( address_text, 0, wxALL, 5 );
+    address_sizer->Add( address_txtctrl, 0, wxALL, 5 );
+    address_sizer->Layout();
+
+    mainSizer->Add( method_sizer, 0, wxALL | wxEXPAND, 5 );
+    mainSizer->Add( address_sizer, 0, wxALL | wxEXPAND, 5 );
     mainSizer->Layout();
+
     SetSizer(mainSizer);
     mainSizer->Fit(this);
 
@@ -1049,6 +1110,7 @@ void wizStreamingMethodPage::OnMethodChange(wxEvent& event)
     i_method = event.GetId() - MethodRadio0_Event;
     address_text->SetLabel( wxU(
      vlc_wraptext( _(methods_array[i_method].psz_address), TEXTWIDTH, false)));
+    address_sizer->Layout();
     mainSizer->Layout();
 }
 
@@ -1136,6 +1198,7 @@ wxWizardPage *wizEncapPage::GetPrev() const { return p_prev; }
 
 wxWizardPage *wizEncapPage::GetNext() const
 {
+       fprintf(stderr,"Action is %i (%i %i)",i_action,ACTION_STREAM,ACTION_TRANSCODE);
     if( i_action== ACTION_STREAM )
         return p_streaming_page;
     else
@@ -1189,7 +1252,9 @@ void wizTranscodeExtraPage::OnSelectFile( wxCommandEvent &event)
 wxWizardPage *wizTranscodeExtraPage::GetPrev() const { return p_prev; }
 wxWizardPage *wizTranscodeExtraPage::GetNext() const {return p_next; }
 
-/* Extra streaming page : Local display ? */
+/***********************************************************
+ *  Extra streaming page
+ ***********************************************************/
 wizStreamingExtraPage::wizStreamingExtraPage( wxWizard *parent,
                        wxWizardPage *prev,
                        wxWizardPage *next) : wxWizardPage(parent)
@@ -1270,27 +1335,17 @@ wxWizard( _p_parent, -1, wxU(_("Streaming/Transcoding Wizard")), wxNullBitmap, w
 WizardDialog::~WizardDialog()
 {
     Destroy();
-    msg_Dbg(p_intf,"Killing wizard");
     delete page1;
-    msg_Dbg(p_intf,"Killing wizard2");
     delete page2;
-    msg_Dbg(p_intf,"Killing wizard3");
     delete tr_page1;
-    msg_Dbg(p_intf,"Killing wizard4");
     delete st_page1 ;
-    msg_Dbg(p_intf,"Killing wizard5");
     delete st_page2;
-    msg_Dbg(p_intf,"Killing wizard6");
     delete tr_page2;
-    msg_Dbg(p_intf,"Killing wizard7");
-    encap_page->SetPrev(NULL);
     delete encap_page;
-    msg_Dbg(p_intf,"Killing wizard done");
 }
 
 void WizardDialog::SetMrl( const char *mrl )
 {
-    msg_Dbg(p_intf, "Set MRL to : %s", mrl );
     this->mrl = strdup( mrl );
 }
 
@@ -1343,19 +1398,19 @@ int WizardDialog::GetAction()
 
 void WizardDialog::Run()
 {
-    msg_Dbg( p_intf,"Launching wizard");
+    msg_Dbg( p_intf,"starting wizard");
     if( RunWizard(page1) )
     {
         int i_size;
         char *psz_opt;
-        msg_Dbg( p_intf,"End wizard");
+        msg_Dbg( p_intf,"wizard completed");
 
-        msg_Dbg( p_intf,"Action: %i", i_action);
         if( i_action == ACTION_TRANSCODE)
         {
-            msg_Dbg( p_intf,"Starting transcode of %s to file %s", mrl, address);
-            msg_Dbg( p_intf,"Using %s (%i kbps) / %s (%i kbps)",vcodec,vb,acodec,ab);
-            msg_Dbg( p_intf,"Encap %s",mux);
+            msg_Dbg( p_intf,"Starting transcode of %s to file %s",
+                                  mrl, address);
+            msg_Dbg( p_intf,"Using %s (%i kbps) / %s (%i kbps),encap %s",
+                                vcodec,vb,acodec,ab,mux);
             int i_tr_size = 10; /* 10 = ab + vb */
             i_tr_size += vcodec ? strlen(vcodec) : 0;
             i_tr_size += acodec ? strlen(acodec) : 0;
@@ -1393,9 +1448,8 @@ void WizardDialog::Run()
         }
         else
         {
-            msg_Dbg( p_intf, "Starting stream of %s to %s using %s", mrl,
-                                                          address, method);
-            msg_Dbg( p_intf, "Encap %s", mux);
+            msg_Dbg( p_intf, "Starting stream of %s to %s using %s, encap %s",
+                               mrl, address, method, mux);
 
             i_size = 40 + strlen(mux) + strlen(address);
             psz_opt = (char *)malloc( i_size * sizeof(char) );
@@ -1433,7 +1487,7 @@ void WizardDialog::Run()
     }
     else
     {
-        msg_Dbg( p_intf, "Wizard cancelled");
+        msg_Dbg( p_intf, "wizard was cancelled");
     }
 }
 /****************************************************************

@@ -269,7 +269,6 @@ void DialogsProvider::OnStreamWizardDialog( wxCommandEvent& WXUNUSED(event) )
 
 void DialogsProvider::OnWizardDialog( wxCommandEvent& WXUNUSED(event) )
 {
-    fprintf(stderr,"AHAH %p\n",p_intf);
     p_wizard_dialog = new WizardDialog( p_intf, this );
 
     if( p_wizard_dialog )

@@ -77,7 +77,8 @@ enum
     AdvancedOptions_Event
 };
 
-BEGIN_EVENT_TABLE(OpenDialog, wxFrame)
+//BEGIN_EVENT_TABLE(OpenDialog, wxFrame)
+BEGIN_EVENT_TABLE(OpenDialog, wxDialog)
     /* Button events */
     EVT_BUTTON(wxID_OK, OpenDialog::OnOk)
     EVT_BUTTON(wxID_CANCEL, OpenDialog::OnCancel)
@@ -337,7 +338,8 @@ void AutoBuiltPanel::UpdateAdvancedMRL()
  *****************************************************************************/
 OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
                         int i_access_method, int i_arg ):
-    wxFrame( _p_parent, -1, wxU(_("Open...")), wxDefaultPosition,
+//    wxFrame( _p_parent, -1, wxU(_("Open...")), wxDefaultPosition,
+      wxDialog( _p_parent, -1, wxU(_("Open...")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     OpenDialog( _p_intf, _p_parent, i_access_method, i_arg, OPEN_NORMAL );
@@ -345,7 +347,8 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
 
 OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
                         int i_access_method, int i_arg, int _i_method ):
-    wxFrame( _p_parent, -1, wxU(_("Open...")), wxDefaultPosition,
+//    wxFrame( _p_parent, -1, wxU(_("Open...")), wxDefaultPosition,
+      wxDialog( _p_parent, -1, wxU(_("Open...")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
@@ -356,6 +359,8 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     file_dialog = NULL;
     i_disc_type_selection = 0;
     i_open_arg = i_arg;
+
+    b_modal = VLC_TRUE;
 
     sout_dialog = NULL;
     subsfile_dialog = NULL;
@@ -518,19 +523,23 @@ int OpenDialog::Show( int i_access_method, int i_arg )
 {
     int i_ret;
     notebook->SetSelection( i_access_method );
-    i_ret = wxFrame::Show();
+//    i_ret = wxFrame::Show();
+   i_ret = wxDialog::Show();
     Raise();
     SetFocus();
     i_open_arg = i_arg;
+    b_modal = VLC_FALSE;
     return i_ret;
 }
 
 int OpenDialog::Show()
 {
     int i_ret;
-    i_ret = wxFrame::Show();
+//    i_ret = wxFrame::Show();
+     i_ret = wxDialog::Show();
     Raise();
     SetFocus();
+    b_modal = VLC_FALSE;
     return i_ret;
 }
 
@@ -956,6 +965,10 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     if( i_method == OPEN_STREAM )
     {
         Hide();
+        if( b_modal)
+        {
+            EndModal( wxID_OK );
+        }
         return;
     }
 
@@ -1011,11 +1024,15 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     vlc_object_release( p_playlist );
 
     Hide();
+
+    if( b_modal) EndModal( wxID_OK );
 }
 
 void OpenDialog::OnCancel( wxCommandEvent& WXUNUSED(event) )
 {
     Hide();
+
+    if( b_modal) EndModal( wxID_CANCEL );
 }
 
 void OpenDialog::OnPageChange( wxNotebookEvent& event )

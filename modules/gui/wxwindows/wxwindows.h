@@ -269,7 +269,8 @@ private:
 
 /* Open Dialog */
 WX_DEFINE_ARRAY(AutoBuiltPanel *, ArrayOfAutoBuiltPanel);
-class OpenDialog: public wxFrame
+//class OpenDialog: public wxFrame
+class OpenDialog: public wxDialog
 {
 public:
     /* Constructor */
@@ -333,6 +334,8 @@ private:
 
     int i_method; /* Normal or for the stream dialog ? */
     int i_open_arg;
+
+    vlc_bool_t b_modal;
 
     wxComboBox *mrl_combo;
     wxNotebook *notebook;
