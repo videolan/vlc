@@ -1075,8 +1075,8 @@ AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
 if test "${ac_cv_c_altivec}" != "no"; then
   AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, Define if your compiler groks C AltiVec extensions.)
   VLC_ADD_CFLAGS([vlc],[${ac_cv_c_altivec}])
-  VLC_ADD_CFLAGS([idctaltivec motionaltivec memcpyaltivec deinterlace],[${ac_cv_c_altivec}])
-  VLC_ADD_CFLAGS([i420_yuy2_altivec],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
+  VLC_ADD_CFLAGS([idctaltivec motionaltivec],[${ac_cv_c_altivec}])
+  VLC_ADD_CFLAGS([i420_yuy2_altivec memcpyaltivec deinterlace],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
 
@@ -2178,16 +2178,21 @@ if test "${enable_dts}" != "no"; then
       VLC_ADD_CPPFLAGS([dtstofloat32],[-I${real_dts_tree}/include])
       VLC_ADD_LDFLAGS([dtstofloat32],[-L${real_dts_tree}/libdts])
       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_dtstofloat32}"
-      AC_CHECK_LIB(dts, dts_free, [
-        VLC_ADD_BUILTINS([dtstofloat32])
-        VLC_ADD_LDFLAGS([dtstofloat32],[-ldts])
+      AC_CHECK_LIB(dts_pic, dts_free, [
+        VLC_ADD_PLUGINS([dtstofloat32])
+        VLC_ADD_LDFLAGS([dtstofloat32],[-ldts_pic])
         ],[
-        if test -f ${real_dts_tree}/libdts/libdts.a
-        then
-          AC_MSG_ERROR([make sure you have at least libdts-0.0.2])
-        else
-          AC_MSG_ERROR([the specified tree hasn't been compiled])
-        fi
+        AC_CHECK_LIB(dts, dts_free, [
+          VLC_ADD_BUILTINS([dtstofloat32])
+          VLC_ADD_LDFLAGS([dtstofloat32],[-ldts])
+          ],[
+          if test -f ${real_dts_tree}/libdts/libdts.a
+          then
+            AC_MSG_ERROR([make sure you have at least libdts-0.0.2])
+          else
+            AC_MSG_ERROR([the specified tree hasn't been compiled])
+          fi
+        ])
       ])
       LDFLAGS="${LDFLAGS_save}"
     else
@@ -2197,13 +2202,18 @@ if test "${enable_dts}" != "no"; then
   else
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_dtstofloat32}"
     AC_CHECK_HEADERS(dts.h, [
-      AC_CHECK_LIB(dts, dts_free, [
+      AC_CHECK_LIB(dts_pic, dts_free, [
         VLC_ADD_PLUGINS([dtstofloat32])
-        VLC_ADD_LDFLAGS([dtstofloat32],[-ldts])
+        VLC_ADD_LDFLAGS([dtstofloat32],[-ldts_pic])
       ],[
-        if test "${enable_dts}" = "yes"; then
-          AC_MSG_ERROR([Could not find libdts on your system: you may get it from http://www.videolan.org/dtsdec.html])
-        fi
+        AC_CHECK_LIB(dts, dts_free, [
+          VLC_ADD_BUILTINS([dtstofloat32])
+          VLC_ADD_LDFLAGS([dtstofloat32],[-ldts])
+        ],[
+          if test "${enable_dts}" = "yes"; then
+            AC_MSG_ERROR([Could not find libdts on your system: you may get it from http://www.videolan.org/dtsdec.html])
+          fi
+        ])
       ])
     ])
     LDFLAGS="${LDFLAGS_save}"
@@ -3643,12 +3653,9 @@ dnl
 dnl  Joystick plugin
 dnl
 AC_ARG_ENABLE(joystick,
-  [  --enable-joystick       joystick control (default disabled)])
-if test "${enable_joystick}" = "yes"
-then
- AC_CHECK_HEADER( linux/joystick.h, 
-		[VLC_ADD_PLUGINS([joystick])]
-	        )
+  [  --enable-joystick       joystick control (default enabled)])
+if test "${enable_joystick}" = "yes"; then
+  AC_CHECK_HEADER(linux/joystick.h, [VLC_ADD_PLUGINS([joystick])])
 fi
 
 dnl
