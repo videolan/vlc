@@ -202,6 +202,7 @@ struct intf_sys_t
     static int ParseSAP( intf_thread_t *p_intf, uint8_t *p_buffer, int i_read );
     static sdp_t *  ParseSDP( vlc_object_t *p_intf, char* psz_sdp );
     static sap_announce_t *CreateAnnounce( intf_thread_t *, uint16_t, sdp_t * );
+    static int RemoveAnnounce( intf_thread_t *p_intf, sap_announce_t *p_announce );
 
 /* Cache */
     static void CacheLoad( intf_thread_t *p_intf );
