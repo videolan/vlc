@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: es_out.c,v 1.1 2003/11/24 20:50:45 fenrir Exp $
+ * $Id: es_out.c,v 1.2 2003/11/27 04:11:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -35,25 +35,43 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+struct es_out_id_t
+{
+    int             i_channel;
+    es_descriptor_t *p_es;
+};
+
 struct es_out_sys_t
 {
     input_thread_t *p_input;
 
+    /* all es */
     int         i_id;
-    es_out_id_t **id;
 
-    vlc_bool_t  i_audio;
-    vlc_bool_t  i_video;
-};
+    int         i_es;
+    es_out_id_t **es;
 
-struct es_out_id_t
-{
-    es_descriptor_t *p_es;
+    /* mode gestion */
+    vlc_bool_t  b_active;
+    int         i_mode;
+
+    /* es count */
+    int         i_audio;
+    int         i_video;
+    int         i_sub;
+
+    /* es to select */
+    int         i_audio_last;
+    int         i_sub_last;
+
+    /* current main es */
+    es_out_id_t *p_es_audio;
+    es_out_id_t *p_es_video;
+    es_out_id_t *p_es_sub;
 };
 
 static es_out_id_t *EsOutAdd    ( es_out_t *, es_format_t * );
 static int          EsOutSend   ( es_out_t *, es_out_id_t *, block_t * );
-static int          EsOutSendPES( es_out_t *, es_out_id_t *, pes_packet_t * );
 static void         EsOutDel    ( es_out_t *, es_out_id_t * );
 static int          EsOutControl( es_out_t *, int i_query, va_list );
 
@@ -63,20 +81,40 @@ static int          EsOutControl( es_out_t *, int i_query, va_list );
  *****************************************************************************/
 es_out_t *input_EsOutNew( input_thread_t *p_input )
 {
-    es_out_t *out = malloc( sizeof( es_out_t ) );
+    es_out_t     *out = malloc( sizeof( es_out_t ) );
+    es_out_sys_t *p_sys = malloc( sizeof( es_out_sys_t ) );
+    vlc_value_t  val;
 
     out->pf_add     = EsOutAdd;
     out->pf_send    = EsOutSend;
-    out->pf_send_pes= EsOutSendPES;
     out->pf_del     = EsOutDel;
     out->pf_control = EsOutControl;
+    out->p_sys      = p_sys;
 
-    out->p_sys = malloc( sizeof( es_out_sys_t ) );
-    out->p_sys->p_input = p_input;
-    out->p_sys->i_id    = 0;
-    out->p_sys->id      = NULL;
-    out->p_sys->i_audio = -1;
-    out->p_sys->i_video = -1;
+    p_sys->p_input = p_input;
+
+    p_sys->b_active = VLC_FALSE;
+    p_sys->i_mode   = ES_OUT_MODE_AUTO;
+
+    p_sys->i_id    = 1;
+
+    p_sys->i_es    = 0;
+    p_sys->es      = NULL;
+
+    p_sys->i_audio = 0;
+    p_sys->i_video = 0;
+    p_sys->i_sub   = 0;
+
+    var_Get( p_input, "audio-channel", &val );
+    p_sys->i_audio_last = val.i_int;
+
+    var_Get( p_input, "spu-channel", &val );
+    p_sys->i_sub_last = val.i_int;
+
+    p_sys->p_es_audio = NULL;
+    p_sys->p_es_video = NULL;
+    p_sys->p_es_sub   = NULL;
+
     return out;
 }
 
@@ -88,16 +126,95 @@ void input_EsOutDelete( es_out_t *out )
     es_out_sys_t *p_sys = out->p_sys;
     int i;
 
-    for( i = 0; i < p_sys->i_id; i++ )
+    for( i = 0; i < p_sys->i_es; i++ )
     {
-        free( p_sys->id[i] );
+        free( p_sys->es[i] );
     }
-    if( p_sys->id )
+    if( p_sys->es )
     {
-        free( p_sys->id );
+        free( p_sys->es );
     }
     free( p_sys );
     free( out );
+}
+
+/*****************************************************************************
+ * EsOutSelect: Select an ES given the current mode
+ * XXX: you need to take a the lock before (stream.stream_lock)
+ *****************************************************************************/
+static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
+{
+    es_out_sys_t      *p_sys = out->p_sys;
+    input_thread_t    *p_input = p_sys->p_input;
+
+    int i_cat = es->p_es->i_cat;
+
+    if( !p_sys->b_active || ( !b_force && es->p_es->fmt.i_priority < 0 ) )
+    {
+        return;
+    }
+
+    if( p_sys->i_mode == ES_OUT_MODE_ALL || b_force )
+    {
+        input_SelectES( p_input, es->p_es );
+    }
+    else if( p_sys->i_mode == ES_OUT_MODE_AUTO )
+    {
+        int i_wanted  = -1;
+
+        if( i_cat == AUDIO_ES )
+        {
+            if( p_sys->p_es_audio && p_sys->p_es_audio->p_es->fmt.i_priority >= es->p_es->fmt.i_priority )
+            {
+                return;
+            }
+            i_wanted  = p_sys->i_audio_last >= 0 ? p_sys->i_audio_last : es->i_channel;
+        }
+        else if( i_cat == SPU_ES )
+        {
+            if( p_sys->p_es_sub && p_sys->p_es_sub->p_es->fmt.i_priority >= es->p_es->fmt.i_priority )
+            {
+                return;
+            }
+            i_wanted  = p_sys->i_sub_last;
+        }
+        else if( i_cat == VIDEO_ES )
+        {
+            i_wanted  = es->i_channel;
+        }
+
+        if( i_wanted == es->i_channel )
+        {
+            input_SelectES( p_input, es->p_es );
+        }
+    }
+
+    /* FIXME TODO handle priority here */
+    if( es->p_es->p_dec )
+    {
+        if( i_cat == AUDIO_ES )
+        {
+            if( p_sys->i_mode == ES_OUT_MODE_AUTO &&
+                p_sys->p_es_audio && p_sys->p_es_audio->p_es->p_dec )
+            {
+                input_UnselectES( p_input, p_sys->p_es_audio->p_es );
+            }
+            p_sys->p_es_audio = es;
+        }
+        else if( i_cat == SPU_ES )
+        {
+            if( p_sys->i_mode == ES_OUT_MODE_AUTO &&
+                p_sys->p_es_sub && p_sys->p_es_sub->p_es->p_dec )
+            {
+                input_UnselectES( p_input, p_sys->p_es_sub->p_es );
+            }
+            p_sys->p_es_sub = es;
+        }
+        else if( i_cat == VIDEO_ES )
+        {
+            p_sys->p_es_video = es;
+        }
+    }
 }
 
 /*****************************************************************************
@@ -107,7 +224,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
-    es_out_id_t       *id = malloc( sizeof( es_out_id_t ) );
+    es_out_id_t       *es = malloc( sizeof( es_out_id_t ) );
     pgrm_descriptor_t *p_prgm = NULL;
     char              psz_cat[strlen( "Stream " ) + 10];
     input_info_category_t *p_cat;
@@ -131,13 +248,13 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
         }
     }
 
-    id->p_es = input_AddES( p_input,
+    es->p_es = input_AddES( p_input,
                             p_prgm,
-                            1 + out->p_sys->i_id,
+                            out->p_sys->i_id,
                             fmt->i_cat,
                             fmt->psz_description, 0 );
-    id->p_es->i_stream_id = 1 + out->p_sys->i_id;
-    id->p_es->i_fourcc = fmt->i_codec;
+    es->p_es->i_stream_id = out->p_sys->i_id;
+    es->p_es->i_fourcc = fmt->i_codec;
 
     switch( fmt->i_cat )
     {
@@ -157,7 +274,9 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             {
                 memcpy( &p_wf[1], fmt->p_extra, fmt->i_extra );
             }
-            id->p_es->p_waveformatex = p_wf;
+            es->p_es->p_waveformatex = p_wf;
+
+            es->i_channel = p_sys->i_audio;
             break;
         }
         case VIDEO_ES:
@@ -181,7 +300,9 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             {
                 memcpy( &p_bih[1], fmt->p_extra, fmt->i_extra );
             }
-            id->p_es->p_bitmapinfoheader = p_bih;
+            es->p_es->p_bitmapinfoheader = p_bih;
+
+            es->i_channel = p_sys->i_video;
             break;
         }
         case SPU_ES:
@@ -190,43 +311,24 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             memset( p_sub, 0, sizeof( subtitle_data_t ) );
             if( fmt->i_extra > 0 )
             {
-                p_sub->psz_header = malloc( fmt->i_extra  );
+                p_sub->psz_header = malloc( fmt->i_extra  + 1 );
                 memcpy( p_sub->psz_header, fmt->p_extra , fmt->i_extra );
+                /* just to be sure */
+                ((uint8_t*)fmt->p_extra)[fmt->i_extra] = '\0';
             }
             /* FIXME beuuuuuurk */
-            id->p_es->p_demux_data = p_sub;
+            es->p_es->p_demux_data = p_sub;
+
+            es->i_channel = p_sys->i_sub;
             break;
         }
+
         default:
+            es->i_channel = 0;
             break;
     }
 
-    if( fmt->i_cat == AUDIO_ES && fmt->i_priority > out->p_sys->i_audio )
-    {
-        if( out->p_sys->i_audio >= 0 )
-        {
-            msg_Err( p_input, "FIXME unselect es in es_out_Add" );
-        }
-        input_SelectES( p_input, id->p_es );
-        if( id->p_es->p_dec )
-        {
-            out->p_sys->i_audio = fmt->i_priority;
-        }
-    }
-    else if( fmt->i_cat == VIDEO_ES && fmt->i_priority > out->p_sys->i_video )
-    {
-        if( out->p_sys->i_video >= 0 )
-        {
-            msg_Err( p_input, "FIXME unselect es in es_out_Add" );
-        }
-        input_SelectES( p_input, id->p_es );
-        if( id->p_es->p_dec )
-        {
-            out->p_sys->i_video = fmt->i_priority;
-        }
-    }
-
-    sprintf( psz_cat, _("Stream %d"), out->p_sys->i_id );
+    sprintf( psz_cat, _("Stream %d"), out->p_sys->i_id - 1 );
     if( ( p_cat = input_InfoCategory( p_input, psz_cat ) ) )
     {
         /* Add information */
@@ -284,74 +386,99 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
                 break;
         }
     }
+
+
+    /* Apply mode
+     * XXX change that when we do group too */
+    if( 1 )
+    {
+        EsOutSelect( out, es, VLC_FALSE );
+    }
+
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    id->p_es->fmt = *fmt;
+    es->p_es->fmt = *fmt;
 
-    TAB_APPEND( out->p_sys->i_id, out->p_sys->id, id );
-    return id;
+    TAB_APPEND( out->p_sys->i_es, out->p_sys->es, es );
+    p_sys->i_id++;  /* always incremented */
+    switch( fmt->i_cat )
+    {
+        case AUDIO_ES:
+            p_sys->i_audio++;
+            break;
+        case SPU_ES:
+            p_sys->i_sub++;
+            break;
+        case VIDEO_ES:
+            p_sys->i_video++;
+            break;
+    }
+
+    return es;
 }
 
 /*****************************************************************************
  * EsOutSend:
  *****************************************************************************/
-static int EsOutSend( es_out_t *out, es_out_id_t *id, block_t *p_block )
+static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 {
-    if( id->p_es->p_dec )
+    vlc_mutex_lock( &out->p_sys->p_input->stream.stream_lock );
+    if( es->p_es->p_dec )
     {
-        input_DecodeBlock( id->p_es->p_dec, p_block );
+        input_DecodeBlock( es->p_es->p_dec, p_block );
     }
     else
     {
         block_Release( p_block );
     }
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * EsOutSendPES:
- *****************************************************************************/
-static int EsOutSendPES( es_out_t *out, es_out_id_t *id, pes_packet_t *p_pes )
-{
-    if( id->p_es->p_dec )
-    {
-        input_DecodePES( id->p_es->p_dec, p_pes );
-    }
-    else
-    {
-        input_DeletePES( out->p_sys->p_input->p_method_data, p_pes );
-    }
+    vlc_mutex_unlock( &out->p_sys->p_input->stream.stream_lock );
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * EsOutDel:
  *****************************************************************************/
-static void EsOutDel( es_out_t *out, es_out_id_t *id )
+static void EsOutDel( es_out_t *out, es_out_id_t *es )
 {
     es_out_sys_t *p_sys = out->p_sys;
 
-    TAB_REMOVE( p_sys->i_id, p_sys->id, id );
+    TAB_REMOVE( p_sys->i_es, p_sys->es, es );
 
+    switch( es->p_es->i_cat )
+    {
+        case AUDIO_ES:
+            p_sys->i_audio--;
+            break;
+        case SPU_ES:
+            p_sys->i_sub--;
+            break;
+        case VIDEO_ES:
+            p_sys->i_video--;
+            break;
+    }
+
+    /* We don't try to reselect */
     vlc_mutex_lock( &p_sys->p_input->stream.stream_lock );
-    if( id->p_es->p_dec )
+    if( es->p_es->p_dec )
     {
-        input_UnselectES( p_sys->p_input, id->p_es );
+        input_UnselectES( p_sys->p_input, es->p_es );
     }
-    if( id->p_es->p_waveformatex )
+
+    if( es->p_es->p_waveformatex )
     {
-        free( id->p_es->p_waveformatex );
-        id->p_es->p_waveformatex = NULL;
+        free( es->p_es->p_waveformatex );
+        es->p_es->p_waveformatex = NULL;
     }
-    if( id->p_es->p_bitmapinfoheader )
+    if( es->p_es->p_bitmapinfoheader )
     {
-        free( id->p_es->p_bitmapinfoheader );
-        id->p_es->p_bitmapinfoheader = NULL;
+        free( es->p_es->p_bitmapinfoheader );
+        es->p_es->p_bitmapinfoheader = NULL;
     }
-    input_DelES( p_sys->p_input, id->p_es );
+    input_DelES( p_sys->p_input, es->p_es );
+
     vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
 
-    free( id );
+    free( es );
 }
 
 /*****************************************************************************
@@ -361,30 +488,94 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
 {
     es_out_sys_t *p_sys = out->p_sys;
     vlc_bool_t  b, *pb;
-    es_out_id_t *id;
+    int         i, *pi;
+
+    es_out_id_t *es;
+
     switch( i_query )
     {
-        case ES_OUT_SET_SELECT:
+        case ES_OUT_SET_ES_STATE:
             vlc_mutex_lock( &p_sys->p_input->stream.stream_lock );
-            id = (es_out_id_t*) va_arg( args, es_out_id_t * );
+            es = (es_out_id_t*) va_arg( args, es_out_id_t * );
             b = (vlc_bool_t) va_arg( args, vlc_bool_t );
-            if( b && id->p_es->p_dec == NULL )
+            if( b && es->p_es->p_dec == NULL )
             {
-                input_SelectES( p_sys->p_input, id->p_es );
+                input_SelectES( p_sys->p_input, es->p_es );
                 vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
-                return id->p_es->p_dec ? VLC_SUCCESS : VLC_EGENERIC;
+                return es->p_es->p_dec ? VLC_SUCCESS : VLC_EGENERIC;
             }
-            else if( !b && id->p_es->p_dec )
+            else if( !b && es->p_es->p_dec )
             {
-                input_UnselectES( p_sys->p_input, id->p_es );
+                input_UnselectES( p_sys->p_input, es->p_es );
                 vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
                 return VLC_SUCCESS;
             }
-        case ES_OUT_GET_SELECT:
-            id = (es_out_id_t*) va_arg( args, es_out_id_t * );
+        case ES_OUT_GET_ES_STATE:
+            es = (es_out_id_t*) va_arg( args, es_out_id_t * );
             pb = (vlc_bool_t*) va_arg( args, vlc_bool_t * );
 
-            *pb = id->p_es->p_dec ? VLC_TRUE : VLC_FALSE;
+            *pb = es->p_es->p_dec ? VLC_TRUE : VLC_FALSE;
+            return VLC_SUCCESS;
+
+        case ES_OUT_SET_ACTIVE:
+            b = (vlc_bool_t) va_arg( args, vlc_bool_t );
+            p_sys->b_active = b;
+            return VLC_SUCCESS;
+
+        case ES_OUT_GET_ACTIVE:
+            pb = (vlc_bool_t*) va_arg( args, vlc_bool_t * );
+            *pb = p_sys->b_active;
+            return VLC_SUCCESS;
+
+        case ES_OUT_SET_MODE:
+            i = (int) va_arg( args, int );
+            if( i == ES_OUT_MODE_NONE || i == ES_OUT_MODE_ALL || i == ES_OUT_MODE_AUTO )
+            {
+                p_sys->i_mode = i;
+
+                /* Reapply policy mode */
+                vlc_mutex_lock( &p_sys->p_input->stream.stream_lock );
+                for( i = 0; i < p_sys->i_es; i++ )
+                {
+                    if( p_sys->es[i]->p_es->p_dec )
+                    {
+                        input_UnselectES( p_sys->p_input, p_sys->es[i]->p_es );
+                    }
+                }
+                for( i = 0; i < p_sys->i_es; i++ )
+                {
+                    EsOutSelect( out, p_sys->es[i], VLC_FALSE );
+                }
+                vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
+
+        case ES_OUT_GET_MODE:
+            pi = (int*) va_arg( args, int* );
+            *pi = p_sys->i_mode;
+            return VLC_SUCCESS;
+
+        case ES_OUT_SET_ES:
+            es = (es_out_id_t*) va_arg( args, es_out_id_t * );
+            if( es == NULL )
+            {
+                for( i = 0; i < p_sys->i_es; i++ )
+                {
+                    vlc_mutex_lock( &p_sys->p_input->stream.stream_lock );
+                    if( p_sys->es[i]->p_es->p_dec )
+                    {
+                        input_UnselectES( p_sys->p_input, p_sys->es[i]->p_es );
+                    }
+                    vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
+                }
+            }
+            else
+            {
+                vlc_mutex_lock( &p_sys->p_input->stream.stream_lock );
+                EsOutSelect( out, es, VLC_TRUE );
+                vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
+            }
             return VLC_SUCCESS;
 
         default:
@@ -392,4 +583,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             return VLC_EGENERIC;
     }
 }
+
+
+
 

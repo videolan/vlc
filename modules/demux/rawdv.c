@@ -2,7 +2,7 @@
  * rawdv.c : raw dv input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rawdv.c,v 1.12 2003/11/24 19:19:02 fenrir Exp $
+ * $Id: rawdv.c,v 1.13 2003/11/27 04:11:40 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -297,9 +297,9 @@ static int Demux( input_thread_t * p_input )
         return 0;
     }
 
-    es_out_Control( p_input->p_es_out, ES_OUT_GET_SELECT,
+    es_out_Control( p_input->p_es_out, ES_OUT_GET_ES_STATE,
                     p_sys->p_es_audio, &b_audio );
-    es_out_Control( p_input->p_es_out, ES_OUT_GET_SELECT,
+    es_out_Control( p_input->p_es_out, ES_OUT_GET_ES_STATE,
                     p_sys->p_es_video, &b_video );
 
     p_block->i_dts =

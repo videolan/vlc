@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.18 2003/11/21 00:38:01 gbazin Exp $
+ * $Id: ninput.h,v 1.19 2003/11/27 04:11:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -26,17 +26,36 @@
 
 #include "vlc_es.h"
 
+enum es_out_mode_e
+{
+    ES_OUT_MODE_NONE,   /* don't select anything */
+    ES_OUT_MODE_ALL,    /* eg for stream output */
+    ES_OUT_MODE_AUTO    /* best audio/video or for input follow audio-channel, spu-channel */
+};
+
 enum es_out_query_e
 {
-    ES_OUT_SET_SELECT,  /* arg1= es_out_id_t* arg2=vlc_bool_t   */
-    ES_OUT_GET_SELECT   /* arg1= es_out_id_t* arg2=vlc_bool_t*  */
+    /* activate apply of mode */
+    ES_OUT_SET_ACTIVE,  /* arg1= vlc_bool_t                     */
+    /* see if mode is currently aplied or not */
+    ES_OUT_GET_ACTIVE,  /* arg1= vlc_bool_t*                    */
+
+    /* set/get mode */
+    ES_OUT_SET_MODE,    /* arg1= int                            */
+    ES_OUT_GET_MODE,    /* arg2= int*                           */
+
+    /* set es selected for the es category(audio/video/spu) */
+    ES_OUT_SET_ES,      /* arg1= es_out_id_t*                   */
+
+    /* force selection/unselection of the ES (bypass current mode)*/
+    ES_OUT_SET_ES_STATE,/* arg1= es_out_id_t* arg2=vlc_bool_t   */
+    ES_OUT_GET_ES_STATE,/* arg1= es_out_id_t* arg2=vlc_bool_t*  */
 };
 
 struct es_out_t
 {
     es_out_id_t *(*pf_add)    ( es_out_t *, es_format_t * );
     int          (*pf_send)   ( es_out_t *, es_out_id_t *, block_t * );
-    int          (*pf_send_pes)( es_out_t *, es_out_id_t *, pes_packet_t * );
     void         (*pf_del)    ( es_out_t *, es_out_id_t * );
     int          (*pf_control)( es_out_t *, int i_query, va_list );
 
@@ -52,15 +71,11 @@ static inline void es_out_Del( es_out_t *out, es_out_id_t *id )
     out->pf_del( out, id );
 }
 static inline int es_out_Send( es_out_t *out, es_out_id_t *id,
-			       block_t *p_block )
+                               block_t *p_block )
 {
     return out->pf_send( out, id, p_block );
 }
-static inline int es_out_SendPES( es_out_t *out, es_out_id_t *id,
-                                  pes_packet_t *p_pes )
-{
-    return out->pf_send_pes( out, id, p_pes );
-}
+
 static inline int es_out_vaControl( es_out_t *out, int i_query, va_list args )
 {
     return out->pf_control( out, i_query, args );

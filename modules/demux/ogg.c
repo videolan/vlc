@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ogg.c,v 1.47 2003/11/26 08:18:09 gbazin Exp $
+ * $Id: ogg.c,v 1.48 2003/11/27 04:11:40 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -359,7 +359,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     }
 
     /* Check the ES is selected */
-    es_out_Control( p_input->p_es_out, ES_OUT_GET_SELECT,
+    es_out_Control( p_input->p_es_out, ES_OUT_GET_ES_STATE,
                     p_stream->p_es, &b_selected );
 
     if( b_selected && !p_stream->b_activated )

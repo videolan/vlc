@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.44 2003/11/23 13:15:27 gbazin Exp $
+ * $Id: mkv.cpp,v 1.45 2003/11/27 04:11:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1401,7 +1401,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
         return;
     }
 
-    es_out_Control( p_input->p_es_out, ES_OUT_GET_SELECT, tk.p_es, &b );
+    es_out_Control( p_input->p_es_out, ES_OUT_GET_ES_STATE, tk.p_es, &b );
     if( !b )
     {
         tk.b_inited = VLC_FALSE;

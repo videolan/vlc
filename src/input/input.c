@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.264 2003/11/26 18:48:24 gbazin Exp $
+ * $Id: input.c,v 1.265 2003/11/27 04:11:40 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -622,6 +622,8 @@ static int InitThread( input_thread_t * p_input )
     }
 
     p_input->p_es_out = input_EsOutNew( p_input );
+    es_out_Control( p_input->p_es_out, ES_OUT_SET_ACTIVE, VLC_FALSE );
+    es_out_Control( p_input->p_es_out, ES_OUT_SET_MODE, ES_OUT_MODE_NONE );
 
     /* Find and open appropriate access module */
     p_input->p_access = module_Need( p_input, "access",
@@ -744,7 +746,7 @@ static int InitThread( input_thread_t * p_input )
         if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string), i_microsecondperframe, 0 ) ) )
         {
             /* Select this ES by default */
-            es_out_Control( p_input->p_es_out, ES_OUT_SET_SELECT, p_sub->p_es, VLC_TRUE );
+            es_out_Control( p_input->p_es_out, ES_OUT_SET_ES_STATE, p_sub->p_es, VLC_TRUE );
 
             TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
         }
@@ -766,6 +768,9 @@ static int InitThread( input_thread_t * p_input )
         }
         free(tmp);
     }
+
+    es_out_Control( p_input->p_es_out, ES_OUT_SET_ACTIVE, VLC_TRUE );
+    es_out_Control( p_input->p_es_out, ES_OUT_SET_MODE, ES_OUT_MODE_AUTO );
 
     return VLC_SUCCESS;
 }

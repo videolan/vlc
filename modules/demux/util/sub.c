@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.38 2003/11/21 00:38:01 gbazin Exp $
+ * $Id: sub.c,v 1.39 2003/11/27 04:11:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -502,7 +502,7 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
     input_thread_t *p_input = p_sub->p_input;
     vlc_bool_t     b;
 
-    es_out_Control( p_input->p_es_out, ES_OUT_GET_SELECT, p_sub->p_es, &b );
+    es_out_Control( p_input->p_es_out, ES_OUT_GET_ES_STATE, p_sub->p_es, &b );
     if( b && !p_sub->i_previously_selected )
     {
         p_sub->i_previously_selected = 1;

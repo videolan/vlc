@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.77 2003/11/26 08:18:09 gbazin Exp $
+ * $Id: avi.c,v 1.78 2003/11/27 04:11:40 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -469,7 +469,7 @@ static int Demux_Seekable( input_thread_t *p_input )
         avi_track_t *tk = p_sys->track[i_track];
         vlc_bool_t  b;
 
-        es_out_Control( p_input->p_es_out, ES_OUT_GET_SELECT, tk->p_es, &b );
+        es_out_Control( p_input->p_es_out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
         if( b && !tk->b_activated )
         {
             if( p_sys->b_seekable)
@@ -794,7 +794,7 @@ static int Demux_UnSeekable( input_thread_t *p_input )
         avi_track_t *tk = p_sys->track[i_stream];
         vlc_bool_t  b;
 
-        es_out_Control( p_input->p_es_out, ES_OUT_GET_SELECT, tk->p_es, &b );
+        es_out_Control( p_input->p_es_out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
 
         if( b && tk->i_cat == VIDEO_ES )
         {
