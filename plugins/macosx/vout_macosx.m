@@ -2,7 +2,7 @@
  * vout_macosx.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout_macosx.m,v 1.14 2002/07/23 00:39:17 sam Exp $
+ * $Id: vout_macosx.m,v 1.15 2002/07/25 21:51:12 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -568,7 +568,7 @@ static int QTCreateSequence( vout_thread_t *p_vout )
     p_descr->frameCount = 1;
     p_descr->clutID = -1;
     p_descr->dataSize = 0;
-    p_descr->depth = 12;
+    p_descr->depth = 24;
 
     HUnlock( (Handle)p_vout->p_sys->h_img_descr );
 
