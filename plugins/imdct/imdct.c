@@ -2,7 +2,7 @@
  * imdct.c : IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdct.c,v 1.8 2002/02/15 13:32:53 sam Exp $
+ * $Id: imdct.c,v 1.9 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -44,7 +44,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "AC3 IMDCT module" )
+    SET_DESCRIPTION( _("AC3 IMDCT module") )
     ADD_CAPABILITY( IMDCT, 50 )
     ADD_SHORTCUT( "c" )
     ADD_SHORTCUT( "imdct" )

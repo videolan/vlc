@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.8 2002/03/06 16:39:37 stef Exp $
+ * $Id: vcd.c,v 1.9 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,7 +42,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "VCD input module" )
+    SET_DESCRIPTION( _("VCD input module") )
     ADD_CAPABILITY( DEMUX, 0 )
     ADD_CAPABILITY( ACCESS, 80 )
     ADD_SHORTCUT( "vcd" )

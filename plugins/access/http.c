@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.7 2002/04/03 23:24:42 massiot Exp $
+ * $Id: http.c,v 1.8 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -62,7 +62,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
  
 MODULE_INIT_START
-    SET_DESCRIPTION( "HTTP access plug-in" )
+    SET_DESCRIPTION( _("HTTP access plug-in") )
     ADD_CAPABILITY( ACCESS, 0 )
     ADD_SHORTCUT( "http" )
     ADD_SHORTCUT( "http4" )

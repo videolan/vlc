@@ -2,7 +2,7 @@
  * logger.c : file logging plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: logger.c,v 1.5 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: logger.c,v 1.6 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -64,7 +64,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "file logging interface module" )
+    SET_DESCRIPTION( _("file logging interface module") )
     ADD_CAPABILITY( INTF, 1 )
     ADD_SHORTCUT( "logger" )
 MODULE_INIT_STOP

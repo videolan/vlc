@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.4 2002/04/18 04:34:37 sam Exp $
+ * $Id: ipv6.c,v 1.5 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -71,7 +71,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
  
 MODULE_INIT_START
-    SET_DESCRIPTION( "IPv6 network abstraction layer" )
+    SET_DESCRIPTION( _("IPv6 network abstraction layer") )
     ADD_CAPABILITY( NETWORK, 40 )
     ADD_SHORTCUT( "ipv6" )
 MODULE_INIT_STOP

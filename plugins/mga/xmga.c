@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.11 2002/03/25 19:16:20 gbazin Exp $
+ * $Id: xmga.c,v 1.12 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -93,28 +93,28 @@ static void ToggleCursor   ( vout_thread_t * );
  * Building configuration tree
  *****************************************************************************/
 
-#define ALT_FS_TEXT "Alternate fullscreen method"
-#define ALT_FS_LONGTEXT "There are two ways to make a fullscreen window, " \
-                        "unfortunately each one has its drawbacks.\n" \
-                        "1) Let the window manager handle your fullscreen " \
-                        "window (default). But things like taskbars will " \
-                        "likely show on top of the video\n" \
-                        "2) Completly bypass the window manager, but then " \
-                        "nothing will be able to show on top of the video"
+#define ALT_FS_TEXT N_("alternate fullscreen method")
+#define ALT_FS_LONGTEXT N_( \
+    "There are two ways to make a fullscreen window, unfortunately each one " \
+    "has its drawbacks.\n" \
+    "1) Let the window manager handle your fullscreen window (default). But " \
+    "things like taskbars will likely show on top of the video.\n" \
+    "2) Completly bypass the window manager, but then nothing will be able " \
+    "to show on top of the video.")
 
-#define DISPLAY_TEXT "X11 display name"
-#define DISPLAY_LONGTEXT "Specify the X11 hardware display you want to use.\n"\
-                         "By default vlc will use the value of the DISPLAY " \
-                         "environment variable."
+#define DISPLAY_TEXT N_("X11 display name")
+#define DISPLAY_LONGTEXT N_( \
+    "Specify the X11 hardware display you want to use.\nBy default vlc will " \
+    "use the value of the DISPLAY environment variable.")
 
 MODULE_CONFIG_START
-ADD_CATEGORY_HINT( "Miscellaneous", NULL )
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
 ADD_STRING  ( "xmga_display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
 ADD_BOOL    ( "xmga_altfullscreen", NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "X11 MGA module" )
+    SET_DESCRIPTION( _("X11 MGA module") )
     ADD_CAPABILITY( VOUT, 60 )
     ADD_SHORTCUT( "xmga" )
 MODULE_INIT_STOP

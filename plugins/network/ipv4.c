@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.9 2002/04/04 05:08:05 sam Exp $
+ * $Id: ipv4.c,v 1.10 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -74,7 +74,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
  
 MODULE_INIT_START
-    SET_DESCRIPTION( "IPv4 network abstraction layer" )
+    SET_DESCRIPTION( _("IPv4 network abstraction layer") )
     ADD_CAPABILITY( NETWORK, 50 )
     ADD_SHORTCUT( "ipv4" )
 MODULE_INIT_STOP

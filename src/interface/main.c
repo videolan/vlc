@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.179 2002/04/17 11:43:31 sam Exp $
+ * $Id: main.c,v 1.180 2002/04/19 13:56:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -94,239 +94,251 @@
 #include "modules_inner.h"                        /* for configuration stuff */
 
 
-#define INTF_TEXT "interface method"
-#define INTF_LONGTEXT "This option allows you to select the interface used by"\
-                      " vlc.\nNote that the default behaviour is to" \
-                      " automatically select the best method available"
+#define INTF_TEXT N_("interface method")
+#define INTF_LONGTEXT N_( \
+    "This option allows you to select the interface used by vlc.\nNote that " \
+    "the default behaviour is to automatically select the best method " \
+    "available.")
 
-#define WARNING_TEXT "warning level (or use -v, -vv, etc...)"
-#define WARNING_LONGTEXT "Increasing the warning level will allow you to see" \
-                         " more debug messages and can sometimes help you to" \
-                         " troubleshoot a problem"
+#define WARNING_TEXT N_("warning level (or use -v, -vv, etc...)")
+#define WARNING_LONGTEXT N_( \
+    "Increasing the warning level will allow you to see more debug messages " \
+    "and can sometimes help you to troubleshoot a problem.")
 
-#define STATS_TEXT "output statistics"
-#define STATS_LONGTEXT "Enabling the stats mode will flood your log console" \
-                       " with various statistics messages"
+#define STATS_TEXT N_("output statistics")
+#define STATS_LONGTEXT N_( \
+    "Enabling the stats mode will flood your log console with various " \
+    "statistics messages.")
 
-#define INTF_PATH_TEXT "interface default search path"
-#define INTF_PATH_LONGTEXT "This option allows you to set the default path" \
-                           " that the interface will open when looking for a" \
-                           " file"
+#define INTF_PATH_TEXT N_("interface default search path")
+#define INTF_PATH_LONGTEXT N_( \
+    "This option allows you to set the default path that the interface will " \
+    "open when looking for a file.")
 
-#define AOUT_TEXT "audio output method"
-#define AOUT_LONGTEXT "This option allows you to select the audio" \
-                      " audio output method used by vlc.\nNote that the" \
-                      " default behaviour is to automatically select the best"\
-                      " method available"
+#define AOUT_TEXT N_("audio output method")
+#define AOUT_LONGTEXT N_( \
+    "This option allows you to select the audio audio output method used by " \
+    "vlc.\nNote that the default behaviour is to automatically select the " \
+    "best method available.")
 
-#define NOAUDIO_TEXT "disable audio"
-#define NOAUDIO_LONGTEXT "This will completely disable the audio output. The" \
-                         " audio decoding stage shouldn't even be done, so it"\
-                         " can allow you to save some processing power"
+#define NOAUDIO_TEXT N_("disable audio")
+#define NOAUDIO_LONGTEXT N_( \
+    "This will completely disable the audio output. The audio decoding " \
+    "stage shouldn't even be done, so it can allow you to save some " \
+    "processing power.")
 
-#define MONO_TEXT "mono audio"
-#define MONO_LONGTEXT "This will force a mono audio output"
+#define MONO_TEXT N_("mono audio")
+#define MONO_LONGTEXT N_("This will force a mono audio output")
 
-#define VOLUME_TEXT "audio output volume"
-#define VOLUME_LONGTEXT "You can set the default audio output volume here," \
-                        " in a range from 0 to 1024"
+#define VOLUME_TEXT N_("audio output volume")
+#define VOLUME_LONGTEXT N_( \
+    "You can set the default audio output volume here, in a range from 0 to " \
+    "1024.")
 
-#define FORMAT_TEXT "audio output format"
-#define FORMAT_LONGTEXT "You can force the audio output format here.\n" \
-                        "0 -> 16 bits signed native endian (default)\n" \
-                        "1 ->  8 bits unsigned\n"                       \
-                        "2 -> 16 bits signed little endian\n"           \
-                        "3 -> 16 bits signed big endian\n"              \
-                        "4 ->  8 bits signed\n"                         \
-                        "5 -> 16 bits unsigned little endian\n"         \
-                        "6 -> 16 bits unsigned big endian\n"            \
-                        "7 -> mpeg2 audio (unsupported)\n"              \
-                        "8 -> ac3 pass-through"
+#define FORMAT_TEXT N_("audio output format")
+#define FORMAT_LONGTEXT N_( \
+    "You can force the audio output format here.\n" \
+    "0 -> 16 bits signed native endian (default)\n" \
+    "1 ->  8 bits unsigned\n"                       \
+    "2 -> 16 bits signed little endian\n"           \
+    "3 -> 16 bits signed big endian\n"              \
+    "4 ->  8 bits signed\n"                         \
+    "5 -> 16 bits unsigned little endian\n"         \
+    "6 -> 16 bits unsigned big endian\n"            \
+    "7 -> mpeg2 audio (unsupported)\n"              \
+    "8 -> ac3 pass-through")
 
-#define RATE_TEXT "audio output frequency (Hz)"
-#define RATE_LONGTEXT "You can force the audio output frequency here.\n"    \
-                      "Common values are 48000, 44100, 32000, 22050,"       \
-                      " 16000, 11025, 8000"
+#define RATE_TEXT N_("audio output frequency (Hz)")
+#define RATE_LONGTEXT N_( \
+    "You can force the audio output frequency here.\nCommon values are " \
+    "48000, 44100, 32000, 22050, 16000, 11025, 8000.")
 
-#define DESYNC_TEXT "Compensate desynchronization of audio (in ms)"
-#define DESYNC_LONGTEXT "This option allows you to delay the audio output."  \
-                        " This can be handy if you notice a lag between the" \
-                        " video and the audio"
+#define DESYNC_TEXT N_("compensate desynchronization of audio (in ms)")
+#define DESYNC_LONGTEXT N_( \
+    "This option allows you to delay the audio output. This can be handy if " \
+    "you notice a lag between the video and the audio.")
 
-#define VOUT_TEXT "video output method"
-#define VOUT_LONGTEXT "This option allows you to select the video output"     \
-                      " method used by vlc.\nNote that the default behaviour" \
-                      " is to automatically select the best method available"
+#define VOUT_TEXT N_("video output method")
+#define VOUT_LONGTEXT N_( \
+    "This option allows you to select the video output method used by vlc.\n" \
+    "Note that the default behaviour is to automatically select the best " \
+    "method available.")
 
-#define NOVIDEO_TEXT "disable video"
-#define NOVIDEO_LONGTEXT "This will completely disable the video output. The" \
-                         " video decoding stage shouldn't even be done, so"   \
-                         " it can allow you to save some processing power"
+#define NOVIDEO_TEXT N_("disable video")
+#define NOVIDEO_LONGTEXT N_( \
+    "This will completely disable the video output. The video decoding " \
+    "stage shouldn't even be done, so it can allow you to save some " \
+    "processing power.")
 
-#define DISPLAY_TEXT "display identifier"
-#define DISPLAY_LONGTEXT NULL
+#define DISPLAY_TEXT N_("display identifier")
+#define DISPLAY_LONGTEXT ""
 
-#define WIDTH_TEXT "video width"
-#define WIDTH_LONGTEXT "You can enforce the video width here.\nNote"  \
-                       " that by default vlc will adapt to the video" \
-                       " characteristics"
+#define WIDTH_TEXT N_("video width")
+#define WIDTH_LONGTEXT N_( \
+    "You can enforce the video width here.\nNote that by default vlc will " \
+    "adapt to the video characteristics.")
 
-#define HEIGHT_TEXT "video height"
-#define HEIGHT_LONGTEXT "You can enforce the video height here.\nNote"  \
-                        " that by default vlc will adapt to the video " \
-                        " characteristics"
+#define HEIGHT_TEXT N_("video height")
+#define HEIGHT_LONGTEXT N_( \
+    "You can enforce the video height here.\nNote that by default vlc will " \
+    "adapt to the video characteristics.")
 
-#define GRAYSCALE_TEXT "grayscale video output"
-#define GRAYSCALE_LONGTEXT "Using this option, vlc will not decode the color "\
-                           "information from the video (this can also allow " \
-                           "you to save some processing power)"
+#define GRAYSCALE_TEXT N_("grayscale video output")
+#define GRAYSCALE_LONGTEXT N_( \
+    "Using this option, vlc will not decode the color information from the " \
+    "video (this can also allow you to save some processing power).")
 
-#define FULLSCREEN_TEXT "fullscreen video output"
-#define FULLSCREEN_LONGTEXT "If this option is enabled, vlc will always " \
-                            "start a video in fullscreen mode"
+#define FULLSCREEN_TEXT N_("fullscreen video output")
+#define FULLSCREEN_LONGTEXT N_( \
+    "If this option is enabled, vlc will always start a video in fullscreen " \
+    "mode.")
 
-#define NOOVERLAY_TEXT "disable hardware acceleration for the video output"
-#define NOOVERLAY_LONGTEXT "By default vlc will try to take advantage of the "\
-                           "overlay capabilities of you graphics card.\n"
+#define NOOVERLAY_TEXT N_("disable hardware acceleration for the video output")
+#define NOOVERLAY_LONGTEXT N_( \
+    "By default vlc will try to take advantage of the overlay capabilities " \
+    "of you graphics card.")
 
-#define SPUMARGIN_TEXT "force SPU position"
-#define SPUMARGIN_LONGTEXT NULL
+#define SPUMARGIN_TEXT N_("force SPU position")
+#define SPUMARGIN_LONGTEXT ""
 
-#define FILTER_TEXT "video filter module"
-#define FILTER_LONGTEXT NULL
+#define FILTER_TEXT N_("video filter module")
+#define FILTER_LONGTEXT ""
 
-#define SERVER_PORT_TEXT "server port"
-#define SERVER_PORT_LONGTEXT NULL
+#define SERVER_PORT_TEXT N_("server port")
+#define SERVER_PORT_LONGTEXT ""
 
-#define NETCHANNEL_TEXT "enable network channel mode"
-#define NETCHANNEL_LONGTEXT NULL
+#define NETCHANNEL_TEXT N_("enable network channel mode")
+#define NETCHANNEL_LONGTEXT ""
 
-#define CHAN_SERV_TEXT "channel server address"
-#define CHAN_SERV_LONGTEXT NULL
+#define CHAN_SERV_TEXT N_("channel server address")
+#define CHAN_SERV_LONGTEXT ""
 
-#define CHAN_PORT_TEXT "channel server port"
-#define CHAN_PORT_LONGTEXT NULL
+#define CHAN_PORT_TEXT N_("channel server port")
+#define CHAN_PORT_LONGTEXT ""
 
-#define IFACE_TEXT "network interface"
-#define IFACE_LONGTEXT NULL
+#define IFACE_TEXT N_("network interface")
+#define IFACE_LONGTEXT ""
 
-#define INPUT_PROGRAM_TEXT "choose program (SID)"
-#define INPUT_PROGRAM_LONGTEXT "choose the program to select by giving its"\
-                                "Service ID"
+#define INPUT_PROGRAM_TEXT N_("choose program (SID)")
+#define INPUT_PROGRAM_LONGTEXT N_( \
+    "Choose the program to select by giving its Service ID.")
 
-#define INPUT_AUDIO_TEXT "choose audio"
-#define INPUT_AUDIO_LONGTEXT NULL
+#define INPUT_AUDIO_TEXT N_("choose audio")
+#define INPUT_AUDIO_LONGTEXT ""
 
-#define INPUT_CHAN_TEXT "choose channel"
-#define INPUT_CHAN_LONGTEXT NULL
+#define INPUT_CHAN_TEXT N_("choose channel")
+#define INPUT_CHAN_LONGTEXT ""
 
-#define INPUT_SUBT_TEXT "choose subtitles"
-#define INPUT_SUBT_LONGTEXT NULL
+#define INPUT_SUBT_TEXT N_("choose subtitles")
+#define INPUT_SUBT_LONGTEXT ""
 
-#define DVD_DEV_TEXT "DVD device"
-#define DVD_DEV_LONGTEXT NULL
+#define DVD_DEV_TEXT N_("DVD device")
+#define DVD_DEV_LONGTEXT ""
 
-#define VCD_DEV_TEXT "VCD device"
-#define VCD_DEV_LONGTEXT NULL
+#define VCD_DEV_TEXT N_("VCD device")
+#define VCD_DEV_LONGTEXT ""
 
-#define SAT_FREQ_TEXT "Satellite transponder frequency"
-#define SAT_FREQ_LONGTEXT NULL
+#define SAT_FREQ_TEXT N_("satellite transponder frequency")
+#define SAT_FREQ_LONGTEXT ""
 
-#define SAT_POL_TEXT "Satellite transponder polarization"
-#define SAT_POL_LONGTEXT NULL
+#define SAT_POL_TEXT N_("satellite transponder polarization")
+#define SAT_POL_LONGTEXT ""
 
-#define SAT_FEC_TEXT "Satellite transponder FEC"
-#define SAT_FEC_LONGTEXT NULL
+#define SAT_FEC_TEXT N_("satellite transponder FEC")
+#define SAT_FEC_LONGTEXT ""
 
-#define SAT_SRATE_TEXT "Satellite transponder symbol rate"
-#define SAT_SRATE_LONGTEXT NULL
+#define SAT_SRATE_TEXT N_("satellite transponder symbol rate")
+#define SAT_SRATE_LONGTEXT ""
 
-#define SAT_DISEQC_TEXT "Use diseqc with antenna"
-#define SAT_DISEQC_LONGTEXT NULL
+#define SAT_DISEQC_TEXT N_("use diseqc with antenna")
+#define SAT_DISEQC_LONGTEXT ""
 
-#define SAT_LNB_LOF1_TEXT "Antenna lnb_lof1 (kHz)"
-#define SAT_LNB_LOF1_LONGTEXT NULL
+#define SAT_LNB_LOF1_TEXT N_("antenna lnb_lof1 (kHz)")
+#define SAT_LNB_LOF1_LONGTEXT ""
 
-#define SAT_LNB_LOF2_TEXT "Antenna lnb_lof2 (kHz)"
-#define SAT_LNB_LOF2_LONGTEXT NULL
+#define SAT_LNB_LOF2_TEXT N_("antenna lnb_lof2 (kHz)")
+#define SAT_LNB_LOF2_LONGTEXT ""
 
-#define SAT_LNB_SLOF_TEXT "Antenna lnb_slof (kHz)"
-#define SAT_LNB_SLOF_LONGTEXT NULL
+#define SAT_LNB_SLOF_TEXT N_("antenna lnb_slof (kHz)")
+#define SAT_LNB_SLOF_LONGTEXT ""
 
-#define IPV6_TEXT "force IPv6"
-#define IPV6_LONGTEXT NULL
+#define IPV6_TEXT N_("force IPv6")
+#define IPV6_LONGTEXT ""
 
-#define IPV4_TEXT "force IPv4"
-#define IPV4_LONGTEXT NULL
+#define IPV4_TEXT N_("force IPv4")
+#define IPV4_LONGTEXT ""
 
-#define ADEC_MPEG_TEXT "choose MPEG audio decoder"
-#define ADEC_MPEG_LONGTEXT NULL
+#define ADEC_MPEG_TEXT N_("choose MPEG audio decoder")
+#define ADEC_MPEG_LONGTEXT ""
 
-#define ADEC_AC3_TEXT "choose AC3 audio decoder"
-#define ADEC_AC3_LONGTEXT NULL
+#define ADEC_AC3_TEXT N_("choose AC3 audio decoder")
+#define ADEC_AC3_LONGTEXT ""
 
-#define VDEC_SMP_TEXT "use additional processors"
-#define VDEC_SMP_LONGTEXT NULL
+#define VDEC_SMP_TEXT N_("use additional processors")
+#define VDEC_SMP_LONGTEXT ""
 
-#define VPAR_SYNCHRO_TEXT "force synchro algorithm {I|I+|IP|IP+|IPB}"
-#define VPAR_SYNCHRO_LONGTEXT NULL
+#define VPAR_SYNCHRO_TEXT N_("force synchro algorithm {I|I+|IP|IP+|IPB}")
+#define VPAR_SYNCHRO_LONGTEXT ""
 
-#define NOMMX_TEXT "disable CPU's MMX support"
-#define NOMMX_LONGTEXT NULL
+#define NOMMX_TEXT N_("disable CPU's MMX support")
+#define NOMMX_LONGTEXT ""
 
-#define NO3DN_TEXT "disable CPU's 3D Now! support"
-#define NO3DN_LONGTEXT NULL
+#define NO3DN_TEXT N_("disable CPU's 3D Now! support")
+#define NO3DN_LONGTEXT ""
 
-#define NOMMXEXT_TEXT "disable CPU's MMX EXT support"
-#define NOMMXEXT_LONGTEXT NULL
+#define NOMMXEXT_TEXT N_("disable CPU's MMX EXT support")
+#define NOMMXEXT_LONGTEXT ""
 
-#define NOSSE_TEXT "disable CPU's SSE support"
-#define NOSSE_LONGTEXT NULL
+#define NOSSE_TEXT N_("disable CPU's SSE support")
+#define NOSSE_LONGTEXT ""
 
-#define NOALTIVEC_TEXT "disable CPU's AltiVec support"
-#define NOALTIVEC_LONGTEXT NULL
+#define NOALTIVEC_TEXT N_("disable CPU's AltiVec support")
+#define NOALTIVEC_LONGTEXT ""
 
-#define PLAYLIST_LAUNCH_TEXT "launch playlist on startup"
-#define PLAYLIST_LAUNCH_LONGTEXT NULL
+#define PLAYLIST_LAUNCH_TEXT N_("launch playlist on startup")
+#define PLAYLIST_LAUNCH_LONGTEXT ""
 
-#define PLAYLIST_ENQUEUE_TEXT "enqueue playlist as default"
-#define PLAYLIST_ENQUEUE_LONGTEXT NULL
+#define PLAYLIST_ENQUEUE_TEXT N_("enqueue playlist as default")
+#define PLAYLIST_ENQUEUE_LONGTEXT ""
 
-#define PLAYLIST_LOOP_TEXT "loop playlist on end"
-#define PLAYLIST_LOOP_LONGTEXT NULL
+#define PLAYLIST_LOOP_TEXT N_("loop playlist on end")
+#define PLAYLIST_LOOP_LONGTEXT ""
 
-#define MEMCPY_TEXT "memory copy method"
-#define MEMCPY_LONGTEXT NULL
+#define MEMCPY_TEXT N_("memory copy method")
+#define MEMCPY_LONGTEXT ""
 
-#define FAST_PTHREAD_TEXT "fast pthread on NT/2K/XP (developpers only)"
-#define FAST_PTHREAD_LONGTEXT "On Windows NT/2K/XP we use a slow but correct "\
-                              "pthread implementation, you can also use this "\
-                              "faster implementation but you might "\
-                              "experience problems with it"
+#define FAST_PTHREAD_TEXT N_("fast pthread on NT/2K/XP (developpers only)")
+#define FAST_PTHREAD_LONGTEXT N_( \
+    "On Windows NT/2K/XP we use a slow but correct pthread implementation, " \
+    "you can also use this faster implementation but you might experience " \
+    "problems with it.")
 
-/* Quick usage guide
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-ADD_CATEGORY_HINT( text, longtext )
-ADD_SUBCATEGORY_HINT( text, longtext )
-ADD_STRING( option_name, value, p_callback, text, longtext )
-ADD_FILE( option_name, psz_value, p_callback, text, longtext )
-ADD_PLUGIN( option_name, psz_value, i_capability, p_callback, text, longtext )
-ADD_INTEGER( option_name, i_value, p_callback, text, longtext )
-ADD_BOOL( option_name, p_callback, text, longtext )
-*/
+/*
+ * Quick usage guide for the configuration options:
+ *
+ * MODULE_CONFIG_START
+ * MODULE_CONFIG_STOP
+ * ADD_CATEGORY_HINT( N_(text), longtext )
+ * ADD_SUBCATEGORY_HINT( N_(text), longtext )
+ * ADD_STRING( option_name, value, p_callback, N_(text), N_(longtext) )
+ * ADD_FILE( option_name, psz_value, p_callback, N_(text), N_(longtext) )
+ * ADD_PLUGIN( option_name, psz_value, i_capability, p_callback,
+ *             N_(text), N_(longtext) )
+ * ADD_INTEGER( option_name, i_value, p_callback, N_(text), N_(longtext) )
+ * ADD_BOOL( option_name, p_callback, N_(text), N_(longtext) )
+ */
 
 MODULE_CONFIG_START
 
 /* Interface options */
-ADD_CATEGORY_HINT( "Interface", NULL)
+ADD_CATEGORY_HINT( N_("Interface"), NULL)
 ADD_PLUGIN  ( "intf", MODULE_CAPABILITY_INTF, NULL, NULL, INTF_TEXT, INTF_LONGTEXT )
 ADD_INTEGER ( "warning", 0, NULL, WARNING_TEXT, WARNING_LONGTEXT )
 ADD_BOOL    ( "stats", NULL, STATS_TEXT, STATS_LONGTEXT )
 ADD_STRING  ( "search_path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT )
 
 /* Audio options */
-ADD_CATEGORY_HINT( "Audio", NULL)
+ADD_CATEGORY_HINT( N_("Audio"), NULL)
 ADD_PLUGIN  ( "aout", MODULE_CAPABILITY_AOUT, NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT )
 ADD_BOOL    ( "noaudio", NULL, NOAUDIO_TEXT, NOAUDIO_LONGTEXT )
 ADD_BOOL    ( "mono", NULL, MONO_TEXT, MONO_LONGTEXT )
@@ -337,7 +349,7 @@ ADD_INTEGER ( "aout_format", 0, NULL, FORMAT_TEXT,
               FORMAT_LONGTEXT )
 
 /* Video options */
-ADD_CATEGORY_HINT( "Video", NULL )
+ADD_CATEGORY_HINT( N_("Video"), NULL )
 ADD_PLUGIN  ( "vout", MODULE_CAPABILITY_VOUT, NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT )
 ADD_BOOL    ( "novideo", NULL, NOVIDEO_TEXT, NOVIDEO_LONGTEXT )
 ADD_INTEGER ( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT )
@@ -349,7 +361,7 @@ ADD_INTEGER ( "spumargin", -1, NULL, SPUMARGIN_TEXT, SPUMARGIN_LONGTEXT )
 ADD_PLUGIN  ( "filter", MODULE_CAPABILITY_VOUT, NULL, NULL, FILTER_TEXT, FILTER_LONGTEXT )
 
 /* Input options */
-ADD_CATEGORY_HINT( "Input", NULL )
+ADD_CATEGORY_HINT( N_("Input"), NULL )
 ADD_INTEGER ( "server_port", 1234, NULL, SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT )
 ADD_BOOL    ( "network_channel", NULL, NETCHANNEL_TEXT, NETCHANNEL_LONGTEXT )
 ADD_STRING  ( "channel_server", "localhost", NULL, CHAN_SERV_TEXT, CHAN_SERV_LONGTEXT )
@@ -383,14 +395,14 @@ ADD_BOOL    ( "ipv6", NULL, IPV6_TEXT, IPV6_LONGTEXT )
 ADD_BOOL    ( "ipv4", NULL, IPV4_TEXT, IPV4_LONGTEXT )
 
 /* Decoder options */
-ADD_CATEGORY_HINT( "Decoders", NULL )
+ADD_CATEGORY_HINT( N_("Decoders"), NULL )
 ADD_PLUGIN  ( "mpeg_adec", MODULE_CAPABILITY_DECODER, NULL, NULL, ADEC_MPEG_TEXT, ADEC_MPEG_LONGTEXT )
 ADD_PLUGIN  ( "ac3_adec", MODULE_CAPABILITY_DECODER, NULL, NULL, ADEC_AC3_TEXT, ADEC_AC3_LONGTEXT )
 ADD_INTEGER ( "vdec_smp", 0, NULL, VDEC_SMP_TEXT, VDEC_SMP_LONGTEXT )
 ADD_STRING  ( "vpar_synchro", NULL, NULL, VPAR_SYNCHRO_TEXT, VPAR_SYNCHRO_LONGTEXT )
 
 /* CPU options */
-ADD_CATEGORY_HINT( "CPU", NULL )
+ADD_CATEGORY_HINT( N_("CPU"), NULL )
 ADD_BOOL    ( "nommx", NULL, NOMMX_TEXT, NOMMX_LONGTEXT )
 ADD_BOOL    ( "no3dn", NULL, NO3DN_TEXT, NO3DN_LONGTEXT )
 ADD_BOOL    ( "nommxext", NULL, NOMMXEXT_TEXT, NOMMXEXT_LONGTEXT )
@@ -398,13 +410,13 @@ ADD_BOOL    ( "nosse", NULL, NOSSE_TEXT, NOSSE_LONGTEXT )
 ADD_BOOL    ( "noaltivec", NULL, NOALTIVEC_TEXT, NOALTIVEC_LONGTEXT )
 
 /* Playlist options */
-ADD_CATEGORY_HINT( "Playlist", NULL )
+ADD_CATEGORY_HINT( N_("Playlist"), NULL )
 ADD_BOOL    ( "playlist_launch", NULL, PLAYLIST_LAUNCH_TEXT, PLAYLIST_LAUNCH_LONGTEXT )
 ADD_BOOL    ( "playlist_enqueue", NULL, PLAYLIST_ENQUEUE_TEXT, PLAYLIST_ENQUEUE_LONGTEXT )
 ADD_BOOL    ( "playlist_loop", NULL, PLAYLIST_LOOP_TEXT, PLAYLIST_LOOP_LONGTEXT )
 
 /* Misc options */
-ADD_CATEGORY_HINT( "Miscellaneous", NULL )
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
 ADD_PLUGIN  ( "memcpy", MODULE_CAPABILITY_MEMCPY, NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT )
 
 #if defined(WIN32)
@@ -414,7 +426,7 @@ ADD_BOOL    ( "fast_pthread", NULL, FAST_PTHREAD_TEXT, FAST_PTHREAD_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "Main program" )
+    SET_DESCRIPTION( N_("main program") )
     ADD_CAPABILITY( MAIN, 100/*whatever*/ )
 MODULE_INIT_STOP
 
@@ -427,18 +439,17 @@ MODULE_DEACTIVATE_STOP
 /* Hack for help options */
 static module_t help_module;
 static module_config_t p_help_config[] = {
-    { MODULE_CONFIG_ITEM_BOOL, "help", "print help (or use -h)",
+    { MODULE_CONFIG_ITEM_BOOL, "help", N_("print help (or use -h)"),
       NULL, NULL, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_ITEM_BOOL, "longhelp", "print detailed help (or use -H)",
+    { MODULE_CONFIG_ITEM_BOOL, "longhelp", N_("print detailed help (or use -H)"),
       NULL, NULL, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_ITEM_BOOL, "list", "print a list of available plugins "
-      "(or use -l)", NULL, NULL, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_ITEM_STRING, "plugin", "print help on plugin (or use -p)",
-      NULL, NULL, 0, NULL, &help_module.config_lock, 0 },
-    { MODULE_CONFIG_ITEM_BOOL, "version", "print version information",
+    { MODULE_CONFIG_ITEM_BOOL, "list", N_("print a list of available plugins "
+      "(or use -l)"), NULL, NULL, 0, NULL, NULL, 0 },
+    { MODULE_CONFIG_ITEM_STRING, "plugin", N_("print help on plugin "
+      "(or use -p)"), NULL, NULL, 0, NULL, &help_module.config_lock, 0 },
+    { MODULE_CONFIG_ITEM_BOOL, "version", N_("print version information"),
       NULL, NULL, 0, NULL, NULL, 0 },
     { MODULE_CONFIG_HINT_END, NULL, NULL, NULL, NULL, 0, NULL, NULL, 0 } };
-
 
 /*****************************************************************************
  * End configuration.
@@ -495,6 +506,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     vout_bank_t   vout_bank;
     char *psz_plugin;
     char *p_tmp;
+    struct module_config_s *p_item;
 
     p_main        = &main_data;               /* set up the global variables */
     p_module_bank = &module_bank;
@@ -504,16 +516,18 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 
     p_main->i_warning_level = 0;
 
-#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT )
     /*
-     * Support for getext
+     * Support for gettext
      */
-#if defined( HAVE_LOCALE_H ) && defined( HAVE_LC_MESSAGES )
+#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT )
+#   if defined( HAVE_LOCALE_H ) && defined( HAVE_LC_MESSAGES )
     if( !setlocale( LC_MESSAGES, "" ) )
     {
-        fprintf( stderr, "warning: unsupported locale.\n" );
+        fprintf( stderr, "warning: unsupported locale settings\n" );
     }
-#endif
+
+    setlocale( LC_CTYPE, "" );
+#   endif
 
     if( !bindtextdomain( PACKAGE, LOCALEDIR ) )
     {
@@ -574,11 +588,16 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 
     /* Hack: insert the help module here */
     help_module.psz_name = "help";
-    help_module.i_config_lines = sizeof(p_help_config) /
-                                     sizeof(module_config_t);
-    help_module.i_config_items = help_module.i_config_lines - 1;
+    help_module.i_config_items =
+                    sizeof(p_help_config) / sizeof(module_config_t) - 1;
     vlc_mutex_init( &help_module.config_lock );
-    help_module.p_config = p_help_config;
+    help_module.p_config = config_Duplicate( p_help_config );
+    for( p_item = help_module.p_config;
+         p_item->i_type != MODULE_CONFIG_HINT_END;
+         p_item++ )
+    {
+        p_item->p_lock = &help_module.config_lock;
+    }
     help_module.next = p_module_bank->first;
     p_module_bank->first = &help_module;
     /* end hack */
@@ -592,8 +611,8 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /* Check for short help option */
     if( config_GetIntVariable( "help" ) )
     {
-        intf_Msg( "Usage: %s [options] [parameters] [file]...\n",
-                  p_main->psz_arg0 );
+        intf_Msg( _("Usage: %s [options] [parameters] [file]...\n"),
+                    p_main->psz_arg0 );
 
         Usage( "help" );
         Usage( "main" );
@@ -894,8 +913,8 @@ static int GetFilenames( int i_argc, char *ppsz_argv[] )
  *****************************************************************************/
 static void Usage( const char *psz_module_name )
 {
-    int i;
     module_t *p_module;
+    module_config_t *p_item;
     char psz_spaces[30];
 
     memset( psz_spaces, 32, 30 );
@@ -917,16 +936,18 @@ static void Usage( const char *psz_module_name )
         if( !p_module->i_config_items ) continue;
 
         /* print module name */
-        intf_Msg( "%s options:\n", p_module->psz_name );
+        intf_Msg( _("%s module options:\n"), p_module->psz_name );
 
-        for( i = 0; i < p_module->i_config_lines; i++ )
+        for( p_item = p_module->p_config;
+             p_item->i_type != MODULE_CONFIG_HINT_END;
+             p_item++ )
         {
-            int j;
+            int i;
 
-            switch( p_module->p_config[i].i_type )
+            switch( p_item->i_type )
             {
             case MODULE_CONFIG_HINT_CATEGORY:
-                intf_Msg( " %s", p_module->p_config[i].psz_text );
+                intf_Msg( " %s", p_item->psz_text );
                 break;
 
             case MODULE_CONFIG_ITEM_STRING:
@@ -934,37 +955,34 @@ static void Usage( const char *psz_module_name )
             case MODULE_CONFIG_ITEM_PLUGIN:
                 /* Nasty hack, but right now I'm too tired to think about
                  * a nice solution */
-                j = 25 - strlen( p_module->p_config[i].psz_name )
-                    - strlen(" <string>") - 1;
-                if( j < 0 ) j = 0; psz_spaces[j] = 0;
+                i = 25 - strlen( p_item->psz_name )
+                    - strlen(_(" <string>")) - 1;
+                if( i < 0 ) i = 0; psz_spaces[i] = 0;
 
-                intf_Msg( "  --%s <string>%s %s",
-                          p_module->p_config[i].psz_name, psz_spaces,
-                          p_module->p_config[i].psz_text );
-                psz_spaces[j] = 32;
+                intf_Msg( "  --%s%s%s %s", p_item->psz_name,
+                          _(" <string>"), psz_spaces, p_item->psz_text );
+                psz_spaces[i] = 32;
                 break;
             case MODULE_CONFIG_ITEM_INTEGER:
                 /* Nasty hack, but right now I'm too tired to think about
                  * a nice solution */
-                j = 25 - strlen( p_module->p_config[i].psz_name )
-                    - strlen(" <integer>") - 1;
-                if( j < 0 ) j = 0; psz_spaces[j] = 0;
+                i = 25 - strlen( p_item->psz_name )
+                    - strlen(_(" <integer>")) - 1;
+                if( i < 0 ) i = 0; psz_spaces[i] = 0;
 
-                intf_Msg( "  --%s <integer>%s %s",
-                          p_module->p_config[i].psz_name, psz_spaces,
-                          p_module->p_config[i].psz_text );
-                psz_spaces[j] = 32;
+                intf_Msg( "  --%s%s%s %s", p_item->psz_name,
+                          _(" <integer>"), psz_spaces, p_item->psz_text );
+                psz_spaces[i] = 32;
                 break;
             case MODULE_CONFIG_ITEM_BOOL:
                 /* Nasty hack, but right now I'm too tired to think about
                  * a nice solution */
-                j = 25 - strlen( p_module->p_config[i].psz_name ) - 1;
-                if( j < 0 ) j = 0; psz_spaces[j] = 0;
+                i = 25 - strlen( p_item->psz_name ) - 1;
+                if( i < 0 ) i = 0; psz_spaces[i] = 0;
 
                 intf_Msg( "  --%s%s %s",
-                          p_module->p_config[i].psz_name, psz_spaces,
-                          p_module->p_config[i].psz_text );
-                psz_spaces[j] = 32;
+                          p_item->psz_name, psz_spaces, p_item->psz_text );
+                psz_spaces[i] = 32;
                 break;
             }
         }
@@ -973,26 +991,28 @@ static void Usage( const char *psz_module_name )
          * Maybe we could use MODULE_CONFIG_ITEM_END to display tail messages
          * for each module?? */
         if( !strcmp( "main", p_module->psz_name ) )
-            intf_Msg( "\nPlaylist items:"
-                "\n  *.mpg, *.vob                   \tPlain MPEG-1/2 files"
+        {
+            intf_Msg( _("\nPlaylist items:"
+                "\n  *.mpg, *.vob                   \tplain MPEG-1/2 files"
                 "\n  [dvd:][device][@raw_device][@[title][,[chapter][,angle]]]"
                 "\n                                 \tDVD device"
                 "\n  [vcd:][device][@[title][,[chapter]]"
                 "\n                                 \tVCD device"
                 "\n  udpstream:[@[<bind address>][:<bind port>]]"
                 "\n                                 \tUDP stream sent by VLS"
-                "\n  vlc:loop                       \tLoop execution of the "
+                "\n  vlc:loop                       \tloop execution of the "
                       "playlist"
-                "\n  vlc:pause                      \tPause execution of "
+                "\n  vlc:pause                      \tpause execution of "
                       "playlist items"
-                "\n  vlc:quit                       \tQuit VLC" );
+                "\n  vlc:quit                       \tquit VLC") );
+        }
 
         intf_Msg( "" );
 
     }
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-        intf_Msg( "\nPress the RETURN key to continue..." );
+        intf_Msg( _("\nPress the RETURN key to continue...") );
         getchar();
 #endif
 }
@@ -1015,10 +1035,10 @@ static void ListModules( void )
 #endif
 
     /* Usage */
-    intf_Msg( "Usage: %s [options] [parameters] [file]...\n",
+    intf_Msg( _("Usage: %s [options] [parameters] [file]...\n"),
               p_main->psz_arg0 );
 
-    intf_Msg( "[plugin]              [description]" );
+    intf_Msg( _("[plugin]              [description]") );
 
     /* Enumerate each module */
     for( p_module = p_module_bank->first ;
@@ -1041,7 +1061,7 @@ static void ListModules( void )
     }
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-        intf_Msg( "\nPress the RETURN key to continue..." );
+        intf_Msg( _("\nPress the RETURN key to continue...") );
         getchar();
 #endif
 }
@@ -1059,13 +1079,13 @@ static void Version( void )
 
     intf_Msg( VERSION_MESSAGE );
     intf_Msg(
-        "This program comes with NO WARRANTY, to the extent permitted by "
+      _("This program comes with NO WARRANTY, to the extent permitted by "
         "law.\nYou may redistribute it under the terms of the GNU General "
         "Public License;\nsee the file named COPYING for details.\n"
-        "Written by the VideoLAN team at Ecole Centrale, Paris." );
+        "Written by the VideoLAN team at Ecole Centrale, Paris.") );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-        intf_Msg( "\nPress the RETURN key to continue..." );
+        intf_Msg( _("\nPress the RETURN key to continue...") );
         getchar();
 #endif
 }

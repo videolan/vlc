@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ncurses.c,v 1.13 2002/04/06 04:22:27 sam Exp $
+ * $Id: ncurses.c,v 1.14 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -53,7 +53,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "ncurses interface module" )
+    SET_DESCRIPTION( _("ncurses interface module") )
     ADD_CAPABILITY( INTF, 10 )
     ADD_SHORTCUT( "curses" )
     ADD_SHORTCUT( "ncurses" )

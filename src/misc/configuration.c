@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.14 2002/04/17 11:43:31 sam Exp $
+ * $Id: configuration.c,v 1.15 2002/04/19 13:56:12 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -196,7 +196,7 @@ void config_PutIntVariable( const char *psz_name, int i_value )
 module_config_t *config_FindConfig( const char *psz_name )
 {
     module_t *p_module;
-    int i;
+    module_config_t *p_item;
 
     if( !psz_name ) return NULL;
 
@@ -204,13 +204,15 @@ module_config_t *config_FindConfig( const char *psz_name )
          p_module != NULL ;
          p_module = p_module->next )
     {
-        for( i = 0; i < p_module->i_config_lines; i++ )
+        for( p_item = p_module->p_config;
+             p_item->i_type != MODULE_CONFIG_HINT_END;
+             p_item++ )
         {
-            if( p_module->p_config[i].i_type & MODULE_CONFIG_HINT )
+            if( p_item->i_type & MODULE_CONFIG_HINT )
                 /* ignore hints */
                 continue;
-            if( !strcmp( psz_name, p_module->p_config[i].psz_name ) )
-                return &p_module->p_config[i];
+            if( !strcmp( psz_name, p_item->psz_name ) )
+                return p_item;
         }
     }
 
@@ -224,42 +226,39 @@ module_config_t *config_FindConfig( const char *psz_name )
  * this module might be unloaded from memory at any time (remember HideModule).
  * This is why we need to create an exact copy of the config data.
  *****************************************************************************/
-module_config_t *config_Duplicate( module_t *p_module )
+module_config_t *config_Duplicate( module_config_t *p_orig )
 {
-    int i;
+    int i, i_lines;
     module_config_t *p_config;
 
-    /* allocate memory */
-    p_config = (module_config_t *)malloc( sizeof(module_config_t)
-                                          * p_module->i_config_lines );
+    /* Calculate the structure length */
+    for( p_config = p_orig, i_lines = 1;
+         p_config->i_type != MODULE_CONFIG_HINT_END;
+         p_config++, i_lines++ );
+
+    /* Allocate memory */
+    p_config = (module_config_t *)malloc( sizeof(module_config_t) * i_lines );
     if( p_config == NULL )
     {
         intf_ErrMsg( "config error: can't duplicate p_config" );
         return( NULL );
     }
 
-    for( i = 0; i < p_module->i_config_lines ; i++ )
+    /* Do the duplication job */
+    for( i = 0; i < i_lines ; i++ )
     {
-        p_config[i].i_type = p_module->p_config_orig[i].i_type;
-        p_config[i].i_value = p_module->p_config_orig[i].i_value;
-        p_config[i].b_dirty = p_module->p_config_orig[i].b_dirty;
-        p_config[i].p_lock = &p_module->config_lock;
-        if( p_module->p_config_orig[i].psz_name )
-            p_config[i].psz_name =
-                strdup( p_module->p_config_orig[i].psz_name );
-        else p_config[i].psz_name = NULL;
-        if( p_module->p_config_orig[i].psz_text )
-            p_config[i].psz_text =
-                strdup( p_module->p_config_orig[i].psz_text );
-        else p_config[i].psz_text = NULL;
-        if( p_module->p_config_orig[i].psz_longtext )
-            p_config[i].psz_longtext =
-                strdup( p_module->p_config_orig[i].psz_longtext );
-        else p_config[i].psz_longtext = NULL;
-        if( p_module->p_config_orig[i].psz_value )
-            p_config[i].psz_value =
-                strdup( p_module->p_config_orig[i].psz_value );
-        else p_config[i].psz_value = NULL;
+        p_config[i].i_type = p_orig[i].i_type;
+        p_config[i].i_value = p_orig[i].i_value;
+        p_config[i].b_dirty = p_orig[i].b_dirty;
+
+        p_config[i].psz_name = p_orig[i].psz_name ?
+                                   strdup( _(p_orig[i].psz_name) ) : NULL;
+        p_config[i].psz_text = p_orig[i].psz_text ?
+                                   strdup( _(p_orig[i].psz_text) ) : NULL;
+        p_config[i].psz_longtext = p_orig[i].psz_longtext ?
+                                   strdup( _(p_orig[i].psz_longtext) ) : NULL;
+        p_config[i].psz_value = p_orig[i].psz_value ?
+                                   strdup( _(p_orig[i].psz_value) ) : NULL;
 
         /* the callback pointer is only valid when the module is loaded so this
          * value is set in ActivateModule() and reset in DeactivateModule() */
@@ -278,10 +277,10 @@ module_config_t *config_Duplicate( module_t *p_module )
 int config_LoadConfigFile( const char *psz_module_name )
 {
     module_t *p_module;
+    module_config_t *p_item;
     FILE *file;
     char line[1024];
     char *p_index, *psz_option_name, *psz_option_value;
-    int i;
     char *psz_filename, *psz_homedir;
 
     /* Acquire config file lock */
@@ -364,47 +363,46 @@ int config_LoadConfigFile( const char *psz_module_name )
             psz_option_value = p_index + 1;
 
             /* try to match this option with one of the module's options */
-            for( i = 0; i < p_module->i_config_lines; i++ )
+            for( p_item = p_module->p_config;
+                 p_item->i_type != MODULE_CONFIG_HINT_END;
+                 p_item++ )
             {
-                if( p_module->p_config[i].i_type & MODULE_CONFIG_HINT )
+                if( p_item->i_type & MODULE_CONFIG_HINT )
                     /* ignore hints */
                     continue;
-                if( !strcmp( p_module->p_config[i].psz_name,
-                             psz_option_name ) )
+
+                if( !strcmp( p_item->psz_name, psz_option_name ) )
                 {
                     /* We found it */
-                    switch( p_module->p_config[i].i_type )
+                    switch( p_item->i_type )
                     {
                     case MODULE_CONFIG_ITEM_BOOL:
                     case MODULE_CONFIG_ITEM_INTEGER:
                         if( !*psz_option_value )
                             break;                    /* ignore empty option */
-                        p_module->p_config[i].i_value =
-                            atoi( psz_option_value);
+                        p_item->i_value = atoi( psz_option_value);
                         intf_WarnMsg( 7, "config: found <%s> option %s=%i",
-                                      p_module->psz_name,
-                                      p_module->p_config[i].psz_name,
-                                      p_module->p_config[i].i_value );
+                                         p_module->psz_name,
+                                         p_item->psz_name, p_item->i_value );
                         break;
 
                     default:
-                        vlc_mutex_lock( p_module->p_config[i].p_lock );
+                        vlc_mutex_lock( p_item->p_lock );
 
                         /* free old string */
-                        if( p_module->p_config[i].psz_value )
-                            free( p_module->p_config[i].psz_value );
+                        if( p_item->psz_value )
+                            free( p_item->psz_value );
 
-                        p_module->p_config[i].psz_value = *psz_option_value ?
+                        p_item->psz_value = *psz_option_value ?
                             strdup( psz_option_value ) : NULL;
 
-                        vlc_mutex_unlock( p_module->p_config[i].p_lock );
+                        vlc_mutex_unlock( p_item->p_lock );
 
                         intf_WarnMsg( 7, "config: found <%s> option %s=%s",
-                                      p_module->psz_name,
-                                      p_module->p_config[i].psz_name,
-                                      p_module->p_config[i].psz_value != NULL ?
-                                        p_module->p_config[i].psz_value :
-                                        "(NULL)" );
+                                         p_module->psz_name,
+                                         p_item->psz_name,
+                                         p_item->psz_value != NULL ?
+                                           p_item->psz_value : "(NULL)" );
                         break;
                     }
                 }
@@ -443,9 +441,10 @@ int config_LoadConfigFile( const char *psz_module_name )
 int config_SaveConfigFile( const char *psz_module_name )
 {
     module_t *p_module;
+    module_config_t *p_item;
     FILE *file;
     char p_line[1024], *p_index2;
-    int i, i_sizebuf = 0;
+    int i_sizebuf = 0;
     char *p_bigbuffer, *p_index;
     boolean_t b_backup;
     char *psz_filename, *psz_homedir;
@@ -469,12 +468,12 @@ int config_SaveConfigFile( const char *psz_module_name )
         return -1;
     }
     sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
+
 #ifndef WIN32
-    i = mkdir( psz_filename, 0755 );
+    if( mkdir( psz_filename, 0755 ) && errno != EEXIST )
 #else
-    i = mkdir( psz_filename );
+    if( mkdir( psz_filename ) && errno != EEXIST )
 #endif
-    if( i && errno != EEXIST )
     {
         intf_ErrMsg( "config error: couldn't create %s (%s)",
                      psz_filename, strerror(errno) );
@@ -596,30 +595,31 @@ int config_SaveConfigFile( const char *psz_module_name )
         if( p_module->psz_longname )
             fprintf( file, "###\n###  %s\n###\n", p_module->psz_longname );
 
-        for( i = 0; i < p_module->i_config_lines; i++ )
+        for( p_item = p_module->p_config;
+             p_item->i_type != MODULE_CONFIG_HINT_END;
+             p_item++ )
         {
-            if( p_module->p_config[i].i_type & MODULE_CONFIG_HINT )
+            if( p_item->i_type & MODULE_CONFIG_HINT )
                 /* ignore hints */
                 continue;
 
-            switch( p_module->p_config[i].i_type )
+            switch( p_item->i_type )
             {
             case MODULE_CONFIG_ITEM_BOOL:
             case MODULE_CONFIG_ITEM_INTEGER:
-                if( p_module->p_config[i].psz_text )
-                    fprintf( file, "# %s %s\n", p_module->p_config[i].psz_text,
-                             MODULE_CONFIG_ITEM_BOOL?"<boolean>":"<integer>" );
-                fprintf( file, "%s=%i\n", p_module->p_config[i].psz_name,
-                         p_module->p_config[i].i_value );
+                if( p_item->psz_text )
+                    fprintf( file, "# %s %s\n", p_item->psz_text,
+                             MODULE_CONFIG_ITEM_BOOL ? _("<boolean>")
+                                                     : _("<integer>") );
+                fprintf( file, "%s=%i\n", p_item->psz_name,
+                         p_item->i_value );
                 break;
 
             default:
-                if( p_module->p_config[i].psz_text )
-                    fprintf( file, "# %s <string>\n",
-                             p_module->p_config[i].psz_text );
-                fprintf( file, "%s=%s\n", p_module->p_config[i].psz_name,
-                         p_module->p_config[i].psz_value?
-                         p_module->p_config[i].psz_value:"" );
+                if( p_item->psz_text )
+                    fprintf( file, _("# %s <string>\n"), p_item->psz_text );
+                fprintf( file, "%s=%s\n", p_item->psz_name,
+                         p_item->psz_value ? p_item->psz_value : "" );
             }
         }
 
@@ -652,8 +652,9 @@ int config_SaveConfigFile( const char *psz_module_name )
 int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
                         boolean_t b_ignore_errors )
 {
-    int i_cmd, i, i_index, i_longopts_size;
+    int i_cmd, i_index, i_longopts_size;
     module_t *p_module;
+    module_config_t *p_item;
     struct option *p_longopts;
 
     /* Short options */
@@ -713,14 +714,16 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
          p_module != NULL ;
          p_module = p_module->next )
     {
-        for( i = 0; i < p_module->i_config_lines; i++ )
+        for( p_item = p_module->p_config;
+             p_item->i_type != MODULE_CONFIG_HINT_END;
+             p_item++ )
         {
-            if( p_module->p_config[i].i_type & MODULE_CONFIG_HINT )
+            if( p_item->i_type & MODULE_CONFIG_HINT )
                 /* ignore hints */
                 continue;
-            p_longopts[i_index].name = p_module->p_config[i].psz_name;
+            p_longopts[i_index].name = p_item->psz_name;
             p_longopts[i_index].has_arg =
-                (p_module->p_config[i].i_type == MODULE_CONFIG_ITEM_BOOL)?
+                (p_item->i_type == MODULE_CONFIG_ITEM_BOOL)?
                                                no_argument : required_argument;
             p_longopts[i_index].flag = 0;
             p_longopts[i_index].val = 0;

@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.4 2002/03/21 07:11:57 gbazin Exp $
+ * $Id: configuration.h,v 1.5 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -72,7 +72,7 @@ void   config_PutPszVariable( const char *psz_name, char *psz_value );
 int config_LoadConfigFile( const char *psz_module_name );
 int config_SaveConfigFile( const char *psz_module_name );
 module_config_t *config_FindConfig( const char *psz_name );
-module_config_t *config_Duplicate ( module_t *p_module );
+module_config_t *config_Duplicate ( module_config_t * );
 char *config_GetHomeDir( void );
 int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
                         boolean_t b_ignore_errors );

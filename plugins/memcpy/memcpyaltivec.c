@@ -2,7 +2,7 @@
  * memcpyaltivec.c : Altivec memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpyaltivec.c,v 1.4 2002/04/16 23:00:54 massiot Exp $
+ * $Id: memcpyaltivec.c,v 1.5 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -44,7 +44,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "Altivec memcpy module" )
+    SET_DESCRIPTION( _("AltiVec memcpy module") )
     ADD_CAPABILITY( MEMCPY, 100 )
     ADD_REQUIREMENT( ALTIVEC )
     ADD_SHORTCUT( "altivec" )

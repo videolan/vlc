@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.13 2002/02/24 22:06:50 sam Exp $
+ * $Id: lpcm_adec.c,v 1.14 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -68,7 +68,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "Linear PCM audio decoder" )
+    SET_DESCRIPTION( _("linear PCM audio decoder") )
     ADD_CAPABILITY( DECODER, 100 )
 MODULE_INIT_STOP
 

@@ -2,7 +2,7 @@
  * i420_rgb.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_rgb.c,v 1.7 2002/03/17 17:00:38 sam Exp $
+ * $Id: i420_rgb.c,v 1.8 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -61,10 +61,12 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
-    SET_DESCRIPTION( "I420,IYUV,YV12 to RGB,RV15,RV16,RV24,RV32 conversions" )
+    SET_DESCRIPTION( _("I420,IYUV,YV12 to "
+                       "RGB,RV15,RV16,RV24,RV32 conversions") )
     ADD_CAPABILITY( CHROMA, 80 )
 #elif defined (MODULE_NAME_IS_chroma_i420_rgb_mmx)
-    SET_DESCRIPTION( "MMX I420,IYUV,YV12 to RV15,RV16,RV24,RV32 conversions" )
+    SET_DESCRIPTION( _( "MMX I420,IYUV,YV12 to "
+                        "RV15,RV16,RV24,RV32 conversions") )
     ADD_CAPABILITY( CHROMA, 100 )
     ADD_REQUIREMENT( MMX )
 #endif

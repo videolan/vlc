@@ -2,7 +2,7 @@
  * downmix3dn.c : accelerated 3D Now! AC3 downmix module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: downmix3dn.c,v 1.8 2002/02/15 13:32:53 sam Exp $
+ * $Id: downmix3dn.c,v 1.9 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Renaud Dartus <reno@via.ecp.fr>
  *
@@ -44,7 +44,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "3D Now! AC3 downmix module" )
+    SET_DESCRIPTION( _("3D Now! AC3 downmix module") )
     ADD_CAPABILITY( DOWNMIX, 200 )
     ADD_REQUIREMENT( 3DNOW )
     ADD_SHORTCUT( "3dn" )

@@ -2,7 +2,7 @@
  * imdctsse.c : accelerated SSE IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdctsse.c,v 1.11 2002/02/15 13:32:53 sam Exp $
+ * $Id: imdctsse.c,v 1.12 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -44,7 +44,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "SSE AC3 IMDCT module" )
+    SET_DESCRIPTION( _("SSE AC3 IMDCT module") )
     ADD_CAPABILITY( IMDCT, 200 )
     ADD_REQUIREMENT( SSE )
     ADD_SHORTCUT( "sse" )

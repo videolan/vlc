@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.4 2002/04/10 16:26:21 jobi Exp $
+ * $Id: file.c,v 1.5 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -57,7 +57,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
  
 MODULE_INIT_START
-    SET_DESCRIPTION( "Standard filesystem file reading" )
+    SET_DESCRIPTION( _("Standard filesystem file reading") )
     ADD_CAPABILITY( ACCESS, 50 )
     ADD_SHORTCUT( "file" )
     ADD_SHORTCUT( "stream" )

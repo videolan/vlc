@@ -2,7 +2,7 @@
  * mga.c : Matrox Graphic Array plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: mga.c,v 1.16 2002/02/15 13:32:53 sam Exp $
+ * $Id: mga.c,v 1.17 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -64,7 +64,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "Matrox Graphic Array video module" )
+    SET_DESCRIPTION( _("Matrox Graphic Array video module") )
     ADD_CAPABILITY( VOUT, 10 )
     ADD_SHORTCUT( "mga" )
 MODULE_INIT_STOP

@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.8 2002/03/19 00:30:44 sam Exp $
+ * $Id: deinterlace.c,v 1.9 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,7 +52,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "deinterlacing module" )
+    SET_DESCRIPTION( _("deinterlacing module") )
     /* Capability score set to 0 because we don't want to be spawned
      * as a video output unless explicitly requested to */
     ADD_CAPABILITY( VOUT, 0 )

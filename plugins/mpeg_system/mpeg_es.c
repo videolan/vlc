@@ -2,7 +2,7 @@
  * mpeg_es.c : Elementary Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_es.c,v 1.7 2002/03/19 00:30:44 sam Exp $
+ * $Id: mpeg_es.c,v 1.8 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -58,7 +58,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "ISO 13818-2 MPEG Elementary Stream input" )
+    SET_DESCRIPTION( _("ISO 13818-2 MPEG Elementary Stream input") )
     ADD_CAPABILITY( DEMUX, 150 )
     ADD_SHORTCUT( "es" )
 MODULE_INIT_STOP

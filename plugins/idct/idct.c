@@ -2,7 +2,7 @@
  * idct.c : C IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idct.c,v 1.20 2002/02/15 13:32:53 sam Exp $
+ * $Id: idct.c,v 1.21 2002/04/19 13:56:11 sam Exp $
  *
  * Author: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -44,7 +44,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "IDCT module" )
+    SET_DESCRIPTION( _("IDCT module") )
     ADD_CAPABILITY( IDCT, 50 )
     ADD_SHORTCUT( "c" )
     ADD_SHORTCUT( "idct" )

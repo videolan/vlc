@@ -2,7 +2,7 @@
  * glide.c : 3dfx Glide plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: glide.c,v 1.13 2002/03/16 23:03:19 sam Exp $
+ * $Id: glide.c,v 1.14 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -69,7 +69,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "3dfx Glide module" )
+    SET_DESCRIPTION( _("3dfx Glide module") )
     ADD_CAPABILITY( VOUT, 20 )
     ADD_SHORTCUT( "glide" )
     ADD_SHORTCUT( "3dfx" )

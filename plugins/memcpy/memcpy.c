@@ -2,7 +2,7 @@
  * memcpy.c : classic memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpy.c,v 1.7 2002/04/03 22:36:50 massiot Exp $
+ * $Id: memcpy.c,v 1.8 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -63,13 +63,13 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
 #ifdef MODULE_NAME_IS_memcpy
-    SET_DESCRIPTION( "libc memcpy module" )
+    SET_DESCRIPTION( _("libc memcpy module") )
     ADD_CAPABILITY( MEMCPY, 50 )
     ADD_SHORTCUT( "c" )
     ADD_SHORTCUT( "libc" )
     ADD_SHORTCUT( "memcpy" )
 #elif defined( MODULE_NAME_IS_memcpy3dn )
-    SET_DESCRIPTION( "3D Now! memcpy module" )
+    SET_DESCRIPTION( _("3D Now! memcpy module") )
     ADD_CAPABILITY( MEMCPY, 100 )
     ADD_REQUIREMENT( 3DNOW )
     ADD_SHORTCUT( "3dn" )
@@ -77,13 +77,13 @@ MODULE_INIT_START
     ADD_SHORTCUT( "memcpy3dn" )
     ADD_SHORTCUT( "memcpy3dnow" )
 #elif defined( MODULE_NAME_IS_memcpymmx )
-    SET_DESCRIPTION( "MMX memcpy module" )
+    SET_DESCRIPTION( _("MMX memcpy module") )
     ADD_CAPABILITY( MEMCPY, 100 )
     ADD_REQUIREMENT( MMX )
     ADD_SHORTCUT( "mmx" )
     ADD_SHORTCUT( "memcpymmx" )
 #elif defined( MODULE_NAME_IS_memcpymmxext )
-    SET_DESCRIPTION( "MMX EXT memcpy module" )
+    SET_DESCRIPTION( _("MMX EXT memcpy module") )
     ADD_CAPABILITY( MEMCPY, 200 )
     ADD_REQUIREMENT( MMXEXT )
     ADD_SHORTCUT( "mmxext" )

@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.17 2002/03/01 00:33:18 massiot Exp $
+ * $Id: dummy.c,v 1.18 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,7 +46,7 @@ MODULE_CONFIG_STOP
 
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "dummy functions module" )
+    SET_DESCRIPTION( _("dummy functions module") )
     /* Capability score set to 0 because we don't want to be spawned
      * unless explicitly requested to */
     ADD_CAPABILITY( AOUT, 0 )

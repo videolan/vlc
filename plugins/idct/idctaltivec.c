@@ -2,7 +2,7 @@
  * idctaltivec.c : Altivec IDCT module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: idctaltivec.c,v 1.23 2002/02/15 13:32:53 sam Exp $
+ * $Id: idctaltivec.c,v 1.24 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -46,7 +46,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "Altivec IDCT module" )
+    SET_DESCRIPTION( _("Altivec IDCT module") )
     ADD_CAPABILITY( IDCT, 200 )
     ADD_REQUIREMENT( ALTIVEC )
     ADD_SHORTCUT( "altivec" )

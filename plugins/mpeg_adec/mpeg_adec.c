@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.21 2002/02/24 22:06:50 sam Exp $
+ * $Id: mpeg_adec.c,v 1.22 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -66,7 +66,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "Mpeg I layer 1/2 audio decoder" )
+    SET_DESCRIPTION( _("MPEG I/II layer 1/2 audio decoder") )
     ADD_CAPABILITY( DECODER, 100 )
     ADD_REQUIREMENT( FPU )
     ADD_SHORTCUT( "builtin" )

@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dvd.c,v 1.30 2002/04/06 04:22:27 sam Exp $
+ * $Id: dvd.c,v 1.31 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -63,16 +63,16 @@ static void UnprobeLibDVDCSS( void );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_CATEGORY_HINT( "[dvd:][device][@raw_device][@[title][,[chapter][,angle]]]", NULL )
+ADD_CATEGORY_HINT( N_("[dvd:][device][@raw_device][@[title][,[chapter][,angle]]]"), NULL )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     ADD_CAPABILITY( DEMUX, 0 )
 #ifdef GOD_DAMN_DMCA
-    SET_DESCRIPTION( "DVD input module, uses libdvdcss if present" )
+    SET_DESCRIPTION( _("DVD input module, uses libdvdcss if present") )
     ADD_CAPABILITY( ACCESS, 90 )
 #else
-    SET_DESCRIPTION( "DVD input module, uses libdvdcss" )
+    SET_DESCRIPTION( _("DVD input module, uses libdvdcss") )
     ADD_CAPABILITY( ACCESS, 100 )
 #endif
     ADD_SHORTCUT( "dvd" )

@@ -2,7 +2,7 @@
  * beos.cpp : BeOS plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: beos.cpp,v 1.17 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: beos.cpp,v 1.18 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -46,7 +46,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "BeOS standard API module" )
+    SET_DESCRIPTION( _("BeOS standard API module") )
     ADD_CAPABILITY( INTF, 100 )
     ADD_CAPABILITY( VOUT, 100 )
     ADD_CAPABILITY( AOUT, 100 )

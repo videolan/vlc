@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.9 2002/02/25 11:25:22 sam Exp $
+ * $Id: lirc.c,v 1.10 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -68,7 +68,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "infrared remote control module" )
+    SET_DESCRIPTION( _("infrared remote control module") )
     ADD_CAPABILITY( INTF, 8 )
     ADD_SHORTCUT( "lirc" )
 MODULE_INIT_STOP

@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.8 2002/04/17 17:00:58 jobi Exp $
+ * $Id: udp.c,v 1.9 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -59,7 +59,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
  
 MODULE_INIT_START
-    SET_DESCRIPTION( "Raw UDP access plug-in" )
+    SET_DESCRIPTION( _("Raw UDP access plug-in") )
     ADD_CAPABILITY( ACCESS, 0 )
     ADD_SHORTCUT( "udp" )
     ADD_SHORTCUT( "udpstream" )

@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.21 2002/03/15 01:47:16 stef Exp $
+ * $Id: ac3_spdif.c,v 1.22 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -116,7 +116,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "SPDIF pass-through AC3 decoder" )
+    SET_DESCRIPTION( _("SPDIF pass-through AC3 decoder") )
     ADD_CAPABILITY( DECODER, 0 )
     ADD_SHORTCUT( "ac3_spdif" )
     ADD_SHORTCUT( "pass_through" )

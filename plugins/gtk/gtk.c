@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.18 2002/03/31 22:35:44 gbazin Exp $
+ * $Id: gtk.c,v 1.19 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -62,23 +62,23 @@ static gint GtkManage         ( gpointer p_data );
 /*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
-#define TOOLTIPS_TEXT "hide tooltips"
-#define TOOLTIPS_LONGTEXT "Do not show tooltips for configuration options"
+#define TOOLTIPS_TEXT N_("hide tooltips")
+#define TOOLTIPS_LONGTEXT N_("Do not show tooltips for configuration options.")
 
-#define PREFS_MAXH_TEXT "maximum height for the configuration windows"
-#define PREFS_MAXH_LONGTEXT "You can set the maximum height that the " \
-                            "configuration windows in the prefences menu " \
-                            "will take"
+#define PREFS_MAXH_TEXT N_("maximum height for the configuration windows")
+#define PREFS_MAXH_LONGTEXT N_( \
+    "You can set the maximum height that the configuration windows in the " \
+    "preferences menu will occupy.")
 
 MODULE_CONFIG_START
-    ADD_CATEGORY_HINT( "Misc Options", NULL )
+    ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
     ADD_BOOL    ( "gtk_hide_tooltips", NULL, TOOLTIPS_TEXT, TOOLTIPS_LONGTEXT )
     ADD_INTEGER ( "gtk_prefs_maxh", 480, NULL, PREFS_MAXH_TEXT,
                   PREFS_MAXH_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "Gtk+ interface module" )
+    SET_DESCRIPTION( _("Gtk+ interface module") )
 #ifndef WIN32
     if( getenv( "DISPLAY" ) == NULL )
     {

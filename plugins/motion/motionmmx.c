@@ -2,7 +2,7 @@
  * motionmmx.c : MMX motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionmmx.c,v 1.15 2002/02/15 13:32:53 sam Exp $
+ * $Id: motionmmx.c,v 1.16 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -44,7 +44,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "MMX motion compensation module" )
+    SET_DESCRIPTION( _("MMX motion compensation module") )
     ADD_CAPABILITY( MOTION, 150 )
     ADD_REQUIREMENT( MMX )
     ADD_SHORTCUT( "mmx" )

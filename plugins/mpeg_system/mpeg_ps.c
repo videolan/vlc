@@ -2,7 +2,7 @@
  * mpeg_ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ps.c,v 1.11 2002/04/15 23:04:08 massiot Exp $
+ * $Id: mpeg_ps.c,v 1.12 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -57,7 +57,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "ISO 13818-1 MPEG Program Stream input" )
+    SET_DESCRIPTION( _("ISO 13818-1 MPEG Program Stream input") )
     ADD_CAPABILITY( DEMUX, 100 )
     ADD_SHORTCUT( "ps" )
 MODULE_INIT_STOP

@@ -2,7 +2,7 @@
  * qt.cpp : Qt plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: qt.cpp,v 1.9 2002/03/17 17:00:38 sam Exp $
+ * $Id: qt.cpp,v 1.10 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -43,7 +43,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "Qt interface module" )
+    SET_DESCRIPTION( _("Qt interface module") )
 #ifndef WIN32
     if( getenv( "DISPLAY" ) == NULL )
     {

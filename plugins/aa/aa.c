@@ -2,7 +2,7 @@
  * vout_aa.c: Aa video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aa.c,v 1.2 2002/04/10 00:04:04 sam Exp $
+ * $Id: aa.c,v 1.3 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -48,7 +48,7 @@ MODULE_CONFIG_STOP
 
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "ASCII-art video output module" )
+    SET_DESCRIPTION( _("ASCII-art video output module") )
     ADD_CAPABILITY( VOUT, 10 )
     ADD_SHORTCUT( "aa" )
     ADD_SHORTCUT( "aalib" )

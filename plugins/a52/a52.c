@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.6 2002/03/12 20:39:50 gbazin Exp $
+ * $Id: a52.c,v 1.7 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -73,7 +73,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "a52 ATSC A/52 aka AC-3 audio decoder plugin" )
+    SET_DESCRIPTION( _("a52 ATSC A/52 aka AC-3 audio decoder module") )
     ADD_CAPABILITY( DECODER, 40 )
     ADD_SHORTCUT( "a52" )
 MODULE_INIT_STOP

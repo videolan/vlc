@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.15 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: video_parser.c,v 1.16 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -77,15 +77,15 @@ void _M( vdec_getfunctions )( function_list_t * p_function_list )
 #define IDCT_METHOD_VAR                 "mpeg_vdec_idct"
 
 MODULE_CONFIG_START
-ADD_CATEGORY_HINT( "Misc Options", NULL)
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL)
 ADD_PLUGIN( IDCT_METHOD_VAR, MODULE_CAPABILITY_IDCT, NULL, NULL,
-	    "IDCT method", NULL )
+	    N_("IDCT method"), NULL )
 ADD_PLUGIN( MOTION_METHOD_VAR, MODULE_CAPABILITY_MOTION, NULL, NULL,
-	    "motion compensation method", NULL )
+	    N_("motion compensation method"), NULL )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "MPEG I/II video decoder module" )
+    SET_DESCRIPTION( _("MPEG I/II video decoder module") )
     ADD_CAPABILITY( DECODER, 50 )
 MODULE_INIT_STOP
 

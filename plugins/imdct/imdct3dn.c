@@ -2,7 +2,7 @@
  * imdct3dn.c : accelerated 3D Now! IMDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: imdct3dn.c,v 1.10 2002/02/15 13:32:53 sam Exp $
+ * $Id: imdct3dn.c,v 1.11 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Renaud Dartus <reno@via.ecp.fr>
  *
@@ -44,7 +44,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "3D Now! AC3 IMDCT module" )
+    SET_DESCRIPTION( _("3D Now! AC3 IMDCT module") )
     ADD_CAPABILITY( IMDCT, 200 )
     ADD_REQUIREMENT( 3DNOW )
     ADD_SHORTCUT( "3dn" )

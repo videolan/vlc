@@ -2,7 +2,7 @@
  * idctmmxext.c : MMX EXT IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctmmxext.c,v 1.20 2002/02/15 13:32:53 sam Exp $
+ * $Id: idctmmxext.c,v 1.21 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -50,7 +50,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "MMX EXT IDCT module" )
+    SET_DESCRIPTION( _("MMX EXT IDCT module") )
     ADD_CAPABILITY( IDCT, 200 )
     ADD_REQUIREMENT( MMXEXT )
     ADD_SHORTCUT( "mmxext" )

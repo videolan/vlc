@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.23 2002/03/14 01:35:28 stef Exp $
+ * $Id: gtk_menu.c,v 1.24 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -522,7 +522,7 @@ static gint GtkLanguageMenus( gpointer          p_data,
     p_menu = gtk_menu_new();
 
     /* special case for "off" item */
-    snprintf( psz_name, GTK_MENU_LABEL_SIZE, "None" );
+    snprintf( psz_name, GTK_MENU_LABEL_SIZE, _("None") );
     psz_name[ GTK_MENU_LABEL_SIZE - 1 ] = '\0';
 
     p_item = gtk_radio_menu_item_new_with_label( p_group, psz_name );
@@ -681,7 +681,7 @@ static gint GtkTitleMenu( gpointer       p_data,
             p_title_submenu = gtk_menu_new();
         }
 
-        snprintf( psz_name, GTK_MENU_LABEL_SIZE, "Title %d (%d)", i_title,
+        snprintf( psz_name, GTK_MENU_LABEL_SIZE, _("Title %d (%d)"), i_title,
                   p_input_bank->pp_input[0]->stream.pp_areas[i_title]->i_part_nb );
         psz_name[ GTK_MENU_LABEL_SIZE - 1 ] = '\0';
 #if 0
@@ -744,7 +744,7 @@ static gint GtkTitleMenu( gpointer       p_data,
                 }
 
                 snprintf( psz_name, GTK_MENU_LABEL_SIZE,
-                          "Chapter %d", i_chapter + 1 );
+                          _("Chapter %d"), i_chapter + 1 );
                 psz_name[ GTK_MENU_LABEL_SIZE - 1 ] = '\0';
     
                 p_item = gtk_radio_menu_item_new_with_label(
@@ -796,7 +796,7 @@ static gint GtkTitleMenu( gpointer       p_data,
                 gtk_widget_set_sensitive( p_navigation, TRUE );
             }
 #else
-            GtkRadioMenu( p_intf, p_title_item, p_chapter_group, "Chapter",
+            GtkRadioMenu( p_intf, p_title_item, p_chapter_group, _("Chapter"),
                 p_input_bank->pp_input[0]->stream.pp_areas[i_title]->i_part_nb,
                 i_title * 100,
                 p_input_bank->pp_input[0]->stream.p_selected_area->i_part +
@@ -901,7 +901,7 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
 
         p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                             p_intf->p_sys->p_window ), "menubar_title" ) );
-        GtkRadioMenu( p_intf, p_menubar_menu, NULL, "Title",
+        GtkRadioMenu( p_intf, p_menubar_menu, NULL, _("Title"),
                       p_input_bank->pp_input[0]->stream.i_area_nb - 1,
                       p_input_bank->pp_input[0]->stream.p_selected_area->i_id,
                       GtkMenubarTitleToggle );
@@ -922,7 +922,7 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
                              p_intf->p_sys->p_popup ), "popup_navigation" ) );
         GtkTitleMenu( p_intf, p_popup_menu, GtkPopupNavigationToggle );
 #if 0
-        GtkRadioMenu( p_intf, p_menubar_menu, NULL, "Title",
+        GtkRadioMenu( p_intf, p_menubar_menu, NULL, _("Title"),
                         p_input_bank->pp_input[0]->stream.i_area_nb - 1,
                         p_input_bank->pp_input[0]->stream.p_selected_area->i_id,
                         on_menubar_chapter_toggle );
@@ -931,7 +931,7 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
         p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                              p_intf->p_sys->p_window ), "menubar_chapter" ) );
 
-        GtkRadioMenu( p_intf, p_menubar_menu, NULL, "Chapter",
+        GtkRadioMenu( p_intf, p_menubar_menu, NULL, _("Chapter"),
                         p_input_bank->pp_input[0]->stream.p_selected_area->i_part_nb,
                         p_input_bank->pp_input[0]->stream.p_selected_area->i_part,
                         GtkMenubarChapterToggle );

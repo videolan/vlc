@@ -45,7 +45,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "Satellite input module" )
+    SET_DESCRIPTION( _("satellite input module") )
     ADD_CAPABILITY( DEMUX, 0 )
     ADD_CAPABILITY( ACCESS, 50 )
     ADD_SHORTCUT( "satellite" )

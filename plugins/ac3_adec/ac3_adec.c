@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.24 2002/04/05 01:05:22 gbazin Exp $
+ * $Id: ac3_adec.c,v 1.25 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -74,15 +74,15 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
 #define IMDCT_METHOD_VAR                "ac3_imdct"
 
 MODULE_CONFIG_START
-ADD_CATEGORY_HINT( "Misc Options", NULL)
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL)
 ADD_PLUGIN  ( DOWNMIX_METHOD_VAR, MODULE_CAPABILITY_DOWNMIX, NULL, NULL,
-              "AC3 downmix method", NULL )
+              N_("AC3 downmix method"), NULL )
 ADD_PLUGIN  ( IMDCT_METHOD_VAR, MODULE_CAPABILITY_IMDCT, NULL, NULL,
-              "AC3 IMDCT method", NULL )
+              N_("AC3 IMDCT method"), NULL )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "software AC3 decoder" )
+    SET_DESCRIPTION( _("software AC3 decoder") )
     ADD_CAPABILITY( DECODER, 50 )
     ADD_SHORTCUT( "ac3_adec" )
     ADD_SHORTCUT( "ac3" )

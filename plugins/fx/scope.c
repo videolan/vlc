@@ -2,7 +2,7 @@
  * scope.c : Scope effect module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: scope.c,v 1.5 2002/03/18 19:14:52 sam Exp $
+ * $Id: scope.c,v 1.6 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -66,7 +66,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "scope effect module" )
+    SET_DESCRIPTION( _("scope effect module") )
     ADD_CAPABILITY( AOUT, 0 )
     ADD_SHORTCUT( "scope" )
 MODULE_INIT_STOP

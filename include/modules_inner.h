@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.13 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: modules_inner.h,v 1.14 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -77,12 +77,12 @@
  */
 #define MODULE_INIT_START                                                     \
     DECLARE_SYMBOLS;                                                          \
-                                                                              \
     int __VLC_SYMBOL( InitModule ) ( module_t *p_module )                     \
     {                                                                         \
         int i_shortcut = 0;                                                   \
+        struct module_config_s* p_item;                                       \
         p_module->psz_name = MODULE_STRING;                                   \
-        p_module->psz_longname = MODULE_STRING;                               \
+        p_module->psz_longname = _( MODULE_STRING );                          \
         p_module->psz_program = NULL;                                         \
         p_module->i_capabilities = 0;                                         \
         p_module->i_cpu_capabilities = 0;
@@ -91,23 +91,26 @@
         STORE_SYMBOLS;                                                        \
         p_module->pp_shortcuts[ i_shortcut ] = NULL;                          \
         p_module->i_config_items = 0;                                         \
-        for( p_module->i_config_lines = 0;                                    \
-             p_module->i_config_lines < (sizeof(p_config)/                    \
-                                            sizeof(module_config_t));         \
-             p_module->i_config_lines++ )                                     \
+        for( p_item = p_config;                                               \
+             p_item->i_type != MODULE_CONFIG_HINT_END;                        \
+             p_item++ )                                                       \
         {                                                                     \
-            if( p_config[p_module->i_config_lines].i_type &                   \
-                MODULE_CONFIG_ITEM )                                          \
+            if( p_item->i_type & MODULE_CONFIG_ITEM )                         \
                 p_module->i_config_items++;                                   \
         }                                                                     \
         vlc_mutex_init( &p_module->config_lock );                             \
-        p_module->p_config_orig = p_config;                                   \
-        p_module->p_config = config_Duplicate( p_module );                    \
+        p_module->p_config = config_Duplicate( p_config );                    \
         if( p_module->p_config == NULL )                                      \
         {                                                                     \
             intf_ErrMsg( MODULE_STRING                                        \
                          " InitModule error: can't duplicate p_config" );     \
             return( -1 );                                                     \
+        }                                                                     \
+        for( p_item = p_module->p_config;                                     \
+             p_item->i_type != MODULE_CONFIG_HINT_END;                        \
+             p_item++ )                                                       \
+        {                                                                     \
+            p_item->p_lock = &p_module->config_lock;                          \
         }                                                                     \
         return( 0 );                                                          \
     }
@@ -140,7 +143,6 @@
     {                                                                         \
         p_module->p_functions =                                               \
           ( module_functions_t * )malloc( sizeof( module_functions_t ) );     \
-        p_module->p_config_orig = p_config;                                   \
         if( p_module->p_functions == NULL )                                   \
         {                                                                     \
             return( -1 );                                                     \
@@ -159,7 +161,6 @@
 #define MODULE_DEACTIVATE_START                                               \
     int __VLC_SYMBOL( DeactivateModule )( module_t *p_module )                \
     {                                                                         \
-        p_module->p_config_orig = NULL;                                       \
         free( p_module->p_functions );
 
 #define MODULE_DEACTIVATE_STOP                                                \

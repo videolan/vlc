@@ -2,7 +2,7 @@
  * idctclassic.c : Classic IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctclassic.c,v 1.21 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: idctclassic.c,v 1.22 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -44,7 +44,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "classic IDCT module" )
+    SET_DESCRIPTION( _("classic IDCT module") )
     ADD_CAPABILITY( IDCT, 100 )
     ADD_SHORTCUT( "classic" )
     ADD_SHORTCUT( "idctclassic" )

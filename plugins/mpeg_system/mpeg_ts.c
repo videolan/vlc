@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ts.c,v 1.7 2002/03/18 19:14:52 sam Exp $
+ * $Id: mpeg_ts.c,v 1.8 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *
@@ -55,7 +55,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "ISO 13818-1 MPEG Transport Stream input" )
+    SET_DESCRIPTION( _("ISO 13818-1 MPEG Transport Stream input") )
     ADD_CAPABILITY( DEMUX, 160 )
     ADD_SHORTCUT( "ts" )
 MODULE_INIT_STOP

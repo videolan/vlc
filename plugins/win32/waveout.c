@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.6 2002/03/20 23:00:16 gbazin Exp $
+ * $Id: waveout.c,v 1.7 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -48,7 +48,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "Win32 waveOut extension module" )
+    SET_DESCRIPTION( _("Win32 waveOut extension module") )
     ADD_CAPABILITY( AOUT, 250 )
     ADD_SHORTCUT( "waveout" )
 MODULE_INIT_STOP

@@ -2,7 +2,7 @@
  * directx.c : Windows DirectX plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.6 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: directx.c,v 1.7 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -47,7 +47,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "DirectX extension module" )
+    SET_DESCRIPTION( _("DirectX extension module") )
     ADD_CAPABILITY( AOUT, 150 )
     ADD_CAPABILITY( VOUT, 150 )
     ADD_SHORTCUT( "directx" )

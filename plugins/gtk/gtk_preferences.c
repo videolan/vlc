@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.21 2002/03/31 22:59:01 gbazin Exp $
+ * $Id: gtk_preferences.c,v 1.22 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -118,7 +118,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                                    intf_thread_t *p_intf )
 {
     module_t *p_module, *p_module_bis;
-    int i;
+    module_config_t *p_item;
 
     guint rows = 0;
 
@@ -213,10 +213,10 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     gtk_container_add( GTK_CONTAINER(config_dialog_vbox), config_notebook );
 
     /* Enumerate config options and add corresponding config boxes */
-    for( i = 0; i < p_module->i_config_lines; i++ )
+    p_item = p_module->p_config;
+    do
     {
-
-        switch( p_module->p_config[i].i_type )
+        switch( p_item->i_type )
         {
 
         case MODULE_CONFIG_HINT_CATEGORY:
@@ -270,26 +270,27 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                                           _requisition.height );
 
             }
-            if( p_module->p_config[i].i_type == MODULE_CONFIG_HINT_END ) break;
-
 
             /*
              * Now we can start taking care of the new category
              */
 
-            /* create a new table for right-left alignment of children */
-            category_table = gtk_table_new( 0, 0, FALSE );
-            gtk_table_set_col_spacings( GTK_TABLE(category_table), 4 );
-            rows = 0;
+            if( p_item->i_type == MODULE_CONFIG_HINT_CATEGORY )
+            {
+                /* create a new table for right-left alignment of children */
+                category_table = gtk_table_new( 0, 0, FALSE );
+                gtk_table_set_col_spacings( GTK_TABLE(category_table), 4 );
+                rows = 0;
 
-            /* create a new category label */
-            category_label = gtk_label_new( p_module->p_config[i].psz_text );
+                /* create a new category label */
+                category_label = gtk_label_new( p_item->psz_text );
+            }
 
             break;
 
         case MODULE_CONFIG_ITEM_PLUGIN:
 
-            item_frame = gtk_frame_new( p_module->p_config[i].psz_text );
+            item_frame = gtk_frame_new( p_item->psz_text );
 
             gtk_table_resize( GTK_TABLE(category_table), ++rows, 2 );
             gtk_table_attach_defaults( GTK_TABLE(category_table), item_frame,
@@ -300,7 +301,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
             /* create a new clist widget */
             {
-                gchar * titles[] = { "Name", "Description" };
+                gchar * titles[] = { _("Name"), _("Description") };
 
                 plugin_clist =
                     gtk_clist_new_with_titles( 2, titles );
@@ -318,8 +319,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                      p_module_bis != NULL ;
                      p_module_bis = p_module_bis->next )
                 {
-                    if( p_module_bis->i_capabilities &
-                        (1 << p_module->p_config[i].i_value) )
+                    if( p_module_bis->i_capabilities & (1 << p_item->i_value) )
                     {
                         entry[0] = p_module_bis->psz_name;
                         entry[1] = p_module_bis->psz_longname;
@@ -361,7 +361,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
             /* add a tooltip on mouseover */
             gtk_tooltips_set_tip( p_intf->p_sys->p_tooltips,
                                   plugin_select_button,
-                                  p_module->p_config[i].psz_longtext, "" );
+                                  p_item->psz_longtext, "" );
 
             /* hbox holding the "selected" label and text input */
             item_hbox = gtk_hbox_new( FALSE, 4 );
@@ -375,15 +375,13 @@ static void GtkCreateConfigDialog( char *psz_module_name,
             gtk_object_set_data( GTK_OBJECT(plugin_clist),
                                  "plugin_entry", string_entry );
             gtk_container_add( GTK_CONTAINER(item_hbox), string_entry );
-            vlc_mutex_lock( p_module->p_config[i].p_lock );
+            vlc_mutex_lock( p_item->p_lock );
             gtk_entry_set_text( GTK_ENTRY(string_entry),
-                                p_module->p_config[i].psz_value ?
-                                p_module->p_config[i].psz_value : "" );
-            vlc_mutex_unlock( p_module->p_config[i].p_lock );
+                                p_item->psz_value ? p_item->psz_value : "" );
+            vlc_mutex_unlock( p_item->p_lock );
             /* add a tooltip on mouseover */
             gtk_tooltips_set_tip( p_intf->p_sys->p_tooltips,
-                                  string_entry,
-                                  p_module->p_config[i].psz_longtext, "" );
+                                  string_entry, p_item->psz_longtext, "" );
 
             /* connect signals to the buttons */
             gtk_signal_connect( GTK_OBJECT(plugin_config_button), "clicked",
@@ -395,7 +393,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
             /* connect signal to track changes in the text box */
             gtk_object_set_data( GTK_OBJECT(string_entry), "config_option",
-                                 p_module->p_config[i].psz_name );
+                                 p_item->psz_name );
             gtk_signal_connect( GTK_OBJECT(string_entry), "changed",
                                 GTK_SIGNAL_FUNC(GtkStringChanged),
                                 (gpointer)config_dialog );
@@ -406,43 +404,39 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
             /* add input box with default value */
             string_entry = gtk_entry_new();
-            vlc_mutex_lock( p_module->p_config[i].p_lock );
+            vlc_mutex_lock( p_item->p_lock );
             gtk_entry_set_text( GTK_ENTRY(string_entry),
-                                p_module->p_config[i].psz_value ?
-                                p_module->p_config[i].psz_value : "" );
-            vlc_mutex_unlock( p_module->p_config[i].p_lock );
+                                p_item->psz_value ? p_item->psz_value : "" );
+            vlc_mutex_unlock( p_item->p_lock );
 
             /* connect signal to track changes in the text box */
             gtk_object_set_data( GTK_OBJECT(string_entry), "config_option",
-                                 p_module->p_config[i].psz_name );
+                                 p_item->psz_name );
             gtk_signal_connect( GTK_OBJECT(string_entry), "changed",
                                 GTK_SIGNAL_FUNC(GtkStringChanged),
                                 (gpointer)config_dialog );
 
-            LABEL_AND_WIDGET( p_module->p_config[i].psz_text,
-                              string_entry,
-                              p_module->p_config[i].psz_longtext );
+            LABEL_AND_WIDGET( p_item->psz_text,
+                              string_entry, p_item->psz_longtext );
             break;
 
         case MODULE_CONFIG_ITEM_INTEGER:
 
             /* add input box with default value */
-            item_adj = gtk_adjustment_new( p_module->p_config[i].i_value,
+            item_adj = gtk_adjustment_new( p_item->i_value,
                                            -1, 99999, 1, 10, 10 );
             integer_spinbutton = gtk_spin_button_new( GTK_ADJUSTMENT(item_adj),
                                                       1, 0 );
 
             /* connect signal to track changes in the spinbutton value */
             gtk_object_set_data( GTK_OBJECT(integer_spinbutton),
-                                 "config_option",
-                                 p_module->p_config[i].psz_name );
+                                 "config_option", p_item->psz_name );
             gtk_signal_connect( GTK_OBJECT(integer_spinbutton), "changed",
                                 GTK_SIGNAL_FUNC(GtkIntChanged),
                                 (gpointer)config_dialog );
 
-            LABEL_AND_WIDGET( p_module->p_config[i].psz_text,
-                              integer_spinbutton,
-                              p_module->p_config[i].psz_longtext );
+            LABEL_AND_WIDGET( p_item->psz_text,
+                              integer_spinbutton, p_item->psz_longtext );
             break;
 
         case MODULE_CONFIG_ITEM_BOOL:
@@ -450,22 +444,24 @@ static void GtkCreateConfigDialog( char *psz_module_name,
             /* add check button */
             bool_checkbutton = gtk_check_button_new();
             gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(bool_checkbutton),
-                                          p_module->p_config[i].i_value );
+                                          p_item->i_value );
 
             /* connect signal to track changes in the button state */
             gtk_object_set_data( GTK_OBJECT(bool_checkbutton), "config_option",
-                                 p_module->p_config[i].psz_name );
+                                 p_item->psz_name );
             gtk_signal_connect( GTK_OBJECT(bool_checkbutton), "toggled",
                                 GTK_SIGNAL_FUNC(GtkBoolChanged),
                                 (gpointer)config_dialog );
 
-            LABEL_AND_WIDGET( p_module->p_config[i].psz_text,
-                              bool_checkbutton,
-                              p_module->p_config[i].psz_longtext );
+            LABEL_AND_WIDGET( p_item->psz_text,
+                              bool_checkbutton, p_item->psz_longtext );
             break;
 
         }
+
+        p_item++;
     }
+    while( p_item->i_type != MODULE_CONFIG_HINT_END );
 
 #ifndef MODULE_NAME_IS_gnome
     /* Now let's add the action buttons at the bottom of the page */

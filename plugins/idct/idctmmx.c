@@ -2,7 +2,7 @@
  * idctmmx.c : MMX IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctmmx.c,v 1.23 2002/02/15 13:32:53 sam Exp $
+ * $Id: idctmmx.c,v 1.24 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -50,7 +50,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "MMX IDCT module" )
+    SET_DESCRIPTION( _("MMX IDCT module") )
     ADD_CAPABILITY( IDCT, 150 )
     ADD_REQUIREMENT( MMX )
     ADD_SHORTCUT( "mmx" )

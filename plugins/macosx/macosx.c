@@ -2,7 +2,7 @@
  * macosx.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: macosx.c,v 1.13 2002/02/18 01:34:44 jlj Exp $
+ * $Id: macosx.c,v 1.14 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -46,7 +46,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "MacOS X interface, sound and video module" )
+    SET_DESCRIPTION( _("MacOS X interface, sound and video module") )
     ADD_CAPABILITY( INTF, 100 )
     ADD_CAPABILITY( AOUT, 100 )
     ADD_CAPABILITY( VOUT, 100 )

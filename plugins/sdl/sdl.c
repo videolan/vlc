@@ -2,7 +2,7 @@
  * sdl.c : SDL plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: sdl.c,v 1.19 2001/12/30 07:09:56 sam Exp $
+ * $Id: sdl.c,v 1.20 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -49,7 +49,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "Simple DirectMedia Layer module" )
+    SET_DESCRIPTION( _("Simple DirectMedia Layer module") )
     ADD_CAPABILITY( AOUT, 40 )
     ADD_CAPABILITY( VOUT, 100 )
     ADD_SHORTCUT( "sdl" )

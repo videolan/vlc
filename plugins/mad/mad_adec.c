@@ -66,7 +66,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "Libmad MPEG 1/2/3 audio decoder library" )
+    SET_DESCRIPTION( _("libmad MPEG 1/2/3 audio decoder library") )
     ADD_CAPABILITY( DECODER, 50 )
     ADD_SHORTCUT( "mad" )
 MODULE_INIT_STOP

@@ -2,7 +2,7 @@
  * downmix.c : AC3 downmix module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: downmix.c,v 1.7 2002/02/15 13:32:53 sam Exp $
+ * $Id: downmix.c,v 1.8 2002/04/19 13:56:10 sam Exp $
  *
  * Authors: Renaud Dartus <reno@via.ecp.fr>
  *
@@ -44,7 +44,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "AC3 downmix module" )
+    SET_DESCRIPTION( _("AC3 downmix module") )
     ADD_CAPABILITY( DOWNMIX, 50 )
     ADD_SHORTCUT( "c" )
     ADD_SHORTCUT( "downmix" )

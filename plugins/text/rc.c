@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.11 2002/03/26 23:08:40 gbazin Exp $
+ * $Id: rc.c,v 1.12 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -81,7 +81,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "remote control interface module" )
+    SET_DESCRIPTION( _("remote control interface module") )
     ADD_CAPABILITY( INTF, 20 )
     ADD_SHORTCUT( "rc" )
 MODULE_INIT_STOP

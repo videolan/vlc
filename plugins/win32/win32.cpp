@@ -42,7 +42,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "Win32 interface module" )
+    SET_DESCRIPTION( _("Win32 interface module") )
     ADD_CAPABILITY( INTF, 100 )
     ADD_SHORTCUT( "win" )
     ADD_SHORTCUT( "win32" )

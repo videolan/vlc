@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.15 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: wall.c,v 1.16 2002/04/19 13:56:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -47,7 +47,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "image wall video module" )
+    SET_DESCRIPTION( _("image wall video module") )
     /* Capability score set to 0 because we don't want to be spawned
      * as a video output unless explicitly requested to */
     ADD_CAPABILITY( VOUT, 0 )
