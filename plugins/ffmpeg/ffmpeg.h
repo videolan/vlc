@@ -2,7 +2,7 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.4 2002/07/15 19:33:02 fenrir Exp $
+ * $Id: ffmpeg.h,v 1.5 2002/07/20 18:53:33 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -103,4 +103,8 @@ typedef struct videodec_thread_s
     mtime_t i_pts;
     int     i_framesize;
     byte_t  *p_framedata;
+
+    int i_frame_error;
+    int i_frame_skip;
+    
 } videodec_thread_t;

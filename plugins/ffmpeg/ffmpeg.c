@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.16 2002/07/20 18:01:42 sam Exp $
+ * $Id: ffmpeg.c,v 1.17 2002/07/20 18:53:33 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -71,11 +71,33 @@ void _M( vdec_getfunctions )( function_list_t * p_function_list )
  * Build configuration tree.
  *****************************************************************************/
 
+#define ERROR_RESILIENCE_LONGTEXT \
+    "ffmpeg can make errors resiliences.          \n"\
+    "Nevertheless, with buggy encoder (like ISO MPEG-4 encoder from M$) " \
+    "this will produce a lot of errors.\n" \
+    "Valid range is -1 to 99 (-1 disable all errors resiliences)."
+
+#define HURRY_UP_LONGTEXT \
+    "Allow the decoder to partially decode or skip frame(s) " \
+    "when there not enough time.\n It's usefull with low CPU power " \
+    "but it could produce broken pictures (not yet implemented)"
+    
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
+#if LIBAVCODEC_BUILD >= 4611
+  ADD_INTEGER ( "ffmpeg-error-resilience", 0, NULL, 
+                "error resilience", ERROR_RESILIENCE_LONGTEXT )
+  ADD_INTEGER ( "ffmpeg-workaround-bugs", 0, NULL, 
+                "workaround bugs", "0-99, seems to be for msmpeg v3\n"  )
+#endif
+#if LIBAVCODEC_BUILD > 4603
+  ADD_BOOL( "ffmpeg-hurry-up", 0, NULL, "hurry up", HURRY_UP_LONGTEXT ) 
+#endif
+
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "ffmpeg video decoder (MS-MPEG4,MPEG4,SVQ1,H263,H263.I)" )
+    SET_DESCRIPTION( "ffmpeg video decoder(MS-MPEG4,MPEG4,SVQ1,H263,H263.I)" )
     ADD_CAPABILITY( DECODER, 70 )
 MODULE_INIT_STOP
 
@@ -85,7 +107,6 @@ MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
-
 
 
 /*****************************************************************************
@@ -264,7 +285,7 @@ static inline void __NextFrame( videodec_thread_t *p_vdec )
     __PES_NEXT( p_vdec->p_fifo );
 }
 
-/* FIXME FIXME some of them may be wrong */
+/* FIXME FIXME some of them are wrong */
 static int i_ffmpeg_PixFmtToChroma[] = 
 {
 /* PIX_FMT_ANY = -1,PIX_FMT_YUV420P, PIX_FMT_YUV422,
@@ -654,6 +675,7 @@ static void ffmpeg_ConvertPicture( picture_t *p_pic,
 static int InitThread( videodec_thread_t *p_vdec )
 {
     int i_ffmpeg_codec; 
+    int i_tmp;
     
     if( p_vdec->p_fifo->p_demux_data )
     {
@@ -696,12 +718,33 @@ static int InitThread( videodec_thread_t *p_vdec )
     p_vdec->p_context->width  = p_vdec->format.i_width;
     p_vdec->p_context->height = p_vdec->format.i_height;
     
-/*  XXX see them and search what that means 
+/*  XXX
     p_vdec->p_context->workaround_bugs 
+      --> seems to be for msmpeg 3 but can't know what is supposed to do
+
     p_vdec->p_context->strict_std_compliance
+      --> strictly follow mpeg4 standard for decoder or encoder ??
+      
+    p_vdec->p_context->error_resilience
+      --> don't make error resilience, because of some ms encoder witch 
+      use some wrong VLC code.
 */
 
-        if (avcodec_open(p_vdec->p_context, p_vdec->p_codec) < 0)
+#if LIBAVCODEC_BUILD >= 4611
+    i_tmp = config_GetInt( p_vdec->p_fifo, "ffmpeg-workaround-bugs" );
+    p_vdec->p_context->workaround_bugs  = __MAX( __MIN( i_tmp, 99 ), 0 );
+
+    i_tmp = config_GetInt( p_vdec->p_fifo, "ffmpeg-error-resilience" );
+    p_vdec->p_context->error_resilience = __MAX( __MIN( i_tmp, 99 ), -1 );
+#endif
+#if LIBAVCODEC_BUILD >= 4614
+    if( config_GetInt( p_vdec->p_fifo, "grayscale" ) )
+    {
+        p_vdec->p_context->flags|= CODEC_FLAG_GRAY;
+    }
+#endif
+    
+    if (avcodec_open(p_vdec->p_context, p_vdec->p_codec) < 0)
     {
         msg_Err( p_vdec->p_fifo, "cannot open codec (%s)",
                                  p_vdec->psz_namecodec );
@@ -746,6 +789,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
     {
         msg_Warn( p_vdec->p_fifo, "cannot decode one frame (%d bytes)",
                                   p_vdec->i_framesize );
+        p_vdec->i_frame_error++;
         return;
     }
     if( !b_gotpicture || avpicture.linesize[0] == 0 )
