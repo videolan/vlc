@@ -1059,6 +1059,10 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
                     { \
                         b_invalid = VLC_TRUE; break; \
                     } \
+                    else \
+                    { \
+                        store = strdup( psz_parse ); \
+                    } \
                 }; \
                 psz_parse = psz_eof + 1; i_field++;
 
