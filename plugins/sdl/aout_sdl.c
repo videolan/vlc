@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_sdl.c,v 1.16 2001/07/25 19:14:06 massiot Exp $
+ * $Id: aout_sdl.c,v 1.17 2001/07/27 16:40:20 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -38,14 +38,14 @@
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 
-#ifdef HAVE_SDL_SDL_H
+#if HAVE_SDL_SDL_H
 #   include <SDL/SDL.h>
-#elif defined(HAVE_SDL11_SDL_H)
+#elif HAVE_SDL11_SDL_H
 #   include <SDL11/SDL.h>
-#elif defined(HAVE_SDL12_SDL_H)
+#elif HAVE_SDL12_SDL_H
 #   include <SDL12/SDL.h>
 #else
-#    error
+#   error
 #endif
 
 #include "config.h"
