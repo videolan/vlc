@@ -49,7 +49,6 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout , char * psz_url_arg , cha
         network_socket_t        socket_desc;
         char                    psz_network[12];       
         struct                  sockaddr_in addr;
-        int                     ttl=15;
               
         p_new = (sap_session_t *)malloc( sizeof ( sap_session_t ) ) ;
         
@@ -60,13 +59,13 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout , char * psz_url_arg , cha
         msg_Dbg (p_sout , "Creating SAP Socket" );
         
         socket_desc.i_type        = NETWORK_UDP;
-        socket_desc.psz_bind_addr = SAP_ADDR;
-        socket_desc.i_bind_port   = SAP_PORT;
-        socket_desc.psz_server_addr   = "";
-        socket_desc.i_server_port     = 0;
+        socket_desc.psz_bind_addr = "";
+        socket_desc.i_bind_port   = 0;
+        socket_desc.psz_server_addr   = SAP_ADDR;
+        socket_desc.i_server_port     = SAP_PORT;
         socket_desc.i_handle          = 0;
         
-        sprintf ( psz_network,"ipv4" ); 
+        sprintf ( psz_network, "ipv4" ); 
 
         p_sout->p_private=(void*) &socket_desc;
         
@@ -84,9 +83,6 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout , char * psz_url_arg , cha
         addr.sin_addr.s_addr = inet_addr(SAP_ADDR);
         addr.sin_port        = htons( SAP_PORT );
     
-        setsockopt( p_new->socket, IPPROTO_IP, IP_MULTICAST_TTL,
-                    (void*)&ttl, sizeof(ttl) );
-     
         p_new->addr = addr;
     
         return(p_new);

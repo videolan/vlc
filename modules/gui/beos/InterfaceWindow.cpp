@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.38 2003/05/17 15:20:46 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.39 2003/05/27 13:22:45 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -965,9 +965,9 @@ InterfaceWindow::_RestoreSettings()
 			set_window_pos( fMessagesWindow, frame );
 		if (fSettings->FindRect( "settings frame", &frame ) == B_OK )
 		{
-		    /* FIXME: Preferences horizontal resizing doesn't work
-		       correctly now */
+		    /* FIXME: Preferences resizing doesn't work correctly yet */
 		    frame.right = frame.left + fPreferencesWindow->Frame().Width();
+		    frame.bottom = frame.top + fPreferencesWindow->Frame().Height();
 			set_window_pos( fPreferencesWindow, frame );
 		}
 		

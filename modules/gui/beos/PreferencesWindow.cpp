@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.24 2003/05/25 17:21:36 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.25 2003/05/27 13:22:45 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -23,6 +23,8 @@
 
 #include <stdlib.h> /* atoi(), strtod() */
 
+#include <String.h>
+
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
@@ -30,7 +32,7 @@
 
 /* TODO:
     - add the needed LockLooper()s
-    - fix horizontal window resizing */
+    - fix window resizing */
 
 /* We use this function to order the items of the BOutlineView */
 int compare_func( const BListItem * _first, const BListItem * _second )
@@ -54,7 +56,7 @@ int compare_func( const BListItem * _first, const BListItem * _second )
 PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
                                       BRect frame, const char * name )
     : BWindow( frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-               B_NOT_ZOOMABLE | B_NOT_H_RESIZABLE ),
+               B_NOT_ZOOMABLE | B_NOT_RESIZABLE ),
       fConfigScroll( NULL ),
       p_intf( p_interface )
 {
