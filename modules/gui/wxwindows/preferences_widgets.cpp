@@ -425,7 +425,7 @@ ModuleListCatConfigControl::ModuleListCatConfigControl( vlc_object_t *p_this,
     vlc_list_release( p_list );
 
     text->SetToolTip( wxU(p_item->psz_longtext) );
-    sizer->Add(text, wxEXPAND );
+    sizer->Add(text, 0, wxEXPAND|wxALL, 5 );
 
     sizer->Add (new wxStaticText( this, -1, wxU( vlc_wraptext( _("Select modules that you want. To get more advanced control, you can also modify the resulting chain by yourself") , 72, ISUTF8 ) ) ) );
 
