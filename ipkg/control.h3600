@@ -1,11 +1,11 @@
-Package: vlc
+Package: gpe-vlc-h3600
 Section: graphics
 Priority: optional
-Version: 0.7.1
-Release: 1
+Version: 0.7.1.test1
+Release: 2
 Architecture: arm
 Source: http://www.videolan.org/vlc/download-sources.html
-Conflicts: gpe-vlc, opie-vlc, opie-libsdl, opie-base
+Conflicts: gpe-vlc, vlc, opie-vlc, opie-base
 Maintainer: Jean-Paul Saman <jpsaman@wxs.nl>
 Depends: libc6, libgtk2.0-0, esddsp
 Copyright: GPL

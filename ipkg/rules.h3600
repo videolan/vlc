@@ -17,7 +17,7 @@ export DESTDIR=${HOME}/arm-linux
 export PKGDIR=${HOME}/packages/vlc-$(VERSION)
 
 export CONFIG_FLAGS="--enable-release --prefix=${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/usr \
-	--enable-plugins \
+	--disable-plugins \
 	--disable-gtk \
 	--disable-gtk2 \
 	--disable-gnome \
@@ -54,16 +54,16 @@ export CONFIG_FLAGS="--enable-release --prefix=${HOME}/arm-linux/task-bootgpe2-v
 	--disable-visual \
 	--enable-freetype \
 	--disable-fribidi \
-	--enable-a52 \
-	--enable-faad \
+	--disable-a52 \
+	--disable-faad \
 	--enable-flac \
 	--enable-libmpeg2 \
 	--enable-dvbpsi \
 	--disable-mkv \
 	--enable-mad \
 	--enable-id3tag \
-	--enable-ffmpeg \
-	--enable-slp \
+	--disable-ffmpeg \
+	--disable-slp \
 	--enable-pda \
 	--x-includes=${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/usr/X11R6/include \
 	--x-libraries=${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/usr/X11R6/lib \
@@ -71,18 +71,9 @@ export CONFIG_FLAGS="--enable-release --prefix=${HOME}/arm-linux/task-bootgpe2-v
 	--with-dvbpsi-tree=${HOME}/arm-linux/vlc-$(VERSION)/libdvbpsi-0.1.3 \
 	--with-mad-tree=${HOME}/arm-linux/vlc-$(VERSION)/libmad-0.15.0b \
 	--with-id3tag-tree=${HOME}/arm-linux/vlc-$(VERSION)/libid3tag-0.15.0b \
-	--with-a52-tree=${HOME}/arm-linux/vlc-$(VERSION)/a52dec-0.7.4 \
-	--with-faad-tree=${HOME}/arm-linux/vlc-$(VERSION)/faad2-20040124 \
 	--with-libmpeg2-tree=${HOME}/arm-linux/vlc-$(VERSION)/mpeg2dec-0.4.0 \
-	--with-slp=${HOME}/arm-linux/vlc-$(VERSION)/openslp-1.0.11/libslp \
 	--with-included-gettext=${HOME}/arm-linux/vlc-$(VERSION)/gettext-0.12.1 \
-	--with-v4l=${HOME}/arm-linux/vlc-$(VERSION)/linux/kernel \
-	--with-ffmpeg-mp3lame \
-	--with-ffmpeg-faac \
-	--with-ffmpeg-tree=${HOME}/arm-linux/vlc-$(VERSION)/ffmpeg-20040103"
-
-# park here ;-0
-# --with-libiconv-prefix=${HOME}/arm-linux//vlc-$(VERSION)/libiconv-1.9.1
+	--with-v4l=${HOME}/arm-linux/vlc-$(VERSION)/linux/kernel"
 
 config:
 	./configure --mandir=$${prefix}/share/man \
@@ -90,24 +81,16 @@ config:
 		--host=arm-linux \
 		--target=arm-linux \
 		$(shell echo $(CONFIG_FLAGS)) \
-	LDFLAGS="-L${HOME}/arm-linux/vlc-$(VERSION)/openslp-1.0.11/libslp/.libs \
-		-L${HOME}/arm-linux/vlc-$(VERSION)/lame-3.93.1/libmp3lame/.libs \
-		-L${HOME}/arm-linux/vlc-$(VERSION)/libid3tag-0.15.0b/.libs \
+	LDFLAGS="-L${HOME}/arm-linux/vlc-$(VERSION)/libid3tag-0.15.0b/.libs \
 		-L${HOME}/arm-linux/vlc-$(VERSION)/flac-1.1.0/src/libFLAC/.libs \
 		-L${HOME}/arm-linux/vlc-$(VERSION)/faac/libfaac/.libs \
-		-L${HOME}/arm-linux/vlc-$(VERSION)/faad2-20040124/libfaad/.libs \
 		-L${HOME}/arm-linux/vlc-$(VERSION)/libdvbpsi-0.1.3/src/.libs/ \
 		-L${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/lib \
 		-L${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/usr/lib \
 		-L${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/usr/X11R6/lib" \
-	CFLAGS="-I${HOME}/arm-linux/vlc-$(VERSION)/openslp-1.0.11/libslp \
-		-I${HOME}/arm-linux/vlc-$(VERSION)/libpng-1.2.5 \
-		-I${HOME}/arm-linux/vlc-$(VERSION)/lame-3.93.1/include \
-		-I${HOME}/arm-linux/vlc-$(VERSION)/libid3tag-0.15.0b \
+	CFLAGS="-I${HOME}/arm-linux/vlc-$(VERSION)/libid3tag-0.15.0b \
 		-I${HOME}/arm-linux/vlc-$(VERSION)/libdvbpsi-0.1.3  \
 		-I${HOME}/arm-linux/vlc-$(VERSION)/flac-1.1.0/include \
-		-I${HOME}/arm-linux/vlc-$(VERSION)/faac/libfaac \
-		-I${HOME}/arm-linux/vlc-$(VERSION)/faad2-20040124/include \
 		-I${HOME}/arm-linux/linux/kernel/include \
 		-I${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/include \
 		-I${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/usr/X11R6/include \
@@ -121,25 +104,16 @@ build:
 	$(MAKE) LDFLAGS="-L${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/usr/X11R6/lib -lX11 -lXext -lXft -lXrender -lXrandr -lfontconfig -lexpat \
 		-L${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/lib \
 		-L${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/usr/lib -lfreetype\
-		-L${HOME}/arm-linux/vlc-$(VERSION)/openslp-1.0.11/libslp/.libs \
-		-L${HOME}/arm-linux/vlc-$(VERSION)/lame-3.93.1/libmp3lame/.libs \
 		-L${HOME}/arm-linux/vlc-$(VERSION)/libid3tag-0.15.0b/.libs \
-		-L${HOME}/arm-linux/vlc-$(VERSION)/libdvbpsi-0.1.3/src/.libs/ \
-		-L${HOME}/arm-linux/vlc-$(VERSION)/flac-1.1.0/src/libFLAC/.libs \
-		-L${HOME}/arm-linux/vlc-$(VERSION)/faad2-20040124/libfaad/.libs \
-		-L${HOME}/arm-linux/vlc-$(VERSION)/faac/libfaac/.libs" \
+		-L${HOME}/arm-linux/vlc-$(VERSION)/libdvbpsi-0.1.3/src/.libs \
+		-L${HOME}/arm-linux/vlc-$(VERSION)/flac-1.1.0/src/libFLAC/.libs" \
 	CFLAGS="-I${HOME}/arm-linux/linux/kernel/include \
 		-I${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/usr/X11R6/include \
 		-I${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/include \
 		-I${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/usr/include \
-		-I${HOME}/arm-linux/vlc-$(VERSION)/openslp-1.0.11/libslp \
-		-I${HOME}/arm-linux/vlc-$(VERSION)/lame-3.93.1/include \
 		-I${HOME}/arm-linux/vlc-$(VERSION)/libid3tag-0.15.0b \
 		-I${HOME}/arm-linux/vlc-$(VERSION)/libdvbpsi-0.1.3 \
-		-I${HOME}/arm-linux/vlc-$(VERSION)/flac-1.1.0/include \
-		-I${HOME}/arm-linux/vlc-$(VERSION)/faad2-20040124/include \
-		-I${HOME}/arm-linux/vlc-$(VERSION)/faac/libfaac \
-		-I${HOME}/arm-linux/vlc-$(VERSION)/openslp-1.0.11/libslp"
+		-I${HOME}/arm-linux/vlc-$(VERSION)/flac-1.1.0/include" 
 
 clean:
 	-$(MAKE) distclean
