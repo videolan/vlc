@@ -3122,8 +3122,8 @@ dnl
 dnl  ALSA module
 dnl
 AC_ARG_ENABLE(alsa,
-  [  --enable-alsa           ALSA sound support for Linux (default disabled)],
-  [if test "${enable_alsa}" = "yes"
+  [  --enable-alsa           ALSA sound support for Linux (default enabled)],
+  [if test "${enable_alsa}" != "no"
    then
      AC_CHECK_HEADER(alsa/asoundlib.h, AC_CHECK_LIB(asound, main, have_alsa="true", have_alsa="false"),have_alsa="false")
      if test "${have_alsa}" = "true"
@@ -3136,7 +3136,9 @@ AC_ARG_ENABLE(alsa,
        VLC_ADD_PLUGINS([alsa])
        VLC_ADD_LDFLAGS([alsa],[-lasound -lm -ldl])
      else
-       AC_MSG_ERROR([Could not find ALSA development headers])
+       if test "${enable_alsa}" = "yes"; then
+         AC_MSG_ERROR([Could not find ALSA development headers])
+       fi
      fi
    fi])
 
