@@ -2,7 +2,7 @@
  * .c: VLM interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vlm.h,v 1.1 2004/03/05 14:03:20 garf Exp $
+ * $Id$
  *
  * Authors: Simon Latapie <garf@videolan.org>
  *          Laurent Aimar <fenrir@videolan.org>
@@ -79,6 +79,21 @@ typedef struct
 
 } vlm_schedule_t;
 
+/* ok, here is the structure of a vlm_message:
+   The parent node is ( name_of_the_command , NULL ), or
+   ( name_of_the_command , message_error ) on error.
+   If a node has children, it should not have a value (=NULL).*/
+typedef struct vlm_message
+{
+    char *psz_name;
+    char *psz_value;
+
+    int i_child;
+
+    struct vlm_message **child;
+
+} vlm_message_t;
+
 
 typedef struct
 {
@@ -106,4 +121,5 @@ typedef struct
 vlm_t *__vlm_New ( vlc_object_t * );
 void   vlm_Delete( vlm_t * );
 
-int vlm_ExecuteCommand( vlm_t *, char *, char **);
+int vlm_ExecuteCommand( vlm_t *, char *, vlm_message_t **);
+void vlm_MessageDelete( vlm_message_t* );

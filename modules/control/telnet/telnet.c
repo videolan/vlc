@@ -125,7 +125,8 @@ typedef struct
     int        i_tel_cmd; // for specific telnet commands
 } telnet_client_t;
 
-static void Write_message( telnet_client_t * , char * , int );
+static char* MessageToString( vlm_message_t* , int );
+static void Write_message( telnet_client_t * , vlm_message_t* , char * , int );
 static int  SocketListen( intf_thread_t * , int );
 
 struct intf_sys_t
@@ -242,7 +243,7 @@ static void Run( intf_thread_t *p_intf )
             cl->fd = fd;
             cl->buffer_write = NULL;
             cl->p_buffer_write = cl->buffer_write;
-            Write_message( cl, "Password:\xff\xfb\x01", WRITE_MODE_PWD );
+            Write_message( cl, NULL, "Password:\xff\xfb\x01", WRITE_MODE_PWD );
 
             TAB_APPEND( p_sys->i_clients, p_sys->clients, cl );
         }
@@ -350,7 +351,7 @@ static void Run( intf_thread_t *p_intf )
 
                 if( cl->p_buffer_read - cl->buffer_read == 999 ) // too long !
                 {
-                    Write_message( cl , "Line too long\n" , cl->i_mode + 2 );
+                    Write_message( cl , NULL, "Line too long\n" , cl->i_mode + 2 );
                 }
             }
         }
@@ -369,12 +370,12 @@ static void Run( intf_thread_t *p_intf )
                 *cl->p_buffer_read = '\0';
                 if( strcmp( s_password, cl->buffer_read ) == 0 )
                 {
-                    Write_message( cl , "\xff\xfc\x01\nWelcome, Master\n> ", WRITE_MODE_CMD );
+                    Write_message( cl , NULL, "\xff\xfc\x01\nWelcome, Master\n> ", WRITE_MODE_CMD );
                 }
                 else
                 {
                     /* wrong password */
-                    Write_message( cl , "\n\rTry again, you polio:\n" , WRITE_MODE_PWD );
+                    Write_message( cl , NULL, "\n\rTry again, you polio:\n" , WRITE_MODE_PWD );
                 }
             }
             else if( cl->i_mode == READ_MODE_CMD && *cl->p_buffer_read == '\n' )
@@ -395,32 +396,48 @@ static void Run( intf_thread_t *p_intf )
                 }
                 else
                 {
-                    char *message;
+                    vlm_message_t *message;
 
                     /* create a standard string */
                     *cl->p_buffer_read = '\0';
 
                     vlm_ExecuteCommand( p_sys->mediatheque, cl->buffer_read , &message);
 
-                    Write_message( cl , message , WRITE_MODE_CMD );
+                    Write_message( cl , message, NULL , WRITE_MODE_CMD );
 
-                    free( message );
+                    vlm_MessageDelete( message );
                 }
             }
         }
     }
 }
 
-static void Write_message( telnet_client_t * client, char * message, int i_mode )
+static void Write_message( telnet_client_t * client, vlm_message_t * message, char * string_message, int i_mode )
 {
+    char *psz_message;
+
     client->p_buffer_read = client->buffer_read;
     (client->p_buffer_read)[0] = 0; // if (cl->p_buffer_read)[0] = '\n'
     if( client->buffer_write ) free( client->buffer_write );
-    client->buffer_write = malloc( strlen( message ) + 1 );
-    strcpy( client->buffer_write , message );
+
+    /* generate the psz_message string */
+    if( message != NULL ) /* ok, look for vlm_message_t */
+    {
+        psz_message = MessageToString( message , 0 );
+        psz_message = realloc( psz_message , strlen( psz_message ) + strlen( "\n> " ) + 1 );
+        strcat( psz_message , "\n> " );
+    }
+    else /* it is a basic string_message */
+    {
+        psz_message = strdup( string_message );
+    }
+
+    client->buffer_write = malloc( strlen( psz_message ) + 1 );
+    strcpy( client->buffer_write , psz_message );
     client->p_buffer_write = client->buffer_write;
-    client->i_buffer_write = strlen( message );
+    client->i_buffer_write = strlen( psz_message );
     client->i_mode = i_mode;
+    free( psz_message );
 }
 
 /* Does what we want except select and accept */
@@ -498,3 +515,48 @@ socket_failed:
     return -1;
 }
 
+/* we need the level of the message to put a beautiful indentation.
+   first level is 0 */
+static char* MessageToString( vlm_message_t* message , int i_level )
+{
+    int i;
+    char *psz_message;
+
+    if( message == NULL )
+    {
+        return strdup( "" );
+    }
+    else if( i_level == 0 && message->i_child == 0 && message->psz_value == NULL  ) /* a command is successful */
+    {
+        /* don't write anything */
+        return strdup( "" );
+    }
+    else
+    {
+        psz_message = strdup( "" );
+        psz_message = realloc( psz_message , strlen( psz_message ) + strlen( message->psz_name ) + i_level + 1 );
+        for( i = 0 ; i < i_level ; i++ )
+        {
+            strcat( psz_message , " " );
+        }
+        strcat( psz_message , message->psz_name );
+        if( message->psz_value )
+        {
+            psz_message = realloc( psz_message , strlen( psz_message ) + strlen( message->psz_value ) + 3 + 1 );
+            strcat( psz_message , " : " );
+            strcat( psz_message , message->psz_value );
+        }
+
+        for( i = 0 ; i < message->i_child ; i++ )
+        {
+            char *child_message = MessageToString( message->child[i] , i_level + 1 );
+
+            psz_message = realloc( psz_message , strlen( psz_message ) +  strlen( child_message ) + 1 + 1 );
+            strcat( psz_message, "\n" );
+            strcat( psz_message, child_message );
+            free( child_message );
+        }
+
+        return psz_message;
+    }
+}
