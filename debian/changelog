@@ -1,3 +1,10 @@
+vlc (0.2.70-1) unstable; urgency=low
+
+  * New upstream release.
+  * Non-i386 package builds really fixed (Closes: #89285).
+
+ -- Samuel Hocevar <sam@zoy.org>  Sat,  7 Apr 2001 05:52:00 +0200
+
 vlc (0.2.63-3) unstable; urgency=low
 
   * Added versioned conflicts/replaces to vlc-gtk (Closes: #88796).
