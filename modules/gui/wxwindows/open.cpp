@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.34 2003/07/26 12:41:52 gbazin Exp $
+ * $Id: open.cpp,v 1.35 2003/07/26 14:19:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -188,30 +188,6 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         wxU(_("Alternatively, you can build an MRL using one of the "
               "following predefined targets:")) );
 
-    /* Create Subtitles File checkox */
-    wxFlexGridSizer *subsfile_sizer = new wxFlexGridSizer( 2, 1, 20 );
-    subsfile_checkbox = new wxCheckBox( panel, SubsFileEnable_Event,
-                                        wxU(_("Subtitles file")) );
-    subsfile_checkbox->SetToolTip( wxU(_("Load an additional subtitles file. "
-                                   "Currently only works with AVI files.")) );
-    subsfile_sizer->Add( subsfile_checkbox, 0,
-                         wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
-    subsfile_button = new wxButton( panel, SubsFileSettings_Event,
-                                    wxU(_("Settings...")) );
-    subsfile_button->Disable();
-
-    char *psz_subsfile = config_GetPsz( p_intf, "sub-file" );
-    if( psz_subsfile && *psz_subsfile )
-    {
-        subsfile_checkbox->SetValue(TRUE);
-        subsfile_button->Enable();
-        subsfile_mrl.Add( wxString(wxT("sub-file=")) + wxU(psz_subsfile) );
-    }
-    if( psz_subsfile ) free( psz_subsfile );
-
-    subsfile_sizer->Add( subsfile_button, 1,
-                         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
-
     /* Create Stream Output checkox */
     wxFlexGridSizer *sout_sizer = new wxFlexGridSizer( 2, 1, 20 );
     sout_checkbox = new wxCheckBox( panel, SoutEnable_Event,
@@ -242,7 +218,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         wxU(_("Capture the stream you are playing to a file")) );
     demuxdump_textctrl = new wxTextCtrl( panel, DemuxDump_Event, wxT(""),
                                          wxDefaultPosition, wxDefaultSize,
-                                         wxTE_PROCESS_ENTER);
+                                         wxTE_PROCESS_ENTER );
     demuxdump_button = new wxButton( panel, DemuxDumpBrowse_Event,
                                      wxU(_("Browse...")) );
 
@@ -307,7 +283,6 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     panel_sizer->Add( mrl_sizer_sizer, 0, wxEXPAND, 5 );
     panel_sizer->Add( label, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( notebook_sizer, 1, wxEXPAND | wxALL, 5 );
-    panel_sizer->Add( subsfile_sizer, 0, wxALIGN_LEFT | wxALL, 5 );
     panel_sizer->Add( sout_sizer, 0, wxALIGN_LEFT | wxALL, 5 );
     panel_sizer->Add( demuxdump_sizer, 0, wxEXPAND | wxALIGN_LEFT | wxALL, 5 );
     panel_sizer->Add( static_line, 0, wxEXPAND | wxALL, 5 );
@@ -355,15 +330,44 @@ wxPanel *OpenDialog::FilePanel( wxWindow* parent )
     wxPanel *panel = new wxPanel( parent, -1, wxDefaultPosition,
                                   wxSize(200, 200) );
 
-    wxBoxSizer *sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxBoxSizer *sizer = new wxBoxSizer( wxVERTICAL );
+
+    /* Create browse file line */
+    wxBoxSizer *file_sizer = new wxBoxSizer( wxHORIZONTAL );
 
     file_combo = new wxComboBox( panel, FileName_Event, wxT(""),
                                  wxPoint(20,25), wxSize(200, -1), 0, NULL );
     wxButton *browse_button = new wxButton( panel, FileBrowse_Event,
                                             wxU(_("Browse...")) );
-    sizer->Add( file_combo, 1, wxALL, 5 );
-    sizer->Add( browse_button, 0, wxALL, 5 );
+    file_sizer->Add( file_combo, 1, wxALL, 5 );
+    file_sizer->Add( browse_button, 0, wxALL, 5 );
 
+    /* Create Subtitles File checkox */
+    wxFlexGridSizer *subsfile_sizer = new wxFlexGridSizer( 2, 1, 20 );
+    subsfile_checkbox = new wxCheckBox( panel, SubsFileEnable_Event,
+                                        wxU(_("Subtitles file")) );
+    subsfile_checkbox->SetToolTip( wxU(_("Load an additional subtitles file. "
+                                   "Currently only works with AVI files.")) );
+    subsfile_sizer->Add( subsfile_checkbox, 0,
+                         wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
+    subsfile_button = new wxButton( panel, SubsFileSettings_Event,
+                                    wxU(_("Settings...")) );
+    subsfile_button->Disable();
+
+    char *psz_subsfile = config_GetPsz( p_intf, "sub-file" );
+    if( psz_subsfile && *psz_subsfile )
+    {
+        subsfile_checkbox->SetValue(TRUE);
+        subsfile_button->Enable();
+        subsfile_mrl.Add( wxString(wxT("sub-file=")) + wxU(psz_subsfile) );
+    }
+    if( psz_subsfile ) free( psz_subsfile );
+
+    subsfile_sizer->Add( subsfile_button, 1,
+                         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
+
+    sizer->Add( file_sizer, 0, wxEXPAND | wxALL, 5 );
+    sizer->Add( subsfile_sizer, 0, wxEXPAND | wxALL, 5 );
     panel->SetSizerAndFit( sizer );
     return panel;
 }
