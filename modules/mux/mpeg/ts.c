@@ -847,6 +847,11 @@ static int Mux( sout_mux_t *p_mux )
                         }
 
                         /* Convert to pes */
+                        if( p_stream->i_stream_id == 0xa0 && p_data->i_pts <= 0 )
+                        {
+                            /* XXX yes I know, it's awfull, but it's needed, so don't remove it ... */
+                            p_data->i_pts = p_data->i_dts;
+                        }
                         E_( EStoPES )( p_mux->p_sout, &p_data, p_data, p_stream->i_stream_id, 1 );
 
                         BufferChainAppend( &p_stream->chain_pes, p_data );

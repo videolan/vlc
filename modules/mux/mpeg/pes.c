@@ -234,7 +234,7 @@ int E_( EStoPES )( sout_instance_t *p_sout,
                    int i_stream_id,
                    int b_mpeg2 )
 {
-    block_t *p_es_sav, *p_pes;
+    block_t *p_pes;
     mtime_t i_pts, i_dts, i_length;
 
     uint8_t *p_data;
@@ -262,7 +262,6 @@ int E_( EStoPES )( sout_instance_t *p_sout,
     p_data = p_es->p_buffer;
 
     *pp_pes = p_pes = NULL;
-    p_es_sav = p_es;
 
     do
     {
@@ -315,7 +314,6 @@ int E_( EStoPES )( sout_instance_t *p_sout,
 
         i_dts += i_length;
     }
-    (*pp_pes)->i_flags = p_es_sav->i_flags;
     return( 0 );
 }
 
