@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.22 2003/10/15 07:34:24 gbazin Exp $
+ * $Id: http.c,v 1.23 2003/10/17 18:59:00 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -200,6 +200,10 @@ static int Activate( vlc_object_t *p_this )
 
     msg_Dbg( p_intf, "base %s:%d", psz_address, i_port );
     p_intf->p_sys = p_sys = malloc( sizeof( intf_sys_t ) );
+    if( !p_intf->p_sys )
+    {
+        return( VLC_ENOMEM );
+    }
     p_sys->p_playlist = NULL;
     p_sys->p_input    = NULL;
 
@@ -227,6 +231,10 @@ static int Activate( vlc_object_t *p_this )
 
     p_sys->i_files = 0;
     p_sys->pp_files = malloc( sizeof( httpd_file_callback_args_t *) );
+    if( !p_sys->pp_files )
+    {
+        return( VLC_ENOMEM );
+    }
 
 #if defined(SYS_DARWIN) || defined(SYS_BEOS) || \
         ( defined(WIN32) && !defined(UNDER_CE ) )
@@ -234,6 +242,10 @@ static int Activate( vlc_object_t *p_this )
     {
         char * psz_vlcpath = p_intf->p_libvlc->psz_vlcpath;
         psz_src = malloc( strlen(psz_vlcpath) + strlen("/share/http" ) + 1 );
+        if( !psz_src )
+        {
+            return( VLC_ENOMEM );
+        }
 #if defined(WIN32)
         sprintf( psz_src, "%s/http", psz_vlcpath);
 #else
@@ -380,6 +392,11 @@ static char *FileToUrl( char *name )
     char *url, *p;
 
     url = p = malloc( strlen( name ) + 1 );
+
+    if( !url || !p )
+    {
+        return NULL;
+    }
 
 #ifdef WIN32
     while( *name == '\\' || *name == '/' )
@@ -558,11 +575,21 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
         {
 #define f p_sys->pp_files[p_sys->i_files]
             f = malloc( sizeof( httpd_file_callback_args_t ) );
+            if( !f )
+            {
+                msg_Err( p_intf, "Out of memory" );
+                return( VLC_ENOMEM );
+            }
             f->p_intf  = p_intf;
             f->file = strdup( dir );
             f->name = FileToUrl( &dir[strlen( psz_root )] );
             f->mime = FileToMime( &dir[strlen( psz_root )] );
 
+            if( !f->name || !f->mime )
+            {
+                msg_Err( p_intf , "Unable to parse directory" );
+                return( VLC_ENOMEM );
+            }
             msg_Dbg( p_intf, "file=%s (url=%s mime=%s)",
                      f->file, f->name, f->mime );
 
@@ -585,6 +612,11 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
                 fold->name[strlen(fold->name) - 1] == '/' )
             {
                 f = malloc( sizeof( httpd_file_callback_args_t ) );
+                if( !f )
+                {
+                    msg_Err( p_intf, "Out of memory" );
+                    return( VLC_ENOMEM );
+                }
                 f->p_intf  = p_intf;
                 f->file = strdup( fold->file );
                 f->name = strdup( fold->name );
@@ -631,6 +663,7 @@ static mvar_t *mvar_New( char *name, char *value )
 {
     mvar_t *v = malloc( sizeof( mvar_t ) );
 
+    if( !v ) return NULL;
     v->name = strdup( name );
     v->value = strdup( value ? value : "" );
 
@@ -1389,7 +1422,15 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
 
 #define PRINTS( str, s ) \
     ALLOC( strlen( str ) + strlen( s ) + 1 ); \
-    *pp_dst += sprintf( *pp_dst, str, s );
+    char * psz_cur = *pp_dst; \
+    *pp_dst += sprintf( *pp_dst, str, s ); \
+    while( psz_cur && *psz_cur ) \
+    {  \
+        /* Prevent script injection */ \
+        if( *psz_cur == '<' ) *psz_cur = '*'; \
+        if( *psz_cur == '>' ) *psz_cur = '*'; \
+        psz_cur++ ; \
+    }
 
     switch( StrToMacroType( m->id ) )
     {
@@ -1844,7 +1885,10 @@ static int  http_get( httpd_file_callback_args_t *p_args,
     if( ( f = fopen( p_args->file, "r" ) ) == NULL )
     {
         p = *pp_data = malloc( 10240 );
-
+        if( !p )
+        {
+                return VLC_EGENERIC;
+        }
         p += sprintf( p, "<html>\n" );
         p += sprintf( p, "<head>\n" );
         p += sprintf( p, "<title>Error loading %s</title>\n", p_args->file );
