@@ -977,8 +977,7 @@ dnl
 if test "${SYS}" != "mingw32"; then
     VLC_ADD_PLUGINS([screensaver])
 else
-    VLC_ADD_PLUGINS([ntservice])
-    VLC_ADD_PLUGINS([dmo])
+    VLC_ADD_PLUGINS([ntservice smb dmo])
     VLC_ADD_LDFLAGS([dmo],[-lole32])
 fi
 

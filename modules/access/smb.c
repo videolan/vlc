@@ -29,8 +29,24 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
-#include <libsmbclient.h>
-#define USE_CTX 1
+#ifdef WIN32
+#ifdef HAVE_FCNTL_H
+#   include <fcntl.h>
+#endif
+#   ifdef HAVE_SYS_STAT_H
+#       include <sys/stat.h>
+#   endif
+#   include <io.h>
+#   define smbc_open(a,b,c) open(a,b,c)
+#   define stat _stati64
+#   define smbc_fstat(a,b) _fstati64(a,b)
+#   define smbc_read read
+#   define smbc_lseek _lseeki64
+#   define smbc_close close
+#else
+#   include <libsmbclient.h>
+#   define USE_CTX 1
+#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -87,6 +103,10 @@ struct access_sys_t
 #endif
 };
 
+#ifdef WIN32
+static void Win32AddConnection( access_t *, char *, char *, char *, char * );
+#endif
+
 void smb_auth( const char *srv, const char *shr, char *wg, int wglen,
                char *un, int unlen, char *pw, int pwlen )
 {
@@ -101,7 +121,8 @@ static int Open( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     struct stat  filestat;
-    char         *psz_uri, *psz_user, *psz_pwd, *psz_domain;
+    char         *psz_path, *psz_uri;
+    char         *psz_user = 0, *psz_pwd = 0, *psz_domain = 0;
     int          i_ret;
 
 #ifdef USE_CTX
@@ -111,25 +132,75 @@ static int Open( vlc_object_t *p_this )
     int          i_smb;
 #endif
 
+    /* Parse input URI
+     * [[[domain;]user[:password@]]server[/share[/path[/file]]]] */
+
+    psz_path = strchr( p_access->psz_path, '/' );
+    if( !psz_path )
+    {
+        msg_Err( p_access, "invalid SMB URI: smb://%s", psz_path );
+        return VLC_EGENERIC;
+    }
+    else
+    {
+        char *psz_tmp = strdup( p_access->psz_path );
+        char *psz_parser;
+
+        psz_tmp[ psz_path - p_access->psz_path ] = 0;
+        psz_path = p_access->psz_path;
+        psz_parser = strchr( psz_tmp, '@' );
+        if( psz_parser )
+        {
+            /* User info is there */
+            *psz_parser = 0;
+            psz_path = p_access->psz_path + (psz_parser - psz_tmp) + 1;
+
+            psz_parser = strchr( psz_tmp, ':' );
+            if( psz_parser )
+            {
+                /* Password found */
+                psz_pwd = strdup( psz_parser+1 );
+                *psz_parser = 0;
+            }
+
+            psz_parser = strchr( psz_tmp, ';' );
+            if( psz_parser )
+            {
+                /* Domain found */
+                *psz_parser = 0; psz_parser++;
+                psz_domain = strdup( psz_tmp );
+            }
+            else psz_parser = psz_tmp;
+
+            psz_user = strdup( psz_parser );
+        }
+
+        free( psz_tmp );
+    }
+
     /* Build an SMB URI
      * smb://[[[domain;]user[:password@]]server[/share[/path[/file]]]] */
 
-    psz_user = var_CreateGetString( p_access, "smb-user" );
+    if( !psz_user ) psz_user = var_CreateGetString( p_access, "smb-user" );
     if( psz_user && !*psz_user ) { free( psz_user ); psz_user = 0; }
-    psz_pwd = var_CreateGetString( p_access, "smb-pwd" );
+    if( !psz_pwd ) psz_pwd = var_CreateGetString( p_access, "smb-pwd" );
     if( psz_pwd && !*psz_pwd ) { free( psz_pwd ); psz_pwd = 0; }
-    psz_domain = var_CreateGetString( p_access, "smb-domain" );
+    if(!psz_domain) psz_domain = var_CreateGetString( p_access, "smb-domain" );
     if( psz_domain && !*psz_domain ) { free( psz_domain ); psz_domain = 0; }
 
-    /* FIXME: will need to parse the URI so we don't override credentials
-     * if there are already present. */
+#ifdef WIN32
+    if( psz_user )
+        Win32AddConnection( p_access, psz_path, psz_user, psz_pwd, psz_domain);
+    asprintf( &psz_uri, "//%s", psz_path );
+#else
     if( psz_user )
         asprintf( &psz_uri, "smb://%s%s%s%s%s@%s",
                   psz_domain ? psz_domain : "", psz_domain ? ";" : "",
                   psz_user, psz_pwd ? ":" : "",
-                  psz_pwd ? psz_pwd : "", p_access->psz_path );
+                  psz_pwd ? psz_pwd : "", psz_path );
     else
-        asprintf( &psz_uri, "smb://%s", p_access->psz_path );
+        asprintf( &psz_uri, "smb://%s", psz_path );
+#endif
 
     if( psz_user ) free( psz_user );
     if( psz_pwd ) free( psz_pwd );
@@ -168,11 +239,14 @@ static int Open( vlc_object_t *p_this )
     else p_access->info.i_size = filestat.st_size;
 
 #else
+
+#ifndef WIN32
     if( smbc_init( smb_auth, 1 ) )
     {
         free( psz_uri );
         return VLC_EGENERIC;
     }
+#endif
 
     if( (i_smb = smbc_open( psz_uri, O_RDONLY, 0 )) < 0 )
     {
@@ -346,3 +420,68 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
     return VLC_SUCCESS;
 }
+
+#ifdef WIN32
+static void Win32AddConnection( access_t *p_access, char *psz_path,
+                                char *psz_user, char *psz_pwd,
+                                char *psz_domain )
+{
+    DWORD (*OurWNetAddConnection2)( LPNETRESOURCE, LPCTSTR, LPCTSTR, DWORD );
+    char psz_remote[MAX_PATH], psz_server[MAX_PATH], psz_share[MAX_PATH];
+    NETRESOURCE net_resource;
+    DWORD i_result;
+    char *psz_parser;
+
+    HINSTANCE hdll = LoadLibrary(_T("MPR.DLL"));
+    if( !hdll )
+    {
+        msg_Warn( p_access, "couldn't load mpr.dll" );
+        return;
+    }
+
+    OurWNetAddConnection2 =
+      (void *)GetProcAddress( hdll, _T("WNetAddConnection2A") );
+    if( !OurWNetAddConnection2 )
+    {
+        msg_Warn( p_access, "couldn't find WNetAddConnection2 in mpr.dll" );
+        return;
+    }
+
+    memset( &net_resource, 0, sizeof(net_resource) );
+    net_resource.dwType = RESOURCETYPE_DISK;
+
+    /* Find out server and share names */
+    psz_server[0] = psz_share[0] = 0;
+    psz_parser = strchr( psz_path, '/' );
+    if( psz_parser )
+    {
+        char *psz_parser2;
+        strncat( psz_server, psz_path, psz_parser - psz_path );
+        psz_parser2 = strchr( psz_parser+1, '/' );
+        if( psz_parser2 )
+            strncat( psz_share, psz_parser+1, psz_parser2 - psz_parser -1 );
+    }
+    else strncat( psz_server, psz_path, MAX_PATH );
+
+    sprintf( psz_remote, "\\\\%s\\%s", psz_server, psz_share );
+    net_resource.lpRemoteName = psz_remote;
+
+    i_result = OurWNetAddConnection2( &net_resource, psz_pwd, psz_user, 0 );
+
+    if( i_result != NO_ERROR )
+    {
+        msg_Dbg( p_access, "connected to %s", psz_remote );
+    }
+    else if( i_result != ERROR_ALREADY_ASSIGNED && 
+             i_result != ERROR_DEVICE_ALREADY_REMEMBERED )
+    {
+        msg_Dbg( p_access, "already connected to %s", psz_remote );
+    }
+    else
+    {
+        msg_Dbg( p_access, "failed to connect to %s", psz_remote );
+    }
+
+    FreeLibrary( hdll );
+}
+#endif // WIN32
