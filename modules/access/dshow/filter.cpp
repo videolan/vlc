@@ -506,7 +506,7 @@ STDMETHODIMP CapturePin::Disconnect()
 
     msg_Dbg( p_input, "CapturePin::Disconnect [OK]" );
 
-#if 0 // FIXME: This does seem to create crashes sometimes
+#if 1 // This used to create crashes sometimes. Is the problem fixed ?
     VLCMediaSample vlc_sample;
 
     vlc_mutex_lock( &p_sys->lock );
