@@ -25,33 +25,7 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
-#include "ninput.h"
-
-int access_vaControl( input_thread_t *p_input, int i_query, va_list args )
-{
-    if( p_input->pf_access_control )
-    {
-        return p_input->pf_access_control( p_input, i_query, args );
-    }
-    return VLC_EGENERIC;
-}
-
-int access_Control( input_thread_t *p_input, int i_query, ...  )
-{
-    va_list args;
-    int     i_result;
-
-    va_start( args, i_query );
-    i_result = access_vaControl( p_input, i_query, args );
-    va_end( args );
-
-    return i_result;
-}
-
-int access_vaControlDefault( input_thread_t *p_input, int i_query, va_list args )
-{
-    return VLC_EGENERIC;
-}
+#include "input_internal.h"
 
 /*****************************************************************************
  * access2_New:

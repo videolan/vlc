@@ -31,8 +31,6 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
-#include "ninput.h"
-
 #ifdef HAVE_DIRENT_H
 #   include <dirent.h>
 #else

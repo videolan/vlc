@@ -22,22 +22,12 @@
  *****************************************************************************/
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#include "input_internal.h"
 #include "vlc_playlist.h"
 
-#include "ninput.h"
-#include "../../modules/demux/util/sub.h"
-
-struct input_thread_sys_t
-{
-    /* subtitles */
-    int              i_sub;
-    subtitle_demux_t **sub;
-    int64_t          i_stop_time;
-};
 
 static void UpdateBookmarksOption( input_thread_t * );
 
@@ -64,7 +54,6 @@ int input_Control( input_thread_t *p_input, int i_query, ...  )
 
 int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 {
-    int     i_ret;
     seekpoint_t *p_bkmk, ***ppp_bkmk;
     int i_bkmk = 0;
     int *pi_bkmk;
@@ -75,54 +64,50 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
     double f, *pf;
     int64_t i_64, *pi_64;
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
     switch( i_query )
     {
         case INPUT_GET_POSITION:
             pf = (double*)va_arg( args, double * );
             *pf = var_GetFloat( p_input, "position" );
-            i_ret = VLC_SUCCESS;
-            break;
+            return VLC_SUCCESS;
+
         case INPUT_SET_POSITION:
             f = (double)va_arg( args, double );
-            i_ret = var_SetFloat( p_input, "position", f );
-            break;
+            return var_SetFloat( p_input, "position", f );
 
         case INPUT_GET_LENGTH:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             *pi_64 = var_GetTime( p_input, "length" );
-            i_ret = VLC_SUCCESS;
-            break;
+            return VLC_SUCCESS;
+
         case INPUT_GET_TIME:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             *pi_64 = var_GetTime( p_input, "time" );
-            i_ret = VLC_SUCCESS;
-            break;
+            return VLC_SUCCESS;
+
         case INPUT_SET_TIME:
             i_64 = (int64_t)va_arg( args, int64_t );
-            i_ret = var_SetTime( p_input, "time", i_64 );
-            break;
+            return var_SetTime( p_input, "time", i_64 );
 
         case INPUT_GET_RATE:
             pi_int = (int*)va_arg( args, int * );
             *pi_int = var_GetInteger( p_input, "rate" );
-            i_ret = VLC_SUCCESS;
-            break;
+            return VLC_SUCCESS;
+
         case INPUT_SET_RATE:
             i_int = (int)va_arg( args, int );
-            i_ret = var_SetInteger( p_input, "rate", i_int );
-            break;
+            return var_SetInteger( p_input, "rate", i_int );
 
         case INPUT_GET_STATE:
             pi_int = (int*)va_arg( args, int * );
             *pi_int = var_GetInteger( p_input, "state" );
-            i_ret = VLC_SUCCESS;
-            break;
+            return VLC_SUCCESS;
+
         case INPUT_SET_STATE:
             i_int = (int)va_arg( args, int );
-            i_ret = var_SetInteger( p_input, "state", i_int );
-            break;
+            return var_SetInteger( p_input, "state", i_int );
 
+#if 0
         case INPUT_ADD_OPTION:
         {
             psz_option = (char *)va_arg( args, char * );
@@ -130,7 +115,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             i_ret = VLC_EGENERIC;
 
             vlc_mutex_lock( &p_input->p_item->lock );
-            /* Check if option already exists */            
+            /* Check if option already exists */
             for( i = 0; i < p_input->p_item->i_options; i++ )
             {
                 if( !strncmp( p_input->p_item->ppsz_options[i], psz_option,
@@ -500,22 +485,33 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 i_ret = VLC_EGENERIC;
             }
             break;
-
+#endif
+        case INPUT_GET_BOOKMARKS:
+        case INPUT_CLEAR_BOOKMARKS:
+        case INPUT_ADD_BOOKMARK:
+        case INPUT_CHANGE_BOOKMARK:
+        case INPUT_DEL_BOOKMARK:
+        case INPUT_SET_BOOKMARK:
+        case INPUT_ADD_OPTION:
+        case INPUT_ADD_INFO:
+        case INPUT_GET_INFO:
+        case INPUT_SET_NAME:
+        case INPUT_GET_SUBDELAY:
+        case INPUT_SET_SUBDELAY:
+            /* FIXME */
+            msg_Err( p_input, "unimplemented query in input_vaControl" );
         default:
             msg_Err( p_input, "unknown query in input_vaControl" );
-            i_ret = VLC_EGENERIC;
-            break;
+            return VLC_EGENERIC;
     }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    return i_ret;
 }
 
 static void UpdateBookmarksOption( input_thread_t *p_input )
 {
     int i, i_len = 0;
     char *psz_value = NULL, *psz_next = NULL;
-
+    /* FIXME */
+#if 0
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     for( i = 0; i < p_input->i_bookmarks; i++ )
@@ -546,4 +542,5 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
                    psz_value ? psz_value : "" );
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
+#endif
 }

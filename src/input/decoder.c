@@ -1,11 +1,12 @@
 /*****************************************************************************
- * input_dec.c: Functions for the management of decoders
+ * decoder.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,25 +27,20 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
-#include <string.h>                                    /* memcpy(), memset() */
-
 #include <vlc/vlc.h>
+
 #include <vlc/decoder.h>
 #include <vlc/vout.h>
+#include <vlc/input.h>
 
 #include "stream_output.h"
+#include "input_internal.h"
 
-#include "input_ext-intf.h"
-#include "input_ext-plugins.h"
+static decoder_t * CreateDecoder( input_thread_t *, es_format_t *, int );
+static void        DeleteDecoder( decoder_t * );
 
-#include "codecs.h"
-
-static void input_NullPacket( input_thread_t *, es_descriptor_t * );
-
-static decoder_t * CreateDecoder( input_thread_t *, es_descriptor_t *, int );
 static int         DecoderThread( decoder_t * );
 static int         DecoderDecode( decoder_t * p_dec, block_t *p_block );
-static void        DeleteDecoder( decoder_t * );
 
 /* Buffers allocation callbacks for the decoders */
 static aout_buffer_t *aout_new_buffer( decoder_t *, int );
@@ -81,10 +77,6 @@ struct decoder_owner_sys_t
 
     /* fifo */
     block_fifo_t *p_fifo;
-
-    /* */
-    input_buffers_t *p_method_data;
-    es_descriptor_t *p_es_descriptor;
 };
 
 
@@ -95,16 +87,17 @@ struct decoder_owner_sys_t
  * \param p_es the es descriptor
  * \return the spawned decoder object
  */
-decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
+decoder_t *input_DecoderNew( input_thread_t *p_input,
+                             es_format_t *fmt, vlc_bool_t b_force_decoder )
 {
     decoder_t   *p_dec = NULL;
     vlc_value_t val;
 
     /* If we are in sout mode, search for packetizer module */
-    if( !p_es->b_force_decoder && p_input->stream.p_sout )
+    if( p_input->p_sout && !b_force_decoder )
     {
         /* Create the decoder configuration structure */
-        p_dec = CreateDecoder( p_input, p_es, VLC_OBJECT_PACKETIZER );
+        p_dec = CreateDecoder( p_input, fmt, VLC_OBJECT_PACKETIZER );
         if( p_dec == NULL )
         {
             msg_Err( p_input, "could not create packetizer" );
@@ -114,7 +107,7 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
     else
     {
         /* Create the decoder configuration structure */
-        p_dec = CreateDecoder( p_input, p_es, VLC_OBJECT_DECODER );
+        p_dec = CreateDecoder( p_input, fmt, VLC_OBJECT_DECODER );
         if( p_dec == NULL )
         {
             msg_Err( p_input, "could not create decoder" );
@@ -133,7 +126,8 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
         return NULL;
     }
 
-    if( !p_es->b_force_decoder && p_input->stream.p_sout && p_input->stream.b_pace_control )
+    if( p_input->p_sout && p_input->input.b_can_pace_control &&
+        !b_force_decoder )
     {
         msg_Dbg( p_input, "stream out mode -> no decoder thread" );
         p_dec->p_owner->b_own_thread = VLC_FALSE;
@@ -147,14 +141,10 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
     if( p_dec->p_owner->b_own_thread )
     {
         int i_priority;
-        if ( p_es->i_cat == AUDIO_ES )
-        {
+        if( fmt->i_cat == AUDIO_ES )
             i_priority = VLC_THREAD_PRIORITY_AUDIO;
-        }
         else
-        {
             i_priority = VLC_THREAD_PRIORITY_VIDEO;
-        }
 
         /* Spawn the decoder thread */
         if( vlc_thread_create( p_dec, "decoder", DecoderThread,
@@ -169,14 +159,6 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
         }
     }
 
-    /* Select a new ES */
-    INSERT_ELEM( p_input->stream.pp_selected_es,
-                 p_input->stream.i_selected_es_number,
-                 p_input->stream.i_selected_es_number,
-                 p_es );
-
-    p_input->stream.b_changed = 1;
-
     return p_dec;
 }
 
@@ -187,10 +169,8 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
  * \param p_es the es descriptor
  * \return nothing
  */
-void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
+void input_DecoderDelete( decoder_t *p_dec )
 {
-    decoder_t *p_dec = p_es->p_dec;
-
     p_dec->b_die = VLC_TRUE;
 
     if( p_dec->p_owner->b_own_thread )
@@ -198,7 +178,7 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
         /* Make sure the thread leaves the function by
          * sending it an empty block. */
         block_t *p_block = block_New( p_dec, 0 );
-        input_DecodeBlock( p_dec, p_block );
+        input_DecoderDecode( p_dec, p_block );
 
         vlc_thread_join( p_dec );
 
@@ -215,55 +195,6 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
 
     /* Delete the decoder */
     vlc_object_destroy( p_dec );
-
-    /* Tell the input there is no more decoder */
-    p_es->p_dec = NULL;
-
-    p_input->stream.b_changed = 1;
-}
-
-/**
- * Put a PES in the decoder's fifo.
- *
- * \param p_dec the decoder object
- * \param p_pes the pes packet
- * \return nothing
- */
-void input_DecodePES( decoder_t * p_dec, pes_packet_t * p_pes )
-{
-    data_packet_t *p_data;
-    int     i_size = 0;
-
-    for( p_data = p_pes->p_first; p_data != NULL; p_data = p_data->p_next )
-    {
-        i_size += p_data->p_payload_end - p_data->p_payload_start;
-    }
-    if( i_size > 0 )
-    {
-        block_t *p_block = block_New( p_dec, i_size );
-        if( p_block )
-        {
-            uint8_t *p_buffer = p_block->p_buffer;
-
-            for( p_data = p_pes->p_first; p_data; p_data = p_data->p_next )
-            {
-                int i_copy = p_data->p_payload_end - p_data->p_payload_start;
-
-                memcpy( p_buffer, p_data->p_payload_start, i_copy );
-
-                p_buffer += i_copy;
-            }
-            p_block->i_pts = p_pes->i_pts;
-            p_block->i_dts = p_pes->i_dts;
-            if( p_pes->b_discontinuity )
-                p_block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-            p_block->i_rate = p_pes->i_rate;
-
-            input_DecodeBlock( p_dec, p_block );
-        }
-    }
-
-    input_DeletePES( p_dec->p_owner->p_method_data, p_pes );
 }
 
 /**
@@ -272,7 +203,7 @@ void input_DecodePES( decoder_t * p_dec, pes_packet_t * p_pes )
  * \param p_dec the decoder object
  * \param p_block the data block
  */
-void input_DecodeBlock( decoder_t * p_dec, block_t *p_block )
+void input_DecoderDecode( decoder_t * p_dec, block_t *p_block )
 {
     if( p_dec->p_owner->b_own_thread )
     {
@@ -301,6 +232,25 @@ void input_DecodeBlock( decoder_t * p_dec, block_t *p_block )
     }
 }
 
+void input_DecoderDiscontinuity( decoder_t * p_dec )
+{
+    block_t *p_null;
+
+    /* Empty the fifo */
+    if( p_dec->p_owner->b_own_thread )
+    {
+        block_FifoEmpty( p_dec->p_owner->p_fifo );
+    }
+
+    /* Send a special block */
+    p_null = block_New( p_dec, 128 );
+    p_null->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+    memset( p_null->p_buffer, 0, p_null->i_buffer );
+
+    input_DecoderDecode( p_dec, p_null );
+}
+
+#if 0
 /**
  * Create a NULL packet for padding in case of a data loss
  *
@@ -311,6 +261,7 @@ void input_DecodeBlock( decoder_t * p_dec, block_t *p_block )
 static void input_NullPacket( input_thread_t * p_input,
                               es_descriptor_t * p_es )
 {
+#if 0
     block_t *p_block = block_New( p_input, PADDING_PACKET_SIZE );
     if( p_block )
     {
@@ -319,6 +270,7 @@ static void input_NullPacket( input_thread_t * p_input,
 
         block_FifoPut( p_es->p_dec->p_owner->p_fifo, p_block );
     }
+#endif
 }
 
 /**
@@ -329,6 +281,7 @@ static void input_NullPacket( input_thread_t * p_input,
  */
 void input_EscapeDiscontinuity( input_thread_t * p_input )
 {
+#if 0
     unsigned int i_es, i;
 
     for( i_es = 0; i_es < p_input->stream.i_selected_es_number; i_es++ )
@@ -343,6 +296,7 @@ void input_EscapeDiscontinuity( input_thread_t * p_input )
             }
         }
     }
+#endif
 }
 
 /**
@@ -353,6 +307,7 @@ void input_EscapeDiscontinuity( input_thread_t * p_input )
  */
 void input_EscapeAudioDiscontinuity( input_thread_t * p_input )
 {
+#if 0
     unsigned int i_es, i;
 
     for( i_es = 0; i_es < p_input->stream.i_selected_es_number; i_es++ )
@@ -367,7 +322,9 @@ void input_EscapeAudioDiscontinuity( input_thread_t * p_input )
             }
         }
     }
+#endif
 }
+#endif
 
 /**
  * Create a decoder object
@@ -377,8 +334,8 @@ void input_EscapeAudioDiscontinuity( input_thread_t * p_input )
  * \param i_object_type Object type as define in include/vlc_objects.h
  * \return the decoder object
  */
-static decoder_t * CreateDecoder( input_thread_t * p_input,
-                                  es_descriptor_t * p_es, int i_object_type )
+static decoder_t * CreateDecoder( input_thread_t *p_input,
+                                  es_format_t *fmt, int i_object_type )
 {
     decoder_t *p_dec;
 
@@ -397,67 +354,12 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
     /* Initialize the decoder fifo */
     p_dec->p_module = NULL;
 
-    es_format_Copy( &p_dec->fmt_in, &p_es->fmt );
 
-    if( p_es->p_waveformatex )
-    {
-#define p_wf ((WAVEFORMATEX *)p_es->p_waveformatex)
-        p_dec->fmt_in.audio.i_channels = p_wf->nChannels;
-        p_dec->fmt_in.audio.i_rate = p_wf->nSamplesPerSec;
-        p_dec->fmt_in.i_bitrate = p_wf->nAvgBytesPerSec * 8;
-        p_dec->fmt_in.audio.i_blockalign = p_wf->nBlockAlign;
-        p_dec->fmt_in.audio.i_bitspersample = p_wf->wBitsPerSample;
-        p_dec->fmt_in.i_extra = p_wf->cbSize;
-        p_dec->fmt_in.p_extra = NULL;
-        if( p_wf->cbSize )
-        {
-            p_dec->fmt_in.p_extra = malloc( p_wf->cbSize );
-            memcpy( p_dec->fmt_in.p_extra, &p_wf[1], p_wf->cbSize );
-        }
-    }
-
-    if( p_es->p_bitmapinfoheader )
-    {
-#define p_bih ((BITMAPINFOHEADER *) p_es->p_bitmapinfoheader)
-        p_dec->fmt_in.i_extra = p_bih->biSize - sizeof(BITMAPINFOHEADER);
-        p_dec->fmt_in.p_extra = NULL;
-        if( p_dec->fmt_in.i_extra )
-        {
-            p_dec->fmt_in.p_extra = malloc( p_dec->fmt_in.i_extra );
-            memcpy( p_dec->fmt_in.p_extra, &p_bih[1], p_dec->fmt_in.i_extra );
-        }
-
-        p_dec->fmt_in.video.i_width = p_bih->biWidth;
-        p_dec->fmt_in.video.i_height = p_bih->biHeight;
-    }
-
-    /* FIXME
-     *  - 1: beurk
-     *  - 2: I'm not sure there isn't any endian problem here (spu)... */
-    if( p_es->i_cat == SPU_ES && p_es->p_demux_data )
-    {
-        if( ( p_es->i_fourcc == VLC_FOURCC( 's', 'p', 'u', ' ' ) ||
-              p_es->i_fourcc == VLC_FOURCC( 's', 'p', 'u', 'b' ) ) &&
-            *((uint32_t*)p_es->p_demux_data) == 0xBeef )
-        {
-            memcpy( p_dec->fmt_in.subs.spu.palette,
-                    p_es->p_demux_data, 17 * 4 );
-        }
-        else if( p_es->i_fourcc == VLC_FOURCC( 'd', 'v', 'b', 's' ) &&
-                 p_es->p_spuinfo )
-        {
-            dvb_spuinfo_t *p_dvbs = (dvb_spuinfo_t*)p_es->p_spuinfo;
-            p_dec->fmt_in.subs.dvb.i_id = p_dvbs->i_id;
-        }
-    }
-
-    p_dec->fmt_in.i_cat = p_es->i_cat;
-    p_dec->fmt_in.i_codec = p_es->i_fourcc;
-
-    p_dec->fmt_out = null_es_format;
+    es_format_Copy( &p_dec->fmt_in, fmt );
+    es_format_Copy( &p_dec->fmt_out, &null_es_format );
 
     /* Allocate our private structure for the decoder */
-    p_dec->p_owner = (decoder_owner_sys_t*)malloc(sizeof(decoder_owner_sys_t));
+    p_dec->p_owner = malloc( sizeof( decoder_owner_sys_t ) );
     if( p_dec->p_owner == NULL )
     {
         msg_Err( p_dec, "out of memory" );
@@ -468,10 +370,9 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
     p_dec->p_owner->p_aout = NULL;
     p_dec->p_owner->p_aout_input = NULL;
     p_dec->p_owner->p_vout = NULL;
-    p_dec->p_owner->p_sout = p_input->stream.p_sout;
+    p_dec->p_owner->p_sout = p_input->p_sout;
     p_dec->p_owner->p_sout_input = NULL;
     p_dec->p_owner->p_packetizer = NULL;
-    p_dec->p_owner->p_es_descriptor = p_es;
 
 
     /* decoder fifo */
@@ -480,8 +381,6 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
         msg_Err( p_dec, "out of memory" );
         return NULL;
     }
-    p_dec->p_owner->p_method_data = p_input->p_method_data;
-
     /* Set buffers allocation callbacks for the decoders */
     p_dec->pf_aout_buffer_new = aout_new_buffer;
     p_dec->pf_aout_buffer_del = aout_del_buffer;
@@ -506,10 +405,11 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
             vlc_object_create( p_input, VLC_OBJECT_PACKETIZER );
         if( p_dec->p_owner->p_packetizer )
         {
-            p_dec->p_owner->p_packetizer->fmt_in = null_es_format;
-            p_dec->p_owner->p_packetizer->fmt_out = null_es_format;
             es_format_Copy( &p_dec->p_owner->p_packetizer->fmt_in,
                             &p_dec->fmt_in );
+
+            es_format_Copy( &p_dec->p_owner->p_packetizer->fmt_out,
+                            &null_es_format );
 
             vlc_object_attach( p_dec->p_owner->p_packetizer, p_input );
 
@@ -591,13 +491,9 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             if( !p_dec->p_owner->p_sout_input )
             {
                 es_format_Copy( &p_dec->p_owner->sout, &p_dec->fmt_out );
-                if( p_dec->p_owner->p_es_descriptor->p_pgrm )
-                {
-                    p_dec->p_owner->sout.i_group =
-                        p_dec->p_owner->p_es_descriptor->p_pgrm->i_number;
-                }
-                p_dec->p_owner->sout.i_id =
-                    p_dec->p_owner->p_es_descriptor->i_id - 1;
+
+                p_dec->p_owner->sout.i_group =p_dec->fmt_in.i_group;
+                p_dec->p_owner->sout.i_id = p_dec->fmt_in.i_id;
                 if( p_dec->fmt_in.psz_language )
                 {
                     p_dec->p_owner->sout.psz_language =

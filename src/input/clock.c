@@ -24,14 +24,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <string.h>                                    /* memcpy(), memset() */
-
+#include <stdlib.h>
 #include <vlc/vlc.h>
 
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
+#include <vlc/input.h>
+#include "input_internal.h"
 
 /*
  * DISCUSSION : SYNCHRONIZATION METHOD
@@ -67,7 +64,8 @@
  * new_average = (old_average * c_average + new_sample_value) / (c_average +1)
  */
 
-static void ClockNewRef( pgrm_descriptor_t * p_pgrm,
+
+static void ClockNewRef( input_clock_t * p_pgrm,
                          mtime_t i_clock, mtime_t i_sysdate );
 
 /*****************************************************************************
@@ -84,19 +82,19 @@ static void ClockNewRef( pgrm_descriptor_t * p_pgrm,
 /*****************************************************************************
  * ClockToSysdate: converts a movie clock to system date
  *****************************************************************************/
-static mtime_t ClockToSysdate( input_thread_t * p_input,
-                               pgrm_descriptor_t * p_pgrm, mtime_t i_clock )
+static mtime_t ClockToSysdate( input_thread_t *p_input,
+                               input_clock_t *cl, mtime_t i_clock )
 {
     mtime_t     i_sysdate = 0;
 
-    if( p_pgrm->i_synchro_state == SYNCHRO_OK )
+    if( cl->i_synchro_state == SYNCHRO_OK )
     {
-        i_sysdate = (mtime_t)(i_clock - p_pgrm->cr_ref)
-                        * (mtime_t)p_input->stream.control.i_rate
+        i_sysdate = (mtime_t)(i_clock - cl->cr_ref)
+                        * (mtime_t)p_input->i_rate
                         * (mtime_t)300;
         i_sysdate /= 27;
         i_sysdate /= 1000;
-        i_sysdate += (mtime_t)p_pgrm->sysdate_ref;
+        i_sysdate += (mtime_t)cl->sysdate_ref;
     }
 
     return( i_sysdate );
@@ -107,46 +105,54 @@ static mtime_t ClockToSysdate( input_thread_t * p_input,
  *****************************************************************************
  * Caution : the synchro state must be SYNCHRO_OK for this to operate.
  *****************************************************************************/
-static mtime_t ClockCurrent( input_thread_t * p_input,
-                             pgrm_descriptor_t * p_pgrm )
+static mtime_t ClockCurrent( input_thread_t *p_input,
+                             input_clock_t *cl )
 {
-    return( (mdate() - p_pgrm->sysdate_ref) * 27 * DEFAULT_RATE
-             / p_input->stream.control.i_rate / 300
-             + p_pgrm->cr_ref );
+    return( (mdate() - cl->sysdate_ref) * 27 * INPUT_RATE_DEFAULT
+             / p_input->i_rate / 300
+             + cl->cr_ref );
 }
 
 /*****************************************************************************
  * ClockNewRef: writes a new clock reference
  *****************************************************************************/
-static void ClockNewRef( pgrm_descriptor_t * p_pgrm,
+static void ClockNewRef( input_clock_t *cl,
                          mtime_t i_clock, mtime_t i_sysdate )
 {
-    p_pgrm->cr_ref = i_clock;
-    p_pgrm->sysdate_ref = i_sysdate ;
+    cl->cr_ref = i_clock;
+    cl->sysdate_ref = i_sysdate ;
 }
 
 /*****************************************************************************
  * input_ClockInit: reinitializes the clock reference after a stream
  *                  discontinuity
  *****************************************************************************/
-void input_ClockInit( pgrm_descriptor_t * p_pgrm )
+void input_ClockInit( input_clock_t *cl, vlc_bool_t b_master, int i_cr_average )
 {
-    p_pgrm->last_cr = 0;
-    p_pgrm->last_pts = 0;
-    p_pgrm->cr_ref = 0;
-    p_pgrm->sysdate_ref = 0;
-    p_pgrm->delta_cr = 0;
-    p_pgrm->c_average_count = 0;
+    cl->i_synchro_state = SYNCHRO_START;
+
+    cl->last_cr = 0;
+    cl->last_pts = 0;
+    cl->cr_ref = 0;
+    cl->sysdate_ref = 0;
+    cl->delta_cr = 0;
+    cl->c_average_count = 0;
+
+    cl->i_cr_average = i_cr_average;
+
+    cl->b_master = b_master;
 }
 
+#if 0
 /*****************************************************************************
  * input_ClockManageControl: handles the messages from the interface
  *****************************************************************************
  * Returns UNDEF_S if nothing happened, PAUSE_S if the stream was paused
  *****************************************************************************/
 int input_ClockManageControl( input_thread_t * p_input,
-                               pgrm_descriptor_t * p_pgrm, mtime_t i_clock )
+                               input_clock_t *cl, mtime_t i_clock )
 {
+#if 0
     vlc_value_t val;
     int i_return_value = UNDEF_S;
 
@@ -221,36 +227,32 @@ int input_ClockManageControl( input_thread_t * p_input,
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return( i_return_value );
+#endif
+    return UNDEF_S;
 }
+#endif
 
 /*****************************************************************************
- * input_ClockManageRef: manages a clock reference
+ * input_ClockSetPCR: manages a clock reference
  *****************************************************************************/
-void input_ClockManageRef( input_thread_t * p_input,
-                           pgrm_descriptor_t * p_pgrm, mtime_t i_clock )
+void input_ClockSetPCR( input_thread_t *p_input,
+                        input_clock_t *cl, mtime_t i_clock )
 {
-    /* take selected program if none specified */
-    if( !p_pgrm )
-    {
-        p_pgrm = p_input->stream.p_selected_program;
-    }
-
-    if( ( p_pgrm->i_synchro_state != SYNCHRO_OK ) ||
-        ( i_clock == 0 && p_pgrm->last_cr != 0 ) )
+    if( ( cl->i_synchro_state != SYNCHRO_OK ) ||
+        ( i_clock == 0 && cl->last_cr != 0 ) )
     {
         /* Feed synchro with a new reference point. */
-        ClockNewRef( p_pgrm, i_clock,
-                     p_pgrm->last_pts + CR_MEAN_PTS_GAP > mdate() ?
-                     p_pgrm->last_pts + CR_MEAN_PTS_GAP : mdate() );
-        p_pgrm->i_synchro_state = SYNCHRO_OK;
+        ClockNewRef( cl, i_clock,
+                     cl->last_pts + CR_MEAN_PTS_GAP > mdate() ?
+                     cl->last_pts + CR_MEAN_PTS_GAP : mdate() );
+        cl->i_synchro_state = SYNCHRO_OK;
 
-        if( p_input->stream.b_pace_control
-             && p_input->stream.p_selected_program == p_pgrm )
+        if( p_input->b_can_pace_control && cl->b_master )
         {
-            p_pgrm->last_cr = i_clock;
+            cl->last_cr = i_clock;
             if( !p_input->b_out_pace_control )
             {
-                mtime_t i_wakeup = ClockToSysdate( p_input, p_pgrm, i_clock );
+                mtime_t i_wakeup = ClockToSysdate( p_input, cl, i_clock );
                 while( (i_wakeup - mdate()) / CLOCK_FREQ > 1 )
                 {
                     msleep( CLOCK_FREQ );
@@ -261,37 +263,38 @@ void input_ClockManageRef( input_thread_t * p_input,
         }
         else
         {
-            p_pgrm->last_cr = 0;
-            p_pgrm->delta_cr = 0;
-            p_pgrm->c_average_count = 0;
+            cl->last_cr = 0;
+            cl->delta_cr = 0;
+            cl->c_average_count = 0;
         }
     }
     else
     {
-        if ( p_pgrm->last_cr != 0 &&
-               (    (p_pgrm->last_cr - i_clock) > CR_MAX_GAP
-                 || (p_pgrm->last_cr - i_clock) < - CR_MAX_GAP ) )
+        if ( cl->last_cr != 0 &&
+               (    (cl->last_cr - i_clock) > CR_MAX_GAP
+                 || (cl->last_cr - i_clock) < - CR_MAX_GAP ) )
         {
             /* Stream discontinuity, for which we haven't received a
              * warning from the stream control facilities (dd-edited
              * stream ?). */
             msg_Warn( p_input, "clock gap, unexpected stream discontinuity" );
-            input_ClockInit( p_pgrm );
-            p_pgrm->i_synchro_state = SYNCHRO_START;
+            input_ClockInit( cl, cl->b_master, cl->i_cr_average );
+            /* FIXME needed ? */
+#if 0
             input_EscapeDiscontinuity( p_input );
+#endif
         }
 
-        p_pgrm->last_cr = i_clock;
+        cl->last_cr = i_clock;
 
-        if( p_input->stream.b_pace_control
-             && p_input->stream.p_selected_program == p_pgrm )
+        if( p_input->b_can_pace_control && cl->b_master )
         {
             /* Wait a while before delivering the packets to the decoder.
              * In case of multiple programs, we arbitrarily follow the
              * clock of the selected program. */
             if( !p_input->b_out_pace_control )
             {
-                mtime_t i_wakeup = ClockToSysdate( p_input, p_pgrm, i_clock );
+                mtime_t i_wakeup = ClockToSysdate( p_input, cl, i_clock );
                 while( (i_wakeup - mdate()) / CLOCK_FREQ > 1 )
                 {
                     msleep( CLOCK_FREQ );
@@ -299,30 +302,32 @@ void input_ClockManageRef( input_thread_t * p_input,
                 }
                 mwait( i_wakeup );
             }
-
+            /* FIXME Not needed anymore ? */
+#if 0
             /* Now take into account interface changes. */
-            input_ClockManageControl( p_input, p_pgrm, i_clock );
+            input_ClockManageControl( p_input, cl, i_clock );
+#endif
         }
         else
         {
             /* Smooth clock reference variations. */
-            mtime_t     i_extrapoled_clock = ClockCurrent( p_input, p_pgrm );
+            mtime_t     i_extrapoled_clock = ClockCurrent( p_input, cl );
 
             /* Bresenham algorithm to smooth variations. */
-            if( p_pgrm->c_average_count == p_input->i_cr_average )
+            if( cl->c_average_count == cl->i_cr_average )
             {
-                p_pgrm->delta_cr = ( p_pgrm->delta_cr
-                                        * (p_input->i_cr_average - 1)
+                cl->delta_cr = ( cl->delta_cr
+                                        * (cl->i_cr_average - 1)
                                       + ( i_extrapoled_clock - i_clock ) )
-                                    / p_input->i_cr_average;
+                                    / cl->i_cr_average;
             }
             else
             {
-                p_pgrm->delta_cr = ( p_pgrm->delta_cr
-                                        * p_pgrm->c_average_count
+                cl->delta_cr = ( cl->delta_cr
+                                        * cl->c_average_count
                                       + ( i_extrapoled_clock - i_clock ) )
-                                    / (p_pgrm->c_average_count + 1);
-                p_pgrm->c_average_count++;
+                                    / (cl->c_average_count + 1);
+                cl->c_average_count++;
             }
         }
     }
@@ -332,23 +337,12 @@ void input_ClockManageRef( input_thread_t * p_input,
  * input_ClockGetTS: manages a PTS or DTS
  *****************************************************************************/
 mtime_t input_ClockGetTS( input_thread_t * p_input,
-                          pgrm_descriptor_t * p_pgrm, mtime_t i_ts )
+                          input_clock_t *cl, mtime_t i_ts )
 {
-    /* take selected program if none specified */
-    if( !p_pgrm )
-    {
-        p_pgrm = p_input->stream.p_selected_program;
-    }
-
-    if( p_pgrm->i_synchro_state == SYNCHRO_OK )
-    {
-        p_pgrm->last_pts = ClockToSysdate( p_input, p_pgrm,
-                                           i_ts + p_pgrm->delta_cr );
-        return( p_pgrm->last_pts + p_input->i_pts_delay );
-    }
-    else
-    {
+    if( cl->i_synchro_state != SYNCHRO_OK )
         return 0;
-    }
+
+    cl->last_pts = ClockToSysdate( p_input, cl, i_ts + cl->delta_cr );
+    return cl->last_pts + p_input->i_pts_delay;
 }
 
