@@ -149,7 +149,7 @@ static void Version                 ( void );
 static void InitSignalHandler       ( void );
 static void SignalHandler           ( int i_signal );
 #ifdef HAVE_MMX
-static int  TestMMX                 ( void );
+       int  TestMMX                 ( void );
 #endif
 
 /*****************************************************************************

@@ -1,3 +1,5 @@
 usr/bin
 usr/lib/videolan/vlc
 usr/share/videolan
+usr/share/doc/vlc
+usr/share/man/man1

@@ -16,6 +16,7 @@ SYS=@SYS@
 PLUGINS=@PLUGINS@
 SNAPSHOTDIR=vlc-@VLC_VERSION@
 INSTALL=@INSTALL@
+ARCH=@ARCH@
 prefix=@prefix@
 
 #----------------- do not change anything below this line ----------------------
@@ -97,11 +98,12 @@ CCFLAGS += -fomit-frame-pointer
 # Optimizations for x86 familiy
 ifneq (,$(findstring 86,$(ARCH)))
 CCFLAGS += -malign-double
-#CCFLAGS += -march=pentium
 # Eventual Pentium Pro optimizations
 ifneq (,$(findstring pentiumpro,$(ARCH)))
 ifneq ($(SYS), BSD)
 CCFLAGS += -march=pentiumpro
+else
+CCFLAGS += -march=pentium
 endif
 endif
 # Eventual MMX optimizations for x86
@@ -356,7 +358,8 @@ distclean: clean
 
 install:
 	mkdir -p $(prefix)/bin
-	$(INSTALL) vlc @ALIASES@ $(prefix)/bin
+	$(INSTALL) vlc $(prefix)/bin
+	for alias in @ALIASES@ ; do ln -s vlc $(prefix)/bin/$$alias ; done
 	mkdir -p $(prefix)/lib/videolan/vlc
 	$(INSTALL) -m 644 $(PLUGINS) $(prefix)/lib/videolan/vlc
 	mkdir -p $(prefix)/share/videolan
@@ -401,7 +404,7 @@ else
 	$(CC) $(CCFLAGS) $(LCFLAGS) $(CFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
 endif
 
-gvlc xvlc fbvlc ggivlc glidevlc: vlc
+gvlc xvlc fbvlc: vlc
 	rm -f $@ && ln -s vlc $@
 
 plugins: $(PLUGINS)

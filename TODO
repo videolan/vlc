@@ -7,6 +7,14 @@
 #
 # Urgency values: Wishlist, Normal, Important, Critical
 
+Task: 0x29
+Difficulty: Medium
+Urgency: Normal
+Description: ALSA audio output support
+ ALSA is the Advanced Linux Sound Architecture and is believed to be
+ technically superior to the usual OSS support found in the Linux kernel.
+Status: Todo
+
 Task: 0x28
 Difficulty: Guru
 Urgency: Wishlist
@@ -60,11 +68,12 @@ Description: Ogg/Vorbis audio decoder support
 Status: Todo
 
 Task: 0x23
-Difficulty: Hard
+Difficulty: Guru
 Urgency: Normal
 Description: Xv video output support
  XFree 4.0 provides the Xv interface which can do hardware YUV on supported
- hardware.
+ hardware. Unfortunately, there doesn't seem to be much documentation
+ available.
 Status: Todo
 
 Task: 0x22
@@ -284,7 +293,7 @@ Description: Do separate packages
  one should do separate packages: a core "vlc" package, and
  "vlc-fb", "vlc-ggi", "vlc-esd" packages depending on the
  core package.
-Status: Todo
+Status: Done 15 Aug 2000 (sam)
 
 Task: 0x09
 Difficulty: Easy

@@ -7,8 +7,52 @@ Standards-Version: 3.0.1
 Package: vlc
 Architecture: any
 Depends: ${shlibs:Depends}
-Description: VideoLAN Client - a free network-aware MPEG and DVD player
+Description: VideoLAN Client - a free MPEG2 and DVD player
  VideoLAN is a free MPEG2 software solution.
  .
- The VideoLAN Client allows to play MPEG2 Transport Streams from the
- network or from a file, as well as direct DVD playback.
+ This is the VideoLAN Client. It plays MPEG2 files, DVDs, or MPEG2
+ streams from a network source.
+
+Package: vlc-gnome
+Architecture: any
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Description: Gnome VideoLAN Client - a free MPEG2 and DVD player for Gnome
+ VideoLAN is a free MPEG2 software solution.
+ .
+ This is the Gnome version of the VideoLAN Client. It plays MPEG2 files,
+ DVDs, or MPEG2 streams from a network source.
+
+Package: vlc-fb
+Architecture: any
+Depends: vlc (= ${Source-Version})
+Description: Framebuffer VideoLAN Client - a free MPEG2 and DVD player
+ VideoLAN is a free MPEG2 software solution.
+ .
+ This is the Linux framebuffer version of the VideoLAN Client. It plays
+ MPEG2 files, DVDs, or MPEG2 streams from a network source.
+
+Package: vlc-ggi
+Architecture: any
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Description: GGI plugin for the VideoLAN MPEG2 and DVD player vlc
+ VideoLAN is a free MPEG2 software solution.
+ .
+ This is a GGI plugin for the VideoLAN Client.
+
+Package: vlc-glide
+Architecture: any
+Depends: vlc (= ${Source-Version}), libglide2
+Description: Glide plugin for the VideoLAN MPEG2 and DVD player vlc
+ VideoLAN is a free MPEG2 software solution.
+ .
+ This is a Glide (3dfx) plugin for the VideoLAN Client.
+
+Package: vlc-esd
+Architecture: any
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Description: Esound plugin for the VideoLAN MPEG2 and DVD player vlc
+ VideoLAN is a free MPEG2 software solution.
+ .
+ This plugin adds support for the Enlightened Sound Daemon to
+ the VideoLAN Client.
+

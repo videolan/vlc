@@ -1,3 +1,4 @@
+Wed Aug 16 01:07:14 CEST 2000
 0.1.99g :
 
   * removed all "*vlc" aliases except "gvlc" and "fbvlc". The other sucked.
@@ -9,6 +10,11 @@
   * fixed a few long lines.
   * fixed 8bpp YUV.
   * fixed the fscked up Bresenham algorithm in all YUV functions.
+  * fixed a dumb bug in the Makefile that prevented inclusion of the
+    -march=pentium directive. thanks Meuuh, blame sam.
+  * fixed a warning in main.c.
+  * separate Debian packages.
+  * added request for ALSA support in the TODO list.
 
 Tue Aug  8 11:24:01 CEST 2000
 0.1.99f :

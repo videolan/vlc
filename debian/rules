@@ -15,7 +15,8 @@ build-stamp:
 	./configure --prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
-		--enable-mmx --enable-gnome --enable-fb
+		--enable-mmx --enable-gnome --enable-fb \
+		--enable-ggi --enable-esd --enable-glide
 	$(MAKE)
 
 	touch build-stamp
@@ -37,6 +38,13 @@ install: build
 
 	$(MAKE) install prefix=`pwd`/debian/tmp/usr
 
+	# make symlinks for packages
+	for alias in ggi gnome fb glide esd ; do \
+		ln -s vlc debian/tmp/usr/share/doc/vlc-$$alias ; done
+	ln -s vlc.1.gz debian/tmp/usr/share/man/man1/fbvlc.1.gz
+	ln -s vlc.1.gz debian/tmp/usr/share/man/man1/gvlc.1.gz
+
+	dh_movefiles
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -55,10 +63,10 @@ binary-arch: build install
 #	dh_installpam
 #	dh_installinit
 	dh_installcron
-	dh_installmanpages
+	dh_installmanpages -Nvlc-gnome -Nvlc-fb -Nvlc-ggi -Nvlc-glide -Nvlc-esd
 	dh_installinfo
 #	dh_undocumented
-	dh_installchangelogs 
+	dh_installchangelogs -Nvlc-gnome -Nvlc-fb -Nvlc-ggi -Nvlc-glide -Nvlc-esd
 	dh_link
 	dh_strip
 	dh_compress
@@ -68,7 +76,7 @@ binary-arch: build install
 #	dh_makeshlibs
 	dh_installdeb
 #	dh_perl
-	dh_shlibdeps
+	dh_shlibdeps -Nvlc-glide
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
