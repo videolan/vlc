@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_sdl.c,v 1.20.2.1 2001/12/18 00:51:19 sam Exp $
+ * $Id: aout_sdl.c,v 1.20.2.2 2001/12/18 02:19:35 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -183,7 +183,8 @@ static int aout_Open( aout_thread_t *p_aout )
 #endif
                 ) < 0 )
     {
-        intf_ErrMsg( "aout error: can't initialize SDL (%s)", SDL_GetError() );+        free( p_aout->p_sys );
+        intf_ErrMsg( "aout error: can't initialize SDL (%s)", SDL_GetError() );
+        free( p_aout->p_sys );
         return( 1 );
     }
 
