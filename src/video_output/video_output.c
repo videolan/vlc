@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.156 2002/01/12 01:25:57 sam Exp $
+ * $Id: video_output.c,v 1.157 2002/01/13 15:07:55 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -172,9 +172,12 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     p_vout->b_info       = 0;
     p_vout->b_interface  = 0;
     p_vout->b_scale      = 1;
-    p_vout->b_fullscreen = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
-                                                VOUT_FULLSCREEN_DEFAULT );
+    p_vout->b_fullscreen = 0;
     p_vout->render_time  = 10;
+
+    /* user requested fullscreen? */
+    if( main_GetIntVariable( VOUT_FULLSCREEN_VAR, VOUT_FULLSCREEN_DEFAULT ) )
+        p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
 
     /* Create thread and set locks */
     vlc_mutex_init( &p_vout->picture_lock );

@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.2 2002/01/10 04:11:25 sam Exp $
+ * $Id: xmga.c,v 1.3 2002/01/13 15:07:55 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -153,6 +153,10 @@ typedef struct vout_sys_s
     int                 i_height_backup;
     int                 i_xpos_backup;
     int                 i_ypos_backup;
+    int                 i_width_backup_2;
+    int                 i_height_backup_2;
+    int                 i_xpos_backup_2;
+    int                 i_ypos_backup_2;
 
     /* Screen saver properties */
     int                 i_ss_timeout;                             /* timeout */
@@ -974,6 +978,10 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
     Atom prop;
     mwmhints_t mwmhints;
     int i_xpos, i_ypos, i_width, i_height;
+    XEvent xevent;
+#ifdef ALTERNATE_FULLSCREEN
+    XSetWindowAttributes attributes;
+#endif
 
     p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
@@ -985,10 +993,35 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         intf_WarnMsg( 3, "vout: entering fullscreen mode" );
 
         /* Save current window coordinates so they can be restored when
-         * we exit from fullscreen mode */
+         * we exit from fullscreen mode. This is the tricky part because
+         * this heavily depends on the behaviour of the window manager.
+         * When you use XMoveWindow some window managers will adjust the top
+         * of the window to the coordinates you gave, but others will instead
+         * adjust the top of the client area to the coordinates
+         * (don't forget windows have decorations). */
 
-        /* find the real parent, which means the which is a direct child of
-         * the root window */
+        /* First, get the position and size of the client area */
+        XGetGeometry( p_vout->p_sys->p_display,
+                      p_vout->p_sys->window,
+                      &dummy1,
+                      &dummy2,
+                      &dummy3,
+                      &p_vout->p_sys->i_width_backup_2,
+                      &p_vout->p_sys->i_height_backup_2,
+                      &dummy2, &dummy3 );
+        XTranslateCoordinates( p_vout->p_sys->p_display,
+                               p_vout->p_sys->window,
+                               DefaultRootWindow( p_vout->p_sys->p_display ),
+                               0,
+                               0,
+                               &p_vout->p_sys->i_xpos_backup_2,
+                               &p_vout->p_sys->i_ypos_backup_2,
+                               &dummy1 );
+
+        /* Then try to get the position and size of the whole window */
+
+        /* find the real parent of our window (created by the window manager),
+         * the one which is a direct child of the root window */
         next_parent = parent = p_vout->p_sys->window;
         while( next_parent != DefaultRootWindow( p_vout->p_sys->p_display ) )
         {
@@ -1020,9 +1053,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
                                &p_vout->p_sys->i_ypos_backup,
                                &dummy1 );
 
-        mwmhints.flags = MWM_HINTS_DECORATIONS;
-        mwmhints.decorations = 0;
-
+        /* fullscreen window size and position */
         i_xpos = 0;
         i_ypos = 0;
         i_width = DisplayWidth( p_vout->p_sys->p_display,
@@ -1042,9 +1073,6 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
     {
         intf_WarnMsg( 3, "vout: leaving fullscreen mode" );
 
-        mwmhints.flags = MWM_HINTS_DECORATIONS;
-        mwmhints.decorations = 1;
-
         i_xpos = p_vout->p_sys->i_xpos_backup;
         i_ypos = p_vout->p_sys->i_ypos_backup;
         i_width = p_vout->p_sys->i_width_backup;
@@ -1057,15 +1085,20 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
      * The other way is to use the motif property "_MOTIF_WM_HINTS" which
      * luckily seems to be supported by most window managers.
      */
+#ifndef ALTERNATE_FULLSCREEN
+    mwmhints.flags = MWM_HINTS_DECORATIONS;
+    mwmhints.decorations = !p_vout->b_fullscreen;
+
     prop = XInternAtom( p_vout->p_sys->p_display, "_MOTIF_WM_HINTS",
                         False );
     XChangeProperty( p_vout->p_sys->p_display, p_vout->p_sys->window,
                      prop, prop, 32, PropModeReplace,
                      (unsigned char *)&mwmhints,
                      PROP_MWM_HINTS_ELEMENTS );
-#if 0 /* brute force way to remove decorations */
-    XSetWindowAttributes attributes;
-    attributes.override_redirect = True;
+
+#else
+    /* brute force way to remove decorations */
+    attributes.override_redirect = p_vout->b_fullscreen;
     XChangeWindowAttributes( p_vout->p_sys->p_display,
                              p_vout->p_sys->window,
                              CWOverrideRedirect,
@@ -1075,14 +1108,117 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
     /* We need to unmap and remap the window if we want the window 
      * manager to take our changes into effect */
     XUnmapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window);
+
+    XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                  StructureNotifyMask, &xevent );
+    while( xevent.type != UnmapNotify )
+        XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                      StructureNotifyMask, &xevent );
+
     XMapRaised( p_vout->p_sys->p_display, p_vout->p_sys->window);
+
+    while( xevent.type != MapNotify )
+        XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                      StructureNotifyMask, &xevent );
+
     XMoveResizeWindow( p_vout->p_sys->p_display,
                        p_vout->p_sys->window,
                        i_xpos,
                        i_ypos,
                        i_width,
                        i_height );
-     XSync( p_vout->p_sys->p_display, False );
+
+    /* Purge all ConfigureNotify events, this is needed to fix a bug where we
+     * would lose the original size of the window */
+    while( xevent.type != ConfigureNotify )
+        XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                      StructureNotifyMask, &xevent );
+    while( XCheckWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                              StructureNotifyMask, &xevent ) );
+
+
+    /* We need to check that the window was really restored where we wanted */
+    if( !p_vout->b_fullscreen )
+    {
+        Window dummy1;
+        unsigned int dummy2, dummy3, dummy4, dummy5;
+
+        /* Check the position */
+        XTranslateCoordinates( p_vout->p_sys->p_display,
+                               p_vout->p_sys->window,
+                               DefaultRootWindow( p_vout->p_sys->p_display ),
+                               0,
+                               0,
+                               &dummy2,
+                               &dummy3,
+                               &dummy1 );
+        if( dummy2 != p_vout->p_sys->i_xpos_backup_2 ||
+            dummy3 != p_vout->p_sys->i_ypos_backup_2 )
+        {
+            /* Ok it didn't work... second try */
+
+            XMoveWindow( p_vout->p_sys->p_display,
+                         p_vout->p_sys->window,
+                         p_vout->p_sys->i_xpos_backup_2,
+                         p_vout->p_sys->i_ypos_backup_2 );
+            
+            /* Purge all ConfigureNotify events, this is needed to fix a bug
+             * where we would lose the original size of the window */
+            XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                          StructureNotifyMask, &xevent );
+            while( xevent.type != ConfigureNotify )
+                XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                              StructureNotifyMask, &xevent );
+            while( XCheckWindowEvent( p_vout->p_sys->p_display,
+                                      p_vout->p_sys->window,
+                                      StructureNotifyMask, &xevent ) );
+        }
+
+        /* Check the size */
+        XGetGeometry( p_vout->p_sys->p_display,
+                      p_vout->p_sys->window,
+                      &dummy1,
+                      &dummy2,
+                      &dummy3,
+                      &dummy4,
+                      &dummy5,
+                      &dummy2, &dummy3 );
+
+        if( dummy4 != p_vout->p_sys->i_width_backup_2 ||
+            dummy5 != p_vout->p_sys->i_height_backup_2 )
+        {
+            /* Ok it didn't work... third try */
+
+            XResizeWindow( p_vout->p_sys->p_display,
+                         p_vout->p_sys->window,
+                         p_vout->p_sys->i_width_backup_2,
+                         p_vout->p_sys->i_height_backup_2 );
+            
+            /* Purge all ConfigureNotify events, this is needed to fix a bug
+             * where we would lose the original size of the window */
+            XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                          StructureNotifyMask, &xevent );
+            while( xevent.type != ConfigureNotify )
+                XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                              StructureNotifyMask, &xevent );
+            while( XCheckWindowEvent( p_vout->p_sys->p_display,
+                                      p_vout->p_sys->window,
+                                      StructureNotifyMask, &xevent ) );
+        }
+    }
+
+#ifdef ALTERNATE_FULLSCREEN
+    XSetInputFocus(p_vout->p_sys->p_display,
+                   p_vout->p_sys->window,
+                   RevertToParent,
+                   CurrentTime);
+#endif
+
+    /* signal that the size needs to be updated */
+    p_vout->p_sys->i_width = i_width;
+    p_vout->p_sys->i_height = i_height;
+    p_vout->i_changes |= VOUT_SIZE_CHANGE;
+
 }
 
 /*****************************************************************************
