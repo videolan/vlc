@@ -123,11 +123,11 @@ vlc_module_begin();
 
     add_bool( "mkv-use-ordered-chapters", 1, NULL,
             N_("Ordered chapters"),
-            N_("Play chapters in the specified order as specified in the file"), VLC_TRUE );
+            N_("Play ordered chapters as specified in the segment"), VLC_TRUE );
 
     add_bool( "mkv-use-chapter-codec", 1, NULL,
             N_("Chapter codecs"),
-            N_("Use chapter codecs found in the file"), VLC_TRUE );
+            N_("Use chapter codecs found in the segment"), VLC_TRUE );
 
     add_bool( "mkv-seek-percent", 0, NULL,
             N_("Seek based on percent not time"),
@@ -336,7 +336,8 @@ public:
     ,psz_parent(NULL)
     {}
     
-    int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time, input_title_t & title );
+    int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time );
+    void PublishChapters( input_title_t & title, int i_level );
     const chapter_item_t * FindTimecode( mtime_t i_timecode ) const;
     
     int64_t                     i_start_time, i_end_time;
@@ -358,20 +359,19 @@ protected:
     bool Leave();
 };
 
-class chapter_edition_t 
+class chapter_edition_t : public chapter_item_t
 {
 public:
     chapter_edition_t()
-    :i_uid(-1)
-    ,b_ordered(false)
+    :b_ordered(false)
     {}
     
-    void RefreshChapters( input_title_t & title );
-    double Duration() const;
-    const chapter_item_t * FindTimecode( mtime_t i_timecode ) const;
+    void RefreshChapters( );
+    mtime_t Duration() const;
+    void PublishChapters( input_title_t & title );
+    void Append( const chapter_edition_t & edition );
+    chapter_item_t * FindChapter( const chapter_item_t & chapter ) const;
     
-    std::vector<chapter_item_t> chapters;
-    int64_t                     i_uid;
     bool                        b_ordered;
 };
 
@@ -577,6 +577,7 @@ public:
 
 /* TODO handle/merge chapters here */
     void UpdateCurrentToChapter( demux_t & demux );
+    bool Select( input_title_t & title );
 
 protected:
     std::vector<matroska_segment_t*> linked_segments;
@@ -658,7 +659,7 @@ public:
     matroska_segment_t *FindSegment( const EbmlBinary & uid ) const;
     void PreloadFamily( );
     void PreloadLinked( matroska_segment_t *p_segment );
-    void PreparePlayback( );
+    bool PreparePlayback( );
     matroska_stream_t *AnalyseAllSegmentsFound( EbmlStream *p_estream );
 };
 
@@ -798,12 +799,7 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->PreloadFamily( );
     p_sys->PreloadLinked( p_segment );
-    p_sys->PreparePlayback( );
-
-    /* add information */
-    p_segment->InformationCreate( );
-
-    if ( !p_segment->Select( 0 ) )
+    if ( !p_sys->PreparePlayback( ) )
     {
         msg_Err( p_demux, "cannot use the segment" );
         goto error;
@@ -1332,10 +1328,16 @@ bool matroska_segment_t::Select( mtime_t i_start_time )
         else if( !strcmp( tk->psz_codec, "V_QUICKTIME" ) )
         {
             MP4_Box_t *p_box = (MP4_Box_t*)malloc( sizeof( MP4_Box_t ) );
+#ifdef VSLHC
+            stream_t *p_mp4_stream = stream_MemoryNew( VLC_OBJECT(&sys.demuxer),
+                                                       tk->p_extra_data,
+                                                       tk->i_extra_data );
+#else
             stream_t *p_mp4_stream = stream_MemoryNew( VLC_OBJECT(&sys.demuxer),
                                                        tk->p_extra_data,
                                                        tk->i_extra_data,
                                                        VLC_FALSE );
+#endif
             MP4_ReadBoxCommon( p_mp4_stream, p_box );
             MP4_ReadBox_sample_vide( p_mp4_stream, p_box );
             tk->fmt.i_codec = p_box->i_type;
@@ -1345,7 +1347,11 @@ bool matroska_segment_t::Select( mtime_t i_start_time )
             tk->fmt.p_extra = malloc( tk->fmt.i_extra );
             memcpy( tk->fmt.p_extra, p_box->data.p_sample_vide->p_qt_image_description, tk->fmt.i_extra );
             MP4_FreeBox_sample_vide( p_box );
+#ifdef VSLHC
+            stream_MemoryDelete( p_mp4_stream, VLC_TRUE );
+#else
             stream_Delete( p_mp4_stream );
+#endif        
         }
         else if( !strcmp( tk->psz_codec, "A_MS/ACM" ) )
         {
@@ -1586,6 +1592,65 @@ void matroska_segment_t::UnSelect( )
     }
 }
 
+bool virtual_segment_t::Select( input_title_t & title )
+{
+    if ( linked_segments.size() == 0 )
+        return false;
+
+    // !!! should be called only once !!!
+    matroska_segment_t *p_segment;
+    size_t i, j;
+
+    // copy editions from the first segment
+    p_segment = linked_segments[0];
+    editions = p_segment->stored_editions;
+    i_current_edition = p_segment->i_default_edition;
+
+    for ( i=1 ; i<linked_segments.size(); i++ )
+    {
+        p_segment = linked_segments[i];
+        // FIXME assume we have the same editions in all segments
+        for (j=0; j<p_segment->stored_editions.size(); j++)
+            editions[j].Append( p_segment->stored_editions[j] );
+    }
+
+    Edition()->PublishChapters( title );
+
+    return true;
+}
+
+void chapter_edition_t::PublishChapters( input_title_t & title )
+{
+    title.i_seekpoint = 0;
+    if ( title.seekpoint != NULL )
+        free( title.seekpoint );
+    chapter_item_t::PublishChapters( title, 0 );
+}
+
+void chapter_item_t::PublishChapters( input_title_t & title, int i_level )
+{
+    if (b_display_seekpoint)
+    {
+        seekpoint_t *sk = vlc_seekpoint_New();
+
+        sk->i_level = i_level;
+        sk->i_time_offset = i_start_time;
+        sk->psz_name = strdup( psz_name.c_str() );
+
+        // A start time of '0' is ok. A missing ChapterTime element is ok, too, because '0' is its default value.
+        title.i_seekpoint++;
+        title.seekpoint = (seekpoint_t**)realloc( title.seekpoint, title.i_seekpoint * sizeof( seekpoint_t* ) );
+        title.seekpoint[title.i_seekpoint-1] = sk;
+    }
+
+    i_seekpoint_num = title.i_seekpoint;
+
+    for ( size_t i=0; i<sub_chapters.size() ; i++)
+    {
+        sub_chapters[i].PublishChapters( title, i_level+1 );
+    }
+}
+
 void virtual_segment_t::UpdateCurrentToChapter( demux_t & demux )
 {
     demux_sys_t & sys = *demux.p_sys;
@@ -1598,7 +1663,7 @@ void virtual_segment_t::UpdateCurrentToChapter( demux_t & demux )
         psz_curr_chapter = editions[i_current_edition].FindTimecode( sys.i_pts );
 
         /* we have moved to a new chapter */
-        if (psz_curr_chapter != NULL && psz_current_chapter != psz_curr_chapter)
+        if (psz_curr_chapter != NULL && psz_current_chapter != NULL && psz_current_chapter != psz_curr_chapter)
         {
             if (psz_current_chapter->i_seekpoint_num != psz_curr_chapter->i_seekpoint_num && psz_curr_chapter->i_seekpoint_num > 0)
             {
@@ -1620,6 +1685,28 @@ void virtual_segment_t::UpdateCurrentToChapter( demux_t & demux )
         }
         psz_current_chapter = psz_curr_chapter;
     }
+}
+
+void chapter_edition_t::Append( const chapter_edition_t & edition )
+{
+    size_t i;
+    chapter_item_t *p_chapter;
+
+    for ( i=0; i<edition.sub_chapters.size(); i++ )
+    {
+        p_chapter = FindChapter( edition.sub_chapters[i] );
+        if ( p_chapter != NULL )
+        {
+        }
+        else
+        {
+        }
+    }
+}
+
+chapter_item_t * chapter_edition_t::FindChapter( const chapter_item_t & chapter ) const
+{
+    return NULL;
 }
 
 static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chapter_item_t *psz_chapter )
@@ -2986,7 +3073,7 @@ void matroska_segment_t::ParseChapters( EbmlElement *chapters )
     EbmlMaster  *m;
     unsigned int i;
     int i_upper_level = 0;
-    float f_dur;
+    mtime_t i_dur;
 
     /* Master elements */
     m = static_cast<EbmlMaster *>(chapters);
@@ -3011,7 +3098,7 @@ void matroska_segment_t::ParseChapters( EbmlElement *chapters )
                 {
                     chapter_item_t new_sub_chapter;
                     ParseChapterAtom( 0, static_cast<EbmlMaster *>(l), new_sub_chapter );
-                    edition.chapters.push_back( new_sub_chapter );
+                    edition.sub_chapters.push_back( new_sub_chapter );
                 }
                 else if( MKV_IS_ID( l, KaxEditionUID ) )
                 {
@@ -3041,15 +3128,15 @@ void matroska_segment_t::ParseChapters( EbmlElement *chapters )
 
     for( i = 0; i < stored_editions.size(); i++ )
     {
-        stored_editions[i].RefreshChapters( *sys.title );
+        stored_editions[i].RefreshChapters( );
     }
     
     if ( stored_editions[i_default_edition].b_ordered )
     {
         /* update the duration of the segment according to the sum of all sub chapters */
-        f_dur = stored_editions[i_default_edition].Duration() / I64C(1000);
-        if (f_dur > 0.0)
-            i_duration = f_dur;
+        i_dur = stored_editions[i_default_edition].Duration() / I64C(1000);
+        if (i_dur > 0)
+            i_duration = i_dur;
     }
 }
 
@@ -3204,19 +3291,13 @@ static char * UTF8ToStr( const UTFstring &u )
     return dst;
 }
 
-void chapter_edition_t::RefreshChapters( input_title_t & title )
+void chapter_edition_t::RefreshChapters( )
 {
-    int64_t i_prev_user_time = 0;
-    std::vector<chapter_item_t>::iterator index = chapters.begin();
-
-    while ( index != chapters.end() )
-    {
-        i_prev_user_time = (*index).RefreshChapters( b_ordered, i_prev_user_time, title );
-        index++;
-    }
+    chapter_item_t::RefreshChapters( b_ordered, -1 );
+    b_display_seekpoint = false;
 }
 
-int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_time, input_title_t & title )
+int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_time )
 {
     int64_t i_user_time = i_prev_user_time;
     
@@ -3224,7 +3305,7 @@ int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
     std::vector<chapter_item_t>::iterator index = sub_chapters.begin();
     while ( index != sub_chapters.end() )
     {
-        i_user_time = (*index).RefreshChapters( b_ordered, i_user_time, title );
+        i_user_time = (*index).RefreshChapters( b_ordered, i_user_time );
         index++;
     }
 
@@ -3244,40 +3325,29 @@ int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
     {
         std::sort( sub_chapters.begin(), sub_chapters.end() );
         i_user_start_time = i_start_time;
-        i_user_end_time = i_end_time;
+        if ( i_end_time != -1 )
+            i_user_end_time = i_end_time;
+        else if ( i_user_time != -1 )
+            i_user_end_time = i_user_time;
+        else
+            i_user_end_time = i_user_start_time;
     }
-
-    if (b_display_seekpoint)
-    {
-        seekpoint_t *sk = vlc_seekpoint_New();
-
-//        sk->i_level = i_level;
-        sk->i_time_offset = i_start_time;
-        sk->psz_name = strdup( psz_name.c_str() );
-
-        // A start time of '0' is ok. A missing ChapterTime element is ok, too, because '0' is its default value.
-        title.i_seekpoint++;
-        title.seekpoint = (seekpoint_t**)realloc( title.seekpoint, title.i_seekpoint * sizeof( seekpoint_t* ) );
-        title.seekpoint[title.i_seekpoint-1] = sk;
-    }
-
-    i_seekpoint_num = title.i_seekpoint;
 
     return i_user_end_time;
 }
 
-double chapter_edition_t::Duration() const
+mtime_t chapter_edition_t::Duration() const
 {
-    double f_result = 0.0;
+    mtime_t i_result = 0.0;
     
-    if ( chapters.size() )
+    if ( sub_chapters.size() )
     {
-        std::vector<chapter_item_t>::const_iterator index = chapters.end();
+        std::vector<chapter_item_t>::const_iterator index = sub_chapters.end();
         index--;
-        f_result = (*index).i_user_end_time;
+        i_result = (*index).i_user_end_time;
     }
     
-    return f_result;
+    return i_result;
 }
 
 const chapter_item_t *chapter_item_t::FindTimecode( mtime_t i_user_timecode ) const
@@ -3295,20 +3365,6 @@ const chapter_item_t *chapter_item_t::FindTimecode( mtime_t i_user_timecode ) co
         
         if ( psz_result == NULL )
             psz_result = this;
-    }
-
-    return psz_result;
-}
-
-const chapter_item_t *chapter_edition_t::FindTimecode( mtime_t i_user_timecode ) const
-{
-    const chapter_item_t *psz_result = NULL;
-
-    std::vector<chapter_item_t>::const_iterator index = chapters.begin();
-    while ( index != chapters.end() && psz_result == NULL )
-    {
-        psz_result = (*index).FindTimecode( i_user_timecode );
-        index++;
     }
 
     return psz_result;
@@ -3379,10 +3435,15 @@ void demux_sys_t::PreloadLinked( matroska_segment_t *p_segment )
     p_current_segment->PreloadLinked( );
 }
 
-void demux_sys_t::PreparePlayback( )
+bool demux_sys_t::PreparePlayback( )
 {
     p_current_segment->LoadCues();
     f_duration = p_current_segment->Duration();
+
+    /* add information */
+    p_current_segment->Segment()->InformationCreate( );
+
+    return p_current_segment->Select( *title );
 }
 
 bool matroska_segment_t::CompareSegmentUIDs( const matroska_segment_t * p_item_a, const matroska_segment_t * p_item_b )
