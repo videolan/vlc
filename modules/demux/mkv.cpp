@@ -508,7 +508,7 @@ public:
 
     bool Preload( );
     bool PreloadFamily( const matroska_segment_t & segment );
-    size_t PreloadLinked( const demux_sys_t & of_sys );
+    size_t PreloadLinked( const demux_sys_t & of_sys, std::vector<matroska_segment_t*> & segments );
     void ParseInfo( EbmlElement *info );
     void ParseChapters( EbmlElement *chapters );
     void ParseSeekHead( EbmlElement *seekhead );
@@ -519,6 +519,7 @@ public:
     int BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration );
     bool Select( mtime_t i_start_time );
     void UnSelect( );
+    static bool CompareSegmentUIDs( const matroska_segment_t * item_a, const matroska_segment_t * item_b );
 };
 
 class matroska_stream_t
@@ -529,6 +530,7 @@ public:
         ,p_es(NULL)
         ,i_current_segment(-1)
         ,sys(demuxer)
+        ,f_duration(-1.0)
     {}
 
     ~matroska_stream_t()
@@ -547,6 +549,9 @@ public:
 
     demux_sys_t                      & sys;
     
+    /* duration of the stream */
+    float                   f_duration;
+
     inline matroska_segment_t *Segment()
     {
         if ( i_current_segment >= 0 && size_t(i_current_segment) < segments.size() )
@@ -558,6 +563,7 @@ public:
 
     void PreloadFamily( const matroska_segment_t & segment );
     size_t PreloadLinked( const demux_sys_t & of_sys );
+    void PreparePlayback( );
 };
 
 class demux_sys_t
@@ -603,6 +609,7 @@ public:
     matroska_segment_t *FindSegment( const EbmlBinary & uid ) const;
     void PreloadFamily( );
     void PreloadLinked( );
+    void PreparePlayback( );
     matroska_stream_t *AnalyseAllSegmentsFound( EbmlStream *p_estream );
 };
 
@@ -747,6 +754,7 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->PreloadFamily( );
     p_sys->PreloadLinked( );
+    p_sys->PreparePlayback( );
 
     /* *** Load the cue if found *** */
     if( p_segment->i_cues_position >= 0 )
@@ -828,17 +836,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_segment && p_segment->f_duration > 0.0 )
+            if( p_stream->f_duration > 0.0 )
             {
-                *pi64 = (int64_t)(p_segment->f_duration * 1000);
+                *pi64 = (int64_t)(p_stream->f_duration * 1000);
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
 
         case DEMUX_GET_POSITION:
             pf = (double*)va_arg( args, double * );
-            if ( p_segment && p_segment->f_duration > 0.0 )
-                *pf = (double)p_sys->i_pts / (1000.0 * p_segment->f_duration);
+            if ( p_stream->f_duration > 0.0 )
+                *pf = (double)p_sys->i_pts / (1000.0 * p_stream->f_duration);
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
@@ -1638,9 +1646,9 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
     /* seek without index or without date */
     if( f_percent >= 0 && (config_GetInt( p_demux, "mkv-seek-percent" ) || !p_segment->b_cues || i_date < 0 ))
     {
-        if (p_segment->f_duration >= 0)
+        if (p_stream->f_duration >= 0)
         {
-            i_date = int64_t( f_percent * p_segment->f_duration * 1000.0 );
+            i_date = int64_t( f_percent * p_stream->f_duration * 1000.0 );
         }
         else
         {
@@ -3108,7 +3116,7 @@ void matroska_segment_t::ParseChapters( EbmlElement *chapters )
                 }
                 else if( MKV_IS_ID( l, KaxEditionFlagOrdered ) )
                 {
-					edition.b_ordered = config_GetInt( &sys.demuxer, "mkv-use-ordered-chapters" ) ? (uint8(*static_cast<KaxEditionFlagOrdered *>( l )) != 0) : 0;
+                    edition.b_ordered = config_GetInt( &sys.demuxer, "mkv-use-ordered-chapters" ) ? (uint8(*static_cast<KaxEditionFlagOrdered *>( l )) != 0) : 0;
                 }
                 else if( MKV_IS_ID( l, KaxEditionFlagDefault ) )
                 {
@@ -3440,12 +3448,13 @@ size_t matroska_stream_t::PreloadLinked( const demux_sys_t & of_sys )
     size_t i_result = 0;
     for (size_t i=0; i<segments.size(); i++)
     {
-        i_result += segments[i]->PreloadLinked( of_sys );
+        i_result += segments[i]->PreloadLinked( of_sys, segments );
     }
+
     return i_result;
 }
 
-size_t matroska_segment_t::PreloadLinked( const demux_sys_t & of_sys )
+size_t matroska_segment_t::PreloadLinked( const demux_sys_t & of_sys, std::vector<matroska_segment_t*> & segments )
 {
     size_t i_result = 0;
     if ( prev_segment_uid.GetBuffer() )
@@ -3453,7 +3462,11 @@ size_t matroska_segment_t::PreloadLinked( const demux_sys_t & of_sys )
         matroska_segment_t *p_segment = of_sys.FindSegment( prev_segment_uid );
         if ( p_segment )
         {
-            i_result += p_segment->Preload( ) ? 1 : 0;
+            if ( p_segment->Preload( ) )
+            {
+                segments.push_back( p_segment );
+                i_result++;
+            }
         }
     }
     if ( next_segment_uid.GetBuffer() )
@@ -3461,10 +3474,51 @@ size_t matroska_segment_t::PreloadLinked( const demux_sys_t & of_sys )
         matroska_segment_t *p_segment = of_sys.FindSegment( next_segment_uid );
         if ( p_segment )
         {
-            i_result += p_segment->Preload( ) ? 1 : 0;
+            if ( p_segment->Preload( ) )
+            {
+                segments.push_back( p_segment );
+                i_result++;
+            }
         }
     }
     return i_result;
+}
+
+void demux_sys_t::PreparePlayback( )
+{
+    matroska_stream_t *p_stream = Stream();
+    if ( p_stream )
+    {
+        p_stream->PreparePlayback( );
+    }
+}
+
+void matroska_stream_t::PreparePlayback( )
+{
+    size_t i;
+
+    // update duration
+    f_duration = 0.0;
+    for (i=0; i<segments.size(); i++)
+    {
+        f_duration += segments[i]->f_duration;
+    }
+
+    // sort segment order
+    std::sort( segments.begin(), segments.end(), matroska_segment_t::CompareSegmentUIDs );
+}
+
+bool matroska_segment_t::CompareSegmentUIDs( const matroska_segment_t * p_item_a, const matroska_segment_t * p_item_b )
+{
+    EbmlBinary * p_itema = (EbmlBinary *)(&p_item_a->segment_uid);
+    if ( *p_itema == p_item_b->prev_segment_uid )
+        return true;
+
+    p_itema = (EbmlBinary *)(&p_item_a->next_segment_uid);
+    if ( *p_itema == p_item_b->segment_uid )
+        return true;
+
+    return false;
 }
 
 bool matroska_segment_t::Preload( )
