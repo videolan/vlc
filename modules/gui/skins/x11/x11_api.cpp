@@ -2,7 +2,7 @@
  * x11_api.cpp: Various x11-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_api.cpp,v 1.8 2003/06/07 00:36:28 asmax Exp $
+ * $Id: x11_api.cpp,v 1.9 2003/06/09 22:02:13 asmax Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -91,7 +91,7 @@ void OSAPI_PostMessage( SkinWindow *win, unsigned int message,
 //---------------------------------------------------------------------------
 int OSAPI_GetNonTransparentColor( int c )
 {
-    return 0;
+    return ( c < 10 ? 10 : c );
 }
 //---------------------------------------------------------------------------
 

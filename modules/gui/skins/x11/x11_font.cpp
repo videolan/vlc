@@ -2,7 +2,7 @@
  * x11_font.cpp: X11 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_font.cpp,v 1.9 2003/06/09 12:33:16 asmax Exp $
+ * $Id: x11_font.cpp,v 1.10 2003/06/09 22:02:13 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -97,7 +97,7 @@ void X11Font::GenericPrint( Graphics *dest, string text, int x, int y,
 
     XGCValues gcVal;
     // Change color to avoid transparency
-    gcVal.foreground = (color == 0 ? 10 : color);
+    gcVal.foreground = (color < 10 ? 10 : color);
     gcVal.font = font;
     XRectangle rect;
     rect.x = x;
