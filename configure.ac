@@ -1962,7 +1962,10 @@ then
     AC_CHECK_LIB(faad, faacDecOpen, [
       AX_ADD_PLUGINS([faad])
       AX_ADD_LDFLAGS([faad],[-lfaad]) ],
-      [ AC_MSG_ERROR([Cannot find libfaad library...]) ])
+      AC_CHECK_LIB(faad, NeAACDecOpen, [
+        AX_ADD_PLUGINS([faad])
+        AX_ADD_LDFLAGS([faad],[-lfaad]) ],
+        [ AC_MSG_ERROR([Cannot find libfaad library...]) ]))
     LDFLAGS="${LDFLAGS_save}"
     CPPFLAGS="${CPPFLAGS_save}"
   fi
