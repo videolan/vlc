@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.6 2003/02/01 21:10:19 massiot Exp $
+$Id: NEWS,v 1.7 2003/02/01 21:20:33 massiot Exp $
 
 Changes between 0.4.6 and 0.5.0:
 --------------------------------
@@ -43,8 +43,10 @@ Codecs:
   * support for DV video codec via libdv
   * support for AAC audio codec via libfaad2
   * support for Xvid codec
-  * support for Xiph.org's Vorbis and Tremor audio codecs
-  * support for Xiph.org's Tarkin and Theora video codecs
+  * support for Xiph.org's Vorbis audio codec
+  * support for Xiph.org's Tremor audio codec (when compiling from sources)
+  * support for Xiph.org's Tarkin and Theora video codecs (when compiling
+    from sources)
   * new codecs supported by latest ffmpeg versions: WMV, WMA, SVQ 1, H263,
     H263i, MJPEG A/B
   * fixed an endianness bug in LPCM codec
