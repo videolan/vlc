@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.46 2003/02/05 16:23:06 hartman Exp $
+ * $Id: intf.m,v 1.47 2003/02/06 23:55:28 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -360,7 +360,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         addPort: p_intf->p_sys->o_sendport
         forMode: NSDefaultRunLoopMode];
 
-    [NSTimer scheduledTimerWithTimeInterval: 0.1
+    [NSTimer scheduledTimerWithTimeInterval: 0.5
         target: self selector: @selector(manageIntf:)
         userInfo: nil repeats: TRUE];
 
@@ -405,7 +405,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
         vlc_mutex_unlock( &p_intf->change_lock );
 
-        o_sleep_date = [NSDate dateWithTimeIntervalSinceNow: 0.1];
+        o_sleep_date = [NSDate dateWithTimeIntervalSinceNow: .5];
         [NSThread sleepUntilDate: o_sleep_date];
     }
 

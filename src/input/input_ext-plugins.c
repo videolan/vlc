@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.27 2003/01/25 03:12:20 fenrir Exp $
+ * $Id: input_ext-plugins.c,v 1.28 2003/02/06 23:55:29 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -145,7 +145,7 @@ void input_BuffersEnd( input_thread_t * p_input, input_buffers_t * p_buffers )
 
         if( p_buffers->i_allocated )
         {
-            msg_Err( p_input, "%d bytes have not been freed, "
+            msg_Err( p_input, "%u bytes have not been freed, "
                               "expect memory leak", p_buffers->i_allocated );
         }
 
