@@ -60,16 +60,24 @@ void WINAPI FreeMediaType( AM_MEDIA_TYPE& mt );
 HRESULT WINAPI CopyMediaType( AM_MEDIA_TYPE *pmtTarget,
                               const AM_MEDIA_TYPE *pmtSource );
 
+int GetFourCCFromMediaType(const AM_MEDIA_TYPE &media_type);
+
 /****************************************************************************
  * Declaration of our dummy directshow filter pin class
  ****************************************************************************/
 class CapturePin: public IPin, public IMemInputPin
 {
+    friend class CaptureEnumMediaTypes;
+
     input_thread_t *p_input;
     CaptureFilter  *p_filter;
 
     IPin *p_connected_pin;
-    AM_MEDIA_TYPE media_type;
+
+    AM_MEDIA_TYPE *media_types;
+    size_t media_type_count;
+
+    AM_MEDIA_TYPE cx_media_type;
 
     deque<VLCMediaSample> samples_queue;
 
@@ -77,7 +85,7 @@ class CapturePin: public IPin, public IMemInputPin
 
   public:
     CapturePin( input_thread_t * _p_input, CaptureFilter *_p_filter,
-                AM_MEDIA_TYPE mt );
+                AM_MEDIA_TYPE *mt, size_t mt_count );
     virtual ~CapturePin();
 
     /* IUnknown methods */
@@ -116,7 +124,7 @@ class CapturePin: public IPin, public IMemInputPin
 
     /* Custom methods */
     HRESULT CustomGetSample( VLCMediaSample * );
-    AM_MEDIA_TYPE CustomGetMediaType();
+    AM_MEDIA_TYPE &CustomGetMediaType();
 };
 
 /****************************************************************************
@@ -124,16 +132,18 @@ class CapturePin: public IPin, public IMemInputPin
  ****************************************************************************/
 class CaptureFilter : public IBaseFilter
 {
+    friend class CapturePin;
+
     input_thread_t *p_input;
     CapturePin     *p_pin;
     IFilterGraph   *p_graph;
-    AM_MEDIA_TYPE  media_type;
+    //AM_MEDIA_TYPE  media_type;
     FILTER_STATE   state;
 
     long i_ref;
 
   public:
-    CaptureFilter( input_thread_t * _p_input, AM_MEDIA_TYPE mt );
+    CaptureFilter( input_thread_t * _p_input, AM_MEDIA_TYPE *mt, size_t mt_count );
     virtual ~CaptureFilter();
 
     /* IUnknown methods */
