@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.3 2001/07/18 14:21:00 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.4 2001/07/18 17:05:39 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -1347,6 +1347,9 @@ static __inline__ void MotionVector( vpar_thread_t * p_vpar,
         }
 
         /* Dual Prime Arithmetic (ISO/IEC 13818-2 section 7.6.3.6). */
+        /* FIXME */
+        intf_Msg( "Your stream uses Dual Prime Arithmetic. Please send a mail"
+                  "to massiot@via.ecp.fr for debugging purposes. Thank you." );
 
 #define i_mv_x  p_mb->pppi_motion_vectors[0][0][0]
         if( i_structure == FRAME_STRUCTURE )

@@ -92,6 +92,7 @@ reasons, we don't call <function>pthread_*</function> functions
 directly, but use a similar wrapper, made of <function> vlc_thread_create,
 vlc_thread_exit, vlc_thread_join, vlc_mutex_init, vlc_mutex_lock,
 vlc_mutex_unlock, vlc_mutex_destroy, vlc_cond_init, vlc_cond_signal,
+vlc_cond_broadcast,
 vlc_cond_wait, vlc_cond_destroy</function>, and structures <type>
 vlc_thread_t, vlc_mutex_t, and vlc_cond_t</type>.
     </para>
@@ -165,7 +166,7 @@ don't need usage of the module name.
     <sect2> <title> Variable naming </title>
 
       <para>
-Hungarian notations used, that means we have the following prefixes :
+Hungarian notations are used, that means we have the following prefixes :
       </para>
 
       <itemizedlist>

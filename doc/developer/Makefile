@@ -18,25 +18,25 @@ JADE=jade
 
 manual: manual.txt manual.ps manual.html
 
-%.tex: %.xml
-	$(JADE) -t tex -V %section-autolabel% -d $(PRINT_SS) $(XML_DECL) $<
+manual.tex: audio_output.xml debugging.xml decoders.xml gfdl.xml glossary.xml history.xml input.xml interface.xml manual.xml overview.xml ports.xml video_output.xml
+	$(JADE) -t tex -V %section-autolabel% -d $(PRINT_SS) $(XML_DECL) manual.xml
 	perl -i.bak -pe 's/\000//g' $@ && rm $*.tex.bak
 # No it's not a joke
 
-%.html: %.xml
+manual.html: audio_output.xml debugging.xml decoders.xml gfdl.xml glossary.xml history.xml input.xml interface.xml manual.xml overview.xml ports.xml video_output.xml
 	$(JADE) -t sgml -V %section-autolabel% -V nochunks \
-         -d $(HTML_SS) $(XML_DECL) $< > $@
+         -d $(HTML_SS) $(XML_DECL) manual.xml > $@
 
-%.dvi: %.tex
-	jadetex $<
-	jadetex $<
-	jadetex $<
+manual.dvi: manual.tex modules.eps ps.eps stream.eps ts.eps
+	jadetex manual.tex
+	jadetex manual.tex
+	jadetex manual.tex
 
-%.ps: %.dvi
+manual.ps: manual.dvi
 	dvips -f $< > $@
 
-%.txt: %.xml
-	$(JADE) -t sgml -V nochunks -d $(HTML_SS) $(XML_DECL) $< > dump.html
+manual.txt: audio_output.xml debugging.xml decoders.xml gfdl.xml glossary.xml history.xml input.xml interface.xml manual.xml overview.xml ports.xml video_output.xml
+	$(JADE) -t sgml -V nochunks -d $(HTML_SS) $(XML_DECL) manual.xml > dump.html
 	lynx -force_html -dump dump.html > $@
 	-rm -f dump.html
 

@@ -310,16 +310,13 @@ be described in the following section.
 VideoLAN Client provides an MPEG-1, and an MPEG-2 Main Profile @
 Main Level decoder. It has been natively written for VLC, and is quite
 mature. Its status is a bit special, since it is splitted between two
-modules : video parser and video decoder [this is subject to change].
+logicial entities : video parser and video decoder.
 The initial goal is to separate bit stream parsing functions from
 highly parallelizable mathematical algorithms. In theory, there can be
 one video parser thread (and only one, otherwise we would have race
-conditions reading the bit stream), along with several video decoder
+conditions reading the bit stream), along with a pool of video decoder
 threads, which do IDCT and motion compensation on several blocks
-at once [practically,
-multi-threaded mode hasn't been tested for a while, still needs some
-work, and was actually slower than mono-threaded mode ; the
-multi-threaded mode won't be documented for the moment].
+at once.
       </para>
 
       <para>
@@ -375,7 +372,9 @@ Note also that the DMV algorithm is untested and is probably buggy.
 
         <para>
 Just like motion compensation, IDCT is platform-specific. So we moved it
-to <filename> plugins/idct</filename>. You need to define four methods :
+to <filename> plugins/idct</filename>. This module does the IDCT
+calculation, and copies the data to the final picture. You need to define
+seven methods :
         </para>
 
         <itemizedlist>
@@ -407,6 +406,25 @@ to <filename> plugins/idct</filename>. You need to define four methods :
           some IDCT (MMX) need to invert certain coefficients in the
           MPEG scan matrices (see ISO/IEC 13818-2).
           </para> </listitem>
+
+          <listitem> <para> <function> vdec_InitDecode </function>
+          <parameter> ( struct vdec_thread_s * p_vdec ) </parameter> :
+          Initializes the IDCT and optional crop tables.
+          </para> </listitem>
+
+          <listitem> <para> <function> vdec_DecodeMacroblockC </function>
+          <parameter> ( struct vdec_thread_s *p_vdec,
+          struct macroblock_s * p_mb ); </parameter> :
+          Decodes an entire macroblock and copies its data to the final
+          picture, including chromatic information.
+          </para> </listitem>
+
+          <listitem> <para> <function> vdec_DecodeMacroblockBW </function>
+          <parameter> ( struct vdec_thread_s *p_vdec,
+          struct macroblock_s * p_mb ); </parameter> :
+          Decodes an entire macroblock and copies its data to the final
+          picture, except chromatic information (used in grayscale mode).
+          </para> </listitem>
         </itemizedlist>
 
         <para>
@@ -417,10 +435,21 @@ and the simple 1-D separation IDCT from the ISO reference decoder
 (<filename>idctclassic.c</filename>).
         </para>
 
+      </sect2>
+
+      <sect2> <title> Symmetrical Multiprocessing </title>
+
         <para>
-[In the future, the IDCT plug-in will include <function> vdec_AddBlock
-</function> and <function> vdec_CopyBlock </function>, which are
-often architecture-specific.]
+The MPEG video decoder of VLC can take advantage of several processors if
+necessary. The idea is to launch a pool of decoders, which will do
+IDCT/motion compensation on several macroblocks at once.
+        </para>
+
+        <para>
+The functions managing the pool are in <filename>
+src/video_decoder/vpar_pool.c</filename>. Its use on non-SMP machines is
+not recommanded, since it is actually slower than the monothread version.
+Even on SMP machines sometimes...
         </para>
 
       </sect2>

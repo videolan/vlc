@@ -458,7 +458,10 @@
 #define VDEC_SMP_VAR                   "vlc_smp"
 
 /* No SMP by default, since it slows down things on non-smp machines. */
-#define VDEC_SMP_DEFAULT               0
+#define VDEC_SMP_DEFAULT                0
+
+/* Nice increments for decoders -- necessary for x11 scheduling */
+#define VDEC_NICE                       3
 
 /*****************************************************************************
  * Messages and console interfaces configuration
