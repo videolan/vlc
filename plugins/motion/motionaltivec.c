@@ -2,7 +2,7 @@
  * motionaltivec.c : Altivec motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionaltivec.c,v 1.2 2001/09/06 14:02:56 massiot Exp $
+ * $Id: motionaltivec.c,v 1.3 2001/09/11 22:22:31 massiot Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Paul Mackerras <paulus@linuxcare.com.au>
@@ -58,7 +58,7 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
                                 | MODULE_CAPABILITY_MOTION;
-    p_module->psz_longname = "MMX motion compensation module";
+    p_module->psz_longname = "Altivec motion compensation module";
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
