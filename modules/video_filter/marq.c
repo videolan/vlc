@@ -70,7 +70,7 @@ struct filter_sys_t
 #define TIMEOUT_TEXT N_("Marquee timeout")
 #define TIMEOUT_LONGTEXT N_("Defines the time the marquee must remain " \
                             "displayed, in milliseconds. Default value is " \
-                            "0 (remain forever)")
+                            "0 (remain forever).")
 
 /*****************************************************************************
  * Module descriptor

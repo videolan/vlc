@@ -443,7 +443,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     caching_checkbox = new wxCheckBox( panel, CachingEnable_Event,
                                        wxU(_("Caching")) );
     caching_checkbox->SetToolTip( wxU(_("Change the default caching value "
-                                        "(in miliseconds)")) );
+                                        "(in milliseconds)")) );
     common_opt_sizer->Add( caching_checkbox, 0,
                            wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     caching_value = new wxSpinCtrl( panel, CachingChange_Event );
