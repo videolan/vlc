@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.62 2000/12/22 13:04:45 sam Exp $
+ * $Id: vpar_headers.c,v 1.63 2000/12/27 18:09:02 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -573,7 +573,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     }
 
 #ifdef STATS
-        p_vpar->pc_pictures[p_vpar->picture.i_coding_type]++;
+    p_vpar->pc_pictures[p_vpar->picture.i_coding_type]++;
 #endif
 
     if( p_vpar->picture.i_current_structure &&
@@ -620,6 +620,9 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         }
         else
         {
+            /* Warn synchro we have a new picture (updates pictures index). */
+            vpar_SynchroNewPicture( p_vpar, p_vpar->picture.i_coding_type );
+
             /* Does synchro say we have enough time to decode it ? */
             b_parsable = vpar_SynchroChoose( p_vpar,
                                p_vpar->picture.i_coding_type, i_structure );
@@ -643,12 +646,15 @@ static void PictureHeader( vpar_thread_t * p_vpar )
             {
                 /* The frame is complete. */
                 p_vpar->picture.i_current_structure = i_structure;
+
+                vpar_SynchroNewPicture( p_vpar, p_vpar->picture.i_coding_type );
                 vpar_SynchroTrash( p_vpar, p_vpar->picture.i_coding_type, i_structure );
             }
         }
         else
         {
             /* Warn Synchro we have trashed a picture. */
+            vpar_SynchroNewPicture( p_vpar, p_vpar->picture.i_coding_type );
             vpar_SynchroTrash( p_vpar, p_vpar->picture.i_coding_type, i_structure );
         }
         p_vpar->picture.p_picture = NULL;
