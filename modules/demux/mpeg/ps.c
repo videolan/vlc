@@ -2,7 +2,7 @@
  * ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ps.c,v 1.13 2003/12/22 14:32:56 sam Exp $
+ * $Id: ps.c,v 1.14 2004/01/03 17:52:15 rocky Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -36,14 +36,7 @@
  *****************************************************************************/
 #define PS_READ_ONCE 50
 
-/*****************************************************************************
- * Private structure
- *****************************************************************************/
-struct demux_sys_t
-{
-    module_t *   p_module;
-    mpeg_demux_t mpeg;
-};
+#include "private.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -258,6 +251,15 @@ static int Activate( vlc_object_t * p_this )
                     case VLC_FOURCC('s','p','u','b'):
                         if( config_GetInt( p_input, "spu-channel" )
                                 == ((p_es->i_id & 0x1F00) >> 8) )
+                        {
+                            input_SelectES( p_input, p_es );
+                        }
+                        break;
+
+                    case VLC_FOURCC('o','g','t',' '):
+		        printf("+++ID: %d\n", p_es->i_id & 0003 );
+                        if( config_GetInt( p_input, "spu-channel" )
+			    == (p_es->i_id & 0x0003) )
                         {
                             input_SelectES( p_input, p_es );
                         }

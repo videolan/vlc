@@ -1,4 +1,4 @@
-SOURCES_mpeg_system = system.c system.h
+SOURCES_mpeg_system = system.c system.h private.h
 SOURCES_m4v = m4v.c
 SOURCES_ps = ps.c
 SOURCES_ts = ts.c

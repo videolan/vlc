@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.26 2003/12/22 14:32:56 sam Exp $
+ * $Id: system.c,v 1.27 2004/01/03 17:52:15 rocky Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -34,11 +34,12 @@
 #include <vlc/input.h>
 
 #include "system.h"
+#include "private.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int Activate ( vlc_object_t * );
+static int  Activate   ( vlc_object_t * );
 
 static ssize_t           ReadPS  ( input_thread_t *, data_packet_t ** );
 static es_descriptor_t * ParsePS ( input_thread_t *, data_packet_t * );
@@ -54,7 +55,7 @@ static void              DemuxTS ( input_thread_t *, data_packet_t *,
 vlc_module_begin();
     set_description( _("generic ISO 13818-1 MPEG demultiplexing") );
     set_capability( "mpeg-system", 100 );
-    set_callbacks( Activate, NULL );
+set_callbacks( Activate, NULL );
 vlc_module_end();
 
 /*****************************************************************************
@@ -62,11 +63,18 @@ vlc_module_end();
  *****************************************************************************/
 static int Activate ( vlc_object_t *p_this )
 {
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    demux_sys_t    *p_sys   = p_input->p_demux_data;
+
     static mpeg_demux_t mpeg_demux =
                     { NULL, ReadPS, ParsePS, DemuxPS, ReadTS, DemuxTS };
 
     memcpy( p_this->p_private, &mpeg_demux, sizeof( mpeg_demux ) );
 
+    if (!p_sys) return VLC_EGENERIC;
+    
+    p_sys->cur_scr_time = -1;
+    
     return VLC_SUCCESS;
 }
 
@@ -554,17 +562,22 @@ static void GatherPES( input_thread_t * p_input, data_packet_t * p_data,
 /*****************************************************************************
  * GetID: Get the ID of a stream
  *****************************************************************************/
-static uint16_t GetID( data_packet_t * p_data )
+static uint16_t GetID( input_thread_t *p_input, data_packet_t * p_data )
 {
     uint16_t i_id;
 
     i_id = p_data->p_demux_start[3];                            /* stream_id */
     if( i_id == 0xBD )
     {
+         demux_sys_t *p_sys = p_input->p_demux_data;
+
         /* FIXME : this is not valid if the header is split in multiple
          * packets */
         /* stream_private_id */
         i_id |= p_data->p_demux_start[ 9 + p_data->p_demux_start[8] ] << 8;
+
+	/* FIXME: See note about cur_scr_time above. */
+	p_sys->cur_scr_time = -1;
     }
     return( i_id );
 }
@@ -849,7 +862,7 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
         unsigned int        i_dummy;
 
         /* This is a PES packet. Find out if we want it or not. */
-        i_id = GetID( p_data );
+        i_id = GetID( p_input, p_data );
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
         if( p_input->stream.pp_programs[0]->b_is_ok )
@@ -970,14 +983,7 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
                     /* SVCD OGT subtitles in stream 0x070 */
                     i_fourcc = VLC_FOURCC('o','g','t', ' ');
                     i_cat = SPU_ES;
-#ifdef FINISHED_DEBUGGING
-                    if( !p_input->stream.b_seekable )
-                    if( config_GetInt( p_input, "spu-channel" )
-                           == ((i_id & 0x0300) >> 8) )
-#endif
-                    {
-                        b_auto_spawn = VLC_TRUE;
-                    }
+		    b_auto_spawn = VLC_TRUE;
                 }
                 else if( ((i_id >> 8) & 0xFF) <= 0x03 &&
                          (i_id & 0x00FF) == 0x00BD )
@@ -985,8 +991,7 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
                     /* CVD subtitles (0x00->0x03) */
                     i_fourcc = VLC_FOURCC('c','v','d', ' ');
                     i_cat = SPU_ES;
-                    msg_Warn( p_input,
-                              "CVD subtitles not implemented yet" );
+		    b_auto_spawn = VLC_TRUE;
                 }
                 else
                 {
@@ -1020,6 +1025,7 @@ static void DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     uint32_t i_code;
     vlc_bool_t b_trash = 0;
     es_descriptor_t * p_es = NULL;
+    demux_sys_t *p_sys = p_input->p_demux_data;
 
     i_code = ((uint32_t)p_data->p_demux_start[0] << 24)
                 | ((uint32_t)p_data->p_demux_start[1] << 16)
@@ -1090,18 +1096,8 @@ static void DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                     /* mux_rate */
                     i_mux_rate = (U32_AT(p_header + 8) & 0x7FFFFE) >> 1;
                 }
-                /* Call the pace control. */
-                input_ClockManageRef( p_input,
-                                      p_input->stream.p_selected_program,
-                                      scr_time );
-
-                if( i_mux_rate != p_input->stream.i_mux_rate
-                     && p_input->stream.i_mux_rate )
-                {
-                    msg_Warn( p_input,
-                              "mux_rate changed, expect cosmetic errors" );
-                }
-                p_input->stream.i_mux_rate = i_mux_rate;
+		p_sys->cur_scr_time   = scr_time;
+		p_sys->i_cur_mux_rate = i_mux_rate;
 
                 b_trash = 1;
             }
@@ -1131,6 +1127,25 @@ static void DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     {
         p_es = ParsePS( p_input, p_data );
 
+	/* Call the pace control. 
+	   FIXME: see hack note about cur_scr_time above. 
+	*/
+	if (p_sys->cur_scr_time != -1) {
+	  input_ClockManageRef( p_input,
+				p_input->stream.p_selected_program,
+				p_sys->cur_scr_time );
+	  
+	  if( p_sys->i_cur_mux_rate != p_input->stream.i_mux_rate
+	      && p_input->stream.i_mux_rate )
+	    {
+	      msg_Warn( p_input,
+			"mux_rate changed prev: %ud, cur: %ud;"
+			" expect cosmetic errors" , 
+			(unsigned int) p_input->stream.i_mux_rate, 
+			(unsigned int) p_sys->i_cur_mux_rate );
+	    }
+	  p_input->stream.i_mux_rate = p_sys->i_cur_mux_rate;
+	}
         vlc_mutex_lock( &p_input->stream.control.control_lock );
         if( p_es != NULL && p_es->p_dec != NULL
              && (p_es->i_cat != AUDIO_ES || !p_input->stream.control.b_mute) )
