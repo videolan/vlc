@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input.c,v 1.5 2003/11/28 22:16:30 gbazin Exp $
+ * $Id: input.c,v 1.6 2003/12/16 12:54:29 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -166,6 +166,7 @@ static int Demux( input_thread_t *p_input )
     {
         case COMMAND_QUIT:
             p_input->p_vlc->b_die = 1;
+            p_input->b_eof = 1;
             break;
 
         case COMMAND_LOOP:
