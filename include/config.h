@@ -123,18 +123,12 @@
 #define INTF_GAMMA_STEP                 .1
 #define INTF_GAMMA_LIMIT                3
 
-/* Scaling modifier limits */
-#define INTF_SCALE_LIMIT                10
-
 /*
  * X11 settings
  */
 
 /* Title of the X11 window */
 #define VOUT_TITLE                      "VideoLAN Client"
-
-/* Environment variable used in place of DISPLAY if available */
-#define ENV_VLC_DISPLAY                 "vlc_DISPLAY"
 
 /*******************************************************************************
  * Input thread configuration
@@ -235,10 +229,15 @@
  * Default settings for video output threads
  */
 
-/* Default dimensions for display window - these dimensions are the standard 
- * width and height for broadcasted MPEG-2 */
-#define VOUT_WIDTH                      544
-#define VOUT_HEIGHT                     576
+/* Environment variable used in place of DISPLAY if available */
+#define VOUT_DISPLAY_VAR                "vlc_DISPLAY"
+
+/* Default dimensions for display window - these dimensions are enough for the 
+ * standard width and height broadcasted MPEG-2 streams */
+#define VOUT_WIDTH_VAR                  "vlc_width"
+#define VOUT_HEIGHT_VAR                 "vlc_height"
+#define VOUT_WIDTH_DEFAULT              640
+#define VOUT_HEIGHT_DEFAULT             480
 
 /* Default video heap size - remember that a decompressed picture is big 
  * (~1 Mbyte) before using huge values */
@@ -247,10 +246,6 @@
 /* Environment variable for grayscale output mode, and default value */
 #define VOUT_GRAYSCALE_VAR              "vlc_grayscale"
 #define VOUT_GRAYSCALE_DEFAULT          0
-
-/* Environment variable for fullscreen output mode, and default value */
-#define VOUT_FULLSCREEN_VAR             "vlc_fullscreen"
-#define VOUT_FULLSCREEN_DEFAULT         0
 
 /* Default gamma */
 #define VOUT_GAMMA                      0.
@@ -341,7 +336,7 @@
 /* Define to enable messages queues - disabling messages queue can be usefull
  * when debugging, since it allows messages which would not otherwise be printed,
  * due to a crash, to be printed anyway */
-#define INTF_MSG_QUEUE
+//#define INTF_MSG_QUEUE
 
 /* Format of the header for debug messages. The arguments following this header
  * are the file (char *), the function (char *) and the line (int) in which the

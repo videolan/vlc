@@ -524,11 +524,12 @@ static int SpawnInput( int i_argc, intf_arg_t *p_argv )
     cfg.p_aout = p_main->p_aout;
 
     /* Create the input thread */
-    if( intf_SelectInput( p_main->p_intf, &cfg ) == -1)
-    {
-        return( INTF_OTHER_ERROR );
+    if( p_main->p_intf->p_input != NULL )
+    {        
+        input_DestroyThread( p_main->p_intf->p_input /*??, NULL*/ );
     }
 
+    p_main->p_intf->p_input = input_CreateThread( &cfg /*??,NULL*/ );
     return( INTF_NO_ERROR );
 }
 

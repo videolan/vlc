@@ -810,7 +810,7 @@ static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic,
     CONVERT_YUV_RGB( 444 )
 }
 
-//-------------------- walken code follow --------------------------------
+//-------------------- walken code follow ---------------------------------------
 
 /*
  * YUV to RGB routines.

@@ -61,7 +61,6 @@ static const struct option longopts[] =
     {   "novideo",          0,          0,      OPT_NOVIDEO },           
     {   "grayscale",        0,          0,      'g' },    
     {   "color",            0,          0,      OPT_COLOR },                
-    {   "fullscreen",       0,          0,      'f' },                
 
     /* VLAN management options */
     {   "novlans",          0,          0,      OPT_NOVLANS },
@@ -70,7 +69,7 @@ static const struct option longopts[] =
 };
 
 /* Short options */
-static const char *psz_shortopts = "hgf";
+static const char *psz_shortopts = "hg";
 
 /*******************************************************************************
  * Global variable program_data - this is the one and only, see main.h
@@ -351,9 +350,6 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_COLOR:                                             /* --color */
             main_PutIntVariable( VOUT_GRAYSCALE_VAR, 0 );
             break;            
-        case 'f':                                          /* -f, --fullscreen */
-            main_PutIntVariable( VOUT_FULLSCREEN_VAR, 1 );
-            break;            
 
         /* VLAN management options */
         case OPT_NOVLANS:                                         /* --novlans */
@@ -418,6 +414,9 @@ static void Usage( void )
 
     /* Video parameters */
     intf_Msg("Video parameters:\n" \
+             "  " VOUT_DISPLAY_VAR "=<display name>      display used\n"
+             "  " VOUT_WIDTH_VAR "=<width>               display width\n"
+             "  " VOUT_HEIGHT_VAR "=<height>             dislay height\n"
              "  " VOUT_FB_DEV_VAR "=<filename>           framebuffer device path\n" \
              "  " VOUT_GRAYSCALE_VAR "={1|0}             grayscale or color output\n" \
 	     ); 
@@ -428,7 +427,7 @@ static void Usage( void )
 	     );
 
     /* Interfaces keys */
-    intf_Msg("Interface keys: most interface accept the following commands:\n" \
+    intf_Msg("Interface keys: most interfaces accept the following commands:\n" \
              "  [esc], q                        quit\n" \
              "  +, -, m                         change volume, mute\n" \
              "  g, G, c                         change gamma, toggle grayscale\n" \

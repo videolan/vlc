@@ -268,11 +268,12 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
         break;        
 #endif
     }
-    vlc_mutex_unlock( &p_vout->picture_lock );
 
 #ifdef DEBUG_VIDEO
     intf_DbgMsg("picture %p\n", p_pic );
 #endif
+
+    vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
 /*******************************************************************************
@@ -300,11 +301,12 @@ void  vout_DatePicture( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date )
         break;        
 #endif
     }
-    vlc_mutex_unlock( &p_vout->picture_lock );
 
 #ifdef DEBUG_VIDEO
     intf_DbgMsg("picture %p\n", p_pic);
 #endif
+
+    vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
 /*******************************************************************************
@@ -490,11 +492,12 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
     p_pic->i_refcount++;
-    vlc_mutex_unlock( &p_vout->picture_lock );
 
 #ifdef DEBUG_VIDEO
-    intf_DbgMsg("picture %p\n", p_pic);    
+    intf_DbgMsg("picture %p refcount=%d\n", p_pic, p_pic->i_refcount );    
 #endif
+
+    vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
 /*******************************************************************************
@@ -519,11 +522,12 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
 	p_pic->i_status = DESTROYED_PICTURE;
     }
-    vlc_mutex_unlock( &p_vout->picture_lock );
 
 #ifdef DEBUG_VIDEO
-    intf_DbgMsg("picture %p\n", p_pic);    
+    intf_DbgMsg("picture %p refcount=%d\n", p_pic, p_pic->i_refcount );    
 #endif
+
+    vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
 /* following functions are local */
@@ -635,10 +639,10 @@ static void RunThread( vout_thread_t *p_vout)
                  * go to next picture */
                 vlc_mutex_lock( &p_vout->picture_lock );
                 p_pic->i_status = p_pic->i_refcount ? DISPLAYED_PICTURE : DESTROYED_PICTURE;
-                vlc_mutex_unlock( &p_vout->picture_lock );
 #ifdef DEBUG_VIDEO
-		intf_DbgMsg( "warning: late picture %p skipped\n", p_pic );
+		intf_DbgMsg( "warning: late picture %p skipped refcount=%d\n", p_pic, p_pic->i_refcount );
 #endif
+                vlc_mutex_unlock( &p_vout->picture_lock );
                 p_pic =         NULL;                
 	    }
 	    else if( pic_date > current_date + VOUT_DISPLAY_DELAY )
@@ -800,15 +804,15 @@ static void EndThread( vout_thread_t *p_vout )
 static void RenderBlank( vout_thread_t *p_vout )
 {
     //?? toooooo slow
-    int  i_index;                                    /* current 32 bits sample */    
-    int  i_width;                                 /* number of 32 bits samples */    
-    u32 *p_pic;                                  /* pointer to 32 bits samples */
+    int  i_index;                                    /* current 64 bits sample */    
+    int  i_width;                                 /* number of 64 bits samples */    
+    u64 *p_pic;                                  /* pointer to 64 bits samples */
     
     /* Initialize variables */
     p_pic =     vout_SysGetPicture( p_vout );
-    i_width =   p_vout->i_bytes_per_line * p_vout->i_height / 128;
+    i_width =   p_vout->i_bytes_per_line * p_vout->i_height / 256;
 
-    /* Clear beginning of screen by 128 bytes blocks */
+    /* Clear beginning of screen by 256 bytes blocks */
     for( i_index = 0; i_index < i_width; i_index++ )
     {
         *p_pic++ = 0;   *p_pic++ = 0;

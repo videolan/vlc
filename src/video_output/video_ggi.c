@@ -45,7 +45,7 @@ typedef struct vout_sys_s
 /*******************************************************************************
  * Local prototypes
  *******************************************************************************/
-static int     GGIOpenDisplay   ( vout_thread_t *p_vout );
+static int     GGIOpenDisplay   ( vout_thread_t *p_vout, char *psz_display );
 static void    GGICloseDisplay  ( vout_thread_t *p_vout );
 
 /*******************************************************************************
@@ -55,7 +55,7 @@ static void    GGICloseDisplay  ( vout_thread_t *p_vout );
  * vout properties to choose the correct mode, and change them according to the 
  * mode actually used.
  *******************************************************************************/
-int vout_SysCreate( vout_thread_t *p_vout )
+int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, int i_root_window )
 {    
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );    
@@ -66,7 +66,7 @@ int vout_SysCreate( vout_thread_t *p_vout )
     }
 
     /* Open and initialize device */
-    if( GGIOpenDisplay( p_vout ) )
+    if( GGIOpenDisplay( p_vout, psz_display ) )
     {
         intf_ErrMsg("error: can't initialize GGI display\n");        
         free( p_vout->p_sys );
@@ -220,7 +220,7 @@ ggi_visual_t    vout_SysGetVisual( vout_thread_t *p_vout )
  * Open and initialize display according to preferences specified in the vout
  * thread fields.
  *******************************************************************************/
-static int GGIOpenDisplay( vout_thread_t *p_vout )
+static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display )
 {
     ggi_mode    mode;                                       /* mode descriptor */    
     ggi_color   col_fg;                                    /* foreground color */    
@@ -235,7 +235,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout )
     }
 
     /* Open display */
-    p_vout->p_sys->p_display = ggiOpen( NULL );
+    p_vout->p_sys->p_display = ggiOpen( psz_display, NULL );
     if( p_vout->p_sys->p_display == NULL )
     {
         intf_ErrMsg("error: can't open GGI default display\n");
@@ -333,6 +333,16 @@ static int GGIOpenDisplay( vout_thread_t *p_vout )
         return( 1 );  
     }    
 
+    /* Set clipping for text */
+    if( ggiSetGCClipping(p_vout->p_sys->p_display, 0, 0, 
+                         mode.visible.x, mode.visible.y ) )
+    {
+        intf_ErrMsg("error: can't set clipping\n");
+        ggiClose( p_vout->p_sys->p_display );        
+        ggiExit();
+        return( 1 );  
+    }
+    
     /* Set thread information */
     p_vout->i_width =           mode.visible.x;    
     p_vout->i_height =          mode.visible.y;

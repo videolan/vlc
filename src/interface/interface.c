@@ -31,6 +31,41 @@
 
 #include "intf_sys.h"
 
+/*******************************************************************************
+ * Constants
+ *******************************************************************************/
+
+/* INTF_INPUT_CFG: pre-configured inputs */
+#define INTF_MAX_INPUT_CFG              10
+static const input_cfg_t INTF_INPUT_CFG[] = 
+{
+    /*  properties                              method  
+     *  file    host    ip              port    vlan */
+    
+    /* Local input (unicast) */
+    {   INPUT_CFG_METHOD | INPUT_CFG_IP,        INPUT_METHOD_TS_UCAST,     
+        NULL,   NULL,   "127.0.0.1",    0,      0       },
+
+    /* Broadcasts */
+    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
+       NULL,    NULL,   NULL,           0,      0       },
+    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
+       NULL,    NULL,   NULL,           0,      1       },
+    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
+       NULL,    NULL,   NULL,           0,      2       },
+    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
+       NULL,    NULL,   NULL,           0,      3       },
+    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
+       NULL,    NULL,   NULL,           0,      4       },
+    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
+       NULL,    NULL,   NULL,           0,      5       },
+    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
+       NULL,    NULL,   NULL,           0,      6       },
+    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
+       NULL,    NULL,   NULL,           0,      7       },
+    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
+       NULL,    NULL,   NULL,           0,      8       }
+};
 
 /*******************************************************************************
  * intf_Create: prepare interface before main loop
@@ -135,10 +170,10 @@ void intf_Destroy( intf_thread_t *p_intf )
 /*******************************************************************************
  * intf_SelectInput: change input stream
  *******************************************************************************
- * Kill existing input, if any, and try to open a new one. If p_cfg is NULL,
- * no new input will be openned.
+ * Kill existing input, if any, and try to open a new one, using an input
+ * configuration table.
  *******************************************************************************/
-int intf_SelectInput( intf_thread_t * p_intf, input_cfg_t *p_cfg )
+int intf_SelectInput( intf_thread_t * p_intf, int i_index )
 {
     intf_DbgMsg("0x%x\n", p_intf );
     
@@ -146,16 +181,18 @@ int intf_SelectInput( intf_thread_t * p_intf, input_cfg_t *p_cfg )
     if( p_intf->p_input != NULL )
     {        
         input_DestroyThread( p_intf->p_input /*??, NULL*/ );
-        p_intf->p_input = NULL;        
     }
-    
-    /* Open new one */
-    if( p_cfg != NULL )
+
+    /* Check that input index is valid */
+    if( (i_index < 0)  || (INTF_MAX_INPUT_CFG < i_index) )
     {        
-        p_intf->p_input = input_CreateThread( p_cfg /*??, NULL*/ );    
-    }
+        p_intf->p_input = NULL;     
+        return( 1 );        
+    }    
     
-    return( (p_cfg != NULL) && (p_intf->p_input == NULL) );    
+    /* Open a new input */
+    p_intf->p_input = input_CreateThread( &INTF_INPUT_CFG[ i_index ] /*??, NULL*/ );        
+    return( p_intf->p_input == NULL );    
 }
 
 /*******************************************************************************
@@ -183,7 +220,10 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
     case '7':
     case '8':
     case '9':                    
-        // ??
+        if( intf_SelectInput( p_intf, i_key - '0' ) )
+        {
+            intf_ErrMsg("error: can not open channel %d\n", i_key - '0');            
+        }        
         break;
     case '+':                                                      /* volume + */
         // ??
