@@ -27,25 +27,23 @@
  ******************************************************************************/
 void input_PcrReInit( input_thread_t *p_input )
 {
-    pcr_descriptor_t* p_pcr;
     ASSERT(p_input);
-    
-    pthread_mutex_lock( &p_pcr->lock );
 
-    p_pcr = p_input->p_pcr;
-    p_pcr->delta_clock = 0;
-    p_pcr->c_average = 0;
-    p_pcr->c_pts = 0;
+    pthread_mutex_lock( &p_input->p_pcr->lock );
+
+    p_input->p_pcr->delta_clock = 0;
+    p_input->p_pcr->c_average = 0;
+    p_input->p_pcr->c_pts = 0;
 
 #ifdef STATS
-    p_pcr->c_average_jitter = 0;
-    p_pcr->c_pcr = 0;
-    p_pcr->max_jitter = 0;
-
-/* For the printf in input_PcrDecode(), this is used for debug purpose only */
+    p_input->p_pcr->c_average_jitter = 0;
+    p_input->p_pcr->c_pcr = 0;
+    p_input->p_pcr->max_jitter = 0;
+    /* For the printf in input_PcrDecode() (for debug purpose only) */
     printf("\n");
 #endif
-    pthread_mutex_unlock( &p_pcr->lock );
+
+    pthread_mutex_unlock( &p_input->p_pcr->lock );
 }
 
 /******************************************************************************
