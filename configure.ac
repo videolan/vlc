@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.147 2004/01/09 15:39:38 hartman Exp $
+dnl $Id: configure.ac,v 1.148 2004/01/09 18:32:03 gbazin Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -273,7 +273,7 @@ CPPFLAGS_save="${CPPFLAGS_save} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcd
 dnl Check for system libs needed
 need_libc=false
 
-AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2 if_nametoindex atoll getenv putenv setenv gmtime_r ctime_r)
+AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf asprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2 if_nametoindex atoll getenv putenv setenv gmtime_r ctime_r)
 
 dnl Check for usual libc functions
 AC_CHECK_FUNCS(strdup strndup atof lseek)
