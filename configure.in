@@ -120,6 +120,7 @@ then
   plugins_CFLAGS="${plugins_CFLAGS} -fnative-struct"
 else
   plugins_CFLAGS="${plugins_CFLAGS} -fPIC"
+  plugins_LDFLAGS="${plugins_LDFLAGS} -fPIC"
 fi
 
 dnl The -DSYS_FOO flag
