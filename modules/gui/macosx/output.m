@@ -41,7 +41,7 @@
 - (id)init
 {
     self = [super init];
-    o_mrl = [[NSString alloc] init];
+    o_mrl = [[NSArray alloc] init];
     o_transcode = [[NSString alloc] init];
     return self;
 }
@@ -53,13 +53,13 @@
     [super dealloc];
 }
 
-- (void)setMRL:(NSString *)o_mrl_string
+- (void)setMRL:(NSArray *)o_mrl_array
 {
     [o_mrl autorelease];
-    o_mrl = [o_mrl_string copy];
+    o_mrl = [o_mrl_array copy];
 }
 
-- (NSString *)getMRL
+- (NSArray *)getMRL
 {
     return [o_mrl copy];
 }
@@ -349,6 +349,7 @@
     NSString *o_mode, *o_mux, *o_mux_string;
     NSMutableString *o_announce = [NSMutableString stringWithString:@""];
     NSMutableString *o_mrl_string = [NSMutableString stringWithString:@":sout=#"];
+    NSArray *o_sout_options;
 
     [o_mrl_string appendString: o_transcode];
     if( [o_display state] == NSOnState )
@@ -373,10 +374,15 @@
     {
         if( [o_dump_chkbox state] == NSOnState )
         {
-            o_mrl_string = [NSMutableString stringWithFormat:
-                            @":demux=demuxdump :demuxdump-file=\"%@\"",
-                            [o_file_field stringValue]];
-            [self setMRL:o_mrl_string];
+            NSMutableArray * o_sout_options;
+            o_sout_options = [NSArray arrayWithObjects:
+                                    [NSString stringWithString:
+                                    @":demux=dump"],
+                                    [NSString stringWithFormat:
+                                    @":demuxdump-file=%@",
+                                    [o_file_field stringValue]],
+                                    nil];
+            [self setMRL:o_sout_options];
             return;
         }
         else
@@ -466,7 +472,8 @@
     {
         [o_mrl_string appendString: @"}"];
     }
-    [self setMRL:o_mrl_string];
+    o_sout_options = [NSArray arrayWithObjects: o_mrl_string,nil];
+    [self setMRL:o_sout_options];
 }
 
 - (void)TTLChanged:(NSNotification *)o_notification

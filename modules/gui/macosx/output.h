@@ -80,12 +80,12 @@
     IBOutlet id o_http_chkbox;
     IBOutlet id o_file_chkbox;
 
-    NSString *o_mrl;
+    NSArray *o_mrl;
     NSString *o_transcode;
 }
 
-- (void)setMRL:(NSString *)o_mrl_string;
-- (NSString *)getMRL;
+- (void)setMRL:(NSArray *)o_mrl_string;
+- (NSArray *)getMRL;
 - (void)setTranscode:(NSString *)o_transcode_string;
 
 - (void)initStrings;

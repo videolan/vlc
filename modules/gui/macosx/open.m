@@ -232,8 +232,9 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     {
         NSMutableDictionary *o_dic;
         NSMutableArray *o_options = [NSMutableArray array];
+        unsigned int i;
+
         o_dic = [NSMutableDictionary dictionaryWithObject: [o_mrl stringValue] forKey: @"ITEM_URL"];
-        
         if( [o_file_sub_ckbox state] == NSOnState )
         {
             [o_options addObject: [NSString stringWithFormat: @"sub-file=%s", [[o_file_sub_path stringValue] UTF8String]]];
@@ -245,7 +246,11 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         }
         if( [o_output_ckbox state] == NSOnState )
         {
-            [o_options addObject: [NSString stringWithString: [(VLCOutput *)o_sout_options getMRL]]];
+            for (i = 0 ; i < [[o_sout_options getMRL] count] ; i++)
+            {
+                [o_options addObject: [NSString stringWithString:
+                      [[(VLCOutput *)o_sout_options getMRL] objectAtIndex: i]]];
+            }
         }
         [o_dic setObject: (NSArray *)[o_options copy] forKey: @"ITEM_OPTIONS"];
         [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue:NO];
