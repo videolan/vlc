@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.6 2002/11/22 19:37:25 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.7 2002/12/03 02:00:37 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -169,7 +169,7 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame,
     p_vout = p_videoout;
     
     // create the view to do the display
-    view = new VLCView( Bounds() );
+    view = new VLCView( Bounds(), p_vout );
 
 	// create background view
     BView *mainView =  new BackgroundView( Bounds(), view );
@@ -862,13 +862,14 @@ VideoWindow::_save_screen_shot( void* cookie )
 /*****************************************************************************
  * VLCView::VLCView
  *****************************************************************************/
-VLCView::VLCView(BRect bounds)
+VLCView::VLCView(BRect bounds, vout_thread_t *p_vout_instance )
 	: BView(bounds, "video view", B_FOLLOW_NONE, B_WILL_DRAW | B_PULSE_NEEDED),
 	  fLastMouseMovedTime(system_time()),
 	  fCursorHidden(false),
 	  fCursorInside(false),
 	  fIgnoreDoubleClick(false)
 {
+    p_vout = p_vout_instance;
     SetViewColor(B_TRANSPARENT_32_BIT);
 }
 
@@ -899,6 +900,7 @@ VLCView::MouseDown(BPoint where)
 {
 	VideoWindow* videoWindow = dynamic_cast<VideoWindow*>(Window());
 	BMessage* msg = Window()->CurrentMessage();
+	msg->PrintToStream();
 	int32 clicks;
 	uint32 buttons;
 	msg->FindInt32("clicks", &clicks);
@@ -996,6 +998,17 @@ VLCView::MouseDown(BPoint where)
 }
 
 /*****************************************************************************
+ * VLCVIew::MouseUp
+ *****************************************************************************/
+void
+VLCView::MouseUp( BPoint where )
+{
+    vlc_value_t val;
+    val.b_bool = VLC_TRUE;
+    var_Set( p_vout, "mouse-clicked", val );
+}
+
+/*****************************************************************************
  * VLCVIew::MouseMoved
  *****************************************************************************/
 void
@@ -1004,6 +1017,18 @@ VLCView::MouseMoved(BPoint point, uint32 transit, const BMessage* dragMessage)
 	fLastMouseMovedTime = system_time();
 	fCursorHidden = false;
 	fCursorInside = (transit == B_INSIDE_VIEW || transit == B_ENTERED_VIEW);
+	/* DVD navigation */
+	unsigned int i_width, i_height, i_x, i_y;
+    vout_PlacePicture( p_vout, (unsigned int)Bounds().Width(),
+                       (unsigned int)Bounds().Height(),
+                       &i_x, &i_y, &i_width, &i_height );
+	vlc_value_t val;
+	val.i_int = ( (int)point.x - i_x ) * p_vout->render.i_width / i_width;
+	var_Set( p_vout, "mouse-x", val );
+	val.i_int = ( (int)point.y - i_y ) * p_vout->render.i_height / i_height;
+	var_Set( p_vout, "mouse-y", val );
+	val.b_bool = VLC_TRUE;
+    var_Set( p_vout, "mouse-moved", val );
 }
 
 /*****************************************************************************

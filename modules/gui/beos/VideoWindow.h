@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.3 2002/10/28 16:55:05 titer Exp $
+ * $Id: VideoWindow.h,v 1.4 2002/12/03 02:00:38 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -59,11 +59,12 @@ colorcombo colspace[]=
 class VLCView : public BView
 {
  public:
-							VLCView( BRect bounds);
+							VLCView( BRect bounds, vout_thread_t *p_vout );
 	virtual					~VLCView();
 
 	virtual	void			AttachedToWindow();
 	virtual	void			MouseDown(BPoint where);
+	virtual	void			MouseUp(BPoint where);
 	virtual	void			MouseMoved(BPoint where, uint32 transit,
 									   const BMessage* dragMessage);
 	virtual	void			Pulse();
@@ -71,6 +72,8 @@ class VLCView : public BView
 	virtual	void			KeyDown(const char* bytes, int32 numBytes);
 
  private:
+            vout_thread_t   *p_vout;
+            
 			bigtime_t		fLastMouseMovedTime;
 			bool			fCursorHidden;
 			bool			fCursorInside;
