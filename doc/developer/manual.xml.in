@@ -17,7 +17,7 @@
 
 <book>
 
-<title> VideoLAN Client API Documentation </title>
+<title> VLC media player API Documentation </title>
 
 <bookinfo>
 
@@ -57,7 +57,7 @@
       <orgname> VideoLAN project </orgname>
     </affiliation>
   </collab>
-  <pubdate> $Id: manual.xml.in,v 1.1 2004/02/13 04:22:39 rocky Exp $ </pubdate>
+  <pubdate> $Id$ </pubdate>
   <copyright> <year> 2001 </year>
               <holder> Christophe Massiot, for IDEALX S.A.S. </holder>
   </copyright>

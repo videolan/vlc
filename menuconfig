@@ -1332,7 +1332,7 @@ Use the <TAB> key to move from the input field to the buttons below it."
 
 DIALOG="./lxdialog/lxdialog"
 
-backtitle="VideoLAN Client Configuration"
+backtitle="VLC media player configuration"
 
 trap "cleanup ; exit 1" 1 2 15
 

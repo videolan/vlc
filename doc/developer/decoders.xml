@@ -307,7 +307,7 @@ be described in the following section.
     <sect1> <title> The MPEG video decoder </title>
 
       <para>
-VideoLAN Client provides an MPEG-1, and an MPEG-2 Main Profile @
+VLC media player provides an MPEG-1, and an MPEG-2 Main Profile @
 Main Level decoder. It has been natively written for VLC, and is quite
 mature. Its status is a bit special, since it is splitted between two
 logicial entities : video parser and video decoder.

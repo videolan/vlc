@@ -104,7 +104,7 @@ video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, ogg, ...) as well as DVD's,
 VCD's, and various streaming protocols. It can also be used as a server to 
 stream in unicast or multicast in IPv4 or IPv6 on a high-bandwidth network.
 
-Install this package if you need to build Videolan Client plugins or intend
+Install this package if you need to build VLC media player plugins or intend
 to link statically to it.
 
 

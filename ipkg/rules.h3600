@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# debian/rules for the VideoLAN Client - uses debhelper.
+# debian/rules for the VLC media player - uses debhelper.
 # based on Joey Hess's one.
 # Kludged for ipkg
 

@@ -20,7 +20,7 @@
 #define CONFIGURE_LINE "eMbedded Visual C++"
 
 /* Copyright string */
-#define COPYRIGHT_MESSAGE "VideoLAN Client - version @VERSION@ @CODENAME@ - (c) 1996-2003 VideoLAN"
+#define COPYRIGHT_MESSAGE "VLC media player - version @VERSION@ @CODENAME@ - (c) 1996-2004 VideoLAN"
 
 /* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
    systems. This function is required for `alloca.c' support on those systems.

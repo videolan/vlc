@@ -2,7 +2,7 @@
  * intf.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf.cpp,v 1.6 2004/01/05 13:07:03 zorglub Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -321,10 +321,10 @@ void IntfWindow::FileQuit( void )
 void IntfWindow::About( void )
 {
     QMessageBox::about( this, "About",
-        "VideoLAN Client\n"
-        "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team\n"
+        "VLC media player\n"
+        "(C) 1996 - 2004 - the VideoLAN Team\n"
         "\n"
-        "This is the VideoLAN client, a DVD and MPEG player.\n"
+        "This is the VLC media player, a DVD and MPEG player.\n"
         "It can play MPEG and MPEG 2 files from a file "
             "or from a network source.\n"
         "\n"

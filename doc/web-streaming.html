@@ -70,7 +70,7 @@ Of course your mileage may vary. The last step is to customize xswallow.conf
 so that it launches VLC to handle MPEG files. Comment out all lines you
 don't need, and add :
 <pre>
-video/mpeg; mpeg,mpg,vob;   vlc -I dummy -V xvideo %s; VideoLAN Client 0.2.83 (XVideo output); VideoLAN
+video/mpeg; mpeg,mpg,vob;   vlc -I dummy -V xvideo %s; VLC (XVideo output); VideoLAN
 </pre> <p>
 
 Notes :
@@ -185,7 +185,7 @@ instance :
   <h3> Configuring XSwallow </h3>
 
 You need to add an entry video/x-mpeg-ts in you xswallow.conf :
-<pre> video/x-mpeg-ts; ts; video-streaming.sh %s; VideoLAN Client 0.2.83 (XVideo output); VideoLAN </pre> <p>
+<pre> video/x-mpeg-ts; ts; video-streaming.sh %s; VLC (XVideo output); VideoLAN </pre> <p>
 
 The same provisions as before apply here. The video-streaming.sh file is a
 simple shell script which retrieves the server's name and spawns VLC :
@@ -204,7 +204,7 @@ release of VLC.
 This page has been written by <a href="mailto:massiot@via.ecp.fr">
 Christophe Massiot</a> for <a href="http://www.idealx.com/"> IDEALX
 S.A.S</a>. <br>
-<em> $Id: web-streaming.html,v 1.1 2001/08/22 18:47:52 massiot Exp $ </em>
+<em> $Id$ </em>
 
 </body>
 

@@ -670,7 +670,7 @@ static int QNXCreateWnd( vout_thread_t * p_vout )
     PtSetArg( &args[0], Pt_ARG_POS, &pos, 0 );
     PtSetArg( &args[1], Pt_ARG_DIM, &p_vout->p_sys->dim, 0 );
     PtSetArg( &args[2], Pt_ARG_FILL_COLOR, color, 0 );
-    PtSetArg( &args[3], Pt_ARG_WINDOW_TITLE, "VideoLan Client", 0 );
+    PtSetArg( &args[3], Pt_ARG_WINDOW_TITLE, "VLC media player", 0 );
     PtSetArg( &args[4], Pt_ARG_WINDOW_MANAGED_FLAGS, Pt_FALSE, Ph_WM_CLOSE );
     PtSetArg( &args[5], Pt_ARG_WINDOW_NOTIFY_FLAGS, Pt_TRUE,
               Ph_WM_MOVE | Ph_WM_RESIZE | Ph_WM_CLOSE );
