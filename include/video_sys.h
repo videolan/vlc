@@ -7,7 +7,7 @@
  * Prototypes
  *******************************************************************************/
 #if defined(VIDEO_X11)
-int          vout_SysCreate  ( p_vout_thread_t p_vout, Display *p_display, Window root_window );
+int          vout_SysCreate  ( p_vout_thread_t p_vout, char *psz_display, Window root_window );
 #elif defined(VIDEO_FB)
 int          vout_SysCreate  ( p_vout_thread_t p_vout );
 #endif

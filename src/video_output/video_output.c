@@ -58,7 +58,7 @@ static void     RenderPicture   ( vout_thread_t *p_vout, picture_t *p_pic );
  *******************************************************************************/
 vout_thread_t * vout_CreateThread               ( 
 #if defined(VIDEO_X11)
-                                                  Display *p_display, Window root_window, 
+                                                  char *psz_display, Window root_window, 
 #elif defined(VIDEO_FB)
                                                   //??
 #endif
@@ -77,7 +77,7 @@ vout_thread_t * vout_CreateThread               (
     intf_DbgMsg( "0x%x\n", p_vout );
     if( vout_SysCreate( p_vout
 #if defined(VIDEO_X11)
-                        , p_display, root_window 
+                        , psz_display, root_window 
 #elif defined(VIDEO_FB)
                         //??
 #endif
@@ -146,7 +146,7 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
     p_vout->b_die = 1;
 
     /* If status is NULL, wait until thread has been destroyed */
-    if( pi_status )
+    if( pi_status == NULL )
     {
         do
         {

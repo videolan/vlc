@@ -11,40 +11,22 @@
  * Preamble
  *******************************************************************************/
 
-#include "vlc.h"
-/*
 #include <errno.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-#include <netinet/in.h>
 #include <sys/shm.h>
-#include <sys/soundcard.h>
-#include <sys/uio.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/Xatom.h>
 #include <X11/extensions/XShm.h>
 
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
 #include "vlc_thread.h"
-#include "xutils.h"
-
-#include "input.h"
-#include "input_vlan.h"
-
-#include "audio_output.h"
-
 #include "video.h"
 #include "video_output.h"
-#include "video_x11.h"
-
-#include "xconsole.h"
-#include "interface.h"
+#include "video_sys.h"
 #include "intf_msg.h"
-*/
 
 /*******************************************************************************
  * vout_sys_t: video output X11 method descriptor
@@ -101,17 +83,28 @@ static void X11DestroyShmImage      ( vout_thread_t *p_vout, XImage *p_ximage,
  *******************************************************************************
  * This function allocate and initialize a X11 vout method.
  *******************************************************************************/
-int vout_SysCreate( vout_thread_t *p_vout, Display *p_display, Window root_window )
+int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, Window root_window )
 {
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );    
-    if( p_vout->p_sys != NULL )
-    {
-        p_vout->p_sys->p_display   = p_display;
-	p_vout->p_sys->root_window = root_window;
-        return( 0 );        
-    }
+    if( p_vout->p_sys == NULL )
+    {   
+        return( 1 );
+        
+    }    
 
-    return( 1 );
+    /* Since XLib is usually not thread-safe, we can't use the same display
+     * pointer than the interface or another thread. However, the window
+     * id is still valid */
+    p_vout->p_sys->p_display = XOpenDisplay( psz_display );
+    if( !p_vout->p_sys->p_display )                               /* error */
+    {
+        intf_ErrMsg("vout error: can't open display %s\n", psz_display );
+        free( p_vout->p_sys );
+        return( 1 );               
+    }
+        
+    p_vout->p_sys->root_window = root_window;
+    return( 0 );
 }
 
 /*******************************************************************************
@@ -158,6 +151,7 @@ void vout_SysEnd( vout_thread_t *p_vout )
  *******************************************************************************/
 void vout_SysDestroy( vout_thread_t *p_vout )
 {
+    XCloseDisplay( p_vout->p_sys->p_display );    
     free( p_vout->p_sys );
 }
 

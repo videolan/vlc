@@ -79,7 +79,7 @@ typedef struct vout_thread_s
  *******************************************************************************/
 vout_thread_t * vout_CreateThread               ( 
 #if defined(VIDEO_X11)
-                                                  Display *p_display, Window root_window, 
+                                                  char *psz_display, Window root_window, 
 #elif defined(VIDEO_FB)
                                                   //??void
 #endif

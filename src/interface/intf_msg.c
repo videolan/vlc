@@ -127,7 +127,9 @@ p_intf_msg_t intf_MsgCreate( void )
 	/* Log file initialization - on failure, file pointer will be null,
 	 * and no log will be issued, but this is not considered as an 
 	 * error */
-	p_msg->i_log_file = open( DEBUG_LOG, O_CREAT | O_APPEND | O_SYNC | O_WRONLY );
+	p_msg->i_log_file = open( DEBUG_LOG, 
+                                  O_CREAT | O_APPEND | O_SYNC | O_WRONLY,
+                                  0777 );
 #endif
     }
     return( p_msg );
