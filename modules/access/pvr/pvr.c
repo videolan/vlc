@@ -2,7 +2,7 @@
  * pvr.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pvr.c,v 1.5 2003/07/22 20:25:07 bigben Exp $
+ * $Id: pvr.c,v 1.6 2003/07/24 18:30:03 bigben Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -144,7 +144,8 @@ static int Open( vlc_object_t * p_this )
                 char *psz_parser_init;
                 psz_parser += strlen( "norm=" );
                 psz_parser_init = psz_parser;
-                while ( *psz_parser != ':' && *psz_parser != ',' )
+                while ( *psz_parser != ':' && *psz_parser != ',' 
+                                                    && *psz_parser != '\0' )
                 {
                     psz_parser++;
                 }
@@ -180,8 +181,8 @@ static int Open( vlc_object_t * p_this )
                                strlen( "frequency=" ) ) )
             {
                 p_sys->i_frequency =
-                    1000 * strtol( psz_parser + strlen( "frequency=" ),
-                            &psz_parser, 0 ) / 16;
+                  strtol( psz_parser + strlen( "frequency=" ),
+                            &psz_parser, 0 );
             }
             else if( !strncmp( psz_parser, "framerate=",
                                strlen( "framerate=" ) ) )
@@ -233,7 +234,8 @@ static int Open( vlc_object_t * p_this )
             {
                 char *psz_parser_init;
                 psz_parser_init = psz_parser;
-                while ( *psz_parser != ':' && *psz_parser != ',' )
+                while ( *psz_parser != ':' && *psz_parser != ',' 
+                                                    && *psz_parser != '\0' )
                 {
                     psz_parser++;
                 }
