@@ -2,7 +2,7 @@
  * motionmmxext.c : MMX EXT motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionmmxext.c,v 1.10 2001/08/22 17:21:45 massiot Exp $
+ * $Id: motionmmxext.c,v 1.11 2001/09/06 14:02:56 massiot Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -31,6 +31,7 @@
 #include "defs.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */

@@ -2,7 +2,7 @@
  * motionaltivec.c : Altivec motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionaltivec.c,v 1.1 2001/09/05 16:07:49 massiot Exp $
+ * $Id: motionaltivec.c,v 1.2 2001/09/06 14:02:56 massiot Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Paul Mackerras <paulus@linuxcare.com.au>
@@ -31,6 +31,7 @@
 #include "defs.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */

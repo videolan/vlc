@@ -2,7 +2,7 @@
  * idctmmx.c : MMX IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmx.c,v 1.18 2001/09/06 10:19:18 massiot Exp $
+ * $Id: idctmmx.c,v 1.19 2001/09/06 14:02:56 massiot Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -409,7 +409,7 @@ static s32 rounder3[] ATTR_ALIGN(8) =
 static s32 rounder5[] ATTR_ALIGN(8) =
     rounder (-0.441341716183);  // C3*(-C5/C4+C5-C3)/2
 
-static __inline__ void IDCT( dctelem_t * p_block )
+static void IDCT( dctelem_t * p_block )
 {
     static dctelem_t table04[] ATTR_ALIGN(16) =
         table (22725, 21407, 19266, 16384, 12873,  8867, 4520);
