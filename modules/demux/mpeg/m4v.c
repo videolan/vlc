@@ -100,7 +100,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control= Control;
     p_demux->p_sys     = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->p_es        = NULL;
-    p_sys->i_dts       = 0;
+    p_sys->i_dts       = 1;
 
     /*
      * Load the mpegvideo packetizer
@@ -163,8 +163,8 @@ static int Demux( demux_t *p_demux)
     }
 
     /* m4v demuxer doesn't set pts/dts at all */
-    p_block_in->i_pts =
-    p_block_in->i_dts = 1;
+    p_block_in->i_dts = p_sys->i_dts;
+    p_block_in->i_pts = 0;
 
     while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer, &p_block_in )) )
     {
@@ -183,7 +183,7 @@ static int Demux( demux_t *p_demux)
             p_block_out = p_next;
 
             /* FIXME FIXME FIXME FIXME */
-            p_sys->i_dts += (mtime_t)90000 / 25;
+            p_sys->i_dts += (mtime_t)1000000 / 25;
             /* FIXME FIXME FIXME FIXME */
         }
     }

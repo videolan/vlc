@@ -1,8 +1,8 @@
 /*****************************************************************************
  * mpgv.c : MPEG-I/II Video demuxer
  *****************************************************************************
- * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpgv.c,v 1.6 2004/03/03 20:39:52 gbazin Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -33,25 +33,19 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open    ( vlc_object_t * );
-static void Close  ( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("MPEG-I/II video demuxer" ) );
-    set_capability( "demux", 100 );
+    set_capability( "demux2", 100 );
     set_callbacks( Open, Close );
     add_shortcut( "mpgv" );
 vlc_module_end();
 
-/* TODO:
- * - free bitrate
- */
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Demux       ( input_thread_t * );
-
 struct demux_sys_t
 {
     vlc_bool_t  b_start;
@@ -61,6 +55,9 @@ struct demux_sys_t
     decoder_t *p_packetizer;
 };
 
+static int Demux( demux_t * );
+static int Control( demux_t *, int, va_list );
+
 #define MPGV_PACKET_SIZE 4096
 
 /*****************************************************************************
@@ -68,22 +65,21 @@ struct demux_sys_t
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys;
-    vlc_bool_t     b_forced = VLC_FALSE;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys;
+    vlc_bool_t   b_forced = VLC_FALSE;
 
-    uint8_t        *p_peek;
+    uint8_t     *p_peek;
 
-    es_format_t    fmt;
-    char psz_description[50];
+    es_format_t  fmt;
 
-    if( stream_Peek( p_input->s, &p_peek, 4 ) < 4 )
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
-        msg_Err( p_input, "cannot peek" );
+        msg_Err( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
 
-    if( p_input->psz_demux && !strncmp( p_input->psz_demux, "mpgv", 4 ) )
+    if( !strncmp( p_demux->psz_demux, "mpgv", 4 ) )
     {
         b_forced = VLC_TRUE;
     }
@@ -92,45 +88,33 @@ static int Open( vlc_object_t * p_this )
     {
         if( !b_forced )
         {
-            msg_Warn( p_input, "ES module discarded (no startcode)" );
+            msg_Warn( p_demux, "ES module discarded (no startcode)" );
             return VLC_EGENERIC;
         }
 
-        msg_Err( p_input, "this doesn't look like an MPEG ES stream, continuing" );
+        msg_Err( p_demux, "this doesn't look like an MPEG ES stream, continuing" );
     }
 
     if( p_peek[3] > 0xb9 )
     {
         if( !b_forced )
         {
-            msg_Warn( p_input, "ES module discarded (system startcode)" );
+            msg_Warn( p_demux, "ES module discarded (system startcode)" );
             return VLC_EGENERIC;
         }
-        msg_Err( p_input, "this seems to be a system stream (PS plug-in ?), but continuing" );
+        msg_Err( p_demux, "this seems to be a system stream (PS plug-in ?), but continuing" );
     }
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( input_InitStream( p_input, 0 ) == -1)
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot init stream" );
-        return VLC_EGENERIC;
-    }
-    p_input->stream.i_mux_rate = 0 / 50;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    p_input->pf_demux  = Demux;
-    p_input->pf_rewind = NULL;
-    p_input->pf_demux_control = demux_vaControlDefault;
-
-    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->b_start = VLC_TRUE;
-    p_sys->p_es    = NULL;
+    p_demux->pf_demux  = Demux;
+    p_demux->pf_control= Control;
+    p_demux->p_sys     = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_sys->b_start     = VLC_TRUE;
+    p_sys->p_es        = NULL;
 
     /*
      * Load the mpegvideo packetizer
      */
-    p_sys->p_packetizer = vlc_object_create( p_input, VLC_OBJECT_PACKETIZER );
+    p_sys->p_packetizer = vlc_object_create( p_demux, VLC_OBJECT_PACKETIZER );
     p_sys->p_packetizer->pf_decode_audio = NULL;
     p_sys->p_packetizer->pf_decode_video = NULL;
     p_sys->p_packetizer->pf_decode_sub = NULL;
@@ -144,7 +128,7 @@ static int Open( vlc_object_t * p_this )
     if( p_sys->p_packetizer->p_module == NULL)
     {
         vlc_object_destroy( p_sys->p_packetizer );
-        msg_Err( p_input, "cannot find mpgv packetizer" );
+        msg_Err( p_demux, "cannot find mpgv packetizer" );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -153,9 +137,7 @@ static int Open( vlc_object_t * p_this )
      * create the output
      */
     es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', 'g', 'v' ) );
-    sprintf( psz_description, "MPEG-I/II Video" );
-    fmt.psz_description = strdup( psz_description );
-    p_sys->p_es = es_out_Add( p_input->p_es_out, &fmt );
+    p_sys->p_es = es_out_Add( p_demux->out, &fmt );
 
     return VLC_SUCCESS;
 }
@@ -165,8 +147,8 @@ static int Open( vlc_object_t * p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    input_thread_t *p_input = (input_thread_t*)p_this;
-    demux_sys_t    *p_sys = p_input->p_demux_data;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     module_Unneed( p_sys->p_packetizer, p_sys->p_packetizer->p_module );
     vlc_object_destroy( p_sys->p_packetizer );
@@ -179,12 +161,12 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int Demux( input_thread_t * p_input )
+static int Demux( demux_t *p_demux )
 {
-    demux_sys_t  *p_sys = p_input->p_demux_data;
+    demux_sys_t  *p_sys = p_demux->p_sys;
     block_t *p_block_in, *p_block_out;
 
-    if( ( p_block_in = stream_Block( p_input->s, MPGV_PACKET_SIZE ) ) == NULL )
+    if( ( p_block_in = stream_Block( p_demux->s, MPGV_PACKET_SIZE ) ) == NULL )
     {
         return 0;
     }
@@ -208,30 +190,29 @@ static int Demux( input_thread_t * p_input )
         {
             block_t *p_next = p_block_out->p_next;
 
-            input_ClockManageRef( p_input,
-                                  p_input->stream.p_selected_program,
-                                  p_block_out->i_dts * 9 / 100 );
-
-            p_block_out->i_dts =
-                input_ClockGetTS( p_input, p_input->stream.p_selected_program,
-                                  p_block_out->i_dts * 9 / 100 );
-            if( p_block_out->i_pts > 0 )
-            {
-                p_block_out->i_pts =
-                    input_ClockGetTS( p_input, p_input->stream.p_selected_program,
-                                      p_block_out->i_pts * 9 / 100 );
-            }
-            else
-            {
-                p_block_out->i_pts = 0;
-            }
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
 
             p_block_out->p_next = NULL;
-            es_out_Send( p_input->p_es_out, p_sys->p_es, p_block_out );
+            es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
 
             p_block_out = p_next;
         }
     }
     return 1;
+}
+
+/*****************************************************************************
+ * Control:
+ *****************************************************************************/
+static int Control( demux_t *p_demux, int i_query, va_list args )
+{
+    /* demux_sys_t *p_sys  = p_demux->p_sys; */
+    /* FIXME calculate the bitrate */
+    if( i_query == DEMUX_SET_TIME )
+        return VLC_EGENERIC;
+    else
+        return demux2_vaControlHelper( p_demux->s,
+                                       0, -1,
+                                       0, 1, i_query, args );
 }
 
