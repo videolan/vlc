@@ -896,8 +896,7 @@ static void End( input_thread_t * p_input )
     vlc_value_t val;
     int i;
 
-    msg_Dbg( p_input, "closing `%s'",
-             p_input->input.p_item->psz_uri );
+    msg_Dbg( p_input, "closing input" );
 
     /* We are at the end */
     p_input->i_state = END_S;
