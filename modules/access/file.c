@@ -465,7 +465,7 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
     {
         int i_handle = p_access_data->_socket.i_handle;
         char *psz_name =
-            p_access_data->p_files[p_access_data->i_index + 1]->psz_name;
+            p_access_data->p_files[++p_access_data->i_index]->psz_name;
 
         msg_Dbg( p_input, "opening file `%s'", psz_name );
 
@@ -476,7 +476,6 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
         }
 
         close( i_handle );
-        p_access_data->i_index++;
 
         /* We have to read some data */
         return Read( p_input, p_buffer, i_len );
@@ -514,10 +513,10 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
         {
             /* Close old file */
             close( i_handle );
+            p_access_data->i_index = i;
         }
         else
         {
-            p_access_data->i_index = i;
             p_access_data->_socket.i_handle = i_handle;
         }
     }
