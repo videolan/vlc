@@ -2,7 +2,7 @@
  * vout_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vout_synchro.c,v 1.4 2003/10/17 18:38:47 gbazin Exp $
+ * $Id: vout_synchro.c,v 1.5 2003/11/04 17:46:18 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -118,7 +118,7 @@
  * vout_SynchroInit : You know what ?
  *****************************************************************************/
 vout_synchro_t * __vout_SynchroInit( vlc_object_t * p_object,
-                                   vout_thread_t * p_vout, int i_frame_rate )
+                                     int i_frame_rate )
 {
     vout_synchro_t * p_synchro = vlc_object_create( p_object,
                                                   sizeof(vout_synchro_t) );
@@ -143,7 +143,6 @@ vout_synchro_t * __vout_SynchroInit( vlc_object_t * p_object,
         p_synchro->i_pic = 0;
 
     p_synchro->i_frame_rate = i_frame_rate;
-    p_synchro->p_vout = p_vout;
 
     return p_synchro;
 }
@@ -169,14 +168,15 @@ void vout_SynchroReset( vout_synchro_t * p_synchro )
 /*****************************************************************************
  * vout_SynchroChoose : Decide whether we will decode a picture or not
  *****************************************************************************/
-vlc_bool_t vout_SynchroChoose( vout_synchro_t * p_synchro, int i_coding_type )
+vlc_bool_t vout_SynchroChoose( vout_synchro_t * p_synchro, int i_coding_type,
+                               int i_render_time )
 {
 #define TAU_PRIME( coding_type )    (p_synchro->p_tau[(coding_type)] \
                                     + (p_synchro->p_tau[(coding_type)] >> 1) \
-                                    + tau_yuv)
+                                    + p_synchro->i_render_time)
 #define S (*p_synchro)
     /* VPAR_SYNCHRO_DEFAULT */
-    mtime_t         now, period, tau_yuv;
+    mtime_t         now, period;
     mtime_t         pts = 0;
     vlc_bool_t      b_decode = 0;
 
@@ -184,9 +184,7 @@ vlc_bool_t vout_SynchroChoose( vout_synchro_t * p_synchro, int i_coding_type )
     period = 1000000 * 1001 / p_synchro->i_frame_rate
                      * p_synchro->i_current_rate / DEFAULT_RATE;
 
-    vlc_mutex_lock( &p_synchro->p_vout->change_lock );
-    tau_yuv = p_synchro->p_vout->render_time;
-    vlc_mutex_unlock( &p_synchro->p_vout->change_lock );
+    p_synchro->i_render_time = i_render_time;
 
     switch( i_coding_type )
     {
@@ -384,7 +382,7 @@ void vout_SynchroNewPicture( vout_synchro_t * p_synchro, int i_coding_type,
               p_synchro->i_n_p,
               p_synchro->p_tau[B_CODING_TYPE],
               p_synchro->i_n_b,
-              p_synchro->p_vout->render_time,
+              p_synchro->i_render_time,
               p_synchro->i_not_chosen_pic,
               p_synchro->i_trashed_pic -
               p_synchro->i_not_chosen_pic,

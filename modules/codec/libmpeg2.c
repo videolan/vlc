@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.31 2003/10/25 00:49:13 sam Exp $
+ * $Id: libmpeg2.c,v 1.32 2003/11/04 17:46:17 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -352,7 +352,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
             {
                 vout_SynchroRelease( p_sys->p_synchro );
             }
-            p_sys->p_synchro = vout_SynchroInit( p_dec, p_sys->p_vout,
+            p_sys->p_synchro = vout_SynchroInit( p_dec,
                 (uint32_t)((uint64_t)1001000000 * 27 /
                 p_sys->p_info->sequence->frame_period) );
             p_sys->b_after_sequence_header = 1;
@@ -410,7 +410,8 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                          & PIC_MASK_CODING_TYPE) == P_CODING_TYPE))
                    && !vout_SynchroChoose( p_sys->p_synchro,
                               p_sys->p_info->current_picture->flags
-                                & PIC_MASK_CODING_TYPE ) )
+                                & PIC_MASK_CODING_TYPE,
+                              p_sys->p_vout->render_time ) )
             {
                 mpeg2_skip( p_sys->p_mpeg2dec, 1 );
                 p_sys->b_skip = 1;

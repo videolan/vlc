@@ -2,7 +2,7 @@
  * vout_synchro.h: frame-dropping structures
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: vout_synchro.h,v 1.2 2003/06/09 00:33:34 massiot Exp $
+ * $Id: vout_synchro.h,v 1.3 2003/11/04 17:46:18 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -46,7 +46,9 @@ struct vout_synchro_t
     /* decoding values */
     mtime_t         p_tau[4];                  /* average decoding durations */
     unsigned int    pi_meaningful[4];            /* number of durations read */
-    /* and p_vout->render_time (read with p_vout->change_lock) */
+
+    /* render_time filled by SynchroChoose() */
+    int i_render_time;
 
     /* stream context */
     int             i_nb_ref;                /* Number of reference pictures */
@@ -80,11 +82,11 @@ struct vout_synchro_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#define vout_SynchroInit(a,b,c) __vout_SynchroInit(VLC_OBJECT(a),b,c)
-VLC_EXPORT( vout_synchro_t *, __vout_SynchroInit, ( vlc_object_t *, vout_thread_t *, int ) );
+#define vout_SynchroInit(a,b) __vout_SynchroInit(VLC_OBJECT(a),b)
+VLC_EXPORT( vout_synchro_t *, __vout_SynchroInit, ( vlc_object_t *, int ) );
 VLC_EXPORT( void, vout_SynchroRelease,        ( vout_synchro_t * ) );
 VLC_EXPORT( void, vout_SynchroReset,          ( vout_synchro_t * ) );
-VLC_EXPORT( vlc_bool_t, vout_SynchroChoose,   ( vout_synchro_t *, int ) );
+VLC_EXPORT( vlc_bool_t, vout_SynchroChoose,   ( vout_synchro_t *, int, int ) );
 VLC_EXPORT( void, vout_SynchroTrash,          ( vout_synchro_t * ) );
 VLC_EXPORT( void, vout_SynchroDecode,         ( vout_synchro_t * ) );
 VLC_EXPORT( void, vout_SynchroEnd,            ( vout_synchro_t *, int, vlc_bool_t ) );
