@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.193 2002/10/17 16:03:18 sam Exp $
+ * $Id: video_output.c,v 1.194 2002/11/02 11:53:17 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -857,44 +857,48 @@ static void InitWindowSize( vout_thread_t *p_vout, int *pi_width,
                             int *pi_height )
 {
     int i_width, i_height;
-    double f_zoom;
+    uint64_t ll_zoom;
+
+#define FP_FACTOR 1000                             /* our fixed point factor */
 
     i_width = config_GetInt( p_vout, "width" );
     i_height = config_GetInt( p_vout, "height" );
-    f_zoom = config_GetFloat( p_vout, "zoom" );
+    ll_zoom = FP_FACTOR * config_GetFloat( p_vout, "zoom" );
 
     if( (i_width >= 0) && (i_height >= 0))
     {
-        *pi_width = i_width * f_zoom;
-        *pi_height = i_height * f_zoom;
+        *pi_width = i_width * ll_zoom / FP_FACTOR;
+        *pi_height = i_height * ll_zoom / FP_FACTOR;
         return;
     }
     else if( i_width >= 0 )
     {
-        *pi_width = i_width * f_zoom;
-        *pi_height = i_width * f_zoom * VOUT_ASPECT_FACTOR /
-                        p_vout->render.i_aspect;
+        *pi_width = i_width * ll_zoom / FP_FACTOR;
+        *pi_height = i_width * ll_zoom * VOUT_ASPECT_FACTOR /
+                        p_vout->render.i_aspect / FP_FACTOR;
         return;
     }
     else if( i_height >= 0 )
     {
-        *pi_height = i_height * f_zoom;
-        *pi_width = i_height * f_zoom * p_vout->render.i_aspect /
-                       VOUT_ASPECT_FACTOR;
+        *pi_height = i_height * ll_zoom / FP_FACTOR;
+        *pi_width = i_height * ll_zoom * p_vout->render.i_aspect /
+                       VOUT_ASPECT_FACTOR / FP_FACTOR;
         return;
     }
 
     if( p_vout->render.i_height * p_vout->render.i_aspect
         >= p_vout->render.i_width * VOUT_ASPECT_FACTOR )
     {
-        *pi_width = p_vout->render.i_height * f_zoom
-          * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
-        *pi_height = p_vout->render.i_height * f_zoom;
+        *pi_width = p_vout->render.i_height * ll_zoom
+          * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR / FP_FACTOR;
+        *pi_height = p_vout->render.i_height * ll_zoom / FP_FACTOR;
     }
     else
     {
-        *pi_width = p_vout->render.i_width * f_zoom;
-        *pi_height = p_vout->render.i_width * f_zoom
-          * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
+        *pi_width = p_vout->render.i_width * ll_zoom / FP_FACTOR;
+        *pi_height = p_vout->render.i_width * ll_zoom
+          * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect / FP_FACTOR;
     }
+
+#undef FP_FACTOR
 }
