@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.46 2002/11/10 23:41:53 sam Exp $
+ * $Id: libvlc.c,v 1.47 2002/11/14 15:07:49 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -276,7 +276,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /* Check for short help option */
     if( config_GetInt( p_vlc, "help" ) )
     {
-        fprintf( stderr, _("Usage: %s [options] [items]...\n\n"),
+        fprintf( stdout, _("Usage: %s [options] [items]...\n\n"),
                          p_vlc->psz_object_name );
         Usage( p_vlc, "main" );
         Usage( p_vlc, "help" );
@@ -1048,7 +1048,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
             {
             case CONFIG_HINT_CATEGORY:
             case CONFIG_HINT_USAGE:
-                fprintf( stderr, " %s\n", p_item->psz_text );
+                fprintf( stdout, " %s\n", p_item->psz_text );
                 break;
 
             case CONFIG_ITEM_STRING:
@@ -1151,13 +1151,13 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
                 if( p_item->i_type == CONFIG_ITEM_BOOL &&
                     !b_help_module )
                 {
-                    fprintf( stderr, psz_format, p_item->psz_name, psz_prefix,
+                    fprintf( stdout, psz_format, p_item->psz_name, psz_prefix,
                              p_item->psz_name, psz_bra, psz_type, psz_ket,
                              psz_spaces, p_item->psz_text, psz_suf );
                 }
                 else
                 {
-                    fprintf( stderr, psz_format, p_item->psz_name, "", "",
+                    fprintf( stdout, psz_format, p_item->psz_name, "", "",
                              psz_bra, psz_type, psz_ket, psz_spaces,
                              p_item->psz_text, psz_suf );
                 }
@@ -1174,7 +1174,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
     vlc_list_release( p_list );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-        fprintf( stderr, _("\nPress the RETURN key to continue...\n") );
+        fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
         getchar();
 #endif
 }
@@ -1198,10 +1198,10 @@ static void ListModules( vlc_t *p_this )
 #endif
 
     /* Usage */
-    fprintf( stderr, _("Usage: %s [options] [items]...\n\n"),
+    fprintf( stdout, _("Usage: %s [options] [items]...\n\n"),
                      p_this->p_vlc->psz_object_name );
 
-    fprintf( stderr, _("[module]              [description]\n") );
+    fprintf( stdout, _("[module]              [description]\n") );
 
     /* List all modules */
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -1219,7 +1219,7 @@ static void ListModules( vlc_t *p_this )
         if( i < 0 ) i = 0;
         psz_spaces[i] = 0;
 
-        fprintf( stderr, "  %s%s %s\n", (*pp_parser)->psz_object_name,
+        fprintf( stdout, "  %s%s %s\n", (*pp_parser)->psz_object_name,
                          psz_spaces, (*pp_parser)->psz_longname );
 
         psz_spaces[i] = ' ';
@@ -1228,7 +1228,7 @@ static void ListModules( vlc_t *p_this )
     vlc_list_release( p_list );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-        fprintf( stderr, _("\nPress the RETURN key to continue...\n") );
+        fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
         getchar();
 #endif
 }
@@ -1244,15 +1244,15 @@ static void Version( void )
     ShowConsole();
 #endif
 
-    fprintf( stderr, VERSION_MESSAGE "\n" );
-    fprintf( stderr,
+    fprintf( stdout, VERSION_MESSAGE "\n" );
+    fprintf( stdout,
       _("This program comes with NO WARRANTY, to the extent permitted by "
         "law.\nYou may redistribute it under the terms of the GNU General "
         "Public License;\nsee the file named COPYING for details.\n"
         "Written by the VideoLAN team at Ecole Centrale, Paris.\n") );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-    fprintf( stderr, _("\nPress the RETURN key to continue...\n") );
+    fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
     getchar();
 #endif
 }
