@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.13 2003/07/18 20:00:02 hartman Exp $
+# $Id: vlc.ebuild,v 1.14 2003/07/18 20:16:53 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -232,6 +232,12 @@ src_compile(){
 
 	# pvr is a local USE var, see /usr/portage/profiles/use.local.desc for more details
         use pvr && myconf="${myconf} --enable-pvr"
+
+	if [ "`use mozilla`" ]; then
+	  myconf="${myconf} --enable-mozilla \
+	    MOZILLA_CONFIG=/usr/lib/mozilla/mozilla-config \
+	    XPIDL=/usr/bin/xpidl"
+	fi
 
 	# vlc uses its own ultraoptimizaed CXXFLAGS
 	# and forcing custom ones generally fails building
