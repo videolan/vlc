@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.13 2003/08/18 17:30:48 fenrir Exp $
+ * $Id: udp.c,v 1.14 2003/11/01 00:11:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -61,8 +61,9 @@
 static int     Open   ( vlc_object_t * );
 static void    Close  ( vlc_object_t * );
 
-static int     Write( sout_access_out_t *, sout_buffer_t * );
-static int     Seek ( sout_access_out_t *, off_t  );
+static int     Write   ( sout_access_out_t *, sout_buffer_t * );
+static int     WriteRaw( sout_access_out_t *, sout_buffer_t * );
+static int     Seek    ( sout_access_out_t *, off_t  );
 
 static void    ThreadWrite( vlc_object_t * );
 
@@ -216,6 +217,7 @@ static int Open( vlc_object_t *p_this )
     {
         p_sys->p_thread->i_caching = atoll( val ) * 1000;
     }
+
     p_sys->i_mtu     = socket_desc.i_mtu;
 
     if( vlc_thread_create( p_sys->p_thread, "sout write thread", ThreadWrite,
@@ -231,7 +233,14 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_sequence_number = rand()&0xffff;
     p_sys->i_ssrc            = rand()&0xffffffff;
 
-    p_access->pf_write       = Write;
+    if( sout_cfg_find( p_access->p_cfg, "raw" ) )
+    {
+        p_access->pf_write       = WriteRaw;
+    }
+    else
+    {
+        p_access->pf_write       = Write;
+    }
     p_access->pf_seek        = Seek;
 
     msg_Info( p_access, "Open: addr:`%s' port:`%d'",
@@ -326,6 +335,18 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
         sout_BufferDelete( p_access->p_sout, p_buffer );
         p_buffer = p_next;
     }
+
+    return( p_sys->p_thread->b_error ? -1 : 0 );
+}
+
+/*****************************************************************************
+ * WriteRaw: write p_buffer without trying to fill mtu
+ *****************************************************************************/
+static int WriteRaw( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
+{
+    sout_access_out_sys_t   *p_sys = p_access->p_sys;
+
+    sout_FifoPut( p_sys->p_thread->p_fifo, p_buffer );
 
     return( p_sys->p_thread->b_error ? -1 : 0 );
 }
