@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.22 2002/08/31 22:10:25 stef Exp $
+ * $Id: oss.c,v 1.23 2002/09/02 23:17:05 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -174,8 +174,25 @@ static int Open( vlc_object_t *p_this )
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
          || i_format != p_aout->output.output.i_format )
     {
-        msg_Err( p_aout, "cannot set audio output format (%i)", i_format );
-        return VLC_EGENERIC;
+        if ( i_format == AOUT_FMT_SPDIF )
+        {
+            /* Retry with S16 */
+            msg_Warn( p_aout, "cannot set audio output format (%i)", i_format );
+            p_aout->output.output.i_format = i_format = AOUT_FMT_S16_NE;
+            p_aout->output.i_nb_samples = FRAME_SIZE;
+            if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
+                 || i_format != p_aout->output.output.i_format )
+            {
+                msg_Err( p_aout, "cannot set audio output format (%i)",
+                         i_format );
+                return VLC_EGENERIC;
+            }
+        }
+        else
+        {
+            msg_Err( p_aout, "cannot set audio output format (%i)", i_format );
+            return VLC_EGENERIC;
+        }
     }
 
     if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )

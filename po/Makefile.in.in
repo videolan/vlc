@@ -2,7 +2,7 @@
 # Copyright (C) 1995-1997, 2000, 2001 by Ulrich Drepper <drepper@gnu.ai.mit.edu>
 #
 # This file file be copied and used freely without restrictions.  It can
-# be used in projects which are not available under the GNU General Public License
+# be used in projects which are not available under the GNU Public License
 # but which still want to provide support for the GNU gettext functionality.
 # Please note that the actual code is *not* freely available.
 

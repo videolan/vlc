@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.61 2002/08/21 22:41:59 massiot Exp $
+ * $Id: audio_output.h,v 1.62 2002/09/02 23:17:05 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -105,6 +105,35 @@ typedef s32 vlc_fixed_t;
 #define FIXED32_MIN ((vlc_fixed_t) -0x80000000L)
 #define FIXED32_MAX ((vlc_fixed_t) +0x7fffffffL)
 #define FIXED32_ONE ((vlc_fixed_t) 0x10000000)
+
+
+/* Dual mono. Two independant mono channels */
+#define AOUT_CHAN_CHANNEL   0x0000000B
+#define AOUT_CHAN_MONO      0x00000001
+#define AOUT_CHAN_STEREO    0x00000002
+/* 3 front channels (left, center, right) */
+#define AOUT_CHAN_3F        0x00000003
+/* 2 front, 1 rear surround channels (L, R, S) */
+#define AOUT_CHAN_2F1R      0x00000004
+/* 3 front, 1 rear surround channels (L, C, R, S) */
+#define AOUT_CHAN_3F1R      0x00000005
+/* 2 front, 2 rear surround channels (L, R, LS, RS) */
+#define AOUT_CHAN_2F2R      0x00000006
+/* 3 front, 2 rear surround channels (L, C, R, LS, RS) */
+#define AOUT_CHAN_3F2R      0x00000007
+/* First of two mono channels */
+#define AOUT_CHAN_CHANNEL1  0x00000008
+/* Second of two mono channels */
+#define AOUT_CHAN_CHANNEL2  0x00000009
+/* Dolby surround compatible stereo */
+#define AOUT_CHAN_DOLBY     0x0000000A
+
+#define AOUT_CHAN_MASK      0x0000000F
+
+/* Low frequency effects channel. Normally used to connect a subwoofer.
+ * Can be combined with any of the above channels. For example :
+ * AOUT_CHAN_3F2R | AOUT_CHAN_LFE -> 3 front, 2 rear, 1 LFE (5.1) */
+#define AOUT_CHAN_LFE       0x00000010
 
 
 /*****************************************************************************

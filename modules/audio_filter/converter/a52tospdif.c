@@ -2,7 +2,7 @@
  * a52tospdif.c : encapsulates A/52 frames into S/PDIF packets
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: a52tospdif.c,v 1.10 2002/08/26 23:00:22 massiot Exp $
+ * $Id: a52tospdif.c,v 1.11 2002/09/02 23:17:05 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -42,7 +42,6 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-
 static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                         aout_buffer_t * );
 
@@ -56,9 +55,7 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
- * Create: allocate trivial mixer
- *****************************************************************************
- * This function allocates and initializes a Crop vout method.
+ * Create:
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {

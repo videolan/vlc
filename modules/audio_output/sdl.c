@@ -2,7 +2,7 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.10 2002/08/31 19:58:04 stef Exp $
+ * $Id: sdl.c,v 1.11 2002/09/02 23:17:05 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -103,6 +103,11 @@ static int Open ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    if ( p_aout->output.output.i_channels > 2 )
+        p_aout->output.output.i_channels = 2;
+    p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+    p_aout->output.i_nb_samples = FRAME_SIZE;
+
     /* TODO: finish and clean this */
 
     desired.freq       = p_aout->output.output.i_rate;
@@ -117,9 +122,6 @@ static int Open ( vlc_object_t *p_this )
     {
         return VLC_EGENERIC;
     }
-
-    p_aout->output.output.i_format = AOUT_FMT_S16_NE;
-    p_aout->output.i_nb_samples = FRAME_SIZE;
 
     SDL_PauseAudio( 0 );
 

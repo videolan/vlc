@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.14 2002/08/30 23:27:05 massiot Exp $
+ * $Id: aout_internal.h,v 1.15 2002/09/02 23:17:05 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -226,6 +226,7 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer );
 void aout_OutputDelete( aout_instance_t * p_aout );
 VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t, vlc_bool_t ) );
 
+VLC_EXPORT( int, aout_FormatNbChannels, ( audio_sample_format_t * p_format ) );
 void aout_FormatPrepare( audio_sample_format_t * p_format );
 void aout_FifoInit( aout_instance_t *, aout_fifo_t *, u32 );
 mtime_t aout_FifoNextStart( aout_instance_t *, aout_fifo_t * );

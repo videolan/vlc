@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.m,v 1.8 2002/08/30 23:27:06 massiot Exp $
+ * $Id: aout.m,v 1.9 2002/09/02 23:17:05 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -118,17 +118,13 @@ int E_(OpenAudio)( vlc_object_t * p_this )
         return -1 ;
     }
 
-    /* We only deal with floats */
-    if ( p_aout->output.output.i_format != AOUT_FMT_FLOAT32 )
-    {
-        msg_Err( p_aout, "cannot set format 0x%x",
-                 p_aout->output.output.i_format );
-        return -1;
-    }
+    /* We only deal with floats. FIXME : this is where we should do S/PDIF. */
+    p_aout->output.output.i_format = AOUT_FMT_FLOAT32;
 
     /* Set sample rate and channels per frame */
     p_aout->output.output.i_rate = p_sys->stream_format.mSampleRate;
-    p_aout->output.output.i_channels = p_sys->stream_format.mChannelsPerFrame;
+    /* FIXME : this is where we should ask for downmixing. */
+    p_aout->output.output.i_channels = 2; //p_sys->stream_format.mChannelsPerFrame;
 
     /* Get the buffer size that the device uses for IO */
     i_param_size = sizeof( p_sys->i_buffer_size );

@@ -446,8 +446,8 @@ BUILTINS="${BUILTINS}"
 PLUGINS="${PLUGINS} misc/dummy/dummy misc/null"
 PLUGINS="${PLUGINS} control/rc/rc misc/logger/logger access/file misc/memcpy/memcpy"
 PLUGINS="${PLUGINS} demux/mpeg/es demux/mpeg/audio demux/mpeg/mpeg_system demux/mpeg/ps demux/mpeg/ts demux/a52sys"
-PLUGINS="${PLUGINS} codec/mpeg_video/idct/idct codec/mpeg_video/idct/idctclassic codec/mpeg_video/motion/motion codec/mpeg_video/mpeg_video codec/spudec/spudec codec/spdif codec/mpeg_audio/mpeg_audio"
-PLUGINS="${PLUGINS} codec/a52old/imdct/imdct codec/a52old/downmix/downmix codec/a52old/a52old"
+PLUGINS="${PLUGINS} codec/mpeg_video/idct/idct codec/mpeg_video/idct/idctclassic codec/mpeg_video/motion/motion codec/mpeg_video/mpeg_video codec/spudec/spudec codec/mpeg_audio/mpeg_audio"
+PLUGINS="${PLUGINS} codec/a52old/imdct/imdct codec/a52old/downmix/downmix codec/a52old/a52old codec/a52"
 #PLUGINS="${PLUGINS} codec/lpcm/lpcm"
 PLUGINS="${PLUGINS} video_filter/deinterlace/deinterlace video_filter/invert video_filter/wall video_filter/transform video_filter/distort video_filter/clone video_filter/crop video_filter/motionblur"
 PLUGINS="${PLUGINS} audio_filter/converter/float32tos16 audio_filter/converter/float32tos8 audio_filter/converter/float32tou16 audio_filter/converter/float32tou8 audio_filter/converter/a52tospdif audio_filter/converter/fixed32tofloat32 audio_filter/converter/fixed32tos16 audio_filter/converter/s16tofloat32"
@@ -1185,17 +1185,17 @@ then
     if test -f ${real_a52_tree}/include/a52.h
     then
       AC_MSG_RESULT(yes)
-      a52_CFLAGS="${a52_CFLAGS} -I${real_a52_tree}"
-      a52_LDFLAGS="${a52_LDFLAGS} -L${real_a52_tree}/liba52/.libs"
-      LDFLAGS="${save_LDFLAGS} ${a52_LDFLAGS}"
+      a52tofloat32_CFLAGS="${a52tofloat32_CFLAGS} -I${real_a52_tree}"
+      a52tofloat32_LDFLAGS="${a52tofloat32_LDFLAGS} -L${real_a52_tree}/liba52/.libs"
+      LDFLAGS="${save_LDFLAGS} ${a52tofloat32_LDFLAGS}"
       AC_CHECK_LIB(a52, a52_free, [
-        BUILTINS="${BUILTINS} codec/a52"
-        a52_LDFLAGS="${a52_LDFLAGS} -la52 -lm"
-        a52_CFLAGS="${a52_CFLAGS} -DUSE_A52DEC_TREE"
+        BUILTINS="${BUILTINS} audio_filter/converter/a52tofloat32"
+        a52tofloat32_LDFLAGS="${a52tofloat32_LDFLAGS} -la52 -lm"
+        a52tofloat32_CFLAGS="${a52tofloat32_CFLAGS} -DUSE_A52DEC_TREE"
         ],[
         if test -f ${real_a52_tree}/liba52/.libs/liba52.a
         then
-          AC_MSG_ERROR([make sure you have at least a52dec-0.7.3])
+          AC_MSG_ERROR([make sure you have at least a52dec-0.7.4])
         else
           AC_MSG_ERROR([the specified tree hasn't been compiled])
         fi
@@ -1220,9 +1220,9 @@ then
     LDFLAGS="${save_LDFLAGS} ${test_LDFLAGS}"
     AC_CHECK_HEADERS(a52dec/a52.h, [
       AC_CHECK_LIB(a52, a52_free, [
-        BUILTINS="${BUILTINS} codec/a52"
-        a52_LDFLAGS="${a52_LDFLAGS} ${test_LDFLAGS} -la52 -lm"
-        a52_CFLAGS="${a52_CFLAGS} ${test_CFLAGS}"
+        BUILTINS="${BUILTINS} audio_filter/converter/a52tofloat32"
+        a52tofloat32_LDFLAGS="${a52tofloat32_LDFLAGS} ${test_LDFLAGS} -la52 -lm"
+        a52tofloat32_CFLAGS="${a52tofloat32_CFLAGS} ${test_CFLAGS}"
       ],[
         if test "x${enable_dvbpsi}" != "x"
         then
@@ -2081,7 +2081,7 @@ AC_SUBST(plugins_CFLAGS)
 AC_SUBST(builtins_CFLAGS)
 AC_SUBST(mozilla_CFLAGS)
 
-AC_SUBST(a52_CFLAGS)
+AC_SUBST(a52tofloat32_CFLAGS)
 AC_SUBST(arts_CFLAGS)
 AC_SUBST(i420_yuy2_mmx_CFLAGS)
 AC_SUBST(dvd_CFLAGS)
@@ -2115,7 +2115,7 @@ AC_SUBST(plugins_LDFLAGS)
 AC_SUBST(builtins_LDFLAGS)
 AC_SUBST(mozilla_LDFLAGS)
 
-AC_SUBST(a52_LDFLAGS)
+AC_SUBST(a52tofloat32_LDFLAGS)
 AC_SUBST(aa_LDFLAGS)
 AC_SUBST(alsa_LDFLAGS)
 AC_SUBST(arts_LDFLAGS)

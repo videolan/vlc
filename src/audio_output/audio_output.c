@@ -2,7 +2,7 @@
  * audio_output.c : audio output instance miscellaneous functions
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.c,v 1.100 2002/08/30 22:22:24 massiot Exp $
+ * $Id: audio_output.c,v 1.101 2002/09/02 23:17:06 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -150,8 +150,53 @@ void aout_BufferPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
 
 /*
- * Formats management (internal)
+ * Formats management
  */
+
+/*****************************************************************************
+ * aout_FormatNbChannels : return the number of channels
+ *****************************************************************************/
+int aout_FormatNbChannels( audio_sample_format_t * p_format )
+{
+    int i_nb;
+
+    switch ( p_format->i_channels & AOUT_CHAN_MASK )
+    {
+    case AOUT_CHAN_CHANNEL1:
+    case AOUT_CHAN_CHANNEL2:
+    case AOUT_CHAN_MONO:
+        i_nb = 1;
+        break;
+
+    case AOUT_CHAN_CHANNEL:
+    case AOUT_CHAN_STEREO:
+    case AOUT_CHAN_DOLBY:
+        i_nb = 2;
+        break;
+
+    case AOUT_CHAN_3F:
+    case AOUT_CHAN_2F1R:
+        i_nb = 3;
+        break;
+
+    case AOUT_CHAN_3F1R:
+    case AOUT_CHAN_2F2R:
+        i_nb = 4;
+        break;
+
+    case AOUT_CHAN_3F2R:
+        i_nb = 5;
+        break;
+
+    default:
+        i_nb = 0;
+    }
+
+    if ( p_format->i_channels & AOUT_CHAN_LFE )
+        return i_nb + 1;
+    else
+        return i_nb;
+}
 
 /*****************************************************************************
  * aout_FormatPrepare : compute the number of bytes per frame & frame length
@@ -190,7 +235,7 @@ void aout_FormatPrepare( audio_sample_format_t * p_format )
         i_result = 0; /* will segfault much sooner... */
     }
 
-    p_format->i_bytes_per_frame = i_result * p_format->i_channels;
+    p_format->i_bytes_per_frame = i_result * aout_FormatNbChannels( p_format );
     p_format->i_frame_length = 1;
 }
 
