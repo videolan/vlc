@@ -29,7 +29,7 @@
         underline   CDATA   "false"
     >
 <!ELEMENT BitmapFont EMPTY>
-    <!ATTLIST Font
+    <!ATTLIST BitmapFont
         id          CDATA   #REQUIRED
         file        CDATA   #REQUIRED
         type        CDATA   "digits"
