@@ -615,7 +615,7 @@ STDMETHODIMP CapturePin::QueryAccept( const AM_MEDIA_TYPE *pmt )
                  ((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biHeight,
                  (char *)&i_fourcc );
     }
-    else
+    else if( pmt->majortype == MEDIATYPE_Audio )
     {
         msg_Dbg( p_input, "CapturePin::QueryAccept [OK] (channels=%d, "
                  "samples/sec=%lu, bits/samples=%d, format=%4.4s)",
@@ -624,6 +624,11 @@ STDMETHODIMP CapturePin::QueryAccept( const AM_MEDIA_TYPE *pmt )
                  ((WAVEFORMATEX *)pmt->pbFormat)->wBitsPerSample,
                  (char *)&i_fourcc );
     }   
+    else
+    {
+        msg_Dbg( p_input, "CapturePin::QueryAccept [OK] (stream format=%4.4s)",
+                 (char *)&i_fourcc );
+    }
 
     if( p_connected_pin )
     {
