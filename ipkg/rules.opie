@@ -58,7 +58,6 @@ build-stamp:
 	$(MAKE)
 
 clean:
-
 	-$(MAKE) distclean
 
 install: build
@@ -80,8 +79,8 @@ install: build
 	cp ipkg/vlc.desktop ${PKGDIR}/opt/QtPalmtop/apps/Applications
 
 install-plugins: install
-	cp plugins/*.so ${PKGDIR}/usr/lib/vlc
+	find ./modules/ -name *.so -print -depth | xargs cp $1 ${PKGDIR}/usr/lib/vlc
 	$(STRIP) ${PKGDIR}/usr/lib/vlc
 
-.PHONY: build clean install
+.PHONY: build clean install install-plugins
 
