@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.1 2002/08/07 21:36:55 massiot Exp $
+ * $Id: aout_internal.h,v 1.2 2002/08/08 00:35:10 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -57,7 +57,7 @@ typedef struct aout_alloc_t
         (p_new_buffer)->i_alloc_type = (p_alloc)->i_alloc_type;             \
         (p_new_buffer)->i_size = (u64)(p_alloc)->i_bytes_per_sec            \
                                         * i_nb_usec / 1000000 + 1;          \
-        (p_new_buffer)->p_buffer = (void *)(p_new_buffer)                   \
+        (p_new_buffer)->p_buffer = (byte_t *)(p_new_buffer)                 \
                                      + sizeof(aout_buffer_t);               \
         if ( (p_previous_buffer) != NULL )                                  \
         {                                                                   \
@@ -184,7 +184,7 @@ struct aout_input_t
 
     aout_fifo_t             fifo;
 
-    char *                  p_first_byte_to_mix;
+    byte_t *                p_first_byte_to_mix;
 };
 
 /*****************************************************************************
@@ -263,4 +263,3 @@ int aout_OutputNew( aout_instance_t * p_aout,
 void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer );
 void aout_OutputDelete( aout_instance_t * p_aout );
 
-int aout_FormatToBytes( audio_sample_format_t * p_format );

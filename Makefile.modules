@@ -55,7 +55,7 @@ all:
 
 clean:
 #	rm -f $(PLUGIN_ALL) $(BUILTIN_ALL)
-	rm -f *.o *.o.* *.lo *.lo.* *.obj *.moc *.moc.* *.bak
+	rm -f *.a *.so *.o *.o.* *.lo.* *.obj *.moc *.moc.* *.bak
 	rm -Rf .dep
 
 FORCE:

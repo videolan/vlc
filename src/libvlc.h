@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.11 2002/08/07 21:36:56 massiot Exp $
+ * $Id: libvlc.h,v 1.12 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -312,8 +312,6 @@
     "\n                                 VCD device" \
     "\n  udpstream:[@[<bind address>][:<bind port>]]" \
     "\n                                 UDP stream sent by VLS" \
-    "\n  vlc:loop                       loop execution of the " \
-    "playlist" \
     "\n  vlc:pause                      pause execution of " \
     "playlist items" \
     "\n  vlc:quit                       quit VLC" \

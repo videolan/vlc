@@ -2,7 +2,7 @@
  * spdif.c: A52 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: spdif.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: spdif.c,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -195,7 +195,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             i_current_pts += i_frame_time;
         }
 
-        // wait a little to avoid an input flood from the a52 input
+        /* wait a little to avoid an input flood from the a52 input */
         mwait( i_current_pts - 500000 );
 
         vlc_mutex_lock (&p_spdif->p_aout_fifo->data_lock);

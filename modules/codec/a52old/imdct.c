@@ -2,7 +2,7 @@
  * imdct.c: A52 DCT
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: imdct.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: imdct.c,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -110,10 +110,10 @@ void imdct (a52dec_t * p_a52dec, s16 * buffer)
             case 2:
                 break;
             default:    /* 1/0 */
-//                if (p_a52dec->bsi.acmod == 1)
+/*              if (p_a52dec->bsi.acmod == 1) */
                     center = p_a52dec->samples;
-//                else if (p_a52dec->bsi.acmod == 0)
-//                  center = samples[config.dual_mono_ch_sel];
+/*              else if (p_a52dec->bsi.acmod == 0)
+                  center = samples[config.dual_mono_ch_sel]; */
                 do_imdct(p_a52dec->p_imdct, center, p_a52dec->p_imdct->delay); /* no downmix*/
     
                 p_a52dec->p_downmix->pf_stream_sample_1ch_to_s16 (buffer, center);

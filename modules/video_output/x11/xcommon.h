@@ -2,7 +2,7 @@
  * xcommon.h: Defines common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.h,v 1.1 2002/08/04 17:23:44 sam Exp $
+ * $Id: xcommon.h,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -41,14 +41,12 @@
 #   define IMAGE_FREE     XDestroyImage
 #endif
 
-VLC_DECLARE_STRUCT(x11_window_t)
-
 /*****************************************************************************
  * x11_window_t: X11 window descriptor
  *****************************************************************************
  * This structure contains all the data necessary to describe an X11 window.
  *****************************************************************************/
-struct x11_window_t
+typedef struct x11_window_t
 {
     Window              base_window;                          /* base window */
     Window              video_window;     /* sub-window for displaying video */
@@ -57,7 +55,8 @@ struct x11_window_t
     int                 i_height;                   /* height of main window */
     Atom                wm_protocols;
     Atom                wm_delete_window;
-};
+
+} x11_window_t;
 
 /*****************************************************************************
  * vout_sys_t: video output method descriptor

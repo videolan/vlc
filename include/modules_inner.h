@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.27 2002/08/04 08:45:35 sam Exp $
+ * $Id: modules_inner.h,v 1.28 2002/08/08 00:35:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -55,13 +55,13 @@
 #if defined( __BUILTIN__ )
 #   define E_( function )          CONCATENATE( function, MODULE_NAME )
 #   define __VLC_SYMBOL( symbol )  CONCATENATE( symbol, MODULE_NAME )
-#   define DECLARE_SYMBOLS         ;
-#   define STORE_SYMBOLS           ;
+#   define DECLARE_SYMBOLS         struct _u_n_u_s_e_d_
+#   define STORE_SYMBOLS           struct _u_n_u_s_e_d_
 #elif defined( __PLUGIN__ )
 #   define E_( function )          function
 #   define __VLC_SYMBOL( symbol  ) CONCATENATE( symbol, MODULE_SYMBOL )
-#   define DECLARE_SYMBOLS         module_symbols_t* p_symbols;
-#   define STORE_SYMBOLS           p_symbols = p_module->p_symbols;
+#   define DECLARE_SYMBOLS         module_symbols_t* p_symbols
+#   define STORE_SYMBOLS           p_symbols = p_module->p_symbols
 #endif
 
 #if defined( __cplusplus )

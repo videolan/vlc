@@ -2,7 +2,7 @@
  * motionmmx.c : MMX motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionmmx.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: motionmmx.c,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -53,7 +53,7 @@ vlc_module_end();
  * Motion compensation in MMX
  *****************************************************************************/
 
-// some rounding constants
+/* some rounding constants */
 mmx_t round1 = {0x0001000100010001LL};
 mmx_t round4 = {0x0002000200020002LL};
 
@@ -67,25 +67,25 @@ mmx_t round4 = {0x0002000200020002LL};
 
 static inline void mmx_zero_reg ()
 {
-    // load 0 into mm0
+    /* load 0 into mm0 */
     pxor_r2r (mm0, mm0);
 }
 
 static inline void mmx_average_2_U8 (yuv_data_t * dest,
                                      yuv_data_t * src1, yuv_data_t * src2)
 {
-    //
-    // *dest = (*src1 + *src2 + 1)/ 2;
-    //
+    /*
+     * *dest = (*src1 + *src2 + 1)/ 2;
+     */
     static mmx_t mask1 = {0x0101010101010101LL};
     static mmx_t mask7f = {0x7f7f7f7f7f7f7f7fLL};
 
-    movq_m2r (*src1, mm1);        // load 8 src1 bytes
+    movq_m2r (*src1, mm1);        /* load 8 src1 bytes */
     movq_r2r (mm1, mm2);
     psrlq_i2r (1, mm1);
     pand_m2r (mask7f, mm1);
 
-    movq_m2r (*src2, mm3);        // load 8 src2 bytes
+    movq_m2r (*src2, mm3);        /* load 8 src2 bytes */
     por_r2r (mm3, mm2);
     psrlq_i2r (1, mm3);
     pand_m2r (mask7f, mm3);
@@ -93,179 +93,179 @@ static inline void mmx_average_2_U8 (yuv_data_t * dest,
     paddb_r2r (mm1, mm3);
     pand_m2r (mask1, mm2);
     paddb_r2r (mm3, mm2);
-    movq_r2m (mm2, *dest);        // store result in dest
+    movq_r2m (mm2, *dest);        /* store result in dest */
 }
 
 static inline void mmx_interp_average_2_U8 (yuv_data_t * dest,
                                             yuv_data_t * src1, yuv_data_t * src2)
 {
-    //
-    // *dest = (*dest + (*src1 + *src2 + 1)/ 2 + 1)/ 2;
-    //
+    /*
+     * *dest = (*dest + (*src1 + *src2 + 1)/ 2 + 1)/ 2;
+     */
 
-    movq_m2r (*dest, mm1);        // load 8 dest bytes
-    movq_r2r (mm1, mm2);        // copy 8 dest bytes
+    movq_m2r (*dest, mm1);        /* load 8 dest bytes */
+    movq_r2r (mm1, mm2);        /* copy 8 dest bytes */
 
-    movq_m2r (*src1, mm3);        // load 8 src1 bytes
-    movq_r2r (mm3, mm4);        // copy 8 src1 bytes
+    movq_m2r (*src1, mm3);        /* load 8 src1 bytes */
+    movq_r2r (mm3, mm4);        /* copy 8 src1 bytes */
 
-    movq_m2r (*src2, mm5);        // load 8 src2 bytes
-    movq_r2r (mm5, mm6);        // copy 8 src2 bytes
+    movq_m2r (*src2, mm5);        /* load 8 src2 bytes */
+    movq_r2r (mm5, mm6);        /* copy 8 src2 bytes */
 
-    punpcklbw_r2r (mm0, mm1);        // unpack low dest bytes
-    punpckhbw_r2r (mm0, mm2);        // unpack high dest bytes
+    punpcklbw_r2r (mm0, mm1);        /* unpack low dest bytes */
+    punpckhbw_r2r (mm0, mm2);        /* unpack high dest bytes */
 
-    punpcklbw_r2r (mm0, mm3);        // unpack low src1 bytes
-    punpckhbw_r2r (mm0, mm4);        // unpack high src1 bytes
+    punpcklbw_r2r (mm0, mm3);        /* unpack low src1 bytes */
+    punpckhbw_r2r (mm0, mm4);        /* unpack high src1 bytes */
 
-    punpcklbw_r2r (mm0, mm5);        // unpack low src2 bytes
-    punpckhbw_r2r (mm0, mm6);        // unpack high src2 bytes
+    punpcklbw_r2r (mm0, mm5);        /* unpack low src2 bytes */
+    punpckhbw_r2r (mm0, mm6);        /* unpack high src2 bytes */
 
-    paddw_r2r (mm5, mm3);        // add lows
+    paddw_r2r (mm5, mm3);        /* add lows */
     paddw_m2r (round1, mm3);
-    psraw_i2r (1, mm3);                // /2
+    psraw_i2r (1, mm3);                /* /2 */
 
-    paddw_r2r (mm6, mm4);        // add highs
+    paddw_r2r (mm6, mm4);        /* add highs */
     paddw_m2r (round1, mm4);
-    psraw_i2r (1, mm4);                // /2
+    psraw_i2r (1, mm4);                /* /2 */
 
-    paddw_r2r (mm3, mm1);        // add lows
+    paddw_r2r (mm3, mm1);        /* add lows */
     paddw_m2r (round1, mm1);
-    psraw_i2r (1, mm1);                // /2
+    psraw_i2r (1, mm1);                /* /2 */
 
-    paddw_r2r (mm4, mm2);        // add highs
+    paddw_r2r (mm4, mm2);        /* add highs */
     paddw_m2r (round1, mm2);
-    psraw_i2r (1, mm2);                // /2
+    psraw_i2r (1, mm2);                /* /2 */
 
-    packuswb_r2r (mm2, mm1);        // pack (w/ saturation)
-    movq_r2m (mm1, *dest);        // store result in dest
+    packuswb_r2r (mm2, mm1);        /* pack (w/ saturation) */
+    movq_r2m (mm1, *dest);        /* store result in dest */
 }
 
 static inline void mmx_average_4_U8 (yuv_data_t * dest,
                                      yuv_data_t * src1, yuv_data_t * src2,
                                      yuv_data_t * src3, yuv_data_t * src4)
 {
-    //
-    // *dest = (*src1 + *src2 + *src3 + *src4 + 2)/ 4;
-    //
+    /*
+     * *dest = (*src1 + *src2 + *src3 + *src4 + 2)/ 4;
+     */
 
-    movq_m2r (*src1, mm1);        // load 8 src1 bytes
-    movq_r2r (mm1, mm2);        // copy 8 src1 bytes
+    movq_m2r (*src1, mm1);        /* load 8 src1 bytes */
+    movq_r2r (mm1, mm2);        /* copy 8 src1 bytes */
 
-    punpcklbw_r2r (mm0, mm1);        // unpack low src1 bytes
-    punpckhbw_r2r (mm0, mm2);        // unpack high src1 bytes
+    punpcklbw_r2r (mm0, mm1);        /* unpack low src1 bytes */
+    punpckhbw_r2r (mm0, mm2);        /* unpack high src1 bytes */
 
-    movq_m2r (*src2, mm3);        // load 8 src2 bytes
-    movq_r2r (mm3, mm4);        // copy 8 src2 bytes
+    movq_m2r (*src2, mm3);        /* load 8 src2 bytes */
+    movq_r2r (mm3, mm4);        /* copy 8 src2 bytes */
 
-    punpcklbw_r2r (mm0, mm3);        // unpack low src2 bytes
-    punpckhbw_r2r (mm0, mm4);        // unpack high src2 bytes
+    punpcklbw_r2r (mm0, mm3);        /* unpack low src2 bytes */
+    punpckhbw_r2r (mm0, mm4);        /* unpack high src2 bytes */
 
-    paddw_r2r (mm3, mm1);        // add lows
-    paddw_r2r (mm4, mm2);        // add highs
+    paddw_r2r (mm3, mm1);        /* add lows */
+    paddw_r2r (mm4, mm2);        /* add highs */
 
-    // now have partials in mm1 and mm2
+    /* now have partials in mm1 and mm2 */
 
-    movq_m2r (*src3, mm3);        // load 8 src3 bytes
-    movq_r2r (mm3, mm4);        // copy 8 src3 bytes
+    movq_m2r (*src3, mm3);        /* load 8 src3 bytes */
+    movq_r2r (mm3, mm4);        /* copy 8 src3 bytes */
 
-    punpcklbw_r2r (mm0, mm3);        // unpack low src3 bytes
-    punpckhbw_r2r (mm0, mm4);        // unpack high src3 bytes
+    punpcklbw_r2r (mm0, mm3);        /* unpack low src3 bytes */
+    punpckhbw_r2r (mm0, mm4);        /* unpack high src3 bytes */
 
-    paddw_r2r (mm3, mm1);        // add lows
-    paddw_r2r (mm4, mm2);        // add highs
+    paddw_r2r (mm3, mm1);        /* add lows */
+    paddw_r2r (mm4, mm2);        /* add highs */
 
-    movq_m2r (*src4, mm5);        // load 8 src4 bytes
-    movq_r2r (mm5, mm6);        // copy 8 src4 bytes
+    movq_m2r (*src4, mm5);        /* load 8 src4 bytes */
+    movq_r2r (mm5, mm6);        /* copy 8 src4 bytes */
 
-    punpcklbw_r2r (mm0, mm5);        // unpack low src4 bytes
-    punpckhbw_r2r (mm0, mm6);        // unpack high src4 bytes
+    punpcklbw_r2r (mm0, mm5);        /* unpack low src4 bytes */
+    punpckhbw_r2r (mm0, mm6);        /* unpack high src4 bytes */
 
-    paddw_r2r (mm5, mm1);        // add lows
-    paddw_r2r (mm6, mm2);        // add highs
+    paddw_r2r (mm5, mm1);        /* add lows */
+    paddw_r2r (mm6, mm2);        /* add highs */
 
-    // now have subtotal in mm1 and mm2
+    /* now have subtotal in mm1 and mm2 */
 
     paddw_m2r (round4, mm1);
-    psraw_i2r (2, mm1);                // /4
+    psraw_i2r (2, mm1);                /* /4 */
     paddw_m2r (round4, mm2);
-    psraw_i2r (2, mm2);                // /4
+    psraw_i2r (2, mm2);                /* /4 */
 
-    packuswb_r2r (mm2, mm1);        // pack (w/ saturation)
-    movq_r2m (mm1, *dest);        // store result in dest
+    packuswb_r2r (mm2, mm1);        /* pack (w/ saturation) */
+    movq_r2m (mm1, *dest);        /* store result in dest */
 }
 
 static inline void mmx_interp_average_4_U8 (yuv_data_t * dest,
                                             yuv_data_t * src1, yuv_data_t * src2,
                                             yuv_data_t * src3, yuv_data_t * src4)
 {
-    //
-    // *dest = (*dest + (*src1 + *src2 + *src3 + *src4 + 2)/ 4 + 1)/ 2;
-    //
+    /*
+     * *dest = (*dest + (*src1 + *src2 + *src3 + *src4 + 2)/ 4 + 1)/ 2;
+     */
 
-    movq_m2r (*src1, mm1);        // load 8 src1 bytes
-    movq_r2r (mm1, mm2);        // copy 8 src1 bytes
+    movq_m2r (*src1, mm1);        /* load 8 src1 bytes */
+    movq_r2r (mm1, mm2);        /* copy 8 src1 bytes */
 
-    punpcklbw_r2r (mm0, mm1);        // unpack low src1 bytes
-    punpckhbw_r2r (mm0, mm2);        // unpack high src1 bytes
+    punpcklbw_r2r (mm0, mm1);        /* unpack low src1 bytes */
+    punpckhbw_r2r (mm0, mm2);        /* unpack high src1 bytes */
 
-    movq_m2r (*src2, mm3);        // load 8 src2 bytes
-    movq_r2r (mm3, mm4);        // copy 8 src2 bytes
+    movq_m2r (*src2, mm3);        /* load 8 src2 bytes */
+    movq_r2r (mm3, mm4);        /* copy 8 src2 bytes */
 
-    punpcklbw_r2r (mm0, mm3);        // unpack low src2 bytes
-    punpckhbw_r2r (mm0, mm4);        // unpack high src2 bytes
+    punpcklbw_r2r (mm0, mm3);        /* unpack low src2 bytes */
+    punpckhbw_r2r (mm0, mm4);        /* unpack high src2 bytes */
 
-    paddw_r2r (mm3, mm1);        // add lows
-    paddw_r2r (mm4, mm2);        // add highs
+    paddw_r2r (mm3, mm1);        /* add lows */
+    paddw_r2r (mm4, mm2);        /* add highs */
 
-    // now have partials in mm1 and mm2
+    /* now have partials in mm1 and mm2 */
 
-    movq_m2r (*src3, mm3);        // load 8 src3 bytes
-    movq_r2r (mm3, mm4);        // copy 8 src3 bytes
+    movq_m2r (*src3, mm3);        /* load 8 src3 bytes */
+    movq_r2r (mm3, mm4);        /* copy 8 src3 bytes */
 
-    punpcklbw_r2r (mm0, mm3);        // unpack low src3 bytes
-    punpckhbw_r2r (mm0, mm4);        // unpack high src3 bytes
+    punpcklbw_r2r (mm0, mm3);        /* unpack low src3 bytes */
+    punpckhbw_r2r (mm0, mm4);        /* unpack high src3 bytes */
 
-    paddw_r2r (mm3, mm1);        // add lows
-    paddw_r2r (mm4, mm2);        // add highs
+    paddw_r2r (mm3, mm1);        /* add lows */
+    paddw_r2r (mm4, mm2);        /* add highs */
 
-    movq_m2r (*src4, mm5);        // load 8 src4 bytes
-    movq_r2r (mm5, mm6);        // copy 8 src4 bytes
+    movq_m2r (*src4, mm5);        /* load 8 src4 bytes */
+    movq_r2r (mm5, mm6);        /* copy 8 src4 bytes */
 
-    punpcklbw_r2r (mm0, mm5);        // unpack low src4 bytes
-    punpckhbw_r2r (mm0, mm6);        // unpack high src4 bytes
+    punpcklbw_r2r (mm0, mm5);        /* unpack low src4 bytes */
+    punpckhbw_r2r (mm0, mm6);        /* unpack high src4 bytes */
 
-    paddw_r2r (mm5, mm1);        // add lows
-    paddw_r2r (mm6, mm2);        // add highs
+    paddw_r2r (mm5, mm1);        /* add lows */
+    paddw_r2r (mm6, mm2);        /* add highs */
 
     paddw_m2r (round4, mm1);
-    psraw_i2r (2, mm1);                // /4
+    psraw_i2r (2, mm1);                /* /4 */
     paddw_m2r (round4, mm2);
-    psraw_i2r (2, mm2);                // /4
+    psraw_i2r (2, mm2);                /* /4 */
 
-    // now have subtotal/4 in mm1 and mm2
+    /* now have subtotal/4 in mm1 and mm2 */
 
-    movq_m2r (*dest, mm3);        // load 8 dest bytes
-    movq_r2r (mm3, mm4);        // copy 8 dest bytes
+    movq_m2r (*dest, mm3);        /* load 8 dest bytes */
+    movq_r2r (mm3, mm4);        /* copy 8 dest bytes */
 
-    punpcklbw_r2r (mm0, mm3);        // unpack low dest bytes
-    punpckhbw_r2r (mm0, mm4);        // unpack high dest bytes
+    punpcklbw_r2r (mm0, mm3);        /* unpack low dest bytes */
+    punpckhbw_r2r (mm0, mm4);        /* unpack high dest bytes */
 
-    paddw_r2r (mm3, mm1);        // add lows
-    paddw_r2r (mm4, mm2);        // add highs
+    paddw_r2r (mm3, mm1);        /* add lows */
+    paddw_r2r (mm4, mm2);        /* add highs */
 
     paddw_m2r (round1, mm1);
-    psraw_i2r (1, mm1);                // /2
+    psraw_i2r (1, mm1);                /* /2 */
     paddw_m2r (round1, mm2);
-    psraw_i2r (1, mm2);                // /2
+    psraw_i2r (1, mm2);                /* /2 */
 
-    // now have end value in mm1 and mm2
+    /* now have end value in mm1 and mm2 */
 
-    packuswb_r2r (mm2, mm1);        // pack (w/ saturation)
-    movq_r2m (mm1,*dest);        // store result in dest
+    packuswb_r2r (mm2, mm1);        /* pack (w/ saturation) */
+    movq_r2m (mm1,*dest);        /* store result in dest */
 }
 
-//-----------------------------------------------------------------------
+/*-----------------------------------------------------------------------*/
 
 static inline void MC_avg_mmx (int width, int height,
                                yuv_data_t * dest, yuv_data_t * ref, int stride)
@@ -295,7 +295,7 @@ static void MC_avg_8_mmx (yuv_data_t * dest, yuv_data_t * ref,
     MC_avg_mmx (8, height, dest, ref, stride);
 }
 
-//-----------------------------------------------------------------------
+/*-----------------------------------------------------------------------*/
 
 static inline void MC_put_mmx (int width, int height,
                                yuv_data_t * dest, yuv_data_t * ref, int stride)
@@ -303,13 +303,13 @@ static inline void MC_put_mmx (int width, int height,
     mmx_zero_reg ();
 
     do {
-        movq_m2r (* ref, mm1);        // load 8 ref bytes
-        movq_r2m (mm1,* dest);        // store 8 bytes at curr
+        movq_m2r (* ref, mm1);        /* load 8 ref bytes */
+        movq_r2m (mm1,* dest);        /* store 8 bytes at curr */
 
         if (width == 16)
             {
-                movq_m2r (* (ref+8), mm1);        // load 8 ref bytes
-                movq_r2m (mm1,* (dest+8));        // store 8 bytes at curr
+                movq_m2r (* (ref+8), mm1);        /* load 8 ref bytes */
+                movq_r2m (mm1,* (dest+8));        /* store 8 bytes at curr */
             }
 
         dest += stride;
@@ -329,9 +329,9 @@ static void MC_put_8_mmx (yuv_data_t * dest, yuv_data_t * ref,
     MC_put_mmx (8, height, dest, ref, stride);
 }
 
-//-----------------------------------------------------------------------
+/*-----------------------------------------------------------------------*/
 
-// Half pixel interpolation in the x direction
+/* Half pixel interpolation in the x direction */
 static inline void MC_avg_x_mmx (int width, int height,
                                  yuv_data_t * dest, yuv_data_t * ref, int stride)
 {
@@ -360,7 +360,7 @@ static void MC_avg_x8_mmx (yuv_data_t * dest, yuv_data_t * ref,
     MC_avg_x_mmx (8, height, dest, ref, stride);
 }
 
-//-----------------------------------------------------------------------
+/*-----------------------------------------------------------------------*/
 
 static inline void MC_put_x_mmx (int width, int height,
                                  yuv_data_t * dest, yuv_data_t * ref, int stride)
@@ -390,7 +390,7 @@ static void MC_put_x8_mmx (yuv_data_t * dest, yuv_data_t * ref,
     MC_put_x_mmx (8, height, dest, ref, stride);
 }
 
-//-----------------------------------------------------------------------
+/*-----------------------------------------------------------------------*/
 
 static inline void MC_avg_xy_8wide_mmx (int height, yuv_data_t * dest,
     yuv_data_t * ref, int stride)
@@ -398,7 +398,7 @@ static inline void MC_avg_xy_8wide_mmx (int height, yuv_data_t * dest,
     pxor_r2r (mm0, mm0);
     movq_m2r (round4, mm7);
 
-    movq_m2r (*ref, mm1);      // calculate first row ref[0] + ref[1]
+    movq_m2r (*ref, mm1);      /* calculate first row ref[0] + ref[1] */
     movq_r2r (mm1, mm2);
 
     punpcklbw_r2r (mm0, mm1);
@@ -417,7 +417,7 @@ static inline void MC_avg_xy_8wide_mmx (int height, yuv_data_t * dest,
 
     do {
 
-        movq_m2r (*ref, mm5);   // calculate next row ref[0] + ref[1]
+        movq_m2r (*ref, mm5);   /* calculate next row ref[0] + ref[1] */
         movq_r2r (mm5, mm6);
 
         punpcklbw_r2r (mm0, mm5);
@@ -432,7 +432,7 @@ static inline void MC_avg_xy_8wide_mmx (int height, yuv_data_t * dest,
         paddw_r2r (mm3, mm5);
         paddw_r2r (mm4, mm6);
 
-        movq_r2r (mm7, mm3);   // calculate round4 + previous row + current row
+        movq_r2r (mm7, mm3);   /* calculate round4 + previous row + current row */
         movq_r2r (mm7, mm4);
 
         paddw_r2r (mm1, mm3);
@@ -441,10 +441,10 @@ static inline void MC_avg_xy_8wide_mmx (int height, yuv_data_t * dest,
         paddw_r2r (mm5, mm3);
         paddw_r2r (mm6, mm4);
 
-        psraw_i2r (2, mm3);                // /4
-        psraw_i2r (2, mm4);                // /4
+        psraw_i2r (2, mm3);                /* /4 */
+        psraw_i2r (2, mm4);                /* /4 */
 
-        movq_m2r (*dest, mm1);   // calculate (subtotal + dest[0] + round1) / 2
+        movq_m2r (*dest, mm1);   /* calculate (subtotal + dest[0] + round1) / 2 */
         movq_r2r (mm1, mm2);
 
         punpcklbw_r2r (mm0, mm1);
@@ -456,13 +456,13 @@ static inline void MC_avg_xy_8wide_mmx (int height, yuv_data_t * dest,
         paddw_m2r (round1, mm3);
         paddw_m2r (round1, mm4);
 
-        psraw_i2r (1, mm3);                // /2
-        psraw_i2r (1, mm4);                // /2
+        psraw_i2r (1, mm3);                /* /2 */
+        psraw_i2r (1, mm4);                /* /2 */
 
-        packuswb_r2r (mm4, mm3);      // pack (w/ saturation)
-	movq_r2m (mm3, *dest);        // store result in dest
+        packuswb_r2r (mm4, mm3);      /* pack (w/ saturation) */
+	movq_r2m (mm3, *dest);        /* store result in dest */
 
-        movq_r2r (mm5, mm1);    // remember current row for the next pass
+        movq_r2r (mm5, mm1);    /* remember current row for the next pass */
         movq_r2r (mm6, mm2);
 
 	ref += stride;
@@ -484,7 +484,7 @@ static void MC_avg_xy8_mmx (yuv_data_t * dest, yuv_data_t * ref,
     MC_avg_xy_8wide_mmx(height, dest, ref, stride);
 }
 
-//-----------------------------------------------------------------------
+/*-----------------------------------------------------------------------*/
 
 static inline void MC_put_xy_8wide_mmx (int height, yuv_data_t * dest,
     yuv_data_t * ref, int stride)
@@ -492,7 +492,7 @@ static inline void MC_put_xy_8wide_mmx (int height, yuv_data_t * dest,
     pxor_r2r (mm0, mm0);
     movq_m2r (round4, mm7);
 
-    movq_m2r (*ref, mm1);      // calculate first row ref[0] + ref[1]
+    movq_m2r (*ref, mm1);      /* calculate first row ref[0] + ref[1] */
     movq_r2r (mm1, mm2);
 
     punpcklbw_r2r (mm0, mm1);
@@ -511,7 +511,7 @@ static inline void MC_put_xy_8wide_mmx (int height, yuv_data_t * dest,
 
     do {
 
-        movq_m2r (*ref, mm5);   // calculate next row ref[0] + ref[1]
+        movq_m2r (*ref, mm5);   /* calculate next row ref[0] + ref[1] */
         movq_r2r (mm5, mm6);
 
         punpcklbw_r2r (mm0, mm5);
@@ -526,7 +526,7 @@ static inline void MC_put_xy_8wide_mmx (int height, yuv_data_t * dest,
         paddw_r2r (mm3, mm5);
         paddw_r2r (mm4, mm6);
 
-        movq_r2r (mm7, mm3);   // calculate round4 + previous row + current row
+        movq_r2r (mm7, mm3);   /* calculate round4 + previous row + current row */
         movq_r2r (mm7, mm4);
 
         paddw_r2r (mm1, mm3);
@@ -535,13 +535,13 @@ static inline void MC_put_xy_8wide_mmx (int height, yuv_data_t * dest,
         paddw_r2r (mm5, mm3);
         paddw_r2r (mm6, mm4);
 
-        psraw_i2r (2, mm3);                // /4
-        psraw_i2r (2, mm4);                // /4
+        psraw_i2r (2, mm3);                /* /4 */
+        psraw_i2r (2, mm4);                /* /4 */
 
-        packuswb_r2r (mm4, mm3);      // pack (w/ saturation)
-	movq_r2m (mm3, *dest);        // store result in dest
+        packuswb_r2r (mm4, mm3);      /* pack (w/ saturation) */
+	movq_r2m (mm3, *dest);        /* store result in dest */
 
-        movq_r2r (mm5, mm1);    // advance to the next row
+        movq_r2r (mm5, mm1);    /* advance to the next row */
         movq_r2r (mm6, mm2);
 
 	ref += stride;
@@ -563,7 +563,7 @@ static void MC_put_xy8_mmx (yuv_data_t * dest, yuv_data_t * ref,
     MC_put_xy_8wide_mmx(height, dest, ref, stride);
 }
 
-//-----------------------------------------------------------------------
+/*-----------------------------------------------------------------------*/
 
 static inline void MC_avg_y_mmx (int width, int height,
                                  yuv_data_t * dest, yuv_data_t * ref, int stride)
@@ -596,7 +596,7 @@ static void MC_avg_y8_mmx (yuv_data_t * dest, yuv_data_t * ref,
     MC_avg_y_mmx (8, height, dest, ref, stride);
 }
 
-//-----------------------------------------------------------------------
+/*-----------------------------------------------------------------------*/
 
 static inline void MC_put_y_mmx (int width, int height,
                                  yuv_data_t * dest, yuv_data_t * ref, int stride)

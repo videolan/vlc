@@ -2,7 +2,7 @@
  * layer2.c: MPEG Layer II audio decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: layer2.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: layer2.c,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -83,7 +83,7 @@ static int adec_bound_table[4] = { 4, 8, 12, 16 };
 typedef struct
 {
     s8 nbal[32];
-    u8 * alloc[32];
+    s8 * alloc[32];
 } alloc_table_t;
 
 #define L3 -1
@@ -209,7 +209,7 @@ int adec_layer2_mono( adec_thread_t * p_adec, s16 * buffer )
     adec_layer2_get_table (p_adec->header, freq_table, &alloc_table, &sblimit);
 
     /* parse allocation */
-    //sblimit=27;
+    /*sblimit=27;*/
 
     for (sb = 0; sb < sblimit; sb++)
     {

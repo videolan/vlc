@@ -2,7 +2,7 @@
  * layer1.c: MPEG Layer I audio decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: layer1.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: layer1.c,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -92,9 +92,7 @@ int adec_layer1_mono( adec_thread_t * p_adec, s16 * buffer )
     float offset[32];
     float sample[32];
 
-    int i_sb;
-    int s;
-    int i_read_bits = 0;
+    unsigned int i_sb, s, i_read_bits = 0;
 
     /*
      * Parse the allocation tables

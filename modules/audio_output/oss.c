@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.1 2002/08/07 21:36:55 massiot Exp $
+ * $Id: oss.c,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -40,6 +40,7 @@
 #endif
 
 #include <vlc/aout.h>
+
 #include "aout_internal.h"
 
 /* SNDCTL_DSP_RESET, SNDCTL_DSP_SETFMT, SNDCTL_DSP_STEREO, SNDCTL_DSP_SPEED,
@@ -62,6 +63,7 @@ struct aout_sys_t
 {
     int                   i_fd;
     volatile vlc_bool_t   b_die;
+    volatile vlc_bool_t   b_initialized;
 };
 
 #define DEFAULT_FRAME_SIZE 2048
@@ -111,7 +113,7 @@ static int Open( vlc_object_t *p_this )
     if( (psz_device = config_GetPsz( p_aout, "dspdev" )) == NULL )
     {
         msg_Err( p_aout, "no audio device given (maybe /dev/dsp ?)" );
-        free( p_aout->p_sys );
+        free( p_sys );
         return -1;
     }
 
@@ -128,16 +130,17 @@ static int Open( vlc_object_t *p_this )
 
     /* Create OSS thread and wait for its readiness. */
     p_sys->b_die = 0;
-    if( vlc_thread_create( p_aout, "aout", OSSThread, VLC_TRUE ) )
+    p_sys->b_initialized = VLC_FALSE;
+    if( vlc_thread_create( p_aout, "aout", OSSThread, VLC_FALSE ) )
     {
-        msg_Err( p_input, "cannot create OSS thread (%s)", strerror(errno) );
-        free( p_aout->p_sys->psz_device );
-        free( p_aout->p_sys );
+        msg_Err( p_aout, "cannot create OSS thread (%s)", strerror(errno) );
+        free( psz_device );
+        free( p_sys );
         return -1;
     }
 
-    p_aout->pf_setformat = SetFormat;
-    p_aout->pf_play = Play;
+    p_aout->output.pf_setformat = SetFormat;
+    p_aout->output.pf_play = Play;
 
     return 0;
 }
@@ -156,6 +159,8 @@ static int SetFormat( aout_instance_t *p_aout )
     int i_format;
     int i_rate;
     vlc_bool_t b_stereo;
+
+    p_sys->b_initialized = VLC_FALSE;
 
     /* Reset the DSP device */
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
@@ -203,9 +208,10 @@ static int SetFormat( aout_instance_t *p_aout )
 
     /* Set the output rate */
     i_rate = p_aout->output.output.i_rate;
-    if( ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_SPEED, &i_rate ) < 0 )
+    if( ioctl( p_sys->i_fd, SNDCTL_DSP_SPEED, &i_rate ) < 0 )
     {
-        msg_Err( p_aout, "cannot set audio output rate (%i)", p_aout->i_rate );
+        msg_Err( p_aout, "cannot set audio output rate (%i)",
+                         p_aout->output.output.i_rate );
         return -1;
     }
 
@@ -217,6 +223,8 @@ static int SetFormat( aout_instance_t *p_aout )
     }
 
     p_aout->output.i_nb_samples = DEFAULT_FRAME_SIZE;
+
+    p_sys->b_initialized = VLC_TRUE;
 
     return 0;
 }
@@ -240,8 +248,8 @@ static void Close( vlc_object_t * p_this )
     p_sys->b_die = 1;
     vlc_thread_join( p_aout );
 
-    close( p_aout->p_sys->i_fd );
-    free( p_aout->p_sys );
+    close( p_sys->i_fd );
+    free( p_sys );
 }
 
 
@@ -275,7 +283,7 @@ static int OSSThread( aout_instance_t * p_aout )
 
     while ( !p_sys->b_die )
     {
-        int i_bytes_per_sample = aout_FormatToBytes( &p_aout->output.output );
+        int i_bytes_per_sample;
         aout_buffer_t * p_buffer;
         mtime_t next_date;
         int i_tmp;
@@ -285,6 +293,13 @@ static int OSSThread( aout_instance_t * p_aout )
          * is equal to the current date + duration of buffered samples.
          * Order is important here, since GetBufInfo is believed to take
          * more time than mdate(). */
+        if( !p_sys->b_initialized )
+        {
+            msleep( THREAD_SLEEP );
+            continue;
+        }
+
+        i_bytes_per_sample = aout_FormatToBytes( &p_aout->output.output );
         next_date = (mtime_t)GetBufInfo( p_aout ) * 1000000
                       / i_bytes_per_sample
                       / p_aout->output.output.i_rate;
@@ -315,4 +330,6 @@ static int OSSThread( aout_instance_t * p_aout )
             aout_BufferFree( p_buffer );
         }
     }
+
+    return 0;
 }

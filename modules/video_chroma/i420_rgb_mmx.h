@@ -2,7 +2,7 @@
  * transforms_yuvmmx.h: MMX YUV transformation assembly
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: i420_rgb_mmx.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: i420_rgb_mmx.h,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Olie Lho <ollie@sis.com.tw>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -25,21 +25,21 @@
  *****************************************************************************/
 
 /* hope these constant values are cache line aligned */
-#define UNUSED_LONGLONG(foo) \
-    static const unsigned long long foo __asm__ (#foo) __attribute__((unused))
-UNUSED_LONGLONG(mmx_80w)     = 0x0080008000800080;
-UNUSED_LONGLONG(mmx_10w)     = 0x1010101010101010;
-UNUSED_LONGLONG(mmx_00ffw)   = 0x00ff00ff00ff00ff;
-UNUSED_LONGLONG(mmx_Y_coeff) = 0x253f253f253f253f;
+#define UNUSED_U64(foo) \
+    static const u64 foo __asm__ (#foo) __attribute__((unused))
+UNUSED_U64(mmx_80w)     = 0x0080008000800080;
+UNUSED_U64(mmx_10w)     = 0x1010101010101010;
+UNUSED_U64(mmx_00ffw)   = 0x00ff00ff00ff00ff;
+UNUSED_U64(mmx_Y_coeff) = 0x253f253f253f253f;
 
-UNUSED_LONGLONG(mmx_U_green) = 0xf37df37df37df37d;
-UNUSED_LONGLONG(mmx_U_blue)  = 0x4093409340934093;
-UNUSED_LONGLONG(mmx_V_red)   = 0x3312331233123312;
-UNUSED_LONGLONG(mmx_V_green) = 0xe5fce5fce5fce5fc;
+UNUSED_U64(mmx_U_green) = 0xf37df37df37df37d;
+UNUSED_U64(mmx_U_blue)  = 0x4093409340934093;
+UNUSED_U64(mmx_V_red)   = 0x3312331233123312;
+UNUSED_U64(mmx_V_green) = 0xe5fce5fce5fce5fc;
 
-UNUSED_LONGLONG(mmx_mask_f8) = 0xf8f8f8f8f8f8f8f8;
-UNUSED_LONGLONG(mmx_mask_fc) = 0xfcfcfcfcfcfcfcfc;
-#undef UNUSED_LONGLONG
+UNUSED_U64(mmx_mask_f8) = 0xf8f8f8f8f8f8f8f8;
+UNUSED_U64(mmx_mask_fc) = 0xfcfcfcfcfcfcfcfc;
+#undef UNUSED_U64
 
 #define MMX_INIT_16 "                                                       \n\
 movd      (%1), %%mm0       # Load 4 Cb       00 00 00 00 u3 u2 u1 u0       \n\

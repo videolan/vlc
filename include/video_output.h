@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.82 2002/07/31 20:56:50 sam Exp $
+ * $Id: video_output.h,v 1.83 2002/08/08 00:35:10 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -157,9 +157,6 @@ struct vout_thread_t
 #define VOUT_SIZE_CHANGE        0x0200                       /* size changed */
 #define VOUT_DEPTH_CHANGE       0x0400                      /* depth changed */
 #define VOUT_CHROMA_CHANGE      0x0800               /* change chroma tables */
-
-/* Disabled for thread deadlocks issues --Meuuh */
-//#define VOUT_NODISPLAY_CHANGE   0xff00    /* changes which forbidden display */
 
 #define MAX_JITTER_SAMPLES      20
 

@@ -1,7 +1,7 @@
 /* seek.c: functions to navigate through DVD.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: seek.c,v 1.1 2002/08/04 17:23:41 sam Exp $
+ * $Id: seek.c,v 1.2 2002/08/08 00:35:10 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -223,8 +223,10 @@ int LbMaxOnce( thread_dvd_data_t * p_dvd )
                          p_dvd->i_vts_start + p_dvd->i_vts_lb,
                          DVDCSS_SEEK_MPEG ) < 0 )
         {
-//X            intf_ErrMsg( "dvd error: %s",
-//X                         dvdcss_error( p_dvd->dvdhandle ) );
+#if 0
+            intf_ErrMsg( "dvd error: %s",
+                         dvdcss_error( p_dvd->dvdhandle ) );
+#endif
             return 0;
         }
 
@@ -308,12 +310,16 @@ int DVDSetChapter( thread_dvd_data_t * p_dvd, int i_chapter )
                          p_dvd->i_vts_start + p_dvd->i_vts_lb,
                          DVDCSS_SEEK_MPEG ) < 0 )
         {
-//X            intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
+#if 0
+            intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
+#endif
             return -1;
         }
         
-//X        intf_WarnMsg( 4, "dvd info: chapter %d prg_cell %d map_cell %d",
-//X                i_chapter, p_dvd->i_prg_cell, p_dvd->i_map_cell );
+#if 0
+        intf_WarnMsg( 4, "dvd info: chapter %d prg_cell %d map_cell %d",
+                i_chapter, p_dvd->i_prg_cell, p_dvd->i_map_cell );
+#endif
     }
     
     return i_chapter;

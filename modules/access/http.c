@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.2 2002/08/07 00:29:36 sam Exp $
+ * $Id: http.c,v 1.3 2002/08/08 00:35:10 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -117,9 +117,10 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     {
          snprintf( psz_buffer, sizeof(psz_buffer),
                    "%s"
-                   "Range: bytes=%lld-\r\n"
+                   "Range: bytes=%d%d-\r\n"
                    HTTP_USERAGENT HTTP_END,
-                   p_access_data->psz_buffer, i_tell );
+                   p_access_data->psz_buffer,
+                   (u32)(i_tell>>32), (u32)i_tell );
     }
     else
     {
@@ -170,7 +171,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
                   strlen("HTTP/1.") ) )
     {
         psz_parser += strlen("HTTP 1.") + 2;
-        i_returncode = atoi( psz_parser );
+        i_returncode = atoi( (char*)psz_parser );
         msg_Dbg( p_input, "HTTP server replied: %i", i_returncode );
         psz_parser += 4;
         for ( i = 0; psz_parser[i] != '\r' || psz_parser[i+1] != '\n'; i++ )
@@ -216,11 +217,11 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
             psz_parser += strlen("Content-Length: ");
             vlc_mutex_lock( &p_input->stream.stream_lock );
 #ifdef HAVE_ATOLL
-            p_input->stream.p_selected_area->i_size = atoll( psz_parser )
+            p_input->stream.p_selected_area->i_size = atoll( (char*)psz_parser )
                                                         + i_tell;
 #else
             /* FIXME : this won't work for 64-bit lengths */
-            p_input->stream.p_selected_area->i_size = atoi( psz_parser )
+            p_input->stream.p_selected_area->i_size = atoi( (char*)psz_parser )
                                                         + i_tell;
 #endif
             vlc_mutex_unlock( &p_input->stream.stream_lock );

@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.36 2002/07/20 18:01:43 sam Exp $
+ * $Id: video_text.c,v 1.37 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -467,7 +467,7 @@ void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int 
                                                      p_font->i_interspacing);
 
     /* compute where to stop... */
-    i_end = (int) (i_percent * strlen(psz_text) / I64C(100));
+    i_end = (int) (i_percent * strlen(psz_text) / (s64)100);
     if(i_end > strlen(psz_text))
         i_end = strlen(psz_text);
     

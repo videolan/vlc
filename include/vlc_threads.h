@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_threads.h,v 1.8 2002/07/31 20:56:50 sam Exp $
+ * $Id: vlc_threads.h,v 1.9 2002/08/08 00:35:10 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -240,8 +240,10 @@ static inline int __vlc_mutex_lock( char * psz_file, int i_line,
     int i_return = pthread_mutex_lock( p_mutex );
     if( i_return )
     {
-//        msg_Err( "thread %d: mutex_lock failed at %s:%d (%s)",
-//                 pthread_self(), psz_file, i_line, strerror(i_return) );
+#if 0
+        msg_Err( "thread %d: mutex_lock failed at %s:%d (%s)",
+                 pthread_self(), psz_file, i_line, strerror(i_return) );
+#endif
     }
     return i_return;
 
@@ -303,8 +305,10 @@ static inline int __vlc_mutex_unlock( char * psz_file, int i_line,
     int i_return = pthread_mutex_unlock( p_mutex );
     if( i_return )
     {
-//        msg_Err( "thread %d: mutex_unlock failed at %s:%d (%s)",
-//                 pthread_self(), psz_file, i_line, strerror(i_return) );
+#if 0
+        msg_Err( "thread %d: mutex_unlock failed at %s:%d (%s)",
+                 pthread_self(), psz_file, i_line, strerror(i_return) );
+#endif
     }
     return i_return;
 
@@ -665,16 +669,20 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
 
         if( i_result == ETIMEDOUT )
         {
-//X            msg_Warn( "thread %d: possible deadlock detected "
-//X                      "in cond_wait at %s:%d (%s)", pthread_self(),
-//X                      psz_file, i_line, strerror(i_result) );
+#if 0
+            msg_Warn( "thread %d: possible deadlock detected "
+                      "in cond_wait at %s:%d (%s)", pthread_self(),
+                      psz_file, i_line, strerror(i_result) );
+#endif
             continue;
         }
 
         if( i_result )
         {
-//X            msg_Err( "thread %d: cond_wait failed at %s:%d (%s)",
-//X                     pthread_self(), psz_file, i_line, strerror(i_result) );
+#if 0
+            msg_Err( "thread %d: cond_wait failed at %s:%d (%s)",
+                     pthread_self(), psz_file, i_line, strerror(i_result) );
+#endif
         }
         return( i_result );
     }

@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.6 2002/07/31 20:56:53 sam Exp $
+ * $Id: messages.c,v 1.7 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -231,7 +231,8 @@ void __msg_Generic( vlc_object_t *p_this, int i_type, const char *psz_module,
         QueueMsg( (vlc_object_t *)p_this, FN_TYPE, "unknown", \
                   psz_format, args ); \
         va_end( args ); \
-    }
+    } \
+    struct _
 
 DECLARE_MSG_FN( __msg_Info, VLC_MSG_INFO );
 DECLARE_MSG_FN( __msg_Err,  VLC_MSG_ERR );

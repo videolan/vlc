@@ -2,7 +2,7 @@
  * downmix.h : A52 downmix types
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: downmix.h,v 1.2 2002/08/07 00:29:36 sam Exp $
+ * $Id: downmix.h,v 1.3 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -22,17 +22,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-VLC_DECLARE_STRUCT(dm_par_t)
-VLC_DECLARE_STRUCT(downmix_t)
-
-struct dm_par_t
+typedef struct dm_par_t
 {
     float unit;
     float clev;
     float slev;
-};
 
-struct downmix_t
+} dm_par_t;
+
+typedef struct downmix_t
 {
     VLC_COMMON_MEMBERS
 
@@ -45,5 +43,6 @@ struct downmix_t
     void (*pf_downmix_3f_0r_to_2ch)(float *, dm_par_t * dm_par);
     void (*pf_stream_sample_2ch_to_s16)(s16 *, float *left, float *right);
     void (*pf_stream_sample_1ch_to_s16)(s16 *, float *center);
-};
+
+} downmix_t;
 

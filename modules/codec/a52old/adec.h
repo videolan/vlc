@@ -2,7 +2,7 @@
  * adec.h : A52 decoder interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: adec.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: adec.h,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -68,7 +68,7 @@ typedef struct syncinfo_s {
     /* Frame size in 16 bit words */
     u16 frame_size;
     /* Bit rate in kilobits */
-    //u16 bit_rate;
+    /*u16 bit_rate;*/
 } syncinfo_t;
 
 typedef struct bsi_s {
@@ -267,14 +267,14 @@ typedef struct audblk_s {
         u16 skipl;
 
     /* channel mantissas */
-//      u16 chmant[5][256];
+/*      u16 chmant[5][256]; */
 
     /* coupling mantissas */
     float cpl_flt[ 256 ];
-//      u16 cplmant[256];
+/*      u16 cplmant[256]; */
 
     /* coupling mantissas */
-//      u16 lfemant[7];
+/*      u16 lfemant[7]; */
 
     /* -- Information not in the bitstream, but derived thereof -- */
 
@@ -301,15 +301,15 @@ typedef struct audblk_s {
     u16 cplendmant;
 
     /* Decoded exponent info */
-    u16 fbw_exp[5][256];
-    u16 cpl_exp[256];
-    u16 lfe_exp[7];
+    s16 fbw_exp[5][256];
+    s16 cpl_exp[256];
+    s16 lfe_exp[7];
 
     /* Bit allocation pointer results */
-    u16 fbw_bap[5][256];
+    s16 fbw_bap[5][256];
     /* FIXME?? figure out exactly how many entries there should be (253-37?) */
-    u16 cpl_bap[256];
-    u16 lfe_bap[7];
+    s16 cpl_bap[256];
+    s16 lfe_bap[7];
 } audblk_t;
 
 /* Everything you wanted to know about band structure */

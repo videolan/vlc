@@ -2,7 +2,7 @@
  * ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ifo.c,v 1.1 2002/08/04 17:23:41 sam Exp $
+ * $Id: ifo.c,v 1.2 2002/08/08 00:35:10 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -91,7 +91,6 @@ int IfoCreate( thread_dvd_data_t * p_dvd )
     p_dvd->p_ifo = malloc( sizeof(ifo_t) );
     if( p_dvd->p_ifo == NULL )
     {
-//X        intf_Err( p_input, "unable to allocate memory. aborting" );
         return -1;
     }
 
@@ -117,13 +116,13 @@ int IfoInit( ifo_t * p_ifo )
     if( !p_ifo->i_start ) return -1;
 
     p_tmp = FillBuffer( p_ifo, p_buf, p_ifo->i_start );
-    //i_start = p_ifo->i_pos;
+    /*i_start = p_ifo->i_pos; */
 
     /*
      * read the video manager information table
      */
 #define MGINF     p_ifo->vmg.manager_inf
-    //fprintf( stderr, "VMGI\n" );
+    /*fprintf( stderr, "VMGI\n" ); */
 
     ReadBytes( p_ifo, p_buf, &p_tmp, MGINF.psz_id, 12 );
     MGINF.psz_id[12] = '\0';
@@ -156,7 +155,7 @@ int IfoInit( ifo_t * p_ifo )
     DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
     DumpBytes( p_ifo, p_buf, &p_tmp, 1 );
     MGINF.i_audio_nb = ReadByte( p_ifo, p_buf, &p_tmp );
-    //fprintf( stderr, "vmgi audio nb : %d\n", MGINF.i_audio_nb );
+    /*fprintf( stderr, "vmgi audio nb : %d\n", MGINF.i_audio_nb ); */
 
     for( i = 0 ; i < 8 ; i++ )
     {
@@ -165,7 +164,7 @@ int IfoInit( ifo_t * p_ifo )
 
     DumpBytes( p_ifo, p_buf, &p_tmp, 17 );
     MGINF.i_spu_nb = ReadByte( p_ifo, p_buf, &p_tmp );
-    //fprintf( stderr, "vmgi subpic nb : %d\n", MGINF.i_spu_nb );
+    /*fprintf( stderr, "vmgi subpic nb : %d\n", MGINF.i_spu_nb ); */
 
     for( i = 0 ; i < MGINF.i_spu_nb ; i++ )
     {
@@ -176,7 +175,7 @@ int IfoInit( ifo_t * p_ifo )
     /*
      * read first play title.
      */
-    //fprintf(stderr,"readtitle %i\n", MGINF.i_first_play_title_start_byte & 0x7ff );
+    /*fprintf(stderr,"readtitle %i\n", MGINF.i_first_play_title_start_byte & 0x7ff ); */
     if( ReadTitle( p_ifo, &p_ifo->vmg.title, p_ifo->i_start
                            + OFF2LB( MGINF.i_first_play_title_start_byte ),
                    MGINF.i_first_play_title_start_byte & 0x7ff ) < 0 )
@@ -192,10 +191,10 @@ int IfoInit( ifo_t * p_ifo )
     {
         p_tmp = FillBuffer( p_ifo, p_buf,
                         p_ifo->i_start + MGINF.i_title_inf_start_sector );
-        //fprintf( stderr, "title inf %d\n", p_ifo->i_pos );
+        /*fprintf( stderr, "title inf %d\n", p_ifo->i_pos ); */
     
         TITINF.i_title_nb = ReadWord( p_ifo, p_buf, &p_tmp );
-        //fprintf( stderr, "title_inf: TTU nb %d\n", TITINF.i_title_nb );
+        /*fprintf( stderr, "title_inf: TTU nb %d\n", TITINF.i_title_nb ); */
         DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
         TITINF.i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
     
@@ -203,7 +202,6 @@ int IfoInit( ifo_t * p_ifo )
         TITINF.p_attr = malloc( TITINF.i_title_nb *sizeof(title_attr_t) );
         if( TITINF.p_attr == NULL )
         {
-//X            intf_Err( p_input, "out of memory in IfoInit" );
             return -1;
         }
     
@@ -216,7 +214,7 @@ int IfoInit( ifo_t * p_ifo )
             TITINF.p_attr[i].i_title_set_num = ReadByte( p_ifo, p_buf, &p_tmp );
             TITINF.p_attr[i].i_title_num = ReadByte( p_ifo, p_buf, &p_tmp );
             TITINF.p_attr[i].i_start_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
-            //fprintf( stderr, "title_inf: %d %d %d\n", TITINF.p_attr[i].i_chapter_nb, TITINF.p_attr[i].i_title_set_num, TITINF.p_attr[i].i_title_num );
+            /*fprintf( stderr, "title_inf: %d %d %d\n", TITINF.p_attr[i].i_chapter_nb, TITINF.p_attr[i].i_title_set_num, TITINF.p_attr[i].i_title_num ); */
         }
     }
     else
@@ -247,7 +245,7 @@ int IfoInit( ifo_t * p_ifo )
                                 MGINF.i_parental_inf_start_sector );
         i_start = p_ifo->i_pos;
 
-        //fprintf( stderr, "PTL\n" );
+        /*fprintf( stderr, "PTL\n" ); */
     
         PARINF.i_country_nb = ReadWord( p_ifo, p_buf, &p_tmp );
         PARINF.i_vts_nb = ReadWord( p_ifo, p_buf, &p_tmp );
@@ -257,7 +255,6 @@ int IfoInit( ifo_t * p_ifo )
                                           * sizeof(parental_desc_t) );
         if( PARINF.p_parental_desc == NULL )
         {
-//X            intf_Err( p_input, "out of memory in IfoInit" );
             return -1;
         }
 
@@ -275,7 +272,6 @@ int IfoInit( ifo_t * p_ifo )
                                           * sizeof(parental_mask_t) );
         if( PARINF.p_parental_mask == NULL )
         {
-//X            intf_Err( p_input, "out of memory in IfoInit" );
             return -1;
         }
 
@@ -292,7 +288,6 @@ int IfoInit( ifo_t * p_ifo )
 
                 if( PARINF.p_parental_mask[i].ppi_mask[j] == NULL )
                 {
-//X                    intf_Err( p_input, "out of memory in IfoInit" );
                     return -1;
                 }
 
@@ -318,17 +313,16 @@ int IfoInit( ifo_t * p_ifo )
                                 MGINF.i_vts_inf_start_sector );
         i_start = p_ifo->i_pos;
     
-        //fprintf( stderr, "VTS ATTR\n" );
+        /*fprintf( stderr, "VTS ATTR\n" ); */
     
         VTSINF.i_vts_nb = ReadWord( p_ifo, p_buf, &p_tmp );;
-        //fprintf( stderr, "VTS ATTR Nb: %d\n", VTSINF.i_vts_nb );
+        /*fprintf( stderr, "VTS ATTR Nb: %d\n", VTSINF.i_vts_nb ); */
         DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
         VTSINF.i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
         VTSINF.pi_vts_attr_start_byte =
                             malloc( VTSINF.i_vts_nb * sizeof(u32) );
         if( VTSINF.pi_vts_attr_start_byte == NULL )
         {
-//X            intf_Err( p_input, "out of memory in IfoInit" );
             return -1;
         }
 
@@ -341,7 +335,6 @@ int IfoInit( ifo_t * p_ifo )
         VTSINF.p_vts_attr = malloc( VTSINF.i_vts_nb * sizeof(vts_attr_t) );
         if( VTSINF.p_vts_attr == NULL )
         {
-//X            intf_Err( p_input, "out of memory in IfoInit" );
             return -1;
         }
 
@@ -359,7 +352,7 @@ int IfoInit( ifo_t * p_ifo )
             DumpBytes( p_ifo, p_buf, &p_tmp, 1 );
             VTSINF.p_vts_attr[i].i_vts_menu_audio_nb =
                                 ReadByte( p_ifo, p_buf, &p_tmp );
-            //fprintf( stderr, "m audio nb : %d\n", VTSINF.p_vts_attr[i].i_vts_menu_audio_nb );
+            /*fprintf( stderr, "m audio nb : %d\n", VTSINF.p_vts_attr[i].i_vts_menu_audio_nb ); */
 
             for( j = 0 ; j < 8 ; j++ )
             {
@@ -369,7 +362,7 @@ int IfoInit( ifo_t * p_ifo )
             DumpBytes( p_ifo, p_buf, &p_tmp, 17 );
             VTSINF.p_vts_attr[i].i_vts_menu_spu_nb =
                                 ReadByte( p_ifo, p_buf, &p_tmp );
-            //fprintf( stderr, "m subp nb : %d\n", VTSINF.p_vts_attr[i].i_vts_menu_spu_nb );
+            /*fprintf( stderr, "m subp nb : %d\n", VTSINF.p_vts_attr[i].i_vts_menu_spu_nb ); */
 
             for( j = 0 ; j < 28 ; j++ )
             {
@@ -382,7 +375,7 @@ int IfoInit( ifo_t * p_ifo )
             DumpBytes( p_ifo, p_buf, &p_tmp, 1 );
             VTSINF.p_vts_attr[i].i_vts_title_audio_nb =
                                 ReadDouble( p_ifo, p_buf, &p_tmp );
-            //fprintf( stderr, "tt audio nb : %d\n", VTSINF.p_vts_attr[i].i_vts_title_audio_nb );
+            /*fprintf( stderr, "tt audio nb : %d\n", VTSINF.p_vts_attr[i].i_vts_title_audio_nb ); */
 
             for( j = 0 ; j < 8 ; j++ )
             {
@@ -392,7 +385,7 @@ int IfoInit( ifo_t * p_ifo )
             DumpBytes( p_ifo, p_buf, &p_tmp, 17 );
             VTSINF.p_vts_attr[i].i_vts_title_spu_nb =
                                 ReadByte( p_ifo, p_buf, &p_tmp );
-            //fprintf( stderr, "tt subp nb : %d\n", VTSINF.p_vts_attr[i].i_vts_title_spu_nb );
+            /*fprintf( stderr, "tt subp nb : %d\n", VTSINF.p_vts_attr[i].i_vts_title_spu_nb ); */
 
             for( j = 0 ; j < 28 /*VTSINF.p_vts_vts_inf[i].i_vtstt_subpic_nb*/ ; j++ )
             {
@@ -430,8 +423,6 @@ int IfoInit( ifo_t * p_ifo )
 
     p_ifo->vts.b_initialized = 0;
 
-//X    intf_Warn( p_input, 2, "vmg initialized" );
-
     return 0;
 }
 
@@ -456,10 +447,10 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
     i_off = p_ifo->vmg.title_inf.p_attr[i_title-1].i_start_sector
                    + p_ifo->i_start;
 
-    //fprintf(stderr, "offset: %d\n" , i_off );
+    /*fprintf(stderr, "offset: %d\n" , i_off ); */
 
     p_tmp = FillBuffer( p_ifo, p_buf, i_off );
-    //i_start = p_ifo->i_pos;
+    /*i_start = p_ifo->i_pos; */
     p_ifo->vts.i_pos = p_ifo->i_pos;
 
 #define MGINF p_ifo->vts.manager_inf
@@ -467,7 +458,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
     /*
      * read manager information
      */
-    //fprintf( stderr, "VTSI\n" );
+    /*fprintf( stderr, "VTSI\n" ); */
 
     ReadBytes( p_ifo, p_buf, &p_tmp, MGINF.psz_id , 12 );
     MGINF.psz_id[12] = '\0';
@@ -533,12 +524,12 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
 
     DumpBytes( p_ifo, p_buf, &p_tmp, 1 );
     MGINF.i_audio_nb = ReadByte( p_ifo, p_buf, &p_tmp );
-    //fprintf( stderr, "vtsi audio nb : %d\n", MGINF.i_audio_nb );
+    /*fprintf( stderr, "vtsi audio nb : %d\n", MGINF.i_audio_nb ); */
 
     for( i = 0 ; i < 8 ; i++ )
     {
         i_temp = ReadQuad( p_ifo, p_buf, &p_tmp );
-        //fprintf( stderr, "Audio %d: %llx\n", i, i_temp );
+        /*fprintf( stderr, "Audio %d: %llx\n", i, i_temp ); */
         i_temp >>= 8;
         MGINF.p_audio_attr[i].i_bar = i_temp & 0xff;
         i_temp >>= 8;
@@ -567,13 +558,13 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
 
     DumpBytes( p_ifo, p_buf, &p_tmp, 17 );
     MGINF.i_spu_nb = ReadByte( p_ifo, p_buf, &p_tmp );
-    //fprintf( stderr, "vtsi subpic nb : %d\n", MGINF.i_spu_nb );
+    /*fprintf( stderr, "vtsi subpic nb : %d\n", MGINF.i_spu_nb ); */
 
     for( i=0 ; i<MGINF.i_spu_nb ; i++ )
     {
         ReadBytes( p_ifo, p_buf, &p_tmp, (u8*)(&i_temp), 6 );
         i_temp = hton64( i_temp ) >> 16;
-        //fprintf( stderr, "Subpic %d: %llx\n", i, i_temp );
+        /*fprintf( stderr, "Subpic %d: %llx\n", i, i_temp ); */
         MGINF.p_spu_attr[i].i_caption = i_temp & 0xff;
         i_temp >>= 8;
         MGINF.p_spu_attr[i].i_foo = i_temp & 0xff;
@@ -594,17 +585,16 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
 
         i_start = p_ifo->i_pos;
     
-        //fprintf( stderr, "VTS PTR\n" );
+        /*fprintf( stderr, "VTS PTR\n" ); */
    
         TITINF.i_title_nb = ReadWord( p_ifo, p_buf, &p_tmp );
-        //fprintf( stderr, "VTS title_inf nb: %d\n", TITINF.i_title_nb );
+        /*fprintf( stderr, "VTS title_inf nb: %d\n", TITINF.i_title_nb ); */
         DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
         TITINF.i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
 
         TITINF.pi_start_byte = malloc( TITINF.i_title_nb * sizeof(u32) );
         if( TITINF.pi_start_byte == NULL )
         {
-//X            intf_Err( p_input, "out of memory in IfoTitleSet" );
             return -1;
         }
 
@@ -618,7 +608,6 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
                                          * sizeof(title_start_t) );
         if( TITINF.p_title_start == NULL )
         {
-//X            intf_Err( p_input, "out of memory in IfoTitleSet" );
             return -1;
         }
 
@@ -671,7 +660,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
         p_tmp = FillBuffer( p_ifo, p_buf, p_ifo->vts.i_pos +
                                           MGINF.i_time_inf_start_sector );
 
-        //fprintf( stderr, "TMAP\n" );
+        /*fprintf( stderr, "TMAP\n" ); */
 
         TIMINF.i_nb = ReadWord( p_ifo, p_buf, &p_tmp );;
         DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
@@ -680,7 +669,6 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
         TIMINF.pi_start_byte = malloc( TIMINF.i_nb * sizeof(u32) );
         if( TIMINF.pi_start_byte == NULL )
         {
-//X            intf_Err( p_input, "out of memory in IfoTitleSet" );
             return -1;
         }
 
@@ -692,7 +680,6 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
         TIMINF.p_time_map = malloc( TIMINF.i_nb * sizeof(time_map_t) );
         if( TIMINF.p_time_map == NULL )
         {
-//X            intf_Err( p_input, "out of memory in IfoTitleSet" );
             return -1;
         }
 
@@ -708,7 +695,6 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
                      malloc( TIMINF.p_time_map[i].i_entry_nb * sizeof(u32) );
                 if( TIMINF.p_time_map[i].pi_sector == NULL )
                 {
-//X                    msg_Err( p_input, "out of memory in IfoTitleSet" );
                     return -1;
                 }
 
@@ -751,8 +737,10 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
     }
 #undef MGINF
 
-//X    intf_Warn( p_input, 4, "vts %d initialized",
-//X               p_ifo->vmg.title_inf.p_attr[i_title-1].i_title_set_num );
+#if 0
+    intf_Warn( p_input, 4, "vts %d initialized",
+               p_ifo->vmg.title_inf.p_attr[i_title-1].i_title_set_num );
+#endif
 
     p_ifo->vts.b_initialized = 1;
 
@@ -902,12 +890,12 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
 
     i_start = p_ifo->i_pos;
 
-    //fprintf( stderr, "PGC @ %d + %d\n", p_ifo->i_pos, i_bytes );
+    /*fprintf( stderr, "PGC @ %d + %d\n", p_ifo->i_pos, i_bytes ); */
 
     DumpBytes( p_ifo, p_buf, &p_tmp, 2);
     p_title->i_chapter_nb = ReadByte( p_ifo, p_buf, &p_tmp );
     p_title->i_cell_nb = ReadByte( p_ifo, p_buf, &p_tmp );
-    //fprintf( stderr, "title: Prg: %d Cell: %d\n",p_title->i_chapter_nb,p_title->i_cell_nb  );
+    /*fprintf( stderr, "title: Prg: %d Cell: %d\n",p_title->i_chapter_nb,p_title->i_cell_nb  ); */
     p_title->i_play_time = ReadDouble( p_ifo, p_buf, &p_tmp );
     p_title->i_prohibited_user_op = ReadDouble( p_ifo, p_buf, &p_tmp );
 
@@ -974,7 +962,6 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
 
             if( p_title->command.p_pre_command == NULL )
             {
-//X                intf_Err( p_input, "out of memory in ReadTitle" );
                 return -1;
             }
 
@@ -998,7 +985,6 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
 
             if( p_title->command.p_post_command == NULL )
             {
-//X                intf_Err( p_input, "out of memory in ReadTitle" );
                 return -1;
             }
 
@@ -1022,7 +1008,6 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
 
             if( p_title->command.p_cell_command == NULL )
             {
-//X                intf_Err( p_input, "out of memory in ReadTitle" );
                 return -1;
             }
 
@@ -1050,7 +1035,6 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
         
         if( p_title->chapter_map.pi_start_cell == NULL )
         {
-//X            intf_Err( p_input, "out of memory in Read Title" );
             return -1;
         }
 
@@ -1074,7 +1058,6 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
     
         if( p_title->p_cell_play == NULL )
         {
-//X            intf_Err( p_input, "out of memory in ReadTitle" );
             return -1;
         }
 
@@ -1105,7 +1088,6 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
 
         if( p_title->p_cell_pos == NULL )
         {
-//X            intf_Err( p_input, "out of memory" );
             return -1;
         }
 
@@ -1175,10 +1157,10 @@ static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf,
     p_tmp = FillBuffer( p_ifo, p_buf, i_block ) + i_bytes;
 
     i_start = p_ifo->i_pos;
-    //fprintf( stderr, "Unit\n" );
+    /*fprintf( stderr, "Unit\n" ); */
 
     p_unit_inf->i_title_nb = ReadWord( p_ifo, p_buf, &p_tmp );
-    //fprintf( stderr, "Unit nb: %d\n", p_unit_inf->i_title_nb );
+    /*fprintf( stderr, "Unit nb: %d\n", p_unit_inf->i_title_nb ); */
     DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
     p_unit_inf->i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
 
@@ -1186,7 +1168,6 @@ static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf,
             malloc( p_unit_inf->i_title_nb * sizeof(unit_title_t) );
     if( p_unit_inf->p_title == NULL )
     {
-//X        intf_Err( p_input, "out of memory in ReadUnit" );
         return -1;
     }
 
@@ -1195,7 +1176,7 @@ static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf,
 #define TITLE p_unit_inf->p_title[i]
         TITLE.i_category_mask = ReadByte( p_ifo, p_buf, &p_tmp );
         TITLE.i_category = ReadByte( p_ifo, p_buf, &p_tmp );
-        //fprintf( stderr, "cat mask %d: %x cat %x\n", i, TITLE.i_category_mask, TITLE.i_category );
+        /*fprintf( stderr, "cat mask %d: %x cat %x\n", i, TITLE.i_category_mask, TITLE.i_category ); */
         TITLE.i_parental_mask = ReadWord( p_ifo, p_buf, &p_tmp );
         TITLE.i_title_start_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
 #undef TITLE
@@ -1203,7 +1184,7 @@ static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf,
 
     for( i = 0 ; i < p_unit_inf->i_title_nb ; i++ )
     {
-        //fprintf( stderr, "Unit: PGC %d @ %d\n", i, p_ifo->i_pos );
+        /*fprintf( stderr, "Unit: PGC %d @ %d\n", i, p_ifo->i_pos ); */
         ReadTitle( p_ifo, &p_unit_inf->p_title[i].title, i_start +
             OFF2LB( p_unit_inf->p_title[i].i_title_start_byte + i_bytes ),
           (p_unit_inf->p_title[i].i_title_start_byte+i_bytes) & 0x7ff );
@@ -1246,26 +1227,25 @@ static int ReadTitleUnit( ifo_t * p_ifo, title_unit_t * p_title_unit,
 
     p_tmp = FillBuffer( p_ifo, p_buf, i_block );
     i_start = p_ifo->i_pos;
-    //fprintf( stderr, "Unit Table\n" );
+    /*fprintf( stderr, "Unit Table\n" ); */
 
     p_title_unit->i_unit_nb = ReadWord( p_ifo, p_buf, &p_tmp );
     DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
     p_title_unit->i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
 
-    //fprintf(stderr, "Unit: nb %d last %d\n", p_title_unit->i_unit_nb, p_title_unit->i_last_byte );
+    /*fprintf(stderr, "Unit: nb %d last %d\n", p_title_unit->i_unit_nb, p_title_unit->i_last_byte ); */
 
     p_title_unit->p_unit = malloc( p_title_unit->i_unit_nb * sizeof(unit_t) );
     if( p_title_unit->p_unit == NULL )
     {
-//X        intf_Err( p_input, "out of memory in ReadTitleUnit" );
         return -1;
     }
 
     for( i = 0 ; i < p_title_unit->i_unit_nb ; i++ )
     {
-        //ReadBytes( p_ifo, p_buf, &p_tmp, p_title_unit->p_unit[i].ps_lang_code, 2 );
+        /*ReadBytes( p_ifo, p_buf, &p_tmp, p_title_unit->p_unit[i].ps_lang_code, 2 ); */
         p_title_unit->p_unit[i].i_lang_code = ReadWord( p_ifo, p_buf, &p_tmp );
-        //fprintf( stderr, "lang %d %x\n", i,p_title_unit->p_unit[i].i_lang_code );
+        /*fprintf( stderr, "lang %d %x\n", i,p_title_unit->p_unit[i].i_lang_code ); */
         DumpBytes( p_ifo, p_buf, &p_tmp, 1 );
         p_title_unit->p_unit[i].i_existence_mask =
                                            ReadByte( p_ifo, p_buf, &p_tmp );
@@ -1277,7 +1257,6 @@ static int ReadTitleUnit( ifo_t * p_ifo, title_unit_t * p_title_unit,
                 malloc( p_title_unit->i_unit_nb * sizeof(unit_inf_t) );
     if( p_title_unit->p_unit_inf == NULL )
     {
-//X        intf_Err( p_input, "out of memory in ReadTitleUnit" );
         return -1;
     }
 
@@ -1323,7 +1302,7 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, int i_block )
 
     p_tmp = FillBuffer( p_ifo, p_buf, i_block );
     i_start = p_ifo->i_pos;
-//    fprintf( stderr, "CELL ADD\n" );
+/*    fprintf( stderr, "CELL ADD\n" ); */
 
     p_cell_inf->i_vob_nb = ReadWord( p_ifo, p_buf, &p_tmp );
     DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
@@ -1337,7 +1316,6 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, int i_block )
                 malloc( p_cell_inf->i_cell_nb *sizeof(cell_map_t) );
     if( p_cell_inf->p_cell_map == NULL )
     {
-//X        intf_Err( p_input, "out of memory in ReadCellInf" );
         return -1;
     }
 
@@ -1378,7 +1356,7 @@ static int ReadVobuMap( ifo_t * p_ifo, vobu_map_t * p_vobu_map, int i_block )
     
     p_tmp = FillBuffer( p_ifo, p_buf, i_block );
     i_start = p_ifo->i_pos;
-    //fprintf( stderr, "VOBU ADMAP\n" );
+    /*fprintf( stderr, "VOBU ADMAP\n" ); */
 
     p_vobu_map->i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
     i_max = ( i_start + p_vobu_map->i_last_byte + 1 - p_ifo->i_pos )
@@ -1387,7 +1365,6 @@ static int ReadVobuMap( ifo_t * p_ifo, vobu_map_t * p_vobu_map, int i_block )
     p_vobu_map->pi_vobu_start_sector = malloc( i_max * sizeof(u32) );
     if( p_vobu_map->pi_vobu_start_sector == NULL )
     {
-//X        intf_Err( p_input, "out of memory in ReadVobuMap" );
         return -1;
     }
 
@@ -1452,20 +1429,20 @@ static char * IfoMath( char val )
     {
         "none",
         "=", 
-        "<->",    // swap
+        "<->",    /* swap */
         "+=",
         "-=",
         "*=",
         "/=",
         "%=",
-        "rnd",    // rnd
+        "rnd",    /* rnd */
         "&=",
         "|=",
         "^=",
-        "??",    // invalid
-        "??",    // invalid
-        "??",    // invalid
-        "??"    // invalid
+        "??",    /* invalid */
+        "??",    /* invalid */
+        "??",    /* invalid */
+        "??"    /* invalid */
     };
 
     return (char *) math_op[val & 0x0f];
@@ -1578,7 +1555,7 @@ static void IfoAdvanced( u8 *pi_code )
         printf( "ReSuME %d", pi_code[7] );
     }
     else if( ( i_cmd & 0x06) == 0x02 )
-    {    // XX01Y
+    {    /* XX01Y */
         printf ("Link to %s cell ", ( i_cmd & 0x01 ) ? "prev" : "next");
     }
     else
@@ -1673,10 +1650,10 @@ static void IfoJmp( ifo_command_t com )
                     break;
             }
 #else
-        // OP_VAL_8(2) is number of cell
-        // it is processed BEFORE switch
-        // under some conditions, it is ignored
-        // I don't understand exactly what it means
+        /* OP_VAL_8(2) is number of cell */
+        /* it is processed BEFORE switch */
+        /* under some conditions, it is ignored */
+        /* I don't understand exactly what it means */
         printf( " ( spec cell 0x%02X ) ", OP_VAL_8(2) ); 
 
         switch( OP_VAL_8(3)>>6 )
@@ -1764,7 +1741,7 @@ void IfoSetSystem( ifo_command_t com )
                         if(OP_VAL_8(1]&0x80)
                                 printf ("s[%s] = 0x%02x;", reg_name[1], OP_VAL_8(1]&0xf);
                         if(OP_VAL_8(2)&0x80)
-//DENT: lwhat about 0x7f here ???
+/*DENT: lwhat about 0x7f here ??? */
                                 printf ("s[%s] = 0x%02x;", reg_name[2], OP_VAL_8(2)&0x7f);
                         if(OP_VAL_8(3)&0x80)
                                 printf ("s[%s] = 0x%02x;", reg_name[3], OP_VAL_8(3)&0xf);
@@ -1804,7 +1781,7 @@ void IfoSetSystem( ifo_command_t com )
         }
         break;
     case 4:
-        //actually only bits 00011100 00011100 are set
+        /*actually only bits 00011100 00011100 are set */
         if( com.i_direct )
         {
             printf ("s[%s] = 0x%02x", ifo_reg[11], OP_VAL_16(1));
@@ -1815,9 +1792,9 @@ void IfoSetSystem( ifo_command_t com )
         }
         break;
     case 6:
-        //actually,
-        //s[%s]=(r[%s]&0x3FF) | (0x%02x << 0xA);
-        //but it is way too ugly
+        /*actually, */
+        /*s[%s]=(r[%s]&0x3FF) | (0x%02x << 0xA); */
+        /*but it is way too ugly */
         if( com.i_direct )
         {
             printf( "s[%s] = 0x%02x", ifo_reg[8], OP_VAL_8(2)>>2 );
@@ -2031,8 +2008,8 @@ void CommandRead( ifo_command_t com )
             else
             {
                 printf( "r[0x%X]", OP_VAL_8(3)&0x1F);
-                    // 0x1F is either not a mistake,
-                    // or Microsoft programmer's mistake!!!
+                    /* 0x1F is either not a mistake, */
+                    /* or Microsoft programmer's mistake!!! */
             }
         }
 
@@ -2042,7 +2019,7 @@ void CommandRead( ifo_command_t com )
         printf( "r[0x%X] ", pi_code[1] & 0xF );
         printf( " %s ", IfoMath( com.i_cmd ) );
 
-        if( com.i_cmd == 0x02 )    // swap
+        if( com.i_cmd == 0x02 )    /* swap */
         {
             printf("r[0x%X] ", OP_VAL_8(0)&0x1F);
         }
@@ -2105,7 +2082,9 @@ static void ReadBytes( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp,
 {
     if( i_nb > DVD_LB_SIZE )
     {
-//X        intf_Err( p_input, "excessive ReadBytes call (%i)", i_nb );
+#if 0
+        intf_Err( p_input, "excessive ReadBytes call (%i)", i_nb );
+#endif
     }
 
     if( *pp_tmp + i_nb >= p_buf + DVD_LB_SIZE )
@@ -2131,7 +2110,9 @@ static void DumpBytes( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp, int i_nb )
 {
     if( i_nb > DVD_LB_SIZE )
     {
-//X        intf_Err( p_input, "excessive DumpBytes call (%i)", i_nb );
+#if 0
+        intf_Err( p_input, "excessive DumpBytes call (%i)", i_nb );
+#endif
     }
 
     *pp_tmp += i_nb;

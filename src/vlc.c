@@ -2,7 +2,7 @@
  * vlc.c: the vlc player
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vlc.c,v 1.7 2002/07/23 00:39:17 sam Exp $
+ * $Id: vlc.c,v 1.8 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -31,7 +31,7 @@
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads
  *****************************************************************************/
-int main(int i_argc, char *ppsz_argv[], char *ppsz_env[])
+int main(int i_argc, char *ppsz_argv[])
 {
     vlc_error_t err;
 
@@ -64,13 +64,15 @@ int main(int i_argc, char *ppsz_argv[], char *ppsz_env[])
     err = vlc_run();
 
     /* Add background interfaces */
-    //{ int i; for( i=10; i--; ) vlc_add_intf( NULL, "dummy", 0 ); }
-    //vlc_add_intf( NULL, "dummy", VLC_FALSE );
-    //vlc_add_intf( NULL, "logger", VLC_FALSE );
-    //vlc_add_intf( NULL, "xosd", VLC_FALSE );
-    //vlc_add_intf( NULL, "gtk", VLC_FALSE );
-    //vlc_add_intf( NULL, "kde", VLC_FALSE );
-    //vlc_add_intf( "rc", VLC_FALSE );
+#if 0
+    { int i; for( i=10; i--; ) vlc_add_intf( NULL, "dummy", 0 ); }
+    vlc_add_intf( NULL, "dummy", VLC_FALSE );
+    vlc_add_intf( NULL, "logger", VLC_FALSE );
+    vlc_add_intf( NULL, "xosd", VLC_FALSE );
+    vlc_add_intf( NULL, "gtk", VLC_FALSE );
+    vlc_add_intf( NULL, "kde", VLC_FALSE );
+    vlc_add_intf( "rc", VLC_FALSE );
+#endif
 
     /* Add a blocking interface and keep the return value */
     err = vlc_add_intf( NULL, VLC_TRUE );

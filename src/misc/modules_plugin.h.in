@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h.in,v 1.2 2002/08/04 12:18:41 sam Exp $
+ * $Id: modules_plugin.h.in,v 1.3 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -31,8 +31,7 @@
  * This function loads a dynamically linked library using a system dependant
  * method, and returns a non-zero value on error, zero otherwise.
  *****************************************************************************/
-static inline int module_load( const char * psz_filename,
-                               module_handle_t * handle )
+static int module_load( const char * psz_filename, module_handle_t * handle )
 {
 #ifdef SYS_BEOS
     *handle = load_add_on( psz_filename );
@@ -70,7 +69,7 @@ static inline int module_load( const char * psz_filename,
  * using a system dependant method. No return value is taken in consideration,
  * since some libraries sometimes refuse to close properly.
  *****************************************************************************/
-static inline void module_unload( module_handle_t handle )
+static void module_unload( module_handle_t handle )
 {
 #ifdef SYS_BEOS
     unload_add_on( handle );
@@ -92,8 +91,8 @@ static inline void module_unload( module_handle_t handle )
  * string, and returns a pointer to it. We don't check for dlerror() or
  * similar functions, since we want a non-NULL symbol anyway.
  *****************************************************************************/
-static inline void * _module_getsymbol( module_handle_t handle,
-                                        const char * psz_function )
+static void * _module_getsymbol( module_handle_t handle,
+                                 const char * psz_function )
 {
 #ifdef SYS_BEOS
     void * p_symbol;
@@ -116,8 +115,8 @@ static inline void * _module_getsymbol( module_handle_t handle,
 #endif
 }
 
-static inline void * module_getsymbol( module_handle_t handle,
-                                       const char * psz_function )
+static void * module_getsymbol( module_handle_t handle,
+                                const char * psz_function )
 {
     void * p_symbol = _module_getsymbol( handle, psz_function );
 
@@ -145,7 +144,7 @@ static inline void * module_getsymbol( module_handle_t handle,
  * function. psz_buffer can be used to store temporary data, it is guaranteed
  * to be kept intact until the return value of module_error has been used.
  *****************************************************************************/
-static inline const char * module_error( char *psz_buffer )
+static const char * module_error( char *psz_buffer )
 {
 #if defined(SYS_BEOS)
     return( "failed" );

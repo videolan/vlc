@@ -29,8 +29,6 @@
 #include "playlist.h"
 #include "preferences.h"
 
-VLC_DECLARE_STRUCT(es_descriptor_t)
-
 /*****************************************************************************
  * The TrackBar is graduated from 0 to SLIDER_MAX_VALUE.
  * SLIDER_MAX_VALUE is set to the higher acceptable value (2^31 - 1), in order

@@ -2,7 +2,7 @@
  * trivial.c : trivial mixer plug-in (1 input, no downmixing)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.1 2002/08/07 21:36:55 massiot Exp $
+ * $Id: trivial.c,v 1.2 2002/08/08 00:35:10 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -99,10 +99,10 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
     {
         int i_nb_bytes = p_buffer->i_nb_samples * sizeof(u32)
                           * p_input->input.i_channels;
-        char * p_in = (p_input->p_first_byte_to_mix == NULL) ?
-                      p_input->fifo.p_first->p_buffer :
-                      p_input->p_first_byte_to_mix;
-        char * p_out = p_buffer->p_buffer;
+        byte_t * p_in = (p_input->p_first_byte_to_mix == NULL) ?
+                        p_input->fifo.p_first->p_buffer :
+                        p_input->p_first_byte_to_mix;
+        byte_t * p_out = p_buffer->p_buffer;
 
         for ( ; ; )
         {
@@ -161,7 +161,7 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
         for ( ; ; )
         {
             ptrdiff_t i_available_bytes = (p_input->fifo.p_first->p_buffer
-                                           - (char *)p_in)
+                                           - (byte_t *)p_in)
                                            + p_input->fifo.p_first->i_nb_samples
                                               * sizeof(u32)
                                               * p_input->input.i_channels;
@@ -195,7 +195,7 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
                 SparseCopy( p_out, p_in, i_nb_samples,
                             p_aout->mixer.output.i_channels,
                             p_input->input.i_channels );
-                p_input->p_first_byte_to_mix = (char *)p_in
+                p_input->p_first_byte_to_mix = (byte_t *)p_in
                                + i_nb_samples * p_input->input.i_channels
                                   * sizeof(u32);
                 break;

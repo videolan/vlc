@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.34 2002/08/07 00:29:37 sam Exp $
+ * $Id: configuration.c,v 1.35 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -511,8 +511,10 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                 !memcmp( &line[1], p_module->psz_object_name,
                          strlen(p_module->psz_object_name) ) )
             {
-                //msg_Dbg( p_this, "loading config for module \"%s\"",
-                //                 p_module->psz_object_name );
+#if 0
+                msg_Dbg( p_this, "loading config for module \"%s\"",
+                                 p_module->psz_object_name );
+#endif
 
                 break;
             }
@@ -560,16 +562,20 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                         if( !*psz_option_value )
                             break;                    /* ignore empty option */
                         p_item->i_value = atoi( psz_option_value);
-                        //msg_Dbg( p_this, "option \"%s\", value %i",
-                        //         p_item->psz_name, p_item->i_value );
+#if 0
+                        msg_Dbg( p_this, "option \"%s\", value %i",
+                                 p_item->psz_name, p_item->i_value );
+#endif
                         break;
 
                     case CONFIG_ITEM_FLOAT:
                         if( !*psz_option_value )
                             break;                    /* ignore empty option */
                         p_item->f_value = (float)atof( psz_option_value);
-                        //msg_Dbg( p_this, "option \"%s\", value %f",
-                        //         p_item->psz_name, (double)p_item->f_value );
+#if O
+                        msg_Dbg( p_this, "option \"%s\", value %f",
+                                 p_item->psz_name, (double)p_item->f_value );
+#endif
                         break;
 
                     default:
@@ -584,9 +590,11 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 
                         vlc_mutex_unlock( p_item->p_lock );
 
-                        //msg_Dbg( p_this, "option \"%s\", value \"%s\"",
-                        //         p_item->psz_name,
-                        //         p_item->psz_value ? p_item->psz_value : "" );
+#if 0
+                        msg_Dbg( p_this, "option \"%s\", value \"%s\"",
+                                 p_item->psz_name,
+                                 p_item->psz_value ? p_item->psz_value : "" );
+#endif
                         break;
                     }
                 }
@@ -1128,7 +1136,6 @@ char *config_GetHomeDir( void )
             p_homedir = (char *)malloc( MAX_PATH );
             if( !p_homedir )
             {
-//X                intf_ErrMsg( "config error: couldn't malloc p_homedir" );
                 return NULL;
             }
 
@@ -1155,15 +1162,11 @@ char *config_GetHomeDir( void )
         {
             if( ( p_tmp = getenv( "TMP" ) ) == NULL )
             {
-                p_homedir = strdup( "/tmp" );
+                p_tmp = "/tmp";
             }
-            else p_homedir = strdup( p_tmp );
-
-//X            intf_ErrMsg( "config error: unable to get home directory, "
-//X                         "using %s instead", p_homedir );
-
         }
-        else p_homedir = strdup( p_tmp );
+
+        p_homedir = strdup( p_tmp );
     }
 #if defined(HAVE_GETPWUID)
     else

@@ -2,7 +2,7 @@
  * motion.c : C motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motion.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: motion.c,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -60,7 +60,7 @@ vlc_module_end();
 #define put(predictor,i) dest[i] = predictor (i)
 #define avg(predictor,i) dest[i] = avg2 (predictor (i), dest[i])
 
-// mc function template
+/* mc function template */
 
 #define MC_FUNC(op,xy)                                                      \
 static void MC_##op##_##xy##16_c (yuv_data_t * dest, yuv_data_t * ref,      \
@@ -104,7 +104,7 @@ static void MC_##op##_##xy##8_c (yuv_data_t * dest, yuv_data_t * ref,       \
     } while (--height);                                                     \
 }
 
-// definitions of the actual mc functions
+/* definitions of the actual mc functions */
 
 MC_FUNC (put,o)
 MC_FUNC (avg,o)

@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.67 2002/08/07 00:29:36 sam Exp $
+ * $Id: input_ext-dec.h,v 1.68 2002/08/08 00:35:10 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -312,7 +312,8 @@ static inline void RemoveBits( bit_stream_t * p_bit_stream,
     {
         p_bit_stream->fifo.buffer = WORD_AT( p_bit_stream->p_byte )
                                         << ( -p_bit_stream->fifo.i_available );
-        ((WORD_TYPE *)p_bit_stream->p_byte)++;
+        p_bit_stream->p_byte =
+                   (byte_t *) ( ((WORD_TYPE *)p_bit_stream->p_byte) + 1 );
         p_bit_stream->fifo.i_available += sizeof(WORD_TYPE) * 8;
         return;
     }
@@ -333,11 +334,13 @@ static inline void RemoveBits32( bit_stream_t * p_bit_stream )
         {
             p_bit_stream->fifo.buffer = WORD_AT( p_bit_stream->p_byte )
                             << (32 - p_bit_stream->fifo.i_available);
-            ((WORD_TYPE *)p_bit_stream->p_byte)++;
+            p_bit_stream->p_byte =
+                       (byte_t *) ( ((WORD_TYPE *)p_bit_stream->p_byte) + 1 );
             return;
         }
 
-        ((WORD_TYPE *)p_bit_stream->p_byte)++;
+        p_bit_stream->p_byte =
+                   (byte_t *) ( ((WORD_TYPE *)p_bit_stream->p_byte) + 1 );
         return;
     }
 
@@ -371,7 +374,8 @@ static inline u32 GetBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
         i_result = p_bit_stream->fifo.buffer
                         >> (8 * sizeof(WORD_TYPE) - i_bits);
         p_bit_stream->fifo.buffer = WORD_AT( p_bit_stream->p_byte );
-        ((WORD_TYPE *)p_bit_stream->p_byte)++;
+        p_bit_stream->p_byte =
+                   (byte_t *) ( ((WORD_TYPE *)p_bit_stream->p_byte) + 1 );
         i_result |= p_bit_stream->fifo.buffer
                         >> (8 * sizeof(WORD_TYPE)
                                      + p_bit_stream->fifo.i_available);
@@ -429,7 +433,8 @@ static inline u32 GetBits32( bit_stream_t * p_bit_stream )
         {
             i_result = p_bit_stream->fifo.buffer;
             p_bit_stream->fifo.buffer = WORD_AT( p_bit_stream->p_byte );
-            ((WORD_TYPE *)p_bit_stream->p_byte)++;
+            p_bit_stream->p_byte =
+                       (byte_t *) ( ((WORD_TYPE *)p_bit_stream->p_byte) + 1 );
             i_result |= p_bit_stream->fifo.buffer
                              >> (p_bit_stream->fifo.i_available);
             p_bit_stream->fifo.buffer <<= (32 - p_bit_stream->fifo.i_available);
@@ -437,7 +442,8 @@ static inline u32 GetBits32( bit_stream_t * p_bit_stream )
         }
 
         i_result = WORD_AT( p_bit_stream->p_byte );
-        ((WORD_TYPE *)p_bit_stream->p_byte)++;
+        p_bit_stream->p_byte =
+                   (byte_t *) ( ((WORD_TYPE *)p_bit_stream->p_byte) + 1 );
         return( i_result );
     }
 

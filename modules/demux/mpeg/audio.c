@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.2 2002/08/07 00:29:36 sam Exp $
+ * $Id: audio.c,v 1.3 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -272,7 +272,7 @@ static int MPEGAudio_SkipID3Tag( input_thread_t *p_input )
     i_size = (p_peek[6] << 21) +
              (p_peek[7] << 14) +
              (p_peek[8] << 7) +
-             p_peek[9];  //Is this safe?
+             p_peek[9];  /* Is this safe? */
     if ( b_footer )
     {
         i_size += 10;
@@ -285,7 +285,7 @@ static int MPEGAudio_SkipID3Tag( input_thread_t *p_input )
         return( -1 );
     }
         
-    p_input->p_current_data += i_size; //seek passed end of ID3 tag
+    p_input->p_current_data += i_size; /* seek passed end of ID3 tag */
 
     return (0);
 }

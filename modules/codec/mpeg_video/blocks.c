@@ -2,7 +2,7 @@
  * blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: blocks.c,v 1.2 2002/08/04 18:39:41 sam Exp $
+ * $Id: blocks.c,v 1.3 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -161,9 +161,7 @@ static inline int GetChromaDCDiff( vpar_thread_t * p_vpar )
 
 #define SATURATE(val)                                                       \
     if ((u32)(val + 2048) > 4095)                                           \
-    {                                                                       \
-       val = (val > 0) ? 2047 : -2048;                                      \
-    }
+       val = (val > 0) ? 2047 : -2048
 
 /*****************************************************************************
  * MPEG2IntraB14 : Decode an intra block according to ISO/IEC 13818-2 table B14
@@ -969,23 +967,23 @@ static inline void PSZ_NAME( vpar_thread_t * p_vpar, macroblock_t * p_mb )  \
     p_mb->p_v_data = p_mb->pp_dest[2] + (p_vpar->mb.i_offset                \
                             >> p_vpar->sequence.b_chroma_h_subsampled);     \
                                                                             \
-    DECODE_LUMABLOCK( 0, PF_MBFUNC );                                       \
-    DECODE_LUMABLOCK( 1, PF_MBFUNC );                                       \
-    DECODE_LUMABLOCK( 2, PF_MBFUNC );                                       \
-    DECODE_LUMABLOCK( 3, PF_MBFUNC );                                       \
+    DECODE_LUMABLOCK( 0, PF_MBFUNC )                                        \
+    DECODE_LUMABLOCK( 1, PF_MBFUNC )                                        \
+    DECODE_LUMABLOCK( 2, PF_MBFUNC )                                        \
+    DECODE_LUMABLOCK( 3, PF_MBFUNC )                                        \
                                                                             \
     do                                                                      \
     {                                                                       \
-        DECODE_CHROMABLOCK( i_b, PF_MBFUNC, 1 );                            \
-        DECODE_CHROMABLOCK( i_b + 1, PF_MBFUNC, 2 );                        \
+        DECODE_CHROMABLOCK( i_b, PF_MBFUNC, 1 )                             \
+        DECODE_CHROMABLOCK( i_b + 1, PF_MBFUNC, 2 )                         \
         i_b += 2;                                                           \
     }                                                                       \
     while( i_b < 4 + p_vpar->sequence.i_chroma_nb_blocks );                 \
 }
 
-DECLARE_INTRAMB( MPEG1IntraMB, MPEG1Intra );
-DECLARE_INTRAMB( MPEG2IntraB14MB, MPEG2IntraB14 );
-DECLARE_INTRAMB( MPEG2IntraB15MB, MPEG2IntraB15 );
+DECLARE_INTRAMB( MPEG1IntraMB, MPEG1Intra )
+DECLARE_INTRAMB( MPEG2IntraB14MB, MPEG2IntraB14 )
+DECLARE_INTRAMB( MPEG2IntraB15MB, MPEG2IntraB15 )
 
 #undef DECLARE_INTRAMB
 #undef DECODE_LUMABLOCK
@@ -1021,22 +1019,22 @@ static inline void PSZ_NAME( vpar_thread_t * p_vpar, macroblock_t * p_mb )  \
     p_mb->p_v_data = p_mb->pp_dest[2] + (p_vpar->mb.i_offset                \
                             >> p_vpar->sequence.b_chroma_h_subsampled);     \
                                                                             \
-    DECODE_LUMABLOCK( 0, PF_MBFUNC );                                       \
-    DECODE_LUMABLOCK( 1, PF_MBFUNC );                                       \
-    DECODE_LUMABLOCK( 2, PF_MBFUNC );                                       \
-    DECODE_LUMABLOCK( 3, PF_MBFUNC );                                       \
+    DECODE_LUMABLOCK( 0, PF_MBFUNC )                                        \
+    DECODE_LUMABLOCK( 1, PF_MBFUNC )                                        \
+    DECODE_LUMABLOCK( 2, PF_MBFUNC )                                        \
+    DECODE_LUMABLOCK( 3, PF_MBFUNC )                                        \
                                                                             \
     do                                                                      \
     {                                                                       \
-        DECODE_CHROMABLOCK( i_b, PF_MBFUNC );                               \
-        DECODE_CHROMABLOCK( i_b + 1, PF_MBFUNC );                           \
+        DECODE_CHROMABLOCK( i_b, PF_MBFUNC )                                \
+        DECODE_CHROMABLOCK( i_b + 1, PF_MBFUNC )                            \
         i_b += 2;                                                           \
     }                                                                       \
     while( i_b < 4 + p_vpar->sequence.i_chroma_nb_blocks );                 \
 }
 
-DECLARE_NONINTRAMB( MPEG1NonIntraMB, MPEG1NonIntra );
-DECLARE_NONINTRAMB( MPEG2NonIntraMB, MPEG2NonIntra );
+DECLARE_NONINTRAMB( MPEG1NonIntraMB, MPEG1NonIntra )
+DECLARE_NONINTRAMB( MPEG2NonIntraMB, MPEG2NonIntra )
 
 #undef DECLARE_NONINTRAMB
 #undef DECODE_LUMABLOCK
@@ -1147,7 +1145,7 @@ static inline int GetDMV( vpar_thread_t * p_vpar )
         p_m_inner->i_height = i_hei;                                        \
         p_m_inner->b_second_half = b_s_half;                                \
         p_mb->i_nb_motions++;                                               \
-    } while( 0 );
+    } while( 0 )
 
 /* MPEG-1 predictions. */
 
@@ -1198,7 +1196,7 @@ static void MotionMPEG1Reuse( vpar_thread_t * p_vpar,
         i_motion_y <<= 1;
     }
 
-     MOTION_BLOCK( b_average, p_motion->ppi_pmv[0][0], p_motion->ppi_pmv[0][1],
+    MOTION_BLOCK( b_average, p_motion->ppi_pmv[0][0], p_motion->ppi_pmv[0][1],
                   i_offset, p_motion->pppi_ref[0], i_offset, i_width, 16, 0 );
 }
 
@@ -1981,7 +1979,7 @@ static inline void ParseSlice( vpar_thread_t * p_vpar,
                     /* Non-intra MB without forward mv in a P picture. */
                     p_f_motion->ppi_pmv[0][0] = p_f_motion->ppi_pmv[0][1] = 0;
                     p_f_motion->ppi_pmv[1][0] = p_f_motion->ppi_pmv[1][1] = 0;
-                    MOTION( MotionFrameZero, MB_MOTION_FORWARD );
+                    MOTION( MotionFrameZero, MB_MOTION_FORWARD )
                 }
             }
             else if( i_structure == FRAME_STRUCTURE )
@@ -1989,22 +1987,22 @@ static inline void ParseSlice( vpar_thread_t * p_vpar,
                 switch( i_mb_modes & MOTION_TYPE_MASK )
                 {
                 case MC_FRAME:
-                    MOTION( MotionFrameFrame, i_mb_modes );
+                    MOTION( MotionFrameFrame, i_mb_modes )
                     break;
 
                 case MC_FIELD:
-                    MOTION( MotionFrameField, i_mb_modes );
+                    MOTION( MotionFrameField, i_mb_modes )
                     break;
 
                 case MC_DMV:
-                    MOTION( MotionFrameDMV, MB_MOTION_FORWARD );
+                    MOTION( MotionFrameDMV, MB_MOTION_FORWARD )
                     break;
 
                 case 0:
                     /* Non-intra MB without forward mv in a P picture. */
                     p_f_motion->ppi_pmv[0][0] = p_f_motion->ppi_pmv[0][1] = 0;
                     p_f_motion->ppi_pmv[1][0] = p_f_motion->ppi_pmv[1][1] = 0;
-                    MOTION( MotionFrameZero, MB_MOTION_FORWARD );
+                    MOTION( MotionFrameZero, MB_MOTION_FORWARD )
                 }
             }
             else
@@ -2013,22 +2011,22 @@ static inline void ParseSlice( vpar_thread_t * p_vpar,
                 switch( i_mb_modes & MOTION_TYPE_MASK )
                 {
                 case MC_FIELD:
-                    MOTION( MotionFieldField, i_mb_modes );
+                    MOTION( MotionFieldField, i_mb_modes )
                     break;
 
                 case MC_16X8:
-                    MOTION( MotionField16x8, i_mb_modes );
+                    MOTION( MotionField16x8, i_mb_modes )
                     break;
 
                 case MC_DMV:
-                    MOTION( MotionFieldDMV, i_mb_modes );
+                    MOTION( MotionFieldDMV, i_mb_modes )
                     break;
 
                 case 0:
                     /* Non-intra MB without forward mv in a P picture. */
                     p_f_motion->ppi_pmv[0][0] = p_f_motion->ppi_pmv[0][1] = 0;
                     p_f_motion->ppi_pmv[1][0] = p_f_motion->ppi_pmv[1][1] = 0;
-                    MOTION( MotionFieldZero, MB_MOTION_FORWARD );
+                    MOTION( MotionFieldZero, MB_MOTION_FORWARD )
                 }
             }
 
@@ -2102,11 +2100,11 @@ static inline void ParseSlice( vpar_thread_t * p_vpar,
 
                     if( i_structure == FRAME_STRUCTURE )
                     {
-                        MOTION( MotionFrameZero, MB_MOTION_FORWARD );
+                        MOTION( MotionFrameZero, MB_MOTION_FORWARD )
                     }
                     else
                     {
-                        MOTION( MotionFieldZero, MB_MOTION_FORWARD );
+                        MOTION( MotionFieldZero, MB_MOTION_FORWARD )
                     }
 
                     p_vpar->pool.pf_decode_mb( &p_vpar->pool, p_mb );
@@ -2127,15 +2125,15 @@ static inline void ParseSlice( vpar_thread_t * p_vpar,
 
                     if( !b_mpeg2 )
                     {
-                        MOTION( MotionMPEG1Reuse, i_mb_modes );
+                        MOTION( MotionMPEG1Reuse, i_mb_modes )
                     }
                     else if( i_structure == FRAME_STRUCTURE )
                     {
-                        MOTION( MotionFrameReuse, i_mb_modes );
+                        MOTION( MotionFrameReuse, i_mb_modes )
                     }
                     else
                     {
-                        MOTION( MotionFieldReuse, i_mb_modes );
+                        MOTION( MotionFieldReuse, i_mb_modes )
                     }
 
                     p_vpar->pool.pf_decode_mb( &p_vpar->pool, p_mb );
@@ -2181,23 +2179,23 @@ void FUNCNAME( vpar_thread_t * p_vpar )                                     \
 }
 
 DECLARE_PICD( vpar_PictureDataGENERIC, p_vpar->sequence.b_mpeg2,
-              p_vpar->picture.i_coding_type, p_vpar->picture.i_structure );
+              p_vpar->picture.i_coding_type, p_vpar->picture.i_structure )
 #if (VPAR_OPTIM_LEVEL > 0)
-DECLARE_PICD( vpar_PictureData2IF, 1, I_CODING_TYPE, FRAME_STRUCTURE );
-DECLARE_PICD( vpar_PictureData2PF, 1, P_CODING_TYPE, FRAME_STRUCTURE );
-DECLARE_PICD( vpar_PictureData2BF, 1, B_CODING_TYPE, FRAME_STRUCTURE );
+DECLARE_PICD( vpar_PictureData2IF, 1, I_CODING_TYPE, FRAME_STRUCTURE )
+DECLARE_PICD( vpar_PictureData2PF, 1, P_CODING_TYPE, FRAME_STRUCTURE )
+DECLARE_PICD( vpar_PictureData2BF, 1, B_CODING_TYPE, FRAME_STRUCTURE )
 #endif
 #if (VPAR_OPTIM_LEVEL > 1)
-DECLARE_PICD( vpar_PictureData2IT, 1, I_CODING_TYPE, TOP_FIELD );
-DECLARE_PICD( vpar_PictureData2PT, 1, P_CODING_TYPE, TOP_FIELD );
-DECLARE_PICD( vpar_PictureData2BT, 1, B_CODING_TYPE, TOP_FIELD );
-DECLARE_PICD( vpar_PictureData2IB, 1, I_CODING_TYPE, BOTTOM_FIELD );
-DECLARE_PICD( vpar_PictureData2PB, 1, P_CODING_TYPE, BOTTOM_FIELD );
-DECLARE_PICD( vpar_PictureData2BB, 1, B_CODING_TYPE, BOTTOM_FIELD );
-DECLARE_PICD( vpar_PictureData1I, 0, I_CODING_TYPE, FRAME_STRUCTURE );
-DECLARE_PICD( vpar_PictureData1P, 0, P_CODING_TYPE, FRAME_STRUCTURE );
-DECLARE_PICD( vpar_PictureData1B, 0, B_CODING_TYPE, FRAME_STRUCTURE );
-DECLARE_PICD( vpar_PictureData1D, 0, D_CODING_TYPE, FRAME_STRUCTURE );
+DECLARE_PICD( vpar_PictureData2IT, 1, I_CODING_TYPE, TOP_FIELD )
+DECLARE_PICD( vpar_PictureData2PT, 1, P_CODING_TYPE, TOP_FIELD )
+DECLARE_PICD( vpar_PictureData2BT, 1, B_CODING_TYPE, TOP_FIELD )
+DECLARE_PICD( vpar_PictureData2IB, 1, I_CODING_TYPE, BOTTOM_FIELD )
+DECLARE_PICD( vpar_PictureData2PB, 1, P_CODING_TYPE, BOTTOM_FIELD )
+DECLARE_PICD( vpar_PictureData2BB, 1, B_CODING_TYPE, BOTTOM_FIELD )
+DECLARE_PICD( vpar_PictureData1I, 0, I_CODING_TYPE, FRAME_STRUCTURE )
+DECLARE_PICD( vpar_PictureData1P, 0, P_CODING_TYPE, FRAME_STRUCTURE )
+DECLARE_PICD( vpar_PictureData1B, 0, B_CODING_TYPE, FRAME_STRUCTURE )
+DECLARE_PICD( vpar_PictureData1D, 0, D_CODING_TYPE, FRAME_STRUCTURE )
 #endif
 
 #undef DECLARE_PICD

@@ -2,7 +2,7 @@
  * imdct.h : A52 IMDCT types
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdct.h,v 1.2 2002/08/07 00:29:36 sam Exp $
+ * $Id: imdct.h,v 1.3 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -22,16 +22,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-VLC_DECLARE_STRUCT(complex_t)
-VLC_DECLARE_STRUCT(imdct_t)
-
-struct complex_t
+typedef struct complex_t
 {
     float real;
     float imag;
-};
+
+} complex_t;
 
 #define N 512
+
+typedef struct imdct_t imdct_t;
 
 struct imdct_t
 {
@@ -77,10 +77,13 @@ struct imdct_t
     /* Module used and shortcuts */
     module_t * p_module;
     void (*pf_imdct_init)    ( imdct_t * );
-    //void (*pf_fft_64p) (complex_t *a);
+#if 0
+    void (*pf_fft_64p) (complex_t *a);
+#endif
     void (*pf_imdct_256)     ( imdct_t *, float [], float [] );
     void (*pf_imdct_256_nol) ( imdct_t *, float [], float [] );
     void (*pf_imdct_512)     ( imdct_t *, float [], float [] );
     void (*pf_imdct_512_nol) ( imdct_t *, float [], float [] );
+
 };
 

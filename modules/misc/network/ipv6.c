@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: ipv6.c,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -111,7 +111,7 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
     }
     if( !_getaddrinfo || !_freeaddrinfo )
     {
-//X        msg_Err( p_this, "no IPv6 stack installed" );
+        /* msg_Err( p_this, "no IPv6 stack installed" ); */
         if( wship6_dll ) FreeLibrary( wship6_dll );
         return( -1 );
     }
@@ -134,17 +134,20 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
         {
             *psz_multicast_interface = '\0';
             psz_multicast_interface++;
-//X            msg_Dbg( p_this, "Interface name specified: \"%s\"",
-//                          psz_multicast_interface );
+#if 0
+            msg_Dbg( p_this, "Interface name specified: \"%s\"",
+                             psz_multicast_interface );
+#endif
             /* now convert that interface name to an index */
 #if !defined( WIN32 )
             p_socket->sin6_scope_id = if_nametoindex(psz_multicast_interface);
 #else
             /* FIXME: for now we always use the default interface */
             p_socket->sin6_scope_id = 0;
-//X            msg_Warn( 3, "Using default interface. This has to be FIXED!");
 #endif
-//X            msg_Warn( p_this, " = #%i\n", p_socket->sin6_scope_id );
+#if 0
+            msg_Warn( p_this, " = #%i\n", p_socket->sin6_scope_id );
+#endif
         }
         psz_address[strlen(psz_address) - 1] = '\0' ;
 
@@ -176,7 +179,9 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
         /* We have a fqdn, try to find its address */
         if ( (p_hostent = gethostbyname2( psz_address, AF_INET6 )) == NULL )
         {
-//X            intf_ErrMsg( "ipv6 error: unknown host %s", psz_address );
+#if 0
+            intf_ErrMsg( "ipv6 error: unknown host %s", psz_address );
+#endif
             return( -1 );
         }
 
@@ -196,7 +201,9 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
         _freeaddrinfo( res );
 
 #else
-//X        intf_ErrMsg( "ipv6 error: IPv6 address %s is invalid", psz_address );
+#if 0
+        intf_ErrMsg( "ipv6 error: IPv6 address %s is invalid", psz_address );
+#endif
         return( -1 );
 #endif
     }
@@ -228,13 +235,9 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     char * psz_server_addr = p_socket->psz_server_addr;
     int i_server_port = p_socket->i_server_port;
 
-    int i_handle, i_opt, i_opt_size;
+    int i_handle, i_opt;
+    unsigned int i_opt_size;
     struct sockaddr_in6 sock;
-
-    if( i_bind_port == 0 )
-    {
-//X        i_bind_port = config_GetInt( "server-port" );
-    }
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET6 domain, automatic (0)
      * protocol */
@@ -322,7 +325,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 
         if( res == -1 )
         {
-//X            intf_ErrMsg( "ipv6 error: setsockopt JOIN_GROUP failed" );
+            msg_Err( p_this, "setsockopt JOIN_GROUP failed" );
         }
     }
 

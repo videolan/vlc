@@ -2,7 +2,7 @@
  * motionmmxext.c : MMX EXT motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionmmxext.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: motionmmxext.c,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -56,7 +56,7 @@ vlc_module_end();
 #define CPU_3DNOW 1
 
 
-//CPU_MMXEXT/CPU_3DNOW adaptation layer
+/* CPU_MMXEXT/CPU_3DNOW adaptation layer */
 
 #define pavg_r2r(src,dest)                                                  \
 do {                                                                        \
@@ -75,7 +75,7 @@ do {                                                                        \
 } while (0)
 
 
-//CPU_MMXEXT code
+/* CPU_MMXEXT code */
 
 
 static inline void MC_put1_8 (int height, yuv_data_t * dest, yuv_data_t * ref,
@@ -222,8 +222,8 @@ static inline void MC_put4_8 (int height, yuv_data_t * dest, yuv_data_t * ref,
         movq_r2m (mm0, *dest);
         dest += stride;
 
-        movq_r2r (mm6, mm7);        // unroll !
-        movq_r2r (mm2, mm0);        // unroll !
+        movq_r2r (mm6, mm7);        /* unroll ! */
+        movq_r2r (mm2, mm0);        /* unroll ! */
     } while (--height);
 }
 

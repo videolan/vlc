@@ -2,7 +2,7 @@
  * exponent.h: A52 exponent calculations
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: exponent.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: exponent.h,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -59,7 +59,7 @@ static const s16 exps_3[128] =
 
 static inline int exp_unpack_ch( a52dec_t * p_a52dec, u16 type,
                                  u16 expstr, u16 ngrps, u16 initial_exp,
-                                 u16 exps[], u16 * dest )
+                                 u16 exps[], s16 * dest )
 {
     u16 i,j;
     s16 exp_acc;

@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.11 2002/07/29 19:05:47 gbazin Exp $
+ * $Id: threads.c,v 1.12 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -312,8 +312,10 @@ int __vlc_mutex_destroy( char * psz_file, int i_line, vlc_mutex_t *p_mutex )
     int i_return = pthread_mutex_destroy( p_mutex );
     if( i_return )
     {
-//X        intf_ErrMsg( "thread %d error: mutex_destroy failed at %s:%d (%s)",
-//X                     pthread_self(), psz_file, i_line, strerror(i_return) );
+#if 0
+        intf_ErrMsg( "thread %d error: mutex_destroy failed at %s:%d (%s)",
+                     pthread_self(), psz_file, i_line, strerror(i_return) );
+#endif
     }
     return i_return;
 
@@ -434,8 +436,10 @@ int __vlc_cond_destroy( char * psz_file, int i_line, vlc_cond_t *p_condvar )
     int i_result = pthread_cond_destroy( p_condvar );
     if( i_result )
     {
-//X        intf_ErrMsg( "thread %d error: cond_destroy failed at %s:%d (%s)",
-//X                     pthread_self(), psz_file, i_line, strerror(i_result) );
+#if 0
+        intf_ErrMsg( "thread %d error: cond_destroy failed at %s:%d (%s)",
+                     pthread_self(), psz_file, i_line, strerror(i_result) );
+#endif
     }
     return i_result;
 

@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.81 2002/08/07 00:29:37 sam Exp $
+ * $Id: modules.c,v 1.82 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -770,8 +770,8 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file )
     p_this->p_vlc->p_module_bank->first = p_module;
     p_this->p_vlc->p_module_bank->i_count++;
 
-    //msg_Dbg( p_this, "plugin \"%s\", %s",
-    //         p_module->psz_object_name, p_module->psz_longname );
+    /* msg_Dbg( p_this, "plugin \"%s\", %s",
+                p_module->psz_object_name, p_module->psz_longname ); */
 
     vlc_object_attach( p_module, p_this->p_vlc->p_module_bank );
 
@@ -888,8 +888,8 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
     p_this->p_vlc->p_module_bank->first = p_module;
     p_this->p_vlc->p_module_bank->i_count++;
 
-    //msg_Dbg( p_this, "builtin \"%s\", %s",
-    //         p_module->psz_object_name, p_module->psz_longname );
+    /* msg_Dbg( p_this, "builtin \"%s\", %s",
+                p_module->psz_object_name, p_module->psz_longname ); */
 
     vlc_object_attach( p_module, p_this->p_vlc->p_module_bank );
 
@@ -1113,7 +1113,8 @@ static int CallEntry( module_t * p_module )
     int (* pf_symbol) ( module_t * p_module );
 
     /* Try to resolve the symbol */
-    pf_symbol = module_getsymbol( p_module->handle, psz_name );
+    pf_symbol = (int (*)(module_t *)) module_getsymbol( p_module->handle, 
+                                                        psz_name );
 
     if( pf_symbol == NULL )
     {

@@ -277,7 +277,6 @@ rm -fr %buildroot
 %dir %{_libdir}/videolan/vlc
 %{_libdir}/videolan/vlc/ac3_spdif.so
 %{_libdir}/videolan/vlc/avi.so
-%{_libdir}/videolan/vlc/dsp.so
 %{_libdir}/videolan/vlc/dummy.so
 %{_libdir}/videolan/vlc/dvd.so
 %{_libdir}/videolan/vlc/fb.so
@@ -301,6 +300,7 @@ rm -fr %buildroot
 %{_libdir}/videolan/vlc/mpeg_ps.so
 %{_libdir}/videolan/vlc/mpeg_ts.so
 %{_libdir}/videolan/vlc/null.so
+%{_libdir}/videolan/vlc/oss.so
 %{_libdir}/videolan/vlc/rc.so
 %{_libdir}/videolan/vlc/spudec.so
 %{_libdir}/videolan/vlc/udp.so

@@ -8040,7 +8040,7 @@ if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
 #define $ac_tr_hdr 1
 EOF
  
-    #PLUGINS="${PLUGINS} audio_output/oss"
+    PLUGINS="${PLUGINS} audio_output/oss"
     echo $ac_n "checking for main in -lossaudio""... $ac_c" 1>&6
 echo "configure:8046: checking for main in -lossaudio" >&5
 ac_lib_var=`echo ossaudio'_'main | sed 'y%./+-%__p_%'`
@@ -8072,7 +8072,7 @@ LIBS="$ac_save_LIBS"
 fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
-  dsp_LDFLAGS="${dsp_LDFLAGS} -lossaudio"
+  oss_LDFLAGS="${oss_LDFLAGS} -lossaudio"
 else
   echo "$ac_t""no" 1>&6
 fi
@@ -9421,7 +9421,7 @@ CFLAGS="${save_CFLAGS}"
 LDFLAGS="${save_LDFLAGS}"
 
 libvlc_LDFLAGS="${vlc_LDFLAGS} ${builtins_LDFLAGS}"
-for i in ${BUILTINS} ; do libvlc_LDFLAGS="${libvlc_LDFLAGS} ${libdir}/vlc/${i}.a `eval echo '$'{${i}_LDFLAGS}`" ; done
+for i in `echo ${BUILTINS} | sed -e 's#[^ ]*/##g'` ; do libvlc_LDFLAGS="${libvlc_LDFLAGS} ${libdir}/vlc/${i}.a `eval echo '$'{${i}_LDFLAGS}`" ; done
 
 
 
@@ -9781,7 +9781,6 @@ s%@arts_LDFLAGS@%$arts_LDFLAGS%g
 s%@beos_LDFLAGS@%$beos_LDFLAGS%g
 s%@i420_rgb_LDFLAGS@%$i420_rgb_LDFLAGS%g
 s%@directx_LDFLAGS@%$directx_LDFLAGS%g
-s%@dsp_LDFLAGS@%$dsp_LDFLAGS%g
 s%@dv_LDFLAGS@%$dv_LDFLAGS%g
 s%@dvd_LDFLAGS@%$dvd_LDFLAGS%g
 s%@dvdread_LDFLAGS@%$dvdread_LDFLAGS%g
@@ -9810,6 +9809,7 @@ s%@mad_LDFLAGS@%$mad_LDFLAGS%g
 s%@memcpyaltivec_LDFLAGS@%$memcpyaltivec_LDFLAGS%g
 s%@motionaltivec_LDFLAGS@%$motionaltivec_LDFLAGS%g
 s%@ncurses_LDFLAGS@%$ncurses_LDFLAGS%g
+s%@oss_LDFLAGS@%$oss_LDFLAGS%g
 s%@qnx_LDFLAGS@%$qnx_LDFLAGS%g
 s%@qt_LDFLAGS@%$qt_LDFLAGS%g
 s%@rc_LDFLAGS@%$rc_LDFLAGS%g

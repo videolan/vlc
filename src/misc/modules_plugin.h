@@ -31,8 +31,7 @@
  * This function loads a dynamically linked library using a system dependant
  * method, and returns a non-zero value on error, zero otherwise.
  *****************************************************************************/
-static inline int module_load( const char * psz_filename,
-                               module_handle_t * handle )
+static int module_load( const char * psz_filename, module_handle_t * handle )
 {
 #ifdef SYS_BEOS
     *handle = load_add_on( psz_filename );
@@ -70,7 +69,7 @@ static inline int module_load( const char * psz_filename,
  * using a system dependant method. No return value is taken in consideration,
  * since some libraries sometimes refuse to close properly.
  *****************************************************************************/
-static inline void module_unload( module_handle_t handle )
+static void module_unload( module_handle_t handle )
 {
 #ifdef SYS_BEOS
     unload_add_on( handle );
@@ -92,8 +91,8 @@ static inline void module_unload( module_handle_t handle )
  * string, and returns a pointer to it. We don't check for dlerror() or
  * similar functions, since we want a non-NULL symbol anyway.
  *****************************************************************************/
-static inline void * _module_getsymbol( module_handle_t handle,
-                                        const char * psz_function )
+static void * _module_getsymbol( module_handle_t handle,
+                                 const char * psz_function )
 {
 #ifdef SYS_BEOS
     void * p_symbol;
@@ -116,8 +115,8 @@ static inline void * _module_getsymbol( module_handle_t handle,
 #endif
 }
 
-static inline void * module_getsymbol( module_handle_t handle,
-                                       const char * psz_function )
+static void * module_getsymbol( module_handle_t handle,
+                                const char * psz_function )
 {
     void * p_symbol = _module_getsymbol( handle, psz_function );
 
@@ -145,7 +144,7 @@ static inline void * module_getsymbol( module_handle_t handle,
  * function. psz_buffer can be used to store temporary data, it is guaranteed
  * to be kept intact until the return value of module_error has been used.
  *****************************************************************************/
-static inline const char * module_error( char *psz_buffer )
+static const char * module_error( char *psz_buffer )
 {
 #if defined(SYS_BEOS)
     return( "failed" );
@@ -185,6 +184,7 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->aout_BufferNew_inner = aout_BufferNew; \
     (p_symbols)->aout_BufferDelete_inner = aout_BufferDelete; \
     (p_symbols)->aout_BufferPlay_inner = aout_BufferPlay; \
+    (p_symbols)->aout_FormatToBytes_inner = aout_FormatToBytes; \
     (p_symbols)->__aout_InputNew_inner = __aout_InputNew; \
     (p_symbols)->aout_InputDelete_inner = aout_InputDelete; \
     (p_symbols)->aout_OutputNextBuffer_inner = aout_OutputNextBuffer; \

@@ -1408,8 +1408,8 @@ if test "x${enable_oss}" != "xno" &&
   (test "x${SYS}" != "xmingw32" || test "x${enable_oss}" = "xyes")
 then
   AC_CHECK_HEADERS(soundcard.h sys/soundcard.h machine/soundcard.h, [
-    #PLUGINS="${PLUGINS} audio_output/oss"
-    AC_CHECK_LIB(ossaudio,main,dsp_LDFLAGS="${dsp_LDFLAGS} -lossaudio")
+    PLUGINS="${PLUGINS} audio_output/oss"
+    AC_CHECK_LIB(ossaudio,main,oss_LDFLAGS="${oss_LDFLAGS} -lossaudio")
   ])
 fi
 
@@ -1909,7 +1909,7 @@ dnl
 dnl  Create the vlc-config script
 dnl
 libvlc_LDFLAGS="${vlc_LDFLAGS} ${builtins_LDFLAGS}"
-for i in ${BUILTINS} ; do libvlc_LDFLAGS="${libvlc_LDFLAGS} ${libdir}/vlc/${i}.a `eval echo '$'{${i}_LDFLAGS}`" ; done
+for i in `echo ${BUILTINS} | sed -e 's#[^ ]*/##g'` ; do libvlc_LDFLAGS="${libvlc_LDFLAGS} ${libdir}/vlc/${i}.a `eval echo '$'{${i}_LDFLAGS}`" ; done
 AC_SUBST(libvlc_LDFLAGS)
 
 dnl 
@@ -1981,7 +1981,6 @@ AC_SUBST(arts_LDFLAGS)
 AC_SUBST(beos_LDFLAGS)
 AC_SUBST(i420_rgb_LDFLAGS)
 AC_SUBST(directx_LDFLAGS)
-AC_SUBST(dsp_LDFLAGS)
 AC_SUBST(dv_LDFLAGS)
 AC_SUBST(dvd_LDFLAGS)
 AC_SUBST(dvdread_LDFLAGS)
@@ -2010,6 +2009,7 @@ AC_SUBST(mad_LDFLAGS)
 AC_SUBST(memcpyaltivec_LDFLAGS)
 AC_SUBST(motionaltivec_LDFLAGS)
 AC_SUBST(ncurses_LDFLAGS)
+AC_SUBST(oss_LDFLAGS)
 AC_SUBST(qnx_LDFLAGS)
 AC_SUBST(qt_LDFLAGS)
 AC_SUBST(rc_LDFLAGS)

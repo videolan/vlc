@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: ipv4.c,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -100,7 +100,6 @@ static int BuildAddr( struct sockaddr_in * p_socket,
             /* We have a fqdn, try to find its address */
             if ( (p_hostent = gethostbyname( psz_address )) == NULL )
             {
-//X                intf_ErrMsg( "BuildLocalAddr: unknown host %s", psz_address );
                 return( -1 );
             }
 

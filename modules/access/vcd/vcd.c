@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.2 2002/08/07 00:29:36 sam Exp $
+ * $Id: vcd.c,v 1.3 2002/08/08 00:35:10 sam Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -243,7 +243,7 @@ static int VCDOpen( vlc_object_t *p_this )
                            * (off_t)VCD_DATA_SIZE;
 
         /* Number of chapters */
-        area[i]->i_part_nb = 0;   // will be the entry points
+        area[i]->i_part_nb = 0;   /* will be the entry points */
         area[i]->i_part = 1;
 
         area[i]->i_plugin_data = p_vcd->p_sectors[i];

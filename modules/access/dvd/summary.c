@@ -3,7 +3,7 @@
  * found in .ifo.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: summary.c,v 1.1 2002/08/04 17:23:41 sam Exp $
+ * $Id: summary.c,v 1.2 2002/08/08 00:35:10 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -66,11 +66,13 @@
  ****************************************************************************/
 void IfoPrintTitle( thread_dvd_data_t * p_dvd )
 {
-//X    intf_WarnMsg( 5, "dvd info: title %d, %d chapter%s, %d angle%s",
-//X                     p_dvd->i_title, p_dvd->i_chapter_nb,
-//X                     (p_dvd->i_chapter_nb == 1) ? "" : "s",
-//X                     p_dvd->i_angle_nb,
-//X                     (p_dvd->i_angle_nb == 1) ? "" : "s" );
+#if 0
+    intf_WarnMsg( 5, "dvd info: title %d, %d chapter%s, %d angle%s",
+                     p_dvd->i_title, p_dvd->i_chapter_nb,
+                     (p_dvd->i_chapter_nb == 1) ? "" : "s",
+                     p_dvd->i_angle_nb,
+                     (p_dvd->i_angle_nb == 1) ? "" : "s" );
+#endif
 }
 
 /****************************************************************************
@@ -79,39 +81,41 @@ void IfoPrintTitle( thread_dvd_data_t * p_dvd )
 #define video p_dvd->p_ifo->vts.manager_inf.video_attr
 void IfoPrintVideo( thread_dvd_data_t * p_dvd )
 {
-//X    char*    psz_perm_displ[4] =
-//X             {
-//X                "pan-scan & letterboxed",
-//X                "pan-scan",
-//X                "letterboxed",
-//X                "not specified"
-//X             };
-//X    char*    psz_source_res[4] =
-//X             {
-//X                "720x480 ntsc or 720x576 pal",
-//X                "704x480 ntsc or 704x576 pal",
-//X                "352x480 ntsc or 352x576 pal",
-//X                "352x240 ntsc or 352x288 pal"
-//X             };
+#if 0
+    char*    psz_perm_displ[4] =
+             {
+                "pan-scan & letterboxed",
+                "pan-scan",
+                "letterboxed",
+                "not specified"
+             };
+    char*    psz_source_res[4] =
+             {
+                "720x480 ntsc or 720x576 pal",
+                "704x480 ntsc or 704x576 pal",
+                "352x480 ntsc or 352x576 pal",
+                "352x240 ntsc or 352x288 pal"
+             };
 
-//X    intf_WarnMsg( 5, "dvd info: MPEG-%d video, %sHz, aspect ratio %s",
-//X                     video.i_compression + 1,
-//X                     video.i_system ? "pal 625 @50" : "ntsc 525 @60",
-//X                     video.i_ratio ? (video.i_ratio == 3) ? "16:9"
-//X                                                          : "unknown"
-//X                                   : "4:3" );
+    intf_WarnMsg( 5, "dvd info: MPEG-%d video, %sHz, aspect ratio %s",
+                     video.i_compression + 1,
+                     video.i_system ? "pal 625 @50" : "ntsc 525 @60",
+                     video.i_ratio ? (video.i_ratio == 3) ? "16:9"
+                                                          : "unknown"
+                                   : "4:3" );
 
-//X    intf_WarnMsg( 5, "dvd info: display mode %s, %s, %s",
-//X                     psz_perm_displ[video.i_perm_displ],
-//X                     video.i_line21_1 ? "line21-1 data in GOP"
-//X                                      : "no line21-1 data",
-//X                     video.i_line21_2 ? "line21-2 data in GOP"
-//X                                      : "no line21-2 data" );
+    intf_WarnMsg( 5, "dvd info: display mode %s, %s, %s",
+                     psz_perm_displ[video.i_perm_displ],
+                     video.i_line21_1 ? "line21-1 data in GOP"
+                                      : "no line21-1 data",
+                     video.i_line21_2 ? "line21-2 data in GOP"
+                                      : "no line21-2 data" );
 
-//X    intf_WarnMsg( 5, "dvd info: source is %s, %sletterboxed, %s mode",
-//X                     psz_source_res[video.i_source_res],
-//X                     video.i_letterboxed ? "" : "not ",
-//X                     video.i_mode ? "film (625/50 only)" : "camera" );
+    intf_WarnMsg( 5, "dvd info: source is %s, %sletterboxed, %s mode",
+                     psz_source_res[video.i_source_res],
+                     video.i_letterboxed ? "" : "not ",
+                     video.i_mode ? "film (625/50 only)" : "camera" );
+#endif
 }
 #undef video
 
@@ -125,29 +129,31 @@ void IfoPrintAudio( thread_dvd_data_t * p_dvd, int i )
 {
     if( audio_status.i_available )
     {
-//X        char* ppsz_mode[8] =
-//X            { "A52", "unknown", "MPEG", "MPEG-2", "LPCM", "SDDS", "DTS", "" };
-//X        char* ppsz_appl_mode[4] =
-//X            { "no application specified", "karaoke", "surround sound", "" };
-//X        char* ppsz_quant[4] =
-//X            { "16 bits", "20 bits", "24 bits", "drc" };
-    
-//X        intf_WarnMsg( 5, "dvd info: audio %d (%s) is %s, "
-//X                         "%d%s channel%s, %dHz, %s", i,
-//X                         DecodeLanguage( audio.i_lang_code ),
-//X                         ppsz_mode[audio.i_coding_mode & 0x7],
-//X                         audio.i_num_channels + 1,
-//X                         audio.i_multichannel_extension ? " ext." : "",
-//X                         audio.i_num_channels ? "s" : "",
-//X                         audio.i_sample_freq ? 96000 : 48000,
-//X                         ppsz_appl_mode[audio.i_appl_mode & 0x3] );
+#if 0
+        char* ppsz_mode[8] =
+            { "A52", "unknown", "MPEG", "MPEG-2", "LPCM", "SDDS", "DTS", "" };
+        char* ppsz_appl_mode[4] =
+            { "no application specified", "karaoke", "surround sound", "" };
+        char* ppsz_quant[4] =
+            { "16 bits", "20 bits", "24 bits", "drc" };
+ 
+        intf_WarnMsg( 5, "dvd info: audio %d (%s) is %s, "
+                         "%d%s channel%s, %dHz, %s", i,
+                         DecodeLanguage( audio.i_lang_code ),
+                         ppsz_mode[audio.i_coding_mode & 0x7],
+                         audio.i_num_channels + 1,
+                         audio.i_multichannel_extension ? " ext." : "",
+                         audio.i_num_channels ? "s" : "",
+                         audio.i_sample_freq ? 96000 : 48000,
+                         ppsz_appl_mode[audio.i_appl_mode & 0x3] );
 
-//X        intf_WarnMsg( 5, "dvd info: %s, quantization %s, status %x",
-//X                         (audio.i_caption == 1) ? "normal caption"
-//X                           : (audio.i_caption == 3) ? "directors comments"
-//X                               : "unknown caption",
-//X                         ppsz_quant[audio.i_quantization & 0x3],
-//X                         audio_status.i_position );
+        intf_WarnMsg( 5, "dvd info: %s, quantization %s, status %x",
+                         (audio.i_caption == 1) ? "normal caption"
+                           : (audio.i_caption == 3) ? "directors comments"
+                               : "unknown caption",
+                         ppsz_quant[audio.i_quantization & 0x3],
+                         audio_status.i_position );
+#endif
     }
 }
 #undef audio_status
@@ -164,14 +170,16 @@ void IfoPrintSpu( thread_dvd_data_t * p_dvd, int i )
 {
     if( spu_status.i_available )
     {
-//X        intf_WarnMsg( 5, "dvd info: spu %d (%s), caption %d "
-//X                         "prefix %x, modes [%s%s%s%s ]", i,
-//X                         DecodeLanguage( spu.i_lang_code ),
-//X                         spu.i_caption, spu.i_prefix,
-//X                         spu_status.i_position_43 ? " 4:3" : "",
-//X                         spu_status.i_position_wide ? " wide" : "",
-//X                         spu_status.i_position_letter ? " letter" : "",
-//X                         spu_status.i_position_pan ? " pan" : "" );
+#if 0
+        intf_WarnMsg( 5, "dvd info: spu %d (%s), caption %d "
+                         "prefix %x, modes [%s%s%s%s ]", i,
+                         DecodeLanguage( spu.i_lang_code ),
+                         spu.i_caption, spu.i_prefix,
+                         spu_status.i_position_43 ? " 4:3" : "",
+                         spu_status.i_position_wide ? " wide" : "",
+                         spu_status.i_position_letter ? " letter" : "",
+                         spu_status.i_position_pan ? " pan" : "" );
+#endif
     }
 }
 #undef spu_status

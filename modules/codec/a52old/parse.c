@@ -2,7 +2,7 @@
  * parse.c: A52 parsing procedures
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: parse.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: parse.c,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -738,8 +738,10 @@ int parse_audblk (a52dec_t * p_a52dec, int blknum)
             if (p_a52dec->audblk.deltbae[i] == DELTA_BIT_NEW)
             {
                 p_a52dec->audblk.deltnseg[i] = GetBits (&p_a52dec->bit_stream,3);
-//                if (p_a52dec->audblk.deltnseg[i] >= 8)
-//                    fprintf (stderr, "parse debug: p_a52dec->audblk.deltnseg[%i] == %i\n", i, p_a52dec->audblk.deltnseg[i]);
+#if 0
+                if (p_a52dec->audblk.deltnseg[i] >= 8)
+                    fprintf (stderr, "parse debug: p_a52dec->audblk.deltnseg[%i] == %i\n", i, p_a52dec->audblk.deltnseg[i]);
+#endif
                 for (j = 0; j < p_a52dec->audblk.deltnseg[i] + 1; j++)
                 {
                     p_a52dec->audblk.deltoffst[i][j] = GetBits (&p_a52dec->bit_stream,5);

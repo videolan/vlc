@@ -1,7 +1,7 @@
 /*****************************************************************************
  * fastmemcpy.h : fast memcpy routines
  *****************************************************************************
- * $Id: fastmemcpy.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: fastmemcpy.h,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: various Linux kernel hackers
  *          various MPlayer hackers
@@ -29,9 +29,9 @@
 
 #define BLOCK_SIZE 4096
 #define CONFUSION_FACTOR 0
-//Feel free to fine-tune the above 2, it might be possible to get some speedup with them :)
+/*Feel free to fine-tune the above 2, it might be possible to get some speedup with them :)*/
 
-//#define STATISTICS
+/*#define STATISTICS*/
 
 #ifndef HAVE_SSE2
 /*
@@ -90,8 +90,8 @@ data.
 If you have questions please contact with me: Nick Kurshev: nickols_k@mail.ru.
 */
 
-// 3dnow memcpy support from kernel 2.4.2
-//  by Pontscho/fresh!mindworkz
+/* 3dnow memcpy support from kernel 2.4.2 */
+/*  by Pontscho/fresh!mindworkz           */
 
 #if defined( HAVE_MMX2 ) || defined( HAVE_3DNOW ) || defined( HAVE_MMX )
 
@@ -128,7 +128,7 @@ __asm__ __volatile__(\
 #ifdef HAVE_SSE
 #define MMREG_SIZE 16
 #else
-#define MMREG_SIZE 64 //8
+#define MMREG_SIZE 64 /*8*/
 #endif
 
 /* Small defines (for readability only) ;) */
@@ -245,7 +245,7 @@ void * fast_memcpy(void * to, const void * from, size_t len)
 		((unsigned char *)to)+=64;
 	}
 #else
-	// Align destination at BLOCK_SIZE boundary
+	/* Align destination at BLOCK_SIZE boundary */
 	for(; ((int)to & (BLOCK_SIZE-1)) && i>0; i--)
 	{
 		__asm__ __volatile__ (
@@ -269,12 +269,12 @@ void * fast_memcpy(void * to, const void * from, size_t len)
 		MOVNTQ" %%mm6, 48(%1)\n"
 		MOVNTQ" %%mm7, 56(%1)\n"
 		:: "r" (from), "r" (to) : "memory");
-		((const unsigned char *)from)+=64;
-		((unsigned char *)to)+=64;
+                from = (const void *) (((const unsigned char *)from)+64);
+		to = (void *) (((unsigned char *)to)+64);
 	}
 
-//	printf(" %d %d\n", (int)from&1023, (int)to&1023);
-	// Pure Assembly cuz gcc is a bit unpredictable ;)
+/*	printf(" %d %d\n", (int)from&1023, (int)to&1023); */
+	/* Pure Assembly cuz gcc is a bit unpredictable ;) */
 # if 0
 	if(i>=BLOCK_SIZE/64)
 		asm volatile(
@@ -314,7 +314,7 @@ void * fast_memcpy(void * to, const void * from, size_t len)
 				"jb 2b				\n\t"
 
 #if CONFUSION_FACTOR > 0
-	// a few percent speedup on out of order executing CPUs
+	/* a few percent speedup on out of order executing CPUs */
 			"movl %5, %%eax		\n\t"
 				"2:			\n\t"
 				"movl (%0), %%ebx	\n\t"
@@ -360,8 +360,8 @@ void * fast_memcpy(void * to, const void * from, size_t len)
 		MOVNTQ" %%mm6, 48(%1)\n"
 		MOVNTQ" %%mm7, 56(%1)\n"
 		:: "r" (from), "r" (to) : "memory");
-		((const unsigned char *)from)+=64;
-		((unsigned char *)to)+=64;
+		from = (const void *) (((const unsigned char *)from)+64);
+		to = (void *) (((unsigned char *)to)+64);
 	}
 
 #endif /* Have SSE */

@@ -148,7 +148,7 @@ mozilla-clean:
 distclean: clean
 	-cd po && $(MAKE) maintainer-clean
 	rm -f **/*.o **/*~ *.log
-	rm -f Makefile.opts Makefile.config
+	rm -f Makefile.opts Makefile.config vlc-config
 	rm -f include/defs.h include/modules_builtin.h
 	rm -f src/misc/modules_builtin.h
 	rm -f config*status config*cache config*log conftest*

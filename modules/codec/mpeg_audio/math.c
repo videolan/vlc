@@ -2,7 +2,7 @@
  * math.c: Inverse Discrete Cosine Transform and Pulse Code Modulation
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: math.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: math.c,v 1.2 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -481,12 +481,12 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 if ((tmp += *f++ * *v) > 32767)
                 {
                     /* ceiling saturation */
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
                     /* floor saturation */
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -518,11 +518,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -554,11 +554,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -590,11 +590,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -626,11 +626,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -662,11 +662,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -698,11 +698,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -734,11 +734,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -770,11 +770,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -806,11 +806,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -842,11 +842,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {    
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -878,11 +878,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -914,11 +914,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -950,11 +950,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -986,11 +986,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 v += 15;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {
@@ -1021,11 +1021,11 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    *p_pcm = 0x7FFF;
+                    *p_pcm = 32767; /* 0x7ffff */
                 }
                 else if (tmp < -32768)
                 {
-                    *p_pcm = 0x8000;
+                    *p_pcm = -32768; /* 0x8000 */
                 }
                 else
                 {

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.15 2002/08/07 21:36:55 massiot Exp $
+ * $Id: vlc_common.h,v 1.16 2002/08/08 00:35:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -135,80 +135,81 @@ typedef u32 vlc_fourcc_t;
  *****************************************************************************/
 
 /* Messages */
-VLC_DECLARE_STRUCT(msg_bank_t)
-VLC_DECLARE_STRUCT(msg_subscription_t)
+typedef struct msg_bank_t msg_bank_t;
+typedef struct msg_subscription_t msg_subscription_t;
 
 /* Playlist */
-VLC_DECLARE_STRUCT(playlist_t)
-VLC_DECLARE_STRUCT(playlist_item_t)
+typedef struct playlist_t playlist_t;
+typedef struct playlist_item_t playlist_item_t;
 
 /* Modules */
-VLC_DECLARE_STRUCT(module_bank_t)
-VLC_DECLARE_STRUCT(module_t)
-VLC_DECLARE_STRUCT(module_config_t)
-VLC_DECLARE_STRUCT(module_symbols_t)
+typedef struct module_bank_t module_bank_t;
+typedef struct module_t module_t;
+typedef struct module_config_t module_config_t;
+typedef struct module_symbols_t module_symbols_t;
 
 /* Interface */
-VLC_DECLARE_STRUCT(intf_thread_t)
-VLC_DECLARE_STRUCT(intf_sys_t)
-VLC_DECLARE_STRUCT(intf_console_t)
-VLC_DECLARE_STRUCT(intf_msg_t)
-VLC_DECLARE_STRUCT(intf_channel_t)
+typedef struct intf_thread_t intf_thread_t;
+typedef struct intf_sys_t intf_sys_t;
+typedef struct intf_console_t intf_console_t;
+typedef struct intf_msg_t intf_msg_t;
+typedef struct intf_channel_t intf_channel_t;
 
 /* Input */
-VLC_DECLARE_STRUCT(input_thread_t)
-VLC_DECLARE_STRUCT(input_channel_t)
-VLC_DECLARE_STRUCT(input_area_t)
-VLC_DECLARE_STRUCT(input_buffers_t)
-VLC_DECLARE_STRUCT(input_socket_t)
-VLC_DECLARE_STRUCT(input_info_t)
-VLC_DECLARE_STRUCT(input_info_category_t)
-VLC_DECLARE_STRUCT(access_sys_t)
-VLC_DECLARE_STRUCT(demux_sys_t)
-VLC_DECLARE_STRUCT(es_descriptor_t)
-VLC_DECLARE_STRUCT(es_sys_t)
-VLC_DECLARE_STRUCT(pgrm_descriptor_t)
-VLC_DECLARE_STRUCT(pgrm_sys_t)
-VLC_DECLARE_STRUCT(stream_descriptor_t)
-VLC_DECLARE_STRUCT(stream_sys_t)
+typedef struct input_thread_t input_thread_t;
+typedef struct input_channel_t input_channel_t;
+typedef struct input_area_t input_area_t;
+typedef struct input_buffers_t input_buffers_t;
+typedef struct input_socket_t input_socket_t;
+typedef struct input_info_t input_info_t;
+typedef struct input_info_category_t input_info_category_t;
+typedef struct access_sys_t access_sys_t;
+typedef struct demux_sys_t demux_sys_t;
+typedef struct es_descriptor_t es_descriptor_t;
+typedef struct es_sys_t es_sys_t;
+typedef struct pgrm_descriptor_t pgrm_descriptor_t;
+typedef struct pgrm_sys_t pgrm_sys_t;
+typedef struct stream_descriptor_t stream_descriptor_t;
+typedef struct stream_sys_t stream_sys_t;
 
 /* Audio */
-VLC_DECLARE_STRUCT(aout_instance_t)
-VLC_DECLARE_STRUCT(aout_input_t)
-VLC_DECLARE_STRUCT(aout_buffer_t)
-VLC_DECLARE_STRUCT(audio_sample_format_t)
+typedef struct aout_instance_t aout_instance_t;
+typedef struct aout_sys_t aout_sys_t;
+typedef struct aout_input_t aout_input_t;
+typedef struct aout_buffer_t aout_buffer_t;
+typedef struct audio_sample_format_t audio_sample_format_t;
 
 /* Video */
-VLC_DECLARE_STRUCT(vout_thread_t)
-VLC_DECLARE_STRUCT(vout_font_t)
-VLC_DECLARE_STRUCT(vout_sys_t)
-VLC_DECLARE_STRUCT(chroma_sys_t)
-VLC_DECLARE_STRUCT(picture_t)
-VLC_DECLARE_STRUCT(picture_sys_t)
-VLC_DECLARE_STRUCT(picture_heap_t)
-VLC_DECLARE_STRUCT(subpicture_t)
-VLC_DECLARE_STRUCT(subpicture_sys_t)
+typedef struct vout_thread_t vout_thread_t;
+typedef struct vout_font_t vout_font_t;
+typedef struct vout_sys_t vout_sys_t;
+typedef struct chroma_sys_t chroma_sys_t;
+typedef struct picture_t picture_t;
+typedef struct picture_sys_t picture_sys_t;
+typedef struct picture_heap_t picture_heap_t;
+typedef struct subpicture_t subpicture_t;
+typedef struct subpicture_sys_t subpicture_sys_t;
 
 /* Decoders */
-VLC_DECLARE_STRUCT(decoder_fifo_t)
+typedef struct decoder_fifo_t decoder_fifo_t;
 
 /* Misc */
-VLC_DECLARE_STRUCT(data_packet_t)
-VLC_DECLARE_STRUCT(data_buffer_t)
-VLC_DECLARE_STRUCT(stream_position_t)
-VLC_DECLARE_STRUCT(stream_ctrl_t)
-VLC_DECLARE_STRUCT(pes_packet_t)
-VLC_DECLARE_STRUCT(bit_stream_t)
-VLC_DECLARE_STRUCT(network_socket_t)
-VLC_DECLARE_STRUCT(iso639_lang_t)
+typedef struct data_packet_t data_packet_t;
+typedef struct data_buffer_t data_buffer_t;
+typedef struct stream_position_t stream_position_t;
+typedef struct stream_ctrl_t stream_ctrl_t;
+typedef struct pes_packet_t pes_packet_t;
+typedef struct bit_stream_t bit_stream_t;
+typedef struct network_socket_t network_socket_t;
+typedef struct iso639_lang_t iso639_lang_t;
 
 /*****************************************************************************
  * Plug-in stuff
  *****************************************************************************/
 #ifndef __PLUGIN__
-#   define VLC_EXPORT( type, name, args ) type name args;
+#   define VLC_EXPORT( type, name, args ) type name args
 #else
-#   define VLC_EXPORT( type, name, args ) ;
+#   define VLC_EXPORT( type, name, args ) struct _u_n_u_s_e_d_
     extern module_symbols_t* p_symbols;
 #endif
 

@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.42 2002/08/04 20:04:11 sam Exp $
+ * $Id: input_dec.c,v 1.43 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -106,9 +106,9 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
     /* Waiting for the thread to exit */
     /* I thought that unlocking was better since thread join can be long
      * but it actually creates late pictures and freezes --stef */
-//    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    /* vlc_mutex_unlock( &p_input->stream.stream_lock ); */
     vlc_thread_join( p_es->p_decoder_fifo );
-//    vlc_mutex_lock( &p_input->stream.stream_lock );
+    /* vlc_mutex_lock( &p_input->stream.stream_lock ); */
 
     /* Delete decoder configuration */
     DeleteDecoderFifo( p_es->p_decoder_fifo );

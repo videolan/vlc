@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mtime.c,v 1.33 2002/07/12 21:57:25 massiot Exp $
+ * $Id: mtime.c,v 1.34 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -73,12 +73,14 @@ int nanosleep(struct timespec *, struct timespec *);
  *****************************************************************************/
 char *mstrtime( char *psz_buffer, mtime_t date )
 {
+    static mtime_t ll1000 = 1000, ll60 = 60, ll24 = 24;
+
     sprintf( psz_buffer, "%02d:%02d:%02d-%03d.%03d",
-             (int) (date / (I64C(1000) * I64C(1000) * I64C(60) * I64C(60)) % I64C(24)),
-             (int) (date / (I64C(1000) * I64C(1000) * I64C(60)) % I64C(60)),
-             (int) (date / (I64C(1000) * I64C(1000)) % I64C(60)),
-             (int) (date / I64C(1000) % I64C(1000)),
-             (int) (date % I64C(1000)) );
+             (int) (date / (ll1000 * ll1000 * ll60 * ll60) % ll24),
+             (int) (date / (ll1000 * ll1000 * ll60) % ll60),
+             (int) (date / (ll1000 * ll1000) % ll60),
+             (int) (date / ll1000 % ll1000),
+             (int) (date % ll1000) );
     return( psz_buffer );
 }
 

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.21 2002/08/07 21:36:56 massiot Exp $
+ * $Id: libvlc.c,v 1.22 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -765,7 +765,7 @@ vlc_error_t vlc_destroy_r( vlc_t *p_vlc )
     if( i_index == i_vlc )
     {
         fprintf( stderr, "error: trying to unregister %p which is not in "
-                         "the list\n", p_vlc );
+                         "the list\n", (void *)p_vlc );
         vlc_mutex_unlock( p_vlc->p_global_lock );
         vlc_object_destroy( p_vlc );
         return VLC_EGENERIC;

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.188 2002/07/31 20:56:53 sam Exp $
+ * $Id: video_output.c,v 1.189 2002/08/08 00:35:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -548,7 +548,7 @@ static void RunThread( vout_thread_t *p_vout)
                 }
                 else
                 {
-                    //intf_WarnMsg( 6, "vout info: duplicating picture" );
+                    /*intf_WarnMsg( 6, "vout info: duplicating picture" );*/
                 }
             }
         }
