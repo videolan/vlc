@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.20 2003/06/30 20:08:21 gbazin Exp $
+ * $Id: transcode.c,v 1.21 2003/06/30 20:44:35 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -951,11 +951,8 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
 
                     id->i_samples_delay -= i_samples;
 
-                    static mtime_t i_old_dts = 0;
-
                     /* update dts */
                     id->i_dts += p_out->i_length;
-                    i_old_dts = id->i_dts;
                     sout_BufferChain( out, p_out );
 
                 }
