@@ -1012,7 +1012,7 @@ static void RunThread( vout_thread_t *p_vout)
                     p_pic->i_status = DESTROYED_PICTURE;
                     p_vout->i_pictures--;
                 }
-                intf_ErrMsg( "warning: late picture skipped (%p)\n", p_pic );
+                intf_DbgMsg( "warning: late picture skipped (%p)\n", p_pic );
                 vlc_mutex_unlock( &p_vout->picture_lock );
 
 		continue;
@@ -1153,14 +1153,6 @@ static void RunThread( vout_thread_t *p_vout)
 
         /* Give back change lock */
         vlc_mutex_unlock( &p_vout->change_lock );
-
-#ifdef DEBUG_VIDEO
-        {
-            char        psz_date[MSTRTIME_MAX_SIZE];
-            intf_DbgMsg( "picture %p waiting until %s\n", p_pic,
-                    mstrtime(psz_date, display_date),
-        }
-#endif
 
         /* Sleep a while or until a given date */
         if( display_date != 0 )
