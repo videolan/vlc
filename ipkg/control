@@ -2,7 +2,15 @@ Package: vlc
 Section: graphics
 Priority: optional
 Version: 0.3.1
+Release: 1
 Architecture: arm
-Maintainer: Christophe Massiot <massiot@via.ecp.fr>
+Maintainer: Jean-Paul Saman <jpsaman@wxs.nl>,  Christophe Massiot <massiot@via.ecp.fr>
 Depends: libc6, task-x
-Description: streaming-capable MPEG decoder
+Copyright: GPL
+Description: VideoLAN Client is a free network-aware MPEG and DVD player.
+ VideoLAN is a free MPEG1/2 software solution licensed under GPL. The original 
+ source can be found on: 
+ http://www.videolan.org/pub/videolan/vlc/0.2.90/vlc-0.2.90.tar.gz
+ The VideoLAN Client allows to play MPEG1, MPEG2 Transport Streams and 
+ Program Streams from the network or from a file, as well as direct DVD 
+ playback. 
