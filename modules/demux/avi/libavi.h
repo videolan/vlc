@@ -2,7 +2,7 @@
  * libavi.h : LibAVI library 
  ******************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.h,v 1.2 2002/11/05 10:07:56 gbazin Exp $
+ * $Id: libavi.h,v 1.3 2002/11/05 23:48:46 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -39,65 +39,61 @@
 #define AVIIF_FIXKEYFRAME   0x00001000L /* invented; used to say that 
                                            the keyframe flag isn't a true flag
                                            but have to be verified */
-#define MKFOURCC( a, b, c, d ) \
-    ( ((u32)a) | ( ((u32)b) << 8 ) | ( ((u32)c) << 16 ) | ( ((u32)d) << 24 ) )
-#define MKTWOCC( a, b ) \
-    ( (u16)(a) | ( (u16)(b) << 8 ) )
 
     /* *** avi stuff *** */
 
-#define AVIFOURCC_RIFF         MKFOURCC('R','I','F','F')
-#define AVIFOURCC_LIST         MKFOURCC('L','I','S','T')
-#define AVIFOURCC_JUNK         MKFOURCC('J','U','N','K')
-#define AVIFOURCC_AVI          MKFOURCC('A','V','I',' ')
-#define AVIFOURCC_WAVE         MKFOURCC('W','A','V','E')
-#define AVIFOURCC_INFO         MKFOURCC('I','N','F','O')
+#define AVIFOURCC_RIFF         VLC_FOURCC('R','I','F','F')
+#define AVIFOURCC_LIST         VLC_FOURCC('L','I','S','T')
+#define AVIFOURCC_JUNK         VLC_FOURCC('J','U','N','K')
+#define AVIFOURCC_AVI          VLC_FOURCC('A','V','I',' ')
+#define AVIFOURCC_WAVE         VLC_FOURCC('W','A','V','E')
+#define AVIFOURCC_INFO         VLC_FOURCC('I','N','F','O')
 
-#define AVIFOURCC_avih         MKFOURCC('a','v','i','h')
-#define AVIFOURCC_hdrl         MKFOURCC('h','d','r','l')
-#define AVIFOURCC_movi         MKFOURCC('m','o','v','i')
-#define AVIFOURCC_idx1         MKFOURCC('i','d','x','1')
+#define AVIFOURCC_avih         VLC_FOURCC('a','v','i','h')
+#define AVIFOURCC_hdrl         VLC_FOURCC('h','d','r','l')
+#define AVIFOURCC_movi         VLC_FOURCC('m','o','v','i')
+#define AVIFOURCC_idx1         VLC_FOURCC('i','d','x','1')
 
-#define AVIFOURCC_strl         MKFOURCC('s','t','r','l')
-#define AVIFOURCC_strh         MKFOURCC('s','t','r','h')
-#define AVIFOURCC_strf         MKFOURCC('s','t','r','f')
-#define AVIFOURCC_strd         MKFOURCC('s','t','r','d')
+#define AVIFOURCC_strl         VLC_FOURCC('s','t','r','l')
+#define AVIFOURCC_strh         VLC_FOURCC('s','t','r','h')
+#define AVIFOURCC_strf         VLC_FOURCC('s','t','r','f')
+#define AVIFOURCC_strd         VLC_FOURCC('s','t','r','d')
 
-#define AVIFOURCC_rec          MKFOURCC('r','e','c',' ')
-#define AVIFOURCC_auds         MKFOURCC('a','u','d','s')
-#define AVIFOURCC_vids         MKFOURCC('v','i','d','s')
+#define AVIFOURCC_rec          VLC_FOURCC('r','e','c',' ')
+#define AVIFOURCC_auds         VLC_FOURCC('a','u','d','s')
+#define AVIFOURCC_vids         VLC_FOURCC('v','i','d','s')
 
-#define AVIFOURCC_IARL         MKFOURCC('I','A','R','L')
-#define AVIFOURCC_IART         MKFOURCC('I','A','R','T')
-#define AVIFOURCC_ICMS         MKFOURCC('I','C','M','S')
-#define AVIFOURCC_ICMT         MKFOURCC('I','C','M','T')
-#define AVIFOURCC_ICOP         MKFOURCC('I','C','O','P')
-#define AVIFOURCC_ICRD         MKFOURCC('I','C','R','D')
-#define AVIFOURCC_ICRP         MKFOURCC('I','C','R','P')
-#define AVIFOURCC_IDIM         MKFOURCC('I','D','I','M')
-#define AVIFOURCC_IDPI         MKFOURCC('I','D','P','I')
-#define AVIFOURCC_IENG         MKFOURCC('I','E','N','G')
-#define AVIFOURCC_IGNR         MKFOURCC('I','G','N','R')
-#define AVIFOURCC_IKEY         MKFOURCC('I','K','E','Y')
-#define AVIFOURCC_ILGT         MKFOURCC('I','L','G','T')
-#define AVIFOURCC_IMED         MKFOURCC('I','M','E','D')
-#define AVIFOURCC_INAM         MKFOURCC('I','N','A','M')
-#define AVIFOURCC_IPLT         MKFOURCC('I','P','L','T')
-#define AVIFOURCC_IPRD         MKFOURCC('I','P','R','D')
-#define AVIFOURCC_ISBJ         MKFOURCC('I','S','B','J')
-#define AVIFOURCC_ISFT         MKFOURCC('I','S','F','T')
-#define AVIFOURCC_ISHP         MKFOURCC('I','S','H','P')
-#define AVIFOURCC_ISRC         MKFOURCC('I','S','R','C')
-#define AVIFOURCC_ISRF         MKFOURCC('I','S','R','F')
-#define AVIFOURCC_ITCH         MKFOURCC('I','T','C','H')
-#define AVIFOURCC_ISMP         MKFOURCC('I','S','M','P')
-#define AVIFOURCC_IDIT         MKFOURCC('I','D','I','T')
+#define AVIFOURCC_IARL         VLC_FOURCC('I','A','R','L')
+#define AVIFOURCC_IART         VLC_FOURCC('I','A','R','T')
+#define AVIFOURCC_ICMS         VLC_FOURCC('I','C','M','S')
+#define AVIFOURCC_ICMT         VLC_FOURCC('I','C','M','T')
+#define AVIFOURCC_ICOP         VLC_FOURCC('I','C','O','P')
+#define AVIFOURCC_ICRD         VLC_FOURCC('I','C','R','D')
+#define AVIFOURCC_ICRP         VLC_FOURCC('I','C','R','P')
+#define AVIFOURCC_IDIM         VLC_FOURCC('I','D','I','M')
+#define AVIFOURCC_IDPI         VLC_FOURCC('I','D','P','I')
+#define AVIFOURCC_IENG         VLC_FOURCC('I','E','N','G')
+#define AVIFOURCC_IGNR         VLC_FOURCC('I','G','N','R')
+#define AVIFOURCC_IKEY         VLC_FOURCC('I','K','E','Y')
+#define AVIFOURCC_ILGT         VLC_FOURCC('I','L','G','T')
+#define AVIFOURCC_IMED         VLC_FOURCC('I','M','E','D')
+#define AVIFOURCC_INAM         VLC_FOURCC('I','N','A','M')
+#define AVIFOURCC_IPLT         VLC_FOURCC('I','P','L','T')
+#define AVIFOURCC_IPRD         VLC_FOURCC('I','P','R','D')
+#define AVIFOURCC_ISBJ         VLC_FOURCC('I','S','B','J')
+#define AVIFOURCC_ISFT         VLC_FOURCC('I','S','F','T')
+#define AVIFOURCC_ISHP         VLC_FOURCC('I','S','H','P')
+#define AVIFOURCC_ISRC         VLC_FOURCC('I','S','R','C')
+#define AVIFOURCC_ISRF         VLC_FOURCC('I','S','R','F')
+#define AVIFOURCC_ITCH         VLC_FOURCC('I','T','C','H')
+#define AVIFOURCC_ISMP         VLC_FOURCC('I','S','M','P')
+#define AVIFOURCC_IDIT         VLC_FOURCC('I','D','I','T')
 
     
-#define AVITWOCC_wb            MKTWOCC('w','b')
-#define AVITWOCC_db            MKTWOCC('d','b')
-#define AVITWOCC_dc            MKTWOCC('d','c')
-#define AVITWOCC_pc            MKTWOCC('p','c')
+#define AVITWOCC_wb            VLC_TWOCC('w','b')
+#define AVITWOCC_db            VLC_TWOCC('d','b')
+#define AVITWOCC_dc            VLC_TWOCC('d','c')
+#define AVITWOCC_pc            VLC_TWOCC('p','c')
     /* *** codex stuff ***  */
 
     /* MPEG4 video */

@@ -2,7 +2,7 @@
  * libavi.c : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.4 2002/11/05 10:07:56 gbazin Exp $
+ * $Id: libavi.c,v 1.5 2002/11/05 23:48:46 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -32,10 +32,10 @@
 
 #define AVI_DEBUG 1
 #define AVIFOURCC_PRINT( x ) \
-    (x)&0xff,           \
-    ( (x) >>  8 )&0xff, \
-    ( (x) >> 16 )&0xff, \
-    ( (x) >> 24 )&0xff
+    ((u8 *)&x)[0],           \
+    ((u8 *)&x)[1],           \
+    ((u8 *)&x)[2],           \
+    ((u8 *)&x)[3]
     
 #define FREE( p ) \
     if( p ) {free( p ); p = NULL; }
@@ -868,7 +868,7 @@ int AVI_ChunkReadRoot( input_thread_t *p_input,
     p_list->p_first = NULL;
     p_list->p_last  = NULL;
 
-    p_list->i_type = MKFOURCC( 'r', 'o', 'o', 't' );
+    p_list->i_type = VLC_FOURCC( 'r', 'o', 'o', 't' );
     
     for( ; ; )
     {
