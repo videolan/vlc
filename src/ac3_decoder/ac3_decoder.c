@@ -217,7 +217,23 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
     {
         p_ac3dec->b_invalid = 0;
 
-        decode_find_sync( p_ac3dec );
+	decode_find_sync( p_ac3dec );
+
+	/*
+	p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = mdate;
+	mdate += 32000;
+	*/
+	if ( DECODER_FIFO_START(p_ac3dec->fifo)->b_has_pts )
+	{
+		p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_ac3dec->fifo)->i_pts;
+		DECODER_FIFO_START(p_ac3dec->fifo)->b_has_pts = 0;
+	}
+	else
+	{
+		p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = LAST_MDATE;
+	}
+
+	parse_syncinfo( p_ac3dec );
 	switch ( p_ac3dec->syncinfo.fscod )
 	{
 		case 0:
@@ -236,22 +252,6 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 			fprintf( stderr, "ac3dec debug: invalid fscod\n" );
 			break;
 	}
-
-	/*
-	p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = mdate;
-	mdate += 32000;
-	*/
-	if ( DECODER_FIFO_START(p_ac3dec->fifo)->b_has_pts )
-	{
-		p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_ac3dec->fifo)->i_pts;
-		DECODER_FIFO_START(p_ac3dec->fifo)->b_has_pts = 0;
-	}
-	else
-	{
-		p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-	}
-
-	parse_syncinfo( p_ac3dec );
 
 	parse_bsi( p_ac3dec );
 

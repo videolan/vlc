@@ -503,13 +503,22 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo/*,
             if ( aout_date < p_fifo->date[p_fifo->l_next_frame] )
             {
 */
-            if ( (p_fifo->date[p_fifo->l_next_frame] - p_fifo->date[p_fifo->l_start_frame] > 1000000) || (p_fifo->date[p_fifo->l_next_frame] <= p_fifo->date[p_fifo->l_start_frame]) )
-            {
-                fprintf( stderr, "aout debug: p_fifo->l_rate == %li\n", p_fifo->l_rate );
-                p_fifo->date[p_fifo->l_start_frame] = p_fifo->date[p_fifo->l_next_frame] - ((1000000 * ((mtime_t)(p_fifo->l_frame_size * ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE))) >> p_fifo->b_stereo) / ((mtime_t)p_fifo->l_rate));
-            }
-            p_fifo->b_next_frame = 1;
-            break;
+
+		if ( p_fifo->date[p_fifo->l_start_frame] >= p_fifo->date[p_fifo->l_next_frame] )
+		{
+			fprintf( stderr, "aout debug: %lli >= %lli\n", p_fifo->date[p_fifo->l_start_frame], p_fifo->date[p_fifo->l_next_frame] );
+			p_fifo->date[p_fifo->l_start_frame] = p_fifo->date[p_fifo->l_next_frame] - ((1000000 * ((mtime_t)(p_fifo->l_frame_size * ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE))) >> p_fifo->b_stereo) / ((mtime_t)p_fifo->l_rate));
+			
+		}
+		else if ( (p_fifo->date[p_fifo->l_next_frame] - p_fifo->date[p_fifo->l_start_frame]) > 1000000 )
+		{
+			fprintf( stderr, "aout debug: (%lli - %lli) > 1000000\n", p_fifo->date[p_fifo->l_next_frame], p_fifo->date[p_fifo->l_start_frame] );
+			p_fifo->date[p_fifo->l_start_frame] = p_fifo->date[p_fifo->l_next_frame] - ((1000000 * ((mtime_t)(p_fifo->l_frame_size * ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE))) >> p_fifo->b_stereo) / ((mtime_t)p_fifo->l_rate));
+		}
+
+		p_fifo->b_next_frame = 1;
+		break;
+
 /*
             }
             else
