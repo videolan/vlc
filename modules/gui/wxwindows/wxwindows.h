@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.79 2003/12/14 21:03:27 gbazin Exp $
+ * $Id: wxwindows.h,v 1.80 2003/12/14 22:49:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -515,6 +515,7 @@ enum
     PS_ENCAPSULATION,
     MPEG1_ENCAPSULATION,
     OGG_ENCAPSULATION,
+    RAW_ENCAPSULATION,
     ASF_ENCAPSULATION,
     AVI_ENCAPSULATION,
     MP4_ENCAPSULATION,

@@ -2,7 +2,7 @@
  * dummy.c: dummy muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: dummy.c,v 1.9 2003/11/21 20:49:14 gbazin Exp $
+ * $Id: dummy.c,v 1.10 2003/12/14 22:49:28 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -43,6 +43,7 @@ vlc_module_begin();
     set_description( _("Dummy/Raw muxer") );
     set_capability( "sout mux", 5 );
     add_shortcut( "dummy" );
+    add_shortcut( "raw" );
     add_shortcut( "es" );
     set_callbacks( Open, Close );
 vlc_module_end();
