@@ -12,4 +12,5 @@ SOURCES_hd1000v = hd1000v.cpp
 SOURCES_snapshot = snapshot.c
 SOURCES_opengl = opengl.c
 SOURCES_image = image.c
-SOURCES_picture = picture.c
+SOURCES_picture = picture.h \
+                  picture.c
