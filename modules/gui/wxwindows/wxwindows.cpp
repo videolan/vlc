@@ -81,8 +81,8 @@ private:
  * Module descriptor
  *****************************************************************************/
 #define EMBED_TEXT N_("Embed video in interface")
-#define EMBED_LONGTEXT N_("Embed the video window inside the interface. The "\
-    "default behaviour is to have video windows separate from the interface.")
+#define EMBED_LONGTEXT N_("Embed the video inside the interface instead " \
+    "of having it in a separate window.")
 #define BOOKMARKS_TEXT N_("Show bookmarks dialog")
 #define BOOKMARKS_LONGTEXT N_("Show bookmarks dialog when the interface " \
     "starts.")
@@ -101,7 +101,7 @@ vlc_module_begin();
     add_shortcut( "wx" );
     set_program( "wxvlc" );
 
-    add_bool( "wxwin-embed", 0, NULL,
+    add_bool( "wxwin-embed", 1, NULL,
               EMBED_TEXT, EMBED_LONGTEXT, VLC_FALSE );
     add_bool( "wxwin-bookmarks", 0, NULL,
               BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, VLC_FALSE );
