@@ -46,8 +46,6 @@
 #   include <sys/socket.h>
 #endif
 
-#undef DEBUG_BUFFER
-
 #include "announce.h"
 #include "network.h"
 
@@ -375,14 +373,7 @@ void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_sap )
 
     if( i_size < 1024 ) /* We mustn't send packets larger than 1024B */
     {
-        if( p_sap->i_ip_version == 6 )
-        {
-            i_ret = send( p_sap->i_socket, psz_send, i_size, 0 );
-        }
-        else
-        {
-            i_ret = send( p_sap->i_socket, psz_send, i_size, 0 );
-        }
+        i_ret = send( p_sap->i_socket, psz_send, i_size, 0 );
     }
 
     if( i_ret <= 0 )

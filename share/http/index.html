@@ -1,51 +1,84 @@
-<html>
-<head>
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD  XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml10/DTD/xhtml10transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+ <head>
     <title>VLC Media Player</title>
+    <style type="css">
+	body {font-family:Verdana, Arial, Sans Serif; }
+	h2 { text-align:center; }
+	table {width:100%;}
+	table.add {width:70%;}
+	div.section {background-color:#FFFFCC;
+	     border:1pt black solid;
+	     margin-bottom:2em; 
+	     padding:0.5em;}
+	div.sectitle {	background-color:#FFFF99; 
+			color:#019;
+			border:1pt black solid;
+			width:20%;
+			font-weight:bold;}
+	tr.ligne1 { background-color:#FFFFEE; }
+	tr.ligne2 { background-color:#FFFFAA; }
+    </style>
     <vlc id="if" param1="url_param"/>
         <meta http-equiv="refresh" content="0;URL=/" />
     <vlc id="end" />
 
     <vlc id="control" param1="stop,pause,previous,next,add,sout,play" />
     <vlc id="set" param1="sout" param2="string" />
-</head>
-<body>
-    <h2><center><a href="http://www.videolan.org">VLC Media Player <vlc id="value" param1="version" /></a> (http interface)</center></h2>
-    <hr/>
-    <td>
-        <form method="get" action="">
-            <input type="submit" name="control" value="stop" />
-            <input type="submit" name="control" value="pause" />
-            <input type="submit" name="control" value="previous" />
-            <input type="submit" name="control" value="next" />
-            <a href="info.html">infos</a>
-        </form>
-    </td>
-    <br />
-    <td>
-        <form method="get" action="" enctype="text/plain" >
-            <input type="text" name="mrl" size="40" />
-            <input type="submit" name="control" value="add" />
-        </form>
-    </td>
-    <td>
-        <form method="get" action="" enctype="text/plain" >
-            <input type="text"   name="sout"    size="30" value="<vlc id="get" param1="sout" param2="string" />" />
-            <input type="submit" name="control" value="sout" />
-        </form>
-    </td>
-    <hr/>
-    <p>
+ </head>
+ <body>
+    <h2>
+     <a href="http://www.videolan.org">VLC Media Player <vlc id="value" param1="version" /></a> (http interface)</h2>
+    <div class="sectitle">Control VLC</div>
+    <div class="section">   
+     <form method="get" action="">
+      <table class="add">
+       <tr>
+        <td><input type="submit" name="control" value="stop" /></td>
+        <td><input type="submit" name="control" value="pause" /></td>
+        <td><input type="submit" name="control" value="previous" /></td>
+        <td><input type="submit" name="control" value="next" /></td>
+        <td><a href="admin/">Administration</a></td>
+       </tr>
+      </table>
+     </form>
+    </div>
+    <div class="sectitle">Add</div>
+    <div class="section">
+     <form method="get" action="" enctype="text/plain" >
+      <table class="add">
+       <tr>
+        <td>Add a MRL (Media Resource Locator) to the playlist</td>
+        <td><input type="text" name="mrl" size="40" /></td>
+        <td><input type="submit" name="control" value="add" /></td>
+       </tr>
+       <tr>
+        <td>Stream Output:</td>
+        <td><input type="text" name="sout" size="40" value="<vlc id="get" param1="sout" param2="string" />" /></td>
+        <td><input type="submit" name="control" value="sout" /></td>
+       </tr>
+      </table>
+     </form>
+    </div>
+  
+    <div class="sectitle">VLC Playlist</div>
+    <div class="section"> 
+    <table>
         <vlc id="foreach" param1="pl" param2="playlist" />
-            <vlc id="if" param1="pl.current" />
+          <tr class="<vlc id="if" param1="2 pl.index % 0 =" />ligne1<vlc id="else" />ligne2<vlc id="end" />">
+          <td>
+           <vlc id="if" param1="pl.current" />
                 <b>
             <vlc id="end" />
-            <a href=?control=play&item=<vlc id="value" param1="pl.index" />><vlc id="value" param1="pl.index" /> - <vlc id="value" param1="pl.name" /></a> <br />
-            <vlc id="if" param1="pl.current" />
+            <a href="?control=play&item=<vlc id="value" param1="pl.index" />"><vlc id="value" param1="pl.index" /> - <vlc id="value" param1="pl.name" /></a>            <vlc id="if" param1="pl.current" />
                 </b>
             <vlc id="end" />
-
+	   </td></tr>
         <vlc id="end" />
-    </p>
+    </table>
+    </div>
     <hr/>
     <p> <vlc id="value" param1="copyright" /> </p>
 </body>

@@ -2,7 +2,7 @@
  * joystick.c: control vlc with a joystick
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: joystick.c,v 1.1 2003/07/20 08:30:41 zorglub Exp $
+ * $Id: joystick.c,v 1.2 2003/07/31 08:18:30 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -48,12 +48,17 @@
 
 /* Default values for parameters */
 #define DEFAULT_MAX_SEEK        10 /* seconds */
-#define DEFAULT_REPEAT          100000
-#define DEFAULT_WAIT            500000
+#define DEFAULT_REPEAT          100
+#define DEFAULT_WAIT            500
 #define DEFAULT_DEVICE          "/dev/input/js0"
 #define DEFAULT_THRESHOLD       12000  /* 0 -> 32767 */
 
-/* Actions
+#define DEFAULT_MAPPING \
+    "{axis-0-up=forward,axis-0-down=back," \
+    "axis-1-up=next,axis-1-down=prev," \
+    "butt-1-down=play,butt-2-down=fullscreen}"
+
+/* Default Actions (used if there are missing actions in the default
  * Available actions are: Next,Prev, Forward,Back,Play,Fullscreen,dummy */
 #define AXE_0_UP_ACTION         Forward
 #define AXE_0_DOWN_ACTION       Back
@@ -107,21 +112,22 @@ struct intf_sys_t
  * Local prototypes.
  *****************************************************************************/
 
-int  Open   ( vlc_object_t * );
-void Close  ( vlc_object_t * );
-static int  Init        ( intf_thread_t *p_intf );
-int handle_event        ( intf_thread_t *p_intf, struct js_event event);
+static int  Open   ( vlc_object_t * );
+static void Close  ( vlc_object_t * );
+static int  Init   ( intf_thread_t *p_intf );
+
+static int handle_event   ( intf_thread_t *p_intf, struct js_event event );
 
 
 /* Actions */
-int Next        (intf_thread_t *p_intf);
-int Prev        (intf_thread_t *p_intf);
-int Back        (intf_thread_t *p_intf);
-int Forward     (intf_thread_t *p_intf);
-int Play        (intf_thread_t *p_intf);
-int Fullscreen  (intf_thread_t *p_intf);
+static int Next        (intf_thread_t *p_intf);
+static int Prev        (intf_thread_t *p_intf);
+static int Back        (intf_thread_t *p_intf);
+static int Forward     (intf_thread_t *p_intf);
+static int Play        (intf_thread_t *p_intf);
+static int Fullscreen  (intf_thread_t *p_intf);
 
-int dummy       (intf_thread_t *p_intf);
+static int dummy       (intf_thread_t *p_intf);
 
 /* Exported functions */
 static void Run       ( intf_thread_t *p_intf );
@@ -131,31 +137,34 @@ static void Run       ( intf_thread_t *p_intf );
  *****************************************************************************/
 #define THRESHOLD_TEXT N_( "Motion threshold" )
 #define THRESHOLD_LONGTEXT N_( \
-    "the amount of joystick movement required for a movement to be" \
-    "recorded" )
+    "The amount of joystick movement required for a movement to be " \
+    "recorded (0->32767)" )
 
 #define DEVICE_TEXT N_( "Joystick device" )
 #define DEVICE_LONGTEXT N_( \
-    "the device for the joystick (usually /dev/jsX or /dev/input/jsX" \
-    "with X the number of the joystick" )
+    "The joystick device (usually /dev/js0 or /dev/input/js0)")
 
 #define REPEAT_TEXT N_( "Repeat time" )
 #define REPEAT_LONGTEXT N_( \
-    "the time waited before the action is repeated if it is still trigered" \
-    "in miscroseconds" )
+    "The time waited before the action is repeated if it is still trigered, " \
+    "in milliseconds" )
 
-#define WAIT_TEXT N_( "Wait before repeat time")
+#define WAIT_TEXT N_( "Wait time")
 #define WAIT_LONGTEXT N_(\
-   " the time waited before the repeat starts, in microseconds")
+   "The time waited before the repeat starts, in milliseconds ")
 
 #define SEEK_TEXT N_( "Max seek interval")
 #define SEEK_LONGTEXT N_(\
-   " the number of seconds that will be seeked if the axis "\
-   "is pushed at its maximum" )
+   "The maximum number of seconds that will be seeked at a time." )
+
+#define MAP_TEXT N_( "Action mapping")
+#define MAP_LONGTEXT N_(\
+   "Allows you to remap the actions. For details," \
+   " please have a look at http://wiki.videolan.org/index.php/Joystick" ) 
 
 vlc_module_begin();
     add_category_hint( N_( "Joystick" ), NULL, VLC_FALSE );
-    add_integer( "motion-threshold", 15000, NULL, 
+    add_integer( "motion-threshold", DEFAULT_THRESHOLD , NULL, 
                      THRESHOLD_TEXT, THRESHOLD_LONGTEXT, VLC_TRUE );
     add_string( "joystick-device", DEFAULT_DEVICE , NULL, 
                      DEVICE_TEXT, DEVICE_LONGTEXT, VLC_TRUE );
@@ -165,15 +174,17 @@ vlc_module_begin();
                      WAIT_TEXT, WAIT_LONGTEXT, VLC_TRUE );
     add_integer ("joystick-max-seek",DEFAULT_MAX_SEEK,NULL,
                      SEEK_TEXT, SEEK_LONGTEXT, VLC_TRUE );
+    add_string("joystick-mapping",DEFAULT_MAPPING,NULL,
+                    MAP_TEXT,MAP_LONGTEXT, VLC_TRUE );
     set_description( _("joystick control interface") );
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
 
 /*****************************************************************************
- * OpenIntf: initialize interface
+ * Open: initialize interface
  *****************************************************************************/
-int Open ( vlc_object_t *p_this )
+static int Open ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
@@ -191,9 +202,9 @@ int Open ( vlc_object_t *p_this )
 }
         
 /*****************************************************************************
- * CloseIntf: destroy the interface
+ * Close: destroy the interface
  *****************************************************************************/
-void Close ( vlc_object_t *p_this )
+static void Close ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
@@ -289,6 +300,8 @@ static void Run( intf_thread_t *p_intf )
 static int Init( intf_thread_t * p_intf )
 {
     char *psz_device;
+    char *psz_parse;
+    char *psz_eof;  /* end of field */
     
     if( !p_intf->b_die )
     {
@@ -308,10 +321,10 @@ static int Init( intf_thread_t * p_intf )
             return -1;
         }
                    
-        p_intf->p_sys->i_repeat =
+        p_intf->p_sys->i_repeat = 1000*
                         config_GetInt( p_intf, "joystick-repeat");
 
-        p_intf->p_sys->i_wait =
+        p_intf->p_sys->i_wait = 1000*
                         config_GetInt( p_intf, "joystick-wait");
         
         p_intf->p_sys->i_threshold = 
@@ -324,20 +337,79 @@ static int Init( intf_thread_t * p_intf )
         p_intf->p_sys->i_maxseek = 
                         config_GetInt( p_intf, "joystick-max-seek" );
 
-        p_intf->p_sys->axes[0].pf_actup   = AXE_0_UP_ACTION;
-        p_intf->p_sys->axes[0].pf_actdown = AXE_0_DOWN_ACTION;
-        p_intf->p_sys->axes[0].b_trigered = VLC_FALSE;
-        p_intf->p_sys->axes[0].l_time     = 0;
+
+        psz_parse = config_GetPsz( p_intf, "joystick-mapping" ) ;
+
+        if ( ! psz_parse) 
+        {
+            msg_Warn (p_intf,"Invalid mapping. Aborting" );
+            return -1;
+        }
+        if( !strlen( psz_parse ) )
+        {
+            msg_Warn( p_intf, "Invalid mapping. Aborting" );
+            return -1;
+        }
         
-        p_intf->p_sys->axes[1].pf_actup   = AXE_1_UP_ACTION;
-        p_intf->p_sys->axes[1].pf_actdown = AXE_1_DOWN_ACTION;
-        p_intf->p_sys->axes[1].b_trigered = VLC_FALSE;
-        p_intf->p_sys->axes[1].l_time     = 0;
-        
+        p_intf->p_sys->axes[0].pf_actup  = AXE_0_UP_ACTION;
+        p_intf->p_sys->axes[0].pf_actdown  = AXE_0_DOWN_ACTION;
+        p_intf->p_sys->axes[1].pf_actup  = AXE_1_UP_ACTION;
+        p_intf->p_sys->axes[1].pf_actdown  = AXE_1_DOWN_ACTION;
+
         p_intf->p_sys->buttons[0].pf_actdown = BUTTON_1_PRESS_ACTION;
         p_intf->p_sys->buttons[0].pf_actup   = BUTTON_1_RELEASE_ACTION;
         p_intf->p_sys->buttons[1].pf_actdown = BUTTON_2_PRESS_ACTION;
         p_intf->p_sys->buttons[1].pf_actup   = BUTTON_2_RELEASE_ACTION;
+        
+/* Macro to parse the command line */
+#define PARSE(name,function)                                                  \
+    if(!strncmp( psz_parse , name , strlen( name ) ) )                        \
+    {                                                                         \
+        psz_parse += strlen( name );                                          \
+        psz_eof = strchr( psz_parse , ',' );                                  \
+        if( !psz_eof)                                                         \
+            psz_eof = strchr( psz_parse, '}' );                               \
+        if( !psz_eof)                                                         \
+            psz_eof = psz_parse + strlen(psz_parse);                          \
+        if( psz_eof )                                                         \
+        {                                                                     \
+            *psz_eof = '\0' ;                                                 \
+        }                                                                     \
+        msg_Dbg(p_intf,"%s -> %s", name,psz_parse) ;                          \
+        if(!strcasecmp( psz_parse , "play" ) ) function = Play;               \
+        if(!strcasecmp( psz_parse , "next" ) ) function = Next;               \
+        if(!strcasecmp( psz_parse , "prev" ) ) function = Prev;               \
+        if(!strcasecmp( psz_parse , "fullscreen" ) ) function = Fullscreen;   \
+        if(!strcasecmp( psz_parse , "forward" ) ) function = Forward;         \
+        if(!strcasecmp( psz_parse , "back" ) ) function = Back;               \
+        psz_parse = psz_eof;                                                  \
+        psz_parse ++;                                                         \
+        continue;                                                             \
+    }                                                                         \
+ 
+        while(1)
+        {
+            PARSE("axis-0-up="   ,p_intf->p_sys->axes[0].pf_actup      );
+            PARSE("axis-0-down=" ,p_intf->p_sys->axes[0].pf_actdown    );
+            PARSE("axis-1-up="   ,p_intf->p_sys->axes[1].pf_actup      );
+            PARSE("axis-1-down=" ,p_intf->p_sys->axes[1].pf_actdown    );
+
+            PARSE("butt-1-up="   ,p_intf->p_sys->buttons[0].pf_actup   );
+            PARSE("butt-1-down=" ,p_intf->p_sys->buttons[0].pf_actdown );
+            PARSE("butt-2-up="   ,p_intf->p_sys->buttons[1].pf_actup   );
+            PARSE("butt-2-down=" ,p_intf->p_sys->buttons[1].pf_actdown );
+            
+            if( *psz_parse )
+                psz_parse++;
+            else
+                break;
+         }
+
+        p_intf->p_sys->axes[0].b_trigered = VLC_FALSE;
+        p_intf->p_sys->axes[0].l_time     = 0;
+
+        p_intf->p_sys->axes[1].b_trigered = VLC_FALSE;
+        p_intf->p_sys->axes[1].l_time     = 0;
         
         vlc_mutex_unlock( &p_intf->change_lock );
 
@@ -352,7 +424,7 @@ static int Init( intf_thread_t * p_intf )
 /*****************************************************************************
  * handle_event : parse a joystick event and takes the appropriate action    *
  *****************************************************************************/
-int handle_event ( intf_thread_t *p_intf, struct js_event event)
+static int handle_event ( intf_thread_t *p_intf, struct js_event event)
 {
     unsigned int i_axe;
       
@@ -363,7 +435,7 @@ int handle_event ( intf_thread_t *p_intf, struct js_event event)
         * triggering something */
         if( event.number == 2 && 
             /* Try to avoid Parkinson joysticks */
-            abs(event.value - p_intf->p_sys->axes[2].i_value) > 10 )
+            abs(event.value - p_intf->p_sys->axes[2].i_value) > 200 )
         {
             p_intf->p_sys->axes[2].i_value = event.value;
             msg_Dbg( p_intf , "Updating volume" );
@@ -396,9 +468,9 @@ int handle_event ( intf_thread_t *p_intf, struct js_event event)
         }    
 
         /* Special for seeking */
-        p_intf->p_sys->f_seconds = 
+        p_intf->p_sys->f_seconds = 1+
             (abs(event.value)-p_intf->p_sys->i_threshold)*
-            p_intf->p_sys->i_maxseek/
+            (p_intf->p_sys->i_maxseek - 1 )/
             (32767-p_intf->p_sys->i_threshold);
 
         
@@ -441,10 +513,11 @@ int handle_event ( intf_thread_t *p_intf, struct js_event event)
 }
 
 /****************************************************************************
- * The possible actions
+ * The actions
  ****************************************************************************/
 
-int Next( intf_thread_t *p_intf)
+/* Go to next item in the playlist */
+static int Next( intf_thread_t *p_intf)
 {
     playlist_t *p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                    FIND_ANYWHERE );
@@ -457,7 +530,8 @@ int Next( intf_thread_t *p_intf)
     return 0;
 }
 
-int Prev( intf_thread_t *p_intf)
+/* Go to previous item in the playlist */
+static int Prev( intf_thread_t *p_intf)
 {
     playlist_t *p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                    FIND_ANYWHERE );
@@ -470,29 +544,45 @@ int Prev( intf_thread_t *p_intf)
     return 0;
 }
 
-int Forward(intf_thread_t *p_intf)
+/* Seek forward */
+static int Forward(intf_thread_t *p_intf)
 {
-    msg_Dbg(p_intf,"Seeking %f seconds",p_intf->p_sys->f_seconds);
-    input_Seek( p_intf->p_sys->p_input, p_intf->p_sys->f_seconds, 
+    if(p_intf->p_sys->p_input)
+    {
+        msg_Dbg(p_intf,"Seeking %f seconds",p_intf->p_sys->f_seconds);
+        input_Seek( p_intf->p_sys->p_input, p_intf->p_sys->f_seconds, 
                     INPUT_SEEK_SECONDS | INPUT_SEEK_CUR);
     return 0;
+    }
+    return -1;
 }
 
-int Back(intf_thread_t *p_intf)
+/* Seek backwards */
+static int Back(intf_thread_t *p_intf)
 {
-    msg_Dbg(p_intf,"Seeking %f seconds",p_intf->p_sys->f_seconds);
-    input_Seek( p_intf->p_sys->p_input, -(p_intf->p_sys->f_seconds), 
+    if(p_intf->p_sys->p_input)
+    {
+        msg_Dbg(p_intf,"Seeking -%f seconds",p_intf->p_sys->f_seconds);
+        input_Seek( p_intf->p_sys->p_input, -(p_intf->p_sys->f_seconds), 
                     INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
-    return 0;
+        return 0;
+    }
+    return -1;
 }
 
-int Play(intf_thread_t *p_intf)
+/* Toggle Play/Pause */
+static int Play(intf_thread_t *p_intf)
 {
-    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE ); 
-    return 0;
+    if(p_intf->p_sys->p_input)
+    {
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE ); 
+        return 0;
+    }
+    return -1;
 }
 
-int Fullscreen(intf_thread_t *p_intf)
+/* Toggle fullscreen mode */
+static int Fullscreen(intf_thread_t *p_intf)
 {
     vout_thread_t * p_vout=vlc_object_find(p_intf,
                           VLC_OBJECT_VOUT, FIND_ANYWHERE );
@@ -505,7 +595,7 @@ int Fullscreen(intf_thread_t *p_intf)
 }
 
 /* dummy event. Use it if you don't wan't anything to happen */
-int dummy(intf_thread_t *p_intf)
+static int dummy(intf_thread_t *p_intf)
 {
    return 0;
 }

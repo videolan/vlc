@@ -1,6 +1,32 @@
-<html>
-<head>
-    <title>VLC Media Player - Admin</title>
+<!DOCTYPE html PUBLIC "-//W3C//DTD  XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml10/DTD/xhtml10transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+ <head>
+    <title>VLC Media Player</title>
+    <style>
+        body {font-family:Verdana, Arial, Sans Serif; }
+        h2 { text-align:center; }
+	td {border:1pt black solid;margin:0em; }
+        table.border {border:1pt black solid;}
+        div.section {background-color:#FFFFCC;
+             border:1pt black solid;
+             margin-bottom:2em;
+	     padding:0.5em; }
+	div.section-ctr {background-color:#FFFFCC;
+             border:1pt black solid;
+             margin-bottom:2em;
+             padding:0.5em;
+	     font-size:1.2em;
+	     text-align:center; }
+
+        div.sectitle {  background-color:#FFFF99;
+                        color:#019;
+                        border:1pt black solid;
+                        width:20%;
+                        font-weight:bold;}
+        tr.ligne1 { background-color:#FFFFEE; }
+        tr.ligne2 { background-color:#FFFFAA; }
+    </style>
     <vlc id="if" param1="url_param"/>
         <meta http-equiv="refresh" content="0;URL=/admin/" />
     <vlc id="end" />
@@ -9,15 +35,13 @@
     <vlc id="set" param1="sout" param2="string" />
 </head>
 <body>
-    <h2>
-        <center>
-        <a href="/">VLC Media Player - Admin <vlc id="value" param1="version" /></a> <form method="get" action=""> <input type="submit" name="control" value="shutdown" /> </form>
-        </center>
-    </h2>
-    <hr/>
+    <h2><a href="/">VLC Media Player - Admin <vlc id="value" param1="version" /></a></h2>
 
-    <h3>Host list</h3>
-    <table border="1" cellspacing="0" >
+<div class="section-ctr">Shutdown VLC<br /> <form method="get" action=""> <input type="submit" name="control" value="shutdown" /> </form></div>
+
+  <div class="sectitle">Host list</div>
+  <div class="section">
+    <table class="border" >
     <tr>
         <th>Id</th><th>Host</th><th>IP</th><th>Port</th>
     </tr>
@@ -30,14 +54,16 @@
         </tr>
     <vlc id="end" />
     </table>
-
-    <h3>File list</h3>
+   </div>
+ 
+   <div class="sectitle">File list</div>
+   <div class="section">
     <table border="1" cellspacing="0" >
     <tr>
         <th>Id</th><th>URL</th><th>Mime</th><th>Protected</th><th>usage</th>
     </tr>
     <vlc id="foreach" param1="url" param2="urls" />
-        <vlc id="if" param1="url.stream 0 =" />
+        <vlc id="if" param1="url.stream 0 =" /> 
             <tr>
             <td><vlc id="value" param1="url.id" /></td>
             <td><vlc id="value" param1="url.url" /></td>
@@ -48,8 +74,11 @@
         <vlc id="end" />
     <vlc id="end" />
     </table>
+   </div>
 
-    <h3>Stream list</h3>
+
+   <div class="sectitle">Stream list</div>
+   <div class="section">
     <table border="1" cellspacing="0" >
     <tr>
         <th>Id</th><th>URL</th><th>Mime</th><th>Protected</th><th>usage</th>
@@ -66,8 +95,10 @@
         <vlc id="end" />
     <vlc id="end" />
     </table>
+   </div>
 
-    <h3>Connections list</h3>
+   <div class="sectitle">Connections list</div>
+   <div class="section">
     <table border="1" cellspacing="0" >
     <tr>
         <th>Id</th><th>ip</th><th>URL</th><th>Status</th><th>Actions</th>
@@ -88,7 +119,7 @@
         </tr>
     <vlc id="end" />
     </table>
-
+   </div>
     <hr />
     <p> <vlc id="value" param1="copyright" /> </p>
 </body>
