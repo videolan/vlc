@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.2 2003/01/26 10:36:10 gbazin Exp $
+ * $Id: open.cpp,v 1.3 2003/01/28 14:00:49 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -49,6 +49,10 @@
 #include <vlc/intf.h>
 
 #include "wxwindows.h"
+
+#ifndef wxRB_SINGLE
+   #define wxRB_SINGLE 0
+#endif
 
 /*****************************************************************************
  * Event Table.

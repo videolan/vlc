@@ -2,7 +2,7 @@
  * mms.h: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.h,v 1.6 2002/12/06 13:05:22 sam Exp $
+ * $Id: mms.h,v 1.7 2003/01/28 14:00:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -36,7 +36,7 @@ typedef struct url_s
     char *psz_private;
 } url_t;
 
-#define FREE( p ) if( p ) free( p )
+#define FREE( p ) if( p ) { free( p );  (p ) = NULL; }
 
 
 #define MMS_PROTO_AUTO  0

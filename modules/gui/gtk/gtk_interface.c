@@ -73,7 +73,6 @@ create_intf_window (void)
   GtkWidget *menubar_about;
   GtkWidget *toolbar_handlebox;
   GtkWidget *toolbar;
-  GtkWidget *tmp_toolbar_icon;
   GtkWidget *toolbar_open;
   GtkWidget *toolbar_disc;
   GtkWidget *toolbar_network;
@@ -600,13 +599,12 @@ create_intf_window (void)
   gtk_toolbar_set_space_style (GTK_TOOLBAR (toolbar), GTK_TOOLBAR_SPACE_LINE);
   gtk_toolbar_set_button_relief (GTK_TOOLBAR (toolbar), GTK_RELIEF_NONE);
 
-  tmp_toolbar_icon = create_pixmap (intf_window, "file.xpm");
   toolbar_open = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("File"),
                                 _("Open a file"), NULL,
-                                tmp_toolbar_icon, NULL, NULL);
+                                NULL, NULL, NULL);
   gtk_widget_ref (toolbar_open);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_open", toolbar_open,
                             (GtkDestroyNotify) gtk_widget_unref);
