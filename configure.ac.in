@@ -1706,8 +1706,6 @@ dnl MP4 module
 dnl
 AC_CHECK_HEADERS(zlib.h, [
   LDFLAGS_mp4="${LDFLAGS_mp4} -lz"
-  LDFLAGS_skins="${LDFLAGS_skins} -lz"
-  LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lz"
 ] )
 
 
@@ -2440,9 +2438,11 @@ if test "x${enable_skins}" != "xno"; then
         CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins ${GTK2_CFLAGS} -DGTK2_SKINS"
         LDFLAGS_skins="${LDFLAGS_skins} -lstdc++  ${GTK2_LIBS}"
       else
+      	IMLIB2_PATH="${PATH}"
+        AC_PATH_PROG(IMLIB2_CONFIG_SKINS, imlib2-config, no, ${IMLIB2_PATH})
         PLUGINS="${PLUGINS} skins"
-        CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins -I${x_includes} -DX11_SKINS"
-        LDFLAGS_skins="${LDFLAGS_skins} -lstdc++ -L${x_libraries} -lXext -lX11"
+        CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS"
+        LDFLAGS_skins="${LDFLAGS_skins} -lstdc++ -L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`"
       fi
 
       PLUGINS="${PLUGINS} skins"
@@ -2471,8 +2471,10 @@ if test "x${enable_basic_skins}" = "xyes"; then
       CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -fno-rtti -Imodules/gui/skins ${GTK2_CFLAGS} -DGTK2_SKINS"
       LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lstdc++  ${GTK2_LIBS}"
     else
-      CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -fno-rtti -Imodules/gui/skins -I${x_includes} -DX11_SKINS"
-      LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lstdc++ -L${x_libraries} -lXext -lX11"
+      IMLIB2_PATH="${PATH}"
+      AC_PATH_PROG(IMLIB2_CONFIG_SKINS, imlib2-config, no, ${IMLIB2_PATH})
+      CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -fno-rtti -Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS"
+      LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lstdc++ -L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`"
     fi
 
   fi

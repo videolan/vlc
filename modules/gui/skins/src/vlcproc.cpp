@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.26 2003/05/29 16:48:29 asmax Exp $
+ * $Id: vlcproc.cpp,v 1.27 2003/05/29 21:40:27 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -102,7 +102,10 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_OPEN:
+            // FIXME: just for testing
+            wxMutexGuiEnter();
             OpenFile( true );
+            wxMutexGuiLeave();
             return true;
 
         case VLC_LOAD_SKIN:
@@ -134,26 +137,38 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_PLAYLIST_ADD_FILE:
+            // FIXME: just for testing
+            wxMutexGuiEnter();
             OpenFile( false );
+            wxMutexGuiLeave();
             return true;
 
 #ifndef BASIC_SKINS
         case VLC_LOG_SHOW:
+            // FIXME: just for testing
+            wxMutexGuiEnter();
             p_intf->p_sys->MessagesDlg->Show(
                 !p_intf->p_sys->MessagesDlg->IsShown() );
+            wxMutexGuiLeave();
             return true;
 
         case VLC_LOG_CLEAR:
             return true;
 
         case VLC_PREFS_SHOW:
+            // FIXME: just for testing
+            wxMutexGuiEnter();
             p_intf->p_sys->PrefsDlg->Show(
                 !p_intf->p_sys->PrefsDlg->IsShown() );
+            wxMutexGuiLeave();
             return true;
 
         case VLC_INFO_SHOW:
+            // FIXME: just for testing
+            wxMutexGuiEnter();
             p_intf->p_sys->InfoDlg->Show(
                 !p_intf->p_sys->InfoDlg->IsShown() );
+            wxMutexGuiLeave();
             return true;
 #endif
 
@@ -394,13 +409,7 @@ void VlcProc::LoadSkin()
 void VlcProc::OpenFile( bool play )
 {
 #ifndef BASIC_SKINS
-    int iRc;
-    
-    // FIXME: just for testing
-    wxMutexGuiEnter();
-    iRc = p_intf->p_sys->OpenDlg->ShowModal();
-    wxMutexGuiLeave();
-    if( iRc != wxID_OK )
+    if( p_intf->p_sys->OpenDlg->ShowModal() != wxID_OK )
     {
         return;
     }
@@ -414,7 +423,6 @@ void VlcProc::OpenFile( bool play )
 
     if( play )
     {
-    wxMutexGuiEnter();
         // Append and play
         for( size_t i = 0; i < p_intf->p_sys->OpenDlg->mrl.GetCount(); i++ )
         {
@@ -422,13 +430,10 @@ void VlcProc::OpenFile( bool play )
                 (const char *)p_intf->p_sys->OpenDlg->mrl[i].mb_str(),
                 PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
         }
-    wxMutexGuiLeave();
-
         p_intf->p_sys->p_theme->EvtBank->Get( "play" )->SendEvent();
     }
     else
     {
-    wxMutexGuiEnter();
         // Append only
         for( size_t i = 0; i < p_intf->p_sys->OpenDlg->mrl.GetCount(); i++ )
         {
@@ -436,7 +441,6 @@ void VlcProc::OpenFile( bool play )
                 (const char *)p_intf->p_sys->OpenDlg->mrl[i].mb_str(),
                 PLAYLIST_APPEND, PLAYLIST_END );
         }
-    wxMutexGuiLeave();
     }
 
     // Refresh interface !

@@ -2,7 +2,7 @@
  * x11_theme.cpp: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.cpp,v 1.6 2003/05/29 16:48:29 asmax Exp $
+ * $Id: x11_theme.cpp,v 1.7 2003/05/29 21:40:27 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -187,7 +187,6 @@ void X11Theme::AddWindow( string name, int x, int y, bool visible,
     
     motifWmHints.flags = 2;    // MWM_HINTS_DECORATIONS;
     motifWmHints.decorations = 0;
-
     XChangeProperty( display, wnd, hints_atom, hints_atom, 32, 
                      PropModeReplace, (unsigned char *)&motifWmHints, 
                      sizeof( motifWmHints ) / sizeof( long ) );
