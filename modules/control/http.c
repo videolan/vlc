@@ -2,7 +2,7 @@
  * http.c :  http remote control plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.2 2003/04/27 00:02:27 gbazin Exp $
+ * $Id: http.c,v 1.3 2003/05/06 12:57:48 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -298,6 +298,42 @@ static void uri_extract_value( char *psz_uri, char *psz_name,
     }
 }
 
+static void uri_decode_url_encoded( char *psz )
+{
+    char *dup = strdup( psz );
+    char *p = dup;
+
+    while( *p )
+    {
+        if( *p == '%' )
+        {
+            char val[3];
+            p++;
+            if( !*p )
+            {
+                break;
+            }
+
+            val[0] = *p++;
+            val[1] = *p++;
+            val[2] = '\0';
+
+            *psz++ = strtol( val, NULL, 16 );
+        }
+        else if( *p == '+' )
+        {
+            *psz++ = ' ';
+            p++;
+        }
+        else
+        {
+            *psz++ = *p++;
+        }
+    }
+    *psz++  ='\0';
+    free( dup );
+}
+
 static int httpd_page_interface_get( httpd_file_callback_args_t *p_args,
                                      uint8_t *p_request, int i_request,
                                      uint8_t **pp_data, int *pi_data )
@@ -351,6 +387,7 @@ static int httpd_page_interface_get( httpd_file_callback_args_t *p_args,
         else if( !strcmp( action, "add" ) )
         {
             uri_extract_value( p_request, "mrl", action, 512 );
+            uri_decode_url_encoded( action );
             playlist_Add( p_playlist, action,
                           PLAYLIST_APPEND, PLAYLIST_END );
             msg_Dbg( p_intf, "requested playlist add: %s", action );
