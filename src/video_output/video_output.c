@@ -1163,7 +1163,7 @@ static void DestroyThread( vout_thread_t *p_vout )
     vlc_mutex_destroy( &p_vout->change_lock );
 
     /* Release the module */
-    if( p_vout->p_module && p_vout->p_module )
+    if( p_vout && p_vout->p_module )
     {
         module_Unneed( p_vout, p_vout->p_module );
     }
