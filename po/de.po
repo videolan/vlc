@@ -451,7 +451,7 @@ msgstr ""
 
 #: src/libvlc.h:129
 msgid "Use the S/PDIF audio output when available"
-msgstr "S/PDIF-Tonausgang verwenden (falls verfügbar)."
+msgstr "S/PDIF-Tonausgang verwenden (falls verfügbar)"
 
 #: src/libvlc.h:131
 msgid ""
@@ -4171,7 +4171,7 @@ msgstr "Plug-Ins"
 
 #: modules/gui/macosx/about.m:73 modules/gui/macosx/intf.m:339
 msgid "About VLC media player"
-msgstr "Über den VLC media player"
+msgstr "Über VLC media player"
 
 #: modules/gui/macosx/controls.m:344 modules/gui/macosx/controls.m:685
 #: modules/gui/macosx/intf.m:390
@@ -4520,7 +4520,7 @@ msgstr "Datenrate (KB/s)"
 
 #: modules/gui/macosx/prefs.m:78 modules/gui/wxwindows/preferences.cpp:255
 msgid "Reset All"
-msgstr "Alles zurücksetzen"
+msgstr "Standardwerte"
 
 #: modules/gui/macosx/prefs.m:79
 msgid "Advanced"
