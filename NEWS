@@ -11,9 +11,10 @@ Core support:
  * Fix crash with deinterlace switching
  * New --play-and-stop feature which stops the playlist after each played item
  * Daemon mode
+ * Technical improvements to the subtitle/OSD subsystem
 
 Input:
- * New screen capture input plugin for X11 and Win32
+ * New screen capture input plugin for X11, Win32, BeOS and Mac OS X (Stream your desktop)
  * Improved DVD support:
     - uses libdvdnav for playing DVDs with menus support
     - uses libdvdread for simple playback with menus (eg. for streaming)
@@ -27,7 +28,7 @@ Demux:
  * Windows Media Server RTSP support
  * Support for MPEG TS streams with error correction (204/192 bytes TS packets)
  * Support for DTS audio in MPEG TS (ETSI TS 102 154 Annex G)
- * Skin2 .vlt file loader (only when skin2 is the current interface)
+ * Skins2 .vlt file loader (only when skin2 is the current interface)
 
 Codecs:
  * G.726 audio support
@@ -43,24 +44,26 @@ Stream Output:
  * H.263 RTP streaming support
  * Support for DTS audio in MPEG TS (ETSI TS 102 154 Annex G)
  * Experimental WAV muxer
+ * SDP generation outputs more compliant SDPs and can create SDP files now
 
 Audio Output:
  * New audio equalizer filter
  * Very trivial volume normalizer
 
 Interfaces:
- * Added search, volume, loop and random functions to the ncurses interface
- * Added a filesystem browser to the ncurses interface
  * OSD sliders for volume and postition information
  * OSD icons for Play and Pause
  * New Streaming Wizard for Windows and Linux default interfaces
  * A few skins2 improvements
+ * Added search, volume, loop and random functions to the ncurses interface
+ * Added a filesystem browser to the ncurses interface
  * The remote control interface can now listen for commands on sockets
  * Improved CORBA control module
 
 Mac OS X port:
  * Fixed the "cannot set buffersize:[nope]" coreaudio problem
- * The MacOSX interface is no longer required to display video
+ * Major speed improvements to the Quartz video output
+ * The Mac OS X interface is no longer required to display video
 
 Linux port:
  * New galaktos visualization plugin (MilkDrop-compatible)
@@ -69,7 +72,7 @@ Linux port:
 Windows port:
  * DirectX Media Object decoder (allows playing some media types, like WMV3)
  * Fixed long standing win32 thread handles leak
- * Fixed problem with CPU useage with subtitles rendering
+ * Fixed problem with CPU usage with subtitles rendering
  * Wallpaper mode for the DirectX video output (only in overlay mode)
 
 Mozilla plugin:

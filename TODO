@@ -16,7 +16,7 @@ Difficulty: Medium
 Platform: any
 Urgency: Wishlist
 Description: RAR/ZIP/... access
- An access module that would be able to uncompress compressed files
+An access module that would be able to uncompress compressed files.
 Status: Todo
 
 Task
@@ -29,10 +29,11 @@ Status: Todo
 
 Task
 Difficulty: Easy
-Platform: Linux, Win32
+Platform: Linux, Win32, Mac
 Urgency: Normal
 Description: Streaming wizard
- Finish the streaming wizard (85% finished)
+ Finish the streaming wizard (85% finished)<br />
+The mac version is at 0%
 Status: Assigned to zorglub
 
 Task
@@ -57,7 +58,7 @@ Difficulty: Hard
 Urgency: Normal
 Platform: any
 Description: Dual window in embed mode
-Windows ttaskbar reports two windows in the video embed mode.
+Windows taskbar reports two windows in the video embed mode.
 Status: Assigned to gibalou
 
 Task
@@ -70,17 +71,9 @@ Status: Todo
 
 Task
 Difficulty: Guru
-Platform: any
-Urgency: Normal
-Description: Demux2 transition
- Complete the transition to demux2. Bughunting and finishing chapter support (80% done)
-Status: Assigned to fenrir
-
-Task
-Difficulty: Guru
 Urgency: Normal
 Platform: any
-Description: Multi-acccess
+Description: External audio file playin
  Allow several access from an input thread to allow for multi-input (30% done)
 Status: Assigned to fenrir
 
@@ -91,14 +84,6 @@ Platform: any
 Description: make everything UTF-8 based
  Convert everything that deals with strings to a UTF-8 based system. Not very difficult, but needs a lot of checking, testing and allows for easy breakage.
 Status: Todo
-
-Task
-Difficulty: Medium
-Urgency: Wishlist
-Platform: any
-Description: OSD Icons
- Make OSD Icons for Play/Pause/Stop. Integrate them better into the core system.
-Status: Assigned to yoann
 
 Task
 Difficulty: Medium
@@ -131,7 +116,15 @@ Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: GSM decoder
-GSM decoder not based on standard reference sources.
+The <a href="http://kbs.cs.tu-berlin.de/~jutta/toast.html">Toast</a> implementation.
+Status: Todo
+
+Task
+Difficulty: Easy
+Urgency: Wishlist
+Platform: any
+Description: AMR decoder
+We will need to find one that isn't based on the reference code.
 Status: Todo
 
 Task
@@ -153,8 +146,8 @@ Status: Todo
 Task
 Difficulty: Easy
 Urgency: Normal
-Platform: any
-Description: LPCM on mac
+Platform: Mac OS X
+Description: LPCM
 The LPCM decoder outputs really small samples which aren't accepted properly by the macosx coreaudio resampler, causing VLC to not output any sound with many DVD's. A test sample that shows this effect on the mac is the Madonna clip.
 Status: Todo
 
@@ -170,8 +163,8 @@ Task
 Difficulty: Easy
 Urgency: Wishlist
 Platform: any
-Description: flash video muxer
-A flash video muxer. FFMPEG can already output flash video. a wast not to make use of that capability.
+Description: flash video playing/streaming
+A flash video muxer and demuxer. FFMPEG can already output flash video. a wast not to make use of that capability.
 Status: Todo
 
 Task
@@ -207,7 +200,7 @@ Platform: Mac OS X
 Description: New OS X preferences
  New preferences for Mac OS X. Current not suited for Mac Users and several
 Pref. elements are broken (hotkeys and int with string desc.).
-Status: Assigned to thedj
+Status: Todo
 
 Task
 Difficulty: Hard
@@ -219,7 +212,6 @@ Still no info over S/PDIF output available.
 Outstanding issues:<br />
  - G5 S/PDIF not working<br />
  - G5 PCM not working because S/PDIF is selected by default, even if not connected.<br />
- - Coreaudio resampler doesn't handle input from lpcm decoder (the samples are too small).
 Status: Todo
 
 Task
@@ -249,7 +241,6 @@ Description: Rework spu decoder
  The spu decoder needs some serious work
   - Split/merge for dvd menu highlighting
   - Downscaling for divx/mkv etc
-  - Chroma independence (YUVA ???)
   - .sub/.idx support
 Status: todo
 
@@ -288,8 +279,6 @@ Difficulty: Medium
 Urgency: Wishlist
 Platform: any
 Description: SPU redesign
-- multiple subpicture channels
-- centralized rendering and use of chroma filters
 - centralized scaling support
 (also look at ogt/cvd sub work)
 Status: Todo
@@ -298,27 +287,16 @@ Task
 Difficulty: Guru
 Urgency: Wishlist
 Platform: Mac OS X
-Description: intf / vout dependency
-The application specific parts of the intf need to be brougth to the VLC application core. A valid NSApplication needs to be created on VLC opening, with the dock and menu hidden/disabled, only being generated on VLC intf loading.
-(70% done) need to fix the interfaces again.<br />
-This is mostly implemented, but some mem leaks are now bothering the macosx part. this should be fixed.
-Status: Assigned to DJ
-
-Task
-Difficulty: Guru
-Urgency: Wishlist
-Platform: Mac OS X
 Description: skins2
-Port VLC skins to Objective C++ and OSX. Also requires the intf to be a dialog handler. Is slighly dependant on intf/vout dependency todoitem
+Port VLC skins to Objective C++ and OSX. Also requires the intf to be a dialog handler.
 Status: Todo
 
 Task
-Difficulty: Hard
+Difficulty: Easy
 Urgency: Wishlist
-Platform: any
+Platform: Mac OS X
 Description: Equalizer Graphic control
 Now that VLC has an equalizer, we need a way to control it easily from the GUI.
-( Done in WX )
 Status: Todo
 
 Task
@@ -329,7 +307,7 @@ Description: informing user.
 Implement a system to: <br />
  - Alert the user of critical errors (cannot play file). Should be blocking. <br />
  - Ask the user a question (Are you sure? or Try to Fix index of avi? or Overwrite File?)<br />
- - Inform the user, without disturbing him. (Buffering stream). This might require a time bases or something perhaps. Because how do we know how long this information should be displayed? Also think of buffering 0-100%<br /> 
+ - Inform the user, without disturbing him. (Buffering stream). This might require a displaytime or something. Because how do we know how long this information should be displayed? Also think of buffering 0-100%<br /> 
 Status: Todo
 
 Task
@@ -337,7 +315,7 @@ Difficulty: Hard
 Urgency: Wishlist
 Platform: any
 Description: Full H323 Videoconferencing
-VLC isn't really suited for this yet, because it introduces quite large latencies. This should fixed before the H323 can ever come close to working in VLC.
+VLC isn't really suited for this yet, because it introduces quite large latencies. This should be fixed before the H323 can ever come close to working in VLC.
 Status: Todo
 
 Task
@@ -393,12 +371,12 @@ Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: export paramaters of an input
- Export the Media Info of a file/source to a standard xml file for use by other applications. Possibly combine with file "probe'ing".
- - AR
- - size
- - bitrate
- - resolution
- - codecs, etc.
+ Export the Media Info of a file/source to a standard xml file for use by other applications. Possibly combine with file "probe'ing".<br />
+ - AR<br />
+ - size<br />
+ - bitrate<br />
+ - resolution<br />
+ - codecs, etc.<br />
 Status: Todo
 
 Task
@@ -406,7 +384,8 @@ Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: SSL http
-SSL encrypted HTTP communication. To support protected VoD.
+SSL encrypted HTTP communication. To support protected VoD.<br />
+The question is how to neatly integrate it into our API. Support for all our http handling plugins means complicating the API. Perhaps we should store the SSL context in the p_sys of the vlc_object that is calling it? Tad dangerous, but would keep stuff simple.
 Status: Todo
 
 Task
@@ -427,10 +406,11 @@ Allows for Progressive download to TEMP folder from browsers. VLC would play the
 Status: Todo
 
 Task
-Difficulty: Hard
+Difficulty: Medium
 Urgency: Wishlist
 Platform: any
 Description: rendezvous announces
+Apple released the rendezvous code under a Open Source license now. perhaps it can be used. (It's OpenTalk now btw).<br />
 DMAP protocol announce for videos.
 Status: Todo
 
@@ -480,11 +460,11 @@ Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: Make vlm more user friendly (setup etc)
-vlm is kinda a pain to setup if you are not entirely experiences with A/V and streaming or VLC for that matter. It can be heavily improved by updating the vlm http interface.
+vlm is kinda a pain to setup if you are not entirely experienced with A/V and streaming or VLC for that matter. It can be heavily improved by updating the vlm http interface. Using seperate fields for the need paramters of a schedule/source.
 Status: Todo
 
 Task
-Difficulty: Medium
+Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: Protocol rollover
@@ -500,6 +480,7 @@ Platform: any
 Description: NAT issues
 Find a way to deal with clients behind a NAT. Multicast and RTSP work 'poorly' in these setups. NATP2P, STUN, UDP hole punching, other techniques ????
 Protocol rollover can be a solution for a lot of these issues.
+Use full DNS names in SDP
 Status: Todo
 
 Task
