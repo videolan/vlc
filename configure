@@ -8153,8 +8153,8 @@ fi
 
 if test "x${enable_svgalib}" = "xyes"
 then
-  PLUGINS="${PLUGINS} video_output/svgalib"
-  svgalib_LDFLAGS="${svgalib_LDFLAGS} -lvga -lvgagl"
+  BUILTINS="${BUILTINS} video_output/svgalib"
+  svgalib_LDFLAGS="${svgalib_LDFLAGS} -lvgagl -lvga"
 fi
 
 # Check whether --enable-ggi or --disable-ggi was given.

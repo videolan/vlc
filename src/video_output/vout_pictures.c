@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.28 2002/07/23 00:39:17 sam Exp $
+ * $Id: vout_pictures.c,v 1.29 2002/08/21 15:10:33 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -497,6 +497,14 @@ void vout_AllocatePicture( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->p->i_pitch = i_width * 2;
             p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
             p_pic->p->i_pixel_pitch = 4;
+            p_pic->i_planes = 1;
+            break;
+
+        case FOURCC_RGB2:
+            p_pic->p->i_lines = i_height;
+            p_pic->p->i_pitch = i_width;
+            p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
+            p_pic->p->i_pixel_pitch = 1;
             p_pic->i_planes = 1;
             break;
 

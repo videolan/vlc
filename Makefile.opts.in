@@ -82,6 +82,7 @@ ts_dvbpsi_CFLAGS = @ts_dvbpsi_CFLAGS@
 qt_CFLAGS = @qt_CFLAGS@
 qte_CFLAGS = @qte_CFLAGS@
 sdl_CFLAGS = @sdl_CFLAGS@
+svgalib_CFLAGS = @svgalib_CFLAGS@
 x11_CFLAGS = @x11_CFLAGS@
 xvideo_CFLAGS = @xvideo_CFLAGS@
 
@@ -135,6 +136,7 @@ qt_LDFLAGS = @qt_LDFLAGS@
 qte_LDFLAGS = @qte_LDFLAGS@
 rc_LDFLAGS = @rc_LDFLAGS@
 sdl_LDFLAGS = @sdl_LDFLAGS@
+svgalib_LDFLAGS = @svgalib_LDFLAGS@
 audio_LDFLAGS = @audio_LDFLAGS@
 ts_dvbpsi_LDFLAGS = @ts_dvbpsi_LDFLAGS@
 vcd_LDFLAGS = @vcd_LDFLAGS@
