@@ -1784,19 +1784,29 @@ AC_ARG_ENABLE(opie,
      [    --with-qte=PATH    Qt Embedded headers and libraries])
      if test "x${with_qte}" = "x"
      then
-       test_LDFLAGS="-L$(QTDIR)/lib"
-       test_CFLAGS="-I${QTDIR}/include"
+       test_LDFLAGS="-L$(QTDIR)/lib -lqte"
+       test_CFLAGS="-I${QTDIR}/include -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
      else
        test_LDFLAGS="-L${with_qte}/lib"
        test_CFLAGS="-I${with_qte}/include"
      fi
 
-     PLUGINS="${PLUGINS} gui/opie/opie"
-     opie_LDFLAGS="${opie_LDFLAGS} ${test_LDFLAGS} -lqte"
-     opie_CFLAGS="${opie_CFLAGS} ${test_CFLAGS}"
-     if test -x ${QTEDIR}/bin/moc
+     CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
+     AC_CHECK_HEADERS(qt.h, [
+       opie_CFLAGS="${opie_CFLAGS} ${test_CFLAGS}"
+       opie_LDFLAGS="${opie_LDFLAGS} -lqpe ${test_LDFLAGS}"
+       if test "x${with_qte}" = "x"
+       then
+         PLUGINS="${PLUGINS} gui/opie/opie"
+       else
+         BUILTINS="${BUILTINS} gui/opie/opie"
+       fi
+     ])
+     CPPFLAGS="${save_CPPFLAGS}"
+
+     if test -x ${QTDIR}/bin/moc
      then
-       MOC=${QTEDIR}/bin/moc
+       MOC=${QTDIR}/bin/moc
      else
        MOC=moc
      fi
