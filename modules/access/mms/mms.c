@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.22 2003/03/03 14:21:08 gbazin Exp $
+ * $Id: mms.c,v 1.23 2003/03/11 18:14:27 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1649,9 +1649,9 @@ static int  mms_ParsePacket( input_thread_t *p_input,
 
     if( i_packet_length > i_data || i_packet_length <= 8)
     {
-        msg_Warn( p_input,
-                  "truncated packet (missing %d bytes)",
-                  i_packet_length - i_data  );
+        msg_Dbg( p_input,
+                 "truncated packet (missing %d bytes)",
+                 i_packet_length - i_data  );
         *pi_used = 0;
         return( -1 );
     }
