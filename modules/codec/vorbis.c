@@ -123,6 +123,19 @@ static block_t *Encode   ( encoder_t *, aout_buffer_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define ENC_QUALITY_TEXT N_("Encoding quality")
+#define ENC_QUALITY_LONGTEXT N_( \
+  "Allows you to specify a quality between 1 (low) and 10 (high), instead " \
+  "of specifying a particular bitrate. This will produce a VBR stream." )
+#define ENC_MAXBR_TEXT N_("Maximum encoding bitrate")
+#define ENC_MAXBR_LONGTEXT N_( \
+  "Allows you to specify a maximum bitrate in kbps. " \
+  "Useful for streaming applications." )
+#define ENC_MINBR_TEXT N_("Minimum encoding bitrate")
+#define ENC_MINBR_LONGTEXT N_( \
+  "Allows you to specify a minimum bitrate in kbps. " \
+  "Useful for encoding for a fixed-size channel." )
+
 vlc_module_begin();
 
     set_description( _("Vorbis audio decoder") );
@@ -139,13 +152,25 @@ vlc_module_begin();
     set_callbacks( OpenPacketizer, CloseDecoder );
 
 #ifndef MODULE_NAME_IS_tremor
+#   define ENC_CFG_PREFIX "sout-vorbis-"
     add_submodule();
     set_description( _("Vorbis audio encoder") );
     set_capability( "encoder", 100 );
     set_callbacks( OpenEncoder, CloseEncoder );
+
+    add_integer( ENC_CFG_PREFIX "quality", 0, NULL, ENC_QUALITY_TEXT,
+                 ENC_QUALITY_LONGTEXT, VLC_FALSE );
+    add_integer( ENC_CFG_PREFIX "max-bitrate", 0, NULL, ENC_MAXBR_TEXT,
+                 ENC_MAXBR_LONGTEXT, VLC_FALSE );
+    add_integer( ENC_CFG_PREFIX "min-bitrate", 0, NULL, ENC_MINBR_TEXT,
+                 ENC_MINBR_LONGTEXT, VLC_FALSE );
 #endif
 
 vlc_module_end();
+
+static const char *ppsz_enc_options[] = {
+    "quality", "max-bitrate", "min-bitrate", NULL
+};
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -558,6 +583,8 @@ static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
+    int i_quality, i_min_bitrate, i_max_bitrate;
+    vlc_value_t val;
 
     if( p_enc->fmt_out.i_codec != VLC_FOURCC('v','o','r','b') &&
         !p_enc->b_force )
@@ -578,17 +605,66 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->fmt_in.i_codec = VLC_FOURCC('f','l','3','2');
     p_enc->fmt_out.i_codec = VLC_FOURCC('v','o','r','b');
 
+    sout_ParseCfg( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
+
+    var_Get( p_enc, ENC_CFG_PREFIX "quality", &val );
+    i_quality = val.i_int;
+    var_Get( p_enc, ENC_CFG_PREFIX "max-bitrate", &val );
+    i_max_bitrate = val.i_int;
+    var_Get( p_enc, ENC_CFG_PREFIX "min-bitrate", &val );
+    i_min_bitrate = val.i_int;
+
     /* Initialize vorbis encoder */
     vorbis_info_init( &p_sys->vi );
 
-    if( vorbis_encode_setup_managed( &p_sys->vi,
-            p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.audio.i_rate,
-            -1, p_enc->fmt_out.i_bitrate, -1 ) ||
-        vorbis_encode_ctl( &p_sys->vi, OV_ECTL_RATEMANAGE_AVG, NULL ) ||
-        vorbis_encode_setup_init( &p_sys->vi ) )
+    if( i_quality > 0 )
     {
-        ;
+        /* VBR mode */
+        if( vorbis_encode_setup_vbr( &p_sys->vi,
+              p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.audio.i_rate,
+              i_quality ) )
+        {
+            vorbis_info_clear( &p_sys->vi );
+            free( p_enc->p_sys );
+            msg_Err( p_enc, "VBR mode initialisation failed" );
+            return VLC_EGENERIC;
+        }
+
+        /* Do we have optional hard quality restrictions? */
+        if( i_max_bitrate > 0 || i_min_bitrate > 0 )
+        {
+            struct ovectl_ratemanage_arg ai;
+            vorbis_encode_ctl( &p_sys->vi, OV_ECTL_RATEMANAGE_GET, &ai );
+
+            ai.bitrate_hard_min = i_min_bitrate;
+            ai.bitrate_hard_max = i_max_bitrate;
+            ai.management_active = 1;
+
+            vorbis_encode_ctl( &p_sys->vi, OV_ECTL_RATEMANAGE_SET, &ai );
+
+        }
+        else
+        {
+            /* Turn off management entirely */
+            vorbis_encode_ctl( &p_sys->vi, OV_ECTL_RATEMANAGE_SET, NULL );
+        }
     }
+    else
+    {
+        if( vorbis_encode_setup_managed( &p_sys->vi,
+              p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.audio.i_rate,
+              i_min_bitrate > 0 ? i_min_bitrate * 1000: -1,
+              p_enc->fmt_out.i_bitrate,
+              i_max_bitrate > 0 ? i_max_bitrate * 1000: -1 ) )
+          {
+              vorbis_info_clear( &p_sys->vi );
+              msg_Err( p_enc, "CBR mode initialisation failed" );
+              free( p_enc->p_sys );
+              return VLC_EGENERIC;
+          }
+    }
+
+    vorbis_encode_setup_init( &p_sys->vi );
 
     /* add a comment */
     vorbis_comment_init( &p_sys->vc);
