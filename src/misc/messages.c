@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.7 2002/08/08 00:35:11 sam Exp $
+ * $Id: messages.c,v 1.8 2002/08/10 19:23:06 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -257,6 +257,9 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
 #ifdef WIN32
     char *              psz_temp;
 #endif
+#ifndef HAVE_VASPRINTF
+    int                 i_size = strlen(psz_format) + INTF_MAX_MSG_SIZE;
+#endif
 
     /*
      * Convert message to string
@@ -264,7 +267,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
 #ifdef HAVE_VASPRINTF
     vasprintf( &psz_str, psz_format, args );
 #else
-    psz_str = (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
+    psz_str = (char*) malloc( i_size * sizeof(char) );
 #endif
 
     if( psz_str == NULL )
@@ -284,11 +287,12 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
         fprintf( stderr, "main warning: couldn't print message\n" );
         return;
     }
-    vsprintf( psz_str, psz_temp, args );
+    vsnprintf( psz_str, i_size, psz_temp, args );
     free( psz_temp );
 #   else
-    vsprintf( psz_str, psz_format, args );
+    vsnprintf( psz_str, i_size, psz_format, args );
 #   endif
+    psz_str[ i_size - 1 ] = 0; /* Just in case */
 #endif
 
     /* Put message in queue */
