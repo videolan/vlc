@@ -3,6 +3,18 @@ Microsoft eMbedded Visual Tools Workspace File, Format Version 3.00
 
 ###############################################################################
 
+Project: "libmad"="..\..\mad-0.14.2b\evc++\libmad\libmad.vcp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "libvlc"=.\libvlc.vcp - Package Owner=<4>
 
 Package=<5>
@@ -227,6 +239,21 @@ Package=<5>
 
 Package=<4>
 {{{
+}}}
+
+###############################################################################
+
+Project: "plugin_mad"=.\plugin_mad.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name libmad
+    End Project Dependency
 }}}
 
 ###############################################################################

@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.24 2002/11/20 19:07:27 sam Exp $
+ * $Id: messages.c,v 1.25 2002/11/25 12:08:58 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -80,7 +80,7 @@ void __msg_Create( vlc_object_t *p_this )
     p_this->p_libvlc->msg_bank.logfile =
         CreateFile( L"vlc-log.txt", GENERIC_WRITE,
                     FILE_SHARE_READ|FILE_SHARE_WRITE, NULL,
-                    OPEN_ALWAYS, 0, NULL );
+                    CREATE_ALWAYS, 0, NULL );
     SetFilePointer( p_this->p_libvlc->msg_bank.logfile, 0, NULL, FILE_END );
 #endif
 }
