@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.3 2002/10/20 12:23:48 massiot Exp $
+ * $Id: common.c,v 1.4 2002/10/21 20:00:10 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -58,6 +58,7 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
     p_aout->i_nb_inputs = 0;
     p_aout->mixer.f_multiplier = 1.0;
     p_aout->mixer.b_error = 1;
+    p_aout->output.b_starving = 1;
 
     vlc_object_attach( p_aout, p_parent->p_vlc );
 

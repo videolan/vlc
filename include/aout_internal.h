@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.23 2002/10/20 12:23:47 massiot Exp $
+ * $Id: aout_internal.h,v 1.24 2002/10/21 20:00:09 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -165,6 +165,9 @@ struct aout_input_t
 typedef struct aout_output_t
 {
     audio_sample_format_t   output;
+    /* Indicates whether the audio output is currently starving, to avoid
+     * printing a 1,000 "output is starving" messages. */
+    vlc_bool_t              b_starving;
 
     /* post-filters */
     aout_filter_t *         pp_filters[AOUT_MAX_FILTERS];

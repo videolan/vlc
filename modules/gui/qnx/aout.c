@@ -70,6 +70,7 @@ int E_(OpenAudio)( vlc_object_t *p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     int i_ret;
     int i_bytes_per_sample;
+    int i_nb_channels;
     snd_pcm_channel_info_t pi;
     snd_pcm_channel_params_t pp;
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
@@ -117,6 +118,8 @@ int E_(OpenAudio)( vlc_object_t *p_this )
     {
         msg_Err( p_aout, "unable to get plugin info (%s)",
                          snd_strerror( i_ret ) );
+        E_(CloseAudio)( p_this );
+        free( p_aout->output.p_sys );
         return -1;
     }
 
@@ -130,23 +133,20 @@ int E_(OpenAudio)( vlc_object_t *p_this )
 
     pp.format.interleave     = 1;
     pp.format.rate           = p_aout->output.output.i_rate;
-    pp.format.voices         = p_aout->output.output.i_channels;
+
+    i_nb_channels = aout_FormatNbChannels( &p_aout->output.output );
+    if ( i_nb_channels > 2 )
+    {
+        /* I don't know if QNX supports more than two channels. */
+        i_nb_channels = 2;
+        p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
+    }
+    pp.format.voices         = i_nb_channels;
 
     p_aout->output.output.i_format = AOUT_FMT_S16_NE;
     p_aout->output.i_nb_samples = DEFAULT_FRAME_SIZE;
-
-    switch( p_aout->output.output.i_format )
-    {
-        case AOUT_FMT_S16_LE:
-            pp.format.format = SND_PCM_SFMT_S16_LE;
-            i_bytes_per_sample = 2;
-            break;
-
-        default:
-            pp.format.format = SND_PCM_SFMT_S16_BE;
-            i_bytes_per_sample = 2;
-            break;
-    }
+    pp.format.format = SND_PCM_SFMT_S16;
+    i_bytes_per_sample = 2;
 
     pp.buf.block.frag_size = p_aout->output.i_nb_samples *
                             p_aout->output.output.i_channels *
@@ -157,6 +157,8 @@ int E_(OpenAudio)( vlc_object_t *p_this )
                                          &pp ) ) < 0 )
     {
         msg_Err( p_aout, "unable to set parameters (%s)", snd_strerror(i_ret) );
+        E_(CloseAudio)( p_this );
+        free( p_aout->output.p_sys );
         return -1;
     }
 
@@ -166,6 +168,8 @@ int E_(OpenAudio)( vlc_object_t *p_this )
     {
         msg_Err( p_aout, "unable to prepare channel (%s)",
                          snd_strerror( i_ret ) );
+        E_(CloseAudio)( p_this );
+        free( p_aout->output.p_sys );
         return -1;
     }
 

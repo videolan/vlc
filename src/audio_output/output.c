@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.18 2002/10/20 12:23:48 massiot Exp $
+ * $Id: output.c,v 1.19 2002/10/21 20:00:10 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -196,8 +196,10 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         /* Set date to 0, to allow the mixer to send a new buffer ASAP */
         aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
         vlc_mutex_unlock( &p_aout->output_fifo_lock );
-        msg_Dbg( p_aout,
+        if ( !p_aout->output.b_starving )
+            msg_Dbg( p_aout,
                  "audio output is starving (no input), playing silence" );
+        p_aout->output.b_starving = 1;
         return NULL;
     }
 
@@ -207,10 +209,14 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
                          + (p_buffer->end_date - p_buffer->start_date) )
     {
         vlc_mutex_unlock( &p_aout->output_fifo_lock );
-        msg_Dbg( p_aout, "audio output is starving (%lld), playing silence",
+        if ( !p_aout->output.b_starving )
+            msg_Dbg( p_aout, "audio output is starving (%lld), playing silence",
                  p_buffer->start_date - start_date );
+        p_aout->output.b_starving = 1;
         return NULL;
     }
+
+    p_aout->output.b_starving = 0;
 
     if ( !b_can_sleek &&
           ( (p_buffer->start_date - start_date > AOUT_PTS_TOLERANCE)
