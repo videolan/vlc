@@ -2,7 +2,7 @@
  * net.c:
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: net.c,v 1.10 2004/03/03 20:39:53 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -194,7 +194,7 @@ int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data,
                 vlc_bool_t b_retry )
 {
     struct timeval  timeout;
-    fd_set          fds;
+    fd_set          fds_r, fds_e;
     int             i_recv;
     int             i_total = 0;
     int             i_ret;
@@ -210,14 +210,17 @@ int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data,
             }
 
             /* Initialize file descriptor set */
-            FD_ZERO( &fds );
-            FD_SET( fd, &fds );
+            FD_ZERO( &fds_r );
+            FD_SET( fd, &fds_r );
+            FD_ZERO( &fds_e );
+            FD_SET( fd, &fds_e );
 
             /* We'll wait 0.5 second if nothing happens */
             timeout.tv_sec = 0;
             timeout.tv_usec = 500000;
-        } while( ( i_ret = select( fd + 1, &fds, NULL, NULL, &timeout )) == 0 ||
-                 ( i_ret < 0 && errno == EINTR ) );
+
+        } while( (i_ret = select(fd + 1, &fds_r, NULL, &fds_e, &timeout)) == 0
+                 || ( i_ret < 0 && errno == EINTR ) );
 
         if( i_ret < 0 )
         {
@@ -239,9 +242,16 @@ int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data,
                 i_recv = i_data;
             }
             else
-#endif
+                msg_Err( p_this, "recv failed (%i)", WSAGetLastError() );
+#else
             msg_Err( p_this, "recv failed (%s)", strerror(errno) );
+#endif
             return i_total > 0 ? i_total : -1;
+        }
+        else if( i_recv == 0 )
+        {
+            /* Connection closed */
+            b_retry = VLC_FALSE;
         }
 
         p_data += i_recv;
@@ -259,7 +269,7 @@ int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data,
 int __net_Write( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data )
 {
     struct timeval  timeout;
-    fd_set          fds;
+    fd_set          fds_w, fds_e;
     int             i_send;
     int             i_total = 0;
     int             i_ret;
@@ -276,14 +286,17 @@ int __net_Write( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data )
             }
 
             /* Initialize file descriptor set */
-            FD_ZERO( &fds );
-            FD_SET( fd, &fds );
+            FD_ZERO( &fds_w );
+            FD_SET( fd, &fds_w );
+            FD_ZERO( &fds_e );
+            FD_SET( fd, &fds_e );
 
             /* We'll wait 0.5 second if nothing happens */
             timeout.tv_sec = 0;
             timeout.tv_usec = 500000;
-        } while( ( i_ret = select( fd + 1, NULL, &fds, NULL, &timeout )) == 0 ||
-                 ( i_ret < 0 && errno == EINTR ) );
+
+        } while( (i_ret = select(fd + 1, NULL, &fds_w, &fds_e, &timeout)) == 0
+                 || ( i_ret < 0 && errno == EINTR ) );
 
         if( i_ret < 0 )
         {
