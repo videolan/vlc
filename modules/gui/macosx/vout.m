@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.81 2004/02/12 17:35:05 titer Exp $
+ * $Id: vout.m,v 1.82 2004/02/25 19:27:23 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -571,7 +571,15 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
 {
     if( p_vout->p_sys->i_opengl )
     {
-        /* TODO */
+        p_vout->b_fullscreen = !p_vout->b_fullscreen;
+        if( p_vout->b_fullscreen )
+        {
+            [p_vout->p_sys->o_glview goFullScreen];
+        }
+        else
+        {
+            [p_vout->p_sys->o_glview exitFullScreen];
+        }
         return 0;
     }
     
@@ -1299,14 +1307,15 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( !fmt )
     {
-        fprintf( stderr, "Cannot create NSOpenGLPixelFormat\n" );
+        msg_Warn( p_vout, "Cannot create NSOpenGLPixelFormat" );
         return nil;
     }
 
     self = [super initWithFrame:frame pixelFormat: fmt];
 
-    [[self openGLContext] makeCurrentContext];
-    [[self openGLContext] update];
+    currentContext = [self openGLContext];
+    [currentContext makeCurrentContext];
+    [currentContext update];
 
     /* Black background */
     glClearColor( 0.0, 0.0, 0.0, 0.0 );
@@ -1357,7 +1366,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void) reshape
 {
-    [[self openGLContext] makeCurrentContext];
+    [currentContext makeCurrentContext];
 
     NSRect bounds = [self bounds];
 
@@ -1365,7 +1374,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
                 (GLint) bounds.size.height );
 
     /* Quad size is set in order to preserve the aspect ratio */
-    if( bounds.size.height * p_vout->output.i_aspect <
+    if( bounds.size.height * p_vout->render.i_aspect <
         bounds.size.width * VOUT_ASPECT_FACTOR )
     {
         f_x = bounds.size.height * p_vout->render.i_aspect /
@@ -1382,7 +1391,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void) initTextures
 {
-    [[self openGLContext] makeCurrentContext];
+    [currentContext makeCurrentContext];
 
     /* Create textures */
     glGenTextures( 1, &i_texture );
@@ -1424,7 +1433,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void) reloadTexture
 {
-    [[self openGLContext] makeCurrentContext];
+    [currentContext makeCurrentContext];
 
     glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
 
@@ -1435,6 +1444,78 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_vout->output.i_width, p_vout->output.i_height,
             GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
             PP_OUTPUTPICTURE[0]->p_data );
+}
+
+- (void) goFullScreen
+{
+    NSOpenGLPixelFormatAttribute attribs[] =
+    {
+        NSOpenGLPFAAccelerated,
+        NSOpenGLPFANoRecovery,
+        NSOpenGLPFADoubleBuffer,
+        NSOpenGLPFAColorSize, 24,
+        NSOpenGLPFAAlphaSize, 8,
+        NSOpenGLPFADepthSize, 24,
+        NSOpenGLPFAFullScreen,
+        NSOpenGLPFAScreenMask,
+        CGDisplayIDToOpenGLDisplayMask( kCGDirectMainDisplay ),
+        0
+    };
+
+    NSOpenGLPixelFormat * fmt = [[NSOpenGLPixelFormat alloc]
+        initWithAttributes: attribs];
+
+    if( !fmt )
+    {
+        msg_Warn( p_vout, "Cannot create NSOpenGLPixelFormat" );
+        return;
+    }
+
+    fullScreenContext = [[NSOpenGLContext alloc]
+        initWithFormat: fmt shareContext: [self openGLContext]];
+
+    if( !fullScreenContext )
+    {
+        msg_Warn( p_vout, "Failed to create new NSOpenGLContext" );
+        return;
+    }
+
+    currentContext = fullScreenContext;
+
+    if( CGCaptureAllDisplays() != CGDisplayNoErr )
+    {
+        msg_Warn( p_vout, "CGCaptureAllDisplays() failed" );
+        return;
+    }
+
+    [fullScreenContext setFullScreen];
+    [fullScreenContext makeCurrentContext];
+    unsigned width  = CGDisplayPixelsWide( kCGDirectMainDisplay );
+    unsigned height = CGDisplayPixelsHigh( kCGDirectMainDisplay );
+    if( height * p_vout->output.i_aspect < width * VOUT_ASPECT_FACTOR )
+    {
+        f_x = (float) height * p_vout->output.i_aspect /
+            width / VOUT_ASPECT_FACTOR;
+        f_y = 1.0;
+    }
+    else
+    {
+        f_x = 1.0;
+        f_y = (float) width * VOUT_ASPECT_FACTOR /
+            p_vout->output.i_aspect / height;
+    }
+    glViewport( 0, 0, width, height );
+    [self initTextures];
+}
+
+- (void) exitFullScreen
+{
+    [NSOpenGLContext clearCurrentContext];
+    [fullScreenContext clearDrawable];
+    [fullScreenContext release];
+    CGReleaseAllDisplays();
+    currentContext = [self openGLContext];
+    [self reshape];
 }
 
 - (void) drawQuad
@@ -1529,7 +1610,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void) drawRect: (NSRect) rect
 {
-    [[self openGLContext] makeCurrentContext];
+    [currentContext makeCurrentContext];
 
     /* Swap buffers only during the vertical retrace of the monitor.
        http://developer.apple.com/documentation/GraphicsImaging/
@@ -1543,7 +1624,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( !b_init_done )
     {
-        [[self openGLContext] flushBuffer];
+        [currentContext flushBuffer];
         return;
     }
 
@@ -1561,7 +1642,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* Wait for the job to be done */
-    [[self openGLContext] flushBuffer];
+    [currentContext flushBuffer];
 }
 
 @end
@@ -1609,13 +1690,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         }
     } 
 
-    if( p_vout->p_sys->i_opengl )
-    {
-        /* XXX Fix fullscreen mode */
-        p_vout->b_fullscreen = 0;
-    }
-
-    if( p_vout->b_fullscreen )
+    if( p_vout->b_fullscreen && !p_vout->p_sys->i_opengl )
     {
         NSRect screen_rect = [o_screen frame];
         screen_rect.origin.x = screen_rect.origin.y = 0;
