@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.14 2003/02/24 12:34:29 fenrir Exp $
+ * $Id: stream_output.c,v 1.15 2003/02/24 23:28:18 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -727,7 +727,7 @@ void sout_BufferChain( sout_buffer_t **pp_chain,
     {
         *pp_chain = p_buffer;
     }
-    else
+    else if( p_buffer != NULL )
     {
         sout_buffer_t *p = *pp_chain;
 
