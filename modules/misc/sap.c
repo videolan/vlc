@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.35 2003/11/12 20:01:01 gbazin Exp $
+ * $Id: sap.c,v 1.36 2003/11/20 23:13:28 sigmunau Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -65,6 +65,10 @@
 #endif
 
 #include "network.h"
+
+#ifdef HAVE_ZLIB_H
+#   include <zlib.h>
+#endif
 
 #define MAX_LINE_LENGTH 256
 
@@ -136,6 +140,7 @@ struct  sess_descr_t
     int  i_version;
     char *psz_sessionname;
     char *psz_connection;
+    char *psz_sdp;
 
     int           i_media;
     media_descr_t **pp_media;
@@ -164,6 +169,47 @@ struct intf_sys_t
     /* playlist group */
     int i_group;
 };
+
+#ifdef HAVE_ZLIB_H
+int do_decompress(unsigned char *src, unsigned char **_dst, int slen) {
+  int result, dstsize, n;
+  unsigned char *dst;
+  z_stream d_stream;
+
+  d_stream.zalloc = (alloc_func)0;
+  d_stream.zfree = (free_func)0;
+  d_stream.opaque = (voidpf)0;
+  result = inflateInit(&d_stream);
+  if (result != Z_OK) {
+    printf("inflateInit() failed. Result: %d\n", result);
+    return(-1);
+  }
+
+  d_stream.next_in = (Bytef *)src;
+  d_stream.avail_in = slen;
+  n = 0;
+  dst = NULL;
+  do {
+    n++;
+    dst = (unsigned char *)realloc(dst, n * 1000);
+    d_stream.next_out = (Bytef *)&dst[(n - 1) * 1000];
+    d_stream.avail_out = 1000;
+    result = inflate(&d_stream, Z_NO_FLUSH);
+    if ((result != Z_OK) && (result != Z_STREAM_END)) {
+      printf("Zlib decompression failed. Result: %d\n", result);
+      return(-1);
+    }
+  } while ((d_stream.avail_out == 0) && (d_stream.avail_in != 0) &&
+           (result != Z_STREAM_END));
+
+  dstsize = d_stream.total_out;
+  inflateEnd(&d_stream);
+
+  *_dst = (unsigned char *)realloc(dst, dstsize);
+
+  return dstsize;
+}
+#endif
 
 /*****************************************************************************
  * Open: initialize and create stuff
@@ -290,19 +336,29 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************
  * Listens to SAP packets, and sends them to packet_handle
  *****************************************************************************/
-#define MAX_SAP_BUFFER 2000
+#define MAX_SAP_BUFFER 5000
 
 static void Run( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys  = p_intf->p_sys;
     uint8_t     buffer[MAX_SAP_BUFFER + 1];
+    uint8_t    *p_end;
 
     /* read SAP packets */
     while( !p_intf->b_die )
     {
         int i_read = NetRead( p_intf, p_sys->fd, buffer, MAX_SAP_BUFFER );
         uint8_t *p_sdp;
-
+        int i_version;
+        int i_address_type;
+        int b_reserved;
+        int b_message_type;
+        int b_encrypted;
+        int b_compressed;
+        int i_mesg_id_hash;
+        unsigned char *p_decompressed_buffer;
+        int i_decompressed_size;
+        
         /* Minimum length is > 6 */
         if( i_read <= 6 )
         {
@@ -314,13 +370,57 @@ static void Run( intf_thread_t *p_intf )
         }
 
         buffer[i_read] = '\0';
+        p_end = &buffer[i_read];
 
         /* Parse the SAP header */
+        i_version = buffer[0] >> 5;
+        if( i_version != 1 )
+        {
+            msg_Warn( p_intf, "strange sap version %d found", i_version );
+        }
+        i_address_type = buffer[0] & 0x10;
+        b_reserved = buffer[0] & 0x08;
+        if( b_reserved != 0 )
+        {
+            msg_Warn( p_intf, "reserved bit incorrectly set" );
+        }
+        b_message_type = buffer[0] & 0x04;
+        if( b_message_type != 0 )
+        {
+            msg_Warn( p_intf, "got session deletion packet" );
+        }
+        b_encrypted = buffer[0] & 0x02;
+        if( b_encrypted )
+        {
+            msg_Warn( p_intf, "encrypted packet" );
+        }
+        b_compressed = buffer[0] & 0x01;
         p_sdp  = &buffer[4];
-        p_sdp += (buffer[0]&0x10) ? 16 : 4;
-        p_sdp += buffer[1];
-
-        while( p_sdp < &buffer[i_read-1] && *p_sdp != '\0' && p_sdp[0] != 'v' && p_sdp[1] != '=' )
+        if( i_address_type == 0 ) /* ipv4 source address */
+        {
+            p_sdp += 4;
+        }
+        else /* ipv6 source address */
+        {
+            p_sdp += 16;
+        }
+        if( b_compressed )
+        {
+#ifdef HAVE_ZLIB_H
+            i_decompressed_size = do_decompress( p_sdp, &p_decompressed_buffer, i_read - ( p_sdp - buffer ) );
+            if( i_decompressed_size > 0 )
+            {
+                memcpy( p_sdp, p_decompressed_buffer, i_decompressed_size );
+                p_sdp[i_decompressed_size] = '\0';
+                p_end = &p_sdp[i_decompressed_size];
+                free( p_decompressed_buffer );
+            }
+#else
+            msg_Warn( p_intf, "Ignoring compressed sap packet" );
+#endif
+        }
+        p_sdp += buffer[1]; /* size of signature */
+        while( p_sdp < p_end - 1 && *p_sdp != '\0' && p_sdp[0] != 'v' && p_sdp[1] != '=' )
         {
             p_sdp++;
         }
@@ -328,7 +428,8 @@ static void Run( intf_thread_t *p_intf )
         {
             p_sdp++;
         }
-        if( p_sdp < &buffer[i_read] )
+
+        if( p_sdp < p_end )
         {
             sess_descr_t *p_sd = parse_sdp( p_intf, p_sdp );
             if( p_sd )
@@ -336,6 +437,10 @@ static void Run( intf_thread_t *p_intf )
                 sess_toitem ( p_intf, p_sd );
                 free_sd ( p_sd );
             }
+        }
+        else
+        {
+            msg_Warn( p_intf, "ditching sap packet" );
         }
     }
 }
@@ -467,6 +572,46 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
     playlist_t *p_playlist = NULL;
 
     psz_uri_default = NULL;
+    if( p_sd->i_media > 1 )
+    {
+        p_item = malloc( sizeof( playlist_item_t ) );
+        if( p_item == NULL )
+        {
+            msg_Warn( p_intf, "out of memory" );
+            return;
+        }
+        p_item->psz_name    = strdup( p_sd->psz_sessionname );
+        p_item->psz_uri     = NULL;
+        p_item->i_duration  = -1;
+        p_item->ppsz_options= NULL;
+        p_item->i_options   = 0;
+
+        p_item->i_type      = 0;
+        p_item->i_status    = 0;
+        p_item->b_autodeletion = VLC_FALSE;
+        p_item->b_enabled   = VLC_TRUE;
+        p_item->i_group     = p_intf->p_sys->i_group;
+        p_item->psz_author  = strdup( "" );
+        psz_uri = malloc( strlen( p_sd->psz_sdp ) + 7 );
+        if( psz_uri == NULL )
+        {
+            msg_Warn( p_intf, "out of memory" );
+            free( p_item->psz_name );
+            free( p_item->psz_author );
+            free( p_item );
+            return;
+        }
+        p_item->psz_uri = psz_uri;
+        memcpy( psz_uri, "sdp://", 6 );
+        psz_uri += 6;
+        memcpy( psz_uri, p_sd->psz_sdp, strlen( p_sd->psz_sdp ) + 1 );
+        /* Enqueueing p_item in the playlist */
+        p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        playlist_AddItem ( p_playlist, p_item, PLAYLIST_CHECK_INSERT, PLAYLIST_END );
+        vlc_object_release( p_playlist );
+        return;
+    }        
+        
     cfield_parse( p_sd->psz_connection, &psz_uri_default );
 
     for( i_count = 0 ; i_count < p_sd->i_media ; i_count++ )
@@ -618,6 +763,8 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
     sd = malloc( sizeof( sess_descr_t ) );
     sd->psz_sessionname = NULL;
     sd->psz_connection  = NULL;
+    sd->psz_sdp         = strdup( p_packet );
+    
     sd->i_media         = 0;
     sd->pp_media        = NULL;
     sd->i_attributes    = 0;

@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.113 2003/11/15 01:21:48 massiot Exp $
+dnl $Id: configure.ac,v 1.114 2003/11/20 23:13:28 sigmunau Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -1905,7 +1905,7 @@ dnl
 dnl MP4 module
 dnl
 AC_CHECK_HEADERS(zlib.h, [
-  AX_ADD_LDFLAGS([mp4 skins],[-lz])
+  AX_ADD_LDFLAGS([mp4 skins sap],[-lz])
 ] )
 
 

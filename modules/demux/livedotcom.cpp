@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.8 2003/11/20 22:10:55 fenrir Exp $
+ * $Id: livedotcom.cpp,v 1.9 2003/11/20 23:13:28 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -65,6 +65,7 @@ vlc_module_begin();
     add_submodule();
         set_description( _("RTSP/RTP describe") );
         add_shortcut( "rtsp" );
+        add_shortcut( "sdp" );
         set_capability( "access", 0 );
         set_callbacks( AccessOpen, AccessClose );
         add_category_hint( N_("RTSP"), NULL, VLC_TRUE );
@@ -134,6 +135,7 @@ struct demux_sys_t
 };
 
 static ssize_t Read   ( input_thread_t *, byte_t *, size_t );
+static ssize_t MRLRead( input_thread_t *, byte_t *, size_t );
 
 static int     Demux  ( input_thread_t * );
 static int     Control( input_thread_t *, int, va_list );
@@ -155,86 +157,108 @@ static int  AccessOpen( vlc_object_t *p_this )
     vlc_value_t      val;
     char             *psz_url;
 
-    if( p_input->psz_access == NULL || strcasecmp( p_input->psz_access, "rtsp" ) )
+    if( p_input->psz_access == NULL || ( strcasecmp( p_input->psz_access, "rtsp" ) && strcasecmp( p_input->psz_access, "sdp" ) ) )
     {
         msg_Warn( p_input, "RTSP access discarded" );
         return VLC_EGENERIC;
     }
-    if( ( scheduler = BasicTaskScheduler::createNew() ) == NULL )
+    if( !strcasecmp( p_input->psz_access, "rtsp" ) )
     {
-        msg_Err( p_input, "BasicTaskScheduler::createNew failed" );
-        return VLC_EGENERIC;
-    }
-    if( ( env = BasicUsageEnvironment::createNew(*scheduler) ) == NULL )
-    {
-        delete scheduler;
-        msg_Err( p_input, "BasicUsageEnvironment::createNew failed" );
-        return VLC_EGENERIC;
-    }
-    if( ( rtsp = RTSPClient::createNew(*env, 1/*verbose*/, "VLC Media Player" ) ) == NULL )
-    {
-        delete env;
-        delete scheduler;
-        msg_Err( p_input, "RTSPClient::createNew failed" );
-        return VLC_EGENERIC;
-    }
+        if( ( scheduler = BasicTaskScheduler::createNew() ) == NULL )
+        {
+            msg_Err( p_input, "BasicTaskScheduler::createNew failed" );
+            return VLC_EGENERIC;
+        }
+        if( ( env = BasicUsageEnvironment::createNew(*scheduler) ) == NULL )
+        {
+            delete scheduler;
+            msg_Err( p_input, "BasicUsageEnvironment::createNew failed" );
+            return VLC_EGENERIC;
+        }
+        if( ( rtsp = RTSPClient::createNew(*env, 1/*verbose*/, "VLC Media Player" ) ) == NULL )
+        {
+            delete env;
+            delete scheduler;
+            msg_Err( p_input, "RTSPClient::createNew failed" );
+            return VLC_EGENERIC;
+        }
 
-    psz_url = (char*)malloc( strlen( p_input->psz_name ) + 8 );
-    sprintf( psz_url, "rtsp://%s", p_input->psz_name );
+        psz_url = (char*)malloc( strlen( p_input->psz_name ) + 8 );
+        sprintf( psz_url, "rtsp://%s", p_input->psz_name );
 
-    p_sys = (access_sys_t*)malloc( sizeof( access_sys_t ) );
-    p_sys->p_sdp = rtsp->describeURL( psz_url );
+        p_sys = (access_sys_t*)malloc( sizeof( access_sys_t ) );
+        p_sys->p_sdp = rtsp->describeURL( psz_url );
 
-    if( p_sys->p_sdp == NULL )
-    {
-        msg_Err( p_input, "describeURL failed (%s)", env->getResultMsg() );
+        if( p_sys->p_sdp == NULL )
+        {
+            msg_Err( p_input, "describeURL failed (%s)", env->getResultMsg() );
 
+            free( psz_url );
+            delete env;
+            delete scheduler;
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
         free( psz_url );
+        p_sys->i_sdp = strlen( p_sys->p_sdp );
+        p_sys->i_pos = 0;
+
+        //fprintf( stderr, "sdp=%s\n", p_sys->p_sdp );
+
         delete env;
         delete scheduler;
-        free( p_sys );
-        return VLC_EGENERIC;
+
+        var_Create( p_input, "rtsp-tcp", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+        var_Get( p_input, "rtsp-tcp", &val );
+
+        p_input->p_access_data = p_sys;
+        p_input->i_mtu = 0;
+
+        /* Set exported functions */
+        p_input->pf_read = Read;
+        p_input->pf_seek = NULL;
+        p_input->pf_set_program = input_SetProgram;
+        p_input->pf_set_area = NULL;
+        p_input->p_private = NULL;
+
+        p_input->psz_demux = "live";
+
+        /* Finished to set some variable */
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        /* FIXME that's not true but eg over tcp, server send data too fast */
+        p_input->stream.b_pace_control = val.b_bool;
+        p_input->stream.p_selected_area->i_tell = 0;
+        p_input->stream.b_seekable = 1; /* Hack to display time */
+        p_input->stream.p_selected_area->i_size = 0;
+        p_input->stream.i_method = INPUT_METHOD_NETWORK;
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        /* Update default_pts to a suitable value for RTSP access */
+        var_Create( p_input, "rtsp-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+        var_Get( p_input, "rtsp-caching", &val );
+        p_input->i_pts_delay = val.i_int * 1000;
+
+        return VLC_SUCCESS;
     }
-    free( psz_url );
-    p_sys->i_sdp = strlen( p_sys->p_sdp );
-    p_sys->i_pos = 0;
-
-    //fprintf( stderr, "sdp=%s\n", p_sys->p_sdp );
-
-    delete env;
-    delete scheduler;
-
-    var_Create( p_input, "rtsp-tcp", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-    var_Get( p_input, "rtsp-tcp", &val );
-
-    p_input->p_access_data = p_sys;
-    p_input->i_mtu = 0;
-
-    /* Set exported functions */
-    p_input->pf_read = Read;
-    p_input->pf_seek = NULL;
-    p_input->pf_set_program = input_SetProgram;
-    p_input->pf_set_area = NULL;
-    p_input->p_private = NULL;
-
-    p_input->psz_demux = "live";
-
-    /* Finished to set some variable */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    /* FIXME that's not true but eg over tcp, server send data too fast */
-    p_input->stream.b_pace_control = val.b_bool;
-    p_input->stream.p_selected_area->i_tell = 0;
-    p_input->stream.b_seekable = 1; /* Hack to display time */
-    p_input->stream.p_selected_area->i_size = 0;
-    p_input->stream.i_method = INPUT_METHOD_NETWORK;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    /* Update default_pts to a suitable value for RTSP access */
-    var_Create( p_input, "rtsp-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Get( p_input, "rtsp-caching", &val );
-    p_input->i_pts_delay = val.i_int * 1000;
-
-    return VLC_SUCCESS;
+    else
+    {
+        p_input->p_access_data = (access_sys_t*)0;
+        p_input->i_mtu = 0;
+        p_input->pf_read = MRLRead;
+        p_input->pf_seek = NULL;
+        p_input->pf_set_program = input_SetProgram;
+        p_input->pf_set_area = NULL;
+        p_input->p_private = NULL;
+        p_input->psz_demux = "live";
+        /* Finished to set some variable */
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        p_input->stream.b_pace_control = VLC_TRUE;
+        p_input->stream.p_selected_area->i_tell = 0;
+        p_input->stream.b_seekable = VLC_FALSE;
+        p_input->stream.p_selected_area->i_size = 0;
+        p_input->stream.i_method = INPUT_METHOD_NETWORK;
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+    }
 }
 
 /*****************************************************************************
@@ -244,9 +268,11 @@ static void AccessClose( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     access_sys_t   *p_sys = p_input->p_access_data;
-
-    delete[] p_sys->p_sdp;
-    free( p_sys );
+    if( !strcasecmp( p_input->psz_access, "rtsp" ) )
+    {
+        delete[] p_sys->p_sdp;
+        free( p_sys );
+    }
 }
 
 /*****************************************************************************
@@ -261,6 +287,22 @@ static ssize_t Read ( input_thread_t *p_input, byte_t *p_buffer, size_t i_len )
     {
         memcpy( p_buffer, &p_sys->p_sdp[p_sys->i_pos], i_copy );
         p_sys->i_pos += i_copy;
+    }
+    return i_copy;
+}
+/*****************************************************************************
+ * MRLRead: read data from the mrl
+ *****************************************************************************/
+static ssize_t MRLRead ( input_thread_t *p_input, byte_t *p_buffer, size_t i_len )
+{
+    int i_done = (int)p_input->p_access_data;
+    int            i_copy = __MIN( (int)i_len, strlen(p_input->psz_name) - i_done );
+
+    if( i_copy > 0 )
+    {
+        memcpy( p_buffer, &p_input->psz_name[i_done], i_copy );
+        i_done += i_copy;
+        p_input->p_access_data = (access_sys_t*)i_done;
     }
     return i_copy;
 }
