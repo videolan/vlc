@@ -876,7 +876,7 @@ dnl  DVD module: optionally check for installed libdvdcss
 dnl
 AC_ARG_ENABLE(dvd,
 [  --enable-dvd            DVD input module (default enabled)])
-if test "x${enable_dvd}" != "xno" -a "x${enable_dvd}" != "x"
+if test "x${enable_dvd}" != "xno"
 then
   AC_ARG_WITH(dvdcss,
   [    --with-dvdcss=PATH    libdvdcss headers and libraries])
