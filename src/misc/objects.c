@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.25 2002/10/14 16:46:56 sam Exp $
+ * $Id: objects.c,v 1.26 2002/10/17 13:15:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -532,8 +532,6 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
  *****************************************************************************/
 static int DumpCommand( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
 {
-    vlc_mutex_lock( &structure_lock );
-
     if( *psz_cmd == 't' )
     {
         char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
@@ -553,12 +551,18 @@ static int DumpCommand( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
             p_object = p_this->p_vlc ? VLC_OBJECT(p_this->p_vlc) : p_this;
         }
 
+        vlc_mutex_lock( &structure_lock );
+
         psz_foo[0] = '|';
         DumpStructure( p_object, 0, psz_foo );
+
+        vlc_mutex_unlock( &structure_lock );
     }
     else if( *psz_cmd == 'l' )
     {
         vlc_object_t **pp_current, **pp_end;
+
+        vlc_mutex_lock( &structure_lock );
 
         pp_current = p_this->p_libvlc->pp_objects;
         pp_end = pp_current + p_this->p_libvlc->i_objects;
@@ -576,9 +580,9 @@ static int DumpCommand( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
                         (*pp_current)->psz_object_type );
             }
         }
-    }
 
-    vlc_mutex_unlock( &structure_lock );
+        vlc_mutex_unlock( &structure_lock );
+    }
 
     return VLC_SUCCESS;
 }

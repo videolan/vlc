@@ -2,7 +2,7 @@
  * error.c: error handling routine
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: error.c,v 1.1 2002/10/14 16:35:18 sam Exp $
+ * $Id: error.c,v 1.2 2002/10/17 13:15:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -43,6 +43,8 @@ char const * vlc_error ( int i_err )
             return "not enough memory";
         case VLC_ETHREAD:
             return "thread error";
+        case VLC_ETIMEOUT:
+            return "timeout";
 
         case VLC_ENOMOD:
             return "module not found";

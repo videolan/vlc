@@ -2,7 +2,7 @@
  * test4.c : Miscellaneous stress tests module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: test4.c,v 1.2 2002/10/14 19:04:51 sam Exp $
+ * $Id: test4.c,v 1.3 2002/10/17 13:15:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,6 +41,11 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
+static int    Callback  ( vlc_object_t *, char *, char * );
+static int    MyCallback( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
+static void * MyThread  ( vlc_object_t * );
+
 static int    Stress    ( vlc_object_t *, char *, char * );
 static void * Dummy     ( vlc_object_t * );
 
@@ -51,14 +56,139 @@ static int    Signal    ( vlc_object_t *, char *, char * );
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("Miscellaneous stress tests") );
-    var_Create( p_module->p_libvlc, "stress", VLC_VAR_COMMAND );
-    var_Set( p_module->p_libvlc, "stress", (vlc_value_t)(void*)Stress );
+    var_Create( p_module->p_libvlc, "callback-test", VLC_VAR_COMMAND );
+    var_Set( p_module->p_libvlc, "callback-test", (vlc_value_t)(void*)Callback );
+    var_Create( p_module->p_libvlc, "stress-test", VLC_VAR_COMMAND );
+    var_Set( p_module->p_libvlc, "stress-test", (vlc_value_t)(void*)Stress );
     var_Create( p_module->p_libvlc, "signal", VLC_VAR_COMMAND );
     var_Set( p_module->p_libvlc, "signal", (vlc_value_t)(void*)Signal );
 vlc_module_end();
 
 /*****************************************************************************
- * Stress: perform various tests
+ * Callback: test callback functions
+ *****************************************************************************/
+static int Callback( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+{
+    int i;
+    char psz_var[20];
+    vlc_object_t *pp_objects[10];
+    vlc_value_t val;
+
+    /* Allocate a few variables */
+    for( i = 0; i < 1000; i++ )
+    {
+        sprintf( psz_var, "blork-%i", i );
+        var_Create( p_this, psz_var, VLC_VAR_INTEGER );
+        var_AddCallback( p_this, psz_var, MyCallback, NULL );
+    }
+
+    /*
+     *  Test #1: callback loop detection
+     */
+    printf( "Test #1: callback loop detection\n" );
+
+    printf( " - without boundary check (vlc should print an error)\n" );
+    val.i_int = 1234567;
+    var_Set( p_this, "blork-12", val );
+
+    printf( " - with boundary check\n" );
+    val.i_int = 12;
+    var_Set( p_this, "blork-12", val );
+
+    /*
+     *  Test #2: concurrent access
+     */
+    printf( "Test #2: concurrent access\n" );
+
+    printf( " - launch worker threads\n" );
+
+    for( i = 0; i < 10; i++ )
+    {
+        pp_objects[i] = vlc_object_create( p_this, VLC_OBJECT_GENERIC );
+        vlc_object_attach( pp_objects[i], p_this );
+        vlc_thread_create( pp_objects[i], "foo", MyThread, 0, VLC_TRUE );
+    }
+
+    msleep( 3000000 );
+
+    printf( " - kill worker threads\n" );
+
+    for( i = 0; i < 10; i++ )
+    {
+        pp_objects[i]->b_die = VLC_TRUE;
+        vlc_thread_join( pp_objects[i] );
+        vlc_object_detach( pp_objects[i] );
+        vlc_object_destroy( pp_objects[i] );
+    }
+
+    /* Clean our mess */
+    for( i = 0; i < 1000; i++ )
+    {
+        sprintf( psz_var, "blork-%i", i );
+        var_DelCallback( p_this, psz_var, MyCallback, NULL );
+        var_Destroy( p_this, psz_var );
+    }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * MyCallback: used by callback-test
+ *****************************************************************************/
+static int MyCallback( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    int i_var = 1 + atoi( psz_var + strlen("blork-") );
+    char psz_newvar[20];
+
+    if( i_var == 1000 )
+    {
+        i_var = 0;
+    }
+
+    /* If we are requested to stop, then stop. */
+    if( i_var == newval.i_int )
+    {
+        return VLC_SUCCESS;
+    }
+
+    /* If we're the blork-3 callback, set blork-4, and so on. */
+    sprintf( psz_newvar, "blork-%i", i_var );
+    var_Set( p_this, psz_newvar, newval );
+
+    return VLC_SUCCESS;   
+}
+
+/*****************************************************************************
+ * MyThread: used by callback-test, creates objects and then do nothing.
+ *****************************************************************************/
+static void * MyThread( vlc_object_t *p_this )
+{
+    char psz_var[20];
+    vlc_value_t val;
+    vlc_object_t *p_parent = p_this->p_parent;
+
+    vlc_thread_ready( p_this );
+
+    val.i_int = 42;
+
+    while( !p_this->b_die )
+    {
+        int i = (int) (100.0 * rand() / (RAND_MAX));
+
+        sprintf( psz_var, "blork-%i", i );
+        val.i_int = i + 200;
+        var_Set( p_parent, psz_var, val );
+
+        /* This is quite heavy, but we only have 10 threads. Keep cool. */
+        msleep( 1000 );
+    }
+
+    return NULL;
+}
+
+/*****************************************************************************
+ * Stress: perform various stress tests
  *****************************************************************************/
 static int Stress( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
 {
@@ -212,7 +342,7 @@ static int Stress( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
 }
 
 /*****************************************************************************
- * Dummy: used by test, creates objects and then do nothing.
+ * Dummy: used by stress-test, creates objects and then do nothing.
  *****************************************************************************/
 static void * Dummy( vlc_object_t *p_this )
 {

@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.16 2002/10/14 16:46:55 sam Exp $
+ * $Id: vlc.h,v 1.17 2002/10/17 13:15:30 sam Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@ typedef union
 #define VLC_SUCCESS         -0                                   /* No error */
 #define VLC_ENOMEM          -1                          /* Not enough memory */
 #define VLC_ETHREAD         -2                               /* Thread error */
+#define VLC_ETIMEOUT        -3                                    /* Timeout */
 
 #define VLC_ENOMOD         -10                           /* Module not found */
 

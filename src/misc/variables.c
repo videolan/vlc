@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.7 2002/10/16 19:39:42 sam Exp $
+ * $Id: variables.c,v 1.8 2002/10/17 13:15:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,6 +42,7 @@ struct callback_entry_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static int GetUnused      ( vlc_object_t *, const char * );
 static u32 HashString     ( const char * );
 static int Insert         ( variable_t *, int, const char * );
 static int InsertInner    ( variable_t *, int, u32 );
@@ -106,6 +107,8 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 
     p_var->i_usage = 1;
 
+    p_var->b_incallback = VLC_FALSE;
+
     p_var->i_entries = 0;
     p_var->p_entries = NULL;
 
@@ -152,20 +155,19 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
  *****************************************************************************/
 int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 {
-    int i_del;
+    int i_var;
     variable_t *p_var;
 
     vlc_mutex_lock( &p_this->var_lock );
 
-    i_del = Lookup( p_this->p_vars, p_this->i_vars, psz_name );
-
-    if( i_del < 0 )
+    i_var = GetUnused( p_this, psz_name );
+    if( i_var < 0 )
     {
         vlc_mutex_unlock( &p_this->var_lock );
-        return VLC_ENOVAR;
+        return i_var;
     }
 
-    p_var = &p_this->p_vars[i_del];
+    p_var = &p_this->p_vars[i_var];
 
     if( p_var->i_usage > 1 )
     {
@@ -197,9 +199,9 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 
     free( p_var->psz_name );
 
-    memmove( p_this->p_vars + i_del,
-             p_this->p_vars + i_del + 1,
-             (p_this->i_vars - i_del - 1) * sizeof(variable_t) );
+    memmove( p_this->p_vars + i_var,
+             p_this->p_vars + i_var + 1,
+             (p_this->i_vars - i_var - 1) * sizeof(variable_t) );
 
     if( (p_this->i_vars & 15) == 0 )
     {
@@ -253,12 +255,11 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
 
     vlc_mutex_lock( &p_this->var_lock );
 
-    i_var = Lookup( p_this->p_vars, p_this->i_vars, psz_name );
-
+    i_var = GetUnused( p_this, psz_name );
     if( i_var < 0 )
     {
         vlc_mutex_unlock( &p_this->var_lock );
-        return VLC_ENOVAR;
+        return i_var;
     }
 
     p_var = &p_this->p_vars[i_var];
@@ -276,22 +277,40 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
     /* Backup needed stuff */
     oldval = p_var->val;
 
-    /* Set the variable */
-    p_var->val = val;
-
-    /* Deal with callbacks */
+    /* Deal with callbacks. Tell we're in a callback, release the lock,
+     * call stored functions, retake the lock. */
     if( p_var->i_entries )
     {
-        int i;
+        int i_var;
+        int i_entries = p_var->i_entries;
+        callback_entry_t *p_entries = p_var->p_entries;
 
-        for( i = p_var->i_entries ; i-- ; )
+        p_var->b_incallback = VLC_TRUE;
+        vlc_mutex_unlock( &p_this->var_lock );
+
+        /* The real calls */
+        for( ; i_entries-- ; )
         {
-            /* FIXME: oooh, see the deadlocks! see the race conditions! */
-            p_var->p_entries[i].pf_callback( p_this, p_var->psz_name,
-                                             oldval, val,
-                                             p_var->p_entries[i].p_data );
+            p_entries[i_entries].pf_callback( p_this, psz_name, oldval, val,
+                                              p_entries[i_entries].p_data );
         }
+
+        vlc_mutex_lock( &p_this->var_lock );
+
+        i_var = Lookup( p_this->p_vars, p_this->i_vars, psz_name );
+        if( i_var < 0 )
+        {
+            msg_Err( p_this, "variable %s has disappeared" );
+            vlc_mutex_unlock( &p_this->var_lock );
+            return VLC_ENOVAR;
+        }
+
+        p_var = &p_this->p_vars[i_var];
+        p_var->b_incallback = VLC_FALSE;
     }
+
+    /* Set the variable */
+    p_var->val = val;
 
     /* Free data if needed */
     switch( p_var->i_type )
@@ -385,20 +404,19 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
 int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
                        vlc_callback_t pf_callback, void *p_data )
 {
-    int i_var, i_entry;
+    int i_entry, i_var;
     variable_t *p_var;
 
     vlc_mutex_lock( &p_this->var_lock );
 
-    i_var = Lookup( p_this->p_vars, p_this->i_vars, psz_name );
+    i_var = GetUnused( p_this, psz_name );
     if( i_var < 0 )
     {
         vlc_mutex_unlock( &p_this->var_lock );
-        return VLC_ENOVAR;
+        return i_var;
     }
 
     p_var = &p_this->p_vars[i_var];
-
     i_entry = p_var->i_entries++;
 
     if( i_entry )
@@ -428,16 +446,16 @@ int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
 int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
                        vlc_callback_t pf_callback, void *p_data )
 {
-    int i_var, i_entry;
+    int i_entry, i_var;
     variable_t *p_var;
 
     vlc_mutex_lock( &p_this->var_lock );
 
-    i_var = Lookup( p_this->p_vars, p_this->i_vars, psz_name );
+    i_var = GetUnused( p_this, psz_name );
     if( i_var < 0 )
     {
         vlc_mutex_unlock( &p_this->var_lock );
-        return VLC_ENOVAR;
+        return i_var;
     }
 
     p_var = &p_this->p_vars[i_var];
@@ -480,6 +498,41 @@ int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
 }
 
 /* Following functions are local */
+
+/*****************************************************************************
+ * GetUnused: find an unused variable from its name
+ *****************************************************************************
+ * We do i_tries tries before giving up, just in case the variable is being
+ * modified and called from a callback.
+ *****************************************************************************/
+static int GetUnused( vlc_object_t *p_this, const char *psz_name )
+{
+    int i_var, i_tries = 0;
+
+    while( VLC_TRUE )
+    {
+        i_var = Lookup( p_this->p_vars, p_this->i_vars, psz_name );
+        if( i_var < 0 )
+        {
+            return VLC_ENOVAR;
+        }
+
+        if( ! p_this->p_vars[i_var].b_incallback )
+        {
+            return i_var;
+        }
+
+        if( i_tries++ > 100 )
+        {
+            msg_Err( p_this, "caught in a callback deadlock?" );
+            return VLC_ETIMEOUT;
+        }
+
+        vlc_mutex_unlock( &p_this->var_lock );
+        msleep( THREAD_SLEEP );
+        vlc_mutex_lock( &p_this->var_lock );
+    }
+}
 
 /*****************************************************************************
  * HashString: our cool hash function

@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.4 2002/10/16 19:39:42 sam Exp $
+ * $Id: variables.h,v 1.5 2002/10/17 13:15:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -37,9 +37,13 @@ struct variable_t
     u32          i_hash;
     int          i_type;
 
-    /* Lots of other things that can be added */
+    /* Creation count: we only destroy the variable if it reaches 0 */
     int          i_usage;
 
+    /* Set to TRUE if the variable is in a callback */
+    vlc_bool_t   b_incallback;
+
+    /* Registered callbacks */
     int                i_entries;
     callback_entry_t * p_entries;
 };
