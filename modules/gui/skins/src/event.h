@@ -2,7 +2,7 @@
  * event.h: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.h,v 1.6 2003/04/14 10:00:38 karibu Exp $
+ * $Id: event.h,v 1.7 2003/04/21 00:54:26 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -62,6 +62,8 @@ using namespace std;
 
 #define VLC_LOG_SHOW        (VLC_MESSAGE + 20)
 #define VLC_LOG_CLEAR       (VLC_MESSAGE + 22)
+#define VLC_PREFS_SHOW      (VLC_MESSAGE + 23)
+#define VLC_INFO_SHOW       (VLC_MESSAGE + 24)
 
 #define VLC_INTF_REFRESH    (VLC_MESSAGE + 30)
 #define VLC_CHANGE_TRAY     (VLC_MESSAGE + 31)

@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.10 2003/04/01 16:11:43 gbazin Exp $
+ * $Id: preferences.cpp,v 1.11 2003/04/21 00:54:26 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -53,7 +53,13 @@
 
 #include <vlc/intf.h>
 
-#include "wxwindows.h"
+#if defined MODULE_NAME_IS_skins
+#   include "../skins/src/skin_common.h"
+#   include "../skins/src/wxdialogs.h"
+#else
+#   include "wxwindows.h"
+#endif
+
 
 #ifndef wxRB_SINGLE
 #   define wxRB_SINGLE 0

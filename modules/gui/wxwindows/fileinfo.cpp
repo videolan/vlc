@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: fileinfo.cpp,v 1.8 2003/04/17 14:00:44 anil Exp $
+ * $Id: fileinfo.cpp,v 1.9 2003/04/21 00:54:26 ipkiss Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -45,7 +45,13 @@
 
 #include <vlc/intf.h>
 
-#include "wxwindows.h"
+#if defined MODULE_NAME_IS_skins
+#   include "../skins/src/skin_common.h"
+#   include "../skins/src/wxdialogs.h"
+#else
+#   include "wxwindows.h"
+#endif
+
 
 /*****************************************************************************
  * Event Table.
@@ -76,7 +82,7 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     /* Initializations */
     p_intf = _p_intf;
     SetIcon( *p_intf->p_sys->p_icon );
-    SetAutoLayout(TRUE);
+    SetAutoLayout( TRUE );
 
     /* Create a panel to put everything in */
     wxPanel *panel = new wxPanel( this, -1 );
@@ -104,22 +110,22 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     main_sizer->Layout();
     SetSizerAndFit( main_sizer );
 
-    UpdateFileInfo();    
+    UpdateFileInfo();
 }
 
 void FileInfo::UpdateFileInfo()
 {
-    if( !p_intf->p_sys->p_input || p_intf->p_sys->p_input->b_dead )
+    input_thread_t *p_input = p_intf->p_sys->p_input;
+
+    if( !p_input || p_input->b_dead )
     {
         if( fileinfo_root )
         {
-            fileinfo_tree->SetItemText ( fileinfo_root , "");
+            fileinfo_tree->SetItemText ( fileinfo_root , "" );
             fileinfo_tree->DeleteChildren ( fileinfo_root );
-        } 
+        }
         return;
     }
-
-    input_thread_t *p_input = p_intf->p_sys->p_input;
 
     if( !fileinfo_root )
     {
@@ -133,7 +139,7 @@ void FileInfo::UpdateFileInfo()
     fileinfo_tree->DeleteChildren( fileinfo_root );
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    
+
     fileinfo_tree->SetItemText( fileinfo_root , p_input->psz_name );
     input_info_category_t *p_cat = p_input->stream.p_info;
 
@@ -145,7 +151,7 @@ void FileInfo::UpdateFileInfo()
         while ( p_info )
         {
             fileinfo_tree->AppendItem( cat, wxString(p_info->psz_name) + ": "
-                                 + p_info->psz_value );
+                                            + p_info->psz_value );
             p_info = p_info->p_next;
         }
         p_cat = p_cat->p_next;

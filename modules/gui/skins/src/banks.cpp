@@ -2,7 +2,7 @@
  * banks.cpp: Bitmap bank, Event, bank, Font bank and OffSet bank
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: banks.cpp,v 1.3 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: banks.cpp,v 1.4 2003/04/21 00:54:26 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -169,10 +169,12 @@ EventBank::EventBank( intf_thread_t *_p_intf )
     Add( "volume_down",      "VLC_VOLUME_CHANGE(DOWN)", "none" );
     Add( "volume_refresh",   "VLC_VOLUME_CHANGE(SET)",  "none" );
 
-    // Log events
+    // Dialogs events
     Add( "show_log",         "VLC_LOG_SHOW(TRUE)",      "none" );
     Add( "hide_log",         "VLC_LOG_SHOW(FALSE)",     "none" );
     Add( "clear_log",        "VLC_LOG_CLEAR",           "none" );
+    Add( "show_prefs",       "VLC_PREFS_SHOW",          "none" );
+    Add( "show_info",        "VLC_INFO_SHOW",           "none" );
 
     Add( "quit",             "VLC_HIDE(VLC_QUIT)",      "CTRL+C" );
     Add( "open",             "VLC_OPEN",                "CTRL+O" );

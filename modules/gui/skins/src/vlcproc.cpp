@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.11 2003/04/21 00:18:37 asmax Exp $
+ * $Id: vlcproc.cpp,v 1.12 2003/04/21 00:54:26 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -131,13 +131,21 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_LOG_SHOW:
-//            p_intf->p_sys->p_theme->ShowLog( evt->GetParam2() );
             p_intf->p_sys->MessagesDlg->Show(
                 !p_intf->p_sys->MessagesDlg->IsShown() );
             return true;
 
         case VLC_LOG_CLEAR:
-//            p_intf->p_sys->p_theme->ClearLog();
+            return true;
+
+        case VLC_PREFS_SHOW:
+            p_intf->p_sys->PrefsDlg->Show(
+                !p_intf->p_sys->PrefsDlg->IsShown() );
+            return true;
+
+        case VLC_INFO_SHOW:
+            p_intf->p_sys->InfoDlg->Show(
+                !p_intf->p_sys->InfoDlg->IsShown() );
             return true;
 
         case VLC_INTF_REFRESH:

@@ -98,8 +98,11 @@ SOURCES_skins = \
 	modules/gui/skins/gtk2/gtk2_window.cpp \
 	modules/gui/skins/gtk2/gtk2_window.h \
 	\
+	modules/gui/wxwindows/fileinfo.cpp \
 	modules/gui/wxwindows/messages.cpp \
 	modules/gui/wxwindows/open.cpp \
+	modules/gui/wxwindows/preferences.cpp \
+	modules/gui/wxwindows/streamout.cpp \
 	$(NULL)
 
 EXTRA_DIST += \

@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.11 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: event.cpp,v 1.12 2003/04/21 00:54:26 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -159,11 +159,15 @@ unsigned int Event::GetMessageType( string Desc )
     else if( Desc == "VLC_VOLUME_SET" )
         return VLC_VOLUME_SET;
 
-    // Logs
+    // Dialogs
     else if( Desc == "VLC_LOG_SHOW" )
         return VLC_LOG_SHOW;
     else if( Desc == "VLC_LOG_CLEAR" )
         return VLC_LOG_CLEAR;
+    else if( Desc == "VLC_PREFS_SHOW" )
+        return VLC_PREFS_SHOW;
+    else if( Desc == "VLC_INFO_SHOW" )
+        return VLC_INFO_SHOW;
 
     // Playlist events
     else if( Desc == "VLC_PLAYLIST_ADD_FILE" )

@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.6 2003/04/20 20:28:39 ipkiss Exp $
+ * $Id: win32_run.cpp,v 1.7 2003/04/21 00:54:26 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -92,6 +92,9 @@ bool Instance::OnInit()
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
     p_intf->p_sys->OpenDlg = new OpenDialog( p_intf, NULL, FILE_ACCESS );
     p_intf->p_sys->MessagesDlg = new Messages( p_intf, NULL );
+    p_intf->p_sys->SoutDlg = new SoutDialog( p_intf, NULL );
+    p_intf->p_sys->PrefsDlg = new PrefsDialog( p_intf, NULL );
+    p_intf->p_sys->InfoDlg = new FileInfo( p_intf, NULL );
     return TRUE;
 }
 

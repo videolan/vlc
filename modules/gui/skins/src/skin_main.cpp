@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.12 2003/04/20 20:28:39 ipkiss Exp $
+ * $Id: skin_main.cpp,v 1.13 2003/04/21 00:54:26 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -281,6 +281,9 @@ int SkinManage( intf_thread_t *p_intf )
 
     // Update the log window
     p_intf->p_sys->MessagesDlg->UpdateLog();
+
+    // Update the file info window
+    p_intf->p_sys->InfoDlg->UpdateFileInfo();
 
     //-------------------------------------------------------------------------
     if( p_intf->p_sys->p_input != NULL && !p_intf->p_sys->p_input->b_die )

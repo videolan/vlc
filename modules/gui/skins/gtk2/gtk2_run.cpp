@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.14 2003/04/20 23:09:31 asmax Exp $
+ * $Id: gtk2_run.cpp,v 1.15 2003/04/21 00:54:26 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -230,6 +230,9 @@ bool Instance::OnInit()
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
     p_intf->p_sys->OpenDlg = new OpenDialog( p_intf, NULL, FILE_ACCESS );
     p_intf->p_sys->MessagesDlg = new Messages( p_intf, NULL );
+    p_intf->p_sys->SoutDlg = new SoutDialog( p_intf, NULL );
+    p_intf->p_sys->PrefsDlg = new PrefsDialog( p_intf, NULL );
+    p_intf->p_sys->InfoDlg = new FileInfo( p_intf, NULL );
     return TRUE;
 }
 
