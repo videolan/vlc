@@ -481,7 +481,7 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
     p_dec->fmt_out.audio.i_physical_channels =
         p_sys->i_channels_conf & AOUT_CHAN_PHYSMASK;
 
-    p_dec->fmt_out.i_bitrate = p_sys->i_bit_rate;
+    p_dec->fmt_out.i_bitrate = p_sys->i_bit_rate * 1000;
 
     if( p_sys->b_packetizer )
     {
