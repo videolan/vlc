@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.236 2003/08/02 15:22:07 fenrir Exp $
+ * $Id: input.c,v 1.237 2003/09/07 22:51:11 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -47,6 +47,7 @@
 #include <vlc/vout.h>
 
 #include "vlc_interface.h"
+#include "ninput.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -58,6 +59,17 @@ static void EndThread       ( input_thread_t *p_input );
 
 static void ParseOption     ( input_thread_t *p_input,
                               const char *psz_option );
+/*****************************************************************************
+ * Callbacks
+ *****************************************************************************/
+static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void *p_data );
+static int TimeCallback    ( vlc_object_t *p_this, char const *psz_cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void *p_data );
+static int StateCallback   ( vlc_object_t *p_this, char const *psz_cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void *p_data );
+static int RateCallback    ( vlc_object_t *p_this, char const *psz_cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
 /*****************************************************************************
  * input_CreateThread: creates a new input thread
@@ -70,6 +82,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 {
     input_thread_t *    p_input;                        /* thread descriptor */
     input_info_category_t * p_info;
+    vlc_value_t val;
     int i;
 
     /* Allocate descriptor */
@@ -95,6 +108,43 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     var_Create( p_input, "sout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "sout-keep",  VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+
+    /* play status */
+
+    /* position variable */
+    var_Create( p_input, "position",  VLC_VAR_FLOAT );  /* position 0.0 -> 1.0 */
+    val.f_float = 0.0;
+    var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
+    var_AddCallback( p_input, "position", PositionCallback, NULL );
+
+    /* time variable */
+    var_Create( p_input, "time",  VLC_VAR_TIME );
+    val.i_time = 0;
+    var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
+    var_AddCallback( p_input, "time", TimeCallback, NULL );
+
+    /* length variable */
+    var_Create( p_input, "length",  VLC_VAR_TIME );
+    val.i_time = 0;
+    var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
+
+    /* rate variable */
+    var_Create( p_input, "rate", VLC_VAR_INTEGER );
+    var_Create( p_input, "rate-slower", VLC_VAR_VOID );
+    var_Create( p_input, "rate-faster", VLC_VAR_VOID );
+    val.i_int = DEFAULT_RATE;
+    var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
+    var_AddCallback( p_input, "rate", RateCallback, NULL );
+    var_AddCallback( p_input, "rate-slower", RateCallback, NULL );
+    var_AddCallback( p_input, "rate-faster", RateCallback, NULL );
+
+    /* state variable */
+    var_Create( p_input, "state", VLC_VAR_INTEGER );
+    val.i_int = INIT_S;
+    var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
+    var_AddCallback( p_input, "state", StateCallback, NULL );
+
 
     /* Initialize thread properties */
     p_input->b_eof      = 0;
@@ -153,7 +203,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->stream.p_selected_area = p_input->stream.pp_areas[0];
 
     /* Initialize stream control properties. */
-    p_input->stream.control.i_status = PLAYING_S;
+    p_input->stream.control.i_status = INIT_S;
     p_input->stream.control.i_rate = DEFAULT_RATE;
     p_input->stream.control.b_mute = 0;
     p_input->stream.control.b_grayscale = config_GetInt( p_input, "grayscale" );
@@ -226,6 +276,9 @@ void input_DestroyThread( input_thread_t *p_input )
  *****************************************************************************/
 static int RunThread( input_thread_t *p_input )
 {
+    vlc_value_t  val;
+    mtime_t      i_update_next = -1;
+
     /* Signal right now, otherwise we'll get stuck in a peek */
     vlc_thread_ready( p_input );
 
@@ -240,8 +293,12 @@ static int RunThread( input_thread_t *p_input )
 
     /* initialization is complete */
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.b_changed = 1;
+    p_input->stream.b_changed        = 1;
+    p_input->stream.control.i_status = PLAYING_S;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    val.i_int = PLAYING_S;
+    var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
 
     while( !p_input->b_die && !p_input->b_error && !p_input->b_eof )
     {
@@ -304,17 +361,14 @@ static int RunThread( input_thread_t *p_input )
 
         if( p_input->stream.p_selected_area->i_seek != NO_SEEK )
         {
-            if( p_input->stream.b_seekable
-                 && p_input->pf_seek != NULL )
+            if( p_input->stream.p_selected_area->i_size > 0 )
             {
-                off_t i_new_pos;
+                unsigned int i;
+                double f = (double)p_input->stream.p_selected_area->i_seek /
+                           (double)p_input->stream.p_selected_area->i_size;
 
-                /* Reinitialize buffer manager. */
-                input_AccessReinit( p_input );
-
-                i_new_pos = p_input->stream.p_selected_area->i_seek;
                 vlc_mutex_unlock( &p_input->stream.stream_lock );
-                p_input->pf_seek( p_input, i_new_pos );
+                demux_Control( p_input, DEMUX_SET_POSITION, f );
                 vlc_mutex_lock( &p_input->stream.stream_lock );
 
                 /* Escape all decoders for the stream discontinuity they
@@ -323,8 +377,7 @@ static int RunThread( input_thread_t *p_input )
 
                 for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
                 {
-                    pgrm_descriptor_t * p_pgrm
-                                            = p_input->stream.pp_programs[i];
+                    pgrm_descriptor_t * p_pgrm=p_input->stream.pp_programs[i];
 
                     /* Reinitialize synchro. */
                     p_pgrm->i_synchro_state = SYNCHRO_REINIT;
@@ -374,6 +427,28 @@ static int RunThread( input_thread_t *p_input )
         else if( i_count < 0 )
         {
             p_input->b_error = 1;
+        }
+
+        if( !p_input->b_error && !p_input->b_eof && i_update_next < mdate() )
+        {
+            double d;
+
+            /* update input status variables */
+            if( !demux_Control( p_input, DEMUX_GET_POSITION, &d ) )
+            {
+                val.f_float = (float)d;
+                var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
+            }
+            if( !demux_Control( p_input, DEMUX_GET_TIME, &val.i_time ) )
+            {
+                var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
+            }
+            if( !demux_Control( p_input, DEMUX_GET_LENGTH, &val.i_time ) )
+            {
+                var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
+            }
+
+            i_update_next = mdate() + 200000LL;
         }
     }
 
@@ -474,7 +549,21 @@ static int InitThread( input_thread_t * p_input )
 
     if( input_AccessInit( p_input ) == -1 )
     {
-        return -1;
+        return VLC_EGENERIC;
+    }
+
+    /* Initialize optional stream output. (before demuxer)*/
+    var_Get( p_input, "sout", &val );
+    if( val.psz_string != NULL )
+    {
+        if ( *val.psz_string && (p_input->stream.p_sout =
+             sout_NewInstance( p_input, val.psz_string )) == NULL )
+        {
+            msg_Err( p_input, "cannot start stream output instance, aborting" );
+            free( val.psz_string );
+            return VLC_EGENERIC;
+        }
+        free( val.psz_string );
     }
 
     /* Find and open appropriate access module */
@@ -499,7 +588,11 @@ static int InitThread( input_thread_t * p_input )
     {
         msg_Err( p_input, "no suitable access module for `%s/%s://%s'",
                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );
-        return -1;
+        if ( p_input->stream.p_sout != NULL )
+        {
+            sout_DeleteInstance( p_input->stream.p_sout );
+        }
+        return VLC_EGENERIC;
     }
 
     /* Waiting for stream. */
@@ -524,7 +617,11 @@ static int InitThread( input_thread_t * p_input )
             if( p_input->b_die || p_input->b_error || p_input->b_eof )
             {
                 module_Unneed( p_input, p_input->p_access );
-                return -1;
+                if ( p_input->stream.p_sout != NULL )
+                {
+                    sout_DeleteInstance( p_input->stream.p_sout );
+                }
+                return VLC_EGENERIC;
             }
         }
     }
@@ -538,27 +635,14 @@ static int InitThread( input_thread_t * p_input )
         msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );
         module_Unneed( p_input, p_input->p_access );
-        return -1;
-    }
-
-    /* Initialize optional stream output. */
-    var_Get( p_input, "sout", &val );
-    if( val.psz_string != NULL )
-    {
-        if ( *val.psz_string && (p_input->stream.p_sout =
-             sout_NewInstance( p_input, val.psz_string )) == NULL )
+        if ( p_input->stream.p_sout != NULL )
         {
-            msg_Err( p_input, "cannot start stream output instance, aborting" );
-            free( val.psz_string );
-            module_Unneed( p_input, p_input->p_access );
-            module_Unneed( p_input, p_input->p_demux );
-            return -1;
+            sout_DeleteInstance( p_input->stream.p_sout );
         }
-
-        free( val.psz_string );
+        return VLC_EGENERIC;
     }
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -580,8 +664,6 @@ static void ErrorThread( input_thread_t *p_input )
  *****************************************************************************/
 static void EndThread( input_thread_t * p_input )
 {
-    vlc_object_t *p_object;
-
 #ifdef HAVE_SYS_TIMES_H
     /* Display statistics */
     struct tms  cpu_usage;
@@ -601,7 +683,25 @@ static void EndThread( input_thread_t * p_input )
     /* Close optional stream output instance */
     if ( p_input->stream.p_sout != NULL )
     {
-        sout_DeleteInstance( p_input->stream.p_sout );
+        vlc_object_t *p_pl = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        vlc_value_t keep;
+
+        if( var_Get( p_input, "sout-keep", &keep ) >= 0 && keep.b_bool && p_pl )
+        {
+            /* attach sout to the playlist */
+            msg_Warn( p_input, "keeping sout" );
+            vlc_object_detach( p_input->stream.p_sout );
+            vlc_object_attach( p_input->stream.p_sout, p_pl );
+        }
+        else
+        {
+            msg_Warn( p_input, "destroying sout" );
+            sout_DeleteInstance( p_input->stream.p_sout );
+        }
+        if( p_pl )
+        {
+            vlc_object_release( p_pl );
+        }
     }
 
     /* Free demultiplexer's data */
@@ -615,15 +715,6 @@ static void EndThread( input_thread_t * p_input )
     /* Free info structures XXX destroy es before 'cause vorbis */
     msg_Dbg( p_input, "freeing info structures...");
     input_DelInfo( p_input );
-
-    /* Close the video output that should have been re-attached
-     * to our object */
-    while( ( p_object = vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD ) ) != NULL )
-    {
-        vlc_object_detach( p_object );
-        vlc_object_release( p_object );
-        vout_Destroy( (vout_thread_t *)p_object );
-    }
 
     free( p_input->psz_source );
     if ( p_input->psz_dupsource != NULL ) free( p_input->psz_dupsource );
@@ -727,3 +818,88 @@ static void ParseOption( input_thread_t *p_input, const char *psz_option )
     if( psz_name ) free( psz_name );
     return;
 }
+
+/*****************************************************************************
+ * Callbacks  (position, time, state, rate )
+ *****************************************************************************/
+static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+
+    msg_Warn( p_input, "cmd=%s old=%f new=%f",
+              psz_cmd,
+              oldval.f_float, newval.f_float );
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.p_selected_area->i_seek =
+        (int64_t)( newval.f_float * (double)p_input->stream.p_selected_area->i_size );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    return VLC_SUCCESS;
+}
+
+static int TimeCallback    ( vlc_object_t *p_this, char const *psz_cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+
+    /* FIXME TODO FIXME */
+    msg_Warn( p_input, "cmd=%s old=%lld new=%lld",
+              psz_cmd,
+              oldval.i_time, newval.i_time );
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.p_selected_area->i_seek =
+        newval.i_time / 1000000 * 50 * p_input->stream.i_mux_rate;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    return VLC_SUCCESS;
+}
+
+static int StateCallback   ( vlc_object_t *p_this, char const *psz_cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    msg_Warn( p_input, "cmd=%s old=%d new=%d",
+              psz_cmd, oldval.i_int, newval.i_int );
+
+    switch( newval.i_int )
+    {
+        case PLAYING_S:
+            input_SetStatus( p_input, INPUT_STATUS_PLAY );
+            return VLC_SUCCESS;
+        case PAUSE_S:
+            input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+            return VLC_SUCCESS;
+        case END_S:
+            input_SetStatus( p_input, INPUT_STATUS_END );
+            return VLC_SUCCESS;
+        default:
+            msg_Err( p_input, "cannot set new state (invalid)" );
+            return VLC_EGENERIC;
+    }
+}
+
+static int RateCallback    ( vlc_object_t *p_this, char const *psz_cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+
+    if( !strcmp( psz_cmd, "rate-slower" ) )
+    {
+        input_SetStatus( p_input, INPUT_STATUS_SLOWER );
+    }
+    else if( !strcmp( psz_cmd, "rate-faster" ) )
+    {
+        input_SetStatus( p_input, INPUT_STATUS_FASTER );
+    }
+    else
+    {
+        msg_Warn( p_input, "cmd=%s old=%d new=%d",
+                  psz_cmd, oldval.i_int, newval.i_int );
+        input_SetRate( p_input, newval.i_int );
+    }
+    return VLC_SUCCESS;
+}
+

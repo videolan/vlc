@@ -2,7 +2,7 @@
  * demux.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: demux.c,v 1.1 2003/08/02 16:43:59 fenrir Exp $
+ * $Id: demux.c,v 1.2 2003/09/07 22:51:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -48,3 +48,109 @@ int  demux_Control  ( input_thread_t *p_input, int i_query, ...  )
     return i_result;
 }
 
+static void SeekOffset( input_thread_t *p_input, int64_t i_pos );
+
+int  demux_vaControlDefault( input_thread_t *p_input, int i_query, va_list args )
+{
+    int     i_ret;
+    double  f, *pf;
+    int64_t i64, *pi64;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    switch( i_query )
+    {
+        case DEMUX_GET_POSITION:
+            pf = (double*)va_arg( args, double * );
+            if( p_input->stream.p_selected_area->i_size <= 0 )
+            {
+                *pf = 0.0;
+            }
+            else
+            {
+                *pf = (double)p_input->stream.p_selected_area->i_tell /
+                      (double)p_input->stream.p_selected_area->i_size;
+            }
+            i_ret = VLC_SUCCESS;
+            break;
+
+        case DEMUX_SET_POSITION:
+            f = (double)va_arg( args, double );
+            if( p_input->stream.b_seekable && p_input->pf_seek != NULL && f >= 0.0 && f <= 1.0 )
+            {
+                SeekOffset( p_input, (int64_t)(f * (double)p_input->stream.p_selected_area->i_size) );
+                i_ret = VLC_SUCCESS;
+            }
+            else
+            {
+                i_ret = VLC_EGENERIC;
+            }
+            break;
+
+        case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            if( p_input->stream.i_mux_rate > 0 )
+            {
+                *pi64 = (int64_t)1000000 *
+                        ( p_input->stream.p_selected_area->i_tell / 50 ) /
+                        p_input->stream.i_mux_rate;
+                i_ret = VLC_SUCCESS;
+            }
+            else
+            {
+                *pi64 = 0;
+                i_ret = VLC_EGENERIC;
+            }
+            break;
+
+        case DEMUX_SET_TIME:
+            i64 = (int64_t)va_arg( args, int64_t );
+            if( p_input->stream.i_mux_rate > 0 &&
+                p_input->stream.b_seekable && p_input->pf_seek != NULL && i64 >= 0 )
+            {
+                SeekOffset( p_input, i64 * 50 *
+                                     (int64_t)p_input->stream.i_mux_rate /
+                                     (int64_t)1000000 );
+                i_ret = VLC_SUCCESS;
+            }
+            else
+            {
+                i_ret = VLC_EGENERIC;
+            }
+            break;
+
+        case DEMUX_GET_LENGTH:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            if( p_input->stream.i_mux_rate > 0 )
+            {
+                *pi64 = (int64_t)1000000 *
+                        ( p_input->stream.p_selected_area->i_size / 50 ) /
+                        p_input->stream.i_mux_rate;
+                i_ret = VLC_SUCCESS;
+            }
+            else
+            {
+                *pi64 = 0;
+                i_ret = VLC_EGENERIC;
+            }
+            break;
+
+        default:
+            msg_Err( p_input, "unknown query in demux_vaControlDefault !!!" );
+            i_ret = VLC_EGENERIC;
+            break;
+    }
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    return i_ret;
+}
+
+
+static void SeekOffset( input_thread_t *p_input, int64_t i_pos )
+{
+    /* Reinitialize buffer manager. */
+    input_AccessReinit( p_input );
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    p_input->pf_seek( p_input, i_pos );
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+}

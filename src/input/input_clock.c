@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_clock.c,v 1.41 2003/08/08 16:50:27 gbazin Exp $
+ * $Id: input_clock.c,v 1.42 2003/09/07 22:51:11 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -147,6 +147,7 @@ void input_ClockInit( pgrm_descriptor_t * p_pgrm )
 int input_ClockManageControl( input_thread_t * p_input,
                                pgrm_descriptor_t * p_pgrm, mtime_t i_clock )
 {
+    vlc_value_t val;
     int i_return_value = UNDEF_S;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -204,6 +205,12 @@ int input_ClockManageControl( input_thread_t * p_input,
              * discontinuities. */
             input_EscapeAudioDiscontinuity( p_input );
         }
+
+        val.i_int = p_input->stream.control.i_rate;
+        var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
+
+        val.i_int = p_input->stream.control.i_status;
+        var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
 
         p_input->stream.i_new_status = UNDEF_S;
         p_input->stream.i_new_rate = UNDEF_S;

@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.29 2003/07/23 23:05:25 gbazin Exp $
+ * $Id: variables.c,v 1.30 2003/09/07 22:51:11 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,10 +46,7 @@ static int CmpBool( vlc_value_t v, vlc_value_t w ) { return v.b_bool ? w.b_bool 
 static int CmpInt( vlc_value_t v, vlc_value_t w ) { return v.i_int == w.i_int ? 0 : v.i_int > w.i_int ? 1 : -1; }
 static int CmpTime( vlc_value_t v, vlc_value_t w )
 {
-    mtime_t v_time,w_time;
-    v_time = ( (mtime_t)v.time.i_high << 32 ) + v.time.i_low;
-    w_time = ( (mtime_t)w.time.i_high << 32 ) + w.time.i_low;
-    return v_time == w_time ? 0 : v_time > w_time ? 1 : -1;
+    return v.i_time == w.i_time ? 0 : v.i_time > w.i_time ? 1 : -1;
 }
 static int CmpString( vlc_value_t v, vlc_value_t w ) { return strcmp( v.psz_string, w.psz_string ); }
 static int CmpFloat( vlc_value_t v, vlc_value_t w ) { return v.f_float == w.f_float ? 0 : v.f_float > w.f_float ? 1 : -1; }
@@ -237,8 +234,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             break;
         case VLC_VAR_TIME:
             p_var->pf_cmp = CmpTime;
-            p_var->val.time.i_low = 0;
-            p_var->val.time.i_high = 0;
+            p_var->val.i_time = 0;
             break;
         case VLC_VAR_ADDRESS:
             p_var->pf_cmp = CmpAddress;
