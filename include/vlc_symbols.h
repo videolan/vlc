@@ -3,6 +3,7 @@
 struct module_symbols_t
 {
     aout_buffer_t * (* aout_BufferNew_inner) ( aout_instance_t *, aout_input_t *, size_t ) ;
+    aout_buffer_t * (* aout_FifoPop_inner) ( aout_instance_t * p_aout, aout_fifo_t * p_fifo ) ;
     aout_buffer_t * (* aout_OutputNextBuffer_inner) ( aout_instance_t *, mtime_t, vlc_bool_t ) ;
     aout_input_t * (* __aout_InputNew_inner) ( vlc_object_t *, aout_instance_t **, audio_sample_format_t * ) ;
     aout_instance_t * (* __aout_NewInstance_inner) ( vlc_object_t * ) ;
@@ -220,6 +221,7 @@ struct module_symbols_t
 #   define aout_DateMove p_symbols->aout_DateMove_inner
 #   define aout_DateSet p_symbols->aout_DateSet_inner
 #   define aout_DeleteInstance p_symbols->aout_DeleteInstance_inner
+#   define aout_FifoPop p_symbols->aout_FifoPop_inner
 #   define aout_InputDelete p_symbols->aout_InputDelete_inner
 #   define aout_OutputNextBuffer p_symbols->aout_OutputNextBuffer_inner
 #   define config_Duplicate p_symbols->config_Duplicate_inner

@@ -180,6 +180,7 @@ static const char * module_error( char *psz_buffer )
  *****************************************************************************/
 #define STORE_SYMBOLS( p_symbols ) \
     (p_symbols)->aout_OutputNextBuffer_inner = aout_OutputNextBuffer; \
+    (p_symbols)->aout_FifoPop_inner = aout_FifoPop; \
     (p_symbols)->__aout_NewInstance_inner = __aout_NewInstance; \
     (p_symbols)->aout_DeleteInstance_inner = aout_DeleteInstance; \
     (p_symbols)->aout_BufferNew_inner = aout_BufferNew; \
