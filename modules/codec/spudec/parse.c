@@ -2,7 +2,7 @@
  * parse.c: SPU parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: parse.c,v 1.7 2002/12/16 23:25:23 massiot Exp $
+ * $Id: parse.c,v 1.8 2003/01/09 10:12:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -271,7 +271,8 @@ static int ParseControlSeq( spudec_thread_t *p_spudec,
         if( i_command == SPU_CMD_END )
         {
             /* Get the control sequence date */
-            date = GetBits( &p_spudec->bit_stream, 16 );
+            date = GetBits( &p_spudec->bit_stream, 16 ) * 11000
+                    * p_spudec->bit_stream.p_pes->i_rate / DEFAULT_RATE;
 
             /* Next offset */
             i_cur_seq = i_index;
@@ -287,17 +288,17 @@ static int ParseControlSeq( spudec_thread_t *p_spudec,
         switch( i_command )
         {
         case SPU_CMD_FORCE_DISPLAY: /* 00 (force displaying) */
-            p_spu->i_start = p_spu->p_sys->i_pts + ( date * 11000 );
+            p_spu->i_start = p_spu->p_sys->i_pts + date;
             p_spu->b_ephemer = VLC_TRUE;
             break;
 
         /* Convert the dates in seconds to PTS values */
         case SPU_CMD_START_DISPLAY: /* 01 (start displaying) */
-            p_spu->i_start = p_spu->p_sys->i_pts + ( date * 11000 );
+            p_spu->i_start = p_spu->p_sys->i_pts + date;
             break;
 
         case SPU_CMD_STOP_DISPLAY: /* 02 (stop displaying) */
-            p_spu->i_stop = p_spu->p_sys->i_pts + ( date * 11000 );
+            p_spu->i_stop = p_spu->p_sys->i_pts + date;
             break;
 
         case SPU_CMD_SET_PALETTE:
@@ -411,10 +412,11 @@ static int ParseControlSeq( spudec_thread_t *p_spudec,
         msg_Err( p_spudec->p_fifo, "no `start display' command" );
     }
 
-    if( !p_spu->i_stop && !p_spu->b_ephemer )
+    if( p_spu->i_stop <= p_spu->i_start && !p_spu->b_ephemer )
     {
         /* This subtitle will live for 5 seconds or until the next subtitle */
-        p_spu->i_stop = p_spu->i_start + 500 * 11000;
+        p_spu->i_stop = p_spu->i_start + 500 * 11000
+                         * p_spudec->bit_stream.p_pes->i_rate / DEFAULT_RATE;;
         p_spu->b_ephemer = VLC_TRUE;
     }
 
