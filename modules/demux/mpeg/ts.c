@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.36 2003/09/10 11:51:00 fenrir Exp $
+ * $Id: ts.c,v 1.37 2003/09/20 17:35:38 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -1175,9 +1175,12 @@ static void TS_DVBPSI_HandlePAT( input_thread_t * p_input,
 
     p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;
 
-    if ( ( p_new_pat->b_current_next && ( p_new_pat->i_version != p_stream_data->i_pat_version ) ) ||
-            p_stream_data->i_pat_version == PAT_UNINITIALIZED  )
+    if( ( p_new_pat->b_current_next &&
+          ( p_new_pat->i_version != p_stream_data->i_pat_version ) ) ||
+        p_stream_data->i_pat_version == PAT_UNINITIALIZED  )
     {
+        msg_Dbg( p_input, "Processing PAT version %d", p_new_pat->i_version );
+
         /* Delete all programs */
         while( p_input->stream.i_pgrm_number )
         {
@@ -1189,6 +1192,10 @@ static void TS_DVBPSI_HandlePAT( input_thread_t * p_input,
                 MP4_IODClean( &p_pgrm_demux_old->iod );
             }
 
+            /* Delete old PMT decoder */
+            if( p_pgrm_demux_old->p_pmt_handle )
+                dvbpsi_DetachPMT( p_pgrm_demux_old->p_pmt_handle );
+
             input_DelProgram( p_input, p_input->stream.pp_programs[0] );
         }
 
@@ -1197,6 +1204,8 @@ static void TS_DVBPSI_HandlePAT( input_thread_t * p_input,
 
         while( p_pgrm )
         {
+            msg_Dbg( p_input, "New program: %d", p_pgrm->i_number );
+
             /* If program = 0, we're having info about NIT not PMT */
             if( p_pgrm->i_number )
             {
@@ -1690,7 +1699,7 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                     p_input->pf_set_program( p_input, p_pgrm_to_select );
             }
             else
-                    p_input->pf_set_program( p_input, p_pgrm );
+                p_input->pf_set_program( p_input, p_pgrm );
         }
         /* if the pmt belongs to the currently selected program, we
          * reselect it to update its ES */

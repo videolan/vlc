@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.118 2003/08/17 20:39:08 fenrir Exp $
+ * $Id: input_programs.c,v 1.119 2003/09/20 17:35:38 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -291,6 +291,9 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
                  p_input->stream.i_pgrm_number,
                  i_pgrm_index );
 
+    if( p_pgrm == p_input->stream.p_selected_program )
+        p_input->stream.p_selected_program = NULL;
+
     /* Free the description of this program */
     free( p_pgrm );
 }
@@ -497,7 +500,6 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
         }
 
     }
-
 
     p_input->stream.p_selected_program = p_new_prg;
 
