@@ -1493,7 +1493,7 @@ AC_ARG_ENABLE(esd,
      AC_PATH_PROG(ESD_CONFIG, esd-config, no)
      if test "x${ESD_CONFIG}" != "xno"
      then
-       #PLUGINS="${PLUGINS} audio_output/esd"
+       PLUGINS="${PLUGINS} audio_output/esd"
        esd_CFLAGS="${esd_CFLAGS} `${ESD_CONFIG} --cflags`"
        esd_LDFLAGS="${esd_LDFLAGS} `${ESD_CONFIG} --libs`"
      fi
@@ -1509,7 +1509,7 @@ AC_ARG_ENABLE(arts,
      AC_PATH_PROG(ARTS_CONFIG, artsc-config, no)
      if test "x${ARTS_CONFIG}" != "xno"
      then
-       #PLUGINS="${PLUGINS} audio_output/arts"
+       PLUGINS="${PLUGINS} audio_output/arts"
        arts_CFLAGS="${arts_CFLAGS} `${ARTS_CONFIG} --cflags`"
        arts_LDFLAGS="${arts_LDFLAGS} `${ARTS_CONFIG} --libs `"
      fi
