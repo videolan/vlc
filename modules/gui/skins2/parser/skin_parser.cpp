@@ -187,7 +187,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["visible"],
                 atoi( attr["width"]), atoi( attr["height"] ),
                 attr["lefttop"], attr["rightbottom"],
-                attr["font"], attr["var"], convertColor( attr["fgcolor"] ),
+                attr["font"], "playlist", convertColor( attr["fgcolor"] ),
                 convertColor( attr["playcolor"] ),
                 convertColor( attr["bgcolor1"] ),
                 convertColor( attr["bgcolor2"] ),
