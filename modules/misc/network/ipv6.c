@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.6 2002/12/23 16:05:04 massiot Exp $
+ * $Id: ipv6.c,v 1.7 2002/12/23 16:21:54 massiot Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -88,7 +88,8 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
                       const char * psz_bind_address, int i_port )
 {
     char * psz_multicast_interface = "";
-    char * psz_address = strdup(psz_bind_address);
+    char * psz_backup = strdup(psz_bind_address);
+    char * psz_address = psz_backup;
 
 #if defined(WIN32)
     /* Try to get getaddrinfo() and freeaddrinfo() from wship6.dll */
@@ -114,7 +115,7 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
     {
         msg_Err( p_this, "no IPv6 stack installed" );
         if( wship6_dll ) FreeLibrary( wship6_dll );
-	free( psz_address );
+        free( psz_backup );
         return( -1 );
     }
 #endif
@@ -161,7 +162,7 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
         if( _getaddrinfo( psz_address, NULL, &hints, &res ) )
         {
             FreeLibrary( wship6_dll );
-            free( psz_address );
+            free( psz_backup );
             return( -1 );
         }
         memcpy( &p_socket->sin6_addr,
@@ -180,7 +181,7 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
         if ( (p_hostent = gethostbyname2( psz_address, AF_INET6 )) == NULL )
         {
             msg_Err( p_this, "ipv6 error: unknown host %s", psz_address );
-            free( psz_address );
+            free( psz_backup );
             return( -1 );
         }
 
@@ -192,7 +193,7 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
         if( _getaddrinfo( psz_address, NULL, &hints, &res ) )
         {
             FreeLibrary( wship6_dll );
-            free( psz_address );
+            free( psz_backup );
             return( -1 );
         }
         memcpy( &p_socket->sin6_addr,
@@ -203,7 +204,7 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
 #else
         msg_Err( p_this, "ipv6 error: IPv6 address %s is invalid",
                  psz_address );
-        free( psz_address );
+        free( psz_backup );
         return( -1 );
 #endif
     }
@@ -212,7 +213,7 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
     FreeLibrary( wship6_dll );
 #endif
 
-    free( psz_address );
+    free( psz_backup );
     return 0;
 }
 
