@@ -374,7 +374,6 @@ int ioctl_SetQAMFrontend( input_thread_t * p_input, struct dvb_frontend_paramete
 
     /* Check Status of frontend */
     i_ret = ioctl_CheckFrontend( p_input, FE_QAM );
-
     return i_ret;
 }
 
@@ -387,7 +386,7 @@ static int ioctl_CheckFrontend( input_thread_t * p_input, fe_type_t type )
     int          fd_front = p_dvb->i_frontend;
     int          i_ret;
 
-    while( !p_input->b_die )
+    while( !p_input->b_die || !p_input->b_error )
     {
         int32_t value;
         fe_status_t status;
@@ -449,7 +448,7 @@ static int ioctl_CheckFrontend( input_thread_t * p_input, fe_type_t type )
             }
             msg_Err( p_input, "check frontend ... resend frontend parameters" );
             msg_Err( p_input, "check frontend ... tuning failed" );
-            return -1;
+            return -3;
         }
 
         /* Read some statistics */

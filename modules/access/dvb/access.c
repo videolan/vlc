@@ -83,6 +83,7 @@ int E_(Open) ( vlc_object_t *p_this )
     int                 i_len = 0;
     vlc_value_t         val;
     int                 i_test;
+    int 		i_ret;
 
     /* parse the options passed in command line : */
     psz_parser = strdup( p_input->psz_name );
@@ -469,13 +470,15 @@ int E_(Open) ( vlc_object_t *p_this )
             fep.u.qpsk.symbol_rate = p_dvb->u_srate;
             fep.u.qpsk.fec_inner = dvb_DecodeFEC( p_input, p_dvb->i_fec ); 
             msg_Dbg( p_input, "DVB-S: satellite (QPSK) frontend %s found", frontend_info.name );
-
-            if( ioctl_SetQPSKFrontend( p_input, fep ) < 0 )
+	    while( (i_ret = ioctl_SetQPSKFrontend( p_input, fep )) < 0 )
             {
-                msg_Err( p_input, "DVB-S: tuning failed" );
-                close( p_dvb->i_frontend );
-                free( p_dvb );
-                return -1;
+		if( (i_ret != -3) && (i_ret < 0))
+		{
+                    msg_Err( p_input, "DVB-S: tuning failed" );
+                    close( p_dvb->i_frontend );
+                    free( p_dvb );
+                    return -1;
+		}
             }
             break;
             
@@ -487,12 +490,15 @@ int E_(Open) ( vlc_object_t *p_this )
             fep.u.qam.fec_inner = dvb_DecodeFEC( p_input, p_dvb->i_fec ); 
             fep.u.qam.modulation = dvb_DecodeModulation( p_input, p_dvb->i_modulation ); 
             msg_Dbg( p_input, "DVB-C: cable (QAM) frontend %s found", frontend_info.name );
-            if( ioctl_SetQAMFrontend( p_input, fep ) < 0 )
-            {
-                msg_Err( p_input, "DVB-C: tuning failed" );
-                close( p_dvb->i_frontend );
-                free( p_dvb );
-                return -1;
+            while( ( i_ret = ioctl_SetQAMFrontend( p_input, fep ) ) < 0  )
+            {		
+		if( (i_ret != -3) && (i_ret < 0))
+                {
+                    msg_Err( p_input, "DVB-C: tuning failed" );
+                    close( p_dvb->i_frontend );
+                    free( p_dvb );
+                    return -1;
+                }
             }
             break;
 
@@ -508,12 +514,15 @@ int E_(Open) ( vlc_object_t *p_this )
             fep.u.ofdm.guard_interval = dvb_DecodeGuardInterval( p_input, p_dvb->i_guard );
             fep.u.ofdm.hierarchy_information = dvb_DecodeHierarchy( p_input, p_dvb->i_hierarchy );
             msg_Dbg( p_input, "DVB-T: terrestrial (OFDM) frontend %s found", frontend_info.name );
-            if( ioctl_SetOFDMFrontend( p_input, fep ) < 0 )
+            while( (i_ret=ioctl_SetOFDMFrontend( p_input, fep )) < 0 )
             {
-                msg_Err( p_input, "DVB-T: tuning failed" );
-                close( p_dvb->i_frontend );
-                free( p_dvb );
-                return -1;
+		if( (i_ret != -3) && (i_ret < 0))
+                {
+                    msg_Err( p_input, "DVB-T: tuning failed" );
+                    close( p_dvb->i_frontend );
+                    free( p_dvb );
+                    return -1;
+		}
             }
             break;
         default:
