@@ -884,7 +884,7 @@ dnl
 dnl  default modules
 dnl
 AX_ADD_PLUGINS([dummy rc telnet logger gestures memcpy hotkeys netsync])
-AX_ADD_PLUGINS([mpgv mpga m4v h264 mpeg_system ps ps2 pva ts avi asf aac mp4 rawdv demux2 nsv real aiff mjpeg])
+AX_ADD_PLUGINS([mpgv mpga m4v h264 mpeg_system ps ps2 pva ts_old avi asf aac mp4 rawdv demux2 nsv real aiff mjpeg])
 AX_ADD_PLUGINS([cvdsub svcdsub spudec dvbsub mpeg_audio lpcm a52 dts cinepak])
 AX_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 AX_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32])
@@ -1111,7 +1111,7 @@ AC_ARG_ENABLE(sout,
 if test "${enable_sout}" != "no"
 then
   AX_ADD_PLUGINS([access_output_dummy access_output_udp access_output_file access_output_http])
-  AX_ADD_PLUGINS([mux_ts mux_ps mux_avi mux_mp4 mux_asf mux_dummy])
+  AX_ADD_PLUGINS([mux_ps mux_avi mux_mp4 mux_asf mux_dummy])
   AX_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
   AX_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
   AX_ADD_PLUGINS([packetizer_copy])
@@ -1455,8 +1455,8 @@ then
     if test -z "${with_dvbpsi_tree}"
     then
       AC_CHECK_HEADERS(dvbpsi/dr.h,
-        [ AX_ADD_PLUGINS([ts_dvbpsi mux_ts_dvbpsi ts2])
-          AX_ADD_LDFLAGS([ts_dvbpsi mux_ts_dvbpsi ts2],[-ldvbpsi]) ],
+        [ AX_ADD_PLUGINS([ts_old_dvbpsi mux_ts ts])
+          AX_ADD_LDFLAGS([ts_old_dvbpsi mux_ts ts],[-ldvbpsi]) ],
         [  AC_MSG_WARN([cannot find libdvbpsi headers]) ],
         [#if defined( HAVE_STDINT_H )
 #   include <stdint.h>
@@ -1480,9 +1480,9 @@ then
       then
         dnl  Use a custom libdvbpsi
         AC_MSG_RESULT(${real_dvbpsi_tree}/src/.libs/libdvbpsi.a)
-        AX_ADD_BUILTINS([ts_dvbpsi mux_ts_dvbpsi ts2])
-        AX_ADD_CPPFLAGS([ts_dvbpsi mux_ts_dvbpsi ts2],[-I${real_dvbpsi_tree}/src])
-        AX_ADD_LDFLAGS([ts_dvbpsi mux_ts_dvbpsi ts2],[-L${real_dvbpsi_tree}/src/.libs -ldvbpsi])
+        AX_ADD_BUILTINS([ts_old_dvbpsi mux_ts ts])
+        AX_ADD_CPPFLAGS([ts_old_dvbpsi mux_ts ts],[-I${real_dvbpsi_tree}/src])
+        AX_ADD_LDFLAGS([ts_old_dvbpsi mux_ts ts],[-L${real_dvbpsi_tree}/src/.libs -ldvbpsi])
       else
         dnl  The given libdvbpsi wasn't built
         AC_MSG_RESULT(no)
@@ -1505,9 +1505,9 @@ then
     fi
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_test}"
     AC_CHECK_HEADERS([dvbpsi/dr.h],[
-      AX_ADD_PLUGINS([ts_dvbpsi mux_ts_dvbpsi ts2])
-      AX_ADD_CPPFLAGS([ts_dvbpsi mux_ts_dvbpsi ts2],[${CPPFLAGS_test}])
-      AX_ADD_LDFLAGS([ts_dvbpsi mux_ts_dvbpsi ts2],[${LDFLAGS_test} -ldvbpsi])
+      AX_ADD_PLUGINS([ts_old_dvbpsi mux_ts ts])
+      AX_ADD_CPPFLAGS([ts_old_dvbpsi mux_ts ts],[${CPPFLAGS_test}])
+      AX_ADD_LDFLAGS([ts_old_dvbpsi mux_ts ts],[${LDFLAGS_test} -ldvbpsi])
 
     ],[
       if test -n "${enable_dvbpsi}"

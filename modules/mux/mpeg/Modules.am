@@ -10,12 +10,3 @@ SOURCES_mux_ts = ts.c \
                  csa.h \
                  bits.h \
                  $(NULL)
-
-SOURCES_mux_ts_dvbpsi = ts.c \
-                        pes.c \
-                        pes.h \
-                        csa.c \
-                        csa.h \
-                        bits.h \
-                        $(NULL)
-

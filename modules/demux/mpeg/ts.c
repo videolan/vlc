@@ -31,7 +31,7 @@
 
 #include "iso_lang.h"
 
-#if defined MODULE_NAME_IS_ts_dvbpsi
+#if defined MODULE_NAME_IS_ts_old_dvbpsi
 #   ifdef HAVE_DVBPSI_DR_H
 #       include <dvbpsi/dvbpsi.h>
 #       include <dvbpsi/descriptor.h>
@@ -100,13 +100,13 @@ static int  Activate   ( vlc_object_t * );
 static void Deactivate ( vlc_object_t * );
 static int  Demux      ( input_thread_t * );
 
-#if defined MODULE_NAME_IS_ts
+#if defined MODULE_NAME_IS_ts_old
 static void TSDemuxPSI ( input_thread_t *, data_packet_t *,
                           es_descriptor_t *, vlc_bool_t );
 static void TSDecodePAT( input_thread_t *, es_descriptor_t *);
 static void TSDecodePMT( input_thread_t *, es_descriptor_t *);
 #define PSI_CALLBACK TSDemuxPSI
-#elif defined MODULE_NAME_IS_ts_dvbpsi
+#elif defined MODULE_NAME_IS_ts_olddvbpsi
 static void TS_DVBPSI_DemuxPSI  ( input_thread_t *, data_packet_t *,
                                   es_descriptor_t *, vlc_bool_t );
 static void TS_DVBPSI_HandlePAT ( input_thread_t *, dvbpsi_pat_t * );
@@ -129,11 +129,11 @@ static void TS_DVBPSI_HandlePMT ( input_thread_t *, dvbpsi_pmt_t * );
     "continuity counters, select this option.")
 
 vlc_module_begin();
-#if defined MODULE_NAME_IS_ts
+#if defined MODULE_NAME_IS_ts_old
     set_description( _("ISO 13818-1 MPEG Transport Stream input") );
     set_capability( "demux", 6 );
     add_shortcut( "ts_old" );
-#elif defined MODULE_NAME_IS_ts_dvbpsi
+#elif defined MODULE_NAME_IS_ts_old_dvbpsi
     set_description( _("ISO 13818-1 MPEG Transport Stream input (libdvbpsi)") );
     set_capability( "demux", 5 );
     add_shortcut( "ts_old_dvbpsi" );
@@ -250,7 +250,7 @@ static int Activate( vlc_object_t * p_this )
     p_stream_data->i_pat_version = PAT_UNINITIALIZED ;
     p_stream_data->b_buggy_psi = config_GetInt( p_input, "buggy-psi" );
 
-#ifdef MODULE_NAME_IS_ts_dvbpsi
+#ifdef MODULE_NAME_IS_ts_old_dvbpsi
     p_stream_data->p_pat_handle = (dvbpsi_handle *)
       dvbpsi_AttachPAT( (dvbpsi_pat_callback) &TS_DVBPSI_HandlePAT, p_input );
 
@@ -326,7 +326,7 @@ static int Demux( input_thread_t * p_input )
 }
 
 
-#if defined MODULE_NAME_IS_ts
+#if defined MODULE_NAME_IS_ts_old
 /*
  * PSI demultiplexing and decoding without libdvbpsi
  */
@@ -821,7 +821,7 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
 #undef p_psi
 }
 
-#elif defined MODULE_NAME_IS_ts_dvbpsi
+#elif defined MODULE_NAME_IS_ts_old_dvbpsi
 /*
  * PSI Decoding using libdvbpsi
  */
