@@ -78,9 +78,6 @@ enum
     RSortTitle_Event,
     Randomize_Event,
 
-    EnableSelection_Event,
-    DisableSelection_Event,
-
     InvertSelection_Event,
     DeleteSelection_Event,
     Random_Event,
@@ -93,7 +90,6 @@ enum
     PopupPreparse_Event,
     PopupSort_Event,
     PopupDel_Event,
-    PopupEna_Event,
     PopupInfo_Event,
 
     SearchText_Event,
@@ -135,8 +131,6 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
 
     EVT_MENU(Randomize_Event, Playlist::OnSort)
 
-    EVT_MENU(EnableSelection_Event, Playlist::OnEnableSelection)
-    EVT_MENU(DisableSelection_Event, Playlist::OnDisableSelection)
     EVT_MENU(InvertSelection_Event, Playlist::OnInvertSelection)
     EVT_MENU(DeleteSelection_Event, Playlist::OnDeleteSelection)
     EVT_MENU(SelectAll_Event, Playlist::OnSelectAll)
@@ -154,7 +148,6 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
     EVT_MENU( PopupPreparse_Event, Playlist::OnPopupPreparse)
     EVT_MENU( PopupSort_Event, Playlist::OnPopupSort)
     EVT_MENU( PopupDel_Event, Playlist::OnPopupDel)
-    EVT_MENU( PopupEna_Event, Playlist::OnPopupEna)
     EVT_MENU( PopupInfo_Event, Playlist::OnPopupInfo)
 
     /* Tree control events */
@@ -244,9 +237,6 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Create our "Selection" menu */
     wxMenu *selection_menu = new wxMenu;
-    selection_menu->Append( EnableSelection_Event, wxU(_("&Enable")) );
-    selection_menu->Append( DisableSelection_Event, wxU(_("&Disable")) );
-    selection_menu->AppendSeparator();
     selection_menu->Append( InvertSelection_Event, wxU(_("&Invert")) );
     selection_menu->Append( DeleteSelection_Event, wxU(_("D&elete")) );
     selection_menu->Append( SelectAll_Event, wxU(_("&Select All")) );
@@ -271,7 +261,6 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     popup_menu->Append( PopupPreparse_Event, wxU(_("Preparse")) );
     popup_menu->Append( PopupSort_Event, wxU(_("Sort this branch")) );
     popup_menu->Append( PopupDel_Event, wxU(_("Delete")) );
-    popup_menu->Append( PopupEna_Event, wxU(_("Enable/Disable")) );
     popup_menu->Append( PopupInfo_Event, wxU(_("Info")) );
 
     /* Create a panel to put everything in */
@@ -1054,34 +1043,6 @@ void Playlist::OnDeleteSelection( wxCommandEvent& WXUNUSED(event) )
     Rebuild();
 }
 
-void Playlist::OnEnableSelection( wxCommandEvent& WXUNUSED(event) )
-{
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-    msg_Warn( p_playlist, "not implemented");
-    vlc_object_release( p_playlist);
-}
-
-void Playlist::OnDisableSelection( wxCommandEvent& WXUNUSED(event) )
-{
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-
-    msg_Warn( p_playlist, "not implemented");
-
-    vlc_object_release( p_playlist);
-}
-
 void Playlist::OnSelectAll( wxCommandEvent& WXUNUSED(event) )
 {
 }
@@ -1497,22 +1458,6 @@ void Playlist::OnPopupSort( wxMenuEvent& event )
             vlc_object_release( p_playlist );
         }
     }
-}
-
-void Playlist::OnPopupEna( wxMenuEvent& event )
-{
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-
-    p_popup_item->b_enabled = VLC_TRUE - p_popup_item->b_enabled;
-
-    vlc_object_release( p_playlist);
-    UpdateItem( i_popup_item );
 }
 
 void Playlist::OnPopupInfo( wxMenuEvent& event )
