@@ -171,7 +171,7 @@ dnl
 dnl Gettext stuff
 dnl
 ALL_LINGUAS="de en_GB fr it ja no ru nl pl sv"
-AM_GNU_GETTEXT_VERSION(0.10.40)
+AM_GNU_GETTEXT_VERSION(0.11.5)
 AM_GNU_GETTEXT
 if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
   AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, Define if we use the local libintl)
@@ -1756,12 +1756,25 @@ dnl
 dnl  Flac plugin
 dnl
 AC_ARG_ENABLE(flac,
-  [  --enable-falc         flac decoder support (default disabled)])
+  [  --enable-flac           flac decoder support (default disabled)])
 if test "x${enable_flac}" = "xyes"
 then
   AC_CHECK_HEADERS(FLAC/stream_decoder.h, [
     PLUGINS="${PLUGINS} flac flacdec"
     LDFLAGS_flacdec="${LDFLAGS_flacdec} -lFLAC"
+   ],[])
+fi
+
+dnl
+dnl  Libmpeg2 plugin
+dnl
+AC_ARG_ENABLE(libmpeg2,
+  [  --enable-libmpeg2       libmpeg2 decoder support (default disabled)])
+if test "x${enable_libmpeg2}" = "xyes"
+then
+  AC_CHECK_HEADERS(mpeg2dec/mpeg2.h, [
+    PLUGINS="${PLUGINS} libmpeg2"
+    LDFLAGS_libmpeg2="${LDFLAGS_libmpeg2} -lmpeg2"
    ],[])
 fi
 

@@ -10,3 +10,4 @@ SOURCES_dv = modules/codec/dv.c
 SOURCES_xvid = modules/codec/xvid.c
 SOURCES_adpcm = modules/codec/adpcm.c
 SOURCES_mpeg_audio = modules/codec/mpeg_audio.c
+SOURCES_libmpeg2 = modules/codec/libmpeg2.c
