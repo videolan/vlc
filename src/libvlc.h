@@ -1060,6 +1060,8 @@ vlc_module_begin();
     add_key( "key-play-bookmark10", KEY_UNSET, NULL, PLAY_BOOKMARK10_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-history-back", KEY_MODIFIER_COMMAND|'[', NULL, HISTORY_BACK_TEXT, HISTORY_BACK_LONGTEXT, VLC_TRUE );
     add_key( "key-history-forward", KEY_MODIFIER_COMMAND|']', NULL, HISTORY_FORWARD_TEXT, HISTORY_FORWARD_LONGTEXT, VLC_TRUE );
+    add_key( "key-audio-track", 'l', NULL, AUDIO_TRACK_KEY_TEXT, AUDIO_TRACK_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-subtitle-track", 's', NULL, SUBTITLE_TRACK_KEY_TEXT, SUBTITLE_TRACK_KEY_LONGTEXT, VLC_FALSE );
 #else
     add_key( "key-fullscreen", 'f', NULL, FULLSCREEN_KEY_TEXT, FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-play-pause", KEY_SPACE, NULL, PLAY_PAUSE_KEY_TEXT, PLAY_PAUSE_KEY_LONGTEXT, VLC_FALSE );
