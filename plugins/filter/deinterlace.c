@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.12.2.1 2002/06/17 09:32:28 sam Exp $
+ * $Id: deinterlace.c,v 1.12.2.2 2002/10/11 21:14:50 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -498,17 +498,16 @@ static void RenderLinear( vout_thread_t *p_vout,
     {
         u8 *p_in, *p_out_end, *p_out;
 
-        p_in = p_pic->p[i_plane].p_pixels
-                   + i_field * p_pic->p[i_plane].i_pitch;
-
+        p_in = p_pic->p[i_plane].p_pixels;
         p_out = p_outpic->p[i_plane].p_pixels;
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch
                              * p_outpic->p[i_plane].i_lines;
 
-        if( i_field == 0 )
+        /* For BOTTOM field we need to add the first line */
+        if( i_field == 1 )
         {
             FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
-            p_in += 2 * p_pic->p[i_plane].i_pitch;
+            p_in += p_pic->p[i_plane].i_pitch;
             p_out += p_pic->p[i_plane].i_pitch;
         }
 
@@ -527,13 +526,15 @@ static void RenderLinear( vout_thread_t *p_vout,
             p_out += p_pic->p[i_plane].i_pitch;
         }
 
-#if 0
+        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
+
+        /* For TOP field we need to add the last line */
         if( i_field == 0 )
         {
-            p_in -= 2 * p_pic->p[i_plane].i_pitch;
+            p_in += p_pic->p[i_plane].i_pitch;
+            p_out += p_pic->p[i_plane].i_pitch;
             FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
         }
-#endif
     }
 }
 
