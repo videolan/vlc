@@ -335,22 +335,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
         break;
 
     case SPU_ES:
-        {
-            subtitle_data_t *p_sub = malloc( sizeof( subtitle_data_t ) );
-            memset( p_sub, 0, sizeof( subtitle_data_t ) );
-            if( fmt->i_extra > 0 )
-            {
-                p_sub->psz_header = malloc( fmt->i_extra  + 1 );
-                memcpy( p_sub->psz_header, fmt->p_extra , fmt->i_extra );
-                /* just to be sure */
-                ((uint8_t*)fmt->p_extra)[fmt->i_extra] = '\0';
-            }
-            /* FIXME beuuuuuurk */
-            es->p_es->p_demux_data = p_sub;
-
-            es->i_channel = p_sys->i_sub;
-            break;
-        }
+        es->i_channel = p_sys->i_sub;
+        break;
 
     default:
         es->i_channel = 0;
@@ -695,7 +681,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                     p_prgm = EsOutAddProgram( out, i_group );
                 }
             }
-            i_pcr   = (int64_t)va_arg( args, int64_t );
+            i_pcr = (int64_t)va_arg( args, int64_t );
 
             /* search program */
             if( p_prgm )
@@ -709,7 +695,8 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
         case ES_OUT_RESET_PCR:
             for( i = 0; i < p_sys->p_input->stream.i_pgrm_number; i++ )
             {
-                p_sys->p_input->stream.pp_programs[i]->i_synchro_state = SYNCHRO_REINIT;
+                p_sys->p_input->stream.pp_programs[i]->i_synchro_state =
+                    SYNCHRO_REINIT;
                 p_sys->p_input->stream.pp_programs[i]->last_pts = 0;
             }
             p_sys->b_pcr_set = VLC_TRUE;
