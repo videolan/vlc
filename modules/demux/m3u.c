@@ -43,6 +43,7 @@
 #define TYPE_HTML 3
 #define TYPE_PLS 4
 #define TYPE_B4S 5
+#define TYPE_WMP 6
 
 struct demux_sys_t
 {
@@ -124,12 +125,13 @@ static int Activate( vlc_object_t * p_this )
     {
         uint8_t *p_peek;
         int i_size = stream_Peek( p_demux->s, &p_peek, MAX_LINE );
-        i_size -= sizeof("[playlist]") - 1;
+        i_size -= sizeof("[Reference]") - 1;
 
         if( i_size > 0 )
         {
             while( i_size &&
                    strncasecmp(p_peek, "[playlist]", sizeof("[playlist]") - 1)
+                   && strncasecmp( p_peek, "[Reference]", sizeof("[Reference]") - 1 )
                    && strncasecmp( p_peek, "<html>", sizeof("<html>") - 1 )
                    && strncasecmp( p_peek, "<asx", sizeof("<asx") - 1 )
                    && strncasecmp( p_peek, "<?xml", sizeof("<?xml") -1 ) )
@@ -144,6 +146,10 @@ static int Activate( vlc_object_t * p_this )
             else if( !strncasecmp( p_peek, "[playlist]", sizeof("[playlist]") -1 ) )
             {
                 i_type2 = TYPE_PLS;
+            }
+            else if( !strncasecmp( p_peek, "[Reference]", sizeof("[Reference]") -1 ) )
+            {
+                i_type2 = TYPE_WMP;
             }
             else if( !strncasecmp( p_peek, "<html>", sizeof("<html>") -1 ) )
             {
@@ -296,6 +302,26 @@ static int ParseLine( demux_t *p_demux, char *psz_line, char *psz_data,
             psz_bol = strchr( psz_bol, '=' );
             if ( !psz_bol ) return 0;
             psz_bol++;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else if ( p_m3u->i_type == TYPE_WMP )
+    {
+        /* We are dealing with some weird WMP stream playlist format
+         * Hurray for idiotic M$. Lines look like: "Ref1=http://..." */
+        if( !strncasecmp( psz_bol, "Ref", sizeof("Ref") - 1 ) )
+        {
+            psz_bol += sizeof("Ref") - 1;
+            psz_bol = strchr( psz_bol, '=' );
+            if ( !psz_bol ) return 0;
+            psz_bol++;
+            if( !strncasecmp( psz_bol, "http://", sizeof("http://") -1 ) )
+            {
+                psz_bol[0] = 'm'; psz_bol[1] = 'm'; psz_bol[2] = 's'; psz_bol[3] = 'h';
+            }
         }
         else
         {
