@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <vlc/vlc.h>
 
+#include "vlc_block.h"
+#include "vlc_stream.h"
 #include "vlc_xml.h"
 
 #include <libxml/xmlreader.h>
