@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.12 2003/04/20 23:42:17 massiot Exp $
+ * $Id: libmpeg2.c,v 1.13 2003/04/22 12:54:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -234,9 +234,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             else
             {
                 /* Use the value provided in the MPEG sequence header */
-                i_aspect = ((uint64_t)p_dec->p_info->sequence->width) *
+                i_aspect = ((uint64_t)p_dec->p_info->sequence->display_width) *
                     p_dec->p_info->sequence->pixel_width * VOUT_ASPECT_FACTOR /
-                    p_dec->p_info->sequence->height /
+                    p_dec->p_info->sequence->display_height /
                     p_dec->p_info->sequence->pixel_height;
             }
 
