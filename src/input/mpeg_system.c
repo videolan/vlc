@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.71 2001/12/11 13:55:55 massiot Exp $
+ * $Id: mpeg_system.c,v 1.72 2001/12/12 13:48:09 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -476,10 +476,11 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
         else
         {
             /* Update the relations between the data packets */
-            p_es->p_last->p_next = p_data;
+            p_pes->p_last->p_next = p_data;
         }
 
-        p_es->p_last = p_data;
+        p_pes->p_last = p_data;
+        p_pes->i_nb_data++;
 
         /* Size of the payload carried in the data packet */
         p_pes->i_pes_size += (p_data->p_payload_end

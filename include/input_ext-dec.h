@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.43 2001/12/12 11:18:38 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.44 2001/12/12 13:48:09 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -84,6 +84,9 @@ typedef struct pes_packet_s
        p_next fields of the data_packet_t struct) */
     data_packet_t *         p_first;      /* The first packet contained by this
                                            * PES (used by decoders). */
+    data_packet_t *         p_last;    /* The last packet contained by this
+                                          PES (used by the buffer allocator) */
+    int                     i_nb_data;
 
     /* Chained list used by the input buffers manager */
     struct pes_packet_s *   p_next;
