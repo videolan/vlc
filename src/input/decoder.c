@@ -585,11 +585,20 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             while( (p_packetized_block =
                     p_packetizer->pf_packetize( p_packetizer, &p_block )) )
             {
-                while( (p_aout_buf =
-                        p_dec->pf_decode_audio( p_dec, &p_packetized_block )) )
+                while( p_packetized_block )
                 {
-                    aout_DecPlay( p_dec->p_owner->p_aout,
-                                  p_dec->p_owner->p_aout_input, p_aout_buf );
+                    block_t *p_next = p_packetized_block->p_next;
+                    p_packetized_block->p_next = NULL;
+
+                    while( (p_aout_buf = p_dec->pf_decode_audio( p_dec,
+                                                       &p_packetized_block )) )
+                    {
+                        aout_DecPlay( p_dec->p_owner->p_aout,
+                                      p_dec->p_owner->p_aout_input,
+                                      p_aout_buf );
+                    }
+
+                    p_packetized_block = p_next;
                 }
             }
         }
@@ -611,12 +620,20 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             while( (p_packetized_block =
                     p_packetizer->pf_packetize( p_packetizer, &p_block )) )
             {
-                while( (p_pic =
-                        p_dec->pf_decode_video( p_dec, &p_packetized_block )) )
+                while( p_packetized_block )
                 {
-                    vout_DatePicture( p_dec->p_owner->p_vout, p_pic,
-                                      p_pic->date );
-                    vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
+                    block_t *p_next = p_packetized_block->p_next;
+                    p_packetized_block->p_next = NULL;
+
+                    while( (p_pic = p_dec->pf_decode_video( p_dec,
+                                                       &p_packetized_block )) )
+                    {
+                        vout_DatePicture( p_dec->p_owner->p_vout, p_pic,
+                                          p_pic->date );
+                        vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
+                    }
+
+                    p_packetized_block = p_next;
                 }
             }
         }
