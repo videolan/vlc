@@ -19,7 +19,6 @@
         {
             ACTIONS = {
                 backward = id; 
-                deinterlace = id; 
                 faster = id; 
                 forward = id; 
                 loop = id; 

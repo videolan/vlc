@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.39 2003/05/25 17:27:13 massiot Exp $
+ * $Id: controls.m,v 1.40 2003/06/01 23:48:17 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -360,42 +360,225 @@
     }
 }
 
-- (IBAction)deinterlace:(id)sender
+- (void)setupVarMenuItem:(NSMenuItem *)o_mi
+                    target:(vlc_object_t *)p_object
+                    var:(const char *)psz_variable
+                    selector:(SEL)pf_callback
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
-    BOOL bEnable = [sender state] == NSOffState;
+    vlc_value_t val, text;
+    int i_type = var_Type( p_object, psz_variable );
 
-    if( bEnable && ![[sender title] isEqualToString: @"none"] )
+    switch( i_type & VLC_VAR_TYPE )
     {
-        config_PutPsz( p_intf, "filter", "deinterlace" );
-	config_PutPsz( p_intf, "deinterlace-mode",
-                    [[sender title] UTF8String] );
+    case VLC_VAR_VOID:
+    case VLC_VAR_BOOL:
+    case VLC_VAR_VARIABLE:
+    case VLC_VAR_STRING:
+    case VLC_VAR_INTEGER:
+        break;
+    default:
+        /* Variable doesn't exist or isn't handled */
+        return;
+    }
+    
+    /* Make sure we want to display the variable */
+    if( i_type & VLC_VAR_HASCHOICE )
+    {
+        var_Change( p_object, psz_variable, VLC_VAR_CHOICESCOUNT, &val, NULL );
+        if( val.i_int == 0 ) return;
+        if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE && val.i_int == 1 )
+            return;
+    }
+    
+    /* Get the descriptive name of the variable */
+    var_Change( p_object, psz_variable, VLC_VAR_GETTEXT, &text, NULL );
+    [o_mi setTitle: [NSApp localizedString: text.psz_string ?
+                                        text.psz_string : strdup( psz_variable ) ]];
+
+    var_Get( p_object, psz_variable, &val );
+    if( i_type & VLC_VAR_HASCHOICE )
+    {
+        NSMenu *o_menu = [o_mi submenu];
+
+        [self setupVarMenu: o_menu forMenuItem: o_mi target:p_object
+                        var:psz_variable selector:pf_callback];
+        
+        if( text.psz_string ) free( text.psz_string );
+        return;
+    }
+
+    VLCMenuExt *o_data;
+    switch( i_type & VLC_VAR_TYPE )
+    {
+    case VLC_VAR_VOID:
+        o_data = [[VLCMenuExt alloc] initWithVar: psz_variable Object: p_object->i_object_id
+                Value: val ofType: i_type];
+        [o_mi setRepresentedObject: [NSValue valueWithPointer:[o_data retain]]];
+        break;
+
+    case VLC_VAR_BOOL:
+        o_data = [[VLCMenuExt alloc] initWithVar: psz_variable Object: p_object->i_object_id
+                Value: val ofType: i_type];
+        [o_mi setRepresentedObject: [NSValue valueWithPointer:[o_data retain]]];
+        [o_mi setState: val.b_bool ? TRUE : FALSE ];
+        break;
+
+    default:
+        if( text.psz_string ) free( text.psz_string );
+        return;
+    }
+
+    if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
+    if( text.psz_string ) free( text.psz_string );
+}
+
+
+- (void)setupVarMenu:(NSMenu *)o_menu
+                    forMenuItem: (NSMenuItem *)o_parent
+                    target:(vlc_object_t *)p_object
+                    var:(const char *)psz_variable
+                    selector:(SEL)pf_callback
+{
+    vlc_value_t val, val_list, text_list;
+    int i_type, i, i_nb_items;
+
+    /* remove previous items */
+    i_nb_items = [o_menu numberOfItems];
+    for( i = 0; i < i_nb_items; i++ )
+    {
+        [o_menu removeItemAtIndex: 0];
+    }
+
+    /* Check the type of the object variable */
+    i_type = var_Type( p_object, psz_variable );
+
+    /* Make sure we want to display the variable */
+    if( i_type & VLC_VAR_HASCHOICE )
+    {
+        var_Change( p_object, psz_variable, VLC_VAR_CHOICESCOUNT, &val, NULL );
+        if( val.i_int == 0 ) return;
+        if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE && val.i_int == 1 )
+            return;
     }
     else
     {
-        config_PutPsz( p_intf, "filter", NULL );
+        return;
     }
+
+    switch( i_type & VLC_VAR_TYPE )
+    {
+    case VLC_VAR_VOID:
+    case VLC_VAR_BOOL:
+    case VLC_VAR_VARIABLE:
+    case VLC_VAR_STRING:
+    case VLC_VAR_INTEGER:
+        break;
+    default:
+        /* Variable doesn't exist or isn't handled */
+        return;
+    }
+
+    if( var_Get( p_object, psz_variable, &val ) < 0 )
+    {
+        return;
+    }
+
+    if( var_Change( p_object, psz_variable, VLC_VAR_GETLIST,
+                    &val_list, &text_list ) < 0 )
+    {
+        if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
+        return;
+    }
+
+    /* make (un)sensitive */
+    [o_parent setEnabled: ( val_list.p_list->i_count > 1 )];
+
+    for( i = 0; i < val_list.p_list->i_count; i++ )
+    {
+        vlc_value_t another_val;
+        NSMenuItem * o_lmi;
+        NSString *o_title = @"";
+        VLCMenuExt *o_data;
+
+        switch( i_type & VLC_VAR_TYPE )
+        {
+        case VLC_VAR_VARIABLE:
+
+            /* This is causing crashes for the moment.
+            o_title = [NSApp localizedString: text_list.p_list->p_values[i].psz_string ?
+                text_list.p_list->p_values[i].psz_string : val_list.p_list->p_values[i].psz_string ];
+            
+            o_data = [[VLCMenuExt alloc] initWithVar: strdup(psz_variable) Object: p_object->i_object_id
+                Value: val ofType: i_type];
+            [o_lmi setRepresentedObject: [NSValue valueWithPointer:[o_data retain]]];
+
+            // Create a submenu
+            NSMenu *o_menu = [o_lmi submenu];
+
+            [self setupVarMenu: o_menu forMenuItem: o_lmi target:p_object
+                            var:psz_variable selector:pf_callback];
+*/
+            return;
+
+        case VLC_VAR_STRING:
+            another_val.psz_string =
+                strdup(val_list.p_list->p_values[i].psz_string);
+
+            o_title = [NSApp localizedString: text_list.p_list->p_values[i].psz_string ?
+                text_list.p_list->p_values[i].psz_string : val_list.p_list->p_values[i].psz_string ];
+
+            o_lmi = [o_menu addItemWithTitle: o_title action: pf_callback keyEquivalent: @""];
+            o_data = [[VLCMenuExt alloc] initWithVar: strdup(psz_variable) Object: p_object->i_object_id
+                    Value: another_val ofType: i_type];
+            [o_lmi setRepresentedObject: [NSValue valueWithPointer:[o_data retain]]];
+            [o_lmi setTarget: self];
+            
+            if( !strcmp( val.psz_string, val_list.p_list->p_values[i].psz_string ) )
+                [o_lmi setState: TRUE ];
+
+            break;
+
+        case VLC_VAR_INTEGER:
+
+             o_title = text_list.p_list->p_values[i].psz_string ?
+                                 [NSApp localizedString: strdup( text_list.p_list->p_values[i].psz_string )] :
+                                 [NSString stringWithFormat: @"%d",
+                                 val_list.p_list->p_values[i].i_int];
+
+            o_lmi = [[o_menu addItemWithTitle: o_title action: pf_callback keyEquivalent: @""] retain ];
+            o_data = [[VLCMenuExt alloc] initWithVar: strdup(psz_variable) Object: p_object->i_object_id
+                    Value: val_list.p_list->p_values[i] ofType: i_type];
+            [o_lmi setRepresentedObject: [NSValue valueWithPointer:[ o_data retain]]];
+            [o_lmi setTarget: self];
+
+            if( val_list.p_list->p_values[i].i_int == val.i_int )
+                [o_lmi setState: TRUE ];
+            break;
+
+        default:
+          break;
+        }
+    }
+    
+    /* clean up everything */
+    if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
+    var_Change( p_object, psz_variable, VLC_VAR_FREELIST, &val_list, &text_list );
 }
 
 - (IBAction)toggleVar:(id)sender
 {
     NSMenuItem *o_mi = (NSMenuItem *)sender;
-    NSMenu *o_mu = [o_mi menu];
-    
-    if( [o_mi state] == NSOffState )
-    {
-        const char * psz_variable = (const char *)
-            [[[o_mu supermenu] itemWithTitle: [o_mu title]] tag];
-        vlc_object_t * p_object = (vlc_object_t *)
-            [[o_mi representedObject] pointerValue];
-        vlc_value_t val;
-        val.i_int = (int)[o_mi tag];
+    VLCMenuExt *o_data = [[o_mi representedObject] pointerValue];
+    vlc_object_t *p_object;
 
-        if ( var_Set( p_object, psz_variable, val ) < 0 )
-        {
-            msg_Warn( p_object, "cannot set variable %s: with %d", psz_variable, val.i_int );
-        }
-    }
+    p_object = (vlc_object_t *)vlc_object_get( [NSApp getIntf],
+                                    [o_data objectID] );
+    if( p_object == NULL ) return;
+
+    var_Set( p_object, strdup([o_data name]), [o_data value] );
+    vlc_object_release( p_object );
+    
+    return;
 }
 
 @end
@@ -405,7 +588,6 @@
 - (BOOL)validateMenuItem:(NSMenuItem *)o_mi
 {
     BOOL bEnabled = TRUE;
-    NSMenu * o_menu = [o_mi menu];
     intf_thread_t * p_intf = [NSApp getIntf];
 
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -517,48 +699,6 @@
             vlc_object_release( (vlc_object_t *)p_vout );
         }
     }
-    else if( [[o_mi title] isEqualToString: _NS("Float On Top")] )
-    {
-        
-        bEnabled = TRUE;
-    }
-    else if( o_menu != nil && 
-             [[o_menu title] isEqualToString: _NS("Deinterlace")] )
-    {
-        char * psz_filter = config_GetPsz( p_intf, "filter" );
-        
-        if( psz_filter != NULL )
-        {
-            free( psz_filter );
-            
-            psz_filter = config_GetPsz( p_intf, "deinterlace-mode" );
-        }
-
-        if( psz_filter != NULL )
-        {
-            if( strcmp( psz_filter, [[o_mi title] UTF8String] ) == 0 )
-            {
-                [o_mi setState: NSOnState];
-            }
-            else
-            {
-                [o_mi setState: NSOffState];
-            }
-
-            free( psz_filter );
-        }
-        else
-        {
-            if( [[o_mi title] isEqualToString: @"none"] )
-            {
-                [o_mi setState: NSOnState];
-            }
-            else
-            {
-                [o_mi setState: NSOffState];
-            }
-        }
-    }
 
     if( p_playlist != NULL )
     {
@@ -567,6 +707,57 @@
     }
 
     return( bEnabled );
+}
+
+@end
+
+/*****************************************************************************
+ * VLCMenuExt implementation 
+ *****************************************************************************
+ * Object connected to a playlistitem which remembers the data belonging to
+ * the variable of the autogenerated menu
+ *****************************************************************************/
+@implementation VLCMenuExt
+
+- (id)initWithVar: (const char *)_psz_name Object: (int)i_id
+        Value: (vlc_value_t)val ofType: (int)_i_type
+{
+    self = [super init];
+
+    if( self != nil )
+    {
+        psz_name = strdup( _psz_name );
+        i_object_id = i_id;
+        value = val;
+        i_type = _i_type;
+    }
+
+    return( self );
+}
+
+- (void)dealloc
+{
+    free( psz_name );
+}
+
+- (char *)name
+{
+    return psz_name;
+}
+
+- (int)objectID
+{
+    return i_object_id;
+}
+
+- (vlc_value_t)value
+{
+    return value;
+}
+
+- (int)type
+{
+    return i_type;
 }
 
 @end

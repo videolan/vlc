@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.41 2003/05/26 14:59:37 hartman Exp $
+ * $Id: intf.h,v 1.42 2003/06/01 23:48:17 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -231,27 +231,19 @@ struct intf_sys_t
 - (void)manage:(playlist_t *)p_playlist;
 - (void)manageMode:(playlist_t *)p_playlist;
 - (void)manageIntf:(NSTimer *)o_timer;
+- (void)setupMenus;
 
 - (void)updateMessageArray;
 - (void)playStatusUpdated:(BOOL)b_pause;
 - (void)setSubmenusEnabled:(BOOL)b_enabled;
 - (void)manageVolumeSlider;
-
-- (void)setupMenus:(input_thread_t *)p_input;
-- (void)setupVarMenu:(NSMenuItem *)o_mi
-                     target:(vlc_object_t *)p_object
-                     var:(const char *)psz_var
-                     selector:(SEL)pf_callback;
+- (IBAction)timesliderUpdate:(id)sender;
 
 - (IBAction)clearRecentItems:(id)sender;
 - (void)openRecentItem:(id)sender;
 
 - (IBAction)viewPreferences:(id)sender;
-
-- (IBAction)timesliderUpdate:(id)sender;
-
 - (IBAction)closeError:(id)sender;
-
 - (IBAction)openReadMe:(id)sender;
 - (IBAction)openDocumentation:(id)sender;
 - (IBAction)reportABug:(id)sender;

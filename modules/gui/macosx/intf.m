@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.87 2003/05/26 14:59:37 hartman Exp $
+ * $Id: intf.m,v 1.88 2003/06/01 23:48:17 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -378,12 +378,12 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     [o_mi_vol_up setTitle: _NS("Volume Up")];
     [o_mi_vol_down setTitle: _NS("Volume Down")];
     [o_mi_mute setTitle: _NS("Mute")];
-    [o_mi_audiotrack setTitle: _NS("Audio Track")];
-    [o_mu_audiotrack setTitle: _NS("Audio Track")];
-    [o_mi_channels setTitle: _NS("Channels")];
-    [o_mu_channels setTitle: _NS("Channels")];
-    [o_mi_device setTitle: _NS("Device")];
-    [o_mu_device setTitle: _NS("Device")];
+    [o_mi_audiotrack setTitle: _NS("Audio track")];
+    [o_mu_audiotrack setTitle: _NS("Audio track")];
+    [o_mi_channels setTitle: _NS("Audio channels")];
+    [o_mu_channels setTitle: _NS("Audio channels")];
+    [o_mi_device setTitle: _NS("Audio device")];
+    [o_mu_device setTitle: _NS("Audio device")];
     
     [o_mu_video setTitle: _NS("Video")];
     [o_mi_half_window setTitle: _NS("Half Size")];
@@ -392,12 +392,12 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     [o_mi_fittoscreen setTitle: _NS("Fit To Screen")];
     [o_mi_fullscreen setTitle: _NS("Fullscreen")];
     [o_mi_floatontop setTitle: _NS("Float On Top")];
-    [o_mi_videotrack setTitle: _NS("Video Track")];
-    [o_mu_videotrack setTitle: _NS("Video Track")];
+    [o_mi_videotrack setTitle: _NS("Video track")];
+    [o_mu_videotrack setTitle: _NS("Video track")];
     [o_mi_screen setTitle: _NS("Screen")];
     [o_mu_screen setTitle: _NS("Screen")];
-    [o_mi_subtitle setTitle: _NS("Subtitles")];
-    [o_mu_subtitle setTitle: _NS("Subtitles")];
+    [o_mi_subtitle setTitle: _NS("Subtitles track")];
+    [o_mu_subtitle setTitle: _NS("Subtitles track")];
     [o_mi_deinterlace setTitle: _NS("Deinterlace")];
     [o_mu_deinterlace setTitle: _NS("Deinterlace")];
 
@@ -533,15 +533,10 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
     if( p_input )
     {
-        vout_thread_t   * p_vout  = NULL;
-        aout_instance_t * p_aout  = NULL; 
-
         vlc_mutex_lock( &p_input->stream.stream_lock );
 
         if( !p_input->b_die )
         {
-            audio_volume_t i_volume;
-
             /* New input or stream map change */
             if( p_input->stream.b_changed )
             {
@@ -556,40 +551,6 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
             {
                 p_intf->p_sys->b_input_update = TRUE;
             }
-
-            p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                              FIND_ANYWHERE );
-            if( p_aout != NULL )
-            {
-                vlc_value_t val;
-
-                if( var_Get( (vlc_object_t *)p_aout, "intf-change", &val )
-                    >= 0 && val.b_bool )
-                {
-                    p_intf->p_sys->b_aout_update = TRUE;
-                }
-
-                vlc_object_release( (vlc_object_t *)p_aout );
-            }
-
-            aout_VolumeGet( p_intf, &i_volume );
-            p_intf->p_sys->b_mute = ( i_volume == 0 );
-
-            p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                              FIND_ANYWHERE );
-            if( p_vout != NULL )
-            {
-                vlc_value_t val;
-
-                if( var_Get( (vlc_object_t *)p_vout, "intf-change", &val )
-                    >= 0 && val.b_bool )
-                {
-                    p_intf->p_sys->b_vout_update = TRUE;
-                }
-
-                vlc_object_release( (vlc_object_t *)p_vout );
-            }
-            [self setupMenus: p_input];
         }
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
@@ -661,6 +622,7 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                                               FIND_ANYWHERE );
         if( p_vout != NULL )
         {
+            /* We need to lock the vout here to make sure it does not disappear */
             id o_vout_wnd;
             NSEnumerator * o_enum = [[NSApp windows] objectEnumerator];
             
@@ -814,6 +776,65 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
         userInfo: nil repeats: FALSE];
 }
 
+- (void)setupMenus
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t *p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, 
+                                                FIND_ANYWHERE );
+    
+    if( p_playlist != NULL )
+    {
+#define p_input p_playlist->p_input
+        if( p_input != NULL )
+        {
+            [o_controls setupVarMenuItem: o_mi_program target: (vlc_object_t *)p_input
+                var: "program" selector: @selector(toggleVar:)];
+            
+            [o_controls setupVarMenuItem: o_mi_title target: (vlc_object_t *)p_input
+                var: "title" selector: @selector(toggleVar:)];
+            
+            [o_controls setupVarMenuItem: o_mi_chapter target: (vlc_object_t *)p_input
+                var: "chapter" selector: @selector(toggleVar:)];
+            
+            [o_controls setupVarMenuItem: o_mi_audiotrack target: (vlc_object_t *)p_input
+                var: "audio-es" selector: @selector(toggleVar:)];
+            
+            [o_controls setupVarMenuItem: o_mi_videotrack target: (vlc_object_t *)p_input
+                var: "video-es" selector: @selector(toggleVar:)];
+            
+            [o_controls setupVarMenuItem: o_mi_subtitle target: (vlc_object_t *)p_input
+                var: "spu-es" selector: @selector(toggleVar:)];
+        
+            aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                        FIND_ANYWHERE );
+            if ( p_aout != NULL )
+            {
+                [o_controls setupVarMenuItem: o_mi_channels target: (vlc_object_t *)p_aout
+                    var: "audio-channels" selector: @selector(toggleVar:)];
+            
+                [o_controls setupVarMenuItem: o_mi_device target: (vlc_object_t *)p_aout
+                    var: "audio-device" selector: @selector(toggleVar:)];
+                vlc_object_release( (vlc_object_t *)p_aout );
+            }
+            
+            vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                                                FIND_ANYWHERE );
+            
+            if ( p_vout != NULL )
+            {
+                [o_controls setupVarMenuItem: o_mi_screen target: (vlc_object_t *)p_vout
+                    var: "video-device" selector: @selector(toggleVar:)];
+                
+                [o_controls setupVarMenuItem: o_mi_deinterlace target: (vlc_object_t *)p_vout
+                    var: "deinterlace" selector: @selector(toggleVar:)];
+                vlc_object_release( (vlc_object_t *)p_vout );
+            }
+        }
+#undef p_input
+    }
+    vlc_object_release( (vlc_object_t *)p_playlist );
+}
+
 - (void)updateMessageArray
 {
     int i_start, i_stop;
@@ -921,6 +942,7 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     [o_mi_videotrack setEnabled: b_enabled];
     [o_mi_subtitle setEnabled: b_enabled];
     [o_mi_channels setEnabled: b_enabled];
+    [o_mi_deinterlace setEnabled: b_enabled];
     [o_mi_device setEnabled: b_enabled];
     [o_mi_screen setEnabled: b_enabled];
 }
@@ -936,6 +958,58 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     [o_volumeslider setEnabled: TRUE];
 
     p_intf->p_sys->b_mute = ( i_volume == 0 );
+}
+
+- (IBAction)timesliderUpdate:(id)sender
+{
+    float f_updated;
+
+    switch( [[NSApp currentEvent] type] )
+    {
+        case NSLeftMouseUp:
+        case NSLeftMouseDown:
+            f_slider = [sender floatValue];
+            return;
+
+        case NSLeftMouseDragged:
+            f_updated = [sender floatValue];
+            break;
+
+        default:
+            return;
+    }
+
+    intf_thread_t * p_intf = [NSApp getIntf];
+
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+
+    if( p_playlist->p_input != NULL )
+    {
+        off_t i_tell;
+        NSString * o_time;
+        char psz_time[ OFFSETTOTIME_MAX_SIZE ];
+
+#define p_area p_playlist->p_input->stream.p_selected_area
+        vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
+        i_tell = f_updated / 10000. * p_area->i_size;
+        input_OffsetToTime( p_playlist->p_input, psz_time, i_tell );
+        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+#undef p_area
+
+        o_time = [NSString stringWithUTF8String: psz_time];
+        [o_timefield setStringValue: o_time]; 
+    }
+
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_object_release( p_playlist );
 }
 
 - (void)terminate
@@ -1008,144 +1082,6 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     [NSApp postEvent: o_event atStart: YES];
 }
 
-- (void)setupMenus:(input_thread_t *)p_input
-{
-    intf_thread_t * p_intf = [NSApp getIntf];
-    vlc_value_t val;
-
-    if( p_intf->p_sys->b_input_update )
-    {
-        val.b_bool = FALSE;
-
-        [self setupVarMenu: o_mi_program target: (vlc_object_t *)p_input
-            var: "program" selector: @selector(toggleVar:)];
-
-        [self setupVarMenu: o_mi_title target: (vlc_object_t *)p_input
-            var: "title" selector: @selector(toggleVar:)];
-
-        [self setupVarMenu: o_mi_chapter target: (vlc_object_t *)p_input
-            var: "chapter" selector: @selector(toggleVar:)];
-
-        [self setupVarMenu: o_mi_audiotrack target: (vlc_object_t *)p_input
-            var: "audio-es" selector: @selector(toggleVar:)];
-
-        [self setupVarMenu: o_mi_videotrack target: (vlc_object_t *)p_input
-            var: "video-es" selector: @selector(toggleVar:)];
-
-        [self setupVarMenu: o_mi_subtitle target: (vlc_object_t *)p_input
-            var: "spu-es" selector: @selector(toggleVar:)];
-
-        p_intf->p_sys->b_input_update = FALSE;
-        var_Set( (vlc_object_t *)p_input, "intf-change", val );
-    }
-
-    if ( p_intf->p_sys->b_aout_update )
-    {
-        aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                    FIND_ANYWHERE );
-
-        if ( p_aout != NULL )
-        {
-            val.b_bool = FALSE;
-            
-            [self setupVarMenu: o_mi_channels target: (vlc_object_t *)p_aout
-                var: "audio-channels" selector: @selector(toggleVar:)];
-
-            [self setupVarMenu: o_mi_device target: (vlc_object_t *)p_aout
-                var: "audio-device" selector: @selector(toggleVar:)];
-            var_Set( (vlc_object_t *)p_aout, "intf-change", val );
-            
-            vlc_object_release( (vlc_object_t *)p_aout );
-        }
-        p_intf->p_sys->b_aout_update = FALSE;
-    }
-
-    if( p_intf->p_sys->b_vout_update )
-    {
-        vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                                          FIND_ANYWHERE );
-
-        if ( p_vout != NULL )
-        {
-            val.b_bool = FALSE;
-
-            [self setupVarMenu: o_mi_screen target: (vlc_object_t *)p_vout
-                var: "video-device" selector: @selector(toggleVar:)];
-            var_Set( (vlc_object_t *)p_vout, "intf-change", val );
-            
-            vlc_object_release( (vlc_object_t *)p_vout );
-            [o_mi_close_window setEnabled: TRUE];
-        }
-        
-        p_intf->p_sys->b_vout_update = FALSE;
-    }
-}
-
-- (void)setupVarMenu:(NSMenuItem *)o_mi
-                     target:(vlc_object_t *)p_object
-                     var:(const char *)psz_variable
-                     selector:(SEL)pf_callback
-{
-    int i, i_nb_items, i_value;
-    NSMenu * o_menu = [o_mi submenu];
-    vlc_value_t val, text;
-    
-    [o_mi setTag: (int)psz_variable];
-    
-    /* remove previous items */
-    i_nb_items = [o_menu numberOfItems];
-    for( i = 0; i < i_nb_items; i++ )
-    {
-        [o_menu removeItemAtIndex: 0];
-    }
-
-    if ( var_Get( p_object, psz_variable, &val ) < 0 )
-    {
-        return;
-    }
-    i_value = val.i_int;
-
-    if ( var_Change( p_object, psz_variable,
-                     VLC_VAR_GETLIST, &val, &text ) < 0 )
-    {
-        return;
-    }
-
-    /* make (un)sensitive */
-    [o_mi setEnabled: ( val.p_list->i_count > 1 )];
-
-    for ( i = 0; i < val.p_list->i_count; i++ )
-    {
-        NSMenuItem * o_lmi;
-        NSString * o_title;
-
-        if ( text.p_list->p_values[i].psz_string )
-        {
-            o_title = [NSApp localizedString: text.p_list->p_values[i].psz_string];
-        }
-        else
-        {
-            o_title = [NSString stringWithFormat: @"%s - %d",
-                        strdup(psz_variable), val.p_list->p_values[i].i_int ];
-        }
-        o_lmi = [o_menu addItemWithTitle: [o_title copy]
-                action: pf_callback keyEquivalent: @""];
-        
-        /* FIXME: this isn't 64-bit clean ! */
-        [o_lmi setTag: val.p_list->p_values[i].i_int];
-        [o_lmi setRepresentedObject:
-            [NSValue valueWithPointer: p_object]];
-        [o_lmi setTarget: o_controls];
-
-        if ( i_value == val.p_list->p_values[i].i_int )
-            [o_lmi setState: NSOnState];
-    }
-
-    var_Change( p_object, psz_variable, VLC_VAR_FREELIST,
-                &val, &text );
-
-}
-
 - (IBAction)clearRecentItems:(id)sender
 {
     [[NSDocumentController sharedDocumentController]
@@ -1160,58 +1096,6 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 - (IBAction)viewPreferences:(id)sender
 {
     [o_prefs showPrefs];
-}
-
-- (IBAction)timesliderUpdate:(id)sender
-{
-    float f_updated;
-
-    switch( [[NSApp currentEvent] type] )
-    {
-        case NSLeftMouseUp:
-        case NSLeftMouseDown:
-            f_slider = [sender floatValue];
-            return;
-
-        case NSLeftMouseDragged:
-            f_updated = [sender floatValue];
-            break;
-
-        default:
-            return;
-    }
-
-    intf_thread_t * p_intf = [NSApp getIntf];
-
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-
-    if( p_playlist->p_input != NULL )
-    {
-        off_t i_tell;
-        NSString * o_time;
-        char psz_time[ OFFSETTOTIME_MAX_SIZE ];
-
-#define p_area p_playlist->p_input->stream.p_selected_area
-        vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
-        i_tell = f_updated / 10000. * p_area->i_size;
-        input_OffsetToTime( p_playlist->p_input, psz_time, i_tell );
-        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-#undef p_area
-
-        o_time = [NSString stringWithUTF8String: psz_time];
-        [o_timefield setStringValue: o_time]; 
-    }
-
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    vlc_object_release( p_playlist );
 }
 
 - (IBAction)closeError:(id)sender
@@ -1307,11 +1191,17 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
 - (BOOL)validateMenuItem:(NSMenuItem *)o_mi
 {
+    NSString *o_title = [o_mi title];
     BOOL bEnabled = TRUE;
 
-    /* Recent Items Menu */
+    if( [o_title isEqualToString: _NS("License")] )
+    {
+        /* we need to do this only once */
+        [self setupMenus];
+    }
 
-    if( [[o_mi title] isEqualToString: _NS("Clear Menu")] )
+    /* Recent Items Menu */
+    if( [o_title isEqualToString: _NS("Clear Menu")] )
     {
         NSMenu * o_menu = [o_mi_open_recent submenu];
         int i_nb_items = [o_menu numberOfItems];
@@ -1364,7 +1254,6 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
             bEnabled = FALSE;
         }
     }
-
     return( bEnabled );
 }
 
