@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.19 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: xcommon.c,v 1.20 2002/03/03 20:42:21 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -344,6 +344,7 @@ static int vout_Create( vout_thread_t *p_vout )
 #endif
 
     /* Create blank cursor (for mouse cursor autohiding) */
+    p_vout->p_sys->i_time_mouse_last_moved = mdate();
     p_vout->p_sys->b_mouse_pointer_visible = 1;
     CreateCursor( p_vout );
 

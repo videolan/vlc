@@ -47,6 +47,7 @@ PLUGINS_DIR :=	ac3_adec \
 		mpeg_system \
 		mpeg_adec \
 		mpeg_vdec \
+		network \
 		qnx \
 		qt \
 		sdl \

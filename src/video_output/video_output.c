@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.163 2002/03/01 00:33:18 massiot Exp $
+ * $Id: video_output.c,v 1.164 2002/03/03 20:42:21 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -151,6 +151,7 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     p_vout->b_scale      = 1;
     p_vout->b_fullscreen = 0;
     p_vout->render_time  = 10;
+    p_vout->c_fps_samples= 0;
 
     /* user requested fullscreen? */
     if( config_GetIntVariable( VOUT_FULLSCREEN_VAR ) )

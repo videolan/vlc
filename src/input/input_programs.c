@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_programs.c,v 1.71 2002/02/19 00:50:19 sam Exp $
+ * $Id: input_programs.c,v 1.72 2002/03/03 20:42:21 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -534,6 +534,8 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         intf_ErrMsg( "ES 0x%x is already selected", p_es->i_id );
         return( -1 );
     }
+
+    p_es->thread_id = 0;
 
     switch( p_es->i_type )
     {
