@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.28 2003/10/31 18:18:46 gbazin Exp $
+ * $Id: events.c,v 1.29 2003/11/19 23:44:35 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -263,7 +263,6 @@ void DirectXEventThread( event_thread_t *p_event )
 static int DirectXCreateWindow( vout_thread_t *p_vout )
 {
     HINSTANCE  hInstance;
-    COLORREF   colorkey;
     HDC        hdc;
     HMENU      hMenu;
     RECT       rect_window;
@@ -275,33 +274,8 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     /* Get this module's instance */
     hInstance = GetModuleHandle(NULL);
 
-    /* Create a BRUSH that will be used by Windows to paint the window
-     * background.
-     * This window background is important for us as it will be used by the
-     * graphics card to display the overlay.
-     * This is why we carefully choose the color for this background, the goal
-     * being to choose a color which isn't complete black but nearly. We
-     * obviously don't want to use black as a colorkey for the overlay because
-     * black is one of the most used color and thus would give us undesirable
-     * effects */
-    /* the first step is to find the colorkey we want to use. The difficulty
-     * comes from the potential dithering (depends on the display depth)
-     * because we need to know the real RGB value of the chosen colorkey */
-    hdc = GetDC( NULL );
-    for( colorkey = 0x0a; colorkey < 0xff /* all shades of red */; colorkey++ )
-    {
-        if( colorkey == GetNearestColor( hdc, colorkey ) )
-        {
-            break;
-        }
-    }
-    msg_Dbg( p_vout, "background color: %i", colorkey );
-
-    /* Create the actual brush */
-    p_vout->p_sys->hbrush = CreateSolidBrush(colorkey);
-    p_vout->p_sys->i_rgb_colorkey = (int)colorkey;
-
     /* Get the current size of the display and its colour depth */
+    hdc = GetDC( NULL );
     p_vout->p_sys->rect_display.right = GetDeviceCaps( hdc, HORZRES );
     p_vout->p_sys->rect_display.bottom = GetDeviceCaps( hdc, VERTRES );
     p_vout->p_sys->i_display_depth = GetDeviceCaps( hdc, BITSPIXEL );
@@ -309,7 +283,6 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
                       p_vout->p_sys->rect_display.right,
                       p_vout->p_sys->rect_display.bottom,
                       p_vout->p_sys->i_display_depth );
-
     ReleaseDC( NULL, hdc );
 
     /* If an external window was specified, we'll draw in it. */
@@ -326,7 +299,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
         SetClassLong( p_vout->p_sys->hwnd,
                       GCL_STYLE, CS_DBLCLKS );
         SetClassLong( p_vout->p_sys->hwnd,
-                      GCL_HBRBACKGROUND, (LONG)p_vout->p_sys->hbrush );
+                      GCL_HBRBACKGROUND, (LONG)GetStockObject(BLACK_BRUSH) );
         SetClassLong( p_vout->p_sys->hwnd,
                       GCL_HCURSOR, (LONG)LoadCursor(NULL, IDC_ARROW) );
         /* Store a p_vout pointer into the window local storage (for later
@@ -363,7 +336,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
         wc.hInstance     = hInstance;                            /* instance */
         wc.hIcon         = vlc_icon;                /* load the vlc big icon */
         wc.hCursor       = LoadCursor(NULL, IDC_ARROW);    /* default cursor */
-        wc.hbrBackground = p_vout->p_sys->hbrush;        /* background color */
+        wc.hbrBackground = GetStockObject(BLACK_BRUSH);  /* background color */
         wc.lpszMenuName  = NULL;                                  /* no menu */
         wc.lpszClassName = "VLC DirectX";             /* use a special class */
         wc.hIconSm       = vlc_icon;              /* load the vlc small icon */
@@ -372,13 +345,6 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
         if( !RegisterClassEx(&wc) )
         {
             WNDCLASS wndclass;
-
-            /* Free window background brush */
-            if( p_vout->p_sys->hbrush )
-            {
-                DeleteObject( p_vout->p_sys->hbrush );
-                p_vout->p_sys->hbrush = NULL;
-            }
 
             if( vlc_icon )
             {
@@ -408,7 +374,8 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
         p_vout->p_sys->hwnd =
             CreateWindow( "VLC DirectX",             /* name of window class */
                     VOUT_TITLE " (DirectX Output)", /* window title bar text */
-                    WS_OVERLAPPEDWINDOW | WS_SIZEBOX,        /* window style */
+                    WS_OVERLAPPEDWINDOW | WS_SIZEBOX | WS_VISIBLE |
+                    WS_CLIPCHILDREN,                         /* window style */
                     CW_USEDEFAULT,                   /* default X coordinate */
                     0,                               /* default Y coordinate */
                     rect_window.right - rect_window.left,    /* window width */
@@ -425,14 +392,19 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
         }
     }
 
+    /* Now display the window */
+    ShowWindow( p_vout->p_sys->hwnd, SW_SHOW );
+
+    /* Create video sub-window. This sub window will always exactly match
+     * the size of the video, which allows us to use crazy overlay colorkeys
+     * without having them shown outside of the video area. */
+    SendMessage( p_vout->p_sys->hwnd, WM_VLC_CREATE_VIDEO_WIN, 0, 0 );
+
     /* Append a "Always On Top" entry in the system menu */
     hMenu = GetSystemMenu( p_vout->p_sys->hwnd, FALSE );
     AppendMenu( hMenu, MF_SEPARATOR, 0, "" );
     AppendMenu( hMenu, MF_STRING | MF_UNCHECKED,
                        IDM_TOGGLE_ON_TOP, "Always on &Top" );
-
-    /* Now display the window */
-    ShowWindow( p_vout->p_sys->hwnd, SW_SHOW );
 
     return VLC_SUCCESS;
 }
@@ -512,6 +484,9 @@ void DirectXUpdateRects( vout_thread_t *p_vout, vlc_bool_t b_force )
     vout_PlacePicture( p_vout, rect.right, rect.bottom,
                        &i_x, &i_y, &i_width, &i_height );
 
+    SetWindowPos( p_vout->p_sys->hvideownd, HWND_TOP,
+                  i_x, i_y, i_width, i_height, 0 );
+
     /* Destination image position and dimensions */
     rect_dest.left = point.x + i_x;
     rect_dest.right = rect_dest.left + i_width;
@@ -523,8 +498,7 @@ void DirectXUpdateRects( vout_thread_t *p_vout, vlc_bool_t b_force )
      * display size so we need to do it otherwise it will fail */
 
     /* Clip the destination window */
-    IntersectRect( &rect_dest_clipped,
-                   &rect_dest,
+    IntersectRect( &rect_dest_clipped, &rect_dest,
                    &p_vout->p_sys->rect_display );
 
 #if 0
@@ -667,24 +641,24 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         }
         break;
 
-    case WM_ERASEBKGND:
-        if( !p_vout->p_sys->b_using_overlay )
+    case WM_VLC_CREATE_VIDEO_WIN:
+        /* Create video sub-window */
+        p_vout->p_sys->hvideownd =
+            CreateWindow( "STATIC", "",   /* window class and title bar text */
+                    WS_CHILD | WS_VISIBLE,                   /* window style */
+                    CW_USEDEFAULT, CW_USEDEFAULT,     /* default coordinates */
+                    CW_USEDEFAULT, CW_USEDEFAULT,
+                    hwnd,                                   /* parent window */
+                    NULL, GetModuleHandle(NULL), NULL );
+
+        if( !p_vout->p_sys->hvideownd )
         {
-            /* We want to eliminate unnecessary background redraws which create
-             * an annoying flickering */
-            int i_width, i_height, i_x, i_y;
-            RECT rect_temp;
-            GetClipBox( (HDC)wParam, &rect_temp );
-#if 0
-            msg_Dbg( p_vout, "WinProc WM_ERASEBKGND %i,%i,%i,%i",
-                          rect_temp.left, rect_temp.top,
-                          rect_temp.right, rect_temp.bottom );
-#endif
-            vout_PlacePicture( p_vout, p_vout->p_sys->i_window_width,
-                               p_vout->p_sys->i_window_height,
-                               &i_x, &i_y, &i_width, &i_height );
-            ExcludeClipRect( (HDC)wParam, i_x, i_y,
-                             i_x + i_width, i_y + i_height );
+            msg_Warn( p_vout, "Can create video sub-window" );
+        }
+        else
+        {
+            SetWindowLong( p_vout->p_sys->hvideownd,
+                           GWL_WNDPROC, (LONG)DefWindowProc );
         }
         break;
 

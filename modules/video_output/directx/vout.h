@@ -2,7 +2,7 @@
  * vout.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout.h,v 1.7 2003/10/25 00:49:14 sam Exp $
+ * $Id: vout.h,v 1.8 2003/11/19 23:44:35 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -45,9 +45,9 @@ struct vout_sys_t
     LPDIRECTDRAWSURFACE2 p_current_surface;   /* surface currently displayed */
     LPDIRECTDRAWCLIPPER  p_clipper;             /* clipper used for blitting */
     HINSTANCE            hddraw_dll;       /* handle of the opened ddraw dll */
-    HBRUSH               hbrush;           /* window backgound brush (color) */
 
     HWND                 hwnd;                  /* Handle of the main window */
+    HWND                 hvideownd;        /* Handle of the video sub-window */
     HWND                 hparent;             /* Handle of the parent window */
     WNDPROC              pf_wndproc;             /* Window handling callback */
 
@@ -118,4 +118,5 @@ void DirectXUpdateRects ( vout_thread_t *p_vout, vlc_bool_t b_force );
  * Constants
  *****************************************************************************/
 #define WM_VLC_HIDE_MOUSE WM_APP
+#define WM_VLC_CREATE_VIDEO_WIN WM_APP + 1
 #define IDM_TOGGLE_ON_TOP WM_USER + 1
