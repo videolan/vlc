@@ -58,7 +58,5 @@ BORLAND_win32 = \
 	modules/gui/win32/misc.h \
 	modules/gui/win32/sout.h \
 	modules/gui/win32/subtitles.h \
-	\
-	modules/gui/win32/strings.cpp \
 	$(NULL)
 
