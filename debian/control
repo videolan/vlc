@@ -13,8 +13,9 @@ Recommends: vlc-gui
 Depends: vlc-plugin-mad, vlc-plugin-a52
 Suggests: gnome-vlc
 Description: a complete multimedia player
- This is the VLC media player. It plays MPEG, MPEG2, MPEG4, DivX, mp3,
- Ogg/Vorbis files, DVDs, and multimedia streams from network sources.
+ This is the VideoLAN project's VLC media player. It plays MPEG, MPEG2,
+ MPEG4, DivX, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia streams
+ from various network sources.
 
 Package: libvlc0-dev
 Section: devel
