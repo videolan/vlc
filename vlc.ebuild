@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.16 2003/07/20 19:48:30 hartman Exp $
+# $Id: vlc.ebuild,v 1.17 2003/07/20 20:54:01 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -25,7 +25,7 @@
 # Thanks to the Gentoo Team for supporting us.
 ###############################################################################
 
-IUSE="arts qt ncurses dvd gtk nls 3dfx matrox svga fbcon esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l lirc wxwindows imlib matroska dvb pvr mozilla mad debug xvid"
+IUSE="arts qt ncurses dvd gtk nls 3dfx svga fbcon esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l lirc wxwindows imlib matroska dvb pvr mozilla mad debug xvid"
 
 # Change these to correspond with the
 # unpacked dirnames of the CVS snapshots.
@@ -163,8 +163,6 @@ src_compile(){
 	use ggi && myconf="${myconf} --enable-ggi"
 
 	use 3dfx && myconf="${myconf} --enable-glide"
-
-	use matrox && myconf="${myconf} --enable-mga"
 
 	use svga && myconf="${myconf} --enable-svgalib"
 
