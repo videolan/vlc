@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.18 2002/04/23 14:16:20 sam Exp $
+ * $Id: gnome.c,v 1.19 2002/05/03 17:37:09 lool Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -63,6 +63,8 @@ static gint GnomeManage      ( gpointer p_data );
  *****************************************************************************/
 #define TOOLTIPS_TEXT N_("hide tooltips")
 #define TOOLTIPS_LONGTEXT N_("Do not show tooltips for configuration options.")
+#define TOOLBAR_TEXT N_("hide text on toolbar buttons")
+#define TOOLBAR_LONGTEXT N_("Do not show the text below icons on the toolbar.")
 
 #define PREFS_MAXH_TEXT N_("maximum height for the configuration windows")
 #define PREFS_MAXH_LONGTEXT N_( \
@@ -73,6 +75,8 @@ MODULE_CONFIG_START
     ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
     ADD_BOOL    ( "gnome-notooltips", NULL, TOOLTIPS_TEXT,
                   TOOLTIPS_LONGTEXT )
+    ADD_BOOL    ( "gnome-notoolbartext", NULL, TOOLBAR_TEXT,
+                  TOOLBAR_LONGTEXT )
     ADD_INTEGER ( "gnome-prefs-maxh", 480, NULL, PREFS_MAXH_TEXT,
                   PREFS_MAXH_LONGTEXT )
 MODULE_CONFIG_STOP
@@ -268,6 +272,12 @@ static void intf_Run( intf_thread_t *p_intf )
     /* Hide tooltips if the option is set */
     if( config_GetIntVariable( "gnome-notooltips" ) )
         gtk_tooltips_disable( p_intf->p_sys->p_tooltips );
+
+    /* Hide toolbar text of the option is set */
+    if ( config_GetIntVariable( "gnome-notoolbartext" ) )
+        gtk_toolbar_set_style(
+            GTK_TOOLBAR(lookup_widget( p_intf->p_sys->p_window, "toolbar" )),
+            GTK_TOOLBAR_ICONS );
 
     /* Store p_intf to keep an eye on it */
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
