@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.23 2003/08/24 00:36:38 fenrir Exp $
+ * $Id: sub.c,v 1.24 2003/08/24 14:43:07 titer Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -311,9 +311,10 @@ char* sub_detect( subtitle_demux_t *p_sub, char *psz_filename)
                         msg_Dbg( p_sub, "autodetected subtitlefile: %s", strdup( p_dir_afile->d_name ) );
                         if( psz_dir )
                         {
+                            char *psz_append;
                             psz_result = (char*)malloc( i_dirlen + strlen( p_dir_afile->d_name ) +1 );
                             strncpy( psz_result, psz_dir, i_dirlen );
-                            char *psz_append = psz_result + i_dirlen;
+                            psz_append = psz_result + i_dirlen;
                             strncpy( psz_append, p_dir_afile->d_name, strlen( p_dir_afile->d_name ) );
                             psz_result[i_dirlen + strlen( p_dir_afile->d_name )] = '\0';
                             return psz_result;
