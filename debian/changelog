@@ -1,3 +1,9 @@
+vlc (0.4.0-1) unstable; urgency=low
+
+  * New upstrea release.
+
+ -- Samuel Hocevar <sam@zoy.org>  Thu, 23 May 2002 01:27:05 +0200
+
 vlc (0.3.1-1) unstable; urgency=low
 
   * New upstream release.

@@ -7,8 +7,42 @@ HEAD
   * Nothing yet.
 
 0.4.0
-Mon, 20 May 2002 22:53:48 +0200
+Thu, 23 May 2002 01:27:05 +0200
 
+  * ./plugins/access/http.c: fixed HTTP input under Win32
+  * ./plugins/chroma/i420_yuy2.h: bugfix for the I420 to YUY2 MMX chroma
+    transformations, with the help of Pascal Levesque.
+  * ./plugins/directx/directx.c: UnregisterClass() in MODULE_DEACTIVATE. If
+    we don't do this, trying to use the class when the plugin is reloaded will
+    cause a segfault.
+  * win32: replaced TUpDown components by TCSpinEdit ones, which allow
+    values greater than 32767. It fixes the audio bug ocurring when a
+    configuration file is saved under the win32 interface
+  * ./plugins/win32/mainframe.cpp: Added some extra space between
+    statusbar and toolbar when nothing is displayed.
+  * ./plugins/text/logger.c: on win32 the logger interface shows up a dos
+    command box.
+  * ./plugins/gtk/gnome.c: fixed uninitialized variable
+  * ./plugins/gtk/gtk_playlist.c: simplified GtkRebuildCList()
+  * ./plugins/beos/vout_beos.cpp: changes to reduce segfaults on exit,
+    and also allow only one Playlist window.
+  * ./include/modules_inner.h: fixed a crash when reopening a hidden
+    module
+  * ./plugins/dvd/dvd_access.c: on Win32 the DVD access plugin has to be
+    explicitly requested. This avoids crashes when the input thread tries
+    to open files as dvds.
+  * ./plugins/dvd/dvd_access.c: fixed a side-effect bug causing crashes
+    on DVD title change
+  * ./plugins/chroma/i420_yuy2.c: margin support for the 420 planar to 422
+    packed chroma transformations.
+  * ./src/input/input.c: fixed a bug with the input remaining stuck when no
+    network data was present.
+  * win32: fixed a stupid bug in the Network dialog.
+  * ./src/interface/main.c: fixed a little memleak.
+  * ./src/input/input_dec.c: removed useless code.
+  * ./src/input/input.c, ./plugins/gtk/gtk.c: fixed access to uninitialized
+    variables.
+  * ./plugins/dvd/dvd_demux.c: fixed the pf_demux return value.
   * ./configure.in: tried to fix the -lavcodec detection.
   * ./plugins/x11/xcommon.c: fixed x11 and xvideo alternate fullscreen.
   * ./plugins/network/ipv6.c: experimental support for Windows IPv6
