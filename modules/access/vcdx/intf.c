@@ -2,7 +2,7 @@
  * intf.c: Video CD interface to handle user interaction and still time
  *****************************************************************************
  * Copyright (C) 2002,2003 VideoLAN
- * $Id: intf.c,v 1.8 2003/11/26 01:40:16 rocky Exp $
+ * $Id: intf.c,v 1.9 2003/11/26 01:45:03 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *   from DVD code by Stéphane Borel <stef@via.ecp.fr>
@@ -97,7 +97,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseIntf: destroy dummy interface
  *****************************************************************************/
-void E_(VCDCloseIntf) ( vlc_object_t *p_this )
+void E_(CloseIntf) ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
