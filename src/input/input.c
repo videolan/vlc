@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.138 2001/10/03 10:12:52 massiot Exp $
+ * $Id: input.c,v 1.139 2001/10/03 12:58:57 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -437,6 +437,11 @@ static int InitThread( input_thread_t * p_input )
         p_input->p_input_module->p_functions->input.functions.input.pf_open( p_input );
         p_input->stream.i_method = INPUT_METHOD_DVD;
     }
+    else if( ( strlen( p_input->p_source ) > 4 ) && !strncasecmp( p_input->p_source, "vlc:", 4 ) )
+    {
+        /* Dummy input - very kludgy */
+        p_input->p_input_module->p_functions->input.functions.input.pf_open( p_input );
+    }
     else
     {
         /* File input */
@@ -525,6 +530,10 @@ static void EndThread( input_thread_t * p_input )
     else 
 #endif
     if( ( strlen( p_input->p_source ) > 4 ) && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+    {
+        p_input->p_input_module->p_functions->input.functions.input.pf_close( p_input );
+    }
+    else if( ( strlen( p_input->p_source ) > 4 ) && !strncasecmp( p_input->p_source, "vlc:", 4 ) )
     {
         p_input->p_input_module->p_functions->input.functions.input.pf_close( p_input );
     }
