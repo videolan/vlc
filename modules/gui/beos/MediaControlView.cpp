@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.9 2003/01/11 19:33:09 stippi Exp $
+ * $Id: MediaControlView.cpp,v 1.10 2003/01/12 02:08:38 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -282,9 +282,9 @@ MediaControlView::Pulse()
 
 // SetProgress
 void
-MediaControlView::SetProgress(uint64 seek, uint64 size)
+MediaControlView::SetProgress( float position )
 {
-	fSeekSlider->SetPosition((float)seek / (float)size);
+	fSeekSlider->SetPosition( position );
 }
 
 // SetStatus

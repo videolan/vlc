@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.14 2003/01/11 19:33:09 stippi Exp $
+ * $Id: InterfaceWindow.cpp,v 1.15 2003/01/12 02:08:38 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -487,8 +487,7 @@ void InterfaceWindow::updateInterface()
 			bool hasChapters = p_wrapper->HasChapters();
 			p_mediaControl->SetStatus( p_wrapper->InputStatus(), 
 									   p_wrapper->InputRate() );
-			p_mediaControl->SetProgress( p_wrapper->InputTell(),
-										 p_wrapper->InputSize() );
+			p_mediaControl->SetProgress( p_wrapper->getTimeAsFloat() );
 			_SetMenusEnabled( true, hasChapters, hasTitles );
 
 			_UpdateSpeedMenu( p_wrapper->InputRate() );

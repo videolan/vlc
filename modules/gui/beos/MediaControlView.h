@@ -2,7 +2,7 @@
  * MediaControlView.h: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.h,v 1.3 2002/10/28 19:42:24 titer Exp $
+ * $Id: MediaControlView.h,v 1.4 2003/01/12 02:08:39 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -49,7 +49,7 @@ class MediaControlView : public BBox
 	virtual	void				Pulse(); // detect stopped stream
 
 								// MediaControlView
-			void				SetProgress(uint64 seek, uint64 size);
+			void				SetProgress( float position );
 
 			void				SetStatus(int status, int rate); 
 			void				SetEnabled(bool enable);

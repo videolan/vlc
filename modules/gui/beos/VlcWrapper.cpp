@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.16 2003/01/11 19:33:09 stippi Exp $
+ * $Id: VlcWrapper.cpp,v 1.17 2003/01/12 02:08:39 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -127,26 +127,6 @@ int VlcWrapper::InputRate()
         return DEFAULT_RATE;
     }
     return p_input->stream.control.i_rate;
-}
-
-/* tell: location in the current stream (in arbitrary units) */
-int VlcWrapper::InputTell()
-{
-    if( !p_input )
-    {
-        return -1;
-    }
-    return p_input->stream.p_selected_area->i_tell;
-}
-
-/* size: total size of the current stream (in arbitrary units) */
-int VlcWrapper::InputSize()
-{
-    if( !p_input )
-    {
-        return -1;
-    }
-    return p_input->stream.p_selected_area->i_size;
 }
 
 void VlcWrapper::InputSlower()
