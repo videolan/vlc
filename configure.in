@@ -203,6 +203,13 @@ AC_ARG_ENABLE(stats,
 [ if test x$enableval = xyes; then STATS=1; fi ])
 
 dnl
+dnl  Trace mode
+dnl
+AC_ARG_ENABLE(trace,
+[  --enable-trace          Enable trace mode (default disabled)],
+[ if test x$enableval = xyes; then TRACE=1; fi ])
+
+dnl
 dnl  Enable/disable optimizations
 dnl
 AC_ARG_ENABLE(optimizations,
@@ -458,6 +465,7 @@ AC_SUBST(DEFINE)
 AC_SUBST(INCLUDE)
 AC_SUBST(DEBUG)
 AC_SUBST(STATS)
+AC_SUBST(TRACE)
 AC_SUBST(OPTIMS)
 AC_SUBST(CSS)
 
@@ -495,6 +503,7 @@ system                : ${SYS}
 architecture          : ${ARCH}
 debug mode            : ${DEBUG}
 statistics            : ${STATS}
+trace mode            : ${TRACE}
 optimizations         : ${OPTIMS}
 CSS decryption        : ${CSS}
 need builtin getopt   : ${GETOPT}

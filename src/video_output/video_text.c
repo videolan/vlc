@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_text.c,v 1.24 2001/04/25 09:31:14 sam Exp $
+ * $Id: video_text.c,v 1.25 2001/04/27 19:29:11 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -415,7 +415,7 @@ void vout_TextSize( vout_font_t *p_font, int i_style, const char *psz_text, int 
         break;
 #ifdef DEBUG
     default:
-        intf_DbgMsg("error: unknown font type %d", p_font->i_type );
+        intf_ErrMsg("error: unknown font type %d", p_font->i_type );
         break;
 #endif
     }
@@ -530,7 +530,7 @@ void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int 
                 break;
 #ifdef DEBUG
             default:
-                intf_DbgMsg("error: unknown font type %d", p_font->i_type );
+                intf_ErrMsg("error: unknown font type %d", p_font->i_type );
                 break;
 #endif
             }

@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.11 2001/04/26 03:55:44 sam Exp $
+ * $Id: vout_xvideo.c,v 1.12 2001/04/27 19:29:11 massiot Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -483,14 +483,12 @@ static int vout_Manage( vout_thread_t *p_vout )
             p_vout->p_sys->b_mouse_pointer_visible = 1; 
             XVideoSetMousePointer( p_vout ); 
         }
-#ifdef DEBUG
         /* Other event */
         else
         {
-            intf_DbgMsg( "%p -> unhandled event type %d received",
+            intf_WarnMsg( 1, "%p -> unhandled event type %d received",
                          p_vout, xevent.type );
         }
-#endif
     }
 
     /* Handle events for YUV video output sub-window */

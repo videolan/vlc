@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.87 2001/04/06 09:15:48 sam Exp $
+ * $Id: vpar_synchro.c,v 1.88 2001/04/27 19:29:11 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -224,7 +224,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
         mtime_t         now, period, tau_yuv;
         mtime_t         pts = 0;
         boolean_t       b_decode = 0;
-#ifdef DEBUG_VPAR
+#ifdef TRACE_VPAR
         char            p_date[MSTRTIME_MAX_SIZE];
 #endif
 
@@ -321,7 +321,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 #ifdef VDEC_SMP
         vlc_mutex_unlock( &p_vpar->synchro.fifo_lock );
 #endif
-#ifdef DEBUG_VPAR
+#ifdef TRACE_VPAR
         intf_DbgMsg("vpar synchro debug: %s picture scheduled for %s, %s (%lld)",
                     i_coding_type == B_CODING_TYPE ? "B" :
                     (i_coding_type == P_CODING_TYPE ? "P" : "I"),
@@ -414,7 +414,7 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar, int i_garbage )
             }
         }
 
-#ifdef DEBUG_VPAR
+#ifdef TRACE_VPAR
         intf_DbgMsg("vpar synchro debug: finished decoding %s (%lld)",
                     i_coding_type == B_CODING_TYPE ? "B" :
                     (i_coding_type == P_CODING_TYPE ? "P" : "I"), tau);

@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.49 2001/04/22 00:08:25 stef Exp $
+ * $Id: input_dvd.c,v 1.50 2001/04/27 19:29:11 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -742,7 +742,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         for( i = 1 ; i <= vts.manager_inf.i_audio_nb ; i++ )
         {
 
-#ifdef DEBUG
         intf_WarnMsg( 1, "Audio %d: %x %x %x %x %x %x %x %x %x %x %x %x", i,
             vts.manager_inf.p_audio_attr[i-1].i_num_channels,
             vts.manager_inf.p_audio_attr[i-1].i_coding_mode,
@@ -756,7 +755,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             vts.manager_inf.p_audio_attr[i-1].i_sample_freq,
             vts.manager_inf.p_audio_attr[i-1].i_lang_code,
             vts.manager_inf.p_audio_attr[i-1].i_caption );
-#endif
 
             switch( vts.manager_inf.p_audio_attr[i-1].i_coding_mode )
             {

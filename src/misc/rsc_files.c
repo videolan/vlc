@@ -4,7 +4,7 @@
  * can be anything, including pictures, audio streams, and so on.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: rsc_files.c,v 1.9 2001/03/21 13:42:34 sam Exp $
+ * $Id: rsc_files.c,v 1.10 2001/04/27 19:29:11 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -204,13 +204,11 @@ int UpdateResourceFile( resource_file_t *p_file )
     byte_t      p_buffer[50];                                      /* buffer */
     int         i_index;                                   /* resource index */
 
-#ifdef DEBUG
     if( p_file->b_read_only )
     {
-        intf_DbgMsg("rsc debug 103-1: can't update a read-only file");
+        intf_ErrMsg("rsc debug 103-1: can't update a read-only file");
         return( -1 );
     }
-#endif
 
     /* Seek beginning of file */
     if( lseek( p_file->i_file, 0, SEEK_SET ) )
@@ -375,13 +373,11 @@ int vlc_WriteResource( resource_file_t *p_file, char *psz_name, int i_type,
     int i_tmp_index;                             /* temporary resource index */
     u64 i_offset;                                                  /* offset */
 
-#ifdef DEBUG
     if( p_file->b_read_only )
     {
-        intf_DbgMsg("rsc debug 107-1: can not write to a read-only resource file");
+        intf_ErrMsg("rsc debug 107-1: can not write to a read-only resource file");
         return( -1 );
     }
-#endif
 
     /* Look for an empty place in the resources table */
     i_index = -1;

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.120 2001/04/25 20:54:07 massiot Exp $
+ * $Id: video_output.c,v 1.121 2001/04/27 19:29:11 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -312,7 +312,7 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
  *****************************************************************************/
 void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
     char        psz_begin_date[MSTRTIME_MAX_SIZE]; /* buffer for date string */
     char        psz_end_date[MSTRTIME_MAX_SIZE];   /* buffer for date string */
 #endif
@@ -321,7 +321,7 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     /* Check if status is valid */
     if( p_subpic->i_status != RESERVED_SUBPICTURE )
     {
-        intf_DbgMsg("error: subpicture %p has invalid status %d", p_subpic,
+        intf_ErrMsg("error: subpicture %p has invalid status %d", p_subpic,
                     p_subpic->i_status );
     }
 #endif
@@ -329,7 +329,7 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     /* Remove reservation flag */
     p_subpic->i_status = READY_SUBPICTURE;
 
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
     /* Send subpicture information */
     intf_DbgMsg("subpicture %p: type=%d, begin date=%s, end date=%s",
                 p_subpic, p_subpic->i_type,
@@ -372,7 +372,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
                  * the best possible case, since no memory allocation needs
                  * to be done */
                 p_vout->p_subpicture[i_subpic].i_status = RESERVED_SUBPICTURE;
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
                 intf_DbgMsg("subpicture %p (in destroyed subpicture slot)",
                             &p_vout->p_subpicture[i_subpic] );
 #endif
@@ -419,7 +419,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
             break;
 #ifdef DEBUG
         default:
-            intf_DbgMsg("error: unknown subpicture type %d", i_type );
+            intf_ErrMsg("error: unknown subpicture type %d", i_type );
             p_free_subpic->p_data   =  NULL;
             break;
 #endif
@@ -448,7 +448,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
                          strerror( ENOMEM ) );
         }
 
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
         intf_DbgMsg("subpicture %p (in free subpicture slot)", p_free_subpic );
 #endif
         vlc_mutex_unlock( &p_vout->subpicture_lock );
@@ -475,14 +475,14 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
    /* Check if status is valid */
    if( p_subpic->i_status != RESERVED_SUBPICTURE )
    {
-       intf_DbgMsg("error: subpicture %p has invalid status %d",
+       intf_ErrMsg("error: subpicture %p has invalid status %d",
                    p_subpic, p_subpic->i_status );
    }
 #endif
 
     p_subpic->i_status = DESTROYED_SUBPICTURE;
 
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
     intf_DbgMsg("subpicture %p", p_subpic);
 #endif
 }
@@ -507,12 +507,12 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
         break;
 #ifdef DEBUG
     default:
-        intf_DbgMsg("error: picture %p has invalid status %d", p_pic, p_pic->i_status );
+        intf_ErrMsg("error: picture %p has invalid status %d", p_pic, p_pic->i_status );
         break;
 #endif
     }
 
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
     intf_DbgMsg("picture %p", p_pic);
 #endif
     vlc_mutex_unlock( &p_vout->picture_lock );
@@ -527,7 +527,7 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 void  vout_DatePicture( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date )
 {
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
     char        psz_date[MSTRTIME_MAX_SIZE];                         /* date */
 #endif
 
@@ -543,12 +543,12 @@ void  vout_DatePicture( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date )
         break;
 #ifdef DEBUG
     default:
-        intf_DbgMsg("error: picture %p has invalid status %d", p_pic, p_pic->i_status );
+        intf_ErrMsg("error: picture %p has invalid status %d", p_pic, p_pic->i_status );
         break;
 #endif
     }
 
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
     intf_DbgMsg("picture %p, display date: %s", p_pic, mstrtime( psz_date, p_pic->date) );
 #endif
     vlc_mutex_unlock( &p_vout->picture_lock );
@@ -592,7 +592,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
                  * memory allocation needs to be done */
                 p_vout->p_picture[i_picture].i_status = RESERVED_PICTURE;
                 p_vout->i_pictures++;
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
                 intf_DbgMsg("picture %p (in destroyed picture slot)",
                             &p_vout->p_picture[i_picture] );
 #endif
@@ -654,7 +654,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
             break;
 #ifdef DEBUG
         default:
-            intf_DbgMsg("error: unknown picture type %d", i_type );
+            intf_ErrMsg("error: unknown picture type %d", i_type );
             p_free_picture->p_data   =  NULL;
             break;
 #endif
@@ -690,7 +690,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
                          strerror( ENOMEM ) );
         }
 
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
         intf_DbgMsg("picture %p (in free picture slot)", p_free_picture );
 #endif
         vlc_mutex_unlock( &p_vout->picture_lock );
@@ -724,14 +724,14 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
         (p_pic->i_status != RESERVED_DATED_PICTURE) &&
         (p_pic->i_status != RESERVED_DISP_PICTURE) )
     {
-        intf_DbgMsg("error: picture %p has invalid status %d", p_pic, p_pic->i_status );
+        intf_ErrMsg("error: picture %p has invalid status %d", p_pic, p_pic->i_status );
     }
 #endif
 
     p_pic->i_status = DESTROYED_PICTURE;
     p_vout->i_pictures--;
 
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
     intf_DbgMsg("picture %p", p_pic);
 #endif
 
@@ -752,7 +752,7 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_lock( &p_vout->picture_lock );
     p_pic->i_refcount++;
 
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
     intf_DbgMsg("picture %p refcount=%d", p_pic, p_pic->i_refcount );
 #endif
 
@@ -769,7 +769,7 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_lock( &p_vout->picture_lock );
     p_pic->i_refcount--;
 
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
     if( p_pic->i_refcount < 0 )
     {
         intf_DbgMsg("error: refcount < 0");
@@ -783,7 +783,7 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
         p_vout->i_pictures--;
     }
 
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
     intf_DbgMsg("picture %p refcount=%d", p_pic, p_pic->i_refcount );
 #endif
 
@@ -1168,7 +1168,7 @@ static void RunThread( vout_thread_t *p_vout)
         /* On awakening, take back lock and send immediately picture to display,
          * then swap buffers */
         vlc_mutex_lock( &p_vout->change_lock );
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
         intf_DbgMsg( "picture %p, subpicture %p in buffer %d, display=%d", p_pic, p_subpic,
                      p_vout->i_buffer_index, b_display /* && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) */ );
 #endif
@@ -1411,7 +1411,7 @@ static void SetBufferArea( vout_thread_t *p_vout, int i_x, int i_y, int i_w, int
         }
         else
         {
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
             intf_DbgMsg("area overflow");
 #endif
             p_buffer->pi_area_end[VOUT_MAX_AREAS - 1] = i_h;
@@ -1435,7 +1435,7 @@ static void SetBufferArea( vout_thread_t *p_vout, int i_x, int i_y, int i_w, int
                  * move all old areas down */
                 if( p_buffer->i_areas == VOUT_MAX_AREAS )
                 {
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
                     intf_DbgMsg("areas overflow");
 #endif
                     p_buffer->pi_area_end[VOUT_MAX_AREAS - 2] = p_buffer->pi_area_end[VOUT_MAX_AREAS - 1];
@@ -1610,7 +1610,7 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
      */
     for( i_area = 0; i_area < p_buffer->i_areas; i_area++ )
     {
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
         intf_DbgMsg("clearing picture %p area in buffer %d: %d-%d", p_pic,
                     p_vout->i_buffer_index, p_buffer->pi_area_begin[i_area], p_buffer->pi_area_end[i_area] );
 #endif
@@ -1658,7 +1658,7 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
     char                psz_date[MSTRTIME_MAX_SIZE];         /* picture date */
     mtime_t             render_time;               /* picture rendering time */
 #endif
@@ -1670,7 +1670,7 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_pic_data =        p_buffer->p_data +
                         p_buffer->i_pic_x * p_vout->i_bytes_per_pixel +
                         p_buffer->i_pic_y * p_vout->i_bytes_per_line;
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
     render_time = mdate();
 #endif
  
@@ -1707,12 +1707,12 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
         break;
 #ifdef DEBUG
     default:
-        intf_DbgMsg("error: unknown picture type %d", p_pic->i_type );
+        intf_ErrMsg("error: unknown picture type %d", p_pic->i_type );
         break;
 #endif
     }
 
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
     /* Print picture date and rendering time */
     intf_DbgMsg("picture %p rendered in buffer %d (%ld us), display date: %s", p_pic,
                 p_vout->i_buffer_index, (long) (mdate() - render_time),
@@ -1974,7 +1974,7 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 
 #ifdef DEBUG
         default:
-            intf_DbgMsg( "error: unknown subpicture %p type %d",
+            intf_ErrMsg( "error: unknown subpicture %p type %d",
                          p_subpic, p_subpic->i_type );
 #endif
         }
@@ -2039,7 +2039,7 @@ static void RenderInterface( vout_thread_t *p_vout )
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
-#ifdef DEBUG_VOUT
+#ifdef TRACE_VOUT
     if( p_vout->i_changes )
     {
         intf_DbgMsg("changes: 0x%x (no display: 0x%x)", p_vout->i_changes,

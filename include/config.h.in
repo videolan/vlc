@@ -66,23 +66,23 @@
 /*****************************************************************************
  * Debugging options - define or undefine symbols
  *****************************************************************************/
-#ifdef DEBUG
-/* General debugging support, which depends of the DEBUG define, is determined
+#ifdef TRACE
+/* General trace support, which depends of the TRACE define, is determined
  * in the Makefile */
 
 /* Modules specific debugging - this will produce a lot of output, but can be
  * useful to track a bug */
-//#define DEBUG_INTF
-//#define DEBUG_INPUT
-//#define DEBUG_AUDIO
-#define DEBUG_VOUT
-#define DEBUG_VPAR
+//#define TRACE_INTF
+//#define TRACE_INPUT
+//#define TRACE_AUDIO
+#define TRACE_VOUT
+#define TRACE_VPAR
 
-/* Debugging log file - if defined, a file can be used to store all messages. If
- * DEBUG_LOG_ONLY is defined, debug messages will only be printed to the log and
+/* Trace log file - if defined, a file can be used to store all messages. If
+ * TRACE_LOG_ONLY is defined, debug messages will only be printed to the log and
  * will not appear on the screen */
-#define DEBUG_LOG                       "vlc-debug.log"
-#define DEBUG_LOG_ONLY
+#define TRACE_LOG                       "vlc-trace.log"
+#define TRACE_LOG_ONLY
 
 #endif
 
@@ -443,7 +443,7 @@
  * when debugging, since it allows messages which would not be printed
  * due to a crash to be printed anyway */
 #ifndef DEBUG
-//#define INTF_MSG_QUEUE
+#define INTF_MSG_QUEUE
 #endif
 
 /* Format of the header for debug messages. The arguments following this header

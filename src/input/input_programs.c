@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.50 2001/04/22 00:08:26 stef Exp $
+ * $Id: input_programs.c,v 1.51 2001/04/27 19:29:11 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -613,7 +613,7 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         return -1;
     }
 
-#ifdef DEBUG_INPUT
+#ifdef TRACE_INPUT
     intf_DbgMsg( "Selecting ES 0x%x", p_es->i_id );
 #endif
 
@@ -711,7 +711,7 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
         return -1;
     }
 
-#ifdef DEBUG_INPUT
+#ifdef TRACE_INPUT
     intf_DbgMsg( "Unselecting ES 0x%x", p_es->i_id );
 #endif
 
@@ -744,7 +744,7 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
 
         if( p_input->stream.pp_selected_es == NULL )
         {
-#ifdef DEBUG_INPUT
+#ifdef TRACE_INPUT
             intf_DbgMsg( "No more selected ES in input_UnselectES" );
 #endif
             return( 1 );

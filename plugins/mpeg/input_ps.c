@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.17 2001/04/22 00:08:26 stef Exp $
+ * $Id: input_ps.c,v 1.18 2001/04/27 19:29:11 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -547,11 +547,14 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
     data_packet_t *    p_data;
     long               l_index;
 
+#ifdef DEBUG
     if ( (p_cache = (packet_cache_t *)p_packet_cache) == NULL )
     {
         intf_ErrMsg( "PPacket cache not initialized" );
         return NULL;
     }
+#endif
+
     /* Safety check */
     if( l_size > INPUT_MAX_PACKET_SIZE )
     {
@@ -565,10 +568,12 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
         /* Allocates a new packet */
         if ( (p_data = malloc( sizeof(data_packet_t) )) == NULL )
         {
-            intf_DbgMsg( "Out of memory" );
+            intf_ErrMsg( "Out of memory" );
             return NULL;
         }
-        intf_WarnMsg( 1, "PS input: data packet allocated" );
+#ifdef TRACE_INPUT
+        intf_DbgMsg( "PS input: data packet allocated" );
+#endif
     }
     else
     {
@@ -576,7 +581,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
         if( (p_data = p_cache->data.p_stack[ -- p_cache->data.l_index ]) 
             == NULL )
         {
-            intf_DbgMsg( "NULL packet in the data cache" );
+            intf_ErrMsg( "NULL packet in the data cache" );
             return NULL;
         }
     }
@@ -595,7 +600,9 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
                 free( p_data );
                 return NULL;
             }
-            intf_WarnMsg( 1, "PS input: small buffer allocated" );
+#ifdef TRACE_INPUT
+            intf_DbgMsg( "PS input: small buffer allocated" );
+#endif
             p_data->l_size = l_size;
         }
         else
@@ -605,7 +612,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
             if( (p_data->p_buffer = p_cache->small.p_stack[l_index].p_data)
                 == NULL )
             {
-                intf_DbgMsg( "NULL packet in the small buffer cache" );
+                intf_ErrMsg( "NULL packet in the small buffer cache" );
                 free( p_data );
                 return NULL;
             }
@@ -632,11 +639,13 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
     	    /* Allocates a new packet */
             if ( (p_data->p_buffer = malloc( l_size )) == NULL )
             {
-                intf_DbgMsg( "Out of memory" );
+                intf_ErrMsg( "Out of memory" );
                 free( p_data );
                 return NULL;
             }
-            intf_WarnMsg( 1, "PS input: large buffer allocated" );
+#ifdef TRACE_INPUT
+            intf_DbgMsg( "PS input: large buffer allocated" );
+#endif
             p_data->l_size = l_size;
         }
         else
@@ -646,7 +655,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
             if( (p_data->p_buffer = p_cache->large.p_stack[l_index].p_data)
                 == NULL )
             {
-                intf_DbgMsg( "NULL packet in the small buffer cache" );
+                intf_ErrMsg( "NULL packet in the small buffer cache" );
                 free( p_data );
                 return NULL;
             }
@@ -683,11 +692,14 @@ static pes_packet_t * NewPES( void * p_packet_cache )
     packet_cache_t *   p_cache;
     pes_packet_t *     p_pes;
 
+#ifdef DEBUG
     if ( (p_cache = (packet_cache_t *)p_packet_cache) == NULL )
     {
         intf_ErrMsg( "Packet cache not initialized" );
         return NULL;
     }
+#endif
+
     /* Checks whether the PES cache is empty */
     if( p_cache->pes.l_index == 0 )
     {
@@ -697,7 +709,9 @@ static pes_packet_t * NewPES( void * p_packet_cache )
             intf_DbgMsg( "Out of memory" );
             return NULL;
         }
-        intf_WarnMsg( 1, "PS input: PES packet allocated" );
+#ifdef TRACE_INPUT
+        intf_DbgMsg( "PS input: PES packet allocated" );
+#endif
     }
     else
     {
@@ -705,7 +719,7 @@ static pes_packet_t * NewPES( void * p_packet_cache )
         if( (p_pes = p_cache->pes.p_stack[ -- p_cache->pes.l_index ]) 
             == NULL )
         {
-            intf_DbgMsg( "NULL packet in the data cache" );
+            intf_ErrMsg( "NULL packet in the data cache" );
             return NULL;
         }
     }
@@ -726,12 +740,14 @@ static void DeletePacket( void * p_packet_cache,
                           data_packet_t * p_data )
 {
     packet_cache_t *   p_cache;
-	
+
+#ifdef DEBUG
     if ( (p_cache = (packet_cache_t *)p_packet_cache) == NULL )
     {
         intf_ErrMsg( "Packet cache not initialized" );
         return;
     }
+#endif
 
 	ASSERT( p_data );
 
@@ -755,7 +771,9 @@ static void DeletePacket( void * p_packet_cache,
             {
                 ASSERT( p_data->p_buffer );
                 free( p_data->p_buffer );
-                intf_WarnMsg( 1, "PS input: small buffer freed" );
+#ifdef TRACE_INPUT
+                intf_DbgMsg( "PS input: small buffer freed" );
+#endif
             }
         }
     	else
@@ -772,7 +790,9 @@ static void DeletePacket( void * p_packet_cache,
             {
                 ASSERT( p_data->p_buffer );
                 free( p_data->p_buffer );
-                intf_WarnMsg( 1, "PS input: large buffer freed" );
+#ifdef TRACE_INPUT
+                intf_DbgMsg( "PS input: large buffer freed" );
+#endif
             }
         }
     }
@@ -781,7 +801,9 @@ static void DeletePacket( void * p_packet_cache,
         /* Cache full: the packet must be freed */
         free( p_data->p_buffer );
     	free( p_data );
-        intf_WarnMsg( 1, "PS input: data packet freed" );
+#ifdef TRACE_INPUT
+        intf_DbgMsg( "PS input: data packet freed" );
+#endif
     }
 
 }
@@ -795,11 +817,13 @@ static void DeletePES( void * p_packet_cache, pes_packet_t * p_pes )
     data_packet_t *     p_data;
     data_packet_t *     p_next;
 
+#ifdef DEBUG
     if ( (p_cache = (packet_cache_t *)p_packet_cache) == NULL )
     {
         intf_ErrMsg( "Packet cache not initialized" );
         return;
     }
+#endif
 
     ASSERT( p_pes);
 
@@ -822,7 +846,9 @@ static void DeletePES( void * p_packet_cache, pes_packet_t * p_pes )
     {
         /* Cache full: the packet must be freed */
         free( p_pes );
-        intf_WarnMsg( 1, "PS input: PES packet freed" );
+#ifdef TRACE_INPUT
+        intf_DbgMsg( "PS input: PES packet freed" );
+#endif
     }
 }
 

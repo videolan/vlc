@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_msg.h,v 1.11 2001/03/21 13:42:33 sam Exp $
+ * $Id: intf_msg.h,v 1.12 2001/04/27 19:29:11 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -30,11 +30,11 @@
  * compiler extensions and print the file, the function and the line number
  * from which they have been called. They call _intf_DbgMsg*() functions after
  * having added debugging informations.
- * Outside DEBUG mode, intf_DbgMsg* functions do nothing.
+ * Outside trace mode, intf_DbgMsg* functions do nothing.
  *****************************************************************************/
-#ifdef DEBUG
+#ifdef TRACE
 
-/* DEBUG mode */
+/* TRACE mode */
 void    _intf_DbgMsg        ( char *psz_file, char *psz_function, int i_line,
                               char *psz_format, ... );
 void    _intf_DbgMsgImm     ( char *psz_file, char *psz_function, int i_line,
@@ -47,7 +47,7 @@ void    _intf_DbgMsgImm     ( char *psz_file, char *psz_function, int i_line,
 
 #else
 
-/* Non-DEBUG mode */
+/* Non-TRACE mode */
 #define intf_DbgMsg( format, args... )
 #define intf_DbgMsgImm( format, args...)
 

@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: intf_msg.c,v 1.30 2001/04/25 09:31:14 sam Exp $
+ * $Id: intf_msg.c,v 1.31 2001/04/27 19:29:11 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -51,7 +51,7 @@
  * intf_msg_item_t
  *****************************************************************************
  * Store a single message. Messages have a maximal size of INTF_MSG_MSGSIZE.
- * If DEBUG is defined, messages have a date field and debug messages are
+ * If TRACE is defined, messages have a date field and debug messages are
  * printed with a date to allow more precise profiling.
  *****************************************************************************/
 typedef struct
@@ -59,8 +59,8 @@ typedef struct
     int     i_type;                               /* message type, see below */
     char *  psz_msg;                                   /* the message itself */
 
-#ifdef DEBUG
-    /* Debugging informations - in DEBUG mode, debug messages have calling
+#ifdef TRACE
+    /* Debugging informations - in TRACE mode, debug messages have calling
      * location informations printed */
     mtime_t date;                                     /* date of the message */
     char *  psz_file;               /* file in which the function was called */
@@ -92,12 +92,12 @@ typedef struct intf_msg_s
     intf_msg_item_t         msg[INTF_MSG_QSIZE];            /* message queue */
 #endif
 
-#ifdef DEBUG_LOG
+#ifdef TRACE_LOG
     /* Log file */
     FILE *                  p_log_file;                          /* log file */
 #endif
 
-#if !defined(INTF_MSG_QUEUE) && !defined(DEBUG_LOG)
+#if !defined(INTF_MSG_QUEUE) && !defined(TRACE_LOG)
     /* If neither messages queue, neither log file is used, then the structure
      * is empty. However, empty structures are not allowed in C. Therefore, a
      * dummy integer is used to fill it. */
@@ -112,7 +112,7 @@ typedef struct intf_msg_s
 static void QueueMsg        ( intf_msg_t *p_msg, int i_type,
                               char *psz_format, va_list ap );
 static void PrintMsg        ( intf_msg_item_t *p_msg );
-#ifdef DEBUG
+#ifdef TRACE
 static void QueueDbgMsg     ( intf_msg_t *p_msg, char *psz_file,
                               char *psz_function, int i_line,
                               char *psz_format, va_list ap );
@@ -147,11 +147,11 @@ p_intf_msg_t intf_MsgCreate( void )
 #endif
 
     
-#ifdef DEBUG_LOG
+#ifdef TRACE_LOG
         /* Log file initialization - on failure, file pointer will be null,
          * and no log will be issued, but this is not considered as an
          * error */
-        p_msg->p_log_file = fopen( DEBUG_LOG, "w" );
+        p_msg->p_log_file = fopen( TRACE_LOG, "w" );
 #endif
     }
     return( p_msg );
@@ -168,7 +168,7 @@ void intf_MsgDestroy( void )
 {
     intf_FlushMsg();                         /* print all remaining messages */
 
-#ifdef DEBUG_LOG
+#ifdef TRACE_LOG
     /* Close log file if any */
     if( p_main->p_msg->p_log_file != NULL )
     {
@@ -258,11 +258,11 @@ void intf_IntfMsg(char *psz_format, ...)
  * _intf_DbgMsg: print a debugging message                               (ok ?)
  *****************************************************************************
  * This function prints a debugging message. Compared to other intf_*Msg
- * functions, it is only defined if DEBUG is defined and require a file name,
+ * functions, it is only defined if TRACE is defined and require a file name,
  * a function name and a line number as additionnal debugging informations. It
  * also prints a debugging header for each received line.
  *****************************************************************************/
-#ifdef DEBUG
+#ifdef TRACE
 void _intf_DbgMsg( char *psz_file, char *psz_function, int i_line,
                    char *psz_format, ...)
 {
@@ -335,7 +335,7 @@ void intf_WarnMsgImm( int i_level, char *psz_format, ... )
  * message immediately. It should only be called through the macro
  * intf_DbgMsgImm().
  *****************************************************************************/
-#ifdef DEBUG
+#ifdef TRACE
 void _intf_DbgMsgImm( char *psz_file, char *psz_function, int i_line,
                       char *psz_format, ...)
 {
@@ -461,7 +461,7 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
      */
     p_msg_item->i_type =     i_type;
     p_msg_item->psz_msg =    psz_str;
-#ifdef DEBUG    
+#ifdef TRACE    
     p_msg_item->date =       mdate();
 #endif
 
@@ -477,9 +477,9 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
  * QueueDbgMsg: add a message to a queue with debugging informations
  *****************************************************************************
  * This function is the same as QueueMsg, except that it is only defined when
- * DEBUG is define, and require additionnal debugging informations.
+ * TRACE is define, and require additionnal debugging informations.
  *****************************************************************************/
-#ifdef DEBUG
+#ifdef TRACE
 static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
                         int i_line, char *psz_format, va_list ap)
 {
@@ -566,11 +566,11 @@ static void FlushLockedMsg ( intf_msg_t *p_msg )
  * PrintMsg: print a message                                             (ok ?)
  *****************************************************************************
  * Print a single message. The message data is not freed. This function exists
- * in two version. The DEBUG version prints a date with each message, and is
- * able to log messages (if DEBUG_LOG is defined).
+ * in two version. The TRACE version prints a date with each message, and is
+ * able to log messages (if TRACE_LOG is defined).
  * The normal one just prints messages to the screen.
  *****************************************************************************/
-#ifdef DEBUG
+#ifdef TRACE
 
 static void PrintMsg( intf_msg_item_t *p_msg )
 {
@@ -626,7 +626,7 @@ static void PrintMsg( intf_msg_item_t *p_msg )
         break;
     case INTF_MSG_ERR:                                     /* error messages */
     case INTF_MSG_WARN:
-#ifndef DEBUG_LOG_ONLY
+#ifndef TRACE_LOG_ONLY
     case INTF_MSG_DBG:                                 /* debugging messages */
 #endif
         fprintf( stderr, "%s\n", psz_msg );
@@ -636,7 +636,7 @@ static void PrintMsg( intf_msg_item_t *p_msg )
         break;
     }
 
-#ifdef DEBUG_LOG
+#ifdef TRACE_LOG
     /* Append all messages to log file */
     if( p_main->p_msg->p_log_file != NULL )
     {
