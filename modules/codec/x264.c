@@ -146,8 +146,8 @@ vlc_module_end();
  * Local prototypes
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "qp", "qp-max", "qp-max", "cabac", "loopfilter", "analyse",
-    "keyint", "idrint", "bframes", "frameref", NULL
+    "qp", "qp-min", "qp-max", "cabac", "loopfilter", "analyse",
+    "keyint", "idrint", "bframes", "frameref", "scenecut", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -222,6 +222,7 @@ static int  Open ( vlc_object_t *p_this )
     {
         /* No QP -> constant bitrate */
 #if X264_BUILD >= 0x000a
+        p_sys->param.rc.b_cbr = 1;
         p_sys->param.rc.i_bitrate = p_enc->fmt_out.i_bitrate / 1000;
         p_sys->param.rc.i_rc_buffer_size = p_sys->param.rc.i_bitrate;
         p_sys->param.rc.i_rc_init_buffer = p_sys->param.rc.i_bitrate / 4;
@@ -299,7 +300,11 @@ static int  Open ( vlc_object_t *p_this )
     }
     if( !(p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_SSE) )
     {
-        p_sys->param.cpu &= ~(X264_CPU_SSE|X264_CPU_SSE2);
+        p_sys->param.cpu &= ~X264_CPU_SSE;
+    }
+    if( !(p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_SSE2) )
+    {
+        p_sys->param.cpu &= ~X264_CPU_SSE2;
     }
 
     /* Open the encoder */

@@ -240,6 +240,9 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( !(p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_SSE) )
     {
         p_context->dsp_mask |= FF_MM_SSE;
+    }
+    if( !(p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_SSE2) )
+    {
         p_context->dsp_mask |= FF_MM_SSE2;
     }
 
