@@ -36,6 +36,7 @@
 /******************************************************************************
 * Prototypes                                                                  *
 ******************************************************************************/
-int VCDReadToc    ( struct thread_vcd_data_s * );
-int VCDReadSector ( struct thread_vcd_data_s *, byte_t * );
+int ioctl_GetTrackCount ( int );
+int * ioctl_GetSectors  ( int );
+int ioctl_ReadSector    ( int, int, byte_t * );
 

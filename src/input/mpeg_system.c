@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.76 2001/12/19 10:00:00 massiot Exp $
+ * $Id: mpeg_system.c,v 1.77 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -28,16 +28,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>                                              /* off_t */
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
 
 #include "stream_control.h"
 #include "input_ext-intf.h"

@@ -2,7 +2,7 @@
  * motion3dnow.c : 3DNow! motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motion3dnow.c,v 1.5 2001/12/09 17:01:36 sam Exp $
+ * $Id: motion3dnow.c,v 1.6 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -22,27 +22,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME motion3dnow
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "mmx.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Local and extern prototypes.
@@ -53,14 +41,15 @@ static void motion_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for 3DNow! motion compensation module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_MOTION;
-    p_module->psz_longname = "3DNow! motion compensation module";
+    SET_DESCRIPTION( "3DNow! motion compensation module" )
+    ADD_CAPABILITY( MOTION, 150 )
+    ADD_REQUIREMENT( 3DNOW )
+    ADD_SHORTCUT( "3dn" )
+    ADD_SHORTCUT( "3dnow" )
+    ADD_SHORTCUT( "motion3dn" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -75,17 +64,6 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int motion_Probe( probedata_t *p_data )
 {
-    if( !TestCPU( CPU_CAPABILITY_3DNOW ) )
-    {
-        return( 0 );
-    }
-
-    if( TestMethod( MOTION_METHOD_VAR, "motion3dnow" )
-         || TestMethod( MOTION_METHOD_VAR, "3dnow" ) )
-    {
-        return( 999 );
-    }
-
     return( 250 );
 }
 

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppenned video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.67 2001/12/19 03:50:22 sam Exp $
+ * $Id: video_output.h,v 1.68 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -39,7 +39,11 @@ typedef struct vout_bank_s
 
 } vout_bank_t;
 
+#ifndef PLUGIN
 extern vout_bank_t *p_vout_bank;
+#else
+#   define p_vout_bank (p_symbols->p_vout_bank)
+#endif
 
 /*****************************************************************************
  * vout_chroma_t: Chroma conversion function
@@ -50,7 +54,8 @@ extern vout_bank_t *p_vout_bank;
  *      p_dest                          destination picture
  * Picture width and source dimensions must be multiples of 16.
  *****************************************************************************/
-typedef void (vout_chroma_convert_t)( picture_t *p_source, picture_t *p_dest );
+typedef void (vout_chroma_convert_t)( struct vout_thread_s *,
+                                      picture_t *, picture_t * );
 
 typedef struct vout_chroma_s
 {
@@ -63,7 +68,6 @@ typedef struct vout_chroma_s
     /* Plugin used and shortcuts to access its capabilities */
     struct module_s *   p_module;
     int  ( * pf_init )  ( struct vout_thread_s * );
-    int  ( * pf_reset ) ( struct vout_thread_s * );
     void ( * pf_end )   ( struct vout_thread_s * );
 
 } vout_chroma_t;
@@ -183,6 +187,7 @@ typedef struct vout_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+#ifndef PLUGIN
 void            vout_InitBank       ( void );
 void            vout_EndBank        ( void );
 
@@ -212,4 +217,19 @@ void            vout_DisplaySubPicture  ( vout_thread_t *, subpicture_t * );
 subpicture_t *  vout_SortSubPictures    ( vout_thread_t *, mtime_t );
 void            vout_RenderSubPictures  ( vout_thread_t *, picture_t *,
                                                            subpicture_t * );
+#else
+#   define vout_CreateThread p_symbols->vout_CreateThread
+#   define vout_DestroyThread p_symbols->vout_DestroyThread
+#   define vout_CreateSubPicture p_symbols->vout_CreateSubPicture
+#   define vout_DestroySubPicture p_symbols->vout_DestroySubPicture
+#   define vout_DisplaySubPicture p_symbols->vout_DisplaySubPicture
+#   define vout_CreatePicture p_symbols->vout_CreatePicture
+#   define vout_AllocatePicture p_symbols->vout_AllocatePicture
+#   define vout_DisplayPicture p_symbols->vout_DisplayPicture
+#   define vout_DestroyPicture p_symbols->vout_DestroyPicture
+#   define vout_DatePicture p_symbols->vout_DatePicture
+#   define vout_LinkPicture p_symbols->vout_LinkPicture
+#   define vout_UnlinkPicture p_symbols->vout_UnlinkPicture
+#   define vout_PlacePicture p_symbols->vout_PlacePicture
+#endif
 

@@ -2,7 +2,7 @@
  * intf_qt.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_qt.cpp,v 1.9 2001/12/07 18:33:08 sam Exp $
+ * $Id: intf_qt.cpp,v 1.10 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,33 +24,21 @@
 extern "C"
 {
 
-#define MODULE_NAME qt
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
 
 #include "intf_playlist.h"
 #include "interface.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 } /* extern "C" */
 
@@ -113,7 +101,7 @@ private slots:
     void Manage( void );
 
     void FileOpen  ( void );
-    void FileQuit  ( void ) { p_intf->b_die = 1; };
+    void FileQuit  ( void ) { qApp->quit(); };
 
     void PlaybackPlay  ( void );
     void PlaybackPause ( void );
@@ -139,11 +127,7 @@ private:
     QLabel     *p_date;
 };
 
-#ifdef BUILTIN
-#   include "BUILTIN_intf_qt.moc"
-#else
-#   include "intf_qt.moc"
-#endif
+#include "intf_qt.moc"
 
 #define SLIDER_MIN    0x00000
 #define SLIDER_MAX    0x10000
@@ -192,16 +176,6 @@ void _M( intf_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int intf_Probe( probedata_t *p_data )
 {
-    if( TestMethod( INTF_METHOD_VAR, "qt" ) )
-    {
-        return( 999 );
-    }
-
-    if( TestProgram( "qvlc" ) )
-    {
-        return( 180 );
-    }
-
     return( 80 );
 }
 
@@ -499,17 +473,13 @@ void IntfWindow::Manage( void )
         p_intf->b_menu_change = 0;
     }
 
-    /* Manage core vlc functions through the callback */
-    p_intf->pf_manage( p_intf );
-
     if( p_intf->b_die )
     {
-        /* Prepare to die, young Skywalker */
         qApp->quit();
-
-        /* Just in case */
-        return;
     }
+
+    /* Manage core vlc functions through the callback */
+    p_intf->pf_manage( p_intf );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * gtk_modules.c : functions to build modules configuration boxes.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_modules.c,v 1.6 2001/12/07 18:33:07 sam Exp $
+ * $Id: gtk_modules.c,v 1.7 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -25,26 +25,18 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
 #include <sys/types.h>                                              /* off_t */
 #include <stdlib.h>
 
-#define gtk 12
-#define gnome 42
-#if ( MODULE_NAME == gtk )
-#   include <gtk/gtk.h>
-#elif ( MODULE_NAME == gnome )
+#include <videolan/vlc.h>
+
+#ifdef MODULE_NAME_IS_gnome
 #   include <gnome.h>
+#else
+#   include <gtk/gtk.h>
 #endif
-#undef gtk
-#undef gnome
 
 #include <string.h>
-
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -56,7 +48,7 @@
 #include "gtk_interface.h"
 #include "gtk_support.h"
 #include "gtk_playlist.h"
-#include "intf_gtk.h"
+#include "gtk_common.h"
 
 gboolean GtkModulesShow( GtkWidget       *widget,
                          GdkEventButton  *event,

@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.32 2001/12/09 17:01:37 sam Exp $
+ * $Id: video_text.c,v 1.33 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -25,13 +25,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                  /* errno */
 #include <stdlib.h>                                                /* free() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 #include <fcntl.h>                                                 /* open() */
+
+#include <videolan/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                    /* read(), close() */
@@ -39,22 +39,11 @@
 #   include <io.h>
 #endif
 
-#ifdef SYS_BEOS
-#   include "beos_specific.h"
-#endif
-
-#ifdef SYS_DARWIN
-#   include "darwin_specific.h"
-#endif
-
 #if defined( WIN32 )
 #   include <io.h>
 #endif
 
-#include "common.h"
 #include "video_text.h"
-
-#include "intf_msg.h"
 
 /*****************************************************************************
  * vout_font_t: bitmap font

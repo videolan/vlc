@@ -20,27 +20,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME qnx 
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Capabilities defined in the other files.

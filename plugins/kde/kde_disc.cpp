@@ -1,12 +1,12 @@
 /***************************************************************************
-                          kdiskdialog.cpp  -  description
+                          kde_disc.cpp  -  description
                              -------------------
     begin                : Sat Apr 7 2001
     copyright            : (C) 2001 by andres
     email                : dae@chez.com
  ***************************************************************************/
 
-#include "kdiskdialog.h"
+#include "kde_disc.h"
 
 #include <qhbox.h>
 #include <qlabel.h>

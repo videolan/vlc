@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.166 2001/12/27 03:47:09 massiot Exp $
+ * $Id: input.c,v 1.167 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -26,12 +26,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
+#include <videolan/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -62,13 +62,7 @@
 #   include <sys/times.h>
 #endif
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
 #include "netutils.h"
-#include "modules.h"
 
 #include "intf_playlist.h"
 
@@ -203,7 +197,7 @@ void input_DestroyThread( input_thread_t *p_input, int *pi_status )
     /* Request thread destruction */
     p_input->b_die = 1;
 
-    /* Make the thread exit of an eventual vlc_cond_wait() */
+    /* Make the thread exit from a possible vlc_cond_wait() */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     vlc_cond_signal( &p_input->stream.stream_wait );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -389,7 +383,6 @@ static void RunThread( input_thread_t *p_input )
  *****************************************************************************/
 static int InitThread( input_thread_t * p_input )
 {
-
     /* Initialize statistics */
     p_input->c_loops                    = 0;
     p_input->stream.c_packets_read      = 0;
@@ -403,7 +396,8 @@ static int InitThread( input_thread_t * p_input )
 
     /* Find appropriate module. */
     p_input->p_input_module = module_Need( MODULE_CAPABILITY_INPUT,
-                                           (probedata_t *)p_input );
+                                 main_GetPszVariable( INPUT_METHOD_VAR, NULL ),
+                                 (probedata_t *)p_input );
 
     if( p_input->p_input_module == NULL )
     {
@@ -427,12 +421,17 @@ static int InitThread( input_thread_t * p_input )
     p_input->pf_rewind        = f.pf_rewind;
     p_input->pf_seek          = f.pf_seek;
 
+    if( f.pf_open != NULL )
+    {
+        f.pf_open( p_input );
+        p_input->stream.i_method = INPUT_METHOD_DVD;
+    }
 #if !defined( SYS_BEOS ) && !defined( SYS_NTO )
     /* FIXME : this is waaaay too kludgy */
-    if( ( strlen( p_input->p_source ) >= 10
-          && !strncasecmp( p_input->p_source, "udpstream:", 10 ) )
-          || ( strlen( p_input->p_source ) >= 4
-                && !strncasecmp( p_input->p_source, "udp:", 4 ) ) )
+    else if( ( strlen( p_input->p_source ) >= 10
+               && !strncasecmp( p_input->p_source, "udpstream:", 10 ) )
+               || ( strlen( p_input->p_source ) >= 4
+                     && !strncasecmp( p_input->p_source, "udp:", 4 ) ) )
     {
         /* Network stream */
         NetworkOpen( p_input );
@@ -445,33 +444,7 @@ static int InitThread( input_thread_t * p_input )
         HTTPOpen( p_input );
         p_input->stream.i_method = INPUT_METHOD_NETWORK;
     }
-    else 
 #endif
-        if( ( ( ( strlen( p_input->p_source ) > 4 )
-                  && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
-              || TestMethod( INPUT_METHOD_VAR, "dvd" ) ) 
-             && f.pf_open != NULL )
-    {
-        /* DVD - this is THE kludge */
-        f.pf_open( p_input );
-        p_input->stream.i_method = INPUT_METHOD_DVD;
-    }
-    else if( ( ( ( strlen( p_input->p_source ) > 8 )
-                   && !strncasecmp( p_input->p_source, "dvdread:", 8 ) )
-                || TestMethod( INPUT_METHOD_VAR, "dvdread" ) )
-             && f.pf_open != NULL )
-    {
-        /* DVDRead - this is THE kludge */
-        f.pf_open( p_input );
-        p_input->stream.i_method = INPUT_METHOD_DVD;
-    }
-    else if( ( strlen( p_input->p_source ) > 4 )
-               && !strncasecmp( p_input->p_source, "vlc:", 4 )
-               && f.pf_open != NULL )
-    {
-        /* Dummy input - very kludgy */
-        f.pf_open( p_input );
-    }
     else if( ( strlen( p_input->p_source ) == 1 )
                && *p_input->p_source == '-' )
     {
@@ -570,12 +543,16 @@ static void CloseThread( input_thread_t * p_input )
 {
 #define f p_input->p_input_module->p_functions->input.functions.input
 
+    if( f.pf_close != NULL )
+    {
+        f.pf_close( p_input );
+    }
 #if !defined( SYS_BEOS ) && !defined( SYS_NTO )
     /* Close stream */
-    if( ( strlen( p_input->p_source ) > 10
-          && !strncasecmp( p_input->p_source, "udpstream:", 10 ) )
-          || ( strlen( p_input->p_source ) > 4
-                && !strncasecmp( p_input->p_source, "udp:", 4 ) ) )
+    else if( ( strlen( p_input->p_source ) > 10
+               && !strncasecmp( p_input->p_source, "udpstream:", 10 ) )
+               || ( strlen( p_input->p_source ) > 4
+                     && !strncasecmp( p_input->p_source, "udp:", 4 ) ) )
     {
         NetworkClose( p_input );
     }
@@ -584,25 +561,7 @@ static void CloseThread( input_thread_t * p_input )
     {
         NetworkClose( p_input );
     }
-    else 
 #endif
-    if( ( ( strlen( p_input->p_source ) > 4 )
-            && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
-        || TestMethod( INPUT_METHOD_VAR, "dvd" ) )
-    {
-        f.pf_close( p_input );
-    }
-    else if( ( ( strlen( p_input->p_source ) > 8 )
-                 && !strncasecmp( p_input->p_source, "dvdread:", 8 ) )
-             || TestMethod( INPUT_METHOD_VAR, "dvdread" ) )
-    {
-        f.pf_close( p_input );
-    }
-    else if( ( strlen( p_input->p_source ) > 4 )
-               && !strncasecmp( p_input->p_source, "vlc:", 4 ) )
-    {
-        f.pf_close( p_input );
-    }
     else
     {
         FileClose( p_input );

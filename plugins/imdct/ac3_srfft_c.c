@@ -2,7 +2,7 @@
  * ac3_srfft.c: ac3 FFT in C
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_srfft_c.c,v 1.3 2001/12/09 17:01:36 sam Exp $
+ * $Id: ac3_srfft_c.c,v 1.4 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -22,20 +22,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME imdct
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
-#include <string.h>                                              /* memcpy() */
-
 #include <math.h>
 #include <stdio.h>
 
-#include "common.h"
+#include <videolan/vlc.h>
 
 #include "ac3_imdct.h"
 #include "ac3_srfft.h"

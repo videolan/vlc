@@ -2,7 +2,7 @@
  * aout_esd.c : Esound functions library
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: aout_esd.c,v 1.16 2001/12/07 18:33:07 sam Exp $
+ * $Id: aout_esd.c,v 1.17 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,9 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME esd
-#include "modules_inner.h"
-
 /* TODO:
  *
  * - use the libesd function to get latency when it's not buggy anymore
@@ -33,8 +30,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <fcntl.h>                                       /* open(), O_WRONLY */
 #include <string.h>                                            /* strerror() */
@@ -44,16 +39,9 @@
 
 #include <esd.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "audio_output.h"                                   /* aout_thread_t */
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * aout_sys_t: esd audio output method descriptor
@@ -100,11 +88,6 @@ void _M( aout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int aout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( AOUT_METHOD_VAR, "esd" ) )
-    {
-        return( 999 );
-    }
-
     /* We don't have to test anything -- if we managed to open this plugin,
      * it means we have the appropriate libs. */
     return( 50 );

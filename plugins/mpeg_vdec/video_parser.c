@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.9 2001/12/30 05:38:44 sam Exp $
+ * $Id: video_parser.c,v 1.10 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -22,15 +22,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME mpeg_vdec
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
+
+#include <videolan/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>                                              /* getpid() */
@@ -43,11 +40,6 @@
 #   include <sys/times.h>
 #endif
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-
 #include "video.h"
 #include "video_output.h"
 
@@ -57,9 +49,6 @@
 #include "vdec_ext-plugins.h"
 #include "vpar_pool.h"
 #include "video_parser.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*
  * Local prototypes
@@ -83,13 +72,11 @@ void _M( vdec_getfunctions )( function_list_t * p_function_list )
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for MPEG video decoder module" )
-    ADD_COMMENT( "Nothing to configure" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_DEC;
-    p_module->psz_longname = "MPEG I/II video decoder module";
+    SET_DESCRIPTION( "MPEG I/II video decoder module" )
+    ADD_CAPABILITY( DECODER, 50 )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -108,10 +95,8 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int decoder_Probe( probedata_t *p_data )
 {
-    if( p_data->i_type == MPEG1_VIDEO_ES || p_data->i_type == MPEG2_VIDEO_ES )
-        return( 50 );
-    else
-        return( 0 );
+    return( ( p_data->i_type == MPEG1_VIDEO_ES
+               || p_data->i_type == MPEG2_VIDEO_ES ) ? 50 : 0 );
 }
 
 /*****************************************************************************
@@ -199,7 +184,9 @@ static int InitThread( vpar_thread_t *p_vpar )
     /*
      * Choose the best motion compensation module
      */
-    p_vpar->p_motion_module = module_Need( MODULE_CAPABILITY_MOTION, NULL );
+    p_vpar->p_motion_module = module_Need( MODULE_CAPABILITY_MOTION,
+                                main_GetPszVariable( MOTION_METHOD_VAR, NULL ),
+                                NULL );
 
     if( p_vpar->p_motion_module == NULL )
     {
@@ -215,7 +202,9 @@ static int InitThread( vpar_thread_t *p_vpar )
     /*
      * Choose the best IDCT module
      */
-    p_vpar->p_idct_module = module_Need( MODULE_CAPABILITY_IDCT, NULL );
+    p_vpar->p_idct_module = module_Need( MODULE_CAPABILITY_IDCT,
+                                  main_GetPszVariable( IDCT_METHOD_VAR, NULL ),
+                                  NULL );
 
     if( p_vpar->p_idct_module == NULL )
     {

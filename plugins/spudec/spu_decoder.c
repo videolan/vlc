@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.5 2001/12/30 05:38:44 sam Exp $
+ * $Id: spu_decoder.c,v 1.6 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,29 +21,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME spudec
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>                                              /* getpid() */
-#endif
-
-#ifdef WIN32                   /* getpid() for win32 is located in process.h */
-#include <process.h>
-#endif
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                    /* memcpy(), memset() */
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
+
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>                                           /* getpid() */
+#endif
+
+#ifdef WIN32                   /* getpid() for win32 is located in process.h */
+#   include <process.h>
+#endif
 
 #include "video.h"
 #include "video_output.h"
@@ -52,9 +44,6 @@
 #include "input_ext-dec.h"
 
 #include "spu_decoder.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -82,13 +71,11 @@ void _M( spudec_getfunctions )( function_list_t * p_function_list )
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for SPU decoder module" )
-    ADD_COMMENT( "Nothing to configure" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_DEC;
-    p_module->psz_longname = "subtitles decoder module";
+    SET_DESCRIPTION( "DVD subtitles decoder module" )
+    ADD_CAPABILITY( DECODER, 50 )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -106,10 +93,7 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int decoder_Probe( probedata_t *p_data )
 {
-    if( p_data->i_type == DVD_SPU_ES )
-        return( 50 );
-    else
-        return( 0 );
+    return ( p_data->i_type == DVD_SPU_ES ) ? 50 : 0;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.16 2001/12/13 12:47:17 sam Exp $
+ * $Id: vout_directx.c,v 1.17 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -20,9 +20,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-#define MODULE_NAME directx
-#include "modules_inner.h"
 
 /* ToDo:
  *
@@ -48,11 +45,11 @@
  * implementing this is not considered high priority.
  * 
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
+
+#include <videolan/vlc.h>
 
 #include <windows.h>
 #include <windowsx.h>
@@ -63,20 +60,12 @@
 #   include <directx.h>
 #endif
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
 #include "netutils.h"
 
 #include "video.h"
 #include "video_output.h"
 
 #include "interface.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 #include "vout_directx.h"
 

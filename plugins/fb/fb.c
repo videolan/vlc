@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.9 2001/12/09 17:01:36 sam Exp $
+ * $Id: fb.c,v 1.10 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -21,27 +21,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME fb
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -52,14 +41,13 @@ void _M( vout_getfunctions )( function_list_t * p_function_list );
  * Building configuration tree
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for framebuffer module" )
-    ADD_COMMENT( "For now, the framebuffer module cannot be configured" )
+    ADD_WINDOW( "Configuration for framebuffer module" )
+        ADD_COMMENT( "For now, the framebuffer module cannot be configured" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_VOUT;
-    p_module->psz_longname = "Linux console framebuffer module";
+    SET_DESCRIPTION( "Linux console framebuffer module" )
+    ADD_CAPABILITY( VOUT, 30 )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

@@ -20,14 +20,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME qnx 
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
@@ -37,19 +32,12 @@
 #include <photon/PtLabel.h>
 #include <photon/PdDirect.h>
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
 
 #include "interface.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * vout_sys_t: video output QNX method descriptor

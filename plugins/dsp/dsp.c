@@ -2,7 +2,7 @@
  * dsp.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dsp.c,v 1.11 2001/12/09 17:01:36 sam Exp $
+ * $Id: dsp.c,v 1.12 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -22,24 +22,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dsp
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-
-#include "modules.h"
-#include "modules_export.h"
+#include <videolan/vlc.h>
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -56,9 +45,9 @@ ADD_WINDOW( "Configuration for dsp module" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_AOUT;
-    p_module->psz_longname = "Linux OSS /dev/dsp module";
+    SET_DESCRIPTION( "Linux OSS /dev/dsp module" )
+    ADD_CAPABILITY( AOUT, 100 )
+    ADD_SHORTCUT( "dsp" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

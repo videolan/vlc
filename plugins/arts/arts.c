@@ -20,24 +20,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME arts
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-
-#include "modules.h"
-#include "modules_export.h"
+#include <videolan/vlc.h>
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -48,15 +37,14 @@ void _M( aout_getfunctions )( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for arts module" )
-    ADD_FRAME( "aRts" )
-        ADD_COMMENT( "This module does not need configuration" )
+    ADD_WINDOW( "Configuration for arts module" )
+        ADD_FRAME( "aRts" )
+            ADD_COMMENT( "This module does not need configuration" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_AOUT;
-    p_module->psz_longname = "arts audio module";
+    SET_DESCRIPTION( "aRts audio module" )
+    ADD_CAPABILITY( AOUT, 50 )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

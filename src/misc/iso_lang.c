@@ -2,7 +2,7 @@
  * iso_lang.c: function to decode language code (in dvd or a52 for instance).
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: iso_lang.c,v 1.2 2001/12/09 17:01:37 sam Exp $
+ * $Id: iso_lang.c,v 1.3 2001/12/30 07:09:56 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -24,11 +24,9 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdio.h>
 
-#include "common.h"
+#include <videolan/vlc.h>
 
 /*****************************************************************************
  * Local tables

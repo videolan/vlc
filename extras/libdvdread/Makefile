@@ -27,8 +27,6 @@ BUILTIN_OBJ = $(OBJ_C:%.o=DVDREAD_%.o)
 
 ALL_OBJ = $(PLUGIN_OBJ) $(BUILTIN_OBJ)
 
-include ../../Makefile.modules
-
 $(OBJ_C): %.o: .dep/%.d
 $(OBJ_C): %.o: %.c
 	$(CC) $(CFLAGS) $(CFLAGS_LIBDVDREAD) $(PCFLAGS) -c -o $@ $<
@@ -50,6 +48,11 @@ $(BUILTIN_OBJ): DVDREAD_%.o: %.c
 # Virtual targets
 #
 all: ../../lib/$(BASE_A)
+
+clean:
+	rm -f $(ALL_OBJ)
+	rm -f *.o
+	rm -rf .dep
 
 libdvdcss:
 	@cd ../../ && $(MAKE) libdvdcss

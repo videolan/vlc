@@ -20,15 +20,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME arts
-#include "modules_inner.h"
-
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <fcntl.h>                                       /* open(), O_WRONLY */
 #include <string.h>                                            /* strerror() */
@@ -38,16 +32,9 @@
 
 #include <artsc.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "audio_output.h"                                   /* aout_thread_t */
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * aout_sys_t: arts audio output method descriptor
@@ -94,11 +81,6 @@ void _M( aout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int aout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( AOUT_METHOD_VAR, "arts" ) )
-    {
-        return( 999 );
-    }
-
     /* We don't have to test anything -- if we managed to open this plugin,
      * it means we have the appropriate libs. */
     return( 50 );

@@ -2,7 +2,7 @@
  * yv12_rgb8.c : YUV to paletted RGB8 conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: yv12_rgb8.c,v 1.2 2001/12/19 18:14:23 sam Exp $
+ * $Id: yv12_rgb8.c,v 1.3 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,32 +21,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME chroma_yv12_rgb8
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <math.h>                                            /* exp(), pow() */
 #include <errno.h>                                                 /* ENOMEM */
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
 
 #include "chroma_common.h"
 #include "transforms.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * chroma_sys_t: chroma method descriptor
@@ -77,14 +66,11 @@ static void ConvertYUV420RGB8   ( vout_thread_t *, picture_t *, picture_t * );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for YV12 to RGB8 module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_CHROMA;
-    p_module->psz_longname = "YV12 to paletted RGB8 conversion module";
+    SET_DESCRIPTION( "YV12 to RGB8 conversion module" )
+    ADD_CAPABILITY( CHROMA, 50 )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

@@ -2,7 +2,7 @@
  * ac3_srfft_3dn.c: accelerated 3D Now! ac3 fft functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_srfft_3dn.c,v 1.4 2001/12/09 17:01:36 sam Exp $
+ * $Id: ac3_srfft_3dn.c,v 1.5 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -21,20 +21,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME imdct3dn
-#include "modules_inner.h"
-
 /*****************************************************************************
- *  * Preamble
- *   *****************************************************************************/
-#include <stdio.h>
-
-#include "defs.h"
-
+ * Preamble
+ *****************************************************************************/
 #include <math.h>
 #include <stdio.h>
 
-#include "common.h"
+#include <videolan/vlc.h>
 
 #include "ac3_imdct.h"
 #include "ac3_srfft.h"

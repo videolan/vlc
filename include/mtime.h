@@ -9,7 +9,7 @@
  * Functions prototyped are implemented in interface/mtime.c.
  *****************************************************************************
  * Copyright (C) 1996, 1997, 1998, 1999, 2000 VideoLAN
- * $Id: mtime.h,v 1.8 2001/11/28 15:08:04 massiot Exp $
+ * $Id: mtime.h,v 1.9 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -26,12 +26,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
- *****************************************************************************/
-
-/*****************************************************************************
- * Required headers:
- *  none
- * this header includes inline functions
  *****************************************************************************/
 
 /*****************************************************************************
@@ -56,7 +50,13 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+#ifndef PLUGIN
 char *  mstrtime ( char *psz_buffer, mtime_t date );
 mtime_t mdate    ( void );
 void    mwait    ( mtime_t date );
 void    msleep   ( mtime_t delay );
+#else
+#   define msleep p_symbols->msleep
+#   define mdate  p_symbols->mdate
+#endif
+

@@ -2,7 +2,7 @@
  * invert.c : Invert video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: invert.c,v 1.2 2001/12/19 03:50:22 sam Exp $
+ * $Id: invert.c,v 1.3 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,31 +21,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME filter_invert
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
 
 #include "filter_common.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -56,14 +44,14 @@ static void vout_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for Invert module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_VOUT;
-    p_module->psz_longname = "invert video module";
+    SET_DESCRIPTION( "invert video module" )
+    /* Capability score set to 0 because we don't want to be spawned
+     * as a video output unless explicitly requested to */
+    ADD_CAPABILITY( VOUT, 0 )
+    ADD_SHORTCUT( "invert" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -117,12 +105,6 @@ static void vout_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( VOUT_FILTER_VAR, "invert" ) )
-    {
-        return( 999 );
-    }
-
-    /* If we weren't asked to filter, don't filter. */
     return( 0 );
 }
 

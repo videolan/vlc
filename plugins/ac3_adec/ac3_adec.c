@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.10 2001/12/30 05:38:44 sam Exp $
+ * $Id: ac3_adec.c,v 1.11 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -21,34 +21,23 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME ac3_adec
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>                                              /* getpid() */
-#endif
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* memset() */
 
-#include "common.h"
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
+
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>                                           /* getpid() */
+#endif
 
 #include "audio_output.h"
 
 #include "stream_control.h"
 #include "input_ext-dec.h"
 #include "input_ext-intf.h"                                /* MPEG?_AUDIO_ES */
-
-#include "modules.h"
-#include "modules_export.h"
 
 #include "ac3_imdct.h"
 #include "ac3_downmix.h"
@@ -80,13 +69,11 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for AC3 decoder module" )
-    ADD_COMMENT( "Nothing to configure" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_DEC;
-    p_module->psz_longname = "AC3 sofware decoder";
+    SET_DESCRIPTION( "software AC3 decoder" )
+    ADD_CAPABILITY( DECODER, 50 )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -239,7 +226,9 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
      * Choose the best downmix module
      */
 #define DOWNMIX p_ac3thread->ac3_decoder->downmix
-    DOWNMIX.p_module = module_Need( MODULE_CAPABILITY_DOWNMIX, NULL );
+    DOWNMIX.p_module = module_Need( MODULE_CAPABILITY_DOWNMIX,
+                               main_GetPszVariable( DOWNMIX_METHOD_VAR, NULL ),
+                               NULL );
 
     if( DOWNMIX.p_module == NULL )
     {
@@ -265,7 +254,9 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
     p_ac3thread->ac3_decoder->imdct = memalign(16, sizeof(imdct_t));
     
 #define IMDCT p_ac3thread->ac3_decoder->imdct
-    IMDCT->p_module = module_Need( MODULE_CAPABILITY_IMDCT, NULL );
+    IMDCT->p_module = module_Need( MODULE_CAPABILITY_IMDCT,
+                               main_GetPszVariable( IMDCT_METHOD_VAR, NULL ),
+                               NULL );
 
     if( IMDCT->p_module == NULL )
     {

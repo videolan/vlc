@@ -9,7 +9,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.115 2001/12/30 04:26:53 sam Exp $
+ * $Id: input_dvd.c,v 1.116 2001/12/30 07:09:55 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -28,17 +28,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dvd
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <videolan/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -65,13 +62,6 @@
 #   include <videolan/dvdcss.h>
 #endif
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "iso_lang.h"
-#include "tests.h"
-
 #if defined( WIN32 )
 #   include "input_iovec.h"
 #endif
@@ -84,11 +74,9 @@
 #include "input_dvd.h"
 #include "dvd_ifo.h"
 #include "dvd_summary.h"
+#include "iso_lang.h"
 
 #include "debug.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /* how many blocks DVDRead will read in each loop */
 #define DVD_BLOCK_READ_ONCE 64
@@ -167,12 +155,7 @@ static int DVDProbe( probedata_t *p_data )
     input_thread_t * p_input = (input_thread_t *)p_data;
 
     char * psz_name = p_input->p_source;
-    int i_score = 5;
-
-    if( TestMethod( INPUT_METHOD_VAR, "dvd" ) )
-    {
-        return( 999 );
-    }
+    int i_score = 0;
 
     if( ( strlen(psz_name) > 4 ) && !strncasecmp( psz_name, "dvd:", 4 ) )
     {
@@ -228,7 +211,6 @@ static void DVDInit( input_thread_t * p_input )
     if( IfoCreate( p_dvd ) < 0 )
     {
         intf_ErrMsg( "dvd error: allcation error in ifo" );
-        dvdcss_close( p_dvd->dvdhandle );
         free( p_dvd );
         input_BuffersEnd( p_input->p_method_data );
         p_input->b_error = 1;
@@ -239,7 +221,6 @@ static void DVDInit( input_thread_t * p_input )
     {
         intf_ErrMsg( "dvd error: fatal failure in ifo" );
         IfoDestroy( p_dvd->p_ifo );
-        dvdcss_close( p_dvd->dvdhandle );
         free( p_dvd );
         input_BuffersEnd( p_input->p_method_data );
         p_input->b_error = 1;
@@ -333,7 +314,7 @@ static void DVDOpen( struct input_thread_s *p_input )
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    /* Parse input string : dvd:device[:rawdevice] */
+    /* Parse input string : dvd:device[@rawdevice] */
     if( strlen( p_input->p_source ) > 4
          && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
     {

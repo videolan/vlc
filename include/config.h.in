@@ -36,10 +36,6 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
-#else
-#define HAVE_CONFIG_H
-
 /*****************************************************************************
  * Program information
  *****************************************************************************/
@@ -52,6 +48,8 @@
                             " @VLC_CODENAME@ - (C)1996-2001 VideoLAN"
 
 #define VLC_VERSION         "@VLC_VERSION@"
+#define MODULE_SUFFIX       "__MODULE_@VLC_SYMBOL@"
+#define MODULE_SYMBOL       @VLC_SYMBOL@
 
 /*****************************************************************************
  * Debugging options - define or undefine symbols
@@ -220,7 +218,7 @@
 
 /* DVD defaults */
 #define INPUT_DVD_DEVICE_VAR            "vlc_dvd_device"
-#define INPUT_DVD_DEVICE_DEFAULT        "/dev/dvd"
+#define INPUT_DVD_DEVICE_DEFAULT        "@DVD_DEVICE@"
 
 #define INPUT_TITLE_VAR                 "vlc_input_title"
 #define INPUT_CHAPTER_VAR               "vlc_input_chapter"
@@ -231,7 +229,7 @@
 
 /* VCD defaults */
 #define INPUT_VCD_DEVICE_VAR            "vlc_vcd_device"
-#define INPUT_VCD_DEVICE_DEFAULT        "/dev/cdrom"
+#define INPUT_VCD_DEVICE_DEFAULT        "@VCD_DEVICE@"
 
 /*****************************************************************************
  * Audio configuration
@@ -343,8 +341,8 @@
 #define VOUT_DEPTH_VAR                  "vlc_depth"
 #define VOUT_DEPTH_DEFAULT              15
 
-/* Multiplier value for aspect ratio calculation */
-#define VOUT_ASPECT_FACTOR              (2*2*2*2*2*2*2*3*3*3*5*5*5)
+/* Multiplier value for aspect ratio calculation (2^7 * 3^3 * 5^3) */
+#define VOUT_ASPECT_FACTOR              432000
 
 /* Maximum width of a scaled source picture - this should be relatively high,
  * since higher stream values will result in no display at all. */
@@ -524,4 +522,3 @@
 #define PLAYLIST_LOOP_VAR               "vlc_playlist_loop"
 #define PLAYLIST_LOOP_DEFAULT           0
 
-#endif

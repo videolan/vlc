@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.25 2001/12/09 17:01:35 sam Exp $
+ * $Id: libdvdcss.c,v 1.26 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -26,14 +26,14 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
+#include <videolan/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -44,8 +44,6 @@
 #else
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif
-
-#include "common.h"
 
 #if defined( WIN32 )
 #   include "input_iovec.h"

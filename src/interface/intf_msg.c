@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: intf_msg.c,v 1.40 2001/12/07 18:33:08 sam Exp $
+ * $Id: intf_msg.c,v 1.41 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -26,8 +26,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                  /* errno */
 #include <fcntl.h>                     /* O_CREAT, O_TRUNC, O_WRONLY, O_SYNC */
 #include <stdio.h>                                               /* required */
@@ -35,14 +33,11 @@
 #include <stdlib.h>                                              /* malloc() */
 #include <string.h>                                            /* strerror() */
 
+#include <videolan/vlc.h>
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>                                      /* close(), write() */
 #endif
-
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
 
 #include "interface.h"
 

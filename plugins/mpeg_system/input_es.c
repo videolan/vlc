@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.10 2001/12/30 04:26:53 sam Exp $
+ * $Id: input_es.c,v 1.11 2001/12/30 07:09:55 sam Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -21,17 +21,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME mpeg_es
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+
+#include <videolan/vlc.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -48,12 +45,6 @@
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
-
 #if defined( WIN32 )
 #   include "input_iovec.h"
 #endif
@@ -66,9 +57,6 @@
 #include "input_es.h"
 
 #include "debug.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -137,11 +125,6 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 static int ESProbe( probedata_t *p_data )
 {
     int i_score = 5;
-
-    if( TestMethod( INPUT_METHOD_VAR, "es" ) )
-    {
-        return( 999 );
-    }
 
     return( i_score );
 }

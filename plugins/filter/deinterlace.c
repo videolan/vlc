@@ -1,8 +1,8 @@
 /*****************************************************************************
- * bob.c : BOB deinterlacer plugin for vlc
+ * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: bob.c,v 1.3 2001/12/19 03:50:22 sam Exp $
+ * $Id: deinterlace.c,v 1.1 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,49 +21,42 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME filter_bob
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
 
 #include "filter_common.h"
 
-#include "modules.h"
-#include "modules_export.h"
+#define DEINTERLACE_MODE_BOB     1
+#define DEINTERLACE_MODE_BLEND   2
 
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
 static void vout_getfunctions( function_list_t * p_function_list );
 
+static void *memblend( void *, const void *, const void *, size_t );
+
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for BOB module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_VOUT;
-    p_module->psz_longname = "BOB deinterlacing module";
+    SET_DESCRIPTION( "deinterlacing module" )
+    /* Capability score set to 0 because we don't want to be spawned
+     * as a video output unless explicitly requested to */
+    ADD_CAPABILITY( VOUT, 0 )
+    ADD_SHORTCUT( "deinterlace" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -74,13 +67,14 @@ MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
 
 /*****************************************************************************
- * vout_sys_t: BOB video output method descriptor
+ * vout_sys_t: Deinterlace video output method descriptor
  *****************************************************************************
  * This structure is part of the video output thread descriptor.
- * It describes the BOB specific properties of an output thread.
+ * It describes the Deinterlace specific properties of an output thread.
  *****************************************************************************/
 typedef struct vout_sys_s
 {
+    int i_mode;
     struct vout_thread_s *p_vout;
 
 } vout_sys_t;
@@ -117,22 +111,18 @@ static void vout_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( VOUT_FILTER_VAR, "bob" ) )
-    {
-        return( 999 );
-    }
-
-    /* If we weren't asked to filter, don't filter. */
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_Create: allocates BOB video thread output method
+ * vout_Create: allocates Deinterlace video thread output method
  *****************************************************************************
- * This function allocates and initializes a BOB vout method.
+ * This function allocates and initializes a Deinterlace vout method.
  *****************************************************************************/
 static int vout_Create( vout_thread_t *p_vout )
 {
+    char *psz_method;
+
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -141,11 +131,34 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
+    /* Look what method was requested */
+    psz_method = main_GetPszVariable( VOUT_FILTER_VAR, "" );
+
+    while( *psz_method && *psz_method != ':' )
+    {
+        psz_method++;
+    }
+
+    if( !strcmp( psz_method, ":bob" ) )
+    {
+        p_vout->p_sys->i_mode = DEINTERLACE_MODE_BOB;
+    }
+    else if( !strcmp( psz_method, ":blend" ) )
+    {
+        p_vout->p_sys->i_mode = DEINTERLACE_MODE_BLEND;
+    }
+    else
+    {
+        intf_ErrMsg( "filter error: no valid deinterlace mode provided, "
+                     "using deinterlace:bob" );
+        p_vout->p_sys->i_mode = DEINTERLACE_MODE_BOB;
+    }
+
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_Init: initialize BOB video thread output method
+ * vout_Init: initialize Deinterlace video thread output method
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
@@ -180,22 +193,34 @@ static int vout_Init( vout_thread_t *p_vout )
 
     switch( p_vout->render.i_chroma )
     {
-        case YUV_420_PICTURE:
+    case YUV_420_PICTURE:
+        switch( p_vout->p_sys->i_mode )
+        {
+        case DEINTERLACE_MODE_BOB:
             p_vout->p_sys->p_vout =
                 vout_CreateThread( NULL,
-                           p_vout->output.i_width, p_vout->output.i_height / 2,
-                           p_vout->output.i_chroma, p_vout->output.i_aspect );
+                       p_vout->output.i_width, p_vout->output.i_height / 2,
+                       p_vout->output.i_chroma, p_vout->output.i_aspect );
             break;
 
-        case YUV_422_PICTURE:
+        case DEINTERLACE_MODE_BLEND:
             p_vout->p_sys->p_vout =
                 vout_CreateThread( NULL,
-                           p_vout->output.i_width, p_vout->output.i_height,
-                           YUV_420_PICTURE, p_vout->output.i_aspect );
+                       p_vout->output.i_width, p_vout->output.i_height,
+                       p_vout->output.i_chroma, p_vout->output.i_aspect );
             break;
+        }
+        break;
 
-        default:
-            break;
+    case YUV_422_PICTURE:
+        p_vout->p_sys->p_vout =
+            vout_CreateThread( NULL,
+                       p_vout->output.i_width, p_vout->output.i_height,
+                       YUV_420_PICTURE, p_vout->output.i_aspect );
+        break;
+
+    default:
+        break;
     }
 
     /* Everything failed */
@@ -214,7 +239,7 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate BOB video thread output method
+ * vout_End: terminate Deinterlace video thread output method
  *****************************************************************************/
 static void vout_End( vout_thread_t *p_vout )
 {
@@ -229,9 +254,9 @@ static void vout_End( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy BOB video thread output method
+ * vout_Destroy: destroy Deinterlace video thread output method
  *****************************************************************************
- * Terminate an output method created by BOBCreateOutputMethod
+ * Terminate an output method created by DeinterlaceCreateOutputMethod
  *****************************************************************************/
 static void vout_Destroy( vout_thread_t *p_vout )
 {
@@ -241,7 +266,7 @@ static void vout_Destroy( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Manage: handle BOB events
+ * vout_Manage: handle Deinterlace events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
@@ -254,8 +279,9 @@ static int vout_Manage( vout_thread_t *p_vout )
 /*****************************************************************************
  * vout_Display: displays previously rendered output
  *****************************************************************************
- * This function send the currently rendered image to BOB image, waits until
- * it is displayed and switch the two rendering buffers, preparing next frame.
+ * This function send the currently rendered image to Deinterlace image,
+ * waits until it is displayed and switch the two rendering buffers, preparing
+ * next frame.
  *****************************************************************************/
 static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
@@ -294,11 +320,14 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
             switch( p_vout->render.i_chroma )
             {
-                case YUV_420_PICTURE:
+            case YUV_420_PICTURE:
 
+                switch( p_vout->p_sys->i_mode )
+                {
+                case DEINTERLACE_MODE_BOB:
                     for( ; p_out < p_out_end ; )
                     {
-                        p_main->fast_memcpy( p_out, p_in,
+                        FAST_MEMCPY( p_out, p_in,
                                      p_pic->planes[ i_index ].i_line_bytes );
 
                         p_out += p_pic->planes[ i_index ].i_line_bytes;
@@ -306,41 +335,111 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
                     }
                     break;
 
-                case YUV_422_PICTURE:
-
-                    i_increment = 2 * p_pic->planes[ i_index ].i_line_bytes;
-
-                    if( i_index == Y_PLANE )
+                case DEINTERLACE_MODE_BLEND:
+                    if( i_index != Y_PLANE )
                     {
                         for( ; p_out < p_out_end ; )
                         {
-                            p_main->fast_memcpy( p_out, p_in,
+                            FAST_MEMCPY( p_out, p_in,
                                      p_pic->planes[ i_index ].i_line_bytes );
-                            p_out += p_pic->planes[ i_index ].i_line_bytes;
-                            p_main->fast_memcpy( p_out, p_in,
-                                     p_pic->planes[ i_index ].i_line_bytes );
-                            p_out += p_pic->planes[ i_index ].i_line_bytes;
-                            p_in += i_increment;
-                        }
-                    }
-                    else
-                    {
-                        for( ; p_out < p_out_end ; )
-                        {
-                            p_main->fast_memcpy( p_out, p_in,
-                                     p_pic->planes[ i_index ].i_line_bytes );
-                            p_out += p_pic->planes[ i_index ].i_line_bytes;
-                            p_in += i_increment;
-                        }
-                    }
-                    break;
 
-                default:
+                            p_out += p_pic->planes[ i_index ].i_line_bytes;
+
+                            FAST_MEMCPY( p_out, p_in,
+                                     p_pic->planes[ i_index ].i_line_bytes );
+
+                            p_out += p_pic->planes[ i_index ].i_line_bytes;
+                            p_in += 2 * p_pic->planes[ i_index ].i_line_bytes;
+                        }
+                        break;
+                    }
+
+                    if( i_field == 0 )
+                    {
+                        FAST_MEMCPY( p_out, p_in,
+                                     p_pic->planes[ i_index ].i_line_bytes );
+                        p_in += 2 * p_pic->planes[ i_index ].i_line_bytes;
+                        p_out += p_pic->planes[ i_index ].i_line_bytes;
+                    }
+
+                    for( ; p_out < p_out_end ; )
+                    {
+                        FAST_MEMCPY( p_out, p_in,
+                                     p_pic->planes[ i_index ].i_line_bytes );
+
+                        p_out += p_pic->planes[ i_index ].i_line_bytes;
+
+                        memblend( p_out, p_in, p_in + 2 * p_pic->planes[ i_index ].i_line_bytes, p_pic->planes[ i_index ].i_line_bytes );
+
+                        p_in += 2 * p_pic->planes[ i_index ].i_line_bytes;
+                        p_out += p_pic->planes[ i_index ].i_line_bytes;
+                    }
                     break;
+                }
+                break;
+
+            case YUV_422_PICTURE:
+
+                i_increment = 2 * p_pic->planes[ i_index ].i_line_bytes;
+
+                if( i_index == Y_PLANE )
+                {
+                    for( ; p_out < p_out_end ; )
+                    {
+                        FAST_MEMCPY( p_out, p_in,
+                                 p_pic->planes[ i_index ].i_line_bytes );
+                        p_out += p_pic->planes[ i_index ].i_line_bytes;
+                        FAST_MEMCPY( p_out, p_in,
+                                 p_pic->planes[ i_index ].i_line_bytes );
+                        p_out += p_pic->planes[ i_index ].i_line_bytes;
+                        p_in += i_increment;
+                    }
+                }
+                else
+                {
+                    for( ; p_out < p_out_end ; )
+                    {
+                        FAST_MEMCPY( p_out, p_in,
+                                 p_pic->planes[ i_index ].i_line_bytes );
+                        p_out += p_pic->planes[ i_index ].i_line_bytes;
+                        p_in += i_increment;
+                    }
+                }
+                break;
+
+            default:
+                break;
             }
         }
 
         vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
     }
+}
+
+static void *memblend( void *p_dest, const void *p_s1,
+                       const void *p_s2, size_t i_bytes )
+{
+    u8* p_end = (u8*)p_dest + i_bytes - 8;
+
+    while( (u8*)p_dest < p_end )
+    {
+        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
+        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
+        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
+        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
+        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
+        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
+        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
+        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
+    }
+
+    p_end += 8;
+
+    while( (u8*)p_dest < p_end )
+    {
+        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
+    }
+
+    return p_dest;
 }
 

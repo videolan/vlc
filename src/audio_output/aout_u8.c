@@ -2,7 +2,7 @@
  * aout_u8.c: 8 bit unsigned audio output functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_u8.c,v 1.9 2001/12/07 18:33:08 sam Exp $
+ * $Id: aout_u8.c,v 1.10 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -24,16 +24,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
 
-#include "common.h"
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-#include "threads.h"
-#include "mtime.h"                             /* mtime_t, mdate(), msleep() */
+#include <videolan/vlc.h>
 
 #include "audio_output.h"
 #include "aout_common.h"

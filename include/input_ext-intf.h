@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.54 2001/12/27 03:47:08 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.55 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -322,20 +322,30 @@ typedef struct input_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+#ifndef PLUGIN
 struct input_thread_s * input_CreateThread ( struct playlist_item_s *,
                                              int *pi_status );
-void input_DestroyThread( struct input_thread_s *, int *pi_status );
+void   input_DestroyThread  ( struct input_thread_s *, int *pi_status );
 
-void input_SetStatus( struct input_thread_s *, int );
-void input_Seek     ( struct input_thread_s *, off_t );
-void input_DumpStream( struct input_thread_s * );
-char * input_OffsetToTime( struct input_thread_s *, char * psz_buffer, off_t );
-int  input_ChangeES ( struct input_thread_s *, struct es_descriptor_s *, u8 );
-int  input_ToggleES ( struct input_thread_s *,
-                      struct es_descriptor_s *,
-                      boolean_t );
-int  input_ChangeArea( struct input_thread_s *, struct input_area_s * );
-int  input_ToggleGrayscale( struct input_thread_s * );
-int  input_ToggleMute( struct input_thread_s * );
-int  input_SetSMP( struct input_thread_s *, int );
+void   input_SetStatus      ( struct input_thread_s *, int );
+void   input_Seek           ( struct input_thread_s *, off_t );
+void   input_DumpStream     ( struct input_thread_s * );
+char * input_OffsetToTime   ( struct input_thread_s *, char *, off_t );
+int    input_ChangeES       ( struct input_thread_s *,
+                              struct es_descriptor_s *, u8 );
+int    input_ToggleES       ( struct input_thread_s *,
+                              struct es_descriptor_s *, boolean_t );
+int    input_ChangeArea     ( struct input_thread_s *, struct input_area_s * );
+int    input_ToggleGrayscale( struct input_thread_s * );
+int    input_ToggleMute     ( struct input_thread_s * );
+int    input_SetSMP         ( struct input_thread_s *, int );
+#else
+#   define input_SetStatus      p_symbols->input_SetStatus
+#   define input_Seek           p_symbols->input_Seek
+#   define input_DumpStream     p_symbols->input_DumpStream
+#   define input_OffsetToTime   p_symbols->input_OffsetToTime
+#   define input_ChangeES       p_symbols->input_ChangeES
+#   define input_ToggleES       p_symbols->input_ToggleES
+#   define input_ChangeArea     p_symbols->input_ChangeArea
+#endif
 

@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.4 2001/12/09 17:01:37 sam Exp $
+ * $Id: win32_specific.c,v 1.5 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -20,17 +20,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-#include "defs.h"
-
 #include <string.h>                                              /* strdup() */
 #include <stdlib.h>                                                /* free() */
 #include <fcntl.h>
 
 #include <winsock2.h>
 
-#include "common.h"
-
-#include "win32_specific.h"
+#include <videolan/vlc.h>
 
 /*****************************************************************************
  * system_Init: initialize winsock.

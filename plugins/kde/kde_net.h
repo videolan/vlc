@@ -1,13 +1,13 @@
 /***************************************************************************
-                          knetdialog.h  -  description
+                          kde_net.h  -  description
                              -------------------
     begin                : Mon Apr 9 2001
     copyright            : (C) 2001 by andres
     email                : dae@chez.com
  ***************************************************************************/
 
-#ifndef _KNETDIALOG_H_
-#define _KNETDIALOG_H_
+#ifndef _KDE_NET_H_
+#define _KDE_NET_H_
 
 #include <qwidget.h>
 #include <kdialogbase.h>
@@ -41,4 +41,4 @@ class KNetDialog : public KDialogBase  {
 
 };
 
-#endif /* _KNETDIALOG_H_ */
+#endif /* _KDE_NET_H_ */

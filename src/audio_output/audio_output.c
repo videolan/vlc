@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.68 2001/12/07 18:33:08 sam Exp $
+ * $Id: audio_output.c,v 1.69 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -24,25 +24,19 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>                                              /* getpid() */
-#endif
-
-#ifdef WIN32                   /* getpid() for win32 is located in process.h */
-#include <process.h>
-#endif
-
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
 
-#include "common.h"
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-#include "threads.h"
-#include "mtime.h"                             /* mtime_t, mdate(), msleep() */
-#include "modules.h"
+#include <videolan/vlc.h>
+
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>                                           /* getpid() */
+#endif
+
+#ifdef WIN32                   /* getpid() for win32 is located in process.h */
+#   include <process.h>
+#endif
 
 #include "audio_output.h"
 #include "aout_common.h"
@@ -98,7 +92,9 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     }
 
     /* Choose the best module */
-    p_aout->p_module = module_Need( MODULE_CAPABILITY_AOUT, NULL );
+    p_aout->p_module = module_Need( MODULE_CAPABILITY_AOUT,
+                           main_GetPszVariable( AOUT_METHOD_VAR, NULL ), 
+                           NULL );
 
     if( p_aout->p_module == NULL )
     {

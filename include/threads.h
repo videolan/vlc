@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.32 2001/12/13 20:47:46 sam Exp $
+ * $Id: threads.h,v 1.33 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -156,16 +156,24 @@ typedef void *(*vlc_thread_func_t)(void *p_data);
  * Prototypes
  *****************************************************************************/
 
-/* Message functions - this is kludgy because we are included before
- * modules_export.h */
-#ifdef PLUGIN
-#   define intf_ErrMsg p_symbols->intf_ErrMsg
-#   define intf_WarnMsg p_symbols->intf_WarnMsg
-#endif
-
 #ifdef GPROF
 /* Wrapper function for profiling */
 static void *      vlc_thread_wrapper ( void *p_wrapper );
+
+#   ifdef WIN32
+
+#       define ITIMER_REAL 1
+#       define ITIMER_PROF 2
+
+struct itimerval
+{
+    struct timeval it_value;
+    struct timeval it_interval;
+};
+
+int setitimer(int kind, const struct itimerval* itnew, struct itimerval* itold);
+
+#   endif /* WIN32 */
 
 typedef struct wrapper_s
 {
@@ -181,21 +189,6 @@ typedef struct wrapper_s
     struct itimerval itimer;
 
 } wrapper_t;
-
-#ifdef WIN32
-struct itimerval
-{
-    struct timeval it_value;
-    struct timeval it_interval;
-};
-
-int setitimer(int kind, const struct itimerval* itnew,
-	      struct itimerval* itold);
-
-#define ITIMER_REAL 1
-#define ITIMER_PROF 2
-
-#endif /* WIN32 */
 
 #endif /* GPROF */
 
@@ -983,7 +976,3 @@ static void *vlc_thread_wrapper( void *p_wrapper )
 }
 #endif
 
-#ifdef PLUGIN
-#   undef intf_WarnMsg
-#   undef intf_ErrMsg
-#endif

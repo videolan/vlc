@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.5 2001/12/19 03:50:22 sam Exp $
+ * $Id: vout_pictures.c,v 1.6 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -25,17 +25,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
@@ -161,7 +156,6 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
                 p_picture->b_top_field_first = b_top_field_first;
 
                 p_vout->i_heap_size++;
-
                 vlc_mutex_unlock( &p_vout->picture_lock );
                 return( p_picture );
 
@@ -339,7 +333,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_picture,
                  * subtitles. */
                 for( i_index = 0 ; i_index < p_picture->i_planes ; i_index++ )
                 {
-                    p_main->fast_memcpy(
+                    FAST_MEMCPY(
                         PP_OUTPUTPICTURE[0]->planes[ i_index ].p_data,
                         p_picture->planes[ i_index ].p_data,
                         p_picture->planes[ i_index ].i_bytes );
@@ -376,9 +370,9 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_picture,
                     //printf("memcpy (not a direct buffer)\n");
         for( i_index = 0; i_index < p_picture->i_planes; i_index++ )
         {
-            p_main->fast_memcpy( PP_OUTPUTPICTURE[0]->planes[ i_index ].p_data,
-                                 p_picture->planes[ i_index ].p_data,
-                                 p_picture->planes[ i_index ].i_bytes );
+            FAST_MEMCPY( PP_OUTPUTPICTURE[0]->planes[ i_index ].p_data,
+                         p_picture->planes[ i_index ].p_data,
+                         p_picture->planes[ i_index ].i_bytes );
         }
 
         vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_subpic );
@@ -393,8 +387,9 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_picture,
     /* This usually means software YUV, or hardware YUV with a
      * different chroma. */
 
+    /* XXX: render to the first direct buffer */
                     //printf("render (not a direct buffer)\n");
-    /* XXX: render to direct buffer */
+    p_vout->chroma.pf_convert( p_vout, p_picture, &p_vout->p_picture[0] );
 
     vout_RenderSubPictures( p_vout, p_picture, p_subpic );
 
@@ -456,26 +451,40 @@ void vout_PlacePicture( vout_thread_t *p_vout, int i_width, int i_height,
 void vout_AllocatePicture( picture_t *p_picture,
                            int i_width, int i_height, int i_chroma )
 {
-    int i_data_size = 0;
-
-    p_picture->i_size = i_width * i_height;
+#define P p_picture->planes
+    int i_bytes, i_index;
 
     /* Calculate coordinates */
     switch( i_chroma )
     {
         case YUV_420_PICTURE:        /* YUV 420: 1,1/4,1/4 samples per pixel */
-            p_picture->i_chroma_size = p_picture->i_size / 4;
-            p_picture->i_chroma_width = i_width / 2;
+            P[ Y_PLANE ].i_bytes = i_width * i_height;
+            P[ Y_PLANE ].i_line_bytes = i_width;
+            P[ U_PLANE ].i_bytes = i_width * i_height / 4;
+            P[ U_PLANE ].i_line_bytes = i_width / 2;
+            P[ V_PLANE ].i_bytes = i_width * i_height / 4;
+            P[ V_PLANE ].i_line_bytes = i_width / 2;
+            p_picture->i_planes = 3;
             break;
 
         case YUV_422_PICTURE:        /* YUV 422: 1,1/2,1/2 samples per pixel */
-            p_picture->i_chroma_size = p_picture->i_size / 2;
-            p_picture->i_chroma_width = i_width / 2;
+            P[ Y_PLANE ].i_bytes = i_width * i_height;
+            P[ Y_PLANE ].i_line_bytes = i_width;
+            P[ U_PLANE ].i_bytes = i_width * i_height / 2;
+            P[ U_PLANE ].i_line_bytes = i_width / 2;
+            P[ V_PLANE ].i_bytes = i_width * i_height / 2;
+            P[ V_PLANE ].i_line_bytes = i_width / 2;
+            p_picture->i_planes = 3;
             break;
 
         case YUV_444_PICTURE:            /* YUV 444: 1,1,1 samples per pixel */
-            p_picture->i_chroma_size = p_picture->i_size;
-            p_picture->i_chroma_width = i_width;
+            P[ Y_PLANE ].i_bytes = i_width * i_height;
+            P[ Y_PLANE ].i_line_bytes = i_width;
+            P[ U_PLANE ].i_bytes = i_width * i_height;
+            P[ U_PLANE ].i_line_bytes = i_width;
+            P[ V_PLANE ].i_bytes = i_width * i_height;
+            P[ V_PLANE ].i_line_bytes = i_width;
+            p_picture->i_planes = 3;
             break;
 
         default:
@@ -484,45 +493,24 @@ void vout_AllocatePicture( picture_t *p_picture,
             return;
     }
 
-    /* Allocate memory */
-    switch( i_chroma )
+    /* Calculate how big the new image should be */
+    for( i_bytes = 0, i_index = 0; i_index < p_picture->i_planes; i_index++ )
     {
-        case YUV_420_PICTURE:        /* YUV 420: 1,1/4,1/4 samples per pixel */
-        case YUV_422_PICTURE:        /* YUV 422: 1,1/2,1/2 samples per pixel */
-        case YUV_444_PICTURE:            /* YUV 444: 1,1,1 samples per pixel */
+        i_bytes += P[ i_index ].i_bytes;
+    }
 
-            i_data_size = p_picture->i_size + 2 * p_picture->i_chroma_size;
+    P[ 0 ].p_data = memalign( 16, i_bytes );
 
-            /* The Y plane */
-            p_picture->planes[ Y_PLANE ].i_bytes =
-                 p_picture->i_size * sizeof(pixel_data_t);
-            p_picture->planes[ Y_PLANE ].i_line_bytes =
-                 i_width * sizeof(pixel_data_t);
-            p_picture->planes[ Y_PLANE ].p_data =
-                 memalign( 16, i_data_size * sizeof(pixel_data_t) * 4 );
-            /* The U plane */
-            p_picture->planes[ U_PLANE ].i_bytes =
-                 p_picture->i_chroma_size * sizeof(pixel_data_t);
-            p_picture->planes[ U_PLANE ].i_line_bytes =
-                 p_picture->i_chroma_width * sizeof(pixel_data_t);
-            p_picture->planes[ U_PLANE ].p_data =
-                 p_picture->planes[ Y_PLANE ].p_data + p_picture->i_size;
-            /* The V plane */
-            p_picture->planes[ V_PLANE ].i_bytes =
-                 p_picture->i_chroma_size * sizeof(pixel_data_t);
-            p_picture->planes[ V_PLANE ].i_line_bytes =
-                 p_picture->i_chroma_width * sizeof(pixel_data_t);
-            p_picture->planes[ V_PLANE ].p_data =
-                 p_picture->planes[ U_PLANE ].p_data + p_picture->i_chroma_size;
+    if( P[ 0 ].p_data == NULL )
+    {
+        p_picture->i_planes = 0;
+        return;
+    }
 
-            p_picture->i_planes = 3;
-
-            break;
-
-        default:
-            p_picture->i_planes = 0;
-
-            break;
+    /* Fill the p_data field for each plane */
+    for( i_index = 1; i_index < p_picture->i_planes; i_index++ )
+    {
+        P[ i_index ].p_data = P[ i_index-1 ].p_data + P[ i_index-1 ].i_bytes;
     }
 }
 

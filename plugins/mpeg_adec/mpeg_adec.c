@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.9 2001/12/30 05:38:44 sam Exp $
+ * $Id: mpeg_adec.c,v 1.10 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -23,22 +23,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME mpeg_adec
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "audio_output.h"               /* aout_fifo_t (for audio_decoder.h) */
 
@@ -47,9 +38,6 @@
 
 #include "mpeg_adec_generic.h"
 #include "mpeg_adec.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 #define ADEC_FRAME_SIZE (2*1152)
 
@@ -60,7 +48,6 @@ static int   decoder_Probe ( probedata_t * );
 static int   decoder_Run   ( decoder_config_t * );
 static void  EndThread     ( adec_thread_t * );
 static void  DecodeThread  ( adec_thread_t * );
-
 
 /*****************************************************************************
  * Capabilities
@@ -75,13 +62,13 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for mpeg audio decoder module" )
-    ADD_COMMENT( "Nothing to configure" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_DEC;
-    p_module->psz_longname = "Mpeg I layer 1/2 audio decoder";
+    SET_DESCRIPTION( "Mpeg I layer 1/2 audio decoder" )
+    ADD_CAPABILITY( DECODER, 100 )
+    ADD_REQUIREMENT( FPU )
+    ADD_SHORTCUT( "builtin" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -96,20 +83,8 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int decoder_Probe( probedata_t *p_data )
 {
-    if( p_data->i_type == MPEG1_AUDIO_ES || p_data->i_type == MPEG2_AUDIO_ES )
-    {
-        if( !TestCPU( CPU_CAPABILITY_FPU ) )
-        {
-            /* This can work but we'd really prefer libmad to take over. */
-            return( 1 );
-        }
-        if( TestMethod( ADEC_MPEG_VAR, "builtin" ) )
-        {
-            return( 999 );
-        }
-        return( 100 );
-    }
-    return( 0 );
+    return( ( p_data->i_type == MPEG1_AUDIO_ES
+               || p_data->i_type == MPEG2_AUDIO_ES ) ? 100 : 0 );
 }
 
 /*****************************************************************************

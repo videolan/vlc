@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.73 2001/12/20 15:43:15 sam Exp $
+ * $Id: vout_sdl.c,v 1.74 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -23,17 +23,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME sdl
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
+
+#include <videolan/vlc.h>
 
 #include <sys/types.h>
 #ifndef WIN32
@@ -42,12 +39,7 @@
 
 #include SDL_INCLUDE_FILE
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
 #include "netutils.h"
-#include "tests.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -56,9 +48,6 @@
 
 #include "stream_control.h"                 /* needed by input_ext-intf.h... */
 #include "input_ext-intf.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 #define SDL_MAX_DIRECTBUFFERS 5
 #define SDL_DEFAULT_BPP 16
@@ -76,6 +65,8 @@ typedef struct vout_sys_s
 
     int i_width;
     int i_height;
+
+    int i_surfaces;
 
     boolean_t   b_cursor;
     boolean_t   b_cursor_autohidden;
@@ -139,11 +130,6 @@ static int vout_Probe( probedata_t *p_data )
         return( 0 );
     }
 
-    if( TestMethod( VOUT_METHOD_VAR, "sdl" ) )
-    {
-        return( 999 );
-    }
-
     return( 100 );
 }
 
@@ -200,6 +186,7 @@ static int vout_Create( vout_thread_t *p_vout )
             * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
     }
 
+#if 0
     if( p_vout->p_sys->i_width <= 300 && p_vout->p_sys->i_height <= 300 )
     {
         p_vout->p_sys->i_width <<= 1;
@@ -210,6 +197,7 @@ static int vout_Create( vout_thread_t *p_vout )
         p_vout->p_sys->i_width += p_vout->p_sys->i_width >> 1;
         p_vout->p_sys->i_height += p_vout->p_sys->i_height >> 1;
     }
+#endif
 
     if( SDLOpenDisplay( p_vout ) )
     {
@@ -232,6 +220,8 @@ static int vout_Init( vout_thread_t *p_vout )
     int i_index;
     picture_t *p_pic;
 
+    p_vout->p_sys->i_surfaces = 0;
+
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output structure */
@@ -245,7 +235,14 @@ static int vout_Init( vout_thread_t *p_vout )
             break;
 
         default:
-            return( 0 );
+            /* All we have is a 16bpp image with square pixels */
+            /* FIXME: and if screen depth != 16 ?! */
+            p_vout->output.i_chroma = RGB_16BPP_PICTURE;
+            p_vout->output.i_width = p_vout->p_sys->i_width;
+            p_vout->output.i_height = p_vout->p_sys->i_height;
+            p_vout->output.i_aspect = p_vout->p_sys->i_width
+                             * VOUT_ASPECT_FACTOR / p_vout->p_sys->i_height;
+            break;
     }
 
     /* Try to initialize SDL_MAX_DIRECTBUFFERS direct buffers */
@@ -298,8 +295,21 @@ static void vout_End( vout_thread_t *p_vout )
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
         i_index--;
-        SDL_UnlockYUVOverlay( PP_OUTPUTPICTURE[ i_index ]->p_sys->p_overlay );
-        SDL_FreeYUVOverlay( PP_OUTPUTPICTURE[ i_index ]->p_sys->p_overlay );
+        switch( p_vout->output.i_chroma )
+        {
+            case YUV_420_PICTURE:
+                SDL_UnlockYUVOverlay(
+                        PP_OUTPUTPICTURE[ i_index ]->p_sys->p_overlay );
+                SDL_FreeYUVOverlay(
+                        PP_OUTPUTPICTURE[ i_index ]->p_sys->p_overlay );
+                break;
+
+            case RGB_16BPP_PICTURE:
+                break;
+
+            default:
+                break;
+        }
         free( PP_OUTPUTPICTURE[ i_index ]->p_sys );
     }
 }
@@ -522,9 +532,21 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     disp.w = w;
     disp.h = h;
 
-    SDL_UnlockYUVOverlay( p_pic->p_sys->p_overlay);
-    SDL_DisplayYUVOverlay( p_pic->p_sys->p_overlay , &disp );
-    SDL_LockYUVOverlay( p_pic->p_sys->p_overlay);
+    switch( p_vout->output.i_chroma )
+    {
+        case RGB_16BPP_PICTURE:
+            SDL_Flip(p_vout->p_sys->p_display);
+            break;
+
+        case YUV_420_PICTURE:
+            SDL_UnlockYUVOverlay( p_pic->p_sys->p_overlay);
+            SDL_DisplayYUVOverlay( p_pic->p_sys->p_overlay , &disp );
+            SDL_LockYUVOverlay( p_pic->p_sys->p_overlay);
+            break;
+
+        default:
+            break;
+    }
 }
 
 /* following functions are local */
@@ -541,7 +563,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
     int    i_bpp;
 
     /* Initialize flags and cursor */
-    i_flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE;
+    i_flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF;
     i_flags |= p_vout->b_fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE;
 
     i_bpp = SDL_VideoModeOK( p_vout->p_sys->i_width, p_vout->p_sys->i_height,
@@ -612,14 +634,37 @@ static void SDLCloseDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
+#define P p_pic->planes
     int i_width  = p_vout->output.i_width;
     int i_height = p_vout->output.i_height;
 
     switch( p_vout->output.i_chroma )
     {
+        case RGB_16BPP_PICTURE:
+            if( p_vout->p_sys->i_surfaces )
+            {
+                /* We already allocated this surface, return */
+                return -1;
+            }
+
+            p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
+
+            if( p_pic->p_sys == NULL )
+            {
+                return -1;
+            }
+
+            P[ RGB_PLANE ].p_data = p_vout->p_sys->p_display->pixels;
+            P[ RGB_PLANE ].i_bytes = 2 * i_width * i_height;
+            P[ RGB_PLANE ].i_line_bytes = 2 * i_width;
+
+            p_vout->p_sys->i_surfaces++;
+
+            p_pic->i_planes = 1;
+
+            return 0;
+
         case YUV_420_PICTURE:
-            /* We know this chroma, allocate a buffer which will be used
-             * directly by the decoder */
             p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
 
             if( p_pic->p_sys == NULL )
@@ -640,23 +685,18 @@ static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
             SDL_LockYUVOverlay( p_pic->p_sys->p_overlay );
 
-            /* Precalculate some values */
-            p_pic->i_size         = i_width * i_height;
-            p_pic->i_chroma_width = i_width / 2;
-            p_pic->i_chroma_size  = i_height * ( i_width / 2 );
-
             /* FIXME: try to get the right i_bytes value from p_overlay */
-            p_pic->planes[ Y_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[ 0 ];
-            p_pic->planes[ Y_PLANE ].i_bytes = p_pic->i_size * sizeof( u8 );
-            p_pic->planes[ Y_PLANE ].i_line_bytes = i_width * sizeof( u8 );
+            P[ Y_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[ 0 ];
+            P[ Y_PLANE ].i_bytes = i_width * i_height;
+            P[ Y_PLANE ].i_line_bytes = i_width;
 
-            p_pic->planes[ U_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[ 2 ];
-            p_pic->planes[ U_PLANE ].i_bytes = p_pic->i_size * sizeof( u8 ) / 4;
-            p_pic->planes[ U_PLANE ].i_line_bytes = p_pic->i_chroma_width * sizeof( u8 );
+            P[ U_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[ 2 ];
+            P[ U_PLANE ].i_bytes = i_width * i_height / 4;
+            P[ U_PLANE ].i_line_bytes = i_width / 2;
 
-            p_pic->planes[ V_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[ 1 ];
-            p_pic->planes[ V_PLANE ].i_bytes = p_pic->i_size * sizeof( u8 ) / 4;
-            p_pic->planes[ V_PLANE ].i_line_bytes = p_pic->i_chroma_width * sizeof( u8 );
+            P[ V_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[ 1 ];
+            P[ V_PLANE ].i_bytes = i_width * i_height / 4;
+            P[ V_PLANE ].i_line_bytes = i_width / 2;
 
             p_pic->i_planes = 3;
 
@@ -666,7 +706,8 @@ static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             /* Unknown chroma, tell the guy to get lost */
             p_pic->i_planes = 0;
 
-            return 0;
+            return -1;
     }
+#undef P
 }
 

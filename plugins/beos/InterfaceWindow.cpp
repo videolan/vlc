@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.10 2001/12/07 18:33:07 sam Exp $
+ * $Id: InterfaceWindow.cpp,v 1.11 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -23,7 +23,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-#include "defs.h"
 
 /* System headers */
 #include <kernel/OS.h>
@@ -40,15 +39,14 @@
 /* VLC headers */
 extern "C"
 {
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
+
 #include "stream_control.h"
 #include "input_ext-intf.h"
+
 #include "interface.h"
 #include "intf_playlist.h"
+
 #include "audio_output.h"
 }
 

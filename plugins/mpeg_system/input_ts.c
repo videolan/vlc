@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ts.c,v 1.9 2001/12/30 04:26:53 sam Exp $
+ * $Id: input_ts.c,v 1.10 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -21,17 +21,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME mpeg_ts
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+
+#include <videolan/vlc.h>
 
 #ifdef STRNCASECMP_IN_STRINGS_H
 #   include <strings.h>
@@ -62,12 +59,6 @@
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
-
 #if defined( WIN32 )
 #   include "input_iovec.h"
 #endif
@@ -78,9 +69,6 @@
 #include "input_ext-plugins.h"
 
 #include "input_ts.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -139,11 +127,6 @@ static int TSProbe( probedata_t * p_data )
 
     char * psz_name = p_input->p_source;
     int i_score = 2;
-
-    if( TestMethod( INPUT_METHOD_VAR, "ts" ) )
-    {
-        return( 999 );
-    }
 
     if( ( strlen(psz_name) >= 10 && !strncasecmp( psz_name, "udpstream:", 10 ) )
             || ( strlen(psz_name) >= 4 && !strncasecmp( psz_name, "udp:", 4 ) ) )

@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_dsp.c,v 1.17 2001/12/07 18:33:07 sam Exp $
+ * $Id: aout_dsp.c,v 1.18 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -22,9 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dsp
-#include "modules_inner.h"
-
 /* TODO:
  *
  * - an aout_GetFormats() function
@@ -36,8 +33,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <fcntl.h>                                       /* open(), O_WRONLY */
 #include <sys/ioctl.h>                                            /* ioctl() */
@@ -45,6 +40,8 @@
 #include <unistd.h>                                      /* write(), close() */
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
+
+#include <videolan/vlc.h>
 
 #ifdef SYS_BSD
 #include <machine/soundcard.h>       /* SNDCTL_DSP_RESET, SNDCTL_DSP_SETFMT,
@@ -54,16 +51,7 @@
                    SNDCTL_DSP_STEREO, SNDCTL_DSP_SPEED, SNDCTL_DSP_GETOSPACE */
 #endif
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
-
 #include "audio_output.h"                                   /* aout_thread_t */
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * aout_sys_t: dsp audio output method descriptor
@@ -122,11 +110,6 @@ static int aout_Probe( probedata_t *p_data )
 
     /* Otherwise, there are good chances we can use this plugin, return 100. */
     close( i_fd );
-
-    if( TestMethod( AOUT_METHOD_VAR, "dsp" ) )
-    {
-        return( 999 );
-    }
 
     return( 100 );
 }

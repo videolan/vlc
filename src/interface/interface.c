@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.84 2001/12/10 04:53:11 sam Exp $
+ * $Id: interface.c,v 1.85 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -26,19 +26,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                                   /* FILE */
 #include <string.h>                                            /* strerror() */
 #include <sys/types.h>                                              /* off_t */
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "modules.h"
+#include <videolan/vlc.h>
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -76,7 +70,9 @@ intf_thread_t* intf_Create( void )
     }
 
     /* Choose the best module */
-    p_intf->p_module = module_Need( MODULE_CAPABILITY_INTF, NULL );
+    p_intf->p_module = module_Need( MODULE_CAPABILITY_INTF,
+                           main_GetPszVariable( INTF_METHOD_VAR, NULL ),
+                           NULL );
 
     if( p_intf->p_module == NULL )
     {

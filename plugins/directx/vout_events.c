@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.6 2001/12/07 18:33:07 sam Exp $
+ * $Id: vout_events.c,v 1.7 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -26,17 +26,12 @@
  * Preamble: This file contains the functions related to the creation of
  *             a window and the handling of its messages (events).
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
+
 #include "netutils.h"
 
 #include "video.h"
@@ -52,9 +47,6 @@
 #endif
 
 #include "interface.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 #include "vout_directx.h"
 

@@ -2,7 +2,7 @@
  * downmixsse.c : accelerated SSE AC3 downmix module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: downmixsse.c,v 1.6 2001/12/09 17:01:36 sam Exp $
+ * $Id: downmixsse.c,v 1.7 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Renaud Dartus <reno@via.ecp.fr>
  *
@@ -21,28 +21,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME downmixsse
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>
 #include <string.h>
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "ac3_downmix.h"
 #include "ac3_downmix_common.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Local and extern prototypes.
@@ -54,14 +42,14 @@ static int  downmix_Probe       ( probedata_t *p_data );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for AC3 downmixsse module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_DOWNMIX;
-    p_module->psz_longname = "SSE AC3 downmix module";
+    SET_DESCRIPTION( "SSE AC3 downmix module" )
+    ADD_CAPABILITY( DOWNMIX, 200 )
+    ADD_REQUIREMENT( SSE )
+    ADD_SHORTCUT( "sse" )
+    ADD_SHORTCUT( "downmixsse" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -96,18 +84,6 @@ static void downmix_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int downmix_Probe( probedata_t *p_data )
 {
-    if( !TestCPU( CPU_CAPABILITY_SSE ) )
-    {
-        return( 0 );
-    }
-
-    if( TestMethod( DOWNMIX_METHOD_VAR, "downmixsse" )
-         || TestMethod( DOWNMIX_METHOD_VAR, "sse" ) )
-    {
-        return( 999 );
-    }
-
-    /* This plugin always works */
     return( 200 );
 }
 

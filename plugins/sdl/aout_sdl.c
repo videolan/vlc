@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_sdl.c,v 1.21 2001/12/19 03:50:22 sam Exp $
+ * $Id: aout_sdl.c,v 1.22 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -23,14 +23,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME sdl
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <fcntl.h>                                       /* open(), O_WRONLY */
 #include <string.h>                                            /* strerror() */
@@ -38,18 +33,11 @@
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 
+#include <videolan/vlc.h>
+
 #include SDL_INCLUDE_FILE
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
-
 #include "audio_output.h"                                   /* aout_thread_t */
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * aout_sys_t: dsp audio output method descriptor
@@ -141,11 +129,6 @@ static int aout_Probe( probedata_t *p_data )
     intf_DbgMsg( "aout: SDL_OpenAudio successfully run" );
     SDL_CloseAudio();
 #endif
-
-    if( TestMethod( AOUT_METHOD_VAR, "sdl" ) )
-    {
-        return( 999 );
-    }
 
     return( 40 );
 }

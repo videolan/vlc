@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_decoder.c,v 1.4 2001/12/10 04:53:11 sam Exp $
+ * $Id: video_decoder.c,v 1.5 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -25,20 +25,15 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>                                              /* getpid() */
-#endif
-
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                    /* memcpy(), memset() */
 #include <errno.h>                                                  /* errno */
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
+
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>                                           /* getpid() */
+#endif
 
 #include "video.h"
 #include "video_output.h"
@@ -50,8 +45,6 @@
 #include "video_decoder.h"
 #include "vpar_pool.h"
 #include "video_parser.h"
-
-#include "modules_export.h"
 
 /*
  * Local prototypes

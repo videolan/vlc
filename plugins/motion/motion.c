@@ -2,7 +2,7 @@
  * motion.c : C motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motion.c,v 1.12 2001/12/09 17:01:36 sam Exp $
+ * $Id: motion.c,v 1.13 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -22,25 +22,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME motion
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
-
-#include "modules.h"
-#include "modules_export.h"
+#include <videolan/vlc.h>
 
 /*****************************************************************************
  * Local and extern prototypes.
@@ -51,14 +39,13 @@ static void motion_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for motion compensation module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_MOTION;
-    p_module->psz_longname = "motion compensation module";
+    SET_DESCRIPTION( "motion compensation module" )
+    ADD_CAPABILITY( MOTION, 50 )
+    ADD_SHORTCUT( "c" )
+    ADD_SHORTCUT( "motion" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -73,13 +60,6 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int motion_Probe( probedata_t *p_data )
 {
-    if( TestMethod( MOTION_METHOD_VAR, "motion" )
-         || TestMethod( MOTION_METHOD_VAR, "c" ) )
-    {
-        return( 999 );
-    }
-
-    /* This module always works */
     return( 50 );
 }
 

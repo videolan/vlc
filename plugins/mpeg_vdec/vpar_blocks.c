@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_blocks.c,v 1.4 2001/12/10 04:53:11 sam Exp $
+ * $Id: vpar_blocks.c,v 1.5 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -26,14 +26,9 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <string.h>                                                /* memset */
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
@@ -46,8 +41,6 @@
 #include "video_parser.h"
 
 #include "vpar_blocks.h"
-
-#include "modules_export.h"
 
 /*
  * Welcome to vpar_blocks.c ! Here's where the heavy processor-critical parsing

@@ -2,7 +2,7 @@
  * ac3_iec958.c: ac3 to spdif converter
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_iec958.c,v 1.4 2001/12/10 04:53:10 sam Exp $
+ * $Id: ac3_iec958.c,v 1.5 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -26,21 +26,16 @@
 /****************************************************************************
  * Preamble
  ****************************************************************************/
-#include "defs.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>                                              /* memset() */
 #include <fcntl.h>
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
+#include <videolan/vlc.h>
 
-#include "common.h"
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-#include "threads.h"
-#include "mtime.h"
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
 
 #include "audio_output.h"
 
@@ -49,8 +44,6 @@
 
 #include "ac3_spdif.h"
 #include "ac3_iec958.h"
-
-#include "modules_export.h"
 
 /****************************************************************************
  * Local structures and tables

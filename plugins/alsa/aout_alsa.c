@@ -2,7 +2,7 @@
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: aout_alsa.c,v 1.23 2001/12/19 03:50:22 sam Exp $
+ * $Id: aout_alsa.c,v 1.24 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -22,15 +22,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME alsa
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>                                           /* "intf_msg.h" */
@@ -38,16 +32,9 @@
 
 #include <alsa/asoundlib.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "audio_output.h"                                   /* aout_thread_t */
-
-#include "modules.h"
-#include "modules_export.h"
 
 typedef struct alsa_device_s
 {
@@ -104,11 +91,6 @@ static int aout_Probe( probedata_t *p_data )
         intf_ErrMsg( "aout error: could not close ALSA device (%s)",
                      snd_strerror( i_close_return ) );
         return( 0 );
-    }
-
-    if( TestMethod( AOUT_METHOD_VAR, "alsa" ) )
-    {
-        return( 999 );
     }
 
     /* And return score */

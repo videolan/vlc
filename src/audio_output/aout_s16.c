@@ -23,16 +23,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
 
-#include "common.h"
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-#include "threads.h"
-#include "mtime.h"                             /* mtime_t, mdate(), msleep() */
+#include <videolan/vlc.h>
 
 #include "audio_output.h"
 #include "aout_common.h"

@@ -2,7 +2,7 @@
  * idctclassic.c : Classic IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctclassic.c,v 1.18 2001/12/09 17:01:36 sam Exp $
+ * $Id: idctclassic.c,v 1.19 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -21,28 +21,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME idctclassic
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>
 #include <string.h>
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "idct.h"
 #include "block_c.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Local and extern prototypes.
@@ -53,14 +41,15 @@ static void idct_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for classic IDCT module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
+    ADD_WINDOW( "Configuration for classic IDCT module" )
+        ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_IDCT;
-    p_module->psz_longname = "classic IDCT module";
+    SET_DESCRIPTION( "classic IDCT module" )
+    ADD_CAPABILITY( IDCT, 100 )
+    ADD_SHORTCUT( "classic" )
+    ADD_SHORTCUT( "idctclassic" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -77,13 +66,6 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int idct_Probe( probedata_t *p_data )
 {
-    if( TestMethod( IDCT_METHOD_VAR, "idctclassic" )
-         || TestMethod( IDCT_METHOD_VAR, "classic" ) )
-    {
-        return( 999 );
-    }
-
-    /* This plugin always works */
     return( 100 );
 }
 

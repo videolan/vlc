@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.9 2001/12/11 15:31:37 sam Exp $
+ * $Id: modules_inner.h,v 1.10 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,111 +49,111 @@
 #define UGLY_KLUDGE( z ) #z
 /* And I need to do _this_ to change « foo bar » to « module_foo_bar » ! */
 #define CONCATENATE( y, z ) CRUDE_HACK( y, z )
-#define CRUDE_HACK( y, z )  module_##y##_##z
+#define CRUDE_HACK( y, z )  y##__MODULE_##z
 
 #define MODULE_VAR( z ) "VLC_MODULE_" #z
 
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
 #ifdef BUILTIN
-
-#   define _M( function ) CONCATENATE( MODULE_NAME, function )
-
-#   define MODULE_INIT_START \
-        int CONCATENATE( MODULE_NAME, InitModule ) ( module_t *p_module ) \
-        { \
-            p_module->psz_name = MODULE_STRING; \
-            p_module->psz_version = VLC_VERSION;
-
-#   define MODULE_INIT_STOP \
-            return( 0 ); \
-        }
-
-#   define MODULE_ACTIVATE_START \
-        int CONCATENATE( MODULE_NAME, ActivateModule ) ( module_t *p_module ) \
-        { \
-            p_module->p_functions = \
-              ( module_functions_t * )malloc( sizeof( module_functions_t ) ); \
-            if( p_module->p_functions == NULL ) \
-            { \
-                return( -1 ); \
-            } \
-            p_module->p_config = p_config;
-
-#   define MODULE_ACTIVATE_STOP \
-            return( 0 ); \
-        }
-
-#   define MODULE_DEACTIVATE_START \
-        int CONCATENATE( MODULE_NAME, DeactivateModule )( module_t *p_module ) \
-        { \
-            free( p_module->p_functions );
-
-#   define MODULE_DEACTIVATE_STOP \
-            return( 0 ); \
-        }
-
+#   define _M( function )  CONCATENATE( function, MODULE_NAME )
+#   define _X( function )  CONCATENATE( function, MODULE_NAME )
+#   define DECLARE_SYMBOLS ;
+#   define STORE_SYMBOLS   ;
 #else
-
-#   define _M( function )    function
-
-#   define MODULE_INIT_START \
-        int InitModule      ( module_t *p_module ) \
-        { \
-            p_module->psz_name = MODULE_STRING; \
-            p_module->psz_version = VLC_VERSION;
-
-#   define MODULE_INIT_STOP \
-            return( 0 ); \
-        }
-
-#   define MODULE_ACTIVATE_START \
-        int ActivateModule  ( module_t *p_module ) \
-        { \
-            p_module->p_functions = \
-              ( module_functions_t * )malloc( sizeof( module_functions_t ) ); \
-            if( p_module->p_functions == NULL ) \
-            { \
-                return( -1 ); \
-            } \
-            p_module->p_config = p_config; \
-            p_symbols = p_module->p_symbols;
-
-#   define MODULE_ACTIVATE_STOP \
-            return( 0 ); \
-        }
-
-#   define MODULE_DEACTIVATE_START \
-        int DeactivateModule( module_t *p_module ) \
-        { \
-            free( p_module->p_functions );
-
-#   define MODULE_DEACTIVATE_STOP \
-            return( 0 ); \
-        }
-
+#   define _M( function )  function
+#   define _X( function )  CONCATENATE( function, MODULE_SYMBOL )
+#   define DECLARE_SYMBOLS module_symbols_t* p_symbols;
+#   define STORE_SYMBOLS   p_symbols = p_module->p_symbols;
 #endif
 
-/* Now the real stuff */
 #define MODULE_STRING STRINGIFY( MODULE_NAME )
+
+/*
+ * InitModule: this function is called once and only once, when the module
+ * is looked at for the first time. We get the useful data from it, for
+ * instance the module name, its shortcuts, its capabilities...
+ */
+#define MODULE_INIT_START                                                     \
+    int _X( InitModule ) ( module_t *p_module )                               \
+    {                                                                         \
+        int i_shortcut = 0;                                                   \
+        p_module->psz_name = MODULE_STRING;                                   \
+        p_module->psz_longname = MODULE_STRING;                               \
+        p_module->psz_program = NULL;                                         \
+        p_module->i_capabilities = 0;                                         \
+        p_module->i_cpu_capabilities = 0;
+
+#define MODULE_INIT_STOP                                                      \
+        p_module->pp_shortcuts[ i_shortcut ] = NULL;                          \
+        return( 0 );                                                          \
+    }
+
+#define ADD_CAPABILITY( cap, score )                                          \
+    p_module->i_capabilities |= 1 << MODULE_CAPABILITY_##cap;                 \
+    p_module->pi_score[ MODULE_CAPABILITY_##cap ] = score;
+
+#define ADD_REQUIREMENT( cap )                                                \
+    p_module->i_cpu_capabilities |= CPU_CAPABILITY_##cap;
+
+#define ADD_PROGRAM( program )                                                \
+    p_module->psz_program = program;
+
+#define ADD_SHORTCUT( shortcut )                                              \
+    p_module->pp_shortcuts[ i_shortcut ] = shortcut;                          \
+    i_shortcut++;
+
+#define SET_DESCRIPTION( desc )                                               \
+    p_module->psz_longname = desc;
+
+/*
+ * ActivateModule: this function is called before functions can be accessed,
+ * we do allocation tasks here, and maybe additional stuff such as large
+ * table allocation. Once ActivateModule is called we are almost sure the
+ * module will be used.
+ */
+#define MODULE_ACTIVATE_START                                                 \
+    DECLARE_SYMBOLS;                                                          \
+                                                                              \
+    int _X( ActivateModule ) ( module_t *p_module )                           \
+    {                                                                         \
+        p_module->p_functions =                                               \
+          ( module_functions_t * )malloc( sizeof( module_functions_t ) );     \
+        if( p_module->p_functions == NULL )                                   \
+        {                                                                     \
+            return( -1 );                                                     \
+        }                                                                     \
+        p_module->p_config = p_config;                                        \
+        STORE_SYMBOLS;
+
+#define MODULE_ACTIVATE_STOP                                                  \
+        return( 0 );                                                          \
+    }
+
+/*
+ * DeactivateModule: this function is called after we are finished with the
+ * module. Everything that has been done in ActivateModule needs to be undone
+ * here.
+ */
+#define MODULE_DEACTIVATE_START                                               \
+    int _X( DeactivateModule )( module_t *p_module )                          \
+    {                                                                         \
+        free( p_module->p_functions );
+
+#define MODULE_DEACTIVATE_STOP                                                \
+        return( 0 );                                                          \
+    }
 
 /*****************************************************************************
  * Macros used to build the configuration structure.
  *****************************************************************************/
-#ifdef BUILTIN
-#   define MODULE_CONFIG_START \
-        static module_config_t p_config[] = { \
-            { MODULE_CONFIG_ITEM_START, NULL, NULL, NULL, NULL },
-#else
-#   define MODULE_CONFIG_START \
-        module_symbols_t* p_symbols; \
-        static module_config_t p_config[] = { \
-        { MODULE_CONFIG_ITEM_START, NULL, NULL, NULL, NULL },
-#endif
+
+#define MODULE_CONFIG_START \
+    static module_config_t p_config[] = { \
+    { MODULE_CONFIG_ITEM_START, NULL, NULL, NULL, NULL },
 
 #define MODULE_CONFIG_STOP \
-    { MODULE_CONFIG_ITEM_END, NULL, NULL, NULL, NULL } \
-};
+    { MODULE_CONFIG_ITEM_END, NULL, NULL, NULL, NULL } };
 
 #define ADD_WINDOW( text ) \
     { MODULE_CONFIG_ITEM_WINDOW, text, NULL, NULL, NULL },
@@ -177,5 +177,4 @@
     { MODULE_CONFIG_ITEM_SCALE, text, name, p_getlist, p_update },
 #define ADD_SPIN( text, name, p_getlist, p_update ) \
     { MODULE_CONFIG_ITEM_SPIN, text, name, p_getlist, p_update },
-
 

@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.2 2001/12/19 03:50:22 sam Exp $
+ * $Id: wall.c,v 1.3 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,31 +21,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME filter_wall
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
 
 #include "filter_common.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -56,14 +44,14 @@ static void vout_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for Wall module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_VOUT;
-    p_module->psz_longname = "image wall video module";
+    SET_DESCRIPTION( "image wall video module" )
+    /* Capability score set to 0 because we don't want to be spawned
+     * as a video output unless explicitly requested to */
+    ADD_CAPABILITY( VOUT, 0 )
+    ADD_SHORTCUT( "wall" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -81,8 +69,10 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 typedef struct vout_sys_s
 {
-    struct vout_thread_s *p_vout_top;
-    struct vout_thread_s *p_vout_bottom;
+    int    i_col;
+    int    i_row;
+    int    i_vout;
+    struct vout_thread_s **pp_vout;
 
 } vout_sys_t;
 
@@ -90,12 +80,14 @@ typedef struct vout_sys_s
  * Local prototypes
  *****************************************************************************/
 static int  vout_Probe     ( probedata_t *p_data );
-static int  vout_Create    ( struct vout_thread_s * );
-static int  vout_Init      ( struct vout_thread_s * );
-static void vout_End       ( struct vout_thread_s * );
-static void vout_Destroy   ( struct vout_thread_s * );
-static int  vout_Manage    ( struct vout_thread_s * );
-static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
+static int  vout_Create    ( vout_thread_t * );
+static int  vout_Init      ( vout_thread_t * );
+static void vout_End       ( vout_thread_t * );
+static void vout_Destroy   ( vout_thread_t * );
+static int  vout_Manage    ( vout_thread_t * );
+static void vout_Display   ( vout_thread_t *, struct picture_s * );
+
+static void RemoveAllVout  ( vout_thread_t *p_vout );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -118,12 +110,6 @@ static void vout_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( VOUT_FILTER_VAR, "wall" ) )
-    {
-        return( 999 );
-    }
-
-    /* If we weren't asked to filter, don't filter. */
     return( 0 );
 }
 
@@ -141,6 +127,20 @@ static int vout_Create( vout_thread_t *p_vout )
         intf_ErrMsg("error: %s", strerror(ENOMEM) );
         return( 1 );
     }
+
+    p_vout->p_sys->i_col = 2;
+    p_vout->p_sys->i_row = 3;
+
+    p_vout->p_sys->pp_vout = malloc( p_vout->p_sys->i_row *
+                                     p_vout->p_sys->i_col *
+                                     sizeof(vout_thread_t*) );
+    if( p_vout->p_sys->pp_vout == NULL )
+    {
+        intf_ErrMsg("error: %s", strerror(ENOMEM) );
+        free( p_vout->p_sys );
+        return( 1 );
+    }
+
 
     return( 0 );
 }
@@ -172,38 +172,31 @@ static int vout_Init( vout_thread_t *p_vout )
     }
 
     /* Try to open the real video output */
-    psz_filter = main_GetPszVariable( VOUT_FILTER_VAR, "" );
+    psz_filter = main_GetPszVariable( VOUT_FILTER_VAR, NULL );
     main_PutPszVariable( VOUT_FILTER_VAR, "" );
 
     intf_WarnMsg( 1, "filter: spawning the real video outputs" );
 
-    p_vout->p_sys->p_vout_top =
-        vout_CreateThread( NULL,
-                           p_vout->render.i_width, p_vout->render.i_height / 2,
-                           p_vout->render.i_chroma, p_vout->render.i_aspect * 2);
-
-    /* Everything failed */
-    if( p_vout->p_sys->p_vout_top == NULL )
+    for( p_vout->p_sys->i_vout = 0;
+         p_vout->p_sys->i_vout < p_vout->p_sys->i_row * p_vout->p_sys->i_col;
+         p_vout->p_sys->i_vout++ )
     {
-        intf_ErrMsg( "filter error: can't open top vout, aborting" );
-
-        return( 0 );
+        p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ] =
+            vout_CreateThread( NULL,
+                p_vout->render.i_width / p_vout->p_sys->i_col,
+                p_vout->render.i_height / p_vout->p_sys->i_row,
+                p_vout->render.i_chroma,
+                p_vout->render.i_aspect * p_vout->p_sys->i_row
+                                        / p_vout->p_sys->i_col );
+        if( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ] == NULL )
+        {
+             intf_ErrMsg( "vout error: failed to get %ix%i vout threads",
+                          p_vout->p_sys->i_col, p_vout->p_sys->i_row );
+             RemoveAllVout( p_vout );
+             return 0;
+        }
     }
 
-    p_vout->p_sys->p_vout_bottom =
-        vout_CreateThread( NULL,
-                           p_vout->render.i_width, p_vout->render.i_height / 2,
-                           p_vout->render.i_chroma, p_vout->render.i_aspect * 2 );
-
-    /* Everything failed */
-    if( p_vout->p_sys->p_vout_bottom == NULL )
-    {
-        intf_ErrMsg( "filter error: can't open bottom vout, aborting" );
-        vout_DestroyThread( p_vout->p_sys->p_vout_top, NULL );
-
-        return( 0 );
-    }
- 
     main_PutPszVariable( VOUT_FILTER_VAR, psz_filter );
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
@@ -233,9 +226,9 @@ static void vout_End( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Destroy( vout_thread_t *p_vout )
 {
-    vout_DestroyThread( p_vout->p_sys->p_vout_top, NULL );
-    vout_DestroyThread( p_vout->p_sys->p_vout_bottom, NULL );
+    RemoveAllVout( p_vout );
 
+    free( p_vout->p_sys->pp_vout );
     free( p_vout->p_sys );
 }
 
@@ -259,55 +252,60 @@ static int vout_Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    picture_t *p_outpic_top, *p_outpic_bottom;
-    int i_index;
+    picture_t *p_outpic;
+    int i_col, i_row, i_vout, i_index;
     mtime_t i_date = mdate() + 50000;
 
-    while( ( p_outpic_top
-              = vout_CreatePicture( p_vout->p_sys->p_vout_top, 0, 0, 0 ) )
-            == NULL )
+    i_vout = 0;
+
+    for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
     {
-        if( p_vout->b_die || p_vout->b_error )
+        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
         {
-            return;
-        }
-        msleep( VOUT_OUTMEM_SLEEP );
-    }   
+            while( ( p_outpic =
+                vout_CreatePicture( p_vout->p_sys->pp_vout[ i_vout ], 0, 0, 0 )
+                   ) == NULL )
+            {
+                if( p_vout->b_die || p_vout->b_error )
+                {
+                    vout_DestroyPicture( p_vout->p_sys->pp_vout[ i_vout ], 
+                                         p_outpic );
+                    return;
+                }
 
-    while( ( p_outpic_bottom
-              = vout_CreatePicture( p_vout->p_sys->p_vout_bottom, 0, 0, 0 ) )
-            == NULL )
-    {
-        if( p_vout->b_die || p_vout->b_error )
-        {
-            vout_DestroyPicture( p_vout->p_sys->p_vout_top, p_outpic_top );
-            return;
-        }
-        msleep( VOUT_OUTMEM_SLEEP );
-    }   
+                msleep( VOUT_OUTMEM_SLEEP );
+            }
 
-    vout_DatePicture( p_vout->p_sys->p_vout_top, p_outpic_top, i_date );
-    vout_DatePicture( p_vout->p_sys->p_vout_bottom, p_outpic_bottom, i_date );
+            vout_DatePicture( p_vout->p_sys->pp_vout[ i_vout ],
+                              p_outpic, i_date );
+            vout_LinkPicture( p_vout->p_sys->pp_vout[ i_vout ],
+                              p_outpic );
 
-    vout_LinkPicture( p_vout->p_sys->p_vout_top, p_outpic_top );
-    vout_LinkPicture( p_vout->p_sys->p_vout_bottom, p_outpic_bottom );
-
-    for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
-    {
-        p_main->fast_memcpy( p_outpic_top->planes[ i_index ].p_data,
-                             p_pic->planes[ i_index ].p_data,
-                             p_pic->planes[ i_index ].i_bytes / 2 );
-
-        p_main->fast_memcpy( p_outpic_bottom->planes[ i_index ].p_data,
+            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+            {
+                FAST_MEMCPY( p_outpic->planes[ i_index ].p_data,
                              p_pic->planes[ i_index ].p_data
-                              + p_pic->planes[ i_index ].i_bytes / 2,
-                             p_pic->planes[ i_index ].i_bytes / 2 );
+                                 + p_pic->planes[ i_index ].i_bytes / 2,
+                             p_outpic->planes[ i_index ].i_bytes );
+            }
+
+            vout_UnlinkPicture( p_vout->p_sys->pp_vout[ i_vout ],
+                                p_outpic );
+            vout_DisplayPicture( p_vout->p_sys->pp_vout[ i_vout ],
+                                 p_outpic );
+
+            i_vout++;
+        }
     }
+}
 
-    vout_UnlinkPicture( p_vout->p_sys->p_vout_top, p_outpic_top );
-    vout_UnlinkPicture( p_vout->p_sys->p_vout_bottom, p_outpic_bottom );
-
-    vout_DisplayPicture( p_vout->p_sys->p_vout_top, p_outpic_top );
-    vout_DisplayPicture( p_vout->p_sys->p_vout_bottom, p_outpic_bottom );
+static void RemoveAllVout( vout_thread_t *p_vout )
+{
+    while( p_vout->p_sys->i_vout )
+    {
+         --p_vout->p_sys->i_vout;
+         vout_DestroyThread( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ],
+                             NULL );
+    }
 }
 

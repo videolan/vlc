@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: main.h,v 1.26 2001/12/10 04:53:10 sam Exp $
+ * $Id: main.h,v 1.27 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -41,7 +41,7 @@ typedef struct main_s
     char **                ppsz_env;                /* environment variables */
     char *                 psz_arg0;         /* program name (whithout path) */
 
-    int                    i_cpu_capabilities;             /* CPU extensions */
+    u32                    i_cpu_capabilities;             /* CPU extensions */
     int                    i_warning_level;        /* warning messages level */
     boolean_t              b_stats;                  /* display statistics ? */
 
@@ -52,8 +52,7 @@ typedef struct main_s
     int                    i_desync;   /* relative desync of the audio ouput */
 
     /* Fast memcpy plugin used */
-    struct module_s *      p_memcpy_module;
-    void *             ( * fast_memcpy ) ( void *, const void *, size_t );
+    memcpy_module_t        memcpy;
 
     /* Unique threads */
     p_intf_thread_t        p_intf;                  /* main interface thread */
@@ -72,11 +71,24 @@ extern main_t *p_main;
 #endif
 
 /*****************************************************************************
+ * Fast memory operation module
+ *****************************************************************************/
+#define FAST_MEMCPY p_main->memcpy.pf_memcpy
+#define FAST_MEMSET p_main->memcpy.pf_memset
+
+/*****************************************************************************
  * Prototypes - these methods are used to get default values for some threads
  * and modules.
  *****************************************************************************/
+#ifndef PLUGIN
 int    main_GetIntVariable( char *psz_name, int i_default );
 char * main_GetPszVariable( char *psz_name, char *psz_default );
 void   main_PutIntVariable( char *psz_name, int i_value );
 void   main_PutPszVariable( char *psz_name, char *psz_value );
+#else
+#   define main_GetIntVariable p_symbols->main_GetIntVariable
+#   define main_PutIntVariable p_symbols->main_PutIntVariable
+#   define main_GetPszVariable p_symbols->main_GetPszVariable
+#   define main_PutPszVariable p_symbols->main_PutPszVariable
+#endif
 

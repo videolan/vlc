@@ -46,12 +46,10 @@
 /* Define if you can safely include both <sys/time.h> and <time.h>.  */
 #undef TIME_WITH_SYS_TIME
 
-/* Define if your processor stores words with the most significant
-   byte first (like Motorola and SPARC, unlike Intel and VAX).  */
-#undef WORDS_BIGENDIAN
-
 #undef PACKAGE
 #undef VERSION
+#undef DVD_DEVICE
+#undef VCD_DEVICE
 
 /* Define if you have the __argz_count function.  */
 #undef HAVE___ARGZ_COUNT
@@ -91,6 +89,9 @@
 
 /* Define if you have the getuid function.  */
 #undef HAVE_GETUID
+
+/* Define if you have the isatty function.  */
+#undef HAVE_ISATTY
 
 /* Define if you have the memalign function.  */
 #undef HAVE_MEMALIGN

@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.53 2001/12/07 18:33:08 sam Exp $
+ * $Id: netutils.c,v 1.54 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -29,11 +29,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                             /* free(), realloc(), atoi() */
 #include <errno.h>                                                /* errno() */
 #include <string.h>                                              /* memset() */
+
+#include <videolan/vlc.h>
 
 #ifdef STRNCASECMP_IN_STRINGS_H
 #   include <strings.h>
@@ -77,14 +77,9 @@
 #include <sys/sockio.h>
 #endif
 
-#include "common.h"
-#include "mtime.h"
-#include "intf_msg.h"
-#include "threads.h"
+#include "netutils.h"
 
 #include "intf_playlist.h"
-
-#include "netutils.h"
 
 /*****************************************************************************
  * input_channel_t: channel library data

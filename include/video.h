@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.35 2001/12/16 16:18:36 sam Exp $
+ * $Id: video.h,v 1.36 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -21,13 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
- *****************************************************************************/
-
-/*****************************************************************************
- * Requires:
- *  "config.h"
- *  "common.h"
- *  "mtime.h"
  *****************************************************************************/
 
 /*****************************************************************************
@@ -69,12 +62,6 @@ typedef struct picture_s
     int             i_refcount;                    /* link reference counter */
     mtime_t         date;                                    /* display date */
 
-    /* These values can be calculated from i_chroma, i_width and i_height
-     * but we leave them to prevent unnecessary calculation */
-    int             i_size;
-    int             i_chroma_width;
-    int             i_chroma_size;
-
     /* Picture margins - needed because of possible padding issues */
     int             i_left_margin;
     int             i_right_margin;
@@ -87,7 +74,7 @@ typedef struct picture_s
     boolean_t       b_repeat_first_field;                         /* RFF bit */
     boolean_t       b_top_field_first;               /* which field is first */
 
-    /* Macroblock counter - the decoder use it to verify if it has
+    /* Macroblock counter - the decoder uses it to verify if it has
      * decoded all the macroblocks of the picture */
     int             i_deccount;
     vlc_mutex_t     lock_deccount;
@@ -99,7 +86,8 @@ typedef struct picture_s
 } picture_t;
 
 /*****************************************************************************
- * picture_heap_t: video picture heap
+ * picture_heap_t: video picture heap, either render (to store pictures used
+ * by the decoder) or output (to store pictures displayed by the vout plugin)
  *****************************************************************************/
 typedef struct picture_heap_s
 {

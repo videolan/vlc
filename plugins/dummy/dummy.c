@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.12 2001/12/09 17:01:36 sam Exp $
+ * $Id: dummy.c,v 1.13 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,24 +21,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dummy
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-
-#include "modules.h"
-#include "modules_export.h"
+#include <videolan/vlc.h>
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -52,18 +41,22 @@ void _M( intf_getfunctions )  ( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for dummy module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
+    ADD_WINDOW( "Configuration for dummy module" )
+        ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
+
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_INPUT
-                                | MODULE_CAPABILITY_AOUT
-                                | MODULE_CAPABILITY_VOUT
-                                | MODULE_CAPABILITY_INTF;
-    p_module->psz_longname = "dummy functions module";
+    SET_DESCRIPTION( "dummy functions module" )
+    /* Capability score set to 0 because we don't want to be spawned
+     * unless explicitly requested to */
+    ADD_CAPABILITY( INPUT, 0 )
+    ADD_CAPABILITY( AOUT, 0 )
+    ADD_CAPABILITY( VOUT, 0 )
+    ADD_CAPABILITY( INTF, 0 )
+    ADD_SHORTCUT( "dummy" )
 MODULE_INIT_STOP
+
 
 MODULE_ACTIVATE_START
     _M( input_getfunctions )( &p_module->p_functions->input );
@@ -71,6 +64,7 @@ MODULE_ACTIVATE_START
     _M( vout_getfunctions )( &p_module->p_functions->vout );
     _M( intf_getfunctions )( &p_module->p_functions->intf );
 MODULE_ACTIVATE_STOP
+
 
 MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP

@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ps.c,v 1.10 2001/12/30 04:26:53 sam Exp $
+ * $Id: input_ps.c,v 1.11 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -22,18 +22,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME mpeg_ps
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+
+#include <videolan/vlc.h>
 
 #ifdef STRNCASECMP_IN_STRINGS_H
 #   include <strings.h>
@@ -50,12 +47,6 @@
 
 #include <fcntl.h>
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
-
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
@@ -64,9 +55,6 @@
 #include "input_ps.h"
 
 #include "debug.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * fseeko: fseeko replacement for BSDI.
@@ -144,11 +132,6 @@ static int PSProbe( probedata_t *p_data )
 
     char * psz_name = p_input->p_source;
     int i_score = 10;
-
-    if( TestMethod( INPUT_METHOD_VAR, "ps" ) )
-    {
-        return( 999 );
-    }
 
     if( ( strlen(psz_name) > 5 ) && (!strncasecmp( psz_name, "file:", 5 )
                                       || !strncasecmp( psz_name, "http:", 5 )) )

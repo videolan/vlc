@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.140 2001/12/29 03:44:38 massiot Exp $
+ * $Id: main.c,v 1.141 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -27,11 +27,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <signal.h>                               /* SIGHUP, SIGINT, SIGKILL */
 #include <stdio.h>                                              /* sprintf() */
 #include <setjmp.h>                                       /* longjmp, setjmp */
+
+#include <videolan/vlc.h>
 
 #ifdef HAVE_GETOPT_LONG
 #   ifdef HAVE_GETOPT_H
@@ -68,13 +68,7 @@
 #include <fcntl.h>                                       /* open(), O_WRONLY */
 #include <sys/stat.h>                                             /* S_IREAD */
 
-#include "common.h"
-#include "debug.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"                                              /* TestCPU() */
-#include "modules.h"
+#include "netutils.h"                                 /* network_ChannelJoin */
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -87,19 +81,7 @@
 #include "video.h"
 #include "video_output.h"
 
-#ifdef SYS_BEOS
-#   include "beos_specific.h"
-#endif
-
-#ifdef SYS_DARWIN
-#   include "darwin_specific.h"
-#endif
-
-#ifdef WIN32
-#   include "win32_specific.h"
-#endif
-
-#include "netutils.h"                                 /* network_ChannelJoin */
+#include "debug.h"
 
 /*****************************************************************************
  * Command line options constants. If something is changed here, be sure that
@@ -248,7 +230,7 @@ static void InitSignalHandler       ( void );
 static void SimpleSignalHandler     ( int i_signal );
 static void FatalSignalHandler      ( int i_signal );
 static void InstructionSignalHandler( int i_signal );
-static int  CPUCapabilities         ( void );
+static u32  CPUCapabilities         ( void );
 
 static int  RedirectSTDOUT          ( void );
 static void ShowConsole             ( void );
@@ -371,7 +353,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         PRINT_CAPABILITY( CPU_CAPABILITY_SSE, "SSE" );
         PRINT_CAPABILITY( CPU_CAPABILITY_ALTIVEC, "Altivec" );
 	PRINT_CAPABILITY( CPU_CAPABILITY_FPU, "FPU" );
-        intf_StatMsg("info: CPU has capabilities : %s", p_capabilities );
+        intf_StatMsg( "info: CPU has capabilities : %s", p_capabilities );
     }
 
     /*
@@ -401,19 +383,11 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Choose the best memcpy module
      */
-    p_main->p_memcpy_module = module_Need( MODULE_CAPABILITY_MEMCPY, NULL );
-
-    if( p_main->p_memcpy_module != NULL )
-    {
-#define f p_main->p_memcpy_module->p_functions->memcpy.functions.memcpy
-        p_main->fast_memcpy = f.fast_memcpy;
-#undef f
-    }
-    else
+    if( module_NeedMemcpy( &p_main->memcpy ) )
     {
         intf_ErrMsg( "intf error: no suitable memcpy module, "
                      "using libc default" );
-        p_main->fast_memcpy = memcpy;
+        p_main->memcpy.pf_memcpy = memcpy;
     }
 
     /*
@@ -465,11 +439,11 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
 
     /*
-     * Free memcpy module
+     * Free memcpy module if it was allocated
      */
-    if( p_main->p_memcpy_module != NULL )
+    if( p_main->memcpy.p_module != NULL )
     {
-        module_Unneed( p_main->p_memcpy_module );
+        module_UnneedMemcpy( &p_main->memcpy );
     }
 
     /*
@@ -976,7 +950,7 @@ static void Usage( int i_fashion )
           "\n  -h, --help                     \tprint help and exit"
           "\n  -H, --longhelp                 \tprint long help and exit"
           "\n      --version                  \toutput version information and exit"
-          "\n\nPlaylist items :"
+          "\n\nPlaylist items:"
           "\n  *.mpg, *.vob                   \tPlain MPEG-1/2 files"
           "\n  dvd:<device>[@<raw device>]    \tDVD device"
           "\n  vcd:<device>                   \tVCD device"
@@ -1147,9 +1121,9 @@ static void InstructionSignalHandler( int i_signal )
  *****************************************************************************
  * This function is called to list extensions the CPU may have.
  *****************************************************************************/
-static int CPUCapabilities( void )
+static u32 CPUCapabilities( void )
 {
-    volatile int i_capabilities = CPU_CAPABILITY_NONE;
+    volatile u32 i_capabilities = CPU_CAPABILITY_NONE;
 
 #if defined( SYS_DARWIN )
     struct host_basic_info hi;

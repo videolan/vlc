@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.13 2001/12/09 17:01:37 sam Exp $
+ * $Id: beos_specific.cpp,v 1.14 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -20,8 +20,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-#include "defs.h"
-
 #include <Application.h>
 #include <Roster.h>
 #include <Path.h>
@@ -32,12 +30,12 @@
 
 extern "C"
 {
-#include "common.h"
+#include <videolan/vlc.h>
+
 #include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 }
-#include "beos_specific.h"
 
 /*****************************************************************************
  * The VlcApplication class

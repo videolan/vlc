@@ -1,2 +1,5 @@
 *.moc.cpp
 .dep
+*.lo
+*.o.*
+*.lo.*

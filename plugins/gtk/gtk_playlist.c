@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.23 2001/12/29 11:36:00 lool Exp $
+ * $Id: gtk_playlist.c,v 1.24 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -25,10 +25,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>
 #include <string.h>
+
+#include <videolan/vlc.h>
 
 #include <sys/types.h>          /* for readdir  and stat stuff */
 
@@ -39,20 +39,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define gtk 12
-#define gnome 42
-#if ( MODULE_NAME == gtk )
-#   include <gtk/gtk.h>
-#elif ( MODULE_NAME == gnome )
+#ifdef MODULE_NAME_IS_gnome
 #   include <gnome.h>
+#else
+#   include <gtk/gtk.h>
 #endif
-#undef gtk
-#undef gnome
-
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -64,9 +55,7 @@
 #include "gtk_interface.h"
 #include "gtk_support.h"
 #include "gtk_playlist.h"
-#include "intf_gtk.h"
-
-#include "modules_export.h"
+#include "gtk_common.h"
 
 /****************************************************************************
  * Playlist window management
@@ -706,26 +695,24 @@ void GtkRebuildCList( GtkCList * p_clist, playlist_t * p_playlist )
     for( i_dummy = 0; i_dummy < p_playlist->i_size ; i_dummy++ )
     {
 #ifdef WIN32 /* WIN32 HACK */
-        ppsz_text[0] = g_strdup( "" );
+        ppsz_text[0] = "";
 #else
-        ppsz_text[0] = rindex( (char *)(p_playlist->p_item[
-                p_playlist->i_size - 1 - i_dummy].psz_name), '/' );
+        ppsz_text[0] = rindex( p_playlist->p_item[
+                p_playlist->i_size - 1 - i_dummy].psz_name, '/' );
         if ( ppsz_text[0] == NULL )
         {
-            ppsz_text[0] = g_strdup( (char *)(p_playlist->p_item[
-                    p_playlist->i_size - 1 - i_dummy].psz_name));
+            ppsz_text[0] =
+              p_playlist->p_item[ p_playlist->i_size - 1 - i_dummy ].psz_name;
         }
         else
         {
-            ppsz_text[0] = g_strdup( ppsz_text[0] + 1 );
+            /* Skip leading '/' */
+            ppsz_text[0]++;
         }
 #endif
-        ppsz_text[1] = g_strdup( "no info" );
+        ppsz_text[1] = "no info";
         
         gtk_clist_insert( p_clist, 0, ppsz_text );
-        
-        free( ppsz_text[0] );
-        free( ppsz_text[1] );
     }
     gtk_clist_set_background( p_clist, p_playlist->i_index, &red);
     gtk_clist_thaw( p_clist );

@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dummy.c,v 1.10 2001/12/10 04:53:10 sam Exp $
+ * $Id: input_dummy.c,v 1.11 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,28 +21,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dummy
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>
 #include <sys/types.h>
 #include <string.h>
 #include <errno.h>
 
+#include <videolan/vlc.h>
+
 #ifdef STRNCASECMP_IN_STRINGS_H
 #   include <strings.h>
 #endif
-
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
 
 #include "interface.h"
 #include "intf_playlist.h"
@@ -51,9 +42,6 @@
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
 #include "input_ext-plugins.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -97,11 +85,6 @@ static int DummyProbe( probedata_t *p_data )
 {
     input_thread_t *p_input = (input_thread_t *)p_data;
     char *psz_name = p_input->p_source;
-
-    if( TestMethod( INPUT_METHOD_VAR, "dummy" ) )
-    {
-        return( 999 );
-    }
 
     if( ( strlen(psz_name) > 4 ) && !strncasecmp( psz_name, "vlc:", 4 ) )
     {

@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dvd.c,v 1.16 2001/12/09 17:01:36 sam Exp $
+ * $Id: dvd.c,v 1.17 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,29 +21,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dvd
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
+
+#include <videolan/vlc.h>
 
 #ifdef GOD_DAMN_DMCA
 #   include <dlfcn.h>
 #   include "dummy_dvdcss.h"
 #endif
-
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -63,18 +52,17 @@ static void UnprobeLibDVDCSS( void );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for DVD module" )
-    ADD_COMMENT( "foobar !" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_INPUT;
 #ifdef GOD_DAMN_DMCA
-    p_module->psz_longname = "DVD input module, uses libdvdcss if present";
+    SET_DESCRIPTION( "DVD input module, uses libdvdcss if present" )
+    ADD_CAPABILITY( INPUT, 90 )
 #else
-    p_module->psz_longname = "DVD input module, linked with libdvdcss";
+    SET_DESCRIPTION( "DVD input module, linked with libdvdcss" )
+    ADD_CAPABILITY( INPUT, 100 )
 #endif
+    ADD_SHORTCUT( "dvd" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

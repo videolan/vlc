@@ -1,16 +1,15 @@
 /***************************************************************************
-                          ktitlemenu.h  -  description
+                          kde_menu.h  -  description
                              -------------------
     begin                : Thu Apr 12 2001
     copyright            : (C) 2001 by andres
     email                : dae@chez.com
  ***************************************************************************/
 
-#ifndef _KTITLEMENU_H_
-#define _KTITLEMENU_H_
+#ifndef _KDE_MENU_H_
+#define _KDE_MENU_H_
 
-#define MODULE_NAME kde
-#include "intf_plugin.h"
+#include "kde_common.h"
 
 #include <qwidget.h>
 #include <kpopupmenu.h>
@@ -40,4 +39,4 @@ private slots: // Private slots
 
 };
 
-#endif /* _KTITLEMENU_H_ */
+#endif /* _KDE_MENU_H_ */

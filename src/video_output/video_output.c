@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.148 2001/12/16 16:18:36 sam Exp $
+ * $Id: video_output.c,v 1.149 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -27,22 +27,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 
+#include <videolan/vlc.h>
+
 #ifdef HAVE_SYS_TIMES_H
 #   include <sys/times.h>
 #endif
-
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "modules.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -55,6 +49,7 @@ static void     RunThread         ( vout_thread_t *p_vout );
 static void     ErrorThread       ( vout_thread_t *p_vout );
 static void     EndThread         ( vout_thread_t *p_vout );
 static void     DestroyThread     ( vout_thread_t *p_vout, int i_status );
+static int      ReduceHeight      ( int );
 
 /*****************************************************************************
  * vout_InitBank: initialize the video output bank.
@@ -110,7 +105,11 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     }
 
     /* Choose the best module */
-    p_vout->p_module = module_Need( MODULE_CAPABILITY_VOUT, NULL );
+    p_vout->p_module =
+        module_Need( MODULE_CAPABILITY_VOUT,
+                     main_GetPszVariable( VOUT_FILTER_VAR,
+                         main_GetPszVariable( VOUT_METHOD_VAR, NULL ) ),
+                     NULL );
 
     if( p_vout->p_module == NULL )
     {
@@ -242,7 +241,8 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
  *****************************************************************************/
 static int InitThread( vout_thread_t *p_vout )
 {
-    int i_index;
+    int i, i_pgcd;
+    probedata_t data;
 
     /* Update status */
     *p_vout->pi_status = THREAD_START;
@@ -269,6 +269,22 @@ static int InitThread( vout_thread_t *p_vout )
         return( 1 );
     }
 
+    intf_WarnMsg( 1, "vout info: got %i direct buffer(s)", I_OUTPUTPICTURES );
+
+    i_pgcd = ReduceHeight( p_vout->render.i_aspect );
+    intf_WarnMsg( 1, "vout info: picture in %ix%i, chroma %i, "
+                     "aspect ratio %i:%i",
+                  p_vout->render.i_width, p_vout->render.i_height,
+                  p_vout->render.i_chroma, p_vout->render.i_aspect / i_pgcd,
+                  VOUT_ASPECT_FACTOR / i_pgcd );
+
+    i_pgcd = ReduceHeight( p_vout->output.i_aspect );
+    intf_WarnMsg( 1, "vout info: picture out %ix%i, chroma %i, "
+                     "aspect ratio %i:%i",
+                  p_vout->output.i_width, p_vout->output.i_height,
+                  p_vout->output.i_chroma, p_vout->output.i_aspect / i_pgcd,
+                  VOUT_ASPECT_FACTOR / i_pgcd );
+
     /* Check whether we managed to create direct buffers similar to
      * the render buffers, ie same size, chroma and aspect ratio */
     if( ( p_vout->output.i_width == p_vout->render.i_width )
@@ -276,33 +292,70 @@ static int InitThread( vout_thread_t *p_vout )
      && ( p_vout->output.i_chroma == p_vout->render.i_chroma )
      && ( p_vout->output.i_aspect == p_vout->render.i_aspect ) )
     {
+        /* Cool ! We have direct buffers, we can ask the decoder to
+         * directly decode into them ! Map the first render buffers to
+         * the first direct buffers, but keep the first direct buffer
+         * for memcpy operations */
         p_vout->b_direct = 1;
 
-        /* Map the first render buffers to the first direct buffers, but
-         * leave the first direct buffer for memcpy operations */
-        i_index = 1;
+        intf_WarnMsg( 2, "vout info: mapping "
+                         "render pictures 0-%i to system pictures 1-%i",
+                         VOUT_MAX_PICTURES - 2, VOUT_MAX_PICTURES - 1 );
+
+        for( i = 1; i < VOUT_MAX_PICTURES; i++ )
+        {
+            PP_RENDERPICTURE[ I_RENDERPICTURES ] = &p_vout->p_picture[ i ];
+            I_RENDERPICTURES++;
+        }
+
     }
     else
     {
+        /* Rats... Something is wrong here, we could not find an output
+         * plugin able to directly render what we decode. See if we can
+         * find a chroma plugin to do the conversion */
         p_vout->b_direct = 0;
 
+        /* Choose the best module */
+        data.chroma.p_render = &p_vout->render;
+        data.chroma.p_output = &p_vout->output;
+        p_vout->chroma.p_module
+            = module_Need( MODULE_CAPABILITY_CHROMA, NULL, &data );
+
+        if( p_vout->chroma.p_module == NULL )
+        {
+            intf_ErrMsg( "vout error: no suitable chroma module" );
+            p_vout->pf_end( p_vout );
+            vlc_mutex_unlock( &p_vout->change_lock );
+            return( 1 );
+        }
+
+#define f p_vout->chroma.p_module->p_functions->chroma.functions.chroma
+        p_vout->chroma.pf_init       = f.pf_init;
+        p_vout->chroma.pf_end        = f.pf_end;
+#undef f
+
+        if( p_vout->chroma.pf_init( p_vout ) )
+        {
+            intf_ErrMsg( "vout error: could not initialize chroma module" );
+            module_Unneed( p_vout->chroma.p_module );
+            p_vout->pf_end( p_vout );
+            vlc_mutex_unlock( &p_vout->change_lock );
+            return( 1 );
+        }
+
+        intf_WarnMsg( 2, "vout info: mapping "
+                         "render pictures %i-%i to system pictures %i-%i",
+                         I_OUTPUTPICTURES - 1, VOUT_MAX_PICTURES - 2,
+                         I_OUTPUTPICTURES, VOUT_MAX_PICTURES - 1 );
+
         /* Append render buffers after the direct buffers */
-        i_index = I_RENDERPICTURES;
+        for( i = I_OUTPUTPICTURES; i < VOUT_MAX_PICTURES; i++ )
+        {
+            PP_RENDERPICTURE[ I_RENDERPICTURES ] = &p_vout->p_picture[ i ];
+            I_RENDERPICTURES++;
+        }
     }
-
-    for( ; i_index < VOUT_MAX_PICTURES; i_index++ )
-    {
-        PP_RENDERPICTURE[ I_RENDERPICTURES ] = &p_vout->p_picture[ i_index ];
-        I_RENDERPICTURES++;
-    }
-
-    intf_WarnMsg( 1, "vout info: got %i direct buffer(s)", I_OUTPUTPICTURES );
-    intf_WarnMsg( 1, "vout info: picture in %ix%i chroma %i aspect ratio %i",
-                  p_vout->render.i_width, p_vout->render.i_height,
-                  p_vout->render.i_chroma, p_vout->render.i_aspect );
-    intf_WarnMsg( 1, "vout info: picture out %ix%i chroma %i aspect ratio %i",
-                  p_vout->output.i_width, p_vout->output.i_height,
-                  p_vout->output.i_chroma, p_vout->output.i_aspect );
 
     /* Mark thread as running and return */
     p_vout->b_active = 1;
@@ -563,6 +616,12 @@ static void EndThread( vout_thread_t *p_vout )
     }
 #endif
 
+    if( !p_vout->b_direct )
+    {
+        p_vout->chroma.pf_end( p_vout );
+        module_Unneed( p_vout->chroma.p_module );
+    }
+
     /* Destroy all remaining pictures */
     for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )
     {
@@ -612,5 +671,35 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
     /* Free structure */
     free( p_vout );
     *pi_status = i_status;
+}
+
+static int ReduceHeight( int i_ratio )
+{
+    int i_dummy = VOUT_ASPECT_FACTOR;
+    int i_pgcd  = 1;
+ 
+    /* VOUT_ASPECT_FACTOR is (2^7 * 3^3 * 5^3), we just check for 2, 3 and 5 */
+    while( !(i_ratio & 1) && !(i_dummy & 1) )
+    {
+        i_ratio >>= 1;
+        i_dummy >>= 1;
+        i_pgcd  <<= 1;
+    }
+
+    while( !(i_ratio % 3) && !(i_ratio % 3) )
+    {
+        i_ratio /= 3;
+        i_dummy /= 3;
+        i_pgcd  *= 3;
+    }
+
+    while( !(i_ratio % 5) && !(i_ratio % 5) )
+    {
+        i_ratio /= 5;
+        i_dummy /= 5;
+        i_pgcd  *= 5;
+    }
+
+    return i_pgcd;
 }
 

@@ -2,7 +2,7 @@
  * iso_lang.h: function to decode language code (in dvd or a52 for instance).
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: iso_lang.h,v 1.1 2001/11/07 17:37:16 stef Exp $
+ * $Id: iso_lang.h,v 1.2 2001/12/30 07:09:54 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -21,4 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifndef PLUGIN
 char * DecodeLanguage( u16 );
+#else
+#   define DecodeLanguage p_symbols->DecodeLanguage
+#endif
+

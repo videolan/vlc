@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.21 2001/12/27 01:49:34 massiot Exp $
+ * $Id: input_dec.c,v 1.22 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -24,23 +24,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>                                              /* off_t */
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
 
 #include "stream_control.h"
 #include "input_ext-dec.h"
 #include "input_ext-intf.h"
 #include "input_ext-plugins.h"
-
-#include "modules.h"
 
 static decoder_config_t * CreateDecoderConfig( input_thread_t * p_input,
                                                es_descriptor_t * p_es );
@@ -58,7 +51,7 @@ vlc_thread_t input_RunDecoder( input_thread_t * p_input,
     /* Get a suitable module */
     probedata.i_type = p_es->i_type;
 
-    p_es->p_module = module_Need( MODULE_CAPABILITY_DEC, &probedata );
+    p_es->p_module = module_Need( MODULE_CAPABILITY_DECODER, NULL, &probedata );
     if( p_es->p_module == NULL )
     {
         intf_ErrMsg( "input error: no suitable decoder module for type 0x%x",

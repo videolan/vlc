@@ -1,10 +1,13 @@
 /*****************************************************************************
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
- * $Id: xvideo.c,v 1.5 2001/12/09 17:01:37 sam Exp $
+ * Copyright (C) 1998-2001 VideoLAN
+ * $Id: xvideo.c,v 1.6 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
+ *          Vincent Seguin <seguin@via.ecp.fr>
+ *          Samuel Hocevar <sam@zoy.org>
+ *          David Kennedy <dkennedy@tinytoad.com>
  *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,45 +24,28 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME xvideo
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>
+#include <string.h>                                            /* strerror() */
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
 
-#include "video.h"
-#include "video_output.h"
-
-#include "modules.h"
-#include "modules_export.h"
-
-/*****************************************************************************
- * Capabilities defined in the other files.
- *****************************************************************************/
-void _M( vout_getfunctions )( function_list_t * p_function_list );
+#include "xcommon.h"
 
 /*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for xvideo module" )
-    ADD_COMMENT( "For now, the xvideo module cannot be configured" )
+    ADD_WINDOW( "Configuration for xvideo module" )
+        ADD_COMMENT( "For now, the xvideo module cannot be configured" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_VOUT;
-    p_module->psz_longname = "XVideo extension module";
+    SET_DESCRIPTION( "XVideo extension module" )
+    ADD_CAPABILITY( VOUT, 150 )
+    ADD_SHORTCUT( "xvideo" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -68,4 +54,45 @@ MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
+
+/* following functions are local */
+
+#if 0
+/*****************************************************************************
+ * XVideoSetAttribute
+ *****************************************************************************
+ * This function can be used to set attributes, e.g. XV_BRIGHTNESS and
+ * XV_CONTRAST. "f_value" should be in the range of 0 to 1.
+ *****************************************************************************/
+static void XVideoSetAttribute( vout_thread_t *p_vout,
+                                char *attr_name, float f_value )
+{
+    int             i_attrib;
+    XvAttribute    *p_attrib;
+    Display        *p_display = p_vout->p_sys->p_display;
+    int             i_xvport  = p_vout->p_sys->i_xvport;
+
+    p_attrib = XvQueryPortAttributes( p_display, i_xvport, &i_attrib );
+
+    do
+    {
+        i_attrib--;
+
+        if( i_attrib >= 0 && !strcmp( p_attrib[ i_attrib ].name, attr_name ) )
+        {
+            int i_sv = f_value * ( p_attrib[ i_attrib ].max_value
+                                    - p_attrib[ i_attrib ].min_value + 1 )
+                        + p_attrib[ i_attrib ].min_value;
+
+            XvSetPortAttribute( p_display, i_xvport,
+                            XInternAtom( p_display, attr_name, False ), i_sv );
+            break;
+        }
+
+    } while( i_attrib > 0 );
+
+    if( p_attrib )
+        XFree( p_attrib );
+}
+#endif
 

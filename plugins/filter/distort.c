@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.2 2001/12/19 19:26:00 sam Exp $
+ * $Id: distort.c,v 1.3 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,33 +21,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME filter_distort
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
 #include <math.h>                                            /* sin(), cos() */
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
 
 #include "filter_common.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 #define DISTORT_MODE_WAVE    1
 #define DISTORT_MODE_RIPPLE  2
@@ -61,14 +49,14 @@ static void vout_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for distort module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_VOUT;
-    p_module->psz_longname = "miscellaneous video effects module";
+    SET_DESCRIPTION( "miscellaneous video effects module" )
+    /* Capability score set to 0 because we don't want to be spawned
+     * as a video output unless explicitly requested to */
+    ADD_CAPABILITY( VOUT, 0 )
+    ADD_SHORTCUT( "distort" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -132,12 +120,6 @@ static void vout_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( VOUT_FILTER_VAR, "distort" ) )
-    {
-        return( 999 );
-    }
-
-    /* If we weren't asked to filter, don't filter. */
     return( 0 );
 }
 
@@ -360,7 +342,7 @@ static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
             {
                 if( i_offset < 0 )
                 {
-                    p_main->fast_memcpy( p_out, p_in - i_offset,
+                    FAST_MEMCPY( p_out, p_in - i_offset,
                          p_inpic->planes[ i_index ].i_line_bytes + i_offset );
                     p_in += p_inpic->planes[ i_index ].i_line_bytes;
                     p_out += p_outpic->planes[ i_index ].i_line_bytes;
@@ -368,7 +350,7 @@ static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
                 }
                 else
                 {
-                    p_main->fast_memcpy( p_out + i_offset, p_in,
+                    FAST_MEMCPY( p_out + i_offset, p_in,
                          p_inpic->planes[ i_index ].i_line_bytes - i_offset );
                     memset( p_out, black_pixel, i_offset );
                     p_in += p_inpic->planes[ i_index ].i_line_bytes;
@@ -377,8 +359,8 @@ static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
             }
             else
             {
-                p_main->fast_memcpy( p_out, p_in,
-                                     p_inpic->planes[ i_index ].i_line_bytes );
+                FAST_MEMCPY( p_out, p_in,
+                             p_inpic->planes[ i_index ].i_line_bytes );
                 p_in += p_inpic->planes[ i_index ].i_line_bytes;
                 p_out += p_outpic->planes[ i_index ].i_line_bytes;
             }
@@ -397,7 +379,7 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
     double f_angle;
     mtime_t new_date = mdate();
 
-    p_vout->p_sys->f_angle -= (new_date - p_vout->p_sys->last_date) / 50000.0;
+    p_vout->p_sys->f_angle -= (p_vout->p_sys->last_date - new_date) / 100000.0;
     p_vout->p_sys->last_date = new_date;
     f_angle = p_vout->p_sys->f_angle;
 
@@ -412,13 +394,13 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
         i_num_lines = p_inpic->planes[ i_index ].i_bytes
                           / p_inpic->planes[ i_index ].i_line_bytes;
 
-        i_first_line = i_num_lines * 3 / 4;
+        i_first_line = i_num_lines * 4 / 5;
 
         p_in = p_inpic->planes[ i_index ].p_data;
         p_out = p_outpic->planes[ i_index ].p_data;
 
-        p_main->fast_memcpy( p_out, p_in,
-                    i_first_line * p_inpic->planes[ i_index ].i_line_bytes );
+        FAST_MEMCPY( p_out, p_in,
+                     i_first_line * p_inpic->planes[ i_index ].i_line_bytes );
 
         p_in += i_first_line * p_inpic->planes[ i_index ].i_line_bytes;
         p_out += i_first_line * p_outpic->planes[ i_index ].i_line_bytes;
@@ -428,17 +410,18 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
         {
             /* Calculate today's offset, don't go above 1/20th of the screen */
             i_offset = (double)(p_inpic->planes[ i_index ].i_line_bytes)
-                         * sin( f_angle + 80.0 * (double)i_line
-                                               / (double)i_num_lines )
-                         * (double)( i_line - i_first_line)
+                         * sin( f_angle + 2.0 * (double)i_line
+                                              / (double)( 1 + i_line
+                                                            - i_first_line) )
+                         * (double)(i_line - i_first_line)
                          / (double)i_num_lines
-                         / 4.0;
+                         / 8.0;
 
             if( i_offset )
             {
                 if( i_offset < 0 )
                 {
-                    p_main->fast_memcpy( p_out, p_in - i_offset,
+                    FAST_MEMCPY( p_out, p_in - i_offset,
                          p_inpic->planes[ i_index ].i_line_bytes + i_offset );
                     p_in -= p_inpic->planes[ i_index ].i_line_bytes;
                     p_out += p_outpic->planes[ i_index ].i_line_bytes;
@@ -446,7 +429,7 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
                 }
                 else
                 {
-                    p_main->fast_memcpy( p_out + i_offset, p_in,
+                    FAST_MEMCPY( p_out + i_offset, p_in,
                          p_inpic->planes[ i_index ].i_line_bytes - i_offset );
                     memset( p_out, black_pixel, i_offset );
                     p_in -= p_inpic->planes[ i_index ].i_line_bytes;
@@ -455,8 +438,8 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
             }
             else
             {
-                p_main->fast_memcpy( p_out, p_in,
-                                     p_inpic->planes[ i_index ].i_line_bytes );
+                FAST_MEMCPY( p_out, p_in,
+                             p_inpic->planes[ i_index ].i_line_bytes );
                 p_in -= p_inpic->planes[ i_index ].i_line_bytes;
                 p_out += p_outpic->planes[ i_index ].i_line_bytes;
             }

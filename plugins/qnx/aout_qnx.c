@@ -21,15 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME qnx 
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>                                           /* "intf_msg.h" */
@@ -37,16 +31,9 @@
 
 #include <sys/asoundlib.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "audio_output.h"                                   /* aout_thread_t */
-
-#include "modules.h"
-#include "modules_export.h"
 
 typedef struct aout_sys_s
 {

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * intf_gtk.h: private Gtk+ interface description
+ * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.h,v 1.9 2001/11/16 00:29:52 stef Exp $
+ * $Id: gtk_common.h,v 1.1 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,6 +27,8 @@
 #define DROP_ACCEPT_TEXT_URI_LIST  0
 #define DROP_ACCEPT_TEXT_PLAIN     1
 #define DROP_ACCEPT_STRING         2
+
+#define MAX_ATEXIT                 10
 
 /*****************************************************************************
  * Useful inline function
@@ -82,17 +84,14 @@ typedef struct intf_sys_s
     GtkLabel *          p_label_chapter;
     gint                i_part;                           /* current chapter */
 
-    /* XXX: Ugly kludge, see intf_gnome.c */
-    void             ( *pf_gtk_callback ) ( void );
-    void             ( *pf_gdk_callback ) ( void );
+    /* XXX: Ugly kludge, see gtk.c */
+    void             ( *pf_callback[MAX_ATEXIT] ) ( void );
 
 } intf_sys_t;
 
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-
 gint GtkModeManage   ( intf_thread_t * p_intf );
 void GtkDisplayDate  ( GtkAdjustment *p_adj );
-
 

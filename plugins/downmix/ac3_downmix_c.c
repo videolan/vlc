@@ -2,7 +2,7 @@
  * ac3_downmix_c.c: ac3 downmix functions in C
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_c.c,v 1.3 2001/12/09 17:01:36 sam Exp $
+ * $Id: ac3_downmix_c.c,v 1.4 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -22,17 +22,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME downmix
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <string.h>                                              /* memcpy() */
 
-#include "common.h"
+#include <videolan/vlc.h>
 
 #include "ac3_downmix.h"
 

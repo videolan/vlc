@@ -2,7 +2,7 @@
  * idctaltivec.c : Altivec IDCT module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: idctaltivec.c,v 1.21 2001/12/09 17:01:36 sam Exp $
+ * $Id: idctaltivec.c,v 1.22 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -23,28 +23,16 @@
 
 #ifndef __BUILD_ALTIVEC_ASM__
 
-#define MODULE_NAME idctaltivec
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"                                              /* TestCPU() */
+#include <videolan/vlc.h>
 
 #include "idct.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -55,14 +43,14 @@ static void idct_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for Altivec IDCT module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_IDCT;
-    p_module->psz_longname = "Altivec IDCT module";
+    SET_DESCRIPTION( "Altivec IDCT module" )
+    ADD_CAPABILITY( IDCT, 200 )
+    ADD_REQUIREMENT( ALTIVEC )
+    ADD_SHORTCUT( "altivec" )
+    ADD_SHORTCUT( "idctaltivec" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -79,17 +67,6 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int idct_Probe( probedata_t *p_data )
 {
-    if( !TestCPU( CPU_CAPABILITY_ALTIVEC ) )
-    {
-        return( 0 );
-    }
-
-    if( TestMethod( IDCT_METHOD_VAR, "idctaltivec" )
-         || TestMethod( IDCT_METHOD_VAR, "altivec" ) )
-    {
-        return( 999 );
-    }
-
     return( 200 );
 }
 

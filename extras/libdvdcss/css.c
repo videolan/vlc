@@ -2,7 +2,7 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.17 2001/12/09 17:01:35 sam Exp $
+ * $Id: css.c,v 1.18 2001/12/30 07:09:54 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *         Håkan Hjort <d95hjort@dtek.chalmers.se>
@@ -33,14 +33,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <string.h>
 
-#include "common.h"
+#include <videolan/vlc.h>
 
 #include "videolan/dvdcss.h"
 #include "libdvdcss.h"

@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mtime.c,v 1.26 2001/12/09 17:01:37 sam Exp $
+ * $Id: mtime.c,v 1.27 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -30,9 +30,9 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdio.h>                                              /* sprintf() */
+
+#include <videolan/vlc.h>
 
 #if defined( PTH_INIT_IN_PTH_H )                                  /* GNU Pth */
 #   include <pth.h>
@@ -51,9 +51,6 @@
 #else
 #   include <sys/time.h>
 #endif
-
-#include "common.h"
-#include "mtime.h"
 
 /*****************************************************************************
  * mstrtime: return a date in a readable format

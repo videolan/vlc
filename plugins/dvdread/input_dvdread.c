@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.11 2001/12/30 04:26:53 sam Exp $
+ * $Id: input_dvdread.c,v 1.12 2001/12/30 07:09:55 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -28,16 +28,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dvdread
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <videolan/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -59,14 +56,6 @@
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif
 
-
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "iso_lang.h"
-#include "tests.h"
-
 #if defined( WIN32 )
 #   include "input_iovec.h"
 #endif
@@ -78,10 +67,9 @@
 
 #include "input_dvdread.h"
 
-#include "debug.h"
+#include "iso_lang.h"
 
-#include "modules.h"
-#include "modules_export.h"
+#include "debug.h"
 
 /* how many blocks DVDRead will read in each loop */
 #define DVD_BLOCK_READ_ONCE 64
@@ -216,7 +204,6 @@ static void DvdReadInit( input_thread_t * p_input )
     if( ! ( p_dvd->p_vmg_file = ifoOpen( p_dvd->p_dvdread, 0 ) ) )
     {
         intf_ErrMsg( "dvdread error: can't open VMG info" );
-        DVDClose( p_dvd->p_dvdread );
         input_BuffersEnd( p_input->p_method_data );
         free( p_dvd );
         p_input->b_error = 1;

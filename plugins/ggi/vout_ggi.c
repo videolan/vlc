@@ -2,7 +2,7 @@
  * vout_ggi.c: GGI video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_ggi.c,v 1.13 2001/12/07 18:33:07 sam Exp $
+ * $Id: vout_ggi.c,v 1.14 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -22,34 +22,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME ggi
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
 #include <ggi/ggi.h>
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
-#include "modules.h"
+#include <videolan/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
 
 #include "intf_msg.h"
 #include "interface.h"
-
-#include "modules_export.h"
 
 /*****************************************************************************
  * vout_sys_t: video output GGI method descriptor

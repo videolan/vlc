@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.38 2001/07/12 20:31:33 reno Exp $
+ * $Id: audio_output.h,v 1.39 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -36,7 +36,11 @@ typedef struct aout_bank_s
 
 } aout_bank_t;
 
+#ifndef PLUGIN
 extern aout_bank_t *p_aout_bank;
+#else
+#   define p_aout_bank (p_symbols->p_aout_bank)
+#endif
 
 /*****************************************************************************
  * aout_increment_t
@@ -204,6 +208,7 @@ typedef struct aout_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+#ifndef PLUGIN
 void            aout_InitBank           ( void );
 void            aout_EndBank            ( void );
 
@@ -213,4 +218,8 @@ void            aout_DestroyThread      ( aout_thread_t *, int * );
 aout_fifo_t *   aout_CreateFifo         ( int, int, long, long, long, void * );
 void            aout_DestroyFifo        ( aout_fifo_t *p_fifo );
 void            aout_FreeFifo           ( aout_fifo_t *p_fifo );
+#else
+#   define aout_CreateFifo p_symbols->aout_CreateFifo
+#   define aout_DestroyFifo p_symbols->aout_DestroyFifo
+#endif
 

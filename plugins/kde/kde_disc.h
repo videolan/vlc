@@ -1,13 +1,13 @@
 /***************************************************************************
-                          kdiskdialog.h  -  description
+                          kde_disc.h  -  description
                              -------------------
     begin                : Sat Apr 7 2001
     copyright            : (C) 2001 by andres
     email                : dae@chez.com
  ***************************************************************************/
 
-#ifndef KDISKDIALOG_H
-#define KDISKDIALOG_H
+#ifndef KDE_DISC_H
+#define KDE_DISC_H
 
 #include <kdialogbase.h>
 #include <qstring.h>

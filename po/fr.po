@@ -18,7 +18,7 @@ msgstr ""
 #: plugins/gtk/gtk_interface.c:152
 #: plugins/gtk/gtk_interface.c:1096
 msgid "_Open File..."
-msgstr "_Ouvrir Fichier"
+msgstr "_Ouvrir fichier..."
 
 #: plugins/gtk/gnome_interface.c:24
 #: plugins/gtk/gnome_interface.c:339
@@ -34,7 +34,7 @@ msgstr "Ouvre un Fichier"
 #: plugins/gtk/gtk_interface.c:167
 #: plugins/gtk/gtk_interface.c:1108
 msgid "Open _Disc..."
-msgstr "Ouvrir _Disque"
+msgstr "Ouvrir _disque..."
 
 #: plugins/gtk/gnome_interface.c:31
 #: plugins/gtk/gnome_interface.c:351
@@ -50,7 +50,7 @@ msgstr "Ouvre un DVD ou un VCD"
 #: plugins/gtk/gtk_interface.c:182
 #: plugins/gtk/gtk_interface.c:1120
 msgid "_Network Stream..."
-msgstr ""
+msgstr "Flux réseau..."
 
 #: plugins/gtk/gnome_interface.c:38
 #: plugins/gtk/gnome_interface.c:363
@@ -59,96 +59,96 @@ msgstr ""
 #: plugins/gtk/gtk_interface.c:475
 #: plugins/gtk/gtk_interface.c:1128
 msgid "Select a Network Stream"
-msgstr ""
+msgstr "Sélectionne un flux réseau"
 
 #: plugins/gtk/gnome_interface.c:51
 #: plugins/gtk/gtk_interface.c:238
 msgid "_Hide interface"
-msgstr ""
+msgstr "Cac_he l'interface"
 
 #: plugins/gtk/gnome_interface.c:58
 #: plugins/gtk/gnome_interface.c:825
 #: plugins/gtk/gtk_interface.c:250
 #: plugins/gtk/gtk_interface.c:986
 msgid "_Fullscreen"
-msgstr ""
+msgstr "Plein écran"
 
 #: plugins/gtk/gnome_interface.c:66
 #: plugins/gtk/gtk_interface.c:269
 msgid "_Title"
-msgstr ""
+msgstr "_Titre"
 
 #: plugins/gtk/gnome_interface.c:67
 msgid "Choose title"
-msgstr ""
+msgstr "Choisir le titre"
 
 #: plugins/gtk/gnome_interface.c:73
 #: plugins/gtk/gtk_interface.c:282
 msgid "_Chapter"
-msgstr ""
+msgstr "Chapitre"
 
 #: plugins/gtk/gnome_interface.c:74
 msgid "Choose chapter"
-msgstr ""
+msgstr "Choisir le chapitre"
 
 #: plugins/gtk/gnome_interface.c:80
 #: plugins/gtk/gnome_interface.c:861
 #: plugins/gtk/gtk_interface.c:294
 #: plugins/gtk/gtk_interface.c:1042
 msgid "An_gle"
-msgstr ""
+msgstr "An_gle"
 
 #: plugins/gtk/gnome_interface.c:81
 msgid "Choose angle"
-msgstr ""
+msgstr "Choisir l'angle"
 
 #: plugins/gtk/gnome_interface.c:88
 #: plugins/gtk/gtk_interface.c:314
 msgid "_Playlist..."
-msgstr ""
+msgstr "_Playlist..."
 
 #: plugins/gtk/gnome_interface.c:89
 #: plugins/gtk/gtk_interface.c:322
 msgid "Open the playlist window"
-msgstr ""
+msgstr "Ouvre la fenêtre playlist"
 
 #: plugins/gtk/gnome_interface.c:95
 #: plugins/gtk/gtk_interface.c:326
 msgid "_Modules..."
-msgstr ""
+msgstr "_Modules..."
 
 #: plugins/gtk/gnome_interface.c:96
 #: plugins/gtk/gtk_interface.c:335
 msgid "Open the plugin manager"
-msgstr ""
+msgstr "Ouvre le gestionnaire de modules"
 
 #: plugins/gtk/gnome_interface.c:107
 #: plugins/gtk/gnome_interface.c:868
 #: plugins/gtk/gtk_interface.c:1054
 msgid "_Audio"
-msgstr ""
+msgstr "_Audio"
 
 #: plugins/gtk/gnome_interface.c:108
 #: plugins/gtk/gnome_interface.c:869
 msgid "Select audio channel"
-msgstr ""
+msgstr "Sélectionne la piste audio"
 
 #: plugins/gtk/gnome_interface.c:114
 #: plugins/gtk/gnome_interface.c:875
 #: plugins/gtk/gtk_interface.c:370
 #: plugins/gtk/gtk_interface.c:1066
 msgid "_Subtitles"
-msgstr ""
+msgstr "_Sous-titres"
 
 #: plugins/gtk/gnome_interface.c:115
 msgid "Select subtitle unit"
-msgstr ""
+msgstr "Sélectionne la piste de sous-titres"
 
 #: plugins/gtk/gnome_interface.c:189
 #: plugins/gtk/gtk_interface.c:108
 #: plugins/gtk/gtk_interface.c:1278
 msgid "VideoLAN Client"
-msgstr ""
+msgstr "Client VideoLAN"
 
 #: plugins/gtk/gnome_interface.c:338
 #: plugins/gtk/gnome_interface.c:1658
@@ -158,7 +158,7 @@ msgstr ""
 #: plugins/gtk/gtk_interface.c:2177
 #: plugins/gtk/gtk_interface.c:2437
 msgid "File"
-msgstr ""
+msgstr "Fichier"
 
 #: plugins/gtk/gnome_interface.c:350
 #: plugins/gtk/gnome_interface.c:529
@@ -169,83 +169,83 @@ msgstr ""
 #: plugins/gtk/gtk_interface.c:2053
 #: plugins/gtk/gtk_interface.c:2530
 msgid "Disc"
-msgstr ""
+msgstr "Disque"
 
 #: plugins/gtk/gnome_interface.c:362
 #: plugins/gtk/gtk_interface.c:474
 msgid "Net"
-msgstr ""
+msgstr "Réseau"
 
 #: plugins/gtk/gnome_interface.c:376
 #: plugins/gtk/gnome_interface.c:796
 #: plugins/gtk/gtk_interface.c:487
 #: plugins/gtk/gtk_interface.c:941
 msgid "Back"
-msgstr ""
+msgstr "Retour"
 
 #: plugins/gtk/gnome_interface.c:377
 #: plugins/gtk/gtk_interface.c:488
 msgid "Go Backwards"
-msgstr ""
+msgstr "Retour arrière"
 
 #: plugins/gtk/gnome_interface.c:389
 #: plugins/gtk/gnome_interface.c:789
 #: plugins/gtk/gtk_interface.c:499
 #: plugins/gtk/gtk_interface.c:934
 msgid "Stop"
-msgstr ""
+msgstr "Stop"
 
 #: plugins/gtk/gnome_interface.c:390
 #: plugins/gtk/gtk_interface.c:500
 msgid "Stop Stream"
-msgstr ""
+msgstr "Arrêter le flux"
 
 #: plugins/gtk/gnome_interface.c:401
 #: plugins/gtk/gnome_interface.c:775
 #: plugins/gtk/gtk_interface.c:510
 msgid "Play"
-msgstr ""
+msgstr "Joue"
 
 #: plugins/gtk/gnome_interface.c:402
 #: plugins/gtk/gtk_interface.c:511
 msgid "Play Stream"
-msgstr ""
+msgstr "Jouer le flux"
 
 #: plugins/gtk/gnome_interface.c:413
 #: plugins/gtk/gnome_interface.c:782
 #: plugins/gtk/gtk_interface.c:521
 #: plugins/gtk/gtk_interface.c:926
 msgid "Pause"
-msgstr ""
+msgstr "Pause"
 
 #: plugins/gtk/gnome_interface.c:414
 #: plugins/gtk/gtk_interface.c:522
 msgid "Pause Stream"
-msgstr ""
+msgstr "Pauser le flux"
 
 #: plugins/gtk/gnome_interface.c:426
 #: plugins/gtk/gnome_interface.c:803
 #: plugins/gtk/gtk_interface.c:533
 #: plugins/gtk/gtk_interface.c:949
 msgid "Slow"
-msgstr ""
+msgstr "Ralenti"
 
 #: plugins/gtk/gnome_interface.c:427
 #: plugins/gtk/gtk_interface.c:534
 msgid "Play Slower"
-msgstr ""
+msgstr "Jouer plus lentement"
 
 #: plugins/gtk/gnome_interface.c:439
 #: plugins/gtk/gnome_interface.c:810
 #: plugins/gtk/gtk_interface.c:545
 #: plugins/gtk/gtk_interface.c:957
 msgid "Fast"
-msgstr ""
+msgstr "Accéléré"
 
 #: plugins/gtk/gnome_interface.c:440
 #: plugins/gtk/gtk_interface.c:546
 msgid "Play Faster"
-msgstr ""
+msgstr "Jouer plus rapidement"
 
 #: plugins/gtk/gnome_interface.c:454
 #: plugins/gtk/gnome_interface.c:1768
@@ -255,12 +255,12 @@ msgstr ""
 #: plugins/gtk/gtk_interface.c:2024
 #: plugins/gtk/gtk_interface.c:3114
 msgid "Playlist"
-msgstr ""
+msgstr "Playlist"
 
 #: plugins/gtk/gnome_interface.c:455
 #: plugins/gtk/gtk_interface.c:560
 msgid "Open Playlist"
-msgstr ""
+msgstr "Ouvre la playlist"
 
 #: plugins/gtk/gnome_interface.c:466
 #: plugins/gtk/gnome_interface.c:840
@@ -269,12 +269,12 @@ msgstr ""
 #: plugins/gtk/gtk_interface.c:700
 #: plugins/gtk/gtk_interface.c:1010
 msgid "Prev"
-msgstr ""
+msgstr "Précédent"
 
 #: plugins/gtk/gnome_interface.c:467
 #: plugins/gtk/gtk_interface.c:571
 msgid "Previous File"
-msgstr ""
+msgstr "Fichier précédent"
 
 #: plugins/gtk/gnome_interface.c:478
 #: plugins/gtk/gnome_interface.c:833
@@ -283,12 +283,12 @@ msgstr ""
 #: plugins/gtk/gtk_interface.c:708
 #: plugins/gtk/gtk_interface.c:1003
 msgid "Next"
-msgstr ""
+msgstr "Suivant"
 
 #: plugins/gtk/gnome_interface.c:479
 #: plugins/gtk/gtk_interface.c:582
 msgid "Next File"
-msgstr ""
+msgstr "Fichier suivant"
 
 #: plugins/gtk/gnome_interface.c:493
 #: plugins/gtk/gtk_interface.c:589
@@ -297,7 +297,7 @@ msgstr ""
 
 #: plugins/gtk/gnome_interface.c:543
 msgid "Title:"
-msgstr ""
+msgstr "Titre:"
 
 #: plugins/gtk/gnome_interface.c:550
 #: plugins/gtk/gtk_interface.c:649
@@ -306,11 +306,11 @@ msgstr ""
 
 #: plugins/gtk/gnome_interface.c:563
 msgid "Select previous title"
-msgstr ""
+msgstr "Sélectionner le titre précédent"
 
 #: plugins/gtk/gnome_interface.c:588
 msgid "Chapter:"
-msgstr ""
+msgstr "Chapitre:"
 
 #: plugins/gtk/gnome_interface.c:595
 #: plugins/gtk/gtk_interface.c:693
@@ -319,19 +319,19 @@ msgstr ""
 
 #: plugins/gtk/gnome_interface.c:608
 msgid "Select previous chapter"
-msgstr ""
+msgstr "Sélectionner le chapitre précédent"
 
 #: plugins/gtk/gnome_interface.c:617
 msgid "Select next chapter"
-msgstr ""
+msgstr "Sélectionner le chapitre suivant"
 
 #: plugins/gtk/gnome_interface.c:626
 msgid "No server"
-msgstr ""
+msgstr "Pas de serveur"
 
 #: plugins/gtk/gnome_interface.c:640
 msgid "Network Channel:"
-msgstr ""
+msgstr "Canal réseau:"
 
 #: plugins/gtk/gnome_interface.c:655
 #: plugins/gtk/gtk_interface.c:752
@@ -341,60 +341,60 @@ msgstr ""
 #: plugins/gtk/gnome_interface.c:818
 #: plugins/gtk/gtk_interface.c:975
 msgid "Toggle _Interface"
-msgstr ""
+msgstr "Cacher/montrer l'_interface"
 
 #: plugins/gtk/gnome_interface.c:826
 msgid "Toggle fullscreen mode"
-msgstr ""
+msgstr "Mode fenêtré/plein écran"
 
 #: plugins/gtk/gnome_interface.c:847
 #: plugins/gtk/gtk_interface.c:1019
 msgid "_Jump..."
-msgstr ""
+msgstr "Sauter à..."
 
 #: plugins/gtk/gnome_interface.c:848
 msgid "Got directly so specified point"
-msgstr ""
+msgstr "Aller directement à un endroit spécifié"
 
 #: plugins/gtk/gnome_interface.c:854
 #: plugins/gtk/gtk_interface.c:1030
 msgid "_Navigation"
-msgstr ""
+msgstr "_Navigation"
 
 #: plugins/gtk/gnome_interface.c:855
 msgid "Navigate through titles and chapters"
-msgstr ""
+msgstr "Naviguer à travers les titres et les chapitres"
 
 #: plugins/gtk/gnome_interface.c:876
 msgid "Select subtitle channel"
-msgstr ""
+msgstr "Sélectionner la piste de sous-titres"
 
 #: plugins/gtk/gnome_interface.c:884
 #: plugins/gtk/gtk_interface.c:1149
 msgid "Playlist..."
-msgstr ""
+msgstr "Playlist..."
 
 #: plugins/gtk/gnome_interface.c:1081
 #: plugins/gtk/gtk_interface.c:1286
 msgid "(C) 1996, 1997, 1998, 1999, 2000, 2001 - the VideoLAN Team"
-msgstr ""
+msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001 - l'équipe VideoLAN"
 
 #: plugins/gtk/gnome_interface.c:1083
 #: plugins/gtk/gtk_interface.c:1312
 msgid "This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and MPEG 2 files from a file or from a network source."
-msgstr ""
+msgstr "Ceci est le client VideoLAN, un lecteur de DVD et de MPEG. Il peut jouer des fichiers MPEG et MPEG2 à partir d'un fichier ou d'une source réseau."
 
 #: plugins/gtk/gnome_interface.c:1097
 msgid "Open File"
-msgstr ""
+msgstr "Ouvrir un fichier"
 
 #: plugins/gtk/gnome_interface.c:1134
 msgid "Modules"
-msgstr ""
+msgstr "Modules"
 
 #: plugins/gtk/gnome_interface.c:1142
 msgid "Sorry, the module manager isn't functional yet. Please retry in a later version."
-msgstr ""
+msgstr "Désolé, le gestionnaire de modules ne fonctionne pas encore. Veuillez réessayer dans une prochaine version"
 
 #: plugins/gtk/gnome_interface.c:1208
 #: plugins/gtk/gtk_interface.c:1405

@@ -2,7 +2,7 @@
  * motionaltivec.c : Altivec motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionaltivec.c,v 1.8 2001/12/09 17:01:36 sam Exp $
+ * $Id: motionaltivec.c,v 1.9 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Paul Mackerras <paulus@linuxcare.com.au>
@@ -24,26 +24,14 @@
 
 #ifndef __BUILD_ALTIVEC_ASM__
 
-#define MODULE_NAME motionaltivec
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 #include <inttypes.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
-
-#include "modules.h"
-#include "modules_export.h"
+#include <videolan/vlc.h>
 
 /*****************************************************************************
  * Local and extern prototypes.
@@ -54,14 +42,14 @@ static void motion_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for Altivec motion compensation module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_MOTION;
-    p_module->psz_longname = "Altivec motion compensation module";
+    SET_DESCRIPTION( "Altivec motion compensation module" )
+    ADD_CAPABILITY( MOTION, 150 )
+    ADD_REQUIREMENT( ALTIVEC )
+    ADD_SHORTCUT( "altivec" )
+    ADD_SHORTCUT( "motionaltivec" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -76,17 +64,6 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int motion_Probe( probedata_t *p_data )
 {
-    if( !TestCPU( CPU_CAPABILITY_ALTIVEC ) )
-    {
-        return( 0 );
-    }
-
-    if( TestMethod( MOTION_METHOD_VAR, "motionaltivec" )
-         || TestMethod( MOTION_METHOD_VAR, "altivec" ) )
-    {
-        return( 999 );
-    }
-
     return( 150 );
 }
 

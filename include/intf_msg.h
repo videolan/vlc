@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_msg.h,v 1.16 2001/10/01 16:18:48 massiot Exp $
+ * $Id: intf_msg.h,v 1.17 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -80,6 +80,7 @@ void    intf_FlushMsg       ( void );
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+#ifndef PLUGIN
 p_intf_msg_t intf_MsgCreate      ( void );
 void         intf_MsgDestroy     ( void );
 
@@ -92,4 +93,22 @@ void         intf_MsgImm         ( char *psz_format, ... );
 void         intf_ErrMsgImm      ( char *psz_format, ... );
 void         intf_WarnMsgImm     ( int i_level, char *psz_format, ... );
 void         intf_WarnHexDump    ( int i_level, void *p_data, int i_size );
+#else
+#   define intf_Msg p_symbols->intf_Msg
+#   define intf_ErrMsg p_symbols->intf_ErrMsg
+#   define intf_StatMsg p_symbols->intf_StatMsg
+#   define intf_WarnMsg p_symbols->intf_WarnMsg
+#   define intf_WarnMsgImm p_symbols->intf_WarnMsgImm
+#   ifdef TRACE
+#       undef  intf_DbgMsg
+#       undef  intf_DbgMsgImm
+#       define intf_DbgMsg( format, args... ) \
+        p_symbols->intf_DbgMsg( __FILE__, __FUNCTION__, \
+                                __LINE__, format, ## args )
+#       define intf_DbgMsgImm( format, args... ) \
+            p_symbols->intf_DbgMsgImm( __FILE__, __FUNCTION__, \
+                                       __LINE__, format, ## args )
+#   endif
+
+#endif
 

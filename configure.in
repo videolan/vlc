@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc and libdvdcss
-AC_INIT(include/common.h)
+AC_INIT(include/main.h)
 AC_CONFIG_HEADER(include/defs.h)
 
 AC_CANONICAL_SYSTEM
@@ -31,7 +31,6 @@ dnl Check for tools
 AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_PROG_CPP
-AC_CHECK_TOOL(RANLIB, ranlib, :)
 
 dnl Gettext stuff
 ALL_LINGUAS="de fr ru"
@@ -46,15 +45,13 @@ dnl AM_PROG_LIBTOOL
 AC_PROG_INSTALL
 
 dnl
-dnl  Endianness check, with a special test for cross-compilation
+dnl  Endianness check, AC_C_BIGENDIAN doesn't work if we are cross-compiling
 dnl
-if test x${cross_compiling} != xyes; then
-  AC_C_BIGENDIAN
-else
-  dnl  We are crosscompiling, give the user the opportunity to specify
-  dnl  --with-words=big or --with-words=little ; otherwise, try to guess
-  AC_ARG_WITH(words,
-    [  --with-words=endianness Set endianness (big or little)])
+dnl  We give the user the opportunity to specify
+dnl  --with-words=big or --with-words=little ; otherwise, try to guess
+dnl
+AC_ARG_WITH(words,
+  [  --with-words=endianness Set endianness (big or little)])
   case "x$withval" in
     xbig)
       ac_cv_c_bigendian=yes
@@ -107,11 +104,9 @@ EOF
       fi
       ;;
   esac
-fi
 
 dnl Check for system libs needed
-AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol)
-AC_CHECK_FUNCS(setenv putenv)
+AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty)
 AC_CHECK_FUNC(connect,,[
   AC_CHECK_LIB(socket,connect,LIB="${LIB} -lsocket")
 ])
@@ -141,7 +136,6 @@ AC_CHECK_FUNC(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
     [AC_DEFINE(HAVE_GETOPT_LONG,1,getopt support) LIB="${LIB} -lgnugetopt"],
     [NEED_GETOPT=1])])
 
-AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(dl,dlopen,LIB="${LIB} -ldl")
 AC_CHECK_LIB(m,cos,
@@ -181,12 +175,14 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
             Define if <strings.h> defines strncasecmp.)])
 
 dnl Check for headers
-AC_CHECK_HEADERS(stddef.h getopt.h strings.h)
+AC_CHECK_HEADERS(getopt.h strings.h)
 AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/time.h sys/times.h)
 AC_CHECK_HEADERS(sys/soundcard.h machine/soundcard.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
 AC_CHECK_HEADERS(machine/param.h)
+
+AC_HEADER_TIME
 
 dnl Check for threads library
 AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
@@ -217,7 +213,7 @@ AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error],
     [CFLAGS="${save_CFLAGS} -bundle -undefined error"
      AC_TRY_COMPILE([],,ac_cv_ld_darwin=yes, ac_cv_ld_darwin=no)])
 if test x"$ac_cv_ld_darwin" != x"no"; then
-    PLCFLAGS="${PLCFLAGS} -bundle -undefined error"
+    PLDFLAGS="${PLDFLAGS} -bundle -undefined error"
 fi
 
 dnl Check for standard plugin linking flags
@@ -226,7 +222,7 @@ AC_CACHE_CHECK([if \$CC accepts -shared],
     [CFLAGS="${save_CFLAGS} -shared"
      AC_TRY_COMPILE([],, ac_cv_ld_plugins=yes, ac_cv_ld_plugins=no)])
 if test x"$ac_cv_ld_plugins" != x"no"; then
-    PLCFLAGS="${PLCFLAGS} -shared"
+    PLDFLAGS="${PLDFLAGS} -shared"
 fi
         
 dnl Check for soname setting
@@ -300,19 +296,13 @@ if test x"$ac_cv_c_boolean_t_cthreads_h" != x"no"; then
     AC_DEFINE(BOOLEAN_T_IN_CTHREADS_H, 1, Define if <cthreads.h> defines boolean_t.)
 fi
 
-dnl Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_TYPE_SIZE_T
-AC_HEADER_TIME
-
-
 ARCH=${target_cpu}
 
 dnl
 dnl  default modules
 dnl
 BUILTINS="${BUILTINS} mpeg_es mpeg_ps mpeg_ts memcpy idct idctclassic motion imdct downmix mpeg_adec lpcm_adec ac3_adec mpeg_vdec"
-PLUGINS="${PLUGINS} ac3_spdif spudec chroma_yv12_rgb8 filter_bob filter_invert filter_wall filter_transform filter_distort"
+PLUGINS="${PLUGINS} ac3_spdif spudec chroma_yv12_rgb16 filter_deinterlace filter_invert filter_wall filter_transform filter_distort"
 
 dnl
 dnl  Accelerated modules
@@ -371,7 +361,8 @@ AC_CACHE_CHECK([if \$CC groks Altivec inline assembly],
 if test x"$ac_cv_altivec_inline" != x"no"; then
   AC_DEFINE(CAN_COMPILE_ALTIVEC, 1, Define if \$CC groks ALTIVEC inline assembly.)
   if test x"$ac_cv_altivec_inline" != x"yes"; then
-    CFLAGS_ALTIVEC="$CFLAGS_ALTIVEC $ac_cv_altivec_inline"
+    CFLAGS_IDCTALTIVEC="$CFLAGS_IDCTALTIVEC $ac_cv_altivec_inline"
+    CFLAGS_MOTIONALTIVEC="$CFLAGS_MOTIONALTIVEC $ac_cv_altivec_inline"
     CFLAGS_VLC="$CFLAGS_VLC $ac_cv_altivec_inline"
   fi
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
@@ -385,7 +376,7 @@ AC_CACHE_CHECK([if \$CC groks Altivec C extensions],
      AC_TRY_COMPILE(,[vec_mtvscr((vector unsigned int)(0));],
         ac_cv_c_altivec=-faltivec, [
         # Linux/PPC test
-        CFLAGS="$save_CFLAGS $CFLAGS_ALTIVEC -fvec"
+        CFLAGS="$save_CFLAGS $CFLAGS_IDCTALTIVEC -fvec"
         AC_TRY_COMPILE(,[vec_mtvscr((vector unsigned int)(0));],
             [ac_cv_c_altivec="-fvec"], ac_cv_c_altivec=no)
         ])
@@ -393,7 +384,8 @@ AC_CACHE_CHECK([if \$CC groks Altivec C extensions],
     ])
 if test x"$ac_cv_c_altivec" != x"no"; then
   AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, Define if your compiler groks C altivec extensions.)
-  CFLAGS_ALTIVEC="$CFLAGS_ALTIVEC $ac_cv_c_altivec"
+  CFLAGS_IDCTALTIVEC="$CFLAGS_IDCTALTIVEC $ac_cv_c_altivec"
+  CFLAGS_MOTIONALTIVEC="$CFLAGS_MOTIONALTIVEC $ac_cv_c_altivec"
   CFLAGS_VLC="$CFLAGS_VLC $ac_cv_c_altivec"
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
@@ -406,7 +398,8 @@ AC_CACHE_CHECK([if linker needs -framework vecLib],
      LDFLAGS=$save_LDFLAGS
     ])
 if test x"$ac_cv_ld_altivec" != x"no"; then
-  LIB_ALTIVEC="-framework vecLib"
+  LIB_IDCTALTIVEC="${LIB_IDCTALTIVEC} -framework vecLib"
+  LIB_MOTIONALTIVEC="${LIB_MOTIONALTIVEC} -framework vecLib"
 fi
 
 dnl
@@ -424,11 +417,20 @@ case ${target_os} in
     ;;
   *mingw32*)
     SYS=mingw32
+    AC_CHECK_TOOL(WINDRES, windres, :)
+    LIB_MPEG_TS="-lws2_32"
+    LIB_RC="-lws2_32"
     ;;
   *nto*)
     SYS=nto
     LIB_X11="${LIB_X11} -lsocket"
     LIB_XVIDEO="${LIB_XVIDEO} -lsocket"
+    ;;
+  beos)
+    SYS=beos
+    LIB="${LIB} -lbe"
+    LIB_BEOS="${LIB_BEOS} -lbe -lgame -lroot -ltracker"
+    PLDFLAGS="${PLDFLAGS} -nostart"
     ;;
   *)
     SYS=${target_os}
@@ -436,13 +438,22 @@ case ${target_os} in
 esac
 
 dnl
-dnl Windoze specific section
+dnl  DVD and VCD devices
 dnl
-if test $SYS = mingw32; then
-AC_CHECK_TOOL(WINDRES, windres, :)
-LIB_MPEG_TS="-lws2_32"
-LIB_RC="-lws2_32"
-fi
+case $SYS in
+  mingw32)
+    DVD_DEVICE="E:"
+    VCD_DEVICE="E:"
+    ;;
+  *)
+    DVD_DEVICE="/dev/dvd"
+    VCD_DEVICE="/dev/cdrom"
+    ;;
+esac
+
+AC_DEFINE_UNQUOTED(DVD_DEVICE, "$DVD_DEVICE")
+AC_DEFINE_UNQUOTED(VCD_DEVICE, "$VCD_DEVICE")
+
 
 dnl
 dnl  libdvdcss: check for DVD ioctls
@@ -506,7 +517,7 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
       NEED_BSDI_LIBDVD=1
       AC_DEFINE(DVD_STRUCT_IN_BSDI_DVDIOCTL_DVD_H, 1,
                 Define if <extras/BSDI_dvdioctl/dvd.h> defines DVD_STRUCT.)
-      OBJ_LIBDVDCSS="${OBJ_LIBDVDCSS} bsdi_dvdioctl.o"
+      SRC_DVDCSS_EXTRA="${SRC_DVDCSS_EXTRA} bsdi_dvdioctl.c"
       LINUX_DVD_STRUCT=1
     ])
   ])
@@ -544,7 +555,6 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
   fi
 ])
 
-
 dnl
 dnl  Special arch tuning
 dnl
@@ -568,6 +578,9 @@ AC_ARG_ENABLE(release,
 [ if test x$enableval = xyes; then RELEASE=1; fi ],
 [ VLC_VERSION="${VLC_VERSION}_`date +%Y-%m-%d`";
   LIBDVDCSS_VERSION="${LIBDVDCSS_VERSION}_`date +%Y-%m-%d`"; ])
+
+VLC_SYMBOL="`echo ${VLC_VERSION} | tr .- __`"
+AC_SUBST(VLC_SYMBOL)
 
 dnl
 dnl  MMX acceleration
@@ -669,6 +682,7 @@ AC_ARG_WITH(dvdcss,
         CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
         LIB_DVD="${LIB_DVD} lib/libdvdcss.a ${LIB_LIBDVDCSS}"
         LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} ../../lib/libdvdcss.a ${LIB_LIBDVDCSS}"
+        LIB_DVDREAD_PLUGIN="${LIB_DVDREAD_PLUGIN} ../../lib/libdvdcss.a ${LIB_LIBDVDCSS}"
       fi
     ;;
     xlocal-shared)
@@ -680,17 +694,19 @@ AC_ARG_WITH(dvdcss,
         CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
         LIB_DVD="${LIB_DVD} -Llib -ldvdcss"
         LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -L../../lib -ldvdcss"
+        LIB_DVDREAD_PLUGIN="${LIB_DVDREAD_PLUGIN} -L../../lib -ldvdcss"
       fi
     ;;
     xno)
       # don't use libdvdcss at all, build a DVD module that can dlopen() it
       DUMMY_LIBDVDCSS=1
       BUILTINS="${BUILTINS} dvd"
-      OBJ_DVD="${OBJ_DVD} dummy_dvdcss.o"
+      SRC_DVD_EXTRA="${SRC_DVD_EXTRA} dummy_dvdcss.c"
       CFLAGS_DVD="${CFLAGS_DVD} -DGOD_DAMN_DMCA"
       CFLAGS_DVD="${CFLAGS_DVD} -DLIBDVDCSS_VERSION=\"${LIBDVDCSS_VERSION}\""
       LIB_DVD="${LIB_DVD} -ldl"
       LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -ldl"
+      LIB_DVDREAD_PLUGIN="${LIB_DVDREAD_PLUGIN} -ldl"
     ;;
     *)
       # existing libdvdcss
@@ -698,10 +714,12 @@ AC_ARG_WITH(dvdcss,
       if test "x$withval" != "xyes"
       then
         LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -L"$withval"/lib"
+        LIB_DVDREAD_PLUGIN="${LIB_DVDREAD_PLUGIN} -L"$withval"/lib"
         CFLAGS_DVD="${CFLAGS_DVD} -I"$withval"/include"
       fi
       LIB_DVD="${LIB_DVD} -ldvdcss"
       LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -ldvdcss"
+      LIB_DVDREAD_PLUGIN="${LIB_DVDREAD_PLUGIN} -ldvdcss"
     esac ],
   # user didn't decide, we choose to use local libdvdcss and link statically
   # if libdvdcss is in the archive, or to use the dummy replacement otherwise.
@@ -713,14 +731,16 @@ AC_ARG_WITH(dvdcss,
       CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
       LIB_DVD="${LIB_DVD} lib/libdvdcss.a ${LIB_LIBDVDCSS}"
       LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} ../../lib/libdvdcss.a ${LIB_LIBDVDCSS}"
+      LIB_DVDREAD_PLUGIN="${LIB_DVDREAD_PLUGIN} ../../lib/libdvdcss.a ${LIB_LIBDVDCSS}"
     else
       # XXX: no check for libdl is done, don't try this at home !
       DUMMY_LIBDVDCSS=1
       BUILTINS="${BUILTINS} dvd"
-      OBJ_DVD="${OBJ_DVD} dummy_dvdcss.o"
+      SRC_DVD_EXTRA="${SRC_DVD_EXTRA} dummy_dvdcss.c"
       CFLAGS_DVD="${CFLAGS_DVD} -DGOD_DAMN_DMCA"
       LIB_DVD="${LIB_DVD} -ldl"
       LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -ldl"
+      LIB_DVDREAD_PLUGIN="${LIB_DVDREAD_PLUGIN} -ldl"
     fi ])
 
 dnl
@@ -820,10 +840,7 @@ AC_ARG_WITH(mad,
 dnl special case for BeOS
 if test x$SYS = xbeos
 then
-    LIB="${LIB} -lbe"
     BUILTINS="${BUILTINS} beos"
-    LIB_BEOS="${LIB_BEOS} -lbe -lgame -lroot -ltracker"
-    PLCFLAGS="${PLCFLAGS} -nostart"
 
 dnl default case
 else
@@ -884,12 +901,14 @@ AC_ARG_ENABLE(macosx,
   [if test x$enable_macosx = xyes
    then
      BUILTINS="${BUILTINS} macosx"
-     LIB_MACOSX="-framework CoreAudio -framework Cocoa -framework AGL -framework QuickTime"
+     LIB_MACOSX="-framework CoreAudio -framework Cocoa -framework AGL -framework QuickTime -lobjc"
+     CFLAGS_MACOSX="-ObjC"
      LIB="${LIB} -ObjC"
    fi],
   [AC_CHECK_HEADERS(Cocoa/Cocoa.h,
      BUILTINS="${BUILTINS} macosx"
-     LIB_MACOSX="-framework CoreAudio -framework Cocoa -framework AGL -framework QuickTime"
+     LIB_MACOSX="-framework CoreAudio -framework Cocoa -framework AGL -framework QuickTime -lobjc"
+     CFLAGS_MACOSX="-ObjC"
      LIB="${LIB} -ObjC"
    )])
 
@@ -1034,6 +1053,7 @@ AC_ARG_WITH(glide,
       else
         LIB_GLIDE="-lglide2x -lm"
       fi
+      CFLAGS_GLIDE="-I/usr/include/glide"
     fi ])
 
 dnl
@@ -1055,6 +1075,7 @@ AC_ARG_ENABLE(qt,
      PLUGINS="${PLUGINS} qt"
      ALIASES="${ALIASES} qvlc"
      LIB_QT="-lqt -L${QTDIR}/lib"
+     CFLAGS_QT="-I/usr/include/qt -I${QTDIR}/include"
      if test -x ${QTDIR}/bin/moc
      then
        MOC=${QTDIR}/bin/moc
@@ -1071,7 +1092,9 @@ AC_ARG_ENABLE(kde,
   [if test x$enable_kde = xyes; then
      PLUGINS="${PLUGINS} kde"
      ALIASES="${ALIASES} kvlc"
-     LIB_KDE="-L${KDEDIR}/lib -lkfile"
+     LIB_KDE="${LIB_KDE} -L${KDEDIR}/lib -lkfile"
+     CFLAGS_KDE="${CFLAGS_KDE} -I/usr/include/kde -I/usr/include/qt"
+     CFLAGS_KDE="${CFLAGS_KDE} -I${KDEDIR}/include -I${QTDIR}/include"
      if test -x ${QTDIR}/bin/moc
      then
        MOC=${QTDIR}/bin/moc
@@ -1090,7 +1113,7 @@ AC_ARG_ENABLE(gnome,
     AC_PATH_PROG(GNOME_CONFIG, gnome-config, no)
     if test -x ${GNOME_CONFIG}
     then
-       CFLAGS_GNOME="`${GNOME_CONFIG} --cflags gnomeui`"
+       CFLAGS_GNOME="`${GNOME_CONFIG} --cflags gtk gnomeui`"
        LIB_GNOME="`${GNOME_CONFIG} --libs gnomeui | sed 's,-rdynamic,,'`"
     fi
     # now look for the gnome.h header
@@ -1131,13 +1154,13 @@ then
   # now look for the gtk.h header
   saved_CPPFLAGS=$CPPFLAGS
   CPPFLAGS="$CPPFLAGS $CFLAGS_GTK"
-  FOUND=
-  AC_CHECK_HEADERS(gtk/gtk.h glib.h gdk/gdk.h, ,
-  [
-    FOUND=no
-	echo "Cannot find gtk development headers."
+  ac_cv_gtk_headers=yes
+  AC_CHECK_HEADERS(gtk/gtk.h glib.h gdk/gdk.h, , [
+    ac_cv_gtk_headers=no
+    echo "Cannot find gtk development headers."
   ])
-  if test -z $FOUND; then
+  if test "x$ac_cv_gtk_headers" = xyes
+  then
     PLUGINS="${PLUGINS} gtk"
     ALIASES="${ALIASES} gvlc"
   fi
@@ -1161,9 +1184,9 @@ if test x$enable_x11 != xno &&
   saved_CPPFLAGS=$CPPFLAGS
   CPPFLAGS="$CPPFLAGS -I$x_includes"
   AC_CHECK_HEADERS(X11/Xlib.h, [
-    #PLUGINS="${PLUGINS} x11"
-    LIB_X11="-L$x_libraries -lX11 -lXext"
-    CFLAGS_X11="-I$x_includes"
+    PLUGINS="${PLUGINS} x11"
+    LIB_X11="${LIB_X11} -L$x_libraries -lX11 -lXext"
+    CFLAGS_X11="${CFLAGS_X11} -I$x_includes"
   ]
   CPPFLAGS=$saved_CPPFLAGS)
 fi
@@ -1186,8 +1209,8 @@ if test x$enable_xvideo != xno &&
   CPPFLAGS="$CPPFLAGS -I$x_includes"
   AC_CHECK_HEADERS(X11/extensions/Xv.h, [
     BUILTINS="${BUILTINS} xvideo"
-    LIB_XVIDEO="-L$x_libraries -lX11 -lXext -lXv"
-    CFLAGS_XVIDEO="-I$x_includes"
+    LIB_XVIDEO="${LIB_XVIDEO} -L$x_libraries -lX11 -lXext -lXv"
+    CFLAGS_XVIDEO="${CFLAGS_XVIDEO} -I$x_includes"
   ]
   CPPFLAGS=$saved_CPPFLAGS)
 fi
@@ -1204,7 +1227,7 @@ AC_ARG_ENABLE(alsa,
      if test x$have_alsa = xtrue
      then
        PLUGINS="${PLUGINS} alsa"
-       LIB_ALSA="-lasound"
+       LIB_ALSA="-lasound -lm -ldl"
      fi
    fi])
 
@@ -1256,14 +1279,15 @@ AC_SUBST(WINDRES)
 AC_SUBST(DLL_PATH)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
+AC_SUBST(VCD_DEVICE)
+AC_SUBST(DVD_DEVICE)
 
-AC_SUBST(LCFLAGS)
-AC_SUBST(PLCFLAGS)
+AC_SUBST(LDFLAGS)
+AC_SUBST(PLDFLAGS)
 AC_SUBST(SOFLAGS)
 
 AC_SUBST(LIB)
 AC_SUBST(LIB_ALSA)
-AC_SUBST(LIB_ALTIVEC)
 AC_SUBST(LIB_ARTS)
 AC_SUBST(LIB_BEOS)
 AC_SUBST(LIB_DARWIN)
@@ -1278,6 +1302,7 @@ AC_SUBST(LIB_GGI)
 AC_SUBST(LIB_GLIDE)
 AC_SUBST(LIB_GNOME)
 AC_SUBST(LIB_GTK)
+AC_SUBST(LIB_IDCTALTIVEC)
 AC_SUBST(LIB_IMDCT)
 AC_SUBST(LIB_IMDCT3DN)
 AC_SUBST(LIB_IMDCTSSE)
@@ -1285,6 +1310,7 @@ AC_SUBST(LIB_KDE)
 AC_SUBST(LIB_LIBDVDCSS)
 AC_SUBST(LIB_MACOSX)
 AC_SUBST(LIB_MAD)
+AC_SUBST(LIB_MOTIONALTIVEC)
 AC_SUBST(LIB_MPEG_TS)
 AC_SUBST(LIB_NCURSES)
 AC_SUBST(LIB_QNX)
@@ -1295,20 +1321,26 @@ AC_SUBST(LIB_X11)
 AC_SUBST(LIB_XVIDEO)
 
 AC_SUBST(CFLAGS_VLC)
-AC_SUBST(CFLAGS_ALTIVEC)
+AC_SUBST(CFLAGS_ARTS)
 AC_SUBST(CFLAGS_DVD)
 AC_SUBST(CFLAGS_DVDREAD)
-AC_SUBST(CFLAGS_LIBDVDCSS)
-AC_SUBST(CFLAGS_ARTS)
 AC_SUBST(CFLAGS_ESD)
+AC_SUBST(CFLAGS_GLIDE)
+AC_SUBST(CFLAGS_GNOME)
 AC_SUBST(CFLAGS_GTK)
+AC_SUBST(CFLAGS_KDE)
+AC_SUBST(CFLAGS_IDCTALTIVEC)
+AC_SUBST(CFLAGS_LIBDVDCSS)
+AC_SUBST(CFLAGS_MACOSX)
 AC_SUBST(CFLAGS_MAD)
+AC_SUBST(CFLAGS_MOTIONALTIVEC)
+AC_SUBST(CFLAGS_QT)
 AC_SUBST(CFLAGS_SDL)
 AC_SUBST(CFLAGS_X11)
 AC_SUBST(CFLAGS_XVIDEO)
 
-AC_SUBST(OBJ_DVD)
-AC_SUBST(OBJ_LIBDVDCSS)
+AC_SUBST(SRC_DVD_EXTRA)
+AC_SUBST(SRC_DVDCSS_EXTRA)
 
 AC_SUBST(NEED_GETOPT)
 AC_SUBST(NEED_LIBDVDCSS)

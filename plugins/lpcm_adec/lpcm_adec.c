@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.7 2001/12/30 05:38:44 sam Exp $
+ * $Id: lpcm_adec.c,v 1.8 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -22,26 +22,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME lpcm_adec
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>                                              /* getpid() */
-#endif
-
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <string.h>                                    /* memcpy(), memset() */
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include "common.h"
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
+
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>                                           /* getpid() */
+#endif
 
 #include "audio_output.h"
 
@@ -49,9 +41,6 @@
 #include "input_ext-dec.h"
 
 #include "lpcm_adec.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -76,13 +65,11 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for lpcm audio decoder module" )
-    ADD_COMMENT( "Nothing to configure" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_DEC;
-    p_module->psz_longname = "Linear PCM audio decoder";
+    SET_DESCRIPTION( "Linear PCM audio decoder" )
+    ADD_CAPABILITY( DECODER, 100 )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -97,10 +84,7 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int decoder_Probe( probedata_t *p_data )
 {
-    if( p_data->i_type == LPCM_AUDIO_ES )
-        return( 100 );
-    else
-        return( 0 );
+    return ( p_data->i_type == LPCM_AUDIO_ES ) ? 100 : 0;
 }
 
 /*****************************************************************************

@@ -1,10 +1,12 @@
 /*****************************************************************************
  * x11.c : X11 plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
- * $Id: x11.c,v 1.9 2001/12/09 17:01:37 sam Exp $
+ * Copyright (C) 1998-2001 VideoLAN
+ * $Id: x11.c,v 1.10 2001/12/30 07:09:56 sam Exp $
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Authors: Vincent Seguin <seguin@via.ecp.fr>
+ *          Samuel Hocevar <sam@zoy.org>
+ *          David Kennedy <dkennedy@tinytoad.com>
  *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,45 +23,28 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME x11
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>
+#include <string.h>                                            /* strerror() */
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
 
-#include "video.h"
-#include "video_output.h"
-
-#include "modules.h"
-#include "modules_export.h"
-
-/*****************************************************************************
- * Capabilities defined in the other files.
- *****************************************************************************/
-void _M( vout_getfunctions )( function_list_t * p_function_list );
+#include "xcommon.h"
 
 /*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for X11 module" )
-    ADD_COMMENT( "For now, the X11 module cannot be configured" )
+    ADD_WINDOW( "Configuration for X11 module" )
+        ADD_COMMENT( "For now, the X11 module cannot be configured" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_VOUT;
-    p_module->psz_longname = "X11 module";
+    SET_DESCRIPTION( "X11 module" )
+    ADD_CAPABILITY( VOUT, 50 )
+    ADD_SHORTCUT( "x11" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -68,4 +53,38 @@ MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
+
+#if 0
+/*****************************************************************************
+ * vout_SetPalette: sets an 8 bpp palette
+ *****************************************************************************
+ * This function sets the palette given as an argument. It does not return
+ * anything, but could later send information on which colors it was unable
+ * to set.
+ *****************************************************************************/
+static void vout_SetPalette( p_vout_thread_t p_vout,
+                             u16 *red, u16 *green, u16 *blue, u16 *transp )
+{
+    int i, j;
+    XColor p_colors[255];
+
+    intf_DbgMsg( "vout: Palette change called" );
+
+    /* allocate palette */
+    for( i = 0, j = 255; i < 255; i++, j-- )
+    {
+        /* kludge: colors are indexed reversely because color 255 seems
+         * to be reserved for black even if we try to set it to white */
+        p_colors[ i ].pixel = j;
+        p_colors[ i ].pad   = 0;
+        p_colors[ i ].flags = DoRed | DoGreen | DoBlue;
+        p_colors[ i ].red   = red[ j ];
+        p_colors[ i ].blue  = blue[ j ];
+        p_colors[ i ].green = green[ j ];
+    }
+
+    XStoreColors( p_vout->p_sys->p_display,
+                  p_vout->p_sys->colormap, p_colors, 256 );
+}
+#endif
 

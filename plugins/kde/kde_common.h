@@ -1,5 +1,5 @@
 /***************************************************************************
-                          intf_plugin.h  -  description
+                          kde_common.h  -  description
                              -------------------
     begin                : Mon Apr 9 2001
     copyright            : (C) 2001 by andres
@@ -11,28 +11,18 @@
 
 extern "C"
 {
-#include "modules_inner.h"
-#include "defs.h"
-
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
 
 #include "intf_playlist.h"
 #include "interface.h"
-
-#include "modules.h"
-#include "modules_export.h"
 }
 
 #endif /* _INTF_PLUGIN_H_ */

@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.3 2001/12/09 17:01:37 sam Exp $
+ * $Id: vcd.c,v 1.4 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,24 +21,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME vcd
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-
-#include "modules.h"
-#include "modules_export.h"
+#include <videolan/vlc.h>
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -53,15 +42,12 @@ void _M( input_getfunctions )( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for VCD module" )
-    ADD_COMMENT( "foobar !" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_INPUT;
-    p_module->psz_longname = "basic VCD input module";
-    
+    SET_DESCRIPTION( "VCD input module" )
+    ADD_CAPABILITY( INPUT, 180 )
+    ADD_SHORTCUT( "vcd" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.12 2001/12/16 16:18:36 sam Exp $
+ * $Id: vout_dummy.c,v 1.13 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,29 +21,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dummy
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 #define DUMMY_WIDTH 16
 #define DUMMY_HEIGHT 16
@@ -95,11 +83,6 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( VOUT_METHOD_VAR, "dummy" ) )
-    {
-        return( 999 );
-    }
-
     return( 1 );
 }
 
@@ -165,7 +148,7 @@ static int vout_Init( vout_thread_t *p_vout )
         }
 
         /* Allocate the picture */
-        if( DummyNewPicture( p_vout, p_pic ) )
+        if( p_pic == NULL || DummyNewPicture( p_vout, p_pic ) )
         {
             break;
         }
@@ -252,14 +235,9 @@ static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
      * directly by the decoder */
     case YUV_420_PICTURE:
 
-        /* Precalculate some values */
-        p_pic->i_size         = i_width * i_height;
-        p_pic->i_chroma_width = i_width / 2;
-        p_pic->i_chroma_size  = i_width * ( i_height / 2 );
-
         /* Allocate the memory buffer */
-        i_luma_bytes = p_pic->i_size * sizeof(pixel_data_t);
-        i_chroma_bytes = p_pic->i_chroma_size * sizeof(pixel_data_t);
+        i_luma_bytes = i_width * i_height * sizeof(pixel_data_t);
+        i_chroma_bytes = i_width * ( i_height / 2 ) * sizeof(pixel_data_t);
 
         /* Y buffer */
         p_pic->planes[ Y_PLANE ].p_data = malloc( i_luma_bytes + 2 * i_chroma_bytes );
@@ -269,12 +247,12 @@ static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         /* U buffer */
         p_pic->planes[ U_PLANE ].p_data = p_pic->planes[ Y_PLANE ].p_data + i_height * i_width;
         p_pic->planes[ U_PLANE ].i_bytes = i_chroma_bytes / 2;
-        p_pic->planes[ U_PLANE ].i_line_bytes = p_pic->i_chroma_width * sizeof(pixel_data_t);
+        p_pic->planes[ U_PLANE ].i_line_bytes = i_width / 2 * sizeof(pixel_data_t);
 
         /* V buffer */
-        p_pic->planes[ V_PLANE ].p_data = p_pic->planes[ U_PLANE ].p_data + i_height * p_pic->i_chroma_width;
+        p_pic->planes[ V_PLANE ].p_data = p_pic->planes[ U_PLANE ].p_data + i_height * i_width / 2;
         p_pic->planes[ V_PLANE ].i_bytes = i_chroma_bytes / 2;
-        p_pic->planes[ V_PLANE ].i_line_bytes = p_pic->i_chroma_width * sizeof(pixel_data_t);
+        p_pic->planes[ V_PLANE ].i_line_bytes = i_width / 2 * sizeof(pixel_data_t);
 
         /* We allocated 3 planes */
         p_pic->i_planes = 3;
@@ -284,6 +262,7 @@ static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Unknown chroma, allocate an RGB buffer, the video output's job
      * will be to do the chroma->RGB conversion */
+        /* XXX FIXME this is BROKEN ! See how the other plugins do it */
     default:
 
         /* Precalculate some values */

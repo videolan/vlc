@@ -21,22 +21,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "intf_msg.h"
+#include <videolan/vlc.h>
 
 #include "audio_output.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 #include "stream_control.h"
 #include "input_ext-dec.h"

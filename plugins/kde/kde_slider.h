@@ -1,5 +1,5 @@
 /***************************************************************************
-                          kvlcslider.h  -  description
+                          kde_slider.h  -  description
                              -------------------
     begin                : Sun Apr 03 2001
     copyright            : (C) 2001 by andres
@@ -8,8 +8,8 @@
 /***************************************************************************
 	shamelessly copied from noatun's excellent interface
 ****************************************************************************/
-#ifndef _KVLCSLIDER_H_
-#define _KVLCSLIDER_H_
+#ifndef _KDE_SLIDER_H_
+#define _KDE_SLIDER_H_
 
 #include <qslider.h>
 
@@ -42,4 +42,4 @@ class KVLCSlider : public QSlider
 		bool pressed; // set this to true when the user drags the slider
 };
 
-#endif /* _KVLCSLIDER_H_ */
+#endif /* _KDE_SLIDER_H_ */

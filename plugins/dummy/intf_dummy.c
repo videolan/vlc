@@ -2,7 +2,7 @@
  * intf_dummy.c: dummy interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: intf_dummy.c,v 1.12 2001/12/07 18:33:07 sam Exp $
+ * $Id: intf_dummy.c,v 1.13 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,28 +21,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dummy
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "intf_msg.h"
 #include "interface.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface
@@ -82,11 +70,6 @@ void _M( intf_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int intf_Probe( probedata_t *p_data )
 {
-    if( TestMethod( INTF_METHOD_VAR, "dummy" ) )
-    {
-        return( 999 );
-    }
-
     return( 1 );
 }
 

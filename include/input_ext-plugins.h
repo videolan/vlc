@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-plugins.h,v 1.14 2001/12/29 03:07:51 massiot Exp $
+ * $Id: input_ext-plugins.h,v 1.15 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -36,15 +36,20 @@
 /*****************************************************************************
  * Prototypes from input_ext-dec.c
  *****************************************************************************/
+#ifndef PLUGIN
 void InitBitstream  ( struct bit_stream_s *, struct decoder_fifo_s *,
                       void (* pf_bitstream_callback)( struct bit_stream_s *,
                                                       boolean_t ),
                       void * p_callback_arg );
 void NextDataPacket ( struct bit_stream_s * );
+#else
+#   define InitBitstream p_symbols->InitBitstream
+#endif
 
 /*****************************************************************************
  * Prototypes from input_programs.c
  *****************************************************************************/
+#ifndef PLUGIN
 int  input_InitStream( struct input_thread_s *, size_t );
 void input_EndStream ( struct input_thread_s * );
 struct pgrm_descriptor_s * input_FindProgram( struct input_thread_s *, u16 );
@@ -61,10 +66,25 @@ struct es_descriptor_s * input_AddES ( struct input_thread_s *,
 void input_DelES     ( struct input_thread_s *, struct es_descriptor_s * );
 int  input_SelectES  ( struct input_thread_s *, struct es_descriptor_s * );
 int  input_UnselectES( struct input_thread_s *, struct es_descriptor_s * );
+#else
+#   define input_InitStream p_symbols->input_InitStream
+#   define input_EndStream p_symbols->input_EndStream
+#   define input_SetProgram p_symbols->input_SetProgram
+#   define input_FindES p_symbols->input_FindES
+#   define input_AddES p_symbols->input_AddES
+#   define input_DelES p_symbols->input_DelES
+#   define input_SelectES p_symbols->input_SelectES
+#   define input_UnselectES p_symbols->input_UnselectES
+#   define input_AddProgram p_symbols->input_AddProgram
+#   define input_DelProgram p_symbols->input_DelProgram
+#   define input_AddArea p_symbols->input_AddArea
+#   define input_DelArea p_symbols->input_DelArea
+#endif
 
 /*****************************************************************************
  * Prototypes from input_dec.c
  *****************************************************************************/
+#ifndef PLUGIN
 //decoder_capabilities_s * input_ProbeDecoder( void );
 vlc_thread_t input_RunDecoder( struct input_thread_s *,
                                struct es_descriptor_s * );
@@ -73,10 +93,14 @@ void input_DecodePES ( struct decoder_fifo_s *, struct pes_packet_s * );
 void input_EscapeDiscontinuity( struct input_thread_s *,
                                 struct pgrm_descriptor_s * );
 void input_EscapeAudioDiscontinuity( struct input_thread_s * );
+#else
+#   define input_DecodePES p_symbols->input_DecodePES
+#endif
 
 /*****************************************************************************
  * Prototypes from input_clock.c
  *****************************************************************************/
+#ifndef PLUGIN
 void input_ClockInit( struct pgrm_descriptor_s * );
 int  input_ClockManageControl( struct input_thread_s *,
                                struct pgrm_descriptor_s *, mtime_t );
@@ -84,6 +108,9 @@ void input_ClockManageRef( struct input_thread_s *,
                            struct pgrm_descriptor_s *, mtime_t );
 mtime_t input_ClockGetTS( struct input_thread_s *,
                           struct pgrm_descriptor_s *, mtime_t );
+#else
+#   define input_ClockManageControl p_symbols->input_ClockManageControl
+#endif
 
 /*****************************************************************************
  * Create a NULL packet for padding in case of a data loss
@@ -906,6 +933,7 @@ typedef struct stream_ps_data_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+#ifndef PLUGIN
 void input_ParsePES  ( struct input_thread_s *, struct es_descriptor_s * );
 void input_GatherPES ( struct input_thread_s *, struct data_packet_s *,
                        struct es_descriptor_s *, boolean_t, boolean_t );
@@ -915,4 +943,12 @@ void input_DemuxPS   ( struct input_thread_s *, struct data_packet_s * );
 void input_DemuxTS   ( struct input_thread_s *, struct data_packet_s * );
 void input_DemuxPSI  ( struct input_thread_s *, struct data_packet_s *,
                        struct es_descriptor_s *, boolean_t, boolean_t );
+#else
+#   define input_ParsePES p_symbols->input_ParsePES
+#   define input_GatherPES p_symbols->input_GatherPES
+#   define input_ParsePS p_symbols->input_ParsePS
+#   define input_DemuxPS p_symbols->input_DemuxPS
+#   define input_DemuxTS p_symbols->input_DemuxTS
+#   define input_DemuxPSI p_symbols->input_DemuxPSI
+#endif
 

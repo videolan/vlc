@@ -1,9 +1,9 @@
 /*****************************************************************************
- * common.h: common definitions
+ * vlc.h: common definitions
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.62 2001/12/30 05:38:44 sam Exp $
+ * $Id: vlc.h,v 1.1 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -32,8 +32,13 @@
 /*****************************************************************************
  * Required vlc headers
  *****************************************************************************/
+#include "defs.h"
 #include "config.h"
 #include "int_types.h"
+
+#if defined( PLUGIN ) || defined( BUILTIN )
+#   include "modules_inner.h"
+#endif
 
 /*****************************************************************************
  * Basic types definitions
@@ -154,6 +159,10 @@ typedef struct vdec_thread_s *          p_vdec_thread_t;
 typedef struct vpar_thread_s *          p_vpar_thread_t;
 typedef struct video_parser_s *         p_video_parser_t;
 
+/* Decoders */
+struct decoder_config_s;
+struct decoder_fifo_s;
+
 /* Misc */
 struct macroblock_s;
 struct data_packet_s;
@@ -162,15 +171,13 @@ struct complex_s;
 struct dm_par_s;
 struct picture_s;
 struct picture_sys_s;
+struct picture_heap_s;
 struct es_descriptor_s;
 struct pgrm_descriptor_s;
 struct pes_packet_s;
 struct input_area_s;
 struct bit_stream_s;
-
-/* Decoders */
-struct decoder_config_s;
-struct decoder_fifo_s;
+struct probedata_s;
 
 /*****************************************************************************
  * Macros and inline functions
@@ -408,6 +415,20 @@ typedef __int64 off_t;
 #endif
 
 /*****************************************************************************
+ * CPU capabilities
+ *****************************************************************************/
+#define CPU_CAPABILITY_NONE    0
+#define CPU_CAPABILITY_486     1<<0
+#define CPU_CAPABILITY_586     1<<1
+#define CPU_CAPABILITY_PPRO    1<<2
+#define CPU_CAPABILITY_MMX     1<<3
+#define CPU_CAPABILITY_3DNOW   1<<4
+#define CPU_CAPABILITY_MMXEXT  1<<5
+#define CPU_CAPABILITY_SSE     1<<6
+#define CPU_CAPABILITY_ALTIVEC 1<<16
+#define CPU_CAPABILITY_FPU     1<<31
+
+/*****************************************************************************
  * I18n stuff
  *****************************************************************************/
 #if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT )
@@ -432,10 +453,6 @@ typedef struct module_symbols_s
     char * ( * main_GetPszVariable ) ( char *, char * );
     void   ( * main_PutIntVariable ) ( char *, int );
     void   ( * main_PutPszVariable ) ( char *, char * );
-
-    int  ( * TestProgram )  ( char * );
-    int  ( * TestMethod )   ( char *, char * );
-    int  ( * TestCPU )      ( int );
 
     int  ( * intf_ProcessKey ) ( struct intf_thread_s *, int );
     void ( * intf_AssignKey )  ( struct intf_thread_s *, int, int, int );
@@ -563,8 +580,8 @@ typedef struct module_symbols_s
 
     char * ( * DecodeLanguage ) ( u16 );
 
-    struct module_s * ( * module_Need )    ( int, void * );
-    void ( * module_Unneed )        ( struct module_s * );
+    struct module_s * ( * module_Need ) ( int, char *, struct probedata_s * );
+    void ( * module_Unneed )            ( struct module_s * );
 } module_symbols_t;
 
 #ifdef PLUGIN
@@ -574,5 +591,20 @@ extern module_symbols_t* p_symbols;
 /*****************************************************************************
  * Required vlc headers
  *****************************************************************************/
+#ifdef SYS_BEOS
+#   include "beos_specific.h"
+#endif
+#ifdef SYS_DARWIN
+#   include "darwin_specific.h"
+#endif
+#ifdef WIN32
+#   include "win32_specific.h"
+#endif
+
+#include "intf_msg.h"
+#include "threads.h"
+#include "mtime.h"
+#include "modules.h"
+
 #include "main.h"
 

@@ -2,7 +2,7 @@
  * intf_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_playlist.h,v 1.4 2001/05/30 17:03:11 sam Exp $
+ * $Id: intf_playlist.h,v 1.5 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -69,6 +69,7 @@ typedef struct playlist_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+#ifndef PLUGIN
 playlist_t * intf_PlaylistCreate   ( void );
 void         intf_PlaylistInit     ( playlist_t * p_playlist );
 int          intf_PlaylistAdd      ( playlist_t * p_playlist,
@@ -79,4 +80,13 @@ void         intf_PlaylistPrev     ( playlist_t * p_playlist );
 void         intf_PlaylistDestroy  ( playlist_t * p_playlist );
 void         intf_PlaylistJumpto   ( playlist_t * p_playlist , int i_pos);
 void         intf_UrlDecode        ( char * );
+#else
+#   define intf_PlaylistAdd          p_symbols->intf_PlaylistAdd
+#   define intf_PlaylistDelete       p_symbols->intf_PlaylistDelete
+#   define intf_PlaylistNext         p_symbols->intf_PlaylistNext
+#   define intf_PlaylistPrev         p_symbols->intf_PlaylistPrev
+#   define intf_PlaylistDestroy      p_symbols->intf_PlaylistDestroy
+#   define intf_PlaylistJumpto       p_symbols->intf_PlaylistJumpto
+#   define intf_UrlDecode            p_symbols->intf_UrlDecode
+#endif
 

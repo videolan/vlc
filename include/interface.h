@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.24 2001/12/10 12:40:24 sam Exp $
+ * $Id: interface.h,v 1.25 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -21,21 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
- *****************************************************************************/
-
-/*****************************************************************************
- * Required headers:
- *  <X11/Xlib.h>
- *  <X11/extensions/XShm.h>
- *  "config.h"
- *  "common.h"
- *  "mtime.h"
- *  "threads.h"
- *  "input.h"
- *  "video.h"
- *  "video_output.h"
- *  "audio_output.h"
- *  "xconsole.h"
  *****************************************************************************/
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * imdct3dn.c : accelerated 3D Now! IMDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: imdct3dn.c,v 1.8 2001/12/09 17:01:36 sam Exp $
+ * $Id: imdct3dn.c,v 1.9 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Renaud Dartus <reno@via.ecp.fr>
  *
@@ -21,28 +21,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME imdct3dn
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>
 #include <string.h>
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "ac3_imdct.h"
 #include "ac3_imdct_common.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Local and extern prototypes.
@@ -54,14 +42,15 @@ static int  imdct_Probe       ( probedata_t *p_data );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for IMDCT module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_IMDCT;
-    p_module->psz_longname = "3D Now! AC3 IMDCT module";
+    SET_DESCRIPTION( "3D Now! AC3 IMDCT module" )
+    ADD_CAPABILITY( IMDCT, 200 )
+    ADD_REQUIREMENT( 3DNOW )
+    ADD_SHORTCUT( "3dn" )
+    ADD_SHORTCUT( "3dnow" )
+    ADD_SHORTCUT( "imdct3dn" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -94,18 +83,6 @@ static void imdct_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int imdct_Probe( probedata_t *p_data )
 {
-    if( !TestCPU( CPU_CAPABILITY_3DNOW ) )
-    {
-        return( 0 );
-    }
-
-    if( TestMethod( IMDCT_METHOD_VAR, "imdct3dn" )
-         || TestMethod( IMDCT_METHOD_VAR, "3dn" ) )
-    {
-        return( 999 );
-    }
-
-    /* This plugin always works */
     return( 200 );
 }
 

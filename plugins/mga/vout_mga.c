@@ -2,7 +2,7 @@
  * vout_mga.c: MGA video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_mga.c,v 1.10 2001/12/09 17:01:36 sam Exp $
+ * $Id: vout_mga.c,v 1.11 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -22,14 +22,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME mga
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <unistd.h>                                               /* close() */
 #include <stdlib.h>                                                /* free() */
@@ -38,16 +33,11 @@
 #include <sys/ioctl.h>                                            /* ioctl() */
 #include <sys/mman.h>                                          /* PROT_WRITE */
 
+#include <videolan/vlc.h>
+
 #ifdef SYS_BSD
 #include <sys/types.h>                                     /* typedef ushort */
 #endif
-
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
-#include "modules.h"
 
 #include "video.h"
 #include "video_output.h"

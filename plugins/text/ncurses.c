@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ncurses.c,v 1.8 2001/12/09 17:01:37 sam Exp $
+ * $Id: ncurses.c,v 1.9 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -21,29 +21,31 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME ncurses
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
+#include <errno.h>                                                 /* ENOMEM */
+#include <stdio.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
+#include <curses.h>
 
-#include "modules.h"
-#include "modules_export.h"
+#include <videolan/vlc.h>
+
+#include "stream_control.h"
+#include "input_ext-intf.h"
+
+#include "interface.h"
 
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * Local prototypes.
  *****************************************************************************/
-void _M( intf_getfunctions )( function_list_t * p_function_list );
+static void intf_getfunctions ( function_list_t * p_function_list );
+static int  intf_Probe        ( probedata_t *p_data );
+static int  intf_Open         ( intf_thread_t *p_intf );
+static void intf_Close        ( intf_thread_t *p_intf );
+static void intf_Run          ( intf_thread_t *p_intf );
 
 /*****************************************************************************
  * Building configuration tree
@@ -57,12 +59,122 @@ MODULE_INIT_START
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
                                 | MODULE_CAPABILITY_INTF;
     p_module->psz_longname = "ncurses interface module";
+    ADD_SHORTCUT( "ncurses" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
-    _M( intf_getfunctions )( &p_module->p_functions->intf );
+    intf_getfunctions( &p_module->p_functions->intf );
 MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
+
+/*****************************************************************************
+ * intf_sys_t: description and status of ncurses interface
+ *****************************************************************************/
+typedef struct intf_sys_s
+{
+    /* special actions */
+    vlc_mutex_t         change_lock;                      /* the change lock */
+
+} intf_sys_t;
+
+/*****************************************************************************
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+static void intf_getfunctions( function_list_t * p_function_list )
+{
+    p_function_list->pf_probe = intf_Probe;
+    p_function_list->functions.intf.pf_open  = intf_Open;
+    p_function_list->functions.intf.pf_close = intf_Close;
+    p_function_list->functions.intf.pf_run   = intf_Run;
+}
+
+/*****************************************************************************
+ * intf_Probe: probe the interface and return a score
+ *****************************************************************************
+ * This function tries to initialize ncurses and returns a score to the
+ * plugin manager so that it can select the best plugin.
+ *****************************************************************************/
+static int intf_Probe( probedata_t *p_data )
+{
+    return( 40 );
+}
+
+/*****************************************************************************
+ * intf_Open: initialize and create window
+ *****************************************************************************/
+static int intf_Open( intf_thread_t *p_intf )
+{
+    /* Allocate instance and initialize some members */
+    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
+    if( p_intf->p_sys == NULL )
+    {
+        intf_ErrMsg( "intf error: %s", strerror(ENOMEM) );
+        return( 1 );
+    }
+
+    /* Initialize the curses library */
+    initscr();
+    /* Don't do NL -> CR/NL */
+    nonl();
+    /* Take input chars one at a time */
+    cbreak();
+    /* Don't echo */
+    noecho();
+
+    curs_set(0);
+    timeout(0);
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * intf_Close: destroy interface window
+ *****************************************************************************/
+static void intf_Close( intf_thread_t *p_intf )
+{
+    /* Close the ncurses interface */
+    endwin();
+
+    /* Destroy structure */
+    free( p_intf->p_sys );
+}
+
+/*****************************************************************************
+ * intf_Run: ncurses thread
+ *****************************************************************************/
+static void intf_Run( intf_thread_t *p_intf )
+{
+    signed char i_key;
+
+    while( !p_intf->b_die )
+    {
+        p_intf->pf_manage( p_intf );
+
+        msleep( INTF_IDLE_SLEEP );
+
+        mvaddstr( 1, 2, VOUT_TITLE " (ncurses interface)" );
+        mvaddstr( 3, 2, "keys:" );
+        mvaddstr( 4, 2, "Q,q.......quit" );
+        //mvaddstr( 5, 2, "No other keys are active yet." );
+
+        while( (i_key = getch()) != -1 )
+	{
+            switch( i_key )
+            {
+                case 'q':
+                case 'Q':
+                    p_intf->b_die = 1;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+}
+
+/* following functions are local */
 

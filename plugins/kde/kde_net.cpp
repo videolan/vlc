@@ -1,12 +1,12 @@
 /***************************************************************************
-                          knetdialog.cpp  -  description
+                          kde_net.cpp  -  description
                              -------------------
     begin                : Mon Apr 9 2001
     copyright            : (C) 2001 by andres
     email                : dae@chez.com
  ***************************************************************************/
 
-#include "knetdialog.h"
+#include "kde_net.h"
 
 #include <kdialogbase.h>
 #include <klineedit.h>

@@ -2,7 +2,7 @@
  * idctmmxext.c : MMX EXT IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctmmxext.c,v 1.18 2001/12/09 17:01:36 sam Exp $
+ * $Id: idctmmxext.c,v 1.19 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -25,30 +25,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME idctmmxext
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>
 #include <string.h>
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"                                              /* TestCPU() */
+#include <videolan/vlc.h>
 
 #include "mmx.h"
 
 #include "idct.h"
 #include "block_mmx.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -59,14 +47,14 @@ static void idct_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for MMX EXT IDCT module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_IDCT;
-    p_module->psz_longname = "MMX EXT IDCT module";
+    SET_DESCRIPTION( "MMX EXT IDCT module" )
+    ADD_CAPABILITY( IDCT, 200 )
+    ADD_REQUIREMENT( MMXEXT )
+    ADD_SHORTCUT( "mmxext" )
+    ADD_SHORTCUT( "idctmmxext" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -83,19 +71,7 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int idct_Probe( probedata_t *p_data )
 {
-    if( !TestCPU( CPU_CAPABILITY_MMXEXT ) )
-    {
-        return( 0 );
-    }
-
-    if( TestMethod( IDCT_METHOD_VAR, "idctmmxext" )
-         || TestMethod( IDCT_METHOD_VAR, "mmxext" ) )
-    {
-        return( 999 );
-    }
-
     return( 200 );
-
 }
 
 /*****************************************************************************

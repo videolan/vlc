@@ -2,7 +2,7 @@
  * intf_playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: intf_playlist.c,v 1.11 2001/12/07 18:33:08 sam Exp $
+ * $Id: intf_playlist.c,v 1.12 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -20,16 +20,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 #include <errno.h>                                                 /* ENOMEM */
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
+#include <videolan/vlc.h>
 
 #include "intf_playlist.h"
 

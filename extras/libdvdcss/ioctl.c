@@ -2,7 +2,7 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.18 2001/12/18 02:44:34 sam Exp $
+ * $Id: ioctl.c,v 1.19 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -29,12 +29,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdio.h>
 
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>
+
+#include <videolan/vlc.h>
 
 #if defined( WIN32 )
 #   include <windows.h>
@@ -72,8 +72,6 @@
 #   include <sys/scsi/scsi_types.h>
 #   include <sys/scsi/impl/uscsi.h>
 #endif
-
-#include "common.h"
 
 #ifdef SYS_DARWIN
 #   include <IOKit/storage/IODVDMediaBSDClient.h>

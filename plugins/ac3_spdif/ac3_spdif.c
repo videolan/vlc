@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.9 2001/12/30 05:38:44 sam Exp $
+ * $Id: ac3_spdif.c,v 1.10 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -23,27 +23,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME ac3_spdif
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>                                              /* memcpy() */
 #include <fcntl.h>
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
+#include <videolan/vlc.h>
 
-#include "common.h"
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-#include "threads.h"
-#include "mtime.h"
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
 
 #include "audio_output.h"
 
@@ -52,9 +44,6 @@
 
 #include "ac3_spdif.h"
 #include "ac3_iec958.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 #define FRAME_NB 8
 
@@ -80,13 +69,11 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for ac3 spdif decoder module" )
-    ADD_COMMENT( "Nothing to configure" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_DEC;
-    p_module->psz_longname = "Ac3 SPDIF decoder for AC3 pass-through";
+    SET_DESCRIPTION( "SPDIF pass-through AC3 decoder" )
+    ADD_CAPABILITY( DECODER, 100 )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -104,11 +91,8 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int decoder_Probe( probedata_t *p_data )
 {
-    if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) && 
-        p_data->i_type == AC3_AUDIO_ES )
-        return( 100 );
-    else
-        return( 0 );
+    return( ( main_GetIntVariable( AOUT_SPDIF_VAR, 0 )
+               && p_data->i_type == AC3_AUDIO_ES ) ? 100 : 0 );
 }
 
 

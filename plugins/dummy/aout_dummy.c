@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: aout_dummy.c,v 1.16 2001/12/07 18:33:07 sam Exp $
+ * $Id: aout_dummy.c,v 1.17 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,26 +21,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dummy
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <string.h>
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "audio_output.h"                                   /* aout_thread_t */
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * vout_dummy_t: dummy video output method descriptor
@@ -85,12 +73,6 @@ void _M( aout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int aout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( AOUT_METHOD_VAR, "dummy" ) )
-    {
-        return( 999 );
-    }
-
-    /* The dummy plugin always works but give it the lower possible score */
     return( 1 );
 }
 

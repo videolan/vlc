@@ -56,6 +56,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		arts/arts \
 		beos/beos \
 		chroma/chroma_yv12_rgb8 \
+		chroma/chroma_yv12_rgb16 \
 		directx/directx \
 		dsp/dsp \
 		dummy/dummy \
@@ -64,7 +65,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		dvdread/dvdread \
 		esd/esd \
 		fb/fb \
-		filter/filter_bob \
+		filter/filter_deinterlace \
 		filter/filter_transform \
 		filter/filter_invert \
 		filter/filter_distort \
@@ -121,7 +122,7 @@ INTERFACE := main interface intf_msg intf_playlist
 INPUT := input input_ext-dec input_ext-intf input_dec input_programs input_clock mpeg_system
 VIDEO_OUTPUT := video_output video_text vout_pictures vout_subpictures
 AUDIO_OUTPUT := audio_output aout_ext-dec aout_u8 aout_s8 aout_u16 aout_s16 aout_spdif
-MISC := mtime tests modules netutils iso_lang
+MISC := mtime modules netutils iso_lang
 
 C_OBJ :=	$(INTERFACE:%=src/interface/%.o) \
 		$(INPUT:%=src/input/%.o) \
@@ -192,18 +193,19 @@ export
 all: Makefile.opts vlc ${ALIASES} vlc.app plugins po
 
 Makefile.opts:
-	@echo "**** No configuration found, running ./configure..."
-	./configure
-	$(MAKE) $(MAKECMDGOALS)
-	exit
+	@echo "**** No configuration found, please run ./configure"
+	@exit 1
+#	./configure
+#	$(MAKE) $(MAKECMDGOALS)
+#	exit	
 
 show:
 	@echo CC: $(CC)
 	@echo CFLAGS: $(CFLAGS)
 	@echo DCFLAGS: $(DCFLAGS)
-	@echo LCFLAGS: $(LCFLAGS)
+	@echo LDFLAGS: $(LDFLAGS)
 	@echo PCFLAGS: $(PCFLAGS)
-	@echo PLCFLAGS: $(PLCFLAGS)
+	@echo PLDFLAGS: $(PLDFLAGS)
 	@echo C_OBJ: $(C_OBJ)
 	@echo CPP_OBJ: $(CPP_OBJ)
 	@echo PLUGIN_OBJ: $(PLUGIN_OBJ)
@@ -229,8 +231,9 @@ libdvdread-clean:
 
 plugins-clean:
 	for dir in $(PLUGINS_DIR) ; do \
-		( cd plugins/$${dir} && $(MAKE) clean ) ; done
-	rm -f plugins/*/*.o plugins/*/*.moc plugins/*/*.bak
+		( cd plugins/$${dir} \
+			&& $(MAKE) -f ../../Makefile.modules clean ) ; done
+	rm -f plugins/*/*.o plugins/*/*.lo plugins/*/*.moc plugins/*/*.bak
 
 vlc-clean:
 	rm -f $(C_OBJ) $(CPP_OBJ)
@@ -495,30 +498,35 @@ FORCE:
 #
 # Generic rules (see below)
 #
+$(H_OBJ): Makefile.opts Makefile.dep Makefile
+#	@echo "regenerating $@"
+	@rm -f $@ && cp $@.in $@
+ifneq (,$(BUILTINS))
+	@for i in $(BUILTINS) ; do \
+		echo "int InitModule__MODULE_"$$i"( module_t* );" >>$@; \
+		echo "int ActivateModule__MODULE_"$$i"( module_t* );" >>$@; \
+		echo "int DeactivateModule__MODULE_"$$i"( module_t* );" >>$@; \
+	done
+	@echo "" >> $@ ;
+endif
+	@echo "#define ALLOCATE_ALL_BUILTINS() \\" >> $@ ;
+	@echo "    do \\" >> $@ ;
+	@echo "    { \\" >> $@ ;
+ifneq (,$(BUILTINS))
+	@for i in $(BUILTINS) ; do \
+		echo "        ALLOCATE_BUILTIN("$$i"); \\" >> $@ ; \
+	done
+	@echo "    } while( 0 );" >> $@ ;
+	@echo "" >> $@ ;
+endif
+
 $(C_DEP): %.d: FORCE
 	@$(MAKE) -s --no-print-directory -f Makefile.dep $@
 
 $(CPP_DEP): %.dpp: FORCE
 	@$(MAKE) -s --no-print-directory -f Makefile.dep $@
 
-$(H_OBJ): Makefile.opts Makefile.dep Makefile
-	rm -f $@ && cp $@.in $@
-ifneq (,$(BUILTINS))
-	for i in $(BUILTINS) ; do \
-		echo "int module_"$$i"_InitModule( module_t* );" >> $@ ; \
-		echo "int module_"$$i"_ActivateModule( module_t* );" >> $@ ; \
-		echo "int module_"$$i"_DeactivateModule( module_t* );" >> $@ ; \
-	done
-	echo "" >> $@ ;
-	printf "#define ALLOCATE_ALL_BUILTINS() do { " >> $@ ;
-	for i in $(BUILTINS) ; do \
-		printf "ALLOCATE_BUILTIN("$$i"); " >> $@ ; \
-	done
-	echo "} while( 0 );" >> $@ ;
-	echo "" >> $@ ;
-endif
-
-$(C_OBJ): %.o: Makefile.opts Makefile.dep Makefile
+$(C_OBJ): %.o: Makefile.opts Makefile.dep Makefile $(H_OBJ)
 $(C_OBJ): %.o: .dep/%.d
 $(C_OBJ): %.o: %.c
 	$(CC) $(CFLAGS) $(CFLAGS_VLC) -c -o $@ $<
@@ -537,8 +545,8 @@ endif
 #
 # Main application target
 #
-vlc: Makefile.opts Makefile.dep Makefile $(H_OBJ) $(VLC_OBJ) $(BUILTIN_OBJ)
-	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) $(BUILTIN_OBJ) $(LCFLAGS)
+vlc: Makefile.opts Makefile.dep Makefile $(VLC_OBJ) $(BUILTIN_OBJ)
+	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) $(BUILTIN_OBJ) $(LDFLAGS)
 ifeq ($(SYS),beos)
 	xres -o $@ ./share/vlc_beos.rsrc
 	mimeset -f $@
@@ -549,14 +557,14 @@ endif
 #
 plugins: Makefile.modules Makefile.opts Makefile.dep Makefile $(PLUGIN_OBJ)
 $(PLUGIN_OBJ): FORCE
-	@cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.so=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:plugins/%=../%)
+	@cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.so=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) -f ../../Makefile.modules $(@:plugins/%=../%)
 
 #
 # Built-in modules target
 #
 builtins: Makefile.modules Makefile.opts Makefile.dep Makefile $(BUILTIN_OBJ)
 $(BUILTIN_OBJ): FORCE
-	@cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:plugins/%=../%)
+	@cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) -f ../../Makefile.modules $(@:plugins/%=../%)
 
 #
 # libdvdcss target

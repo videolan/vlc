@@ -5,7 +5,7 @@
  * contains the basic udf handling functions
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_udf.c,v 1.17 2001/12/09 17:01:36 sam Exp $
+ * $Id: dvd_udf.c,v 1.18 2001/12/30 07:09:55 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -28,17 +28,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dvd
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
+
+#include <videolan/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -56,16 +53,8 @@
 #   include <videolan/dvdcss.h>
 #endif
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-
 #include "input_dvd.h"
 #include "dvd_ifo.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 #define UDFADshort      1
 #define UDFADlong       2
@@ -109,7 +98,7 @@ static int UDFReadLB( dvdcss_handle dvdhandle, off_t i_lba,
 {
     if( dvdcss_seek( dvdhandle, i_lba, DVDCSS_NOFLAGS ) < 0 )
     {
-        intf_ErrMsg( "UDF: Postion not found" );
+        intf_ErrMsg( "dvd error: block %i not found", i_lba );
         return 0;
     }
 
@@ -273,7 +262,7 @@ static int UDFLogVolume(u8 * pi_data, char * p_volume_descriptor )
 
     if( i_lb_size != DVD_LB_SIZE )
     {
-        intf_ErrMsg( "UDF: Non valid sector size (%d)", i_lb_size );
+        intf_ErrMsg( "dvd error: invalid UDF sector size (%d)", i_lb_size );
         return 1;
     }
 
@@ -675,7 +664,7 @@ u32 DVDUDFFindFile( dvdcss_handle dvdhandle, char * psz_path )
     i_partition = 0;
     if( !UDFFindPartition( i_partition, &partition ) )
     {
-        intf_ErrMsg( "UDF: Partition 0 not found" );
+        intf_ErrMsg( "dvd error: partition 0 not found" );
         return 0;
     }
   
@@ -704,26 +693,26 @@ u32 DVDUDFFindFile( dvdcss_handle dvdhandle, char * psz_path )
 
     if( i_tag_id != 256 )
     {
-        intf_ErrMsg( "UDF: Bad descriptor" );
+        intf_ErrMsg( "dvd error: bad UDF descriptor" );
         return 0;
     }
     if( root_icb.i_partition != i_partition )
     {
-        intf_ErrMsg( "UDF: Bad partition" );
+        intf_ErrMsg( "dvd error: bad UDF partition" );
         return 0;
     }
   
     /* Find root dir */
     if( !UDFMapICB( root_icb, &i_file_type, &file, partition ) )
     {
-        intf_ErrMsg( "UDF: Can't find root dir" );
+        intf_ErrMsg( "dvd error: can't find root dir" );
         return 0;
     }
 
     /* root dir should be dir */
     if( i_file_type != 4 )
     {
-        intf_ErrMsg( "UDF: Root dir error" );
+        intf_ErrMsg( "dvd error: root dir error" );
         return 0;
     }
 
@@ -733,13 +722,13 @@ u32 DVDUDFFindFile( dvdcss_handle dvdhandle, char * psz_path )
     {
         if( !UDFScanDir( file, psz_token, &icb, partition ) )
         {
-            intf_ErrMsg( "UDF: Scan dir error" );
+            intf_ErrMsg( "dvd error: scan dir error" );
             return 0;
         }
 
         if( !UDFMapICB ( icb, &i_file_type, &file, partition ) )
         {
-            intf_ErrMsg( "UDF: ICB error" );
+            intf_ErrMsg( "dvd error: ICB error" );
             return 0;
         }
 

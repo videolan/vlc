@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.9 2001/12/07 18:33:07 sam Exp $
+ * $Id: gtk_display.c,v 1.10 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -25,29 +25,18 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
-#define gtk 12
-#define gnome 42
-#if ( MODULE_NAME == gtk )
-#   include <gtk/gtk.h>
-#elif ( MODULE_NAME == gnome )
-#   include <gnome.h>
-#endif
-#undef gtk
-#undef gnome
+#include <videolan/vlc.h>
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
-#include "modules.h"
+#ifdef MODULE_NAME_IS_gnome
+#   include <gnome.h>
+#else
+#   include <gtk/gtk.h>
+#endif
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -63,9 +52,7 @@
 #include "gtk_support.h"
 #include "gtk_menu.h"
 #include "gtk_display.h"
-#include "intf_gtk.h"
-
-#include "modules_export.h"
+#include "gtk_common.h"
 
 /*****************************************************************************
  * GtkDisplayDate: display stream date

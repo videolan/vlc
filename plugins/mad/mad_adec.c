@@ -20,27 +20,15 @@
  *                                                                         *
  ***************************************************************************/
 
-#define MODULE_NAME mad
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "audio_output.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 #include "stream_control.h"
 #include "input_ext-dec.h"
@@ -75,13 +63,13 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for mad_adec module" )
-    ADD_COMMENT( "No device to configure." )
+    ADD_WINDOW( "Configuration for mad_adec module" )
+        ADD_COMMENT( "No device to configure." )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_DEC;
-    p_module->psz_longname = "Libmad MPEG 1/2/3 audio decoder library";
+    SET_DESCRIPTION( "Libmad MPEG 1/2/3 audio decoder library" )
+    ADD_CAPABILITY( DECODER, 50 )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -101,10 +89,6 @@ static int decoder_Probe( probedata_t *p_data )
 {
     if( p_data->i_type == MPEG1_AUDIO_ES || p_data->i_type == MPEG2_AUDIO_ES )
     {
-        if( TestMethod( ADEC_MPEG_VAR, "mad" ) )
-        {
-            return( 999 );
-        }
         return( 50 );
     }
     else

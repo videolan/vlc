@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.7 2001/12/16 16:18:36 sam Exp $
+ * $Id: vpar_headers.c,v 1.8 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -25,15 +25,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                    /* memcpy(), memset() */
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
@@ -45,8 +40,6 @@
 #include "vpar_pool.h"
 #include "video_parser.h"
 #include "video_decoder.h"
-
-#include "modules_export.h"
 
 /*
  * Local prototypes
@@ -495,7 +488,6 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
             vlc_mutex_unlock( &p_vout_bank->lock );
 
             p_vpar->p_fifo->b_error = 1;
-            /* XXX ! XXX ! XXX ! what to do here ? */
             return;
         }
         

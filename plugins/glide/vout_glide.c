@@ -2,7 +2,7 @@
  * vout_glide.c: 3dfx video output display method for 3dfx cards
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_glide.c,v 1.9 2001/12/07 18:33:07 sam Exp $
+ * $Id: vout_glide.c,v 1.10 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,37 +21,25 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME glide
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
+#include <videolan/vlc.h>
+
 #ifndef __linux__
-#include <conio.h>                                            /* for glide ? */
+#   include <conio.h>                                         /* for glide ? */
 #endif
 #include <glide.h>
 #include <linutil.h>                            /* Glide kbhit() and getch() */
-
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
 
 #include "video.h"
 #include "video_output.h"
 
 #include "interface.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 #define GLIDE_WIDTH 800
 #define GLIDE_HEIGHT 600

@@ -2,7 +2,7 @@
  * qt.cpp : Qt plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: qt.cpp,v 1.5 2001/12/09 17:01:37 sam Exp $
+ * $Id: qt.cpp,v 1.6 2001/12/30 07:09:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,26 +21,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME qt
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
 extern "C"
 {
-#include "common.h"                                     /* boolean_t, byte_t */
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-
-#include "modules.h"
-#include "modules_export.h"
+#include <videolan/vlc.h>
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -51,14 +40,14 @@ void _M( intf_getfunctions )( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for Qt module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
+    ADD_WINDOW( "Configuration for Qt module" )
+        ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_INTF;
-    p_module->psz_longname = "Qt interface module";
+    SET_DESCRIPTION( "Qt interface module" )
+    ADD_CAPABILITY( INTF, 80 )
+    ADD_PROGRAM( "qvlc" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

@@ -2,7 +2,7 @@
  * idct.c : C IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idct.c,v 1.18 2001/12/09 17:01:36 sam Exp $
+ * $Id: idct.c,v 1.19 2001/12/30 07:09:55 sam Exp $
  *
  * Author: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -21,28 +21,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME idct
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <stdlib.h>
 #include <string.h>
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "idct.h"
 #include "block_c.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * Local and extern prototypes.
@@ -53,14 +41,13 @@ static void idct_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for IDCT module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_IDCT;
-    p_module->psz_longname = "IDCT module";
+    SET_DESCRIPTION( "IDCT module" )
+    ADD_CAPABILITY( IDCT, 50 )
+    ADD_SHORTCUT( "c" )
+    ADD_SHORTCUT( "idct" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -77,13 +64,6 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int idct_Probe( probedata_t *p_data )
 {
-    if( TestMethod( IDCT_METHOD_VAR, "idct" )
-         || TestMethod( IDCT_METHOD_VAR, "c" ))
-    {
-        return( 999 );
-    }
-
-    /* This plugin always works */
     return( 50 );
 }
 

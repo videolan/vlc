@@ -2,7 +2,7 @@
  * adec_generic.c: MPEG audio decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec_generic.c,v 1.4 2001/12/10 04:53:11 sam Exp $
+ * $Id: mpeg_adec_generic.c,v 1.5 2001/12/30 07:09:55 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -22,14 +22,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include "defs.h"
-
 #include <string.h>                                    /* memcpy(), memset() */
 
-#include "common.h"
-#include "intf_msg.h"
-#include "threads.h"
-#include "mtime.h"
+#include <videolan/vlc.h>
 
 #include "input_ext-dec.h"
 #include "stream_control.h"
@@ -39,9 +34,6 @@
 #include "adec_math.h"                                     /* DCT32(), PCM() */
 #include "adec_layer1.h"
 #include "adec_layer2.h"
-
-#include "modules.h"
-#include "modules_export.h"     /* Used for exporting vlc symbols to plugins */
 
 int adec_Init( adec_thread_t * p_adec )
 {

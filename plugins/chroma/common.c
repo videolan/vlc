@@ -2,7 +2,7 @@
  * common.c: Chroma transformation functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: common.c,v 1.1 2001/12/16 16:18:36 sam Exp $
+ * $Id: common.c,v 1.2 2001/12/30 07:09:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -22,24 +22,15 @@
  * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
-#define MODULE_NAME yuv
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "defs.h"
-
 #include <math.h>                                            /* exp(), pow() */
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
-#include "config.h"
-#include "common.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
+#include <videolan/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
@@ -47,9 +38,6 @@
 #include "video_common.h"
 
 #include "intf_msg.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 static int     yuv_Probe      ( probedata_t *p_data );
 static int     yuv_Init       ( vout_thread_t *p_vout );

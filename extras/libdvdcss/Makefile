@@ -13,35 +13,30 @@ SOFLAGS :=
 endif
 
 #
+# C headers directories
+#
+CFLAGS := -I../../include -I../../extras $(CFLAGS)
+
+#
 # Objects
 #
-
 OBJ_C = libdvdcss.o css.o ioctl.o
-
 ALL_OBJ = $(OBJ_C) $(OBJ_LIBDVDCSS)
 
-include ../../Makefile.modules
-
-$(OBJ_C): %.o: .dep/%.d
-$(OBJ_C): %.o: %.c
-	$(CC) $(CFLAGS) $(CFLAGS_LIBDVDCSS) $(PCFLAGS) -c -o $@ $<
-
-bsdi_dvdioctl.o: ../BSDI_dvdioctl/dvdioctl.c
-	$(CC) $(CFLAGS) $(CFLAGS_LIBDVDCSS) $(PCFLAGS) -c -o $@ $<
-
-../../lib/$(FULL_SO): $(OBJ_C) $(OBJ_LIBDVDCSS)
-	$(CC) $(PCFLAGS) $(ALL_SOFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_LIBDVDCSS)
-	rm -f ../../lib/$(BASE_SO) && ln -s $(FULL_SO) ../../lib/$(BASE_SO)
-	rm -f ../../lib/$(MAJOR_SO) && ln -s $(FULL_SO) ../../lib/$(MAJOR_SO)
-
-../../lib/$(BASE_A): $(OBJ_C) $(OBJ_LIBDVDCSS)
-	ar r $@ $^
-	$(RANLIB) $@
+# 
+# Standard dependencies
+#
+C_DEP := $(ALL_OBJ:%.o=.dep/%.d)
 
 #
 # Virtual targets
 #
 all: ../../lib/$(FULL_SO) ../../lib/$(BASE_A)
+
+clean:
+	rm -f $(ALL_OBJ)
+	rm -f *.o
+	rm -rf .dep
 
 install:
 	mkdir -p $(DESTDIR)$(includedir)/videolan
@@ -58,4 +53,27 @@ uninstall:
 	rm -f $(DESTDIR)$(libdir)/$(BASE_SO)
 	rm -f $(DESTDIR)$(libdir)/$(MAJOR_SO)
 	rm -f $(DESTDIR)$(libdir)/$(FULL_SO)
+
+FORCE:
+
+$(ALL_OBJ): %.o: ../../Makefile.dep Makefile
+
+$(C_DEP): %.d: FORCE
+	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@
+
+$(OBJ_C): %.o: .dep/%.d
+$(OBJ_C): %.o: %.c
+	$(CC) $(CFLAGS) $(CFLAGS_LIBDVDCSS) $(PCFLAGS) -c -o $@ $<
+
+bsdi_dvdioctl.o: ../BSDI_dvdioctl/dvdioctl.c
+	$(CC) $(CFLAGS) $(CFLAGS_LIBDVDCSS) $(PCFLAGS) -c -o $@ $<
+
+../../lib/$(FULL_SO): $(OBJ_C) $(OBJ_LIBDVDCSS)
+	$(CC) $(PCFLAGS) $(ALL_SOFLAGS) -o $@ $^ $(PLDFLAGS) $(LIB_LIBDVDCSS)
+	rm -f ../../lib/$(BASE_SO) && ln -s $(FULL_SO) ../../lib/$(BASE_SO)
+	rm -f ../../lib/$(MAJOR_SO) && ln -s $(FULL_SO) ../../lib/$(MAJOR_SO)
+
+../../lib/$(BASE_A): $(OBJ_C) $(OBJ_LIBDVDCSS)
+	ar r $@ $^
+	$(RANLIB) $@
 

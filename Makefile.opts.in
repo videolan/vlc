@@ -67,13 +67,13 @@ includedir = @includedir@
 # Libraries for special cases
 #
 LIB_ALSA = @LIB_ALSA@
-LIB_ALTIVEC = @LIB_ALTIVEC@
 LIB_ARTS = @LIB_ARTS@
 LIB_BEOS = @LIB_BEOS@
 LIB_DARWIN = @LIB_DARWIN@
 LIB_DIRECTX = @LIB_DIRECTX@
 LIB_DVD = @LIB_DVD@
 LIB_DVD_PLUGIN = @LIB_DVD_PLUGIN@
+LIB_DVDREAD_PLUGIN = @LIB_DVDREAD_PLUGIN@
 LIB_DVDREAD = @LIB_DVDREAD@
 LIB_DVDREAD_PLUGIN = @LIB_DVDREAD_PLUGIN@
 LIB_ESD = @LIB_ESD@
@@ -82,6 +82,7 @@ LIB_GGI = @LIB_GGI@
 LIB_GLIDE = @LIB_GLIDE@
 LIB_GNOME = @LIB_GNOME@
 LIB_GTK = @LIB_GTK@
+LIB_IDCTALTIVEC = @LIB_IDCTALTIVEC@
 LIB_IMDCT = @LIB_IMDCT@
 LIB_IMDCT3DN = @LIB_IMDCT3DN@
 LIB_IMDCTSSE = @LIB_IMDCTSSE@
@@ -89,6 +90,7 @@ LIB_KDE = @LIB_KDE@
 LIB_LIBDVDCSS = @LIB_LIBDVDCSS@
 LIB_MACOSX = @LIB_MACOSX@
 LIB_MAD = @LIB_MAD@
+LIB_MOTIONALTIVEC = @LIB_MOTIONALTIVEC@
 LIB_MPEG_TS = @LIB_MPEG_TS@
 LIB_NCURSES = @LIB_NCURSES@
 LIB_QNX = @LIB_QNX@
@@ -102,15 +104,20 @@ LIB_XVIDEO = @LIB_XVIDEO@
 # CFLAGS for special cases
 #
 CFLAGS_VLC = @CFLAGS_VLC@
-CFLAGS_ALTIVEC = @CFLAGS_ALTIVEC@
+CFLAGS_ARTS = @CFLAGS_ARTS@
 CFLAGS_DVD = @CFLAGS_DVD@
 CFLAGS_DVDREAD = @CFLAGS_DVDREAD@
-CFLAGS_ARTS = @CFLAGS_ARTS@
 CFLAGS_ESD = @CFLAGS_ESD@
-CFLAGS_LIBDVDCSS = @CFLAGS_LIBDVDCSS@
-CFLAGS_ESD = @CFLAGS_ESD@
+CFLAGS_GLIDE = @CFLAGS_GLIDE@
+CFLAGS_GNOME = @CFLAGS_GNOME@
 CFLAGS_GTK = @CFLAGS_GTK@
+CFLAGS_KDE = @CFLAGS_KDE@
+CFLAGS_IDCTALTIVEC = @CFLAGS_IDCTALTIVEC@
+CFLAGS_LIBDVDCSS = @CFLAGS_LIBDVDCSS@
+CFLAGS_MACOSX = @CFLAGS_MACOSX@
 CFLAGS_MAD = @CFLAGS_MAD@
+CFLAGS_MOTIONALTIVEC = @CFLAGS_MOTIONALTIVEC@
+CFLAGS_QT = @CFLAGS_QT@
 CFLAGS_SDL = @CFLAGS_SDL@
 CFLAGS_X11 = @CFLAGS_X11@
 CFLAGS_XVIDEO = @CFLAGS_XVIDEO@
@@ -118,8 +125,8 @@ CFLAGS_XVIDEO = @CFLAGS_XVIDEO@
 #
 # Additional objects
 #
-OBJ_DVD = @OBJ_DVD@
-OBJ_LIBDVDCSS = @OBJ_LIBDVDCSS@
+SRC_DVD_EXTRA = @SRC_DVD_EXTRA@
+SRC_DVDCSS_EXTRA = @SRC_DVDCSS_EXTRA@
 
 #
 # Other special cases
@@ -166,8 +173,8 @@ LIBDVDCSS_VERSION=@LIBDVDCSS_VERSION@
 
 # DEFINE will contain some of the constants definitions decided in Makefile, 
 # including SYS_xx. It will be passed to C compiler.
-DEFINE_CONSTANTS := -DSYS_$(shell echo $(SYS) | sed -e 's/-.*//' | tr '[a-z].' '[A-Z]_')
-DEFINE += $(DEFINE_CONSTANTS)
+DEFINE_SYS := -DSYS_$(shell echo $(SYS) | sed -e 's/-.*//' | tr '[a-z].' '[A-Z]_')
+DEFINE += $(DEFINE_SYS)
 
 # On Linux and Solaris, activate 64-bit off_t (by default under BSD)
 DEFINE += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 
@@ -189,13 +196,8 @@ INCLUDE += -Iinclude -Iextras
 #
 # Libraries needed by built-in modules
 #
-# Let's go for a crude hack !
-LIB_MOTIONALTIVEC := $(LIB_ALTIVEC)
-LIB_IDCTALTIVEC := $(LIB_ALTIVEC)
-ifneq (,$(BUILTINS))
-LIB_BUILTINS := $(shell for i in ${BUILTINS} ; do echo $$i | tr '[a-z]' '[A-Z]' | sed -e 's/.*/$$LIB_&/' ; done)
+LIB_BUILTINS := $(patsubst %,$$LIB_%,$(shell echo $(BUILTINS) | tr '[a-z]' '[A-Z]'))
 LIB += $(LIB_BUILTINS)
-endif
 
 #
 # Libraries
@@ -282,17 +284,18 @@ DCFLAGS += -MM
 #
 # C compiler flags: linking
 #
-LCFLAGS += @LCFLAGS@ $(LIB)
-LCFLAGS += -Wall
+LDFLAGS += @LDFLAGS@
+LDFLAGS += $(LIB)
+LDFLAGS += -Wall
 ifneq ($(DEBUG),1)
 ifneq ($(GPROF),1)
 ifneq ($(CPROF),1)
-#LCFLAGS += -s
+#LDFLAGS += -s
 endif
 endif
 endif
 ifneq (,$(findstring mingw32,$(SYS)))
-LCFLAGS += -mwindows -Xlinker --force-exe-suffix
+LDFLAGS += -mwindows -Xlinker --force-exe-suffix
 endif
 
 #
@@ -312,7 +315,7 @@ endif
 #
 # C compiler flags: plugin linking
 #
-PLCFLAGS += @PLCFLAGS@
+PLDFLAGS += @PLDFLAGS@
 
 #
 # Debugging and profiling support
