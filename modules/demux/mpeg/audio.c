@@ -2,7 +2,7 @@
  * audio.c : mpeg audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.14 2003/03/14 00:24:08 sigmunau Exp $
+ * $Id: audio.c,v 1.15 2003/03/23 12:12:32 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -378,6 +378,7 @@ static void ExtractXingHeader( input_thread_t *p_input,
     if( ( p_xh->i_flags&FRAMES_FLAG )&&( i_size >= 4 ) )
     {
         p_xh->i_frames = GetDWBE( p_peek );
+        if( p_xh->i_frames == 0 ) p_xh->i_flags &= ~FRAMES_FLAG;
         p_peek += 4;
         i_size -= 4;
     }
@@ -385,6 +386,7 @@ static void ExtractXingHeader( input_thread_t *p_input,
 
     {
         p_xh->i_bytes = GetDWBE( p_peek );
+        if( p_xh->i_bytes == 0 ) p_xh->i_flags &= ~BYTES_FLAG;
         p_peek += 4;
         i_size -= 4;
     }
