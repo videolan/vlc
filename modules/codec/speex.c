@@ -2,7 +2,7 @@
  * speex.c: speex decoder/packetizer/encoder module making use of libspeex.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: speex.c,v 1.11 2004/01/29 17:51:07 zorglub Exp $
+ * $Id: speex.c,v 1.12 2004/01/29 19:38:17 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -464,6 +464,7 @@ static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
         input_InfoCategory( p_input, _("Speex comment") );
     playlist_t *p_playlist = vlc_object_find( p_dec, VLC_OBJECT_PLAYLIST,
                                               FIND_ANYWHERE );
+    playlist_item_t *p_item;
 
     char *p_buf = (char *)p_oggpacket->packet;
     SpeexMode *p_mode;

@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: win32_specific.c,v 1.33 2004/01/29 17:51:08 zorglub Exp $
+ * $Id: win32_specific.c,v 1.34 2004/01/29 19:38:17 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -297,7 +297,7 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
 
         if( pwm_data->lpData )
         {
-            int i_argc, i_data, i_opt, i_options,i_id,i_pos,j;
+            int i_argc, i_data, i_opt, i_options;
             char **ppsz_argv;
             char *p_data = (char *)pwm_data->lpData;
 
@@ -321,11 +321,13 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                 {
                     i_options++;
                 }
-                i_id = playlist_Add( p_playlist, ppsz_argv[ i_opt ],
-                              ppsz_argv[ i_opt ],
-                              PLAYLIST_APPEND | (i_opt? 0 : PLAYLIST_GO),
-                              PLAYLIST_END, -1,
-                              ppsz_argv[i_opt+1], i_options );
+
+                playlist_AddExt( p_playlist, ppsz_argv[i_opt],ppsz_argv[i_opt],
+                    PLAYLIST_APPEND | (i_opt? 0 : PLAYLIST_GO),
+                    PLAYLIST_END, -1,
+                    (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
+                    i_options );
+
                 i_opt += i_options;
             }
 
