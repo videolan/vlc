@@ -43,6 +43,7 @@ export LIBRARY_PATH = $(PREFIX)/lib:%A/lib:/boot/home/config/lib:/boot/beos/syst
 export BELIBRARIES = $(PREFIX)/lib:/boot/develop/lib/x86
 export C_INCLUDE_PATH = $(PREFIX)/include
 export CPLUS_INCLUDE_PATH = $(PREFIX)/include
+export LDFLAGS = -lnet
 endif
 
 # ***************************************************************************
