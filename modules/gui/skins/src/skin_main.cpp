@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.11 2003/04/18 16:04:17 asmax Exp $
+ * $Id: skin_main.cpp,v 1.12 2003/04/20 20:28:39 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -23,6 +23,8 @@
  * USA.
  *****************************************************************************/
 
+//--- GENERAL ---------------------------------------------------------------
+#include <wx/wx.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/vlc.h>
@@ -41,6 +43,7 @@
 #include "themeloader.h"
 #include "vlcproc.h"
 #include "skin_common.h"
+#include "wxdialogs.h"
 
 
 //---------------------------------------------------------------------------
@@ -133,8 +136,6 @@ static void Close ( vlc_object_t *p_this )
     // Unsuscribe to messages bank
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
-
-
     // Destroy structure
     free( p_intf->p_sys );
 }
@@ -145,7 +146,6 @@ static void Close ( vlc_object_t *p_this )
 //---------------------------------------------------------------------------
 static void Run( intf_thread_t *p_intf )
 {
-
 #if !defined WIN32
 /* FIXME: should be elsewhere ? */
     // Initialize GDK
@@ -227,7 +227,6 @@ static void Run( intf_thread_t *p_intf )
     // Refresh the whole interface
     OSAPI_PostMessage( NULL, VLC_INTF_REFRESH, 0, (int)true );
 
-    // Run interface message loop
     OSRun( p_intf );
 }
 
@@ -281,7 +280,7 @@ int SkinManage( intf_thread_t *p_intf )
     OSAPI_PostMessage( NULL, VLC_INTF_REFRESH, 0, (long)false );
 
     // Update the log window
-    //p_intf->p_sys->p_theme->UpdateLog( p_intf->p_sys->p_sub );
+    p_intf->p_sys->MessagesDlg->UpdateLog();
 
     //-------------------------------------------------------------------------
     if( p_intf->p_sys->p_input != NULL && !p_intf->p_sys->p_input->b_die )
@@ -350,4 +349,3 @@ int SkinManage( intf_thread_t *p_intf )
 
     return( VLC_TRUE );
 }
-//---------------------------------------------------------------------------

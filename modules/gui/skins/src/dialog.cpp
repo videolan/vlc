@@ -2,7 +2,7 @@
  * dialog.cpp: Classes for some dialog boxes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialog.cpp,v 1.3 2003/04/12 21:43:27 asmax Exp $
+ * $Id: dialog.cpp,v 1.4 2003/04/20 20:28:39 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -48,87 +48,6 @@ OpenFileDialog::OpenFileDialog( intf_thread_t *_p_intf, string title,
 OpenFileDialog::~OpenFileDialog()
 {
     delete[] Filter;
-}
-//---------------------------------------------------------------------------
-
-
-
-
-//---------------------------------------------------------------------------
-// Log Window
-//---------------------------------------------------------------------------
-LogWindow::LogWindow( intf_thread_t *_p_intf )
-{
-    p_intf = _p_intf;
-    Visible = false;
-}
-//---------------------------------------------------------------------------
-LogWindow::~LogWindow()
-{
-}
-//---------------------------------------------------------------------------
-void LogWindow::Update( msg_subscription_t *Sub )
-{
-    //if( !Visible )
-    //    return;
-
-    int i_start, i_stop;
-    int i_max_lines;
-
-    vlc_mutex_lock( Sub->p_lock );
-    i_stop = *Sub->pi_stop;
-    vlc_mutex_unlock( Sub->p_lock );
-
-    if( Sub->i_start != i_stop )
-    {
-        for( i_start = Sub->i_start;
-             i_start != i_stop;
-             i_start = (i_start+1) % VLC_MSG_QSIZE )
-        {
-
-
-/* FIXME: kludge */
-#ifdef WIN32
-            // Append all messages to log window
-            switch( Sub->p_msg[i_start].i_type )
-            {
-                case VLC_MSG_ERR:
-                    ChangeColor( RGB( 255, 0, 0 ), true );
-                    break;
-                case VLC_MSG_WARN:
-                    ChangeColor( RGB( 255, 128, 0 ), true );
-                    break;
-                default:
-                    ChangeColor( RGB( 128, 128, 128 ) );
-                    break;
-#else
-  fprintf(stderr, "WARNING: FIXME in dialog.cpp");
-            // Append all messages to log window
-            switch( Sub->p_msg[i_start].i_type )
-            {
-                case VLC_MSG_ERR:
- //                   ChangeColor( RGB( 255, 0, 0 ), true );
-                    break;
-                case VLC_MSG_WARN:
-//                    ChangeColor( RGB( 255, 128, 0 ), true );
-                    break;
-                default:
-//                    ChangeColor( RGB( 128, 128, 128 ) );
-                    break;
-#endif
-            }
-
-            // Add message
-            if( i_max_lines )
-            {
-                AddLine( (string)Sub->p_msg[i_start].psz_msg );
-            }
-        }
-
-        vlc_mutex_lock( Sub->p_lock );
-        Sub->i_start = i_start;
-        vlc_mutex_unlock( Sub->p_lock );
-    }
 }
 //---------------------------------------------------------------------------
 

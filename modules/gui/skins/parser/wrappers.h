@@ -2,7 +2,7 @@
  * wrappers.h: Wrappers around C++ objects
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: wrappers.h,v 1.3 2003/03/19 17:14:50 karibu Exp $
+ * $Id: wrappers.h,v 1.4 2003/04/20 20:28:39 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -46,7 +46,7 @@ extern "C" {
 //---------------------------------------------------------------------------
     void AddThemeInfo( char *name, char *author, char *email,
                        char *webpage );
-    void StartTheme( char *log, char *magnet );
+    void StartTheme( char *magnet );
     void EndTheme();
 
 //---------------------------------------------------------------------------

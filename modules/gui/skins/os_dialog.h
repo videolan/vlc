@@ -2,7 +2,7 @@
  * os_dialog.h: Wrapper for the common dialogs
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_dialog.h,v 1.3 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: os_dialog.h,v 1.4 2003/04/20 20:28:39 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -27,11 +27,9 @@
 #if defined( WIN32 )
     #include "win32/win32_dialog.h"
     #define OSOpenFileDialog Win32OpenFileDialog
-    #define OSLogWindow Win32LogWindow
-#else    
+#else
     #include "gtk2/gtk2_dialog.h"
     #define OSOpenFileDialog GTK2OpenFileDialog
-    #define OSLogWindow GTK2LogWindow
 #endif
 
 

@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.13 2003/04/06 01:00:07 massiot Exp $
+ * $Id: open.cpp,v 1.14 2003/04/20 20:28:40 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -49,7 +49,12 @@
 
 #include <vlc/intf.h>
 
-#include "wxwindows.h"
+#if defined MODULE_NAME_IS_skins
+#   include "../skins/src/skin_common.h"
+#   include "../skins/src/wxdialogs.h"
+#else
+#   include "wxwindows.h"
+#endif
 
 #ifndef wxRB_SINGLE
 #   define wxRB_SINGLE 0
@@ -672,12 +677,14 @@ void OpenDialog::OnSoutEnable( wxCommandEvent& event )
 void OpenDialog::OnSoutSettings( wxCommandEvent& WXUNUSED(event) )
 {
     /* Show/hide the open dialog */
+#if !defined MODULE_NAME_IS_skins
     SoutDialog dialog( p_intf, p_main_interface );
 
     if( dialog.ShowModal() == wxID_OK )
     {
         config_PutPsz( p_intf, "sout", (char *)dialog.mrl.c_str() );
     }
+#endif
 }
 
 /*****************************************************************************

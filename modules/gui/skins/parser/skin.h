@@ -1,5 +1,5 @@
 /* XML processor/application API for skin.dtd (Id: skin.dtd,v 1.3 2003/03/19 17:14:50 karibu Exp).
- * Generated 2003/04/08 20:19:55.
+ * Generated 2003/04/20 20:23:13.
  *
  * This program was generated with the FleXML XML processor generator,
  * (Id: flexml.pl,v 1.24 1999/12/13 16:18:30 krisrose Exp).
@@ -174,8 +174,6 @@ typedef char* AT_PlayListControl_abs;
 #define AU_PlayListControl_abs NULL
 typedef char* AT_ImageControl_visible;
 #define AU_ImageControl_visible NULL
-typedef char* AT_Theme_log;
-#define AU_Theme_log NULL
 typedef char* AT_PlayListControl_width;
 #define AU_PlayListControl_width NULL
 typedef char* AT_SliderControl_help;
@@ -350,7 +348,6 @@ extern AT_ControlGroup_y A_ControlGroup_y;
 extern AT_PlayListControl_longfilename A_PlayListControl_longfilename;
 extern AT_PlayListControl_abs A_PlayListControl_abs;
 extern AT_ImageControl_visible A_ImageControl_visible;
-extern AT_Theme_log A_Theme_log;
 extern AT_PlayListControl_width A_PlayListControl_width;
 extern AT_SliderControl_help A_SliderControl_help;
 extern AT_ButtonControl_help A_ButtonControl_help;

@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.9 2003/04/17 16:32:14 karibu Exp $
+ * $Id: vlcproc.cpp,v 1.10 2003/04/20 20:28:39 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -23,6 +23,7 @@
  * USA.
  *****************************************************************************/
 
+#include <wx/wx.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/vlc.h>
@@ -43,6 +44,7 @@
 #include "window.h"
 #include "vlcproc.h"
 #include "skin_common.h"
+#include "wxdialogs.h"
 
 
 
@@ -129,11 +131,13 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_LOG_SHOW:
-            p_intf->p_sys->p_theme->ShowLog( evt->GetParam2() );
+//            p_intf->p_sys->p_theme->ShowLog( evt->GetParam2() );
+            p_intf->p_sys->MessagesDlg->Show(
+                !p_intf->p_sys->MessagesDlg->IsShown() );
             return true;
 
         case VLC_LOG_CLEAR:
-            p_intf->p_sys->p_theme->ClearLog();
+//            p_intf->p_sys->p_theme->ClearLog();
             return true;
 
         case VLC_INTF_REFRESH:
@@ -383,51 +387,39 @@ void VlcProc::LoadSkin()
 //---------------------------------------------------------------------------
 void VlcProc::OpenFile( bool play )
 {
-    // Initialize file structure
-    OpenFileDialog *OpenFile;
+    if( p_intf->p_sys->OpenDlg->ShowModal() != wxID_OK )
+    {
+        return;
+    }
+
+    // Check if playlist is available
+    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
     if( play )
     {
-        OpenFile = (OpenFileDialog *)new OSOpenFileDialog( p_intf,
-            _("Open file"), false );
+        // Append and play
+        playlist_Add( p_playlist,
+                      (char *)p_intf->p_sys->OpenDlg->mrl.c_str(),
+                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+
+        p_intf->p_sys->p_theme->EvtBank->Get( "play" )->SendEvent();
     }
     else
     {
-        OpenFile = (OpenFileDialog *)new OSOpenFileDialog( p_intf,
-            _("Add file"), true );
-    }
-    OpenFile->AddFilter( _("All files"), "*.*" );
-
-    // Check if palylist is available
-    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
-    if( p_playlist == NULL )
-        return;
-
-    // Open dialog box and launch file
-    if( OpenFile->Open() )
-    {
-        list<string>::const_iterator file;
-        for( file = OpenFile->FileList.begin();
-             file != OpenFile->FileList.end(); file++ )
-        {
-            playlist_Add( p_playlist, (*file).c_str(), PLAYLIST_APPEND,
-                          PLAYLIST_END );
-        }
-
-        // Refreshing
-        if( play )
-        {
-            // Play
-            p_intf->p_sys->p_theme->EvtBank->Get( "play" )->SendEvent();
-        }
-
-        // Refresh interface !
-        p_intf->p_sys->p_theme->EvtBank->Get( "playlist_refresh" )
-            ->PostSynchroMessage();
-        InterfaceRefresh();
+        // Append only
+        playlist_Add( p_playlist,
+                        (char *)p_intf->p_sys->OpenDlg->mrl.c_str(),
+                        PLAYLIST_APPEND, PLAYLIST_END );
     }
 
-    // Free memory
-    delete OpenFile;
+    // Refresh interface !
+    p_intf->p_sys->p_theme->EvtBank->Get( "playlist_refresh" )
+        ->PostSynchroMessage();
+    InterfaceRefresh();
 }
 //---------------------------------------------------------------------------
 void VlcProc::DropFile( unsigned int param )

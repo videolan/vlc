@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: messages.cpp,v 1.3 2003/04/06 16:30:43 gbazin Exp $
+ * $Id: messages.cpp,v 1.4 2003/04/20 20:28:40 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -45,7 +45,12 @@
 
 #include <vlc/intf.h>
 
-#include "wxwindows.h"
+#if defined MODULE_NAME_IS_skins
+#   include "../skins/src/skin_common.h"
+#   include "../skins/src/wxdialogs.h"
+#else
+#   include "wxwindows.h"
+#endif
 
 /*****************************************************************************
  * Event Table.

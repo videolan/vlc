@@ -2,7 +2,7 @@
  * theme.cpp: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.8 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: theme.cpp,v 1.9 2003/04/20 20:28:39 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -54,7 +54,6 @@ Theme::Theme( intf_thread_t *_p_intf )
     FntBank = new FontBank( p_intf );
     EvtBank = new EventBank( p_intf );
     OffBank = new OffSetBank( p_intf );
-    Log = NULL;
     ConstructPlaylist = false;
 
     ShowInTray    = false;
@@ -70,7 +69,6 @@ Theme::~Theme()
     {
         delete (OSWindow *)(*win);
     }
-    delete (OSLogWindow *)Log;
     delete OffBank;
     delete EvtBank;
     delete BmpBank;
@@ -183,13 +181,9 @@ void Theme::SaveConfig()
 
 }
 //---------------------------------------------------------------------------
-void Theme::StartTheme( bool log, int magnet )
+void Theme::StartTheme( int magnet )
 {
     Magnet = magnet;
-    if( log )
-    {
-        Log = (LogWindow *)new OSLogWindow( p_intf );
-    }
 }
 //---------------------------------------------------------------------------
 void Theme::InitTheme()
@@ -402,40 +396,6 @@ void Theme::CheckAnchors()
         HangToAnchors( (*win), x, y, true );
         (*win)->Move( x, y );
     }
-}
-//---------------------------------------------------------------------------
-void Theme::UpdateLog( msg_subscription_t *Sub )
-{
-    if( Log != NULL )
-        Log->Update( Sub );
-}
-//---------------------------------------------------------------------------
-void Theme::ShowLog( int show )
-{
-    if( Log == NULL )
-        return;
-
-    if( show == 1 )
-    {
-        Log->Show();
-    }
-    else if( show == 0 )
-    {
-        Log->Hide();
-    }
-    else if( show == 2 )
-    {
-        if( Log->IsVisible() )
-            Log->Hide();
-        else
-            Log->Show();
-    }
-}
-//---------------------------------------------------------------------------
-void Theme::ClearLog()
-{
-    if( Log!= NULL )
-        Log->Clear();
 }
 //---------------------------------------------------------------------------
 

@@ -58,6 +58,7 @@ SOURCES_skins = \
 	modules/gui/skins/src/vlcproc.h \
 	modules/gui/skins/src/window.cpp \
 	modules/gui/skins/src/window.h \
+	modules/gui/skins/src/wxdialogs.h \
 	\
 	modules/gui/skins/win32/win32_api.cpp \
 	modules/gui/skins/win32/win32_bitmap.cpp \
@@ -96,6 +97,9 @@ SOURCES_skins = \
 	modules/gui/skins/gtk2/gtk2_theme.h \
 	modules/gui/skins/gtk2/gtk2_window.cpp \
 	modules/gui/skins/gtk2/gtk2_window.h \
+	\
+	modules/gui/wxwindows/messages.cpp \
+	modules/gui/wxwindows/open.cpp \
 	$(NULL)
 
 EXTRA_DIST += \

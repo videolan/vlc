@@ -2,7 +2,7 @@
  * theme.h: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: theme.h,v 1.2 2003/04/20 20:28:39 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -40,7 +40,6 @@ class BitmapBank;
 class FontBank;
 class Event;
 class OffSetBank;
-class LogWindow;
 
 //---------------------------------------------------------------------------
 class Theme
@@ -48,7 +47,6 @@ class Theme
     private:
 
     protected:
-        LogWindow *Log;
         int  Magnet;
         intf_thread_t *p_intf;
 
@@ -58,7 +56,7 @@ class Theme
     public:
         // Constructors
         Theme( intf_thread_t *_p_intf );
-        void StartTheme( bool log, int magnet );
+        void StartTheme( int magnet );
 
         // Destructor
         virtual ~Theme();
@@ -90,12 +88,6 @@ class Theme
         bool MoveSkinMagnet( Window *wnd, int left, int top );
         void MoveSkin( Window *wnd, int left, int top );
         void CheckAnchors();
-
-        // Log window
-        LogWindow *GetLogWindow()   { return Log; };
-        void UpdateLog( msg_subscription_t *Sub );
-        void ShowLog( int show );
-        void ClearLog();
 
         bool ConstructPlaylist;
 

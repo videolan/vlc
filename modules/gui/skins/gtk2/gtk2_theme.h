@@ -2,7 +2,7 @@
  * gtk2_theme.h: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.h,v 1.2 2003/04/13 17:46:22 asmax Exp $
+ * $Id: gtk2_theme.h,v 1.3 2003/04/20 20:28:39 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -39,7 +39,6 @@ class Window;
 class EventBank;
 class BitmapBank;
 class FontBank;
-class LogWindow;
 
 //---------------------------------------------------------------------------
 class GTK2Theme : public Theme
@@ -62,8 +61,7 @@ class GTK2Theme : public Theme
         virtual ~GTK2Theme();
 /*
         // Specific windows methods
-        HINSTANCE getInstance()       { return hinst; }
-        HWND      GetLogHandle();*/
+        HINSTANCE getInstance()       { return hinst; } */
         GdkWindow *GetParentWindow()   { return ParentWindow; }
 
         // !!!

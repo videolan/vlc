@@ -1,6 +1,6 @@
 /* XML application for skin.dtd (Id: skin.dtd,v 1.3 2003/03/19 17:14:50 karibu Exp).
  * Includes actions from skin.act.
- * Generated 2003/04/08 20:19:55.
+ * Generated 2003/04/20 20:23:13.
  *
  * This program was generated with the FleXML XML processor generator,
  * (Id: flexml.pl,v 1.24 1999/12/13 16:18:30 krisrose Exp).
@@ -226,7 +226,7 @@ void STag_Theme(void)
 #line 141 "skin.act"
 
         
-            StartTheme( A_Theme_log, A_Theme_magnet );
+            StartTheme( A_Theme_magnet );
         
     
 } /* STag_Theme */

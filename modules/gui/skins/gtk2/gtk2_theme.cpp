@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.19 2003/04/20 16:16:34 asmax Exp $
+ * $Id: gtk2_theme.cpp,v 1.20 2003/04/20 20:28:39 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -99,10 +99,6 @@ GTK2Theme::~GTK2Theme()
     if( GetClassInfo( hinst, "SkinWindow", &wndclass ) )
     {
         UnregisterClass( "SkinWindow", hinst );
-    }
-    if( GetClassInfo( hinst, "LogWindow", &wndclass ) )
-    {
-        UnregisterClass( "LogWindow", hinst );
     }
     if( GetClassInfo( hinst, "ParentWindow", &wndclass ) )
     {
@@ -268,14 +264,6 @@ void GTK2Theme::AddWindow( string name, int x, int y, bool visible,
         fadetime, alpha, movealpha, dragdrop, name ) ) ;
 
 }
-//---------------------------------------------------------------------------
-/*HWND GTK2Theme::GetLogHandle()
-{
-    if( Log != NULL )
-        return ( (GTK2LogWindow *)Log )->GetWindow();
-    else
-        return NULL;
-}*/
 //---------------------------------------------------------------------------
 void GTK2Theme::ChangeTray()
 {/*

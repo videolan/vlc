@@ -2,7 +2,7 @@
  * wrappers.cpp: Wrappers around C++ objects
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: wrappers.cpp,v 1.8 2003/04/17 15:43:30 karibu Exp $
+ * $Id: wrappers.cpp,v 1.9 2003/04/20 20:28:39 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -94,10 +94,9 @@ void EndWindow()
 {
 }
 //---------------------------------------------------------------------------
-void StartTheme( char *log, char *magnet )
+void StartTheme( char *magnet )
 {
-    g_pIntf->p_sys->p_theme->StartTheme( ConvertBoolean( log ),
-        atoi( magnet ) );
+    g_pIntf->p_sys->p_theme->StartTheme( atoi( magnet ) );
 }
 //---------------------------------------------------------------------------
 void EndTheme()

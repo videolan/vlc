@@ -2,7 +2,7 @@
  * win32_theme.h: Win32 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_theme.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: win32_theme.h,v 1.3 2003/04/20 20:28:39 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -41,7 +41,6 @@ class Window;
 class EventBank;
 class BitmapBank;
 class FontBank;
-class LogWindow;
 
 //---------------------------------------------------------------------------
 class Win32Theme : public Theme
@@ -65,7 +64,6 @@ class Win32Theme : public Theme
 
         // Specific windows methods
         HINSTANCE getInstance()       { return hinst; }
-        HWND      GetLogHandle();
         HWND      GetParentWindow()   { return ParentWindow; }
 
         // !!!

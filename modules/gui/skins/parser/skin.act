@@ -4,7 +4,7 @@
  * skin.act: FleXML actions file
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin.act,v 1.3 2003/03/19 17:14:50 karibu Exp $
+ * $Id: skin.act,v 1.4 2003/04/20 20:28:39 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -140,7 +140,7 @@
     </end>
     <start tag="Theme">
         <![CDATA[
-            StartTheme( {log}, {magnet} );
+            StartTheme( {magnet} );
         ]]>
     </start>
     <end tag="Theme">

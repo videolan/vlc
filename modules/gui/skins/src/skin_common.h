@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: skin_common.h,v 1.2 2003/04/20 20:28:39 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -32,33 +32,41 @@
 
 
 class Theme;
+class wxIcon;
+class OpenDialog;
+class Messages;
 
-/*****************************************************************************
- * intf_sys_t: description and status of skin interface
- *****************************************************************************/
+//---------------------------------------------------------------------------
+// intf_sys_t: description and status of skin interface
+//---------------------------------------------------------------------------
 struct intf_sys_t
 {
-    /* Pointer to the theme main class */
+    // Pointer to the theme main class
     Theme *p_theme;
     char *p_new_theme_file;
 
-    /* The input thread */
-    input_thread_t  * p_input;
+    // The input thread
+    input_thread_t *p_input;
 
-    /* The playlist thread */
-    playlist_t * p_playlist;
+    // The playlist thread
+    playlist_t *p_playlist;
 
     // Check if thread is closing
     int  i_close_status;
     bool b_all_win_closed;
 
-    /* message bank subscription */
-    msg_subscription_t* p_sub;
+    // message bank subscription
+    msg_subscription_t *p_sub;
 
     // Interface status
     int         i_index;        // Set wich file is being played
     int         i_size;         // Size of playlist;
 
+    wxIcon *p_icon;
+
+    // Dialogs
+    OpenDialog *OpenDlg;
+    Messages   *MessagesDlg;
 };
 
 #endif

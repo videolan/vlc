@@ -2,7 +2,7 @@
  * gtk2_dialog.h: GTK2 implementation of some dialog boxes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_dialog.h,v 1.1 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_dialog.h,v 1.2 2003/04/20 20:28:39 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -49,32 +49,6 @@ class GTK2OpenFileDialog : OpenFileDialog
 
         virtual void AddFilter( string name, string type );
         virtual bool Open();
-};
-//---------------------------------------------------------------------------
-class GTK2LogWindow : LogWindow
-{
-    private:
-/*        HWND hWindow;
-        HWND hRichCtrl;
-        string RtfHeader;*/
-
-    public:
-        // Constructors
-        GTK2LogWindow( intf_thread_t *_p_intf );
-
-        // Destructors
-        virtual ~GTK2LogWindow();
-
-        virtual void Clear();
-        virtual void AddLine( string line );
-        virtual void ChangeColor( int color, bool bold = false );
-        virtual void Show();
-        virtual void Hide();
-/*
-        // Specific methods
-        HWND GetRichCtrl() { return hRichCtrl; };
-        HWND GetWindow()   { return hWindow; };*/
-
 };
 //---------------------------------------------------------------------------
 
