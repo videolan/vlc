@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.10 2003/03/01 19:25:13 gbazin Exp $
+##  $Id: toolbox,v 1.11 2003/03/03 16:49:14 gbazin Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -118,7 +118,7 @@ then
       cat >> ${target} << EOF
 # Begin Source File${M}
 SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
-# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\"plugins\\" /D DATA_PATH=\\"share\\"${M}
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\".\\" /D DATA_PATH=\\"share\\"${M}
 # End Source File${M}
 EOF
     done
@@ -134,7 +134,7 @@ EOF
         cat >> ${target} << EOF
 # Begin Source File${M}
 SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
-# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\"plugins\\" /D DATA_PATH=\\"share\\"${M}
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\".\\" /D DATA_PATH=\\"share\\"${M}
 !IF "\$(CFG)" == "libvlc - Win32 (WCE MIPS) Release"${M}
 # PROP Output_Dir "MIPSRel\\${subdir}"${M}
 # PROP Intermediate_Dir "MIPSRel\\${subdir}"${M}
@@ -172,7 +172,7 @@ EOF
           cat >> ${target} << EOF
 # Begin Source File${M}
 SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
-# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\"plugins\\" /D DATA_PATH=\\"share\\"${M}
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\".\\" /D DATA_PATH=\\"share\\"${M}
 !IF "\$(CFG)" == "libvlc - Win32 Release"${M}
 # PROP Output_Dir "Release\\${subdir}"${M}
 # PROP Intermediate_Dir "Release\\${subdir}"${M}

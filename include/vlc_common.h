@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.55 2003/02/28 04:31:24 ipkiss Exp $
+ * $Id: vlc_common.h,v 1.56 2003/03/03 16:49:14 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -610,8 +610,17 @@ typedef __int64 off_t;
 #       define off_t unsigned __int64
 #   endif
 
+#   ifdef lseek
+#       undef lseek
+#       define lseek _lseeki64
+#   endif
+
 #   ifndef O_NONBLOCK
 #       define O_NONBLOCK 0
+#   endif
+
+#   ifndef alloca
+#       define alloca _alloca
 #   endif
 
     /* These two are not defined in mingw32 (bug?) */

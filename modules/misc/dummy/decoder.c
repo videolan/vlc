@@ -2,7 +2,7 @@
  * dec_dummy.c: dummy decoder plugin for vlc.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: decoder.c,v 1.4 2002/11/18 18:05:13 sam Exp $
+ * $Id: decoder.c,v 1.5 2003/03/03 16:49:14 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -29,6 +29,8 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h> /* write(), close() */
+#elif defined( WIN32 ) && !defined( UNDER_CE )
+#   include <io.h>
 #endif
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h> /* open() */

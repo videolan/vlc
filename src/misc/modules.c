@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.114 2003/02/18 22:40:39 ipkiss Exp $
+ * $Id: modules.c,v 1.115 2003/03/03 16:49:14 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -565,7 +565,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     path[ sizeof(path)/sizeof(char*) - 2 ] = config_GetPsz( p_this,
                                                             "plugin-path" );
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
+#if defined( WIN32 ) && !defined( UNDER_CE ) && !defined( _MSC_VER )
     /* If there is no 'plugins' nor 'modules' subdirectory, the user may have
      * screwed up the unzipping stage, so we look into '.' instead */
     if( !opendir( "plugins" ) && !opendir( "modules" )
@@ -642,8 +642,12 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
                                int i_maxdepth )
 {
+#if defined( UNDER_CE ) || defined( _MSC_VER )
 #ifdef UNDER_CE
     MYCHAR psz_path[MAX_PATH + 256];
+#else
+    char psz_path[MAX_PATH + 256];
+#endif
     WIN32_FIND_DATA finddata;
     HANDLE handle;
     unsigned int rc;
@@ -659,7 +663,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
         return;
     }
 
-#ifdef UNDER_CE
+#if defined( UNDER_CE ) || defined( _MSC_VER )
     rc = GetFileAttributes( psz_dir );
     if( !(rc & FILE_ATTRIBUTE_DIRECTORY) )
     {
@@ -668,7 +672,11 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
     }
 
     /* Parse all files in the directory */
+#ifdef UNDER_CE
     swprintf( psz_path, L"%s\\*.*", psz_dir );
+#else
+    sprintf( psz_path, "%s\\*.*", psz_dir );
+#endif
     handle = FindFirstFile( psz_path, &finddata );
     if( handle == INVALID_HANDLE_VALUE )
     {
@@ -679,15 +687,33 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
     /* Parse the directory and try to load all files it contains. */
     do
     {
+#ifdef UNDER_CE
         unsigned int i_len = wcslen( finddata.cFileName );
-
         swprintf( psz_path, L"%s\\%s", psz_dir, finddata.cFileName );
+#else
+        unsigned int i_len = strlen( finddata.cFileName );
+        /* Skip ".", ".." and anything starting with "." */
+        if( !*finddata.cFileName || *finddata.cFileName == '.' )
+        {
+            if( !FindNextFile( handle, &finddata ) ) break;
+            continue;
+        }
+        sprintf( psz_path, "%s\\%s", psz_dir, finddata.cFileName );
+#endif
 
         if( GetFileAttributes( psz_path ) & FILE_ATTRIBUTE_DIRECTORY )
         {
             AllocatePluginDir( p_this, psz_path, i_maxdepth - 1 );
         }
-        else if( i_len > strlen( LIBEXT ) )
+        else if( i_len > strlen( LIBEXT )
+#ifdef UNDER_CE
+                )
+#else
+                  /* We only load files ending with LIBEXT */
+                  && !strncasecmp( psz_path + strlen( psz_path)
+                                   - strlen( LIBEXT ),
+                                   LIBEXT, strlen( LIBEXT ) ) )
+#endif
         {
             AllocatePluginFile( p_this, psz_path );
         }
