@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.13 2003/04/22 12:54:49 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.14 2003/04/22 23:31:07 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -390,6 +390,9 @@ static void CloseDecoder( dec_thread_t * p_dec )
                 if( p_dec->p_vout->render.pp_picture[i_pic]->i_status ==
                       RESERVED_PICTURE )
                     vout_DestroyPicture( p_dec->p_vout,
+                                     p_dec->p_vout->render.pp_picture[i_pic] );
+                if( p_dec->p_vout->render.pp_picture[i_pic]->i_refcount > 0 )
+                    vout_UnlinkPicture( p_dec->p_vout,
                                      p_dec->p_vout->render.pp_picture[i_pic] );
             }
 
