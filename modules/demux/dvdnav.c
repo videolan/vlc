@@ -52,17 +52,11 @@ vlc_module_begin();
     add_integer( "dvdnav-caching", DEFAULT_PTS_DELAY / 1000, NULL,
         CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     set_capability( "access_demux", 0 );
+    add_shortcut( "dvd" );
     add_shortcut( "dvdnav" );
     add_shortcut( "dvdnavsimple" );
     set_callbacks( Open, Close );
 vlc_module_end();
-
-/* TODO
- *  - use dvdnav_get_next_cache_block/dvdnav_free_cache_block
- *  - all
- *  - once done the new input API remove the pseudo access
- *  - ...
- */
 
 /* Shall we use libdvdnav's read ahead cache? */
 #define DVD_READ_CACHE 1
@@ -586,7 +580,7 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "     - domain=%d", event->new_domain );
 
         /* dvdnav_get_video_aspect / dvdnav_get_video_scale_permission */
-        /* TODO check if we alsways have VTS and CELL */
+        /* TODO check if we always have VTS and CELL */
         p_sys->i_aspect = dvdnav_get_video_aspect( p_sys->dvdnav );
 
         /* reset PCR */
