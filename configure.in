@@ -1,0 +1,59 @@
+dnl Autoconf settings for vlc
+AC_INIT(src/interface/main.c)
+AC_CONFIG_HEADER(include/defs.h)
+AC_CANONICAL_HOST
+
+VLC_VERSION=0.1.99
+AC_SUBST(VLC_VERSION)
+VLC_CODENAME=Onatopp
+AC_SUBST(VLC_CODENAME)
+
+dnl Check for tools
+AC_PROG_MAKE_SET
+AC_PROG_CC
+AC_PROG_CPP
+
+dnl AM_PROG_LIBTOOL
+AC_PROG_INSTALL
+
+dnl Check for compiler environment
+AC_C_CONST
+AC_C_BIGENDIAN
+
+dnl Check for system libs needed
+AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol)
+AC_CHECK_FUNCS(setenv putenv)
+AC_CHECK_FUNC(connect,,[AC_CHECK_LIB(socket,connect)])
+AC_CHECK_FUNC(gethostbyname,,[AC_CHECK_LIB(nsl,gethostbyname)])
+AC_CHECK_FUNC(nanosleep,,[AC_CHECK_LIB(rt,nanosleep,,[AC_CHECK_LIB(posix4,nanosleep)])])
+AC_CHECK_FUNCS(usleep)
+AC_CHECK_FUNC(inet_aton,,[AC_CHECK_LIB(resolv,inet_aton)])
+AC_FUNC_MMAP
+AC_FUNC_VPRINTF
+AC_TYPE_SIGNAL
+AC_CHECK_LIB(dl, dlopen)
+AC_CHECK_LIB(gnugetopt, optarg)
+AC_CHECK_LIB(be, _)
+AC_CHECK_LIB(game, _)
+AC_CHECK_LIB(root, _)
+AC_CHECK_LIB(m, powl)
+AC_CHECK_LIB(pthread, pthread_create)
+AC_CHECK_LIB(threads, thread_create)
+
+dnl check for getopt_long, substitute the distributed versions if not
+AC_CHECK_FUNC(getopt_long,,[LIBOBJS="$LIBOBJS getopt.o getopt1.o"])
+AC_SUBST(LIBOBJS)
+
+AC_CHECK_HEADERS(fcntl.h sys/ioctl.h sys/time.h unistd.h)
+AC_CHECK_HEADERS(sys/soundcard.h machine/soundcard.h)
+
+dnl Check for threads library
+AC_CHECK_HEADERS(cthreads.h pthread.h kernel/sheduler.h kernel/OS.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_SIZE_T
+AC_HEADER_TIME
+
+AC_OUTPUT([Makefile])
+
