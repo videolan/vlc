@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.2 2002/08/13 11:59:36 sam Exp $
+ * $Id: esd.c,v 1.3 2002/08/13 14:53:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -36,8 +36,6 @@
 
 #include <esd.h>
 
-#define DEFAULT_FRAME_SIZE 2048*2
-
 /*****************************************************************************
  * aout_sys_t: esd audio output method descriptor
  *****************************************************************************
@@ -49,6 +47,8 @@ struct aout_sys_t
     esd_format_t esd_format;
     int          i_fd;
     vlc_bool_t   b_initialized;
+
+    mtime_t      latency;
 };
 
 /*****************************************************************************
@@ -141,7 +141,17 @@ static int SetFormat( aout_instance_t *p_aout )
     }
 
     p_aout->output.output.i_format = AOUT_FMT_S16_NE;
-    p_aout->output.i_nb_samples = DEFAULT_FRAME_SIZE;
+    p_aout->output.i_nb_samples = ESD_BUF_SIZE * 2;
+
+    /* ESD latency is calculated for 44100 Hz. We don't have any way to get the
+     * number of buffered samples, so I assume ESD_BUF_SIZE/2 */
+    p_sys->latency =
+        (mtime_t)( esd_get_latency( esd_open_sound(NULL) ) + ESD_BUF_SIZE / 2
+                    * p_aout->output.output.i_rate / ESD_DEFAULT_RATE
+                    * aout_FormatTo( &p_aout->output.output, 1 ) )
+      * (mtime_t)1000000
+      / (mtime_t)aout_FormatToByterate( &p_aout->output.output,
+                                        p_aout->output.output.i_rate );
 
     p_sys->b_initialized = VLC_TRUE;
 
@@ -181,7 +191,6 @@ static int ESDThread( aout_instance_t * p_aout )
     while ( !p_aout->b_die )
     {
         aout_buffer_t * p_buffer;
-        mtime_t next_date = 0;
         int i_tmp, i_size;
         byte_t * p_bytes;
 
@@ -191,19 +200,9 @@ static int ESDThread( aout_instance_t * p_aout )
             continue;
         }
 
-        if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )
-        {
-            /* Get the presentation date of the next write() operation. It
-             * is equal to the current date + esd latency */
-            /* FIXME: wtf ? it works better with a - here */
-            next_date = -(mtime_t)esd_get_latency(esd_open_sound(NULL))
-                      * 1000000
-                      / aout_FormatToByterate( &p_aout->output.output,
-                                               p_aout->output.output.i_rate );
-            next_date += mdate();
-        }
-
-        p_buffer = aout_OutputNextBuffer( p_aout, next_date );
+        /* Get the presentation date of the next write() operation. It
+         * is equal to the current date + buffered samples + esd latency */
+        p_buffer = aout_OutputNextBuffer( p_aout, mdate() + p_sys->latency );
 
         if ( p_buffer != NULL )
         {
@@ -214,7 +213,7 @@ static int ESDThread( aout_instance_t * p_aout )
         else
         {
             i_size = aout_FormatToSize( &p_aout->output.output,
-                                        DEFAULT_FRAME_SIZE );
+                                        ESD_BUF_SIZE * 2 );
             p_bytes = alloca( i_size );
             memset( p_bytes, 0, i_size );
         }

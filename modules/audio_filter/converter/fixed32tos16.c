@@ -1,8 +1,8 @@
 /*****************************************************************************
- * fixed32tos16.c : converter from fised32 to signed 16 bits integer
+ * fixed32tos16.c : converter from fixed32 to signed 16 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: fixed32tos16.c,v 1.1 2002/08/12 20:34:56 jpsaman Exp $
+ * $Id: fixed32tos16.c,v 1.2 2002/08/13 14:53:46 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -201,7 +201,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     s16 sample;
 //    static struct audio_dither dither;
 
-    for ( i = 0; i < p_in_buf->i_nb_samples * p_filter->input.i_channels; i++ )
+    for ( i = p_in_buf->i_nb_samples * p_filter->input.i_channels ; i-- )
     {
         /* Accurate scaling */
 //        p_out = mpg321_s24_to_s16_pcm(16, *p_in++, &dither);
