@@ -309,7 +309,7 @@ vdec_IDCT:
 	psllw $1, %mm6			/* t146=t152 */
 	pmulhw 8*3(%esi), %mm5		/* V3 */
 	paddsw %mm6, %mm0		/* V63 */
-/* note that V15 computation has a correction step: 
+/* note that V15 computation has a correction step:
  * this is a 'magic' constant that rebiases the results to be closer to the
  * expected result.  this magic constant can be refined to reduce the error
  * even more by doing the correction step in a later stage when the number
@@ -669,7 +669,7 @@ vdec_IDCT:
 	movq scratch3, %mm0
 	psraw $4, %mm7
 /* moved up from next block */
-	movq scratch5, %mm6 
+	movq scratch5, %mm6
 	psubsw %mm4, %mm1		/* out14 ; free mm4 */
 	paddsw %mm3, %mm5		/* out2 */
 	psraw $4, %mm1

@@ -56,7 +56,7 @@ typedef struct vdec_thread_s
     u8 *            pi_crop;
 //#endif
 #endif
-        
+
 #ifdef STATS
     /* Statistics */
     count_t         c_loops;                              /* number of loops */
@@ -65,7 +65,7 @@ typedef struct vdec_thread_s
     count_t         c_pictures;                   /* number of pictures read */
     count_t         c_i_pictures;               /* number of I pictures read */
     count_t         c_p_pictures;               /* number of P pictures read */
-    count_t         c_b_pictures;               /* number of B pictures read */    
+    count_t         c_b_pictures;               /* number of B pictures read */
 #endif
     count_t         c_decoded_pictures;        /* number of pictures decoded */
     count_t         c_decoded_i_pictures;    /* number of I pictures decoded */

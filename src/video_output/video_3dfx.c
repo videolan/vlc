@@ -1,11 +1,11 @@
-/******************************************************************************
+/*****************************************************************************
  * vout_3dfx.c: 3dfx video output display method for 3dfx cards
  * (c)2000 VideoLAN
- ******************************************************************************/
+ *****************************************************************************/
 
-/******************************************************************************
+/*****************************************************************************
  * Preamble
- ******************************************************************************/
+ *****************************************************************************/
 
 #include <errno.h>
 #include <fcntl.h>
@@ -36,39 +36,39 @@
 #define BITS_PER_PLANE 16
 #define BYTES_PER_PIXEL 2
 
-/******************************************************************************
+/*****************************************************************************
  * vout_sys_t: 3dfx video output method descriptor
- ******************************************************************************
+ *****************************************************************************
  * This structure is part of the video output thread descriptor.
  * It describes the 3dfx specific properties of an output thread.
- ******************************************************************************/
+ *****************************************************************************/
 typedef struct vout_sys_s
 {
-    GrLfbInfo_t                 p_buffer_info;            /* back buffer info */
+    GrLfbInfo_t                 p_buffer_info;           /* back buffer info */
 
     /* Dummy video memory */
-    byte_t *                    p_video;                       /* base adress */    
-    size_t                      i_page_size;                     /* page size */
+    byte_t *                    p_video;                      /* base adress */
+    size_t                      i_page_size;                    /* page size */
 
 } vout_sys_t;
 
-/******************************************************************************
+/*****************************************************************************
  * Local prototypes
- ******************************************************************************/
+ *****************************************************************************/
 static int     GlideOpenDisplay   ( vout_thread_t *p_vout );
 static void    GlideCloseDisplay  ( vout_thread_t *p_vout );
 
-/******************************************************************************
+/*****************************************************************************
  * vout_SysCreate: allocates 3dfx video thread output method
- ******************************************************************************
+ *****************************************************************************
  * This function allocates and initializes a 3dfx vout method.
- ******************************************************************************/
+ *****************************************************************************/
 int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, int i_root_window )
 {
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
-    {   
+    {
         intf_ErrMsg("error: %s\n", strerror(ENOMEM) );
         return( 1 );
     }
@@ -84,50 +84,50 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, int i_root_window 
     return( 0 );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * vout_SysInit: initialize 3dfx video thread output method
- ******************************************************************************/
+ *****************************************************************************/
 int vout_SysInit( vout_thread_t *p_vout )
 {
     return( 0 );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * vout_SysEnd: terminate 3dfx video thread output method
- ******************************************************************************/
+ *****************************************************************************/
 void vout_SysEnd( vout_thread_t *p_vout )
-{       
-    ;    
+{
+    ;
 }
 
-/******************************************************************************
+/*****************************************************************************
  * vout_SysDestroy: destroy 3dfx video thread output method
- ******************************************************************************
+ *****************************************************************************
  * Terminate an output method created by vout_CreateOutputMethod
- ******************************************************************************/
+ *****************************************************************************/
 void vout_SysDestroy( vout_thread_t *p_vout )
 {
     GlideCloseDisplay( p_vout );
     free( p_vout->p_sys );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * vout_SysManage: handle 3dfx events
- ******************************************************************************
+ *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
- ******************************************************************************/
+ *****************************************************************************/
 int vout_SysManage( vout_thread_t *p_vout )
 {
     return 0;
 }
 
-/******************************************************************************
+/*****************************************************************************
  * vout_SysDisplay: displays previously rendered output
- ******************************************************************************
+ *****************************************************************************
  * This function send the currently rendered image to 3dfx image, waits until
  * it is displayed and switch the two rendering buffers, preparing next frame.
- ******************************************************************************/
+ *****************************************************************************/
 void vout_SysDisplay( vout_thread_t *p_vout )
 {
     grLfbUnlock( GR_LFB_WRITE_ONLY, GR_BUFFER_BACKBUFFER );
@@ -145,7 +145,7 @@ void vout_SysDisplay( vout_thread_t *p_vout )
 /* following functions are local */
 
 /*****************************************************************************
- * GlideOpenDisplay: open and initialize 3dfx device 
+ * GlideOpenDisplay: open and initialize 3dfx device
  *****************************************************************************/
 
 static int GlideOpenDisplay( vout_thread_t *p_vout )
@@ -228,18 +228,18 @@ static int GlideOpenDisplay( vout_thread_t *p_vout )
     grBufferClear( 0, 0, 0 );
 
     /* Set and initialize buffers */
-    vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer_info.lfbPtr, 
+    vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer_info.lfbPtr,
                      p_front_buffer_info.lfbPtr );
-   
-    return( 0 );
-}    
 
-/******************************************************************************
- * GlideCloseDisplay: close and reset 3dfx device 
- ******************************************************************************
+    return( 0 );
+}
+
+/*****************************************************************************
+ * GlideCloseDisplay: close and reset 3dfx device
+ *****************************************************************************
  * Returns all resources allocated by GlideOpenDisplay and restore the original
  * state of the device.
- ******************************************************************************/
+ *****************************************************************************/
 static void GlideCloseDisplay( vout_thread_t *p_vout )
 {
     /* unlock the hidden buffer */

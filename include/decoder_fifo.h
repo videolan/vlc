@@ -1,38 +1,38 @@
-/******************************************************************************
+/*****************************************************************************
  * decoder_fifo.h: interface for decoders PES fifo
  * (c)1999 VideoLAN
- ******************************************************************************
+ *****************************************************************************
  * Required headers:
  * - "config.h"
  * - "common.h"
  * - "vlc_thread.h"
  * - "input.h"
- ******************************************************************************/
+ *****************************************************************************/
 
-/******************************************************************************
+/*****************************************************************************
  * Macros
- ******************************************************************************/
+ *****************************************************************************/
 
 /* ?? move to inline functions */
 #define DECODER_FIFO_ISEMPTY( fifo )    ( (fifo).i_start == (fifo).i_end )
 #define DECODER_FIFO_ISFULL( fifo )     ( ( ( (fifo).i_end + 1 - (fifo).i_start ) \
                                           & FIFO_SIZE ) == 0 )
 #define DECODER_FIFO_START( fifo )      ( (fifo).buffer[ (fifo).i_start ] )
-#define DECODER_FIFO_INCSTART( fifo )   ( (fifo).i_start = ((fifo).i_start + 1) \
-                                                           & FIFO_SIZE ) 
+#define DECODER_FIFO_INCSTART( fifo )   ( (fifo).i_start = ((fifo).i_start + 1)\
+                                                           & FIFO_SIZE )
 #define DECODER_FIFO_END( fifo )        ( (fifo).buffer[ (fifo).i_end ] )
 #define DECODER_FIFO_INCEND( fifo )     ( (fifo).i_end = ((fifo).i_end + 1) \
                                                          & FIFO_SIZE )
 
-/******************************************************************************
+/*****************************************************************************
  * decoder_fifo_t
- ******************************************************************************
+ *****************************************************************************
  * This rotative FIFO contains PES packets that are to be decoded...
- ******************************************************************************/
+ *****************************************************************************/
 typedef struct
 {
-    vlc_mutex_t         data_lock;                          /* fifo data lock */
-    vlc_cond_t          data_wait;          /* fifo data conditional variable */
+    vlc_mutex_t         data_lock;                         /* fifo data lock */
+    vlc_cond_t          data_wait;         /* fifo data conditional variable */
 
     /* buffer is an array of PES packets pointers */
     pes_packet_t *      buffer[FIFO_SIZE + 1];
@@ -41,12 +41,12 @@ typedef struct
 
 } decoder_fifo_t;
 
-/******************************************************************************
+/*****************************************************************************
  * bit_fifo_t : bit fifo descriptor
- ******************************************************************************
+ *****************************************************************************
  * This type describes a bit fifo used to store bits while working with the
  * input stream at the bit level.
- ******************************************************************************/
+ *****************************************************************************/
 typedef struct bit_fifo_s
 {
     /* This unsigned integer allows us to work at the bit level. This buffer
@@ -59,12 +59,12 @@ typedef struct bit_fifo_s
 
 } bit_fifo_t;
 
-/******************************************************************************
+/*****************************************************************************
  * bit_stream_t : bit stream descriptor
- ******************************************************************************
+ *****************************************************************************
  * This type, based on a PES stream, includes all the structures needed to
  * handle the input stream like a bit stream.
- ******************************************************************************/
+ *****************************************************************************/
 typedef struct bit_stream_s
 {
     /*
@@ -163,10 +163,10 @@ static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
     }
 }
 
-/******************************************************************************
+/*****************************************************************************
  * NeedBits : reads i_bits new bits in the bit stream and stores them in the
  *            bit buffer
- ******************************************************************************
+ *****************************************************************************
  * - i_bits must be less or equal 32 !
  * - There is something important to notice with that function : if the number
  * of bits available in the bit buffer when calling NeedBits() is greater than
@@ -174,7 +174,7 @@ static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
  * (i_available < i_bits), the byte returned by GetByte() will be shifted with
  * a negative value and the number of bits available in the bit buffer will be
  * set to more than 32 !
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ void NeedBits( bit_stream_t * p_bit_stream, int i_bits )
 {
     while ( p_bit_stream->fifo.i_available < i_bits )
@@ -184,24 +184,24 @@ static __inline__ void NeedBits( bit_stream_t * p_bit_stream, int i_bits )
     }
 }
 
-/******************************************************************************
+/*****************************************************************************
  * DumpBits : removes i_bits bits from the bit buffer
- ******************************************************************************
+ *****************************************************************************
  * - i_bits <= i_available
  * - i_bits < 32 (because (u32 << 32) <=> (u32 = u32))
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ void DumpBits( bit_stream_t * p_bit_stream, int i_bits )
 {
     p_bit_stream->fifo.buffer <<= i_bits;
     p_bit_stream->fifo.i_available -= i_bits;
 }
 
-/******************************************************************************
+/*****************************************************************************
  * DumpBits32 : removes 32 bits from the bit buffer
- ******************************************************************************
+ *****************************************************************************
  * This function actually believes that you have already put 32 bits in the
  * bit buffer, so you can't you use it anytime.
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ void DumpBits32( bit_stream_t * p_bit_stream )
 {
     p_bit_stream->fifo.buffer = 0;
@@ -215,36 +215,36 @@ static __inline__ void DumpBits32( bit_stream_t * p_bit_stream )
  * need to call RealignBits() before).
  */
 
-/******************************************************************************
+/*****************************************************************************
  * RemoveBits : removes i_bits bits from the bit buffer
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ void RemoveBits( bit_stream_t * p_bit_stream, int i_bits )
 {
     NeedBits( p_bit_stream, i_bits );
     DumpBits( p_bit_stream, i_bits );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * RemoveBits32 : removes 32 bits from the bit buffer
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ void RemoveBits32( bit_stream_t * p_bit_stream )
 {
     NeedBits( p_bit_stream, 32 );
     DumpBits32( p_bit_stream );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * ShowBits : return i_bits bits from the bit stream
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ u32 ShowBits( bit_stream_t * p_bit_stream, int i_bits )
 {
     NeedBits( p_bit_stream, i_bits );
     return( p_bit_stream->fifo.buffer >> (32 - i_bits) );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * GetBits : returns i_bits bits from the bit stream and removes them
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ u32 GetBits( bit_stream_t * p_bit_stream, int i_bits )
 {
     u32 i_buffer;
@@ -255,9 +255,9 @@ static __inline__ u32 GetBits( bit_stream_t * p_bit_stream, int i_bits )
     return( i_buffer );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * GetBits32 : returns 32 bits from the bit stream and removes them
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ u32 GetBits32( bit_stream_t * p_bit_stream )
 {
     u32 i_buffer;
@@ -268,9 +268,9 @@ static __inline__ u32 GetBits32( bit_stream_t * p_bit_stream )
     return( i_buffer );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * RealignBits : realigns the bit buffer on an 8-bit boundary
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ void RealignBits( bit_stream_t * p_bit_stream )
 {
     DumpBits( p_bit_stream, p_bit_stream->fifo.i_available & 7 );

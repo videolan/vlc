@@ -43,7 +43,7 @@ static __inline__ void exp_unpack_ch( ac3dec_thread_t * p_ac3dec, u16 type, u16 
 	exp_acc = initial_exp;
 	j = 0;
 
-	/* In the case of a fbw channel then the initial absolute values is 
+	/* In the case of a fbw channel then the initial absolute values is
 	 * also an exponent */
 	if ( type != UNPACK_CPL )
 	{

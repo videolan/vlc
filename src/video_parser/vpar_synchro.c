@@ -81,7 +81,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
                        + 1000000.0 / (1 + p_vpar->synchro.actual_fps);
     }
     p_vpar->synchro.i_last_decode_pts = i_current_pts;
- 
+
     /* see if the current image has a pts - if not, set to 0 */
     p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_stop].i_pts
 	    = i_current_pts;
@@ -99,7 +99,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
                        + 1000000.0 / (p_vpar->synchro.theorical_fps);
         //fprintf (stderr, "  ");
     }
-    
+
     decoder_fifo->buffer[decoder_fifo->i_start]->b_has_pts = 0;
 
     /* else fprintf (stderr, "R ");
@@ -144,7 +144,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
                 {
                     p_vpar->synchro.actual_fps = (p_vpar->synchro.actual_fps + 1000000.0 * (1 + p_vpar->synchro.nondropped_b_count + p_vpar->synchro.nondropped_p_count) / (i_current_pts - p_vpar->synchro.i_last_nondropped_i_pts)) / 2;
                 }
-    
+
             }
 
 
@@ -210,7 +210,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
 
 	    p_vpar->synchro.b_count_predict = predict;
             p_vpar->synchro.current_b_count = 0;
-	    
+	
             /* now we calculated all statistics, it's time to
              * decide what we have the time to display
              */
@@ -234,7 +234,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
                 p_vpar->synchro.displayable_p = 0;
 
 	    if( p_vpar->synchro.can_display_p
-                && !(p_vpar->synchro.can_display_b 
+                && !(p_vpar->synchro.can_display_b
                     = ( p_vpar->synchro.i_mean_decode_time
                     * (1 + p_vpar->synchro.b_count_predict
                         + p_vpar->synchro.p_count_predict)) < i_delay) )
@@ -300,7 +300,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 
             p_vpar->synchro.displayable_p--;
             return( 1 );
-   
+
         case B_CODING_TYPE:
 
             if( p_vpar->synchro.can_display_b )
@@ -313,7 +313,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                 //fprintf( stderr, "trashed a B\n");
                 return( 0 );
             }
- 
+
             if( p_vpar->synchro.displayable_b <= 0 )
                 return( 0 );
 
@@ -379,7 +379,7 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar )
 mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
 {
     mtime_t i_displaydate = p_vpar->synchro.i_last_display_pts;
-    
+
 
     static mtime_t i_delta = 0;
 #if 0
@@ -407,7 +407,7 @@ AVEC LES IMAGES MONOTRAMES */
 boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                               int i_structure )
 {
-    switch (i_coding_type) 
+    switch (i_coding_type)
     {
     case B_CODING_TYPE:
         if ((p_vpar->synchro.kludge_level <= p_vpar->synchro.kludge_nbp))
@@ -426,7 +426,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
         return( 1 );
 
     case P_CODING_TYPE:
-        if (p_vpar->synchro.kludge_p++ >= p_vpar->synchro.kludge_level) 
+        if (p_vpar->synchro.kludge_p++ >= p_vpar->synchro.kludge_level)
         {
             return( 0 );
         }

@@ -28,7 +28,7 @@ typedef struct macroblock_s
                                                  /* which blocks are coded ? */
     int                     i_chroma_nb_blocks;         /* number of blocks for
                                                          * chroma components */
-    
+
     /* IDCT information */
     dctelem_t               ppi_blocks[12][64];                    /* blocks */
     f_idct_t                pf_idct[12];             /* sparse IDCT or not ? */
@@ -47,7 +47,7 @@ typedef struct macroblock_s
     int                     i_l_x, i_c_x;
     int                     i_motion_l_y;
     int                     i_motion_c_y;
-    int                     i_l_stride;         /* number of yuv_data_t to 
+    int                     i_l_stride;         /* number of yuv_data_t to
                                                  * ignore when changing line */
     int                     i_c_stride;                  /* idem, for chroma */
     boolean_t               b_P_second;  /* Second field of a P picture ?
@@ -91,9 +91,9 @@ typedef struct lookup_s
     int    i_length;
 } lookup_t;
 
-/******************************************************************************
+/*****************************************************************************
  * ac_lookup_t : special entry type for lookup tables about ac coefficients
- *****************************************************************************/ 
+ *****************************************************************************/
 typedef struct dct_lookup_s
 {
     char   i_run;

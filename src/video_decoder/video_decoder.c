@@ -1,13 +1,13 @@
-/*******************************************************************************
+/*****************************************************************************
  * video_decoder.c : video decoder thread
  * (c)1999 VideoLAN
- *******************************************************************************/
+ *****************************************************************************/
 
 /* ?? passer en terminate/destroy avec les signaux supplémentaires */
 
-/*******************************************************************************
+/*****************************************************************************
  * Preamble
- *******************************************************************************/
+ *****************************************************************************/
 //#include "vlc.h"
 
 #include <errno.h>
@@ -53,14 +53,14 @@ static void     RunThread           ( vdec_thread_t *p_vdec );
 static void     ErrorThread         ( vdec_thread_t *p_vdec );
 static void     EndThread           ( vdec_thread_t *p_vdec );
 
-/*******************************************************************************
+/*****************************************************************************
  * vdec_CreateThread: create a video decoder thread
- *******************************************************************************
+ *****************************************************************************
  * This function creates a new video decoder thread, and returns a pointer
  * to its description. On error, it returns NULL.
  * Following configuration properties are used:
  * ??
- *******************************************************************************/
+ *****************************************************************************/
 vdec_thread_t * vdec_CreateThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
 {
     vdec_thread_t *     p_vdec;
@@ -98,13 +98,13 @@ vdec_thread_t * vdec_CreateThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
     return( p_vdec );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * vdec_DestroyThread: destroy a video decoder thread
- *******************************************************************************
+ *****************************************************************************
  * Destroy and terminate thread. This function will return 0 if the thread could
  * be destroyed, and non 0 else. The last case probably means that the thread
  * was still active, and another try may succeed.
- *******************************************************************************/
+ *****************************************************************************/
 void vdec_DestroyThread( vdec_thread_t *p_vdec /*, int *pi_status */ )
 {
     intf_DbgMsg("vdec debug: requesting termination of video decoder thread %p\n", p_vdec);
@@ -126,13 +126,13 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec /*, int *pi_status */ )
 
 /* following functions are local */
 
-/*******************************************************************************
+/*****************************************************************************
  * vdec_InitThread: initialize video decoder thread
- *******************************************************************************
+ *****************************************************************************
  * This function is called from RunThread and performs the second step of the
  * initialization. It returns 0 on success. Note that the thread's flag are not
  * modified inside this function.
- *******************************************************************************/
+ *****************************************************************************/
 #ifdef VDEC_SMP
 static int vdec_InitThread( vdec_thread_t *p_vdec )
 #else
@@ -145,7 +145,7 @@ int vdec_InitThread( vdec_thread_t *p_vdec )
 
     /* Initialize other properties */
 #ifdef STATS
-    p_vdec->c_loops = 0;    
+    p_vdec->c_loops = 0;
     p_vdec->c_idle_loops = 0;
     p_vdec->c_decoded_pictures = 0;
     p_vdec->c_decoded_i_pictures = 0;
@@ -169,17 +169,17 @@ int vdec_InitThread( vdec_thread_t *p_vdec )
     }
 
     /* Mark thread as running and return */
-    intf_DbgMsg("vdec debug: InitThread(%p) succeeded\n", p_vdec);    
-    return( 0 );    
+    intf_DbgMsg("vdec debug: InitThread(%p) succeeded\n", p_vdec);
+    return( 0 );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * ErrorThread: RunThread() error loop
- *******************************************************************************
+ *****************************************************************************
  * This function is called when an error occured during thread main's loop. The
  * thread can still receive feed, but must be ready to terminate as soon as
  * possible.
- *******************************************************************************/
+ *****************************************************************************/
 static void ErrorThread( vdec_thread_t *p_vdec )
 {
     macroblock_t *       p_mb;
@@ -192,26 +192,26 @@ static void ErrorThread( vdec_thread_t *p_vdec )
     }
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * EndThread: thread destruction
- *******************************************************************************
- * This function is called when the thread ends after a sucessfull 
+ *****************************************************************************
+ * This function is called when the thread ends after a sucessfull
  * initialization.
- *******************************************************************************/
+ *****************************************************************************/
 static void EndThread( vdec_thread_t *p_vdec )
 {
     intf_DbgMsg("vdec debug: EndThread(%p)\n", p_vdec);
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * AddBlock : add a block
- *******************************************************************************/
+ *****************************************************************************/
 #ifndef HAVE_MMX
 static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
                                  yuv_data_t * p_data, int i_incr )
 {
     int i_x, i_y;
- 
+
     for( i_y = 0; i_y < 8; i_y++ )
     {
         for( i_x = 0; i_x < 8; i_x++ )
@@ -238,7 +238,7 @@ static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
             "addl       %2,%0\n\t"
-            
+
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
@@ -248,7 +248,7 @@ static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
             "addl       %2,%0\n\t"
-            
+
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
@@ -258,7 +258,7 @@ static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
             "addl       %2,%0\n\t"
-            
+
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
@@ -268,7 +268,7 @@ static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
             "addl       %2,%0\n\t"
-            
+
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
@@ -278,7 +278,7 @@ static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
             "addl       %2,%0\n\t"
-            
+
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
@@ -288,7 +288,7 @@ static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
             "addl       %2,%0\n\t"
-            
+
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
@@ -298,7 +298,7 @@ static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
             "addl       %2,%0\n\t"
-                       
+
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
@@ -308,15 +308,15 @@ static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
 
-            "emms" 
+            "emms"
              :"+r" (p_data): "r" (p_block),"r" (i_incr+8));
 }
 #endif
 
 
-/*******************************************************************************
+/*****************************************************************************
  * CopyBlock : copy a block
- *******************************************************************************/
+ *****************************************************************************/
 #ifndef HAVE_MMX
 static __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
                                   yuv_data_t * p_data, int i_incr )
@@ -349,14 +349,14 @@ static  __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
 
             "movq        32(%1),%%mm0\n\t"
             "packuswb   40(%1),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"           
+            "movq        %%mm0,(%0)\n\t"
             "addl           %2,%0\n\t"
-            
+
             "movq        48(%1),%%mm0\n\t"
             "packuswb   56(%1),%%mm0\n\t"
             "movq        %%mm0,(%0)\n\t"
             "addl           %2,%0\n\t"
-                                                                        
+
             "movq        64(%1),%%mm0\n\t"
             "packuswb   72(%1),%%mm0\n\t"
             "movq        %%mm0,(%0)\n\t"
@@ -381,9 +381,9 @@ static  __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
 #endif
 
 
-/*******************************************************************************
+/*****************************************************************************
  * vdec_DecodeMacroblock : decode a macroblock of a picture
- *******************************************************************************/
+ *****************************************************************************/
 #define DECODEBLOCKS( OPBLOCK )                                         \
 {                                                                       \
     int             i_b, i_mask;                                        \
@@ -460,19 +460,19 @@ void vdec_DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
 }
 
 
-/*******************************************************************************
+/*****************************************************************************
  * RunThread: video decoder thread
- *******************************************************************************
+ *****************************************************************************
  * Video decoder thread. This function does only return when the thread is
- * terminated. 
- *******************************************************************************/
+ * terminated.
+ *****************************************************************************/
 static void RunThread( vdec_thread_t *p_vdec )
 {
     intf_DbgMsg("vdec debug: running video decoder thread (%p) (pid == %i)\n",
                 p_vdec, getpid());
 
-    /* 
-     * Initialize thread and free configuration 
+    /*
+     * Initialize thread and free configuration
      */
     p_vdec->b_error = vdec_InitThread( p_vdec );
     if( p_vdec->b_error )
@@ -493,7 +493,7 @@ static void RunThread( vdec_thread_t *p_vdec )
         {
             vdec_DecodeMacroblock( p_vdec, p_mb );
         }
-    } 
+    }
 
     /*
      * Error loop

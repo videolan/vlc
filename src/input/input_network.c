@@ -1,21 +1,21 @@
-/*******************************************************************************
- * network.c: functions to read from the network 
+/*****************************************************************************
+ * network.c: functions to read from the network
  * (c)1999 VideoLAN
- *******************************************************************************
+ *****************************************************************************
  * Manages a socket.
- *******************************************************************************/
+ *****************************************************************************/
 
-/*******************************************************************************
+/*****************************************************************************
  * Preamble
- *******************************************************************************/
+ *****************************************************************************/
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <string.h>
 #include <stdio.h>
-#include <netdb.h>      /* servent, getservbyname(), hostent, gethostbyname() */
-#include <sys/socket.h>          /* socket(), setsockopt(), bind(), connect() */
-#include <unistd.h>                                                /* close() */
-#include <netinet/in.h>                      /* sockaddr_in, htons(), htonl() */
+#include <netdb.h>     /* servent, getservbyname(), hostent, gethostbyname() */
+#include <sys/socket.h>         /* socket(), setsockopt(), bind(), connect() */
+#include <unistd.h>                                               /* close() */
+#include <netinet/in.h>                     /* sockaddr_in, htons(), htonl() */
 #include <errno.h>
 #include <sys/time.h>
 #include <unistd.h>
@@ -33,9 +33,9 @@
 #include "intf_msg.h"
 #include "main.h"
 
-/******************************************************************************
+/*****************************************************************************
  * input_NetworkOpen: initialize a network stream
- ******************************************************************************/
+ *****************************************************************************/
 int input_NetworkOpen( input_thread_t *p_input )
 {
     int                     i_socket_option;
@@ -47,9 +47,9 @@ int input_NetworkOpen( input_thread_t *p_input )
     {
         if( input_VlanJoin( p_input->i_vlan ) )
         {
-            intf_ErrMsg("error: can't join vlan %d\n", p_input->i_vlan);            
-            return( 1 );            
-        }        
+            intf_ErrMsg("error: can't join vlan %d\n", p_input->i_vlan);
+            return( 1 );
+        }
     }
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
@@ -60,8 +60,8 @@ int input_NetworkOpen( input_thread_t *p_input )
         return( 1 );
     }
 
-    /* 
-     * Set up the options of the socket 
+    /*
+     * Set up the options of the socket
      */
 
     /* Set SO_REUSEADDR option which allows to re-bind() a busy port */
@@ -90,15 +90,15 @@ int input_NetworkOpen( input_thread_t *p_input )
         close( p_input->i_handle );
         return( 1 );
     }
-    
-    /* 
+
+    /*
      * Bind the socket
      */
 
     /* Use default port if not specified */
     if( p_input->i_port == 0 )
     {
-        p_input->i_port = main_GetIntVariable( INPUT_PORT_VAR, INPUT_PORT_DEFAULT );        
+        p_input->i_port = main_GetIntVariable( INPUT_PORT_VAR, INPUT_PORT_DEFAULT );
     }
 
     /* Find the address. */
@@ -121,7 +121,7 @@ int input_NetworkOpen( input_thread_t *p_input )
         if( BuildInetAddr( &sa_in, NULL, p_input->i_port ) == (-1) )
         {
             close( p_input->i_handle );
-            return( -1 );            
+            return( -1 );
         }
 #endif
         break;
@@ -159,7 +159,7 @@ int input_NetworkOpen( input_thread_t *p_input )
         return( 1 );
     }
 
-    /* 
+    /*
      * Connect the socket to the remote server
      */
 
@@ -168,7 +168,7 @@ int input_NetworkOpen( input_thread_t *p_input )
     {
         p_input->psz_source = main_GetPszVariable( INPUT_SERVER_VAR, INPUT_SERVER_DEFAULT );
     }
-    
+
     if( BuildInetAddr( &sa_in, p_input->psz_source, htons(0) ) == (-1) )
     {
         close( p_input->i_handle );
@@ -176,7 +176,7 @@ int input_NetworkOpen( input_thread_t *p_input )
     }
 
     /* Connect the socket. */
-    if( connect( p_input->i_handle, (struct sockaddr *) &sa_in,  
+    if( connect( p_input->i_handle, (struct sockaddr *) &sa_in,
                  sizeof( sa_in ) ) == (-1) )
     {
         intf_ErrMsg("error: can't connect socket\n" );
@@ -186,15 +186,15 @@ int input_NetworkOpen( input_thread_t *p_input )
     return( 0 );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * input_NetworkRead: read a stream from the network
- ******************************************************************************
+ *****************************************************************************
  * Wait for data during up to 1 second and then abort if none is arrived. The
  * number of bytes read is returned or -1 if an error occurs (so 0 is returned
  * after a timeout)
  * We don't have to make any test on presentation times, since we suppose
  * the network server sends us data when we need it.
- ******************************************************************************/
+ *****************************************************************************/
 int input_NetworkRead( input_thread_t *p_input, const struct iovec *p_vector,
                        size_t i_count )
 {
@@ -205,7 +205,7 @@ int input_NetworkRead( input_thread_t *p_input, const struct iovec *p_vector,
     /* Watch the given fd to see when it has input */
     FD_ZERO(&rfds);
     FD_SET(p_input->i_handle, &rfds);
-  
+
     /* Wait up to 1 second */
     tv.tv_sec = 1;
     tv.tv_usec = 0;
@@ -221,9 +221,9 @@ int input_NetworkRead( input_thread_t *p_input, const struct iovec *p_vector,
     return( i_rc );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * input_NetworkClose: close a network stream
- ******************************************************************************/
+ *****************************************************************************/
 void input_NetworkClose( input_thread_t *p_input )
 {
     /* Close local socket. */
@@ -234,8 +234,8 @@ void input_NetworkClose( input_thread_t *p_input )
 
     /* Leave vlan if required */
     if( p_input->i_method == INPUT_METHOD_TS_VLAN_BCAST )
-    {        
+    {
         input_VlanLeave( p_input->i_vlan );
-    }    
+    }
 }
 

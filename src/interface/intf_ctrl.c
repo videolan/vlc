@@ -1,7 +1,7 @@
-/*******************************************************************************
+/*****************************************************************************
  * intf_ctrl.c: interface commands access to control functions
  * (c)1999 VideoLAN
- *******************************************************************************
+ *****************************************************************************
  * Library of functions common to all interfaces, allowing access to various
  * structures and settings. Interfaces should only use those functions
  * to read or write informations from other threads.
@@ -19,11 +19,11 @@
  * error codes defined in command.h. Custom error codes are allowed, but should
  * be positive.
  * More informations about parameters stand in `list of commands' section.
- *******************************************************************************/
+ *****************************************************************************/
 
-/*******************************************************************************
+/*****************************************************************************
  * Preamble
- *******************************************************************************/
+ *****************************************************************************/
 #include "vlc.h"
 #include <sys/stat.h>
 /*??#include <errno.h>
@@ -89,7 +89,7 @@ static int Psi                  ( int i_argc, intf_arg_t *p_argv );
 /*
  * List of commands.
  * This list is used by intf_ExecCommand function to find functions to
- * execute and prepare its arguments. It is terminated by an element  which name 
+ * execute and prepare its arguments. It is terminated by an element  which name
  * is a null pointer. intf_command_t is defined in command.h.
  *
  * Here is a description of a command description elements:
@@ -98,12 +98,12 @@ static int Psi                  ( int i_argc, intf_arg_t *p_argv );
  *  format is an argument descriptor (see below),
  *  summary is a text string displayed in regard of the command name when `help'
  *      is called without parameters, and whith usage on syntax error,
- *  usage is a short syntax indicator displayed with summary when the command 
+ *  usage is a short syntax indicator displayed with summary when the command
  *      causes a syntax error,
  *  help is a complete help about the command, displayed when `help' is called with
  *      the command name as parameter.
  *
- * Format string is a list of ' ' separated strings, which have following 
+ * Format string is a list of ' ' separated strings, which have following
  * meanings:
  *  s       string argument
  *  i       integer argument
@@ -111,68 +111,68 @@ static int Psi                  ( int i_argc, intf_arg_t *p_argv );
  *  ?       optionnal argument
  *  *       argument can be repeated
  *  name=   named argument
- * Example: "channel=i? s*? i " means that any number of string arguments, 
+ * Example: "channel=i? s*? i " means that any number of string arguments,
  * followed by a single mandatory integer argument are waited. A named argument,
  * which name is `channel' and must have an integer value can be optionnaly
  * specified at beginning. The last space is mandatory if there is at least one
  * element, since it acts as an item terminator.
  * Named arguments MUST be at the beginning of the format string, and in
- * alphabetic order, but their order on command line has no importance. 
+ * alphabetic order, but their order on command line has no importance.
  * The format string can't have more than INTF_MAX_ARGS elements.
  */
 const intf_command_t control_command[] =
 {
-  { "demo", Demo,                                                      /* demo */
-    /* format: */   "", 
-    /* summary: */  "program demonstration", 
-    /* usage: */    "demo", 
+  { "demo", Demo,                                                    /* demo */
+    /* format: */   "",
+    /* summary: */  "program demonstration",
+    /* usage: */    "demo",
     /* help: */     "Start program capabilities demonstration." },
-  { "display", DisplayImage,                                        /* display */
+  { "display", DisplayImage,                                      /* display */
     /* format: */   "s ",
     /* summary: */  "load and display an image",
     /* usage: */    "display <file>",
-    /* help: */     "Load and display an image. Image format is automatically " \
+    /* help: */     "Load and display an image. Image format is automatically "\
     "identified from file name extension." },
-  { "exec", Exec,                                                      /* exec */
+  { "exec", Exec,                                                    /* exec */
     /* format: */   "s ",
     /* summary: */  "execute a script file",
     /* usage: */    "exec <file>",
-    /* help: */     "Load an execute a script." },      
-  { "exit", Quit,                                         /* exit (quit alias) */
+    /* help: */     "Load an execute a script." },
+  { "exit", Quit,                                       /* exit (quit alias) */
     /* format: */   "",
     /* summary: */  "quit program",
     /* usage: */    "exit",
     /* help: */     "see `quit'." },
-  { "help", Help,                                                      /* help */
-    /* format: */   "s? ", 
-    /* summary: */  "list all functions or print help about a specific function", 
-    /* usage: */    "help [command]", 
+  { "help", Help,                                                    /* help */
+    /* format: */   "s? ",
+    /* summary: */  "list all functions or print help about a specific function",
+    /* usage: */    "help [command]",
     /* help: */     "If called without argument, list all available " \
-    " functions.\nIf a command name is provided as argument, displays a short " \
+    " functions.\nIf a command name is provided as argument, displays a short "\
     "inline help about the command.\n" },
-  { "play-audio", PlayAudio,                                     /* play-audio */
-    /* format: */   "stereo=i? rate=i? s ", 
+  { "play-audio", PlayAudio,                                   /* play-audio */
+    /* format: */   "stereo=i? rate=i? s ",
     /* summary: */  "play an audio file",
     /* usage: */    "play-audio [stereo=1/0] [rate=r] <file>",
     /* help: */     "Load and play an audio file." },
   { "play-video", PlayVideo,                                      /* play-video */
-    /* format: */   "s ", 
+    /* format: */   "s ",
     /* summary: */  "play a video (.vlp) file",
     /* usage: */    "play-video <file>",
     /* help: */     "Load and play a video file." },
-  { "quit", Quit,                                                      /* quit */
+  { "quit", Quit,                                                    /* quit */
     /* format: */   "",
     /* summary: */  "quit program",
     /* usage: */    "quit",
-    /* help: */     "Terminates the program execution... There is not much to" \
+    /* help: */     "Terminates the program execution... There is not much to"\
     " say about it !" },
-  { "select-pid", SelectPID,                                     /* select-pid */
+  { "select-pid", SelectPID,                                   /* select-pid */
     /* format: */   "i i ",
     /* summary: */  "spawn a decoder thread for a specified PID",
     /* summary: */  "select-pid <input> <pid>",
     /* help: */     "Spawn a decoder thread for <pid>. The stream will be" \
     " received by <input>." },
-  { "spawn-input", SpawnInput,                                  /* spawn-input */
+  { "spawn-input", SpawnInput,                                /* spawn-input */
     /* format: */   "method=i? filename=s? hostname=s? ip=s? port=i? vlan=i?",
     /* summary: */  "spawn an input thread",
     /* summary: */  "spawn-input [method=<method>]\n" \
@@ -181,12 +181,12 @@ const intf_command_t control_command[] =
     /* help: */     "Spawn an input thread. Method is 10, 20, 21, 22, 32, "\
     "hostname is the fully-qualified domain name, ip is a dotted-decimal address." },
 #ifdef DEBUG
-  { "test", Test,                                                      /* test */
+  { "test", Test,                                                    /* test */
     /* format: */   "i? ",
     /* summary: */  "crazy developper's test",
     /* usage: */    "depends on the last coder :-)",
     /* help: */     "`test' works only in DEBUG mode, and is provide for " \
-    "developpers as an easy way to test part of their code. If you don't know " \
+    "developpers as an easy way to test part of their code. If you don't know "\
     "what it should do, just try !" },
 #endif
   { "vlan", Vlan,
@@ -197,7 +197,7 @@ const intf_command_t control_command[] =
     "vlan [intf=<interface>] join <vlan>\n" \
     "vlan [intf=<interface>] leave",
     /* help: */     "Perform various operations on vlans. 'synchro' resynchronize " \
-    "with the server. 'request' ask which is the current vlan (for the default " \
+    "with the server. 'request' ask which is the current vlan (for the default "\
     "interface or for a given one). 'join' and 'leave' try to change vlan." },
   { "psi", Psi,
     /* format: */   "i ",
@@ -205,16 +205,16 @@ const intf_command_t control_command[] =
     /* usage: */    "psi <input thread index>",
     /* help: */     "Display the PSI tables on the console. Warning: this is debug" \
     "command, it can leads to pb since locks are not taken yet" },
-  { 0, 0, 0, 0, 0 }                                        /* array terminator */
+  { 0, 0, 0, 0, 0 }                                      /* array terminator */
 };
 
 /* following functions are local */
 
-/*******************************************************************************
+/*****************************************************************************
  * Demo: demo
- *******************************************************************************
- * This function is provided to display a demo of program possibilities. 
- *******************************************************************************/
+ *****************************************************************************
+ * This function is provided to display a demo of program possibilities.
+ *****************************************************************************/
 static int Demo( int i_argc, intf_arg_t *p_argv )
 {
     intf_IntfMsg( COPYRIGHT_MESSAGE );
@@ -222,45 +222,45 @@ static int Demo( int i_argc, intf_arg_t *p_argv )
     return( INTF_NO_ERROR );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * Exec: execute a script
- *******************************************************************************
+ *****************************************************************************
  * This function load and execute a script.
- *******************************************************************************/
+ *****************************************************************************/
 static int Exec( int i_argc, intf_arg_t *p_argv )
 {
-    int i_err;                                                   /* error code */
-    
+    int i_err;                                                 /* error code */
+
     i_err = intf_ExecScript( p_argv[1].psz_str );
-    return( i_err ? INTF_OTHER_ERROR : INTF_NO_ERROR );     
+    return( i_err ? INTF_OTHER_ERROR : INTF_NO_ERROR );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * DisplayImage: load and display an image                               (ok ?)
- *******************************************************************************
+ *****************************************************************************
  * Try to load an image identified by it's filename and displays it as a still
  * image using interface video heap.
- *******************************************************************************/
+ *****************************************************************************/
 static int DisplayImage( int i_argc, intf_arg_t *p_argv )
 {
     /* ?? */
     return( INTF_NO_ERROR );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * Help: list all available commands                                     (ok ?)
- *******************************************************************************
+ *****************************************************************************
  * This function print a list of available commands
- *******************************************************************************/
+ *****************************************************************************/
 static int Help( int i_argc, intf_arg_t *p_argv )
 {
-    int     i_index;                                          /* command index */
+    int     i_index;                                        /* command index */
 
-    /* If called with an argument: look for the command and display it's help */
+   /* If called with an argument: look for the command and display it's help */
     if( i_argc == 2 )
     {
 fprintf( stderr, "maxx debug: coin\n" );
-        for( i_index = 0; control_command[i_index].psz_name 
+        for( i_index = 0; control_command[i_index].psz_name
                  && strcmp( control_command[i_index].psz_name, p_argv[1].psz_str );
              i_index++ )
         {
@@ -288,7 +288,7 @@ fprintf( stderr, "maxx debug: blih\n" );
     {
         for( i_index = 0; control_command[i_index].psz_name; i_index++ )
         {
-            intf_IntfMsg( "%s: %s",  control_command[i_index].psz_name, 
+            intf_IntfMsg( "%s: %s",  control_command[i_index].psz_name,
                           control_command[i_index].psz_summary );
         }
     }
@@ -296,18 +296,18 @@ fprintf( stderr, "maxx debug: blih\n" );
     return( INTF_NO_ERROR );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * PlayAudio: play an audio file                                         (ok ?)
- ******************************************************************************
+ *****************************************************************************
  * Play a raw audio file from a file, at a given rate.
- ******************************************************************************/
+ *****************************************************************************/
 static int PlayAudio( int i_argc, intf_arg_t *p_argv )
 {
-    char * psz_file = NULL;               /* name of the audio raw file (s16) */
-    int i_fd;       /* file descriptor of the audio file that is to be loaded */
-    aout_fifo_t fifo;          /* fifo stores the informations about the file */
-    struct stat stat_buffer;       /* needed to find out the size of psz_file */
-    int i_arg;                                              /* argument index */
+    char * psz_file = NULL;              /* name of the audio raw file (s16) */
+    int i_fd;      /* file descriptor of the audio file that is to be loaded */
+    aout_fifo_t fifo;         /* fifo stores the informations about the file */
+    struct stat stat_buffer;      /* needed to find out the size of psz_file */
+    int i_arg;                                             /* argument index */
 
     if ( !p_main->b_audio )                  /* audio is disabled */
     {
@@ -325,13 +325,13 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
     {
         switch( p_argv[i_arg].i_index )
         {
-        case 0:                                                     /* stereo */
+        case 0:                                                    /* stereo */
             fifo.b_stereo = p_argv[i_arg].i_num;
             break;
-        case 1:                                                       /* rate */
+        case 1:                                                      /* rate */
             fifo.l_rate = p_argv[i_arg].i_num;
             break;
-        case 2:                                                   /* filename */
+        case 2:                                                  /* filename */
             psz_file = p_argv[i_arg].psz_str;
             break;
         }
@@ -355,7 +355,7 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
 
     /* Open file */
     i_fd =  open( psz_file, O_RDONLY );
-    if ( i_fd < 0 )                                                  /* error */
+    if ( i_fd < 0 )                                                 /* error */
     {
         intf_IntfMsg("play-audio error: can't open `%s'", psz_file);
         return( INTF_OTHER_ERROR );
@@ -369,7 +369,7 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
     if ( (fifo.buffer = malloc(sizeof(s16)*(fifo.l_units << fifo.b_stereo))) == NULL ) /* !! */
     {
         intf_IntfMsg("play-audio error: not enough memory to read `%s'", psz_file );
-        close( i_fd );                                          /* close file */
+        close( i_fd );                                         /* close file */
         return( INTF_OTHER_ERROR );
     }
     if ( read(i_fd, fifo.buffer, sizeof(s16)*(fifo.l_units << fifo.b_stereo))
@@ -382,7 +382,7 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
     }
     close( i_fd );
 
-    /* Now we can work out how many output units we can compute with the fifo */
+   /* Now we can work out how many output units we can compute with the fifo */
     fifo.l_units = (long)(((s64)fifo.l_units*(s64)p_main->p_aout->dsp.l_rate)/(s64)fifo.l_rate);
 
     /* Create the fifo */
@@ -396,22 +396,22 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
     return( INTF_NO_ERROR );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * PlayVideo: play a video sequence from a file
- *******************************************************************************
+ *****************************************************************************
  * ??
- *******************************************************************************/
+ *****************************************************************************/
 static int PlayVideo( int i_argc, intf_arg_t *p_argv )
 {
     /* ?? */
-    return( INTF_NO_ERROR );    
+    return( INTF_NO_ERROR );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * Quit: quit program                                                    (ok ?)
- *******************************************************************************
+ *****************************************************************************
  * This function set `die' flag of interface, asking the program to terminate.
- *******************************************************************************/
+ *****************************************************************************/
 static int Quit( int i_argc, intf_arg_t *p_argv )
 {
     p_main->p_intf->b_die = 1;
@@ -419,16 +419,16 @@ static int Quit( int i_argc, intf_arg_t *p_argv )
 }
 
 
-/******************************************************************************
+/*****************************************************************************
  *
- ******************************************************************************
+ *****************************************************************************
  *
- ******************************************************************************/
+ *****************************************************************************/
 static int SelectPID( int i_argc, intf_arg_t *p_argv )
 {
     int i_input = -1, i_pid = -1;
     int i_arg;
-  
+
     /* Parse parameters - see command list above */
     for ( i_arg = 1; i_arg < i_argc; i_arg++ )
     {
@@ -453,36 +453,36 @@ static int SelectPID( int i_argc, intf_arg_t *p_argv )
 }
 
 
-/******************************************************************************
+/*****************************************************************************
  * SpawnInput: spawn an input thread                                     (ok ?)
- ******************************************************************************
+ *****************************************************************************
  * Spawn an input thread
- ******************************************************************************/
+ *****************************************************************************/
 static int SpawnInput( int i_argc, intf_arg_t *p_argv )
 {
     int                 i_arg;
-    int                 i_method = 0;                     /* method parameter */
-    char *              psz_source = NULL;                /* source parameter */
-    int                 i_port = 0;                         /* port parameter */
-    int                 i_vlan = 0;                         /* vlan parameter */
+    int                 i_method = 0;                    /* method parameter */
+    char *              psz_source = NULL;               /* source parameter */
+    int                 i_port = 0;                        /* port parameter */
+    int                 i_vlan = 0;                        /* vlan parameter */
 
     /* Parse parameters - see command list above */
     for ( i_arg = 1; i_arg < i_argc; i_arg++ )
     {
         switch( p_argv[i_arg].i_index )
         {
-        case 0:                                                     /* method */
+        case 0:                                                    /* method */
             i_method = p_argv[i_arg].i_num;
             break;
-        case 1:                                     /* filename, hostname, ip */
+        case 1:                                    /* filename, hostname, ip */
         case 2:
-        case 3:            
+        case 3:
             psz_source = p_argv[i_arg].psz_str;
             break;
-        case 4:                                                       /* port */
+        case 4:                                                      /* port */
             i_port = p_argv[i_arg].i_num;
             break;
-        case 5:                                                       /* VLAN */
+        case 5:                                                      /* VLAN */
             i_vlan = p_argv[i_arg].i_num;
             break;
         }
@@ -490,51 +490,51 @@ static int SpawnInput( int i_argc, intf_arg_t *p_argv )
 
     /* Destroy current input, if any */
     if( p_main->p_intf->p_input != NULL )
-    {        
+    {
         input_DestroyThread( p_main->p_intf->p_input, NULL );
     }
 
     p_main->p_intf->p_input = input_CreateThread( i_method, psz_source, i_port, i_vlan,
-                                                  p_main->p_intf->p_vout, p_main->p_aout, 
+                                                  p_main->p_intf->p_vout, p_main->p_aout,
                                                   NULL );
     return( INTF_NO_ERROR );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * Test: test function
- *******************************************************************************
+ *****************************************************************************
  * This function is provided to test new functions in the program. Fell free
- * to modify ! 
+ * to modify !
  * This function is only defined in DEBUG mode.
- *******************************************************************************/
+ *****************************************************************************/
 #ifdef DEBUG
 static int Test( int i_argc, intf_arg_t *p_argv )
 {
-    int i_thread;    
+    int i_thread;
 
 /*??    if( i_argc == 1 )
     {
         i_thread = intf_CreateVoutThread( &p_main->intf_thread, NULL, -1, -1);
-        intf_IntfMsg("return value: %d", i_thread );        
+        intf_IntfMsg("return value: %d", i_thread );
     }
     else*/
     {
-        i_thread = p_argv[1].i_num;        
-    //??    intf_DestroyVoutThread( &p_main->intf_thread, i_thread );        
-    }    
+        i_thread = p_argv[1].i_num;
+    //??    intf_DestroyVoutThread( &p_main->intf_thread, i_thread );
+    }
 
     return( INTF_NO_ERROR );
 }
 #endif
 
-/*******************************************************************************
+/*****************************************************************************
  * Vlan: vlan operations
- *******************************************************************************
+ *****************************************************************************
  * This function performs various vlan operations.
- *******************************************************************************/
+ *****************************************************************************/
 static int Vlan( int i_argc, intf_arg_t *p_argv  )
 {
-    int i_command;                                  /* command argument number */
+    int i_command;                                /* command argument number */
 
     /* Do not try anything if vlans are desactivated */
     if( !p_main->b_vlans )
@@ -542,19 +542,19 @@ static int Vlan( int i_argc, intf_arg_t *p_argv  )
         intf_IntfMsg("vlans are desactivated");
         return( INTF_OTHER_ERROR );
     }
-    
+
     /* Look for command in list of arguments - this argument is mandatory and
      * imposed by the calling function */
     for( i_command = 1; p_argv[i_command].i_index == 1; i_command++ )
     {
-        ;        
+        ;
     }
-    
+
     /* Command is 'join' */
     if( !strcmp(p_argv[i_command].psz_str, "join") )
     {
         /* ?? */
-    }    
+    }
     /* Command is 'leave' */
     else if( !strcmp(p_argv[i_command].psz_str, "leave") )
     {
@@ -564,22 +564,22 @@ static int Vlan( int i_argc, intf_arg_t *p_argv  )
     else
     {
         intf_IntfMsg("vlan error: unknown command %s", p_argv[i_command].psz_str );
-        return( INTF_USAGE_ERROR );        
+        return( INTF_USAGE_ERROR );
     }
-         
+
     return( INTF_NO_ERROR );
 }
 
 
-/*******************************************************************************
+/*****************************************************************************
  * Psi
- *******************************************************************************
- * This function is provided to display PSI tables. 
- *******************************************************************************/
+ *****************************************************************************
+ * This function is provided to display PSI tables.
+ *****************************************************************************/
 static int Psi( int i_argc, intf_arg_t *p_argv )
 {
     int i_index = p_argv[1].i_num;
-  
+
     intf_IntfMsg("Reading PSI table for input %d\n", i_index);
 //????    input_PsiRead(p_main->p_intf->p_x11->p_input );
     return( INTF_NO_ERROR );

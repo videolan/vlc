@@ -1,15 +1,15 @@
-/*******************************************************************************
+/*****************************************************************************
  * input_netlist.h: netlist interface
  * (c)1998 VideoLAN
- *******************************************************************************
+ *****************************************************************************
  * The netlists are an essential part of the input structure. We maintain a
  * list of free TS packets and free PES packets to avoid continuous malloc
  * and free.
- *******************************************************************************/
+ *****************************************************************************/
 
-/******************************************************************************
+/*****************************************************************************
  * Prototypes
- ******************************************************************************/
+ *****************************************************************************/
 int     input_NetlistInit       ( input_thread_t *p_input );
 void    input_NetlistEnd        ( input_thread_t *p_input );
 
@@ -17,13 +17,13 @@ static __inline__ void input_NetlistFreePES( input_thread_t *p_input, pes_packet
 static __inline__ void input_NetlistFreeTS( input_thread_t *p_input, ts_packet_t *p_ts_packet );
 static __inline__ pes_packet_t* input_NetlistGetPES( input_thread_t *p_input );
 
-/******************************************************************************
+/*****************************************************************************
  * input_NetlistFreePES: add a PES packet to the netlist
- *******************************************************************************
+ *****************************************************************************
  * Add a PES packet to the PES netlist, so that the packet can immediately be
  * reused by the demultiplexer. We put this function directly in the .h file,
  * because it is very frequently called.
- *******************************************************************************/
+ *****************************************************************************/
 static __inline__ void input_NetlistFreePES( input_thread_t *p_input,
                                   pes_packet_t *p_pes_packet )
 {
@@ -53,7 +53,7 @@ static __inline__ void input_NetlistFreePES( input_thread_t *p_input,
 #endif
         p_ts_packet = p_ts_packet->p_next_ts;
     }
-    
+
     /* Free the PES structure. */
 #ifdef INPUT_LIFO_PES_NETLIST
     p_input->netlist.i_pes_index--;
@@ -67,13 +67,13 @@ static __inline__ void input_NetlistFreePES( input_thread_t *p_input,
     vlc_mutex_unlock( &p_input->netlist.lock );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * input_NetlistFreeTS: add a TS packet to the netlist
- *******************************************************************************
+ *****************************************************************************
  * Add a TS packet to the TS netlist, so that the packet can immediately be
  * reused by the demultiplexer. Shouldn't be called by other threads (they
  * should only use input_FreePES.
- *******************************************************************************/
+ *****************************************************************************/
 static __inline__ void input_NetlistFreeTS( input_thread_t *p_input,
                                             ts_packet_t *p_ts_packet )
 {
@@ -95,19 +95,19 @@ static __inline__ void input_NetlistFreeTS( input_thread_t *p_input,
     vlc_mutex_unlock( &p_input->netlist.lock );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * input_NetlistGetPES: remove a PES packet from the netlist
- *******************************************************************************
+ *****************************************************************************
  * Add a TS packet to the TS netlist, so that the packet can immediately be
  * reused by the demultiplexer. Shouldn't be called by other threads (they
  * should only use input_FreePES.
- *******************************************************************************/
+ *****************************************************************************/
 static __inline__ pes_packet_t* input_NetlistGetPES( input_thread_t *p_input )
 {
     pes_packet_t *          p_pes_packet;
 
 #ifdef INPUT_LIFO_PES_NETLIST
-    /* i_pes_index might be accessed by a decoder thread to give back a 
+    /* i_pes_index might be accessed by a decoder thread to give back a
      * packet. */
     vlc_mutex_lock( &p_input->netlist.lock );
 

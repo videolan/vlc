@@ -75,7 +75,7 @@ typedef struct vpar_thread_s
     /* ?? */
  /*??*/
 //    int *pi_status;
-    
+
 
     /* Input properties */
     decoder_fifo_t      fifo;                              /* PES input fifo */
@@ -85,7 +85,7 @@ typedef struct vpar_thread_s
 
     /* Output properties */
     vout_thread_t *     p_vout;                       /* video output thread */
-    
+
     /* Decoder properties */
     struct vdec_thread_s *      pp_vdec[NB_VDEC];
     video_fifo_t                vfifo;

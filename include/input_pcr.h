@@ -1,7 +1,7 @@
-/*******************************************************************************
+/*****************************************************************************
  * input_pcr.h: PCR management interface
  * (c)1999 VideoLAN
- *******************************************************************************/
+ *****************************************************************************/
 
 /* Maximum number of samples used to compute the dynamic average value,
  * it is also the maximum of c_average in the pcr_descriptor_struct.
@@ -17,10 +17,10 @@
 #define SYNCHRO_START       2
 #define SYNCHRO_REINIT      3
 
-/******************************************************************************
+/*****************************************************************************
  * Prototypes
- ******************************************************************************/
+ *****************************************************************************/
 int            input_PcrInit        ( input_thread_t *p_input );
-void           input_PcrDecode      ( input_thread_t *p_input, es_descriptor_t* p_es, 
+void           input_PcrDecode      ( input_thread_t *p_input, es_descriptor_t* p_es,
                                        u8* p_pcr_data );
 void           input_PcrEnd         ( input_thread_t *p_input );

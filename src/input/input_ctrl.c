@@ -1,26 +1,26 @@
-/*******************************************************************************
+/*****************************************************************************
  * input_ctrl.c: Decodeur control
  * (c)1999 VideoLAN
- *******************************************************************************
+ *****************************************************************************
  * Control the extraction and the decoding of the programs elements carried in
  * a stream.
- *******************************************************************************/
+ *****************************************************************************/
 
-/*******************************************************************************
+/*****************************************************************************
  * Preamble
- *******************************************************************************/
+ *****************************************************************************/
 
 #include "vlc.h"
 
 #if 0
 #include <errno.h>
-#include <sys/uio.h>                                                 /* iovec */
-#include <stdlib.h>                               /* atoi(), malloc(), free() */
+#include <sys/uio.h>                                                /* iovec */
+#include <stdlib.h>                              /* atoi(), malloc(), free() */
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
 
-#include <netinet/in.h>                                              /* ntohs */
+#include <netinet/in.h>                                             /* ntohs */
 
 #include "common.h"
 #include "config.h"
@@ -44,18 +44,18 @@
 
 #endif
 
-/******************************************************************************
+/*****************************************************************************
  * input_AddPgrmElem: Start the extraction and the decoding of a program element
- ******************************************************************************
+ *****************************************************************************
  * Add the element given by its PID in the list of PID to extract and spawn
- * the decoding thread. 
+ * the decoding thread.
  * This function only modifies the table of selected es, but must NOT modify
  * the table of ES itself.
- ******************************************************************************/
+ *****************************************************************************/
 int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
 {
     int i_es_loop, i_selected_es_loop;
-    
+
     /* Since this function is intended to be called by interface, lock the
      * elementary stream structure. */
     vlc_mutex_lock( &p_input->es_lock );
@@ -80,7 +80,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
             /* Find a free spot in pp_selected_es. */
             for( i_selected_es_loop = 0; p_input->pp_selected_es[i_selected_es_loop] != NULL
                   && i_selected_es_loop < INPUT_MAX_SELECTED_ES; i_selected_es_loop++ );
-            
+
             if( i_selected_es_loop == INPUT_MAX_SELECTED_ES )
             {
                 /* array full */
@@ -178,21 +178,21 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
             }
         }
     }
-    
+
     /* We haven't found this PID in the current stream. */
     vlc_mutex_unlock( &p_input->es_lock );
     intf_ErrMsg("input error: can't find PID %d\n", i_current_id);
     return( -1 );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * input_DelPgrmElem: Stop the decoding of a program element
- ******************************************************************************
+ *****************************************************************************
  * Stop the extraction of the element given by its PID and kill the associated
  * decoder thread
  * This function only modifies the table of selected es, but must NOT modify
  * the table of ES itself.
- ******************************************************************************/
+ *****************************************************************************/
 int input_DelPgrmElem( input_thread_t *p_input, int i_current_id )
 {
     int i_selected_es_loop, i_last_selected;
@@ -257,7 +257,7 @@ int input_DelPgrmElem( input_thread_t *p_input, int i_current_id )
                      i_last_selected++ );
 
                 /* Exchange streams. */
-                p_input->pp_selected_es[i_selected_es_loop] = 
+                p_input->pp_selected_es[i_selected_es_loop] =
                             p_input->pp_selected_es[i_last_selected];
                 p_input->pp_selected_es[i_last_selected] = NULL;
 
@@ -275,12 +275,12 @@ int input_DelPgrmElem( input_thread_t *p_input, int i_current_id )
 
 
 
-/******************************************************************************
+/*****************************************************************************
  * input_IsElemRecv: Test if an element given by its PID is currently received
- ******************************************************************************
+ *****************************************************************************
  * Cannot return the position of the es in the pp_selected_es, for it can
  * change once we have released the lock
- ******************************************************************************/
+ *****************************************************************************/
 boolean_t input_IsElemRecv( input_thread_t *p_input, int i_id )
 {
   boolean_t b_is_recv = 0;

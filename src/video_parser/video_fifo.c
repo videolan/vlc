@@ -1,11 +1,11 @@
-/*******************************************************************************
+/*****************************************************************************
  * video_fifo.c : video FIFO management
  * (c)1999 VideoLAN
- *******************************************************************************/
+ *****************************************************************************/
 
-/*******************************************************************************
+/*****************************************************************************
  * Preamble
- *******************************************************************************/
+ *****************************************************************************/
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,7 +19,7 @@
 #include "vlc_thread.h"
 
 #include "intf_msg.h"
-#include "debug.h"                      /* ?? temporaire, requis par netlist.h */
+#include "debug.h"                    /* ?? temporaire, requis par netlist.h */
 
 #include "input.h"
 #include "input_netlist.h"
@@ -53,10 +53,10 @@ void vpar_InitFIFO( vpar_thread_t * p_vpar )
     vlc_mutex_init( &p_vpar->vfifo.lock );
     vlc_cond_init( &p_vpar->vfifo.wait );
     vlc_mutex_init( &p_vpar->vbuffer.lock );
-    
+
     /* Initialize FIFO properties */
     p_vpar->vfifo.i_start = p_vpar->vfifo.i_end = 0;
-    
+
     /* Initialize buffer properties */
     p_vpar->vbuffer.i_index = VFIFO_SIZE; /* all structures are available */
     for( i_dummy = 0; i_dummy < VFIFO_SIZE + 1; i_dummy++ )

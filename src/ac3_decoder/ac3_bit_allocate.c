@@ -29,7 +29,7 @@ static s16 calc_lowcomp(s16 a,s16 b0,s16 b1,s16 bin);
 static inline u16 min(s16 a,s16 b);
 static inline u16 max(s16 a,s16 b);
 */
-static void ba_compute_psd(s16 start, s16 end, s16 exps[], 
+static void ba_compute_psd(s16 start, s16 end, s16 exps[],
 		s16 psd[], s16 bndpsd[]);
 
 static void ba_compute_excitation(s16 start, s16 end,s16 fgain,
@@ -52,7 +52,7 @@ static u16 floortab[] = { 0x2f0, 0x2b0, 0x270, 0x230, 0x1f0, 0x170, 0x0f0, 0xf80
 static s16 fastgain[] = { 0x080, 0x100, 0x180, 0x200, 0x280, 0x300, 0x380, 0x400  };
 
 
-static s16 bndtab[] = {  0,  1,  2,   3,   4,   5,   6,   7,   8,   9, 
+static s16 bndtab[] = {  0,  1,  2,   3,   4,   5,   6,   7,   8,   9,
                      10, 11, 12,  13,  14,  15,  16,  17,  18,  19,
                      20, 21, 22,  23,  24,  25,  26,  27,  28,  31,
                      34, 37, 40,  43,  46,  49,  55,  61,  67,  73,
@@ -116,33 +116,33 @@ static s16 latab[] = { 0x0040, 0x003f, 0x003e, 0x003d, 0x003c, 0x003b, 0x003a, 0
                     0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
                     0x0000, 0x0000, 0x0000, 0x0000};
 
-static s16 hth[][50] = {{ 0x04d0, 0x04d0, 0x0440, 0x0400, 0x03e0, 0x03c0, 0x03b0, 0x03b0,  
-                      0x03a0, 0x03a0, 0x03a0, 0x03a0, 0x03a0, 0x0390, 0x0390, 0x0390,  
-                      0x0380, 0x0380, 0x0370, 0x0370, 0x0360, 0x0360, 0x0350, 0x0350,  
+static s16 hth[][50] = {{ 0x04d0, 0x04d0, 0x0440, 0x0400, 0x03e0, 0x03c0, 0x03b0, 0x03b0,
+                      0x03a0, 0x03a0, 0x03a0, 0x03a0, 0x03a0, 0x0390, 0x0390, 0x0390,
+                      0x0380, 0x0380, 0x0370, 0x0370, 0x0360, 0x0360, 0x0350, 0x0350,
                       0x0340, 0x0340, 0x0330, 0x0320, 0x0310, 0x0300, 0x02f0, 0x02f0,
                       0x02f0, 0x02f0, 0x0300, 0x0310, 0x0340, 0x0390, 0x03e0, 0x0420,
                       0x0460, 0x0490, 0x04a0, 0x0460, 0x0440, 0x0440, 0x0520, 0x0800,
                       0x0840, 0x0840 },
-                      
-                    { 0x04f0, 0x04f0, 0x0460, 0x0410, 0x03e0, 0x03d0, 0x03c0, 0x03b0, 
-                      0x03b0, 0x03a0, 0x03a0, 0x03a0, 0x03a0, 0x03a0, 0x0390, 0x0390, 
-                      0x0390, 0x0380, 0x0380, 0x0380, 0x0370, 0x0370, 0x0360, 0x0360, 
-                      0x0350, 0x0350, 0x0340, 0x0340, 0x0320, 0x0310, 0x0300, 0x02f0, 
-                      0x02f0, 0x02f0, 0x02f0, 0x0300, 0x0320, 0x0350, 0x0390, 0x03e0, 
-                      0x0420, 0x0450, 0x04a0, 0x0490, 0x0460, 0x0440, 0x0480, 0x0630, 
+
+                    { 0x04f0, 0x04f0, 0x0460, 0x0410, 0x03e0, 0x03d0, 0x03c0, 0x03b0,
+                      0x03b0, 0x03a0, 0x03a0, 0x03a0, 0x03a0, 0x03a0, 0x0390, 0x0390,
+                      0x0390, 0x0380, 0x0380, 0x0380, 0x0370, 0x0370, 0x0360, 0x0360,
+                      0x0350, 0x0350, 0x0340, 0x0340, 0x0320, 0x0310, 0x0300, 0x02f0,
+                      0x02f0, 0x02f0, 0x02f0, 0x0300, 0x0320, 0x0350, 0x0390, 0x03e0,
+                      0x0420, 0x0450, 0x04a0, 0x0490, 0x0460, 0x0440, 0x0480, 0x0630,
                       0x0840, 0x0840 },
-                      
-                    { 0x0580, 0x0580, 0x04b0, 0x0450, 0x0420, 0x03f0, 0x03e0, 0x03d0, 
-                      0x03c0, 0x03b0, 0x03b0, 0x03b0, 0x03a0, 0x03a0, 0x03a0, 0x03a0, 
-                      0x03a0, 0x03a0, 0x03a0, 0x03a0, 0x0390, 0x0390, 0x0390, 0x0390, 
-                      0x0380, 0x0380, 0x0380, 0x0370, 0x0360, 0x0350, 0x0340, 0x0330, 
-                      0x0320, 0x0310, 0x0300, 0x02f0, 0x02f0, 0x02f0, 0x0300, 0x0310, 
-                      0x0330, 0x0350, 0x03c0, 0x0410, 0x0470, 0x04a0, 0x0460, 0x0440, 
+
+                    { 0x0580, 0x0580, 0x04b0, 0x0450, 0x0420, 0x03f0, 0x03e0, 0x03d0,
+                      0x03c0, 0x03b0, 0x03b0, 0x03b0, 0x03a0, 0x03a0, 0x03a0, 0x03a0,
+                      0x03a0, 0x03a0, 0x03a0, 0x03a0, 0x0390, 0x0390, 0x0390, 0x0390,
+                      0x0380, 0x0380, 0x0380, 0x0370, 0x0360, 0x0350, 0x0340, 0x0330,
+                      0x0320, 0x0310, 0x0300, 0x02f0, 0x02f0, 0x02f0, 0x0300, 0x0310,
+                      0x0330, 0x0350, 0x03c0, 0x0410, 0x0470, 0x04a0, 0x0460, 0x0440,
                       0x0450, 0x04e0 }};
 
 
 static s16 baptab[] = { 0,  1,  1,  1,  1,  1,  2,  2,  3,  3,  3,  4,  4,  5,  5,  6,
-                     6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  8,  9,  9,  9,  9, 10, 
+                     6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  8,  9,  9,  9,  9, 10,
                      10, 10, 10, 11, 11, 11, 11, 12, 12, 12, 12, 13, 13, 13, 13, 14,
                      14, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15 };
 
@@ -182,22 +182,22 @@ static __inline__ s16 logadd( s16 a, s16 b )
 
 static __inline__ s16 calc_lowcomp( s16 a, s16 b0, s16 b1, s16 bin )
 {
-	if (bin < 7) 
-	{ 
+	if (bin < 7)
+	{
 		if ((b0 + 256) == b1)
-			a = 384; 
-	 	else if (b0 > b1) 
-			a = max(0, a - 64); 
-	} 
-	else if (bin < 20) 
-	{ 
-		if ((b0 + 256) == b1) 
-			a = 320; 
-		else if (b0 > b1) 
-			a = max(0, a - 64) ; 
+			a = 384;
+	 	else if (b0 > b1)
+			a = max(0, a - 64);
 	}
-	else  
-		a = max(0, a - 128); 
+	else if (bin < 20)
+	{
+		if ((b0 + 256) == b1)
+			a = 320;
+		else if (b0 > b1)
+			a = max(0, a - 64) ;
+	}
+	else
+		a = max(0, a - 128);
 	
 	return(a);
 }
@@ -222,15 +222,15 @@ void bit_allocate( ac3dec_thread_t * p_ac3dec )
 		return;
 
 	/* Do some setup before we do the bit alloc */
-	sdecay = slowdec[p_ac3dec->audblk.sdcycod]; 
+	sdecay = slowdec[p_ac3dec->audblk.sdcycod];
 	fdecay = fastdec[p_ac3dec->audblk.fdcycod];
-	sgain = slowgain[p_ac3dec->audblk.sgaincod]; 
-	dbknee = dbpbtab[p_ac3dec->audblk.dbpbcod]; 
-	floor = floortab[p_ac3dec->audblk.floorcod]; 
+	sgain = slowgain[p_ac3dec->audblk.sgaincod];
+	dbknee = dbpbtab[p_ac3dec->audblk.dbpbcod];
+	floor = floortab[p_ac3dec->audblk.floorcod];
 
 	/* if all the SNR offset constants are zero then the whole block is zero */
-	if(!p_ac3dec->audblk.csnroffst    && !p_ac3dec->audblk.fsnroffst[0] && 
-		 !p_ac3dec->audblk.fsnroffst[1] && !p_ac3dec->audblk.fsnroffst[2] && 
+	if(!p_ac3dec->audblk.csnroffst    && !p_ac3dec->audblk.fsnroffst[0] &&
+		 !p_ac3dec->audblk.fsnroffst[1] && !p_ac3dec->audblk.fsnroffst[2] &&
 		 !p_ac3dec->audblk.fsnroffst[3] && !p_ac3dec->audblk.fsnroffst[4] &&
 		 !p_ac3dec->audblk.cplfsnroffst && !p_ac3dec->audblk.lfefsnroffst)
 	{
@@ -243,8 +243,8 @@ void bit_allocate( ac3dec_thread_t * p_ac3dec )
 	for(i = 0; i < p_ac3dec->bsi.nfchans; i++)
 	{
 		start = 0;
-		end = p_ac3dec->audblk.endmant[i] ; 
-		fgain = fastgain[p_ac3dec->audblk.fgaincod[i]]; 
+		end = p_ac3dec->audblk.endmant[i] ;
+		fgain = fastgain[p_ac3dec->audblk.fgaincod[i]];
 		snroffset = (((p_ac3dec->audblk.csnroffst - 15) << 4) + p_ac3dec->audblk.fsnroffst[i]) << 2 ;
 		fastleak = 0;
 		slowleak = 0;
@@ -260,11 +260,11 @@ void bit_allocate( ac3dec_thread_t * p_ac3dec )
 
 	if(p_ac3dec->audblk.cplinu)
 	{
-		start = p_ac3dec->audblk.cplstrtmant; 
-		end = p_ac3dec->audblk.cplendmant; 
+		start = p_ac3dec->audblk.cplstrtmant;
+		end = p_ac3dec->audblk.cplendmant;
 		fgain = fastgain[p_ac3dec->audblk.cplfgaincod];
 		snroffset = (((p_ac3dec->audblk.csnroffst - 15) << 4) + p_ac3dec->audblk.cplfsnroffst) << 2 ;
-		fastleak = (p_ac3dec->audblk.cplfleak << 8) + 768; 
+		fastleak = (p_ac3dec->audblk.cplfleak << 8) + 768;
 		slowleak = (p_ac3dec->audblk.cplsleak << 8) + 768;
 
 		ba_compute_psd(start, end, p_ac3dec->audblk.cpl_exp, psd, bndpsd);
@@ -296,35 +296,35 @@ void bit_allocate( ac3dec_thread_t * p_ac3dec )
 }
 
 
-static void ba_compute_psd(s16 start, s16 end, s16 exps[], 
+static void ba_compute_psd(s16 start, s16 end, s16 exps[],
 		s16 psd[], s16 bndpsd[])
 {
 	int bin,i,j,k;
 	s16 lastbin = 0;
 	
 	/* Map the exponents into dBs */
-	for (bin=start; bin<end; bin++) 
-	{ 
-		psd[bin] = (3072 - (exps[bin] << 7)); 
+	for (bin=start; bin<end; bin++)
+	{
+		psd[bin] = (3072 - (exps[bin] << 7));
 	}
 
 	/* Integrate the psd function over each bit allocation band */
-	j = start; 
-	k = masktab[start]; 
+	j = start;
+	k = masktab[start];
 	
-	do 
-	{ 
-		lastbin = min(bndtab[k] + bndsz[k], end); 
-		bndpsd[k] = psd[j]; 
-		j++; 
+	do
+	{
+		lastbin = min(bndtab[k] + bndsz[k], end);
+		bndpsd[k] = psd[j];
+		j++;
 
-		for (i = j; i < lastbin; i++) 
-		{ 
+		for (i = j; i < lastbin; i++)
+		{
 			bndpsd[k] = logadd(bndpsd[k], psd[j]);
-			j++; 
-		} 
+			j++;
+		}
 		
-		k++; 
+		k++;
 	} while (end > lastbin);
 }
 
@@ -339,61 +339,61 @@ static void ba_compute_excitation(s16 start, s16 end,s16 fgain,
 	s16 begin = 0;
 
 	/* Compute excitation function */
-	bndstrt = masktab[start]; 
-	bndend = masktab[end - 1] + 1; 
+	bndstrt = masktab[start];
+	bndend = masktab[end - 1] + 1;
 	
-	if (bndstrt == 0) /* For fbw and lfe channels */ 
-	{ 
-		lowcomp = calc_lowcomp(lowcomp, bndpsd[0], bndpsd[1], 0); 
-		excite[0] = bndpsd[0] - fgain - lowcomp; 
+	if (bndstrt == 0) /* For fbw and lfe channels */
+	{
+		lowcomp = calc_lowcomp(lowcomp, bndpsd[0], bndpsd[1], 0);
+		excite[0] = bndpsd[0] - fgain - lowcomp;
 		lowcomp = calc_lowcomp(lowcomp, bndpsd[1], bndpsd[2], 1);
-		excite[1] = bndpsd[1] - fgain - lowcomp; 
-		begin = 7 ; 
+		excite[1] = bndpsd[1] - fgain - lowcomp;
+		begin = 7 ;
 		
-		/* Note: Do not call calc_lowcomp() for the last band of the lfe channel, (bin = 6) */ 
-		for (bin = 2; bin < 7; bin++) 
-		{ 
+		/* Note: Do not call calc_lowcomp() for the last band of the lfe channel, (bin = 6) */
+		for (bin = 2; bin < 7; bin++)
+		{
 			if (!(is_lfe && (bin == 6)))
-				lowcomp = calc_lowcomp(lowcomp, bndpsd[bin], bndpsd[bin+1], bin); 
-			fastleak = bndpsd[bin] - fgain; 
-			slowleak = bndpsd[bin] - sgain; 
-			excite[bin] = fastleak - lowcomp; 
+				lowcomp = calc_lowcomp(lowcomp, bndpsd[bin], bndpsd[bin+1], bin);
+			fastleak = bndpsd[bin] - fgain;
+			slowleak = bndpsd[bin] - sgain;
+			excite[bin] = fastleak - lowcomp;
 			
 			if (!(is_lfe && (bin == 6)))
 			{
-				if (bndpsd[bin] <= bndpsd[bin+1]) 
+				if (bndpsd[bin] <= bndpsd[bin+1])
 				{
-					begin = bin + 1 ; 
-					break; 
-				} 
+					begin = bin + 1 ;
+					break;
+				}
 			}
-		} 
+		}
 		
-		for (bin = begin; bin < min(bndend, 22); bin++) 
-		{ 
+		for (bin = begin; bin < min(bndend, 22); bin++)
+		{
 			if (!(is_lfe && (bin == 6)))
-				lowcomp = calc_lowcomp(lowcomp, bndpsd[bin], bndpsd[bin+1], bin); 
-			fastleak -= fdecay ; 
-			fastleak = max(fastleak, bndpsd[bin] - fgain); 
-			slowleak -= sdecay ; 
-			slowleak = max(slowleak, bndpsd[bin] - sgain); 
-			excite[bin] = max(fastleak - lowcomp, slowleak); 
-		} 
-		begin = 22; 
-	} 
-	else /* For coupling channel */ 
-	{ 
-		begin = bndstrt; 
-	} 
+				lowcomp = calc_lowcomp(lowcomp, bndpsd[bin], bndpsd[bin+1], bin);
+			fastleak -= fdecay ;
+			fastleak = max(fastleak, bndpsd[bin] - fgain);
+			slowleak -= sdecay ;
+			slowleak = max(slowleak, bndpsd[bin] - sgain);
+			excite[bin] = max(fastleak - lowcomp, slowleak);
+		}
+		begin = 22;
+	}
+	else /* For coupling channel */
+	{
+		begin = bndstrt;
+	}
 
-	for (bin = begin; bin < bndend; bin++) 
-	{ 
-		fastleak -= fdecay; 
-		fastleak = max(fastleak, bndpsd[bin] - fgain); 
-		slowleak -= sdecay; 
-		slowleak = max(slowleak, bndpsd[bin] - sgain); 
-		excite[bin] = max(fastleak, slowleak) ; 
-	} 
+	for (bin = begin; bin < bndend; bin++)
+	{
+		fastleak -= fdecay;
+		fastleak = max(fastleak, bndpsd[bin] - fgain);
+		slowleak -= sdecay;
+		slowleak = max(slowleak, bndpsd[bin] - sgain);
+		excite[bin] = max(fastleak, slowleak) ;
+	}
 }
 
 static void ba_compute_mask(s16 start, s16 end, u16 fscod,
@@ -452,27 +452,27 @@ static void ba_compute_bap(s16 start, s16 end, s16 snroffset,
 	s16 address = 0;
 
 	/* Compute the bit allocation pointer for each bin */
-	i = start; 
-	j = masktab[start]; 
+	i = start;
+	j = masktab[start];
 
-	do 
-	{ 
-		lastbin = min(bndtab[j] + bndsz[j], end); 
-		mask[j] -= snroffset; 
-		mask[j] -= floor; 
+	do
+	{
+		lastbin = min(bndtab[j] + bndsz[j], end);
+		mask[j] -= snroffset;
+		mask[j] -= floor;
 		
-		if (mask[j] < 0) 
-			mask[j] = 0; 
+		if (mask[j] < 0)
+			mask[j] = 0;
 
 		mask[j] &= 0x1fe0;
-		mask[j] += floor; 
-		for (k = i; k < lastbin; k++) 
-		{ 
-			address = (psd[i] - mask[j]) >> 5; 
-			address = min(63, max(0, address)); 
-			bap[i] = baptab[address]; 
-			i++; 
-		} 
-		j++; 
+		mask[j] += floor;
+		for (k = i; k < lastbin; k++)
+		{
+			address = (psd[i] - mask[j]) >> 5;
+			address = min(63, max(0, address));
+			bap[i] = baptab[address];
+			i++;
+		}
+		j++;
 	} while (end > lastbin);
 }

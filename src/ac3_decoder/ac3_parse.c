@@ -429,12 +429,12 @@ void parse_audblk( ac3dec_thread_t * p_ac3dec )
 			p_ac3dec->audblk.ncplsubnd = (p_ac3dec->audblk.cplendf + 2) - p_ac3dec->audblk.cplbegf + 1;
 
 			/* Calculate the start and end bins of the coupling channel */
-			p_ac3dec->audblk.cplstrtmant = (p_ac3dec->audblk.cplbegf * 12) + 37 ; 
+			p_ac3dec->audblk.cplstrtmant = (p_ac3dec->audblk.cplbegf * 12) + 37 ;
 			p_ac3dec->audblk.cplendmant =  ((p_ac3dec->audblk.cplendf + 3) * 12) + 37;
 
 			/* The number of combined subbands is ncplsubnd minus each combined
 			 * band */
-			p_ac3dec->audblk.ncplbnd = p_ac3dec->audblk.ncplsubnd; 
+			p_ac3dec->audblk.ncplbnd = p_ac3dec->audblk.ncplsubnd;
 
 			for(i=1; i< p_ac3dec->audblk.ncplsubnd; i++)
 			{
@@ -482,7 +482,7 @@ void parse_audblk( ac3dec_thread_t * p_ac3dec )
 		}
 
 		/* If we're in dual mono mode, there's going to be some phase info */
-		if( (p_ac3dec->bsi.acmod == 0x2) && p_ac3dec->audblk.phsflginu && 
+		if( (p_ac3dec->bsi.acmod == 0x2) && p_ac3dec->audblk.phsflginu &&
 				(p_ac3dec->audblk.cplcoe[0] || p_ac3dec->audblk.cplcoe[1]))
 		{
 			for(j=0;j < p_ac3dec->audblk.ncplbnd; j++)
@@ -505,19 +505,9 @@ void parse_audblk( ac3dec_thread_t * p_ac3dec )
 		p_ac3dec->total_bits_read += 1;
 		if(p_ac3dec->audblk.rematstr)
 		{
-			if (p_ac3dec->audblk.cplinu == 0) 
-			{ 
-				for(i = 0; i < 4; i++) 
-				{
-					NeedBits( &(p_ac3dec->bit_stream), 1 );
-					p_ac3dec->audblk.rematflg[i] = (u16)(p_ac3dec->bit_stream.fifo.buffer >> (32 - 1));
-					DumpBits( &(p_ac3dec->bit_stream), 1 );
-					p_ac3dec->total_bits_read += 1;
-				}
-			}
-			if((p_ac3dec->audblk.cplbegf > 2) && p_ac3dec->audblk.cplinu) 
+			if (p_ac3dec->audblk.cplinu == 0)
 			{
-				for(i = 0; i < 4; i++) 
+				for(i = 0; i < 4; i++)
 				{
 					NeedBits( &(p_ac3dec->bit_stream), 1 );
 					p_ac3dec->audblk.rematflg[i] = (u16)(p_ac3dec->bit_stream.fifo.buffer >> (32 - 1));
@@ -525,18 +515,28 @@ void parse_audblk( ac3dec_thread_t * p_ac3dec )
 					p_ac3dec->total_bits_read += 1;
 				}
 			}
-			if((p_ac3dec->audblk.cplbegf <= 2) && p_ac3dec->audblk.cplinu) 
-			{ 
-				for(i = 0; i < 3; i++) 
+			if((p_ac3dec->audblk.cplbegf > 2) && p_ac3dec->audblk.cplinu)
+			{
+				for(i = 0; i < 4; i++)
 				{
 					NeedBits( &(p_ac3dec->bit_stream), 1 );
 					p_ac3dec->audblk.rematflg[i] = (u16)(p_ac3dec->bit_stream.fifo.buffer >> (32 - 1));
 					DumpBits( &(p_ac3dec->bit_stream), 1 );
 					p_ac3dec->total_bits_read += 1;
 				}
-			} 
-			if((p_ac3dec->audblk.cplbegf == 0) && p_ac3dec->audblk.cplinu) 
-				for(i = 0; i < 2; i++) 
+			}
+			if((p_ac3dec->audblk.cplbegf <= 2) && p_ac3dec->audblk.cplinu)
+			{
+				for(i = 0; i < 3; i++)
+				{
+					NeedBits( &(p_ac3dec->bit_stream), 1 );
+					p_ac3dec->audblk.rematflg[i] = (u16)(p_ac3dec->bit_stream.fifo.buffer >> (32 - 1));
+					DumpBits( &(p_ac3dec->bit_stream), 1 );
+					p_ac3dec->total_bits_read += 1;
+				}
+			}
+			if((p_ac3dec->audblk.cplbegf == 0) && p_ac3dec->audblk.cplinu)
+				for(i = 0; i < 2; i++)
 				{
 					NeedBits( &(p_ac3dec->bit_stream), 1 );
 					p_ac3dec->audblk.rematflg[i] = (u16)(p_ac3dec->bit_stream.fifo.buffer >> (32 - 1));
@@ -555,10 +555,10 @@ void parse_audblk( ac3dec_thread_t * p_ac3dec )
 		DumpBits( &(p_ac3dec->bit_stream), 2 );
 		p_ac3dec->total_bits_read += 2;
 
-		if(p_ac3dec->audblk.cplexpstr==0) 
+		if(p_ac3dec->audblk.cplexpstr==0)
 			p_ac3dec->audblk.ncplgrps = 0;
 		else
-			p_ac3dec->audblk.ncplgrps = (p_ac3dec->audblk.cplendmant - p_ac3dec->audblk.cplstrtmant) / 
+			p_ac3dec->audblk.ncplgrps = (p_ac3dec->audblk.cplendmant - p_ac3dec->audblk.cplstrtmant) /
 				(3 << (p_ac3dec->audblk.cplexpstr-1));
 
 	}
@@ -572,7 +572,7 @@ void parse_audblk( ac3dec_thread_t * p_ac3dec )
 	}
 
 	/* Get the exponent strategy for lfe channel */
-	if(p_ac3dec->bsi.lfeon) 
+	if(p_ac3dec->bsi.lfeon)
 	{
 		NeedBits( &(p_ac3dec->bit_stream), 1 );
 		p_ac3dec->audblk.lfeexpstr = (u16)(p_ac3dec->bit_stream.fifo.buffer >> (32 - 1));
@@ -581,13 +581,13 @@ void parse_audblk( ac3dec_thread_t * p_ac3dec )
 	}
 
 	/* Determine the bandwidths of all the fbw channels */
-	for(i = 0; i < p_ac3dec->bsi.nfchans; i++) 
-	{ 
+	for(i = 0; i < p_ac3dec->bsi.nfchans; i++)
+	{
 		u16 grp_size;
 
-		if(p_ac3dec->audblk.chexpstr[i] != EXP_REUSE) 
-		{ 
-			if (p_ac3dec->audblk.cplinu && p_ac3dec->audblk.chincpl[i]) 
+		if(p_ac3dec->audblk.chexpstr[i] != EXP_REUSE)
+		{
+			if (p_ac3dec->audblk.cplinu && p_ac3dec->audblk.chincpl[i])
 			{
 				p_ac3dec->audblk.endmant[i] = p_ac3dec->audblk.cplstrtmant;
 			}

@@ -1,14 +1,14 @@
-/*******************************************************************************
- * psi.c: PSI management 
+/*****************************************************************************
+ * psi.c: PSI management
  * (c)1999 VideoLAN
- *******************************************************************************
+ *****************************************************************************
  * Manages structures containing PSI information, and affiliated decoders.
  * TO DO: Fonctions d'init des structures
- ******************************************************************************/
+ *****************************************************************************/
 
-/*******************************************************************************
+/*****************************************************************************
  * Preamble
- *******************************************************************************/
+ *****************************************************************************/
 #include "vlc.h"
 
 /*
@@ -16,10 +16,10 @@
 #include <pthread.h>
 #include <errno.h>
 #include <stdio.h>
-#include <sys/uio.h>                                                 
-#include <stdlib.h>                              
+#include <sys/uio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <netinet/in.h>                                             
+#include <netinet/in.h>
 #include <sys/soundcard.h>
 
 #include "common.h"
@@ -88,7 +88,7 @@ static stream_descriptor_t* AddStreamDescr( input_thread_t* p_input,
 static void DestroyStreamDescr( input_thread_t* p_input, u16 i_stream_id );
 static pgrm_descriptor_t* AddPgrmDescr( stream_descriptor_t* p_stream,
                                        u16 i_pgrm_id );
-static void DestroyPgrmDescr( input_thread_t* p_input, 
+static void DestroyPgrmDescr( input_thread_t* p_input,
                               stream_descriptor_t* p_stream, u16 i_pgrm_id );
 static es_descriptor_t* AddESDescr( input_thread_t* p_input,
                                     pgrm_descriptor_t* p_pgrm, u16 i_es_pid );
@@ -101,16 +101,16 @@ static boolean_t Is_known( byte_t* a_known_section, u8 i_section );
 static void Set_known( byte_t* a_known_section, u8 i_section );
 static void Unset_known( byte_t* a_known_section, u8 i_section );
 
-/******************************************************************************
+/*****************************************************************************
  * input_PsiInit: Initialize PSI decoder
- ******************************************************************************
+ *****************************************************************************
  * Init the structures in which the PSI decoder will put the informations it
  * got from PSI tables and request for the reception of the PAT.
- ******************************************************************************/
+ *****************************************************************************/
 int input_PsiInit( input_thread_t *p_input )
 {
   ASSERT(p_input);
-  
+
   /* Precalculate the 32-bit CRC table if not already done ???
      TO DO -> Put a lock or do that at pgrm init */
   if( !b_crc_initialised )
@@ -118,7 +118,7 @@ int input_PsiInit( input_thread_t *p_input )
     BuildCrc32Table();
     b_crc_initialised = 1;
   }
-  
+
   /* Init the structure that describes the stream we are receiving */
   AddStreamDescr( p_input, PSI_UNINITIALISED );
 
@@ -133,9 +133,9 @@ int input_PsiInit( input_thread_t *p_input )
   return( 0 );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * input_PsiClean: Clean PSI structures before dying
- ******************************************************************************/
+ *****************************************************************************/
 int input_PsiEnd( input_thread_t *p_input )
 {
   ASSERT(p_input);
@@ -152,19 +152,19 @@ int input_PsiEnd( input_thread_t *p_input )
   return( 0 );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * input_PsiRead: Read the table of programs
- ******************************************************************************
+ *****************************************************************************
  * Ugly debugging function at that time ???????
- ******************************************************************************/
+ *****************************************************************************/
 void input_PsiRead( input_thread_t *p_input /* ??? */ )
 {
   int i_index;
   int i_index2;
   pgrm_descriptor_t* p_pgrm;
-  
+
   ASSERT( p_input );
- 
+
   /* Lock the tables, since this method can be called from any thread */
   //vlc_mutex_lock()
 
@@ -173,7 +173,7 @@ void input_PsiRead( input_thread_t *p_input /* ??? */ )
   {
     intf_IntfMsg( "Warning: PMT not yet complete\n" );
   }
-  
+
   /* Read the table */
   for( i_index = 0; i_index < p_input->p_stream->i_pgrm_number; i_index++ )
   {
@@ -201,12 +201,12 @@ void input_PsiRead( input_thread_t *p_input /* ??? */ )
   //vlc_mutex_unlock()
 }
 
-/******************************************************************************
+/*****************************************************************************
  * input_PsiDecode: Decode a PSI section
- ******************************************************************************
+ *****************************************************************************
  * This funtion is essentially a wrapper that will  perform basic checks on
  * the section and then call the right function according to its type.
- ******************************************************************************/
+ *****************************************************************************/
 void input_PsiDecode( input_thread_t *p_input, psi_section_t* p_psi_section )
 {
   ASSERT(p_input);
@@ -228,7 +228,7 @@ void input_PsiDecode( input_thread_t *p_input, psi_section_t* p_psi_section )
     }
   }
 #endif
-  
+
   /* If the section is not immediatly applicable, trash it (DVB drafts disallow
      transmission of such sections, so we didn't implement it) */
   if( !p_psi_section->buffer[5] & 0x01 )
@@ -236,7 +236,7 @@ void input_PsiDecode( input_thread_t *p_input, psi_section_t* p_psi_section )
     intf_DbgMsg( "PSI not yet applicable: trash it\n" );
     return;
   }
-  
+
   /* Handle the packet according to it's type given it the table_id  */
   switch ( p_psi_section->buffer[0] )
   {
@@ -261,26 +261,26 @@ void input_PsiDecode( input_thread_t *p_input, psi_section_t* p_psi_section )
   }
 }
 
-/******************************************************************************
+/*****************************************************************************
  * DecodeAssocSection: Decode a PAS
- ******************************************************************************
+ *****************************************************************************
  * No check is made to known if the table is currently applicable or not, so
  * that unapplicable sections must be filtered before calling this function
  * The Program Association Table can be segmented to occupy multiple sections
  * so that we have to know which sections we have already received (IsKnown() /
  * SetKnown() calls)
- ******************************************************************************/
+ *****************************************************************************/
 static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
 {
-    u8 i_stream_id;             /* Id of the stream described in that section */
-    u8 i_version;              /* Version of the table carried in the section */
+    u8 i_stream_id;            /* Id of the stream described in that section */
+    u8 i_version;             /* Version of the table carried in the section */
 
-    u16 i_pgrm_id;                       /* Id of the current described  pgrm */
-    u16 i_pgrm_map_pid;            /* PID of the associated program map table */
-    int i_pgrm_number;         /* Number of programs described in the section */
+    u16 i_pgrm_id;                      /* Id of the current described  pgrm */
+    u16 i_pgrm_map_pid;           /* PID of the associated program map table */
+    int i_pgrm_number;        /* Number of programs described in the section */
 
     boolean_t b_is_invalid = 0;
-    
+
     u8 i_current_section;
     u8 i_last_section;
 
@@ -321,7 +321,7 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
             b_is_invalid = 1;
         }
     }
-    
+
     /* Clear the table if needed */
     if( b_is_invalid )
     {
@@ -334,7 +334,7 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
         /* Stop the reception of all programs and PSI informations
            associated with this stream, excepted the PAT on PID 0 and the SDT
            on PID 17 */
-        for( i_es_index = 0; i_es_index < INPUT_MAX_SELECTED_ES && 
+        for( i_es_index = 0; i_es_index < INPUT_MAX_SELECTED_ES &&
              p_input->pp_selected_es[i_es_index]; i_es_index++ )
         {
           if( p_input->pp_selected_es[i_es_index]->b_psi )
@@ -405,7 +405,7 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
                 intf_DbgMsg("Already receiving pid %d", i_pgrm_map_pid);
                 i_es_index = INPUT_MAX_ES+1;
                 break;
-              } 
+              }
             }
             /* Start to receive that PID if we're not already doing it */
             if( i_es_index <= INPUT_MAX_ES )
@@ -420,10 +420,10 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
               AddPgrmDescr(p_descr, i_pgrm_id);
             }
           }
-          
+
           /* We now know the info carried in this section */
           Set_known(p_descr->a_known_PAT_sections, i_current_section);
-        
+
           /* Check if the table is now complete */
           p_descr->i_known_PAT_sections++;
           if( p_descr->i_known_PAT_sections >= i_last_section)
@@ -434,9 +434,9 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
 #undef p_descr
 }
 
-/******************************************************************************
+/*****************************************************************************
  * DecodePgrmMapSection: Decode a PMS
- ******************************************************************************
+ *****************************************************************************
  * No check is made to known if the table is currently applicable or not, so
  * that unapplicable sections must be filtered before calling this function
  * The Program Map Table can be segmented to occupy multiple sections so that
@@ -445,16 +445,16 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
  * Note that the processing of those sections is different from the one of the
  * others since here a section refers to a single program, and a program cannot
  * be segmented into multiple sections
- ******************************************************************************/
+ *****************************************************************************/
 static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
 {
-  u16 i_pgrm_number;           /* Id of the program described in that section */
-  u8 i_version;                /* Version of the description for that program */
-  
+  u16 i_pgrm_number;          /* Id of the program described in that section */
+  u8 i_version;               /* Version of the description for that program */
+
   u16 i_offset;
   u16 i_section_length;
   u16 i_descr_end;
-  
+
   u8 i_last_section;
   u8 i_current_section;
 
@@ -516,7 +516,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
           intf_DbgMsg( "Invalidating PID %d\n", p_pgrm->ap_es[i_index]->i_id );
           DestroyESDescr(p_input, p_pgrm, p_pgrm->ap_es[i_index]->i_id);
         }
-        
+
        /* Update version number */
         p_pgrm->i_version = i_version;
 
@@ -596,7 +596,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
                 p_es->b_pcr = 1;
               else
                 p_es->b_pcr = 0;
-              
+
               /* Read additional info given by the descriptors */
               i_offset += 5;
               intf_DbgMsg("description length for PID %d: %d\n", p_es->i_id,
@@ -617,7 +617,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
           intf_DbgMsg("Description of program %d complete\n", p_pgrm->i_number);
           p_pgrm->b_is_ok = 1;
           Set_known(p_descr->a_known_PMT_sections, i_current_section);
-        
+
           /* Check if the PMT is now complete */
           p_descr->i_known_PMT_sections++;
           if( p_descr->i_known_PMT_sections >= i_last_section)
@@ -680,28 +680,28 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
 #undef p_descr
 }
 
-/******************************************************************************
+/*****************************************************************************
  * DecodeSrvDescrSection
- ******************************************************************************
+ *****************************************************************************
  * A finir et a refaire proprement ????
- ******************************************************************************/
+ *****************************************************************************/
 void DecodeSrvDescrSection( byte_t* p_sdt, input_thread_t *p_input )
 {
   u16 i_stream_id;
   u8 i_version;
   u16 i_length;
-  
+
   int i_index;
   int i_offset;
   boolean_t b_must_update = 0;
-  
+
   int i_descr_end;
 
   ASSERT(p_sdt);
   ASSERT(p_input);
 
 #define p_stream (p_input->p_stream)
-  
+
    /* Read stream id and version number immediately, to be sure they will be
       initialised in all the cases in which we will need them */
    i_stream_id = U16_AT(&p_sdt[3]);
@@ -737,7 +737,7 @@ void DecodeSrvDescrSection( byte_t* p_sdt, input_thread_t *p_input )
 
      while(i_offset < i_length)
      {
-       
+
        /* Find the program to which the description applies */
        for( i_index = 0; i_index < p_stream->i_pgrm_number; i_index++ )
        {
@@ -766,11 +766,11 @@ void DecodeSrvDescrSection( byte_t* p_sdt, input_thread_t *p_input )
 #undef p_stream
 }
 
-/******************************************************************************
+/*****************************************************************************
  * DecodePgrmDescr
- ******************************************************************************
+ *****************************************************************************
  * Decode any descriptor applying to the definition of a program
- ******************************************************************************/
+ *****************************************************************************/
 static void DecodePgrmDescriptor( byte_t* p_descriptor,
                                   pgrm_descriptor_t* p_pgrm )
 {
@@ -790,7 +790,7 @@ static void DecodePgrmDescriptor( byte_t* p_descriptor,
     /* Handle specific descriptor info */
     switch(i_type)
     {
-#ifdef DVB_EXTENSIONS        
+#ifdef DVB_EXTENSIONS
     case PSI_SERVICE_DESCRIPTOR:
     {
         /* Store service type */
@@ -823,11 +823,11 @@ static void DecodePgrmDescriptor( byte_t* p_descriptor,
     }
 }
 
-/******************************************************************************
+/*****************************************************************************
  * DecodeESDescriptor
- ******************************************************************************
+ *****************************************************************************
  * Decode any descriptor applying to the definition of an ES
- ******************************************************************************/
+ *****************************************************************************/
 static void DecodeESDescriptor( byte_t* p_descriptor, es_descriptor_t* p_es )
 {
     u8 i_type;                                     /* Type of the descriptor */
@@ -857,7 +857,7 @@ static void DecodeESDescriptor( byte_t* p_descriptor, es_descriptor_t* p_es )
     {
         intf_DbgMsg("Target background descriptor received\n");
         break;
-    }   
+    }
     case PSI_VIDEO_WINDOW_DESCRIPTOR:
     {
         intf_DbgMsg("Video window descriptor received\n");
@@ -869,22 +869,22 @@ static void DecodeESDescriptor( byte_t* p_descriptor, es_descriptor_t* p_es )
     }
 }
 
-/******************************************************************************
+/*****************************************************************************
  * input_AddPsiPID: Start to receive the PSI info contained in a PID
- ******************************************************************************
+ *****************************************************************************
  * Add a descriptor to the table of es descriptor for that es and mark the es
  * as being to be received by the input (since all PSI must be received to
  * build the description of the program)
- ******************************************************************************/
+ *****************************************************************************/
 static int input_AddPsiPID( input_thread_t *p_input, int i_pid )
 {
   int i_index;
   es_descriptor_t* p_psi_es;
-  int i_rc = 0;  
+  int i_rc = 0;
 
   /* Store the description of this stream in the input thread */
   p_psi_es = AddESDescr(p_input, NULL, i_pid);
-  
+
   if(p_psi_es)
   {
     /* Precise this ES carries PSI */
@@ -930,26 +930,26 @@ static int input_AddPsiPID( input_thread_t *p_input, int i_pid )
   return( i_rc );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * input_DelPsiPID: Stop to receive the PSI info contained in a PID
- ******************************************************************************
+ *****************************************************************************
  * Remove the PID from the list of ES descriptors and from the list of ES that
  * the input must receive.
  * Known PID for PSI should always be received, so that their description
  * should be pointed out by a member of pp_selected_es. But as INPUT_MAX_ES
  * can be different of INPUT_MAX_SELECTED_ES, this may happen, so that we must
  * do 2 loops.
- ******************************************************************************/
+ *****************************************************************************/
 static int input_DelPsiPID( input_thread_t *p_input, int i_pid )
 {
-  int i_es_index, i_last_sel;  
+  int i_es_index, i_last_sel;
 
   intf_DbgMsg( "Deleting PSI PID %d\n", i_pid );
 
   /* Stop to receive the ES. Since the interface can also access the table
      of selected es, lock the elementary stream structure */
   vlc_mutex_lock( &p_input->es_lock );
-  
+
   for( i_es_index = 0; i_es_index < INPUT_MAX_SELECTED_ES; i_es_index++ )
   {
     if( p_input->pp_selected_es[i_es_index] &&
@@ -984,12 +984,12 @@ static int input_DelPsiPID( input_thread_t *p_input, int i_pid )
   return( 0 );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * Precalculate the 32-bit CRC table
- ******************************************************************************
+ *****************************************************************************
  * This table is a global variable shared by all decoders, so it has to be
  * initialised only once
- ******************************************************************************/
+ *****************************************************************************/
 void BuildCrc32Table( )
 {
     u32 i, j, k;
@@ -1002,15 +1002,15 @@ void BuildCrc32Table( )
     }
 }
 
-/******************************************************************************
+/*****************************************************************************
  * Test the validity of a checksum
- ******************************************************************************
+ *****************************************************************************
  * The checksum must be stored at the end of the data, and the given size must
  * include the 32 bits of the CRC.
  * Return 0 if the checksum is OK, any other value if the data are corrupted
- ******************************************************************************/
+ *****************************************************************************/
 int CheckCRC32(byte_t* p_data, int i_data_size)
-{  
+{
   int i;
   u32 i_crc = 0xffffffff;
 
@@ -1022,60 +1022,60 @@ int CheckCRC32(byte_t* p_data, int i_data_size)
   return i_crc;
 }
 
-/******************************************************************************
+/*****************************************************************************
  * Is_known: check if a given section has already been received
- ******************************************************************************
+ *****************************************************************************
  * As a table cannot be segmented into more than 256 sections, we store a 256
  * bits long table, each bit set to one indicating that the corresponding
  * saction has been received
- ******************************************************************************/
+ *****************************************************************************/
 boolean_t Is_known( byte_t* a_known_section, u8 i_section )
 {
   byte_t mask;
   boolean_t b_is_known;
-  
+
   /* Where to get the information ? */
   int i_bit_in_byte = i_section % 8;
   int i_byte_in_table = (i_section - i_bit_in_byte) / 8;
 
   /* Build mask to read the Is_known flag */
   mask = 0x01 << i_bit_in_byte;
-  
+
   /* Read the flag */
   b_is_known = a_known_section[i_byte_in_table] & mask;
 
   return b_is_known;
 }
 
-/******************************************************************************
+/*****************************************************************************
  * Set_known: mark a given section has having been received
- ******************************************************************************
+ *****************************************************************************
  *
- ******************************************************************************/
+ *****************************************************************************/
 static void Set_known( byte_t* a_known_section, u8 i_section )
 {
   byte_t mask;
-  
+
   /* Where to get the information ? */
   int i_bit_in_byte = i_section % 8;
   int i_byte_in_table = (i_section - i_bit_in_byte) / 8;
 
   /* Build mask to read the Is_known flag */
   mask = 0x01 << i_bit_in_byte;
-  
+
   /* Set the flag */
   a_known_section[i_byte_in_table] |= mask;
 }
 
-/******************************************************************************
+/*****************************************************************************
  * Unset_known: remove the 'received' mark for a given section
- ******************************************************************************
- * 
- ******************************************************************************/
+ *****************************************************************************
+ *
+ *****************************************************************************/
 static void Unset_known( byte_t* a_known_section, u8 i_section )
 {
   byte_t mask;
-  
+
   /* Where to get the information ? */
   int i_bit_in_byte = i_section % 8;
   int i_byte_in_table = (i_section - i_bit_in_byte) / 8;
@@ -1083,21 +1083,21 @@ static void Unset_known( byte_t* a_known_section, u8 i_section )
   /* Build mask to read the Is_known flag */
   mask = 0x01 << i_bit_in_byte;
   mask = ~mask;
-  
+
   /* Unset the flag */
   a_known_section[i_byte_in_table] &= mask;
 }
 
-/******************************************************************************
+/*****************************************************************************
  * AddStreamDescr: add and init the stream descriptor of the given input
- ******************************************************************************
- * 
- ******************************************************************************/
+ *****************************************************************************
+ *
+ *****************************************************************************/
 static stream_descriptor_t* AddStreamDescr(input_thread_t* p_input,
                                            u16 i_stream_id)
 {
   ASSERT(p_input);
-  
+
   intf_DbgMsg("Adding description for stream %d\n", i_stream_id);
 
   p_input->p_stream = malloc( sizeof(stream_descriptor_t) );
@@ -1129,11 +1129,11 @@ static stream_descriptor_t* AddStreamDescr(input_thread_t* p_input,
   return p_input->p_stream;
 }
 
-/******************************************************************************
+/*****************************************************************************
  * DestroyStreamDescr: destroy the stream desciptor of the given input
- ******************************************************************************
- * 
- ******************************************************************************/
+ *****************************************************************************
+ *
+ *****************************************************************************/
 static void DestroyStreamDescr(input_thread_t* p_input, u16 i_stream_id)
 {
   int i_index;
@@ -1157,16 +1157,16 @@ static void DestroyStreamDescr(input_thread_t* p_input, u16 i_stream_id)
   p_input->p_stream = NULL;
 }
 
-/******************************************************************************
+/*****************************************************************************
  * AddPgrmDescr: add and init a program descriptor
- ******************************************************************************
+ *****************************************************************************
  * This program descriptor will be referenced in the given stream descriptor
- ******************************************************************************/
+ *****************************************************************************/
 static pgrm_descriptor_t* AddPgrmDescr( stream_descriptor_t* p_stream,
                                         u16 i_pgrm_id)
 {
-  int i_pgrm_index = p_stream->i_pgrm_number;        /* Where to add the pgrm */
-  
+  int i_pgrm_index = p_stream->i_pgrm_number;       /* Where to add the pgrm */
+
   ASSERT(p_stream);
 
   intf_DbgMsg("Adding description for pgrm %d\n", i_pgrm_id);
@@ -1192,11 +1192,11 @@ static pgrm_descriptor_t* AddPgrmDescr( stream_descriptor_t* p_stream,
   return p_stream->ap_programs[i_pgrm_index];
 }
 
-/******************************************************************************
+/*****************************************************************************
  * AddPgrmDescr: destroy a program descriptor
- ******************************************************************************
+ *****************************************************************************
  * All ES descriptions referenced in the descriptor will be deleted.
- ******************************************************************************/
+ *****************************************************************************/
 static void DestroyPgrmDescr( input_thread_t * p_input,
                               stream_descriptor_t * p_stream, u16 i_pgrm_id )
 {
@@ -1221,7 +1221,7 @@ static void DestroyPgrmDescr( input_thread_t * p_input,
   /* Make sure that the pgrm exists */
   ASSERT(i_pgrm_index >= 0);
   ASSERT(p_pgrm);
-  
+
   /* Free the structures that describe the es that belongs to that program */
   for( i_index = 0; i_index < p_pgrm->i_es_number; i_index++ )
   {
@@ -1236,27 +1236,27 @@ static void DestroyPgrmDescr( input_thread_t * p_input,
 
   /* Remove this program from the stream's list of programs */
   p_stream->i_pgrm_number--;
-  p_stream->ap_programs[i_pgrm_index] = 
+  p_stream->ap_programs[i_pgrm_index] =
                                  p_stream->ap_programs[p_stream->i_pgrm_number];
   p_stream->ap_programs = realloc( p_stream->ap_programs,
                           p_stream->i_pgrm_number*sizeof(pgrm_descriptor_t *) );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * AddESDescr:
- ******************************************************************************
+ *****************************************************************************
  * Reserve a slot in the table of ES descritors for the ES and add it to the
  * list of ES of p_pgrm. If p_pgrm if NULL, then the ES is considered as stand
  * alone (PSI ?)
- ******************************************************************************/
+ *****************************************************************************/
 static es_descriptor_t* AddESDescr(input_thread_t* p_input,
                                    pgrm_descriptor_t* p_pgrm, u16 i_es_pid)
 {
   int i_index;
   es_descriptor_t* p_es = NULL;
-  
+
   ASSERT(p_input);
-  
+
   intf_DbgMsg("Adding description for ES %d\n", i_es_pid);
 
   /* Find an empty slot to store the description of that es */
@@ -1274,13 +1274,13 @@ static es_descriptor_t* AddESDescr(input_thread_t* p_input,
     p_es = &p_input->p_es[i_index];
     p_es->i_id = i_es_pid;
     intf_DbgMsg("Slot %d in p_es table assigned to ES %d\n", i_index, i_es_pid);
-    
+
     /* Init its values */
     p_es->i_type = 0;  /* ??? */
     p_es->b_psi = 0;
     p_es->b_pcr = 0;
     p_es->i_continuity_counter = 0xFF;
-    
+
     p_es->p_pes_packet = NULL;
 //    p_es->p_next_pes_packet = NULL;
     p_es->p_dec = NULL;
@@ -1299,20 +1299,20 @@ static es_descriptor_t* AddESDescr(input_thread_t* p_input,
       intf_DbgMsg( "Added ES %d not added to the definition of any pgrm\n",
                    i_es_pid );
   }
-  
+
   return p_es;
 }
 
-/******************************************************************************
+/*****************************************************************************
  * DestroyESDescr:
- ******************************************************************************
- * 
- ******************************************************************************/
+ *****************************************************************************
+ *
+ *****************************************************************************/
 static void DestroyESDescr(input_thread_t* p_input,
                            pgrm_descriptor_t* p_pgrm, u16 i_pid)
 {
   int i_index;
-  
+
   /* Look for the description of the ES */
   for(i_index = 0; i_index < INPUT_MAX_ES; i_index++)
   {

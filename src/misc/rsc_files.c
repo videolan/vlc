@@ -1,12 +1,12 @@
-/*******************************************************************************
+/*****************************************************************************
  * rsc_files.c: resources files manipulation functions
  * (c)1999 VideoLAN
- *******************************************************************************
+ *****************************************************************************
  * This library describe a general format used to store 'resources'. Resources
  * can be anything, including pictures, audio streams, and so on.
- *******************************************************************************/
+ *****************************************************************************/
 
-/*******************************************************************************
+/*****************************************************************************
  * Format of a resource file:
  *  offset      type        meaning
  *  0           char[2]     "RF" (magic number)
@@ -20,11 +20,11 @@
  *  +34         u64         data offset in bytes, from beginning of file
  *  +42         u64         data size in bytes
  * } * i_size
- *******************************************************************************/
+ *****************************************************************************/
 
-/*******************************************************************************
+/*****************************************************************************
  * Preamble
- *******************************************************************************/
+ *****************************************************************************/
 #include <errno.h>
 #include <fcntl.h>
 #include <stdlib.h>
@@ -40,19 +40,19 @@
 
 #include "intf_msg.h"
 
-/*******************************************************************************
+/*****************************************************************************
  * CreateResourceFile: create a new resource file
- *******************************************************************************
+ *****************************************************************************
  * Creates a new resource file. The file is opened read/write and erased if
  * it already exists.
- *******************************************************************************
+ *****************************************************************************
  * Messages type: rsc, major code 101
- *******************************************************************************/
-resource_file_t *CreateResourceFile( char *psz_filename, int i_type, int i_size, 
+ *****************************************************************************/
+resource_file_t *CreateResourceFile( char *psz_filename, int i_type, int i_size,
                                      int i_mode )
 {
-    resource_file_t *   p_file;                              /* new descriptor */
-    int                 i_index;                             /* resource index */
+    resource_file_t *   p_file;                            /* new descriptor */
+    int                 i_index;                           /* resource index */
 
     /* Create descriptor and tables */
     p_file = malloc( sizeof(resource_file_t) );
@@ -67,15 +67,15 @@ resource_file_t *CreateResourceFile( char *psz_filename, int i_type, int i_size,
         intf_ErrMsg("rsc error 101-2: %s\n", strerror(errno));
         free( p_file );
         return( NULL );
-    } 
-                
+    }
+
     /* Open file */
-    p_file->i_file = open( psz_filename, O_CREAT | O_RDWR, i_mode ); 
-    if( p_file->i_file == -1 )                                        /* error */
+    p_file->i_file = open( psz_filename, O_CREAT | O_RDWR, i_mode );
+    if( p_file->i_file == -1 )                                      /* error */
     {
         intf_ErrMsg("rsc error 101-3: %s: %s\n", psz_filename, strerror(errno) );
         free( p_file->p_resource );
-        free( p_file );        
+        free( p_file );
     }
 
     /* Initialize tables */
@@ -90,19 +90,19 @@ resource_file_t *CreateResourceFile( char *psz_filename, int i_type, int i_size,
     return( p_file );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * OpenResourceFile: open an existing resource file read-only
- *******************************************************************************
+ *****************************************************************************
  * Open an existing resource file. i_flags should be O_RDONLY or O_RDWR. An
  * error will occurs if the file does not exists.
- *******************************************************************************
+ *****************************************************************************
  * Messages type: rsc, major code 102
- *******************************************************************************/
+ *****************************************************************************/
 resource_file_t *OpenResourceFile( char *psz_filename, int i_type, int i_flags )
 {
-    resource_file_t *   p_file;                              /* new descriptor */
-    int                 i_index;                             /* resource index */
-    byte_t              p_buffer[50];                                /* buffer */
+    resource_file_t *   p_file;                            /* new descriptor */
+    int                 i_index;                           /* resource index */
+    byte_t              p_buffer[50];                              /* buffer */
 
     /* Create descriptor and tables */
     p_file = malloc( sizeof(resource_file_t) );
@@ -110,17 +110,17 @@ resource_file_t *OpenResourceFile( char *psz_filename, int i_type, int i_flags )
     {
         intf_ErrMsg("rsc error 102-1: %s\n", strerror(errno));
         return( NULL );
-    }   
-                
+    }
+
     /* Open file */
-    p_file->i_file = open( psz_filename, i_flags ); 
-    if( p_file->i_file == -1 )                                        /* error */
+    p_file->i_file = open( psz_filename, i_flags );
+    if( p_file->i_file == -1 )                                      /* error */
     {
         intf_ErrMsg("rsc error 102-2: %s: %s\n", psz_filename, strerror(errno) );
-        free( p_file );         
+        free( p_file );
         return( NULL );
-    }   
-    
+    }
+
     /* Read header */
     if( read( p_file->i_file, p_buffer, 8 ) != 8)
     {
@@ -148,8 +148,8 @@ resource_file_t *OpenResourceFile( char *psz_filename, int i_type, int i_flags )
         close( p_file->i_file );
         free( p_file );
         return( NULL );
-    } 
-    
+    }
+
     /* Initialize table */
     p_file->b_up_to_date = 1;
     p_file->b_read_only = ( i_flags & O_RDWR ) ? 0 : 1;
@@ -173,19 +173,19 @@ resource_file_t *OpenResourceFile( char *psz_filename, int i_type, int i_flags )
     return( p_file );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * UpdateResourceFile: write the resources table in a resource file
- *******************************************************************************
- * This function writes resources table in the resource file. This is 
+ *****************************************************************************
+ * This function writes resources table in the resource file. This is
  * automatically done when the file is closed, but can also be done manually.
- *******************************************************************************
+ *****************************************************************************
  * Messages type: rsc, major code 103
- *******************************************************************************/
+ *****************************************************************************/
 int UpdateResourceFile( resource_file_t *p_file )
 {
-    byte_t      p_buffer[50];                                        /* buffer */
-    int         i_index;                                     /* resource index */
-                             
+    byte_t      p_buffer[50];                                      /* buffer */
+    int         i_index;                                   /* resource index */
+
 #ifdef DEBUG
     if( p_file->b_read_only )
     {
@@ -210,7 +210,7 @@ int UpdateResourceFile( resource_file_t *p_file )
     *(u16 *)(p_buffer + 6) =    p_file->i_size;
     if( write( p_file->i_file, p_buffer, 8 ) != 8 )
     {
-        intf_ErrMsg("rsc error 103-2: %s\n", strerror(errno)); 
+        intf_ErrMsg("rsc error 103-2: %s\n", strerror(errno));
         return( -3 );
     }
 
@@ -220,12 +220,12 @@ int UpdateResourceFile( resource_file_t *p_file )
         memcpy( p_buffer, p_file->p_resource[i_index].psz_name, 32 );
         *(u16 *)(p_buffer + 32) =   p_file->p_resource[i_index].i_type;
         *(u64 *)(p_buffer + 34) =   p_file->p_resource[i_index].i_offset;
-        *(u64 *)(p_buffer + 42) =   p_file->p_resource[i_index].i_size;            
+        *(u64 *)(p_buffer + 42) =   p_file->p_resource[i_index].i_size;
         if( write( p_file->i_file, p_buffer, 8 ) != 8 )
         {
-            intf_ErrMsg("rsc error 103-3: %s\n", strerror(errno)); 
+            intf_ErrMsg("rsc error 103-3: %s\n", strerror(errno));
             return( -4 );
-        }           
+        }
     }
 
     /* Mark file as up to date */
@@ -234,14 +234,14 @@ int UpdateResourceFile( resource_file_t *p_file )
     return( 0 );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * CloseResourceFile: close a resource file
- *******************************************************************************
+ *****************************************************************************
  * Updates the resources table if required, and close the file. It returns non
  * 0 in case of error.
- *******************************************************************************
+ *****************************************************************************
  * Messages type: rsc, major code 104
- *******************************************************************************/
+ *****************************************************************************/
 int CloseResourceFile( resource_file_t *p_file )
 {
     /* Update table */
@@ -261,23 +261,23 @@ int CloseResourceFile( resource_file_t *p_file )
     return( 0 );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * SeekResource: seek a resource in a resource file
- *******************************************************************************
+ *****************************************************************************
  * Look for a resource in file and place the "reading head" at the beginning of
  * the resource data.
  * In case of success, the resource number is returned. Else, a negative number
  * is returned.
- *******************************************************************************
+ *****************************************************************************
  * Messages type: rsc, major code 105
- *******************************************************************************/
+ *****************************************************************************/
 int SeekResource( resource_file_t *p_file, char *psz_name, int i_type )
 {
-    int     i_index;                                         /* resource index */
+    int     i_index;                                       /* resource index */
 
     /* Look for resource in table */
-    for( i_index = 0; 
-         (i_index < p_file->i_size) 
+    for( i_index = 0;
+         (i_index < p_file->i_size)
              && ((i_type != p_file->p_resource[i_index].i_type )
                  || strcmp(psz_name, p_file->p_resource[i_index].psz_name));
          i_index++ )
@@ -293,7 +293,7 @@ int SeekResource( resource_file_t *p_file, char *psz_name, int i_type )
     /* Seek */
     if( lseek( p_file->i_file, p_file->p_resource[i_index].i_offset, SEEK_SET ) )
     {
-        intf_ErrMsg("rsc error 105-2: can not reach %s.%d: %s\n", psz_name, 
+        intf_ErrMsg("rsc error 105-2: can not reach %s.%d: %s\n", psz_name,
                     i_type, strerror(errno));
         return( -2 );
     }
@@ -301,18 +301,18 @@ int SeekResource( resource_file_t *p_file, char *psz_name, int i_type )
     return( i_index );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * ReadResource: read a resource
- *******************************************************************************
+ *****************************************************************************
  * Read a resource from a file. The function returns a negative value in case
  * of error, and 0 in case of success.
- *******************************************************************************
+ *****************************************************************************
  * Messages type: rsc, major code 106
- *******************************************************************************/
+ *****************************************************************************/
 int ReadResource( resource_file_t *p_file, char *psz_name, int i_type,
                   size_t max_size, byte_t *p_data )
 {
-    int i_index;                                             /* resource index */
+    int i_index;                                           /* resource index */
 
     /* Seek resource */
     i_index = SeekResource( p_file, psz_name, i_type );
@@ -329,11 +329,11 @@ int ReadResource( resource_file_t *p_file, char *psz_name, int i_type,
     }
 
     /* Read data */
-    if( read( p_file->i_file, p_data, p_file->p_resource[i_index].i_size ) 
+    if( read( p_file->i_file, p_data, p_file->p_resource[i_index].i_size )
         != p_file->p_resource[i_index].i_size )
     {
         intf_ErrMsg("rsc error 106-2: can not read %s.%d: %s\n",
-                    p_file->p_resource[i_index].psz_name, 
+                    p_file->p_resource[i_index].psz_name,
                     p_file->p_resource[i_index].i_type,
                     strerror(errno));
         return( -3 );
@@ -342,19 +342,19 @@ int ReadResource( resource_file_t *p_file, char *psz_name, int i_type,
     return( 0 );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * WriteResource: write a resource
- *******************************************************************************
+ *****************************************************************************
  * Append a resource at the end of the file. It returns non 0 on error.
- *******************************************************************************
+ *****************************************************************************
  * Messages type: rsc, major code 107
- *******************************************************************************/
-int WriteResource( resource_file_t *p_file, char *psz_name, int i_type, 
+ *****************************************************************************/
+int WriteResource( resource_file_t *p_file, char *psz_name, int i_type,
                    size_t size, byte_t *p_data )
 {
-    int i_index;                                             /* resource index */
-    int i_tmp_index;                               /* temporary resource index */
-    u64 i_offset;                                                    /* offset */
+    int i_index;                                           /* resource index */
+    int i_tmp_index;                             /* temporary resource index */
+    u64 i_offset;                                                  /* offset */
 
 #ifdef DEBUG
     if( p_file->b_read_only )
@@ -371,7 +371,7 @@ int WriteResource( resource_file_t *p_file, char *psz_name, int i_type,
     {
         if( p_file->p_resource[i_tmp_index].i_type != EMPTY_RESOURCE)
         {
-            i_offset = MAX( i_offset, p_file->p_resource[i_tmp_index].i_offset 
+            i_offset = MAX( i_offset, p_file->p_resource[i_tmp_index].i_offset
                             + p_file->p_resource[i_tmp_index].i_size );
         }
         else if( i_index == -1 )
@@ -401,7 +401,7 @@ int WriteResource( resource_file_t *p_file, char *psz_name, int i_type,
 
     /* Update table */
     strncpy( p_file->p_resource[i_index].psz_name, psz_name, RESOURCE_MAX_NAME );
-    p_file->p_resource[i_index].psz_name[RESOURCE_MAX_NAME] = '\0';        
+    p_file->p_resource[i_index].psz_name[RESOURCE_MAX_NAME] = '\0';
     p_file->p_resource[i_index].i_type = i_type;
     p_file->p_resource[i_index].i_offset = i_offset;
     p_file->p_resource[i_index].i_size = size;

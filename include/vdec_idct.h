@@ -12,7 +12,7 @@
 
 /*****************************************************************************
  * Common declarations
- *****************************************************************************/ 
+ *****************************************************************************/
 
 #ifndef VDEC_DFT
 typedef short dctelem_t;
@@ -87,7 +87,7 @@ struct vdec_thread_s;
  */
 
 #define CONST_BITS 8       /* Jimmy chose this constant :) */
- 
+
 #ifdef EIGHT_BIT_SAMPLES
 #define PASS1_BITS  2
 #else

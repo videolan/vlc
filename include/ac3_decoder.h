@@ -279,7 +279,7 @@ typedef struct audblk_s
 
 	/* Bit allocation pointer results */
 	u16 fbw_bap[5][256];
-	//FIXME figure out exactly how many entries there should be (253-37?) 
+	//FIXME figure out exactly how many entries there should be (253-37?)
 	u16 cpl_bap[256];
 	u16 lfe_bap[7];
 

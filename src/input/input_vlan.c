@@ -1,11 +1,11 @@
-/*******************************************************************************
+/*****************************************************************************
  * input_vlan.c: vlan management library
  * (c)1999 VideoLAN
- *******************************************************************************/
+ *****************************************************************************/
 
-/*******************************************************************************
+/*****************************************************************************
  * Preamble
- *******************************************************************************/
+ *****************************************************************************/
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -27,29 +27,29 @@
 #include "intf_msg.h"
 #include "main.h"
 
-/*******************************************************************************
+/*****************************************************************************
  * input_vlan_t: vlan library data
- *******************************************************************************
+ *****************************************************************************
  * Store global vlan library data.
- *******************************************************************************/
+ *****************************************************************************/
 typedef struct input_vlan_s
-{    
-    int         i_vlan_id;                              /* current vlan number */
-    mtime_t     last_change;                               /* last change date */
+{
+    int         i_vlan_id;                            /* current vlan number */
+    mtime_t     last_change;                             /* last change date */
 } input_vlan_t;
 
-/*******************************************************************************
+/*****************************************************************************
  * Local prototypes
- *******************************************************************************/
+ *****************************************************************************/
 static int ZeTrucMucheFunction( int Channel );
 
-/*******************************************************************************
+/*****************************************************************************
  * input_VlanCreate: initialize global vlan method data
- *******************************************************************************
+ *****************************************************************************
  * Initialize vlan input method global data. This function should be called
  * once before any input thread is created or any call to other input_Vlan*()
  * function is attempted.
- *******************************************************************************/
+ *****************************************************************************/
 int input_VlanCreate( void )
 {
     /* Allocate structure */
@@ -57,67 +57,67 @@ int input_VlanCreate( void )
     if( p_main->p_vlan == NULL )
     {
         intf_ErrMsg("error: %s\n", strerror(ENOMEM));
-        return( 1 );        
+        return( 1 );
     }
 
     /* Initialize structure */
     p_main->p_vlan->i_vlan_id   = 0;
-    p_main->p_vlan->last_change = 0;    
+    p_main->p_vlan->last_change = 0;
 
-    intf_Msg("VLANs initialized\n");    
-    return( 0 );    
+    intf_Msg("VLANs initialized\n");
+    return( 0 );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * input_VlanDestroy: free global vlan method data
- *******************************************************************************
+ *****************************************************************************
  * Free resources allocated by input_VlanMethodInit. This function should be
  * called at the end of the program.
- *******************************************************************************/
+ *****************************************************************************/
 void input_VlanDestroy( void )
 {
     /* Return to default vlan */
     if( p_main->p_vlan->i_vlan_id != 0 )
     {
-        input_VlanJoin( 0 );        
-    }    
-    
+        input_VlanJoin( 0 );
+    }
+
     /* Free structure */
-    free( p_main->p_vlan );        
+    free( p_main->p_vlan );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * input_VlanJoin: join a vlan
- *******************************************************************************
+ *****************************************************************************
  * This function will try to join a vlan. If the relevant interface is already
- * on the good vlan, nothing will be done. Else, and if possible (if the 
+ * on the good vlan, nothing will be done. Else, and if possible (if the
  * interface is not locked), the vlan server will be contacted and a change will
  * be requested. The function will block until the change is effective. Note
  * that once a vlan is no more used, it's interface should be unlocked using
  * input_VlanLeave().
  * Non 0 will be returned in case of error.
- *******************************************************************************/
+ *****************************************************************************/
 int input_VlanJoin( int i_vlan_id )
-{    
+{
     /* If last change is too recent, wait a while */
     if( mdate() - p_main->p_vlan->last_change < INPUT_VLAN_CHANGE_DELAY )
     {
         intf_Msg("Waiting before changing VLAN...\n");
-        mwait( p_main->p_vlan->last_change + INPUT_VLAN_CHANGE_DELAY );        
+        mwait( p_main->p_vlan->last_change + INPUT_VLAN_CHANGE_DELAY );
     }
     p_main->p_vlan->last_change = mdate();
-    p_main->p_vlan->i_vlan_id = i_vlan_id;    
+    p_main->p_vlan->i_vlan_id = i_vlan_id;
 
     intf_Msg("Joining VLAN %d (channel %d)\n", i_vlan_id + 2, i_vlan_id );
     return( ZeTrucMucheFunction( i_vlan_id ) ); // ?? join vlan
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * input_VlanLeave: leave a vlan
- *******************************************************************************
+ *****************************************************************************
  * This function tells the vlan library that the designed interface is no more
  * locked and than vlan changes can occur.
- *******************************************************************************/
+ *****************************************************************************/
 void input_VlanLeave( int i_vlan_id )
 {
     // ??
@@ -134,7 +134,7 @@ static int ZeTrucMucheFunction( int Channel)
 	struct sockaddr_in	sa_client;
         char mess[80];
 
-  	/*      
+  	/*
 	 *Looking for informations about the eth0 interface
 	 */
 
@@ -145,13 +145,13 @@ static int ZeTrucMucheFunction( int Channel)
 
 	/* Looking for the interface IP address */
 	ioctl( i_socket, SIOCGIFDSTADDR, &interface );
-	ipaddr = inet_ntoa((*(struct sockaddr_in *)(&(interface.ifr_addr))).sin_addr ); 
+	ipaddr = inet_ntoa((*(struct sockaddr_in *)(&(interface.ifr_addr))).sin_addr );
 
 	/* Looking for the interface MAC address */
 	ioctl( i_socket, SIOCGIFHWADDR, &interface );
 	close( i_socket );
 	
-	/* 
+	/*
 	 * Getting address, port, ... of the server
 	 */
 
@@ -165,7 +165,7 @@ static int ZeTrucMucheFunction( int Channel)
 	inet_aton( main_GetPszVariable( INPUT_VLAN_SERVER_VAR, INPUT_VLAN_SERVER_DEFAULT ), &(sa_server.sin_addr) );
 	
 	/*
-	 * Getting address, port, ... of the client 
+	 * Getting address, port, ... of the client
 	 */
 
 	/* Initialize */

@@ -25,7 +25,7 @@ typedef struct video_synchro_tab_s
 {
     double mean;
     double deviation;
-    
+
 } video_synchro_tab_t;
 
 typedef struct video_synchro_fifo_s
@@ -34,7 +34,7 @@ typedef struct video_synchro_fifo_s
     int i_image_type;
     mtime_t i_decode_date;
     mtime_t i_pts;
-    
+
 } video_synchro_fifo_t;
 
 typedef struct video_synchro_s
@@ -47,12 +47,12 @@ typedef struct video_synchro_s
     /* mean decoding time */
     mtime_t i_mean_decode_time;
     /* dates */
-    mtime_t i_last_display_pts;            /* pts of the last displayed image */
-    mtime_t i_last_decode_pts;               /* pts of the last decoded image */
-    mtime_t i_last_i_pts;                          /* pts of the last I image */
-    mtime_t i_last_nondropped_i_pts;       /* pts of last non-dropped I image */
+    mtime_t i_last_display_pts;           /* pts of the last displayed image */
+    mtime_t i_last_decode_pts;              /* pts of the last decoded image */
+    mtime_t i_last_i_pts;                         /* pts of the last I image */
+    mtime_t i_last_nondropped_i_pts;      /* pts of last non-dropped I image */
     unsigned int i_images_since_pts;
-    
+
     /* il manquait un compteur */
     unsigned int modulo;
 

@@ -54,7 +54,7 @@
  */
 
     /* Table for coded_block_pattern resolution */
-static lookup_t     pl_coded_pattern[512] = 
+static lookup_t     pl_coded_pattern[512] =
     { {MB_ERROR, 0}, {0, 9}, {39, 9}, {27, 9}, {59, 9}, {55, 9}, {47, 9}, {31, 9},
     {58, 8}, {58, 8}, {54, 8}, {54, 8}, {46, 8}, {46, 8}, {30, 8}, {30, 8},
     {57, 8}, {57, 8}, {53, 8}, {53, 8}, {45, 8}, {45, 8}, {29, 8}, {29, 8},
@@ -64,66 +64,66 @@ static lookup_t     pl_coded_pattern[512] =
     {41, 8}, {41, 8}, {21, 8}, {21, 8}, {49, 8}, {49, 8}, {13, 8}, {13, 8},
     {35, 8}, {35, 8}, {19, 8}, {19, 8}, {11, 8}, {11, 8}, {7, 8}, {7, 8},
     {34, 7}, {34, 7}, {34, 7}, {34, 7}, {18, 7}, {18, 7}, {18, 7}, {18, 7},
-    {10, 7}, {10, 7}, {10, 7}, {10, 7}, {6, 7}, {6, 7}, {6, 7}, {6, 7}, 
-    {33, 7}, {33, 7}, {33, 7}, {33, 7}, {17, 7}, {17, 7}, {17, 7}, {17, 7}, 
-    {9, 7}, {9, 7}, {9, 7}, {9, 7}, {5, 7}, {5, 7}, {5, 7}, {5, 7}, 
-    {63, 6}, {63, 6}, {63, 6}, {63, 6}, {63, 6}, {63, 6}, {63, 6}, {63, 6}, 
-    {3, 6}, {3, 6}, {3, 6}, {3, 6}, {3, 6}, {3, 6}, {3, 6}, {3, 6}, 
-    {36, 6}, {36, 6}, {36, 6}, {36, 6}, {36, 6}, {36, 6}, {36, 6}, {36, 6}, 
-    {24, 6}, {24, 6}, {24, 6}, {24, 6}, {24, 6}, {24, 6}, {24, 6}, {24, 6}, 
+    {10, 7}, {10, 7}, {10, 7}, {10, 7}, {6, 7}, {6, 7}, {6, 7}, {6, 7},
+    {33, 7}, {33, 7}, {33, 7}, {33, 7}, {17, 7}, {17, 7}, {17, 7}, {17, 7},
+    {9, 7}, {9, 7}, {9, 7}, {9, 7}, {5, 7}, {5, 7}, {5, 7}, {5, 7},
+    {63, 6}, {63, 6}, {63, 6}, {63, 6}, {63, 6}, {63, 6}, {63, 6}, {63, 6},
+    {3, 6}, {3, 6}, {3, 6}, {3, 6}, {3, 6}, {3, 6}, {3, 6}, {3, 6},
+    {36, 6}, {36, 6}, {36, 6}, {36, 6}, {36, 6}, {36, 6}, {36, 6}, {36, 6},
+    {24, 6}, {24, 6}, {24, 6}, {24, 6}, {24, 6}, {24, 6}, {24, 6}, {24, 6},
     {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5},
     {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5},
-    {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, 
-    {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, 
-    {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, 
-    {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, 
-    {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, 
-    {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, 
-    {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, 
-    {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, 
-    {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, 
-    {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, 
-    {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, 
-    {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, 
-    {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, 
-    {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, 
-    {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, 
-    {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, 
-    {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, 
-    {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, 
-    {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, 
-    {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, 
-    {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, 
-    {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, 
-    {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, 
-    {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, 
-    {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, 
-    {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, 
-    {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, 
-    {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, 
-    {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, 
-    {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, 
-    {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, 
-    {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, 
-    {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, 
+    {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5},
+    {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5},
+    {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5},
+    {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5},
+    {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5},
+    {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5},
+    {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5},
+    {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5},
+    {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5},
+    {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5},
+    {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5},
+    {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5},
+    {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5},
+    {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5},
+    {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5},
+    {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5},
+    {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5},
+    {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5},
+    {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5},
+    {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5},
+    {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5},
+    {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5},
+    {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4},
+    {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4},
+    {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4},
+    {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4},
+    {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4},
+    {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4},
+    {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4},
+    {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4},
+    {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4},
+    {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4},
+    {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4},
     {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4},
     {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4},
-    {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, 
-    {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, 
     {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4},
-    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
-    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
-    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
-    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
-    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
-    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
-    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
+    {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4},
+    {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4},
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3},
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3},
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3},
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3},
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3},
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3},
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3},
     {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3} };
 
-    /* Tables for dc DCT coefficients 
+    /* Tables for dc DCT coefficients
      * Tables are cut in two parts to reduce memory occupation
      */
-    
+
     /* Table B-12, dct_dc_size_luminance, codes 00xxx ... 11110 */
 static lookup_t     pl_dct_dc_lum_init_table_1[32] =
     { {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
@@ -157,7 +157,7 @@ static lookup_t     pl_dct_dc_chrom_init_table_2[32] =
       {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7},
       {8, 8}, {8, 8}, {8, 8}, {8, 8}, {9, 9}, {9, 9}, {10,10}, {11,10}
     };
-    
+
 
     /* Tables for ac DCT coefficients. There are cut in many parts to save space */
     /* Table B-14, DCT coefficients table zero,
@@ -383,7 +383,7 @@ void vpar_InitCrop( vpar_thread_t * p_vpar )
 
 /* Function for filling up the lookup table for mb_addr_inc */
 static void __inline__ FillMbAddrIncTable( vpar_thread_t * p_vpar,
-                                    int i_start, int i_end, int i_step, 
+                                    int i_start, int i_end, int i_step,
                                     int * pi_value, int i_length )
 {
     int i_pos, i_offset;
@@ -397,13 +397,13 @@ static void __inline__ FillMbAddrIncTable( vpar_thread_t * p_vpar,
         (*pi_value)--;
     }
 }
-    
+
 /* Function that initialize the table using the last one */
 void vpar_InitMbAddrInc( vpar_thread_t * p_vpar )
 {
     int i_dummy;
     int i_value;
-    
+
     for( i_dummy = 0 ; i_dummy < 8 ; i_dummy++ )
     {
         p_vpar->pl_mb_addr_inc[i_dummy].i_value = MB_ERROR;
@@ -413,7 +413,7 @@ void vpar_InitMbAddrInc( vpar_thread_t * p_vpar )
     p_vpar->pl_mb_addr_inc[8].i_value = MB_ADDRINC_ESCAPE;
     p_vpar->pl_mb_addr_inc[8].i_length = 11;
 
-    for( i_dummy = 9 ; i_dummy < 15 ; i_dummy ++ ) 
+    for( i_dummy = 9 ; i_dummy < 15 ; i_dummy ++ )
     {
         p_vpar->pl_mb_addr_inc[i_dummy].i_value =  MB_ERROR;
         p_vpar->pl_mb_addr_inc[i_dummy].i_length = 0;
@@ -422,14 +422,14 @@ void vpar_InitMbAddrInc( vpar_thread_t * p_vpar )
     p_vpar->pl_mb_addr_inc[15].i_value = MB_ADDRINC_STUFFING;
     p_vpar->pl_mb_addr_inc[15].i_length = 11;
 
-    for( i_dummy = 16; i_dummy < 24; i_dummy++ ) 
+    for( i_dummy = 16; i_dummy < 24; i_dummy++ )
     {
         p_vpar->pl_mb_addr_inc[i_dummy].i_value =  MB_ERROR;
         p_vpar->pl_mb_addr_inc[i_dummy].i_length = 0;
     }
-    
+
     i_value = 33;
-    
+
     FillMbAddrIncTable( p_vpar, 24, 36, 1, &i_value, 11 );
     FillMbAddrIncTable( p_vpar, 36, 48, 2, &i_value, 10 );
     FillMbAddrIncTable( p_vpar, 48, 96, 8, &i_value, 8 );
@@ -453,7 +453,7 @@ static void __inline__ FillMBType( vpar_thread_t * p_vpar,
                                    int           i_length )
 {
     int i_dummy;
-    
+
     for( i_dummy = i_start ; i_dummy < i_end ; i_dummy++ )
     {
         p_vpar->ppl_mb_type[i_mb_type][i_dummy].i_value = i_value;
@@ -524,7 +524,7 @@ static void __inline__ FillDCTTable( dct_lookup_t * p_tab_dest, dct_lookup_t * p
 /* Fonction that actually fills the table or create the pointers */
 void vpar_InitDCTTables( vpar_thread_t * p_vpar )
 {
-    /* Tables are cut in two parts to reduce memory occupation */    
+    /* Tables are cut in two parts to reduce memory occupation */
     p_vpar->pppl_dct_dc_size[0][0] = pl_dct_dc_lum_init_table_1;
     p_vpar->pppl_dct_dc_size[0][1] = pl_dct_dc_lum_init_table_2;
     p_vpar->pppl_dct_dc_size[1][0] = pl_dct_dc_chrom_init_table_1;
@@ -532,7 +532,7 @@ void vpar_InitDCTTables( vpar_thread_t * p_vpar )
 
     memset( p_vpar->ppl_dct_coef[0], MB_ERROR, 16 );
     memset( p_vpar->ppl_dct_coef[1], MB_ERROR, 16 );
-    
+
     /* For table B14 & B15, we have a pointer to tables */
     /* We fill the table thanks to the fonction defined above */
     FillDCTTable( p_vpar->ppl_dct_coef[0], pl_DCT_tab0, 256, 60,  4 );
@@ -608,7 +608,7 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
     int         i_level;
     boolean_t   b_sign;
     int *       pi_quant;
-    
+
     /* Lookup Table for the chromatic component */
     static int pi_cc_index[12] = { 0, 0, 0, 0, 1, 2, 1, 2, 1, 2 };
 
@@ -628,7 +628,7 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
     }
 
     /* Decoding of the AC coefficients */
-    
+
     i_nc = 0;
     i_coef = 0;
     for( i_parse = 0; !p_vpar->b_die; i_parse++ )
@@ -662,7 +662,7 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
             i_level =   p_vpar->ppl_dct_coef[0][i_code].i_level;
         }
 
-        
+
         RemoveBits( &p_vpar->bit_stream, i_length );
 
         switch( i_run )
@@ -702,9 +702,9 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
         {
             break;
         }
-        
+
         i_pos = pi_scan[p_vpar->picture.b_alternate_scan][i_parse];
-        i_level = ( ((i_level << 1) + 1) * p_vpar->mb.i_quantizer_scale 
+        i_level = ( ((i_level << 1) + 1) * p_vpar->mb.i_quantizer_scale
                     * pi_quant[i_pos] ) >> 5;
         p_mb->ppi_blocks[i_b][i_pos] = b_sign ? -i_level : i_level;
     }
@@ -735,7 +735,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
     boolean_t   b_vlc_intra;
     boolean_t   b_sign;
     int *       pi_quant;
-    
+
     /* Lookup Table for the chromatic component */
     static int pi_cc_index[12] = { 0, 0, 0, 0, 1, 2, 1, 2, 1, 2 };
     i_cc = pi_cc_index[i_b];
@@ -753,15 +753,15 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
         pi_quant = p_vpar->sequence.chroma_intra_quant.pi_matrix;
     }
 
-#if 0    
+#if 0
     /* Decoding of the DC intra coefficient */
     /* The nb of bits to parse depends on i_type */
     i_code = ShowBits( &p_vpar->bit_stream, 9 + i_type );
-    
+
     /* To reduce memory occupation, there are two lookup tables
      * See InitDCT above */
     i_code5 = i_code >> (4+i_type);
-    
+
     /* Shall we lookup in the first or in the second table ? */
     i_select = ( i_code5 == 31 );
     /* Offset value for looking in the second table */
@@ -769,7 +769,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
     i_pos = ( i_code5 * ( ! i_select ) ) + ( ( i_code - i_offset ) * i_select );
     i_dct_dc_size = p_vpar->pppl_dct_dc_size[i_type][i_select][i_pos].i_value;
 #endif
-    
+
     if( !i_type/*i_b < 4*/ )
     {
         /* decode length */
@@ -817,9 +817,9 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
     }
 
     /* Dump the variable length code */
-    //RemoveBits( &p_vpar->bit_stream, 
+    //RemoveBits( &p_vpar->bit_stream,
     //          p_vpar->pppl_dct_dc_size[i_type][i_select][i_pos].i_length );
-    
+
     /* Read the actual code with the good length */
     p_vpar->mb.pi_dc_dct_pred[i_cc] += i_dct_dc_diff;
 
@@ -829,7 +829,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
     i_nc = ( p_vpar->mb.pi_dc_dct_pred[i_cc] != 0 );
 
     /* Decoding of the AC coefficients */
-    
+
     i_coef = 0;
     b_vlc_intra = p_vpar->picture.b_intra_vlc_format;
     for( i_parse = 1; !p_vpar->b_die/*i_parse < 64*/; i_parse++ )
@@ -863,7 +863,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
             int code = i_code;
             int intra_vlc_format = b_vlc_intra;
             dct_lookup_t tab;
-            
+
     if (code>=16384 && !intra_vlc_format)
       tab = pl_DCT_tab_ac[(code>>12)-4];
     else if (code>=1024)
@@ -905,7 +905,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
 
 
 
-        
+
         RemoveBits( &p_vpar->bit_stream, i_length );
 
         switch( i_run )
@@ -913,7 +913,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
             case DCT_ESCAPE:
                 i_run = GetBits( &p_vpar->bit_stream, 6 );
                 i_level = GetBits( &p_vpar->bit_stream, 12 );
-                /*p_mb->ppi_blocks[i_b][i_parse] = ( b_sign = ( i_level > 2047 ) ) 
+                /*p_mb->ppi_blocks[i_b][i_parse] = ( b_sign = ( i_level > 2047 ) )
                                                           ? ( -4096 + i_level )
                                                           : i_level;*/
                 i_level = (b_sign = ( i_level > 2047 )) ? 4096 - i_level
@@ -939,7 +939,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
         i_coef = i_parse;
         i_parse += i_run;
         i_nc ++;
- 
+
         if( i_parse >= 64 )
         {
             break;
@@ -967,7 +967,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
 static __inline__ int MotionCode( vpar_thread_t * p_vpar )
 {
     int i_code;
-    static lookup_t pl_mv_tab0[8] = 
+    static lookup_t pl_mv_tab0[8] =
         { {-1,0}, {3,3}, {2,2}, {2,2}, {1,1}, {1,1}, {1,1}, {1,1} };
     /* Table B-10, motion_code, codes 0000011 ... 000011x */
     static lookup_t pl_mv_tab1[8] =
@@ -977,7 +977,7 @@ static __inline__ int MotionCode( vpar_thread_t * p_vpar )
         {16,9}, {15,9}, {14,9}, {13,9},
         {12,9}, {11,9}, {10,8}, {10,8},
         {9,8},  {9,8},  {8,8},  {8,8} };
-    
+
     if( GetBits( &p_vpar->bit_stream, 1 ) )
     {
         return 0;
@@ -1007,7 +1007,7 @@ static __inline__ int MotionCode( vpar_thread_t * p_vpar )
 
     RemoveBits( &p_vpar->bit_stream, pl_mv_tab2[i_code].i_length );
     return( GetBits( &p_vpar->bit_stream, 1 ) ?
-        -pl_mv_tab2[i_code].i_value : pl_mv_tab2[i_code].i_value );            
+        -pl_mv_tab2[i_code].i_value : pl_mv_tab2[i_code].i_value );
 }
 
 /****************************************************************************
@@ -1047,7 +1047,7 @@ static __inline__ void MotionVector( vpar_thread_t * p_vpar,
     int i_motion_code, i_motion_residual;
     int i_r_size;
     int pi_dm_vector[2];
-    
+
     i_r_size = p_vpar->picture.ppi_f_code[i_s][0] - 1;
     i_motion_code = MotionCode( p_vpar );
     i_motion_residual = (i_r_size != 0 && i_motion_code != 0) ?
@@ -1067,26 +1067,26 @@ static __inline__ void MotionVector( vpar_thread_t * p_vpar,
             pi_dm_vector[0] = 0;
         }
     }
-    
+
     i_r_size = p_vpar->picture.ppi_f_code[i_s][1]-1;
     i_motion_code = MotionCode( p_vpar );
     i_motion_residual = (i_r_size != 0 && i_motion_code != 0) ?
                         GetBits( &p_vpar->bit_stream, i_r_size) : 0;
 
-   
+
     if( (p_vpar->mb.i_mv_format == MOTION_FIELD)
         && (i_structure == FRAME_STRUCTURE) )
     {
          p_vpar->mb.pppi_pmv[i_r][i_s][1] >>= 1;
     }
-    
+
     DecodeMotionVector( &p_vpar->mb.pppi_pmv[i_r][i_s][1], i_r_size,
                         i_motion_code, i_motion_residual, i_full_pel );
 
     if( (p_vpar->mb.i_mv_format == MOTION_FIELD)
         && (i_structure == FRAME_STRUCTURE) )
          p_vpar->mb.pppi_pmv[i_r][i_s][1] <<= 1;
-     
+
     p_mb->pppi_motion_vectors[i_r][i_s][1] = p_vpar->mb.pppi_pmv[i_r][i_s][1];
 
     if( p_vpar->mb.b_dmv )
@@ -1197,7 +1197,7 @@ static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
     int i_addr_inc = 0;
     /* Index in the lookup table mb_addr_inc */
     int    i_index = ShowBits( &p_vpar->bit_stream, 11 );
-        
+
     /* Test the presence of the escape character */
     while( i_index == 8 )
     {
@@ -1205,13 +1205,13 @@ static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
         i_addr_inc += 33;
         i_index = ShowBits( &p_vpar->bit_stream, 11 );
     }
-     
+
     /* Affect the value from the lookup table */
     i_addr_inc += p_vpar->pl_mb_addr_inc[i_index].i_value;
-    
+
     /* Dump the good number of bits */
     RemoveBits( &p_vpar->bit_stream, p_vpar->pl_mb_addr_inc[i_index].i_length );
-    
+
     return i_addr_inc;
 }
 
@@ -1222,7 +1222,7 @@ static __inline__ int IMBType( vpar_thread_t * p_vpar )
 {
     /* Take two bits for testing */
     int                 i_type = ShowBits( &p_vpar->bit_stream, 2 );
-    
+
     /* Lookup table for macroblock_type */
     static lookup_t     pl_mb_Itype[4] = { {MB_ERROR, 0},
                                            {MB_QUANT|MB_INTRA, 2},
@@ -1240,7 +1240,7 @@ static __inline__ int PMBType( vpar_thread_t * p_vpar )
 {
     /* Testing on 6 bits */
     int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
-    
+
     /* Dump the good number of bits */
     RemoveBits( &p_vpar->bit_stream, p_vpar->ppl_mb_type[0][i_type].i_length );
     /* return the value from the lookup table for P type */
@@ -1254,10 +1254,10 @@ static __inline__ int BMBType( vpar_thread_t * p_vpar )
 {
      /* Testing on 6 bits */
     int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
-    
+
     /* Dump the good number of bits */
     RemoveBits( &p_vpar->bit_stream, p_vpar->ppl_mb_type[1][i_type].i_length );
-    
+
     /* return the value from the lookup table for B type */
     return p_vpar->ppl_mb_type[1][i_type].i_value;
 }
@@ -1277,10 +1277,10 @@ static __inline__ int CodedPattern420( vpar_thread_t * p_vpar )
 {
     /* Take the max 9 bits length vlc code for testing */
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
-    
+
     /* Trash the good number of bits read in the lookup table */
     RemoveBits( &p_vpar->bit_stream, pl_coded_pattern[i_vlc].i_length );
-    
+
     /* return the value from the vlc table */
     return pl_coded_pattern[i_vlc].i_value;
 }
@@ -1291,9 +1291,9 @@ static __inline__ int CodedPattern420( vpar_thread_t * p_vpar )
 static __inline__ int CodedPattern422( vpar_thread_t * p_vpar )
 {
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
-    
+
     RemoveBits( &p_vpar->bit_stream, pl_coded_pattern[i_vlc].i_length );
-    
+
     /* Supplementary 2 bits long code for 4:2:2 format */
     return pl_coded_pattern[i_vlc].i_value |
            (GetBits( &p_vpar->bit_stream, 2 ) << 6);
@@ -1305,9 +1305,9 @@ static __inline__ int CodedPattern422( vpar_thread_t * p_vpar )
 static __inline__ int CodedPattern444( vpar_thread_t * p_vpar )
 {
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
-    
+
     RemoveBits( &p_vpar->bit_stream, pl_coded_pattern[i_vlc].i_length );
-    
+
     return pl_coded_pattern[i_vlc].i_value |
            (GetBits( &p_vpar->bit_stream, 6 ) << 6);
 }
@@ -1393,7 +1393,7 @@ static __inline__ void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
         p_vpar->picture.b_error = 1;
         return;
     }
-    
+
     if( (p_mb = vpar_NewMacroblock( &p_vpar->vfifo )) == NULL )
     {
         /* b_die == 1 */
@@ -1405,7 +1405,7 @@ static __inline__ void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
 
     InitMacroblock( p_vpar, p_mb, i_coding_type, i_chroma_format,
                     i_structure, b_second_field );
-   
+
     /* Motion type is picture structure. */
     p_mb->pf_motion = pf_motion_skipped[i_chroma_format]
                                        [i_structure];
@@ -1452,11 +1452,11 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
     case D_CODING_TYPE:
         p_mb->i_mb_type = DMBType( p_vpar );
     }
-    
+
     /* SCALABILITY : warning, we don't know if spatial_temporal_weight_code
      * has to be dropped, take care if you use scalable streams. */
     /* RemoveBits( &p_vpar->bit_stream, 2 ); */
-    
+
     if( (i_coding_type == P_CODING_TYPE || i_coding_type == B_CODING_TYPE)
         && (p_mb->i_mb_type & (MB_MOTION_FORWARD | MB_MOTION_BACKWARD)) )
     {
@@ -1510,8 +1510,8 @@ if( p_vpar->picture.b_error )                                           \
     (*pi_mb_address)--;                                                 \
     vpar_DestroyMacroblock( &p_vpar->vfifo, p_mb );                     \
     return;                                                             \
-} 
- 
+}
+
 
 #define PARSEBLOCKS( MPEG1FUNC, MPEG2FUNC )                             \
 {                                                                       \
@@ -1835,7 +1835,7 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
         }
     }
     *pi_mb_address = (i_vert_code - 1)*p_vpar->sequence.i_mb_width;
-    
+
     /* Reset DC coefficients predictors (ISO/IEC 13818-2 7.2.1). */
     p_vpar->mb.pi_dc_dct_pred[0] = p_vpar->mb.pi_dc_dct_pred[1]
         = p_vpar->mb.pi_dc_dct_pred[2]
@@ -1884,7 +1884,7 @@ static __inline__ void PictureData( vpar_thread_t * p_vpar, int i_mb_base,
             break;
         }
         RemoveBits32( &p_vpar->bit_stream );
-        
+
         /* Decode slice data. */
         SliceHeader( p_vpar, &i_mb_address, i_mb_base, i_dummy & 255,
                      b_high, b_dp_scalable, b_mpeg2, i_coding_type,

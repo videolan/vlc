@@ -18,11 +18,11 @@
 #ifdef VDEC_SMP
 /* ?? move to inline functions */
 #define VIDEO_FIFO_ISEMPTY( fifo )    ( (fifo).i_start == (fifo).i_end )
-#define VIDEO_FIFO_ISFULL( fifo )     ( ( ( (fifo).i_end + 1 - (fifo).i_start ) \
+#define VIDEO_FIFO_ISFULL( fifo )     ( ( ( (fifo).i_end + 1 - (fifo).i_start )\
                                           & VFIFO_SIZE ) == 0 )
 #define VIDEO_FIFO_START( fifo )      ( (fifo).buffer[ (fifo).i_start ] )
 #define VIDEO_FIFO_INCSTART( fifo )   ( (fifo).i_start = ((fifo).i_start + 1) \
-                                                           & VFIFO_SIZE ) 
+                                                           & VFIFO_SIZE )
 #define VIDEO_FIFO_END( fifo )        ( (fifo).buffer[ (fifo).i_end ] )
 #define VIDEO_FIFO_INCEND( fifo )     ( (fifo).i_end = ((fifo).i_end + 1) \
                                                          & VFIFO_SIZE )
@@ -46,12 +46,12 @@ static __inline__ macroblock_t * vpar_GetMacroblock( video_fifo_t * p_fifo )
             return( NULL );
         }
     }
-    
+
     p_mb = VIDEO_FIFO_START( *p_fifo );
     VIDEO_FIFO_INCSTART( *p_fifo );
 
     vlc_mutex_unlock( &p_fifo->lock );
-    
+
     return( p_mb );
 #else
     /* Shouldn't normally be used without SMP. */
@@ -101,7 +101,7 @@ static __inline__ void vpar_DecodeMacroblock( video_fifo_t * p_fifo,
 #ifdef VDEC_SMP
     /* Place picture in the video FIFO */
     vlc_mutex_lock( &p_fifo->lock );
-        
+
     /* By construction, the video FIFO cannot be full */
     VIDEO_FIFO_END( *p_fifo ) = p_mb;
     VIDEO_FIFO_INCEND( *p_fifo );
@@ -136,7 +136,7 @@ static __inline__ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo,
 
         /* Warn Synchro for its records. */
         vpar_SynchroEnd( p_fifo->p_vpar );
-     
+
         /* Unlink referenced pictures */
         if( p_mb->p_forward != NULL )
         {

@@ -1,14 +1,14 @@
-/*******************************************************************************
+/*****************************************************************************
  * spu_decoder.c : spu decoder thread
  * (c)2000 VideoLAN
- *******************************************************************************/
+ *****************************************************************************/
 
 /* repompé sur video_decoder.c
  * ?? passer en terminate/destroy avec les signaux supplémentaires */
 
-/*******************************************************************************
+/*****************************************************************************
  * Preamble
- *******************************************************************************/
+ *****************************************************************************/
 //#include "vlc.h"
 
 #include <errno.h>
@@ -40,9 +40,9 @@ static void     RunThread           ( spudec_thread_t *p_spudec );
 static void     ErrorThread         ( spudec_thread_t *p_spudec );
 static void     EndThread           ( spudec_thread_t *p_spudec );
 
-/******************************************************************************
+/*****************************************************************************
  * spudec_CreateThread: create a spu decoder thread
- ******************************************************************************/
+ *****************************************************************************/
 spudec_thread_t * spudec_CreateThread( input_thread_t * p_input )
 {
     spudec_thread_t *     p_spudec;
@@ -90,13 +90,13 @@ spudec_thread_t * spudec_CreateThread( input_thread_t * p_input )
     return( p_spudec );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * spudec_DestroyThread: destroy a spu decoder thread
- *******************************************************************************
+ *****************************************************************************
  * Destroy and terminate thread. This function will return 0 if the thread could
  * be destroyed, and non 0 else. The last case probably means that the thread
  * was still active, and another try may succeed.
- *******************************************************************************/
+ *****************************************************************************/
 void spudec_DestroyThread( spudec_thread_t *p_spudec )
 {
     intf_DbgMsg("spudec debug: requesting termination of spu decoder thread %p\n", p_spudec);
@@ -116,13 +116,13 @@ void spudec_DestroyThread( spudec_thread_t *p_spudec )
 
 /* following functions are local */
 
-/*******************************************************************************
+/*****************************************************************************
  * InitThread: initialize spu decoder thread
- *******************************************************************************
+ *****************************************************************************
  * This function is called from RunThread and performs the second step of the
  * initialization. It returns 0 on success. Note that the thread's flag are not
  * modified inside this function.
- *******************************************************************************/
+ *****************************************************************************/
 static int InitThread( spudec_thread_t *p_spudec )
 {
     intf_DbgMsg("spudec debug: initializing spu decoder thread %p\n", p_spudec);
@@ -149,12 +149,12 @@ static int InitThread( spudec_thread_t *p_spudec )
     return( 0 );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * RunThread: spu decoder thread
- *******************************************************************************
+ *****************************************************************************
  * spu decoder thread. This function does only return when the thread is
- * terminated. 
- *******************************************************************************/
+ * terminated.
+ *****************************************************************************/
 static void RunThread( spudec_thread_t *p_spudec )
 {
     intf_DbgMsg("spudec debug: running spu decoder thread (%p) (pid == %i)\n",
@@ -199,13 +199,13 @@ static void RunThread( spudec_thread_t *p_spudec )
     EndThread( p_spudec );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * ErrorThread: RunThread() error loop
- *******************************************************************************
+ *****************************************************************************
  * This function is called when an error occured during thread main's loop. The
  * thread can still receive feed, but must be ready to terminate as soon as
  * possible.
- *******************************************************************************/
+ *****************************************************************************/
 static void ErrorThread( spudec_thread_t *p_spudec )
 {
     /* We take the lock, because we are going to read/write the start/end
@@ -230,12 +230,12 @@ static void ErrorThread( spudec_thread_t *p_spudec )
     vlc_mutex_unlock( &p_spudec->fifo.data_lock );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * EndThread: thread destruction
- *******************************************************************************
- * This function is called when the thread ends after a sucessfull 
+ *****************************************************************************
+ * This function is called when the thread ends after a sucessfull
  * initialization.
- *******************************************************************************/
+ *****************************************************************************/
 static void EndThread( spudec_thread_t *p_spudec )
 {
     intf_DbgMsg( "spudec debug: destroying spu decoder thread %p\n", p_spudec );

@@ -208,7 +208,7 @@ static void __inline__ ReferenceReplace( vpar_thread_t * p_vpar,
 static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_matrix )
 {
     int i_dummy;
-    
+
     if( !p_matrix->b_allocated )
     {
         /* Allocate a piece of memory to load the matrix. */
@@ -220,7 +220,7 @@ static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_ma
         }
         p_matrix->b_allocated = 1;
     }
-    
+
     for( i_dummy = 0; i_dummy < 64; i_dummy++ )
     {
         p_matrix->pi_matrix[pi_scan[SCAN_ZIGZAG][i_dummy]]
@@ -245,7 +245,7 @@ static __inline__ void LinkMatrix( quant_matrix_t * p_matrix, int * pi_array )
         free( p_matrix->pi_matrix );
         p_matrix->b_allocated = 0;
     }
-    
+
     p_matrix->pi_matrix = pi_array;
 }
 
@@ -314,7 +314,7 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
  *****************************************************************************/
 static void SequenceHeader( vpar_thread_t * p_vpar )
 {
-#define RESERVED    -1 
+#define RESERVED    -1
     static float r_frame_rate_table[16] =
     {
         0.0,
@@ -331,7 +331,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
 #undef RESERVED
 
     int i_height_save, i_width_save;
-    
+
     i_height_save = p_vpar->sequence.i_height;
     i_width_save = p_vpar->sequence.i_width;
 
@@ -344,7 +344,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     /* We don't need bit_rate_value, marker_bit, vbv_buffer_size,
      * constrained_parameters_flag */
     RemoveBits( &p_vpar->bit_stream, 30 );
-    
+
     /*
      * Quantization matrices
      */
@@ -357,7 +357,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         /* Use default matrix. */
         LinkMatrix( &p_vpar->sequence.intra_quant, pi_default_intra_quant );
     }
-    
+
     if( GetBits( &p_vpar->bit_stream, 1 ) ) /* load_non_intra_quantizer_matrix */
     {
         LoadMatrix( p_vpar, &p_vpar->sequence.nonintra_quant );
@@ -367,7 +367,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         /* Use default matrix. */
         LinkMatrix( &p_vpar->sequence.nonintra_quant, pi_default_nonintra_quant );
     }
-    
+
     /* Unless later overwritten by a matrix extension, we have the same
      * matrices for luminance and chrominance. */
     LinkMatrix( &p_vpar->sequence.chroma_intra_quant,
@@ -385,7 +385,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
 
         /* Turn the MPEG2 flag on */
         p_vpar->sequence.b_mpeg2 = 1;
-    
+
         /* Parse sequence_extension */
         RemoveBits32( &p_vpar->bit_stream );
         /* extension_start_code_identifier, profile_and_level_indication */
@@ -521,7 +521,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 #ifdef VDEC_SMP
     int                 i_mb;
 #endif
-    
+
     RemoveBits( &p_vpar->bit_stream, 10 ); /* temporal_reference */
     p_vpar->picture.i_coding_type = GetBits( &p_vpar->bit_stream, 3 );
     RemoveBits( &p_vpar->bit_stream, 16 ); /* vbv_delay */
@@ -544,7 +544,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         RemoveBits( &p_vpar->bit_stream, 8 );
     }
 
-    /* 
+    /*
      * Picture Coding Extension
      */
     NextStartCode( p_vpar );
@@ -554,7 +554,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         RemoveBits32( &p_vpar->bit_stream );
         /* extension_start_code_identifier */
         RemoveBits( &p_vpar->bit_stream, 4 );
-        
+
         p_vpar->picture.ppi_f_code[0][0] = GetBits( &p_vpar->bit_stream, 4 );
         p_vpar->picture.ppi_f_code[0][1] = GetBits( &p_vpar->bit_stream, 4 );
         p_vpar->picture.ppi_f_code[1][0] = GetBits( &p_vpar->bit_stream, 4 );
@@ -574,7 +574,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
          * chroma_420_type (obsolete) */
         RemoveBits( &p_vpar->bit_stream, 1 );
         p_vpar->picture.b_progressive_frame = GetBits( &p_vpar->bit_stream, 1 );
-        
+
         /* composite_display_flag */
         if( GetBits( &p_vpar->bit_stream, 1 ) )
         {
@@ -617,7 +617,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 #endif
             vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
         }
-        
+
         p_vpar->picture.i_current_structure = 0;
 
         intf_DbgMsg("vpar debug: odd number of field picture.\n");
@@ -651,7 +651,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     {
         /* Update the reference pointers. */
         ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, NULL );
-        
+
         /* Warn Synchro we have trashed a picture. */
         vpar_SynchroTrash( p_vpar, p_vpar->picture.i_coding_type, i_structure );
 
@@ -706,7 +706,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, P_picture );
 
 #ifdef VDEC_SMP
-        /* Link referenced pictures for the decoder 
+        /* Link referenced pictures for the decoder
          * They are unlinked in vpar_ReleaseMacroblock() & vpar_DestroyMacroblock() */
         if( p_vpar->picture.i_coding_type == P_CODING_TYPE ||
             p_vpar->picture.i_coding_type == B_CODING_TYPE )
@@ -716,7 +716,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         if( p_vpar->picture.i_coding_type == B_CODING_TYPE )
         {
             vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
-        } 
+        }
 #endif
     }
     p_vpar->picture.i_current_structure |= i_structure;

@@ -1,8 +1,8 @@
-/*******************************************************************************
+/*****************************************************************************
  * video_yuv_mmx.S: YUV transformation, optimized for MMX processors
  * (c)1999 VideoLAN
- *******************************************************************************
- * Following functions are defined:     
+ *****************************************************************************
+ * Following functions are defined:
  * vout_YUV420_16_MMX
  *            This function performs YUV12-to-RGB16 color conversion for H26x.
  *            It handles any format in which there are three fields, the low
@@ -19,7 +19,7 @@
  *            Height may be any amount, but must be a multiple of two.  The U
  *            and V planes may have a different pitch than the Y plane, subject
  *            to the same limitations.
- *******************************************************************************/
+ *****************************************************************************/
 
 //.include iammx.inc
 //.include locals.inc
@@ -27,7 +27,7 @@
 .data
     .align 16
 
-RGB_formats: 
+RGB_formats:
     .long  RGB565
     .long  RGB555
     .long  RGB664
@@ -57,7 +57,7 @@ sixbitu:            .quad 0xc0c0c0c0c0c0c0c0
 #define YPlane                    LocalFrameSize + RegisterStorageSize +  4
 #define UPlane                    LocalFrameSize + RegisterStorageSize +  8
 #define VPlane                    LocalFrameSize + RegisterStorageSize + 12
-#define FrameWidth                LocalFrameSize + RegisterStorageSize + 16 
+#define FrameWidth                LocalFrameSize + RegisterStorageSize + 16
 #define FrameHeight               LocalFrameSize + RegisterStorageSize + 20
 #define YPitch                    LocalFrameSize + RegisterStorageSize + 24
 #define ChromaPitch               LocalFrameSize + RegisterStorageSize + 28
@@ -112,14 +112,14 @@ sixbitu:            .quad 0xc0c0c0c0c0c0c0c0
  *
  *  CCOffsetToLine0 is relative to ColorConvertedFrame.
  *  CCType  used by RGB color convertors to determine the exact conversion type.
- *    RGB565 = 0 
+ *    RGB565 = 0
  *    RGB555 = 1
  *    RGB664 = 2
  *    RGB655 = 3
  */
 
 .globl ConvertYUV420RGB16MMX
-ConvertYUV420RGB16MMX: 
+ConvertYUV420RGB16MMX:
   pushl      %esi
   pushl      %edi
 
@@ -133,7 +133,7 @@ ConvertYUV420RGB16MMX:
 
   jmp        *RGB_formats(,%eax,4)
 
-RGB555: 
+RGB555:
   xorl       %eax,%eax
   movl       $2,%ebx                 /* 10-8 for byte shift */
   movl       %ebx,RLeftShift(%esp)
@@ -154,7 +154,7 @@ RGB555:
   movq       %mm0,BUpperLimit(%esp)
   jmp        RGBEND
 
-RGB664: 
+RGB664:
   xorl       %eax,%eax
   movl       $2,%ebx                 /* 8-6 */
   movl       %ebx,RLeftShift(%esp)
@@ -177,7 +177,7 @@ RGB664:
   movq       %mm0,BUpperLimit(%esp)
   jmp        RGBEND
 
-RGB655: 
+RGB655:
   xorl       %eax,%eax
   movl       $2,%ebx                 /* 8-6 */
   movl       %ebx,RLeftShift(%esp)
@@ -200,7 +200,7 @@ RGB655:
   movq       %mm0,BUpperLimit(%esp)
   jmp        RGBEND
 
-RGB565: 
+RGB565:
   xorl       %eax,%eax
   movl       $3,%ebx                 /* 8-5 */
   movl       %ebx,RLeftShift(%esp)
@@ -223,7 +223,7 @@ RGB565:
   movq       %mm0,GUpperLimit(%esp)
 //  jmp        RGBEND
 
-RGBEND: 
+RGBEND:
   movl       VPlane(%esp),%ebx
   movl       UPlane(%esp),%ecx
   subl       %ebx,%ecx
@@ -278,7 +278,7 @@ RGBEND:
  *  Register Usage:
  */
 
-PrepareChromaLine: 
+PrepareChromaLine:
   movl       AspectCount(%esp),%ebp
   movl       FrameWidth(%esp),%ebx
   subl       $2,%ebp
@@ -289,10 +289,10 @@ PrepareChromaLine:
   xorl       %eax,%eax
   addl       AspectAdjustmentCount(%esp),%ebp
   movl       %eax,tmpCCOPitch(%esp)
-continue: 
+continue:
   movl       %ebp,AspectCount(%esp)
 
-do_next_8x2_block: 
+do_next_8x2_block:
   movl       tmpYCursorEven(%esp),%ebp
 /* here is even line */
   movd       (%edx,%ebx,),%mm1       /* 4 u values */
@@ -402,7 +402,7 @@ do_next_8x2_block:
   psllw      GLeftShift(%esp),%mm3   /* shift high G 5 positions */
   por        %mm3,%mm7               /* mm5: high RBG16 */
 
-  movl       tmpYCursorOdd(%esp),%ebp  /* moved to here to save cycles 
+  movl       tmpYCursorOdd(%esp),%ebp  /* moved to here to save cycles
                                            before odd line */
   movq       %mm1,(%edi)             /* !! aligned */
 
@@ -459,7 +459,7 @@ do_next_8x2_block:
  *        mm3- temporary results
  */
 
-  psllq      RLeftShift(%esp),%mm0   /* position R in the most significant 
+  psllq      RLeftShift(%esp),%mm0   /* position R in the most significant
                                         part of the byte */
   movq       %mm2,%mm7               /* mm7: Save B */
 
@@ -544,7 +544,7 @@ do_next_8x2_block:
 
 /******************************************************************************/
 
-finish: 
+finish:
   emms
   addl       $LocalFrameSize,%esp
 

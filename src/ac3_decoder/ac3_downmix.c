@@ -52,7 +52,7 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 
 	/*
 	if(p_ac3dec->bsi.acmod > 7)
-		dprintf("(downmix) invalid acmod number\n"); 
+		dprintf("(downmix) invalid acmod number\n");
 	*/
 
 	//There are two main cases, with or without Dolby Surround
@@ -91,7 +91,7 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 				left_sur  = p_ac3dec->samples.channel[2];
 				right_sur = p_ac3dec->samples.channel[3];
 
-				for (j = 0; j < 256; j++) 
+				for (j = 0; j < 256; j++)
 				{
 					right_tmp = 0.2265f * *left_sur++ + 0.2265f * *right_sur++;
 					left_tmp  = -1 * right_tmp;
@@ -115,7 +115,7 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 				//Mono surround
 				right_sur = p_ac3dec->samples.channel[3];
 
-				for (j = 0; j < 256; j++) 
+				for (j = 0; j < 256; j++)
 				{
 					right_tmp =  0.2265f * *right_sur++;
 					left_tmp  = - right_tmp;
@@ -138,11 +138,11 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 				//Mono surround
 				right_sur = p_ac3dec->samples.channel[2];
 
-				for (j = 0; j < 256; j++) 
+				for (j = 0; j < 256; j++)
 				{
 					right_tmp =  0.2265f * *right_sur++;
 					left_tmp  = - right_tmp;
-					right_tmp += 0.3204f * *right++; 
+					right_tmp += 0.3204f * *right++;
 					left_tmp  += 0.3204f * *left++;
 
 					*(out_buf++) = left_tmp * NORM;
@@ -160,7 +160,7 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 				centre    = p_ac3dec->samples.channel[1];
 				right     = p_ac3dec->samples.channel[2];
 
-				for (j = 0; j < 256; j++) 
+				for (j = 0; j < 256; j++)
 				{
 					right_tmp = 0.3204f * *right++ + 0.2265f * *centre;
 					left_tmp  = 0.3204f * *left++  + 0.2265f * *centre++;
@@ -191,7 +191,7 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 				//Mono program!
 				right = p_ac3dec->samples.channel[0];
 
-				for (j = 0; j < 256; j++) 
+				for (j = 0; j < 256; j++)
 				{
 					right_tmp = 0.7071f * *right++;
 
@@ -209,7 +209,7 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 				//Dual mono, output selected by user
 				right = p_ac3dec->samples.channel[global_prefs.dual_mono_channel_select];
 
-				for (j = 0; j < 256; j++) 
+				for (j = 0; j < 256; j++)
 				{
 					right_tmp = 0.7071f * *right++;
 
@@ -239,7 +239,7 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 				clev = cmixlev_lut[p_ac3dec->bsi.cmixlev];
 				slev = smixlev_lut[p_ac3dec->bsi.surmixlev];
 
-				for (j = 0; j < 256; j++) 
+				for (j = 0; j < 256; j++)
 				{
 					right_tmp= 0.4142f * *right++ + clev * *centre   + slev * *right_sur++;
 					left_tmp = 0.4142f * *left++  + clev * *centre++ + slev * *left_sur++;
@@ -262,7 +262,7 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 
 				slev = smixlev_lut[p_ac3dec->bsi.surmixlev];
 
-				for (j = 0; j < 256; j++) 
+				for (j = 0; j < 256; j++)
 				{
 					right_tmp= 0.4142f * *right++ + slev * *right_sur++;
 					left_tmp = 0.4142f * *left++  + slev * *left_sur++;
@@ -287,7 +287,7 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 				clev = cmixlev_lut[p_ac3dec->bsi.cmixlev];
 				slev = smixlev_lut[p_ac3dec->bsi.surmixlev];
 
-				for (j = 0; j < 256; j++) 
+				for (j = 0; j < 256; j++)
 				{
 					right_tmp= 0.4142f * *right++ + clev * *centre   + slev * *right_sur;
 					left_tmp = 0.4142f * *left++  + clev * *centre++ + slev * *right_sur++;
@@ -310,7 +310,7 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 
 				slev = smixlev_lut[p_ac3dec->bsi.surmixlev];
 
-				for (j = 0; j < 256; j++) 
+				for (j = 0; j < 256; j++)
 				{
 					right_tmp= 0.4142f * *right++ + slev * *right_sur;
 					left_tmp = 0.4142f * *left++  + slev * *right_sur++;
@@ -332,10 +332,10 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 
 				clev = cmixlev_lut[p_ac3dec->bsi.cmixlev];
 
-				for (j = 0; j < 256; j++) 
+				for (j = 0; j < 256; j++)
 				{
-					right_tmp= 0.4142f * *right++ + clev * *centre;   
-					left_tmp = 0.4142f * *left++  + clev * *centre++; 
+					right_tmp= 0.4142f * *right++ + clev * *centre;
+					left_tmp = 0.4142f * *left++  + clev * *centre++;
 
 					*(out_buf++) = left_tmp * NORM;
 					*(out_buf++) = right_tmp * NORM;
@@ -362,7 +362,7 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 				//Mono program!
 				right = p_ac3dec->samples.channel[0];
 
-				for (j = 0; j < 256; j++) 
+				for (j = 0; j < 256; j++)
 				{
 					right_tmp = 0.7071f * *right++;
 
@@ -380,7 +380,7 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 				//Dual mono, output selected by user
 				right = p_ac3dec->samples.channel[global_prefs.dual_mono_channel_select];
 
-				for (j = 0; j < 256; j++) 
+				for (j = 0; j < 256; j++)
 				{
 					right_tmp = 0.7071f * *right++;
 

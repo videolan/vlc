@@ -1,9 +1,9 @@
-/*******************************************************************************
+/*****************************************************************************
  * config.h: limits and configuration
  * (c)1999 VideoLAN
- *******************************************************************************
+ *****************************************************************************
  * Defines all compilation-time configuration constants and size limits
- *******************************************************************************/
+ *****************************************************************************/
 
 /* Conventions regarding names of symbols and variables
  * ----------------------------------------------------
@@ -11,17 +11,17 @@
  * - Symbols should begin with a prefix indicating in which module they are
  *   used, such as INTF_, VOUT_ or ADEC_.
  *
- * - Regarding environment variables, which are used as initialization parameters 
+ * - Regarding environment variables, which are used as initialization parameters
  *   for threads :
  *   + variable names should end with '_VAR'
  *   + environment variable default value should end with '_DEFAULT'
- *   + values having a special meaning with '_VAL' 
- *   
+ *   + values having a special meaning with '_VAL'
+ *
  */
 
-/*******************************************************************************
+/*****************************************************************************
  * Program information
- *******************************************************************************/
+ *****************************************************************************/
 
 /* Program version and copyright message */
 #define COPYRIGHT_MESSAGE	        "VideoLAN Client v" PROGRAM_VERSION " - (c)1999-2000 VideoLAN"
@@ -29,9 +29,9 @@
                                         "version " PROGRAM_VERSION " ( " PROGRAM_BUILD " )\n" \
                                         "compilation options: " PROGRAM_OPTIONS
 
-/*******************************************************************************
+/*****************************************************************************
  * General compilation options
- *******************************************************************************/
+ *****************************************************************************/
 
 /* Define for DVB support - Note that some extensions or restrictions may be
  * incompatible with native MPEG2 streams */
@@ -50,9 +50,9 @@
 /* Define for unthreaded version of the program - ?? not yet implemented */
 //#define NO_THREAD
 
-/*******************************************************************************
+/*****************************************************************************
  * Debugging options - define or undefine symbols
- *******************************************************************************/
+ *****************************************************************************/
 #ifdef DEBUG
 /* General debugging support, which depends of the DEBUG define, is determined
  * in the Makefile */
@@ -72,9 +72,9 @@
 
 #endif
 
-/*******************************************************************************
+/*****************************************************************************
  * General configuration
- *******************************************************************************/
+ *****************************************************************************/
 
 /* Automagically spawn input, audio and video threads ? */
 // ?? used ?
@@ -92,9 +92,9 @@
 #define FIFO_SIZE                       1023
 
 
-/*******************************************************************************
+/*****************************************************************************
  * Interface configuration
- *******************************************************************************/
+ *****************************************************************************/
 
 /* Environment variable used to store startup script name and default value */
 #define INTF_INIT_SCRIPT_VAR	        "vlc_init"
@@ -118,9 +118,9 @@
 /* Title of the X11 window */
 #define VOUT_TITLE                      "VideoLAN Client"
 
-/*******************************************************************************
+/*****************************************************************************
  * Input thread configuration
- *******************************************************************************/
+ *****************************************************************************/
 
 /* ?? */
 #define INPUT_IDLE_SLEEP                100000
@@ -152,7 +152,7 @@
  * INPUT_MAX_TS + 1 must be a power of 2, to optimize the %(INPUT_MAX_TS+1)
  * operation with a &INPUT_MAX_TS in the case of a fifo netlist.
  * It should be > number of fifos * FIFO_SIZE to avoid input deadlock. */
-#define INPUT_MAX_TS                    32767      /* INPUT_MAX_TS + 1 = 2^15 */
+#define INPUT_MAX_TS                    32767     /* INPUT_MAX_TS + 1 = 2^15 */
 
 /* Same thing with PES packets */
 #define INPUT_MAX_PES                   16383
@@ -181,8 +181,8 @@
 #define INPUT_PORT_DEFAULT              1234
 
 /*
- * Vlan method 
- */ 
+ * Vlan method
+ */
 
 /* Default network interface and environment variable */
 #define INPUT_IFACE_VAR                 "vlc_iface"
@@ -194,7 +194,7 @@
 #define INPUT_VLAN_PORT_VAR             "vlc_vlan_port"
 #define INPUT_VLAN_PORT_DEFAULT         6010
 
-/* Delay between vlan changes - this is required to avoid flooding the VLAN 
+/* Delay between vlan changes - this is required to avoid flooding the VLAN
  * server */
 #define INPUT_VLAN_CHANGE_DELAY         5000000
 
@@ -202,9 +202,9 @@
  * mark it to be presented */
 #define INPUT_PTS_DELAY                 2000000
 
-/*******************************************************************************
+/*****************************************************************************
  * Audio configuration
- *******************************************************************************/
+ *****************************************************************************/
 
 /* Environment variable used to store dsp device name, and default value */
 #define AOUT_DSP_VAR                    "vlc_dsp"
@@ -216,11 +216,11 @@
 
 /* Environment variable for output rate, and default value */
 #define AOUT_RATE_VAR                   "vlc_audio_rate"
-#define AOUT_RATE_DEFAULT               44100 
+#define AOUT_RATE_DEFAULT               44100
 
-/*******************************************************************************
+/*****************************************************************************
  * Video configuration
- *******************************************************************************/
+ *****************************************************************************/
 
 /*
  * Default settings for video output threads
@@ -229,25 +229,25 @@
 /* Environment variable used in place of DISPLAY if available */
 #define VOUT_DISPLAY_VAR                "vlc_display"
 
-/* Default dimensions for display window - these dimensions are enough for the 
+/* Default dimensions for display window - these dimensions are enough for the
  * standard width and height broadcasted MPEG-2 streams */
 #define VOUT_WIDTH_VAR                  "vlc_width"
 #define VOUT_HEIGHT_VAR                 "vlc_height"
 #define VOUT_WIDTH_DEFAULT              640
 #define VOUT_HEIGHT_DEFAULT             480
 
-/* Maximum width of a scaled source picture - this should be relatively high, 
+/* Maximum width of a scaled source picture - this should be relatively high,
  * since higher stream values will result in no display at all. */
 #define VOUT_MAX_WIDTH                  4096
 
-/* Video heap size - remember that a decompressed picture is big 
+/* Video heap size - remember that a decompressed picture is big
  * (~1 Mbyte) before using huge values */
 #define VOUT_MAX_PICTURES               10
 
 /* Maximum number of active areas in a rendering buffer. Active areas are areas
- * of the picture which need to be cleared before re-using the buffer. If a 
+ * of the picture which need to be cleared before re-using the buffer. If a
  * picture, including its many additions such as subtitles, additionnal user
- * informations and interface, has too many active areas, some of them are 
+ * informations and interface, has too many active areas, some of them are
  * joined. */
 #define VOUT_MAX_AREAS                  5
 
@@ -266,7 +266,7 @@
  * Time settings
  */
 
-/* Time during which the thread will sleep if it has nothing to 
+/* Time during which the thread will sleep if it has nothing to
  * display (in micro-seconds) */
 #define VOUT_IDLE_SLEEP                 20000
 
@@ -291,13 +291,13 @@
 #define VOUT_FB_DEV_VAR                 "vlc_fb_dev"
 #define VOUT_FB_DEV_DEFAULT             "/dev/fb0"
 
-/*******************************************************************************
+/*****************************************************************************
  * Video parser configuration
- *******************************************************************************/
+ *****************************************************************************/
 
 #define VPAR_IDLE_SLEEP                 100000
 
-/* Time to sleep when waiting for a buffer (from vout or the video fifo). 
+/* Time to sleep when waiting for a buffer (from vout or the video fifo).
  * It should be approximately the time needed to perform a complete picture
  * loop. Since it only happens when the video heap is full, it does not need
  * to be too low, even if it blocks the decoder. */
@@ -317,9 +317,9 @@
 /* Maximum number of macroblocks in a picture. */
 #define MAX_MB                          2048
 
-/*******************************************************************************
+/*****************************************************************************
  * Video decoder configuration
- *******************************************************************************/
+ *****************************************************************************/
 
 //#define VDEC_SMP
 
@@ -333,15 +333,15 @@
 /* Maximum range of values out of the IDCT + motion compensation. */
 #define VDEC_CROPRANGE                  2048
 
-/*******************************************************************************
+/*****************************************************************************
  * Generic decoder configuration
- *******************************************************************************/
+ *****************************************************************************/
 
 #define GDEC_IDLE_SLEEP                 100000
 
-/*******************************************************************************
+/*****************************************************************************
  * Messages and console interfaces configuration
- *******************************************************************************/
+ *****************************************************************************/
 
 /* Maximal size of the message queue - in case of overflow, all messages in the
  * queue are printed by the calling thread */

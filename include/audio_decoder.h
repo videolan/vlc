@@ -1,7 +1,7 @@
-/******************************************************************************
+/*****************************************************************************
  * audio_decoder.h : audio decoder thread interface
  * (c)1999 VideoLAN
- ******************************************************************************
+ *****************************************************************************
  * = Prototyped functions are implemented in audio_decoder/audio_decoder.c
  *
  * = Required headers :
@@ -16,7 +16,7 @@
  *
  * = - MSb = Most Significant bit
  *   - MSB = Most Significant Byte
- ******************************************************************************/
+ *****************************************************************************/
 
 /*
  * TODO :
@@ -28,14 +28,14 @@
 
 #define ADEC_FRAME_SIZE 384
 
-/******************************************************************************
+/*****************************************************************************
  * adec_frame_t
- ******************************************************************************/
+ *****************************************************************************/
 typedef s16 adec_frame_t[ ADEC_FRAME_SIZE ];
 
-/******************************************************************************
+/*****************************************************************************
  * adec_bank_t
- ******************************************************************************/
+ *****************************************************************************/
 typedef struct adec_bank_s
 {
     float               v1[512];
@@ -45,24 +45,24 @@ typedef struct adec_bank_s
 
 } adec_bank_t;
 
-/******************************************************************************
+/*****************************************************************************
  * adec_thread_t : audio decoder thread descriptor
- ******************************************************************************
+ *****************************************************************************
  * This type describes an audio decoder thread
- ******************************************************************************/
+ *****************************************************************************/
 typedef struct adec_thread_s
 {
     /*
      * Thread properties
      */
-    vlc_thread_t        thread_id;                 /* id for thread functions */
-    boolean_t           b_die;                                  /* `die' flag */
-    boolean_t           b_error;                              /* `error' flag */
+    vlc_thread_t        thread_id;                /* id for thread functions */
+    boolean_t           b_die;                                 /* `die' flag */
+    boolean_t           b_error;                             /* `error' flag */
 
     /*
      * Input properties
      */
-    decoder_fifo_t      fifo;                   /* stores the PES stream data */
+    decoder_fifo_t      fifo;                  /* stores the PES stream data */
     /* The bit stream structure handles the PES stream at the bit level */
     bit_stream_t        bit_stream;
 
@@ -75,13 +75,13 @@ typedef struct adec_thread_s
     /*
      * Output properties
      */
-    aout_fifo_t *       p_aout_fifo;  /* stores the decompressed audio frames */
-    aout_thread_t *     p_aout;            /* needed to create the audio fifo */
+    aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
+    aout_thread_t *     p_aout;           /* needed to create the audio fifo */
 
 } adec_thread_t;
 
-/******************************************************************************
+/*****************************************************************************
  * Prototypes
- ******************************************************************************/
+ *****************************************************************************/
 adec_thread_t * adec_CreateThread       ( input_thread_t * p_input /* !! , aout_thread_t * p_aout !! */ );
 void            adec_DestroyThread      ( adec_thread_t * p_adec );

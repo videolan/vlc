@@ -1,7 +1,7 @@
-/******************************************************************************
+/*****************************************************************************
  * audio_decoder.c: MPEG1 Layer I-II audio decoder thread
  * (c)1999 VideoLAN
- ******************************************************************************/
+ *****************************************************************************/
 
 /*
  * TODO :
@@ -11,30 +11,30 @@
  *
  */
 
-/******************************************************************************
+/*****************************************************************************
  * Preamble
- ******************************************************************************/
+ *****************************************************************************/
 #include <unistd.h>
 
-#include <stdio.h>                                            /* "intf_msg.h" */
-#include <stdlib.h>                                       /* malloc(), free() */
+#include <stdio.h>                                           /* "intf_msg.h" */
+#include <stdlib.h>                                      /* malloc(), free() */
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>                                            /* ntohl() */
-#include <sys/soundcard.h>                                /* "audio_output.h" */
-#include <sys/uio.h>                                             /* "input.h" */
+#include <netinet/in.h>                                           /* ntohl() */
+#include <sys/soundcard.h>                               /* "audio_output.h" */
+#include <sys/uio.h>                                            /* "input.h" */
 
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
 #include "vlc_thread.h"
-#include "debug.h"                                       /* "input_netlist.h" */
+#include "debug.h"                                      /* "input_netlist.h" */
 
-#include "intf_msg.h"                         /* intf_DbgMsg(), intf_ErrMsg() */
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 
-#include "input.h"                                            /* pes_packet_t */
-#include "input_netlist.h"                          /* input_NetlistFreePES() */
-#include "decoder_fifo.h"          /* DECODER_FIFO_(ISEMPTY|START|INCSTART)() */
+#include "input.h"                                           /* pes_packet_t */
+#include "input_netlist.h"                         /* input_NetlistFreePES() */
+#include "decoder_fifo.h"         /* DECODER_FIFO_(ISEMPTY|START|INCSTART)() */
 
 #include "audio_output.h"
 
@@ -42,9 +42,9 @@
 #include "audio_decoder.h"
 #include "audio_math.h"
 
-/******************************************************************************
+/*****************************************************************************
  * Local prototypes
- ******************************************************************************/
+ *****************************************************************************/
 static int      InitThread              ( adec_thread_t * p_adec );
 static void     RunThread               ( adec_thread_t * p_adec );
 static void     ErrorThread             ( adec_thread_t * p_adec );
@@ -62,12 +62,12 @@ static void     DumpBits                ( bit_stream_t * p_bit_stream, int i_bit
 static int      FindHeader              ( adec_thread_t * p_adec );
 */
 
-/******************************************************************************
+/*****************************************************************************
  * adec_CreateThread: creates an audio decoder thread
- ******************************************************************************
+ *****************************************************************************
  * This function creates a new audio decoder thread, and returns a pointer to
  * its description. On error, it returns NULL.
- ******************************************************************************/
+ *****************************************************************************/
 adec_thread_t * adec_CreateThread( input_thread_t * p_input )
 {
     adec_thread_t *     p_adec;
@@ -128,15 +128,15 @@ adec_thread_t * adec_CreateThread( input_thread_t * p_input )
     return( p_adec );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * adec_DestroyThread: destroys an audio decoder thread
- ******************************************************************************
+ *****************************************************************************
  * This function asks an audio decoder thread to terminate. This function has
  * not to wait until the decoder thread has really died, because the killer (ie
  * this function's caller) is the input thread, that's why we are sure that no
  * other thread will try to access to this thread's descriptor after its
  * destruction.
- ******************************************************************************/
+ *****************************************************************************/
 void adec_DestroyThread( adec_thread_t * p_adec )
 {
     intf_DbgMsg("adec debug: requesting termination of audio decoder thread %p\n", p_adec);
@@ -156,13 +156,13 @@ void adec_DestroyThread( adec_thread_t * p_adec )
 
 /* Following functions are local */
 
-/******************************************************************************
+/*****************************************************************************
  * FindHeader : parses an input stream until an audio frame header could be
  *              found
- ******************************************************************************
+ *****************************************************************************
  * When this function returns successfully, the header can be found in the
  * buffer of the bit stream fifo.
- ******************************************************************************/
+ *****************************************************************************/
 static int FindHeader( adec_thread_t * p_adec )
 {
     while ( (!p_adec->b_die) && (!p_adec->b_error) )
@@ -178,18 +178,18 @@ static int FindHeader( adec_thread_t * p_adec )
     return( -1 );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * adec_Layer`L'_`M': decodes an mpeg 1, layer `L', mode `M', audio frame
- ******************************************************************************
+ *****************************************************************************
  * These functions decode the audio frame which has already its header loaded
  * in the i_header member of the audio decoder thread structure and its first
  * byte of data described by the bit stream structure of the audio decoder
  * thread (there is no bit available in the bit buffer yet)
- ******************************************************************************/
+ *****************************************************************************/
 
-/******************************************************************************
+/*****************************************************************************
  * adec_Layer1_Mono
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ int adec_Layer1_Mono( adec_thread_t * p_adec )
 {
     p_adec->bit_stream.fifo.buffer = 0;
@@ -197,9 +197,9 @@ static __inline__ int adec_Layer1_Mono( adec_thread_t * p_adec )
     return( 0 );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * adec_Layer1_Stereo
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ int adec_Layer1_Stereo( adec_thread_t * p_adec )
 {
     p_adec->bit_stream.fifo.buffer = 0;
@@ -207,9 +207,9 @@ static __inline__ int adec_Layer1_Stereo( adec_thread_t * p_adec )
     return( 0 );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * adec_Layer2_Mono
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ int adec_Layer2_Mono( adec_thread_t * p_adec )
 {
     p_adec->bit_stream.fifo.buffer = 0;
@@ -217,9 +217,9 @@ static __inline__ int adec_Layer2_Mono( adec_thread_t * p_adec )
     return( 0 );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * adec_Layer2_Stereo
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
 {
     typedef struct requantization_s
@@ -298,7 +298,7 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
     /* Check if the frame is valid or not */
     if ( i_sblimit == 0 )
     {
-        return( 0 );                                  /* the frame is invalid */
+        return( 0 );                                 /* the frame is invalid */
     }
     /* Find out the number of bits allocated */
     pi_nbal = ppi_nbal[ (i_bitrate_per_channel_index <= 2) ? 0 : 1 ];
@@ -411,7 +411,7 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
         MACRO( pp_requantization_ab[i_sb] )
     }
 
-#define SWITCH( pi_scfsi, pf_scalefactor_0, pf_scalefactor_1, pf_scalefactor_2 ) \
+#define SWITCH( pi_scfsi, pf_scalefactor_0, pf_scalefactor_1, pf_scalefactor_2 )\
     switch ( (pi_scfsi)[i_sb] ) \
     { \
         case 0: \
@@ -696,12 +696,12 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
     return( 6 );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * InitThread : initialize an audio decoder thread
- ******************************************************************************
+ *****************************************************************************
  * This function is called from RunThread and performs the second step of the
  * initialization. It returns 0 on success.
- ******************************************************************************/
+ *****************************************************************************/
 static int InitThread( adec_thread_t * p_adec )
 {
     aout_fifo_t         aout_fifo;
@@ -727,7 +727,7 @@ static int InitThread( adec_thread_t * p_adec )
     /* Now we look for an audio frame header in the input stream */
     if ( FindHeader(p_adec) )
     {
-        return( -1 );                              /* b_die or b_error is set */
+        return( -1 );                             /* b_die or b_error is set */
     }
 
     /*
@@ -785,12 +785,12 @@ static int InitThread( adec_thread_t * p_adec )
     return( 0 );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * RunThread : audio decoder thread
- ******************************************************************************
+ *****************************************************************************
  * Audio decoder thread. This function does only returns when the thread is
  * terminated.
- ******************************************************************************/
+ *****************************************************************************/
 static void RunThread( adec_thread_t * p_adec )
 {
 //    static const int    pi_framesize[512] = ADEC_FRAME_SIZE;
@@ -924,13 +924,13 @@ static void RunThread( adec_thread_t * p_adec )
     EndThread( p_adec );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * ErrorThread : audio decoder's RunThread() error loop
- ******************************************************************************
+ *****************************************************************************
  * This function is called when an error occured during thread main's loop. The
  * thread can still receive feed, but must be ready to terminate as soon as
  * possible.
- ******************************************************************************/
+ *****************************************************************************/
 static void ErrorThread( adec_thread_t *p_adec )
 {
     /* We take the lock, because we are going to read/write the start/end
@@ -955,12 +955,12 @@ static void ErrorThread( adec_thread_t *p_adec )
     vlc_mutex_unlock( &p_adec->fifo.data_lock );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * EndThread : audio decoder thread destruction
- ******************************************************************************
- * This function is called when the thread ends after a sucessfull 
+ *****************************************************************************
+ * This function is called when the thread ends after a sucessfull
  * initialization.
- ******************************************************************************/
+ *****************************************************************************/
 static void EndThread( adec_thread_t *p_adec )
 {
     intf_DbgMsg("adec debug: destroying audio decoder thread %p\n", p_adec);

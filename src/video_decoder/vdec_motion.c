@@ -115,7 +115,7 @@ static __inline__ void MotionComponent(
                          {
                              p_dest[i_x+i_x1] = (unsigned int)(p_src[i_x+i_x1] + 1
                                                 + p_src[i_x+i_x1 + i_step])
-                                              >> 1;  
+                                              >> 1;
                          }
                     }
                     p_dest += i_stride;
@@ -137,7 +137,7 @@ static __inline__ void MotionComponent(
                              p_dest[i_x+i_x1]
                                 = ((unsigned int)(
                                       p_src[i_x+i_x1]
-                                    + p_src[i_x+i_x1 + 1] 
+                                    + p_src[i_x+i_x1 + 1]
                                     + p_src[i_x+i_x1 + i_step]
                                     + p_src[i_x+i_x1 + i_step + 1]
                                     + 2) >> 2);

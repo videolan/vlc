@@ -1,16 +1,16 @@
-/*******************************************************************************
+/*****************************************************************************
  * netutils.c: various network functions
  * (c)1999 VideoLAN
- *******************************************************************************
- * ?? 
- *******************************************************************************
+ *****************************************************************************
+ * ??
+ *****************************************************************************
  * Required headers:
  * <netinet/in.h>
- *******************************************************************************/
+ *****************************************************************************/
 
-/*******************************************************************************
+/*****************************************************************************
  * Preamble
- *******************************************************************************/
+ *****************************************************************************/
 #include <netdb.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -32,53 +32,53 @@
 
 #include "netutils.h"
 
-/*******************************************************************************
+/*****************************************************************************
  * BuildInetAddr: build an Internet address descriptor
- *******************************************************************************
+ *****************************************************************************
  * Build an internet socket descriptor from a host name, or an ip, and a port.
  * If the address is NULL, then INADDR_ANY will be used, allowing to receive
  * on any address for a local socket. Usually, in this case, 'port' is also null
  * and the function always succeeds.
- *******************************************************************************/
+ *****************************************************************************/
 int BuildInetAddr( struct sockaddr_in *p_sa_in, char *psz_in_addr, int i_port )
 {
-    struct hostent *p_hostent;                              /* host descriptor */
+    struct hostent *p_hostent;                            /* host descriptor */
 
     bzero( p_sa_in, sizeof( struct sockaddr_in ) );
-    p_sa_in->sin_family = AF_INET;                                   /* family */
-    p_sa_in->sin_port = htons( i_port );                               /* port */
+    p_sa_in->sin_family = AF_INET;                                 /* family */
+    p_sa_in->sin_port = htons( i_port );                             /* port */
 
     /* Use INADDR_ANY if psz_in_addr is NULL */
     if( psz_in_addr == NULL )
-    {        
+    {
         p_sa_in->sin_addr.s_addr = htonl(INADDR_ANY);
-    }    
-    /* Try to convert address directly from in_addr - this will work if 
-     * psz_in_addr is dotted decimal. */    
+    }
+    /* Try to convert address directly from in_addr - this will work if
+     * psz_in_addr is dotted decimal. */
     else if( !inet_aton( psz_in_addr, &p_sa_in->sin_addr) )
     {
         /* The convertion failed: the address is an host name, which needs
          * to be resolved */
-        intf_DbgMsg("debug: resolving internet address %s...\n", psz_in_addr);        
+        intf_DbgMsg("debug: resolving internet address %s...\n", psz_in_addr);
         if ( (p_hostent = gethostbyname(psz_in_addr)) == NULL)
         {
             intf_ErrMsg("error: unknown host %s\n", psz_in_addr);
-            return( -1 );            
+            return( -1 );
         }
 
         /* Copy the first address of the host in the socket address */
         bcopy( p_hostent->h_addr_list[0], &p_sa_in->sin_addr, p_hostent->h_length);
     }
-    return( 0 );    
+    return( 0 );
 }
 
 
-/*******************************************************************************
+/*****************************************************************************
  * ServerPort: extract port from a "server:port" adress
- *******************************************************************************
+ *****************************************************************************
  * Returns the port number in a "server:port" address and replace the ":" by
  * a NUL character, or returns -1.
- *******************************************************************************/
+ *****************************************************************************/
 int ServerPort( char *psz_addr )
 {
     char *psz_index;
@@ -87,8 +87,8 @@ int ServerPort( char *psz_addr )
     for( psz_index = psz_addr; *psz_index && (*psz_index != ':'); psz_index++ )
     {
         ;
-    }        
-    
+    }
+
     /* If a port number has been found, convert it and return it */
     if( *psz_index == ':' )
     {
@@ -96,23 +96,23 @@ int ServerPort( char *psz_addr )
         return( atoi( psz_index + 1 ) );
     }
 
-    return( - 1 );    
+    return( - 1 );
 }
 
 
-/*******************************************************************************
+/*****************************************************************************
  * ReadIfConf: Read the configuration of an interface
- *******************************************************************************
+ *****************************************************************************
  * i_sockfd must reference a socket open as follow: AF_INET, DOCK_DGRAM, 0
- *******************************************************************************/
+ *****************************************************************************/
 int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
-{             
+{
     struct ifreq ifr_config;
     int i_rc = 0;
-  
+
     ASSERT(p_ifdescr);
     ASSERT(psz_name);
-  
+
     /* Which interface are we interested in ? */
     strcpy(ifr_config.ifr_name, psz_name);
 
@@ -130,7 +130,7 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
         return -1;
     }
 
-    /* Read physical address of the interface and store it in our description */
+   /* Read physical address of the interface and store it in our description */
     i_rc = ioctl(i_sockfd, SIOCGIFHWADDR, (byte_t *)&ifr_config);
     if( !i_rc )
     {
@@ -149,7 +149,7 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
                     psz_name, strerror(errno));
         return -1;
     }
-  
+
     /* Read IP address of the interface and store it in our description */
     i_rc = ioctl(i_sockfd, SIOCGIFADDR, (byte_t *)&ifr_config);
     if( !i_rc )
@@ -164,8 +164,8 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
                     psz_name, strerror(errno));
         return -1;
     }
-  
-    /* Read broadcast address of the interface and store it in our description */
+
+  /* Read broadcast address of the interface and store it in our description */
     if(p_ifdescr->i_flags & IFF_POINTOPOINT)
     {
         intf_DbgMsg("%s doen't not support broadcast\n", psz_name);
@@ -188,24 +188,24 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
                     psz_name, strerror(errno));
         return -1;
     }
-  
+
     return i_rc;
 }
 
 
 
-/*******************************************************************************
+/*****************************************************************************
  * ReadNetConf: Retrieve the network configuration of the host
- *******************************************************************************
+ *****************************************************************************
  * Only IP interfaces are listed, and only if they are up
  * i_sockfd must reference a socket open as follow: AF_INET, DOCK_DGRAM, 0
- *******************************************************************************/
+ *****************************************************************************/
 int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
 {
     struct ifreq* a_ifr_ifconf = NULL;
     struct ifreq* p_ifr_current_if;
     struct ifconf ifc_netconf;
-  
+
     int i_if_number;
     int i_remaining;
     int i_rc = 0;
@@ -281,7 +281,7 @@ int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
             }
         }
     }
-  
+
     /* Don't need the a_ifr_ifconf anymore */
     free( a_ifr_ifconf );
     return i_rc;

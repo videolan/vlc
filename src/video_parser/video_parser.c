@@ -1,13 +1,13 @@
-/*******************************************************************************
+/*****************************************************************************
  * video_parser.c : video parser thread
  * (c)1999 VideoLAN
- *******************************************************************************/
+ *****************************************************************************/
 
 /* ?? passer en terminate/destroy avec les signaux supplémentaires */
 
-/*******************************************************************************
+/*****************************************************************************
  * Preamble
- *******************************************************************************/
+ *****************************************************************************/
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -21,7 +21,7 @@
 #include "vlc_thread.h"
 
 #include "intf_msg.h"
-#include "debug.h"                     /* ?? temporaire, requis par netlist.h */
+#include "debug.h"                    /* ?? temporaire, requis par netlist.h */
 
 #include "input.h"
 #include "input_netlist.h"
@@ -48,14 +48,14 @@ static void     RunThread           ( vpar_thread_t *p_vpar );
 static void     ErrorThread         ( vpar_thread_t *p_vpar );
 static void     EndThread           ( vpar_thread_t *p_vpar );
 
-/*******************************************************************************
+/*****************************************************************************
  * vpar_CreateThread: create a generic parser thread
- *******************************************************************************
+ *****************************************************************************
  * This function creates a new video parser thread, and returns a pointer
  * to its description. On error, it returns NULL.
  * Following configuration properties are used:
  * ??
- *******************************************************************************/
+ *****************************************************************************/
 #include "main.h"
 #include "interface.h"
 extern main_t* p_main;
@@ -109,13 +109,13 @@ p_vpar->p_vout = p_main->p_intf->p_vout;
     return( p_vpar );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * vpar_DestroyThread: destroy a generic parser thread
- *******************************************************************************
+ *****************************************************************************
  * Destroy a terminated thread. This function will return 0 if the thread could
  * be destroyed, and non 0 else. The last case probably means that the thread
  * was still active, and another try may succeed.
- *******************************************************************************/
+ *****************************************************************************/
 void vpar_DestroyThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
 {
     intf_DbgMsg("vpar debug: requesting termination of video parser thread %p\n", p_vpar);
@@ -134,12 +134,12 @@ void vpar_DestroyThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
 
 /* following functions are local */
 
-/*******************************************************************************
+/*****************************************************************************
  * CheckConfiguration: check vpar_CreateThread() configuration
- *******************************************************************************
+ *****************************************************************************
  * Set default parameters where required. In DEBUG mode, check if configuration
  * is valid.
- *******************************************************************************/
+ *****************************************************************************/
 #if 0
 static int CheckConfiguration( video_cfg_t *p_cfg )
 {
@@ -149,13 +149,13 @@ static int CheckConfiguration( video_cfg_t *p_cfg )
 }
 #endif
 
-/*******************************************************************************
+/*****************************************************************************
  * InitThread: initialize vpar output thread
- *******************************************************************************
+ *****************************************************************************
  * This function is called from RunThread and performs the second step of the
  * initialization. It returns 0 on success. Note that the thread's flag are not
  * modified inside this function.
- *******************************************************************************/
+ *****************************************************************************/
 static int InitThread( vpar_thread_t *p_vpar )
 {
 #ifdef VDEC_SMP
@@ -203,7 +203,7 @@ static int InitThread( vpar_thread_t *p_vpar )
 
     /* Initialize other properties */
 #ifdef STATS
-    p_vpar->c_loops = 0;    
+    p_vpar->c_loops = 0;
     p_vpar->c_idle_loops = 0;
     p_vpar->c_pictures = 0;
     p_vpar->c_i_pictures = 0;
@@ -305,18 +305,18 @@ static int InitThread( vpar_thread_t *p_vpar )
     return( 0 );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * RunThread: generic parser thread
- *******************************************************************************
+ *****************************************************************************
  * Video parser thread. This function does only returns when the thread is
- * terminated. 
- *******************************************************************************/
+ * terminated.
+ *****************************************************************************/
 static void RunThread( vpar_thread_t *p_vpar )
 {
     intf_DbgMsg("vpar debug: running video parser thread (%p) (pid == %i)\n", p_vpar, getpid());
 
-    /* 
-     * Initialize thread 
+    /*
+     * Initialize thread
      */
     p_vpar->b_error = InitThread( p_vpar );
 
@@ -344,7 +344,7 @@ static void RunThread( vpar_thread_t *p_vpar )
                 break;
             };
         }
-    } 
+    }
 
     /*
      * Error loop
@@ -360,13 +360,13 @@ static void RunThread( vpar_thread_t *p_vpar )
     EndThread( p_vpar );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * ErrorThread: RunThread() error loop
- *******************************************************************************
+ *****************************************************************************
  * This function is called when an error occured during thread main's loop. The
  * thread can still receive feed, but must be ready to terminate as soon as
  * possible.
- *******************************************************************************/
+ *****************************************************************************/
 static void ErrorThread( vpar_thread_t *p_vpar )
 {
     /* We take the lock, because we are going to read/write the start/end
@@ -391,12 +391,12 @@ static void ErrorThread( vpar_thread_t *p_vpar )
     vlc_mutex_unlock( &p_vpar->fifo.data_lock );
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * EndThread: thread destruction
- *******************************************************************************
- * This function is called when the thread ends after a sucessfull 
+ *****************************************************************************
+ * This function is called when the thread ends after a sucessfull
  * initialization.
- *******************************************************************************/
+ *****************************************************************************/
 static void EndThread( vpar_thread_t *p_vpar )
 {
 #ifdef VDEC_SMP

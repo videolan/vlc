@@ -1,15 +1,15 @@
-/*******************************************************************************
+/*****************************************************************************
  * video_yuv.c: YUV transformation functions
  * (c)1999 VideoLAN
- *******************************************************************************
+ *****************************************************************************
  * Provides functions to perform the YUV conversion. The functions provided here
  * are a complete and portable C implementation, and may be replaced in certain
  * case by optimized functions.
- *******************************************************************************/
+ *****************************************************************************/
 
-/*******************************************************************************
+/*****************************************************************************
  * Preamble
- *******************************************************************************/
+ *****************************************************************************/
 #include <math.h>
 #include <errno.h>
 #include <string.h>
@@ -24,11 +24,11 @@
 #include "video_yuv.h"
 #include "intf_msg.h"
 
-/*******************************************************************************
+/*****************************************************************************
  * Constants
- *******************************************************************************/
+ *****************************************************************************/
 
-/* Color masks for different color depths - 8bpp masks can be choosen, since 
+/* Color masks for different color depths - 8bpp masks can be choosen, since
  * colormaps instead of hardware-defined colors are used. */
 //?? remove
 #define RED_8BPP_MASK           0xe0
@@ -90,7 +90,7 @@ const int MATRIX_COEFFICIENTS_TABLE[8][4] =
  *****************************************************************************/
 static void     SetGammaTable     ( int *pi_table, double f_gamma );
 static void     SetYUV            ( vout_thread_t *p_vout );
-static void     SetOffset         ( int i_width, int i_height, int i_pic_width, int i_pic_height, 
+static void     SetOffset         ( int i_width, int i_height, int i_pic_width, int i_pic_height,
                                     boolean_t *pb_h_scaling, int *pi_v_scaling, int *p_offset );
 
 static void     ConvertY4Gray8    ( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
@@ -187,7 +187,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
         (((*p_y++ + dither13[i_real_y]) >> 4) << 7)                           \
       + ((*p_u++ + dither23[i_real_y]) >> 5) * 9                              \
       + ((*p_v++ + dither23[i_real_y]) >> 5) ];                               \
- 
+
 #define CONVERT_4YUV_PIXELS_SCALE( CHROMA )                                   \
     *p_pic++ = p_lookup[                                                      \
         (((*p_y + dither10[i_real_y]) >> 4) << 7)                             \
@@ -437,29 +437,29 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
 int vout_InitYUV( vout_thread_t *p_vout )
 {
     size_t      tables_size;                        /* tables size, in bytes */
-    
+
     /* Computes tables size - 3 Bpp use 32 bits pixel entries in tables */
     switch( p_vout->i_bytes_per_pixel )
     {
     case 1:
         tables_size = sizeof( u8 ) * (p_vout->b_grayscale ? GRAY_TABLE_SIZE : PALETTE_TABLE_SIZE);
-        break;        
+        break;
     case 2:
         tables_size = sizeof( u16 ) * (p_vout->b_grayscale ? GRAY_TABLE_SIZE : RGB_TABLE_SIZE);
-        break;        
-    case 3:        
+        break;
+    case 3:
     case 4:
-    default:         
-        tables_size = sizeof( u32 ) * (p_vout->b_grayscale ? GRAY_TABLE_SIZE : RGB_TABLE_SIZE);        
-        break;        
+    default:
+        tables_size = sizeof( u32 ) * (p_vout->b_grayscale ? GRAY_TABLE_SIZE : RGB_TABLE_SIZE);
+        break;
     }
-    
+
     /* Allocate memory */
     p_vout->yuv.p_base = malloc( tables_size );
     if( p_vout->yuv.p_base == NULL )
     {
         intf_ErrMsg("error: %s\n", strerror(ENOMEM));
-        return( 1 );                
+        return( 1 );
     }
 
     /* Allocate memory for conversion buffer and offset array */
@@ -468,20 +468,20 @@ int vout_InitYUV( vout_thread_t *p_vout )
     {
         intf_ErrMsg("error: %s\n", strerror(ENOMEM));
         free( p_vout->yuv.p_base );
-        return( 1 );                
+        return( 1 );
     }
-    p_vout->yuv.p_offset = malloc( p_vout->i_width * sizeof( int ) );    
+    p_vout->yuv.p_offset = malloc( p_vout->i_width * sizeof( int ) );
     if( p_vout->yuv.p_offset == NULL )
     {
         intf_ErrMsg("error: %s\n", strerror(ENOMEM));
         free( p_vout->yuv.p_base );
-        free( p_vout->yuv.p_buffer );        
-        return( 1 );                
+        free( p_vout->yuv.p_buffer );
+        return( 1 );
     }
 
     /* Initialize tables */
     SetYUV( p_vout );
-    return( 0 );    
+    return( 0 );
 }
 
 /*****************************************************************************
@@ -492,8 +492,8 @@ int vout_InitYUV( vout_thread_t *p_vout )
  *****************************************************************************/
 int vout_ResetYUV( vout_thread_t *p_vout )
 {
-    vout_EndYUV( p_vout );    
-    return( vout_InitYUV( p_vout ) );    
+    vout_EndYUV( p_vout );
+    return( vout_InitYUV( p_vout ) );
 }
 
 /*****************************************************************************
@@ -505,7 +505,7 @@ void vout_EndYUV( vout_thread_t *p_vout )
 {
     free( p_vout->yuv.p_base );
     free( p_vout->yuv.p_buffer );
-    free( p_vout->yuv.p_offset );    
+    free( p_vout->yuv.p_offset );
 }
 
 /* following functions are local */
@@ -537,12 +537,12 @@ static void SetYUV( vout_thread_t *p_vout )
     int         pi_gamma[256];                                /* gamma table */
     int         i_index;                                  /* index in tables */
 
-    /* Build gamma table */    
+    /* Build gamma table */
     SetGammaTable( pi_gamma, p_vout->f_gamma );
-    
+
     /*
      * Set pointers and build YUV tables
-     */        
+     */
     if( p_vout->b_grayscale )
     {
         /* Grayscale: build gray table */
@@ -557,8 +557,8 @@ static void SetYUV( vout_thread_t *p_vout )
                 {
                     p_vout->yuv.yuv.p_gray8[ -i_index ] =      RGB2PIXEL( p_vout, pi_gamma[0], pi_gamma[0], pi_gamma[0] );
                     p_vout->yuv.yuv.p_gray8[ 256 + i_index ] = RGB2PIXEL( p_vout, pi_gamma[255], pi_gamma[255], pi_gamma[255] );
-                }            
-                for( i_index = 0; i_index < 256; i_index++) 
+                }
+                for( i_index = 0; i_index < 256; i_index++)
                 {
                     p_vout->yuv.yuv.p_gray8[ i_index ] = pi_gamma[ i_index ];
                     bright[ i_index ] = i_index << 8;
@@ -571,7 +571,7 @@ static void SetYUV( vout_thread_t *p_vout )
                 p_vout->i_gray_pixel = 0x44;
                 p_vout->i_blue_pixel = 0x3b;
 
-                break;        
+                break;
             }
         case 2:
             p_vout->yuv.yuv.p_gray16 =  (u16 *)p_vout->yuv.p_base + GRAY_MARGIN;
@@ -579,25 +579,25 @@ static void SetYUV( vout_thread_t *p_vout )
             {
                 p_vout->yuv.yuv.p_gray16[ -i_index ] =      RGB2PIXEL( p_vout, pi_gamma[0], pi_gamma[0], pi_gamma[0] );
                 p_vout->yuv.yuv.p_gray16[ 256 + i_index ] = RGB2PIXEL( p_vout, pi_gamma[255], pi_gamma[255], pi_gamma[255] );
-            }            
-            for( i_index = 0; i_index < 256; i_index++) 
+            }
+            for( i_index = 0; i_index < 256; i_index++)
             {
                 p_vout->yuv.yuv.p_gray16[ i_index ] = RGB2PIXEL( p_vout, pi_gamma[i_index], pi_gamma[i_index], pi_gamma[i_index] );
             }
-            break;        
+            break;
         case 3:
-        case 4:        
+        case 4:
             p_vout->yuv.yuv.p_gray32 =  (u32 *)p_vout->yuv.p_base + GRAY_MARGIN;
             for( i_index = 0; i_index < GRAY_MARGIN; i_index++ )
             {
                 p_vout->yuv.yuv.p_gray32[ -i_index ] =      RGB2PIXEL( p_vout, pi_gamma[0], pi_gamma[0], pi_gamma[0] );
                 p_vout->yuv.yuv.p_gray32[ 256 + i_index ] = RGB2PIXEL( p_vout, pi_gamma[255], pi_gamma[255], pi_gamma[255] );
-            }            
-            for( i_index = 0; i_index < 256; i_index++) 
+            }
+            for( i_index = 0; i_index < 256; i_index++)
             {
                 p_vout->yuv.yuv.p_gray32[ i_index ] = RGB2PIXEL( p_vout, pi_gamma[i_index], pi_gamma[i_index], pi_gamma[i_index] );
             }
-            break;        
+            break;
          }
     }
     else
@@ -613,16 +613,16 @@ static void SetYUV( vout_thread_t *p_vout )
                 x = x + ( x >> 3 ) - 16; \
                 if( x < 0 ) x = 0;       \
                 if( x > 255 ) x = 255;
-    
+
                 int y,u,v;
                 int r,g,b;
                 int uvr, uvg, uvb;
                 int i = 0, j = 0;
                 u16 red[256], green[256], blue[256], transp[256];
                 unsigned char lookup[PALETTE_TABLE_SIZE];
-    
+
                 p_vout->yuv.yuv.p_rgb8 = (u8 *)p_vout->yuv.p_base;
-    
+
                 /* this loop calculates the intersection of an YUV box
                  * and the RGB cube. */
                 for ( y = 0; y <= 256; y += 16 )
@@ -636,23 +636,23 @@ static void SetYUV( vout_thread_t *p_vout )
                         r = y + uvr;
                         g = y + uvg;
                         b = y + uvb;
-    
+
                         if( r >= RGB_MIN && g >= RGB_MIN && b >= RGB_MIN
                                 && r <= RGB_MAX && g <= RGB_MAX && b <= RGB_MAX )
                         {
                             /* this one should never happen unless someone fscked up my code */
                             if(j == 256) { intf_DbgMsg( "sorry, no colors left\n" ); exit( 1 ); }
-    
+
                             /* saturate the colors */
                             SATURATE( r );
                             SATURATE( g );
                             SATURATE( b );
-    
+
                             red[j] = r << 8;
                             green[j] = g << 8;
                             blue[j] = b << 8;
                             transp[j] = 0;
-    
+
                             /* allocate color */
                             lookup[i] = 1;
                             p_vout->yuv.yuv.p_rgb8[i++] = j;
@@ -687,13 +687,13 @@ static void SetYUV( vout_thread_t *p_vout )
                     {
                         int u2, v2;
                         int dist, mindist = 100000000;
-    
+
                         if( lookup[i] || y==0)
                         {
                             i++;
                             continue;
                         }
-    														    
+    														
                         /* heavy. yeah. */
                         for( u2 = 0; u2 <= 256; u2 += 32 )
                         for( v2 = 0; v2 <= 256; v2 += 32 )
@@ -721,7 +721,7 @@ static void SetYUV( vout_thread_t *p_vout )
                     i += 128-81;
                 }
 
-                break;        
+                break;
             }
         case 2:
             p_vout->yuv.yuv.p_rgb16 = (u16 *)p_vout->yuv.p_base;
@@ -744,9 +744,9 @@ static void SetYUV( vout_thread_t *p_vout )
             {
                 p_vout->yuv.yuv.p_rgb16[RED_OFFSET + i_index] =   RGB2PIXEL( p_vout, pi_gamma[ i_index ], 0, 0 );
                 p_vout->yuv.yuv.p_rgb16[GREEN_OFFSET + i_index] = RGB2PIXEL( p_vout, 0, pi_gamma[ i_index ], 0 );
-                p_vout->yuv.yuv.p_rgb16[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_vout, 0, 0, pi_gamma[ i_index ] ); 
-            }            
-            break;        
+                p_vout->yuv.yuv.p_rgb16[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_vout, 0, 0, pi_gamma[ i_index ] );
+            }
+            break;
         case 3:
         case 4:
             p_vout->yuv.yuv.p_rgb32 = (u32 *)p_vout->yuv.p_base;
@@ -769,11 +769,11 @@ static void SetYUV( vout_thread_t *p_vout )
             {
                 p_vout->yuv.yuv.p_rgb32[RED_OFFSET + i_index] =   RGB2PIXEL( p_vout, pi_gamma[ i_index ], 0, 0 );
                 p_vout->yuv.yuv.p_rgb32[GREEN_OFFSET + i_index] = RGB2PIXEL( p_vout, 0, pi_gamma[ i_index ], 0 );
-                p_vout->yuv.yuv.p_rgb32[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_vout, 0, 0, pi_gamma[ i_index ] ); 
-            }            
-            break;        
+                p_vout->yuv.yuv.p_rgb32[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_vout, 0, 0, pi_gamma[ i_index ] );
+            }
+            break;
         }
-    }    
+    }
 
     /*
      * Set functions pointers
@@ -784,26 +784,26 @@ static void SetYUV( vout_thread_t *p_vout )
         switch( p_vout->i_bytes_per_pixel )
         {
         case 1:
-            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertY4Gray8;        
-            p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertY4Gray8;        
-            p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray8;        
-            break;        
+            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertY4Gray8;
+            p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertY4Gray8;
+            p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray8;
+            break;
         case 2:
-            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertY4Gray16;        
-            p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertY4Gray16;        
-            p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray16;        
-            break;        
+            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertY4Gray16;
+            p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertY4Gray16;
+            p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray16;
+            break;
         case 3:
-            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertY4Gray24;        
-            p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertY4Gray24;        
-            p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray24;        
-            break;        
-        case 4:        
-            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertY4Gray32;        
-            p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertY4Gray32;        
-            p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray32;        
-            break;        
-        }        
+            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertY4Gray24;
+            p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertY4Gray24;
+            p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray24;
+            break;
+        case 4:
+            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertY4Gray32;
+            p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertY4Gray32;
+            p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray32;
+            break;
+        }
     }
     else
     {
@@ -814,24 +814,24 @@ static void SetYUV( vout_thread_t *p_vout )
             p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertYUV420RGB8;
             p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertYUV422RGB8;
             p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertYUV444RGB8;
-            break;        
+            break;
         case 2:
-            p_vout->yuv.p_Convert420 =   (vout_yuv_convert_t *) ConvertYUV420RGB16;        
-            p_vout->yuv.p_Convert422 =   (vout_yuv_convert_t *) ConvertYUV422RGB16;        
-            p_vout->yuv.p_Convert444 =   (vout_yuv_convert_t *) ConvertYUV444RGB16;        
-            break;        
+            p_vout->yuv.p_Convert420 =   (vout_yuv_convert_t *) ConvertYUV420RGB16;
+            p_vout->yuv.p_Convert422 =   (vout_yuv_convert_t *) ConvertYUV422RGB16;
+            p_vout->yuv.p_Convert444 =   (vout_yuv_convert_t *) ConvertYUV444RGB16;
+            break;
         case 3:
-            p_vout->yuv.p_Convert420 =   (vout_yuv_convert_t *) ConvertYUV420RGB24;        
-            p_vout->yuv.p_Convert422 =   (vout_yuv_convert_t *) ConvertYUV422RGB24;        
-            p_vout->yuv.p_Convert444 =   (vout_yuv_convert_t *) ConvertYUV444RGB24;        
-            break;        
-        case 4:        
-            p_vout->yuv.p_Convert420 =   (vout_yuv_convert_t *) ConvertYUV420RGB32;        
-            p_vout->yuv.p_Convert422 =   (vout_yuv_convert_t *) ConvertYUV422RGB32;        
-            p_vout->yuv.p_Convert444 =   (vout_yuv_convert_t *) ConvertYUV444RGB32;        
-            break;        
+            p_vout->yuv.p_Convert420 =   (vout_yuv_convert_t *) ConvertYUV420RGB24;
+            p_vout->yuv.p_Convert422 =   (vout_yuv_convert_t *) ConvertYUV422RGB24;
+            p_vout->yuv.p_Convert444 =   (vout_yuv_convert_t *) ConvertYUV444RGB24;
+            break;
+        case 4:
+            p_vout->yuv.p_Convert420 =   (vout_yuv_convert_t *) ConvertYUV420RGB32;
+            p_vout->yuv.p_Convert422 =   (vout_yuv_convert_t *) ConvertYUV422RGB32;
+            p_vout->yuv.p_Convert444 =   (vout_yuv_convert_t *) ConvertYUV444RGB32;
+            break;
         }
-    }        
+    }
 }
 
 /*****************************************************************************
@@ -840,29 +840,29 @@ static void SetYUV( vout_thread_t *p_vout )
  * This function will build an offset array used in later conversion functions.
  * It will also set horizontal and vertical scaling indicators.
  *****************************************************************************/
-static void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height, 
+static void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height,
                        boolean_t *pb_h_scaling, int *pi_v_scaling, int *p_offset )
-{    
+{
     int i_x;                                    /* x position in destination */
     int i_scale_count;                                     /* modulo counter */
 
     /*
      * Prepare horizontal offset array
-     */      
+     */
     if( i_pic_width - i_width > 0 )
     {
         /* Prepare scaling array for horizontal extension */
-        *pb_h_scaling =  1;   
+        *pb_h_scaling =  1;
         i_scale_count =         i_pic_width;
         for( i_x = i_width; i_x--; )
         {
             while( (i_scale_count -= i_width) > 0 )
             {
-                *p_offset++ = 0;                
+                *p_offset++ = 0;
             }
-            *p_offset++ = 1;            
-            i_scale_count += i_pic_width;            
-        }        
+            *p_offset++ = 1;
+            i_scale_count += i_pic_width;
+        }
     }
     else if( i_pic_width - i_width < 0 )
     {
@@ -871,19 +871,19 @@ static void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_hei
         i_scale_count =         i_pic_width;
         for( i_x = i_pic_width; i_x--; )
         {
-            *p_offset = 1;            
+            *p_offset = 1;
             while( (i_scale_count -= i_pic_width) >= 0 )
-            {                
-                *p_offset += 1;                
+            {
+                *p_offset += 1;
             }
             p_offset++;
             i_scale_count += i_width;
-        }        
+        }
     }
     else
     {
-        /* No horizontal scaling: YUV conversion is done directly to picture */          
-        *pb_h_scaling = 0;        
+        /* No horizontal scaling: YUV conversion is done directly to picture */
+        *pb_h_scaling = 0;
     }
 
     /*
@@ -891,15 +891,15 @@ static void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_hei
      */
     if( i_pic_height - i_height > 0 )
     {
-        *pi_v_scaling = 1;        
+        *pi_v_scaling = 1;
     }
     else if( i_pic_height - i_height < 0 )
     {
-        *pi_v_scaling = -1;        
+        *pi_v_scaling = -1;
     }
     else
     {
-        *pi_v_scaling = 0;        
+        *pi_v_scaling = 0;
     }
 }
 
@@ -922,15 +922,15 @@ static void ConvertY4Gray8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_y,
     u8 *        p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
-    
-    /* 
-     * Initialize some values  - i_pic_line_width will store the line skip 
+
+    /*
+     * Initialize some values  - i_pic_line_width will store the line skip
      */
-    i_pic_line_width -= i_pic_width;                                            
-    p_gray =            p_vout->yuv.yuv.p_gray8;    
-    p_buffer_start =    p_vout->yuv.p_buffer;                                   
-    p_offset_start =    p_vout->yuv.p_offset;                                   
-    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+    i_pic_line_width -= i_pic_width;
+    p_gray =            p_vout->yuv.yuv.p_gray8;
+    p_buffer_start =    p_vout->yuv.p_buffer;
+    p_offset_start =    p_vout->yuv.p_offset;
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
@@ -956,11 +956,11 @@ static void ConvertY4Gray8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_y,
             *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
             *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
             *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
-        }             
+        }
 
         /* Do horizontal and vertical scaling */
         SCALE_WIDTH;
-        SCALE_HEIGHT(400, 1);        
+        SCALE_HEIGHT(400, 1);
     }
 }
 
@@ -982,15 +982,15 @@ static void ConvertY4Gray16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y
     u16 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
-    
-    /* 
-     * Initialize some values  - i_pic_line_width will store the line skip 
+
+    /*
+     * Initialize some values  - i_pic_line_width will store the line skip
      */
-    i_pic_line_width -= i_pic_width;                                            
-    p_gray =            p_vout->yuv.yuv.p_gray16;    
-    p_buffer_start =    p_vout->yuv.p_buffer;                                   
-    p_offset_start =    p_vout->yuv.p_offset;                                   
-    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+    i_pic_line_width -= i_pic_width;
+    p_gray =            p_vout->yuv.yuv.p_gray16;
+    p_buffer_start =    p_vout->yuv.p_buffer;
+    p_offset_start =    p_vout->yuv.p_offset;
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
@@ -1002,7 +1002,7 @@ static void ConvertY4Gray16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y
         /* Mark beginnning of line for possible later line copy, and initialize
          * buffer */
         p_pic_start =   p_pic;
-        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
         /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
@@ -1016,11 +1016,11 @@ static void ConvertY4Gray16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y
             *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
             *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
             *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
-        }             
+        }
 
         /* Do horizontal and vertical scaling */
         SCALE_WIDTH;
-        SCALE_HEIGHT(400, 2);        
+        SCALE_HEIGHT(400, 2);
     }
 }
 
@@ -1052,15 +1052,15 @@ static void ConvertY4Gray32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y
     u32 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
-    
-    /* 
-     * Initialize some values  - i_pic_line_width will store the line skip 
+
+    /*
+     * Initialize some values  - i_pic_line_width will store the line skip
      */
-    i_pic_line_width -= i_pic_width;                                            
-    p_gray =            p_vout->yuv.yuv.p_gray32;    
-    p_buffer_start =    p_vout->yuv.p_buffer;                                   
-    p_offset_start =    p_vout->yuv.p_offset;                                   
-    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+    i_pic_line_width -= i_pic_width;
+    p_gray =            p_vout->yuv.yuv.p_gray32;
+    p_buffer_start =    p_vout->yuv.p_buffer;
+    p_offset_start =    p_vout->yuv.p_offset;
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
@@ -1072,7 +1072,7 @@ static void ConvertY4Gray32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y
         /* Mark beginnning of line for possible later line copy, and initialize
          * buffer */
         p_pic_start =   p_pic;
-        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
         /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
@@ -1086,11 +1086,11 @@ static void ConvertY4Gray32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y
             *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
             *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
             *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
-        }             
+        }
 
         /* Do horizontal and vertical scaling */
         SCALE_WIDTH;
-        SCALE_HEIGHT(400, 4);        
+        SCALE_HEIGHT(400, 4);
     }
 }
 
@@ -1111,7 +1111,7 @@ static void ConvertYUV420RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     int         i_chroma_width;                              /* chroma width */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
-    
+
     int dither10[4] = { 0x0, 0x8, 0x2, 0xa };
     int dither11[4] = { 0xc, 0x4, 0xe, 0x6 };
     int dither12[4] = { 0x3, 0xb, 0x1, 0x9 };
@@ -1128,14 +1128,14 @@ static void ConvertYUV420RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     //int dither[4][4] = { { 15, 15, 0, 0 }, { 15, 15, 0, 0 }, { 0, 0, 15, 15 }, { 0, 0, 15, 15 } };
     //int dither[4][4] = { { 8, 8, 8, 8 }, { 8, 8, 8, 8 }, { 8, 8, 8, 8 }, { 8, 8, 8, 8 } };
     //int dither[4][4] = { { 0, 1, 2, 3 }, { 4, 5, 6, 7 }, { 8, 9, 10, 11 }, { 12, 13, 14, 15 } };
-    /* 
-     * Initialize some values  - i_pic_line_width will store the line skip 
+    /*
+     * Initialize some values  - i_pic_line_width will store the line skip
      */
     i_pic_line_width -= i_pic_width;
     i_chroma_width =    i_width / 2;
     p_offset_start =    p_vout->yuv.p_offset;
     p_lookup =          p_vout->yuv.p_base;
-    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
@@ -1172,16 +1172,16 @@ static void ConvertYUV422RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     u8 *        p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
-    
-    /* 
-     * Initialize some values  - i_pic_line_width will store the line skip 
+
+    /*
+     * Initialize some values  - i_pic_line_width will store the line skip
      */
     i_pic_line_width -= i_pic_width;
     i_chroma_width =    i_width / 2;
     p_yuv =             p_vout->yuv.yuv.p_rgb8;
-    p_buffer_start =    p_vout->yuv.p_buffer;        
-    p_offset_start =    p_vout->yuv.p_offset;                    
-    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+    p_buffer_start =    p_vout->yuv.p_buffer;
+    p_offset_start =    p_vout->yuv.p_offset;
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
@@ -1193,7 +1193,7 @@ static void ConvertYUV422RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
         /* Mark beginnning of line for possible later line copy, and initialize
          * buffer */
         p_pic_start =   p_pic;
-        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
         /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
@@ -1207,11 +1207,11 @@ static void ConvertYUV422RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
             CONVERT_YUV_PIXEL(1);  CONVERT_Y_PIXEL(1);
             CONVERT_YUV_PIXEL(1);  CONVERT_Y_PIXEL(1);
             CONVERT_YUV_PIXEL(1);  CONVERT_Y_PIXEL(1);
-        }             
+        }
 
         /* Do horizontal and vertical scaling */
         SCALE_WIDTH;
-        SCALE_HEIGHT(422, 1);        
+        SCALE_HEIGHT(422, 1);
     }
 }
 
@@ -1236,15 +1236,15 @@ static void ConvertYUV444RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     u8 *        p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
-    
-    /* 
-     * Initialize some values  - i_pic_line_width will store the line skip 
+
+    /*
+     * Initialize some values  - i_pic_line_width will store the line skip
      */
     i_pic_line_width -= i_pic_width;
     p_yuv =             p_vout->yuv.yuv.p_rgb8;
-    p_buffer_start =    p_vout->yuv.p_buffer;        
-    p_offset_start =    p_vout->yuv.p_offset;                    
-    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+    p_buffer_start =    p_vout->yuv.p_buffer;
+    p_offset_start =    p_vout->yuv.p_offset;
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
@@ -1256,7 +1256,7 @@ static void ConvertYUV444RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
         /* Mark beginnning of line for possible later line copy, and initialize
          * buffer */
         p_pic_start =   p_pic;
-        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
         /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
@@ -1270,11 +1270,11 @@ static void ConvertYUV444RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
             CONVERT_YUV_PIXEL(1);  CONVERT_YUV_PIXEL(1);
             CONVERT_YUV_PIXEL(1);  CONVERT_YUV_PIXEL(1);
             CONVERT_YUV_PIXEL(1);  CONVERT_YUV_PIXEL(1);
-        }             
+        }
 
         /* Do horizontal and vertical scaling */
         SCALE_WIDTH;
-        SCALE_HEIGHT(444, 1);        
+        SCALE_HEIGHT(444, 1);
     }
 }
 
@@ -1290,11 +1290,11 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
 /*
     i_chroma_width =    i_width / 2;
     i_chroma_skip =     i_skip / 2;
-    ConvertYUV420RGB16MMX( p_y, p_u, p_v, i_width, i_height, 
-                           (i_width + i_skip) * sizeof( yuv_data_t ), 
+    ConvertYUV420RGB16MMX( p_y, p_u, p_v, i_width, i_height,
+                           (i_width + i_skip) * sizeof( yuv_data_t ),
                            (i_chroma_width + i_chroma_skip) * sizeof( yuv_data_t),
                            i_scale, (u8 *)p_pic, 0, 0, (i_width + i_pic_eol) * sizeof( u16 ),
-                           p_vout->i_screen_depth == 15 );    
+                           p_vout->i_screen_depth == 15 );
 */
     boolean_t   b_horizontal_scaling;             /* horizontal scaling type */
     int         i_vertical_scaling;                 /* vertical scaling type */
@@ -1310,16 +1310,16 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
     u16 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
-    
-    /* 
-     * Initialize some values  - i_pic_line_width will store the line skip 
+
+    /*
+     * Initialize some values  - i_pic_line_width will store the line skip
      */
     i_pic_line_width -= i_pic_width;
     i_chroma_width =    i_width / 2;
     p_yuv =             p_vout->yuv.yuv.p_rgb16;
-    p_buffer_start =    p_vout->yuv.p_buffer;        
-    p_offset_start =    p_vout->yuv.p_offset;                    
-    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+    p_buffer_start =    p_vout->yuv.p_buffer;
+    p_offset_start =    p_vout->yuv.p_offset;
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
@@ -1331,7 +1331,7 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
         /* Mark beginnning of line for possible later line copy, and initialize
          * buffer */
         p_pic_start =   p_pic;
-        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
         /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
@@ -1345,11 +1345,11 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
-        }             
+        }
 
         /* Do horizontal and vertical scaling */
         SCALE_WIDTH;
-        SCALE_HEIGHT(420, 2);        
+        SCALE_HEIGHT(420, 2);
     }
 }
 
@@ -1374,16 +1374,16 @@ static void ConvertYUV422RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
     u16 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
-    
-    /* 
-     * Initialize some values  - i_pic_line_width will store the line skip 
+
+    /*
+     * Initialize some values  - i_pic_line_width will store the line skip
      */
     i_pic_line_width -= i_pic_width;
     i_chroma_width =    i_width / 2;
     p_yuv =             p_vout->yuv.yuv.p_rgb16;
-    p_buffer_start =    p_vout->yuv.p_buffer;        
-    p_offset_start =    p_vout->yuv.p_offset;                    
-    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+    p_buffer_start =    p_vout->yuv.p_buffer;
+    p_offset_start =    p_vout->yuv.p_offset;
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
@@ -1395,7 +1395,7 @@ static void ConvertYUV422RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
         /* Mark beginnning of line for possible later line copy, and initialize
          * buffer */
         p_pic_start =   p_pic;
-        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
         /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
@@ -1409,11 +1409,11 @@ static void ConvertYUV422RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
-        }             
+        }
 
         /* Do horizontal and vertical scaling */
         SCALE_WIDTH;
-        SCALE_HEIGHT(422, 2);        
+        SCALE_HEIGHT(422, 2);
     }
 }
 
@@ -1438,15 +1438,15 @@ static void ConvertYUV444RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
     u16 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
-    
-    /* 
-     * Initialize some values  - i_pic_line_width will store the line skip 
+
+    /*
+     * Initialize some values  - i_pic_line_width will store the line skip
      */
     i_pic_line_width -= i_pic_width;
     p_yuv =             p_vout->yuv.yuv.p_rgb16;
-    p_buffer_start =    p_vout->yuv.p_buffer;        
-    p_offset_start =    p_vout->yuv.p_offset;                    
-    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+    p_buffer_start =    p_vout->yuv.p_buffer;
+    p_offset_start =    p_vout->yuv.p_offset;
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
@@ -1458,7 +1458,7 @@ static void ConvertYUV444RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
         /* Mark beginnning of line for possible later line copy, and initialize
          * buffer */
         p_pic_start =   p_pic;
-        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
         /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
@@ -1472,11 +1472,11 @@ static void ConvertYUV444RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
             CONVERT_YUV_PIXEL(2);  CONVERT_YUV_PIXEL(2);
             CONVERT_YUV_PIXEL(2);  CONVERT_YUV_PIXEL(2);
             CONVERT_YUV_PIXEL(2);  CONVERT_YUV_PIXEL(2);
-        }             
+        }
 
         /* Do horizontal and vertical scaling */
         SCALE_WIDTH;
-        SCALE_HEIGHT(444, 2);        
+        SCALE_HEIGHT(444, 2);
     }
 }
 
@@ -1506,7 +1506,7 @@ static void ConvertYUV422RGB24( p_vout_thread_t p_vout, void *p_pic, yuv_data_t 
 static void ConvertYUV444RGB24( p_vout_thread_t p_vout, void *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                                 int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
                                 int i_matrix_coefficients )
-{    
+{
     //???
 }
 
@@ -1531,16 +1531,16 @@ static void ConvertYUV420RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
     u32 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
-    
-    /* 
-     * Initialize some values  - i_pic_line_width will store the line skip 
+
+    /*
+     * Initialize some values  - i_pic_line_width will store the line skip
      */
     i_pic_line_width -= i_pic_width;
     i_chroma_width =    i_width / 2;
     p_yuv =             p_vout->yuv.yuv.p_rgb32;
-    p_buffer_start =    p_vout->yuv.p_buffer;        
-    p_offset_start =    p_vout->yuv.p_offset;                    
-    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+    p_buffer_start =    p_vout->yuv.p_buffer;
+    p_offset_start =    p_vout->yuv.p_offset;
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
@@ -1552,7 +1552,7 @@ static void ConvertYUV420RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
         /* Mark beginnning of line for possible later line copy, and initialize
          * buffer */
         p_pic_start =   p_pic;
-        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
         /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
@@ -1566,11 +1566,11 @@ static void ConvertYUV420RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
             CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
             CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
             CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
-        }             
+        }
 
         /* Do horizontal and vertical scaling */
         SCALE_WIDTH;
-        SCALE_HEIGHT(420, 4);        
+        SCALE_HEIGHT(420, 4);
     }
 }
 
@@ -1595,16 +1595,16 @@ static void ConvertYUV422RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
     u32 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
-    
-    /* 
-     * Initialize some values  - i_pic_line_width will store the line skip 
+
+    /*
+     * Initialize some values  - i_pic_line_width will store the line skip
      */
     i_pic_line_width -= i_pic_width;
     i_chroma_width =    i_width / 2;
     p_yuv =             p_vout->yuv.yuv.p_rgb32;
-    p_buffer_start =    p_vout->yuv.p_buffer;        
-    p_offset_start =    p_vout->yuv.p_offset;                    
-    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+    p_buffer_start =    p_vout->yuv.p_buffer;
+    p_offset_start =    p_vout->yuv.p_offset;
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
@@ -1616,7 +1616,7 @@ static void ConvertYUV422RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
         /* Mark beginnning of line for possible later line copy, and initialize
          * buffer */
         p_pic_start =   p_pic;
-        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
         /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
@@ -1630,11 +1630,11 @@ static void ConvertYUV422RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
             CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
             CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
             CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
-        }             
+        }
 
         /* Do horizontal and vertical scaling */
         SCALE_WIDTH;
-        SCALE_HEIGHT(422, 4);        
+        SCALE_HEIGHT(422, 4);
     }
 }
 
@@ -1659,15 +1659,15 @@ static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
     u32 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
-    
-    /* 
-     * Initialize some values  - i_pic_line_width will store the line skip 
+
+    /*
+     * Initialize some values  - i_pic_line_width will store the line skip
      */
     i_pic_line_width -= i_pic_width;
     p_yuv =             p_vout->yuv.yuv.p_rgb32;
-    p_buffer_start =    p_vout->yuv.p_buffer;        
-    p_offset_start =    p_vout->yuv.p_offset;                    
-    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+    p_buffer_start =    p_vout->yuv.p_buffer;
+    p_offset_start =    p_vout->yuv.p_offset;
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
@@ -1679,7 +1679,7 @@ static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
         /* Mark beginnning of line for possible later line copy, and initialize
          * buffer */
         p_pic_start =   p_pic;
-        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
         /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
@@ -1693,11 +1693,11 @@ static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
             CONVERT_YUV_PIXEL(4);  CONVERT_YUV_PIXEL(4);
             CONVERT_YUV_PIXEL(4);  CONVERT_YUV_PIXEL(4);
             CONVERT_YUV_PIXEL(4);  CONVERT_YUV_PIXEL(4);
-        }             
+        }
 
         /* Do horizontal and vertical scaling */
         SCALE_WIDTH;
-        SCALE_HEIGHT(444, 4);        
+        SCALE_HEIGHT(444, 4);
     }
 }
 

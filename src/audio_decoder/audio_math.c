@@ -6,12 +6,12 @@
  * Preamble
  *****************************************************************************/
 #include <unistd.h>
-#include <stdio.h>                                            /* "intf_msg.h" */
-#include <stdlib.h>                                       /* malloc(), free() */
+#include <stdio.h>                                           /* "intf_msg.h" */
+#include <stdlib.h>                                      /* malloc(), free() */
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>                                            /* ntohl() */
-#include <sys/soundcard.h>                                /* "audio_output.h" */
+#include <netinet/in.h>                                           /* ntohl() */
+#include <sys/soundcard.h>                               /* "audio_output.h" */
 #include <sys/uio.h>
 
 #include "config.h"
@@ -20,7 +20,7 @@
 #include "vlc_thread.h"
 #include "debug.h"
 
-#include "intf_msg.h"                         /* intf_DbgMsg(), intf_ErrMsg() */
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 
 #include "input.h"
 #include "input_netlist.h"
@@ -85,7 +85,7 @@ void DCT32(float *x, adec_bank_t *b)
            tt9 , tt10, tt11, tt12, tt13, tt14, tt15, tt16,
            tt17, tt18, tt19, tt20, tt21, tt22, tt23, tt24,
            tt25, tt26, tt27, tt28, tt29, tt30, tt31, tt32, *y;
-    
+
     /* We unrolled the loops */
     /* Odd-even ordering is integrated before the 1st stage */
     t17 = c17 * (x[0] - x[31]);
@@ -458,9 +458,9 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
     int i;
     float tmp, *v;
     const float *f;
-    
+
     f = c;
-    
+
     switch(b->pos) {
 	case 0:
 	    v = b->actual;

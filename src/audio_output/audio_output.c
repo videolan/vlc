@@ -1,7 +1,7 @@
-/******************************************************************************
+/*****************************************************************************
  * audio_output.c : audio output thread
  * (c)1999 VideoLAN
- ******************************************************************************/
+ *****************************************************************************/
 
 /* TODO:
  *
@@ -15,29 +15,29 @@
  *
  */
 
-/******************************************************************************
+/*****************************************************************************
  * Preamble
- ******************************************************************************/
+ *****************************************************************************/
 #include <unistd.h>
 
 #include <sys/soundcard.h>
-#include <stdio.h>                                            /* "intf_msg.h" */
-#include <stdlib.h>                             /* calloc(), malloc(), free() */
+#include <stdio.h>                                           /* "intf_msg.h" */
+#include <stdlib.h>                            /* calloc(), malloc(), free() */
 
 #include "common.h"
 #include "config.h"
-#include "mtime.h"                              /* mtime_t, mdate(), msleep() */
+#include "mtime.h"                             /* mtime_t, mdate(), msleep() */
 #include "vlc_thread.h"
 
-#include "intf_msg.h"                         /* intf_DbgMsg(), intf_ErrMsg() */
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 
 #include "audio_output.h"
 #include "audio_dsp.h"
 #include "main.h"
 
-/******************************************************************************
+/*****************************************************************************
  * Local prototypes
- ******************************************************************************/
+ *****************************************************************************/
 
 static int aout_SpawnThread( aout_thread_t * p_aout );
 
@@ -56,14 +56,14 @@ void aout_Thread_U16_Stereo     ( aout_thread_t * p_aout );
 static __inline__ void InitializeIncrement( aout_increment_t * p_increment, long l_numerator, long l_denominator );
 static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, mtime_t aout_date );
 
-/******************************************************************************
+/*****************************************************************************
  * aout_CreateThread: initialize audio thread
- ******************************************************************************/
+ *****************************************************************************/
 aout_thread_t *aout_CreateThread( int *pi_status )
 {
-    aout_thread_t * p_aout;                               /* thread descriptor */
+    aout_thread_t * p_aout;                             /* thread descriptor */
 //    int             i_status;                                 /* thread status */
-   
+
     /* Allocate descriptor */
     p_aout = (aout_thread_t *) malloc( sizeof(aout_thread_t) );
     if( p_aout == NULL )
@@ -76,11 +76,11 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     p_aout->dsp.i_format = AOUT_DEFAULT_FORMAT;
     p_aout->dsp.psz_device = main_GetPszVariable( AOUT_DSP_VAR, AOUT_DSP_DEFAULT );
     p_aout->dsp.b_stereo   = main_GetIntVariable( AOUT_STEREO_VAR, AOUT_STEREO_DEFAULT );
-    p_aout->dsp.l_rate     = main_GetIntVariable( AOUT_RATE_VAR, AOUT_RATE_DEFAULT );    
+    p_aout->dsp.l_rate     = main_GetIntVariable( AOUT_RATE_VAR, AOUT_RATE_DEFAULT );
     // ???? end of kludge
 
-    /* 
-     * Initialize DSP 
+    /*
+     * Initialize DSP
      */
     if ( aout_dspOpen( &p_aout->dsp ) )
     {
@@ -129,9 +129,9 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     return( p_aout );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * aout_SpawnThread
- ******************************************************************************/
+ *****************************************************************************/
 static int aout_SpawnThread( aout_thread_t * p_aout )
 {
     int             i_fifo;
@@ -266,12 +266,12 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
     return( 0 );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * aout_DestroyThread
- ******************************************************************************/
+ *****************************************************************************/
 void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
 {
-    //???? pi_status is not handled correctly: check vout how to do! 
+    //???? pi_status is not handled correctly: check vout how to do!
 
     intf_DbgMsg("aout debug: requesting termination of audio output thread (%p)\n", p_aout);
 
@@ -289,9 +289,9 @@ void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
     free( p_aout );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * aout_CreateFifo
- ******************************************************************************/
+ *****************************************************************************/
 aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
 {
     int i_fifo;
@@ -390,9 +390,9 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
     return( &p_aout->fifo[i_fifo] );
 }
 
-/******************************************************************************
+/*****************************************************************************
  * aout_DestroyFifo
- ******************************************************************************/
+ *****************************************************************************/
 void aout_DestroyFifo( aout_fifo_t * p_fifo )
 {
     intf_DbgMsg("aout debug: requesting destruction of audio output fifo (%p)\n", p_fifo);
@@ -402,7 +402,7 @@ void aout_DestroyFifo( aout_fifo_t * p_fifo )
 /* Here are the local macros */
 
 #define UPDATE_INCREMENT( increment, integer ) \
-    if ( ((increment).l_remainder += (increment).l_euclidean_remainder) >= 0 ) \
+    if ( ((increment).l_remainder += (increment).l_euclidean_remainder) >= 0 )\
     { \
         (integer) += (increment).l_euclidean_integer + 1; \
         (increment).l_remainder -= (increment).l_euclidean_denominator; \
@@ -414,9 +414,9 @@ void aout_DestroyFifo( aout_fifo_t * p_fifo )
 
 /* Following functions are local */
 
-/******************************************************************************
+/*****************************************************************************
  * InitializeIncrement
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ void InitializeIncrement( aout_increment_t * p_increment, long l_numerator, long l_denominator )
 {
     p_increment->l_remainder = -l_denominator;
@@ -433,9 +433,9 @@ static __inline__ void InitializeIncrement( aout_increment_t * p_increment, long
     p_increment->l_euclidean_denominator = l_denominator;
 }
 
-/******************************************************************************
+/*****************************************************************************
  * NextFrame
- ******************************************************************************/
+ *****************************************************************************/
 static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, mtime_t aout_date )
 {
     long l_units, l_rate;
