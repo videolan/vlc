@@ -1,4 +1,4 @@
-$Id: INSTALL.win32,v 1.19 2003/07/29 17:42:58 gbazin Exp $
+$Id: INSTALL.win32,v 1.20 2003/10/26 13:07:50 gbazin Exp $
 
 INSTALL file for the Windows9x/Me/NT4/2k/XP version of the VLC media player
 
@@ -51,8 +51,14 @@ Getting the right compiler tools
 
 - cross-compiling with mingw32:
 You first need to download a linux cross-compiler version of mingw32.
-(for Debian GNU/Linux users, you can use the mingw32, mingw32-binutils and
-mingw32-runtime packages)
+
+For Debian GNU/Linux users, you can use the mingw32, mingw32-binutils and
+mingw32-runtime packages.
+
+Or you can use our mingw32 gcc-3.3.1 cross-compiler package:
+http://www.videolan.org/pub/testing/win32/mingw-gcc3.3.1-linux-crosscompiler.tar.bz2 (requires libc6 >= 2.3.2).
+You will need to extract this package in your root directory (everything will
+be extracted in /usr/local/cross-tools).
 
 - compiling natively on Windoze with cygwin:
 You will need to download and run the setup.exe app from cygwin's web site
@@ -86,7 +92,9 @@ http://www.videolan.org/pub/testing/contrib/
 We also provide a package with all the libraries already compiled so it is
 actually really easy to compile a full-featured version of vlc (these compiled
 libraries will only work with mingw or cygwin):
-http://www.videolan.org/pub/testing/win32/contrib-20030729-win32-bin.tar.bz2
+http://www.videolan.org/pub/testing/win32/contrib-20030729-win32-bin.tar.bz2 or
+http://www.videolan.org/pub/testing/win32/contrib-20031026-win32-bin-gcc3.3.1-only.tar.bz2
+if you are using the new version of gcc (3.3.1).
 All you need to do is extract it in your root directory (the include files
 and libraries will be put in /usr/win32). You can do this with the following
 command: "tar xjvf contrib-20030729-win32-bin.tar.bz2 -C /"
@@ -119,7 +127,28 @@ along those lines:
       --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
       --with-freetype-config-path=/usr/win32/bin \
+      --disable-fribidi --disable-vcdx \
       --enable-debug
+
+If you are cross-compiling with our gcc-3.3.1 package, you can use something
+along those lines:
+
+  ./bootstrap && \
+  PATH=/usr/local/mingw/bin:$PATH \
+  CPPFLAGS=-I/usr/win32/include \
+  LDFLAGS=-L/usr/win32/lib \
+  CC=i586-mingw32msvc-gcc CXX=i586-mingw32msvc-g++ \
+  ./configure --host=i586-mingw32msvc --build=i386-linux \
+      --disable-sdl --disable-gtk \
+      --enable-nls \
+      --enable-ffmpeg --with-ffmpeg-mp3lame \
+      --enable-faad \
+      --enable-flac \
+      --enable-theora \
+      --with-wx-config-path=/usr/win32/bin \
+      --with-freetype-config-path=/usr/win32/bin \
+      --with-fribidi-config-path=/usr/win32/bin \
+      --disable-vcdx --enable-debug
 
 If you are using cygwin, you can build VLC with or without the unix emulation
 layer (without is usually better). To build without the emulaion layer, use
@@ -137,6 +166,7 @@ something like this:
       --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
       --with-freetype-config-path=/usr/win32/bin \
+      --with-fribidi-config-path=/usr/win32/bin \
       --enable-debug
 
 If you want to use the emulation layer, then just omit the CC="gcc -mno-cygwin"
@@ -157,6 +187,7 @@ lines:
       --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
       --with-freetype-config-path=/usr/win32/bin \
+      --with-fribidi-config-path=/usr/win32/bin \
       --enable-debug
 
 See `./configure --help' for more information.
@@ -165,6 +196,9 @@ Actually Compiling the VLC source
 =================================
 
 Once configured, to build VLC, just run `make'.
+
+( If you are using our gcc-3.3.1 cross-compiler you'll need to use:
+  PATH=/usr/local/mingw/bin:$PATH make )
 
 Well done, now you're ready to use VLC!
 =======================================
