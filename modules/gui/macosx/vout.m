@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.66 2003/12/08 19:50:22 gbazin Exp $
+ * $Id: vout.m,v 1.67 2003/12/15 19:25:56 bigben Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -417,6 +417,8 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 static int CoSendRequest( vout_thread_t *p_vout, SEL sel )
 {
     int i_ret = 0;
+    vlc_value_t val;
+    intf_thread_t * p_intf;
 
     VLCVout * o_vlv = [[VLCVout alloc] init];
 
@@ -426,6 +428,21 @@ static int CoSendRequest( vout_thread_t *p_vout, SEL sel )
     }
 
     [o_vlv release];
+
+    /*This makes this function dependant of the presence of a macosx 
+    interface. We do not check if this interface exists, since it has 
+    already been done before.*/
+
+    p_intf = [NSApp getIntf];
+
+    val.b_bool = p_vout->b_fullscreen;
+    var_Create(p_intf,"fullscreen",VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+    var_Set(p_intf,"fullscreen",val);
+
+    val.b_bool = VLC_TRUE;
+    var_Create(p_intf,"intf-change",VLC_VAR_BOOL);
+    var_Set(p_intf, "intf-change",val);
+
 
     return( i_ret );
 }
@@ -442,7 +459,7 @@ static int CoCreateWindow( vout_thread_t *p_vout )
         msg_Err( p_vout, "CoSendRequest (createWindow) failed" );
         return( 1 );
     }
-
+    
     return( 0 );
 }
 
@@ -481,8 +498,6 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
     }
     
     p_vout->b_fullscreen = !p_vout->b_fullscreen;
-
-    config_PutInt( p_vout, "fullscreen", p_vout->b_fullscreen );
 
     if( CoCreateWindow( p_vout ) )
     {
@@ -1273,6 +1288,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     
     [p_vout->p_sys->o_window updateTitle];
     [p_vout->p_sys->o_window makeKeyAndOrderFront: nil];
+
 }
 
 - (void)destroyWindow:(NSValue *)o_value

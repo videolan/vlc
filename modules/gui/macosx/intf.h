@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.51 2003/12/11 19:34:47 hartman Exp $
+ * $Id: intf.h,v 1.52 2003/12/15 19:25:56 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -75,7 +75,8 @@ struct intf_sys_t
     vlc_bool_t b_play_status;
     vlc_bool_t b_playlist_update;
     vlc_bool_t b_current_title_update;
-    
+    vlc_bool_t b_fullscreen_update;
+
     /* menus handlers */
     vlc_bool_t b_input_update;
     vlc_bool_t b_aout_update;

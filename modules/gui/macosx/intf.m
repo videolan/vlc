@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.106 2003/12/15 15:38:26 hartman Exp $
+ * $Id: intf.m,v 1.107 2003/12/15 19:25:56 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -72,6 +72,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     
     [[VLCApplication sharedApplication] autorelease];
     [NSApp setIntf: p_intf];
+
 
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
 
@@ -615,7 +616,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     while( !p_intf->b_die )
     {
         playlist_t * p_playlist;
-
+        vlc_value_t val;
         vlc_mutex_lock( &p_intf->change_lock );
 
         p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, 
@@ -657,6 +658,15 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
             
 #undef p_input
             vlc_object_release( p_playlist );
+
+            var_Create(p_intf,"intf-change",VLC_VAR_BOOL );
+            if( var_Get( p_intf, "intf-change", &val )
+                        >= 0 && val.b_bool )
+            {
+                p_intf->p_sys->b_fullscreen_update = TRUE;
+            }
+            val.b_bool = VLC_FALSE;
+            var_Set( p_intf,"intf-change",val);
         }
 
         vlc_mutex_unlock( &p_intf->change_lock );
@@ -758,8 +768,34 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         [o_timefield setStringValue: @"0:00:00"];
 
         [self manageVolumeSlider];
-
         p_intf->p_sys->b_intf_update = VLC_FALSE;
+    }
+
+    if (p_intf->p_sys->b_fullscreen_update )
+    { 
+        vout_thread_t  * p_vout;
+        vlc_value_t val;
+        p_vout=vlc_object_find(p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE);
+        if (p_vout !=NULL)
+        {
+            if( var_Get( p_intf, "fullscreen", &val )
+                        >= 0 && val.b_bool )
+            {
+                [o_btn_fullscreen setState:VLC_TRUE];
+            }
+            else
+            {
+                [o_btn_fullscreen setState:VLC_FALSE];
+            }
+        [o_btn_fullscreen setEnabled: VLC_TRUE];
+        vlc_object_release( p_vout );
+        }
+        else
+        {
+        [o_btn_fullscreen setState: VLC_FALSE];
+        [o_btn_fullscreen setEnabled: VLC_FALSE];
+        }
+    p_intf->p_sys->b_fullscreen_update = VLC_FALSE;
     }
 
     if( p_intf->p_sys->b_playing && p_input != NULL )
