@@ -6,7 +6,7 @@
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_netlist.c,v 1.45 2001/11/28 15:08:06 massiot Exp $
+ * $Id: input_netlist.c,v 1.46 2001/12/02 17:32:19 stef Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -373,7 +373,8 @@ void input_NetlistMviovec( void * p_method_data, int i_nb_iovec,
 
         pp_data[i_loop]->pi_refcount = p_netlist->pi_refcount +
                                        p_netlist->i_iovec_start;
-        (*pp_data[i_loop]->pi_refcount)++;
+        //(*pp_data[i_loop]->pi_refcount)++;
+        (*pp_data[i_loop]->pi_refcount) = 1;
 
         p_netlist->i_iovec_start ++;
         p_netlist->i_iovec_start &= p_netlist->i_nb_iovec;
@@ -484,7 +485,8 @@ struct data_packet_s * input_NetlistNewPacket( void * p_method_data,
     p_packet->b_discard_payload = 0;
 
     p_packet->pi_refcount = p_netlist->pi_refcount + p_netlist->i_iovec_start;
-    (*p_packet->pi_refcount)++;
+    //(*p_packet->pi_refcount)++;
+    (*p_packet->pi_refcount) = 1;
 
     p_netlist->i_iovec_start ++;
     p_netlist->i_iovec_start &= p_netlist->i_nb_iovec;
@@ -568,7 +570,7 @@ void input_NetlistDeletePacket( void * p_method_data, data_packet_t * p_data )
 
     if( (*p_data->pi_refcount) <= 0 )
     {
-
+        (*p_data->pi_refcount) = 0;
         p_netlist->i_iovec_end++;
         p_netlist->i_iovec_end &= p_netlist->i_nb_iovec;
         p_netlist->p_free_iovec[p_netlist->i_iovec_end].iov_base =
