@@ -132,7 +132,7 @@ vlc_module_end();
  *****************************************************************************/
 static int  Demux  ( demux_t * );
 static int  Control( demux_t *, int, va_list );
-static void Seek   ( demux_t *, mtime_t i_date, int i_percent );
+static void Seek   ( demux_t *, mtime_t i_date, double f_percent );
 
 #ifdef HAVE_ZLIB_H
 block_t *block_zlib_decompress( vlc_object_t *p_this, block_t *p_in_block ) {
@@ -1092,7 +1092,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_POSITION:
             f = (double)va_arg( args, double );
-            Seek( p_demux, -1, (int)(100.0 * f) );
+            Seek( p_demux, -1, f );
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
@@ -1378,7 +1378,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
 #undef tk
 }
 
-static void Seek( demux_t *p_demux, mtime_t i_date, int i_percent)
+static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -1391,27 +1391,27 @@ static void Seek( demux_t *p_demux, mtime_t i_date, int i_percent)
     int         i_track_skipping;
     int         i_track;
 
-    msg_Dbg( p_demux, "seek request to "I64Fd" (%d%%)", i_date, i_percent );
-    if( i_date < 0 && i_percent < 0 )
+    msg_Dbg( p_demux, "seek request to "I64Fd" (%f%%)", i_date, f_percent );
+    if( i_date < 0 && f_percent < 0 )
     {
         return;
     }
-    if( i_percent > 100 ) i_percent = 100;
+    if( f_percent > 1.0 ) f_percent = 1.0;
 
     delete p_sys->ep;
     p_sys->ep = new EbmlParser( p_sys->es, p_sys->segment );
     p_sys->cluster = NULL;
 
     /* seek without index or without date */
-    if( i_percent >= 0 && (config_GetInt( p_demux, "mkv-seek-percent" ) || !p_sys->b_cues || i_date < 0 ))
+    if( f_percent >= 0 && (config_GetInt( p_demux, "mkv-seek-percent" ) || !p_sys->b_cues || i_date < 0 ))
     {
         if (p_sys->f_duration >= 0)
         {
-            i_date = i_percent * p_sys->f_duration * 10;
+            i_date = f_percent * p_sys->f_duration * 1000;
         }
         else
         {
-            int64_t i_pos = i_percent * stream_Size( p_demux->s ) / 100;
+            int64_t i_pos = f_percent * stream_Size( p_demux->s );
 
             msg_Dbg( p_demux, "inacurate way of seeking" );
             for( i_index = 0; i_index < p_sys->i_index; i_index++ )
