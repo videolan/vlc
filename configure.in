@@ -1208,14 +1208,20 @@ AC_ARG_ENABLE(qnx,
     fi
 
 dnl
-dnl  Windows MFC interface module
+dnl  Windows native interface module, built with Borland C++ Builder
 dnl
-AC_ARG_ENABLE(win32,
-  [  --enable-win32          Win32 interface support (default disabled)],
-  [ if test "x$enableval" != "xno"
+AC_ARG_ENABLE(intfwin,
+[  --enable-intfwin        Win32 interface support (default disabled)],
+[ if test "x$enableval" != "xno"
+  then
+    AC_ARG_WITH(bcbuilder, 
+    [    --with-bcbuilder=PATH Borland C++ Builder installation path])
+    if test "x$with_bcbuilder" != "x"
     then
-      PLUGINS="${PLUGINS} win32"
-    fi ])
+      BCBUILDER="$with_bcbuilder"
+    fi
+    PLUGINS="${PLUGINS} intfwin"
+  fi ])
 
 dnl
 dnl  ncurses module
@@ -1419,6 +1425,7 @@ AC_SUBST(TUNING)
 AC_SUBST(RELEASE)
 AC_SUBST(MOC)
 AC_SUBST(WINDRES)
+AC_SUBST(BCBUILDER)
 AC_SUBST(DLL_PATH)
 AC_SUBST(VLC_PACKAGE)
 AC_SUBST(VLC_VERSION)

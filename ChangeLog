@@ -4,6 +4,8 @@
 
 HEAD
 
+  * ./configure.in: added --enable-intfwin to enable the win32 interface and
+    --with-bcbuilder to tell make where to find Borland C++ Builder.
   * ./plugins/win32/intfwin.bpr: we now build intfwin.so at the right place.
   * ./plugins/win32/Makefile: intfwin.so can be built using commandline.
   * ./configure.in, ./include/threads.h, ./include/common.h: a custom defs.h

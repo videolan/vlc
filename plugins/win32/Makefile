@@ -8,7 +8,6 @@ waveout_SOURCES = waveout.c
 # we override everything by setting intfwin_CUSTOM
 #
 intfwin_CUSTOM = yes
-BCBUILDER = "D:/Program Files/CBuilder5"
 
 ../intfwin.so: Makefile
 	rm -f intfwin.mak

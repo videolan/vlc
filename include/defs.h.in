@@ -308,10 +308,10 @@
 #undef HAVE_LIBST
 
 /* Package name */
-#undef PACKAGE
+#undef VLC_PACKAGE
 
 /* Package version */
-#undef VERSION
+#undef VLC_VERSION
 
 /* Define if you have the iconv() function. */
 #undef HAVE_ICONV
