@@ -59,8 +59,8 @@ endif
 ifeq ($(SYS),BEOS)
 all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
-	.FLAC .speex .faad .faac .lame .ffmpeg .dvdcss .dvdread .dvbpsi \
-	.dts
+	.FLAC .speex .faad .faac .lame .ffmpeg .dvdcss .dvdread .dvdnav \
+	.dvbpsi .dts
 endif
 
 FORCE:
@@ -711,9 +711,15 @@ libdvdnav-$(LIBDVDNAV_VERSION).tar.gz:
 libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/dvdnav.patch
+ifeq ($(SYS),DARWIN)
+	(cd $@; autoheader)
+endif
+ifeq ($(SYS),BEOS)
+	(cd $@; ./autogen.sh noconfig)
+endif
 
 .dvdnav: libdvdnav .dvdread
-	(cd $<; ./autogen.sh noconfig && ./configure --enable-static --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
+	(cd $<; ./configure --enable-static --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
