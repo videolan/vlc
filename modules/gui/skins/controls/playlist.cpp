@@ -2,7 +2,7 @@
  * playlist.cpp: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.14 2003/06/09 14:04:20 asmax Exp $
+ * $Id: playlist.cpp,v 1.15 2003/06/23 20:35:36 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -79,6 +79,7 @@ ControlPlayList::ControlPlayList( string id, bool visible, int width,
 
     // Scroll
     StartIndex  = 0;
+
 }
 //---------------------------------------------------------------------------
 ControlPlayList::~ControlPlayList()

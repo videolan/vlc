@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.38 2003/06/22 12:46:49 asmax Exp $
+ * $Id: vlcproc.cpp,v 1.39 2003/06/23 20:35:36 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -46,11 +46,28 @@
 //---------------------------------------------------------------------------
 VlcProc::VlcProc( intf_thread_t *_p_intf )
 {
-    p_intf = _p_intf;
+    p_intf = _p_intf; 
+    
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf, 
+        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist != NULL )
+    {
+        // We want to be noticed of playlit changes
+        var_AddCallback( p_playlist, "intf-change", RefreshCallback, this );
+        vlc_object_release( p_playlist );   
+    }
 }
 //---------------------------------------------------------------------------
 VlcProc::~VlcProc()
 {
+    // Remove the refresh callback
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf, 
+        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist != NULL )
+    {
+        var_DelCallback( p_playlist, "intf-change", RefreshCallback, this );
+        vlc_object_release( p_playlist );
+    }
 }
 //---------------------------------------------------------------------------
 bool VlcProc::EventProc( Event *evt )
@@ -145,7 +162,7 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_INTF_REFRESH:
-            InterfaceRefresh( (bool)evt->GetParam2() );
+            InterfaceRefresh();
             return true;
 
         case VLC_TEST_ALL_CLOSED:
@@ -225,7 +242,16 @@ bool VlcProc::IsClosing()
 //---------------------------------------------------------------------------
 // Private methods
 //---------------------------------------------------------------------------
-void VlcProc::InterfaceRefresh( bool All )
+
+// Refresh callback
+int VlcProc::RefreshCallback( vlc_object_t *p_this, const char *psz_variable,
+        vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    ( (VlcProc*)param )->InterfaceRefresh();
+    return VLC_SUCCESS;
+}
+
+void VlcProc::InterfaceRefresh()
 {
     // Shortcut pointers
     intf_sys_t  *Sys      = p_intf->p_sys;
@@ -308,7 +334,6 @@ void VlcProc::InterfaceRefresh( bool All )
             Sys->i_size  = 0;
         }
     }
-
 }
 //---------------------------------------------------------------------------
 void VlcProc::EnabledEvent( string type, bool state )

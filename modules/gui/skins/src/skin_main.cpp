@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.41 2003/06/22 17:52:12 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.42 2003/06/23 20:35:36 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -333,7 +333,6 @@ static void Run( intf_thread_t *p_intf )
 
     msg_Dbg( p_intf, "Load theme time : %i ms", OSAPI_GetTime() - a );
 
-    // Refresh the whole interface
     OSAPI_PostMessage( NULL, VLC_INTF_REFRESH, 0, (int)true );
 
     OSRun( p_intf );
@@ -390,8 +389,6 @@ int SkinManage( intf_thread_t *p_intf )
         p_intf->p_sys->p_input = NULL;
     }
 
-    OSAPI_PostMessage( NULL, VLC_INTF_REFRESH, 0, (long)false );
-
 #if !defined(MODULE_NAME_IS_basic_skins) //FIXME
     // Update the log window
     p_intf->p_sys->p_dialogs->MessagesDlg->UpdateLog();
@@ -418,7 +415,6 @@ int SkinManage( intf_thread_t *p_intf )
             (unsigned int)
             p_intf->p_sys->p_theme->EvtBank->Get( "volume_refresh" ),
             (long)( volume * SLIDER_RANGE / AOUT_VOLUME_MAX ) );
-
 
         // Refresh slider
         // if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )

@@ -2,7 +2,7 @@
  * vlcproc.h: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.h,v 1.7 2003/06/09 12:33:16 asmax Exp $
+ * $Id: vlcproc.h,v 1.8 2003/06/23 20:35:36 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -52,7 +52,10 @@ class VlcProc
         void ChangeVolume( unsigned int msg, long param );
         void AddNetworkUDP( int port );
 
-        void InterfaceRefresh( bool All = false );
+        static int RefreshCallback( vlc_object_t *p_this, 
+            const char *psz_variable, vlc_value_t old_val, vlc_value_t new_val, 
+            void *param );
+        void InterfaceRefresh();
         void EnabledEvent( string type, bool state );
 
     public:

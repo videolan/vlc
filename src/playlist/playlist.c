@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.36 2003/05/26 19:06:47 gbazin Exp $
+ * $Id: playlist.c,v 1.37 2003/06/23 20:35:36 asmax Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -557,6 +557,7 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
 {
     int i_oldindex = p_playlist->i_index;
     vlc_bool_t b_random;
+    vlc_value_t val;
 
     /* If the playlist is empty, there is no current item */
     if( p_playlist->i_size == 0 )
@@ -604,6 +605,9 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
     {
         p_playlist->i_index = p_playlist->i_size - 1;
     }
+
+    val.b_bool = VLC_TRUE;
+    var_Set( p_playlist, "intf-change", val );
 }
 
 /*****************************************************************************
