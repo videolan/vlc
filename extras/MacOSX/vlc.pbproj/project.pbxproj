@@ -874,7 +874,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
 			name = equalizer.h;
-			path = "/Users/djc/src/videolan/vlc-trunk/modules/gui/macosx/equalizer.h";
+			path = "../../modules/gui/macosx/equalizer.h";
 			refType = 0;
 			sourceTree = "<absolute>";
 		};
@@ -883,7 +883,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.objc;
 			name = equalizer.m;
-			path = "/Users/djc/src/videolan/vlc-trunk/modules/gui/macosx/equalizer.m";
+			path = "../../modules/gui/macosx/equalizer.m";
 			refType = 0;
 			sourceTree = "<absolute>";
 		};
