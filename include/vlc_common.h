@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.33 2002/10/29 13:22:47 sam Exp $
+ * $Id: vlc_common.h,v 1.34 2002/11/07 22:56:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -59,6 +59,13 @@
 #   include <stdint.h>
 #elif defined( HAVE_INTTYPES_H )
 #   include <inttypes.h>
+#elif defined( SYS_CYGWIN )
+#   include <sys/types.h>
+    /* Cygwin only defines half of these... */
+    typedef u_int8_t            uint8_t;
+    typedef u_int16_t           uint16_t;
+    typedef u_int32_t           uint32_t;
+    typedef u_int64_t           uint64_t;
 #else
     /* Fallback types (very x86-centric, sorry) */
     typedef unsigned char       uint8_t;
