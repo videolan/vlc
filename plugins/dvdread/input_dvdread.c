@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.22 2002/03/01 01:12:28 stef Exp $
+ * $Id: input_dvdread.c,v 1.23 2002/03/01 14:17:22 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -91,6 +91,7 @@ static int  DvdReadRead     ( struct input_thread_s *, byte_t *, size_t );
 static void DvdReadSeek     ( struct input_thread_s *, off_t );
 
 /* called only from here */
+static void DvdReadLauchDecoders( input_thread_t * p_input );
 static void DvdReadHandleDSI( thread_dvd_data_t * p_dvd, u8 * p_data );
 static void DvdReadFindCell ( thread_dvd_data_t * p_dvd );
 
@@ -129,71 +130,16 @@ void _M( demux_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int DvdReadInit( input_thread_t * p_input )
 {
-    thread_dvd_data_t *  p_dvd;
-
     if( strncmp( p_input->p_access_module->psz_name, "dvdread", 7 ) )
     {
         return -1;
     }
 
-    p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);            
-            
-    if( p_main->b_video )
-    {
-        input_SelectES( p_input, p_input->stream.pp_es[0] );
-    }
-
-    if( p_main->b_audio )
-    {
-        /* For audio: first one if none or a not existing one specified */
-        int i_audio = config_GetIntVariable( INPUT_CHANNEL_VAR );
-        if( i_audio < 0 /*|| i_audio > i_audio_nb*/ )
-        {
-            config_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
-            i_audio = 1;
-        }
-        if( i_audio > 0/* && i_audio_nb > 0*/ )
-        {
-            if( config_GetIntVariable( AOUT_SPDIF_VAR ) ||
-                ( config_GetIntVariable( INPUT_AUDIO_VAR ) ==
-                  REQUESTED_AC3 ) )
-            {
-                int     i_ac3 = i_audio;
-                while( ( p_input->stream.pp_es[i_ac3]->i_type !=
-                       AC3_AUDIO_ES ) && ( i_ac3 <=
-                       p_dvd->p_vts_file->vtsi_mat->nr_of_vts_audio_streams ) )
-                {
-                    i_ac3++;
-                }
-                if( p_input->stream.pp_es[i_ac3]->i_type == AC3_AUDIO_ES )
-                {
-                    input_SelectES( p_input,
-                                    p_input->stream.pp_es[i_ac3] );
-                }
-            }
-            else
-            {
-                input_SelectES( p_input,
-                                p_input->stream.pp_es[i_audio] );
-            }
-        }
-    }
-
-    if( p_main->b_video )
-    {
-        /* for spu, default is none */
-        int i_spu = config_GetIntVariable( INPUT_SUBTITLE_VAR );
-        if( i_spu < 0 /*|| i_spu > i_spu_nb*/ )
-        {
-            config_PutIntVariable( INPUT_SUBTITLE_VAR, 0 );
-            i_spu = 0;
-        }
-        if( i_spu > 0 /*&& i_spu_nb > 0*/ )
-        {
-            i_spu += p_dvd->p_vts_file->vtsi_mat->nr_of_vts_audio_streams;
-            input_SelectES( p_input, p_input->stream.pp_es[i_spu] );
-        }
-    }
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    
+    DvdReadLauchDecoders( p_input );
+    
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return 0;
 }
@@ -759,9 +705,9 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         /* FIXME: hack to check that the demuxer is ready, and set
          * the decoders */
-        if( p_input->pf_init )
+        if( p_input->p_demux_module )
         {
-            p_input->pf_init( p_input );
+            DvdReadLauchDecoders( p_input );
         }
             
     } /* i_title >= 0 */
@@ -973,7 +919,10 @@ static void DvdReadSeek( input_thread_t * p_input, off_t i_off )
     int                     i_vobu = 0;
     int                     i_sub_cell = 0;
 
+    vlc_mutex_lock( &p_input->stream.stream_lock );
     i_off += p_input->stream.p_selected_area->i_start;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    
     i_lb = OFF2LB( i_off );
     p_dvd = ( thread_dvd_data_t * )p_input->p_access_data;
 
@@ -1029,10 +978,12 @@ static void DvdReadSeek( input_thread_t * p_input, off_t i_off )
     p_dvd->i_chapter = i_chapter;
     DvdReadFindCell( p_dvd );
 
+    vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.p_selected_area->i_tell =
         LB2OFF ( p_dvd->i_cur_block )
          - p_input->stream.p_selected_area->i_start;
     p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return;
 }
@@ -1177,5 +1128,72 @@ static void DvdReadFindCell( thread_dvd_data_t * p_dvd )
     {
         p_dvd->i_chapter++;
         p_dvd->b_eoc = 1;
+    }
+}
+
+/*****************************************************************************
+ * DvdReadLaunchDecoders
+ *****************************************************************************/
+static void DvdReadLauchDecoders( input_thread_t * p_input )
+{
+    thread_dvd_data_t *  p_dvd;
+    
+    p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);            
+            
+    if( p_main->b_video )
+    {
+        input_SelectES( p_input, p_input->stream.pp_es[0] );
+    }
+
+    if( p_main->b_audio )
+    {
+        /* For audio: first one if none or a not existing one specified */
+        int i_audio = config_GetIntVariable( INPUT_CHANNEL_VAR );
+        if( i_audio < 0 /*|| i_audio > i_audio_nb*/ )
+        {
+            config_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
+            i_audio = 1;
+        }
+        if( i_audio > 0/* && i_audio_nb > 0*/ )
+        {
+            if( config_GetIntVariable( AOUT_SPDIF_VAR ) ||
+                ( config_GetIntVariable( INPUT_AUDIO_VAR ) ==
+                  REQUESTED_AC3 ) )
+            {
+                int     i_ac3 = i_audio;
+                while( ( p_input->stream.pp_es[i_ac3]->i_type !=
+                       AC3_AUDIO_ES ) && ( i_ac3 <=
+                       p_dvd->p_vts_file->vtsi_mat->nr_of_vts_audio_streams ) )
+                {
+                    i_ac3++;
+                }
+                if( p_input->stream.pp_es[i_ac3]->i_type == AC3_AUDIO_ES )
+                {
+                    input_SelectES( p_input,
+                                    p_input->stream.pp_es[i_ac3] );
+                }
+            }
+            else
+            {
+                input_SelectES( p_input,
+                                p_input->stream.pp_es[i_audio] );
+            }
+        }
+    }
+
+    if( p_main->b_video )
+    {
+        /* for spu, default is none */
+        int i_spu = config_GetIntVariable( INPUT_SUBTITLE_VAR );
+        if( i_spu < 0 /*|| i_spu > i_spu_nb*/ )
+        {
+            config_PutIntVariable( INPUT_SUBTITLE_VAR, 0 );
+            i_spu = 0;
+        }
+        if( i_spu > 0 /*&& i_spu_nb > 0*/ )
+        {
+            i_spu += p_dvd->p_vts_file->vtsi_mat->nr_of_vts_audio_streams;
+            input_SelectES( p_input, p_input->stream.pp_es[i_spu] );
+        }
     }
 }

@@ -9,7 +9,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.123 2002/03/01 01:12:28 stef Exp $
+ * $Id: input_dvd.c,v 1.124 2002/03/01 14:17:22 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -99,6 +99,7 @@ static int  DVDInit         ( struct input_thread_s * );
 static void DVDEnd          ( struct input_thread_s * );
 
 /* called only inside */
+static void DVDLaunchDecoders( input_thread_t * p_input );
 static int  DVDChooseAngle( thread_dvd_data_t * );
 static int  DVDFindCell( thread_dvd_data_t * );
 static int  DVDFindSector( thread_dvd_data_t * );
@@ -139,76 +140,17 @@ void _M( demux_getfunctions)( function_list_t * p_function_list )
  *****************************************************************************/
 static int DVDInit( input_thread_t * p_input )
 {
-    thread_dvd_data_t *  p_dvd;
-    int                  i_audio;
-    int                  i_spu;
 
     if( strncmp( p_input->p_access_module->psz_name, "dvd", 3 ) )
     {
         return -1;
     }
 
-    p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
-
-    /* Select Video stream (always 0) */
-    if( p_main->b_video )
-    {
-        input_SelectES( p_input, p_input->stream.pp_es[0] );
-    }
-
-    /* Select audio stream */
-    if( p_main->b_audio )
-    {
-        /* For audio: first one if none or a not existing one specified */
-        i_audio = config_GetIntVariable( INPUT_CHANNEL_VAR );
-        if( i_audio < 0 /*|| i_audio > i_audio_nb*/ )
-        {
-            config_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
-            i_audio = 1;
-        }
-        if( i_audio > 0 /*&& i_audio_nb > 0*/ )
-        {
-            if( config_GetIntVariable( AOUT_SPDIF_VAR ) ||
-                ( config_GetIntVariable( INPUT_AUDIO_VAR ) ==
-                  REQUESTED_AC3 ) )
-            {
-                int     i_ac3 = i_audio;
-                while( ( p_input->stream.pp_es[i_ac3]->i_type !=
-                         AC3_AUDIO_ES ) && ( i_ac3 <=
-                         p_dvd->p_ifo->vts.manager_inf.i_audio_nb ) )
-                {
-                    i_ac3++;
-                }
-                if( p_input->stream.pp_es[i_ac3]->i_type == AC3_AUDIO_ES )
-                {
-                    input_SelectES( p_input,
-                                    p_input->stream.pp_es[i_ac3] );
-                }
-            }
-            else
-            {
-                input_SelectES( p_input,
-                                p_input->stream.pp_es[i_audio] );
-            }
-        }
-    }
-
-    /* Select subtitle */
-    if( p_main->b_video )
-    {
-        /* for spu, default is none */
-        i_spu = config_GetIntVariable( INPUT_SUBTITLE_VAR );
-        if( i_spu < 0 /*|| i_spu > i_spu_nb*/ )
-        {
-            config_PutIntVariable( INPUT_SUBTITLE_VAR, 0 );
-            i_spu = 0;
-        }
-        if( i_spu > 0 /* && i_spu_nb > 0*/ )
-        {
-            i_spu += p_dvd->p_ifo->vts.manager_inf.i_audio_nb;
-            input_SelectES( p_input, p_input->stream.pp_es[i_spu] );
-        }
-    }
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    
+    DVDLaunchDecoders( p_input );
+    
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return 0;
 }
@@ -804,9 +746,9 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
     
         /* FIXME: hack to check that the demuxer is ready, and set
         * the decoders */
-        if( p_input->pf_init )
+        if( p_input->p_demux_module )
         {
-            p_input->pf_init( p_input );
+            DVDLaunchDecoders( p_input );
         }
 
     } /* i_title >= 0 */
@@ -1037,9 +979,11 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     
     p_dvd = ( thread_dvd_data_t * )(p_input->p_access_data);
 
+    vlc_mutex_lock( &p_input->stream.stream_lock );
     /* we have to take care of offset of beginning of title */
     p_dvd->i_sector = OFF2LB(i_off + p_input->stream.p_selected_area->i_start)
                        - p_dvd->i_title_start;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     i_prg_cell = 0;
     i_chapter = 0;
@@ -1118,7 +1062,6 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     }
 
     p_dvd->i_chapter = i_chapter;
-    p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
 
     if( ( i_block = dvdcss_seek( p_dvd->dvdhandle,
                                  p_dvd->i_title_start + p_dvd->i_sector,
@@ -1129,8 +1072,11 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
         return;
     }
 
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
     p_input->stream.p_selected_area->i_tell =
         LB2OFF ( i_block ) - p_input->stream.p_selected_area->i_start;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     intf_WarnMsg( 7, "Program Cell: %d Cell: %d Chapter: %d",
                      p_dvd->i_prg_cell, p_dvd->i_cell, p_dvd->i_chapter );
@@ -1296,3 +1242,74 @@ static int DVDChooseAngle( thread_dvd_data_t * p_dvd )
 }
 
 #undef title
+/*****************************************************************************
+ * DVDLaunchDecoders
+ *****************************************************************************/
+static void DVDLaunchDecoders( input_thread_t * p_input )
+{
+    thread_dvd_data_t *  p_dvd;
+    int                  i_audio;
+    int                  i_spu;
+
+    p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
+
+    /* Select Video stream (always 0) */
+    if( p_main->b_video )
+    {
+        input_SelectES( p_input, p_input->stream.pp_es[0] );
+    }
+
+    /* Select audio stream */
+    if( p_main->b_audio )
+    {
+        /* For audio: first one if none or a not existing one specified */
+        i_audio = config_GetIntVariable( INPUT_CHANNEL_VAR );
+        if( i_audio < 0 /*|| i_audio > i_audio_nb*/ )
+        {
+            config_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
+            i_audio = 1;
+        }
+        if( i_audio > 0 /*&& i_audio_nb > 0*/ )
+        {
+            if( config_GetIntVariable( AOUT_SPDIF_VAR ) ||
+                ( config_GetIntVariable( INPUT_AUDIO_VAR ) ==
+                  REQUESTED_AC3 ) )
+            {
+                int     i_ac3 = i_audio;
+                while( ( p_input->stream.pp_es[i_ac3]->i_type !=
+                         AC3_AUDIO_ES ) && ( i_ac3 <=
+                         p_dvd->p_ifo->vts.manager_inf.i_audio_nb ) )
+                {
+                    i_ac3++;
+                }
+                if( p_input->stream.pp_es[i_ac3]->i_type == AC3_AUDIO_ES )
+                {
+                    input_SelectES( p_input,
+                                    p_input->stream.pp_es[i_ac3] );
+                }
+            }
+            else
+            {
+                input_SelectES( p_input,
+                                p_input->stream.pp_es[i_audio] );
+            }
+        }
+    }
+
+    /* Select subtitle */
+    if( p_main->b_video )
+    {
+        /* for spu, default is none */
+        i_spu = config_GetIntVariable( INPUT_SUBTITLE_VAR );
+        if( i_spu < 0 /*|| i_spu > i_spu_nb*/ )
+        {
+            config_PutIntVariable( INPUT_SUBTITLE_VAR, 0 );
+            i_spu = 0;
+        }
+        if( i_spu > 0 /* && i_spu_nb > 0*/ )
+        {
+            i_spu += p_dvd->p_ifo->vts.manager_inf.i_audio_nb;
+            input_SelectES( p_input, p_input->stream.pp_es[i_spu] );
+        }
+    }
+}
