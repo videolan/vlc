@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.4 2001/02/09 03:51:42 stef Exp $
+ * $Id: dvd_css.c,v 1.5 2001/02/09 18:34:01 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -33,7 +33,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <netinet/in.h>
-#ifdef HAVE_IOCTL_H
+#ifdef HAVE_SYS_IOCTL_H
 # include <sys/ioctl.h>
 #endif
 #ifdef HAVE_SYS_DVDIO_H
@@ -268,7 +268,7 @@ unsigned char pi_css_tab5[256]=
 /*****************************************************************************
  * CSSGetASF : Get Authentification success flag
  *****************************************************************************/
-int CSSGetASF( int i_fd )
+static int CSSGetASF( int i_fd )
 {
     dvd_authinfo ai;
 
