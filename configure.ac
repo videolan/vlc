@@ -392,22 +392,14 @@ if test $ac_cv_struct_sockaddr_storage = no; then
 fi
 
 dnl getnameinfo, which implies {get,free}addrinfo, but not gai_strerror,
-dnl -lws2_32 required with Mingw32, -lresolv NOT needed on Solaris.
-dnl AC_SEARCH_LIBS won't work with Mingw32
+dnl not available on win32 and -lresolv NOT needed on Solaris.
 AH_TEMPLATE(HAVE_GETNAMEINFO,
   [Define to 1 if you have the `getnameinfo' function.])
-ac_func_getnameinfo_save_LIBS=$LIBS
-AS_IF([test "${SYS}" = "mingw32"],
-  [LIBS="-lws2_32 $LIBS"])
+AH_TEMPLATE(HAVE_GAI_STRERROR,
+  [Define to 1 if you have the `gai_strerror' function.])
 AC_CACHE_CHECK([for getnameinfo], ac_cv_func_getnameinfo,
 [AC_LINK_IFELSE([AC_LANG_PROGRAM([
 [#include <sys/types.h>
-#if defined( UNDER_CE )
-# include <winsock.h>
-#elif defined( WIN32 )
-# include <winsock2.h>
-# include <ws2tcpip.h>
-#else
 # include <sys/socket.h>
 # include <netdb.h>
 #endif]
@@ -415,29 +407,8 @@ AC_CACHE_CHECK([for getnameinfo], ac_cv_func_getnameinfo,
 ac_cv_func_getnameinfo=yes,
 ac_cv_func_getnameinfo=no)])
 AS_IF([test $ac_cv_func_getnameinfo = yes],
-  [AC_DEFINE(HAVE_GETNAMEINFO)])
-LIBS=$ac_func_getnameinfo_save_LIBS
-
-dnl Cannot have gai_strerror if not getaddrinfo
-AH_TEMPLATE(HAVE_GAI_STRERROR,
-  [Define to 1 if you have the `gai_strerror' function.])
-AC_CACHE_CHECK([for gai_strerror], ac_cv_func_gai_strerror,
-[AC_LINK_IFELSE([AC_LANG_PROGRAM([
-[#include <sys/types.h>
-#if defined( UNDER_CE )
-# include <winsock.h>
-#elif defined( WIN32 )
-# include <winsock2.h>
-# include <ws2tcpip.h>
-#else
-# include <sys/socket.h>
-# include <netdb.h>
-#endif]], [[gai_strerror(0);]])],
-ac_cv_func_gai_strerror=yes,
-ac_cv_func_gai_strerror=no)])
-AS_IF([test $ac_cv_func_gai_strerror = yes],
-  [AC_DEFINE(HAVE_GAI_STRERROR)],
-  [gai_support=no])
+  [AC_DEFINE(HAVE_GETNAMEINFO)
+   AC_DEFINE(HAVE_GAI_STRERROR)])
 
 dnl Check for va_copy
 AC_CACHE_CHECK([for va_copy], ac_cv_c_va_copy,
