@@ -249,6 +249,10 @@
  * picture. */
 #define NB_VDEC                         1
 
+/* Maximum range of values out of the IDCT + motion compensation. Only
+ * used if you define MPEG2_COMPLIANT above. */
+#define VDEC_CROPRANGE                  2048
+
 /*******************************************************************************
  * Generic decoder configuration
  *******************************************************************************/

@@ -81,7 +81,8 @@ vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
     /*
      * Initialize the input properties
      */
-    /* Initialize the parser fifo's data lock and conditional variable and set     * its buffer as empty */
+    /* Initialize the decoder fifo's data lock and conditional variable and set
+     * its buffer as empty */
     vlc_mutex_init( &p_vpar->fifo.data_lock );
     vlc_cond_init( &p_vpar->fifo.data_wait );
     p_vpar->fifo.i_start = 0;
@@ -221,7 +222,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     }
 
     /* Initialize lookup tables */
-#ifdef MPEG2_COMPLIANT
+#if defined(MPEG2_COMPLIANT) && !defined(VDEC_DFT)
     vpar_InitCrop( p_vpar );
 #endif
     InitMbAddrInc( p_vpar );

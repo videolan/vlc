@@ -142,7 +142,7 @@ extern int pi_scan[2][64] =
  * vpar_InitCrop : Initialize the crop table for saturation
  *                 (ISO/IEC 13818-2 section 7.4.3)
  *****************************************************************************/
-#ifdef MPEG2_COMPLIANT
+#if defined(MPEG2_COMPLIANT) && !defined(VDEC_DFT)
 void vpar_InitCrop( vpar_thread_t * p_vpar )
 {
     int i_dummy;

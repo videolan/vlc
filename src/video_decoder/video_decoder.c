@@ -126,6 +126,10 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec /*, int *pi_status */ )
  *******************************************************************************/
 static int InitThread( vdec_thread_t *p_vdec )
 {
+#ifdef MPEG2_COMPLIANT
+    int i_dummy;
+#endif
+
     intf_DbgMsg("vdec debug: initializing video decoder thread %p\n", p_vdec);
 
     /* Initialize other properties */
@@ -136,6 +140,23 @@ static int InitThread( vdec_thread_t *p_vdec )
     p_vdec->c_decoded_i_pictures = 0;
     p_vdec->c_decoded_p_pictures = 0;
     p_vdec->c_decoded_b_pictures = 0;
+#endif
+
+#ifdef MPEG2_COMPLIANT
+    /* Init crop table */
+    p_vdec->pi_crop = p_vdec->pi_crop_buf + (VDEC_CROPRANGE >> 1);
+    for( i_dummy = -VDEC_CROPRANGE; i_dummy < -256; i_dummy ++ )
+    {
+        p_vdec->pi_crop[i_dummy] = -256;
+    }
+    for( ; i_dummy < 255; i_dummy ++ )
+    {
+        p_vdec->pi_crop[i_dummy] = i_dummy;
+    }
+    for( ; i_dummy < (VDEC_CROPRANGE >> 1) -1; i_dummy++ )
+    {
+        p_vdec->pi_crop[i_dummy] = 255;
+    }
 #endif
 
     /* Mark thread as running and return */
@@ -278,7 +299,8 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
 /*******************************************************************************
  * vdec_AddBlock : add a block
  *******************************************************************************/
-void vdec_AddBlock( elem_t * p_block, data_t * p_data, int i_incr )
+void vdec_AddBlock( vdec_thread_t * p_vdec, elem_t * p_block, data_t * p_data,
+                    int i_incr )
 {
     int i_x, i_y;
     
@@ -286,8 +308,12 @@ void vdec_AddBlock( elem_t * p_block, data_t * p_data, int i_incr )
     {
         for( i_x = 0; i_x < 8; i_x++ )
         {
-            /* ??? Need clip to be MPEG-2 compliant */
+#ifdef MPEG2_COMPLIANT
+            *p_data = p_vdec->pi_clip[*p_data + *p_block++];
+            p_data++;
+#else
             *p_data++ += *p_block++;
+#endif
         }
         p_data += i_incr;
     }
@@ -296,7 +322,8 @@ void vdec_AddBlock( elem_t * p_block, data_t * p_data, int i_incr )
 /*******************************************************************************
  * vdec_CopyBlock : copy a block
  *******************************************************************************/
-void vdec_CopyBlock( elem_t * p_block, data_t * p_data, int i_incr )
+void vdec_CopyBlock( vdec_thread_t * p_vdec, elem_t * p_block, data_t * p_data,
+                     int i_incr )
 {
     int i_x, i_y;
     
@@ -322,6 +349,7 @@ void vdec_CopyBlock( elem_t * p_block, data_t * p_data, int i_incr )
 /*******************************************************************************
  * vdec_DummyBlock : dummy function that does nothing
  *******************************************************************************/
-void vdec_DummyBlock( elem_t * p_block, data_t * p_data, int i_incr )
+void vdec_DummyBlock( vdec_thread_t * p_vdec, elem_t * p_block, data_t * p_data,
+                      int i_incr )
 {
 }
