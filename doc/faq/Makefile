@@ -5,7 +5,7 @@ html:
 	sgmltools -b html -s ../common/stylesheet-html.dsl faq-alone.sgml
 	mv faq-alone/*.html .
 	rmdir faq-alone
-	ln -s book1.html index.html
+	ln -s article1.html index.html
 
 clean:
 	rm -f *.html *.txt *.zip *.pdf *.ps *.rtf
