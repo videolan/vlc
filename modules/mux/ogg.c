@@ -315,7 +315,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     msg_Dbg( p_mux, "adding input" );
 
-    p_input->p_sys = (void *)p_stream = malloc( sizeof( ogg_stream_t ) );
+    p_input->p_sys = p_stream = malloc( sizeof( ogg_stream_t ) );
 
     p_stream->i_cat       = p_input->p_fmt->i_cat;
     p_stream->i_fourcc    = p_input->p_fmt->i_codec;
@@ -721,8 +721,8 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
             if( p_stream->i_fourcc == VLC_FOURCC( 'f', 'l', 'a', 'c' ) )
             {
                 /* Skip the flac stream marker */
-                ((uint8_t *)op.bytes) -= 4;
-                ((uint8_t *)op.packet) += 4;
+                op.bytes -= 4;
+                op.packet+= 4;
             }
             op.b_o_s  = 0;
             op.e_o_s  = 0;
