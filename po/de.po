@@ -1,20 +1,21 @@
 # German translation for VLC.
 # Copyright (C) 1999-2004 VideoLAN <videolan@videolan.org>
 #
-# Felix Kühne <fk@aenneburghardt.de>, 2003-2004
 # Thanks to Thomas Graf <tgr@reeler.org> for starting a translation in 2002.
+# Felix Kühne <fk@aenneburghardt.de>, 2003-2004.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 0.73.3\n"
+"Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-03-01 20:59+0100\n"
-"PO-Revision-Date: 2002-04-18 23:38+0100\n"
+"PO-Revision-Date: 2004-04-07 13:47+0200\n"
 "Last-Translator: Felix Kühne <fk@aenneburghardt.de>\n"
-"Language-Team: \n"
+"Language-Team: German\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.0.2\n"
 
 #: include/vlc_help.h:32
 msgid "VLC preferences"
@@ -64,8 +65,7 @@ msgstr "Einstellungen der Tonfilter"
 
 #: include/vlc_help.h:55
 msgid "Audio filters can be set in the Audio section, and configured here."
-msgstr ""
-"Tonfilter können in der Ton-Sektion ausgewählt und hier eingestellt werden."
+msgstr "Tonfilter können in der Ton-Sektion ausgewählt und hier eingestellt werden."
 
 #: include/vlc_help.h:58
 msgid "Audio output modules settings"
@@ -897,8 +897,7 @@ msgid "Audio output volume"
 msgstr "Ausgabelautstärke"
 
 #: src/libvlc.h:121
-msgid ""
-"You can set the default audio output volume here, in a range from 0 to 1024."
+msgid "You can set the default audio output volume here, in a range from 0 to 1024."
 msgstr ""
 "Sie können hier die Standard-Lautstärke zwischen im Bereich von 0 bis 1024 "
 "festlegen."
@@ -1140,8 +1139,7 @@ msgid "Fullscreen video output"
 msgstr "Vollbildausgabe"
 
 #: src/libvlc.h:228
-msgid ""
-"If this option is enabled, VLC will always start a video in fullscreen mode."
+msgid "If this option is enabled, VLC will always start a video in fullscreen mode."
 msgstr ""
 "Wenn diese Option aktiviert ist, wird VLC ein Video immer im Vollbildmodus "
 "starten."
@@ -1324,8 +1322,7 @@ msgid "Choose audio"
 msgstr "Ton wählen"
 
 #: src/libvlc.h:311
-msgid ""
-"Give the default type of audio you want to use in a DVD. (Developers only)"
+msgid "Give the default type of audio you want to use in a DVD. (Developers only)"
 msgstr ""
 "Geben Sie den Standard-Ton-Typ ein, den Sie bei DVDs benutzen wollen. (nur "
 "für Entwickler)"
@@ -1347,8 +1344,7 @@ msgid "Choose subtitle track"
 msgstr "Untertitelspur wählen"
 
 #: src/libvlc.h:321
-msgid ""
-"Give the stream number of the subtitle channel you want to use (from 1 to n)."
+msgid "Give the stream number of the subtitle channel you want to use (from 1 to n)."
 msgstr ""
 "Geben Sie die Stream-Nummer des Untertitelkanals ein, den Sie benutzen "
 "möchten (von 1 bis n)."
@@ -1472,8 +1468,7 @@ msgid "Preferred encoders list"
 msgstr "Liste der bevorzugten Kodierer"
 
 #: src/libvlc.h:400
-msgid ""
-"This allows you to select a list of encoders that VLC will use in priority"
+msgid "This allows you to select a list of encoders that VLC will use in priority"
 msgstr ""
 "Diese Option erlaubt Ihnen eine Liste von Kodierern auswählen, die VLC mit "
 "Priorität benutzen wird."
@@ -1544,8 +1539,7 @@ msgid "Preferred packetizer list"
 msgstr "Liste der bevorzugten Packetizer"
 
 #: src/libvlc.h:437
-msgid ""
-"This allows you to select the order in which VLC will choose its packetizers."
+msgid "This allows you to select the order in which VLC will choose its packetizers."
 msgstr ""
 "Diese Option erlaubt Ihnen die Reihefolge festzulegen nach der VLC seine "
 "Paket-Erzeuger wählt."
@@ -1556,8 +1550,7 @@ msgstr "Mux-Modul"
 
 #: src/libvlc.h:442
 msgid "This is a legacy entry to let you configure mux modules"
-msgstr ""
-"Dies ist ein Altlast-Eintrag mit dem Sie die mux-Module konfigurieren können."
+msgstr "Dies ist ein Altlast-Eintrag mit dem Sie die mux-Module konfigurieren können."
 
 #: src/libvlc.h:444
 msgid "Access output module"
@@ -1596,8 +1589,7 @@ msgstr "Prozessor-'3D Now!' Unterstützung aktivieren"
 msgid ""
 "If your processor supports the 3D Now! instructions set, VLC can take "
 "advantage of them."
-msgstr ""
-"Falls Ihr Prozessor 3D Now! Befehle unterstützt, kann VLC diese benutzen."
+msgstr "Falls Ihr Prozessor 3D Now! Befehle unterstützt, kann VLC diese benutzen."
 
 #: src/libvlc.h:462
 msgid "Enable CPU MMX EXT support"
@@ -1607,8 +1599,7 @@ msgstr "MMX EXT Unterstützung aktivieren."
 msgid ""
 "If your processor supports the MMX EXT instructions set, VLC can take "
 "advantage of them."
-msgstr ""
-"Falls Ihr Prozessor MMX EXT Befehle unterstützt, kann VLC diese benutzen."
+msgstr "Falls Ihr Prozessor MMX EXT Befehle unterstützt, kann VLC diese benutzen."
 
 #: src/libvlc.h:467
 msgid "Enable CPU SSE support"
@@ -1628,8 +1619,7 @@ msgstr "CPU SSE2 Unterstützung aktivieren"
 msgid ""
 "If your processor supports the SSE2 instructions set, VLC can take advantage "
 "of them."
-msgstr ""
-"Falls Ihr Prozessor SSE2-Anweisungen unterstützt, kann VLC diese benutzen."
+msgstr "Falls Ihr Prozessor SSE2-Anweisungen unterstützt, kann VLC diese benutzen."
 
 #: src/libvlc.h:477
 msgid "Enable CPU AltiVec support"
@@ -1639,8 +1629,7 @@ msgstr "AltiVec Unterstützung aktivieren"
 msgid ""
 "If your processor supports the AltiVec instructions set, VLC can take "
 "advantage of them."
-msgstr ""
-"Falls Ihr Prozessor AltiVec Befehle unterstützt, kann VLC diese benutzen."
+msgstr "Falls Ihr Prozessor AltiVec Befehle unterstützt, kann VLC diese benutzen."
 
 #: src/libvlc.h:483
 msgid ""
@@ -1722,8 +1711,7 @@ msgstr "Demux-Modul"
 
 #: src/libvlc.h:516
 msgid "This is a legacy entry to let you configure demux modules."
-msgstr ""
-"Dies ist ein Altlasteintrag, mit Sie die Demux-Module konfigurieren können."
+msgstr "Dies ist ein Altlasteintrag, mit Sie die Demux-Module konfigurieren können."
 
 #: src/libvlc.h:518
 msgid "Allow real-time priority"
@@ -1908,8 +1896,7 @@ msgstr "Nächstes Objekt"
 
 #: src/libvlc.h:587
 msgid "Select the hotkey to use to skip to the next item in the playlist."
-msgstr ""
-"Wählen Sie Hotkey zum Springen zum nächsten Objekt der Wiedergabeliste."
+msgstr "Wählen Sie Hotkey zum Springen zum nächsten Objekt der Wiedergabeliste."
 
 #: src/libvlc.h:588 modules/gui/macosx/controls.m:140
 #: modules/gui/macosx/controls.m:644 modules/gui/macosx/intf.m:444
@@ -1919,8 +1906,7 @@ msgstr "Vorheriges Objekt"
 
 #: src/libvlc.h:589
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
-msgstr ""
-"Wählen Sie den Hotkey zum Springen zum vorherigen Objekt der Wiedergabeliste."
+msgstr "Wählen Sie den Hotkey zum Springen zum vorherigen Objekt der Wiedergabeliste."
 
 #: src/libvlc.h:590 modules/gui/gtk/gnome_interface.c:566
 #: modules/gui/gtk/gnome_interface.c:1027 modules/gui/gtk/gtk_interface.c:676
@@ -2039,8 +2025,7 @@ msgstr "Aktivieren"
 
 #: src/libvlc.h:622
 msgid "Select the key to activate selected item in dvd menus."
-msgstr ""
-"Wählen Sie den Hotkey zum Aktivieren des ausgewählten Objekts in DVD-Menüs."
+msgstr "Wählen Sie den Hotkey zum Aktivieren des ausgewählten Objekts in DVD-Menüs."
 
 #: src/libvlc.h:623 modules/gui/gtk/gnome_interface.c:909
 msgid "Volume up"
@@ -2156,8 +2141,7 @@ msgstr "Wiedergabelistenlesezeichen 10 festlegen"
 
 #: src/libvlc.h:650
 msgid "Select the key to set this playlist bookmark."
-msgstr ""
-"Wählen Sie den Hotkey zum Festlegen dieses Wiedergabelistenlesezeichens."
+msgstr "Wählen Sie den Hotkey zum Festlegen dieses Wiedergabelistenlesezeichens."
 
 #: src/libvlc.h:652
 msgid ""
@@ -2499,8 +2483,7 @@ msgstr "Format zur Benutzung im Wiedergabelistenfeld \"Autor\""
 
 #: modules/access/cdda/cdda.c:130
 msgid "Format to use in playlist \"title\" field when no CDDB"
-msgstr ""
-"Format zur Benutzung im Wiedergabelistenfeld \"Titel\", falls ohne CDDB"
+msgstr "Format zur Benutzung im Wiedergabelistenfeld \"Titel\", falls ohne CDDB"
 
 #: modules/access/cdda/cdda.c:136
 msgid "Format to use in playlist \"title\" field when using CDDB"
@@ -2512,8 +2495,7 @@ msgstr "CDDB-Suchen machen?"
 
 #: modules/access/cdda/cdda.c:141
 msgid "If set, lookup CD-DA track information using the CDDB protocol"
-msgstr ""
-"Wenn aktiv, wird CD-DA-Titel-Informationen durch das CDDB-Protokollgesucht"
+msgstr "Wenn aktiv, wird CD-DA-Titel-Informationen durch das CDDB-Protokollgesucht"
 
 #: modules/access/cdda/cdda.c:146
 msgid "CDDB server"
@@ -2549,8 +2531,7 @@ msgstr "CDDB über das HTTP-Protokoll kontaktieren?"
 
 #: modules/access/cdda/cdda.c:167
 msgid "If set, the CDDB server gets information via the CDDB HTTP protocol"
-msgstr ""
-"Wenn aktiv erhält der CDDB-Server Informationen über das CDDB-HTTP-Protokoll"
+msgstr "Wenn aktiv erhält der CDDB-Server Informationen über das CDDB-HTTP-Protokoll"
 
 #: modules/access/cdda/cdda.c:172
 msgid "CDDB server timeout"
@@ -2757,8 +2738,7 @@ msgstr "DVB-Karte auf Fähigkeiten prüfen"
 
 #: modules/access/dvb/qpsk.c:75
 msgid "Some dvb cards do not like to be probed for their capabilities."
-msgstr ""
-"Einige DVB-Karten mögen es nicht, auf Ihre Fähigkeiten geprüft zu werden."
+msgstr "Einige DVB-Karten mögen es nicht, auf Ihre Fähigkeiten geprüft zu werden."
 
 #: modules/access/dvb/qpsk.c:78
 msgid "Modulation type"
@@ -2917,10 +2897,8 @@ msgid "FTP user name"
 msgstr "FTP Benutzername"
 
 #: modules/access/ftp.c:45
-msgid ""
-"Allows you to modify the user name that will be used for the connection."
-msgstr ""
-"Erlaubt Ihnen den für die Verbindung benutzten Benutzernamen zu ändern."
+msgid "Allows you to modify the user name that will be used for the connection."
+msgstr "Erlaubt Ihnen den für die Verbindung benutzten Benutzernamen zu ändern."
 
 #: modules/access/ftp.c:47
 msgid "FTP password"
@@ -2987,8 +2965,7 @@ msgid "HTTP user agent"
 msgstr "HTTP Useragent"
 
 #: modules/access/http.c:62
-msgid ""
-"Allows you to modify the user agent that will be used for the connection."
+msgid "Allows you to modify the user agent that will be used for the connection."
 msgstr "Erlaubt Ihnen den für die Verbindung benutzten User-Agent zu ändern."
 
 #: modules/access/http.c:66
@@ -3066,27 +3043,27 @@ msgstr ""
 
 #: modules/access/slp.c:65
 msgid "SLP scopes list"
-msgstr ""
+msgstr "SLP-Scope - Liste"
 
 #: modules/access/slp.c:67
 msgid ""
 "This string is a comma separated list of scope names or empty if you want to "
 "use the default scopes. It is used in all SLP queries."
-msgstr ""
+msgstr "Dieser String ist eine durch Kommata getrennte Liste von Scope-Namen. Geben Sie nichts ein, wenn Sie die standardmäßigen Scopes benutzen möchten. Diese Liste wird in allen SLP-Anfragen benutzt."
 
 #: modules/access/slp.c:70
 msgid "SLP naming authority"
-msgstr ""
+msgstr "SLP-Benennungsautorität"
 
 #: modules/access/slp.c:72
 msgid ""
 "This string is a list of naming authorities to search. Use \"*\" for all and "
 "the empty string for the default of IANA."
-msgstr ""
+msgstr "Dieser String ist eine Liste von Benennungsautoritäten, die gesucht werden. Benutzen Sie \"*\" für alle oder einen leeren Strings für den IANA-Standard."
 
 #: modules/access/slp.c:75
 msgid "SLP LDAP filter"
-msgstr "SLP - LDAP - Filter"
+msgstr "SLP-LDAP-Filter"
 
 #: modules/access/slp.c:77
 msgid ""
@@ -3096,13 +3073,13 @@ msgstr ""
 
 #: modules/access/slp.c:80
 msgid "Language requested in SLP requests"
-msgstr "In SLP-Anforderungen angeforderte Sprache"
+msgstr "In SLP-Anfragen angeforderte Sprache"
 
 #: modules/access/slp.c:82
 msgid ""
 "RFC 1766 Language tag for the natural language locale of requests, leave "
 "empty to use the default locale. It is used in all SLP queries."
-msgstr ""
+msgstr "RFC 1766 Sprachkennzeichen für die lokale Sprache der Anfragen. Lassen Sie diesen Strings leer, um die standardmäßige Sprache zu benutzen. Diese Einstellung wird in allen SLP-Anfragen benutzt."
 
 #: modules/access/slp.c:86
 msgid "SLP input"
@@ -4236,8 +4213,7 @@ msgstr "Host-Adresse"
 
 #: modules/control/http.c:74
 msgid "You can set the address and port the http interface will bind to."
-msgstr ""
-"Sie können die bindende Adresse und den Port des HTTP-Interfaces einstellen."
+msgstr "Sie können die bindende Adresse und den Port des HTTP-Interfaces einstellen."
 
 #: modules/control/http.c:75 modules/control/http.c:76
 msgid "Source directory"
@@ -4285,8 +4261,7 @@ msgstr "Wartezeit (ms)"
 
 #: modules/control/joystick.c:154
 msgid "The time waited before the repeat starts, in milliseconds."
-msgstr ""
-"Die Zeit, die gewartet wird, bis die Wiederholung startet; in Mikrosekunden."
+msgstr "Die Zeit, die gewartet wird, bis die Wiederholung startet; in Mikrosekunden."
 
 #: modules/control/joystick.c:156
 msgid "Max seek interval (seconds)"
@@ -4294,8 +4269,7 @@ msgstr "Max. Suchintervall (Sekunden)"
 
 #: modules/control/joystick.c:158
 msgid "The maximum number of seconds that will be seeked at a time."
-msgstr ""
-"Die maximale Zahl der Sekunden, die an einem Zeitpunkt lang gesucht wird."
+msgstr "Die maximale Zahl der Sekunden, die an einem Zeitpunkt lang gesucht wird."
 
 #: modules/control/joystick.c:160
 msgid "Action mapping"
@@ -4303,7 +4277,7 @@ msgstr "Aktionsmapping"
 
 #: modules/control/joystick.c:161
 msgid "Allows you to remap the actions."
-msgstr ""
+msgstr "Erlaubt Ihnen die Aktionen erneut abzubilden."
 
 #: modules/control/joystick.c:176
 msgid "Joystick control interface"
@@ -4339,8 +4313,7 @@ msgstr "NT/2000/XP-Dienst installieren"
 
 #: modules/control/ntservice.c:41
 msgid "If enabled the interface will install the service and exit."
-msgstr ""
-"Wenn aktiviert wird die Oberfläche den Dienst installieren und sich beenden."
+msgstr "Wenn aktiviert wird die Oberfläche den Dienst installieren und sich beenden."
 
 #: modules/control/ntservice.c:42
 msgid "Uninstall NT/2K/XP service"
@@ -4381,8 +4354,7 @@ msgid "Show stream position"
 msgstr "Stream Position anzeigen"
 
 #: modules/control/rc/rc.c:78
-msgid ""
-"Show the current position in seconds within the stream from time to time."
+msgid "Show the current position in seconds within the stream from time to time."
 msgstr "Zeigt die aktuelle Position im Stream von Zeit zu Zeit in Sekunden an."
 
 #: modules/control/rc/rc.c:80
@@ -4426,8 +4398,7 @@ msgid "Force index creation"
 msgstr "Index-Erzeugung erzwingen"
 
 #: modules/demux/avi/avi.c:46
-msgid ""
-"Recreate a index for the AVI file so we can seek trough it more reliably."
+msgid "Recreate a index for the AVI file so we can seek trough it more reliably."
 msgstr ""
 "Einen Index für die AVI-Datei erzeugen, so dass wir sie zuverlässiger "
 "durchsuchen können."
@@ -4446,8 +4417,7 @@ msgstr "Dateiname des Dumps"
 
 #: modules/demux/demuxdump.c:50
 msgid "Specify a file name to which the raw stream will be dumped."
-msgstr ""
-"Geben Sie einen Dateinamen ein, unter dem der rohe Stream gesichert wird."
+msgstr "Geben Sie einen Dateinamen ein, unter dem der rohe Stream gesichert wird."
 
 #: modules/demux/demuxdump.c:53
 msgid "Filedump demuxer"
@@ -4612,39 +4582,39 @@ msgstr ""
 
 #: modules/demux/mod.c:54
 msgid "Reverb level (0-100)"
-msgstr ""
+msgstr "Reverb-Niveau (0-100)"
 
 #: modules/demux/mod.c:54
 msgid "Reverb level (0-100 defaults to 0)"
-msgstr ""
+msgstr "Reverb-Niveau (0-100, standardmäßig 0)"
 
 #: modules/demux/mod.c:55
 msgid "Reverb delay (ms)"
-msgstr ""
+msgstr "Reverb-Verzögerung (ms)"
 
 #: modules/demux/mod.c:55
 msgid "Reverb delay in ms (usually 40-200ms)"
-msgstr ""
+msgstr "Reverb-Verzögerung in ms (üblicherweise 40-200 ms)"
 
 #: modules/demux/mod.c:57
 msgid "Mega bass"
-msgstr ""
+msgstr "Mega-Bass"
 
 #: modules/demux/mod.c:58
 msgid "Mega bass level (0-100)"
-msgstr ""
+msgstr "Mega-Bass-Niveau (0-100)"
 
 #: modules/demux/mod.c:58
 msgid "Mega bass level (0-100 defaults to 0)"
-msgstr ""
+msgstr "Mega-Bass-Niveau (0-100, standardmäßig 0)"
 
 #: modules/demux/mod.c:59
 msgid "Mega bass cutt off (Hz)"
-msgstr ""
+msgstr "Mega-Bass-Abgrenzung (Hz)"
 
 #: modules/demux/mod.c:59
 msgid "Mega bass cutt off (10-100Hz)"
-msgstr ""
+msgstr "Mega-Bass-Abgrenzung (10-100Hz)"
 
 #: modules/demux/mod.c:61
 msgid "Surround"
@@ -5195,14 +5165,12 @@ msgid "OK"
 msgstr "OK"
 
 #: modules/gui/beos/InterfaceWindow.cpp:372
-#, fuzzy
 msgid "VLC Media Player: Open Media Files"
-msgstr "VideoLAN Client: Medien-Dateien öffnen"
+msgstr "VLC media player: Medien-Dateien öffnen"
 
 #: modules/gui/beos/InterfaceWindow.cpp:376
-#, fuzzy
 msgid "VLC Media Player: Open Subtitle File"
-msgstr "VideoLAN Client: Untertitel-Datei öffnen"
+msgstr "VLC media player: Untertitel-Datei öffnen"
 
 #: modules/gui/beos/MediaControlView.cpp:68
 msgid "Drop files to play"
@@ -5680,8 +5648,7 @@ msgstr "Ziel öffnen:"
 msgid ""
 "Alternatively, you can build an MRL using one of the following predefined "
 "targets:"
-msgstr ""
-"Sonst können Sie eine MRL mit einer dieser vordefinierten Ziele erzeugen:"
+msgstr "Sonst können Sie eine MRL mit einer dieser vordefinierten Ziele erzeugen:"
 
 #: modules/gui/gtk/gnome_interface.c:1563
 #: modules/gui/gtk/gnome_interface.c:2007 modules/gui/gtk/gtk_interface.c:1878
@@ -6523,8 +6490,7 @@ msgid "Error"
 msgstr "Fehler"
 
 #: modules/gui/macosx/intf.m:555
-msgid ""
-"An error has occurred which probably prevented the execution of your request:"
+msgid "An error has occurred which probably prevented the execution of your request:"
 msgstr ""
 "Ein Fehler ist aufgetreten, der wahrscheinlich die Ausführung der "
 "gewünschten Funktion verhindert hat."
@@ -6585,15 +6551,14 @@ msgstr ""
 "komplett durchsichtig."
 
 #: modules/gui/macosx/macosx.m:57
-#, fuzzy
 msgid "Stretch Aspect Ratio"
-msgstr "Korrektes Seitenverhältnis"
+msgstr "Seitenverhältnis dehnen"
 
 #: modules/gui/macosx/macosx.m:58
 msgid ""
 "Instead of keeping the aspect ratio of the movie when resizing the video, "
 "stretch the video to fill the entire window."
-msgstr ""
+msgstr "Anstatt das Seitenverhältnis des Bildes bei Größenanpassungen zu behalten, das Bild dehnen, um das gesamte Fenster auszufüllen."
 
 #: modules/gui/macosx/macosx.m:62
 msgid "Use OpenGL"
@@ -6804,8 +6769,7 @@ msgstr "Ausgewählte Datei automatisch abspielen"
 
 #: modules/gui/pda/pda.c:59
 msgid "Automatically play a file when selected in the file selection list"
-msgstr ""
-"Automatisch die Datei abspielen, wenn sie in der Dateiliste ausgewählt wird"
+msgstr "Automatisch die Datei abspielen, wenn sie in der Dateiliste ausgewählt wird"
 
 #: modules/gui/pda/pda.c:66
 msgid "PDA Linux Gtk2+ interface"
@@ -6867,14 +6831,12 @@ msgid "udp6://@:1234"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:398
-#, fuzzy
 msgid "rtp://"
-msgstr "ftp://"
+msgstr ""
 
 #: modules/gui/pda/pda_interface.c:399
-#, fuzzy
 msgid "rtp6://"
-msgstr "ftp://"
+msgstr ""
 
 #: modules/gui/pda/pda_interface.c:400
 msgid "ftp://"
@@ -6885,7 +6847,6 @@ msgid "http://"
 msgstr "http://"
 
 #: modules/gui/pda/pda_interface.c:402
-#, fuzzy
 msgid "mms://"
 msgstr "mms"
 
@@ -6942,9 +6903,8 @@ msgid "Protocol:"
 msgstr "Protokoll:"
 
 #: modules/gui/pda/pda_interface.c:522 modules/gui/pda/pda_interface.c:848
-#, fuzzy
 msgid "Transcode:"
-msgstr "Umkodieren"
+msgstr "Umschlüsseln:"
 
 #: modules/gui/pda/pda_interface.c:531 modules/gui/pda/pda_interface.c:833
 #: modules/gui/pda/pda_interface.c:857 modules/gui/pda/pda_interface.c:1099
@@ -7289,7 +7249,6 @@ msgid "Preference"
 msgstr "Einstellung"
 
 #: modules/gui/pda/pda_interface.c:1334
-#, fuzzy
 msgid ""
 "VLC Media Player is an MPEG, MPEG 2, MP3 and DivX player that accepts input "
 "from local or network sources and is licensed under the GPL (http://www.gnu."
@@ -7979,8 +7938,7 @@ msgstr "Untertitel-Optionen"
 
 #: modules/gui/wxwindows/subtitles.cpp:162
 msgid "Override frames per second. It will only work with MicroDVD subtitles."
-msgstr ""
-"Bilder pro Sekunde übergehen. Dies wird nur mit MicroDVD-Untertiteln laufen."
+msgstr "Bilder pro Sekunde übergehen. Dies wird nur mit MicroDVD-Untertiteln laufen."
 
 #: modules/gui/wxwindows/subtitles.cpp:218
 msgid "Open file"
@@ -8292,8 +8250,7 @@ msgstr "IPv6-SAP-Listening"
 
 #: modules/misc/sap.c:91
 msgid "Set this if you want the SAP module to listen to IPv4 announces"
-msgstr ""
-"Aktivieren Sie dies, wenn das SAP-Modul nach IPv4-Ankündigungen hören soll"
+msgstr "Aktivieren Sie dies, wenn das SAP-Modul nach IPv4-Ankündigungen hören soll"
 
 #: modules/misc/sap.c:92
 msgid "IPv6-SAP listening"
@@ -8301,8 +8258,7 @@ msgstr "IPv6-SAP-Listening"
 
 #: modules/misc/sap.c:94
 msgid "Set this if you want the SAP module to listen to IPv6 announces"
-msgstr ""
-"Aktivieren Sie dies, wenn das SAP-Modul nach IPv6-Ankündigungen hören soll"
+msgstr "Aktivieren Sie dies, wenn das SAP-Modul nach IPv6-Ankündigungen hören soll"
 
 #: modules/misc/sap.c:95
 msgid "IPv6 SAP scope"
@@ -8317,8 +8273,7 @@ msgid "SAP timeout (seconds)"
 msgstr "SAP Timeout (Sekunden)"
 
 #: modules/misc/sap.c:100
-msgid ""
-"Sets the time before SAP items get deleted if no new announceis received"
+msgid "Sets the time before SAP items get deleted if no new announceis received"
 msgstr ""
 "Stellt die Zeit ein, bevor SAP-Objekte gelöscht werden, wenn keine neuen "
 "Ankündigungen empfangen werden."
@@ -8520,8 +8475,7 @@ msgstr "Anzahl der Klone"
 
 #: modules/video_filter/clone.c:56
 msgid "Select the number of video windows in which to clone the video"
-msgstr ""
-"Wählen Sie die Anzahl Video-Fenster, in denen das Bild geklont werden soll"
+msgstr "Wählen Sie die Anzahl Video-Fenster, in denen das Bild geklont werden soll"
 
 #: modules/video_filter/clone.c:59
 msgid "List of vout modules"
@@ -8529,8 +8483,7 @@ msgstr "Liste von vout Modulen"
 
 #: modules/video_filter/clone.c:60
 msgid "Select the specific vout modules that you want to activate"
-msgstr ""
-"Wählen Sie das spezifische vout-Modul aus, welche Sie aktivieren möchten"
+msgstr "Wählen Sie das spezifische vout-Modul aus, welche Sie aktivieren möchten"
 
 #: modules/video_filter/clone.c:63
 msgid "Clone video filter"
@@ -8622,8 +8575,7 @@ msgstr "Transparenz des Logos (255-0)"
 
 #: modules/video_filter/logo.c:65
 msgid "You can change it by middle-clicking and moving mouse left or right"
-msgstr ""
-"Sie können es durch Mittel-Klicken und rechts/links bewegen der Mausverändern"
+msgstr "Sie können es durch Mittel-Klicken und rechts/links bewegen der Mausverändern"
 
 #: modules/video_filter/logo.c:68
 msgid "Logo video filter"
@@ -8680,8 +8632,7 @@ msgid "Number of columns"
 msgstr "Anzahl der Spalten"
 
 #: modules/video_filter/wall.c:54
-msgid ""
-"Select the number of horizontal videowindows in which to split the video"
+msgid "Select the number of horizontal videowindows in which to split the video"
 msgstr ""
 "Wählen Sie die Anzahl der horizontalen Video-Fenster, in denen das Bild "
 "verteilt werden soll"
@@ -8882,8 +8833,7 @@ msgstr ""
 
 #: modules/video_output/x11/x11.c:61
 msgid "choose the screen to be used for fullscreen mode."
-msgstr ""
-"Wählen Sie den Bildschirm, der für den Vollbildmodus benutzt werden soll."
+msgstr "Wählen Sie den Bildschirm, der für den Vollbildmodus benutzt werden soll."
 
 #: modules/video_output/x11/x11.c:63 modules/video_output/x11/xvideo.c:74
 msgid ""
@@ -9032,8 +8982,7 @@ msgstr "Ausgleich des Schattens in Pixeln"
 
 #: modules/visualization/xosd/xosd.c:72
 msgid "Font used to display text in the xosd output"
-msgstr ""
-"Die Schrift, die zur Anzeige des Textes in der xosd Ausgabe benutzt wird"
+msgstr "Die Schrift, die zur Anzeige des Textes in der xosd Ausgabe benutzt wird"
 
 #: modules/visualization/xosd/xosd.c:75
 msgid "XOSD interface"
@@ -10421,3 +10370,4 @@ msgstr "XOSD Oberfläche"
 
 #~ msgid "Open disc..."
 #~ msgstr "Volume öffnen..."
+

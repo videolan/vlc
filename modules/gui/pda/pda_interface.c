@@ -393,13 +393,13 @@ create_pda (void)
   gtk_widget_set_name (comboMRL, "comboMRL");
   gtk_widget_show (comboMRL);
   gtk_box_pack_start (GTK_BOX (hbox12), comboMRL, TRUE, TRUE, 0);
-  comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("udp://@:1234"));
-  comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("udp6://@:1234"));
-  comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("rtp://"));
-  comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("rtp6://"));
-  comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("ftp://"));
-  comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("http://"));
-  comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("mms://"));
+  comboMRL_items = g_list_append (comboMRL_items, (gpointer) "udp://@:1234");
+  comboMRL_items = g_list_append (comboMRL_items, (gpointer) "udp6://@:1234");
+  comboMRL_items = g_list_append (comboMRL_items, (gpointer) "rtp://");
+  comboMRL_items = g_list_append (comboMRL_items, (gpointer) "rtp6://");
+  comboMRL_items = g_list_append (comboMRL_items, (gpointer) "ftp://");
+  comboMRL_items = g_list_append (comboMRL_items, (gpointer) "http://");
+  comboMRL_items = g_list_append (comboMRL_items, (gpointer) "mms://");
   gtk_combo_set_popdown_strings (GTK_COMBO (comboMRL), comboMRL_items);
   g_list_free (comboMRL_items);
 
@@ -689,9 +689,9 @@ create_pda (void)
                     (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_combo_set_value_in_list (GTK_COMBO (comboV4lVideoDevice), TRUE, TRUE);
-  comboV4lVideoDevice_items = g_list_append (comboV4lVideoDevice_items, (gpointer) _("/dev/video"));
-  comboV4lVideoDevice_items = g_list_append (comboV4lVideoDevice_items, (gpointer) _("/dev/video0"));
-  comboV4lVideoDevice_items = g_list_append (comboV4lVideoDevice_items, (gpointer) _("/dev/video1"));
+  comboV4lVideoDevice_items = g_list_append (comboV4lVideoDevice_items, (gpointer) "/dev/video");
+  comboV4lVideoDevice_items = g_list_append (comboV4lVideoDevice_items, (gpointer) "/dev/video0");
+  comboV4lVideoDevice_items = g_list_append (comboV4lVideoDevice_items, (gpointer) "/dev/video1");
   gtk_combo_set_popdown_strings (GTK_COMBO (comboV4lVideoDevice), comboV4lVideoDevice_items);
   g_list_free (comboV4lVideoDevice_items);
 
@@ -708,10 +708,10 @@ create_pda (void)
   gtk_table_attach (GTK_TABLE (tableV4L), comboV4lAudioDevice, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  comboV4lAudioDevice_items = g_list_append (comboV4lAudioDevice_items, (gpointer) _("/dev/dsp"));
-  comboV4lAudioDevice_items = g_list_append (comboV4lAudioDevice_items, (gpointer) _("/dev/audio"));
-  comboV4lAudioDevice_items = g_list_append (comboV4lAudioDevice_items, (gpointer) _("/dev/audio0"));
-  comboV4lAudioDevice_items = g_list_append (comboV4lAudioDevice_items, (gpointer) _("/dev/audio1"));
+  comboV4lAudioDevice_items = g_list_append (comboV4lAudioDevice_items, (gpointer) "/dev/dsp");
+  comboV4lAudioDevice_items = g_list_append (comboV4lAudioDevice_items, (gpointer) "/dev/audio");
+  comboV4lAudioDevice_items = g_list_append (comboV4lAudioDevice_items, (gpointer) "/dev/audio0");
+  comboV4lAudioDevice_items = g_list_append (comboV4lAudioDevice_items, (gpointer) "/dev/audio1");
   gtk_combo_set_popdown_strings (GTK_COMBO (comboV4lAudioDevice), comboV4lAudioDevice_items);
   g_list_free (comboV4lAudioDevice_items);
 
