@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.29 2003/10/12 21:53:58 hartman Exp $
+ * $Id: sub.c,v 1.30 2003/10/18 21:46:01 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <ctype.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
@@ -226,6 +227,30 @@ static struct
     { NULL,         SUB_TYPE_UNKNOWN,   "Unknow",   NULL }
 };
 
+static char * local_stristr( char *psz_big, char *psz_little)
+{
+    char *p_pos = psz_big;
+    
+    if (!psz_big || !psz_little || !*psz_little) return psz_big;
+
+    while (*p_pos)
+    {
+	if (toupper(*p_pos) == toupper(*psz_little))
+        {
+	    char * psz_cur1 = p_pos + 1;
+	    char * psz_cur2 = psz_little + 1;
+	    while (*psz_cur1 && *psz_cur2 && toupper(*psz_cur1) == toupper(*psz_cur2))
+            {
+		psz_cur1++;
+		psz_cur2++;
+	    }
+	    if (!*psz_cur2) return p_pos;
+	}
+	p_pos++;
+    }
+    return NULL;
+}
+
 /*****************************************************************************
  * sub_open: Open a subtitle file and add subtitle ES
  *****************************************************************************/
@@ -319,7 +344,7 @@ static int  sub_open ( subtitle_demux_t *p_sub,
                 break;
             }
 
-            if( strstr( s, "<SAMI>" ) )
+            if( local_stristr( s, "<SAMI>" ) )
             {
                 i_sub_type = SUB_TYPE_SAMI;
                 break;
@@ -352,11 +377,11 @@ static int  sub_open ( subtitle_demux_t *p_sub,
                 }
                 break;
             }
-            else if( strstr( s, "This is a Sub Station Alpha v4 script" ) )
+            else if( local_stristr( s, "This is a Sub Station Alpha v4 script" ) )
             {
                 i_sub_type = SUB_TYPE_SSA2_4; // I hop this will work
             }
-            else if( !strncmp( s, "Dialogue: Marked", 16  ) )
+            else if( !strncasecmp( s, "Dialogue: Marked", 16  ) )
             {
                 i_sub_type = SUB_TYPE_SSA2_4; // could be wrong
                 break;
@@ -888,9 +913,9 @@ static char *sub_SamiSearch( text_t *txt, char *psz_start, char *psz_str )
 {
     if( psz_start )
     {
-        if( strstr( psz_start, psz_str ) )
+        if( local_stristr( psz_start, psz_str ) )
         {
-            char *s = strstr( psz_start, psz_str );
+            char *s = local_stristr( psz_start, psz_str );
 
             s += strlen( psz_str );
 
@@ -904,9 +929,9 @@ static char *sub_SamiSearch( text_t *txt, char *psz_start, char *psz_str )
         {
             return NULL;
         }
-        if( strstr( p, psz_str ) )
+        if( local_stristr( p, psz_str ) )
         {
-            char *s = strstr( p, psz_str );
+            char *s = local_stristr( p, psz_str );
 
             s += strlen( psz_str );
 
@@ -958,11 +983,11 @@ static int  sub_Sami( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecper
         {
             if( *p == '<' )
             {
-                if( !strncmp( p, "<br", 3 ) || !strncmp( p, "<BR", 3 ) )
+                if( !strncasecmp( p, "<br", 3 ) )
                 {
                     ADDC( '\n' );
                 }
-                else if( strstr( p, "Start=" ) )
+                else if( local_stristr( p, "Start=" ) )
                 {
                     text_previous_line( txt );
                     break;
