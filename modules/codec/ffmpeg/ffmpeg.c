@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.25 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: ffmpeg.c,v 1.26 2003/03/11 05:52:37 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -79,7 +79,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
     "Quality of post processing\n"\
     "Valid range is 0 to 6\n" \
     "(Overridden by others setting)"
-    
+
 #define POSTPROCESSING_AQ_LONGTEXT \
     "Post processing quality is selected upon time left " \
     "but no more than requested quality\n" \
@@ -99,34 +99,34 @@ vlc_module_begin();
     add_category_hint( N_("ffmpeg"), NULL, VLC_FALSE );
 #if LIBAVCODEC_BUILD >= 4615
     add_bool( "ffmpeg-dr", 0, NULL,
-              "direct rendering", 
+              "direct rendering",
               "direct rendering", VLC_TRUE );
 #endif
 #if LIBAVCODEC_BUILD >= 4611
-    add_integer ( "ffmpeg-error-resilience", -1, NULL, 
+    add_integer ( "ffmpeg-error-resilience", -1, NULL,
                   "error resilience", ERROR_RESILIENCE_LONGTEXT, VLC_TRUE );
-    add_integer ( "ffmpeg-workaround-bugs", 1, NULL, 
+    add_integer ( "ffmpeg-workaround-bugs", 1, NULL,
                   "workaround bugs", WORKAROUND_BUGS_LONGTEXT, VLC_FALSE );
 #endif
     add_bool( "ffmpeg-hurry-up", 0, NULL, "hurry up", HURRY_UP_LONGTEXT, VLC_FALSE );
-    
+
     add_category_hint( N_("Post processing"), NULL, VLC_FALSE );
     add_module( "ffmpeg-pp", "postprocessing",NULL, NULL,
-                N_( "ffmpeg postprocessing module" ), NULL, VLC_FALSE ); 
+                N_( "ffmpeg postprocessing module" ), NULL, VLC_FALSE );
     add_integer( "ffmpeg-pp-q", 0, NULL,
                  "post processing quality", POSTPROCESSING_Q_LONGTEXT, VLC_FALSE );
     add_bool( "ffmpeg-pp-auto", 0, NULL,
               "auto-level Post processing quality", POSTPROCESSING_AQ_LONGTEXT, VLC_FALSE );
-    add_bool( "ffmpeg-db-yv", 0, NULL, 
-              "force vertical luminance deblocking", 
+    add_bool( "ffmpeg-db-yv", 0, NULL,
+              "force vertical luminance deblocking",
               "force vertical luminance deblocking (override other settings)", VLC_TRUE );
-    add_bool( "ffmpeg-db-yh", 0, NULL, 
+    add_bool( "ffmpeg-db-yh", 0, NULL,
               "force horizontal luminance deblocking",
               "force horizontal luminance deblocking (override other settings)", VLC_TRUE );
-    add_bool( "ffmpeg-db-cv", 0, NULL, 
+    add_bool( "ffmpeg-db-cv", 0, NULL,
               "force vertical chrominance deblocking",
               "force vertical chrominance deblocking (override other settings)", VLC_TRUE );
-    add_bool( "ffmpeg-db-ch", 0, NULL, 
+    add_bool( "ffmpeg-db-ch", 0, NULL,
               "force horizontal chrominance deblocking",
               "force horizontal chrominance deblocking (override other settings) ", VLC_TRUE );
     add_bool( "ffmpeg-dr-y", 0, NULL,
@@ -135,7 +135,7 @@ vlc_module_begin();
     add_bool( "ffmpeg-dr-c", 0, NULL,
               "force chrominance deringing",
               "force chrominance deringing (override other settings)", VLC_TRUE );
-      
+
     set_description( _("ffmpeg audio/video decoder((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
     set_capability( "decoder", 70 );
     set_callbacks( OpenDecoder, NULL );
@@ -144,7 +144,7 @@ vlc_module_end();
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
  *****************************************************************************
- * Tries to launch a decoder and return score so that the interface is able 
+ * Tries to launch a decoder and return score so that the interface is able
  * to chose.
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
@@ -193,7 +193,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         DecoderError( p_fifo );
         return( -1 );
     }
-     
+
     while( (!p_decoder->p_fifo->b_die) && (!p_decoder->p_fifo->b_error) )
     {
         switch( p_decoder->i_cat )
@@ -218,9 +218,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     {
         return( -1 );
     }
-   
+
     return( 0 );
-} 
+}
 
 /*****************************************************************************
  *
@@ -231,8 +231,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 /*****************************************************************************
  * InitThread: initialize vdec output thread
  *****************************************************************************
- * This function is called from decoder_Run and performs the second step 
- * of the initialization. It returns 0 on success. Note that the thread's 
+ * This function is called from decoder_Run and performs the second step
+ * of the initialization. It returns 0 on success. Note that the thread's
  * flag are not modified inside this function.
  *
  * ffmpeg codec will be open, some memory allocated. But Vout is not yet
@@ -242,7 +242,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 static int InitThread( generic_thread_t *p_decoder )
 {
     int i_result;
-    
+
      /* *** init ffmpeg library (libavcodec) *** */
     if( !b_ffmpeginit )
     {
@@ -263,12 +263,12 @@ static int InitThread( generic_thread_t *p_decoder )
                            &p_decoder->i_cat,
                            &p_decoder->i_codec_id,
                            &p_decoder->psz_namecodec );
-   
+
     /* *** ask ffmpeg for a decoder *** */
-    if( !( p_decoder->p_codec = 
+    if( !( p_decoder->p_codec =
                 avcodec_find_decoder( p_decoder->i_codec_id ) ) )
     {
-        msg_Err( p_decoder->p_fifo, 
+        msg_Err( p_decoder->p_fifo,
                  "codec not found (%s)",
                  p_decoder->psz_namecodec );
         return( -1 );
@@ -281,7 +281,7 @@ static int InitThread( generic_thread_t *p_decoder )
     p_decoder->p_context = malloc( sizeof( AVCodecContext ) );
     memset( p_decoder->p_context, 0, sizeof( AVCodecContext ) );
 #endif
-  
+
     switch( p_decoder->i_cat )
     {
         case VIDEO_ES:
@@ -293,7 +293,7 @@ static int InitThread( generic_thread_t *p_decoder )
         default:
             i_result = -1;
     }
-    
+
     p_decoder->pts = 0;
     p_decoder->p_buffer = NULL;
     p_decoder->i_buffer = 0;
@@ -310,17 +310,17 @@ static int InitThread( generic_thread_t *p_decoder )
  *****************************************************************************/
 static void EndThread( generic_thread_t *p_decoder )
 {
-    
+
     if( !p_decoder )
     {
         return;
     }
-    
+
     if( p_decoder->p_context != NULL)
     {
         FREE( p_decoder->p_context->extradata );
         avcodec_close( p_decoder->p_context );
-        msg_Dbg( p_decoder->p_fifo, 
+        msg_Dbg( p_decoder->p_fifo,
                  "ffmpeg codec (%s) stopped",
                  p_decoder->psz_namecodec );
         free( p_decoder->p_context );
@@ -337,7 +337,7 @@ static void EndThread( generic_thread_t *p_decoder )
             E_( EndThread_Video )( (vdec_thread_t*)p_decoder );
             break;
     }
-    
+
     free( p_decoder );
 }
 
@@ -346,8 +346,8 @@ static void EndThread( generic_thread_t *p_decoder )
  *****************************************************************************/
 
 int E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes )
-{   
-    int i_copy; 
+{
+    int i_copy;
     int i_count;
 
     data_packet_t   *p_data;
@@ -357,7 +357,7 @@ int E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes )
     while( p_data != NULL && i_count < i_max )
     {
 
-        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start, 
+        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start,
                         i_max - i_count );
 
         if( i_copy > 0 )
@@ -399,7 +399,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             psz_name = "MPEG-1/2 Video";
             break;
 #endif
-#if LIBAVCODEC_BUILD >= 4608 
+#if LIBAVCODEC_BUILD >= 4608
         case FOURCC_DIV1:
         case FOURCC_div1:
         case FOURCC_MPG4:
@@ -434,7 +434,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
         case FOURCC_AP41:
         case FOURCC_3IV1:
             i_cat = VIDEO_ES;
-#if LIBAVCODEC_BUILD >= 4608 
+#if LIBAVCODEC_BUILD >= 4608
             i_codec = CODEC_ID_MSMPEG4V3;
 #else
             i_codec = CODEC_ID_MSMPEG4;
@@ -521,6 +521,16 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             break;
 
 #if LIBAVCODEC_BUILD >= 4655
+        case FOURCC_MAC3:
+            i_cat = AUDIO_ES;
+            i_codec = CODEC_ID_MACE3;
+            psz_name = "MACE-3 audio";
+            break;
+        case FOURCC_MAC6:
+            i_cat = AUDIO_ES;
+            i_codec = CODEC_ID_MACE6;
+            psz_name = "MACE-6 audio";
+            break;
         case FOURCC_dvau:
             i_cat = AUDIO_ES;
             i_codec = CODEC_ID_DVAUDIO;
