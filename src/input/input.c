@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.153 2001/11/12 04:12:37 sam Exp $
+ * $Id: input.c,v 1.154 2001/11/12 22:42:56 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -52,7 +52,9 @@
 #   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>
 #   include <netinet/in.h>
-#   include <arpa/inet.h>
+#   ifdef HAVE_ARPA_INET_H
+#       include <arpa/inet.h>                    /* inet_ntoa(), inet_aton() */
+#   endif
 #endif
 
 #ifdef HAVE_SYS_TIMES_H
@@ -728,22 +730,6 @@ static void NetworkOpen( input_thread_t * p_input )
     struct sockaddr_in  sock;
     unsigned int        i_mc_group;
 
-#ifdef WIN32
-    WSADATA Data;
-    int i_err;
-#endif
-    
-#ifdef WIN32
-    /* WinSock Library Init. */
-    i_err = WSAStartup( MAKEWORD( 1, 1 ), &Data );
-
-    if( i_err )
-    {
-        intf_ErrMsg( "input: can't initiate WinSocks, error %i", i_err );
-        return ;
-    }
-#endif
-    
     /* Get the remote server */
     if( p_input->p_source != NULL )
     {
@@ -993,10 +979,6 @@ static void NetworkClose( input_thread_t * p_input )
     intf_WarnMsg( 2, "input: closing network target `%s'", p_input->p_source );
 
     close( p_input->i_handle );
-
-#ifdef WIN32 
-    WSACleanup();
-#endif
 }
 
 /*****************************************************************************
@@ -1012,22 +994,6 @@ static void HTTPOpen( input_thread_t * p_input )
     struct sockaddr_in  sock;
     char                psz_buffer[256];
 
-#ifdef WIN32
-    WSADATA Data;
-    int i_err;
-#endif
-    
-#ifdef WIN32
-    /* WinSock Library Init. */
-    i_err = WSAStartup( MAKEWORD( 1, 1 ), &Data );
-
-    if( i_err )
-    {
-        intf_ErrMsg( "input: can't initiate WinSocks, error %i", i_err );
-        return ;
-    }
-#endif
-    
     /* Get the remote server */
     if( p_input->p_source != NULL )
     {

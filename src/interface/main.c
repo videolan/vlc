@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.123 2001/11/12 20:16:33 sam Exp $
+ * $Id: main.c,v 1.124 2001/11/12 22:42:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -90,6 +90,10 @@
 
 #ifdef SYS_DARWIN
 #   include "darwin_specific.h"
+#endif
+
+#ifdef WIN32
+#   include "win32_specific.h"
 #endif
 
 #include "netutils.h"                                 /* network_ChannelJoin */
@@ -288,7 +292,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * System specific initialization code
      */
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN )
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN ) || defined( WIN32 )
     system_Init( &i_argc, ppsz_argv, ppsz_env );
 
 #elif defined( WIN32 )
@@ -440,7 +444,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * System specific cleaning code
      */
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN )
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN ) || defined( WIN32 )
     system_End();
 #endif
 

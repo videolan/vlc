@@ -133,6 +133,7 @@ C_OBJ +=	src/misc/darwin_specific.o
 endif
 
 ifneq (,$(findstring mingw32,$(SYS)))
+C_OBJ +=	src/misc/win32_specific.o
 RESOURCE_OBJ :=	share/vlc_win32_rc.o
 endif
 

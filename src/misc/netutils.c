@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.42 2001/11/12 20:16:33 sam Exp $
+ * $Id: netutils.c,v 1.43 2001/11/12 22:42:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -38,23 +38,24 @@
 #endif
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>                                         /* gethostname() */
+#   include <unistd.h>                                      /* gethostname() */
 #elif defined( _MSC_VER ) && defined( _WIN32 )
-#include <io.h>
+#   include <io.h>
 #endif
 
 #if !defined( _MSC_VER )
 #include <sys/time.h>                                        /* gettimeofday */
 #endif
 
-#if !defined( WIN32 )
-#include <netdb.h>                                        /* gethostbyname() */
-#include <netinet/in.h>                               /* BSD: struct in_addr */
-#include <sys/socket.h>                              /* BSD: struct sockaddr */
-#endif
-
-#ifdef HAVE_ARPA_INET_H
-#include <arpa/inet.h>                           /* inet_ntoa(), inet_aton() */
+#ifdef WIN32
+#   include <winsock2.h>
+#elif !defined( SYS_BEOS ) && !defined( SYS_NTO )
+#   include <netdb.h>                                         /* hostent ... */
+#   include <sys/socket.h>                           /* BSD: struct sockaddr */
+#   include <netinet/in.h>                            /* BSD: struct in_addr */
+#   ifdef HAVE_ARPA_INET_H
+#       include <arpa/inet.h>                    /* inet_ntoa(), inet_aton() */
+#   endif
 #endif
 
 #ifdef SYS_LINUX
@@ -287,6 +288,12 @@ int network_ChannelJoin( int i_channel )
 
     /* Initializing the socket */
     i_fd = socket( AF_INET, SOCK_DGRAM, 0 );
+    if( i_fd < 0 )
+    {
+        intf_ErrMsg( "network error: unable to create vlcs socket (%s)",
+                     strerror( errno ) );
+        return -1;
+    }
 
     /* Getting information about the channel server */
     psz_vlcs = main_GetPszVariable( INPUT_CHANNEL_SERVER_VAR,
@@ -294,7 +301,8 @@ int network_ChannelJoin( int i_channel )
     i_port = main_GetIntVariable( INPUT_CHANNEL_PORT_VAR,
                                   INPUT_CHANNEL_PORT_DEFAULT );
 
-    intf_WarnMsg( 6, "network: vlcs '%s', port %d", psz_vlcs, i_port );
+    intf_WarnMsg( 5, "network: socket %i, vlcs '%s', port %d",
+                     i_fd, psz_vlcs, i_port );
 
     memset( &sa_client, 0x00, sizeof(struct sockaddr_in) );
     memset( &sa_server, 0x00, sizeof(struct sockaddr_in) );
@@ -310,11 +318,11 @@ int network_ChannelJoin( int i_channel )
 #endif
 
     /* Bind the socket */
-    i_dummy = bind( i_fd, (struct sockaddr *)(&sa_client),
-                          sizeof(struct sockaddr) );
-    if ( i_dummy )
+    if( bind( i_fd, (struct sockaddr*)(&sa_client), sizeof(sa_client) ) )
     {
-        intf_ErrMsg( "network: unable to bind vlcs socket: %i", i_dummy );
+        intf_ErrMsg( "network: unable to bind vlcs socket (%s)",
+                     strerror( errno ) );
+        close( i_fd );
         return -1;
     }
 
@@ -322,6 +330,7 @@ int network_ChannelJoin( int i_channel )
     if( GetMacAddress( i_fd, psz_mac ) )
     {
         intf_ErrMsg( "network error: failed getting MAC address" );
+        close( i_fd );
         return -1;
     }
 
@@ -347,9 +356,8 @@ int network_ChannelJoin( int i_channel )
     delay.tv_usec = 0;
     FD_ZERO( &fds );
     FD_SET( i_fd, &fds );
-    i_dummy = select( i_fd + 1, &fds, NULL, NULL, &delay );
 
-    switch( i_dummy )
+    switch( select( i_fd + 1, &fds, NULL, NULL, &delay ) )
     {
         case 0:
             intf_ErrMsg( "network error: no answer from vlcs" );
@@ -396,7 +404,7 @@ int network_ChannelJoin( int i_channel )
 
 #else
     intf_ErrMsg( "network error: channels not supported on this platform" );
-    return NULL;
+    return -1; 
 
 #endif
 }
