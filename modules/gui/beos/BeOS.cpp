@@ -2,7 +2,7 @@
  * beos.cpp : BeOS plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: BeOS.cpp,v 1.11 2003/06/03 12:06:29 titer Exp $
+ * $Id: BeOS.cpp,v 1.12 2003/06/17 16:09:16 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -53,9 +53,9 @@ vlc_module_begin();
     add_string( "beos-screenshotpath", "/boot/home/", NULL, "Screenshot Path", "", VLC_TRUE );
     add_string_from_list( "beos-screenshotformat", "PNG", ppsz_screenshotformat, NULL, "Screenshot Format", "", VLC_TRUE );
     set_description( _("BeOS standard API interface") );
-    add_submodule();
-        set_capability( "interface", 100 );
-        set_callbacks( E_(OpenIntf), E_(CloseIntf) );
+    set_capability( "interface", 100 );
+    set_callbacks( E_(OpenIntf), E_(CloseIntf) );
+
     add_submodule();                                     
         set_capability( "video output", 100 );
         set_callbacks( E_(OpenVideo), E_(CloseVideo) );

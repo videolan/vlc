@@ -7,7 +7,7 @@
  *****************************************************************************
  *    
  * Copyright (C) 2001 VideoLAN
- * $Id: dvd.c,v 1.5 2003/03/30 18:14:35 gbazin Exp $
+ * $Id: dvd.c,v 1.6 2003/06/17 16:09:16 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -50,10 +50,9 @@ void E_(CloseIntf) ( vlc_object_t * );
 vlc_module_begin();
     add_usage_hint( N_("[dvdplay:][device][@[title][,[chapter][,angle]]]") );
     set_description( _("DVD input with menus support") );
-    add_submodule();
-        set_capability( "access", 120 );
-        set_callbacks( E_(OpenDVD), E_(CloseDVD) );
-        add_shortcut( "dvd" );
+    set_capability( "access", 120 );
+    set_callbacks( E_(OpenDVD), E_(CloseDVD) );
+    add_shortcut( "dvd" );
     add_submodule();
         set_capability( "demux", 0 );
         set_callbacks( E_(InitDVD), E_(EndDVD) );

@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dvd.c,v 1.7 2003/05/15 22:27:36 massiot Exp $
+ * $Id: dvd.c,v 1.8 2003/06/17 16:09:16 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -96,9 +96,9 @@ vlc_module_begin();
 #endif
     add_shortcut( "dvdold" );
     add_shortcut( "dvdsimple" );
-    add_submodule();
-        set_capability( "access", i );
-        set_callbacks( E_(DVDOpen), E_(DVDClose) );
+    set_capability( "access", i );
+    set_callbacks( E_(DVDOpen), E_(DVDClose) );
+
     add_submodule();
         set_capability( "demux", 0 );
         set_callbacks( E_(DVDInit), E_(DVDEnd) );

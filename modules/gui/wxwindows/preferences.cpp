@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.20 2003/06/16 21:55:58 gbazin Exp $
+ * $Id: preferences.cpp,v 1.21 2003/06/17 16:09:16 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -66,6 +66,7 @@
 /*****************************************************************************
  * Classes declarations.
  *****************************************************************************/
+class ConfigTreeData;
 class PrefsTreeCtrl : public wxTreeCtrl
 {
 public:
@@ -81,6 +82,7 @@ public:
 private:
     /* Event handlers (these functions should _not_ be virtual) */
     void OnSelectTreeItem( wxTreeEvent& event );
+    ConfigTreeData *FindModuleConfig( ConfigTreeData *config_data );
 
     DECLARE_EVENT_TABLE()
 
@@ -150,8 +152,10 @@ class ConfigTreeData : public wxTreeItemData
 {
 public:
 
-    ConfigTreeData() { panel = NULL; psz_section = NULL; }
+    ConfigTreeData() { b_submodule = 0; panel = NULL; psz_section = NULL; }
     virtual ~ConfigTreeData() { if( panel ) delete panel; }
+
+    vlc_bool_t b_submodule;
 
     PrefsPanel *panel;
     wxBoxSizer *sizer;
@@ -442,7 +446,10 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 
         /* Add the plugin to the tree */
         ConfigTreeData *config_data = new ConfigTreeData;
-        config_data->i_object_id = p_module->i_object_id;
+        config_data->b_submodule = p_module->b_submodule;
+        config_data->i_object_id = p_module->b_submodule ?
+            ((module_t *)p_module->p_parent)->i_object_id :
+            p_module->i_object_id;
         AppendItem( capability_item, wxU(p_module->psz_object_name), -1, -1,
                     config_data );
     }
@@ -524,6 +531,14 @@ void PrefsTreeCtrl::CleanChanges()
     long cookie, cookie2;
     ConfigTreeData *config_data;
 
+    config_data = !GetSelection() ? NULL :
+        FindModuleConfig( (ConfigTreeData *)GetItemData( GetSelection() ) );
+    if( config_data  )
+    {
+        config_data->panel->Hide();
+        p_sizer->Remove( config_data->panel );
+    }
+
     /* Clean changes for the main module */
     wxTreeItemId item = GetFirstChild( root_item, cookie );
     for( size_t i_child_index = 0;
@@ -533,20 +548,8 @@ void PrefsTreeCtrl::CleanChanges()
         config_data = (ConfigTreeData *)GetItemData( item );
         if( config_data && config_data->panel )
         {
-            if( item == GetSelection() )
-            {
-                config_data->panel->Hide();
-                p_sizer->Remove( config_data->panel );
-            }
-
             delete config_data->panel;
             config_data->panel = NULL;
-
-            if( item == GetSelection() )
-            {
-                wxTreeEvent event;
-                OnSelectTreeItem( event );
-            }
         }
 
         item = GetNextChild( root_item, cookie );
@@ -567,20 +570,8 @@ void PrefsTreeCtrl::CleanChanges()
 
             if( config_data && config_data->panel )
             {
-                if( item2 == GetSelection() )
-                {
-                    config_data->panel->Hide();
-                    p_sizer->Remove( config_data->panel );
-                }
-
                 delete config_data->panel;
                 config_data->panel = NULL;
-
-                if( item2 == GetSelection() )
-                {
-                    wxTreeEvent event;
-                    OnSelectTreeItem( event );
-                }
             }
 
             item2 = GetNextChild( item, cookie2 );
@@ -588,13 +579,59 @@ void PrefsTreeCtrl::CleanChanges()
 
         item = GetNextChild( plugins_item, cookie );
     }
+
+    if( GetSelection() )
+    {
+        wxTreeEvent event;
+        OnSelectTreeItem( event );
+    }
+}
+
+ConfigTreeData *PrefsTreeCtrl::FindModuleConfig( ConfigTreeData *config_data )
+{
+    /* We need this complexity because submodules don't have their own config
+     * options. They use the parent module ones. */
+
+    if( !config_data || !config_data->b_submodule )
+    {
+        return config_data;
+    }
+
+    long cookie, cookie2;
+    ConfigTreeData *config_new;
+    wxTreeItemId item = GetFirstChild( plugins_item, cookie );
+    for( size_t i_child_index = 0;
+         i_child_index < GetChildrenCount( plugins_item, FALSE );
+         i_child_index++ )
+    {
+        wxTreeItemId item2 = GetFirstChild( item, cookie2 );
+        for( size_t i_child_index = 0;
+             i_child_index < GetChildrenCount( item, FALSE );
+             i_child_index++ )
+        {
+            config_new = (ConfigTreeData *)GetItemData( item2 );
+            if( config_new && !config_new->b_submodule &&
+                config_new->i_object_id == config_data->i_object_id )
+            {
+                return config_new;
+            }
+
+            item2 = GetNextChild( item, cookie2 );
+        }
+
+        item = GetNextChild( plugins_item, cookie );
+    }
+
+    /* Found nothing */
+    return NULL;
 }
 
 void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
 {
     ConfigTreeData *config_data;
 
-    config_data = (ConfigTreeData *)GetItemData( event.GetOldItem() );
+    config_data = FindModuleConfig( (ConfigTreeData *)GetItemData(
+                                    event.GetOldItem() ) );
     if( config_data && config_data->panel )
     {
         config_data->panel->Hide();
@@ -602,7 +639,8 @@ void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
     }
 
     /* Don't use event.GetItem() because we also send fake events */
-    config_data = (ConfigTreeData *)GetItemData( GetSelection() );
+    config_data = FindModuleConfig( (ConfigTreeData *)GetItemData(
+                                    GetSelection() ) );
     if( config_data )
     {
         if( !config_data->panel )

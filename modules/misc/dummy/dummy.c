@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.7 2003/05/15 22:27:37 massiot Exp $
+ * $Id: dummy.c,v 1.8 2003/06/17 16:09:16 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -50,15 +50,13 @@
 #endif
 
 vlc_module_begin();
-    set_description( _("dummy functions") );
+    set_description( _("dummy interface function") );
+    set_capability( "interface", 0 );
     add_shortcut( "vlc" );
-    add_submodule();
-        set_description( _("dummy interface function") );
-        set_capability( "interface", 0 );
-        set_callbacks( E_(OpenIntf), NULL );
+    set_callbacks( E_(OpenIntf), NULL );
 #ifdef WIN32
-        add_category_hint( N_("Interface"), NULL, VLC_FALSE );
-        add_bool( "dummy-quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_FALSE );
+    add_category_hint( N_("Interface"), NULL, VLC_FALSE );
+    add_bool( "dummy-quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_FALSE );
 #endif
     add_submodule();
         set_description( _("dummy access function") );

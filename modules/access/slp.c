@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.11 2003/05/15 22:27:36 massiot Exp $
+ * $Id: slp.c,v 1.12 2003/06/17 16:09:16 gbazin Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -84,9 +84,9 @@ vlc_module_begin();
                 NAMINGAUTHORITY_LONGTEXT, VLC_TRUE );
     add_string( "slp-filter", "", NULL, FILTER_TEXT, FILTER_LONGTEXT, VLC_TRUE );
     add_string( "slp-lang", "", NULL, LANG_TEXT, LANG_LONGTEXT, VLC_TRUE );
-    add_submodule();
-        set_capability( "access", 0 );
-        set_callbacks( Open, Close );
+    set_capability( "access", 0 );
+    set_callbacks( Open, Close );
+
     add_submodule();
         add_shortcut( "demux_slp" );
         set_capability( "demux", 0 );

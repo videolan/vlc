@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.12 2003/06/16 15:39:11 zorglub Exp $
+ * $Id: sap.c,v 1.13 2003/06/17 16:09:16 gbazin Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *
@@ -60,6 +60,12 @@
 #   elif defined( SYS_BEOS )
 #      include <net/netdb.h>
 #   endif
+#endif
+
+#ifdef UNDER_CE
+#   define close(a) CloseHandle(a);
+#elif defined( WIN32 )
+#   define close(a) closesocket(a);
 #endif
 
 #include "network.h"
@@ -217,15 +223,7 @@ static void Run( intf_thread_t *p_intf )
     }
 
     /* Closing socket */
-
-#ifdef UNDER_CE
-    CloseHandle( socket_desc.i_handle );
-#elif defined( WIN32 )
-    closesocket( socket_desc.i_handle );
-#else
     close( socket_desc.i_handle );
-#endif
-
 }
 
 /********************************************************************
