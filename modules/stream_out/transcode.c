@@ -950,7 +950,9 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         if( id->pp_filter[0]->p_module ) id->i_filter++;
         else
         {
-            msg_Dbg( p_stream, "no audio filter found" );
+            msg_Dbg( p_stream, "no audio filter found (%4.4s->%4.4s)",
+                     (char *)&id->pp_filter[0]->fmt_in,
+                     (char *)&id->pp_filter[0]->fmt_out );
             vlc_object_detach( id->pp_filter[0] );
             vlc_object_destroy( id->pp_filter[0] );
             module_Unneed( id->p_decoder, id->p_decoder->p_module );
@@ -981,7 +983,9 @@ static int transcode_audio_new( sout_stream_t *p_stream,
                 id->pp_filter[1]->fmt_out.i_codec !=
                   id->p_encoder->fmt_in.i_codec )
             {
-                msg_Dbg( p_stream, "no audio filter found" );
+                msg_Dbg( p_stream, "no audio filter found (%4.4s->%4.4s)",
+                         (char *)&id->pp_filter[1]->fmt_in,
+                         (char *)&id->pp_filter[1]->fmt_out );
                 module_Unneed( id->pp_filter[0], id->pp_filter[0]->p_module );
                 vlc_object_detach( id->pp_filter[0] );
                 vlc_object_destroy( id->pp_filter[0] );
