@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.8 2002/12/06 16:34:08 sam Exp $
+ * $Id: xcommon.c,v 1.9 2003/01/09 18:06:06 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1100,21 +1100,21 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
             p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[0];
             p_pic->p[Y_PLANE].i_pixel_pitch = 1;
-            p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
+            p_pic->p[Y_PLANE].i_visible_pitch = p_vout->output.i_width;
 
             p_pic->U_PIXELS = p_pic->p_sys->p_image->data
                                + p_pic->p_sys->p_image->offsets[1];
             p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[1];
             p_pic->p[U_PLANE].i_pixel_pitch = 1;
-            p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
+            p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width / 2;
 
             p_pic->V_PIXELS = p_pic->p_sys->p_image->data
                                + p_pic->p_sys->p_image->offsets[2];
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[2];
             p_pic->p[V_PLANE].i_pixel_pitch = 1;
-            p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
+            p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width / 2;
 
             p_pic->i_planes = 3;
             break;
@@ -1127,20 +1127,21 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[0];
             p_pic->p[Y_PLANE].i_pixel_pitch = 1;
             p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
+            p_pic->p[Y_PLANE].i_visible_pitch = p_vout->output.i_width;
 
             p_pic->U_PIXELS = p_pic->p_sys->p_image->data
                                + p_pic->p_sys->p_image->offsets[2];
             p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[2];
             p_pic->p[U_PLANE].i_pixel_pitch = 1;
-            p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
+            p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width / 2;
 
             p_pic->V_PIXELS = p_pic->p_sys->p_image->data
                                + p_pic->p_sys->p_image->offsets[1];
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[1];
             p_pic->p[V_PLANE].i_pixel_pitch = 1;
-            p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
+            p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width / 2;
 
             p_pic->i_planes = 3;
             break;
@@ -1153,7 +1154,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             /* XXX: this just looks so plain wrong... check it out ! */
             p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0] / 4;
             p_pic->p->i_pixel_pitch = 4;
-            p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
+            p_pic->p->i_visible_pitch = p_vout->output.i_width * 4;
 
             p_pic->i_planes = 1;
             break;
@@ -1166,7 +1167,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p->i_lines = p_vout->output.i_height;
             p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
             p_pic->p->i_pixel_pitch = 4;
-            p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
+            p_pic->p->i_visible_pitch = p_vout->output.i_width * 4;
 
             p_pic->i_planes = 1;
             break;
@@ -1178,7 +1179,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p->i_lines = p_vout->output.i_height;
             p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
             p_pic->p->i_pixel_pitch = 2;
-            p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
+            p_pic->p->i_visible_pitch = p_vout->output.i_width * 2;
 
             p_pic->i_planes = 1;
             break;
@@ -1190,7 +1191,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p->i_lines = p_vout->output.i_height;
             p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
             p_pic->p->i_pixel_pitch = 2;
-            p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
+            p_pic->p->i_visible_pitch = p_vout->output.i_width * 2;
 
             p_pic->i_planes = 1;
             break;
