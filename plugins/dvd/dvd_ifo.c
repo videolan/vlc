@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.33 2001/06/12 22:14:44 sam Exp $
+ * $Id: dvd_ifo.c,v 1.34 2001/06/20 07:43:48 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -287,8 +287,9 @@ int IfoInit( ifo_t * p_ifo )
 
         for( i = 0 ; i < PARINF.i_country_nb ; i++ )
         {
-            p_tmp = FillBuffer( p_ifo, p_buf, LB2OFF( i_start ) +
-                      PARINF.p_parental_desc[i].i_parental_mask_start_byte );
+            p_tmp = FillBuffer( p_ifo, p_buf, i_start + OFF2LB(
+                      PARINF.p_parental_desc[i].i_parental_mask_start_byte ) )
+              + (PARINF.p_parental_desc[i].i_parental_mask_start_byte & 0x7ff);
 
             for( j = 0 ; j < 8 ; j++ )
             {
@@ -378,8 +379,8 @@ int IfoInit( ifo_t * p_ifo )
 
             for( j = 0 ; j < 28 ; j++ )
             {
-                ReadBytes( p_ifo, p_buf, &p_tmp, (u8*)(&i_temp), 6 );
                 /* FIXME : Fix endianness issue here */
+                ReadBytes( p_ifo, p_buf, &p_tmp, (u8*)(&i_temp), 6 );
             }
 
             DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
@@ -401,8 +402,8 @@ int IfoInit( ifo_t * p_ifo )
 
             for( j = 0 ; j < 28 /*VTSINF.p_vts_vts_inf[i].i_vtstt_subpic_nb*/ ; j++ )
             {
-                ReadBytes( p_ifo, p_buf, &p_tmp, (u8*)(&i_temp), 6 );
                 /* FIXME : Fix endianness issue here */
+                ReadBytes( p_ifo, p_buf, &p_tmp, (u8*)(&i_temp), 6 );
             }
         }
     }
@@ -461,17 +462,18 @@ int IfoTitleSet( ifo_t * p_ifo )
     i_off = p_ifo->vmg.title_inf.p_attr[p_ifo->i_title-1].i_start_sector
                    + p_ifo->i_start;
 
-//fprintf(stderr, "offset: %d\n" , i_off );
+    //fprintf(stderr, "offset: %d\n" , i_off );
 
     p_tmp = FillBuffer( p_ifo, p_buf, i_off );
-//i_start = p_ifo->i_pos;
+    //i_start = p_ifo->i_pos;
     p_ifo->vts.i_pos = p_ifo->i_pos;
 
 #define MGINF p_ifo->vts.manager_inf
+
     /*
-     * reads manager information
+     * read manager information
      */
-//fprintf( stderr, "VTSI\n" );
+    //fprintf( stderr, "VTSI\n" );
 
     ReadBytes( p_ifo, p_buf, &p_tmp, MGINF.psz_id , 12 );
     MGINF.psz_id[12] = '\0';
@@ -509,8 +511,8 @@ int IfoTitleSet( ifo_t * p_ifo )
 
     for( i = 0 ; i < 28 ; i++ )
     {
-        ReadBytes( p_ifo, p_buf, &p_tmp, (u8*)(&i_temp), 6 );
         /* FIXME : take care of endianness */
+        ReadBytes( p_ifo, p_buf, &p_tmp, (u8*)(&i_temp), 6 );
     }
 
     DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
@@ -588,13 +590,13 @@ int IfoTitleSet( ifo_t * p_ifo )
     }
 
     /*
-     * reads title information: set of pointers to title
+     * read title information: set of pointers to title
      */
 #define TITINF p_ifo->vts.title_inf
     if( MGINF.i_title_inf_start_sector )
     {
         p_tmp = FillBuffer( p_ifo, p_buf, p_ifo->vts.i_pos +
-                        MGINF.i_title_inf_start_sector );
+                                          MGINF.i_title_inf_start_sector );
 
         i_start = p_ifo->i_pos;
     
@@ -630,13 +632,12 @@ int IfoTitleSet( ifo_t * p_ifo )
         {
             p_tmp = FillBuffer( p_ifo, p_buf, i_start +
                                 OFF2LB( TITINF.pi_start_byte[i] ) )
-                     + TITINF.pi_start_byte[i];
+                     + (TITINF.pi_start_byte[i] & 0x7ff);
 
             TITINF.p_title_start[i].i_title_id =
                                    ReadWord( p_ifo, p_buf, &p_tmp );
             TITINF.p_title_start[i].i_chapter =
                                    ReadWord( p_ifo, p_buf, &p_tmp );
-            //fprintf( stderr, "VTS %d title_inf Pgc: %d Prg: %d\n", i,title_inf.p_title_start[i].i_program_chain_num, TITINF.p_title_start[i].i_program_num );
         }
     }
 #undef TITINF
@@ -674,7 +675,7 @@ int IfoTitleSet( ifo_t * p_ifo )
         u8      p_buf[DVD_LB_SIZE];
 
         p_tmp = FillBuffer( p_ifo, p_buf, p_ifo->vts.i_pos +
-                        MGINF.i_time_inf_start_sector );
+                                          MGINF.i_time_inf_start_sector );
 
         //fprintf( stderr, "TMAP\n" );
 
@@ -724,40 +725,32 @@ int IfoTitleSet( ifo_t * p_ifo )
     }
 #undef TIMINF
 
-    if( MGINF.i_menu_cell_inf_start_sector )
+    if( MGINF.i_menu_cell_inf_start_sector
+         && ReadCellInf( p_ifo, &p_ifo->vts.menu_cell_inf, p_ifo->vts.i_pos +
+                         MGINF.i_menu_cell_inf_start_sector ) < 0 )
     {
-        if( ReadCellInf( p_ifo, &p_ifo->vts.menu_cell_inf, p_ifo->vts.i_pos +
-                 MGINF.i_menu_cell_inf_start_sector ) < 0 )
-        {
-            return -1;
-        }
+        return -1;
     }
 
-    if( MGINF.i_menu_vobu_map_start_sector )
+    if( MGINF.i_menu_vobu_map_start_sector
+         && ReadVobuMap( p_ifo, &p_ifo->vts.menu_vobu_map, p_ifo->vts.i_pos +
+                         MGINF.i_menu_vobu_map_start_sector ) < 0 )
     {
-        if( ReadVobuMap( p_ifo, &p_ifo->vts.menu_vobu_map, p_ifo->vts.i_pos +
-                  MGINF.i_menu_vobu_map_start_sector ) < 0 )
-        {
-            return -1;
-        }
+        return -1;
     }
 
-    if( MGINF.i_cell_inf_start_sector )
+    if( MGINF.i_cell_inf_start_sector
+         && ReadCellInf( p_ifo, &p_ifo->vts.cell_inf, p_ifo->vts.i_pos +
+                         MGINF.i_cell_inf_start_sector ) )
     {
-        if( ReadCellInf( p_ifo, &p_ifo->vts.cell_inf, p_ifo->vts.i_pos +
-                        MGINF.i_cell_inf_start_sector ) )
-        {
-            return -1;
-        }
+        return -1;
     }
 
-    if( MGINF.i_vobu_map_start_sector )
+    if( MGINF.i_vobu_map_start_sector
+         && ReadVobuMap( p_ifo, &p_ifo->vts.vobu_map, p_ifo->vts.i_pos +
+                         MGINF.i_vobu_map_start_sector ) )
     {
-        if( ReadVobuMap( p_ifo, &p_ifo->vts.vobu_map, p_ifo->vts.i_pos +
-                        MGINF.i_vobu_map_start_sector ) )
-        {
-            return -1;
-        }
+        return -1;
     }
 #undef MGINF
 
@@ -945,14 +938,13 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
     p_title->i_next_title_num = ReadWord( p_ifo, p_buf, &p_tmp );
     p_title->i_prev_title_num = ReadWord( p_ifo, p_buf, &p_tmp );
     p_title->i_go_up_title_num = ReadWord( p_ifo, p_buf, &p_tmp );
-    //fprintf( stderr, "title: Prev: %d Next: %d Up: %d\n",pgc.i_prev_pgc_nb ,pgc.i_next_pgc_nb, pgc.i_goup_pgc_nb );
     p_title->i_still_time = ReadByte( p_ifo, p_buf, &p_tmp );
     p_title->i_play_mode = ReadByte( p_ifo, p_buf, &p_tmp );
 
     for( i = 0 ; i < 16 ; i++ )
     {
-        p_title->pi_yuv_color[i] = ReadDouble( p_ifo, p_buf, &p_tmp );
         /* FIXME : We have to erase the extra bit */
+        p_title->pi_yuv_color[i] = ReadDouble( p_ifo, p_buf, &p_tmp );
     }
 
     p_title->i_command_start_byte = ReadWord( p_ifo, p_buf, &p_tmp );
@@ -1348,7 +1340,7 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, int i_block )
         MAP.i_cell_id = ReadByte( p_ifo, p_buf, &p_tmp );
         DumpBytes( p_ifo, p_buf, &p_tmp, 1 );
         MAP.i_start_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
-        //fprintf(stderr, "sector[%d] %d (%lld)\n", i,ntohl(*(u32*)(p_tmp)), p_ifo->i_pos);
+        //fprintf(stderr, "sector[%d] %d (%d)\n", i,ntohl(*(u32*)(p_tmp)), p_ifo->i_pos);
         MAP.i_end_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
 #undef MAP
     }
@@ -2094,33 +2086,30 @@ void CommandPrint( ifo_t ifo )
  *****************************************************************************/
 static u8* FillBuffer( ifo_t* p_ifo, u8* p_buf, int i_pos )
 {
-    memset( p_buf, 0, DVD_LB_SIZE );
-
     p_ifo->i_pos = dvdcss_seek( p_ifo->dvdhandle, i_pos );
     dvdcss_read( p_ifo->dvdhandle, p_buf, 1, DVDCSS_NOFLAGS );
 
     return p_buf;
 }
 
-static u8 ReadByte( ifo_t * p_ifo, u8* p_buf, u8** pp_tmp )
+static void ReadBytes( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp,
+                                     u8* pi_dest, int i_nb )
 {
-    u8      i_ret;
-
-    if( *pp_tmp > p_buf + DVD_LB_SIZE )
+    if( i_nb > DVD_LB_SIZE )
     {
-        *pp_tmp = FillBuffer( p_ifo, p_buf, p_ifo->i_pos + 1 );
+        intf_ErrMsg( "ifo error: excessive ReadBytes call (%i)", i_nb );
     }
 
-    i_ret = *(*pp_tmp)++;
-
-    return i_ret;
-}
-
-static void ReadBytes( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp,
-                                  u8* pi_dest, int i_nb )
-{
-    if( *pp_tmp > p_buf + DVD_LB_SIZE - i_nb )
+    if( *pp_tmp + i_nb >= p_buf + DVD_LB_SIZE )
     {
+        int i_spare = (int)( (p_buf + DVD_LB_SIZE) - *pp_tmp );
+
+        /* Copy the bytes remaining in the current buffer */
+        memcpy( pi_dest, *pp_tmp, i_spare );
+        pi_dest += i_spare;
+        i_nb -= i_spare;
+
+        /* Load the next buffer */
         *pp_tmp = FillBuffer( p_ifo, p_buf, p_ifo->i_pos + 1 );
     }
 
@@ -2130,64 +2119,57 @@ static void ReadBytes( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp,
     return;
 }
 
-static void DumpBytes( ifo_t* p_ifo, u8* p_buf,
-                                 u8** pp_tmp, int i_nb )
+static void DumpBytes( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp, int i_nb )
 {
-    if( *pp_tmp > p_buf + DVD_LB_SIZE - i_nb )
+    if( i_nb > DVD_LB_SIZE )
     {
-        *pp_tmp = FillBuffer( p_ifo, p_buf, p_ifo->i_pos + 1 );
+        intf_ErrMsg( "ifo error: excessive DumpBytes call (%i)", i_nb );
     }
 
     *pp_tmp += i_nb;
 
+    if( *pp_tmp >= p_buf + DVD_LB_SIZE )
+    {
+        /* If we went too far, load the next buffer */
+        *pp_tmp = FillBuffer( p_ifo, p_buf, p_ifo->i_pos + 1 )
+                   + (int)( (*pp_tmp) - (p_buf - DVD_LB_SIZE) );
+    }
+
     return;
 }
 
-static u16 ReadWord( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp )
+#define ADDBYTE \
+    if( *pp_tmp >= p_buf + DVD_LB_SIZE ) \
+    { \
+        *pp_tmp = FillBuffer( p_ifo, p_buf, p_ifo->i_pos + 1 ); \
+    } \
+    i_ret <<= 8; i_ret |= **pp_tmp; (*pp_tmp)++;
+
+static u8 ReadByte( ifo_t * p_ifo, u8* p_buf, u8** pp_tmp )
 {
-    u16     i_ret;
-
-    if( *pp_tmp > p_buf + DVD_LB_SIZE - 2 )
-    {
-        *pp_tmp = FillBuffer( p_ifo, p_buf, p_ifo->i_pos + 1 );
-    }
-
-    i_ret = U16_AT(*pp_tmp);
-    (*pp_tmp) += 2;
-
+    u8     i_ret = 0;
+    ADDBYTE;
     return i_ret;
 }
 
-static u32 ReadDouble( ifo_t * p_ifo, u8* p_buf,
-                                  u8** pp_tmp )
+static u16 ReadWord( ifo_t * p_ifo, u8* p_buf, u8** pp_tmp )
 {
-    u32     i_ret;
-
-    if( *pp_tmp > p_buf + DVD_LB_SIZE - 4 )
-    {
-        *pp_tmp = FillBuffer( p_ifo, p_buf, p_ifo->i_pos + 1 );
-        //intf_WarnMsg( 1, "new buffer in double @ %lld", p_ifo->i_pos );
-    }
-
-    i_ret = U32_AT(*pp_tmp);
-    (*pp_tmp) += 4;
-
+    u16    i_ret = 0;
+    ADDBYTE; ADDBYTE;
     return i_ret;
 }
 
-static u64 ReadQuad( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp )
+static u32 ReadDouble( ifo_t * p_ifo, u8* p_buf, u8** pp_tmp )
 {
-    u64     i_ret;
-
-    if( *pp_tmp > p_buf + DVD_LB_SIZE - 8 )
-    {
-        *pp_tmp = FillBuffer( p_ifo, p_buf, p_ifo->i_pos + 1 );
-    }
-
-    i_ret = U64_AT(*pp_tmp);
-    (*pp_tmp) += 8;
-
+    u32    i_ret = 0;
+    ADDBYTE; ADDBYTE; ADDBYTE; ADDBYTE;
     return i_ret;
 }
 
+static u64 ReadQuad( ifo_t * p_ifo, u8* p_buf, u8** pp_tmp )
+{
+    u64    i_ret = 0;
+    ADDBYTE; ADDBYTE; ADDBYTE; ADDBYTE; ADDBYTE; ADDBYTE; ADDBYTE; ADDBYTE;
+    return i_ret;
+}
 

@@ -2,7 +2,7 @@
  * vdec_block_c.c: Macroblock copy functions in C
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: vdec_block_c.c,v 1.3 2001/06/03 12:47:21 sam Exp $
+ * $Id: vdec_block_c.c,v 1.4 2001/06/20 07:43:48 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -32,6 +32,8 @@
  * Preamble
  *****************************************************************************/
 #include "defs.h"
+
+#include <string.h>
 
 #include "config.h"
 #include "common.h"

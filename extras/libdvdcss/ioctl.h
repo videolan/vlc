@@ -1,8 +1,8 @@
 /*****************************************************************************
- * dvd_ioctl.h: DVD ioctl replacement function
+ * ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.h,v 1.2 2001/06/14 02:47:44 sam Exp $
+ * $Id: ioctl.h,v 1.3 2001/06/20 07:43:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
