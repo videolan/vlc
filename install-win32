@@ -5,6 +5,8 @@
 ;;;;;;;;;;;;;
 ; CHANGELOG ;
 ;;;;;;;;;;;;;
+; modifications by Gildas Bazin <gbazin@netcourrier.com> 26 Feb 2003
+; . added the locale directory.
 ; modifications by Samuel Hocevar <sam@zoy.org> 05 Apr 2002
 ; . no need for @VERSION@ anymore
 ; . updated script for NSIS 1.96.
@@ -56,6 +58,7 @@ Section "Install"
 
 	File  /r share
 	File  /r plugins
+	File  /r locale
 
 	CreateDirectory "$SMPROGRAMS\VideoLAN"
 	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc.lnk" "$INSTDIR\vlc.exe" 
@@ -79,6 +82,8 @@ Section "Uninstall"
 	RMDir $INSTDIR\share
 	Delete $INSTDIR\plugins\*
 	RMDir $INSTDIR\plugins
+	Delete $INSTDIR\locale\*
+	RMDir $INSTDIR\locale
 	Delete $INSTDIR\*
 	RMDir $INSTDIR
 	DeleteRegKey HKLM SOFTWARE\VideoLAN

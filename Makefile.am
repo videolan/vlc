@@ -525,19 +525,27 @@ package-win32:
 	cp vlc.exe tmp/ 
 	$(STRIP) tmp/vlc.exe
 	cp INSTALL.win32 tmp/INSTALL.txt ; unix2dos tmp/INSTALL.txt
-	for file in AUTHORS COPYING ChangeLog README THANKS NEWS ; \
+	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
 			do cp $$file tmp/$${file}.txt ; \
 			unix2dos tmp/$${file}.txt ; done
+
 	mkdir tmp/plugins
 	for i in dummy $(PLUGIN_FILES) ; do if test "x$$i" != "xdummy" ; then \
 		$(INSTALL) $$i tmp/plugins/ ; \
 	fi ; done
-# don't include these two
-#rm -f tmp/plugins/gtk.so tmp/plugins/sdl.so
-	for i in dummy tmp/plugins/*$(LIBEXT) ; do if test $$i != tmp/plugins/intfwin.so -a $$i != dummy ; then $(STRIP) $$i ; fi ; done
+
+	for i in dummy tmp/plugins/*$(LIBEXT) ; \
+		do if test $$i != tmp/plugins/libwin32_plugin.$(LIBEXT) \
+		-a $$i != dummy ; then $(STRIP) $$i ; fi ; done
 	mkdir tmp/share
-	for file in default8x16.psf default8x9.psf ; \
-		do cp share/$$file tmp/share/ ; done
+	cp share/*.rle tmp/share/ ;
+
+	mkdir tmp/locale
+	for i in $(ALL_LINGUAS); do \
+		mkdir -p tmp/locale/$${i}/LC_MESSAGES ; \
+		cp po/$${i}.gmo tmp/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
+	done
+
 # Create package 
 	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe -- /DVERSION=${VERSION} tmp/nsi
 # Clean up
