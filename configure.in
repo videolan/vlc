@@ -902,7 +902,7 @@ then
       dnl  Use a custom libffmpeg
       AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
       BUILTINS="${BUILTINS} ffmpeg"
-      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} ${real_ffmpeg_tree}/libavcodec/libavcodec.a"
+      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} ${real_ffmpeg_tree}/libavcodec/libavcodec.a -lm"
       ffmpeg_CFLAGS="${ffmpeg_CFLAGS} -I${real_ffmpeg_tree}/libavcodec"
     else
       dnl  The given libavcodec wasn't built
@@ -913,10 +913,10 @@ then
     save_CFLAGS=$CFLAGS
     save_LDFLAGS=$LDFLAGS
     CFLAGS="$CFLAGS $ffmpeg_CFLAGS"
-    LDFLAGS="$LDFLAGS $ffmpeg_LDFLAGS"
+    LDFLAGS="$LDFLAGS $ffmpeg_LDFLAGS -lm"
     AC_CHECK_LIB(avcodec, avcodec_init, [
       BUILTINS="${BUILTINS} ffmpeg"
-      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lavcodec" ],
+      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lavcodec -lm" ],
       [ AC_MSG_ERROR([Cannot find libavcodec library...]) ])
     CFLAGS=$save_CFLAGS
     LDFLAGS=$save_LDFLAGS

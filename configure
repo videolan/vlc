@@ -6513,7 +6513,7 @@ echo "configure:6506: checking for libavcodec.a in ${with_ffmpeg_tree}" >&5
     then
             echo "$ac_t""${real_ffmpeg_tree}/libavcodec/libavcodec.a" 1>&6
       BUILTINS="${BUILTINS} ffmpeg"
-      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} ${real_ffmpeg_tree}/libavcodec/libavcodec.a"
+      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} ${real_ffmpeg_tree}/libavcodec/libavcodec.a -lm"
       ffmpeg_CFLAGS="${ffmpeg_CFLAGS} -I${real_ffmpeg_tree}/libavcodec"
     else
             echo "$ac_t""no" 1>&6
@@ -6523,7 +6523,7 @@ echo "configure:6506: checking for libavcodec.a in ${with_ffmpeg_tree}" >&5
     save_CFLAGS=$CFLAGS
     save_LDFLAGS=$LDFLAGS
     CFLAGS="$CFLAGS $ffmpeg_CFLAGS"
-    LDFLAGS="$LDFLAGS $ffmpeg_LDFLAGS"
+    LDFLAGS="$LDFLAGS $ffmpeg_LDFLAGS -lm"
     echo $ac_n "checking for avcodec_init in -lavcodec""... $ac_c" 1>&6
 echo "configure:6529: checking for avcodec_init in -lavcodec" >&5
 ac_lib_var=`echo avcodec'_'avcodec_init | sed 'y%./+-%__p_%'`
@@ -6561,7 +6561,7 @@ if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   
       BUILTINS="${BUILTINS} ffmpeg"
-      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lavcodec" 
+      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lavcodec -lm" 
 else
   echo "$ac_t""no" 1>&6
  { echo "configure: error: Cannot find libavcodec library..." 1>&2; exit 1; } 
