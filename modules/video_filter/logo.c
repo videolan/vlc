@@ -128,6 +128,16 @@ static picture_t *LoadPNG( vlc_object_t *p_this )
                   &i_bit_depth, &i_color_type, &i_interlace_type,
                   &i_compression_type, &i_filter_type);
 
+    if( i_color_type == PNG_COLOR_TYPE_PALETTE )
+        png_set_palette_to_rgb( p_png );
+
+    if( i_color_type == PNG_COLOR_TYPE_GRAY ||
+        i_color_type == PNG_COLOR_TYPE_GRAY_ALPHA )
+          png_set_gray_to_rgb( p_png );
+
+    if( png_get_valid( p_png, p_info, PNG_INFO_tRNS ) )
+        png_set_tRNS_to_alpha( p_png );
+
     p_row_pointers = malloc( sizeof(png_bytep) * i_height );
     for( i = 0; i < (int)i_height; i++ )
     {
