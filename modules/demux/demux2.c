@@ -64,6 +64,7 @@ vlc_module_begin();
     add_shortcut( "mp4v" );
     add_shortcut( "mpgv" );
     add_shortcut( "rawdv" );
+    add_shortcut( "ogg" );
 vlc_module_end();
 
 /*****************************************************************************
