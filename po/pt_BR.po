@@ -1250,7 +1250,7 @@ msgid ""
 "  vlc:quit                       quit VLC\n"
 msgstr ""
 "\n"
-"Playlist items:\n"
+"Itens da Lista de Reprodução:\n"
 "  *.mpg, *.vob                   arquivos simples MPEG-1/2\n"
 "  [dvd:][dispositivo][@dispositivo_raw][@[título][,[capítulo][,ângulo]]]\n"
 "                                 Dispositivo de DVD\n"
@@ -1570,7 +1570,7 @@ msgstr "Ângulo"
 
 #: modules/access/dvdplay/access.c:217
 msgid "Resume"
-msgstr "Remover"
+msgstr "Continuar"
 
 #: modules/access/dvdplay/dvd.c:51
 msgid "[dvdplay:][device][@[title][,[chapter][,angle]]]"
@@ -1969,7 +1969,7 @@ msgstr "Saída de audio DirectX"
 
 #: modules/audio_output/directx.c:415
 msgid "3 Front 2 Rear"
-msgstr "3 Frontais 2 Traseiros"
+msgstr "3 Frontais 2 Traseiras"
 
 #: modules/audio_output/esd.c:66
 msgid "EsounD audio output"
