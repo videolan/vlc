@@ -6,6 +6,142 @@ HEAD
 
   * Nothing yet.
 
+0.4.2
+Sun,  7 Jul 2002 22:15:33 +0200
+
+  * ./plugins/beos/VideoWindow.h: changed default bitmap to 16bit to fix
+    green distortion problem.
+  * ./plugins/network/ipv6.c: enabled IPv6 multicast support.
+  * ./plugins/dvd/dvd_es.c: error in selecting SPU stream.
+  * ./plugins/spudec/spu_decoder.c: endianness fix for subtitles colour.
+  * ./plugins/spudec/spu_decoder.c: little hack for preventing blank alpha
+    palette.
+  * ./plugins/spudec/spu_decoder.c: subtitle transparency support.
+  * ./plugins/macosx: new controls for audio output, and deinterlacing
+    support.
+  * ./plugins/macosx: fixed a bug with language and subtitle menus.
+  * ./plugins/access/http.c: should be more tolerant with old servers and
+    non-seekable streams.
+  * ./plugins/filter/deinterlace.c: backported new deinterlacing routines.
+  * ./include/threads.h, ./include/threads_funcs.h: backported the new Win32
+    cond_wait implementation from MAIN.
+  * ./plugins/gtk/gnome_callbacks.c: fixed a crash when activating preferences 
+    from the popup menu.
+
+0.4.1
+Mon,  3 Jun 2002 23:43:35 +0200
+
+  * ./plugins/gtk/gnome.glade: added lines this #@%$! Glade had munched, fixes
+    a segfault in the Gnome popup menu when toggling the interface.
+  * ./configure.in, ./plugins/mpeg_system/mpeg_ts.c: fixed libdvbpsi handling.
+  * ./src/misc/configuration.c: fixed the --nofoo option handling.
+  * ./src/interface/main.c: fixed two compilation warnings under Solaris.
+  * ./plugins/avi/avi.c, ./plugins/mpeg_system/mpeg_audio.c: ES will be
+    selected only once.
+  * ./plugins/win32/waveout.c: waveOutUnprepareHeader() was never being
+    called. This should fix the memory leak some people reported when using
+    the waveout plugin.
+  * ./src/misc/netutils.c: factored code common to the interfaces into the
+    network_ChannelJoin function.
+  * ./plugins/mga/xmga.c, ./plugins/x11/xcommon.c, ./plugins/sdl/vout_sdl.c,
+    ./plugins/directx/vout_events.c: we can now use keys F1 to F12 to switch
+    channels from the video output window.
+  * ./plugins/motion/motionmmx.c: MMX motion optimizations courtesy of
+    Vladimir Chernyshov <greengrass@writeme.com>.
+  * ./plugins/dvdread/dvdread.c: disabled the dvdread plugin because it
+    currently sucks.
+  * ./src/misc/configuration.c, ./src/interface/main.c: we now accept --nofoo
+    and --no-foo as negations for --foo. Also, the --help output is nicer.
+  * ./plugins/macosx/*: rewrote the net panel for OS X
+  * ./plugins/qnx/vout_qnx.c: QNX compilation fix.
+  * ./plugins/spudec/spu_decoder.c: fixed a margin bug in the SPU renderer
+    which caused subtitles to appear slanted in odd width windows.
+  * ./plugins/gtk/gtk_display.c, ./plugins/win32/mainframe.cpp: we deactivate
+    popup menus when no stream is being played, even in network mode.
+  * ./src/input/mpeg_system.c: removed unnecessarily verbose message.
+  * ./src/video_output/video_output.c: fixed the "picture has invalid status"
+    bug which might have been the cause of crashes.
+  * ./plugins/filter/crop.c: attempt at an automatic border cropping filter,
+    using "--filter crop --autocrop".
+  * ./vlc.spec: added missing filters to the RPM generation.
+  * ./plugins/macosx/*: channel change support on Mac OS X.
+  * ./extras/MacOSX/Resources/vlc.icns: new OS X icon, courtesy of Benjamin
+    Mironer <bmironer@noos.fr>.
+  * ./plugins/filter/crop.c: crop filter. Usage examples:
+      --filter crop --crop-geometry 640x480
+      --filter crop --crop-geometry 320x200+10+10
+  * ./plugins/macosx/intf_vlc_wrapper.m: fixed a bug in the chapter handling.
+  * ./plugins/macosx/vout_vlc_wrapper.m: more keystrokes.
+  * ./plugins/chroma/i420_yuy2.h: simplified the chroma code. Please test
+    under BeOS and QNX.
+  * ./plugins/macosx/intf_vlc_wrapper.m: fix for non-ASCII filenames in the
+    MacOS X interface, courtesy of Watanabe Go <go@dsl.gr.jp>.
+  * ./plugins/chroma/i420_yuy2.h: fixed an old overflow bug spotted by
+    Rudolf Cornelissen.
+  * ./plugins/chroma/i420_rgb16.c: fix for skewed display in software RV32
+    mode, courtesy of Pascal Levesque.
+  * ./plugins/beos/InterfaceWindow.h: stopped more than one playlist being
+    opened.
+  * ./plugins/beos/InterfaceWindow.cpp: fixed segfault on exit with playlist
+    open.
+  * ./plugins/beos/vout_beos.cpp: corrected size of output window.
+  * ./plugins/a52/a52.c, ./plugins/satellite/satellite_tools.c: compilation
+    fixes for Solaris.
+  * ./plugins/sdl/aout_sdl.c: fixed an endianness issue created by a
+    brain-dead developer :p
+  * ./plugins/win32/mainframe.cpp: the "Eject" button is enabled only after we
+    played a dvd or vcd.
+  * ./plugins/win32/mainframe.cpp: the toolbar is now flat and less cubist.
+  * ./plugins/win32/mainframe.cpp: got rid of the ugly slider with some winXP
+    skins. 
+  * ./plugins/win32/messages.cpp: added a config option to limit the number of
+    messages in the log window (default is set to 500).
+  * ./plugins/mpeg_vdec/vpar_headers.c: don't try to deference a null
+    pointer.
+  * ./plugins/gtk/gnome.c: compilation fix.
+  * ./src/misc/netutils.c: removed the obsolete artificial delay when switching
+    channels.
+  * ./src/interface/intf_eject.c: added ejection code for Win32.
+  * ./plugins/win32/*: enabled the "Eject" button (thanks Ipkiss).
+  * ./include/configuration.h: changed ADD_BOOL and ADD_BOOL_WITH_SHORT config
+    macros to accept a default value as an argument.
+  * ./src/misc/configuration.c: modified the command line parsing to accept
+    --foo and --no-foo when a "foo" boolean config option is defined.
+  * ./src/interface/main.c: modified the help menu to indicate whether the
+    option is enabled or disabled by default.
+  * ./src/video_output/video_output.c: when the video output hasn't received
+    a new picture for a while, it redisplays the last displayed one. This will
+    be useful for DVD menus, but also solves the "picture becomes black when
+    vlc is paused" issue.
+  * ./plugins/dummy/dummy.c: added a CATEGORY_HINT to the config.
+  * ./plugins/x11/xcommon.c: small change to the ToggleFullscreen routine
+    to avoid a flickering during the switch.
+  * ./plugins/filters/*: fixed inconsistencies.
+  * ./plugins/win32/mainframe.dfm: new icons for the toolbar buttons.
+  * ./plugins/win32/network.cpp: URL can now start with "http://" in the
+    Network dialog box.
+  * ./plugins/win32/about.dfm: updated the About dialog box.
+  * ./include/video.h: added a b_force flag to picture_t so that we can force
+    the display of an image even if it is late.
+  * ./plugins/filter/*: filters are now configurable through the configuration
+    system. Patch from Sigmund Augdal <sigmunau@stud.ntnu.no>.
+  * ./po/vlc.pot: updated potfile.
+  * ./po/pl.po: polish translation, courtesy of Arkadiusz Lipiec
+    <A.Lipiec@elka.pw.edu.pl>.
+  * ./debian/control: updated Debian package descriptions.      
+  * ./plugins/aa/aa.c: removed all palette code as it was unused.
+  * ./plugins/aa/aa.c: moved the aa_fastrender call from vout_Display to
+    vout_Render.
+  * ./plugins/aa/aa.c: added support for resizing and right-click menu.
+  * ./src/input/mpeg_system.c: in order to make ac3 working in avi file, moved
+    some code from ac3 decoder to mpeg_system.c. (skip 3 bytes is now done in
+    mpeg_system.c and no longer in ac3 audio decoder).
+  * src/misc/netutils.c: tests if message from vlcs begins with 'E:' or 'I:'
+    instead of testing 'E: ' and 'I: ' (to simplify miniVLCS).
+  * ./plugins/avi/avi.c, ./plugins/avi/libioRIFF.c: added more safety tests.
+  * ./include/inpu_ext-dec.h: added a check to fifo->b_die after the call
+    to BitstreamNextDataPacket() in GetChunk().
+
 0.4.0
 Thu, 23 May 2002 01:27:05 +0200
 
