@@ -1641,6 +1641,24 @@ AC_ARG_ENABLE(kde,
    fi])
 
 dnl
+dnl  Qt embedded module
+dnl
+AC_ARG_ENABLE(qte,
+  [  --enable-qte            Qt embedded interface support (default disabled)],
+  [if test "x${enable_qte}" = "xyes"; then
+     PLUGINS="${PLUGINS} gui/qte/qte"
+     qte_LDFLAGS="${qte_LDFLAGS} -lqte -L${QTEDIR}/lib"
+     qte_CFLAGS="${qte_CFLAGS} -I/usr/include/qte -I${QTEDIR}/include"
+     if test -x ${QTEDIR}/bin/moc
+     then
+       MOC=${QTEDIR}/bin/moc
+     else
+       MOC=moc
+     fi
+   fi])
+
+
+dnl
 dnl  MacOS X module
 dnl
 AC_ARG_ENABLE(macosx,
@@ -1971,6 +1989,7 @@ AC_SUBST(mad_CFLAGS)
 AC_SUBST(memcpyaltivec_CFLAGS)
 AC_SUBST(motionaltivec_CFLAGS)
 AC_SUBST(qt_CFLAGS)
+AC_SUBST(qte_CFLAGS)
 AC_SUBST(sdl_CFLAGS)
 AC_SUBST(x11_CFLAGS)
 AC_SUBST(xvideo_CFLAGS)
@@ -2018,6 +2037,7 @@ AC_SUBST(ncurses_LDFLAGS)
 AC_SUBST(oss_LDFLAGS)
 AC_SUBST(qnx_LDFLAGS)
 AC_SUBST(qt_LDFLAGS)
+AC_SUBST(qte_LDFLAGS)
 AC_SUBST(rc_LDFLAGS)
 AC_SUBST(sdl_LDFLAGS)
 AC_SUBST(vcd_LDFLAGS)

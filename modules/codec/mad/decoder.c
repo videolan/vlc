@@ -165,7 +165,7 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
         msg_Dbg( p_fifo, "downscale default fast selected" );
     }
 
-		if (psz_downscale) free(psz_downscale);
+	if (psz_downscale) free(psz_downscale);
 
     /* Initialize the libmad decoder structures */
     p_mad_adec->libmad_decoder = (struct mad_decoder*) malloc(sizeof(struct mad_decoder));
