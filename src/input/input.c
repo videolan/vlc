@@ -705,6 +705,16 @@ static __inline__ void input_DemuxTS( input_thread_t *p_input,
             intf_DbgMsg("Duplicate packet received by TS demux\n");
             b_trash = 1;
         }
+        else if( p_es_descriptor->i_continuity_counter == 0xFF )
+        {
+            /* This means that the packet is the first one we receive for this
+               ES since the continuity counter ranges between 0 and 0x0F
+               excepts when it has been initialized by the input: Init the 
+               counter to the correct value. */
+            intf_DbgMsg("First packet for PID %d received by TS demux\n",
+                        p_es_descriptor->i_id);
+            p_es_descriptor->i_continuity_counter = (p[3] & 0x0f);
+        }
         else
         {
             /* This can indicate that we missed a packet or that the
@@ -831,7 +841,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                      so the PES won't be usefull for any decoder. Moreover,
                      this should never happen so we can trash the packet and
                      exit roughly without regrets */
-                  intf_DbgMsg("PES packet too short: trashed\n");
+                  intf_DbgMsg("PES packet is too short: trashed\n");
                   input_NetlistFreePES( p_input, p_pes );
                   p_pes = NULL;
                   /* Stats ?? */

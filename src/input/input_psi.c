@@ -1167,7 +1167,7 @@ static pgrm_descriptor_t* AddPgrmDescr( stream_descriptor_t* p_stream,
 }
 
 /******************************************************************************
- * AddPgrmDescr: destroy a program descriptor
+ * DestroyPgrmDescr: destroy a program descriptor
  ******************************************************************************
  * All ES descriptions referenced in the descriptor will be deleted.
  ******************************************************************************/
@@ -1253,6 +1253,7 @@ static es_descriptor_t* AddESDescr(input_thread_t* p_input,
     p_es->i_type = 0;  /* ??? */
     p_es->b_psi = 0;
     p_es->b_pcr = 0;
+    p_es->i_continuity_counter = 0xFF;
     
     p_es->p_pes_packet = NULL;
 //    p_es->p_next_pes_packet = NULL;
@@ -1269,7 +1270,7 @@ static es_descriptor_t* AddESDescr(input_thread_t* p_input,
                    i_es_pid, p_pgrm->i_number );
     }
     else
-      intf_DbgMsg( "Added ES %d not added to the definition of any pgrm\n",
+      intf_DbgMsg( "ES %d not added to the definition of any pgrm\n",
                    i_es_pid );
   }
   

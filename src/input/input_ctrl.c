@@ -135,7 +135,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
 
                 /* Initialise the demux */
                 p_input->p_es[i_es_loop].p_pes_packet = NULL;
-                p_input->p_es[i_es_loop].i_continuity_counter = 0;
+                p_input->p_es[i_es_loop].i_continuity_counter = 0xFF;
                 p_input->p_es[i_es_loop].b_random = 0;
 		
                 /* Mark stream to be demultiplexed. */
