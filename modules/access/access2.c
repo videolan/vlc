@@ -44,12 +44,18 @@ vlc_module_begin();
     add_shortcut( "ftp" );
     add_shortcut( "tcp" );
     add_shortcut( "pvr" );
+
     add_shortcut( "file" );
     add_shortcut( "stream" );
     add_shortcut( "kfir" );
 
-    /* Hack */
-    //add_shortcut( "file" );
+    add_shortcut( "udp" );
+    add_shortcut( "udp4" );
+    add_shortcut( "udp6" );
+
+    add_shortcut( "rtp" );
+    add_shortcut( "rtp4" );
+    add_shortcut( "rtp6" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -67,6 +73,8 @@ typedef struct
 
     int i_title;
     input_title_t **title;
+
+    vlc_bool_t b_first_read;
 
 } access2_sys_t;
 
@@ -183,6 +191,7 @@ static int Access2Open( vlc_object_t * p_this )
 
     p_sys->p_access = p_access;
     p_sys->p_block = NULL;
+    p_sys->b_first_read = VLC_TRUE;
 
     return VLC_SUCCESS;
 }
@@ -252,10 +261,14 @@ static int  Access2Read( input_thread_t *p_input, byte_t *p_buffer, size_t i_len
         }
 
         i_copy = __MIN( i_len - i_total, p_sys->p_block->i_buffer );
-        memcpy( &p_buffer[i_total], p_sys->p_block->p_buffer, i_copy );
+        if( i_copy > 0 )
+        {
+            memcpy( &p_buffer[i_total], p_sys->p_block->p_buffer, i_copy );
 
-        p_sys->p_block->i_buffer -= i_copy;
-        p_sys->p_block->p_buffer += i_copy;
+            p_sys->p_block->i_buffer -= i_copy;
+            p_sys->p_block->p_buffer += i_copy;
+        }
+
         if( p_sys->p_block->i_buffer <= 0 )
         {
             block_Release( p_sys->p_block );
@@ -265,6 +278,16 @@ static int  Access2Read( input_thread_t *p_input, byte_t *p_buffer, size_t i_len
         i_total += i_copy;
     }
 update:
+    if( p_sys->b_first_read )
+    {
+        /* Some access update it only after first read (like udp) */
+        if( p_access->psz_demux && *p_access->psz_demux )
+        {
+            if( !p_input->psz_demux || *p_input->psz_demux == '\0' )
+                p_input->psz_demux = strdup( p_access->psz_demux );
+        }
+        p_sys->b_first_read = VLC_FALSE;
+    }
     if( p_access->info.i_update & INPUT_UPDATE_SIZE )
     {
         vlc_mutex_lock( &p_input->stream.stream_lock );
