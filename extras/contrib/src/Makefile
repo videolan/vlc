@@ -643,9 +643,10 @@ libdvdnav-$(LIBDVDNAV_VERSION).tar.gz:
 
 libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/dvdnav.patch
 
 .dvdnav: libdvdnav .dvdread
-	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
+	(cd $<; autoconf && ./configure --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
