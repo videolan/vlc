@@ -2,7 +2,7 @@
  * x11_dragdrop.cpp: X11 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_dragdrop.cpp,v 1.3 2003/06/09 00:07:09 asmax Exp $
+ * $Id: x11_dragdrop.cpp,v 1.4 2003/06/09 00:32:58 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -171,21 +171,34 @@ void X11DropObject::DndDrop( ldata_t data )
     XGetWindowProperty( display, src, propAtom, 0, 1024, False, 
                         AnyPropertyType, &type, &format, &nitems, &nbytes, 
                         (unsigned char**)&buffer );
-    string selection = buffer;
+    string selection = "";
+    if( buffer != NULL )
+    {
+        selection = buffer;
+    }
     XFree( buffer );
     XUNLOCK;
-    
-    // Find the protocol, if any
-    string::size_type pos = selection.find( ":", 0 );
-    if( selection.find("///", pos + 1 ) == pos + 1 )
+ 
+    if( selection != "" )
     {
-        selection.erase( pos + 1, 2 );
-    }
+        // TODO: multiple files handling
+        string::size_type end = selection.find( "\n", 0 );
+        selection = selection.substr( 0, end -1 );     
+        end = selection.find( "\r", 0 );
+        selection = selection.substr( 0, end -1 );
+
+        // Find the protocol, if any
+        string::size_type pos = selection.find( ":", 0 );
+        if( selection.find("///", pos + 1 ) == pos + 1 )
+        {
+            selection.erase( pos + 1, 2 );
+        }
     
-    char *name = new char[selection.size()+1];
-    strncpy( name, selection.c_str(), selection.size()+1 );
-    msg_Dbg( p_intf, "drop: %s\n", name );
-    OSAPI_PostMessage( NULL, VLC_DROP, (unsigned int)name, 0 );
+        char *name = new char[selection.size()+1];
+        strncpy( name, selection.c_str(), selection.size()+1 );
+        msg_Dbg( p_intf, "drop: %s\n", name );
+        OSAPI_PostMessage( NULL, VLC_DROP, (unsigned int)name, 0 );
+    }
     
     // Tell the source we accepted the drop
     XEvent event;
@@ -201,4 +214,5 @@ void X11DropObject::DndDrop( ldata_t data )
     XSendEvent( display, src, False, 0, &event );
     XUNLOCK;
 }
+
 #endif
