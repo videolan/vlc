@@ -518,10 +518,37 @@ static void QTScaleMatrix( vout_thread_t *p_vout )
 
     GetPortBounds( p_vout->p_sys->p_qdport, &s_rect );
 
-    factor_x = FixDiv( Long2Fix( s_rect.right - s_rect.left ),
-                       Long2Fix( p_vout->output.i_width ) );
-    factor_y = FixDiv( Long2Fix( s_rect.bottom - s_rect.top ),
-                       Long2Fix( p_vout->output.i_height ) );
+    if( (s_rect.bottom - s_rect.top) * p_vout->render.i_aspect
+        < (s_rect.right - s_rect.left) * VOUT_ASPECT_FACTOR )
+    {
+        factor_x = FixDiv( Long2Fix( (s_rect.bottom - s_rect.top)
+                            * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR ),
+                           Long2Fix( p_vout->render.i_width ) );
+        factor_y = FixDiv( Long2Fix( s_rect.bottom - s_rect.top ),
+                           Long2Fix( p_vout->render.i_height ) );
+#if 0
+        p_vout->p_sys->display_rect.top = 0;
+        p_vout->p_sys->display_rect.bottom = s_rect.bottom - s_rect.top;
+        p_vout->p_sys->display_rect.left = 12;
+        p_vout->p_sys->display_rect.right = 12 + (s_rect.bottom - s_rect.top)
+                            * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
+#endif
+    }
+    else
+    {
+        factor_x = FixDiv( Long2Fix( s_rect.right - s_rect.left ),
+                           Long2Fix( p_vout->render.i_width ) );
+        factor_y = FixDiv( Long2Fix( (s_rect.right - s_rect.left)
+                            * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect ),
+                           Long2Fix( p_vout->render.i_height ) );
+#if 0
+        p_vout->p_sys->display_rect.top = 12;
+        p_vout->p_sys->display_rect.bottom = 12 + (s_rect.right - s_rect.left)
+                            * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
+        p_vout->p_sys->display_rect.left = 0;
+        p_vout->p_sys->display_rect.right = s_rect.right - s_rect.left;
+#endif
+    }
 
     SetIdentityMatrix( p_vout->p_sys->p_matrix );
     ScaleMatrix( p_vout->p_sys->p_matrix,
