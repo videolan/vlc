@@ -122,7 +122,7 @@ vlc_module_begin();
                  NORM_LONGTEXT, VLC_FALSE );
        change_integer_list( i_norm_list, psz_norm_list_text, 0 );
     add_integer( "pvr-width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
-    add_integer( "pvr-height", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT,
+    add_integer( "pvr-height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT,
                  VLC_TRUE );
     add_integer( "pvr-frequency", -1, NULL, FREQUENCY_TEXT, FREQUENCY_LONGTEXT,
                  VLC_FALSE );

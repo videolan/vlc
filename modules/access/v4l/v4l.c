@@ -7,6 +7,7 @@
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
  *         Gildas Bazin <gbazin@videolan.org>
+ *         Benjamin Pracht <bigben at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,6 +86,56 @@ static void Close( vlc_object_t * );
 #define CHROMA_LONGTEXT N_( \
     "Force the Video4Linux video device to use a specific chroma format " \
     "(eg. I420 (default), RV24, etc.)")
+#define FREQUENCY_TEXT N_( "Frequency" )
+#define FREQUENCY_LONGTEXT N_( \
+    "Frequency to capture (in kHz), if applicable" )
+#define CHANNEL_TEXT N_( "Channel" )
+#define CHANNEL_LONGTEXT N_( \
+    "Channel of the card to use (Usually, 0 = tuner, " \
+    "1 = composite, 2 = svideo)" )
+#define NORM_TEXT N_( "Norm" )
+#define NORM_LONGTEXT N_( \
+    "Defines the norm of the stream (Automatic, SECAM, PAL, or NTSC)" )
+#define AUDIO_TEXT N_( "Audio Channel" )
+#define AUDIO_LONGTEXT N_( \
+    "Audio Channel to use, if there are several audio input" )
+#define WIDTH_TEXT N_( "Width" )
+#define WIDTH_LONGTEXT N_( "Width of the stream to capture " \
+    "(-1 for autodetect)" )
+#define HEIGHT_TEXT N_( "Height" )
+#define HEIGHT_LONGTEXT N_( "Height of the stream to capture " \
+    "(-1 for autodetect)" )
+#define BRIGHTNESS_TEXT N_( "Brightness" )
+#define BRIGHTNESS_LONGTEXT N_( \
+    "Set the Brightness of the video input" )
+#define HUE_TEXT N_( "Hue" )
+#define HUE_LONGTEXT N_( \
+    "Set the Hue of the video input" )
+#define COLOUR_TEXT N_( "Colour" )
+#define COLOUR_LONGTEXT N_( \
+    "Set the Colour of the video input" )
+#define CONTRAST_TEXT N_( "Contrast" )
+#define CONTRAST_LONGTEXT N_( \
+    "Set the Contrast of the video input" )
+#define TUNER_TEXT N_( "Tuner" )
+#define TUNER_LONGTEXT N_( "Tuner to use, if there are several ones" )
+#define SAMPLERATE_TEXT N_( "Samplerate" )
+#define SAMPLERATE_LONGTEXT N_( \
+    "Samplerate of the captures audio stream, in Hz" )
+#define STEREO_TEXT N_( "Stereo" )
+#define STEREO_LONGTEXT N_( \
+    "If this option is set, the audio stream will be captured in stereo" )
+#define MJPEG_TEXT N_( "MJPEG" )
+#define MJPEG_LONGTEXT N_(  \
+    "Set this option if the capture device outputs MJPEG" )
+#define DECIMATION_TEXT N_( "Decimation" )
+#define DECIMATION_LONGTEXT N_( \
+    "Set the Decimation level for MJPEG streams" )
+#define QUALITY_TEXT N_( "Quality" )
+#define QUALITY_LONGTEXT N_( "Set the quality of the stream" )
+#define FPS_TEXT N_( "Framerate" )
+#define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
+    "(-1 for auto)" )
 
 vlc_module_begin();
     set_shortname( _("Video4Linux") );
@@ -100,6 +151,35 @@ vlc_module_begin();
                 VLC_FALSE );
     add_string( "v4l-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 VLC_TRUE );
+    add_float( "v4l-fps", -1.0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
+    add_integer( "v4l-samplerate", 44100, NULL, SAMPLERATE_TEXT,
+                SAMPLERATE_LONGTEXT, VLC_TRUE );
+    add_integer( "v4l-channel", 0, NULL, CHANNEL_TEXT, CHANNEL_LONGTEXT,
+                VLC_TRUE );
+    add_integer( "v4l-tuner", -1, NULL, TUNER_TEXT, TUNER_LONGTEXT, VLC_TRUE );
+    add_integer( "v4l-norm", VIDEO_MODE_AUTO, NULL, NORM_TEXT, NORM_LONGTEXT,
+                VLC_FALSE );
+    add_integer( "v4l-frequency", -1, NULL, FREQUENCY_TEXT, FREQUENCY_LONGTEXT,
+                VLC_FALSE );
+    add_integer( "v4l-audio", -1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, VLC_TRUE );
+    add_bool( "v4l-stereo", VLC_TRUE, NULL, STEREO_TEXT, STEREO_LONGTEXT,
+            VLC_TRUE );
+    add_integer( "v4l-width", 0, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
+    add_integer( "v4l-height", 0, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT,
+                VLC_TRUE );
+    add_integer( "v4l-brightness", -1, NULL, BRIGHTNESS_TEXT,
+                BRIGHTNESS_LONGTEXT, VLC_TRUE );
+    add_integer( "v4l-colour", -1, NULL, COLOUR_TEXT, COLOUR_LONGTEXT,
+                VLC_TRUE );
+    add_integer( "v4l-hue", -1, NULL, HUE_TEXT, HUE_LONGTEXT, VLC_TRUE );
+    add_integer( "v4l-contrast", -1, NULL, CONTRAST_TEXT, CONTRAST_LONGTEXT,
+                VLC_TRUE );
+    add_bool( "v4l-mjpeg", VLC_FALSE, NULL, MJPEG_TEXT, MJPEG_LONGTEXT,
+            VLC_TRUE );
+    add_integer( "v4l-decimation", 1, NULL, DECIMATION_TEXT,
+            DECIMATION_LONGTEXT, VLC_TRUE );
+    add_integer( "v4l-quality", 100, NULL, QUALITY_TEXT, QUALITY_LONGTEXT,
+            VLC_TRUE );
 
     add_shortcut( "v4l" );
     set_capability( "access_demux", 10 );
