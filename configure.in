@@ -407,11 +407,23 @@ dnl
 dnl  XVideo module
 dnl
 AC_ARG_ENABLE(xvideo,
-  [  --enable-xvideo         XVideo interface support (default disabled)],
-  [if test x$enable_xvideo = xyes; then
-     PLUGINS="${PLUGINS} xvideo"
-     LIB_XVIDEO="-L/usr/X11R6/lib -lX11 -lXext -lXv"
-   fi])
+  [  --disable-xvideo        XVideo support (default enabled)])
+if test x$enable_xvideo != xno; then
+  if test x$x_includes = xNONE; then
+    x_includes=/usr/X11R6/include
+  fi
+  if test x$x_libraries = xNONE; then
+    x_libraries=/usr/X11R6/lib
+  fi
+  saved_CPPFLAGS=$CPPFLAGS
+  CPPFLAGS="$CPPFLAGS -I$x_includes"
+  AC_CHECK_HEADERS(X11/extensions/Xv.h, [
+    PLUGINS="${PLUGINS} xvideo"
+    LIB_XVIDEO="-L$x_libraries -lX11 -lXext -lXv"
+    CFLAGS_X11="-I$x_includes"
+  ]
+  CPPFLAGS=$saved_CPPFLAGS)
+fi
 
 dnl
 dnl  ALSA module

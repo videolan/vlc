@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_text.c,v 1.23 2001/04/12 01:52:45 sam Exp $
+ * $Id: video_text.c,v 1.24 2001/04/25 09:31:14 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -376,6 +376,12 @@ vout_font_t *vout_LoadFont( const char *psz_name )
  *****************************************************************************/
 void vout_UnloadFont( vout_font_t *p_font )
 {
+    /* If no font was loaded, do nothing */
+    if( p_font == NULL )
+    {
+        return;
+    }
+
     intf_DbgMsg( "vout: unloading font %p", p_font );
     free( p_font->p_data );
     free( p_font );
@@ -389,6 +395,13 @@ void vout_UnloadFont( vout_font_t *p_font )
  *****************************************************************************/
 void vout_TextSize( vout_font_t *p_font, int i_style, const char *psz_text, int *pi_width, int *pi_height )
 {
+    /* If no font was loaded, do nothing */
+    if( p_font == NULL )
+    {
+        *pi_width = *pi_height = 0;
+        return;
+    }
+
     switch( p_font->i_type )
     {
     case VOUT_FIXED_FONT:
@@ -425,6 +438,12 @@ void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int 
     int         i_font_bytes_per_line, i_font_height;     /* font properties */
     int         i_position, i_end;                      /* current position  */
     vout_put_byte_t *p_PutByte;                          /* PutByte function */
+
+    /* If no font was loaded, do nothing */
+    if( p_font == NULL )
+    {
+        return;
+    }
 
     /* FIXME: background: can be something else that whole byte ?? */
 

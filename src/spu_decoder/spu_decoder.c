@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.35 2001/04/06 09:15:48 sam Exp $
+ * $Id: spu_decoder.c,v 1.36 2001/04/25 09:31:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -303,7 +303,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
                   p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y,
                   p_spu->type.spu.i_offset[0], p_spu->type.spu.i_offset[1] );
 
-    /* SPU is finished - we can tell the video output to display it */
+    /* SPU is finished - we can ask the video output to display it */
     vout_DisplaySubPicture( p_spudec->p_vout, p_spu );
 
     /* Clean up */
@@ -352,11 +352,9 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                 case SPU_CMD_FORCE_DISPLAY:
  
                     /* 00 (force displaying) */
- 
                     break;
  
-                /* FIXME: here we have to calculate dates. It's around
-                 * i_date * 12000 but I don't know how much exactly. */
+                /* Convert the dates in seconds to PTS values */
                 case SPU_CMD_START_DISPLAY:
  
                     /* 01 (start displaying) */
@@ -418,12 +416,11 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                 case SPU_CMD_END:
  
                     /* ff (end) */
- 
                     break;
  
                 default:
  
-                    /* ?? (unknown command) */
+                    /* xx (unknown command) */
                     intf_ErrMsg( "spudec error: unknown command 0x%.2x",
                                  i_command );
                     return( 1 );
@@ -466,7 +463,8 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
 
             /* More than one padding byte - this is very strange, but
              * we can deal with it */
-            intf_WarnMsg( 2, "spudec warning: %i padding bytes",
+            intf_WarnMsg( 2, "spudec warning: %i padding bytes, we usually "
+                             "get 1 or none",
                           p_spudec->i_spu_size - i_index );
 
             while( i_index < p_spudec->i_spu_size )
@@ -501,10 +499,11 @@ static int ParseRLE( u8 *p_src, subpicture_t * p_spu )
     u16 *p_dest = (u16 *)p_spu->p_data;
 
     /* The subtitles are interlaced, we need two offsets */
-    unsigned int  pi_table[2];
+    unsigned int  pi_table[ 2 ];
     unsigned int *pi_offset;
-    pi_table[0] = p_spu->type.spu.i_offset[0] << 1;
-    pi_table[1] = p_spu->type.spu.i_offset[1] << 1;
+
+    pi_table[ 0 ] = p_spu->type.spu.i_offset[ 0 ] << 1;
+    pi_table[ 1 ] = p_spu->type.spu.i_offset[ 1 ] << 1;
 
     for( i_y = 0 ; i_y < i_height ; i_y++ )
     {
@@ -537,8 +536,8 @@ static int ParseRLE( u8 *p_src, subpicture_t * p_spu )
                             else
                             {
                                 /* We have a boo boo ! */
-                                intf_ErrMsg( "spudec error: unknown code %.4x",
-                                             i_code );
+                                intf_ErrMsg( "spudec error: unknown RLE code "
+                                             "0x%.4x", i_code );
                                 return( 1 );
                             }
                         }

@@ -74,7 +74,7 @@ Description: Full DVD navigation
 Status: Todo
 
 Task: 0x56
-Difficulty: Important
+Difficulty: Hard
 Urgency: Normal
 Description: XVideo video output
  XVideo is reported to work a bit better than the SDL wrapper on some
@@ -141,7 +141,7 @@ Status: Todo
 
 Task: 0x4e
 Difficulty: Hard
-Urgency: High
+Urgency: Important
 Description: Write stream zones support
  For random access we need to know where stream descriptors are valid
  and reside (essentially DVD plugin). -> Meuuh
@@ -516,7 +516,7 @@ Description: Rewrite input for Program Stream files
  Currently when we read a PS file, it is first translated to TS
  because we first had only PS support. Now time has come to get
  rid of this ugly kludge and integrate a proper PS input.
-Status: Done because of Input II on 5 Dec 2000 (Meuuh)
+Status: Done 5 Dec 2000 (Meuuh) because of Input II
 
 Task: 0x1f
 Difficulty: Hard
@@ -625,7 +625,7 @@ Urgency: Wishlist
 Description: Support MPEG1 timecodes
  The vlc can parse an MPEG1 system stream, but the parsed
  PCR values do not seem to be correct. Check what's wrong.
-Status: Done because of Input II on 5 Dec 2000 (Meuuh)
+Status: Done 5 Dec 2000 (Meuuh) because of Input II
 
 Task: 0x12
 Difficulty: Medium
@@ -745,7 +745,7 @@ Description: Optimize video parser
  The video parser has some speed issues currently unexplained:
  even though most functions are inlined, it keeps eating more
  CPU than it should. This has to be investigated.
-Status: Done because of Input II on 5 Dec 2000 (Meuuh)
+Status: Done 5 Dec 2000 (Meuuh) because of Input II
 
 Task: 0x05
 Difficulty: Easy
@@ -754,7 +754,7 @@ Description: Backport vlms input
  The vlc uses the same file input code as the vlms (VideoLAN
  Mini Server) which has been much improved. Someone should
  port modifications done to the vlms back to the vlc.
-Status: Done because of Input II on 5 Dec 2000 (Meuuh)
+Status: Done 5 Dec 2000 (Meuuh) because of Input II
 
 Task: 0x04
 Difficulty: Medium

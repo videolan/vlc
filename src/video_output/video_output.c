@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.117 2001/03/21 13:42:34 sam Exp $
+ * $Id: video_output.c,v 1.118 2001/04/25 09:31:14 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -228,19 +228,12 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
     if( p_vout->p_default_font == NULL )
     {
         intf_ErrMsg( "vout error: could not load default font" );
-        p_vout->pf_destroy( p_vout );
-        free( p_vout );
-        return( NULL );
     }
 
     p_vout->p_large_font = vout_LoadFont( VOUT_LARGE_FONT );
     if( p_vout->p_large_font == NULL )
     {
         intf_ErrMsg( "vout error: could not load large font" );
-        vout_UnloadFont( p_vout->p_default_font );
-        p_vout->pf_destroy( p_vout );
-        free( p_vout );
-        return( NULL );
     }
 
     /* Create thread and set locks */

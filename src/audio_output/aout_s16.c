@@ -2,7 +2,6 @@
  * aout_s16.c: 16 bit signed audio output functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_s16.c,v 1.2 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -86,12 +85,23 @@ void aout_S16StereoThread( aout_thread_t * p_aout )
         }
 
         l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );
+	//fprintf(stderr,"l_bytes 1: %li\n",l_bytes);
+	//fprintf(stderr,"  playing...\n");
         p_aout->date = mdate() + ((((mtime_t)(l_bytes / 4)) * 1000000) / ((mtime_t)p_aout->l_rate)); /* sizeof(s16) << (p_aout->b_stereo) == 4 */
         p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(s16) );
+	//fprintf(stderr,"l_bytes #: %li\n",p_aout->pf_getbufinfo( p_aout, l_buffer_limit ));
         if ( l_bytes > (l_buffer_limit * sizeof(s16)) )
         {
-            msleep( p_aout->l_msleep );
+	//fprintf(stderr,"  sleeping...\n");
+            msleep( p_aout->l_msleep / 2);
+        l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );
+	//fprintf(stderr,"l_bytes *: %li\n",l_bytes);
+            msleep( p_aout->l_msleep / 2);
         }
+	else
+	//fprintf(stderr,"  not sleeping.\n");
+        l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );
+	//fprintf(stderr,"l_bytes 2: %li\n\n",l_bytes);
     }
 
     vlc_mutex_lock( &p_aout->fifos_lock );

@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: intf_msg.c,v 1.29 2001/04/25 06:56:47 benny Exp $
+ * $Id: intf_msg.c,v 1.30 2001/04/25 09:31:14 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -576,7 +576,17 @@ static void PrintMsg( intf_msg_item_t *p_msg )
 {
     char    psz_date[MSTRTIME_MAX_SIZE];            /* formatted time buffer */
     int     i_msg_len = MSTRTIME_MAX_SIZE + strlen(p_msg->psz_msg) + 200;
-    char    psz_msg[i_msg_len];                            /* message buffer */
+    char   *psz_msg;                                       /* message buffer */
+
+    psz_msg = malloc( sizeof( char ) * i_msg_len );
+
+    /* Check if allocation succeeded */
+    if( psz_msg == NULL )
+    {
+        fprintf( stderr, "error: not enough memory for message %s\n",
+                 p_msg->psz_msg );
+        return;
+    }
 
     /* Format message - the message is formatted here because in case the log
      * file is used, it avoids another format string parsing */
@@ -604,14 +614,6 @@ static void PrintMsg( intf_msg_item_t *p_msg )
                   psz_date, p_msg->psz_file, p_msg->psz_function, p_msg->i_line,
                   p_msg->psz_msg );
         break;
-    }
-
-    /* Check if formatting function succeeded */
-    if( psz_msg == NULL )
-    {
-        fprintf( stderr, "error: can not format message (%s): %s\n",
-                 strerror( errno ), p_msg->psz_msg );
-        return;
     }
 
     /*
@@ -642,6 +644,9 @@ static void PrintMsg( intf_msg_item_t *p_msg )
         fwrite( "\n", 1, 1, p_main->p_msg->p_log_file );
     }
 #endif
+
+    /* Free the message */
+    free( psz_msg );
 }
 
 #else
