@@ -115,7 +115,7 @@ if test "${action}" = "changelog"
 then
   YEAR="`date +%Y`"
   echo "toolbox --changelog no longer required. use this instead:"
-  echo " svn log -v -r '{$YEAR-01-01}:{$YEAR-12-31}' > ChangeLog"
+  echo " svn log -v -r '{$YEAR-12-31}:{$YEAR-01-01}' > ChangeLog"
   exit 0
 fi
 
