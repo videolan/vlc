@@ -2,7 +2,7 @@
  * dts.c : raw DTS stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dts.c,v 1.1 2003/12/01 23:39:11 gbazin Exp $
+ * $Id: dts.c,v 1.2 2004/01/21 17:56:05 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -29,6 +29,7 @@
 #include <vlc_codec.h>
 
 #define DTS_PACKET_SIZE 16384
+#define DTS_MAX_HEADER_SIZE 11
 
 /*****************************************************************************
  * Local prototypes
@@ -64,21 +65,46 @@ static int Open( vlc_object_t * p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux_sys_t    *p_sys;
     byte_t *       p_peek;
+    int            i_peek = 0;
 
     p_input->pf_demux = Demux;
     p_input->pf_demux_control = demux_vaControlDefault;
     p_input->pf_rewind = NULL;
 
-    /* Have a peep at the show. */
-    if( input_Peek( p_input, &p_peek, 4 ) < 4 )
+    /* Check if we are dealing with a WAV file */
+    if( input_Peek( p_input, &p_peek, 12 ) == 12 &&
+        !strncmp( p_peek, "RIFF", 4 ) && !strncmp( &p_peek[8], "WAVE", 4 ) )
     {
-        /* Stream shorter than 4 bytes... */
+        /* Skip the wave header */
+        i_peek = 12 + 8;
+        while( input_Peek( p_input, &p_peek, i_peek ) == i_peek &&
+               strncmp( p_peek + i_peek - 8, "data", 4 ) )
+        {
+            i_peek += GetDWLE( p_peek + i_peek - 4 ) + 8;
+        }
+    }
+
+    /* Have a peep at the show. */
+    if( input_Peek( p_input, &p_peek, i_peek + DTS_MAX_HEADER_SIZE ) <
+        i_peek + DTS_MAX_HEADER_SIZE )
+    {
+        /* Stream too short */
         msg_Err( p_input, "cannot peek()" );
         return VLC_EGENERIC;
     }
 
-    if( p_peek[0] != 0x7f || p_peek[1] != 0xfe ||
-        p_peek[2] != 0x80 || p_peek[3] != 0x01 )
+    /* 14 bits, little endian version of the bitstream */
+    if( p_peek[i_peek + 0] == 0xff && p_peek[i_peek + 1] == 0x1f &&
+        p_peek[i_peek + 2] == 0x00 && p_peek[i_peek + 3] == 0xe8 &&
+        (p_peek[i_peek + 4] & 0xf0) == 0xf0 && p_peek[i_peek + 5] == 0x07 )
+    {
+    }
+    /* 16 bits, big endian version of the bitstream */
+    else if( p_peek[i_peek + 0] == 0x7f && p_peek[i_peek + 1] == 0xfe &&
+             p_peek[i_peek + 2] == 0x80 && p_peek[i_peek + 3] == 0x01 )
+    {
+    }
+    else
     {
         if( p_input->psz_demux && !strncmp( p_input->psz_demux, "dts", 3 ) )
         {

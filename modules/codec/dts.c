@@ -2,7 +2,7 @@
  * dts.c: parse DTS audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dts.c,v 1.9 2003/12/22 14:32:55 sam Exp $
+ * $Id: dts.c,v 1.10 2004/01/21 17:56:05 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -30,7 +30,7 @@
 
 #include "vlc_block_helper.h"
 
-#define DTS_HEADER_SIZE 10
+#define DTS_HEADER_SIZE 12
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
@@ -82,7 +82,8 @@ static int  OpenPacketizer( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 static void *DecodeBlock  ( decoder_t *, block_t ** );
 
-static int  SyncInfo      ( const byte_t *, unsigned int *, unsigned int *,
+static inline int SyncCode( const uint8_t * );
+static int  SyncInfo      ( const uint8_t *, unsigned int *, unsigned int *,
                             unsigned int *, unsigned int *, unsigned int * );
 
 static uint8_t       *GetOutBuffer ( decoder_t *, void ** );
@@ -190,12 +191,11 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         switch( p_sys->i_state )
         {
         case STATE_NOSYNC:
-            /* Look for sync dword - should be 0x7ffe8001 */
-            while( block_PeekBytes( &p_sys->bytestream, p_header, 4 )
+            /* Look for sync code - should be 0x7ffe8001 */
+            while( block_PeekBytes( &p_sys->bytestream, p_header, 6 )
                    == VLC_SUCCESS )
             {
-                if( p_header[0] == 0x7f && p_header[1] == 0xfe &&
-                    p_header[2] == 0x80 && p_header[3] == 0x01 )
+                if( SyncCode( p_header ) == VLC_SUCCESS )
                 {
                     p_sys->i_state = STATE_SYNC;
                     break;
@@ -251,19 +251,19 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             /* Check if next expected frame contains the sync word */
             if( block_PeekOffsetBytes( &p_sys->bytestream,
-                                       p_sys->i_frame_size, p_header, 4 )
+                                       p_sys->i_frame_size, p_header, 6 )
                 != VLC_SUCCESS )
             {
                 /* Need more data */
                 return NULL;
             }
 
-            if( p_header[0] != 0x7f || p_header[1] != 0xfe ||
-                p_header[2] != 0x80 || p_header[3] != 0x01 )
+            if( SyncCode( p_header ) != VLC_SUCCESS )
             {
                 msg_Dbg( p_dec, "emulated sync word "
                          "(no sync on following frame) %2.2x%2.2x%2.2x%2.2x",
-                         p_header[0], p_header[1], p_header[2], p_header[3] );
+                         (int)p_header[0], (int)p_header[1],
+                         (int)p_header[2], (int)p_header[3] );
                 p_sys->i_state = STATE_NOSYNC;
                 block_SkipByte( &p_sys->bytestream );
                 break;
@@ -422,49 +422,135 @@ static block_t *GetSoutBuffer( decoder_t *p_dec )
 /*****************************************************************************
  * SyncInfo: parse DTS sync info
  *****************************************************************************/
-static int SyncInfo( const byte_t * p_buf,
-                     unsigned int * pi_channels,
-                     unsigned int * pi_channels_conf,
-                     unsigned int * pi_sample_rate,
-                     unsigned int * pi_bit_rate,
-                     unsigned int * pi_frame_length )
+static const unsigned int ppi_dts_samplerate[] =
 {
-    unsigned int i_bit_rate;
-    unsigned int i_audio_mode;
-    unsigned int i_sample_rate;
+    0, 8000, 16000, 32000, 64000, 128000,
+    11025, 22050, 44010, 88020, 176400,
+    12000, 24000, 48000, 96000, 192000
+};
+
+static const unsigned int ppi_dts_bitrate[] =
+{
+    32000, 56000, 64000, 96000, 112000, 128000,
+    192000, 224000, 256000, 320000, 384000,
+    448000, 512000, 576000, 640000, 768000,
+    896000, 1024000, 1152000, 1280000, 1344000,
+    1408000, 1411200, 1472000, 1536000, 1920000,
+    2048000, 3072000, 3840000, 4096000, 0, 0
+};
+
+static int SyncInfo16be( const uint8_t *p_buf,
+                         unsigned int *pi_audio_mode,
+                         unsigned int *pi_sample_rate,
+                         unsigned int *pi_bit_rate,
+                         unsigned int *pi_frame_length )
+{
     unsigned int i_frame_size;
-    unsigned int i_frame_length;
 
-    static const unsigned int ppi_dts_samplerate[] =
-    {
-        0, 8000, 16000, 32000, 64000, 128000,
-        11025, 22050, 44010, 88020, 176400,
-        12000, 24000, 48000, 96000, 192000
-    };
-
-    static const unsigned int ppi_dts_bitrate[] =
-    {
-        32000, 56000, 64000, 96000, 112000, 128000,
-        192000, 224000, 256000, 320000, 384000,
-        448000, 512000, 576000, 640000, 768000,
-        896000, 1024000, 1152000, 1280000, 1344000,
-        1408000, 1411200, 1472000, 1536000, 1920000,
-        2048000, 3072000, 3840000, 4096000, 0, 0
-    };
-
-    if( (p_buf[0] != 0x7f) || (p_buf[1] != 0xfe) ||
-        (p_buf[2] != 0x80) || (p_buf[3] != 0x01) )
-    {
-        return( 0 );
-    }
-
-    i_frame_length = (p_buf[4] & 0x01) << 6 | (p_buf[5] >> 2);
+    *pi_frame_length = (p_buf[4] & 0x01) << 6 | (p_buf[5] >> 2);
     i_frame_size = (p_buf[5] & 0x03) << 12 | (p_buf[6] << 4) |
                    (p_buf[7] >> 4);
 
-    i_audio_mode = (p_buf[7] & 0x0f) << 2 | (p_buf[8] >> 6);
-    i_sample_rate = (p_buf[8] >> 2) & 0x0f;
-    i_bit_rate = (p_buf[8] & 0x03) << 3 | ((p_buf[9] >> 5) & 0x07);
+    *pi_audio_mode = (p_buf[7] & 0x0f) << 2 | (p_buf[8] >> 6);
+    *pi_sample_rate = (p_buf[8] >> 2) & 0x0f;
+    *pi_bit_rate = (p_buf[8] & 0x03) << 3 | ((p_buf[9] >> 5) & 0x07);
+
+    return i_frame_size + 1;
+}
+
+static int Buf14leTO16be( uint8_t *p_out, const uint8_t *p_in, int i_in )
+{
+    unsigned char tmp, cur = 0;
+    int bits_in, bits_out = 0;
+    int i, i_out = 0;
+
+    for( i = 0; i < i_in; i++  )
+    {
+	if( i%2 )
+	{
+	    tmp = p_in[i-1];
+	    bits_in = 8;
+	}
+	else
+	{
+	    tmp = p_in[i+1] & 0x3F;
+	    bits_in = 8 - 2;
+	}
+
+        if( bits_out < 8 )
+        {
+            int need = __MIN( 8 - bits_out, bits_in );
+            cur <<= need;
+            cur |= ( tmp >> (bits_in - need) );
+            tmp <<= (8 - bits_in + need);
+            tmp >>= (8 - bits_in + need);
+            bits_in -= need;
+            bits_out += need;
+        }
+
+        if( bits_out == 8 )
+        {
+            p_out[i_out] = cur;
+            cur = 0;
+            bits_out = 0;
+            i_out++;
+        }
+
+        bits_out += bits_in;
+        cur <<= bits_in;
+        cur |= tmp;
+    }
+
+    return i_out;
+}
+
+static inline int SyncCode( const uint8_t *p_buf )
+{
+    /* 14 bits, little endian version of the bitstream */
+    if( p_buf[0] == 0xff && p_buf[1] == 0x1f &&
+        p_buf[2] == 0x00 && p_buf[3] == 0xe8 &&
+        (p_buf[4] & 0xf0) == 0xf0 && p_buf[5] == 0x07 )
+    {
+        return VLC_SUCCESS;
+    }
+    /* 16 bits, big endian version of the bitstream */
+    else if( p_buf[0] == 0x7f && p_buf[1] == 0xfe &&
+             p_buf[2] == 0x80 && p_buf[3] == 0x01 )
+    {
+        return VLC_SUCCESS;
+    }
+    else return VLC_EGENERIC;
+}
+
+static int SyncInfo( const uint8_t *p_buf,
+                     unsigned int *pi_channels,
+                     unsigned int *pi_channels_conf,
+                     unsigned int *pi_sample_rate,
+                     unsigned int *pi_bit_rate,
+                     unsigned int *pi_frame_length )
+{
+    unsigned int i_audio_mode;
+    unsigned int i_frame_size;
+
+    /* 14 bits, little endian version of the bitstream */
+    if( p_buf[0] == 0xff && p_buf[1] == 0x1f &&
+        p_buf[2] == 0x00 && p_buf[3] == 0xe8 &&
+        (p_buf[4] & 0xf0) == 0xf0 && p_buf[5] == 0x07 )
+    {
+        uint8_t conv_buf[12];
+	Buf14leTO16be( conv_buf, p_buf, 12 );
+        i_frame_size = SyncInfo16be( conv_buf, &i_audio_mode, pi_sample_rate,
+                                     pi_bit_rate, pi_frame_length );
+	i_frame_size = i_frame_size * 8 / 14 * 2;
+    }
+    /* 16 bits, big endian version of the bitstream */
+    else if( p_buf[0] == 0x7f && p_buf[1] == 0xfe &&
+             p_buf[2] == 0x80 && p_buf[3] == 0x01 )
+    {
+        i_frame_size = SyncInfo16be( p_buf, &i_audio_mode, pi_sample_rate,
+                                     pi_bit_rate, pi_frame_length );
+    }
+    else return 0;
 
     switch( i_audio_mode )
     {
@@ -548,30 +634,27 @@ static int SyncInfo( const byte_t * p_buf,
                 *pi_channels = 0;
                 *pi_channels_conf = 0;
             }
-            else
-            {
-                return( 0 );
-            }
+            else return 0;
             break;
     }
 
-    if( i_sample_rate >= sizeof( ppi_dts_samplerate ) /
-                         sizeof( ppi_dts_samplerate[0] ) )
+    if( *pi_sample_rate >= sizeof( ppi_dts_samplerate ) /
+                           sizeof( ppi_dts_samplerate[0] ) )
     {
-        return( 0 );
+        return 0;
     }
 
-    *pi_sample_rate = ppi_dts_samplerate[ i_sample_rate ];
+    *pi_sample_rate = ppi_dts_samplerate[ *pi_sample_rate ];
 
-    if( i_bit_rate >= sizeof( ppi_dts_bitrate ) /
-                      sizeof( ppi_dts_bitrate[0] ) )
+    if( *pi_bit_rate >= sizeof( ppi_dts_bitrate ) /
+                        sizeof( ppi_dts_bitrate[0] ) )
     {
-        return( 0 );
+        return 0;
     }
 
-    *pi_bit_rate = ppi_dts_bitrate[ i_bit_rate ];
+    *pi_bit_rate = ppi_dts_bitrate[ *pi_bit_rate ];
 
-    *pi_frame_length = (i_frame_length + 1) * 32;
+    *pi_frame_length = (*pi_frame_length + 1) * 32;
 
-    return i_frame_size + 1;
+    return i_frame_size;
 }
