@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.14 2002/04/19 13:56:11 sam Exp $
+ * $Id: lpcm_adec.c,v 1.15 2002/05/24 12:42:14 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -191,7 +191,8 @@ void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
     }
     
     GetChunk( &p_lpcmdec->bit_stream, p_temp, LPCMDEC_FRAME_SIZE);
-    
+    if( p_lpcmdec->p_fifo->b_die ) return;
+
     for( i_loop = 0; i_loop < LPCMDEC_FRAME_SIZE/2; i_loop++ )
     {
         buffer[2*i_loop]=p_temp[2*i_loop+1];

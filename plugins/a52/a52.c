@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.11 2002/05/20 15:03:32 gbazin Exp $
+ * $Id: a52.c,v 1.12 2002/05/24 12:42:14 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -158,6 +158,7 @@ static int decoder_Run ( decoder_config_t *p_config )
 
         /* get a52 frame header */
         GetChunk( &p_a52_adec->bit_stream, p_a52_adec->p_frame_buffer, 7 );
+	if( p_a52_adec->p_fifo->b_die ) break;
 
         /* check if frame is valid and get frame info */
         p_a52_adec->frame_size = a52_syncinfo( p_a52_adec->p_frame_buffer,
@@ -171,7 +172,7 @@ static int decoder_Run ( decoder_config_t *p_config )
             continue;
         }
 
-        if( DecodeFrame( p_a52_adec ) )
+        if( DecodeFrame( p_a52_adec ) && !p_a52_adec->p_fifo->b_die )
         {
             DecoderError( p_config->p_decoder_fifo );
             free( p_a52_adec );
@@ -240,9 +241,9 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
     }
 
     /* Creating the audio output fifo if not created yet */
-    if (p_a52_adec->p_aout_fifo == NULL )
+    if( p_a52_adec->p_aout_fifo == NULL )
     {
-        p_a52_adec->p_aout_fifo = aout_CreateFifo( AOUT_FIFO_PCM, 
+        p_a52_adec->p_aout_fifo = aout_CreateFifo( AOUT_FIFO_PCM,
                                     p_a52_adec->i_channels,
                                     p_a52_adec->sample_rate,
                                     AC3DEC_FRAME_SIZE * p_a52_adec->i_channels,
@@ -279,6 +280,7 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
     /* Get the complete frame */
     GetChunk( &p_a52_adec->bit_stream, p_a52_adec->p_frame_buffer + 7,
               p_a52_adec->frame_size - 7 );
+    if( p_a52_adec->p_fifo->b_die ) return( -1 );
 
     /* do the actual decoding now */
     a52_frame( p_a52_adec->p_a52_state, p_a52_adec->p_frame_buffer,

@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.24 2002/05/17 18:01:25 stef Exp $
+ * $Id: ac3_spdif.c,v 1.25 2002/05/24 12:42:14 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -406,6 +406,8 @@ int ac3_parse_syncinfo( ac3_spdif_thread_t *p_spdif )
     /* Read sync frame */
     GetChunk( &p_spdif->bit_stream, p_spdif->p_ac3 + 2,
               sizeof(sync_frame_t) - 2 );
+    if( p_spdif->p_fifo->b_die ) return -1;
+
     p_sync_frame = (sync_frame_t*)p_spdif->p_ac3;
 
     /* Compute frame rate */

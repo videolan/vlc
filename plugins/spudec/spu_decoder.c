@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.23 2002/05/19 15:50:02 stef Exp $
+ * $Id: spu_decoder.c,v 1.24 2002/05/24 12:42:14 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -320,11 +320,12 @@ static void ParsePacket( spudec_thread_t *p_spudec )
     }
 
     /* Get RLE data */
-    for( i_offset = 0;
-         i_offset + SPU_CHUNK_SIZE < p_spudec->i_rle_size;
+    for( i_offset = 0; i_offset < p_spudec->i_rle_size;
          i_offset += SPU_CHUNK_SIZE )
     {
-        GetChunk( &p_spudec->bit_stream, p_src + i_offset, SPU_CHUNK_SIZE );
+        GetChunk( &p_spudec->bit_stream, p_src + i_offset,
+                  ( i_offset + SPU_CHUNK_SIZE < p_spudec->i_rle_size ) ?
+                  SPU_CHUNK_SIZE : p_spudec->i_rle_size - i_offset );
 
         /* Abort subtitle parsing if we were requested to stop */
         if( p_spudec->p_fifo->b_die )
@@ -334,9 +335,6 @@ static void ParsePacket( spudec_thread_t *p_spudec )
             return;
         }
     }
-
-    GetChunk( &p_spudec->bit_stream, p_src + i_offset,
-              p_spudec->i_rle_size - i_offset );
 
 #if 0
     /* Dump the subtitle info */
@@ -1202,4 +1200,3 @@ static void RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
         break;
     }
 }
-

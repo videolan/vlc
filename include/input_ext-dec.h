@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.58 2002/05/18 17:47:46 sam Exp $
+ * $Id: input_ext-dec.h,v 1.59 2002/05/24 12:42:14 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -505,9 +505,11 @@ static inline void GetChunk( bit_stream_t * p_bit_stream,
             p_buffer += i_available;
             i_buf_len -= i_available;
             BitstreamNextDataPacket( p_bit_stream );
+            if( p_bit_stream->p_decoder_fifo->b_die )
+                return;
         }
         while( (i_available = p_bit_stream->p_end - p_bit_stream->p_byte)
-                <= i_buf_len && !p_bit_stream->p_decoder_fifo->b_die );
+                <= i_buf_len );
 
         if( i_buf_len )
         {
