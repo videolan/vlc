@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.9 2002/11/26 22:20:18 gbazin Exp $
+ * $Id: directx.c,v 1.10 2003/01/05 13:39:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -176,7 +176,7 @@ static int OpenAudio( vlc_object_t *p_this )
     p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
     if( DirectxCreateSecondaryBuffer( p_aout ) )
     {
-        msg_Err( p_aout, "cannot create WAVE_FORMAT_IEEE_FLOAT buffer" );
+        msg_Dbg( p_aout, "cannot create WAVE_FORMAT_IEEE_FLOAT buffer" );
 
         p_aout->output.output.i_format = VLC_FOURCC('s','1','6','l');
         if( DirectxCreateSecondaryBuffer( p_aout ) )
@@ -191,7 +191,7 @@ static int OpenAudio( vlc_object_t *p_this )
     if( vlc_thread_create( p_aout->output.p_sys->p_notif,
                            "DirectSound Notification Thread",
                            DirectSoundThread,
-                           THREAD_PRIORITY_TIME_CRITICAL, 1 ) )
+                           VLC_THREAD_PRIORITY_HIGHEST, 1 ) )
     {
         msg_Err( p_aout, "cannot create DirectSoundThread" );
         goto error;
