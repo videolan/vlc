@@ -40,9 +40,6 @@
     IBOutlet id o_btn_delete_group;
     IBOutlet id o_btn_add_group;
     IBOutlet id o_outline_view;
-    IBOutlet id o_group_lbl;
-    IBOutlet id o_group_cbx;
-    IBOutlet id o_group_color;
 
     int i_item;
     NSMutableArray * o_selected;
@@ -53,10 +50,6 @@
 - (void)initPanel:(id)sender;
 - (IBAction)infoCancel:(id)sender;
 - (IBAction)infoOk:(id)sender;
-- (IBAction)handleGroup:(id)sender;
-- (IBAction)deleteOutlineGroup:(id)sender;
-- (IBAction)createOutlineGroup:(id)sender;
-- (void)createComboBox;
 - (int)getItem;
 
 @end

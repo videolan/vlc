@@ -19,7 +19,6 @@
 	<string>364.0</string>
 	<key>IBLockedObjects</key>
 	<array>
-		<integer>1789</integer>
 		<integer>2203</integer>
 		<integer>2208</integer>
 		<integer>2206</integer>
@@ -27,9 +26,10 @@
 	</array>
 	<key>IBOpenObjects</key>
 	<array>
-		<integer>21</integer>
-		<integer>29</integer>
 		<integer>2197</integer>
+		<integer>29</integer>
+		<integer>1789</integer>
+		<integer>21</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>7R28</string>

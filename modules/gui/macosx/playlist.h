@@ -46,6 +46,12 @@
     IBOutlet id o_random_ckb;
     IBOutlet id o_loop_popup;
     IBOutlet id o_mi_save_playlist;
+    IBOutlet id o_ctx_menu;
+
+    IBOutlet id o_mi_play;
+    IBOutlet id o_mi_delete;
+    IBOutlet id o_mi_info;
+    IBOutlet id o_mi_selectall;
 
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;

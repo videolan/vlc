@@ -577,45 +577,26 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 }
 
-#if 0
 - (NSMenu *)menuForEvent:(NSEvent *)o_event
 {
-    intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                            FIND_ANYWHERE );
-
-    bool b_itemstate = FALSE;
-
     NSPoint pt;
     vlc_bool_t b_rows;
     vlc_bool_t b_item_sel;
 
-    pt = [o_table_view convertPoint: [o_event locationInWindow]
+    pt = [o_outline_view convertPoint: [o_event locationInWindow]
                                                  fromView: nil];
-    b_item_sel = ( [o_table_view rowAtPoint: pt] != -1 &&
-                   [o_table_view selectedRow] != -1 );
-    b_rows = [o_table_view numberOfRows] != 0;
+    b_item_sel = ( [o_outline_view rowAtPoint: pt] != -1 &&
+                   [o_outline_view selectedRow] != -1 );
+    b_rows = [o_outline_view numberOfRows] != 0;
 
     [o_mi_play setEnabled: b_item_sel];
     [o_mi_delete setEnabled: b_item_sel];
     [o_mi_selectall setEnabled: b_rows];
     [o_mi_info setEnabled: b_item_sel];
-    [o_mi_toggleItemsEnabled setEnabled: b_item_sel];
-    [o_mi_enableGroup setEnabled: b_item_sel];
-    [o_mi_disableGroup setEnabled: b_item_sel];
-
-    if (p_playlist)
-    {
-        b_itemstate = ([o_table_view selectedRow] > -1) ?
-            p_playlist->pp_items[[o_table_view selectedRow]]->b_enabled : FALSE;
-        vlc_object_release(p_playlist);
-    }
-
-    [o_mi_toggleItemsEnabled setState: b_itemstate];
 
     return( o_ctx_menu );
 }
-#endif
+
 - (void)initDict
 {
     [o_outline_dict removeAllObjects];
