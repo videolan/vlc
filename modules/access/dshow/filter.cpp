@@ -299,7 +299,7 @@ int GetFourCCFromMediaType(const AM_MEDIA_TYPE &media_type)
  * Implementation of our dummy directshow filter pin class
  ****************************************************************************/
 
-CapturePin::CapturePin( input_thread_t * _p_input, CaptureFilter *_p_filter,
+CapturePin::CapturePin( access_t * _p_input, CaptureFilter *_p_filter,
                         AM_MEDIA_TYPE *mt, size_t mt_count )
   : p_input( _p_input ), p_filter( _p_filter ), p_connected_pin( NULL ),
     media_types(mt), media_type_count(mt_count), i_ref( 1 )
@@ -317,7 +317,7 @@ CapturePin::~CapturePin()
 #endif
     for( size_t c=0; c<media_type_count; c++ )
     {
-	FreeMediaType(media_types[c]);
+        FreeMediaType(media_types[c]);
     }
     FreeMediaType(cx_media_type);
 }
@@ -328,7 +328,7 @@ HRESULT CapturePin::CustomGetSample( VLCMediaSample *vlc_sample )
     msg_Dbg( p_input, "CapturePin::CustomGetSample" );
 #endif
 
-    access_sys_t *p_sys = p_input->p_access_data;
+    access_sys_t *p_sys = p_input->p_sys;
     vlc_mutex_lock( &p_sys->lock );
     if( samples_queue.size() )
     {
@@ -410,31 +410,31 @@ STDMETHODIMP CapturePin::Connect( IPin * pReceivePin,
 #endif
     if( State_Stopped == p_filter->state )
     {
-	if( ! p_connected_pin )
-	{
-	    if( ! pmt )
-		return S_OK;
-		
-	    if( (GUID_NULL != pmt->majortype) && (media_types[0].majortype != pmt->majortype) )
-		return S_FALSE;
+        if( ! p_connected_pin )
+        {
+            if( ! pmt )
+                return S_OK;
+                
+            if( (GUID_NULL != pmt->majortype) && (media_types[0].majortype != pmt->majortype) )
+                return S_FALSE;
 
-	    if( (GUID_NULL != pmt->subtype) && (! GetFourCCFromMediaType(*pmt)) )
-		return S_FALSE;
+            if( (GUID_NULL != pmt->subtype) && (! GetFourCCFromMediaType(*pmt)) )
+                return S_FALSE;
 
-	    if( pmt->pbFormat )
-	    {
-	        if( pmt->majortype == MEDIATYPE_Video )
-	        {
-		    if( (((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biHeight == 0) )
-			return S_FALSE;
-		    if( (((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biWidth == 0) )
-			return S_FALSE;
+            if( pmt->pbFormat )
+            {
+                if( pmt->majortype == MEDIATYPE_Video )
+                {
+                    if( (((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biHeight == 0) )
+                        return S_FALSE;
+                    if( (((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biWidth == 0) )
+                        return S_FALSE;
 
-		}
-	    }
-	    return S_OK;
-	}
-	return VFW_E_ALREADY_CONNECTED;
+                }
+            }
+            return S_OK;
+        }
+        return VFW_E_ALREADY_CONNECTED;
     }
     return VFW_E_NOT_STOPPED;
 }
@@ -446,16 +446,16 @@ STDMETHODIMP CapturePin::ReceiveConnection( IPin * pConnector,
 #endif
 
     if( State_Stopped != p_filter->state )
-	return VFW_E_NOT_STOPPED;
+        return VFW_E_NOT_STOPPED;
 
     if( ! pmt )
-	return E_POINTER;
+        return E_POINTER;
 
     if( p_connected_pin )
-	return VFW_E_ALREADY_CONNECTED;
+        return VFW_E_ALREADY_CONNECTED;
 
     if( S_OK != QueryAccept(pmt) )
-	return VFW_E_TYPE_NOT_ACCEPTED;
+        return VFW_E_TYPE_NOT_ACCEPTED;
 
     p_connected_pin = pConnector;
     p_connected_pin->AddRef();
@@ -473,7 +473,7 @@ STDMETHODIMP CapturePin::Disconnect()
 
 #if 0 // FIXME: This does seem to create crashes sometimes
     VLCMediaSample vlc_sample;
-    access_sys_t *p_sys = p_input->p_access_data;
+    access_sys_t *p_sys = p_input->p_sys;
 
     vlc_mutex_lock( &p_sys->lock );
     while( samples_queue.size() )
@@ -554,23 +554,23 @@ STDMETHODIMP CapturePin::QueryAccept( const AM_MEDIA_TYPE *pmt )
 #endif
     if( State_Stopped == p_filter->state )
     {
-	if( media_types[0].majortype == pmt->majortype )
-	{
-	    if( GetFourCCFromMediaType(*pmt) )
-	    {
-		if( pmt->majortype == MEDIATYPE_Video )
-		    if( pmt->pbFormat &&
-			((((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biHeight == 0) ||
-			 (((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biWidth == 0)) )
-			return S_FALSE;
+        if( media_types[0].majortype == pmt->majortype )
+        {
+            if( GetFourCCFromMediaType(*pmt) )
+            {
+                if( pmt->majortype == MEDIATYPE_Video )
+                    if( pmt->pbFormat &&
+                        ((((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biHeight == 0) ||
+                         (((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biWidth == 0)) )
+                        return S_FALSE;
 
-		if( !p_connected_pin )
-		    return S_OK;
+                if( !p_connected_pin )
+                    return S_OK;
 
-		FreeMediaType( cx_media_type );
-		return CopyMediaType( &cx_media_type, pmt );
-	    }
-	}
+                FreeMediaType( cx_media_type );
+                return CopyMediaType( &cx_media_type, pmt );
+            }
+        }
     }
     return S_FALSE;
 }
@@ -660,7 +660,7 @@ STDMETHODIMP CapturePin::Receive( IMediaSample *pSample )
     mtime_t i_timestamp = mdate() * 10;
     VLCMediaSample vlc_sample = {pSample, i_timestamp};
 
-    access_sys_t *p_sys = p_input->p_access_data;
+    access_sys_t *p_sys = p_input->p_sys;
     vlc_mutex_lock( &p_sys->lock );
     samples_queue.push_front( vlc_sample );
 
@@ -705,9 +705,10 @@ STDMETHODIMP CapturePin::ReceiveCanBlock( void )
 /****************************************************************************
  * Implementation of our dummy directshow filter class
  ****************************************************************************/
-
-CaptureFilter::CaptureFilter( input_thread_t * _p_input, AM_MEDIA_TYPE *mt, size_t mt_count )
-  : p_input( _p_input ), p_pin( new CapturePin( _p_input, this, mt, mt_count ) ),
+CaptureFilter::CaptureFilter( access_t * _p_input, AM_MEDIA_TYPE *mt,
+                              size_t mt_count )
+  : p_input( _p_input ),
+    p_pin( new CapturePin( _p_input, this, mt, mt_count ) ),
     state( State_Stopped ), i_ref( 1 )
 {
 }
@@ -909,7 +910,7 @@ CapturePin *CaptureFilter::CustomGetPin()
  * Implementation of our dummy directshow enumpins class
  ****************************************************************************/
 
-CaptureEnumPins::CaptureEnumPins( input_thread_t * _p_input,
+CaptureEnumPins::CaptureEnumPins( access_t * _p_input,
                                   CaptureFilter *_p_filter,
                                   CaptureEnumPins *pEnumPins )
   : p_input( _p_input ), p_filter( _p_filter ), i_ref( 1 )
@@ -1038,10 +1039,8 @@ STDMETHODIMP CaptureEnumPins::Clone( IEnumPins **ppEnum )
 /****************************************************************************
  * Implementation of our dummy directshow enummediatypes class
  ****************************************************************************/
-
-CaptureEnumMediaTypes::CaptureEnumMediaTypes( input_thread_t * _p_input,
-                                  CapturePin *_p_pin,
-                                  CaptureEnumMediaTypes *pEnumMediaTypes )
+CaptureEnumMediaTypes::CaptureEnumMediaTypes( access_t * _p_input,
+    CapturePin *_p_pin, CaptureEnumMediaTypes *pEnumMediaTypes )
   : p_input( _p_input ), p_pin( _p_pin ), i_ref( 1 )
 {
     /* Hold a reference count on our filter */
@@ -1116,7 +1115,7 @@ STDMETHODIMP CaptureEnumMediaTypes::Next( ULONG cMediaTypes,
     ULONG count;
 
     if( ! ppMediaTypes ) 
-	return E_POINTER;
+        return E_POINTER;
 
     if( (! pcFetched)  && (cMediaTypes > 1) )
        return E_POINTER;
@@ -1125,17 +1124,17 @@ STDMETHODIMP CaptureEnumMediaTypes::Next( ULONG cMediaTypes,
 
     while( (count < cMediaTypes) && (i_position < p_pin->media_type_count)  )
     {
-	ppMediaTypes[count] = (AM_MEDIA_TYPE *)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
-	if( CopyMediaType(ppMediaTypes[count], &p_pin->media_types[i_position]) != S_OK )
-	    return E_OUTOFMEMORY;
+        ppMediaTypes[count] = (AM_MEDIA_TYPE *)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
+        if( CopyMediaType(ppMediaTypes[count], &p_pin->media_types[i_position]) != S_OK )
+            return E_OUTOFMEMORY;
 
-	count++;
-	i_position++; 
+        count++;
+        i_position++; 
     }
 
     if( pcFetched ) 
     {
-	*pcFetched = count;
+        *pcFetched = count;
     }
 
     return (count == cMediaTypes) ? S_OK : S_FALSE;

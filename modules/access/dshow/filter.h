@@ -69,7 +69,7 @@ class CapturePin: public IPin, public IMemInputPin
 {
     friend class CaptureEnumMediaTypes;
 
-    input_thread_t *p_input;
+    access_t *p_input;
     CaptureFilter  *p_filter;
 
     IPin *p_connected_pin;
@@ -84,7 +84,7 @@ class CapturePin: public IPin, public IMemInputPin
     long i_ref;
 
   public:
-    CapturePin( input_thread_t * _p_input, CaptureFilter *_p_filter,
+    CapturePin( access_t * _p_input, CaptureFilter *_p_filter,
                 AM_MEDIA_TYPE *mt, size_t mt_count );
     virtual ~CapturePin();
 
@@ -134,7 +134,7 @@ class CaptureFilter : public IBaseFilter
 {
     friend class CapturePin;
 
-    input_thread_t *p_input;
+    access_t *p_input;
     CapturePin     *p_pin;
     IFilterGraph   *p_graph;
     //AM_MEDIA_TYPE  media_type;
@@ -143,7 +143,7 @@ class CaptureFilter : public IBaseFilter
     long i_ref;
 
   public:
-    CaptureFilter( input_thread_t * _p_input, AM_MEDIA_TYPE *mt, size_t mt_count );
+    CaptureFilter( access_t * _p_input, AM_MEDIA_TYPE *mt, size_t mt_count );
     virtual ~CaptureFilter();
 
     /* IUnknown methods */
@@ -178,14 +178,14 @@ class CaptureFilter : public IBaseFilter
  ****************************************************************************/
 class CaptureEnumPins : public IEnumPins
 {
-    input_thread_t * p_input;
+    access_t * p_input;
     CaptureFilter  *p_filter;
 
     int i_position;
     long i_ref;
 
 public:
-    CaptureEnumPins( input_thread_t * _p_input, CaptureFilter *_p_filter,
+    CaptureEnumPins( access_t * _p_input, CaptureFilter *_p_filter,
                      CaptureEnumPins *pEnumPins );
     virtual ~CaptureEnumPins();
 
@@ -206,14 +206,14 @@ public:
  ****************************************************************************/
 class CaptureEnumMediaTypes : public IEnumMediaTypes
 {
-    input_thread_t * p_input;
+    access_t * p_input;
     CapturePin     *p_pin;
 
     int i_position;
     long i_ref;
 
 public:
-    CaptureEnumMediaTypes( input_thread_t * _p_input, CapturePin *_p_pin,
+    CaptureEnumMediaTypes( access_t * _p_input, CapturePin *_p_pin,
                            CaptureEnumMediaTypes *pEnumMediaTypes );
 
     virtual ~CaptureEnumMediaTypes();

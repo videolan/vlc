@@ -71,6 +71,7 @@ vlc_module_begin();
     add_shortcut( "directory" );
     add_shortcut( "wav" );
     add_shortcut( "v4l" );
+    add_shortcut( "dshow" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -141,8 +142,9 @@ static int Demux2Open( vlc_object_t * p_this )
  *****************************************************************************/
 static int Demux2Demux( input_thread_t * p_input )
 {
-    demux2_sys_t  *p_sys = (demux2_sys_t*)p_input->p_demux_data;
+    demux2_sys_t *p_sys = (demux2_sys_t*)p_input->p_demux_data;
 
+    p_sys->p_demux->b_die = p_input->b_die;
     return demux2_Demux( p_sys->p_demux );
 }
 
@@ -151,7 +153,7 @@ static int Demux2Demux( input_thread_t * p_input )
  *****************************************************************************/
 static int  Demux2Control( input_thread_t *p_input, int i_query, va_list args )
 {
-    demux2_sys_t  *p_sys = (demux2_sys_t*)p_input->p_demux_data;
+    demux2_sys_t *p_sys = (demux2_sys_t*)p_input->p_demux_data;
 
     return demux2_vaControl( p_sys->p_demux, i_query, args );
 }
