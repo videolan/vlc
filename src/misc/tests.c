@@ -58,3 +58,11 @@ int TestMethod( char * psz_var, char * psz_method )
     return( !strcmp( psz_method, main_GetPszVariable( psz_var, "" ) ) );
 }
 
+/*****************************************************************************
+ * TestCPU: tests if the processor has MMX support and other capabilities
+ *****************************************************************************/
+int TestCPU( int i_capabilities )
+{
+    return( (i_capabilities & p_main->i_cpu_capabilities) == i_capabilities );
+}
+

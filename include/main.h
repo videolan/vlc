@@ -39,6 +39,7 @@ typedef struct
     char **                ppsz_argv;              /* command line arguments */
     char **                ppsz_env;                /* environment variables */
     char *                 psz_arg0;         /* program name (whithout path) */
+    int                    i_cpu_capabilities;             /* CPU extensions */
 
     /* Generic settings */
     boolean_t              b_audio;             /* is audio output allowed ? */

@@ -191,14 +191,25 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     beos_Create();
 #endif
 
+    p_main->i_cpu_capabilities = CPUCapabilities();
+
     /*
      * Test if our code is likely to run on this CPU 
      */
-#ifdef HAVE_MMX
-    if( !( TestCPU() & CPU_CAPABILITY_MMX ) )
+#if defined( __pentium__ ) || defined( __pentiumpro__ )
+    if( ! TestCPU( CPU_CAPABILITY_586 ) )
     {
-        fprintf( stderr, "Sorry, this program needs an MMX processor. "
-                         "Please run the non-MMX version.\n" );
+        fprintf( stderr, "Sorry, this program needs a Pentium CPU.\n"
+                         "Please try a version without Pentium support.\n" );
+        return( 1 );
+    }
+#endif
+
+#ifdef HAVE_MMX
+    if( ! TestCPU( CPU_CAPABILITY_MMX ) )
+    {
+        fprintf( stderr, "Sorry, this program needs MMX extensions.\n"
+                         "Please try a version without MMX support.\n" );
         return( 1 );
     }
 #endif

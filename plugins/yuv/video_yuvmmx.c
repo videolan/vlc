@@ -75,7 +75,7 @@ void yuv_getfunctions( function_list_t * p_function_list )
 static int yuv_Probe( probedata_t *p_data )
 {
     /* Test for MMX support in the CPU */
-    if( TestCPU() & CPU_CAPABILITY_MMX )
+    if( TestCPU( CPU_CAPABILITY_MMX ) )
     {
         if( TestMethod( YUV_METHOD_VAR, "yuvmmx" ) )
         {

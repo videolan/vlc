@@ -21,19 +21,12 @@
  *****************************************************************************/
 
 #define CPU_CAPABILITY_NONE    0
-#define CPU_CAPABILITY_MMX     1<<0
-#define CPU_CAPABILITY_3DNOW   1<<1
-#define CPU_CAPABILITY_MMXEXT  1<<2
-
-#define cpuid( a, eax, ebx, ecx, edx ) \
-    asm volatile ( "pushl %%ebx      \n\
-                    cpuid            \n\
-                    popl %%ebx"        \
-                 : "=a" ( eax ),       \
-                   "=c" ( ecx ),       \
-                   "=d" ( edx )        \
-                 : "a"  ( a )          \
-                 : "cc" );
+#define CPU_CAPABILITY_486     1<<0
+#define CPU_CAPABILITY_586     1<<1
+#define CPU_CAPABILITY_PPRO    1<<2
+#define CPU_CAPABILITY_MMX     1<<3
+#define CPU_CAPABILITY_3DNOW   1<<4
+#define CPU_CAPABILITY_MMXEXT  1<<5
 
 /*****************************************************************************
  * TestVersion: tests if the given string equals the current version
@@ -41,72 +34,102 @@
 int TestVersion( char * psz_version );
 int TestProgram( char * psz_program );
 int TestMethod( char * psz_var, char * psz_method );
+int TestCPU( int i_capabilities );
 
 /*****************************************************************************
- * TestCPU: tests if the processor has MMX support and other capabilities
+ * CPUCapabilities: list the processors MMX support and other capabilities
  *****************************************************************************
- * This function is called to check extensions the CPU may have.
+ * This function is called to list extensions the CPU may have.
  *****************************************************************************/
-static __inline__ int TestCPU( void )
+static __inline__ int CPUCapabilities( void )
 {
-#ifndef __i386__
-    return( CPU_CAPABILITY_NONE );
-#else
-    int i_reg, i_dummy = 0;
+    int         i_capabilities = CPU_CAPABILITY_NONE;
+#ifdef __i386__
+    int         i_eax, i_ebx, i_ecx, i_edx;
+    boolean_t   b_amd;
 
-    /* test for a 386 CPU */
-    asm volatile ( "pushfl
-                    popl %%eax
-                    movl %%eax, %%ecx
-                    xorl $0x40000, %%eax
-                    pushl %%eax
-                    popfl
-                    pushfl
-                    popl %%eax
-                    xorl %%ecx, %%eax
-                    andl $0x40000, %%eax"
-                 : "=a" ( i_reg ) );
-
-    if( !i_reg )
-    {
-        return( CPU_CAPABILITY_NONE );
-    }
+#define cpuid( a )                 \
+    asm volatile ( "cpuid"         \
+                 : "=a" ( i_eax ), \
+                   "=b" ( i_ebx ), \
+                   "=c" ( i_ecx ), \
+                   "=d" ( i_edx )  \
+                 : "a"  ( a )      \
+                 : "cc" );         \
 
     /* test for a 486 CPU */
-    asm volatile ( "movl %%ecx, %%eax
+    asm volatile ( "pushfl
+                    popl %%eax
+                    movl %%eax, %%ebx
                     xorl $0x200000, %%eax
                     pushl %%eax
                     popfl
                     pushfl
-                    popl %%eax
-                    xorl %%ecx, %%eax
-                    pushl %%ecx
-                    popfl
-                    andl $0x200000, %%eax"
-                 : "=a" ( i_reg ) );
+                    popl %%eax"
+                 : "=a" ( i_eax ),
+                   "=b" ( i_ebx )
+                 :
+                 : "cc" );
 
-    if( !i_reg )
+    if( i_eax == i_ebx )
     {
-        return( CPU_CAPABILITY_NONE );
+        return( i_capabilities );
     }
+
+    i_capabilities |= CPU_CAPABILITY_486;
 
     /* the CPU supports the CPUID instruction - get its level */
-    cpuid( 0, i_reg, i_dummy, i_dummy, i_dummy );
+    cpuid( 0x00000000 );
 
-    if( !i_reg )
+    if( !i_eax )
     {
-        return( CPU_CAPABILITY_NONE );
+        return( i_capabilities );
     }
+
+    /* FIXME: this isn't correct, since some 486s have cpuid */
+    i_capabilities |= CPU_CAPABILITY_586;
+
+    /* borrowed from mpeg2dec */
+    b_amd = ( i_ebx == 0x68747541 ) && ( i_ecx == 0x444d4163 )
+                    && ( i_edx == 0x69746e65 );
 
     /* test for the MMX flag */
-    cpuid( 1, i_dummy, i_dummy, i_dummy, i_reg );
+    cpuid( 0x00000001 );
 
-    if( ! (i_reg & 0x00800000) )
+    if( ! (i_edx & 0x00800000) )
     {
-        return( CPU_CAPABILITY_NONE );
+        return( i_capabilities );
     }
 
-    return( CPU_CAPABILITY_MMX );
-#endif
+    i_capabilities |= CPU_CAPABILITY_MMX;
+
+    if( i_edx & 0x02000000 )
+    {
+        i_capabilities |= CPU_CAPABILITY_MMXEXT;
+    }
+    
+    /* test for additional capabilities */
+    cpuid( 0x80000000 );
+
+    if( i_eax < 0x80000001 )
+    {
+        return( i_capabilities );
+    }
+
+    /* list these additional capabilities */
+    cpuid( 0x80000001 );
+
+    if( i_edx & 0x80000000 )
+    {
+        i_capabilities |= CPU_CAPABILITY_3DNOW;
+    }
+
+    if( b_amd && ( i_edx & 0x00400000 ) )
+    {
+        i_capabilities |= CPU_CAPABILITY_MMXEXT;
+    }
+#endif /* __i386__ */
+
+    return( i_capabilities );
 }
 

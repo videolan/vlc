@@ -2,7 +2,7 @@
  * idctmmx.c : MMX IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmx.c,v 1.4 2001/01/16 05:04:25 sam Exp $
+ * $Id: idctmmx.c,v 1.5 2001/01/16 16:09:52 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -143,7 +143,7 @@ static void idct_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int idct_Probe( probedata_t *p_data )
 {
-    if( TestCPU() & CPU_CAPABILITY_MMX )
+    if( TestCPU( CPU_CAPABILITY_MMX ) )
     {
         if( TestMethod( IDCT_METHOD_VAR, "idctmmx" ) )
         {
