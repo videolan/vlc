@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.63 2003/08/23 14:26:34 lool Exp $
+ * $Id: configuration.c,v 1.64 2003/08/23 14:38:50 lool Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1520,27 +1520,32 @@ static char *ConfigKeyToString( int i_key )
 {
     char *psz_key = malloc( 100 );
     char *p;
-    int i;
+    size_t index;
     if ( !psz_key )
     {
         return NULL;
     }
     *psz_key = '\0';
     p = psz_key;
-    for( i = 0; i < sizeof(modifiers) / sizeof(key_descriptor_t); i++ )
+    for( index = 0;
+         index < (sizeof(modifiers) / sizeof(key_descriptor_t));
+         index++ )
     {
-        if ( i_key & modifiers[i].i_key_code )
+        if ( i_key & modifiers[index].i_key_code )
         {
-            p += sprintf( p, "%s-", modifiers[i].psz_key_string );
+            p += sprintf( p, "%s-", modifiers[index].psz_key_string );
         }
     }
-    for( i = 0; i < sizeof(keys) / sizeof( key_descriptor_t); i++)
+    for( index = 0;
+         index < (sizeof(keys) / sizeof( key_descriptor_t));
+         index++)
     {
-        if ( ( i_key & ~KEY_MODIFIER ) == keys[i].i_key_code )
+        if ( (int)( i_key & ~KEY_MODIFIER ) == keys[index].i_key_code )
         {
-            p += sprintf( p, "%s", keys[i].psz_key_string );
+            p += sprintf( p, "%s", keys[index].psz_key_string );
             break;
         }
     }
     return psz_key;
 }
+
