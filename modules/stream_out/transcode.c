@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.31 2003/08/26 18:01:16 fenrir Exp $
+ * $Id: transcode.c,v 1.32 2003/10/01 12:01:46 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1417,11 +1417,20 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                     id->f_dst.i_height = id->ff_dec_c->height - p_sys->i_crop_top - p_sys->i_crop_bottom;
             }
 
+            /* Make sure we get extradata filled by the encoder */
+            id->ff_enc_c->extradata_size = 0;
+            id->ff_enc_c->extradata = NULL;
+            id->ff_enc_c->flags |= CODEC_FLAG_GLOBAL_HEADER;
+
             if( avcodec_open( id->ff_enc_c, id->ff_enc ) )
             {
                 msg_Err( p_stream, "cannot open encoder" );
                 return VLC_EGENERIC;
             }
+
+            id->f_dst.i_extra_data = id->ff_enc_c->extradata_size;
+            id->f_dst.p_extra_data = id->ff_enc_c->extradata;
+            id->ff_enc_c->flags &= ~CODEC_FLAG_GLOBAL_HEADER;
 
             if( !( id->id = p_stream->p_sys->p_out->pf_add( p_stream->p_sys->p_out, &id->f_dst ) ) )
             {
