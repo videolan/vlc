@@ -2,7 +2,7 @@
  * Common pixel/chroma manipulation routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: pixmap.h,v 1.5 2004/01/31 05:53:35 rocky Exp $
+ * $Id: pixmap.h,v 1.6 2004/01/31 23:33:02 rocky Exp $
  *
  * Author: Rocky Bernstein
  *
@@ -110,8 +110,8 @@ yuv2rgb(const ogt_yuvt_t *p_yuv, uint8_t *p_rgb_out )
 #define RED_PIXEL   0
 #define BLUE_PIXEL  2
 #else
-#define BLUE_PIXEL  2
-#define RED_PIXEL   0
+#define RED_PIXEL   2
+#define BLUE_PIXEL  0
 #endif
 
 /**
