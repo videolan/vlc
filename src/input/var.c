@@ -333,7 +333,12 @@ void input_ControlVarTitle( input_thread_t *p_input, int i_title )
     int  i;
 
     /* Create/Destroy command variables */
-    if( t->i_seekpoint > 1 )
+    if( t->i_seekpoint <= 1 )
+    {
+        var_Destroy( p_input, "next-chapter" );
+        var_Destroy( p_input, "prev-chapter" );
+    }
+    else if( var_Get( p_input, "next-chapter", &val ) != VLC_SUCCESS )
     {
         vlc_value_t text;
 
@@ -346,11 +351,6 @@ void input_ControlVarTitle( input_thread_t *p_input, int i_title )
         text.psz_string = _("Previous chapter");
         var_Change( p_input, "prev-chapter", VLC_VAR_SETTEXT, &text, NULL );
         var_AddCallback( p_input, "prev-chapter", SeekpointCallback, NULL );
-    }
-    else
-    {
-        var_Destroy( p_input, "next-chapter" );
-        var_Destroy( p_input, "prev-chapter" );
     }
 
     /* Build chapter list */
