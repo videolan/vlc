@@ -45,6 +45,7 @@ vlc_module_begin();
 
     /* Hack */
     add_shortcut( "nsv" );
+    add_shortcut( "live" );
     add_shortcut( "ts2" );
     add_shortcut( "ps2" );
     add_shortcut( "dvdnav" );
