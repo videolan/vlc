@@ -999,7 +999,7 @@ wizStreamingMethodPage::wizStreamingMethodPage( wxWizard *parent,
     /* Create the texts */
     pageHeader( this, mainSizer,  STREAMING1_TITLE, STREAMING1_TEXT );
 
-    mainSizer->Add( 0,0,1 );
+    mainSizer->Add( 0,50,0 );
 
     i_method = 0;
 
@@ -1102,6 +1102,8 @@ void wizStreamingMethodPage::OnMethodChange(wxEvent& event)
     i_method = event.GetId() - MethodRadio0_Event;
     address_text->SetLabel( wxU(
      vlc_wraptext( _(methods_array[i_method].psz_address), TEXTWIDTH, false)));
+    address_sizer->Layout();
+    mainSizer->Layout();
 }
 
 /***************************************************
