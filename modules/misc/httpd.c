@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.25 2003/08/11 20:18:02 fenrir Exp $
+ * $Id: httpd.c,v 1.26 2003/08/25 01:32:26 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1433,6 +1433,7 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
     char *p, *p_end;
 
     int  i;
+    int  b_xplaystream = VLC_FALSE;
     char command[32];
     char url[1024];
     char version[32];
@@ -1521,6 +1522,16 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
                     strcpy( user, decoded );
                     strcpy( password, p );
                 }
+            }
+        }
+        else if( !strcmp( header, "Pragma:" ) )
+        {
+            char method[128];
+
+            httpd_RequestGetWord( method, 128, &p, p_end );
+            if( !strcasecmp( method, "xPlayStrm=1" ) )
+            {
+                b_xplaystream = VLC_TRUE;
             }
         }
     }
@@ -1646,12 +1657,26 @@ search_file:
     p = p_con->p_buffer = malloc( p_con->i_buffer_size );
 
     p += sprintf( p, "HTTP/1.0 %d %s\r\n", p_con->i_http_error, psz_status );
-    p += sprintf( p, "Content-type: %s\r\n", p_con->p_file->psz_mime );
+    if( !strcmp( p_con->p_file->psz_mime, "video/x-ms-asf-stream" ) )
+    {
+        p += sprintf( p, "Server: Cougar 4.1.0.3923\r\n" );
+        p += sprintf( p, "Content-type: application/octet-stream\r\n" );
+        p += sprintf( p, "Pragma: client-id=%d\r\n", rand()&0x7fffffff );
+        p += sprintf( p, "Pragma: features=\"broadcast\"\r\n" );
+        if( !b_xplaystream )
+        {
+            p_con->i_method = HTTPD_CONNECTION_METHOD_HEAD;
+        }
+    }
+    else
+    {
+        p += sprintf( p, "Content-type: %s\r\n", p_con->p_file->psz_mime );
+    }
+    p += sprintf( p, "Cache-Control: no-cache\r\n" );
     if( p_con->i_http_error == 401 )
     {
         p += sprintf( p, "WWW-Authenticate: Basic realm=\"%s\"\r\n", user );
     }
-    p += sprintf( p, "Cache-Control: no-cache\r\n" );
     p += sprintf( p, "\r\n" );
 
     p_con->i_buffer_size = strlen( p_con->p_buffer );// + 1;
