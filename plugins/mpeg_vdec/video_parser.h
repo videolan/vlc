@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.4 2002/04/15 23:04:08 massiot Exp $
+ * $Id: video_parser.h,v 1.5 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -366,7 +366,7 @@ typedef struct vpar_thread_s
 /*****************************************************************************
  * NextStartCode : Find the next start code
  *****************************************************************************/
-static __inline__ void NextStartCode( bit_stream_t * p_bit_stream )
+static inline void NextStartCode( bit_stream_t * p_bit_stream )
 {
     /* Re-align the buffer on an 8-bit boundary */
     RealignBits( p_bit_stream );
@@ -383,7 +383,7 @@ static __inline__ void NextStartCode( bit_stream_t * p_bit_stream )
  *****************************************************************************
  * Quantizer scale factor (ISO/IEC 13818-2 7.4.2.2)
  *****************************************************************************/
-static __inline__ void LoadQuantizerScale( struct vpar_thread_s * p_vpar )
+static inline void LoadQuantizerScale( struct vpar_thread_s * p_vpar )
 {
     /* Quantization coefficient table */
     static u8   pi_non_linear_quantizer_scale[32] =

@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.8 2002/05/15 13:36:40 marcari Exp $
+ * $Id: input_ext-plugins.c,v 1.9 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -205,8 +205,8 @@ void input_BuffersEnd( input_buffers_t * p_buffers )
 /*****************************************************************************
  * input_NewBuffer: return a pointer to a data buffer of the appropriate size
  *****************************************************************************/
-static __inline__ data_buffer_t * NewBuffer( input_buffers_t * p_buffers,
-                                             size_t i_size )
+static inline data_buffer_t * NewBuffer( input_buffers_t * p_buffers,
+                                         size_t i_size )
 {
     data_buffer_t * p_buf;
 
@@ -274,8 +274,8 @@ data_buffer_t * input_NewBuffer( input_buffers_t * p_buffers, size_t i_size )
 /*****************************************************************************
  * input_ReleaseBuffer: put a buffer back into the cache
  *****************************************************************************/
-static __inline__ void ReleaseBuffer( input_buffers_t * p_buffers,
-                                      data_buffer_t * p_buf )
+static inline void ReleaseBuffer( input_buffers_t * p_buffers,
+                                  data_buffer_t * p_buf )
 {
     /* Decrement refcount */
     if( --p_buf->i_refcount > 0 )
@@ -307,8 +307,8 @@ void input_ReleaseBuffer( input_buffers_t * p_buffers, data_buffer_t * p_buf )
 /*****************************************************************************
  * input_ShareBuffer: allocate a data_packet_t pointing to a given buffer
  *****************************************************************************/
-static __inline__ data_packet_t * ShareBuffer( input_buffers_t * p_buffers,
-                                               data_buffer_t * p_buf )
+static inline data_packet_t * ShareBuffer( input_buffers_t * p_buffers,
+                                           data_buffer_t * p_buf )
 {
     data_packet_t * p_data;
 
@@ -356,8 +356,8 @@ data_packet_t * input_ShareBuffer( input_buffers_t * p_buffers,
 /*****************************************************************************
  * input_NewPacket: allocate a packet along with a buffer
  *****************************************************************************/
-static __inline__ data_packet_t * NewPacket( input_buffers_t * p_buffers,
-                                             size_t i_size )
+static inline data_packet_t * NewPacket( input_buffers_t * p_buffers,
+                                         size_t i_size )
 {
     data_buffer_t * p_buf = NewBuffer( p_buffers, i_size );
     data_packet_t * p_data;
@@ -389,8 +389,8 @@ data_packet_t * input_NewPacket( input_buffers_t * p_buffers, size_t i_size )
 /*****************************************************************************
  * input_DeletePacket: deallocate a packet and its buffers
  *****************************************************************************/
-static __inline__ void DeletePacket( input_buffers_t * p_buffers,
-                                     data_packet_t * p_data )
+static inline void DeletePacket( input_buffers_t * p_buffers,
+                                 data_packet_t * p_data )
 {
     while( p_data != NULL )
     {
@@ -424,7 +424,7 @@ void input_DeletePacket( input_buffers_t * p_buffers, data_packet_t * p_data )
 /*****************************************************************************
  * input_NewPES: return a pointer to a new PES packet
  *****************************************************************************/
-static __inline__ pes_packet_t * NewPES( input_buffers_t * p_buffers )
+static inline pes_packet_t * NewPES( input_buffers_t * p_buffers )
 {
     pes_packet_t * p_pes;
 
@@ -471,8 +471,8 @@ pes_packet_t * input_NewPES( input_buffers_t * p_buffers )
  * input_DeletePES: put a pes and all data packets and all buffers back into
  *                  the cache
  *****************************************************************************/
-static __inline__ void DeletePES( input_buffers_t * p_buffers,
-                                  pes_packet_t * p_pes )
+static inline void DeletePES( input_buffers_t * p_buffers,
+                              pes_packet_t * p_pes )
 {
     while( p_pes != NULL )
     {
@@ -726,7 +726,7 @@ ssize_t input_FDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len 
 /*****************************************************************************
  * NetworkSelect: Checks whether data is available on a file descriptor
  *****************************************************************************/
-static __inline__ int NetworkSelect( input_thread_t * p_input )
+static inline int NetworkSelect( input_thread_t * p_input )
 {
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
     struct timeval  timeout;

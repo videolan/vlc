@@ -2,7 +2,7 @@
  * motionmmxext.c : MMX EXT motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionmmxext.c,v 1.17 2002/04/19 13:56:11 sam Exp $
+ * $Id: motionmmxext.c,v 1.18 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -88,7 +88,7 @@ do {                                                                        \
 //CPU_MMXEXT code
 
 
-static __inline__ void MC_put1_8 (int height, yuv_data_t * dest, yuv_data_t * ref,
+static inline void MC_put1_8 (int height, yuv_data_t * dest, yuv_data_t * ref,
                               int stride)
 {
     do {
@@ -99,7 +99,7 @@ static __inline__ void MC_put1_8 (int height, yuv_data_t * dest, yuv_data_t * re
     } while (--height);
 }
 
-static __inline__ void MC_put1_16 (int height, yuv_data_t * dest, yuv_data_t * ref,
+static inline void MC_put1_16 (int height, yuv_data_t * dest, yuv_data_t * ref,
                                int stride)
 {
     do {
@@ -112,7 +112,7 @@ static __inline__ void MC_put1_16 (int height, yuv_data_t * dest, yuv_data_t * r
     } while (--height);
 }
 
-static __inline__ void MC_avg1_8 (int height, yuv_data_t * dest, yuv_data_t * ref,
+static inline void MC_avg1_8 (int height, yuv_data_t * dest, yuv_data_t * ref,
                               int stride, int cpu)
 {
     do {
@@ -124,7 +124,7 @@ static __inline__ void MC_avg1_8 (int height, yuv_data_t * dest, yuv_data_t * re
     } while (--height);
 }
 
-static __inline__ void MC_avg1_16 (int height, yuv_data_t * dest, yuv_data_t * ref,
+static inline void MC_avg1_16 (int height, yuv_data_t * dest, yuv_data_t * ref,
                                int stride, int cpu)
 {
     do {
@@ -139,7 +139,7 @@ static __inline__ void MC_avg1_16 (int height, yuv_data_t * dest, yuv_data_t * r
     } while (--height);
 }
 
-static __inline__ void MC_put2_8 (int height, yuv_data_t * dest, yuv_data_t * ref,
+static inline void MC_put2_8 (int height, yuv_data_t * dest, yuv_data_t * ref,
                               int stride, int offset, int cpu)
 {
     do {
@@ -151,7 +151,7 @@ static __inline__ void MC_put2_8 (int height, yuv_data_t * dest, yuv_data_t * re
     } while (--height);
 }
 
-static __inline__ void MC_put2_16 (int height, yuv_data_t * dest, yuv_data_t * ref,
+static inline void MC_put2_16 (int height, yuv_data_t * dest, yuv_data_t * ref,
                                int stride, int offset, int cpu)
 {
     do {
@@ -166,7 +166,7 @@ static __inline__ void MC_put2_16 (int height, yuv_data_t * dest, yuv_data_t * r
     } while (--height);
 }
 
-static __inline__ void MC_avg2_8 (int height, yuv_data_t * dest, yuv_data_t * ref,
+static inline void MC_avg2_8 (int height, yuv_data_t * dest, yuv_data_t * ref,
                               int stride, int offset, int cpu)
 {
     do {
@@ -179,7 +179,7 @@ static __inline__ void MC_avg2_8 (int height, yuv_data_t * dest, yuv_data_t * re
     } while (--height);
 }
 
-static __inline__ void MC_avg2_16 (int height, yuv_data_t * dest, yuv_data_t * ref,
+static inline void MC_avg2_16 (int height, yuv_data_t * dest, yuv_data_t * ref,
                                int stride, int offset, int cpu)
 {
     do {
@@ -198,7 +198,7 @@ static __inline__ void MC_avg2_16 (int height, yuv_data_t * dest, yuv_data_t * r
 
 static mmx_t mask_one = {0x0101010101010101LL};
 
-static __inline__ void MC_put4_8 (int height, yuv_data_t * dest, yuv_data_t * ref,
+static inline void MC_put4_8 (int height, yuv_data_t * dest, yuv_data_t * ref,
                               int stride, int cpu)
 {
     movq_m2r (*ref, mm0);
@@ -237,7 +237,7 @@ static __inline__ void MC_put4_8 (int height, yuv_data_t * dest, yuv_data_t * re
     } while (--height);
 }
 
-static __inline__ void MC_put4_16 (int height, yuv_data_t * dest, yuv_data_t * ref,
+static inline void MC_put4_16 (int height, yuv_data_t * dest, yuv_data_t * ref,
                                int stride, int cpu)
 {
     do {
@@ -283,7 +283,7 @@ static __inline__ void MC_put4_16 (int height, yuv_data_t * dest, yuv_data_t * r
     } while (--height);
 }
 
-static __inline__ void MC_avg4_8 (int height, yuv_data_t * dest, yuv_data_t * ref,
+static inline void MC_avg4_8 (int height, yuv_data_t * dest, yuv_data_t * ref,
                               int stride, int cpu)
 {
     do {
@@ -312,7 +312,7 @@ static __inline__ void MC_avg4_8 (int height, yuv_data_t * dest, yuv_data_t * re
     } while (--height);
 }
 
-static __inline__ void MC_avg4_16 (int height, yuv_data_t * dest, yuv_data_t * ref,
+static inline void MC_avg4_16 (int height, yuv_data_t * dest, yuv_data_t * ref,
                                int stride, int cpu)
 {
     do {

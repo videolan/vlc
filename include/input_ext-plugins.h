@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.27 2002/05/15 13:07:18 marcari Exp $
+ * $Id: input_ext-plugins.h,v 1.28 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -145,8 +145,8 @@ void input_AccessEnd( struct input_thread_s * );
 /*****************************************************************************
  * Create a NULL packet for padding in case of a data loss
  *****************************************************************************/
-static __inline__ void input_NullPacket( input_thread_t * p_input,
-                                         es_descriptor_t * p_es )
+static inline void input_NullPacket( input_thread_t * p_input,
+                                     es_descriptor_t * p_es )
 {
     data_packet_t *             p_pad_data;
     pes_packet_t *              p_pes;

@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.57 2002/05/13 21:55:30 fenrir Exp $
+ * $Id: input_ext-dec.h,v 1.58 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -239,7 +239,7 @@ void CurrentPTS( struct bit_stream_s *, mtime_t *, mtime_t * );
  * on a word boundary (XXX: there must be at least sizeof(WORD_TYPE) - 1
  * empty bytes in the bit buffer)
  *****************************************************************************/
-static __inline__ void AlignWord( bit_stream_t * p_bit_stream )
+static inline void AlignWord( bit_stream_t * p_bit_stream )
 {
     while( (ptrdiff_t)p_bit_stream->p_byte
              & (sizeof(WORD_TYPE) - 1) )
@@ -265,8 +265,8 @@ static __inline__ void AlignWord( bit_stream_t * p_bit_stream )
 /*****************************************************************************
  * ShowBits : return i_bits bits from the bit stream
  *****************************************************************************/
-static __inline__ u32 ShowBits( bit_stream_t * p_bit_stream,
-                                unsigned int i_bits )
+static inline u32 ShowBits( bit_stream_t * p_bit_stream,
+                            unsigned int i_bits )
 {
     if( p_bit_stream->fifo.i_available >= i_bits )
     {
@@ -288,8 +288,8 @@ static __inline__ u32 ShowBits( bit_stream_t * p_bit_stream,
  * ShowSignedBits : return i_bits bits from the bit stream, using signed
  *                  arithmetic
  *****************************************************************************/
-static __inline__ s32 ShowSignedBits( bit_stream_t * p_bit_stream,
-                                      unsigned int i_bits )
+static inline s32 ShowSignedBits( bit_stream_t * p_bit_stream,
+                                  unsigned int i_bits )
 {
     if( p_bit_stream->fifo.i_available >= i_bits )
     {
@@ -306,8 +306,8 @@ static __inline__ s32 ShowSignedBits( bit_stream_t * p_bit_stream,
  * RemoveBits : removes i_bits bits from the bit buffer
  *              XXX: do not use for 32 bits, see RemoveBits32
  *****************************************************************************/
-static __inline__ void RemoveBits( bit_stream_t * p_bit_stream,
-                                   unsigned int i_bits )
+static inline void RemoveBits( bit_stream_t * p_bit_stream,
+                               unsigned int i_bits )
 {
     p_bit_stream->fifo.i_available -= i_bits;
 
@@ -334,7 +334,7 @@ static __inline__ void RemoveBits( bit_stream_t * p_bit_stream,
  *                refill it)
  *****************************************************************************/
 #if (WORD_TYPE == u32)
-static __inline__ void RemoveBits32( bit_stream_t * p_bit_stream )
+static inline void RemoveBits32( bit_stream_t * p_bit_stream )
 {
     if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
     {
@@ -361,8 +361,8 @@ static __inline__ void RemoveBits32( bit_stream_t * p_bit_stream )
  * GetBits : returns i_bits bits from the bit stream and removes them
  *           XXX: do not use for 32 bits, see GetBits32
  *****************************************************************************/
-static __inline__ u32 GetBits( bit_stream_t * p_bit_stream,
-                               unsigned int i_bits )
+static inline u32 GetBits( bit_stream_t * p_bit_stream,
+                           unsigned int i_bits )
 {
     u32             i_result;
 
@@ -398,8 +398,8 @@ static __inline__ u32 GetBits( bit_stream_t * p_bit_stream,
  *                 using signed arithmetic
  *                 XXX: do not use for 32 bits
  *****************************************************************************/
-static __inline__ s32 GetSignedBits( bit_stream_t * p_bit_stream,
-                                     unsigned int i_bits )
+static inline s32 GetSignedBits( bit_stream_t * p_bit_stream,
+                                 unsigned int i_bits )
 {
     if( p_bit_stream->fifo.i_available >= i_bits )
     {
@@ -421,7 +421,7 @@ static __inline__ s32 GetSignedBits( bit_stream_t * p_bit_stream,
  * GetBits32 : returns 32 bits from the bit stream and removes them
  *****************************************************************************/
 #if (WORD_TYPE == u32)
-static __inline__ u32 GetBits32( bit_stream_t * p_bit_stream )
+static inline u32 GetBits32( bit_stream_t * p_bit_stream )
 {
     u32             i_result;
 
@@ -461,7 +461,7 @@ static __inline__ u32 GetBits32( bit_stream_t * p_bit_stream )
 /*****************************************************************************
  * RealignBits : realigns the bit buffer on an 8-bit boundary
  *****************************************************************************/
-static __inline__ void RealignBits( bit_stream_t * p_bit_stream )
+static inline void RealignBits( bit_stream_t * p_bit_stream )
 {
     p_bit_stream->fifo.buffer <<= (p_bit_stream->fifo.i_available & 0x7);
     p_bit_stream->fifo.i_available &= ~0x7;
@@ -475,8 +475,8 @@ static __inline__ void RealignBits( bit_stream_t * p_bit_stream )
  * RealignBits(). p_buffer must point to a buffer at least as big as i_buf_len
  * otherwise your code will crash.
  *****************************************************************************/
-static __inline__ void GetChunk( bit_stream_t * p_bit_stream,
-                                 byte_t * p_buffer, size_t i_buf_len )
+static inline void GetChunk( bit_stream_t * p_bit_stream,
+                             byte_t * p_buffer, size_t i_buf_len )
 {
     ptrdiff_t           i_available;
 

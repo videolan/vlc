@@ -193,7 +193,7 @@ struct audio_dither {
 * NAME:                prng()
 * DESCRIPTION: 32-bit pseudo-random number generator
 */
-static __inline__ unsigned long prng(unsigned long state)
+static inline unsigned long prng(unsigned long state)
 {
     return (state * 0x0019660dL + 0x3c6ef35fL) & 0xffffffffL;
 }
@@ -202,7 +202,7 @@ static __inline__ unsigned long prng(unsigned long state)
 * NAME:        mpg321_s24_to_s16_pcm()
 * DESCRIPTION: generic linear sample quantize and dither routine
 */
-static __inline__ signed int mpg321_s24_to_s16_pcm(unsigned int bits, mad_fixed_t sample,
+static inline signed int mpg321_s24_to_s16_pcm(unsigned int bits, mad_fixed_t sample,
                                     struct audio_dither *dither)
 {
     unsigned int scalebits;
@@ -258,7 +258,7 @@ static __inline__ signed int mpg321_s24_to_s16_pcm(unsigned int bits, mad_fixed_
 /*****************************************************************************
  * s24_to_s16_pcm: Scale a 24 bit pcm sample to a 16 bit pcm sample.
  *****************************************************************************/
-static __inline__ mad_fixed_t s24_to_s16_pcm(mad_fixed_t sample)
+static inline mad_fixed_t s24_to_s16_pcm(mad_fixed_t sample)
 {
   /* round */
   sample += (1L << (MAD_F_FRACBITS - 16));

@@ -2,7 +2,7 @@
  * block_c.h: Macroblock copy functions in C
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: block_c.h,v 1.1 2001/09/05 16:07:49 massiot Exp $
+ * $Id: block_c.h,v 1.2 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -58,8 +58,8 @@ static void InitBlock ( )
 /*****************************************************************************
  * AddBlock: add a block
  *****************************************************************************/
-static __inline__ void AddBlock( dctelem_t * p_block, yuv_data_t * p_data,
-                                 int i_incr )
+static inline void AddBlock( dctelem_t * p_block, yuv_data_t * p_data,
+                             int i_incr )
 {
     int i = 8;
 
@@ -81,8 +81,8 @@ static __inline__ void AddBlock( dctelem_t * p_block, yuv_data_t * p_data,
 /*****************************************************************************
  * CopyBlock: copy a block
  *****************************************************************************/
-static __inline__ void CopyBlock( dctelem_t * p_block, yuv_data_t * p_data,
-                                  int i_incr )
+static inline void CopyBlock( dctelem_t * p_block, yuv_data_t * p_data,
+                              int i_incr )
 {
     int i = 8;
 

@@ -2,7 +2,7 @@
  * motionmmx.c : MMX motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionmmx.c,v 1.16 2002/04/19 13:56:11 sam Exp $
+ * $Id: motionmmx.c,v 1.17 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -74,13 +74,13 @@ mmx_t round4 = {0x0002000200020002LL};
  * unrolling will help
  */
 
-static __inline__ void mmx_zero_reg ()
+static inline void mmx_zero_reg ()
 {
     // load 0 into mm0
     pxor_r2r (mm0, mm0);
 }
 
-static __inline__ void mmx_average_2_U8 (yuv_data_t * dest,
+static inline void mmx_average_2_U8 (yuv_data_t * dest,
                                      yuv_data_t * src1, yuv_data_t * src2)
 {
     //
@@ -111,7 +111,7 @@ static __inline__ void mmx_average_2_U8 (yuv_data_t * dest,
     movq_r2m (mm1, *dest);        // store result in dest
 }
 
-static __inline__ void mmx_interp_average_2_U8 (yuv_data_t * dest,
+static inline void mmx_interp_average_2_U8 (yuv_data_t * dest,
                                             yuv_data_t * src1, yuv_data_t * src2)
 {
     //
@@ -156,7 +156,7 @@ static __inline__ void mmx_interp_average_2_U8 (yuv_data_t * dest,
     movq_r2m (mm1, *dest);        // store result in dest
 }
 
-static __inline__ void mmx_average_4_U8 (yuv_data_t * dest,
+static inline void mmx_average_4_U8 (yuv_data_t * dest,
                                      yuv_data_t * src1, yuv_data_t * src2,
                                      yuv_data_t * src3, yuv_data_t * src4)
 {
@@ -210,7 +210,7 @@ static __inline__ void mmx_average_4_U8 (yuv_data_t * dest,
     movq_r2m (mm1, *dest);        // store result in dest
 }
 
-static __inline__ void mmx_interp_average_4_U8 (yuv_data_t * dest,
+static inline void mmx_interp_average_4_U8 (yuv_data_t * dest,
                                             yuv_data_t * src1, yuv_data_t * src2,
                                             yuv_data_t * src3, yuv_data_t * src4)
 {
@@ -282,7 +282,7 @@ static __inline__ void mmx_interp_average_4_U8 (yuv_data_t * dest,
 
 //-----------------------------------------------------------------------
 
-static __inline__ void MC_avg_mmx (int width, int height,
+static inline void MC_avg_mmx (int width, int height,
                                yuv_data_t * dest, yuv_data_t * ref, int stride)
 {
     mmx_zero_reg ();
@@ -312,7 +312,7 @@ static void MC_avg_8_mmx (yuv_data_t * dest, yuv_data_t * ref,
 
 //-----------------------------------------------------------------------
 
-static __inline__ void MC_put_mmx (int width, int height,
+static inline void MC_put_mmx (int width, int height,
                                yuv_data_t * dest, yuv_data_t * ref, int stride)
 {
     mmx_zero_reg ();
@@ -347,7 +347,7 @@ static void MC_put_8_mmx (yuv_data_t * dest, yuv_data_t * ref,
 //-----------------------------------------------------------------------
 
 // Half pixel interpolation in the x direction
-static __inline__ void MC_avg_x_mmx (int width, int height,
+static inline void MC_avg_x_mmx (int width, int height,
                                  yuv_data_t * dest, yuv_data_t * ref, int stride)
 {
     mmx_zero_reg ();
@@ -377,7 +377,7 @@ static void MC_avg_x8_mmx (yuv_data_t * dest, yuv_data_t * ref,
 
 //-----------------------------------------------------------------------
 
-static __inline__ void MC_put_x_mmx (int width, int height,
+static inline void MC_put_x_mmx (int width, int height,
                                  yuv_data_t * dest, yuv_data_t * ref, int stride)
 {
     mmx_zero_reg ();
@@ -407,7 +407,7 @@ static void MC_put_x8_mmx (yuv_data_t * dest, yuv_data_t * ref,
 
 //-----------------------------------------------------------------------
 
-static __inline__ void MC_avg_xy_mmx (int width, int height,
+static inline void MC_avg_xy_mmx (int width, int height,
                                   yuv_data_t * dest, yuv_data_t * ref, int stride)
 {
     yuv_data_t * ref_next = ref+stride;
@@ -441,7 +441,7 @@ static void MC_avg_xy8_mmx (yuv_data_t * dest, yuv_data_t * ref,
 
 //-----------------------------------------------------------------------
 
-static __inline__ void MC_put_xy_mmx (int width, int height,
+static inline void MC_put_xy_mmx (int width, int height,
                                   yuv_data_t * dest, yuv_data_t * ref, int stride)
 {
     yuv_data_t * ref_next = ref+stride;
@@ -474,7 +474,7 @@ static void MC_put_xy8_mmx (yuv_data_t * dest, yuv_data_t * ref,
 
 //-----------------------------------------------------------------------
 
-static __inline__ void MC_avg_y_mmx (int width, int height,
+static inline void MC_avg_y_mmx (int width, int height,
                                  yuv_data_t * dest, yuv_data_t * ref, int stride)
 {
     yuv_data_t * ref_next = ref+stride;
@@ -507,7 +507,7 @@ static void MC_avg_y8_mmx (yuv_data_t * dest, yuv_data_t * ref,
 
 //-----------------------------------------------------------------------
 
-static __inline__ void MC_put_y_mmx (int width, int height,
+static inline void MC_put_y_mmx (int width, int height,
                                  yuv_data_t * dest, yuv_data_t * ref, int stride)
 {
     yuv_data_t * ref_next = ref+stride;

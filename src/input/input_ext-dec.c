@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.30 2002/03/01 00:33:18 massiot Exp $
+ * $Id: input_ext-dec.c,v 1.31 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -112,8 +112,8 @@ void DecoderError( decoder_fifo_t * p_fifo )
  * NextDataPacket: go to the data packet after *pp_data, return 1 if we
  * changed PES
  *****************************************************************************/
-static __inline__ boolean_t _NextDataPacket( decoder_fifo_t * p_fifo,
-                                             data_packet_t ** pp_data )
+static inline boolean_t _NextDataPacket( decoder_fifo_t * p_fifo,
+                                         data_packet_t ** pp_data )
 {
     boolean_t b_new_pes;
 
@@ -179,7 +179,7 @@ boolean_t NextDataPacket( decoder_fifo_t * p_fifo, data_packet_t ** pp_data )
  * BitstreamNextDataPacket: go to the next data packet, and update bitstream
  * context
  *****************************************************************************/
-static __inline__ void _BitstreamNextDataPacket( bit_stream_t * p_bit_stream )
+static inline void _BitstreamNextDataPacket( bit_stream_t * p_bit_stream )
 {
     decoder_fifo_t *    p_fifo = p_bit_stream->p_decoder_fifo;
     boolean_t           b_new_pes;

@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_audio.c,v 1.7 2002/05/17 23:01:02 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.8 2002/05/18 17:47:47 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -161,7 +161,7 @@ static char* mpegaudio_mode[4] =
     "stereo", "joint stereo", "dual channel", "mono"
 };
 
-static __inline__ u32 __GetDWBE( byte_t *p_buff )
+static inline u32 __GetDWBE( byte_t *p_buff )
 {
     return( ( (*(p_buff)) << 24 ) + ( (*(p_buff+1)) << 16 ) +
                     ( (*(p_buff+2)) << 8 ) +  ( (*(p_buff+3)) ) );

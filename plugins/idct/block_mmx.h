@@ -2,7 +2,7 @@
  * block_mmx.h: Macroblock copy functions in MMX assembly
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: block_mmx.h,v 1.1 2001/09/05 16:07:49 massiot Exp $
+ * $Id: block_mmx.h,v 1.2 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -25,7 +25,7 @@
 /*****************************************************************************
  * InitBlock: placeholder because we don't need a crop table, MMX does it for us
  *****************************************************************************/
-static __inline__ void InitBlock( )
+static inline void InitBlock( )
 {
     ;
 }
@@ -44,8 +44,8 @@ static __inline__ void InitBlock( )
     punpckhbw_r2r (mm0, r2);                                                \
     paddsw_m2r (*(p_block+offset+4), r2);
 
-static __inline__ void AddBlock( dctelem_t * p_block, yuv_data_t * p_data,
-                                 int i_incr )
+static inline void AddBlock( dctelem_t * p_block, yuv_data_t * p_data,
+                             int i_incr )
 {
     movq_m2r (*p_data, mm1);
     pxor_r2r (mm0, mm0);
@@ -82,8 +82,8 @@ static __inline__ void AddBlock( dctelem_t * p_block, yuv_data_t * p_data,
     movq_r2m (r2, *p_data);                                                 \
     packuswb_r2r (r1, r0);
 
-static __inline__ void CopyBlock( dctelem_t * p_block, yuv_data_t * p_data,
-                                  int i_incr )
+static inline void CopyBlock( dctelem_t * p_block, yuv_data_t * p_data,
+                              int i_incr )
 {
     movq_m2r (*(p_block+0*8), mm0);
     movq_m2r (*(p_block+0*8+4), mm1);

@@ -2,7 +2,7 @@
  * idctmmx.c : MMX IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctmmx.c,v 1.25 2002/04/21 11:23:03 gbazin Exp $
+ * $Id: idctmmx.c,v 1.26 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -101,7 +101,7 @@ static void NormScan( u8 ppi_scan[2][64] )
                                        c5, -c1,  c7, -c5,   \
                                        c7,  c3,  c3, -c1 }
 
-static __inline__ void RowHead( dctelem_t * row, int offset, dctelem_t * table )
+static inline void RowHead( dctelem_t * row, int offset, dctelem_t * table )
 {
     movq_m2r (*(row+offset), mm2);      // mm2 = x6 x4 x2 x0
 
@@ -120,7 +120,7 @@ static __inline__ void RowHead( dctelem_t * row, int offset, dctelem_t * table )
     punpckhdq_r2r (mm2, mm2);           // mm2 = x6 x4 x6 x4
 }
 
-static __inline__ void Row( dctelem_t * table, s32 * rounder )
+static inline void Row( dctelem_t * table, s32 * rounder )
 {
     pmaddwd_r2r (mm2, mm4);             // mm4 = -C4*x4-C2*x6 C4*x4+C6*x6
     punpckldq_r2r (mm5, mm5);           // mm5 = x3 x1 x3 x1
@@ -159,7 +159,7 @@ static __inline__ void Row( dctelem_t * table, s32 * rounder )
     psubd_r2r (mm5, mm7);               // mm7 = a3-b3 a2-b2 + rounder
 }
 
-static __inline__ void RowTail( dctelem_t * row, int store )
+static inline void RowTail( dctelem_t * row, int store )
 {
     psrad_i2r (ROW_SHIFT, mm0);         // mm0 = y3 y2
 
@@ -183,8 +183,8 @@ static __inline__ void RowTail( dctelem_t * row, int store )
     movq_r2m (mm7, *(row+store+4));     // save y7 y6 y5 y4
 }
 
-static __inline__ void RowMid( dctelem_t * row, int store,
-                               int offset, dctelem_t * table )
+static inline void RowMid( dctelem_t * row, int store,
+                           int offset, dctelem_t * table )
 {
     movq_m2r (*(row+offset), mm2);      // mm2 = x6 x4 x2 x0
     psrad_i2r (ROW_SHIFT, mm0);         // mm0 = y3 y2
@@ -217,7 +217,7 @@ static __inline__ void RowMid( dctelem_t * row, int store,
     pmaddwd_r2r (mm0, mm3);             // mm3 = C4*x0+C6*x2 C4*x0+C2*x2
 }
 
-static __inline__ void Col( dctelem_t * col, int offset )
+static inline void Col( dctelem_t * col, int offset )
 {
 #define T1 13036
 #define T2 27146
@@ -411,7 +411,7 @@ static void IDCT( dctelem_t * p_block )
     Col( p_block, 4 );
 }
 
-static __inline__ void RestoreCPUState( )
+static inline void RestoreCPUState( )
 {
     /* reenables the FPU */
     __asm__ __volatile__ ("emms");

@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.95 2002/05/14 20:54:52 jobi Exp $
+ * $Id: mpeg_system.c,v 1.96 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -51,10 +51,8 @@
  * It also solves some alignment problems on non-IA-32, non-PPC processors.
  * This is a variation on the theme of input_ext-dec.h:GetChunk().
  *****************************************************************************/
-static __inline__ size_t MoveChunk( byte_t * p_dest,
-                                    data_packet_t ** pp_data_src,
-                                    byte_t ** pp_src,
-                                    size_t i_buf_len )
+static inline size_t MoveChunk( byte_t * p_dest, data_packet_t ** pp_data_src,
+                                byte_t ** pp_src, size_t i_buf_len )
 {
     ptrdiff_t           i_available;
 

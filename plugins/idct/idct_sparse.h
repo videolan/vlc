@@ -2,7 +2,7 @@
  * idct_sparse.h : Sparse IDCT functions (must be include at the end)
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct_sparse.h,v 1.2 2002/04/21 11:23:03 gbazin Exp $
+ * $Id: idct_sparse.h,v 1.3 2002/05/18 17:47:46 sam Exp $
  *
  * Author: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -47,8 +47,8 @@ static void InitIDCT ( void ** pp_idct_data )
 /*****************************************************************************
  * SparseIDCT : IDCT function for sparse matrices
  *****************************************************************************/
-static __inline__ void SparseIDCT( dctelem_t * p_block, void * p_idct_data,
-                                   int i_sparse_pos )
+static inline void SparseIDCT( dctelem_t * p_block, void * p_idct_data,
+                               int i_sparse_pos )
 {
     short int val;
     int * dp;

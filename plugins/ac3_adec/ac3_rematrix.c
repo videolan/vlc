@@ -2,7 +2,7 @@
  * ac3_rematrix.c: ac3 audio rematrixing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_rematrix.c,v 1.6 2001/12/30 07:09:54 sam Exp $
+ * $Id: ac3_rematrix.c,v 1.7 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -41,7 +41,7 @@ struct rematrix_band_s {
 
 static const struct rematrix_band_s rematrix_band[] = { {13,24}, {25,36}, {37 ,60}, {61,252}};
 
-static __inline__ u32 min_value (u32 a, u32 b)
+static inline u32 min_value (u32 a, u32 b)
 {
     return (a < b ? a : b);
 }

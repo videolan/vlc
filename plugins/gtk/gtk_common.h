@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_common.h,v 1.7 2002/03/25 20:37:00 lool Exp $
+ * $Id: gtk_common.h,v 1.8 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -33,7 +33,7 @@
 /*****************************************************************************
  * Useful inline function
  ****************************************************************************/
-static __inline__ intf_thread_t * GetIntf( GtkWidget *item, char * psz_parent )
+static inline intf_thread_t * GetIntf( GtkWidget *item, char * psz_parent )
 {
     return( gtk_object_get_data( GTK_OBJECT( lookup_widget(item, psz_parent) ),
                                                      "p_intf" ) );

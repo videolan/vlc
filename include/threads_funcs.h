@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads_funcs.h,v 1.2 2002/04/29 23:57:38 massiot Exp $
+ * $Id: threads_funcs.h,v 1.3 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -31,7 +31,7 @@
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
  *****************************************************************************/
-static __inline__ int vlc_threads_init( void )
+static inline int vlc_threads_init( void )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_init();
@@ -57,7 +57,7 @@ static __inline__ int vlc_threads_init( void )
 /*****************************************************************************
  * vlc_threads_end: stop threads system
  *****************************************************************************/
-static __inline__ int vlc_threads_end( void )
+static inline int vlc_threads_end( void )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_kill();
@@ -83,7 +83,7 @@ static __inline__ int vlc_threads_end( void )
 /*****************************************************************************
  * vlc_mutex_init: initialize a mutex
  *****************************************************************************/
-static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
+static inline int vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_mutex_init( p_mutex );
@@ -165,8 +165,8 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
         _vlc_mutex_lock( "(unknown)", 0, P_MUTEX )
 #endif
 
-static __inline__ int _vlc_mutex_lock( char * psz_file, int i_line,
-                                       vlc_mutex_t *p_mutex )
+static inline int _vlc_mutex_lock( char * psz_file, int i_line,
+                                   vlc_mutex_t *p_mutex )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_mutex_acquire( p_mutex, TRUE, NULL );
@@ -228,8 +228,8 @@ static __inline__ int _vlc_mutex_lock( char * psz_file, int i_line,
         _vlc_mutex_unlock( "(unknown)", 0, P_MUTEX )
 #endif
 
-static __inline__ int _vlc_mutex_unlock( char * psz_file, int i_line,
-                                         vlc_mutex_t *p_mutex )
+static inline int _vlc_mutex_unlock( char * psz_file, int i_line,
+                                     vlc_mutex_t *p_mutex )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_mutex_release( p_mutex );
@@ -289,8 +289,8 @@ static __inline__ int _vlc_mutex_unlock( char * psz_file, int i_line,
         _vlc_mutex_destroy( "(unknown)", 0, P_MUTEX )
 #endif
 
-static __inline__ int _vlc_mutex_destroy( char * psz_file, int i_line,
-                                          vlc_mutex_t *p_mutex )
+static inline int _vlc_mutex_destroy( char * psz_file, int i_line,
+                                      vlc_mutex_t *p_mutex )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return 0;
@@ -336,7 +336,7 @@ static __inline__ int _vlc_mutex_destroy( char * psz_file, int i_line,
 /*****************************************************************************
  * vlc_cond_init: initialize a condition
  *****************************************************************************/
-static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
+static inline int vlc_cond_init( vlc_cond_t *p_condvar )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_cond_init( p_condvar );
@@ -390,7 +390,7 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
 /*****************************************************************************
  * vlc_cond_signal: start a thread on condition completion
  *****************************************************************************/
-static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
+static inline int vlc_cond_signal( vlc_cond_t *p_condvar )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_cond_notify( p_condvar, FALSE );
@@ -463,7 +463,7 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
  * Only works with pthreads, you need to adapt it for others
  * FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
  */
-static __inline__ int vlc_cond_broadcast( vlc_cond_t *p_condvar )
+static inline int vlc_cond_broadcast( vlc_cond_t *p_condvar )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_cond_notify( p_condvar, FALSE );
@@ -543,9 +543,9 @@ static __inline__ int vlc_cond_broadcast( vlc_cond_t *p_condvar )
         _vlc_cond_wait( "(unknown)", 0, P_COND, P_MUTEX )
 #endif
 
-static __inline__ int _vlc_cond_wait( char * psz_file, int i_line,
-                                      vlc_cond_t *p_condvar,
-                                      vlc_mutex_t *p_mutex )
+static inline int _vlc_cond_wait( char * psz_file, int i_line,
+                                  vlc_cond_t *p_condvar,
+                                  vlc_mutex_t *p_mutex )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_cond_await( p_condvar, p_mutex, NULL );
@@ -670,8 +670,8 @@ static __inline__ int _vlc_cond_wait( char * psz_file, int i_line,
         _vlc_cond_destroy( "(unknown)", 0, P_COND )
 #endif
 
-static __inline__ int _vlc_cond_destroy( char * psz_file, int i_line,
-                                         vlc_cond_t *p_condvar )
+static inline int _vlc_cond_destroy( char * psz_file, int i_line,
+                                     vlc_cond_t *p_condvar )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return 0;
@@ -707,11 +707,9 @@ static __inline__ int _vlc_cond_destroy( char * psz_file, int i_line,
 #define vlc_thread_create( P_THREAD, PSZ_NAME, FUNC, P_DATA )            \
         _vlc_thread_create( __FILE__, __LINE__, P_THREAD, PSZ_NAME, FUNC, P_DATA )
 
-static __inline__ int _vlc_thread_create( char * psz_file, int i_line,
-                                          vlc_thread_t *p_thread,
-                                          char *psz_name,
-                                          vlc_thread_func_t func,
-                                          void *p_data )
+static inline int _vlc_thread_create( char * psz_file, int i_line,
+                                      vlc_thread_t *p_thread, char *psz_name,
+                                      vlc_thread_func_t func, void *p_data )
 {
     int i_ret;
 
@@ -792,7 +790,7 @@ static __inline__ int _vlc_thread_create( char * psz_file, int i_line,
 /*****************************************************************************
  * vlc_thread_exit: terminate a thread
  *****************************************************************************/
-static __inline__ void vlc_thread_exit( void )
+static inline void vlc_thread_exit( void )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     pth_exit( 0 );
@@ -830,8 +828,8 @@ static __inline__ void vlc_thread_exit( void )
         _vlc_thread_join( "(unknown)", 0, THREAD ) 
 #endif
 
-static __inline__ void _vlc_thread_join( char * psz_file, int i_line,
-                                         vlc_thread_t thread )
+static inline void _vlc_thread_join( char * psz_file, int i_line,
+                                     vlc_thread_t thread )
 {
     int i_ret = 0;
 

@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.32 2002/05/13 17:58:08 sam Exp $
+ * $Id: xcommon.c,v 1.33 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -241,7 +241,7 @@ typedef struct mwmhints_s
 /*****************************************************************************
  * Seeking function TODO: put this in a generic location !
  *****************************************************************************/
-static __inline__ void vout_Seek( off_t i_seek )
+static inline void vout_Seek( off_t i_seek )
 {
     off_t i_tell;
 

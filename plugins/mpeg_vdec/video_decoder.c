@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_decoder.c,v 1.8 2002/05/13 23:15:43 massiot Exp $
+ * $Id: video_decoder.c,v 1.9 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -160,14 +160,12 @@ void vdec_EndThread( vdec_thread_t * p_vdec )
 /*****************************************************************************
  * MotionBlock: does one component of the motion compensation
  *****************************************************************************/
-static __inline__ void MotionBlock( vdec_pool_t * p_pool,
-                                    boolean_t b_average,
-                                    int i_x_pred, int i_y_pred,
-                                    yuv_data_t * pp_dest[3], int i_dest_offset,
-                                    yuv_data_t * pp_src[3], int i_src_offset,
-                                    int i_stride, int i_height,
-                                    boolean_t b_second_half,
-                                    int i_chroma_format )
+static inline void MotionBlock( vdec_pool_t * p_pool, boolean_t b_average,
+                                int i_x_pred, int i_y_pred,
+                                yuv_data_t * pp_dest[3], int i_dest_offset,
+                                yuv_data_t * pp_src[3], int i_src_offset,
+                                int i_stride, int i_height,
+                                boolean_t b_second_half, int i_chroma_format )
 {
     int             i_xy_half;
     yuv_data_t *    p_src1;

@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.13 2002/05/06 21:05:26 gbazin Exp $
+ * $Id: xmga.c,v 1.14 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -232,7 +232,7 @@ typedef struct mwmhints_s
 /*****************************************************************************
  * Seeking function TODO: put this in a generic location !
  *****************************************************************************/
-static __inline__ void vout_Seek( off_t i_seek )
+static inline void vout_Seek( off_t i_seek )
 {
     off_t i_tell;
 

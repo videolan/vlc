@@ -34,7 +34,7 @@ struct iovec
  * readv_*: readv() replacements for iovec-impaired C libraries
  *****************************************************************************/
 #if defined( WIN32 )
-static __inline__ int readv( int i_fd, struct iovec *p_iovec, int i_count )
+static inline int readv( int i_fd, struct iovec *p_iovec, int i_count )
 {
     int i_index, i_len, i_total = 0;
     unsigned char *p_base;

@@ -2,7 +2,7 @@
  * vpar_pool.h : video parser/video decoders communication
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_pool.h,v 1.1 2001/11/13 12:09:18 henri Exp $
+ * $Id: vpar_pool.h,v 1.2 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -90,8 +90,8 @@ void vpar_EndPool( struct vpar_thread_s * );
 /*****************************************************************************
  * vpar_GetMacroblock: In a vdec thread, get the next available macroblock
  *****************************************************************************/
-static __inline__ macroblock_t * vpar_GetMacroblock( vdec_pool_t * p_pool,
-                                                     boolean_t * pb_die )
+static inline macroblock_t * vpar_GetMacroblock( vdec_pool_t * p_pool,
+                                                 boolean_t * pb_die )
 {
     macroblock_t *  p_mb;
 

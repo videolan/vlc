@@ -2,7 +2,7 @@
  * ac3_mantissa.h: ac3 mantissa computation
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_mantissa.h,v 1.1 2001/11/13 12:09:17 henri Exp $
+ * $Id: ac3_mantissa.h,v 1.2 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -233,7 +233,7 @@ static const u16 dither_lut[256] =
  0x8bf4, 0x2be5, 0x6bc7, 0xcbd6, 0xeb83, 0x4b92, 0x0bb0, 0xaba1
 };
 
-static __inline__ u16 dither_gen (mantissa_t * p_mantissa)
+static inline u16 dither_gen (mantissa_t * p_mantissa)
 {
         s16 state;
 
@@ -245,8 +245,8 @@ static __inline__ u16 dither_gen (mantissa_t * p_mantissa)
 
 
 /* Fetch an unpacked, left justified, and properly biased/dithered mantissa value */
-static __inline__ float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithflag,
-                                   u16 exp)
+static inline float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithflag,
+                                     u16 exp)
 {
     u16 group_code = 0;
 
@@ -352,7 +352,7 @@ static __inline__ float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithf
 }
 
 /* Uncouple the coupling channel into a fbw channel */
-static __inline__ void uncouple_channel (ac3dec_t * p_ac3dec, u32 ch)
+static inline void uncouple_channel (ac3dec_t * p_ac3dec, u32 ch)
 {
     u32 bnd = 0;
     u32 sub_bnd = 0;

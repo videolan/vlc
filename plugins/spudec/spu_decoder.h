@@ -2,7 +2,7 @@
  * spu_decoder.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: spu_decoder.h,v 1.3 2002/03/15 18:20:27 sam Exp $
+ * $Id: spu_decoder.h,v 1.4 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -86,8 +86,8 @@ typedef struct spudec_thread_s
 /*****************************************************************************
  * AddNibble: read a nibble from a source packet and add it to our integer.
  *****************************************************************************/
-static __inline__ unsigned int AddNibble( unsigned int i_code,
-                                          u8 *p_src, int *pi_index )
+static inline unsigned int AddNibble( unsigned int i_code,
+                                      u8 *p_src, int *pi_index )
 {
     if( *pi_index & 0x1 )
     {

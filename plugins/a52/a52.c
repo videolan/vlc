@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.9 2002/05/01 19:59:42 gbazin Exp $
+ * $Id: a52.c,v 1.10 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -58,7 +58,7 @@ static void EndThread      ( a52_adec_thread_t * );
 
 static void               BitstreamCallback ( bit_stream_t *, boolean_t );
 static void               float2s16_2       ( float *, int16_t * );
-static __inline__ int16_t convert   ( int32_t );
+static inline int16_t     convert   ( int32_t );
 
 /*****************************************************************************
  * Capabilities
@@ -318,7 +318,7 @@ static void EndThread (a52_adec_thread_t *p_a52_adec)
  * float2s16_2 : converts floats to ints using a trick based on the IEEE
  *               floating-point format
  *****************************************************************************/
-static __inline__ int16_t convert (int32_t i)
+static inline int16_t convert (int32_t i)
 {
     if (i > 0x43c07fff)
         return 32767;

@@ -2,7 +2,7 @@
  * idctclassic.c : Classic IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctclassic.c,v 1.23 2002/04/21 11:23:03 gbazin Exp $
+ * $Id: idctclassic.c,v 1.24 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -69,7 +69,7 @@ static void NormScan( u8 ppi_scan[2][64] )
 /*****************************************************************************
  * IDCT : IDCT function for normal matrices
  *****************************************************************************/
-static __inline__ void IDCT( dctelem_t * p_block )
+static inline void IDCT( dctelem_t * p_block )
 {
     s32 tmp0, tmp1, tmp2, tmp3;
     s32 tmp10, tmp11, tmp12, tmp13;
@@ -287,7 +287,7 @@ static __inline__ void IDCT( dctelem_t * p_block )
     }
 }
 
-static __inline__ void RestoreCPUState( )
+static inline void RestoreCPUState( )
 {
     ;
 }

@@ -2,7 +2,7 @@
  * aout_pcm.c: PCM audio output functions
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: aout_pcm.c,v 1.5 2002/05/18 15:51:37 gbazin Exp $
+ * $Id: aout_pcm.c,v 1.6 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -175,8 +175,8 @@ void aout_PCMThread( aout_thread_t * p_aout )
 /*****************************************************************************
  * InitializeIncrement: change i_x/i_y to i_a+i_b/i_c
  *****************************************************************************/
-static __inline__ void InitializeIncrement( aout_increment_t * p_inc,
-                                            int i_x, int i_y )
+static inline void InitializeIncrement( aout_increment_t * p_inc,
+                                        int i_x, int i_y )
 {
     p_inc->i_r = -i_y;
     p_inc->i_a = 0;
@@ -194,8 +194,7 @@ static __inline__ void InitializeIncrement( aout_increment_t * p_inc,
 /*****************************************************************************
  * UpdateIncrement
  *****************************************************************************/
-static __inline__ void UpdateIncrement( aout_increment_t * p_inc, 
-                                        int * pi_integer )
+static inline void UpdateIncrement( aout_increment_t * p_inc, int * pi_integer )
 {
     if( (p_inc->i_r += p_inc->i_b) >= 0 )
     {

@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.9 2002/05/13 21:55:30 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.10 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -94,14 +94,14 @@ MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
 
 
-static __inline__ u16 __GetWordLittleEndianFromBuff( byte_t *p_buff )
+static inline u16 __GetWordLittleEndianFromBuff( byte_t *p_buff )
 {
     u16 i;
     i = (*p_buff) + ( *(p_buff + 1) <<8 );
     return ( i );
 }
 
-static __inline__ u32 __GetDoubleWordLittleEndianFromBuff( byte_t *p_buff )
+static inline u32 __GetDoubleWordLittleEndianFromBuff( byte_t *p_buff )
 {
     u32 i;
     i = (*p_buff) + ( *(p_buff + 1) <<8 ) + 
@@ -199,7 +199,7 @@ static void __PES_NEXT( decoder_fifo_t *p_fifo )
     vlc_mutex_unlock( &p_fifo->data_lock );
 }
 
-static __inline__ void __GetFrame( videodec_thread_t *p_vdec )
+static inline void __GetFrame( videodec_thread_t *p_vdec )
 {
     pes_packet_t  *p_pes;
     data_packet_t *p_data;
@@ -232,7 +232,7 @@ static __inline__ void __GetFrame( videodec_thread_t *p_vdec )
     } while( p_data );
 }
 
-static __inline__ void __NextFrame( videodec_thread_t *p_vdec )
+static inline void __NextFrame( videodec_thread_t *p_vdec )
 {
     pes_packet_t  *p_pes;
 

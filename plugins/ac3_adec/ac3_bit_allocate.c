@@ -2,7 +2,7 @@
  * ac3_bit_allocate.c: ac3 allocation tables
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ac3_bit_allocate.c,v 1.6 2001/12/30 07:09:54 sam Exp $
+ * $Id: ac3_bit_allocate.c,v 1.7 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -154,17 +154,17 @@ static const s16 baptab[] = { 0,  1,  1,  1,  1,  1,  2,  2,  3,  3,  3,  4,  4,
                      10, 10, 10, 11, 11, 11, 11, 12, 12, 12, 12, 13, 13, 13, 13, 14,
                      14, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15 };
 
-static __inline__ u16 max_value (s16 a, s16 b)
+static inline u16 max_value (s16 a, s16 b)
 {
     return (a > b ? a : b);
 }
 
-static __inline__ u16 min_value (s16 a, s16 b)
+static inline u16 min_value (s16 a, s16 b)
 {
     return (a < b ? a : b);
 }
 
-static __inline__ s16 logadd (s16 a, s16 b)
+static inline s16 logadd (s16 a, s16 b)
 {
     s16 c;
 
@@ -175,7 +175,7 @@ static __inline__ s16 logadd (s16 a, s16 b)
     }
 }
 
-static __inline__ s16 calc_lowcomp (s16 a, s16 b0, s16 b1, s16 bin)
+static inline s16 calc_lowcomp (s16 a, s16 b0, s16 b1, s16 bin)
 {
     if (bin < 7) {
         if ((b0 + 256) == b1)

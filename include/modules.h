@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.49 2002/05/15 00:02:27 sam Exp $
+ * $Id: modules.h,v 1.50 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -39,7 +39,7 @@ typedef void *  module_handle_t;
 /*****************************************************************************
  * Module capabilities.
  *****************************************************************************/
-static __inline__ char *GetCapabilityName( unsigned int i_capa )
+static inline char *GetCapabilityName( unsigned int i_capa )
 {
     /* The sole purpose of this inline function and the ugly #defines
      * around it is to avoid having two places to modify when adding a

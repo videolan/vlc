@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.106 2002/05/15 13:07:18 marcari Exp $
+ * $Id: common.h,v 1.107 2002/05/18 17:47:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -335,7 +335,7 @@ typedef struct iso639_lang_s iso639_lang_t;
 #else
 #   define hton16      htons
 #   define hton32      htonl
-    static __inline__ u64 __hton64( u64 i )
+    static inline u64 __hton64( u64 i )
     {
         return ((u64)(htonl((i) & 0xffffffff)) << 32)
                 | htonl(((i) >> 32) & 0xffffffff );

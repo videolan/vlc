@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.19 2002/05/17 18:12:59 stef Exp $
+ * $Id: vpar_headers.c,v 1.20 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -44,7 +44,7 @@
 /*
  * Local prototypes
  */
-static __inline__ void NextStartCode( bit_stream_t * );
+static inline void NextStartCode( bit_stream_t * );
 static void SequenceHeader( vpar_thread_t * p_vpar );
 static void GroupHeader( vpar_thread_t * p_vpar );
 static void PictureHeader( vpar_thread_t * p_vpar );
@@ -117,9 +117,9 @@ u8 pi_scan[2][64] ATTR_ALIGN(16) =
 /*****************************************************************************
  * ReferenceUpdate : Update the reference pointers when we have a new picture
  *****************************************************************************/
-static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
-                                        int i_coding_type,
-                                        picture_t * p_newref )
+static void inline ReferenceUpdate( vpar_thread_t * p_vpar,
+                                    int i_coding_type,
+                                    picture_t * p_newref )
 {
     if( i_coding_type != B_CODING_TYPE )
     {
@@ -150,9 +150,8 @@ static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
  * ReferenceReplace : Replace the last reference pointer when we destroy
  *                    a picture
  *****************************************************************************/
-static void __inline__ ReferenceReplace( vpar_thread_t * p_vpar,
-                                         int i_coding_type,
-                                         picture_t * p_newref )
+static void inline ReferenceReplace( vpar_thread_t * p_vpar, int i_coding_type,
+                                     picture_t * p_newref )
 {
     if( i_coding_type != B_CODING_TYPE )
     {
@@ -171,8 +170,8 @@ static void __inline__ ReferenceReplace( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * LoadMatrix : Load a quantization matrix
  *****************************************************************************/
-static __inline__ void LoadMatrix( vpar_thread_t * p_vpar,
-                                   quant_matrix_t * p_matrix )
+static inline void LoadMatrix( vpar_thread_t * p_vpar,
+                               quant_matrix_t * p_matrix )
 {
     int i_dummy;
 
@@ -198,7 +197,7 @@ static __inline__ void LoadMatrix( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * LinkMatrix : Link a quantization matrix to another
  *****************************************************************************/
-static __inline__ void LinkMatrix( quant_matrix_t * p_matrix, u8 * pi_array )
+static inline void LinkMatrix( quant_matrix_t * p_matrix, u8 * pi_array )
 {
     if( p_matrix->b_allocated )
     {
@@ -213,7 +212,7 @@ static __inline__ void LinkMatrix( quant_matrix_t * p_matrix, u8 * pi_array )
 /*****************************************************************************
  * ChromaToFourCC: Return a FourCC value used by the video output.
  *****************************************************************************/
-static __inline__ u64 ChromaToFourCC( int i_chroma )
+static inline u64 ChromaToFourCC( int i_chroma )
 {
     switch( i_chroma )
     {

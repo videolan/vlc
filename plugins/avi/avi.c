@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.18 2002/05/17 15:47:01 fenrir Exp $
+ * $Id: avi.c,v 1.19 2002/05/18 17:47:46 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -187,7 +187,7 @@ int avi_ParseWaveFormatEx( waveformatex_t *h, byte_t *p_data )
     return( 0 );
 }
 
-static __inline__ int __AVIGetESTypeFromTwoCC( u16 i_type )
+static inline int __AVIGetESTypeFromTwoCC( u16 i_type )
 {
     switch( i_type )
     {
@@ -1193,8 +1193,8 @@ static pes_packet_t *__AVI_ReadStreamBytesInPES(  input_thread_t    *p_input,
  * Function to convert pts to chunk or byte
  *****************************************************************************/
 
-static __inline__ mtime_t __AVI_PTSToChunk( AVIStreamInfo_t *p_info, 
-                                            mtime_t i_pts )
+static inline mtime_t __AVI_PTSToChunk( AVIStreamInfo_t *p_info, 
+                                        mtime_t i_pts )
 {
     return( (mtime_t)((double)i_pts *
                       (double)p_info->header.i_rate /
@@ -1202,8 +1202,8 @@ static __inline__ mtime_t __AVI_PTSToChunk( AVIStreamInfo_t *p_info,
                       (double)1000000.0 ) );
 }
 
-static __inline__ mtime_t __AVI_PTSToByte( AVIStreamInfo_t *p_info,
-                                   mtime_t i_pts )
+static inline mtime_t __AVI_PTSToByte( AVIStreamInfo_t *p_info,
+                                       mtime_t i_pts )
 {
     return( (mtime_t)((double)i_pts * 
                       (double)p_info->header.i_samplesize *
@@ -1420,9 +1420,9 @@ static pes_packet_t *AVI_GetFrameInPES( input_thread_t *p_input,
  *****************************************************************************
  * Handle multiple pes, and set pts to the good value 
  *****************************************************************************/
-static __inline__ void AVI_DecodePES( input_thread_t *p_input,
-                                      AVIStreamInfo_t *p_info,
-                                      pes_packet_t *p_pes )
+static inline void AVI_DecodePES( input_thread_t *p_input,
+                                  AVIStreamInfo_t *p_info,
+                                  pes_packet_t *p_pes )
 {
     pes_packet_t    *p_pes_next;
     /* input_decode want only one pes, but AVI_GetFrameInPES give

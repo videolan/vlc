@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_blocks.c,v 1.8 2002/04/15 23:04:08 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.9 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -81,7 +81,7 @@ void vpar_InitScanTable( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * GetLumaDCDiff : Get the luminance DC coefficient difference
  *****************************************************************************/
-static __inline__ int GetLumaDCDiff( vpar_thread_t * p_vpar )
+static inline int GetLumaDCDiff( vpar_thread_t * p_vpar )
 {
     lookup_t *  p_tab;
     int         i_size, i_dc_diff, i_code;
@@ -123,7 +123,7 @@ static __inline__ int GetLumaDCDiff( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * GetChromaDCDiff : Get the chrominance DC coefficient difference
  *****************************************************************************/
-static __inline__ int GetChromaDCDiff( vpar_thread_t * p_vpar )
+static inline int GetChromaDCDiff( vpar_thread_t * p_vpar )
 {
     lookup_t *  p_tab;
     int         i_size, i_dc_diff, i_code;
@@ -958,8 +958,7 @@ coeff_2:
                p_vpar->sequence.chroma_intra_quant.pi_matrix );
 
 #define DECLARE_INTRAMB( PSZ_NAME, PF_MBFUNC )                              \
-static __inline__ void PSZ_NAME( vpar_thread_t * p_vpar,                    \
-                                 macroblock_t * p_mb )                      \
+static inline void PSZ_NAME( vpar_thread_t * p_vpar, macroblock_t * p_mb )  \
 {                                                                           \
     idct_inner_t *  p_idct;                                                 \
     int             i_b = 4;                                                \
@@ -1011,8 +1010,7 @@ DECLARE_INTRAMB( MPEG2IntraB15MB, MPEG2IntraB15 );
     }
 
 #define DECLARE_NONINTRAMB( PSZ_NAME, PF_MBFUNC )                           \
-static __inline__ void PSZ_NAME( vpar_thread_t * p_vpar,                    \
-                                 macroblock_t * p_mb )                      \
+static inline void PSZ_NAME( vpar_thread_t * p_vpar, macroblock_t * p_mb )  \
 {                                                                           \
     idct_inner_t *  p_idct;                                                 \
     int             i_b = 4;                                                \
@@ -1052,7 +1050,7 @@ DECLARE_NONINTRAMB( MPEG2NonIntraMB, MPEG2NonIntra );
 /****************************************************************************
  * MotionDelta : Parse the next motion delta
  ****************************************************************************/
-static __inline__ int MotionDelta( vpar_thread_t * p_vpar, int i_f_code )
+static inline int MotionDelta( vpar_thread_t * p_vpar, int i_f_code )
 {
     int         i_delta, i_sign, i_code;
     lookup_t *  p_tab;
@@ -1097,7 +1095,7 @@ static __inline__ int MotionDelta( vpar_thread_t * p_vpar, int i_f_code )
 /****************************************************************************
  * BoundMotionVector : Bound a motion_vector :-)
  ****************************************************************************/
-static __inline__ int BoundMotionVector( int i_vector, int i_f_code )
+static inline int BoundMotionVector( int i_vector, int i_f_code )
 {
     int i_limit;
 
@@ -1120,7 +1118,7 @@ static __inline__ int BoundMotionVector( int i_vector, int i_f_code )
 /****************************************************************************
  * GetDMV : Decode a differential motion vector (Dual Prime Arithmetic)
  ****************************************************************************/
-static __inline__ int GetDMV( vpar_thread_t * p_vpar )
+static inline int GetDMV( vpar_thread_t * p_vpar )
 {
     dmv_lookup_t * p_tab;
 
@@ -1532,7 +1530,7 @@ static void MotionFieldConceal( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * MacroblockAddressIncrement : Get the macroblock_address_increment field
  *****************************************************************************/
-static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
+static inline int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
 {
     lookup_t *  p_tab;
     int         i_code;
@@ -1573,7 +1571,7 @@ static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * CodedPattern : coded_block_pattern
  *****************************************************************************/
-static __inline__ int CodedPattern( vpar_thread_t * p_vpar )
+static inline int CodedPattern( vpar_thread_t * p_vpar )
 {
     lookup_t *  p_tab;
     int         i_code;
@@ -1604,10 +1602,8 @@ static __inline__ int CodedPattern( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * MacroblockModes : Get the macroblock_modes structure
  *****************************************************************************/
-static __inline__ int MacroblockModes( vpar_thread_t * p_vpar,
-                                       macroblock_t * p_mb,
-                                       int i_coding_type,
-                                       int i_structure )
+static inline int MacroblockModes( vpar_thread_t * p_vpar, macroblock_t * p_mb,
+                                   int i_coding_type, int i_structure )
 {
     int         i_mb_modes;
     lookup_t *  p_tab;
@@ -1765,9 +1761,9 @@ mb_intra:
         return;                                                             \
     }
 
-static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
-                                   u32 i_vert_code, boolean_t b_mpeg2,
-                                   int i_coding_type, int i_structure )
+static inline void ParseSlice( vpar_thread_t * p_vpar,
+                               u32 i_vert_code, boolean_t b_mpeg2,
+                               int i_coding_type, int i_structure )
 {
     int             i_lum_offset, i_chrom_offset, i_offset, i_lum_vsize, i_chrom_vsize;
     picture_t *     pp_forward_ref[2];
@@ -2156,9 +2152,8 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * PictureData : Parse off all macroblocks (ISO/IEC 13818-2 6.2.3.7)
  *****************************************************************************/
-static __inline__ void vpar_PictureData( vpar_thread_t * p_vpar,
-                                         boolean_t b_mpeg2,
-                                         int i_coding_type, int i_structure )
+static inline void vpar_PictureData( vpar_thread_t * p_vpar, boolean_t b_mpeg2,
+                                     int i_coding_type, int i_structure )
 {
     u32         i_dummy;
 

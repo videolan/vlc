@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.90 2002/05/14 17:31:40 sam Exp $
+ * $Id: vout_sdl.c,v 1.91 2002/05/18 17:47:47 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -93,7 +93,7 @@ typedef struct picture_sys_s
 /*****************************************************************************
  * Seeking function TODO: put this in a generic location !
  *****************************************************************************/
-static __inline__ void vout_Seek( off_t i_seek )
+static inline void vout_Seek( off_t i_seek )
 {
     off_t i_tell;
 
