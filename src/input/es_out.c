@@ -682,11 +682,11 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 }
             }
             i_pcr = (int64_t)va_arg( args, int64_t );
-
             /* search program */
             if( p_prgm )
             {
-                input_ClockManageRef( p_sys->p_input, p_prgm, i_pcr * 9 / 100);
+                /* 11 is a vodoo trick to avoid non_pcr*9/100 to be null */
+                input_ClockManageRef( p_sys->p_input, p_prgm, (i_pcr + 11 ) * 9 / 100);
             }
             p_sys->b_pcr_set = VLC_TRUE;
             return VLC_SUCCESS;
