@@ -208,6 +208,8 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "directx-wallpaper";
         pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "video-snapshot";
+        pi_objects[i++] = p_object->i_object_id;
 
         p_dec_obj = (vlc_object_t *)vlc_object_find( p_object,
                                                      VLC_OBJECT_DECODER,
@@ -395,6 +397,8 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
         ppsz_varnames[i] = "video-on-top";
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "directx-wallpaper";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "video-snapshot";
         pi_objects[i++] = p_object->i_object_id;
 
         p_dec_obj = (vlc_object_t *)vlc_object_find( p_object,

@@ -45,6 +45,8 @@ static int OnTopCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
 static int FullscreenCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
+static int SnapshotCallback( vlc_object_t *, char const *,
+                             vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * vout_RequestWindow: Create/Get a video window if possible.
@@ -228,6 +230,12 @@ void vout_IntfInit( vout_thread_t *p_vout )
         p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
     }
     var_AddCallback( p_vout, "fullscreen", FullscreenCallback, NULL );
+
+    /* Add a snapshot variable */
+    var_Create( p_vout, "video-snapshot", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    text.psz_string = _("Snapshot");
+    var_Change( p_vout, "video-snapshot", VLC_VAR_SETTEXT, &text, NULL );
+    var_AddCallback( p_vout, "video-snapshot", SnapshotCallback, NULL );
 
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-x", VLC_VAR_INTEGER );
@@ -417,5 +425,13 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     val.b_bool = VLC_TRUE;
     var_Set( p_vout, "intf-change", val );
+    return VLC_SUCCESS;
+}
+
+static int SnapshotCallback( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    vout_Control( p_vout, VOUT_SNAPSHOT );
     return VLC_SUCCESS;
 }
