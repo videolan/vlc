@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.29 2001/03/05 00:40:06 stef Exp $
+ * $Id: input_dvd.c,v 1.30 2001/03/06 10:21:59 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -52,7 +52,6 @@
 
 #include <string.h>
 #include <errno.h>
-#include <malloc.h>
 
 #include "config.h"
 #include "common.h"

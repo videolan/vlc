@@ -2,7 +2,7 @@
  * dvd_ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.h,v 1.2 2001/02/20 23:30:15 sam Exp $
+ * $Id: dvd_ioctl.h,v 1.3 2001/03/06 10:21:59 massiot Exp $
  *
  * Authors: David Giller <rafetmad@oxy.edu>
  *          Eberhard Moenkeberg <emoenke@gwdg.de>
@@ -46,7 +46,7 @@ int dvd_ioctl( int i_fd, unsigned long i_op, void *p_arg );
 
 #ifdef SYS_BEOS
 #   include <be/support/byteorder.h>
-#else
+#elif defined(SYS_LINUX)
 #   include <asm/byteorder.h>
 #endif
 
