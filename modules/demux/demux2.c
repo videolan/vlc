@@ -39,14 +39,14 @@ static void Demux2Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Demux2 adaptation layer" ) );
-    set_capability( "demux", 2 );
+    set_capability( "demux", 10 );
     set_callbacks( Demux2Open, Demux2Close );
     add_shortcut( "demux2" );
 
     /* Hack */
     add_shortcut( "nsv" );
     add_shortcut( "live" );
-    add_shortcut( "ts2" );
+    add_shortcut( "ts" );
     add_shortcut( "ps2" );
     add_shortcut( "dvdnav" );
     add_shortcut( "dvdnavsimple" );

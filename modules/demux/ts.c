@@ -73,7 +73,7 @@ vlc_module_begin();
     add_bool( "ts-silent", 0, NULL, "Silent mode", "do not complain on encrypted PES", VLC_TRUE );
     set_capability( "demux2", 10 );
     set_callbacks( Open, Close );
-    add_shortcut( "ts2" );
+    add_shortcut( "ts" );
 vlc_module_end();
 
 /*****************************************************************************

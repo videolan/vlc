@@ -131,12 +131,12 @@ static void TS_DVBPSI_HandlePMT ( input_thread_t *, dvbpsi_pmt_t * );
 vlc_module_begin();
 #if defined MODULE_NAME_IS_ts
     set_description( _("ISO 13818-1 MPEG Transport Stream input") );
-    set_capability( "demux", 160 );
-    add_shortcut( "ts" );
+    set_capability( "demux", 6 );
+    add_shortcut( "ts_old" );
 #elif defined MODULE_NAME_IS_ts_dvbpsi
     set_description( _("ISO 13818-1 MPEG Transport Stream input (libdvbpsi)") );
-    set_capability( "demux", 170 );
-    add_shortcut( "ts_dvbpsi" );
+    set_capability( "demux", 5 );
+    add_shortcut( "ts_old_dvbpsi" );
 #endif
 
     add_bool( "vls-backwards-compat", 0, NULL,
