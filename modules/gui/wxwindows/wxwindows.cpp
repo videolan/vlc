@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.14 2003/03/30 13:23:28 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.15 2003/04/17 14:00:44 anil Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -214,6 +214,9 @@ bool Instance::OnInit()
 
     /* Create the log window */
     p_intf->p_sys->p_messages_window = new Messages( p_intf, MainInterface );
+
+    /* Create the fileinfo window */
+    p_intf->p_sys->p_fileinfo_window = new FileInfo ( p_intf, MainInterface );
 
     /* Show the interface */
     MainInterface->Show( TRUE );

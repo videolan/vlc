@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: fileinfo.cpp,v 1.7 2003/04/06 13:18:26 sigmunau Exp $
+ * $Id: fileinfo.cpp,v 1.8 2003/04/17 14:00:44 anil Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -61,7 +61,7 @@ BEGIN_EVENT_TABLE(FileInfo, wxFrame)
     /* Button events */
     EVT_BUTTON(wxID_OK, FileInfo::OnClose)
 
-    /* Destroy the window when the user closes the window */
+    /* Hide the window when the user closes the window */
     EVT_CLOSE(FileInfo::OnClose)
 
 END_EVENT_TABLE()
@@ -74,8 +74,7 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
-    intf_thread_t *p_intf = _p_intf;
-    input_thread_t *p_input = p_intf->p_sys->p_input;
+    p_intf = _p_intf;
     SetIcon( *p_intf->p_sys->p_icon );
     SetAutoLayout(TRUE);
 
@@ -83,8 +82,8 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     wxPanel *panel = new wxPanel( this, -1 );
     panel->SetAutoLayout( TRUE );
 
-    wxTreeCtrl *tree =
-        new wxTreeCtrl( panel, -1, wxDefaultPosition, wxSize(350,350),
+    fileinfo_tree =
+        new wxTreeCtrl( panel, -1, wxDefaultPosition, wxSize( 350, 350 ),
                         wxTR_HAS_BUTTONS | wxTR_HIDE_ROOT | wxSUNKEN_BORDER );
 
     /* Create the OK button */
@@ -97,7 +96,7 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     ok_button_sizer->Layout();
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
-    panel_sizer->Add( tree, 1, wxEXPAND | wxALL, 5 );
+    panel_sizer->Add( fileinfo_tree, 1, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( ok_button_sizer, 0, wxALIGN_CENTRE );
     panel_sizer->Layout();
     panel->SetSizerAndFit( panel_sizer );
@@ -105,31 +104,57 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     main_sizer->Layout();
     SetSizerAndFit( main_sizer );
 
-    if ( !p_intf->p_sys->p_input )
+    UpdateFileInfo();    
+}
+
+void FileInfo::UpdateFileInfo()
+{
+    if( !p_intf->p_sys->p_input || p_intf->p_sys->p_input->b_dead )
     {
-        /* Nothing to show, but hey... */
-        Show( true );
+        if( fileinfo_root )
+        {
+            fileinfo_tree->SetItemText ( fileinfo_root , "");
+            fileinfo_tree->DeleteChildren ( fileinfo_root );
+        } 
         return;
     }
 
+    input_thread_t *p_input = p_intf->p_sys->p_input;
+
+    if( !fileinfo_root )
+    {
+        fileinfo_root = fileinfo_tree->AddRoot( p_input->psz_name );
+    }
+    else if( fileinfo_tree->GetItemText( fileinfo_root ) == p_input->psz_name )
+    {
+        return;
+    }
+
+    fileinfo_tree->DeleteChildren( fileinfo_root );
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    wxTreeItemId root = tree->AddRoot( p_input->psz_name );
-    input_info_category_t *p_cat = p_input->stream.p_info;
     
-    while ( p_cat ) {
-        wxTreeItemId cat = tree->AppendItem( root, p_cat->psz_name );
+    fileinfo_tree->SetItemText( fileinfo_root , p_input->psz_name );
+    input_info_category_t *p_cat = p_input->stream.p_info;
+
+    while ( p_cat )
+    {
+        wxTreeItemId cat = fileinfo_tree->AppendItem( fileinfo_root,
+                                                      p_cat->psz_name );
         input_info_t *p_info = p_cat->p_info;
-        while ( p_info ) {
-            tree->AppendItem( cat, wxString(p_info->psz_name) + ": "
-                              + p_info->psz_value );
+        while ( p_info )
+        {
+            fileinfo_tree->AppendItem( cat, wxString(p_info->psz_name) + ": "
+                                 + p_info->psz_value );
             p_info = p_info->p_next;
         }
         p_cat = p_cat->p_next;
-        tree->Expand( cat );
+        fileinfo_tree->Expand( cat );
     }
+
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    Show( true );
+    return;
 }
 
 FileInfo::~FileInfo()
@@ -138,5 +163,5 @@ FileInfo::~FileInfo()
 
 void FileInfo::OnClose( wxCommandEvent& event )
 {
-    Destroy();
+    Hide();
 }

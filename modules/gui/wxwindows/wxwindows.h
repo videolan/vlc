@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.16 2003/04/06 16:30:43 gbazin Exp $
+ * $Id: wxwindows.h,v 1.17 2003/04/17 14:00:44 anil Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -26,14 +26,16 @@
 #include <wx/notebook.h>
 #include <wx/spinctrl.h>
 #include <wx/dnd.h>
+#include <wx/treectrl.h>
 
 class Playlist;
 class Messages;
+class FileInfo;
 
 #define SLIDER_MAX_POS 10000
 
 /*****************************************************************************
- * intf_sys_t: description and status of Gtk+ interface
+ * intf_sys_t: description and status of wxwindows interface
  *****************************************************************************/
 struct intf_sys_t
 {
@@ -44,6 +46,7 @@ struct intf_sys_t
     /* secondary windows */
     Playlist            *p_playlist_window;
     Messages            *p_messages_window;
+    FileInfo            *p_fileinfo_window;
 
     /* special actions */
     vlc_bool_t          b_playing;
@@ -400,11 +403,17 @@ public:
     /* Constructor */
     FileInfo( intf_thread_t *p_intf, Interface *p_main_interface );
     virtual ~FileInfo();
+    void UpdateFileInfo();
 
 private:
     void OnClose( wxCommandEvent& event );
+
     DECLARE_EVENT_TABLE();
-    
+   
+    intf_thread_t *p_intf;
+    wxTreeCtrl *fileinfo_tree;
+    wxTreeItemId fileinfo_root;
+
 };
 
 #if !defined(__WXX11__)
