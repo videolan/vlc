@@ -2,7 +2,7 @@
  * standard.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.5 2003/06/23 11:41:26 zorglub Exp $
+ * $Id: standard.c,v 1.6 2003/06/23 13:45:30 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -59,7 +59,7 @@ struct sout_stream_sys_t
 {
     sout_mux_t           *p_mux;
     sap_session_t        *p_sap;
-    unsigned int          b_sap;
+    vlc_bool_t           b_sap;
 };
 
 /*****************************************************************************

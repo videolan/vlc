@@ -98,6 +98,7 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout ,
         if( !( p_network = module_Need( p_sout, "network", psz_network ) ) )
         {
              msg_Warn( p_sout, "failed to open a connection (udp)" );
+             return NULL;
         }
         module_Unneed( p_sout, p_network );
               
@@ -167,6 +168,7 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout ,
         if( !( p_network = module_Need( p_sout, "network", psz_network ) ) )
         {
             msg_Warn( p_sout, "failed to open a connection (udp)" );
+            return NULL;
         }
         module_Unneed( p_sout, p_network );
                
