@@ -2,7 +2,7 @@
  * logo.c : logo video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: logo.c,v 1.2 2003/07/04 19:00:43 titer Exp $
+ * $Id: logo.c,v 1.3 2003/09/18 21:42:54 garf Exp $
  *
  * Authors: Simon Latapie <garf@videolan.org>
  *
@@ -141,9 +141,13 @@ static int Init( vout_thread_t *p_vout )
     png_bytep * row_pointers;
     png_infop info_ptr;
     unsigned int i;
-    unsigned int j;
+//    unsigned int j;
+    unsigned int x;
+    unsigned int y;
     int temp;
     int i_size;
+    int i_parity_width;
+    int i_parity_height;
 
     /*  read png file  */
     filename = config_GetPsz( p_vout, "logo_file" );
@@ -156,7 +160,8 @@ static int Init( vout_thread_t *p_vout )
         p_vout->p_sys->error=1;
         msg_Err( p_vout , "file not found %s", filename );
         free( filename );
-    } else
+    }
+    else
     {
         free( filename );
         p_vout->p_sys->error=0;
@@ -174,6 +179,13 @@ static int Init( vout_thread_t *p_vout )
         fclose(fp);
         /* finish to read the image in the file. Now We have to convert it YUV */
         /* initialize yuv plans of the image */
+        i_parity_width = p_vout->p_sys->width % 2;
+        i_parity_height = p_vout->p_sys->height % 2;
+        
+        p_vout->p_sys->height = p_vout->p_sys->height
+                             + (p_vout->p_sys->height % 2);
+        p_vout->p_sys->width = p_vout->p_sys->width
+                            + (p_vout->p_sys->width % 2);
         i_size = p_vout->p_sys->height * p_vout->p_sys->width;
 
         p_vout->p_sys->png_image[0] = malloc( i_size );
@@ -184,44 +196,51 @@ static int Init( vout_thread_t *p_vout )
         p_vout->p_sys->png_image_a[1] = malloc( i_size / 4 );
         p_vout->p_sys->png_image_a[2] = p_vout->p_sys->png_image_a[1];
 
-        /* conversion */
-        j = 0;
-        for( i= 0; i < p_vout->p_sys->height * p_vout->p_sys->width ; i++)
+        for( y = 0; y < p_vout->p_sys->height ; y++)
         {
-            uint8_t (*p)[4];
-            int x;
-            int y;
-            
-            x = i % p_vout->p_sys->width;
-            y = i / p_vout->p_sys->width;
-
-            /* FIXME FIXME */
-            p = (void*)row_pointers[y];
-
-            p_vout->p_sys->png_image_a[0][i]= p[x][3];        
-            p_vout->p_sys->png_image[0][i]= (p[x][0] * 257
-                                           + p[x][1] * 504
-                                           + p[x][2] * 98)/1000 + 16;
-
-            if( ( x % 2 == 0 ) && ( y % 2 == 0 ) )
+            for( x = 0; x < p_vout->p_sys->width ; x++)
             {
-                temp = (p[x][2] * 439
-                      - p[x][0] * 148
-                      - p[x][1] * 291)/1000 + 128;
+                uint8_t (*p)[4];
+                int idx;
+                int idxc;
+                 
+                /* FIXME FIXME */
+                p = (void*)row_pointers[y];
+                idx = x + y * p_vout->p_sys->width;
+                idxc= x/2 + (y/2) * (p_vout->p_sys->width/2);
 
-                temp = (uint8_t)( temp < 0 ? 0 : temp );
-                p_vout->p_sys->png_image[1][j] = temp;
+                if( ((i_parity_width == 0) || (x != (p_vout->p_sys->width - 1))) &&
+                    ((i_parity_height == 0) || (y != (p_vout->p_sys->height - 1))))
+                {
+                    p_vout->p_sys->png_image_a[0][idx]= p[x][3];
+                    p_vout->p_sys->png_image[0][idx]= (p[x][0] * 257
+                                                     + p[x][1] * 504
+                                                     + p[x][2] * 98)/1000 + 16;
 
-                temp = ( p[x][0] * 439
-                       - p[x][1] * 368
-                       - p[x][2] * 71)/1000 + 128;
-                temp = __MAX( __MIN( temp, 255 ), 0 );
+                    if( ( x % 2 == 0 ) && ( y % 2 == 0 ) )
+                    {
+                
+                        temp = (p[x][2] * 439
+                              - p[x][0] * 148
+                              - p[x][1] * 291)/1000 + 128;
 
-                p_vout->p_sys->png_image[2][j] = (uint8_t)( temp < 0 ? 0 : temp );
-                p_vout->p_sys->png_image_a[1][j] = p_vout->p_sys->png_image_a[0][i];
-                j++;
+                        temp = __MAX( __MIN( temp, 255 ), 0 );
+                        p_vout->p_sys->png_image[1][idxc] = temp;
+
+                        temp = ( p[x][0] * 439
+                               - p[x][1] * 368
+                               - p[x][2] * 71)/1000 + 128;
+                        temp = __MAX( __MIN( temp, 255 ), 0 );
+                        p_vout->p_sys->png_image[2][idxc] = temp;
+                        p_vout->p_sys->png_image_a[1][idxc] = p_vout->p_sys->png_image_a[0][idx];
+
+                    }
+                    
+                } else
+                {
+                    p_vout->p_sys->png_image_a[0][idx]= 0;
+                }
             }
-
         }
         /* now we can free row_pointers*/
         free(row_pointers);
@@ -323,7 +342,6 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     picture_t *p_outpic;
     int i_index;
-    int i_pic_width;
     int tr;
 
     /* This is a new frame. Get a structure from the video_output. */
@@ -340,16 +358,15 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, p_pic->date );
     vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
 
-    i_pic_width=p_vout->output.i_width;
     
     tr = p_vout->p_sys->trans;
     
     for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
     {
-
         memcpy( p_outpic->p[i_index].p_pixels,
                 p_pic->p[i_index].p_pixels, 
                 p_pic->p[i_index].i_lines * p_pic->p[i_index].i_pitch);
+
 
         if (p_vout->p_sys->error == 0)
         {
@@ -362,17 +379,20 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
             if (i_index == 0)
             {
-                p_out  = p_outpic->p[i_index].p_pixels + p_vout->p_sys->posy * i_pic_width + p_vout->p_sys->posx;
-                i_delta = i_pic_width - p_vout->p_sys->width;
+                p_out  = p_outpic->p[i_index].p_pixels +
+                            p_vout->p_sys->posy * p_outpic->p[i_index].i_pitch +
+                            p_vout->p_sys->posx;
                 i_max = p_vout->p_sys->height;
                 j_max = p_vout->p_sys->width;
             } else
             {
-                p_out  = p_outpic->p[i_index].p_pixels + (p_vout->p_sys->posy / 2)* (i_pic_width / 2) + p_vout->p_sys->posx / 2;
-                i_delta = (i_pic_width - p_vout->p_sys->width) / 2;
+                p_out  = p_outpic->p[i_index].p_pixels +
+                         (p_vout->p_sys->posy/2)* p_outpic->p[i_index].i_pitch +
+                         p_vout->p_sys->posx / 2;
                 i_max = p_vout->p_sys->height / 2;
                 j_max = p_vout->p_sys->width / 2;
             }
+            i_delta = p_outpic->p[i_index].i_pitch - j_max;
             
             p_in_a = p_vout->p_sys->png_image_a[i_index];
             p_in   = p_vout->p_sys->png_image[i_index];
@@ -383,7 +403,6 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                 for( j = 0 ; j < j_max ; j++)
                 {
                     *p_out = ( *p_out * ( 65025 - *p_in_a * tr) + *p_in * *p_in_a * tr) >> 16;
-
                     p_out++;
                     p_in++;
                     p_in_a++;
@@ -391,7 +410,6 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                 p_out += i_delta;
             }
          }
-
     }
 
     vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
