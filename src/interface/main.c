@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.100 2001/06/12 00:30:41 reno Exp $
+ * $Id: main.c,v 1.101 2001/06/12 11:02:07 reno Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -930,7 +930,7 @@ static void InstructionSignalHandler( int i_signal )
  *****************************************************************************/
 static int CPUCapabilities( void )
 {
-    int i_capabilities = CPU_CAPABILITY_NONE;
+    volatile int i_capabilities = CPU_CAPABILITY_NONE;
 
 #if defined( SYS_BEOS )
     i_capabilities |= CPU_CAPABILITY_486
@@ -967,8 +967,8 @@ static int CPUCapabilities( void )
     }
 
 #elif defined( __i386__ )
-    unsigned int  i_eax, i_ebx, i_ecx, i_edx;
-    boolean_t     b_amd;
+    volatile unsigned int  i_eax, i_ebx, i_ecx, i_edx;
+    volatile boolean_t     b_amd;
 
     signal( SIGILL,  InstructionSignalHandler );
     
