@@ -144,7 +144,7 @@ Difficulty: Hard
 Urgency: Important
 Description: Write stream zones support
  For random access we need to know where stream descriptors are valid
- and reside (essentially DVD plugin). -> Meuuh
+ and reside (essentially DVD plugin).
 Status: Done (stef)
 
 Task: 0x4d
@@ -161,7 +161,7 @@ Description: Update documentation
  The input structures have undergone a major restructuration with
  input-II. It might be a good idea to reflect thoses changes in the
  documentation.
-Status: Todo
+Status: Done 16 Jul 2001 (Meuuh)
 
 Task: 0x4b
 Difficulty: Guru
@@ -176,8 +176,7 @@ Difficulty: Medium
 Urgency: Normal
 Description: Write ES input plugin
  We need to be able to read .mpg video streams, or .mp* audio streams.
- More information -> Meuuh
-Status: Todo
+Status: Done 27 Jun 2001 (Meuuh)
 
 Task: 0x49
 Difficulty: Easy

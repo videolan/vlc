@@ -50,6 +50,13 @@ HEAD
   * Put most builtins in plugins again due to performances issues.
   * Fixed the painfully slow build process (at last!).
   * Added new dummy input plugin.
+  * Wrote an ES input plug-in for .mpg files which didn't work.
+  * Fixed a bug in GetChunk() for very small chunks of data (hence a bug
+    in the SPU decoder).
+  * Reactivated SDL parachute in non-debug mode (because of a memory
+    leakage).
+  * Added IDEALX developer documentation in doc/.
+  * Removed the outdated generic decoder.
 
 0.2.80
 Tue,  5 Jun 2001 04:41:06 +0200
