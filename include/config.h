@@ -211,6 +211,10 @@
 #define INPUT_VLAN_PORT_VAR             "vlc_vlan_port"
 #define INPUT_VLAN_PORT_DEFAULT         6010
 
+/* Delay between vlan changes - this is required to avoid flooding the VLAN 
+ * server */
+#define INPUT_VLAN_CHANGE_DELAY         5000000
+
 /*******************************************************************************
  * Audio configuration
  *******************************************************************************/

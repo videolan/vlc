@@ -34,7 +34,8 @@
  *******************************************************************************/
 typedef struct input_vlan_s
 {    
-    int i_dummy;
+    int         i_vlan_id;                              /* current vlan number */
+    mtime_t     last_change;                               /* last change date */
 } input_vlan_t;
 
 /*******************************************************************************
@@ -59,6 +60,10 @@ int input_VlanCreate( void )
         return( 1 );        
     }
 
+    /* Initialize structure */
+    p_main->p_vlan->i_vlan_id   = 0;
+    p_main->p_vlan->last_change = 0;    
+
     intf_Msg("VLANs initialized\n");    
     return( 0 );    
 }
@@ -71,6 +76,12 @@ int input_VlanCreate( void )
  *******************************************************************************/
 void input_VlanDestroy( void )
 {
+    /* Return to default vlan */
+    if( p_main->p_vlan->i_vlan_id != 0 )
+    {
+        input_VlanJoin( 0 );        
+    }    
+    
     /* Free structure */
     free( p_main->p_vlan );        
 }
@@ -88,7 +99,16 @@ void input_VlanDestroy( void )
  *******************************************************************************/
 int input_VlanJoin( int i_vlan_id )
 {    
-    intf_Msg("Joining VLAN %d (channel %d)\n", i_vlan_id + 2, i_vlan_id );    
+    /* If last change is too recent, wait a while */
+    if( mdate() - p_main->p_vlan->last_change < INPUT_VLAN_CHANGE_DELAY )
+    {
+        intf_Msg("Waiting before changing VLAN...\n");
+        mwait( p_main->p_vlan->last_change + INPUT_VLAN_CHANGE_DELAY );        
+    }
+    p_main->p_vlan->last_change = mdate();
+    p_main->p_vlan->i_vlan_id = i_vlan_id;    
+
+    intf_Msg("Joining VLAN %d (channel %d)\n", i_vlan_id + 2, i_vlan_id );
     return( ZeTrucMucheFunction( i_vlan_id ) ); // ?? join vlan
 }
 
@@ -100,8 +120,7 @@ int input_VlanJoin( int i_vlan_id )
  *******************************************************************************/
 void input_VlanLeave( int i_vlan_id )
 {
-    intf_Msg("Leaving VLAN %d (channel %d)\n", i_vlan_id + 2, i_vlan_id );    
-    ZeTrucMucheFunction( 0 );    // ?? join default vlan
+    // ??
 }
 
 /* following functions are local */
@@ -115,7 +134,8 @@ static int ZeTrucMucheFunction( int Channel)
 	struct sockaddr_in	sa_client;
         char mess[80];
 
-	
+	return( 0 );
+        
   	/*      
 	 *Looking for informations about the eth0 interface
 	 */
