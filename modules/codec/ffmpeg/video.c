@@ -71,6 +71,9 @@ struct decoder_sys_t
 
     vlc_bool_t b_has_b_frames;
 
+    /* Hack to force display of still pictures */
+    vlc_bool_t b_first_frame;
+
     int i_buffer_orig, i_buffer;
     char *p_buffer_orig, *p_buffer;
 
@@ -365,6 +368,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->input_pts = p_sys->input_dts = 0;
     p_sys->i_pts = 0;
     p_sys->b_has_b_frames = VLC_FALSE;
+    p_sys->b_first_frame = VLC_TRUE;
     p_sys->i_late_frames = 0;
     p_sys->i_buffer = 0;
     p_sys->i_buffer_orig = 1;
@@ -518,7 +522,8 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         i_used = avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
                                        &b_gotpicture,
                                        p_sys->p_buffer, p_sys->i_buffer );
-        if( b_null_size && p_sys->p_context->width > 0 && p_sys->p_context->height > 0 )
+        if( b_null_size && p_sys->p_context->width > 0 &&
+            p_sys->p_context->height > 0 )
         {
             /* Reparse it to not drop the I frame */
             b_null_size = VLC_FALSE;
@@ -609,6 +614,13 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
                     (2 + p_sys->p_ff_pic->repeat_pict) *
                     p_sys->p_context->frame_rate_base /
                     (2 * p_sys->p_context->frame_rate);
+            }
+
+            if( p_sys->b_first_frame )
+            {
+                /* Hack to force display of still pictures */
+                p_sys->b_first_frame = VLC_FALSE;
+                p_pic->b_force = VLC_TRUE;
             }
             return p_pic;
         }
