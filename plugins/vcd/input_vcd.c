@@ -64,10 +64,6 @@
  * Local prototypes
  *****************************************************************************/
 /* called from outside */
-static int  VCDInit         ( struct input_thread_s * );
-static void VCDEnd          ( struct input_thread_s * );
-static int  VCDDemux        ( struct input_thread_s * );
-static int  VCDRewind       ( struct input_thread_s * );
 
 static int  VCDOpen         ( struct input_thread_s *);
 static void VCDClose        ( struct input_thread_s *);
@@ -90,17 +86,6 @@ void _M( access_getfunctions )( function_list_t * p_function_list )
     access.pf_set_program      = VCDSetProgram;
     access.pf_seek             = VCDSeek;
 #undef access
-}
-
-
-void _M( demux_getfunctions )( function_list_t * p_function_list )
-{
-#define demux p_function_list->functions.demux
-    demux.pf_init             = VCDInit;
-    demux.pf_end              = VCDEnd;
-    demux.pf_demux            = VCDDemux;
-    demux.pf_rewind           = VCDRewind;
-#undef demux
 }
 
 /*
@@ -277,7 +262,7 @@ static int VCDOpen( struct input_thread_s *p_input )
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    p_input->psz_demux = "vcd";
+    p_input->psz_demux = "ps";
 
     return 0;
 }
@@ -415,14 +400,6 @@ static int VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
 }
 
 
-/*****************************************************************************
- * VCDRewind : reads a stream backward
- *****************************************************************************/
-static int VCDRewind( input_thread_t * p_input )
-{
-    return( -1 );
-}
-
 /****************************************************************************
  * VCDSeek
  ****************************************************************************/
@@ -439,93 +416,3 @@ static void VCDSeek( input_thread_t * p_input, off_t i_off )
         (off_t)p_vcd->i_sector * (off_t)VCD_DATA_SIZE
          - p_input->stream.p_selected_area->i_start;
 }
-
-/*
- * Demux functions
- */
-
-
-/*****************************************************************************
- * VCDInit: initializes VCD structures
- *****************************************************************************/
-static int VCDInit( input_thread_t * p_input )
-{
-    es_descriptor_t *       p_es;
-    
-    if( p_input->stream.i_method != INPUT_METHOD_VCD )
-    {
-        return -1;
-    }
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    
-    /* Set program information. */
-    input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
-    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-
-    /* No PSM to read in disc mode, we already have all the information */
-    p_input->stream.p_selected_program->b_is_ok = 1;
-
-    p_es = input_AddES( p_input, p_input->stream.p_selected_program, 0xe0, 0 );
-    p_es->i_stream_id = 0xe0;
-    p_es->i_type = MPEG1_VIDEO_ES;
-    p_es->i_cat = VIDEO_ES;
-
-    if( p_main->b_video )
-    {
-        input_SelectES( p_input, p_es );
-    }
-
-    p_es = input_AddES( p_input, p_input->stream.p_selected_program, 0xc0, 0 );
-    p_es->i_stream_id = 0xc0;
-    p_es->i_type = MPEG1_AUDIO_ES;
-    p_es->b_audio = 1;
-    p_es->i_cat = AUDIO_ES;
-
-    if( p_main->b_audio )
-    {
-        input_SelectES( p_input, p_es );
-    }
-
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-    
-    return 0;
-}
-
-/*****************************************************************************
- * VCDEnd: frees unused data
- *****************************************************************************/
-static void VCDEnd( input_thread_t * p_input )
-{
-    ;
-}
-
-
-/*****************************************************************************
- * VCDDemux: reads and demuxes data packets
- *****************************************************************************
- * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
- * packets.
- *****************************************************************************/
-static int VCDDemux( input_thread_t * p_input )
-{
-    int                 i;
-
-    for( i = 0; i < VCD_BLOCKS_ONCE; i++ )
-    {
-        data_packet_t *     p_data;
-        ssize_t             i_result;
-
-        i_result = input_ReadPS( p_input, &p_data );
-
-        if( i_result <= 0 )
-        {
-            return( i_result );
-        }
-
-        input_DemuxPS( p_input, p_data );
-    }
-
-    return( i );
-}
-

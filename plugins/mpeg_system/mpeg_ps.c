@@ -2,7 +2,7 @@
  * mpeg_ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ps.c,v 1.13 2002/04/23 14:16:20 sam Exp $
+ * $Id: mpeg_ps.c,v 1.14 2002/05/15 22:53:10 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -273,7 +273,6 @@ static int PSInit( input_thread_t * p_input )
     {
         /* The programs will be added when we read them. */
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_input->stream.i_method = INPUT_METHOD_FILE;
         p_input->stream.pp_programs[0]->b_is_ok = 0;
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
