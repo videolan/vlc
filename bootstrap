@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.40 2003/01/28 17:11:38 sam Exp $
+##  $Id: bootstrap,v 1.41 2003/02/01 18:41:09 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -245,7 +245,7 @@ fi
 aclocal${amvers} -I m4 || exit 1
 autoheader || exit 1
 
-automake${amvers} --foreign --add-missing --copy || PERLSUCKS=yes
+automake${amvers} --add-missing --copy || PERLSUCKS=yes
 
 case "$PERLSUCKS" in
   no)
