@@ -2,7 +2,7 @@
  * transform.c : transform image plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: transform.c,v 1.4 2002/11/28 17:35:00 sam Exp $
+ * $Id: transform.c,v 1.5 2003/01/09 14:00:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -149,7 +149,7 @@ static int Create( vlc_object_t *p_this )
 
         free( psz_method );
     }
-    
+
     return( 0 );
 }
 
@@ -160,7 +160,7 @@ static int Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
-    
+
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output structure */
@@ -177,8 +177,9 @@ static int Init( vout_thread_t *p_vout )
         p_vout->p_sys->p_vout = vout_Create( p_vout,
                            p_vout->render.i_height, p_vout->render.i_width,
                            p_vout->render.i_chroma,
-                           (u64)VOUT_ASPECT_FACTOR * (u64)VOUT_ASPECT_FACTOR
-                               / (u64)p_vout->render.i_aspect );
+                           (uint64_t)VOUT_ASPECT_FACTOR
+                            * (uint64_t)VOUT_ASPECT_FACTOR
+                            / (uint64_t)p_vout->render.i_aspect );
     }
     else
     {
@@ -193,7 +194,7 @@ static int Init( vout_thread_t *p_vout )
         msg_Err( p_vout, "cannot open vout, aborting" );
         return( 0 );
     }
- 
+
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
     return( 0 );
@@ -249,7 +250,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             return;
         }
         msleep( VOUT_OUTMEM_SLEEP );
-    }   
+    }
 
     vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, p_pic->date );
     vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
@@ -261,18 +262,19 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             {
                 int i_pitch = p_pic->p[i_index].i_pitch;
 
-                u8 *p_in = p_pic->p[i_index].p_pixels;
+                uint8_t *p_in = p_pic->p[i_index].p_pixels;
 
-                u8 *p_out = p_outpic->p[i_index].p_pixels;
-                u8 *p_out_end = p_out + p_outpic->p[i_index].i_lines
-                                         * p_outpic->p[i_index].i_pitch;
+                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
+                uint8_t *p_out_end = p_out + p_outpic->p[i_index].i_lines
+                                              * p_outpic->p[i_index].i_pitch;
 
                 for( ; p_out < p_out_end ; )
                 {
-                    u8 *p_line_end;
+                    uint8_t *p_line_end;
 
-                    p_line_end = p_in + p_pic->p[i_index].i_lines
-                                         * p_pic->p[i_index].i_pitch;
+                    p_out_end -= p_outpic->p[i_index].i_pitch
+                                  - p_outpic->p[i_index].i_visible_pitch;
+                    p_line_end = p_in + p_pic->p[i_index].i_lines * i_pitch;
 
                     for( ; p_in < p_line_end ; )
                     {
@@ -286,13 +288,14 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             break;
 
         case TRANSFORM_MODE_180:
+            /* FIXME: we should use i_visible_pitch here */
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
-                u8 *p_in = p_pic->p[i_index].p_pixels;
-                u8 *p_in_end = p_in + p_pic->p[i_index].i_lines
-                                       * p_pic->p[i_index].i_pitch;
+                uint8_t *p_in = p_pic->p[i_index].p_pixels;
+                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_lines
+                                            * p_pic->p[i_index].i_pitch;
 
-                u8 *p_out = p_outpic->p[i_index].p_pixels;
+                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
 
                 for( ; p_in < p_in_end ; )
                 {
@@ -306,18 +309,17 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             {
                 int i_pitch = p_pic->p[i_index].i_pitch;
 
-                u8 *p_in = p_pic->p[i_index].p_pixels;
+                uint8_t *p_in = p_pic->p[i_index].p_pixels;
 
-                u8 *p_out = p_outpic->p[i_index].p_pixels;
-                u8 *p_out_end = p_out + p_outpic->p[i_index].i_lines
-                                         * p_outpic->p[i_index].i_pitch;
+                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
+                uint8_t *p_out_end = p_out + p_outpic->p[i_index].i_lines
+                                              * p_outpic->p[i_index].i_pitch;
 
                 for( ; p_out < p_out_end ; )
                 {
-                    u8 *p_in_end;
+                    uint8_t *p_in_end;
 
-                    p_in_end = p_in + p_pic->p[i_index].i_lines
-                                       * p_pic->p[i_index].i_pitch;
+                    p_in_end = p_in + p_pic->p[i_index].i_lines * i_pitch;
 
                     for( ; p_in < p_in_end ; )
                     {
@@ -325,6 +327,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                         *p_out++ = *p_in_end;
                     }
 
+                    p_out += p_outpic->p[i_index].i_pitch
+                              - p_outpic->p[i_index].i_visible_pitch;
                     p_in++;
                 }
             }
@@ -333,17 +337,17 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         case TRANSFORM_MODE_VFLIP:
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
-                u8 *p_in = p_pic->p[i_index].p_pixels;
-                u8 *p_in_end = p_in + p_pic->p[i_index].i_lines
-                                       * p_pic->p[i_index].i_pitch;
+                uint8_t *p_in = p_pic->p[i_index].p_pixels;
+                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_lines
+                                            * p_pic->p[i_index].i_pitch;
 
-                u8 *p_out = p_outpic->p[i_index].p_pixels;
+                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
 
                 for( ; p_in < p_in_end ; )
                 {
                     p_in_end -= p_pic->p[i_index].i_pitch;
                     p_vout->p_vlc->pf_memcpy( p_out, p_in_end,
-                                              p_pic->p[i_index].i_pitch );
+                                           p_pic->p[i_index].i_visible_pitch );
                     p_out += p_pic->p[i_index].i_pitch;
                 }
             }
@@ -352,15 +356,16 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         case TRANSFORM_MODE_HFLIP:
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
-                u8 *p_in = p_pic->p[i_index].p_pixels;
-                u8 *p_in_end = p_in + p_pic->p[i_index].i_lines
-                                       * p_pic->p[i_index].i_pitch;
+                uint8_t *p_in = p_pic->p[i_index].p_pixels;
+                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_lines
+                                            * p_pic->p[i_index].i_pitch;
 
-                u8 *p_out = p_outpic->p[i_index].p_pixels;
+                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
 
                 for( ; p_in < p_in_end ; )
                 {
-                    u8 *p_line_end = p_in + p_pic->p[i_index].i_pitch;
+                    uint8_t *p_line_end = p_in
+                                           + p_pic->p[i_index].i_visible_pitch;
 
                     for( ; p_in < p_line_end ; )
                     {
