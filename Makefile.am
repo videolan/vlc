@@ -10,7 +10,7 @@ DIST_SUBDIRS = $(SUBDIRS) modules src debian doc ipkg lib autotools
 
 EXTRA_DIST = HACKING MAINTAINERS src/extras/COPYING \
              INSTALL.win32 README.MacOSX.rtf vlc.spec install-win32 \
-             Modules.am macosx-dmg \
+             Modules.am \
              configure.ac.in mkinstalldirs bootstrap
 MOSTLYCLEANFILES =
 BUILT_SOURCES =
@@ -248,9 +248,13 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/pause.png \
 	extras/MacOSX/Resources/play.png \
 	extras/MacOSX/Resources/prefs.png \
+	extras/MacOSX/Resources/slow.png \
 	extras/MacOSX/Resources/stop.png \
 	extras/MacOSX/Resources/vlc_hg.png \
+	extras/MacOSX/Resources/vlc.scriptSuite \
+	extras/MacOSX/Resources/English.lproj/vlc.scriptTerminology \
 	extras/MacOSX/vlc.pbproj/project.pbxproj \
+	extras/MacOSX/macosx-dmg \
 	$(NULL)
 
 ###############################################################################
@@ -560,7 +564,7 @@ package-macosx:
 	cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS tmp/
 
 # Create disk image 
-	./macosx-dmg 18 "vlc-${VERSION}" tmp/* 
+	./extras/MacOSX/macosx-dmg 18 "vlc-${VERSION}" tmp/* 
 
 # Clean up
 	rm -Rf tmp
