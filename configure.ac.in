@@ -736,6 +736,16 @@ case "${ARCH}" in
 esac
 
 dnl
+dnl  Enable profiling
+dnl
+AC_ARG_ENABLE(gprof,
+[  --enable-gprof          gprof profiling (default disabled)])
+AC_ARG_ENABLE(cprof,
+[  --enable-cprof          cprof profiling (default disabled)])
+AM_CONDITIONAL(GPROF, test "${enable_gprof}" = "yes")
+AM_CONDITIONAL(CPROF, test "${enable_gprof}" = "yes")
+
+dnl
 dnl  default modules
 dnl
 PLUGINS="${PLUGINS} dummy rc logger gestures access_file memcpy"
@@ -759,11 +769,16 @@ PLUGINS="${PLUGINS} sap screensaver"
 dnl
 dnl  Accelerated modules
 dnl
-MMX_MODULES="memcpymmx idctmmx motionmmx i420_rgb_mmx i420_yuy2_mmx i422_yuy2_mmx i420_ymga_mmx"
+MMX_MODULES="memcpymmx idctmmx motionmmx i420_rgb_mmx i422_yuy2_mmx i420_ymga_mmx"
 MMXEXT_MODULES="memcpymmxext idctmmxext motionmmxext"
 THREEDNOW_MODULES="memcpy3dn"
 SSE_MODULES=""
 ALTIVEC_MODULES="idctaltivec motionaltivec memcpyaltivec"
+
+if test "${enable_gprof}" != "yes"
+then
+  MMX_MODULES="${MMX_MODULES} i420_yuy2_mmx"
+fi
 
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
     [ac_cv_mmx_inline],
@@ -2651,16 +2666,6 @@ if test "${ac_cv_c_bigendian}" = "yes"
 then
   AC_DEFINE(WORDS_BIGENDIAN, 1, big endian system)
 fi
-
-dnl
-dnl  Profiling
-dnl
-AC_ARG_ENABLE(gprof,
-[  --enable-gprof          gprof profiling (default disabled)])
-AC_ARG_ENABLE(cprof,
-[  --enable-cprof          cprof profiling (default disabled)])
-AM_CONDITIONAL(GPROF, test "x${enable_gprof}" = "xyes")
-AM_CONDITIONAL(CPROF, test "x${enable_gprof}" = "xyes")
 
 dnl
 dnl  GNU portable threads
