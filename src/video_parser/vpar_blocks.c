@@ -522,16 +522,27 @@ void InitDCTTables( vpar_thread_t * p_vpar )
     memcpy( p_vpar->pppl_dct_dc_size[1][1], pl_dct_dc_chrom_init_table_2,
             sizeof( pl_dct_dc_chrom_init_table_2 ) );
     /* For table B14 & B15, we have a pointer to tables */
+    p_vpar->ppl_dct_coef[0] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab_dc ) );
     memcpy( p_vpar->ppl_dct_coef[0], pl_DCT_tab_dc, sizeof( pl_DCT_tab_dc ) );
+    p_vpar->ppl_dct_coef[1] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab_ac ) );
     memcpy( p_vpar->ppl_dct_coef[1], pl_DCT_tab_ac, sizeof( pl_DCT_tab_ac ) );
+    p_vpar->ppl_dct_coef[2] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab0 ) );
     memcpy( p_vpar->ppl_dct_coef[2], pl_DCT_tab0, sizeof( pl_DCT_tab0 ) );
+    p_vpar->ppl_dct_coef[3] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab1 ) );
     memcpy( p_vpar->ppl_dct_coef[3], pl_DCT_tab1, sizeof( pl_DCT_tab1 ) );
+    p_vpar->ppl_dct_coef[4] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab2 ) );
     memcpy( p_vpar->ppl_dct_coef[4], pl_DCT_tab2, sizeof( pl_DCT_tab2 ) );
+    p_vpar->ppl_dct_coef[5] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab3 ) );
     memcpy( p_vpar->ppl_dct_coef[5], pl_DCT_tab3, sizeof( pl_DCT_tab3 ) );
+    p_vpar->ppl_dct_coef[6] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab4 ) );
     memcpy( p_vpar->ppl_dct_coef[6], pl_DCT_tab4, sizeof( pl_DCT_tab4 ) );
+    p_vpar->ppl_dct_coef[7] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab5 ) );
     memcpy( p_vpar->ppl_dct_coef[7], pl_DCT_tab5, sizeof( pl_DCT_tab5 ) );
+    p_vpar->ppl_dct_coef[8] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab6 ) );
     memcpy( p_vpar->ppl_dct_coef[8], pl_DCT_tab6, sizeof( pl_DCT_tab6 ) );
+    p_vpar->ppl_dct_coef[9] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab0a ) );
     memcpy( p_vpar->ppl_dct_coef[9], pl_DCT_tab0a, sizeof( pl_DCT_tab0a ) );
+    p_vpar->ppl_dct_coef[10] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab1a ) );
     memcpy( p_vpar->ppl_dct_coef[10], pl_DCT_tab1a, sizeof( pl_DCT_tab1a ) );
 }
 

@@ -164,10 +164,11 @@ static __inline__ void NextStartCode( vpar_thread_t * p_vpar )
     /* Re-align the buffer on an 8-bit boundary */
     RealignBits( &p_vpar->bit_stream );
 
-    while( ShowBits( &p_vpar->bit_stream, 24 ) != 0x01L && !p_vpar->b_die )
+    while( ShowBits( &p_vpar->bit_stream, 16 ) != 0 && !p_vpar->b_die )
     {
         DumpBits( &p_vpar->bit_stream, 8 );
     }
+    DumpBits( &p_vpar->bit_stream, 16 );
 }
 
 /*****************************************************************************
@@ -262,7 +263,7 @@ int vpar_NextSequenceHeader( vpar_thread_t * p_vpar )
     while( !p_vpar->b_die )
     {
         NextStartCode( p_vpar );
-        if( ShowBits( &p_vpar->bit_stream, 32 ) == SEQUENCE_HEADER_CODE )
+        if( ShowBits( &p_vpar->bit_stream, 16 ) == SEQUENCE_HEADER_CODE )
             return 0;
     }
     return 1;
@@ -279,21 +280,28 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
         switch( GetBits32( &p_vpar->bit_stream ) )
         {
         case SEQUENCE_HEADER_CODE:
+            fprintf( stderr, "begin sequence header\n" );
             SequenceHeader( p_vpar );
+            fprintf( stderr, "end sequence header\n" );
             return 0;
             break;
 
         case GROUP_START_CODE:
+            fprintf( stderr, "begin group\n" );
             GroupHeader( p_vpar );
+            fprintf( stderr, "end group\n" );
             return 0;
             break;
 
         case PICTURE_START_CODE:
+            fprintf( stderr, "begin picture\n" );
             PictureHeader( p_vpar );
+            fprintf( stderr, "end picture\n" );
             return 0;
             break;
 
         case SEQUENCE_END_CODE:
+            fprintf( stderr, "sequence header end code\n" );
             return 1;
             break;
 
@@ -531,8 +539,9 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     /* 
      * Picture Coding Extension
      */
+    fprintf( stderr, "picture1\n" );
     NextStartCode( p_vpar );
-    if( ShowBits( &p_vpar->bit_stream, 32 ) == EXTENSION_START_CODE )
+    if( ShowBits( &p_vpar->bit_stream, 16 ) == EXTENSION_START_CODE )
     {
         /* Parse picture_coding_extension */
         DumpBits32( &p_vpar->bit_stream );

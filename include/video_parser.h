@@ -72,7 +72,7 @@ typedef struct vpar_thread_s
     /* variable length codes for the structure dct_dc_size for intra blocks */
     lookup_t                pppl_dct_dc_size[2][2][32];
     /* structure to store the tables B14 & B15 */
-    dct_lookup_t            *ppl_dct_coef[10];
+    dct_lookup_t            *ppl_dct_coef[11];
 
 #ifdef STATS
     /* Statistics */
