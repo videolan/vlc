@@ -92,6 +92,7 @@ typedef struct
                                                    * matrices                */
     int                 pi_dc_dct_pred[3];          /* ISO/IEC 13818-2 7.2.1 */
     int                 pppi_pmv[2][2][2];  /* Motion vect predictors, 7.6.3 */
+    int                 i_motion_dir;/* Used for the next skipped macroblock */
 
     /* Context used to optimize block parsing */
     int                 i_motion_type, i_mv_count, i_mv_format;
