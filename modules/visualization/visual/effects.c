@@ -2,7 +2,7 @@
  * effects.c : Effects for the visualization system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: effects.c,v 1.5 2003/09/03 10:00:23 zorglub Exp $
+ * $Id: effects.c,v 1.6 2003/09/08 22:00:47 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -175,7 +175,7 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                  y = p_dest[j];
         }
         /* Calculate the height of the bar */
-        y >>=5; /* remove some noise */
+        y >>=7;/* remove some noise */
         if( y != 0)
         {
             height[i] = (int)log(y)* y_scale;
