@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.13 2002/03/22 13:16:35 tcastley Exp $
+ * $Id: InterfaceWindow.cpp,v 1.14 2002/03/26 10:29:19 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -138,6 +138,8 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 
     p_mediaControl = new MediaControlView( controlRect );
     p_mediaControl->SetViewColor( ui_color(B_PANEL_BACKGROUND_COLOR) );
+    b_empty_playlist = true;
+    p_mediaControl->SetEnabled( !b_empty_playlist );
 
     /* Show */
     AddChild( p_mediaControl );
@@ -199,6 +201,8 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         file_panel = new BFilePanel();
         file_panel->SetTarget( this );
         file_panel->Show();
+        b_empty_playlist = false;
+        p_mediaControl->SetEnabled( !b_empty_playlist );
         break;
 
 	case OPEN_PLAYLIST:
@@ -224,6 +228,8 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             }
             intf_PlaylistJumpto( p_main->p_playlist, 
                                  p_main->p_playlist->i_size - 1 );
+            b_empty_playlist = false;
+            p_mediaControl->SetEnabled( !b_empty_playlist );
         }
         break;
 
