@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.91 2002/07/16 21:25:43 sam Exp $
+ * $Id: input_programs.c,v 1.92 2002/07/21 15:18:29 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -693,6 +693,7 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     case SVQ1_VIDEO_ES:
     case H263_VIDEO_ES:
     case I263_VIDEO_ES:
+    case CINEPAK_VIDEO_ES:
     case DVD_SPU_ES:
         if( config_GetInt( p_input, "video" ) )
         {

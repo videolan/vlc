@@ -27,6 +27,7 @@ PLUGINS_DIR :=	a52 \
 		avi \
 		beos \
 		chroma \
+		cinepak \
 		directx \
 		downmix \
 		dsp \
@@ -55,6 +56,7 @@ PLUGINS_DIR :=	a52 \
 		mpeg_system \
 		mpeg_adec \
 		mpeg_vdec \
+		mp4 \
 		network \
 		ogg \
 		qnx \
@@ -88,6 +90,7 @@ PLUGINS_TARGETS := a52/a52 \
 		chroma/chroma_i422_yuy2_mmx \
 		chroma/chroma_i420_ymga \
 		chroma/chroma_i420_ymga_mmx \
+		cinepak/cinepak \
 		directx/directx \
 		downmix/downmix \
 		downmix/downmixsse \
@@ -146,6 +149,7 @@ PLUGINS_TARGETS := a52/a52 \
 		mpeg_system/mpeg_ts_dvbpsi \
 		mpeg_adec/mpeg_adec \
 		mpeg_vdec/mpeg_vdec \
+		mp4/mp4 \
 		network/ipv4 \
 		network/ipv6 \
 		ogg/vorbis \

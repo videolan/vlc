@@ -1048,6 +1048,16 @@ then
 fi
 
 dnl
+dnl  cinepak plugin
+dnl
+AC_ARG_ENABLE(cinepak,
+  [  --enable-cinepak        Cinepak decoder (default enabled)])
+if test "x${enable_cinepak}" != "xno"
+then
+  PLUGINS="${PLUGINS} cinepak"
+fi
+
+dnl
 dnl  ogg vorbis plugin
 dnl
 AC_ARG_ENABLE(vorbis,
