@@ -476,6 +476,15 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
     p_pic->i_refcount--;
+
+#ifdef DEBUG_VIDEO
+    if( p_pic->i_refcount < 0 )
+    {
+        intf_DbgMsg("error: refcount < 0\n");
+        p_pic->i_refcount = 0;        
+    }    
+#endif
+
     if( (p_pic->i_refcount == 0) && (p_pic->i_status == DISPLAYED_PICTURE) )
     {
 	p_pic->i_status = DESTROYED_PICTURE;
@@ -760,6 +769,7 @@ static void EndThread( vout_thread_t *p_vout )
  *******************************************************************************/
 static void RenderBlank( vout_thread_t *p_vout )
 {
+    //?? toooooo slow
     int  i_index;                                    /* current 32 bits sample */    
     int  i_width;                                 /* number of 32 bits samples */    
     u32 *p_pic;                                  /* pointer to 32 bits samples */
@@ -804,13 +814,18 @@ static void RenderBlank( vout_thread_t *p_vout )
  *******************************************************************************/
 static int RenderPicture( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_blank )
 {
+#ifdef STATS
+    /* Start recording render time */
+    p_vout->render_time = mdate();
+#endif
+
     /* Mark last picture date */
     p_vout->last_picture_date = p_pic->date;    
 
     /* Blank screen if required */
     if( b_blank )
     {
-        RenderBlank( p_vout );
+// ?????       RenderBlank( p_vout );
     }
 
     /* 
@@ -846,7 +861,7 @@ static int RenderPicture( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_b
  /* ??? p_vout->p_convert_yuv_420( p_vout, 
                                    p_pic->p_y, p_pic->p_u, p_pic->p_v,
                                    i_chroma_width, i_chroma_height,
-                                   p_vout->i_width / 2, p_vout->i_height,
+                                    p_vout->i_width / 2, p_vout->i_height,
                                    p_vout->i_bytes_per_line,
                                    0, 0, 0 );
   */      break;        
@@ -870,10 +885,12 @@ static int RenderPicture( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_b
      */
     //??
 
+#ifdef STATS
+    /* End recording render time */
+    p_vout->render_time = mdate() - p_vout->render_time;
+#endif
     return( 1 );    
 }
-
-
 
 /*******************************************************************************
  * RenderPictureInfo: print additionnal informations on a picture
@@ -909,17 +926,17 @@ static int RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic, boolean_t
     /*
      * Print picture information in lower right corner
      */
-    sprintf( psz_buffer, "%s picture (mc=%d) %dx%d (%dx%d%+d%+d ar=%s)",
+    sprintf( psz_buffer, "%s picture %dx%d (%dx%d%+d%+d %s)",
              (p_pic->i_type == YUV_420_PICTURE) ? "4:2:0" :
              ((p_pic->i_type == YUV_422_PICTURE) ? "4:2:2" :
-              ((p_pic->i_type == YUV_444_PICTURE) ? "4:4:4" : "?")),
-             p_pic->i_matrix_coefficients, p_pic->i_width, p_pic->i_height,
+              ((p_pic->i_type == YUV_444_PICTURE) ? "4:4:4" : "ukn-type")),
+             p_pic->i_width, p_pic->i_height,
              p_pic->i_display_width, p_pic->i_display_height,
              p_pic->i_display_horizontal_offset, p_pic->i_display_vertical_offset,
-             (p_pic->i_aspect_ratio == AR_SQUARE_PICTURE) ? "square" :
+             (p_pic->i_aspect_ratio == AR_SQUARE_PICTURE) ? "sq" :
              ((p_pic->i_aspect_ratio == AR_3_4_PICTURE) ? "4:3" :
               ((p_pic->i_aspect_ratio == AR_16_9_PICTURE) ? "16:9" :
-               ((p_pic->i_aspect_ratio == AR_221_1_PICTURE) ? "2.21:1" : "?" ))));    
+               ((p_pic->i_aspect_ratio == AR_221_1_PICTURE) ? "2.21:1" : "ukn-ar" ))));    
     vout_SysPrint( p_vout, p_vout->i_width, p_vout->i_height, 1, 1, psz_buffer );
 #endif
     

@@ -288,9 +288,6 @@
  * X11 settings 
  */
 
-/* Allow use of X11 XShm (shared memory) extension if possible */
-#define VOUT_XSHM                       1
-
 /* Font maximum and minimum characters - characters outside this range are not
  * printed - maximum range is 1-256 */
 #define VOUT_MIN_CHAR                   1

@@ -136,7 +136,7 @@ int vout_SysInit( vout_thread_t *p_vout )
         }
         if( i_err )                                        /* an error occured */
         {                        
-            intf_Msg("warning: XShm video extension desactivated\n" );
+            intf_Msg("Video: XShm extension desactivated\n" );
             p_vout->p_sys->b_shm = 0;
         }
     }
@@ -146,14 +146,14 @@ int vout_SysInit( vout_thread_t *p_vout )
     {
         if( X11CreateImage( p_vout, &p_vout->p_sys->p_ximage[0] ) )
         {
-            intf_Msg("error: can't create images\n");
+            intf_ErrMsg("error: can't create images\n");
             p_vout->p_sys->p_ximage[0] = NULL;
             p_vout->p_sys->p_ximage[1] = NULL;
             return( 1 );
         }
         if( X11CreateImage( p_vout, &p_vout->p_sys->p_ximage[1] ) )
         {
-            intf_Msg("error: can't create images\n");
+            intf_ErrMsg("error: can't create images\n");
             X11DestroyImage( p_vout->p_sys->p_ximage[0] );
             p_vout->p_sys->p_ximage[0] = NULL;
             p_vout->p_sys->p_ximage[1] = NULL;
@@ -213,8 +213,8 @@ int vout_SysManage( vout_thread_t *p_vout )
 {
     if( p_vout->i_changes & VOUT_SIZE_CHANGE ) 
     {        
+        intf_DbgMsg("resizing window\n");      
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;        
-        intf_DbgMsg("resizing window\n");        
 
         /* Resize window */
         XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->window, 
@@ -224,7 +224,12 @@ int vout_SysManage( vout_thread_t *p_vout )
         vout_SysEnd( p_vout );
 
         /* Recreate XImages. If SysInit failed, the thread can't go on. */
-        return( vout_SysInit( p_vout ) );
+        if( vout_SysInit( p_vout ) )
+        {
+            intf_ErrMsg("error: can't resize display\n");
+            return( 1 );            
+        }
+        intf_Msg("Video: display resized to %dx%d\n", p_vout->i_width, p_vout->i_height);            
     }
     
     return 0;
@@ -379,9 +384,12 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
 
     /* Initialize structure */
     p_vout->p_sys->root_window  = root_window;
-    p_vout->p_sys->b_shm        = VOUT_XSHM && 
-        (XShmQueryExtension(p_vout->p_sys->p_display) == True);
+    p_vout->p_sys->b_shm        = (XShmQueryExtension(p_vout->p_sys->p_display) == True);
     p_vout->p_sys->i_screen     = DefaultScreen( p_vout->p_sys->p_display );
+    if( !p_vout->p_sys->b_shm )
+    {        
+        intf_Msg("Video: XShm extension is not available\n");    
+    }    
 
     /* Get the screen depth */
     p_vout->i_screen_depth = DefaultDepth( p_vout->p_sys->p_display, 
