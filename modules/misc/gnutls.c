@@ -24,7 +24,6 @@
 /*
  * TODO:
  * - fix FIXMEs,
- * - server-side client cert validation,
  * - client-side server cert validation (?).
  */
 
@@ -105,6 +104,8 @@ typedef struct tls_server_sys_t
     struct saved_session_t          *p_store;
     int                             i_cache_size;
     vlc_mutex_t                     cache_lock;
+
+    int                             (*pf_handshake2)( tls_session_t * );
 } tls_server_sys_t;
 
 
@@ -186,7 +187,7 @@ gnutls_Recv( void *p_session, void *buf, int i_length )
  * needed, 2 if more would-be blocking send is required.
  *****************************************************************************/
 static int
-gnutls_SessionContinueHandshake( tls_session_t *p_session)
+gnutls_ContinueHandshake( tls_session_t *p_session)
 {
     tls_session_sys_t *p_sys;
     int val;
@@ -211,7 +212,51 @@ gnutls_SessionContinueHandshake( tls_session_t *p_session)
 }
 
 static int
-gnutls_SessionHandshake( tls_session_t *p_session, int fd,
+gnutls_HandshakeAndValidate( tls_session_t *p_session )
+{
+    int val;
+
+    val = gnutls_ContinueHandshake( p_session );
+    if( val == 0 )
+    {
+        int status;
+
+        val = gnutls_certificate_verify_peers2( ((tls_session_sys_t *)
+                                                (p_session->p_sys))->session,
+                                                &status );
+
+        if( val )
+        {
+            msg_Err( p_session, "TLS certificate verification failed : %s",
+                     gnutls_strerror( val ) );
+            p_session->pf_close( p_session );
+            return -1;
+        }
+
+        if( status )
+        {
+            msg_Warn( p_session, "TLS session : access denied" );
+            if( status & GNUTLS_CERT_INVALID )
+                msg_Dbg( p_session, "certificate could not be verified" );
+            if( status & GNUTLS_CERT_REVOKED )
+                msg_Dbg( p_session, "certificate was revoked" );
+            if( status & GNUTLS_CERT_SIGNER_NOT_FOUND )
+                msg_Dbg( p_session, "certificate's signer was not found" );
+            if( status & GNUTLS_CERT_SIGNER_NOT_CA )
+                msg_Dbg( p_session, "certificate's signer is not a CA" );
+            p_session->pf_close( p_session );
+            return -1;
+        }
+
+        msg_Dbg( p_session, "TLS certificate verified" );
+        return 0;
+    }
+
+    return val;
+}
+
+static int
+gnutls_BeginHandshake( tls_session_t *p_session, int fd,
                          const char *psz_hostname )
 {
     tls_session_sys_t *p_sys;
@@ -223,9 +268,8 @@ gnutls_SessionHandshake( tls_session_t *p_session, int fd,
         gnutls_server_name_set( p_sys->session, GNUTLS_NAME_DNS, psz_hostname,
                                 strlen( psz_hostname ) );
 
-    return gnutls_SessionContinueHandshake( p_session );
+    return p_session->pf_handshake2( p_session );
 }
-
 
 /*****************************************************************************
  * tls_SessionClose:
@@ -291,8 +335,8 @@ gnutls_ClientCreate( tls_t *p_tls )
     p_session->sock.p_sys = p_session;
     p_session->sock.pf_send = gnutls_Send;
     p_session->sock.pf_recv = gnutls_Recv;
-    p_session->pf_handshake = gnutls_SessionHandshake;
-    p_session->pf_handshake2 = gnutls_SessionContinueHandshake;
+    p_session->pf_handshake = gnutls_BeginHandshake;
+    p_session->pf_handshake2 = gnutls_ContinueHandshake;
     p_session->pf_close = gnutls_ClientDelete;
 
     p_sys->session.b_handshaked = VLC_FALSE;
@@ -501,8 +545,9 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     p_session->sock.p_sys = p_session;
     p_session->sock.pf_send = gnutls_Send;
     p_session->sock.pf_recv = gnutls_Recv;
-    p_session->pf_handshake = gnutls_SessionHandshake;
-    p_session->pf_handshake2 = gnutls_SessionContinueHandshake;
+    p_session->pf_handshake = gnutls_BeginHandshake;
+    p_session->pf_handshake2 = ((tls_server_sys_t *)
+                               (p_server->p_sys))->pf_handshake2;
     p_session->pf_close = gnutls_SessionClose;
 
     ((tls_session_sys_t *)p_session->p_sys)->b_handshaked = VLC_FALSE;
@@ -589,18 +634,17 @@ gnutls_ServerDelete( tls_server_t *p_server )
  * tls_ServerAddCA:
  *****************************************************************************
  * Adds one or more certificate authorities.
- * TODO: we are not able to check the client credentials yet, so this function
- * is pretty useless.
  * Returns -1 on error, 0 on success.
  *****************************************************************************/
 static int
 gnutls_ServerAddCA( tls_server_t *p_server, const char *psz_ca_path )
 {
     int val;
+    tls_server_sys_t *p_sys;
 
-    val = gnutls_certificate_set_x509_trust_file( ((tls_server_sys_t *)
-                                                  (p_server->p_sys))
-                                                    ->x509_cred,
+    p_sys = (tls_server_sys_t *)(p_server->p_sys);
+
+    val = gnutls_certificate_set_x509_trust_file( p_sys->x509_cred,
                                                   psz_ca_path,
                                                   GNUTLS_X509_FMT_PEM );
     if( val < 0 )
@@ -611,6 +655,10 @@ gnutls_ServerAddCA( tls_server_t *p_server, const char *psz_ca_path )
         return VLC_EGENERIC;
     }
     msg_Dbg( p_server, " %d trusted CA added (%s)", val, psz_ca_path );
+
+    /* enables peer's certificate verification */
+    p_sys->pf_handshake2 = gnutls_HandshakeAndValidate;
+
     return VLC_SUCCESS;
 }
 
@@ -687,6 +735,9 @@ gnutls_ServerCreate( tls_t *p_tls, const char *psz_cert_path,
     p_server->pf_add_CA = gnutls_ServerAddCA;
     p_server->pf_add_CRL = gnutls_ServerAddCRL;
     p_server->pf_session_prepare = gnutls_ServerSessionPrepare;
+
+    /* No certificate validation by default */
+    p_sys->pf_handshake2 = gnutls_ContinueHandshake;
 
     /* FIXME: check for errors */
     vlc_mutex_init( p_server, &p_sys->cache_lock );
@@ -806,8 +857,8 @@ Open( vlc_object_t *p_this )
 
     vlc_value_t lock, count;
 
-    var_Create( p_this->p_libvlc, "tls_mutex", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc, "tls_mutex", &lock );
+    var_Create( p_this->p_libvlc, "gnutls_mutex", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc, "gnutls_mutex", &lock );
     vlc_mutex_lock( lock.p_address );
 
     /* Initialize GnuTLS only once */
@@ -821,7 +872,7 @@ Open( vlc_object_t *p_this )
         gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_vlc);
         if( gnutls_global_init( ) )
         {
-            msg_Warn( p_this, "cannot initialize GNUTLS" );
+            msg_Warn( p_this, "cannot initialize GnuTLS" );
             vlc_mutex_unlock( lock.p_address );
             return VLC_EGENERIC;
         }
@@ -829,10 +880,10 @@ Open( vlc_object_t *p_this )
         {
             gnutls_global_deinit( );
             vlc_mutex_unlock( lock.p_address );
-            msg_Err( p_this, "unsupported GNUTLS version" );
+            msg_Err( p_this, "unsupported GnuTLS version" );
             return VLC_EGENERIC;
         }
-        msg_Dbg( p_this, "GNUTLS initialized" );
+        msg_Dbg( p_this, "GnuTLS initialized" );
     }
 
     count.i_int++;
@@ -868,7 +919,7 @@ Close( vlc_object_t *p_this )
     if( count.i_int == 0 )
     {
         gnutls_global_deinit( );
-        msg_Dbg( p_this, "GNUTLS deinitialized" );
+        msg_Dbg( p_this, "GnuTLS deinitialized" );
     }
 
     vlc_mutex_unlock( lock.p_address );
