@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.2 2002/08/12 09:34:15 sam Exp $
+ * $Id: intf.m,v 1.3 2002/10/02 22:56:53 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -29,16 +29,12 @@
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include <string.h>
 
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <vlc/vout.h>
-
-#include <Cocoa/Cocoa.h>
 #include <QuickTime/QuickTime.h>
 
 #include "intf.h"
 #include "vout.h"
 #include "playlist.h"
+#include "asystm.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -246,6 +242,15 @@ static void Run( intf_thread_t *p_intf )
     [[NSRunLoop currentRunLoop] 
         addPort: p_intf->p_sys->o_sendport
         forMode: NSDefaultRunLoopMode];
+
+    // Since we need the sound menu now, it's a good time to create the sound system class
+    asystm=[[MacOSXAudioSystem alloc] initWithGUI:self];
+    [asystm retain];
+    
+}
+
+- (void)noopAction:(id)sender {
+    // nothing
 }
 
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename
@@ -431,6 +436,8 @@ static void Run( intf_thread_t *p_intf )
                 context: [NSGraphicsContext currentContext] eventNumber: 1
                 clickCount: 1 pressure: 0.0];
     [NSApp postEvent: pEvent atStart: YES];
+
+    [asystm release];
 }
 
 - (void)manageMode

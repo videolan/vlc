@@ -346,6 +346,11 @@ C: fgp
 D: MacOS X port
 S: Austria
 
+N: Heiko Panther
+E: heiko.panther@web.de
+D: Mac OS X audio device selection framework
+S: Germany
+
 N: Olivier Pomel
 E: pomel@via.ecp.fr
 C: pomel

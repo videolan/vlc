@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.m,v 1.11 2002/09/30 21:32:33 massiot Exp $
+ * $Id: aout.m,v 1.12 2002/10/02 22:56:53 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -32,11 +32,14 @@
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include "aout_internal.h"
+#include "asystm.h"
 
 #include <Carbon/Carbon.h>
 #include <CoreAudio/AudioHardware.h>
 #include <CoreAudio/HostTime.h>
 #include <AudioToolbox/AudioConverter.h>
+
+#define A52_FRAME_NB 1536
 
 /*****************************************************************************
  * aout_sys_t: private audio output method descriptor
@@ -70,13 +73,16 @@ static OSStatus IOCallback      ( AudioDeviceID inDevice,
 /*****************************************************************************
  * Open: open a CoreAudio HAL device
  *****************************************************************************/
+extern MacOSXAudioSystem *gTheMacOSXAudioSystem; // Remove this global, access audio system froma aout some other way
+
 int E_(OpenAudio)( vlc_object_t * p_this )
 {
     OSStatus err;
     UInt32 i_param_size;
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
-
+    msg_Dbg(p_aout, "************************* ENTER OpenAudio ****************************");
+    
     /* Allocate instance */
     p_sys = p_aout->output.p_sys = malloc( sizeof( struct aout_sys_t ) );
     memset( p_sys, 0, sizeof( struct aout_sys_t ) );
@@ -87,68 +93,89 @@ int E_(OpenAudio)( vlc_object_t * p_this )
     }
 
     /* Get the default output device */
-    /* FIXME : be more clever in choosing from several devices */
-    i_param_size = sizeof( p_sys->device );
-    err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice,
-                                    &i_param_size, 
-                                    (void *)&p_sys->device );
-    if( err != noErr ) 
+    // We now ask the GUI for the selected device
+    p_sys->device=[gTheMacOSXAudioSystem getSelectedDeviceSetToRate:p_aout->output.output.i_rate];
+    if(p_sys->device==0)
     {
-        msg_Err( p_aout, "failed to get the device: %d", err );
+        msg_Err( p_aout, "couldn't get output device");
         return( -1 );
     }
+    msg_Dbg(p_aout, "device returned: %ld", p_sys->device);
 
     p_aout->output.pf_play = Play;
     aout_VolumeSoftInit( p_aout );
 
     /* Get a description of the data format used by the device */
-    i_param_size = sizeof( p_sys->stream_format ); 
-    err = AudioDeviceGetProperty( p_sys->device, 0, false, 
-                                  kAudioDevicePropertyStreamFormat, 
-                                  &i_param_size,
-                                  &p_sys->stream_format );
+    i_param_size = sizeof(AudioStreamBasicDescription); 
+    err = AudioDeviceGetProperty(p_sys->device, 0, false, kAudioDevicePropertyStreamFormat, &i_param_size, &p_sys->stream_format );
     if( err != noErr )
     {
-        msg_Err( p_aout, "failed to get stream format: %d", err );
+        msg_Err( p_aout, "failed to get stream format: %4.4s", &err );
         return -1 ;
     }
 
-    if( p_sys->stream_format.mFormatID != kAudioFormatLinearPCM )
+    msg_Dbg( p_aout, "mSampleRate %ld, mFormatID %4.4s, mFormatFlags %ld, mBytesPerPacket %ld, mFramesPerPacket %ld, mBytesPerFrame %ld, mChannelsPerFrame %ld, mBitsPerChannel %ld",
+           (UInt32)p_sys->stream_format.mSampleRate, &p_sys->stream_format.mFormatID,
+           p_sys->stream_format.mFormatFlags, p_sys->stream_format.mBytesPerPacket,
+           p_sys->stream_format.mFramesPerPacket, p_sys->stream_format.mBytesPerFrame,
+           p_sys->stream_format.mChannelsPerFrame, p_sys->stream_format.mBitsPerChannel );
+
+    msg_Dbg( p_aout, "vlc format %4.4s, mac output format '%4.4s'",
+             (char *)&p_aout->output.output.i_format, &p_sys->stream_format.mFormatID );
+
+    switch(p_sys->stream_format.mFormatID)
     {
-        msg_Err( p_aout, "kAudioFormatLinearPCM required" );
-        return -1 ;
-    }
+    case 0:
+    case kAudioFormatLinearPCM:
+        p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
+        if ( p_sys->stream_format.mChannelsPerFrame < 6 )
+            p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
+        else
+            p_aout->output.output.i_channels = AOUT_CHAN_3F2R | AOUT_CHAN_LFE;
+        break;
 
-    /* We only deal with floats. FIXME : this is where we should do S/PDIF. */
-    p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
+    case kAudioFormat60958AC3:
+    case 'IAC3':
+        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
+        //not necessary, use the input's format by default --Meuuh
+        //p_aout->output.output.i_channels = AOUT_CHAN_DOLBY | AOUT_CHAN_LFE;
+        p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE; //p_sys->stream_format.mBytesPerFrame;
+        p_aout->output.output.i_frame_length = A52_FRAME_NB; //p_sys->stream_format.mFramesPerPacket;
+        break;
+
+    default:
+        msg_Err( p_aout, "Unknown hardware format '%4.4s'. Go ask Heiko.", &p_sys->stream_format.mFormatID );
+        return -1;
+    }
 
     /* Set sample rate and channels per frame */
     p_aout->output.output.i_rate = p_sys->stream_format.mSampleRate;
-    /* FIXME : this is where we should ask for downmixing. */
-    p_aout->output.output.i_channels = 2; //p_sys->stream_format.mChannelsPerFrame;
 
     /* Get the buffer size that the device uses for IO */
     i_param_size = sizeof( p_sys->i_buffer_size );
-#if 0
-    err = AudioDeviceGetProperty( p_sys->device, 0, false, 
+#if 1	// i have a feeling we should use the buffer size imposed by the AC3 device (usually about 6144)
+    err = AudioDeviceGetProperty( p_sys->device, 1, false, 
                                   kAudioDevicePropertyBufferSize, 
                                   &i_param_size, &p_sys->i_buffer_size );
-msg_Dbg( p_aout, "toto : %d", p_sys->i_buffer_size );
+    if(err) {
+	msg_Err(p_aout, "failed to get buffer size - err %4.4s, device %ld", &err, p_sys->device);
+	return -1;
+    }
+    else msg_Dbg( p_aout, "native buffer Size: %d", p_sys->i_buffer_size );
 #else
-    p_sys->i_buffer_size = sizeof(float) * p_aout->output.output.i_channels
-                            * 4096;
-    err = AudioDeviceSetProperty( p_sys->device, 0, 0, false,
+    p_sys->i_buffer_size = p_aout->output.output.i_bytes_per_frame;
+    err = AudioDeviceSetProperty( p_sys->device, 0, 1, false,
                                   kAudioDevicePropertyBufferSize,
                                   i_param_size, &p_sys->i_buffer_size );
-#endif
     if( err != noErr )
     {
-        msg_Err( p_aout, "failed to set device buffer size: %d", err );
+        msg_Err( p_aout, "failed to set device buffer size: %4.4s", err );
         return( -1 );
     }
+    else msg_Dbg(p_aout, "bufferSize set to %d", p_sys->i_buffer_size);
+#endif
 
-    p_aout->output.i_nb_samples = p_sys->i_buffer_size / sizeof(float)
-                                   / p_aout->output.output.i_channels;
+    p_aout->output.i_nb_samples = p_sys->i_buffer_size / p_sys->stream_format.mBytesPerFrame;
 
     /* Add callback */
     err = AudioDeviceAddIOProc( p_sys->device,
@@ -220,15 +247,19 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
     current_date = p_sys->clock_diff
                  + AudioConvertHostTimeToNanos(host_time.mHostTime) / 1000;
 
-    p_buffer = aout_OutputNextBuffer( p_aout, current_date, VLC_FALSE );
+//    msg_Dbg(p_aout, "Now fetching audio data");
+    p_buffer = aout_OutputNextBuffer( p_aout, current_date, (p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i')) );
 
     /* move data into output data buffer */
     if ( p_buffer != NULL )
     {
-        BlockMoveData( p_buffer->p_buffer,
+	BlockMoveData( p_buffer->p_buffer,
                        outOutputData->mBuffers[ 0 ].mData, 
                        p_sys->i_buffer_size );
-        aout_BufferFree( p_buffer );
+
+//	msg_Dbg(p_aout, "This buffer has %d bytes, i take %d", p_buffer->i_nb_bytes, p_sys->i_buffer_size);
+    
+	aout_BufferFree( p_buffer );
     }
     else
     {

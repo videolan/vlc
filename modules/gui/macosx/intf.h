@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: intf.h,v 1.2 2002/10/02 22:56:53 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -21,6 +21,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+#include <vlc/vout.h>
+
+#include <Cocoa/Cocoa.h>
 
 /*****************************************************************************
  * VLCApplication interface 
@@ -140,6 +146,8 @@ struct intf_sys_t
     IBOutlet id o_dmi_play;
     IBOutlet id o_dmi_pause;
     IBOutlet id o_dmi_stop;
+
+    id asystm;			// MacOSXAudioSystem
 }
 
 - (void)terminate;
@@ -155,6 +163,8 @@ struct intf_sys_t
 
 - (IBAction)clearRecentItems:(id)sender;
 - (void)openRecentItem:(id)sender;
+
+//- (void)selectAction:(id)sender;
 
 @end
 

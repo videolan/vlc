@@ -5,11 +5,14 @@ SOURCES_macosx = \
 	modules/gui/macosx/intf.m \
 	modules/gui/macosx/open.m \
 	modules/gui/macosx/playlist.m \
-	modules/gui/macosx/controls.m
+	modules/gui/macosx/controls.m \
+        modules/gui/macosx/asystm.m
 
 noinst_HEADERS += \
 	modules/gui/macosx/intf.h \
 	modules/gui/macosx/open.h \
 	modules/gui/macosx/playlist.h \
-	modules/gui/macosx/vout.h
+	modules/gui/macosx/vout.h \
+	modules/gui/macosx/adev_discovery.h \
+	modules/gui/macosx/asystm.h
 
