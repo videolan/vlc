@@ -1,4 +1,4 @@
-$Id: THANKS,v 1.13 2003/12/02 23:03:31 gbazin Exp $
+$Id: THANKS,v 1.14 2003/12/04 16:49:43 sam Exp $
 
 VLC makes extensive use of the following persons' code:
 
@@ -10,7 +10,7 @@ The VideoLAN team would like to thank the following contributors:
 
 André de Barros Martins Ribeiro <andrerib@ajato.com.br> - Brazilian portuguese localization
 Andres Krapf <dae@via.ecp.fr> - FreeBSD port and tests, KDE interface
-Andy Lindsay <andy_vl@ananam.com> - Fixes in the TS demux
+Andy Lindsay <andy_vl@ananam.com> - fixes in the TS demux
 Arkadiusz Lipiec <A.Lipiec@elka.pw.edu.pl> - Polish translation
 Arkadiusz Miskiewicz <misiek@pld.ORG.PL> - autoconf and Makefile patches
 Arnaud Gomes-do-Vale <arnaud@carrosse.frmug.org> - autoconf patches

@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.111 2003/11/30 16:00:23 fenrir Exp $
+ * $Id: libvlc.h,v 1.112 2003/12/04 16:49:45 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -98,7 +98,7 @@ static char *ppsz_language_text[] =
 #define AOUT_CAT_LONGTEXT N_( \
     "These options allow you to tune VLC's audio subsystem, " \
     "and to add audio filters which can be used for " \
-    "postprocessing or visual effects (spectrum analyser,...).\n" \
+    "postprocessing or visual effects (spectrum analyzer, ...).\n" \
     "To tune these filters, have a look at the \"audio filter\" " \
     "plugin options.")
 
@@ -436,7 +436,7 @@ static char *ppsz_language_text[] =
     "advantage of them.")
 
 #define PLAYLIST_CAT_LONGTEXT N_( \
-     "These options define the behaviour of the playlist. Some " \
+     "These options define the behavior of the playlist. Some " \
      "of them can be overriden in the playlist dialog box." )
 
 #define RANDOM_TEXT N_("Play files randomly forever")

@@ -2,7 +2,7 @@
  * speex.c: speex decoder/packetizer/encoder module making use of libspeex.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: speex.c,v 1.5 2003/11/23 15:50:07 gbazin Exp $
+ * $Id: speex.c,v 1.6 2003/12/04 16:49:43 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -388,7 +388,12 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
         i_ret = speex_decode( p_sys->p_state, &p_sys->bits,
                               (int16_t *)p_aout_buffer->p_buffer );
-        if( i_ret == -1 ) return NULL; /* End of stream */
+        if( i_ret == -1 )
+        {
+            /* End of stream */
+            return NULL;
+        }
+
         if( i_ret== -2 )
         {
             msg_Warn( p_dec, "Decoding error: corrupted stream?" );

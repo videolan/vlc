@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.18 2003/12/02 23:03:31 gbazin Exp $
+ * $Id: dshow.cpp,v 1.19 2003/12/04 16:49:43 sam Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -124,8 +124,8 @@ static char *ppsz_adev_text[] = { N_("Default"), N_("None") };
 #define CHROMA_TEXT N_("Video input chroma format")
 #define CHROMA_LONGTEXT N_( \
     "Force the DirectShow video input to use a specific chroma format " \
-    "(eg. I420 (default), RV24, etc...)")
-#define CONFIG_TEXT N_("Show device properties dialog")
+    "(eg. I420 (default), RV24, etc.)")
+#define CONFIG_TEXT N_("Device properties")
 #define CONFIG_LONGTEXT N_( \
     "Show the properties dialog of the selected device")
 

@@ -2,7 +2,7 @@
  * caca.c: Color ASCII Art video output plugin using libcaca
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: caca.c,v 1.3 2003/11/22 16:18:05 sam Exp $
+ * $Id: caca.c,v 1.4 2003/12/04 16:49:43 sam Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *
@@ -53,8 +53,15 @@ static void Display   ( vout_thread_t *, picture_t * );
 #define MODE_TEXT N_("dithering mode")
 #define MODE_LONGTEXT N_("Choose the libcaca dithering mode")
 
-static char *mode_list[] = { "none", "ordered", "random" };
-static char *mode_list_text[] = { N_("No dithering"), N_("Ordered dithering"),
+static char *mode_list[] = { "none",
+                             "ordered2",
+                             "ordered4",
+                             "ordered8",
+                             "random" };
+static char *mode_list_text[] = { N_("No dithering"),
+                                  N_("2x2 ordered dithering"),
+                                  N_("4x4 ordered dithering"),
+                                  N_("8x8 ordered dithering"),
                                   N_("Random dithering") };
 
 vlc_module_begin();
@@ -86,7 +93,7 @@ struct vout_sys_t
 static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    enum caca_dithering dither = CACA_DITHER_ORDERED;
+    enum caca_dithering dither = CACA_DITHERING_ORDERED4;
     vlc_value_t val;
 
     /* Allocate structure */
@@ -110,11 +117,19 @@ static int Create( vlc_object_t *p_this )
     {
         if( !strcmp( val.psz_string, "none" ) )
         {
-            dither = CACA_DITHER_NONE;
+            dither = CACA_DITHERING_NONE;
+        }
+        else if( !strcmp( val.psz_string, "ordered2" ) )
+        {
+            dither = CACA_DITHERING_ORDERED2;
+        }
+        else if( !strcmp( val.psz_string, "ordered4" ) )
+        {
+            dither = CACA_DITHERING_ORDERED4;
         }
         else if( !strcmp( val.psz_string, "random" ) )
         {
-            dither = CACA_DITHER_RANDOM;
+            dither = CACA_DITHERING_RANDOM;
         }
         free( val.psz_string );
     }

@@ -2,7 +2,7 @@
  * video_output.h : video output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.102 2003/11/19 00:06:06 sigmunau Exp $
+ * $Id: video_output.h,v 1.103 2003/12/04 16:49:43 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -73,7 +73,7 @@ struct vout_thread_t
     vlc_mutex_t         change_lock;                 /**< thread change lock */
     vout_sys_t *        p_sys;                     /**< system output method */
     /**@}*/
-    
+
     /** \name Current display properties */
     /**@{*/
     uint16_t            i_changes;          /**< changes made to the thread.
@@ -90,7 +90,7 @@ struct vout_thread_t
     unsigned int        i_window_height;            /**< video window height */
     unsigned int        i_alignment;          /**< video alignment in window */
     /**@}*/
-    
+
     /** \name Plugin used and shortcuts to access its capabilities */
     /**@{*/
     module_t *   p_module;
@@ -138,11 +138,11 @@ struct vout_thread_t
 
     /* text renderer data */
     text_renderer_sys_t * p_text_renderer_data;        /**< private data for
-						           the text renderer */
+                                                           the text renderer */
     module_t *            p_text_renderer_module;  /**< text renderer module */
     /** callback used when a new string needs to be shown on the vout */
-    int ( *pf_add_string ) ( vout_thread_t *, byte_t *, text_style_t *, int,  
-			     int, int, mtime_t, mtime_t ); 
+    int ( *pf_add_string ) ( vout_thread_t *, byte_t *, text_style_t *, int,
+                             int, int, mtime_t, mtime_t );
 };
 
 #define I_OUTPUTPICTURES p_vout->output.i_pictures
@@ -156,13 +156,13 @@ struct vout_thread_t
  * @{
  */
 /** b_info changed */
-#define VOUT_INFO_CHANGE        0x0001                   
+#define VOUT_INFO_CHANGE        0x0001
 /** b_grayscale changed */
-#define VOUT_GRAYSCALE_CHANGE   0x0002              
+#define VOUT_GRAYSCALE_CHANGE   0x0002
 /** b_interface changed */
-#define VOUT_INTF_CHANGE        0x0004              
+#define VOUT_INTF_CHANGE        0x0004
 /** b_scale changed */
-#define VOUT_SCALE_CHANGE       0x0008                  
+#define VOUT_SCALE_CHANGE       0x0008
 /** gamma changed */
 #define VOUT_GAMMA_CHANGE       0x0010
 /** b_cursor changed */

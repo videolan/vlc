@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.35 2003/11/26 22:00:56 gbazin Exp $
+ * $Id: v4l.c,v 1.36 2003/12/04 16:49:43 sam Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -86,8 +86,8 @@ static void DemuxClose ( vlc_object_t * );
     "If you don't specify anything, no audio device will be used.")
 #define CHROMA_TEXT N_("Video input chroma format")
 #define CHROMA_LONGTEXT N_( \
-    "Force the v4l video device to use a specific chroma format " \
-    "(eg. I420 (default), RV24, etc...)")
+    "Force the Video4Linux video device to use a specific chroma format " \
+    "(eg. I420 (default), RV24, etc.)")
 
 vlc_module_begin();
     set_description( _("Video4Linux input") );

@@ -2,7 +2,7 @@
  * stream.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamwizard.cpp,v 1.1 2003/10/29 18:54:46 gbazin Exp $
+ * $Id: streamwizard.cpp,v 1.2 2003/12/04 16:49:43 sam Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -38,9 +38,9 @@
 
 
 #define STREAM_INTRO N_( "Stream with VLC in three steps" )
-#define STREAM_STEP1 N_( "Step 1 : Select what to stream" )
-#define STREAM_STEP2 N_( "Step 2 : Define streaming method" )
-#define STREAM_STEP3 N_( "Step 3 : Start streaming" )
+#define STREAM_STEP1 N_( "Step 1: Select what to stream" )
+#define STREAM_STEP2 N_( "Step 2: Define streaming method" )
+#define STREAM_STEP3 N_( "Step 3: Start streaming" )
 
 
 /*****************************************************************************

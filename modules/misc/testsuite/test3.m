@@ -2,7 +2,7 @@
  * test3.m : Empty Objective C module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: test3.m,v 1.1 2002/10/04 13:13:54 sam Exp $
+ * $Id: test3.m,v 1.2 2003/12/04 16:49:43 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -34,11 +34,11 @@
 @class Desc;
 
 @interface Desc : Object
-+ (char*) ription;
++ (const char*) ription;
 @end
 
 @implementation Desc
-+ (char*) ription
++ (const char*) ription
 {
     return "Objective C module that does nothing";
 }

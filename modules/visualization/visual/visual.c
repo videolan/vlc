@@ -2,7 +2,7 @@
  * visual.c : Visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.c,v 1.11 2003/11/02 06:33:49 hartman Exp $
+ * $Id: visual.c,v 1.12 2003/12/04 16:49:43 sam Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -50,7 +50,7 @@
 
 #define NBBANDS_TEXT N_( "Number of bands" )
 #define NBBANDS_LONGTEXT N_( \
-      "Number of bands used by spectrum analizer, should be 20 or 80" )
+      "Number of bands used by spectrum analyzer, should be 20 or 80" )
 
 #define SEPAR_TEXT N_( "Band separator" )
 #define SEPAR_LONGTEXT N_( \

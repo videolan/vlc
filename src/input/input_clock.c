@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_clock.c,v 1.43 2003/11/29 18:36:13 massiot Exp $
+ * $Id: input_clock.c,v 1.44 2003/12/04 16:49:45 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -91,7 +91,7 @@ static mtime_t ClockToSysdate( input_thread_t * p_input,
 
     if( p_pgrm->i_synchro_state == SYNCHRO_OK )
     {
-        i_sysdate = (mtime_t)(i_clock - p_pgrm->cr_ref) 
+        i_sysdate = (mtime_t)(i_clock - p_pgrm->cr_ref)
                         * (mtime_t)p_input->stream.control.i_rate
                         * (mtime_t)300;
         i_sysdate /= 27;

@@ -2,7 +2,7 @@
  * tcp.c: TCP access plug-in
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: tcp.c,v 1.1 2003/11/30 14:28:07 fenrir Exp $
+ * $Id: tcp.c,v 1.2 2003/12/04 16:49:43 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -66,7 +66,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("TCP input") );
-    add_category_hint( N_("tcp"), NULL , VLC_TRUE );
+    add_category_hint( N_("TCP"), NULL , VLC_TRUE );
     add_integer( "tcp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     set_capability( "access", 0 );
     add_shortcut( "tcp" );
