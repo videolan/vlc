@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.25 2003/05/13 22:59:16 gbazin Exp $
+ * $Id: wxwindows.h,v 1.26 2003/05/15 01:33:53 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -301,6 +301,7 @@ private:
     void UpdateMRL();
     wxPanel *AccessPanel( wxWindow* parent );
     wxPanel *EncapsulationPanel( wxWindow* parent );
+    wxPanel *TranscodingPanel( wxWindow* parent );
     void    ParseMRL();
 
     /* Event handlers (these functions should _not_ be virtual) */
@@ -319,18 +320,20 @@ private:
     /* Event handlers for the encapsulation panel */
     void OnEncapsulationChange( wxCommandEvent& event );
 
+    /* Event handlers for the transcoding panel */
+    void OnTranscodingEnable( wxCommandEvent& event );
+    void OnTranscodingChange( wxCommandEvent& event );
+
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
     wxWindow *p_parent;
 
     wxComboBox *mrl_combo;
-    wxPanel *access_panel;
-    wxPanel *encapsulation_panel;
 
     /* Controls for the access outputs */
-    wxPanel *access_subpanels[4];
-    wxRadioButton *access_radios[4];
+    wxPanel *access_subpanels[5];
+    wxCheckBox *access_checkboxes[5];
 
     int i_access_type;
 
@@ -339,9 +342,16 @@ private:
     wxTextCtrl *net_addr;
 
     /* Controls for the encapsulation */
-    wxRadioButton *encapsulation_radios[4];
+    wxRadioButton *encapsulation_radios[5];
     int i_encapsulation_type;
 
+    /* Controls for transcoding */
+    wxCheckBox *video_transc_checkbox;
+    wxComboBox *video_codec_combo;
+    wxComboBox *audio_codec_combo;
+    wxCheckBox *audio_transc_checkbox;
+    wxComboBox *video_bitrate_combo;
+    wxComboBox *audio_bitrate_combo;
 };
 
 /* Subtitles File Dialog */
