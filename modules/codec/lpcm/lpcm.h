@@ -2,7 +2,7 @@
  * lpcm.h : lpcm decoder module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: lpcm.h,v 1.2 2002/09/18 01:28:05 henri Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,8 +42,11 @@ typedef struct lpcmdec_thread_s
     /*
      * Output properties
      */
-    aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
-
+    aout_instance_t        *p_aout;
+    aout_input_t           *p_aout_input;
+    audio_sample_format_t   output_format;
+    audio_date_t        end_date;
+    
     /* The bit stream structure handles the PES stream at the bit level */
     bit_stream_t bit_stream;
 

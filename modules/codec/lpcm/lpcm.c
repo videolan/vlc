@@ -2,7 +2,7 @@
  * lpcm.c: lpcm decoder module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm.c,v 1.3 2002/08/30 22:22:24 massiot Exp $
+ * $Id: lpcm.c,v 1.4 2002/09/18 01:28:05 henri Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -25,19 +25,19 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <string.h>                                    /* memcpy(), memset() */
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>                                    /* memcpy(), memset() */
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/decoder.h>
+#include <input_ext-dec.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                           /* getpid() */
 #endif
 
 #include "lpcm.h"
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -45,7 +45,7 @@ static int  OpenDecoder    ( vlc_object_t * );
 static int  RunDecoder     ( decoder_fifo_t * );
 
        void DecodeFrame    ( lpcmdec_thread_t * );
-static int  InitThread     ( lpcmdec_thread_t * );
+// static int  InitThread     ( lpcmdec_thread_t * );
 static void EndThread      ( lpcmdec_thread_t * );
 
 /*****************************************************************************
@@ -95,10 +95,25 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
      */
     p_lpcmdec->p_fifo = p_fifo;
 
-    if( InitThread( p_lpcmdec ) )
+    /* Init the BitStream */
+    InitBitstream( &p_lpcmdec->bit_stream, p_lpcmdec->p_fifo,
+                   NULL, NULL );
+   
+    /* FIXME : I suppose the number of channel ans sampling rate 
+     * are someway in the headers */
+    p_lpcmdec->output_format.i_format = AOUT_FMT_S16_BE;
+    p_lpcmdec->output_format.i_channels = 2;
+    p_lpcmdec->output_format.i_rate = 48000;
+    
+    aout_DateInit( &p_lpcmdec->end_date, 48000 );
+    p_lpcmdec->p_aout_input = aout_InputNew( p_lpcmdec->p_fifo,
+                                         &p_lpcmdec->p_aout,
+                                         &p_lpcmdec->output_format );
+
+    if( p_lpcmdec->p_aout_input == NULL )
     {
-        DecoderError( p_fifo );
-        free( p_lpcmdec );
+        msg_Err( p_lpcmdec->p_fifo, "failed to create aout fifo" );
+        p_lpcmdec->p_fifo->b_error = 1;
         return( -1 );
     }
 
@@ -121,66 +136,40 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
 }
 
 /*****************************************************************************
- * InitThread : initialize an lpcm decoder thread
- *****************************************************************************/
-static int InitThread (lpcmdec_thread_t * p_lpcmdec)
-{
-
-    /* Init the BitStream */
-    InitBitstream( &p_lpcmdec->bit_stream, p_lpcmdec->p_fifo,
-                   NULL, NULL);
-
-    /* Creating the audio output fifo */
-    p_lpcmdec->p_aout_fifo =
-                aout_CreateFifo( p_lpcmdec->p_fifo, AOUT_FIFO_PCM,
-                                 2, 48000, LPCMDEC_FRAME_SIZE / 2, NULL  );
-    if ( p_lpcmdec->p_aout_fifo == NULL )
-    {
-        return( -1 );
-    }
-    return( 0 );
-}
-
-/*****************************************************************************
  * DecodeFrame: decodes a frame.
  *****************************************************************************/
 void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
 {
-    byte_t *    buffer;
-#ifndef WORDS_BIGENDIAN
-    byte_t *    p_temp[LPCMDEC_FRAME_SIZE];
-#endif
+    byte_t     buffer[LPCMDEC_FRAME_SIZE];
+    
+    aout_buffer_t *    p_aout_buffer;
+    mtime_t     i_pts;
     vlc_bool_t  b_sync;
     int         i_loop;
 
-    CurrentPTS( &p_lpcmdec->bit_stream,
-        &p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->i_end_frame],
-        NULL );
-    if( !p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->i_end_frame] )
-    {
-        p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->i_end_frame] =
-            LAST_MDATE;
-    }
-
-    buffer = ((byte_t *)p_lpcmdec->p_aout_fifo->buffer) + 
-              (p_lpcmdec->p_aout_fifo->i_end_frame * LPCMDEC_FRAME_SIZE);
-
-    RemoveBits32(&p_lpcmdec->bit_stream);
-#if 0
-    byte1 = GetBits(&p_lpcmdec->bit_stream, 8) ;
-    byte2 = GetBits(&p_lpcmdec->bit_stream, 8) ;
+    NextPTS( &p_lpcmdec->bit_stream, &i_pts, NULL );
     
-    /* I only have 2 test streams. As far as I understand
-     * after the RemoveBits and the 2 GetBits, we should be exactly 
-     * where we want : the sync word : 0x0180.
-     * If not, we go and find it. */
-    while( ( byte1 != 0x01 || byte2 != 0x80 ) && (!p_lpcmdec->p_fifo->b_die)
-                                       && (!p_lpcmdec->p_fifo->b_error) )
+    if( i_pts != 0 && i_pts != aout_DateGet( &p_lpcmdec->end_date ) )
     {
-        byte1 = byte2;
-        byte2 = GetBits(&p_lpcmdec->bit_stream, 8);
+        aout_DateSet( &p_lpcmdec->end_date, i_pts );
     }
-#else
+    
+    p_aout_buffer = aout_BufferNew( p_lpcmdec->p_aout,
+                                  p_lpcmdec->p_aout_input,
+                                  LPCMDEC_FRAME_SIZE/4 );
+    
+    if( !p_aout_buffer )
+    {
+        msg_Err( p_lpcmdec->p_fifo, "cannot get aout buffer" );
+        p_lpcmdec->p_fifo->b_error = 1;
+        return;
+    }
+    
+    p_aout_buffer->start_date = aout_DateGet( &p_lpcmdec->end_date );
+   
+    p_aout_buffer->end_date = aout_DateIncrement( &p_lpcmdec->end_date,
+                                                   LPCMDEC_FRAME_SIZE/4 );
+
     b_sync = 0;
     while( ( !p_lpcmdec->p_fifo->b_die ) &&
            ( !p_lpcmdec->p_fifo->b_error ) &&
@@ -191,33 +180,18 @@ void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
                ( GetBits( &p_lpcmdec->bit_stream, 8 ) != 0x01 ) );
         b_sync = ( ShowBits( &p_lpcmdec->bit_stream, 8 ) == 0x80 );
     }
-    RemoveBits( &p_lpcmdec->bit_stream, 8 );
-#endif
     
-#ifndef WORDS_BIGENDIAN
-    GetChunk( &p_lpcmdec->bit_stream, p_temp, LPCMDEC_FRAME_SIZE);
-    if( p_lpcmdec->p_fifo->b_die || p_lpcmdec->p_fifo->b_error ) return;
+    RemoveBits( &p_lpcmdec->bit_stream, 8 );
+    
+    GetChunk( &p_lpcmdec->bit_stream, p_aout_buffer->p_buffer, 
+              LPCMDEC_FRAME_SIZE);
 
-#   ifdef HAVE_SWAB
-    swab( buffer, p_temp, LPCMDEC_FRAME_SIZE );
-#   else
-    for( i_loop = 0; i_loop < LPCMDEC_FRAME_SIZE/2; i_loop++ )
-    {
-        buffer[2*i_loop]=p_temp[2*i_loop+1];
-        buffer[2*i_loop+1]=p_temp[2*i_loop];
-    }
-#   endif
+    if( p_lpcmdec->p_fifo->b_die || p_lpcmdec->p_fifo->b_error ) 
+        return;
 
-#else
-    GetChunk( &p_lpcmdec->bit_stream, buffer, LPCMDEC_FRAME_SIZE);
-    if( p_lpcmdec->p_fifo->b_die ) return;
-#endif
+    aout_BufferPlay( p_lpcmdec->p_aout, p_lpcmdec->p_aout_input, 
+                     p_aout_buffer );
 
-    vlc_mutex_lock (&p_lpcmdec->p_aout_fifo->data_lock);
-    p_lpcmdec->p_aout_fifo->i_end_frame = 
-        (p_lpcmdec->p_aout_fifo->i_end_frame + 1) & AOUT_FIFO_SIZE;
-    vlc_cond_signal (&p_lpcmdec->p_aout_fifo->data_wait);
-    vlc_mutex_unlock (&p_lpcmdec->p_aout_fifo->data_lock);
 }
 
 /*****************************************************************************
@@ -226,14 +200,10 @@ void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
 static void EndThread( lpcmdec_thread_t * p_lpcmdec )
 {
     /* If the audio output fifo was created, we destroy it */
-    if( p_lpcmdec->p_aout_fifo != NULL ) 
+    if( p_lpcmdec->p_aout_input )
     {
-        aout_DestroyFifo( p_lpcmdec->p_aout_fifo );
-
-        /* Make sure the output thread leaves the NextFrame() function */
-        vlc_mutex_lock( &(p_lpcmdec->p_aout_fifo->data_lock) );
-        vlc_cond_signal( &(p_lpcmdec->p_aout_fifo->data_wait) );
-        vlc_mutex_unlock( &(p_lpcmdec->p_aout_fifo->data_lock) );
+        aout_InputDelete( p_lpcmdec->p_aout, p_lpcmdec->p_aout_input );
+        
     }
 
     /* Destroy descriptor */

@@ -37,18 +37,18 @@ dnl Check for GNU make
 dnl
 AC_PATH_PROG(GMAKE, gmake, no)
 if test "x${GMAKE}" = "xno"; then
-  AC_CACHE_CHECK([whether GNU make is installed],
-      [ac_cv_gmake],
-      [if make --version | grep -q -i gnu; then
-         ac_cv_gmake="yes"
-       else
-         echo "This software needs you to install GNU make to compile properly."
-         echo "You can get it from http://www.gnu.org/."
-         exit
-       fi])
-  VLC_MAKE="make"
+AC_CACHE_CHECK([whether GNU make is installed],
+  [ac_cv_gmake],
+  [if make --version | grep -q -i gnu; then
+     ac_cv_gmake="yes"
+   else
+     echo "This software needs you to install GNU make to compile properly."
+     echo "You can get it from http://www.gnu.org/."
+     exit
+   fi])
+VLC_MAKE="make"
 else
-  VLC_MAKE="gmake"
+VLC_MAKE="gmake"
 fi
 
 dnl Gettext stuff
@@ -72,66 +72,66 @@ dnl
 dnl  Check the operating system
 dnl
 case "x${target_os}" in
-  x)
-    SYS=unknown
-    ;;
-  xlinux*)
-    SYS=linux
-    ;;
-  xbsdi*)
-    SYS=bsdi
-    save_CFLAGS="${save_CFLAGS} -pthread"; CFLAGS="${save_CFLAGS}"
-    dvd_LDFLAGS="${dvd_LDFLAGS} -ldvd"
-    vcd_LDFLAGS="${vcd_LDFLAGS} -ldvd"
-    ;;
-  x*bsd*)
-    SYS="${target_os}"
-    save_CFLAGS="${save_CFLAGS} -pthread"; CFLAGS="${save_CFLAGS}"
-    ;;
-  xdarwin*)
-    SYS=darwin
-    save_CFLAGS="${save_CFLAGS} -no-cpp-precomp"; CFLAGS="${save_CFLAGS}"
-    vlc_LDFLAGS="${vlc_LDFLAGS} -all_load"
-    ;;
-  x*mingw32*)
-    SYS=mingw32
-    AC_CHECK_TOOL(WINDRES, windres, :)
-    save_CFLAGS="${save_CFLAGS} -fnative-struct -D_OFF_T_ -D_off_t=long"; CFLAGS="${save_CFLAGS}"
-    vlc_LDFLAGS="${vlc_LDFLAGS} -mwindows -Xlinker --force-exe-suffix"
-    vlc_LDFLAGS="${vlc_LDFLAGS} -lws2_32 -lnetapi32"
-    ipv4_LDFLAGS="${ipv4_LDFLAGS} -lws2_32"
-    ipv6_LDFLAGS="${ipv6_LDFLAGS} -lws2_32"
-    http_LDFLAGS="${http_LDFLAGS} -lws2_32"
-    rc_LDFLAGS="${rc_LDFLAGS} -lws2_32"
-    ;;
-  x*nto*)
-    SYS=nto
-    x11_LDFLAGS="${x11_LDFLAGS} -lsocket"
-    xvideo_LDFLAGS="${xvideo_LDFLAGS} -lsocket"
-    ;;
-  xsolaris*)
-    SYS=solaris
-    ;;
-  xbeos)
-    SYS=beos
-    save_CFLAGS="${save_CFLAGS} -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual"; CFLAGS="${save_CFLAGS}"
-    vlc_LDFLAGS="${vlc_LDFLAGS} -lbe"
-    plugins_LDFLAGS="${plugins_LDFLAGS} -nostart"
-    beos_LDFLAGS="${beos_LDFLAGS} -lbe -lgame -lroot -ltracker -lstdc++.r4"
-    ipv4_LDFLAGS="${ipv4_LDFLAGS} -lbind"
-    ;;
-  x*)
-    SYS="${target_os}"
-    ;;
+x)
+SYS=unknown
+;;
+xlinux*)
+SYS=linux
+;;
+xbsdi*)
+SYS=bsdi
+save_CFLAGS="${save_CFLAGS} -pthread"; CFLAGS="${save_CFLAGS}"
+dvd_LDFLAGS="${dvd_LDFLAGS} -ldvd"
+vcd_LDFLAGS="${vcd_LDFLAGS} -ldvd"
+;;
+x*bsd*)
+SYS="${target_os}"
+save_CFLAGS="${save_CFLAGS} -pthread"; CFLAGS="${save_CFLAGS}"
+;;
+xdarwin*)
+SYS=darwin
+save_CFLAGS="${save_CFLAGS} -no-cpp-precomp"; CFLAGS="${save_CFLAGS}"
+vlc_LDFLAGS="${vlc_LDFLAGS} -all_load"
+;;
+x*mingw32*)
+SYS=mingw32
+AC_CHECK_TOOL(WINDRES, windres, :)
+save_CFLAGS="${save_CFLAGS} -fnative-struct -D_OFF_T_ -D_off_t=long"; CFLAGS="${save_CFLAGS}"
+vlc_LDFLAGS="${vlc_LDFLAGS} -mwindows -Xlinker --force-exe-suffix"
+vlc_LDFLAGS="${vlc_LDFLAGS} -lws2_32 -lnetapi32"
+ipv4_LDFLAGS="${ipv4_LDFLAGS} -lws2_32"
+ipv6_LDFLAGS="${ipv6_LDFLAGS} -lws2_32"
+http_LDFLAGS="${http_LDFLAGS} -lws2_32"
+rc_LDFLAGS="${rc_LDFLAGS} -lws2_32"
+;;
+x*nto*)
+SYS=nto
+x11_LDFLAGS="${x11_LDFLAGS} -lsocket"
+xvideo_LDFLAGS="${xvideo_LDFLAGS} -lsocket"
+;;
+xsolaris*)
+SYS=solaris
+;;
+xbeos)
+SYS=beos
+save_CFLAGS="${save_CFLAGS} -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual"; CFLAGS="${save_CFLAGS}"
+vlc_LDFLAGS="${vlc_LDFLAGS} -lbe"
+plugins_LDFLAGS="${plugins_LDFLAGS} -nostart"
+beos_LDFLAGS="${beos_LDFLAGS} -lbe -lgame -lroot -ltracker -lstdc++.r4"
+ipv4_LDFLAGS="${ipv4_LDFLAGS} -lbind"
+;;
+x*)
+SYS="${target_os}"
+;;
 esac
 
 dnl Flags for plugin compilation
 if test "x${SYS}" = "xmingw32"
 then
-  plugins_CFLAGS="${plugins_CFLAGS} -fnative-struct"
+plugins_CFLAGS="${plugins_CFLAGS} -fnative-struct"
 else
-  plugins_CFLAGS="${plugins_CFLAGS} -fPIC"
-  plugins_LDFLAGS="${plugins_LDFLAGS} -fPIC"
+plugins_CFLAGS="${plugins_CFLAGS} -fPIC"
+plugins_LDFLAGS="${plugins_LDFLAGS} -fPIC"
 fi
 
 dnl The -DSYS_FOO flag
@@ -141,17 +141,17 @@ dnl Check for system libs needed
 AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2 atoll strndup)
 
 AC_CHECK_FUNC(connect,,[
-  AC_CHECK_LIB(socket,connect,
-    ipv4_LDFLAGS="${ipv4_LDFLAGS} -lsocket"
-    vlc_LDFLAGS="${vlc_LDFLAGS} -lsocket"
+AC_CHECK_LIB(socket,connect,
+ipv4_LDFLAGS="${ipv4_LDFLAGS} -lsocket"
+vlc_LDFLAGS="${vlc_LDFLAGS} -lsocket"
 )])
 AC_CHECK_FUNC(send,,[
-  AC_CHECK_LIB(socket,send,
-    http_LDFLAGS="${http_LDFLAGS} -lsocket"
+AC_CHECK_LIB(socket,send,
+http_LDFLAGS="${http_LDFLAGS} -lsocket"
 )])
 AC_CHECK_FUNC(gethostbyname,,[
-  AC_CHECK_LIB(nsl,gethostbyname,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lnsl",[
-    AC_CHECK_LIB(bind,gethostbyname,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lbind")])
+AC_CHECK_LIB(nsl,gethostbyname,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lnsl",[
+AC_CHECK_LIB(bind,gethostbyname,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lbind")])
 ])
 have_nanosleep=0
 AC_CHECK_FUNC(nanosleep,have_nanosleep=1,[
@@ -162,42 +162,42 @@ AC_CHECK_FUNC(nanosleep,have_nanosleep=1,[
   )
 ])
 if test x$have_nanosleep = x1; then
-  AC_DEFINE(HAVE_NANOSLEEP, 1,
-            Define if nanosleep is available.)
+AC_DEFINE(HAVE_NANOSLEEP, 1,
+        Define if nanosleep is available.)
 fi
 # HP/UX port
 AC_CHECK_LIB(rt,sem_init, [pthread_LDFLAGS="${pthread_LDFLAGS} -lrt"])
 
 AC_CHECK_FUNC(inet_aton,,[
-  AC_CHECK_LIB(resolv,inet_aton,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lresolv")
+AC_CHECK_LIB(resolv,inet_aton,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lresolv")
 ])
 AC_CHECK_FUNC(textdomain,,[
-  AC_CHECK_LIB(intl,textdomain,
-    vlc_LDFLAGS="${vlc_LDFLAGS} -lintl"
-    plugins_LDFLAGS="${plugins_LDFLAGS} -lintl"
-  )
+AC_CHECK_LIB(intl,textdomain,
+vlc_LDFLAGS="${vlc_LDFLAGS} -lintl"
+plugins_LDFLAGS="${plugins_LDFLAGS} -lintl"
+)
 ])
 
 dnl Check for getopt
 NEED_GETOPT=0
 AC_CHECK_FUNC(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
 [ # FreeBSD has a gnugetopt library for this:
-  AC_CHECK_LIB([gnugetopt],[getopt_long],
-    [AC_DEFINE(HAVE_GETOPT_LONG,1,getopt support) vlc_LDFLAGS="${vlc_LDFLAGS} -lgnugetopt"],
-    [NEED_GETOPT=1])])
+AC_CHECK_LIB([gnugetopt],[getopt_long],
+[AC_DEFINE(HAVE_GETOPT_LONG,1,getopt support) vlc_LDFLAGS="${vlc_LDFLAGS} -lgnugetopt"],
+[NEED_GETOPT=1])])
 
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(dl,dlopen,vlc_LDFLAGS="${vlc_LDFLAGS} -ldl")
 AC_CHECK_LIB(m,cos,
-  imdct_LDFLAGS="${imdct_LDFLAGS} -lm"
-  filter_distort_LDFLAGS="${filter_distort_LDFLAGS} -lm")
+imdct_LDFLAGS="${imdct_LDFLAGS} -lm"
+filter_distort_LDFLAGS="${filter_distort_LDFLAGS} -lm")
 AC_CHECK_LIB(m,pow,
-  ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lm"
-  imdct_LDFLAGS="${imdct_LDFLAGS} -lm"
-  imdct3dn_LDFLAGS="${imdct3dn_LDFLAGS} -lm"
-  imdctsse_LDFLAGS="${imdctsse_LDFLAGS} -lm"
-  i420_rgb_LDFLAGS="${i420_rgb_LDFLAGS} -lm"
-  faad_LDFLAGS="${faad_LDFLAGS} -lm"
+ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lm"
+imdct_LDFLAGS="${imdct_LDFLAGS} -lm"
+imdct3dn_LDFLAGS="${imdct3dn_LDFLAGS} -lm"
+imdctsse_LDFLAGS="${imdctsse_LDFLAGS} -lm"
+i420_rgb_LDFLAGS="${i420_rgb_LDFLAGS} -lm"
+faad_LDFLAGS="${faad_LDFLAGS} -lm"
 )
 
 dnl Check for pthreads - borrowed from XMMS
@@ -209,11 +209,11 @@ if test "x${THREAD_LIB}" = "xerror"; then
   AC_CHECK_LIB(pthreads,main,THREAD_LIB="-lpthreads ${pthread_LDFLAGS}")
 fi
 if test "x${THREAD_LIB}" = "xerror"; then
-  AC_CHECK_LIB(c_r,main,THREAD_LIB="-lc_r")
+AC_CHECK_LIB(c_r,main,THREAD_LIB="-lc_r")
 fi
 if test "x${THREAD_LIB}" = "xerror"; then
-  AC_CHECK_FUNC(pthread_mutex_lock)
-  THREAD_LIB=""
+AC_CHECK_FUNC(pthread_mutex_lock)
+THREAD_LIB=""
 fi
 
 dnl Check for cthreads under GNU/Hurd for instance
@@ -221,14 +221,14 @@ AC_CHECK_LIB(threads,cthread_fork,THREAD_LIB="-lthreads")
 
 dnl Check for misc headers
 AC_EGREP_HEADER(pthread_cond_t,pthread.h,[
-  AC_DEFINE(PTHREAD_COND_T_IN_PTHREAD_H, 1,
-            Define if <pthread.h> defines pthread_cond_t.)])
+AC_DEFINE(PTHREAD_COND_T_IN_PTHREAD_H, 1,
+        Define if <pthread.h> defines pthread_cond_t.)])
 AC_EGREP_HEADER(pthread_once,pthread.h,[
-  AC_DEFINE(PTHREAD_ONCE_IN_PTHREAD_H, 1,
-            Define if <pthread.h> defines pthread_once.)])
+AC_DEFINE(PTHREAD_ONCE_IN_PTHREAD_H, 1,
+        Define if <pthread.h> defines pthread_once.)])
 AC_EGREP_HEADER(strncasecmp,strings.h,[
-  AC_DEFINE(STRNCASECMP_IN_STRINGS_H, 1,
-            Define if <strings.h> defines strncasecmp.)])
+AC_DEFINE(STRNCASECMP_IN_STRINGS_H, 1,
+        Define if <strings.h> defines strncasecmp.)])
 
 dnl Check for headers
 AC_CHECK_HEADERS(stdint.h getopt.h strings.h inttypes.h sys/int_types.h)
@@ -242,14 +242,14 @@ AC_HEADER_TIME
 
 dnl Mac OS X and other OSes don't have declaration for nanosleep
 AC_EGREP_HEADER(nanosleep,time.h,[
-  AC_DEFINE(HAVE_DECL_NANOSLEEP, 1,
-            Define if <time.h> defines nanosleep.)
+AC_DEFINE(HAVE_DECL_NANOSLEEP, 1,
+        Define if <time.h> defines nanosleep.)
 ])
 
 dnl Make sure we have timespecs
 AC_EGREP_HEADER(timespec,sys/time.h,[
-  AC_DEFINE(HAVE_STRUCT_TIMESPEC, 1,
-            Define if <sys/time.h> defines struct timespec.)
+AC_DEFINE(HAVE_STRUCT_TIMESPEC, 1,
+        Define if <sys/time.h> defines struct timespec.)
 ])
 
 dnl Check for threads library
@@ -257,10 +257,10 @@ AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
 
 dnl Default X headers and libraries
 if test "x${x_includes}" = "xNONE"; then
-  x_includes="/usr/X11R6/include"
+x_includes="/usr/X11R6/include"
 fi
 if test "x${x_libraries}" = "xNONE"; then
-  x_libraries="/usr/X11R6/lib"
+x_libraries="/usr/X11R6/lib"
 fi
 
 dnl Build the gtk_main plugin?
@@ -269,174 +269,174 @@ NEED_GTK_MAIN=no
 dnl Check for DPMS
 if test "x${SYS}" != "xmingw32"
 then
-  CPPFLAGS="${save_CPPFLAGS} -I${x_includes}"
-  AC_CHECK_HEADERS(X11/extensions/dpms.h, [
-    AC_EGREP_HEADER(DPMSInfo,X11/extensions/dpms.h,[
-      AC_DEFINE(DPMSINFO_IN_DPMS_H, 1,
-                Define if <X11/extensions/dpms.h> defines DPMSInfo.)
-    ])
-  ])
-  CPPFLAGS="${save_CPPFLAGS}"
+CPPFLAGS="${save_CPPFLAGS} -I${x_includes}"
+AC_CHECK_HEADERS(X11/extensions/dpms.h, [
+AC_EGREP_HEADER(DPMSInfo,X11/extensions/dpms.h,[
+  AC_DEFINE(DPMSINFO_IN_DPMS_H, 1,
+            Define if <X11/extensions/dpms.h> defines DPMSInfo.)
+])
+])
+CPPFLAGS="${save_CPPFLAGS}"
 fi
 
 dnl Check for ntohl, etc.
 AC_CACHE_CHECK([for ntohl in sys/param.h],
-    [ac_cv_c_ntohl_sys_param_h],
-    [CFLAGS="${save_CFLAGS} -Wall -Werror"
-     AC_TRY_COMPILE([#include <sys/param.h>],
-        [void foo() { int meuh; ntohl(meuh); }],
-        ac_cv_c_ntohl_sys_param_h=yes, ac_cv_c_ntohl_sys_param_h=no)])
+[ac_cv_c_ntohl_sys_param_h],
+[CFLAGS="${save_CFLAGS} -Wall -Werror"
+ AC_TRY_COMPILE([#include <sys/param.h>],
+    [void foo() { int meuh; ntohl(meuh); }],
+    ac_cv_c_ntohl_sys_param_h=yes, ac_cv_c_ntohl_sys_param_h=no)])
 if test "x${ac_cv_c_ntohl_sys_param_h}" != "xno"; then
-    AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
+AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
 fi
 
 dnl Check for inline function size limit
 AC_CACHE_CHECK([if \$CC accepts -finline-limit],
-    [ac_cv_c_inline_limit],
-    [CFLAGS="${save_CFLAGS} -finline-limit-30000"
-     AC_TRY_COMPILE([],,ac_cv_c_inline_limit=yes, ac_cv_c_inline_limit=no)])
+[ac_cv_c_inline_limit],
+[CFLAGS="${save_CFLAGS} -finline-limit-30000"
+ AC_TRY_COMPILE([],,ac_cv_c_inline_limit=yes, ac_cv_c_inline_limit=no)])
 if test "x${ac_cv_c_inline_limit}" != "xno"; then
-    save_CFLAGS="${save_CFLAGS} -finline-limit-30000"; CFLAGS="${save_CFLAGS}"
+save_CFLAGS="${save_CFLAGS} -finline-limit-30000"; CFLAGS="${save_CFLAGS}"
 fi
 
 dnl Check for -W or -w flags
 AC_CACHE_CHECK([if \$CC accepts -Wall -Winline],
-    [ac_cv_c_Wall_Winline],
-    [CFLAGS="-Wall -Winline ${save_CFLAGS}"
-     AC_TRY_COMPILE([],,ac_cv_c_Wall_Winline=yes, ac_cv_c_Wall_Winline=no)])
+[ac_cv_c_Wall_Winline],
+[CFLAGS="-Wall -Winline ${save_CFLAGS}"
+ AC_TRY_COMPILE([],,ac_cv_c_Wall_Winline=yes, ac_cv_c_Wall_Winline=no)])
 if test "x${ac_cv_c_Wall_Winline}" != "xno"; then
-    save_CFLAGS="-Wall -Winline ${save_CFLAGS}"; CFLAGS="${save_CFLAGS}"
+save_CFLAGS="-Wall -Winline ${save_CFLAGS}"; CFLAGS="${save_CFLAGS}"
 else
-    AC_CACHE_CHECK([if \$CC accepts -wall -winline],
-        [ac_cv_c_wall_winline],
-        [CFLAGS="-wall -winline ${save_CFLAGS}"
-         AC_TRY_COMPILE([],,ac_cv_c_wall_winline=yes, ac_cv_c_wall_winline=no)])
-    if test "x${ac_cv_c_wall_winline}" != "xno"; then
-        save_CFLAGS="-wall -winline ${save_CFLAGS}"; CFLAGS="${save_CFLAGS}"
-    fi
+AC_CACHE_CHECK([if \$CC accepts -wall -winline],
+    [ac_cv_c_wall_winline],
+    [CFLAGS="-wall -winline ${save_CFLAGS}"
+     AC_TRY_COMPILE([],,ac_cv_c_wall_winline=yes, ac_cv_c_wall_winline=no)])
+if test "x${ac_cv_c_wall_winline}" != "xno"; then
+    save_CFLAGS="-wall -winline ${save_CFLAGS}"; CFLAGS="${save_CFLAGS}"
+fi
 fi
 
 dnl Check for -pipe
 AC_CACHE_CHECK([if \$CC accepts -pipe],
-    [ac_cv_c_pipe],
-    [CFLAGS="${save_CFLAGS} -pipe"
-     AC_TRY_COMPILE([],,ac_cv_c_pipe=yes, ac_cv_c_pipe=no)])
+[ac_cv_c_pipe],
+[CFLAGS="${save_CFLAGS} -pipe"
+ AC_TRY_COMPILE([],,ac_cv_c_pipe=yes, ac_cv_c_pipe=no)])
 if test "x${ac_cv_c_pipe}" != "xno"; then
-    save_CFLAGS="${save_CFLAGS} -pipe"; CFLAGS="${save_CFLAGS}"
+save_CFLAGS="${save_CFLAGS} -pipe"; CFLAGS="${save_CFLAGS}"
 fi
 
 dnl Check for various optimization flags
 AC_CACHE_CHECK([if \$CC accepts -O3],
-    [ac_cv_c_o3],
-    [CFLAGS="${save_CFLAGS} -O3"
-     AC_TRY_COMPILE([],,ac_cv_c_o3=yes, ac_cv_c_o3=no)])
+[ac_cv_c_o3],
+[CFLAGS="${save_CFLAGS} -O3"
+ AC_TRY_COMPILE([],,ac_cv_c_o3=yes, ac_cv_c_o3=no)])
 if test "x${ac_cv_c_o3}" != "xno"; then
-    CFLAGS_OPTIM="${CFLAGS_OPTIM} -O3"
+CFLAGS_OPTIM="${CFLAGS_OPTIM} -O3"
 else
-    AC_CACHE_CHECK([if \$CC accepts -O2],
-        [ac_cv_c_o2],
-        [CFLAGS="${save_CFLAGS} -O2"
-         AC_TRY_COMPILE([],,ac_cv_c_o2=yes, ac_cv_c_o2=no)])
-    if test "x${ac_cv_c_o2}" != "xno"; then
-        CFLAGS_OPTIM="${CFLAGS_OPTIM} -O2"
-    else
-        AC_CACHE_CHECK([if \$CC accepts -O],
-            [ac_cv_c_o],
-            [CFLAGS="${save_CFLAGS} -O"
-             AC_TRY_COMPILE([],,ac_cv_c_o=yes, ac_cv_c_o=no)])
-        if test "x${ac_cv_c_o}" != "xno"; then
-            CFLAGS_OPTIM="${CFLAGS_OPTIM} -O"
-        fi
+AC_CACHE_CHECK([if \$CC accepts -O2],
+    [ac_cv_c_o2],
+    [CFLAGS="${save_CFLAGS} -O2"
+     AC_TRY_COMPILE([],,ac_cv_c_o2=yes, ac_cv_c_o2=no)])
+if test "x${ac_cv_c_o2}" != "xno"; then
+    CFLAGS_OPTIM="${CFLAGS_OPTIM} -O2"
+else
+    AC_CACHE_CHECK([if \$CC accepts -O],
+        [ac_cv_c_o],
+        [CFLAGS="${save_CFLAGS} -O"
+         AC_TRY_COMPILE([],,ac_cv_c_o=yes, ac_cv_c_o=no)])
+    if test "x${ac_cv_c_o}" != "xno"; then
+        CFLAGS_OPTIM="${CFLAGS_OPTIM} -O"
     fi
+fi
 fi
 
 dnl Check for -ffast-math
 AC_CACHE_CHECK([if \$CC accepts -ffast-math],
-    [ac_cv_c_fast_math],
-    [CFLAGS="${save_CFLAGS} -ffast-math"
-     AC_TRY_COMPILE([],,ac_cv_c_fast_math=yes, ac_cv_c_fast_math=no)])
+[ac_cv_c_fast_math],
+[CFLAGS="${save_CFLAGS} -ffast-math"
+ AC_TRY_COMPILE([],,ac_cv_c_fast_math=yes, ac_cv_c_fast_math=no)])
 if test "x${ac_cv_c_fast_math}" != "xno"; then
-    CFLAGS_OPTIM="${CFLAGS_OPTIM} -ffast-math"
+CFLAGS_OPTIM="${CFLAGS_OPTIM} -ffast-math"
 fi
 
 dnl Check for -funroll-loops
 AC_CACHE_CHECK([if \$CC accepts -funroll-loops],
-    [ac_cv_c_unroll_loops],
-    [CFLAGS="${save_CFLAGS} -funroll-loops"
-     AC_TRY_COMPILE([],,ac_cv_c_unroll_loops=yes, ac_cv_c_unroll_loops=no)])
+[ac_cv_c_unroll_loops],
+[CFLAGS="${save_CFLAGS} -funroll-loops"
+ AC_TRY_COMPILE([],,ac_cv_c_unroll_loops=yes, ac_cv_c_unroll_loops=no)])
 if test "x${ac_cv_c_unroll_loops}" != "xno"; then
-    CFLAGS_OPTIM="${CFLAGS_OPTIM} -funroll-loops"
+CFLAGS_OPTIM="${CFLAGS_OPTIM} -funroll-loops"
 fi
 
 dnl Check for -fomit-frame-pointer
 AC_CACHE_CHECK([if \$CC accepts -fomit-frame-pointer],
-    [ac_cv_c_omit_frame_pointer],
-    [CFLAGS="${save_CFLAGS} -fomit-frame-pointer"
-     AC_TRY_COMPILE([],,ac_cv_c_omit_frame_pointer=yes, ac_cv_c_omit_frame_pointer=no)])
+[ac_cv_c_omit_frame_pointer],
+[CFLAGS="${save_CFLAGS} -fomit-frame-pointer"
+ AC_TRY_COMPILE([],,ac_cv_c_omit_frame_pointer=yes, ac_cv_c_omit_frame_pointer=no)])
 if test "x${ac_cv_c_omit_frame_pointer}" != "xno"; then
-    CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fomit-frame-pointer"
-    # this plugin does not compile without -fomit-frame-pointer, damn gcc!
-    i420_yuy2_mmx_CFLAGS="${i420_yuy2_mmx_CFLAGS} -fomit-frame-pointer"
+CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fomit-frame-pointer"
+# this plugin does not compile without -fomit-frame-pointer, damn gcc!
+i420_yuy2_mmx_CFLAGS="${i420_yuy2_mmx_CFLAGS} -fomit-frame-pointer"
 fi
 
 dnl Check for Darwin plugin linking flags
 AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error -lcc_dynamic],
-    [ac_cv_ld_darwin],
-    [CFLAGS="${save_CFLAGS} -bundle -undefined error -lcc_dynamic"
-     AC_TRY_COMPILE([],,ac_cv_ld_darwin=yes, ac_cv_ld_darwin=no)])
+[ac_cv_ld_darwin],
+[CFLAGS="${save_CFLAGS} -bundle -undefined error -lcc_dynamic"
+ AC_TRY_COMPILE([],,ac_cv_ld_darwin=yes, ac_cv_ld_darwin=no)])
 if test "x${ac_cv_ld_darwin}" != "xno"; then
-    plugins_LDFLAGS="${plugins_LDFLAGS} -bundle -undefined error -lcc_dynamic"
+plugins_LDFLAGS="${plugins_LDFLAGS} -bundle -undefined error -lcc_dynamic"
 fi
 
 dnl Check for standard plugin linking flags
 AC_CACHE_CHECK([if \$CC accepts -shared],
-    [ac_cv_ld_plugins],
-    [CFLAGS="${save_CFLAGS} -shared"
-     AC_TRY_COMPILE([],, ac_cv_ld_plugins=yes, ac_cv_ld_plugins=no)])
+[ac_cv_ld_plugins],
+[CFLAGS="${save_CFLAGS} -shared"
+ AC_TRY_COMPILE([],, ac_cv_ld_plugins=yes, ac_cv_ld_plugins=no)])
 if test "x${ac_cv_ld_plugins}" != "xno"; then
-    plugins_LDFLAGS="${plugins_LDFLAGS} -shared"
+plugins_LDFLAGS="${plugins_LDFLAGS} -shared"
 fi
-        
+    
 dnl Check for variadic macros
 AC_CACHE_CHECK([for variadic cpp macros],
-    [ac_cv_cpp_variadic_macros],
-    [CFLAGS="${save_CFLAGS}"
-     AC_TRY_COMPILE(
-         [#include <stdio.h>
-          #define a(b,c...) printf(b,##c)],
-         [a("foo");a("%s","bar");a("%s%s","baz","quux");],
-         ac_cv_cpp_variadic_macros=yes,
-         ac_cv_cpp_variadic_macros=no)])
+[ac_cv_cpp_variadic_macros],
+[CFLAGS="${save_CFLAGS}"
+ AC_TRY_COMPILE(
+     [#include <stdio.h>
+      #define a(b,c...) printf(b,##c)],
+     [a("foo");a("%s","bar");a("%s%s","baz","quux");],
+     ac_cv_cpp_variadic_macros=yes,
+     ac_cv_cpp_variadic_macros=no)])
 if test "x${ac_cv_cpp_variadic_macros}" != "xno"; then
-    AC_DEFINE(HAVE_VARIADIC_MACROS, 1, Support for variadic macros)
+AC_DEFINE(HAVE_VARIADIC_MACROS, 1, Support for variadic macros)
 fi
 
 dnl Checks for __attribute__(aligned()) directive
 AC_CACHE_CHECK([__attribute__ ((aligned ())) support],
-    [ac_cv_c_attribute_aligned],
-    [ac_cv_c_attribute_aligned=0
-        CFLAGS="${save_CFLAGS} -Werror"
-    for ac_cv_c_attr_align_try in 2 4 8 16 32 64; do
-        AC_TRY_COMPILE([],
-        [static char c __attribute__ ((aligned(${ac_cv_c_attr_align_try}))) = 0; return c;],
-        [ac_cv_c_attribute_aligned="${ac_cv_c_attr_align_try}"])
-    done
-        CFLAGS="${save_CFLAGS}"])
+[ac_cv_c_attribute_aligned],
+[ac_cv_c_attribute_aligned=0
+    CFLAGS="${save_CFLAGS} -Werror"
+for ac_cv_c_attr_align_try in 2 4 8 16 32 64; do
+    AC_TRY_COMPILE([],
+    [static char c __attribute__ ((aligned(${ac_cv_c_attr_align_try}))) = 0; return c;],
+    [ac_cv_c_attribute_aligned="${ac_cv_c_attr_align_try}"])
+done
+    CFLAGS="${save_CFLAGS}"])
 if test "x${ac_cv_c_attribute_aligned}" != "x0"; then
-    AC_DEFINE_UNQUOTED([ATTRIBUTE_ALIGNED_MAX],
-        [${ac_cv_c_attribute_aligned}],[Maximum supported data alignment])
+AC_DEFINE_UNQUOTED([ATTRIBUTE_ALIGNED_MAX],
+    [${ac_cv_c_attribute_aligned}],[Maximum supported data alignment])
 fi
 
 dnl
 dnl  Check the CPU
 dnl
 case "x${target_cpu}" in
-  x)
-    ARCH=unknown
-    ;;
-  *)
-    ARCH="${target_cpu}"
-    ;;
+x)
+ARCH=unknown
+;;
+*)
+ARCH="${target_cpu}"
+;;
 esac
 
 dnl
@@ -447,10 +447,9 @@ PLUGINS="${PLUGINS} misc/dummy/dummy misc/null"
 PLUGINS="${PLUGINS} control/rc/rc misc/logger/logger access/file misc/memcpy/memcpy"
 PLUGINS="${PLUGINS} demux/mpeg/es demux/mpeg/audio demux/mpeg/mpeg_system demux/mpeg/ps demux/mpeg/ts demux/a52sys"
 PLUGINS="${PLUGINS} codec/mpeg_video/idct/idct codec/mpeg_video/idct/idctclassic codec/mpeg_video/motion/motion codec/mpeg_video/mpeg_video codec/spudec/spudec codec/mpeg_audio/mpeg_audio"
-PLUGINS="${PLUGINS} codec/a52old/imdct/imdct codec/a52old/downmix/downmix codec/a52old/a52old codec/a52"
-#PLUGINS="${PLUGINS} codec/lpcm/lpcm"
+PLUGINS="${PLUGINS} codec/a52old/imdct/imdct codec/a52old/downmix/downmix codec/a52old/a52old codec/a52 codec/lpcm/lpcm"
 PLUGINS="${PLUGINS} video_filter/deinterlace/deinterlace video_filter/invert video_filter/wall video_filter/transform video_filter/distort video_filter/clone video_filter/crop video_filter/motionblur"
-PLUGINS="${PLUGINS} audio_filter/converter/float32tos16 audio_filter/converter/float32tos8 audio_filter/converter/float32tou16 audio_filter/converter/float32tou8 audio_filter/converter/a52tospdif audio_filter/converter/fixed32tofloat32 audio_filter/converter/fixed32tos16 audio_filter/converter/s16tofloat32"
+PLUGINS="${PLUGINS} audio_filter/converter/float32tos16 audio_filter/converter/float32tos8 audio_filter/converter/float32tou16 audio_filter/converter/float32tou8 audio_filter/converter/a52tospdif audio_filter/converter/fixed32tofloat32 audio_filter/converter/fixed32tos16 audio_filter/converter/s16tofloat32 audio_filter/converter/s16tofloat32swab"
 PLUGINS="${PLUGINS} audio_filter/resampler/trivial audio_filter/resampler/ugly"
 PLUGINS="${PLUGINS} audio_filter/channel_mixer/trivial"
 PLUGINS="${PLUGINS} audio_mixer/float32 audio_mixer/trivial audio_mixer/spdif"
