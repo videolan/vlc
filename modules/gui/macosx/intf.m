@@ -732,19 +732,14 @@ static VLCMain *_o_sharedMainInstance = nil;
             if( p_input )
             {
                 msg_Dbg( p_intf, "input has changed, refreshing interface" );
-                p_intf->p_sys->i_play_status = PLAYING_S;
-                p_intf->p_sys->b_playing = TRUE;
-                p_intf->p_sys->b_current_title_update = 1;
-                p_intf->p_sys->b_intf_update = TRUE;
-                p_intf->p_sys->b_input_update = TRUE;
+                p_intf->p_sys->b_input_update = VLC_TRUE;
             }
         }
-        else if( p_input->b_dead )
+        else if( p_input->b_die || p_input->b_dead )
         {
             /* input stopped */
-            p_intf->p_sys->b_playing = FALSE;
-            p_intf->p_sys->b_intf_update = TRUE;
-            p_intf->p_sys->i_play_status = PAUSE_S;
+            p_intf->p_sys->b_intf_update = VLC_TRUE;
+            p_intf->p_sys->i_play_status = END_S;
             [o_scrollfield setStringValue: _NS("VLC media player") ];
             vlc_object_release( p_input );
             p_input = NULL;
@@ -753,7 +748,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
         vlc_mutex_unlock( &p_intf->change_lock );
 
-        o_sleep_date = [NSDate dateWithTimeIntervalSinceNow: .3];
+        o_sleep_date = [NSDate dateWithTimeIntervalSinceNow: .1];
         [NSThread sleepUntilDate: o_sleep_date];
     }
 
@@ -772,6 +767,13 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
 
 #define p_input p_intf->p_sys->p_input
+    if( p_intf->p_sys->b_input_update )
+    {
+        /* Called when new input is opened */
+        p_intf->p_sys->b_current_title_update = VLC_TRUE;
+        p_intf->p_sys->b_intf_update = VLC_TRUE;
+        p_intf->p_sys->b_input_update = VLC_FALSE;
+    }
     if( p_intf->p_sys->b_intf_update )
     {
         vlc_bool_t b_input = VLC_FALSE;
@@ -868,7 +870,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             [o_scrollfield setStringValue: o_temp ];
 
 
-            p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+            /*p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                                     FIND_ANYWHERE );
             if( p_vout != NULL )
             {
@@ -879,17 +881,17 @@ static VLCMain *_o_sharedMainInstance = nil;
                 {
                     if( [[o_vout_wnd className] isEqualToString: @"VLCWindow"] )
                     {
-                        ;//[o_vout_wnd updateTitle];
+                        ;[o_vout_wnd updateTitle];
                     }
                 }
                 vlc_object_release( (vlc_object_t *)p_vout );
-            }
+            }*/
             [o_playlist updateRowSelection];
             vlc_object_release( p_playlist );
             p_intf->p_sys->b_current_title_update = FALSE;
         }
 
-        if( p_intf->p_sys->b_playing && [o_timeslider isEnabled] )
+        if( p_input && [o_timeslider isEnabled] )
         {
             /* Update the slider */
             vlc_value_t time;
@@ -923,9 +925,9 @@ static VLCMain *_o_sharedMainInstance = nil;
             [self playStatusUpdated: p_intf->p_sys->i_play_status];
         }
     }
-    else if( p_intf->p_sys->b_playing && !p_intf->b_die )
+    else
     {
-        p_intf->p_sys->i_play_status = PAUSE_S;
+        p_intf->p_sys->i_play_status = END_S;
         p_intf->p_sys->b_intf_update = VLC_TRUE;
         [self playStatusUpdated: p_intf->p_sys->i_play_status];
         [self setSubmenusEnabled: FALSE];
@@ -942,77 +944,71 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)setupMenus
 {
-    playlist_t *p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
-    if( p_playlist != NULL )
+#define p_input p_intf->p_sys->p_input
+    if( p_input != NULL )
     {
-#define p_input p_playlist->p_input
-        if( p_input != NULL )
+        [o_controls setupVarMenuItem: o_mi_program target: (vlc_object_t *)p_input
+            var: "program" selector: @selector(toggleVar:)];
+
+        [o_controls setupVarMenuItem: o_mi_title target: (vlc_object_t *)p_input
+            var: "title" selector: @selector(toggleVar:)];
+
+        [o_controls setupVarMenuItem: o_mi_chapter target: (vlc_object_t *)p_input
+            var: "chapter" selector: @selector(toggleVar:)];
+
+        [o_controls setupVarMenuItem: o_mi_audiotrack target: (vlc_object_t *)p_input
+            var: "audio-es" selector: @selector(toggleVar:)];
+
+        [o_controls setupVarMenuItem: o_mi_videotrack target: (vlc_object_t *)p_input
+            var: "video-es" selector: @selector(toggleVar:)];
+
+        [o_controls setupVarMenuItem: o_mi_subtitle target: (vlc_object_t *)p_input
+            var: "spu-es" selector: @selector(toggleVar:)];
+
+        aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                    FIND_ANYWHERE );
+        if ( p_aout != NULL )
         {
-            [o_controls setupVarMenuItem: o_mi_program target: (vlc_object_t *)p_input
-                var: "program" selector: @selector(toggleVar:)];
+            [o_controls setupVarMenuItem: o_mi_channels target: (vlc_object_t *)p_aout
+                var: "audio-channels" selector: @selector(toggleVar:)];
 
-            [o_controls setupVarMenuItem: o_mi_title target: (vlc_object_t *)p_input
-                var: "title" selector: @selector(toggleVar:)];
+            [o_controls setupVarMenuItem: o_mi_device target: (vlc_object_t *)p_aout
+                var: "audio-device" selector: @selector(toggleVar:)];
 
-            [o_controls setupVarMenuItem: o_mi_chapter target: (vlc_object_t *)p_input
-                var: "chapter" selector: @selector(toggleVar:)];
-
-            [o_controls setupVarMenuItem: o_mi_audiotrack target: (vlc_object_t *)p_input
-                var: "audio-es" selector: @selector(toggleVar:)];
-
-            [o_controls setupVarMenuItem: o_mi_videotrack target: (vlc_object_t *)p_input
-                var: "video-es" selector: @selector(toggleVar:)];
-
-            [o_controls setupVarMenuItem: o_mi_subtitle target: (vlc_object_t *)p_input
-                var: "spu-es" selector: @selector(toggleVar:)];
-
-            aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                        FIND_ANYWHERE );
-            if ( p_aout != NULL )
-            {
-                [o_controls setupVarMenuItem: o_mi_channels target: (vlc_object_t *)p_aout
-                    var: "audio-channels" selector: @selector(toggleVar:)];
-
-                [o_controls setupVarMenuItem: o_mi_device target: (vlc_object_t *)p_aout
-                    var: "audio-device" selector: @selector(toggleVar:)];
-
-                [o_controls setupVarMenuItem: o_mi_visual target: (vlc_object_t *)p_aout
-                    var: "visual" selector: @selector(toggleVar:)];
-                vlc_object_release( (vlc_object_t *)p_aout );
-            }
-
-            vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                                                FIND_ANYWHERE );
-
-            if ( p_vout != NULL )
-            {
-                vlc_object_t * p_dec_obj;
-
-                [o_controls setupVarMenuItem: o_mi_screen target: (vlc_object_t *)p_vout
-                    var: "video-device" selector: @selector(toggleVar:)];
-
-                [o_controls setupVarMenuItem: o_mi_deinterlace target: (vlc_object_t *)p_vout
-                    var: "deinterlace" selector: @selector(toggleVar:)];
-
-                p_dec_obj = (vlc_object_t *)vlc_object_find(
-                                                     (vlc_object_t *)p_vout,
-                                                     VLC_OBJECT_DECODER,
-                                                     FIND_PARENT );
-                if ( p_dec_obj != NULL )
-                {
-                   [o_controls setupVarMenuItem: o_mi_ffmpeg_pp target:
-                        (vlc_object_t *)p_dec_obj var:"ffmpeg-pp-q" selector:
-                        @selector(toggleVar:)];
-
-                    vlc_object_release(p_dec_obj);
-                }
-                vlc_object_release( (vlc_object_t *)p_vout );
-            }
+            [o_controls setupVarMenuItem: o_mi_visual target: (vlc_object_t *)p_aout
+                var: "visual" selector: @selector(toggleVar:)];
+            vlc_object_release( (vlc_object_t *)p_aout );
         }
-#undef p_input
+
+        vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                                            FIND_ANYWHERE );
+
+        if ( p_vout != NULL )
+        {
+            vlc_object_t * p_dec_obj;
+
+            [o_controls setupVarMenuItem: o_mi_screen target: (vlc_object_t *)p_vout
+                var: "video-device" selector: @selector(toggleVar:)];
+
+            [o_controls setupVarMenuItem: o_mi_deinterlace target: (vlc_object_t *)p_vout
+                var: "deinterlace" selector: @selector(toggleVar:)];
+
+            p_dec_obj = (vlc_object_t *)vlc_object_find(
+                                                 (vlc_object_t *)p_vout,
+                                                 VLC_OBJECT_DECODER,
+                                                 FIND_PARENT );
+            if ( p_dec_obj != NULL )
+            {
+               [o_controls setupVarMenuItem: o_mi_ffmpeg_pp target:
+                    (vlc_object_t *)p_dec_obj var:"ffmpeg-pp-q" selector:
+                    @selector(toggleVar:)];
+
+                vlc_object_release(p_dec_obj);
+            }
+            vlc_object_release( (vlc_object_t *)p_vout );
+        }
     }
-    vlc_object_release( (vlc_object_t *)p_playlist );
+#undef p_input
 }
 
 - (void)updateMessageArray
@@ -1099,7 +1095,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)playStatusUpdated:(int)i_status
 {
-    if( i_status != PAUSE_S )
+    if( i_status == PLAYING_S )
     {
         [o_btn_play setImage: o_img_pause];
         [o_btn_play setAlternateImage: o_img_pause_pressed];
@@ -1147,7 +1143,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)timesliderUpdate:(id)sender
 {
-    input_thread_t * p_input;
+#define p_input p_intf->p_sys->p_input
     float f_updated;
 
     switch( [[NSApp currentEvent] type] )
@@ -1161,9 +1157,6 @@ static VLCMain *_o_sharedMainInstance = nil;
         default:
             return;
     }
-
-    p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                            FIND_ANYWHERE );
 
     if( p_input != NULL )
     {
@@ -1184,9 +1177,8 @@ static VLCMain *_o_sharedMainInstance = nil;
                         (int) (i_seconds / 60 % 60),
                         (int) (i_seconds % 60)];
         [o_timefield setStringValue: o_time];
-
-        vlc_object_release( p_input );
     }
+#undef p_input
 }
 
 - (void)terminate

@@ -57,7 +57,6 @@ struct intf_sys_t
     input_thread_t * p_input;
 
     /* special actions */
-    vlc_bool_t b_playing;
     vlc_bool_t b_mute;
     int i_play_status;
 
