@@ -15,11 +15,16 @@
 
 # Video output settings
 VIDEO=X11
-#VIDEO=DGA (not yet supported)
 #VIDEO=DUMMY
 #VIDEO=FB
 #VIDEO=GGI
-#VIDEO=BEOS (not yet supported)
+
+# Highly experimental
+#VIDEO=3DFX
+
+# Not yet supported
+#VIDEO=BEOS
+#VIDEO=DGA
 
 # Target architecture and optimization
 #ARCH=
@@ -86,6 +91,10 @@ ifeq ($(VIDEO),X11)
 INCLUDE += -I/usr/X11R6/include
 endif
 
+ifeq ($(VIDEO),3DFX)
+INCLUDE += -I/usr/include/glide
+endif
+
 #
 # Libraries
 #
@@ -99,6 +108,9 @@ LIB += -lXext
 endif
 ifeq ($(VIDEO),GGI)
 LIB += -lggi
+endif
+ifeq ($(VIDEO),3DFX)
+LIB += -lglide2x
 endif
 
 #
