@@ -1,0 +1,281 @@
+#! /bin/sh
+
+##  toolbox for vlc, the VideoLAN Client
+##  $Id: toolbox,v 1.1 2002/12/25 22:36:14 sam Exp $
+##
+##  Authors: Samuel Hocevar <sam@zoy.org>
+
+###
+###  Get a sane environment, just in case
+###
+LANG=C
+export LANG
+CYGWIN=binmode
+export CYGWIN
+
+##
+##  Give help
+##
+help()
+{
+  cat << EOF
+recognized flags are:
+  --update-vc     update Microsoft Visual Studio files
+  --update-po     update translation files
+EOF
+  exit 1
+}
+
+###
+###  argument check
+###
+do_help=yes
+do_po=no
+do_vc=no
+while test $# -gt 0; do
+  case "$1" in
+    --update-vc)
+      do_help=no
+      do_vc=yes
+      ;;
+    --update-po)
+      do_help=no
+      do_po=yes
+      ;;
+    *)
+      echo "$0: unknown option $1"
+      do_help=yes
+      help
+      ;;
+  esac
+  shift
+done
+
+##
+##  Give help if needed
+##
+if test "$do_help" = "yes"
+then
+  help
+fi
+
+##
+##  Update the MSVC project files
+##
+if test "$do_vc" = "yes"
+then
+  if test ! -f Makefile
+  then
+    echo "no Makefile found, did you run ./configure?"
+    exit 1
+  fi
+
+  echo "generating Visual Studio files..."
+
+  #  The evil ^M
+  M=''
+
+  #  Sources that get built under Win32 - FIXME: anyone wanna deuglify this? :)
+  LIBVLC_SOURCES=`awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_common'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p';  awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_win32'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_dirent'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_getopt'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_libc'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'`
+
+  LIBVLC_HEADERS=`awk 'BEGIN{a=0}{if(!a&&/^'HEADERS_include'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'HEADERS_include_built'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'`
+
+  LIBVLC_PKG_HEADERS=`awk 'BEGIN{a=0}{if(!a&&/^'dist_pkginclude_HEADERS'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'`
+
+  # Clean up
+  rm -f evc/*.vcp msvc/*.dsp
+
+  # libvlc files
+  for target in evc/libvlc.vcp msvc/libvlc.dsp
+  do
+    echo "${target}"
+    #  Top of the project file
+    perl -pe 'if(/§SOURCES§/){last;}' < ${target}.in > ${target}
+    #  The source files
+    for file in `for i in ${LIBVLC_SOURCES} ; do echo $i ; done | grep -v "/.*/"`
+    do
+      cat >> ${target} << EOF
+# Begin Source File${M}
+SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\"plugins\\" /D DATA_PATH=\\"share\\"${M}
+# End Source File${M}
+EOF
+    done
+    for subdir in `for i in ${LIBVLC_SOURCES} ; do echo $i ; done | grep "/.*/" | cut -f2 -d/ | sort | uniq`
+    do
+      cat >> ${target} << EOF
+# Begin Group "${subdir}"${M}
+EOF
+      for file in `for i in ${LIBVLC_SOURCES} ; do echo $i ; done | grep "/${subdir}/"`
+      do
+      if test "${target}" = "evc/libvlc.vcp"
+      then
+        cat >> ${target} << EOF
+# Begin Source File${M}
+SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\"plugins\\" /D DATA_PATH=\\"share\\"${M}
+!IF "\$(CFG)" == "libvlc - Win32 (WCE MIPS) Release"${M}
+# PROP Output_Dir "MIPSRel\\${subdir}"${M}
+# PROP Intermediate_Dir "MIPSRel\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE MIPS) Debug"${M}
+# PROP Output_Dir "MIPSDbg\\${subdir}"${M}
+# PROP Intermediate_Dir "MIPSDbg\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE SH4) Release"${M}
+# PROP Output_Dir "SH4Rel\\${subdir}"${M}
+# PROP Intermediate_Dir "SH4Rel\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE SH4) Debug"${M}
+# PROP Output_Dir "SH4Dbg\\${subdir}"${M}
+# PROP Intermediate_Dir "SH4Dbg\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE SH3) Release"${M}
+# PROP Output_Dir "SH3Rel\\${subdir}"${M}
+# PROP Intermediate_Dir "SH3Rel\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE SH3) Debug"${M}
+# PROP Output_Dir "SH3Dbg\\${subdir}"${M}
+# PROP Intermediate_Dir "SH3Dbg\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE ARM) Release"${M}
+# PROP Output_Dir "ARMRel\\${subdir}"${M}
+# PROP Intermediate_Dir "ARMRel\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE ARM) Debug"${M}
+# PROP Output_Dir "ARMDbg\\${subdir}"${M}
+# PROP Intermediate_Dir "ARMDbg\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE x86em) Release"${M}
+# PROP Output_Dir "X86EMRel\\${subdir}"${M}
+# PROP Intermediate_Dir "X86EMRel\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE x86em) Debug"${M}
+# PROP Output_Dir "X86EMDbg\\${subdir}"${M}
+# PROP Intermediate_Dir "X86EMDbg\\${subdir}"${M}
+!ENDIF${M}
+# End Source File${M}
+EOF
+        else
+          cat >> ${target} << EOF
+# Begin Source File${M}
+SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\"plugins\\" /D DATA_PATH=\\"share\\"${M}
+!IF "\$(CFG)" == "libvlc - Win32 Release"${M}
+# PROP Output_Dir "Release\\${subdir}"${M}
+# PROP Intermediate_Dir "Release\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 Debug"${M}
+# PROP Output_Dir "Debug\\${subdir}"${M}
+# PROP Intermediate_Dir "Debug\\${subdir}"${M}
+!ENDIF${M}
+# End Source File${M}
+EOF
+        fi
+      done
+      cat >> ${target} << EOF
+# End Group${M}
+EOF
+    done
+    #  The headers
+    perl -e 'while(<>){if(/§SOURCES§/){last;}}while(<>){if(/§HEADERS§/){last;}print $_}' < ${target}.in >> ${target}
+    for file in ${LIBVLC_HEADERS}
+    do
+      cat >> ${target} << EOF
+# Begin Source File${M}
+SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
+# End Source File${M}
+EOF
+    done
+    cat >> ${target} << EOF
+# Begin Group "vlc"${M}
+EOF
+    for file in ${LIBVLC_PKG_HEADERS}
+    do
+      cat >> ${target} << EOF
+# Begin Source File${M}
+SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
+# End Source File${M}
+EOF
+    done
+    cat >> ${target} << EOF
+# End Group${M}
+EOF
+    perl -e 'while(<>){if(/§HEADERS§/){last;}}while(<>){print $_}' < ${target}.in >> ${target}
+  done
+
+  # plugins files
+  grep '^L_[^ ]*_pic =' Modules.am | while read a b c
+  do
+    makefile="`echo $c | sed -e 's@/[^/]*$@/Modules.am@'`"
+    plugin="`echo $a | sed 's/L_\(.*\)_pic/\1/'`"
+    # this is an attempt at getting a list of plugin sources... we take the
+    # production and remove everything that does not contain "module", which
+    # means you miss $(NULL), but other variables too.
+    cfiles=`grep -v '[^-_a-zA-Z0-9]*#' ${makefile} | awk 'BEGIN{a=0}{if(!a&&/^SOURCES_'${plugin}'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' | tr '\\ ' '\n\n' | sed -ne 's,/,\\\\,g; s/.*modules/modules/p'`
+    hfiles=`for i in ${cfiles} ; do echo $i ; done | grep '\.h$'`
+    cfiles=`for i in ${cfiles} ; do echo $i ; done | grep -v '\.h$'`
+    for dir in evc msvc
+    do
+      test "${dir}" = "evc" && suf="vcp" || suf="dsp"
+      source="${dir}/plugins.${suf}.in"
+      target="${dir}/plugin_${plugin}.${suf}"
+      echo "${target}"
+      perl -pe 'if(/§SOURCES§/){last;} s/§PLUGIN§/'${plugin}'/g' < ${source} > ${target}
+      for cfile in ${cfiles}
+      do
+        cat >> ${target} << EOF
+# Begin Source File${M}
+SOURCE="..\\${cfile}"${M}
+# End Source File${M}
+EOF
+      done
+      # sed is really nicer for this... unfortunately it's broken under cygwin
+      # sed -ne '1,/§SOURCES§/d; /§HEADERS§/,$d; p' < ${source} >> ${target}
+      perl -e 'while(<>){if(/§SOURCES§/){last;}}while(<>){if(/§HEADERS§/){last;}print $_}' < ${source} >> ${target}
+      for hfile in ${hfiles}
+      do
+        cat >> ${target} << EOF
+# Begin Source File${M}
+SOURCE="..\\${hfile}"${M}
+# End Source File${M}
+EOF
+      done
+      # sed -ne '1,/§HEADERS§/d; p' < ${source} >> ${target}
+      perl -e 'while(<>){if(/§HEADERS§/){last;}}while(<>){print $_}' < ${source} >> ${target}
+    done
+  done
+
+  # vlc files
+  for target in evc/vlc.vcp msvc/vlc.dsp
+  do
+    echo "${target}"
+    #  Top of the project file
+    perl -pe 'if(/§SOURCES§/){last;}' < ${target}.in > ${target}
+    #  The source files
+    if test "${target}" = "evc/vlc.vcp"
+    then
+      cat >> ${target} << EOF
+# Begin Source File${M}
+SOURCE="..\\evc\\vlc.c"${M}
+# End Source File${M}
+EOF
+    else
+      cat >> ${target} << EOF
+# Begin Source File${M}
+SOURCE="..\\src\\vlc.c"${M}
+# End Source File${M}
+EOF
+    fi
+    #  Bottom of the project file - handles resource files too
+    perl -e 'while(<>){if(/§SOURCES§/){last;}}while(<>){print $_}' < ${target}.in >> ${target}
+  done
+
+  echo "done."
+  exit 0
+fi
+
+##
+##  Update the potfiles because no one ever does it
+##
+if test "$do_po" = "yes"
+then
+  cd po
+  rm -f vlc.pot
+  make vlc.pot
+  make update-po
+  cd ..
+
+  exit 0
+fi
+
