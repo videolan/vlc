@@ -133,7 +133,7 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
         return NULL;
     }
 
-    if( !p_es->b_force_decoder && p_input->stream.p_sout )
+    if( !p_es->b_force_decoder && p_input->stream.p_sout && p_input->stream.b_pace_control )
     {
         msg_Dbg( p_input, "stream out mode -> no decoder thread" );
         p_dec->p_owner->b_own_thread = VLC_FALSE;
