@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.2 2003/03/19 18:14:48 karibu Exp $
+ * $Id: event.cpp,v 1.3 2003/04/01 12:24:54 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -238,13 +238,13 @@ void Event::CreateEvent()
 
     // Check parameters
     if( scan < 1 )
-        msg = "VLC_NOTHING";
+        strcpy( msg, "VLC_NOTHING" );
     if( scan < 2 )
-        para1 = "";
+        strcpy( para1, "" );
     if( scan < 3 )
-        para2 = "";
+        strcpy( para2, "" );
     if( scan < 4 )
-        para3 = "";
+        strcpy( para3, "" );
 
     // Find Message type
     Message = GetMessageType( msg );
