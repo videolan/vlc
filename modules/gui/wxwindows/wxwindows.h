@@ -998,7 +998,7 @@ public:
     vlc_bool_t b_need_update;
 
 private:
-    void OnClose( wxCommandEvent& event );
+    void OnClose( wxCloseEvent& event );
 
     DECLARE_EVENT_TABLE();
 

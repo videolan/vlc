@@ -69,8 +69,8 @@ private:
 
     wxWindow *p_child_window;
 
-    void UpdateSize( wxSizeEvent & );
-    void UpdateHide( wxSizeEvent & );
+    void UpdateSize( wxEvent & );
+    void UpdateHide( wxEvent & );
     void OnControlEvent( wxCommandEvent & );
 
     DECLARE_EVENT_TABLE();
@@ -235,8 +235,9 @@ void VideoWindow::ReleaseWindow( void *p_window )
     vlc_mutex_unlock( &lock );
 }
 
-void VideoWindow::UpdateSize( wxSizeEvent &event )
+void VideoWindow::UpdateSize( wxEvent &_event )
 {
+    wxSizeEvent * event = (wxSizeEvent*)(&_event);
     if( !b_shown )
     {
         p_intf->p_sys->p_video_sizer->Show( this, TRUE );
@@ -244,14 +245,15 @@ void VideoWindow::UpdateSize( wxSizeEvent &event )
         SetFocus();
         b_shown = VLC_TRUE;
     }
-    p_intf->p_sys->p_video_sizer->SetMinSize( event.GetSize() );
+    p_intf->p_sys->p_video_sizer->SetMinSize( event->GetSize() );
 
     wxCommandEvent intf_event( wxEVT_INTF, 0 );
     p_parent->AddPendingEvent( intf_event );
 }
 
-void VideoWindow::UpdateHide( wxSizeEvent &event )
+void VideoWindow::UpdateHide( wxEvent &_event )
 {
+    wxSizeEvent * event = (wxSizeEvent*)(&_event);
     if( b_shown )
     {
         p_intf->p_sys->p_video_sizer->Show( this, FALSE );
@@ -261,7 +263,7 @@ void VideoWindow::UpdateHide( wxSizeEvent &event )
         SetSize(0,0);
         Show();
     }
-    p_intf->p_sys->p_video_sizer->SetMinSize( event.GetSize() );
+    p_intf->p_sys->p_video_sizer->SetMinSize( event->GetSize() );
 
     wxCommandEvent intf_event( wxEVT_INTF, 0 );
     p_parent->AddPendingEvent( intf_event );

@@ -160,7 +160,7 @@ FileInfo::~FileInfo()
 {
 }
 
-void FileInfo::OnClose( wxCommandEvent& event )
+void FileInfo::OnClose( wxCloseEvent& event )
 {
     Hide();
 }
