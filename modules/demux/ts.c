@@ -2,7 +2,7 @@
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ts.c,v 1.3 2004/01/18 01:49:11 fenrir Exp $
+ * $Id: ts.c,v 1.4 2004/01/18 06:15:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -202,7 +202,11 @@ struct demux_sys_t
 static int Demux  ( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
-static void PIDInit( ts_pid_t *pid, vlc_bool_t b_psi, ts_psi_t *p_owner );
+
+static void PIDInit ( ts_pid_t *pid, vlc_bool_t b_psi, ts_psi_t *p_owner );
+static void PIDClean( es_out_t *out, ts_pid_t *pid );
+static int  PIDFillFormat( ts_pid_t *pid, int i_stream_type );
+
 static void PATCallBack( demux_t *, dvbpsi_pat_t * );
 static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt );
 
@@ -215,9 +219,8 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk );
 static char *LanguageNameISO639( char *p );
 
 static iod_descriptor_t *IODNew( int , uint8_t * );
-static void IODFree( iod_descriptor_t * );
+static void              IODFree( iod_descriptor_t * );
 
-static int ESFillFormat( es_format_t *fmt, int i_stream_type );
 
 /*****************************************************************************
  * Open
@@ -317,7 +320,7 @@ static int Open( vlc_object_t *p_this )
                         {
                             pmt->psi->i_pid_pcr = i_pid;
                         }
-                        ESFillFormat( &pid->es->fmt, i_stream_type);
+                        PIDFillFormat( pid, i_stream_type);
                         if( pid->es->fmt.i_cat != UNKNOWN_ES )
                         {
                             msg_Dbg( p_demux, "  * es pid=0x%x type=0x%x fcc=%4.4s", i_pid, i_stream_type, (char*)&pid->es->fmt.i_codec );
@@ -583,6 +586,35 @@ static void PIDInit( ts_pid_t *pid, vlc_bool_t b_psi, ts_psi_t *p_owner )
     }
 }
 
+static void PIDClean( es_out_t *out, ts_pid_t *pid )
+{
+    if( pid->psi )
+    {
+        if( pid->psi->handle )
+        {
+            dvbpsi_DetachPMT( pid->psi->handle );
+        }
+        if( pid->psi->iod )
+        {
+            IODFree( pid->psi->iod );
+        }
+        free( pid->psi );
+    }
+    else
+    {
+        if( pid->es->id )
+        {
+            es_out_Del( out, pid->es->id );
+        }
+        if( pid->es->p_pes )
+        {
+            block_ChainRelease( pid->es->p_pes );
+        }
+        free( pid->es );
+    }
+    pid->b_valid = VLC_FALSE;
+}
+
 /****************************************************************************
  * gathering stuff
  ****************************************************************************/
@@ -749,12 +781,10 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
 
 static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 {
-    uint8_t     *p = p_bk->p_buffer;
-
-    vlc_bool_t  b_unit_start= p[1]&0x40;
-    vlc_bool_t  b_adaptation= p[3]&0x20;
-    vlc_bool_t  b_payload   = p[3]&0x10;
-    int         i_cc = p[3]&0x0f;   /* continuity counter */
+    const uint8_t    *p = p_bk->p_buffer;
+    const vlc_bool_t  b_adaptation= p[3]&0x20;
+    const vlc_bool_t  b_payload   = p[3]&0x10;
+    const int         i_cc        = p[3]&0x0f;   /* continuity counter */
     /* transport_scrambling_control is ignored */
 
     int         i_skip = 0;
@@ -840,6 +870,8 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     }
     else
     {
+        const vlc_bool_t b_unit_start= p[1]&0x40;
+
         /* we have to gather it */
         p_bk->p_buffer += i_skip;
         p_bk->i_buffer -= i_skip;
@@ -896,8 +928,10 @@ static char *LanguageNameISO639( char *psz_code )
     }
 }
 
-static int ESFillFormat( es_format_t *fmt, int i_stream_type )
+static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
 {
+    es_format_t *fmt = &pid->es->fmt;
+
     switch( i_stream_type )
     {
         case 0x01:  /* MPEG-1 video */
@@ -960,7 +994,7 @@ static int ESFillFormat( es_format_t *fmt, int i_stream_type )
 }
 
 /*****************************************************************************
- * MP4 specific functions
+ * MP4 specific functions (IOD parser)
  *****************************************************************************/
 static int  IODDescriptorLength( int *pi_data, uint8_t **pp_data )
 {
@@ -981,38 +1015,32 @@ static int IODGetByte( int *pi_data, uint8_t **pp_data )
 {
     if( *pi_data > 0 )
     {
-        int i_b = **pp_data;
+        const int i_b = **pp_data;
         (*pp_data)++;
         (*pi_data)--;
         return( i_b );
     }
-    else
-    {
-        return( 0 );
-    }
+    return( 0 );
 }
-
-static int MP4_GetWord( int *pi_data, uint8_t **pp_data )
+static int IODGetWord( int *pi_data, uint8_t **pp_data )
 {
-    int i1, i2;
-    i1 = IODGetByte( pi_data, pp_data );
-    i2 = IODGetByte( pi_data, pp_data );
+    const int i1 = IODGetByte( pi_data, pp_data );
+    const int i2 = IODGetByte( pi_data, pp_data );
     return( ( i1 << 8 ) | i2 );
 }
 static int IODGet3Bytes( int *pi_data, uint8_t **pp_data )
 {
-    int i1, i2, i3;
-    i1 = IODGetByte( pi_data, pp_data );
-    i2 = IODGetByte( pi_data, pp_data );
-    i3 = IODGetByte( pi_data, pp_data );
+    const int i1 = IODGetByte( pi_data, pp_data );
+    const int i2 = IODGetByte( pi_data, pp_data );
+    const int i3 = IODGetByte( pi_data, pp_data );
+
     return( ( i1 << 16 ) | ( i2 << 8) | i3 );
 }
 
-static uint32_t IODGetWord( int *pi_data, uint8_t **pp_data )
+static uint32_t IODGetDWord( int *pi_data, uint8_t **pp_data )
 {
-    uint32_t i1, i2;
-    i1 = MP4_GetWord( pi_data, pp_data );
-    i2 = MP4_GetWord( pi_data, pp_data );
+    const uint32_t i1 = IODGetWord( pi_data, pp_data );
+    const uint32_t i2 = IODGetWord( pi_data, pp_data );
     return( ( i1 << 16 ) | i2 );
 }
 
@@ -1130,7 +1158,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                     fprintf( stderr, "\n* - ES_Descriptor length:%d", i_length );
                     es_descr.b_ok = 1;
 
-                    es_descr.i_es_id = MP4_GetWord( &i_data, &p_data );
+                    es_descr.i_es_id = IODGetWord( &i_data, &p_data );
                     i_flags = IODGetByte( &i_data, &p_data );
                     es_descr.b_streamDependenceFlag = ( i_flags >> 7 )&0x01;
                     b_url = ( i_flags >> 6 )&0x01;
@@ -1142,7 +1170,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 
                     if( es_descr.b_streamDependenceFlag )
                     {
-                        es_descr.i_dependOn_es_id = MP4_GetWord( &i_data, &p_data );
+                        es_descr.i_dependOn_es_id = IODGetWord( &i_data, &p_data );
                         fprintf( stderr, "\n*   * dependOn_es_id:%d", es_descr.i_dependOn_es_id );
                     }
 
@@ -1158,7 +1186,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 
                     if( es_descr.b_OCRStreamFlag )
                     {
-                        es_descr.i_OCR_es_id = MP4_GetWord( &i_data, &p_data );
+                        es_descr.i_OCR_es_id = IODGetWord( &i_data, &p_data );
                         fprintf( stderr, "\n*   * OCR_es_id:%d", es_descr.i_OCR_es_id );
                     }
 
@@ -1177,8 +1205,8 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                     dec_descr.i_streamType = i_flags >> 2;
                     dec_descr.b_upStream = ( i_flags >> 1 )&0x01;
                     dec_descr.i_bufferSizeDB = IODGet3Bytes( &i_data, &p_data );
-                    dec_descr.i_maxBitrate = IODGetWord( &i_data, &p_data );
-                    dec_descr.i_avgBitrate = IODGetWord( &i_data, &p_data );
+                    dec_descr.i_maxBitrate = IODGetDWord( &i_data, &p_data );
+                    dec_descr.i_avgBitrate = IODGetDWord( &i_data, &p_data );
                     fprintf( stderr, "\n*     * objectTypeIndication:0x%x", dec_descr.i_objectTypeIndication  );
                     fprintf( stderr, "\n*     * streamType:0x%x", dec_descr.i_streamType );
                     fprintf( stderr, "\n*     * upStream:%d", dec_descr.b_upStream );
@@ -1362,15 +1390,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
         if( pid->b_valid && pid->p_owner == pmt->psi && pid->psi == NULL )
         {
-            pid->b_valid = VLC_FALSE;
-            if( pid->es->id )
-            {
-                es_out_Del( p_demux->out, pid->es->id );
-            }
-            if( pid->es->p_pes )
-            {
-                block_ChainRelease( pid->es->p_pes );
-            }
+            PIDClean( p_demux->out, pid );
         }
     }
     if( pmt->psi->iod )
@@ -1406,7 +1426,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         }
 
         PIDInit( pid, VLC_FALSE, pmt->psi );
-        ESFillFormat( &pid->es->fmt, p_es->i_type );
+        PIDFillFormat( pid, p_es->i_type );
 
         if( p_es->i_type == 0x10 || p_es->i_type == 0x11 )
         {
@@ -1615,22 +1635,14 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
             {
                 if( pid->p_owner == pat->psi )
                 {
-                    dvbpsi_DetachPMT( pid->psi->handle );
-                    if( pid->psi->iod )
-                    {
-                        IODFree( pid->psi->iod );
-                        pid->psi->iod = NULL;
-                    }
-                    pid->b_valid = VLC_FALSE;
+                    PIDClean( p_demux->out, pid );
                     TAB_REMOVE( p_sys->i_pmt, p_sys->pmt, pid );
                 }
             }
             else if( pid->p_owner && pid->p_owner->i_number != 0 && pid->es->id )
             {
                 /* We only remove es that aren't defined by extra pmt */
-                es_out_Del( p_demux->out, pid->es->id );
-
-                pid->b_valid = VLC_FALSE;
+                PIDClean( p_demux->out, pid );
             }
         }
     }
