@@ -595,7 +595,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->ti.frame_width = p_enc->fmt_in.video.i_width;
     p_sys->ti.frame_height = p_enc->fmt_in.video.i_height;
     p_sys->ti.offset_x = 0 /*frame_x_offset*/;
-    p_sys->ti.offset_y = 0/*frame_y_offset*/;
+    p_sys->ti.offset_y = 0 /*frame_y_offset*/;
 
     p_sys->i_width = p_sys->ti.width;
     p_sys->i_height = p_sys->ti.height;
@@ -614,9 +614,14 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     if( p_enc->fmt_in.video.i_aspect )
     {
-        p_sys->ti.aspect_numerator =
-            p_enc->fmt_in.video.i_aspect * p_sys->ti.height / p_sys->ti.width;
-        p_sys->ti.aspect_denominator = VOUT_ASPECT_FACTOR;
+        int64_t i_num, i_den;
+        int i_dst_num, i_dst_den;
+
+        i_num = p_enc->fmt_in.video.i_aspect * (int64_t)p_sys->ti.height;
+        i_den = VOUT_ASPECT_FACTOR * p_sys->ti.width;
+        vlc_reduce( &i_dst_num, &i_dst_den, i_num, i_den, 0 );
+        p_sys->ti.aspect_numerator = i_dst_num;
+        p_sys->ti.aspect_denominator = i_dst_den;
     }
     else
     {
