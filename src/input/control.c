@@ -63,6 +63,9 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
     double f, *pf;
     int64_t i_64, *pi_64;
 
+    char *psz;
+    vlc_value_t val;
+
     switch( i_query )
     {
         case INPUT_GET_POSITION:
@@ -279,7 +282,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             UpdateBookmarksOption( p_input );
 
             return VLC_SUCCESS;
-            break;
 
         case INPUT_CHANGE_BOOKMARK:
             p_bkmk = (seekpoint_t *)va_arg( args, seekpoint_t * );
@@ -308,7 +310,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             UpdateBookmarksOption( p_input );
 
             return VLC_SUCCESS;
-            break;
 
         case INPUT_DEL_BOOKMARK:
             i_bkmk = (int)va_arg( args, int );
@@ -342,7 +343,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             vlc_mutex_unlock( &p_input->input.p_item->lock );
 
             return VLC_EGENERIC;
-            break;
 
         case INPUT_GET_BOOKMARKS:
             ppp_bkmk = (seekpoint_t ***)va_arg( args, seekpoint_t *** );
@@ -396,7 +396,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             UpdateBookmarksOption( p_input );
 
             return VLC_SUCCESS;
-            break;
 
         case INPUT_SET_BOOKMARK:
             i_bkmk = (int)va_arg( args, int );
@@ -469,7 +468,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             vlc_mutex_unlock( &p_input->input.p_item->lock );
 
             return VLC_SUCCESS;
-            break;
         }
 
         case INPUT_GET_BYTE_POSITION:
@@ -477,14 +475,21 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             *pi_64 = !p_input->input.p_stream ? 0 :
                 stream_Tell( p_input->input.p_stream );
             return VLC_SUCCESS;
-            break;
 
         case INPUT_SET_BYTE_SIZE:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             *pi_64 = !p_input->input.p_stream ? 0 :
                 stream_Size( p_input->input.p_stream );
             return VLC_SUCCESS;
-            break;
+
+        case INPUT_ADD_SLAVE:
+            psz = (char*)va_arg( args, char * );
+            if( psz && *psz )
+            {
+                val.psz_string = strdup( psz );
+                input_ControlPush( p_input, INPUT_CONTROL_ADD_SLAVE, &val );
+            }
+            return VLC_SUCCESS;
 
         default:
             msg_Err( p_input, "unknown query in input_vaControl" );

@@ -1405,6 +1405,84 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             }
             break;
 
+        case INPUT_CONTROL_ADD_SLAVE:
+            if( val.psz_string )
+            {
+                input_source_t *slave = InputSourceNew( p_input );
+
+                if( !InputSourceInit( p_input, slave, val.psz_string, NULL ) )
+                {
+                    vlc_meta_t *p_meta_new = NULL;
+                    vlc_meta_t *p_meta;
+                    int64_t i_time;
+
+                    /* Add the slave */
+                    msg_Dbg( p_input, "adding %s as slave on the fly",
+                             val.psz_string );
+
+                    /* Set position */
+                    if( demux2_Control( p_input->input.p_demux,
+                                        DEMUX_GET_TIME, &i_time ) )
+                    {
+                        msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
+                        InputSourceClean( p_input, slave );
+                        free( slave );
+                        break;
+                    }
+                    if( demux2_Control( slave->p_demux,
+                                        DEMUX_SET_TIME, i_time ) )
+                    {
+                        msg_Err( p_input, "seek failed for new slave" );
+                        InputSourceClean( p_input, slave );
+                        free( slave );
+                        break;
+                    }
+
+
+                    /* Get meta (access and demux) */
+                    if( access2_Control( slave->p_access,
+                                          ACCESS_GET_META, &p_meta_new ) )
+                        p_meta_new = NULL;
+                    if( !demux2_Control( slave->p_demux,
+                                         DEMUX_GET_META, &p_meta ) )
+                    {
+                        if( p_meta_new )
+                        {
+                            vlc_meta_Merge( p_meta_new, p_meta );
+                            vlc_meta_Delete( p_meta );
+                        }
+                        else
+                        {
+                            p_meta_new = p_meta;
+                        }
+                    }
+                    /* Update meta */
+                    if( p_meta_new )
+                    {
+                        if( p_input->p_meta )
+                        {
+                            vlc_meta_Merge( p_input->p_meta, p_meta_new );
+                            vlc_meta_Delete( p_meta_new );
+                        }
+                        else
+                        {
+                            p_input->p_meta = p_meta_new;
+                        }
+                        UpdateMeta( p_input );
+                    }
+
+                    TAB_APPEND( p_input->i_slave, p_input->slave, slave );
+                }
+                else
+                {
+                    msg_Warn( p_input, "failed to add %s as slave",
+                              val.psz_string );
+                }
+
+                free( val.psz_string );
+            }
+            break;
+
         case INPUT_CONTROL_SET_BOOKMARK:
         default:
             msg_Err( p_input, "not yet implemented" );
