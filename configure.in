@@ -144,13 +144,18 @@ AC_CHECK_FUNC(gethostbyname,,[
 AC_CHECK_FUNC(gethostbyname,,[
   AC_CHECK_LIB(bind,gethostbyname,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lbind")
 ])
-AC_CHECK_FUNCS(nanosleep,,[
+have_nanosleep=0
+AC_CHECK_FUNC(nanosleep,have_nanosleep=1,[
   AC_CHECK_LIB(rt,nanosleep,
-    [vlc_LDFLAGS="${vlc_LDFLAGS} -lrt"],
+    [vlc_LDFLAGS="${vlc_LDFLAGS} -lrt"; have_nanosleep=1],
     [AC_CHECK_LIB(posix4,nanosleep,
-        [vlc_LDFLAGS="${vlc_LDFLAGS} -lposix4"])]
+        [vlc_LDFLAGS="${vlc_LDFLAGS} -lposix4"; have_nanosleep=1])]
   )
 ])
+if test x$have_nanosleep = x1; then
+  AC_DEFINE(HAVE_NANOSLEEP, 1,
+            Define if nanosleep is available.)
+fi
 AC_CHECK_FUNC(inet_aton,,[
   AC_CHECK_LIB(resolv,inet_aton,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lresolv")
 ])
