@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: deinterlace.c,v 1.21 2004/02/01 16:53:11 sigmunau Exp $
+ * $Id: deinterlace.c,v 1.22 2004/02/03 12:49:53 sigmunau Exp $
  *
  * Author: Sam Hocevar <sam@zoy.org>
  *
@@ -56,10 +56,18 @@ static void RenderBlend  ( vout_thread_t *, picture_t *, picture_t * );
 static void RenderLinear ( vout_thread_t *, picture_t *, picture_t *, int );
 
 static void MergeGeneric ( void *, const void *, const void *, size_t );
+#if defined(CAN_COMPILE_C_ALTIVEC)
 static void MergeAltivec ( void *, const void *, const void *, size_t );
+#endif
+#if defined(CAN_COMPILE_MMX)
 static void MergeMMX     ( void *, const void *, const void *, size_t );
+#endif
+#if defined(CAN_COMPILE_SSE)
 static void MergeSSE2    ( void *, const void *, const void *, size_t );
+#endif
+#if defined(CAN_COMPILE_MMX) || defined(CAN_COMPILE_SSE)
 static void EndMMX       ( void );
+#endif
 
 static int  SendEvents   ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
@@ -146,21 +154,28 @@ static int Create( vlc_object_t *p_this )
     p_vout->p_sys->last_date = 0;
     vlc_mutex_init( p_vout, &p_vout->p_sys->filter_lock );
 
+#if defined(CAN_COMPILE_C_ALTIVEC)
     if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_ALTIVEC )
     {
         p_vout->p_sys->pf_merge = MergeAltivec;
         p_vout->p_sys->pf_end_merge = NULL;
     }
-    if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_MMX )
-    {
-        p_vout->p_sys->pf_merge = MergeMMX;
-        p_vout->p_sys->pf_end_merge = EndMMX;
-    }
+#endif
+#if defined(CAN_COMPILE_SSE)
     if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_SSE2 )
     {
         p_vout->p_sys->pf_merge = MergeSSE2;
         p_vout->p_sys->pf_end_merge = EndMMX;
     }
+    else
+#endif
+#if defined(CAN_COMPILE_MMX)
+    if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_MMX )
+    {
+        p_vout->p_sys->pf_merge = MergeMMX;
+        p_vout->p_sys->pf_end_merge = EndMMX;
+    }
+#endif
     else
     {
         p_vout->p_sys->pf_merge = MergeGeneric;
@@ -839,6 +854,7 @@ static void MergeGeneric( void *_p_dest, const void *_p_s1,
     }
 }
 
+#if defined(CAN_COMPILE_MMX)
 static void MergeMMX( void *_p_dest, const void *_p_s1, const void *_p_s2,
                       size_t i_bytes )
 {
@@ -865,7 +881,9 @@ static void MergeMMX( void *_p_dest, const void *_p_s1, const void *_p_s2,
         *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
     }
 }
+#endif
 
+#if defined(CAN_COMPILE_SSE)
 static void MergeSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
                        size_t i_bytes )
 {
@@ -892,16 +910,19 @@ static void MergeSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
         *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
     }
 }
+#endif
 
+#if defined(CAN_COMPILE_MMX) || defined(CAN_COMPILE_SSE)
 static void EndMMX( void )
 {
     __asm__ __volatile__( "emms" :: );
 }
+#endif
 
+#ifdef CAN_COMPILE_C_ALTIVEC
 static void MergeAltivec( void *_p_dest, const void *_p_s1,
                           const void *_p_s2, size_t i_bytes )
 {
-#ifdef CAN_COMPILE_C_ALTIVEC
     uint8_t *p_dest = (uint8_t*)_p_dest;
     const uint8_t *p_s1 = (const uint8_t *)_p_s1;
     const uint8_t *p_s2 = (const uint8_t *)_p_s2;
@@ -930,8 +951,8 @@ static void MergeAltivec( void *_p_dest, const void *_p_s1,
     {
         *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
     }
-#endif
 }
+#endif
 
 /*****************************************************************************
  * SendEvents: forward mouse and keyboard events to the parent p_vout

@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.168 2004/01/31 16:44:58 rocky Exp $
+dnl $Id: configure.ac,v 1.169 2004/02/03 12:49:53 sigmunau Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -931,6 +931,7 @@ AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
      AC_TRY_COMPILE(,[void *p;asm volatile("packuswb %%mm1,%%mm2"::"r"(p));],
                     ac_cv_mmx_inline=yes, ac_cv_mmx_inline=no)])
 if test "${ac_cv_mmx_inline}" != "no"; then
+  AC_DEFINE(CAN_COMPILE_MMX, 1, Define if \$CC groks MMX inline assembly.)
   ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
 fi
 
@@ -940,6 +941,7 @@ AC_CACHE_CHECK([if \$CC groks MMX EXT inline assembly],
      AC_TRY_COMPILE(,[void *p;asm volatile("maskmovq %%mm1,%%mm2"::"r"(p));],
                     ac_cv_mmxext_inline=yes, ac_cv_mmxext_inline=no)])
 if test "${ac_cv_mmxext_inline}" != "no"; then
+  AC_DEFINE(CAN_COMPILE_MMXEXT, 1, Define if \$CC groks MMX EXT inline assembly.)
   ACCEL_MODULES="${ACCEL_MODULES} ${MMXEXT_MODULES}"
 fi
 
