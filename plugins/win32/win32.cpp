@@ -38,7 +38,15 @@ void _M( intf_getfunctions ) ( function_list_t * p_function_list );
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
+
+#define MAX_LINES_TEXT N_("maximum number of lines in the log window")
+#define MAX_LINES_LONGTEXT N_( \
+    "You can set the maximum number of lines that the log window will display."\
+    " Enter -1 if you want to keep all messages." )
+
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
+    ADD_INTEGER( "intfwin-max-lines", 500, NULL, MAX_LINES_TEXT, MAX_LINES_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

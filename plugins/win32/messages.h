@@ -28,6 +28,7 @@
 #include <StdCtrls.hpp>
 #include <Forms.hpp>
 #include <ComCtrls.hpp>
+#include <Menus.hpp>
 //---------------------------------------------------------------------------
 class TMessagesDlg : public TForm
 {

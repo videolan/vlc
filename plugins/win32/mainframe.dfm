@@ -141,16 +141,18 @@ object MainFrameDlg: TMainFrameDlg
     Left = 0
     Top = 0
     Width = 533
-    Height = 60
+    Height = 50
     ButtonHeight = 46
     ButtonWidth = 39
     Caption = 'ToolBar'
+    EdgeBorders = [ebTop, ebBottom]
+    Flat = True
     Images = ImageListToolbar
     ShowCaptions = True
     TabOrder = 0
     object ToolButtonFile: TToolButton
       Left = 0
-      Top = 2
+      Top = 0
       Hint = 'Open a file'
       Caption = 'File'
       ImageIndex = 0
@@ -158,7 +160,7 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonDisc: TToolButton
       Left = 39
-      Top = 2
+      Top = 0
       Hint = 'Open a DVD or VCD'
       Caption = 'Disc'
       ImageIndex = 1
@@ -166,7 +168,7 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonNet: TToolButton
       Left = 78
-      Top = 2
+      Top = 0
       Hint = 'Open a network stream'
       Caption = 'Net'
       ImageIndex = 2
@@ -174,7 +176,7 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonSep1: TToolButton
       Left = 117
-      Top = 2
+      Top = 0
       Width = 8
       Caption = 'ToolButtonSep1'
       ImageIndex = 3
@@ -182,7 +184,7 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonBack: TToolButton
       Left = 125
-      Top = 2
+      Top = 0
       Caption = 'Back'
       Enabled = False
       ImageIndex = 3
@@ -190,7 +192,7 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonPlay: TToolButton
       Left = 164
-      Top = 2
+      Top = 0
       Hint = 'Play stream'
       Caption = 'Play'
       ImageIndex = 5
@@ -198,7 +200,7 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonPause: TToolButton
       Left = 203
-      Top = 2
+      Top = 0
       Hint = 'Pause stream'
       Caption = 'Pause'
       Enabled = False
@@ -207,7 +209,7 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonStop: TToolButton
       Left = 242
-      Top = 2
+      Top = 0
       Hint = 'Stop stream'
       Caption = 'Stop'
       Enabled = False
@@ -216,16 +218,16 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonEject: TToolButton
       Left = 281
-      Top = 2
+      Top = 0
       Hint = 'Eject disc'
       Caption = 'Eject'
-      Enabled = True
+      Enabled = False
       ImageIndex = 7
       OnClick = ToolButtonEjectClick
     end
     object ToolButton1: TToolButton
       Left = 320
-      Top = 2
+      Top = 0
       Width = 8
       Caption = 'ToolButton1'
       ImageIndex = 13
@@ -233,7 +235,7 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonSlow: TToolButton
       Left = 328
-      Top = 2
+      Top = 0
       Hint = 'Play slower'
       Caption = 'Slow'
       Enabled = False
@@ -242,7 +244,7 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonFast: TToolButton
       Left = 367
-      Top = 2
+      Top = 0
       Hint = 'Play faster'
       Caption = 'Fast'
       Enabled = False
@@ -251,7 +253,7 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonSep2: TToolButton
       Left = 406
-      Top = 2
+      Top = 0
       Width = 8
       Caption = 'ToolButtonSep2'
       ImageIndex = 9
@@ -259,7 +261,7 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonPlaylist: TToolButton
       Left = 414
-      Top = 2
+      Top = 0
       Hint = 'Open playlist'
       Caption = 'Playlist'
       ImageIndex = 10
@@ -268,7 +270,7 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonPrev: TToolButton
       Left = 453
-      Top = 2
+      Top = 0
       Hint = 'Previous file'
       Caption = 'Prev'
       ImageIndex = 11
@@ -276,7 +278,7 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonNext: TToolButton
       Left = 492
-      Top = 2
+      Top = 0
       Hint = 'Next file'
       Caption = 'Next'
       ImageIndex = 12
@@ -295,7 +297,7 @@ object MainFrameDlg: TMainFrameDlg
   end
   object GroupBoxFile: TGroupBox
     Left = 0
-    Top = 100
+    Top = 90
     Width = 533
     Height = 32
     Align = alTop
@@ -313,7 +315,7 @@ object MainFrameDlg: TMainFrameDlg
   end
   object GroupBoxNetwork: TGroupBox
     Left = 0
-    Top = 164
+    Top = 154
     Width = 533
     Height = 40
     Align = alTop
@@ -355,7 +357,7 @@ object MainFrameDlg: TMainFrameDlg
   end
   object GroupBoxDisc: TGroupBox
     Left = 0
-    Top = 132
+    Top = 122
     Width = 533
     Height = 32
     Align = alTop
@@ -439,7 +441,7 @@ object MainFrameDlg: TMainFrameDlg
   end
   object GroupBoxSlider: TGroupBox
     Left = 0
-    Top = 60
+    Top = 50
     Width = 533
     Height = 40
     Align = alTop

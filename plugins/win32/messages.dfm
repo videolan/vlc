@@ -22,6 +22,12 @@ object MessagesDlg: TMessagesDlg
     Height = 424
     Align = alTop
     Anchors = [akLeft, akTop, akRight, akBottom]
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
     ReadOnly = True
     ScrollBars = ssBoth
     TabOrder = 0
