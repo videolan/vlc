@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ts.h,v 1.1 2001/02/14 15:58:29 henri Exp $
+ * $Id: input_ts.h,v 1.2 2001/02/21 04:38:59 henri Exp $
  *
  * Authors:
  *
@@ -22,12 +22,10 @@
  *****************************************************************************/
 
 
-// #define NB_DATA 16384 
-// #define NB_PES  8192
-#define NB_DATA 17000
-#define NB_PES  9000
+#define NB_DATA 16384 
+#define NB_PES  8192
 
-
+/* Will be used whne NetworkOpen is ready */
 typedef struct thread_ts_data_s { 
     
     // FILE *                  stream;

@@ -2,12 +2,13 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.37 2001/02/19 19:08:59 massiot Exp $
+ * $Id: mpeg_system.c,v 1.38 2001/02/21 04:38:59 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
  *          Benoît Steiner <benny@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
+ *          Henri Fallon <henri@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,6 +52,8 @@
  * Local prototypes
  *****************************************************************************/
 
+static void input_DecodePAT( input_thread_t *, es_descriptor_t *);
+static void input_DecodePMT( input_thread_t *, es_descriptor_t *);
 
 /*
  * PES Packet management
@@ -887,21 +890,20 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
  *****************************************************************************/
 void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
 {
-    int                 i_pid, i_dummy;
+    u16                 i_pid;
+    int                 i_dummy;
     boolean_t           b_adaptation;         /* Adaptation field is present */
     boolean_t           b_payload;                 /* Packet carries payload */
     boolean_t           b_unit_start;  /* A PSI or a PES start in the packet */
     boolean_t           b_trash = 0;             /* Is the packet unuseful ? */
     boolean_t           b_lost = 0;             /* Was there a packet loss ? */
+    boolean_t           b_psi = 0;                        /* Is this a PSI ? */
     es_descriptor_t *   p_es = NULL;
     es_ts_data_t *      p_es_demux = NULL;
     pgrm_ts_data_t *    p_pgrm_demux = NULL;
 
     #define p (p_data->p_buffer)
-
-    //intf_DbgMsg("input debug: TS-demultiplexing packet %p, pid %d",
-    //            p_ts_packet, U16_AT(&p[1]) & 0x1fff);
-
+   
     /* Extract flags values from TS common header. */
     i_pid = U16_AT(&p[1]) & 0x1fff;
     b_unit_start = (p[1] & 0x40);
@@ -911,42 +913,42 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
     /* Find out the elementary stream. */
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-// kludge    
-if ( i_pid == 0x78 )
-{
-    p_es = input_FindES( p_input, 0x78 );
-    p_es->i_type = MPEG2_VIDEO_ES;
-    if( p_es->p_pes == NULL )
-      intf_ErrMsg("Got p_es . p_es->p_pes == null ? %d",p_es->p_pes == NULL);
-}
-else
-{
-    p_es = NULL;
-    b_trash = 1;
-}
-
+        
+    p_es= input_FindES( p_input, i_pid );
     
+    if( (p_es != NULL) && (p_es->p_demux_data != NULL) )
+    {
+        p_es_demux = (es_ts_data_t *)p_es->p_demux_data;
+        
+        if( p_es_demux->b_psi )
+            b_psi = 1;
+    }
+
     vlc_mutex_lock( &p_input->stream.control.control_lock );
-    if( p_es == NULL || p_es->p_decoder_fifo == NULL
-         || (p_es->b_audio && p_input->stream.control.b_mute) )
+
+    if( ( p_es == NULL ) || (p_es->b_audio && p_input->stream.control.b_mute) )
     {
         /* Not selected. Just read the adaptation field for a PCR. */
         b_trash = 1;
     }
+    else if( p_es->p_decoder_fifo == NULL  && !b_psi )
+      b_trash =1; 
+
     vlc_mutex_unlock( &p_input->stream.control.control_lock );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-// kludge
-    if (p_es != NULL )
-    {
-    
-    p_es_demux = (es_ts_data_t *)p_es->p_demux_data;
-    p_pgrm_demux = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data; 
-    
-    p_pgrm_demux->i_pcr_pid = 0x78;
 
-    if( (p_es->p_decoder_fifo != NULL) || (p_pgrm_demux->i_pcr_pid == i_pid) )
+    if( ( p_es != NULL ) && 
+        ((p_es->p_decoder_fifo != NULL) || b_psi 
+                                   || (p_pgrm_demux->i_pcr_pid == i_pid) ) )
     {
+        p_es_demux = (es_ts_data_t *)p_es->p_demux_data;
+
+        if( ! p_es_demux->b_psi )
+        {
+            p_pgrm_demux = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data; 
+        }
+
 #ifdef STATS
         p_es->c_packets++;
 #endif
@@ -1082,13 +1084,10 @@ else
             } /* not continuous */
         } /* continuity */
     } /* if selected or PCR */
-
-    }
     
     /* Trash the packet if it has no payload or if it isn't selected */
     if( b_trash )
     {
-        
         p_input->pf_delete_packet( p_input->p_method_data, p_data );
 #ifdef STATS
         p_input->c_packets_trashed++;
@@ -1096,24 +1095,324 @@ else
     }
     else
     {
-        if( p_es_demux->b_psi )
+        if( b_psi )
         {
-//debug
-//printf("DemuxTS : Was a PSI\n");
             /* The payload contains PSI tables */
-#if 0
-            /* FIXME ! write the PSI decoder :p */
             input_DemuxPSI( p_input, p_data, p_es,
                             b_unit_start, b_lost );
-#endif
+
         }
         else
         {
             /* The payload carries a PES stream */
             input_GatherPES( p_input, p_data, p_es, b_unit_start, b_lost ); 
         }
+
     }
 
 #undef p
 
+}
+
+/*
+ * PSI demultiplexing and decoding
+ */
+
+/*****************************************************************************
+ * DemuxPSI : makes up complete PSI data
+ *****************************************************************************/
+void input_DemuxPSI( input_thread_t * p_input, data_packet_t * p_data, 
+        es_descriptor_t * p_es, boolean_t b_unit_start, boolean_t b_lost )
+{
+    es_ts_data_t  * p_demux_data;
+    
+    p_demux_data = (es_ts_data_t *)p_es->p_demux_data;
+
+#define p_psi (p_demux_data->p_psi_section)
+#define p (p_data->p_payload_start)
+
+    if( b_unit_start )
+    {
+        /* unit_start set to 1 -> presence of a pointer field
+         * (see ISO/IEC 13818 (2.4.4.2) which should be set to 0x00 */
+        if( (u8)p[0] != 0x00 )
+        {
+        /*    intf_WarnMsg( 2, */
+            intf_ErrMsg( "Non zero pointer field found. Trying to continue" );
+            p+=(u8)p[0];
+        }
+        else
+            p++;
+
+        /* This is the begining of a new section */
+
+        if( ((u8)(p[1]) & 0xc0) != 0x80 ) 
+        {
+            intf_ErrMsg( "Invalid PSI packet" );
+            p_psi->b_trash = 1;
+        }
+        else 
+        {
+            p_psi->i_section_length = U16_AT(p+1) & 0x0fff;
+            p_psi->b_section_complete = 0;
+            p_psi->i_read_in_section = 0;
+            p_psi->i_section_number = (u8)p[6];
+
+            if( p_psi->b_is_complete || p_psi->i_section_number == 0 )
+            {
+                /* This is a new PSI packet */
+                p_psi->b_is_complete = 0;
+                p_psi->b_trash = 0;
+                p_psi->i_version_number = ( p[5] >> 1 ) & 0x1f;
+                p_psi->i_last_section_number = (u8)p[7];
+
+                /* We'll write at the begining of the buffer */
+                p_psi->p_current = p_psi->buffer;
+            }
+            else
+            {
+                if( p_psi->b_section_complete )
+                {
+                    /* New Section of an already started PSI */
+                    p_psi->b_section_complete = 0;
+                    
+                    if( p_psi->i_version_number != (( p[5] >> 1 ) & 0x1f) )
+                    {
+                        intf_WarnMsg( 2,"PSI version differs inside same PAT" );
+                        p_psi->b_trash = 1;
+                    }
+                    if( p_psi->i_section_number + 1 != (u8)p[6] )
+                    {
+                        intf_WarnMsg( 2, 
+                                "PSI Section discontinuity. Packet lost ?");
+                        p_psi->b_trash = 1;
+                    }
+                    else
+                        p_psi->i_section_number++;
+                }
+                else
+                {
+                    intf_WarnMsg( 2, "Received unexpected new PSI section" );
+                    p_psi->b_trash = 1;
+                }
+            }
+        }
+    } /* b_unit_start */
+    
+    if( !p_psi->b_trash )
+    {
+        /* read */
+        if( (p_data->p_payload_end - p) >=
+            ( p_psi->i_section_length - p_psi->i_read_in_section ) )
+        {
+            /* The end of the section is in this TS packet */
+            memcpy( p_psi->p_current, p, 
+            (p_psi->i_section_length - p_psi->i_read_in_section) );
+    
+            p_psi->b_section_complete = 1;
+            p_psi->p_current += 
+                (p_psi->i_section_length - p_psi->i_read_in_section);
+                        
+            if( p_psi->i_section_number == p_psi->i_last_section_number )
+            {
+                /* This was the last section of PSI */
+                p_psi->b_is_complete = 1;
+            }
+        }
+        else
+        {
+            memcpy( p_psi->buffer, p, p_data->p_payload_end - p );
+            p_psi->i_read_in_section+= p_data->p_payload_end - p;
+
+            p_psi->p_current += p_data->p_payload_end - p;
+        }
+    }
+
+    if ( p_psi->b_is_complete )
+    {
+        switch( p_demux_data->i_psi_type)
+        {
+            case PSI_IS_PAT:
+                input_DecodePAT( p_input, p_es );
+                break;
+            case PSI_IS_PMT:
+                input_DecodePMT( p_input, p_es );
+                break;
+            default:
+                intf_ErrMsg("Received unknown PSI in demuxPSI");
+        }
+    }
+#undef p_psi    
+#undef p
+    
+    return ;
+}
+
+/*****************************************************************************
+ * DecodePAT : Decodes Programm association table and deal with it
+ *****************************************************************************/
+static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
+{
+    
+    stream_ts_data_t  * p_stream_data;
+    es_ts_data_t      * p_demux_data;
+
+   
+    p_demux_data = (es_ts_data_t *)p_es->p_demux_data;
+    p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;
+    
+#define p_psi (p_demux_data->p_psi_section)
+
+    if( p_stream_data->i_pat_version != p_psi->i_version_number )
+    {
+        /* PAT has changed. We are going to delete all programms and 
+         * create new ones. We chose not to only change what was needed
+         * as a PAT change may mean the stream is radically changing and
+         * this is a secure method to avoid krashed */
+        pgrm_descriptor_t * p_pgrm;
+        es_descriptor_t   * p_current_es;
+        es_ts_data_t      * p_es_demux;
+        pgrm_ts_data_t    * p_pgrm_demux;
+        byte_t            * p_current_data;           
+        
+        int                 i_section_length,i_program_id,i_pmt_pid;
+        int                 i_loop, i_current_section;
+        
+        p_current_data = p_psi->buffer;
+
+
+        for( i_loop = 0; i_loop < p_input->stream.i_pgrm_number; i_loop++ )
+        {
+            input_DelProgram( p_input, p_input->stream.pp_programs[i_loop] );
+        }
+        
+        do
+        {
+            i_section_length = U16_AT(p_current_data+1) & 0x0fff;
+            i_current_section = (u8)p_current_data[6];
+    
+            for( i_loop = 0; i_loop < (i_section_length-9)/4 ; i_loop++ )
+            {
+                i_program_id = U16_AT(p_current_data + i_loop*4 + 8);
+                i_pmt_pid = U16_AT( p_current_data + i_loop*4 + 10) & 0x1fff;
+    
+                /* If program = 0, we're having info about NIT not PMT */
+                if( i_program_id )
+                {
+                    /* Add this program */
+                    p_pgrm = input_AddProgram( p_input, i_program_id, 
+                                               sizeof( pgrm_ts_data_t ) );
+                   
+                    /* whatis the PID of the PMT of this program */
+                    p_pgrm_demux = (pgrm_ts_data_t *)p_pgrm->p_demux_data;
+                    p_pgrm_demux->i_pmt_version = PMT_UNINITIALIZED;
+    
+                    /* Add the PMT ES to this program */
+                    p_current_es = input_AddES( p_input, p_pgrm,(u16)i_pmt_pid,
+                                        sizeof( es_ts_data_t) );
+                    p_es_demux = (es_ts_data_t *)p_current_es->p_demux_data;
+                    p_es_demux->b_psi = 1;
+                    p_es_demux->i_psi_type = PSI_IS_PMT;
+                    
+                    p_es_demux->p_psi_section = 
+                                            malloc( sizeof( psi_section_t ) );
+                    p_es_demux->p_psi_section->b_is_complete = 0;
+                }
+            }
+            
+            p_current_data+=3+i_section_length;
+            
+        } while( i_current_section < p_psi->i_last_section_number );
+        
+        /* Go to the beginning of the next section*/
+        p_stream_data->i_pat_version = p_psi->i_version_number;
+
+    }
+#undef p_psi    
+
+}
+
+/*****************************************************************************
+ * DecodePMT : decode a given Program Stream Map
+ * ***************************************************************************
+ * When the PMT changes, it may mean a deep change in the stream, and it is
+ * careful to deletes the ES and add them again. If the PMT doesn't change,
+ * there no need to do anything.
+ *****************************************************************************/
+static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
+{
+
+    pgrm_ts_data_t            * p_pgrm_data;
+    es_ts_data_t              * p_demux_data;
+
+    p_demux_data = (es_ts_data_t *)p_es->p_demux_data;
+    p_pgrm_data = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data;
+    
+#define p_psi (p_demux_data->p_psi_section)
+
+    if( p_psi->i_version_number != p_pgrm_data->i_pmt_version ) 
+    {
+        es_descriptor_t   * p_new_es;  
+        es_ts_data_t      * p_es_demux;
+        byte_t            * p_current_data, * p_current_section;
+        int                 i_section_length,i_current_section;
+        int                 i_prog_info_length, i_loop;
+        int                 i_es_info_length, i_pid, i_stream_type;
+        
+        p_current_section = p_psi->buffer;
+        p_current_data = p_psi->buffer;
+        
+        p_pgrm_data->i_pcr_pid = U16_AT(p_current_section + 8) & 0x1fff;
+
+        /* Delete all ES in this program  except the PSI */
+        for( i_loop=0; i_loop < p_es->p_pgrm->i_es_number; i_loop++ )
+        {
+            p_es_demux = (es_ts_data_t *)
+                         p_es->p_pgrm->pp_es[i_loop]->p_demux_data;
+            if ( ! p_es_demux->b_psi )
+            input_DelES( p_input, p_es->p_pgrm->pp_es[i_loop] );
+        }
+
+        /* Then add what we received in this PMT */
+        do
+        {
+            
+            i_section_length = U16_AT(p_current_data+1) & 0x0fff;
+            i_current_section = (u8)p_current_data[6];
+            i_prog_info_length = U16_AT(p_current_data+10) & 0x0fff;
+
+            /* For the moment we ignore program descriptors */
+            p_current_data += 12+i_prog_info_length;
+    
+            /* The end of the section, before the CRC is at 
+             * p_current_section + i_section_length -1 */
+            while( p_current_data < p_current_section + i_section_length -1 )
+            {
+                i_stream_type = (int)p_current_data[0];
+                i_pid = U16_AT( p_current_data + 1 ) & 0x1fff;
+                i_es_info_length = U16_AT( p_current_data + 3 ) & 0x0fff;
+                
+                /* Add this ES to the program */
+                p_new_es = input_AddES( p_input, p_es->p_pgrm, 
+                                        (u16)i_pid, sizeof( es_ts_data_t ) );
+                p_new_es->i_type = i_stream_type;
+                
+                /* We want to decode */
+                input_SelectES( p_input, p_new_es );
+
+                p_current_data += 5 + i_es_info_length;
+            }
+
+            /* Go to the beginning of the next section*/
+            p_current_data += 3+i_section_length;
+           
+            p_current_section+=1;
+            
+        } while( i_current_section < p_psi->i_last_section_number );
+
+        p_pgrm_data->i_pmt_version = p_psi->i_version_number;
+
+    }
+    
+#undef p_psi
 }

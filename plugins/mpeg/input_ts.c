@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.5 2001/02/20 07:49:13 sam Exp $
+ * $Id: input_ts.c,v 1.6 2001/02/21 04:38:59 henri Exp $
  *
  * Authors: 
  *
@@ -130,8 +130,9 @@ static void TSInit( input_thread_t * p_input )
 {
     /* Initialize netlist and TS structures */
     thread_ts_data_t    * p_method;
-    pgrm_ts_data_t      * p_pgrm_demux;
-    es_descriptor_t     * kludge1;
+    es_descriptor_t     * p_pat_es;
+    es_ts_data_t        * p_demux_data;
+    stream_ts_data_t    * p_stream_data;
 
     /* Initialise structure */
     p_method = malloc( sizeof( thread_ts_data_t ) );
@@ -159,28 +160,21 @@ static void TSInit( input_thread_t * p_input )
     /* Initialize the stream */
     input_InitStream( p_input, sizeof( stream_ts_data_t ) );
 
-    /* FIXME : PSIDemux and PSIDecode */
-    /* Add audio and video programs */
-    /* p_input->stream.pp_programs[0] = */
-    input_AddProgram( p_input, 0, sizeof( pgrm_ts_data_t ) );
-    p_pgrm_demux = 
-        (pgrm_ts_data_t *)p_input->stream.pp_programs[0]->p_demux_data;
-    p_pgrm_demux->i_pcr_pid = 0x78;
+    /* Init */
+    p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;
+    p_stream_data->i_pat_version = PAT_UNINITIALIZED ;
 
-    kludge1 = input_AddES( p_input, p_input->stream.pp_programs[0], 
-                           0x78, sizeof( es_ts_data_t ) );
-
-    // kludge
-    kludge1->i_type = MPEG2_VIDEO_ES;
-
-    input_SelectES( p_input, kludge1 );
-
-    vlc_mutex_lock( &(p_input->stream.stream_lock) );
-    p_input->stream.pp_programs[0]->b_is_ok = 1;
-    vlc_mutex_unlock( &(p_input->stream.stream_lock) );
-
-//debug
-intf_ErrMsg("End of TSINIT");    
+    /* We'll have to catch the PAT in order to continue 
+     * Then the input will catch the PMT and then the others ES
+     * The PAT es is indepedent of any program. */
+    p_pat_es = input_AddES( p_input, NULL,
+                           0x00, sizeof( es_ts_data_t ) );
+    p_demux_data=(es_ts_data_t *)p_pat_es->p_demux_data;
+    p_demux_data->b_psi = 1;
+    p_demux_data->i_psi_type = PSI_IS_PAT;
+    p_demux_data->p_psi_section = malloc(sizeof(psi_section_t));
+    p_demux_data->p_psi_section->b_is_complete = 1;
+    
 }
 
 /*****************************************************************************
@@ -188,7 +182,13 @@ intf_ErrMsg("End of TSINIT");
  *****************************************************************************/
 static void TSEnd( input_thread_t * p_input )
 {
+    es_descriptor_t     * p_pat_es;
+    
+    p_pat_es = input_FindES( p_input, 0x00 );
 
+    if( p_pat_es != NULL )
+        input_DelES( p_input, p_pat_es );
+    free(p_input->p_plugin_data);
 }
 
 /*****************************************************************************

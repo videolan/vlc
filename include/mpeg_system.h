@@ -3,7 +3,7 @@
  * and TS system layers
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: mpeg_system.h,v 1.1 2001/02/08 04:43:27 sam Exp $
+ * $Id: mpeg_system.h,v 1.2 2001/02/21 04:38:59 henri Exp $
  *
  * Authors:
  *
@@ -28,6 +28,12 @@
 #define TS_PACKET_SIZE      188                       /* Size of a TS packet */
 #define PSI_SECTION_SIZE    4096            /* Maximum size of a PSI section */
 
+#define PAT_UNINITIALIZED    (1 << 6)
+#define PMT_UNINITIALIZED    (1 << 6)
+
+#define PSI_IS_PAT          0x00
+#define PSI_IS_PMT          0x01
+#define UNKNOWN_PSI         0xff
 
 /*****************************************************************************
  * psi_section_t
@@ -39,11 +45,24 @@ typedef struct psi_section_s
 {
     byte_t                  buffer[PSI_SECTION_SIZE];
 
-    /* Is there a section being decoded ? */
-    boolean_t               b_running_section;
+    u8                      i_section_number;
+    u8                      i_last_section_number;
+    u8                      i_version_number;
+    u16                     i_section_length;
+    u16                     i_read_in_section;
+    
+    /* the PSI is complete */
+    boolean_t               b_is_complete;
+    
+    /* packet missed up ? */
+    boolean_t               b_trash;
 
-    u16                     i_length;
-    u16                     i_current_position;
+    /*about sections  */ 
+    boolean_t               b_section_complete;
+
+    /* where are we currently ? */
+    byte_t                * p_current;
+
 } psi_section_t;
 
 /*****************************************************************************
@@ -53,6 +72,9 @@ typedef struct es_ts_data_s
 {
     boolean_t               b_psi;   /* Does the stream have to be handled by
                                       *                    the PSI decoder ? */
+
+    int                     i_psi_type;  /* There are different types of PSI */
+    
     psi_section_t *         p_psi_section;                    /* PSI packets */
 
     /* Markers */
@@ -65,6 +87,7 @@ typedef struct es_ts_data_s
 typedef struct pgrm_ts_data_s
 {
     u16                     i_pcr_pid;             /* PCR ES, for TS streams */
+    int                     i_pmt_version;
 } pgrm_ts_data_t;
 
 /*****************************************************************************
@@ -72,28 +95,7 @@ typedef struct pgrm_ts_data_s
  *****************************************************************************/
 typedef struct stream_ts_data_s
 {
-    /* Program Association Table status */
-    u8                      i_PAT_version;                 /* version number */
-    boolean_t               b_is_PAT_complete;      /* Is the PAT complete ? */
-    u8                      i_known_PAT_sections;
-                                     /* Number of section we received so far */
-    byte_t                  a_known_PAT_sections[32];
-                                                /* Already received sections */
-
-    /* Program Map Table status */
-    boolean_t               b_is_PMT_complete;      /* Is the PMT complete ? */
-    u8                      i_known_PMT_sections;
-                                     /* Number of section we received so far */
-    byte_t                  a_known_PMT_sections[32];
-                                                /* Already received sections */
-
-    /* Service Description Table status */
-    u8                      i_SDT_version;                 /* version number */
-    boolean_t               b_is_SDT_complete;      /* Is the SDT complete ? */
-    u8                      i_known_SDT_sections;
-                                     /* Number of section we received so far */
-    byte_t                  a_known_SDT_sections[32];
-                                                /* Already received sections */
+    int i_pat_version;          /* Current version of the PAT */
 } stream_ts_data_t;
 
 /*****************************************************************************
@@ -120,3 +122,5 @@ es_descriptor_t * input_ParsePS( struct input_thread_s *,
                                  struct data_packet_s * );
 void input_DemuxPS( struct input_thread_s *, struct data_packet_s * );
 void input_DemuxTS( struct input_thread_s *, struct data_packet_s * );
+void input_DemuxPSI( input_thread_t *, data_packet_t *, es_descriptor_t *, 
+                     boolean_t, boolean_t );
