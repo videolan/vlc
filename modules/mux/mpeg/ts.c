@@ -499,6 +499,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     p_sys->i_mpeg4_streams++;
                     p_stream->i_es_id = p_stream->i_pid;
                     break;
+                case VLC_FOURCC( 'h', '2','6', '4' ):
+                    p_stream->i_stream_type = 0x1b;
+                    p_stream->i_stream_id = 0xe0;
+                    break;
                 /* XXX dirty dirty but somebody want that : using crapy MS-codec XXX */
                 /* I didn't want to do that :P */
                 case VLC_FOURCC( 'H', '2', '6', '3' ):
