@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.27 2002/12/07 23:50:30 massiot Exp $
+ * $Id: output.c,v 1.28 2003/01/04 16:27:49 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -243,9 +243,10 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
                  "trashing "I64Fd"us", mdate() - p_buffer->start_date,
                  p_buffer->end_date - p_buffer->start_date );
         p_buffer = p_buffer->p_next;
+        aout_BufferFree( p_aout->output.fifo.p_first );
+        p_aout->output.fifo.p_first = p_buffer;
     }
 
-    p_aout->output.fifo.p_first = p_buffer;
     if ( p_buffer == NULL )
     {
         p_aout->output.fifo.pp_last = &p_aout->output.fifo.p_first;
