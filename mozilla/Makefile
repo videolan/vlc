@@ -37,7 +37,7 @@ $(PLUGIN_OBJ): Makefile ../lib/libvlc.a $(BUILTIN_OBJ:%=../%) $(C_OBJ)
 	$(CC) -shared $(LDFLAGS) -L../lib $(mozilla_LDFLAGS) $(C_OBJ) -lvlc $(BUILTIN_OBJ:%=../%) $(builtins_LDFLAGS) -o $@
 
 $(C_OBJ): %.o: %.c vlcplugin.h
-	$(CC) $(CFLAGS) -I../include $(mozilla_CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -I.. -I../include $(mozilla_CFLAGS) -c $< -o $@
 
 ../%:
 	@cd .. && $(MAKE) $(@:../%=%)

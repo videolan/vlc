@@ -23,8 +23,8 @@ SRC_C := $(filter %.c,$($(module_name)_SOURCES))
 SRC_CPP := $(filter %.cpp,$($(module_name)_SOURCES))
 SRC_M := $(filter %.m,$($(module_name)_SOURCES))
 
-plugins_CFLAGS += -D__PLUGIN__ -I$(PARENT)/include -I$(PARENT)/extras
-builtins_CFLAGS += -D__BUILTIN__ -I$(PARENT)/include -I$(PARENT)/extras
+plugins_CFLAGS += -D__PLUGIN__ -I$(PARENT) -I$(PARENT)/include -I$(PARENT)/extras
+builtins_CFLAGS += -D__BUILTIN__ -I$(PARENT) -I$(PARENT)/include -I$(PARENT)/extras
 
 ifeq (lo,$(suff))
 extra_CFLAGS := $(plugins_CFLAGS) $($(module_name)_CFLAGS) \

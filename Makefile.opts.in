@@ -199,7 +199,7 @@ CFLAGS += -DPLUGIN_PATH=\"@prefix@/lib/vlc\"
 #
 # C headers directories
 #
-CFLAGS += -Iinclude -Iextras
+vlc_CFLAGS += -Iinclude -Iextras -I.
 
 #
 # C compiler flags: mainstream compilation
