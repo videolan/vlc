@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.90 2003/06/17 14:43:22 hartman Exp $
+ * $Id: intf.m,v 1.91 2003/06/30 01:51:10 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -669,8 +669,8 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
             /* control buttons for free pace streams */
             b_control = p_input->stream.b_pace_control; 
 
-            /* chapters */
-            b_chapters = p_input->stream.p_selected_area->i_part_nb > 1; 
+            /* chapters & titles */
+            b_chapters = p_input->stream.i_area_nb > 1; 
 
             /* play status */
             p_intf->p_sys->b_play_status = 

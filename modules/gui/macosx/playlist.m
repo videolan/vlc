@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.26 2003/06/29 00:14:50 hartman Exp $
+ * $Id: playlist.m,v 1.27 2003/06/30 01:51:10 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -57,7 +57,10 @@ int MacVersion102 = -1;
 - (void)keyDown:(NSEvent *)o_event
 {
     unichar key = 0;
-    int i_row;
+    int i, c, i_row;
+    NSMutableArray *o_to_delete;
+    NSNumber *o_number;
+    
     playlist_t * p_playlist;
     intf_thread_t * p_intf = [NSApp getIntf];
 
@@ -89,16 +92,20 @@ int MacVersion102 = -1;
         case NSDeleteFunctionKey:
         case NSDeleteCharFunctionKey:
         case NSBackspaceCharacter:
-            while( ( i_row = [self selectedRow] ) != -1 )
-            {
+            o_to_delete = [NSMutableArray arrayWithArray:[[self selectedRowEnumerator] allObjects]];
+            c = [o_to_delete count];
+            
+            for( i = 0; i < c; i++ ) {
+                o_number = [o_to_delete lastObject];
+                i_row = [o_number intValue];
+                
                 if( p_playlist->i_index == i_row && p_playlist->i_status )
                 {
                     playlist_Stop( p_playlist );
                 }
-        
-                playlist_Delete( p_playlist, i_row ); 
-        
+                [o_to_delete removeObject: o_number];
                 [self deselectRow: i_row];
+                playlist_Delete( p_playlist, i_row );
             }
             [self reloadData];
             break;
@@ -236,7 +243,9 @@ int MacVersion102 = -1;
 
 - (IBAction)deleteItems:(id)sender
 {
-    int i_row;
+    int i, c, i_row;
+    NSMutableArray *o_to_delete;
+    NSNumber *o_number;
 
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -246,17 +255,21 @@ int MacVersion102 = -1;
     {
         return;
     }
-
-    while( ( i_row = [o_table_view selectedRow] ) != -1 )
-    {
+    
+    o_to_delete = [NSMutableArray arrayWithArray:[[o_table_view selectedRowEnumerator] allObjects]];
+    c = [o_to_delete count];
+    
+    for( i = 0; i < c; i++ ) {
+        o_number = [o_to_delete lastObject];
+        i_row = [o_number intValue];
+        
         if( p_playlist->i_index == i_row && p_playlist->i_status )
         {
             playlist_Stop( p_playlist );
         }
-
-        playlist_Delete( p_playlist, i_row ); 
-
+        [o_to_delete removeObject: o_number];
         [o_table_view deselectRow: i_row];
+        playlist_Delete( p_playlist, i_row );
     }
 
     vlc_object_release( p_playlist );
