@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.49 2003/05/04 22:42:17 gbazin Exp $
+ * $Id: input_ext-intf.c,v 1.50 2003/05/31 12:24:39 titer Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -71,7 +71,6 @@ void __input_SetStatus( vlc_object_t * p_this, int i_mode )
         break;
 
     case INPUT_STATUS_FASTER:
-        /* If we are already going too fast, go back to default rate */
         if( p_input->stream.control.i_rate * 8 <= DEFAULT_RATE )
         {
             msg_Dbg( p_input, "can not play any faster" );
@@ -101,7 +100,6 @@ void __input_SetStatus( vlc_object_t * p_this, int i_mode )
         break;
 
     case INPUT_STATUS_SLOWER:
-        /* If we are already going too slow, go back to default rate */
         if( p_input->stream.control.i_rate >= 8 * DEFAULT_RATE )
         {
             msg_Dbg( p_input, "can not play any slower" );
@@ -132,6 +130,58 @@ void __input_SetStatus( vlc_object_t * p_this, int i_mode )
 
     default:
         break;
+    }
+
+    vlc_cond_signal( &p_input->stream.stream_wait );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    vlc_object_release( p_input );
+}
+
+void __input_SetRate( vlc_object_t * p_this, int i_rate )
+{
+    input_thread_t *p_input;
+
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
+
+    if( p_input == NULL )
+    {
+        msg_Err( p_this, "no input found" );
+        return;
+    }
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    if( i_rate * 8 < DEFAULT_RATE )
+    {
+        msg_Dbg( p_input, "can not play faster than 8x" );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        return;
+    }
+    if( i_rate > DEFAULT_RATE * 8 )
+    {
+        msg_Dbg( p_input, "can not play slower than 1/8x" );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        return;
+    }
+   
+    p_input->stream.i_new_status = FORWARD_S;
+    p_input->stream.i_new_rate = i_rate;
+
+    if ( p_input->stream.i_new_rate < DEFAULT_RATE )
+    {
+        msg_Dbg( p_input, "playing at %i:1 fast forward",
+             DEFAULT_RATE / p_input->stream.i_new_rate );
+    }
+    else if ( p_input->stream.i_new_rate > DEFAULT_RATE )
+    {
+        msg_Dbg( p_input, "playing at 1:%i slow motion",
+              p_input->stream.i_new_rate / DEFAULT_RATE );
+    }
+    else if ( p_input->stream.i_new_rate == DEFAULT_RATE )
+    {
+        p_input->stream.i_new_status = PLAYING_S;
+        msg_Dbg( p_input, "playing at normal rate" );
     }
 
     vlc_cond_signal( &p_input->stream.stream_wait );

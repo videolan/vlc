@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.90 2003/05/17 22:00:00 gbazin Exp $
+ * $Id: input_ext-intf.h,v 1.91 2003/05/31 12:24:39 titer Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -384,6 +384,9 @@ void   input_DestroyThread  ( input_thread_t * );
 
 #define input_SetStatus(a,b) __input_SetStatus(VLC_OBJECT(a),b)
 VLC_EXPORT( void, __input_SetStatus, ( vlc_object_t *, int ) );
+
+#define input_SetRate(a,b) __input_SetRate(VLC_OBJECT(a),b)
+VLC_EXPORT( void, __input_SetRate, ( vlc_object_t *, int ) );
 
 #define input_Seek(a,b,c) __input_Seek(VLC_OBJECT(a),b,c)
 VLC_EXPORT( void, __input_Seek, ( vlc_object_t *, off_t, int ) );

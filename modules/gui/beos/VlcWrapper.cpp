@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.32 2003/05/30 18:43:31 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.33 2003/05/31 12:24:39 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -114,47 +114,7 @@ void VlcWrapper::InputSetRate( int rate )
     if( !p_input )
         return;
 
-    int times = 0;
-    int oldrate = InputRate();
-    switch( ( rate > oldrate ) ? ( rate / oldrate ) : ( oldrate / rate ) )
-    {
-        case 64:
-            times = 6;
-            break;
-        case 32:
-            times = 5;
-            break;
-        case 16:
-            times = 4;
-            break;
-        case 8:
-            times = 3;
-            break;
-        case 4:
-            times = 2;
-            break;
-        case 2:
-            times = 1;
-            break;
-    }
-
-    int newrate = oldrate;
-    for( int i = 0; i < times; i++ )
-    {
-        if( rate > oldrate )
-        {
-            input_SetStatus( p_input, INPUT_STATUS_SLOWER );
-            newrate *= 2;
-        }
-        else
-        {
-            input_SetStatus( p_input, INPUT_STATUS_FASTER );
-            newrate /= 2;
-        }
-        /* Wait it's actually done */
-        while( InputRate() != newrate )
-            msleep( 10000 );
-    }
+    input_SetRate( p_input, rate );
 }
 
 BList * VlcWrapper::GetChannels( int i_cat )
