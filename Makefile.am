@@ -72,10 +72,11 @@ HEADERS_include = \
 	include/darwin_specific.h \
 	include/charset.h \
 	include/codecs.h \
-	include/ninput.h \
-	include/input_ext-dec.h \
-	include/input_ext-intf.h \
-	include/input_ext-plugins.h \
+	include/vlc_es_out.h \
+	include/vlc_input.h \
+	include/vlc_access.h \
+	include/vlc_stream.h \
+	include/vlc_demux.h \
 	include/intf_eject.h \
 	include/iso_lang.h \
 	include/vlc_httpd.h \
@@ -87,7 +88,6 @@ HEADERS_include = \
 	include/network.h \
 	include/os_specific.h \
 	include/snapshot.h \
-	include/stream_control.h \
 	include/stream_output.h \
 	include/variables.h \
 	include/video_output.h \
