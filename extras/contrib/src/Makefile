@@ -55,7 +55,7 @@ all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
-	.png
+	.png .gpgerror .gcrypt .gnutls
 endif
 ifeq ($(SYS),BEOS)
 all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
@@ -1005,6 +1005,60 @@ zvbi: zvbi-$(ZVBI_VERSION).tar.bz2
 CLEAN_FILE += .zvbi
 CLEAN_PKG += zvbi
 DISCLEAN_PKG += zvbi-$(ZVBI_VERSION).tar.bz2
+
+# ***************************************************************************
+# gpg-error 
+# ***************************************************************************
+
+libgpg-error-$(GPGERROR_VERSION).tar.gz:
+	$(WGET) $(GPGERROR_URL)
+
+libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.gpgerror: libgpg-error
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install )
+	touch $@
+
+CLEAN_FILE += .gpgerror
+CLEAN_PKG += libgpg-error
+DISCLEAN_PKG += libgpg-error-$(GPGERROR_VERSION).tar.gz
+
+# ***************************************************************************
+# libgcrypt
+# ***************************************************************************
+
+libgcrypt-$(GCRYPT_VERSION).tar.gz:
+	$(WGET) $(GCRYPT_URL)
+
+libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.gcrypt: libgcrypt
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install )
+	touch $@
+
+CLEAN_FILE += .gcrypt
+CLEAN_PKG += libgcrypt
+DISCLEAN_PKG += libgcrypt-$(GCRYPT_VERSION).tar.gz
+
+# ***************************************************************************
+# gnutls
+# ***************************************************************************
+
+gnutls-$(GNUTLS_VERSION).tar.bz2:
+	$(WGET) $(GNUTLS_URL)
+
+gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+.gnutls: gnutls
+	(cd $<; ./configure --prefix=$(PREFIX) && make install )
+	touch $@
+
+CLEAN_FILE += .gnutls
+CLEAN_PKG += gnutls
+DISCLEAN_PKG += gnutls-$(GNUTLS_VERSION).tar.bz2
 
 # ***************************************************************************
 # Some cleansing
