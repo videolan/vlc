@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.31 2003/11/05 00:39:16 gbazin Exp $
+ * $Id: freetype.c,v 1.32 2003/11/19 00:06:06 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -77,7 +77,9 @@ static int  AddText   ( vout_thread_t *, byte_t *, text_style_t *, int,
                         int, int, mtime_t, mtime_t );
 static void FreeString( subpicture_t * );
 
+#if !defined(HAVE_ICONV)
 static int  GetUnicodeCharFromUTF8( byte_t ** );
+#endif
 
 static line_desc_t *NewLine( byte_t * );
 
@@ -760,8 +762,9 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
         uint32_t *p_fribidi_string;
         FriBidiCharType base_dir = FRIBIDI_TYPE_ON;
         p_fribidi_string = malloc( ( i_string_length + 1 ) * sizeof(uint32_t) );
-        fribidi_log2vis( p_unicode_string, i_string_length, &base_dir,
-                         p_fribidi_string, NULL, NULL, NULL );
+        fribidi_log2vis( (FriBidiChar*)p_unicode_string, i_string_length,
+                         &base_dir, (FriBidiChar*)p_fribidi_string, NULL, NULL,
+                         NULL );
         free( p_unicode_string );
         p_unicode_string = p_fribidi_string;
         p_fribidi_string[ i_string_length ] = 0;
@@ -902,6 +905,7 @@ static void FreeString( subpicture_t *p_subpic )
     free( p_string );
 }
 
+#if !defined( HAVE_ICONV )
 /* convert one or more utf8 bytes into a unicode character */
 static int GetUnicodeCharFromUTF8( byte_t **ppsz_utf8_string )
 {
@@ -945,6 +949,7 @@ static int GetUnicodeCharFromUTF8( byte_t **ppsz_utf8_string )
     (*ppsz_utf8_string)++;
     return i_char;
 }
+#endif
 
 static line_desc_t *NewLine( byte_t *psz_string )
 {

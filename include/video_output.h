@@ -2,7 +2,7 @@
  * video_output.h : video output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.101 2003/11/05 09:16:55 gbazin Exp $
+ * $Id: video_output.h,v 1.102 2003/11/19 00:06:06 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -141,7 +141,7 @@ struct vout_thread_t
 						           the text renderer */
     module_t *            p_text_renderer_module;  /**< text renderer module */
     /** callback used when a new string needs to be shown on the vout */
-    int ( *pf_add_string ) ( vout_thread_t *, char *, text_style_t *, int,  
+    int ( *pf_add_string ) ( vout_thread_t *, byte_t *, text_style_t *, int,  
 			     int, int, mtime_t, mtime_t ); 
 };
 
