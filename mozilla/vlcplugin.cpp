@@ -2,7 +2,7 @@
  * vlcplugin.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcplugin.cpp,v 1.5 2003/07/16 16:33:59 sam Exp $
+ * $Id: vlcplugin.cpp,v 1.6 2003/10/23 17:04:39 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,11 +24,22 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "config.h"
+
 #include <vlc/vlc.h>
 
+#ifdef HAVE_MOZILLA_CONFIG_H
+#   include <mozilla-config.h>
+#endif
 #include <nsISupports.h>
 #include <nsMemory.h>
 #include <npapi.h>
+
+#if !defined(XP_MACOSX) && !defined(XP_UNIX) && !defined(XP_WIN)
+#define XP_UNIX 1
+#elif defined(XP_MACOSX)
+#undef XP_UNIX
+#endif
 
 #include "vlcpeer.h"
 #include "vlcplugin.h"

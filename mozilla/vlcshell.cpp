@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.25 2003/10/15 07:34:25 gbazin Exp $
+ * $Id: vlcshell.cpp,v 1.26 2003/10/23 17:04:40 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,6 +27,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -37,9 +39,19 @@
 #endif
 
 /* Mozilla stuff */
+#ifdef HAVE_MOZILLA_CONFIG_H
+#   include <mozilla-config.h>
+#endif
 #include <nsISupports.h>
 #include <nsMemory.h>
 #include <npapi.h>
+#include <jri.h>
+
+#if !defined(XP_MACOSX) && !defined(XP_UNIX) && !defined(XP_WIN)
+#define XP_UNIX 1
+#elif defined(XP_MACOSX)
+#undef XP_UNIX
+#endif
 
 #ifdef XP_WIN
     /* Windows stuff */
@@ -50,6 +62,13 @@
 #   include <Quickdraw.h>
 #endif
 
+#ifdef XP_UNIX
+    /* X11 stuff */
+#   include <X11/Xlib.h>
+#   include <X11/Intrinsic.h>
+#   include <X11/StringDefs.h>
+#endif
+
 #include "vlcpeer.h"
 #include "vlcplugin.h"
 
@@ -57,18 +76,6 @@
 #   define WINDOW_TEXT "(no picture)"
 #else
 #   define WINDOW_TEXT "(no libvlc)"
-#endif
-
-/* No, I really don't want to use XP_UNIX stuff on MacOSX */
-#ifdef XP_MACOSX
-#undef XP_UNIX
-#endif
-
-#ifdef XP_UNIX
-    /* X11 stuff */
-#   include <X11/Xlib.h>
-#   include <X11/Intrinsic.h>
-#   include <X11/StringDefs.h>
 #endif
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * vlcpeer.cpp: scriptable peer descriptor
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcpeer.cpp,v 1.8 2003/09/21 10:23:59 gbazin Exp $
+ * $Id: vlcpeer.cpp,v 1.9 2003/10/23 17:04:39 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,6 +24,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "config.h"
+
 #include <vlc/vlc.h>
 
 #ifdef DEBUG
@@ -31,9 +33,18 @@
 #   undef DEBUG
 #endif
 
+#ifdef HAVE_MOZILLA_CONFIG_H
+#   include <mozilla-config.h>
+#endif
 #include <nsISupports.h>
 #include <nsMemory.h>
 #include <npapi.h>
+
+#if !defined(XP_MACOSX) && !defined(XP_UNIX) && !defined(XP_WIN)
+#define XP_UNIX 1
+#elif defined(XP_MACOSX)
+#undef XP_UNIX
+#endif
 
 #include "vlcpeer.h"
 #include "vlcplugin.h"

@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.90 2003/10/22 17:12:30 gbazin Exp $
+dnl $Id: configure.ac,v 1.91 2003/10/23 17:04:39 sam Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -3166,6 +3166,9 @@ then
     dnl Workaround for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=150490
     AX_ADD_CPPFLAGS([mozilla],[[`${MOZILLA_CONFIG} --cflags plugin xpcom java | sed 's,-I\([^ ]*\)/mozilla/\([^ ]*\),-I\1/\2 -I\1/mozilla/\2,g' | xargs`]])
     AX_ADD_LDFLAGS([mozilla],[`${MOZILLA_CONFIG} --libs plugin xpcom`])
+    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_mozilla}"
+    AC_CHECK_HEADERS(mozilla-config.h)
+    CPPFLAGS="${CPPFLAGS_save}"
   fi
 
 dnl special case for mingw32
