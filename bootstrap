@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap.sh file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.11 2002/08/28 15:30:57 sam Exp $
+##  $Id: bootstrap,v 1.12 2002/08/28 19:48:16 massiot Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -60,22 +60,38 @@ fi;else
 fi
 
 # Check for automake
+amvers="none"
 if automake-1.6 --version >/dev/null 2>&1
 then
-  amvers=1.6
-else if automake-1.5 --version >/dev/null 2>&1
-then
-  amvers=1.5
+  amvers="-1.6"
 else
+  if automake-1.5 --version >/dev/null 2>&1
+  then
+    amvers="-1.5"
+  else
+    if automake --version > /dev/null 2>&1
+    then
+      amvers=`automake --version | head -1 | cut -d\  -f 4`
+
+      if expr "$amvers" "<" "1.5" > /dev/null 2>&1
+      then amvers="none"
+      else amvers=""
+      fi
+    fi
+  fi
+fi
+
+if test x$amvers = xnone
+then
   set +x
   echo "you need automake version 1.5 or later"
   exit 1
-fi;fi
+fi
 
 # Do the rest
-aclocal-${amvers} -I m4
+aclocal${amvers} -I m4
 autoheader
-automake-${amvers} --foreign --add-missing --copy
+automake${amvers} --foreign --add-missing --copy
 autoconf
 
 # nuahahahahaha !! overwriting Makefile.in with what *I* want!
