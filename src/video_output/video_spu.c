@@ -106,7 +106,7 @@ void vout_RenderSPU( vout_buffer_t *p_buffer, subpicture_t *p_subpic,
     int i_y_scale = ( p_buffer->i_pic_height << 6 ) / TARGET_HEIGHT;
 
     /* FIXME: fake palette - the real one has to be sought in the .IFO */
-    static int p_palette[4] = { 0x0000, 0x0000, 0x5555, 0xffff };
+    static int p_palette[4] = { 0x0000, 0xffff, 0x5555, 0x8888 };
 
     boolean_t b_aligned = 1;
     byte_t *p_from[2];
