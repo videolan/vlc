@@ -341,6 +341,29 @@ static bo_t *GetSVQ3Tag( mp4_stream_t *p_stream )
 {
     bo_t *smi = box_new( "SMI " );
 
+    if( p_stream->p_fmt->i_extra > 0x4e )
+    {
+        uint8_t *p_end = &((uint8_t*)p_stream->p_fmt->p_extra)[p_stream->p_fmt->i_extra];
+        uint8_t *p     = &((uint8_t*)p_stream->p_fmt->p_extra)[0x46];
+
+        while( p + 8 < p_end )
+        {
+            int i_size = GetDWBE( p );
+            if( i_size <= 1 )
+            {
+                /* FIXME handle 1 as long size */
+                break;
+            }
+            if( !strncmp( &p[4], "SMI ", 4 ) )
+            {
+                bo_add_mem( smi, p_end - p - 8, &p[8] );
+                return smi;
+            }
+            p += i_size;
+        }
+    }
+
+    /* Create a dummy one in fallback */
     bo_add_fourcc( smi, "SEQH" );
     bo_add_32be( smi, 0x5 );
     bo_add_32be( smi, 0xe2c0211d );
