@@ -2,15 +2,15 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.6 2003/01/13 17:39:05 fenrir Exp $
+ * $Id: adpcm.c,v 1.7 2003/02/16 09:50:22 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- *      
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -41,6 +41,8 @@
 #define ADPCM_IMA_QT    1
 #define ADPCM_IMA_WAV   2
 #define ADPCM_MS        3
+#define ADPCM_DK3       4
+#define ADPCM_DK4       4
 
 typedef struct adec_thread_s
 {
@@ -78,6 +80,7 @@ static void EndThread      ( adec_thread_t * );
 
 static void DecodeAdpcmMs( adec_thread_t *, aout_buffer_t * );
 static void DecodeAdpcmImaWav( adec_thread_t *, aout_buffer_t * );
+static void DecodeAdpcmDk4( adec_thread_t *, aout_buffer_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -98,7 +101,7 @@ static int pi_channels_maps[6] =
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARLEFT,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARLEFT 
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARLEFT
 };
 
 /* Various table from http://www.pcisys.net/~melanson/codecs/adpcm.txt */
@@ -147,18 +150,18 @@ static int i_adaptation_coeff2[7] =
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
-    
+
     switch( p_fifo->i_fourcc )
-    {   
+    {
 //        case VLC_FOURCC('i','m','a', '4'): /* IMA ADPCM */
         case VLC_FOURCC('m','s',0x00,0x02): /* MS ADPCM */
         case VLC_FOURCC('m','s',0x00,0x11): /* IMA ADPCM */
-//        case VLC_FOURCC('m','s',0x00,0x61): /* Duck DK4 ADPCM */
+        case VLC_FOURCC('m','s',0x00,0x61): /* Duck DK4 ADPCM */
 //        case VLC_FOURCC('m','s',0x00,0x62): /* Duck DK3 ADPCM */
 
             p_fifo->pf_run = RunDecoder;
             return VLC_SUCCESS;
-            
+
         default:
             return VLC_EGENERIC;
     }
@@ -180,7 +183,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         return( -1 );
     }
     memset( p_adec, 0, sizeof( adec_thread_t ) );
-    
+
     p_adec->p_fifo = p_fifo;
 
     if( InitThread( p_adec ) != 0 )
@@ -242,12 +245,14 @@ static int InitThread( adec_thread_t * p_adec )
             p_adec->i_codec = ADPCM_MS;
             break;
         case VLC_FOURCC('m','s',0x00,0x61): /* Duck DK4 ADPCM */
+            p_adec->i_codec = ADPCM_DK4;
+            break;
         case VLC_FOURCC('m','s',0x00,0x62): /* Duck DK3 ADPCM */
-            p_adec->i_codec = 0;
+            p_adec->i_codec = ADPCM_DK3;
             break;
     }
 
-    if( p_adec->p_wf->nChannels < 1 || 
+    if( p_adec->p_wf->nChannels < 1 ||
             p_adec->p_wf->nChannels > 2 )
     {
         msg_Err( p_adec->p_fifo, "bad channels count(1-2)" );
@@ -276,19 +281,24 @@ static int InitThread( adec_thread_t * p_adec )
             p_adec->i_samplesperblock = 64;
             break;
         case ADPCM_IMA_WAV:
-            p_adec->i_samplesperblock = 
+            p_adec->i_samplesperblock =
                  2 * ( p_adec->i_block - 4 * p_adec->p_wf->nChannels )/
                  p_adec->p_wf->nChannels;
                  break;
         case ADPCM_MS:
-            p_adec->i_samplesperblock = 
-                2 * ( p_adec->i_block - 7 * p_adec->p_wf->nChannels ) / 
+            p_adec->i_samplesperblock =
+                2 * ( p_adec->i_block - 7 * p_adec->p_wf->nChannels ) /
                 p_adec->p_wf->nChannels + 2;
+            break;
+        case ADPCM_DK4:
+            p_adec->i_samplesperblock =
+               2 * ( p_adec->i_block - 4 * p_adec->p_wf->nChannels ) /
+               p_adec->p_wf->nChannels + 1;
             break;
         default:
             p_adec->i_samplesperblock = 0;
     }
-   
+
     msg_Dbg( p_adec->p_fifo,
              "format: samplerate:%dHz channels:%d bits/sample:%d blockalign:%d samplesperblock %d",
              p_adec->p_wf->nSamplesPerSec,
@@ -442,6 +452,8 @@ static void DecodeThread( adec_thread_t *p_adec )
             case ADPCM_MS:
                 DecodeAdpcmMs( p_adec, p_aout_buffer );
                 break;
+            case ADPCM_DK4:
+                DecodeAdpcmDk4( p_adec, p_aout_buffer );
             default:
                 break;
         }
@@ -480,9 +492,12 @@ static void EndThread (adec_thread_t *p_adec)
     (v) |= ( *p_buffer ) << 8; p_buffer++; \
     if( (v)&0x8000 ) (v) -= 0x010000;
 
+/*
+ * MS
+ */
 typedef struct adpcm_ms_channel_s
 {
-    int i_idelta; 
+    int i_idelta;
     int i_sample1, i_sample2;
     int i_coeff1, i_coeff2;
 
@@ -497,7 +512,7 @@ static int AdpcmMsExpandNibble(adpcm_ms_channel_t *p_channel,
     /* expand sign */
 
     i_snibble = i_nibble - ( i_nibble&0x08 ? 0x10 : 0 );
-    
+
     i_predictor = ( p_channel->i_sample1 * p_channel->i_coeff1 + 
                     p_channel->i_sample2 * p_channel->i_coeff2 ) / 256 +
                   i_snibble * p_channel->i_idelta;
@@ -515,7 +530,7 @@ static int AdpcmMsExpandNibble(adpcm_ms_channel_t *p_channel,
     }
     return( i_predictor );
 }
-    
+
 static void DecodeAdpcmMs( adec_thread_t *p_adec,  
                            aout_buffer_t *p_aout_buffer)
 {
@@ -525,7 +540,7 @@ static void DecodeAdpcmMs( adec_thread_t *p_adec,
     uint16_t           *p_sample;
     int b_stereo;
     int i_block_predictor;
-    
+
     p_buffer = p_adec->p_block;
     b_stereo = p_adec->p_wf->nChannels == 2 ? 1 : 0;
 
@@ -546,7 +561,7 @@ static void DecodeAdpcmMs( adec_thread_t *p_adec,
     {
         GetWord( channel[1].i_idelta );
     }
-    
+
     GetWord( channel[0].i_sample1 );
     if( b_stereo )
     {
@@ -579,15 +594,18 @@ static void DecodeAdpcmMs( adec_thread_t *p_adec,
     {
         *p_sample = AdpcmMsExpandNibble( &channel[0], (*p_buffer) >> 4);
         p_sample++;
-        
+
         *p_sample = AdpcmMsExpandNibble( &channel[b_stereo ? 1 : 0], 
                                          (*p_buffer)&0x0f);
         p_sample++;
     }
 
-    
+
 }
 
+/*
+ * IMA-WAV
+ */
 typedef struct adpcm_ima_wav_channel_s
 {
     int i_predictor;
@@ -618,7 +636,7 @@ static int AdpcmImaWavExpandNibble(adpcm_ima_wav_channel_t *p_channel,
     return( p_channel->i_predictor );
 }
 
-static void DecodeAdpcmImaWav( adec_thread_t *p_adec,  
+static void DecodeAdpcmImaWav( adec_thread_t *p_adec,
                                aout_buffer_t *p_aout_buffer)
 {
     uint8_t                 *p_buffer;
@@ -626,7 +644,7 @@ static void DecodeAdpcmImaWav( adec_thread_t *p_adec,
     int                     i_nibbles;
     uint16_t                *p_sample;
     int                     b_stereo;
-    
+
     p_buffer = p_adec->p_block;
     b_stereo = p_adec->p_wf->nChannels == 2 ? 1 : 0;
 
@@ -642,7 +660,7 @@ static void DecodeAdpcmImaWav( adec_thread_t *p_adec,
         CLAMP( channel[1].i_step_index, 0, 88 );
         p_buffer++;
     }
-    
+
     p_sample = (int16_t*)p_aout_buffer->p_buffer;
     if( b_stereo )
     {
@@ -660,7 +678,7 @@ static void DecodeAdpcmImaWav( adec_thread_t *p_adec,
                     AdpcmImaWavExpandNibble(&channel[0],p_buffer[i] >> 4);
             }
             p_buffer += 4;
-            
+
             for( i = 0; i < 4; i++ )
             {
                 p_sample[i * 4 + 1] = 
@@ -677,8 +695,8 @@ static void DecodeAdpcmImaWav( adec_thread_t *p_adec,
     }
     else
     {
-        for( i_nibbles = 2 * (p_adec->i_block - 4); 
-             i_nibbles > 0; 
+        for( i_nibbles = 2 * (p_adec->i_block - 4);
+             i_nibbles > 0;
              i_nibbles -= 2, p_buffer++ )
         {
             *p_sample =AdpcmImaWavExpandNibble( &channel[0], (*p_buffer)&0x0f );
@@ -689,6 +707,53 @@ static void DecodeAdpcmImaWav( adec_thread_t *p_adec,
     }
 }
 
+/*
+ * Dk4
+ */
 
+static void DecodeAdpcmDk4( adec_thread_t *p_adec,
+                               aout_buffer_t *p_aout_buffer)
+{
+    uint8_t                 *p_buffer;
+    adpcm_ima_wav_channel_t channel[2];
+    int                     i_nibbles;
+    uint16_t                *p_sample;
+    int                     b_stereo;
 
+    p_buffer = p_adec->p_block;
+    b_stereo = p_adec->p_wf->nChannels == 2 ? 1 : 0;
 
+    GetWord( channel[0].i_predictor );
+    GetByte( channel[0].i_step_index );
+    CLAMP( channel[0].i_step_index, 0, 88 );
+    p_buffer++;
+
+    if( b_stereo )
+    {
+        GetWord( channel[1].i_predictor );
+        GetByte( channel[1].i_step_index );
+        CLAMP( channel[1].i_step_index, 0, 88 );
+        p_buffer++;
+    }
+
+    p_sample = (int16_t*)p_aout_buffer->p_buffer;
+
+    /* first output predictor */
+    *p_sample++ = channel[0].i_predictor;
+    if( b_stereo )
+    {
+        *p_sample++ = channel[1].i_predictor;
+    }
+
+    for( i_nibbles = 0;
+         i_nibbles < p_adec->i_block - 4 * (b_stereo ? 2:1 );
+         i_nibbles++ )
+    {
+        *p_sample++ = AdpcmImaWavExpandNibble( &channel[0],
+                                              (*p_buffer) >> 4);
+        *p_sample++ = AdpcmImaWavExpandNibble( &channel[b_stereo ? 1 : 0],
+                                               (*p_buffer)&0x0f);
+
+        p_buffer++;
+    }
+}
