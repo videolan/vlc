@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.29 2003/10/22 00:00:54 fenrir Exp $
+ * $Id: mkv.cpp,v 1.30 2003/10/29 23:36:59 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1250,6 +1250,10 @@ static int Open( vlc_object_t * p_this )
         {
             tk.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
         }
+        else if( !strcmp( tk.psz_codec, "S_VOBSUB" ) )
+        {
+            tk.i_codec = VLC_FOURCC( 's','p','u',' ' );
+        }
         else
         {
             msg_Err( p_input, "unknow codec id=`%s'", tk.psz_codec );
@@ -1618,7 +1622,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
         p_pes->i_pts = i_pts;
         p_pes->i_dts = i_pts;
 
-        if( tk.i_cat == SPU_ES )
+        if( tk.i_cat == SPU_ES && strcmp( tk.psz_codec, "S_VOBSUB" ) )
         {
             if( i_duration > 0 )
             {
