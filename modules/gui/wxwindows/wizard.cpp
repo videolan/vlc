@@ -50,7 +50,7 @@ enum
     MoreInfoStreaming_Event,
     MoreInfoTranscode_Event,
 
-    Open_Event,Choose_Event,
+    Open_Event , Choose_Event ,
     ListView_Event,
     InputRadio0_Event, InputRadio1_Event,
     PartialEnable_Event,
@@ -63,9 +63,12 @@ enum
     EncapRadio4_Event, EncapRadio5_Event,
     EncapRadio6_Event, EncapRadio7_Event,
     EncapRadio8_Event, EncapRadio9_Event,
+    EncapRadio10_Event, EncapRadio11_Event,
 
     VideoEnable_Event, VideoCodec_Event,VideoBitrate_Event,
     AudioEnable_Event, AudioCodec_Event,AudioBitrate_Event,
+
+    SAP_Event,
 
 };
 
@@ -152,11 +155,24 @@ END_EVENT_TABLE()
 #define EXTRATRANSCODE_TEXT _("In this page, you will define a few " \
                               "additionnal parameters for your transcoding" )
 
+#define CHOOSE_OUTFILE _("You must choose a file to save to")
+
 /* Streaming 2 */
 #define EXTRASTREAMING_TITLE _("Additional streaming options")
 #define EXTRASTREAMING_TEXT _("In this page, you will define a few " \
                               "additionnal parameters for your stream" )
 
+#define TTL _("Define the TTL (Time-To-Live) of the stream. This parameter " \
+              "is the maximum number of routers your stream can go through. " \
+              "If you don't know what it means, or if you want to stream on " \
+              "your local network only, leave this setting to 1." )
+
+#define SAP _("When streaming using UDP, you can announce your streams " \
+              "using the SAP/SDP announcing protocol. This way, the clients " \
+              "won't have to type in the multicast address, it will appear " \
+              "in their playlist if they enable the SAP extra interface.\n" \
+              "If you want to give a name to your stream, enter it here, " \
+              "else, a default name will be used" )
 
 /*****************************************************************************
  * All the pages of the wizard, declaration
@@ -360,9 +376,11 @@ public:
                             wxWizardPage *next);
     virtual wxWizardPage *GetPrev() const;
     virtual wxWizardPage *GetNext() const;
+    void OnWizardPageChanging( wxWizardEvent& event );
 protected:
     DECLARE_EVENT_TABLE()
     void wizTranscodeExtraPage::OnSelectFile(wxCommandEvent&);
+    wxTextCtrl *file_text;
     WizardDialog *p_parent;
     wxWizardPage *p_prev;
     wxWizardPage *p_next;
@@ -370,6 +388,7 @@ protected:
 
 BEGIN_EVENT_TABLE(wizTranscodeExtraPage, wxWizardPage)
     EVT_BUTTON( Open_Event, wizTranscodeExtraPage::OnSelectFile)
+    EVT_WIZARD_PAGE_CHANGING(-1, wizTranscodeExtraPage::OnWizardPageChanging)
 END_EVENT_TABLE()
 
 /* Additional settings for streaming */
@@ -380,14 +399,23 @@ public:
                             wxWizardPage *next);
     virtual wxWizardPage *GetPrev() const;
     virtual wxWizardPage *GetNext() const;
+    void OnWizardPageChanging(wxWizardEvent&);
+    void OnSAP( wxCommandEvent&);
+    wxCheckBox *sap_checkbox;
+    wxTextCtrl *sap_text;
 protected:
+    friend class wizEncapPage;
     DECLARE_EVENT_TABLE()
     WizardDialog *p_parent;
     wxWizardPage *p_prev;
     wxWizardPage *p_next;
+
+    wxSpinCtrl *ttl_spin;
 };
 
 BEGIN_EVENT_TABLE(wizStreamingExtraPage, wxWizardPage)
+    EVT_CHECKBOX( SAP_Event, wizStreamingExtraPage::OnSAP )
+    EVT_WIZARD_PAGE_CHANGING(-1, wizStreamingExtraPage::OnWizardPageChanging)
 END_EVENT_TABLE()
 
 
@@ -1101,8 +1129,24 @@ void wizEncapPage::OnWizardPageChanging(wxWizardEvent& event)
         }
     }
     p_parent->SetMux( encaps_array[i_mux].psz_mux );
+
+    if( p_parent->GetAction() == ACTION_STREAM )
+    {
+        if( strstr( p_parent->method, "udp" ))
+        {
+            ((wizStreamingExtraPage *)GetNext())->sap_checkbox->Enable();
+            ((wizStreamingExtraPage *)GetNext())->sap_text->Enable(false);
+        }
+        else
+        {
+           ((wizStreamingExtraPage *)GetNext())->sap_checkbox->Enable( false );
+           ((wizStreamingExtraPage *)GetNext())->sap_text->Enable( false );
+        }
+    }
+
     return;
 }
+
 
 void wizEncapPage::OnEncapChange(wxEvent& event)
 {
@@ -1162,11 +1206,23 @@ wizTranscodeExtraPage::wizTranscodeExtraPage( wxWizard *parent,
     /* Create the texts */
     pageHeader( this, mainSizer, EXTRATRANSCODE_TITLE, EXTRATRANSCODE_TEXT );
 
-    mainSizer->Add( new wxStaticText( this, -1,
+    mainSizer->Add( 0, 0, 1 );
+
+    wxFlexGridSizer *sizer = new wxFlexGridSizer( 2, 2, 1 );
+    sizer->Add( new wxStaticText( this, -1,
                     wxU(_("Select the file to save to") ) ),
                     0, wxALL, 5 );
+    sizer->Add( 0, 0, 1 );
 
-    mainSizer->Add( new wxButton( this, Open_Event, wxU("Choose") ) );
+    file_text = new wxTextCtrl( this, -1, wxU(""), wxDefaultPosition,
+                                wxSize( 150, -1 ) );
+
+    sizer->Add( file_text, 0,  wxALL, 5 );
+    sizer->Add( new wxButton( this, Open_Event, wxU("Choose") ) );
+
+    mainSizer->Add( sizer, 0, 0, 0) ;
+
+    mainSizer->Add( 0, 0, 1 );
     SetSizer(mainSizer);
     mainSizer->Fit(this);
 }
@@ -1180,11 +1236,23 @@ void wizTranscodeExtraPage::OnSelectFile( wxCommandEvent &event)
     {
         if( file_dialog->GetFilename().mb_str() )
         {
-            p_parent->SetTranscodeOut( (char*)file_dialog->GetFilename().
-                                                  c_str() );
+            file_text->SetValue( file_dialog->GetFilename() );
         }
     }
+}
 
+void wizTranscodeExtraPage::OnWizardPageChanging( wxWizardEvent& event )
+{
+    if( event.GetDirection() && file_text->GetValue().IsEmpty() )
+    {
+        wxMessageBox( wxU( CHOOSE_OUTFILE ), wxU( ERROR_MSG ),
+                      wxICON_WARNING | wxOK, this->p_parent );
+        event.Veto();
+    }
+    if( event.GetDirection() )
+    {
+       p_parent->SetTranscodeOut( (char *)file_text->GetValue().c_str());
+    }
 }
 
 wxWizardPage *wizTranscodeExtraPage::GetPrev() const { return p_prev; }
@@ -1205,8 +1273,60 @@ wizStreamingExtraPage::wizStreamingExtraPage( wxWizard *parent,
     /* Create the texts */
     pageHeader( this, mainSizer, EXTRASTREAMING_TITLE, EXTRASTREAMING_TEXT );
 
+    mainSizer->Add( 0, 0, 1 );
+
+    wxFlexGridSizer *sizer = new wxFlexGridSizer( 2,2,1) ;
+
+    /* TTL */
+    sizer->Add( new wxStaticText( this, -1, wxU(_("Time-To-Live (TTL)"))),
+                    0, wxALL,  5 );
+    ttl_spin = new wxSpinCtrl( this, -1, "", wxDefaultPosition, wxDefaultSize,
+                    0, 1, 255, 1 );
+    ttl_spin->SetToolTip(wxU(_(TTL) ) ) ;
+    sizer->Add( ttl_spin, 0, wxALL , 5 );
+
+    /* SAP announce */
+    sap_checkbox =  new wxCheckBox( this, SAP_Event, wxU(_("SAP Announce")) );
+    sap_checkbox->SetToolTip( wxU(_( SAP ) ) );
+    sizer->Add( sap_checkbox, 0, 0 , 0 );
+    sap_text = new wxTextCtrl( this, -1, wxU(""), wxDefaultPosition,
+                    wxSize(100,25) );
+    sap_text->SetToolTip( wxU(_( SAP ) ) );
+    sizer->Add( sap_text, 0, wxALL , 5 );
+
+    mainSizer->Add(sizer, 0, wxALL, 5 );
+
+    mainSizer->Add( 0, 0, 1 );
+
     SetSizer(mainSizer);
     mainSizer->Fit(this);
+}
+
+void wizStreamingExtraPage::OnSAP( wxCommandEvent &event )
+{
+    sap_text->Enable( event.IsChecked() );
+}
+
+void wizStreamingExtraPage::OnWizardPageChanging(wxWizardEvent& event)
+{
+    if( sap_checkbox->IsChecked() )
+    {
+        if( sap_text->GetValue().IsEmpty() )
+        {
+            p_parent->SetSAP( true, NULL );
+        }
+        else
+        {
+            p_parent->SetSAP( true,
+                             (const char *)sap_text->GetValue().mb_str() );
+        }
+    }
+    else
+    {
+        p_parent->SetSAP( false, NULL );
+    }
+
+    p_parent->SetTTL( ttl_spin->GetValue() );
 }
 
 wxWizardPage *wizStreamingExtraPage::GetPrev() const { return p_prev; }
@@ -1229,12 +1349,13 @@ wxWizard( _p_parent, -1, wxU(_("Streaming/Transcoding Wizard")), wxNullBitmap, w
 {
     /* Initializations */
     p_intf = _p_intf;
-    SetPageSize(wxSize(400,350));
+    SetPageSize(wxSize(400,420));
 
     /* Initialize structure */
     i_action = 0;
     i_from = 0;
     i_to = 0;
+    i_ttl = 1;
     vb = 0;
     ab = 0;
     acodec=NULL;
@@ -1282,6 +1403,27 @@ WizardDialog::~WizardDialog()
 void WizardDialog::SetMrl( const char *mrl )
 {
     this->mrl = strdup( mrl );
+}
+
+void WizardDialog::SetTTL( int i_ttl )
+{
+    this->i_ttl = i_ttl;
+}
+
+void WizardDialog::SetSAP( bool b_enabled, const char *psz_text )
+{
+    this->b_sap = b_enabled;
+    if( b_enabled )
+    {
+        if( psz_text != NULL )
+        {
+            this->psz_sap_name = strdup( psz_text );
+        }
+        else
+        {
+            this->psz_sap_name = NULL;
+        }
+    }
 }
 
 void WizardDialog::SetPartial( int i_from, int i_to )
@@ -1384,17 +1526,44 @@ void WizardDialog::Run()
             msg_Dbg( p_intf, "Starting stream of %s to %s using %s, encap %s",
                                mrl, address, method, mux);
 
-            i_size = 40 + strlen(mux) + strlen(address);
-            psz_opt = (char *)malloc( i_size * sizeof(char) );
-            sprintf( psz_opt, ":sout=#standard{mux=%s,url=%s,access=%s}",
+            if( b_sap )
+            {
+                char *psz_sap_option = NULL;
+                if( psz_sap_name )
+                {
+                    psz_sap_option = (char *) malloc( strlen( psz_sap_name )
+                                               + 15 );
+                    sprintf( psz_sap_option, "sap,name=\"%s\"",psz_sap_name );
+                }
+                else
+                {
+                    psz_sap_option = (char *) malloc( 10 );
+                    sprintf( psz_sap_option, "sap" );
+                }
+                i_size = 40 + strlen(mux) + strlen(address) +
+                              strlen( psz_sap_option);
+                psz_opt = (char *)malloc( i_size * sizeof(char) );
+                sprintf( psz_opt,
+                        ":sout=#standard{mux=%s,url=%s,access=%s,%s}",
+                                  mux, address,method, psz_sap_option);
+                msg_Dbg( p_intf, "Sap enabled: %s", psz_sap_option);
+                if( psz_sap_option ) free( psz_sap_option );
+            }
+            else
+            {
+                i_size = 40 + strlen(mux) + strlen(address);
+                psz_opt = (char *)malloc( i_size * sizeof(char) );
+                sprintf( psz_opt, ":sout=#standard{mux=%s,url=%s,access=%s}",
                             mux, address,method);
+            }
         }
 
         playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
                             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE);
         if( p_playlist )
         {
-            playlist_item_t *p_item = playlist_ItemNew( p_playlist, mrl, ITEM_NAME );
+            playlist_item_t *p_item = playlist_ItemNew( p_playlist, mrl,
+                                                        ITEM_NAME );
             playlist_ItemAddOption( p_item, psz_opt);
             if( i_from != 0)
             {
@@ -1409,6 +1578,11 @@ void WizardDialog::Run()
                 sprintf( psz_to, "stop-time=%i", i_to);
                 playlist_ItemAddOption( p_item, psz_to);
             }
+
+            char psz_ttl[20];
+            sprintf( psz_ttl, "ttl=%i",i_ttl );
+            playlist_ItemAddOption( p_item, psz_ttl );
+
             playlist_AddItem( p_playlist, p_item, PLAYLIST_GO, PLAYLIST_END );
             vlc_object_release(p_playlist);
         }

@@ -31,4 +31,7 @@ EXTRA_DIST += \
 	bitmaps/slow.xpm \
 	bitmaps/fast.xpm \
 	bitmaps/playlist.xpm \
-	bitmaps/speaker.xpm
+	bitmaps/speaker.xpm \
+	bitmaps/shuffle.xpm \
+	bitmaps/repeat.xpm \
+	bitmaps/loop.xpm

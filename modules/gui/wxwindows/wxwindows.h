@@ -578,19 +578,24 @@ public:
     virtual ~WizardDialog();
     void SetTranscode( char *vcodec, int vb, char *acodec,int ab);
     void SetMrl( const char *mrl );
+    void SetTTL( int i_ttl );
     void SetPartial( int, int );
     void SetStream( char *method, char *address );
     void SetTranscodeOut( char *address );
     void SetAction( int i_action );
     int  GetAction();
+    void SetSAP( bool b_enabled, const char *psz_name );
     void SetMux( char *mux );
     void Run();
     int i_action;
+    char *method;
 
-private:
+protected:
     int vb,ab;
-    int i_from, i_to;
-    char *vcodec,*acodec,*method,*address,*mrl,*mux;
+    int i_from, i_to, i_ttl;
+    char *vcodec , *acodec , *address , *mrl , *mux ;
+    char *psz_sap_name;
+    bool b_sap;
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
