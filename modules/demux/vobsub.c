@@ -46,7 +46,7 @@ static void Close( vlc_object_t *p_this );
 
 vlc_module_begin();
     set_description( _("Vobsub subtitles demux") );
-    set_capability( "demux2", 0 );
+    set_capability( "demux2", 1 );
     
     set_callbacks( Open, Close );
 
@@ -180,6 +180,9 @@ static int Open ( vlc_object_t *p_this )
     {
         msg_Err( p_demux, "couldn't open .sub Vobsub file: %s",
                  psz_vobname );
+        free( p_sys );
+        free( psz_vobname );
+        return VLC_EGENERIC;
     }
     free( psz_vobname );
 
