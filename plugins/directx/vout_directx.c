@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.c,v 1.10 2001/08/05 15:32:46 gbazin Exp $
+ * $Id: vout_directx.c,v 1.11 2001/11/01 21:55:47 jlj Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -303,7 +303,7 @@ static void vout_Destroy( vout_thread_t *p_vout )
      * so we send a fake message */
     if( p_vout->p_sys->i_event_thread_status == THREAD_READY )
     {
-        PostMessage( p_vout->p_sys->hwnd, WM_CHAR, (WPARAM)'^', 0);
+        PostMessage( p_vout->p_sys->hwnd, WM_CHAR, (WPARAM)'q', 0);
         vlc_thread_join( p_vout->p_sys->event_thread_id );
     }
 
