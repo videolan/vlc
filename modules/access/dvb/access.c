@@ -190,16 +190,7 @@ static block_t *Block( access_t * );
 static int Control( access_t *, int, va_list );
 
 #define SATELLITE_READ_ONCE 3
-#if 0
-static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer,
-                              size_t i_len);
-static int     SetArea    ( input_thread_t *, input_area_t * );
-static int     SetProgram ( input_thread_t *, pgrm_descriptor_t * );
-static void    Seek       ( input_thread_t *, off_t );
-static void    AllocateDemux( input_thread_t * p_input, int i_pid,
-                              int i_type );
-static void    CloseProgram( input_thread_t * p_input );
-#endif
+#define TS_PACKET_SIZE 188
 
 static void FilterUnset( access_t *, int i_start, int i_max );
 static void FilterSet( access_t *, int i_pid, int i_type );
@@ -217,7 +208,7 @@ static int Open( vlc_object_t *p_this )
     access_sys_t *p_sys;
 
     /* Only if selected */
-    if( *p_access->psz_acces == '\0' )
+    if( *p_access->psz_access == '\0' )
         return VLC_EGENERIC;
 
     /* Set up access */
@@ -273,12 +264,12 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->b_budget_mode )
     {
         msg_Dbg( p_access, "setting filter on all PIDs" );
-        AllocateDemux( p_access, 0x2000, OTHER_TYPE );
+        FilterSet( p_access, 0x2000, OTHER_TYPE );
     }
     else
     {
         msg_Dbg( p_access, "setting filter on PAT" );
-        AllocateDemux( p_access, 0x0, OTHER_TYPE );
+        FilterSet( p_access, 0x0, OTHER_TYPE );
     }
 
     return VLC_SUCCESS;
@@ -304,7 +295,6 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static block_t *Block( access_t *p_access )
 {
-    access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
     struct timeval timeout;
     fd_set fds;
@@ -334,14 +324,14 @@ static block_t *Block( access_t *p_access )
 
     if ( i_ret < 0 )
     {
-        msg_Err( p_input, "select error (%s)", strerror(errno) );
+        msg_Err( p_access, "select error (%s)", strerror(errno) );
         return NULL;
     }
 
-    p_block = block_New( p_access, p_sys->i_mtu );
+    p_block = block_New( p_access, SATELLITE_READ_ONCE * TS_PACKET_SIZE );
     if( ( p_block->i_buffer = read( p_sys->i_handle, p_block->p_buffer, SATELLITE_READ_ONCE * TS_PACKET_SIZE ) ) <= 0 )
     {
-        msg_Err( p_input, "read failed (%s)", strerror(errno) );
+        msg_Err( p_access, "read failed (%s)", strerror(errno) );
         block_Release( p_block );
         return NULL;
     }
@@ -358,7 +348,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
     vlc_bool_t   *pb_bool, b_bool;
     int          *pi_int, i_int;
     int64_t      *pi_64;
-    vlc_value_t  val;
 
     switch( i_query )
     {
@@ -412,7 +401,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 /*****************************************************************************
  * FilterSet/FilterUnset:
  *****************************************************************************/
-static void FilterSet( access_t *p_access, int i_pid, int i_type );
+static void FilterSet( access_t *p_access, int i_pid, int i_type )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i;
@@ -461,42 +450,42 @@ static void FilterUnset( access_t *p_access, int i_start, int i_max )
 static void VarInit( access_t *p_access )
 {
     /* */
-    var_Create( p_input, "dvb-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     /* */
-    var_Create( p_input, "dvb-adapter", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-device", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-frequency", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-inversion", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-probe", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-lnb-lof1", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-lnb-lof2", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-lnb-slof", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-adapter", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-device", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-frequency", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-inversion", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-probe", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-lnb-lof1", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-lnb-lof2", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-lnb-slof", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     /* */
-    var_Create( p_input, "dvb-budget-mode", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-satno", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-voltage", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-tone", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-fec", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-srate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-budget-mode", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-satno", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-voltage", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-tone", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-fec", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-srate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     /* */
-    var_Create( p_input, "dvb-modulation", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-modulation", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     /* */
-    var_Create( p_input, "dvb-code-rate-hp", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-code-rate-lp", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-bandwidth", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-transmission", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-guard", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "dvb-hierarchy", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-code-rate-hp", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-code-rate-lp", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-bandwidth", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-transmission", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-guard", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-hierarchy", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 }
 
 /* */
 static int ParseMRL( access_t *p_access )
 {
-    char *psz_dup = strdup( p_input->psz_path );
+    char *psz_dup = strdup( p_access->psz_path );
     char *psz_parser = psz_dup;
     char *psz_next;
     vlc_value_t         val;
@@ -583,7 +572,7 @@ static int ParseMRL( access_t *p_access )
         }
         else
         {
-            msg_Err( p_access, "unknown option (%d)", psz_parser );
+            msg_Err( p_access, "unknown option (%s)", psz_parser );
             free( psz_dup );
             return VLC_EGENERIC;
         }

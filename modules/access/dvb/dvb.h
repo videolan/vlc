@@ -45,7 +45,7 @@ typedef struct frontend_t frontend_t;
 
 #define MAX_DEMUX 24
 
-struct access_t
+struct access_sys_t
 {
     int i_handle;
     demux_handle_t p_demux_handles[MAX_DEMUX];
