@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.3 2002/11/14 22:38:47 massiot Exp $
+ * $Id: audio.c,v 1.4 2002/11/27 12:41:45 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -196,14 +196,14 @@ void  E_( DecodeThread_Audio )( adec_thread_t *p_adec )
 
         if( i_frame_size > 0 )
         {
-            if( p_adec->i_buffer < i_frame_size + 16 )
+            if( p_adec->i_buffer_size < i_frame_size + 16 )
             {
                 FREE( p_adec->p_buffer );
                 p_adec->p_buffer = malloc( i_frame_size + 16 );
-                p_adec->i_buffer = i_frame_size + 16;
+                p_adec->i_buffer_size = i_frame_size + 16;
             }
             
-            E_( GetPESData )( p_adec->p_buffer, p_adec->i_buffer, p_pes );
+            E_( GetPESData )( p_adec->p_buffer, p_adec->i_buffer_size, p_pes );
         }
         input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
     } while( i_frame_size <= 0 );

@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.17 2002/11/18 02:46:10 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.18 2002/11/27 12:41:45 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -294,6 +294,10 @@ static int InitThread( generic_thread_t *p_decoder )
     }
     
     p_decoder->pts = 0;
+    p_decoder->p_buffer = NULL;
+    p_decoder->i_buffer = 0;
+    p_decoder->i_buffer_size = 0;
+
     return( i_result );
 }
 
@@ -313,7 +317,6 @@ static void EndThread( generic_thread_t *p_decoder )
     
     if( p_decoder->p_context != NULL)
     {
-        FREE( p_decoder->p_context->quant_store );
         FREE( p_decoder->p_context->extradata );
         avcodec_close( p_decoder->p_context );
         msg_Dbg( p_decoder->p_fifo, 
@@ -341,7 +344,7 @@ static void EndThread( generic_thread_t *p_decoder )
  * locales Functions
  *****************************************************************************/
 
-void E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes )
+int E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes )
 {   
     int i_copy; 
     int i_count;
@@ -372,6 +375,7 @@ void E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes )
     {
         memset( p_buf, 0, i_max - i_count );
     }
+    return( i_count );
 }
 
 
@@ -386,6 +390,14 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
 
     switch( i_fourcc )
     {
+#if 0
+        /* XXX don't use it */
+        case FOURCC_mpgv:
+            i_cat = VIDEO_ES;
+            i_codec = CODEC_ID_MPEG1VIDEO;
+            psz_name = "MPEG-1/2 Video";
+            break;
+#endif
 #if LIBAVCODEC_BUILD >= 4608 
         case FOURCC_DIV1:
         case FOURCC_div1:
@@ -479,7 +491,21 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             i_codec = CODEC_ID_WMV2;
             psz_name ="Windows Media Video 2";
             break;
-
+        case FOURCC_MJPG:
+        case FOURCC_mjpg:
+        case FOURCC_mjpa:
+        case FOURCC_jpeg:
+        case FOURCC_JFIF:
+            i_cat = VIDEO_ES;
+            i_codec = CODEC_ID_MJPEG;
+            psz_name = "Motion JPEG";
+            break;
+        case FOURCC_mjpb:
+            i_cat = VIDEO_ES;
+            i_codec = CODEC_ID_MJPEGB;
+            psz_name = "Motion JPEG B";
+            break;
+              
 #if LIBAVCODEC_BUILD >= 4632
         case FOURCC_WMA1:
         case FOURCC_wma1:

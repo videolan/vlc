@@ -2,7 +2,7 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.8 2002/11/05 10:07:56 gbazin Exp $
+ * $Id: ffmpeg.h,v 1.9 2002/11/27 12:41:45 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -37,7 +37,8 @@
     \
     /* Private stuff for frame gathering */ \
     u8      *p_buffer;      /* buffer for gather pes */  \
-    int     i_buffer;       /* size of allocated p_framedata */
+    int     i_buffer_size;  /* size of allocated p_buffer */ \
+    int     i_buffer;       /* bytes already present in p_buffer */
         
 
 typedef struct generic_thread_s
@@ -55,11 +56,14 @@ typedef struct generic_thread_s
 
 #define FREE( p ) if( p ) free( p ); p = NULL
 
-void E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes );
+int E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes );
 
 /*****************************************************************************
  * Video codec fourcc
  *****************************************************************************/
+
+/* MPEG 1/2 video */
+#define FOURCC_mpgv         VLC_FOURCC('m','p','g','v')
 
 /* MPEG4 video */
 #define FOURCC_DIVX         VLC_FOURCC('D','I','V','X')
@@ -117,6 +121,17 @@ void E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes );
 
 /* Sorenson v1 */
 #define FOURCC_SVQ1 VLC_FOURCC( 'S', 'V', 'Q', '1' )
+
+/* mjpeg */
+#define FOURCC_MJPG VLC_FOURCC( 'M', 'J', 'P', 'G' )
+#define FOURCC_mjpg VLC_FOURCC( 'm', 'j', 'p', 'g' )
+    /* for mov file */
+#define FOURCC_mjpa VLC_FOURCC( 'm', 'j', 'p', 'a' )
+    /* for mov file XXX: untested */
+#define FOURCC_mjpb VLC_FOURCC( 'm', 'j', 'p', 'b' )
+
+#define FOURCC_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' )
+#define FOURCC_JFIF VLC_FOURCC( 'J', 'F', 'I', 'F' )
 
 /* wmv */
 #define FOURCC_WMV1         VLC_FOURCC('W','M','V','1')
