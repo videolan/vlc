@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.37 2003/05/08 01:16:57 hartman Exp $
+ * $Id: controls.m,v 1.38 2003/05/11 18:41:27 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -160,7 +160,7 @@
         input_ChangeArea( p_playlist->p_input, p_area );
         vlc_mutex_unlock( &p_playlist->object_lock );
 
-        p_intf->p_sys->b_chapter_update = VLC_TRUE;
+        p_intf->p_sys->b_input_update = VLC_TRUE;
     }
     else
     {
@@ -206,7 +206,7 @@
         input_ChangeArea( p_playlist->p_input, p_area );
         vlc_mutex_unlock( &p_playlist->object_lock );
 
-        p_intf->p_sys->b_chapter_update = VLC_TRUE;
+        p_intf->p_sys->b_input_update = VLC_TRUE;
     }
     else
     {
