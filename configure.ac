@@ -883,7 +883,7 @@ test "${enable_cprof}" != "yes" && enable_cprof="no"
 dnl
 dnl  default modules
 dnl
-AX_ADD_PLUGINS([dummy rc telnet logger gestures memcpy hotkeys])
+AX_ADD_PLUGINS([dummy rc telnet logger gestures memcpy hotkeys netsync])
 AX_ADD_PLUGINS([mpgv mpga m4v h264 mpeg_system ps ps2 pva ts avi asf aac mp4 rawdv demux2 nsv real aiff mjpeg])
 AX_ADD_PLUGINS([cvdsub svcdsub spudec dvbsub mpeg_audio lpcm a52 dts cinepak])
 AX_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
