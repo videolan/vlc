@@ -90,6 +90,8 @@ typedef struct
     es_format_t   *p_fmt;
     int           i_track_id;
 
+    int64_t      i_length_neg;
+
     /* index */
     unsigned int i_entry_count;
     unsigned int i_entry_max;
@@ -605,6 +607,7 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     unsigned int i_chunk, i_stsc_last_val, i_stsc_entries, i, i_index;
     bo_t *stbl, *stsd, *stts, *stco, *stsc, *stsz;
     uint32_t i_timescale;
+    int64_t  i_residue;
 
     stbl = box_new( "stbl" );
     stsd = box_full_new( "stsd", 0, 0 );
@@ -703,10 +706,11 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     else
         i_timescale = 1001;
 
-    for( i = 0, i_index = 0; i < p_stream->i_entry_count; i_index++)
+    for( i = 0, i_index = 0, i_residue = 0; i < p_stream->i_entry_count; i_index++)
     {
         int64_t i_delta;
         int     i_first;
+        int64_t i_tmp;
 
         i_first = i;
         i_delta = p_stream->entry[i].i_length;
@@ -723,9 +727,12 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
             i++;
         }
 
+        i_tmp = i_delta * (int64_t)i_timescale + i_residue;
+
         bo_add_32be( stts, i - i_first );           // sample-count
-        bo_add_32be( stts, i_delta * (int64_t)i_timescale /
-                     (int64_t)1000000 );            // sample-delta
+        bo_add_32be( stts, i_tmp / I64C(1000000) ); // sample-delta
+
+        i_residue = i_tmp % I64C(1000000);
     }
     bo_fix_32be( stts, 12, i_index );
 
@@ -1208,6 +1215,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 p_input->p_fmt->i_extra );
     }
     p_stream->i_track_id    = p_sys->i_nb_streams + 1;
+    p_stream->i_length_neg  = 0;
     p_stream->i_entry_count = 0;
     p_stream->i_entry_max   = 1000;
     p_stream->entry         =
@@ -1293,14 +1301,36 @@ static int Mux( sout_mux_t *p_mux )
         p_stream = (mp4_stream_t*)p_input->p_sys;
 
         p_data  = sout_FifoGet( p_input->p_fifo );
+        if( p_input->p_fifo->i_depth > 0 )
+        {
+            sout_buffer_t *p_next = sout_FifoShow( p_input->p_fifo );
+            int64_t       i_diff  = p_next->i_dts - p_data->i_dts;
+
+            if( i_diff < I64C(1000000 ) )   /* protection */
+            {
+                p_data->i_length = i_diff;
+            }
+        }
+        if( p_data->i_length <= 0 )
+        {
+            msg_Warn( p_mux, "i_length <= 0" );
+            p_stream->i_length_neg += p_data->i_length - 1;
+            p_data->i_length = 1;
+        }
+        else if( p_stream->i_length_neg < 0 )
+        {
+            int64_t i_recover = __MIN( p_data->i_length / 4, - p_stream->i_length_neg );
+
+            p_data->i_length -= i_recover;
+            p_stream->i_length_neg += i_recover;
+        }
 
         /* add index entry */
         p_stream->entry[p_stream->i_entry_count].i_pos   = p_sys->i_pos;
         p_stream->entry[p_stream->i_entry_count].i_size  = p_data->i_size;
         p_stream->entry[p_stream->i_entry_count].i_pts   = p_data->i_pts;
         p_stream->entry[p_stream->i_entry_count].i_dts   = p_data->i_dts;
-        p_stream->entry[p_stream->i_entry_count].i_length=
-            __MAX( p_data->i_length, 0 );
+        p_stream->entry[p_stream->i_entry_count].i_length= p_data->i_length;
 
         if( p_stream->i_entry_count == 0 )
         {
@@ -1308,7 +1338,7 @@ static int Mux( sout_mux_t *p_mux )
              * To make sure audio/video are in sync, we report a corrected
              * length for the 1st sample. */
             p_stream->entry[p_stream->i_entry_count].i_length =
-                __MAX( p_data->i_length, 0 ) +
+                p_data->i_length +
                 p_data->i_pts - p_sys->i_start_dts;
         }
 
@@ -1322,7 +1352,7 @@ static int Mux( sout_mux_t *p_mux )
         }
 
         /* update */
-        p_stream->i_duration += __MAX( p_data->i_length, 0 );
+        p_stream->i_duration += p_data->i_length;
         p_sys->i_pos += p_data->i_size;
 
         /* write data */
