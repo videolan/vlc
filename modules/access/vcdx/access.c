@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000, 2003, 2004 VideoLAN
- * $Id: access.c,v 1.15 2004/01/05 13:07:02 zorglub Exp $
+ * $Id: access.c,v 1.16 2004/01/06 04:10:18 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -976,66 +976,65 @@ VCDUpdateVar( input_thread_t *p_input, int i_num, int i_action,
 }
 
 
-#define meta_info_add_str(title, str) \
-  if ( str ) {                                                                \
-    dbg_print( INPUT_DBG_META, "field: %s: %s\n", title, str);                \
-    input_AddInfo( p_cat, _(title), "%s", str );                              \
-    playlist_AddInfo( p_playlist, -1, p_cat->psz_name, _(title),              \
-                      "%s",str );
+static inline void
+MetaInfoAddStr(input_thread_t *p_input, input_info_category_t *p_cat, 
+		  playlist_t *p_playlist, char *title, 
+		  const char *str)
+{
+  thread_vcd_data_t *p_vcd = (thread_vcd_data_t *) p_input->p_access_data;
+  if ( str ) {                                                                
+    dbg_print( INPUT_DBG_META, "field: %s: %s\n", title, str);
+    input_AddInfo( p_cat, title, "%s", str );              
+    playlist_AddInfo( p_playlist, -1, p_cat->psz_name, title,
+                      "%s",str );                                             
   }
+}
 
-#define meta_info_add_num(title, num) \
-  dbg_print( INPUT_DBG_META, "field %s: %d\n", title, num);                   \
-  input_AddInfo( p_cat, _(title), "%d", num );                                \
-  playlist_AddInfo( p_playlist, -1, p_cat->psz_name, _(title),                \
+
+static inline void
+MetaInfoAddNum(input_thread_t *p_input, input_info_category_t *p_cat, 
+	       playlist_t *p_playlist, char *title, int num)
+{
+  thread_vcd_data_t *p_vcd = (thread_vcd_data_t *) p_input->p_access_data;
+  dbg_print( INPUT_DBG_META, "field %s: %d\n", title, num);
+  input_AddInfo( p_cat, title, "%d", num );
+  playlist_AddInfo( p_playlist, -1, p_cat->psz_name, title,
                     "%d",num );
+}
+  
+#define addstr(title, str) \
+  MetaInfoAddStr( p_input, p_cat, p_playlist, title, str );
 
+#define addnum(title, num) \
+  MetaInfoAddNum( p_input, p_cat, p_playlist, title, num );
+  
 static void InformationCreate( input_thread_t *p_input  )
 {
   thread_vcd_data_t *p_vcd = (thread_vcd_data_t *) p_input->p_access_data;
   unsigned int i_nb = vcdinfo_get_num_entries(p_vcd->vcd);
   unsigned int last_entry = 0;
   input_info_category_t *p_cat;
-<<<<<<< access.c
-  playlist_item_t *p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
-                                                 FIND_PARENT );
-=======
   track_t i_track;
->>>>>>> 1.14
+  playlist_t *p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
+                                                 FIND_PARENT );
 
   p_cat = input_InfoCategory( p_input, "General" );
 
-  meta_info_add_str( _("VCD Format"), 
-		     vcdinfo_get_format_version_str(p_vcd->vcd));
-  meta_info_add_str( _("Album"), 
-		     vcdinfo_get_album_id(p_vcd->vcd));
-  meta_info_add_str( _("Application"),
-		     vcdinfo_get_application_id(p_vcd->vcd));
-  meta_info_add_str( _("Preparer"),
-		     vcdinfo_get_preparer_id(p_vcd->vcd));
-  meta_info_add_num( _("Vol #"),
-		     vcdinfo_get_volume_num(p_vcd->vcd));
-  meta_info_add_num( _("Vol max #"),
-		     vcdinfo_get_volume_count(p_vcd->vcd));
-  meta_info_add_str( _("Volume Set"), 
-		     vcdinfo_get_volumeset_id(p_vcd->vcd));
-  meta_info_add_str( _("Volume"),
-		     vcdinfo_get_volume_id(p_vcd->vcd));
-  meta_info_add_str( _("Publisher"),
-		     vcdinfo_get_publisher_id(p_vcd->vcd));
-  meta_info_add_str( _("System Id"),
-		     vcdinfo_get_system_id(p_vcd->vcd));
-  meta_info_add_num( "LIDs",       vcdinfo_get_num_LIDs(p_vcd->vcd));
-  meta_info_add_num( _("Entries"),
-		     vcdinfo_get_num_entries(p_vcd->vcd));
-  meta_info_add_num( _("Segments"),
-		     vcdinfo_get_num_segments(p_vcd->vcd));
-  meta_info_add_num( _("Tracks"),
-		     vcdinfo_get_num_tracks(p_vcd->vcd));
+  addstr( _("VCD Format"),  vcdinfo_get_format_version_str(p_vcd->vcd) );
+  addstr( _("Album"),       vcdinfo_get_album_id(p_vcd->vcd));
+  addstr( _("Application"), vcdinfo_get_application_id(p_vcd->vcd) );
+  addstr( _("Preparer"),    vcdinfo_get_preparer_id(p_vcd->vcd) );
+  addnum( _("Vol #"),       vcdinfo_get_volume_num(p_vcd->vcd) );
+  addnum( _("Vol max #"),   vcdinfo_get_volume_count(p_vcd->vcd) );
+  addstr( _("Volume Set"),  vcdinfo_get_volumeset_id(p_vcd->vcd) );
+  addstr( _("Volume"),      vcdinfo_get_volume_id(p_vcd->vcd) );
+  addstr( _("Publisher"),   vcdinfo_get_publisher_id(p_vcd->vcd) );
+  addstr( _("System Id"),   vcdinfo_get_system_id(p_vcd->vcd) );
+  addnum( "LIDs",           vcdinfo_get_num_LIDs(p_vcd->vcd) );
+  addnum( _("Entries"),     vcdinfo_get_num_entries(p_vcd->vcd) );
+  addnum( _("Segments"),    vcdinfo_get_num_segments(p_vcd->vcd) );
+  addnum( _("Tracks"),      vcdinfo_get_num_tracks(p_vcd->vcd) );
 
-<<<<<<< access.c
-  if( p_playlist) vlc_object_release( p_playlist );
-=======
   /* Spit out track information. Could also include MSF info.
    */
 
@@ -1048,18 +1047,16 @@ static void InformationCreate( input_thread_t *p_input  )
     p_cat = input_InfoCategory( p_input, track_str );
 
     if (p_vcd->b_svd) {
-      meta_info_add_num( _("Audio Channels"),  
-			 vcdinfo_audio_type_num_channels(p_vcd->vcd, 
-							 audio_type) );
+      addnum(_("Audio Channels"),  
+	     vcdinfo_audio_type_num_channels(p_vcd->vcd, audio_type) );
     }
 
-    meta_info_add_num( _("First Entry Point"),  last_entry );
+    addnum(_("First Entry Point"), last_entry );
     for ( ; last_entry < i_nb 
 	    && vcdinfo_get_track(p_vcd->vcd, last_entry) == i_track;
 	  last_entry++ ) ;
-    meta_info_add_num( _("Last Entry Point"),  last_entry-1 );
+    addnum(_("Last Entry Point"), last_entry-1 );
   }
->>>>>>> 1.14
 }
 
 #define add_format_str_info(val)			       \
@@ -1257,7 +1254,6 @@ VCDCreatePlayListItem(const input_thread_t *p_input,
                       const char *psz_source, int playlist_operation,
                       int i_pos)
 {
-  mtime_t i_duration = -1;
   char *p_author;
   char *p_title;
   char c_type;
@@ -1295,11 +1291,9 @@ VCDCreatePlayListItem(const input_thread_t *p_input,
 		  config_GetPsz( p_input, MODULE_STRING "-author-format" ),
 		  psz_mrl, itemid );
 
-  /* FIXME: This is horrible, but until the playlist interface is fixed up
-     something like this has to be done for the "Author" field.
-   */
   if( i_pos == PLAYLIST_END ) i_pos = p_playlist->i_size - 1;
-  playlist_AddInfo(p_playlist, i_pos, _("General"), _("Author"), "%s",p_author);
+  playlist_AddInfo(p_playlist, i_pos, _("General"), _("Author"), "%s",
+		   p_author);
 }
 
 static int
@@ -1332,14 +1326,18 @@ VCDFixupPlayList( input_thread_t *p_input, thread_vcd_data_t *p_vcd,
 
   InformationCreate( p_input );
 
-  if ( play_single_item ) {
+  if ( play_single_item ) 
+    {
     /* May fill out more information when the playlist user interface becomes
        more mature.
      */
     VCDCreatePlayListItem(p_input, p_vcd, p_playlist, itemid,
                           psz_mrl, psz_mrl_max, psz_source, PLAYLIST_REPLACE,
                           p_playlist->i_index);
-  } else {
+
+    } 
+  else 
+    {
     vcdinfo_itemid_t list_itemid;
     list_itemid.type=VCDINFO_ITEM_TYPE_ENTRY;
 
@@ -1423,7 +1421,7 @@ E_(Open) ( vlc_object_t *p_this )
     cdio_log_set_handler ( cdio_log_handler );
     vcd_log_set_handler ( vcd_log_handler );
 
-    psz_source             = VCDParse( p_input, &itemid, &play_single_item );
+    psz_source = VCDParse( p_input, &itemid, &play_single_item );
 
     if ( NULL == psz_source )
     {
