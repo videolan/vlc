@@ -38,9 +38,11 @@
 
 //void DisplayStreamDate( wxControl *, intf_thread_t *, int );
 
-/* Callback prototype */
+/* Callback prototypes */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t old_val, vlc_value_t new_val, void *param );
+static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
+                       vlc_value_t old_val, vlc_value_t new_val, void *param );
 
 /*****************************************************************************
  * Constructor.
@@ -60,6 +62,7 @@ Timer::Timer( intf_thread_t *_p_intf, Interface *_p_main_interface )
     if( p_playlist != NULL )
     {
         var_AddCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
+        var_AddCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
         vlc_object_release( p_playlist );
     }
 
@@ -75,6 +78,7 @@ Timer::~Timer()
     if( p_playlist != NULL )
     {
         var_DelCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
+        var_DelCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
         vlc_object_release( p_playlist );
     }
 }
@@ -294,6 +298,13 @@ void Timer::Notify()
         i_old_playing_status = PAUSE_S;
     }
 
+    /* Show the interface, if requested */
+    if( p_intf->p_sys->b_intf_show )
+    {
+        p_main_interface->Raise();
+        p_intf->p_sys->b_intf_show = VLC_FALSE;
+    }
+
     if( p_intf->b_die )
     {
         vlc_mutex_unlock( &p_intf->change_lock );
@@ -321,6 +332,18 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
         p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU,
                                        new_val.b_bool, 0 );
     }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * IntfShowCB: callback triggered by the intf-show playlist variable.
+ *****************************************************************************/
+static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
+                       vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)param;
+    p_intf->p_sys->b_intf_show = VLC_TRUE;
 
     return VLC_SUCCESS;
 }

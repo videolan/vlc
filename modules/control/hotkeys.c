@@ -288,7 +288,17 @@ static void Run( intf_thread_t *p_intf )
                 }
             }
         }
-
+        else if( i_action == ACTIONID_INTF_SHOW )
+        {
+            val.b_bool = VLC_TRUE;
+            p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+            if( p_playlist )
+            {
+                var_Set( p_playlist, "intf-show", val );
+                vlc_object_release( p_playlist );
+            }
+        }
         else if( i_action == ACTIONID_SUBDELAY_DOWN )
         {
             int64_t i_delay = var_GetTime( p_input, "spu-delay" );

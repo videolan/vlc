@@ -230,7 +230,7 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_SUBDELAY_DOWN         47
 #define ACTIONID_HISTORY_BACK          48
 #define ACTIONID_HISTORY_FORWARD       49
-
 #define ACTIONID_AUDIO_TRACK           50
 #define ACTIONID_SUBTITLE_TRACK        51
+#define ACTIONID_INTF_SHOW             52
 

@@ -738,6 +738,8 @@ static char *ppsz_align_descriptions[] =
 #define AUDIO_TRACK_KEY_LONGTEXT N_("Cycle through the available audio tracks(languages)")
 #define SUBTITLE_TRACK_KEY_TEXT N_("Cycle subtitle track")
 #define SUBTITLE_TRACK_KEY_LONGTEXT N_("Cycle through the available subtitle tracks")
+#define INTF_SHOW_KEY_TEXT N_("Show interface")
+#define INTF_SHOW_KEY_LONGTEXT N_("Raise the interface above all other windows")
 
 #define PLAYLIST_USAGE N_( \
     "\nPlaylist MRL syntax:" \
@@ -1067,6 +1069,7 @@ vlc_module_begin();
 #   define KEY_SUBDELAY_DOWN      KEY_MODIFIER_COMMAND|'j'
 #   define KEY_AUDIO_TRACK        'l'
 #   define KEY_SUBTITLE_TRACK     's'
+#   define KEY_INTF_SHOW          'i'
 
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_COMMAND|KEY_F1
 #   define KEY_SET_BOOKMARK2      KEY_MODIFIER_COMMAND|KEY_F2
@@ -1117,10 +1120,11 @@ vlc_module_begin();
 #   define KEY_VOL_UP             KEY_MODIFIER_CTRL|KEY_UP
 #   define KEY_VOL_DOWN           KEY_MODIFIER_CTRL|KEY_DOWN
 #   define KEY_VOL_MUTE           'm'
-#   define KEY_SUBDELAY_UP        KEY_MODIFIER_COMMAND|'h'
-#   define KEY_SUBDELAY_DOWN      KEY_MODIFIER_COMMAND|'j'
+#   define KEY_SUBDELAY_UP        KEY_MODIFIER_CTRL|'h'
+#   define KEY_SUBDELAY_DOWN      KEY_MODIFIER_CTRL|'j'
 #   define KEY_AUDIO_TRACK        'l'
 #   define KEY_SUBTITLE_TRACK     'k'
+#   define KEY_INTF_SHOW          'i'
 
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_CTRL|KEY_F1
 #   define KEY_SET_BOOKMARK2      KEY_MODIFIER_CTRL|KEY_F2
@@ -1206,6 +1210,8 @@ vlc_module_begin();
              AUDIO_TRACK_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-subtitle-track", KEY_SUBTITLE_TRACK, NULL,
              SUBTITLE_TRACK_KEY_TEXT, SUBTITLE_TRACK_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-intf-show", KEY_INTF_SHOW, NULL,
+             INTF_SHOW_KEY_TEXT, INTF_SHOW_KEY_LONGTEXT, VLC_TRUE );
 
     add_key( "key-set-bookmark1", KEY_SET_BOOKMARK1, NULL,
              SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
@@ -1315,6 +1321,7 @@ static struct hotkey p_hotkeys[] =
     { "key-subdelay-up", ACTIONID_SUBDELAY_UP, 0 },
     { "key-audio-track", ACTIONID_AUDIO_TRACK, 0},
     { "key-subtitle-track", ACTIONID_SUBTITLE_TRACK, 0},
+    { "key-intf-show", ACTIONID_INTF_SHOW, 0},
     { "key-nav-activate", ACTIONID_NAV_ACTIVATE, 0 },
     { "key-nav-up", ACTIONID_NAV_UP, 0 },
     { "key-nav-down", ACTIONID_NAV_DOWN, 0 },

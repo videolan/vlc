@@ -943,7 +943,7 @@ test "${enable_cprof}" != "yes" && enable_cprof="no"
 dnl
 dnl  default modules
 dnl
-VLC_ADD_PLUGINS([dummy rc telnet logger gestures memcpy hotkeys netsync])
+VLC_ADD_PLUGINS([dummy rc telnet logger gestures memcpy hotkeys netsync showintf])
 VLC_ADD_PLUGINS([mpgv mpga m4v m4a h264 ps pva avi asf aac mp4 rawdv nsv real aiff mjpeg demuxdump])
 VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec dvbsub mpeg_audio lpcm a52 dts cinepak])
 VLC_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])

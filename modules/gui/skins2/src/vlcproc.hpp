@@ -107,6 +107,11 @@ class VlcProc: public SkinObject
                                  vlc_value_t oldVal, vlc_value_t newVal,
                                  void *pParam );
 
+        /// Callback for intf-show variable
+        static int onIntfShow( vlc_object_t *pObj, const char *pVariable,
+                               vlc_value_t oldVal, vlc_value_t newVal,
+                               void *pParam );
+
         /// Callback for item-change variable
         static int onItemChange( vlc_object_t *pObj, const char *pVariable,
                                  vlc_value_t oldVal, vlc_value_t newVal,

@@ -29,8 +29,11 @@
 #include "os_factory.hpp"
 #include "os_timer.hpp"
 #include "var_manager.hpp"
+#include "theme.hpp"
+#include "window_manager.hpp"
 #include "../commands/async_queue.hpp"
 #include "../commands/cmd_change_skin.hpp"
+#include "../commands/cmd_show_window.hpp"
 #include "../commands/cmd_quit.hpp"
 #include "../commands/cmd_vars.hpp"
 #include "../utils/var_bool.hpp"
@@ -95,6 +98,9 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     // Called when the playlist changes
     var_AddCallback( pIntf->p_sys->p_playlist, "intf-change",
                      onIntfChange, this );
+    // Called when the "interface shower" wants us to show the skin
+    var_AddCallback( pIntf->p_sys->p_playlist, "intf-show",
+                     onIntfShow, this );
     // Called when the current played item changes
     var_AddCallback( pIntf->p_sys->p_playlist, "playlist-current",
                      onPlaylistChange, this );
@@ -129,10 +135,13 @@ VlcProc::~VlcProc()
 
     var_DelCallback( getIntf()->p_sys->p_playlist, "intf-change",
                      onIntfChange, this );
+    var_DelCallback( getIntf()->p_sys->p_playlist, "intf-show",
+                     onIntfShow, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-current",
                      onPlaylistChange, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-change",
                      onItemChange, this );
+    var_DelCallback( getIntf(), "skin-to-load", onSkinToLoad, this );
 }
 
 
@@ -242,7 +251,7 @@ int VlcProc::onIntfChange( vlc_object_t *pObj, const char *pVariable,
                            vlc_value_t oldVal, vlc_value_t newVal,
                            void *pParam )
 {
-    VlcProc *pThis = ( VlcProc* )pParam;
+    VlcProc *pThis = (VlcProc*)pParam;
 
     // Create a playlist notify command
     CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
@@ -256,11 +265,34 @@ int VlcProc::onIntfChange( vlc_object_t *pObj, const char *pVariable,
 }
 
 
+int VlcProc::onIntfShow( vlc_object_t *pObj, const char *pVariable,
+                         vlc_value_t oldVal, vlc_value_t newVal,
+                         void *pParam )
+{
+    if (newVal.i_int)
+    {
+        VlcProc *pThis = (VlcProc*)pParam;
+
+        // Create a raise all command
+        CmdRaiseAll *pCmd =
+            new CmdRaiseAll( pThis->getIntf(),
+                             pThis->getIntf()->p_sys->p_theme->getWindowManager() );
+
+        // Push the command in the asynchronous command queue
+        AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+        pQueue->remove( "raise all windows" );
+        pQueue->push( CmdGenericPtr( pCmd ) );
+    }
+
+    return VLC_SUCCESS;
+}
+
+
 int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
                            vlc_value_t oldVal, vlc_value_t newVal,
                            void *pParam )
 {
-    VlcProc *pThis = ( VlcProc* )pParam;
+    VlcProc *pThis = (VlcProc*)pParam;
 
     // Create a playlist notify command
     // TODO: selective update
@@ -279,7 +311,7 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
                                vlc_value_t oldVal, vlc_value_t newVal,
                                void *pParam )
 {
-    VlcProc *pThis = ( VlcProc* )pParam;
+    VlcProc *pThis = (VlcProc*)pParam;
 
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
 
@@ -316,7 +348,7 @@ int VlcProc::onSkinToLoad( vlc_object_t *pObj, const char *pVariable,
                            vlc_value_t oldVal, vlc_value_t newVal,
                            void *pParam )
 {
-    VlcProc *pThis = ( VlcProc* )pParam;
+    VlcProc *pThis = (VlcProc*)pParam;
 
     // Create a playlist notify command
     CmdChangeSkin *pCmd =

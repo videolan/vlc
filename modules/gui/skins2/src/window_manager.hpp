@@ -67,6 +67,9 @@ class WindowManager: public SkinObject
         /// If a new anchoring is detected, the windows will move accordingly.
         void move( TopWindow &rWindow, int left, int top ) const;
 
+        /// Raise all the registered windows
+        void raiseAll() const;
+
         /// Show all the registered windows
         void showAll() const;
 

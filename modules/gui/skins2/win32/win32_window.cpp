@@ -127,7 +127,8 @@ void Win32Window::moveResize( int left, int top, int width, int height ) const
 
 void Win32Window::raise() const
 {
-    SetWindowPos( m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+//     SetWindowPos( m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+    SetForegroundWindow( m_hWnd );
 }
 
 

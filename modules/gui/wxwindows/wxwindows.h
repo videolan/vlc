@@ -108,6 +108,7 @@ struct intf_sys_t
 
     /* special actions */
     vlc_bool_t          b_playing;
+    vlc_bool_t          b_intf_show;                /* interface to be shown */
 
     /* The input thread */
     input_thread_t *    p_input;
