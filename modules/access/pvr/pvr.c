@@ -2,7 +2,7 @@
  * pvr.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pvr.c,v 1.7 2003/09/08 11:05:02 bigben Exp $
+ * $Id: pvr.c,v 1.8 2003/10/23 22:46:16 bigben Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -97,6 +97,7 @@ struct access_sys_t
     int i_bitrate;
     int i_bitrate_peak;
     int i_bitrate_mode;
+    int i_input;
 };
 
 /*****************************************************************************
@@ -133,6 +134,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_framerate = 25;
     p_sys->i_bitrate = 3000000;
     p_sys->i_bitrate_peak = 4000000;
+    p_sys->i_input = 4;
 
     /* parse command line options */
     psz_tofree = strdup( p_input->psz_name );
@@ -172,6 +174,13 @@ static int Open( vlc_object_t * p_this )
                     {p_sys->i_standard = strtol( psz_parser_init ,
                                           &psz_parser, 0 );}
 
+            }
+            else if( !strncmp( psz_parser, "input=",
+                               strlen( "input=" ) ) )
+            {
+                p_sys->i_input =
+                  strtol( psz_parser + strlen( "input=" ),
+                            &psz_parser, 0 );
             }
             else if( !strncmp( psz_parser, "device=", strlen( "device=" ) ) )
             {
@@ -287,9 +296,9 @@ static int Open( vlc_object_t * p_this )
 
     free( psz_tofree );
 
-    msg_Dbg( p_input, "device: %s, standard: %x, size: %dx%d, "
+    msg_Dbg( p_input, "device: %s, input: %d, standard: %x, size: %dx%d, "
              "frequency: %d, framerate: %d, bitrate: %d/%d/%d",
-             psz_device, p_sys->i_standard, p_sys->i_width,
+             psz_device, p_sys->i_input, p_sys->i_standard, p_sys->i_width,
              p_sys->i_height, p_sys->i_frequency, p_sys->i_framerate,
              p_sys->i_bitrate, p_sys->i_bitrate_peak,p_sys->i_bitrate_mode );
 
@@ -300,6 +309,13 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
     free( psz_device );
+
+    /* set the input */
+    if( ioctl( p_sys->i_fd, VIDIOC_S_INPUT, &p_sys->i_input ) < 0 )
+    {
+        msg_Warn( p_input, "VIDIOC_S_INPUT failed" );
+    }
+
 
     /* set the video standard */
     if( ioctl( p_sys->i_fd, VIDIOC_S_STD, &p_sys->i_standard ) < 0 )
