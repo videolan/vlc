@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.31 2003/08/26 01:04:29 fenrir Exp $
+ * $Id: ts.c,v 1.32 2003/10/27 13:35:15 nitrox Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -674,7 +674,7 @@ static int Mux( sout_mux_t *p_mux )
                            p_sys->i_dts,
                            p_sys->i_length,
                            3 * p_sys->i_pcr_delay/2 );  /* latency is equal to i_pcr_delay
-                                                           3/2 is for security */
+                                                         3/2 is for security */
                 sout_AccessOutWrite( p_mux->p_access, p_ts );
 
                 /* Reset the ts chain */

@@ -7,7 +7,6 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.73.3\n"
-"Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2003-10-10 09:29+0200\n"
 "PO-Revision-Date: 2002-04-18 23:38+0100\n"
 "Last-Translator: Felix Kühne <fk@aenneburghardt.de>\n"
@@ -15,6 +14,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Report-Msgid-Bugs-To: \n"
 
 #: include/vlc_help.h:32
 #, fuzzy

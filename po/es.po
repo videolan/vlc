@@ -6,7 +6,6 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2003-10-10 09:29+0200\n"
 "PO-Revision-Date: 2002-04-22 09:56+0200\n"
 "Last-Translator: Antonio Javier Varela <tonxabar@hotmail.com>\n"
@@ -14,6 +13,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8-bit\n"
+"Report-Msgid-Bugs-To: \n"
 
 #: include/vlc_help.h:32
 msgid "VLC Preferences"
@@ -25,8 +25,8 @@ msgid ""
 "plugin in the Plugins section.\n"
 "Click on 'Advanced Options' to see every options."
 msgstr ""
-"Configura algunas opciones globales en Cofiguraciones Generales y configura cada plugin "
-"VLC en la sección Plugins.\n"
+"Configura algunas opciones globales en Cofiguraciones Generales y configura "
+"cada plugin VLC en la sección Plugins.\n"
 "Pulsa en 'Opciones Avanzadas' para verlas todas."
 
 #: include/vlc_help.h:38
@@ -34,7 +34,7 @@ msgid "VLC Plugins Preferences"
 msgstr "Preferencias de Plugins VLC"
 
 #: include/vlc_help.h:40
-#, fuzzy, in Spain people is starting 2 use "tunear" (from tuning) in car mods -awful word!-. Do U Fast & Furious?
+#, fuzzy
 msgid ""
 "In this tree, you can set options for every plugin used by VLC.\n"
 "Plugins are sorted by type.\n"
@@ -54,7 +54,8 @@ msgid ""
 "Common settings you may want to alter are http proxy or caching settings."
 msgstr ""
 "Configuraciones relacionadas con varios métodos de acceso usados por VLC.\n"
-"Las comunes que puedes desear alterar son proxy http o configuraciones de caché."
+"Las comunes que puedes desear alterar son proxy http o configuraciones de "
+"caché."
 
 #: include/vlc_help.h:53
 msgid "Audio filters settings"
@@ -62,7 +63,8 @@ msgstr "Configuraciones de filtros de audio"
 
 #: include/vlc_help.h:55
 msgid "Audio filters can be set in the Audio section, and configured here."
-msgstr "Los filtros de audio pueden ponerse en la sección Audio, y configurarse aquí."
+msgstr ""
+"Los filtros de audio pueden ponerse en la sección Audio, y configurarse aquí."
 
 #: include/vlc_help.h:58
 msgid "Audio output modules settings"
@@ -90,8 +92,8 @@ msgid ""
 "In the Subsdec section you may want to set your preferred subtitles text "
 "encoding."
 msgstr ""
-"En la sección Subsdec puedes desear poner tu codificador preferido de texto de "
-"subtítulos."
+"En la sección Subsdec puedes desear poner tu codificador preferido de texto "
+"de subtítulos."
 
 #: include/vlc_help.h:69
 msgid "Demuxers settings"
@@ -106,20 +108,21 @@ msgid ""
 "Interface plugins can be enabled in the Interface section and configured "
 "here."
 msgstr ""
-"Los plugins de interfaz pueden habilitarse en la sección Interfaz y configurarse "
-"aquí."
+"Los plugins de interfaz pueden habilitarse en la sección Interfaz y "
+"configurarse aquí."
 
 #: include/vlc_help.h:77
 msgid "Stream output access modules settings"
 msgstr "Configuraciones de módulos de acceso a salida de volcado"
 
 #: include/vlc_help.h:79
+#, fuzzy
 msgid ""
-"In this section you can set the caching value for the UDP stream output "
+"In this section you can set the caching value for the UDP streamoutput "
 "access module."
 msgstr ""
-"En esta sección puedes poner el valor de caché para el módulo de acceso a salida "
-"de volcado UDP."
+"En esta sección puedes poner el valor de caché para el módulo de acceso a "
+"salida de volcado UDP."
 
 #: include/vlc_help.h:82
 msgid "Subtitle demuxer settings"
@@ -130,8 +133,8 @@ msgid ""
 "In this section you can force the behaviour of the subtitle demuxer, for "
 "example by setting the subtitles type or file name."
 msgstr ""
-"Enesta sección puedes forzar el comportamiento del demuxor de subtítulos, por "
-"ejemplo poniendo el tipo de subtítulos o su nombre de archivo."
+"Enesta sección puedes forzar el comportamiento del demuxor de subtítulos, "
+"por ejemplo poniendo el tipo de subtítulos o su nombre de archivo."
 
 #: include/vlc_help.h:87
 msgid "Text renderer settings"
@@ -161,11 +164,13 @@ msgid "Video filters settings"
 msgstr "Configuraciones de filtros de vídeo"
 
 #: include/vlc_help.h:99
+#, fuzzy
 msgid ""
 "Video filters can be enabled in the Video section and configured here.\n"
-"Configure the \"adjust\" filter to modify contrast/hue/saturation settings."
+"Configure the \"adjust\" filter to modify contrast/hue/saturation  settings."
 msgstr ""
-"Los filtros de vídeo pueden habilitarse en la sección Vídeo y configurarse aquí.\n"
+"Los filtros de vídeo pueden habilitarse en la sección Vídeo y configurarse "
+"aquí.\n"
 "Configura el filtro \"adjust\" para modificar las configuraciones de "
 "contraste/color/saturación."
 
@@ -199,12 +204,13 @@ msgid ""
 "For more information, have a look at the web site."
 msgstr ""
 "VLC es un reproductor multimedia de código fuente abierto (open-source) y "
-"multiplataforma para varios formatos de audio y vídeo (MPEG-1, MPEG-2, MPEG-4, "
-"DivX, mp3, Ogg, ...) así como DVDs, VCDs, CDs de audio, y varios protocolos de "
-"volcado.\n."
-"\n"
-"VLC es también un servidor de volcado con capacidades de transcodificación (uniemisión "
-"y multiemisión UTP, HTTP, ...) principalmente diseñado para redes de gran ancho de banda.\n"
+"multiplataforma para varios formatos de audio y vídeo (MPEG-1, MPEG-2, MPEG-"
+"4, DivX, mp3, Ogg, ...) así como DVDs, VCDs, CDs de audio, y varios "
+"protocolos de volcado.\n"
+".\n"
+"VLC es también un servidor de volcado con capacidades de transcodificación "
+"(uniemisión y multiemisión UTP, HTTP, ...) principalmente diseñado para "
+"redes de gran ancho de banda.\n"
 "\n"
 "Para más información, echa un vistazo al sitio web."
 
@@ -444,8 +450,8 @@ msgid ""
 "various related options."
 msgstr ""
 "Estas opciones te permiten configurar las interfaces usadas por VLC.\n"
-"Puedes elegir la interfaz principal, módulos de interfaz adicionales, y definir "
-"varias opciones relacionadas."
+"Puedes elegir la interfaz principal, módulos de interfaz adicionales, y "
+"definir varias opciones relacionadas."
 
 #: src/libvlc.h:44
 msgid "Interface module"
@@ -457,7 +463,8 @@ msgid ""
 "The default behavior is to automatically select the best module available."
 msgstr ""
 "Esta opción te permite elegir la interfaz usada por VLC.\n"
-"El comportamiento por defecto es elegir automaticamente el mejor módulo posible."
+"El comportamiento por defecto es elegir automaticamente el mejor módulo "
+"posible."
 
 #: src/libvlc.h:50 modules/control/ntservice.c:48
 msgid "Extra interface modules"
@@ -679,8 +686,9 @@ msgid "Audio filters"
 msgstr "Filtros de audio"
 
 #: src/libvlc.h:152
+#, fuzzy
 msgid ""
-"This allows you to add audio postprocessing filters, to modify the sound."
+"This allows you to add audio postprocessing filters, to modifythe sound."
 msgstr ""
 "Esto te permite añadir filtros de postproceso, para modificar el sonido."
 
@@ -703,10 +711,11 @@ msgstr ""
 "Funciona con cualquier formato de fuente desde mono a 5.1"
 
 #: src/libvlc.h:165
+#, fuzzy
 msgid ""
 "These options allow you to modify options related to the video output "
 "subsystem. You can for example enable video filters, like deinterlacing, "
-"contrast / hue / saturation adjusting, ...\n"
+"constrast / hue / saturation adjusting, ...\n"
 "Enable these filters here and configure them in the video filters plugins "
 "section."
 msgstr ""
@@ -815,8 +824,8 @@ msgid ""
 "If enabled, VLC will try to take advantage of the overlay capabilities of "
 "your graphics card."
 msgstr ""
-"Si habilitada, VLC intentará aprovecharse de las capacidades de transparencia "
-"de tu tarjeta gráfica."
+"Si habilitada, VLC intentará aprovecharse de las capacidades de "
+"transparencia de tu tarjeta gráfica."
 
 #: src/libvlc.h:218
 msgid "Force SPU position"
@@ -1050,8 +1059,7 @@ msgstr "Elige lista codificadora de vídeo preferida"
 #: src/libvlc.h:340 src/libvlc.h:344
 msgid ""
 "This allows you to select the order in which VLC will choose its codecs. "
-msgstr ""
-"Esto te permite elegir el orden en el que VLC elegirá sus códecs."
+msgstr "Esto te permite elegir el orden en el que VLC elegirá sus códecs."
 
 #: src/libvlc.h:342
 msgid "Choose preferred audio encoder list"
@@ -1062,8 +1070,8 @@ msgid ""
 "These options allow you to set default global options for the stream output "
 "subsystem."
 msgstr ""
-"Estas opciones te permiten poner opciones globales por defecto para el subsistema "
-"de salida de volcado."
+"Estas opciones te permiten poner opciones globales por defecto para el "
+"subsistema de salida de volcado."
 
 #: src/libvlc.h:351
 msgid "Choose a stream output"
@@ -1241,20 +1249,21 @@ msgid "Repeat the current playlistitem"
 msgstr "Repetir actual objeto de lista de reproducción"
 
 #: src/libvlc.h:433
+#, fuzzy
 msgid ""
-"When this is active VLC will keep playing the current playlist item over and "
+"When this is active VLC will keep playing the current playlistitem over and "
 "over again."
 msgstr ""
-"Cuando esto está activado, VLC seguirá ejecutando el actual objeto de lista de "
-"reproducción una y otra vez."
+"Cuando esto está activado, VLC seguirá ejecutando el actual objeto de lista "
+"de reproducción una y otra vez."
 
 #: src/libvlc.h:437
 msgid ""
 "These options allow you to select default modules. Leave these alone unless "
 "you really know what you are doing."
 msgstr ""
-"Estas opciones te permiten elegir módulos por defecto. Déjalas en paz a menos "
-"que sepas lo que realmente estás haciendo..."
+"Estas opciones te permiten elegir módulos por defecto. Déjalas en paz a "
+"menos que sepas lo que realmente estás haciendo..."
 
 #: src/libvlc.h:440
 msgid "Memory copy module"
@@ -1296,10 +1305,11 @@ msgid ""
 "explorer. This option will allow you to play the file with the already "
 "running instance or enqueue it."
 msgstr ""
-"Permitiendo ejecutar sólo un VLC puede a veces ser útil, por ejemplo si asociaste "
-"VLC con varios tipos de medios, y no quieres que un nuevo VLC se abra cada vez "
-"que haces doble clic en un archivo en el explorador. Esta opción te permite "
-"reproducir el archivo con el VLC ya ejecutado o ponerlo en cola."
+"Permitiendo ejecutar sólo un VLC puede a veces ser útil, por ejemplo si "
+"asociaste VLC con varios tipos de medios, y no quieres que un nuevo VLC se "
+"abra cada vez que haces doble clic en un archivo en el explorador. Esta "
+"opción te permite reproducir el archivo con el VLC ya ejecutado o ponerlo en "
+"cola."
 
 #: src/libvlc.h:461
 msgid "Increase the priority of the process"
@@ -1728,8 +1738,8 @@ msgid ""
 "libcdio  (10)  16\n"
 "seeks    (20)  32\n"
 msgstr ""
-"Esta integral al verla en binario es una máscara de depuración\n."
-"MRL               1\n"
+"Esta integral al verla en binario es una máscara de depuración\n"
+".MRL               1\n"
 "llamada  externa  2\n"
 "toda llamada      4\n"
 "LSN               8\n"
@@ -1756,7 +1766,8 @@ msgid ""
 "value should be set in miliseconds units."
 msgstr ""
 "Te permite modificar el valor de captura por defecto para volcados de "
-"archivos en directo (DirectShow). El valor debería ponerse en uds. de milisegs."
+"archivos en directo (DirectShow). El valor debería ponerse en uds. de "
+"milisegs."
 
 #: modules/access/dshow/dshow.cpp:64
 msgid "DirectShow input"
@@ -1779,11 +1790,12 @@ msgid ""
 "adapter cards have a device file in directory named /dev/dvb/adapter[n] with "
 "n>=0"
 msgstr ""
-"tajetas adaptadoras tienen un archivo de aparato en el directorio llamado "
-"/dev/dvb/adapter[n] con n>=0"
+"tajetas adaptadoras tienen un archivo de aparato en el directorio llamado /"
+"dev/dvb/adapter[n] con n>=0"
 
 #: modules/access/dvb/qpsk.c:47
-msgid "device number to use on adapter"
+#, fuzzy
+msgid "device nummer to use on adapter"
 msgstr "nº de aparato a usar en adaptador"
 
 #: modules/access/dvb/qpsk.c:50
@@ -1800,7 +1812,8 @@ msgstr "FEC de transpondedor satélite por defecto"
 
 #: modules/access/dvb/qpsk.c:57
 msgid "FEC=Forward Error Correction mode"
-msgstr "FEC=Forward Error Correction, modo de Correción de Error por Adelantado"
+msgstr ""
+"FEC=Forward Error Correction, modo de Correción de Error por Adelantado"
 
 #: modules/access/dvb/qpsk.c:59
 msgid "satellite default transponder symbol rate in KHz"
@@ -1835,7 +1848,7 @@ msgid "modulation type"
 msgstr "tipo de modulación"
 
 #: modules/access/dvb/qpsk.c:79
-#, fuzzy, frontend=final frontal?
+#, fuzzy
 msgid "modulation type for frontend device "
 msgstr "tipo de modulación para aparato final "
 
@@ -2262,7 +2275,7 @@ msgid "audio filter for s16->float32 conversion"
 msgstr "filtro de audio para conversión s16->float32"
 
 #: modules/audio_filter/converter/s16tofloat32swab.c:58
-#, fuzzy, endianess???
+#, fuzzy
 msgid "audio filter for s16->float32 with endianness conversion"
 msgstr "filtro de audio para conversión s16->float32 con endianess"
 
@@ -2643,7 +2656,8 @@ msgstr "Justificación de subtítulos"
 
 #: modules/codec/subsdec.c:98
 msgid "Change the justification of substitles (0=center, 1=left, 2=right)"
-msgstr "Cambia la justificación de subtítulos (0=centro, 1=izquierda, 2=derecha)"
+msgstr ""
+"Cambia la justificación de subtítulos (0=centro, 1=izquierda, 2=derecha)"
 
 #: modules/codec/subsdec.c:101
 msgid "text subtitles decoder"
@@ -2747,8 +2761,8 @@ msgid ""
 "The amount of joystick movement required for a movement to be recorded (0-"
 ">32767)"
 msgstr ""
-"la cantidad de movimiento de joystick necesaria para grabar un movimiento "
-"(0->32767)"
+"la cantidad de movimiento de joystick necesaria para grabar un movimiento (0-"
+">32767)"
 
 #: modules/control/joystick.c:143
 msgid "Joystick device"
@@ -2795,8 +2809,8 @@ msgid ""
 "Allows you to remap the actions. For details, please have a look at http://"
 "wiki.videolan.org/index.php/Joystick"
 msgstr ""
-"Te permite remapear las acciones. Más información en http://wiki.videolan.org/"
-"index.php/Joystick"
+"Te permite remapear las acciones. Más información en http://wiki.videolan."
+"org/index.php/Joystick"
 
 #: modules/control/joystick.c:166
 msgid "Joystick"
@@ -5125,8 +5139,9 @@ msgid "MPEG 1"
 msgstr ""
 
 #: modules/gui/macosx/output.m:317 modules/gui/macosx/output.m:386
-msgid "QuickTime"
-msgstr ""
+#, fuzzy
+msgid "Quicktime"
+msgstr "Quitar"
 
 #: modules/gui/macosx/output.m:318 modules/gui/macosx/output.m:336
 #: modules/gui/macosx/output.m:380
@@ -6289,7 +6304,7 @@ msgid "SAP Playlist group ID"
 msgstr ""
 
 #: modules/misc/sap.c:164
-msgid "Sets the default group ID in which SAP items are put"
+msgid "Sets the default group ID in whichSAP items are put"
 msgstr ""
 
 #: modules/misc/sap.c:168
@@ -6832,7 +6847,7 @@ msgid "XVideo extension video output"
 msgstr "Salida de vídeo extensión XVideo"
 
 #: modules/visualization/goom.c:50
-#, fuzzy, what it means goom???
+#, fuzzy
 msgid "goom effect"
 msgstr "efecto goom"
 

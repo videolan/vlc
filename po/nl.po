@@ -6,7 +6,6 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2003-10-10 09:29+0200\n"
 "PO-Revision-Date: 2002-04-20 16:58GMT\n"
 "Last-Translator: Derk-Jan Hartman <thedj at sf.net>\n"
@@ -14,6 +13,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Report-Msgid-Bugs-To: \n"
 "X-Generator: KBabel 0.8\n"
 
 #: include/vlc_help.h:32
