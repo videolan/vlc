@@ -286,6 +286,38 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
 }
 
 /**
+ * Make a subpicture region from an existing picture_t
+ *
+ * \param p_this vlc_object_t
+ * \param p_fmt the format that this subpicture region should have
+ * \param p_pic a pointer to the picture creating the region (not freed)
+ */
+subpicture_region_t *__spu_MakeRegion( vlc_object_t *p_this,
+                                       video_format_t *p_fmt,
+                                       picture_t *p_pic )
+{
+    subpicture_region_t *p_region = malloc( sizeof(subpicture_region_t) );
+    memset( p_region, 0, sizeof(subpicture_region_t) );
+    p_region->p_next = 0;
+    p_region->p_cache = 0;
+    p_region->fmt = *p_fmt;
+    p_region->psz_text = 0;
+    p_region->i_font_color = -1; /* default to using freetype-color -opacity */
+    p_region->i_font_opacity = -1;
+    p_region->i_font_size = -1; /* and the freetype fontsize */
+
+    if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
+        p_fmt->p_palette = p_region->fmt.p_palette =
+            malloc( sizeof(video_palette_t) );
+    else p_fmt->p_palette = p_region->fmt.p_palette = NULL;
+
+    memcpy( &p_region->picture, p_pic, sizeof(picture_t) );
+    p_region->picture.pf_release = RegionPictureRelease;
+
+    return p_region;
+}
+
+/**
  * Destroy a subpicture region
  *
  * \param p_this vlc_object_t
@@ -384,6 +416,7 @@ subpicture_t *spu_CreateSubpicture( spu_t *p_spu )
     vlc_mutex_unlock( &p_spu->subpicture_lock );
 
     p_subpic->pf_create_region = __spu_CreateRegion;
+    p_subpic->pf_make_region = __spu_MakeRegion;
     p_subpic->pf_destroy_region = __spu_DestroyRegion;
     
     return p_subpic;
@@ -1011,6 +1044,7 @@ static subpicture_t *spu_new_buffer( filter_t *p_filter )
     p_subpic->b_absolute = VLC_TRUE;
 
     p_subpic->pf_create_region = __spu_CreateRegion;
+    p_subpic->pf_make_region = __spu_MakeRegion;
     p_subpic->pf_destroy_region = __spu_DestroyRegion;
 
     return p_subpic;

@@ -5,6 +5,7 @@
  * $Id: picture.c 10081 2005-03-01 15:33:51Z dionoea $
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,31 +30,57 @@
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
 #include <vlc/vout.h>
-#include <vlc/aout.h>
 
-#include <sys/types.h>
-#ifndef WIN32
-#   include <netinet/in.h>                            /* BSD: struct in_addr */
-#endif
-
-/***********************************************************************
-*
-***********************************************************************/
-struct vout_sys_t
-{
-    int i_picture_pos; /* picture position in p_picture_vout */
-};
+#include "vlc_image.h"
 
 #include "picture.h"
 
-#define ID_TEXT N_("ID")
+/*****************************************************************************
+ * Local structures
+ *****************************************************************************/
+struct vout_sys_t
+{
+    picture_vout_t *p_picture_vout;
+    vlc_mutex_t *p_lock;
 
-/***********************************************************************
-* Local prototypes
-***********************************************************************/
+    int i_picture_pos; /* picture position in p_picture_vout */
+    image_handler_t *p_image; /* filters for resizing */
+#ifdef IMAGE_2PASSES
+    image_handler_t *p_image2;
+#endif
+    int i_height, i_width;
+    mtime_t i_last_pic;
+};
 
+/* Delay after which the picture is blanked out if there hasn't been any
+ * new picture. */
+#define BLANK_DELAY     I64C(1000000)
+
+typedef void (* pf_release_t)( picture_t * );
+static void ReleasePicture( picture_t *p_pic )
+{
+    p_pic->i_refcount--;
+
+    if ( p_pic->i_refcount <= 0 )
+    {
+        if ( p_pic->p_sys != NULL )
+        {
+            pf_release_t pf_release = (pf_release_t)p_pic->p_sys;
+            p_pic->p_sys = NULL;
+            pf_release( p_pic );
+        }
+        else
+        {
+            if( p_pic && p_pic->p_data_orig ) free( p_pic->p_data_orig );
+            if( p_pic ) free( p_pic );
+        }
+    }
+}
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static int  Init    ( vout_thread_t * );
@@ -61,45 +88,71 @@ static void End     ( vout_thread_t * );
 static int  Manage  ( vout_thread_t * );
 static void Display ( vout_thread_t *, picture_t * );
 
-/***********************************************************************
-* Module descriptor
-***********************************************************************/
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+#define ID_TEXT N_("ID")
+#define ID_LONGTEXT N_( \
+    "Specify an identifier string for this subpicture" )
+
+#define WIDTH_TEXT N_("Video width")
+#define WIDTH_LONGTEXT N_( \
+    "Allows you to specify the output video width." )
+#define HEIGHT_TEXT N_("Video height")
+#define HEIGHT_LONGTEXT N_( \
+    "Allows you to specify the output video height." )
+
 vlc_module_begin();
-    set_description(_("VLC Internal Picture video output") );
-    set_capability( "video output", 70 );
+    set_shortname( _( "Picture" ) );
+    set_description(_("VLC internal picture video output") );
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_VOUT );
+    set_capability( "video output", 0 );
+
+    add_string( "picture-id", "Id", NULL, ID_TEXT, ID_LONGTEXT, VLC_FALSE );
+    add_integer( "picture-width", 0, NULL, WIDTH_TEXT,
+                 WIDTH_LONGTEXT, VLC_TRUE );
+    add_integer( "picture-height", 0, NULL, HEIGHT_TEXT,
+                 HEIGHT_LONGTEXT, VLC_TRUE );
+
     set_callbacks( Open, Close );
-    add_string( "picture-id", "Id", NULL, ID_TEXT, ID_TEXT, VLC_FALSE );
+
+    var_Create( p_module->p_libvlc, "picture-lock", VLC_VAR_MUTEX );
 vlc_module_end();
 
-/***********************************************************************
-* Open : allocate video thread output method
-***********************************************************************/
-static int Open ( vlc_object_t *p_this )
+/*****************************************************************************
+ * Open : allocate video thread output method
+ *****************************************************************************/
+static int Open( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    vout_sys_t *p_sys;
     libvlc_t *p_libvlc = p_vout->p_libvlc;
-    struct picture_vout_t *p_picture_vout = NULL;
-    vlc_value_t val;
+    picture_vout_t *p_picture_vout = NULL;
+    picture_vout_e_t *p_pic;
+    vlc_value_t val, lockval;
 
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
-    if( p_vout->p_sys == NULL )
+    p_sys = p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
+    if( p_sys == NULL )
     {
         msg_Err( p_vout, "out of memory" );
         return VLC_ENOMEM;
     }
 
+    var_Get( p_libvlc, "picture-lock", &lockval );
+    p_sys->p_lock = lockval.p_address;
+    vlc_mutex_lock( p_sys->p_lock );
+
+    p_sys->i_picture_pos = -1;
     if( var_Get( p_libvlc, "p_picture_vout", &val ) != VLC_SUCCESS )
     {
-        msg_Dbg( p_vout, "p_picture_vout not found" );
         p_picture_vout = malloc( sizeof( struct picture_vout_t ) );
-        if( p_vout->p_sys == NULL )
+        if( p_picture_vout == NULL )
         {
             msg_Err( p_vout, "out of memory" );
             return VLC_ENOMEM;
         }
 
-        vlc_mutex_init( p_libvlc, &p_picture_vout->lock );
-        vlc_mutex_lock( &p_picture_vout->lock );
         var_Create( p_libvlc, "p_picture_vout", VLC_VAR_ADDRESS );
         val.p_address = p_picture_vout;
         var_Set( p_libvlc, "p_picture_vout", val );
@@ -109,30 +162,56 @@ static int Open ( vlc_object_t *p_this )
     }
     else
     {
+        int i;
         p_picture_vout = val.p_address;
-        msg_Dbg( p_vout, "p_picture_vout found" );
-        vlc_mutex_lock( &p_picture_vout->lock );
+        for ( i = 0; i < p_picture_vout->i_picture_num; i++ )
+        {
+            if ( p_picture_vout->p_pic[i].i_status == PICTURE_VOUT_E_AVAILABLE )
+                break;
+        }
+
+        if ( i != p_picture_vout->i_picture_num )
+            p_sys->i_picture_pos = i;
     }
 
-    p_vout->p_sys->i_picture_pos = p_picture_vout->i_picture_num;
+    p_sys->p_picture_vout = p_picture_vout;
 
-    p_picture_vout->p_pic = realloc( p_picture_vout->p_pic,
-      (p_picture_vout->i_picture_num+1) * sizeof( struct picture_vout_e_t ) );
+    if ( p_sys->i_picture_pos == -1 )
+    {
+        p_picture_vout->p_pic = realloc( p_picture_vout->p_pic,
+                                         (p_picture_vout->i_picture_num + 1)
+                                           * sizeof(picture_vout_e_t) );
+        p_sys->i_picture_pos = p_picture_vout->i_picture_num;
+        p_picture_vout->i_picture_num++;
+    }
 
-    p_picture_vout->p_pic[p_picture_vout->i_picture_num].p_picture = NULL;
-    p_picture_vout->p_pic[p_picture_vout->i_picture_num].i_status
-      = PICTURE_VOUT_E_OCCUPIED;
+    p_pic = &p_picture_vout->p_pic[p_sys->i_picture_pos];
+    p_pic->p_picture = NULL;
+    p_pic->i_status = PICTURE_VOUT_E_OCCUPIED;
 
     var_Create( p_vout, "picture-id", VLC_VAR_STRING );
-    var_Change( p_vout, "picture-id", VLC_VAR_INHERITVALUE, &val, NULL);
-    p_picture_vout->p_pic[p_picture_vout->i_picture_num].psz_id
-      = (char *)malloc( sizeof(char) * ( strlen( val.psz_string) + 1 ) );
-    strcpy( p_picture_vout->p_pic[p_picture_vout->i_picture_num].psz_id,
-            val.psz_string );
+    var_Change( p_vout, "picture-id", VLC_VAR_INHERITVALUE, &val, NULL );
+    p_pic->psz_id = val.psz_string;
 
-    p_picture_vout->i_picture_num++;
+    vlc_mutex_unlock( p_sys->p_lock );
 
-    vlc_mutex_unlock( &p_picture_vout->lock );
+    var_Create( p_vout, "picture-height", VLC_VAR_INTEGER );
+    var_Change( p_vout, "picture-height", VLC_VAR_INHERITVALUE, &val, NULL );
+    p_sys->i_height = val.i_int; 
+
+    var_Create( p_vout, "picture-width", VLC_VAR_INTEGER );
+    var_Change( p_vout, "picture-width", VLC_VAR_INHERITVALUE, &val, NULL );
+    p_sys->i_width = val.i_int; 
+
+    if ( p_sys->i_height || p_sys->i_width )
+    {
+        p_sys->p_image = image_HandlerCreate( p_vout );
+#ifdef IMAGE_2PASSES
+        p_sys->p_image2 = image_HandlerCreate( p_vout );
+#endif
+    }
+
+    p_sys->i_last_pic = 0;
 
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
@@ -144,12 +223,11 @@ static int Open ( vlc_object_t *p_this )
 }
 
 
-/***********************************************************************
-* Init
-***********************************************************************/
+/*****************************************************************************
+ * Init
+ *****************************************************************************/
 static int Init( vout_thread_t *p_vout )
 {
-
     picture_t *p_pic;
     int i_index;
 
@@ -200,109 +278,215 @@ static int Init( vout_thread_t *p_vout )
 
 }
 
-/***********************************************************************
-* End
-***********************************************************************/
+/*****************************************************************************
+ * End
+ *****************************************************************************/
 static void End( vout_thread_t *p_vout )
 {
     return;
 }
 
-/***********************************************************************
-* Close
-***********************************************************************/
-static void Close ( vlc_object_t *p_this )
+/*****************************************************************************
+ * Close
+ *****************************************************************************/
+static void Close( vlc_object_t *p_this )
 {
-    vout_thread_t * p_vout = (vout_thread_t *)p_this;
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    vout_sys_t *p_sys = p_vout->p_sys;
+    picture_vout_t *p_picture_vout = p_sys->p_picture_vout;
+    picture_vout_e_t *p_pic;
+    vlc_bool_t b_last_picture = VLC_TRUE;
+    int i;
 
-    libvlc_t *p_libvlc = p_vout->p_libvlc;
-    struct picture_vout_t *p_picture_vout = NULL;
-    vlc_value_t val;
-    int i_flag=0, i;
+    vlc_mutex_lock( p_sys->p_lock );
+    p_pic = &p_picture_vout->p_pic[p_sys->i_picture_pos];
 
-    msg_Dbg( p_vout, "Closing Picture Vout ...");
-    var_Get( p_libvlc, "p_picture_vout", &val );
-    p_picture_vout = val.p_address;
-
-    vlc_mutex_lock( &p_picture_vout->lock );
-
-    if( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture )
+    if( p_pic->p_picture )
     {
-        /* FIXME */
-        free( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture );
+        p_pic->p_picture->pf_release( p_pic->p_picture );
+        p_pic->p_picture = NULL;
     }
-    p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].i_status
-      = PICTURE_VOUT_E_AVAILABLE;
+    p_pic->i_status = PICTURE_VOUT_E_AVAILABLE;
+    if( p_pic->psz_id )
+        free( p_pic->psz_id );
 
     for( i = 0; i < p_picture_vout->i_picture_num; i ++)
     {
         if( p_picture_vout->p_pic[i].i_status == PICTURE_VOUT_E_OCCUPIED )
         {
-            i_flag = 1;
+            b_last_picture = VLC_FALSE;
             break;
         }
     }
 
-    if( i_flag == 1 )
-    {
-        vlc_mutex_unlock( &p_picture_vout->lock );
-    }
-    else
+    if( b_last_picture )
     {
         free( p_picture_vout->p_pic );
-        vlc_mutex_unlock( &p_picture_vout->lock );
-        vlc_mutex_destroy( &p_picture_vout->lock );
-        var_Destroy( p_libvlc, "p_picture_vout" );
+        free( p_picture_vout );
+        var_Destroy( p_this->p_libvlc, "p_picture_vout" );
     }
 
-    free( p_vout->p_sys );
+    vlc_mutex_unlock( p_sys->p_lock );
+
+    if ( p_sys->i_height || p_sys->i_width )
+    {
+        image_HandlerDelete( p_sys->p_image );
+#ifdef IMAGE_2PASSES
+        image_HandlerDelete( p_sys->p_image2 );
+#endif
+    }
+
+    free( p_sys );
 }
 
-/***********************************************************************
-* Manage
-***********************************************************************/
+/*****************************************************************************
+ * PushPicture : push a picture in the p_picture_vout structure
+ *****************************************************************************/
+static void PushPicture( vout_thread_t *p_vout, picture_t *p_picture )
+{
+    vout_sys_t *p_sys = p_vout->p_sys;
+    picture_vout_t *p_picture_vout = p_sys->p_picture_vout;
+    picture_vout_e_t *p_pic;
+
+    vlc_mutex_lock( p_sys->p_lock );
+    p_pic = &p_picture_vout->p_pic[p_sys->i_picture_pos];
+
+    if( p_pic->p_picture != NULL )
+    {
+        p_pic->p_picture->pf_release( p_pic->p_picture );
+    }
+    p_pic->p_picture = p_picture;
+
+    vlc_mutex_unlock( p_sys->p_lock );
+}
+
+/*****************************************************************************
+ * Manage
+ *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
+    vout_sys_t *p_sys = p_vout->p_sys;
+
+    if ( mdate() - p_sys->i_last_pic > BLANK_DELAY )
+    {
+        /* Display black */
+#if 0
+        picture_t *p_new_pic = (picture_t*)malloc( sizeof(picture_t) );
+        int i;
+
+        if ( p_sys->i_height || p_sys->i_width )
+        {
+            vout_AllocatePicture( p_vout, p_new_pic,
+                                  VLC_FOURCC('Y','U','V','A'),
+                                  p_sys->i_width, p_sys->i_height,
+                                  p_vout->render.i_aspect );
+        }
+        else
+        {
+            vout_AllocatePicture( p_vout, p_new_pic, p_vout->render.i_chroma,
+                                  p_vout->render.i_width,
+                                  p_vout->render.i_height,
+                                  p_vout->render.i_aspect );
+        }
+
+        p_new_pic->i_refcount++;
+        p_new_pic->i_status = DESTROYED_PICTURE;
+        p_new_pic->i_type   = DIRECT_PICTURE;
+        p_new_pic->pf_release = ReleasePicture;
+
+        for ( i = 0; i < p_pic->i_planes; i++ )
+        {
+            /* This assumes planar YUV format */
+            p_vout->p_vlc->pf_memset( p_pic->p[i].p_pixels, i ? 0x80 : 0,
+                                      p_pic->p[i].i_lines
+                                       * p_pic->p[i].i_pitch );
+        }
+
+        PushPicture( p_vout, p_new_pic );
+#else
+        PushPicture( p_vout, NULL );
+#endif
+        p_sys->i_last_pic = INT64_MAX;
+    }
+
     return VLC_SUCCESS;
 }
 
-/***********************************************************************
-* Display
-***********************************************************************/
+/*****************************************************************************
+ * Display
+ *****************************************************************************/
 static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    libvlc_t *p_libvlc = p_vout->p_libvlc;
-    vlc_value_t val;
-    struct picture_vout_t *p_picture_vout;
+    vout_sys_t *p_sys = p_vout->p_sys;
     picture_t *p_new_pic;
 
-    var_Get( p_libvlc, "p_picture_vout", &val );
-    p_picture_vout = val.p_address;
+    if ( p_sys->i_height || p_sys->i_width )
+    {
+        video_format_t fmt_out = {0}, fmt_in = {0};
+#ifdef IMAGE_2PASSES
+        vide_format_t fmt_middle = {0};
+        picture_t *p_new_pic2;
+#endif
 
-    p_new_pic = (picture_t*)malloc( sizeof(picture_t) );
-    vout_AllocatePicture( p_vout,
-         p_new_pic,
-         p_pic->format.i_chroma,
-         p_pic->format.i_width,
-         p_pic->format.i_height,
-         VOUT_ASPECT_FACTOR * p_pic->format.i_height / p_pic->format.i_width );
+        fmt_in.i_chroma = p_vout->render.i_chroma;
+        fmt_in.i_width = p_vout->render.i_width;
+        fmt_in.i_height = p_vout->render.i_height;
 
+#ifdef IMAGE_2PASSES
+        fmt_middle.i_chroma = p_vout->render.i_chroma;
+        fmt_middle.i_width = p_vout->p_sys->i_width;
+        fmt_middle.i_height = p_vout->p_sys->i_height;
+        fmt_middle.i_visible_width = fmt_middle.i_width;
+        fmt_middle.i_visible_height = fmt_middle.i_height;
+
+        p_new_pic2 = image_Convert( p_vout->p_sys->p_image2,
+                                    p_pic, &fmt_in, &fmt_middle );
+        if ( p_new_pic2 == NULL )
+        {
+            msg_Err( p_vout, "image resizing failed %dx%d->%dx%d %4.4s",
+                     p_vout->render.i_width, p_vout->render.i_height,
+                     fmt_middle.i_width, fmt_middle.i_height,
+                     (char *)&p_vout->render.i_chroma);
+            return;
+        }
+#endif
+
+        fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+        fmt_out.i_width = p_sys->i_width;
+        fmt_out.i_height = p_sys->i_height;
+        fmt_out.i_visible_width = fmt_out.i_width;
+        fmt_out.i_visible_height = fmt_out.i_height;
+
+#ifdef IMAGE_2PASSES
+        p_new_pic = image_Convert( p_vout->p_sys->p_image,
+                                   p_new_pic2, &fmt_middle, &fmt_out );
+        p_new_pic2->pf_release( p_new_pic2 );
+#else
+        p_new_pic = image_Convert( p_vout->p_sys->p_image,
+                                   p_pic, &fmt_in, &fmt_out );
+#endif
+        if ( p_new_pic == NULL )
+        {
+            msg_Err( p_vout, "image conversion failed" );
+            return;
+        }
+    }
+    else
+    {
+        p_new_pic = (picture_t*)malloc( sizeof(picture_t) );
+        vout_AllocatePicture( p_vout, p_new_pic, p_pic->format.i_chroma,
+                              p_pic->format.i_width, p_pic->format.i_height,
+                              p_vout->render.i_aspect );
+
+        vout_CopyPicture( p_vout, p_new_pic, p_pic );
+    }
+
+    p_new_pic->i_refcount = 1;
     p_new_pic->i_status = DESTROYED_PICTURE;
     p_new_pic->i_type   = DIRECT_PICTURE;
+    p_new_pic->p_sys = (picture_sys_t *)p_new_pic->pf_release;
+    p_new_pic->pf_release = ReleasePicture;
 
-    vout_CopyPicture( p_vout, p_new_pic, p_pic );
-
-    vlc_mutex_lock( &p_picture_vout->lock );
-    if( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture )
-    {
-        if( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture->p_data_orig )
-        {
-            free( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos]
-                            .p_picture->p_data_orig );
-        }
-        free( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture );
-    }
-    p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture = p_new_pic;
-
-    vlc_mutex_unlock( &p_picture_vout->lock );
+    PushPicture( p_vout, p_new_pic );
+    p_sys->i_last_pic = p_pic->date;
 }

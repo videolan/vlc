@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_codec.h: codec related structures
+ * vlc_filter.h: filter related structures
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
  * $Id$

@@ -26,16 +26,19 @@
 
 #define PICTURE_VOUT_E_AVAILABLE 0
 #define PICTURE_VOUT_E_OCCUPIED 1
-struct picture_vout_e_t {
+typedef struct picture_vout_e_t
+{
     picture_t *p_picture;
     int i_status;
     char *psz_id;
-};
-struct picture_vout_t
+} picture_vout_e_t;
+
+typedef struct picture_vout_t
 {
-    vlc_mutex_t lock;
     int i_picture_num;
-    struct picture_vout_e_t *p_pic;
-};
+    picture_vout_e_t *p_pic;
+} picture_vout_t;
+
+#undef IMAGE_2PASSES
 
 #endif

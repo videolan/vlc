@@ -1,29 +1,30 @@
 /*****************************************************************************
-* mosaic.c : Mosaic video plugin for vlc
-*****************************************************************************
-* Copyright (C) 2004-2005 VideoLAN
-* $Id$
-*
-* Authors: Antoine Cellerier <dionoea@via.ecp.fr>
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ * mosaic.c : Mosaic video plugin for vlc
+ *****************************************************************************
+ * Copyright (C) 2004-2005 VideoLAN
+ * $Id$
+ *
+ * Authors: Antoine Cellerier <dionoea@via.ecp.fr>
+ *          Christophe Massiot <massiot@via.ecp.fr>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
 *****************************************************************************/
 
 /*****************************************************************************
-* Preamble
-*****************************************************************************/
+ * Preamble
+ *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 #include <math.h>
@@ -32,37 +33,35 @@
 #include <vlc/vout.h>
 
 #include "vlc_filter.h"
-#include "vlc_input.h"
-
 #include "vlc_image.h"
 
-/*****************************************************************************
-* Local prototypes
-*****************************************************************************/
+#include "../video_output/picture.h"
 
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
 static int  CreateFilter    ( vlc_object_t * );
 static void DestroyFilter   ( vlc_object_t * );
 
 static subpicture_t *Filter( filter_t *, mtime_t );
 
 static int MosaicCallback( vlc_object_t *, char const *, vlc_value_t,
-                            vlc_value_t, void * );
+                           vlc_value_t, void * );
 
 /*****************************************************************************
-* filter_sys_t : filter desriptor
-*****************************************************************************/
-
-#include "../video_output/picture.h"
-
+ * filter_sys_t : filter descriptor
+ *****************************************************************************/
 struct filter_sys_t
 {
-
     image_handler_t *p_image;
+#ifdef IMAGE_2PASSES
     image_handler_t *p_image2;
+#endif
     picture_t *p_pic;
 
-    int i_pos; /* mosaic positioning method */
-    int i_ar; /* do we keep aspect ratio ? */
+    int i_position; /* mosaic positioning method */
+    vlc_bool_t b_ar; /* do we keep the aspect ratio ? */
+    vlc_bool_t b_keep; /* do we keep the original picture format ? */
     int i_width, i_height; /* mosaic height and width */
     int i_cols, i_rows; /* mosaic rows and cols */
     int i_xoffset, i_yoffset; /* top left corner offset */
@@ -72,29 +71,37 @@ struct filter_sys_t
     char **ppsz_order; /* list of picture-id */
     int i_order_length;
 
+    mtime_t i_delay;
 };
 
 /*****************************************************************************
-* Module descriptor
-*****************************************************************************/
+ * Module descriptor
+ *****************************************************************************/
+#define ALPHA_TEXT N_("Alpha blending")
+#define ALPHA_LONGTEXT N_("Alpha blending (0 -> 255). Default is 255")
 
-#define ALPHA_TEXT N_("Mosaic alpha blending (0 -> 255)")
-#define ALPHA_LONGTEXT N_("Mosaic alpha blending (0 -> 255). default is 255")
+#define HEIGHT_TEXT N_("Height in pixels")
+#define WIDTH_TEXT N_("Width in pixels")
+#define XOFFSET_TEXT N_("Top left corner x coordinate")
+#define YOFFSET_TEXT N_("Top left corner y coordinate")
+#define VBORDER_TEXT N_("Vertical border width in pixels")
+#define HBORDER_TEXT N_("Horizontal border width in pixels")
 
-#define HEIGHT_TEXT N_("Mosaic height in pixels")
-#define WIDTH_TEXT N_("Mosaic width in pixels")
-#define XOFFSET_TEXT N_("Mosaic top left corner x coordinate")
-#define YOFFSET_TEXT N_("Mosaic top left corner y coordinate")
-#define VBORDER_TEXT N_("Mosaic vertical border width in pixels")
-#define HBORDER_TEXT N_("Mosaic horizontal border width in pixels")
-
-#define POS_TEXT N_("Mosaic positioning method")
-#define POS_LONGTEXT N_("Mosaic positioning method. auto : automatically chose the best number of rows and columns. fixed : used the user defined number of rows and columns.")
-#define ROWS_TEXT N_("Mosaic number of rows")
-#define COLS_TEXT N_("Mosaic number of columns")
+#define POS_TEXT N_("Positioning method")
+#define POS_LONGTEXT N_("Positioning method. auto : automatically choose " \
+        "the best number of rows and columns. fixed : use the user-defined " \
+        "number of rows and columns.")
+#define ROWS_TEXT N_("Number of rows")
+#define COLS_TEXT N_("Number of columns")
 #define AR_TEXT N_("Keep aspect ratio when resizing")
+#define KEEP_TEXT N_("Keep original size")
 
 #define ORDER_TEXT N_("Order as a comma separated list of picture-id(s)")
+
+#define DELAY_TEXT N_("Delay")
+#define DELAY_LONGTEXT N_("Pictures coming from the picture video outputs " \
+        "will be delayed accordingly (in milliseconds, >= 100 ms). For high " \
+        "values you will need to raise file-caching and others.")
 
 static int pi_pos_values[] = { 0, 1 };
 static char * ppsz_pos_descriptions[] =
@@ -102,7 +109,7 @@ static char * ppsz_pos_descriptions[] =
 
 
 vlc_module_begin();
-    set_description( _("Mosaic video sub filter") );
+    set_description( N_("Mosaic video sub filter") );
     set_shortname( N_("Mosaic") );
     set_capability( "sub filter", 0 );
     set_callbacks( CreateFilter, DestroyFilter );
@@ -120,18 +127,22 @@ vlc_module_begin();
     add_integer( "mosaic-rows", 2, NULL, ROWS_TEXT, ROWS_TEXT, VLC_FALSE );
     add_integer( "mosaic-cols", 2, NULL, COLS_TEXT, COLS_TEXT, VLC_FALSE );
     add_bool( "mosaic-keep-aspect-ratio", 0, NULL, AR_TEXT, AR_TEXT, VLC_FALSE );
+    add_bool( "mosaic-keep-picture", 0, NULL, KEEP_TEXT, KEEP_TEXT, VLC_FALSE );
     add_string( "mosaic-order", "", NULL, ORDER_TEXT, ORDER_TEXT, VLC_FALSE );
+
+    add_integer( "mosaic-delay", 100, NULL, DELAY_TEXT, DELAY_LONGTEXT,
+                 VLC_FALSE );
 vlc_module_end();
 
 
 /*****************************************************************************
-* CreateFiler: allocates mosaic video filter
-*****************************************************************************/
-
+ * CreateFiler: allocate mosaic video filter
+ *****************************************************************************/
 static int CreateFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
+    libvlc_t *p_libvlc = p_filter->p_libvlc;
     char *psz_order;
     int i_index;
 
@@ -142,39 +153,54 @@ static int CreateFilter( vlc_object_t *p_this )
         msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
     }
-    p_sys->p_image = image_HandlerCreate( p_filter );
-    p_sys->p_image2 = image_HandlerCreate( p_filter );
 
     p_filter->pf_sub_filter = Filter;
     p_sys->p_pic = NULL;
 
-    p_sys->i_width = __MAX( 0, var_CreateGetInteger( p_filter->p_libvlc, "mosaic-width" ) );
-    p_sys->i_height = __MAX( 0, var_CreateGetInteger( p_filter->p_libvlc, "mosaic-height" ) );
+#define GET_VAR( name, min, max )                                           \
+    p_sys->i_##name = __MIN( max, __MAX( min,                               \
+                var_CreateGetInteger( p_filter, "mosaic-" #name ) ) );      \
+    var_Destroy( p_filter, "mosaic-" #name );                               \
+    var_Create( p_libvlc, "mosaic-" #name, VLC_VAR_INTEGER );               \
+    var_SetInteger( p_libvlc, "mosaic-" #name, p_sys->i_##name );           \
+    var_AddCallback( p_libvlc, "mosaic-" #name, MosaicCallback, p_sys );
 
-    p_sys->i_xoffset = __MAX( 0, var_CreateGetInteger( p_filter->p_libvlc, "mosaic-xoffset" ) );
-    p_sys->i_yoffset = __MAX( 0, var_CreateGetInteger( p_filter->p_libvlc, "mosaic-yoffset" ) );
+    GET_VAR( width, 0, INT32_MAX );
+    GET_VAR( height, 0, INT32_MAX );
+    GET_VAR( xoffset, 0, INT32_MAX );
+    GET_VAR( yoffset, 0, INT32_MAX );
+    GET_VAR( vborder, 0, INT32_MAX );
+    GET_VAR( hborder, 0, INT32_MAX );
+    GET_VAR( rows, 1, INT32_MAX );
+    GET_VAR( cols, 1, INT32_MAX );
+    GET_VAR( alpha, 0, 255 );
+    GET_VAR( position, 0, 1 );
+    GET_VAR( delay, 100, INT32_MAX );
+    p_sys->i_delay *= 1000;
 
-    p_sys->i_vborder = __MAX( 0, var_CreateGetInteger( p_filter->p_libvlc, "mosaic-vborder" ) );
-    p_sys->i_hborder = __MAX( 0, var_CreateGetInteger( p_filter->p_libvlc, "mosaic-hborder" ) );
+    p_sys->b_ar = var_CreateGetBool( p_filter, "mosaic-keep-aspect-ratio" );
+    var_Destroy( p_filter, "mosaic-keep-aspect-ratio" );
+    var_Create( p_libvlc, "mosaic-keep-aspect-ratio", VLC_VAR_INTEGER );
+    var_SetBool( p_libvlc, "mosaic-keep-aspect-ratio", p_sys->b_ar );
+    var_AddCallback( p_libvlc, "mosaic-keep-aspect-ratio", MosaicCallback,
+                     p_sys );
 
-    p_sys->i_rows = __MAX( 1, var_CreateGetInteger( p_filter->p_libvlc, "mosaic-rows") );
-    p_sys->i_cols = __MAX( 1, var_CreateGetInteger( p_filter->p_libvlc, "mosaic-cols") );
-
-    p_sys->i_alpha = var_CreateGetInteger( p_filter->p_libvlc, "mosaic-alpha" );
-    p_sys->i_alpha = __MIN( 255, __MAX( 0, p_sys->i_alpha ) );
-
-    p_sys->i_pos = var_CreateGetInteger( p_filter->p_libvlc, "mosaic-position" );
-    if( p_sys->i_pos > 1 || p_sys->i_pos < 0 ) p_sys->i_pos = 0;
-
-    p_sys->i_ar = var_CreateGetInteger( p_filter->p_libvlc, "mosaic-keep-aspect-ratio" );
+    p_sys->b_keep = var_CreateGetBool( p_filter, "mosaic-keep-picture" );
+    if ( !p_sys->b_keep )
+    {
+        p_sys->p_image = image_HandlerCreate( p_filter );
+#ifdef IMAGE_2PASSES
+        p_sys->p_image2 = image_HandlerCreate( p_filter );
+#endif
+    }
 
     p_sys->i_order_length = 0;
     p_sys->ppsz_order = NULL;
-    psz_order = var_CreateGetString( p_filter->p_libvlc, "mosaic-order" );
+    psz_order = var_CreateGetString( p_filter, "mosaic-order" );
 
     if( psz_order[0] != 0 )
     {
-        char* psz_end=NULL;
+        char *psz_end = NULL;
         i_index = 0;
         do
         { 
@@ -189,44 +215,28 @@ static int CreateFilter( vlc_object_t *p_this )
         p_sys->i_order_length = i_index;
     }
 
-    var_AddCallback( p_filter->p_libvlc, "mosaic-alpha",
-                     MosaicCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "mosaic-height",
-                     MosaicCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "mosaic-width",
-                     MosaicCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "mosaic-xoffset",
-                     MosaicCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "mosaic-yoffset",
-                     MosaicCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "mosaic-vborder",
-                     MosaicCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "mosaic-hborder",
-                     MosaicCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "mosaic-position",
-                     MosaicCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "mosaic-rows",
-                     MosaicCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "mosaic-cols",
-                     MosaicCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "mosaic-keep-aspect-ratio",
-                     MosaicCallback, p_sys );
+    vlc_thread_set_priority( p_filter, VLC_THREAD_PRIORITY_OUTPUT );
 
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
-* DestroyFilter: destroy mosaic video filter
-*****************************************************************************/
-
+ * DestroyFilter: destroy mosaic video filter
+ *****************************************************************************/
 static void DestroyFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
+    libvlc_t *p_libvlc = p_filter->p_libvlc;
     int i_index;
 
-    image_HandlerDelete( p_sys->p_image );
-    image_HandlerDelete( p_sys->p_image2 );
+    if( !p_sys->b_keep )
+    {
+        image_HandlerDelete( p_sys->p_image );
+#ifdef IMAGE_2PASSES
+        image_HandlerDelete( p_sys->p_image2 );
+#endif
+    }
 
     if( p_sys->i_order_length )
     {
@@ -237,43 +247,63 @@ static void DestroyFilter( vlc_object_t *p_this )
         free( p_sys->ppsz_order );
     }
 
-    var_Destroy( p_filter->p_libvlc, "mosaic-alpha" );
-    var_Destroy( p_filter->p_libvlc, "mosaic-height" );
-    var_Destroy( p_filter->p_libvlc, "mosaic-width" );
-    var_Destroy( p_filter->p_libvlc, "mosaic-xoffset" );
-    var_Destroy( p_filter->p_libvlc, "mosaic-yoffset" );
-    var_Destroy( p_filter->p_libvlc, "mosaic-vborder" );
-    var_Destroy( p_filter->p_libvlc, "mosaic-hborder" );
-    var_Destroy( p_filter->p_libvlc, "mosaic-position" );
-    var_Destroy( p_filter->p_libvlc, "mosaic-rows" );
-    var_Destroy( p_filter->p_libvlc, "mosaic-cols" );
-    var_Destroy( p_filter->p_libvlc, "mosaic-keep-aspect-ratio" );
+    var_Destroy( p_libvlc, "mosaic-alpha" );
+    var_Destroy( p_libvlc, "mosaic-height" );
+    var_Destroy( p_libvlc, "mosaic-width" );
+    var_Destroy( p_libvlc, "mosaic-xoffset" );
+    var_Destroy( p_libvlc, "mosaic-yoffset" );
+    var_Destroy( p_libvlc, "mosaic-vborder" );
+    var_Destroy( p_libvlc, "mosaic-hborder" );
+    var_Destroy( p_libvlc, "mosaic-position" );
+    var_Destroy( p_libvlc, "mosaic-rows" );
+    var_Destroy( p_libvlc, "mosaic-cols" );
+    var_Destroy( p_libvlc, "mosaic-keep-aspect-ratio" );
+
     if( p_sys->p_pic ) p_sys->p_pic->pf_release( p_sys->p_pic );
     free( p_sys );
 }
 
 /*****************************************************************************
-* Filter
-*****************************************************************************/
+ * MosaicReleasePicture : Hack to avoid picture duplication
+ *****************************************************************************/
+static void MosaicReleasePicture( picture_t *p_picture )
+{
+    picture_t *p_original_pic = (picture_t *)p_picture->p_sys;
 
+    p_original_pic->pf_release( p_original_pic );
+}
+
+/*****************************************************************************
+ * Filter
+ *****************************************************************************/
 static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 {
-
     filter_sys_t *p_sys = p_filter->p_sys;
+    libvlc_t *p_libvlc = p_filter->p_libvlc;
+
     subpicture_t *p_spu;
 
-    libvlc_t *p_libvlc = p_filter->p_libvlc;
-    vlc_value_t val;
     int i_index, i_real_index, i_row, i_col;
     int i_greatest_real_index_used = p_sys->i_order_length - 1;
 
     subpicture_region_t *p_region;
     subpicture_region_t *p_region_prev = NULL;
 
-    struct picture_vout_t *p_picture_vout;
+    picture_vout_t *p_picture_vout;
+    vlc_value_t val, lockval;
+
+    /* Wait for the specified date. This is to avoid running too fast and
+     * take twice the same pictures. */
+    mwait( date - p_sys->i_delay );
+
+    if ( var_Get( p_libvlc, "picture-lock", &lockval ) )
+        return NULL;
+
+    vlc_mutex_lock( lockval.p_address );
 
     if( var_Get( p_libvlc, "p_picture_vout", &val ) )
     {
+        vlc_mutex_unlock( lockval.p_address );
         return NULL;
     }
 
@@ -293,29 +323,29 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->i_alpha = p_sys->i_alpha;
 
-    vlc_mutex_lock( &p_picture_vout->lock );
-
-    if( p_sys->i_pos == 0 ) /* use automatic positioning */
+    if( p_sys->i_position == 0 ) /* use automatic positioning */
     {
         int i_numpics = p_sys->i_order_length; /* keep slots and all */
-        for( i_index = 0 ;
-             i_index < p_picture_vout->i_picture_num ;
-             i_index ++ )
+        for( i_index = 0;
+             i_index < p_picture_vout->i_picture_num;
+             i_index++ )
         {
             if( p_picture_vout->p_pic[i_index].i_status
-                           == PICTURE_VOUT_E_OCCUPIED ) {
+                           == PICTURE_VOUT_E_OCCUPIED )
+            {
                 i_numpics ++;
                 if( p_sys->i_order_length
-                    && p_picture_vout->p_pic[i_index].psz_id != 0 ){
-                /* we also want to leave slots for images given in mosaic-order
-                that are not available in p_vout_picture */
+                    && p_picture_vout->p_pic[i_index].psz_id != 0 )
+                {
+                    /* We also want to leave slots for images given in
+                     * mosaic-order that are not available in p_vout_picture */
                     int i;
                     for( i = 0; i < p_sys->i_order_length ; i++ )
                     {
-                        if( ! strcmp( p_sys->ppsz_order[i],
-                                    p_picture_vout->p_pic[i_index].psz_id ) )
+                        if( !strcmp( p_sys->ppsz_order[i],
+                                     p_picture_vout->p_pic[i_index].psz_id ) )
                         {
-                            i_numpics --;
+                            i_numpics--;
                             break;
                         }
                     }
@@ -324,41 +354,40 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             }
         }
         p_sys->i_rows = ((int)ceil(sqrt( (float)i_numpics )));
-        p_sys->i_cols = ( i_numpics%p_sys->i_rows == 0 ?
-                            i_numpics/p_sys->i_rows :
-                            i_numpics/p_sys->i_rows + 1 );
+        p_sys->i_cols = ( i_numpics % p_sys->i_rows == 0 ?
+                            i_numpics / p_sys->i_rows :
+                            i_numpics / p_sys->i_rows + 1 );
     }
 
     i_real_index = 0;
 
-    for( i_index = 0 ; i_index < p_picture_vout->i_picture_num ; i_index ++ )
+    for( i_index = 0; i_index < p_picture_vout->i_picture_num; i_index++ )
     {
+        picture_vout_e_t *p_pic = &p_picture_vout->p_pic[i_index];
+        video_format_t fmt_in = {0}, fmt_out = {0};
+        picture_t *p_converted;
+#ifdef IMAGE_2PASSES
+        video_format_t fmt_middle = {0};
+        picture_t *p_middle;
+#endif
 
-        video_format_t fmt_in = {0}, fmt_middle = {0}, fmt_out = {0};
-
-        picture_t *p_converted, *p_middle;
-
-        if(  p_picture_vout->p_pic[i_index].p_picture == NULL )
+        if( p_pic->i_status == PICTURE_VOUT_E_AVAILABLE
+             || p_pic->p_picture == NULL )
         {
-            break;
+            continue;
         }
 
-        if(  p_picture_vout->p_pic[i_index].i_status
-               == PICTURE_VOUT_E_AVAILABLE )
-        {
-            msg_Dbg( p_filter, "Picture Vout Element is empty");
-            break;
-        }
         if( p_sys->i_order_length == 0 )
-            i_real_index ++;
+        {
+            i_real_index++;
+        }
         else
         {
             int i;
-            for( i =0; i <= p_sys->i_order_length; i++ )
+            for( i = 0; i <= p_sys->i_order_length; i++ )
             {
                 if( i == p_sys->i_order_length ) break;
-                if( strcmp( p_picture_vout->p_pic[i_index].psz_id,
-                    p_sys->ppsz_order[ i ] ) == 0 )
+                if( strcmp( p_pic->psz_id, p_sys->ppsz_order[i] ) == 0 )
                 {
                     i_real_index = i;
                     break;
@@ -367,96 +396,120 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             if( i == p_sys->i_order_length )
                 i_real_index = ++i_greatest_real_index_used;
         }
-        i_row = ( i_real_index / p_sys->i_cols ) % p_sys->i_rows ;
+        i_row = ( i_real_index / p_sys->i_cols ) % p_sys->i_rows;
         i_col = i_real_index % p_sys->i_cols ;
 
-        /* Convert the images */
-/*        fprintf (stderr, "Input image %ix%i %4.4s\n",
-                  p_picture_vout->p_pic[i_index].p_picture->format.i_width,
-                  p_picture_vout->p_pic[i_index].p_picture->format.i_height,
-                  (char *)&p_picture_vout->p_pic[i_index].p_picture->format.i_chroma );*/
-
-        fmt_in.i_chroma = p_picture_vout->p_pic[i_index].
-                                                p_picture->format.i_chroma;
-        fmt_in.i_height = p_picture_vout->p_pic[i_index].
-                                                p_picture->format.i_height;
-        fmt_in.i_width = p_picture_vout->p_pic[i_index].
-                                                p_picture->format.i_width;
-
-
-        fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
-        fmt_out.i_width = fmt_in.i_width *
-            ( ( p_sys->i_width - ( p_sys->i_cols - 1 ) * p_sys->i_vborder )
-              / p_sys->i_cols ) / fmt_in.i_width;
-        fmt_out.i_height = fmt_in.i_height *
-            ( ( p_sys->i_height - ( p_sys->i_rows - 1 ) * p_sys->i_hborder )
-              / p_sys->i_rows ) / fmt_in.i_height;
-        if( p_sys->i_ar ) /* keep aspect ratio */
+        if( !p_sys->b_keep )
         {
-            if( (float)fmt_out.i_width/(float)fmt_out.i_height
-                > (float)fmt_in.i_width/(float)fmt_in.i_height )
+            /* Convert the images */
+            fmt_in.i_chroma = p_pic->p_picture->format.i_chroma;
+            fmt_in.i_height = p_pic->p_picture->format.i_height;
+            fmt_in.i_width = p_pic->p_picture->format.i_width;
+
+            fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+            fmt_out.i_width = fmt_in.i_width *
+                ( ( p_sys->i_width - ( p_sys->i_cols - 1 ) * p_sys->i_vborder )
+                  / p_sys->i_cols ) / fmt_in.i_width;
+            fmt_out.i_height = fmt_in.i_height *
+                ( ( p_sys->i_height - ( p_sys->i_rows - 1 ) * p_sys->i_hborder )
+                  / p_sys->i_rows ) / fmt_in.i_height;
+            if( p_sys->b_ar ) /* keep aspect ratio */
             {
-                fmt_out.i_width = ( fmt_out.i_height * fmt_in.i_width ) / fmt_in.i_height ;
-            } else {
-                fmt_out.i_height = ( fmt_out.i_width * fmt_in.i_height ) / fmt_in.i_width ;
+                if( (float)fmt_out.i_width / (float)fmt_out.i_height
+                      > (float)fmt_in.i_width / (float)fmt_in.i_height )
+                {
+                    fmt_out.i_width = ( fmt_out.i_height * fmt_in.i_width )
+                                         / fmt_in.i_height ;
+                }
+                else
+                {
+                    fmt_out.i_height = ( fmt_out.i_width * fmt_in.i_height )
+                                        / fmt_in.i_width ;
+                }
+             }
+
+            fmt_out.i_visible_width = fmt_out.i_width;
+            fmt_out.i_visible_height = fmt_out.i_height;
+
+#ifdef IMAGE_2PASSES
+            fmt_middle.i_chroma = fmt_in.i_chroma;
+            fmt_middle.i_visible_width = fmt_middle.i_width = fmt_out.i_width;
+            fmt_middle.i_visible_height = fmt_middle.i_height = fmt_out.i_height;
+
+            p_middle = image_Convert( p_sys->p_image2, p_pic->p_picture,
+                                      &fmt_in, &fmt_middle );
+            if( !p_middle )
+            {
+                msg_Warn( p_filter, "image resizing failed" );
+                continue;
             }
-         }
 
-        fmt_out.i_visible_width = fmt_out.i_width;
-        fmt_out.i_visible_height = fmt_out.i_height;
-
-        fmt_middle.i_chroma = fmt_in.i_chroma;
-        fmt_middle.i_visible_width = fmt_middle.i_width = fmt_out.i_width;
-        fmt_middle.i_visible_height = fmt_middle.i_height = fmt_out.i_height;
-
-        p_middle = image_Convert( p_sys->p_image,
-            p_picture_vout->p_pic[i_index].p_picture, &fmt_in, &fmt_middle );
-        if( !p_middle )
+            p_converted = image_Convert( p_sys->p_image, p_middle,
+                                         &fmt_middle, &fmt_out );
+            p_middle->pf_release( p_middle );
+#else
+            p_converted = image_Convert( p_sys->p_image, p_pic->p_picture,
+                                         &fmt_in, &fmt_out );
+#endif
+            if( !p_converted )
+            {
+                msg_Warn( p_filter, "image chroma conversion failed" );
+                continue;
+            }
+        }
+        else
         {
-            msg_Err( p_filter, "image resizing failed" );
-            p_filter->pf_sub_buffer_del( p_filter, p_spu );
-            vlc_mutex_unlock( &p_picture_vout->lock );
-            return NULL;
+            p_converted = p_pic->p_picture;
+            p_converted->i_refcount++;
+            fmt_in.i_width = fmt_out.i_width = p_converted->format.i_width;
+            fmt_in.i_height = fmt_out.i_height = p_converted->format.i_height;
+            fmt_in.i_chroma = fmt_out.i_chroma = p_converted->format.i_chroma;
+            fmt_out.i_visible_width = fmt_out.i_width;
+            fmt_out.i_visible_height = fmt_out.i_height;
         }
 
-        p_converted = image_Convert( p_sys->p_image2,
-                 p_middle, &fmt_middle, &fmt_out );
-        if( !p_converted )
-        {
-            msg_Err( p_filter, "image chroma convertion failed" );
-            p_filter->pf_sub_buffer_del( p_filter, p_spu );
-            vlc_mutex_unlock( &p_picture_vout->lock );
-            return NULL;
-        }
-
-/*        fprintf( stderr, "Converted %ix%i %4.4s\n", p_converted->format.i_width, p_converted->format.i_height, (char *)&p_converted->format.i_chroma);*/
-
-
-        p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt_out);
+        p_region = p_spu->pf_make_region( VLC_OBJECT(p_filter), &fmt_out,
+                                          p_converted );
         if( !p_region )
         {
             msg_Err( p_filter, "cannot allocate SPU region" );
             p_filter->pf_sub_buffer_del( p_filter, p_spu );
-            vlc_mutex_unlock( &p_picture_vout->lock );
+            vlc_mutex_unlock( lockval.p_address );
             return NULL;
         }
 
-        if( p_sys->i_ar ) /* keep aspect ratio */
+        /* HACK ALERT : let's fix the pointers to avoid picture duplication.
+         * This is necessary because p_region->picture is not a pointer
+         * as it ought to be. */
+        if( !p_sys->b_keep )
+        {
+            free( p_converted );
+        }
+        else
+        {
+            /* Keep a pointer to the original picture (and its refcount...). */
+            p_region->picture.p_sys = (picture_sys_t *)p_converted;
+            p_region->picture.pf_release = MosaicReleasePicture;
+        }
+
+        if( p_sys->b_ar || p_sys->b_keep ) /* keep aspect ratio */
         {
             /* center the video in the dedicated rectangle */
             p_region->i_x = p_sys->i_xoffset
-                            + i_col * ( p_sys->i_width / p_sys->i_cols )
-                            + ( i_col * p_sys->i_vborder ) / p_sys->i_cols
-                        + ( fmt_in.i_width *
-            ( ( p_sys->i_width - ( p_sys->i_cols - 1 ) * p_sys->i_vborder )
-              / p_sys->i_cols ) / fmt_in.i_width - fmt_out.i_width ) / 2;
+                        + i_col * ( p_sys->i_width / p_sys->i_cols )
+                        + ( i_col * p_sys->i_vborder ) / p_sys->i_cols
+                        + ( ( ( p_sys->i_width
+                                 - ( p_sys->i_cols - 1 ) * p_sys->i_vborder )
+                            / p_sys->i_cols ) - fmt_out.i_width ) / 2;
             p_region->i_y = p_sys->i_yoffset
                         + i_row * ( p_sys->i_height / p_sys->i_rows )
                         + ( i_row * p_sys->i_hborder ) / p_sys->i_rows
-                        + ( fmt_in.i_height *
-            ( ( p_sys->i_height - ( p_sys->i_rows - 1 ) * p_sys->i_hborder )
-              / p_sys->i_rows ) / fmt_in.i_height - fmt_out.i_height ) / 2;
-        } else {
+                        + ( ( ( p_sys->i_height
+                                 - ( p_sys->i_rows - 1 ) * p_sys->i_hborder )
+                            / p_sys->i_rows ) - fmt_out.i_height ) / 2;
+        }
+        else
+        {
             /* we don't have to center the video since it takes the
             whole rectangle area */
             p_region->i_x = p_sys->i_xoffset
@@ -467,21 +520,19 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                         + ( i_row * p_sys->i_hborder ) / p_sys->i_rows;
         }
 
-        if( p_region_prev == NULL ){
+        if( p_region_prev == NULL )
+        {
             p_spu->p_region = p_region;
-        } else {
+        }
+        else
+        {
             p_region_prev->p_next = p_region;
         }
 
         p_region_prev = p_region;
-
-        vout_CopyPicture( p_filter, &p_region->picture, p_converted );
-
-        p_middle->pf_release( p_middle );
-        p_converted->pf_release( p_converted );
     }
 
-    vlc_mutex_unlock( &p_picture_vout->lock );
+    vlc_mutex_unlock( lockval.p_address );
 
     return p_spu;
 }
@@ -489,7 +540,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 /*****************************************************************************
 * Callback to update params on the fly
 *****************************************************************************/
-
 static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
                             vlc_value_t oldval, vlc_value_t newval,
                             void *p_data )
@@ -546,9 +596,9 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
         else
         {
             msg_Dbg( p_this, "Changing position method from %d (%s) to %d (%s)",
-                             p_sys->i_pos, ppsz_pos_descriptions[p_sys->i_pos],
+                             p_sys->i_position, ppsz_pos_descriptions[p_sys->i_position],
                              newval.i_int, ppsz_pos_descriptions[newval.i_int]);
-            p_sys->i_pos = newval.i_int;
+            p_sys->i_position = newval.i_int;
         }
     }
     else if( !strcmp( psz_var, "mosaic-rows" ) )
@@ -568,12 +618,12 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
         if( newval.i_int )
         {
             msg_Dbg( p_this, "Keep aspect ratio" );
-            p_sys->i_ar = 1;
+            p_sys->b_ar = 1;
         }
         else
         {
             msg_Dbg( p_this, "Don't keep aspect ratio" );
-            p_sys->i_ar = 0;
+            p_sys->b_ar = 0;
         }
     }
     return VLC_SUCCESS;

@@ -273,6 +273,8 @@ struct subpicture_t
     /** Pointer to functions for region management */
     subpicture_region_t * ( *pf_create_region ) ( vlc_object_t *,
                                                   video_format_t * );
+    subpicture_region_t * ( *pf_make_region ) ( vlc_object_t *,
+                                                video_format_t *, picture_t * );
     void ( *pf_destroy_region ) ( vlc_object_t *, subpicture_region_t * );
 
     /** Private data - the subtitle plugin might want to put stuff here to
