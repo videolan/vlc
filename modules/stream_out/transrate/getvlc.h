@@ -20,15 +20,11 @@
 #define BOTTOM_FIELD 2
 #define FRAME_PICTURE 3
 
-/* remove num valid bits from bit_buf */
-#define DUMPBITS(bit_buf,bits,num) Flush_Bits(num)
-#define COPYBITS(bit_buf,bits,num) Copy_Bits(num)
-
 /* take num bits from the high part of bit_buf and zero extend them */
-#define UBITS(bit_buf,num) (((uint32_t)(inbitbuf)) >> (32 - (num)))
+#define UBITS(bit_buf,num) (((uint32_t)(bs->i_bit_in_cache)) >> (32 - (num)))
 
 /* take num bits from the high part of bit_buf and sign extend them */
-#define SBITS(bit_buf,num) (((int32_t)(inbitbuf)) >> (32 - (num)))
+#define SBITS(bit_buf,num) (((int32_t)(bs->i_bit_in_cache)) >> (32 - (num)))
 
 typedef struct {
     uint8_t modes;
