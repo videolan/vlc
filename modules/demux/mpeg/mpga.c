@@ -29,6 +29,8 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#include "vlc_meta.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -58,6 +60,8 @@ struct demux_sys_t
     mtime_t         i_time;
 
     int             i_bitrate_avg;  /* extracted from Xing header */
+
+    vlc_meta_t      *meta;
 
     es_out_id_t     *p_es;
 };
@@ -165,9 +169,19 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
-    /* skip possible id3 header */
+    p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_sys->i_time = 1;
+    p_sys->i_bitrate_avg = 0;
+    p_sys->meta = NULL;
+
+    /* skip/parse possible id3 header */
     if( ( p_id3 = module_Need( p_demux, "id3", NULL, 0 ) ) )
     {
+        p_sys->meta = (vlc_meta_t *)p_demux->p_private;
+        /* temporary */
+        msg_Dbg( p_demux, "Title : %s",
+                 vlc_meta_GetValue( p_sys->meta,VLC_META_TITLE ) );
+        p_demux->p_private = NULL;
         module_Unneed( p_demux, p_id3 );
     }
 
@@ -209,9 +223,6 @@ static int Open( vlc_object_t * p_this )
 
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->i_time = 1;
-    p_sys->i_bitrate_avg = 0;
 
     es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', 'g', 'a' ) );
 
@@ -388,8 +399,21 @@ static void Close( vlc_object_t * p_this )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
-    return demux2_vaControlHelper( p_demux->s,
-                                   0, -1,
-                                   p_sys->i_bitrate_avg, 1, i_query, args );
+
+    vlc_meta_t **pp_meta;
+
+    switch( i_query )
+    {
+        case DEMUX_GET_META:
+            pp_meta = (vlc_meta_t **)va_arg( args, vlc_meta_t** );
+            *pp_meta = vlc_meta_Duplicate( p_sys->meta );
+            return VLC_SUCCESS;
+
+        default:
+            return demux2_vaControlHelper( p_demux->s,
+                                           0, -1,
+                                           p_sys->i_bitrate_avg, 1, i_query,
+                                           args );
+    }
 }
 

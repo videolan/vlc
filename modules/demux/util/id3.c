@@ -49,38 +49,25 @@ vlc_module_end();
  ****************************************************************************/
 static int SkipID3Tag( vlc_object_t *p_this )
 {
-    input_thread_t *p_input = NULL;
+    demux_t *p_demux = (demux_t *)p_this;
     uint8_t *p_peek;
     int i_size;
     uint8_t version, revision;
     int b_footer;
 
-    if ( p_this->i_object_type == VLC_OBJECT_INPUT )
-    {
-        p_input = (input_thread_t *)p_this;
-    }
-    if( p_input == NULL )
-    {
-        p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
-        if( p_input == NULL )
-        {
-            return VLC_EGENERIC;
-        }
-    }
+    p_demux->p_private = NULL;
 
-    msg_Dbg( p_input, "checking for ID3 tag" );
+    msg_Dbg( p_demux, "checking for ID3 tag" );
 
     /* get 10 byte id3 header */
-    if( stream_Peek( p_input->s, &p_peek, 10 ) < 10 )
+    if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
     {
-        msg_Err( p_input, "cannot peek()" );
-        vlc_object_release( p_input );
+        msg_Err( p_demux, "cannot peek()" );
         return VLC_EGENERIC;
     }
 
     if( p_peek[0] != 'I' || p_peek[1] != 'D' || p_peek[2] != '3' )
     {
-        vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
 
@@ -98,11 +85,10 @@ static int SkipID3Tag( vlc_object_t *p_this )
     i_size += 10;
 
     /* Skip the entire tag */
-    stream_Read( p_input->s, NULL, i_size );
+    stream_Read( p_demux->s, NULL, i_size );
 
-    msg_Dbg( p_input, "ID3v2.%d revision %d tag found, skiping %d bytes",
+    msg_Dbg( p_demux, "ID3v2.%d revision %d tag found, skiping %d bytes",
              version, revision, i_size );
 
-    vlc_object_release( p_input );
     return VLC_SUCCESS;
 }
