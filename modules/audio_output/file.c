@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.27 2004/01/25 18:53:07 gbazin Exp $
+ * $Id: file.c,v 1.28 2004/02/03 23:31:46 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -69,6 +69,21 @@ struct aout_sys_t
     WAVEHEADER waveh;                      /* Wave header of the output file */
 };
 
+#define CHANNELS_MAX 6
+static int pi_channels_maps[CHANNELS_MAX+1] =
+{
+    0,
+    AOUT_CHAN_CENTER,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+    AOUT_CHAN_CENTER | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
+     | AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE
+};
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -79,10 +94,14 @@ static void    Play        ( aout_instance_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define FORMAT_TEXT N_("Output Format")
+#define FORMAT_TEXT N_("Output format")
 #define FORMAT_LONGTEXT N_("One of \"u8\", \"s8\", \"u16\", \"s16\", " \
-                        "\"u16_le\", \"s16_le\", \"u16_be\", " \
-                        "\"s16_be\", \"fixed32\", \"float32\" or \"spdif\"")
+    "\"u16_le\", \"s16_le\", \"u16_be\", \"s16_be\", \"fixed32\", " \
+    "\"float32\" or \"spdif\"")
+#define CHANNELS_TEXT N_("Output channels number")
+#define CHANNELS_LONGTEXT N_("By default, all the channels of the incoming " \
+    "will be saved but you can restrict the number of channels here.")
+
 #define WAV_TEXT N_("Add wave header")
 #define WAV_LONGTEXT N_("Instead of writing a raw file, you can add a wav " \
                         "header to the file")
@@ -101,7 +120,7 @@ static int format_int[] = { VLC_FOURCC('u','8',' ',' '),
                             VLC_FOURCC('f','l','3','2'),
                             VLC_FOURCC('s','p','i','f') };
 
-#define FILE_TEXT N_("Output File")
+#define FILE_TEXT N_("Output file")
 #define FILE_LONGTEXT N_("File to which the audio samples will be written to")
 
 vlc_module_begin();
@@ -110,7 +129,9 @@ vlc_module_begin();
     add_string( "audiofile-format", "s16", NULL,
                 FORMAT_TEXT, FORMAT_LONGTEXT, VLC_TRUE );
         change_string_list( format_list, 0, 0 );
-    add_file( "audiofile", "audiofile.wav", NULL, FILE_TEXT,
+    add_integer( "audiofile-channels", 0, NULL,
+                 CHANNELS_TEXT, CHANNELS_LONGTEXT, VLC_TRUE );
+    add_file( "audiofile-file", "audiofile.wav", NULL, FILE_TEXT,
               FILE_LONGTEXT, VLC_FALSE );
     add_bool( "audiofile-wav", 1, NULL, WAV_TEXT, WAV_LONGTEXT, VLC_TRUE );
 
@@ -126,12 +147,22 @@ vlc_module_end();
 static int Open( vlc_object_t * p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
-    char * psz_name = config_GetPsz( p_this, "audiofile" );
-    char * psz_format = config_GetPsz( p_aout, "audiofile-format" );
+    char * psz_name, * psz_format;
     char ** ppsz_compare = format_list;
-    int i = 0;
+    vlc_value_t val;
+    int i_channels, i = 0;
 
-   /* Allocate structure */
+    var_Create( p_this, "audiofile-file", VLC_VAR_STRING|VLC_VAR_DOINHERIT );
+    var_Get( p_this, "audiofile-file", &val );
+    psz_name = val.psz_string;
+    if( !psz_name || !*psz_name )
+    {
+        msg_Err( p_aout, "you need to specify an output file name" );
+        if( psz_name ) free( psz_name );
+        return VLC_EGENERIC;
+    }
+
+    /* Allocate structure */
     p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->output.p_sys == NULL )
     {
@@ -144,10 +175,15 @@ static int Open( vlc_object_t * p_this )
     if ( p_aout->output.p_sys->p_file == NULL )
     {
         free( p_aout->output.p_sys );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     p_aout->output.pf_play = Play;
+
+    /* Audio format */
+    var_Create( p_this, "audiofile-format", VLC_VAR_STRING|VLC_VAR_DOINHERIT );
+    var_Get( p_this, "audiofile-format", &val );
+    psz_format = val.psz_string;
 
     while ( *ppsz_compare != NULL )
     {
@@ -164,7 +200,7 @@ static int Open( vlc_object_t * p_this )
                  psz_format );
         fclose( p_aout->output.p_sys->p_file );
         free( p_aout->output.p_sys );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     p_aout->output.output.i_format = format_int[i];
@@ -181,8 +217,22 @@ static int Open( vlc_object_t * p_this )
         aout_VolumeSoftInit( p_aout );
     }
 
-    p_aout->output.p_sys->b_add_wav_header =
-        config_GetInt( p_this, "audiofile-wav" );
+    /* Channels number */
+    var_Create( p_this, "audiofile-channels",
+                VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    var_Get( p_this, "audiofile-channels", &val );
+    i_channels = val.i_int;
+
+    if( i_channels > 0 && i_channels <= CHANNELS_MAX )
+    {
+        p_aout->output.output.i_physical_channels =
+            pi_channels_maps[i_channels];
+    }
+
+    /* WAV header */
+    var_Create( p_this, "audiofile-wav", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+    var_Get( p_this, "audiofile-wav", &val );
+    p_aout->output.p_sys->b_add_wav_header = val.b_bool;
 
     if( p_aout->output.p_sys->b_add_wav_header )
     {
