@@ -173,7 +173,7 @@ dnl
 dnl Gettext stuff
 dnl
 ALL_LINGUAS="de en_GB fr it ja no ru nl pl sv"
-AM_GNU_GETTEXT_VERSION(0.10.40)
+AM_GNU_GETTEXT_VERSION(0.11.5)
 AM_GNU_GETTEXT
 if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
   AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, Define if we use the local libintl)
