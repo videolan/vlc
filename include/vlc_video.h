@@ -241,10 +241,9 @@ struct subpicture_t
     /**@{*/
     mtime_t         i_start;                  /**< beginning of display date */
     mtime_t         i_stop;                         /**< end of display date */
-    vlc_bool_t      b_ephemer;     /**< If this flag is set to true
-                                      the subtitle will be displayed
-                                      untill the next one appear */
-    vlc_bool_t      b_fade;        /**< enable fading */
+    vlc_bool_t      b_ephemer;    /**< If this flag is set to true the subtitle
+                                will be displayed untill the next one appear */
+    vlc_bool_t      b_fade;                               /**< enable fading */
     /**@}*/
 
     subpicture_region_t *p_region;  /**< region list composing this subtitle */
@@ -258,6 +257,7 @@ struct subpicture_t
     int          i_y;                    /**< offset from alignment position */
     int          i_width;                                 /**< picture width */
     int          i_height;                               /**< picture height */
+    int          i_alpha;                                  /**< transparency */
     int          i_original_picture_width;  /**< original width of the movie */
     int          i_original_picture_height;/**< original height of the movie */
     int          b_absolute;                       /**< position is absolute */
