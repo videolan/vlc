@@ -49,6 +49,7 @@ PLUGINS_DIR :=	a52 \
 		mpeg_adec \
 		mpeg_vdec \
 		network \
+		ogg \
 		qnx \
 		qt \
 		satellite \
@@ -130,6 +131,7 @@ PLUGINS_TARGETS := a52/a52 \
 		mpeg_vdec/mpeg_vdec \
 		network/ipv4 \
 		network/ipv6 \
+		ogg/vorbis \
 		qnx/qnx \
 		qt/qt \
 		satellite/satellite \

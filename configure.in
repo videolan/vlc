@@ -704,13 +704,26 @@ dnl
 dnl  a52 AC3 decoder plugin
 dnl
 AC_ARG_ENABLE(a52,
-  [  --disable-a52           AC3 support with liba52 (default enabled)])
+  [  --enable-a52            AC3 support with liba52 (default enabled)])
 if test "x$enableval" != "xno" -a x$SYS != xmingw32
   then
     AC_CHECK_HEADERS(a52dec/a52.h, [
       BUILTINS="${BUILTINS} a52"
       LIB_A52="${LIB_A52} -la52 -lm"
      ],[])
+fi
+
+dnl
+dnl  ogg vorbis plugin
+dnl
+AC_ARG_ENABLE(vorbis,
+  [  --enable-vorbis             Ogg/Vorbis decoder support (default enabled)])
+if test "x$enableval" != "xno"
+then
+  AC_CHECK_HEADERS(ogg/ogg.h, [
+    PLUGINS="${PLUGINS} vorbis"
+    LIB_VORBIS="${LIB_VORBIS} -lvorbis"
+   ],[])
 fi
 
 dnl
@@ -724,7 +737,7 @@ dnl  X11 module
 dnl  (enabled by default except on win32)
 dnl
 AC_ARG_ENABLE(x11,
-  [  --disable-x11           X11 support (default enabled)])
+  [  --enable-x11            X11 support (default enabled)])
 if test x$enable_x11 != xno &&
   (test x$SYS != xmingw32 || test x$enable_x11 = xyes); then
   if test x$x_includes = xNONE; then
@@ -748,7 +761,7 @@ dnl  XVideo module
 dnl  (enabled by default except on win32)
 dnl
 AC_ARG_ENABLE(xvideo,
-  [  --disable-xvideo        XVideo support (default enabled)])
+  [  --enable-xvideo         XVideo support (default enabled)])
 if test x$enable_xvideo != xno &&
   (test x$SYS != xmingw32 || test x$enable_xvideo = xyes); then
   if test x$x_includes = xNONE; then
@@ -780,7 +793,7 @@ dnl
 dnl  SDL module
 dnl
 AC_ARG_ENABLE(sdl,
-  [  --disable-sdl           SDL support (default enabled)])
+  [  --enable-sdl            SDL support (default enabled)])
 if test "x$enable_sdl" != "xno"
 then
   SDL_PATH=$PATH
@@ -1027,7 +1040,7 @@ dnl
 dnl  Gtk+ module
 dnl
 AC_ARG_ENABLE(gtk,
-  [  --disable-gtk           Gtk+ support (default enabled)])
+  [  --enable-gtk            Gtk+ support (default enabled)])
 if test x$enable_gtk != xno
 then
   GTK_PATH=$PATH
@@ -1422,6 +1435,7 @@ AC_SUBST(LIB_QT)
 AC_SUBST(LIB_RC)
 AC_SUBST(LIB_SDL)
 AC_SUBST(LIB_VCD)
+AC_SUBST(LIB_VORBIS)
 AC_SUBST(LIB_WAVEOUT)
 AC_SUBST(LIB_WIN32)
 AC_SUBST(LIB_X11)

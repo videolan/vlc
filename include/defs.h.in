@@ -250,6 +250,9 @@
 /* Define if you have the <nl_types.h> header file.  */
 #undef HAVE_NL_TYPES_H
 
+/* Define if you have the <ogg/ogg.h> header file.  */
+#undef HAVE_OGG_OGG_H
+
 /* Define if you have the <pthread.h> header file.  */
 #undef HAVE_PTHREAD_H
 

@@ -4,7 +4,14 @@
 
 HEAD
 
-  * fixed ./plugins/gtk/gtk_callbacks.c to use the dvd_device config option.
+  * ./plugins/ogg/*: added preliminary files for an Ogg/Vorbis decoder a
+    contributor is currently working on.
+  * ALL: removed libdvdcss from the vlc tree.
+  * ALL: removed libdvdread from the vlc tree.
+  * ./acconfig.h: removed this file.
+  * ./plugins/dvd/dummy_dvdcss.c: merged this file into dvd.c.
+  * ./AUTHORS: moved a few gentlemen to the libdvdcss AUTHORS file.
+  * ./plugins/gtk/gtk_callbacks.c: use the dvd_device config option.
   * ./po/ja.po: added Japanese translation from Fumio Nakayama
     <endymion@ca2.so-net.ne.jp>.
   * ./plugins/gtk/gtk_callbacks.c: fixed disc ejection code.
