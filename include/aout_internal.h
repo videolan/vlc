@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.29 2002/11/09 18:28:36 sam Exp $
+ * $Id: aout_internal.h,v 1.30 2002/11/10 14:31:46 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -138,6 +138,9 @@ typedef struct aout_mixer_t
 /*****************************************************************************
  * aout_input_t : input stream for the audio output
  *****************************************************************************/
+#define AOUT_RESAMPLING_NONE     0
+#define AOUT_RESAMPLING_UP       1
+#define AOUT_RESAMPLING_DOWN     2
 struct aout_input_t
 {
     /* When this lock is taken, the pipeline cannot be changed by a
@@ -154,6 +157,9 @@ struct aout_input_t
     /* resamplers */
     aout_filter_t *         pp_resamplers[AOUT_MAX_FILTERS];
     int                     i_nb_resamplers;
+    int                     i_resampling_type;
+    mtime_t                 i_resamp_start_date;
+    int                     i_resamp_start_drift;
 
     aout_fifo_t             fifo;
 

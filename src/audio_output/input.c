@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.18 2002/11/08 10:26:53 gbazin Exp $
+ * $Id: input.c,v 1.19 2002/11/10 14:31:46 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -98,6 +98,10 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             return -1;
         }
 
+        /* Setup the initial rate of the resampler */
+        p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
+        p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
+
         aout_FiltersHintBuffers( p_aout, p_input->pp_resamplers,
                                  p_input->i_nb_resamplers,
                                  &p_input->input_alloc );
@@ -168,8 +172,11 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         vlc_mutex_lock( &p_aout->input_fifos_lock );
         aout_FifoSet( p_aout, &p_input->fifo, 0 );
         vlc_mutex_unlock( &p_aout->input_fifos_lock );
+        p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
+        p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
+        msg_Warn( p_aout, "timing screwed, stopping resampling" );
         start_date = 0;
-    } 
+    }
 
     if ( p_buffer->start_date < mdate() + AOUT_MIN_PREPARE_TIME )
     {
@@ -188,8 +195,11 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     aout_FiltersPlay( p_aout, p_input->pp_filters, p_input->i_nb_filters,
                       &p_buffer );
 
-    if ( start_date < p_buffer->start_date - AOUT_PTS_TOLERANCE
-          || start_date > p_buffer->start_date + AOUT_PTS_TOLERANCE )
+    /* Run the resampler if needed.
+     * We first need to calculate the output rate of this resampler. */
+    if ( ( p_input->i_resampling_type == AOUT_RESAMPLING_NONE ) &&
+         ( start_date < p_buffer->start_date - AOUT_PTS_TOLERANCE
+           || start_date > p_buffer->start_date + AOUT_PTS_TOLERANCE ) )
     {
         /* Can happen in several circumstances :
          * 1. A problem at the input (clock drift)
@@ -198,48 +208,82 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          *    synchronization
          * Solution : resample the buffer to avoid a scratch.
          */
-        int i_ratio;
-        mtime_t old_duration;
         mtime_t drift = p_buffer->start_date - start_date;
 
-        msg_Warn( p_aout, "buffer is "I64Fd" %s, resampling",
-                         drift > 0 ? drift : -drift,
-                         drift > 0 ? "in advance" : "late" );
-        old_duration = p_buffer->end_date - p_buffer->start_date;
-        duration = p_buffer->end_date - start_date;
-        i_ratio = (duration * 100) / old_duration;
-        /* If the ratio is too != 100, the sound quality will be awful. */
-        if ( i_ratio < 100 - AOUT_MAX_RESAMPLING /* % */ )
-        {
-            duration = (old_duration * (100 - AOUT_MAX_RESAMPLING)) / 100;
-        }
-        if ( i_ratio > 100 + AOUT_MAX_RESAMPLING /* % */ )
-        {
-            duration = (old_duration * (100 + AOUT_MAX_RESAMPLING)) / 100;
-        }
-        p_input->pp_resamplers[0]->input.i_rate 
-            = (p_input->input.i_rate * old_duration) / duration;
+        p_input->i_resamp_start_date = mdate();
+        p_input->i_resamp_start_drift = drift;
 
+        if ( drift > 0 )
+            p_input->i_resampling_type = AOUT_RESAMPLING_DOWN;
+        else
+            p_input->i_resampling_type = AOUT_RESAMPLING_UP;
+
+        msg_Warn( p_aout, "buffer is "I64Fd" %s, triggering %ssampling",
+                          drift > 0 ? drift : -drift,
+                          drift > 0 ? "in advance" : "late",
+                          drift > 0 ? "down" : "up");
+    }
+
+    if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
+    {
+        /* Resampling has been triggered previously (because of dates
+         * mismatch). We want the resampling to happen progressively so
+         * it isn't too audible to the listener. */
+
+        if( p_input->i_resampling_type == AOUT_RESAMPLING_UP )
+        {
+            p_input->pp_resamplers[0]->input.i_rate += 10; /* Hz */
+        }
+        else
+        {
+            p_input->pp_resamplers[0]->input.i_rate -= 10; /* Hz */
+        }
+
+        /* Check if everything is back to normal, in which case we can stop the
+         * resampling */
+        if( p_input->pp_resamplers[0]->input.i_rate ==
+              p_input->input.i_rate )
+        {
+            p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
+            msg_Warn( p_aout, "resampling stopped after "I64Fi" usec",
+                      mdate() - p_input->i_resamp_start_date );
+        }
+        else if( abs( p_buffer->start_date - start_date ) <
+                 abs( p_input->i_resamp_start_drift ) / 2 )
+        {
+            /* if we reduced the drift from half, then it is time to switch
+             * back the resampling direction. */
+            if( p_input->i_resampling_type == AOUT_RESAMPLING_UP )
+                p_input->i_resampling_type = AOUT_RESAMPLING_DOWN;
+            else
+                p_input->i_resampling_type = AOUT_RESAMPLING_UP;
+            p_input->i_resamp_start_drift = 0;
+        }
+        else if( p_input->i_resamp_start_drift &&
+                 ( abs( p_buffer->start_date - start_date ) >
+                   abs( p_input->i_resamp_start_drift ) ) )
+        {
+            /* If the drift is increasing and not decreasing, than something
+             * is bad. We'd better stop the resampling right now. */
+            msg_Warn( p_aout, "timing screwed, stopping resampling" );
+            p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
+            p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
+        }
+    }
+
+    /* Actually run the resampler now. */
+    if ( p_aout->mixer.mixer.i_rate !=
+         p_input->pp_resamplers[0]->input.i_rate )
+    {
         aout_FiltersPlay( p_aout, p_input->pp_resamplers,
                           p_input->i_nb_resamplers,
                           &p_buffer );
     }
-    else
-    {
-        duration = p_buffer->end_date - p_buffer->start_date;
-
-        if ( p_input->input.i_rate != p_aout->mixer.mixer.i_rate )
-        {
-            /* Standard resampling is needed ! */
-            p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
-
-            aout_FiltersPlay( p_aout, p_input->pp_resamplers,
-                              p_input->i_nb_resamplers,
-                              &p_buffer );
-        }
-    }
 
     /* Adding the start date will be managed by aout_FifoPush(). */
+    duration = ( p_buffer->end_date - p_buffer->start_date ) *
+               p_input->pp_resamplers[0]->input.i_rate / p_input->input.i_rate;
+
     p_buffer->start_date = start_date;
     p_buffer->end_date = start_date + duration;
 

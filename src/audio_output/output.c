@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.22 2002/11/08 10:26:53 gbazin Exp $
+ * $Id: output.c,v 1.23 2002/11/10 14:31:46 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -231,9 +231,9 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
     {
         /* Try to compensate the drift by doing some resampling. */
         int i;
-        mtime_t difference = p_buffer->start_date - start_date;
-        msg_Warn( p_aout, "output date isn't PTS date, resampling ("I64Fd")",
-                  difference );
+        mtime_t difference = start_date - p_buffer->start_date;
+        msg_Warn( p_aout, "output date isn't PTS date, requesting "
+                  "resampling ("I64Fd")", difference );
 
         vlc_mutex_lock( &p_aout->input_fifos_lock );
         for ( i = 0; i < p_aout->i_nb_inputs; i++ )
