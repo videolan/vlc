@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-05-24 14:40+0200\n"
+"POT-Creation-Date: 2003-05-27 23:43+0200\n"
 "PO-Revision-Date: 2003-01-09 02:37+0900\n"
 "Last-Translator: Fumio Nakayama <endymion@ca2.so-net.ne.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -29,7 +29,7 @@ msgid "Audio channels"
 msgstr "オーディオ・チャンネルの選択"
 
 #: src/audio_output/output.c:107 src/audio_output/output.c:142
-#: modules/audio_output/alsa.c:165 modules/audio_output/directx.c:423
+#: modules/audio_output/alsa.c:167 modules/audio_output/directx.c:423
 #: modules/audio_output/oss.c:202 modules/audio_output/sdl.c:181
 #: modules/audio_output/sdl.c:198 modules/audio_output/waveout.c:358
 msgid "Stereo"
@@ -117,7 +117,7 @@ msgstr "リスト"
 
 #: src/input/input_programs.c:94 modules/gui/gtk/gnome_interface.c:1078
 #: modules/gui/gtk/gtk_interface.c:1199 modules/gui/kde/interface.cpp:142
-#: modules/gui/macosx/intf.m:347 modules/gui/macosx/intf.m:348
+#: modules/gui/macosx/intf.m:370 modules/gui/macosx/intf.m:371
 msgid "Program"
 msgstr "プログラム"
 
@@ -125,18 +125,18 @@ msgstr "プログラム"
 #: modules/gui/beos/MediaControlView.cpp:1258
 #: modules/gui/gtk/gnome_interface.c:1650 modules/gui/gtk/gtk_interface.c:1956
 #: modules/gui/gtk/menu.c:1402 modules/gui/gtk/menu.c:1423
-#: modules/gui/kde/interface.cpp:144 modules/gui/macosx/intf.m:349
-#: modules/gui/macosx/intf.m:350 modules/gui/macosx/open.m:149
-#: modules/gui/wxwindows/open.cpp:382
+#: modules/gui/kde/interface.cpp:144 modules/gui/macosx/intf.m:372
+#: modules/gui/macosx/intf.m:373 modules/gui/macosx/open.m:149
+#: modules/gui/wxwindows/open.cpp:393
 msgid "Title"
 msgstr "タイトル"
 
 #: src/input/input_programs.c:102 modules/gui/beos/MediaControlView.cpp:1259
 #: modules/gui/gtk/gnome_interface.c:1640 modules/gui/gtk/gtk_interface.c:1946
 #: modules/gui/gtk/menu.c:1019 modules/gui/gtk/menu.c:1432
-#: modules/gui/kde/interface.cpp:146 modules/gui/macosx/intf.m:351
-#: modules/gui/macosx/intf.m:352 modules/gui/macosx/open.m:150
-#: modules/gui/wxwindows/open.cpp:388
+#: modules/gui/kde/interface.cpp:146 modules/gui/macosx/intf.m:374
+#: modules/gui/macosx/intf.m:375 modules/gui/macosx/open.m:150
+#: modules/gui/wxwindows/open.cpp:399
 msgid "Chapter"
 msgstr "チャプター"
 
@@ -190,7 +190,7 @@ msgstr "チャプター"
 msgid "Previous Chapter"
 msgstr "チャプター"
 
-#: src/input/input_programs.c:668
+#: src/input/input_programs.c:668 src/video_output/video_output.c:397
 msgid "Disable"
 msgstr ""
 
@@ -203,34 +203,34 @@ msgstr ""
 msgid "C"
 msgstr "ja"
 
-#: src/libvlc.c:301 src/libvlc.c:1357
+#: src/libvlc.c:301 src/libvlc.c:1364
 #, c-format
 msgid ""
 "Usage: %s [options] [items]...\n"
 "\n"
 msgstr ""
 
-#: src/libvlc.c:1189 src/misc/configuration.c:961
+#: src/libvlc.c:1196 src/misc/configuration.c:961
 msgid "string"
 msgstr "文字列"
 
-#: src/libvlc.c:1206 src/misc/configuration.c:946
+#: src/libvlc.c:1213 src/misc/configuration.c:946
 msgid "integer"
 msgstr "整数"
 
-#: src/libvlc.c:1209 src/misc/configuration.c:953
+#: src/libvlc.c:1216 src/misc/configuration.c:953
 msgid "float"
 msgstr "浮動小数点"
 
-#: src/libvlc.c:1215
+#: src/libvlc.c:1222
 msgid " (default enabled)"
 msgstr " (デフォルト：有効)"
 
-#: src/libvlc.c:1216
+#: src/libvlc.c:1223
 msgid " (default disabled)"
 msgstr " (デフォルト：無効)"
 
-#: src/libvlc.c:1332 src/libvlc.c:1387 src/libvlc.c:1411
+#: src/libvlc.c:1339 src/libvlc.c:1394 src/libvlc.c:1418
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -238,11 +238,11 @@ msgstr ""
 "\n"
 "続けるにはEnterキーを押してください。\n"
 
-#: src/libvlc.c:1360
+#: src/libvlc.c:1367
 msgid "[module]              [description]\n"
 msgstr "[モジュール]          [説明]\n"
 
-#: src/libvlc.c:1405
+#: src/libvlc.c:1412
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -1117,15 +1117,15 @@ msgstr "インタフェース"
 #: modules/demux/ogg.c:554 modules/demux/ogg.c:813 modules/demux/ogg.c:986
 #: modules/gui/beos/InterfaceWindow.cpp:259
 #: modules/gui/gtk/gnome_interface.c:1092 modules/gui/gtk/gtk_interface.c:1219
-#: modules/gui/macosx/intf.m:354 modules/gui/macosx/output.m:150
+#: modules/gui/macosx/intf.m:377 modules/gui/macosx/output.m:155
 msgid "Audio"
 msgstr "オーディオ"
 
 #: src/libvlc.h:473 modules/demux/asf/asf.c:302 modules/demux/avi/avi.c:1203
 #: modules/demux/ogg.c:613 modules/demux/ogg.c:653 modules/demux/ogg.c:718
 #: modules/demux/ogg.c:893 modules/gui/gtk/gnome_interface.c:1099
-#: modules/gui/gtk/gtk_interface.c:1296 modules/gui/macosx/intf.m:365
-#: modules/gui/macosx/macosx.m:66 modules/gui/macosx/output.m:140
+#: modules/gui/gtk/gtk_interface.c:1296 modules/gui/macosx/intf.m:388
+#: modules/gui/macosx/macosx.m:66 modules/gui/macosx/output.m:144
 #: modules/misc/dummy/dummy.c:83 modules/video_output/directx/directx.c:112
 msgid "Video"
 msgstr "ビデオ"
@@ -1157,8 +1157,8 @@ msgstr ""
 #: modules/gui/familiar/interface.c:610 modules/gui/gtk/gnome_interface.c:643
 #: modules/gui/gtk/gnome_interface.c:2384
 #: modules/gui/gtk/gnome_interface.c:2409 modules/gui/gtk/gtk_interface.c:747
-#: modules/gui/gtk/gtk_interface.c:2697 modules/gui/macosx/intf.m:297
-#: modules/gui/macosx/intf.m:385 modules/gui/wxwindows/interface.cpp:351
+#: modules/gui/gtk/gtk_interface.c:2697 modules/gui/macosx/intf.m:320
+#: modules/gui/macosx/intf.m:408 modules/gui/wxwindows/interface.cpp:352
 #: modules/gui/wxwindows/playlist.cpp:102
 msgid "Playlist"
 msgstr "リスト"
@@ -1201,11 +1201,42 @@ msgstr "バージョン情報の印刷"
 msgid "boolean"
 msgstr "真偽値"
 
-#: src/video_output/video_output.c:382 modules/gui/beos/VideoOutput.cpp:1138
+#: src/video_output/video_output.c:384 modules/gui/beos/VideoOutput.cpp:1138
 #: modules/gui/macosx/controls.m:342 modules/gui/macosx/controls.m:486
-#: modules/gui/macosx/intf.m:370
+#: modules/gui/macosx/intf.m:393
 msgid "Fullscreen"
 msgstr "全画面化"
+
+#: src/video_output/video_output.c:395 modules/gui/gtk/gnome_interface.c:183
+#: modules/gui/gtk/gnome_interface.c:966 modules/gui/gtk/gtk_interface.c:553
+#: modules/gui/gtk/gtk_interface.c:1349 modules/gui/macosx/controls.m:526
+#: modules/gui/macosx/intf.m:401 modules/gui/macosx/intf.m:402
+#: modules/video_filter/deinterlace/deinterlace.c:81
+msgid "Deinterlace"
+msgstr "ノンインタレース化"
+
+#: src/video_output/video_output.c:399
+#, fuzzy
+msgid "Discard"
+msgstr "ディスク"
+
+#: src/video_output/video_output.c:401
+msgid "Blend"
+msgstr ""
+
+#: src/video_output/video_output.c:403
+#, fuzzy
+msgid "Mean"
+msgstr "メディア"
+
+#: src/video_output/video_output.c:405
+msgid "Bob"
+msgstr ""
+
+#: src/video_output/video_output.c:407
+#, fuzzy
+msgid "Linear"
+msgstr "整数"
 
 #: modules/access/cdda.c:86 modules/access/file.c:69 modules/access/ftp.c:86
 #: modules/access/http.c:80 modules/access/mms/mms.c:57
@@ -1375,6 +1406,26 @@ msgstr ""
 msgid "Microsoft Media Server (MMS) input"
 msgstr ""
 
+#: modules/access_output/dummy.c:56
+#, fuzzy
+msgid "Dummy stream ouput"
+msgstr "ストリームの出力先の選択"
+
+#: modules/access_output/file.c:58
+#, fuzzy
+msgid "File stream ouput"
+msgstr "ストリームの出力先の選択"
+
+#: modules/access_output/http.c:54
+#, fuzzy
+msgid "HTTP stream ouput"
+msgstr "ストリームの出力先の選択"
+
+#: modules/access_output/udp.c:73
+#, fuzzy
+msgid "UDP stream ouput"
+msgstr "ストリームの出力先の選択"
+
 #: modules/access/satellite/satellite.c:41
 #, fuzzy
 msgid "Satellite default transponder frequency"
@@ -1474,35 +1525,6 @@ msgstr "Video4Linux入力モジュール"
 #, fuzzy
 msgid "VCD input"
 msgstr "VCD入力モジュール"
-
-#: modules/access/vlcs.c:131 modules/misc/sap.c:131
-msgid "SAP"
-msgstr ""
-
-#: modules/access/vlcs.c:134
-#, fuzzy
-msgid "SAP interface module"
-msgstr "インタフェース・モジュール"
-
-#: modules/access_output/dummy.c:56
-#, fuzzy
-msgid "Dummy stream ouput"
-msgstr "ストリームの出力先の選択"
-
-#: modules/access_output/file.c:58
-#, fuzzy
-msgid "File stream ouput"
-msgstr "ストリームの出力先の選択"
-
-#: modules/access_output/http.c:54
-#, fuzzy
-msgid "HTTP stream ouput"
-msgstr "ストリームの出力先の選択"
-
-#: modules/access_output/udp.c:73
-#, fuzzy
-msgid "UDP stream ouput"
-msgstr "ストリームの出力先の選択"
 
 #: modules/audio_filter/channel_mixer/headphone.c:48
 #, fuzzy
@@ -1677,13 +1699,13 @@ msgstr "ALSAオーディオ・モジュール"
 msgid "Audio device"
 msgstr "DVDデバイス"
 
-#: modules/audio_output/alsa.c:159 modules/audio_output/directx.c:435
+#: modules/audio_output/alsa.c:161 modules/audio_output/directx.c:435
 #: modules/audio_output/oss.c:222 modules/audio_output/sdl.c:182
 #: modules/audio_output/sdl.c:201 modules/audio_output/waveout.c:371
 msgid "Mono"
 msgstr "モノラル"
 
-#: modules/audio_output/alsa.c:201 modules/audio_output/directx.c:478
+#: modules/audio_output/alsa.c:203 modules/audio_output/directx.c:478
 #: modules/audio_output/oss.c:246 modules/audio_output/waveout.c:387
 msgid "A/52 over S/PDIF"
 msgstr ""
@@ -1852,23 +1874,150 @@ msgstr "DVビデオ・デコーダ"
 msgid "AAC audio decoder (using libfaad2)"
 msgstr "AACデコーダ・モジュール (libfaad2)"
 
-#: modules/codec/ffmpeg/ffmpeg.c:154
-msgid "ffmpeg"
+#: modules/codec/ffmpeg/ffmpeg.c:86
+msgid "Direct rendering"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:88
+msgid "Error resilience"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:90
+msgid ""
+"ffmpeg can make errors resiliences.          \n"
+"Nevertheless, with buggy encoder (like ISO MPEG-4 encoder from M$) this will "
+"produce a lot of errors.\n"
+"Valid range is -1 to 99 (-1 disable all errors resiliences)."
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:95
+msgid "Workaround bugs"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:97
+msgid ""
+"Try to fix some bugs\n"
+"1  autodetect\n"
+"2  old msmpeg4\n"
+"4  xvid interlaced\n"
+"8  ump4 \n"
+"16 no padding\n"
+"32 ac vlc64 Qpel chroma"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:106
+msgid "Hurry up"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:108
+msgid ""
+"Allow the decoder to partially decode or skip frame(s) when there not enough "
+"time.\n"
+" It's usefull with low CPU power but it could produce broken pictures."
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:112
+#, fuzzy
+msgid "Truncated stream"
+msgstr "ストリームの再生"
+
+#: modules/codec/ffmpeg/ffmpeg.c:113
+msgid "truncated stream -1:auto,0:disable,:1:enable"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:115
+#, fuzzy
+msgid "Post processing quality"
+msgstr "後処理"
+
+#: modules/codec/ffmpeg/ffmpeg.c:117
+msgid ""
+"Quality of post processing\n"
+"Valid range is 0 to 6"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:120
+msgid "Ffmpeg postproc filter chains"
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:157
+#, fuzzy
+msgid "Ffmpeg postprocessing module"
+msgstr "ffmpeg 後処理モジュール"
+
+#: modules/codec/ffmpeg/ffmpeg.c:159
+#, fuzzy
+msgid "Auto-level Post processing quality"
+msgstr "C 後処理モジュール"
+
+#: modules/codec/ffmpeg/ffmpeg.c:161
+msgid ""
+"Post processing quality is selected upon time left but no more than "
+"requested quality\n"
+"Not yet implemented !"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:165
+msgid "Force vertical luminance deblocking"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:166
+msgid "Force vertical luminance deblocking (override other settings)"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:168
+msgid "Force horizontal luminance deblocking"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:169
+msgid "Force horizontal luminance deblocking (override other settings)"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:171
+msgid "Force vertical chrominance deblocking"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:172
+msgid "Force vertical chrominance deblocking (override other settings)"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:174
+msgid "Force horizontal chrominance deblocking"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:175
+msgid "Force horizontal chrominance deblocking (override other settings)"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:177
+msgid "Force luminance deringing"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:178
+msgid "Force luminance deringing (override other settings)"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:180
+msgid "Force chrominance deringing"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:181
+msgid "Force chrominance deringing (override other settings)"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:184
+msgid "ffmpeg"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.c:187
 msgid "ffmpeg audio/video decoder((MS)MPEG4,SVQ1,H263,WMV,WMA)"
 msgstr "ffmpeg オーディオ／ビデオ・デコーダ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
 
-#: modules/codec/ffmpeg/ffmpeg.c:168
+#: modules/codec/ffmpeg/ffmpeg.c:195
 msgid "Post processing"
 msgstr "後処理"
 
-#: modules/codec/ffmpeg/ffmpeg.c:177
-msgid "ffmpeg postprocessing module"
-msgstr "ffmpeg 後処理モジュール"
-
-#: modules/codec/ffmpeg/ffmpeg.c:204
+#: modules/codec/ffmpeg/ffmpeg.c:215
 msgid "ffmpeg chroma conversion"
 msgstr ""
 
@@ -1892,7 +2041,7 @@ msgstr "MMXエクステンション後処理モジュール"
 msgid "flac audio decoder"
 msgstr "疑似AC3オーディオ・デコーダ"
 
-#: modules/codec/libmpeg2.c:89
+#: modules/codec/libmpeg2.c:90
 #, fuzzy
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "MPEG 1/2ビデオ・デコーダ・モジュール"
@@ -1910,14 +2059,14 @@ msgstr ""
 msgid "MPEG I/II layer 1/2 audio decoder"
 msgstr "MPEG 1/2ビデオ・デコーダ・モジュール"
 
-#: modules/codec/mpeg_video/idct/idct.c:41
-msgid "IDCT"
-msgstr ""
-
 #: modules/codec/mpeg_video/idct/idctaltivec.c:45
 #, fuzzy
 msgid "AltiVec IDCT"
 msgstr "Altivec IDCTモジュール"
+
+#: modules/codec/mpeg_video/idct/idct.c:41
+msgid "IDCT"
+msgstr ""
 
 #: modules/codec/mpeg_video/idct/idctclassic.c:41
 #, fuzzy
@@ -1934,11 +2083,6 @@ msgstr "MMX IDCTモジュール"
 msgid "MMX EXT IDCT"
 msgstr "MMXエクステンションIDCTモジュール"
 
-#: modules/codec/mpeg_video/motion/motion.c:42
-#, fuzzy
-msgid "motion compensation"
-msgstr "モーション補正モジュール"
-
 #: modules/codec/mpeg_video/motion/motion3dnow.c:44
 #, fuzzy
 msgid "3D Now! motion compensation"
@@ -1948,6 +2092,11 @@ msgstr "3D Now!モーション補正モジュール"
 #, fuzzy
 msgid "AltiVec motion compensation"
 msgstr "AltiVecモーション補正モジュール"
+
+#: modules/codec/mpeg_video/motion/motion.c:42
+#, fuzzy
+msgid "motion compensation"
+msgstr "モーション補正モジュール"
 
 #: modules/codec/mpeg_video/motion/motionmmx.c:45
 #, fuzzy
@@ -2141,20 +2290,20 @@ msgstr "VLCを終了"
 #: modules/control/lirc/lirc.c:297 modules/control/lirc/lirc.c:323
 #: modules/gui/familiar/interface.c:177 modules/gui/gtk/gnome_interface.c:602
 #: modules/gui/gtk/gnome_interface.c:1020 modules/gui/gtk/gtk_interface.c:709
-#: modules/gui/gtk/gtk_interface.c:1119 modules/gui/macosx/intf.m:879
-#: modules/gui/macosx/intf.m:880 modules/gui/macosx/intf.m:881
-#: modules/gui/wxwindows/interface.cpp:810
+#: modules/gui/gtk/gtk_interface.c:1119 modules/gui/macosx/intf.m:902
+#: modules/gui/macosx/intf.m:903 modules/gui/macosx/intf.m:904
+#: modules/gui/wxwindows/interface.cpp:811
 msgid "Pause"
 msgstr "一時停止"
 
 #: modules/control/lirc/lirc.c:310 modules/gui/familiar/interface.c:190
 #: modules/gui/gtk/gnome_interface.c:590
 #: modules/gui/gtk/gnome_interface.c:1013 modules/gui/gtk/gtk_interface.c:698
-#: modules/gui/macosx/intf.m:300 modules/gui/macosx/intf.m:338
-#: modules/gui/macosx/intf.m:399 modules/gui/macosx/intf.m:886
-#: modules/gui/macosx/intf.m:887 modules/gui/macosx/intf.m:888
-#: modules/gui/macosx/playlist.m:178 modules/gui/wxwindows/interface.cpp:348
-#: modules/gui/wxwindows/interface.cpp:815
+#: modules/gui/macosx/intf.m:323 modules/gui/macosx/intf.m:361
+#: modules/gui/macosx/intf.m:422 modules/gui/macosx/intf.m:909
+#: modules/gui/macosx/intf.m:910 modules/gui/macosx/intf.m:911
+#: modules/gui/macosx/playlist.m:178 modules/gui/wxwindows/interface.cpp:349
+#: modules/gui/wxwindows/interface.cpp:816
 msgid "Play"
 msgstr "再生"
 
@@ -2213,8 +2362,8 @@ msgstr ""
 #: modules/demux/avi/avi.c:1171 modules/demux/ogg.c:821
 #: modules/demux/ogg.c:994 modules/gui/gtk/gnome_interface.c:148
 #: modules/gui/gtk/gnome_interface.c:931 modules/gui/gtk/gtk_interface.c:481
-#: modules/gui/gtk/gtk_interface.c:1282 modules/gui/macosx/intf.m:360
-#: modules/gui/macosx/intf.m:361
+#: modules/gui/gtk/gtk_interface.c:1282 modules/gui/macosx/intf.m:383
+#: modules/gui/macosx/intf.m:384
 msgid "Channels"
 msgstr "チャンネル"
 
@@ -2240,7 +2389,7 @@ msgstr "行数"
 #: modules/demux/avi/avi.c:1234 modules/demux/ogg.c:554
 #: modules/demux/ogg.c:613 modules/demux/ogg.c:653 modules/demux/ogg.c:718
 #: modules/demux/ogg.c:813 modules/demux/ogg.c:893 modules/demux/ogg.c:986
-#: modules/gui/familiar/interface.c:370 modules/gui/macosx/output.m:130
+#: modules/gui/familiar/interface.c:370 modules/gui/macosx/output.m:134
 msgid "Type"
 msgstr "タイプ"
 
@@ -2908,7 +3057,7 @@ msgstr ""
 #: modules/gui/beos/InterfaceWindow.cpp:201
 #: modules/gui/beos/InterfaceWindow.cpp:300
 #: modules/gui/familiar/interface.c:149 modules/gui/familiar/interface.c:150
-#: modules/gui/macosx/intf.m:304 modules/gui/macosx/prefs.m:75
+#: modules/gui/macosx/intf.m:327 modules/gui/macosx/prefs.m:75
 #: modules/gui/wxwindows/preferences.cpp:229
 msgid "Preferences"
 msgstr "設定..."
@@ -2917,7 +3066,7 @@ msgstr "設定..."
 #: modules/gui/beos/InterfaceWindow.cpp:298
 #: modules/gui/gtk/gnome_interface.c:2692 modules/gui/gtk/gtk_interface.c:2947
 #: modules/gui/kde/info.cpp:9 modules/gui/kde/messages.cpp:8
-#: modules/gui/macosx/intf.m:310 modules/gui/macosx/intf.m:387
+#: modules/gui/macosx/intf.m:333 modules/gui/macosx/intf.m:410
 #: modules/gui/wxwindows/messages.cpp:79
 msgid "Messages"
 msgstr "メッセージ"
@@ -2932,16 +3081,16 @@ msgstr "メッセージ"
 #: modules/gui/gtk/gtk_interface.c:1884 modules/gui/gtk/gtk_interface.c:2733
 #: modules/gui/gtk/gtk_interface.c:2850 modules/gui/gtk/gtk_interface.c:3102
 #: modules/gui/macosx/open.m:141 modules/gui/macosx/open.m:264
-#: modules/gui/macosx/output.m:121 modules/gui/macosx/output.m:194
-#: modules/gui/macosx/output.m:279 modules/gui/wxwindows/interface.cpp:335
+#: modules/gui/macosx/output.m:125 modules/gui/macosx/output.m:200
+#: modules/gui/macosx/output.m:285 modules/gui/wxwindows/interface.cpp:336
 #: modules/gui/wxwindows/open.cpp:276 modules/gui/wxwindows/streamout.cpp:340
 msgid "File"
 msgstr "ファイル"
 
 #: modules/gui/beos/InterfaceWindow.cpp:240
 #: modules/gui/beos/PlayListWindow.cpp:84
-#: modules/gui/gtk/gnome_interface.c:2179
-#: modules/gui/gtk2/gnome2_interface.c:113 modules/gui/macosx/open.m:332
+#: modules/gui/gtk2/gnome2_interface.c:113
+#: modules/gui/gtk/gnome_interface.c:2179 modules/gui/macosx/open.m:332
 #: modules/gui/macosx/open.m:630 modules/gui/macosx/open.m:677
 msgid "Open File"
 msgstr "ファイルを開く"
@@ -2964,7 +3113,7 @@ msgid "About"
 msgstr "VideoLANについて"
 
 #: modules/gui/beos/InterfaceWindow.cpp:256 modules/gui/kde/interface.cpp:93
-#: modules/gui/macosx/intf.m:376 modules/gui/macosx/intf.m:377
+#: modules/gui/macosx/intf.m:399 modules/gui/macosx/intf.m:400
 msgid "Subtitles"
 msgstr "字幕"
 
@@ -3003,8 +3152,8 @@ msgid "Speed"
 msgstr "選択済み"
 
 #: modules/gui/beos/InterfaceWindow.cpp:286 modules/gui/macosx/controls.m:422
-#: modules/gui/macosx/intf.m:299 modules/gui/macosx/intf.m:341
-#: modules/gui/wxwindows/interface.cpp:357
+#: modules/gui/macosx/intf.m:322 modules/gui/macosx/intf.m:364
+#: modules/gui/wxwindows/interface.cpp:358
 msgid "Slower"
 msgstr "スロー"
 
@@ -3013,12 +3162,12 @@ msgid "Normal"
 msgstr ""
 
 #: modules/gui/beos/InterfaceWindow.cpp:290 modules/gui/macosx/controls.m:421
-#: modules/gui/macosx/intf.m:302 modules/gui/macosx/intf.m:340
-#: modules/gui/wxwindows/interface.cpp:359
+#: modules/gui/macosx/intf.m:325 modules/gui/macosx/intf.m:363
+#: modules/gui/wxwindows/interface.cpp:360
 msgid "Faster"
 msgstr "早送り"
 
-#: modules/gui/beos/InterfaceWindow.cpp:295 modules/gui/macosx/intf.m:381
+#: modules/gui/beos/InterfaceWindow.cpp:295 modules/gui/macosx/intf.m:404
 msgid "Window"
 msgstr "ウィンドウ"
 
@@ -3032,7 +3181,7 @@ msgstr "リスト"
 #: modules/gui/gtk/gtk_interface.c:2638 modules/gui/gtk/gtk_interface.c:2869
 #: modules/gui/gtk/gtk_interface.c:2976 modules/gui/gtk/gtk_interface.c:3250
 #: modules/gui/gtk/preferences.c:605 modules/gui/macosx/open.m:138
-#: modules/gui/macosx/open.m:179 modules/gui/macosx/output.m:117
+#: modules/gui/macosx/open.m:179 modules/gui/macosx/output.m:121
 #: modules/gui/wxwindows/fileinfo.cpp:96
 #: modules/gui/wxwindows/messages.cpp:102 modules/gui/wxwindows/open.cpp:267
 #: modules/gui/wxwindows/preferences.cpp:250
@@ -3054,16 +3203,16 @@ msgstr "字幕の選択"
 msgid "Drop files to play"
 msgstr ""
 
-#: modules/gui/beos/PlayListWindow.cpp:93 modules/gui/wxwindows/menus.cpp:167
+#: modules/gui/beos/PlayListWindow.cpp:93 modules/gui/wxwindows/menus.cpp:169
 #: modules/gui/wxwindows/playlist.cpp:154
 msgid "Close"
 msgstr "閉じる"
 
-#: modules/gui/beos/PlayListWindow.cpp:98 modules/gui/macosx/intf.m:330
+#: modules/gui/beos/PlayListWindow.cpp:98 modules/gui/macosx/intf.m:353
 msgid "Edit"
 msgstr "編集"
 
-#: modules/gui/beos/PlayListWindow.cpp:100 modules/gui/macosx/intf.m:335
+#: modules/gui/beos/PlayListWindow.cpp:100 modules/gui/macosx/intf.m:358
 #: modules/gui/macosx/playlist.m:180
 msgid "Select All"
 msgstr "すべてを選択"
@@ -3116,24 +3265,24 @@ msgstr "名前"
 #: modules/gui/beos/PreferencesWindow.cpp:44
 #: modules/gui/beos/PreferencesWindow.cpp:46
 #: modules/gui/beos/PreferencesWindow.cpp:98
-#: modules/gui/gtk/gnome_interface.c:2216 modules/gui/macosx/prefs.m:607
-#: modules/gui/macosx/prefs.m:615 modules/gui/macosx/prefs.m:685
+#: modules/gui/gtk/gnome_interface.c:2216 modules/gui/macosx/prefs.m:690
+#: modules/gui/macosx/prefs.m:698 modules/gui/macosx/prefs.m:768
 msgid "Modules"
 msgstr "モジュール"
 
-#: modules/gui/beos/PreferencesWindow.cpp:220
+#: modules/gui/beos/PreferencesWindow.cpp:219
 #: modules/gui/gtk/preferences.c:609
 msgid "Apply"
 msgstr "適用"
 
-#: modules/gui/beos/PreferencesWindow.cpp:225
+#: modules/gui/beos/PreferencesWindow.cpp:224
 #: modules/gui/gtk/preferences.c:596 modules/gui/gtk/preferences.c:613
-#: modules/gui/macosx/output.m:332 modules/gui/macosx/prefs.m:76
+#: modules/gui/macosx/output.m:338 modules/gui/macosx/prefs.m:76
 #: modules/gui/wxwindows/preferences.cpp:254
 msgid "Save"
 msgstr "保存"
 
-#: modules/gui/beos/PreferencesWindow.cpp:229
+#: modules/gui/beos/PreferencesWindow.cpp:228
 #, fuzzy
 msgid "Defaults"
 msgstr "削除"
@@ -3174,6 +3323,7 @@ msgid "Take Screen Shot"
 msgstr ""
 
 #: modules/gui/beos/VlcWrapper.cpp:185 modules/gui/gtk/menu.c:733
+#: modules/gui/macosx/prefs.m:348
 msgid "None"
 msgstr "なし"
 
@@ -3202,8 +3352,8 @@ msgstr "Gtk+インタフェース・モジュール"
 msgid "VLC media player"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:124 modules/gui/wxwindows/open.cpp:652
-#: modules/gui/wxwindows/preferences.cpp:965
+#: modules/gui/familiar/interface.c:124 modules/gui/wxwindows/open.cpp:663
+#: modules/gui/wxwindows/preferences.cpp:967
 #: modules/gui/wxwindows/subtitles.cpp:196
 msgid "Open file"
 msgstr "ファイルを開く"
@@ -3227,8 +3377,8 @@ msgstr "ストリームの再生"
 #: modules/gui/familiar/interface.c:203 modules/gui/gtk/gnome_interface.c:566
 #: modules/gui/gtk/gnome_interface.c:1027 modules/gui/gtk/gtk_interface.c:676
 #: modules/gui/gtk/gtk_interface.c:1127 modules/gui/macosx/controls.m:435
-#: modules/gui/macosx/intf.m:301 modules/gui/macosx/intf.m:339
-#: modules/gui/macosx/intf.m:400 modules/gui/wxwindows/interface.cpp:346
+#: modules/gui/macosx/intf.m:324 modules/gui/macosx/intf.m:362
+#: modules/gui/macosx/intf.m:423 modules/gui/wxwindows/interface.cpp:347
 msgid "Stop"
 msgstr "停止"
 
@@ -3260,7 +3410,7 @@ msgstr "UDPマルチキャスト"
 
 #: modules/gui/familiar/interface.c:412 modules/gui/gtk/gnome_interface.c:1747
 #: modules/gui/gtk/gtk_interface.c:2062 modules/gui/macosx/open.m:160
-#: modules/gui/macosx/output.m:124 modules/gui/wxwindows/open.cpp:445
+#: modules/gui/macosx/output.m:128 modules/gui/wxwindows/open.cpp:456
 #: modules/gui/wxwindows/streamout.cpp:380
 msgid "Address"
 msgstr "ホスト名/アドレス"
@@ -3270,13 +3420,13 @@ msgstr "ホスト名/アドレス"
 #: modules/gui/gtk/gnome_interface.c:2912 modules/gui/gtk/gtk_interface.c:2052
 #: modules/gui/gtk/gtk_interface.c:2101 modules/gui/gtk/gtk_interface.c:3225
 #: modules/gui/macosx/open.m:159 modules/gui/macosx/open.m:161
-#: modules/gui/macosx/output.m:125 modules/gui/wxwindows/open.cpp:430
-#: modules/gui/wxwindows/open.cpp:453 modules/gui/wxwindows/streamout.cpp:390
+#: modules/gui/macosx/output.m:129 modules/gui/wxwindows/open.cpp:441
+#: modules/gui/wxwindows/open.cpp:464 modules/gui/wxwindows/streamout.cpp:390
 msgid "Port"
 msgstr "ポート番号"
 
-#: modules/gui/familiar/interface.c:478 modules/gui/macosx/output.m:127
-#: modules/gui/macosx/output.m:221 modules/gui/macosx/output.m:289
+#: modules/gui/familiar/interface.c:478 modules/gui/macosx/output.m:131
+#: modules/gui/macosx/output.m:227 modules/gui/macosx/output.m:295
 #: modules/gui/wxwindows/streamout.cpp:341
 msgid "HTTP"
 msgstr ""
@@ -3363,10 +3513,10 @@ msgstr ""
 "VideoLAN Clientは、MPEG, MPEG 2, MP3 DivXをローカルおよび、ネットワーク上の"
 "ソースから再生できるプレイヤーです。"
 
-#: modules/gui/familiar/support.c:121 modules/gui/gtk/gnome_support.c:100
+#: modules/gui/familiar/support.c:121 modules/gui/gtk2/gnome2_support.c:60
+#: modules/gui/gtk2/gnome2_support.c:85 modules/gui/gtk2/gtk2_support.c:90
+#: modules/gui/gtk2/gtk2_support.c:114 modules/gui/gtk/gnome_support.c:100
 #: modules/gui/gtk/gnome_support.c:138 modules/gui/gtk/gtk_support.c:121
-#: modules/gui/gtk2/gnome2_support.c:60 modules/gui/gtk2/gnome2_support.c:85
-#: modules/gui/gtk2/gtk2_support.c:90 modules/gui/gtk2/gtk2_support.c:114
 #, c-format
 msgid "Couldn't find pixmap file: %s"
 msgstr "ピックスマップ・ファイル %s が見つかりません。"
@@ -3375,6 +3525,69 @@ msgstr "ピックスマップ・ファイル %s が見つかりません。"
 #, c-format
 msgid "Error loading pixmap file: %s"
 msgstr "ピックスマップ・ファイル %s のロードでエラーが発生しました。"
+
+#: modules/gui/gtk2/gnome2.c:54 modules/gui/gtk2/gtk2.c:55
+#, fuzzy
+msgid "Gtk2 interface"
+msgstr "Gtk+インタフェース・モジュール"
+
+#: modules/gui/gtk2/gnome2_interface.c:31
+#, fuzzy
+msgid "_New"
+msgstr "表示(_V)"
+
+#: modules/gui/gtk2/gnome2_interface.c:87
+msgid "gnome2"
+msgstr ""
+
+#: modules/gui/gtk2/gnome2_interface.c:112
+msgid "button4"
+msgstr ""
+
+#: modules/gui/gtk2/gnome2_interface.c:122
+#: modules/gui/gtk2/gtk2_interface.c:183
+msgid "button3"
+msgstr ""
+
+#: modules/gui/gtk2/gnome2_interface.c:123 modules/gui/macosx/output.m:337
+msgid "Save File"
+msgstr "ファイルの保存"
+
+#: modules/gui/gtk2/gtk2_interface.c:67
+#, fuzzy
+msgid "window1"
+msgstr "ウィンドウ"
+
+#: modules/gui/gtk2/gtk2_interface.c:77 modules/gui/gtk/gtk_interface.c:147
+#: modules/gui/gtk/gtk_interface.c:1373
+msgid "_File"
+msgstr "ファイル(_F)"
+
+#: modules/gui/gtk2/gtk2_interface.c:109
+#, fuzzy
+msgid "_Edit"
+msgstr "編集"
+
+#: modules/gui/gtk2/gtk2_interface.c:132 modules/gui/gtk/gtk_interface.c:268
+msgid "_View"
+msgstr "表示(_V)"
+
+#: modules/gui/gtk2/gtk2_interface.c:139 modules/gui/gtk/gtk_interface.c:569
+msgid "_Help"
+msgstr "ヘルプ(_H)"
+
+#: modules/gui/gtk2/gtk2_interface.c:146
+#, fuzzy
+msgid "_About"
+msgstr "VideoLANについて"
+
+#: modules/gui/gtk2/gtk2_interface.c:163
+msgid "button1"
+msgstr ""
+
+#: modules/gui/gtk2/gtk2_interface.c:173
+msgid "button2"
+msgstr ""
 
 #: modules/gui/gtk/gnome.c:55 modules/gui/gtk/gtk.c:57
 #, fuzzy
@@ -3424,7 +3637,7 @@ msgstr "ファイルを開く(_O)..."
 #: modules/gui/gtk/gnome_interface.c:20 modules/gui/gtk/gnome_interface.c:504
 #: modules/gui/gtk/gnome_interface.c:986 modules/gui/gtk/gtk_interface.c:173
 #: modules/gui/gtk/gtk_interface.c:619 modules/gui/gtk/gtk_interface.c:1399
-#: modules/gui/wxwindows/interface.cpp:230
+#: modules/gui/wxwindows/interface.cpp:231
 #, fuzzy
 msgid "Open a file"
 msgstr "ファイルを開く"
@@ -3527,25 +3740,25 @@ msgstr "オーディオ・チャンネルの選択"
 
 #: modules/gui/gtk/gnome_interface.c:126 modules/gui/gtk/gnome_interface.c:909
 #: modules/gui/gtk/gtk_interface.c:452 modules/gui/gtk/gtk_interface.c:1253
-#: modules/gui/macosx/intf.m:355
+#: modules/gui/macosx/intf.m:378
 msgid "Volume Up"
 msgstr "ボリュームを上げる"
 
 #: modules/gui/gtk/gnome_interface.c:133 modules/gui/gtk/gnome_interface.c:916
 #: modules/gui/gtk/gtk_interface.c:459 modules/gui/gtk/gtk_interface.c:1260
-#: modules/gui/macosx/intf.m:356
+#: modules/gui/macosx/intf.m:379
 msgid "Volume Down"
 msgstr "ボリュームを下げる"
 
 #: modules/gui/gtk/gnome_interface.c:140 modules/gui/gtk/gnome_interface.c:923
 #: modules/gui/gtk/gtk_interface.c:466 modules/gui/gtk/gtk_interface.c:1267
-#: modules/gui/macosx/controls.m:482 modules/gui/macosx/intf.m:357
+#: modules/gui/macosx/controls.m:482 modules/gui/macosx/intf.m:380
 msgid "Mute"
 msgstr "ミュートする"
 
 #: modules/gui/gtk/gnome_interface.c:155 modules/gui/gtk/gnome_interface.c:938
 #: modules/gui/gtk/gtk_interface.c:488 modules/gui/gtk/gtk_interface.c:1289
-#: modules/gui/macosx/intf.m:362 modules/gui/macosx/intf.m:363
+#: modules/gui/macosx/intf.m:385 modules/gui/macosx/intf.m:386
 msgid "Device"
 msgstr "DVDデバイス"
 
@@ -3564,18 +3777,10 @@ msgstr "字幕の選択"
 msgid "_Fullscreen"
 msgstr "全画面化(_F)"
 
-#: modules/gui/gtk/gnome_interface.c:183 modules/gui/gtk/gnome_interface.c:966
-#: modules/gui/gtk/gtk_interface.c:553 modules/gui/gtk/gtk_interface.c:1349
-#: modules/gui/macosx/controls.m:526 modules/gui/macosx/intf.m:378
-#: modules/gui/macosx/intf.m:379
-#: modules/video_filter/deinterlace/deinterlace.c:81
-msgid "Deinterlace"
-msgstr "ノンインタレース化"
-
 #: modules/gui/gtk/gnome_interface.c:190 modules/gui/gtk/gnome_interface.c:973
 #: modules/gui/gtk/gtk_interface.c:560 modules/gui/gtk/gtk_interface.c:1356
-#: modules/gui/macosx/intf.m:374 modules/gui/macosx/intf.m:375
-#: modules/gui/macosx/output.m:120 modules/gui/macosx/vout.m:199
+#: modules/gui/macosx/intf.m:397 modules/gui/macosx/intf.m:398
+#: modules/gui/macosx/output.m:124 modules/gui/macosx/vout.m:199
 msgid "Screen"
 msgstr "スクリーン"
 
@@ -3593,18 +3798,18 @@ msgstr "ビデオ"
 #: modules/gui/gtk/gnome_interface.c:2267 modules/gui/gtk/gtk_interface.c:629
 #: modules/gui/gtk/gtk_interface.c:816 modules/gui/gtk/gtk_interface.c:2005
 #: modules/gui/gtk/gtk_interface.c:2726 modules/gui/macosx/open.m:142
-#: modules/gui/macosx/open.m:268 modules/gui/wxwindows/interface.cpp:337
+#: modules/gui/macosx/open.m:268 modules/gui/wxwindows/interface.cpp:338
 #: modules/gui/wxwindows/open.cpp:278
 msgid "Disc"
 msgstr "ディスク"
 
 #: modules/gui/gtk/gnome_interface.c:527 modules/gui/gtk/gtk_interface.c:640
-#: modules/gui/wxwindows/interface.cpp:339
+#: modules/gui/wxwindows/interface.cpp:340
 msgid "Net"
 msgstr "Network"
 
 #: modules/gui/gtk/gnome_interface.c:539 modules/gui/gtk/gtk_interface.c:651
-#: modules/gui/wxwindows/interface.cpp:342
+#: modules/gui/wxwindows/interface.cpp:343
 msgid "Sat"
 msgstr "衛星"
 
@@ -3666,7 +3871,7 @@ msgstr "プレイリストを開く"
 #: modules/gui/gtk/gnome_interface.c:1063 modules/gui/gtk/gtk_interface.c:758
 #: modules/gui/gtk/gtk_interface.c:844 modules/gui/gtk/gtk_interface.c:888
 #: modules/gui/gtk/gtk_interface.c:1173
-#: modules/gui/wxwindows/interface.cpp:353
+#: modules/gui/wxwindows/interface.cpp:354
 msgid "Prev"
 msgstr "前"
 
@@ -3679,8 +3884,8 @@ msgstr "前のファイル"
 #: modules/gui/gtk/gnome_interface.c:1056 modules/gui/gtk/gtk_interface.c:769
 #: modules/gui/gtk/gtk_interface.c:852 modules/gui/gtk/gtk_interface.c:896
 #: modules/gui/gtk/gtk_interface.c:1166 modules/gui/macosx/controls.m:443
-#: modules/gui/macosx/intf.m:303 modules/gui/macosx/intf.m:343
-#: modules/gui/macosx/intf.m:401 modules/gui/wxwindows/interface.cpp:355
+#: modules/gui/macosx/intf.m:326 modules/gui/macosx/intf.m:366
+#: modules/gui/macosx/intf.m:424 modules/gui/wxwindows/interface.cpp:356
 msgid "Next"
 msgstr "次"
 
@@ -3781,8 +3986,8 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1998 modules/gui/gtk/gtk_interface.c:1877
 #: modules/gui/gtk/gtk_interface.c:2315 modules/gui/macosx/open.m:145
 #: modules/gui/macosx/open.m:151 modules/gui/macosx/open.m:173
-#: modules/gui/macosx/output.m:123 modules/gui/wxwindows/open.cpp:246
-#: modules/gui/wxwindows/open.cpp:343
+#: modules/gui/macosx/output.m:127 modules/gui/wxwindows/open.cpp:246
+#: modules/gui/wxwindows/open.cpp:354
 #: modules/gui/wxwindows/preferences.cpp:778
 #: modules/gui/wxwindows/streamout.cpp:367
 #: modules/gui/wxwindows/subtitles.cpp:107
@@ -3790,24 +3995,24 @@ msgid "Browse..."
 msgstr "ブラウズ..."
 
 #: modules/gui/gtk/gnome_interface.c:1586 modules/gui/gtk/gtk_interface.c:1901
-#: modules/gui/wxwindows/open.cpp:368
+#: modules/gui/wxwindows/open.cpp:379
 msgid "Disc type"
 msgstr "ディスク・タイプ"
 
 #: modules/gui/gtk/gnome_interface.c:1605 modules/gui/gtk/gtk_interface.c:1920
 #: modules/gui/macosx/open.m:155 modules/gui/macosx/open.m:488
-#: modules/gui/wxwindows/open.cpp:362
+#: modules/gui/wxwindows/open.cpp:373
 msgid "DVD"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1613 modules/gui/gtk/gtk_interface.c:1928
 #: modules/gui/macosx/open.m:156 modules/gui/macosx/open.m:382
-#: modules/gui/macosx/open.m:472 modules/gui/wxwindows/open.cpp:363
+#: modules/gui/macosx/open.m:472 modules/gui/wxwindows/open.cpp:374
 msgid "VCD"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1621 modules/gui/gtk/gtk_interface.c:1936
-#: modules/gui/macosx/open.m:148 modules/gui/wxwindows/open.cpp:374
+#: modules/gui/macosx/open.m:148 modules/gui/wxwindows/open.cpp:385
 msgid "Device name"
 msgstr "デバイス名"
 
@@ -3818,24 +4023,24 @@ msgstr "DVDメニューを使用"
 
 #: modules/gui/gtk/gnome_interface.c:1707 modules/gui/gtk/gtk_interface.c:2022
 #: modules/gui/macosx/open.m:164 modules/gui/macosx/open.m:547
-#: modules/gui/macosx/open.m:585 modules/gui/wxwindows/open.cpp:409
+#: modules/gui/macosx/open.m:585 modules/gui/wxwindows/open.cpp:420
 msgid "UDP/RTP"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1717 modules/gui/gtk/gtk_interface.c:2032
 #: modules/gui/macosx/open.m:165 modules/gui/macosx/open.m:548
-#: modules/gui/macosx/open.m:597 modules/gui/wxwindows/open.cpp:410
+#: modules/gui/macosx/open.m:597 modules/gui/wxwindows/open.cpp:421
 msgid "UDP/RTP Multicast"
 msgstr "UDPマルチキャスト"
 
 #: modules/gui/gtk/gnome_interface.c:1727 modules/gui/gtk/gtk_interface.c:2042
 #: modules/gui/macosx/open.m:166 modules/gui/macosx/open.m:549
-#: modules/gui/macosx/open.m:610 modules/gui/wxwindows/open.cpp:411
+#: modules/gui/macosx/open.m:610 modules/gui/wxwindows/open.cpp:422
 msgid "HTTP/FTP/MMS"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1759 modules/gui/gtk/gtk_interface.c:2074
-#: modules/gui/macosx/open.m:162 modules/gui/wxwindows/open.cpp:467
+#: modules/gui/macosx/open.m:162 modules/gui/wxwindows/open.cpp:478
 msgid "URL"
 msgstr ""
 
@@ -3885,7 +4090,7 @@ msgid "fps"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2049 modules/gui/gtk/gtk_interface.c:2369
-#: modules/gui/macosx/open.m:172 modules/gui/macosx/output.m:116
+#: modules/gui/macosx/open.m:172 modules/gui/macosx/output.m:120
 #: modules/gui/wxwindows/open.cpp:201 modules/gui/wxwindows/open.cpp:223
 #, fuzzy
 msgid "Settings..."
@@ -3967,14 +4172,14 @@ msgid "Destination Target: "
 msgstr "送信先のアスペクト・レシオ"
 
 #: modules/gui/gtk/gnome_interface.c:2857 modules/gui/gtk/gtk_interface.c:3112
-#: modules/gui/macosx/output.m:128 modules/gui/macosx/output.m:231
-#: modules/gui/macosx/output.m:290 modules/gui/wxwindows/streamout.cpp:342
+#: modules/gui/macosx/output.m:132 modules/gui/macosx/output.m:237
+#: modules/gui/macosx/output.m:296 modules/gui/wxwindows/streamout.cpp:342
 msgid "UDP"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2867 modules/gui/gtk/gtk_interface.c:3122
-#: modules/gui/macosx/output.m:129 modules/gui/macosx/output.m:241
-#: modules/gui/macosx/output.m:292 modules/gui/wxwindows/streamout.cpp:343
+#: modules/gui/macosx/output.m:133 modules/gui/macosx/output.m:247
+#: modules/gui/macosx/output.m:298 modules/gui/wxwindows/streamout.cpp:343
 msgid "RTP"
 msgstr ""
 
@@ -3997,8 +4202,8 @@ msgid "PS"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2972 modules/gui/gtk/gtk_interface.c:3217
-#: modules/gui/macosx/output.m:135 modules/gui/macosx/output.m:273
-#: modules/gui/macosx/output.m:319
+#: modules/gui/macosx/output.m:139 modules/gui/macosx/output.m:279
+#: modules/gui/macosx/output.m:325
 msgid "AVI"
 msgstr ""
 
@@ -4016,11 +4221,6 @@ msgstr ""
 msgid "Gtk+ interface"
 msgstr "Gtk+インタフェース・モジュール"
 
-#: modules/gui/gtk/gtk_interface.c:147 modules/gui/gtk/gtk_interface.c:1373
-#: modules/gui/gtk2/gtk2_interface.c:77
-msgid "_File"
-msgstr "ファイル(_F)"
-
 #: modules/gui/gtk/gtk_interface.c:238
 msgid "_Close"
 msgstr "閉じる(_C)"
@@ -4036,10 +4236,6 @@ msgstr "終了(_x)"
 #: modules/gui/gtk/gtk_interface.c:261
 msgid "Exit the program"
 msgstr "プログラムの終了"
-
-#: modules/gui/gtk/gtk_interface.c:268 modules/gui/gtk2/gtk2_interface.c:132
-msgid "_View"
-msgstr "表示(_V)"
 
 #: modules/gui/gtk/gtk_interface.c:294
 msgid "Hide the main interface window"
@@ -4060,10 +4256,6 @@ msgstr "設定(_P)..."
 #: modules/gui/gtk/gtk_interface.c:411
 msgid "Configure the application"
 msgstr "アプリケーションの設定"
-
-#: modules/gui/gtk/gtk_interface.c:569 modules/gui/gtk2/gtk2_interface.c:139
-msgid "_Help"
-msgstr "ヘルプ(_H)"
 
 #: modules/gui/gtk/gtk_interface.c:587 modules/gui/gtk/gtk_interface.c:1435
 msgid "_About..."
@@ -4173,56 +4365,6 @@ msgstr "設定"
 msgid "Selected:"
 msgstr "選択済み:"
 
-#: modules/gui/gtk2/gnome2.c:54 modules/gui/gtk2/gtk2.c:55
-#, fuzzy
-msgid "Gtk2 interface"
-msgstr "Gtk+インタフェース・モジュール"
-
-#: modules/gui/gtk2/gnome2_interface.c:31
-#, fuzzy
-msgid "_New"
-msgstr "表示(_V)"
-
-#: modules/gui/gtk2/gnome2_interface.c:87
-msgid "gnome2"
-msgstr ""
-
-#: modules/gui/gtk2/gnome2_interface.c:112
-msgid "button4"
-msgstr ""
-
-#: modules/gui/gtk2/gnome2_interface.c:122
-#: modules/gui/gtk2/gtk2_interface.c:183
-msgid "button3"
-msgstr ""
-
-#: modules/gui/gtk2/gnome2_interface.c:123 modules/gui/macosx/output.m:331
-msgid "Save File"
-msgstr "ファイルの保存"
-
-#: modules/gui/gtk2/gtk2_interface.c:67
-#, fuzzy
-msgid "window1"
-msgstr "ウィンドウ"
-
-#: modules/gui/gtk2/gtk2_interface.c:109
-#, fuzzy
-msgid "_Edit"
-msgstr "編集"
-
-#: modules/gui/gtk2/gtk2_interface.c:146
-#, fuzzy
-msgid "_About"
-msgstr "VideoLANについて"
-
-#: modules/gui/gtk2/gtk2_interface.c:163
-msgid "button1"
-msgstr ""
-
-#: modules/gui/gtk2/gtk2_interface.c:173
-msgid "button2"
-msgstr ""
-
 #: modules/gui/kde/interface.cpp:88
 msgid "Languages"
 msgstr "言語"
@@ -4254,235 +4396,235 @@ msgstr "メッセージ:"
 msgid "Plugins"
 msgstr ""
 
-#: modules/gui/macosx/about.m:73 modules/gui/macosx/intf.m:315
+#: modules/gui/macosx/about.m:73 modules/gui/macosx/intf.m:338
 #, fuzzy
 msgid "About VLC media player"
 msgstr "VLCメディア・プレイヤーについて"
 
 #: modules/gui/macosx/controls.m:344 modules/gui/macosx/controls.m:487
-#: modules/gui/macosx/intf.m:366
+#: modules/gui/macosx/intf.m:389
 #, fuzzy
 msgid "Half Size"
 msgstr "サイズ"
 
 #: modules/gui/macosx/controls.m:346 modules/gui/macosx/controls.m:488
-#: modules/gui/macosx/intf.m:367
+#: modules/gui/macosx/intf.m:390
 msgid "Normal Size"
 msgstr ""
 
 #: modules/gui/macosx/controls.m:348 modules/gui/macosx/controls.m:489
-#: modules/gui/macosx/intf.m:368
+#: modules/gui/macosx/intf.m:391
 msgid "Double Size"
 msgstr ""
 
 #: modules/gui/macosx/controls.m:350 modules/gui/macosx/controls.m:491
 #: modules/gui/macosx/controls.m:498 modules/gui/macosx/controls.m:520
-#: modules/gui/macosx/intf.m:371
+#: modules/gui/macosx/intf.m:394
 msgid "Float On Top"
 msgstr ""
 
 #: modules/gui/macosx/controls.m:352 modules/gui/macosx/controls.m:490
-#: modules/gui/macosx/intf.m:369
+#: modules/gui/macosx/intf.m:392
 #, fuzzy
 msgid "Fit To Screen"
 msgstr "スクリーン"
 
-#: modules/gui/macosx/controls.m:442 modules/gui/macosx/intf.m:298
-#: modules/gui/macosx/intf.m:342 modules/gui/macosx/intf.m:402
+#: modules/gui/macosx/controls.m:442 modules/gui/macosx/intf.m:321
+#: modules/gui/macosx/intf.m:365 modules/gui/macosx/intf.m:425
 msgid "Previous"
 msgstr "前のファイル"
 
-#: modules/gui/macosx/controls.m:461 modules/gui/macosx/intf.m:344
+#: modules/gui/macosx/controls.m:461 modules/gui/macosx/intf.m:367
 msgid "Loop"
 msgstr "ループ"
 
-#: modules/gui/macosx/controls.m:468 modules/gui/macosx/intf.m:345
+#: modules/gui/macosx/controls.m:468 modules/gui/macosx/intf.m:368
 #, fuzzy
 msgid "Step Forward"
 msgstr "転送"
 
-#: modules/gui/macosx/controls.m:469 modules/gui/macosx/intf.m:346
+#: modules/gui/macosx/controls.m:469 modules/gui/macosx/intf.m:369
 #, fuzzy
 msgid "Step Backward"
 msgstr "逆転再生"
 
-#: modules/gui/macosx/info.m:172 modules/gui/macosx/intf.m:386
-#: modules/gui/macosx/intf.m:411
+#: modules/gui/macosx/info.m:172 modules/gui/macosx/intf.m:409
+#: modules/gui/macosx/intf.m:434
 msgid "Info"
-msgstr ""
-
-#: modules/gui/macosx/intf.m:293
-#, fuzzy
-msgid "VLC - Controller"
-msgstr "コントロール"
-
-#: modules/gui/macosx/intf.m:305
-#, fuzzy
-msgid "Volume"
-msgstr "ボリュームを上げる"
-
-#: modules/gui/macosx/intf.m:306
-#, fuzzy
-msgid "Position"
-msgstr "極性"
-
-#: modules/gui/macosx/intf.m:312
-msgid "Open CrashLog"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:316
 #, fuzzy
+msgid "VLC - Controller"
+msgstr "コントロール"
+
+#: modules/gui/macosx/intf.m:328
+#, fuzzy
+msgid "Volume"
+msgstr "ボリュームを上げる"
+
+#: modules/gui/macosx/intf.m:329
+#, fuzzy
+msgid "Position"
+msgstr "極性"
+
+#: modules/gui/macosx/intf.m:335
+msgid "Open CrashLog"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:339
+#, fuzzy
 msgid "Preferences..."
 msgstr "設定(_P)..."
 
-#: modules/gui/macosx/intf.m:317
+#: modules/gui/macosx/intf.m:340
 msgid "Hide VLC"
 msgstr "VLCを隠す"
 
-#: modules/gui/macosx/intf.m:318
+#: modules/gui/macosx/intf.m:341
 msgid "Hide Others"
 msgstr "インタフェースを隠す"
 
-#: modules/gui/macosx/intf.m:319
+#: modules/gui/macosx/intf.m:342
 msgid "Show All"
 msgstr "すべてを表示"
 
-#: modules/gui/macosx/intf.m:320
+#: modules/gui/macosx/intf.m:343
 msgid "Quit VLC"
 msgstr "VLCを終了"
 
-#: modules/gui/macosx/intf.m:322
+#: modules/gui/macosx/intf.m:345
 msgid "1:File"
 msgstr "1:ファイル"
 
-#: modules/gui/macosx/intf.m:323
+#: modules/gui/macosx/intf.m:346
 msgid "Open..."
 msgstr "開く..."
 
-#: modules/gui/macosx/intf.m:324
+#: modules/gui/macosx/intf.m:347
 msgid "Open File..."
 msgstr "ファイルを開く..."
 
-#: modules/gui/macosx/intf.m:325
+#: modules/gui/macosx/intf.m:348
 msgid "Open Disc..."
 msgstr "ディスクを開く..."
 
-#: modules/gui/macosx/intf.m:326
+#: modules/gui/macosx/intf.m:349
 msgid "Open Network..."
 msgstr "ネットワークを開く"
 
-#: modules/gui/macosx/intf.m:327
+#: modules/gui/macosx/intf.m:350
 msgid "Open Recent"
 msgstr "最近使った項目を開く"
 
-#: modules/gui/macosx/intf.m:328 modules/gui/macosx/intf.m:1291
+#: modules/gui/macosx/intf.m:351 modules/gui/macosx/intf.m:1314
 msgid "Clear Menu"
 msgstr "メニューをクリアする"
 
-#: modules/gui/macosx/intf.m:331
+#: modules/gui/macosx/intf.m:354
 msgid "Cut"
 msgstr "カット"
 
-#: modules/gui/macosx/intf.m:332
+#: modules/gui/macosx/intf.m:355
 msgid "Copy"
 msgstr "コピー"
 
-#: modules/gui/macosx/intf.m:333
+#: modules/gui/macosx/intf.m:356
 msgid "Paste"
 msgstr "ペースト"
 
-#: modules/gui/macosx/intf.m:334
+#: modules/gui/macosx/intf.m:357
 msgid "Clear"
 msgstr "クリア"
 
-#: modules/gui/macosx/intf.m:337
+#: modules/gui/macosx/intf.m:360
 msgid "Controls"
 msgstr "コントロール"
 
-#: modules/gui/macosx/intf.m:358 modules/gui/macosx/intf.m:359
+#: modules/gui/macosx/intf.m:381 modules/gui/macosx/intf.m:382
 #, fuzzy
 msgid "Audio Track"
 msgstr "オーディオ"
 
-#: modules/gui/macosx/intf.m:372 modules/gui/macosx/intf.m:373
+#: modules/gui/macosx/intf.m:395 modules/gui/macosx/intf.m:396
 #, fuzzy
 msgid "Video Track"
 msgstr "ビデオ"
 
-#: modules/gui/macosx/intf.m:382
+#: modules/gui/macosx/intf.m:405
 msgid "Minimize Window"
 msgstr "ウィンドウを最小化"
 
-#: modules/gui/macosx/intf.m:383
+#: modules/gui/macosx/intf.m:406
 msgid "Close Window"
 msgstr "ウィンドウを閉じる"
 
-#: modules/gui/macosx/intf.m:384
+#: modules/gui/macosx/intf.m:407
 #, fuzzy
 msgid "Controller"
 msgstr "コントロール"
 
-#: modules/gui/macosx/intf.m:389
+#: modules/gui/macosx/intf.m:412
 msgid "Bring All to Front"
 msgstr "すべてを前に"
 
-#: modules/gui/macosx/intf.m:391
+#: modules/gui/macosx/intf.m:414
 #, fuzzy
 msgid "Help"
 msgstr "ヘルプ"
 
-#: modules/gui/macosx/intf.m:392
+#: modules/gui/macosx/intf.m:415
 #, fuzzy
 msgid "ReadMe..."
 msgstr "メッセージ..."
 
-#: modules/gui/macosx/intf.m:393
+#: modules/gui/macosx/intf.m:416
 #, fuzzy
 msgid "Online Documentation"
 msgstr "モーション補正モジュール"
 
-#: modules/gui/macosx/intf.m:394
+#: modules/gui/macosx/intf.m:417
 msgid "Report a Bug"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:395
+#: modules/gui/macosx/intf.m:418
 #, fuzzy
 msgid "VideoLAN Website"
 msgstr "VideoLANクライアント"
 
-#: modules/gui/macosx/intf.m:396
+#: modules/gui/macosx/intf.m:419
 msgid "License"
 msgstr "ライセンス"
 
-#: modules/gui/macosx/intf.m:405
+#: modules/gui/macosx/intf.m:428
 msgid "Error"
 msgstr "エラー"
 
-#: modules/gui/macosx/intf.m:406
+#: modules/gui/macosx/intf.m:429
 #, fuzzy
 msgid ""
 "An error has occurred which probably prevented the execution of your request:"
 msgstr "要求された処理の実行でエラーが発生しました :"
 
-#: modules/gui/macosx/intf.m:407
+#: modules/gui/macosx/intf.m:430
 #, fuzzy
 msgid "If you believe that it is a bug, please follow the instructions at:"
 msgstr "もし、バグであると思われるなら、以下の手順にしたがってください :"
 
-#: modules/gui/macosx/intf.m:408
+#: modules/gui/macosx/intf.m:431
 msgid "Open Messages Window"
 msgstr "メッセージウィンドウを表示"
 
-#: modules/gui/macosx/intf.m:409
+#: modules/gui/macosx/intf.m:432
 msgid "Dismiss"
 msgstr "やり直し"
 
-#: modules/gui/macosx/intf.m:1254
+#: modules/gui/macosx/intf.m:1277
 #, fuzzy
 msgid "No CrashLog found"
 msgstr "%@s は見つかりません"
 
-#: modules/gui/macosx/intf.m:1254
+#: modules/gui/macosx/intf.m:1277
 msgid ""
 "Either you are running Mac OS X pre 10.2 or you haven't experienced any "
 "heavy crashes yet."
@@ -4562,63 +4704,57 @@ msgstr "%@s は見つかりません"
 msgid "Open VIDEO_TS Directory"
 msgstr "VIDEO_TSディレクトリを開く"
 
-#: modules/gui/macosx/output.m:115
+#: modules/gui/macosx/output.m:119
 #, fuzzy
 msgid "Advanced output:"
 msgstr "ALSAオーディオ・モジュール"
 
-#: modules/gui/macosx/output.m:119
+#: modules/gui/macosx/output.m:123
 msgid "Output Options"
 msgstr ""
 
-#: modules/gui/macosx/output.m:122 modules/gui/macosx/output.m:210
-#: modules/gui/macosx/output.m:285
+#: modules/gui/macosx/output.m:126 modules/gui/macosx/output.m:216
+#: modules/gui/macosx/output.m:291
 #, fuzzy
 msgid "Stream"
 msgstr "ストリームの停止"
 
-#: modules/gui/macosx/output.m:126
+#: modules/gui/macosx/output.m:130
 msgid "TTL"
 msgstr ""
 
-#: modules/gui/macosx/output.m:132 modules/gui/wxwindows/streamout.cpp:437
+#: modules/gui/macosx/output.m:136 modules/gui/wxwindows/streamout.cpp:437
 msgid "Encapsulation Method"
 msgstr ""
 
-#: modules/gui/macosx/output.m:133
+#: modules/gui/macosx/output.m:137
 msgid "MPEG TS"
 msgstr ""
 
-#: modules/gui/macosx/output.m:134 modules/gui/macosx/output.m:275
-#: modules/gui/macosx/output.m:317
+#: modules/gui/macosx/output.m:138 modules/gui/macosx/output.m:281
+#: modules/gui/macosx/output.m:323
 msgid "MPEG PS"
 msgstr ""
 
-#: modules/gui/macosx/output.m:136 modules/gui/macosx/output.m:274
-#: modules/gui/macosx/output.m:321
+#: modules/gui/macosx/output.m:140 modules/gui/macosx/output.m:280
+#: modules/gui/macosx/output.m:327
 msgid "Ogg"
 msgstr ""
 
-#: modules/gui/macosx/output.m:137 modules/gui/macosx/output.m:276
-#: modules/gui/macosx/output.m:323
+#: modules/gui/macosx/output.m:141 modules/gui/macosx/output.m:282
+#: modules/gui/macosx/output.m:329
 msgid "mp4"
 msgstr ""
 
-#: modules/gui/macosx/output.m:139
+#: modules/gui/macosx/output.m:143
 #, fuzzy
 msgid "Transcode options"
 msgstr "ストリームの一時停止"
 
-#: modules/gui/macosx/output.m:149 modules/gui/macosx/output.m:153
-msgid "Bitrate (bps)"
-msgstr ""
-
-#: modules/gui/macosx/output.m:151
-msgid "mpga"
-msgstr ""
-
-#: modules/gui/macosx/output.m:152
-msgid "a52 "
+#: modules/gui/macosx/output.m:153 modules/gui/macosx/output.m:158
+#: modules/gui/wxwindows/streamout.cpp:512
+#: modules/gui/wxwindows/streamout.cpp:549
+msgid "Bitrate (kb/s)"
 msgstr ""
 
 #: modules/gui/macosx/prefs.m:78 modules/gui/wxwindows/preferences.cpp:256
@@ -4629,12 +4765,6 @@ msgstr "すべてを選択"
 #: modules/gui/macosx/prefs.m:79
 msgid "Advanced"
 msgstr ""
-
-#: modules/gui/macosx/prefs.m:143 modules/gui/macosx/prefs.m:341
-#: modules/gui/macosx/prefs.m:368
-#, fuzzy
-msgid "Auto"
-msgstr "作成者"
 
 #: modules/gui/ncurses/ncurses.c:66
 #, fuzzy
@@ -4651,33 +4781,33 @@ msgstr "オーディオ出力を強制的にモノラルにします。"
 msgid "Qt interface"
 msgstr "Qtインタフェース・モジュール"
 
-#: modules/gui/skins/src/skin_main.cpp:251
-#: modules/gui/skins/src/vlcproc.cpp:338
+#: modules/gui/skins/src/skin_main.cpp:239
+#: modules/gui/skins/src/vlcproc.cpp:339
 #, fuzzy
 msgid "Open a skin file"
 msgstr "ファイルを開く"
 
-#: modules/gui/skins/src/skin_main.cpp:292
-#: modules/gui/skins/src/skin_main.cpp:293
+#: modules/gui/skins/src/skin_main.cpp:280
+#: modules/gui/skins/src/skin_main.cpp:281
 msgid "Last skin actually used"
 msgstr ""
 
-#: modules/gui/skins/src/skin_main.cpp:294
-#: modules/gui/skins/src/skin_main.cpp:295
+#: modules/gui/skins/src/skin_main.cpp:282
+#: modules/gui/skins/src/skin_main.cpp:283
 msgid "Config of last used skin"
 msgstr ""
 
-#: modules/gui/skins/src/skin_main.cpp:296
-#: modules/gui/skins/src/skin_main.cpp:297
+#: modules/gui/skins/src/skin_main.cpp:284
+#: modules/gui/skins/src/skin_main.cpp:285
 msgid "Show application in system tray"
 msgstr ""
 
-#: modules/gui/skins/src/skin_main.cpp:298
-#: modules/gui/skins/src/skin_main.cpp:299
+#: modules/gui/skins/src/skin_main.cpp:286
+#: modules/gui/skins/src/skin_main.cpp:287
 msgid "Show application in taskbar"
 msgstr ""
 
-#: modules/gui/skins/src/skin_main.cpp:310
+#: modules/gui/skins/src/skin_main.cpp:298
 #, fuzzy
 msgid "Skinnable Interface"
 msgstr "メインウィンドウの表示/非表示(_I)"
@@ -4687,209 +4817,209 @@ msgstr "メインウィンドウの表示/非表示(_I)"
 msgid "FileInfo"
 msgstr "ファイルを開く(_O)..."
 
-#: modules/gui/wxwindows/interface.cpp:231
+#: modules/gui/wxwindows/interface.cpp:232
 #, fuzzy
 msgid "Open a DVD or (S)VCD"
 msgstr "DVDまたはVCDを開く"
 
-#: modules/gui/wxwindows/interface.cpp:232
+#: modules/gui/wxwindows/interface.cpp:233
 #, fuzzy
 msgid "Open a network stream"
 msgstr "ネットワークストリームを選択する"
 
-#: modules/gui/wxwindows/interface.cpp:233
+#: modules/gui/wxwindows/interface.cpp:234
 #, fuzzy
 msgid "Open a satellite stream"
 msgstr "衛星カードを開く"
 
-#: modules/gui/wxwindows/interface.cpp:234
+#: modules/gui/wxwindows/interface.cpp:235
 msgid "Eject the DVD/CD"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:235
+#: modules/gui/wxwindows/interface.cpp:236
 #, fuzzy
 msgid "Exit this program"
 msgstr "プログラムの終了"
 
-#: modules/gui/wxwindows/interface.cpp:237
+#: modules/gui/wxwindows/interface.cpp:238
 #, fuzzy
 msgid "Open the playlist"
 msgstr "プレイリストを開く"
 
-#: modules/gui/wxwindows/interface.cpp:238
+#: modules/gui/wxwindows/interface.cpp:239
 #, fuzzy
 msgid "Show the program logs"
 msgstr "プログラムの選択"
 
-#: modules/gui/wxwindows/interface.cpp:239
+#: modules/gui/wxwindows/interface.cpp:240
 msgid "Show information about the file being played"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:241
+#: modules/gui/wxwindows/interface.cpp:242
 msgid "Go to the preferences menu"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:243
+#: modules/gui/wxwindows/interface.cpp:244
 #, fuzzy
 msgid "About this program"
 msgstr "プログラムの終了"
 
-#: modules/gui/wxwindows/interface.cpp:247
+#: modules/gui/wxwindows/interface.cpp:248
 #, fuzzy
 msgid "&Open File..."
 msgstr "ファイルを開く..."
 
-#: modules/gui/wxwindows/interface.cpp:249
+#: modules/gui/wxwindows/interface.cpp:250
 #, fuzzy
 msgid "Open &Disc..."
 msgstr "ディスクを開く..."
 
-#: modules/gui/wxwindows/interface.cpp:251
+#: modules/gui/wxwindows/interface.cpp:252
 #, fuzzy
 msgid "&Network Stream..."
 msgstr "ネットワークストリーム(_N)..."
 
-#: modules/gui/wxwindows/interface.cpp:254
+#: modules/gui/wxwindows/interface.cpp:255
 #, fuzzy
 msgid "&Satellite Stream..."
 msgstr "ネットワークストリーム(_N)..."
 
-#: modules/gui/wxwindows/interface.cpp:259
+#: modules/gui/wxwindows/interface.cpp:260
 #, fuzzy
 msgid "&Eject Disc"
 msgstr "ディスクの取出し(_E)"
 
-#: modules/gui/wxwindows/interface.cpp:263
+#: modules/gui/wxwindows/interface.cpp:264
 #, fuzzy
 msgid "E&xit"
 msgstr "終了(_x)"
 
-#: modules/gui/wxwindows/interface.cpp:267
+#: modules/gui/wxwindows/interface.cpp:268
 #, fuzzy
 msgid "&Playlist..."
 msgstr "プレイリスト..."
 
-#: modules/gui/wxwindows/interface.cpp:269
-#, fuzzy
-msgid "&Logs..."
-msgstr "ディスクを開く(_D)..."
-
 #: modules/gui/wxwindows/interface.cpp:270
+#, fuzzy
+msgid "&Messages..."
+msgstr "メッセージ..."
+
+#: modules/gui/wxwindows/interface.cpp:271
 #, fuzzy
 msgid "&File info..."
 msgstr "ファイルを開く(_O)..."
 
-#: modules/gui/wxwindows/interface.cpp:275
+#: modules/gui/wxwindows/interface.cpp:276
 #, fuzzy
 msgid "&Preferences..."
 msgstr "設定(_P)..."
 
-#: modules/gui/wxwindows/interface.cpp:292
+#: modules/gui/wxwindows/interface.cpp:293
 #, fuzzy
 msgid "&About..."
 msgstr "VideoLANについて(_A)..."
 
-#: modules/gui/wxwindows/interface.cpp:296
+#: modules/gui/wxwindows/interface.cpp:297
 #, fuzzy
 msgid "&File"
 msgstr "ファイル"
 
-#: modules/gui/wxwindows/interface.cpp:297
+#: modules/gui/wxwindows/interface.cpp:298
 #, fuzzy
 msgid "&View"
 msgstr "表示(_V)"
 
-#: modules/gui/wxwindows/interface.cpp:298
+#: modules/gui/wxwindows/interface.cpp:299
 #, fuzzy
 msgid "&Settings"
 msgstr "設定(_S)"
 
-#: modules/gui/wxwindows/interface.cpp:299
-#: modules/gui/wxwindows/interface.cpp:476
-#: modules/gui/wxwindows/interface.cpp:524
+#: modules/gui/wxwindows/interface.cpp:300
+#: modules/gui/wxwindows/interface.cpp:478
+#: modules/gui/wxwindows/interface.cpp:526
 #, fuzzy
 msgid "&Audio"
 msgstr "オーディオ"
 
-#: modules/gui/wxwindows/interface.cpp:300
-#: modules/gui/wxwindows/interface.cpp:495
-#: modules/gui/wxwindows/interface.cpp:528
+#: modules/gui/wxwindows/interface.cpp:301
+#: modules/gui/wxwindows/interface.cpp:497
+#: modules/gui/wxwindows/interface.cpp:530
 #, fuzzy
 msgid "&Video"
 msgstr "ビデオ"
 
-#: modules/gui/wxwindows/interface.cpp:301
-#: modules/gui/wxwindows/interface.cpp:514
-#: modules/gui/wxwindows/interface.cpp:532
+#: modules/gui/wxwindows/interface.cpp:302
+#: modules/gui/wxwindows/interface.cpp:516
+#: modules/gui/wxwindows/interface.cpp:534
 #, fuzzy
 msgid "&Navigation"
 msgstr "ナビゲーション(_N)"
 
-#: modules/gui/wxwindows/interface.cpp:302
+#: modules/gui/wxwindows/interface.cpp:303
 #, fuzzy
 msgid "&Help"
 msgstr "ヘルプ(_H)"
 
-#: modules/gui/wxwindows/interface.cpp:318
+#: modules/gui/wxwindows/interface.cpp:319
 #, fuzzy
 msgid "Stop current playlist item"
 msgstr "プレイリストを開く"
 
-#: modules/gui/wxwindows/interface.cpp:319
+#: modules/gui/wxwindows/interface.cpp:320
 msgid "Play current playlist item"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:320
+#: modules/gui/wxwindows/interface.cpp:321
 msgid "Pause current playlist item"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:321
+#: modules/gui/wxwindows/interface.cpp:322
 #: modules/gui/wxwindows/playlist.cpp:351
 #, fuzzy
 msgid "Open playlist"
 msgstr "プレイリストを開く"
 
-#: modules/gui/wxwindows/interface.cpp:322
+#: modules/gui/wxwindows/interface.cpp:323
 #, fuzzy
 msgid "Previous playlist item"
 msgstr "前のファイル"
 
-#: modules/gui/wxwindows/interface.cpp:323
+#: modules/gui/wxwindows/interface.cpp:324
 #, fuzzy
 msgid "Next playlist item"
 msgstr "プレイリストを開く"
 
-#: modules/gui/wxwindows/interface.cpp:324
+#: modules/gui/wxwindows/interface.cpp:325
 #, fuzzy
 msgid "Play slower"
 msgstr "スロー再生"
 
-#: modules/gui/wxwindows/interface.cpp:325
+#: modules/gui/wxwindows/interface.cpp:326
 #, fuzzy
 msgid "Play faster"
 msgstr "早送り再生"
 
-#: modules/gui/wxwindows/interface.cpp:560
+#: modules/gui/wxwindows/interface.cpp:561
 #, fuzzy
 msgid ""
 " (wxWindows interface)\n"
 "\n"
 msgstr "ネイティブWindowsインタフェース"
 
-#: modules/gui/wxwindows/interface.cpp:561
+#: modules/gui/wxwindows/interface.cpp:562
 msgid ""
 "(C) 1996-2003 - the VideoLAN Team\n"
 "\n"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:562
+#: modules/gui/wxwindows/interface.cpp:563
 msgid ""
 "The VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/\n"
 "\n"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:564
+#: modules/gui/wxwindows/interface.cpp:565
 #, fuzzy
 msgid ""
 "This is the VideoLAN Client, a DVD, MPEG and DivX player.\n"
@@ -4898,7 +5028,7 @@ msgstr ""
 "このソフトウェアはDVDおよび、MPEGを再生するVideoLANクライアントです。\n"
 "ファイルまたは、ネットワークからMPEGとMPEG 2データを再生することができます。"
 
-#: modules/gui/wxwindows/interface.cpp:568
+#: modules/gui/wxwindows/interface.cpp:569
 #, fuzzy, c-format
 msgid "About %s"
 msgstr "VideoLANについて"
@@ -4913,12 +5043,12 @@ msgstr "設定(_S)"
 msgid "Video menu"
 msgstr "設定(_S)"
 
-#: modules/gui/wxwindows/menus.cpp:139
+#: modules/gui/wxwindows/menus.cpp:141
 #, fuzzy
 msgid "Input menu"
 msgstr "入力"
 
-#: modules/gui/wxwindows/menus.cpp:329
+#: modules/gui/wxwindows/menus.cpp:334
 msgid "Empty"
 msgstr ""
 
@@ -4955,16 +5085,16 @@ msgstr "ストリームの一時停止"
 msgid "Capture the stream you are playing to a file"
 msgstr ""
 
-#: modules/gui/wxwindows/open.cpp:361
+#: modules/gui/wxwindows/open.cpp:372
 msgid "DVD (menus support)"
 msgstr ""
 
-#: modules/gui/wxwindows/open.cpp:364
+#: modules/gui/wxwindows/open.cpp:375
 #, fuzzy
 msgid "CD Audio"
 msgstr "オーディオ"
 
-#: modules/gui/wxwindows/open.cpp:837 modules/gui/wxwindows/streamout.cpp:640
+#: modules/gui/wxwindows/open.cpp:848 modules/gui/wxwindows/streamout.cpp:640
 #, fuzzy
 msgid "Save file"
 msgstr "ファイルの保存"
@@ -5043,8 +5173,9 @@ msgid "No configuration options available"
 msgstr "コンフィグレーション・オプションにツールチップを表示"
 
 #: modules/gui/wxwindows/preferences.cpp:865
-msgid "Advanced..."
-msgstr ""
+#, fuzzy
+msgid "Advanced options"
+msgstr "ALSAオーディオ・モジュール"
 
 #: modules/gui/wxwindows/streamout.cpp:166
 msgid "Stream output MRL"
@@ -5085,11 +5216,6 @@ msgstr "持続期間"
 #, fuzzy
 msgid "Video codec"
 msgstr "DVDデバイス"
-
-#: modules/gui/wxwindows/streamout.cpp:512
-#: modules/gui/wxwindows/streamout.cpp:549
-msgid "Bitrate (kb/s)"
-msgstr ""
 
 #: modules/gui/wxwindows/streamout.cpp:543
 #, fuzzy
@@ -5226,6 +5352,11 @@ msgstr "ファイル・ロギング・インタフェース・モジュール"
 msgid "Using the logger interface plugin..."
 msgstr "ロギング・インタフェース・プラグインを使用します。"
 
+#: modules/misc/memcpy/memcpyaltivec.c:52
+#, fuzzy
+msgid "AltiVec memcpy"
+msgstr "AltiVec memcpyモジュール"
+
 #: modules/misc/memcpy/memcpy.c:81
 #, fuzzy
 msgid "libc memcpy"
@@ -5246,11 +5377,6 @@ msgstr "MMX memcpyモジュール"
 msgid "MMX EXT memcpy"
 msgstr "MMXエクステンションmemcpyモジュール"
 
-#: modules/misc/memcpy/memcpyaltivec.c:52
-#, fuzzy
-msgid "AltiVec memcpy"
-msgstr "AltiVec memcpyモジュール"
-
 #: modules/misc/network/ipv4.c:85
 msgid "IPv4 network abstraction layer"
 msgstr "IPv4ネットワーク抽象レイヤ"
@@ -5263,6 +5389,10 @@ msgstr "IPv6ネットワーク抽象レイヤ"
 #, fuzzy
 msgid "Qt Embedded GUI helper"
 msgstr "QT埋め込みモジュール"
+
+#: modules/misc/sap.c:131
+msgid "SAP"
+msgstr ""
 
 #: modules/misc/sap.c:134
 #, fuzzy
@@ -5395,7 +5525,7 @@ msgid "Set image contrast"
 msgstr ""
 
 #: modules/video_filter/adjust.c:61
-msgid "Set the image contrast. Defaults to 1"
+msgid "Set the image contrast, between 0 and 2. Defaults to 1"
 msgstr ""
 
 #: modules/video_filter/adjust.c:62
@@ -5411,7 +5541,7 @@ msgid "Set image saturation"
 msgstr ""
 
 #: modules/video_filter/adjust.c:65
-msgid "Set the image saturation. Defaults to 1"
+msgid "Set the image saturation, between 0 and 3. Defaults to 1"
 msgstr ""
 
 #: modules/video_filter/adjust.c:66
@@ -5419,7 +5549,7 @@ msgid "Set image brightness"
 msgstr ""
 
 #: modules/video_filter/adjust.c:67
-msgid "Set the image brightness. Defaults to 1"
+msgid "Set the image brightness, between 0 and 2. Defaults to 1"
 msgstr ""
 
 #: modules/video_filter/adjust.c:71
@@ -5464,8 +5594,10 @@ msgid "Crop geometry"
 msgstr "縁取りジオメトリ"
 
 #: modules/video_filter/crop.c:55
-msgid "Set the geometry of the zone to crop"
-msgstr "区画から縁取りまでのジオメトリを指定"
+msgid ""
+"Set the geometry of the zone to crop. This is set as width x heigth + left "
+"offset + top offset."
+msgstr ""
 
 #: modules/video_filter/crop.c:57
 #, fuzzy
@@ -5786,11 +5918,21 @@ msgstr "共有メモリの使用"
 msgid "Use shared memory to communicate between VLC and the X server."
 msgstr "共有メモリをVLCとXサーバの通信のために使用します。"
 
-#: modules/video_output/x11/x11.c:62
+#: modules/video_output/x11/x11.c:61 modules/video_output/x11/xvideo.c:72
+msgid "choose the screen to be used for fullscreen mode."
+msgstr ""
+
+#: modules/video_output/x11/x11.c:63 modules/video_output/x11/xvideo.c:74
+msgid ""
+"Choose the screen you want to use in fullscreen mode. For instance set it to "
+"0 for first screen, 1 for the second."
+msgstr ""
+
+#: modules/video_output/x11/x11.c:67
 msgid "X11"
 msgstr ""
 
-#: modules/video_output/x11/x11.c:68
+#: modules/video_output/x11/x11.c:76
 #, fuzzy
 msgid "X11 video output"
 msgstr "オーバーレイ"
@@ -5819,11 +5961,11 @@ msgstr ""
 "最も効果的なものを使ってパフォーマンスを改善するかわりに、特定の色彩フォー"
 "マットを使用するためのXVideoレンダラを強制的に指定します。"
 
-#: modules/video_output/x11/xvideo.c:73
+#: modules/video_output/x11/xvideo.c:78
 msgid "XVideo"
 msgstr ""
 
-#: modules/video_output/x11/xvideo.c:81
+#: modules/video_output/x11/xvideo.c:90
 #, fuzzy
 msgid "XVideo extension video output"
 msgstr "XVideoエクステンション・モジュール"
@@ -5871,6 +6013,21 @@ msgstr "XOSDモジュール"
 #, fuzzy
 msgid "xosd interface"
 msgstr "xosdインタフェース・モジュール"
+
+#, fuzzy
+#~ msgid "SAP interface module"
+#~ msgstr "インタフェース・モジュール"
+
+#, fuzzy
+#~ msgid "Auto"
+#~ msgstr "作成者"
+
+#, fuzzy
+#~ msgid "&Logs..."
+#~ msgstr "ディスクを開く(_D)..."
+
+#~ msgid "Set the geometry of the zone to crop"
+#~ msgstr "区画から縁取りまでのジオメトリを指定"
 
 #, fuzzy
 #~ msgid "Display identifier"
@@ -6275,9 +6432,6 @@ msgstr "xosdインタフェース・モジュール"
 #, fuzzy
 #~ msgid "flac decoder module"
 #~ msgstr "字幕・デコーダ・モジュール"
-
-#~ msgid "C Post Processing module"
-#~ msgstr "C 後処理モジュール"
 
 #, fuzzy
 #~ msgid "libmpeg2 decoder module"

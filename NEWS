@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.45 2003/05/20 21:35:52 hartman Exp $
+$Id: NEWS,v 1.46 2003/05/27 21:48:44 gbazin Exp $
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------
@@ -40,7 +40,7 @@ Miscellaneous:
  * Added a Gentoo ebuild file to the distribution
 
 UNIX ports:
- *
+ * Basic support for the X11 Xinerama extension.
 
 Mac OS X port:
  * When you add several items to the playlist, they are sorted alphabetically.
@@ -59,6 +59,7 @@ Win32 port:
  * Fixed the "no sound" problem on NT4
  * Improved skinnable interface (it now uses the wxWindows interface dialogs).
  * Added support for compressed skins files (.vlt files)
+ * Fixed SVCD chapters support.
 
 BeOS port:
  * Interface localization

@@ -553,8 +553,7 @@ package-win32:
 	fi ; done
 
 	for i in dummy $(srcdir)/tmp/plugins/*$(LIBEXT) ; \
-		do if test $$i != $(srcdir)/tmp/plugins/libwin32_plugin$(LIBEXT) \
-		-a $$i != dummy ; then $(STRIP) $$i ; fi ; done
+		do if test $$i != dummy ; then $(STRIP) $$i ; fi ; done
 
 	mkdir $(srcdir)/tmp/share
 	cp $(srcdir)/share/*.rle $(srcdir)/tmp/share/ ;
@@ -573,9 +572,6 @@ package-win32:
 	for i in $(srcdir)/doc/skins/*.txt; do \
 		cp $$i $(srcdir)/tmp/skins/ || true ; \
 	done
-
-	$(MAKE) -C $(srcdir)/doc/faq html ;
-	cp $(srcdir)/doc/faq/faq.html $(srcdir)/tmp/FAQ.htm ;
 
 # Create package 
 	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe -- /DVERSION=${VERSION} $(srcdir)/tmp/nsi
