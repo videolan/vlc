@@ -193,7 +193,7 @@ void DialogsProvider::OnIdle( wxIdleEvent& WXUNUSED(event) )
 {
   /* Update the log window */
   if( p_messages_dialog )
-//    p_messages_dialog->UpdateLog();
+    p_messages_dialog->UpdateLog();
 
   /* Update the playlist */
   if( p_playlist_dialog )
