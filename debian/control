@@ -2,7 +2,7 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Samuel Hocevar <sam@zoy.org>
-Build-Depends: debhelper (>=2.2.0), xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt-dev, libasound2-dev (>=0.9.0beta10a), libarts-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, kdelibs-dev, dvb-dev, libdv2-dev, libxosd-dev (>=1.0.2-1), svgalibg1-dev (>=1.4.0)
+Build-Depends: debhelper (>=2.2.0), xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt-dev, libasound2-dev (>=0.9.0beta10a), libarts-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, kdelibs-dev, dvb-dev, libdv2-dev, libxosd-dev (>=1.0.2-1), svgalibg1-dev (>=1.4.0), libogg-dev, libvorbis-dev
 Standards-Version: 3.5.6
 
 Package: vlc
@@ -316,3 +316,13 @@ Description: DVB input plugin for vlc
  .
  This plugin adds support for DVB cards to vlc, the VideoLAN Client. Note
  that your card needs to be supported by your kernel before vlc can use it.
+
+Package: vlc-plugin-ogg
+Architecture: any
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Description: Ogg demuxer and Vorbis codec plugins for vlc
+ VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+ .
+ These plugins add support for the Ogg bitstream format and the Ogg Vorbis
+ compressed audio format to vlc, the VideoLAN Client. They are autodetected.
+

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.21 2002/10/29 18:12:07 sam Exp $
+##  $Id: bootstrap,v 1.22 2002/11/04 15:04:44 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -126,6 +126,7 @@ L_builtin += \$(L_${mod}_b)
 L_builtin_pic += \$(L_${mod}_pic)
 LDFLAGS_builtin += \$(F_${mod}_b)
 ${PRIVATE}BUILT_SOURCES += \$(B_${mod}_p) \$(B_${mod}_b)
+PLUGIN_FILES += \$(D_${mod}_p)
 
 ${PRIVATE}${sym}_lib${mod}_plugin_a_SOURCES = \$(SOURCES_${mod})
 ${NODIST}${PRIVATE}nodist_${sym}_lib${mod}_plugin_a_SOURCES = \$(nodist_SOURCES_${mod})
@@ -152,7 +153,6 @@ libvlc_LIBRARIES += \$(L_${mod}_b) \$(L_${mod}_pic)
 lib${mod}_DATA = \$(D_${mod}_p)
 
 lib${mod}dir = \$(libdir)/vlc/${topdir}
-MOSTLYCLEANFILES += \$(D_${mod}_p)
 ${PRIVATE}noinst_LIBRARIES += \$(L_${mod}_p)
 ${PRIVATE}${dir}/lib${mod}_plugin\$(LIBEXT): \$(${sym}_lib${mod}_plugin_a_OBJECTS)
 ${PRIVATE}	\$(${LINKER}) \$^ -shared \$(LDFLAGS_plugins) \$(LDFLAGS_${mod})
@@ -171,7 +171,7 @@ echo "done."
 ###  classic bootstrap stuff
 ###
 set -x
-rm -f aclocal.m4 configure config.guess config.log config.sub ltmain.sh libtool ltconfig missing mkinstalldirs depcomp install-sh
+rm -f aclocal.m4 m4/oldgettext.m4 configure config.guess config.log config.sub ltmain.sh libtool ltconfig missing mkinstalldirs depcomp install-sh
 rm -Rf intl
 
 # Check for gettext

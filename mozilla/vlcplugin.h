@@ -2,7 +2,7 @@
  * vlcplugin.h: a VideoLAN plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcplugin.h,v 1.7 2002/10/25 18:17:59 sam Exp $
+ * $Id: vlcplugin.h,v 1.8 2002/11/04 15:04:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -91,6 +91,8 @@ private:
     "video/x-msvideo:avi:AVI video;" \
     /* QuickTime */ \
     "video/quicktime:mov,qt:QuickTime video;" \
+    /* Ogg */ \
+    "application/x-ogg:ogg:Ogg stream;" \
     /* explicit plugin call */ \
     "application/x-vlc-plugin::VLC plugin"
 

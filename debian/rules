@@ -13,7 +13,7 @@ export DH_COMPAT=3
 #
 
 CONFIG_FLAGS = --enable-release --prefix=/usr
-CONFIG_FLAGS += --enable-gnome --enable-gtk --enable-familiar --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde --enable-mp4 --enable-dvb --enable-dv --enable-svgalib --enable-satellite
+CONFIG_FLAGS += --enable-gnome --enable-gtk --enable-familiar --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde --enable-mp4 --enable-dvb --enable-dv --enable-svgalib --enable-satellite --enable-ogg --enable-vorbis
 CONFIG_FLAGS += --enable-ffmpeg --with-ffmpeg-tree=extras/ffmpeg
 CONFIG_FLAGS += --enable-faad --with-faad-tree=extras/faad
 ifeq ($(DEB_BUILD_ARCH),i386)
@@ -211,6 +211,13 @@ endif
 	ln -s vlc debian/vlc-plugin-dvb/usr/share/doc/vlc-plugin-dvb
 	mv debian/vlc/usr/lib/vlc/access/libsatellite_plugin.so \
 		debian/vlc-plugin-dvb/usr/lib/vlc/access
+
+	# Package: vlc-plugin-ogg
+	ln -s vlc debian/vlc-plugin-ogg/usr/share/doc/vlc-plugin-ogg
+	mv debian/vlc/usr/lib/vlc/demux/libogg_plugin.so \
+		debian/vlc-plugin-ogg/usr/lib/vlc/demux
+	mv debian/vlc/usr/lib/vlc/codec/libvorbis_plugin.so \
+		debian/vlc-plugin-ogg/usr/lib/vlc/codec
 
 	# Clean up
 	rm -f debian/vlc/$(VIDDIR)/*.png

@@ -155,6 +155,7 @@ HEADERS_include = \
 	include/beos_specific.h \
 	include/configuration.h \
 	include/darwin_specific.h \
+	include/codecs.h \
 	include/error.h \
 	include/input_ext-dec.h \
 	include/input_ext-intf.h \
@@ -392,14 +393,17 @@ if HAVE_DARWIN
 # Create the MacOS X app
 vlc_app_DATA = vlc.app
 vlc_appdir = $(bindir)
-vlc.app: vlc
+vlc.app: vlc $(PLUGIN_FILES)
 	rm -Rf vlc.app
 	cd extras/MacOSX ; pbxbuild | grep -v '^[ \t]' | grep -v "^$$"
 	cp -r extras/MacOSX/build/vlc.bundle ./vlc.app
-	$(INSTALL) -d vlc.app/Contents/MacOS/share
-	$(INSTALL) -d vlc.app/Contents/MacOS/modules
+	$(INSTALL) -d vlc.app/Contents/MacOS
 	$(INSTALL) vlc vlc.app/Contents/MacOS/
-#	FIXME: install modules ! (and add dependency on modules)
+	$(INSTALL) -d vlc.app/Contents/MacOS/modules
+	for i in dummy $(PLUGIN_FILES) ; do if test "x$$i" != "xdummy" ; then \
+		$(INSTALL) $$i vlc.app/Contents/MacOS/modules/ ; \
+	fi ; done
+	$(INSTALL) -d vlc.app/Contents/MacOS/share
 	$(INSTALL) -m 644 share/*.psf vlc.app/Contents/MacOS/share
 endif
 
@@ -494,6 +498,9 @@ endif
 ###############################################################################
 # Modules
 ###############################################################################
+MOSTLYCLEANFILES += $(PLUGIN_FILES)
+PLUGIN_FILES =
+
 libvlcdir = $(libdir)/vlc
 
 include Modules.am
