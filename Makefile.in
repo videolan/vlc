@@ -306,7 +306,7 @@ show:
 snapshot:
 	rm -rf /tmp/${SNAPSHOTDIR}
 	mkdir /tmp/${SNAPSHOTDIR}
-	cp -a * /tmp/${SNAPSHOTDIR}
+	cp -r * /tmp/${SNAPSHOTDIR}
 		(cd /tmp/${SNAPSHOTDIR} ; \
 		make distclean ; \
 		find . -type d -name CVS | xargs rm -rf ; \

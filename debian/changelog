@@ -1,3 +1,9 @@
+vlc (0.1.99a) unstable; urgency=low
+
+  * Fixed some compile flag errors
+
+ -- Samuel Hocevar <sam@via.ecp.fr>  Thu, 15 Jun 2000 20:48:54 +0200
+
 vlc (0.1.99-1) unstable; urgency=low
 
   * Initial Release.
