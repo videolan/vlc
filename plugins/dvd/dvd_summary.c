@@ -3,7 +3,7 @@
  * found in .ifo.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_summary.c,v 1.14 2002/03/06 01:20:56 stef Exp $
+ * $Id: dvd_summary.c,v 1.15 2002/03/08 22:58:12 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -68,13 +68,11 @@
  ****************************************************************************/
 void IfoPrintTitle( thread_dvd_data_t * p_dvd )
 {
-    intf_WarnMsg( 5, "dvd info: title %d, %d chapter%s, %d angle%s, "
-                     "vobstart at %d blocks, stream size %d blocks",
+    intf_WarnMsg( 5, "dvd info: title %d, %d chapter%s, %d angle%s",
                      p_dvd->i_title, p_dvd->i_chapter_nb,
                      (p_dvd->i_chapter_nb == 1) ? "" : "s",
                      p_dvd->i_angle_nb,
-                     (p_dvd->i_angle_nb == 1) ? "" : "s",
-                     p_dvd->i_start, p_dvd->i_size );
+                     (p_dvd->i_angle_nb == 1) ? "" : "s" );
 }
 
 /****************************************************************************

@@ -2,7 +2,7 @@
  * dvd.h: thread structure of the DVD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd.h,v 1.1 2002/03/06 01:20:56 stef Exp $
+ * $Id: dvd.h,v 1.2 2002/03/08 22:58:12 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -45,19 +45,19 @@ typedef struct thread_dvd_data_s
 
     int                     i_chapter_nb;
     int                     i_chapter;
+    boolean_t               b_new_chapter;
 
     int                     i_angle_nb;
     int                     i_angle;
+
+    int                     i_map_cell;   /* cell index in adress map */
+    int                     i_prg_cell;   /* cell index in program map */
     int                     i_angle_cell; /* cell index in the current angle */
 
-    int                     i_cell;              /* cell index in adress map */
-    int                     i_prg_cell;         /* cell index in program map */
+    int                     i_vts_start;  /* offset to beginning of vts */
+    int                     i_vts_lb;     /* sector in vts */
+    int                     i_end_lb;     /* last sector of current cell */
 
-    int                     i_sector;
-    int                     i_end_sector;     /* last sector of current cell */
-
-    int                     i_title_start;
-    int                     i_start;
     int                     i_size;
 
     /* Structure that contains all information of the DVD */

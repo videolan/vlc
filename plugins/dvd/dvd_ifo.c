@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.44 2002/03/06 01:20:56 stef Exp $
+ * $Id: dvd_ifo.c,v 1.45 2002/03/08 22:58:12 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -438,7 +438,7 @@ int IfoInit( ifo_t * p_ifo )
 /*****************************************************************************
  * IfoTitleSet: Parse vts*.ifo files to fill the Video Title Set structure.
  *****************************************************************************/
-int IfoTitleSet( ifo_t * p_ifo )
+int IfoTitleSet( ifo_t * p_ifo, int i_title )
 {
     u8          p_buf[DVD_LB_SIZE];
     u8 *        p_tmp;
@@ -453,7 +453,7 @@ int IfoTitleSet( ifo_t * p_ifo )
         FreeTitleSet( &p_ifo->vts );
     }
 
-    i_off = p_ifo->vmg.title_inf.p_attr[p_ifo->i_title-1].i_start_sector
+    i_off = p_ifo->vmg.title_inf.p_attr[i_title-1].i_start_sector
                    + p_ifo->i_start;
 
     //fprintf(stderr, "offset: %d\n" , i_off );
@@ -748,8 +748,8 @@ int IfoTitleSet( ifo_t * p_ifo )
     }
 #undef MGINF
 
-    intf_WarnMsg( 2, "ifo info: vts %d initialized",
-         p_ifo->vmg.title_inf.p_attr[p_ifo->i_title-1].i_title_set_num );
+    intf_WarnMsg( 4, "ifo info: vts %d initialized",
+         p_ifo->vmg.title_inf.p_attr[i_title-1].i_title_set_num );
 
     p_ifo->vts.b_initialized = 1;
 
