@@ -2,7 +2,7 @@
  * ctrl_button.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_button.cpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -68,6 +68,8 @@ CtrlButton::CtrlButton( intf_thread_t *pIntf, const GenericBitmap &rBmpUp,
 
     // Transitions
     m_fsm.addTransition( "upOver", "mouse:left:down", "downOver",
+                         &m_cmdUpOverDownOver );
+    m_fsm.addTransition( "upOver", "mouse:left:dblclick", "downOver",
                          &m_cmdUpOverDownOver );
     m_fsm.addTransition( "downOver", "mouse:left:up", "upOver",
                          &m_cmdDownOverUpOver );
