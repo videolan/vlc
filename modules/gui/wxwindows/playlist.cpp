@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: playlist.cpp,v 1.48 2004/02/28 19:40:06 zorglub Exp $
+ * $Id: playlist.cpp,v 1.49 2004/02/29 14:05:45 zorglub Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -1078,6 +1078,12 @@ void Playlist::ShowInfos( int i_item )
     {
         return;
     }
+   
+    if( i_item == -1 )
+    {
+        return;
+    }
+ 
     if( iteminfo_dialog == NULL )
     {
         vlc_mutex_lock( &p_playlist->object_lock);
