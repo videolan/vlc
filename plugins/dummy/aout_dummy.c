@@ -1,9 +1,9 @@
 /*****************************************************************************
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
+ * Copyright (C) 2000, 2001 VideoLAN
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,8 +94,10 @@ static int aout_Open( aout_thread_t *p_aout )
 {
     /* Initialize some variables */
     p_aout->i_format = AOUT_FORMAT_DEFAULT;
-    p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR, AOUT_STEREO_DEFAULT );
-    p_aout->l_rate     = main_GetIntVariable( AOUT_RATE_VAR, AOUT_RATE_DEFAULT );
+    p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR,
+                                                  AOUT_STEREO_DEFAULT );
+    p_aout->l_rate     =     main_GetIntVariable( AOUT_RATE_VAR,
+                                                  AOUT_RATE_DEFAULT );
 
     return( 0 );
 }

@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.9 2001/02/12 00:20:37 sam Exp $
+ * $Id: intf_gnome.c,v 1.10 2001/02/13 04:29:46 sam Exp $
  *
  * Authors:
  *
@@ -134,12 +134,11 @@ static int intf_Open( intf_thread_t *p_intf )
     }
 
     /* Initialize Gnome thread */
-    p_intf->p_sys->b_window = 1;
-    p_intf->p_sys->b_playlist = 0;
-
     p_intf->p_sys->b_popup_changed = 0;
     p_intf->p_sys->b_window_changed = 0;
     p_intf->p_sys->b_playlist_changed = 0;
+
+    p_intf->p_sys->b_scale_isfree = 1;
 
     p_intf->p_sys->pf_gtk_callback = NULL;
     p_intf->p_sys->pf_gdk_callback = NULL;
@@ -224,7 +223,9 @@ static gint GnomeManage( gpointer p_data )
 {
     intf_thread_t *p_intf = (void *)p_data;
 
-    /* if the "display popup" flag has changed */
+    vlc_mutex_lock( &p_intf->p_sys->change_lock );
+
+    /* If the "display popup" flag has changed */
     if( p_intf->b_menu_change )
     {
         gnome_popup_menu_do_popup( p_intf->p_sys->p_popup,
@@ -232,15 +233,44 @@ static gint GnomeManage( gpointer p_data )
         p_intf->b_menu_change = 0;
     }
 
+    /* Manage the slider */
+    if( p_intf->p_input != NULL && p_intf->p_sys->p_window != NULL
+         && p_intf->p_sys->b_scale_isfree )
+    {
+        GtkWidget *p_scale;
+        GtkAdjustment *p_adj;
+   
+        p_scale = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                                  p_intf->p_sys->p_window ), "hscale" ) );
+        p_adj = gtk_range_get_adjustment ( GTK_RANGE( p_scale ) );
+
+        /* Update the value */
+        p_adj->value = ( 100. * p_intf->p_input->stream.i_tell )
+                           / p_intf->p_input->stream.i_size;
+
+        /* Gtv does it this way. Why not. */
+        gtk_range_set_adjustment ( GTK_RANGE( p_scale ), p_adj );
+        gtk_range_slider_update ( GTK_RANGE( p_scale ) );
+        gtk_range_clear_background ( GTK_RANGE( p_scale ) );
+        gtk_range_draw_background ( GTK_RANGE( p_scale ) );
+    }
+
     /* Manage core vlc functions through the callback */
     p_intf->pf_manage( p_intf );
 
     if( p_intf->b_die )
     {
+        /* Make sure we won't be called again */
+        gtk_timeout_remove( p_intf->p_sys->i_timeout );
+
+        vlc_mutex_unlock( &p_intf->p_sys->change_lock );
+
         /* prepare to die, young man */
         gtk_main_quit();
         return( FALSE );
     }
+
+    vlc_mutex_unlock( &p_intf->p_sys->change_lock );
 
     return( TRUE );
 }

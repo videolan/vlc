@@ -3,7 +3,9 @@
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Pierre Baillet <oct@zoy.org>
+ *          Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,10 +39,6 @@
 #include "mtime.h"
 #include "tests.h"
 #include "modules.h"
-
-/* FIXME: it's up to the _interface_ to do this, not the video output */
-#include "stream_control.h"
-#include "input_ext-intf.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -79,8 +77,8 @@ typedef struct vout_sys_s
     boolean_t   b_overlay;
     boolean_t   b_cursor;
     boolean_t   b_reopen_display;
-    Uint8   *   p_sdl_buf[2];                           /* Buffer information */
-}   vout_sys_t;
+    Uint8   *   p_sdl_buf[2];                          /* Buffer information */
+} vout_sys_t;
 
 /*****************************************************************************
  * Local prototypes.
@@ -113,7 +111,7 @@ void vout_getfunctions( function_list_t * p_function_list )
 }
 
 /*****************************************************************************
- * intf_Probe: probe the video driver and return a score
+ * vout_Probe: probe the video driver and return a score
  *****************************************************************************
  * This function tries to initialize SDL and returns a score to the
  * plugin manager so that it can select the best plugin.
@@ -182,7 +180,6 @@ int vout_Create( vout_thread_t *p_vout )
 
     /* FIXME: get rid of this ASAP, it's FUCKING UGLY */
     { intf_thread_t * p_intf = p_main->p_intf;
-    /* p_intf->p_intf_getKey = intf_getKey; */
     intf_AssignKey(p_intf, SDLK_q,      INTF_KEY_QUIT, 0);
     intf_AssignKey(p_intf, SDLK_ESCAPE, INTF_KEY_QUIT, 0);
     /* intf_AssignKey(p_intf,3,'Q'); */
@@ -252,9 +249,6 @@ int vout_Manage( vout_thread_t *p_vout )
     SDL_Event event;                                            /* SDL event */
     Uint8   i_key;
 
-    /* FIXME: do this nicely */
-    input_thread_t * p_input = p_main->p_intf->p_input;
-
     /* Process events */
     while( SDL_PollEvent(&event) )
     {
@@ -298,63 +292,22 @@ int vout_Manage( vout_thread_t *p_vout )
 
             case SDLK_c:                                 /* toggle grayscale */
                 p_vout->b_grayscale = ! p_vout->b_grayscale;
-               	p_vout->i_changes |= VOUT_GRAYSCALE_CHANGE;
+                p_vout->i_changes |= VOUT_GRAYSCALE_CHANGE;
                 break;
 
             case SDLK_i:                                      /* toggle info */
                 p_vout->b_info = ! p_vout->b_info;
-               	p_vout->i_changes |= VOUT_INFO_CHANGE;
+                p_vout->i_changes |= VOUT_INFO_CHANGE;
                 break;
 
-	    case SDLK_s:                                   /* toggle scaling */
+            case SDLK_s:                                   /* toggle scaling */
                 p_vout->b_scale = ! p_vout->b_scale;
-               	p_vout->i_changes |= VOUT_SCALE_CHANGE;
+                p_vout->i_changes |= VOUT_SCALE_CHANGE;
                 break;
 
-	    case SDLK_SPACE:                             /* toggle interface */
+            case SDLK_SPACE:                             /* toggle interface */
                 p_vout->b_interface = ! p_vout->b_interface;
-               	p_vout->i_changes |= VOUT_INTF_CHANGE;
-                break;
-
-            /* FIXME : this is temporary */
-            case SDLK_p:
-                if( p_input != NULL )
-                {
-                    input_SetRate( p_input, INPUT_RATE_PAUSE );
-                }
-                break;
-
-            case SDLK_a:
-                if( p_input != NULL )
-                {
-                    input_SetRate( p_input, INPUT_RATE_FASTER );
-                }
-                break;
-
-            case SDLK_z:
-                if( p_input != NULL )
-                {
-                    input_SetRate( p_input, INPUT_RATE_SLOWER );
-                }
-                break;
-
-            case SDLK_j:
-                if( p_input != NULL )
-                {
-                    /* Jump forwards */
-                    input_Seek( p_input, p_input->stream.i_tell
-                                 + p_input->stream.i_size / 20 );
-                                                               /* gabuzomeu */
-                }
-                break;
-
-            case SDLK_b:
-                if( p_input != NULL )
-                {
-                    /* Jump backwards */
-                    input_Seek( p_input, p_input->stream.i_tell
-                                 - p_input->stream.i_size / 20 );
-                }
+                p_vout->i_changes |= VOUT_INTF_CHANGE;
                 break;
 
             default:

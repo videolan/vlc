@@ -144,3 +144,18 @@ on_toolbar_slow_clicked                (GtkButton       *button,
 void
 on_toolbar_fast_clicked                (GtkButton       *button,
                                         gpointer         user_data);
+
+gboolean
+on_hscale_button_release_event         (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+gboolean
+on_hscale_button_release_event         (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+gboolean
+on_hscale_button_press_event           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);

@@ -1,11 +1,11 @@
 /*****************************************************************************
  * sdl.c : SDL plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
+ * Copyright (C) 2000, 2001 VideoLAN
  *
- * Authors:
- *      . Initial plugin code by Samuel Hocevar <sam@via.ecp.fr>
- *      . Modified to use the SDL by Pierre Baillet <octplane@via.ecp.fr>
+ * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Pierre Baillet <oct@zoy.org>
+ *          Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

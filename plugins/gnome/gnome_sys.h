@@ -2,7 +2,7 @@
  * gnome_sys.h: private Gnome interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gnome_sys.h,v 1.2 2001/02/12 00:20:37 sam Exp $
+ * $Id: gnome_sys.h,v 1.3 2001/02/13 04:29:46 sam Exp $
  *
  * Authors:
  *
@@ -29,16 +29,10 @@ typedef struct intf_sys_s
     /* special actions */
     vlc_mutex_t         change_lock;                      /* the change lock */
 
-    boolean_t           b_activity_changed;       /* vout activity toggled ? */
-    boolean_t           b_activity;                         /* vout activity */
-
     boolean_t           b_popup_changed;                   /* display menu ? */
-
     boolean_t           b_window_changed;        /* window display toggled ? */
-    boolean_t           b_window;                        /* display window ? */
-
     boolean_t           b_playlist_changed;    /* playlist display toggled ? */
-    boolean_t           b_playlist;                    /* display playlist ? */
+    boolean_t           b_scale_isfree;       /* user isn't dragging scale ? */
 
     /* intf_Manage callback timeout */
     int                 i_timeout;

@@ -426,3 +426,43 @@ on_toolbar_fast_clicked                (GtkButton       *button,
     }
 }
 
+
+gboolean
+on_hscale_button_release_event         (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), "intf_window" );
+
+    GtkAdjustment *p_adj = gtk_range_get_adjustment( GTK_RANGE(widget) );
+    off_t i_seek = (p_adj->value * p_intf->p_input->stream.i_size) / 100;
+
+    vlc_mutex_lock( &p_intf->p_sys->change_lock );
+
+    p_intf->p_sys->b_scale_isfree = 1;
+    if( p_intf->p_input != NULL )
+    {
+        input_Seek( p_intf->p_input, i_seek );
+    }
+
+    vlc_mutex_unlock( &p_intf->p_sys->change_lock );
+
+    return FALSE;
+}
+
+
+gboolean
+on_hscale_button_press_event           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), "intf_window" );
+
+    vlc_mutex_lock( &p_intf->p_sys->change_lock );
+    p_intf->p_sys->b_scale_isfree = 0;
+    vlc_mutex_unlock( &p_intf->p_sys->change_lock );
+
+    return FALSE;
+}
+
+

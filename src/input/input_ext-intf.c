@@ -123,10 +123,12 @@ void input_SetRate( input_thread_t * p_input, int i_mode )
  *****************************************************************************/
 void input_Seek( input_thread_t * p_input, off_t i_position )
 {
-    intf_Msg( "input: seeking position %lld/%lld", i_position,
-                                                   p_input->stream.i_size );
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.i_seek = i_position;
+
+    intf_Msg( "input: seeking position %lld/%lld", i_position,
+                                                   p_input->stream.i_size );
+
     vlc_cond_signal( &p_input->stream.stream_wait );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }

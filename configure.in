@@ -138,8 +138,8 @@ dnl default case
 else
 
 AC_ARG_ENABLE(dummy,
-  [  --enable-dummy          dummy audio and video support (default disabled)],
-  [if test x$enable_dummy = xyes; then PLUGINS=${PLUGINS}"dummy "; fi])
+  [  --disable-dummy         dummy module (default enabled)])
+if test x$enable_dummy != xno; then PLUGINS=${PLUGINS}"dummy "; fi
 AC_ARG_ENABLE(null,
   [  --disable-null          Null module (default enabled)])
 if test x$enable_null != xno; then PLUGINS=${PLUGINS}"null "; fi

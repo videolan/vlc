@@ -90,10 +90,11 @@
 
 #define OPT_AOUT                180
 #define OPT_VOUT                181
-#define OPT_MOTION              182
-#define OPT_IDCT                183
-#define OPT_YUV                 184
-#define OPT_INPUT               185
+#define OPT_INTF                182
+#define OPT_MOTION              183
+#define OPT_IDCT                184
+#define OPT_YUV                 185
+#define OPT_INPUT               186
 
 #define OPT_SYNCHRO             190
 #define OPT_WARNING             191
@@ -113,6 +114,10 @@ static const struct option longopts[] =
     {   "help",             0,          0,      'h' },
     {   "longhelp",         0,          0,      'H' },
     {   "version",          0,          0,      'v' },
+
+    /* Interface options */
+    {   "intf",             1,          0,      OPT_INTF },
+    {   "warning",          1,          0,      OPT_WARNING },
 
     /* Audio options */
     {   "noaudio",          0,          0,      OPT_NOAUDIO },
@@ -148,9 +153,6 @@ static const struct option longopts[] =
 
     /* Synchro options */
     {   "synchro",          1,          0,      OPT_SYNCHRO },
-
-    /* Interface messages */
-    {   "warning",          1,          0,      OPT_WARNING },
     {   0,                  0,          0,      0 }
 };
 
@@ -561,6 +563,14 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             return( -1 );
             break;
 
+        /* Interface warning messages level */
+        case OPT_INTF:                                             /* --intf */
+            main_PutPszVariable( INTF_METHOD_VAR, optarg );
+            break;
+        case OPT_WARNING:                                       /* --warning */
+            main_PutIntVariable( INTF_WARNING_VAR, atoi(optarg) );
+            break;
+
         /* Audio options */
         case OPT_NOAUDIO:                                       /* --noaudio */
             p_main->b_audio = 0;
@@ -597,16 +607,16 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_COLOR:                                           /* --color */
             main_PutIntVariable( VOUT_GRAYSCALE_VAR, 0 );
             break;
-	case OPT_FULLSCREEN:                                 /* --fullscreen */
+        case OPT_FULLSCREEN:                                 /* --fullscreen */
             main_PutIntVariable( VOUT_FULLSCREEN_VAR, 1 );
             break;
-	case OPT_OVERLAY:                                       /* --overlay */
+        case OPT_OVERLAY:                                       /* --overlay */
             main_PutIntVariable( VOUT_OVERLAY_VAR, 1 );
             break;
-	case OPT_MOTION:                                         /* --motion */
+        case OPT_MOTION:                                         /* --motion */
             main_PutPszVariable( MOTION_METHOD_VAR, optarg );
             break;
-	case OPT_IDCT:                                             /* --idct */
+        case OPT_IDCT:                                             /* --idct */
             main_PutPszVariable( IDCT_METHOD_VAR, optarg );
             break;
         case OPT_YUV:                                               /* --yuv */
@@ -632,7 +642,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
 
         /* Input options */
-	case OPT_INPUT:                                           /* --input */
+        case OPT_INPUT:                                           /* --input */
             main_PutPszVariable( INPUT_METHOD_VAR, optarg );
             break;
         case OPT_VLANS:                                           /* --vlans */
@@ -651,11 +661,6 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         /* Synchro options */
         case OPT_SYNCHRO:                                      
             main_PutPszVariable( VPAR_SYNCHRO_VAR, optarg );
-            break;
-
-        /* Interface warning messages level */
-        case OPT_WARNING:                                       /* --warning */
-            main_PutIntVariable( INTF_WARNING_VAR, atoi(optarg) );
             break;
             
         /* Internal error: unknown option */
@@ -709,6 +714,9 @@ static void Usage( int i_fashion )
 
     /* Options */
     intf_MsgImm( "\nOptions:"
+          "\n      --intf <module>            \tinterface method"
+          "\n      --warning <level>          \tdisplay warning messages"
+          "\n"
           "\n      --noaudio                  \tdisable audio"
           "\n      --aout <module>            \taudio output method"
           "\n      --stereo, --mono           \tstereo/mono audio"
@@ -736,8 +744,6 @@ static void Usage( int i_fashion )
           "\n      --port <port>              \tvideo server port"
           "\n      --broadcast                \tlisten to a broadcast"
           "\n"
-          "\n      --warning <level>          \tdisplay warning messages"
-          "\n"
           "\n  -h, --help                     \tprint help and exit"
           "\n  -H, --longhelp                 \tprint long help and exit"
           "\n  -v, --version                  \toutput version information and exit" );
@@ -747,7 +753,8 @@ static void Usage( int i_fashion )
 
     /* Interface parameters */
     intf_MsgImm( "\nInterface parameters:\n"
-        "\n  " INTF_INIT_SCRIPT_VAR "=<filename>               \tinitialization script"
+        "\n  " INTF_METHOD_VAR "=<method name>          \tinterface method"
+        "\n  " INTF_INIT_SCRIPT_VAR "=<filename>             \tinitialization script"
         "\n  " INTF_CHANNELS_VAR "=<filename>            \tchannels list"
         "\n  " INTF_WARNING_VAR "=<level>                \twarning level" );
 

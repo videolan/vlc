@@ -106,6 +106,7 @@ static int aout_Probe( probedata_t *p_data )
 {
     SDL_AudioSpec desired, obtained;
 
+    return 0;
     /* Start AudioSDL */
     if( SDL_Init(SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE) != 0 )
     {
@@ -116,7 +117,7 @@ static int aout_Probe( probedata_t *p_data )
     desired.freq       = 11025;                                 /* frequency */
     desired.format     = AUDIO_U8;                        /* unsigned 8 bits */
     desired.channels   = 2;                                          /* mono */
-    desired.callback   = aout_SDLCallback;       /* no callback function yet */
+    desired.callback   = NULL;                   /* no callback function yet */
     desired.userdata   = NULL;                     /* null parm for callback */
     desired.samples    = 4096;
 

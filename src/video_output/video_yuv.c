@@ -61,7 +61,7 @@ int vout_InitYUV( vout_thread_t *p_vout )
     if( p_vout->yuv.p_module == NULL )
     {
         intf_ErrMsg( "vout error: no suitable yuv module" );
-	return( -1 );
+        return( -1 );
     }
 
 #define yuv_functions p_vout->yuv.p_module->p_functions->yuv.functions.yuv

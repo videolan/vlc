@@ -129,9 +129,9 @@ typedef struct function_list_s
             void ( * pf_frame_field_##yuv ) ( struct macroblock_s * ); \
             void ( * pf_frame_frame_##yuv ) ( struct macroblock_s * ); \
             void ( * pf_frame_dmv_##yuv )   ( struct macroblock_s * );
-	    motion_functions( 420 )
-	    motion_functions( 422 )
-	    motion_functions( 444 )
+            motion_functions( 420 )
+            motion_functions( 422 )
+            motion_functions( 444 )
 #undef motion_functions
         } motion;
 

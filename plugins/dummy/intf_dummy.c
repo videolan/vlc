@@ -1,9 +1,9 @@
 /*****************************************************************************
  * intf_dummy.c: dummy interface plugin
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
+ * Copyright (C) 2000, 2001 VideoLAN
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,13 +31,8 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-
-#include "video.h"
-#include "video_output.h"
+#include "tests.h"
+#include "modules.h"
 
 #include "intf_msg.h"
 #include "interface.h"
@@ -53,9 +48,45 @@ typedef struct intf_sys_s
 } intf_sys_t;
 
 /*****************************************************************************
- * intf_DummyCreate: initialize dummy interface
+ * Local prototypes.
  *****************************************************************************/
-int intf_DummyCreate( intf_thread_t *p_intf )
+static int  intf_Probe     ( probedata_t *p_data );
+static int  intf_Open      ( intf_thread_t *p_intf );
+static void intf_Close     ( intf_thread_t *p_intf );
+static void intf_Run       ( intf_thread_t *p_intf );
+
+/*****************************************************************************
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+void intf_getfunctions( function_list_t * p_function_list )
+{
+    p_function_list->pf_probe = intf_Probe;
+    p_function_list->functions.intf.pf_open  = intf_Open;
+    p_function_list->functions.intf.pf_close = intf_Close;
+    p_function_list->functions.intf.pf_run   = intf_Run;
+}
+
+/*****************************************************************************
+ * intf_Probe: probe the interface and return a score
+ *****************************************************************************
+ * This function tries to initialize Gnome and returns a score to the
+ * plugin manager so that it can select the best plugin.
+ *****************************************************************************/
+static int intf_Probe( probedata_t *p_data )
+{
+    if( TestMethod( INTF_METHOD_VAR, "dummy" ) )
+    {
+        return( 999 );
+    }
+
+    return( 1 );
+}
+
+/*****************************************************************************
+ * intf_Open: initialize dummy interface
+ *****************************************************************************/
+static int intf_Open( intf_thread_t *p_intf )
 {
     /* Allocate instance and initialize some members */
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
@@ -64,46 +95,31 @@ int intf_DummyCreate( intf_thread_t *p_intf )
         return( 1 );
     };
 
-    /* Spawn video output thread */
-    if( p_main->b_video )
-    {
-        p_intf->p_vout = vout_CreateThread( NULL, 0, 0, 0, NULL, 0, NULL );
-        if( p_intf->p_vout == NULL )                                /* error */
-        {
-            intf_ErrMsg("intf error: can't create output thread" );
-            return( 1 );
-        }
-    }
     return( 0 );
 }
 
 /*****************************************************************************
- * intf_DummyDestroy: destroy dummy interface
+ * intf_Close: destroy dummy interface
  *****************************************************************************/
-void intf_DummyDestroy( intf_thread_t *p_intf )
+static void intf_Close( intf_thread_t *p_intf )
 {
-    /* Close input thread, if any (blocking) */
-    if( p_intf->p_input )
-    {
-        input_DestroyThread( p_intf->p_input, NULL );
-    }
-
-    /* Close video output thread, if any (blocking) */
-    if( p_intf->p_vout )
-    {
-        vout_DestroyThread( p_intf->p_vout, NULL );
-    }
-
     /* Destroy structure */
     free( p_intf->p_sys );
 }
 
 
 /*****************************************************************************
- * intf_DummyManage: event loop
+ * intf_Run: main loop
  *****************************************************************************/
-void intf_DummyManage( intf_thread_t *p_intf )
+static void intf_Run( intf_thread_t *p_intf )
 {
-    ;
+    while( !p_intf->b_die )
+    {
+        /* Manage core vlc functions through the callback */
+        p_intf->pf_manage( p_intf );
+
+        /* Wait a bit */
+        msleep( INTF_IDLE_SLEEP );
+    }
 }
 

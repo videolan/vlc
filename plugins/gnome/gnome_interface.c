@@ -29,14 +29,14 @@ static GnomeUIInfo menubar_view_menu_uiinfo[] =
 {
   {
     GNOME_APP_UI_ITEM, N_("P_laylist"),
-    NULL,
+    N_("Open the playlist window"),
     (gpointer) on_menubar_playlist_activate, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_INDEX,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("_Plugins"),
-    NULL,
+    N_("Open the plugin manager"),
     (gpointer) on_menubar_plugins_activate, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ATTACH,
     0, (GdkModifierType) 0, NULL
@@ -69,7 +69,7 @@ GtkWidget*
 create_intf_window (void)
 {
   GtkWidget *intf_window;
-  GtkWidget *dock1;
+  GtkWidget *dockitem;
   GtkWidget *toolbar;
   GtkWidget *tmp_toolbar_icon;
   GtkWidget *toolbar_open;
@@ -82,18 +82,20 @@ create_intf_window (void)
   GtkWidget *toolbar_playlist;
   GtkWidget *toolbar_prev;
   GtkWidget *toolbar_next;
-  GtkWidget *scrolledwindow1;
-  GtkWidget *text1;
+  GtkWidget *vbox2;
+  GtkWidget *label6;
+  GtkWidget *label7;
+  GtkWidget *hscale;
   GtkWidget *appbar;
 
   intf_window = gnome_app_new ("VideoLAN Client", _("VideoLAN Client"));
   gtk_object_set_data (GTK_OBJECT (intf_window), "intf_window", intf_window);
 
-  dock1 = GNOME_APP (intf_window)->dock;
-  gtk_widget_ref (dock1);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "dock1", dock1,
+  dockitem = GNOME_APP (intf_window)->dock;
+  gtk_widget_ref (dockitem);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "dockitem", dockitem,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (dock1);
+  gtk_widget_show (dockitem);
 
   gnome_app_create_menus (GNOME_APP (intf_window), menubar_uiinfo);
 
@@ -289,22 +291,42 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_next);
 
-  scrolledwindow1 = gtk_scrolled_window_new (NULL, NULL);
-  gtk_widget_ref (scrolledwindow1);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "scrolledwindow1", scrolledwindow1,
+  vbox2 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_ref (vbox2);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "vbox2", vbox2,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (scrolledwindow1);
-  gnome_app_set_contents (GNOME_APP (intf_window), scrolledwindow1);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow1), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+  gtk_widget_show (vbox2);
+  gnome_app_set_contents (GNOME_APP (intf_window), vbox2);
 
-  text1 = gtk_text_new (NULL, NULL);
-  gtk_widget_ref (text1);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "text1", text1,
+  label6 = gtk_label_new (_("File name: wazaa.mpeg"));
+  gtk_widget_ref (label6);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label6", label6,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (text1);
-  gtk_container_add (GTK_CONTAINER (scrolledwindow1), text1);
-  gtk_text_insert (GTK_TEXT (text1), NULL, NULL, NULL,
-                   _("This is some random text. Nah. Eat at Sam's. Rent this place. Wazaaa."), 69);
+  gtk_widget_show (label6);
+  gtk_box_pack_start (GTK_BOX (vbox2), label6, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label6), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
+  gtk_misc_set_padding (GTK_MISC (label6), 5, 0);
+
+  label7 = gtk_label_new (_("File type: awesome movie"));
+  gtk_widget_ref (label7);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label7", label7,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label7);
+  gtk_box_pack_start (GTK_BOX (vbox2), label7, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label7), GTK_JUSTIFY_LEFT);
+  gtk_label_set_line_wrap (GTK_LABEL (label7), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label7), 0, 0.5);
+  gtk_misc_set_padding (GTK_MISC (label7), 5, 0);
+
+  hscale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 100, 1, 0, 0)));
+  gtk_widget_ref (hscale);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "hscale", hscale,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (hscale);
+  gtk_box_pack_start (GTK_BOX (vbox2), hscale, FALSE, FALSE, 0);
+  gtk_scale_set_value_pos (GTK_SCALE (hscale), GTK_POS_BOTTOM);
+  gtk_range_set_update_policy (GTK_RANGE (hscale), GTK_UPDATE_DELAYED);
 
   appbar = gnome_appbar_new (TRUE, TRUE, GNOME_PREFERENCES_NEVER);
   gtk_widget_ref (appbar);
@@ -346,6 +368,12 @@ create_intf_window (void)
                       NULL);
   gtk_signal_connect (GTK_OBJECT (toolbar_next), "clicked",
                       GTK_SIGNAL_FUNC (on_toolbar_next_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (hscale), "button_release_event",
+                      GTK_SIGNAL_FUNC (on_hscale_button_release_event),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (hscale), "button_press_event",
+                      GTK_SIGNAL_FUNC (on_hscale_button_press_event),
                       NULL);
 
   return intf_window;
