@@ -2068,9 +2068,10 @@ static int Manage( vout_thread_t *p_vout )
 
     /* Clear changes flags which does not need management or have been
      * handled */
-    p_vout->i_changes &= ~(VOUT_GAMMA_CHANGE | VOUT_GRAYSCALE_CHANGE |
-                           VOUT_YUV_CHANGE   | VOUT_INFO_CHANGE |
-                           VOUT_INTF_CHANGE  | VOUT_SCALE_CHANGE );
+    p_vout->i_changes &= ~(VOUT_GAMMA_CHANGE  | VOUT_GRAYSCALE_CHANGE |
+                           VOUT_YUV_CHANGE    | VOUT_INFO_CHANGE |
+                           VOUT_INTF_CHANGE   | VOUT_SCALE_CHANGE |
+                           VOUT_CURSOR_CHANGE | VOUT_FULLSCREEN_CHANGE );
 
     /* Detect unauthorized changes */
     if( p_vout->i_changes )

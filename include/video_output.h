@@ -219,9 +219,11 @@ typedef struct vout_thread_s
 #define VOUT_GRAYSCALE_CHANGE   0x0002                /* b_grayscale changed */
 #define VOUT_INTF_CHANGE        0x0004                /* b_interface changed */
 #define VOUT_SCALE_CHANGE       0x0008                    /* b_scale changed */
+#define VOUT_GAMMA_CHANGE       0x0010                      /* gamma changed */
+#define VOUT_CURSOR_CHANGE      0x0020                   /* b_cursor changed */
+#define VOUT_FULLSCREEN_CHANGE  0x0040               /* b_fullscreen changed */
 #define VOUT_SIZE_CHANGE        0x0200                       /* size changed */
 #define VOUT_DEPTH_CHANGE       0x0400                      /* depth changed */
-#define VOUT_GAMMA_CHANGE       0x0010                      /* gamma changed */
 #define VOUT_YUV_CHANGE         0x0800                  /* change yuv tables */
 
 /* Disabled for thread deadlocks issues --Meuuh */

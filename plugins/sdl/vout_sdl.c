@@ -49,7 +49,7 @@
  * This structure is part of the video output thread descriptor.
  * It describes the SDL specific properties of an output thread.
  *****************************************************************************/
-/* FIXME: SOME CLUELESS MORON DEFINED THIS STRUCTURE IN INTF_SDL.C AS WELL */
+/* FIXME: SOME CLUELESS MORON DEFINED THIS STRUCTURE IN INTF_SDL.C AS WELL   */
 typedef struct vout_sys_s
 {
     int i_width;
@@ -60,8 +60,6 @@ typedef struct vout_sys_s
     boolean_t   b_overlay;
     boolean_t   b_cursor;
     boolean_t   b_reopen_display;
-    boolean_t   b_toggle_fullscreen;
-    boolean_t   b_hide_cursor;
     Uint8   *   p_buffer[2];
                                                      /* Buffers informations */
 }   vout_sys_t;
@@ -72,7 +70,7 @@ typedef struct vout_sys_s
 static int     SDLOpenDisplay       ( vout_thread_t *p_vout );
 static void    SDLCloseDisplay      ( vout_thread_t *p_vout );
 static void    SDLToggleFullScreen  ( vout_thread_t *p_vout );
-static void    SDLHideCursor        ( vout_thread_t *p_vout );
+static void    SDLTogglePointer     ( vout_thread_t *p_vout );
 /*****************************************************************************
  * vout_SDLCreate: allocate SDL video thread output method
  *****************************************************************************
@@ -124,11 +122,10 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
     {
       intf_ErrMsg( "error: can't initialize SDL library: %s",
                    SDL_GetError() );
+      free( p_vout->p_sys );
       return( 1 );
     }
 
-    p_vout->p_sys->b_toggle_fullscreen = 0;
-    p_vout->p_sys->b_hide_cursor = 0;
     return( 0 );
 }
 
@@ -171,28 +168,61 @@ void vout_SDLDestroy( vout_thread_t *p_vout )
  *****************************************************************************/
 int vout_SDLManage( vout_thread_t *p_vout )
 {
-    /* If the display has to be reopened we do so */
-    if( p_vout->p_sys->b_reopen_display )
-    {
-        SDLCloseDisplay(p_vout);
 
-        if( SDLOpenDisplay(p_vout) )
+    /*
+     * Size Change 
+     */
+    if ( p_vout->i_changes & VOUT_SIZE_CHANGE )
+    {
+        p_vout->p_sys->i_width = p_vout->i_width;
+        p_vout->p_sys->i_height = p_vout->i_height;
+
+        /* Need to reopen display */
+        SDLCloseDisplay( p_vout );
+        if ( SDLOpenDisplay( p_vout ) )
         {
-            intf_ErrMsg( "error: can't open DISPLAY default display" );
-            return( 1 );
+          intf_ErrMsg( "error: can't open DISPLAY default display" );
+          return( 1 );
         }
-    }
-
-    /* if fullscreen has to be toggled we do so */
-    if( p_vout->p_sys->b_toggle_fullscreen )
-    {
-        SDLToggleFullScreen(p_vout);
+        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
     }
     
-    /* if pointer has to be hidden/shown we do so */
-    if( p_vout->p_sys->b_hide_cursor )
+    /*
+     * YUV Change 
+     */
+    if ( p_vout->i_changes & VOUT_YUV_CHANGE )
     {
-        SDLHideCursor(p_vout);
+        p_vout->b_need_render = 1 - p_vout->b_need_render;
+        
+        /* Need to reopen display */
+        SDLCloseDisplay( p_vout );
+        if ( SDLOpenDisplay( p_vout ) )
+        {
+          intf_ErrMsg( "error: can't open DISPLAY default display" );
+          return( 1 );
+        }
+        p_vout->i_changes &= ~VOUT_YUV_CHANGE;
+    }
+    
+    /*
+     * Fullscreen change
+     */
+    if ( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
+    {
+        p_vout->p_sys->b_fullscreen = 1 - p_vout->p_sys->b_fullscreen;
+        SDLToggleFullScreen( p_vout );
+        p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
+    }
+
+    
+
+    /*
+     * Pointer change
+     */
+    if ( p_vout->i_changes & VOUT_CURSOR_CHANGE )
+    {
+        p_vout->p_sys->b_cursor = 1 - p_vout->p_sys->b_cursor;
+        SDLTogglePointer( p_vout );
     }
     
     return( 0 );
@@ -205,7 +235,8 @@ int vout_SDLManage( vout_thread_t *p_vout )
  * anything, but could later send information on which colors it was unable
  * to set.
  *****************************************************************************/
-void vout_SDLSetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green, u16 *blue, u16 *transp)
+void vout_SDLSetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green,
+                         u16 *blue, u16 *transp)
 {
      /* Create a display surface with a grayscale palette */
     SDL_Color colors[256];
@@ -401,8 +432,6 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
                                  p_vout->p_sys->p_buffer[ 1 ] );
     }
 
-    p_vout->i_changes |= VOUT_YUV_CHANGE;
-
     p_vout->p_sys->b_reopen_display = 0;
 
     return( 0 );
@@ -449,16 +478,15 @@ static void SDLToggleFullScreen( vout_thread_t *p_vout )
         p_vout->p_sys->b_cursor=0;
     }
     
-    p_vout->p_sys->b_toggle_fullscreen = 0;
-    SDLHideCursor(p_vout);
+    SDLTogglePointer( p_vout );
 }
 
 /*****************************************************************************
- * SDLHideCursor: Hide/Show mouse pointer
+ * SDLTogglePointer: Hide/Show mouse pointer
  *****************************************************************************
  * This function hides/shows the mouse pointer inside the main window.
  *****************************************************************************/
-static void SDLHideCursor( vout_thread_t *p_vout )
+static void SDLTogglePointer( vout_thread_t *p_vout )
 {
     if( p_vout->p_sys->b_cursor==1 )
     {
@@ -468,5 +496,4 @@ static void SDLHideCursor( vout_thread_t *p_vout )
     {
         SDL_ShowCursor( 1 );
     }
-    p_vout->p_sys->b_hide_cursor = 0;
 }

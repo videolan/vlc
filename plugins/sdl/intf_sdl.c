@@ -2,7 +2,7 @@
  * intf_sdl.c: SDL interface plugin
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_sdl.c,v 1.25 2001/02/05 15:50:57 nitrox Exp $
+ * $Id: intf_sdl.c,v 1.26 2001/02/06 00:56:55 nitrox Exp $
  *
  * Authors:
  *
@@ -50,30 +50,8 @@
 
 #include "main.h"
 
-/* FIXME: SOME CLUELESS MORON DEFINED THIS STRUCTURE IN VOUT_SDL.C AS WELL */
-typedef struct vout_sys_s
-{
-    int i_width;
-    int i_height;
-    SDL_Surface *   p_display;                             /* display device */
-    SDL_Overlay *   p_overlay;
-    boolean_t   b_fullscreen;
-    boolean_t   b_overlay;
-    boolean_t   b_cursor;                                /* 1 if hide 0 else */
-    boolean_t   b_reopen_display;
-    boolean_t   b_toggle_fullscreen;
-    boolean_t   b_hide_cursor;
-    Uint8   *   p_buffer[2];
-                                                     /* Buffers informations */
-}   vout_sys_t;
-
-
 /* local prototype */
 void intf_SDL_Keymap( intf_thread_t * p_intf );
-void intf_SDL_Resize( intf_thread_t * p_intf, int width, int height );
-void intf_SDL_Fullscreen(intf_thread_t * p_intf);
-void intf_SDL_YUVSwitch(intf_thread_t * p_intf);
-void intf_SDL_Hidecursor(intf_thread_t * p_intf);  
 
 /*****************************************************************************
  * intf_SDLCreate: initialize and create SDL interface
@@ -133,85 +111,63 @@ void intf_SDLManage( intf_thread_t *p_intf )
     SDL_Event event;                                            /* SDL event */
     Uint8   i_key;
  
-    if( p_intf->p_vout->p_sys->b_overlay )
-    {
-        intf_SDL_YUVSwitch(p_intf);
-        p_intf->p_vout->p_sys->b_overlay = 0;
-    }
-
     while ( SDL_PollEvent(&event) )
     {
-        switch (event.type) {
-            case SDL_VIDEORESIZE:                      /* Resizing of window */
-                intf_SDL_Resize( p_intf, event.resize.w, event.resize.h );
-                break;
-            case SDL_KEYDOWN:                         /* if a key is pressed */
-                i_key = event.key.keysym.sym;                  /* forward it */
-                switch(i_key) {
-                                                    /* switch to fullscreen  */
-                    case SDLK_f:
-                        intf_SDL_Fullscreen(p_intf);
-                        break;
-                    case SDLK_y:
-                        intf_SDL_YUVSwitch(p_intf);
-                        break; 
-                  default :
-                        if( intf_ProcessKey( p_intf, (char ) i_key ) )
-                        {
-                            intf_DbgMsg( "unhandled key '%c' (%i)",
-                                         (char) i_key, i_key );
-                        }
-                        break;
-                }
-                break;
+        switch (event.type)
+        {
+        case SDL_VIDEORESIZE:                           /* Resizing of window */
+            intf_Msg( "intf: video display resized (%dx%d)", event.resize.w
+                                                           , event.resize.h ); 
+            vlc_mutex_lock( &p_intf->p_vout->change_lock );
+            p_intf->p_vout->i_width = event.resize.w;
+            p_intf->p_vout->i_height = event.resize.h;
+            p_intf->p_vout->i_changes |= VOUT_SIZE_CHANGE;
+            vlc_mutex_unlock( &p_intf->p_vout->change_lock );
+            break;
             
-            case SDL_MOUSEBUTTONDOWN:
-                if(event.button.button==SDL_BUTTON_MIDDLE)
-                {
-                  intf_SDL_Hidecursor(p_intf);
-                }                                       
+        case SDL_KEYDOWN:                              /* if a key is pressed */
+            i_key = event.key.keysym.sym;
+               
+            switch(i_key) 
+            {
+            case SDLK_f:                              /* switch to fullscreen */
+                vlc_mutex_lock( &p_intf->p_vout->change_lock );
+                p_intf->p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                vlc_mutex_unlock( &p_intf->p_vout->change_lock );
                 break;
                 
-            case SDL_QUIT:
-                intf_ProcessKey( p_intf, SDLK_q );
+           case SDLK_y:                                 /* switch to hard YUV */
+                vlc_mutex_lock( &p_intf->p_vout->change_lock );
+                p_intf->p_vout->i_changes |= VOUT_YUV_CHANGE;
+                vlc_mutex_unlock( &p_intf->p_vout->change_lock );
+                break; 
+                        
+            default:
+                if( intf_ProcessKey( p_intf, (char )i_key ) )
+                {
+                   intf_DbgMsg( "unhandled key '%c' (%i)", (char)i_key, i_key );
+                }
                 break;
-           default:
-                break;
+            }
+            break;
+            
+        case SDL_MOUSEBUTTONDOWN:
+            if( event.button.button == SDL_BUTTON_MIDDLE )
+            {
+                vlc_mutex_lock( &p_intf->p_vout->change_lock );
+                p_intf->p_vout->i_changes |= VOUT_CURSOR_CHANGE;
+                vlc_mutex_unlock( &p_intf->p_vout->change_lock );
+            }                                       
+            break;
+            
+        case SDL_QUIT:
+            intf_ProcessKey( p_intf, SDLK_q );
+            break;
+       
+        default:
+            break;
         }
     }
-}
-
-void intf_SDL_Resize( intf_thread_t * p_intf, int width, int height )
-{
-    intf_Msg( "intf: video display resized (%dx%d)", width, height ); 
-    vlc_mutex_lock( &p_intf->p_vout->change_lock );
-    p_intf->p_vout->p_sys->i_width = width;
-    p_intf->p_vout->p_sys->i_height = height;
-    p_intf->p_vout->p_sys->b_reopen_display = 1;
-    vlc_mutex_unlock( &p_intf->p_vout->change_lock );
-}
-
-void intf_SDL_YUVSwitch(intf_thread_t * p_intf)
-{
-    vlc_mutex_lock( &p_intf->p_vout->change_lock );
-    p_intf->p_vout->b_need_render = 1 - p_intf->p_vout->b_need_render;
-    p_intf->p_vout->p_sys->b_reopen_display = 1;
-    vlc_mutex_unlock( &p_intf->p_vout->change_lock );
-}
-void intf_SDL_Fullscreen(intf_thread_t * p_intf)
-{
-    vlc_mutex_lock( &p_intf->p_vout->change_lock );
-    p_intf->p_vout->p_sys->b_fullscreen = 1-p_intf->p_vout->p_sys->b_fullscreen;
-    p_intf->p_vout->p_sys->b_toggle_fullscreen = 1;
-    vlc_mutex_unlock( &p_intf->p_vout->change_lock );
-} 
-
-void intf_SDL_Hidecursor(intf_thread_t * p_intf)
-{
-    vlc_mutex_lock(&p_intf->p_vout->change_lock);
-    p_intf->p_vout->p_sys->b_cursor = 1 - p_intf->p_vout->p_sys->b_cursor;
-    p_intf->p_vout->p_sys->b_hide_cursor=1;
-    vlc_mutex_unlock(&p_intf->p_vout->change_lock);
 }
 
 void intf_SDL_Keymap(intf_thread_t * p_intf )
@@ -242,4 +198,3 @@ void intf_SDL_Keymap(intf_thread_t * p_intf )
     intf_AssignKey(p_intf, SDLK_s,      INTF_KEY_TOGGLE_SCALING, 0);
 
 }
-
