@@ -314,7 +314,7 @@ static char *ppsz_align_descriptions[] =
     "Give the stream number of the subtitle channel you want to use " \
     "(from 0 to n).")
 
-#define INPUT_REPEAT_TEXT N_("Number of time the same input will be repeated")
+#define INPUT_REPEAT_TEXT N_("Input repetitions")
 #define INPUT_REPEAT_LONGTEXT N_("Number of time the same input will be repeated")
 
 #define START_TIME_TEXT N_("Input start time (seconds)")
@@ -864,6 +864,8 @@ vlc_module_begin();
     add_integer( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
     add_integer( "video-x", -1, NULL, VIDEOX_TEXT, VIDEOX_LONGTEXT, VLC_TRUE );
     add_integer( "video-y", -1, NULL, VIDEOY_TEXT, VIDEOY_LONGTEXT, VLC_TRUE );
+    add_bool( "video-deco", 0, NULL, VIDEO_DECO_TEXT,
+              VIDEO_DECO_LONGTEXT, VLC_TRUE );
     add_string( "video-title", NULL, NULL, VIDEO_TITLE_TEXT,
                  VIDEO_TITLE_LONGTEXT, VLC_TRUE );
     add_integer( "align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE );
@@ -891,8 +893,6 @@ vlc_module_begin();
         change_short('V');
 
     set_subcategory( SUBCAT_VIDEO_VFILTER );
-    add_bool( "video-deco", 0, NULL, VIDEO_DECO_TEXT,
-              VIDEO_DECO_LONGTEXT, VLC_TRUE );
     add_module_list_cat( "filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
                 FILTER_TEXT, FILTER_LONGTEXT, VLC_FALSE );
 #if 0
