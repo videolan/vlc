@@ -2,7 +2,7 @@
  * render.c : Philips OGT (SVCD Subtitle) renderer
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: render.c,v 1.8 2004/01/02 04:44:34 rocky Exp $
+ * $Id: render.c,v 1.9 2004/01/03 17:19:41 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -110,12 +110,12 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop )
 {
   /* Common variables */
-  uint8_t *p_pixel_base;
+  uint8_t *p_pixel_base_Y, *p_pixel_base_V, *p_pixel_base_U;
   ogt_yuvt_t *p_source;
 
-  unsigned int i_plane;
   int i_x, i_y;
-  
+  vlc_bool_t even_scanline = VLC_FALSE;
+
   /* Crop-specific */
   int i_x_start, i_y_start, i_x_end, i_y_end;
   /* int i=0; */
@@ -128,8 +128,14 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
 	     p_pic->Y_PITCH, p_pic->U_PITCH, p_pic->V_PITCH );
 
   
-  p_pixel_base = p_pic->p[Y_PLANE].p_pixels + p_spu->i_x
-               + p_pic->p[Y_PLANE].i_pitch * p_spu->i_y;
+  p_pixel_base_Y = p_pic->p[Y_PLANE].p_pixels + p_spu->i_x
+                 + p_pic->p[Y_PLANE].i_pitch * p_spu->i_y;
+  
+  p_pixel_base_U = p_pic->p[U_PLANE].p_pixels + p_spu->i_x/2
+                 + p_pic->p[U_PLANE].i_pitch * p_spu->i_y/2;
+  
+  p_pixel_base_V = p_pic->p[V_PLANE].p_pixels + p_spu->i_x/2
+                 + p_pic->p[V_PLANE].i_pitch * p_spu->i_y/2;
   
   i_x_start = p_sys->i_x_start;
   i_y_start = p_pic->p[Y_PLANE].i_pitch * p_sys->i_y_start;
@@ -144,6 +150,12 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
        i_y < p_spu->i_height * p_pic->p[Y_PLANE].i_pitch ;
        i_y += p_pic->p[Y_PLANE].i_pitch )
     {
+      uint8_t *p_pixel_base_Y_y = p_pixel_base_Y + i_y;
+      uint8_t *p_pixel_base_U_y = p_pixel_base_U + i_y/4;
+      uint8_t *p_pixel_base_V_y = p_pixel_base_V + i_y/4;
+
+      even_scanline = !even_scanline;
+
       /* printf("+++begin line: %d,\n", i++); */
       /* Draw until we reach the end of the line */
       for( i_x = 0; i_x < p_spu->i_width; i_x++, p_source++ )
@@ -170,9 +182,16 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
 		   pixel with subtitle pixel. */
 		
 		/* This is the location that's going to get changed.*/
-		uint8_t *p_pixel = p_pixel_base + i_x + i_y;
+		uint8_t *p_pixel_Y = p_pixel_base_Y_y + i_x;
 		
-		*p_pixel = p_source->plane[Y_PLANE];
+		*p_pixel_Y = p_source->plane[Y_PLANE];
+
+		if ( even_scanline && i_x % 2 == 0 ) {
+		  uint8_t *p_pixel_U = p_pixel_base_U_y + i_x/2;
+		  uint8_t *p_pixel_V = p_pixel_base_V_y + i_x/2;
+		  *p_pixel_U = p_source->plane[U_PLANE];
+		  *p_pixel_V = p_source->plane[V_PLANE];
+		}
 		
 		break;
 	      }
@@ -182,13 +201,14 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
 		/* Blend in underlying pixel subtitle pixel. */
 		
 		/* This is the location that's going to get changed.*/
-		uint8_t *p_pixel = p_pixel_base + i_x + i_y;
+		uint8_t *p_pixel_Y = p_pixel_base_Y_y + i_x;
+
 
 		/* This is the weighted part of the subtitle. The
 		   color plane is 8 bits and transparancy is 4 bits so
 		   when multiplied we get up to 12 bits.
 		 */
-		uint16_t i_sub_color = 
+		uint16_t i_sub_color_Y = 
 		  (uint16_t) ( p_source->plane[Y_PLANE] *
 			       (uint16_t) (p_source->s.t) );
 
@@ -198,8 +218,8 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
 		   inverses, the sum of i_sub_color and i_pixel_color
 		   will not exceed 12 bits.
 		*/
-		uint16_t i_pixel_color = 
-		  (uint16_t) ( *p_pixel * 
+		uint16_t i_pixel_color_Y = 
+		  (uint16_t) ( *p_pixel_Y * 
 			       (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
 		
 		/* Scale the 12-bit result back down to 8 bits. A
@@ -210,105 +230,33 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
 		   transparent and all opaque) aren't handled properly.
 		   But we deal with them in special cases above. */
 
-		*p_pixel = ( i_sub_color + i_pixel_color ) >> 4;
+		*p_pixel_Y = ( i_sub_color_Y + i_pixel_color_Y ) >> 4;
+
+		if ( even_scanline && i_x % 2 == 0 ) {
+		  uint8_t *p_pixel_U = p_pixel_base_U_y + i_x/2;
+		  uint8_t *p_pixel_V = p_pixel_base_V_y + i_x/2;
+		  uint16_t i_sub_color_U = 
+		    (uint16_t) ( p_source->plane[U_PLANE] *
+				 (uint16_t) (p_source->s.t) );
+		  
+		  uint16_t i_sub_color_V = 
+		    (uint16_t) ( p_source->plane[V_PLANE] *
+				 (uint16_t) (p_source->s.t) );
+		  uint16_t i_pixel_color_U = 
+		    (uint16_t) ( *p_pixel_U * 
+				 (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
+		  uint16_t i_pixel_color_V = 
+		    (uint16_t) ( *p_pixel_V * 
+				 (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
+		  *p_pixel_U = ( i_sub_color_U + i_pixel_color_U ) >> 4;
+		  *p_pixel_V = ( i_sub_color_V + i_pixel_color_V ) >> 4;
+		}
 		break;
 	      }
 	      
 	    }
 	}
     }
-
-
-#if 0
-  for ( i_plane = U_PLANE; i_plane <= V_PLANE ; i_plane++ )
-    {
-      
-      p_pixel_base = p_pic->p[i_plane].p_pixels + p_spu->i_x / 2
-	           + p_pic->p[i_plane].i_pitch * p_spu->i_y / 2;
-      
-      i_x_start = p_sys->i_x_start / 2;
-      i_y_start = p_pic->p[Y_PLANE].i_pitch * p_sys->i_y_start;
-		   
-      i_x_end   = p_sys->i_x_end / 2;
-      i_y_end   = p_pic->p[Y_PLANE].i_pitch * p_sys->i_y_end;
-      
-      p_source = (ogt_yuvt_t *)p_sys->p_data;
-      
-      /* Draw until we reach the bottom of the subtitle */
-      for( i_y = 0;
-	   i_y < p_spu->i_height * p_pic->p[i_plane].i_pitch ;
-	   i_y += p_pic->p[i_plane].i_pitch )
-	{
-	  /* printf("+++begin line: %d,\n", i++); */
-	  /* Draw until we reach the end of the line */
-	  for( i_x = 0; i_x < p_spu->i_width; i_x += 2, p_source += 2 )
-	    {
-
-	      if( b_crop
-		  && ( i_x < i_x_start || i_x > i_x_end
-		       || i_y < i_y_start || i_y > i_y_end ) )
-		{
-		  continue;
-		}
-	      
-	      /* printf( "t: %x, y: %x, u: %x, v: %x\n", 
-		 p_source->s.t, p_source->y, p_source->u, p_source->v ); */
-	      
-	      switch( p_source->s.t )
-		{
-		case 0x00: 
-		  /* Completely transparent. Don't change pixel. */
-		  break;
-
-		default:
-		case MAX_ALPHA:
-		  {
-		    
-		    /* Completely opaque. Completely overwrite underlying
-		       pixel with subtitle pixel. */
-		    
-		    /* This is the location that's going to get changed.*/
-		    uint8_t *p_pixel = p_pixel_base + i_y/2 + i_x/2;
-		    uint8_t alpha  = p_source->plane[i_plane];
-		    *p_pixel = ( ( *p_pixel * ( 0xFF - alpha ) ) >> 8 ) +
-		      ( 0x80 * alpha >> 8 );
-		    break;
-		  }
-
-#if 0		  
-		  {
-		    /* Blend in underlying pixel subtitle pixel. */
-		    
-		    /* To be able to scale correctly for full
-		       opaqueness, we add 1 to the alpha.  This means
-		       alpha value 0 won't be completely transparent and
-		       is not correct, but that's handled in a special
-		       case above anyway. */
-		    uint8_t *p_pixel = p_pixel_base + i_y/2 + i_x/2;
-		    uint8_t low_val  = *p_pixel & 0x0f;
-		    uint8_t high_val = *p_pixel & 0xf0 >> 4;
-		    uint16_t i_colprecomp = (p_source->plane[i_plane]
-		       * (uint16_t) (p_source->s.t+1)) >> 4;
-		    uint8_t i_destalpha  = MAX_ALPHA - p_source->s.t;
-		    uint16_t new_low = ( i_colprecomp + low_val*i_destalpha ) 
-		                        / 2;
-		    uint16_t new_high;
-		    
-		    p_source++;
-		    i_colprecomp = (p_source->plane[i_plane]
-		       * (uint16_t) (p_source->s.t+1)) >> 4;
-		    i_destalpha  = MAX_ALPHA - p_source->s.t;
-		    new_high = ( i_colprecomp + high_val*i_destalpha ) / 2;
-
-		    *p_pixel = (new_high << 4) | new_low;
-		    break;
-		  }
-#endif
-		}
-	    }
-	}
-  }
-#endif
 }
 
 #define Y2RV16(val) ((uint16_t) (0x111 * (uint16_t) ( (val) >> 4 )))
@@ -317,7 +265,7 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop )
 {
     /* Common variables */
-    uint8_t *p_pixel_base;
+    uint8_t *p_pixel_base_Y;
     ogt_yuvt_t *p_src_start = (ogt_yuvt_t *)p_spu->p_sys->p_data;
     ogt_yuvt_t *p_src_end   = &p_src_start[p_spu->i_height * p_spu->i_width];
 
@@ -342,7 +290,7 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
     i_width  = p_spu->i_width  * i_xscale;
     i_height = p_spu->i_height * i_yscale;
 
-    p_pixel_base = p_pic->p->p_pixels + ( i_width >> 6 ) * 2
+    p_pixel_base_Y = p_pic->p->p_pixels + ( i_width >> 6 ) * 2
               /* Add the picture coordinates and the SPU coordinates */
               + ( (p_spu->i_x * i_xscale) >> 6 ) * 2
               + ( (p_spu->i_y * i_yscale) >> 6 ) * p_pic->p->i_pitch;
@@ -396,7 +344,7 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
                 case MAX_ALPHA:
 		  {
 		    uint16_t i_colprecomp = Y2RV16(p_source->plane[Y_PLANE]);
-		    uint8_t *p_pixel = p_pixel_base + i_yreal;
+		    uint8_t *p_pixel = p_pixel_base_Y + i_yreal;
 		    *p_pixel = i_colprecomp;
 		    break;
 		  }
@@ -410,11 +358,11 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
 		       be completely transparent and is not correct, but
 		       that's handled in a special case above anyway. */
 		
-		    uint8_t *p_pixel = p_pixel_base + i_yreal;
+		    uint8_t *p_pixel = p_pixel_base_Y + i_yreal;
 		    uint16_t i_colprecomp = Y2RV16(p_source->plane[Y_PLANE])
 		      * ( (uint16_t) (p_source->s.t+1) );
 		    uint16_t i_destalpha = MAX_ALPHA - p_source->s.t;
-		    p_pixel = p_pixel_base + i_yreal;
+		    p_pixel = p_pixel_base_Y + i_yreal;
 		    *p_pixel = ( i_colprecomp + 
 				 (uint16_t) (*p_pixel) * i_destalpha ) 
 		      >> ALPHA_SCALEDOWN;
@@ -458,7 +406,7 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
                     for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
                          i_ytmp += p_pic->p->i_pitch )
                     {
-		      uint8_t *p_pixel = p_pixel_base + i_ytmp;
+		      uint8_t *p_pixel = p_pixel_base_Y + i_ytmp;
 		      uint16_t i_colprecomp = Y2RV16(p_source->plane[Y_PLANE]);
 		      *p_pixel = i_colprecomp;
                     }
@@ -475,7 +423,7 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
 			 be completely transparent and is not correct, but
 			 that's handled in a special case above anyway. */
 		      
-		      uint8_t *p_pixel = p_pixel_base + i_ytmp;
+		      uint8_t *p_pixel = p_pixel_base_Y + i_ytmp;
 		      uint16_t i_colprecomp = Y2RV16(p_source->plane[Y_PLANE])
 			* ( (uint16_t) (p_source->s.t+1) );
 		      uint16_t i_destalpha = MAX_ALPHA - p_source->s.t;
