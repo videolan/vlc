@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.20 2003/03/30 18:14:36 gbazin Exp $
+ * $Id: file.c,v 1.21 2003/04/20 22:52:03 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -124,7 +124,7 @@ vlc_module_end();
 static int Open( vlc_object_t * p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
-    char * psz_name = config_GetPsz( p_this, "audiofile-path" );
+    char * psz_name = config_GetPsz( p_this, "audiofile" );
     char * psz_format = config_GetPsz( p_aout, "audiofile-format" );
     char ** ppsz_compare = format_list;
     int i = 0;
