@@ -502,17 +502,17 @@ if test "x${ac_cv_c_Wall}" != "xno"; then
 fi
 
 if test "x${ac_cv_c_Wunreachable_code}" != "xno"; then
-    CFLAGS_save="-Wunreachable-code ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="-Wunreachable-code ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="-Wunreachable-code ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
+#    CFLAGS_save="-Wunreachable-code ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
+#    CXXFLAGS_save="-Wunreachable-code ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
+#    OBJCFLAGS_save="-Wunreachable-code ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 
     dnl -Wunreachable-code means gcc-3.x, we can use -Wconversion and we can
     dnl activate -Winline for C++, it won't choke on system headers.
-    if test "x${ac_cv_c_Wconversion}" != "xno"; then
-        CFLAGS_save="-Wconversion ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-        CXXFLAGS_save="-Wconversion ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
-        OBJCFLAGS_save="-Wconversion ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
-    fi
+#    if test "x${ac_cv_c_Wconversion}" != "xno"; then
+#        CFLAGS_save="-Wconversion ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
+#        CXXFLAGS_save="-Wconversion ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
+#        OBJCFLAGS_save="-Wconversion ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
+#    fi
     if test "x${ac_cv_c_Winline}" != "xno"; then
         CXXFLAGS_save="-Winline ${CXXFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     fi
