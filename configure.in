@@ -147,10 +147,8 @@ AC_CHECK_FUNC(send,,[
     http_LDFLAGS="${http_LDFLAGS} -lsocket"
 )])
 AC_CHECK_FUNC(gethostbyname,,[
-  AC_CHECK_LIB(nsl,gethostbyname,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lnsl")
-])
-AC_CHECK_FUNC(gethostbyname,,[
-  AC_CHECK_LIB(bind,gethostbyname,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lbind")
+  AC_CHECK_LIB(nsl,gethostbyname,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lnsl",[
+    AC_CHECK_LIB(bind,gethostbyname,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lbind")])
 ])
 have_nanosleep=0
 AC_CHECK_FUNC(nanosleep,have_nanosleep=1,[

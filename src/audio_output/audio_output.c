@@ -2,7 +2,7 @@
  * audio_output.c : audio output instance
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.c,v 1.96 2002/08/14 13:10:44 sam Exp $
+ * $Id: audio_output.c,v 1.97 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -57,7 +57,6 @@ aout_instance_t * __aout_NewInstance( vlc_object_t * p_parent )
     p_aout->b_change_requested = 0;
     p_aout->i_nb_inputs = 0;
 
-    vlc_mutex_init( p_parent, &p_aout->mixer_lock );
     vlc_cond_init( p_parent, &p_aout->mixer_signal );
     p_aout->b_mixer_active = 0;
 
@@ -73,7 +72,6 @@ void aout_DeleteInstance( aout_instance_t * p_aout )
 {
     vlc_mutex_destroy( &p_aout->input_lock );
     vlc_cond_destroy( &p_aout->input_signal );
-    vlc_mutex_destroy( &p_aout->mixer_lock );
     vlc_cond_destroy( &p_aout->mixer_signal );
 
     /* Free structure. */
@@ -94,10 +92,8 @@ aout_buffer_t * aout_BufferNew( aout_instance_t * p_aout,
     /* This necessarily allocates in the heap. */
     aout_BufferAlloc( &p_input->input_alloc, duration, NULL, p_buffer );
     p_buffer->i_nb_samples = i_nb_samples;
-    p_buffer->i_nb_bytes = duration
-                              * aout_FormatToByterate( &p_input->input )
-                              / 1000000;
-    p_buffer->i_nb_bytes &= ~0x3;
+    p_buffer->i_nb_bytes = i_nb_samples * p_input->input.i_bytes_per_frame
+                              / p_input->input.i_frame_length;
 
     if ( p_buffer == NULL )
     {
@@ -126,8 +122,6 @@ void aout_BufferDelete( aout_instance_t * p_aout, aout_input_t * p_input,
 void aout_BufferPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                       aout_buffer_t * p_buffer )
 {
-    vlc_bool_t b_run_mixer = 0;
-
     if ( p_buffer->start_date == 0 )
     {
         msg_Warn( p_aout, "non-dated buffer received" );
@@ -146,28 +140,13 @@ void aout_BufferPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     aout_InputPlay( p_aout, p_input, p_buffer );
 
     /* Run the mixer if it is able to run. */
-    vlc_mutex_lock( &p_aout->mixer_lock );
-    if ( !p_aout->b_mixer_active )
-    {
-        p_aout->b_mixer_active = 1;
-        b_run_mixer = 1;
-    }
-    vlc_mutex_unlock( &p_aout->mixer_lock );
-
-    if ( b_run_mixer )
-    {
-        aout_MixerRun( p_aout );
-        vlc_mutex_lock( &p_aout->mixer_lock );
-        p_aout->b_mixer_active = 0;
-        vlc_cond_broadcast( &p_aout->mixer_signal );
-        vlc_mutex_unlock( &p_aout->mixer_lock );
-    }
+    aout_MixerRun( p_aout );
 }
 
 /*****************************************************************************
- * aout_FormatToByterate : compute the number of bytes per second
+ * aout_FormatPrepare : compute the number of bytes per frame & frame length
  *****************************************************************************/
-int aout_FormatToByterate( audio_sample_format_t * p_format )
+void aout_FormatPrepare( audio_sample_format_t * p_format )
 {
     int i_result;
 
@@ -193,14 +172,15 @@ int aout_FormatToByterate( audio_sample_format_t * p_format )
     case AOUT_FMT_SPDIF:
     case AOUT_FMT_A52:
     case AOUT_FMT_DTS:
-        /* For these formats the caller has to indicate the number of bytes
-         * per second it evaluates. */
-        return p_format->i_bytes_per_sec;
+        /* For these formats the caller has to indicate the parameters
+         * by hand. */
+        return;
 
     default:
-        return 0; /* will segfault much sooner... */
+        i_result = 0; /* will segfault much sooner... */
     }
 
-    return i_result * p_format->i_channels * p_format->i_rate;
+    p_format->i_bytes_per_frame = i_result * p_format->i_channels;
+    p_format->i_frame_length = 1;
 }
 

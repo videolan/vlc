@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.59 2002/08/14 00:43:51 massiot Exp $
+ * $Id: audio_output.h,v 1.60 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -32,7 +32,12 @@ struct audio_sample_format_t
     int                 i_rate;
     int                 i_channels;
     /* Optional - for A52, SPDIF and DTS types */
-    int                 i_bytes_per_sec;
+    int                 i_bytes_per_frame;
+    int                 i_frame_length;
+    /* Please note that it may be completely arbitrary - buffers are not
+     * obliged to contain a integral number of so-called "frames". It's
+     * just here for the division :
+     * i_nb_samples * i_bytes_per_frame / i_frame_length */
 };
 
 #define AOUT_FMT_MU_LAW     0x00000001
@@ -53,6 +58,12 @@ struct audio_sample_format_t
 #define AOUT_FMTS_IDENTICAL( p_first, p_second ) (                          \
     ((p_first)->i_format == (p_second)->i_format)                           \
       && ((p_first)->i_rate == (p_second)->i_rate)                          \
+      && ((p_first)->i_channels == (p_second)->i_channels                   \
+           || (p_first)->i_channels == -1 || (p_second)->i_channels == -1) )
+
+/* Check if i_rate == i_rate and i_channels == i_channels */
+#define AOUT_FMTS_SIMILAR( p_first, p_second ) (                            \
+    ((p_first)->i_rate == (p_second)->i_rate)                               \
       && ((p_first)->i_channels == (p_second)->i_channels                   \
            || (p_first)->i_channels == -1 || (p_second)->i_channels == -1) )
 
@@ -103,7 +114,7 @@ struct aout_buffer_t
 {
     byte_t *                p_buffer;
     int                     i_alloc_type;
-    /* i_size is the real size of the buffer (normally unused), i_nb_bytes
+    /* i_size is the real size of the buffer (used for debug ONLY), i_nb_bytes
      * is the number of significative bytes in it. */
     size_t                  i_size, i_nb_bytes;
     int                     i_nb_samples;
@@ -125,7 +136,7 @@ VLC_EXPORT( void,              aout_DeleteInstance, ( aout_instance_t * ) );
 VLC_EXPORT( aout_buffer_t *, aout_BufferNew, ( aout_instance_t *, aout_input_t *, size_t ) );
 VLC_EXPORT( void, aout_BufferDelete, ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) );
 VLC_EXPORT( void, aout_BufferPlay, ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) );
-VLC_EXPORT( int, aout_FormatToByterate, ( audio_sample_format_t * p_format ) );
+VLC_EXPORT( void, aout_FormatPrepare, ( audio_sample_format_t * p_format ) );
 
 /* From input.c : */
 #define aout_InputNew(a,b,c) __aout_InputNew(VLC_OBJECT(a),b,c)

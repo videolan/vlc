@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.5 2002/08/14 00:23:59 massiot Exp $
+ * $Id: file.c,v 1.6 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -42,7 +42,7 @@
 static int     Open        ( vlc_object_t * );
 static void    Close       ( vlc_object_t * );
 static int     SetFormat   ( aout_instance_t * );
-static void    Play        ( aout_instance_t *, aout_buffer_t * );
+static void    Play        ( aout_instance_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -133,8 +133,8 @@ static int SetFormat( aout_instance_t * p_aout )
     if ( p_aout->output.output.i_format == AOUT_FMT_SPDIF )
     {
         p_aout->output.i_nb_samples = A52_FRAME_NB;
-        p_aout->output.output.i_bytes_per_sec = p_aout->output.output.i_rate
-                                     * AOUT_SPDIF_SIZE / A52_FRAME_NB;
+        p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
+        p_aout->output.output.i_frame_length = A52_FRAME_NB;
     }
     else
     {
@@ -146,8 +146,9 @@ static int SetFormat( aout_instance_t * p_aout )
 /*****************************************************************************
  * Play: pretend to play a sound
  *****************************************************************************/
-static void Play( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
+static void Play( aout_instance_t * p_aout )
 {
+    aout_buffer_t * p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
     if( fwrite( p_buffer->p_buffer, p_buffer->i_nb_bytes, 1,
                 (FILE *)p_aout->output.p_sys ) != 1 )
     {

@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.4 2002/08/19 17:07:14 bozo Exp $
+ * $Id: alsa.c,v 1.5 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -79,8 +79,7 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
 static int  SetFormat    ( aout_instance_t * );
-static void Play         ( aout_instance_t *,
-                           aout_buffer_t * );
+static void Play         ( aout_instance_t * );
 
 static int  ALSAThread   ( aout_instance_t * );
 static void ALSAFill     ( aout_instance_t * );
@@ -343,9 +342,8 @@ static int SetFormat( aout_instance_t * p_aout )
 /*****************************************************************************
  * Play: queue a buffer for playing by ALSAThread
  *****************************************************************************/
-static void Play( aout_instance_t *p_aout, aout_buffer_t * p_buffer )
+static void Play( aout_instance_t *p_aout )
 {
-    aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.c,v 1.4 2002/08/14 00:23:59 massiot Exp $
+ * $Id: aout.c,v 1.5 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -39,7 +39,7 @@
  * Local prototypes.
  *****************************************************************************/
 static int     SetFormat   ( aout_instance_t * );
-static void    Play        ( aout_instance_t *, aout_buffer_t * );
+static void    Play        ( aout_instance_t * );
 
 /*****************************************************************************
  * OpenAudio: open a dummy audio device
@@ -62,8 +62,8 @@ static int SetFormat( aout_instance_t * p_aout )
     if ( p_aout->output.output.i_format == AOUT_FMT_SPDIF )
     {
         p_aout->output.i_nb_samples = A52_FRAME_NB;
-        p_aout->output.output.i_bytes_per_sec = p_aout->output.output.i_rate
-                                     * AOUT_SPDIF_SIZE / A52_FRAME_NB;
+        p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
+        p_aout->output.output.i_frame_length = A52_FRAME_NB;
     }
     else
     {
@@ -75,8 +75,9 @@ static int SetFormat( aout_instance_t * p_aout )
 /*****************************************************************************
  * Play: pretend to play a sound
  *****************************************************************************/
-static void Play( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
+static void Play( aout_instance_t * p_aout )
 {
+    aout_buffer_t * p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
     aout_BufferFree( p_buffer );
 }
 

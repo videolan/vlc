@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52.c,v 1.4 2002/08/14 00:23:59 massiot Exp $
+ * $Id: a52.c,v 1.5 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -304,7 +304,7 @@ static int DecodeFrame( a52_thread_t * p_dec, byte_t * p_frame_buffer )
                                A52_FRAME_NB );
     if ( p_buffer == NULL ) return -1;
     p_buffer->start_date = p_dec->last_date;
-    p_dec->last_date += (mtime_t)(A52_FRAME_NB * 1000000)
+    p_dec->last_date += (mtime_t)A52_FRAME_NB * 1000000
                           / p_dec->output_format.i_rate;
     p_buffer->end_date = p_dec->last_date;
 

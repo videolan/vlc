@@ -2,7 +2,7 @@
  * aout.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout.c,v 1.4 2002/08/14 00:43:52 massiot Exp $
+ * $Id: aout.c,v 1.5 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -97,7 +97,7 @@ void E_(CloseAudio) ( vlc_object_t *p_this );
  * Local prototypes.
  *****************************************************************************/
 static int  SetFormat ( aout_instance_t * );
-static void Play      ( aout_instance_t *, aout_buffer_t * );
+static void Play      ( aout_instance_t * );
 
 /* local functions */
 static int  DirectxCreateSecondaryBuffer ( aout_instance_t * );
@@ -248,9 +248,8 @@ static int SetFormat( aout_instance_t *p_aout )
  * This doesn't actually play the buffer. This just stores the buffer so it
  * can be played by the callback thread.
  *****************************************************************************/
-static void Play( aout_instance_t *p_aout, aout_buffer_t *p_buffer )
+static void Play( aout_instance_t *p_aout )
 {
-    aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
 }
 
 /*****************************************************************************

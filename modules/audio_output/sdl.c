@@ -2,7 +2,7 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.2 2002/08/14 00:43:52 massiot Exp $
+ * $Id: sdl.c,v 1.3 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -47,7 +47,7 @@ static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
 
 static int  SetFormat   ( aout_instance_t * );
-static void Play        ( aout_instance_t *, aout_buffer_t * );
+static void Play        ( aout_instance_t * );
 
 static void SDLCallback ( void *, Uint8 *, int );
 
@@ -129,13 +129,8 @@ static int SetFormat( aout_instance_t *p_aout )
 /*****************************************************************************
  * Play: play a sound samples buffer
  *****************************************************************************/
-static void Play( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
+static void Play( aout_instance_t * p_aout )
 {
-    SDL_LockAudio();                                     /* Stop callbacking */
-
-    aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
-
-    SDL_UnlockAudio();                                  /* go on callbacking */
 }
 
 /*****************************************************************************

@@ -3,18 +3,24 @@
 MAX_TEX_RECURSION=4
 
 # For Debian :
-XML_DECL=/usr/lib/sgml/declaration/xml.decl
-HTML_SS=/usr/lib/sgml/stylesheet/dsssl/docbook/nwalsh/html/docbook.dsl
-PRINT_SS=/usr/lib/sgml/stylesheet/dsssl/docbook/nwalsh/print/docbook.dsl
+#XML_DECL=/usr/lib/sgml/declaration/xml.decl
+#HTML_SS=/usr/lib/sgml/stylesheet/dsssl/docbook/nwalsh/html/docbook.dsl
+#PRINT_SS=/usr/lib/sgml/stylesheet/dsssl/docbook/nwalsh/print/docbook.dsl
 
 # For RedHat :
 #XML_DECL=/usr/lib/sgml/stylesheets/nwalsh-modular/dtds/decls/xml.dcl
 #HTML_SS=/usr/lib/sgml/stylesheets/nwalsh-modular/html/docbook.dsl
 #PRINT_SS=/usr/lib/sgml/stylesheets/nwalsh-modular/print/docbook.dsl
 
+# For Mac OS X :
+#XML_DECL=/usr/lib/sgml/declaration/xml.decl
+HTML_SS=/sw/share/sgml/dsssl/docbook-dsssl-nwalsh/html/docbook.dsl
+PRINT_SS=/sw/share/sgml/dsssl/docbook-dsssl-nwalsh/print/docbook.dsl
+
 all: manual
 
-JADE=jade
+#JADE=jade
+JADE=openjade
 
 manual: manual.txt manual.ps manual.html
 

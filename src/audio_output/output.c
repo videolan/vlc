@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.6 2002/08/14 00:43:52 massiot Exp $
+ * $Id: output.c,v 1.7 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -46,7 +46,6 @@ int aout_OutputNew( aout_instance_t * p_aout,
     vlc_mutex_init( p_aout, &p_aout->output.fifo.lock );
     p_aout->output.fifo.p_first = NULL;
     p_aout->output.fifo.pp_last = &p_aout->output.fifo.p_first;
-    p_aout->output.last_date = 0;
 
     p_aout->output.p_module = module_Need( p_aout, "audio output",
                                            psz_name );
@@ -80,43 +79,36 @@ int aout_OutputNew( aout_instance_t * p_aout,
         module_Unneed( p_aout, p_aout->output.p_module );
         return -1;
     }
+    aout_FormatPrepare( &p_aout->output.output );
 
     msg_Dbg( p_aout, "output format=%d rate=%d channels=%d",
              p_aout->output.output.i_format, p_aout->output.output.i_rate,
              p_aout->output.output.i_channels );
 
     /* Calculate the resulting mixer output format. */
-    p_aout->mixer.output.i_channels = p_aout->output.output.i_channels;
-    p_aout->mixer.output.i_rate = p_aout->output.output.i_rate;
+    memcpy( &p_aout->mixer.mixer, &p_aout->output.output,
+            sizeof(audio_sample_format_t) );
     if ( !AOUT_FMT_NON_LINEAR(&p_aout->output.output) )
     {
         /* Non-S/PDIF mixer only deals with float32 or fixed32. */
-        p_aout->mixer.output.i_format
+        p_aout->mixer.mixer.i_format
                      = (p_aout->p_vlc->i_cpu & CPU_CAPABILITY_FPU) ?
                         AOUT_FMT_FLOAT32 : AOUT_FMT_FIXED32;
-        p_aout->mixer.output.i_bytes_per_sec
-                     = aout_FormatToByterate( &p_aout->mixer.output );
+        aout_FormatPrepare( &p_aout->mixer.mixer );
     }
     else
     {
-        p_aout->mixer.output.i_format = p_format->i_format;
-        p_aout->mixer.output.i_bytes_per_sec = p_format->i_bytes_per_sec;
+        p_aout->mixer.mixer.i_format = p_format->i_format;
     }
 
     msg_Dbg( p_aout, "mixer format=%d rate=%d channels=%d",
-             p_aout->mixer.output.i_format, p_aout->mixer.output.i_rate,
-             p_aout->mixer.output.i_channels );
-
-    /* Calculate the resulting mixer input format. */
-    p_aout->mixer.input.i_channels = -1; /* unchanged */
-    p_aout->mixer.input.i_rate = p_aout->mixer.output.i_rate;
-    p_aout->mixer.input.i_format = p_aout->mixer.output.i_format;
-    p_aout->mixer.input.i_bytes_per_sec = p_aout->mixer.output.i_bytes_per_sec;
+             p_aout->mixer.mixer.i_format, p_aout->mixer.mixer.i_rate,
+             p_aout->mixer.mixer.i_channels );
 
     /* Create filters. */
     if ( aout_FiltersCreatePipeline( p_aout, p_aout->output.pp_filters,
                                      &p_aout->output.i_nb_filters,
-                                     &p_aout->mixer.output,
+                                     &p_aout->mixer.mixer,
                                      &p_aout->output.output ) < 0 )
     {
         msg_Err( p_aout, "couldn't set an output pipeline" );
@@ -127,7 +119,9 @@ int aout_OutputNew( aout_instance_t * p_aout,
     /* Prepare hints for the buffer allocator. */
     p_aout->mixer.output_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
     p_aout->mixer.output_alloc.i_bytes_per_sec
-         = aout_FormatToByterate( &p_aout->output.output );
+                        = p_aout->mixer.mixer.i_bytes_per_frame
+                           * p_aout->mixer.mixer.i_rate
+                           / p_aout->mixer.mixer.i_frame_length;
 
     aout_FiltersHintBuffers( p_aout, p_aout->output.pp_filters,
                              p_aout->output.i_nb_filters,
@@ -157,7 +151,9 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
                       p_aout->output.i_nb_filters,
                       &p_buffer );
 
-    p_aout->output.pf_play( p_aout, p_buffer );
+    aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
+
+    p_aout->output.pf_play( p_aout );
 }
 
 /*****************************************************************************
@@ -211,12 +207,12 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
 
         /* Take the mixer lock because no input can be removed when the
          * the mixer lock is taken. */
-        vlc_mutex_lock( &p_aout->mixer_lock );
+        vlc_mutex_lock( &p_aout->output.fifo.lock );
         for ( i = 0; i < p_input->i_nb_inputs; i++ )
         {
             aout_input_t * p_input = p_aout->pp_inputs[i];
         }
-        vlc_mutex_lock( &p_aout->mixer_lock );
+        vlc_mutex_lock( &p_aout->output.fifo.lock );
     }
 #endif
 

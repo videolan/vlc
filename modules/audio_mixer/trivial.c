@@ -2,7 +2,7 @@
  * trivial.c : trivial mixer plug-in (1 input, no downmixing)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.4 2002/08/12 22:12:50 massiot Exp $
+ * $Id: trivial.c,v 1.5 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -56,8 +56,8 @@ static int Create( vlc_object_t *p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
 
-    if ( p_aout->mixer.output.i_format != AOUT_FMT_FLOAT32
-          && p_aout->mixer.output.i_format != AOUT_FMT_FIXED32 )
+    if ( p_aout->mixer.mixer.i_format != AOUT_FMT_FLOAT32
+          && p_aout->mixer.mixer.i_format != AOUT_FMT_FIXED32 )
     {
         return -1;
     }
@@ -67,6 +67,7 @@ static int Create( vlc_object_t *p_this )
     return 0;
 }
 
+#if 0
 /*****************************************************************************
  * SparseCopy: trivially downmix or upmix a buffer
  *****************************************************************************/
@@ -85,6 +86,7 @@ static void SparseCopy( u32 * p_dest, const u32 * p_src, size_t i_len,
         p_dest += i_output_stride;
     }
 }
+#endif
 
 /*****************************************************************************
  * DoWork: mix a new output buffer
@@ -92,111 +94,44 @@ static void SparseCopy( u32 * p_dest, const u32 * p_src, size_t i_len,
 static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 {
     aout_input_t * p_input = p_aout->pp_inputs[0];
+    int i_nb_bytes = p_buffer->i_nb_samples * sizeof(u32)
+                      * p_aout->mixer.mixer.i_channels;
+    byte_t * p_in = p_input->p_first_byte_to_mix;
+    byte_t * p_out = p_buffer->p_buffer;
 
-    if ( p_input->input.i_channels == p_aout->mixer.output.i_channels )
+    for ( ; ; )
     {
-        int i_nb_bytes = p_buffer->i_nb_samples * sizeof(u32)
-                          * p_input->input.i_channels;
-        byte_t * p_in = (p_input->p_first_byte_to_mix == NULL) ?
-                        p_input->fifo.p_first->p_buffer :
-                        p_input->p_first_byte_to_mix;
-        byte_t * p_out = p_buffer->p_buffer;
+        ptrdiff_t i_available_bytes = (p_input->fifo.p_first->p_buffer
+                                        - p_in)
+                                        + p_input->fifo.p_first->i_nb_samples
+                                           * sizeof(u32)
+                                           * p_aout->mixer.mixer.i_channels;
 
-        for ( ; ; )
+        if ( i_available_bytes < i_nb_bytes )
         {
-            ptrdiff_t i_available_bytes = (p_input->fifo.p_first->p_buffer
-                                           - p_in)
-                                           + p_input->fifo.p_first->i_nb_samples
-                                              * sizeof(u32)
-                                              * p_input->input.i_channels;
+            aout_buffer_t * p_old_buffer;
 
-            if ( i_available_bytes < i_nb_bytes )
+            if ( i_available_bytes > 0 )
+                p_aout->p_vlc->pf_memcpy( p_out, p_in, i_available_bytes );
+            i_nb_bytes -= i_available_bytes;
+            p_out += i_available_bytes;
+
+            /* Next buffer */
+            p_old_buffer = aout_FifoPop( p_aout, &p_input->fifo );
+            aout_BufferFree( p_old_buffer );
+            if ( p_input->fifo.p_first == NULL )
             {
-                aout_buffer_t * p_old_buffer;
-
-                if ( i_available_bytes > 0 )
-                    p_aout->p_vlc->pf_memcpy( p_out, p_in, i_available_bytes );
-                i_nb_bytes -= i_available_bytes;
-                p_out += i_available_bytes;
-
-                /* Next buffer */
-                p_old_buffer = aout_FifoPop( p_aout, &p_input->fifo );
-                aout_BufferFree( p_old_buffer );
-                if ( p_input->fifo.p_first == NULL )
-                {
-                    msg_Err( p_aout, "internal amix error" );
-                    return;
-                }
-                p_in = p_input->fifo.p_first->p_buffer;
+                msg_Err( p_aout, "internal amix error" );
+                return;
             }
-            else
-            {
+            p_in = p_input->fifo.p_first->p_buffer;
+        }
+        else
+        {
+            if ( i_nb_bytes > 0 )
                 p_aout->p_vlc->pf_memcpy( p_out, p_in, i_nb_bytes );
-                p_input->p_first_byte_to_mix = p_in + i_nb_bytes;
-                break;
-            }
-        }
-    }
-    else
-    {
-        /* Downmixing or upmixing. */
-        int i_nb_samples = p_buffer->i_nb_samples;
-        u32 * p_in = (p_input->p_first_byte_to_mix == NULL) ?
-                     (u32 *)p_input->fifo.p_first->p_buffer :
-                     (u32 *)p_input->p_first_byte_to_mix;
-        u32 * p_out = (u32 *)p_buffer->p_buffer;
-
-        if ( p_input->input.i_channels < p_aout->mixer.output.i_channels )
-        {
-            /* Zero out the destination buffer, to avoid static on unavailable
-             * channels. */
-            memset( p_buffer->p_buffer, 0,
-                    p_buffer->i_nb_samples * sizeof(u32)
-                     * p_aout->mixer.output.i_channels );
-        }
-
-        for ( ; ; )
-        {
-            ptrdiff_t i_available_bytes = (p_input->fifo.p_first->p_buffer
-                                           - (byte_t *)p_in)
-                                           + p_input->fifo.p_first->i_nb_samples
-                                              * sizeof(u32)
-                                              * p_input->input.i_channels;
-            int i_available_samples = i_available_bytes
-                                       / p_input->input.i_channels
-                                       / sizeof(u32);
-
-            if ( i_available_samples < i_nb_samples )
-            {
-                aout_buffer_t * p_old_buffer;
-
-                if ( i_available_samples > 0 )
-                    SparseCopy( p_out, p_in, i_available_samples,
-                                p_aout->mixer.output.i_channels,
-                                p_input->input.i_channels );
-                i_nb_samples -= i_available_samples;
-                p_out += i_available_samples * p_aout->mixer.output.i_channels;
-
-                /* Next buffer */
-                p_old_buffer = aout_FifoPop( p_aout, &p_input->fifo );
-                aout_BufferFree( p_old_buffer );
-                if ( p_input->fifo.p_first == NULL )
-                {
-                    msg_Err( p_aout, "internal amix error" );
-                    return;
-                }
-                p_in = (u32 *)p_input->fifo.p_first->p_buffer;
-            }
-            else
-            {
-                SparseCopy( p_out, p_in, i_nb_samples,
-                            p_aout->mixer.output.i_channels,
-                            p_input->input.i_channels );
-                p_input->p_first_byte_to_mix = (byte_t *)p_in
-                               + i_nb_samples * p_input->input.i_channels
-                                  * sizeof(u32);
-                break;
-            }
+            p_input->p_first_byte_to_mix = p_in + i_nb_bytes;
+            break;
         }
     }
 }

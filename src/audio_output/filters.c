@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filters.c,v 1.4 2002/08/14 00:23:59 massiot Exp $
+ * $Id: filters.c,v 1.5 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -37,6 +37,117 @@
 #include "aout_internal.h"
 
 /*****************************************************************************
+ * FindFilter: find an audio filter for a specific transformation
+ *****************************************************************************/
+static aout_filter_t * FindFilter( aout_instance_t * p_aout,
+                             const audio_sample_format_t * p_input_format,
+                             const audio_sample_format_t * p_output_format )
+{
+    aout_filter_t * p_filter = vlc_object_create( p_aout,
+                                                  sizeof(aout_filter_t) );
+
+    if ( p_filter == NULL ) return NULL;
+    vlc_object_attach( p_filter, p_aout );
+
+    memcpy( &p_filter->input, p_input_format, sizeof(audio_sample_format_t) );
+    memcpy( &p_filter->output, p_output_format,
+            sizeof(audio_sample_format_t) );
+    p_filter->p_module = module_Need( p_filter, "audio filter", NULL );
+    if ( p_filter->p_module == NULL )
+    {
+        vlc_object_detach( p_filter );
+        vlc_object_destroy( p_filter );
+        return NULL;
+    }
+
+    return p_filter;
+}
+
+/*****************************************************************************
+ * SplitConversion: split a conversion in two parts 
+ *****************************************************************************
+ * Returns the number of conversions required by the first part - 0 if only
+ * one conversion was asked.
+ * Beware : p_output_format can be modified during this function if the
+ * developer passed SplitConversion( toto, titi, titi, ... ). That is legal.
+ * SplitConversion( toto, titi, toto, ... ) isn't.
+ *****************************************************************************/
+static int SplitConversion( aout_instance_t * p_aout,
+                             const audio_sample_format_t * p_input_format,
+                             const audio_sample_format_t * p_output_format,
+                             audio_sample_format_t * p_middle_format,
+                             boolean_t b_format_first,
+                             boolean_t b_rate_first )
+{
+    boolean_t b_format =
+             (p_input_format->i_format != p_output_format->i_format);
+    boolean_t b_rate = (p_input_format->i_rate != p_output_format->i_rate);
+    boolean_t b_channels =
+             (p_input_format->i_channels != p_output_format->i_channels);
+    int i_nb_conversions = b_format + b_rate + b_channels;
+
+    if ( i_nb_conversions <= 1 ) return 0;
+
+    memcpy( p_middle_format, p_output_format, sizeof(audio_sample_format_t) );
+
+    if ( i_nb_conversions == 2 )
+    {
+        if ( !b_format )
+        {
+            if ( b_rate_first )
+            {
+                p_middle_format->i_channels = p_input_format->i_channels;
+            }
+            else
+            {
+                p_middle_format->i_rate = p_input_format->i_rate;
+            }
+            return 1;
+        }
+
+        if ( !b_rate )
+        {
+            if ( b_format_first )
+            {
+                p_middle_format->i_channels = p_input_format->i_channels;
+            }
+            else
+            {
+                p_middle_format->i_format = p_input_format->i_format;
+            }
+            return 1;
+        }
+
+        /* !b_channels */
+        if ( b_format_first )
+        {
+            p_middle_format->i_rate = p_input_format->i_rate;
+        }
+        else
+        {
+            p_middle_format->i_format = p_input_format->i_format;
+        }
+        return 1;
+    }
+
+    /* i_nb_conversion == 3 */
+    if ( !b_format_first )
+    {
+        p_middle_format->i_format = p_input_format->i_format;
+    }
+    else if ( !b_rate_first )
+    {
+        p_middle_format->i_channels = p_input_format->i_channels;
+    }
+    else
+    {
+        p_middle_format->i_rate = p_input_format->i_rate;
+    }
+
+    return 2;
+}
+
+/*****************************************************************************
  * aout_FiltersCreatePipeline: create a filters pipeline to transform a sample
  *                             format to another
  *****************************************************************************
@@ -45,9 +156,12 @@
 int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
                                 aout_filter_t ** pp_filters,
                                 int * pi_nb_filters,
-                                audio_sample_format_t * p_input_format,
-                                audio_sample_format_t * p_output_format )
+                                const audio_sample_format_t * p_input_format,
+                                const audio_sample_format_t * p_output_format )
 {
+    audio_sample_format_t temp_format;
+    boolean_t b_format_first, b_rate_first;
+
     if ( AOUT_FMTS_IDENTICAL( p_input_format, p_output_format ) )
     {
         msg_Dbg( p_aout, "no need for any filter" );
@@ -55,79 +169,105 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
         return 0;
     }
 
-    pp_filters[0] = vlc_object_create( p_aout, sizeof(aout_filter_t) );
-    if ( pp_filters[0] == NULL )
-    {
-        return -1;
-    }
-    vlc_object_attach( pp_filters[0], p_aout );
+    msg_Dbg( p_aout, "filter(s) format=%d->%d rate=%d->%d channels=%d->%d",
+             p_input_format->i_format, p_output_format->i_format,
+             p_input_format->i_rate, p_output_format->i_rate,
+             p_input_format->i_channels, p_output_format->i_channels );
 
     /* Try to find a filter to do the whole conversion. */
-    memcpy( &pp_filters[0]->input, p_input_format,
-            sizeof(audio_sample_format_t) );
-    memcpy( &pp_filters[0]->output, p_output_format,
-            sizeof(audio_sample_format_t) );
-    pp_filters[0]->p_module = module_Need( pp_filters[0], "audio filter",
-                                           NULL );
-    if ( pp_filters[0]->p_module != NULL )
+    pp_filters[0] = FindFilter( p_aout, p_input_format, p_output_format );
+    if ( pp_filters[0] != NULL )
     {
         msg_Dbg( p_aout, "found a filter for the whole conversion" );
         *pi_nb_filters = 1;
         return 0;
     }
 
-    /* Split the conversion : format | rate, or rate | format. */
-    pp_filters[0]->output.i_format = pp_filters[0]->input.i_format;
-    pp_filters[0]->p_module = module_Need( pp_filters[0], "audio filter",
-                                           NULL );
-    if ( pp_filters[0]->p_module == NULL )
+    /* We'll have to split the conversion. We always to the downmixing
+     * before the resampling, and the upmixing after the resampling (to
+     * maximize the resampling efficiency). */
+    b_rate_first = (p_input_format->i_channels < p_output_format->i_channels);
+
+    for ( b_format_first = 1; b_format_first >= 0; b_format_first-- )
     {
-        /* Then, start with the format conversion. */
-        memcpy( &pp_filters[0]->output, p_output_format,
-                sizeof(audio_sample_format_t) );
-        pp_filters[0]->output.i_rate = pp_filters[0]->input.i_rate;
-        pp_filters[0]->p_module = module_Need( pp_filters[0], "audio filter",
-                                               NULL );
-        if ( pp_filters[0]->p_module == NULL )
+        int i_nb_conversions = SplitConversion( p_aout, p_input_format,
+                                               p_output_format, &temp_format,
+                                               b_format_first, b_rate_first );
+        if ( !i_nb_conversions )
         {
-            msg_Err( p_aout, "couldn't find a filter for any conversion" );
-            vlc_object_detach( pp_filters[0] );
-            vlc_object_destroy( pp_filters[0] );
+            /* There was only one conversion to do, and we already failed. */
+            msg_Err( p_aout, "couldn't find a filter for the conversion" );
             return -1;
         }
+
+        pp_filters[0] = FindFilter( p_aout, p_input_format, &temp_format );
+        if ( pp_filters[0] == NULL && i_nb_conversions == 2 )
+        {
+            /* Try with only one conversion. */
+            SplitConversion( p_aout, p_input_format, &temp_format,
+                             &temp_format, b_format_first, b_rate_first );
+            pp_filters[0] = FindFilter( p_aout, p_input_format,
+                                        &temp_format );
+        }
+        if ( pp_filters[0] == NULL )
+        {
+            /* Retry with b_format_first = 0. */
+            continue;
+        }
+
+        /* We have the first stage of the conversion. Find a filter for
+         * the rest. */
+        pp_filters[1] = FindFilter( p_aout, &pp_filters[0]->output,
+                                    p_output_format );
+        if ( pp_filters[1] == NULL )
+        {
+            /* Try to split the conversion. */
+            i_nb_conversions = SplitConversion( p_aout,
+                                    &pp_filters[0]->output,
+                                    p_output_format, &temp_format,
+                                    b_format_first, b_rate_first );
+            if ( !i_nb_conversions )
+            {
+                vlc_object_detach( pp_filters[0] );
+                vlc_object_destroy( pp_filters[0] );
+                continue;
+            }
+            pp_filters[1] = FindFilter( p_aout, &pp_filters[0]->output,
+                                        &temp_format );
+            pp_filters[2] = FindFilter( p_aout, &temp_format,
+                                        p_output_format );
+
+            if ( pp_filters[1] == NULL || pp_filters[2] == NULL )
+            {
+                vlc_object_detach( pp_filters[0] );
+                vlc_object_destroy( pp_filters[0] );
+                if ( pp_filters[1] != NULL )
+                {
+                    vlc_object_detach( pp_filters[1] );
+                    vlc_object_destroy( pp_filters[1] );
+                }
+                if ( pp_filters[2] != NULL )
+                {
+                    vlc_object_detach( pp_filters[2] );
+                    vlc_object_destroy( pp_filters[2] );
+                }
+                continue;
+            }
+            *pi_nb_filters = 3;
+        }
+        else
+        {
+            *pi_nb_filters = 2;
+        }
+
+        /* We have enough filters. */
+        msg_Dbg( p_aout, "found %d filters for the whole conversion",
+                 *pi_nb_filters );
+        return 0;
     }
 
-    /* Find a filter for the rest. */
-    pp_filters[1] = vlc_object_create( p_aout, sizeof(aout_filter_t) );
-    if ( pp_filters[1] == NULL )
-    {
-        vlc_object_detach( pp_filters[0] );
-        vlc_object_destroy( pp_filters[0] );
-        return -1;
-    }
-    vlc_object_attach( pp_filters[1], p_aout );
-
-    memcpy( &pp_filters[1]->input, &pp_filters[0]->output,
-            sizeof(audio_sample_format_t) );
-    memcpy( &pp_filters[1]->output, p_output_format,
-            sizeof(audio_sample_format_t) );
-    pp_filters[1]->p_module = module_Need( pp_filters[1], "audio filter",
-                                           NULL );
-    if ( pp_filters[1]->p_module == NULL )
-    {
-        msg_Err( p_aout,
-                 "couldn't find a filter for the 2nd part of the conversion" );
-        vlc_object_detach( pp_filters[0] );
-        vlc_object_destroy( pp_filters[0] );
-        vlc_object_detach( pp_filters[1] );
-        vlc_object_destroy( pp_filters[1] );
-        return -1;
-    }
-
-    msg_Dbg( p_aout, "filter pipeline made of two filters" );
-    *pi_nb_filters = 2;
-
-    return 0;
+    msg_Err( p_aout, "couldn't find filters for the conversion" );
+    return -1;
 }
 
 /*****************************************************************************
@@ -161,8 +301,12 @@ void aout_FiltersHintBuffers( aout_instance_t * p_aout,
     {
         aout_filter_t * p_filter = pp_filters[i];
 
-        int i_output_size = aout_FormatToByterate( &p_filter->output );
-        int i_input_size = aout_FormatToByterate( &p_filter->input );
+        int i_output_size = p_filter->output.i_bytes_per_frame
+                             * p_filter->output.i_rate
+                             / p_filter->output.i_frame_length;
+        int i_input_size = p_filter->input.i_bytes_per_frame
+                             * p_filter->input.i_rate
+                             / p_filter->input.i_frame_length;
 
         p_first_alloc->i_bytes_per_sec = __MAX( p_first_alloc->i_bytes_per_sec,
                                                 i_output_size );
@@ -199,7 +343,7 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
         aout_buffer_t * p_output_buffer;
 
         aout_BufferAlloc( &p_filter->output_alloc,
-                          (u64)((*pp_input_buffer)->i_nb_samples * 1000000)
+                          (mtime_t)(*pp_input_buffer)->i_nb_samples * 1000000
                             / p_filter->output.i_rate, *pp_input_buffer,
                           p_output_buffer );
         if ( p_output_buffer == NULL )

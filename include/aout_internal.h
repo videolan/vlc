@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.5 2002/08/14 00:43:51 massiot Exp $
+ * $Id: aout_internal.h,v 1.6 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -27,8 +27,7 @@
 typedef struct aout_alloc_t
 {
     int                     i_alloc_type;
-    int                     i_bytes_per_sec; /* -1 if only the alloc_type is
-                                              * relevant. */
+    int                     i_bytes_per_sec;
 } aout_alloc_t;
 
 #define AOUT_ALLOC_NONE     0
@@ -86,6 +85,7 @@ typedef struct aout_fifo_t
     vlc_mutex_t             lock;
     struct aout_buffer_t *  p_first;
     struct aout_buffer_t ** pp_last;
+    mtime_t                 end_date;
 } aout_fifo_t;
 
 static inline void aout_FifoInit( struct aout_instance_t * p_aout,
@@ -94,6 +94,7 @@ static inline void aout_FifoInit( struct aout_instance_t * p_aout,
     vlc_mutex_init( (vlc_object_t *)p_aout, &p_fifo->lock );
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;
+    p_fifo->end_date = 0;
 }
 
 static inline void aout_FifoPush( struct aout_instance_t * p_aout,
@@ -104,10 +105,42 @@ static inline void aout_FifoPush( struct aout_instance_t * p_aout,
     *p_fifo->pp_last = p_buffer;
     p_fifo->pp_last = &p_buffer->p_next;
     *p_fifo->pp_last = NULL;
+    /* Enforce continuity of the stream. */
+    if ( p_fifo->end_date )
+    {
+        mtime_t duration = p_buffer->end_date - p_buffer->start_date;
+
+        p_buffer->start_date = p_fifo->end_date;
+        p_buffer->end_date = p_fifo->end_date =
+                             p_buffer->start_date + duration;
+    }
+    else
+    {
+        p_fifo->end_date = p_buffer->end_date;
+    }
     vlc_mutex_unlock( &p_fifo->lock );
 }
 
-/* This function supposes there is one buffer in p_fifo. */
+static inline mtime_t aout_FifoNextStart( struct aout_instance_t * p_aout,
+                                          aout_fifo_t * p_fifo )
+{
+    mtime_t end_date;
+    vlc_mutex_lock( &p_fifo->lock );
+    end_date = p_fifo->end_date;
+    vlc_mutex_unlock( &p_fifo->lock );
+    return end_date;
+}
+
+/* Reinit the end_date (for instance after a pause). */
+static inline void aout_FifoSet( struct aout_instance_t * p_aout,
+                                 aout_fifo_t * p_fifo, mtime_t date )
+{
+    vlc_mutex_lock( &p_fifo->lock );
+    p_fifo->end_date = date;
+    vlc_mutex_unlock( &p_fifo->lock );
+}
+
+/* This function supposes there is at least one buffer in p_fifo. */
 static inline aout_buffer_t * aout_FifoPop( struct aout_instance_t * p_aout,
                                             aout_fifo_t * p_fifo )
 {
@@ -164,8 +197,7 @@ typedef struct aout_filter_t
  *****************************************************************************/
 typedef struct aout_mixer_t
 {
-    audio_sample_format_t   input;
-    audio_sample_format_t   output;
+    audio_sample_format_t   mixer;
     aout_alloc_t            output_alloc;
 
     module_t *              p_module;
@@ -188,7 +220,7 @@ struct aout_input_t
 
     aout_fifo_t             fifo;
 
-    mtime_t                 next_packet_date;
+    /* Mixer information */
     byte_t *                p_first_byte_to_mix;
 };
 
@@ -204,12 +236,11 @@ typedef struct aout_output_t
     int                     i_nb_filters;
 
     aout_fifo_t             fifo;
-    mtime_t                 last_date;
 
     struct module_t *       p_module;
     struct aout_sys_t *     p_sys;
     int                  (* pf_setformat)( aout_instance_t * );
-    void                 (* pf_play)( aout_instance_t *, aout_buffer_t * );
+    void                 (* pf_play)( aout_instance_t * );
     int                     i_nb_samples;
 } aout_output_t;
 
@@ -229,8 +260,8 @@ struct aout_instance_t
     int                     i_nb_inputs;
 
     /* Mixer */
-    vlc_mutex_t             mixer_lock;
-    vlc_cond_t              mixer_signal;
+    vlc_cond_t              mixer_signal; /* the associated mutex is
+                                           * p_aout->output.fifo.lock */
     vlc_bool_t              b_mixer_active;
     aout_mixer_t            mixer;
 
@@ -247,8 +278,8 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
                                 aout_filter_t ** pp_filters,
                                 int * pi_nb_filters,
-                                audio_sample_format_t * p_input_format,
-                                audio_sample_format_t * p_output_format );
+                                const audio_sample_format_t * p_input_format,
+                                const audio_sample_format_t * p_output_format );
 void aout_FiltersDestroyPipeline( aout_instance_t * p_aout,
                                   aout_filter_t ** pp_filters,
                                   int i_nb_filters );

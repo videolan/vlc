@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.6 2002/08/14 13:10:44 sam Exp $
+ * $Id: esd.c,v 1.7 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -58,7 +58,7 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
 static int  SetFormat    ( aout_instance_t * );
-static void Play         ( aout_instance_t *, aout_buffer_t * );
+static void Play         ( aout_instance_t * );
 static int  ESDThread    ( aout_instance_t * );
 
 /*****************************************************************************
@@ -160,9 +160,8 @@ static int SetFormat( aout_instance_t *p_aout )
 /*****************************************************************************
  * Play: queue a buffer for playing by ESDThread
  *****************************************************************************/
-static void Play( aout_instance_t *p_aout, aout_buffer_t * p_buffer )
+static void Play( aout_instance_t *p_aout )
 {
-    aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
 }
 
 /*****************************************************************************

@@ -36,7 +36,6 @@ struct module_symbols_t
     int (* __vlc_thread_create_inner) ( vlc_object_t *, char *, int, char *, void * ( * ) ( void * ), vlc_bool_t ) ;
     int (* __vlc_threads_end_inner) ( vlc_object_t * ) ;
     int (* __vlc_threads_init_inner) ( vlc_object_t * ) ;
-    int (* aout_FormatToByterate_inner) ( audio_sample_format_t * p_format ) ;
     int (* input_AccessInit_inner) ( input_thread_t * ) ;
     int (* input_AddInfo_inner) ( input_info_category_t *, char *, char *, ... ) ;
     int (* input_ChangeArea_inner) ( input_thread_t *, input_area_t * ) ;
@@ -104,6 +103,7 @@ struct module_symbols_t
     void (* aout_BufferDelete_inner) ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) ;
     void (* aout_BufferPlay_inner) ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) ;
     void (* aout_DeleteInstance_inner) ( aout_instance_t * ) ;
+    void (* aout_FormatPrepare_inner) ( audio_sample_format_t * p_format ) ;
     void (* aout_InputDelete_inner) ( aout_instance_t *, aout_input_t * ) ;
     void (* config_Duplicate_inner) ( module_t *, module_config_t * ) ;
     void (* config_SetCallbacks_inner) ( module_config_t *, module_config_t * ) ;
@@ -211,7 +211,7 @@ struct module_symbols_t
 #   define aout_BufferNew p_symbols->aout_BufferNew_inner
 #   define aout_BufferPlay p_symbols->aout_BufferPlay_inner
 #   define aout_DeleteInstance p_symbols->aout_DeleteInstance_inner
-#   define aout_FormatToByterate p_symbols->aout_FormatToByterate_inner
+#   define aout_FormatPrepare p_symbols->aout_FormatPrepare_inner
 #   define aout_InputDelete p_symbols->aout_InputDelete_inner
 #   define aout_OutputNextBuffer p_symbols->aout_OutputNextBuffer_inner
 #   define config_Duplicate p_symbols->config_Duplicate_inner

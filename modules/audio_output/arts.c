@@ -59,7 +59,7 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
 static int  SetFormat    ( aout_instance_t * );
-static void Play         ( aout_instance_t *, aout_buffer_t * );
+static void Play         ( aout_instance_t * );
 static int  aRtsThread   ( aout_instance_t * );
 
 /*****************************************************************************
@@ -159,9 +159,8 @@ static int SetFormat( aout_instance_t *p_aout )
 /*****************************************************************************
  * Play: queue a buffer for playing by aRtsThread
  *****************************************************************************/
-static void Play( aout_instance_t *p_aout, aout_buffer_t * p_buffer )
+static void Play( aout_instance_t *p_aout );
 {
-    aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
 }
 
 /*****************************************************************************

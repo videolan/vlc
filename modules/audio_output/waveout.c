@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.3 2002/08/14 00:43:52 massiot Exp $
+ * $Id: waveout.c,v 1.4 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -45,7 +45,7 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );                   
 
 static int  SetFormat    ( aout_instance_t * );  
-static void Play         ( aout_instance_t *, aout_buffer_t * );
+static void Play         ( aout_instance_t * );
 
 /* local functions */
 static int OpenWaveOut   ( aout_instance_t *p_aout, int i_format,
@@ -186,9 +186,8 @@ static int SetFormat( aout_instance_t *p_aout )
  * This doesn't actually play the buffer. This just stores the buffer so it
  * can be played by the callback thread.
  *****************************************************************************/
-static void Play( aout_instance_t *p_aout, aout_buffer_t *p_buffer )
+static void Play( aout_instance_t *p_aout )
 {
-    aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
 }
 
 /*****************************************************************************

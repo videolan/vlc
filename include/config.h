@@ -139,6 +139,10 @@
  * will cause the calling thread to sleep */
 #define AOUT_MAX_PREPARE_TIME           (mtime_t)(.5*CLOCK_FREQ)
 
+/* Max acceptable delay between the coded PTS and the actual presentation
+ * time, without resampling */
+#define AOUT_PTS_TOLERANCE              (mtime_t)(.03*CLOCK_FREQ)
+
 /*****************************************************************************
  * Video configuration
  *****************************************************************************/

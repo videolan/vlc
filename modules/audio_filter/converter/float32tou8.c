@@ -2,7 +2,7 @@
  * float32tou8.c : converter from float32 to unsigned 8 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32tou8.c,v 1.2 2002/08/14 00:23:59 massiot Exp $
+ * $Id: float32tou8.c,v 1.3 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Xavier Maillard <zedek@fxgsproject.org>
  *
@@ -64,12 +64,10 @@ static int Create( vlc_object_t *p_this )
         return -1;
     }
 
-    if ( p_filter->input.i_rate != p_filter->output.i_rate
-          || p_filter->input.i_channels != p_filter->output.i_channels )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
     {
         return -1;
     }
-
 
     p_filter->pf_do_work = DoWork;
     p_filter->b_in_place = 1;

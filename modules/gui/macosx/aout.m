@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.m,v 1.4 2002/08/14 00:43:52 massiot Exp $
+ * $Id: aout.m,v 1.5 2002/08/19 21:31:11 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -58,8 +58,7 @@ struct aout_sys_t
  * Local prototypes.
  *****************************************************************************/
 static int      SetFormat       ( aout_instance_t *p_aout );
-static void     Play            ( aout_instance_t *p_aout,
-                                  aout_buffer_t *p_buffer );
+static void     Play            ( aout_instance_t *p_aout );
 
 static OSStatus IOCallback      ( AudioDeviceID inDevice,
                                   const AudioTimeStamp *inNow, 
@@ -139,14 +138,10 @@ static int SetFormat( aout_instance_t * p_aout )
                  p_aout->output.output.i_format );
         return -1;
     }
-    p_sys->stream_format.mFormatFlags |=
-        kLinearPCMFormatFlagIsFloat;
 
     /* Set sample rate and channels per frame */
-    p_sys->stream_format.mSampleRate
-                 = p_aout->output.output.i_rate; 
-    p_sys->stream_format.mChannelsPerFrame
-                 = p_aout->output.output.i_channels;
+    p_aout->output.output.i_rate = p_sys->stream_format.mSampleRate;
+    p_aout->output.output.i_channels = p_sys->stream_format.mChannelsPerFrame;
 
     /* Get the buffer size that the device uses for IO */
     i_param_size = sizeof( p_sys->i_buffer_size );
@@ -186,8 +181,9 @@ msg_Dbg( p_aout, "toto : %d", p_sys->i_buffer_size );
     }
 
     /* Let's pray for the following operation to be atomic... */
-    p_sys->clock_diff = mdate()
-         - AudioConvertHostTimeToNanos(AudioGetCurrentHostTime()) / 1000;
+    p_sys->clock_diff = - (mtime_t)AudioConvertHostTimeToNanos(
+                                 AudioGetCurrentHostTime()) / 1000;
+    p_sys->clock_diff += mdate();
 
     return 0;
 }
@@ -214,9 +210,8 @@ void E_(CloseAudio)( aout_instance_t * p_aout )
 /*****************************************************************************
  * Play: queue a buffer for playing by IOCallback
  *****************************************************************************/
-static void Play( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
+static void Play( aout_instance_t * p_aout )
 {
-    aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
 }
 
 /*****************************************************************************
