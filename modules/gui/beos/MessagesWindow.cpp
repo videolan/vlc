@@ -2,7 +2,7 @@
  * MessagesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MessagesWindow.cpp,v 1.10 2003/05/17 18:30:41 titer Exp $
+ * $Id: MessagesWindow.cpp,v 1.11 2003/05/18 22:30:33 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -39,6 +39,17 @@
  *****************************************************************************/
 void MessagesView::Pulse()
 {
+    bool isScrolling = false;
+    if( fScrollBar->LockLooper() )
+    {
+        float min, max;
+        fScrollBar->GetRange( &min, &max );
+        if( fScrollBar->Value() != max )
+            isScrolling = true;
+        fScrollBar->UnlockLooper();
+        
+    }
+
     int i_start, oldLength;
     char * psz_module_type = NULL;
     rgb_color red = { 200, 0, 0 };
@@ -100,10 +111,10 @@ void MessagesView::Pulse()
         vlc_mutex_unlock( p_sub->p_lock );
     }
 
-    /* Scroll at the end unless the is user is selecting something */
+    /* Scroll at the end unless the is user is scrolling or selecting something */
     int32 start, end;
     GetSelection( &start, &end );
-    if( start == end && fScrollBar->LockLooper() )
+    if( !isScrolling && start == end && fScrollBar->LockLooper() )
     {
         float min, max;
         fScrollBar->GetRange( &min, &max );
