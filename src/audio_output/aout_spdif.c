@@ -2,7 +2,7 @@
  * aout_spdif: ac3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.14 2001/06/13 00:03:08 stef Exp $
+ * $Id: aout_spdif.c,v 1.15 2001/07/25 14:51:48 bozo Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -41,7 +41,6 @@
 #include "audio_output.h"
 #include "aout_common.h"
 
-#define BLANK_FRAME_MAX 1000
 #define SLEEP_TIME      16000
 
 /*****************************************************************************
@@ -150,12 +149,6 @@ void aout_SpdifThread( aout_thread_t * p_aout )
              * the external decoder */
             intf_WarnMsg( 6, "spdif warning: blank frame" );
             p_aout->pf_play( p_aout, pi_blank, SPDIF_FRAME_SIZE );
-
-            /* we kill the output if we don't have any stream */
-            if( ++i_blank > BLANK_FRAME_MAX )
-            {
-                p_aout->b_die = 1;
-            }
         }
     }
     
