@@ -471,7 +471,7 @@ Open( vlc_object_t *p_this )
 
     if( count.i_int == 0)
     {
-        __p_gcry_data = p_this;
+        __p_gcry_data = VLC_OBJECT( p_this->p_vlc );
 
         gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_vlc);
         if( gnutls_global_init( ) )
