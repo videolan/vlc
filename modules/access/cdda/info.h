@@ -33,7 +33,7 @@ int      CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
  we handle Meta Information requests and basically copy what we've
  saved here.
  */
-void     CDDAMetaInfo( access_t *p_access, int  );
+void     CDDAMetaInfo( access_t *p_access, int, /*const*/ char *psz_mrl  );
 
 
 /*

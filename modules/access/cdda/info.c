@@ -149,14 +149,14 @@ cddb_end: ;
 }
 #endif /*HAVE_LIBCDDB*/
 
-#define add_meta_val(FIELD, VLC_META, VAL)                              \
+#define add_meta_val(VLC_META, VAL)					\
   if ( p_cdda->p_meta && VAL) {                                         \
     vlc_meta_Add( p_cdda->p_meta, VLC_META, VAL );                      \
     dbg_print( INPUT_DBG_META, "field %s: %s\n", VLC_META, VAL );       \
   }                                                                     \
 
-#define add_cddb_meta(FIELD, VLC_META)                                  \
-  add_meta_val(FIELD, VLC_META, p_cdda->cddb.disc->FIELD);
+#define add_cddb_meta(FIELD, VLC_META)			                \
+  add_meta_val(VLC_META, p_cdda->cddb.disc->FIELD);
 
 #define add_cddb_meta_fmt(FIELD, FORMAT_SPEC, VLC_META)                 \
   {                                                                     \
@@ -164,7 +164,7 @@ cddb_end: ;
     snprintf( psz_buf, sizeof(psz_buf)-1, FORMAT_SPEC,                  \
               p_cdda->cddb.disc->FIELD );                               \
     psz_buf[sizeof(psz_buf)-1] = '\0';                                  \
-    add_meta_val(FIELD, VLC_META, psz_buf);                             \
+    add_meta_val(VLC_META, psz_buf);					\
   }
 
 /* Adds a string-valued entry to the stream and media information if
@@ -219,13 +219,16 @@ cddb_end: ;
  media info" or in playlist info. The intialization of CD-Text or CDDB
  is done here though.
  */
-void CDDAMetaInfo( access_t *p_access, int i_track )
+void CDDAMetaInfo( access_t *p_access, int i_track, /*const*/ char *psz_mrl )
 {
     cdda_data_t *p_cdda = (cdda_data_t *) p_access->p_sys;
-
+    char *psz_meta_title = psz_mrl;
+    char *psz_meta_artist = NULL;
+    
     if ( ! p_cdda ) return;
 
     p_cdda->psz_mcn = cdio_get_mcn(p_cdda->p_cdio);
+    p_cdda->p_meta = vlc_meta_New();
 
 #ifdef HAVE_LIBCDDB
     if ( p_cdda->b_cddb_enabled )
@@ -233,11 +236,11 @@ void CDDAMetaInfo( access_t *p_access, int i_track )
         GetCDDBInfo(p_access, p_cdda);
         if ( p_cdda->cddb.disc )
         {
-            p_cdda->p_meta = vlc_meta_New();
             if( i_track == -1 )
             {
-                add_cddb_meta(title,    VLC_META_TITLE);
-                add_cddb_meta(artist,   VLC_META_ARTIST);
+	        psz_meta_title  = p_cdda->cddb.disc->title;
+	        psz_meta_artist = p_cdda->cddb.disc->artist;
+	      
                 input_Control( p_cdda->p_input, INPUT_SET_NAME,
                                p_cdda->cddb.disc->artist );
             }
@@ -249,20 +252,22 @@ void CDDAMetaInfo( access_t *p_access, int i_track )
                 {
                     if( t->title != NULL )
                     {
-                        add_meta_val( NULL, VLC_META_TITLE, t->title );
+                        add_meta_val( VLC_META_TITLE, t->title );
                     }
                     if( t->artist != NULL )
                     {
-                        add_meta_val( NULL, VLC_META_ARTIST, t->artist );
+                        add_meta_val( VLC_META_ARTIST, t->artist );
                     }
                 }
             }
-            add_cddb_meta(genre,    VLC_META_GENRE);
-            add_cddb_meta_fmt(year,   "%d", VLC_META_DATE );
-        }
+            add_cddb_meta(genre, VLC_META_GENRE);
+            add_cddb_meta_fmt(year, "%d", VLC_META_DATE );
+	}
+	
     }
 
 #endif /*HAVE_LIBCDDB*/
+    
 #define TITLE_MAX 30
     {
         track_t i = p_cdda->i_tracks;
@@ -299,6 +304,8 @@ void CDDAMetaInfo( access_t *p_access, int i_track )
         p_cdda->p_cdtext[0] = cdio_get_cdtext(p_cdda->p_cdio, 0);
         if (p_cdda->p_cdtext[0])
         {
+	    char *psz_field;
+	  
             add_cdtext_disc_info_str("Arranger (CD-Text)",    CDTEXT_ARRANGER);
             add_cdtext_disc_info_str("Composer (CD-Text)",    CDTEXT_COMPOSER);
             add_cdtext_disc_info_str("Disc ID (CD-Text)",     CDTEXT_DISCID);
@@ -307,6 +314,16 @@ void CDDAMetaInfo( access_t *p_access, int i_track )
             add_cdtext_disc_info_str("Performer (CD-Text)",   CDTEXT_PERFORMER);
             add_cdtext_disc_info_str("Songwriter (CD-Text)",  CDTEXT_SONGWRITER);
             add_cdtext_disc_info_str("Title (CD-Text)",       CDTEXT_TITLE);
+
+	    psz_field = p_cdda->p_cdtext[0]->field[CDTEXT_TITLE];
+	    if (psz_field && strlen(psz_field)) {   
+	      psz_meta_title = psz_field;
+	    }
+	    psz_field = p_cdda->p_cdtext[0]->field[CDTEXT_PERFORMER];
+	    if (psz_field && strlen(psz_field)) {   
+	      psz_meta_artist = psz_field;
+	    }
+	    
         }
 
 	for( i = 0 ; i < p_cdda->i_tracks ; i++ )
@@ -359,6 +376,15 @@ void CDDAMetaInfo( access_t *p_access, int i_track )
 	    }
 #endif /*HAVE_LIBCDDB*/
 	}
+
+	/* Above we should have set psz_meta_title and psz_meta_artist
+	   to CDDB or CD-Text values or the default value depending on
+	   availablity and user preferences. So now add it to VLC's meta.
+	 */
+	add_meta_val( VLC_META_TITLE, psz_meta_title );
+	if (psz_meta_artist) 
+	  add_meta_val( VLC_META_ARTIST, psz_meta_artist );
+
     }
 }
 
@@ -805,11 +831,11 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 
     if( b_single_track )
     {
-        CDDAMetaInfo( p_access, p_cdda->i_track );
+        CDDAMetaInfo( p_access, p_cdda->i_track, psz_mrl );
     }
     else
     {
-        CDDAMetaInfo( p_access, -1 );
+        CDDAMetaInfo( p_access, -1, psz_mrl );
     }
 
     p_item = playlist_ItemGetByInput( p_playlist,

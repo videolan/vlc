@@ -516,11 +516,12 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
             {
                 *pp_meta = vlc_meta_Duplicate( p_cdda->p_meta );
                 dbg_print( INPUT_DBG_META, "%s", "Meta copied" );
+		return VLC_SUCCESS;
             }
-            else
-                msg_Warn( p_access, "tried to copy NULL meta info" );
-
-            return VLC_SUCCESS;
+            else {
+	        msg_Warn( p_access, "tried to copy NULL meta info" );
+		return VLC_EGENERIC;
+	    }
         }
 
         case ACCESS_CAN_SEEK:
