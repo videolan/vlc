@@ -2,7 +2,7 @@
  * win32_theme.cpp: Win32 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_theme.cpp,v 1.7 2003/04/29 12:54:57 gbazin Exp $
+ * $Id: win32_theme.cpp,v 1.8 2003/06/22 00:00:28 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -72,8 +72,8 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
     // Find window matching with hwnd
     list<SkinWindow *>::const_iterator win;
-    for( win = p_intf->p_sys->p_theme->WindowList.begin();
-         win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
+    for( win = SkinWindowList::Instance()->Begin();
+         win != SkinWindowList::Instance()->End(); win++ )
     {
         // If it is the correct window
         if( hwnd == ( (Win32Window *)(*win) )->GetHandle() )
@@ -301,8 +301,8 @@ void Win32Theme::AddWindow( string name, int x, int y, bool visible,
 
     SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)p_intf );
 
-    WindowList.push_back( (SkinWindow *)new OSWindow( p_intf, hwnd, x, y,
-        visible, fadetime, alpha, movealpha, dragdrop ) ) ;
+    SkinWindowList::Instance()->Add( (SkinWindow *)new OSWindow( p_intf, 
+        hwnd, x, y, visible, fadetime, alpha, movealpha, dragdrop ) ) ;
 }
 //---------------------------------------------------------------------------
 void Win32Theme::ChangeTray()

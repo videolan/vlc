@@ -2,7 +2,7 @@
  * theme.cpp: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.14 2003/06/09 12:33:16 asmax Exp $
+ * $Id: theme.cpp,v 1.15 2003/06/22 00:00:28 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -63,7 +63,8 @@ Theme::~Theme()
 {
     // Delete the windows
     list<SkinWindow *>::const_iterator win;
-    for( win = WindowList.begin(); win != WindowList.end(); win++ )
+    for( win = SkinWindowList::Instance()->Begin(); 
+         win != SkinWindowList::Instance()->End(); win++ )
     {
         delete (OSWindow *)(*win);
     }
@@ -87,7 +88,8 @@ void Theme::ShowTheme()
     Event *evt2;
 
     // Synchronize control to visible aspect
-    for( win = WindowList.begin(); win != WindowList.end(); win++ )
+    for( win = SkinWindowList::Instance()->Begin(); 
+         win != SkinWindowList::Instance()->End(); win++ )
     {
         // Synchronize windows visibility
         if( (*win)->OnStartThemeVisible )
@@ -108,7 +110,14 @@ void Theme::ShowTheme()
     CheckAnchors();
 
     // Show windows
-    OSAPI_PostMessage( NULL, VLC_SHOW, 0, 0 );
+    for( list<SkinWindow *>::const_iterator win =
+        SkinWindowList::Instance()->Begin();
+        win != SkinWindowList::Instance()->End(); win++ )
+    {
+        if( (*win)->OnStartThemeVisible )
+            OSAPI_PostMessage( (*win), WINDOW_OPEN, 1, 0 );
+    }
+    p_intf->p_sys->b_all_win_closed = false;
 }
 //---------------------------------------------------------------------------
 void Theme::CreateSystemMenu()
@@ -133,7 +142,8 @@ void Theme::LoadConfig()
     int x, y, v, scan;
 
     // Get config for each window
-    for( win = WindowList.begin(); win != WindowList.end(); win++ )
+    for( win = SkinWindowList::Instance()->Begin(); 
+         win != SkinWindowList::Instance()->End(); win++ )
     {
         // Get config
         scan = sscanf( &save[i * 13], "(%4d,%4d,%1d)", &x, &y, &v );
@@ -159,7 +169,8 @@ void Theme::SaveConfig()
     int x, y;
 
     // Save config of every window
-    for( win = WindowList.begin(); win != WindowList.end(); win++ )
+    for( win = SkinWindowList::Instance()->Begin(); 
+         win != SkinWindowList::Instance()->End(); win++ )
     {
         // Print config
         (*win)->GetPos( x, y );
@@ -198,8 +209,9 @@ void Theme::InitTheme()
 //---------------------------------------------------------------------------
 void Theme::InitWindows()
 {
-    for( list<SkinWindow *>::const_iterator win = WindowList.begin();
-         win != WindowList.end(); win++ )
+    list<SkinWindow *>::const_iterator win;
+    for( win = SkinWindowList::Instance()->Begin(); 
+         win != SkinWindowList::Instance()->End(); win++ )
     {
         (*win)->Init();
     }
@@ -207,8 +219,9 @@ void Theme::InitWindows()
 //---------------------------------------------------------------------------
 void Theme::InitControls()
 {
-    for( list<SkinWindow *>::const_iterator win = WindowList.begin();
-         win != WindowList.end(); win++ )
+    list<SkinWindow *>::const_iterator win;
+    for( win = SkinWindowList::Instance()->Begin(); 
+         win != SkinWindowList::Instance()->End(); win++ )
     {
         for( unsigned int i = 0; i < (*win)->ControlList.size(); i++ )
         {
@@ -219,8 +232,9 @@ void Theme::InitControls()
 //---------------------------------------------------------------------------
 SkinWindow * Theme::GetWindow( string name )
 {
-    for( list<SkinWindow *>::const_iterator win = WindowList.begin();
-         win != WindowList.end(); win++ )
+    list<SkinWindow *>::const_iterator win;
+    for( win = SkinWindowList::Instance()->Begin(); 
+         win != SkinWindowList::Instance()->End(); win++ )
     {
         if( name == OSAPI_GetWindowTitle( *win ) )
         {
@@ -293,8 +307,11 @@ bool Theme::MoveSkinMagnet( SkinWindow *wnd, int left, int top )
 
     // All windows can be moved
     list<SkinWindow *>::const_iterator win;
-    for( win = WindowList.begin(); win != WindowList.end(); win++ )
+    for( win = SkinWindowList::Instance()->Begin(); 
+         win != SkinWindowList::Instance()->End(); win++ )
+    {
         (*win)->Moved = false;
+    }
 
     // Move Window
     MoveSkin( wnd, NewLeft - Wx, NewTop - Wy );
@@ -310,7 +327,8 @@ void Theme::HangToAnchors( SkinWindow *wnd, int &x, int &y, bool init )
     list<Anchor *>::const_iterator win_anchor, wnd_anchor;
 
     // Parse list of windows
-    for( win = WindowList.begin(); win != WindowList.end(); win++ )
+    for( win = SkinWindowList::Instance()->Begin(); 
+         win != SkinWindowList::Instance()->End(); win++ )
     {
         // If window is moved window
         if( (*win) == wnd )
@@ -392,7 +410,8 @@ void Theme::CheckAnchors()
     list<SkinWindow *>::const_iterator win;
     int x, y;
 
-    for( win = WindowList.begin(); win != WindowList.end(); win++ )
+    for( win = SkinWindowList::Instance()->Begin(); 
+         win != SkinWindowList::Instance()->End(); win++ )
     {
         (*win)->GetPos( x, y );
         HangToAnchors( (*win), x, y, true );

@@ -2,7 +2,7 @@
  * window.h: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.h,v 1.3 2003/04/21 21:51:16 asmax Exp $
+ * $Id: window.h,v 1.4 2003/06/22 00:00:28 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -144,6 +144,22 @@ class SkinWindow
 
         // Get the interface thread
         intf_thread_t *GetIntf()    { return p_intf; }
+};
+//---------------------------------------------------------------------------
+class SkinWindowList
+{
+    private:
+        static SkinWindowList *_instance;
+        list<SkinWindow*> _list;
+        
+        SkinWindowList();
+        
+    public:
+        static SkinWindowList *Instance();
+        void Add( SkinWindow *win );
+        SkinWindow *Back();
+        list<SkinWindow*>::const_iterator Begin();
+        list<SkinWindow*>::const_iterator End();
 };
 //---------------------------------------------------------------------------
 

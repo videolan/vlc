@@ -2,7 +2,7 @@
  * x11_dragdrop.cpp: X11 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_dragdrop.cpp,v 1.4 2003/06/09 00:32:58 asmax Exp $
+ * $Id: x11_dragdrop.cpp,v 1.5 2003/06/22 00:00:28 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -108,6 +108,7 @@ void X11DropObject::DndEnter( ldata_t data )
             break;
         }
     }
+    fprintf(stderr,"dndenter\n");
 }
 //---------------------------------------------------------------------------
 void X11DropObject::DndPosition( ldata_t data )
@@ -140,10 +141,12 @@ void X11DropObject::DndPosition( ldata_t data )
     // Tell the source whether we accept the drop
     XSendEvent( display, src, False, 0, &event );
     XUNLOCK;
+    fprintf(stderr,"dndpos\n");
 }
 //---------------------------------------------------------------------------
 void X11DropObject::DndLeave( ldata_t data )
 {
+    fprintf(stderr,"dndleave\n");
 }
 //---------------------------------------------------------------------------
 void X11DropObject::DndDrop( ldata_t data )
@@ -196,7 +199,7 @@ void X11DropObject::DndDrop( ldata_t data )
     
         char *name = new char[selection.size()+1];
         strncpy( name, selection.c_str(), selection.size()+1 );
-        msg_Dbg( p_intf, "drop: %s\n", name );
+    fprintf(stderr,"dnddrop %s\n", name);
         OSAPI_PostMessage( NULL, VLC_DROP, (unsigned int)name, 0 );
     }
     

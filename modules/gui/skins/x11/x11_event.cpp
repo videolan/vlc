@@ -2,7 +2,7 @@
  * x11_event.cpp: x11 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_event.cpp,v 1.3 2003/06/09 12:33:16 asmax Exp $
+ * $Id: x11_event.cpp,v 1.4 2003/06/22 00:00:28 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -74,8 +74,8 @@ bool X11Event::SendEvent()
     {
         // Find window matching with Wnd
         list<SkinWindow *>::const_iterator win;
-        for( win = p_intf->p_sys->p_theme->WindowList.begin();
-             win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
+        for( win = SkinWindowList::Instance()->Begin();
+             win != SkinWindowList::Instance()->End(); win++ )
         {
             // If it is the correct window
             if( Wnd == ( (X11Window *)(*win) )->GetHandle() )
