@@ -50,7 +50,7 @@ plugins/imdct/imdctsse.c
 plugins/kde/kde.cpp
 plugins/lirc/lirc.c
 plugins/lpcm_adec/lpcm_adec.c
-plugins/macosx/macosx.c
+plugins/macosx/macosx.m
 plugins/mad/mad_adec.c
 plugins/memcpy/memcpy.c
 plugins/memcpy/memcpyaltivec.c
