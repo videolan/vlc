@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.10 2001/06/14 01:49:44 sam Exp $
+ * $Id: gtk_menu.c,v 1.11 2001/06/29 11:34:28 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -838,6 +838,7 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
 
         p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                              p_intf->p_sys->p_window ), "menubar_chapter" ) );
+
         GtkRadioMenu( p_intf, p_menubar_menu, NULL, "Chapter",
                         p_intf->p_input->stream.p_selected_area->i_part_nb,
                         p_intf->p_input->stream.p_selected_area->i_part,
