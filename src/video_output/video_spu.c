@@ -30,8 +30,10 @@
 #include "config.h"
 #include "common.h"
 #include "threads.h"
+#include "plugins.h"
 #include "mtime.h"
 #include "video.h"
+#include "video_output.h"
 #include "video_spu.h"
 
 #include "intf_msg.h"
@@ -41,8 +43,10 @@ typedef struct vout_spu_s
     int i_id;
     byte_t *p_data;
 
+    /* coordinates inside the spu */
     int x;
     int y;
+    /* size of the spu */
     int width;
     int height;
 
@@ -89,32 +93,44 @@ static int NewLine  ( vout_spu_t *p_vspu, int *i_id );
  *****************************************************************************
  * 
  *****************************************************************************/
-void vout_RenderSPU( byte_t *p_data, int p_offset[2],
-                     subpicture_t *p_subpic, byte_t *p_pic,
-                     int i_bytes_per_pixel, int i_bytes_per_line )
+void vout_RenderSPU( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
     int i_code = 0x00;
     int i_next = 0;
     int i_id = 0;
     int i_color;
+    int i_bytes_per_pixel = p_vout->i_bytes_per_pixel;
+    int i_bytes_per_line = p_vout->i_bytes_per_line;
 
-    /* fake palette - the real one has to be sought in the .IFO */
+    int i_width = 720;
+    int i_pic_width = p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_width;
+    int i_height = 576;
+    int i_pic_height = p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_height;
+
+    /* FIXME: fake palette - the real one has to be sought in the .IFO */
     static int p_palette[4] = { 0x0000, 0xffff, 0x5555, 0x0000 };
 
     boolean_t b_aligned = 1;
     byte_t *p_from[2];
     vout_spu_t vspu;
 
-    p_from[1] = p_data + p_offset[1];
-    p_from[0] = p_data + p_offset[0];
+    p_from[1] = p_subpic->p_data + p_subpic->type.spu.i_offset[1];
+    p_from[0] = p_subpic->p_data + p_subpic->type.spu.i_offset[0];
 
     vspu.x = 0;
     vspu.y = 0;
     vspu.width = 720;
     vspu.height = 576;
-    vspu.p_data = p_pic + p_subpic->i_x * i_bytes_per_pixel + p_subpic->i_y * i_bytes_per_line;
+    vspu.p_data = p_vout->p_buffer[ p_vout->i_buffer_index ].p_data
+                    /* go to the picture coordinates */
+                    + p_vout->p_buffer->i_pic_x * p_vout->i_bytes_per_pixel
+                    + p_vout->p_buffer->i_pic_y * p_vout->i_bytes_per_line
+                    /* go to the SPU coordinates */
+                    + p_subpic->i_x * i_bytes_per_pixel
+                    + p_subpic->i_y * i_bytes_per_line;
 
-    while( p_from[0] < p_data + p_offset[1] )
+    while( p_from[0] < (byte_t *)p_subpic->p_data
+                         + p_subpic->type.spu.i_offset[1] )
     {
         GET_NIBBLE( i_code );
 
@@ -135,9 +151,10 @@ void vout_RenderSPU( byte_t *p_data, int p_offset[2],
             {
                 if( (i_color = i_code & 0x3) )
                 {
-                    u8 *p_target = &vspu.p_data[ i_bytes_per_pixel *
-                                    ( vspu.x + vspu.y * vspu.width ) ];
-                    memset( p_target, p_palette[i_color], i_bytes_per_pixel * (i_code >> 2) );
+                    u8 *p_target = &vspu.p_data[ i_bytes_per_pixel * (vspu.x * i_pic_width / i_width)
+                                        + ( vspu.y * i_pic_height / i_height) * i_bytes_per_line ];
+                    memset( p_target, p_palette[i_color],
+                            ((i_code * i_pic_width / i_width) >> 2) * i_bytes_per_pixel );
                 }
                 vspu.x += i_code >> 2;
             }

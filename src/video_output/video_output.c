@@ -1859,11 +1859,7 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
                 vout_DestroySubPicture( p_vout, p_subpic );
                 break;
             }
-            vout_RenderSPU( p_subpic->p_data, p_subpic->type.spu.i_offset,
-                            p_subpic,
-                            p_vout->p_buffer[ p_vout->i_buffer_index ].p_data,
-                            p_vout->i_bytes_per_pixel,
-                            p_vout->i_bytes_per_line );
+            vout_RenderSPU( p_vout, p_subpic );
             break;
         case TEXT_SUBPICTURE:                            /* single line text */
             /* Select default font if not specified */
