@@ -28,7 +28,7 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_CPP
 AC_PROG_CXX
-"${CXX}" --version >/dev/null 2>&1 || CXX=""
+eval "${CXX} --version" >/dev/null 2>&1 || CXX=""
 if test "${CXX}" != ""; then
   AC_PROG_CXXCPP
 fi
