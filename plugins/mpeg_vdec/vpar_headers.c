@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.15 2002/02/27 22:57:10 sam Exp $
+ * $Id: vpar_headers.c,v 1.16 2002/03/14 01:35:28 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -419,6 +419,12 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         p_vpar->sequence.b_mpeg2 = 0;
         p_vpar->sequence.b_progressive = 1;
         p_vpar->sequence.i_chroma_format = CHROMA_420;
+    }
+
+    /* check whether the input gives a particular aspect ratio */
+    if( p_vpar->p_config->p_demux_data )
+    {
+        i_aspect = *(int*)(p_vpar->p_config->p_demux_data);
     }
 
     /* Store calculated aspect ratio */

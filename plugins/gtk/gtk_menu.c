@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.22 2002/03/06 01:20:56 stef Exp $
+ * $Id: gtk_menu.c,v 1.23 2002/03/14 01:35:28 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -246,7 +246,6 @@ void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
     intf_thread_t * p_intf;
     input_area_t *  p_area;
     gint            i_chapter;
-    char            psz_chapter[5];
     GtkWidget *     p_popup_menu;
 
     p_intf    = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
@@ -257,10 +256,6 @@ void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
     {
         p_area->i_part = i_chapter;
         input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
-
-        snprintf( psz_chapter, 4, "%02d", p_area->i_part );
-        psz_chapter[ 4 ] = '\0';
-        gtk_label_set_text( p_intf->p_sys->p_label_chapter, psz_chapter );
 
         p_intf->p_sys->b_chapter_update = 1;
         p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
@@ -382,10 +377,8 @@ static gint GtkRadioMenu( intf_thread_t * p_intf,
      * We have to release the lock since input_ToggleES needs it */
     if( p_item_selected != NULL )
     {
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
         gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item_selected ),
                                         TRUE );
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
     }
 
     /* be sure that menu is sensitive, if there are several items */
@@ -841,10 +834,8 @@ static gint GtkTitleMenu( gpointer       p_data,
      * We have to release the lock since input_ToggleES needs it */
     if( p_item_active != NULL )
     {
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
         gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item_active ),
                                         TRUE );
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
     }
 #if 0
     if( p_input_bank->pp_input[0]->stream.i_area_nb > 1 )

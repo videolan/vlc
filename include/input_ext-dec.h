@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.53 2002/03/01 00:33:17 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.54 2002/03/14 01:35:28 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -532,6 +532,7 @@ typedef struct decoder_config_s
     u16                     i_id;
     u8                      i_type;         /* type of the elementary stream */
 
+    void *                  p_demux_data;
     struct stream_ctrl_s *  p_stream_ctrl;
     struct decoder_fifo_s * p_decoder_fifo;
 } decoder_config_t;

@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.30 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: input_dec.c,v 1.31 2002/03/14 01:35:28 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -247,6 +247,8 @@ static decoder_config_t * CreateDecoderConfig( input_thread_t * p_input,
 
     p_config->i_id = p_es->i_id;
     p_config->i_type = p_es->i_type;
+    p_config->p_demux_data = p_es->p_demux_data;
+    
     p_config->p_stream_ctrl = &p_input->stream.control;
 
     p_config->p_decoder_fifo->p_first = NULL;

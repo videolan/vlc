@@ -1,7 +1,7 @@
 /* dvd_es.c: functions to find and select ES
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_es.c,v 1.4 2002/03/12 18:37:46 stef Exp $
+ * $Id: dvd_es.c,v 1.5 2002/03/14 01:35:28 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -70,9 +70,9 @@ void DVDLaunchDecoders( input_thread_t * p_input );
 #define vmg p_dvd->p_ifo->vmg
 #define vts p_dvd->p_ifo->vts
 
-#define ADDES( stream_id, private_id, type, cat, lang )                 \
+#define ADDES( stream_id, private_id, type, cat, lang, size )           \
     i_id = ( (private_id) << 8 ) | (stream_id);                         \
-    p_es = input_AddES( p_input, NULL, i_id, 0 );                       \
+    p_es = input_AddES( p_input, NULL, i_id, size );                    \
     p_es->i_stream_id = (stream_id);                                    \
     p_es->i_type = (type);                                              \
     p_es->i_cat = (cat);                                                \
@@ -90,13 +90,24 @@ void DVDReadVideo( input_thread_t * p_input )
     thread_dvd_data_t * p_dvd;
     es_descriptor_t *   p_es;
     int                 i_id;
+    int                 i_ratio;
 
     p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
 
     /* ES 0 -> video MPEG2 */
     IfoPrintVideo( p_dvd );
-
-    ADDES( 0xe0, 0, MPEG2_VIDEO_ES, VIDEO_ES, 0 );
+    i_ratio = vts.manager_inf.video_attr.i_ratio;
+    
+    if( i_ratio )
+    {
+        ADDES( 0xe0, 0, MPEG2_VIDEO_ES, VIDEO_ES, 0, sizeof(int) );
+        *(int*)(p_es->p_demux_data) = i_ratio;
+    }
+    else
+    {
+        ADDES( 0xe0, 0, MPEG2_VIDEO_ES, VIDEO_ES, 0, 0 );
+    }
+        
 }
 
 /*****************************************************************************
@@ -132,7 +143,7 @@ void DVDReadAudio( input_thread_t * p_input )
             {
             case 0x00:              /* AC3 */
                 ADDES( 0xbd, 0x80 + audio_status.i_position,
-                       AC3_AUDIO_ES, AUDIO_ES, i_lang );
+                       AC3_AUDIO_ES, AUDIO_ES, i_lang, 0 );
                 p_es->b_audio = 1;
                 strcat( p_es->psz_desc, " (ac3)" );
 
@@ -140,14 +151,14 @@ void DVDReadAudio( input_thread_t * p_input )
             case 0x02:
             case 0x03:              /* MPEG audio */
                 ADDES( 0xc0 + audio_status.i_position, 0,
-                       MPEG2_AUDIO_ES, AUDIO_ES, i_lang );
+                       MPEG2_AUDIO_ES, AUDIO_ES, i_lang, 0 );
                 p_es->b_audio = 1;
                 strcat( p_es->psz_desc, " (mpeg)" );
 
                 break;
             case 0x04:              /* LPCM */
                 ADDES( 0xbd, 0xa0 + audio_status.i_position,
-                       LPCM_AUDIO_ES, AUDIO_ES, i_lang );
+                       LPCM_AUDIO_ES, AUDIO_ES, i_lang, 0 );
                 p_es->b_audio = 1;
                 strcat( p_es->psz_desc, " (lpcm)" );
 
@@ -172,6 +183,8 @@ void DVDReadAudio( input_thread_t * p_input )
  *****************************************************************************/
 #define spu_status \
     vts.title_unit.p_title[p_dvd->i_title_id-1].title.pi_spu_status[i-1]
+#define palette \
+    vts.title_unit.p_title[p_dvd->i_title_id-1].title.pi_yuv_color
 
 void DVDReadSPU( input_thread_t * p_input )
 {
@@ -214,11 +227,22 @@ void DVDReadSPU( input_thread_t * p_input )
                 i_id = spu_status.i_position_43;
             }
 
-            ADDES( 0xbd, 0x20 + i_id, DVD_SPU_ES, SPU_ES,
-                   vts.manager_inf.p_spu_attr[i-1].i_lang_code );
+            if( vmg.title.pi_yuv_color )
+            {
+                ADDES( 0xbd, 0x20 + i_id, DVD_SPU_ES, SPU_ES,
+                       vts.manager_inf.p_spu_attr[i-1].i_lang_code,
+                       16*sizeof(u32) );
+                memcpy( p_es->p_demux_data, palette, 16*sizeof(u32) ); 
+            }
+            else
+            {
+                ADDES( 0xbd, 0x20 + i_id, DVD_SPU_ES, SPU_ES,
+                   vts.manager_inf.p_spu_attr[i-1].i_lang_code, 0 );
+            }
         }
     }
 }
+#undef palette
 #undef spu_status
 
 #undef vts

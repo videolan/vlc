@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.10 2002/02/19 00:50:19 sam Exp $
+ * $Id: spu_decoder.c,v 1.11 2002/03/14 01:35:28 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -102,6 +102,8 @@ static int decoder_Probe( u8 *pi_type )
 static int decoder_Run( decoder_config_t * p_config )
 {
     spudec_thread_t *     p_spudec;
+    int                   i;
+    u32 *                 pi_yuv_color;
    
     intf_WarnMsg( 3, "spudec: thread launched. Initializing ..." );
 
@@ -127,6 +129,17 @@ static int decoder_Run( decoder_config_t * p_config )
      * Initialize thread and free configuration
      */
     p_spudec->p_fifo->b_error = InitThread( p_spudec );
+
+    pi_yuv_color = p_config->p_demux_data;
+    for( i=0 ; i<16 ; i++ )
+    {
+        intf_WarnMsg( 12, "spudec info: 0x%02x 0x%02x 0x%02x 0x%02x",
+                          *((u8*)(pi_yuv_color)),
+                          *((u8*)(pi_yuv_color) + 1),
+                          *((u8*)(pi_yuv_color) + 2),
+                          *((u8*)(pi_yuv_color) + 3));
+        pi_yuv_color++;
+    }
 
     /*
      * Main loop - it is not executed if an error occured during
