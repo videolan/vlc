@@ -2,7 +2,7 @@
  * avi.h : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.h,v 1.2 2002/04/25 21:52:42 sam Exp $
+ * $Id: avi.h,v 1.3 2002/04/30 12:35:24 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define 	MAX_PACKETS_IN_FIFO 	10
+#define 	MAX_PACKETS_IN_FIFO 	2
 
 /* flags for use in <dwFlags> in AVIFileHdr */
 #define AVIF_HASINDEX       0x00000010  /* Index at end of file? */
@@ -130,31 +130,34 @@ typedef struct AVIStreamInfo_s
     bitmapinfoheader_t  video_format;
     waveformatex_t      audio_format;
     es_descriptor_t     *p_es;   
-    int                 b_unselected; /* previously unselected */
+    int                 b_selected; /* newly selected */
     AVIIndexEntry_t     *p_index;
     int                 i_idxnb;
     int                 i_idxmax; 
-    int                 i_idxpos;
+    int                 i_idxposc;  /* numero of chunk */
+    int                 i_idxposb;  /* byte in the current chunk */
     off_t               i_idxoffset; /* how many to add to index.i_pos */
 } AVIStreamInfo_t;
 
 typedef struct demux_data_avi_file_s
 {
-    mtime_t i_date;       /* date correspondant à i_chunkread = 0 */
+    mtime_t i_date; 
 
     riffchunk_t *p_riff;
     riffchunk_t *p_hdrl;
     riffchunk_t *p_movi;
     riffchunk_t *p_idx1;
 
-    /* Info extraites de avih */
+    /* Info extrated from avih */
     MainAVIHeader_t avih;
 
-    /* les differents stream */
+    /* number of stream and informations*/
     int i_streams;
     AVIStreamInfo_t   **pp_info; 
 
-/* absolument pas definitif */
+    /* current audio and video es */
+    AVIStreamInfo_t *p_info_video;
+    AVIStreamInfo_t *p_info_audio;
 
 } demux_data_avi_file_t;
-
+ 
