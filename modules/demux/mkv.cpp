@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.47 2003/11/28 22:23:04 fenrir Exp $
+ * $Id: mkv.cpp,v 1.48 2003/12/02 01:54:30 rocky Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -2171,14 +2171,9 @@ static void InformationsCreate( input_thread_t *p_input )
     p_cat = input_InfoCategory( p_input, "Matroska" );
     if( p_sys->f_duration > 1000.1 )
     {
-        int64_t i_sec = (int64_t)p_sys->f_duration / 1000;
-        int h,m,s;
-
-        h = i_sec / 3600;
-        m = ( i_sec / 60 ) % 60;
-        s = i_sec % 60;
-
-        input_AddInfo( p_cat, _("Duration"), "%d:%2.2d:%2.2d" , h, m, s );
+	char psz_buffer[MSTRTIME_MAX_SIZE];
+        input_AddInfo( p_cat, _("Duration"), 
+		       msecstotimestr( psz_buffer, p_sys->f_duration ) );
     }
 
     if( p_sys->psz_title )

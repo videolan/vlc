@@ -9,7 +9,7 @@
  * Functions prototyped are implemented in interface/mtime.c.
  *****************************************************************************
  * Copyright (C) 1996, 1997, 1998, 1999, 2000 VideoLAN
- * $Id: mtime.h,v 1.13 2002/11/11 14:39:11 sam Exp $
+ * $Id: mtime.h,v 1.14 2003/12/02 01:54:30 rocky Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -47,6 +47,9 @@
  *****************************************************************************/
 #define MSTRTIME_MAX_SIZE 22
 
+#define msecstotimestr(psz_buffer, msecs) \
+  secstotimestr( psz_buffer, (msecs / (int) 1000) )
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
@@ -54,4 +57,5 @@ VLC_EXPORT( char *,  mstrtime, ( char *psz_buffer, mtime_t date ) );
 VLC_EXPORT( mtime_t, mdate,    ( void ) );
 VLC_EXPORT( void,    mwait,    ( mtime_t date ) );
 VLC_EXPORT( void,    msleep,   ( mtime_t delay ) );
+VLC_EXPORT( char *,  secstotimestr, ( char *psz_buffer, int secs ) );
 

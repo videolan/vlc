@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.7 2003/12/01 03:34:30 rocky Exp $
+ * $Id: access.c,v 1.8 2003/12/02 01:54:30 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -518,18 +518,6 @@ static void CDDASeek( input_thread_t * p_input, off_t i_off )
 
 }
 
-static 
-char * secs2TimeStr( int64_t i_sec )
-{
-  int h = i_sec / 3600;
-  int m = ( i_sec / 60 ) % 60;
-  int s = i_sec % 60;
-  static char buffer[20];
-
-  snprintf(buffer, 20, "%d:%2.2d:%2.2d", h, m, s);
-  return buffer;
-}
-
 #define meta_info_add_str(title, str) \
   if ( str ) {						\
     printf("field %s str %s\n", title, str);		\
@@ -551,7 +539,9 @@ static void InformationCreate( input_thread_t *p_input  )
     if( p_cdda->cddb.disc->length > 1000 )
       {
 	int64_t i_sec = (int64_t) p_cdda->cddb.disc->length;
-	input_AddInfo( p_cat, _("Duration"), "%s", secs2TimeStr( i_sec ) );
+	char psz_buffer[MSTRTIME_MAX_SIZE];
+	input_AddInfo( p_cat, _("Duration"), "%s", 
+		       secstotimestr( psz_buffer, i_sec ) );
       } else 
       {
 	use_cddb = 0;
@@ -585,11 +575,13 @@ static void InformationCreate( input_thread_t *p_input  )
   if (!use_cddb)
   {
     track_t i_track = p_cdda->i_nb_tracks;
+    char psz_buffer[MSTRTIME_MAX_SIZE];
     mtime_t i_duration = 
       (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1]) 
       / CDIO_CD_FRAMES_PER_SEC;
 
-    input_AddInfo( p_cat, _("Duration"), "%s", secs2TimeStr( i_duration ) );
+    input_AddInfo( p_cat, _("Duration"), "%s", 
+		   secstotimestr( psz_buffer, i_duration ) );
   }
 }
 
@@ -829,10 +821,11 @@ CDDAFormatStr(const input_thread_t *p_input, cdda_data_t *p_cdda,
 
     case 's':
       if (p_cdda->i_cddb_enabled) {
+	char psz_buffer[MSTRTIME_MAX_SIZE];
 	mtime_t i_duration = 
 	  (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1]) 
 	  / CDIO_CD_FRAMES_PER_SEC;
-	add_format_str_info(secs2TimeStr(i_duration));
+	add_format_str_info(secstotimestr( psz_buffer, i_duration ) );
       } else goto not_special;
       break;
 

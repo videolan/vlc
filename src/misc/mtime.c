@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mtime.c,v 1.36 2003/06/05 11:52:19 gbazin Exp $
+ * $Id: mtime.c,v 1.37 2003/12/02 01:54:30 rocky Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -67,21 +67,48 @@ int nanosleep(struct timespec *, struct timespec *);
 /*****************************************************************************
  * mstrtime: return a date in a readable format
  *****************************************************************************
- * This functions is provided for any interface function which need to print a
- * date. psz_buffer should be a buffer long enough to store the formatted
+ * This function converts a mtime date into a string.
+ * psz_buffer should be a buffer long enough to store the formatted
  * date.
  *****************************************************************************/
+/**
+ * \brief return a date in a readable format
+ * \param date to be converted
+ * \param psz_buffer should be a buffer at least MSTRTIME_MAX_SIZE characters
+ * \return psz_buffer is returned so this can be used as printf parameter.
+ */
 char *mstrtime( char *psz_buffer, mtime_t date )
 {
     static mtime_t ll1000 = 1000, ll60 = 60, ll24 = 24;
 
-    sprintf( psz_buffer, "%02d:%02d:%02d-%03d.%03d",
+    snprintf( psz_buffer, MSTRTIME_MAX_SIZE, "%02d:%02d:%02d-%03d.%03d",
              (int) (date / (ll1000 * ll1000 * ll60 * ll60) % ll24),
              (int) (date / (ll1000 * ll1000 * ll60) % ll60),
              (int) (date / (ll1000 * ll1000) % ll60),
              (int) (date / ll1000 % ll1000),
              (int) (date % ll1000) );
     return( psz_buffer );
+}
+
+/*****************************************************************************
+ * secstotimestr: convert seconds to a time in the format h:mm:ss 
+ *****************************************************************************
+ * This function is provided for any interface function which need to print a
+ * time string in the format h:mm:ss
+ * date.
+ *****************************************************************************/
+/**
+ * \brief convert seconds to a time in the format h:mm:ss 
+ * \param secs  the date to be converted
+ * \param psz_buffer should be a buffer at least MSTRTIME_MAX_SIZE characters
+ * \return psz_buffer is returned so this can be used as printf parameter.
+ */
+char *secstotimestr( char *psz_buffer, int secs )
+{
+  snprintf( psz_buffer, MSTRTIME_MAX_SIZE, "%d:%2.2d:%2.2d",
+	    (int) (secs / 3600), (int)(( secs % 3600 ) / 60), 
+	    (int)(secs % 60) );
+  return( psz_buffer );
 }
 
 /*****************************************************************************
