@@ -67,6 +67,7 @@ int Import_M3U( vlc_object_t *p_this )
     }
     else if( ( psz_ext && !strcasecmp( psz_ext, ".m3u") ) ||
              ( psz_ext && !strcasecmp( psz_ext, ".ram") ) ||
+             ( psz_ext && !strcasecmp( psz_ext, ".rm") ) ||
              /* A .ram file can contain a single rtsp link */
              ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "m3u") ) )
     {
@@ -186,12 +187,14 @@ static int Demux( demux_t *p_demux )
         }
         else if( *psz_parse )
         {
+            char *psz_mrl;
             if( !psz_name || !*psz_name )
             {
-                psz_name = strdup( psz_parse ); /* Use filename as name for relative entries */
+                /* Use filename as name for relative entries */
+                psz_name = strdup( psz_parse );
             }
-            char *psz_mrl =
-                ProcessMRL( psz_parse, p_demux->p_sys->psz_prefix );
+
+            psz_mrl = ProcessMRL( psz_parse, p_demux->p_sys->psz_prefix );
 
             b_cleanup = VLC_TRUE;
             if( !psz_mrl ) goto error;

@@ -81,6 +81,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
 {
     vlc_value_t lockval;
     vlm_t *p_vlm = NULL;
+    char *psz_vlmconf;
 
     /* to be sure to avoid multiple creation */
     var_Create( p_this->p_libvlc, "vlm_mutex", VLC_VAR_MUTEX );
@@ -116,8 +117,8 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
         return NULL;
     }
 
-    /* try loading the vlm conf file given by --vlm-conf */
-    char *psz_vlmconf =  config_GetPsz( p_vlm, "vlm-conf" );
+    /* Try loading the vlm conf file given by --vlm-conf */
+    psz_vlmconf = config_GetPsz( p_vlm, "vlm-conf" );
 
     if( psz_vlmconf && *psz_vlmconf )
     {

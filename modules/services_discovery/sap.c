@@ -426,6 +426,7 @@ static void Run( services_discovery_t *p_sd )
     /* read SAP packets */
     while( !p_sd->b_die )
     {
+        int i_read;
         p_buffer = (uint8_t *)malloc( MAX_SAP_BUFFER );
 
         if( !p_buffer )
@@ -435,9 +436,9 @@ static void Run( services_discovery_t *p_sd )
             continue;
         }
 
-        int i_read = net_Select( p_sd, p_sd->p_sys->pi_fd, NULL,
-                                 p_sd->p_sys->i_fd, p_buffer,
-                                 MAX_SAP_BUFFER, 500000 );
+        i_read = net_Select( p_sd, p_sd->p_sys->pi_fd, NULL,
+                             p_sd->p_sys->i_fd, p_buffer,
+                             MAX_SAP_BUFFER, 500000 );
 #if 0
         /* Check for items that need deletion */
         for( i = 0 ; i< p_sd->p_sys->i_announces ; i++ )
@@ -470,8 +471,7 @@ static void Run( services_discovery_t *p_sd )
 
               /* Remove the sap_announce from the array */
               REMOVE_ELEM( p_sd->p_sys->pp_announces,
-                           p_sd->p_sys->i_announces,
-                           i );
+                           p_sd->p_sys->i_announces, i );
 
               free( p_announce );
 
@@ -512,10 +512,7 @@ static int Demux( demux_t *p_demux )
 
    playlist_t *p_playlist;
 
-   if( !psz_sdp )
-   {
-        return -1;
-   }
+   if( !psz_sdp ) return -1;
 
    /* Gather the complete sdp file */
    for( ;; )
@@ -828,8 +825,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     p_sap->p_item = p_item;
 
     TAB_APPEND( p_sd->p_sys->i_announces,
-                p_sd->p_sys->pp_announces,
-                p_sap );
+                p_sd->p_sys->pp_announces, p_sap );
 
     return p_sap;
 }
@@ -1148,9 +1144,7 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
             case( 'a' ): /* attribute */
             {
                 char *psz_eon = strchr( &psz_sdp[2], ':' );
-
-                 attribute_t *p_attr = (attribute_t *)malloc(
-                                        sizeof( attribute_t ) );
+                attribute_t *p_attr = malloc( sizeof( attribute_t ) );
 
                 /* Attribute with value */
                 if( psz_eon )
@@ -1211,7 +1205,6 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
 /***********************************************************************
  * ismult: returns true if we have a multicast address
  ***********************************************************************/
-
 static int ismult( char *psz_uri )
 {
     char *psz_end;
@@ -1234,16 +1227,15 @@ static int ismult( char *psz_uri )
     return( i_value < 224 ? VLC_FALSE : VLC_TRUE );
 }
 
-static int InitSocket( services_discovery_t *p_sd, char *psz_address, int i_port )
+static int InitSocket( services_discovery_t *p_sd, char *psz_address,
+                       int i_port )
 {
     int i_fd = net_OpenUDP( p_sd, psz_address, i_port, "", 0 );
 
     if( i_fd != -1 )
     {
-        INSERT_ELEM(  p_sd->p_sys->pi_fd,
-                      p_sd->p_sys->i_fd,
-                      p_sd->p_sys->i_fd,
-                      i_fd );
+        INSERT_ELEM(  p_sd->p_sys->pi_fd, p_sd->p_sys->i_fd,
+                      p_sd->p_sys->i_fd, i_fd );
         return VLC_SUCCESS;
     }
 
@@ -1339,15 +1331,9 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_sd,
                                           VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
-    if( p_announce->p_sdp )
-    {
-        FreeSDP( p_announce->p_sdp );
-    }
+    if( p_announce->p_sdp ) FreeSDP( p_announce->p_sdp );
 
-    if( !p_playlist )
-    {
-        return VLC_EGENERIC;
-    }
+    if( !p_playlist ) return VLC_EGENERIC;
 
     if( p_announce->p_item )
     {
@@ -1380,8 +1366,7 @@ static vlc_bool_t IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 )
         p_sdp1->psz_address_type && p_sdp2->psz_address_type &&
         p_sdp1->psz_address &&  p_sdp2->psz_address )
     {
-        if(
-           !strcmp( p_sdp1->psz_username , p_sdp2->psz_username ) &&
+        if(!strcmp( p_sdp1->psz_username , p_sdp2->psz_username ) &&
            !strcmp( p_sdp1->psz_network_type , p_sdp2->psz_network_type ) &&
            !strcmp( p_sdp1->psz_address_type , p_sdp2->psz_address_type ) &&
            !strcmp( p_sdp1->psz_address , p_sdp2->psz_address ) &&
