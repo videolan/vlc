@@ -94,7 +94,7 @@ vlc_module_begin ()
     /* video output filter submodule */
     add_submodule ()
     set_capability("video filter", 0)
-    set_callbacks(OpenVideo, Close)
+    set_callback(OpenVideo)
     set_description(N_("Audio Bar Graph Video sub source"))
     add_shortcut("audiobargraph_v")
 vlc_module_end ()
@@ -491,8 +491,13 @@ static const struct vlc_filter_operations filter_sub_ops = {
     .source_sub = FilterSub,
 };
 
+static void CloseVideo( filter_t *p_filter )
+{
+    Close( VLC_OBJECT(p_filter) );
+}
+
 static const struct vlc_filter_operations filter_video_ops = {
-    .filter_video = FilterVideo,
+    .filter_video = FilterVideo, .close = CloseVideo,
 };
 
 /**

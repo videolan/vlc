@@ -41,7 +41,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create      ( vlc_object_t * );
-static void Destroy     ( vlc_object_t * );
+static void Destroy     ( filter_t * );
 
 static void Filter( filter_t *, picture_t *, picture_t * );
 static void PlanarYUVPosterize( picture_t *, picture_t *, int);
@@ -49,7 +49,7 @@ static void PackedYUVPosterize( picture_t *, picture_t *, int);
 static void RVPosterize( picture_t *, picture_t *, bool, int );
 static void YuvPosterization( uint8_t *, uint8_t *, uint8_t *, uint8_t *,
                     uint8_t, uint8_t, uint8_t, uint8_t, int );
-VIDEO_FILTER_WRAPPER( Filter )
+VIDEO_FILTER_WRAPPER_CLOSE(Filter, Destroy)
 
 static const char *const ppsz_filter_options[] = {
     "level", NULL
@@ -74,7 +74,7 @@ vlc_module_begin ()
     add_integer_with_range( CFG_PREFIX "level", 6, 2, 256,
                            POSTERIZE_LEVEL_TEXT, POSTERIZE_LEVEL_LONGTEXT,
                            false )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -145,9 +145,8 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************
  * Terminate an output method created by PosterizeCreateOutputMethod
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     var_DelCallback( p_filter, CFG_PREFIX "level", FilterCallback, p_sys );

@@ -41,9 +41,9 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
+static void Close(filter_t *);
 static void Filter(filter_t *filter, picture_t *src, picture_t *dst);
-VIDEO_FILTER_WRAPPER( Filter )
+VIDEO_FILTER_WRAPPER_CLOSE(Filter, Close)
 
 #define BANK_SIZE (64)
 
@@ -74,7 +74,7 @@ vlc_module_begin()
                            PERIOD_MIN_TEXT, PERIOD_MIN_LONGTEXT, false)
     add_integer_with_range(CFG_PREFIX "period-max", 3*PERIOD_MAX/4, PERIOD_MIN, PERIOD_MAX,
                            PERIOD_MAX_TEXT, PERIOD_MAX_LONGTEXT, false)
-    set_callbacks(Open, Close)
+    set_callback(Open)
 vlc_module_end()
 
 /*****************************************************************************
@@ -416,9 +416,8 @@ static int Open(vlc_object_t *object)
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_object_t *object)
+static void Close(filter_t *filter)
 {
-    filter_t     *filter = (filter_t *)object;
     filter_sys_t *sys    = filter->p_sys;
 
     var_DelCallback(filter, CFG_PREFIX "variance", Callback, NULL);

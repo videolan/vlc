@@ -572,10 +572,28 @@ CVPX_to_CVPX_converter_Create(filter_t *filter, bool to_rgba)
     return converter;
 }
 
+static void
+Close(filter_t *filter)
+{
+    filter_sys_t *p_sys = filter->p_sys;
+    struct ci_filters_ctx *ctx = p_sys->ctx;
+    enum filter_type filter_types[NUM_MAX_EQUIVALENT_VLC_FILTERS];
+
+    filter_desc_table_GetFilterTypes(p_sys->psz_filter, filter_types);
+    for (unsigned int i = 0;
+         i < NUM_MAX_EQUIVALENT_VLC_FILTERS && filter_types[i] != FILTER_NONE;
+         ++i)
+        filter_chain_RemoveFilter(&ctx->fchain, filter_types[i]);
+
+    vlc_video_context_Release(filter->vctx_out);
+    free(p_sys);
+}
+
 static const struct vlc_filter_operations filter_ops =
 {
     .filter_video = Filter,
     .video_mouse = Mouse,
+    .close = Close,
 };
 
 static int
@@ -740,24 +758,6 @@ OpenCustom(vlc_object_t *obj)
     return Open(obj, "custom");
 }
 
-static void
-Close(vlc_object_t *obj)
-{
-    filter_t *filter = (filter_t *)obj;
-    filter_sys_t *p_sys = filter->p_sys;
-    struct ci_filters_ctx *ctx = p_sys->ctx;
-    enum filter_type filter_types[NUM_MAX_EQUIVALENT_VLC_FILTERS];
-
-    filter_desc_table_GetFilterTypes(p_sys->psz_filter, filter_types);
-    for (unsigned int i = 0;
-         i < NUM_MAX_EQUIVALENT_VLC_FILTERS && filter_types[i] != FILTER_NONE;
-         ++i)
-        filter_chain_RemoveFilter(&ctx->fchain, filter_types[i]);
-
-    vlc_video_context_Release(filter->vctx_out);
-    free(p_sys);
-}
-
 #define CI_CUSTOM_FILTER_TEXT N_("Use a specific Core Image Filter")
 #define CI_CUSTOM_FILTER_LONGTEXT N_( \
     "Example: 'CICrystallize', 'CIBumpDistortion', 'CIThermal', 'CIComicEffect'")
@@ -769,31 +769,31 @@ vlc_module_begin()
     set_description(N_("Mac OS X hardware video filters"))
 
     add_submodule()
-    set_callbacks(OpenAdjust, Close)
+    set_callback(OpenAdjust)
     add_shortcut("adjust")
 
     add_submodule()
-    set_callbacks(OpenInvert, Close)
+    set_callback(OpenInvert)
     add_shortcut("invert")
 
     add_submodule()
-    set_callbacks(OpenPosterize, Close)
+    set_callback(OpenPosterize)
     add_shortcut("posterize")
 
     add_submodule()
-    set_callbacks(OpenSepia, Close)
+    set_callback(OpenSepia)
     add_shortcut("sepia")
 
     add_submodule()
-    set_callbacks(OpenSharpen, Close)
+    set_callback(OpenSharpen)
     add_shortcut("sharpen")
 
     add_submodule()
-    set_callbacks(OpenPsychedelic, Close)
+    set_callback(OpenPsychedelic)
     add_shortcut("psychedelic")
 
     add_submodule()
-    set_callbacks(OpenCustom, Close)
+    set_callback(OpenCustom)
     add_shortcut("ci")
     add_string("ci-filter", "CIComicEffect", CI_CUSTOM_FILTER_TEXT, CI_CUSTOM_FILTER_LONGTEXT, true);
 vlc_module_end()

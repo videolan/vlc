@@ -317,11 +317,11 @@ static int CheckFmt(const video_format_t *in, const video_format_t *out,
 }
 
 static const struct vlc_filter_operations filter_upload_ops = {
-    .filter_video = UploadSurface,
+    .filter_video = UploadSurface,   .close = vlc_vaapi_CloseChroma,
 };
 
 static const struct vlc_filter_operations filter_download_ops = {
-    .filter_video = DownloadSurface,
+    .filter_video = DownloadSurface, .close = vlc_vaapi_CloseChroma,
 };
 
 int
@@ -413,9 +413,8 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
 }
 
 void
-vlc_vaapi_CloseChroma(vlc_object_t *obj)
+vlc_vaapi_CloseChroma(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
     filter_sys_t *const filter_sys = filter->p_sys;
 
     if (filter_sys->dest_pics)

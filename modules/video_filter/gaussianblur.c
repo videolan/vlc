@@ -39,7 +39,7 @@
  * Module descriptor
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
+static void Destroy   ( filter_t * );
 
 #define SIGMA_MIN (0.01)
 #define SIGMA_MAX (4096.0)
@@ -65,14 +65,14 @@ vlc_module_begin ()
                           SIGMA_TEXT, SIGMA_LONGTEXT,
                           false )
 
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static void Filter( filter_t *, picture_t *, picture_t * );
-VIDEO_FILTER_WRAPPER( Filter )
+VIDEO_FILTER_WRAPPER_CLOSE(Filter, Destroy)
 
 static const char *const ppsz_filter_options[] = {
     "sigma", NULL
@@ -174,9 +174,8 @@ static int Create( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     free( p_sys->pt_distribution );

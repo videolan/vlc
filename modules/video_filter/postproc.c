@@ -54,10 +54,10 @@
  * Local prototypes
  *****************************************************************************/
 static int OpenPostproc( vlc_object_t * );
-static void ClosePostproc( vlc_object_t * );
+static void ClosePostproc( filter_t * );
 
 static void PostprocPict( filter_t *, picture_t *, picture_t * );
-VIDEO_FILTER_WRAPPER( PostprocPict )
+VIDEO_FILTER_WRAPPER_CLOSE(PostprocPict, ClosePostproc)
 
 static int PPQCallback( vlc_object_t *, char const *,
                         vlc_value_t, vlc_value_t, void * );
@@ -88,7 +88,7 @@ vlc_module_begin ()
 
     set_capability( "video filter", 0 )
 
-    set_callbacks( OpenPostproc, ClosePostproc )
+    set_callback( OpenPostproc )
 
     add_integer_with_range( FILTER_PREFIX "q", PP_QUALITY_MAX, 0,
                             PP_QUALITY_MAX, Q_TEXT, Q_LONGTEXT, false )
@@ -261,9 +261,8 @@ static int OpenPostproc( vlc_object_t *p_this )
 /*****************************************************************************
  * ClosePostproc
  *****************************************************************************/
-static void ClosePostproc( vlc_object_t *p_this )
+static void ClosePostproc( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     /* delete the callback before destroying the mutex */

@@ -66,7 +66,7 @@ struct filter_sys_t
  * Local prototypes
  ****************************************************************************/
 static int  OpenFilter ( vlc_object_t * );
-static void CloseFilter( vlc_object_t * );
+static void CloseFilter( filter_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
 
@@ -81,7 +81,7 @@ vlc_module_begin ()
 
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_callbacks( OpenFilter, CloseFilter )
+    set_callback( OpenFilter )
 
     add_string( "opencv-haarcascade-file", "c:\\haarcascade_frontalface_alt.xml",
                           N_("Haar cascade filename"),
@@ -113,6 +113,7 @@ static int OpenFilter( vlc_object_t *p_this )
         FilterOperationInitializer()
         {
             ops.filter_video = Filter;
+            ops.close        = CloseFilter;
         };
     } filter_ops;
     p_filter->ops = &filter_ops.ops;
@@ -138,9 +139,8 @@ static int OpenFilter( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseFilter: clean up the filter
  *****************************************************************************/
-static void CloseFilter( vlc_object_t *p_this )
+static void CloseFilter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = static_cast<filter_sys_t *>(p_filter->p_sys);
 
     if( p_sys->p_cascade )

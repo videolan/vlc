@@ -40,13 +40,13 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
+static void Destroy   ( filter_t * );
 
 static void Filter( filter_t *, picture_t *, picture_t * );
 static void FilterErase( filter_t *, picture_t *, picture_t * );
 static int EraseCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
-VIDEO_FILTER_WRAPPER( Filter )
+VIDEO_FILTER_WRAPPER_CLOSE( Filter, Destroy )
 
 /*****************************************************************************
  * Module descriptor
@@ -76,7 +76,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "y", 0, POSY_TEXT, POSY_LONGTEXT, false )
 
     add_shortcut( "erase" )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -186,9 +186,8 @@ static int Create( vlc_object_t *p_this )
 /*****************************************************************************
  * Destroy
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
     if( p_sys->p_mask )
         picture_Release( p_sys->p_mask );

@@ -259,8 +259,20 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
     return VLC_SUCCESS;
 }
 
+static void D3D9CloseAdjust(filter_t *filter)
+{
+    filter_sys_t *sys = filter->p_sys;
+
+    IDirect3DSurface9_Release( sys->hw_surface );
+    IDirectXVideoProcessor_Release( sys->processor );
+    FreeLibrary( sys->hdecoder_dll );
+    vlc_video_context_Release(filter->vctx_out);
+
+    free(sys);
+}
+
 static const struct vlc_filter_operations filter_ops = {
-    .filter_video = Filter,
+    .filter_video = Filter, .close = D3D9CloseAdjust,
 };
 
 static int D3D9OpenAdjust(vlc_object_t *obj)
@@ -472,25 +484,12 @@ error:
     return VLC_EGENERIC;
 }
 
-static void D3D9CloseAdjust(vlc_object_t *obj)
-{
-    filter_t *filter = (filter_t *)obj;
-    filter_sys_t *sys = filter->p_sys;
-
-    IDirect3DSurface9_Release( sys->hw_surface );
-    IDirectXVideoProcessor_Release( sys->processor );
-    FreeLibrary( sys->hdecoder_dll );
-    vlc_video_context_Release(filter->vctx_out);
-
-    free(sys);
-}
-
 vlc_module_begin()
     set_description(N_("Direct3D9 adjust filter"))
     set_capability("video filter", 0)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_callbacks(D3D9OpenAdjust, D3D9CloseAdjust)
+    set_callback(D3D9OpenAdjust)
     add_shortcut( "adjust" )
 
     add_float_with_range( "contrast", 1.0, 0.0, 2.0,

@@ -335,8 +335,35 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
     return VLC_SUCCESS;
 }
 
+static void D3D11CloseAdjust(filter_t *filter)
+{
+    filter_sys_t *sys = filter->p_sys;
+
+    var_DelCallback( filter, "contrast",   AdjustCallback, sys );
+    var_DelCallback( filter, "brightness", AdjustCallback, sys );
+    var_DelCallback( filter, "hue",        AdjustCallback, sys );
+    var_DelCallback( filter, "saturation", AdjustCallback, sys );
+    var_DelCallback( filter, "gamma",      AdjustCallback, sys );
+    var_DelCallback( filter, "brightness-threshold",
+                                             AdjustCallback, sys );
+
+    for (int i=0; i<PROCESSOR_SLICES; i++)
+    {
+        if (sys->procInput[i])
+            ID3D11VideoProcessorInputView_Release(sys->procInput[i]);
+        if (sys->procOutput[i])
+            ID3D11VideoProcessorOutputView_Release(sys->procOutput[i]);
+    }
+    ID3D11Texture2D_Release(sys->out[0].texture);
+    ID3D11Texture2D_Release(sys->out[1].texture);
+    D3D11_ReleaseProcessor( &sys->d3d_proc );
+    vlc_video_context_Release(filter->vctx_out);
+
+    free(sys);
+}
+
 static const struct vlc_filter_operations filter_ops = {
-    .filter_video = Filter,
+    .filter_video = Filter, .close = D3D11CloseAdjust,
 };
 
 static int D3D11OpenAdjust(vlc_object_t *obj)
@@ -537,40 +564,12 @@ error:
     return VLC_EGENERIC;
 }
 
-static void D3D11CloseAdjust(vlc_object_t *obj)
-{
-    filter_t *filter = (filter_t *)obj;
-    filter_sys_t *sys = filter->p_sys;
-
-    var_DelCallback( filter, "contrast",   AdjustCallback, sys );
-    var_DelCallback( filter, "brightness", AdjustCallback, sys );
-    var_DelCallback( filter, "hue",        AdjustCallback, sys );
-    var_DelCallback( filter, "saturation", AdjustCallback, sys );
-    var_DelCallback( filter, "gamma",      AdjustCallback, sys );
-    var_DelCallback( filter, "brightness-threshold",
-                                             AdjustCallback, sys );
-
-    for (int i=0; i<PROCESSOR_SLICES; i++)
-    {
-        if (sys->procInput[i])
-            ID3D11VideoProcessorInputView_Release(sys->procInput[i]);
-        if (sys->procOutput[i])
-            ID3D11VideoProcessorOutputView_Release(sys->procOutput[i]);
-    }
-    ID3D11Texture2D_Release(sys->out[0].texture);
-    ID3D11Texture2D_Release(sys->out[1].texture);
-    D3D11_ReleaseProcessor( &sys->d3d_proc );
-    vlc_video_context_Release(filter->vctx_out);
-
-    free(sys);
-}
-
 vlc_module_begin()
     set_description(N_("Direct3D11 adjust filter"))
     set_capability("video filter", 0)
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_callbacks(D3D11OpenAdjust, D3D11CloseAdjust)
+    set_callback(D3D11OpenAdjust)
     add_shortcut( "adjust" )
 
     add_float_with_range( "contrast", 1.0, 0.0, 2.0,

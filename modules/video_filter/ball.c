@@ -73,10 +73,10 @@ enum { RED, GREEN, BLUE, WHITE };
 typedef struct filter_sys_t filter_sys_t;
 
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
+static void Destroy   ( filter_t * );
 
 static void Filter( filter_t *, picture_t *, picture_t * );
-VIDEO_FILTER_WRAPPER( Filter )
+VIDEO_FILTER_WRAPPER_CLOSE( Filter, Destroy )
 
 static void drawBall( filter_sys_t *p_sys, picture_t *p_outpic );
 static void drawPixelRGB24( filter_sys_t *p_sys, picture_t *p_outpic,
@@ -148,7 +148,7 @@ vlc_module_begin ()
               EDGE_VISIBLE_TEXT, EDGE_VISIBLE_LONGTEXT, true )
 
     add_shortcut( "ball" )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -318,9 +318,8 @@ static int Create( vlc_object_t *p_this )
 *****************************************************************************
 * Terminate an output method created by DistortCreateOutputMethod
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter)
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     var_DelCallback( p_filter, FILTER_PREFIX "color",

@@ -41,7 +41,7 @@
  * Local protypes
  *****************************************************************************/
 static int  Open         (vlc_object_t *);
-static void Close        (vlc_object_t *);
+static void Close        (filter_t *);
 static picture_t *Filter (filter_t *, picture_t *);
 static int DenoiseCallback( vlc_object_t *p_this, char const *psz_var,
                             vlc_value_t oldval, vlc_value_t newval,
@@ -76,7 +76,7 @@ vlc_module_begin()
 
     add_shortcut("hqdn3d")
 
-    set_callbacks(Open, Close)
+    set_callback(Open)
 vlc_module_end()
 
 static const char *const filter_options[] = {
@@ -156,7 +156,7 @@ static int Open(vlc_object_t *this)
 
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_video = Filter,
+        .filter_video = Filter, .close = Close,
     };
 
     filter->p_sys = sys;
@@ -173,9 +173,8 @@ static int Open(vlc_object_t *this)
 /*****************************************************************************
  * Close
  *****************************************************************************/
-static void Close(vlc_object_t *this)
+static void Close(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)this;
     filter_sys_t *sys = filter->p_sys;
     struct vf_priv_s *cfg = &sys->cfg;
 

@@ -39,7 +39,7 @@
  * Module descriptor
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
+static void Destroy   ( filter_t * );
 
 #define FILTER_PREFIX "motiondetect-"
 
@@ -51,7 +51,7 @@ vlc_module_begin ()
     set_capability( "video filter", 0 )
 
     add_shortcut( "motion" )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 
@@ -118,7 +118,7 @@ static int Create( vlc_object_t *p_this )
     }
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_video = Filter, .flush = Flush,
+        .filter_video = Filter, .flush = Flush, .close = Destroy,
     };
     p_filter->ops = &filter_ops;
 
@@ -145,9 +145,8 @@ static int Create( vlc_object_t *p_this )
 /*****************************************************************************
  * Destroy
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     free( p_sys->p_buf2 );

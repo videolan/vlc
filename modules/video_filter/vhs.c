@@ -99,7 +99,7 @@ static int  vhs_sliding_effect_apply( filter_t *, picture_t * );
  *****************************************************************************/
 
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static void Close( filter_t * );
 
 vlc_module_begin()
     set_description( N_("VHS movie effect video filter") )
@@ -108,7 +108,7 @@ vlc_module_begin()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end()
 
 /**
@@ -145,7 +145,7 @@ static int Open( vlc_object_t *p_this )
     /* init data */
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_video = Filter,
+        .filter_video = Filter, .close = Close,
     };
     p_filter->ops = &filter_ops;
     p_sys->i_start_time = p_sys->i_cur_time = p_sys->i_last_time = vlc_tick_now();
@@ -156,8 +156,7 @@ static int Open( vlc_object_t *p_this )
 /**
  * Close the filter
  */
-static void Close( vlc_object_t *p_this ) {
-    filter_t *p_filter = (filter_t*)p_this;
+static void Close( filter_t *p_filter ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     /* Free allocated memory */

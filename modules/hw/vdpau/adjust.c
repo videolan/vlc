@@ -135,12 +135,25 @@ static picture_t *Adjust(filter_t *filter, picture_t *pic)
     return pic;
 }
 
+static void Close(filter_t *filter)
+{
+    filter_sys_t *sys = filter->p_sys;
+
+    var_DelCallback(filter, "hue", HueCallback, &sys->hue);
+    var_DelCallback(filter, "saturation", SaturationCallback,
+                    &sys->saturation);
+    var_DelCallback(filter, "contrast", ContrastCallback, &sys->contrast);
+    var_DelCallback(filter, "brightness", BrightnessCallback,
+                    &sys->brightness);
+    free(sys);
+}
+
 static const char *const options[] = {
     "brightness", "contrast", "saturation", "hue", NULL
 };
 
 static const struct vlc_filter_operations filter_ops = {
-    .filter_video = Adjust,
+    .filter_video = Adjust, .close = Close,
 };
 
 static int Open(vlc_object_t *obj)
@@ -190,25 +203,11 @@ static int Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_object_t *obj)
-{
-    filter_t *filter = (filter_t *)obj;
-    filter_sys_t *sys = filter->p_sys;
-
-    var_DelCallback(filter, "hue", HueCallback, &sys->hue);
-    var_DelCallback(filter, "saturation", SaturationCallback,
-                    &sys->saturation);
-    var_DelCallback(filter, "contrast", ContrastCallback, &sys->contrast);
-    var_DelCallback(filter, "brightness", BrightnessCallback,
-                    &sys->brightness);
-    free(sys);
-}
-
 vlc_module_begin()
     set_description(N_("VDPAU adjust video filter"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_capability("video filter", 0)
     add_shortcut("adjust")
-    set_callbacks(Open, Close)
+    set_callback(Open)
 vlc_module_end()

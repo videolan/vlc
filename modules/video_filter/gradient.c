@@ -44,13 +44,13 @@ enum { GRADIENT, EDGE, HOUGH };
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
+static void Destroy   ( filter_t * );
 
 static void Filter( filter_t *, picture_t *, picture_t * );
 static int GradientCallback( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t,
                              void * );
-VIDEO_FILTER_WRAPPER( Filter )
+VIDEO_FILTER_WRAPPER_CLOSE(Filter, Destroy)
 
 static void FilterGradient( filter_t *, picture_t *, picture_t * );
 static void FilterEdge    ( filter_t *, picture_t *, picture_t * );
@@ -95,7 +95,7 @@ vlc_module_begin ()
                 CARTOON_TEXT, CARTOON_LONGTEXT, false )
 
     add_shortcut( "gradient" )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -213,9 +213,8 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************
  * Terminate an output method created by DistortCreateOutputMethod
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     var_DelCallback( p_filter, FILTER_PREFIX "mode",

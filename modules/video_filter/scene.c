@@ -45,7 +45,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create      ( vlc_object_t * );
-static void Destroy     ( vlc_object_t * );
+static void Destroy     ( filter_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
 
@@ -116,7 +116,7 @@ vlc_module_begin ()
     add_integer_with_range( CFG_PREFIX "ratio", 50, 1, INT_MAX,
                             RATIO_TEXT, RATIO_LONGTEXT, false )
 
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 static const char *const ppsz_vfilter_options[] = {
@@ -199,7 +199,7 @@ static int Create( vlc_object_t *p_this )
 
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_video = Filter,
+        .filter_video = Filter, .close = Destroy,
     };
     p_filter->ops = &filter_ops;
 
@@ -209,9 +209,8 @@ static int Create( vlc_object_t *p_this )
 /*****************************************************************************
  * Destroy: destroy video filter method
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     image_HandlerDelete( p_sys->p_image );

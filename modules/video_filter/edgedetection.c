@@ -46,7 +46,7 @@
  * Local prototypes
  *****************************************************************************/
 static int Open( vlc_object_t * );
-static void Close( vlc_object_t * );
+static void Close( filter_t * );
 static picture_t *new_frame( filter_t * );
 static picture_t *Filter( filter_t *, picture_t * );
 static uint8_t sobel( const uint8_t *, const int, const int, int, int);
@@ -73,7 +73,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_capability( "video filter", 0 )
-    set_callbacks( Open, Close )
+    set_callback( Open )
 
 vlc_module_end ()
 
@@ -90,7 +90,7 @@ static void Flush( filter_t *p_filter )
 
 static const struct vlc_filter_operations filter_ops =
 {
-    .filter_video = Filter, .flush = Flush,
+    .filter_video = Filter, .flush = Flush, .close = Close,
 };
 
 /*****************************************************************************
@@ -142,9 +142,8 @@ static int Open( vlc_object_t *p_this )
 /******************************************************************************
  * Closes the filter and cleans up all dynamically allocated data.
  ******************************************************************************/
-static void Close( vlc_object_t *p_this )
+static void Close( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_chain_Delete( (filter_chain_t *)p_filter->p_sys );
 }
 

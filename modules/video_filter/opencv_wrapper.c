@@ -46,7 +46,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
+static void Destroy   ( filter_t * );
 
 static picture_t* Filter( filter_t*, picture_t* );
 
@@ -72,7 +72,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_capability( "video filter", 0 )
     add_shortcut( "opencv_wrapper" )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
     add_float_with_range( "opencv-scale", 1.0, 0.1, 2.0,
                           N_("Scale factor (0.1-2.0)"),
                           N_("Amount by which to scale the picture before sending it to the internal OpenCV filter"),
@@ -251,7 +251,7 @@ static int Create( vlc_object_t *p_this )
 
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_video = Filter,
+        .filter_video = Filter, .close = Destroy,
     };
     p_filter->ops = &filter_ops;
     p_filter->p_sys = p_sys;
@@ -264,9 +264,8 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************
  * Terminate an output method created by opencv_wrapperCreateOutputMethod
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t* p_filter )
 {
-    filter_t* p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
     ReleaseImages( p_filter );
 

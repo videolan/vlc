@@ -45,7 +45,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
+static void Destroy   ( filter_t * );
 
 static void FilterPlanar( filter_t *, picture_t *, picture_t * );
 static picture_t *FilterPacked( filter_t *, picture_t * );
@@ -96,7 +96,7 @@ vlc_module_begin ()
         change_safe()
 
     add_shortcut( "adjust" )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -141,11 +141,11 @@ static int BoolCallback( vlc_object_t *obj, char const *varname,
     return VLC_SUCCESS;
 }
 
-VIDEO_FILTER_WRAPPER( FilterPlanar )
+VIDEO_FILTER_WRAPPER_CLOSE( FilterPlanar, Destroy )
 
 static const struct vlc_filter_operations packed_filter_ops =
 {
-    .filter_video = FilterPacked,
+    .filter_video = FilterPacked, .close = Destroy,
 };
 
 /*****************************************************************************
@@ -231,9 +231,8 @@ static int Create( vlc_object_t *p_this )
 /*****************************************************************************
  * Destroy: destroy adjust video filter
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     var_DelCallback( p_filter, "contrast", FloatCallback, &p_sys->f_contrast );

@@ -43,11 +43,11 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
+static void Destroy   ( filter_t * );
 
 static void Filter( filter_t *, picture_t *, picture_t * );
 static picture_t *FilterPacked( filter_t *, picture_t * );
-VIDEO_FILTER_WRAPPER( Filter )
+VIDEO_FILTER_WRAPPER_CLOSE( Filter, Destroy )
 
 /*****************************************************************************
  * Module descriptor
@@ -79,7 +79,7 @@ vlc_module_begin ()
                  N_("Saturation threshold"), "", false )
     add_integer( CFG_PREFIX "similaritythres", 15,
                  N_("Similarity threshold"), "", false )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -105,7 +105,7 @@ typedef struct
 
 static const struct vlc_filter_operations packed_filter_ops =
 {
-    .filter_video = FilterPacked,
+    .filter_video = FilterPacked, .close = Destroy,
 };
 
 /*****************************************************************************
@@ -166,7 +166,7 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************
  * Terminate an output method created by adjustCreateOutputMethod
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;

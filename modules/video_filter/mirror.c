@@ -41,7 +41,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create      ( vlc_object_t * );
-static void Destroy     ( vlc_object_t * );
+static void Destroy     ( filter_t * );
 
 static void Filter( filter_t *, picture_t *, picture_t * );
 static void VerticalMirror( picture_t *, picture_t *, int plane, bool );
@@ -52,7 +52,7 @@ static void RV24VerticalMirror( picture_t *, picture_t *, int plane, bool );
 static void RV32VerticalMirror( picture_t *, picture_t *, int plane, bool );
 
 static void YUV422Mirror2Pixels( uint8_t *, uint8_t *, bool );
-VIDEO_FILTER_WRAPPER( Filter )
+VIDEO_FILTER_WRAPPER_CLOSE(Filter, Destroy)
 
 static const char *const ppsz_filter_options[] = {
     "split", "direction", NULL
@@ -90,7 +90,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "direction", 0, DIRECTION_TEXT,
                 DIRECTION_LONGTEXT, false )
         change_integer_list( pi_direction_values, ppsz_direction_descriptions )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -166,9 +166,8 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************
  * Terminate an output method created by MirrorCreateOutputMethod
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     var_DelCallback( p_filter, CFG_PREFIX "split", FilterCallback, p_sys );

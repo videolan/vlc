@@ -77,10 +77,18 @@ static picture_t *Sharpen(filter_t *filter, picture_t *pic)
     return pic;
 }
 
+static void Close(filter_t *filter)
+{
+    filter_sys_t *sys = filter->p_sys;
+
+    var_DelCallback(filter, "sharpen-sigma", SharpenCallback, sys);
+    free(sys);
+}
+
 static const char *const options[] = { "sigma", NULL };
 
 static const struct vlc_filter_operations filter_ops = {
-    .filter_video = Sharpen,
+    .filter_video = Sharpen, .close = Close,
 };
 
 static int Open(vlc_object_t *obj)
@@ -140,15 +148,6 @@ static int Open(vlc_object_t *obj)
     atomic_init(&sys->sigma, u.u);
 
     return VLC_SUCCESS;
-}
-
-static void Close(vlc_object_t *obj)
-{
-    filter_t *filter = (filter_t *)obj;
-    filter_sys_t *sys = filter->p_sys;
-
-    var_DelCallback(filter, "sharpen-sigma", SharpenCallback, sys);
-    free(sys);
 }
 
 vlc_module_begin()

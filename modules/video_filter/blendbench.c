@@ -41,7 +41,7 @@
  * Local prototypes
  *****************************************************************************/
 static int Create( vlc_object_t * );
-static void Destroy( vlc_object_t * );
+static void Destroy( filter_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
 
@@ -95,7 +95,7 @@ vlc_module_begin ()
     add_string( CFG_PREFIX "blend-chroma", "YUVA", BLEND_CHROMA_TEXT,
               BLEND_CHROMA_LONGTEXT, false )
 
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -146,7 +146,7 @@ static int blendbench_LoadImage( vlc_object_t *p_this, picture_t **pp_pic,
 
 static const struct vlc_filter_operations filter_ops =
 {
-    .filter_video = Filter,
+    .filter_video = Filter, .close = Destroy,
 };
 
 /*****************************************************************************
@@ -218,9 +218,8 @@ static int Create( vlc_object_t *p_this )
 /*****************************************************************************
  * Destroy: destroy video thread output method
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     picture_Release( p_sys->p_base_image );

@@ -39,7 +39,7 @@
  * Local and extern prototypes.
  *****************************************************************************/
 static int  Activate( vlc_object_t * );
-static void Destroy( vlc_object_t * );
+static void Destroy( filter_t * );
 static picture_t *Filter( filter_t *, picture_t * );
 static void Flush( filter_t * );
 
@@ -106,7 +106,7 @@ vlc_module_begin ()
     set_description( N_("Canvas video filter") )
     set_capability( "video filter", 0 )
     set_help( CANVAS_HELP )
-    set_callbacks( Activate, Destroy )
+    set_callback( Activate )
 
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
@@ -147,7 +147,7 @@ static const struct filter_video_callbacks canvas_cbs =
 
 static const struct vlc_filter_operations filter_ops =
 {
-    .filter_video = Filter, .flush = Flush,
+    .filter_video = Filter, .flush = Flush, .close = Destroy,
 };
 
 /*****************************************************************************
@@ -387,9 +387,8 @@ static int Activate( vlc_object_t *p_this )
 /*****************************************************************************
  *
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
     filter_chain_Delete( p_sys->p_chain );
     free( p_sys );

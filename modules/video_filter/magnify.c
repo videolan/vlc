@@ -42,7 +42,7 @@
  * Module descriptor
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
+static void Destroy   ( filter_t * );
 
 vlc_module_begin ()
     set_description( N_("Magnify/Zoom interactive video filter") )
@@ -51,7 +51,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 
@@ -133,6 +133,7 @@ static int Create( vlc_object_t *p_this )
     {
         .filter_video = Filter,
         .video_mouse = Mouse,
+        .close = Destroy,
     };
     p_filter->ops = &filter_ops;
     return VLC_SUCCESS;
@@ -141,9 +142,8 @@ static int Create( vlc_object_t *p_this )
 /*****************************************************************************
  * Destroy:
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     image_HandlerDelete( p_sys->p_image );

@@ -567,8 +567,23 @@ OpenAdjust_InitFilterParams(filter_t * filter, void * p_data,
     return VLC_SUCCESS;
 }
 
+static void
+CloseAdjust(filter_t *filter)
+{
+    filter_sys_t *const filter_sys = filter->p_sys;
+
+    for (unsigned int i = 0; i < NUM_ADJUST_MODES; ++i)
+    {
+        var_DelCallback(filter, adjust_params_names[i],
+                        FilterCallback, filter_sys->p_data);
+        var_Destroy(filter, adjust_params_names[i]);
+    }
+    free(filter_sys->p_data);
+    Close(filter, filter_sys);
+}
+
 static const struct vlc_filter_operations Adjust_ops = {
-    .filter_video = Adjust,
+    .filter_video = Adjust, .close = CloseAdjust,
 };
 
 static int
@@ -600,22 +615,6 @@ error:
         var_Destroy(obj, adjust_params_names[i]);
     free(p_data);
     return VLC_EGENERIC;
-}
-
-static void
-CloseAdjust(vlc_object_t * obj)
-{
-    filter_t *const     filter = (filter_t *)obj;
-    filter_sys_t *const filter_sys = filter->p_sys;
-
-    for (unsigned int i = 0; i < NUM_ADJUST_MODES; ++i)
-    {
-        var_DelCallback(obj, adjust_params_names[i],
-                        FilterCallback, filter_sys->p_data);
-        var_Destroy(obj, adjust_params_names[i]);
-    }
-    free(filter_sys->p_data);
-    Close(filter, filter_sys);
 }
 
 /***************************
@@ -688,8 +687,20 @@ OpenBasicFilter_InitFilterParams(filter_t * filter, void * p_data,
     return VLC_SUCCESS;
 }
 
+static void
+CloseBasicFilter(filter_t *filter)
+{
+    filter_sys_t *const                 filter_sys = filter->p_sys;
+    struct basic_filter_data *const     p_data = filter_sys->p_data;
+
+    var_DelCallback(filter, p_data->sigma.psz_name, FilterCallback, p_data);
+    var_Destroy(filter, p_data->sigma.psz_name);
+    free(p_data);
+    Close(filter, filter_sys);
+}
+
 static const struct vlc_filter_operations BasicFilter_ops = {
-    .filter_video = BasicFilter,
+    .filter_video = BasicFilter, .close = CloseBasicFilter
 };
 
 static int
@@ -738,19 +749,6 @@ OpenSharpenFilter(vlc_object_t * obj)
 {
     return OpenBasicFilter(obj, VAProcFilterSharpening, "sharpen-sigma",
                            &vlc_sharpen_sigma_range);
-}
-
-static void
-CloseBasicFilter(vlc_object_t * obj)
-{
-    filter_t *const                     filter = (filter_t *)obj;
-    filter_sys_t *const                 filter_sys = filter->p_sys;
-    struct basic_filter_data *const     p_data = filter_sys->p_data;
-
-    var_DelCallback(obj, p_data->sigma.psz_name, FilterCallback, p_data);
-    var_Destroy(obj, p_data->sigma.psz_name);
-    free(p_data);
-    Close(filter, filter_sys);
 }
 
 /*************************
@@ -1144,7 +1142,7 @@ vlc_module_begin()
     set_capability("video filter", 0)
 
     add_submodule()
-    set_callbacks(OpenAdjust, CloseAdjust)
+    set_callback(OpenAdjust)
     add_shortcut("adjust")
 
     add_submodule()
@@ -1152,7 +1150,7 @@ vlc_module_begin()
     add_shortcut("deinterlace")
 
     add_submodule()
-    set_callbacks(OpenDenoiseFilter, CloseBasicFilter)
+    set_callback(OpenDenoiseFilter)
     add_float_with_range("denoise-sigma", 1.f, .0f, .0f,
                          "Denoise strength (0-2)",
                          "Set the Denoise strength, between 0 and 2. "
@@ -1161,10 +1159,9 @@ vlc_module_begin()
     add_shortcut("denoise")
 
     add_submodule()
-    set_callbacks(OpenSharpenFilter, CloseBasicFilter)
+    set_callback(OpenSharpenFilter)
     add_shortcut("sharpen")
 
     add_submodule()
-    set_capability("video converter", 10)
-    set_callbacks(vlc_vaapi_OpenChroma, vlc_vaapi_CloseChroma)
+    set_video_converter_callback(vlc_vaapi_OpenChroma, 10)
 vlc_module_end()

@@ -39,15 +39,15 @@
  *****************************************************************************/
 static int       ActivateConverter  ( vlc_object_t * );
 static int       ActivateFilter     ( vlc_object_t * );
-static void      Destroy            ( vlc_object_t * );
+static void      Destroy            ( filter_t * );
 
 vlc_module_begin ()
     set_description( N_("Video filtering using a chain of video filter modules") )
     set_capability( "video converter", 1 )
-    set_callbacks( ActivateConverter, Destroy )
+    set_callback( ActivateConverter )
     add_submodule ()
         set_capability( "video filter", 0 )
-        set_callbacks( ActivateFilter, Destroy )
+        set_callback( ActivateFilter )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -155,7 +155,7 @@ static const struct filter_video_callbacks filter_video_chain_cbs =
 };
 
 static const struct vlc_filter_operations filter_ops = {
-    .filter_video = Chain, .flush = Flush,
+    .filter_video = Chain, .flush = Flush, .close = Destroy,
 };
 
 /*****************************************************************************
@@ -259,9 +259,8 @@ static int ActivateFilter( vlc_object_t *p_this )
     return i_ret;
 }
 
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     if (p_sys->p_video_filter)

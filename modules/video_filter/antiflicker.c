@@ -46,8 +46,8 @@ static int AntiFlickerCallback( vlc_object_t *p_this, char const *psz_var,
                            void *p_data );
 
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
-VIDEO_FILTER_WRAPPER( Filter )
+static void Destroy   ( filter_t * );
+VIDEO_FILTER_WRAPPER_CLOSE( Filter, Destroy )
 
 #define WINDOW_TEXT N_("Window size")
 #define WINDOW_LONGTEXT N_("Number of frames (0 to 100)")
@@ -78,7 +78,7 @@ vlc_module_begin ()
         SFTN_TEXT, SFTN_LONGTEXT, false )
 
     add_shortcut( "antiflicker" )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -158,9 +158,8 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************
  * Terminate an output method created by DistortCreateOutputMethod
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     var_DelCallback(p_filter,FILTER_PREFIX "window-size",

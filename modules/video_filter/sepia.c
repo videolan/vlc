@@ -42,7 +42,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create      ( vlc_object_t * );
-static void Destroy     ( vlc_object_t * );
+static void Destroy     ( filter_t * );
 
 static void RVSepia( picture_t *, picture_t *, int );
 static void PlanarI420Sepia( picture_t *, picture_t *, int);
@@ -51,7 +51,7 @@ static void Filter( filter_t *, picture_t *, picture_t * );
 static const char *const ppsz_filter_options[] = {
     "intensity", NULL
 };
-VIDEO_FILTER_WRAPPER( Filter )
+VIDEO_FILTER_WRAPPER_CLOSE(Filter, Destroy)
 
 /*****************************************************************************
  * Module descriptor
@@ -71,7 +71,7 @@ vlc_module_begin ()
     add_integer_with_range( CFG_PREFIX "intensity", 120, 0, 255,
                            SEPIA_INTENSITY_TEXT, SEPIA_INTENSITY_LONGTEXT,
                            false )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -154,10 +154,8 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************
  * Terminate an output method
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-
     var_DelCallback( p_filter, CFG_PREFIX "intensity", FilterCallback, NULL );
 
     free( p_filter->p_sys );

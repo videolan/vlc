@@ -40,7 +40,7 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
+static void Close(filter_t *);
 
 #define CFG_PREFIX "gradfun-"
 
@@ -66,7 +66,7 @@ vlc_module_begin()
     add_float_with_range(CFG_PREFIX "strength", 1.2, STRENGTH_MIN, STRENGTH_MAX,
                          STRENGTH_TEXT, STRENGTH_LONGTEXT, false)
 
-    set_callbacks(Open, Close)
+    set_callback(Open)
 vlc_module_end()
 
 /*****************************************************************************
@@ -100,7 +100,7 @@ vlc_module_end()
 
 static void Filter(filter_t *, picture_t *, picture_t *);
 static int Callback(vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void *);
-VIDEO_FILTER_WRAPPER( Filter )
+VIDEO_FILTER_WRAPPER_CLOSE(Filter, Close)
 
 typedef struct
 {
@@ -162,9 +162,8 @@ static int Open(vlc_object_t *object)
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_object_t *object)
+static void Close(filter_t *filter)
 {
-    filter_t     *filter = (filter_t *)object;
     filter_sys_t *sys = filter->p_sys;
 
     var_DelCallback(filter, CFG_PREFIX "radius",   Callback, NULL);
