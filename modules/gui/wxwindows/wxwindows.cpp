@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.29 2003/08/08 16:50:27 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.30 2003/08/11 17:31:15 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -238,12 +238,6 @@ static void Init( intf_thread_t *p_intf )
 #else
     wxEntry( i_args, p_args );
 #endif
-
-    if( p_intf->pf_show_dialog )
-    {
-        /* We need to manually clean up the dialogs class */
-        if( p_intf->p_sys->p_wxwindow ) delete p_intf->p_sys->p_wxwindow;
-    }
 }
 
 /* following functions are local */
