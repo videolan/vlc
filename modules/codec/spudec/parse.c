@@ -2,7 +2,7 @@
  * parse.c: SPU parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: parse.c,v 1.12 2003/07/22 20:49:10 hartman Exp $
+ * $Id: parse.c,v 1.13 2003/07/29 22:25:40 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -413,7 +413,7 @@ static int ParseControlSeq( spudec_thread_t *p_spudec,
         msg_Err( p_spudec->p_fifo, "no `start display' command" );
     }
 
-    if( !p_spu->i_stop <= p_spu->i_start && !p_spu->b_ephemer )
+    if( p_spu->i_stop <= p_spu->i_start && !p_spu->b_ephemer )
     {
         /* This subtitle will live for 5 seconds or until the next subtitle */
         p_spu->i_stop = p_spu->i_start + (mtime_t)500 * 11000
