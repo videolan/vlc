@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.39 2001/03/02 03:32:46 stef Exp $
+ * $Id: mpeg_system.c,v 1.40 2001/03/02 13:20:29 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -64,6 +64,7 @@ static void input_DecodePMT( input_thread_t *, es_descriptor_t *);
  *****************************************************************************
  * Small utility function used to parse discontinuous headers safely. Copies
  * i_buf_len bytes of data to a buffer and returns the size copied.
+ * It also solves some alignment problems on non-IA-32, non-PPC processors.
  * This is a variation on the theme of input_ext-dec.h:GetChunk().
  *****************************************************************************/
 static __inline__ size_t MoveChunk( byte_t * p_dest,
@@ -223,8 +224,9 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     }
                     p_pes->i_pts = input_ClockGetTS( p_input, p_es->p_pgrm,
                     ( ((mtime_t)(p_full_header[2] & 0x0E) << 29) |
-                      (((mtime_t)U16_AT(p_full_header + 3) << 14) - (1 << 14)) |
-                      ((mtime_t)U16_AT(p_full_header + 5) >> 1) ) );
+                      (((mtime_t)U32_AT(p_full_header + 2) & 0xFFFE00) << 6) |
+                      ((mtime_t)p_full_header[5] << 7) |
+                      ((mtime_t)p_full_header[6] >> 1) ) );
 
                     if( b_has_dts )
                     {
@@ -313,9 +315,10 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     }
 
                     p_pes->i_pts = input_ClockGetTS( p_input, p_es->p_pgrm,
-                      ( ((mtime_t)(p_ts[0] & 0x0E) << 29) |
-                        (((mtime_t)U16_AT(p_ts + 1) << 14) - (1 << 14)) |
-                        ((mtime_t)U16_AT(p_ts + 3) >> 1) ) );
+                       ( ((mtime_t)(p_ts[0] & 0x0E) << 29) |
+                         (((mtime_t)U32_AT(p_ts) & 0xFFFE00) << 6) |
+                         ((mtime_t)p_ts[3] << 7) |
+                         ((mtime_t)p_ts[4] >> 1) ) );
 
                     if( b_has_dts )
                     {
@@ -333,8 +336,9 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                         p_pes->i_dts = input_ClockGetTS( p_input,
                                                          p_es->p_pgrm,
                             ( ((mtime_t)(p_ts[0] & 0x0E) << 29) |
-                              (((mtime_t)U16_AT(p_ts + 1) << 14) - (1 << 14)) |
-                              ((mtime_t)U16_AT(p_ts + 3) >> 1) ) );
+                              (((mtime_t)U32_AT(p_ts) & 0xFFFE00) << 6) |
+                              ((mtime_t)p_ts[3] << 7) |
+                              ((mtime_t)p_ts[4] >> 1) ) );
                     }
                 }
             }
@@ -503,6 +507,8 @@ static u16 GetID( data_packet_t * p_data )
     i_id = p_data->p_payload_start[3];                                 /* stream_id */
     if( i_id == 0xBD )
     {
+        /* FIXME : this is not valid if the header is split in multiple
+         * packets */
         /* stream_private_id */
         i_id |= p_data->p_payload_start[ 9 + p_data->p_payload_start[8] ] << 8;
     }
@@ -511,6 +517,8 @@ static u16 GetID( data_packet_t * p_data )
 
 /*****************************************************************************
  * DecodePSM: Decode the Program Stream Map information
+ *****************************************************************************
+ * FIXME : loads are not aligned in this function
  *****************************************************************************/
 static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
 {
@@ -647,8 +655,8 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
     u32                 i_code;
     es_descriptor_t *   p_es = NULL;
 
-    i_code = U32_AT( p_data->p_payload_start );
-    if( i_code > 0x1BC ) /* ES start code */
+    i_code = p_data->p_payload_start[3];
+    if( i_code > 0xBC ) /* ES start code */
     {
         u16                 i_id;
         int                 i_dummy;
@@ -791,27 +799,50 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                 if( (p_data->p_payload_start[4] & 0xC0) == 0x40 )
                 {
                     /* MPEG-2 */
+                    byte_t      p_header[14];
+                    byte_t *    p_byte;
+                    p_byte = p_data->p_payload_start;
+
+                    if( MoveChunk( p_header, &p_data, &p_byte, 14 ) != 14 )
+                    {
+                        intf_WarnMsg( 3, "Packet too short to have a header" );
+                        b_trash = 1;
+                        break;
+                    }
                     scr_time =
-                         ((mtime_t)(p_data->p_payload_start[4] & 0x38) << 27) |
-                         ((mtime_t)(U32_AT(p_data->p_payload_start + 4) & 0x03FFF800)
+                         ((mtime_t)(p_header[4] & 0x38) << 27) |
+                         ((mtime_t)(U32_AT(p_header + 4) & 0x03FFF800)
                                         << 4) |
-                         ((mtime_t)(U32_AT(p_data->p_payload_start + 6) & 0x03FFF800)
+                         ((( ((mtime_t)U16_AT(p_header + 6) << 16)
+                            | (mtime_t)U16_AT(p_header + 8) ) & 0x03FFF800)
                                         >> 11);
 
                     /* mux_rate */
-                    i_mux_rate = (U32_AT(p_data->p_payload_start + 10) & 0xFFFFFC00);
+                    i_mux_rate = (( ((u32)U16_AT(p_header + 10) << 16)
+                                   | (u32)U16_AT(p_header + 12) ) & 0xFFFFFC00)
+                                    >> 11;
                 }
                 else
                 {
                     /* MPEG-1 SCR is like PTS. */
+                    byte_t      p_header[12];
+                    byte_t *    p_byte;
+                    p_byte = p_data->p_payload_start;
+
+                    if( MoveChunk( p_header, &p_data, &p_byte, 12 ) != 12 )
+                    {
+                        intf_WarnMsg( 3, "Packet too short to have a header" );
+                        b_trash = 1;
+                        break;
+                    }
                     scr_time =
-                         ((mtime_t)(p_data->p_payload_start[4] & 0x0E) << 29) |
-                         (((mtime_t)U16_AT(p_data->p_payload_start + 5) << 14)
-                           - (1 << 14)) |
-                         ((mtime_t)U16_AT(p_data->p_payload_start + 7) >> 1);
+                         ((mtime_t)(p_header[4] & 0x0E) << 29) |
+                         (((mtime_t)U32_AT(p_header + 4) & 0xFFFE00) << 6) |
+                         ((mtime_t)p_header[7] << 7) |
+                         ((mtime_t)p_header[8] >> 1);
 
                     /* mux_rate */
-                    i_mux_rate = (U32_AT(p_data->p_payload_start + 8) & 0x8FFFFE);
+                    i_mux_rate = (U32_AT(p_header + 8) & 0x8FFFFE) >> 11;
                 }
                 /* Call the pace control. */
                 input_ClockManageRef( p_input, p_input->stream.pp_programs[0],

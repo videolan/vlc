@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.76 2001/02/20 15:03:00 massiot Exp $
+ * $Id: video_parser.c,v 1.77 2001/03/02 13:20:29 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -423,6 +423,10 @@ static void EndThread( vpar_thread_t *p_vpar )
         vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
                           vpar_SynchroDate( p_vpar ) );
         vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
+    }
+    if( p_vpar->picture.p_picture != NULL )
+    {
+        vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
     }
 
 #ifdef STATS

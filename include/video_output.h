@@ -197,9 +197,7 @@ typedef struct vout_thread_s
     p_vout_font_t       p_default_font;                      /* default font */
     p_vout_font_t       p_large_font;                          /* large font */
 
-#ifdef STATS
     count_t             c_loops;
-#endif
 } vout_thread_t;
 
 /* Flags for changes - these flags are set in the i_changes field when another

@@ -167,7 +167,7 @@ char * input_OffsetToTime( input_thread_t * p_input, char * psz_buffer,
 
     if( p_input->stream.i_mux_rate )
     {
-        i_seconds = i_offset * 50 / p_input->stream.i_mux_rate;
+        i_seconds = i_offset / 50 / p_input->stream.i_mux_rate;
         snprintf( psz_buffer, OFFSETTOTIME_MAX_SIZE, "%d:%02d:%02d",
                  (int) (i_seconds / (60 * 60)),
                  (int) (i_seconds / 60 % 60),

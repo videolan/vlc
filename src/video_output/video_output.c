@@ -979,14 +979,27 @@ static void RunThread( vout_thread_t *p_vout)
         p_subpic =      NULL;
         display_date =  0;
         current_date =  mdate();
-#ifdef STATS
+
         p_vout->c_loops++;
         if( !(p_vout->c_loops % VOUT_STATS_NB_LOOPS) )
         {
+#ifdef STATS
             intf_Msg("vout stats: picture heap: %d/%d",
                      p_vout->i_pictures, VOUT_MAX_PICTURES);
-        }
 #endif
+
+            if( p_vout->b_info )
+            {
+                long i_fps = VOUT_FPS_SAMPLES * 1000000 * 10 /
+                           ( p_vout->p_fps_sample[ (p_vout->c_fps_samples - 1)
+                                                   % VOUT_FPS_SAMPLES ] -
+                             p_vout->p_fps_sample[ p_vout->c_fps_samples
+                                                   % VOUT_FPS_SAMPLES ] );
+                intf_Msg( "vout stats: %li.%i fps",
+                          i_fps / 10, (int)i_fps % 10 );
+            }
+        }
+
 
         /*
          * Find the picture to display - this operation does not need lock,

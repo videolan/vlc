@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.23 2001/03/02 03:32:46 stef Exp $
+ * $Id: input_ext-dec.h,v 1.24 2001/03/02 13:20:28 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -208,7 +208,7 @@ u32  UnalignedGetBits( struct bit_stream_s *, unsigned int );
  *****************************************************************************/
 static __inline__ void AlignWord( bit_stream_t * p_bit_stream )
 {
-    while( (p_bit_stream->p_byte - p_bit_stream->p_data->p_buffer)
+    while( (ptrdiff_t)p_bit_stream->p_byte
              & (sizeof(WORD_TYPE) - 1) )
     {
         if( p_bit_stream->p_byte < p_bit_stream->p_end )
