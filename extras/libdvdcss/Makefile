@@ -3,7 +3,7 @@
 # (c)2001 VideoLAN
 ###############################################################################
 
-include ../../Makefile.opts
+-include ../../Makefile.opts
 
 LIBDVDCSS_VERSION = 0.0.1
 LIBDVDCSS_MAJOR = 0

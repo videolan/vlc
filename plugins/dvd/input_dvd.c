@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.73 2001/06/14 01:49:44 sam Exp $
+ * $Id: input_dvd.c,v 1.74 2001/06/14 02:47:45 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -157,11 +157,8 @@ static int DVDProbe( probedata_t *p_data )
     input_thread_t * p_input = (input_thread_t *)p_data;
 
     char * psz_name = p_input->p_source;
-    int i_handle;
+    dvdcss_handle dvdhandle;
     int i_score = 5;
-#if defined( WIN32 )
-    char buf[7];
-#endif
 
     if( TestMethod( INPUT_METHOD_VAR, "dvd" ) )
     {
@@ -183,25 +180,11 @@ static int DVDProbe( probedata_t *p_data )
         psz_name += 4;
     }
 
-#if !defined( WIN32 )
-    i_handle = open( psz_name, 0 );
-    if( i_handle == -1 )
+    dvdhandle = dvdcss_open( psz_name, DVDCSS_INIT_QUIET );
+    if( dvdhandle == NULL )
     {
         return( 0 );
     }
-    close( i_handle );
-#else
-    snprintf( buf, 7, "\\\\.\\%c:", psz_name[0] );
-    (HANDLE) i_handle = CreateFile( i_score < 90 ? psz_name : buf, 
-                        GENERIC_READ | GENERIC_WRITE,
-                        FILE_SHARE_READ | FILE_SHARE_WRITE,
-                        NULL, OPEN_EXISTING, 0, NULL );
-    if( (HANDLE) i_handle == INVALID_HANDLE_VALUE )
-    {
-        return( 0 );
-    }
-    CloseHandle( (HANDLE) i_handle );
-#endif
 
     return( i_score );
 }

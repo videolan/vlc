@@ -2,7 +2,7 @@
  * dvd_ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.h,v 1.1 2001/06/12 22:14:44 sam Exp $
+ * $Id: ioctl.h,v 1.2 2001/06/14 02:47:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -59,6 +59,19 @@ int ioctl_SendKey2          ( int, int *, u8 * );
 #endif
 
 /*****************************************************************************
+ * Common macro, win32 (ASPI) specific
+ *****************************************************************************/
+#if defined( WIN32 )
+#define INIT_SSC( TYPE, SIZE ) \
+    struct SRB_ExecSCSICmd ssc; \
+    u8 p_buffer[ (SIZE) ]; \
+    memset( &ssc, 0, sizeof( struct SRB_ExecSCSICmd ) ); \
+    ssc.SRB_BufPointer = (char *)p_buffer; \
+    ssc.SRB_BufLen = (SIZE); \
+    WinInitSSC( &ssc, (TYPE) );
+#endif
+
+/*****************************************************************************
  * Various DVD I/O tables
  *****************************************************************************/
 
@@ -83,6 +96,10 @@ int ioctl_SendKey2          ( int, int *, u8 * );
 
 #if defined( WIN32 )
 
+/*****************************************************************************
+ * win32 ioctl specific
+ *****************************************************************************/
+
 #define IOCTL_DVD_START_SESSION         CTL_CODE(FILE_DEVICE_DVD, 0x0400, METHOD_BUFFERED, FILE_READ_ACCESS)
 #define IOCTL_DVD_READ_KEY              CTL_CODE(FILE_DEVICE_DVD, 0x0401, METHOD_BUFFERED, FILE_READ_ACCESS)
 #define IOCTL_DVD_SEND_KEY              CTL_CODE(FILE_DEVICE_DVD, 0x0402, METHOD_BUFFERED, FILE_READ_ACCESS)
@@ -90,10 +107,13 @@ int ioctl_SendKey2          ( int, int *, u8 * );
 
 #define IOCTL_SCSI_PASS_THROUGH_DIRECT  CTL_CODE(FILE_DEVICE_CONTROLLER, 0x0405, METHOD_BUFFERED, FILE_READ_ACCESS | FILE_WRITE_ACCESS)
 
-#define DVD_CHALLENGE_KEY_LENGTH    (12 + sizeof(DVD_COPY_PROTECT_KEY))
-#define DVD_BUS_KEY_LENGTH          (8 + sizeof(DVD_COPY_PROTECT_KEY))
-#define DVD_DISK_KEY_LENGTH         (2048 + sizeof(DVD_COPY_PROTECT_KEY))
-#define DVD_ASF_LENGTH              (sizeof(DVD_ASF) + sizeof(DVD_COPY_PROTECT_KEY))
+#define DVD_CHALLENGE_KEY_LENGTH        (12 + sizeof(DVD_COPY_PROTECT_KEY))
+#define DVD_BUS_KEY_LENGTH              (8 + sizeof(DVD_COPY_PROTECT_KEY))
+#define DVD_DISK_KEY_LENGTH             (2048 + sizeof(DVD_COPY_PROTECT_KEY))
+#define DVD_ASF_LENGTH                  (sizeof(DVD_ASF) + sizeof(DVD_COPY_PROTECT_KEY))
+
+#define SCSI_IOCTL_DATA_OUT             0
+#define SCSI_IOCTL_DATA_IN              1
 
 typedef ULONG DVD_SESSION_ID, *PDVD_SESSION_ID;
 
@@ -152,8 +172,73 @@ typedef struct _SCSI_PASS_THROUGH_DIRECT
     UCHAR Cdb[16];
 } SCSI_PASS_THROUGH_DIRECT, *PSCSI_PASS_THROUGH_DIRECT;
 
-#define SCSI_IOCTL_DATA_OUT         0
-#define SCSI_IOCTL_DATA_IN          1
+/*****************************************************************************
+ * win32 aspi specific
+ *****************************************************************************/
+
+#define WIN2K               ( GetVersion() < 0x80000000 )
+#define ASPI_HAID           0
+#define ASPI_TARGET         0
+
+#define SENSE_LEN           0x0E
+#define SC_EXEC_SCSI_CMD    0x02
+#define SC_GET_DISK_INFO    0x06
+#define SS_COMP             0x01
+#define SS_PENDING          0x00
+#define SS_NO_ADAPTERS      0xE8
+#define SRB_DIR_IN          0x08
+#define SRB_DIR_OUT         0x10
+#define SRB_EVENT_NOTIFY    0x40
+
+struct w32_aspidev
+{
+    long hASPI;
+    short i_sid;
+    off_t i_pos;
+    long (*lpSendCommand)( void* );
+};
+
+#pragma pack(1)
+
+struct SRB_GetDiskInfo
+{
+    unsigned char   SRB_Cmd;
+    unsigned char   SRB_Status;
+    unsigned char   SRB_HaId;
+    unsigned char   SRB_Flags;
+    unsigned long   SRB_Hdr_Rsvd;
+    unsigned char   SRB_Target;
+    unsigned char   SRB_Lun;
+    unsigned char   SRB_DriveFlags;
+    unsigned char   SRB_Int13HDriveInfo;
+    unsigned char   SRB_Heads;
+    unsigned char   SRB_Sectors;
+    unsigned char   SRB_Rsvd1[22];
+};
+
+struct SRB_ExecSCSICmd
+{
+    unsigned char   SRB_Cmd;
+    unsigned char   SRB_Status;
+    unsigned char   SRB_HaId;
+    unsigned char   SRB_Flags;
+    unsigned long   SRB_Hdr_Rsvd;
+    unsigned char   SRB_Target;
+    unsigned char   SRB_Lun;
+    unsigned short  SRB_Rsvd1;
+    unsigned long   SRB_BufLen;
+    unsigned char   *SRB_BufPointer;
+    unsigned char   SRB_SenseLen;
+    unsigned char   SRB_CDBLen;
+    unsigned char   SRB_HaStat;
+    unsigned char   SRB_TargStat;
+    unsigned long   *SRB_PostProc;
+    unsigned char   SRB_Rsvd2[20];
+    unsigned char   CDBByte[16];
+    unsigned char   SenseArea[SENSE_LEN+2];
+};
+
+#pragma pack()
 
 #endif
 

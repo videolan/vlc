@@ -2,7 +2,7 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.1 2001/06/12 22:14:44 sam Exp $
+ * $Id: css.c,v 1.2 2001/06/14 02:47:44 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -39,7 +39,7 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 )
+#elif defined( WIN32 )
 #   include <io.h>
 #endif
 
@@ -322,7 +322,7 @@ int CSSGetKey( dvdcss_handle dvdcss )
     off_t       i_pos;
     boolean_t   b_encrypted;
     boolean_t   b_stop_scanning;
-    int         i_bytes_read;
+    int         i_blocks_read;
     int         i_best_plen;
     int         i_best_p;
     int         i,j;
@@ -336,16 +336,11 @@ int CSSGetKey( dvdcss_handle dvdcss )
     b_stop_scanning = 0;
 
     /* Position of the title on the disc */
-    i_pos = (off_t)DVDCSS_BLOCK_SIZE * (off_t)dvdcss->css.i_title_pos;
+    i_pos = (off_t)dvdcss->css.i_title_pos;
 
     do {
-#if !defined( WIN32 )
-    i_pos = lseek( dvdcss->i_fd, i_pos, SEEK_SET );
-    i_bytes_read = read( dvdcss->i_fd, pi_buf, 0x800 );
-#else
-    i_pos = SetFilePointer( (HANDLE) dvdcss->i_fd, i_pos, 0, FILE_BEGIN );
-    ReadFile( (HANDLE) dvdcss->i_fd, pi_buf, 0x800, &i_bytes_read, NULL );
-#endif
+    i_pos = dvdcss_seek( dvdcss, i_pos );
+    i_blocks_read = dvdcss_read( dvdcss, pi_buf, 1, DVDCSS_NOFLAGS );
 
     /* PES_scrambling_control */
     if( pi_buf[0x14] & 0x30 )
@@ -377,8 +372,8 @@ int CSSGetKey( dvdcss_handle dvdcss )
         }
     }
 
-    i_pos += i_bytes_read;
-    } while( i_bytes_read == 0x800 && !b_stop_scanning);
+    i_pos += i_blocks_read;
+    } while( i_blocks_read == 0x1 && !b_stop_scanning);
 
     if( b_stop_scanning)
     {

@@ -187,7 +187,7 @@ ifneq (,$(findstring darwin,$(SYS)))
 CFLAGS += -traditional-cpp
 endif
 
-ifneq (,$(findstring mingw32,$(SYS)))                                                                     
+ifneq (,$(findstring mingw32,$(SYS)))
 CFLAGS += -fnative-struct
 endif
 
@@ -242,7 +242,7 @@ endif
 # C compiler flags: plugin compilation
 #
 ifneq (,$(findstring mingw32,$(SYS)))
-PCFLAGS += -fPIC -fnative-struct
+PCFLAGS += -fnative-struct
 else
 PCFLAGS += -fPIC
 endif

@@ -4,6 +4,44 @@
 
 HEAD
 
+  * Fully working Windows DVD ioctl support by Jon Lech Johansen.
+  * DirectX enhancements by Gildas Bazin, such as software rendering.
+  * Merged dvdcss_init and dvdcss_open into dvdcss_open, and dvdcss_close
+    and dvdcss_end into dvdcss_close. libdvdcss API now has 7 functions.
+  * Another failed attempt at profiling vlc under Linux: ported the
+    threads API to GNU Pth. Activate with --enable-pth. It doesn't seem to
+    spawn new threads for me, maybe someone will have better luck.
+  * Makefile optimizations.
+  * Automatic build of libdvdcss if not found.
+  * The DVD netlist no longer stops when the fifo is empty ; it just waits
+    until there are free vectors again.
+  * Exported the CSS part of the dvd plugin into a library.
+  * Slight modification in input_dvd since Getiovec wasn't at the right place.
+  * Send escape packet when changing title, not to be stuck in some decoder.
+  * The position in the title is now reset when we change title to
+    prevent a title from being unavailable because we're stuck at the end.
+  * Fixed a bug with 1-chapter-long titles that displayed chapter 0.
+  * Added a _temporary_ field in p_main to know whether the audio stream is
+    AC3 (ugly). It allows a vlc launched in spdif mode to play mpeg or lpcm
+    audio.
+  * Cleaned the title property messages to get rid of the ugly stars.
+  * Added LPCM support. It should work with stereo LPCM.
+  * Fixed a warning when compiling main.c.
+  * Checked that OS supports SSE instructions on PIIIs (to avoid illegal
+    hardware instructions on Linux 2.2.x).
+  * Fixed a bug in synchro reinitialization: we no longer have a shift each
+    time we restart the synchro (for SCR discontinuity for instance)
+  * In DVD mode, we reinit the synchro only if the SCR are not continuous
+    (instead of each cell).
+  * Tried to improve AC3 spdif to prevent desynchronization.
+  * Lots of DirectX plugin fixes by Gildas Bazin.   
+  * Compilation fix in message queue mode.
+  * Another FreeBSD compilation fix.
+  * SDL compilation fix for FreeBSD.
+  * Fixed compilation of motion modules as plugins.
+  * Applied old FreeBSD patch for dvd input by German Tischler.
+  * Found what was causing the slowdowns: a namespace collision. Put all
+    plugins into builtins again.
   * Put most builtins in plugins again due to performances issues.
   * Fixed the painfully slow build process (at last!).
   * Added new dummy input plugin.

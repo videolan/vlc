@@ -148,6 +148,9 @@
 /* Define if you have the <videolan/dvdcss.h> header file.  */
 #undef HAVE_VIDEOLAN_DVDCSS_H
 
+/* Define if you have the <winioctl.h> header file.  */
+#undef HAVE_WINIOCTL_H
+
 /* Define if you have the pth library (-lpth).  */
 #undef HAVE_LIBPTH
 

@@ -177,6 +177,13 @@ AC_TRY_COMPILE([void quux(){void *p;asm("maskmovq %%mm1,%%mm2"::"r"(p));}],,
 dnl
 dnl  libdvdcss: check for DVD ioctls
 dnl
+
+dnl  for windoze
+AC_CHECK_HEADERS(winioctl.h,[
+  LIBDVDCSS=1
+])
+
+dnl  for Un*x
 AC_CHECK_HEADERS(sys/ioctl.h,[
   LIBDVDCSS=1
   AC_CHECK_HEADERS(sys/cdio.h sys/dvdio.h linux/cdrom.h)
