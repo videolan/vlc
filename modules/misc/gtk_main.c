@@ -2,7 +2,7 @@
  * gtk_main.c : Gtk+ wrapper for gtk_main
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: gtk_main.c,v 1.1 2002/08/20 18:08:51 sam Exp $
+ * $Id: gtk_main.c,v 1.2 2002/08/21 15:53:06 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -213,7 +213,9 @@ static void GtkMain( vlc_object_t *p_this )
     /* gtk_init needs to know the command line. We don't care, so we
      * give it an empty one */
     static char  *p_args[] = { "" };
+#ifdef HAVE_GNOME_H
     static char **pp_args  = p_args;
+#endif
     static int    i_args   = 1;
 
     /* gtk_init will register stuff with g_atexit, so we need to have

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.20 2002/08/14 17:06:53 sam Exp $
+ * $Id: vlc_common.h,v 1.21 2002/08/21 15:53:06 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -467,7 +467,7 @@ typedef __int64 off_t;
 #endif
 #define VERSION VLC_VERSION
 
-#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT ) && !defined( __BORLANDC__ ) && !defined( MODULE_NAME_IS_gnome )
+#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT ) && !defined( __BORLANDC__ ) && !defined( NEED_GNOMESUPPORT_H )
 #   include <libintl.h>
 #   undef _
 #   define _(String) dgettext (PACKAGE, String)
@@ -476,7 +476,7 @@ typedef __int64 off_t;
 #   else
 #       define N_(String) (String)
 #   endif
-#elif !defined( MODULE_NAME_IS_gnome )
+#elif !defined( NEED_GNOMESUPPORT_H )
 #   define _(String) (String)
 #   define N_(String) (String)
 #endif
