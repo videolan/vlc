@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.c,v 1.5 2001/06/28 22:12:04 gbazin Exp $
+ * $Id: vout_directx.c,v 1.6 2001/07/08 17:45:52 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -137,6 +137,7 @@ static void DirectXCloseDDraw     ( vout_thread_t *p_vout );
 static void DirectXCloseWindow    ( vout_thread_t *p_vout );
 static void DirectXCloseDisplay   ( vout_thread_t *p_vout );
 static void DirectXCloseSurface   ( vout_thread_t *p_vout );
+static void DirectXKeepAspectRatio( vout_thread_t *p_vout, RECT *coordinates );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -302,168 +303,165 @@ static int vout_Manage( vout_thread_t *p_vout )
     WINDOWPLACEMENT window_placement;
     boolean_t       b_dispatch_msg = TRUE;
 
-    while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+    while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
     {
-        if( GetMessage(&msg, NULL, 0, 0) >= 0 )
+        switch( msg.message )
         {
-            switch( msg.message )
+
+        case WM_CLOSE:
+            intf_WarnMsg( 4, "vout: vout_Manage WM_CLOSE" );
+            p_vout->b_die = 1;
+            break;
+          
+        case WM_QUIT:
+            intf_WarnMsg( 4, "vout: vout_Manage WM_QUIT" );
+            p_main->p_intf->b_die = 1;
+            break;
+          
+        case WM_MOVE:
+            intf_WarnMsg( 3, "vout: vout_Manage WM_MOVE" );
+            if( !p_vout->b_need_render )
             {
-
-                case WM_CLOSE:
-                    intf_WarnMsg( 4, "vout: vout_Manage WM_CLOSE" );
-                    p_vout->b_die = 1;
-                    break;
-
-                case WM_QUIT:
-                    intf_WarnMsg( 4, "vout: vout_Manage WM_QUIT" );
-                    p_main->p_intf->b_die = 1;
-                    break;
-
-                case WM_MOVE:
-                    intf_WarnMsg( 3, "vout: vout_Manage WM_MOVE" );
-                    if( !p_vout->b_need_render )
-                    {
-                        p_vout->i_changes |= VOUT_SIZE_CHANGE;
-                    }
-                    /* don't create a never ending loop */
-                    b_dispatch_msg = FALSE;
-                    break;
-
-                case WM_APP:
-                    intf_WarnMsg( 3, "vout: vout_Manage WM_APP" );
-                    if( !p_vout->b_need_render )
-                    {
-                        p_vout->i_changes |= VOUT_SIZE_CHANGE;
-                    }
-                    /* don't create a never ending loop */
-                    b_dispatch_msg = FALSE;
-                    break;
-
-                case WM_PAINT:
-                    intf_WarnMsg( 4, "vout: vout_Manage WM_PAINT" );
-                    break;
-
-                case WM_ERASEBKGND:
-                    intf_WarnMsg( 4, "vout: vout_Manage WM_ERASEBKGND" );
-                    break;
-
-                case WM_MOUSEMOVE:
-                    intf_WarnMsg( 4, "vout: vout_Manage WM_MOUSEMOVE" );
-                    if( p_vout->p_sys->b_cursor )
-                    {
-                        if( p_vout->p_sys->b_cursor_autohidden )
-                        {
-                            p_vout->p_sys->b_cursor_autohidden = 0;
-                            p_vout->p_sys->i_lastmoved = mdate();
-                            ShowCursor( TRUE );
-                        }
-                        else
-                        {
-                            p_vout->p_sys->i_lastmoved = mdate();
-                        }
-                    }               
-                    break;
-
-                case WM_KEYDOWN:
-                    /* the key events are first processed here. The next
-                     * message processed by this main message loop will be the
-                     * char translation of the key event */
-                    intf_WarnMsg( 3, "vout: vout_Manage WM_KEYDOWN" );
-                    switch( msg.wParam )
-                    {
-                        case VK_ESCAPE:
-                        case VK_F12:
-                            p_main->p_intf->b_die = 1;
-                            break;
-                    }
-                    TranslateMessage(&msg);
-                    b_dispatch_msg = FALSE;
-                    break;
-
-                case WM_CHAR:
-                    intf_WarnMsg( 3, "vout: vout_Manage WM_CHAR" );
-                    switch( msg.wParam )
-                    {
-                        case 'q':
-                        case 'Q':
-                            p_main->p_intf->b_die = 1;
-                            break;
-
-                        case 'f':                    /* switch to fullscreen */
-                        case 'F':
-                            p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                            break;
-
-                        case 'y':                      /* switch to hard YUV */
-                        case 'Y':
-                            p_vout->i_changes |= VOUT_YUV_CHANGE;
-                            break;
-                          
-                        case 'c':                        /* toggle grayscale */
-                        case 'C':
-                            p_vout->b_grayscale = ! p_vout->b_grayscale;
-                            p_vout->i_changes |= VOUT_GRAYSCALE_CHANGE;
-                            break;
-                          
-                        case 'i':                             /* toggle info */
-                        case 'I':
-                            p_vout->b_info = ! p_vout->b_info;
-                            p_vout->i_changes |= VOUT_INFO_CHANGE;
-                            break;
-
-                        case 's':                          /* toggle scaling */
-                        case 'S':
-                            p_vout->b_scale = ! p_vout->b_scale;
-                            p_vout->i_changes |= VOUT_SCALE_CHANGE;
-                            break;
-
-                        case ' ':                        /* toggle interface */
-                            p_vout->b_interface = ! p_vout->b_interface;
-                            p_vout->i_changes |= VOUT_INTF_CHANGE;
-                            break;
-
-                        case '0': network_ChannelJoin( 0 ); break;
-                        case '1': network_ChannelJoin( 1 ); break;
-                        case '2': network_ChannelJoin( 2 ); break;
-                        case '3': network_ChannelJoin( 3 ); break;
-                        case '4': network_ChannelJoin( 4 ); break;
-                        case '5': network_ChannelJoin( 5 ); break;
-                        case '6': network_ChannelJoin( 6 ); break;
-                        case '7': network_ChannelJoin( 7 ); break;
-                        case '8': network_ChannelJoin( 8 ); break;
-                        case '9': network_ChannelJoin( 9 ); break;
-
-                        default:
-                            if( intf_ProcessKey( p_main->p_intf,
-                                                 (char )msg.wParam ) )
-                            {
-                               intf_DbgMsg( "unhandled key '%c' (%i)",
-                                            (char)msg.wParam, msg.wParam );
-                            }
-                            break;
-                    }
-
-                default:
-                    intf_WarnMsg( 4, "vout: vout_Manage WM Default %i",
-                                  msg.message );
+                p_vout->i_changes |= VOUT_SIZE_CHANGE;
+            }
+            /* don't create a never ending loop */
+            b_dispatch_msg = FALSE;
+            break;
+          
+        case WM_APP:
+            intf_WarnMsg( 3, "vout: vout_Manage WM_APP" );
+            if( !p_vout->b_need_render )
+            {
+                p_vout->i_changes |= VOUT_SIZE_CHANGE;
+            }
+            /* don't create a never ending loop */
+            b_dispatch_msg = FALSE;
+            break;
+          
+#if 0
+        case WM_PAINT:
+            intf_WarnMsg( 4, "vout: vout_Manage WM_PAINT" );
+            break;
+          
+        case WM_ERASEBKGND:
+            intf_WarnMsg( 4, "vout: vout_Manage WM_ERASEBKGND" );
+            break;
+#endif
+          
+        case WM_MOUSEMOVE:
+            intf_WarnMsg( 4, "vout: vout_Manage WM_MOUSEMOVE" );
+            if( p_vout->p_sys->b_cursor )
+            {
+                if( p_vout->p_sys->b_cursor_autohidden )
+                {
+                    p_vout->p_sys->b_cursor_autohidden = 0;
+                    p_vout->p_sys->i_lastmoved = mdate();
+                    ShowCursor( TRUE );
+                }
+                else
+                {
+                    p_vout->p_sys->i_lastmoved = mdate();
+                }
+            }               
+            break;
+          
+        case WM_KEYDOWN:
+            /* the key events are first processed here. The next
+             * message processed by this main message loop will be the
+             * char translation of the key event */
+            intf_WarnMsg( 3, "vout: vout_Manage WM_KEYDOWN" );
+            switch( msg.wParam )
+            {
+            case VK_ESCAPE:
+            case VK_F12:
+                p_main->p_intf->b_die = 1;
+                break;
+            }
+            TranslateMessage(&msg);
+            b_dispatch_msg = FALSE;
+            break;
+          
+        case WM_CHAR:
+            intf_WarnMsg( 3, "vout: vout_Manage WM_CHAR" );
+            switch( msg.wParam )
+            {
+            case 'q':
+            case 'Q':
+                p_main->p_intf->b_die = 1;
+                break;
+              
+            case 'f':                                /* switch to fullscreen */
+            case 'F':
+                p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                break;
+              
+            case 'y':                                  /* switch to hard YUV */
+            case 'Y':
+                p_vout->i_changes |= VOUT_YUV_CHANGE;
+                break;
+              
+            case 'c':                                    /* toggle grayscale */
+            case 'C':
+                p_vout->b_grayscale = ! p_vout->b_grayscale;
+                p_vout->i_changes |= VOUT_GRAYSCALE_CHANGE;
+                break;
+              
+            case 'i':                                         /* toggle info */
+            case 'I':
+                p_vout->b_info = ! p_vout->b_info;
+                p_vout->i_changes |= VOUT_INFO_CHANGE;
+                break;
+              
+            case 's':                                      /* toggle scaling */
+            case 'S':
+                p_vout->b_scale = ! p_vout->b_scale;
+                p_vout->i_changes |= VOUT_SCALE_CHANGE;
+                break;
+              
+            case ' ':                                    /* toggle interface */
+                p_vout->b_interface = ! p_vout->b_interface;
+                p_vout->i_changes |= VOUT_INTF_CHANGE;
+                break;
+              
+            case '0': network_ChannelJoin( 0 ); break;
+            case '1': network_ChannelJoin( 1 ); break;
+            case '2': network_ChannelJoin( 2 ); break;
+            case '3': network_ChannelJoin( 3 ); break;
+            case '4': network_ChannelJoin( 4 ); break;
+            case '5': network_ChannelJoin( 5 ); break;
+            case '6': network_ChannelJoin( 6 ); break;
+            case '7': network_ChannelJoin( 7 ); break;
+            case '8': network_ChannelJoin( 8 ); break;
+            case '9': network_ChannelJoin( 9 ); break;
+              
+            default:
+                if( intf_ProcessKey( p_main->p_intf,
+                                     (char )msg.wParam ) )
+                {
+                    intf_DbgMsg( "unhandled key '%c' (%i)",
+                                 (char)msg.wParam, msg.wParam );
+                }
                 break;
             }
 
-            /* don't create a never ending loop */
-            if( b_dispatch_msg )
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-            b_dispatch_msg = TRUE;
+#if 0          
+        default:
+            intf_WarnMsg( 4, "vout: vout_Manage WM Default %i",
+                          msg.message );
+            break;
+#endif
 
-        }
-        else
+        } /* End Switch */
+
+        /* don't create a never ending loop */
+        if( b_dispatch_msg )
         {
-            return( 1 );
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
         }
+        b_dispatch_msg = TRUE;
 
-    }
+    } /* End While() */
 
 
     /*
@@ -486,7 +484,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         intf_WarnMsg( 3, "vout: vout_Manage Size Change" );
         if( DirectXUpdateOverlay( p_vout ) )
             /* failed so try again next time */
-            PostMessage( p_vout->p_sys->hwnd, WM_APP, 0, 0);
+	    PostMessage( p_vout->p_sys->hwnd, WM_APP, 0, 0);
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
     }
 
@@ -601,9 +599,6 @@ static void vout_Display( vout_thread_t *p_vout )
     int           i_image_width;
     int           i_image_height;
 
-
-    intf_WarnMsg( 5, "vout: vout_Display" );
-
     if( (p_vout->p_sys->p_display == NULL) )
     {
         intf_WarnMsg( 3, "vout error: vout_Display no display!!" );
@@ -662,6 +657,12 @@ static void vout_Display( vout_thread_t *p_vout )
         ClientToScreen(p_vout->p_sys->hwnd, &point_window);
         rect_window.right = point_window.x;
         rect_window.bottom = point_window.y;
+
+        /* We want to keep the aspect ratio of the video */
+        if( p_vout->b_scale )
+        {
+            DirectXKeepAspectRatio( p_vout, &rect_window );
+        }
 
         /* Blit video surface to display */
         dxresult = IDirectDrawSurface3_Blt(p_vout->p_sys->p_display,
@@ -800,11 +801,11 @@ long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     switch( message )
     {
 
+#if 0
     case WM_APP:
         intf_WarnMsg( 3, "vout: WinProc WM_APP" );
         break;
 
-#if 0
     case WM_ACTIVATE:
         intf_WarnMsg( 4, "vout: WinProc WM_ACTIVED" );
         break;
@@ -846,6 +847,10 @@ long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
     case WM_MOVING:
         intf_WarnMsg( 4, "vout: WinProc WM_MOVING" );
+        break;
+
+    case WM_ENTERSIZEMOVE:
+        intf_WarnMsg( 4, "vout: WinProc WM_ENTERSIZEMOVE" );
         break;
 
     case WM_SIZING:
@@ -913,7 +918,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
      * comes from the potential dithering (depends on the display depth)
      * because we need to know the real RGB value of the chosen colorkey */
     hdc = GetDC( GetDesktopWindow() );
-    for( colorkey = 1; colorkey < 0xFF /*all shades of red*/; colorkey++ )
+    for( colorkey = 5; colorkey < 0xFF /*all shades of red*/; colorkey++ )
     {
         if( colorkey == GetNearestColor( hdc, colorkey ) )
           break;
@@ -1225,7 +1230,7 @@ static int DirectXCreateSurface( vout_thread_t *p_vout )
                        DDSD_HEIGHT |
                        DDSD_WIDTH |
                        DDSD_PIXELFORMAT;
-        ddsd.ddsCaps.dwCaps = DDSCAPS_OVERLAY;
+        ddsd.ddsCaps.dwCaps = DDSCAPS_OVERLAY | DDSCAPS_VIDEOMEMORY;
         ddsd.dwHeight =  p_vout->p_sys->i_image_height;
         ddsd.dwWidth =  p_vout->p_sys->i_image_width;
         ddsd.dwBackBufferCount = 1;                       /* One back buffer */
@@ -1486,91 +1491,8 @@ static int DirectXUpdateOverlay( vout_thread_t *p_vout )
     /* We want to keep the aspect ratio of the video */
     if( p_vout->b_scale )
     {
-        switch( p_vout->p_rendered_pic->i_aspect_ratio )
-        {
-            case AR_16_9_PICTURE:
-            if( ((rect_window.right-rect_window.left)*9)
-                > ((rect_window.bottom-rect_window.top)*16) )
-            {
-                int temp;
-                temp = (rect_window.bottom-rect_window.top)*16/9;
-                temp = (rect_window.right-rect_window.left) - temp;
-                rect_window.left += (temp/2);
-                rect_window.right -= (temp/2);
-            }
-            else
-            {
-                int temp;
-                temp = (rect_window.right-rect_window.left)*9/16;
-                temp = (rect_window.bottom-rect_window.top) - temp;
-                rect_window.top += (temp/2);
-                rect_window.bottom -= (temp/2);
-            }
-            break;
-
-            case AR_221_1_PICTURE:
-            if( ((rect_window.right-rect_window.left)*100)
-                > ((rect_window.bottom-rect_window.top)*221) )
-            {
-                int temp;
-                temp = (rect_window.bottom-rect_window.top)*221/100;
-                temp = (rect_window.right-rect_window.left) - temp;
-                rect_window.left += (temp/2);
-                rect_window.right -= (temp/2);
-            }
-            else
-            {
-                int temp;
-                temp = (rect_window.right-rect_window.left)*100/221;
-                temp = (rect_window.bottom-rect_window.top) - temp;
-                rect_window.top += (temp/2);
-                rect_window.bottom -= (temp/2);
-            }
-            break;
-
-            case AR_SQUARE_PICTURE:
-            if( (rect_window.right-rect_window.left)
-                > (rect_window.bottom-rect_window.top) )
-            {
-                int temp;
-                temp = (rect_window.bottom-rect_window.top);
-                temp = (rect_window.right-rect_window.left) - temp;
-                rect_window.left += (temp/2);
-                rect_window.right -= (temp/2);
-            }
-            else
-            {
-                int temp;
-                temp = (rect_window.right-rect_window.left);
-                temp = (rect_window.bottom-rect_window.top) - temp;
-                rect_window.top += (temp/2);
-                rect_window.bottom -= (temp/2);
-            }
-            break;
-
-            case AR_3_4_PICTURE:
-            default:
-            if( ((rect_window.right-rect_window.left)*3)
-                > ((rect_window.bottom-rect_window.top)*4) )
-            {
-                int temp;
-                temp = (rect_window.bottom-rect_window.top)*4/3;
-                temp = (rect_window.right-rect_window.left) - temp;
-                rect_window.left += (temp/2);
-                rect_window.right -= (temp/2);
-            }
-            else
-            {
-                int temp;
-                temp = (rect_window.right-rect_window.left)*3/4;
-                temp = (rect_window.bottom-rect_window.top) - temp;
-                rect_window.top += (temp/2);
-                rect_window.bottom -= (temp/2);
-            }
-            break;
-        }
+        DirectXKeepAspectRatio( p_vout, &rect_window );
     }
-
 
     /* It seems we can't feed the UpdateOverlay directdraw function with
      * negative values so we have to clip the computed rectangles */
@@ -1599,6 +1521,10 @@ static int DirectXUpdateOverlay( vout_thread_t *p_vout )
     intf_WarnMsg( 3, "vout: DirectXUpdateOverlay window coords: %i,%i,%i,%i",
                   rect_window.left, rect_window.top,
                   rect_window.right, rect_window.bottom);
+
+    /* the 2 following lines are to fix a bug when click on Windows desktop */
+    if( (rect_window.right-rect_window.left)==0 ||
+        (rect_window.bottom-rect_window.top)==0 ) return 0;
 
     /* Clip the source image */
     rect_image.left = ( rect_window.left == rect_window_backup.left ) ? 0
@@ -1759,4 +1685,102 @@ static void DirectXCloseSurface( vout_thread_t *p_vout )
 
     /* Disable any display */
     p_vout->p_sys->b_display_enabled = 0;
+}
+
+/*****************************************************************************
+ * DirectXKeepAspectRatio: 
+ *****************************************************************************
+ * This function adjusts the coordinates of the video rectangle to keep the
+ * aspect/ratio of the video.
+ *****************************************************************************/
+static void DirectXKeepAspectRatio( vout_thread_t *p_vout, RECT *rect_window )
+{
+
+  if( !p_vout->p_rendered_pic ) return;
+
+  switch( p_vout->p_rendered_pic->i_aspect_ratio )
+  {
+      case AR_16_9_PICTURE:
+      if( ((rect_window->right-rect_window->left)*9)
+          > ((rect_window->bottom-rect_window->top)*16) )
+      {
+        int temp;
+        temp = (rect_window->bottom-rect_window->top)*16/9;
+        temp = (rect_window->right-rect_window->left) - temp;
+        rect_window->left += (temp/2);
+        rect_window->right -= (temp/2);
+      }
+      else
+        {
+          int temp;
+          temp = (rect_window->right-rect_window->left)*9/16;
+          temp = (rect_window->bottom-rect_window->top) - temp;
+          rect_window->top += (temp/2);
+          rect_window->bottom -= (temp/2);
+        }
+      break;
+      
+  case AR_221_1_PICTURE:
+    if( ((rect_window->right-rect_window->left)*100)
+        > ((rect_window->bottom-rect_window->top)*221) )
+      {
+        int temp;
+        temp = (rect_window->bottom-rect_window->top)*221/100;
+        temp = (rect_window->right-rect_window->left) - temp;
+        rect_window->left += (temp/2);
+        rect_window->right -= (temp/2);
+      }
+    else
+      {
+        int temp;
+        temp = (rect_window->right-rect_window->left)*100/221;
+        temp = (rect_window->bottom-rect_window->top) - temp;
+        rect_window->top += (temp/2);
+        rect_window->bottom -= (temp/2);
+      }
+    break;
+    
+  case AR_3_4_PICTURE:
+    if( ((rect_window->right-rect_window->left)*3)
+        > ((rect_window->bottom-rect_window->top)*4) )
+      {
+        int temp;
+        temp = (rect_window->bottom-rect_window->top)*4/3;
+        temp = (rect_window->right-rect_window->left) - temp;
+        rect_window->left += (temp/2);
+        rect_window->right -= (temp/2);
+      }
+    else
+      {
+        int temp;
+        temp = (rect_window->right-rect_window->left)*3/4;
+        temp = (rect_window->bottom-rect_window->top) - temp;
+        rect_window->top += (temp/2);
+        rect_window->bottom -= (temp/2);
+      }
+    break;
+
+  case AR_SQUARE_PICTURE:
+  default:
+    if( (rect_window->right-rect_window->left)
+        > (rect_window->bottom-rect_window->top) )
+      {
+        int temp;
+        temp = (rect_window->bottom-rect_window->top);
+        temp = (rect_window->right-rect_window->left) - temp;
+        rect_window->left += (temp/2);
+        rect_window->right -= (temp/2);
+      }
+    else
+      {
+        int temp;
+        temp = (rect_window->right-rect_window->left);
+        temp = (rect_window->bottom-rect_window->top) - temp;
+        rect_window->top += (temp/2);
+        rect_window->bottom -= (temp/2);
+      }
+    break;
+    
+  }
+
 }

@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.11 2001/06/29 11:34:28 stef Exp $
+ * $Id: gtk_menu.c,v 1.12 2001/07/08 17:45:52 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -58,12 +58,6 @@
 #include "main.h"
 
 #include "modules_export.h"
-
-#ifdef WIN32
-#ifndef snprintf
-#define snprintf _snprintf
-#endif
-#endif
 
 /*
  * Local Prototypes

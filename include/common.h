@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.35 2001/06/03 12:47:21 sam Exp $
+ * $Id: common.h,v 1.36 2001/07/08 17:45:51 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -193,7 +193,6 @@ struct pgrm_descriptor_s;
 
 /* win32, cl and icl support */
 #if defined( _MSC_VER )
-typedef long off_t;
 #   define __attribute__(x)
 #   define __inline__      __inline
 #   define strncasecmp     strnicmp
@@ -206,4 +205,15 @@ typedef long off_t;
 #else
 #   define I64C(x)         x##LL
 #endif
+
+#if defined( WIN32 )
+typedef __int64 off_t;
+#ifndef snprintf
+#define snprintf _snprintf         /* snprintf not defined in mingw32 (bug?) */
+#endif
+#endif
+
+
+
+
 

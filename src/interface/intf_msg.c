@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: intf_msg.c,v 1.36 2001/06/02 01:09:03 sam Exp $
+ * $Id: intf_msg.c,v 1.37 2001/07/08 17:45:52 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -48,12 +48,6 @@
 #include "interface.h"
 
 #include "main.h"
-
-#ifdef WIN32
-#ifndef snprintf
-#define snprintf _snprintf         /* snprintf not defined in mingw32 (bug?) */
-#endif
-#endif
 
 /*****************************************************************************
  * intf_msg_item_t
@@ -128,6 +122,9 @@ static void QueueDbgMsg     ( intf_msg_t *p_msg, char *psz_file,
 static void FlushLockedMsg  ( intf_msg_t *p_msg );
 #endif
 
+#if defined( WIN32 )
+static char *ConvertPrintfFormatString ( char *psz_format );
+#endif
 
 /*****************************************************************************
  * intf_MsgCreate: initialize messages interface                         (ok ?)
@@ -404,6 +401,9 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
 {
     char *                  psz_str;             /* formatted message string */
     intf_msg_item_t *       p_msg_item;                /* pointer to message */
+#ifdef WIN32
+    char *                  psz_temp;
+#endif
 
 #ifndef INTF_MSG_QUEUE /*................................... instant mode ...*/
     intf_msg_item_t         msg_item;                             /* message */
@@ -413,6 +413,7 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
     /*
      * Convert message to string
      */
+
 #ifdef HAVE_VASPRINTF
     vasprintf( &psz_str, psz_format, ap );
 #else
@@ -426,10 +427,15 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
         fprintf(stderr, "\n" );
         exit( errno );
     }
-#ifdef HAVE_VASPRINTF
+#ifndef HAVE_VASPRINTF
+#ifdef WIN32
+    psz_temp = ConvertPrintfFormatString(psz_format);
+    vsprintf( psz_str, psz_temp, ap );
+    free( psz_temp );
 #else
     vsprintf( psz_str, psz_format, ap );
-#endif
+#endif /* WIN32 */
+#endif /* HAVE_VASPRINTF */
 
 #ifdef INTF_MSG_QUEUE /*...................................... queue mode ...*/
     vlc_mutex_lock( &p_msg->lock );                              /* get lock */
@@ -472,6 +478,9 @@ static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
 {
     char *                  psz_str;             /* formatted message string */
     intf_msg_item_t *       p_msg_item;                /* pointer to message */
+#ifdef WIN32
+    char *                  psz_temp;
+#endif
 
 #ifndef INTF_MSG_QUEUE /*................................... instant mode ...*/
     intf_msg_item_t         msg_item;                             /* message */
@@ -485,7 +494,6 @@ static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
     vasprintf( &psz_str, psz_format, ap );
 #else
     psz_str = (char*) malloc( INTF_MAX_MSG_SIZE );
-    vsprintf( psz_str, psz_format, ap );
 #endif
     if( psz_str == NULL )
     {
@@ -496,6 +504,15 @@ static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
         fprintf(stderr, "\n" );
         exit( errno );
     }
+#ifndef HAVE_VASPRINTF
+#ifdef WIN32
+    psz_temp = ConvertPrintfFormatString(psz_format);
+    vsprintf( psz_str, psz_temp, ap );
+    free( psz_temp );
+#else
+    vsprintf( psz_str, psz_format, ap );
+#endif /* WIN32 */
+#endif /* HAVE_VASPRINTF */
 
 #ifdef INTF_MSG_QUEUE /*...................................... queue mode ...*/
     vlc_mutex_lock( &p_msg->lock );                              /* get lock */
@@ -651,3 +668,58 @@ static void PrintMsg( intf_msg_item_t *p_msg )
 
 #endif
 
+
+#if defined( WIN32 )
+/*****************************************************************************
+ * ConvertPrintfFormatString: replace all occurrences of %ll with %I64 in the
+ *                            printf format string.
+ *****************************************************************************
+ * Win32 doesn't recognize the "%lld" format in a printf string, so we have
+ * to convert this string to something that win32 can handle.
+ * This is a REALLY UGLY HACK which won't even work in every situation,
+ * but hey I don't want to put an ifdef WIN32 each time I use printf with
+ * a "long long" type!!!
+ * By the way, if we don't do this we can sometimes end up with segfaults.
+ *****************************************************************************/
+static char *ConvertPrintfFormatString( char *psz_format )
+{
+  int i, i_counter=0, i_pos=0;
+  char *psz_dest;
+
+  /* We first need to check how many occurences of %ll there are in the
+   * psz_format string. Once we'll know that we'll be able to malloc the
+   * destination string */
+
+  for( i=0; i <= (strlen(psz_format) - 4); i++ )
+  {
+      if( !strncmp( (char *)(psz_format + i), "%ll", 3 ) )
+	  i_counter++;
+  }
+
+  /* malloc the destination string */
+  psz_dest = malloc( strlen(psz_format) + i_counter + 1 );
+  if( psz_dest == NULL )
+  {
+      fprintf(stderr, "warning: malloc failed in ConvertPrintfFormatString\n");
+      exit (errno);
+  }
+
+  /* Now build the modified string */
+  i_counter = 0;
+  for( i=0; i <= (strlen(psz_format) - 4); i++ )
+  {
+      if( !strncmp( (char *)(psz_format + i), "%ll", 3 ) )
+      {
+          memcpy( psz_dest+i_pos+i_counter, psz_format+i_pos, i-i_pos+1);
+          *(psz_dest+i+i_counter+1)='I';
+          *(psz_dest+i+i_counter+2)='6';
+          *(psz_dest+i+i_counter+3)='4';
+	  i_pos = i+3;
+          i_counter++;
+      }
+  }
+  strcpy( psz_dest+i_pos+i_counter, psz_format+i_pos );
+
+  return psz_dest;
+}
+#endif

@@ -2,7 +2,7 @@
  * aout_directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_directx.c,v 1.3 2001/06/14 01:49:44 sam Exp $
+ * $Id: aout_directx.c,v 1.4 2001/07/08 17:45:52 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -97,7 +97,7 @@ static void    aout_Play        ( aout_thread_t *p_aout,
                                   byte_t *buffer, int i_size );
 static void    aout_Close       ( aout_thread_t *p_aout );
 
-/* local function */
+/* local functions */
 static int DirectxCreateSecondaryBuffer( aout_thread_t *p_aout );
 static int DirectxInitDSound( aout_thread_t *p_aout );
 
@@ -209,6 +209,7 @@ static int aout_Open( aout_thread_t *p_aout )
         intf_WarnMsg( 3, "aout: can't set primary buffer format");
     }
 
+#if 0
     /* ensure the primary buffer is playing. We won't actually hear anything
      * until the secondary buffer is playing */
     dsresult = IDirectSoundBuffer_Play( p_aout->p_sys->p_dsbuffer_primary,
@@ -224,6 +225,7 @@ static int aout_Open( aout_thread_t *p_aout )
         p_aout->p_sys->p_dsbuffer_primary = NULL;
         return( 1 );
     }
+#endif
 
     return( 0 );
 }
@@ -286,6 +288,7 @@ static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
         return( l_buffer_limit );
     }
 
+#if 0
     /* temporary hack. When you start playing a new file, the play position
      * doesn't start changing immediatly, even though sound is already
      * playing from the sound card */
@@ -294,6 +297,7 @@ static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
        intf_WarnMsg( 5, "aout: DirectX aout_GetBufInfo: %li", l_buffer_limit);
        return( l_buffer_limit );
     }
+#endif
 
     l_result = (p_aout->p_sys->l_write_position >= l_play_position) ?
       (p_aout->p_sys->l_write_position - l_play_position) /2
@@ -334,6 +338,7 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
         intf_WarnMsg( 3, "aout: DirectX aout_Play can'get buffer position");
     }
 
+#if 1
     /* check that we are not overflowing the circular buffer (everything should
      * be alright but just in case) */
     l_buffer_free_length =  l_play_position - p_aout->p_sys->l_write_position;
@@ -352,11 +357,13 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
     }
     else
     {
+#if 0
         intf_WarnMsg( 4, "aout: DirectX aout_Play buffer: size %i, free %i !!!"
                       , i_size, l_buffer_free_length);
         intf_WarnMsg( 4, "aout: DirectX aout_Play buffer: writepos %i, readpos %i !!!", p_aout->p_sys->l_write_position, l_play_position);
-
+#endif
     }
+#endif
 
     /* Before copying anything, we have to lock the buffer */
     dsresult = IDirectSoundBuffer_Lock( p_aout->p_sys->p_dsbuffer,
@@ -389,7 +396,9 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
     /* Now do the actual memcopy (two memcpy because the buffer is circular) */
     memcpy( p_write_position, buffer, l_bytes1 );
     if( p_start_buffer != NULL )
+    {
         memcpy( p_start_buffer, buffer + l_bytes1, l_bytes2 );
+    }
 
     /* Now the data has been copied, unlock the buffer */
     IDirectSoundBuffer_Unlock( p_aout->p_sys->p_dsbuffer, 
@@ -543,7 +552,6 @@ static int DirectxCreateSecondaryBuffer( aout_thread_t *p_aout )
     WAVEFORMATEX waveformat;
     DSBUFFERDESC dsbdesc;
     DSBCAPS      dsbcaps;
-    HRESULT      dsresult;
 
     /* First set the buffer format */
     memset(&waveformat, 0, sizeof(WAVEFORMATEX)); 
@@ -561,7 +569,7 @@ static int DirectxCreateSecondaryBuffer( aout_thread_t *p_aout )
     dsbdesc.dwSize = sizeof(DSBUFFERDESC); 
     dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2/* Better position accuracy */
                     | DSBCAPS_GLOBALFOCUS;      /* Allows background playing */
-    dsbdesc.dwBufferBytes = waveformat.nAvgBytesPerSec * 4; /* 4 sec buffer */
+    dsbdesc.dwBufferBytes = waveformat.nAvgBytesPerSec * 2;  /* 2 sec buffer */
     dsbdesc.lpwfxFormat = &waveformat; 
  
     if( IDirectSound_CreateSoundBuffer( p_aout->p_sys->p_dsobject,

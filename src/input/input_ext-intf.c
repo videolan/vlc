@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-intf.c,v 1.24 2001/05/19 00:39:30 stef Exp $
+ * $Id: input_ext-intf.c,v 1.25 2001/07/08 17:45:52 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -28,10 +28,6 @@
 
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>                                              /* off_t */
-
-#ifdef WIN32
-#define snprintf _snprintf
-#endif
 
 #include "config.h"
 #include "common.h"

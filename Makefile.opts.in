@@ -195,7 +195,7 @@ CFLAGS += -traditional-cpp
 endif
 
 ifneq (,$(findstring mingw32,$(SYS)))
-CFLAGS += -fnative-struct
+CFLAGS += -fnative-struct -D_OFF_T_ -D_off_t=long
 endif
 
 # Optimizations : don't compile debug versions with them
