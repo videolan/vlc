@@ -9,7 +9,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.122 2002/02/27 03:47:56 sam Exp $
+ * $Id: input_dvd.c,v 1.123 2002/03/01 01:12:28 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -78,23 +78,25 @@
 
 #include "debug.h"
 
-/* how many blocks DVDRead will read in each loop */
-#define DVD_BLOCK_READ_ONCE 64
+/* how many packets DVDDemux will read in each loop */
+#define DVD_READ_ONCE 64
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+
 /* called from outside */
-static int  DVDProbe        ( struct input_thread_s * );
-static void DVDInit         ( struct input_thread_s * );
-static void DVDEnd          ( struct input_thread_s * );
-static void DVDOpen         ( struct input_thread_s * );
+static int  DVDOpen         ( struct input_thread_s * );
 static void DVDClose        ( struct input_thread_s * );
 static int  DVDSetArea      ( struct input_thread_s *, struct input_area_s * );
 static int  DVDSetProgram   ( struct input_thread_s *, pgrm_descriptor_t * );
-static int  DVDRead         ( struct input_thread_s *, data_packet_t ** );
+static int  DVDRead         ( struct input_thread_s *, byte_t *, size_t );
 static void DVDSeek         ( struct input_thread_s *, off_t );
+
 static int  DVDRewind       ( struct input_thread_s * );
+static int  DVDDemux        ( struct input_thread_s * );
+static int  DVDInit         ( struct input_thread_s * );
+static void DVDEnd          ( struct input_thread_s * );
 
 /* called only inside */
 static int  DVDChooseAngle( thread_dvd_data_t * );
@@ -103,114 +105,299 @@ static int  DVDFindSector( thread_dvd_data_t * );
 static int  DVDChapterSelect( thread_dvd_data_t *, int );
 
 /*****************************************************************************
- * Declare a buffer manager
- *****************************************************************************/
-#define FLAGS           BUFFERS_UNIQUE_SIZE
-#define NB_LIFO         1
-DECLARE_BUFFERS_SHARED( FLAGS, NB_LIFO );
-DECLARE_BUFFERS_INIT( FLAGS, NB_LIFO );
-DECLARE_BUFFERS_END_SHARED( FLAGS, NB_LIFO );
-DECLARE_BUFFERS_NEWPACKET_SHARED( FLAGS, NB_LIFO );
-DECLARE_BUFFERS_DELETEPACKET_SHARED( FLAGS, NB_LIFO, 1000 );
-DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
-DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 1000 );
-DECLARE_BUFFERS_TOIO( FLAGS, DVD_LB_SIZE );
-DECLARE_BUFFERS_SHAREBUFFER( FLAGS );
-
-/*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void _M( input_getfunctions )( function_list_t * p_function_list )
+void _M( access_getfunctions)( function_list_t * p_function_list )
 {
-#define input p_function_list->functions.input
-    input.pf_probe            = DVDProbe;
-    input.pf_init             = DVDInit;
+#define input p_function_list->functions.access
     input.pf_open             = DVDOpen;
     input.pf_close            = DVDClose;
-    input.pf_end              = DVDEnd;
-    input.pf_init_bit_stream  = InitBitstream;
     input.pf_read             = DVDRead;
     input.pf_set_area         = DVDSetArea;
     input.pf_set_program      = DVDSetProgram;
-    input.pf_demux            = input_DemuxPS;
-    input.pf_new_packet       = input_NewPacket;
-    input.pf_new_pes          = input_NewPES;
-    input.pf_delete_packet    = input_DeletePacket;
-    input.pf_delete_pes       = input_DeletePES;
-    input.pf_rewind           = DVDRewind;
     input.pf_seek             = DVDSeek;
 #undef input
 }
 
-/*
- * Data reading functions
- */
-
-/*****************************************************************************
- * DVDProbe: verifies that the stream is a PS stream
- *****************************************************************************/
-static int DVDProbe( input_thread_t * p_input )
+void _M( demux_getfunctions)( function_list_t * p_function_list )
 {
-    char * psz_name = p_input->p_source;
-
-    if( ( strlen(psz_name) > 4 ) && !strncasecmp( psz_name, "dvd:", 4 ) )
-    {
-        /* If the user specified "dvd:" then it's probably a DVD */
-        return 0;
-    }
-
-    return -1;
+#define demux p_function_list->functions.demux
+    demux.pf_init             = DVDInit;
+    demux.pf_end              = DVDEnd;
+    demux.pf_demux            = DVDDemux;
+    demux.pf_rewind           = DVDRewind;
+#undef demux
 }
+
+/*
+ * Data demux functions
+ */
 
 /*****************************************************************************
  * DVDInit: initializes DVD structures
  *****************************************************************************/
-static void DVDInit( input_thread_t * p_input )
+static int DVDInit( input_thread_t * p_input )
 {
+    thread_dvd_data_t *  p_dvd;
+    int                  i_audio;
+    int                  i_spu;
+
+    if( strncmp( p_input->p_access_module->psz_name, "dvd", 3 ) )
+    {
+        return -1;
+    }
+
+    p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
+
+    /* Select Video stream (always 0) */
+    if( p_main->b_video )
+    {
+        input_SelectES( p_input, p_input->stream.pp_es[0] );
+    }
+
+    /* Select audio stream */
+    if( p_main->b_audio )
+    {
+        /* For audio: first one if none or a not existing one specified */
+        i_audio = config_GetIntVariable( INPUT_CHANNEL_VAR );
+        if( i_audio < 0 /*|| i_audio > i_audio_nb*/ )
+        {
+            config_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
+            i_audio = 1;
+        }
+        if( i_audio > 0 /*&& i_audio_nb > 0*/ )
+        {
+            if( config_GetIntVariable( AOUT_SPDIF_VAR ) ||
+                ( config_GetIntVariable( INPUT_AUDIO_VAR ) ==
+                  REQUESTED_AC3 ) )
+            {
+                int     i_ac3 = i_audio;
+                while( ( p_input->stream.pp_es[i_ac3]->i_type !=
+                         AC3_AUDIO_ES ) && ( i_ac3 <=
+                         p_dvd->p_ifo->vts.manager_inf.i_audio_nb ) )
+                {
+                    i_ac3++;
+                }
+                if( p_input->stream.pp_es[i_ac3]->i_type == AC3_AUDIO_ES )
+                {
+                    input_SelectES( p_input,
+                                    p_input->stream.pp_es[i_ac3] );
+                }
+            }
+            else
+            {
+                input_SelectES( p_input,
+                                p_input->stream.pp_es[i_audio] );
+            }
+        }
+    }
+
+    /* Select subtitle */
+    if( p_main->b_video )
+    {
+        /* for spu, default is none */
+        i_spu = config_GetIntVariable( INPUT_SUBTITLE_VAR );
+        if( i_spu < 0 /*|| i_spu > i_spu_nb*/ )
+        {
+            config_PutIntVariable( INPUT_SUBTITLE_VAR, 0 );
+            i_spu = 0;
+        }
+        if( i_spu > 0 /* && i_spu_nb > 0*/ )
+        {
+            i_spu += p_dvd->p_ifo->vts.manager_inf.i_audio_nb;
+            input_SelectES( p_input, p_input->stream.pp_es[i_spu] );
+        }
+    }
+
+    return 0;
+}
+
+/*****************************************************************************
+ * DVDEnd: frees unused data
+ *****************************************************************************/
+static void DVDEnd( input_thread_t * p_input )
+{
+}
+
+/*****************************************************************************
+ * DVDDemux
+ *****************************************************************************/
+#define PEEK( SIZE )                                                        \
+    i_result = input_Peek( p_input, &p_peek, SIZE );                        \
+    if( i_result == -1 )                                                    \
+    {                                                                       \
+        return( -1 );                                                       \
+    }                                                                       \
+    else if( i_result < SIZE )                                              \
+    {                                                                       \
+        /* EOF */                                                           \
+        return( 0 );                                                        \
+    }
+
+static int DVDDemux( input_thread_t * p_input )
+{
+    int                 i;
+    byte_t *            p_peek;
+    data_packet_t *     p_data;
+    ssize_t             i_result;
+    int                 i_packet_size;
+            
+
+    /* Read headers to compute payload length */
+    for( i = 0 ; i < DVD_READ_ONCE ; i++ )
+    {
+
+        /* Read what we believe to be a packet header. */
+        PEEK( 4 );
+            
+        /* Default header */
+        if( U32_AT( p_peek ) != 0x1BA )
+        {
+            /* That's the case for all packets, except pack header. */
+            i_packet_size = U16_AT( p_peek + 4 );
+        }
+        else
+        {
+            /* MPEG-2 Pack header. */
+            i_packet_size = 8;
+        }
+
+        /* Fetch a packet of the appropriate size. */
+        i_result = input_SplitBuffer( p_input, &p_data, i_packet_size + 6 );
+        if( i_result <= 0 )
+        {
+            return( i_result );
+        }
+
+        /* In MPEG-2 pack headers we still have to read stuffing bytes. */
+        if( (p_data->p_demux_start[3] == 0xBA) && (i_packet_size == 8) )
+        {
+            size_t i_stuffing = (p_data->p_demux_start[13] & 0x7);
+            /* Force refill of the input buffer - though we don't care
+             * about p_peek. Please note that this is unoptimized. */
+            PEEK( i_stuffing );
+            p_input->p_current_data += i_stuffing;
+        }
+
+        input_DemuxPS( p_input, p_data );
+                        
+    }
+    
+    return i;
+}
+
+/*****************************************************************************
+ * DVDRewind : reads a stream backward
+ *****************************************************************************/
+static int DVDRewind( input_thread_t * p_input )
+{
+    return( -1 );
+}
+
+
+
+/*
+ * Data access functions
+ */
+
+/*****************************************************************************
+ * DVDOpen: open dvd
+ *****************************************************************************/
+static int DVDOpen( struct input_thread_s *p_input )
+{
+    struct stat          stat_info;
+    char *               psz_parser = p_input->psz_name;
+    char *               psz_device = p_input->psz_name;
+    dvdcss_handle        dvdhandle;
     thread_dvd_data_t *  p_dvd;
     input_area_t *       p_area;
     int                  i_title;
     int                  i_chapter;
     int                  i;
 
+    /* Parse input string : device[@rawdevice] */
+    while( *psz_parser && *psz_parser != '@' )
+    {
+        psz_parser++;
+    }
+
+    if( *psz_parser == '@' )
+    {
+        /* Found raw device */
+        *psz_parser = '\0';
+        psz_parser++;
+
+        config_PutPszVariable( "DVDCSS_RAW_DEVICE", psz_parser );
+    }
+
+    if( stat( psz_device, &stat_info ) == -1 )
+    {
+        intf_ErrMsg( "input error: cannot stat() device `%s' (%s)",
+                     psz_device, strerror(errno));
+        return( -1 );                    
+    }
+    if( !S_ISBLK(stat_info.st_mode) && !S_ISCHR(stat_info.st_mode) )
+    {
+        intf_WarnMsg( 3, "input : DVD plugin discarded"
+                         " (not a valid block device)" );
+        return -1;
+    }
+
+    intf_WarnMsg( 2, "input: dvd=%s raw=%s", psz_device, psz_parser );
+    
+    /* 
+     * set up input
+     */ 
+    p_input->i_mtu = 0;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    p_input->stream.i_method = INPUT_METHOD_DVD;
+
+    /* If we are here we can control the pace... */
+    p_input->stream.b_pace_control = 1;
+
+    p_input->stream.b_seekable = 1;
+    p_input->stream.p_selected_area->i_size = 0;
+
+    p_input->stream.p_selected_area->i_tell = 0;
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    /*
+     *  get plugin ready
+     */ 
+    dvdhandle = dvdcss_open( psz_device );
+
+    if( dvdhandle == NULL )
+    {
+        intf_ErrMsg( "dvd error: dvdcss can't open device" );
+        return -1;
+    }
+
     p_dvd = malloc( sizeof(thread_dvd_data_t) );
     if( p_dvd == NULL )
     {
         intf_ErrMsg( "dvd error: out of memory" );
-        p_input->b_error = 1;
-        return;
+        return -1;
     }
 
-    p_input->p_plugin_data = (void *)p_dvd;
-
-    if( (p_input->p_method_data = input_BuffersInit()) == NULL )
-    {
-        p_input->b_error = 1;
-        return;
-    }
-
-    p_dvd->dvdhandle = (dvdcss_handle) p_input->p_handle;
+    p_dvd->dvdhandle = (dvdcss_handle) dvdhandle;
+    p_input->p_access_data = (void *)p_dvd;
 
     if( dvdcss_seek( p_dvd->dvdhandle, 0, DVDCSS_NOFLAGS ) < 0 )
     {
         intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
-        input_BuffersEnd( p_input->p_method_data );
-        p_input->b_error = 1;
-        return;
+        return -1;
     }
-
-    /* We read DVD_BLOCK_READ_ONCE in each loop */
-    p_dvd->i_block_once = DVD_BLOCK_READ_ONCE;
 
     /* Ifo allocation & initialisation */
     if( IfoCreate( p_dvd ) < 0 )
     {
         intf_ErrMsg( "dvd error: allcation error in ifo" );
         free( p_dvd );
-        input_BuffersEnd( p_input->p_method_data );
-        p_input->b_error = 1;
-        return;
+        return -1;
     }
 
     if( IfoInit( p_dvd->p_ifo ) < 0 )
@@ -218,9 +405,7 @@ static void DVDInit( input_thread_t * p_input )
         intf_ErrMsg( "dvd error: fatal failure in ifo" );
         IfoDestroy( p_dvd->p_ifo );
         free( p_dvd );
-        input_BuffersEnd( p_input->p_method_data );
-        p_input->b_error = 1;
-        return;
+        return -1;
     }
 
     /* Set stream and area data */
@@ -282,73 +467,16 @@ static void DVDInit( input_thread_t * p_input )
     p_area->i_part = i_chapter;
 
     /* set title, chapter, audio and subpic */
-    DVDSetArea( p_input, p_area );
+    if( DVDSetArea( p_input, p_area ) )
+    {
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        return -1;
+    }
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    return;
-}
+    return 0;
 
-/*****************************************************************************
- * DVDOpen: open dvd
- *****************************************************************************/
-static void DVDOpen( struct input_thread_s *p_input )
-{
-    dvdcss_handle dvdhandle;
-    char * psz_parser;
-    char * psz_device;
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-
-    p_input->stream.i_method = INPUT_METHOD_DVD;
-
-    /* If we are here we can control the pace... */
-    p_input->stream.b_pace_control = 1;
-
-    p_input->stream.b_seekable = 1;
-    p_input->stream.p_selected_area->i_size = 0;
-
-    p_input->stream.p_selected_area->i_tell = 0;
-
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    /* Parse input string : dvd:device[@rawdevice] */
-    if( strlen( p_input->p_source ) > 4
-         && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
-    {
-        psz_parser = psz_device = p_input->p_source + 4;
-    }
-    else
-    {
-        psz_parser = psz_device = p_input->p_source;
-    }
-
-    while( *psz_parser && *psz_parser != '@' )
-    {
-        psz_parser++;
-    }
-
-    if( *psz_parser == '@' )
-    {
-        /* Found raw device */
-        *psz_parser = '\0';
-        psz_parser++;
-
-        config_PutPszVariable( "DVDCSS_RAW_DEVICE", psz_parser );
-    }
-
-    intf_WarnMsg( 2, "input: dvd=%s raw=%s", psz_device, psz_parser );
-
-    dvdhandle = dvdcss_open( psz_device );
-
-    if( dvdhandle == NULL )
-    {
-        intf_ErrMsg( "dvd error: dvdcss can't open device" );
-        p_input->b_error = 1;
-        return;
-    }
-
-    p_input->p_handle = (void *) dvdhandle;
 }
 
 /*****************************************************************************
@@ -356,24 +484,17 @@ static void DVDOpen( struct input_thread_s *p_input )
  *****************************************************************************/
 static void DVDClose( struct input_thread_s *p_input )
 {
-    /* Clean up libdvdcss */
-    dvdcss_close( (dvdcss_handle) p_input->p_handle );
-}
-
-/*****************************************************************************
- * DVDEnd: frees unused data
- *****************************************************************************/
-static void DVDEnd( input_thread_t * p_input )
-{
     thread_dvd_data_t *     p_dvd;
 
-    p_dvd = (thread_dvd_data_t*)p_input->p_plugin_data;
+    p_dvd = (thread_dvd_data_t*)p_input->p_access_data;
 
     IfoDestroy( p_dvd->p_ifo );
 
+    p_input->p_access_data = (void *)(p_dvd->dvdhandle);
     free( p_dvd );
 
-    input_BuffersEnd( p_input->p_method_data );
+    /* Clean up libdvdcss */
+    dvdcss_close( (dvdcss_handle) p_input->p_access_data );
 }
 
 /*****************************************************************************
@@ -400,11 +521,9 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
     int                  i_vts_title;
     int                  i_audio_nb = 0;
     int                  i_spu_nb = 0;
-    int                  i_audio;
-    int                  i_spu;
     int                  i;
 
-    p_dvd = (thread_dvd_data_t*)p_input->p_plugin_data;
+    p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
 
     /* we can't use the interface slider until initilization is complete */
     p_input->stream.b_seekable = 0;
@@ -546,6 +665,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
         p_input->stream.p_selected_program = p_input->stream.pp_programs[0]; 
+//        p_input->stream.p_new_program = p_input->stream.pp_programs[0]; 
 
         /* No PSM to read in DVD mode, we already have all information */
         p_input->stream.p_selected_program->b_is_ok = 1;
@@ -560,11 +680,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_es->i_stream_id = 0xe0;
         p_es->i_type = MPEG2_VIDEO_ES;
         p_es->i_cat = VIDEO_ES;
-        if( p_main->b_video )
-        {
-            input_SelectES( p_input, p_es );
-        }
-
+        
 #define audio_status \
     vts.title_unit.p_title[p_dvd->i_title_id-1].title.pi_audio_status[i-1]
         /* Audio ES, in the order they appear in .ifo */
@@ -685,55 +801,14 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             }
         }
 #undef spu_status
-        if( p_main->b_audio )
+    
+        /* FIXME: hack to check that the demuxer is ready, and set
+        * the decoders */
+        if( p_input->pf_init )
         {
-            /* For audio: first one if none or a not existing one specified */
-            i_audio = config_GetIntVariable( INPUT_CHANNEL_VAR );
-            if( i_audio < 0 || i_audio > i_audio_nb )
-            {
-                i_audio = 1;
-            }
-            if( i_audio > 0 && i_audio_nb > 0 )
-            {
-                if( config_GetIntVariable( AOUT_SPDIF_VAR ) ||
-                    ( config_GetIntVariable( INPUT_AUDIO_VAR ) ==
-                      REQUESTED_AC3 ) )
-                {
-                    int     i_ac3 = i_audio;
-                    while( ( p_input->stream.pp_es[i_ac3]->i_type !=
-                             AC3_AUDIO_ES ) && ( i_ac3 <=
-                             vts.manager_inf.i_audio_nb ) )
-                    {
-                        i_ac3++;
-                    }
-                    if( p_input->stream.pp_es[i_ac3]->i_type == AC3_AUDIO_ES )
-                    {
-                        input_SelectES( p_input,
-                                        p_input->stream.pp_es[i_ac3] );
-                    }
-                }
-                else
-                {
-                    input_SelectES( p_input,
-                                    p_input->stream.pp_es[i_audio] );
-                }
-            }
+            p_input->pf_init( p_input );
         }
 
-        if( p_main->b_video )
-        {
-            /* for spu, default is none */
-            i_spu = config_GetIntVariable( INPUT_SUBTITLE_VAR );
-            if( i_spu < 0 || i_spu > i_spu_nb )
-            {
-                i_spu = 0;
-            }
-            if( i_spu > 0 && i_spu_nb > 0 )
-            {
-                i_spu += vts.manager_inf.i_audio_nb;
-                input_SelectES( p_input, p_input->stream.pp_es[i_spu] );
-            }
-        }
     } /* i_title >= 0 */
     else
     {
@@ -808,160 +883,106 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
  * DVDRead: reads data packets.
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
- * packets.
+ * bytes.
  *****************************************************************************/
 static int DVDRead( input_thread_t * p_input,
-                    data_packet_t ** pp_data )
+                    byte_t * p_buffer, size_t i_count )
 {
     thread_dvd_data_t *     p_dvd;
-    struct iovec            p_vec[DVD_BLOCK_READ_ONCE];
-    u8 *                    pi_cur;
     int                     i_block_once;
-    int                     i_packet_size;
-    int                     i_iovec;
-    int                     i_packet;
-    int                     i_pos;
     int                     i_read_blocks;
+    int                     i_read_total;
     int                     i_sector;
+    int                     i_blocks;
     boolean_t               b_eoc;
-    data_packet_t *         p_data;
 
-    p_dvd = (thread_dvd_data_t *)p_input->p_plugin_data;
+    p_dvd = (thread_dvd_data_t *)(p_input->p_access_data);
 
-    *pp_data = NULL;
-
+    i_sector = 0;
+    i_read_total = 0;
+    i_read_blocks = 0;
     b_eoc = 0;
-    i_sector = p_dvd->i_title_start + p_dvd->i_sector;
-    i_block_once = p_dvd->i_end_sector - p_dvd->i_sector + 1;
 
+    i_blocks = OFF2LB(i_count);
 
-    /* Get the position of the next cell if we're at cell end */
-    if( i_block_once <= 0 )
+    while( i_blocks )
     {
-        int     i_angle;
-
-        p_dvd->i_cell++;
-        p_dvd->i_angle_cell++;
-
-        /* Find cell index in adress map */
-        if( DVDFindSector( p_dvd ) < 0 )
-        {
-            intf_ErrMsg( "dvd error: can't find next cell" );
-            return 1;
-        }
-
-        /* Position the fd pointer on the right address */
-        if( ( i_sector = dvdcss_seek( p_dvd->dvdhandle,
-                                      p_dvd->i_title_start + p_dvd->i_sector,
-                                      DVDCSS_SEEK_MPEG ) ) < 0 )
-        {
-            intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
-            return -1;
-        }
-
-        /* update chapter : it will be easier when we have navigation
-         * ES support */
-        if( p_dvd->i_chapter < ( p_dvd->i_chapter_nb - 1 ) )
-        {
-            if( title.p_cell_play[p_dvd->i_prg_cell].i_category & 0xf000 )
-            {
-                i_angle = p_dvd->i_angle - 1;
-            }
-            else
-            {
-                i_angle = 0;
-            }
-            if( title.chapter_map.pi_start_cell[p_dvd->i_chapter] <=
-                ( p_dvd->i_prg_cell - i_angle + 1 ) )
-            {
-                p_dvd->i_chapter++;
-                b_eoc = 1;
-            }
-        }
-
+        i_sector = p_dvd->i_title_start + p_dvd->i_sector;
         i_block_once = p_dvd->i_end_sector - p_dvd->i_sector + 1;
-    }
 
-    /* The number of blocks read is the max between the requested
-     * value and the leaving block in the cell */
-    if( i_block_once > p_dvd->i_block_once )
-    {
-        i_block_once = p_dvd->i_block_once;
-    }
-/*
-intf_WarnMsg( 2, "Sector: 0x%x Read: %d Chapter: %d", p_dvd->i_sector, i_block_once, p_dvd->i_chapter );
-*/
-
-    /* Get iovecs */
-    *pp_data = p_data = input_BuffersToIO( p_input->p_method_data, p_vec,
-                                           DVD_BLOCK_READ_ONCE );
-
-    if ( p_data == NULL )
-    {
-        return( -1 );
-    }
-
-    /* Reads from DVD */
-    i_read_blocks = dvdcss_readv( p_dvd->dvdhandle, p_vec,
-                                  i_block_once, DVDCSS_READ_DECRYPT );
-
-    /* Update global position */
-    p_dvd->i_sector += i_read_blocks;
-
-    i_packet = 0;
-
-    /* Read headers to compute payload length */
-    for( i_iovec = 0 ; i_iovec < i_read_blocks ; i_iovec++ )
-    {
-        data_packet_t * p_current = p_data;
-        i_pos = 0;
-
-        while( i_pos < DVD_LB_SIZE )
+        /* Get the position of the next cell if we're at cell end */
+        if( i_block_once <= 0 )
         {
-            pi_cur = (u8*)p_vec[i_iovec].iov_base + i_pos;
+            int     i_angle;
 
-            /* Default header */
-            if( U32_AT( pi_cur ) != 0x1BA )
+            p_dvd->i_cell++;
+            p_dvd->i_angle_cell++;
+
+            /* Find cell index in adress map */
+            if( DVDFindSector( p_dvd ) < 0 )
             {
-                /* That's the case for all packets, except pack header. */
-                i_packet_size = U16_AT( pi_cur + 4 );
-            }
-            else
-            {
-                /* MPEG-2 Pack header. */
-                i_packet_size = 8;
+                intf_ErrMsg( "dvd error: can't find next cell" );
+                return 1;
             }
 
-            if( i_pos != 0 )
+            /* Position the fd pointer on the right address */
+            if( ( i_sector = dvdcss_seek( p_dvd->dvdhandle,
+                                p_dvd->i_title_start + p_dvd->i_sector,
+                                DVDCSS_SEEK_MPEG ) ) < 0 )
             {
-                *pp_data = input_ShareBuffer( p_input->p_method_data,
-                                              p_current );
-            }
-            else
-            {
-                *pp_data = p_data;
-                p_data = p_data->p_next;
+                intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
+                return -1;
             }
 
-            (*pp_data)->p_payload_start = (*pp_data)->p_demux_start =
-                    (*pp_data)->p_demux_start + i_pos;
+            /* update chapter : it will be easier when we have navigation
+             * ES support */
+            if( p_dvd->i_chapter < ( p_dvd->i_chapter_nb - 1 ) )
+            {
+                if( title.p_cell_play[p_dvd->i_prg_cell].i_category & 0xf000 )
+                {
+                    i_angle = p_dvd->i_angle - 1;
+                }
+                else
+                {
+                    i_angle = 0;
+                }
+                if( title.chapter_map.pi_start_cell[p_dvd->i_chapter] <=
+                    ( p_dvd->i_prg_cell - i_angle + 1 ) )
+                {
+                    p_dvd->i_chapter++;
+                    b_eoc = 1;
+                }
+            }
 
-            (*pp_data)->p_payload_end =
-                    (*pp_data)->p_payload_start + i_packet_size + 6;
-
-            i_packet++;
-            i_pos += i_packet_size + 6;
-            pp_data = &(*pp_data)->p_next;
+            i_block_once = p_dvd->i_end_sector - p_dvd->i_sector + 1;
         }
-    }
 
-    p_input->pf_delete_packet( p_input->p_method_data, p_data );
-    *pp_data = NULL;
+        /* The number of blocks read is the max between the requested
+         * value and the leaving block in the cell */
+        if( i_block_once > i_blocks )
+        {
+            i_block_once = i_blocks;
+        }
+    /*
+    intf_WarnMsg( 2, "Sector: 0x%x Read: %d Chapter: %d", p_dvd->i_sector, i_block_once, p_dvd->i_chapter );
+    */
+
+        /* Reads from DVD */
+        i_read_blocks = dvdcss_read( p_dvd->dvdhandle, p_buffer,
+                                     i_block_once, DVDCSS_READ_DECRYPT );
+
+        i_blocks -= i_read_blocks;
+        p_buffer += LB2OFF( i_read_blocks );
+        i_read_total += i_read_blocks;
+
+        /* Update global position */
+        p_dvd->i_sector += i_read_blocks;
+    }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     p_input->stream.p_selected_area->i_tell =
-        LB2OFF( i_sector + i_read_blocks ) -
+        LB2OFF( i_sector + i_read_total ) -
         p_input->stream.p_selected_area->i_start;
     if( b_eoc )
     {
@@ -985,25 +1006,17 @@ intf_WarnMsg( 2, "Sector: 0x%x Read: %d Chapter: %d", p_dvd->i_sector, i_block_o
         p_dvd->i_title++;
         DVDSetArea( p_input, p_input->stream.pp_areas[p_dvd->i_title] );
         vlc_mutex_unlock( &p_input->stream.stream_lock );
-        return( i_packet );
+        return LB2OFF( i_read_total );
     }
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-
+/*
     if( i_read_blocks != i_block_once )
     {
         return -1;
     }
-
-    return( i_packet );
-}
-
-/*****************************************************************************
- * DVDRewind : reads a stream backward
- *****************************************************************************/
-static int DVDRewind( input_thread_t * p_input )
-{
-    return( -1 );
+*/
+    return LB2OFF( i_read_total );
 }
 
 /*****************************************************************************
@@ -1022,7 +1035,7 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     int                     i_chapter;
     int                     i_angle;
     
-    p_dvd = ( thread_dvd_data_t * )p_input->p_plugin_data;
+    p_dvd = ( thread_dvd_data_t * )(p_input->p_access_data);
 
     /* we have to take care of offset of beginning of title */
     p_dvd->i_sector = OFF2LB(i_off + p_input->stream.p_selected_area->i_start)
@@ -1121,7 +1134,6 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
 
     intf_WarnMsg( 7, "Program Cell: %d Cell: %d Chapter: %d",
                      p_dvd->i_prg_cell, p_dvd->i_cell, p_dvd->i_chapter );
-
 
     return;
 }

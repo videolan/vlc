@@ -6387,7 +6387,7 @@ if test "${with_dvdcss+set}" = set; then
    case "x${withval}" in
     xlocal-static|xyes)
       # local libdvdcss, statically linked
-      #BUILTINS="${BUILTINS} dvd"
+      BUILTINS="${BUILTINS} dvd"
       if test x${CAN_BUILD_LIBDVDCSS} = x1
       then
         NEED_LIBDVDCSS=1
@@ -6398,7 +6398,7 @@ if test "${with_dvdcss+set}" = set; then
     ;;
     xlocal-shared)
       # local libdvdcss, dynamically linked
-      #PLUGINS="${PLUGINS} dvd"
+      PLUGINS="${PLUGINS} dvd"
       if test x${CAN_BUILD_LIBDVDCSS} = x1
       then
         NEED_LIBDVDCSS=1
@@ -6408,7 +6408,7 @@ if test "${with_dvdcss+set}" = set; then
     ;;
     xno)
       # don't use libdvdcss at all, build a DVD module that can dlopen() it
-      #BUILTINS="${BUILTINS} dvd"
+      BUILTINS="${BUILTINS} dvd"
       DUMMY_LIBDVDCSS=1
       SRC_DVD_EXTRA="${SRC_DVD_EXTRA} dummy_dvdcss.c"
       CFLAGS_DVD="${CFLAGS_DVD} -DGOD_DAMN_DMCA"
@@ -6417,7 +6417,7 @@ if test "${with_dvdcss+set}" = set; then
     ;;
     *)
       # existing libdvdcss
-      #PLUGINS="${PLUGINS} dvd"
+      PLUGINS="${PLUGINS} dvd"
       if test "x$withval" != "xyes"
       then
         LIB_DVD="${LIB_DVD} -L"$withval"/lib"
@@ -6430,14 +6430,14 @@ else
   # if libdvdcss is in the archive, or to use the dummy replacement otherwise.
    if test x${CAN_BUILD_LIBDVDCSS} = x1
     then
-      #BUILTINS="${BUILTINS} dvd"
+      BUILTINS="${BUILTINS} dvd"
       NEED_LIBDVDCSS=1
       STATIC_LIBDVDCSS=1
       CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
       LIB_DVD="${LIB_DVD} lib/libdvdcss.a ${LIB_LIBDVDCSS}"
     else
       # XXX: no check for libdl is done, don't try this at home !
-      #BUILTINS="${BUILTINS} dvd"
+      BUILTINS="${BUILTINS} dvd"
       DUMMY_LIBDVDCSS=1
       SRC_DVD_EXTRA="${SRC_DVD_EXTRA} dummy_dvdcss.c"
       CFLAGS_DVD="${CFLAGS_DVD} -DGOD_DAMN_DMCA"

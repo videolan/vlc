@@ -2,7 +2,7 @@
  * dvdread.c : DvdRead input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dvdread.c,v 1.10 2002/02/26 01:17:13 stef Exp $
+ * $Id: dvdread.c,v 1.11 2002/03/01 01:12:28 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -32,7 +32,8 @@
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
-void _M( input_getfunctions )( function_list_t * p_function_list );
+void _M( access_getfunctions)( function_list_t * p_function_list );
+void _M( demux_getfunctions)( function_list_t * p_function_list );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -42,13 +43,14 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( "DVDRead input module" )
-    ADD_CAPABILITY( INPUT, 110 )
+    ADD_CAPABILITY( DEMUX, 210 )
+    ADD_CAPABILITY( ACCESS, 110 )
     ADD_SHORTCUT( "dvdread" )
-    
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
-    _M( input_getfunctions )( &p_module->p_functions->input );
+    _M( access_getfunctions)( &p_module->p_functions->access );
+    _M( demux_getfunctions)( &p_module->p_functions->demux );
 MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
