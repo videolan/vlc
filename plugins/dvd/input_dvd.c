@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.74 2001/06/14 02:47:45 sam Exp $
+ * $Id: input_dvd.c,v 1.75 2001/06/15 01:22:58 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -460,7 +460,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         p_dvd->i_sector = 0;
         p_dvd->i_size = vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector;
-        intf_WarnMsg( 2, "dvd info: stream size 1: %d", p_dvd->i_size );
 
         if( DVDChapterSelect( p_dvd, 1 ) < 0 )
         {
@@ -759,13 +758,14 @@ static int DVDRead( input_thread_t * p_input,
     int                     i_packet;
     int                     i_pos;
     int                     i_read_blocks;
-    off_t                   i_off;
+    int                     i_sector;
     boolean_t               b_eof;
     boolean_t               b_eot;
 
     p_dvd = (thread_dvd_data_t *)p_input->p_plugin_data;
     p_netlist = (dvd_netlist_t *)p_input->p_method_data;
 
+    i_sector = p_dvd->i_title_start + p_dvd->i_sector;
     i_block_once = p_dvd->i_end_sector - p_dvd->i_sector + 1;
 
     /* Get the position of the next cell if we're at cell end */
@@ -785,8 +785,8 @@ static int DVDRead( input_thread_t * p_input,
         }
 
         /* Position the fd pointer on the right address */
-        i_off = LB2OFF( dvdcss_seek( p_dvd->dvdhandle,
-                                     p_dvd->i_title_start + p_dvd->i_sector ) );
+        i_sector = dvdcss_seek( p_dvd->dvdhandle,
+                                p_dvd->i_title_start + p_dvd->i_sector );
 
         /* update chapter : it will be easier when we have navigation
          * ES support */
@@ -806,14 +806,6 @@ static int DVDRead( input_thread_t * p_input,
                 p_dvd->i_chapter++;
             }
         }
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-
-        p_input->stream.p_selected_area->i_tell = i_off -
-                                    p_input->stream.p_selected_area->i_start;
-        p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
-
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
 
         i_block_once = p_dvd->i_end_sector - p_dvd->i_sector + 1;
     }
@@ -911,9 +903,13 @@ static int DVDRead( input_thread_t * p_input,
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    p_input->stream.p_selected_area->i_tell += LB2OFF( i_read_blocks );
+    p_input->stream.p_selected_area->i_tell =
+        LB2OFF( i_sector + i_read_blocks ) -
+        p_input->stream.p_selected_area->i_start;
+    p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
+
     b_eot = !( p_input->stream.p_selected_area->i_tell
-                < LB2OFF( p_dvd->i_size ) );
+                  < p_input->stream.p_selected_area->i_size );
     b_eof = b_eot && ( ( p_dvd->i_title + 1 ) >= p_input->stream.i_area_nb );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
