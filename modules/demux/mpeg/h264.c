@@ -2,7 +2,7 @@
  * h264.c : H264 Video demuxer
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: m4v.c 7239 2004-04-02 03:24:53Z fenrir $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -39,6 +39,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_description( _("H264 video demuxer" ) );
     set_capability( "demux2", 0 );
+    add_float( "h264-fps", 25.0, NULL, "fps", "fps", VLC_TRUE );
     set_callbacks( Open, Close );
     add_shortcut( "h264" );
 vlc_module_end();
@@ -51,6 +52,7 @@ struct demux_sys_t
     mtime_t     i_dts;
     es_out_id_t *p_es;
 
+    float       f_fps;
     decoder_t *p_packetizer;
 };
 
@@ -69,6 +71,7 @@ static int Open( vlc_object_t * p_this )
     vlc_bool_t   b_forced = VLC_FALSE;
 
     uint8_t     *p_peek;
+    vlc_value_t val;
 
     if( stream_Peek( p_demux->s, &p_peek, 5 ) < 5 )
     {
@@ -99,6 +102,14 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys     = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->p_es        = NULL;
     p_sys->i_dts       = 1;
+    var_Create( p_demux, "h264-fps", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "h264-fps", &val );
+    p_sys->f_fps = val.f_float;
+    if( val.f_float < 0.001 )
+    {
+        p_sys->f_fps = 0.001;
+    }
+    msg_Dbg( p_demux, "using %.2f fps", p_sys->f_fps );
 
     /*
      * Load the mpegvideo packetizer
@@ -181,7 +192,7 @@ static int Demux( demux_t *p_demux)
             p_block_out = p_next;
 
             /* FIXME FIXME FIXME FIXME */
-            p_sys->i_dts += (mtime_t)1000000 / 25;
+            p_sys->i_dts += (int64_t)((double)1000000.0 / p_sys->f_fps);
             /* FIXME FIXME FIXME FIXME */
         }
     }
