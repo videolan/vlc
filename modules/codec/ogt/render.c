@@ -2,7 +2,7 @@
  * render.c : Philips OGT (SVCD Subtitle) renderer
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: render.c,v 1.11 2004/01/12 13:12:07 rocky Exp $
+ * $Id: render.c,v 1.12 2004/01/14 04:50:02 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -139,7 +139,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
   int i_x_start, i_y_start, i_x_end, i_y_end;
   /* int i=0; */
 
-  struct subpicture_sys_t *p_sys = p_spu->p_sys;
+  const struct subpicture_sys_t *p_sys = p_spu->p_sys;
   
   dbg_print( (DECODE_DBG_CALL|DECODE_DBG_RENDER), 
 	     "spu width x height: (%dx%d), (x,y)=(%d,%d), yuv pitch (%d,%d,%d)", 
@@ -173,21 +173,33 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
       uint8_t *p_pixel_base_U_y = p_pixel_base_U + i_y/4;
       uint8_t *p_pixel_base_V_y = p_pixel_base_V + i_y/4;
 
+      i_x = 0;
+
+      if ( b_crop ) {
+        if ( i_y > i_y_end ) break;
+        if (i_x_start) {
+          i_x = i_x_start;
+          p_source += i_x_start;
+        }
+      }
+
       even_scanline = !even_scanline;
 
-      /* printf("+++begin line: %d,\n", i++); */
       /* Draw until we reach the end of the line */
-      for( i_x = 0; i_x < p_spu->i_width; i_x++, p_source++ )
+      for( ; i_x < p_spu->i_width; i_x++, p_source++ )
 	{
-	  if( b_crop
-	      && ( i_x < i_x_start || i_x > i_x_end
-		   || i_y < i_y_start || i_y > i_y_end ) )
+
+	  if( b_crop ) {
+
+            /* FIXME: y cropping should be dealt with outside of this loop.*/
+            if ( i_y < i_y_start) continue;
+
+            if ( i_x > i_x_end )
 	    {
-	      continue;
+	      p_source += p_spu->i_width - i_x;
+              break;
 	    }
-	  
-	  /* printf( "t: %x, y: %x, u: %x, v: %x\n", 
-	     p_source->s.t, p_source->y, p_source->u, p_source->v ); */
+          }
 	  
 	  switch( p_source->s.t )
 	    {
@@ -299,12 +311,13 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
   ogt_yuvt_t *p_source;
 
   int i_x, i_y;
+  const uint16_t i_spu_width = p_spu->i_width;
 
   /* Crop-specific */
   int i_x_start, i_y_start, i_x_end, i_y_end;
   /* int i=0; */
 
-  struct subpicture_sys_t *p_sys = p_spu->p_sys;
+  const struct subpicture_sys_t *p_sys = p_spu->p_sys;
   
   dbg_print( (DECODE_DBG_CALL|DECODE_DBG_RENDER), 
 	     "spu width x height: (%dx%d), (x,y)=(%d,%d), pitch: %d", 
@@ -320,7 +333,7 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
   
   i_x_end   = p_sys->i_x_end;
   i_y_end   = p_sys->i_y_end   * p_pic->p->i_pitch;
-  
+
   p_source = (ogt_yuvt_t *)p_sys->p_data;
   
   /* Draw until we reach the bottom of the subtitle */
@@ -330,19 +343,33 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
     {
       uint8_t *p_pixel_base_y = p_pixel_base + i_y;
 
-      /* printf("+++begin line: %d,\n", i++); */
+      i_x = 0;
+
+      if ( b_crop ) {
+        if ( i_y > i_y_end ) break;
+        if (i_x_start) {
+          i_x = i_x_start;
+          p_source += i_x_start;
+        }
+      }
+  
+
       /* Draw until we reach the end of the line */
-      for( i_x = 0; i_x < p_spu->i_width; i_x++, p_source++ )
+      for( ;  i_x < i_spu_width; i_x++, p_source++ )
 	{
-	  if( b_crop
-	      && ( i_x < i_x_start || i_x > i_x_end
-		   || i_y < i_y_start || i_y > i_y_end ) )
+
+	  if( b_crop ) {
+
+            /* FIXME: y cropping should be dealt with outside of this loop.*/
+            if ( i_y < i_y_start) continue;
+
+            if ( i_x > i_x_end )
 	    {
-	      continue;
+	      p_source += p_spu->i_width - i_x;
+              break;
 	    }
-	  
-	  /* printf( "t: %x, y: %x, u: %x, v: %x\n", 
-	     p_source->s.t, p_source->y, p_source->u, p_source->v ); */
+          }
+  
 	  
 	  switch( p_source->s.t )
 	    {
@@ -359,11 +386,11 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 		uint8_t *p_pixel = p_pixel_base_y + i_x * 2;
 		
 		/* draw a two contiguous pixels: 2 Y values, 1 U, and 1 V. */
-		*p_pixel++ = p_source->plane[Y_PLANE];
-		*p_pixel++ = p_source->plane[V_PLANE];
-		*p_pixel++ = (p_source+1)->plane[Y_PLANE];
-		*p_pixel++ = p_source->plane[U_PLANE];
-
+		*p_pixel++ = p_source->plane[Y_PLANE] ;
+                *p_pixel++ = p_source->plane[V_PLANE] ;
+		*p_pixel++ = p_source->plane[Y_PLANE] ;
+                *p_pixel++ = p_source->plane[U_PLANE] ;
+                
 		break;
 	      }
 
@@ -382,10 +409,6 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 		uint16_t i_sub_color_Y1 = 
 		  (uint16_t) ( p_source->plane[Y_PLANE] *
 			       (uint16_t) (p_source->s.t) );
-
-		uint16_t i_sub_color_Y2 = 
-		  (uint16_t) ( p_source->plane[Y_PLANE] *
-			       (uint16_t) ((p_source+1)->s.t) );
 
 		/* This is the weighted part of the underlying pixels.
 		   For the same reasons above, the result is up to 12
@@ -407,9 +430,6 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 		uint16_t i_pixel_color_U = 
 		  (uint16_t) ( *(p_pixel+1) * 
 			       (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
-		uint16_t i_pixel_color_Y2 = 
-		  (uint16_t) ( *(p_pixel+2) * 
-			       (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
 		uint16_t i_pixel_color_V = 
 		  (uint16_t) ( *(p_pixel+3) * 
 			       (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
@@ -425,9 +445,9 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 		   But we deal with them in special cases above. */
 
 		*p_pixel++ = ( i_sub_color_Y1 + i_pixel_color_Y1 ) >> 4;
-		*p_pixel++ = ( i_sub_color_U + i_pixel_color_U ) >> 4;
-		*p_pixel++ = ( i_sub_color_Y2 + i_pixel_color_Y2 ) >> 4;
 		*p_pixel++ = ( i_sub_color_V + i_pixel_color_V ) >> 4;
+		*p_pixel++ = ( i_sub_color_Y1 + i_pixel_color_Y1 ) >> 4;
+		*p_pixel++ = ( i_sub_color_U + i_pixel_color_U ) >> 4;
 		break;
 	      }
 	    }
@@ -435,7 +455,45 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
     }
 }
 
-#define Y2RV16(val) ((uint16_t) (0x1111 * ( (uint16_t) (val) >> 4 )))
+/* 
+   FIXME: 
+   MOVE clip_8_bit and uuv2rgb TO A MORE GENERIC PLACE.
+ */
+
+/* Force v in the range 0.255 */
+static inline uint8_t 
+clip_8_bit(int v)
+{
+  if (v<0)   return 0;
+  if (v>255) return 255;
+  return (uint8_t) v;
+}
+
+static inline void
+yuv2rgb16(ogt_yuvt_t *p_yuv, uint8_t *p_rgb1, uint8_t *p_rgb2 )
+{
+  
+  int i_Y  = p_yuv->s.y - 16;
+  int i_Cb = p_yuv->s.v - 128;
+  int i_Cr = p_yuv->s.u - 128;
+  
+  int i_red   = (1.1644 * i_Y) + (1.5960 * i_Cr);
+  int i_green = (1.1644 * i_Y) - (0.3918 * i_Cb) - (0.8130 * i_Cr);
+  int i_blue  = (1.1644 * i_Y) + (2.0172 * i_Cb);
+  
+  i_red   = clip_8_bit( i_red ) >> 3;
+  i_green = clip_8_bit( i_green ) >> 3;
+  i_blue  = clip_8_bit( i_blue ) >> 3;
+  
+  *p_rgb1 = (i_blue << 3) | (i_red & 0x18 >> 3);
+  *p_rgb2 = (i_red & 0x07 << 5) | (i_green & 0x1F);
+
+
+#if 0
+  printf("Y,Cb,Cr = (%d,%d,%d), r,g,b=(%d,%d,%d), rgb1: %x, rgb2 %x\n",
+         i_Y, i_Cb, i_Cr, i_red, i_green, i_blue, *p_rgb1, *p_rgb2);
+#endif
+}
 
 static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop )
@@ -483,7 +541,8 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
 
     /* Draw until we reach the bottom of the subtitle */
     i_y = 0;
-    for( i_y_src = 0 ; i_y_src < p_spu->i_height ; i_y_src++ )
+    for( i_y_src = 0 ; i_y_src < p_spu->i_height * p_spu->i_width; 
+         i_y_src += p_spu->i_width )
     {
 	uint8_t *p_pixel_base_y;
         i_ytmp = i_y >> 6;
@@ -528,16 +587,17 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
 		    /* Completely opaque. Completely overwrite underlying
 		       pixel with subtitle pixel. */
 		
-		    uint16_t i_colprecomp = Y2RV16(p_source->plane[Y_PLANE]);
-
 		    /* This is the location that's going to get changed.
 		     */
 		    uint8_t *p_dest = p_pixel_base_y + 2 * (i_x >> 6 );
-#if 1
-                    memset( p_dest, i_colprecomp, 2*i_xscale );
-#else 
-                    memset( p_dest, 0xFFFF, 2*i_xscale );
-#endif
+                    int i;
+                    uint8_t i_rgb1;
+                    uint8_t i_rgb2;
+                    yuv2rgb16(p_source, &i_rgb1, &i_rgb2);
+                    for (i=0; i< 2*i_xscale; i+=2) {
+                      *p_dest++ = i_rgb1;
+                      *p_dest++ = i_rgb2;
+                    }
 		    break;
 		  }
 
@@ -604,19 +664,26 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
 		  {
 		    /* Completely opaque. Completely overwrite underlying
 		       pixel with subtitle pixel. */
-		    uint16_t i_colprecomp = Y2RV16(p_source->plane[Y_PLANE]);
+
+		    /* This is the location that's going to get changed.
+		     */
 		    uint8_t *p_pixel_base_x = p_pixel_base + 2 * ( i_x >> 6 );
-		    
-		    printf("++multiline\n");
 
                     for(  ; i_ytmp < i_ynext ; i_ytmp += p_pic->p->i_pitch )
                     {
 		      /* This is the location that's going to get changed.  */
 		      uint8_t *p_dest = p_pixel_base_x + i_ytmp;
 #if 1
-		      memset( p_dest, i_colprecomp, 2*i_xscale );
+                    int i;
+                    uint8_t i_rgb1;
+                    uint8_t i_rgb2;
+                    yuv2rgb16(p_source, &i_rgb1, &i_rgb2);
+                    for (i=0; i< 2*i_xscale; i+=2) {
+                      *p_dest++ = i_rgb1;
+                      *p_dest++ = i_rgb2;
+                    }
 #else 
-		      memset( p_dest, 0xFFFF, 2*i_xscale );
+		      memset( p_dest, 0xFF, 2*i_xscale );
 #endif
                     }
                     break;
