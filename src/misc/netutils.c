@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.63 2002/05/15 11:06:17 marcari Exp $
+ * $Id: netutils.c,v 1.64 2002/05/25 19:15:50 marcari Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -262,15 +262,15 @@ int network_ChannelJoin( int i_channel )
     recv( i_fd, psz_mess, MESSAGE_LENGTH, 0 );
     psz_mess[ MESSAGE_LENGTH - 1 ] = '\0';
 
-    if( !strncasecmp( psz_mess, "E: ", 3 ) )
+    if( !strncasecmp( psz_mess, "E:", 2 ) )
     {
-        intf_ErrMsg( "network error: vlcs said '%s'", psz_mess + 3 );
+        intf_ErrMsg( "network error: vlcs said '%s'", psz_mess + 2 );
         close( i_fd );
         return -1;
     }
-    else if( !strncasecmp( psz_mess, "I: ", 3 ) )
+    else if( !strncasecmp( psz_mess, "I:", 2 ) )
     {
-        intf_WarnMsg( 2, "network info: vlcs said '%s'", psz_mess + 3 );
+        intf_WarnMsg( 2, "network info: vlcs said '%s'", psz_mess + 2 );
     }
     else /* We got something to play ! FIXME: not very nice */
     {
