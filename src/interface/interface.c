@@ -17,6 +17,10 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
@@ -36,6 +40,7 @@
 #include "xconsole.h"
 #include "interface.h"
 #include "intf_msg.h"
+#include "intf_cmd.h"
 
 #include "pgm_data.h"
 /* ?? remove useless headers */
@@ -96,7 +101,10 @@ int intf_Run( intf_thread_t *p_intf )
 static int StartInterface( intf_thread_t *p_intf )
 {
     int i_thread;                                              /* thread index */
-    
+#ifdef AUTO_SPAWN
+    int fd;
+#endif
+
     /* Empty all threads array */
     for( i_thread = 0; i_thread < VOUT_MAX_THREADS; i_thread++ )
     {
@@ -113,6 +121,16 @@ static int StartInterface( intf_thread_t *p_intf )
         intf_ErrMsg("intf error: can't open X11 console\n");
         return( 1 );
     }
+
+#ifdef AUTO_SPAWN
+    /* Execute the initialization script (typically spawn an input thread) */
+    if ( (fd = open( INIT_SCRIPT, O_RDONLY )) != -1 )
+    {
+        /* Startup script does exist */
+        close( fd );
+        intf_ExecScript( "vlc.init" );
+    }
+#endif
 
     return( 0 );
 }

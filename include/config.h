@@ -26,7 +26,7 @@
 //#define DVB_RESTRICTIONS
 
 /* Define for profiling support */
-#define STATS
+//#define STATS
 
 /* Define for unthreaded version of the program - ?? not yet implemented */
 //#define NO_THREAD
@@ -55,6 +55,12 @@
 /*******************************************************************************
  * Common settings
  *******************************************************************************/
+
+/* Automagically spawn input, audio and video threads ? */
+#define AUTO_SPAWN
+
+/* Startup script */
+#define INIT_SCRIPT	"vlc.init"
 
 /* ?? */
 #define THREAD_SLEEP    100000

@@ -434,6 +434,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
   u16 i_es_pid;
 
   int i_index = 0;
+  int i_es_loop;
   pgrm_descriptor_t* p_pgrm;
   es_descriptor_t* p_es;
 
@@ -590,7 +591,27 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
           /* Check if the PMT is now complete */
           p_descr->i_known_PMT_sections++;
           if( p_descr->i_known_PMT_sections >= i_last_section)
-            p_descr->b_is_PMT_complete = 1;
+          {
+              p_descr->b_is_PMT_complete = 1;
+
+#ifdef AUTO_SPAWN
+              /* Spawn an audio and a video thread, if possible. */
+              for( i_es_loop = 0; i_es_loop < INPUT_MAX_ES; i_es_loop++ )
+              {
+                  switch( p_input->p_es[i_es_loop].i_type )
+                  {
+                  case MPEG1_VIDEO_ES:
+                  case MPEG2_VIDEO_ES:
+                  case MPEG1_AUDIO_ES:
+                  case MPEG2_AUDIO_ES:
+                      /* Spawn an audio thread */
+                      input_AddPgrmElem( p_input, p_input->p_es[i_es_loop].i_id );
+                      break;
+                  default:
+                  }
+              }
+#endif
+          }
         }
     }
 

@@ -33,9 +33,9 @@ void input_PcrReInit( input_thread_t *p_input )
     p_pcr = p_input->p_pcr;
 
     p_pcr->c_average = 0;
-    p_pcr->c_average_jitter = 0;
 
 #ifdef STATS
+    p_pcr->c_average_jitter = 0;
     p_pcr->c_pcr = 0;
     p_pcr->max_jitter = 0;
 

@@ -327,7 +327,7 @@ static void input_Thread( input_thread_t *p_input )
             p_input->b_die = 1;
         }
 
-#ifdef DEBUG
+#ifdef STATS
         p_input->c_loops++;
 #endif
     }
