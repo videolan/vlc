@@ -304,6 +304,12 @@ libdvdcss-install:
 libdvdcss-uninstall:
 	-cd extras/libdvdcss && $(MAKE) uninstall
 
+libdvdread-install:
+	-cd extras/libdvdread && $(MAKE) install
+
+libdvdread-uninstall:
+	-cd extras/libdvdread && $(MAKE) uninstall
+
 po-install:
 	-cd po && $(MAKE) install
 

@@ -3,9 +3,7 @@
 # (c)2001 VideoLAN
 ###############################################################################
 
-LIBDVDREAD_VERSION := 0.9.2
-CFLAGS_LIBDVDREAD := -I. -DHAVE_CONFIG_H
-LIB_LIBDVDREAD := -ldl
+LIBDVDREAD_VERSION := 0.9.2-videolan
 
 BASE_A := libdvdread.a
 BASE_SO := libdvdread.so
@@ -19,7 +17,7 @@ endif
 #
 # C headers directories
 #
-CFLAGS := -I../../include -I../../extras $(CFLAGS)
+CFLAGS := -I../../include $(CFLAGS_DVDREAD) $(CFLAGS)
 
 #
 # Objects
@@ -36,26 +34,39 @@ C_DEP := $(ALL_OBJ:%.o=.dep/%.d)
 #
 # Virtual targets
 #
-all: ../../lib/$(BASE_A)
+all: ../../lib/$(BASE_A) ../../lib/$(FULL_SO)
 
 clean:
 	rm -f $(ALL_OBJ)
 	rm -f *.o
 	rm -rf .dep
 
+install:
+	mkdir -p $(DESTDIR)$(libdir)
+	-$(INSTALL) -m 644 ../../lib/$(BASE_A) $(DESTDIR)$(libdir)
+	-$(INSTALL) -m 644 ../../lib/$(FULL_SO) $(DESTDIR)$(libdir)
+	rm -f $(DESTDIR)$(libdir)/$(BASE_SO) && ln -s $(FULL_SO)                $(DESTDIR)$(libdir)/$(BASE_SO)
+	rm -f $(DESTDIR)$(libdir)/$(MAJOR_SO) && ln -s $(FULL_SO)               $(DESTDIR)$(libdir)/$(MAJOR_SO)
+
+uninstall:
+	rm -f $(DESTDIR)$(libdir)/$(BASE_A)
+	rm -f $(DESTDIR)$(libdir)/$(BASE_SO)
+	rm -f $(DESTDIR)$(libdir)/$(MAJOR_SO)
+	rm -f $(DESTDIR)$(libdir)/$(FULL_SO)
+
 FORCE:
 
 $(ALL_OBJ): %.o: ../../Makefile.dep Makefile
 
 $(C_DEP): %.d: FORCE
-	        @$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@
+	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@
 
 $(OBJ_C): %.o: .dep/%.d
 $(OBJ_C): %.o: %.c
-	$(CC) $(CFLAGS) $(CFLAGS_DVDREAD) $(CFLAGS_LIBDVDREAD) $(PCFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
 
 ../../lib/$(FULL_SO): $(OBJ_C) $(OBJ_LIBDVDREAD)
-	$(CC) $(PCFLAGS) $(ALL_SOFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_LIBDVDREAD)
+	$(CC) $(PCFLAGS) $(ALL_SOFLAGS) -o $@ $^ $(PLDFLAGS) $(LIB_LIBDVDREAD)
 	rm -f ../../lib/$(BASE_SO) && ln -s $(FULL_SO) ../../lib/$(BASE_SO)
 	rm -f ../../lib/$(MAJOR_SO) && ln -s $(FULL_SO) ../../lib/$(MAJOR_SO)
 

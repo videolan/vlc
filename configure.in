@@ -759,91 +759,119 @@ AC_ARG_WITH(dvdcss,
   [ case "x${withval}" in
     xlocal-static|xyes)
       # local libdvdcss, statically linked
+      BUILTINS="${BUILTINS} dvd"
       if test x${CAN_BUILD_LIBDVDCSS} = x1
       then
         NEED_LIBDVDCSS=1
         STATIC_LIBDVDCSS=1
-        BUILTINS="${BUILTINS} dvd"
         CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
         LIB_DVD="${LIB_DVD} lib/libdvdcss.a ${LIB_LIBDVDCSS}"
-        LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} ../../lib/libdvdcss.a ${LIB_LIBDVDCSS}"
-        LIB_DVDREAD="${LIB_DVDREAD} lib/libdvdread.a lib/libdvdcss.a ${LIB_LIBDVDCSS}"
-        LIB_DVDREAD_PLUGIN="${LIB_DVDREAD_PLUGIN} ../../lib/libdvdcss.a ${LIB_LIBDVDCSS}"
       fi
     ;;
     xlocal-shared)
       # local libdvdcss, dynamically linked
+      PLUGINS="${PLUGINS} dvd"
       if test x${CAN_BUILD_LIBDVDCSS} = x1
       then
         NEED_LIBDVDCSS=1
-        BUILTINS="${BUILTINS} dvd"
         CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
-        LIB_DVD="${LIB_DVD} -Llib -ldvdcss"
-        LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -L../../lib -ldvdcss"
-        LIB_DVDREAD="${LIB_DVD} -Llib -ldvdread -ldvdcss"
-        LIB_DVDREAD_PLUGIN="${LIB_DVDREAD_PLUGIN} -L../../lib -ldvdcss"
+        LIB_DVD="${LIB_DVD} -L../../lib -ldvdcss"
       fi
     ;;
     xno)
       # don't use libdvdcss at all, build a DVD module that can dlopen() it
-      DUMMY_LIBDVDCSS=1
       BUILTINS="${BUILTINS} dvd"
+      DUMMY_LIBDVDCSS=1
       SRC_DVD_EXTRA="${SRC_DVD_EXTRA} dummy_dvdcss.c"
       CFLAGS_DVD="${CFLAGS_DVD} -DGOD_DAMN_DMCA"
       CFLAGS_DVD="${CFLAGS_DVD} -DLIBDVDCSS_VERSION=\"${LIBDVDCSS_VERSION}\""
       LIB_DVD="${LIB_DVD} -ldl"
-      LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -ldl"
-      LIB_DVDREAD="${LIB_DVDREAD} lib/libdvdread.a -ldl"
-      LIB_DVDREAD_PLUGIN="${LIB_DVDREAD_PLUGIN} -ldl"
     ;;
     *)
       # existing libdvdcss
-      BUILTINS="${BUILTINS} dvd"
+      PLUGINS="${PLUGINS} dvd"
       if test "x$withval" != "xyes"
       then
-        LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -L"$withval"/lib"
-        LIB_DVDREAD_PLUGIN="${LIB_DVDREAD_PLUGIN} -L"$withval"/lib"
+        LIB_DVD="${LIB_DVD} -L"$withval"/lib"
         CFLAGS_DVD="${CFLAGS_DVD} -I"$withval"/include"
       fi
       LIB_DVD="${LIB_DVD} -ldvdcss"
-      LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -ldvdcss"
-      LIB_DVDREAD="${LIB_DVDREAD} -ldvdread -ldvdcss"
-      LIB_DVDREAD_PLUGIN="${LIB_DVDREAD_PLUGIN} -ldvdread -ldvdcss"
     esac ],
   # user didn't decide, we choose to use local libdvdcss and link statically
   # if libdvdcss is in the archive, or to use the dummy replacement otherwise.
   [ if test x${CAN_BUILD_LIBDVDCSS} = x1
     then
+      BUILTINS="${BUILTINS} dvd"
       NEED_LIBDVDCSS=1
       STATIC_LIBDVDCSS=1
-      BUILTINS="${BUILTINS} dvd"
       CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
       LIB_DVD="${LIB_DVD} lib/libdvdcss.a ${LIB_LIBDVDCSS}"
-      LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} ../../lib/libdvdcss.a ${LIB_LIBDVDCSS}"
-      LIB_DVDREAD="${LIB_DVDREAD} lib/libdvdread.a lib/libdvdcss.a ${LIB_LIBDVDCSS}"
-      LIB_DVDREAD_PLUGIN="${LIB_DVDREAD_PLUGIN} ../../lib/libdvdread.a ../../lib/libdvdcss.a ${LIB_LIBDVDCSS}"
     else
       # XXX: no check for libdl is done, don't try this at home !
-      DUMMY_LIBDVDCSS=1
       BUILTINS="${BUILTINS} dvd"
+      DUMMY_LIBDVDCSS=1
       SRC_DVD_EXTRA="${SRC_DVD_EXTRA} dummy_dvdcss.c"
       CFLAGS_DVD="${CFLAGS_DVD} -DGOD_DAMN_DMCA"
       LIB_DVD="${LIB_DVD} -ldl"
-      LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -ldl"
-      LIB_DVDREAD="${LIB_DVDREAD} lib/libdvdread.a -ldl"
-      LIB_DVDREAD_PLUGIN="${LIB_DVDREAD_PLUGIN} -ldl"
     fi ])
 
 dnl
 dnl DVDREAD module: check for libdvdread plugin
 dnl
-AC_ARG_ENABLE(dvdread,
-[  --enable-dvdread          Enable dvdread support (default disabled)],
-[ if test x$enableval = xyes
-  then
-    BUILTINS="${BUILTINS} dvdread" 
-    CFLAGS_DVDREAD="${CFLAGS_DVD} ${CFLAGS_DVDREAD} -I../../extras/libdvdread"
-  fi ])
+if test x${DUMMY_LIBDVDCSS} = x1; then STATIC_LIBDVDREAD=1; fi
+if test x${STATIC_LIBDVDCSS} = x1; then STATIC_LIBDVDREAD=1; fi
+AC_ARG_WITH(dvdread,
+  [  --with-dvdread[=name]   way to use libdvdread,
+                          same options as --with-dvdcss (default no)],
+  [ case "x${withval}" in
+    xlocal-static|xyes)
+      if test x${STATIC_LIBDVDREAD} = x1
+      then
+        BUILTINS="${BUILTINS} dvdread" 
+        CFLAGS_DVDREAD="${CFLAGS_DVDREAD} ${CFLAGS_DVD} -I../../extras/libdvdread"
+        LIB_DVDREAD="${LIB_DVDREAD} lib/libdvdread.a ${LIB_DVD}"
+      else
+	AC_MSG_ERROR([Can't link static dvdread with shared dvdcss])
+      fi
+    ;;
+    xno)
+    ;;
+    x)
+      if test x${STATIC_LIBDVDREAD} = x1
+      then
+        BUILTINS="${BUILTINS} dvdread" 
+        CFLAGS_DVDREAD="${CFLAGS_DVDREAD} ${CFLAGS_DVD} -I../../extras/libdvdread"
+        LIB_DVDREAD="${LIB_DVDREAD} lib/libdvdread.a ${LIB_DVD}"
+      else
+        PLUGINS="${PLUGINS} dvdread"
+        CFLAGS_DVDREAD="${CFLAGS_DVDREAD} -I../../extras/libdvdread  ${CFLAGS_DVD}"
+        LIB_DVDREAD="${LIB_DVDREAD} -Llib -ldvdread ${LIB_DVD}"
+      fi 
+    ;;
+    *)
+      if test "x$withval" != "xlocal-shared"
+      then
+        LIB_DVDREAD="${LIB_DVDREAD} -L"$withval"/lib"
+        CFLAGS_DVDREAD="${CFLAGS_DVDREAD} -I"$withval"/include"
+      else
+        LIB_DVDREAD="${LIB_DVDREAD} -L../../lib"
+        CFLAGS_DVDREAD="${CFLAGS_DVDREAD} -I../../extras/libdvdread"
+      fi
+      if test x${STATIC_LIBDVDCSS} = x1
+      then
+	AC_MSG_ERROR([Can't link shared dvdread with static dvdcss])
+      else
+        PLUGINS="${PLUGINS} dvdread"
+        CFLAGS_DVDREAD="${CFLAGS_DVDREAD} ${CFLAGS_DVD}"
+        LIB_DVDREAD="${LIB_DVDREAD} -ldvdread ${LIB_DVD}"
+      fi
+    esac
+    if test x${DUMMY_LIBDVDCSS} = x1
+    then
+      LIB_LIBDVDREAD="${LIB_LIBDVDREAD} -ldl"
+    else
+      LIB_LIBDVDREAD="${LIB_LIBDVDREAD} -L../../lib -ldvdcss"
+    fi ])
 
 dnl
 dnl  VCD module
@@ -1431,9 +1459,7 @@ AC_SUBST(LIB_BEOS)
 AC_SUBST(LIB_DARWIN)
 AC_SUBST(LIB_DIRECTX)
 AC_SUBST(LIB_DVD)
-AC_SUBST(LIB_DVD_PLUGIN)
 AC_SUBST(LIB_DVDREAD)
-AC_SUBST(LIB_DVDREAD_PLUGIN)
 AC_SUBST(LIB_ESD)
 AC_SUBST(LIB_FILTER_DISTORT)
 AC_SUBST(LIB_GGI)
@@ -1446,6 +1472,7 @@ AC_SUBST(LIB_IMDCT3DN)
 AC_SUBST(LIB_IMDCTSSE)
 AC_SUBST(LIB_KDE)
 AC_SUBST(LIB_LIBDVDCSS)
+AC_SUBST(LIB_LIBDVDREAD)
 AC_SUBST(LIB_MACOSX)
 AC_SUBST(LIB_MAD)
 AC_SUBST(LIB_MOTIONALTIVEC)
