@@ -2,7 +2,7 @@
  * preferences.cpp: preferences window for the kde gui
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.cpp,v 1.15 2003/04/09 12:03:44 sam Exp $
+ * $Id: preferences.cpp,v 1.16 2003/05/05 14:58:45 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -194,6 +194,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
             break;
 
             case CONFIG_ITEM_FILE:
+            case CONFIG_ITEM_DIRECTORY:
             {
                 QHBox *hb = new QHBox(category_table);
                 hb->setSpacing(spacingHint());
@@ -211,6 +212,10 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                 KURLRequester *kfile = new KURLRequester( p_item->psz_value ?
                                                           p_item->psz_value : "",
                                                           hb );
+                if ( p_item->i_type == CONFIG_ITEM_DIRECTORY )
+                {
+                    kfile->setMode(KFile::Directory|KFile::ExistingOnly|KFile::LocalOnly);
+                }
                 connect(kfile, SIGNAL(textChanged ( const QString & )),
                         ci, SLOT(setValue( const QString &)));
                 QToolTip::add(kfile, p_item->psz_longtext);
@@ -358,6 +363,7 @@ void KPreferences::slotApply()
 
             switch( p_config->getType() ) {
 
+            case CONFIG_ITEM_DIRECTORY:
             case CONFIG_ITEM_STRING:
             case CONFIG_ITEM_FILE:
             case CONFIG_ITEM_MODULE:
