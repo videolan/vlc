@@ -34,9 +34,14 @@ ACLOCAL_ARGS="-I m4"
 # Check for contrib directory
 if test -d extras/contrib/bin; then
   export PATH=./extras/contrib/bin:$PATH
-  export LD_LIBRARY_PATH=./extras/contrib/lib:$LD_LIBRARY_PATH
-  export DYLD_LIBRARY_PATH=./extras/contrib/lib:$DYLD_LIBRARY_PATH
   ACLOCAL_ARGS="${ACLOCAL_ARGS} -I extras/contrib/share/aclocal"
+  if test ".`uname -s`" = ".Darwin"; then
+    export LD_LIBRARY_PATH=./extras/contrib/lib:$LD_LIBRARY_PATH
+    export DYLD_LIBRARY_PATH=./extras/contrib/lib:$DYLD_LIBRARY_PATH
+  elif test ".`uname -s`" = ".BeOS"; then
+    export LIBRARY_PATH=./extras/contrib/lib:$LIBRARY_PATH
+    export BELIBRARIES=./extras/contrib/lib:$BELIBRARIES
+  fi
 fi
 
 # Check for automake
