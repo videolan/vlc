@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.23 2003/05/05 15:21:27 sigmunau Exp $
+ * $Id: variables.c,v 1.24 2003/05/11 18:43:19 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -408,7 +408,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             INSERT_ELEM( p_var->choices.p_values, p_var->choices.i_count,
                          i, *p_val );
             INSERT_ELEM( p_var->choices_text.p_values,
-                         p_var->choices_text.i_count, i, (vlc_value_t)0 );
+                         p_var->choices_text.i_count, i, *p_val );
             p_var->pf_dup( &p_var->choices.p_values[i] );
             p_var->choices_text.p_values[i].psz_string =
                 ( p_val2 && p_val2->psz_string ) ?

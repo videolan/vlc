@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.109 2003/05/11 18:40:11 hartman Exp $
+ * $Id: input_programs.c,v 1.110 2003/05/11 18:43:19 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -635,6 +635,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
         text.psz_string = p_es->psz_desc;
         var_Change( p_input, psz_var, VLC_VAR_ADDCHOICE, &val, &text );
     }
+    else p_es->psz_desc = NULL;
 
     return p_es;
 }
