@@ -802,13 +802,17 @@ DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
 libdts-$(LIBDTS_VERSION).tar.gz:
 	$(WGET) $(LIBDTS_URL)
 
+ifeq ($(SYS),DARWIN)
 # libdts 0.0.2 doesn't compile on BeOS
-#libdts: libdts-$(LIBDTS_VERSION).tar.gz
-#	$(EXTRACT_GZ)
+libdts: libdts-$(LIBDTS_VERSION).tar.gz
+	$(EXTRACT_GZ)
+endif
 
+ifeq ($(SYS),BEOS)
 libdts:
 	svn co svn://svn.videolan.org/libdts/trunk libdts
 	(cd $@; ./bootstrap)
+endif
 
 .dts: libdts
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
