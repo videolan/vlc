@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.29 2003/08/09 14:59:24 gbazin Exp $
+ * $Id: transcode.c,v 1.30 2003/08/11 20:48:19 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1509,8 +1509,11 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             frame = id->p_ff_pic_tmp2;
         }
 
-        /* Set the pts of the frame being encoded */
-        frame->pts = p_sys->i_output_pts;
+        /* Set the pts of the frame being encoded (segfaults with mpeg4!)*/
+        if( id->f_dst.i_fourcc == VLC_FOURCC( 'm', 'p', 'g', 'v' ) )
+            frame->pts = p_sys->i_output_pts;
+        else
+            frame->pts = 0;
 
         /* Interpolate the next PTS
          * (needed by the mpeg video packetizer which can send pts <= 0 ) */
