@@ -3,7 +3,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.62 2003/11/05 00:40:08 hartman Exp $
+ * $Id: vout.m,v 1.63 2003/11/06 16:28:28 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -143,7 +143,6 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     p_vout->p_sys->p_matrix = (MatrixRecordPtr)malloc( sizeof(MatrixRecord) );
     p_vout->p_sys->p_fullscreen_state = NULL;
 
-    p_vout->p_sys->b_mouse_pointer_visible = VLC_TRUE;
     p_vout->p_sys->b_mouse_moved = VLC_TRUE;
     p_vout->p_sys->i_time_mouse_last_moved = mdate();
 
@@ -423,40 +422,14 @@ static int vout_Manage( vout_thread_t *p_vout )
      * it has to deal with multiple monitors and therefore checks a lot */
     if( !p_vout->p_sys->b_mouse_moved && p_vout->b_fullscreen )
     {
-        if( mdate() - p_vout->p_sys->i_time_mouse_last_moved > 2000000 && 
-                   p_vout->p_sys->b_mouse_pointer_visible )
+        if( mdate() - p_vout->p_sys->i_time_mouse_last_moved > 3000000 )
         {
             VLCHideMouse( p_vout, YES );
-        }
-        else if ( !p_vout->p_sys->b_mouse_pointer_visible )
-        {
-            vlc_bool_t b_playing = NO;
-            input_thread_t * p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT,
-                                                                    FIND_ANYWHERE );
-
-            if ( p_input != NULL )
-            {
-                vlc_value_t state;
-                var_Get( p_input, "state", &state );
-                b_playing = state.i_int != PAUSE_S;
-                vlc_object_release( p_input );
-            }
-            if ( !b_playing )
-            {
-                VLCHideMouse( p_vout, NO );
-            }
         }
     }
     else if ( p_vout->p_sys->b_mouse_moved && p_vout->b_fullscreen )
     {
-        if( !p_vout->p_sys->b_mouse_pointer_visible )
-        {
-            VLCHideMouse( p_vout, NO );
-        }
-        else
-        {
-            p_vout->p_sys->b_mouse_moved = NO;
-        }
+        VLCHideMouse( p_vout, NO );
     }
     
     return( 0 );
@@ -574,7 +547,7 @@ static int CoCreateWindow( vout_thread_t *p_vout )
  *****************************************************************************/
 static int CoDestroyWindow( vout_thread_t *p_vout )
 {
-    if( !p_vout->p_sys->b_mouse_pointer_visible )
+    if( [[NSCursor currentCursor] image] == NULL )
     {
         VLCHideMouse( p_vout, NO );
     }
@@ -641,13 +614,11 @@ static void VLCHideMouse ( vout_thread_t *p_vout, BOOL b_hide )
     if ( b_hide && b_inside )
     {
         /* only hide if mouse over VLCView */
-        [NSCursor hide];
-        p_vout->p_sys->b_mouse_pointer_visible = 0;
+        [NSCursor setHiddenUntilMouseMoves: YES];
     }
     else if ( !b_hide )
     {
-        [NSCursor unhide];
-        p_vout->p_sys->b_mouse_pointer_visible = 1;
+        [NSCursor setHiddenUntilMouseMoves: NO];
     }
     p_vout->p_sys->b_mouse_moved = NO;
     p_vout->p_sys->i_time_mouse_last_moved = mdate();
@@ -1004,8 +975,29 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( key )
     {
-        val.i_int |= CocoaConvertKey( key );
-        var_Set( p_vout->p_vlc, "key-pressed", val );
+        /* Escape should always get you out of fullscreen */
+        if( key == (unichar) 0x1b )
+        {
+             if( [self isFullscreen] )
+             {
+                 [self toggleFullscreen];
+             }
+        }
+        else if ( key == ' ' )
+        {
+             playlist_t *p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
+                                                     FIND_ANYWHERE );
+             if ( p_playlist != NULL )
+             {
+                 playlist_Pause( p_playlist );
+                 vlc_object_release( p_playlist);
+             }
+        }
+        else
+        {
+            val.i_int |= CocoaConvertKey( key );
+            var_Set( p_vout->p_vlc, "key-pressed", val );
+        }
     }
     else
     {
@@ -1306,13 +1298,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         p_vout->p_sys->i_time_mouse_last_moved = mdate();
         p_vout->p_sys->b_mouse_moved = YES;
     }
-    else if ( !b_inside && !p_vout->p_sys->b_mouse_pointer_visible )
-    {
-        /* people with multiple monitors need their mouse,
-         * even if VLCView in fullscreen. */
-        VLCHideMouse( p_vout, NO );
-    }
-    
+
     [super mouseMoved: o_event];
 }
 

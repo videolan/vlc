@@ -75,6 +75,7 @@
                 "o_btn_slower" = id; 
                 "o_btn_stop" = id; 
                 "o_controls" = id; 
+                "o_dmi_mute" = id; 
                 "o_dmi_next" = id; 
                 "o_dmi_play" = id; 
                 "o_dmi_previous" = id; 

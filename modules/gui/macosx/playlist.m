@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.34 2003/10/19 23:12:16 hartman Exp $
+ * $Id: playlist.m,v 1.35 2003/11/06 16:28:28 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -81,10 +81,6 @@ int MacVersion102 = -1;
     
     switch( key )
     {
-        case ' ':
-            [(VLCControls *)[[NSApp delegate] getControls] play: nil];
-            break;
-
         case NSDeleteCharacter:
         case NSDeleteFunctionKey:
         case NSDeleteCharFunctionKey:

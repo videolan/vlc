@@ -2,7 +2,7 @@
  * vout.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.h,v 1.14 2003/11/05 00:40:08 hartman Exp $
+ * $Id: vout.h,v 1.15 2003/11/06 16:28:28 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -79,7 +79,6 @@ struct vout_sys_t
     int isplugin;
 
     vlc_bool_t b_mouse_moved;
-    vlc_bool_t b_mouse_pointer_visible;
     mtime_t i_time_mouse_last_moved;
 
 #ifdef __QUICKTIME__
