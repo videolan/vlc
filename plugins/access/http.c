@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.15 2002/07/15 23:05:46 jlj Exp $
+ * $Id: http.c,v 1.16 2002/07/23 20:32:55 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -433,7 +433,7 @@ static int HTTPOpen( input_thread_t * p_input )
     {
         char * psz_pos = strstr(p_access_data->psz_buffer, "HTTP/1.1");
         p_input->stream.b_seekable = 0;
-        psz_pos[7] = 0;
+        psz_pos[7] = '0';
         if( HTTPConnect( p_input, 0 ) )
         {
             free( p_input->p_access_data );
