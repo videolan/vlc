@@ -1,10 +1,10 @@
 /*****************************************************************************
- * audio.c : mpeg audio Stream input module for vlc
+ * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3tag.c,v 1.1 2002/08/24 21:35:31 sigmunau Exp $
+ * $Id: id3tag.c,v 1.2 2002/10/13 14:26:48 sigmunau Exp $
  *
- * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

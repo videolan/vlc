@@ -2,7 +2,7 @@
  * QConfigItem.h : includes for the QConfigItem class
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: QConfigItem.h,v 1.2 2002/08/12 17:38:10 sigmunau Exp $
+ * $Id: QConfigItem.h,v 1.3 2002/10/13 14:26:47 sigmunau Exp $
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001
  *
@@ -42,16 +42,19 @@ class QConfigItem : public QObject
     float fValue();
     int iValue();
     QString sValue();
+    bool changed();
 
  public slots:
     void setValue(int val);
     void setValue(float val);
     void setValue(double val);
     void setValue(const QString &val);
+    void resetChanged();
     
  private:
     int iVal, type;
     float fVal;
     QString sVal;
+    bool bChanged;
 };
 #endif

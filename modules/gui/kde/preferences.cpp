@@ -2,7 +2,7 @@
  * preferences.cpp: preferences window for the kde gui
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.cpp,v 1.6 2002/10/10 19:34:06 sigmunau Exp $
+ * $Id: preferences.cpp,v 1.7 2002/10/13 14:26:47 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -183,10 +183,10 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                 QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
                                                   p_item->i_type,
                                                   p_item->i_value);
+                item_adj->setValue( p_item->i_value );
                 connect(item_adj, SIGNAL(valueChanged( int)),
                         ci, SLOT(setValue(int)));
                 QToolTip::add(item_adj, p_item->psz_longtext);
-                item_adj->setValue( p_item->i_value );
             }
             break;
 
@@ -281,29 +281,33 @@ void KPreferences::slotApply()
     while ( (obj=it.current()) != 0 ) {
         ++it;
         QConfigItem *p_config = (QConfigItem *)obj;
-        msg_Dbg( p_intf, const_cast<char *>(p_config->name()));
-        msg_Dbg( p_intf, "%d", p_config->getType());
+        if ( p_config->changed() )
+        {
+            msg_Dbg( p_intf, const_cast<char *>(p_config->name()));
+            msg_Dbg( p_intf, "%d", p_config->getType());
 
-        switch( p_config->getType() ) {
+            switch( p_config->getType() ) {
 
-        case CONFIG_ITEM_STRING:
-        case CONFIG_ITEM_FILE:
-        case CONFIG_ITEM_MODULE:
-            if (p_config->sValue()) {
-                config_PutPsz( p_intf, p_config->name(),
-                               strdup(p_config->sValue().latin1()));
+            case CONFIG_ITEM_STRING:
+            case CONFIG_ITEM_FILE:
+            case CONFIG_ITEM_MODULE:
+                if (p_config->sValue()) {
+                    config_PutPsz( p_intf, p_config->name(),
+                                   strdup(p_config->sValue().latin1()));
+                }
+                else {
+                    config_PutPsz( p_intf, p_config->name(), NULL );
+                }
+                break;
+            case CONFIG_ITEM_INTEGER:
+            case CONFIG_ITEM_BOOL:
+                config_PutInt( p_intf, p_config->name(), p_config->iValue() );
+                break;
+            case CONFIG_ITEM_FLOAT:
+                config_PutFloat( p_intf, p_config->name(), p_config->fValue() );
+                break;
             }
-            else {
-                config_PutPsz( p_intf, p_config->name(), NULL );
-            }
-            break;
-        case CONFIG_ITEM_INTEGER:
-        case CONFIG_ITEM_BOOL:
-            config_PutInt( p_intf, p_config->name(), p_config->iValue() );
-            break;
-        case CONFIG_ITEM_FLOAT:
-            config_PutFloat( p_intf, p_config->name(), p_config->fValue() );
-            break;
+            p_config->resetChanged();
         }
     }
     delete l;

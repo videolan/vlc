@@ -2,7 +2,7 @@
  * QConfigItem.cpp: The QConfigItem class
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: QConfigItem.cpp,v 1.2 2002/08/12 17:38:10 sigmunau Exp $
+ * $Id: QConfigItem.cpp,v 1.3 2002/10/13 14:26:47 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon 12.08.2002
  *
@@ -27,6 +27,7 @@ QConfigItem::QConfigItem(QObject *parent, QString name, int iType, int i_val) :
 {
     type = iType;
     iVal = i_val;
+    bChanged = false;
 }
 
 QConfigItem::QConfigItem(QObject *parent, QString name, int iType, float f_val) :
@@ -34,6 +35,7 @@ QConfigItem::QConfigItem(QObject *parent, QString name, int iType, float f_val) 
 {
     type = iType;
     fVal = f_val;
+    bChanged = false;
 }
 
 QConfigItem::QConfigItem(QObject *parent, QString name, int iType, QString s_val) :
@@ -41,6 +43,7 @@ QConfigItem::QConfigItem(QObject *parent, QString name, int iType, QString s_val
 {
     type = iType;
     sVal = s_val;
+    bChanged = false;
 }
 
 QConfigItem::~QConfigItem()
@@ -71,19 +74,33 @@ QString QConfigItem::sValue()
 void QConfigItem::setValue(int val)
 {
     iVal = val;
+    bChanged = true;
 }
 
 void QConfigItem::setValue(float val)
 {
     fVal = val;
+    bChanged = true;
 }
 
 void QConfigItem::setValue(double val)
 {
     fVal = (float)val;
+    bChanged = true;
 }
 
 void QConfigItem::setValue(const QString &val)
 {
     sVal = val;
+    bChanged = true;
+}
+
+bool QConfigItem::changed()
+{
+    return bChanged;
+}
+
+void QConfigItem::resetChanged()
+{
+    bChanged = false;
 }
