@@ -282,14 +282,14 @@ EXTRA_DIST += \
 	msvc/libvlc.dsp.in \
 	msvc/plugins.dsp.in \
 	msvc/vlc.dsp.in \
-	msvc/config.h \
+	msvc/config.h.in \
 	msvc/modules_builtin_msvc.h \
 	evc/vlc.vcw \
 	evc/libvlc.vcp.in \
 	evc/vlc.vcp.in \
 	evc/plugins.vcp.in \
 	evc/vlc.c \
-	evc/config.h \
+	evc/config.h.in \
 	evc/modules_builtin_evc.h \
 	$(NULL)
 
