@@ -52,6 +52,13 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "mux", "", NULL, "mux", "", VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "url", "", NULL, "url", "", VLC_TRUE );
 
+    add_bool( SOUT_CFG_PREFIX "sap", 0, NULL, "sap", "", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "sap-name", "", NULL, "sap name", "", VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "sap-ipv6", 0, NULL, "sap ipv6", "", VLC_TRUE );
+
+    add_bool( SOUT_CFG_PREFIX "slp", 0, NULL, "slp", "", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "slp-name", "", NULL, "slp name", "", VLC_TRUE );
+
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -60,7 +67,10 @@ vlc_module_end();
  * Exported prototypes
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "access", "mux", "url", NULL
+    "access", "mux", "url",
+    "sap", "sap-name", "sap-ipv6",
+    "slp", "slp-name",
+    NULL
 };
 
 #define DEFAULT_IPV6_SCOPE '8'
@@ -89,11 +99,6 @@ static int Open( vlc_object_t *p_this )
     char *psz_mux;
     char *psz_access;
     char *psz_url;
-
-    sout_cfg_t *p_sap_cfg = sout_cfg_find( p_stream->p_cfg, "sap" );
-#ifdef HAVE_SLP_H
-    sout_cfg_t *p_slp_cfg = sout_cfg_find( p_stream->p_cfg, "slp" );
-#endif
 
     vlc_value_t val;
 
@@ -264,7 +269,8 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_stream, "mux opened" );
 
     /*  *** Create the SAP Session structure *** */
-    if( psz_access &&  p_sap_cfg &&
+    var_Get( p_stream, SOUT_CFG_PREFIX "sap", &val );
+    if( val.b_bool &&
         ( strstr( psz_access, "udp" ) || strstr( psz_access ,  "rtp" ) ) )
     {
         session_descriptor_t *p_session = sout_AnnounceSessionCreate();
@@ -272,43 +278,18 @@ static int Open( vlc_object_t *p_this )
             sout_AnnounceMethodCreate( METHOD_TYPE_SAP );
         vlc_url_t url;
 
-        /* Parse user input */
-        if( p_sap_cfg->psz_value )
+        var_Get( p_stream, SOUT_CFG_PREFIX "sap-name", &val );
+        if( *val.psz_string )
         {
-            char *psz_sap = p_sap_cfg->psz_value;
-            /* subconfig */
-            if( ! strncmp(psz_sap, "sap{", 4 ) )
-            {
-                sout_cfg_t *p_cfg;
-                char *psz_curr,*psz_null;
-                sout_cfg_parser( &psz_null, &p_cfg, psz_sap );
-                psz_curr =  sout_cfg_find_value( p_cfg,"name");
-                if( psz_curr != NULL)
-                {
-                    p_session->psz_name = strdup( psz_curr );
-                }
-                else
-                {
-                    p_session->psz_name = strdup( psz_url );
-
-                }
-
-                psz_curr = sout_cfg_find_value( p_cfg,"ip_version");
-                if( psz_curr != NULL)
-                {
-                    p_method->i_ip_version =
-                        atoi( psz_curr ) != 0 ? atoi(psz_curr) : 4;
-                }
-            }
-            else
-            {
-                p_session->psz_name = strdup( p_sap_cfg->psz_value );
-            }
+            p_session->psz_name = val.psz_string;
         }
         else
         {
+            free( val.psz_string );
             p_session->psz_name = strdup( psz_url );
         }
+        var_Get( p_stream, SOUT_CFG_PREFIX "sap-ipv6", &val );
+        p_method->i_ip_version = val.b_bool ? 6 : 4;
 
         /* Now, parse the URL to extract host and port */
         vlc_UrlParse( &url, psz_url , 0);
@@ -340,12 +321,25 @@ static int Open( vlc_object_t *p_this )
 
     /* *** Register with slp *** */
 #ifdef HAVE_SLP_H
-    if( p_slp_cfg && ( strstr( psz_access, "udp" ) ||
-                       strstr( psz_access ,  "rtp" ) ) )
+    var_Get( p_stream, SOUT_CFG_PREFIX "slp", &val );
+    if( val.b_bool &&
+        ( strstr( psz_access, "udp" ) || strstr( psz_access ,  "rtp" ) ) )
     {
+        int i_ret;
+
         msg_Info( p_this, "SLP Enabled");
-        if( sout_SLPReg( p_sout, psz_url,
-            p_slp_cfg->psz_value ? p_slp_cfg->psz_value : psz_url) )
+        var_Get( p_stream, SOUT_CFG_PREFIX "sap-name", &val );
+        if( *val.psz_string )
+        {
+            i_ret = sout_SLPReg( p_sout, psz_url, val.psz_string );
+        }
+        else
+        {
+            i_ret = sout_SLPReg( p_sout, psz_url, psz_url );
+        }
+        free( val.psz_string );
+
+        if( i_ret )
         {
            msg_Warn( p_sout, "SLP Registering failed");
         }
