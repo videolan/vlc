@@ -35,8 +35,8 @@ class PngBitmap: public GenericBitmap
     public:
         /// Load a PNG bitmap from a file. aColor is the transparency
         /// color, in the format 0xRRGGBB
-        PngBitmap( intf_thread_t *pIntf, string fileName,
-                   uint32_t aColor );
+        PngBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
+                   string fileName, uint32_t aColor );
 
         virtual ~PngBitmap();
 

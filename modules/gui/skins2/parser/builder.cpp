@@ -48,12 +48,19 @@
 #include "../utils/var_bool.hpp"
 #include "../utils/var_text.hpp"
 
+#include "vlc_image.h"
 
-Builder::Builder( intf_thread_t *pIntf, const BuilderData &rData):
+
+Builder::Builder( intf_thread_t *pIntf, const BuilderData &rData ):
     SkinObject( pIntf ), m_rData( rData ), m_pTheme( NULL )
 {
+    m_pImageHandler = image_HandlerCreate( pIntf );
 }
 
+Builder::~Builder()
+{
+    if( m_pImageHandler ) image_HandlerDelete( m_pImageHandler );
+}
 
 CmdGeneric *Builder::parseAction( const string &rAction )
 {
@@ -133,15 +140,17 @@ void Builder::addTheme( const BuilderData::Theme &rData )
 
 void Builder::addBitmap( const BuilderData::Bitmap &rData )
 {
-    GenericBitmap *pBmp = new PngBitmap( getIntf(), rData.m_fileName,
-                                         rData.m_alphaColor );
+    GenericBitmap *pBmp =
+        new PngBitmap( getIntf(), m_pImageHandler,
+                       rData.m_fileName, rData.m_alphaColor );
     m_pTheme->m_bitmaps[rData.m_id] = GenericBitmapPtr( pBmp );
 }
 
 
 void Builder::addBitmapFont( const BuilderData::BitmapFont &rData )
 {
-    GenericBitmap *pBmp = new PngBitmap( getIntf(), rData.m_file, 0 );
+    GenericBitmap *pBmp =
+        new PngBitmap( getIntf(), m_pImageHandler, rData.m_file, 0 );
     m_pTheme->m_bitmaps[rData.m_id] = GenericBitmapPtr( pBmp );
 
     GenericFont *pFont = new BitmapFont( getIntf(), *pBmp, rData.m_type );

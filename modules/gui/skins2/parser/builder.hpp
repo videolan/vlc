@@ -47,7 +47,7 @@ class Builder: public SkinObject
 {
     public:
         Builder( intf_thread_t *pIntf, const BuilderData &rData );
-        virtual ~Builder() {}
+        virtual ~Builder();
 
         /// Create a Theme object, ready to use.
         /// Return NULL in case of problem
@@ -90,6 +90,9 @@ class Builder: public SkinObject
 
         /// Function to parse "points" tags
         Bezier *getPoints( const char *pTag ) const;
+
+        /// Image handler (used to load image files)
+        image_handler_t *m_pImageHandler;
 };
 
 #endif
