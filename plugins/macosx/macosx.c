@@ -2,7 +2,7 @@
  * macosx.c : MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: macosx.c,v 1.7 2001/10/30 10:48:14 massiot Exp $
+ * $Id: macosx.c,v 1.8 2001/11/29 15:56:37 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -32,9 +32,11 @@
 #include "defs.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 
