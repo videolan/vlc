@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.5 2001/12/03 16:18:37 sam Exp $
+ * $Id: spu_decoder.c,v 1.5.2.1 2001/12/13 23:56:18 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -187,34 +187,29 @@ static int spu_dec_Run( decoder_config_t * p_config )
  *****************************************************************************/
 static int spu_dec_Init( spudec_thread_t *p_spudec )
 {
+    int i_retry = 0;
+
     /* Spawn a video output if there is none */
     vlc_mutex_lock( &p_vout_bank->lock );
 
-    if( p_vout_bank->i_count == 0 )
+    while( p_vout_bank->i_count == 0 )
     {
-        intf_WarnMsg( 1, "spudec: no vout present, spawning one" );
+        vlc_mutex_unlock( &p_vout_bank->lock );
 
-        p_spudec->p_vout = vout_CreateThread( NULL, 0, 0 );
-
-        /* Everything failed */
-        if( p_spudec->p_vout == NULL )
+        if( i_retry++ > 10 )
         {
-            intf_Msg( "spudec: can't open vout, aborting" );
-            vlc_mutex_unlock( &p_vout_bank->lock );
+            intf_WarnMsg( 1, "spudec: waited too long for vout, aborting" );
             free( p_spudec );
 
             return( -1 );
         }
 
-        p_vout_bank->pp_vout[ p_vout_bank->i_count ] = p_spudec->p_vout;
-        p_vout_bank->i_count++;
+        msleep( VOUT_OUTMEM_SLEEP );
+        vlc_mutex_lock( &p_vout_bank->lock );
     }
-    else
-    {
-        /* Take the first video output FIXME: take the best one */
-        p_spudec->p_vout = p_vout_bank->pp_vout[ 0 ];
-    }
-
+    
+    /* Take the first video output FIXME: take the best one */
+    p_spudec->p_vout = p_vout_bank->pp_vout[ 0 ];
     vlc_mutex_unlock( &p_vout_bank->lock );
     p_spudec->p_config->pf_init_bit_stream(
             &p_spudec->bit_stream,

@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.2.2.1 2001/12/10 10:59:14 massiot Exp $
+ * $Id: vpar_headers.c,v 1.2.2.2 2001/12/13 23:56:18 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -782,7 +782,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
             {
                 return;
             }
-            msleep( VPAR_OUTMEM_SLEEP );
+            msleep( VOUT_OUTMEM_SLEEP );
         }
 
         /* Initialize values. */
