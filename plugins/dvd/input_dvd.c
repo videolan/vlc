@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.83 2001/07/30 18:56:35 gbazin Exp $
+ * $Id: input_dvd.c,v 1.84 2001/08/06 13:28:00 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -59,7 +59,11 @@
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif
 
-#include <videolan/dvdcss.h>
+#ifdef GOD_DAMN_DMCA
+#   include "dummy_dvdcss.h"
+#else
+#   include <videolan/dvdcss.h>
+#endif
 
 #include "config.h"
 #include "common.h"

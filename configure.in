@@ -1,15 +1,24 @@
 dnl Autoconf settings for vlc and libdvdcss
-AC_INIT(include/main.h)
+AC_INIT(include/common.h)
 AC_CONFIG_HEADER(include/defs.h)
 
 AC_CANONICAL_HOST
 
-VLC_VERSION=0.2.81
-AC_SUBST(VLC_VERSION)
-LIBDVDCSS_VERSION=0.0.2
-AC_SUBST(LIBDVDCSS_VERSION)
-VLC_CODENAME=Ourumov
-AC_SUBST(VLC_CODENAME)
+HAVE_VLC=0
+if test -r src/interface/main.c; then
+  HAVE_VLC=1
+  VLC_VERSION=0.2.81
+  AC_SUBST(VLC_VERSION)
+  VLC_CODENAME=Ourumov
+  AC_SUBST(VLC_CODENAME)
+fi
+
+HAVE_LIBDVDCSS=0
+if test -r extras/libdvdcss/libdvdcss.c; then
+  HAVE_LIBDVDCSS=1
+  LIBDVDCSS_VERSION=0.0.2
+  AC_SUBST(LIBDVDCSS_VERSION)
+fi
 
 dnl Save CFLAGS
 save_CFLAGS="${CFLAGS}"
@@ -109,7 +118,7 @@ void foo() { int meuh; ntohl(meuh); }],,
  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl Check for inline function size limit
-CFLAGS="${save_CFLAGS} -finline-limit=12"
+CFLAGS="${save_CFLAGS} -finline-limit=31337"
 AC_MSG_CHECKING([if \$CC accepts -finline-limit])
 AC_TRY_COMPILE([],,
  save_CFLAGS="${save_CFLAGS} -finline-limit=31337"; AC_MSG_RESULT(yes),
@@ -177,14 +186,17 @@ dnl
 dnl  libdvdcss: check for DVD ioctls
 dnl
 
+dnl  default is no
+CAN_BUILD_LIBDVDCSS=0
+
 dnl  for windoze
 AC_CHECK_HEADERS(winioctl.h,[
-  CAN_BUILD_LIBDVDCSS=1
+  CAN_BUILD_LIBDVDCSS="${HAVE_LIBDVDCSS}"
 ])
 
-dnl  for Un*x
+dnl  for Un*x and BeOS
 AC_CHECK_HEADERS(sys/ioctl.h,[
-  CAN_BUILD_LIBDVDCSS=1
+  CAN_BUILD_LIBDVDCSS="${HAVE_LIBDVDCSS}"
   AC_CHECK_HEADERS(sys/cdio.h sys/dvdio.h linux/cdrom.h)
   BSD_DVD_STRUCT=0
   dnl
@@ -215,6 +227,7 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
               Define if <linux/cdrom.h> defines DVD_STRUCT.)
   ])
 ])
+
 
 dnl
 dnl  Check the operating system
@@ -318,8 +331,9 @@ dnl  DVD module: check for installed libdvdcss or local libdvdcss
 dnl
 LOCAL_LIBDVDCSS=0
 STATIC_LIBDVDCSS=0
+DUMMY_LIBDVDCSS=0
 AC_ARG_WITH(dvdcss,
-  [  --with-dvdcss[=name]    way to use libdvdcss, either local-static, local-shared or a path to another libdvdcss such as /usr/local (default local-static)],
+  [  --with-dvdcss[=name]    way to use libdvdcss, either 'yes' or 'no', or 'local-static', 'local-shared', or a path to another libdvdcss such as '/usr/local' (default 'local-static')],
   [ case "x${withval}" in
     xlocal-static|xyes)
       # local libdvdcss, statically linked
@@ -344,6 +358,15 @@ AC_ARG_WITH(dvdcss,
         LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -L../../lib -ldvdcss"
       fi
     ;;
+    xno)
+      # don't use libdvdcss at all, build a DVD module that can dlopen() it
+      DUMMY_LIBDVDCSS=1
+      BUILTINS="${BUILTINS} dvd"
+      OBJ_DVD="${OBJ_DVD} dummy_dvdcss.o"
+      CFLAGS_DVD="${CFLAGS_DVD} -DGOD_DAMN_DMCA"
+      LIB_DVD="${LIB_DVD} -ldl"
+      LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -ldl"
+    ;;
     *)
       # existing libdvdcss
       BUILTINS="${BUILTINS} dvd"
@@ -356,6 +379,7 @@ AC_ARG_WITH(dvdcss,
       LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -ldvdcss"
     esac ],
   # user didn't decide, we choose to use local libdvdcss and link statically
+  # if libdvdcss is in the archive, or to use the dummy replacement otherwise.
   [ if test x${CAN_BUILD_LIBDVDCSS} = x1
     then
       LOCAL_LIBDVDCSS=1
@@ -364,24 +388,15 @@ AC_ARG_WITH(dvdcss,
       CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
       LIB_DVD="${LIB_DVD} lib/libdvdcss.a"
       LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} ../../lib/libdvdcss.a"
+    else
+      # XXX: no check for libdl is done, don't try this at home !
+      DUMMY_LIBDVDCSS=1
+      BUILTINS="${BUILTINS} dvd"
+      OBJ_DVD="${OBJ_DVD} dummy_dvdcss.o"
+      CFLAGS_DVD="${CFLAGS_DVD} -DGOD_DAMN_DMCA"
+      LIB_DVD="${LIB_DVD} -ldl"
+      LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -ldl"
     fi ])
-
-dnl
-dnl  CSS DVD decryption (for libdvdcss)
-dnl
-CSS=0
-AC_ARG_ENABLE(css,
-  [  --disable-css           Disable DVD CSS decryption (default enabled)],
-  [ if test x$enableval = xyes
-    then
-      CSS=1
-    fi ],
-  [ CSS=1; ])
-
-if test x${CSS} = x1
-then
-  AC_DEFINE(HAVE_CSS, 1, Define if you want DVD CSS decryption.)
-fi
 
 dnl
 dnl  dummy plugin
@@ -502,7 +517,10 @@ dnl  Linux framebuffer module
 dnl
 AC_ARG_ENABLE(fb,
   [  --enable-fb             Linux framebuffer support (default disabled)],
-  [if test x$enable_fb = xyes; then PLUGINS="${PLUGINS} fb"; fi])
+  [ if test x$enable_fb = xyes
+    then
+      PLUGINS="${PLUGINS} fb"
+    fi ])
 
 dnl
 dnl  GGI module
@@ -767,7 +785,6 @@ AC_SUBST(TRACE)
 AC_SUBST(PROFILING)
 AC_SUBST(OPTIMS)
 AC_SUBST(GETOPT)
-AC_SUBST(CSS)
 AC_SUBST(MOC)
 AC_SUBST(WINDRES)
 
@@ -804,6 +821,8 @@ AC_SUBST(CFLAGS_GTK)
 AC_SUBST(CFLAGS_SDL)
 AC_SUBST(CFLAGS_X11)
 
+AC_SUBST(OBJ_DVD)
+
 AC_SUBST(LOCAL_LIBDVDCSS)
 
 AC_OUTPUT([Makefile.opts include/config.h])
@@ -813,8 +832,11 @@ global configuration
 --------------------
 system                : ${SYS}
 architecture          : ${ARCH}
-optimizations         : ${OPTIMS}
+optimizations         : ${OPTIMS}"
 
+if test x${HAVE_VLC} = x1
+then
+  echo "
 vlc configuration
 -----------------
 vlc version           : ${VLC_VERSION}
@@ -825,20 +847,32 @@ profiling             : ${PROFILING}
 need builtin getopt   : ${GETOPT}
 built-in modules      :${BUILTINS}
 plugin modules        :${PLUGINS}
-vlc aliases           :${ALIASES}
-
-libdvdcss configuration
------------------------
-need to be built      : ${LOCAL_LIBDVDCSS}"
-
-if test x${LOCAL_LIBDVDCSS} = x1
-then
-  echo "link statically       : ${STATIC_LIBDVDCSS}
-CSS decryption        : ${CSS}"
+vlc aliases           :${ALIASES}"
 fi
 
 echo "
-You may now tune Makefile.opts at your convenience. To build vlc and its
-plugins, type \`make vlc plugins'. If you want to build libdvdcss only,
-type \`make libdvdcss'."
+libdvdcss configuration
+-----------------------
+can be built          : ${CAN_BUILD_LIBDVDCSS}
+will be built         : ${LOCAL_LIBDVDCSS}"
+if test x${LOCAL_LIBDVDCSS} = x1
+then
+  echo "link statically       : ${STATIC_LIBDVDCSS}"
+else
+  echo "use dummy replacement : ${DUMMY_LIBDVDCSS}"
+fi
+
+echo "
+You may now tune Makefile.opts at your convenience, for instance to choose
+which modules get compiled as plugins.
+"
+if test x${HAVE_VLC} = x1
+then
+  echo "To build vlc and its plugins, type \`make vlc'."
+fi
+if test x${HAVE_LIBDVDCSS} = x1
+then
+  echo "To build libdvdcss only, type \`make libdvdcss'."
+fi
+echo ""
 

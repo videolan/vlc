@@ -34,10 +34,10 @@ $(BUILTIN_QT:%.o=%.moc): BUILTIN_%.moc: %.cpp
 # Real targets
 #
 
-../../plugins/qt.so: $(PLUGIN_QT)
+../qt.so: $(PLUGIN_QT)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_QT)
 
-../../plugins/qt.a: $(BUILTIN_QT)
+../qt.a: $(BUILTIN_QT)
 	ar r $@ $^
 	$(RANLIB) $@
 

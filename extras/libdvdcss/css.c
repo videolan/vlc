@@ -2,7 +2,7 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.7 2001/07/27 01:05:17 sam Exp $
+ * $Id: css.c,v 1.8 2001/08/06 13:27:59 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -45,22 +45,18 @@
 #include "videolan/dvdcss.h"
 #include "libdvdcss.h"
 
-#ifdef HAVE_CSS
-#   include "csstables.h"
-#endif /* HAVE_CSS */
+#include "csstables.h"
 #include "ioctl.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-#ifdef HAVE_CSS
 static int  CSSGetASF    ( dvdcss_handle dvdcss );
 static void CSSCryptKey  ( int i_key_type, int i_varient,
                            u8 const * p_challenge, u8* p_key );
 static int  CSSCracker   ( int i_start, unsigned char * p_crypted,
                            unsigned char * p_decrypted,
                            dvd_key_t * p_sector_key, dvd_key_t * p_key );
-#endif /* HAVE_CSS */
 
 /*****************************************************************************
  * CSSTest : check if the disc is encrypted or not
@@ -92,7 +88,6 @@ int CSSTest( dvdcss_handle dvdcss )
  *****************************************************************************/
 int CSSInit( dvdcss_handle dvdcss )
 {
-#ifdef HAVE_CSS
     /* structures defined in cdrom.h or dvdio.h */
     unsigned char p_buffer[2048 + 4 + 1];
     char psz_warning[32];
@@ -284,12 +279,7 @@ int CSSInit( dvdcss_handle dvdcss )
             return -1;
     }
 
-#else /* HAVE_CSS */
-    _dvdcss_error( dvdcss, "CSS decryption is disabled in this library" );
-
-#endif /* HAVE_CSS */
     return -1;
-
 }
 
 /*****************************************************************************
@@ -299,7 +289,6 @@ int CSSInit( dvdcss_handle dvdcss )
  *****************************************************************************/
 int CSSGetKey( dvdcss_handle dvdcss, int i_pos, dvd_key_t p_titlekey )
 {
-#ifdef HAVE_CSS
     /*
      * Title key cracking method from Ethan Hawke,
      * with Frank A. Stevenson algorithm.
@@ -376,12 +365,6 @@ int CSSGetKey( dvdcss_handle dvdcss, int i_pos, dvd_key_t p_titlekey )
     }
 
     return -1;
-
-#else /* HAVE_CSS */
-    _dvdcss_error( dvdcss, "css decryption unavailable" );
-    return -1;
-
-#endif /* HAVE_CSS */
 }
 
 /*****************************************************************************
@@ -392,7 +375,6 @@ int CSSGetKey( dvdcss_handle dvdcss, int i_pos, dvd_key_t p_titlekey )
  *****************************************************************************/
 int CSSDescrambleSector( dvd_key_t p_key, u8* p_sec )
 {
-#ifdef HAVE_CSS
     unsigned int    i_t1, i_t2, i_t3, i_t4, i_t5, i_t6;
     u8*             p_end = p_sec + 0x800;
 
@@ -427,14 +409,7 @@ int CSSDescrambleSector( dvd_key_t p_key, u8* p_sec )
     }
 
     return 0;
-
-#else /* HAVE_CSS */
-    return 1;
-
-#endif /* HAVE_CSS */
 }
-
-#ifdef HAVE_CSS
 
 /* Following functions are local */
 
@@ -809,6 +784,4 @@ static int CSSCracker( int i_start,
 
     return i_exit;
 }
-
-#endif /* HAVE_CSS */
 

@@ -22,10 +22,10 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../plugins/mga.so: $(PLUGIN_C)
+../mga.so: $(PLUGIN_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/mga.a: $(BUILTIN_C)
+../mga.a: $(BUILTIN_C)
 	ar r $@ $^
 	$(RANLIB) $@
 

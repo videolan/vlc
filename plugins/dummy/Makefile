@@ -26,17 +26,17 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../plugins/null.so: $(PLUGIN_NULL)
+../null.so: $(PLUGIN_NULL)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/null.a: $(BUILTIN_NULL)
+../null.a: $(BUILTIN_NULL)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../plugins/dummy.so: $(PLUGIN_DUMMY)
+../dummy.so: $(PLUGIN_DUMMY)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/dummy.a: $(BUILTIN_DUMMY)
+../dummy.a: $(BUILTIN_DUMMY)
 	ar r $@ $^
 	$(RANLIB) $@
 

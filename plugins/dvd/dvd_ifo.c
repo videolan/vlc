@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.35 2001/07/25 08:41:21 gbazin Exp $
+ * $Id: dvd_ifo.c,v 1.36 2001/08/06 13:28:00 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -45,7 +45,11 @@
 #include <string.h>
 #include <fcntl.h>
 
-#include <videolan/dvdcss.h>
+#ifdef GOD_DAMN_DMCA
+#   include "dummy_dvdcss.h"
+#else
+#   include <videolan/dvdcss.h>
+#endif
 
 #include "config.h"
 #include "common.h"
@@ -282,7 +286,7 @@ int IfoInit( ifo_t * p_ifo )
                                           * sizeof(parental_mask_t) );
         if( PARINF.p_parental_mask == NULL )
         {
-            intf_ErrMsg( "ifo erro: out of memory in IfoInit" );
+            intf_ErrMsg( "ifo error: out of memory in IfoInit" );
             return -1;
         }
 
@@ -348,7 +352,7 @@ int IfoInit( ifo_t * p_ifo )
         VTSINF.p_vts_attr = malloc( VTSINF.i_vts_nb * sizeof(vts_attr_t) );
         if( VTSINF.p_vts_attr == NULL )
         {
-            intf_ErrMsg( "ifo erro: out of memory in IfoInit" );
+            intf_ErrMsg( "ifo error: out of memory in IfoInit" );
             return -1;
         }
 

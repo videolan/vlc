@@ -22,10 +22,10 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../plugins/fb.so: $(PLUGIN_C)
+../fb.so: $(PLUGIN_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/fb.a: $(BUILTIN_C)
+../fb.a: $(BUILTIN_C)
 	ar r $@ $^
 	$(RANLIB) $@
 

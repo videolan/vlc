@@ -28,24 +28,24 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../plugins/es.so: $(PLUGIN_ES)
+../es.so: $(PLUGIN_ES)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/es.a: $(BUILTIN_ES)
+../es.a: $(BUILTIN_ES)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../plugins/ps.so: $(PLUGIN_PS)
+../ps.so: $(PLUGIN_PS)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/ps.a: $(BUILTIN_PS)
+../ps.a: $(BUILTIN_PS)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../plugins/ts.so: $(PLUGIN_TS)
+../ts.so: $(PLUGIN_TS)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_TS)
 
-../../plugins/ts.a: $(BUILTIN_TS)
+../ts.a: $(BUILTIN_TS)
 	ar r $@ $^
 	$(RANLIB) $@
 

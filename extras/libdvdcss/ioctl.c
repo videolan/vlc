@@ -2,7 +2,7 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.5 2001/07/25 00:23:40 sam Exp $
+ * $Id: ioctl.c,v 1.6 2001/08/06 13:28:00 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -979,3 +979,4 @@ static int WinSendSSC( int i_fd, struct SRB_ExecSCSICmd *p_ssc )
     return p_ssc->SRB_Status == SS_COMP ? 0 : -1;
 }
 #endif
+

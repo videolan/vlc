@@ -125,6 +125,7 @@ D: Bug fixes
 
 N: Jon Lech Johansen
 E: jon-vl@nanocrew.net
+C: jlj
 D: PS input fixes
 D: Win32 DVD input port
 D: QNX RTOS plug-in

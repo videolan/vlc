@@ -40,24 +40,24 @@ $(BUILTIN_DOWNMIX3DN): BUILTIN_DOWNMIX3DN_%.o: %.c
 # Real targets
 #
 
-../../plugins/downmix.so: $(PLUGIN_DOWNMIX)
+../downmix.so: $(PLUGIN_DOWNMIX)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/downmix.a: $(BUILTIN_DOWNMIX)
+../downmix.a: $(BUILTIN_DOWNMIX)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../plugins/downmixsse.so: $(PLUGIN_DOWNMIXSSE)
+../downmixsse.so: $(PLUGIN_DOWNMIXSSE)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/downmixsse.a: $(BUILTIN_DOWNMIXSSE)
+../downmixsse.a: $(BUILTIN_DOWNMIXSSE)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../plugins/downmix3dn.so: $(PLUGIN_DOWNMIX3DN)
+../downmix3dn.so: $(PLUGIN_DOWNMIX3DN)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/downmix3dn.a: $(BUILTIN_DOWNMIX3DN)
+../downmix3dn.a: $(BUILTIN_DOWNMIX3DN)
 	ar r $@ $^
 	$(RANLIB) $@
 

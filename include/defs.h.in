@@ -1,4 +1,4 @@
-/* include/defs.h.in.  Generated automatically from configure.in by autoheader.  */
+/* include/defs.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
 
 /* Define to empty if the keyword does not work.  */
 #undef const
@@ -189,9 +189,6 @@
 
 /* Define if <pth.h> defines pth_init */
 #undef PTH_INIT_IN_PTH_H
-
-/* Define if you want DVD CSS decryption. */
-#undef HAVE_CSS
 
 /* Indicate whether we should use SDL/SDL.h or SDL11/SDL.h */
 #undef SDL_INCLUDE_FILE

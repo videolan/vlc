@@ -30,10 +30,10 @@ $(BUILTIN_MACOSX): BUILTIN_%.o: %.c
 # Real targets
 #
 
-../../plugins/macosx.so: $(PLUGIN_MACOSX)
+../macosx.so: $(PLUGIN_MACOSX)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_MACOSX)
 
-../../plugins/macosx.a: $(BUILTIN_MACOSX)
+../macosx.a: $(BUILTIN_MACOSX)
 	ar r $@ $^
 	$(RANLIB) $@
 

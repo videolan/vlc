@@ -22,10 +22,10 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../plugins/directx.so: $(PLUGIN_C)
+../directx.so: $(PLUGIN_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_DIRECTX)
 
-../../plugins/directx.a: $(BUILTIN_C)
+../directx.a: $(BUILTIN_C)
 	ar r $@ $^
 	$(RANLIB) $@
 

@@ -8,24 +8,28 @@
 # This is the debhelper compatability version to use.
 export DH_COMPAT=3
 
+# Compilation options
+export CONFIG_FLAGS="--prefix=/usr --enable-gnome --enable-gtk --enable-fb --with-ggi --with-sdl --enable-esd --enable-alsa --enable-qt"
+export LIBDVDCSS_FLAGS="--with-dvdcss=local-shared"
+export VIDDIR="usr/share/videolan"
+export PIXDIR="usr/share/pixmaps"
+export GNOMEDIR="usr/share/gnome/apps/Multimedia"
+
 build: build-stamp
 build-stamp:
 	dh_testdir
 
 	if [ $(DEB_BUILD_ARCH) = i386 ]; then \
-	./configure --prefix=/usr \
-		--mandir=\$${prefix}/share/man \
-		--infodir=\$${prefix}/share/info \
-		--enable-gnome --enable-gtk --enable-fb --with-glide \
-		--with-ggi --with-sdl --enable-esd \
-		--enable-qt --disable-ppro ; \
+		./configure --mandir=$${prefix}/share/man \
+			--infodir=$${prefix}/share/info \
+			$(shell echo $(CONFIG_FLAGS)) \
+			$(shell echo $(LIBDVDCSS_FLAGS)) \
+			--with-glide --disable-ppro ; \
 	else \
-	./configure --prefix=/usr \
-		--mandir=\$${prefix}/share/man \
-		--infodir=\$${prefix}/share/info \
-		--enable-gnome --enable-gtk --enable-fb \
-		--with-ggi --with-sdl --enable-esd \
-		--enable-qt ; \
+		./configure --mandir=$${prefix}/share/man \
+			--infodir=$${prefix}/share/info \
+			$(shell echo $(CONFIG_FLAGS)) \
+			$(shell echo $(LIBDVDCSS_FLAGS)) ; \
 	fi
 
 	$(MAKE)
@@ -49,66 +53,43 @@ install: build
 
 	DESTDIR=`pwd`/debian/vlc/ $(MAKE) install prefix=/usr
 
-	# get rid of libdvdcss for the moment
-	rm -f debian/vlc/usr/lib/libdvdcss*
-	rm -Rf debian/vlc/usr/include
-
-	# make symlinks for packages
-	aliases="ggi gtk gnome esd sdl qt" ; \
-	if [ $(DEB_BUILD_ARCH) = i386 ]; then aliases=$$aliases" glide" ; fi ; \
-	for alias in `echo $$aliases` ; do \
-		mkdir -p debian/vlc-$$alias/usr/share/doc/ ; \
+	# make symlinks for packages and install plugins
+	for alias in ggi gtk gnome esd sdl qt alsa `if [ $(DEB_BUILD_ARCH) = i386 ]; then echo glide ; fi` ; do \
 		ln -s vlc debian/vlc-$$alias/usr/share/doc/vlc-$$alias ; \
-		mkdir -p debian/vlc-$$alias/usr/lib/videolan/vlc/ ; \
 		mv debian/vlc/usr/lib/videolan/vlc/$$alias.so \
 			debian/vlc-$$alias/usr/lib/videolan/vlc/ ; done
 
-	mkdir -p debian/vlc-gtk/usr/bin/
 	mv debian/vlc/usr/bin/gvlc debian/vlc-gtk/usr/bin/
-	mkdir -p debian/vlc-gnome/usr/bin/
 	mv debian/vlc/usr/bin/gnome-vlc debian/vlc-gnome/usr/bin/
-	mkdir -p debian/vlc-qt/usr/bin/
 	mv debian/vlc/usr/bin/qvlc debian/vlc-qt/usr/bin/
 
-	mkdir -p debian/vlc/usr/share/pixmaps/
-	mv debian/vlc/usr/share/videolan/vlc.png \
-		debian/vlc/usr/share/pixmaps/
-	mkdir -p debian/vlc/usr/share/gnome/apps/Multimedia/
-	cp debian/vlc.desktop debian/vlc/usr/share/gnome/apps/Multimedia/
+	mv debian/vlc/$(VIDDIR)/vlc.png debian/vlc/$(PIXDIR)
+	mv debian/vlc/$(VIDDIR)/gvlc.xpm debian/vlc-gtk/$(VIDDIR)
+	mv debian/vlc/$(VIDDIR)/gvlc.png debian/vlc-gtk/$(PIXDIR)
+	mv debian/vlc/$(VIDDIR)/gnome-vlc.xpm debian/vlc-gnome/$(VIDDIR)
+	mv debian/vlc/$(VIDDIR)/gnome-vlc.png debian/vlc-gnome/$(PIXDIR)
+	mv debian/vlc/$(VIDDIR)/qvlc.xpm debian/vlc-qt/$(VIDDIR)
+	mv debian/vlc/$(VIDDIR)/qvlc.png debian/vlc-qt/$(PIXDIR)
 
-	mkdir -p debian/vlc-gtk/usr/share/videolan/ \
-		debian/vlc-gtk/usr/share/pixmaps/
-	mv debian/vlc/usr/share/videolan/gvlc.xpm \
-		debian/vlc-gtk/usr/share/videolan/
-	mv debian/vlc/usr/share/videolan/gvlc.png \
-		debian/vlc-gtk/usr/share/pixmaps/
-	mkdir -p debian/vlc-gtk/usr/share/gnome/apps/Multimedia/
-	cp debian/gvlc.desktop debian/vlc-gtk/usr/share/gnome/apps/Multimedia/
+	cp debian/vlc.desktop debian/vlc/$(GNOMEDIR)
+	cp debian/gvlc.desktop debian/vlc-gtk/$(GNOMEDIR)
+	cp debian/gnome-vlc.desktop debian/vlc-gnome/$(GNOMEDIR)
 
-	mkdir -p debian/vlc-gnome/usr/share/videolan/ \
-		debian/vlc-gnome/usr/share/pixmaps/
-	mv debian/vlc/usr/share/videolan/gnome-vlc.xpm \
-		debian/vlc-gnome/usr/share/videolan/
-	mv debian/vlc/usr/share/videolan/gnome-vlc.png \
-		debian/vlc-gnome/usr/share/pixmaps/
-	mkdir -p debian/vlc-gnome/usr/share/gnome/apps/Multimedia/
-	cp debian/gnome-vlc.desktop debian/vlc-gnome/usr/share/gnome/apps/Multimedia/
-
-	mkdir -p debian/vlc-qt/usr/share/videolan/ \
-		debian/vlc-qt/usr/share/pixmaps/
-	mv debian/vlc/usr/share/videolan/qvlc.xpm \
-		debian/vlc-qt/usr/share/videolan/
-	mv debian/vlc/usr/share/videolan/qvlc.png \
-		debian/vlc-qt/usr/share/pixmaps/
-
-	mkdir -p debian/vlc/usr/share/man/man1/
-	gzip -9 < doc/vlc.1 >| debian/vlc/usr/share/man/man1/vlc.1.gz
-	mkdir -p debian/vlc-gtk/usr/share/man/man1/
+	#gzip -9 < doc/vlc.1 >| debian/vlc/usr/share/man/man1/vlc.1.gz
 	ln -s vlc.1.gz debian/vlc-gtk/usr/share/man/man1/gvlc.1.gz
-	mkdir -p debian/vlc-gnome/usr/share/man/man1/
 	ln -s vlc.1.gz debian/vlc-gnome/usr/share/man/man1/gnome-vlc.1.gz
-	mkdir -p debian/vlc-qt/usr/share/man/man1/
 	ln -s vlc.1.gz debian/vlc-qt/usr/share/man/man1/qvlc.1.gz
+
+# libdvdcss start
+	mv debian/vlc/usr/include/videolan/dvdcss.h \
+				debian/libdvdcss0.0.2-dev/usr/include/videolan
+	rmdir debian/vlc/usr/include/videolan
+	rmdir debian/vlc/usr/include
+	mv debian/vlc/usr/lib/*.a debian/libdvdcss0.0.2-dev/usr/lib
+	mv debian/vlc/usr/lib/*.so debian/libdvdcss0.0.2-dev/usr/lib
+	mv debian/vlc/usr/lib/*.so.* debian/libdvdcss0.0.2/usr/lib
+	ln -s libdvdcss0.0.2 debian/libdvdcss0.0.2-dev/usr/share/doc/libdvdcss0.0.2-dev
+# libdvdcss stop
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -121,16 +102,17 @@ binary-arch: build install
 	dh_testroot
 #	dh_installdebconf	
 	dh_installdocs
-	dh_installexamples
+#	dh_installexamples
 	dh_installmenu
 #	dh_installemacsen
 #	dh_installpam
 #	dh_installinit
-	#dh_installcron
-#	dh_installmanpages -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-qt doc/vlc.1
-	#dh_installinfo
+#	dh_installcron
+#	dh_installmanpages -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt doc/vlc.1
+	dh_installman doc/vlc.1
+#	dh_installinfo
 #	dh_undocumented
-	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-qt
+	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt ChangeLog
 	dh_link
 	dh_strip
 	dh_compress

@@ -30,10 +30,10 @@ $(BUILTIN_SDL): BUILTIN_%.o: %.c
 # Real targets
 #
 
-../../plugins/sdl.so: $(PLUGIN_SDL)
+../sdl.so: $(PLUGIN_SDL)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_SDL)
 
-../../plugins/sdl.a: $(BUILTIN_SDL)
+../sdl.a: $(BUILTIN_SDL)
 	ar r $@ $^
 	$(RANLIB) $@
 

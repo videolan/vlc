@@ -1,0 +1,46 @@
+README for libdvdcss, a portable abstraction library for DVD decryption
+
+
+Introduction
+============
+
+libdvdcss is part of the VideoLAN project, a full MPEG2 client/server
+solution. The VideoLAN Client can also be used as a standalone program
+to play MPEG2 streams from a hard disk or a DVD.
+
+
+Building, Installing and Running libdvdcss
+==========================================
+
+See the INSTALL or INSTALL.libdvdcss file for this.
+
+
+Troubleshooting
+===============
+
+A mailing-list has been set up for support and discussion about vlc and
+libdvdcss. Its address is :
+
+   <vlc@videolan.org>
+
+To subscribe, send a mail to <listar@videolan.org> with the following
+words in the mail body :
+
+   subscribe vlc
+
+To unsubscribe, do the same with the words :
+
+   unsubscribe vlc
+
+
+When reporting bugs, try to be as precise as possible (which OS, which
+distribution, what plugins you were trying, and so on).
+
+
+Resources
+=========
+
+The VideoLAN web site at http://www.videolan.org/ is a good start for
+information about MPEG and DVD playing. Have a look at the documentation
+section, as well as the bookmarks.
+

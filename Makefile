@@ -87,6 +87,13 @@ ifneq (,$(BUILTINS))
 BUILTIN_OBJ := $(shell for i in $(BUILTINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.*/\('$$i'\) .*@plugins/\1.a@' -e 's@^ .*@@' ; done)
 endif
 
+#
+# Misc variables
+#
+VLC_QUICKVERSION := $(shell grep 'VLC_VERSION=' configure.in | cut -f2 -d=)
+LIBDVDCSS_QUICKVERSION := $(shell grep 'LIBDVDCSS_VERSION=' configure.in | cut -f2 -d=)
+
+
 # All symbols must be exported
 export
 
@@ -97,21 +104,37 @@ export
 #
 # Virtual targets
 #
-all: Makefile.opts vlc ${ALIASES} plugins vlc.app
+all: Makefile.opts vlc ${ALIASES} vlc.app
 
 Makefile.opts:
 	@echo "**** No configuration found, running ./configure..."
 	./configure
-	$(MAKE) all
-	exit
 
+# Include Makefile.opts again in case we just generated it
+ifneq (1,$(HAVE_MAKEFILE_OPTS))
+    -include Makefile.opts
+endif
+
+show:
+	@echo CC: $(CC)
+	@echo CFLAGS: $(CFLAGS)
+	@echo DCFLAGS: $(DCFLAGS)
+	@echo LCFLAGS: $(LCFLAGS)
+	@echo C_OBJ: $(C_OBJ)
+	@echo CPP_OBJ: $(CPP_OBJ)
+	@echo PLUGIN_OBJ: $(PLUGIN_OBJ)
+	@echo BUILTIN_OBJ: $(BUILTIN_OBJ)
+
+#
+# Cleaning rules
+#
 clean: libdvdcss-clean plugins-clean vlc-clean
 	rm -f src/*/*.o extras/*/*.o
-	rm -f lib/*.so lib/*.so.* lib/*.a
-	rm -f plugins/*.so plugins/*.so.* plugins/*.a
+	rm -f lib/*.so* lib/*.a
+	rm -f plugins/*.so plugins/*.a
 
 libdvdcss-clean:
-	cd extras/libdvdcss && $(MAKE) clean
+	-cd extras/libdvdcss && $(MAKE) clean
 
 plugins-clean:
 	for dir in $(PLUGINS_DIR) ; do \
@@ -133,6 +156,9 @@ distclean: clean
 	rm -Rf .dep
 	rm -f .gdb_history
 
+#
+# Install/uninstall rules
+#
 install: libdvdcss-install vlc-install plugins-install
 
 uninstall: libdvdcss-uninstall vlc-uninstall plugins-uninstall
@@ -164,94 +190,98 @@ ifneq (,$(PLUGINS))
 endif
 
 plugins-uninstall:
-ifneq (,$(PLUGINS))
 	rm -f $(DESTDIR)$(libdir)/videolan/vlc/*.so
-endif
 
 libdvdcss-install:
-	cd extras/libdvdcss && $(MAKE) install
+	-cd extras/libdvdcss && $(MAKE) install
 
 libdvdcss-uninstall:
-	cd extras/libdvdcss && $(MAKE) uninstall
+	-cd extras/libdvdcss && $(MAKE) uninstall
 
-show:
-	@echo CC: $(CC)
-	@echo CFLAGS: $(CFLAGS)
-	@echo DCFLAGS: $(DCFLAGS)
-	@echo LCFLAGS: $(LCFLAGS)
-	@echo C_OBJ: $(C_OBJ)
-	@echo CPP_OBJ: $(CPP_OBJ)
-	@echo objects: $(objects)
-	@echo cppobjects: $(cppobjects)
-	@echo PLUGIN_OBJ: $(PLUGIN_OBJ)
-	@echo BUILTIN_OBJ: $(BUILTIN_OBJ)
-
-
-# ugliest of all, but I have no time to do it -- sam
-snapshot: clean Makefile.opts
-	rm -Rf /tmp/vlc-${PROGRAM_VERSION}* /tmp/vlc-${PROGRAM_VERSION}nocss*
-	# copy archive in /tmp
+#
+# Package generation rules
+#
+snapshot-common: clean
+	rm -Rf /tmp/vlc
+	# Copy directory structure in /tmp
 	find -type d | grep -v CVS | grep -v '\.dep' | while read i ; \
-		do mkdir -p /tmp/vlc-${PROGRAM_VERSION}/$$i ; \
+		do mkdir -p /tmp/vlc/$$i ; \
 	done
 	find debian -mindepth 1 -maxdepth 1 -type d | \
-		while read i ; do rm -Rf /tmp/vlc-${PROGRAM_VERSION}/$$i ; done
-	# .c .h .in .cpp .glade
+		while read i ; do rm -Rf /tmp/vlc/$$i ; done
+	# Copy .c .h .in .cpp and .glade files
 	find include src plugins -type f -name '*.[chig]*' | while read i ; \
-		do cp $$i /tmp/vlc-${PROGRAM_VERSION}/$$i ; done
-	# Makefiles
-	find . plugins -type f -name Makefile | while read i ; \
-		do cp $$i /tmp/vlc-${PROGRAM_VERSION}/$$i ; done
-	# extra files
-	cp -a extras/* /tmp/vlc-${PROGRAM_VERSION}/extras
-	cp -a doc/* /tmp/vlc-${PROGRAM_VERSION}/doc
-	find /tmp/vlc-${PROGRAM_VERSION}/extras \
-		/tmp/vlc-${PROGRAM_VERSION}/doc \
-		-type d -name CVS | while read i ; \
-			do rm -Rf $$i ; \
-		done
-	# copy misc files
-	cp vlc.spec AUTHORS COPYING ChangeLog INSTALL INSTALL.libdvdcss \
-		INSTALL-win32.txt README TODO todo.pl \
-		Makefile.opts.in Makefile.dep Makefile.modules \
+		do cp $$i /tmp/vlc/$$i ; done
+	# Copy plugin Makefiles
+	find plugins -type f -name Makefile | while read i ; \
+		do cp $$i /tmp/vlc/$$i ; done
+	# Copy extra programs and documentation
+	cp -a extras/* /tmp/vlc/extras
+	cp -a doc/* /tmp/vlc/doc
+	find /tmp/vlc/extras /tmp/vlc/doc \
+		-type d -name CVS -o -type f -name '.*' | while read i ; \
+			do rm -Rf $$i ; done
+	# Copy misc files
+	cp vlc.spec AUTHORS COPYING TODO todo.pl ChangeLog README* INSTALL* \
+		Makefile Makefile.opts.in Makefile.dep Makefile.modules \
 		configure configure.in install-sh config.sub config.guess \
-			/tmp/vlc-${PROGRAM_VERSION}/
-	for file in control control-css vlc-gtk.menu vlc.copyright vlc.docs \
-		changelog changelog-css rules rules-css vlc.dirs vlc.desktop \
-		gvlc.desktop gnome-vlc.desktop vlc.menu ; do \
-			cp debian/$$file /tmp/vlc-${PROGRAM_VERSION}/debian/ ; \
-		done
-	for file in default8x16.psf default8x9.psf vlc_beos.rsrc vlc.icns \
-		gvlc_win32.ico vlc_win32_rc.rc ; do \
-			cp share/$$file /tmp/vlc-${PROGRAM_VERSION}/share/ ; \
-		done
-	for icon in vlc gvlc qvlc gnome-vlc kvlc ; do \
-		cp share/$$icon.xpm share/$$icon.png \
-			/tmp/vlc-${PROGRAM_VERSION}/share/ ; done
+			/tmp/vlc/
+	# Copy Debian control files
+	for file in debian/*dirs debian/*menu debian/*desktop ; do \
+		cp $$file /tmp/vlc/debian ; done
+	for file in control changelog rules vlc.copyright vlc.docs ; do \
+		cp debian/$$file /tmp/vlc/debian/ ; done
+	# Copy fonts and icons
+	for file in share/*png share/*xpm share/*psf ; do \
+		cp $$file /tmp/vlc/share ; done
+	for file in vlc_beos.rsrc vlc.icns gvlc_win32.ico vlc_win32_rc.rc ; do \
+			cp share/$$file /tmp/vlc/share/ ; done
 
-	# build css-enabled archives
-	(cd /tmp ; tar cf vlc-${PROGRAM_VERSION}.tar vlc-${PROGRAM_VERSION} ; \
-		bzip2 -f -9 < vlc-${PROGRAM_VERSION}.tar \
-			> vlc-${PROGRAM_VERSION}.tar.bz2 ; \
-		gzip -f -9 vlc-${PROGRAM_VERSION}.tar )
-	mv /tmp/vlc-${PROGRAM_VERSION}.tar.gz \
-		/tmp/vlc-${PROGRAM_VERSION}.tar.bz2 ..
+snapshot: snapshot-common
+	# Build archives and clean up
+	F=vlc-${VLC_QUICKVERSION}; \
+	rm -Rf /tmp/$$F ; mv /tmp/vlc /tmp/$$F; \
+	(cd /tmp ; tar cf $$F.tar $$F ; bzip2 -f -9 < $$F.tar > $$F.tar.bz2; \
+		gzip -f -9 $$F.tar ); mv /tmp/$$F.tar.gz /tmp/$$F.tar.bz2 ..; \
+	rm -Rf /tmp/$$F
 
-	# clean up
-	rm -Rf /tmp/vlc-${PROGRAM_VERSION}*
+snapshot-nocss: snapshot-common
+	# Remove libdvdcss
+	rm -Rf /tmp/vlc/extras/libdvdcss
+	rm -f /tmp/vlc/*.libdvdcss
+	# Fix debian information
+	rm -f /tmp/vlc/debian/libdvdcss*
+	rm -f /tmp/vlc/debian/control
+	sed -e 's#^ DVDs# unencrypted DVDs#' < debian/control \
+		| awk '{if(gsub("Package: libdvdcss",$$0))a=1;if(a==0)print $$0;if(a==1&&$$0=="")a=0}' \
+		> /tmp/vlc/debian/control
+	rm -f /tmp/vlc/debian/rules
+	sed -e 's#^\(export LIBDVDCSS_FLAGS=\).*#\1"--without-dvdcss"#' < debian/rules \
+		| awk '{if($$0=="# libdvdcss start")a=1;if(a==0)print $$0;if($$0=="# libdvdcss stop")a=0}' \
+		> /tmp/vlc/debian/rules
+	chmod +x /tmp/vlc/debian/rules
+	# Build css-disabled archives and clean up
+	F=vlc-${VLC_QUICKVERSION}; G=vlc-${VLC_QUICKVERSION}-nocss; \
+	rm -Rf /tmp/$$F ; mv /tmp/vlc /tmp/$$F; \
+	(cd /tmp ; tar cf $$G.tar $$F ; bzip2 -f -9 < $$G.tar > $$G.tar.bz2; \
+		gzip -f -9 $$G.tar ); mv /tmp/$$G.tar.gz /tmp/$$G.tar.bz2 ..; \
+	rm -Rf /tmp/$$F
 
-libdvdcss-snapshot: clean Makefile.opts
-	rm -Rf /tmp/libdvdcss-${LIBDVDCSS_VERSION}* \
-		/tmp/libdvdcss-${LIBDVDCSS_VERSION}nocss*
-	# copy archive in /tmp
-	find include extras doc lib -type d | grep -v CVS | grep -v '\.dep' | \
-		while read i ; do \
-			mkdir -p /tmp/libdvdcss-${LIBDVDCSS_VERSION}/$$i ; \
-		done
-	# .c .h .in .cpp .glade
-	find include extras -type f -name '*.[chig]*' | while read i ; \
-		do cp $$i /tmp/libdvdcss-${LIBDVDCSS_VERSION}/$$i ; done
-	# Makefiles
+libdvdcss-snapshot: snapshot-common
+	# Remove vlc sources and icons, doc, debian directory...
+	rm -Rf /tmp/vlc/src /tmp/vlc/share /tmp/vlc/plugins /tmp/vlc/doc
+	rm -Rf /tmp/vlc/extras/GNUgetopt /tmp/vlc/extras/MacOSX_app
+	rm -Rf /tmp/vlc/debian
+	# Remove useless headers
+	rm -f /tmp/vlc/include/*
+	for file in defs.h.in config.h.in common.h int_types.h ; \
+		do cp include/$$file /tmp/vlc/include/ ; done
+	# Remove misc files (??? - maybe not really needed)
+	rm -f /tmp/vlc/vlc.spec /tmp/vlc/INSTALL-win32.txt
+	mv /tmp/vlc/INSTALL.libdvdcss /tmp/vlc/INSTALL
+	mv /tmp/vlc/README.libdvdcss /tmp/vlc/README
+	# Fix Makefile
+	rm -f /tmp/vlc/Makefile
 	sed -e 's#^install:#install-unused:#' \
 		-e 's#^uninstall:#uninstall-unused:#' \
 		-e 's#^clean:#clean-unused:#' \
@@ -259,32 +289,22 @@ libdvdcss-snapshot: clean Makefile.opts
 		-e 's#^libdvdcss-install:#install:#' \
 		-e 's#^libdvdcss-uninstall:#uninstall:#' \
 		-e 's#^libdvdcss-clean:#clean:#' \
-		< Makefile > /tmp/libdvdcss-${LIBDVDCSS_VERSION}/Makefile
-	# extra files
-	cp -a extras/* /tmp/libdvdcss-${LIBDVDCSS_VERSION}/extras
-	cp -a doc/* /tmp/libdvdcss-${LIBDVDCSS_VERSION}/doc
-	find /tmp/libdvdcss-${LIBDVDCSS_VERSION}/extras \
-		/tmp/libdvdcss-${LIBDVDCSS_VERSION}/doc \
-		-type d -name CVS | while read i ; \
-			do rm -Rf $$i ; \
-		done
-	# copy misc files
-	cp AUTHORS COPYING ChangeLog INSTALL INSTALL.libdvdcss README \
-		TODO todo.pl Makefile.opts.in Makefile.dep Makefile.modules \
-		configure configure.in install-sh config.sub config.guess \
-			/tmp/libdvdcss-${LIBDVDCSS_VERSION}/
+		< Makefile > /tmp/vlc/Makefile
+	# Build archives and clean up
+	F=libdvdcss-${LIBDVDCSS_QUICKVERSION}; \
+	rm -Rf /tmp/$$F ; mv /tmp/vlc /tmp/$$F; \
+	(cd /tmp ; tar cf $$F.tar $$F ; bzip2 -f -9 < $$F.tar > $$F.tar.bz2; \
+		gzip -f -9 $$F.tar ); mv /tmp/$$F.tar.gz /tmp/$$F.tar.bz2 ..; \
+	rm -Rf /tmp/$$F
 
-	# build css-enabled archives
-	(cd /tmp ; tar cf libdvdcss-${LIBDVDCSS_VERSION}.tar \
-		libdvdcss-${LIBDVDCSS_VERSION} ; \
-		bzip2 -f -9 < libdvdcss-${LIBDVDCSS_VERSION}.tar \
-			> libdvdcss-${LIBDVDCSS_VERSION}.tar.bz2 ; \
-		gzip -f -9 libdvdcss-${LIBDVDCSS_VERSION}.tar )
-	mv /tmp/libdvdcss-${LIBDVDCSS_VERSION}.tar.gz \
-		/tmp/libdvdcss-${LIBDVDCSS_VERSION}.tar.bz2 ..
+deb:
+	dpkg-buildpackage -rfakeroot -us -uc
 
-	# clean up
-	rm -Rf /tmp/libdvdcss-${LIBDVDCSS_VERSION}*
+#
+# Gtk/Gnome/* aliases and OS X application
+#
+gnome-vlc gvlc kvlc qvlc: vlc
+	rm -f $@ && ln -s vlc $@
 
 .PHONY: vlc.app
 vlc.app: Makefile.opts
@@ -306,13 +326,6 @@ endif
 FORCE:
 
 #
-# GTK/Gnome aliases - don't add too many aliases which could bloat
-# the namespace
-#
-gnome-vlc gvlc kvlc qvlc: vlc
-	rm -f $@ && ln -s vlc $@
-
-#
 # Generic rules (see below)
 #
 $(C_DEP): %.d: FORCE
@@ -329,16 +342,14 @@ ifneq (,$(BUILTINS))
 		echo "int module_"$$i"_ActivateModule( module_t* );" >> $@ ; \
 		echo "int module_"$$i"_DeactivateModule( module_t* );" >> $@ ; \
 	done
-endif
-ifneq (,$(BUILTINS))
 	echo "" >> $@ ;
 	printf "#define ALLOCATE_ALL_BUILTINS() do { " >> $@ ;
 	for i in $(BUILTINS) ; do \
 		printf "ALLOCATE_BUILTIN("$$i"); " >> $@ ; \
 	done
 	echo "} while( 0 );" >> $@ ;
-endif
 	echo "" >> $@ ;
+endif
 
 $(C_OBJ): %.o: Makefile.opts Makefile.dep Makefile
 $(C_OBJ): %.o: .dep/%.d
@@ -359,7 +370,7 @@ endif
 #
 # Main application target
 #
-vlc: Makefile.opts Makefile.dep Makefile $(H_OBJ) $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ)
+vlc: Makefile.opts Makefile.dep Makefile $(H_OBJ) $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ) plugins
 	$(CC) $(CFLAGS) -o $@ $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ) $(LCFLAGS)
 ifeq ($(SYS),beos)
 	xres -o $@ ./share/vlc_beos.rsrc
@@ -371,14 +382,14 @@ endif
 #
 plugins: Makefile.modules Makefile.opts Makefile.dep Makefile $(PLUGIN_OBJ)
 $(PLUGIN_OBJ): FORCE
-	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.so=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:%=../../%)
+	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.so=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:plugins/%=../%)
 
 #
 # Built-in modules target
 #
 builtins: Makefile.modules Makefile.opts Makefile.dep Makefile $(BUILTIN_OBJ)
 $(BUILTIN_OBJ): FORCE
-	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:%=../../%)
+	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:plugins/%=../%)
 
 #
 # libdvdcss target

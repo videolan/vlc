@@ -22,8 +22,8 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../plugins/qnx.so: $(PLUGIN_C)
+../qnx.so: $(PLUGIN_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_QNX) 
 
-../../plugins/qnx.a: $(BUILTIN_C)
+../qnx.a: $(BUILTIN_C)
 	ar r $@ $^

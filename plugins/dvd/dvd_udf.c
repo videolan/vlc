@@ -5,7 +5,7 @@
  * contains the basic udf handling functions
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_udf.c,v 1.12 2001/07/27 01:05:17 sam Exp $
+ * $Id: dvd_udf.c,v 1.13 2001/08/06 13:28:00 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -50,7 +50,11 @@
 #   include <strings.h>
 #endif
 
-#include <videolan/dvdcss.h>
+#ifdef GOD_DAMN_DMCA
+#   include "dummy_dvdcss.h"
+#else
+#   include <videolan/dvdcss.h>
+#endif
 
 #include "config.h"
 #include "common.h"

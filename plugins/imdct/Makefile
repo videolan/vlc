@@ -44,24 +44,24 @@ $(BUILTIN_IMDCT3DN): BUILTIN_IMDCT3DN_%.o: %.c
 # Real targets
 #
 
-../../plugins/imdct.so: $(PLUGIN_IMDCT) $(PLUGIN_IMDCTCOMMON)
+../imdct.so: $(PLUGIN_IMDCT) $(PLUGIN_IMDCTCOMMON)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/imdct.a: $(BUILTIN_IMDCT)
+../imdct.a: $(BUILTIN_IMDCT)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../plugins/imdctsse.so: $(PLUGIN_IMDCTSSE) $(PLUGIN_IMDCTCOMMON)
+../imdctsse.so: $(PLUGIN_IMDCTSSE) $(PLUGIN_IMDCTCOMMON)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/imdctsse.a: $(BUILTIN_IMDCTSSE)
+../imdctsse.a: $(BUILTIN_IMDCTSSE)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../plugins/imdct3dn.so: $(PLUGIN_IMDCT3DN) $(PLUGIN_IMDCTCOMMON)
+../imdct3dn.so: $(PLUGIN_IMDCT3DN) $(PLUGIN_IMDCTCOMMON)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/imdct3dn.a: $(BUILTIN_IMDCT3DN)
+../imdct3dn.a: $(BUILTIN_IMDCT3DN)
 	ar r $@ $^
 	$(RANLIB) $@
 

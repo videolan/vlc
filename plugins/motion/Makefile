@@ -44,31 +44,31 @@ $(BUILTIN_MOTIONMMXEXT): BUILTIN_MOTIONMMXEXT_%.o: %.c
 # Real targets
 #
 
-../../plugins/motion.so: $(PLUGIN_MOTION) $(PLUGIN_MOTIONCOMMON)
+../motion.so: $(PLUGIN_MOTION) $(PLUGIN_MOTIONCOMMON)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/motion.a: $(BUILTIN_MOTION)
+../motion.a: $(BUILTIN_MOTION)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../plugins/motionclassic.so: $(PLUGIN_MOTIONCLASSIC) $(PLUGIN_MOTIONCOMMON)
+../motionclassic.so: $(PLUGIN_MOTIONCLASSIC) $(PLUGIN_MOTIONCOMMON)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/motionclassic.a: $(BUILTIN_MOTIONCLASSIC)
+../motionclassic.a: $(BUILTIN_MOTIONCLASSIC)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../plugins/motionmmx.so: $(PLUGIN_MOTIONMMX) $(PLUGIN_MOTIONCOMMON)
+../motionmmx.so: $(PLUGIN_MOTIONMMX) $(PLUGIN_MOTIONCOMMON)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/motionmmx.a: $(BUILTIN_MOTIONMMX)
+../motionmmx.a: $(BUILTIN_MOTIONMMX)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../plugins/motionmmxext.so: $(PLUGIN_MOTIONMMXEXT) $(PLUGIN_MOTIONCOMMON)
+../motionmmxext.so: $(PLUGIN_MOTIONMMXEXT) $(PLUGIN_MOTIONCOMMON)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/motionmmxext.a: $(BUILTIN_MOTIONMMXEXT)
+../motionmmxext.a: $(BUILTIN_MOTIONMMXEXT)
 	ar r $@ $^
 	$(RANLIB) $@
 

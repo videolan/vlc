@@ -5,8 +5,10 @@
 
 -include ../../Makefile.opts
 
-LIBDVDCSS_VERSION = 0.0.1
-LIBDVDCSS_MAJOR = 0
+BASE_A := libdvdcss.a
+BASE_SO := libdvdcss.so
+MAJOR_SO := libdvdcss.so.$(shell echo $(LIBDVDCSS_VERSION) | cut -f1 -d.)
+FULL_SO := libdvdcss.so.$(LIBDVDCSS_VERSION)
 
 #
 # Objects
@@ -21,30 +23,30 @@ $(LIBDVDCSS_O): %.o: .dep/%.d
 $(LIBDVDCSS_O): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
 
-../../lib/libdvdcss.so.$(LIBDVDCSS_VERSION): $(LIBDVDCSS_O)
-	$(CC) $(PCFLAGS) -Wl,-soname -Wl,libdvdcss.so.$(LIBDVDCSS_MAJOR) -o $@ $^ $(PLCFLAGS)
-	rm -f ../../lib/libdvdcss.so && ln -s libdvdcss.so.$(LIBDVDCSS_VERSION) ../../lib/libdvdcss.so
-	rm -f ../../lib/libdvdcss.so.$(LIBDVDCSS_MAJOR) && ln -s libdvdcss.so.$(LIBDVDCSS_VERSION) ../../lib/libdvdcss.so.$(LIBDVDCSS_MAJOR)
+../../lib/$(FULL_SO): $(LIBDVDCSS_O)
+	$(CC) $(PCFLAGS) -Wl,-soname -Wl,$(MAJOR_SO) -o $@ $^ $(PLCFLAGS)
+	rm -f ../../lib/$(BASE_SO) && ln -s $(FULL_SO) ../../lib/$(BASE_SO)
+	rm -f ../../lib/$(MAJOR_SO) && ln -s $(FULL_SO) ../../lib/$(MAJOR_SO)
 
-../../lib/libdvdcss.a: $(LIBDVDCSS_O)
+../../lib/$(BASE_A): $(LIBDVDCSS_O)
 	ar r $@ $^
 	$(RANLIB) $@
 
-all: ../../lib/libdvdcss.so.$(LIBDVDCSS_VERSION) ../../lib/libdvdcss.a
+all: ../../lib/$(FULL_SO) ../../lib/$(BASE_A)
 
 install:
 	mkdir -p $(DESTDIR)$(includedir)/videolan
 	$(INSTALL) -m 644 videolan/dvdcss.h $(DESTDIR)$(includedir)/videolan
 	mkdir -p $(DESTDIR)$(libdir)
-	$(INSTALL) -m 644 ../../lib/libdvdcss.a $(DESTDIR)$(libdir)
-	$(INSTALL) -m 644 ../../lib/libdvdcss.so.$(LIBDVDCSS_VERSION) $(DESTDIR)$(libdir)
-	rm -f $(DESTDIR)$(libdir)/libdvdcss.so && ln -s libdvdcss.so.$(LIBDVDCSS_VERSION) $(DESTDIR)$(libdir)/libdvdcss.so
-	rm -f $(DESTDIR)$(libdir)/libdvdcss.so.$(LIBDVDCSS_MAJOR) && ln -s libdvdcss.so.$(LIBDVDCSS_VERSION) $(DESTDIR)$(libdir)/libdvdcss.so.$(LIBDVDCSS_MAJOR)
+	$(INSTALL) -m 644 ../../lib/$(BASE_A) $(DESTDIR)$(libdir)
+	$(INSTALL) -m 644 ../../lib/$(FULL_SO) $(DESTDIR)$(libdir)
+	rm -f $(DESTDIR)$(libdir)/$(BASE_SO) && ln -s $(FULL_SO) $(DESTDIR)$(libdir)/$(BASE_SO)
+	rm -f $(DESTDIR)$(libdir)/$(MAJOR_SO) && ln -s $(FULL_SO) $(DESTDIR)$(libdir)/$(MAJOR_SO)
 
 uninstall:
 	rm -f $(DESTDIR)$(includedir)/videolan/dvdcss.h
-	rm -f $(DESTDIR)$(libdir)/libdvdcss.a
-	rm -f $(DESTDIR)$(libdir)/libdvdcss.so
-	rm -f $(DESTDIR)$(libdir)/libdvdcss.so.$(LIBDVDCSS_MAJOR)
-	rm -f $(DESTDIR)$(libdir)/libdvdcss.so.$(LIBDVDCSS_VERSION)
+	rm -f $(DESTDIR)$(libdir)/$(BASE_A)
+	rm -f $(DESTDIR)$(libdir)/$(BASE_SO)
+	rm -f $(DESTDIR)$(libdir)/$(MAJOR_SO)
+	rm -f $(DESTDIR)$(libdir)/$(FULL_SO)
 

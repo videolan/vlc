@@ -1,7 +1,7 @@
 Name: vlc
 Version: 0.2.81
 Release: 1
-Copyright: GPL
+License: GPL
 Url: http://www.videolan.org/
 Group: X11/Applications/Graphics
 Source0: http://www.videolan.org/packages/0.2.81/vlc-0.2.81.tar.gz

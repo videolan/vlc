@@ -27,17 +27,17 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../plugins/yuv.so: $(PLUGIN_YUV)
+../yuv.so: $(PLUGIN_YUV)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_YUV)
 
-../../plugins/yuv.a: $(BUILTIN_YUV)
+../yuv.a: $(BUILTIN_YUV)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../plugins/yuvmmx.so: $(PLUGIN_YUVMMX)
+../yuvmmx.so: $(PLUGIN_YUVMMX)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../plugins/yuvmmx.a: $(BUILTIN_YUVMMX)
+../yuvmmx.a: $(BUILTIN_YUVMMX)
 	ar r $@ $^
 	$(RANLIB) $@
 

@@ -22,10 +22,10 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../plugins/darwin.so: $(PLUGIN_C)
+../darwin.so: $(PLUGIN_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_DARWIN)
 
-../../plugins/darwin.a: $(BUILTIN_C)
+../darwin.a: $(BUILTIN_C)
 	ar r $@ $^
 	$(RANLIB) $@
 

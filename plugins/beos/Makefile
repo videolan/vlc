@@ -22,10 +22,10 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../plugins/beos.so: $(PLUGIN_CPP)
+../beos.so: $(PLUGIN_CPP)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_BEOS)
 
-../../plugins/beos.a: $(BUILTIN_CPP)
+../beos.a: $(BUILTIN_CPP)
 	ar r $@ $^
 	$(RANLIB) $@
 

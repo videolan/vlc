@@ -7,7 +7,7 @@
 # Objects
 #
 
-PLUGIN_DVD = dvd.o input_dvd.o dvd_netlist.o dvd_ifo.o dvd_udf.o dvd_summary.o
+PLUGIN_DVD = dvd.o input_dvd.o dvd_netlist.o dvd_ifo.o dvd_udf.o dvd_summary.o $(OBJ_DVD)
 BUILTIN_DVD = $(PLUGIN_DVD:%.o=BUILTIN_%.o)
 
 ALL_OBJ = $(PLUGIN_DVD) $(BUILTIN_DVD)
@@ -31,17 +31,17 @@ $(BUILTIN_DVD): BUILTIN_%.o: %.c
 #
 
 ifeq (1,$(LOCAL_LIBDVDCSS))
-../../plugins/dvd.so: libdvdcss $(PLUGIN_DVD)
+../dvd.so: libdvdcss $(PLUGIN_DVD)
 	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD_PLUGIN)
 
-../../plugins/dvd.a: libdvdcss $(BUILTIN_DVD)
+../dvd.a: libdvdcss $(BUILTIN_DVD)
 	ar r $@ $(BUILTIN_DVD)
 	$(RANLIB) $@
 else
-../../plugins/dvd.so: $(PLUGIN_DVD)
+../dvd.so: $(PLUGIN_DVD)
 	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD_PLUGIN)
 
-../../plugins/dvd.a: $(BUILTIN_DVD)
+../dvd.a: $(BUILTIN_DVD)
 	ar r $@ $(BUILTIN_DVD)
 	$(RANLIB) $@
 endif

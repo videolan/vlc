@@ -22,10 +22,10 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../plugins/alsa.so: $(PLUGIN_C)
+../alsa.so: $(PLUGIN_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_ALSA)
 
-../../plugins/alsa.a: $(BUILTIN_C)
+../alsa.a: $(BUILTIN_C)
 	ar r $@ $^
 	$(RANLIB) $@
 
