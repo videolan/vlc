@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.5 2002/08/29 23:53:22 massiot Exp $
+ * $Id: vcd.c,v 1.6 2002/10/04 18:07:21 sam Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -181,7 +181,7 @@ static int VCDOpen( vlc_object_t *p_this )
 
     if( p_vcd->i_handle == -1 )
     {
-        msg_Err( p_input, "could not open %s\n", psz_source );
+        msg_Err( p_input, "could not open %s", psz_source );
         free (p_vcd);
         return -1;
     }

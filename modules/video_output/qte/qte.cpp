@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.cpp,v 1.3 2002/09/23 21:44:23 jpsaman Exp $
+ * $Id: qte.cpp,v 1.4 2002/10/04 18:07:21 sam Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -160,7 +160,7 @@ static int Open( vlc_object_t *p_this )
 
     CreateQtWindow(p_vout);
 
-    //msg_Err(p_vout, "-vout_Create::qte\n" );
+    //msg_Err(p_vout, "-vout_Create::qte" );
     return( 0 );
 }
 
@@ -173,7 +173,7 @@ static void Close ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
-    //msg_Err( p_vout, "+vout_Destroy::qte\n" );
+    //msg_Err( p_vout, "+vout_Destroy::qte" );
     DestroyQtWindow(p_vout);
     free(p_vout->p_sys);
 }
@@ -191,7 +191,7 @@ static int Init( vout_thread_t *p_vout )
 
     int         dd = QPixmap::defaultDepth();
 
-    //msg_Err( p_vout,"+vout_Init::qte\n" );
+    //msg_Err( p_vout,"+vout_Init::qte" );
 
     I_OUTPUTPICTURES = 0;
 
@@ -234,7 +234,7 @@ static int Init( vout_thread_t *p_vout )
         I_OUTPUTPICTURES++;
     }
 
-    //msg_Err(p_vout, "-vout_Init::qte %d output pictures\n", I_OUTPUTPICTURES);
+    //msg_Err(p_vout, "-vout_Init::qte %d output pictures", I_OUTPUTPICTURES);
 
     return( 0 );
 }
@@ -245,7 +245,7 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    //msg_Err(p_vout, "+vout_Render::qte\n" );
+    //msg_Err(p_vout, "+vout_Render::qte" );
     ;
 }
 
@@ -319,7 +319,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
-    //msg_Err(p_vout, "+vout_Manage::qte\n" );
+    //msg_Err(p_vout, "+vout_Manage::qte" );
     return 0;
 }
 
@@ -333,7 +333,7 @@ static void End( vout_thread_t *p_vout )
 {
     int i_index;
 
-    //msg_Err(p_vout, "+vout_End::qte\n" );
+    //msg_Err(p_vout, "+vout_End::qte" );
 
     /* Free the direct buffers we allocated */
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
@@ -353,7 +353,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     int dd = QPixmap::defaultDepth();
 
-    //msg_Err(p_vout, "+NewPicture::dd = %d\n",dd );
+    //msg_Err(p_vout, "+NewPicture::dd = %d",dd );
 
     p_pic->p_sys = (picture_sys_t*) malloc( sizeof( picture_sys_t ) );
 
@@ -428,7 +428,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
 /*
-    msg_Err(p_vout, "NewPicture: %d %d %d\n",p_vout->output.i_width,
+    msg_Err(p_vout, "NewPicture: %d %d %d",p_vout->output.i_width,
                                  p_vout->output.i_height,
                                  p_vout->output.i_chroma );
 */

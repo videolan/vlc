@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.4 2002/10/04 12:01:40 gbazin Exp $
+ * $Id: gtk.c,v 1.5 2002/10/04 18:07:21 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -171,11 +171,7 @@ static void Run( intf_thread_t *p_intf )
     int    i_args   = 1;
     int    i_dummy;
 
-    /* gtk_init will register stuff with g_atexit, so we need to take
-     * the global lock if we want to be able to intercept the calls */
-    vlc_mutex_lock( &p_intf->p_libvlc->global_lock );
     gtk_init( &i_args, &pp_args );
-    vlc_mutex_unlock( &p_intf->p_libvlc->global_lock );
 #endif
 
     /* Create some useful widgets that will certainly be used */

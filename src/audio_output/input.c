@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.14 2002/09/27 23:38:04 massiot Exp $
+ * $Id: input.c,v 1.15 2002/10/04 18:07:22 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -168,7 +168,6 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                   mdate() - p_buffer->start_date );
         aout_BufferFree( p_buffer );
 
-        vlc_mutex_unlock( &p_input->lock );
         return 0;
     }
 

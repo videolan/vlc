@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.35 2002/10/03 18:56:09 sam Exp $
+ * $Id: libvlc.c,v 1.36 2002/10/04 18:07:22 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -142,6 +142,7 @@ vlc_t * vlc_create_r( void )
 {
     int i_ret;
     vlc_t * p_vlc = NULL;
+    vlc_mutex_t * p_libvlc_lock;
 
     /* vlc_threads_init *must* be the first internal call! No other call is
      * allowed before the thread system has been initialized. */
@@ -152,15 +153,12 @@ vlc_t * vlc_create_r( void )
     }
 
     /* Now that the thread system is initialized, we don't have much, but
-     * at least we have libvlc.global_lock */
-    vlc_mutex_lock( &libvlc.global_lock );
+     * at least we have vlc_mutex_need */
+    p_libvlc_lock = vlc_mutex_need( &libvlc, "libvlc" );
+    vlc_mutex_lock( p_libvlc_lock );
     if( !libvlc.b_ready )
     {
         char *psz_env;
-
-        vlc_mutex_init( &libvlc, &libvlc.structure_lock );
-        libvlc.p_global_data = NULL;
-        libvlc.b_ready = VLC_TRUE;
 
         /* Guess what CPU we have */
         libvlc.i_cpu = CPUCapabilities();
@@ -182,14 +180,17 @@ vlc_t * vlc_create_r( void )
         msg_Dbg( &libvlc, COPYRIGHT_MESSAGE );
         msg_Dbg( &libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
 
-        /* Initialize the module bank and and load the configuration of the
+        /* Initialize the module bank and load the configuration of the
          * main module. We need to do this at this stage to be able to display
          * a short help if required by the user. (short help == main module
          * options) */
         module_InitBank( &libvlc );
         module_LoadMain( &libvlc );
+
+        libvlc.b_ready = VLC_TRUE;
     }
-    vlc_mutex_unlock( &libvlc.global_lock );
+    vlc_mutex_unlock( p_libvlc_lock );
+    vlc_mutex_unneed( &libvlc, "libvlc" );
 
     /* Allocate a vlc object */
     p_vlc = vlc_object_create( &libvlc, VLC_OBJECT_VLC );
@@ -416,9 +417,9 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     else
     {
         int i_tmp = config_GetInt( p_vlc, "verbose" );
-        if( i_tmp >= 0 && i_tmp <= 4 )
+        if( i_tmp >= 0 )
         {
-            libvlc.i_verbose = i_tmp;
+            libvlc.i_verbose = __MIN( i_tmp, 4 );
         }
     }
     libvlc.b_color = libvlc.b_color || config_GetInt( p_vlc, "color" );

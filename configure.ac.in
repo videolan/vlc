@@ -99,7 +99,7 @@ case "x${target_os}" in
     SYS=mingw32
     AC_CHECK_TOOL(WINDRES, windres, :)
     CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
-    LDFLAGS_vlc="${LDFLAGS_vlc} -lws2_32 -lnetapi32 -mwindows -Xlinker --force-exe-suffix"
+    LDFLAGS_vlc="${LDFLAGS_vlc} -lws2_32 -lnetapi32 -mwindows"
     LDFLAGS_ipv4="${LDFLAGS_ipv4} -lws2_32"
     LDFLAGS_ipv6="${LDFLAGS_ipv6} -lws2_32"
     LDFLAGS_access_http="${LDFLAGS_http} -lws2_32"

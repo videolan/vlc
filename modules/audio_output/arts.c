@@ -2,7 +2,7 @@
  * arts.c : aRts module
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: arts.c,v 1.12 2002/09/30 11:05:35 sam Exp $
+ * $Id: arts.c,v 1.13 2002/10/04 18:07:21 sam Exp $
  *
  * Authors: Emmanuel Blindauer <manu@agat.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -123,7 +123,7 @@ static int Open( vlc_object_t *p_this )
        * (mtime_t)arts_stream_get( p_sys->stream, ARTS_P_SERVER_LATENCY );
     p_sys->i_size = arts_stream_get( p_sys->stream, ARTS_P_PACKET_SIZE );
 
-    msg_Dbg( p_aout, "aRts initialized, latency %i000, %i packets of size %i\n",
+    msg_Dbg( p_aout, "aRts initialized, latency %i000, %i packets of size %i",
                      arts_stream_get( p_sys->stream, ARTS_P_SERVER_LATENCY ),
                      arts_stream_get( p_sys->stream, ARTS_P_PACKET_COUNT ),
                      arts_stream_get( p_sys->stream, ARTS_P_PACKET_SIZE ) );
