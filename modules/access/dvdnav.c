@@ -34,7 +34,7 @@
 
 #include <dvdnav/dvdnav.h>
 
-#include "ps.h"
+#include "../demux/ps.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -135,14 +135,9 @@ static int Open( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
+    dvdnav_t    *p_dvdnav;
     int         i_title, i_chapter, i_angle;
     char        *psz_name;
-
-    if( strncmp( p_demux->psz_access, "dvdnav", 6 ) )
-    {
-        msg_Warn( p_demux, "dvdnav module discarded" );
-        return VLC_EGENERIC;
-    }
 
     psz_name = ParseCL( VLC_OBJECT(p_demux), p_demux->psz_path, VLC_TRUE,
                         &i_title, &i_chapter, &i_angle );
@@ -151,11 +146,21 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* fill p_demux field */
+    /* Open dvdnav */
+    if( dvdnav_open( &p_dvdnav, psz_name ) != DVDNAV_STATUS_OK )
+    {
+        msg_Warn( p_demux, "cannot open dvdnav" );
+        free( psz_name );
+        return VLC_EGENERIC;
+    }
+    free( psz_name );
+
+    /* Fill p_demux field */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     memset( p_sys, 0, sizeof( demux_sys_t ) );
+    p_sys->dvdnav = p_dvdnav;
 
     p_sys->b_simple =
         strcmp( p_demux->psz_access, "dvdnavsimple" ) ? VLC_FALSE : VLC_TRUE;
@@ -168,15 +173,6 @@ static int Open( vlc_object_t *p_this )
     ps_track_init( p_sys->tk );
     p_sys->i_aspect = -1;
     p_sys->b_es_out_ok = VLC_FALSE;
-
-    /* Open dvdnav */
-    if( dvdnav_open( &p_sys->dvdnav, psz_name ) != DVDNAV_STATUS_OK )
-    {
-        msg_Warn( p_demux, "cannot open dvdnav" );
-        free( psz_name );
-        return VLC_EGENERIC;
-    }
-    free( psz_name );
 
     if( 1 )
     {
@@ -208,9 +204,9 @@ static int Open( vlc_object_t *p_this )
         msg_Warn( p_demux, "cannot set PGC positioning flag" );
     }
 
-    if( dvdnav_menu_language_select ( p_sys->dvdnav,"en") != DVDNAV_STATUS_OK||
-        dvdnav_audio_language_select( p_sys->dvdnav,"en") != DVDNAV_STATUS_OK||
-        dvdnav_spu_language_select  ( p_sys->dvdnav,"en") != DVDNAV_STATUS_OK )
+    if( dvdnav_menu_language_select (p_sys->dvdnav,"en") != DVDNAV_STATUS_OK ||
+        dvdnav_audio_language_select(p_sys->dvdnav,"en") != DVDNAV_STATUS_OK ||
+        dvdnav_spu_language_select  (p_sys->dvdnav,"en") != DVDNAV_STATUS_OK )
     {
         msg_Warn( p_demux, "something failed while setting en language (%s)",
                   dvdnav_err_to_string( p_sys->dvdnav ) );
@@ -442,7 +438,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     return VLC_EGENERIC;
             }
             else if( dvdnav_part_play( p_sys->dvdnav, p_demux->info.i_title,
-                                       i ) != DVDNAV_STATUS_OK )
+                                       i + 1 ) != DVDNAV_STATUS_OK )
             {
                 msg_Warn( p_demux, "cannot set title/chapter" );
                 return VLC_EGENERIC;
@@ -636,11 +632,11 @@ static int Demux( demux_t *p_demux )
                                        &i_part ) == DVDNAV_STATUS_OK )
         {
             if( i_title >= 0 && i_title < p_sys->i_title &&
-                i_part >= 0  && i_part  < p_sys->title[i_title]->i_seekpoint &&
-                p_demux->info.i_seekpoint != i_part )
+                i_part >= 1 && i_part <= p_sys->title[i_title]->i_seekpoint &&
+                p_demux->info.i_seekpoint != i_part - 1 )
             {
                 p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-                p_demux->info.i_seekpoint = i_part;
+                p_demux->info.i_seekpoint = i_part - 1;
             }
         }
         break;
@@ -819,7 +815,7 @@ static void DemuxTitles( demux_t *p_demux )
 
     /* Find out number of titles/chapters */
     dvdnav_get_number_of_titles( p_sys->dvdnav, &i_titles );
-    for( i = 1; i < i_titles; i++ )
+    for( i = 1; i <= i_titles; i++ )
     {
         int32_t i_chapters = 0;
         int j;
