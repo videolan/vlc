@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.113 2003/05/17 22:00:00 gbazin Exp $
+ * $Id: input_programs.c,v 1.114 2003/05/18 23:16:57 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -747,7 +747,7 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
     /* Kill associated decoder, if any. */
     if( p_es->p_decoder_fifo != NULL )
     {
-        input_EndDecoder( p_input, p_es );
+        input_UnselectES( p_input, p_es );
     }
 
     /* Remove this ES from the description of the program if it is associated
