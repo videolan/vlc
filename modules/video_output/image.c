@@ -222,8 +222,8 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
                                          10 );
 
     fmt_in.i_chroma = p_vout->render.i_chroma;
-    fmt_in.i_width = p_vout->render.i_width;
-    fmt_in.i_height = p_vout->render.i_height;
+    fmt_out.i_width = fmt_in.i_width = p_vout->render.i_width;
+    fmt_out.i_height = fmt_in.i_height = p_vout->render.i_height;
 
     p_vout->p_sys->i_current++;
 
