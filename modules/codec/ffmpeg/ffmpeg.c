@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.39 2003/05/25 00:16:47 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.40 2003/05/25 10:14:20 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -157,7 +157,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
 #define FFMPEG_PP_TEXT N_( "Ffmpeg postprocessing module" )
 
 #define PP_AQ_TEXT N_("Auto-level Post processing quality")
-#define POSTPROCESSING_AQ_LONGTEXT N_( \
+#define PP_AQ_LONGTEXT N_( \
     "Post processing quality is selected upon time left " \
     "but no more than requested quality\n" \
     "Not yet implemented !")
