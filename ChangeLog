@@ -9,6 +9,8 @@ HEAD
 0.4.1
 Mon,  3 Jun 2002 23:43:35 +0200
 
+  * ./plugins/gtk/gnome.glade: added lines this #@%$! Glade had munched, fixes
+    a segfault in the Gnome popup menu when toggling the interface.
   * ./configure.in, ./plugins/mpeg_system/mpeg_ts.c: fixed libdvbpsi handling.
   * ./src/misc/configuration.c: fixed the --nofoo option handling.
   * ./src/interface/main.c: fixed two compilation warnings under Solaris.
