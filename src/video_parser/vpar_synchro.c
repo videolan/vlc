@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.83 2001/02/12 11:22:31 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.84 2001/02/12 13:20:15 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -583,7 +583,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
     if( p_vpar->synchro.backward_pts + DEFAULT_PTS_DELAY < now )
     {
         /* The same. */
-        p_vpar->synchro.current_pts = 0;
+        p_vpar->synchro.backward_pts = 0;
     }
 
 #ifdef STATS

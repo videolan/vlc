@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.28 2001/02/08 17:44:12 massiot Exp $
+ * $Id: input.h,v 1.29 2001/02/12 13:20:14 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -34,6 +34,7 @@
                                  * of data loss (this should be < 188).      */
 #define PADDING_PACKET_NUMBER 10 /* Number of padding packets top insert to
                                   * escape a decoder.                        */
+#define NO_SEEK             -1
 
 /*****************************************************************************
  * Prototypes from input_ext-dec.c

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.79 2001/02/11 01:15:11 sam Exp $
+ * $Id: input.c,v 1.80 2001/02/12 13:20:14 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -105,7 +105,7 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.i_selected_es_number = 0;
     p_input->stream.i_pgrm_number = 0;
     p_input->stream.i_new_status = p_input->stream.i_new_rate = 0;
-    p_input->stream.i_seek = 0;
+    p_input->stream.i_seek = NO_SEEK;
 
     /* Initialize stream control properties. */
     p_input->stream.control.i_status = PLAYING_S;
@@ -198,7 +198,7 @@ static void RunThread( input_thread_t *p_input )
 #endif
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        if( p_input->stream.i_seek )
+        if( p_input->stream.i_seek != NO_SEEK )
         {
             if( p_input->stream.b_seekable && p_input->pf_seek != NULL )
             {
@@ -216,7 +216,7 @@ static void RunThread( input_thread_t *p_input )
                     p_pgrm->i_synchro_state = SYNCHRO_REINIT;
                 }
             }
-            p_input->stream.i_seek = 0;
+            p_input->stream.i_seek = NO_SEEK;
         }
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
