@@ -45,7 +45,11 @@
 #include <nsISupports.h>
 #include <nsMemory.h>
 #include <npapi.h>
+
+/* This is from mozilla java, do we really need it? */
+#if 0 
 #include <jri.h>
+#endif
 
 #if !defined(XP_MACOSX) && !defined(XP_UNIX) && !defined(XP_WIN)
 #define XP_UNIX 1
