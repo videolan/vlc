@@ -341,12 +341,7 @@ static int ExecuteCommand(vlm_t *vlm, char *command, vlm_message_t **p_message)
         goto end_seq;
     }
 
-    if( strcmp(p_command[0], "segfault") == 0 )
-    {
-        /* the only command we really need */
-        *((int *)NULL) = 42;
-    }
-    else if( strcmp(p_command[0], "new") == 0 )
+    if( strcmp(p_command[0], "new") == 0 )
     {
         if( i_command >= 3 )
         {
