@@ -35,6 +35,7 @@
 typedef GUID guid_t;
 
 #define MAX_ASF_TRACKS 128
+#define ASF_DATA_PACKET_SIZE 4096
 
 /*****************************************************************************
  * Module descriptor
@@ -206,7 +207,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_write_header = VLC_TRUE;
     p_sys->i_track = 0;
-    p_sys->i_packet_size = 4096;
+    p_sys->i_packet_size = ASF_DATA_PACKET_SIZE;
     p_sys->i_packet_count= 0;
 
     /* Generate a random fid */
@@ -817,6 +818,9 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
         i_ci_size += 8 + 2 * strlen( p_sys->track[i].psz_name );
         if( p_sys->track[i].i_cat == AUDIO_ES ) i_ci_size += 4;
         else if( p_sys->track[i].i_cat == VIDEO_ES ) i_ci_size += 6;
+
+        /* Error correction data field */
+        if( p_sys->track[i].b_audio_correction ) i_size += 8;
     }
 
     /* size of the content description object */
@@ -833,9 +837,6 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     /* size of the metadata object */
     for( i = 0; i < p_sys->i_track; i++ )
     {
-        /* Error correction data field */
-        if( p_sys->track[i].b_audio_correction ) i_size += 8;
-
         if( p_sys->track[i].i_cat == VIDEO_ES )
         {
             i_cm_size = 26 + 2 * (16 + 2 * sizeof("AspectRatio?"));
@@ -955,11 +956,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
         tk = &p_sys->track[i];
 
         bo_add_guid ( &bo, &asf_object_stream_properties_guid );
-
-        if( tk->b_audio_correction ) /* Error correction data field */
-            bo_addle_u64( &bo, 78 + tk->i_extra + 8 );
-        else
-            bo_addle_u64( &bo, 78 + tk->i_extra );
+        bo_addle_u64( &bo, 78 + tk->i_extra + (tk->b_audio_correction ? 8:0) );
 
         if( tk->i_cat == AUDIO_ES )
         {
@@ -1099,6 +1096,15 @@ static block_t *asf_packet_create( sout_mux_t *p_mux,
         /* add payload (header size = 17) */
         i_payload = __MIN( i_data - i_pos,
                            p_sys->i_packet_size - p_sys->i_pk_used - 17 );
+
+        if( tk->b_audio_correction && p_sys->i_pk_frame && i_payload < i_data )
+        {
+            /* Don't know why yet but WMP doesn't like splitted WMA packets */
+            *last = asf_packet_flush( p_mux );
+            last  = &(*last)->p_next;
+            continue;
+        }
+
         bo_add_u8   ( &bo, !(data->i_flags & BLOCK_FLAG_TYPE_P ||
                       data->i_flags & BLOCK_FLAG_TYPE_B) ?
                       0x80 | tk->i_id : tk->i_id );
