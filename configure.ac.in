@@ -325,6 +325,7 @@ AC_CHECK_FUNCS(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
     [need_getopt=:])])
 AM_CONDITIONAL(BUILD_GETOPT, ${need_getopt})
 
+if test "x$SYS" != "xmingw32"; then
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(dl,dlopen,LDFLAGS_vlc="${LDFLAGS_vlc} -ldl")
 AC_CHECK_LIB(m,cos,
@@ -344,7 +345,9 @@ AC_CHECK_LIB(m,pow,
 AC_CHECK_LIB(m,sqrt,
   LDFLAGS_headphone_channel_mixer="${LDFLAGS_headphone_channel_mixer} -lm"
 )
+fi # end "x$SYS" != "xmingw32"
 
+if test "x$SYS" != "xmingw32"; then
 dnl Check for pthreads - borrowed from XMMS
 THREAD_LIB=error
 if test "x${THREAD_LIB}" = "xerror"; then
@@ -402,10 +405,8 @@ AC_ARG_ENABLE(st,
     fi
 ])
 
-if test "x${SYS}" != "xmingw32"; then
-  LDFLAGS_vlc="${LDFLAGS_vlc} ${THREAD_LIB}"
-  LDFLAGS_plugins="${LDFLAGS_plugins} ${THREAD_LIB}"
-fi
+LDFLAGS_vlc="${LDFLAGS_vlc} ${THREAD_LIB}"
+LDFLAGS_plugins="${LDFLAGS_plugins} ${THREAD_LIB}"
 
 dnl Don't link with rt when using GNU-pth
 if test "x${THREAD_LIB}" != "x-lpth" && test "x${THREAD_LIB}" != "x-lst"; then
@@ -440,6 +441,7 @@ AC_EGREP_HEADER(pthread_once,pthread.h,[
   AC_DEFINE(PTHREAD_ONCE_IN_PTHREAD_H, 1,
             Define if <pthread.h> defines pthread_once.)],[
   AC_MSG_RESULT(no)])
+fi # end "x$SYS" != "xmingw32"
 
 AC_MSG_CHECKING(for strncasecmp in strings.h)
 AC_EGREP_HEADER(strncasecmp,strings.h,[
@@ -453,8 +455,10 @@ AC_CHECK_HEADERS(signal.h time.h errno.h stdint.h getopt.h strings.h inttypes.h 
 AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h sys/ioctl.h sys/stat.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
+if test "x$SYS" != "xmingw32"; then
 AC_CHECK_HEADERS(machine/param.h sys/shm.h)
 AC_CHECK_HEADERS(linux/version.h)
+fi # end "x$SYS" != "xmingw32"
 
 AC_HEADER_TIME
 
@@ -464,6 +468,7 @@ AC_CHECK_HEADERS(dirent.h,,[need_dirent=:])
 AM_CONDITIONAL(BUILD_DIRENT, ${need_dirent})
 
 dnl Mac OS X and other OSes don't have declaration for nanosleep
+if test "x$SYS" != "xmingw32"; then
 AC_MSG_CHECKING(for nanosleep in time.h)
 AC_EGREP_HEADER(nanosleep,time.h,[
   AC_MSG_RESULT(yes)
@@ -472,6 +477,7 @@ AC_EGREP_HEADER(nanosleep,time.h,[
 ],[
   AC_MSG_RESULT(no)
 ])
+fi # end "x$SYS" != "xmingw32"
 
 dnl Make sure we have timespecs
 AC_MSG_CHECKING(for timespec in sys/time.h)
@@ -484,7 +490,9 @@ AC_EGREP_HEADER(timespec,sys/time.h,[
 ])
 
 dnl Check for threads library
+if test "x$SYS" != "xmingw32"; then
 AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
+fi # end "x$SYS" != "xmingw32"
 
 dnl Default X headers and libraries
 if test "x${x_includes}" = "xNONE"; then
@@ -887,8 +895,6 @@ if test "x${ac_cv_sse_inline}" != "xno" -a "x${SYS}" != "xmingw32"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${SSE_MODULES}"
 fi
 
-# don't try to grok AltiVec with native mingw32 it doesn't work right now
-# we should be able to remove this test with future versions of mingw32
 if test "x${SYS}" != "xmingw32"; then
 AC_CACHE_CHECK([if \$CC groks AltiVec inline assembly],
     [ac_cv_altivec_inline],
@@ -944,7 +950,7 @@ if test "x${ac_cv_ld_altivec}" != "xno"; then
   LDFLAGS_memcpyaltivec="${LDFLAGS_memcpyaltivec} -framework vecLib"
   LDFLAGS_vlc="${LDFLAGS_vlc} -framework vecLib"
 fi
-fi # end if mingw32
+fi # end "x$SYS" != "xmingw32"
 
 AC_ARG_WITH(,[])
 AC_ARG_WITH(,[Optimization options:])
