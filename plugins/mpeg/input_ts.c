@@ -2,9 +2,9 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.9 2001/03/07 01:36:41 sam Exp $
+ * $Id: input_ts.c,v 1.10 2001/03/18 18:48:27 henri Exp $
  *
- * Authors: 
+ * Authors: Henri Fallon <henri@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -143,22 +143,20 @@ static void TSInit( input_thread_t * p_input )
     p_method = malloc( sizeof( thread_ts_data_t ) );
     if( p_method == NULL )
     {
-        intf_ErrMsg( "Out of memory" );
+        intf_ErrMsg( "TS input : Out of memory" );
         p_input->b_error = 1;
         return;
     }
- 
+
     p_input->p_plugin_data = (void *)p_method;
     p_input->p_method_data = NULL;
  
-    
-    /* XXX : For the time being, only file, after, i'll do the network */ 
     
     /* Initialize netlist */
     if( input_NetlistInit( p_input, NB_DATA, NB_PES, TS_PACKET_SIZE, 
                 INPUT_READ_ONCE ) )
     {
-        intf_ErrMsg( "Could not initialize netlist" );
+        intf_ErrMsg( "TS input : Could not initialize netlist" );
         return;
     }
    
@@ -205,11 +203,29 @@ static void TSEnd( input_thread_t * p_input )
 static int TSRead( input_thread_t * p_input,
                    data_packet_t * pp_packets[INPUT_READ_ONCE] )
 {
-    unsigned int i_read, i_loop;
-    struct iovec * p_iovec;
+    thread_ts_data_t    * p_method;
+    unsigned int    i_read, i_loop;
+    int             i_data;
+    struct iovec  * p_iovec;
+    struct timeval  s_wait;
     
+
+    /* Init */
+    p_method = ( thread_ts_data_t * )p_input->p_plugin_data;
+   
+    /* Initialize file descriptor set */
+    FD_ZERO( &(p_method->s_fdset) );
+    FD_SET( p_input->i_handle, &(p_method->s_fdset) );
+
+    
+    /* We'll wait 0.5 second if nothing happens */
+    s_wait.tv_sec = 0.5;
+    s_wait.tv_usec = 0;
+    
+    /* Reset pointer table */
     memset( pp_packets, 0, INPUT_READ_ONCE*sizeof(data_packet_t *) );
     
+    /* Get iovecs */
     p_iovec = input_NetlistGetiovec( p_input->p_method_data );
     
     if ( p_iovec == NULL )
@@ -217,21 +233,35 @@ static int TSRead( input_thread_t * p_input,
         return( -1 ); /* empty netlist */
     } 
 
-    i_read = readv( p_input->i_handle, p_iovec, INPUT_READ_ONCE );
-    if( i_read == -1 )
+    /* Fill if some data is available */
+    i_data = select(p_input->i_handle + 1, &(p_method->s_fdset), NULL, NULL, 
+                    &s_wait);
+    
+    if( i_data == -1 )
     {
-        intf_ErrMsg( "Could not readv" );
+        intf_ErrMsg( "TS input : Error in select : %s", strerror(errno) );
         return( -1 );
     }
-
-    input_NetlistMviovec( p_input->p_method_data, 
-            (int)(i_read/TS_PACKET_SIZE) , pp_packets );
-
-    /* check correct TS header */
-    for( i_loop=0; i_loop < (int)(i_read/TS_PACKET_SIZE); i_loop++ )
+    
+    if( i_data )
     {
-        if( pp_packets[i_loop]->p_buffer[0] != 0x47 )
-            intf_ErrMsg( "Bad TS Packet (starcode != 0x47)." );
+        i_read = readv( p_input->i_handle, p_iovec, INPUT_READ_ONCE );
+        
+        if( i_read == -1 )
+        {
+            intf_ErrMsg( "TS input : Could not readv" );
+            return( -1 );
+        }
+    
+        input_NetlistMviovec( p_input->p_method_data, 
+                (int)(i_read/TS_PACKET_SIZE) , pp_packets );
+    
+        /* check correct TS header */
+        for( i_loop=0; i_loop < (int)(i_read/TS_PACKET_SIZE); i_loop++ )
+        {
+            if( pp_packets[i_loop]->p_buffer[0] != 0x47 )
+                intf_ErrMsg( "TS input : Bad TS Packet (starcode != 0x47)." );
+        }
     }
     return 0;
 }
