@@ -1,7 +1,7 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.57 2003/08/13 14:17:25 zorglub Exp $
+dnl $Id: configure.ac,v 1.58 2003/08/13 23:26:55 gbazin Exp $
 
-AC_INIT(vlc,0.6.2)
+AC_INIT(vlc,0.6.3-cvs)
 
 CONFIGURE_LINE="$0 $*"
 CODENAME="Trevelyan"
@@ -13,7 +13,7 @@ AC_CANONICAL_SYSTEM
 
 dnl XXX: we don't put any flags here, because automake 1.5 doesn't support
 dnl them. And we need the comma otherwize automake will choke on it.
-AM_INIT_AUTOMAKE(vlc,0.6.2)
+AM_INIT_AUTOMAKE(vlc,0.6.3-cvs)
 AM_CONFIG_HEADER(config.h)
 
 dnl
@@ -802,6 +802,8 @@ dnl Some plugins aren't useful on some platforms
 dnl
 if test "${SYS}" != "mingw32"; then
     AX_ADD_PLUGINS([screensaver])
+else
+    AX_ADD_PLUGINS([ntservice])
 fi
 
 dnl
