@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.16 2003/05/16 23:02:37 gbazin Exp $
+ * $Id: transcode.c,v 1.17 2003/05/22 20:45:25 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -477,7 +477,9 @@ static struct
     { VLC_FOURCC( 'm', 'j', 'p', 'b' ), CODEC_ID_MJPEGB },
     { VLC_FOURCC( 'd', 'v', 's', 'l' ), CODEC_ID_DVVIDEO },
     { VLC_FOURCC( 'S', 'V', 'Q', '1' ), CODEC_ID_SVQ1 },
+#if LIBAVCODEC_BUILD >= 4666
     { VLC_FOURCC( 'S', 'V', 'Q', '3' ), CODEC_ID_SVQ3 },
+#endif
 
     /* raw video code, only used for 'encoding' */
     { VLC_FOURCC( 'I', '4', '2', '0' ), CODEC_ID_RAWVIDEO },
