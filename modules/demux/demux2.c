@@ -2,7 +2,7 @@
  * demux2 adaptation layer.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: demux2.c,v 1.5 2004/01/18 11:14:23 gbazin Exp $
+ * $Id: demux2.c,v 1.6 2004/01/20 14:51:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -28,6 +28,8 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+
+#include "vlc_playlist.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -70,6 +72,7 @@ static int Demux2Open( vlc_object_t * p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux2_sys_t   *p_sys   = malloc( sizeof( demux2_sys_t ) );
     demux_t        *p_demux;
+    playlist_t     *p_playlist;
 
     char           *psz_uri;
 
@@ -101,6 +104,19 @@ static int Demux2Open( vlc_object_t * p_this )
         /* We should handle special access+demuxer but later */
         free( p_sys );
         return VLC_EGENERIC;
+    }
+
+    /* Now retreive meta info from demuxer */
+    if( ( p_playlist = vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
+                                        FIND_ANYWHERE ) ) )
+    {
+        int64_t i_length;
+
+        if( !demux2_Control( p_demux, DEMUX_GET_LENGTH, &i_length ) )
+        {
+            playlist_SetDuration( p_playlist, -1, i_length );
+        }
+        vlc_object_release( p_playlist );
     }
 
     p_input->pf_demux = Demux2Demux;
