@@ -520,8 +520,8 @@ static void Usage( int i_fashion )
  *****************************************************************************/
 static void Version( void )
 {
-    intf_Msg( "vlc " PROGRAM_VERSION " " PROGRAM_CODENAME
-              " (" PROGRAM_BUILD ") (" PROGRAM_OPTIONS ")\n"
+    intf_Msg( "vlc "  " " 
+              " ("  ") ("  ")\n"
               "Copyright 1996-2000 VideoLAN\n"
               "This program comes with NO WARRANTY, to the extent permitted by law.\n"
               "You may redistribute it under the terms of the GNU General Public License;\n"

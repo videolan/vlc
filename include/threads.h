@@ -29,7 +29,7 @@
 #elif defined(HAVE_CTHREADS_H)                                    /* GNUMach */
 #include <cthreads.h>
 
-#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)   /* BeOS */
+#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)   /* BeOS */
 #include <kernel/OS.h>
 #include <kernel/scheduler.h>
 
@@ -88,7 +88,7 @@ typedef struct s_condition {
     struct cond_imp *implications;
 } vlc_cond_t;
 
-#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
 
 typedef thread_id vlc_thread_t;
 
@@ -152,7 +152,7 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
     *p_thread = cthread_fork( (cthread_fn_t)func, (any_t)p_data );
     return( 0 );
 
-#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     *p_thread = spawn_thread( (thread_func)func, psz_name, B_NORMAL_PRIORITY, p_data );
     return resume_thread( *p_thread );
 
@@ -171,7 +171,7 @@ static __inline__ void vlc_thread_exit( void )
     int result;
     cthread_exit( &result );
 
-#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     exit_thread( 0 );
 
 #elif defined(HAVE_PTHREAD_H)
@@ -188,7 +188,7 @@ static __inline__ void vlc_thread_join( vlc_thread_t thread )
 #if defined(HAVE_CTHREADS_H)
     cthread_join( thread );
 
-#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     int32 exit_value;	
     wait_for_thread( thread, &exit_value );
 
@@ -198,7 +198,7 @@ static __inline__ void vlc_thread_join( vlc_thread_t thread )
 #endif
 }
 
-#if defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+#if defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
 /* lazy_init_mutex */
 static __inline__ void lazy_init_mutex(vlc_mutex_t* p_mutex)
 {
@@ -223,7 +223,7 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
     mutex_init( p_mutex );
     return( 0 );
 
-#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     // check the arguments and whether it's already been initialized
     if( !p_mutex ) return B_BAD_VALUE;
     if( p_mutex->init == 9999 ) return EALREADY;
@@ -248,7 +248,7 @@ static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
     mutex_lock( p_mutex );
     return( 0 );
 
-#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     status_t err;
 
     if( !p_mutex ) return B_BAD_VALUE;
@@ -274,7 +274,7 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
     mutex_unlock( p_mutex );
     return( 0 );
 
-#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     if(! p_mutex) return B_BAD_VALUE;
     if( p_mutex->init < 2000 ) return B_NO_INIT;
     lazy_init_mutex( p_mutex );
@@ -290,7 +290,7 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
 #endif
 }
 
-#if defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+#if defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
 /* lazy_init_cond */
 static __inline__ void lazy_init_cond( vlc_cond_t* p_condvar )
 {
@@ -320,7 +320,7 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
 
     return( 0 );
 
-#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     if( !p_condvar ) return B_BAD_VALUE;
     if( p_condvar->init == 9999 ) return EALREADY;
 
@@ -350,7 +350,7 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
     }
     return( 0 );
 
-#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     status_t err = B_OK;
 
     if( !p_condvar ) return B_BAD_VALUE;
@@ -388,7 +388,7 @@ static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex
     condition_wait( (condition_t)p_condvar, (mutex_t)p_mutex );
     return( 0 );
 
-#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     status_t err;
 
     if( !p_condvar ) return B_BAD_VALUE;

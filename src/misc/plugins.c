@@ -60,7 +60,7 @@ int RequestPlugin ( plugin_id_t * p_plugin, char * psz_mask, char * psz_name )
         *p_plugin = dlopen( psz_plugin, RTLD_NOW | RTLD_GLOBAL );
 
 #elif defined(HAVE_IMAGE_H)
-        *p_plugin = load_addon_image( psz_plugin );
+        *p_plugin = load_add_on( psz_plugin );
 
 #endif
 

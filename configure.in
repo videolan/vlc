@@ -50,7 +50,7 @@ AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
 
 dnl Check for threads library
-AC_CHECK_HEADERS(cthreads.h pthread.h kernel/sheduler.h kernel/OS.h)
+AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

@@ -2731,7 +2731,7 @@ fi
 done
 
 
-for ac_hdr in cthreads.h pthread.h kernel/sheduler.h kernel/OS.h
+for ac_hdr in cthreads.h pthread.h kernel/scheduler.h kernel/OS.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6

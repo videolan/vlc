@@ -1,3 +1,4 @@
+# Generated automatically from Makefile.in by configure.
 ################################################################################
 # vlc (VideoLAN Client) main makefile
 # (c)1998 VideoLAN
@@ -87,10 +88,10 @@ PROGRAM_BUILD = `date` $(USER)
 DEFINE += -DARCH_$(shell echo $(ARCH) | cut -f1 -d' ')
 DEFINE += -DSYS_$(SYS)
 DEFINE += -DPLUGIN_PATH="\"$(PREFIX)/lib/videolan/vlc\""
-DEFINE += -DPROGRAM_VERSION="\"@VLC_VERSION@\""
-DEFINE += -DPROGRAM_CODENAME="\"@VLC_CODENAME@\""
-DEFINE += -DPROGRAM_OPTIONS="\"$(shell echo $(PROGRAM_OPTIONS) | tr 'A-Z' 'a-z')\""
-DEFINE += -DPROGRAM_BUILD="\"$(PROGRAM_BUILD)\""
+DEFINE += -DPROGRAM_VERSION="\"0.1.99\""
+DEFINE += -DPROGRAM_CODENAME="\"Onatopp\""
+#DEFINE += -DPROGRAM_OPTIONS="\"$(shell echo $(PROGRAM_OPTIONS) | tr 'A-Z' 'a-z')\""
+#DEFINE += -DPROGRAM_BUILD="\"$(PROGRAM_BUILD)\""
 ifeq ($(DEBUG),1)
 DEFINE += -DDEBUG
 endif
@@ -378,7 +379,11 @@ $(PLUGIN_OBJ): %.so: .dep/%.d
 # audio plugins
 plugins/aout/aout_dummy.so plugins/aout/aout_dsp.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
+ifeq ($(SYS), BEOS)
+		@$(CC) $(CCFLAGS) $(CFLAGS) -nostart -o $@ $<
+else
 		@$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
+endif
 
 plugins/aout/aout_esd.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
@@ -392,7 +397,11 @@ endif
 plugins/intf/intf_dummy.so plugins/vout/vout_dummy.so \
 	plugins/intf/intf_fb.so plugins/vout/vout_fb.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
+ifeq ($(SYS), BEOS)
+		@$(CC) $(CCFLAGS) $(CFLAGS) -nostart -o $@ $<
+else
 		@$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
+endif
 
 plugins/intf/intf_x11.so plugins/vout/vout_x11.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"

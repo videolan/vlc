@@ -73,8 +73,8 @@
 /* Define if you have the <kernel/OS.h> header file.  */
 #undef HAVE_KERNEL_OS_H
 
-/* Define if you have the <kernel/sheduler.h> header file.  */
-#undef HAVE_KERNEL_SHEDULER_H
+/* Define if you have the <kernel/scheduler.h> header file.  */
+#undef HAVE_KERNEL_SCHEDULER_H
 
 /* Define if you have the <machine/soundcard.h> header file.  */
 #undef HAVE_MACHINE_SOUNDCARD_H
