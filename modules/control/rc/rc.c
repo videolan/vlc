@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.36 2003/07/23 01:13:47 gbazin Exp $
+ * $Id: rc.c,v 1.37 2003/07/28 07:16:50 fenrir Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -527,8 +527,19 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "seek" ) )
     {
-        input_Seek( p_input, atoi( newval.psz_string ),
-                    INPUT_SEEK_SECONDS | INPUT_SEEK_SET );
+        if( strlen( newval.psz_string ) > 0 &&
+            newval.psz_string[strlen( newval.psz_string ) - 1] == '%' )
+        {
+            input_Seek( p_input, atoi( newval.psz_string ),
+                        INPUT_SEEK_PERCENT | INPUT_SEEK_SET );
+        }
+        else
+        {
+            input_Seek( p_input, atoi( newval.psz_string ),
+                        INPUT_SEEK_SECONDS | INPUT_SEEK_SET );
+        }
+        vlc_object_release( p_input );
+        return VLC_SUCCESS;
     }
     else if( !strcmp( psz_cmd, "chapter" ) ||
              !strcmp( psz_cmd, "chapter_n" ) ||
