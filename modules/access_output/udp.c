@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.11 2003/07/31 23:44:49 fenrir Exp $
+ * $Id: udp.c,v 1.12 2003/08/01 19:38:48 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -380,38 +380,44 @@ static void ThreadWrite( vlc_object_t *p_this )
 {
     sout_access_thread_t *p_thread = (sout_access_thread_t*)p_this;
     sout_instance_t      *p_sout = p_thread->p_sout;
-    sout_buffer_t        *p_buffer;
-    mtime_t              i_date, i_pts_delay;
+    mtime_t              i_pts_delay;
+    mtime_t              i_date_last = -1;
 
     /* Get the i_pts_delay value */
     i_pts_delay = config_GetInt( p_this, "udp-sout-caching" ) * 1000;
 
-    p_buffer = sout_FifoGet( p_thread->p_fifo );
-    if( p_thread->b_die ) return;
-
-    i_date = mdate() + i_pts_delay - p_buffer->i_dts;
-
-    while( 1 )
+    while( ! p_thread->b_die )
     {
-        mtime_t i_wait;
+        sout_buffer_t *p_pk;
+        mtime_t       i_date;
 
-        i_wait = i_date + p_buffer->i_dts;
+        p_pk = sout_FifoGet( p_thread->p_fifo );
 
-        if( i_wait - mdate() > MAX_ERROR || i_wait - mdate() < -MAX_ERROR )
+        i_date = i_pts_delay + p_pk->i_dts;
+        if( i_date_last > 0 )
         {
-            msg_Warn( p_sout, "resetting clock" );
-            i_date = mdate() + i_pts_delay - p_buffer->i_dts;
+            if( i_date - i_date_last > 2000000 )
+            {
+                msg_Dbg( p_thread, "mmh, hole > 2s -> drop" );
+
+                sout_BufferDelete( p_sout, p_pk );
+                i_date_last = i_date;
+                continue;
+            }
+            else if( i_date - i_date_last < 0 )
+            {
+                msg_Dbg( p_thread, "mmh, paquets in the past -> drop" );
+
+                sout_BufferDelete( p_sout, p_pk );
+                i_date_last = i_date;
+                continue;
+            }
         }
-        else
-        {
-            mwait( i_wait );
-        }
 
-        send( p_thread->i_handle, p_buffer->p_buffer, p_buffer->i_size, 0 );
 
-        sout_BufferDelete( p_sout, p_buffer );
-
-        p_buffer = sout_FifoGet( p_thread->p_fifo );
-        if( p_thread->b_die ) return;
+        mwait( i_date );
+        send( p_thread->i_handle, p_pk->p_buffer, p_pk->i_size, 0 );
+        sout_BufferDelete( p_sout, p_pk );
+        i_date_last = i_date;
     }
 }
