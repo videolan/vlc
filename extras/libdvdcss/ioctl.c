@@ -2,12 +2,13 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.11 2001/08/10 17:43:50 sam Exp $
+ * $Id: ioctl.c,v 1.12 2001/09/28 15:24:11 massiot Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Håkan Hjort <d95hjort@dtek.chalmers.se>
+ *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,7 +71,8 @@
 #include "common.h"
 
 #ifdef SYS_DARWIN
-#   include "MacOSX_dvdioctl/DVDioctl.h"
+#   include <IOKit/storage/IODVDMediaBSDClient.h>
+//#   include "DVDioctl/DVDioctl.h"
 #endif
 
 #include "ioctl.h"
@@ -150,9 +152,22 @@ int ioctl_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
     // s->copyright.rmi = p_buffer[ 5 ];
 
 #elif defined( SYS_DARWIN )
-    *pi_copyright = 1;
+    dk_dvd_read_structure_t dvd;
+    DVDCopyrightInfo dvdcpi;
+    
+    memset(&dvd, 0, sizeof(dvd));
+    memset(&dvdcpi, 0, sizeof(dvdcpi));
 
-    i_ret = 0;
+    dvd.buffer = &dvdcpi;
+    dvd.bufferLength = sizeof(dvdcpi);
+    dvd.format = kDVDStructureFormatCopyrightInfo;
+    dvd.layer = i_layer;
+    
+    i_ret = ioctl( i_fd, DKIOCDVDREADSTRUCTURE, &dvd );
+
+    *pi_copyright = dvdcpi.copyrightProtectionSystemType;
+
+//    if (i_ret != 0) _dvdcss_debug( dvdcss, "ioctl_ReadCopyright retval = %d\n", i_ret );
 
 #elif defined( WIN32 )
     if( WIN2K ) /* NT/Win2000/Whistler */
@@ -289,9 +304,20 @@ int ioctl_ReadKey( int i_fd, int *pi_agid, u8 *p_key )
     memcpy( p_key, p_buffer + 4, 2048 );
 
 #elif defined( SYS_DARWIN )
-    i_ret = 0;
+    dk_dvd_read_structure_t dvd;
+    DVDDiscKeyInfo dvddki;
+    
+    memset(&dvd, 0, sizeof(dvd));
+    memset(&dvddki, 0, sizeof(dvddki));
 
-    memset( p_key, 0x00, 2048 );
+    dvd.buffer = &dvddki;
+    dvd.bufferLength = sizeof(dvddki);
+    dvd.format = kDVDStructureFormatDiscKeyInfo;
+    dvd.grantID = *pi_agid;
+    
+    i_ret = ioctl( i_fd, DKIOCDVDREADSTRUCTURE, &dvd );
+
+    memcpy( p_key, dvddki.discKeyStructures, 2048 );
 
 #elif defined( WIN32 )
     if( WIN2K ) /* NT/Win2000/Whistler */
@@ -393,15 +419,22 @@ int ioctl_ReportAgid( int i_fd, int *pi_agid )
     *pi_agid = p_buffer[ 7 ] >> 6;
     
 #elif defined( SYS_DARWIN )
-    INIT_DVDIOCTL( 8 );
+    dk_dvd_report_key_t dvd;
+    DVDAuthenticationGrantIDInfo dvdagid;
+    
+    memset(&dvd, 0, sizeof(dvd));
+    memset(&dvdagid, 0, sizeof(dvdagid));
 
-    dvdioctl.i_keyformat = kCSSAGID;
-    dvdioctl.i_agid = *pi_agid;
-    dvdioctl.i_lba = 0;
+    dvd.buffer = &dvdagid;
+    dvd.bufferLength = sizeof(dvdagid);
+    dvd.format = kDVDKeyFormatAGID_CSS;
+    dvd.grantID = *pi_agid;
+    dvdagid.grantID = *pi_agid; //do we need this
+    dvd.keyClass = kDVDKeyClassCSS_CPPM_CPRM; //or this - this is 0x00 anyways
 
-    i_ret = ioctl( i_fd, IODVD_REPORT_KEY, &dvdioctl );
+    i_ret = ioctl( i_fd, DKIOCDVDREPORTKEY, &dvd );
 
-    *pi_agid = p_buffer[ 7 ] >> 6;
+    *pi_agid = dvdagid.grantID;
 
 #elif defined( WIN32 )
     if( WIN2K ) /* NT/Win2000/Whistler */
@@ -484,15 +517,20 @@ int ioctl_ReportChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
     memcpy( p_challenge, p_buffer + 4, 12 );
     
 #elif defined( SYS_DARWIN )
-    INIT_DVDIOCTL( 16 );
+    dk_dvd_report_key_t dvd;
+    DVDChallengeKeyInfo dvdcki;
+    
+    memset(&dvd, 0, sizeof(dvd));
+    memset(&dvdcki, 0, sizeof(dvdcki));
 
-    dvdioctl.i_keyformat = kChallengeKey;
-    dvdioctl.i_agid = *pi_agid;
-    dvdioctl.i_lba = 0;
+    dvd.buffer = &dvdcki;
+    dvd.bufferLength = sizeof(dvdcki);
+    dvd.format = kDVDKeyFormatChallengeKey;
+    dvd.grantID = *pi_agid;
 
-    i_ret = ioctl( i_fd, IODVD_REPORT_KEY, &dvdioctl );
+    i_ret = ioctl( i_fd, DKIOCDVDREPORTKEY, &dvd );
 
-    memcpy( p_challenge, p_buffer + 4, 12 );
+    memcpy( p_challenge, dvdcki.challengeKeyValue, 10 );
 
 #elif defined( WIN32 )
     if( WIN2K ) /* NT/Win2000/Whistler */
@@ -590,15 +628,21 @@ int ioctl_ReportASF( int i_fd, int *pi_agid, int *pi_asf )
     *pi_asf = p_buffer[ 7 ] & 1;
     
 #elif defined( SYS_DARWIN )
-    INIT_DVDIOCTL( 8 );
+    dk_dvd_report_key_t dvd;
+    DVDAuthenticationSuccessFlagInfo dvdasfi;
+    
+    memset(&dvd, 0, sizeof(dvd));
+    memset(&dvdasfi, 0, sizeof(dvdasfi));
 
-    dvdioctl.i_keyformat = kASF;
-    dvdioctl.i_agid = *pi_agid;
-    dvdioctl.i_lba = 0;
+    dvd.buffer = &dvdasfi;
+    dvd.bufferLength = sizeof(dvdasfi);
+    dvd.format = kDVDKeyFormatASF;
+    dvd.grantID = *pi_agid;
+    dvdasfi.successFlag = *pi_asf;
+    
+    i_ret = ioctl( i_fd, DKIOCDVDREPORTKEY, &dvd );
 
-    i_ret = ioctl( i_fd, IODVD_REPORT_KEY, &dvdioctl );
-
-    *pi_asf = p_buffer[ 7 ] & 1;
+    *pi_asf = dvdasfi.successFlag;
 
 #elif defined( WIN32 )
     if( WIN2K ) /* NT/Win2000/Whistler */
@@ -696,14 +740,20 @@ int ioctl_ReportKey1( int i_fd, int *pi_agid, u8 *p_key )
     memcpy( p_key, p_buffer + 4, 8 );;
     
 #elif defined( SYS_DARWIN )
-    INIT_DVDIOCTL( 12 );
+    dk_dvd_report_key_t dvd;
+    DVDKey1Info dvdk1i;
+    
+    memset(&dvd, 0, sizeof(dvd));
+    memset(&dvdk1i, 0, sizeof(dvdk1i));
 
-    dvdioctl.i_keyformat = kKey1;
-    dvdioctl.i_agid = *pi_agid;
+    dvd.buffer = &dvdk1i;
+    dvd.bufferLength = sizeof(dvdk1i);
+    dvd.format = kDVDKeyFormatKey1;
+    dvd.grantID = *pi_agid;
+    
+    i_ret = ioctl( i_fd, DKIOCDVDREPORTKEY, &dvd );
 
-    i_ret = ioctl( i_fd, IODVD_SEND_KEY, &dvdioctl );
-
-    memcpy( p_key, p_buffer + 4, 8 );
+    memcpy( p_key, dvdk1i.key1Value, 5 );
 
 #elif defined( WIN32 )
     if( WIN2K ) /* NT/Win2000/Whistler */
@@ -790,12 +840,21 @@ int ioctl_InvalidateAgid( int i_fd, int *pi_agid )
     }
 
 #elif defined( SYS_DARWIN )
-    INIT_DVDIOCTL( 0 );
+    dk_dvd_send_key_t dvd;
+    DVDAuthenticationGrantIDInfo dvdagid;
+    
+    memset(&dvd, 0, sizeof(dvd));
+    memset(&dvdagid, 0, sizeof(dvdagid));
 
-    dvdioctl.i_keyformat = kInvalidateAGID;
-    dvdioctl.i_agid = *pi_agid;
+    dvd.buffer = &dvdagid;
+    dvd.bufferLength = sizeof(dvdagid);
+    dvd.format = kDVDKeyFormatAGID_Invalidate;
+    dvd.grantID = *pi_agid;
+    dvdagid.grantID = *pi_agid; //we need this?
+    
+    i_ret = ioctl( i_fd, DKIOCDVDSENDKEY, &dvd );
 
-    i_ret = ioctl( i_fd, IODVD_SEND_KEY, &dvdioctl );
+    *pi_agid = dvdagid.grantID;
 
 #elif defined( WIN32 )
     if( WIN2K ) /* NT/Win2000/Whistler */
@@ -881,15 +940,20 @@ int ioctl_SendChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
     return 0;
     
 #elif defined( SYS_DARWIN )
-    INIT_DVDIOCTL( 16 );
+    dk_dvd_send_key_t dvd;
+    DVDChallengeKeyInfo dvdcki;
+    
+    memset(&dvd, 0, sizeof(dvd));
+    memset(&dvdcki, 0, sizeof(dvdcki));
 
-    dvdioctl.i_keyformat = kChallengeKey;
-    dvdioctl.i_agid = *pi_agid;
+    dvd.buffer = &dvdcki;
+    dvd.bufferLength = sizeof(dvdcki);
+    dvd.format = kDVDKeyFormatChallengeKey;
+    dvd.grantID = *pi_agid;
 
-    p_buffer[ 1 ] = 0xe;
-    memcpy( p_buffer + 4, p_challenge, 12 );
+    memcpy( dvdcki.challengeKeyValue, p_challenge,  10 );
 
-    return ioctl( i_fd, IODVD_SEND_KEY, &dvdioctl );
+    return ioctl( i_fd, DKIOCDVDSENDKEY, &dvd );
 
 #elif defined( WIN32 )
     if( WIN2K ) /* NT/Win2000/Whistler */
@@ -979,6 +1043,22 @@ int ioctl_SendKey2( int i_fd, int *pi_agid, u8 *p_key )
 
     return 0;
     
+#elif defined( SYS_DARWIN )
+    dk_dvd_send_key_t dvd;
+    DVDKey2Info dvdk2i;
+    
+    memset(&dvd, 0, sizeof(dvd));
+    memset(&dvdk2i, 0, sizeof(dvdk2i));
+
+    dvd.buffer = &dvdk2i;
+    dvd.bufferLength = sizeof(dvdk2i);
+    dvd.format = kDVDKeyFormatKey2;
+    dvd.grantID = *pi_agid;
+    
+    memcpy( dvdk2i.key2Value, p_key,  5 );
+
+    return ioctl( i_fd, DKIOCDVDSENDKEY, &dvd );
+
 #elif defined( WIN32 )
     if( WIN2K ) /* NT/Win2000/Whistler */
     {
@@ -1009,17 +1089,6 @@ int ioctl_SendKey2( int i_fd, int *pi_agid, u8 *p_key )
 
         return WinSendSSC( i_fd, &ssc );
     }
-
-#elif defined( SYS_DARWIN )
-    INIT_DVDIOCTL( 12 );
-
-    dvdioctl.i_keyformat = kKey2;
-    dvdioctl.i_agid = *pi_agid;
-
-    p_buffer[ 1 ] = 0xa;
-    memcpy( p_buffer + 4, p_key, 8 );
-
-    return ioctl( i_fd, IODVD_SEND_KEY, &dvdioctl );
 
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
