@@ -1,7 +1,10 @@
-$Id: svcd-ogt-subtitles.txt,v 1.1 2004/01/04 16:25:00 rocky Exp $
+$Id: svcd-ogt-subtitles.txt,v 1.2 2004/02/13 00:57:03 rocky Exp $
 The following information is culled from information from 
 Julio Sanchez Fernandez (http://subhandler.sourceforge.net)
 by Rocky Bernstein. 
+
+If you have any corrections or additions to make, please send them
+to rocky@panix.com.
 
 SVCD subtitles are transported in private streams with id 0x70 (AC3
 has 0,x80+, CVD subs 0+)

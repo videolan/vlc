@@ -1,4 +1,4 @@
-$Id: cvd-subtitles.txt,v 1.3 2004/01/09 01:17:57 rocky Exp $
+$Id: cvd-subtitles.txt,v 1.4 2004/02/13 00:57:03 rocky Exp $
 The following information is culled from information from 
 Julio Sanchez Fernandez (http://subhandler.sourceforge.net)
 by Rocky Bernstein. 
@@ -7,6 +7,9 @@ We do not have information on the subtitle format used on CVD's except
 the submux sample code and a couple of samples of dubious
 origin. Thus, the information below is result of reading some code
 whose correctness is not known and some experimentation.
+
+Please, if you have any corrections or additions to make, send
+them to rocky@panix.com.
 
 CVD subtitles are different in several ways from SVCD OGT subtitles
 (see see corresponding info on that.)
