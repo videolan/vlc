@@ -42,7 +42,7 @@
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
+#include "tests.h"
 
 #include "audio_output.h"                                   /* aout_thread_t */
 
@@ -139,6 +139,12 @@ static int aout_Probe( probedata_t *p_data )
 
     /* Otherwise, there are good chances we can use this plugin, return 100. */
     SDL_CloseAudio();
+
+    if( TestMethod( AOUT_METHOD_VAR, "sdl" ) )
+    {
+        return( 999 );
+    }
+
     return( 50 );
 }
 
