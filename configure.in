@@ -30,6 +30,9 @@ AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_PROG_CPP
 
+dnl Find the right ranlib, even when cross-compiling
+AC_CHECK_TOOL(RANLIB, ranlib, :)
+
 dnl Gettext stuff
 ALL_LINGUAS="de fr ru"
 
@@ -1038,13 +1041,13 @@ then
     then
       AC_CHECK_HEADERS(directx.h,
       [ PLUGINS="${PLUGINS} directx"
-        LIB_DIRECTX="-lgdi32 -ldxguid" ])
+        LIB_DIRECTX="-lgdi32" ])
     else
       AC_MSG_CHECKING(for directX headers in ${withval})
       if test -f ${withval}/include/directx.h
       then
         PLUGINS="${PLUGINS} directx"
-        LIB_DIRECTX="-L${withval}/lib -lgdi32 -ldxguid"
+        LIB_DIRECTX="-L${withval}/lib -lgdi32"
         INCLUDE="${INCLUDE} -I${withval}/include"
         AC_MSG_RESULT(yes)
       else

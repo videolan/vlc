@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.67 2002/01/09 02:01:14 sam Exp $
+ * $Id: common.h,v 1.68 2002/01/13 18:13:07 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -286,6 +286,7 @@ struct probedata_s;
  * byte orders other than little and big endians are not supported, but only
  * the VAX seems to have such exotic properties - note that these 'functions'
  * needs <netinet/in.h> or the local equivalent. */
+#if !defined( WIN32 )
 #if WORDS_BIGENDIAN
 #   define hton16      htons
 #   define hton32      htonl
@@ -306,6 +307,7 @@ struct probedata_s;
 #   define ntoh32      ntohl
 #   define ntoh64      hton64
 #endif
+#endif /* !defined( WIN32 ) */
 
 /* Macros with automatic casts */
 #define U64_AT(p)   ( ntoh64 ( *( (u64 *)(p) ) ) )
@@ -343,13 +345,6 @@ struct probedata_s;
  * ourselves. ( several plugins use them and it is too much hassle to link
  * winsock with each of them ;-)
  */
-#   undef ntoh32(x)
-#   undef ntoh16(x)
-#   undef ntoh64(x)
-#   undef hton32(x)
-#   undef hton16(x)
-#   undef hton64(x)
-
 #   ifdef WORDS_BIGENDIAN
 #       define ntoh32(x)       (x)
 #       define ntoh16(x)       (x)
@@ -363,7 +358,7 @@ struct probedata_s;
 #       define ntoh64(x)     __bswap_32 (x)
 #       define hton32(x)     __bswap_32 (x)
 #       define hton16(x)     __bswap_16 (x)
-#       define hton64(x)     __bswap_32 (x)
+#       define hton64(x)     __bswap_64 (x)
 #   endif
 
 /* win32, cl and icl support */
@@ -399,6 +394,10 @@ typedef __int64 off_t;
 #           define off_t __int64
 #       endif
 #       define stat _stati64
+#   endif
+
+#   ifndef O_NONBLOCK
+#       define O_NONBLOCK 0
 #   endif
 
 #   ifndef snprintf

@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.54 2001/12/30 07:09:56 sam Exp $
+ * $Id: netutils.c,v 1.55 2002/01/13 18:13:07 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -67,6 +67,7 @@
 #if defined( WIN32 )                    /* tools to get the MAC adress from  */
 #include <windows.h>                    /* the interface under Windows       */
 #include <stdio.h>
+#include <nb30.h>
 #endif
 
 #ifdef HAVE_NET_IF_H
