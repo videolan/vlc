@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.20 2003/04/07 09:25:54 gbazin Exp $
+ * $Id: interface.cpp,v 1.21 2003/04/17 14:18:47 anil Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -414,8 +414,12 @@ void Interface::OnLogs( wxCommandEvent& WXUNUSED(event) )
 
 void Interface::OnFileInfo( wxCommandEvent& WXUNUSED(event) )
 {
-    /* Open a fileinfo window */
-    new FileInfo( p_intf, this );
+    /* Show/hide the file info window */
+    wxFrame *p_fileinfo_window = p_intf->p_sys->p_fileinfo_window;
+    if( p_fileinfo_window )
+    {
+        p_fileinfo_window->Show( ! p_fileinfo_window->IsShown() );
+    }
 }
 
 void Interface::OnPreferences( wxCommandEvent& WXUNUSED(event) )
