@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.30 2003/10/18 21:46:01 hartman Exp $
+ * $Id: sub.c,v 1.31 2003/10/31 22:46:19 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -52,7 +52,8 @@ static void sub_close( subtitle_demux_t *p_sub );
 
 static void sub_fix( subtitle_demux_t *p_sub );
 
-static char *ppsz_sub_type[] = { "auto", "microdvd", "subrip", "ssa1", "ssa2-4", "vplayer", "sami", NULL };
+static char *ppsz_sub_type[] = { "auto", "microdvd", "subrip", "ssa1", "ssa2-4",
+                                 "vplayer", "sami", "vobsub", NULL };
 
 
 /*****************************************************************************
@@ -209,6 +210,7 @@ static int  sub_SSA1Read    ( text_t *txt, subtitle_t *p_subtitle, mtime_t i_mic
 static int  sub_SSA2_4Read  ( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
 static int  sub_Vplayer     ( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
 static int  sub_Sami        ( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
+static int  sub_VobSub      ( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
 
 static struct
 {
@@ -224,7 +226,8 @@ static struct
     { "ssa2-4",     SUB_TYPE_SSA2_4,    "SSA-2/3/4",sub_SSA2_4Read },
     { "vplayer",    SUB_TYPE_VPLAYER,   "VPlayer",  sub_Vplayer },
     { "sami",       SUB_TYPE_SAMI,      "SAMI",     sub_Sami },
-    { NULL,         SUB_TYPE_UNKNOWN,   "Unknow",   NULL }
+    { "vobsub",     SUB_TYPE_VOBSUB,    "VobSub",   sub_VobSub },
+    { NULL,         SUB_TYPE_UNKNOWN,   "Unknown",  NULL }
 };
 
 static char * local_stristr( char *psz_big, char *psz_little)
@@ -373,23 +376,29 @@ static int  sub_open ( subtitle_demux_t *p_sub,
                 }
                 else
                 {
-                    i_sub_type = SUB_TYPE_SSA2_4; // I hop this will work
+                    i_sub_type = SUB_TYPE_SSA2_4; /* I hope this will work */
                 }
                 break;
             }
             else if( local_stristr( s, "This is a Sub Station Alpha v4 script" ) )
             {
-                i_sub_type = SUB_TYPE_SSA2_4; // I hop this will work
+                i_sub_type = SUB_TYPE_SSA2_4; /* I hope this will work */
+                break;
             }
             else if( !strncasecmp( s, "Dialogue: Marked", 16  ) )
             {
-                i_sub_type = SUB_TYPE_SSA2_4; // could be wrong
+                i_sub_type = SUB_TYPE_SSA2_4; /* could be wrong */
                 break;
             }
             else if( sscanf( s, "%d:%d:%d:", &i_dummy, &i_dummy, &i_dummy ) == 3 ||
                      sscanf( s, "%d:%d:%d ", &i_dummy, &i_dummy, &i_dummy ) == 3 )
             {
                 i_sub_type = SUB_TYPE_VPLAYER;
+                break;
+            }
+            else if( local_stristr( s, "# VobSub index file" ) )
+            {
+                i_sub_type = SUB_TYPE_VOBSUB;
                 break;
             }
         }
@@ -411,6 +420,7 @@ static int  sub_open ( subtitle_demux_t *p_sub,
         {
             msg_Dbg( p_input, "detected %s format",
                     sub_read_subtitle_function[i].psz_name );
+            p_sub->i_sub_type = i_sub_type;
             pf_read_subtitle = sub_read_subtitle_function[i].pf_read_subtitle;
             break;
         }
@@ -445,7 +455,7 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     text_unload( &txt );
 
     /* *** fix subtitle (order and time) *** */
-    p_sub->i_subtitle = 0;  // will be modified by sub_fix
+    p_sub->i_subtitle = 0;  /* will be modified by sub_fix */
     sub_fix( p_sub );
 
     /* *** add subtitle ES *** */
@@ -456,7 +466,16 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     p_sub->p_es->i_stream_id = 0xff - i_track_id;    /* FIXME */
-    p_sub->p_es->i_fourcc    = VLC_FOURCC( 's','u','b','t' );
+
+    if( p_sub->i_sub_type != SUB_TYPE_VOBSUB )
+    {
+        p_sub->p_es->i_fourcc    = VLC_FOURCC( 's','u','b','t' );
+    }
+    else
+    {
+        p_sub->p_es->i_fourcc    = VLC_FOURCC( 's','p','u',' ' );
+        /* open vobsub file */
+    }
 
     p_sub->i_previously_selected = 0;
     return VLC_SUCCESS;
@@ -1028,4 +1047,46 @@ static int  sub_Sami( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecper
     return( VLC_SUCCESS );
 #undef ADDC
 }
+
+static int  sub_VobSub( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe)
+{
+    /*
+     * Parse the idx file. Each line:
+     * timestamp: hh:mm:ss:mss, filepos: loc
+     * hexint is the hex location of the vobsub in the .sub file
+     *
+     */
+    char *p;
+
+    char buffer_text[MAX_LINE + 1];
+    uint32_t    i_start, i_location;
+
+    for( ;; )
+    {
+        if( ( p = text_get_line( txt ) ) == NULL )
+        {
+            return( VLC_EGENERIC );
+        }
+        i_start = 0;
+        unsigned int h, m, s, ms, loc;
+
+        memset( buffer_text, '\0', MAX_LINE );
+        if( sscanf( p, "timestamp: %d:%d:%d:%d, filepos: %x%[^\r\n]",
+                    &h, &m, &s, &ms, &loc, buffer_text ) == 5 )
+        {
+            i_start = ( (mtime_t)h * 3600*1000 +
+                        (mtime_t)m * 60*1000 +
+                        (mtime_t)s * 1000 +
+                        (mtime_t)ms ) * 1000;
+            i_location = loc;
+            break;
+        }
+    }
+    p_subtitle->i_start = (mtime_t)i_start;
+    p_subtitle->i_stop  = 0;
+    p_subtitle->i_vobsub_location = i_location;
+    fprintf( stderr, "time: %x, location: %x\n", i_start, i_location );
+    return( 0 );
+}
+
 

@@ -2,7 +2,7 @@
  * sub.h
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: sub.h,v 1.8 2003/10/11 22:40:05 hartman Exp $
+ * $Id: sub.h,v 1.9 2003/10/31 22:46:19 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -27,6 +27,7 @@
 #define SUB_TYPE_SSA2_4     0x03
 #define SUB_TYPE_VPLAYER    0x04
 #define SUB_TYPE_SAMI       0x05
+#define SUB_TYPE_VOBSUB     0x100
 #define SUB_TYPE_UNKNOWN    0xffff
 
 typedef struct subtitle_s
@@ -35,8 +36,22 @@ typedef struct subtitle_s
     mtime_t i_stop;
 
     char    *psz_text;
+    int     i_vobsub_location;
+
 } subtitle_t;
 
+typedef struct subtitle_track_s
+{
+    int             i_track_id;
+    int             i_subtitle;
+    int             i_subtitles;
+    subtitle_t      *subtitle;
+    char            *psz_language;
+
+    int             i_previously_selected; /* to make pf_seek */
+    es_descriptor_t *p_es;
+    
+} subtitle_track_t;
 
 typedef struct subtitle_demux_s
 {
@@ -55,15 +70,19 @@ typedef struct subtitle_demux_s
     
 
     /* *** private *** */
-    input_thread_t  *p_input;
-    int             i_sub_type;
+    input_thread_t      *p_input;
+    int                 i_sub_type;
+
+    int                 i_previously_selected; /* to make pf_seek */
+    int                 i_subtitle;
+    int                 i_subtitles;
+    subtitle_t          *subtitle;
+    es_descriptor_t     *p_es;
     
-    int             i_previously_selected; // to make pf_seek
-    es_descriptor_t *p_es;
+    /*unsigned int	i_tracks;
+    subtitle_track_t	*p_tracks
+    */
     
-    int             i_subtitle;
-    int             i_subtitles;
-    subtitle_t      *subtitle;
 
 } subtitle_demux_t;
 
