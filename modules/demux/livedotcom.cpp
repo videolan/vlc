@@ -157,6 +157,11 @@ static int Control( demux_t *, int, va_list );
 
 static int ParseASF( demux_t * );
 
+static void StreamRead( void *p_private, unsigned int i_size, unsigned int i_truncated_bytes, struct timeval pts, unsigned int i_duration );
+static void StreamClose( void *p_private );
+static void TaskInterrupt( void *p_private );
+
+
 /*****************************************************************************
  * DemuxOpen:
  *****************************************************************************/
@@ -520,6 +525,11 @@ static int  Open ( vlc_object_t *p_this )
             tk->p_es = es_out_Add( p_demux->out, &tk->fmt );
         }
 
+        if( sub->rtcpInstance() != NULL )
+        {
+            sub->rtcpInstance()->setByeHandler( StreamClose, tk );
+        }
+
         if( tk->p_es || tk->b_quicktime || tk->b_muxed || tk->b_asf )
         {
             tk->readSource = sub->readSource();
@@ -648,11 +658,6 @@ static void Close( vlc_object_t *p_this )
     }
     free( p_sys );
 }
-
-
-static void StreamRead( void *p_private, unsigned int i_size, unsigned int i_truncated_bytes, struct timeval pts, unsigned int i_duration );
-static void StreamClose( void *p_private );
-static void TaskInterrupt( void *p_private );
 
 /*****************************************************************************
  * Demux:
@@ -798,19 +803,20 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->i_start = (mtime_t)(f * (double)p_sys->i_length);
                 p_sys->i_pcr_start = 0;
                 p_sys->i_pcr       = 0;
+                
                 for( i = 0; i < p_sys->i_track; i++ )
                 {
                     p_sys->track[i]->i_pts = 0;
                 }
                 return VLC_SUCCESS;
             }
-            return VLC_EGENERIC;
+            return VLC_SUCCESS;
         }
 
         /* Special for access_demux */
         case DEMUX_CAN_PAUSE:
             pb = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-            if( p_sys->rtsp )
+            if( p_sys->rtsp && p_sys->i_length )
                 *pb = VLC_TRUE; /* Not always true, but will be handled in SET_PAUSE_STATE */
             else
                 *pb = VLC_FALSE;
@@ -822,8 +828,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_PAUSE_STATE:
+            double d_npt;
             MediaSubsessionIterator *iter;
             MediaSubsession *sub;
+
+            d_npt = ( (double)( p_sys->i_pcr - p_sys->i_pcr_start + p_sys->i_start ) ) / 1000000.00;
 
             b_bool = (vlc_bool_t)va_arg( args, vlc_bool_t );
             if( p_sys->rtsp == NULL )
@@ -833,23 +842,22 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             while( ( sub = iter->next() ) != NULL )
             {
                 if( ( b_bool && !p_sys->rtsp->pauseMediaSubsession( *sub ) ) ||
-                    ( !b_bool && !p_sys->rtsp->playMediaSubsession( *sub, -1 ) ) )
+                    ( !b_bool && !p_sys->rtsp->playMediaSubsession( *sub, d_npt > 0 ? d_npt : -1 ) ) )
                 {
                     delete iter;
                     return VLC_EGENERIC;
                 }
             }
             delete iter;
-
+#if 0
             /* reset PCR and PCR start, mmh won't work well for multi-stream I fear */
             for( i = 0; i < p_sys->i_track; i++ )
             {
-                live_track_t *tk = p_sys->track[i];
-                tk->i_pts = 0;
+                p_sys->track[i]->i_pts = 0;
             }
             p_sys->i_pcr_start = 0; /* FIXME Wrong */
             p_sys->i_pcr = 0;
-
+#endif
             return VLC_SUCCESS;
 
         case DEMUX_GET_TITLE_INFO:
