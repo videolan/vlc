@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.30 2003/09/02 20:19:25 gbazin Exp $
+ * $Id: decoder.c,v 1.31 2003/09/09 12:36:24 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -394,9 +394,9 @@ static void DecodeThread( adec_thread_t *p_adec )
         /* **** First check if we have a valid output **** */
         if( !p_adec->p_aout_input ||
             p_adec->output_format.i_original_channels
-              != pi_channels_maps[faad_frame.channels] ||
+              != pi_channels_maps[faad_frame.channels]
 #ifndef HAVE_OLD_FAAD2
-            ( faad_frame.samplerate &&
+            || ( faad_frame.samplerate &&
               p_adec->output_format.i_rate != faad_frame.samplerate )
 #endif
             )
