@@ -2,7 +2,7 @@
  * vpar_pool.c : management of the pool of decoder threads
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vpar_pool.c,v 1.5 2001/12/30 07:09:56 sam Exp $
+ * $Id: vpar_pool.c,v 1.6 2002/03/19 12:48:01 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -206,6 +206,11 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
 void vpar_EndPool( vpar_thread_t * p_vpar )
 {
     int i;
+
+    for( i = 0; i < 12; i++ )
+    {
+        free( p_vpar->pool.mb.p_idcts[i].pi_block );
+    }
 
     for( i = 0; i < p_vpar->pool.i_smp; i++ )
     {

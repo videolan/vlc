@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.9 2002/03/18 19:14:52 sam Exp $
+ * $Id: dvd_access.c,v 1.10 2002/03/19 12:48:01 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -789,6 +789,7 @@ static char * DVDParse( input_thread_t * p_input )
     {
         intf_ErrMsg( "dvd error: cannot stat() device `%s' (%s)",
                      psz_device, strerror(errno));
+        free( psz_device );
         return NULL;                    
     }
     
@@ -797,6 +798,7 @@ static char * DVDParse( input_thread_t * p_input )
     {
         intf_WarnMsg( 3, "input: DVD plugin discarded"
                          " (not a valid block device)" );
+        free( psz_device );
         return NULL;
     }
 #endif
