@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.12 2002/01/10 04:11:25 sam Exp $
+ * $Id: mpeg_adec.c,v 1.13 2002/01/10 23:41:08 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -198,7 +198,7 @@ static void DecodeThread( adec_thread_t * p_adec )
 
         p_adec->i_sync = 1;
 
-        p_adec->p_aout_fifo->l_rate = sync_info.sample_rate;
+ //       p_adec->p_aout_fifo->l_rate = sync_info.sample_rate;
 
         buffer = ((s16 *)p_adec->p_aout_fifo->buffer)
                     + (p_adec->p_aout_fifo->l_end_frame * ADEC_FRAME_SIZE);
@@ -223,7 +223,6 @@ static void DecodeThread( adec_thread_t * p_adec )
         else
         {
             vlc_mutex_lock (&p_adec->p_aout_fifo->data_lock);
-
             p_adec->p_aout_fifo->l_end_frame =
                 (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
             vlc_cond_signal (&p_adec->p_aout_fifo->data_wait);

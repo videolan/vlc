@@ -237,132 +237,51 @@ static void S16Play( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
         break;
 
     case AOUT_ADEC_MONO_FIFO:
-
-        l_units = p_aout->l_units;
-        while ( l_units > 0 )
-        {
-            if ( !p_fifo->b_next_frame )
-            {
-                if ( NextFrame(p_aout, p_fifo, p_aout->date + ((((mtime_t)(l_buffer >> 1)) * 1000000) / ((mtime_t)p_aout->l_rate))) )
-                {
-                    break;
-                }
-            }
-
-            if ( p_fifo->l_units > l_units )
-            {
-                /* p_aout->b_stereo == 1 */
-                l_buffer_limit = p_aout->l_units << 1;
-
-                while ( l_buffer < l_buffer_limit )
-                {
-                    p_aout->s32_buffer[l_buffer++] +=
-                        (s32)( ((s16 *)p_fifo->buffer)[p_fifo->l_unit] );
-                    p_aout->s32_buffer[l_buffer++] +=
-                        (s32)( ((s16 *)p_fifo->buffer)[p_fifo->l_unit] );
-
-                    UPDATE_INCREMENT( p_fifo->unit_increment, p_fifo->l_unit )
-                    if ( p_fifo->l_unit >= /* p_fifo->b_stereo == 0 */
-                         ((AOUT_FIFO_SIZE + 1) * (p_fifo->l_frame_size >> 0)) )
-                    {
-                        p_fifo->l_unit -= /* p_fifo->b_stereo == 0 */
-                            ((AOUT_FIFO_SIZE + 1) * (p_fifo->l_frame_size >> 0));
-                    }
-                }
-                p_fifo->l_units -= l_units;
-                break;
-            }
-            else /* p_fifo->l_units <= l_units */
-            {
-                /* p_aout->b_stereo == 1 */
-                l_buffer_limit = p_fifo->l_units << 1;
-
-                while ( l_buffer < l_buffer_limit )
-                {
-                    p_aout->s32_buffer[l_buffer++] +=
-                        (s32)( ((s16 *)p_fifo->buffer)[p_fifo->l_unit] );
-                    p_aout->s32_buffer[l_buffer++] +=
-                        (s32)( ((s16 *)p_fifo->buffer)[p_fifo->l_unit] );
-
-                    UPDATE_INCREMENT( p_fifo->unit_increment, p_fifo->l_unit )
-                    if ( p_fifo->l_unit >= /* p_fifo->b_stereo == 0 */
-                         ((AOUT_FIFO_SIZE + 1) * (p_fifo->l_frame_size >> 0)) )
-                    {
-                        p_fifo->l_unit -= /* p_fifo->b_stereo == 0 */
-                            ((AOUT_FIFO_SIZE + 1) * (p_fifo->l_frame_size >> 0));
-                    }
-                }
-                l_units -= p_fifo->l_units;
-
-                vlc_mutex_lock( &p_fifo->data_lock );
-                p_fifo->l_start_frame = p_fifo->l_next_frame;
-                vlc_cond_signal( &p_fifo->data_wait );
-                vlc_mutex_unlock( &p_fifo->data_lock );
-
-                /* p_fifo->b_start_frame = 1; */
-                p_fifo->l_next_frame += 1;
-                p_fifo->l_next_frame &= AOUT_FIFO_SIZE;
-                p_fifo->b_next_frame = 0;
-            }
-        }
-        break;
-
     case AOUT_ADEC_STEREO_FIFO:
 
         l_units = p_aout->l_units;
         while ( l_units > 0 )
         {
-            if ( !p_fifo->b_next_frame )
+            if( !p_fifo->b_next_frame )
             {
-                if ( NextFrame(p_aout, p_fifo, p_aout->date + ((((mtime_t)(l_buffer >> 1)) * 1000000) / ((mtime_t)p_aout->l_rate))) )
+                if( NextFrame(p_aout, p_fifo, p_aout->date + ((((mtime_t)(l_buffer >> 1)) * 1000000) / ((mtime_t)p_aout->l_rate))) )
                 {
                     break;
                 }
             }
+            l_buffer_limit = p_aout->l_units << p_aout->b_stereo;
 
-            if ( p_fifo->l_units > l_units )
+            while ( l_buffer < l_buffer_limit )
             {
-                /* p_aout->b_stereo == 1 */
-                l_buffer_limit = p_aout->l_units << 1;
-
-                while ( l_buffer < l_buffer_limit )
+                if( p_aout->b_stereo )
                 {
                     p_aout->s32_buffer[l_buffer++] +=
                         (s32)( ((s16 *)p_fifo->buffer)[2*p_fifo->l_unit] );
                     p_aout->s32_buffer[l_buffer++] +=
                         (s32)( ((s16 *)p_fifo->buffer)[2*p_fifo->l_unit+1] );
-
-                    UPDATE_INCREMENT( p_fifo->unit_increment, p_fifo->l_unit )
-                    if ( p_fifo->l_unit >= /* p_fifo->b_stereo == 1 */
-                         ((AOUT_FIFO_SIZE + 1) * (p_fifo->l_frame_size >> 1)) )
-                    {
-                        p_fifo->l_unit -= /* p_fifo->b_stereo == 1 */
-                            ((AOUT_FIFO_SIZE + 1) * (p_fifo->l_frame_size >> 1));
-                    }
                 }
-                p_fifo->l_units -= l_units;
+                else
+                {
+                    p_aout->s32_buffer[l_buffer++] +=
+                        (s32)( ((s16 *)p_fifo->buffer)[p_fifo->l_unit] );
+                }
+
+                UPDATE_INCREMENT( p_fifo->unit_increment, p_fifo->l_unit )
+                if ( p_fifo->l_unit >= 
+                     ((AOUT_FIFO_SIZE + 1) * (p_fifo->l_frame_size >> p_fifo->b_stereo)) )
+                {
+                    p_fifo->l_unit -= 
+                        ((AOUT_FIFO_SIZE + 1) * (p_fifo->l_frame_size >> p_fifo->b_stereo));
+                }
+            }
+ 
+            if ( p_fifo->l_units > l_units )
+            {
+               p_fifo->l_units -= l_units;
                 break;
             }
             else /* p_fifo->l_units <= l_units */
             {
-                /* p_aout->b_stereo == 1 */
-                l_buffer_limit = p_fifo->l_units << 1;
-
-                while ( l_buffer < l_buffer_limit )
-                {
-                    p_aout->s32_buffer[l_buffer++] +=
-                        (s32)( ((s16 *)p_fifo->buffer)[2*p_fifo->l_unit] );
-                    p_aout->s32_buffer[l_buffer++] +=
-                        (s32)( ((s16 *)p_fifo->buffer)[2*p_fifo->l_unit+1] );
-
-                    UPDATE_INCREMENT( p_fifo->unit_increment, p_fifo->l_unit )
-                    if ( p_fifo->l_unit >= /* p_fifo->b_stereo == 1 */
-                         ((AOUT_FIFO_SIZE + 1) * (p_fifo->l_frame_size >> 1)) )
-                    {
-                        p_fifo->l_unit -= /* p_fifo->b_stereo == 1 */
-                            ((AOUT_FIFO_SIZE + 1) * (p_fifo->l_frame_size >> 1));
-                    }
-                }
                 l_units -= p_fifo->l_units;
 
                 vlc_mutex_lock( &p_fifo->data_lock );
