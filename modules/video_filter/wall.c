@@ -348,7 +348,7 @@ static int Init( vout_thread_t *p_vout )
             else
             {
                 i_width = ( i_target_width - i_hstart % i_target_width );
-                if( i_col > ( p_vout->p_sys->i_col / 2 ) )
+                if( i_col >= ( p_vout->p_sys->i_col / 2 ) )
                 {
                     i_align |= VOUT_ALIGN_LEFT;
                     i_width -= i_hstart_rounded ? 2: 0;
@@ -373,7 +373,7 @@ static int Init( vout_thread_t *p_vout )
             {
                 i_height = ( i_target_height -
                              i_vstart%i_target_height );
-                if(  i_row > ( p_vout->p_sys->i_row / 2 ) )
+                if(  i_row >= ( p_vout->p_sys->i_row / 2 ) )
                 {
                     i_align |= VOUT_ALIGN_TOP;
                     i_height -= i_vstart_rounded ? 2: 0;
