@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.24 2003/01/12 18:26:09 fenrir Exp $
+ * $Id: avi.c,v 1.25 2003/01/13 04:46:49 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -725,7 +725,7 @@ static mtime_t  AVI_MovieGetLength( input_thread_t *p_input, demux_sys_t *p_avi 
         {
             i_length =
                 (mtime_t)( p_stream->p_index[p_stream->i_idxnb-1].i_lengthtotal +
-                           p_stream->p_index[p_stream->i_idxnb-1].i_length ) /
+                           p_stream->p_index[p_stream->i_idxnb-1].i_length ) *
                 (mtime_t)p_stream->i_scale /
                 (mtime_t)p_stream->i_rate /
                 (mtime_t)p_stream->i_samplesize;

@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.9 2003/01/13 02:33:13 fenrir Exp $
+ * $Id: stream_output.c,v 1.10 2003/01/13 04:46:49 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -555,6 +555,8 @@ int sout_BufferReallocFromPreHeader( sout_instance_t *p_sout, sout_buffer_t *p_b
     p_buffer->p_buffer -= i_size;
     p_buffer->i_size += i_size;
     p_buffer->i_buffer_size += i_size;
+
+    return( 0 );
 }
 
 int sout_BufferDelete( sout_instance_t *p_sout, sout_buffer_t *p_buffer )
