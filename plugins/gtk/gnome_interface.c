@@ -717,7 +717,7 @@ create_intf_window (void)
                       "intf_window");
   gtk_signal_connect (GTK_OBJECT (button_chapter_prev), "clicked",
                       GTK_SIGNAL_FUNC (GtkChapterPrev),
-                      NULL);
+                      "intf_window");
   gtk_signal_connect (GTK_OBJECT (button_chapter_next), "clicked",
                       GTK_SIGNAL_FUNC (GtkChapterNext),
                       "intf_window");
