@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.5 2002/11/17 06:46:56 fenrir Exp $
+ * $Id: mp4.c,v 1.6 2002/11/19 17:23:21 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-
+#include "codecs.h"
 #include "libmp4.h"
 #include "mp4.h"
 
@@ -901,8 +901,9 @@ static void MP4_StartDecoder( input_thread_t *p_input,
     int         i_decoder_specific_info_len;
     uint8_t     *p_decoder_specific_info;
     
-    uint8_t     *p_init;
- 
+    uint8_t             *p_init;
+    BITMAPINFOHEADER    *p_bih;
+
     MP4_Box_t   *p_esds;
 
     
@@ -1047,31 +1048,35 @@ static void MP4_StartDecoder( input_thread_t *p_input,
         case( VIDEO_ES ):    
             /* now create a bitmapinfoheader_t for decoder and 
                add information found in p_esds */
-            p_init = malloc( 40 + i_decoder_specific_info_len);
-            memset( p_init, 0, 40 + i_decoder_specific_info_len);
-            MP4_Set4BytesLE( p_init, 40 + i_decoder_specific_info_len );
-            if( p_sample->data.p_sample_vide->i_width )
+            p_init = malloc( sizeof( BITMAPINFOHEADER ) + i_decoder_specific_info_len );
+            p_bih = (BITMAPINFOHEADER*)p_init;
+
+            p_bih->biSize     = sizeof( BITMAPINFOHEADER ) + i_decoder_specific_info_len;
+            p_bih->biWidth    = p_sample->data.p_sample_vide->i_width;
+            p_bih->biHeight   = p_sample->data.p_sample_vide->i_height;
+            p_bih->biPlanes   = 1;      // FIXME
+            p_bih->biBitCount = 0;      // FIXME
+            p_bih->biCompression   = 0; // FIXME
+            p_bih->biSizeImage     = 0; // FIXME
+            p_bih->biXPelsPerMeter = 0; // FIXME
+            p_bih->biYPelsPerMeter = 0; // FIXME
+            p_bih->biClrUsed       = 0; // FIXME
+            p_bih->biClrImportant  = 0; // FIXME
+
+            if( p_bih->biWidth == 0 )
             {
-                MP4_Set4BytesLE( p_init + 4, 
-                                 p_sample->data.p_sample_vide->i_width );
+                // fall on display size
+                p_bih->biWidth = p_demux_track->i_width;
             }
-            else
+            if( p_bih->biHeight == 0 )
             {
-                /* use display size */
-                MP4_Set4BytesLE( p_init + 4, p_demux_track->i_width );
+                // fall on display size
+                p_bih->biHeight = p_demux_track->i_height;
             }
-            if( p_sample->data.p_sample_vide->i_height )
-            {
-                MP4_Set4BytesLE( p_init + 8, 
-                                 p_sample->data.p_sample_vide->i_height );
-            }
-            else
-            {
-                MP4_Set4BytesLE( p_init + 8, p_demux_track->i_height );
-            }
+            
             if( i_decoder_specific_info_len )
             {
-                memcpy( p_init + 40, 
+                memcpy( p_init + sizeof( BITMAPINFOHEADER ), 
                         p_decoder_specific_info,
                         i_decoder_specific_info_len);
             }
