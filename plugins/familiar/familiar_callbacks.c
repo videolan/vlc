@@ -2,7 +2,7 @@
  * familiar_callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: familiar_callbacks.c,v 1.6.2.8 2002/10/07 21:37:11 jpsaman Exp $
+ * $Id: familiar_callbacks.c,v 1.6.2.9 2002/10/10 20:33:12 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -419,7 +419,21 @@ on_comboURL_entry_changed              (GtkEditable     *editable,
     struct stat st;
 
     psz_url = gtk_entry_get_text(GTK_ENTRY(editable));
-    if (lstat((char*)psz_url, &st)==0)
+    if( (strncmp("file://",(const char *) psz_url,7)==0) ||
+		    (strncmp("udp://",(const char *) psz_url,6)==0) ||
+		    (strncmp("udp4://",(const char *) psz_url,7)==0) ||		
+			(strncmp("udp6://",(const char *) psz_url,7)==0) ||
+		    (strncmp("udpstream://",(const char *) psz_url,12)==0) ||
+		    (strncmp("rtp://",(const char *) psz_url,6)==0) ||
+		    (strncmp("rtp4://",(const char *) psz_url,7)==0) ||
+		    (strncmp("rtp6://",(const char *) psz_url,7)==0) ||
+		    (strncmp("rtpstream://",(const char *) psz_url,12)==0) ||
+		    (strncmp("http://",(const char *) psz_url,7)==0) )
+	{
+		intf_ErrMsg( "comboURL change event - open URL" );
+        MediaURLOpenChanged(GTK_WIDGET(editable), psz_url);
+    }
+    else if (lstat((char*)psz_url, &st)==0)
     {
         if (S_ISDIR(st.st_mode))
            ReadDirectory(p_intf->p_sys->p_clist, psz_url);
