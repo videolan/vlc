@@ -1,6 +1,5 @@
 SOURCES_mp4 = \
 	mp4.c \
-	mp4.h \
 	libmp4.c \
 	libmp4.h \
 	drms.c \

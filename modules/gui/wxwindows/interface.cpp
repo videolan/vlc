@@ -336,7 +336,9 @@ void Interface::CreateOurMenuBar()
     file_menu->AppendSeparator();
     file_menu->Append( StreamWizard_Event,
                        wxU(_("Streaming &Wizard...\tCtrl-W")) );
+#if 0
     file_menu->Append( Wizard_Event, wxU(_("New Wizard...")) );
+#endif
     file_menu->AppendSeparator();
     file_menu->Append( Exit_Event, wxU(_("E&xit\tCtrl-X")) );
 

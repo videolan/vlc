@@ -31,7 +31,11 @@ EXTRA_DIST = \
 	lirc/example.lircrc \
 	skins/skins-howto.txt \
 	skins/events-howto.txt \
-	skins/curve_maker \
+	skins/curve_maker/Bezier.bas \
+	skins/curve_maker/Bezier.frm \
+	skins/curve_maker/Bezier.frx \
+	skins/curve_maker/bezier.vbp \
+	skins/curve_maker/Bezier.vbw \
 	strings.txt \
 	translations.txt \
 	win32/Cross-Compile-Howto.txt \
