@@ -2,7 +2,7 @@
  * telnet.c: VLM interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: telnet.c,v 1.1 2004/03/05 14:03:20 garf Exp $
+ * $Id$
  *
  * Authors: Simon Latapie <garf@videolan.org>
  *          Laurent Aimar <fenrir@videolan.org>
@@ -164,6 +164,8 @@ static int Open( vlc_object_t *p_this )
         free( p_intf->p_sys );
         return VLC_EGENERIC;
     }
+    msg_Info( p_intf, _("Telnet interface started on port: %d"), i_telnetport );
+
     p_intf->p_sys->i_clients   = 0;
     p_intf->p_sys->clients     = NULL;
     p_intf->p_sys->mediatheque = vlm_New( p_intf );
