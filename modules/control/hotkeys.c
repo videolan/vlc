@@ -415,6 +415,10 @@ static void Run( intf_thread_t *p_intf )
                 var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
                             &list, &list2 );
                 i_count = list.p_list->i_count;
+                if( i_count <= 1 )
+                {
+                    continue;
+                }
                 for( i = 0; i < i_count; i++ )
                 {
                     if( val.i_int == list.p_list->p_values[i].i_int )
@@ -434,8 +438,8 @@ static void Run( intf_thread_t *p_intf )
                 else if( i == i_count - 1 )
                 {
                     var_Set( p_input, "audio-es",
-                             list.p_list->p_values[0] );
-                    i = 0;
+                             list.p_list->p_values[1] );
+                    i = 1;
                 }
                 else
                 {
@@ -447,7 +451,7 @@ static void Run( intf_thread_t *p_intf )
                                  _("Audio track: %s"),
                                  list2.p_list->p_values[i].psz_string );
             }
-            else if( i_action = ACTIONID_SUBTITLE_TRACK )
+            else if( i_action == ACTIONID_SUBTITLE_TRACK )
             {
                 vlc_value_t val, list, list2;
                 int i_count, i;
