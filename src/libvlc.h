@@ -488,10 +488,6 @@ static char *ppsz_align_descriptions[] =
 #define ACCESS_OUTPUT_LONGTEXT N_( \
     "This is a legacy entry to let you configure access output modules")
 
-#define ANN_CAT_LONGTEXT N_( \
-    "These options allow you to set options for the session announcement" \
-    "subsystem." )
-
 #define ANN_SAPCTRL_TEXT N_("Control SAP flow")
 #define ANN_SAPCTRL_LONGTEXT N_("If this option is enabled, the flow on " \
     "the SAP multicast address will be controlled. This is needed if you " \
@@ -924,8 +920,6 @@ vlc_module_begin();
                 ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, VLC_TRUE );
     add_integer( "ttl", 1, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
 
-    /* Announce options */
-    add_category_hint( N_("Announce system"), ANN_CAT_LONGTEXT, VLC_TRUE );
     add_bool( "sap-flow-control", VLC_FALSE, NULL, ANN_SAPCTRL_TEXT,
                                ANN_SAPCTRL_LONGTEXT, VLC_TRUE );
     add_integer( "sap-interval", 5, NULL, ANN_SAPINTV_TEXT,
