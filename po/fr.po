@@ -5693,7 +5693,7 @@ msgid ""
 "Path to the x509 PEM certificate file that will be used by the HTTP/SSL "
 "stream output"
 msgstr ""
-"Chemin du fichier x509 de certificat qui sera utilis�par la sortie HTTP/SSL."
+"Chemin du fichier x509 de certificat qui sera utilisé par la sortie HTTP/SSL."
 
 #: modules/access_output/http.c:60 modules/control/http.c:84
 msgid "Private key file"
@@ -5704,7 +5704,7 @@ msgid ""
 "Path to the x509 PEM private key file that will  be used by the HTTP/SSL "
 "stream output. Leave empty if you don't have one."
 msgstr ""
-"Chemin du fichier x509 de cl�priv� qui sera  qui sera utilis�par la sortie "
+"Chemin du fichier x509 de clé privée qui sera  qui sera utilisée par la sortie "
 "HTTP/SSL. Ne rien entrer si vous n'en n'avez pas."
 
 #: modules/access_output/http.c:64 modules/control/http.c:86
@@ -5717,8 +5717,8 @@ msgid ""
 "file that will be used by the HTTP/SSL stream output. Leave empty if you "
 "don't have one."
 msgstr ""
-"Chemin du fichier x509 d'autorit� de certifications qui sera utilis�par la "
-"sortie HTTP/SSL. Ne rien entrer si vous n'en n'avez pas"
+"Chemin du fichier x509 d'autorité de certification qui sera utilisé par la "
+"sortie HTTP/SSL. Ne rien entrer si vous n'en n'avez pas."
 
 #: modules/access_output/http.c:69 modules/control/http.c:89
 msgid "CRL file"
@@ -5729,8 +5729,8 @@ msgid ""
 "Path to the x509 PEM Certificates Revocation List file that will be HTTP/SSL "
 "stream output. Leave empty if you don't have one."
 msgstr ""
-"Chemin du fichier x509 de r�ocations de certificats qui sera utilis�par la "
-"sortie HTTP/SSL. Ne rien entrer si vous n'en n'avez pas"
+"Chemin du fichier x509 de liste de révocation de certificats qui sera utilisé "
+"par la sortie HTTP/SSL. Ne rien entrer si vous n'en n'avez pas"
 
 #: modules/access_output/http.c:75
 msgid "HTTP stream output"
