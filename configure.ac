@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.156 2004/01/25 21:03:16 rocky Exp $
+dnl $Id: configure.ac,v 1.157 2004/01/26 04:51:09 rocky Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -376,7 +376,7 @@ AC_CHECK_LIB(m,cos,[
   AX_ADD_LDFLAGS([adjust distort a52tofloat32],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  AX_ADD_LDFLAGS([ffmpeg stream_out_transcode stream_out_transrate i420_rgb faad],[-lm])
+  AX_ADD_LDFLAGS([ffmpeg stream_out_transcode stream_out_transrate i420_rgb faadsvdsub svcdsub freetype visual],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   AX_ADD_LDFLAGS([headphone_channel_mixer],[-lm])
@@ -1536,7 +1536,7 @@ then
 
   if test "${enable_vcdx}" != "no"
   then
-    PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.20-cdio,
+    PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.20,
      [enable_vcd="no"
       AC_DEFINE(HAVE_VCDX, [], 
       [Define for the VCD plugin using libcdio/libvcdinfo])
