@@ -2,9 +2,15 @@
  * dvd_css.h: Structures for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.h,v 1.2 2001/02/13 10:08:51 stef Exp $
+ * $Id: dvd_css.h,v 1.3 2001/02/15 21:03:27 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
+ *
+ * based on:
+ *  - css-auth by Derek Fawcus <derek@spider.com>
+ *  - DVD CSS ioctls example program by Andrew T. Veliath <andrewtv@usa.net>
+ *  - DeCSSPlus by Ethan Hawke
+ *  - The Divide and conquer attack by Frank A. Stevenson<frank@funcom.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

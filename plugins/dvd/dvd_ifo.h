@@ -2,10 +2,15 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.5 2001/02/14 04:11:01 stef Exp $
+ * $Id: dvd_ifo.h,v 1.6 2001/02/15 21:03:27 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
+ * based on:
+ *  - libifo by Thomas Mirlacher <dent@cosy.sbg.ac.at>
+ *  - IFO structure documentation by Thomas Mirlacher, Björn Englund,
+ *  Håkan Hjort
+ * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or

@@ -2,9 +2,14 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.7 2001/02/14 04:11:01 stef Exp $
+ * $Id: dvd_ifo.c,v 1.8 2001/02/15 21:03:27 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
+ *
+ * based on:
+ *  - libifo by Thomas Mirlacher <dent@cosy.sbg.ac.at>
+ *  - IFO structure documentation by Thomas Mirlacher, Björn Englund,
+ *  Håkan Hjort
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,7 +67,7 @@ static int IfoFindVMG( ifo_t* p_ifo )
     }
     p_ifo->i_off = p_ifo->i_pos;
 
-//fprintf( stderr, "VMG Off : %lld\n", (long long)(p_ifo->i_off) );
+fprintf( stderr, "VMG Off : %lld\n", (long long)(p_ifo->i_off) );
 
     return 0;
 }
@@ -87,7 +92,7 @@ static int IfoFindVTS( ifo_t* p_ifo )
     }
     p_ifo->i_off = p_ifo->i_pos;
 
-//fprintf( stderr, "VTS Off : %lld\n", (long long)(p_ifo->i_off) );
+fprintf( stderr, "VTS Off : %lld\n", (long long)(p_ifo->i_off) );
 
     return 0;
 }
@@ -1115,7 +1120,7 @@ void IfoRead( ifo_t* p_ifo )
 
         i_off = (off_t)(p_ifo->vmg.ptt_srpt.p_tts[i].i_ssector) *DVD_LB_SIZE;
         p_ifo->i_pos = lseek( p_ifo->i_fd, i_off, SEEK_SET );
-//fprintf( stderr, "%lld\n" , p_ifo->i_pos );
+fprintf( stderr, "%lld\n" , p_ifo->i_pos );
 
         /* FIXME : use udf filesystem to avoid this */
         IfoFindVTS( p_ifo );
