@@ -80,36 +80,40 @@
       </div>
 
       <div class="section">
-        <form method="get" action="">
-          <table>
+        <table>
             <tr>
               <td>
-                <table><tr>
-                <td>
-                  <input type="submit" name="control" value="sort" /> by
-                  <select name="type">
-                    <option value="title">title</option>
-                    <option value="group">group</option>
-                    <option value="author">author</option>
-                    <option value="shuffle">shuffle</option>
-                  </select> with
-                  <select name="order">
-                    <option value="0">normal order</option>
-                    <option value="1">reverse order</option>
-                  </select>
-                </td>
-                <td>
-                  <form method="get" action="">
-                     Move the item number
-		    <input type="text" name="psz_pos" size="5" /> to 
-		    <input type="text" name="psz_newpos" size="5" /> 
-		    <input type="submit" name="control" value="move" />
-                  </form>
-                </td>
-                </tr></table>
+                <table>
+		  <tr>
+                    <td>
+                      <form method="get" action="">
+                        <input type="submit" name="control" value="sort" /> by
+                        <select name="type">
+                          <option value="title">title</option>
+                          <option value="group">group</option>
+                          <option value="author">author</option>
+                          <option value="shuffle">shuffle</option>
+                        </select> with
+                        <select name="order">
+                          <option value="0">normal order</option>
+                          <option value="1">reverse order</option>
+                        </select>
+		      </form>
+                    </td>
+                    <td>
+                      <form method="get" action="">
+                         Move the item number
+		        <input type="text" name="psz_pos" size="5" /> to 
+		        <input type="text" name="psz_newpos" size="5" /> 
+		        <input type="submit" name="control" value="move" />
+                      </form>
+                    </td>
+                  </tr>
+		</table>
               </td>
             </tr>
-            <tr>
+	  <form method="get" action="">
+            <tr> 
               <td>
                 <table>
                   <vlc id="rpn" param1="0"/>
@@ -139,12 +143,12 @@
             </tr>
             <tr>  
               <td>
-                <input type="submit" name="control" value="delete" />
-                <input type="submit" name="control" value="keep" />
+                   <input type="submit" name="control" value="delete" />
+                   <input type="submit" name="control" value="keep" />
               </td>
             </tr>
-          </table>
-        </form>
+	  </form>
+        </table>
       </div>
     </div>
     <hr/>
