@@ -516,10 +516,10 @@ msgid "C"
 msgstr "de"
 
 #: src/libvlc.c:320
-#, fuzzy, c-format
+#, c-format
 msgid "Usage: %s [options] [items]...\n"
 msgstr ""
-"Usage: %s [Optionen] [Date]...\n"
+"Benutzung: %s [Optionen] [Objekte]...\n"
 "\n"
 
 #: src/libvlc.c:1271 src/misc/configuration.c:1144
@@ -677,7 +677,7 @@ msgstr ""
 
 #: src/libvlc.h:63
 msgid "Verbosity (0,1,2)"
-msgstr "Wortfülle (0,1,2)"
+msgstr "Verbose-Level (0,1,2)"
 
 #: src/libvlc.h:65
 msgid ""
@@ -1647,7 +1647,6 @@ msgid "Condition variables implementation for Win9x (developers only)"
 msgstr "Umgebungsvariablen-Implementation für Win9x (nur für Entwickler)"
 
 #: src/libvlc.h:533
-#, fuzzy
 msgid ""
 "On Windows 9x/Me you can use a fast but incorrect condition variables "
 "implementation (more precisely there is a possibility for a race condition "
@@ -1655,10 +1654,12 @@ msgid ""
 "robust. Currently you can choose between implementation 0 (which is the "
 "fastest but slightly incorrect), 1 (default) and 2."
 msgstr ""
-"Unter Windows 9x/Me benutzen wir schnelle, aber nicht korrekte, "
-"Umgebungsvariablen. Es ist aber auch möglich, langsamere und robustere zu "
-"benutzen. Derzeit können Sie zwischen 0 (die standardmäßige und schnellste), "
-"1 und 2 wählen."
+"Unter Windows 9x/Me können Sie eine schnelle, aber inkorrekte "
+"Condition-Variablen-Implementation (präziser: es gibt eine Möglichkeit, dass "
+"eine Race-Condition geschieht). Wieauchimmer, es ist möglich, langsamere "
+"Alternativen zu benutzen, die robuster sind. Derzeit können Sie zwischen "
+"Implementation 0 (welches die schnellste, aber leicht inkorrekte ist), 1 "
+"(standard) und 2."
 
 #: src/libvlc.h:541
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
@@ -3506,7 +3507,6 @@ msgid "MPEG audio layer I/II/III packetizer"
 msgstr "MPEG audio layer I/II/III Packetizer"
 
 #: modules/codec/ogt/cvd.c:40
-#, fuzzy
 msgid ""
 "This integer when viewed in binary is a debugging mask\n"
 "external call          1\n"
@@ -3517,22 +3517,22 @@ msgid ""
 "misc info             32\n"
 msgstr ""
 "Diese Ganzzahl ist eine Debug-Maske, wenn sie binär betrachtet wird.\n"
-"Externe Aufrufe      1\n"
-"Alle Aufrufe         2\n"
-"Diverses             4\n"
+"Externer Aufruf        1\n"
+"Alle Aufrufe           2\n"
+"Paket-Assembly-Info    4\n"
+"Bild-Bitmaps           8\n"
+"Bildtransformationen  16\n"
+"Diverses Info         32\n"
 
 #: modules/codec/ogt/cvd.c:55
-#, fuzzy
 msgid "CVD subtitle decoder"
-msgstr "DVD Untertitel Dekoder"
+msgstr "CVD Untertitel Dekoder"
 
 #: modules/codec/ogt/cvd.c:64
-#, fuzzy
 msgid "Chaoji VCD subtitle packetizer"
-msgstr "DVD Untertitel Dekoder"
+msgstr "Chaoji VCD Untertitelpacketizer"
 
 #: modules/codec/ogt/ogt.c:40
-#, fuzzy
 msgid ""
 "This integer when viewed in binary is a debugging mask\n"
 "external call          1\n"
@@ -3544,9 +3544,13 @@ msgid ""
 "misc info             64\n"
 msgstr ""
 "Diese Ganzzahl ist eine Debug-Maske, wenn sie binär betrachtet wird.\n"
-"Externe Aufrufe      1\n"
-"Alle Aufrufe         2\n"
-"Diverses             4\n"
+"Externer Aufruf        1\n"
+"All Aufrufe            2\n"
+"Paket-Assembly-Info    4\n"
+"Bild-Bitmaps           8\n"
+"Bild-Transformationen 16\n"
+"Rendering-Information 32\n"
+"Verschiedenes         64\n"
 
 #: modules/codec/ogt/ogt.c:57
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -5677,9 +5681,8 @@ msgid "VLC - Controller"
 msgstr "VLC - Steuerung"
 
 #: modules/gui/macosx/intf.m:441
-#, fuzzy
 msgid "VLC Media Player"
-msgstr "VLC media Player"
+msgstr "VLC Media Player"
 
 #: modules/gui/macosx/intf.m:445 modules/gui/pda/pda_interface.c:231
 #: modules/gui/pda/pda_interface.c:232
