@@ -162,7 +162,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     var_Get( p_input, "audio-track", &val );
     p_sys->i_audio_last = val.i_int;
 
-    var_Get( p_input, "spu-track", &val );
+    var_Get( p_input, "sub-track", &val );
     p_sys->i_sub_last = val.i_int;
 
     var_Get( p_input, "audio-language", &val );
@@ -174,7 +174,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
                      i, p_sys->ppsz_audio_language[i] );
     }
 
-    var_Get( p_input, "spu-language", &val );
+    var_Get( p_input, "sub-language", &val );
     p_sys->ppsz_sub_language = LanguageSplit(val.psz_string);
     if( p_sys->ppsz_sub_language )
     {

@@ -398,10 +398,10 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     var_Create( p_input, "audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "audio-track", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Create( p_input, "spu-track", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    var_Create( p_input, "sub-track", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "audio-language", VLC_VAR_STRING|VLC_VAR_DOINHERIT );
-    var_Create( p_input, "spu-language", VLC_VAR_STRING|VLC_VAR_DOINHERIT );
+    var_Create( p_input, "sub-language", VLC_VAR_STRING|VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "sub-file", VLC_VAR_FILE | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sub-autodetect-file", VLC_VAR_BOOL |

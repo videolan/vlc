@@ -254,20 +254,20 @@ static int Open( vlc_object_t *p_this )
 
     /* Set audio language */
     psz_code = DemuxGetLanguageCode( p_demux, "audio-language" );
-    if( dvdnav_audio_language_select(p_sys->dvdnav, psz_code ) !=
+    if( dvdnav_audio_language_select( p_sys->dvdnav, psz_code ) !=
         DVDNAV_STATUS_OK )
     {
         msg_Warn( p_demux, "can't set audio language to '%s' (%s)",
                   psz_code, dvdnav_err_to_string( p_sys->dvdnav ) );
         /* We try to fall back to 'en' */
         if( strcmp( psz_code, LANGUAGE_DEFAULT ) )
-            dvdnav_audio_language_select(p_sys->dvdnav, LANGUAGE_DEFAULT );
+            dvdnav_audio_language_select( p_sys->dvdnav, LANGUAGE_DEFAULT );
     }
     free( psz_code );
 
     /* Set spu language */
-    psz_code = DemuxGetLanguageCode( p_demux, "spu-language" );
-    if( dvdnav_spu_language_select( p_sys->dvdnav,psz_code ) !=
+    psz_code = DemuxGetLanguageCode( p_demux, "sub-language" );
+    if( dvdnav_spu_language_select( p_sys->dvdnav, psz_code ) !=
         DVDNAV_STATUS_OK )
     {
         msg_Warn( p_demux, "can't set spu language to '%s' (%s)",

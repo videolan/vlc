@@ -378,8 +378,8 @@ static char *ppsz_clock_descriptions[] =
     "\"subpictures filters\" modules section. You can also set many " \
     "miscellaneous subpictures options." )
 
-#define SPUMARGIN_TEXT N_("Force SPU position")
-#define SPUMARGIN_LONGTEXT N_( \
+#define SUB_MARGIN_TEXT N_("Force subtitle position")
+#define SUB_MARGIN_LONGTEXT N_( \
     "You can use this option to place the subtitles under the movie, " \
     "instead of over the movie. Try several positions.")
 
@@ -969,8 +969,8 @@ vlc_module_begin();
                  SUB_PATH_TEXT, SUB_PATH_LONGTEXT, VLC_TRUE );
     add_file( "sub-file", NULL, NULL, SUB_FILE_TEXT,
               SUB_FILE_LONGTEXT, VLC_TRUE );
-    add_integer( "spumargin", -1, NULL, SPUMARGIN_TEXT,
-                 SPUMARGIN_LONGTEXT, VLC_TRUE );
+    add_integer( "sub-margin", -1, NULL, SUB_MARGIN_TEXT,
+                 SUB_MARGIN_LONGTEXT, VLC_TRUE );
 
     set_section( N_( "Overlays" ) , NULL );
     add_module( "sub-filter", "sub filter", NULL, NULL,
@@ -994,11 +994,11 @@ vlc_module_begin();
                 INPUT_PROGRAMS_TEXT, INPUT_PROGRAMS_LONGTEXT, VLC_FALSE );
     add_integer( "audio-track", -1, NULL,
                  INPUT_AUDIOTRACK_TEXT, INPUT_AUDIOTRACK_LONGTEXT, VLC_FALSE );
-    add_integer( "spu-track", -1, NULL,
+    add_integer( "sub-track", -1, NULL,
                  INPUT_SUBTRACK_TEXT, INPUT_SUBTRACK_LONGTEXT, VLC_FALSE );
     add_string( "audio-language", "", NULL,
                  INPUT_AUDIOTRACK_LANG_TEXT, INPUT_AUDIOTRACK_LANG_LONGTEXT, VLC_FALSE );
-    add_string( "spu-language", "", NULL,
+    add_string( "sub-language", "", NULL,
                  INPUT_SUBTRACK_LANG_TEXT, INPUT_SUBTRACK_LANG_LONGTEXT, VLC_FALSE );
 
 
