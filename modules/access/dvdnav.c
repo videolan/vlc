@@ -243,21 +243,22 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Set menu language ("en")
-     * XXX: maybe it would be better to set it like audio/spu or to create a --menu-language option */
-    if( dvdnav_menu_language_select( p_sys->dvdnav,LANGUAGE_DEFAULT ) != DVDNAV_STATUS_OK )
+     * XXX: maybe it would be better to set it like audio/spu
+     * or to create a --menu-language option */
+    if( dvdnav_menu_language_select( p_sys->dvdnav,LANGUAGE_DEFAULT ) !=
+        DVDNAV_STATUS_OK )
     {
-        msg_Warn( p_demux, "something failed while setting menu '%s' language (%s)",
-                  LANGUAGE_DEFAULT,
-                  dvdnav_err_to_string( p_sys->dvdnav ) );
+        msg_Warn( p_demux, "can't set menu language to '%s' (%s)",
+                  LANGUAGE_DEFAULT, dvdnav_err_to_string( p_sys->dvdnav ) );
     }
 
     /* Set audio language */
     psz_code = DemuxGetLanguageCode( p_demux, "audio-language" );
-    if( dvdnav_audio_language_select(p_sys->dvdnav, psz_code ) != DVDNAV_STATUS_OK )
+    if( dvdnav_audio_language_select(p_sys->dvdnav, psz_code ) !=
+        DVDNAV_STATUS_OK )
     {
-        msg_Warn( p_demux, "something failed while setting audio '%s' language (%s)",
-                  psz_code,
-                  dvdnav_err_to_string( p_sys->dvdnav ) );
+        msg_Warn( p_demux, "can't set audio language to '%s' (%s)",
+                  psz_code, dvdnav_err_to_string( p_sys->dvdnav ) );
         /* We try to fall back to 'en' */
         if( strcmp( psz_code, LANGUAGE_DEFAULT ) )
             dvdnav_audio_language_select(p_sys->dvdnav, LANGUAGE_DEFAULT );
@@ -266,11 +267,11 @@ static int Open( vlc_object_t *p_this )
 
     /* Set spu language */
     psz_code = DemuxGetLanguageCode( p_demux, "spu-language" );
-    if( dvdnav_spu_language_select( p_sys->dvdnav,psz_code ) != DVDNAV_STATUS_OK )
+    if( dvdnav_spu_language_select( p_sys->dvdnav,psz_code ) !=
+        DVDNAV_STATUS_OK )
     {
-        msg_Warn( p_demux, "something failed while setting spu '%s' language (%s)",
-                  psz_code,
-                  dvdnav_err_to_string( p_sys->dvdnav ) );
+        msg_Warn( p_demux, "can't set spu language to '%s' (%s)",
+                  psz_code, dvdnav_err_to_string( p_sys->dvdnav ) );
         /* We try to fall back to 'en' */
         if( strcmp( psz_code, LANGUAGE_DEFAULT ) )
             dvdnav_spu_language_select(p_sys->dvdnav, LANGUAGE_DEFAULT );
@@ -778,9 +779,9 @@ static char *DemuxGetLanguageCode( demux_t *p_demux, char *psz_var )
     char *p;
 
     psz_lang = var_CreateGetString( p_demux, psz_var );
-    /* XXX: we will use only the first value (and ignore other ones in case of a list) */
-    if( ( p = strchr( psz_lang, "," ) ) )
-        *p = '\0';
+    /* XXX: we will use only the first value
+     * (and ignore other ones in case of a list) */
+    if( ( p = strchr( psz_lang, ',' ) ) ) *p = '\0';
 
     for( pl = p_languages; pl->psz_iso639_1 != NULL; pl++ )
     {
