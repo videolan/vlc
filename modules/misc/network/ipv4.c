@@ -410,35 +410,44 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         {
             /* set the time-to-live */
             int i_ttl = p_socket->i_ttl;
-	    unsigned char ttl;
+            unsigned char ttl;
 
-	    if( i_ttl < 1 )
+            if( i_ttl < 1 )
             {
-                i_ttl = config_GetInt( p_this, "i_ttl" );
+                if( var_Get( p_this, "ttl", &val ) != VLC_SUCCESS )
+                {
+                    var_Create( p_this, "ttl",
+                                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+                    var_Get( p_this, "ttl", &val );
+                }
+                i_ttl = val.i_int;
             }
             if( i_ttl < 1 ) i_ttl = 1;
             ttl = (unsigned char) i_ttl;
 
             /* There is some confusion in the world whether IP_MULTICAST_TTL 
-	     * takes a byte or an int as an argument. BSD seems to indicate byte
-	     * so we are going with that and use int as a fallback to be safe */
+             * takes a byte or an int as an argument.
+             * BSD seems to indicate byte so we are going with that and use
+             * int as a fallback to be safe */
             if( setsockopt( i_handle, IPPROTO_IP, IP_MULTICAST_TTL,
                             &ttl, sizeof( ttl ) ) < 0 )
             {
 #ifdef HAVE_ERRNO_H
-	        msg_Dbg( p_this, "failed to set ttl (%s). Let's try it the integer way.", strerror(errno) );
+                msg_Dbg( p_this, "failed to set ttl (%s). Let's try it "
+                         "the integer way.", strerror(errno) );
 #endif
-	        if( setsockopt( i_handle, IPPROTO_IP, IP_MULTICAST_TTL,
-		                &i_ttl, sizeof( i_ttl ) ) <0 )
-		{
+                if( setsockopt( i_handle, IPPROTO_IP, IP_MULTICAST_TTL,
+                                &i_ttl, sizeof( i_ttl ) ) <0 )
+                {
 #ifdef HAVE_ERRNO_H
-                    msg_Err( p_this, "failed to set ttl (%s)", strerror(errno) );
+                    msg_Err( p_this, "failed to set ttl (%s)",
+                             strerror(errno) );
 #else
                     msg_Err( p_this, "failed to set ttl" );
 #endif
                     close( i_handle );
                     return( -1 );
-		}
+                }
             }
         }
 #endif
@@ -446,8 +455,11 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 
     p_socket->i_handle = i_handle;
 
-    var_Create( p_this, "mtu", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "mtu", &val );
+    if( var_Get( p_this, "mtu", &val ) != VLC_SUCCESS )
+    {
+        var_Create( p_this, "mtu", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+        var_Get( p_this, "mtu", &val );
+    }
     p_socket->i_mtu = val.i_int;
     return( 0 );
 }
@@ -543,12 +555,12 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
             vlc_value_t val;
             fd_set fds;
 
-            if( !var_Type( p_this, "ipv4-timeout" ) )
+            if( var_Get( p_this, "ipv4-timeout", &val ) != VLC_SUCCESS )
             {
                 var_Create( p_this, "ipv4-timeout",
                             VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+                var_Get( p_this, "ipv4-timeout", &val );
             }
-            var_Get( p_this, "ipv4-timeout", &val );
             i_max_count = val.i_int * 1000 / 100000 /* timeout.tv_usec */;
 
             msg_Dbg( p_this, "connection in progress" );
