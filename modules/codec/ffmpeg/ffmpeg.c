@@ -500,6 +500,9 @@ static struct
     { VLC_FOURCC('F','L','V','1'), CODEC_ID_FLV1,
       VIDEO_ES, "Flash Video" },
 
+    { VLC_FOURCC('H','2','6','1'), CODEC_ID_H261,
+      VIDEO_ES, "H.261" },
+
 #if LIBAVCODEC_BUILD > 4680
     { VLC_FOURCC('F','L','I','C'), CODEC_ID_FLIC,
       VIDEO_ES, "Flic Video" },
@@ -674,7 +677,7 @@ static struct
       VIDEO_ES, "Sierra VMD Video" },
 #endif
 
-#if LIBAVCODEC_BUILD >= 4718
+#if LIBAVCODEC_BUILD >= 4719
     /* FFMPEG's SNOW wavelet codec */
     { VLC_FOURCC('S','N','O','W'), CODEC_ID_SNOW,
       VIDEO_ES, "FFMpeg SNOW wavelet Video" },
