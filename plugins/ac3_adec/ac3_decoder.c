@@ -2,7 +2,7 @@
  * ac3_decoder.c: core ac3 decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_decoder.c,v 1.6 2001/12/30 07:09:54 sam Exp $
+ * $Id: ac3_decoder.c,v 1.7 2002/04/23 23:44:36 fenrir Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -45,10 +45,10 @@
 static const float cmixlev_lut[4] = { 0.707, 0.595, 0.500, 0.707 };
 static const float smixlev_lut[4] = { 0.707, 0.500, 0.0  , 0.500 };
 
-int ac3_init (ac3dec_t * p_ac3dec)
+int _M( ac3_init )(ac3dec_t * p_ac3dec)
 {
     p_ac3dec->mantissa.lfsr_state = 1;          /* dither_gen initialization */
-    imdct_init(p_ac3dec->imdct);
+    _M( imdct_init )(p_ac3dec->imdct) ;
     
     return 0;
 }

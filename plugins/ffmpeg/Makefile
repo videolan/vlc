@@ -1,1 +1,2 @@
-ffmpeg_SOURCES = 
+ffmpeg_SOURCES = ffmpeg.c
+

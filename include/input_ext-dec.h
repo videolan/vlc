@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.54 2002/03/14 01:35:28 stef Exp $
+ * $Id: input_ext-dec.h,v 1.55 2002/04/23 23:44:36 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -31,6 +31,8 @@
 /* These ones might violate the norm : */
 #define DVD_SPU_ES          0x82
 #define LPCM_AUDIO_ES       0x83
+#define MSMPEG4_VIDEO_ES    0x90
+#define MPEG4_VIDEO_ES      0x91
 #define UNKNOWN_ES          0xFF
 
 /* Structures exported to the decoders */

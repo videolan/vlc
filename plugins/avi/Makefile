@@ -1,1 +1,2 @@
-avi_SOURCES = 
+avi_SOURCES = avi.c
+

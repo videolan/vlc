@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.27 2002/04/23 14:16:20 sam Exp $
+ * $Id: ac3_adec.c,v 1.28 2002/04/23 23:44:36 fenrir Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -214,7 +214,7 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
     IMDCT->w_64   = vlc_memalign( 16, 64 * sizeof(complex_t),
                                   &IMDCT->w_64_orig );
 
-    ac3_init( p_ac3thread->ac3_decoder );
+    _M( ac3_init )( p_ac3thread->ac3_decoder );
 
     /*
      * Initialize the output properties

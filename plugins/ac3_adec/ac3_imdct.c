@@ -2,7 +2,7 @@
  * ac3_imdct.c: ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_imdct.c,v 1.7 2001/12/30 07:09:54 sam Exp $
+ * $Id: ac3_imdct.c,v 1.8 2002/04/23 23:44:36 fenrir Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -44,7 +44,7 @@
 #   define M_PI 3.14159265358979323846
 #endif
 
-void imdct_init(imdct_t * p_imdct)
+void _M( imdct_init )(imdct_t * p_imdct)
 {
     int i;
     float scale = 181.019;
