@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.1 2002/12/14 21:32:41 fenrir Exp $
+ * $Id: udp.c,v 1.2 2003/01/23 15:52:04 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -97,7 +97,7 @@ typedef struct sout_access_data_s
     uint16_t            i_sequence_number;
     uint32_t            i_ssrc;
 
-    int                 i_mtu;
+    unsigned int        i_mtu;
 
     sout_buffer_t       *p_buffer;
 
@@ -263,7 +263,7 @@ static void Close( vlc_object_t * p_this )
 static int Write( sout_instance_t *p_sout, sout_buffer_t *p_buffer )
 {
     sout_access_data_t  *p_access = (sout_access_data_t*)p_sout->p_access_data;
-    int i_write;
+    unsigned int i_write;
 
     while( p_buffer )
     {

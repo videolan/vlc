@@ -2,7 +2,7 @@
  * mpeg4audio.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4audio.c,v 1.1 2003/01/08 10:26:49 fenrir Exp $
+ * $Id: mpeg4audio.c,v 1.2 2003/01/23 15:52:04 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -219,7 +219,6 @@ static int InitThread( packetizer_thread_t *p_pack )
     }
     else
     {
-        int i_wf = sizeof( WAVEFORMATEX ) + 5;
         /* we will try to create a AAC Config from adts */
         p_pack->output_format.i_cat = UNKNOWN_ES;
         p_pack->output_format.i_fourcc = VLC_FOURCC( 'n', 'u', 'l', 'l' );
@@ -257,7 +256,7 @@ static void PacketizeThreadMPEG4( packetizer_thread_t *p_pack )
 {
     sout_buffer_t   *p_sout_buffer;
     pes_packet_t    *p_pes;
-    size_t          i_size;
+    ssize_t          i_size;
 
     /* **** get samples count **** */
     input_ExtractPES( p_pack->p_fifo, &p_pes );
@@ -279,7 +278,7 @@ static void PacketizeThreadMPEG4( packetizer_thread_t *p_pack )
     if( i_size > 0 )
     {
         data_packet_t   *p_data;
-        size_t          i_buffer;
+        ssize_t          i_buffer;
 
         p_sout_buffer = 
             sout_BufferNew( p_pack->p_sout_input->p_sout, i_size );
@@ -295,7 +294,7 @@ static void PacketizeThreadMPEG4( packetizer_thread_t *p_pack )
         {
             size_t          i_copy;
 
-            i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start, 
+            i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start,
                             i_size - i_buffer );
             if( i_copy > 0 )
             {

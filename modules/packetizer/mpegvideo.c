@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.7 2003/01/22 04:51:16 fenrir Exp $
+ * $Id: mpegvideo.c,v 1.8 2003/01/23 15:52:04 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -181,7 +181,7 @@ static const double pd_frame_rates[16] =
 
 static int CopyUntilNextStartCode( packetizer_t   *p_pack,
                                    sout_buffer_t  *p_sout_buffer,
-                                   int            *pi_pos )
+                                   unsigned int   *pi_pos )
 {
     int i_copy = 0;
 

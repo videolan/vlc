@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.11 2003/01/02 20:48:28 gbazin Exp $
+ * $Id: vorbis.c,v 1.12 2003/01/23 15:52:04 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -184,7 +184,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     }
     /* parse the vorbis comment */
     {
-        input_thread_t *p_input = p_fifo->p_parent;
+        input_thread_t *p_input = (input_thread_t *)p_fifo->p_parent;
         input_info_category_t *p_cat = input_InfoCategory( p_input,
                                                            "Vorbis Comment" );
         int i = 0;

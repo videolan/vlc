@@ -2,7 +2,7 @@
  * mpeg4video.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.6 2003/01/19 08:27:28 fenrir Exp $
+ * $Id: mpeg4video.c,v 1.7 2003/01/23 15:52:04 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -247,7 +247,7 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
 {
     sout_buffer_t   *p_sout_buffer;
     pes_packet_t    *p_pes;
-    size_t          i_size;
+    ssize_t          i_size;
 
     /* **** get samples count **** */
     input_ExtractPES( p_pack->p_fifo, &p_pes );
@@ -266,7 +266,7 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
     {
         pes_packet_t    *p_pes_next;
         data_packet_t   *p_data;
-        size_t          i_buffer;
+        ssize_t          i_buffer;
 
         p_sout_buffer = 
             sout_BufferNew( p_pack->p_sout_input->p_sout, i_size );
@@ -280,7 +280,7 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
              p_data != NULL && i_buffer < i_size;
              p_data = p_data->p_next)
         {
-            size_t          i_copy;
+            ssize_t i_copy;
 
             i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start, 
                             i_size - i_buffer );

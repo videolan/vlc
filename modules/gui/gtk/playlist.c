@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: playlist.c,v 1.2 2002/08/08 22:28:22 sam Exp $
+ * $Id: playlist.c,v 1.3 2003/01/23 15:52:04 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -611,8 +611,8 @@ static GList * GtkReadFiles( intf_thread_t * p_intf, gchar * psz_fsname )
  */
 int GtkAppendList( playlist_t * p_playlist, int i_pos, GList * p_list )
 {
-    guint i_dummy;
-    guint i_length;
+    int i_dummy;
+    int i_length;
 
     i_length = g_list_length( p_list );
 

@@ -2,7 +2,7 @@
  * menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: menu.c,v 1.5 2003/01/22 00:32:32 fenrir Exp $
+ * $Id: menu.c,v 1.6 2003/01/23 15:52:04 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -341,7 +341,7 @@ static void GtkPopupVoutDeviceToggle( GtkCheckMenuItem * menuitem, gpointer user
 static void GtkDeinterlaceUpdate( intf_thread_t *p_intf, char *psz_mode )
 {
     char *psz_filter;
-    int  i;
+    unsigned int  i;
 
     psz_filter = config_GetPsz( p_intf, "filter" );
 

@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.28 2003/01/23 13:44:21 fenrir Exp $
+ * $Id: avi.c,v 1.29 2003/01/23 15:52:04 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -683,7 +683,7 @@ static void    AVI_StreamStop( input_thread_t *p_input,
 static int AVI_StreamStopFinishedStreams( input_thread_t *p_input,
                                            demux_sys_t *p_avi )
 {
-    int unsigned i_stream;
+    unsigned int i_stream;
     int b_end;
 
     for( i_stream = 0,b_end = VLC_TRUE;
@@ -925,7 +925,7 @@ static int AVIInit( vlc_object_t * p_this )
                        p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
                        p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
     }
-        
+
     /* now read info on each stream and create ES */
     p_avi->pp_info = calloc( p_avi->i_streams,
                             sizeof( avi_stream_t* ) );
@@ -1958,7 +1958,7 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
         /* read thoses data */
         if( p_stream->i_samplesize )
         {
-            int i_toread;
+            unsigned int i_toread;
 
             if( ( i_toread = toread[i_stream].i_toread ) <= 0 )
             {

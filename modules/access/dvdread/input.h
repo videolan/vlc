@@ -2,7 +2,7 @@
  * input.h: thread structure of the DVD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: input.h,v 1.2 2003/01/23 15:52:04 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -39,11 +39,11 @@ typedef struct thread_dvd_data_s
 
     ifo_handle_t *          p_vmg_file;
     ifo_handle_t *          p_vts_file;
-            
-    int                     i_title;
-    int                     i_chapter;
-    int                     i_angle;
-    int                     i_angle_nb;
+
+    unsigned int            i_title;
+    unsigned int            i_chapter;
+    unsigned int            i_angle;
+    unsigned int            i_angle_nb;
 
     tt_srpt_t *             p_tt_srpt;
     pgc_t *                 p_cur_pgc;
@@ -51,14 +51,14 @@ typedef struct thread_dvd_data_s
     dsi_t                   dsi_pack;
 
     int                     i_ttn;
-    
+
     unsigned int            i_pack_len;
     unsigned int            i_cur_block;
     unsigned int            i_next_vobu;
     unsigned int            i_end_block;
 
-    int                     i_cur_cell;
-    int                     i_next_cell;
+    unsigned int            i_cur_cell;
+    unsigned int            i_next_cell;
     vlc_bool_t              b_eoc;
 } thread_dvd_data_t;
 
