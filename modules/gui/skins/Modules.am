@@ -49,7 +49,7 @@ SOURCES_skins = \
 	modules/gui/skins/src/graphics.cpp \
 	modules/gui/skins/src/graphics.h \
 	modules/gui/skins/src/skin_main.cpp \
-	modules/gui/skins/src/skin-common.h \
+	modules/gui/skins/src/skin_common.h \
 	modules/gui/skins/src/theme.cpp \
 	modules/gui/skins/src/theme.h \
 	modules/gui/skins/src/themeloader.cpp \
