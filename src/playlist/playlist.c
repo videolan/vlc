@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.26 2002/12/06 06:42:24 babal Exp $
+ * $Id: playlist.c,v 1.27 2002/12/06 10:10:40 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -522,7 +522,7 @@ static void PlayItem( playlist_t *p_playlist )
 
     msg_Dbg( p_playlist, "creating new input thread" );
     p_playlist->p_input = input_CreateThread( p_playlist,
-                p_playlist->pp_items[p_playlist->i_index], NULL );
+                                  p_playlist->pp_items[p_playlist->i_index] );
 }
 
 /*****************************************************************************
@@ -532,6 +532,6 @@ static void PlayItem( playlist_t *p_playlist )
  *****************************************************************************/
 static void Poubellize ( playlist_t *p_playlist, input_thread_t *p_input )
 {
-    
+    msg_Dbg( p_playlist, "poubellizing input %i\n", p_input->i_object_id );
 }
 

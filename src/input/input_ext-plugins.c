@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.24 2002/11/13 20:51:05 sam Exp $
+ * $Id: input_ext-plugins.c,v 1.25 2002/12/06 10:10:39 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -521,13 +521,14 @@ ssize_t input_Peek( input_thread_t * p_input, byte_t ** pp_byte, size_t i_size )
     if( p_input->p_last_data - p_input->p_current_data < (ptrdiff_t)i_size )
     {
         /* Go to the next buffer */
-        size_t i_ret = input_FillBuffer( p_input );
+        ssize_t i_ret = input_FillBuffer( p_input );
 
-        if( i_size == -1 )
+        if( i_ret == -1 )
         {
             return -1;
         }
-        else if( i_ret < i_size )
+
+        if( i_ret < (ssize_t)i_size )
         {
             i_size = i_ret;
         }
@@ -546,13 +547,14 @@ ssize_t input_SplitBuffer( input_thread_t * p_input,
     if( p_input->p_last_data - p_input->p_current_data < (ptrdiff_t)i_size )
     {
         /* Go to the next buffer */
-        size_t i_ret = input_FillBuffer( p_input );
+        ssize_t i_ret = input_FillBuffer( p_input );
 
         if( i_ret == -1 )
         {
             return -1;
         }
-        else if( i_ret < i_size )
+
+        if( i_ret < (ssize_t)i_size )
         {
             i_size = i_ret;
         }

@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.20 2002/11/13 20:51:04 sam Exp $
+ * $Id: mixer.c,v 1.21 2002/12/06 10:10:39 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -30,7 +30,7 @@
 #include <vlc/vlc.h>
 
 #ifdef HAVE_ALLOCA_H
-#   include <alloca.h> 
+#   include <alloca.h>
 #endif
 
 #include "audio_output.h"
@@ -118,7 +118,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
         aout_DateSet( &exact_start_date, 0 );
         start_date = 0;
-    } 
+    }
 
     vlc_mutex_unlock( &p_aout->output_fifo_lock );
 
@@ -140,7 +140,8 @@ static int MixBuffer( aout_instance_t * p_aout )
             {
                 msg_Warn( p_aout, "input PTS is out of range ("I64Fd"), "
                           "trashing", mdate() - p_buffer->start_date );
-                aout_BufferFree( aout_FifoPop( p_aout, p_fifo ) );
+                p_buffer = aout_FifoPop( p_aout, p_fifo );
+                aout_BufferFree( p_buffer );
                 p_buffer = p_fifo->p_first;
             }
 
@@ -288,7 +289,7 @@ static int MixBuffer( aout_instance_t * p_aout )
 
     /* Run the mixer. */
     aout_BufferAlloc( &p_aout->mixer.output_alloc,
-                      ((u64)p_aout->output.i_nb_samples * 1000000)
+                      ((uint64_t)p_aout->output.i_nb_samples * 1000000)
                         / p_aout->output.output.i_rate,
                       /* This is a bit kludgy, but is actually only used
                        * for the S/PDIF dummy mixer : */

@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filters.c,v 1.14 2002/11/14 22:38:48 massiot Exp $
+ * $Id: filters.c,v 1.15 2002/12/06 10:10:39 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -30,7 +30,7 @@
 #include <vlc/vlc.h>
 
 #ifdef HAVE_ALLOCA_H
-#   include <alloca.h> 
+#   include <alloca.h>
 #endif
 
 #include "audio_output.h"
@@ -66,7 +66,7 @@ static aout_filter_t * FindFilter( aout_instance_t * p_aout,
 }
 
 /*****************************************************************************
- * SplitConversion: split a conversion in two parts 
+ * SplitConversion: split a conversion in two parts
  *****************************************************************************
  * Returns the number of conversions required by the first part - 0 if only
  * one conversion was asked.
@@ -74,10 +74,9 @@ static aout_filter_t * FindFilter( aout_instance_t * p_aout,
  * developer passed SplitConversion( toto, titi, titi, ... ). That is legal.
  * SplitConversion( toto, titi, toto, ... ) isn't.
  *****************************************************************************/
-static int SplitConversion( aout_instance_t * p_aout,
-                             const audio_sample_format_t * p_input_format,
-                             const audio_sample_format_t * p_output_format,
-                             audio_sample_format_t * p_middle_format )
+static int SplitConversion( const audio_sample_format_t * p_input_format,
+                            const audio_sample_format_t * p_output_format,
+                            audio_sample_format_t * p_middle_format )
 {
     vlc_bool_t b_format =
              (p_input_format->i_format != p_output_format->i_format);
@@ -150,7 +149,7 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
     /* We'll have to split the conversion. We always do the downmixing
      * before the resampling, because the audio decoder can probably do it
      * for us. */
-    i_nb_conversions = SplitConversion( p_aout, p_input_format,
+    i_nb_conversions = SplitConversion( p_input_format,
                                         p_output_format, &temp_format );
     if ( !i_nb_conversions )
     {
@@ -163,10 +162,8 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
     if ( pp_filters[0] == NULL && i_nb_conversions == 2 )
     {
         /* Try with only one conversion. */
-        SplitConversion( p_aout, p_input_format, &temp_format,
-                         &temp_format );
-        pp_filters[0] = FindFilter( p_aout, p_input_format,
-                                    &temp_format );
+        SplitConversion( p_input_format, &temp_format, &temp_format );
+        pp_filters[0] = FindFilter( p_aout, p_input_format, &temp_format );
     }
     if ( pp_filters[0] == NULL )
     {
@@ -182,9 +179,8 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
     if ( pp_filters[1] == NULL )
     {
         /* Try to split the conversion. */
-        i_nb_conversions = SplitConversion( p_aout,
-                                    &pp_filters[0]->output,
-                                    p_output_format, &temp_format );
+        i_nb_conversions = SplitConversion( &pp_filters[0]->output,
+                                           p_output_format, &temp_format );
         if ( !i_nb_conversions )
         {
             vlc_object_detach( pp_filters[0] );
@@ -253,6 +249,8 @@ void aout_FiltersHintBuffers( aout_instance_t * p_aout,
                               int i_nb_filters, aout_alloc_t * p_first_alloc )
 {
     int i;
+
+    (void)p_aout; /* unused */
 
     for ( i = i_nb_filters - 1; i >= 0; i-- )
     {

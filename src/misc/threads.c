@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.26 2002/11/11 14:39:12 sam Exp $
+ * $Id: threads.c,v 1.27 2002/12/06 10:10:40 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -227,7 +227,7 @@ struct itimerval
 {
     struct timeval it_value;
     struct timeval it_interval;
-};  
+};
 
 int setitimer(int kind, const struct itimerval* itnew, struct itimerval* itold);
 #   endif /* WIN32 && !UNDER_CE */
@@ -237,14 +237,14 @@ typedef struct wrapper_t
     /* Data lock access */
     vlc_mutex_t lock;
     vlc_cond_t  wait;
-    
+
     /* Data used to spawn the real thread */
     vlc_thread_func_t func;
     void *p_data;
-    
+
     /* Profiling timer passed to the thread */
     struct itimerval itimer;
-    
+
 } wrapper_t;
 
 #endif /* GPROF */
@@ -361,7 +361,7 @@ int __vlc_mutex_destroy( char * psz_file, int i_line, vlc_mutex_t *p_mutex )
     }
     return 0;
 
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )    
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_result = pthread_mutex_destroy( &p_mutex->mutex );
     if ( i_result )
     {
@@ -380,7 +380,7 @@ int __vlc_mutex_destroy( char * psz_file, int i_line, vlc_mutex_t *p_mutex )
 
     p_mutex->init = 0;
     return B_OK;
-#endif    
+#endif
 
     if( i_result )
     {
@@ -573,7 +573,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 #elif defined( ST_INIT_IN_ST_H )
     p_this->thread_id = st_thread_create( func, (void *)p_this, 1, 0 );
     i_ret = 0;
-    
+
 #elif defined( WIN32 ) || defined( UNDER_CE )
     {
         unsigned threadID;
@@ -583,10 +583,10 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
          * Knowledge Base, article 104641) */
         p_this->thread_id =
 #if defined( UNDER_CE )
-                (HANDLE)CreateThread( NULL, 0, (PTHREAD_START) func, 
+                (HANDLE)CreateThread( NULL, 0, (PTHREAD_START) func,
                                       (void *)p_this, 0, &threadID );
 #else
-                (HANDLE)_beginthreadex( NULL, 0, (PTHREAD_START) func, 
+                (HANDLE)_beginthreadex( NULL, 0, (PTHREAD_START) func,
                                         (void *)p_this, 0, &threadID );
 #endif
     }
@@ -692,7 +692,7 @@ void __vlc_thread_join( vlc_object_t *p_this, char * psz_file, int i_line )
 
 #elif defined( ST_INIT_IN_ST_H )
     i_ret = st_thread_join( p_this->thread_id, NULL );
-    
+
 #elif defined( UNDER_CE )
     WaitForSingleObject( p_this->thread_id, INFINITE );
 

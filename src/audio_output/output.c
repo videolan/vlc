@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.24 2002/11/14 22:38:48 massiot Exp $
+ * $Id: output.c,v 1.25 2002/12/06 10:10:39 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -111,9 +111,9 @@ int aout_OutputNew( aout_instance_t * p_aout,
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
                          NULL );
     }
-    else if ( p_aout->output.output.i_physical_channels == 
+    else if ( p_aout->output.output.i_physical_channels ==
                  (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)
-              && p_aout->output.output.i_original_channels == 
+              && p_aout->output.output.i_original_channels ==
                  (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
     {
         /* Stereo - create the audio-channels variable. */
@@ -138,7 +138,8 @@ int aout_OutputNew( aout_instance_t * p_aout,
     aout_FormatPrepare( &p_aout->output.output );
 
     /* Prepare FIFO. */
-    aout_FifoInit( p_aout, &p_aout->output.fifo, p_aout->output.output.i_rate );
+    aout_FifoInit( p_aout, &p_aout->output.fifo,
+                   p_aout->output.output.i_rate );
 
     vlc_mutex_unlock( &p_aout->output_fifo_lock );
 

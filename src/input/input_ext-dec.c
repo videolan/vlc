@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.42 2002/11/13 20:51:05 sam Exp $
+ * $Id: input_ext-dec.c,v 1.43 2002/12/06 10:10:39 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -234,7 +234,7 @@ u32 UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
 
                     p_bit_stream->i_showbits_buffer = 0;
 
-                    for( j = i = 0 ; i < sizeof(WORD_TYPE) ; i++ )
+                    for( j = i = 0 ; i < (int)sizeof(WORD_TYPE) ; i++ )
                     {
                         if( p_bit_stream->p_byte >= p_bit_stream->p_end )
                         {

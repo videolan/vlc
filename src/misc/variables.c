@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.13 2002/10/31 11:16:30 sam Exp $
+ * $Id: variables.c,v 1.14 2002/12/06 10:10:40 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -51,23 +51,23 @@ static int CmpAddress( vlc_value_t v, vlc_value_t w ) { return v.p_address == w.
 /*****************************************************************************
  * Local duplication functions, and local deallocation functions
  *****************************************************************************/
-static void DupDummy( vlc_value_t *p_val ) { ; }
+static void DupDummy( vlc_value_t *p_val ) { (void)p_val; /* unused */ }
 static void DupString( vlc_value_t *p_val ) { p_val->psz_string = strdup( p_val->psz_string ); }
 
-static void FreeDummy( vlc_value_t *p_val ) { ; }
+static void FreeDummy( vlc_value_t *p_val ) { (void)p_val; /* unused */ }
 static void FreeString( vlc_value_t *p_val ) { free( p_val->psz_string ); }
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int GetUnused      ( vlc_object_t *, const char * );
-static u32 HashString     ( const char * );
-static int Insert         ( variable_t *, int, const char * );
-static int InsertInner    ( variable_t *, int, u32 );
-static int Lookup         ( variable_t *, int, const char * );
-static int LookupInner    ( variable_t *, int, u32 );
+static int      GetUnused   ( vlc_object_t *, const char * );
+static uint32_t HashString  ( const char * );
+static int      Insert      ( variable_t *, int, const char * );
+static int      InsertInner ( variable_t *, int, uint32_t );
+static int      Lookup      ( variable_t *, int, const char * );
+static int      LookupInner ( variable_t *, int, uint32_t );
 
-static void CheckValue    ( variable_t *, vlc_value_t * );
+static void     CheckValue  ( variable_t *, vlc_value_t * );
 
 /*****************************************************************************
  * var_Create: initialize a vlc variable
@@ -265,7 +265,7 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 /*****************************************************************************
  * var_Change: perform an action on a variable
  *****************************************************************************
- * 
+ *
  *****************************************************************************/
 int __var_Change( vlc_object_t *p_this, const char *psz_name,
                   int i_action, vlc_value_t *p_val )
@@ -593,7 +593,7 @@ int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
 
     entry.pf_callback = pf_callback;
     entry.p_data = p_data;
-        
+
     vlc_mutex_lock( &p_this->var_lock );
 
     i_var = GetUnused( p_this, psz_name );
@@ -704,9 +704,9 @@ static int GetUnused( vlc_object_t *p_this, const char *psz_name )
  * fast and not suck too much. This one is pretty fast and did 0 collisions
  * in wenglish's dictionary.
  *****************************************************************************/
-static u32 HashString( const char *psz_string )
+static uint32_t HashString( const char *psz_string )
 {
-    u32 i_hash = 0;
+    uint32_t i_hash = 0;
 
     while( *psz_string )
     {
@@ -736,7 +736,7 @@ static int Insert( variable_t *p_vars, int i_count, const char *psz_name )
     return InsertInner( p_vars, i_count, HashString( psz_name ) );
 }
 
-static int InsertInner( variable_t *p_vars, int i_count, u32 i_hash )
+static int InsertInner( variable_t *p_vars, int i_count, uint32_t i_hash )
 {
     int i_middle;
 
@@ -778,7 +778,7 @@ static int InsertInner( variable_t *p_vars, int i_count, u32 i_hash )
  *****************************************************************************/
 static int Lookup( variable_t *p_vars, int i_count, const char *psz_name )
 {
-    u32 i_hash;
+    uint32_t i_hash;
     int i, i_pos;
 
     if( i_count == 0 )
@@ -825,7 +825,7 @@ static int Lookup( variable_t *p_vars, int i_count, const char *psz_name )
     return -1;
 }
 
-static int LookupInner( variable_t *p_vars, int i_count, u32 i_hash )
+static int LookupInner( variable_t *p_vars, int i_count, uint32_t i_hash )
 {
     int i_middle;
 

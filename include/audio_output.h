@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.72 2002/11/28 23:24:14 massiot Exp $
+ * $Id: audio_output.h,v 1.73 2002/12/06 10:10:40 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,10 +32,10 @@ struct audio_sample_format_t
     unsigned int        i_rate;
     /* Describes the channels configuration of the samples (ie. number of
      * channels which are available in the buffer, and positions). */
-    u32                 i_physical_channels;
+    uint32_t            i_physical_channels;
     /* Describes from which original channels, before downmixing, the
      * buffer is derived. */
-    u32                 i_original_channels;
+    uint32_t            i_original_channels;
     /* Optional - for A/52, SPDIF and DTS types : */
     /* Bytes used by one compressed frame, depends on bitrate. */
     unsigned int        i_bytes_per_frame;
@@ -77,7 +77,7 @@ struct audio_sample_format_t
 /*
  * Fixed-point format: 0xABBBBBBB
  * A == whole part      (sign + 3 bits)
- * B == fractional part (28 bits) 
+ * B == fractional part (28 bits)
  *
  * Values are signed two's complement, so the effective range is:
  * 0x80000000 to 0x7fffffff
@@ -88,7 +88,7 @@ struct audio_sample_format_t
  *
  * 28 bits of fractional accuracy represent about
  * 8.6 digits of decimal accuracy.
- * 
+ *
  * Fixed-point numbers can be added or subtracted as normal
  * integers, but multiplication requires shifting the 64-bit result
  * from 56 fractional bits back to 28 (and rounding.)
@@ -130,7 +130,7 @@ struct aout_buffer_t
     /* i_size is the real size of the buffer (used for debug ONLY), i_nb_bytes
      * is the number of significative bytes in it. */
     size_t                  i_size, i_nb_bytes;
-    int                     i_nb_samples;
+    unsigned int            i_nb_samples;
     mtime_t                 start_date, end_date;
 
     struct aout_buffer_t *  p_next;
@@ -140,7 +140,7 @@ struct aout_buffer_t
 #define AOUT_SPDIF_SIZE 6144
 
 /* Number of samples in an A/52 frame. */
-#define A52_FRAME_NB 1536 
+#define A52_FRAME_NB 1536
 
 /*****************************************************************************
  * audio_date_t : date incrementation without long-term rounding errors

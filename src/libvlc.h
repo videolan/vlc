@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.25 2002/12/03 16:29:04 gitan Exp $
+ * $Id: libvlc.h,v 1.26 2002/12/06 10:10:39 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -499,14 +499,20 @@ vlc_module_end();
 
 static module_config_t p_help_config[] =
 {
-    { CONFIG_ITEM_BOOL, NULL, "help", 'h', N_("print help") },
-    { CONFIG_ITEM_BOOL, NULL, "longhelp", 'H', N_("print detailed help") },
+    { CONFIG_ITEM_BOOL, NULL, "help", 'h', N_("print help"),
+      NULL, NULL, 0, 0.0, NULL, NULL, NULL, VLC_FALSE },
+    { CONFIG_ITEM_BOOL, NULL, "longhelp", 'H', N_("print detailed help"),
+      NULL, NULL, 0, 0.0, NULL, NULL, NULL, VLC_FALSE },
     { CONFIG_ITEM_BOOL, NULL, "list", 'l',
-                              N_("print a list of available modules") },
-    { CONFIG_ITEM_STRING, NULL, "module", 'p', N_("print help on module") },
+                              N_("print a list of available modules"),
+      NULL, NULL, 0, 0.0, NULL, NULL, NULL, VLC_FALSE },
+    { CONFIG_ITEM_STRING, NULL, "module", 'p', N_("print help on module"),
+      NULL, NULL, 0, 0.0, NULL, NULL, NULL, VLC_FALSE },
     { CONFIG_ITEM_BOOL, NULL, "version", '\0',
-                              N_("print version information") },
-    { CONFIG_HINT_END, NULL, NULL, '\0' }
+                              N_("print version information"),
+      NULL, NULL, 0, 0.0, NULL, NULL, NULL, VLC_FALSE },
+    { CONFIG_HINT_END, NULL, NULL, '\0', NULL,
+      NULL, NULL, 0, 0.0, NULL, NULL, NULL, VLC_FALSE }
 };
 
 /*****************************************************************************

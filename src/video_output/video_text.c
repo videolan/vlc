@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.40 2002/11/13 20:51:05 sam Exp $
+ * $Id: video_text.c,v 1.41 2002/12/06 10:10:40 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -22,6 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/* XXX: unused */
+#if 0
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -603,4 +605,4 @@ static void PutByte32( u32 *p_pic, int i_byte, byte_t i_char, byte_t i_border, b
     PUT_BYTE_MASK(i_border, i_border_color);
     PUT_BYTE_MASK(i_bg, i_bg_color);
 }
-
+#endif

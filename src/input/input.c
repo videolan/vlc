@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.216 2002/12/03 23:36:41 gitan Exp $
+ * $Id: input.c,v 1.217 2002/12/06 10:10:39 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -61,11 +61,9 @@ static void EndThread       ( input_thread_t *p_input );
  *****************************************************************************
  * This function creates a new input, and returns a pointer
  * to its description. On error, it returns NULL.
- * If pi_status is NULL, then the function will block until the thread is ready.
- * If not, it will be updated using one of the THREAD_* constants.
  *****************************************************************************/
 input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
-                                      playlist_item_t *p_item, int *pi_status )
+                                      playlist_item_t *p_item )
 {
     input_thread_t *    p_input;                        /* thread descriptor */
     input_info_category_t * p_info;

@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.29 2002/11/17 06:46:56 fenrir Exp $
+ * $Id: objects.c,v 1.30 2002/12/06 10:10:39 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -121,9 +121,9 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             break;
         default:
             i_size = i_type > 0
-                      ? i_type > sizeof(vlc_object_t)
-                         ? i_type : sizeof(vlc_object_t)
-                      : sizeof(vlc_object_t);
+                      ? i_type > (int)sizeof(vlc_object_t)
+                         ? i_type : (int)sizeof(vlc_object_t)
+                      : (int)sizeof(vlc_object_t);
             i_type = VLC_OBJECT_GENERIC;
             psz_type = "generic";
             break;

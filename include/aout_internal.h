@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.34 2002/11/14 22:38:46 massiot Exp $
+ * $Id: aout_internal.h,v 1.35 2002/12/06 10:10:40 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -275,7 +275,7 @@ void aout_OutputDelete( aout_instance_t * p_aout );
 VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t, vlc_bool_t ) );
 
 /* From common.c : */
-VLC_EXPORT( int, aout_FormatNbChannels, ( const audio_sample_format_t * p_format ) );
+VLC_EXPORT( unsigned int, aout_FormatNbChannels, ( const audio_sample_format_t * p_format ) );
 VLC_EXPORT( void, aout_FormatPrepare, ( audio_sample_format_t * p_format ) );
 VLC_EXPORT( void, aout_FormatPrint, ( aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format ) );
 VLC_EXPORT( void, aout_FormatsPrint, ( aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format1, const audio_sample_format_t * p_format2 ) );

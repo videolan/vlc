@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.9 2002/11/14 22:38:48 massiot Exp $
+ * $Id: common.c,v 1.10 2002/12/06 10:10:39 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -95,15 +95,15 @@ void aout_Delete( aout_instance_t * p_aout )
 /*****************************************************************************
  * aout_FormatNbChannels : return the number of channels
  *****************************************************************************/
-int aout_FormatNbChannels( const audio_sample_format_t * p_format )
+unsigned int aout_FormatNbChannels( const audio_sample_format_t * p_format )
 {
-    static const u32 pi_channels[] =
+    static const uint32_t pi_channels[] =
         { AOUT_CHAN_CENTER, AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
           AOUT_CHAN_REARCENTER, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
           AOUT_CHAN_LFE };
-    int i_nb = 0, i;
+    unsigned int i_nb = 0, i;
 
-    for ( i = 0; i < sizeof(pi_channels)/sizeof(u32); i++ )
+    for ( i = 0; i < sizeof(pi_channels)/sizeof(uint32_t); i++ )
     {
         if ( p_format->i_physical_channels & pi_channels[i] ) i_nb++;
     }
@@ -263,7 +263,7 @@ void aout_FormatsPrint( aout_instance_t * p_aout, const char * psz_text,
  * aout_FifoInit : initialize the members of a FIFO
  *****************************************************************************/
 void aout_FifoInit( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
-                    u32 i_rate )
+                    uint32_t i_rate )
 {
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;
@@ -284,7 +284,7 @@ void aout_FifoPush( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
     {
         p_buffer->start_date = aout_DateGet( &p_fifo->end_date );
         p_buffer->end_date = aout_DateIncrement( &p_fifo->end_date,
-                                                 p_buffer->i_nb_samples ); 
+                                                 p_buffer->i_nb_samples );
     }
     else
     {
@@ -354,6 +354,7 @@ mtime_t aout_FifoFirstDate( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 aout_buffer_t * aout_FifoPop( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 {
     aout_buffer_t * p_buffer;
+
     p_buffer = p_fifo->p_first;
     if ( p_buffer == NULL ) return NULL;
     p_fifo->p_first = p_buffer->p_next;
@@ -389,7 +390,7 @@ void aout_FifoDestroy( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 /*****************************************************************************
  * aout_DateInit : set the divider of an audio_date_t
  *****************************************************************************/
-void aout_DateInit( audio_date_t * p_date, u32 i_divider )
+void aout_DateInit( audio_date_t * p_date, uint32_t i_divider )
 {
     p_date->date = 0;
     p_date->i_divider = i_divider;
@@ -425,7 +426,7 @@ mtime_t aout_DateGet( const audio_date_t * p_date )
  * aout_DateIncrement : increment the date and return the result, taking
  * into account rounding errors
  *****************************************************************************/
-mtime_t aout_DateIncrement( audio_date_t * p_date, u32 i_nb_samples )
+mtime_t aout_DateIncrement( audio_date_t * p_date, uint32_t i_nb_samples )
 {
     mtime_t i_dividend = (mtime_t)i_nb_samples * 1000000;
     p_date->date += i_dividend / p_date->i_divider;
