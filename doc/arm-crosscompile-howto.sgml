@@ -3,7 +3,8 @@
 <titlepag>
   <title>Cross compiling VLC for ARM-Linux based platforms</title>
   <author>Marc Ariberti <tt><htmlurl url="mailto:marcari@videolan.org" name="<marcari@videolan.org>"></tt></author>
-  <date>v0.0.1, 13 march 2003</date>
+  <author>Jean-Paul Saman <tt><htmlurl url="mailto:jpsaman@wxs.nl" name="<jpsaman@wxs.nl>"></tt></author>
+  <date>v0.0.2, 19 march 2004</date>
   <abstract>
     This document describes all the steps to cross compile vlc for ARM based
     platforms. It describes how to build a cross compilation toolchain, how to
