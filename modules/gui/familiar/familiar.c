@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.22 2003/01/03 20:55:00 jpsaman Exp $
+ * $Id: familiar.c,v 1.23 2003/01/04 00:21:00 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -325,7 +325,11 @@ static int Manage( intf_thread_t *p_intf )
             /* Manage the slider */
             if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
             {
+#ifndef HAVE_STRONGARM
                 float newvalue = p_intf->p_sys->p_adj->value;
+#else
+                off_t newvalue = p_intf->p_sys->p_adj->value;
+#endif
 
 #define p_area p_input->stream.p_selected_area
                 /* If the user hasn't touched the slider since the last time,
@@ -335,8 +339,11 @@ static int Manage( intf_thread_t *p_intf )
                     /* Update the value */
                     p_intf->p_sys->p_adj->value =
                     p_intf->p_sys->f_adj_oldvalue =
+#ifndef HAVE_STRONGARM
                         ( 100. * p_area->i_tell ) / p_area->i_size;
-
+#else
+						( 100 * p_area->i_tell ) / p_area->i_size;						
+#endif
                     gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
                                              "value_changed" );
                 }
