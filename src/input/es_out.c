@@ -1073,14 +1073,13 @@ static char *LanguageGetName( const char *psz_code )
  ****************************************************************************/
 static void EsOutAddInfo( es_out_t *out, es_out_id_t *es )
 {
-    es_out_sys_t      *p_sys = out->p_sys;
-    input_thread_t    *p_input = p_sys->p_input;
-    es_format_t       *fmt = &es->fmt;
-
-    char psz_cat[strlen(_("Stream %d")) + 12];
+    es_out_sys_t   *p_sys = out->p_sys;
+    input_thread_t *p_input = p_sys->p_input;
+    es_format_t    *fmt = &es->fmt;
+    char           *psz_cat;
 
     /* Add stream info */
-    sprintf( psz_cat, _("Stream %d"), out->p_sys->i_id - 1 );
+    asprintf( &psz_cat, _("Stream %d"), out->p_sys->i_id - 1 );
 
     input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Codec"),
                    "%.4s", (char*)&fmt->i_codec );
@@ -1138,4 +1137,6 @@ static void EsOutAddInfo( es_out_t *out, es_out_id_t *es )
     default:
         break;
     }
+
+    free( psz_cat );
 }

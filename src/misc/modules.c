@@ -763,21 +763,23 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
     }
 
 #if defined( UNDER_CE ) || defined( _MSC_VER )
+#ifdef UNDER_CE
     MultiByteToWideChar( CP_ACP, 0, psz_dir, -1, psz_wdir, MAX_PATH );
 
     rc = GetFileAttributes( psz_wdir );
-    if( !(rc & FILE_ATTRIBUTE_DIRECTORY) )
-    {
-        /* Not a directory */
-        return;
-    }
+    if( !(rc & FILE_ATTRIBUTE_DIRECTORY) ) return; /* Not a directory */
 
     /* Parse all files in the directory */
-#ifdef UNDER_CE
     swprintf( psz_path, L"%s\\*.*", psz_dir );
+
 #else
+    rc = GetFileAttributes( psz_dir );
+    if( !(rc & FILE_ATTRIBUTE_DIRECTORY) ) return; /* Not a directory */
+
+    /* Parse all files in the directory */
     sprintf( psz_path, "%s\\*.*", psz_dir );
 #endif
+
     handle = FindFirstFile( psz_path, &finddata );
     if( handle == INVALID_HANDLE_VALUE )
     {

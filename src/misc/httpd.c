@@ -1108,7 +1108,7 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
         break; // success
 
 socket_error:
-        close( fd );
+        net_Close( fd );
         fd = -1;
     }
 

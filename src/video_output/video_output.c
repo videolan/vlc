@@ -1354,8 +1354,10 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
     var_Get( p_input, "video-es", &val );
     if( val.i_int >= 0 )
     {
+        vlc_value_t val_es;
+        val_es.i_int = -VIDEO_ES;
         p_vout->b_filter_change = VLC_TRUE;
-        var_Set( p_input, "video-es", (vlc_value_t)-VIDEO_ES );
+        var_Set( p_input, "video-es", val_es );
         var_Set( p_input, "video-es", val );
     }
 
@@ -1386,8 +1388,10 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     var_Get( p_input, "video-es", &val );
     if( val.i_int >= 0 )
     {
+        vlc_value_t val_es;
+        val_es.i_int = -VIDEO_ES;
         p_vout->b_filter_change = VLC_TRUE;
-        var_Set( p_input, "video-es", (vlc_value_t)-VIDEO_ES );
+        var_Set( p_input, "video-es", val_es );
         var_Set( p_input, "video-es", val );
     }
 

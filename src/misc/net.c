@@ -53,6 +53,8 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
+#elif defined( WIN32 ) && !defined( UNDER_CE )
+#   include <io.h>
 #endif
 
 #include "network.h"
@@ -411,8 +413,7 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, uint8_t *p_data,
     }
     else
     {
-        if( fd == STDIN_FILENO ) i_recv = read( fd, p_data, i_data ); else
-
+        if( fd == 0 /*STDIN_FILENO*/ ) i_recv = read( fd, p_data, i_data ); else
         if( ( i_recv = recv( fd, p_data, i_data, 0 ) ) <= 0 )
         {
 #ifdef WIN32
