@@ -199,18 +199,6 @@
 
 	    <widget>
 	      <class>GtkMenuItem</class>
-	      <name>menubar_fullscreen</name>
-	      <signal>
-		<name>activate</name>
-		<handler>GtkFullscreen</handler>
-		<last_modification_time>Sat, 19 May 2001 16:28:15 GMT</last_modification_time>
-	      </signal>
-	      <label>_Fullscreen</label>
-	      <right_justify>False</right_justify>
-	    </widget>
-
-	    <widget>
-	      <class>GtkMenuItem</class>
 	      <name>separator9</name>
 	      <right_justify>False</right_justify>
 	    </widget>
@@ -302,30 +290,6 @@
 	    <name>menubar_settings_menu</name>
 
 	    <widget>
-	      <class>GtkMenuItem</class>
-	      <name>menubar_audio</name>
-	      <sensitive>False</sensitive>
-	      <tooltip>Select audio channel</tooltip>
-	      <label>_Audio</label>
-	      <right_justify>False</right_justify>
-	    </widget>
-
-	    <widget>
-	      <class>GtkMenuItem</class>
-	      <name>menubar_subpictures</name>
-	      <sensitive>False</sensitive>
-	      <tooltip>Select subtitles channel</tooltip>
-	      <label>_Subtitles</label>
-	      <right_justify>False</right_justify>
-	    </widget>
-
-	    <widget>
-	      <class>GtkMenuItem</class>
-	      <name>separator5</name>
-	      <right_justify>False</right_justify>
-	    </widget>
-
-	    <widget>
 	      <class>GtkPixmapMenuItem</class>
 	      <name>menubar_preferences</name>
 	      <signal>
@@ -347,6 +311,21 @@
 	  <widget>
 	    <class>GtkMenu</class>
 	    <name>menubar_config_audio_menu</name>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_audio</name>
+	      <sensitive>False</sensitive>
+	      <tooltip>Select audio channel</tooltip>
+	      <label>_Language</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>separator25</name>
+	      <right_justify>False</right_justify>
+	    </widget>
 
 	    <widget>
 	      <class>GtkMenuItem</class>
@@ -418,8 +397,34 @@
 
 	    <widget>
 	      <class>GtkMenuItem</class>
-	      <name>menubar_video_device</name>
-	      <label>Screen</label>
+	      <name>menubar_subpictures</name>
+	      <sensitive>False</sensitive>
+	      <tooltip>Select subtitles channel</tooltip>
+	      <label>_Subtitles</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>separator23</name>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_fullscreen</name>
+	      <signal>
+		<name>activate</name>
+		<handler>GtkFullscreen</handler>
+		<last_modification_time>Sat, 19 May 2001 16:28:15 GMT</last_modification_time>
+	      </signal>
+	      <label>_Fullscreen</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>separator24</name>
 	      <right_justify>False</right_justify>
 	    </widget>
 
@@ -427,6 +432,13 @@
 	      <class>GtkMenuItem</class>
 	      <name>menubar_deinterlace</name>
 	      <label>Deinterlace</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_video_device</name>
+	      <label>Screen</label>
 	      <right_justify>False</right_justify>
 	    </widget>
 	  </widget>
@@ -1184,107 +1196,6 @@
 
   <widget>
     <class>GtkMenuItem</class>
-    <name>popup_interface_toggle</name>
-    <signal>
-      <name>activate</name>
-      <handler>GtkWindowToggle</handler>
-      <last_modification_time>Sat, 19 May 2001 16:18:51 GMT</last_modification_time>
-    </signal>
-    <label>Toggle _Interface</label>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>popup_fullscreen</name>
-    <tooltip>Toggle fullscreen mode</tooltip>
-    <signal>
-      <name>activate</name>
-      <handler>GtkFullscreen</handler>
-      <last_modification_time>Sat, 19 May 2001 16:19:07 GMT</last_modification_time>
-    </signal>
-    <label>_Fullscreen</label>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>popup_video_device</name>
-    <label>Screen</label>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>popup_deinterlace</name>
-    <label>Deinterlace</label>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>separator8</name>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>popup_volume_up</name>
-    <signal>
-      <name>activate</name>
-      <handler>GtkVolumeUp</handler>
-      <last_modification_time>Mon, 20 Jan 2003 16:33:43 GMT</last_modification_time>
-    </signal>
-    <label>Volume Up</label>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>popup_volume_down</name>
-    <signal>
-      <name>activate</name>
-      <handler>GtkVolumeDown</handler>
-      <last_modification_time>Mon, 20 Jan 2003 16:33:43 GMT</last_modification_time>
-    </signal>
-    <label>Volume Down</label>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>popup_volume_mute</name>
-    <signal>
-      <name>activate</name>
-      <handler>GtkVolumeMute</handler>
-      <last_modification_time>Mon, 20 Jan 2003 16:33:43 GMT</last_modification_time>
-    </signal>
-    <label>Mute</label>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>popup_audio_channels</name>
-    <label>Channels</label>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>popup_audio_device</name>
-    <label>Device</label>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>separator17</name>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
     <name>popup_next</name>
     <signal>
       <name>activate</name>
@@ -1323,6 +1234,12 @@
 
   <widget>
     <class>GtkMenuItem</class>
+    <name>separator17</name>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
     <name>popup_program</name>
     <sensitive>False</sensitive>
     <tooltip>Switch program</tooltip>
@@ -1341,23 +1258,148 @@
   </widget>
 
   <widget>
-    <class>GtkPixmapMenuItem</class>
-    <name>popup_audio</name>
-    <sensitive>False</sensitive>
-    <tooltip>Select audio channel</tooltip>
-    <label>_Audio</label>
+    <class>GtkMenuItem</class>
+    <name>audio1</name>
+    <label>Audio</label>
     <right_justify>False</right_justify>
-    <stock_icon>GNOME_STOCK_MENU_VOLUME</stock_icon>
+
+    <widget>
+      <class>GtkMenu</class>
+      <name>audio1_menu</name>
+
+      <widget>
+	<class>GtkPixmapMenuItem</class>
+	<name>popup_audio</name>
+	<sensitive>False</sensitive>
+	<tooltip>Select audio channel</tooltip>
+	<label>_Language</label>
+	<right_justify>False</right_justify>
+	<stock_icon>GNOME_STOCK_MENU_VOLUME</stock_icon>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>separator20</name>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>popup_volume_up</name>
+	<signal>
+	  <name>activate</name>
+	  <handler>GtkVolumeUp</handler>
+	  <last_modification_time>Mon, 20 Jan 2003 16:33:43 GMT</last_modification_time>
+	</signal>
+	<label>Volume Up</label>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>popup_volume_down</name>
+	<signal>
+	  <name>activate</name>
+	  <handler>GtkVolumeDown</handler>
+	  <last_modification_time>Mon, 20 Jan 2003 16:33:43 GMT</last_modification_time>
+	</signal>
+	<label>Volume Down</label>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>popup_volume_mute</name>
+	<signal>
+	  <name>activate</name>
+	  <handler>GtkVolumeMute</handler>
+	  <last_modification_time>Mon, 20 Jan 2003 16:33:43 GMT</last_modification_time>
+	</signal>
+	<label>Mute</label>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>separator21</name>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>popup_audio_channels</name>
+	<label>Channels</label>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>popup_audio_device</name>
+	<label>Device</label>
+	<right_justify>False</right_justify>
+      </widget>
+    </widget>
   </widget>
 
   <widget>
-    <class>GtkPixmapMenuItem</class>
-    <name>popup_subpictures</name>
-    <sensitive>False</sensitive>
-    <tooltip>Select subtitles channel</tooltip>
-    <label>_Subtitles</label>
+    <class>GtkMenuItem</class>
+    <name>video1</name>
+    <label>Video</label>
     <right_justify>False</right_justify>
-    <stock_icon>GNOME_STOCK_MENU_FONT</stock_icon>
+
+    <widget>
+      <class>GtkMenu</class>
+      <name>video1_menu</name>
+
+      <widget>
+	<class>GtkPixmapMenuItem</class>
+	<name>popup_subpictures</name>
+	<sensitive>False</sensitive>
+	<tooltip>Select subtitles channel</tooltip>
+	<label>_Subtitles</label>
+	<right_justify>False</right_justify>
+	<stock_icon>GNOME_STOCK_MENU_FONT</stock_icon>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>separator18</name>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>popup_fullscreen</name>
+	<tooltip>Toggle fullscreen mode</tooltip>
+	<signal>
+	  <name>activate</name>
+	  <handler>GtkFullscreen</handler>
+	  <last_modification_time>Sat, 19 May 2001 16:19:07 GMT</last_modification_time>
+	</signal>
+	<label>_Fullscreen</label>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>separator19</name>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>popup_deinterlace</name>
+	<label>Deinterlace</label>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>popup_video_device</name>
+	<label>Screen</label>
+	<right_justify>False</right_justify>
+      </widget>
+    </widget>
   </widget>
 
   <widget>
@@ -1434,6 +1476,18 @@
 	<stock_item>GNOMEUIINFO_MENU_ABOUT_ITEM</stock_item>
       </widget>
     </widget>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_interface_toggle</name>
+    <signal>
+      <name>activate</name>
+      <handler>GtkWindowToggle</handler>
+      <last_modification_time>Sat, 19 May 2001 16:18:51 GMT</last_modification_time>
+    </signal>
+    <label>Toggle _Interface</label>
+    <right_justify>False</right_justify>
   </widget>
 
   <widget>

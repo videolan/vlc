@@ -37,7 +37,6 @@ create_intf_window (void)
   GtkWidget *menubar_view_menu;
   GtkAccelGroup *menubar_view_menu_accels;
   GtkWidget *menubar_interface_hide;
-  GtkWidget *menubar_fullscreen;
   GtkWidget *separator13;
   GtkWidget *menubar_program;
   GtkWidget *menubar_title;
@@ -49,13 +48,12 @@ create_intf_window (void)
   GtkWidget *menubar_settings;
   GtkWidget *menubar_settings_menu;
   GtkAccelGroup *menubar_settings_menu_accels;
-  GtkWidget *menubar_audio;
-  GtkWidget *menubar_subpictures;
-  GtkWidget *separator8;
   GtkWidget *menubar_preferences;
   GtkWidget *menubar_config_audio;
   GtkWidget *menubar_config_audio_menu;
   GtkAccelGroup *menubar_config_audio_menu_accels;
+  GtkWidget *menubar_audio;
+  GtkWidget *separator18;
   GtkWidget *menubar_volume_up;
   GtkWidget *menubar_volume_down;
   GtkWidget *menubar_volume_mute;
@@ -65,8 +63,12 @@ create_intf_window (void)
   GtkWidget *menubar_config_video;
   GtkWidget *menubar_config_video_menu;
   GtkAccelGroup *menubar_config_video_menu_accels;
-  GtkWidget *menubar_video_device;
+  GtkWidget *menubar_subpictures;
+  GtkWidget *separator25;
+  GtkWidget *menubar_fullscreen;
+  GtkWidget *separator24;
   GtkWidget *menubar_deinterlace;
+  GtkWidget *menubar_video_device;
   GtkWidget *menubar_help;
   GtkWidget *menubar_help_menu;
   GtkAccelGroup *menubar_help_menu_accels;
@@ -296,17 +298,6 @@ create_intf_window (void)
   gtk_container_add (GTK_CONTAINER (menubar_view_menu), menubar_interface_hide);
   gtk_tooltips_set_tip (tooltips, menubar_interface_hide, _("Hide the main interface window"), NULL);
 
-  menubar_fullscreen = gtk_menu_item_new_with_label ("");
-  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_fullscreen)->child),
-                                   _("_Fullscreen"));
-  gtk_widget_add_accelerator (menubar_fullscreen, "activate_item", menubar_view_menu_accels,
-                              tmp_key, 0, 0);
-  gtk_widget_ref (menubar_fullscreen);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_fullscreen", menubar_fullscreen,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (menubar_fullscreen);
-  gtk_container_add (GTK_CONTAINER (menubar_view_menu), menubar_fullscreen);
-
   separator13 = gtk_menu_item_new ();
   gtk_widget_ref (separator13);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator13", separator13,
@@ -412,40 +403,6 @@ create_intf_window (void)
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menubar_settings), menubar_settings_menu);
   menubar_settings_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (menubar_settings_menu));
 
-  menubar_audio = gtk_menu_item_new_with_label ("");
-  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_audio)->child),
-                                   _("A_udio"));
-  gtk_widget_add_accelerator (menubar_audio, "activate_item", menubar_settings_menu_accels,
-                              tmp_key, 0, 0);
-  gtk_widget_ref (menubar_audio);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_audio", menubar_audio,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (menubar_audio);
-  gtk_container_add (GTK_CONTAINER (menubar_settings_menu), menubar_audio);
-  gtk_widget_set_sensitive (menubar_audio, FALSE);
-  gtk_tooltips_set_tip (tooltips, menubar_audio, _("Select audio channel"), NULL);
-
-  menubar_subpictures = gtk_menu_item_new_with_label ("");
-  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_subpictures)->child),
-                                   _("_Subtitles"));
-  gtk_widget_add_accelerator (menubar_subpictures, "activate_item", menubar_settings_menu_accels,
-                              tmp_key, 0, 0);
-  gtk_widget_ref (menubar_subpictures);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_subpictures", menubar_subpictures,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (menubar_subpictures);
-  gtk_container_add (GTK_CONTAINER (menubar_settings_menu), menubar_subpictures);
-  gtk_widget_set_sensitive (menubar_subpictures, FALSE);
-  gtk_tooltips_set_tip (tooltips, menubar_subpictures, _("Select subtitles channel"), NULL);
-
-  separator8 = gtk_menu_item_new ();
-  gtk_widget_ref (separator8);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator8", separator8,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (separator8);
-  gtk_container_add (GTK_CONTAINER (menubar_settings_menu), separator8);
-  gtk_widget_set_sensitive (separator8, FALSE);
-
   menubar_preferences = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_preferences)->child),
                                    _("_Preferences..."));
@@ -475,6 +432,27 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menubar_config_audio), menubar_config_audio_menu);
   menubar_config_audio_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (menubar_config_audio_menu));
+
+  menubar_audio = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_audio)->child),
+                                   _("_Language"));
+  gtk_widget_add_accelerator (menubar_audio, "activate_item", menubar_config_audio_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (menubar_audio);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_audio", menubar_audio,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (menubar_audio);
+  gtk_container_add (GTK_CONTAINER (menubar_config_audio_menu), menubar_audio);
+  gtk_widget_set_sensitive (menubar_audio, FALSE);
+  gtk_tooltips_set_tip (tooltips, menubar_audio, _("Select audio channel"), NULL);
+
+  separator18 = gtk_menu_item_new ();
+  gtk_widget_ref (separator18);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator18", separator18,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator18);
+  gtk_container_add (GTK_CONTAINER (menubar_config_audio_menu), separator18);
+  gtk_widget_set_sensitive (separator18, FALSE);
 
   menubar_volume_up = gtk_menu_item_new_with_label (_("Volume Up"));
   gtk_widget_ref (menubar_volume_up);
@@ -537,12 +515,45 @@ create_intf_window (void)
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menubar_config_video), menubar_config_video_menu);
   menubar_config_video_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (menubar_config_video_menu));
 
-  menubar_video_device = gtk_menu_item_new_with_label (_("Screen"));
-  gtk_widget_ref (menubar_video_device);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_video_device", menubar_video_device,
+  menubar_subpictures = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_subpictures)->child),
+                                   _("_Subtitles"));
+  gtk_widget_add_accelerator (menubar_subpictures, "activate_item", menubar_config_video_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (menubar_subpictures);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_subpictures", menubar_subpictures,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (menubar_video_device);
-  gtk_container_add (GTK_CONTAINER (menubar_config_video_menu), menubar_video_device);
+  gtk_widget_show (menubar_subpictures);
+  gtk_container_add (GTK_CONTAINER (menubar_config_video_menu), menubar_subpictures);
+  gtk_widget_set_sensitive (menubar_subpictures, FALSE);
+  gtk_tooltips_set_tip (tooltips, menubar_subpictures, _("Select subtitles channel"), NULL);
+
+  separator25 = gtk_menu_item_new ();
+  gtk_widget_ref (separator25);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator25", separator25,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator25);
+  gtk_container_add (GTK_CONTAINER (menubar_config_video_menu), separator25);
+  gtk_widget_set_sensitive (separator25, FALSE);
+
+  menubar_fullscreen = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_fullscreen)->child),
+                                   _("_Fullscreen"));
+  gtk_widget_add_accelerator (menubar_fullscreen, "activate_item", menubar_config_video_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (menubar_fullscreen);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_fullscreen", menubar_fullscreen,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (menubar_fullscreen);
+  gtk_container_add (GTK_CONTAINER (menubar_config_video_menu), menubar_fullscreen);
+
+  separator24 = gtk_menu_item_new ();
+  gtk_widget_ref (separator24);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator24", separator24,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator24);
+  gtk_container_add (GTK_CONTAINER (menubar_config_video_menu), separator24);
+  gtk_widget_set_sensitive (separator24, FALSE);
 
   menubar_deinterlace = gtk_menu_item_new_with_label (_("Deinterlace"));
   gtk_widget_ref (menubar_deinterlace);
@@ -550,6 +561,13 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (menubar_deinterlace);
   gtk_container_add (GTK_CONTAINER (menubar_config_video_menu), menubar_deinterlace);
+
+  menubar_video_device = gtk_menu_item_new_with_label (_("Screen"));
+  gtk_widget_ref (menubar_video_device);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_video_device", menubar_video_device,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (menubar_video_device);
+  gtk_container_add (GTK_CONTAINER (menubar_config_video_menu), menubar_video_device);
 
   menubar_help = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_help)->child),
@@ -966,9 +984,6 @@ create_intf_window (void)
   gtk_signal_connect (GTK_OBJECT (menubar_interface_hide), "activate",
                       GTK_SIGNAL_FUNC (GtkWindowToggle),
                       NULL);
-  gtk_signal_connect (GTK_OBJECT (menubar_fullscreen), "activate",
-                      GTK_SIGNAL_FUNC (GtkFullscreen),
-                      NULL);
   gtk_signal_connect (GTK_OBJECT (menubar_playlist), "activate",
                       GTK_SIGNAL_FUNC (GtkPlaylistShow),
                       NULL);
@@ -989,6 +1004,9 @@ create_intf_window (void)
                       NULL);
   gtk_signal_connect (GTK_OBJECT (menubar_volume_mute), "activate",
                       GTK_SIGNAL_FUNC (GtkVolumeMute),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (menubar_fullscreen), "activate",
+                      GTK_SIGNAL_FUNC (GtkFullscreen),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (menubar_about), "activate",
                       GTK_SIGNAL_FUNC (GtkAboutShow),
@@ -1079,25 +1097,34 @@ create_intf_popup (void)
   GtkWidget *popup_back;
   GtkWidget *popup_slow;
   GtkWidget *popup_fast;
-  GtkWidget *separator6;
-  GtkWidget *popup_interface_toggle;
-  GtkWidget *popup_fullscreen;
-  GtkWidget *popup_video_device;
-  GtkWidget *popup_deinterlace;
-  GtkWidget *separator5;
-  GtkWidget *popup_volume_up;
-  GtkWidget *popup_volume_down;
-  GtkWidget *popup_volume_mute;
-  GtkWidget *popup_audio_channels;
-  GtkWidget *popup_audio_device;
   GtkWidget *separator16;
   GtkWidget *popup_next;
   GtkWidget *popup_prev;
   GtkWidget *popup_jump;
+  GtkWidget *separator27;
   GtkWidget *popup_program;
   GtkWidget *popup_navigation;
+  GtkWidget *audio1;
+  GtkWidget *audio1_menu;
+  GtkAccelGroup *audio1_menu_accels;
   GtkWidget *popup_audio;
+  GtkWidget *separator19;
+  GtkWidget *popup_volume_up;
+  GtkWidget *popup_volume_down;
+  GtkWidget *popup_volume_mute;
+  GtkWidget *separator20;
+  GtkWidget *popup_audio_channels;
+  GtkWidget *popup_audio_device;
+  GtkWidget *video1;
+  GtkWidget *video1_menu;
+  GtkAccelGroup *video1_menu_accels;
   GtkWidget *popup_subpictures;
+  GtkWidget *separator21;
+  GtkWidget *popup_fullscreen;
+  GtkWidget *separator23;
+  GtkWidget *popup_deinterlace;
+  GtkWidget *popup_video_device;
+  GtkWidget *separator26;
   GtkWidget *popup_open;
   GtkWidget *popup_open_menu;
   GtkAccelGroup *popup_open_menu_accels;
@@ -1106,6 +1133,7 @@ create_intf_popup (void)
   GtkWidget *popup_network;
   GtkWidget *separator12;
   GtkWidget *popup_about;
+  GtkWidget *popup_interface_toggle;
   GtkWidget *popup_playlist;
   GtkWidget *popup_preferences;
   GtkWidget *separator9;
@@ -1168,93 +1196,6 @@ create_intf_popup (void)
   gtk_container_add (GTK_CONTAINER (intf_popup), popup_fast);
   gtk_widget_set_sensitive (popup_fast, FALSE);
 
-  separator6 = gtk_menu_item_new ();
-  gtk_widget_ref (separator6);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator6", separator6,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (separator6);
-  gtk_container_add (GTK_CONTAINER (intf_popup), separator6);
-  gtk_widget_set_sensitive (separator6, FALSE);
-
-  popup_interface_toggle = gtk_menu_item_new_with_label ("");
-  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_interface_toggle)->child),
-                                   _("Toggle _Interface"));
-  gtk_widget_add_accelerator (popup_interface_toggle, "activate_item", intf_popup_accels,
-                              tmp_key, 0, 0);
-  gtk_widget_ref (popup_interface_toggle);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_interface_toggle", popup_interface_toggle,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (popup_interface_toggle);
-  gtk_container_add (GTK_CONTAINER (intf_popup), popup_interface_toggle);
-
-  popup_fullscreen = gtk_menu_item_new_with_label ("");
-  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_fullscreen)->child),
-                                   _("_Fullscreen"));
-  gtk_widget_add_accelerator (popup_fullscreen, "activate_item", intf_popup_accels,
-                              tmp_key, 0, 0);
-  gtk_widget_ref (popup_fullscreen);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_fullscreen", popup_fullscreen,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (popup_fullscreen);
-  gtk_container_add (GTK_CONTAINER (intf_popup), popup_fullscreen);
-
-  popup_video_device = gtk_menu_item_new_with_label (_("Screen"));
-  gtk_widget_ref (popup_video_device);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_video_device", popup_video_device,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (popup_video_device);
-  gtk_container_add (GTK_CONTAINER (intf_popup), popup_video_device);
-
-  popup_deinterlace = gtk_menu_item_new_with_label (_("Deinterlace"));
-  gtk_widget_ref (popup_deinterlace);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_deinterlace", popup_deinterlace,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (popup_deinterlace);
-  gtk_container_add (GTK_CONTAINER (intf_popup), popup_deinterlace);
-
-  separator5 = gtk_menu_item_new ();
-  gtk_widget_ref (separator5);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator5", separator5,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (separator5);
-  gtk_container_add (GTK_CONTAINER (intf_popup), separator5);
-  gtk_widget_set_sensitive (separator5, FALSE);
-
-  popup_volume_up = gtk_menu_item_new_with_label (_("Volume Up"));
-  gtk_widget_ref (popup_volume_up);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_volume_up", popup_volume_up,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (popup_volume_up);
-  gtk_container_add (GTK_CONTAINER (intf_popup), popup_volume_up);
-
-  popup_volume_down = gtk_menu_item_new_with_label (_("Volume Down"));
-  gtk_widget_ref (popup_volume_down);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_volume_down", popup_volume_down,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (popup_volume_down);
-  gtk_container_add (GTK_CONTAINER (intf_popup), popup_volume_down);
-
-  popup_volume_mute = gtk_menu_item_new_with_label (_("Mute"));
-  gtk_widget_ref (popup_volume_mute);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_volume_mute", popup_volume_mute,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (popup_volume_mute);
-  gtk_container_add (GTK_CONTAINER (intf_popup), popup_volume_mute);
-
-  popup_audio_channels = gtk_menu_item_new_with_label (_("Channels"));
-  gtk_widget_ref (popup_audio_channels);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_audio_channels", popup_audio_channels,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (popup_audio_channels);
-  gtk_container_add (GTK_CONTAINER (intf_popup), popup_audio_channels);
-
-  popup_audio_device = gtk_menu_item_new_with_label (_("Device"));
-  gtk_widget_ref (popup_audio_device);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_audio_device", popup_audio_device,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (popup_audio_device);
-  gtk_container_add (GTK_CONTAINER (intf_popup), popup_audio_device);
-
   separator16 = gtk_menu_item_new ();
   gtk_widget_ref (separator16);
   gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator16", separator16,
@@ -1288,6 +1229,14 @@ create_intf_popup (void)
   gtk_widget_show (popup_jump);
   gtk_container_add (GTK_CONTAINER (intf_popup), popup_jump);
 
+  separator27 = gtk_menu_item_new ();
+  gtk_widget_ref (separator27);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator27", separator27,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator27);
+  gtk_container_add (GTK_CONTAINER (intf_popup), separator27);
+  gtk_widget_set_sensitive (separator27, FALSE);
+
   popup_program = gtk_menu_item_new_with_label (_("Program"));
   gtk_widget_ref (popup_program);
   gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_program", popup_program,
@@ -1308,29 +1257,157 @@ create_intf_popup (void)
   gtk_container_add (GTK_CONTAINER (intf_popup), popup_navigation);
   gtk_widget_set_sensitive (popup_navigation, FALSE);
 
+  audio1 = gtk_menu_item_new_with_label (_("Audio"));
+  gtk_widget_ref (audio1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "audio1", audio1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (audio1);
+  gtk_container_add (GTK_CONTAINER (intf_popup), audio1);
+
+  audio1_menu = gtk_menu_new ();
+  gtk_widget_ref (audio1_menu);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "audio1_menu", audio1_menu,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (audio1), audio1_menu);
+  audio1_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (audio1_menu));
+
   popup_audio = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_audio)->child),
-                                   _("_Audio"));
-  gtk_widget_add_accelerator (popup_audio, "activate_item", intf_popup_accels,
+                                   _("_Language"));
+  gtk_widget_add_accelerator (popup_audio, "activate_item", audio1_menu_accels,
                               tmp_key, 0, 0);
   gtk_widget_ref (popup_audio);
   gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_audio", popup_audio,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (popup_audio);
-  gtk_container_add (GTK_CONTAINER (intf_popup), popup_audio);
+  gtk_container_add (GTK_CONTAINER (audio1_menu), popup_audio);
   gtk_widget_set_sensitive (popup_audio, FALSE);
+
+  separator19 = gtk_menu_item_new ();
+  gtk_widget_ref (separator19);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator19", separator19,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator19);
+  gtk_container_add (GTK_CONTAINER (audio1_menu), separator19);
+  gtk_widget_set_sensitive (separator19, FALSE);
+
+  popup_volume_up = gtk_menu_item_new_with_label (_("Volume Up"));
+  gtk_widget_ref (popup_volume_up);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_volume_up", popup_volume_up,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (popup_volume_up);
+  gtk_container_add (GTK_CONTAINER (audio1_menu), popup_volume_up);
+
+  popup_volume_down = gtk_menu_item_new_with_label (_("Volume Down"));
+  gtk_widget_ref (popup_volume_down);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_volume_down", popup_volume_down,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (popup_volume_down);
+  gtk_container_add (GTK_CONTAINER (audio1_menu), popup_volume_down);
+
+  popup_volume_mute = gtk_menu_item_new_with_label (_("Mute"));
+  gtk_widget_ref (popup_volume_mute);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_volume_mute", popup_volume_mute,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (popup_volume_mute);
+  gtk_container_add (GTK_CONTAINER (audio1_menu), popup_volume_mute);
+
+  separator20 = gtk_menu_item_new ();
+  gtk_widget_ref (separator20);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator20", separator20,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator20);
+  gtk_container_add (GTK_CONTAINER (audio1_menu), separator20);
+  gtk_widget_set_sensitive (separator20, FALSE);
+
+  popup_audio_channels = gtk_menu_item_new_with_label (_("Channels"));
+  gtk_widget_ref (popup_audio_channels);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_audio_channels", popup_audio_channels,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (popup_audio_channels);
+  gtk_container_add (GTK_CONTAINER (audio1_menu), popup_audio_channels);
+
+  popup_audio_device = gtk_menu_item_new_with_label (_("Device"));
+  gtk_widget_ref (popup_audio_device);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_audio_device", popup_audio_device,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (popup_audio_device);
+  gtk_container_add (GTK_CONTAINER (audio1_menu), popup_audio_device);
+
+  video1 = gtk_menu_item_new_with_label (_("Video"));
+  gtk_widget_ref (video1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "video1", video1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (video1);
+  gtk_container_add (GTK_CONTAINER (intf_popup), video1);
+
+  video1_menu = gtk_menu_new ();
+  gtk_widget_ref (video1_menu);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "video1_menu", video1_menu,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (video1), video1_menu);
+  video1_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (video1_menu));
 
   popup_subpictures = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_subpictures)->child),
                                    _("_Subtitles"));
-  gtk_widget_add_accelerator (popup_subpictures, "activate_item", intf_popup_accels,
+  gtk_widget_add_accelerator (popup_subpictures, "activate_item", video1_menu_accels,
                               tmp_key, 0, 0);
   gtk_widget_ref (popup_subpictures);
   gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_subpictures", popup_subpictures,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (popup_subpictures);
-  gtk_container_add (GTK_CONTAINER (intf_popup), popup_subpictures);
+  gtk_container_add (GTK_CONTAINER (video1_menu), popup_subpictures);
   gtk_widget_set_sensitive (popup_subpictures, FALSE);
+
+  separator21 = gtk_menu_item_new ();
+  gtk_widget_ref (separator21);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator21", separator21,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator21);
+  gtk_container_add (GTK_CONTAINER (video1_menu), separator21);
+  gtk_widget_set_sensitive (separator21, FALSE);
+
+  popup_fullscreen = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_fullscreen)->child),
+                                   _("_Fullscreen"));
+  gtk_widget_add_accelerator (popup_fullscreen, "activate_item", video1_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (popup_fullscreen);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_fullscreen", popup_fullscreen,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (popup_fullscreen);
+  gtk_container_add (GTK_CONTAINER (video1_menu), popup_fullscreen);
+
+  separator23 = gtk_menu_item_new ();
+  gtk_widget_ref (separator23);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator23", separator23,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator23);
+  gtk_container_add (GTK_CONTAINER (video1_menu), separator23);
+  gtk_widget_set_sensitive (separator23, FALSE);
+
+  popup_deinterlace = gtk_menu_item_new_with_label (_("Deinterlace"));
+  gtk_widget_ref (popup_deinterlace);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_deinterlace", popup_deinterlace,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (popup_deinterlace);
+  gtk_container_add (GTK_CONTAINER (video1_menu), popup_deinterlace);
+
+  popup_video_device = gtk_menu_item_new_with_label (_("Screen"));
+  gtk_widget_ref (popup_video_device);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_video_device", popup_video_device,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (popup_video_device);
+  gtk_container_add (GTK_CONTAINER (video1_menu), popup_video_device);
+
+  separator26 = gtk_menu_item_new ();
+  gtk_widget_ref (separator26);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator26", separator26,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator26);
+  gtk_container_add (GTK_CONTAINER (intf_popup), separator26);
+  gtk_widget_set_sensitive (separator26, FALSE);
 
   popup_open = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_open)->child),
@@ -1405,6 +1482,17 @@ create_intf_popup (void)
   gtk_widget_show (popup_about);
   gtk_container_add (GTK_CONTAINER (popup_open_menu), popup_about);
 
+  popup_interface_toggle = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_interface_toggle)->child),
+                                   _("Toggle _Interface"));
+  gtk_widget_add_accelerator (popup_interface_toggle, "activate_item", intf_popup_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (popup_interface_toggle);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_interface_toggle", popup_interface_toggle,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (popup_interface_toggle);
+  gtk_container_add (GTK_CONTAINER (intf_popup), popup_interface_toggle);
+
   popup_playlist = gtk_menu_item_new_with_label (_("Playlist..."));
   gtk_widget_ref (popup_playlist);
   gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_playlist", popup_playlist,
@@ -1460,11 +1548,14 @@ create_intf_popup (void)
   gtk_signal_connect (GTK_OBJECT (popup_fast), "activate",
                       GTK_SIGNAL_FUNC (GtkControlFast),
                       NULL);
-  gtk_signal_connect (GTK_OBJECT (popup_interface_toggle), "activate",
-                      GTK_SIGNAL_FUNC (GtkWindowToggle),
+  gtk_signal_connect (GTK_OBJECT (popup_next), "activate",
+                      GTK_SIGNAL_FUNC (GtkPlaylistNext),
                       NULL);
-  gtk_signal_connect (GTK_OBJECT (popup_fullscreen), "activate",
-                      GTK_SIGNAL_FUNC (GtkFullscreen),
+  gtk_signal_connect (GTK_OBJECT (popup_prev), "activate",
+                      GTK_SIGNAL_FUNC (GtkPlaylistPrev),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (popup_jump), "activate",
+                      GTK_SIGNAL_FUNC (GtkJumpShow),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (popup_volume_up), "activate",
                       GTK_SIGNAL_FUNC (GtkVolumeUp),
@@ -1475,14 +1566,8 @@ create_intf_popup (void)
   gtk_signal_connect (GTK_OBJECT (popup_volume_mute), "activate",
                       GTK_SIGNAL_FUNC (GtkVolumeMute),
                       NULL);
-  gtk_signal_connect (GTK_OBJECT (popup_next), "activate",
-                      GTK_SIGNAL_FUNC (GtkPlaylistNext),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (popup_prev), "activate",
-                      GTK_SIGNAL_FUNC (GtkPlaylistPrev),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (popup_jump), "activate",
-                      GTK_SIGNAL_FUNC (GtkJumpShow),
+  gtk_signal_connect (GTK_OBJECT (popup_fullscreen), "activate",
+                      GTK_SIGNAL_FUNC (GtkFullscreen),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (popup_file), "activate",
                       GTK_SIGNAL_FUNC (GtkFileOpenShow),
@@ -1495,6 +1580,9 @@ create_intf_popup (void)
                       NULL);
   gtk_signal_connect (GTK_OBJECT (popup_about), "activate",
                       GTK_SIGNAL_FUNC (GtkAboutShow),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (popup_interface_toggle), "activate",
+                      GTK_SIGNAL_FUNC (GtkWindowToggle),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (popup_playlist), "activate",
                       GTK_SIGNAL_FUNC (GtkPlaylistShow),
