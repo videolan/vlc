@@ -2,7 +2,7 @@
  * text.cpp: Text control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: text.cpp,v 1.4 2003/04/17 13:08:02 karibu Exp $
+ * $Id: text.cpp,v 1.5 2003/04/17 16:34:31 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -88,10 +88,8 @@
             if( !( (ControlText *)data )->IsScrolling() )
                 return false;
 
-            /* FIXME
             if( !( (ControlText *)data )->GetSelected() )
                ( (ControlText *)data )->DoScroll();
-            */
 
             return true;
         }
