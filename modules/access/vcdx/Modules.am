@@ -1,5 +1,7 @@
 SOURCES_vcdx = \
 	access.c \
+	intf.c \
+	intf.h \
 	vcd.c \
 	vcd.h \
 	vcdplayer.h \

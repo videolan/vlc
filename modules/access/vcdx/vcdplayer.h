@@ -19,7 +19,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/* VCD Player header. More or less media-player independent */
+/* VCD Player header. More or less media-player independent. Or at least
+   that is the goal. So we prefer bool to vlc_bool.
+ */
 
 #ifndef _VCDPLAYER_H_
 #define _VCDPLAYER_H_
@@ -83,7 +85,7 @@ typedef struct thread_vcd_data_s
   unsigned int i_blocks_per_read;       /* number of blocks per read */
 
   /* Current State: position */
-  vlc_bool_t   in_still;                /* true if in still */
+  bool         in_still;                /* true if in still */
   int          i_lid;                   /* LID that play item is in. Implies 
                                            PBC is on. VCDPLAYER_BAD_ENTRY if 
                                            not none or not in PBC */
@@ -102,7 +104,10 @@ typedef struct thread_vcd_data_s
   track_t      i_track;                 /* Current track number */
   lsn_t        i_lsn;                   /* Current logical sector number */
   lsn_t        end_lsn;                 /* LSN of end of current 
-                                           entry/segment/track. */
+                                           entry/segment/track. This block
+                                           can be read (and is not one after 
+                                           the "end").
+                                        */
   lsn_t        origin_lsn;              /* LSN of start of seek/slider */
   lsn_t        track_lsn;               /* LSN of start track origin of track 
                                            we are in. */
@@ -110,12 +115,12 @@ typedef struct thread_vcd_data_s
                                            entry). */
   lsn_t *      p_entries;               /* Entry points */
   lsn_t *      p_segments;              /* Segments */
-  vlc_bool_t   b_valid_ep;              /* Valid entry points flag */
-  vlc_bool_t   b_end_of_track;          /* If the end of track was reached */
+  bool         b_valid_ep;              /* Valid entry points flag */
+  bool         b_end_of_track;          /* If the end of track was reached */
 
   /* Information about (S)VCD */
   char *       psz_source;              /* (S)VCD drive or image filename */
-  vlc_bool_t   b_svd;                   /* true if we have SVD info */
+  bool         b_svd;                   /* true if we have SVD info */
   vlc_meta_t  *p_meta;
   track_t      i_tracks;                /* # of playable MPEG tracks. This is 
                                            generally one less than the number
@@ -144,8 +149,10 @@ typedef struct thread_vcd_data_s
   intf_thread_t *p_intf;
   int            i_audio_nb;
   int            i_still_time;
-  vlc_bool_t     b_end_of_cell;
+  bool           b_end_of_cell;
   input_thread_t *p_input;
+  demux_t        *p_demux;
+  access_t       *p_access;
   
 } vcdplayer_t;
 
@@ -155,41 +162,40 @@ typedef struct thread_vcd_data_s
   confused with a user's list of favorite things to play or the 
   "next" field of a LID which moves us to a different LID.
  */
-vlc_bool_t vcdplayer_inc_play_item( access_t *p_access );
+bool vcdplayer_inc_play_item( access_t *p_access );
 
 /*!
   Return true if playback control (PBC) is on
 */
-vlc_bool_t vcdplayer_pbc_is_on(const vcdplayer_t *p_this);
+bool vcdplayer_pbc_is_on(const vcdplayer_t *p_this);
 
 /*!
   Play item assocated with the "default" selection.
 
   Return false if there was some problem.
 */
-vlc_bool_t vcdplayer_play_default( access_t * p_access );
+bool vcdplayer_play_default( access_t * p_access );
 
 /*!
   Play item assocated with the "next" selection.
 
   Return false if there was some problem.
 */
-vlc_bool_t vcdplayer_play_next( access_t * p_access );
+bool vcdplayer_play_next( access_t * p_access );
 
 /*!
   Play item assocated with the "prev" selection.
 
   Return false if there was some problem.
 */
-vlc_bool_t vcdplayer_play_prev( access_t * p_access );
+bool vcdplayer_play_prev( access_t * p_access );
 
 /*!
   Play item assocated with the "return" selection.
 
   Return false if there was some problem.
 */
-vlc_bool_t
-vcdplayer_play_return( access_t * p_access );
+bool vcdplayer_play_return( access_t * p_access );
 
 /* 
    Set's start origin and size for subsequent seeks.  
@@ -201,11 +207,12 @@ void vcdplayer_set_origin(access_t *p_access, lsn_t i_lsn, track_t i_track,
 
 void vcdplayer_play(access_t *p_access, vcdinfo_itemid_t itemid);
 
-vcdplayer_read_status_t vcdplayer_pbc_nav     ( access_t * p_access );
-vcdplayer_read_status_t vcdplayer_non_pbc_nav ( access_t * p_access );
+vcdplayer_read_status_t vcdplayer_pbc_nav     ( access_t * p_access,
+                                                uint8_t  *wait_time );
+vcdplayer_read_status_t vcdplayer_non_pbc_nav ( access_t * p_access,
+                                                uint8_t  *wait_time );
 
-vcdplayer_read_status_t vcdplayer_read (access_t * p_access_t, 
-                                        uint8_t *p_buf);
+vcdplayer_read_status_t vcdplayer_read (access_t * p_access_t, uint8_t *p_buf);
 
 #endif /* _VCDPLAYER_H_ */
 /* 

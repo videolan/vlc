@@ -37,13 +37,13 @@
 #include <libvcd/logging.h>
 
 static inline void
-MetaInfoAddStr(access_t *p_access, char *p_cat,
-               char *title, const char *str)
+MetaInfoAddStr(access_t *p_access, char *psz_cat,
+               char *title, const char *psz)
 {
   vcdplayer_t *p_vcd = (vcdplayer_t *) p_access->p_sys;
-  if ( str ) {
-    dbg_print( INPUT_DBG_META, "field: %s: %s", title, str);
-    input_Control( p_vcd->p_input, INPUT_ADD_INFO, p_cat, title, "%s", str);
+  if ( psz ) {
+    dbg_print( INPUT_DBG_META, "cat %s, field: %s: %s", psz_cat, title, psz);
+    input_Control( p_vcd->p_input, INPUT_ADD_INFO, psz_cat, title, "%s", psz);
   }
 }
 
@@ -52,8 +52,16 @@ static inline void
 MetaInfoAddNum(access_t *p_access, char *psz_cat, char *title, int num)
 {
   vcdplayer_t *p_vcd = (vcdplayer_t *) p_access->p_sys;
-  dbg_print( INPUT_DBG_META, "field %s: %d", title, num);
+  dbg_print( INPUT_DBG_META, "cat %s, field %s: %d", psz_cat,  title, num);
   input_Control( p_vcd->p_input, INPUT_ADD_INFO, psz_cat, title, "%d", num );
+}
+
+static inline void
+MetaInfoAddHex(access_t *p_access, char *psz_cat, char *title, int hex)
+{
+  vcdplayer_t *p_vcd = (vcdplayer_t *) p_access->p_sys;
+  dbg_print( INPUT_DBG_META, "cat %s, field %s: %d", psz_cat, title, hex);
+  input_Control( p_vcd->p_input, INPUT_ADD_INFO, psz_cat, title, "%x", hex );
 }
 
 #define addstr(title, str) \
@@ -61,6 +69,9 @@ MetaInfoAddNum(access_t *p_access, char *psz_cat, char *title, int num)
 
 #define addnum(title, num) \
   MetaInfoAddNum( p_access, psz_cat, title, num );
+
+#define addhex(title, hex) \
+  MetaInfoAddHex( p_access, psz_cat, title, hex );
 
 void 
 VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl )
@@ -109,6 +120,49 @@ VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl )
 	  last_entry++ ) ;
     addnum(_("Last Entry Point"), last_entry-1 );
     addnum(_("Track size (in sectors)"), i_secsize );
+  }
+  
+  {
+    lid_t i_lid;
+    for( i_lid = 1 ; i_lid <= p_vcd->i_lids ; i_lid++ ) {
+      PsdListDescriptor_t pxd;
+      char psz_cat[20];
+      snprintf(psz_cat, sizeof(psz_cat), "LID %d", i_lid);
+      if (vcdinfo_lid_get_pxd(p_vcd->vcd, &pxd, i_lid)) {
+	switch (pxd.descriptor_type) {
+	case PSD_TYPE_END_LIST:
+	  addstr(_("type"), _("end"));
+	  break;
+	case PSD_TYPE_PLAY_LIST:
+	  addstr(_("type"), _("play list"));
+	  addnum("items",     vcdinf_pld_get_noi(pxd.pld));
+	  addhex("next",      vcdinf_pld_get_next_offset(pxd.pld));
+	  addhex("previous",  vcdinf_pld_get_prev_offset(pxd.pld));
+	  addhex("return",    vcdinf_pld_get_return_offset(pxd.pld));
+	  addnum("wait time", vcdinf_get_wait_time(pxd.pld));
+	  break;
+	case PSD_TYPE_SELECTION_LIST:
+	case PSD_TYPE_EXT_SELECTION_LIST:
+	  addstr(_("type"), 
+		 PSD_TYPE_SELECTION_LIST == pxd.descriptor_type 
+		 ? _("extended selection list")
+		 : _("selection list")
+		 );
+	  addhex("default",          vcdinf_psd_get_default_offset(pxd.psd));
+	  addhex("loop count",       vcdinf_get_loop_count(pxd.psd));
+	  addhex("next",             vcdinf_psd_get_next_offset(pxd.psd));
+	  addhex("previous",         vcdinf_psd_get_prev_offset(pxd.psd));
+	  addhex("return",           vcdinf_psd_get_return_offset(pxd.psd));
+	  addhex("rejected",         vcdinf_psd_get_lid_rejected(pxd.psd));
+	  addhex("time-out offset",  vcdinf_get_timeout_offset(pxd.psd));
+	  addnum("time-out time",    vcdinf_get_timeout_time(pxd.psd));
+	  break;
+	default: 
+	  addstr(_("type"), _("unknown type"));
+	  break;
+	}
+      }
+    }
   }
 
   if ( CDIO_INVALID_TRACK != i_track )
@@ -308,110 +362,6 @@ VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcd,
     }
   }
   return strdup(temp_str);
-}
-
-static void
-VCDCreatePlayListItem(const access_t *p_access,
-                      vcdplayer_t *p_vcd,
-                      playlist_t *p_playlist,
-                      const vcdinfo_itemid_t *itemid,
-                      char *psz_mrl, int psz_mrl_max,
-                      const char *psz_source, int playlist_operation,
-                      int i_pos)
-{
-  char *p_author;
-  char *p_title;
-  char c_type;
-
-  switch(itemid->type) {
-  case VCDINFO_ITEM_TYPE_TRACK:
-    c_type='T';
-    break;
-  case VCDINFO_ITEM_TYPE_SEGMENT:
-    c_type='S';
-    break;
-  case VCDINFO_ITEM_TYPE_LID:
-    c_type='P';
-    break;
-  case VCDINFO_ITEM_TYPE_ENTRY:
-    c_type='E';
-    break;
-  default:
-    c_type='?';
-    break;
-  }
-
-  snprintf(psz_mrl, psz_mrl_max, "%s%s@%c%3u", VCD_MRL_PREFIX, psz_source,
-           c_type, itemid->num);
-
-  p_title =
-    VCDFormatStr( p_access, p_vcd,
-		  config_GetPsz( p_access, MODULE_STRING "-title-format" ),
-		  psz_mrl, itemid );
-  
-  playlist_Add( p_playlist, psz_mrl, p_title, playlist_operation, i_pos );
-
-  p_author =
-    VCDFormatStr( p_access, p_vcd,
-		  config_GetPsz( p_access, MODULE_STRING "-author-format" ),
-		  psz_mrl, itemid );
-
-  if( i_pos == PLAYLIST_END ) i_pos = p_playlist->i_size - 1;
-  playlist_AddInfo(p_playlist, i_pos, _("General"), _("Author"), "%s",
-		   p_author);
-}
-
-int
-VCDFixupPlayList( access_t *p_access, vcdplayer_t *p_vcd,
-                  const char *psz_source, vcdinfo_itemid_t *itemid,
-                  vlc_bool_t b_single_item )
-{
-  unsigned int i;
-  playlist_t * p_playlist;
-  char       * psz_mrl;
-  unsigned int psz_mrl_max = strlen(VCD_MRL_PREFIX) + strlen(psz_source) +
-    strlen("@T") + strlen("100") + 1;
-
-  psz_mrl = malloc( psz_mrl_max );
-
-  if( psz_mrl == NULL )
-    {
-      msg_Warn( p_access, "out of memory" );
-      return -1;
-    }
-
-  p_playlist = (playlist_t *) vlc_object_find( p_access, VLC_OBJECT_PLAYLIST,
-                                               FIND_ANYWHERE );
-  if( !p_playlist )
-    {
-      msg_Warn( p_access, "can't find playlist" );
-      free(psz_mrl);
-      return -1;
-    }
-
-  {
-    vcdinfo_itemid_t list_itemid;
-    list_itemid.type=VCDINFO_ITEM_TYPE_ENTRY;
-
-    playlist_LockDelete( p_playlist, p_playlist->i_index);
-
-    for( i = 0 ; i < p_vcd->i_entries ; i++ )
-      {
-        list_itemid.num=i;
-        VCDCreatePlayListItem(p_access, p_vcd, p_playlist, &list_itemid,
-                              psz_mrl, psz_mrl_max, psz_source,
-                              PLAYLIST_APPEND, PLAYLIST_END);
-      }
-
-#if LOOKED_OVER
-    playlist_Command( p_playlist, PLAYLIST_GOTO, 0 );
-#endif
-
-  }
-
-  vlc_object_release( p_playlist );
-  free(psz_mrl);
-  return 0;
 }
 
 void

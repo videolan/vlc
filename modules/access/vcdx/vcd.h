@@ -54,4 +54,3 @@ typedef struct
 
 int  VCDSetArea      ( access_t * );
 int  VCDSeek         ( access_t *, off_t );
-int  VCDPlay         ( access_t *, vcdinfo_itemid_t );

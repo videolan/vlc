@@ -34,12 +34,12 @@
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-int  E_(VCDOpen)      ( vlc_object_t * );
-void E_(VCDClose)     ( vlc_object_t * );
-int  E_(OpenIntf)     ( vlc_object_t * );
-void E_(CloseIntf)    ( vlc_object_t * );
-int  E_(VCDInit)      ( vlc_object_t * );
-void E_(VCDEnd)       ( vlc_object_t * );
+int  VCDOpen       ( vlc_object_t * );
+void VCDClose      ( vlc_object_t * );
+int  VCDOpenIntf   ( vlc_object_t * );
+void VCDCloseIntf  ( vlc_object_t * );
+int  E_(VCDInit)   ( vlc_object_t * );
+void E_(VCDEnd)    ( vlc_object_t * );
 
 int  E_(DebugCallback) ( vlc_object_t *p_this, const char *psz_name,
                          vlc_value_t oldval, vlc_value_t val,
@@ -96,7 +96,7 @@ vlc_module_begin();
     set_description( _("Video CD (VCD 1.0, 1.1, 2.0, SVCD, HQVCD) input") );
     set_capability( "access2", 55 /* slightly lower than vcd */ );
     set_shortname( N_("(Super) Video CD"));
-    set_callbacks( E_(VCDOpen), E_(VCDClose) );
+    set_callbacks( VCDOpen, VCDClose );
     add_shortcut( "vcdx" );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
@@ -118,6 +118,12 @@ vlc_module_begin();
                  "Otherwise we play by tracks."),
               VLC_FALSE );
 
+    add_bool( MODULE_STRING "-extended-info", 0, NULL,
+              N_("Show extended VCD info?"),
+              N_("Show the maximum about of information under Stream and "
+                 "Media Info. Shows for example playback control navigation."),
+              VLC_FALSE );
+
     add_string( MODULE_STRING "-author-format",
                 "%v - %F disc %c of %C",
                 NULL,
@@ -132,11 +138,8 @@ vlc_module_begin();
 
 #ifdef FIXED
     add_submodule();
-        set_capability( "demux", 0 );
-        set_callbacks( E_(VCDInit), E_(VCDEnd) );
-    add_submodule();
         set_capability( "interface", 0 );
-        set_callbacks( E_(OpenIntf), E_(CloseIntf) );
+        set_callbacks( VCDOpenIntf, VCDCloseIntf );
 #endif
 
 vlc_module_end();

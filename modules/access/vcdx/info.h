@@ -27,13 +27,6 @@
 #include "vcdplayer.h"
 
 /*
- Fills out playlist information.
- */
-int VCDFixupPlayList( access_t *p_access, vcdplayer_t *p_vcd,
-		      const char *psz_source, vcdinfo_itemid_t *itemid,
-		      vlc_bool_t b_single_track );
-
-/*
  Sets VCD meta information and navigation/playlist entries. 
  */
 void VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl );

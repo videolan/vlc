@@ -32,10 +32,6 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/input.h>
-
-#include "vcd.h"
-#include "info.h"
-#include "intf.h"
 #include "vlc_keys.h"
 
 #include <cdio/cdio.h>
@@ -44,6 +40,9 @@
 #include <cdio/util.h>
 #include <libvcd/info.h>
 #include <libvcd/logging.h>
+#include "vcd.h"
+#include "info.h"
+#include "intf.h"
 
 #define FREE_AND_NULL(ptr) if (NULL != ptr) free(ptr); ptr = NULL;
 
@@ -147,6 +146,7 @@ VCDReadBlock( access_t * p_access )
     block_t     *p_block;
     const int   i_blocks = p_vcd->i_blocks_per_read;
     int         i_read;
+    uint8_t *   p_buf;
 
     i_read = 0;
 
@@ -162,16 +162,42 @@ VCDReadBlock( access_t * p_access )
         return NULL;
     }
 
+    p_buf = (uint8_t *) p_block->p_buffer;
     for ( i_read = 0 ; i_read < i_blocks ; i_read++ )
     {
-      const lsn_t old_lsn = p_vcd->i_lsn;
+      vcdplayer_read_status_t read_status = vcdplayer_read(p_access, p_buf);
 
-      switch ( vcdplayer_read(p_access, (byte_t *) p_block->p_buffer 
-			      + (i_read*M2F2_SECTOR_SIZE)) ) {
+      p_access->info.i_pos += M2F2_SECTOR_SIZE;
+
+      switch ( read_status ) {
       case READ_END:
 	/* End reached. Return NULL to indicated this. */
+	/* We also set the postion to the end so the higher level
+           (demux?) doesn't try to keep reading. If everything works out
+	   right this shouldn't have to happen.
+	 */
+#if 0
+	if ( p_access->info.i_pos != p_access->info.i_size ) {
+	  msg_Warn( p_access, 
+		    "At end but pos (%llu) is not size (%llu). Adjusting.",
+		    p_access->info.i_pos, p_access->info.i_size );
+	  p_access->info.i_pos = p_access->info.i_size;
+	}
+#endif
+
+#if 1
 	block_Release( p_block );
 	return NULL;
+#else
+	{
+	  memset(p_buf, 0, M2F2_SECTOR_SIZE);
+	  p_buf += 2;
+	  *p_buf = 0x01;
+	  printf("++++hacked\n");
+	  return p_block;
+	}
+#endif
+
       case READ_ERROR:
 	/* Some sort of error. Should we increment lsn? to skip block?
 	 */
@@ -179,20 +205,26 @@ VCDReadBlock( access_t * p_access )
 	return NULL;
       case READ_STILL_FRAME: 
 	{
-	  dbg_print(INPUT_DBG_STILL, "Handled still event\n");
-	  /* Reached the end of a still frame. */
-	  byte_t * p_buf = (byte_t *) p_block->p_buffer;
-	  
-	  p_buf += (i_read*M2F2_SECTOR_SIZE);
+	  /* FIXME The below should be done in an event thread.
+	     Until then...
+	   */
+#if 0
+	  msleep( MILLISECONDS_PER_SEC * *p_buf );
+	  p_vcd->in_still = VLC_FALSE;
+	  dbg_print(INPUT_DBG_STILL, "still wait time done");
+#else 
+	  vcdIntfStillTime(p_vcd->p_intf, *p_buf);
+#endif
+
+#if 1
+	  block_Release( p_block );
+	  return NULL;
+#else
 	  memset(p_buf, 0, M2F2_SECTOR_SIZE);
 	  p_buf += 2;
 	  *p_buf = 0x01;
-	  dbg_print(INPUT_DBG_STILL, "Handled still event");
-	  
-	  p_vcd->in_still = VLC_TRUE;
-	  var_SetInteger( p_access, "state", PAUSE_S );
-	  
 	  return p_block;
+#endif
 	}
 	
       default:
@@ -201,14 +233,13 @@ VCDReadBlock( access_t * p_access )
 	;
       }
 
-      p_access->info.i_pos += (p_vcd->i_lsn - old_lsn) *  M2F2_SECTOR_SIZE;
-
+      p_buf += M2F2_SECTOR_SIZE;
       /* Update seekpoint */
       if ( VCDINFO_ITEM_TYPE_ENTRY == p_vcd->play_item.type )
       {
 	unsigned int i_entry = p_vcd->play_item.num+1;
 	lsn_t        i_lsn   = vcdinfo_get_entry_lba(p_vcd->vcd, i_entry);
-	if (p_vcd->i_lsn >= i_lsn )
+	if ( p_vcd->i_lsn >= i_lsn && i_lsn != VCDINFO_NULL_LBA )
         {
 	    const track_t i_track = p_vcd->i_track;
 	    p_vcd->play_item.num = i_entry;
@@ -742,7 +773,7 @@ vcd_Open( vlc_object_t *p_this, const char *psz_dev )
 	p_vcd->track[i].size  = 
 	  vcdinfo_get_track_sect_count(p_vcdobj, track_num);
 	p_vcd->track[i].start_LSN = 
-	  vcdinfo_get_track_lsn(p_vcdobj, track_num);
+	  vcdinfo_get_track_lba(p_vcdobj, track_num);
       }
     } else 
       p_vcd->track = NULL;
@@ -810,7 +841,7 @@ VCDUpdateVar( access_t *p_access, int i_num, int i_action,
   and VLC_EGENERIC for some other error.
  *****************************************************************************/
 int
-E_(VCDOpen) ( vlc_object_t *p_this )
+VCDOpen ( vlc_object_t *p_this )
 {
     access_t         *p_access = (access_t *)p_this;
     vcdplayer_t      *p_vcd;
@@ -865,6 +896,8 @@ E_(VCDOpen) ( vlc_object_t *p_this )
     p_vcd->play_item.type    = VCDINFO_ITEM_TYPE_NOTFOUND;
     p_vcd->p_input           = vlc_object_find( p_access, VLC_OBJECT_INPUT, 
 					      FIND_PARENT );
+    p_vcd->p_demux           = vlc_object_find( p_access, VLC_OBJECT_DEMUX, 
+						FIND_PARENT );
     p_vcd->p_meta            = vlc_meta_New();
     p_vcd->p_segments        = NULL;
     p_vcd->p_entries         = NULL;
@@ -918,17 +951,18 @@ E_(VCDOpen) ( vlc_object_t *p_this )
     p_access->psz_demux = strdup( "ps" );
 
 #if FIXED
-    p_vcd->p_intf = intf_Create( p_access, "vcdx" );
-    p_vcd->p_intf->b_block = VLC_FALSE;
-    intf_RunThread( p_vcd->p_intf );
-#endif
-
-#if FIXED
     if (play_single_item)
       VCDFixupPlayList( p_access, p_vcd, psz_source, &itemid, 
 			play_single_item );
 #endif
     
+    p_vcd->p_intf = intf_Create( p_access, "vcdx" );
+    p_vcd->p_intf->b_block = VLC_FALSE;
+    p_vcd->p_access = p_access;
+
+#ifdef FIXED
+    intf_RunThread( p_vcd->p_intf );
+#endif
 
     free( psz_source );
 
@@ -943,7 +977,7 @@ E_(VCDOpen) ( vlc_object_t *p_this )
  * VCDClose: closes VCD releasing allocated memory.
  *****************************************************************************/
 void
-E_(VCDClose) ( vlc_object_t *p_this )
+VCDClose ( vlc_object_t *p_this )
 {
     access_t    *p_access = (access_t *)p_this;
     vcdplayer_t *p_vcd = (vcdplayer_t *)p_access->p_sys;
