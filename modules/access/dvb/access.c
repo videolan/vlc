@@ -486,7 +486,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
     unsigned int u_video_type = 1; /* default video type */
     unsigned int u_audio_type = 2; /* default audio type */
 
-    // Get adapter and device number to use for this dvb card
+    /* Get adapter and device number to use for this dvb card */
     u_adapter = config_GetInt( p_input, "adapter" );
     u_device  = config_GetInt( p_input, "device" );
 
@@ -501,7 +501,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
             {
                 input_UnselectES( p_input , p_es );
             }
-            if ( p_es->i_demux_fd )
+            if ( p_es->i_demux_fd > 0)
             {
                 ioctl_UnsetDMXFilter(p_input, p_es->i_demux_fd );
                 p_es->i_demux_fd = 0;
