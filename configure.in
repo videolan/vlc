@@ -338,11 +338,11 @@ fi
 
 AC_CACHE_CHECK([if \$CC groks Altivec inline assembly],
     [ac_cv_altivec_inline],
-    [AC_TRY_COMPILE(,[void quux(){asm("mtspr 256,%0"::"r"(-1));}],
+    [AC_TRY_COMPILE(,[void quux(){asm("vperm 0,1,2,3");}],
          ac_cv_altivec_inline=yes,
          [save_CFLAGS=$CFLAGS
           CFLAGS="$CFLAGS -Wa,-m7400"
-          AC_TRY_COMPILE(,[void quux(){asm("mtspr 256,%0"::"r"(-1));}],
+          AC_TRY_COMPILE(,[void quux(){asm("vperm 0,1,2,3");}],
             [ac_cv_altivec_inline=yes; CFLAGS_ALTIVEC="-Wa,-m7400"],
             ac_cv_altivec_inline=no)
           CFLAGS=$save_CFLAGS
