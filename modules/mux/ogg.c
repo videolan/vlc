@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.17 2003/10/09 19:31:38 gbazin Exp $
+ * $Id: ogg.c,v 1.18 2003/10/10 17:09:42 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -27,7 +27,10 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
+
+#ifdef HAVE_TIME_H
+#   include <time.h>
+#endif
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
@@ -226,6 +229,7 @@ struct sout_mux_sys_t
     int     i_streams;
 
     mtime_t i_start_dts;
+    int     i_next_serial_no;
 
     /* number of logical streams pending to be added */
     int i_add_streams;
@@ -261,6 +265,12 @@ static int Open( vlc_object_t *p_this )
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
     p_mux->i_preheader  = 1;
+
+    /* First serial number is random.
+     * (Done like this because on win32 you need to seed the random number
+     *  generator once per thread). */
+    srand( (unsigned int)time( NULL ) );
+    p_sys->i_next_serial_no = rand();
 
     return VLC_SUCCESS;
 }
@@ -330,7 +340,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     p_stream->i_cat       = p_input->p_fmt->i_cat;
     p_stream->i_fourcc    = p_input->p_fmt->i_fourcc;
-    p_stream->i_serial_no = rand();
+    p_stream->i_serial_no = p_sys->i_next_serial_no++;
     p_stream->i_packet_no = 0;
 
     p_stream->i_sout_headers = 0;
@@ -883,7 +893,7 @@ static int Mux( sout_mux_t *p_mux )
             if( p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
             {
                 /* FIXME, we assume only keyframes and 25fps */
-  	        op.granulepos = ( ( i_dts - p_sys->i_start_dts ) * I64C(25)
+                op.granulepos = ( ( i_dts - p_sys->i_start_dts ) * I64C(25)
                     / I64C(1000000) ) << p_stream->i_keyframe_granule_shift;
             }
             else

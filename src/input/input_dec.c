@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.64 2003/10/08 21:01:07 gbazin Exp $
+ * $Id: input_dec.c,v 1.65 2003/10/10 17:09:42 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -33,7 +33,7 @@
 #include "input_ext-intf.h"
 #include "input_ext-plugins.h"
 
-static decoder_t * CreateDecoder( input_thread_t *, es_descriptor_t * );
+static decoder_t * CreateDecoder( input_thread_t *, es_descriptor_t *, int );
 static int         DecoderThread( decoder_t * );
 static void        DeleteDecoder( decoder_t * );
 
@@ -44,18 +44,8 @@ decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
                                    es_descriptor_t * p_es )
 {
     vlc_value_t    val;
-    decoder_t      *p_dec;
+    decoder_t      *p_dec = NULL;
     int            i_priority;
-
-    /* Create the decoder configuration structure */
-    p_dec = CreateDecoder( p_input, p_es );
-    if( p_dec == NULL )
-    {
-        msg_Err( p_input, "could not create decoder" );
-        return NULL;
-    }
-
-    p_dec->p_module = NULL;
 
     /* If we are in sout mode, search for packetizer module */
     var_Get( p_input, "sout", &val );
@@ -75,19 +65,35 @@ decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
 
         if( val.b_bool )
         {
+            /* Create the decoder configuration structure */
+            p_dec = CreateDecoder( p_input, p_es, VLC_OBJECT_PACKETIZER );
+            if( p_dec == NULL )
+            {
+                msg_Err( p_input, "could not create packetizer" );
+                return NULL;
+            }
+
             p_dec->p_module =
                 module_Need( p_dec, "packetizer", "$packetizer" );
         }
     }
     else
     {
+        /* Create the decoder configuration structure */
+        p_dec = CreateDecoder( p_input, p_es, VLC_OBJECT_DECODER );
+        if( p_dec == NULL )
+        {
+            msg_Err( p_input, "could not create decoder" );
+            return NULL;
+        }
+
         /* default Get a suitable decoder module */
         p_dec->p_module = module_Need( p_dec, "decoder", "$codec" );
 
         if( val.psz_string ) free( val.psz_string );
     }
 
-    if( p_dec->p_module == NULL )
+    if( !p_dec || !p_dec->p_module )
     {
         msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'.\n"
                  "VLC probably does not support this sound or video format.",
@@ -278,11 +284,11 @@ void input_EscapeAudioDiscontinuity( input_thread_t * p_input )
  * CreateDecoderFifo: create a decoder_fifo_t
  *****************************************************************************/
 static decoder_t * CreateDecoder( input_thread_t * p_input,
-                                  es_descriptor_t * p_es )
+                                  es_descriptor_t * p_es, int i_object_type )
 {
     decoder_t * p_dec;
 
-    p_dec = vlc_object_create( p_input, VLC_OBJECT_DECODER );
+    p_dec = vlc_object_create( p_input, i_object_type );
     if( p_dec == NULL )
     {
         msg_Err( p_input, "out of memory" );
@@ -372,21 +378,21 @@ static int DecoderThread( decoder_t * p_dec )
             break;
         }
 
-	for( i_size = 0, p_data = p_pes->p_first;
-	     p_data != NULL; p_data = p_data->p_next )
-	{
- 	    i_size += p_data->p_payload_end - p_data->p_payload_start;
-	}
-	p_block = block_New( p_dec, i_size );
-	for( i_size = 0, p_data = p_pes->p_first;
-	     p_data != NULL; p_data = p_data->p_next )
-	{
+        for( i_size = 0, p_data = p_pes->p_first;
+             p_data != NULL; p_data = p_data->p_next )
+        {
+            i_size += p_data->p_payload_end - p_data->p_payload_start;
+        }
+        p_block = block_New( p_dec, i_size );
+        for( i_size = 0, p_data = p_pes->p_first;
+             p_data != NULL; p_data = p_data->p_next )
+        {
             if( p_data->p_payload_end == p_data->p_payload_start )
                 continue;
             memcpy( p_block->p_buffer + i_size, p_data->p_payload_start,
-		    p_data->p_payload_end - p_data->p_payload_start );
+                    p_data->p_payload_end - p_data->p_payload_start );
             i_size += p_data->p_payload_end - p_data->p_payload_start;
-	}
+        }
 
         p_block->i_pts = p_pes->i_pts;
         p_block->i_dts = p_pes->i_dts;
