@@ -600,7 +600,8 @@ static void decode_page_composition( decoder_t *p_dec, bs_t *s )
 #endif
         free_all( p_dec );
     }
-    else if( !p_sys->p_page && i_state != DVBSUB_PCS_STATE_ACQUISITION )
+    else if( !p_sys->p_page && i_state != DVBSUB_PCS_STATE_ACQUISITION &&
+             i_state != DVBSUB_PCS_STATE_CHANGE )
     {
         /* Not a full PCS, we need to wait for one */
         msg_Dbg( p_dec, "didn't receive an acquisition page yet" );
@@ -1003,7 +1004,7 @@ static void dvbsub_pdata2bpp( bs_t *s, uint8_t *p, int i_width, int *pi_off )
                 else
                 {
                     /* 1 pixel color 0 */
-                    i_count = 0;
+                    i_count = 1;
                 }
             }
         }
@@ -1290,18 +1291,22 @@ static subpicture_t *render( decoder_t *p_dec )
 /*****************************************************************************
  * encoder_sys_t : encoder descriptor
  *****************************************************************************/
+typedef struct encoder_region_t
+{
+    int i_width;
+    int i_height;
+
+} encoder_region_t;
+
 struct encoder_sys_t
 {
     unsigned int i_page_ver;
     unsigned int i_region_ver;
     unsigned int i_clut_ver;
 
-    /*
-     * Input properties
-     */
-    /*
-     * Common properties
-     */
+    int i_regions;
+    encoder_region_t *p_regions;
+
     mtime_t i_pts;
 };
 
@@ -1341,6 +1346,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_page_ver = 0;
     p_sys->i_region_ver = 0;
     p_sys->i_clut_ver = 0;
+    p_sys->i_regions = 0;
+    p_sys->p_regions = 0;
 
     return VLC_SUCCESS;
 }
@@ -1377,8 +1384,28 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     bs_write( s, 8, 0xff ); /* End marker */
     p_block->i_buffer = bs_pos( s ) / 8;
     p_block->i_pts = p_block->i_dts = p_subpic->i_start;
-    if( !p_subpic->b_ephemer && p_subpic->i_stop )
+    if( !p_subpic->b_ephemer && p_subpic->i_stop > p_subpic->i_start )
+    {
+        block_t *p_block_stop;
+
         p_block->i_length = p_subpic->i_stop - p_subpic->i_start;
+
+        /* Send another (empty) subtitle to signal the end of display */
+        p_block_stop = block_New( p_enc, 64000 );
+        bs_init( s, p_block_stop->p_buffer, p_block_stop->i_buffer );
+        bs_write( s, 8, 0x20 ); /* Data identifier */
+        bs_write( s, 8, 0x0 ); /* Subtitle stream id */
+        encode_page_composition( p_enc, s, 0 );
+        bs_write( s, 8, 0x0f ); /* Sync byte */
+        bs_write( s, 8, DVBSUB_ST_ENDOFDISPLAY ); /* Segment type */
+        bs_write( s, 16, 1 ); /* Page id */
+        bs_write( s, 16, 0 ); /* Segment length */
+        bs_write( s, 8, 0xff ); /* End marker */
+        p_block_stop->i_buffer = bs_pos( s ) / 8;
+        p_block_stop->i_pts = p_block_stop->i_dts = p_subpic->i_stop;
+        block_ChainAppend( &p_block, p_block_stop );
+        p_block_stop->i_length = 100000;//p_subpic->i_stop - p_subpic->i_start;
+    }
 
     msg_Dbg( p_enc, "subpicture encoded properly" );
 
@@ -1393,6 +1420,7 @@ static void CloseEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
+    if( p_sys->i_regions ) free( p_sys->p_regions );
     free( p_sys );
 }
 
@@ -1401,24 +1429,65 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     subpicture_region_t *p_region;
-    int i_regions;
+    vlc_bool_t b_mode_change = VLC_FALSE;
+    int i_regions, i_timeout;
 
     bs_write( s, 8, 0x0f ); /* Sync byte */
     bs_write( s, 8, DVBSUB_ST_PAGE_COMPOSITION ); /* Segment type */
     bs_write( s, 16, 1 ); /* Page id */
 
-    for( i_regions = 0, p_region = p_subpic->p_region; p_region;
-         p_region = p_region->p_next, i_regions++ );
+    for( i_regions = 0, p_region = p_subpic ? p_subpic->p_region : 0;
+         p_region; p_region = p_region->p_next, i_regions++ )
+    {
+        if( i_regions >= p_sys->i_regions )
+        {
+            encoder_region_t region;
+            region.i_width = region.i_height = 0;
+            p_sys->p_regions =
+                realloc( p_sys->p_regions, sizeof(encoder_region_t) *
+                         (p_sys->i_regions + 1) );
+            p_sys->p_regions[p_sys->i_regions++] = region;
+        }
+
+        if( p_sys->p_regions[i_regions].i_width <
+            (int)p_region->fmt.i_visible_width )
+        {
+            b_mode_change = VLC_TRUE;
+            msg_Dbg( p_enc, "region %i width change: %i -> %i",
+                     i_regions, p_sys->p_regions[i_regions].i_width,
+                     p_region->fmt.i_visible_width );
+            p_sys->p_regions[i_regions].i_width =
+                p_region->fmt.i_visible_width;
+        }
+        if( p_sys->p_regions[i_regions].i_height <
+            (int)p_region->fmt.i_visible_height )
+        {
+            b_mode_change = VLC_TRUE;
+            msg_Dbg( p_enc, "region %i height change: %i -> %i",
+                     i_regions, p_sys->p_regions[i_regions].i_height,
+                     p_region->fmt.i_visible_height );
+            p_sys->p_regions[i_regions].i_height =
+                p_region->fmt.i_visible_height;
+        }
+    }
 
     bs_write( s, 16, i_regions * 6 + 2 ); /* Segment length */
 
-    bs_write( s, 8, 5 ); /* Timeout */
+    i_timeout = 0;
+    if( p_subpic && !p_subpic->b_ephemer &&
+        p_subpic->i_stop > p_subpic->i_start )
+    {
+        i_timeout = (p_subpic->i_stop - p_subpic->i_start) / 1000000;
+    }
+
+    bs_write( s, 8, i_timeout + 15 ); /* Timeout */
     bs_write( s, 4, p_sys->i_page_ver++ );
-    bs_write( s, 2, DVBSUB_PCS_STATE_ACQUISITION );
+    bs_write( s, 2, b_mode_change ?
+              DVBSUB_PCS_STATE_CHANGE : DVBSUB_PCS_STATE_ACQUISITION );
     bs_write( s, 2, 0 ); /* Reserved */
 
-    for( i_regions = 0, p_region = p_subpic->p_region; p_region;
-         p_region = p_region->p_next, i_regions++ )
+    for( i_regions = 0, p_region = p_subpic ? p_subpic->p_region : 0;
+         p_region; p_region = p_region->p_next, i_regions++ )
     {
         bs_write( s, 8, i_regions );
         bs_write( s, 8, 0 ); /* Reserved */
@@ -1457,7 +1526,8 @@ static void encode_clut( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
         bs_write( s, 1, p_pal->i_entries == 256 ); /* 8bit/entry flag */
         bs_write( s, 4, 0 ); /* Reserved */
         bs_write( s, 1, 1 ); /* Full range flag */
-        bs_write( s, 8, p_pal->palette[i][0] ); /* Y value */
+        bs_write( s, 8, p_pal->palette[i][3] ?  /* Y value */
+                  (p_pal->palette[i][0] ? p_pal->palette[i][0] : 16) : 0 );
         bs_write( s, 8, p_pal->palette[i][1] ); /* Cr value */
         bs_write( s, 8, p_pal->palette[i][2] ); /* Cb value */
         bs_write( s, 8, 0xff - p_pal->palette[i][3] ); /* T value */
@@ -1469,39 +1539,44 @@ static void encode_region_composition( encoder_t *p_enc, bs_t *s,
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     subpicture_region_t *p_region;
-    int i_regions;
+    int i_region, i_bg;
 
-    for( i_regions = 0, p_region = p_subpic->p_region; p_region;
-         p_region = p_region->p_next, i_regions++ )
+    for( i_region = 0, p_region = p_subpic->p_region; p_region;
+         p_region = p_region->p_next, i_region++ )
     {
         video_palette_t *p_pal = p_region->fmt.p_palette;
         int i_depth = p_pal->i_entries == 4 ? 0x1 :
             p_pal->i_entries == 16 ? 0x2 : 0x3;
+
+        for( i_bg = 0; i_bg < p_pal->i_entries; i_bg++ )
+        {
+            if( !p_pal->palette[i_bg][3] ) break;
+        }
 
         bs_write( s, 8, 0x0f ); /* Sync byte */
         bs_write( s, 8, DVBSUB_ST_REGION_COMPOSITION ); /* Segment type */
         bs_write( s, 16, 1 ); /* Page id */
 
         bs_write( s, 16, 10 + 6 ); /* Segment length */
-        bs_write( s, 8, i_regions );
+        bs_write( s, 8, i_region );
         bs_write( s, 4, p_sys->i_region_ver++ );
 
         /* Region attributes */
-        bs_write( s, 1, 0 ); /* Fill */
+        bs_write( s, 1, i_bg < p_pal->i_entries ); /* Fill */
         bs_write( s, 3, 0 ); /* Reserved */
-        bs_write( s, 16, p_region->fmt.i_visible_width );
-        bs_write( s, 16, p_region->fmt.i_visible_height );
+        bs_write( s, 16, p_sys->p_regions[i_region].i_width );
+        bs_write( s, 16, p_sys->p_regions[i_region].i_height );
         bs_write( s, 3, i_depth );  /* Region level of compatibility */
         bs_write( s, 3, i_depth  ); /* Region depth */
         bs_write( s, 2, 0 ); /* Reserved */
         bs_write( s, 8, 1 ); /* Clut id */
-        bs_write( s, 8, 0 ); /* region 8bit pixel code */
-        bs_write( s, 4, 0 ); /* region 4bit pixel code */
-        bs_write( s, 2, 0 ); /* region 2bit pixel code */
+        bs_write( s, 8, i_bg ); /* region 8bit pixel code */
+        bs_write( s, 4, i_bg ); /* region 4bit pixel code */
+        bs_write( s, 2, i_bg ); /* region 2bit pixel code */
         bs_write( s, 2, 0 ); /* Reserved */
 
         /* In our implementation we only have 1 object per region */
-        bs_write( s, 16, i_regions );
+        bs_write( s, 16, i_region );
         bs_write( s, 2, DVBSUB_OT_BASIC_BITMAP );
         bs_write( s, 2, 0 ); /* object provider flag */
         bs_write( s, 12, 0 ); /* object horizontal position */
@@ -1518,12 +1593,12 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
 {
     encoder_sys_t   *p_sys = p_enc->p_sys;
     subpicture_region_t *p_region;
-    int i_regions;
+    int i_region;
 
     int i_length_pos, i_update_pos, i_pixel_data_pos;
 
-    for( i_regions = 0, p_region = p_subpic->p_region; p_region;
-         p_region = p_region->p_next, i_regions++ )
+    for( i_region = 0, p_region = p_subpic->p_region; p_region;
+         p_region = p_region->p_next, i_region++ )
     {
         bs_write( s, 8, 0x0f ); /* Sync byte */
         bs_write( s, 8, DVBSUB_ST_OBJECT_DATA ); /* Segment type */
@@ -1531,7 +1606,7 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
 
         i_length_pos = bs_pos( s );
         bs_write( s, 16, 0 ); /* Segment length */
-        bs_write( s, 16, i_regions ); /* Object id */
+        bs_write( s, 16, i_region ); /* Object id */
         bs_write( s, 4, p_sys->i_region_ver++ );
         bs_write( s, 2, 0 ); /* object coding method */
 
