@@ -2,7 +2,7 @@
  * item-ext.c : Exported playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: item-ext.c,v 1.1 2004/01/05 12:59:43 zorglub Exp $
+ * $Id: item-ext.c,v 1.2 2004/01/05 14:42:14 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -53,9 +53,20 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_uri,
     {
         msg_Err( p_playlist, "out of memory" );
     }
-
-    p_item->psz_name   = strdup( psz_name );
+    if( psz_uri == NULL)
+    {
+        msg_Err( p_playlist, "Not adding NULL item");
+        return -1;
+    }
     p_item->psz_uri    = strdup( psz_uri );
+    if( psz_name != NULL )
+    {
+        p_item->psz_name   = strdup( psz_name );
+    }
+    else
+    {
+        p_item->psz_name = strdup ( psz_uri );
+    }
     p_item->i_status = 0;
     p_item->b_autodeletion = VLC_FALSE;
     p_item->b_enabled = VLC_TRUE;
@@ -65,8 +76,8 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_uri,
     p_item->pp_categories = NULL;
     p_item->i_categories = 0;
 
-    playlist_CreateItemCategory( p_item, "General");
-    playlist_CreateItemCategory( p_item, "Options");
+    playlist_CreateItemCategory( p_item, _("General") );
+    playlist_CreateItemCategory( p_item, _("Options") );
     return playlist_AddItem( p_playlist, p_item, i_mode, i_pos );
 }
 

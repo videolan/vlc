@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.44 2004/01/05 12:59:54 zorglub Exp $
+ * $Id: sap.c,v 1.45 2004/01/05 14:42:14 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -95,6 +95,10 @@
 #define SAP_SCOPE_TEXT N_("IPv6 SAP scope")
 #define SAP_SCOPE_LONGTEXT N_( \
        "Sets the scope for IPv6 announces (default is 8)")
+#define SAP_TIMEOUT_TEXT N_("SAP timeout")
+#define SAP_TIMEOUT_LONGTEXT N_( \
+       "Sets the time before SAP items get deleted if no new announce" \
+       "is received")
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
@@ -112,6 +116,9 @@ vlc_module_begin();
 
         add_string( "sap-ipv6-scope", "8" , NULL,
                     SAP_SCOPE_TEXT, SAP_SCOPE_LONGTEXT, VLC_TRUE);
+
+        add_integer( "sap-timeout", 30, NULL,
+                     SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, VLC_TRUE);
 
     set_description( _("SAP interface") );
     set_capability( "interface", 0 );
@@ -183,6 +190,8 @@ struct intf_sys_t
     /* Table of announces */
     int i_announces;
     struct sap_announce_t **pp_announces;
+
+    int i_timeout;
 };
 
 #ifdef HAVE_ZLIB_H
@@ -236,6 +245,7 @@ static int Open( vlc_object_t *p_this )
 
     playlist_t          *p_playlist;
 
+    p_sys->i_timeout = config_GetInt(p_intf,"sap-timeout");
     p_sys->fd[0] = -1;
     p_sys->fd[1] = -1;
     if( config_GetInt( p_intf, "sap-ipv4" ) )
@@ -393,7 +403,8 @@ static void Run( intf_thread_t *p_intf )
         for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
         {
            struct sap_announce_t *p_announce;
-           if( mdate() - p_intf->p_sys->pp_announces[i]->i_last > 10000000 )
+           if( mdate() - p_intf->p_sys->pp_announces[i]->i_last > 1000000*
+               p_sys->i_timeout )
            {
               msg_Dbg(p_intf,"Time out for %s, deleting (%i/%i)",
                              p_intf->p_sys->pp_announces[i]->psz_name,
@@ -915,7 +926,7 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
     sd->psz_sessionname = NULL;
     sd->psz_connection  = NULL;
     sd->psz_sdp         = strdup( p_packet );
-    
+
     sd->i_media         = 0;
     sd->pp_media        = NULL;
     sd->i_attributes    = 0;
