@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-03-04 18:18+0100\n"
+"POT-Creation-Date: 2003-02-27 00:36+0100\n"
 "PO-Revision-Date: 2003-01-31 16:35+0100\n"
 "Last-Translator: Vella Bruno\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -102,15 +102,14 @@ msgstr ""
 
 #: src/libvlc.h:49
 msgid "verbosity (0,1,2)"
-msgstr "dettaglio (0,1,2)"
+msgstr "dettaglio messaggi (0,1,2)"
 
 #: src/libvlc.h:51
 msgid ""
 "This options sets the verbosity level (0=only errors and standard messages, "
 "1=warnings, 2=debug)."
 msgstr ""
-"Questa opzione imposta il livello di dettaglio (0=solo errori e messaggi "
-"standard, 1=avvertimenti, 2=debug)."
+"Questa opzione imposta il livello di dettaglio dei messaggi (0=solo errori e messaggi standard, 1=avvertimenti, 2=debug)."
 
 #: src/libvlc.h:54
 msgid "be quiet"
@@ -135,13 +134,13 @@ msgstr ""
 
 #: src/libvlc.h:63
 msgid "show advanced options"
-msgstr ""
+msgstr "mostra opzioni avanzate"
 
 #: src/libvlc.h:65
 msgid ""
 "When this option is turned on, the interfaces will show all the available "
 "options, including those that most users should never touch"
-msgstr ""
+msgstr "Quando questa opzione e' attiva, le interfacce mostreranno tutte le opzioni disponibili, incluse quelle che la maggior parte degli utenti non dovrebbero mai toccare"
 
 #: src/libvlc.h:68
 msgid "interface default search path"
@@ -244,17 +243,14 @@ msgstr ""
 
 #: src/libvlc.h:111
 msgid "use the S/PDIF audio output when available"
-msgstr ""
+msgstr "utilizza l'uscita audio S/PDIF se disponibile"
 
 #: src/libvlc.h:113
-#, fuzzy
 msgid ""
 "This option allows you to use the S/PDIF audio output by default when your "
 "hardware supports it as well as the audio stream being played."
 msgstr ""
-"Questa opzione ti permette di selezionare il metodo di uscita audio usato da "
-"VLC. Il comportamento predefinito e' di selezionare automaticamente il "
-"miglior metodo disponibile."
+"Questa opzione ti permette di utilizzare l'uscita audio S/PDIF se il tuo hardware la supporta mentre viene riprodotta la sorgente audio."
 
 #: src/libvlc.h:116
 msgid "headphone virtual spatialization effect"
@@ -320,7 +316,7 @@ msgstr "indentificatore display"
 msgid ""
 "This is the local display port that will be used for X11 drawing. For "
 "instance :0.1."
-msgstr "Questa è la porta dello schermo locale che verra' usata per la grafica X11. Per esempio :0.1."
+msgstr "Questa e' la porta dello schermo locale che verra' usata per la grafica X11. Per esempio :0.1."
 
 #: src/libvlc.h:146
 msgid "video width"
@@ -1052,7 +1048,7 @@ msgstr ""
 #: modules/access/dvd/dvd.c:87 modules/access/dvdplay/dvd.c:52
 #, fuzzy
 msgid "dvd"
-msgstr "Aggiungi"
+msgstr "dvd"
 
 #: modules/access/dvd/dvd.c:91
 msgid "DVD input module, uses libdvdcss if installed"
@@ -3136,7 +3132,7 @@ msgstr "Pannello"
 
 #: modules/gui/macosx/intf.m:359 modules/gui/macosx/intf.m:383
 msgid "Info"
-msgstr ""
+msgstr "Informazioni"
 
 #: modules/gui/macosx/intf.m:362
 msgid "Bring All to Front"
@@ -3270,10 +3266,9 @@ msgid "maximum number of lines in the log window"
 msgstr "numero massimo di linee nella finestra resoconto"
 
 #: modules/gui/win32/win32.cpp:304
-#, fuzzy
 msgid ""
 "You can set the maximum number of lines that the log window will display."
-msgstr "numero massimo di linee nella finestra resoconto"
+msgstr "Puoi impostare il numero massimo di linee che la finestra resoconto mostrera'."
 
 #: modules/gui/win32/win32.cpp:305
 msgid " Enter -1 if you want to keep all messages."
@@ -4121,9 +4116,8 @@ msgid "Select the number of video windows in which to clone the video"
 msgstr "Seleziona il numero di finestre video nelle quali clonare"
 
 #: modules/video_filter/clone.c:58
-#, fuzzy
 msgid "Clone"
-msgstr "Chiudi"
+msgstr "Clonatura"
 
 #: modules/video_filter/clone.c:60
 msgid "image clone video module"
@@ -4157,7 +4151,7 @@ msgstr "modulo video ritaglia immagine"
 #. ****************************************************************************
 #: modules/video_filter/deinterlace/deinterlace.c:75
 msgid "deinterlace mode"
-msgstr "modalità deinterlaccia"
+msgstr "modalita' deinterlaccia"
 
 #: modules/video_filter/deinterlace/deinterlace.c:76
 msgid "One of \"discard\", \"blend\", \"mean\", \"bob\" or \"linear\""
@@ -4172,16 +4166,15 @@ msgstr "modulo deinterlacciamento"
 #. ****************************************************************************
 #: modules/video_filter/distort.c:59
 msgid "distort mode"
-msgstr "modalità distorsione"
+msgstr "modalita' distorsione"
 
 #: modules/video_filter/distort.c:60
 msgid "Distort mode, one of \"wave\" and \"ripple\""
 msgstr ""
 
 #: modules/video_filter/distort.c:65
-#, fuzzy
 msgid "Distort"
-msgstr "modalità distorsione"
+msgstr "Distorsione"
 
 #: modules/video_filter/distort.c:68
 msgid "miscellaneous video effects module"
@@ -4378,9 +4371,8 @@ msgstr ""
 #.    add_category_hint( N_("QT Embedded"), NULL );
 #.    add_string( "qte-display", "landscape", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT);
 #: modules/video_output/qte/qte.cpp:116
-#, fuzzy
 msgid "QT Embedded video module"
-msgstr "modulo video clona immagine"
+msgstr "modulo video QT incorporato"
 
 #: modules/video_output/sdl.c:106
 msgid "Simple DirectMedia Layer video module"
@@ -4397,7 +4389,7 @@ msgstr "modulo uscita video"
 
 #: modules/video_output/x11/x11.c:57 modules/video_output/x11/xvideo.c:68
 msgid "use shared memory"
-msgstr ""
+msgstr "utilizza memoria condivisa"
 
 #: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
 msgid "Use shared memory to communicate between VLC and the X server."
