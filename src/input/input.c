@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.231 2003/06/24 13:33:48 sam Exp $
+ * $Id: input.c,v 1.232 2003/06/28 17:20:41 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -570,10 +570,6 @@ static void EndThread( input_thread_t * p_input )
     msg_Dbg( p_input, "%ld loops", p_input->c_loops );
 #endif
 
-    /* Free info structures */
-    msg_Dbg( p_input, "freeing info structures...");
-    input_DelInfo( p_input );
-
     input_DumpStream( p_input );
 
     /* Free all ES and destroy all decoder threads */
@@ -593,9 +589,14 @@ static void EndThread( input_thread_t * p_input )
 
     input_AccessEnd( p_input );
 
+    /* Free info structures XXX destroy es before 'cause vorbis */
+    msg_Dbg( p_input, "freeing info structures...");
+    input_DelInfo( p_input );
+
     /* Close the video output that should have been re-attached
      * to our object */
     p_object = vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
+
     if( p_object )
     {
         vlc_object_detach( p_object );
