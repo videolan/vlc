@@ -581,6 +581,15 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, video_format_t *fmt_in,
         p_enc->fmt_in.video.i_width = fmt_out->i_width;
         p_enc->fmt_in.video.i_height = fmt_out->i_height;
     }
+    else if( fmt_out->i_sar_num && fmt_out->i_sar_den &&
+	     fmt_out->i_sar_num * fmt_in->i_sar_den !=
+             fmt_out->i_sar_den * fmt_in->i_sar_num )
+    {
+        p_enc->fmt_in.video.i_width =
+	    fmt_in->i_sar_num * (int64_t)fmt_out->i_sar_den * fmt_in->i_width /
+            fmt_in->i_sar_den / fmt_out->i_sar_num;
+    }
+
     p_enc->fmt_in.video.i_frame_rate = 25;
     p_enc->fmt_in.video.i_frame_rate_base = 1;
 
