@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.27 2003/06/23 23:51:31 gbazin Exp $
+ * $Id: ogg.c,v 1.28 2003/06/24 00:31:34 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -1416,9 +1416,9 @@ static int Demux( input_thread_t * p_input )
     }
 #undef p_stream
 
-    /* Sanity check for streams where the granulepos of the header packets
+    /* This is for streams where the granulepos of the header packets
      * don't match these of the data packets (eg. ogg web radios). */
-    if( p_ogg->i_old_pcr == 0 && p_ogg->i_pcr > 1000000 )
+    if( p_ogg->i_old_pcr == 0 && p_ogg->i_pcr > 0 )
         p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_REINIT;
 
     /* Call the pace control */
