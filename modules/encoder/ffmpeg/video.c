@@ -2,7 +2,7 @@
  * video.c : video encoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: video.c,v 1.2 2003/04/20 11:57:13 gbazin Exp $
+ * $Id: video.c,v 1.3 2003/04/26 14:54:49 gbazin Exp $
  *
  * Authors: Laurent Aimar
  *
@@ -93,8 +93,15 @@ int  E_( OpenEncoderVideo ) ( vlc_object_t *p_this )
     /* *** fix parameters *** */
     /* FIXME be clever, some codec support additional chroma */
     if( p_encoder->i_chroma != VLC_FOURCC( 'I', '4', '2', '0' ) )
+    switch( p_encoder->i_chroma )
     {
-        p_encoder->i_chroma = VLC_FOURCC( 'I', '4', '2', '0' );
+        case VLC_FOURCC( 'I', '4', '2', '0' ):
+        case VLC_FOURCC( 'I', '4', '2', '2' ):
+        case VLC_FOURCC( 'Y', 'U', 'Y', '2' ):
+            break;
+        default:
+            p_encoder->i_chroma = VLC_FOURCC( 'I', '4', '2', '0' );
+            return VLC_EGENERIC;
     }
 #if 0
     p_encoder->i_width = ( p_encoder->i_width + 15 )&0xfffff8;
@@ -127,7 +134,6 @@ void E_( CloseEncoderVideo )( vlc_object_t *p_this )
 static int  Init     ( video_encoder_t *p_encoder )
 {
     encoder_sys_t *p_sys;
-    char          *psz_codec;
     int           i_codec;
 
     /* *** allocate memory *** */
@@ -143,11 +149,11 @@ static int  Init     ( video_encoder_t *p_encoder )
     {
         case VLC_FOURCC( 'm', 'p', '1', 'v' ):
         case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
-            psz_codec = "MPEG I";
+            p_encoder->p_sys->psz_codec = "MPEG I";
             i_codec = CODEC_ID_MPEG1VIDEO;
             break;
         case VLC_FOURCC( 'm', 'p', '4', 'v' ):
-            psz_codec = "MPEG-4";
+            p_encoder->p_sys->psz_codec = "MPEG-4";
             i_codec = CODEC_ID_MPEG4;
             break;
         default:
@@ -168,7 +174,11 @@ static int  Init     ( video_encoder_t *p_encoder )
     p_context->bit_rate = config_GetInt( p_encoder, "encoder-ffmpeg-video-bitrate" ) * 1000;
     p_context->width = p_encoder->i_width;
     p_context->height= p_encoder->i_height;
+#if LIBAVCODEC_BUILD >= 4662
+    p_context->frame_rate = 25 * DEFAULT_FRAME_RATE_BASE;
+#else
     p_context->frame_rate = 25 * FRAME_RATE_BASE;
+#endif
     p_context->gop_size = config_GetInt( p_encoder, "encoder-ffmpeg-video-max-key-interval" );
     p_context->qmin = __MAX( __MIN( config_GetInt( p_encoder, "encoder-ffmpeg-video-min-quant" ), 31 ), 1 );
     p_context->qmax = __MAX( __MIN( config_GetInt( p_encoder, "encoder-ffmpeg-video-max-quant" ), 31 ), 1 );
@@ -186,6 +196,12 @@ static int  Init     ( video_encoder_t *p_encoder )
         case VLC_FOURCC( 'I', '4', '2', '0' ):
             p_frame->pict_type = PIX_FMT_YUV420P;
             break;
+        case VLC_FOURCC( 'I', '4', '2', '2' ):
+            p_frame->pict_type = PIX_FMT_YUV422P;
+            break;
+        case VLC_FOURCC( 'Y', 'U', 'Y', '2' ):
+            p_frame->pict_type = PIX_FMT_YUV422;
+            break;
         default:
             return VLC_EGENERIC;
     }
@@ -202,7 +218,7 @@ static int  Init     ( video_encoder_t *p_encoder )
  *
  *****************************************************************************/
 static int  Encode   ( video_encoder_t *p_encoder,
-                               picture_t *p_pic, void *p_data, size_t *pi_data )
+                       picture_t *p_pic, void *p_data, size_t *pi_data )
 {
 #define p_frame   p_encoder->p_sys->p_frame
 #define p_context p_encoder->p_sys->p_context

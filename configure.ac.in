@@ -1526,7 +1526,7 @@ then
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
     AC_CHECK_HEADERS(ffmpeg/avcodec.h postproc/postprocess.h)
     AC_CHECK_LIB(avcodec, avcodec_init, [
-      BUILTINS="${BUILTINS} ffmpeg stream_out_transcode"
+      BUILTINS="${BUILTINS} ffmpeg stream_out_transcode encoder_ffmpeg"
       LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -lavcodec"
       dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
       dnl       linker would miserably barf on multiple definitions.
@@ -1550,7 +1550,7 @@ then
     if test -f "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
       dnl  Use a custom libffmpeg
       AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
-      BUILTINS="${BUILTINS} ffmpeg stream_out_transcode"
+      BUILTINS="${BUILTINS} ffmpeg stream_out_transcode encoder_ffmpeg"
       LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -L${real_ffmpeg_tree}/libavcodec -lavcodec"
       CPPFLAGS_ffmpeg="${CPPFLAGS_ffmpeg} -I${real_ffmpeg_tree}/libavcodec"
 
@@ -1564,6 +1564,10 @@ then
       AC_MSG_ERROR([cannot find ${real_ffmpeg_tree}/libavcodec/libavcodec.a, make sure you compiled libavcodec in ${with_ffmpeg_tree}])
     fi
   fi
+
+  dnl Duplicate the ffmpeg CPPFLAGS and LDFLAGS for the encoder
+  LDFLAGS_encoder_ffmpeg=${LDFLAGS_ffmpeg}
+  CPPFLAGS_encoder_ffmpeg=${CPPFLAGS_ffmpeg}
 
   dnl Add postprocessing modules
   PLUGINS="${PLUGINS} postprocessing_c"
@@ -1663,7 +1667,7 @@ then
     then
       dnl  Use a custom xvid
       AC_MSG_RESULT(${real_xvid_tree}/build/generic/libxvidcore.a)
-      BUILTINS="${BUILTINS} xvid"
+      BUILTINS="${BUILTINS} xvid encoder_xvid"
       LDFLAGS_xvid="${LDFLAGS_xvid} -L${real_xvid_tree}/build/generic -lxvidcore"
       CPPFLAGS_xvid="${CPPFLAGS_xvid} -I${real_xvid_tree}/src"
     else
@@ -1677,12 +1681,16 @@ then
     AC_CHECK_HEADERS(xvid.h, ,
       [ AC_MSG_ERROR([Cannot find development headers for libxvidcore...]) ])
     AC_CHECK_LIB(xvidcore, xvid_init, [
-      PLUGINS="${PLUGINS} xvid"
+      PLUGINS="${PLUGINS} xvid encoder_xvid"
       LDFLAGS_xvid="${LDFLAGS_xvid} -lxvidcore" ],
       [ AC_MSG_ERROR([Cannot find libxvidcore library...]) ])
     LDFLAGS="${LDFLAGS_save}"
     CPPFLAGS="${CPPFLAGS_save}"
   fi
+
+  dnl Duplicate the xvid CPPFLAGS and LDFLAGS for the encoder
+  LDFLAGS_encoder_xvid=${LDFLAGS_xvid}
+  CPPFLAGS_encoder_xvid=${CPPFLAGS_xvid}
 fi
 
 
@@ -2036,7 +2044,7 @@ then
       fi ])
   AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no, ${FREETYPE_PATH})
 
-  if test "x${FREETYPE_CONFIG}" != "xno" -a "x${have_xosd}" = "xtrue"
+  if test "x${FREETYPE_CONFIG}" != "xno"
   then
     PLUGINS="${PLUGINS} osdtext"
     CFLAGS_osdtext="${CFLAGS_osdtext} `${FREETYPE_CONFIG} --cflags`"
