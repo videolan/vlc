@@ -2,6 +2,7 @@ vlc (0.5.2-3) unstable; urgency=low
 
   * Added explicit dependencies on vlc to legacy packages to make linda and
     lintian happier.
+  * Added correct versioned build-dependency on debhelper.
 
  -- Samuel Hocevar <sam@zoy.org>  Tue, 25 Mar 2003 23:21:51 +0100
 
