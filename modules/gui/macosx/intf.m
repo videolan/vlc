@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.83 2003/05/15 01:23:05 hartman Exp $
+ * $Id: intf.m,v 1.84 2003/05/20 15:23:25 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -503,8 +503,6 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)manage:(playlist_t *)p_playlist
 {
-    vlc_value_t val;
-
     intf_thread_t * p_intf = [NSApp getIntf];
 
 #define p_input p_playlist->p_input
@@ -972,12 +970,6 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
         o_msg_lock = nil;
     }
 
-    if( o_prefs != nil )
-    {
-        [o_prefs release];
-        o_prefs = nil;
-    }
-
     [NSApp stop: nil];
 
     /* write cached user defaults to disk */
@@ -1143,12 +1135,7 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
 - (IBAction)viewPreferences:(id)sender
 {
-    if( o_prefs == nil )
-    {
-        o_prefs = [[VLCPrefs alloc] init];
-    }
-
-    [o_prefs createPrefPanel: @"main"];
+    [o_prefs showPrefs];
 }
 
 - (IBAction)timesliderUpdate:(id)sender

@@ -2,7 +2,7 @@
  * prefs.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.h,v 1.5 2003/05/09 00:41:11 hartman Exp $
+ * $Id: prefs.h,v 1.6 2003/05/20 15:23:25 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -23,6 +23,23 @@
 
 #define PREFS_WRAP 60
 
+@interface VLCTreeItem : NSObject
+{
+    NSString *o_name;
+    int i_object_id;
+    VLCTreeItem *o_parent;
+    NSMutableArray *o_children;
+}
+
++ (VLCTreeItem *)rootItem;
+- (int)numberOfChildren;
+- (VLCTreeItem *)childAtIndex:(int)i_index;
+- (int)getObjectID;
+- (NSString *)getName;
+- (BOOL)hasPrefs:(NSString *)o_module_name;
+
+@end
+
 /*****************************************************************************
  * VLCPrefs interface
  *****************************************************************************/
@@ -30,26 +47,26 @@
 {
     intf_thread_t *p_intf;
     vlc_bool_t b_advanced;
+    VLCTreeItem *o_config_tree;
+    NSView *o_empty_view;
     
-    NSMutableDictionary *o_pref_panels;
-    NSMutableDictionary *o_toolbars;
-    NSMutableDictionary *o_scroll_views;
-    NSMutableDictionary *o_panel_views;
-    NSMutableDictionary *o_save_prefs;
+    IBOutlet id o_prefs_window;
+    IBOutlet id o_tree;
+    IBOutlet id o_prefs_view;
+    IBOutlet id o_save_btn;
+    IBOutlet id o_cancel_btn;
+    IBOutlet id o_reset_btn;
+    IBOutlet id o_advanced_ckb;
 }
 
-- (BOOL)hasPrefs:(NSString *)o_module_name;
-- (void)createPrefPanel:(NSString *)o_module_name;
-- (void)destroyPrefPanel:(id)o_unknown;
-- (void)selectPrefView:(id)sender;
-
-- (void)moduleSelected:(id)sender;
-- (void)configureModule:(id)sender;
-- (void)selectModule:(id)sender;
-
+- (void)initStrings;
+- (void)showPrefs;
+- (IBAction)savePrefs: (id)sender;
+- (IBAction)closePrefs: (id)sender;
+- (IBAction)resetAll: (id)sender;
+- (IBAction)advancedToggle: (id)sender;
+- (void)showViewForID: (int) i_id andName:(NSString *)o_item_name;
 - (void)configChanged:(id)o_unknown;
-
-- (void)clickedApplyCancelOK:(id)sender;
 
 @end
 
@@ -135,6 +152,7 @@
 @end
 
 INTF_CONTROL_CONFIG(Button);
+INTF_CONTROL_CONFIG(PopUpButton);
 INTF_CONTROL_CONFIG(ComboBox);
 INTF_CONTROL_CONFIG(TextField);
 

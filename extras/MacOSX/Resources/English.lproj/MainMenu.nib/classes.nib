@@ -162,6 +162,7 @@
                 "o_mu_videotrack" = id; 
                 "o_mu_window" = id; 
                 "o_playlist" = id; 
+                "o_prefs" = id; 
                 "o_timefield" = id; 
                 "o_timeslider" = id; 
                 "o_volumeslider" = id; 
@@ -311,7 +312,22 @@
             }; 
             SUPERCLASS = NSObject; 
         }, 
-        {CLASS = VLCPlaylistView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }
+        {CLASS = VLCPlaylistView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
+        {
+            ACTIONS = {advancedToggle = id; closePrefs = id; resetAll = id; savePrefs = id; }; 
+            CLASS = VLCPrefs; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "o_advanced_ckb" = id; 
+                "o_cancel_btn" = id; 
+                "o_prefs_view" = id; 
+                "o_prefs_window" = id; 
+                "o_reset_btn" = id; 
+                "o_save_btn" = id; 
+                "o_tree" = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
     ); 
     IBVersion = 1; 
 }
