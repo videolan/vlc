@@ -5,7 +5,7 @@
  * contains the basic udf handling functions
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_udf.c,v 1.14 2001/10/13 15:34:21 stef Exp $
+ * $Id: dvd_udf.c,v 1.15 2001/11/07 17:37:16 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -648,13 +648,13 @@ static int UDFFindPartition( int i_part_nb, struct partition_s *p_partition )
 
 
 /*****************************************************************************
- * UDFFindFile: looks for a file on the UDF disc/imagefile
+ * DVDUDFFindFile: looks for a file on the UDF disc/imagefile
  *****************************************************************************
  * Path has to be the absolute pathname on the UDF filesystem,
  * starting with '/'.
  * returns absolute LB number, or 0 on error
  *****************************************************************************/
-u32 UDFFindFile( dvdcss_handle dvdhandle, char * psz_path )
+u32 DVDUDFFindFile( dvdcss_handle dvdhandle, char * psz_path )
 {
     struct partition_s  partition;
     struct ad_s         root_icb;

@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.39 2001/11/07 03:37:27 stef Exp $
+ * $Id: dvd_ifo.c,v 1.40 2001/11/07 17:37:16 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -124,7 +124,7 @@ int IfoInit( ifo_t * p_ifo )
     int                 i_start;
 
     /* find the start sector of video information on the dvd */
-    p_ifo->i_start = UDFFindFile( p_ifo->dvdhandle, "/VIDEO_TS/VIDEO_TS.IFO" );
+    p_ifo->i_start = DVDUDFFindFile( p_ifo->dvdhandle, "/VIDEO_TS/VIDEO_TS.IFO" );
     if( !p_ifo->i_start ) return -1;
 
     p_tmp = FillBuffer( p_ifo, p_buf, p_ifo->i_start );
@@ -1328,7 +1328,7 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, int i_block )
 
     p_tmp = FillBuffer( p_ifo, p_buf, i_block );
     i_start = p_ifo->i_pos;
-    //fprintf( stderr, "CELL ADD\n" );
+//    fprintf( stderr, "CELL ADD\n" );
 
     p_cell_inf->i_vob_nb = ReadWord( p_ifo, p_buf, &p_tmp );
     DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
@@ -1336,8 +1336,8 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, int i_block )
 
     p_cell_inf->i_cell_nb = (p_cell_inf->i_end_byte/* - 7*/) / sizeof(cell_map_t);
 
-    //fprintf( stderr, "Cell inf: vob %d end %d cell %d\n", p_cell_inf->i_vob_nb, p_cell_inf->i_end_byte,  p_cell_inf->i_cell_nb );
-
+/*    fprintf( stderr, "Cell inf: vob %d end %d cell %d\n", p_cell_inf->i_vob_nb, p_cell_inf->i_end_byte,  p_cell_inf->i_cell_nb );
+*/
     p_cell_inf->p_cell_map =
                 malloc( p_cell_inf->i_cell_nb *sizeof(cell_map_t) );
     if( p_cell_inf->p_cell_map == NULL )
@@ -1353,7 +1353,7 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, int i_block )
         MAP.i_cell_id = ReadByte( p_ifo, p_buf, &p_tmp );
         DumpBytes( p_ifo, p_buf, &p_tmp, 1 );
         MAP.i_start_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
-        //fprintf(stderr, "sector[%d] %d (%d)\n", i,ntohl(*(u32*)(p_tmp)), p_ifo->i_pos);
+/*        fprintf(stderr, "sector[%d] %d (%d)\n", i,ntohl(*(u32*)(p_tmp)), p_ifo->i_pos);*/
         MAP.i_end_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
 #undef MAP
     }

@@ -13,12 +13,82 @@ endif
 # 
 # All possible plugin directories, needed for make clean
 #
-PLUGINS_DIR :=	alsa beos darwin directx dsp dummy dvd esd fb ggi glide gtk downmix idct imdct kde macosx mga motion mpeg qt sdl text vcd x11 yuv
+PLUGINS_DIR :=	alsa \
+		beos \
+		darwin \
+		directx \
+		dsp \
+		dummy \
+		dvd \
+		esd \
+		fb \
+		ggi \
+		glide \
+		gtk \
+		downmix \
+		idct \
+		imdct \
+		kde \
+		macosx \
+		mga \
+		motion \
+		mpeg \
+		qt \
+		sdl \
+		text \
+		vcd \
+		x11 \
+		yuv
 
 #
 # All possible plugin objects
 #
-PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin directx/directx dsp/dsp dummy/dummy dummy/null dvd/dvd esd/esd fb/fb ggi/ggi glide/glide gtk/gnome gtk/gtk downmix/downmix downmix/downmixsse downmix/downmix3dn idct/idct idct/idctclassic idct/idctmmx idct/idctmmxext idct/idctaltivec imdct/imdct imdct/imdct3dn imdct/imdctsse kde/kde macosx/macosx macosx/macosx_qt mga/mga motion/motion motion/motionmmx motion/motionmmxext motion/motion3dnow motion/motionaltivec mpeg/es mpeg/ps mpeg/ts qt/qt sdl/sdl text/ncurses text/rc vcd/vcd x11/x11 x11/xvideo yuv/yuv yuv/yuvmmx
+PLUGINS_TARGETS := alsa/alsa \
+		beos/beos \
+		darwin/darwin \
+		directx/directx \
+		dsp/dsp \
+		dummy/dummy \
+		dummy/null \
+		dvd/dvd \
+		esd/esd \
+		fb/fb \
+		ggi/ggi \
+		glide/glide \
+		gtk/gnome \
+		gtk/gtk \
+		downmix/downmix \
+		downmix/downmixsse \
+		downmix/downmix3dn \
+		idct/idct \
+		idct/idctclassic \
+		idct/idctmmx \
+		idct/idctmmxext \
+		idct/idctaltivec \
+		imdct/imdct \
+		imdct/imdct3dn \
+		imdct/imdctsse \
+		kde/kde \
+		macosx/macosx \
+		macosx/macosx_qt \
+		mga/mga \
+		motion/motion \
+		motion/motionmmx \
+		motion/motionmmxext \
+		motion/motion3dnow \
+		motion/motionaltivec \
+		mpeg/es \
+		mpeg/ps \
+		mpeg/ts \
+		qt/qt \
+		sdl/sdl \
+		text/ncurses \
+		text/rc \
+		vcd/vcd \
+		x11/x11 \
+		x11/xvideo \
+		yuv/yuv \
+		yuv/yuvmmx
 
 #
 # C Objects
@@ -33,7 +103,7 @@ LPCM_DECODER := lpcm_decoder_thread
 AUDIO_DECODER := audio_decoder adec_generic adec_layer1 adec_layer2 adec_math
 SPU_DECODER := spu_decoder
 VIDEO_DECODER := video_parser vpar_headers vpar_blocks vpar_synchro vpar_pool video_decoder
-MISC := mtime tests modules netutils
+MISC := mtime tests modules netutils iso_lang
 
 C_OBJ :=	$(INTERFACE:%=src/interface/%.o) \
 		$(INPUT:%=src/input/%.o) \
@@ -406,4 +476,3 @@ $(BUILTIN_OBJ): FORCE
 #
 libdvdcss: Makefile.opts
 	cd extras/libdvdcss && $(MAKE)
-

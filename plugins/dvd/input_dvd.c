@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.91 2001/10/16 16:51:28 stef Exp $
+ * $Id: input_dvd.c,v 1.92 2001/11/07 17:37:16 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -69,6 +69,7 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
+#include "iso_lang.h"
 #include "tests.h"
 
 #if defined( WIN32 )
@@ -582,7 +583,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                     p_es->i_type = AC3_AUDIO_ES;
                     p_es->b_audio = 1;
                     p_es->i_cat = AUDIO_ES;
-                    strcpy( p_es->psz_desc, IfoLanguage( hton16(
+                    strcpy( p_es->psz_desc, DecodeLanguage( hton16(
                         vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
                     strcat( p_es->psz_desc, " (ac3)" );
     
@@ -596,7 +597,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                     p_es->i_type = MPEG2_AUDIO_ES;
                     p_es->b_audio = 1;
                     p_es->i_cat = AUDIO_ES;
-                    strcpy( p_es->psz_desc, IfoLanguage( hton16(
+                    strcpy( p_es->psz_desc, DecodeLanguage( hton16(
                         vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
                     strcat( p_es->psz_desc, " (mpeg)" );
     
@@ -610,7 +611,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                     p_es->i_type = LPCM_AUDIO_ES;
                     p_es->b_audio = 1;
                     p_es->i_cat = AUDIO_ES;
-                    strcpy( p_es->psz_desc, IfoLanguage( hton16(
+                    strcpy( p_es->psz_desc, DecodeLanguage( hton16(
                         vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
                     strcat( p_es->psz_desc, " (lpcm)" );
     
@@ -672,7 +673,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                 p_es->i_stream_id = 0xbd;
                 p_es->i_type = DVD_SPU_ES;
                 p_es->i_cat = SPU_ES;
-                strcpy( p_es->psz_desc, IfoLanguage( hton16(
+                strcpy( p_es->psz_desc, DecodeLanguage( hton16(
                     vts.manager_inf.p_spu_attr[i-1].i_lang_code ) ) ); 
             }
         }
@@ -1153,7 +1154,7 @@ static int DVDFindCell( thread_dvd_data_t * p_dvd )
     }
 
 /*
-intf_WarnMsg( 7, "FindCell: i_cell %d i_index %d found %d nb %d",
+intf_WarnMsg( 12, "FindCell: i_cell %d i_index %d found %d nb %d",
                     p_dvd->i_cell,
                     p_dvd->i_prg_cell,
                     i_cell,
@@ -1189,7 +1190,7 @@ static int DVDFindSector( thread_dvd_data_t * p_dvd )
         intf_ErrMsg( "dvd error: can't find sector" );
         return -1;
     }
-
+    
     /* Find start and end sectors of new cell */
 #if 1
     p_dvd->i_sector = MAX(
@@ -1204,7 +1205,7 @@ static int DVDFindSector( thread_dvd_data_t * p_dvd )
 #endif
 
 /*
-    intf_WarnMsg( 7, "cell: %d sector1: 0x%x end1: 0x%x\n"
+    intf_WarnMsg( 12, "cell: %d sector1: 0x%x end1: 0x%x\n"
                    "index: %d sector2: 0x%x end2: 0x%x\n"
                    "category: 0x%x ilvu end: 0x%x vobu start 0x%x", 
         p_dvd->i_cell,
