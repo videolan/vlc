@@ -80,7 +80,7 @@ CtrlText::CtrlText( intf_thread_t *pIntf, VarText &rVariable,
     m_fsm.addTransition( "outMoving", "enter", "moving" );
 
     // Initial state
-    m_fsm.setState( "outStill" );
+    m_fsm.setState( "moving" );
 
     // Observe the variable
     m_rVariable.addObserver( this );
@@ -210,23 +210,25 @@ void CtrlText::displayText( const UString &rText )
     onChangePosition();
     m_xPos = 0;
 
-    // If the control was in the moving state, check if the scrolling is
-    // still necessary
-    const string &rState = m_fsm.getState();
-    if( rState == "moving" || rState == "outMoving" )
+    if( getPosition() )
     {
-        if( m_pImg && m_pImg->getWidth() >= getPosition()->getWidth() )
+        // If the control was in the moving state, check if the scrolling is
+        // still necessary
+        const string &rState = m_fsm.getState();
+        if( rState == "moving" || rState == "outMoving" )
         {
-            m_pCurrImg = m_pImgDouble;
-            m_pTimer->start( MOVING_TEXT_DELAY, false );
+            if( m_pImg && m_pImg->getWidth() >= getPosition()->getWidth() )
+            {
+                m_pCurrImg = m_pImgDouble;
+                m_pTimer->start( MOVING_TEXT_DELAY, false );
+            }
+            else
+            {
+                m_pTimer->stop();
+            }
         }
-        else
-        {
-            m_pTimer->stop();
-        }
+        notifyLayout();
     }
-
-    notifyLayout();
 }
 
 
