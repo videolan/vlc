@@ -55,12 +55,11 @@
     "Audio filters can be set in the Audio section, and configured " \
     "here.")
 
+#define AUDIO_FILTER2_TITLE N_("Audio filters settings")
+#define AUDIO_FILTER2_HELP N_(" ")
+
 #define AOUT_TITLE N_("Audio output modules settings")
 #define AOUT_HELP N_("These are general settings for audio output modules.")
-
-#define AOUT_ENC_TITLE N_("Audio encoders settings")
-#define AOUT_ENC_HELP N_( \
-    "These are general settings for audio encoding modules.")
 
 #define CHROMA_TITLE N_("Chroma modules settings")
 #define CHROMA_HELP N_("These settings affect chroma transformation modules.")
@@ -70,21 +69,38 @@
     "In the Subsdec section you may want to set the text encoding of your " \
     "preferred subtitles.")
 
+#define PACKETIZER_TITLE  N_("Packetizer modules settings" )
+#define PACKETIZER_HELP N_(" ")
+
+#define ENCODER_TITLE N_("Encoders settings")
+#define ENCODER_HELP N_( \
+    "These are general settings for video/audio/subtitles encoding modules.")
+
 #define DEMUX_TITLE N_("Demuxers settings")
 #define DEMUX_HELP N_( "These settings affect demuxer modules.")
-
-#define DEMUX2_TITLE N_("Demuxers settings (new generation)")
-#define DEMUX2_HELP N_("These settings affect new generation demuxer modules.")
 
 #define INTERFACE_TITLE N_("Interface plugins settings")
 #define INTERFACE_HELP  N_( \
     "Interface plugins can be enabled in the Interface section and " \
     "configured here.")
 
-#define SOUT_TITLE N_("Stream output access modules settings")
-#define SOUT_HELP N_( \
+#define DIALOGS_TITLE N_("Dialog providers settings")
+#define DIALOGS_HELP  N_( \
+    "Dialog providers can be configured here.")
+
+#define NETWORK_TITLE N_("Network modules settings")
+#define NETWORK_HELP N_(" ")
+
+#define SOUT_ACCESS_TITLE N_("Stream output access modules settings")
+#define SOUT_ACCESS_HELP N_( \
     "In this section you can set the caching value for the UDP stream " \
     "output access module.")
+
+#define SOUT_MUX_TITLE N_("Stream output muxer modules settings")
+#define SOUT_MUX_HELP N_(" ")
+
+#define SOUT_STREAM_TITLE N_("Stream output modules settings")
+#define SOUT_STREAM_HELP N_(" ")
 
 #define SUBTITLE_DEMUX_TITLE N_("Subtitle demuxer settings")
 #define SUBTITLE_DEMUX_HELP N_( \
@@ -96,7 +112,7 @@
     "Use these settings to choose the font you want VLC to use for text " \
     "rendering (to display subtitles for example).")
 
-#define VOUT__TITLE N_("Video output modules settings")
+#define _VOUT_TITLE N_("Video output modules settings")
 #define VOUT_HELP N_( \
     "Choose your preferred video output in the Video section, " \
     "and configure it here." )
@@ -107,6 +123,9 @@
     "here.\n" \
     "Configure the \"adjust\" filter to modify contrast/hue/saturation " \
     "settings.")
+
+#define VIDEO_FILTER2_TITLE N_("Video filters settings")
+#define VIDEO_FILTER2_HELP N_(" ")
 
 /*
  *  A little help for modules with unknown capabilities
@@ -120,39 +139,52 @@
  *****************************************************************************/
 static inline char * GetCapabilityHelp( char *psz_capability, int i_type)
 {
-    if( psz_capability == NULL) return "";
+    if( psz_capability == NULL) return " ";
 
-    if( !strcasecmp(psz_capability,"access") )
+    if( !strcasecmp(psz_capability,"access_demux") )
+        return i_type == 1 ? ACCESS_TITLE : ACCESS_HELP;
+    if( !strcasecmp(psz_capability,"access2") )
         return i_type == 1 ? ACCESS_TITLE : ACCESS_HELP;
     if( !strcasecmp(psz_capability,"audio filter") )
         return i_type == 1 ? AUDIO_FILTER_TITLE : AUDIO_FILTER_HELP;
+    if( !strcasecmp(psz_capability,"audio filter2") )
+        return i_type == 1 ? AUDIO_FILTER2_TITLE : AUDIO_FILTER2_HELP;
     if( !strcasecmp(psz_capability,"audio output") )
         return i_type == 1 ? AOUT_TITLE : AOUT_HELP;
-    if( !strcasecmp(psz_capability,"audio encoder") )
-        return i_type == 1 ? AOUT_ENC_TITLE : AOUT_ENC_HELP;
     if( !strcasecmp(psz_capability,"chroma") )
         return i_type == 1 ? CHROMA_TITLE : CHROMA_HELP;
     if( !strcasecmp(psz_capability,"decoder") )
         return i_type == 1 ? DECODER_TITLE : DECODER_HELP;
-    if( !strcasecmp(psz_capability,"demux") )
-        return i_type == 1 ? DEMUX_TITLE : DEMUX_HELP;
+    if( !strcasecmp(psz_capability,"packetizer") )
+        return i_type == 1 ? PACKETIZER_TITLE : PACKETIZER_HELP;
+    if( !strcasecmp(psz_capability,"encoder") )
+        return i_type == 1 ? ENCODER_TITLE : ENCODER_HELP;
     if( !strcasecmp(psz_capability,"demux2") )
-        return i_type == 1 ? DEMUX2_TITLE : DEMUX2_HELP;
+        return i_type == 1 ? DEMUX_TITLE : DEMUX_HELP;
     if( !strcasecmp(psz_capability,"interface") )
         return i_type == 1 ? INTERFACE_TITLE : INTERFACE_HELP;
+    if( !strcasecmp(psz_capability,"dialogs provider") )
+        return i_type == 1 ? DIALOGS_TITLE : DIALOGS_HELP;
+    if( !strcasecmp(psz_capability,"network") )
+        return i_type == 1 ? NETWORK_TITLE : NETWORK_HELP;
     if( !strcasecmp(psz_capability,"sout access") )
-        return i_type == 1 ? SOUT_TITLE : SOUT_HELP;
+        return i_type == 1 ? SOUT_ACCESS_TITLE : SOUT_ACCESS_HELP;
+    if( !strcasecmp(psz_capability,"sout mux") )
+        return i_type == 1 ? SOUT_MUX_TITLE : SOUT_MUX_HELP;
+    if( !strcasecmp(psz_capability,"sout stream") )
+        return i_type == 1 ? SOUT_STREAM_TITLE : SOUT_STREAM_HELP;
     if( !strcasecmp(psz_capability,"subtitle demux") )
         return i_type == 1 ? SUBTITLE_DEMUX_TITLE : SUBTITLE_DEMUX_HELP;
     if( !strcasecmp(psz_capability,"text renderer") )
         return i_type == 1 ? TEXT_TITLE : TEXT_HELP;
     if( !strcasecmp(psz_capability,"video output") )
-        return i_type == 1 ? VOUT__TITLE : VOUT_HELP;
+        return i_type == 1 ? _VOUT_TITLE : VOUT_HELP;
     if( !strcasecmp(psz_capability,"video filter") )
         return i_type == 1 ? VIDEO_FILTER_TITLE : VIDEO_FILTER_HELP;
+    if( !strcasecmp(psz_capability,"video filter2") )
+        return i_type == 1 ? VIDEO_FILTER2_TITLE : VIDEO_FILTER2_HELP;
 
-    return "";
+    return " ";
 }
-
 
 #endif /* VLC_HELP_H */

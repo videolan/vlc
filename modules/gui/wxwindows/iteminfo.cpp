@@ -275,10 +275,6 @@ void ItemInfoDialog::UpdateInfo()
     /* Rebuild the tree */
     for( int i = 0; i< p_item->input.i_categories ; i++)
     {
-        if( !strcmp( p_item->input.pp_categories[i]->psz_name, _("Options") ) )
-        {
-            continue;
-        }
         wxTreeItemId cat = info_tree->AppendItem( info_root,
                             wxU( p_item->input.pp_categories[i]->psz_name) );
 
