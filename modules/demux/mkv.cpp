@@ -1715,7 +1715,12 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
 
         if( i_track < p_segment->tracks.size() )
         {
-            if( tk->fmt.i_cat == VIDEO_ES )
+            if( p_sys->i_pts >= p_sys->i_start_pts )
+            {
+                BlockDecode( p_demux, block, p_sys->i_pts, 0 );
+                i_track_skipping = 0;
+            }
+            else if( tk->fmt.i_cat == VIDEO_ES )
             {
                 if( i_block_ref1 == -1 && tk->b_search_keyframe )
                 {
@@ -1726,7 +1731,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
                 {
                     BlockDecode( p_demux, block, p_sys->i_pts, 0 );
                 }
-            }
+            } 
         }
 
         delete block;
