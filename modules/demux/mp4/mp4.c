@@ -625,7 +625,6 @@ static int Demux( demux_t *p_demux )
                     }
                 }
                 p_block->i_dts = MP4_TrackGetPTS( p_demux, tk ) + 1;
-                fprintf( stderr, "dts=%lld\n", p_block->i_dts );
 
                 p_block->i_pts = tk->fmt.i_cat == VIDEO_ES ? 0 : p_block->i_dts + 1;
 
