@@ -1,11 +1,39 @@
---- libpng/scripts/makefile.macosx	Sun Sep 26 18:18:04 2004
-+++ libpng/scripts/makefile.macosx.orig	Thu Oct  3 13:32:34 2002
+diff -ruN libpng.orig/scripts/makefile.macosx libpng/scripts/makefile.macosx
+--- libpng.orig/scripts/makefile.macosx	Thu Oct  3 13:32:34 2002
++++ libpng/scripts/makefile.macosx	Thu Apr  7 01:00:51 2005
 @@ -6,7 +6,7 @@
  # For conditions of distribution and use, see copyright notice in png.h
  
  # where make install puts libpng.a and png.h
 -prefix=/usr/local
 +prefix=PREFIX
-
+ 
  # Where the zlib library and include files are located
  #ZLIBLIB=/usr/local/lib
+@@ -21,7 +21,7 @@
+ PNGVER = $(PNGMAJ).$(PNGMIN)
+ 
+ CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
+-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -current_version $(PNGVER)
++LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz
+ 
+ LIBNAME=libpng12
+ SHAREDLIB_POSTFIX=dylib
+@@ -52,7 +52,7 @@
+ 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
+ 	pngwtran.o pngmem.o pngerror.o pngpread.o
+ 
+-all: libpng.a pngtest shared libpng.pc libpng-config
++all: libpng.a pngtest libpng.pc libpng-config
+ 
+ shared: $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX)
+ 
+@@ -153,7 +153,7 @@
+ 	chmod 755 $(DB)/$(LIBNAME)-config
+ 	(cd $(DB); ln -sf $(LIBNAME)-config libpng-config)
+ 
+-install: install-static install-shared install-man install-config
++install: install-static install-man install-config
+ 
+ # If you installed in $(DESTDIR), test-installed won't work until you
+ # move the library to its final location.

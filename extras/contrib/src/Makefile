@@ -1023,7 +1023,7 @@ libpng: libpng-$(PNG_VERSION).tar.bz2
 	cat Patches/libpng.patch | sed s,PREFIX,$(PREFIX), | patch -p0
 
 .png: libpng
-	(cd $<; cp scripts/makefile.macosx Makefile && make shared && make install)
+	(cd $<; cp scripts/makefile.macosx Makefile && make && make install)
 	touch $@
 
 CLEAN_FILE += .png
