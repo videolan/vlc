@@ -2,7 +2,7 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.17 2003/04/28 12:25:34 asmax Exp $
+ * $Id: gtk2_graphics.cpp,v 1.18 2003/05/13 19:25:59 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -40,7 +40,7 @@
 //---------------------------------------------------------------------------
 // GTK2 GRAPHICS
 //---------------------------------------------------------------------------
-GTK2Graphics::GTK2Graphics( int w, int h, SkinWindow *from ) : Graphics( w, h )
+GTK2Graphics::GTK2Graphics( intf_thread_t *p_intf, int w, int h, SkinWindow *from ) : Graphics( w, h )
 {
     if( from != NULL )
     {

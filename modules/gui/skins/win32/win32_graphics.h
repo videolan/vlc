@@ -2,7 +2,7 @@
  * win32_graphics.h: Win32 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_graphics.h,v 1.5 2003/04/28 12:25:34 asmax Exp $
+ * $Id: win32_graphics.h,v 1.6 2003/05/13 19:25:59 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -40,7 +40,7 @@ class Win32Graphics : public Graphics
 
     public:
         // Constructor
-        Win32Graphics( int w, int h, SkinWindow *from = NULL );
+        Win32Graphics( intf_thread_t *p_intf, int w, int h, SkinWindow *from = NULL );
         // Destructor
         virtual ~Win32Graphics();
         // Drawing methods

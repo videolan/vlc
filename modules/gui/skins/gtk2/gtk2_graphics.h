@@ -2,7 +2,7 @@
  * gtk2_graphics.h: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.h,v 1.6 2003/04/28 12:25:34 asmax Exp $
+ * $Id: gtk2_graphics.h,v 1.7 2003/05/13 19:25:59 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -43,7 +43,7 @@ class GTK2Graphics : public Graphics
 
     public:
         // Constructor
-        GTK2Graphics( int w, int h, SkinWindow *from = NULL );
+        GTK2Graphics( intf_thread_t *p_intf, int w, int h, SkinWindow *from = NULL );
         // Destructor
         virtual ~GTK2Graphics();
         // Drawing methods
