@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.8 2002/12/06 16:34:07 sam Exp $
+ * $Id: system.c,v 1.9 2003/02/04 11:07:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -187,7 +187,7 @@ static void ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             msg_Warn( p_input, "packet corrupted, PES sizes do not match" );
         }
 
-        switch( p_es->i_stream_id )
+        switch( p_header[3] )
         {
         case 0xBC:  /* Program stream map */
         case 0xBE:  /* Padding */

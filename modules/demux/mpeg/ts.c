@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.14 2003/01/08 16:40:29 fenrir Exp $
+ * $Id: ts.c,v 1.15 2003/02/04 11:07:45 massiot Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -631,11 +631,17 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                     {
                         case MPEG1_VIDEO_ES:
                         case MPEG2_VIDEO_ES:
+                            /* This isn't real, but we don't actually use
+                             * it. */
+                            p_new_es->i_stream_id = 0xE0;
                             p_new_es->i_fourcc = VLC_FOURCC('m','p','g','v');
                             p_new_es->i_cat = VIDEO_ES;
                             break;
                         case MPEG1_AUDIO_ES:
                         case MPEG2_AUDIO_ES:
+                            /* This isn't real, but we don't actually use
+                             * it. */
+                            p_new_es->i_stream_id = 0xC0;
                             p_new_es->i_fourcc = VLC_FOURCC('m','p','g','a');
                             p_new_es->i_cat = AUDIO_ES;
                             break;
