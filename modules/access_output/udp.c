@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.8 2003/05/24 11:53:11 sam Exp $
+ * $Id: udp.c,v 1.9 2003/06/19 18:22:05 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -64,13 +64,22 @@ static void    Close  ( vlc_object_t * );
 static int     Write( sout_access_out_t *, sout_buffer_t * );
 static int     Seek ( sout_access_out_t *, off_t  );
 
-static void    ThreadWrite( vlc_object_t *p_this );
+static void    ThreadWrite( vlc_object_t * );
+
+static sout_buffer_t *NewUDPPacket( sout_access_out_t *, mtime_t );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define CACHING_TEXT N_("caching value in ms")
+#define CACHING_LONGTEXT N_( \
+    "Allows you to modify the default caching value for udp streams. This " \
+    "value should be set in miliseconds units." )
+
 vlc_module_begin();
     set_description( _("UDP stream ouput") );
+    add_category_hint( N_("udp stream output"), NULL , VLC_TRUE );
+    add_integer( "udp-sout-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     set_capability( "sout access", 100 );
     add_shortcut( "udp" );
     add_shortcut( "rtp" ); // Will work only with ts muxer
@@ -129,7 +138,8 @@ static int Open( vlc_object_t *p_this )
     if( p_access->psz_access != NULL &&
         !strcmp( p_access->psz_access, "rtp" ) )
     {
-        msg_Warn( p_access, "becarefull that rtp ouput work only with ts payload(not an error)" );
+        msg_Warn( p_access, "becarefull that rtp ouput work only with ts "
+                  "payload(not an error)" );
         p_sys->b_rtpts = 1;
     }
     else
@@ -165,8 +175,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->p_thread =
-        vlc_object_create( p_access,
-                           sizeof( sout_access_thread_t ) );
+        vlc_object_create( p_access, sizeof( sout_access_thread_t ) );
     if( !p_sys->p_thread )
     {
         msg_Err( p_access, "out of memory" );
@@ -195,8 +204,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_thread->i_handle = socket_desc.i_handle;
     p_sys->i_mtu     = socket_desc.i_mtu;
 
-    if( vlc_thread_create( p_sys->p_thread, "sout write thread",
-                           ThreadWrite, VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+    if( vlc_thread_create( p_sys->p_thread, "sout write thread", ThreadWrite,
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
     {
         msg_Err( p_access->p_sout, "cannot spawn sout access thread" );
         vlc_object_destroy( p_sys->p_thread );
@@ -211,8 +220,7 @@ static int Open( vlc_object_t *p_this )
     p_access->pf_write       = Write;
     p_access->pf_seek        = Seek;
 
-    msg_Info( p_access,
-              "Open: addr:`%s' port:`%d'",
+    msg_Info( p_access, "Open: addr:`%s' port:`%d'",
               psz_dst_addr, i_dst_port );
 
     free( psz_dst_addr );
@@ -291,46 +299,13 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
 
         if( !p_sys->p_buffer )
         {
-            p_sys->p_buffer = sout_BufferNew( p_access->p_sout, p_sys->i_mtu );
-            p_sys->p_buffer->i_dts = p_buffer->i_dts;
-            p_sys->p_buffer->i_size = 0;
-            if( p_sys->b_rtpts )
-            {
-                mtime_t i_timestamp = p_sys->p_buffer->i_dts * 9 / 100;
-
-                /* add rtp/ts header */
-                p_sys->p_buffer->p_buffer[0] = 0x80;
-                p_sys->p_buffer->p_buffer[1] = 0x21; // mpeg2-ts
-
-                p_sys->p_buffer->p_buffer[2] =
-                    ( p_sys->i_sequence_number >> 8 )&0xff;
-                p_sys->p_buffer->p_buffer[3] =
-                    p_sys->i_sequence_number&0xff;
-                p_sys->i_sequence_number++;
-
-                p_sys->p_buffer->p_buffer[4] = ( i_timestamp >> 24 )&0xff;
-                p_sys->p_buffer->p_buffer[5] = ( i_timestamp >> 16 )&0xff;
-                p_sys->p_buffer->p_buffer[6] = ( i_timestamp >>  8 )&0xff;
-                p_sys->p_buffer->p_buffer[7] = i_timestamp&0xff;
-
-                p_sys->p_buffer->p_buffer[ 8] =
-                    ( p_sys->i_ssrc >> 24 )&0xff;
-                p_sys->p_buffer->p_buffer[ 9] =
-                    ( p_sys->i_ssrc >> 16 )&0xff;
-                p_sys->p_buffer->p_buffer[10] =
-                    ( p_sys->i_ssrc >>  8 )&0xff;
-                p_sys->p_buffer->p_buffer[11] = p_sys->i_ssrc&0xff;
-
-                p_sys->p_buffer->i_size = 12;
-            }
+            p_sys->p_buffer = NewUDPPacket( p_access, p_buffer->i_dts );
         }
-
 
         if( p_buffer->i_size > 0 )
         {
             memcpy( p_sys->p_buffer->p_buffer + p_sys->p_buffer->i_size,
-                    p_buffer->p_buffer,
-                    i_write );
+                    p_buffer->p_buffer, i_write );
             p_sys->p_buffer->i_size += i_write;
         }
         p_next = p_buffer->p_next;
@@ -352,14 +327,57 @@ static int Seek( sout_access_out_t *p_access, off_t i_pos )
 }
 
 /*****************************************************************************
+ * NewUDPPacket: allocate a new UDP packet of size p_sys->i_mtu
+ *****************************************************************************/
+static sout_buffer_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
+{
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
+    sout_buffer_t *p_buffer;
+
+    p_buffer = sout_BufferNew( p_access->p_sout, p_sys->i_mtu );
+    p_buffer->i_dts = i_dts;
+    p_buffer->i_size = 0;
+
+    if( p_sys->b_rtpts )
+    {
+        mtime_t i_timestamp = p_buffer->i_dts * 9 / 100;
+
+        /* add rtp/ts header */
+        p_buffer->p_buffer[0] = 0x80;
+        p_buffer->p_buffer[1] = 0x21; // mpeg2-ts
+
+        p_buffer->p_buffer[2] = ( p_sys->i_sequence_number >> 8 )&0xff;
+        p_buffer->p_buffer[3] = p_sys->i_sequence_number&0xff;
+        p_sys->i_sequence_number++;
+
+        p_buffer->p_buffer[4] = ( i_timestamp >> 24 )&0xff;
+        p_buffer->p_buffer[5] = ( i_timestamp >> 16 )&0xff;
+        p_buffer->p_buffer[6] = ( i_timestamp >>  8 )&0xff;
+        p_buffer->p_buffer[7] = i_timestamp&0xff;
+
+        p_buffer->p_buffer[ 8] = ( p_sys->i_ssrc >> 24 )&0xff;
+        p_buffer->p_buffer[ 9] = ( p_sys->i_ssrc >> 16 )&0xff;
+        p_buffer->p_buffer[10] = ( p_sys->i_ssrc >>  8 )&0xff;
+        p_buffer->p_buffer[11] = p_sys->i_ssrc&0xff;
+
+        p_buffer->i_size = 12;
+    }
+
+    return p_buffer;
+}
+
+/*****************************************************************************
  * ThreadWrite: Write a packet on the network at the good time.
  *****************************************************************************/
 static void ThreadWrite( vlc_object_t *p_this )
 {
     sout_access_thread_t *p_thread = (sout_access_thread_t*)p_this;
     sout_instance_t      *p_sout = p_thread->p_sout;
-    sout_buffer_t *p_buffer;
-    mtime_t       i_date;
+    sout_buffer_t        *p_buffer;
+    mtime_t              i_date, i_pts_delay;
+
+    /* Get the i_pts_delay value */
+    i_pts_delay = config_GetInt( p_this, "udp-sout-caching" ) * 1000;
 
     while( !p_thread->b_die && p_thread->p_fifo->i_depth < 5 )
     {
@@ -370,38 +388,30 @@ static void ThreadWrite( vlc_object_t *p_this )
         return;
     }
     p_buffer = sout_FifoShow( p_thread->p_fifo );
-    i_date = mdate() - p_buffer->i_dts;
+    i_date = mdate() + i_pts_delay - p_buffer->i_dts;
 
-    for( ;; )
+    while( 1 )
     {
         mtime_t i_wait;
 
         p_buffer = sout_FifoGet( p_thread->p_fifo );
 
-        if( p_thread->b_die )
-        {
-            return;
-        }
+        if( p_thread->b_die ) return;
+
         i_wait = i_date + p_buffer->i_dts;
 
-        if( i_wait - mdate() > MAX_ERROR ||
-            i_wait - mdate() < -MAX_ERROR )
+        if( i_wait - mdate() > MAX_ERROR || i_wait - mdate() < -MAX_ERROR )
         {
             msg_Warn( p_sout, "resetting clock" );
-            i_date = mdate() - p_buffer->i_dts;
+            i_date = mdate() + i_pts_delay - p_buffer->i_dts;
         }
         else
         {
             mwait( i_wait );
         }
 
-        send( p_thread->i_handle,
-              p_buffer->p_buffer,
-              p_buffer->i_size,
-              0 );
+        send( p_thread->i_handle, p_buffer->p_buffer, p_buffer->i_size, 0 );
 
         sout_BufferDelete( p_sout, p_buffer );
     }
 }
-
-
