@@ -58,8 +58,10 @@ typedef struct input_cfg_s *            p_input_cfg_t;
 
 /* Audio */
 struct aout_thread_s;
+struct aout_sys_s;
 
 typedef struct aout_thread_s *          p_aout_thread_t;
+typedef struct aout_sys_s *             p_aout_sys_t;
 
 /* Video */
 struct vout_thread_s;

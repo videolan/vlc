@@ -110,9 +110,9 @@ const intf_command_t control_command[] =
     " functions.\nIf a command name is provided as argument, displays a short "\
     "inline help about the command.\n" },
   { "play-audio", PlayAudio,                                   /* play-audio */
-    /* format: */   "stereo=i? rate=i? s ",
+    /* format: */   "channels=i? rate=i? s ",
     /* summary: */  "play an audio file",
-    /* usage: */    "play-audio [stereo=1/0] [rate=r] <file>",
+    /* usage: */    "play-audio [channels=1/2] [rate=r] <file>",
     /* help: */     "Load and play an audio file." },
   { "play-video", PlayVideo,                                      /* play-video */
     /* format: */   "s ",
@@ -275,17 +275,17 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
     }
 
     /* Set default configuration */
-    fifo.b_stereo = AOUT_DEFAULT_STEREO;
+    fifo.i_channels = 1 + AOUT_DEFAULT_STEREO;
     fifo.l_rate = AOUT_DEFAULT_RATE;
 
-    /* The stereo and rate parameters are essential ! */
+    /* The channels and rate parameters are essential ! */
     /* Parse parameters - see command list above */
     for ( i_arg = 1; i_arg < i_argc; i_arg++ )
     {
         switch( p_argv[i_arg].i_index )
         {
-        case 0:                                                    /* stereo */
-            fifo.b_stereo = p_argv[i_arg].i_num;
+        case 0:                                                  /* channels */
+            fifo.i_channels = p_argv[i_arg].i_num;
             break;
         case 1:                                                      /* rate */
             fifo.l_rate = p_argv[i_arg].i_num;
@@ -297,18 +297,18 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
     }
 
     /* Setting up the type of the fifo */
-    switch ( fifo.b_stereo )
+    switch ( fifo.i_channels )
     {
-        case 0:
+        case 1:
             fifo.i_type = AOUT_INTF_MONO_FIFO;
             break;
 
-        case 1:
+        case 2:
             fifo.i_type = AOUT_INTF_STEREO_FIFO;
             break;
 
         default:
-            intf_IntfMsg("play-audio error: stereo must be 0 or 1");
+            intf_IntfMsg("play-audio error: channels must be 1 or 2");
             return( INTF_OTHER_ERROR );
     }
 
@@ -322,17 +322,17 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
 
     /* Get file size to calculate number of audio units */
     fstat( i_fd, &stat_buffer );
-    fifo.l_units = ( long )( stat_buffer.st_size / (sizeof(s16) << fifo.b_stereo) );
+    fifo.l_units = ( long )( stat_buffer.st_size / (sizeof(s16) << (fifo.i_channels - 1)) );
 
     /* Allocate memory, read file and close it */
-    if ( (fifo.buffer = malloc(sizeof(s16)*(fifo.l_units << fifo.b_stereo))) == NULL ) /* !! */
+    if ( (fifo.buffer = malloc(sizeof(s16)*(fifo.l_units << (fifo.i_channels - 1)))) == NULL ) /* !! */
     {
         intf_IntfMsg("play-audio error: not enough memory to read `%s'", psz_file );
         close( i_fd );                                         /* close file */
         return( INTF_OTHER_ERROR );
     }
-    if ( read(i_fd, fifo.buffer, sizeof(s16)*(fifo.l_units << fifo.b_stereo))
-        != sizeof(s16)*(fifo.l_units << fifo.b_stereo) )
+    if ( read(i_fd, fifo.buffer, sizeof(s16)*(fifo.l_units << (fifo.i_channels - 1)))
+        != sizeof(s16)*(fifo.l_units << (fifo.i_channels - 1)) )
     {
         intf_IntfMsg("play-audio error: can't read %s", psz_file);
         free( fifo.buffer );
@@ -342,7 +342,7 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
     close( i_fd );
 
     /* Now we can work out how many output units we can compute with the fifo */
-    fifo.l_units = (long)(((s64)fifo.l_units*(s64)p_main->p_aout->sys.l_rate)/(s64)fifo.l_rate);
+    fifo.l_units = (long)(((s64)fifo.l_units*(s64)p_main->p_aout->l_rate)/(s64)fifo.l_rate);
 
     /* Create the fifo */
     if ( aout_CreateFifo(p_main->p_aout, &fifo) == NULL )

@@ -25,8 +25,8 @@
 /* Default output device. You probably should not change this. */
 #define AOUT_DEFAULT_DEVICE     "/dev/dsp"
 
-/* Default audio output format (AFMT_S16_NE = Native Endianess) */
-#define AOUT_DEFAULT_FORMAT     AFMT_S16_NE
+/* Default audio output format (AOUT_FMT_S16_NE = Native Endianess) */
+#define AOUT_DEFAULT_FORMAT     AOUT_FMT_S16_NE
 
 /* Default stereo mode (0 stands for mono, 1 for stereo) */
 #define AOUT_DEFAULT_STEREO     1
@@ -58,28 +58,6 @@
  */
 #define AOUT_FIFO_ISEMPTY( fifo )       ( (fifo).l_end_frame == (fifo).i_start_frame )
 #define AOUT_FIFO_ISFULL( fifo )        ( ((((fifo).l_end_frame + 1) - (fifo).l_start_frame) & AOUT_FIFO_SIZE) == 0 )
-
-/*****************************************************************************
- * aout_sys_t
- *****************************************************************************/
-typedef struct
-{
-    /* Path to the audio output device (default is set to "/dev/dsp") */
-    char *              psz_device;
-    int                 i_fd;
-
-    /* Format of the audio output samples (see <sys/soundcard.h>) */
-    int                 i_format;
-    /* Following boolean is set to 0 if output sound is mono, 1 if stereo */
-    boolean_t           b_stereo;
-    /* Rate of the audio output sound (in Hz) */
-    long                l_rate;
-
-    /* Buffer information structure, used by aout_sys_getbufinfo() to store the
-     * current state of the internal sound card buffer */
-    audio_buf_info      buf_info;
-
-} aout_sys_t;
 
 /*****************************************************************************
  * aout_increment_t
@@ -118,7 +96,7 @@ typedef struct
     int                 i_type;
     boolean_t           b_die;
 
-    boolean_t           b_stereo;
+    int                 i_channels;
     long                l_rate;
 
     vlc_mutex_t         data_lock;
@@ -158,22 +136,20 @@ typedef struct
 /*****************************************************************************
  * aout_thread_t : audio output thread descriptor
  *****************************************************************************/
-typedef int  (aout_sys_open_t)           ( aout_sys_t *p_sys );
-typedef int  (aout_sys_reset_t)          ( aout_sys_t *p_sys );
-typedef int  (aout_sys_setformat_t)      ( aout_sys_t *p_sys );
-typedef int  (aout_sys_setchannels_t)    ( aout_sys_t *p_sys );
-typedef int  (aout_sys_setrate_t)        ( aout_sys_t *p_sys );
-typedef long (aout_sys_getbufinfo_t)     ( aout_sys_t *p_sys );
-typedef void (aout_sys_playsamples_t)    ( aout_sys_t *p_sys,
+typedef int  (aout_sys_open_t)           ( p_aout_thread_t p_aout );
+typedef int  (aout_sys_reset_t)          ( p_aout_thread_t p_aout );
+typedef int  (aout_sys_setformat_t)      ( p_aout_thread_t p_aout );
+typedef int  (aout_sys_setchannels_t)    ( p_aout_thread_t p_aout );
+typedef int  (aout_sys_setrate_t)        ( p_aout_thread_t p_aout );
+typedef long (aout_sys_getbufinfo_t)     ( p_aout_thread_t p_aout );
+typedef void (aout_sys_playsamples_t)    ( p_aout_thread_t p_aout,
                                            byte_t *buffer, int i_size );
-typedef void (aout_sys_close_t)          ( aout_sys_t *p_sys );
+typedef void (aout_sys_close_t)          ( p_aout_thread_t p_aout );
 
 typedef struct aout_thread_s
 {
     vlc_thread_t        thread_id;
     boolean_t           b_die;
-
-    aout_sys_t          sys;
 
     vlc_mutex_t         fifos_lock;
     aout_fifo_t         fifo[ AOUT_MAX_FIFOS ];
@@ -202,6 +178,22 @@ typedef struct aout_thread_s
      * will be played */
     mtime_t             date;
 
+    /* Path to the audio output device (default is set to "/dev/dsp") */
+    char *              psz_device;
+    int                 i_fd;
+
+    /* Format of the audio output samples */
+    int                 i_format;
+    /* Number of channels */
+    int                 i_channels;
+    /* Rate and gain of the audio output sound (in Hz) */
+    long                l_rate;
+    long                l_gain;
+
+    /* there might be some useful private structure, such as audio_buf_info
+     * for the OSS output */
+    p_aout_sys_t        p_sys;
+
 } aout_thread_t;
 
 /* Output methods */
@@ -211,6 +203,21 @@ typedef struct aout_thread_s
 /* Get the fallback method */
 #ifdef AUDIO_DSP
 #define AOUT_DEFAULT_METHOD "dsp"
+#endif
+
+/* Those are from <linux/soundcard.h> but are needed because of formats
+ * on other platforms */
+#define AOUT_FMT_U8          0x00000008
+#define AOUT_FMT_S16_LE      0x00000010           /* Little endian signed 16 */
+#define AOUT_FMT_S16_BE      0x00000020              /* Big endian signed 16 */
+#define AOUT_FMT_S8          0x00000040
+#define AOUT_FMT_U16_LE      0x00000080                 /* Little endian U16 */
+#define AOUT_FMT_U16_BE      0x00000100                    /* Big endian U16 */
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+#define AOUT_FMT_S16_NE      AOUT_FMT_S16_LE
+#elif __BYTE_ORDER == __BIG_ENDIAN
+#define AOUT_FMT_S16_NE      AOUT_FMT_S16_BE
 #endif
 
 /*****************************************************************************

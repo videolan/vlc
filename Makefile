@@ -326,10 +326,10 @@ C_OBJ = $(interface_obj) \
 ifeq ($(ARCH),X86)
 ifeq ($(MMX), YES)
 ifeq ($(DECODER),new)
-ASM_OBJ = 			video_decoder/idctmmx.o \
+ASM_OBJ = 			video_decoder/vdec_idctmmx.o \
 						video_output/video_yuv_mmx.o
 else
-ASM_OBJ = 			video_decoder_ref/idctmmx.o \
+ASM_OBJ = 			video_decoder_ref/vdec_idctmmx.o \
 						video_output/video_yuv_mmx.o
 endif
 endif

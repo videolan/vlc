@@ -740,13 +740,13 @@ static int InitThread( adec_thread_t * p_adec )
     {
         intf_DbgMsg("adec debug: mode == mono\n");
         aout_fifo.i_type = AOUT_ADEC_MONO_FIFO;
-        aout_fifo.b_stereo = 0;
+        aout_fifo.i_channels = 1;
     }
     else
     {
         intf_DbgMsg("adec debug: mode == stereo\n");
         aout_fifo.i_type = AOUT_ADEC_STEREO_FIFO;
-        aout_fifo.b_stereo = 1;
+        aout_fifo.i_channels = 2;
     }
 
     /* Checking the sampling frequency */
