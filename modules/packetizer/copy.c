@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.9 2003/05/03 01:12:13 fenrir Exp $
+ * $Id: copy.c,v 1.10 2003/05/16 23:02:37 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -242,6 +242,10 @@ static int InitThread( packetizer_thread_t *p_pack )
             break;
         case VLC_FOURCC( 'S', 'V', 'Q', '1' ):
             p_pack->output_format.i_fourcc = VLC_FOURCC( 'S', 'V', 'Q', '1' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'S', 'V', 'Q', '3' );
             p_pack->output_format.i_cat = VIDEO_ES;
             break;
 

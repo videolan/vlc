@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.15 2003/05/04 18:51:34 fenrir Exp $
+ * $Id: transcode.c,v 1.16 2003/05/16 23:02:37 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -310,6 +310,7 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
 
     id = malloc( sizeof( sout_stream_id_t ) );
     id->i_dts = 0;
+    id->id = NULL;
     if( p_fmt->i_cat == AUDIO_ES && p_sys->i_acodec != 0 )
     {
         msg_Dbg( p_stream,
@@ -405,7 +406,7 @@ static int     Del      ( sout_stream_t *p_stream, sout_stream_id_t *id )
         }
     }
 
-    p_sys->p_out->pf_del( p_sys->p_out, id->id );
+    if( id->id ) p_sys->p_out->pf_del( p_sys->p_out, id->id );
     free( id );
 
     return VLC_SUCCESS;
@@ -476,6 +477,7 @@ static struct
     { VLC_FOURCC( 'm', 'j', 'p', 'b' ), CODEC_ID_MJPEGB },
     { VLC_FOURCC( 'd', 'v', 's', 'l' ), CODEC_ID_DVVIDEO },
     { VLC_FOURCC( 'S', 'V', 'Q', '1' ), CODEC_ID_SVQ1 },
+    { VLC_FOURCC( 'S', 'V', 'Q', '3' ), CODEC_ID_SVQ3 },
 
     /* raw video code, only used for 'encoding' */
     { VLC_FOURCC( 'I', '4', '2', '0' ), CODEC_ID_RAWVIDEO },
