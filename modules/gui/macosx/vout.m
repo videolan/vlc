@@ -416,37 +416,45 @@
 
 - (void)updateTitle
 {
-    NSMutableString * o_title;
-    playlist_t * p_playlist;
+    NSMutableString * o_title,* o_mrl;
+    vlc_bool_t b_file = VLC_FALSE;
+    input_thread_t * p_input;
     
     if( p_vout == NULL )
     {
         return;
     }
     
-    p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
+    p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT,
+                                                FIND_PARENT );
     
-    if( p_playlist == NULL )
+    if( p_input == NULL )
     {
         return;
     }
 
-    vlc_mutex_lock( &p_playlist->object_lock );
-    o_title = [NSMutableString stringWithUTF8String: 
-        p_playlist->status.p_item->input.psz_uri]; 
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    vlc_object_release( p_playlist );
+    if( ! strcmp( p_input->input.p_access->p_module->psz_shortname, "File" ) )
+        b_file = VLC_TRUE;
+    if( p_input->input.p_item->psz_name != NULL )
+        o_title = [NSMutableString stringWithUTF8String:
+            p_input->input.p_item->psz_name];
+    if( p_input->input.p_item->psz_uri != NULL )
+        o_mrl = [NSMutableString stringWithUTF8String:
+            p_input->input.p_item->psz_uri];
+    if( o_title == nil )
+        o_title = o_mrl;
 
-    if( o_title != nil )
+    vlc_object_release( p_input );
+    if( o_mrl != nil )
     {
-        NSRange prefix_range = [o_title rangeOfString: @"file:"];
-        if( prefix_range.location != NSNotFound )
+        if( b_file == VLC_TRUE )
         {
-            [o_title deleteCharactersInRange: prefix_range];
-            [self setTitleWithRepresentedFilename: o_title];
+            NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
+            if( prefix_range.location != NSNotFound )
+                [o_mrl deleteCharactersInRange: prefix_range];
+            [self setRepresentedFilename: o_mrl];
         }
-            [self setTitle: o_title];
+        [self setTitle: o_title];
     }
     else
     {
