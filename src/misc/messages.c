@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: messages.c,v 1.38 2004/01/06 12:02:06 zorglub Exp $
+ * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -491,6 +491,11 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
         case VLC_OBJECT_VOUT: psz_object = "video output"; break;
         case VLC_OBJECT_AOUT: psz_object = "audio output"; break;
         case VLC_OBJECT_SOUT: psz_object = "stream output"; break;
+        case VLC_OBJECT_HTTPD: psz_object = "http daemon"; break;
+        case VLC_OBJECT_DIALOGS: psz_object = "dialogs provider"; break;
+        case VLC_OBJECT_VLM: psz_object = "vlm"; break;
+        case VLC_OBJECT_ANNOUNCE: psz_object = "announce handler"; break;
+        case VLC_OBJECT_DEMUX: psz_object = "demuxer"; break;
     }
 
 #ifdef UNDER_CE
