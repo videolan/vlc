@@ -2,7 +2,7 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.3 2001/06/25 11:34:08 sam Exp $
+ * $Id: ioctl.c,v 1.4 2001/07/19 11:50:50 massiot Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -167,6 +167,16 @@ int ioctl_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
 
         *pi_copyright = p_buffer[ 4 ];
     }
+
+#elif defined( __QNXNTO__ )
+    /*
+        QNX RTOS currently doesn't have a CAM
+        interface (they're working on it though).
+        Assume DVD is not encrypted.
+    */
+
+    *pi_copyright = 0;
+    i_ret = 0;
 
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */

@@ -63,6 +63,7 @@ HEAD
   * Kludged so that times displayed in the scrollbar are finally correct
     for MPEG-2 streams.
   * FreeBSD compilation fix by Øyvind Kolbu.
+  * QNX RTOS plug-in by Jon Lech Johansen.
 
 0.2.80
 Tue,  5 Jun 2001 04:41:06 +0200
