@@ -61,7 +61,7 @@ int Import_B4S( vlc_object_t *p_this )
     psz_ext = strrchr ( p_demux->psz_path, '.' );
 
     if( ( psz_ext && !strcasecmp( psz_ext, ".b4s") ) ||
-        ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "b4s") ) )
+        ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "b4s-open") ) )
     {
         ;
     }
