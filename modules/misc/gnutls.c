@@ -36,11 +36,12 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
+#include <errno.h>
 #include <vlc/vlc.h>
 
 #include "vlc_tls.h"
 
-
+#include <gcrypt.h>
 #include <gnutls/gnutls.h>
 
 #define DH_BITS 1024
@@ -383,6 +384,56 @@ gnutls_ServerCreate( tls_t *p_this, const char *psz_cert_path,
 }
 
 
+/*
+ * gcrypt thread option VLC implementation
+ */
+vlc_object_t *__p_gcry_data;
+
+static int gcry_vlc_mutex_init (void **p_sys)
+{
+    int i_val;
+    vlc_mutex_t *p_lock = (vlc_mutex_t *)malloc (sizeof (vlc_mutex_t));
+
+    if( p_lock == NULL)
+        return ENOMEM;
+
+    i_val = vlc_mutex_init( __p_gcry_data, p_lock);
+    if (i_val)
+        free (p_lock);
+    else
+        *p_sys = p_lock;
+    return i_val;
+}
+
+static int gcry_vlc_mutex_destroy (void **p_sys)
+{
+    int i_val;
+    vlc_mutex_t *p_lock = (vlc_mutex_t *)*p_sys;
+
+    i_val = vlc_mutex_destroy (p_lock);
+    free (p_lock);
+    return i_val;
+}
+
+static int gcry_vlc_mutex_lock (void **p_sys)
+{
+    return vlc_mutex_lock ((vlc_mutex_t *)*p_sys);
+}
+
+static int gcry_vlc_mutex_unlock (void **lock)
+{
+    return vlc_mutex_unlock ((vlc_mutex_t *)*lock);
+}
+
+static struct gcry_thread_cbs gcry_threads_vlc =                        
+{
+    GCRY_THREAD_OPTION_USER,
+    NULL,
+    gcry_vlc_mutex_init,
+    gcry_vlc_mutex_destroy,
+    gcry_vlc_mutex_lock,
+    gcry_vlc_mutex_unlock
+};
 
 
 static int
@@ -403,6 +454,9 @@ Open( vlc_object_t *p_this )
     /* FIXME: should check version number */
     if( count.i_int == 0)
     {
+        __p_gcry_data = p_this;
+
+        gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_vlc);
         if( gnutls_global_init( ) )
         {
             msg_Warn( p_this, "cannot initialize GNUTLS" );
