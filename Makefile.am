@@ -746,13 +746,20 @@ package-win32-base:
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/admin"
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/vlm"
 	cp $(srcdir)/share/http/*.html $(top_builddir)/vlc-${VERSION}/http/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.html ;
 	cp $(srcdir)/share/http/*.css $(top_builddir)/vlc-${VERSION}/http/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.css ;
+	cp $(srcdir)/share/http/*.png $(top_builddir)/vlc-${VERSION}/http/
+	cp $(srcdir)/share/http/*.ico $(top_builddir)/vlc-${VERSION}/http/ ;
 	cp $(srcdir)/share/http/admin/*.html \
            $(top_builddir)/vlc-${VERSION}/http/admin/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/admin/*.html ;
 	cp $(srcdir)/share/http/admin/.access \
            $(top_builddir)/vlc-${VERSION}/http/admin/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/admin/.access ;
 	cp $(srcdir)/share/http/vlm/*.html \
            $(top_builddir)/vlc-${VERSION}/http/vlm/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/vlm/*.html ;
 
 	cp $(srcdir)/share/vlc48x48.ico $(top_builddir)/vlc-${VERSION}/ ;
 
