@@ -472,6 +472,11 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
     /* Register preset bands (for intf) if : */
     /* We have no bands info --> the preset info must be given to the intf */
     /* or The bands info matches the preset */
+    if (p_sys->psz_newbands == NULL)
+    {
+        msg_Err(p_filter, "No preset selected");
+        return (VLC_EGENERIC);
+    }
     if( ( *(val2.psz_string) &&
         strstr( p_sys->psz_newbands, val2.psz_string ) ) || !*val2.psz_string )
     {
@@ -668,7 +673,7 @@ static int BandsCallback( vlc_object_t *p_this, char const *psz_cmd,
             p_sys->f_amp[i] = EqzConvertdB( f );
 
             if( !*p ) break; /* end of line */
-            p++;
+            p=p_next+1;
         }
     }
 
