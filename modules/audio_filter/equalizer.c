@@ -658,7 +658,11 @@ static int BandsCallback( vlc_object_t *p_this, char const *psz_cmd,
         for( i = 0; i < p_sys->i_band; i++ )
         {
             /* Read dB -20/20 */
+#ifdef HAVE_STRTOF
             float f = strtof( p, &p_next );
+#else
+            float f = (float) strtod( p, &p_next );
+#endif
             if( !p_next || p_next == p ) break; /* strtof() failed */
 
             p_sys->f_amp[i] = EqzConvertdB( f );

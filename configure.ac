@@ -120,7 +120,7 @@ case "${target_os}" in
     OBJCFLAGS_save="${OBJCFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; OBJCFLAGS="${OBJCFLAGS_save}"
     VLC_ADD_LDFLAGS([vlc ffmpeg],[-all_load])
     VLC_ADD_LDFLAGS([mp4], [-framework IOKit -framework CoreFoundation])
-    VLC_ADD_CFLAGS([vlc],[-x objective-c])
+    VLC_ADD_CFLAGS([libvlc],[-x objective-c])
     VLC_ADD_LDFLAGS([vlc],[-Wl,-multiply_defined,suppress])
     ;;
   *mingw32* | *cygwin*)
@@ -285,7 +285,7 @@ CPPFLAGS_save="${CPPFLAGS_save} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcd
 dnl Check for system libs needed
 need_libc=false
 
-AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf asprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2 if_nametoindex atoll getenv putenv setenv gmtime_r ctime_r localtime_r lrintf)
+AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol strtof isatty vasprintf asprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2 if_nametoindex atoll getenv putenv setenv gmtime_r ctime_r localtime_r lrintf)
 
 dnl Check for usual libc functions
 AC_CHECK_FUNCS(strdup strndup atof lseek)
