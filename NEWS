@@ -1,9 +1,10 @@
-$Id: NEWS,v 1.79 2004/01/17 13:47:57 sigmunau Exp $
+$Id: NEWS,v 1.80 2004/01/23 11:54:48 rocky Exp $
 Changes between 0.7.0 and 0.7.1:
 ---------------------------------
 
 Core support:
  * Fixed a nasty bug that causes preferences not to be saved some times.
+ * SVCD (Philips OGT) and CVD subtitles 
 
 Playlist:
  * Internal improvments
