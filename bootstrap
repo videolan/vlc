@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for the VLC media player
-##  $Id: bootstrap,v 1.62 2003/07/03 11:23:09 sam Exp $
+##  $Id: bootstrap,v 1.63 2003/07/04 13:53:06 sam Exp $
 ##
 ##  Authors: Sam Hocevar <sam@zoy.org>
 
@@ -129,12 +129,31 @@ all: all-${mod}
 
 all-${mod}:
 if BUILD_MOZILLA
-	@if test "\$(plugin)" != "no" && \$(VLC_CONFIG) --target plugin | grep "${dir}/lib${mod}_plugin" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}_plugin\$(LIBEXT); fi; \\
-	if test "\$(builtin)" != "no" && \$(VLC_CONFIG) --target builtin | grep "${dir}/lib${mod}\\.a" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}.a; fi; \\
-	if test "\$(pic)" != "no" && \$(VLC_CONFIG) --target builtin pic | grep "${dir}/lib${mod}_pic\\.a" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}_pic.a; fi
+	@set fnord \$\$MAKEFLAGS; amf=\$\$2; \\
+	if test "\$(plugin)" != "no" \\
+	    && \$(VLC_CONFIG) --target plugin | grep "${dir}/lib${mod}_plugin" >/dev/null 2>&1; then \\
+	  \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}_plugin\$(LIBEXT) || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \\
+	fi; \\
+	if test "\$(builtin)" != "no" \\
+	    && \$(VLC_CONFIG) --target builtin | grep "${dir}/lib${mod}\\.a" >/dev/null 2>&1; then \\
+	  \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}.a || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \\
+	fi; \\
+	if test "\$(pic)" != "no" \\
+	    && \$(VLC_CONFIG) --target builtin pic | grep "${dir}/lib${mod}_pic\\.a" >/dev/null 2>&1; then \\
+	  \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}_pic.a || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \\
+	fi; \\
+	test -z "\$\$fail"
 else
-	@if test "\$(plugin)" != "no" && \$(VLC_CONFIG) --target plugin | grep "${dir}/lib${mod}_plugin" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}_plugin\$(LIBEXT); fi; \\
-	if test "\$(builtin)" != "no" && \$(VLC_CONFIG) --target builtin | grep "${dir}/lib${mod}\\.a" >/dev/null 2>&1 ; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}.a; fi
+	@set fnord \$\$MAKEFLAGS; amf=\$\$2; \\
+	if test "\$(plugin)" != "no" \\
+	    && \$(VLC_CONFIG) --target plugin | grep "${dir}/lib${mod}_plugin" >/dev/null 2>&1; then \\
+	  \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}_plugin\$(LIBEXT) || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \\
+	fi; \\
+	if test "\$(builtin)" != "no" \\
+	    && \$(VLC_CONFIG) --target builtin | grep "${dir}/lib${mod}\\.a" >/dev/null 2>&1; then \\
+	  \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}.a || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \\
+	fi; \\
+	test -z "\$\$fail"
 endif
 
 if UNTRUE
