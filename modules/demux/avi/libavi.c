@@ -2,7 +2,7 @@
  * libavi.c : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.2 2002/10/26 19:14:45 fenrir Exp $
+ * $Id: libavi.c,v 1.3 2002/10/27 15:37:16 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -109,14 +109,33 @@ int AVI_SeekAbsolute( input_thread_t *p_input,
     }
     else
     {
-        int i_peek;
-        int i_skip = i_pos - i_filepos;
-        u8  *p_peek;
+        data_packet_t   *p_data;
+        int             i_skip = i_pos - i_filepos;
+        
         msg_Warn( p_input, "will skip %d bytes, slow", i_skip );
         if( i_skip < 0 )
         {
             return( 0 ); // failed
         }
+        while (i_skip > 0 )
+        {
+            int i_read;
+            
+            i_read = input_SplitBuffer( p_input, &p_data, 
+                                        __MIN( 4096, i_skip ) );
+            if( i_read < 0 )
+            {
+                return( 0 );
+            }
+            i_skip -= i_read;
+            
+            input_DeletePacket( p_input->p_method_data, p_data );
+            if( i_read == 0 && i_skip > 0 )
+            {
+                return( 0 );
+            }
+        }
+#if 0
         while( i_skip > 0 )
         {
             i_peek = input_Peek( p_input, &p_peek, i_skip+1 );
@@ -130,6 +149,7 @@ int AVI_SeekAbsolute( input_thread_t *p_input,
                 return( 0);
             }
         }
+#endif
         return( 1 );
     }
 }

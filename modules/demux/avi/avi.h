@@ -2,7 +2,7 @@
  * avi.h : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.h,v 1.4 2002/10/15 00:55:07 fenrir Exp $
+ * $Id: avi.h,v 1.5 2002/10/27 15:37:16 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define 	MAX_PACKETS_IN_FIFO 	2
+
+typedef struct avi_packet_s
+{
+    u32     i_fourcc;
+    off_t   i_pos;
+    u32     i_size;
+    u32     i_type;     // only for AVIFOURCC_LIST
+    
+    u8      i_peek[8];  //first 8 bytes
+
+    int     i_stream;
+    int     i_cat;
+} avi_packet_t;
+
 
 typedef struct AVIIndexEntry_s
 {
@@ -29,22 +42,14 @@ typedef struct AVIIndexEntry_s
     u32 i_pos;
     u32 i_length;
     u32 i_lengthtotal;
+
 } AVIIndexEntry_t;
 
-typedef struct AVIESBuffer_s
+typedef struct avi_stream_s
 {
-    struct AVIESBuffer_s *p_next;
-
-    pes_packet_t *p_pes;
-    int i_posc;
-    int i_posb;
-} AVIESBuffer_t;
-
-
-typedef struct AVIStreamInfo_s
-{
-    int i_cat;           /* AUDIO_ES, VIDEO_ES */
     int i_activated;
+
+    int i_cat;           /* AUDIO_ES, VIDEO_ES */
     vlc_fourcc_t    i_fourcc;
     vlc_fourcc_t    i_codec;
 
@@ -52,8 +57,8 @@ typedef struct AVIStreamInfo_s
     int             i_scale;
     int             i_samplesize;
     
-    es_descriptor_t     *p_es;   
-    int                 b_selected; /* newly selected */
+    es_descriptor_t     *p_es;
+
     AVIIndexEntry_t     *p_index;
     int                 i_idxnb;
     int                 i_idxmax; 
@@ -61,32 +66,23 @@ typedef struct AVIStreamInfo_s
     int                 i_idxposc;  /* numero of chunk */
     int                 i_idxposb;  /* byte in the current chunk */
 
-    /* add some buffering */
-    AVIESBuffer_t       *p_pes_first;
-    AVIESBuffer_t       *p_pes_last;
-    int                 i_pes_count;
-    int                 i_pes_totalsize;
-} AVIStreamInfo_t;
+} avi_stream_t;
 
 struct demux_sys_t
 {
     mtime_t i_time;
     mtime_t i_length;
     mtime_t i_pcr; 
-    int     i_rate;
-    riffchunk_t *p_movi;
 
     int     b_seekable;
     avi_chunk_t ck_root;
     
-    /* Info extrated from avih */
-
+    off_t   i_movi_begin;
+    off_t   i_movi_lastchunk_pos; /* XXX position of last valid chunk */
+    
     /* number of stream and informations*/
     int i_streams;
-    AVIStreamInfo_t   **pp_info; 
+    avi_stream_t  **pp_info; 
 
-    /* current audio and video es */
-    AVIStreamInfo_t *p_info_video;
-    AVIStreamInfo_t *p_info_audio;
 };
 
