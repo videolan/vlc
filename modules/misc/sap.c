@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.22 2003/09/11 15:34:16 zorglub Exp $
+ * $Id: sap.c,v 1.23 2003/09/15 08:33:29 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -590,6 +590,14 @@ static int parse_sap( char *p_packet )
     //Looks for the first '\0' byte after length
     for(;p_packet[i_hlen]!='\0'; i_hlen++);
 
+    if( i_hlen > 50 ) /* Definitely too long...
+                         Maybe we have a fucked up packet without  \0 */
+    {   /* As a workaround, we search for "v=" */
+        i_hlen = 4;
+        for(;p_packet[i_hlen] != 'v' && p_packet[i_hlen+1] != '=' ; i_hlen++);
+        return i_hlen-1;
+    }
+     
     return(i_hlen);
 }
 
