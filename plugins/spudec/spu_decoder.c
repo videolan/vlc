@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.28 2002/06/05 18:18:49 stef Exp $
+ * $Id: spu_decoder.c,v 1.29 2002/06/27 19:46:32 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -378,7 +378,7 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
     u8  i_command;
     int i_date;
 
-    int i;
+    int i, pi_alpha[4];
 
     /* XXX: temporary variables */
     vlc_bool_t b_force_display = 0;
@@ -444,9 +444,16 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                                         p_demux_data + sizeof(int)))[
                                           GetBits(&p_spudec->bit_stream, 4) ];
 
+                            /* FIXME: this job should be done sooner */
+#ifndef WORDS_BIGENDIAN
                             p_spu->p_sys->pi_yuv[3-i][0] = (i_color>>16) & 0xff;
                             p_spu->p_sys->pi_yuv[3-i][1] = (i_color>>0) & 0xff;
                             p_spu->p_sys->pi_yuv[3-i][2] = (i_color>>8) & 0xff;
+#else
+                            p_spu->p_sys->pi_yuv[3-i][0] = (i_color>>8) & 0xff;
+                            p_spu->p_sys->pi_yuv[3-i][1] = (i_color>>24) & 0xff;
+                            p_spu->p_sys->pi_yuv[3-i][2] = (i_color>>16) & 0xff;
+#endif
                         }
                     }
                     else
@@ -460,11 +467,26 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                 case SPU_CMD_SET_ALPHACHANNEL:
  
                     /* 04xxxx (alpha channel) */
-                    for( i = 0; i < 4 ; i++ )
+                    pi_alpha[3] = GetBits( &p_spudec->bit_stream, 4 );
+                    pi_alpha[2] = GetBits( &p_spudec->bit_stream, 4 );
+                    pi_alpha[1] = GetBits( &p_spudec->bit_stream, 4 );
+                    pi_alpha[0] = GetBits( &p_spudec->bit_stream, 4 );
+
+                    /* Ignore blank alpha palette. Sometimes spurious blank
+                     * alpha palettes are present - dunno why. */
+                    if( pi_alpha[0] | pi_alpha[1] | pi_alpha[2] | pi_alpha[3] )
                     {
-                        p_spu->p_sys->pi_alpha[3-i]
-                                       = GetBits( &p_spudec->bit_stream, 4 );
+                        p_spu->p_sys->pi_alpha[0] = pi_alpha[0];
+                        p_spu->p_sys->pi_alpha[1] = pi_alpha[1];
+                        p_spu->p_sys->pi_alpha[2] = pi_alpha[2];
+                        p_spu->p_sys->pi_alpha[3] = pi_alpha[3];
                     }
+                    else
+                    {
+                        msg_Warn( p_spudec->p_fifo,
+                                  "ignoring blank alpha palette" );
+                    }
+
                     i_index += 2;
  
                     break;
@@ -827,10 +849,11 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
     u16  p_clut16[4];
     u32  p_clut32[4];
     u8  *p_dest;
+    u8  *p_destptr = (u8 *)p_dest;
     u16 *p_source = (u16 *)p_spu->p_sys->p_data;
 
     int i_x, i_y;
-    int i_len, i_color;
+    int i_len, i_color, i_colprecomp, i_destalpha;
     u8  i_cnt;
 
     /* RGB-specific */
@@ -856,28 +879,37 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
         {
             /* Get the RLE part, then draw the line */
             i_color = *p_source & 0x3;
+            i_len = *p_source++ >> 2;
 
             switch( p_spu->p_sys->pi_alpha[ i_color ] )
             {
                 case 0x00:
-                    i_x -= *p_source++ >> 2;
                     break;
 
                 case 0x0f:
-                    i_len = *p_source++ >> 2;
                     memset( p_dest - i_x - i_y,
                             p_spu->p_sys->pi_yuv[i_color][0], i_len );
-                    i_x -= i_len;
                     break;
 
                 default:
-                    /* FIXME: we should do transparency */
-                    i_len = *p_source++ >> 2;
-                    memset( p_dest - i_x - i_y,
-                            p_spu->p_sys->pi_yuv[i_color][0], i_len );
-                    i_x -= i_len;
+                    /* To be able to divide by 16 (>>4) we add 1 to the alpha.
+                     * This means Alpha 0 won't be completely transparent, but
+                     * that's handled in a special case above anyway. */
+                    i_colprecomp = p_spu->p_sys->pi_yuv[i_color][0]
+                                    * (p_spu->p_sys->pi_alpha[ i_color ] + 1);
+                    i_destalpha = 15 - p_spu->p_sys->pi_alpha[ i_color ];
+
+                    for ( p_destptr = p_dest - i_x - i_y;
+                          p_destptr < p_dest - i_x - i_y + i_len;
+                          p_destptr++ )
+                    {
+                        *p_destptr = ( i_colprecomp +
+                                        *p_destptr * i_destalpha ) >> 4;
+                    }
                     break;
+
             }
+            i_x -= i_len;
         }
     }
 
