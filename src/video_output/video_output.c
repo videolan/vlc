@@ -930,6 +930,10 @@ static int InitThread( vout_thread_t *p_vout )
     /* Mark thread as running and return */
     p_vout->b_active =          1;
     *p_vout->pi_status =        THREAD_READY;
+    /* cheats the clock so that the display come as soon as the thread is run */
+    p_vout->last_display_date = mdate()-5000000;
+
+    
     intf_DbgMsg("thread ready\n");
     return( 0 );
 }
@@ -1297,7 +1301,7 @@ void Print( vout_thread_t *p_vout, int i_x, int i_y, int i_h_align, int i_v_alig
                     i_y * p_vout->i_bytes_per_line + i_x * p_vout->i_bytes_per_pixel,
                     p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
                     p_vout->i_white_pixel, 0, 0,
-                    0, psz_text );
+                    0, psz_text, 100 );
     }
 }
 
@@ -1743,25 +1747,42 @@ static int RenderIdle( vout_thread_t *p_vout )
     int         i_x = 0, i_y = 0;                           /* text position */
     int         i_width, i_height;                              /* text size */
     mtime_t     current_date;                                /* current date */
-    const char *psz_text = "waiting for stream ...";      /* text to display */
+    int         i_amount = 0;                             /*  amount to draw */
+    char *psz_text =    "Waiting for stream";            /* text to display */
+    char *psz_wtext =   "[................]";
+
+
+    memset( p_vout->p_buffer[ p_vout->i_buffer_index ].p_data,
+                    p_vout->i_bytes_per_line * p_vout->i_height, 12);
 
 
     current_date = mdate();
-    if( (current_date - p_vout->last_display_date) > VOUT_IDLE_DELAY &&
-        (current_date - p_vout->last_idle_date) > VOUT_IDLE_DELAY )
+    if( (current_date - p_vout->last_display_date) > VOUT_IDLE_DELAY 
+//            && (current_date - p_vout->last_idle_date) > VOUT_IDLE_DELAY 
+    )
     {
         SetBufferPicture( p_vout, NULL );
         vout_TextSize( p_vout->p_large_font, WIDE_TEXT | OUTLINED_TEXT, psz_text,
                        &i_width, &i_height );
         if( !Align( p_vout, &i_x, &i_y, i_width, i_height, CENTER_RALIGN, CENTER_RALIGN ) )
         {
+            i_amount = (int) ((current_date - p_vout->last_display_date- VOUT_IDLE_DELAY) / 5000LL);            
             vout_Print( p_vout->p_large_font,
                         p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
                         i_x * p_vout->i_bytes_per_pixel + i_y * p_vout->i_bytes_per_line,
                         p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
                         p_vout->i_white_pixel, p_vout->i_gray_pixel, 0,
-                        WIDE_TEXT | OUTLINED_TEXT, psz_text );
-            SetBufferArea( p_vout, i_x, i_y, i_width, i_height );
+                        WIDE_TEXT | OUTLINED_TEXT, psz_text,  i_amount );
+
+            vout_Print( p_vout->p_large_font,
+                    p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
+                    i_x * p_vout->i_bytes_per_pixel + (i_y + 16) * p_vout->i_bytes_per_line,
+                    p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
+                    p_vout->i_white_pixel, p_vout->i_gray_pixel, 0,
+                    WIDE_TEXT | OUTLINED_TEXT, psz_wtext,  (i_amount/2)%110 );
+            
+
+            SetBufferArea( p_vout, i_x, i_y, i_width, i_height + 16 );
         }
         return( 1 );
     }
@@ -1862,7 +1883,7 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
                             p_subpic->type.text.i_char_color,
                             p_subpic->type.text.i_border_color,
                             p_subpic->type.text.i_bg_color,
-                            p_subpic->type.text.i_style, p_subpic->p_data );
+                            p_subpic->type.text.i_style, p_subpic->p_data, 100 );
                 SetBufferArea( p_vout, p_subpic->i_x, p_subpic->i_y,
                                i_width, i_height );
             }
@@ -1913,7 +1934,7 @@ static void RenderInterface( vout_thread_t *p_vout )
                     (p_vout->i_height - i_height) * p_vout->i_bytes_per_line,
                     p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
                     p_vout->i_white_pixel, p_vout->i_black_pixel, 0,
-                    OUTLINED_TEXT, psz_text_1 );
+                    OUTLINED_TEXT, psz_text_1, 100 );
     }
     if( i_width_2 < p_vout->i_width )
     {
@@ -1921,7 +1942,7 @@ static void RenderInterface( vout_thread_t *p_vout )
                     (p_vout->i_height - i_height + i_text_height) * p_vout->i_bytes_per_line,
                     p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
                     p_vout->i_white_pixel, p_vout->i_black_pixel, 0,
-                    OUTLINED_TEXT, psz_text_2 );
+                    OUTLINED_TEXT, psz_text_2, 100 );
     }
 
     /* Activate modified area */

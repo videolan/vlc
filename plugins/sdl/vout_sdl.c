@@ -161,6 +161,7 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
         /* Change display frame */
         if( p_vout->p_sys->b_must_acquire )
         {
+            
             SDL_Flip( p_vout->p_sys->p_display );
         }
         /* Swap buffers and change write frame */
@@ -212,6 +213,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
             p_vout->i_height, 
             15, 
             SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN );
+        
     } else {
         p_vout->p_sys->p_display = SDL_SetVideoMode(p_vout->i_width, 
             p_vout->i_height, 

@@ -42,6 +42,7 @@
 #include "video.h"
 #include "video_output.h"
 
+
 #include "interface.h"
 #include "intf_msg.h"
 #include "keystrokes.h"
@@ -54,13 +55,23 @@
 typedef struct intf_sys_s
 {
     /* SDL system information */
-    SDL_Surface	*		p_display;                                /* display */
-	
+    SDL_Surface * p_display;
+    int isFullscreen;	
 } intf_sys_t;
+
+typedef struct vout_sys_s
+{
+    SDL_Surface *   p_display;                             /* display device */
+    Uint8   *   p_buffer[2];
+                                                     /* Buffers informations */
+    boolean_t   b_must_acquire;           /* must be acquired before writing */
+}   vout_sys_t;
+
 
 /* local prototype */
 void    intf_SDL_Keymap( intf_thread_t * p_intf );
-    
+void intf_SDL_Fullscreen(intf_thread_t * p_intf);
+   
 
 /*****************************************************************************
  * intf_SDLCreate: initialize and create SDL interface
@@ -137,32 +148,103 @@ void intf_SDLManage( intf_thread_t *p_intf )
     
     while ( SDL_PollEvent(&event) ) 
     {
-        i_key = event.key.keysym.sym;                  /* forward it */
+        i_key = event.key.keysym.sym;                          /* forward it */
         
         switch (event.type) {           
             case SDL_KEYDOWN:                         /* if a key is pressed */
-                if( intf_ProcessKey( p_intf, (char ) i_key ) )
-                {
-                    intf_DbgMsg( "unhandled key '%c' (%i)\n", 
-                                 (char) i_key, i_key );
+                switch(i_key) {
+                                                    /* switch to fullscreen  */
+                    case SDLK_f:
+                        intf_SDL_Fullscreen(p_intf);
+                        break;
+                       
+                  default :
+                        if( intf_ProcessKey( p_intf, (char ) i_key ) )
+                        {
+                            intf_DbgMsg( "unhandled key '%c' (%i)\n", 
+                                         (char) i_key, i_key );
+                        }
+                        break;
                 }
                 break;
+                
             case SDL_QUIT:
                 intf_ProcessKey( p_intf, INTF_KEY_QUIT ); 
                 break;
-            default:
+           default:
                 break;
         }
     }
 }
 
+void intf_SDL_Fullscreen(intf_thread_t * p_intf)
+{
+    SDL_FreeSurface( p_intf->p_vout->p_sys->p_display );
+    
+    if(p_intf->p_sys->isFullscreen == 1)
+    {
+        p_intf->p_vout->p_sys->p_display = 
+                SDL_SetVideoMode(
+                                 p_intf->p_vout->i_width,
+                                 p_intf->p_vout->i_height,
+                                 15,
+                                 SDL_ANYFORMAT |
+                                 SDL_HWSURFACE |
+                                 SDL_DOUBLEBUF);
+        p_intf->p_sys->isFullscreen = 0;
+    }
+    else
+    {
+        p_intf->p_vout->p_sys->p_display = 
+                SDL_SetVideoMode(
+                                 p_intf->p_vout->i_width,
+                                 p_intf->p_vout->i_height,
+                                 15,
+                                 SDL_ANYFORMAT |
+                                 SDL_HWSURFACE |
+                                 SDL_DOUBLEBUF |
+                                 SDL_FULLSCREEN );
+        p_intf->p_sys->isFullscreen = 1;                        
+    }
+    SDL_EventState(SDL_KEYUP , SDL_IGNORE);
+    p_intf->p_vout->p_sys->p_buffer[ 0 ] = p_intf->p_vout->p_sys->p_display->pixels;
+    
+    SDL_Flip(p_intf->p_vout->p_sys->p_display);
+    p_intf->p_vout->p_sys->p_buffer[ 1 ] = p_intf->p_vout->p_sys->p_display->pixels;
+    
+    SDL_Flip(p_intf->p_vout->p_sys->p_display);
+    SDL_SetClipping(p_intf->p_vout->p_sys->p_display, 0, 0,
+            p_intf->p_vout->p_sys->p_display->w,
+            p_intf->p_vout->p_sys->p_display->h );
+    
+    p_intf->p_vout->i_width =           p_intf->p_vout->p_sys->p_display->w;
+    p_intf->p_vout->i_height =          p_intf->p_vout->p_sys->p_display->h;
+
+    p_intf->p_vout->i_bytes_per_line = 
+        p_intf->p_vout->p_sys->p_display->format->BytesPerPixel 
+        * 
+        p_intf->p_vout->p_sys->p_display->w ;
+
+    p_intf->p_vout->i_screen_depth =    
+        p_intf->p_vout->p_sys->p_display->format->BitsPerPixel;
+    p_intf->p_vout->i_bytes_per_pixel = 
+        p_intf->p_vout->p_sys->p_display->format->BytesPerPixel;
+    p_intf->p_vout->i_red_mask =        
+        p_intf->p_vout->p_sys->p_display->format->Rmask;
+    p_intf->p_vout->i_green_mask =      
+        p_intf->p_vout->p_sys->p_display->format->Gmask;
+    p_intf->p_vout->i_blue_mask =       
+        p_intf->p_vout->p_sys->p_display->format->Bmask;
+} 
+    
+
 
 
 void intf_SDL_Keymap(intf_thread_t * p_intf )
 {
-    p_intf->p_intf_get_key = intf_GetKey; 
-    intf_AssignKey(p_intf, SDLK_q,      INTF_KEY_QUIT, NULL);
-    intf_AssignKey(p_intf, SDLK_ESCAPE, INTF_KEY_QUIT, NULL);
+    //p_intf->p_intf_getKey = intf_getKey; 
+    intf_AssignKey(p_intf, SDLK_q,      INTF_KEY_QUIT, 0);
+    intf_AssignKey(p_intf, SDLK_ESCAPE, INTF_KEY_QUIT, 0);
     /* intf_AssignKey(p_intf,3,'Q'); */
     intf_AssignKey(p_intf, SDLK_0,      INTF_KEY_SET_CHANNEL,0);
     intf_AssignKey(p_intf, SDLK_1,      INTF_KEY_SET_CHANNEL,1);
@@ -174,16 +256,16 @@ void intf_SDL_Keymap(intf_thread_t * p_intf )
     intf_AssignKey(p_intf, SDLK_7,      INTF_KEY_SET_CHANNEL,7);
     intf_AssignKey(p_intf, SDLK_8,      INTF_KEY_SET_CHANNEL,8);
     intf_AssignKey(p_intf, SDLK_9,      INTF_KEY_SET_CHANNEL,9);
-    intf_AssignKey(p_intf, SDLK_PLUS,   INTF_KEY_INC_VOLUME, NULL);
-    intf_AssignKey(p_intf, SDLK_MINUS,  INTF_KEY_DEC_VOLUME, NULL);
-    intf_AssignKey(p_intf, SDLK_m,      INTF_KEY_TOGGLE_VOLUME, NULL);
+    intf_AssignKey(p_intf, SDLK_PLUS,   INTF_KEY_INC_VOLUME, 0);
+    intf_AssignKey(p_intf, SDLK_MINUS,  INTF_KEY_DEC_VOLUME, 0);
+    intf_AssignKey(p_intf, SDLK_m,      INTF_KEY_TOGGLE_VOLUME, 0);
     /* intf_AssignKey(p_intf,'M','M'); */
-    intf_AssignSKey(p_intf, SDLK_g,      INTF_KEY_DEC_GAMMA, NULL);
+    intf_AssignKey(p_intf, SDLK_g,      INTF_KEY_DEC_GAMMA, 0);
     /* intf_AssignKey(p_intf,'G','G'); */
-    intf_AssignSKey(p_intf, SDLK_c,      INTF_KEY_TOGGLE_GRAYSCALE, NULL);
-    intf_AssignSKey(p_intf, SDLK_SPACE,  INTF_KEY_TOGGLE_INTERFACE, NULL);
-    intf_AssignSKey(p_intf, 'i',         INTF_KEY_TOGGLE_INFO, NULL);
-    intf_AssignSKey(p_intf, SDLK_s,      INTF_KEY_TOGGLE_SCALING, NULL);
+    intf_AssignKey(p_intf, SDLK_c,      INTF_KEY_TOGGLE_GRAYSCALE, 0);
+    intf_AssignKey(p_intf, SDLK_SPACE,  INTF_KEY_TOGGLE_INTERFACE, 0);
+    intf_AssignKey(p_intf, 'i',         INTF_KEY_TOGGLE_INFO, 0);
+    intf_AssignKey(p_intf, SDLK_s,      INTF_KEY_TOGGLE_SCALING, 0);
 
 }
 

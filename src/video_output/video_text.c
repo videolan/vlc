@@ -359,7 +359,7 @@ void vout_TextSize( vout_font_t *p_font, int i_style, const char *psz_text, int 
  * previously loaded bitmap font.
  *****************************************************************************/
 void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int i_bytes_per_line,
-                 u32 i_char_color, u32 i_border_color, u32 i_bg_color, int i_style, const char *psz_text )
+                 u32 i_char_color, u32 i_border_color, u32 i_bg_color, int i_style, const char *psz_text, int i_percent)
 {
     byte_t      *p_char, *p_border;        /* character and border mask data */
     int         i_char_mask, i_border_mask, i_bg_mask;              /* masks */
@@ -367,6 +367,7 @@ void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int 
     int         i_byte;                         /* current byte in character */
     int         i_interspacing;                  /* offset between two chars */
     int         i_font_bytes_per_line, i_font_height;     /* font properties */
+    int         i_position, i_end;                      /* current position  */
     vout_put_byte_t *p_PutByte;                          /* PutByte function */
 
     /* FIXME: background: can be something else that whole byte ?? */
@@ -400,8 +401,14 @@ void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int 
                                                      p_font->i_interspacing * 2 :
                                                      p_font->i_interspacing);
 
+    /* compute where to stop... */
+    i_end = (int) (i_percent * strlen(psz_text) / 100LL);
+    if(i_end > strlen(psz_text))
+        i_end = strlen(psz_text);
+    
+    
     /* Print text */
-    for( ; *psz_text != '\0'; psz_text++ )
+    for( i_position = 0; i_position < i_end; i_position++ ,psz_text++ )
     {
         /* Check that the character is valid */
         if( (*psz_text >= p_font->i_first) && (*psz_text <= p_font->i_last) )
@@ -453,6 +460,7 @@ void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int 
 #endif
             }
         }
+    
     }
 }
 

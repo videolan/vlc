@@ -7,6 +7,14 @@
 #
 # Urgency values: Wishlist, Normal, Important, Critical
 
+Task: 0x39
+Difficulty: Medium
+Urgency: Wishlist
+Description: Rewrite the font display routines
+ The current font display routines aren't powerful enough. There
+ should be a way to display a big String at once, without needing
+ to compute the size of the string and its coordinates beforehand.
+
 Task: 0x38
 Difficulty: Medium
 Urgency: Important
@@ -28,9 +36,18 @@ Status: Done 27 Aug 2000 (Meuuh)
 Task: 0x36
 Difficulty: Medium
 Urgency: Normal
- Description: Finish the new keyboard input interface to support 
- interfaces that allow modifiers. This will allow the SDL to run 
- properly.
+ Description: 
+ . Finish the new keyboard input interface to support 
+   interfaces that allow modifiers. This will allow the SDL to run 
+   properly.
+ . Here are some details:
+   Allow any interface to have its own set of keys:
+    - allow the 'discovery' of the main interface of the binding 
+      created by each interface:
+       what key ("control-C", what action (INTF...))
+    - extend the interface by a specific struct (meta+modifier+ascii)
+    - implement an interface specific getKey function.
+
 Status: Todo
 
 Task: 0x35
