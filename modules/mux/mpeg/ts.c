@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.18 2003/05/14 11:15:50 fenrir Exp $
+ * $Id: ts.c,v 1.19 2003/05/31 00:10:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -260,6 +260,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 case VLC_FOURCC( 'D', 'I', 'V', '3' ):
                 case VLC_FOURCC( 'D', 'I', 'V', '2' ):
                 case VLC_FOURCC( 'D', 'I', 'V', '1' ):
+                case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
                     p_stream->i_stream_type = 0xa0; // private
                     p_stream->i_stream_id = 0xa0;   // beurk
                     break;

@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.24 2003/05/15 22:27:37 massiot Exp $
+ * $Id: ts.c,v 1.25 2003/05/31 00:10:11 fenrir Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -1532,9 +1532,7 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                 if( p_dr && p_dr->i_length >= 8 )
                 {
                     int i_bih_size;
-                    i_fourcc = (p_dr->p_data[0] << 24) |
-                        (p_dr->p_data[1] << 16) | (p_dr->p_data[2] <<  8) |
-                        p_dr->p_data[3];
+                    i_fourcc = VLC_FOURCC( p_dr->p_data[0], p_dr->p_data[1], p_dr->p_data[2], p_dr->p_data[3] );
 
                     i_bih_size = (p_dr->p_data[8] << 8) | p_dr->p_data[9];
                     i_size = sizeof( BITMAPINFOHEADER ) + i_bih_size;
