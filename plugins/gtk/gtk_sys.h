@@ -2,7 +2,7 @@
  * gtk_sys.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_sys.h,v 1.3 2001/03/07 10:31:10 stef Exp $
+ * $Id: gtk_sys.h,v 1.4 2001/03/08 13:32:55 octplane Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -43,6 +43,10 @@ typedef struct intf_sys_s
 
     /* intf_Manage callback timeout */
     int                 i_timeout;
+    int                 i_list_timeout;
+
+    /* Playlist selected item */
+    int                 i_playing;
 
     /* windows and widgets */
     GtkWidget *         p_window;                             /* main window */

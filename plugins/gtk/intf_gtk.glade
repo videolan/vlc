@@ -24,14 +24,14 @@
   <class>GtkWindow</class>
   <name>intf_window</name>
   <signal>
-    <name>destroy</name>
-    <handler>on_intf_window_destroy</handler>
-    <last_modification_time>Sun, 11 Feb 2001 17:41:57 GMT</last_modification_time>
-  </signal>
-  <signal>
     <name>drag_data_received</name>
     <handler>on_intf_window_drag_data_received</handler>
     <last_modification_time>Fri, 16 Feb 2001 01:59:35 GMT</last_modification_time>
+  </signal>
+  <signal>
+    <name>delete_event</name>
+    <handler>on_intf_window_destroy</handler>
+    <last_modification_time>Thu, 08 Mar 2001 10:33:41 GMT</last_modification_time>
   </signal>
   <title>VideoLAN Client</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
@@ -168,7 +168,6 @@
 	    <widget>
 	      <class>GtkMenuItem</class>
 	      <name>menubar_playlist</name>
-	      <sensitive>False</sensitive>
 	      <tooltip>Open the playlist window</tooltip>
 	      <signal>
 		<name>activate</name>
@@ -414,7 +413,6 @@
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
 	  <name>toolbar_playlist</name>
-	  <sensitive>False</sensitive>
 	  <tooltip>Open Playlist</tooltip>
 	  <signal>
 	    <name>clicked</name>
@@ -671,6 +669,18 @@
   <widget>
     <class>GtkMenuItem</class>
     <name>separator9</name>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>main_window_toggle</name>
+    <signal>
+      <name>activate</name>
+      <handler>on_main_window_toggle</handler>
+      <last_modification_time>Thu, 08 Mar 2001 10:37:08 GMT</last_modification_time>
+    </signal>
+    <label>show/hide main _window</label>
     <right_justify>False</right_justify>
   </widget>
 
@@ -1258,6 +1268,142 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
 	    <expand>True</expand>
 	    <fill>True</fill>
 	  </child>
+	</widget>
+      </widget>
+    </widget>
+  </widget>
+</widget>
+
+<widget>
+  <class>GtkWindow</class>
+  <name>intf_playlist</name>
+  <signal>
+    <name>delete_event</name>
+    <handler>on_intf_playlist_destroy_event</handler>
+    <last_modification_time>Thu, 08 Mar 2001 10:16:44 GMT</last_modification_time>
+  </signal>
+  <title>Playlist</title>
+  <type>GTK_WINDOW_DIALOG</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
+  <default_width>386</default_width>
+  <default_height>200</default_height>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>True</allow_grow>
+  <auto_shrink>False</auto_shrink>
+
+  <widget>
+    <class>GtkVBox</class>
+    <name>vbox6</name>
+    <homogeneous>False</homogeneous>
+    <spacing>0</spacing>
+
+    <widget>
+      <class>GtkMenuBar</class>
+      <name>menubar2</name>
+      <shadow_type>GTK_SHADOW_OUT</shadow_type>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>False</fill>
+      </child>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>add1</name>
+	<label>Add</label>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>delete1</name>
+	<label>Delete</label>
+	<right_justify>False</right_justify>
+
+	<widget>
+	  <class>GtkMenu</class>
+	  <name>delete1_menu</name>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>selection</name>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_delete_clicked</handler>
+	      <last_modification_time>Thu, 08 Mar 2001 11:12:03 GMT</last_modification_time>
+	    </signal>
+	    <label>_selection</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+	</widget>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>selection1</name>
+	<label>Selection</label>
+	<right_justify>False</right_justify>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkScrolledWindow</class>
+      <name>scrolledwindow1</name>
+      <hscrollbar_policy>GTK_POLICY_AUTOMATIC</hscrollbar_policy>
+      <vscrollbar_policy>GTK_POLICY_AUTOMATIC</vscrollbar_policy>
+      <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
+      <vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
+      <child>
+	<padding>0</padding>
+	<expand>True</expand>
+	<fill>True</fill>
+      </child>
+
+      <widget>
+	<class>GtkCList</class>
+	<name>clist1</name>
+	<can_focus>True</can_focus>
+	<signal>
+	  <name>event</name>
+	  <handler>on_clist1_event</handler>
+	  <last_modification_time>Thu, 08 Mar 2001 10:14:05 GMT</last_modification_time>
+	</signal>
+	<signal>
+	  <name>drag_data_received</name>
+	  <handler>on_intf_playlist_drag_data_received</handler>
+	  <last_modification_time>Thu, 08 Mar 2001 12:00:13 GMT</last_modification_time>
+	</signal>
+	<columns>2</columns>
+	<column_widths>257,80</column_widths>
+	<selection_mode>GTK_SELECTION_EXTENDED</selection_mode>
+	<show_titles>False</show_titles>
+	<shadow_type>GTK_SHADOW_IN</shadow_type>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <child_name>CList:title</child_name>
+	  <name>label22</name>
+	  <label>File</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <child_name>CList:title</child_name>
+	  <name>label23</name>
+	  <label>Duration</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
 	</widget>
       </widget>
     </widget>

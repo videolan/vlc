@@ -192,7 +192,8 @@ INTERFACE =	src/interface/main.o \
 		src/interface/intf_ctrl.o \
 		src/interface/intf_plst.o \
 		src/interface/intf_channels.o \
-		src/interface/intf_console.o
+		src/interface/intf_console.o \
+		src/interface/intf_urldecode.o \
 
 INPUT =		src/input/input_ext-dec.o \
 		src/input/input_ext-intf.o \
@@ -324,7 +325,8 @@ PLUGIN_GTK =	plugins/gtk/gtk.o \
 		plugins/gtk/intf_gtk.o \
 		plugins/gtk/gtk_callbacks.o \
 		plugins/gtk/gtk_interface.o \
-		plugins/gtk/gtk_support.o
+		plugins/gtk/gtk_support.o \
+		plugins/gtk/gtk_playlist.o
 
 PLUGIN_GNOME =	plugins/gnome/gnome.o \
 		plugins/gnome/intf_gnome.o \

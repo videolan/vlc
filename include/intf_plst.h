@@ -71,7 +71,9 @@ playlist_t * intf_PlstCreate   ( void );
 void         intf_PlstInit     ( playlist_t * p_playlist );
 int          intf_PlstAdd      ( playlist_t * p_playlist,
                                  int i_pos, char * psz_item );
+int          intf_PlstDelete  ( playlist_t * p_playlist,
+                                 int i_pos );
 void         intf_PlstNext     ( playlist_t * p_playlist );
 void         intf_PlstPrev     ( playlist_t * p_playlist );
 void         intf_PlstDestroy  ( playlist_t * p_playlist );
-
+void         intf_PlstJumpto   ( playlist_t * p_playlist , int i_pos);

@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.5 2001/03/07 11:56:33 stef Exp $
+ * $Id: intf_gtk.c,v 1.6 2001/03/08 13:32:55 octplane Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -72,6 +72,7 @@ static gint GtkChapterMenu  ( gpointer, GtkWidget *,
                               void (*pf_activate)(GtkMenuItem *, gpointer) );
 static gint GtkTitleMenu    ( gpointer, GtkWidget *, 
                               void (*pf_activate)(GtkMenuItem *, gpointer) );
+void GtkPlayListManage( gpointer p_data );
 
 
 /*****************************************************************************
@@ -147,6 +148,9 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys->b_menus_update = 1;
     p_intf->p_sys->b_scale_isfree = 1;
 
+
+    p_intf->p_sys->i_playing = -1;
+
     p_intf->p_sys->pf_gtk_callback = NULL;
     p_intf->p_sys->pf_gdk_callback = NULL;
 
@@ -183,6 +187,7 @@ static void intf_Run( intf_thread_t *p_intf )
     char *p_args[] = { "" };
     char **pp_args = p_args;
     int i_args = 1;
+    GtkWidget * temp;
 
     /* The data types we are allowed to receive */
     static GtkTargetEntry target_table[] =
@@ -197,6 +202,7 @@ static void intf_Run( intf_thread_t *p_intf )
     /* Create some useful widgets that will certainly be used */
     p_intf->p_sys->p_window = create_intf_window( );
     p_intf->p_sys->p_popup = create_intf_popup( );
+    p_intf->p_sys->p_playlist = create_intf_playlist( );
 
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
@@ -207,9 +213,14 @@ static void intf_Run( intf_thread_t *p_intf )
                        GTK_DEST_DEFAULT_ALL, target_table,
                        1, GDK_ACTION_COPY );
 
+    /* Accept file drops on the playlist window */
+    temp = lookup_widget(p_intf->p_sys->p_playlist, "clist1"); 
+    gtk_drag_dest_set( GTK_WIDGET( temp ),
+                       GTK_DEST_DEFAULT_ALL, target_table,
+                       1, GDK_ACTION_COPY );
+
     /* We don't create these ones yet because we perhaps won't need them */
     p_intf->p_sys->p_about = NULL;
-    p_intf->p_sys->p_playlist = NULL;
     p_intf->p_sys->p_modules = NULL;
     p_intf->p_sys->p_fileopen = NULL;
     p_intf->p_sys->p_disc = NULL;
@@ -220,6 +231,11 @@ static void intf_Run( intf_thread_t *p_intf )
 
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_popup),
                          "p_intf", p_intf );
+
+    gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_playlist),
+                         "p_intf", p_intf );
+
+ 
 
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
@@ -254,12 +270,16 @@ static void intf_Run( intf_thread_t *p_intf )
  * In this function, called approx. 10 times a second, we check what the
  * main program wanted to tell us.
  *****************************************************************************/
+
 static gint GtkManage( gpointer p_data )
 {
     intf_thread_t *p_intf = (void *)p_data;
 
+    GtkPlayListManage( p_data ); 
+
     vlc_mutex_lock( &p_intf->p_sys->change_lock );
 
+    
     /* If the "display popup" flag has changed */
     if( p_intf->b_menu_change )
     {
@@ -370,6 +390,7 @@ static gint GtkManage( gpointer p_data )
         gtk_range_clear_background ( GTK_RANGE( p_scale ) );
         gtk_range_draw_background ( GTK_RANGE( p_scale ) );
     }
+
 
     /* Manage core vlc functions through the callback */
     p_intf->pf_manage( p_intf );

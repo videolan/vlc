@@ -1,9 +1,6 @@
 #include <gtk/gtk.h>
 
-
-void
-on_intf_window_destroy                 (GtkObject       *object,
-                                        gpointer         user_data);
+/* General glade callbacks */
 
 void
 on_intf_window_drag_data_received      (GtkWidget       *widget,
@@ -212,4 +209,62 @@ on_menubar_title_activate              (GtkMenuItem     *menuitem,
 
 void
 on_menubar_chapter_activate            (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+gboolean
+on_clist1_event                        (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);
+
+gboolean
+on_intf_window_delete                  (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);
+
+gboolean
+on_intf_playlist_destroy_event         (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);
+
+gboolean
+on_intf_playlist_destroy_event         (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);
+
+void
+on_intf_playlist_drag_data_received    (GtkWidget       *widget,
+                                        GdkDragContext  *drag_context,
+                                        gint             x,
+                                        gint             y,
+                                        GtkSelectionData *data,
+                                        guint            info,
+                                        guint            time,
+                                        gpointer         user_data);
+
+gboolean
+on_clist1_event                        (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);
+
+gboolean
+on_intf_playlist_destroy_event         (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);
+
+gboolean
+on_intf_window_destroy                 (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);
+
+gboolean
+on_intf_window_destroy                 (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);
+
+void
+on_main_window_toggle                  (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_delete_clicked                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data);

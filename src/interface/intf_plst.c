@@ -197,12 +197,17 @@ int intf_PlstDelete( playlist_t * p_playlist, int i_pos )
         p_playlist->p_item[ i_index ] = p_playlist->p_item[ i_index + 1 ];
     }
 
+    if( i_pos < p_playlist->i_index )
+        p_playlist->i_index--;
+        
+    
     /* Decrement playlist size */
     p_playlist->i_size--;
     p_playlist->p_item = realloc( p_playlist->p_item,
                     p_playlist->i_size * sizeof( playlist_item_t ) );
 
     intf_WarnMsg( 1, "intf: removed %s from playlist", psz_name );
+    
 
     /* Delete the item */
     free( psz_name );
@@ -237,6 +242,26 @@ void intf_PlstDestroy( playlist_t * p_playlist )
 
     intf_WarnMsg( 1, "intf: playlist destroyed" );
 }
+void intf_PlstJumpto( playlist_t * p_playlist , int i_pos)
+{
+    vlc_mutex_lock( &p_playlist->change_lock );
+ 
+    p_playlist->i_index = i_pos;
+    
+    if( p_playlist->i_index != -1 )
+    {
+        if( p_playlist->current.psz_name != NULL )
+        {
+            free( p_playlist->current.psz_name );
+        }
+        p_playlist->current = p_playlist->p_item[ p_playlist->i_index ];
+        p_playlist->current.psz_name
+                            = strdup( p_playlist->current.psz_name );
+        }
+
+    vlc_mutex_unlock( &p_playlist->change_lock );
+}   
+
 
 /*****************************************************************************
  * Following functions are local

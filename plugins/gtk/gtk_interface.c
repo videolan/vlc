@@ -232,7 +232,6 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (menubar_playlist);
   gtk_container_add (GTK_CONTAINER (menubar_view_menu), menubar_playlist);
-  gtk_widget_set_sensitive (menubar_playlist, FALSE);
   gtk_tooltips_set_tip (tooltips, menubar_playlist, _("Open the playlist window"), NULL);
 
   menubar_modules = gtk_menu_item_new_with_label ("");
@@ -473,7 +472,6 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_playlist", toolbar_playlist,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_playlist);
-  gtk_widget_set_sensitive (toolbar_playlist, FALSE);
 
   toolbar_prev = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
                                 GTK_TOOLBAR_CHILD_BUTTON,
@@ -539,11 +537,11 @@ create_intf_window (void)
   gtk_widget_show (statusbar1);
   gtk_box_pack_end (GTK_BOX (vbox2), statusbar1, FALSE, TRUE, 0);
 
-  gtk_signal_connect (GTK_OBJECT (intf_window), "destroy",
-                      GTK_SIGNAL_FUNC (on_intf_window_destroy),
-                      NULL);
   gtk_signal_connect (GTK_OBJECT (intf_window), "drag_data_received",
                       GTK_SIGNAL_FUNC (on_intf_window_drag_data_received),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (intf_window), "delete_event",
+                      GTK_SIGNAL_FUNC (on_intf_window_destroy),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (menubar_open), "activate",
                       GTK_SIGNAL_FUNC (on_menubar_open_activate),
@@ -632,6 +630,7 @@ create_intf_popup (void)
   GtkWidget *popup_audio;
   GtkWidget *popup_subpictures;
   GtkWidget *separator9;
+  GtkWidget *main_window_toggle;
   GtkWidget *popup_about;
   GtkWidget *popup_exit;
   GtkTooltips *tooltips;
@@ -762,6 +761,17 @@ create_intf_popup (void)
   gtk_container_add (GTK_CONTAINER (intf_popup), separator9);
   gtk_widget_set_sensitive (separator9, FALSE);
 
+  main_window_toggle = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (main_window_toggle)->child),
+                                   _("show/hide main _window"));
+  gtk_widget_add_accelerator (main_window_toggle, "activate_item", intf_popup_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (main_window_toggle);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "main_window_toggle", main_window_toggle,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (main_window_toggle);
+  gtk_container_add (GTK_CONTAINER (intf_popup), main_window_toggle);
+
   popup_about = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_about)->child),
                                    _("_About..."));
@@ -801,6 +811,9 @@ create_intf_popup (void)
                       NULL);
   gtk_signal_connect (GTK_OBJECT (popup_disc), "activate",
                       GTK_SIGNAL_FUNC (on_popup_disc_activate),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (main_window_toggle), "activate",
+                      GTK_SIGNAL_FUNC (on_main_window_toggle),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (popup_about), "activate",
                       GTK_SIGNAL_FUNC (on_popup_about_activate),
@@ -870,7 +883,7 @@ create_intf_about (void)
   gtk_widget_show (frame1);
   gtk_box_pack_start (GTK_BOX (vbox3), frame1, FALSE, FALSE, 0);
 
-  label16 = gtk_label_new (_("Régis Duchesne <regis@via.ecp.fr>\nMichel Lespinasse <walken@zoy.org>\nOlivier Pomel <pomel@via.ecp.fr>\nPierre Baillet <oct@zoy.org>\nJean-Philippe Grimaldi <jeanphi@via.ecp.fr>\nAndres Krapf <dae@via.ecp.fr>\nChristophe Massiot <massiot@via.ecp.fr>\nVincent Seguin <seguin@via.ecp.fr>\nBenoit Steiner <benny@via.ecp.fr>\nArnaud de Bossoreille de Ribou <bozo@via.ecp.fr>\nJean-Marc Dressler <polux@via.ecp.fr>\nGaël Hendryckx <jimmy@via.ecp.fr>\nSamuel Hocevar <sam@zoy.org>\nBrieuc Jeunhomme <bbp@via.ecp.fr>\nMichel Kaempf <maxx@via.ecp.fr>\nStéphane Borel <stef@via.ecp.fr>\nRenaud Dartus <reno@via.ecp.fr>\nHenri Fallon <henri@via.ecp.fr>"));
+  label16 = gtk_label_new (_("R\351gis Duchesne <regis@via.ecp.fr>\nMichel Lespinasse <walken@zoy.org>\nOlivier Pomel <pomel@via.ecp.fr>\nPierre Baillet <oct@zoy.org>\nJean-Philippe Grimaldi <jeanphi@via.ecp.fr>\nAndres Krapf <dae@via.ecp.fr>\nChristophe Massiot <massiot@via.ecp.fr>\nVincent Seguin <seguin@via.ecp.fr>\nBenoit Steiner <benny@via.ecp.fr>\nArnaud de Bossoreille de Ribou <bozo@via.ecp.fr>\nJean-Marc Dressler <polux@via.ecp.fr>\nGa\353l Hendryckx <jimmy@via.ecp.fr>\nSamuel Hocevar <sam@zoy.org>\nBrieuc Jeunhomme <bbp@via.ecp.fr>\nMichel Kaempf <maxx@via.ecp.fr>\nSt\351phane Borel <stef@via.ecp.fr>\nRenaud Dartus <reno@via.ecp.fr>\nHenri Fallon <henri@via.ecp.fr>"));
   gtk_widget_ref (label16);
   gtk_object_set_data_full (GTK_OBJECT (intf_about), "label16", label16,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -1148,5 +1161,130 @@ create_intf_disc (void)
                       NULL);
 
   return intf_disc;
+}
+
+GtkWidget*
+create_intf_playlist (void)
+{
+  GtkWidget *intf_playlist;
+  GtkWidget *vbox6;
+  GtkWidget *menubar2;
+  GtkWidget *add1;
+  GtkWidget *delete1;
+  GtkWidget *delete1_menu;
+  GtkAccelGroup *delete1_menu_accels;
+  guint tmp_key;
+  GtkWidget *selection;
+  GtkWidget *selection1;
+  GtkWidget *scrolledwindow1;
+  GtkWidget *clist1;
+  GtkWidget *label22;
+  GtkWidget *label23;
+
+  intf_playlist = gtk_window_new (GTK_WINDOW_DIALOG);
+  gtk_object_set_data (GTK_OBJECT (intf_playlist), "intf_playlist", intf_playlist);
+  gtk_window_set_title (GTK_WINDOW (intf_playlist), _("Playlist"));
+  gtk_window_set_default_size (GTK_WINDOW (intf_playlist), 386, 200);
+
+  vbox6 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_ref (vbox6);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "vbox6", vbox6,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (vbox6);
+  gtk_container_add (GTK_CONTAINER (intf_playlist), vbox6);
+
+  menubar2 = gtk_menu_bar_new ();
+  gtk_widget_ref (menubar2);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "menubar2", menubar2,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (menubar2);
+  gtk_box_pack_start (GTK_BOX (vbox6), menubar2, FALSE, FALSE, 0);
+
+  add1 = gtk_menu_item_new_with_label (_("Add"));
+  gtk_widget_ref (add1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "add1", add1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (add1);
+  gtk_container_add (GTK_CONTAINER (menubar2), add1);
+
+  delete1 = gtk_menu_item_new_with_label (_("Delete"));
+  gtk_widget_ref (delete1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "delete1", delete1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (delete1);
+  gtk_container_add (GTK_CONTAINER (menubar2), delete1);
+
+  delete1_menu = gtk_menu_new ();
+  gtk_widget_ref (delete1_menu);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "delete1_menu", delete1_menu,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (delete1), delete1_menu);
+  delete1_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (delete1_menu));
+
+  selection = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (selection)->child),
+                                   _("_selection"));
+  gtk_widget_add_accelerator (selection, "activate_item", delete1_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (selection);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "selection", selection,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (selection);
+  gtk_container_add (GTK_CONTAINER (delete1_menu), selection);
+
+  selection1 = gtk_menu_item_new_with_label (_("Selection"));
+  gtk_widget_ref (selection1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "selection1", selection1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (selection1);
+  gtk_container_add (GTK_CONTAINER (menubar2), selection1);
+
+  scrolledwindow1 = gtk_scrolled_window_new (NULL, NULL);
+  gtk_widget_ref (scrolledwindow1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "scrolledwindow1", scrolledwindow1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (scrolledwindow1);
+  gtk_box_pack_start (GTK_BOX (vbox6), scrolledwindow1, TRUE, TRUE, 0);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow1), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
+  clist1 = gtk_clist_new (2);
+  gtk_widget_ref (clist1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "clist1", clist1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (clist1);
+  gtk_container_add (GTK_CONTAINER (scrolledwindow1), clist1);
+  gtk_clist_set_column_width (GTK_CLIST (clist1), 0, 257);
+  gtk_clist_set_column_width (GTK_CLIST (clist1), 1, 80);
+  gtk_clist_set_selection_mode (GTK_CLIST (clist1), GTK_SELECTION_EXTENDED);
+  gtk_clist_column_titles_hide (GTK_CLIST (clist1));
+
+  label22 = gtk_label_new (_("File"));
+  gtk_widget_ref (label22);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "label22", label22,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label22);
+  gtk_clist_set_column_widget (GTK_CLIST (clist1), 0, label22);
+
+  label23 = gtk_label_new (_("Duration"));
+  gtk_widget_ref (label23);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "label23", label23,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label23);
+  gtk_clist_set_column_widget (GTK_CLIST (clist1), 1, label23);
+
+  gtk_signal_connect (GTK_OBJECT (intf_playlist), "delete_event",
+                      GTK_SIGNAL_FUNC (on_intf_playlist_destroy_event),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (selection), "activate",
+                      GTK_SIGNAL_FUNC (on_delete_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (clist1), "event",
+                      GTK_SIGNAL_FUNC (on_clist1_event),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (clist1), "drag_data_received",
+                      GTK_SIGNAL_FUNC (on_intf_playlist_drag_data_received),
+                      NULL);
+
+  return intf_playlist;
 }
 
