@@ -2,7 +2,7 @@
  * vout.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.h,v 1.11 2003/05/01 01:11:17 hartman Exp $
+ * $Id: vout.h,v 1.12 2003/08/14 12:38:03 garf Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -81,10 +81,15 @@ struct vout_sys_t
 #ifdef __QUICKTIME__
     CodecType i_codec;
     CGrafPtr p_qdport;
+    CGrafPtr p_qdportold;
     ImageSequence i_seq;
     MatrixRecordPtr p_matrix;
     DecompressorComponent img_dc;
     ImageDescriptionHandle h_img_descr;
     Ptr p_fullscreen_state;
+    RgnHandle mask;
+    int portx;
+    int porty;
+    int isplugin;
 #endif
 };

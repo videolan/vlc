@@ -3,7 +3,6 @@
  *****************************************************************************/
 
 /* Definitions of system resource types */
-#include <Types.r>
 
 /* The first string in the array is a plugin description,
  * the second is the plugin name */

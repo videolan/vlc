@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.94 2003/07/23 01:13:48 gbazin Exp $
+ * $Id: libvlc.c,v 1.95 2003/08/14 12:38:04 garf Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -564,7 +564,18 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
      * FIXME: kludge to use a p_vlc-local variable for the Mozilla plugin
      */
     var_Create( p_vlc, "drawable", VLC_VAR_INTEGER );
-
+    var_Create( p_vlc, "drawableredraw", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawablet", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawablel", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawableb", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawabler", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawablex", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawabley", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawablew", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawableh", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawableportx", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawableporty", VLC_VAR_INTEGER );
+    
     /*
      * Get input filenames given as commandline arguments
      */
@@ -893,6 +904,7 @@ int VLC_Stop( int i_object )
      * Ask the interfaces to stop and destroy them
      */
     msg_Dbg( p_vlc, "removing all interfaces" );
+
     while( (p_intf = vlc_object_find( p_vlc, VLC_OBJECT_INTF, FIND_CHILD )) )
     {
         intf_StopThread( p_intf );
@@ -904,6 +916,7 @@ int VLC_Stop( int i_object )
     /*
      * Free playlists
      */
+    
     msg_Dbg( p_vlc, "removing all playlists" );
     while( (p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST,
                                           FIND_CHILD )) )
@@ -912,7 +925,7 @@ int VLC_Stop( int i_object )
         vlc_object_release( p_playlist );
         playlist_Destroy( p_playlist );
     }
-
+    
     /*
      * Free video outputs
      */

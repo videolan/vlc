@@ -1,44 +1,10 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * Version: NPL 1.1/GPL 2.0/LGPL 2.1
- *
- * The contents of this file are subject to the Netscape Public License
- * Version 1.1 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://www.mozilla.org/NPL/
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
- * for the specific language governing rights and limitations under the
- * License.
- *
- * The Original Code is mozilla.org code.
- *
- * The Initial Developer of the Original Code is 
- * Netscape Communications Corporation.
- * Portions created by the Initial Developer are Copyright (C) 1998
- * the Initial Developer. All Rights Reserved.
- *
- * Contributor(s):
- *
- * Alternatively, the contents of this file may be used under the terms of
- * either the GNU General Public License Version 2 or later (the "GPL"), or 
- * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
- * in which case the provisions of the GPL or the LGPL are applicable instead
- * of those above. If you wish to allow use of your version of this file only
- * under the terms of either the GPL or the LGPL, and not to allow others to
- * use your version of this file under the terms of the NPL, indicate your
- * decision by deleting the provisions above and replace them with the notice
- * and other provisions required by the GPL or the LGPL. If you do not delete
- * the provisions above, a recipient may use your version of this file under
- * the terms of any one of the NPL, the GPL or the LGPL.
- *
- * ***** END LICENSE BLOCK ***** */
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 // npmac.cpp
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+#include <string.h>
 
 #include <Processes.h>
 #include <Gestalt.h>
@@ -48,26 +14,23 @@
 #include <ToolUtils.h>
 
 #define XP_MAC 1
-#define NDEBUG 1
 
 //
 // A4Stuff.h contains the definition of EnterCodeResource and 
-// EnterCodeResource, used for setting up the code resource¹s
+// EnterCodeResource, used for setting up the code resourceÕs
 // globals for 68K (analagous to the function SetCurrentA5
 // defined by the toolbox).
 //
 // A4Stuff does not exist as of CW 7. Define them to nothing.
 //
 
-#if defined(XP_MACOSX) || (defined(__MWERKS__) && (__MWERKS__ >= 0x2400))
+#if (defined(__MWERKS__) && (__MWERKS__ >= 0x2400)) || defined(__GNUC__)
 	#define EnterCodeResource()
 	#define ExitCodeResource()
 #else
     #include <A4Stuff.h>
 #endif
 
-#include "nscore.h"
-#include "jri.h"
 #include "npapi.h"
 
 //
@@ -94,7 +57,7 @@
 #endif
 #endif
 
-// The following fix for static initializers (which fixes a preious
+// The following fix for static initializers (which fixes a previous
 // incompatibility with some parts of PowerPlant, was submitted by 
 // Jan Ulbrich.
 #ifdef __MWERKS__
@@ -117,7 +80,7 @@
 // Define PLUGIN_TRACE to 1 to have the wrapper functions emit
 // DebugStr messages whenever they are called.
 //
-#define PLUGIN_TRACE 0
+//#define PLUGIN_TRACE 1
 
 #if PLUGIN_TRACE
 #define PLUGINDEBUGSTR(msg)		::DebugStr(msg)
@@ -126,8 +89,91 @@
 #endif
 
 
+#ifdef XP_MACOSX
+
+// glue for mapping outgoing Macho function pointers to TVectors
+struct TFPtoTVGlue{
+    void* glue[2];
+};
+
+struct {
+    TFPtoTVGlue     newp;
+    TFPtoTVGlue     destroy;
+    TFPtoTVGlue     setwindow;
+    TFPtoTVGlue     newstream;
+    TFPtoTVGlue     destroystream;
+    TFPtoTVGlue     asfile;
+    TFPtoTVGlue     writeready;
+    TFPtoTVGlue     write;
+    TFPtoTVGlue     print;
+    TFPtoTVGlue     event;
+    TFPtoTVGlue     urlnotify;
+    TFPtoTVGlue     getvalue;
+    TFPtoTVGlue     setvalue;
+
+    TFPtoTVGlue     shutdown;
+} gPluginFuncsGlueTable;
+
+static inline void* SetupFPtoTVGlue(TFPtoTVGlue* functionGlue, void* fp)
+{
+    functionGlue->glue[0] = fp;
+    functionGlue->glue[1] = 0;
+    return functionGlue;
+}
+
+#define PLUGIN_TO_HOST_GLUE(name, fp) (SetupFPtoTVGlue(&gPluginFuncsGlueTable.name, (void*)fp))
+
+// glue for mapping netscape TVectors to Macho function pointers
+struct TTVtoFPGlue {
+    uint32 glue[6];
+};
+
+struct {
+    TTVtoFPGlue             geturl;
+    TTVtoFPGlue             posturl;
+    TTVtoFPGlue             requestread;
+    TTVtoFPGlue             newstream;
+    TTVtoFPGlue             write;
+    TTVtoFPGlue             destroystream;
+    TTVtoFPGlue             status;
+    TTVtoFPGlue             uagent;
+    TTVtoFPGlue             memalloc;
+    TTVtoFPGlue             memfree;
+    TTVtoFPGlue             memflush;
+    TTVtoFPGlue             reloadplugins;
+    TTVtoFPGlue             getJavaEnv;
+    TTVtoFPGlue             getJavaPeer;
+    TTVtoFPGlue             geturlnotify;
+    TTVtoFPGlue             posturlnotify;
+    TTVtoFPGlue             getvalue;
+    TTVtoFPGlue             setvalue;
+    TTVtoFPGlue             invalidaterect;
+    TTVtoFPGlue             invalidateregion;
+    TTVtoFPGlue             forceredraw;
+} gNetscapeFuncsGlueTable;
+
+static void* SetupTVtoFPGlue(TTVtoFPGlue* functionGlue, void* tvp)
+{
+    static const TTVtoFPGlue glueTemplate = { 0x3D800000, 0x618C0000, 0x800C0000, 0x804C0004, 0x7C0903A6, 0x4E800420 };
+
+    memcpy(functionGlue, &glueTemplate, sizeof(TTVtoFPGlue));
+    functionGlue->glue[0] |= ((UInt32)tvp >> 16);
+    functionGlue->glue[1] |= ((UInt32)tvp & 0xFFFF);
+    ::MakeDataExecutable(functionGlue, sizeof(TTVtoFPGlue));
+    return functionGlue;
+}
+
+#define HOST_TO_PLUGIN_GLUE(name, fp) (SetupTVtoFPGlue(&gNetscapeFuncsGlueTable.name, (void*)fp))
+
+#else
+
+#define PLUGIN_TO_HOST_GLUE(name, fp) (fp)
+#define HOST_TO_PLUGIN_GLUE(name, fp) (fp)
+
+#endif /* XP_MACOSX */
 
 
+#pragma mark -
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -136,12 +182,11 @@
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-#if !OPAQUE_TOOLBOX_STRUCTS || !TARGET_API_MAC_CARBON
-QDGlobals*		gQDPtr;				// Pointer to Netscape¹s QuickDraw globals
+#if !TARGET_API_MAC_CARBON
+QDGlobals*		gQDPtr;				// Pointer to NetscapeÕs QuickDraw globals
 #endif
-short			gResFile;			// Refnum of the plugin¹s resource file
+short			gResFile;			// Refnum of the pluginÕs resource file
 NPNetscapeFuncs	gNetscapeFuncs;		// Function table for procs in Netscape called by plugin
-
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -267,24 +312,14 @@ const char* NPN_UserAgent(NPP instance)
 	return CallNPN_UserAgentProc(gNetscapeFuncs.uagent, instance);
 }
 
-#define DEBUG_MEMORY 0
-
 void* NPN_MemAlloc(uint32 size)
 {
-#if DEBUG_MEMORY
-	return (void*) NewPtrClear(size);
-#else
 	return CallNPN_MemAllocProc(gNetscapeFuncs.memalloc, size);
-#endif
 }
 
 void NPN_MemFree(void* ptr)
 {
-#if DEBUG_MEMORY
-	DisposePtr(Ptr(ptr));
-#else
 	CallNPN_MemFreeProc(gNetscapeFuncs.memfree, ptr);
-#endif
 }
 
 uint32 NPN_MemFlush(uint32 size)
@@ -297,16 +332,17 @@ void NPN_ReloadPlugins(NPBool reloadPages)
 	CallNPN_ReloadPluginsProc(gNetscapeFuncs.reloadplugins, reloadPages);
 }
 
-
+#ifdef OJI
 JRIEnv* NPN_GetJavaEnv(void)
 {
 	return CallNPN_GetJavaEnvProc( gNetscapeFuncs.getJavaEnv );
 }
 
-jref  NPN_GetJavaPeer(NPP instance)
+jobject  NPN_GetJavaPeer(NPP instance)
 {
 	return CallNPN_GetJavaPeerProc( gNetscapeFuncs.getJavaPeer, instance );
 }
+#endif
 
 NPError NPN_GetValue(NPP instance, NPNVariable variable, void *value)
 {
@@ -333,6 +369,8 @@ void NPN_ForceRedraw(NPP instance)
 	CallNPN_ForceRedrawProc( gNetscapeFuncs.forceredraw, instance);
 }
 
+#pragma mark -
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 // Wrapper functions for all calls from Netscape to the plugin.
@@ -356,7 +394,7 @@ void		Private_StreamAsFile(NPP instance, NPStream* stream, const char* fname);
 void		Private_Print(NPP instance, NPPrint* platformPrint);
 int16 		Private_HandleEvent(NPP instance, void* event);
 void        Private_URLNotify(NPP instance, const char* url, NPReason reason, void* notifyData);
-jref		Private_GetJavaClass(void);
+jobject		Private_GetJavaClass(void);
 
 
 NPError Private_Initialize(void)
@@ -375,7 +413,7 @@ void Private_Shutdown(void)
 	PLUGINDEBUGSTR("\pShutdown;g;");
 	NPP_Shutdown();
 
-#ifndef XP_MACOSX
+#ifdef __MWERKS__
 	__destroy_global_chain();
 #endif
 
@@ -487,49 +525,51 @@ void Private_URLNotify(NPP instance, const char* url, NPReason reason, void* not
 	ExitCodeResource();
 }
 
-
-jref Private_GetJavaClass(void)
+#ifdef OJI
+jobject Private_GetJavaClass(void)
 {
 	EnterCodeResource();
 	PLUGINDEBUGSTR("\pGetJavaClass;g;");
 
-    jref clazz = NPP_GetJavaClass();
+    jobject clazz = NPP_GetJavaClass();
     ExitCodeResource();
     if (clazz)
     {
 		JRIEnv* env = NPN_GetJavaEnv();
-		return (jref)JRI_NewGlobalRef(env, clazz);
+		return (jobject)JRI_NewGlobalRef(env, clazz);
     }
     return NULL;
 }
-
+#endif
 
 void SetUpQD(void);
-
 void SetUpQD(void)
 {
-#if !OPAQUE_TOOLBOX_STRUCTS || !TARGET_API_MAC_CARBON
+#if !TARGET_API_MAC_CARBON
 	ProcessSerialNumber PSN;
 	FSSpec				myFSSpec;
 	Str63				name;
 	ProcessInfoRec		infoRec;
 	OSErr				result = noErr;
-	CFragConnectionID 	connID;
+	CFragConnectionID	connID;
 	Str255 				errName;
-	
+#endif	
+
 	//
-	// Memorize the plugin¹s resource file 
+	// Memorize the pluginÕs resource file 
 	// refnum for later use.
 	//
 	gResFile = CurResFile();
 	
+#if !TARGET_API_MAC_CARBON
 	//
 	// Ask the system if CFM is available.
 	//
 	long response;
 	OSErr err = Gestalt(gestaltCFMAttr, &response);
 	Boolean hasCFM = BitTst(&response, 31-gestaltCFMPresent);
-			
+
+	ProcessInfoRec infoRec;
 	if (hasCFM)
 	{
 		//
@@ -537,10 +577,13 @@ void SetUpQD(void)
 		// will give us back the name and FSSpec of the application.
 		// See the Process Manager in IM.
 		//
+		Str63 name;
+		FSSpec myFSSpec;
 		infoRec.processInfoLength = sizeof(ProcessInfoRec);
 		infoRec.processName = name;
 		infoRec.processAppSpec = &myFSSpec;
 		
+		ProcessSerialNumber PSN;
 		PSN.highLongOfPSN = 0;
 		PSN.lowLongOfPSN = kCurrentProcess;
 		
@@ -554,30 +597,33 @@ void SetUpQD(void)
 		//
 		result = -1;		
 		
+	CFragConnectionID connID;
 	if (result == noErr)
 	{
 		//
 		// Now that we know the app name and FSSpec, we can call GetDiskFragment
 		// to get a connID to use in a subsequent call to FindSymbol (it will also
-		// return the address of ³main² in app, which we ignore).  If GetDiskFragment 
+		// return the address of ÒmainÓ in app, which we ignore).  If GetDiskFragment 
 		// returns an error, we assume the app must be 68K.
 		//
 		Ptr mainAddr; 	
+		Str255 errName;
 		result =  GetDiskFragment(infoRec.processAppSpec, 0L, 0L, infoRec.processName,
-								  kReferenceCFrag, &connID, (Ptr*)&mainAddr, errName);
+								  kLoadCFrag, &connID, (Ptr*)&mainAddr, errName);
 	}
 
 	if (result == noErr) 
 	{
 		//
 		// The app is a PPC code fragment, so call FindSymbol
-		// to get the exported ³qd² symbol so we can access its
+		// to get the exported ÒqdÓ symbol so we can access its
 		// QuickDraw globals.
 		//
 		CFragSymbolClass symClass;
 		result = FindSymbol(connID, "\pqd", (Ptr*)&gQDPtr, &symClass);
-		if (result != noErr)
-			PLUGINDEBUGSTR("\pFailed in FindSymbol qd");
+		if (result != noErr) {	// this fails if we are in NS 6
+			gQDPtr = &qd;		// so we default to the standard QD globals
+		}
 	}
 	else
 	{
@@ -591,32 +637,33 @@ void SetUpQD(void)
 }
 
 
-
-#if TARGET_RT_MAC_CFM && !TARGET_API_MAC_CARBON
-NPError
+#ifdef __GNUC__
+// gcc requires that main have an 'int' return type
+int main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs, NPP_ShutdownUPP* unloadUpp);
 #else
-int
+NPError main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs, NPP_ShutdownUPP* unloadUpp);
 #endif
-main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs, NPP_ShutdownUPP* unloadUpp);
 
+#if !TARGET_API_MAC_CARBON
 #pragma export on
-
-#if TARGET_RT_MAC_CFM && !TARGET_API_MAC_CARBON
+#if GENERATINGCFM
 RoutineDescriptor mainRD = BUILD_ROUTINE_DESCRIPTOR(uppNPP_MainEntryProcInfo, main);
 #endif
-
 #pragma export off
- 
+#endif /* !TARGET_API_MAC_CARBON */
 
-#if TARGET_RT_MAC_CFM && !TARGET_API_MAC_CARBON
-NPError
+#ifdef __GNUC__
+DEFINE_API_C(int) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs, NPP_ShutdownUPP* unloadUpp)
 #else
-int
+DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs, NPP_ShutdownUPP* unloadUpp)
 #endif
-main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs, NPP_ShutdownUPP* unloadUpp)
 {
 	EnterCodeResource();
 	PLUGINDEBUGSTR("\pmain");
+
+#ifdef __MWERKS__
+	__InitCode__();
+#endif
 
 	NPError err = NPERR_NO_ERROR;
 	
@@ -627,27 +674,23 @@ main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs, NPP_ShutdownUPP* unlo
 		err = NPERR_INVALID_FUNCTABLE_ERROR;
 	
 	//
-	// Check the ³major² version passed in Netscape¹s function table.
-	// We won¹t load if the major version is newer than what we expect.
+	// Check the ÒmajorÓ version passed in NetscapeÕs function table.
+	// We wonÕt load if the major version is newer than what we expect.
 	// Also check that the function tables passed in are big enough for
 	// all the functions we need (they could be bigger, if Netscape added
-	// new APIs, but that¹s OK with us -- we¹ll just ignore them).
+	// new APIs, but thatÕs OK with us -- weÕll just ignore them).
 	//
 	if (err == NPERR_NO_ERROR)
 	{
 		if ((nsTable->version >> 8) > NP_VERSION_MAJOR)		// Major version is in high byte
 			err = NPERR_INCOMPATIBLE_VERSION_ERROR;
-//		if (nsTable->size < sizeof(NPNetscapeFuncs))
-//			err = NPERR_INVALID_FUNCTABLE_ERROR;
-//		if (pluginFuncs->size < sizeof(NPPluginFuncs))		
-//			err = NPERR_INVALID_FUNCTABLE_ERROR;
 	}
 		
 	
 	if (err == NPERR_NO_ERROR)
 	{
 		//
-		// Copy all the fields of Netscape¹s function table into our
+		// Copy all the fields of NetscapeÕs function table into our
 		// copy so we can call back into Netscape later.  Note that
 		// we need to copy the fields one by one, rather than assigning
 		// the whole structure, because the Netscape function table
@@ -656,67 +699,67 @@ main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs, NPP_ShutdownUPP* unlo
 		
 		int navMinorVers = nsTable->version & 0xFF;
 
-		gNetscapeFuncs.version = nsTable->version;
-		gNetscapeFuncs.size = nsTable->size;
-		gNetscapeFuncs.posturl = nsTable->posturl;
-		gNetscapeFuncs.geturl = nsTable->geturl;
-		gNetscapeFuncs.requestread = nsTable->requestread;
-		gNetscapeFuncs.newstream = nsTable->newstream;
-		gNetscapeFuncs.write = nsTable->write;
-		gNetscapeFuncs.destroystream = nsTable->destroystream;
-		gNetscapeFuncs.status = nsTable->status;
-		gNetscapeFuncs.uagent = nsTable->uagent;
-		gNetscapeFuncs.memalloc = nsTable->memalloc;
-		gNetscapeFuncs.memfree = nsTable->memfree;
-		gNetscapeFuncs.memflush = nsTable->memflush;
-		gNetscapeFuncs.reloadplugins = nsTable->reloadplugins;
+		gNetscapeFuncs.version          = nsTable->version;
+		gNetscapeFuncs.size             = nsTable->size;
+		gNetscapeFuncs.posturl          = (NPN_PostURLUPP)HOST_TO_PLUGIN_GLUE(posturl, nsTable->posturl);
+		gNetscapeFuncs.geturl           = (NPN_GetURLUPP)HOST_TO_PLUGIN_GLUE(geturl, nsTable->geturl);
+		gNetscapeFuncs.requestread      = (NPN_RequestReadUPP)HOST_TO_PLUGIN_GLUE(requestread, nsTable->requestread);
+		gNetscapeFuncs.newstream        = (NPN_NewStreamUPP)HOST_TO_PLUGIN_GLUE(newstream, nsTable->newstream);
+		gNetscapeFuncs.write            = (NPN_WriteUPP)HOST_TO_PLUGIN_GLUE(write, nsTable->write);
+		gNetscapeFuncs.destroystream    = (NPN_DestroyStreamUPP)HOST_TO_PLUGIN_GLUE(destroystream, nsTable->destroystream);
+		gNetscapeFuncs.status           = (NPN_StatusUPP)HOST_TO_PLUGIN_GLUE(status, nsTable->status);
+		gNetscapeFuncs.uagent           = (NPN_UserAgentUPP)HOST_TO_PLUGIN_GLUE(uagent, nsTable->uagent);
+		gNetscapeFuncs.memalloc         = (NPN_MemAllocUPP)HOST_TO_PLUGIN_GLUE(memalloc, nsTable->memalloc);
+		gNetscapeFuncs.memfree          = (NPN_MemFreeUPP)HOST_TO_PLUGIN_GLUE(memfree, nsTable->memfree);
+		gNetscapeFuncs.memflush         = (NPN_MemFlushUPP)HOST_TO_PLUGIN_GLUE(memflush, nsTable->memflush);
+		gNetscapeFuncs.reloadplugins    = (NPN_ReloadPluginsUPP)HOST_TO_PLUGIN_GLUE(reloadplugins, nsTable->reloadplugins);
 		if( navMinorVers >= NPVERS_HAS_LIVECONNECT )
 		{
-			gNetscapeFuncs.getJavaEnv = nsTable->getJavaEnv;
-			gNetscapeFuncs.getJavaPeer = nsTable->getJavaPeer;
+			gNetscapeFuncs.getJavaEnv   = (NPN_GetJavaEnvUPP)HOST_TO_PLUGIN_GLUE(getJavaEnv, nsTable->getJavaEnv);
+			gNetscapeFuncs.getJavaPeer  = (NPN_GetJavaPeerUPP)HOST_TO_PLUGIN_GLUE(getJavaPeer, nsTable->getJavaPeer);
 		}
 		if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
 		{	
-			gNetscapeFuncs.geturlnotify = nsTable->geturlnotify;
-			gNetscapeFuncs.posturlnotify = nsTable->posturlnotify;
+			gNetscapeFuncs.geturlnotify 	= (NPN_GetURLNotifyUPP)HOST_TO_PLUGIN_GLUE(geturlnotify, nsTable->geturlnotify);
+			gNetscapeFuncs.posturlnotify 	= (NPN_PostURLNotifyUPP)HOST_TO_PLUGIN_GLUE(posturlnotify, nsTable->posturlnotify);
 		}
-		gNetscapeFuncs.getvalue = nsTable->getvalue;
-		gNetscapeFuncs.setvalue = nsTable->setvalue;
-		gNetscapeFuncs.invalidaterect = nsTable->invalidaterect;
-		gNetscapeFuncs.invalidateregion = nsTable->invalidateregion;
-		gNetscapeFuncs.forceredraw = nsTable->forceredraw;
-
-		// defer static constructors until the global functions are initialized.
-#ifndef XP_MACOSX
-		__InitCode__();
-#endif
+		gNetscapeFuncs.getvalue         = (NPN_GetValueUPP)HOST_TO_PLUGIN_GLUE(getvalue, nsTable->getvalue);
+		gNetscapeFuncs.setvalue         = (NPN_SetValueUPP)HOST_TO_PLUGIN_GLUE(setvalue, nsTable->setvalue);
+		gNetscapeFuncs.invalidaterect   = (NPN_InvalidateRectUPP)HOST_TO_PLUGIN_GLUE(invalidaterect, nsTable->invalidaterect);
+		gNetscapeFuncs.invalidateregion = (NPN_InvalidateRegionUPP)HOST_TO_PLUGIN_GLUE(invalidateregion, nsTable->invalidateregion);
+		gNetscapeFuncs.forceredraw      = (NPN_ForceRedrawUPP)HOST_TO_PLUGIN_GLUE(forceredraw, nsTable->forceredraw);
 		
 		//
 		// Set up the plugin function table that Netscape will use to
 		// call us.  Netscape needs to know about our version and size
 		// and have a UniversalProcPointer for every function we implement.
 		//
-		pluginFuncs->version = (NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR;
-		pluginFuncs->size = sizeof(NPPluginFuncs);
-		pluginFuncs->newp = NewNPP_NewProc(Private_New);
-		pluginFuncs->destroy = NewNPP_DestroyProc(Private_Destroy);
-		pluginFuncs->setwindow = NewNPP_SetWindowProc(Private_SetWindow);
-		pluginFuncs->newstream = NewNPP_NewStreamProc(Private_NewStream);
-		pluginFuncs->destroystream = NewNPP_DestroyStreamProc(Private_DestroyStream);
-		pluginFuncs->asfile = NewNPP_StreamAsFileProc(Private_StreamAsFile);
-		pluginFuncs->writeready = NewNPP_WriteReadyProc(Private_WriteReady);
-		pluginFuncs->write = NewNPP_WriteProc(Private_Write);
-		pluginFuncs->print = NewNPP_PrintProc(Private_Print);
-		pluginFuncs->event = NewNPP_HandleEventProc(Private_HandleEvent);	
+		pluginFuncs->version        = (NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR;
+		pluginFuncs->size           = sizeof(NPPluginFuncs);
+		pluginFuncs->newp           = NewNPP_NewProc(PLUGIN_TO_HOST_GLUE(newp, Private_New));
+		pluginFuncs->destroy        = NewNPP_DestroyProc(PLUGIN_TO_HOST_GLUE(destroy, Private_Destroy));
+		pluginFuncs->setwindow      = NewNPP_SetWindowProc(PLUGIN_TO_HOST_GLUE(setwindow, Private_SetWindow));
+		pluginFuncs->newstream      = NewNPP_NewStreamProc(PLUGIN_TO_HOST_GLUE(newstream, Private_NewStream));
+		pluginFuncs->destroystream  = NewNPP_DestroyStreamProc(PLUGIN_TO_HOST_GLUE(destroystream, Private_DestroyStream));
+		pluginFuncs->asfile         = NewNPP_StreamAsFileProc(PLUGIN_TO_HOST_GLUE(asfile, Private_StreamAsFile));
+		pluginFuncs->writeready     = NewNPP_WriteReadyProc(PLUGIN_TO_HOST_GLUE(writeready, Private_WriteReady));
+		pluginFuncs->write          = NewNPP_WriteProc(PLUGIN_TO_HOST_GLUE(write, Private_Write));
+		pluginFuncs->print          = NewNPP_PrintProc(PLUGIN_TO_HOST_GLUE(print, Private_Print));
+		pluginFuncs->event          = NewNPP_HandleEventProc(PLUGIN_TO_HOST_GLUE(event, Private_HandleEvent));	
 		if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
 		{	
-			pluginFuncs->urlnotify = NewNPP_URLNotifyProc(Private_URLNotify);			
+			pluginFuncs->urlnotify = NewNPP_URLNotifyProc(PLUGIN_TO_HOST_GLUE(urlnotify, Private_URLNotify));			
 		}
+#ifdef OJI
 		if( navMinorVers >= NPVERS_HAS_LIVECONNECT )
 		{
 			pluginFuncs->javaClass	= (JRIGlobalRef) Private_GetJavaClass();
 		}
-		*unloadUpp = NewNPP_ShutdownProc(Private_Shutdown);
+#else
+                pluginFuncs->javaClass = NULL;
+#endif
+		*unloadUpp = NewNPP_ShutdownProc(PLUGIN_TO_HOST_GLUE(shutdown, Private_Shutdown));
+
 		SetUpQD();
 		err = Private_Initialize();
 	}

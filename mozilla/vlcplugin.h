@@ -2,7 +2,7 @@
  * vlcplugin.h: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcplugin.h,v 1.11 2003/07/17 09:25:58 sigmunau Exp $
+ * $Id: vlcplugin.h,v 1.12 2003/08/14 12:38:03 garf Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,6 +24,12 @@
 /*******************************************************************************
  * Instance state information about the plugin.
  ******************************************************************************/
+
+/* No, I really don't want to use XP_UNIX stuff on MacOSX */
+#ifdef XP_MACOSX
+#undef XP_UNIX
+#endif
+
 class VlcPlugin
 {
 public:
@@ -52,6 +58,12 @@ public:
     Window   window;
     Display *p_display;
 #endif
+
+#ifdef XP_MACOSX
+    /* MACOS data members */
+    NPWindow *window;
+#endif
+
 
     /* vlc data members */
     int      i_vlc;

@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.15 2003/07/23 01:13:48 gbazin Exp $
+ * $Id: vlcshell.cpp,v 1.16 2003/08/14 12:38:03 garf Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,14 +45,7 @@
     /* Windows stuff */
 #endif
 
-#ifdef XP_UNIX
-    /* X11 stuff */
-#   include <X11/Xlib.h>
-#   include <X11/Intrinsic.h>
-#   include <X11/StringDefs.h>
-#endif
-
-#ifdef XP_MAC
+#ifdef XP_MACOSX
     /* Mac OS X stuff */
 #   include <QuickDraw.h>
 #endif
@@ -66,6 +59,18 @@
 #   define WINDOW_TEXT "(no libvlc)"
 #endif
 
+/* No, I really don't want to use XP_UNIX stuff on MacOSX */
+#ifdef XP_MACOSX
+#undef XP_UNIX
+#endif
+
+#ifdef XP_UNIX
+    /* X11 stuff */
+#   include <X11/Xlib.h>
+#   include <X11/Intrinsic.h>
+#   include <X11/StringDefs.h>
+#endif
+
 /*****************************************************************************
  * Unix-only declarations
 ******************************************************************************/
@@ -74,6 +79,15 @@
 #   define AOUT_PLUGINS "oss,dummy"
 
 static void Redraw( Widget w, XtPointer closure, XEvent *event );
+#endif
+
+/*****************************************************************************
+ * MacOS-only declarations
+******************************************************************************/
+#ifdef XP_MACOSX
+#   define VOUT_PLUGINS "macosx"
+#   define AOUT_PLUGINS "macosx"
+
 #endif
 
 /*****************************************************************************
@@ -176,23 +190,28 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
 /******************************************************************************
  * Mac-only API calls
  *****************************************************************************/
-#ifdef XP_MAC
+#ifdef XP_MACOSX
 int16 NPP_HandleEvent( NPP instance, void * event )
 {
+    VlcPlugin *p_plugin = (VlcPlugin*)instance->pdata;
+    vlc_value_t value;
+
     if( instance == NULL )
     {
         return false;
     }
 
-    Boolean eventHandled = false;
+    EventRecord *pouetEvent = (EventRecord*)event;
 
-#if 0
-    TPlugin *pPlugin = (TPlugin*)instance->pdata;
-    if( pPlugin != NULL && event != NULL )
+    if (pouetEvent->what == 6)
     {
-        eventHandled = pPlugin->HandleEvent( *(EventRecord*)event );
+        value.i_int = 1;
+        VLC_Set( p_plugin->i_vlc, "drawableredraw", value );
+
+        return true;
     }
-#endif
+
+    Boolean eventHandled = false;
 
     return eventHandled;
 }
@@ -381,6 +400,20 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
 
 NPError NPP_SetWindow( NPP instance, NPWindow* window )
 {
+#ifdef XP_MACOSX
+    vlc_value_t value;
+    vlc_value_t valuex;
+    vlc_value_t valuey;
+    vlc_value_t valuew;
+    vlc_value_t valueh;
+    vlc_value_t valuet;
+    vlc_value_t valuel;
+    vlc_value_t valueb;
+    vlc_value_t valuer;
+    vlc_value_t valueportx;
+    vlc_value_t valueporty;
+#endif
+
     if( instance == NULL )
     {
         return NPERR_INVALID_INSTANCE_ERROR;
@@ -390,11 +423,42 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 
     /* Write the window ID for vlc */
 #if USE_LIBVLC
-    vlc_value_t value;
 
+#ifdef XP_MACOSX
+    value.i_int = ((NP_Port*) (window->window))->port;
+    VLC_Set( p_plugin->i_vlc, "drawable", value );
+
+    valueportx.i_int = ((NP_Port*) (window->window))->portx;
+    valueporty.i_int = ((NP_Port*) (window->window))->porty;
+    VLC_Set( p_plugin->i_vlc, "drawableportx", valueportx );
+    VLC_Set( p_plugin->i_vlc, "drawableporty", valueporty );
+
+    valuex.i_int = window->x;
+    valuey.i_int = window->y;
+    valuew.i_int = window->width;
+    valueh.i_int = window->height;
+    valuet.i_int = window->clipRect.top;
+    valuel.i_int = window->clipRect.left;
+    valueb.i_int = window->clipRect.bottom;
+    valuer.i_int = window->clipRect.right;
+
+    VLC_Set( p_plugin->i_vlc, "drawablet", valuet );
+    VLC_Set( p_plugin->i_vlc, "drawablel", valuel );
+    VLC_Set( p_plugin->i_vlc, "drawableb", valueb );
+    VLC_Set( p_plugin->i_vlc, "drawabler", valuer );
+    VLC_Set( p_plugin->i_vlc, "drawablex", valuex );
+    VLC_Set( p_plugin->i_vlc, "drawabley", valuey );
+    VLC_Set( p_plugin->i_vlc, "drawablew", valuew );
+    VLC_Set( p_plugin->i_vlc, "drawableh", valueh );
+
+    p_plugin->window = window;
+
+#else
     /* FIXME: this cast sucks */
     value.i_int = (int) (ptrdiff_t) (void *) window->window;
     VLC_Set( p_plugin->i_vlc, "drawable", value );
+#endif
+
 #endif
 
     /*
