@@ -600,8 +600,6 @@ static int ParseSAP( intf_thread_t *p_intf, uint8_t *p_buffer, int i_read )
         psz_sdp++;
     }
 
-    fprintf(stderr,"\n\n%s\n\n", psz_sdp);
-
     /* Parse SDP info */
     p_sdp = ParseSDP( VLC_OBJECT(p_intf), psz_sdp );
 
