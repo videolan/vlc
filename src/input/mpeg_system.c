@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.63 2001/11/12 03:07:13 stef Exp $
+ * $Id: mpeg_system.c,v 1.64 2001/11/12 10:33:42 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1499,7 +1499,6 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                         p_new_es->i_cat = VIDEO_ES;
                         input_SelectES( p_input, p_new_es );
                         break;
-                        p_new_es->i_stream_id = 0xBD;
                     case MPEG1_AUDIO_ES:
                     case MPEG2_AUDIO_ES:
                         p_new_es->i_cat = AUDIO_ES;
