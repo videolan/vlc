@@ -2,7 +2,7 @@
  * intf_macosx.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf_macosx.h,v 1.1 2002/07/15 01:54:03 jlj Exp $
+ * $Id: intf_macosx.h,v 1.2 2002/07/16 20:41:48 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -125,6 +125,7 @@ struct intf_sys_s
     IBOutlet id o_mi_vol_down;
     IBOutlet id o_mi_mute;
     IBOutlet id o_mi_fullscreen;
+    IBOutlet id o_mi_deinterlace;
     IBOutlet id o_mi_program;
     IBOutlet id o_mi_title;
     IBOutlet id o_mi_chapter;

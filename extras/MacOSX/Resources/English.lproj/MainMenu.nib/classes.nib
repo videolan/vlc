@@ -3,6 +3,7 @@
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
             ACTIONS = {
+                deinterlace = id; 
                 faster = id; 
                 fullscreen = id; 
                 loop = id; 
@@ -42,6 +43,7 @@
                 o_mi_clear = id; 
                 o_mi_copy = id; 
                 o_mi_cut = id; 
+                o_mi_deinterlace = id; 
                 o_mi_faster = id; 
                 o_mi_fullscreen = id; 
                 o_mi_hide = id; 

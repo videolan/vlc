@@ -2,7 +2,7 @@
  * vout_macosx.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout_macosx.m,v 1.11 2002/07/15 20:09:31 sam Exp $
+ * $Id: vout_macosx.m,v 1.12 2002/07/16 20:41:48 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -32,6 +32,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
+#include <vlc/aout.h>
 #include <vlc/intf.h>
 
 #include <Cocoa/Cocoa.h>

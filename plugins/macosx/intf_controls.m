@@ -2,7 +2,7 @@
  * intf_controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf_controls.m,v 1.1 2002/07/15 01:54:03 jlj Exp $
+ * $Id: intf_controls.m,v 1.2 2002/07/16 20:41:48 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -60,6 +60,7 @@
 - (IBAction)volumeDown:(id)sender;
 - (IBAction)mute:(id)sender;
 - (IBAction)fullscreen:(id)sender;
+- (IBAction)deinterlace:(id)sender;
 
 - (IBAction)toggleProgram:(id)sender;
 - (IBAction)toggleTitle:(id)sender;
@@ -267,6 +268,23 @@
     }
 }
 
+- (IBAction)deinterlace:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    BOOL bEnable = [sender state] == NSOffState;
+
+    if( bEnable )
+    {
+        config_PutPsz( p_intf, "filter", "deinterlace" );
+        config_PutPsz( p_intf, "deinterlace-mode", 
+                       [[sender title] lossyCString] );
+    }
+    else
+    {
+        config_PutPsz( p_intf, "filter", NULL );
+    }
+}
+
 - (IBAction)toggleProgram:(id)sender
 {
     NSMenuItem * o_mi = (NSMenuItem *)sender;
@@ -370,6 +388,7 @@
 - (BOOL)validateMenuItem:(NSMenuItem *)o_mi
 {
     BOOL bEnabled = TRUE;
+    NSMenu * o_menu = [o_mi menu];
     intf_thread_t * p_intf = [NSApp getIntf];
 
     if( [[o_mi title] isEqualToString: _NS("Pause")] ||
@@ -454,13 +473,44 @@
 
         if( [[o_window className] isEqualToString: @"VLCWindow"] )
         {
-            [o_mi setState: [o_window isFullscreen]]; 
+            [o_mi setState: [o_window isFullscreen] ? 
+                             NSOnState : NSOffState]; 
         }
         else
         {
             bEnabled = FALSE;
         }
     }
+    else if( o_menu != nil && 
+             [[o_menu title] isEqualToString: _NS("Deinterlace")] )
+    { 
+        char * psz_filter = config_GetPsz( p_intf, "filter" );
+
+        if( psz_filter != NULL )
+        {
+            free( psz_filter );
+
+            psz_filter = config_GetPsz( p_intf, "deinterlace-mode" );
+        }
+
+        if( psz_filter != NULL )
+        {
+            if( strcmp( psz_filter, [[o_mi title] lossyCString] ) == 0 )
+            {
+                [o_mi setState: NSOnState]; 
+            }
+            else
+            {
+                [o_mi setState: NSOffState];
+            }
+
+            free( psz_filter );
+        } 
+        else
+        {
+            [o_mi setState: NSOffState];
+        }
+    } 
 
     return( bEnabled );
 }

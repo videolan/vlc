@@ -2,7 +2,7 @@
  * intf_macosx.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf_macosx.m,v 1.7 2002/07/15 20:09:31 sam Exp $
+ * $Id: intf_macosx.m,v 1.8 2002/07/16 20:41:48 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -223,6 +223,7 @@ static void intf_Run( intf_thread_t *p_intf )
     [o_mi_vol_down setTitle: _NS("Volume Down")];
     [o_mi_mute setTitle: _NS("Mute")];
     [o_mi_fullscreen setTitle: _NS("Fullscreen")];
+    [o_mi_deinterlace setTitle: _NS("Deinterlace")];
     [o_mi_program setTitle: _NS("Program")];
     [o_mi_title setTitle: _NS("Title")];
     [o_mi_chapter setTitle: _NS("Chapter")];

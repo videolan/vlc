@@ -5,6 +5,7 @@
 0.5.0
 Not released yet
 
+  * ./plugins/access/http.c: fixed a double free bug and a memory leak.
   * MacOS X: added messages and playlist panel, dock menu, context menu 
     in video view and localization support.
   * ./README: removed much outdated data.
