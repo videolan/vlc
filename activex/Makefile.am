@@ -85,7 +85,7 @@ axvlc.tlb axvlc_idl.c axvlc_idl.h: axvlc.idl
 	$(MIDL) -Oicf -error all -env win32 -tlb axvlc.tlb -iid axvlc_idl.c -h axvlc_idl.h axvlc.idl
 
 clean-tlb:
-	-rm axvlc.tlb axvlc_idl.c axvlc_idl.h
+	rm -f axvlc.tlb axvlc_idl.c axvlc_idl.h
 
 else
 
@@ -126,7 +126,7 @@ stamp-pic: FORCE
 ###############################################################################
 
 clean-local: clean-stamp clean-tlb
-	-rm axvlc$(LIBEXT)
+	rm -f axvlc$(LIBEXT)
 
 ###############################################################################
 # Force rule
