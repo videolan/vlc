@@ -191,7 +191,11 @@
  * late, the thread will perform an idle loop. This time should be
  * at least VOUT_IDLE_SLEEP plus the time required to render a few
  * images, to avoid trashing of decoded images */
-#define VOUT_DISPLAY_DELAY              ((int)(0.500*CLOCK_FREQ))
+#define VOUT_DISPLAY_DELAY              ((int)(0.200*CLOCK_FREQ))
+
+/* Pictures which are VOUT_BOGUS_DELAY or more in advance probably have
+ * a bogus PTS and won't be displayed */
+#define VOUT_BOGUS_DELAY                ((int)(0.800*CLOCK_FREQ))
 
 /* Delay (in microseconds) before an idle screen is displayed */
 #define VOUT_IDLE_DELAY                 (5*CLOCK_FREQ)

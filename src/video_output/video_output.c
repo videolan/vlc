@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.175 2002/05/06 21:05:26 gbazin Exp $
+ * $Id: video_output.c,v 1.176 2002/05/17 14:17:05 lool Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -571,8 +571,30 @@ static void RunThread( vout_thread_t *p_vout)
                     p_picture->i_status = DESTROYED_PICTURE;
                     p_vout->i_heap_size--;
                 }
-                intf_WarnMsg( 1, "vout warning: late picture skipped (%p)",
-                              p_picture );
+                intf_WarnMsg( 1, "vout warning: late picture skipped (%lld)",
+                              current_date - display_date );
+                vlc_mutex_unlock( &p_vout->picture_lock );
+
+                continue;
+            }
+            else if( display_date > current_date + VOUT_BOGUS_DELAY )
+            {
+                /* Picture is waaay too early: it will be destroyed */
+                vlc_mutex_lock( &p_vout->picture_lock );
+                if( p_picture->i_refcount )
+                {
+                    /* Pretend we displayed the picture, but don't destroy
+                     * it since the decoder might still need it. */
+                    p_picture->i_status = DISPLAYED_PICTURE;
+                }
+                else
+                {
+                    /* Destroy the picture without displaying it */
+                    p_picture->i_status = DESTROYED_PICTURE;
+                    p_vout->i_heap_size--;
+                }
+                intf_WarnMsg( 1, "vout warning: early picture skipped (%lld)",
+                              display_date - current_date );
                 vlc_mutex_unlock( &p_vout->picture_lock );
 
                 continue;
