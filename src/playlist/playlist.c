@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: playlist.c,v 1.80 2004/02/23 12:17:24 gbazin Exp $
+ * $Id: playlist.c,v 1.81 2004/02/23 21:50:14 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -267,7 +267,7 @@ static mtime_t ObjectGarbageCollector( playlist_t *p_playlist, int i_type,
 {
     vlc_object_t *p_obj;
 
-    if( destroy_date > mdate() ) return;
+    if( destroy_date > mdate() ) return destroy_date;
 
     if( destroy_date == 0 )
     {
