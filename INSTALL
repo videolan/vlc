@@ -11,7 +11,7 @@ A typical way to configure the vlc is :
 For a full compilation, you may try :
 
    ./configure --prefix=/usr --enable-mmx --enable-gnome --enable-fb \
-           --enable-glide --enable-ggi --enable-mga --enable-esd
+           --enable-glide --enable-ggi --enable-mga --enable-esd --enable-alsa
 
 See `./configure --help' for more information.
 

@@ -339,10 +339,13 @@ PLUGIN_YUVMMX = plugins/yuvmmx/yuvmmx.o \
 		plugins/yuvmmx/video_yuv24.o \
 		plugins/yuvmmx/video_yuv32.o
 
+PLUGIN_ALSA = plugins/alsa/alsa.o \
+	      plugins/alsa/aout_alsa.o
+
 PLUGIN_OBJ = $(PLUGIN_BEOS) $(PLUGIN_DSP) $(PLUGIN_DUMMY) $(PLUGIN_ESD) \
 		$(PLUGIN_FB) $(PLUGIN_GGI) $(PLUGIN_GLIDE) $(PLUGIN_GNOME) \
 		$(PLUGIN_MGA) $(PLUGIN_X11) $(PLUGIN_YUV) $(PLUGIN_YUVMMX) \
-		$(PLUGIN_SDL)	
+		$(PLUGIN_SDL) $(PLUGIN_ALSA)
 #
 # Other lists of files
 #
@@ -473,6 +476,11 @@ $(PLUGIN_ESD): %.o: %.c
 lib/dsp.so: $(PLUGIN_DSP)
 	ld -shared -o $@ $^
 $(PLUGIN_DSP): %.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+lib/alsa.so: $(PLUGIN_ALSA)
+	ld -shared -o $@ $^
+$(PLUGIN_ALSA): %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 lib/dummy.so: $(PLUGIN_DUMMY)

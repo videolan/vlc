@@ -17,6 +17,7 @@
     advantage of the SMP machines.
   * Added --enable-debug, --enable-stats, and --disable-optims in the
     GNU configure stuff.
+  * Added alsa audio support (plugin)  
 
 Mon, 28 Aug 2000 02:34:18 +0200
 0.1.99i :

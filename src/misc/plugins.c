@@ -107,6 +107,7 @@ void bank_Init( plugin_bank_t * p_bank )
     /* Audio pluins */
     SEEK_PLUGIN( "dsp" );
     SEEK_PLUGIN( "esd" );
+    SEEK_PLUGIN( "alsa" );
     
     /* Dummy plugin */
     SEEK_PLUGIN( "dummy" );

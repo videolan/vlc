@@ -157,7 +157,7 @@ Urgency: Normal
 Description: ALSA audio output support
  ALSA is the Advanced Linux Sound Architecture and is believed to be
  technically superior to the usual OSS support found in the Linux kernel.
-Status: Todo
+Status: Done ( henri )
 
 Task: 0x28
 Difficulty: Guru
