@@ -79,11 +79,13 @@ static void Close( vlc_object_t * );
 #define SRC_TEXT N_( "Source directory" )
 #define SRC_LONGTEXT N_( "Source directory" )
 #define CERT_TEXT N_( "Certificate file" )
-#define CERT_LONGTEXT N_( "HTTP interface x509 PEM certificate file (enables SSL)" )
+#define CERT_LONGTEXT N_( "HTTP interface x509 PEM certificate file " \
+                          "(enables SSL)" )
 #define KEY_TEXT N_( "Private key file" )
 #define KEY_LONGTEXT N_( "HTTP interface x509 PEM private key file" )
 #define CA_TEXT N_( "Root CA file" )
-#define CA_LONGTEXT N_( "HTTP interface x509 PEM trusted root CA certificates file" )
+#define CA_LONGTEXT N_( "HTTP interface x509 PEM trusted root CA " \
+                        "certificates file" )
 #define CRL_TEXT N_( "CRL file" )
 #define CRL_LONGTEXT N_( "HTTP interace Certificates Revocation List file" )
 

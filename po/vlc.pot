@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-11-10 16:03+0100\n"
+"POT-Creation-Date: 2004-11-11 13:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4280,39 +4280,48 @@ msgstr ""
 msgid "Allows you to give the mime returned by the server."
 msgstr ""
 
-#: modules/access_output/http.c:56 modules/control/http.c:81
+#: modules/access_output/http.c:57 modules/control/http.c:81
 msgid "Certificate file"
 msgstr ""
 
-#: modules/access_output/http.c:57
-msgid "HTTP/SSL stream output x509 PEM certificate file"
+#: modules/access_output/http.c:58
+msgid ""
+"Path to the x509 PEM certificate file that will be used by the HTTP/SSL "
+"stream output"
 msgstr ""
 
-#: modules/access_output/http.c:58 modules/control/http.c:83
+#: modules/access_output/http.c:60 modules/control/http.c:84
 msgid "Private key file"
 msgstr ""
 
-#: modules/access_output/http.c:59
-msgid "HTTP/SSL stream output x509 PEM private key file"
+#: modules/access_output/http.c:61
+msgid ""
+"Path to the x509 PEM private key file that will  be used by the HTTP/SSL "
+"stream output. Leave empty if you don't have one."
 msgstr ""
 
-#: modules/access_output/http.c:60 modules/control/http.c:85
+#: modules/access_output/http.c:64 modules/control/http.c:86
 msgid "Root CA file"
 msgstr ""
 
-#: modules/access_output/http.c:61
-msgid "HTTP/SSL stream output x509 PEM trusted root CA certificates file"
+#: modules/access_output/http.c:65
+msgid ""
+"Path to the x509 PEM trusted root CA certificates (certificate authority) "
+"file that will be used by the HTTP/SSL stream output. Leave empty if you "
+"don't have one."
 msgstr ""
 
-#: modules/access_output/http.c:62 modules/control/http.c:87
+#: modules/access_output/http.c:69 modules/control/http.c:89
 msgid "CRL file"
 msgstr ""
 
-#: modules/access_output/http.c:63
-msgid "HTTP/SSL stream output Certificates Revocation List file"
+#: modules/access_output/http.c:70
+msgid ""
+"Path to the x509 PEM Certificates Revocation List file that will be HTTP/SSL "
+"stream output. Leave empty if you don't have one."
 msgstr ""
 
-#: modules/access_output/http.c:66
+#: modules/access_output/http.c:75
 msgid "HTTP stream output"
 msgstr ""
 
@@ -5520,8 +5529,8 @@ msgstr ""
 
 #: modules/codec/x264.c:66
 msgid ""
-"Larger values save bits, thus improve quality, at the cost of seeking "
-"precision."
+"Larger values save bits, thus improve quality for a given bitrate, at the "
+"cost of seeking precision."
 msgstr ""
 
 #: modules/codec/x264.c:69
@@ -5701,19 +5710,19 @@ msgstr ""
 msgid "HTTP interface x509 PEM certificate file (enables SSL)"
 msgstr ""
 
-#: modules/control/http.c:84
+#: modules/control/http.c:85
 msgid "HTTP interface x509 PEM private key file"
 msgstr ""
 
-#: modules/control/http.c:86
+#: modules/control/http.c:87
 msgid "HTTP interface x509 PEM trusted root CA certificates file"
 msgstr ""
 
-#: modules/control/http.c:88
+#: modules/control/http.c:90
 msgid "HTTP interace Certificates Revocation List file"
 msgstr ""
 
-#: modules/control/http.c:91
+#: modules/control/http.c:93
 msgid "HTTP remote control interface"
 msgstr ""
 
@@ -10185,7 +10194,7 @@ msgstr ""
 
 #: modules/misc/gnutls.c:56
 msgid ""
-"Allows you to modify the Diffie-Hellman prime's number of bits(used for TLS "
+"Allows you to modify the Diffie-Hellman prime's number of bits (used for TLS "
 "or SSL-based server-side encryption)."
 msgstr ""
 
