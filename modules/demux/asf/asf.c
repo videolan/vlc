@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.20 2003/02/01 01:21:04 fenrir Exp $
+ * $Id: asf.c,v 1.21 2003/02/27 13:19:43 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -45,7 +45,7 @@ static int    Demux      ( input_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( "ASF v1.0 demuxer (file only)" );
+    set_description( _("ASF v1.0 demuxer (file only)") );
     set_capability( "demux", 200 );
     set_callbacks( Activate, Deactivate );
     add_shortcut( "asf" );

@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-02-27 00:36+0100\n"
+"POT-Creation-Date: 2003-02-27 12:59+0000\n"
 "PO-Revision-Date: 2002-28-02 23.35+0100\n"
 "Last-Translator: Sigmund Augdal <sigmunau@idi.ntnu.no>.\n"
 "Language-Team: \n"
@@ -12,12 +12,10 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#. Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
 #: src/libvlc.c:255
 msgid "C"
 msgstr "no"
 
-#. Usage
 #: src/libvlc.c:298 src/libvlc.c:1308
 #, c-format
 msgid ""
@@ -63,12 +61,6 @@ msgid ""
 "Written by the VideoLAN team at Ecole Centrale, Paris.\n"
 msgstr ""
 
-#. ****************************************************************************
-#. * Configuration options for the main program. Each module will also separatly
-#. * define its own configuration options.
-#. * Look into configuration.h if you need to know more about the following
-#. * macros.
-#. ****************************************************************************
 #: src/libvlc.h:37
 #, fuzzy
 msgid "interface module"
@@ -801,31 +793,26 @@ msgid ""
 "  vlc:quit                       quit VLC\n"
 msgstr ""
 
-#. Interface options
 #: src/libvlc.h:443 modules/misc/dummy/dummy.c:59
 msgid "Interface"
 msgstr "Grensesnitt"
 
-#. Audio options
 #: src/libvlc.h:457 modules/audio_output/file.c:108
 #: modules/gui/gtk/gnome_interface.c:1133 modules/gui/gtk/gtk_interface.c:1260
 #: modules/gui/macosx/intf.m:338
 msgid "Audio"
 msgstr "Lyd"
 
-#. Video options
 #: src/libvlc.h:475 modules/gui/gtk/gnome_interface.c:1140
 #: modules/gui/gtk/gtk_interface.c:1337 modules/gui/macosx/intf.m:345
-#: modules/misc/dummy/dummy.c:77 modules/video_output/directx/directx.c:107
+#: modules/misc/dummy/dummy.c:77 modules/video_output/directx/directx.c:109
 msgid "Video"
 msgstr "Video"
 
-#. Input options
 #: src/libvlc.h:495 modules/access/satellite/satellite.c:66
 msgid "Input"
 msgstr ""
 
-#. Decoder options
 #: src/libvlc.h:529
 msgid "Decoders"
 msgstr ""
@@ -834,7 +821,6 @@ msgstr ""
 msgid "Encoders"
 msgstr ""
 
-#. Stream output options
 #: src/libvlc.h:537 modules/gui/gtk/gnome_interface.c:2149
 #: modules/gui/gtk/gtk_interface.c:2468 modules/gui/gtk/gtk_interface.c:3150
 #: modules/gui/macosx/open.m:204 modules/gui/win32/strings.cpp:221
@@ -842,22 +828,19 @@ msgstr ""
 msgid "Stream output"
 msgstr "Standard output:"
 
-#. CPU options
 #: src/libvlc.h:550
 msgid "CPU"
 msgstr ""
 
-#. Playlist options
 #: src/libvlc.h:562 modules/gui/gtk/gnome_interface.c:648
 #: modules/gui/gtk/gnome_interface.c:2500
 #: modules/gui/gtk/gnome_interface.c:2525 modules/gui/gtk/gtk_interface.c:752
 #: modules/gui/gtk/gtk_interface.c:2813 modules/gui/macosx/intf.m:281
 #: modules/gui/macosx/intf.m:357 modules/gui/win32/strings.cpp:120
-#: modules/gui/win32/strings.cpp:180
+#: modules/gui/win32/strings.cpp:180 modules/gui/wxwindows/interface.cpp:283
 msgid "Playlist"
 msgstr "Spilleliste"
 
-#. Misc options
 #: src/libvlc.h:569 modules/audio_filter/converter/a52tofloat32.c:85
 #: modules/audio_filter/converter/mpgatofixed32.c:60
 #: modules/codec/a52old/a52old.c:59 modules/codec/mpeg_video/parser.c:84
@@ -935,9 +918,6 @@ msgid ""
 "the directory where you installed VLC and run \"vlc -I win32\"\n"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/access/dvd/dvd.c:65
 msgid "method to use by libdvdcss for key decryption"
 msgstr ""
@@ -962,7 +942,7 @@ msgstr ""
 msgid "[dvd:][device][@raw_device][@[title][,[chapter][,angle]]]"
 msgstr ""
 
-#: modules/access/dvd/dvd.c:87
+#: modules/access/dvd/dvd.c:87 modules/access/dvdplay/dvd.c:52
 #, fuzzy
 msgid "dvd"
 msgstr "Legg til"
@@ -975,14 +955,28 @@ msgstr ""
 msgid "DVD input module, uses libdvdcss"
 msgstr ""
 
+#: modules/access/dvdread/dvdread.c:46
+msgid "DVDRead input module"
+msgstr ""
+
+#: modules/access/dvdplay/dvd.c:51
+msgid "[dvdplay:][device][@[title][,[chapter][,angle]]]"
+msgstr ""
+
+#: modules/access/dvdplay/dvd.c:53
+#, fuzzy
+msgid "dvdplay input module"
+msgstr "Standard grensesnitt: "
+
+#: modules/access/vcd/vcd.c:79
+msgid "VCD input module"
+msgstr ""
+
 #: modules/access/v4l/v4l.c:45
 #, fuzzy
 msgid "Video4Linux input module"
 msgstr "Standard grensesnitt: "
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/access/file.c:63 modules/access/http.c:84 modules/access/udp.c:75
 msgid "caching value in ms"
 msgstr ""
@@ -1002,9 +996,6 @@ msgstr ""
 msgid "file"
 msgstr "Fil"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/access/http.c:78
 msgid "specify an HTTP proxy"
 msgstr ""
@@ -1047,13 +1038,6 @@ msgstr "Standard grensesnitt: "
 msgid "udp"
 msgstr "dsp"
 
-#: modules/access/dvdread/dvdread.c:46
-msgid "DVDRead input module"
-msgstr ""
-
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/access/satellite/satellite.c:41
 msgid "satellite default transponder frequency"
 msgstr ""
@@ -1090,9 +1074,25 @@ msgstr ""
 msgid "satellite input module"
 msgstr ""
 
-#: modules/access/vcd/vcd.c:79
-msgid "VCD input module"
-msgstr ""
+#: modules/access_output/file.c:58
+#, fuzzy
+msgid "File stream ouput"
+msgstr "Standard output:"
+
+#: modules/access_output/dummy.c:58
+#, fuzzy
+msgid "Dummy stream ouput"
+msgstr "Standard output:"
+
+#: modules/access_output/http.c:54
+#, fuzzy
+msgid "HTTP stream ouput"
+msgstr "Standard output:"
+
+#: modules/access_output/udp.c:75
+#, fuzzy
+msgid "UDP stream ouput"
+msgstr "Standard output:"
 
 #: modules/audio_filter/channel_mixer/trivial.c:46
 msgid "audio filter for trivial channel mixing"
@@ -1130,9 +1130,6 @@ msgstr ""
 msgid "audio filter for s16->float32 conversion"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/audio_filter/converter/a52tofloat32.c:76
 msgid "A/52 dynamic range compression"
 msgstr ""
@@ -1164,6 +1161,10 @@ msgstr ""
 
 #: modules/audio_filter/resampler/ugly.c:46
 msgid "audio filter for ugly resampling"
+msgstr ""
+
+#: modules/audio_filter/resampler/linear.c:59
+msgid "audio filter for linear interpolation resampling"
 msgstr ""
 
 #: modules/audio_mixer/float32.c:45
@@ -1201,7 +1202,6 @@ msgstr ""
 msgid "Mono"
 msgstr "Mono"
 
-#. Open the device
 #: modules/audio_output/alsa.c:194 modules/audio_output/alsa.c:308
 #: modules/audio_output/directx.c:264 modules/audio_output/directx.c:459
 #: modules/audio_output/oss.c:237 modules/audio_output/oss.c:306
@@ -1236,9 +1236,6 @@ msgstr "Standard grensesnitt: "
 msgid "EsounD audio module"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/audio_output/file.c:82
 msgid "output format"
 msgstr ""
@@ -1270,9 +1267,6 @@ msgstr ""
 msgid "file audio output module"
 msgstr "Standard grensesnitt: "
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/audio_output/oss.c:102
 msgid "try to work around buggy OSS drivers"
 msgstr ""
@@ -1337,9 +1331,19 @@ msgstr ""
 msgid "3D Now! A52 IMDCT module"
 msgstr ""
 
+#: modules/codec/adpcm.c:91
+#, fuzzy
+msgid "ADPCM audio deocder"
+msgstr "Standard grensesnitt: "
+
 #: modules/codec/araw.c:73
 msgid "Pseudo Raw Audio decoder"
 msgstr ""
+
+#: modules/codec/cinepak/cinepak.c:60
+#, fuzzy
+msgid "Cinepak video decoder"
+msgstr "Standard grensesnitt: "
 
 #: modules/codec/dv.c:48
 msgid "DV video decoder"
@@ -1348,6 +1352,11 @@ msgstr ""
 #: modules/codec/faad/decoder.c:55
 msgid "AAC decoder module (libfaad2)"
 msgstr ""
+
+#: modules/codec/flacdec.c:107
+#, fuzzy
+msgid "flac decoder module"
+msgstr "Standard grensesnitt: "
 
 #: modules/codec/ffmpeg/ffmpeg.c:99
 #, fuzzy
@@ -1378,6 +1387,11 @@ msgstr ""
 msgid "MMXEXT Post Processing module"
 msgstr ""
 
+#: modules/codec/libmpeg2.c:75
+#, fuzzy
+msgid "libmpeg2 decoder module"
+msgstr "Standard grensesnitt: "
+
 #: modules/codec/lpcm.c:98
 msgid "linear PCM audio parser"
 msgstr ""
@@ -1386,9 +1400,6 @@ msgstr ""
 msgid "MPEG audio layer I/II/III parser"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/codec/mpeg_video/idct/idct.c:41
 #: modules/codec/mpeg_video/parser.c:59
 msgid "IDCT module"
@@ -1470,9 +1481,6 @@ msgstr ""
 msgid "MPEG I/II video decoder module"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor.
-#. ****************************************************************************
 #: modules/codec/spudec/spudec.c:48
 msgid "font used by the text subtitler"
 msgstr ""
@@ -1493,13 +1501,54 @@ msgstr "_Teksting"
 msgid "subtitles decoder module"
 msgstr "Standard grensesnitt: "
 
+#: modules/codec/tarkin.c:95
+#, fuzzy
+msgid "Tarkin decoder module"
+msgstr "Standard grensesnitt: "
+
+#: modules/codec/theora.c:84
+#, fuzzy
+msgid "Theora decoder module"
+msgstr "Standard grensesnitt: "
+
+#: modules/codec/vorbis.c:112
+#, fuzzy
+msgid "Vorbis decoder module"
+msgstr "Standard grensesnitt: "
+
+#: modules/codec/xvid.c:48
+msgid "Xvid video decoder"
+msgstr ""
+
+#: modules/control/gestures.c:77
+msgid "Motion threshold"
+msgstr ""
+
+#: modules/control/gestures.c:79
+msgid "the amount of movement required for a mouse gesture to be recorded"
+msgstr ""
+
+#: modules/control/gestures.c:82
+msgid "Mouse button"
+msgstr ""
+
+#: modules/control/gestures.c:84
+msgid "the mouse button to be held down during mouse gestures"
+msgstr ""
+
+#: modules/control/gestures.c:89
+msgid "Gestures"
+msgstr ""
+
+#: modules/control/gestures.c:93
+#, fuzzy
+msgid "mouse gestures control module"
+msgstr "Standard grensesnitt: "
+
 #: modules/control/lirc/lirc.c:61
 msgid "infrared remote control module"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/control/rc/rc.c:77
 msgid "show stream position"
 msgstr ""
@@ -1526,8 +1575,49 @@ msgstr ""
 msgid "remote control interface module"
 msgstr "Standard grensesnitt: "
 
+#: modules/demux/a52sys.c:52
+msgid "A52 demuxer"
+msgstr ""
+
 #: modules/demux/aac/demux.c:46
 msgid "AAC stream demux"
+msgstr ""
+
+#: modules/demux/asf/asf.c:48
+msgid "ASF v1.0 demuxer (file only)"
+msgstr ""
+
+#: modules/demux/avi/avi.c:60
+msgid "avi-demuxer"
+msgstr ""
+
+#: modules/demux/avi/avi.c:62 modules/demux/avi/avi.c:63
+#, fuzzy
+msgid "force interleaved method"
+msgstr "Standard grensesnitt: "
+
+#: modules/demux/avi/avi.c:65 modules/demux/avi/avi.c:66
+msgid "force index creation"
+msgstr ""
+
+#: modules/demux/avi/avi.c:68
+msgid "avi demuxer"
+msgstr ""
+
+#: modules/demux/demuxdump.c:49
+msgid "Dump Demux input"
+msgstr ""
+
+#: modules/demux/flac.c:52
+msgid "flac demuxer"
+msgstr ""
+
+#: modules/demux/m3u.c:63
+msgid "m3u/asx metademux"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:53
+msgid "MP4 demuxer"
 msgstr ""
 
 #: modules/demux/mpeg/audio.c:47
@@ -1546,9 +1636,6 @@ msgstr ""
 msgid "generic ISO 13818-1 MPEG demultiplexing"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/demux/mpeg/ts.c:97
 msgid "compatibility with pre-0.4 VLS"
 msgstr ""
@@ -1578,6 +1665,14 @@ msgstr ""
 msgid "ISO 13818-1 MPEG Transport Stream input (libdvbpsi)"
 msgstr ""
 
+#: modules/demux/ogg.c:187
+msgid "ogg stream demux"
+msgstr ""
+
+#: modules/demux/rawdv.c:115
+msgid "raw dv demux"
+msgstr ""
+
 #: modules/demux/util/id3.c:46
 msgid "Simple id3 tag skipper"
 msgstr ""
@@ -1586,13 +1681,23 @@ msgstr ""
 msgid "id3 tag parser using libid3tag"
 msgstr ""
 
+#: modules/demux/wav/wav.c:49
+msgid "WAV demuxer"
+msgstr ""
+
+#: modules/encoder/ffmpeg/encoder.c:51
+#, fuzzy
+msgid "ffmpeg encoder"
+msgstr "mpeg"
+
+#: modules/encoder/xvid.c:58
+msgid "XviD video encoder (MPEG-4)"
+msgstr ""
+
 #: modules/gui/beos/BeOS.cpp:50
 msgid "BeOS standard API module"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/gui/familiar/familiar.c:62
 msgid "autoplay selected file"
 msgstr ""
@@ -1606,9 +1711,6 @@ msgstr ""
 msgid "Familiar Linux Gtk+ interface module"
 msgstr "Standard grensesnitt: "
 
-#.
-#. * from modules/gui/win32/mainframe.dfm:
-#.
 #: modules/gui/familiar/interface.c:66 modules/gui/familiar/interface.c:448
 #: modules/gui/gtk/gnome_interface.c:279 modules/gui/gtk/gtk_interface.c:126
 #: modules/gui/gtk/gtk_interface.c:1636 modules/gui/win32/strings.cpp:8
@@ -1623,14 +1725,11 @@ msgstr ""
 msgid "Open"
 msgstr "Åpne fil"
 
-#: modules/gui/familiar/interface.c:91
+#: modules/gui/familiar/interface.c:91 modules/gui/wxwindows/open.cpp:496
 #, fuzzy
 msgid "Open file"
 msgstr "Åpne fil"
 
-#.
-#. * from modules/gui/win32/preferences.dfm:
-#.
 #: modules/gui/familiar/interface.c:103 modules/gui/familiar/interface.c:104
 #: modules/gui/macosx/intf.m:288 modules/gui/macosx/prefs.m:191
 #: modules/gui/win32/strings.cpp:211
@@ -1650,7 +1749,7 @@ msgstr "Stopp strøm"
 #: modules/gui/gtk/gnome_interface.c:1061 modules/gui/gtk/gtk_interface.c:714
 #: modules/gui/gtk/gtk_interface.c:1160 modules/gui/macosx/intf.m:857
 #: modules/gui/macosx/intf.m:858 modules/gui/macosx/intf.m:859
-#: modules/gui/win32/strings.cpp:102
+#: modules/gui/win32/strings.cpp:102 modules/gui/wxwindows/interface.cpp:591
 msgid "Pause"
 msgstr "Pause"
 
@@ -1659,14 +1758,14 @@ msgstr "Pause"
 msgid "Pause stream"
 msgstr "Pause strøm"
 
-#. dock menu
 #: modules/gui/familiar/interface.c:144 modules/gui/gtk/gnome_interface.c:595
 #: modules/gui/gtk/gnome_interface.c:1054 modules/gui/gtk/gtk_interface.c:703
 #: modules/gui/macosx/intf.m:284 modules/gui/macosx/intf.m:323
 #: modules/gui/macosx/intf.m:370 modules/gui/macosx/intf.m:864
 #: modules/gui/macosx/intf.m:865 modules/gui/macosx/intf.m:866
 #: modules/gui/macosx/playlist.m:122 modules/gui/win32/strings.cpp:100
-#: modules/gui/win32/strings.cpp:204
+#: modules/gui/win32/strings.cpp:204 modules/gui/wxwindows/interface.cpp:280
+#: modules/gui/wxwindows/interface.cpp:596
 msgid "Play"
 msgstr "Spill"
 
@@ -1680,6 +1779,7 @@ msgstr "Spill strøm"
 #: modules/gui/gtk/gtk_interface.c:1168 modules/gui/macosx/intf.m:285
 #: modules/gui/macosx/intf.m:324 modules/gui/macosx/intf.m:371
 #: modules/gui/macosx/controls.m:695 modules/gui/win32/strings.cpp:104
+#: modules/gui/wxwindows/interface.cpp:278
 msgid "Stop"
 msgstr "Stopp"
 
@@ -1696,10 +1796,6 @@ msgstr ""
 msgid "Forward stream"
 msgstr ""
 
-#. Automatically generated by 'toolbox --update-po', please don't compile
-#.
-#. * from modules/gui/win32/about.dfm:
-#.
 #: modules/gui/familiar/interface.c:185 modules/gui/familiar/interface.c:186
 #: modules/gui/familiar/interface.c:459 modules/gui/gtk/gtk_interface.c:1621
 #: modules/gui/win32/strings.cpp:7
@@ -1757,6 +1853,7 @@ msgstr "Bruk"
 #: modules/gui/macosx/open.m:170 modules/gui/win32/strings.cpp:27
 #: modules/gui/win32/strings.cpp:174 modules/gui/win32/strings.cpp:215
 #: modules/gui/win32/strings.cpp:234 modules/gui/win32/strings.cpp:250
+#: modules/gui/wxwindows/open.cpp:172
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -1796,9 +1893,6 @@ msgstr ""
 msgid "Error loading pixmap file: %s"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/gui/gtk/gnome.c:55 modules/gui/gtk/gtk.c:57
 msgid "show tooltips"
 msgstr ""
@@ -1842,7 +1936,7 @@ msgstr "_Åpne fil..."
 #: modules/gui/gtk/gnome_interface.c:20 modules/gui/gtk/gnome_interface.c:509
 #: modules/gui/gtk/gnome_interface.c:1027 modules/gui/gtk/gtk_interface.c:178
 #: modules/gui/gtk/gtk_interface.c:624 modules/gui/gtk/gtk_interface.c:1440
-#: modules/gui/win32/strings.cpp:94
+#: modules/gui/win32/strings.cpp:94 modules/gui/wxwindows/interface.cpp:187
 #, fuzzy
 msgid "Open a file"
 msgstr "Åpne en fil"
@@ -2040,6 +2134,7 @@ msgstr "Video"
 #: modules/gui/macosx/open.m:206 modules/gui/macosx/open.m:313
 #: modules/gui/macosx/open.m:732 modules/gui/macosx/open.m:766
 #: modules/gui/win32/strings.cpp:93 modules/gui/win32/strings.cpp:226
+#: modules/gui/wxwindows/interface.cpp:267 modules/gui/wxwindows/open.cpp:160
 msgid "File"
 msgstr "Fil"
 
@@ -2049,16 +2144,18 @@ msgstr "Fil"
 #: modules/gui/gtk/gtk_interface.c:821 modules/gui/gtk/gtk_interface.c:2053
 #: modules/gui/gtk/gtk_interface.c:2842 modules/gui/macosx/open.m:173
 #: modules/gui/macosx/open.m:317 modules/gui/win32/strings.cpp:43
-#: modules/gui/win32/strings.cpp:95
+#: modules/gui/win32/strings.cpp:95 modules/gui/wxwindows/interface.cpp:269
+#: modules/gui/wxwindows/open.cpp:162
 msgid "Disc"
 msgstr "Disk"
 
 #: modules/gui/gtk/gnome_interface.c:532 modules/gui/gtk/gtk_interface.c:645
-#: modules/gui/win32/strings.cpp:97
+#: modules/gui/win32/strings.cpp:97 modules/gui/wxwindows/interface.cpp:271
 msgid "Net"
 msgstr "Nett"
 
 #: modules/gui/gtk/gnome_interface.c:544 modules/gui/gtk/gtk_interface.c:656
+#: modules/gui/wxwindows/interface.cpp:274
 msgid "Sat"
 msgstr ""
 
@@ -2125,6 +2222,7 @@ msgstr "Åpne Spilleliste"
 #: modules/gui/gtk/gtk_interface.c:849 modules/gui/gtk/gtk_interface.c:893
 #: modules/gui/gtk/gtk_interface.c:1214 modules/gui/win32/strings.cpp:112
 #: modules/gui/win32/strings.cpp:132 modules/gui/win32/strings.cpp:136
+#: modules/gui/wxwindows/interface.cpp:285
 msgid "Prev"
 msgstr "Forrige"
 
@@ -2141,6 +2239,7 @@ msgstr "Forrige fil"
 #: modules/gui/macosx/intf.m:328 modules/gui/macosx/intf.m:372
 #: modules/gui/macosx/controls.m:703 modules/gui/win32/strings.cpp:114
 #: modules/gui/win32/strings.cpp:134 modules/gui/win32/strings.cpp:138
+#: modules/gui/wxwindows/interface.cpp:287
 msgid "Next"
 msgstr "Neste"
 
@@ -2242,16 +2341,18 @@ msgid "Open Stream"
 msgstr "Stopp strøm"
 
 #: modules/gui/gtk/gnome_interface.c:1524 modules/gui/gtk/gtk_interface.c:1839
-#: modules/gui/macosx/open.m:166
+#: modules/gui/macosx/open.m:166 modules/gui/wxwindows/open.cpp:138
 msgid "Media Resource Locator (MRL)"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1546 modules/gui/gtk/gtk_interface.c:1861
+#: modules/gui/wxwindows/open.cpp:142
 #, fuzzy
 msgid "Open Target:"
 msgstr "Stopp strøm"
 
 #: modules/gui/gtk/gnome_interface.c:1566 modules/gui/gtk/gtk_interface.c:1881
+#: modules/gui/wxwindows/open.cpp:153
 msgid ""
 "Alternatively, you can build an MRL using one of the following predefined "
 "targets:"
@@ -2262,24 +2363,25 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:2422 modules/gui/macosx/open.m:176
 #: modules/gui/macosx/open.m:179 modules/gui/macosx/open.m:185
 #: modules/gui/macosx/open.m:210 modules/gui/win32/strings.cpp:229
-#: modules/gui/win32/strings.cpp:248
+#: modules/gui/win32/strings.cpp:248 modules/gui/wxwindows/open.cpp:214
 #, fuzzy
 msgid "Browse..."
 msgstr "Utforsk"
 
 #: modules/gui/gtk/gnome_interface.c:1634 modules/gui/gtk/gtk_interface.c:1949
-#: modules/gui/win32/strings.cpp:25
+#: modules/gui/win32/strings.cpp:25 modules/gui/wxwindows/open.cpp:238
 msgid "Disc type"
 msgstr "Disktype"
 
 #: modules/gui/gtk/gnome_interface.c:1653 modules/gui/gtk/gtk_interface.c:1968
 #: modules/gui/macosx/open.m:189 modules/gui/macosx/open.m:532
+#: modules/gui/wxwindows/open.cpp:233
 msgid "DVD"
 msgstr "DVD"
 
 #: modules/gui/gtk/gnome_interface.c:1661 modules/gui/gtk/gtk_interface.c:1976
 #: modules/gui/macosx/open.m:190 modules/gui/macosx/open.m:441
-#: modules/gui/macosx/open.m:524
+#: modules/gui/macosx/open.m:524 modules/gui/wxwindows/open.cpp:235
 msgid "VCD"
 msgstr "VCD"
 
@@ -2291,14 +2393,14 @@ msgstr "Navn på enhet"
 #: modules/gui/gtk/gnome_interface.c:1688 modules/gui/gtk/gtk_interface.c:1994
 #: modules/gui/gtk/menu.c:1007 modules/gui/gtk/menu.c:1375
 #: modules/gui/kde/interface.cpp:147 modules/gui/macosx/intf.m:334
-#: modules/gui/macosx/open.m:184
+#: modules/gui/macosx/open.m:184 modules/gui/wxwindows/open.cpp:258
 msgid "Chapter"
 msgstr "Kapittel"
 
 #: modules/gui/gtk/gnome_interface.c:1698 modules/gui/gtk/gtk_interface.c:2004
 #: modules/gui/gtk/menu.c:1345 modules/gui/gtk/menu.c:1366
 #: modules/gui/kde/interface.cpp:145 modules/gui/macosx/intf.m:333
-#: modules/gui/macosx/open.m:183
+#: modules/gui/macosx/open.m:183 modules/gui/wxwindows/open.cpp:252
 msgid "Title"
 msgstr "Tittel"
 
@@ -2309,17 +2411,19 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1755 modules/gui/gtk/gtk_interface.c:2070
 #: modules/gui/macosx/open.m:197 modules/gui/macosx/open.m:591
 #: modules/gui/macosx/open.m:629 modules/gui/win32/strings.cpp:169
+#: modules/gui/wxwindows/open.cpp:284
 msgid "UDP/RTP"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1765 modules/gui/gtk/gtk_interface.c:2080
 #: modules/gui/macosx/open.m:198 modules/gui/macosx/open.m:592
 #: modules/gui/macosx/open.m:641 modules/gui/win32/strings.cpp:170
+#: modules/gui/wxwindows/open.cpp:285
 msgid "UDP/RTP Multicast"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1775 modules/gui/gtk/gtk_interface.c:2090
-#: modules/gui/win32/strings.cpp:171
+#: modules/gui/win32/strings.cpp:171 modules/gui/wxwindows/open.cpp:286
 #, fuzzy
 msgid "Channel server"
 msgstr "Kanaltjener:"
@@ -2327,6 +2431,7 @@ msgstr "Kanaltjener:"
 #: modules/gui/gtk/gnome_interface.c:1785 modules/gui/gtk/gtk_interface.c:2100
 #: modules/gui/macosx/open.m:199 modules/gui/macosx/open.m:593
 #: modules/gui/macosx/open.m:654 modules/gui/win32/strings.cpp:172
+#: modules/gui/wxwindows/open.cpp:287
 msgid "HTTP/FTP/MMS"
 msgstr ""
 
@@ -2337,25 +2442,28 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:2185 modules/gui/gtk/gtk_interface.c:2196
 #: modules/gui/gtk/gtk_interface.c:3341 modules/gui/macosx/open.m:192
 #: modules/gui/macosx/open.m:194 modules/gui/macosx/open.m:212
+#: modules/gui/wxwindows/open.cpp:306 modules/gui/wxwindows/open.cpp:329
+#: modules/gui/wxwindows/open.cpp:351
 msgid "Port"
 msgstr "Port"
 
 #: modules/gui/gtk/gnome_interface.c:1805
 #: modules/gui/gtk/gnome_interface.c:1817 modules/gui/gtk/gtk_interface.c:2120
 #: modules/gui/gtk/gtk_interface.c:2132 modules/gui/macosx/open.m:193
-#: modules/gui/macosx/open.m:211
+#: modules/gui/macosx/open.m:211 modules/gui/wxwindows/open.cpp:321
+#: modules/gui/wxwindows/open.cpp:343
 msgid "Address"
 msgstr "Adresse"
 
 #: modules/gui/gtk/gnome_interface.c:1827 modules/gui/gtk/gtk_interface.c:2142
-#: modules/gui/macosx/open.m:195
+#: modules/gui/macosx/open.m:195 modules/gui/wxwindows/open.cpp:365
 msgid "URL"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1937
 #: modules/gui/gtk/gnome_interface.c:2397 modules/gui/gtk/gtk_interface.c:2252
 #: modules/gui/gtk/gtk_interface.c:2856 modules/gui/macosx/open.m:174
-#: modules/gui/macosx/open.m:321
+#: modules/gui/macosx/open.m:321 modules/gui/wxwindows/open.cpp:164
 msgid "Network"
 msgstr "Nettverk"
 
@@ -2386,6 +2494,7 @@ msgid "Horizontal"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2063 modules/gui/gtk/gtk_interface.c:2378
+#: modules/gui/wxwindows/open.cpp:166
 #, fuzzy
 msgid "Satellite"
 msgstr "Åpne spilleliste-vinduet"
@@ -2422,10 +2531,13 @@ msgstr "Moduler"
 msgid ""
 "Sorry, the module manager isn't functional yet. Please retry in a later "
 "version."
-msgstr "Beklager, modul håndtereren virker ikke ennå. Vennligst prøv på nytt i en senere versjon."
+msgstr ""
+"Beklager, modul håndtereren virker ikke ennå. Vennligst prøv på nytt i en "
+"senere versjon."
 
 #: modules/gui/gtk/gnome_interface.c:2404
 #: modules/gui/gtk/gnome_interface.c:2545 modules/gui/gtk/gtk_interface.c:2863
+#: modules/gui/wxwindows/playlist.cpp:135
 msgid "Url"
 msgstr "Url"
 
@@ -2466,7 +2578,7 @@ msgid "Selection"
 msgstr "Valg"
 
 #: modules/gui/gtk/gnome_interface.c:2552 modules/gui/gtk/gtk_interface.c:2973
-#: modules/gui/win32/strings.cpp:182
+#: modules/gui/win32/strings.cpp:182 modules/gui/wxwindows/playlist.cpp:136
 msgid "Duration"
 msgstr "Varighet"
 
@@ -2487,9 +2599,6 @@ msgstr "m:"
 msgid "h:"
 msgstr "h:"
 
-#.
-#. * from modules/gui/win32/messages.dfm:
-#.
 #: modules/gui/gtk/gnome_interface.c:2808 modules/gui/gtk/gtk_interface.c:3063
 #: modules/gui/kde/messages.cpp:8 modules/gui/macosx/intf.m:294
 #: modules/gui/macosx/intf.m:359 modules/gui/win32/strings.cpp:153
@@ -2642,11 +2751,13 @@ msgstr ""
 #: modules/gui/win32/strings.cpp:26 modules/gui/win32/strings.cpp:154
 #: modules/gui/win32/strings.cpp:173 modules/gui/win32/strings.cpp:183
 #: modules/gui/win32/strings.cpp:214 modules/gui/win32/strings.cpp:233
-#: modules/gui/win32/strings.cpp:249
+#: modules/gui/win32/strings.cpp:249 modules/gui/wxwindows/open.cpp:170
+#: modules/gui/wxwindows/fileinfo.cpp:83 modules/gui/wxwindows/messages.cpp:94
+#: modules/gui/wxwindows/playlist.cpp:141
 msgid "OK"
 msgstr "OK"
 
-#: modules/gui/gtk/gtk_interface.c:1825
+#: modules/gui/gtk/gtk_interface.c:1825 modules/gui/wxwindows/open.cpp:124
 #, fuzzy
 msgid "Open Target"
 msgstr "Stopp strøm"
@@ -2707,7 +2818,6 @@ msgstr "_Invertert"
 msgid "_Select"
 msgstr "_Valgt"
 
-#. special case for "off" item
 #: modules/gui/gtk/menu.c:725 modules/gui/macosx/prefs.m:399
 #: modules/gui/macosx/prefs.m:428 modules/gui/macosx/prefs.m:670
 #: modules/gui/macosx/prefs.m:699
@@ -2734,7 +2844,6 @@ msgstr "Varighet"
 msgid "Configure"
 msgstr ""
 
-#. add new label
 #: modules/gui/gtk/preferences.c:394 modules/gui/kde/pluginsbox.cpp:53
 #, fuzzy
 msgid "Selected:"
@@ -2811,7 +2920,6 @@ msgstr ""
 msgid "Open CrashLog"
 msgstr ""
 
-#. main menu
 #: modules/gui/macosx/intf.m:300
 msgid "About VLC media player"
 msgstr ""
@@ -2864,7 +2972,6 @@ msgstr "Åpne nettverk"
 msgid "Open Recent"
 msgstr "Stopp strøm"
 
-#. Recent Items Menu
 #: modules/gui/macosx/intf.m:313 modules/gui/macosx/intf.m:1504
 msgid "Clear Menu"
 msgstr ""
@@ -2982,7 +3089,6 @@ msgstr ""
 msgid "License"
 msgstr ""
 
-#. error panel
 #: modules/gui/macosx/intf.m:376
 msgid "Error"
 msgstr ""
@@ -3116,9 +3222,6 @@ msgstr "Standard grensesnitt: "
 msgid "Version x.y.z"
 msgstr ""
 
-#.
-#. * from modules/gui/win32/disc.dfm:
-#.
 #: modules/gui/win32/strings.cpp:19
 #, fuzzy
 msgid "Open Disc"
@@ -3177,7 +3280,7 @@ msgstr "Fil"
 msgid "0:00:00"
 msgstr ""
 
-#: modules/gui/win32/strings.cpp:47
+#: modules/gui/win32/strings.cpp:47 modules/gui/wxwindows/interface.cpp:236
 #, fuzzy
 msgid "&File"
 msgstr "Fil"
@@ -3197,7 +3300,7 @@ msgstr "Åpne en _disk"
 msgid "&Network stream..."
 msgstr "_Nettverksstrøm"
 
-#: modules/gui/win32/strings.cpp:51
+#: modules/gui/win32/strings.cpp:51 modules/gui/wxwindows/interface.cpp:237
 #, fuzzy
 msgid "&View"
 msgstr "_Vis"
@@ -3207,7 +3310,7 @@ msgstr "_Vis"
 msgid "&Hide interface"
 msgstr "_Gjem grensesnitt"
 
-#: modules/gui/win32/strings.cpp:54
+#: modules/gui/win32/strings.cpp:54 modules/gui/wxwindows/interface.cpp:219
 #, fuzzy
 msgid "&Playlist..."
 msgstr "Spilleliste..."
@@ -3269,12 +3372,12 @@ msgstr "Velg fil"
 msgid "&Language"
 msgstr ""
 
-#: modules/gui/win32/strings.cpp:72
+#: modules/gui/win32/strings.cpp:72 modules/gui/wxwindows/interface.cpp:226
 #, fuzzy
 msgid "&Subtitles"
 msgstr "_Teksting"
 
-#: modules/gui/win32/strings.cpp:74
+#: modules/gui/win32/strings.cpp:74 modules/gui/wxwindows/interface.cpp:239
 #, fuzzy
 msgid "&Help"
 msgstr "_Hjelp"
@@ -3411,9 +3514,6 @@ msgstr "Åpne spilleliste-vinduet"
 msgid "&Copy text"
 msgstr ""
 
-#.
-#. * from modules/gui/win32/network.dfm:
-#.
 #: modules/gui/win32/strings.cpp:161
 #, fuzzy
 msgid "Open network"
@@ -3460,12 +3560,13 @@ msgstr "Nettverk"
 msgid "&Url"
 msgstr "Url"
 
-#: modules/gui/win32/strings.cpp:189
+#: modules/gui/win32/strings.cpp:189 modules/gui/wxwindows/playlist.cpp:112
 #, fuzzy
 msgid "&Delete"
 msgstr "Slett"
 
 #: modules/gui/win32/strings.cpp:190 modules/gui/win32/strings.cpp:191
+#: modules/gui/wxwindows/playlist.cpp:118
 #, fuzzy
 msgid "&Selection"
 msgstr "Valg"
@@ -3527,9 +3628,6 @@ msgstr "Tittel:"
 msgid "239.239.0.1"
 msgstr ""
 
-#.
-#. * from modules/gui/win32/subtitles.dfm:
-#.
 #: modules/gui/win32/strings.cpp:240
 #, fuzzy
 msgid "Add subtitles"
@@ -3547,9 +3645,253 @@ msgstr ""
 msgid "0.0"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
+#: modules/gui/wxwindows/wxwindows.cpp:82
+msgid "wxWindows"
+msgstr ""
+
+#: modules/gui/wxwindows/wxwindows.cpp:83
+#, fuzzy
+msgid "wxWindows interface module"
+msgstr "Standard grensesnitt: "
+
+#: modules/gui/wxwindows/interface.cpp:188
+#, fuzzy
+msgid "Open a DVD or (S)VCD"
+msgstr "Åpne en DVD eller VCD"
+
+#: modules/gui/wxwindows/interface.cpp:189
+#, fuzzy
+msgid "Open a network stream"
+msgstr "Velg en nettverksstrøm"
+
+#: modules/gui/wxwindows/interface.cpp:190
+#, fuzzy
+msgid "Open a satellite stream"
+msgstr "Åpne spilleliste-vinduet"
+
+#: modules/gui/wxwindows/interface.cpp:191
+msgid "Eject the DVD/CD"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:192
+#, fuzzy
+msgid "Exit this program"
+msgstr "Avslutt programmet"
+
+#: modules/gui/wxwindows/interface.cpp:194
+#, fuzzy
+msgid "Open the playlist"
+msgstr "Åpne spilleliste-vinduet"
+
+#: modules/gui/wxwindows/interface.cpp:195
+#, fuzzy
+msgid "Show the program logs"
+msgstr "Avslutt programmet"
+
+#: modules/gui/wxwindows/interface.cpp:196
+msgid "Show information about the file being played"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:198
+msgid "Change the current audio track"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:199
+msgid "Change the current subtitles stream"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:200
+msgid "Go to the preferences menu"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:202
+#, fuzzy
+msgid "About this program"
+msgstr "Avslutt programmet"
+
+#: modules/gui/wxwindows/interface.cpp:206
+#, fuzzy
+msgid "&Open File..."
+msgstr "_Åpne fil..."
+
+#: modules/gui/wxwindows/interface.cpp:207
+#, fuzzy
+msgid "Open &Disc..."
+msgstr "Åpne en _disk"
+
+#: modules/gui/wxwindows/interface.cpp:208
+#, fuzzy
+msgid "&Network Stream..."
+msgstr "_Nettverksstrøm"
+
+#: modules/gui/wxwindows/interface.cpp:210
+#, fuzzy
+msgid "&Satellite Stream..."
+msgstr "_Nettverksstrøm"
+
+#: modules/gui/wxwindows/interface.cpp:213
+#, fuzzy
+msgid "&Eject Disc"
+msgstr "Åpne Disk"
+
+#: modules/gui/wxwindows/interface.cpp:215
+#, fuzzy
+msgid "E&xit"
+msgstr "_Avslutt"
+
+#: modules/gui/wxwindows/interface.cpp:220
+#, fuzzy
+msgid "&Logs..."
+msgstr "Åpne en _disk"
+
+#: modules/gui/wxwindows/interface.cpp:221
+#, fuzzy
+msgid "&File info..."
+msgstr "_Åpne fil..."
+
+#: modules/gui/wxwindows/interface.cpp:225
+#, fuzzy
+msgid "&Audio"
+msgstr "Lyd"
+
+#: modules/gui/wxwindows/interface.cpp:228
+#, fuzzy
+msgid "&Preferences..."
+msgstr "_Preferanser..."
+
+#: modules/gui/wxwindows/interface.cpp:232
+#, fuzzy
+msgid "&About..."
+msgstr "_Om..."
+
+#: modules/gui/wxwindows/interface.cpp:238
+#, fuzzy
+msgid "&Settings"
+msgstr "_Innstillinger"
+
+#: modules/gui/wxwindows/interface.cpp:252
+#, fuzzy
+msgid "Stop current playlist item"
+msgstr "Åpne spilleliste-vinduet"
+
+#: modules/gui/wxwindows/interface.cpp:253
+msgid "Play current playlist item"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:254
+msgid "Pause current playlist item"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:255
+#, fuzzy
+msgid "Open playlist"
+msgstr "Åpne Spilleliste"
+
+#: modules/gui/wxwindows/interface.cpp:256
+#, fuzzy
+msgid "Previous playlist item"
+msgstr "Forrige fil"
+
+#: modules/gui/wxwindows/interface.cpp:257
+#, fuzzy
+msgid "Next playlist item"
+msgstr "Åpne spilleliste-vinduet"
+
+#: modules/gui/wxwindows/interface.cpp:378
+#, fuzzy
+msgid ""
+" (wxWindows interface)\n"
+"\n"
+msgstr "Standard grensesnitt: "
+
+#: modules/gui/wxwindows/interface.cpp:379
+#, fuzzy
+msgid ""
+"(C) 1996-2003 - the VideoLAN Team\n"
+"\n"
+msgstr "© 1996-2003 the VideoLAN team"
+
+#: modules/gui/wxwindows/interface.cpp:380
+msgid ""
+"The VideoLAN team <videolan@videolan.org>\n"
+"http://www.videolan.org/\n"
+"\n"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:382
+#, fuzzy
+msgid ""
+"This is the VideoLAN Client, a DVD, MPEG and DivX player.\n"
+"It can play MPEG and MPEG2 files from a file or from a network source."
+msgstr ""
+"Dette er VideoLAN client, en DVD, MPEG og DivX spiller. Den kan spille MPEG "
+"og MPEG 2 filer fra en fil eller en nettverkskilde"
+
+#: modules/gui/wxwindows/interface.cpp:386
+#, fuzzy
+msgid "About "
+msgstr "Om"
+
+#: modules/gui/wxwindows/open.cpp:234
+msgid "DVD (menus support)"
+msgstr ""
+
+#: modules/gui/wxwindows/open.cpp:244
+#, fuzzy
+msgid "Device Name"
+msgstr "Navn på enhet"
+
+#: modules/gui/wxwindows/open.cpp:308 modules/gui/wxwindows/open.cpp:331
+#: modules/gui/wxwindows/open.cpp:353 modules/gui/wxwindows/popup.cpp:262
+#, c-format
+msgid "%d"
+msgstr ""
+
+#: modules/gui/wxwindows/popup.cpp:88
+#, fuzzy
+msgid "Audio menu"
+msgstr "_Innstillinger"
+
+#: modules/gui/wxwindows/popup.cpp:101
+#, fuzzy
+msgid "Video menu"
+msgstr "_Innstillinger"
+
+#: modules/gui/wxwindows/popup.cpp:113
+msgid "Input menu"
+msgstr ""
+
+#: modules/gui/wxwindows/popup.cpp:126 modules/gui/wxwindows/playlist.cpp:107
+msgid "&Close"
+msgstr ""
+
+#: modules/gui/wxwindows/playlist.cpp:104
+msgid "Add &Url..."
+msgstr ""
+
+#: modules/gui/wxwindows/playlist.cpp:105
+msgid "Add &Directory..."
+msgstr ""
+
+#: modules/gui/wxwindows/playlist.cpp:111
+#, fuzzy
+msgid "&Invert"
+msgstr "Inverter"
+
+#: modules/gui/wxwindows/playlist.cpp:113
+#, fuzzy
+msgid "&Select All"
+msgstr "Velg fil"
+
+#: modules/gui/wxwindows/playlist.cpp:117
+#, fuzzy
+msgid "&Manage"
+msgstr "_Vinkel"
+
+#: modules/gui/wxwindows/playlist.cpp:192
+msgid "no info"
+msgstr ""
+
 #: modules/misc/dummy/dummy.c:37
 msgid "dummy image chroma format"
 msgstr ""
@@ -3584,6 +3926,10 @@ msgstr "Skjul grensesnittvinduet"
 #, fuzzy
 msgid "Gtk+ helper module"
 msgstr "Standard grensesnitt: "
+
+#: modules/misc/httpd.c:91
+msgid "HTTP 1.0 daemon"
+msgstr ""
 
 #: modules/misc/logger/logger.c:86
 msgid "log filename"
@@ -3631,7 +3977,7 @@ msgstr ""
 msgid "AltiVec memcpy module"
 msgstr ""
 
-#: modules/misc/network/ipv4.c:86
+#: modules/misc/network/ipv4.c:87
 msgid "IPv4 network abstraction layer"
 msgstr ""
 
@@ -3639,12 +3985,79 @@ msgstr ""
 msgid "IPv6 network abstraction layer"
 msgstr ""
 
+#: modules/misc/qte_main.cpp:66
+#, fuzzy
+msgid "Qt Embedded helper module"
+msgstr "Standard grensesnitt: "
+
+#: modules/misc/sap.c:131
+msgid "SAP"
+msgstr ""
+
+#: modules/misc/sap.c:134
+#, fuzzy
+msgid "SAP interface module"
+msgstr "Standard grensesnitt: "
+
+#: modules/misc/screensaver.c:44
+#, fuzzy
+msgid "screensaver disabling module"
+msgstr "Standard grensesnitt: "
+
 #: modules/misc/testsuite/test1.c:33
 msgid "C module that does nothing"
 msgstr ""
 
 #: modules/misc/testsuite/test4.c:63
 msgid "Miscellaneous stress tests"
+msgstr ""
+
+#: modules/mux/avi.c:96
+msgid "Avi muxer"
+msgstr ""
+
+#: modules/mux/dummy.c:62
+msgid "Dummy muxer"
+msgstr ""
+
+#: modules/mux/mpeg/ps.c:79
+msgid "PS muxer"
+msgstr ""
+
+#: modules/mux/mpeg/ts.c:140
+msgid "TS muxer"
+msgstr ""
+
+#: modules/mux/mpeg/ts.c:145
+msgid "TS muxer (libdvbpsi)"
+msgstr ""
+
+#: modules/mux/ogg.c:54
+msgid "Ogg/ogm muxer"
+msgstr ""
+
+#: modules/packetizer/a52.c:70
+msgid "A/52 audio packetizer"
+msgstr ""
+
+#: modules/packetizer/copy.c:69
+msgid "Copy packetizer"
+msgstr ""
+
+#: modules/packetizer/mpeg4audio.c:89
+msgid "MPEG4 Audio packetizer"
+msgstr ""
+
+#: modules/packetizer/mpeg4video.c:73
+msgid "MPEG4 Video packetizer"
+msgstr ""
+
+#: modules/packetizer/mpegaudio.c:69
+msgid "MPEG-I/II audio packetizer"
+msgstr ""
+
+#: modules/packetizer/mpegvideo.c:73
+msgid "MPEG-I/II video packetizer"
 msgstr ""
 
 #: modules/video_chroma/i420_rgb.c:67
@@ -3672,9 +4085,6 @@ msgstr "Hopp til: "
 msgid "MMX conversions from "
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_filter/clone.c:53
 msgid "number of clones"
 msgstr ""
@@ -3692,9 +4102,6 @@ msgstr ""
 msgid "image clone video module"
 msgstr "Standard grensesnitt: "
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_filter/crop.c:54
 msgid "crop geometry"
 msgstr ""
@@ -3716,9 +4123,6 @@ msgstr ""
 msgid "image crop video module"
 msgstr "Standard grensesnitt: "
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_filter/deinterlace/deinterlace.c:75
 #, fuzzy
 msgid "deinterlace mode"
@@ -3733,9 +4137,6 @@ msgstr ""
 msgid "deinterlacing module"
 msgstr "Standard grensesnitt: "
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_filter/distort.c:59
 #, fuzzy
 msgid "distort mode"
@@ -3759,9 +4160,6 @@ msgstr ""
 msgid "invert video module"
 msgstr "Standard grensesnitt: "
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_filter/motionblur.c:54
 msgid "blur factor"
 msgstr ""
@@ -3774,9 +4172,6 @@ msgstr ""
 msgid "Motion blur filter"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_filter/transform.c:57
 msgid "transform type"
 msgstr ""
@@ -3789,9 +4184,6 @@ msgstr ""
 msgid "image transformation module"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_filter/wall.c:53
 msgid "number of columns"
 msgstr ""
@@ -3825,32 +4217,29 @@ msgstr ""
 msgid "ASCII-art video output module"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
-#: modules/video_output/directx/directx.c:93
+#: modules/video_output/directx/directx.c:95
 msgid "always on top"
 msgstr ""
 
-#: modules/video_output/directx/directx.c:94
+#: modules/video_output/directx/directx.c:96
 msgid "place the directx window on top of other windows"
 msgstr ""
 
-#: modules/video_output/directx/directx.c:95
+#: modules/video_output/directx/directx.c:97
 msgid "use hardware YUV->RGB conversions"
 msgstr ""
 
-#: modules/video_output/directx/directx.c:97
+#: modules/video_output/directx/directx.c:99
 msgid ""
 "Try to use hardware acceleration for YUV->RGB conversions. This option "
 "doesn't have any effect when using overlays."
 msgstr ""
 
-#: modules/video_output/directx/directx.c:99
+#: modules/video_output/directx/directx.c:101
 msgid "use video buffers in system memory"
 msgstr ""
 
-#: modules/video_output/directx/directx.c:101
+#: modules/video_output/directx/directx.c:103
 msgid ""
 "Create video buffers in system memory instead of video memory. This isn't "
 "recommended as usually using video memory allows to benefit from more "
@@ -3858,7 +4247,7 @@ msgid ""
 "doesn't have any effect when using overlays."
 msgstr ""
 
-#: modules/video_output/directx/directx.c:111
+#: modules/video_output/directx/directx.c:113
 #, fuzzy
 msgid "DirectX video module"
 msgstr "Standard grensesnitt: "
@@ -3876,9 +4265,6 @@ msgstr "Standardenhet:"
 msgid "Linux console framebuffer module"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_output/ggi.c:56 modules/video_output/mga/xmga.c:98
 #: modules/video_output/x11/x11.c:52 modules/video_output/x11/xvideo.c:58
 msgid "X11 display name"
@@ -3898,9 +4284,6 @@ msgstr ""
 msgid "Matrox Graphic Array video module"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_output/mga/xmga.c:89 modules/video_output/x11/x11.c:43
 #: modules/video_output/x11/xvideo.c:49
 #, fuzzy
@@ -3929,9 +4312,6 @@ msgstr ""
 msgid "X11 MGA module"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_output/qte/qte.cpp:80
 msgid "QT Embedded display name"
 msgstr ""
@@ -3942,8 +4322,6 @@ msgid ""
 "will use the value of the DISPLAY environment variable."
 msgstr ""
 
-#.    add_category_hint( N_("QT Embedded"), NULL );
-#.    add_string( "qte-display", "landscape", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT);
 #: modules/video_output/qte/qte.cpp:116
 #, fuzzy
 msgid "QT Embedded video module"
@@ -3957,6 +4335,11 @@ msgstr "Standard grensesnitt: "
 #: modules/video_output/svgalib.c:53
 msgid "SVGAlib module"
 msgstr ""
+
+#: modules/video_output/wingdi.c:82
+#, fuzzy
+msgid "Windows GDI video output module"
+msgstr "Standard grensesnitt: "
 
 #: modules/video_output/x11/x11.c:57 modules/video_output/x11/xvideo.c:68
 msgid "use shared memory"
@@ -3975,9 +4358,6 @@ msgstr "x11"
 msgid "X11 module"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_output/x11/xvideo.c:44
 msgid "XVideo adaptor number"
 msgstr ""
@@ -4011,9 +4391,6 @@ msgstr ""
 msgid "scope effect"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/visualization/xosd/xosd.c:61
 #, fuzzy
 msgid "flip vertical position"
@@ -4093,10 +4470,6 @@ msgstr "Standard grensesnitt: "
 #~ msgstr "_Vis"
 
 #, fuzzy
-#~ msgid "Open a network stream"
-#~ msgstr "Velg en nettverksstrøm"
-
-#, fuzzy
 #~ msgid "Open file..."
 #~ msgstr "_Åpne fil..."
 
@@ -4107,9 +4480,6 @@ msgstr "Standard grensesnitt: "
 #, fuzzy
 #~ msgid "Network stream..."
 #~ msgstr "_Nettverksstrøm"
-
-#~ msgid "Previous File"
-#~ msgstr "Forrige fil"
 
 #, fuzzy
 #~ msgid "-"

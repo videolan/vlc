@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.9 2002/11/28 17:34:59 sam Exp $
+ * $Id: cinepak.c,v 1.10 2003/02/27 13:19:44 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -57,7 +57,7 @@ static void     DecodeThread    ( videodec_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( "Cinepak video decoder" );
+    set_description( _("Cinepak video decoder") );
     set_capability( "decoder", 70 );
     set_callbacks( OpenDecoder, NULL );
 vlc_module_end();

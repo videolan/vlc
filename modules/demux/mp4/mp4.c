@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.17 2003/02/07 01:22:55 fenrir Exp $
+ * $Id: mp4.c,v 1.18 2003/02/27 13:19:43 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,7 +50,7 @@ static int   MP4Seek     ( input_thread_t *, mtime_t );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( "MP4 demuxer" );
+    set_description( _("MP4 demuxer") );
     set_capability( "demux", 242 );
     set_callbacks( MP4Init, __MP4End );
 vlc_module_end();

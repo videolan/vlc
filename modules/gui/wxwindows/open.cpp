@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.4 2003/01/28 21:18:53 gbazin Exp $
+ * $Id: open.cpp,v 1.5 2003/02/27 13:19:44 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -493,7 +493,7 @@ void OpenDialog::OnFilePanelChange( wxCommandEvent& WXUNUSED(event) )
 
 void OpenDialog::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
 {
-    wxFileDialog dialog( this, _("Open file"), _(""), _(""), _("*.*"),
+    wxFileDialog dialog( this, _("Open file"), "", "", "*.*",
                          wxOPEN );
 
     if( dialog.ShowModal() == wxID_OK )

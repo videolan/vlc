@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-02-27 00:36+0100\n"
+"POT-Creation-Date: 2003-02-27 12:59+0000\n"
 "PO-Revision-Date: 2002-07-12 11:49+0100\n"
 "Last-Translator: Arkadiusz Lipiec <alipiec@elka.pw.edu.pl>\n"
 "Language-Team: polish <pl@li.org>\n"
@@ -13,12 +13,10 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#. Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
 #: src/libvlc.c:255
 msgid "C"
 msgstr "pl"
 
-#. Usage
 #: src/libvlc.c:298 src/libvlc.c:1308
 #, fuzzy, c-format
 msgid ""
@@ -72,12 +70,6 @@ msgstr ""
 "Public License; zajrzyj do pliku COPYING, aby uzyskaæ wiêcej szczegó³ów.\n"
 "Program napisany przez zespó³ VideoLAN na uczelni Ecole Centrale, Pary¿.\n"
 
-#. ****************************************************************************
-#. * Configuration options for the main program. Each module will also separatly
-#. * define its own configuration options.
-#. * Look into configuration.h if you need to know more about the following
-#. * macros.
-#. ****************************************************************************
 #: src/libvlc.h:37
 msgid "interface module"
 msgstr "modu³ interfejsu"
@@ -86,7 +78,9 @@ msgstr "modu³ interfejsu"
 msgid ""
 "This option allows you to select the interface used by VLC. The default "
 "behavior is to automatically select the best module available."
-msgstr "Ta opcja umo¿liwia wybranie interfejsu u¿ywanego przez VLC. Domy¶lnym zachowaniem jest automatyczny wybór najlepszego dostêpnego modu³u."
+msgstr ""
+"Ta opcja umo¿liwia wybranie interfejsu u¿ywanego przez VLC. Domy¶lnym "
+"zachowaniem jest automatyczny wybór najlepszego dostêpnego modu³u."
 
 #: src/libvlc.h:43
 #, fuzzy
@@ -99,7 +93,9 @@ msgid ""
 "This option allows you to select additional interfaces used by VLC. They "
 "will be launched in the background in addition to the default interface. Use "
 "a comma separated list of interface modules."
-msgstr "Ta opcja umo¿liwia wybranie interfejsu u¿ywanego przez VLC. Domy¶lnym zachowaniem jest automatyczny wybór najlepszego dostêpnego modu³u."
+msgstr ""
+"Ta opcja umo¿liwia wybranie interfejsu u¿ywanego przez VLC. Domy¶lnym "
+"zachowaniem jest automatyczny wybór najlepszego dostêpnego modu³u."
 
 #: src/libvlc.h:49
 msgid "verbosity (0,1,2)"
@@ -127,7 +123,9 @@ msgstr "kolorowe komunikaty"
 msgid ""
 "When this option is turned on, the messages sent to the console will be "
 "colorized. Your terminal needs Linux color support for this to work."
-msgstr "Po w³±czeniu tej opcji, komunikaty wysy³ane do konsoli bêd± kolorozyowane. Terminal powinien obs³ugiwaæ kolory aby funkcja zadzia³a³a."
+msgstr ""
+"Po w³±czeniu tej opcji, komunikaty wysy³ane do konsoli bêd± kolorozyowane. "
+"Terminal powinien obs³ugiwaæ kolory aby funkcja zadzia³a³a."
 
 #: src/libvlc.h:63
 msgid "show advanced options"
@@ -147,7 +145,9 @@ msgstr "domy¶lna ¶cie¿ka wyszukiwania interfejsu"
 msgid ""
 "This option allows you to set the default path that the interface will open "
 "when looking for a file."
-msgstr "Ta opcja umo¿liwia ustawienie domy¶lnej ¶cie¿ki, któr± interfejs bêdzie otwiera³ w poszukiwaniu pliku."
+msgstr ""
+"Ta opcja umo¿liwia ustawienie domy¶lnej ¶cie¿ki, któr± interfejs bêdzie "
+"otwiera³ w poszukiwaniu pliku."
 
 #: src/libvlc.h:73
 msgid "plugin search path"
@@ -158,7 +158,9 @@ msgstr "¶cie¿ka wyszukiwania wtyczek"
 msgid ""
 "This option allows you to specify an additional path for VLC to look for its "
 "plugins."
-msgstr "Ta opcja umo¿liwia ustawienie dodatkowej ¶cie¿ki dla VLC, wykorzystywanej przy wyszukiwaniu wtyczek programu."
+msgstr ""
+"Ta opcja umo¿liwia ustawienie dodatkowej ¶cie¿ki dla VLC, wykorzystywanej "
+"przy wyszukiwaniu wtyczek programu."
 
 #: src/libvlc.h:78
 msgid "audio output module"
@@ -168,7 +170,9 @@ msgstr "modu³ wyj¶ciowy d¼wiêku"
 msgid ""
 "This option allows you to select the audio output method used by VLC. The "
 "default behavior is to automatically select the best method available."
-msgstr "Ta opcja umo¿liwia wybranie metody wyj¶ciowej d¼wiêku u¿ywanej przez VLC. Domy¶lnym zachowaniem jest automatyczne wybranie najlepszej dostêpnej metody."
+msgstr ""
+"Ta opcja umo¿liwia wybranie metody wyj¶ciowej d¼wiêku u¿ywanej przez VLC. "
+"Domy¶lnym zachowaniem jest automatyczne wybranie najlepszej dostêpnej metody."
 
 #: src/libvlc.h:84
 msgid "enable audio"
@@ -178,7 +182,9 @@ msgstr "w³±czenie d¼wiêku"
 msgid ""
 "You can completely disable the audio output. In this case the audio decoding "
 "stage won't be done, and it will save some processing power."
-msgstr "Mo¿na ca³kiem wy³±czyæ d¼wiêk. W tym przypadku etap dekodowania d¼wiêku nie zostanie wykonany, wiêc bêdzie mo¿na zaoszczêdziæ trochê mocy procesora."
+msgstr ""
+"Mo¿na ca³kiem wy³±czyæ d¼wiêk. W tym przypadku etap dekodowania d¼wiêku nie "
+"zostanie wykonany, wiêc bêdzie mo¿na zaoszczêdziæ trochê mocy procesora."
 
 #: src/libvlc.h:89
 msgid "force mono audio"
@@ -195,7 +201,9 @@ msgstr "g³o¶no¶æ wyj¶cia d¼wiêku"
 #: src/libvlc.h:94
 msgid ""
 "You can set the default audio output volume here, in a range from 0 to 1024."
-msgstr "Mo¿na ustawiæ domy¶lny poziom g³o¶no¶ci wyj¶cia d¼wiêku w zakresie od 0 do 1024."
+msgstr ""
+"Mo¿na ustawiæ domy¶lny poziom g³o¶no¶ci wyj¶cia d¼wiêku w zakresie od 0 do "
+"1024."
 
 #: src/libvlc.h:97
 #, fuzzy
@@ -214,7 +222,9 @@ msgstr "czêstotliwo¶æ wyj¶ciowa d¼wiêku (Hz)"
 msgid ""
 "You can force the audio output frequency here. Common values are 48000, "
 "44100, 32000, 22050, 16000, 11025, 8000."
-msgstr "W tym miejscu mo¿na wymusiæ czêstotliwo¶æ wyj¶ciow± d¼wiêku. Zwyk³ymi warto¶ciami s± 48000, 44100, 32000, 22050, 16000, 11025, 8000."
+msgstr ""
+"W tym miejscu mo¿na wymusiæ czêstotliwo¶æ wyj¶ciow± d¼wiêku. Zwyk³ymi "
+"warto¶ciami s± 48000, 44100, 32000, 22050, 16000, 11025, 8000."
 
 #: src/libvlc.h:106
 msgid "compensate desynchronization of audio (in ms)"
@@ -224,7 +234,9 @@ msgstr "kompensacja rozsynchronizowania d¼wiêku (w ms)"
 msgid ""
 "This option allows you to delay the audio output. This can be handy if you "
 "notice a lag between the video and the audio."
-msgstr "Ta opcja umo¿liwia opó¼nienie wyj¶cia d¼wiêku. To mo¿e byæ u¿yteczne w razie wystêpowania opó¼nieñ miêdzy d¼wiêkiem a obrazem."
+msgstr ""
+"Ta opcja umo¿liwia opó¼nienie wyj¶cia d¼wiêku. To mo¿e byæ u¿yteczne w razie "
+"wystêpowania opó¼nieñ miêdzy d¼wiêkiem a obrazem."
 
 #: src/libvlc.h:111
 msgid "use the S/PDIF audio output when available"
@@ -235,7 +247,9 @@ msgstr ""
 msgid ""
 "This option allows you to use the S/PDIF audio output by default when your "
 "hardware supports it as well as the audio stream being played."
-msgstr "Ta opcja umo¿liwia wybranie metody wyj¶ciowej d¼wiêku u¿ywanej przez VLC. Domy¶lnym zachowaniem jest automatyczne wybranie najlepszej dostêpnej metody."
+msgstr ""
+"Ta opcja umo¿liwia wybranie metody wyj¶ciowej d¼wiêku u¿ywanej przez VLC. "
+"Domy¶lnym zachowaniem jest automatyczne wybranie najlepszej dostêpnej metody."
 
 #: src/libvlc.h:116
 msgid "headphone virtual spatialization effect"
@@ -268,7 +282,9 @@ msgstr "modu³ wyj¶ciowy obrazu"
 msgid ""
 "This option allows you to select the video output method used by VLC. The "
 "default behavior is to automatically select the best method available."
-msgstr "Ta opcja umo¿liwia wybranie metody wyj¶ciowej obrazu u¿ywanej przez VLC. Domy¶lnym zachowaniem jest automatyczny wybór najlepszej dostêpnej metody."
+msgstr ""
+"Ta opcja umo¿liwia wybranie metody wyj¶ciowej obrazu u¿ywanej przez VLC. "
+"Domy¶lnym zachowaniem jest automatyczny wybór najlepszej dostêpnej metody."
 
 #: src/libvlc.h:136
 msgid "enable video"
@@ -278,7 +294,10 @@ msgstr "w³±czony obraz"
 msgid ""
 "You can completely disable the video output. In this case the video decoding "
 "stage won't be done, which will save some processing power."
-msgstr "Mo¿na ca³kowicie wy³±czyæ wyj¶cie obrazu. W tym przypadku etap dekodowania obrazu nie zostanie wykonany, co umo¿liwi zaoszczêdzenie trochê mocy procesora."
+msgstr ""
+"Mo¿na ca³kowicie wy³±czyæ wyj¶cie obrazu. W tym przypadku etap dekodowania "
+"obrazu nie zostanie wykonany, co umo¿liwi zaoszczêdzenie trochê mocy "
+"procesora."
 
 #: src/libvlc.h:141
 msgid "display identifier"
@@ -298,7 +317,9 @@ msgstr "szeroko¶æ obrazu"
 msgid ""
 "You can enforce the video width here. By default VLC will adapt to the video "
 "characteristics."
-msgstr "Mo¿na wymusiæ w tym miejscu szeroko¶æ obrazu. Domy¶lnie VLC zaadoptuje charakterystyki obrazu."
+msgstr ""
+"Mo¿na wymusiæ w tym miejscu szeroko¶æ obrazu. Domy¶lnie VLC zaadoptuje "
+"charakterystyki obrazu."
 
 #: src/libvlc.h:151
 msgid "video height"
@@ -308,7 +329,9 @@ msgstr "wysoko¶æ obrazu"
 msgid ""
 "You can enforce the video height here. By default VLC will adapt to the "
 "video characteristics."
-msgstr "Mo¿na wymusiæ w tym miejscu wysoko¶æ obrazu. Domy¶lnie VLC zaadoptuje charakterystyki obrazu."
+msgstr ""
+"Mo¿na wymusiæ w tym miejscu wysoko¶æ obrazu. Domy¶lnie VLC zaadoptuje "
+"charakterystyki obrazu."
 
 #: src/libvlc.h:156
 msgid "zoom video"
@@ -326,7 +349,9 @@ msgstr "wyj¶cie obrazu w skali szaro¶ci"
 msgid ""
 "When enabled, the color information from the video won't be decoded (this "
 "can also allow you to save some processing power)."
-msgstr "Po w³±czeniu informacje o kolorze z obrazu nie zostan± zdekodowane (pozwala to tak¿e na oszczêdzenie trochê mocy procesora)."
+msgstr ""
+"Po w³±czeniu informacje o kolorze z obrazu nie zostan± zdekodowane (pozwala "
+"to tak¿e na oszczêdzenie trochê mocy procesora)."
 
 #: src/libvlc.h:165
 msgid "fullscreen video output"
@@ -335,7 +360,8 @@ msgstr "wyj¶cie pe³noekranowe obrazu"
 #: src/libvlc.h:167
 msgid ""
 "If this option is enabled, VLC will always start a video in fullscreen mode."
-msgstr "Po w³±czeniu tej opcji, VLC zawsze wy¶wietli obraz w trybie pe³noekranowym."
+msgstr ""
+"Po w³±czeniu tej opcji, VLC zawsze wy¶wietli obraz w trybie pe³noekranowym."
 
 #: src/libvlc.h:170
 msgid "overlay video output"
@@ -346,7 +372,9 @@ msgstr "wyj¶cie obrazu w trybie overlay"
 msgid ""
 "If enabled, VLC will try to take advantage of the overlay capabilities of "
 "your graphic card."
-msgstr "Po w³±czeniu, VLC bêdzie próbowa³ skorzystaæ z w³a¶ciwo¶ci overlay karty graficznej."
+msgstr ""
+"Po w³±czeniu, VLC bêdzie próbowa³ skorzystaæ z w³a¶ciwo¶ci overlay karty "
+"graficznej."
 
 #: src/libvlc.h:175
 msgid "force SPU position"
@@ -356,7 +384,9 @@ msgstr "wymuszanie pozycji SPU"
 msgid ""
 "You can use this option to place the subtitles under the movie, instead of "
 "over the movie. Try several positions."
-msgstr "Mo¿na u¿yæ tej opcji do umieszczania podtytu³ów pod filmem, zamiast nad nim. Wypróbuj ró¿ne pozycje."
+msgstr ""
+"Mo¿na u¿yæ tej opcji do umieszczania podtytu³ów pod filmem, zamiast nad nim. "
+"Wypróbuj ró¿ne pozycje."
 
 #: src/libvlc.h:180
 msgid "video filter module"
@@ -366,7 +396,9 @@ msgstr "modu³ filtru obrazu"
 msgid ""
 "This will allow you to add a post-processing filter to enhance the picture "
 "quality, for instance deinterlacing, or to clone or distort the video window."
-msgstr "Ta opcja umo¿liwia dodawanie filtrów polepszaj±cych jako¶æ obrazu, np. filtr przeciwko migotaniu, lub klonowanie zak³óceñ obrazu."
+msgstr ""
+"Ta opcja umo¿liwia dodawanie filtrów polepszaj±cych jako¶æ obrazu, np. filtr "
+"przeciwko migotaniu, lub klonowanie zak³óceñ obrazu."
 
 #: src/libvlc.h:186
 msgid "source aspect ratio"
@@ -435,7 +467,9 @@ msgstr "port serwera kana³ów"
 
 #: src/libvlc.h:224
 msgid "Indicate here the port on which the VideoLAN Channel Server runs."
-msgstr "Tutaj nale¿y okre¶liæ port na którym uruchomiony jest serwer kana³ów VideoLAN."
+msgstr ""
+"Tutaj nale¿y okre¶liæ port na którym uruchomiony jest serwer kana³ów "
+"VideoLAN."
 
 #: src/libvlc.h:226
 msgid "network interface"
@@ -445,7 +479,9 @@ msgstr "interfejs sieciowy"
 msgid ""
 "If you have several interfaces on your Linux machine and use the VLAN "
 "solution, you may indicate here which interface to use."
-msgstr "Je¶li istnieje kilka interfejsów sieciowych na komputerze i u¿ywane jest rozwi±zanie VLAN, mo¿na wskazaæ który interfejs bêdzie u¿ywany."
+msgstr ""
+"Je¶li istnieje kilka interfejsów sieciowych na komputerze i u¿ywane jest "
+"rozwi±zanie VLAN, mo¿na wskazaæ który interfejs bêdzie u¿ywany."
 
 #: src/libvlc.h:231
 #, fuzzy
@@ -458,7 +494,9 @@ msgid ""
 "If you have several interfaces on your machine and use the multicast "
 "solution, you will probably have to indicate the IP address of your "
 "multicasting interface here."
-msgstr "Je¶li istnieje kilka interfejsów sieciowych na komputerze i u¿ywane jest rozwi±zanie VLAN, mo¿na wskazaæ który interfejs bêdzie u¿ywany."
+msgstr ""
+"Je¶li istnieje kilka interfejsów sieciowych na komputerze i u¿ywane jest "
+"rozwi±zanie VLAN, mo¿na wskazaæ który interfejs bêdzie u¿ywany."
 
 #: src/libvlc.h:237
 msgid "time to live"
@@ -494,7 +532,9 @@ msgstr "wybierz kana³"
 msgid ""
 "Give the stream number of the audio channel you want to use in a DVD (from 1 "
 "to n)."
-msgstr "Podaj numer strumienia kana³u d¼wiekowego u¿ywany przy odtwarzaniu DVD (od 1 do n)."
+msgstr ""
+"Podaj numer strumienia kana³u d¼wiekowego u¿ywany przy odtwarzaniu DVD (od 1 "
+"do n)."
 
 #: src/libvlc.h:255
 msgid "choose subtitles"
@@ -504,7 +544,9 @@ msgstr "wybierz podtytu³y"
 msgid ""
 "Give the stream number of the subtitle channel you want to use in a DVD "
 "(from 1 to n)."
-msgstr "Podaj numer strumienia kana³u podtytu³ów u¿ywanego przy odtwarzaniu DVD (od 1 do n)."
+msgstr ""
+"Podaj numer strumienia kana³u podtytu³ów u¿ywanego przy odtwarzaniu DVD (od "
+"1 do n)."
 
 #: src/libvlc.h:260
 msgid "DVD device"
@@ -536,7 +578,9 @@ msgstr "wymu¶ IPv6"
 msgid ""
 "If you check this box, IPv6 will be used by default for all UDP and HTTP "
 "connections."
-msgstr "Zaznaczenie tej opcji powoduje, ¿e IPv6 bêdzie u¿ywany domy¶lnie dla wszystkich po³±czeñ UDP i HTTP."
+msgstr ""
+"Zaznaczenie tej opcji powoduje, ¿e IPv6 bêdzie u¿ywany domy¶lnie dla "
+"wszystkich po³±czeñ UDP i HTTP."
 
 #: src/libvlc.h:279
 msgid "force IPv4"
@@ -546,7 +590,9 @@ msgstr "wymu¶ IPv4"
 msgid ""
 "If you check this box, IPv4 will be used by default for all UDP and HTTP "
 "connections."
-msgstr "Zaznaczenie tej opcji powoduje, ¿e IPv4 bêdzie u¿ywany domy¶lnie dla wszystkich po³±czeñ UDP i HTTP."
+msgstr ""
+"Zaznaczenie tej opcji powoduje, ¿e IPv4 bêdzie u¿ywany domy¶lnie dla "
+"wszystkich po³±czeñ UDP i HTTP."
 
 #: src/libvlc.h:284
 msgid "choose preferred codec list"
@@ -663,7 +709,8 @@ msgstr "w³±czona obs³uga 3D Now!"
 msgid ""
 "If your processor supports the 3D Now! instructions set, VLC can take "
 "advantage of them."
-msgstr "Je¶li procesor obs³uguje zbiór istrukcji 3D Now!, mo¿na z nich skorzystaæ."
+msgstr ""
+"Je¶li procesor obs³uguje zbiór istrukcji 3D Now!, mo¿na z nich skorzystaæ."
 
 #: src/libvlc.h:348
 msgid "enable CPU MMX EXT support"
@@ -673,7 +720,9 @@ msgstr "w³±czona obs³uga MMX EXT"
 msgid ""
 "If your processor supports the MMX EXT instructions set, VLC can take "
 "advantage of them."
-msgstr "Je¶li procesor obs³uguje rozszerzony zbiór istrukcji MMX, mo¿na z nich skorzystaæ."
+msgstr ""
+"Je¶li procesor obs³uguje rozszerzony zbiór istrukcji MMX, mo¿na z nich "
+"skorzystaæ."
 
 #: src/libvlc.h:353
 msgid "enable CPU SSE support"
@@ -694,7 +743,8 @@ msgstr "w³±czona obs³uga AltiVec"
 msgid ""
 "If your processor supports the AltiVec instructions set, VLC can take "
 "advantage of them."
-msgstr "Je¶li procesor obs³uguje zbiór istrukcji AltiVec, mo¿na z nich skorzystaæ."
+msgstr ""
+"Je¶li procesor obs³uguje zbiór istrukcji AltiVec, mo¿na z nich skorzystaæ."
 
 #: src/libvlc.h:363
 msgid "play files randomly forever"
@@ -712,7 +762,9 @@ msgstr "w³±czanie listy odtwarzania przy uruchamianiu"
 
 #: src/libvlc.h:370
 msgid "If you want VLC to start playing on startup, then enable this option."
-msgstr "Je¶li VLC ma w³±czaæ odtwarzanie po uruchomieniu wówczas nale¿y zaznaczyæ t± opcjê."
+msgstr ""
+"Je¶li VLC ma w³±czaæ odtwarzanie po uruchomieniu wówczas nale¿y zaznaczyæ t± "
+"opcjê."
 
 #: src/libvlc.h:372
 msgid "enqueue items in playlist"
@@ -722,7 +774,9 @@ msgstr "kolejkowanie obiektów listy odtwarzania"
 msgid ""
 "If you want VLC to add items to the playlist as you open them, then enable "
 "this option."
-msgstr "Je¶li VLC ma dodawaæ pliki do listy odtwarzania po ich otwarciu wówczas nale¿y zaznaczyæ t± opcjê."
+msgstr ""
+"Je¶li VLC ma dodawaæ pliki do listy odtwarzania po ich otwarciu wówczas "
+"nale¿y zaznaczyæ t± opcjê."
 
 #: src/libvlc.h:377
 msgid "loop playlist on end"
@@ -732,7 +786,9 @@ msgstr "zapêtlanie listy odtwarzania"
 msgid ""
 "If you want VLC to keep playing the playlist indefinitely then enable this "
 "option."
-msgstr "Je¶li VLC ma odtwarzaæ w nieskoñczono¶æ listê odtwarzania wówczas nale¿y zaznaczyæ t± opcjê."
+msgstr ""
+"Je¶li VLC ma odtwarzaæ w nieskoñczono¶æ listê odtwarzania wówczas nale¿y "
+"zaznaczyæ t± opcjê."
 
 #: src/libvlc.h:382
 msgid "memory copy module"
@@ -743,7 +799,9 @@ msgstr "modu³ kopiowania pamiêci"
 msgid ""
 "You can select which memory copy module you want to use. By default VLC will "
 "select the fastest one supported by your hardware."
-msgstr "Mo¿na wybraæ który z modu³ów kopiowania pamiêci ma byæ u¿ywany. Domy¶lnie VLC wybierze najszybszy obs³ugiwany przez sprzêt modu³."
+msgstr ""
+"Mo¿na wybraæ który z modu³ów kopiowania pamiêci ma byæ u¿ywany. Domy¶lnie "
+"VLC wybierze najszybszy obs³ugiwany przez sprzêt modu³."
 
 #: src/libvlc.h:387
 msgid "access module"
@@ -772,7 +830,10 @@ msgid ""
 "On Windows NT/2K/XP we use a slow mutex implementation but which allows us "
 "to correctely implement condition variables. You can also use the faster "
 "Win9x implementation but you might experience problems with it."
-msgstr "W systemie Windows NT/2K/XP u¿ywana jest wolna lecz poprawna implementacja w±tków pthread, mo¿na tak¿e wybraæ szybsz± implementacjê lecz wówczas mo¿na napotkaæ problemy."
+msgstr ""
+"W systemie Windows NT/2K/XP u¿ywana jest wolna lecz poprawna implementacja "
+"w±tków pthread, mo¿na tak¿e wybraæ szybsz± implementacjê lecz wówczas mo¿na "
+"napotkaæ problemy."
 
 #: src/libvlc.h:402
 msgid "Condition variables implementation for Win9x (developers only)"
@@ -814,31 +875,26 @@ msgstr ""
 "  vlc:pause                      zatrzymanie odtwarzania obiektów listy\n"
 "  vlc:quit                       wyj¶cie z VLC\n"
 
-#. Interface options
 #: src/libvlc.h:443 modules/misc/dummy/dummy.c:59
 msgid "Interface"
 msgstr "Interfejs"
 
-#. Audio options
 #: src/libvlc.h:457 modules/audio_output/file.c:108
 #: modules/gui/gtk/gnome_interface.c:1133 modules/gui/gtk/gtk_interface.c:1260
 #: modules/gui/macosx/intf.m:338
 msgid "Audio"
 msgstr "D¼wiêk"
 
-#. Video options
 #: src/libvlc.h:475 modules/gui/gtk/gnome_interface.c:1140
 #: modules/gui/gtk/gtk_interface.c:1337 modules/gui/macosx/intf.m:345
-#: modules/misc/dummy/dummy.c:77 modules/video_output/directx/directx.c:107
+#: modules/misc/dummy/dummy.c:77 modules/video_output/directx/directx.c:109
 msgid "Video"
 msgstr "Obraz"
 
-#. Input options
 #: src/libvlc.h:495 modules/access/satellite/satellite.c:66
 msgid "Input"
 msgstr "Wej¶cie"
 
-#. Decoder options
 #: src/libvlc.h:529
 msgid "Decoders"
 msgstr "Dekodery"
@@ -848,29 +904,25 @@ msgstr "Dekodery"
 msgid "Encoders"
 msgstr "Dekodery"
 
-#. Stream output options
 #: src/libvlc.h:537 modules/gui/gtk/gnome_interface.c:2149
 #: modules/gui/gtk/gtk_interface.c:2468 modules/gui/gtk/gtk_interface.c:3150
 #: modules/gui/macosx/open.m:204 modules/gui/win32/strings.cpp:221
 msgid "Stream output"
 msgstr ""
 
-#. CPU options
 #: src/libvlc.h:550
 msgid "CPU"
 msgstr "CPU"
 
-#. Playlist options
 #: src/libvlc.h:562 modules/gui/gtk/gnome_interface.c:648
 #: modules/gui/gtk/gnome_interface.c:2500
 #: modules/gui/gtk/gnome_interface.c:2525 modules/gui/gtk/gtk_interface.c:752
 #: modules/gui/gtk/gtk_interface.c:2813 modules/gui/macosx/intf.m:281
 #: modules/gui/macosx/intf.m:357 modules/gui/win32/strings.cpp:120
-#: modules/gui/win32/strings.cpp:180
+#: modules/gui/win32/strings.cpp:180 modules/gui/wxwindows/interface.cpp:283
 msgid "Playlist"
 msgstr "Lista odtwarzania"
 
-#. Misc options
 #: src/libvlc.h:569 modules/audio_filter/converter/a52tofloat32.c:85
 #: modules/audio_filter/converter/mpgatofixed32.c:60
 #: modules/codec/a52old/a52old.c:59 modules/codec/mpeg_video/parser.c:84
@@ -947,9 +999,6 @@ msgid ""
 "the directory where you installed VLC and run \"vlc -I win32\"\n"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/access/dvd/dvd.c:65
 msgid "method to use by libdvdcss for key decryption"
 msgstr ""
@@ -974,7 +1023,7 @@ msgstr ""
 msgid "[dvd:][device][@raw_device][@[title][,[chapter][,angle]]]"
 msgstr "[dvd:][urz±dzenie][@surowe_urz±dzenie][@[tytu³][,[rozdzia³][,k±t]]]"
 
-#: modules/access/dvd/dvd.c:87
+#: modules/access/dvd/dvd.c:87 modules/access/dvdplay/dvd.c:52
 #, fuzzy
 msgid "dvd"
 msgstr "Dodaj"
@@ -988,14 +1037,29 @@ msgstr "modu³ wej¶ciowy DVD, u¿ywa bibl. libdvdcss je¶li obecna"
 msgid "DVD input module, uses libdvdcss"
 msgstr "modu³ wej¶ciowy DVD, u¿ywa bibl. libdvdcss"
 
+#: modules/access/dvdread/dvdread.c:46
+msgid "DVDRead input module"
+msgstr "modu³ wej¶ciowy DVDRead"
+
+#: modules/access/dvdplay/dvd.c:51
+#, fuzzy
+msgid "[dvdplay:][device][@[title][,[chapter][,angle]]]"
+msgstr "[dvd:][urz±dzenie][@surowe_urz±dzenie][@[tytu³][,[rozdzia³][,k±t]]]"
+
+#: modules/access/dvdplay/dvd.c:53
+#, fuzzy
+msgid "dvdplay input module"
+msgstr "modu³ wej¶cia VCD"
+
+#: modules/access/vcd/vcd.c:79
+msgid "VCD input module"
+msgstr "modu³ wej¶cia VCD"
+
 #: modules/access/v4l/v4l.c:45
 #, fuzzy
 msgid "Video4Linux input module"
 msgstr "modu³ wej¶cia VCD"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/access/file.c:63 modules/access/http.c:84 modules/access/udp.c:75
 msgid "caching value in ms"
 msgstr ""
@@ -1015,9 +1079,6 @@ msgstr "CZytanie standartowego pliku systemowego"
 msgid "file"
 msgstr "Plik"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/access/http.c:78
 msgid "specify an HTTP proxy"
 msgstr ""
@@ -1059,13 +1120,6 @@ msgstr "modu³ dostêpu"
 msgid "udp"
 msgstr ""
 
-#: modules/access/dvdread/dvdread.c:46
-msgid "DVDRead input module"
-msgstr "modu³ wej¶ciowy DVDRead"
-
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/access/satellite/satellite.c:41
 msgid "satellite default transponder frequency"
 msgstr "czêstotlowo¶æ domy¶lnego transpondera satelitarnego"
@@ -1102,9 +1156,25 @@ msgstr "antena lnb_slof (kHz)"
 msgid "satellite input module"
 msgstr "modu³ wej¶cia satelity"
 
-#: modules/access/vcd/vcd.c:79
-msgid "VCD input module"
-msgstr "modu³ wej¶cia VCD"
+#: modules/access_output/file.c:58
+#, fuzzy
+msgid "File stream ouput"
+msgstr "wyj¶cie obrazu w skali szaro¶ci"
+
+#: modules/access_output/dummy.c:58
+#, fuzzy
+msgid "Dummy stream ouput"
+msgstr "wyj¶cie obrazu w skali szaro¶ci"
+
+#: modules/access_output/http.c:54
+#, fuzzy
+msgid "HTTP stream ouput"
+msgstr "wyj¶cie obrazu w skali szaro¶ci"
+
+#: modules/access_output/udp.c:75
+#, fuzzy
+msgid "UDP stream ouput"
+msgstr "wyj¶cie obrazu w skali szaro¶ci"
 
 #: modules/audio_filter/channel_mixer/trivial.c:46
 msgid "audio filter for trivial channel mixing"
@@ -1142,9 +1212,6 @@ msgstr ""
 msgid "audio filter for s16->float32 conversion"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/audio_filter/converter/a52tofloat32.c:76
 msgid "A/52 dynamic range compression"
 msgstr "Kompresja dynamicznego zakresu A/52"
@@ -1156,8 +1223,11 @@ msgid ""
 "without disturbing anyone. If you disable the dynamic range compression the "
 "playback will be more adapted to a movie theater or a listening room."
 msgstr ""
-"Kompresja dynamicznego zakresu wyg³adza g³o¶ne d¼wiêki, za¶ ciche czyni g³o¶niejszymi, tak wiêc mo¿na ³atwiej ods³uchiwaæ strumienia w g³o¶nym ¶rodowisku bez przeszkadzania komukolwiek.\n"
-"Je¶li zostanie wy³±czona kompresja dynamicznego zakresu bêdzie to lepiej pasuj±ca opcja w przypadku sali kinowej lub pokoju akustycznego."
+"Kompresja dynamicznego zakresu wyg³adza g³o¶ne d¼wiêki, za¶ ciche czyni "
+"g³o¶niejszymi, tak wiêc mo¿na ³atwiej ods³uchiwaæ strumienia w g³o¶nym "
+"¶rodowisku bez przeszkadzania komukolwiek.\n"
+"Je¶li zostanie wy³±czona kompresja dynamicznego zakresu bêdzie to lepiej "
+"pasuj±ca opcja w przypadku sali kinowej lub pokoju akustycznego."
 
 #: modules/audio_filter/converter/a52tofloat32.c:87
 #, fuzzy
@@ -1179,6 +1249,10 @@ msgstr ""
 
 #: modules/audio_filter/resampler/ugly.c:46
 msgid "audio filter for ugly resampling"
+msgstr ""
+
+#: modules/audio_filter/resampler/linear.c:59
+msgid "audio filter for linear interpolation resampling"
 msgstr ""
 
 #: modules/audio_mixer/float32.c:45
@@ -1218,7 +1292,6 @@ msgstr "modu³ d¼wiêkowy ALSA"
 msgid "Mono"
 msgstr ""
 
-#. Open the device
 #: modules/audio_output/alsa.c:194 modules/audio_output/alsa.c:308
 #: modules/audio_output/directx.c:264 modules/audio_output/directx.c:459
 #: modules/audio_output/oss.c:237 modules/audio_output/oss.c:306
@@ -1253,9 +1326,6 @@ msgstr "modu³ rozszerzeñ DirectX"
 msgid "EsounD audio module"
 msgstr "modu³ d¼wiêku EsounD"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/audio_output/file.c:82
 #, fuzzy
 msgid "output format"
@@ -1289,9 +1359,6 @@ msgstr " (domy¶lnie wy³±czone)"
 msgid "file audio output module"
 msgstr "modu³ wyj¶ciowy d¼wiêku"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/audio_output/oss.c:102
 msgid "try to work around buggy OSS drivers"
 msgstr ""
@@ -1363,10 +1430,20 @@ msgstr "modu³ SSE AC3 IMDCT"
 msgid "3D Now! A52 IMDCT module"
 msgstr "modu³ #D Now! A3 IMDCT"
 
+#: modules/codec/adpcm.c:91
+#, fuzzy
+msgid "ADPCM audio deocder"
+msgstr "wybierz dekoder d¼wiêku AC3"
+
 #: modules/codec/araw.c:73
 #, fuzzy
 msgid "Pseudo Raw Audio decoder"
 msgstr "wybierz dekoder d¼wiêku AC3"
+
+#: modules/codec/cinepak/cinepak.c:60
+#, fuzzy
+msgid "Cinepak video decoder"
+msgstr "modu³ dekodera obrazu MPEG I/II"
 
 #: modules/codec/dv.c:48
 #, fuzzy
@@ -1376,6 +1453,11 @@ msgstr "modu³ dekodera obrazu MPEG I/II"
 #: modules/codec/faad/decoder.c:55
 msgid "AAC decoder module (libfaad2)"
 msgstr ""
+
+#: modules/codec/flacdec.c:107
+#, fuzzy
+msgid "flac decoder module"
+msgstr "modu³ dekodera podtytu³ów DVD"
 
 #: modules/codec/ffmpeg/ffmpeg.c:99
 msgid "ffmpeg"
@@ -1408,6 +1490,11 @@ msgstr "modu³ kompensacji ruchu MMX"
 msgid "MMXEXT Post Processing module"
 msgstr "modu³ kompensacji ruchu MMXEXT"
 
+#: modules/codec/libmpeg2.c:75
+#, fuzzy
+msgid "libmpeg2 decoder module"
+msgstr "modu³ dekodera podtytu³ów DVD"
+
 #: modules/codec/lpcm.c:98
 #, fuzzy
 msgid "linear PCM audio parser"
@@ -1417,9 +1504,6 @@ msgstr "dekoder liniowy PCM d¼wiêku"
 msgid "MPEG audio layer I/II/III parser"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/codec/mpeg_video/idct/idct.c:41
 #: modules/codec/mpeg_video/parser.c:59
 msgid "IDCT module"
@@ -1467,14 +1551,20 @@ msgstr "modu³ kompensacji ruchu MMXEXT"
 msgid ""
 "This option allows you to select the IDCT module used by this video decoder. "
 "The default behavior is to automatically select the best module available."
-msgstr "Ta opcja umo¿liwia wybranie modu³u IDCT u¿ywanego przez ten dekoder obrazu. Nale¿y zauwa¿yæ, ¿e domy¶lnym zachowaniem jest automatyczny wybór najlepszego dostêpnego modu³u."
+msgstr ""
+"Ta opcja umo¿liwia wybranie modu³u IDCT u¿ywanego przez ten dekoder obrazu. "
+"Nale¿y zauwa¿yæ, ¿e domy¶lnym zachowaniem jest automatyczny wybór "
+"najlepszego dostêpnego modu³u."
 
 #: modules/codec/mpeg_video/parser.c:67
 msgid ""
 "This option allows you to select the motion compensation module used by this "
 "video decoder. The default behavior is to automatically select the best "
 "module available."
-msgstr "Ta opcja umo¿liwia wybranie modu³u kompensacji ruchu u¿ywanego przez ten dekoder obrazu. Domy¶lnym zachowaniem jest automatyczny wybór najlepszego dostêpnego modu³u."
+msgstr ""
+"Ta opcja umo¿liwia wybranie modu³u kompensacji ruchu u¿ywanego przez ten "
+"dekoder obrazu. Domy¶lnym zachowaniem jest automatyczny wybór najlepszego "
+"dostêpnego modu³u."
 
 #: modules/codec/mpeg_video/parser.c:71
 msgid "use additional processors"
@@ -1484,7 +1574,9 @@ msgstr "u¿ywanie dodatkowych procesorów"
 msgid ""
 "This video decoder can benefit from a multiprocessor computer. If you have "
 "one, you can specify the number of processors here."
-msgstr "Tek dekoder obrazu przynosi korzy¶ci przy komputerze wieloprocesorowym.Je¶li posiadasz taki, mo¿na tutaj okre¶liæ liczbê procesorów."
+msgstr ""
+"Tek dekoder obrazu przynosi korzy¶ci przy komputerze wieloprocesorowym.Je¶li "
+"posiadasz taki, mo¿na tutaj okre¶liæ liczbê procesorów."
 
 #: modules/codec/mpeg_video/parser.c:76
 msgid "force synchro algorithm {I|I+|IP|IP+|IPB}"
@@ -1496,15 +1588,15 @@ msgid ""
 "types of picture you want to decode. Please bear in mind that if you select "
 "more pictures than what your CPU is capable to decode, you won't get "
 "anything."
-msgstr "Ta opcja umo¿liwia wymuszenie algorytmu synchronizacji, poprzez bezpo¶redni wybór typów dekodowanego obrazu. Nale¿y zwróciæ uwagê, ¿e wybranie wiêcej obrazów ni¿ procesor jest zdolny zdekodowaæ nie daje niczego."
+msgstr ""
+"Ta opcja umo¿liwia wymuszenie algorytmu synchronizacji, poprzez bezpo¶redni "
+"wybór typów dekodowanego obrazu. Nale¿y zwróciæ uwagê, ¿e wybranie wiêcej "
+"obrazów ni¿ procesor jest zdolny zdekodowaæ nie daje niczego."
 
 #: modules/codec/mpeg_video/parser.c:92
 msgid "MPEG I/II video decoder module"
 msgstr "modu³ dekodera obrazu MPEG I/II"
 
-#. ****************************************************************************
-#. * Module descriptor.
-#. ****************************************************************************
 #: modules/codec/spudec/spudec.c:48
 msgid "font used by the text subtitler"
 msgstr ""
@@ -1525,13 +1617,55 @@ msgstr "_Podtytu³y"
 msgid "subtitles decoder module"
 msgstr "modu³ dekodera podtytu³ów DVD"
 
+#: modules/codec/tarkin.c:95
+#, fuzzy
+msgid "Tarkin decoder module"
+msgstr "modu³ dekodera obrazu MPEG I/II"
+
+#: modules/codec/theora.c:84
+#, fuzzy
+msgid "Theora decoder module"
+msgstr "modu³ dekodera podtytu³ów DVD"
+
+#: modules/codec/vorbis.c:112
+#, fuzzy
+msgid "Vorbis decoder module"
+msgstr "modu³ dekodera podtytu³ów DVD"
+
+#: modules/codec/xvid.c:48
+#, fuzzy
+msgid "Xvid video decoder"
+msgstr "modu³ dekodera obrazu MPEG I/II"
+
+#: modules/control/gestures.c:77
+msgid "Motion threshold"
+msgstr ""
+
+#: modules/control/gestures.c:79
+msgid "the amount of movement required for a mouse gesture to be recorded"
+msgstr ""
+
+#: modules/control/gestures.c:82
+msgid "Mouse button"
+msgstr ""
+
+#: modules/control/gestures.c:84
+msgid "the mouse button to be held down during mouse gestures"
+msgstr ""
+
+#: modules/control/gestures.c:89
+msgid "Gestures"
+msgstr ""
+
+#: modules/control/gestures.c:93
+#, fuzzy
+msgid "mouse gestures control module"
+msgstr "modu³ zdalnego sterowania w podczerwieni"
+
 #: modules/control/lirc/lirc.c:61
 msgid "infrared remote control module"
 msgstr "modu³ zdalnego sterowania w podczerwieni"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/control/rc/rc.c:77
 #, fuzzy
 msgid "show stream position"
@@ -1558,8 +1692,50 @@ msgstr ""
 msgid "remote control interface module"
 msgstr "modu³ interfejsu sterowania zdalnego"
 
+#: modules/demux/a52sys.c:52
+msgid "A52 demuxer"
+msgstr ""
+
 #: modules/demux/aac/demux.c:46
 msgid "AAC stream demux"
+msgstr ""
+
+#: modules/demux/asf/asf.c:48
+msgid "ASF v1.0 demuxer (file only)"
+msgstr ""
+
+#: modules/demux/avi/avi.c:60
+msgid "avi-demuxer"
+msgstr ""
+
+#: modules/demux/avi/avi.c:62 modules/demux/avi/avi.c:63
+#, fuzzy
+msgid "force interleaved method"
+msgstr "Tryb antyprzeplotowy"
+
+#: modules/demux/avi/avi.c:65 modules/demux/avi/avi.c:66
+#, fuzzy
+msgid "force index creation"
+msgstr "wymuszenie d¼wiêku mono"
+
+#: modules/demux/avi/avi.c:68
+msgid "avi demuxer"
+msgstr ""
+
+#: modules/demux/demuxdump.c:49
+msgid "Dump Demux input"
+msgstr ""
+
+#: modules/demux/flac.c:52
+msgid "flac demuxer"
+msgstr ""
+
+#: modules/demux/m3u.c:63
+msgid "m3u/asx metademux"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:53
+msgid "MP4 demuxer"
 msgstr ""
 
 #: modules/demux/mpeg/audio.c:47
@@ -1580,9 +1756,6 @@ msgstr "Programowe wej¶cie strumienia ISO 13818-1 MPEG"
 msgid "generic ISO 13818-1 MPEG demultiplexing"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/demux/mpeg/ts.c:97
 msgid "compatibility with pre-0.4 VLS"
 msgstr ""
@@ -1612,6 +1785,15 @@ msgstr "Wej¶cie transportu strumienia ISO 13818-1 MPEG"
 msgid "ISO 13818-1 MPEG Transport Stream input (libdvbpsi)"
 msgstr "Wej¶cie transportu strumienia ISO 13818-1 MPEG (libdvbpsi)"
 
+#: modules/demux/ogg.c:187
+#, fuzzy
+msgid "ogg stream demux"
+msgstr "dekoder d¼wiêku MPEG warstwa I/II"
+
+#: modules/demux/rawdv.c:115
+msgid "raw dv demux"
+msgstr ""
+
 #: modules/demux/util/id3.c:46
 msgid "Simple id3 tag skipper"
 msgstr ""
@@ -1620,13 +1802,23 @@ msgstr ""
 msgid "id3 tag parser using libid3tag"
 msgstr ""
 
+#: modules/demux/wav/wav.c:49
+msgid "WAV demuxer"
+msgstr ""
+
+#: modules/encoder/ffmpeg/encoder.c:51
+msgid "ffmpeg encoder"
+msgstr ""
+
+#: modules/encoder/xvid.c:58
+#, fuzzy
+msgid "XviD video encoder (MPEG-4)"
+msgstr "modu³ dekodera obrazu MPEG I/II"
+
 #: modules/gui/beos/BeOS.cpp:50
 msgid "BeOS standard API module"
 msgstr "modu³ standardowy API BeOS"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/gui/familiar/familiar.c:62
 msgid "autoplay selected file"
 msgstr ""
@@ -1640,9 +1832,6 @@ msgstr ""
 msgid "Familiar Linux Gtk+ interface module"
 msgstr "Modu³ interfejsu Gtk+"
 
-#.
-#. * from modules/gui/win32/mainframe.dfm:
-#.
 #: modules/gui/familiar/interface.c:66 modules/gui/familiar/interface.c:448
 #: modules/gui/gtk/gnome_interface.c:279 modules/gui/gtk/gtk_interface.c:126
 #: modules/gui/gtk/gtk_interface.c:1636 modules/gui/win32/strings.cpp:8
@@ -1657,14 +1846,11 @@ msgstr ""
 msgid "Open"
 msgstr "Otwórz plik"
 
-#: modules/gui/familiar/interface.c:91
+#: modules/gui/familiar/interface.c:91 modules/gui/wxwindows/open.cpp:496
 #, fuzzy
 msgid "Open file"
 msgstr "Otwórz plik"
 
-#.
-#. * from modules/gui/win32/preferences.dfm:
-#.
 #: modules/gui/familiar/interface.c:103 modules/gui/familiar/interface.c:104
 #: modules/gui/macosx/intf.m:288 modules/gui/macosx/prefs.m:191
 #: modules/gui/win32/strings.cpp:211
@@ -1685,7 +1871,7 @@ msgstr "Otwórz strumieñ"
 #: modules/gui/gtk/gnome_interface.c:1061 modules/gui/gtk/gtk_interface.c:714
 #: modules/gui/gtk/gtk_interface.c:1160 modules/gui/macosx/intf.m:857
 #: modules/gui/macosx/intf.m:858 modules/gui/macosx/intf.m:859
-#: modules/gui/win32/strings.cpp:102
+#: modules/gui/win32/strings.cpp:102 modules/gui/wxwindows/interface.cpp:591
 msgid "Pause"
 msgstr "Wstrzymaj"
 
@@ -1694,14 +1880,14 @@ msgstr "Wstrzymaj"
 msgid "Pause stream"
 msgstr "Wstrzymuje strumieñ"
 
-#. dock menu
 #: modules/gui/familiar/interface.c:144 modules/gui/gtk/gnome_interface.c:595
 #: modules/gui/gtk/gnome_interface.c:1054 modules/gui/gtk/gtk_interface.c:703
 #: modules/gui/macosx/intf.m:284 modules/gui/macosx/intf.m:323
 #: modules/gui/macosx/intf.m:370 modules/gui/macosx/intf.m:864
 #: modules/gui/macosx/intf.m:865 modules/gui/macosx/intf.m:866
 #: modules/gui/macosx/playlist.m:122 modules/gui/win32/strings.cpp:100
-#: modules/gui/win32/strings.cpp:204
+#: modules/gui/win32/strings.cpp:204 modules/gui/wxwindows/interface.cpp:280
+#: modules/gui/wxwindows/interface.cpp:596
 msgid "Play"
 msgstr "Odtwórz"
 
@@ -1715,6 +1901,7 @@ msgstr "Odtwarza strumieñ"
 #: modules/gui/gtk/gtk_interface.c:1168 modules/gui/macosx/intf.m:285
 #: modules/gui/macosx/intf.m:324 modules/gui/macosx/intf.m:371
 #: modules/gui/macosx/controls.m:695 modules/gui/win32/strings.cpp:104
+#: modules/gui/wxwindows/interface.cpp:278
 msgid "Stop"
 msgstr "Zatrzymaj"
 
@@ -1731,10 +1918,6 @@ msgstr ""
 msgid "Forward stream"
 msgstr ""
 
-#. Automatically generated by 'toolbox --update-po', please don't compile
-#.
-#. * from modules/gui/win32/about.dfm:
-#.
 #: modules/gui/familiar/interface.c:185 modules/gui/familiar/interface.c:186
 #: modules/gui/familiar/interface.c:459 modules/gui/gtk/gtk_interface.c:1621
 #: modules/gui/win32/strings.cpp:7
@@ -1792,6 +1975,7 @@ msgstr "Zastosuj"
 #: modules/gui/macosx/open.m:170 modules/gui/win32/strings.cpp:27
 #: modules/gui/win32/strings.cpp:174 modules/gui/win32/strings.cpp:215
 #: modules/gui/win32/strings.cpp:234 modules/gui/win32/strings.cpp:250
+#: modules/gui/wxwindows/open.cpp:172
 msgid "Cancel"
 msgstr "Anuluj"
 
@@ -1834,9 +2018,6 @@ msgstr ""
 msgid "Error loading pixmap file: %s"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/gui/gtk/gnome.c:55 modules/gui/gtk/gtk.c:57
 msgid "show tooltips"
 msgstr "wy¶wietlanie podpowiedzi"
@@ -1861,7 +2042,9 @@ msgstr "maksymalna wysoko¶æ okien konfiguracji"
 msgid ""
 "You can set the maximum height that the configuration windows in the "
 "preferences menu will occupy."
-msgstr "Mo¿na ustawiæ maksymalny rozmiar, jaki bêd± mog³y mieæ okna konfiguracji w menu preferencji."
+msgstr ""
+"Mo¿na ustawiæ maksymalny rozmiar, jaki bêd± mog³y mieæ okna konfiguracji w "
+"menu preferencji."
 
 #: modules/gui/gtk/gnome.c:72
 msgid "GNOME"
@@ -1880,7 +2063,7 @@ msgstr "_Otwórz plik..."
 #: modules/gui/gtk/gnome_interface.c:20 modules/gui/gtk/gnome_interface.c:509
 #: modules/gui/gtk/gnome_interface.c:1027 modules/gui/gtk/gtk_interface.c:178
 #: modules/gui/gtk/gtk_interface.c:624 modules/gui/gtk/gtk_interface.c:1440
-#: modules/gui/win32/strings.cpp:94
+#: modules/gui/win32/strings.cpp:94 modules/gui/wxwindows/interface.cpp:187
 #, fuzzy
 msgid "Open a file"
 msgstr "Otwiera plik"
@@ -2068,6 +2251,7 @@ msgstr "Obraz"
 #: modules/gui/macosx/open.m:206 modules/gui/macosx/open.m:313
 #: modules/gui/macosx/open.m:732 modules/gui/macosx/open.m:766
 #: modules/gui/win32/strings.cpp:93 modules/gui/win32/strings.cpp:226
+#: modules/gui/wxwindows/interface.cpp:267 modules/gui/wxwindows/open.cpp:160
 msgid "File"
 msgstr "Plik"
 
@@ -2077,16 +2261,18 @@ msgstr "Plik"
 #: modules/gui/gtk/gtk_interface.c:821 modules/gui/gtk/gtk_interface.c:2053
 #: modules/gui/gtk/gtk_interface.c:2842 modules/gui/macosx/open.m:173
 #: modules/gui/macosx/open.m:317 modules/gui/win32/strings.cpp:43
-#: modules/gui/win32/strings.cpp:95
+#: modules/gui/win32/strings.cpp:95 modules/gui/wxwindows/interface.cpp:269
+#: modules/gui/wxwindows/open.cpp:162
 msgid "Disc"
 msgstr "Dysk"
 
 #: modules/gui/gtk/gnome_interface.c:532 modules/gui/gtk/gtk_interface.c:645
-#: modules/gui/win32/strings.cpp:97
+#: modules/gui/win32/strings.cpp:97 modules/gui/wxwindows/interface.cpp:271
 msgid "Net"
 msgstr "Sieæ"
 
 #: modules/gui/gtk/gnome_interface.c:544 modules/gui/gtk/gtk_interface.c:656
+#: modules/gui/wxwindows/interface.cpp:274
 msgid "Sat"
 msgstr "Satelita"
 
@@ -2150,6 +2336,7 @@ msgstr "Otwórz listê"
 #: modules/gui/gtk/gtk_interface.c:849 modules/gui/gtk/gtk_interface.c:893
 #: modules/gui/gtk/gtk_interface.c:1214 modules/gui/win32/strings.cpp:112
 #: modules/gui/win32/strings.cpp:132 modules/gui/win32/strings.cpp:136
+#: modules/gui/wxwindows/interface.cpp:285
 msgid "Prev"
 msgstr "Poprz"
 
@@ -2166,6 +2353,7 @@ msgstr "Poprzedni plik"
 #: modules/gui/macosx/intf.m:328 modules/gui/macosx/intf.m:372
 #: modules/gui/macosx/controls.m:703 modules/gui/win32/strings.cpp:114
 #: modules/gui/win32/strings.cpp:134 modules/gui/win32/strings.cpp:138
+#: modules/gui/wxwindows/interface.cpp:287
 msgid "Next"
 msgstr "Nast"
 
@@ -2253,23 +2441,27 @@ msgstr "Lista odtwarzania..."
 msgid ""
 "This is the VideoLAN Client, a DVD, MPEG and DivX player. It can play MPEG "
 "and MPEG2 files from a file or from a network source."
-msgstr "Klient VideoLAN, odtwarzacz DVD, MPEG i DivX. Program potrafi odtwarzaæ MPEG i MPEG2 z pliku lub ze ¼ród³a sieciowego."
+msgstr ""
+"Klient VideoLAN, odtwarzacz DVD, MPEG i DivX. Program potrafi odtwarzaæ MPEG "
+"i MPEG2 z pliku lub ze ¼ród³a sieciowego."
 
 #: modules/gui/gtk/gnome_interface.c:1507
 msgid "Open Stream"
 msgstr "Otwórz strumieñ"
 
 #: modules/gui/gtk/gnome_interface.c:1524 modules/gui/gtk/gtk_interface.c:1839
-#: modules/gui/macosx/open.m:166
+#: modules/gui/macosx/open.m:166 modules/gui/wxwindows/open.cpp:138
 msgid "Media Resource Locator (MRL)"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1546 modules/gui/gtk/gtk_interface.c:1861
+#: modules/gui/wxwindows/open.cpp:142
 #, fuzzy
 msgid "Open Target:"
 msgstr "Otwiera plik"
 
 #: modules/gui/gtk/gnome_interface.c:1566 modules/gui/gtk/gtk_interface.c:1881
+#: modules/gui/wxwindows/open.cpp:153
 msgid ""
 "Alternatively, you can build an MRL using one of the following predefined "
 "targets:"
@@ -2280,23 +2472,24 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:2422 modules/gui/macosx/open.m:176
 #: modules/gui/macosx/open.m:179 modules/gui/macosx/open.m:185
 #: modules/gui/macosx/open.m:210 modules/gui/win32/strings.cpp:229
-#: modules/gui/win32/strings.cpp:248
+#: modules/gui/win32/strings.cpp:248 modules/gui/wxwindows/open.cpp:214
 msgid "Browse..."
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1634 modules/gui/gtk/gtk_interface.c:1949
-#: modules/gui/win32/strings.cpp:25
+#: modules/gui/win32/strings.cpp:25 modules/gui/wxwindows/open.cpp:238
 msgid "Disc type"
 msgstr "Typ p³yty"
 
 #: modules/gui/gtk/gnome_interface.c:1653 modules/gui/gtk/gtk_interface.c:1968
 #: modules/gui/macosx/open.m:189 modules/gui/macosx/open.m:532
+#: modules/gui/wxwindows/open.cpp:233
 msgid "DVD"
 msgstr "DVD"
 
 #: modules/gui/gtk/gnome_interface.c:1661 modules/gui/gtk/gtk_interface.c:1976
 #: modules/gui/macosx/open.m:190 modules/gui/macosx/open.m:441
-#: modules/gui/macosx/open.m:524
+#: modules/gui/macosx/open.m:524 modules/gui/wxwindows/open.cpp:235
 msgid "VCD"
 msgstr "VCD"
 
@@ -2308,14 +2501,14 @@ msgstr "Nazwa urz±dzenia"
 #: modules/gui/gtk/gnome_interface.c:1688 modules/gui/gtk/gtk_interface.c:1994
 #: modules/gui/gtk/menu.c:1007 modules/gui/gtk/menu.c:1375
 #: modules/gui/kde/interface.cpp:147 modules/gui/macosx/intf.m:334
-#: modules/gui/macosx/open.m:184
+#: modules/gui/macosx/open.m:184 modules/gui/wxwindows/open.cpp:258
 msgid "Chapter"
 msgstr "Rozdzia³"
 
 #: modules/gui/gtk/gnome_interface.c:1698 modules/gui/gtk/gtk_interface.c:2004
 #: modules/gui/gtk/menu.c:1345 modules/gui/gtk/menu.c:1366
 #: modules/gui/kde/interface.cpp:145 modules/gui/macosx/intf.m:333
-#: modules/gui/macosx/open.m:183
+#: modules/gui/macosx/open.m:183 modules/gui/wxwindows/open.cpp:252
 msgid "Title"
 msgstr "Tytu³"
 
@@ -2326,24 +2519,27 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1755 modules/gui/gtk/gtk_interface.c:2070
 #: modules/gui/macosx/open.m:197 modules/gui/macosx/open.m:591
 #: modules/gui/macosx/open.m:629 modules/gui/win32/strings.cpp:169
+#: modules/gui/wxwindows/open.cpp:284
 msgid "UDP/RTP"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1765 modules/gui/gtk/gtk_interface.c:2080
 #: modules/gui/macosx/open.m:198 modules/gui/macosx/open.m:592
 #: modules/gui/macosx/open.m:641 modules/gui/win32/strings.cpp:170
+#: modules/gui/wxwindows/open.cpp:285
 #, fuzzy
 msgid "UDP/RTP Multicast"
 msgstr "UDP Multicast"
 
 #: modules/gui/gtk/gnome_interface.c:1775 modules/gui/gtk/gtk_interface.c:2090
-#: modules/gui/win32/strings.cpp:171
+#: modules/gui/win32/strings.cpp:171 modules/gui/wxwindows/open.cpp:286
 msgid "Channel server"
 msgstr "Serwer kana³ów"
 
 #: modules/gui/gtk/gnome_interface.c:1785 modules/gui/gtk/gtk_interface.c:2100
 #: modules/gui/macosx/open.m:199 modules/gui/macosx/open.m:593
 #: modules/gui/macosx/open.m:654 modules/gui/win32/strings.cpp:172
+#: modules/gui/wxwindows/open.cpp:287
 msgid "HTTP/FTP/MMS"
 msgstr ""
 
@@ -2354,25 +2550,28 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:2185 modules/gui/gtk/gtk_interface.c:2196
 #: modules/gui/gtk/gtk_interface.c:3341 modules/gui/macosx/open.m:192
 #: modules/gui/macosx/open.m:194 modules/gui/macosx/open.m:212
+#: modules/gui/wxwindows/open.cpp:306 modules/gui/wxwindows/open.cpp:329
+#: modules/gui/wxwindows/open.cpp:351
 msgid "Port"
 msgstr "Port"
 
 #: modules/gui/gtk/gnome_interface.c:1805
 #: modules/gui/gtk/gnome_interface.c:1817 modules/gui/gtk/gtk_interface.c:2120
 #: modules/gui/gtk/gtk_interface.c:2132 modules/gui/macosx/open.m:193
-#: modules/gui/macosx/open.m:211
+#: modules/gui/macosx/open.m:211 modules/gui/wxwindows/open.cpp:321
+#: modules/gui/wxwindows/open.cpp:343
 msgid "Address"
 msgstr "Adres"
 
 #: modules/gui/gtk/gnome_interface.c:1827 modules/gui/gtk/gtk_interface.c:2142
-#: modules/gui/macosx/open.m:195
+#: modules/gui/macosx/open.m:195 modules/gui/wxwindows/open.cpp:365
 msgid "URL"
 msgstr "URL"
 
 #: modules/gui/gtk/gnome_interface.c:1937
 #: modules/gui/gtk/gnome_interface.c:2397 modules/gui/gtk/gtk_interface.c:2252
 #: modules/gui/gtk/gtk_interface.c:2856 modules/gui/macosx/open.m:174
-#: modules/gui/macosx/open.m:321
+#: modules/gui/macosx/open.m:321 modules/gui/wxwindows/open.cpp:164
 msgid "Network"
 msgstr "Sieæ"
 
@@ -2401,6 +2600,7 @@ msgid "Horizontal"
 msgstr "Pozioma"
 
 #: modules/gui/gtk/gnome_interface.c:2063 modules/gui/gtk/gtk_interface.c:2378
+#: modules/gui/wxwindows/open.cpp:166
 #, fuzzy
 msgid "Satellite"
 msgstr "Otwórz kartê satelitarn±"
@@ -2437,10 +2637,13 @@ msgstr "Modu³y"
 msgid ""
 "Sorry, the module manager isn't functional yet. Please retry in a later "
 "version."
-msgstr "Przepraszamy, mened¿er modu³ów jeszcze nie jest funkcjonalny. Spróbuj u¿yæ funkcji pó¼niejszej wersji programu."
+msgstr ""
+"Przepraszamy, mened¿er modu³ów jeszcze nie jest funkcjonalny. Spróbuj u¿yæ "
+"funkcji pó¼niejszej wersji programu."
 
 #: modules/gui/gtk/gnome_interface.c:2404
 #: modules/gui/gtk/gnome_interface.c:2545 modules/gui/gtk/gtk_interface.c:2863
+#: modules/gui/wxwindows/playlist.cpp:135
 msgid "Url"
 msgstr "Url"
 
@@ -2481,7 +2684,7 @@ msgid "Selection"
 msgstr "Wybór"
 
 #: modules/gui/gtk/gnome_interface.c:2552 modules/gui/gtk/gtk_interface.c:2973
-#: modules/gui/win32/strings.cpp:182
+#: modules/gui/win32/strings.cpp:182 modules/gui/wxwindows/playlist.cpp:136
 msgid "Duration"
 msgstr "Czas trwania"
 
@@ -2501,9 +2704,6 @@ msgstr "m:"
 msgid "h:"
 msgstr "h:"
 
-#.
-#. * from modules/gui/win32/messages.dfm:
-#.
 #: modules/gui/gtk/gnome_interface.c:2808 modules/gui/gtk/gtk_interface.c:3063
 #: modules/gui/kde/messages.cpp:8 modules/gui/macosx/intf.m:294
 #: modules/gui/macosx/intf.m:359 modules/gui/win32/strings.cpp:153
@@ -2653,11 +2853,13 @@ msgstr "Zespó³ VideoLAN <videolan@videolan.org>"
 #: modules/gui/win32/strings.cpp:26 modules/gui/win32/strings.cpp:154
 #: modules/gui/win32/strings.cpp:173 modules/gui/win32/strings.cpp:183
 #: modules/gui/win32/strings.cpp:214 modules/gui/win32/strings.cpp:233
-#: modules/gui/win32/strings.cpp:249
+#: modules/gui/win32/strings.cpp:249 modules/gui/wxwindows/open.cpp:170
+#: modules/gui/wxwindows/fileinfo.cpp:83 modules/gui/wxwindows/messages.cpp:94
+#: modules/gui/wxwindows/playlist.cpp:141
 msgid "OK"
 msgstr "OK"
 
-#: modules/gui/gtk/gtk_interface.c:1825
+#: modules/gui/gtk/gtk_interface.c:1825 modules/gui/wxwindows/open.cpp:124
 #, fuzzy
 msgid "Open Target"
 msgstr "Otwórz strumieñ"
@@ -2717,7 +2919,6 @@ msgstr "_Odwróæ"
 msgid "_Select"
 msgstr "_Wybierz"
 
-#. special case for "off" item
 #: modules/gui/gtk/menu.c:725 modules/gui/macosx/prefs.m:399
 #: modules/gui/macosx/prefs.m:428 modules/gui/macosx/prefs.m:670
 #: modules/gui/macosx/prefs.m:699
@@ -2743,7 +2944,6 @@ msgstr "Opis"
 msgid "Configure"
 msgstr "Skonfiguruj"
 
-#. add new label
 #: modules/gui/gtk/preferences.c:394 modules/gui/kde/pluginsbox.cpp:53
 msgid "Selected:"
 msgstr "Wybrano:"
@@ -2818,7 +3018,6 @@ msgstr ""
 msgid "Open CrashLog"
 msgstr ""
 
-#. main menu
 #: modules/gui/macosx/intf.m:300
 msgid "About VLC media player"
 msgstr ""
@@ -2871,7 +3070,6 @@ msgstr "Otwórz sieæ"
 msgid "Open Recent"
 msgstr "Otwórz strumieñ"
 
-#. Recent Items Menu
 #: modules/gui/macosx/intf.m:313 modules/gui/macosx/intf.m:1504
 msgid "Clear Menu"
 msgstr ""
@@ -2990,7 +3188,6 @@ msgstr "Klient VideoLAN"
 msgid "License"
 msgstr ""
 
-#. error panel
 #: modules/gui/macosx/intf.m:376
 msgid "Error"
 msgstr ""
@@ -3107,7 +3304,9 @@ msgstr "maksymalna liczba wierszy w oknie dziennika"
 #, fuzzy
 msgid ""
 "You can set the maximum number of lines that the log window will display."
-msgstr "Mo¿na ustawiæ maksymaln± liczbê wierszy, które bêd± wy¶wietlane w oknie dziennika. Wprowad¼ -1 je¶li maj± byæ zapamiêtywane wszystkie komunikaty."
+msgstr ""
+"Mo¿na ustawiæ maksymaln± liczbê wierszy, które bêd± wy¶wietlane w oknie "
+"dziennika. Wprowad¼ -1 je¶li maj± byæ zapamiêtywane wszystkie komunikaty."
 
 #: modules/gui/win32/win32.cpp:305
 msgid " Enter -1 if you want to keep all messages."
@@ -3122,9 +3321,6 @@ msgstr "modu³ interfejsu Win32"
 msgid "Version x.y.z"
 msgstr ""
 
-#.
-#. * from modules/gui/win32/disc.dfm:
-#.
 #: modules/gui/win32/strings.cpp:19
 #, fuzzy
 msgid "Open Disc"
@@ -3183,7 +3379,7 @@ msgstr "Plik"
 msgid "0:00:00"
 msgstr ""
 
-#: modules/gui/win32/strings.cpp:47
+#: modules/gui/win32/strings.cpp:47 modules/gui/wxwindows/interface.cpp:236
 #, fuzzy
 msgid "&File"
 msgstr "Plik"
@@ -3203,7 +3399,7 @@ msgstr "Otwórz _p³ytê..."
 msgid "&Network stream..."
 msgstr "_Strumieñ sieciowy..."
 
-#: modules/gui/win32/strings.cpp:51
+#: modules/gui/win32/strings.cpp:51 modules/gui/wxwindows/interface.cpp:237
 #, fuzzy
 msgid "&View"
 msgstr "_Widok"
@@ -3213,7 +3409,7 @@ msgstr "_Widok"
 msgid "&Hide interface"
 msgstr "U_kryj interfejs"
 
-#: modules/gui/win32/strings.cpp:54
+#: modules/gui/win32/strings.cpp:54 modules/gui/wxwindows/interface.cpp:219
 #, fuzzy
 msgid "&Playlist..."
 msgstr "Lista odtwarzania..."
@@ -3275,12 +3471,12 @@ msgstr "Wybierz plik"
 msgid "&Language"
 msgstr ""
 
-#: modules/gui/win32/strings.cpp:72
+#: modules/gui/win32/strings.cpp:72 modules/gui/wxwindows/interface.cpp:226
 #, fuzzy
 msgid "&Subtitles"
 msgstr "_Podtytu³y"
 
-#: modules/gui/win32/strings.cpp:74
+#: modules/gui/win32/strings.cpp:74 modules/gui/wxwindows/interface.cpp:239
 #, fuzzy
 msgid "&Help"
 msgstr "_Pomoc"
@@ -3416,9 +3612,6 @@ msgstr "Otwiera okno komunikatów"
 msgid "&Copy text"
 msgstr ""
 
-#.
-#. * from modules/gui/win32/network.dfm:
-#.
 #: modules/gui/win32/strings.cpp:161
 #, fuzzy
 msgid "Open network"
@@ -3464,12 +3657,13 @@ msgstr "Sieæ"
 msgid "&Url"
 msgstr "Url"
 
-#: modules/gui/win32/strings.cpp:189
+#: modules/gui/win32/strings.cpp:189 modules/gui/wxwindows/playlist.cpp:112
 #, fuzzy
 msgid "&Delete"
 msgstr "Usuñ"
 
 #: modules/gui/win32/strings.cpp:190 modules/gui/win32/strings.cpp:191
+#: modules/gui/wxwindows/playlist.cpp:118
 #, fuzzy
 msgid "&Selection"
 msgstr "Wybór"
@@ -3531,9 +3725,6 @@ msgstr "Tytu³:"
 msgid "239.239.0.1"
 msgstr ""
 
-#.
-#. * from modules/gui/win32/subtitles.dfm:
-#.
 #: modules/gui/win32/strings.cpp:240
 #, fuzzy
 msgid "Add subtitles"
@@ -3551,9 +3742,258 @@ msgstr ""
 msgid "0.0"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
+#: modules/gui/wxwindows/wxwindows.cpp:82
+#, fuzzy
+msgid "wxWindows"
+msgstr "Aktywne okna"
+
+#: modules/gui/wxwindows/wxwindows.cpp:83
+#, fuzzy
+msgid "wxWindows interface module"
+msgstr "modu³ interfejsu"
+
+#: modules/gui/wxwindows/interface.cpp:188
+#, fuzzy
+msgid "Open a DVD or (S)VCD"
+msgstr "Otwiera DVD lub VCD"
+
+#: modules/gui/wxwindows/interface.cpp:189
+#, fuzzy
+msgid "Open a network stream"
+msgstr "Wybiera strumieñ sieciowy"
+
+#: modules/gui/wxwindows/interface.cpp:190
+#, fuzzy
+msgid "Open a satellite stream"
+msgstr "Otwiera kartê satelitarn±"
+
+#: modules/gui/wxwindows/interface.cpp:191
+msgid "Eject the DVD/CD"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:192
+#, fuzzy
+msgid "Exit this program"
+msgstr "Wychodzi z programu"
+
+#: modules/gui/wxwindows/interface.cpp:194
+#, fuzzy
+msgid "Open the playlist"
+msgstr "Otwiera okno listy odtwarzania"
+
+#: modules/gui/wxwindows/interface.cpp:195
+#, fuzzy
+msgid "Show the program logs"
+msgstr "Wybiera program"
+
+#: modules/gui/wxwindows/interface.cpp:196
+msgid "Show information about the file being played"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:198
+msgid "Change the current audio track"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:199
+msgid "Change the current subtitles stream"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:200
+msgid "Go to the preferences menu"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:202
+#, fuzzy
+msgid "About this program"
+msgstr "Wychodzi z programu"
+
+#: modules/gui/wxwindows/interface.cpp:206
+#, fuzzy
+msgid "&Open File..."
+msgstr "_Otwórz plik..."
+
+#: modules/gui/wxwindows/interface.cpp:207
+#, fuzzy
+msgid "Open &Disc..."
+msgstr "Otwórz _p³ytê..."
+
+#: modules/gui/wxwindows/interface.cpp:208
+#, fuzzy
+msgid "&Network Stream..."
+msgstr "_Strumieñ sieciowy..."
+
+#: modules/gui/wxwindows/interface.cpp:210
+#, fuzzy
+msgid "&Satellite Stream..."
+msgstr "_Strumieñ sieciowy..."
+
+#: modules/gui/wxwindows/interface.cpp:213
+#, fuzzy
+msgid "&Eject Disc"
+msgstr "_Wysuñ p³ytê"
+
+#: modules/gui/wxwindows/interface.cpp:215
+#, fuzzy
+msgid "E&xit"
+msgstr "W_yjd¼"
+
+#: modules/gui/wxwindows/interface.cpp:220
+#, fuzzy
+msgid "&Logs..."
+msgstr "Otwórz _p³ytê..."
+
+#: modules/gui/wxwindows/interface.cpp:221
+#, fuzzy
+msgid "&File info..."
+msgstr "_Otwórz plik..."
+
+#: modules/gui/wxwindows/interface.cpp:225
+#, fuzzy
+msgid "&Audio"
+msgstr "D¼wiêk"
+
+#: modules/gui/wxwindows/interface.cpp:228
+#, fuzzy
+msgid "&Preferences..."
+msgstr "_Preferencje..."
+
+#: modules/gui/wxwindows/interface.cpp:232
+#, fuzzy
+msgid "&About..."
+msgstr "_Informacje o..."
+
+#: modules/gui/wxwindows/interface.cpp:238
+#, fuzzy
+msgid "&Settings"
+msgstr "U_stawienia"
+
+#: modules/gui/wxwindows/interface.cpp:252
+#, fuzzy
+msgid "Stop current playlist item"
+msgstr "Otwiera okno listy odtwarzania"
+
+#: modules/gui/wxwindows/interface.cpp:253
+msgid "Play current playlist item"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:254
+msgid "Pause current playlist item"
+msgstr ""
+
+#: modules/gui/wxwindows/interface.cpp:255
+#, fuzzy
+msgid "Open playlist"
+msgstr "Otwórz listê"
+
+#: modules/gui/wxwindows/interface.cpp:256
+#, fuzzy
+msgid "Previous playlist item"
+msgstr "Poprzedni plik"
+
+#: modules/gui/wxwindows/interface.cpp:257
+#, fuzzy
+msgid "Next playlist item"
+msgstr "Otwiera okno listy odtwarzania"
+
+#: modules/gui/wxwindows/interface.cpp:378
+#, fuzzy
+msgid ""
+" (wxWindows interface)\n"
+"\n"
+msgstr "modu³ interfejsu Win32"
+
+#: modules/gui/wxwindows/interface.cpp:379
+#, fuzzy
+msgid ""
+"(C) 1996-2003 - the VideoLAN Team\n"
+"\n"
+msgstr "(c) 1996-2003 Zespó³ VideoLAN"
+
+#: modules/gui/wxwindows/interface.cpp:380
+#, fuzzy
+msgid ""
+"The VideoLAN team <videolan@videolan.org>\n"
+"http://www.videolan.org/\n"
+"\n"
+msgstr ""
+"Zespó³ VideoLAN <videolan@videolan.org>\n"
+"http://www.videolan.org/"
+
+#: modules/gui/wxwindows/interface.cpp:382
+#, fuzzy
+msgid ""
+"This is the VideoLAN Client, a DVD, MPEG and DivX player.\n"
+"It can play MPEG and MPEG2 files from a file or from a network source."
+msgstr ""
+"Klient VideoLAN, odtwarzacz DVD, MPEG i DivX. Program potrafi odtwarzaæ MPEG "
+"i MPEG2 z pliku lub ze ¼ród³a sieciowego."
+
+#: modules/gui/wxwindows/interface.cpp:386
+#, fuzzy
+msgid "About "
+msgstr "Informacje o..."
+
+#: modules/gui/wxwindows/open.cpp:234
+msgid "DVD (menus support)"
+msgstr ""
+
+#: modules/gui/wxwindows/open.cpp:244
+#, fuzzy
+msgid "Device Name"
+msgstr "Nazwa urz±dzenia"
+
+#: modules/gui/wxwindows/open.cpp:308 modules/gui/wxwindows/open.cpp:331
+#: modules/gui/wxwindows/open.cpp:353 modules/gui/wxwindows/popup.cpp:262
+#, c-format
+msgid "%d"
+msgstr ""
+
+#: modules/gui/wxwindows/popup.cpp:88
+#, fuzzy
+msgid "Audio menu"
+msgstr "U_stawienia"
+
+#: modules/gui/wxwindows/popup.cpp:101
+#, fuzzy
+msgid "Video menu"
+msgstr "U_stawienia"
+
+#: modules/gui/wxwindows/popup.cpp:113
+#, fuzzy
+msgid "Input menu"
+msgstr "Wej¶cie"
+
+#: modules/gui/wxwindows/popup.cpp:126 modules/gui/wxwindows/playlist.cpp:107
+#, fuzzy
+msgid "&Close"
+msgstr "Nic"
+
+#: modules/gui/wxwindows/playlist.cpp:104
+msgid "Add &Url..."
+msgstr ""
+
+#: modules/gui/wxwindows/playlist.cpp:105
+msgid "Add &Directory..."
+msgstr ""
+
+#: modules/gui/wxwindows/playlist.cpp:111
+#, fuzzy
+msgid "&Invert"
+msgstr "Odwróæ"
+
+#: modules/gui/wxwindows/playlist.cpp:113
+#, fuzzy
+msgid "&Select All"
+msgstr "Wybierz plik"
+
+#: modules/gui/wxwindows/playlist.cpp:117
+msgid "&Manage"
+msgstr ""
+
+#: modules/gui/wxwindows/playlist.cpp:192
+msgid "no info"
+msgstr ""
+
 #: modules/misc/dummy/dummy.c:37
 msgid "dummy image chroma format"
 msgstr "format chroma fikcyjnych obrazów"
@@ -3562,7 +4002,10 @@ msgstr "format chroma fikcyjnych obrazów"
 msgid ""
 "Force the dummy video output to create images using a specific chroma format "
 "instead of trying to improve performances by using the most efficient one."
-msgstr "Wymusza format fikcyjny wyj¶cia obrazów przy tworzeniu okre¶lonego formatu chroma zamiast próby zwiêkszania wydajno¶ci przez u¿ycie najbardziej wydajnego formatu."
+msgstr ""
+"Wymusza format fikcyjny wyj¶cia obrazów przy tworzeniu okre¶lonego formatu "
+"chroma zamiast próby zwiêkszania wydajno¶ci przez u¿ycie najbardziej "
+"wydajnego formatu."
 
 #: modules/misc/dummy/dummy.c:44
 msgid "don't open a dos command box interface"
@@ -3591,6 +4034,10 @@ msgstr ""
 msgid "Gtk+ helper module"
 msgstr "Modu³ interfejsu Gtk+"
 
+#: modules/misc/httpd.c:91
+msgid "HTTP 1.0 daemon"
+msgstr ""
+
 #: modules/misc/logger/logger.c:86
 msgid "log filename"
 msgstr "nazwa pliku dziennika"
@@ -3606,7 +4053,8 @@ msgstr "format dziennika"
 #: modules/misc/logger/logger.c:87
 msgid ""
 "Specify the log format. Available choices are \"text\" (default) and \"html\""
-msgstr "Okre¶la format dziennika. Mo¿liwe opcje to \"text\" (domy¶lnie) i \"html\""
+msgstr ""
+"Okre¶la format dziennika. Mo¿liwe opcje to \"text\" (domy¶lnie) i \"html\""
 
 #: modules/misc/logger/logger.c:88
 msgid "file logging interface module"
@@ -3639,13 +4087,32 @@ msgstr "modu³ MMX EXT memcpy"
 msgid "AltiVec memcpy module"
 msgstr "modu³ AltiVec memcpy"
 
-#: modules/misc/network/ipv4.c:86
+#: modules/misc/network/ipv4.c:87
 msgid "IPv4 network abstraction layer"
 msgstr "sieciowa warstwa abstrakcji IPv4"
 
 #: modules/misc/network/ipv6.c:79
 msgid "IPv6 network abstraction layer"
 msgstr "sieciowa warstwa abstrakcji IPv6"
+
+#: modules/misc/qte_main.cpp:66
+#, fuzzy
+msgid "Qt Embedded helper module"
+msgstr "modu³ demux"
+
+#: modules/misc/sap.c:131
+msgid "SAP"
+msgstr ""
+
+#: modules/misc/sap.c:134
+#, fuzzy
+msgid "SAP interface module"
+msgstr "modu³ interfejsu"
+
+#: modules/misc/screensaver.c:44
+#, fuzzy
+msgid "screensaver disabling module"
+msgstr "modu³ przeplotu"
 
 #: modules/misc/testsuite/test1.c:33
 #, fuzzy
@@ -3656,6 +4123,56 @@ msgstr "pusty modu³ nie robi nic"
 #, fuzzy
 msgid "Miscellaneous stress tests"
 msgstr "Ró¿ne"
+
+#: modules/mux/avi.c:96
+msgid "Avi muxer"
+msgstr ""
+
+#: modules/mux/dummy.c:62
+msgid "Dummy muxer"
+msgstr ""
+
+#: modules/mux/mpeg/ps.c:79
+msgid "PS muxer"
+msgstr ""
+
+#: modules/mux/mpeg/ts.c:140
+msgid "TS muxer"
+msgstr ""
+
+#: modules/mux/mpeg/ts.c:145
+msgid "TS muxer (libdvbpsi)"
+msgstr ""
+
+#: modules/mux/ogg.c:54
+msgid "Ogg/ogm muxer"
+msgstr ""
+
+#: modules/packetizer/a52.c:70
+msgid "A/52 audio packetizer"
+msgstr ""
+
+#: modules/packetizer/copy.c:69
+msgid "Copy packetizer"
+msgstr ""
+
+#: modules/packetizer/mpeg4audio.c:89
+msgid "MPEG4 Audio packetizer"
+msgstr ""
+
+#: modules/packetizer/mpeg4video.c:73
+msgid "MPEG4 Video packetizer"
+msgstr ""
+
+#: modules/packetizer/mpegaudio.c:69
+#, fuzzy
+msgid "MPEG-I/II audio packetizer"
+msgstr "dekoder d¼wiêku MPEG warstwa I/II"
+
+#: modules/packetizer/mpegvideo.c:73
+#, fuzzy
+msgid "MPEG-I/II video packetizer"
+msgstr "modu³ dekodera obrazu MPEG I/II"
 
 #: modules/video_chroma/i420_rgb.c:67
 #, fuzzy
@@ -3682,9 +4199,6 @@ msgstr " do "
 msgid "MMX conversions from "
 msgstr "konwersje MMX z "
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_filter/clone.c:53
 #, fuzzy
 msgid "number of clones"
@@ -3705,9 +4219,6 @@ msgstr "Nic"
 msgid "image clone video module"
 msgstr "modu³ ¶ciany obrazu (image wall)"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_filter/crop.c:54
 msgid "crop geometry"
 msgstr ""
@@ -3729,9 +4240,6 @@ msgstr ""
 msgid "image crop video module"
 msgstr "modu³ ¶ciany obrazu (image wall)"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_filter/deinterlace/deinterlace.c:75
 #, fuzzy
 msgid "deinterlace mode"
@@ -3746,9 +4254,6 @@ msgstr "jedna z opcji \"discard\", \"blend\", \"mean\", \"bob\" lub \"linear\""
 msgid "deinterlacing module"
 msgstr "modu³ przeplotu"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_filter/distort.c:59
 #, fuzzy
 msgid "distort mode"
@@ -3772,9 +4277,6 @@ msgstr "ró¿ne modu³y efektów obrazu"
 msgid "invert video module"
 msgstr "modu³ odwracania obrazu"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_filter/motionblur.c:54
 msgid "blur factor"
 msgstr ""
@@ -3787,9 +4289,6 @@ msgstr ""
 msgid "Motion blur filter"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_filter/transform.c:57
 #, fuzzy
 msgid "transform type"
@@ -3803,9 +4302,6 @@ msgstr "Jeden z \"90\", \"180\", \"270\", \"hflip\" i \"vflip\""
 msgid "image transformation module"
 msgstr "modu³ transformacji obrazu"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_filter/wall.c:53
 #, fuzzy
 msgid "number of columns"
@@ -3842,40 +4338,43 @@ msgstr "modu³ ¶ciany obrazu (image wall)"
 msgid "ASCII-art video output module"
 msgstr "modu³ wyj¶ciowy obrazu ASCII-art"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
-#: modules/video_output/directx/directx.c:93
+#: modules/video_output/directx/directx.c:95
 msgid "always on top"
 msgstr ""
 
-#: modules/video_output/directx/directx.c:94
+#: modules/video_output/directx/directx.c:96
 msgid "place the directx window on top of other windows"
 msgstr ""
 
-#: modules/video_output/directx/directx.c:95
+#: modules/video_output/directx/directx.c:97
 msgid "use hardware YUV->RGB conversions"
 msgstr "u¿ywanie konwersji sprzêtowej YUV->RGB"
 
-#: modules/video_output/directx/directx.c:97
+#: modules/video_output/directx/directx.c:99
 msgid ""
 "Try to use hardware acceleration for YUV->RGB conversions. This option "
 "doesn't have any effect when using overlays."
-msgstr "Spróbuj u¿yæ akceleracji sprzêtowej dla konwersji YUV->RGB. Ta opcja nie przynosi ¿adnych efektów w trybie overlay."
+msgstr ""
+"Spróbuj u¿yæ akceleracji sprzêtowej dla konwersji YUV->RGB. Ta opcja nie "
+"przynosi ¿adnych efektów w trybie overlay."
 
-#: modules/video_output/directx/directx.c:99
+#: modules/video_output/directx/directx.c:101
 msgid "use video buffers in system memory"
 msgstr "u¿ywanie buforów obrazu w pamiêci systemowej"
 
-#: modules/video_output/directx/directx.c:101
+#: modules/video_output/directx/directx.c:103
 msgid ""
 "Create video buffers in system memory instead of video memory. This isn't "
 "recommended as usually using video memory allows to benefit from more "
 "hardware acceleration (like rescaling or YUV->RGB conversions). This option "
 "doesn't have any effect when using overlays."
-msgstr "Tworzenie buforów obrazu w pamiêci systemowej zamiast w pamiêci karty. To nie jest zalecane gdy¿ zazwyczaj u¿ywanie pamiêci karty daje korzy¶ci z akceleracji sprzêtowej (jak przeskalowywanie lub konwersje YUV->RGB). Ta opcja nie przynosi ¿adnych efektów w trybie overlay."
+msgstr ""
+"Tworzenie buforów obrazu w pamiêci systemowej zamiast w pamiêci karty. To "
+"nie jest zalecane gdy¿ zazwyczaj u¿ywanie pamiêci karty daje korzy¶ci z "
+"akceleracji sprzêtowej (jak przeskalowywanie lub konwersje YUV->RGB). Ta "
+"opcja nie przynosi ¿adnych efektów w trybie overlay."
 
-#: modules/video_output/directx/directx.c:111
+#: modules/video_output/directx/directx.c:113
 #, fuzzy
 msgid "DirectX video module"
 msgstr "modu³ odwracania obrazu"
@@ -3892,9 +4391,6 @@ msgstr "urz±dzenie bufora ramek"
 msgid "Linux console framebuffer module"
 msgstr "modu³ bufora ramek konsoli linuksowej"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_output/ggi.c:56 modules/video_output/mga/xmga.c:98
 #: modules/video_output/x11/x11.c:52 modules/video_output/x11/xvideo.c:58
 msgid "X11 display name"
@@ -3916,9 +4412,6 @@ msgstr "modu³ 3dfx Glide"
 msgid "Matrox Graphic Array video module"
 msgstr "modu³ obrazu Matrox Graphic Array"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_output/mga/xmga.c:89 modules/video_output/x11/x11.c:43
 #: modules/video_output/x11/xvideo.c:49
 msgid "alternate fullscreen method"
@@ -3934,24 +4427,26 @@ msgid ""
 "2) Completly bypass the window manager, but then nothing will be able to "
 "show on top of the video."
 msgstr ""
-"Istniej± dwa sposobu na prze³±czenie okna w tryb pe³noekranowy, ka¿dy niesety ma swoje wady.\n"
-"1) Pozwól mened¿erowi okien obs³ugiwaæ oknem pe³noekranowym (domy¶lnie). Lecz elementy takie jak paski stanu bêd± wy¶wietlane na górze obrazu.\n"
-"2) Ca³kowite pominiêcie mened¿era okien, lecz wówczas nic nie bêdzie mog³o byæ wy¶wietlane na górze obrazu."
+"Istniej± dwa sposobu na prze³±czenie okna w tryb pe³noekranowy, ka¿dy "
+"niesety ma swoje wady.\n"
+"1) Pozwól mened¿erowi okien obs³ugiwaæ oknem pe³noekranowym (domy¶lnie). "
+"Lecz elementy takie jak paski stanu bêd± wy¶wietlane na górze obrazu.\n"
+"2) Ca³kowite pominiêcie mened¿era okien, lecz wówczas nic nie bêdzie mog³o "
+"byæ wy¶wietlane na górze obrazu."
 
 #: modules/video_output/mga/xmga.c:100 modules/video_output/x11/x11.c:54
 #: modules/video_output/x11/xvideo.c:60
 msgid ""
 "Specify the X11 hardware display you want to use. By default VLC will use "
 "the value of the DISPLAY environment variable."
-msgstr "Okre¶la u¿ywany ekran sprzêtowy X11. Domy¶lnie VLC u¿yje warto¶ci ze zmiennej ¶rodowiskowej DISPLAY."
+msgstr ""
+"Okre¶la u¿ywany ekran sprzêtowy X11. Domy¶lnie VLC u¿yje warto¶ci ze "
+"zmiennej ¶rodowiskowej DISPLAY."
 
 #: modules/video_output/mga/xmga.c:107
 msgid "X11 MGA module"
 msgstr "modu³ X11 MGA"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_output/qte/qte.cpp:80
 #, fuzzy
 msgid "QT Embedded display name"
@@ -3962,10 +4457,10 @@ msgstr "nazwa ekranu X11"
 msgid ""
 "Specify the Qt Embedded hardware display you want to use. By default VLC "
 "will use the value of the DISPLAY environment variable."
-msgstr "Okre¶la u¿ywany ekran sprzêtowy X11. Domy¶lnie VLC u¿yje warto¶ci ze zmiennej ¶rodowiskowej DISPLAY."
+msgstr ""
+"Okre¶la u¿ywany ekran sprzêtowy X11. Domy¶lnie VLC u¿yje warto¶ci ze "
+"zmiennej ¶rodowiskowej DISPLAY."
 
-#.    add_category_hint( N_("QT Embedded"), NULL );
-#.    add_string( "qte-display", "landscape", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT);
 #: modules/video_output/qte/qte.cpp:116
 #, fuzzy
 msgid "QT Embedded video module"
@@ -3980,6 +4475,11 @@ msgstr "modu³ Simple DirectMedia Layer (SDL)"
 #, fuzzy
 msgid "SVGAlib module"
 msgstr "modu³ 3dfx Glide"
+
+#: modules/video_output/wingdi.c:82
+#, fuzzy
+msgid "Windows GDI video output module"
+msgstr "modu³ wyj¶ciowy obrazu"
 
 #: modules/video_output/x11/x11.c:57 modules/video_output/x11/xvideo.c:68
 msgid "use shared memory"
@@ -3997,9 +4497,6 @@ msgstr ""
 msgid "X11 module"
 msgstr "modu³ X11"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/video_output/x11/xvideo.c:44
 msgid "XVideo adaptor number"
 msgstr "Numer karty XVideo"
@@ -4008,7 +4505,9 @@ msgstr "Numer karty XVideo"
 msgid ""
 "If you graphics card provides several adaptors, this option allows you to "
 "choose which one will be used (you shouldn't have to change this)."
-msgstr "Je¶li karta graficzna obs³uguje kilka kart, ta opcja umo¿liwia wybranie która z nich ma byæ u¿ywana (nie powinno siê tego zmieniaæ)."
+msgstr ""
+"Je¶li karta graficzna obs³uguje kilka kart, ta opcja umo¿liwia wybranie "
+"która z nich ma byæ u¿ywana (nie powinno siê tego zmieniaæ)."
 
 #: modules/video_output/x11/xvideo.c:63
 msgid "XVimage chroma format"
@@ -4018,7 +4517,10 @@ msgstr "format XVimage chroma"
 msgid ""
 "Force the XVideo renderer to use a specific chroma format instead of trying "
 "to improve performances by using the most efficient one."
-msgstr "Wymusza renderowanie XVideo w trybie u¿ywaj±cym formatu chroma zamiast próbowania polepszenia wydajno¶ci przez u¿ycie najbardziej wydajnego formatu. "
+msgstr ""
+"Wymusza renderowanie XVideo w trybie u¿ywaj±cym formatu chroma zamiast "
+"próbowania polepszenia wydajno¶ci przez u¿ycie najbardziej wydajnego "
+"formatu. "
 
 #: modules/video_output/x11/xvideo.c:73
 #, fuzzy
@@ -4034,9 +4536,6 @@ msgstr "modu³ rozszerzenia XVideo"
 msgid "scope effect"
 msgstr "modu³ efektu zasiêgu"
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/visualization/xosd/xosd.c:61
 #, fuzzy
 msgid "flip vertical position"
@@ -4086,17 +4585,12 @@ msgstr "modu³ interfejsu"
 #~ msgid ""
 #~ "Specify a QT Embedded drawable to use instead of opening a new window. "
 #~ "This option is DANGEROUS, use with care."
-#~ msgstr "Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
+#~ msgstr ""
+#~ "Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta "
+#~ "opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
 
 #, fuzzy
 #~ msgid "the VideoLAN Team <videolan@videolan.org>"
-#~ msgstr ""
-#~ "Zespó³ VideoLAN <videolan@videolan.org>\n"
-#~ "http://www.videolan.org/"
-
-#~ msgid ""
-#~ "the VideoLAN team <videolan@videolan.org>\n"
-#~ "http://www.videolan.org/"
 #~ msgstr ""
 #~ "Zespó³ VideoLAN <videolan@videolan.org>\n"
 #~ "http://www.videolan.org/"
@@ -4121,7 +4615,9 @@ msgstr "modu³ interfejsu"
 #~ msgid ""
 #~ "Specify a window to use instead of opening a new one. This option is "
 #~ "DANGEROUS, use with care."
-#~ msgstr "Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
+#~ msgstr ""
+#~ "Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta "
+#~ "opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
 
 #~ msgid "X11 drawable"
 #~ msgstr "obiekt rysunkowy X11"
@@ -4129,7 +4625,9 @@ msgstr "modu³ interfejsu"
 #~ msgid ""
 #~ "Specify a X11 drawable to use instead of opening a new window. This "
 #~ "option is DANGEROUS, use with care."
-#~ msgstr "Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
+#~ msgstr ""
+#~ "Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta "
+#~ "opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
 
 #~ msgid "A_udio"
 #~ msgstr "A_udio"
@@ -4160,10 +4658,6 @@ msgstr "modu³ interfejsu"
 #~ msgstr "_Widok"
 
 #, fuzzy
-#~ msgid "Open a network stream"
-#~ msgstr "Wybiera strumieñ sieciowy"
-
-#, fuzzy
 #~ msgid "Open file..."
 #~ msgstr "_Otwórz plik..."
 
@@ -4175,9 +4669,6 @@ msgstr "modu³ interfejsu"
 #~ msgid "Network stream..."
 #~ msgstr "_Strumieñ sieciowy..."
 
-#~ msgid "Previous File"
-#~ msgstr "Poprzedni plik"
-
 #, fuzzy
 #~ msgid "(C) Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002"
 #~ msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - Zespó³ VideoLAN"
@@ -4186,7 +4677,9 @@ msgstr "modu³ interfejsu"
 #~ msgid ""
 #~ "This is the VideoLAN Client, a DVD, MPEG and DivX player. It can play "
 #~ "MPEG and MPEG 2 files from a file or from a network source."
-#~ msgstr "Klient VideoLAN, odtwarzacz DVD i MPEG. Program potrafi odtwarzaæ MPEG i MPEG2 z pliku lub ze ¼ród³a sieciowego."
+#~ msgstr ""
+#~ "Klient VideoLAN, odtwarzacz DVD i MPEG. Program potrafi odtwarzaæ MPEG i "
+#~ "MPEG2 z pliku lub ze ¼ród³a sieciowego."
 
 #, fuzzy
 #~ msgid "VideoLAN Client (win32 interface)"

@@ -7,7 +7,7 @@
  *****************************************************************************
  *    
  * Copyright (C) 2001 VideoLAN
- * $Id: dvd.c,v 1.2 2003/02/20 01:52:45 sigmunau Exp $
+ * $Id: dvd.c,v 1.3 2003/02/27 13:19:44 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -48,9 +48,9 @@ void E_(CloseIntf) ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    add_usage_hint( "[dvdplay:][device][@[title][,[chapter][,angle]]]" );
-    add_category_hint( "dvd", NULL, VLC_TRUE );
-    set_description( "dvdplay input module" );
+    add_usage_hint( N_("[dvdplay:][device][@[title][,[chapter][,angle]]]") );
+    add_category_hint( N_("dvd"), NULL, VLC_TRUE );
+    set_description( _("dvdplay input module") );
     add_submodule();
         set_capability( "access", 120 );
         set_callbacks( E_(OpenDVD), E_(CloseDVD) );

@@ -2,7 +2,7 @@
  * a52sys.c : A/52 input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52sys.c,v 1.1 2002/08/28 22:25:38 massiot Exp $
+ * $Id: a52sys.c,v 1.2 2003/02/27 13:19:43 gbazin Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -49,7 +49,7 @@ static int  Demux ( input_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();                                      
-    set_description( "A52 demuxer" );                       
+    set_description( _("A52 demuxer") );                       
     set_capability( "demux", 155 );
     set_callbacks( Init, NULL );
     add_shortcut( "a52" );

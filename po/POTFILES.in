@@ -7,13 +7,20 @@ include/interface.h
 
 # access modules
 modules/access/dvd/dvd.c
+modules/access/dvdread/dvdread.c
+modules/access/dvdplay/dvd.c
+modules/access/vcd/vcd.c
 modules/access/v4l/v4l.c
 modules/access/file.c
 modules/access/http.c
 modules/access/udp.c
-modules/access/dvdread/dvdread.c
 modules/access/satellite/satellite.c
-modules/access/vcd/vcd.c
+
+# access_output modules
+modules/access_output/file.c
+modules/access_output/dummy.c
+modules/access_output/http.c
+modules/access_output/udp.c
 
 # audio_filter modules
 modules/audio_filter/channel_mixer/trivial.c
@@ -30,6 +37,7 @@ modules/audio_filter/converter/mpgatofixed32.c
 modules/audio_filter/converter/s16tofloat32swab.c
 modules/audio_filter/resampler/trivial.c
 modules/audio_filter/resampler/ugly.c
+modules/audio_filter/resampler/linear.c
 
 # audio_mixer modules
 modules/audio_mixer/float32.c
@@ -51,11 +59,15 @@ modules/codec/a52.c
 modules/codec/a52old/a52old.c
 modules/codec/a52old/downmix/downmix.c
 modules/codec/a52old/imdct/imdct.c
+modules/codec/adpcm.c
 modules/codec/araw.c
+modules/codec/cinepak/cinepak.c
 modules/codec/dv.c
 modules/codec/faad/decoder.c
+modules/codec/flacdec.c
 modules/codec/ffmpeg/ffmpeg.c
 modules/codec/ffmpeg/postprocessing/postprocessing.c
+modules/codec/libmpeg2.c
 modules/codec/lpcm.c
 modules/codec/mpeg_audio.c
 modules/codec/mpeg_video/idct/idct.c
@@ -70,20 +82,39 @@ modules/codec/mpeg_video/motion/motionmmx.c
 modules/codec/mpeg_video/motion/motionmmxext.c
 modules/codec/mpeg_video/parser.c
 modules/codec/spudec/spudec.c
+modules/codec/tarkin.c
+modules/codec/theora.c
+modules/codec/vorbis.c
+modules/codec/xvid.c
 
 # control modules
+modules/control/gestures.c
 modules/control/lirc/lirc.c
 modules/control/rc/rc.c
 
 # demux modules
+modules/demux/a52sys.c
 modules/demux/aac/demux.c
+modules/demux/asf/asf.c
+modules/demux/avi/avi.c
+modules/demux/demuxdump.c
+modules/demux/flac.c
+modules/demux/m3u.c
+modules/demux/mp4/mp4.c
 modules/demux/mpeg/audio.c
 modules/demux/mpeg/es.c
 modules/demux/mpeg/ps.c
 modules/demux/mpeg/system.c
 modules/demux/mpeg/ts.c
+modules/demux/ogg.c
+modules/demux/rawdv.c
 modules/demux/util/id3.c
 modules/demux/util/id3tag.c
+modules/demux/wav/wav.c
+
+# encoder modules
+modules/encoder/ffmpeg/encoder.c
+modules/encoder/xvid.c
 
 # gui modules
 modules/gui/beos/BeOS.cpp
@@ -116,20 +147,46 @@ modules/gui/qt/qt.cpp
 modules/gui/win32/misc.cpp
 modules/gui/win32/win32.cpp
 modules/gui/win32/strings.cpp
+modules/gui/wxwindows/wxwindows.cpp
+modules/gui/wxwindows/interface.cpp
+modules/gui/wxwindows/open.cpp
+modules/gui/wxwindows/popup.cpp
+modules/gui/wxwindows/fileinfo.cpp
+modules/gui/wxwindows/messages.cpp
+modules/gui/wxwindows/playlist.cpp
 
 # misc plugins
 modules/misc/dummy/dummy.c
 modules/misc/dummy/interface.c
 modules/misc/gtk_main.c
+modules/misc/httpd.c
 modules/misc/logger/logger.c
 modules/misc/memcpy/memcpy.c
 modules/misc/memcpy/memcpyaltivec.c
 modules/misc/network/ipv4.c
 modules/misc/network/ipv6.c
+modules/misc/qte_main.cpp
+modules/misc/sap.c
+modules/misc/screensaver.c
 modules/misc/testsuite/test1.c
 modules/misc/testsuite/test2.cpp
 modules/misc/testsuite/test3.m
 modules/misc/testsuite/test4.c
+
+# mux plugins
+modules/mux/avi.c
+modules/mux/dummy.c
+modules/mux/mpeg/ps.c
+modules/mux/mpeg/ts.c
+modules/mux/ogg.c
+
+# packetizer plugins
+modules/packetizer/a52.c
+modules/packetizer/copy.c
+modules/packetizer/mpeg4audio.c
+modules/packetizer/mpeg4video.c
+modules/packetizer/mpegaudio.c
+modules/packetizer/mpegvideo.c
 
 # video_chroma modules
 modules/video_chroma/i420_rgb.c
@@ -158,6 +215,7 @@ modules/video_output/mga/xmga.c
 modules/video_output/qte/qte.cpp
 modules/video_output/sdl.c
 modules/video_output/svgalib.c
+modules/video_output/wingdi.c
 modules/video_output/x11/x11.c
 modules/video_output/x11/xvideo.c
 
