@@ -2,7 +2,7 @@
  * httpd.h
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.h,v 1.4 2003/03/15 00:09:31 fenrir Exp $
+ * $Id: httpd.h,v 1.5 2003/06/25 15:50:52 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -109,11 +109,13 @@ static inline httpd_t* httpd_Find( vlc_object_t *p_this, vlc_bool_t b_create )
 static inline void  httpd_Release( httpd_t *p_httpd )
 {
     vlc_object_release( p_httpd );
+
     if( p_httpd->i_refcount <= 0 )
     {
+        msg_Info( p_httpd, "destroying unused httpd" );
         vlc_object_detach( p_httpd );
+        module_Unneed( p_httpd, p_httpd->p_module );
+        vlc_object_destroy( p_httpd );
     }
 }
-
-
 
