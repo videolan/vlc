@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.27 2002/11/13 20:51:03 sam Exp $
+##  $Id: bootstrap,v 1.28 2002/11/18 11:50:42 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -31,7 +31,7 @@ EOF
 ###
 ###  argument check
 ###
-do_help=yes
+test "$EMAIL" = "sam@zoy.org" && do_help=yes || do_help=no
 do_po=no
 do_vc=no
 while test $# -gt 0; do
