@@ -2,7 +2,7 @@
  * gtk2_api.cpp: Various gtk2-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_api.cpp,v 1.15 2003/04/24 14:38:06 asmax Exp $
+ * $Id: gtk2_api.cpp,v 1.16 2003/04/28 12:00:13 asmax Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -22,7 +22,7 @@
  * USA.
  *****************************************************************************/
 
-#if !defined WIN32
+#ifdef GTK2_SKINS
 
 //--- GTK2 ------------------------------------------------------------------
 #include <glib.h>

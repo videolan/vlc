@@ -2396,7 +2396,7 @@ if test "x${enable_skins}" != "xno"; then
     if test "x${enable_skins}" = "xyes"; then
       PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
       PLUGINS="${PLUGINS} skins"
-      CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins -Imodules/gui/skins/src -Imodules/gui/skins/gtk2 -Imodules/gui/skins/controls -Imodules/gui/skins/parser ${GTK2_CFLAGS}"
+      CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins -Imodules/gui/skins/src -Imodules/gui/skins/gtk2 -Imodules/gui/skins/controls -Imodules/gui/skins/parser ${GTK2_CFLAGS} -DGTK2_SKINS"
       LDFLAGS_skins="${LDFLAGS_skins} -lstdc++  ${GTK2_LIBS}"
     fi
   fi

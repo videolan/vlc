@@ -2,7 +2,7 @@
  * gtk2_dragdrop.cpp: GTK2 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_dragdrop.cpp,v 1.5 2003/04/19 11:46:11 asmax Exp $
+ * $Id: gtk2_dragdrop.cpp,v 1.6 2003/04/28 12:00:13 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -22,7 +22,7 @@
  * USA.
  *****************************************************************************/
 
-#if !defined WIN32
+#ifdef GTK2_SKINS
 
 //--- GTK2 -----------------------------------------------------------------
 #include <gdk/gdk.h>

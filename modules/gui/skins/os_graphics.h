@@ -2,7 +2,7 @@
  * os_graphics.h: Wrapper for the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_graphics.h,v 1.4 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: os_graphics.h,v 1.5 2003/04/28 12:00:13 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -30,7 +30,7 @@
     #define SRC_AND    SRCAND
     #define OSGraphics Win32Graphics
     #define OSRegion   Win32Region
-#else    
+#elif defined GTK2_SKINS
     #include "gtk2/gtk2_graphics.h"
     #define SRC_COPY   1
     #define SRC_AND    2

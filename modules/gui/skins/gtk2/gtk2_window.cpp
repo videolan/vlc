@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.28 2003/04/22 17:56:44 asmax Exp $
+ * $Id: gtk2_window.cpp,v 1.29 2003/04/28 12:00:13 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -22,7 +22,7 @@
  * USA.
  *****************************************************************************/
 
-#if !defined WIN32
+#ifdef GTK2_SKINS
 
 //--- GENERAL ---------------------------------------------------------------
 //#include <math.h>

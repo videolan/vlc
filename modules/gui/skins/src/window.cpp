@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.20 2003/04/28 00:18:27 ipkiss Exp $
+ * $Id: window.cpp,v 1.21 2003/04/28 12:00:14 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -98,6 +98,7 @@ void SkinWindow::Open()
 
     Changing = true;
 
+#ifdef WIN32
     if( Transition && IS_WINNT )
     {
         SetTransparency( 0 );
@@ -106,17 +107,23 @@ void SkinWindow::Open()
     }
     else
     {
+#endif
         OSAPI_PostMessage( this, WINDOW_SHOW, 0, 0 );
+#ifdef WIN32
     }
+#endif
+
 }
 //---------------------------------------------------------------------------
 void SkinWindow::Close()
 {
     Changing = true;
 
+#ifdef WIN32
     if( Transition && IS_WINNT )
         Fade( 0, Transition, WINDOW_HIDE );
     else
+#endif
         OSAPI_PostMessage( this, WINDOW_FADE, WINDOW_HIDE, 1242 );
 }
 //---------------------------------------------------------------------------
@@ -141,6 +148,7 @@ void SkinWindow::Hide()
 void SkinWindow::Fade( int To, int Time, unsigned int evt )
 {
     // No fading effect on win9x
+#ifdef WIN32
     if( IS_WINNT )
     {
         StartAlpha = Alpha;
@@ -151,6 +159,7 @@ void SkinWindow::Fade( int To, int Time, unsigned int evt )
 
         OSAPI_PostMessage( this, WINDOW_FADE, evt, Lock );
     }
+#endif
 }
 //---------------------------------------------------------------------------
 bool SkinWindow::ProcessEvent( Event *evt )
@@ -249,6 +258,7 @@ bool SkinWindow::ProcessEvent( Event *evt )
 //---------------------------------------------------------------------------
 bool SkinWindow::ChangeAlpha( int time )
 {
+#ifdef WIN32
     if( IS_WINNT )
     {
         if( time >= EndTime )
@@ -271,6 +281,7 @@ bool SkinWindow::ChangeAlpha( int time )
             return false;
         }
     }
+#endif
     return true;
 }
 //---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.24 2003/04/21 22:12:37 asmax Exp $
+ * $Id: gtk2_theme.cpp,v 1.25 2003/04/28 12:00:13 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -22,7 +22,7 @@
  * USA.
  *****************************************************************************/
 
-#if !defined WIN32
+#ifdef GTK2_SKINS
 
 //--- GTK2 -----------------------------------------------------------------
 #include <gdk/gdk.h>

@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.16 2003/04/21 18:39:38 asmax Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.17 2003/04/28 12:00:13 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -23,7 +23,7 @@
  * USA.
  *****************************************************************************/
 
-#if !defined WIN32
+#ifdef GTK2_SKINS
 
 //--- GTK2 -----------------------------------------------------------------
 #include <gdk-pixbuf/gdk-pixbuf.h>
