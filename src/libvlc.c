@@ -705,7 +705,108 @@ int VLC_AddIntf( int i_object, char const *psz_module,
 }
 
 /*****************************************************************************
- * VLC_Destroy: stop playing and destroy everything.
+ * VLC_Die: ask vlc to die.
+ *****************************************************************************
+ * This function sets p_vlc->b_die to VLC_TRUE, but does not do any other
+ * task. It is your duty to call VLC_CleanUp and VLC_Destroy afterwards.
+ *****************************************************************************/
+int VLC_Die( int i_object )
+{
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_vlc->b_die = VLC_TRUE;
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * VLC_CleanUp: CleanUp all the intf, playlist, vout, aout
+ *****************************************************************************/
+int VLC_CleanUp( int i_object )
+{
+    intf_thread_t      * p_intf;
+    playlist_t         * p_playlist;
+    vout_thread_t      * p_vout;
+    aout_instance_t    * p_aout;
+    announce_handler_t * p_announce;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    /*
+     * Ask the interfaces to stop and destroy them
+     */
+    msg_Dbg( p_vlc, "removing all interfaces" );
+    while( (p_intf = vlc_object_find( p_vlc, VLC_OBJECT_INTF, FIND_CHILD )) )
+    {
+        intf_StopThread( p_intf );
+        vlc_object_detach( p_intf );
+        vlc_object_release( p_intf );
+        intf_Destroy( p_intf );
+    }
+
+    /*
+     * Free playlists
+     */
+    msg_Dbg( p_vlc, "removing all playlists" );
+    while( (p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST,
+                                          FIND_CHILD )) )
+    {
+        vlc_object_detach( p_playlist );
+        vlc_object_release( p_playlist );
+        playlist_Destroy( p_playlist );
+    }
+
+    /*
+     * Free video outputs
+     */
+    msg_Dbg( p_vlc, "removing all video outputs" );
+    while( (p_vout = vlc_object_find( p_vlc, VLC_OBJECT_VOUT, FIND_CHILD )) )
+    {
+        vlc_object_detach( p_vout );
+        vlc_object_release( p_vout );
+        vout_Destroy( p_vout );
+    }
+
+    /*
+     * Free audio outputs
+     */
+    msg_Dbg( p_vlc, "removing all audio outputs" );
+    while( (p_aout = vlc_object_find( p_vlc, VLC_OBJECT_AOUT, FIND_CHILD )) )
+    {
+        vlc_object_detach( (vlc_object_t *)p_aout );
+        vlc_object_release( (vlc_object_t *)p_aout );
+        aout_Delete( p_aout );
+    }
+
+    /*
+     * Free announce handler(s?)
+     */
+    msg_Dbg( p_vlc, "removing announce handler" );
+    while( (p_announce = vlc_object_find( p_vlc, VLC_OBJECT_ANNOUNCE,
+                                                 FIND_CHILD ) ) )
+   {
+        vlc_object_detach( p_announce );
+        vlc_object_release( p_announce );
+        announce_HandlerDestroy( p_announce );
+   }
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * VLC_Destroy: Destroy everything.
  *****************************************************************************
  * This function requests the running threads to finish, waits for their
  * termination, and destroys their structure.
@@ -758,9 +859,6 @@ int VLC_Destroy( int i_object )
 
     /* Destroy mutexes */
     vlc_mutex_destroy( &p_vlc->config_lock );
-#ifdef SYS_DARWIN
-    vlc_mutex_destroy( &p_vlc->quicktime_lock );
-#endif
 
     vlc_object_detach( p_vlc );
 
@@ -776,74 +874,7 @@ int VLC_Destroy( int i_object )
 }
 
 /*****************************************************************************
- * VLC_Die: ask vlc to die.
- *****************************************************************************
- * This function sets p_vlc->b_die to VLC_TRUE, but does not do any other
- * task. It is your duty to call VLC_End and VLC_Destroy afterwards.
- *****************************************************************************/
-int VLC_Die( int i_object )
-{
-    vlc_t *p_vlc = vlc_current_object( i_object );
-
-    if( !p_vlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
-    p_vlc->b_die = VLC_TRUE;
-
-    if( i_object ) vlc_object_release( p_vlc );
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * VLC_AddTarget: adds a target for playing.
- *****************************************************************************
- * This function adds psz_target to the current playlist. If a playlist does
- * not exist, it will create one.
- *****************************************************************************/
-int VLC_AddTarget( int i_object, char const *psz_target,
-                   char const **ppsz_options, int i_options,
-                   int i_mode, int i_pos )
-{
-    int i_err;
-    playlist_t *p_playlist;
-    vlc_t *p_vlc = vlc_current_object( i_object );
-
-    if( !p_vlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
-    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
-    if( p_playlist == NULL )
-    {
-        msg_Dbg( p_vlc, "no playlist present, creating one" );
-        p_playlist = playlist_Create( p_vlc );
-
-        if( p_playlist == NULL )
-        {
-            if( i_object ) vlc_object_release( p_vlc );
-            return VLC_EGENERIC;
-        }
-
-        vlc_object_yield( p_playlist );
-    }
-
-    i_err = playlist_AddExt( p_playlist, psz_target, psz_target,
-                             i_mode, i_pos, -1, ppsz_options, i_options);
-
-    vlc_object_release( p_playlist );
-
-    if( i_object ) vlc_object_release( p_vlc );
-    return i_err;
-}
-
-/*****************************************************************************
  * VLC_Set: set a vlc variable
- *****************************************************************************
- *
  *****************************************************************************/
 int VLC_Set( int i_object, char const *psz_var, vlc_value_t value )
 {
@@ -894,8 +925,6 @@ int VLC_Set( int i_object, char const *psz_var, vlc_value_t value )
 
 /*****************************************************************************
  * VLC_Get: get a vlc variable
- *****************************************************************************
- *
  *****************************************************************************/
 int VLC_Get( int i_object, char const *psz_var, vlc_value_t *p_value )
 {
@@ -913,84 +942,56 @@ int VLC_Get( int i_object, char const *psz_var, vlc_value_t *p_value )
     return i_ret;
 }
 
-/* FIXME: temporary hacks */
-
-
 /*****************************************************************************
- * VLC_IsPlaying: Query for Playlist Status
+ * VLC_AddTarget: adds a target for playing.
+ *****************************************************************************
+ * This function adds psz_target to the current playlist. If a playlist does
+ * not exist, it will create one.
  *****************************************************************************/
-vlc_bool_t VLC_IsPlaying( int i_object )
+int VLC_AddTarget( int i_object, char const *psz_target,
+                   char const **ppsz_options, int i_options,
+                   int i_mode, int i_pos )
 {
-
-    playlist_t * p_playlist;
-    vlc_bool_t   playing;
-
+    int i_err;
+    playlist_t *p_playlist;
     vlc_t *p_vlc = vlc_current_object( i_object );
 
-    /* Check that the handle is valid */
     if( !p_vlc )
     {
         return VLC_ENOOBJ;
     }
 
-    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
-    if( !p_playlist )
+    if( p_playlist == NULL )
     {
-        if( i_object ) vlc_object_release( p_vlc );
-        return VLC_ENOOBJ;
+        msg_Dbg( p_vlc, "no playlist present, creating one" );
+        p_playlist = playlist_Create( p_vlc );
+
+        if( p_playlist == NULL )
+        {
+            if( i_object ) vlc_object_release( p_vlc );
+            return VLC_EGENERIC;
+        }
+
+        vlc_object_yield( p_playlist );
     }
 
-    playing = playlist_IsPlaying( p_playlist );
+    i_err = playlist_AddExt( p_playlist, psz_target, psz_target,
+                             i_mode, i_pos, -1, ppsz_options, i_options);
 
     vlc_object_release( p_playlist );
 
     if( i_object ) vlc_object_release( p_vlc );
-
-    return playing;
-
+    return i_err;
 }
-
-
-/*****************************************************************************
- * VLC_ClearPlaylist: Query for Playlist Status
- *
- * return: 0
- *****************************************************************************/
-int VLC_ClearPlaylist( int i_object )
-{
-
-    playlist_t * p_playlist;
-    vlc_t *p_vlc = vlc_current_object( i_object );
-
-    /* Check that the handle is valid */
-    if( !p_vlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
-    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
-
-    if( !p_playlist )
-    {
-        if( i_object ) vlc_object_release( p_vlc );
-        return VLC_ENOOBJ;
-    }
-
-    playlist_Clear(p_playlist);
-
-    vlc_object_release( p_playlist );
-
-    if( i_object ) vlc_object_release( p_vlc );
-    return 0;
-}
-
 
 /*****************************************************************************
  * VLC_Play: play
  *****************************************************************************/
 int VLC_Play( int i_object )
 {
+    int i_err;
     playlist_t * p_playlist;
     vlc_t *p_vlc = vlc_current_object( i_object );
 
@@ -1008,103 +1009,11 @@ int VLC_Play( int i_object )
         return VLC_ENOOBJ;
     }
 
-    vlc_mutex_lock( &p_playlist->object_lock );
-    if( p_playlist->i_size )
-    {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        playlist_Play( p_playlist );
-    }
-    else
-    {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-    }
-
+    i_err = playlist_Play( p_playlist );
     vlc_object_release( p_playlist );
 
     if( i_object ) vlc_object_release( p_vlc );
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * VLC_Stop: stop
- *****************************************************************************/
-int VLC_Stop( int i_object )
-{
-    intf_thread_t      * p_intf;
-    playlist_t         * p_playlist;
-    vout_thread_t      * p_vout;
-    aout_instance_t    * p_aout;
-    announce_handler_t * p_announce;
-    vlc_t *p_vlc = vlc_current_object( i_object );
-
-    /* Check that the handle is valid */
-    if( !p_vlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
-    /*
-     * Ask the interfaces to stop and destroy them
-     */
-    msg_Dbg( p_vlc, "removing all interfaces" );
-
-    while( (p_intf = vlc_object_find( p_vlc, VLC_OBJECT_INTF, FIND_CHILD )) )
-    {
-        intf_StopThread( p_intf );
-        vlc_object_detach( p_intf );
-        vlc_object_release( p_intf );
-        intf_Destroy( p_intf );
-    }
-
-    /*
-     * Free playlists
-     */
-
-    msg_Dbg( p_vlc, "removing all playlists" );
-    while( (p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST,
-                                          FIND_CHILD )) )
-    {
-        vlc_object_detach( p_playlist );
-        vlc_object_release( p_playlist );
-        playlist_Destroy( p_playlist );
-    }
-
-    /*
-     * Free video outputs
-     */
-    msg_Dbg( p_vlc, "removing all video outputs" );
-    while( (p_vout = vlc_object_find( p_vlc, VLC_OBJECT_VOUT, FIND_CHILD )) )
-    {
-        vlc_object_detach( p_vout );
-        vlc_object_release( p_vout );
-        vout_Destroy( p_vout );
-    }
-
-    /*
-     * Free audio outputs
-     */
-    msg_Dbg( p_vlc, "removing all audio outputs" );
-    while( (p_aout = vlc_object_find( p_vlc, VLC_OBJECT_AOUT, FIND_CHILD )) )
-    {
-        vlc_object_detach( (vlc_object_t *)p_aout );
-        vlc_object_release( (vlc_object_t *)p_aout );
-        aout_Delete( p_aout );
-    }
-
-    /*
-     * Free announce handler(s?)
-     */
-    msg_Dbg( p_vlc, "removing announce handler" );
-    while( (p_announce = vlc_object_find( p_vlc, VLC_OBJECT_ANNOUNCE,
-                                                 FIND_CHILD ) ) )
-   {
-        vlc_object_detach( p_announce );
-        vlc_object_release( p_announce );
-        announce_HandlerDestroy( p_announce );
-   }
-
-    if( i_object ) vlc_object_release( p_vlc );
-    return VLC_SUCCESS;
+    return i_err;
 }
 
 /*****************************************************************************
@@ -1112,27 +1021,123 @@ int VLC_Stop( int i_object )
  *****************************************************************************/
 int VLC_Pause( int i_object )
 {
-    input_thread_t *p_input;
+    int i_err;
+    playlist_t * p_playlist;
     vlc_t *p_vlc = vlc_current_object( i_object );
 
+    /* Check that the handle is valid */
     if( !p_vlc )
     {
         return VLC_ENOOBJ;
     }
 
-    p_input = vlc_object_find( p_vlc, VLC_OBJECT_INPUT, FIND_CHILD );
+    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
 
-    if( !p_input )
+    if( !p_playlist )
     {
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_ENOOBJ;
     }
 
-    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
-    vlc_object_release( p_input );
+    i_err = playlist_Pause( p_playlist );
+    vlc_object_release( p_playlist );
 
     if( i_object ) vlc_object_release( p_vlc );
-    return VLC_SUCCESS;
+    return i_err;
+}
+
+/*****************************************************************************
+ * VLC_Pause: toggle pause
+ *****************************************************************************/
+int VLC_Stop( int i_object )
+{
+    int i_err;
+    playlist_t * p_playlist;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+    if( !p_playlist )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    i_err = playlist_Stop( p_playlist );
+    vlc_object_release( p_playlist );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return i_err;
+}
+
+/*****************************************************************************
+ * VLC_IsPlaying: Query for Playlist Status
+ *****************************************************************************/
+vlc_bool_t VLC_IsPlaying( int i_object )
+{
+    playlist_t * p_playlist;
+    vlc_bool_t   b_playing;
+
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+    if( !p_playlist )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    b_playing = playlist_IsPlaying( p_playlist );
+
+    vlc_object_release( p_playlist );
+
+    if( i_object ) vlc_object_release( p_vlc );
+
+    return b_playing;
+}
+
+/*****************************************************************************
+ * VLC_ClearPlaylist: Empty the playlist
+ *****************************************************************************/
+int VLC_ClearPlaylist( int i_object )
+{
+    int i_err;
+    playlist_t * p_playlist;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+    if( !p_playlist )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    i_err = playlist_Clear(p_playlist);
+
+    vlc_object_release( p_playlist );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return i_err;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * vlcpeer.cpp: scriptable peer descriptor
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcpeer.cpp,v 1.9 2003/10/23 17:04:39 sam Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -110,7 +110,7 @@ NS_IMETHODIMP VlcPeer::Stop()
 {
     if( p_plugin )
     {
-        VLC_Stop( p_plugin->i_vlc );
+        VLC_CleanUp( p_plugin->i_vlc );
         p_plugin->b_stream = 0;
     }
     return NS_OK;

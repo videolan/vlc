@@ -2,7 +2,7 @@
  * vlc.c: the vlc player, WinCE version
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlc.c,v 1.6 2004/01/24 21:06:52 hartman Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -140,7 +140,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     VLC_Die( 0 );
 
     /* Finish the threads */
-    VLC_Stop( 0 );
+    VLC_CleanUp( 0 );
 
     /* Destroy the libvlc structure */
     VLC_Destroy( 0 );

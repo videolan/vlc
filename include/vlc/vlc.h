@@ -1,8 +1,13 @@
 /*****************************************************************************
  * vlc.h: global header for vlc
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
+ * Copyright (C) 1998-2004 VideoLAN
  * $Id$
+ *
+ * Authors: Vincent Seguin <seguin@via.ecp.fr>
+ *          Samuel Hocevar <sam@zoy.org>
+ *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Derk-Jan Hartman <hartman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +26,7 @@
 
 /**
  * \defgroup libvlc Libvlc
- * This is libvlc.
+ * This is libvlc, the base library of the VLC program.
  *
  * @{
  */
@@ -107,7 +112,7 @@ struct vlc_list_t
  * Playlist
  *****************************************************************************/
 
-/* Used by playlist_Add */
+/* Used by VLC_AddTarget() */
 #define PLAYLIST_INSERT          0x0001
 #define PLAYLIST_REPLACE         0x0002
 #define PLAYLIST_APPEND          0x0004
@@ -115,18 +120,6 @@ struct vlc_list_t
 #define PLAYLIST_CHECK_INSERT    0x0010
 
 #define PLAYLIST_END           -666
-
-/**
- * Playlist commands
- */
-typedef enum {
-    PLAYLIST_PLAY,                              /**< Starts playing. No arg. */
-    PLAYLIST_PAUSE,                     /**< Toggles playlist pause. No arg. */
-    PLAYLIST_STOP,                               /**< Stops playing. No arg. */
-    PLAYLIST_SKIP,                               /**< Skip X items and play. */
-    PLAYLIST_GOTO,                                       /**< Goto Xth item. */
-    PLAYLIST_MODE                                /**< Set playlist mode. ??? */
-} playlist_command_t;
 
 /*****************************************************************************
  * Required internal headers
@@ -181,10 +174,26 @@ int     VLC_Create       ( void );
 int     VLC_Init         ( int, int, char *[] );
 
 /**
+ * Add an interface
+ *
+ * This function opens an interface plugin and runs it. If b_block is set
+ * to 0, VLC_AddIntf will return immediately and let the interface run in a
+ * separate thread. If b_block is set to 1, VLC_AddIntf will continue until
+ * user requests to quit.
+ *
+ * \param i_object a vlc object id
+ * \param psz_module a vlc module name of an interface
+ * \param b_block make this interface blocking
+ * \param b_play start playing when the interface is done loading
+ * \return VLC_SUCCESS on success
+ */
+int     VLC_AddIntf      ( int, char const *, vlc_bool_t, vlc_bool_t );
+
+/**
  * Ask vlc to die
  *
  * This function sets p_vlc->b_die to VLC_TRUE, but does not do any other
- * task. It is your duty to call VLC_End and VLC_Destroy afterwards.
+ * task. It is your duty to call VLC_CleanUp and VLC_Destroy afterwards.
  *
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
@@ -192,10 +201,23 @@ int     VLC_Init         ( int, int, char *[] );
 int     VLC_Die          ( int );
 
 /**
- * Stop playing and destroy everything.
+ * Clean up all the intf, playlist, vout and aout
+ *
+ * This function requests all intf, playlist, vout and aout objects to finish
+ * and CleanUp. Only a blank VLC object should remain after this.
+ *
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
+int     VLC_CleanUp      ( int );
+
+/**
+ * Destroy all threads and the VLC object
  *
  * This function requests the running threads to finish, waits for their
  * termination, and destroys their structure.
+ * Then it will de-init all VLC object initializations. 
+ *
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
@@ -226,15 +248,87 @@ int     VLC_Set          ( int, char const *, vlc_value_t );
  */
 int     VLC_Get          ( int, char const *, vlc_value_t * );
 
-int     VLC_AddIntf      ( int, char const *, vlc_bool_t, vlc_bool_t );
+/**
+ * Add a target to the current playlist
+ *
+ * This funtion will add a target to the current playlist. If a playlist does
+ * not exist, it will be created.
+ *
+ * \param i_object a vlc object id
+ * \param psz_target the URI of the target to play
+ * \param ppsz_options an array of strings with input options (ie. :input-repeat)
+ * \param i_options the amount of options in the ppsz_options array
+ * \param i_mode the insert mode to insert the target into the playlist (PLAYLIST_* defines)
+ * \param i_pos the position at which to add the new target (PLAYLIST_END for end)
+ * \return VLC_SUCCESS on success
+ */
 int     VLC_AddTarget    ( int, char const *, const char **, int, int, int );
 
+/**
+ * Start the playlist and play the currently selected playlist item
+ *
+ * If there is something in the playlist, and the playlist is not running,
+ * then start the playlist and play the currently selected playlist item.
+ * If an item is currently paused, then resume it.
+ *
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
 int     VLC_Play         ( int );
+
+/**
+ * Pause the currently playing item. Resume it if already paused
+ *
+ * If an item is currently playing then pause it.
+ * If the item is already paused, then resume playback.
+ *
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
 int     VLC_Pause        ( int );
+
+/**
+ * Stop the playlist
+ *
+ * If an item is currently playing then stop it.
+ * Set the playlist to a stopped state.
+ *
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
 int     VLC_Stop         ( int );
-int     VLC_FullScreen   ( int );
-int     VLC_ClearPlaylist( int );
+
+/**
+ * Stop the playlist
+ *
+ * If an item is currently playing then stop it.
+ * Set the playlist to a stopped state.
+ *
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
 vlc_bool_t VLC_IsPlaying ( int );
+
+/**
+ * Clear the contents of the playlist
+ *
+ * Completly empty the entire playlist.
+ *
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
+int     VLC_ClearPlaylist( int );
+
+/**
+ * Toggle Fullscreen mode
+ *
+ * Switch between normal and fullscreen video
+ *
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
+int     VLC_FullScreen   ( int );
+
 
 # ifdef __cplusplus
 }

@@ -102,7 +102,7 @@ int main( int i_argc, char *ppsz_argv[] )
     i_ret = VLC_AddIntf( 0, NULL, VLC_TRUE, VLC_TRUE );
 
     /* Finish the threads */
-    VLC_Stop( 0 );
+    VLC_CleanUp( 0 );
 
     /* Destroy the libvlc structure */
     VLC_Destroy( 0 );

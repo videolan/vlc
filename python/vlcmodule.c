@@ -59,7 +59,7 @@ static PyObject *vlc_stop(PyObject *self, PyObject *args)
 
     if (!PyArg_ParseTuple(args, "i", &iVlc))
         return NULL;
-    iRc = VLC_Stop(iVlc);
+    iRc = VLC_CleanUp(iVlc);
     return Py_BuildValue("i", iRc);
 }
 

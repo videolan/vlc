@@ -29,6 +29,14 @@ Status: Assigned to zorglub
 
 Task
 Difficulty: Hard
+Platform: WinCE
+Urgency: Wishlist
+Description: WinCE port
+ A WinCE port for PocketPC and the likes. (95% finished)
+Status: Assigned to MixerAnderson
+
+Task
+Difficulty: Hard
 Urgency: Normal
 Platform: any
 Description: Embedded video outputs
@@ -238,6 +246,14 @@ Implement a system to
  - Alert the user of critical errors (cannot play file)
  - Ask the user a question (Are you sure? or Try to Fix index of avi? or Overwrite File?)
  - Inform the user, without disturbing him. (Buffering stream)
+Status: Todo
+
+Task
+Difficulty: Hard
+Urgency: Wishlist
+Platform: any
+Description: Full H323 Videoconferencing
+VLC isn't really suited for this yet, because it introduces quite large latencies. This should fixed before the H323 can ever come close to working in VLC.
 Status: Todo
 
 Task

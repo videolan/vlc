@@ -57,6 +57,6 @@ mediacontrol_exit(mediacontrol_Instance *self)
 {
   vlc_object_release((vlc_object_t*)self->p_playlist);
   vlc_object_release((vlc_object_t*)self->p_intf);
-  VLC_Stop(self->vlc_object_id);
+  VLC_CleanUp(self->vlc_object_id);
   VLC_Destroy(self->vlc_object_id);
 }

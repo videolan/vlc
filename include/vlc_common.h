@@ -189,6 +189,20 @@ typedef struct msg_bank_t msg_bank_t;
 typedef struct msg_subscription_t msg_subscription_t;
 
 /* Playlist */
+
+/* FIXME */
+/**
+ * Playlist commands
+ */
+typedef enum {
+    PLAYLIST_PLAY,                              /**< Starts playing. No arg. */
+    PLAYLIST_PAUSE,                     /**< Toggles playlist pause. No arg. */
+    PLAYLIST_STOP,                               /**< Stops playing. No arg. */
+    PLAYLIST_SKIP,                               /**< Skip X items and play. */
+    PLAYLIST_GOTO,                                       /**< Goto Xth item. */
+} playlist_command_t;
+
+
 typedef struct playlist_t playlist_t;
 typedef struct playlist_item_t playlist_item_t;
 typedef struct playlist_group_t playlist_group_t;

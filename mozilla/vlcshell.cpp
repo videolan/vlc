@@ -428,7 +428,7 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
         if( p_plugin->i_vlc )
         {
 #if USE_LIBVLC
-            VLC_Stop( p_plugin->i_vlc );
+            VLC_CleanUp( p_plugin->i_vlc );
             VLC_Destroy( p_plugin->i_vlc );
 #endif
             p_plugin->i_vlc = 0;
