@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.75 2003/06/20 15:34:51 hartman Exp $
+ * $Id: libvlc.h,v 1.76 2003/07/18 20:52:10 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -125,6 +125,12 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
 #define DESYNC_LONGTEXT N_( \
     "This option allows you to delay the audio output. This can be handy if " \
     "you notice a lag between the video and the audio.")
+
+#define MULTICHA_TEXT N_("Choose prefered audio output channels mode")
+#define MULTICHA_LONGTEXT N_( \
+    "This option allows you to set the audio output channels mode that will " \
+    "be used by default when possible (ie. if your hardware supports it as " \
+    "well as the audio stream being played)")
 
 #define SPDIF_TEXT N_("Use the S/PDIF audio output when available")
 #define SPDIF_LONGTEXT N_( \
@@ -392,6 +398,15 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
 #define DEMUX_LONGTEXT N_( \
     "This is a legacy entry to let you configure demux modules")
 
+#define HPRIORITY_TEXT N_("Increase the priority of the process")
+#define HPRIORITY_LONGTEXT N_( \
+    "Increasing the priority of the process will very likely improve your " \
+    "playing experience as it allows VLC not to be disturbed by other " \
+    "applications that could otherwise take too much processor time.\n" \
+    "However be advise that in certain circumstances (bugs) VLC could take " \
+    "all the processor time and render the whole system unresponsive which " \
+    "might require a reboot of your machine.")
+
 #define FAST_MUTEX_TEXT N_("Fast mutex on NT/2K/XP (developers only)")
 #define FAST_MUTEX_LONGTEXT N_( \
     "On Windows NT/2K/XP we use a slow mutex implementation but which " \
@@ -521,9 +536,11 @@ vlc_module_begin();
     add_category_hint( N_("Decoders"), NULL, VLC_TRUE );
     add_module( "codec", "decoder", NULL, NULL, CODEC_TEXT, CODEC_LONGTEXT, VLC_TRUE );
 
+#if 0 // Encoders have been disabled for now as we are using the stream output transcoder instead
     add_category_hint( N_("Encoders"), NULL, VLC_TRUE );
     add_module( "video-encoder", "video encoder", NULL, NULL, ENCODER_VIDEO_TEXT, ENCODER_VIDEO_LONGTEXT, VLC_TRUE );
     add_module( "audio-encoder", "audio encoder", NULL, NULL, ENCODER_AUDIO_TEXT, ENCODER_AUDIO_LONGTEXT, VLC_TRUE );
+#endif
 
     /* Stream output options */
     add_category_hint( N_("Stream output"), NULL, VLC_TRUE );
@@ -570,6 +587,7 @@ vlc_module_begin();
     add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT, VLC_TRUE );
 
 #if defined(WIN32)
+    add_bool( "high-priority", 1, NULL, HPRIORITY_TEXT, HPRIORITY_LONGTEXT, VLC_TRUE );
     add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT, FAST_MUTEX_LONGTEXT, VLC_TRUE );
     add_integer( "win9x-cv-method", 0, NULL, WIN9X_CV_TEXT, WIN9X_CV_LONGTEXT, VLC_TRUE );
 #endif

@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.22 2003/03/03 14:21:08 gbazin Exp $
+ * $Id: win32_specific.c,v 1.23 2003/07/18 20:52:11 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -117,14 +117,15 @@ void system_Configure( vlc_t *p_this )
 #ifndef ABOVE_NORMAL_PRIORITY_CLASS
 #   define ABOVE_NORMAL_PRIORITY_CLASS 0x00008000
 #endif
-    if( !SetPriorityClass( GetCurrentProcess(),
-			   ABOVE_NORMAL_PRIORITY_CLASS ) )
+    if( config_GetInt( p_this, "high-priority" ) &&
+        !SetPriorityClass( GetCurrentProcess(),
+                           ABOVE_NORMAL_PRIORITY_CLASS ) )
     {
         if( !SetPriorityClass( GetCurrentProcess(),
-			       HIGH_PRIORITY_CLASS ) )
-	    msg_Dbg( p_this, "can't raise process priority" );
-	else
-	    msg_Dbg( p_this, "raised process priority" );
+                               HIGH_PRIORITY_CLASS ) )
+            msg_Dbg( p_this, "can't raise process priority" );
+        else
+            msg_Dbg( p_this, "raised process priority" );
     }
     else
 	msg_Dbg( p_this, "raised process priority" );
