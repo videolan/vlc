@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.54 2003/11/15 22:42:16 hartman Exp $
+ * $Id: controls.m,v 1.55 2003/11/19 19:00:16 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -177,6 +177,8 @@
         vout_OSDMessage( (vlc_object_t *)p_intf, _( "Shuffle Off" ) );
     }    
 
+    p_intf->p_sys->b_playlist_update = VLC_TRUE;
+    p_intf->p_sys->b_intf_update = VLC_TRUE;
     vlc_object_release( p_playlist );
 }
 
@@ -201,8 +203,10 @@
     else
     {
         vout_OSDMessage( (vlc_object_t *)p_intf, _( "Repeat Off" ) );
-    }    
+    }
 
+    p_intf->p_sys->b_playlist_update = VLC_TRUE;    
+    p_intf->p_sys->b_intf_update = VLC_TRUE;
     vlc_object_release( p_playlist );
 }
 
@@ -229,6 +233,8 @@
         vout_OSDMessage( (vlc_object_t *)p_intf, _( "Loop Off" ) );
     }    
 
+    p_intf->p_sys->b_playlist_update = VLC_TRUE;
+    p_intf->p_sys->b_intf_update = VLC_TRUE;
     vlc_object_release( p_playlist );
 }
 
