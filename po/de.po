@@ -9141,9 +9141,6 @@ msgstr "XOSD Oberfläche"
 #~ msgid "Repeat Playlist"
 #~ msgstr "Wiedergabeliste wiederholen"
 
-#~ msgid "VLC media player"
-#~ msgstr "VLC media player"
-
 #~ msgid "TTL"
 #~ msgstr "TTL"
 
