@@ -2,7 +2,7 @@
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.12 2003/01/15 11:27:29 massiot Exp $
+ * $Id: intf.c,v 1.13 2003/01/16 13:22:30 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -67,10 +67,12 @@ int aout_VolumeGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
 
     if ( p_aout->mixer.b_error )
     {
+        int i;
         /* The output module is destroyed. */
         vlc_mutex_unlock( &p_aout->mixer_lock );
-        msg_Err( p_aout, "VolumeGet called without output module" );
-        return -1;
+        i = config_GetInt( p_aout, "volume" );
+        if (pi_volume != NULL ) *pi_volume = (audio_volume_t)i;
+        return 0;
     }
 
     i_result = p_aout->output.pf_volume_get( p_aout, pi_volume );
@@ -90,10 +92,11 @@ int aout_VolumeSet( aout_instance_t * p_aout, audio_volume_t i_volume )
 
     if ( p_aout->mixer.b_error )
     {
+        int i;
         /* The output module is destroyed. */
         vlc_mutex_unlock( &p_aout->mixer_lock );
-        msg_Err( p_aout, "VolumeSet called without output module" );
-        return -1;
+        config_PutInt( p_aout, "volume", i_volume );
+        return 0;
     }
 
     i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
@@ -236,7 +239,6 @@ int aout_VolumeMute( aout_instance_t * p_aout, audio_volume_t * pi_volume )
 
     if ( p_aout->mixer.b_error )
     {
-        int i;
         /* The output module is destroyed. */
         vlc_mutex_unlock( &p_aout->mixer_lock );
         config_PutInt( p_aout, "volume", 0 );
