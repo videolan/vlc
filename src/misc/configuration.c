@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.56 2003/05/12 17:33:20 gbazin Exp $
+ * $Id: configuration.c,v 1.57 2003/06/14 16:29:22 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -944,6 +944,8 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                     fprintf( file, "# %s (%s)\n", p_item->psz_text,
                              (p_item->i_type == CONFIG_ITEM_BOOL) ?
                              _("boolean") : _("integer") );
+                if( p_item->i_value == p_item->i_value_orig )
+                    fprintf( file, "#" );
                 fprintf( file, "%s=%i\n", p_item->psz_name, p_item->i_value );
                 break;
 
@@ -951,6 +953,8 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                 if( p_item->psz_text )
                     fprintf( file, "# %s (%s)\n", p_item->psz_text,
                              _("float") );
+                if( p_item->f_value == p_item->f_value_orig )
+                    fprintf( file, "#" );
                 fprintf( file, "%s=%f\n", p_item->psz_name,
                          (double)p_item->f_value );
                 break;
@@ -959,6 +963,10 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                 if( p_item->psz_text )
                     fprintf( file, "# %s (%s)\n", p_item->psz_text,
                              _("string") );
+                if( (!p_item->psz_value && !p_item->psz_value_orig) ||
+                    (p_item->psz_value && p_item->psz_value_orig &&
+                     !strcmp( p_item->psz_value, p_item->psz_value_orig )) )
+                    fprintf( file, "#" );
                 fprintf( file, "%s=%s\n", p_item->psz_name,
                          p_item->psz_value ? p_item->psz_value : "" );
             }
