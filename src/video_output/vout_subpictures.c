@@ -369,12 +369,6 @@ void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic_dst,
     {
         p_vout->p_blend = vlc_object_create( p_vout, sizeof(filter_t) );
         vlc_object_attach( p_vout->p_blend, p_vout );
-        p_vout->p_blend->fmt_out.video.i_width =
-            p_vout->p_blend->fmt_out.video.i_visible_width =
-                p_vout->render.i_width;
-        p_vout->p_blend->fmt_out.video.i_height =
-            p_vout->p_blend->fmt_out.video.i_visible_height =
-                p_vout->render.i_height;
         p_vout->p_blend->fmt_out.video.i_x_offset =
             p_vout->p_blend->fmt_out.video.i_y_offset = 0;
         p_vout->p_blend->fmt_out.video.i_aspect =
@@ -542,7 +536,15 @@ void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic_dst,
                     p_vout->pi_alpha[3];
             }
 
-            p_vout->p_blend->pf_video_blend( p_vout->p_blend, p_pic_dst,
+            /* Update the output picture size */
+            p_vout->p_blend->fmt_out.video.i_width =
+                p_vout->p_blend->fmt_out.video.i_visible_width =
+                    p_vout->output.i_width;
+            p_vout->p_blend->fmt_out.video.i_height =
+                p_vout->p_blend->fmt_out.video.i_visible_height =
+                    p_vout->output.i_height;
+
+           p_vout->p_blend->pf_video_blend( p_vout->p_blend, p_pic_dst,
                 p_pic_src, &p_region->picture, i_x_offset, i_y_offset );
 
             p_region = p_region->p_next;
