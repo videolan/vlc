@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.30 2003/11/09 03:41:50 garf Exp $
+ * $Id: http.c,v 1.31 2003/11/09 05:22:56 garf Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1696,50 +1696,46 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                     audio_volume_t i_volume;
                     int i_value;
 
-                    if( p_sys->p_input )
-                    {
-                        uri_extract_value( p_request, "value", vol, 8 );
-                        aout_VolumeGet( p_intf, &i_volume );
-                        uri_decode_url_encoded( vol );
+                    uri_extract_value( p_request, "value", vol, 8 );
+                    aout_VolumeGet( p_intf, &i_volume );
+                    uri_decode_url_encoded( vol );
 
-                        if( vol[0] == '+' )
+                    if( vol[0] == '+' )
+                    {
+                        i_value = atoi( vol + 1 );
+                        if( (i_volume + i_value) > AOUT_VOLUME_MAX )
                         {
-                            i_value = atoi( vol + 1 );
-                            if( (i_volume + i_value) > AOUT_VOLUME_MAX )
-                            {
-                                aout_VolumeSet( p_intf , AOUT_VOLUME_MAX );
-                                msg_Dbg( p_intf, "requested volume set: max" );
-                            } else
-                            {
-                                aout_VolumeSet( p_intf , (i_volume + i_value) );
-                                msg_Dbg( p_intf, "requested volume set: +%i", (i_volume + i_value) );
-                            }
-                        } else
-                        if( vol[0] == '-' )
-                        {
-                            i_value = atoi( vol + 1 );
-                            if( (i_volume - i_value) < AOUT_VOLUME_MIN )
-                            {
-                                aout_VolumeSet( p_intf , AOUT_VOLUME_MIN );
-                                msg_Dbg( p_intf, "requested volume set: min" );
-                            } else
-                            {
-                                aout_VolumeSet( p_intf , (i_volume - i_value) );
-                                msg_Dbg( p_intf, "requested volume set: -%i", (i_volume - i_value) );
-                            }
+                            aout_VolumeSet( p_intf , AOUT_VOLUME_MAX );
+                            msg_Dbg( p_intf, "requested volume set: max" );
                         } else
                         {
-                            i_value = atoi( vol );
-                            if( ( i_value <= AOUT_VOLUME_MAX ) && ( i_value >= AOUT_VOLUME_MIN ) )
-                            {
-                                aout_VolumeSet( p_intf , atoi( vol ) );
-                                msg_Dbg( p_intf, "requested volume set: %i", atoi( vol ) );
-                            }
+                            aout_VolumeSet( p_intf , (i_volume + i_value) );
+                            msg_Dbg( p_intf, "requested volume set: +%i", (i_volume + i_value) );
+                        }
+                    } else
+                    if( vol[0] == '-' )
+                    {
+                        i_value = atoi( vol + 1 );
+                        if( (i_volume - i_value) < AOUT_VOLUME_MIN )
+                        {
+                            aout_VolumeSet( p_intf , AOUT_VOLUME_MIN );
+                            msg_Dbg( p_intf, "requested volume set: min" );
+                        } else
+                        {
+                            aout_VolumeSet( p_intf , (i_volume - i_value) );
+                            msg_Dbg( p_intf, "requested volume set: -%i", (i_volume - i_value) );
+                        }
+                    } else
+                    {
+                        i_value = atoi( vol );
+                        if( ( i_value <= AOUT_VOLUME_MAX ) && ( i_value >= AOUT_VOLUME_MIN ) )
+                        {
+                            aout_VolumeSet( p_intf , atoi( vol ) );
+                            msg_Dbg( p_intf, "requested volume set: %i", atoi( vol ) );
                         }
                     }
                     break;
                 }
-
 
                 /* playlist management */
                 case MVLC_ADD:
