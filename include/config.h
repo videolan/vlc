@@ -338,7 +338,7 @@
 /* Define to enable messages queues - disabling messages queue can be usefull
  * when debugging, since it allows messages which would not otherwise be printed,
  * due to a crash, to be printed anyway */
-#define INTF_MSG_QUEUE
+//#define INTF_MSG_QUEUE
 
 /* Format of the header for debug messages. The arguments following this header
  * are the file (char *), the function (char *) and the line (int) in which the

@@ -32,11 +32,10 @@ typedef struct
     int             i_matrix_coefficients;       /* in YUV type, encoding type */    
     
     /* Picture static properties - those properties are fixed at initialization
-     * and should NOT be modified. Note that for YUV pictures, i_bytes_per_line
-     * has no signification and is replaced by i_width */
+     * and should NOT be modified */
     int             i_width;                                  /* picture width */
     int             i_height;                                /* picture height */
-    int             i_bytes_per_line;        /* total number of bytes per line */
+    int             i_chroma_width;                            /* chroma width */
 
     /* Picture dynamic properties - those properties can be changed by the 
      * decoder */

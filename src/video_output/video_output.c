@@ -11,7 +11,6 @@
  * Preamble
  *******************************************************************************/
 #include <errno.h>
-#include <math.h> 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -27,140 +26,9 @@
 #include "video.h"
 #include "video_output.h"
 #include "video_sys.h"
+#include "video_yuv.h"
 #include "intf_msg.h"
 #include "main.h"
-
-/*******************************************************************************
- * Macros
- *******************************************************************************/
-
-/* CLIP_BYTE: return value if between 0 and 255, else return nearest boundary 
- * (0 or 255), used to build translations tables */
-#define CLIP_BYTE( i_val ) ( (i_val < 0) ? 0 : ((i_val > 255) ? 255 : i_val) )
-
-/* YUV_GRAYSCALE: parametric macro for YUV grayscale transformation.
- * Due to the high performance need of this loop, all possible conditions 
- * evaluations are made outside the transformation loop. However, the code does 
- * not change much for two different loops. This macro allows to change slightly
- * the content of the loop without having to copy and paste code. It is used in 
- * RenderYUVPicture function. */
-#define YUV_GRAYSCALE( TRANS_GRAY, P_PIC )                              \
-/* Main loop */                                                         \
-for (i_pic_y=0; i_pic_y < p_pic->i_height ; i_pic_y++)                  \
-{                                                                       \
-    for (i_pic_x=0; i_pic_x< p_pic->i_width; i_pic_x+=16)               \
-    {                                                                   \
-        /* Convert 16 pixels (width is always multiple of 16 */         \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-        *P_PIC++ = TRANS_GRAY[ *p_y++ ];                                \
-    }                                                                   \
-    /* Skip until beginning of next line */                             \
-    P_PIC += i_eol_offset;                                              \
-}                                                                       
-
-/* YUV_TRANSFORM: parametric macro for YUV transformation.
- * Due to the high performance need of this loop, all possible conditions 
- * evaluations are made outside the transformation loop. However, the code does 
- * not change much for two different loops. This macro allows to change slightly
- * the content of the loop without having to copy and paste code. It is used in 
- * RenderYUVPicture function. */
-#define YUV_TRANSFORM( CHROMA, TRANS_RED, TRANS_GREEN, TRANS_BLUE, P_PIC ) \
-/* Main loop */                                                         \
-for (i_pic_y=0; i_pic_y < p_pic->i_height ; i_pic_y++)                  \
-{                                                                       \
-    for (i_pic_x=0; i_pic_x< p_pic->i_width; i_pic_x+=2 )               \
-    {                                                                   \
-        /* First sample (complete) */                                   \
-        i_y = 76309 * *p_y++ - 1188177;                                 \
-        i_u = *p_u++ - 128;                                             \
-        i_v = *p_v++ - 128;                                             \
-        *P_PIC++ =                                                      \
-            TRANS_RED   [(i_y+i_crv*i_v)                >>16] |         \
-            TRANS_GREEN [(i_y-i_cgu*i_u-i_cgv*i_v)      >>16] |         \
-            TRANS_BLUE  [(i_y+i_cbu*i_u)                >>16];          \
-        i_y = 76309 * *p_y++ - 1188177;                                 \
-        /* Second sample (partial) */                                   \
-        if( CHROMA == 444 )                                             \
-        {                                                               \
-            i_u = *p_u++ - 128;                                         \
-            i_v = *p_v++ - 128;                                         \
-        }                                                               \
-        *P_PIC++ =                                                      \
-            TRANS_RED   [(i_y+i_crv*i_v)                >>16] |         \
-            TRANS_GREEN [(i_y-i_cgu*i_u-i_cgv*i_v)      >>16] |         \
-            TRANS_BLUE  [(i_y+i_cbu*i_u)                >>16];          \
-    }                                                                   \
-    if( (CHROMA == 420) && !(i_pic_y & 0x1) )                           \
-    {                                                                   \
-        p_u -= i_chroma_width;                                          \
-        p_v -= i_chroma_width;                                          \
-    }                                                                   \
-    /* Skip until beginning of next line */                             \
-    P_PIC += i_eol_offset;                                              \
-}
-
-/*******************************************************************************
- * Constants
- *******************************************************************************/
-
-/* RGB/YUV inversion matrix (ISO/IEC 13818-2 section 6.3.6, table 6.9) */
-const int MATRIX_COEFFICIENTS_TABLE[8][4] =
-{
-  {117504, 138453, 13954, 34903},       /* no sequence_display_extension */
-  {117504, 138453, 13954, 34903},       /* ITU-R Rec. 709 (1990) */
-  {104597, 132201, 25675, 53279},       /* unspecified */
-  {104597, 132201, 25675, 53279},       /* reserved */
-  {104448, 132798, 24759, 53109},       /* FCC */
-  {104597, 132201, 25675, 53279},       /* ITU-R Rec. 624-4 System B, G */
-  {104597, 132201, 25675, 53279},       /* SMPTE 170M */
-  {117579, 136230, 16907, 35559}        /* SMPTE 240M (1987) */
-};
-
-/*******************************************************************************
- * External prototypes
- *******************************************************************************/
-#ifdef HAVE_MMX
-/* YUV transformations for MMX - in video_yuv_mmx.S 
- *      p_y, p_u, p_v:          Y U and V planes
- *      i_width, i_height:      frames dimensions (pixels)
- *      i_ypitch, i_vpitch:     Y and V lines sizes (bytes)
- *      i_aspect:               vertical aspect factor
- *      p_pic:                  RGB frame
- *      i_dci_offset:           ?? x offset for left image border
- *      i_offset_to_line_0:     ?? x offset for left image border
- *      i_pitch:                RGB line size (bytes)
- *      i_colortype:            0 for 565, 1 for 555 */
-void vout_YUV420_16_MMX( u8* p_y, u8* p_u, u8 *p_v, 
-                         unsigned int i_width, unsigned int i_height,
-                         unsigned int i_ypitch, unsigned int i_vpitch,
-                         unsigned int i_aspect, u8 *p_pic, 
-                         u32 i_dci_offset, u32 i_offset_to_line_0,
-                         int CCOPitch, int i_colortype );
-#endif
-
-/* Optimized YUV functions: translations and tables building - in video_yuv_c.c
- * ??? looks efficient, but does not work well - ask walken */
-void yuvToRgb16 ( unsigned char * Y,
-			unsigned char * U, unsigned char * V,
-                  short * dest, short table[1935], int width);
-int rgbTable16 (short table [1935],
-                int redMask, int greenMask, int blueMask,
-                unsigned char gamma[256]);
-
 
 /*******************************************************************************
  * Local prototypes
@@ -169,11 +37,7 @@ static int      InitThread              ( vout_thread_t *p_vout );
 static void     RunThread               ( vout_thread_t *p_vout );
 static void     ErrorThread             ( vout_thread_t *p_vout );
 static void     EndThread               ( vout_thread_t *p_vout );
-static void     BuildTables             ( vout_thread_t *p_vout );
 static void     RenderPicture           ( vout_thread_t *p_vout, picture_t *p_pic );
-static void     RenderYUVGrayPicture    ( vout_thread_t *p_vout, picture_t *p_pic );
-static void     RenderYUV16Picture      ( vout_thread_t *p_vout, picture_t *p_pic );
-static void     RenderYUV32Picture      ( vout_thread_t *p_vout, picture_t *p_pic );
 static void     RenderPictureInfo       ( vout_thread_t *p_vout, picture_t *p_pic );
 static int      RenderIdle              ( vout_thread_t *p_vout, int i_level );
 
@@ -203,8 +67,15 @@ vout_thread_t * vout_CreateThread               (
         return( NULL );
     }
 
+    /* Initialize thread properties */
+    p_vout->b_die               = 0;
+    p_vout->b_error             = 0;    
+    p_vout->b_active            = 0;
+    p_vout->pi_status           = (pi_status != NULL) ? pi_status : &i_status;
+    *p_vout->pi_status          = THREAD_CREATE;    
+
     /* Initialize some fields used by the system-dependant method - these fields will
-     * probably be modified by the method */
+     * probably be modified by the method, and are only preferences */
 #ifdef DEBUG
     p_vout->b_info              = 1;    
 #else
@@ -240,21 +111,18 @@ vout_thread_t * vout_CreateThread               (
                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
                 p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
                 p_vout->f_x_ratio, p_vout->f_y_ratio, p_vout->b_grayscale );
-  
-    /* Terminate the initialization */
-    p_vout->b_die               = 0;
-    p_vout->b_error             = 0;    
-    p_vout->b_active            = 0;
-    p_vout->pi_status           = (pi_status != NULL) ? pi_status : &i_status;
-    *p_vout->pi_status          = THREAD_CREATE;    
+
+    /* Initialize changement properties */
+    p_vout->b_gamma_change      = 0;
+    p_vout->i_new_width         = p_vout->i_width;
+    p_vout->i_new_height        = p_vout->i_height; 
+
 #ifdef STATS
+    /* Initialize statistics fields */
     p_vout->c_loops             = 0;
     p_vout->c_idle_loops        = 0;
     p_vout->c_fps_samples       = 0;
 #endif      
-    p_vout->b_gamma_change      = 0;
-    p_vout->i_new_width         = p_vout->i_width;
-    p_vout->i_new_height        = p_vout->i_height;    
 
     /* Create thread and set locks */
     vlc_mutex_init( &p_vout->lock );
@@ -353,12 +221,13 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
  * This function create a reserved image in the video output heap. 
  * A null pointer is returned if the function fails. This method provides an
  * already allocated zone of memory in the picture data fields. It needs locking
- * since several pictures can be created by several producers threads.
+ * since several pictures can be created by several producers threads. 
  *******************************************************************************/
 picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type, 
-			       int i_width, int i_height, int i_bytes_per_line )
+			       int i_width, int i_height )
 {
     int         i_picture;                                    /* picture index */
+    int         i_chroma_width;                                /* chroma width */    
     picture_t * p_free_picture = NULL;                   /* first free picture */    
     picture_t * p_destroyed_picture = NULL;         /* first destroyed picture */    
 
@@ -374,15 +243,16 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
     {
 	if( p_vout->p_picture[i_picture].i_status == DESTROYED_PICTURE )
 	{
-	    /* Picture is marked for destruction, but is still allocated */
+	    /* Picture is marked for destruction, but is still allocated - note
+             * that if width and type are the same for two pictures, chroma_width 
+             * should also be the same */
 	    if( (p_vout->p_picture[i_picture].i_type           == i_type)   &&
 		(p_vout->p_picture[i_picture].i_height         == i_height) &&
-		(p_vout->p_picture[i_picture].i_bytes_per_line == i_bytes_per_line) )
+		(p_vout->p_picture[i_picture].i_width          == i_width) )
 	    {
 		/* Memory size do match : memory will not be reallocated, and function
                  * can end immediately - this is the best possible case, since no
                  * memory allocation needs to be done */
-		p_vout->p_picture[i_picture].i_width  = i_width;
 		p_vout->p_picture[i_picture].i_status = RESERVED_PICTURE;
 #ifdef DEBUG_VIDEO
                 intf_DbgMsg("picture %p (in destroyed picture slot)\n", 
@@ -424,22 +294,25 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
         switch( i_type )
         {
         case YUV_420_PICTURE:          /* YUV 420: 1,1/4,1/4 samples per pixel */
-            p_free_picture->p_data = malloc( i_height * i_bytes_per_line * 3 / 2 );
-            p_free_picture->p_y = (yuv_data_t *) p_free_picture->p_data;
-            p_free_picture->p_u = (yuv_data_t *)(p_free_picture->p_data + i_height * i_bytes_per_line);
-            p_free_picture->p_v = (yuv_data_t *)(p_free_picture->p_data + i_height * i_bytes_per_line * 5 / 4);
+            i_chroma_width = i_width / 4;            
+            p_free_picture->p_data = malloc( i_height * i_chroma_width * 6 * sizeof( yuv_data_t ) );
+            p_free_picture->p_y = (yuv_data_t *)p_free_picture->p_data;
+            p_free_picture->p_u = (yuv_data_t *)p_free_picture->p_data + i_height * i_chroma_width * 4;
+            p_free_picture->p_v = (yuv_data_t *)p_free_picture->p_data + i_height * i_chroma_width * 5;
             break;
         case YUV_422_PICTURE:          /* YUV 422: 1,1/2,1/2 samples per pixel */
-            p_free_picture->p_data = malloc( 2 * i_height * i_bytes_per_line );
-            p_free_picture->p_y = (yuv_data_t *) p_free_picture->p_data;
-            p_free_picture->p_u = (yuv_data_t *)(p_free_picture->p_data + i_height * i_bytes_per_line);
-            p_free_picture->p_v = (yuv_data_t *)(p_free_picture->p_data + i_height * i_bytes_per_line * 3 / 2);
+            i_chroma_width = i_width / 2;            
+            p_free_picture->p_data = malloc( i_height * i_chroma_width * 4 * sizeof( yuv_data_t ) );
+            p_free_picture->p_y = (yuv_data_t *)p_free_picture->p_data;
+            p_free_picture->p_u = (yuv_data_t *)p_free_picture->p_data + i_height * i_chroma_width * 2;
+            p_free_picture->p_v = (yuv_data_t *)p_free_picture->p_data + i_height * i_chroma_width * 3;
             break;
         case YUV_444_PICTURE:              /* YUV 444: 1,1,1 samples per pixel */
-            p_free_picture->p_data = malloc( 3 * i_height * i_bytes_per_line );                
-            p_free_picture->p_y = (yuv_data_t *) p_free_picture->p_data;
-            p_free_picture->p_u = (yuv_data_t *)(p_free_picture->p_data + i_height * i_bytes_per_line);
-            p_free_picture->p_v = (yuv_data_t *)(p_free_picture->p_data + i_height * i_bytes_per_line * 2);
+            i_chroma_width = i_width;            
+            p_free_picture->p_data = malloc( i_height * i_chroma_width * 3 * sizeof( yuv_data_t ) );
+            p_free_picture->p_y = (yuv_data_t *)p_free_picture->p_data;
+            p_free_picture->p_u = (yuv_data_t *)p_free_picture->p_data + i_height * i_chroma_width;
+            p_free_picture->p_v = (yuv_data_t *)p_free_picture->p_data + i_height * i_chroma_width * 2;
             break;                
 #ifdef DEBUG
         default:
@@ -451,14 +324,19 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
 
         if( p_free_picture->p_data != NULL )
         {        
-            /* Copy picture informations */
+            /* Copy picture informations, set some default values */
             p_free_picture->i_type                      = i_type;
             p_free_picture->i_status                    = RESERVED_PICTURE;
+            p_free_picture->i_matrix_coefficients       = 1; 
             p_free_picture->i_width                     = i_width;
             p_free_picture->i_height                    = i_height;
-            p_free_picture->i_bytes_per_line            = i_bytes_per_line;
+            p_free_picture->i_chroma_width              = i_chroma_width;            
+            p_free_picture->i_display_horizontal_offset = 0;
+            p_free_picture->i_display_vertical_offset   = 0;            
+            p_free_picture->i_display_width             = i_width;
+            p_free_picture->i_display_height            = i_height;
+            p_free_picture->i_aspect_ratio              = AR_SQUARE_PICTURE;            
             p_free_picture->i_refcount                  = 0;            
-            p_free_picture->i_matrix_coefficients       = 1; 
         }
         else
         {
@@ -560,13 +438,6 @@ static int InitThread( vout_thread_t *p_vout )
 
     /* Update status */
     *p_vout->pi_status = THREAD_START;    
-    
-    /* Initialize pictures */    
-    for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++)
-    {
-        p_vout->p_picture[i_index].i_type  = EMPTY_PICTURE;
-        p_vout->p_picture[i_index].i_status= FREE_PICTURE;
-    }
 
     /* Initialize output method - this function issues its own error messages */
     if( vout_SysInit( p_vout ) )
@@ -575,21 +446,19 @@ static int InitThread( vout_thread_t *p_vout )
         return( 1 );
     } 
 
-    /* Allocate translation tables */
-    p_vout->p_trans_base = malloc( ( 4 * 1024 + 1935 ) * p_vout->i_bytes_per_pixel );
-    if( p_vout->p_trans_base == NULL )
+    /* Initialize pictures */    
+    for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++)
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+        p_vout->p_picture[i_index].i_type  = EMPTY_PICTURE;
+        p_vout->p_picture[i_index].i_status= FREE_PICTURE;
+    }
+
+    /* Initialize convertion tables and functions */
+    if( vout_InitTables( p_vout ) )
+    {
+        intf_ErrMsg("error: can't allocate translation tables\n");
         return( 1 );                
     }
-    p_vout->p_trans_red =       p_vout->p_trans_base +           384 *p_vout->i_bytes_per_pixel;
-    p_vout->p_trans_green =     p_vout->p_trans_base + (  1024 + 384)*p_vout->i_bytes_per_pixel;
-    p_vout->p_trans_blue =      p_vout->p_trans_base + (2*1024 + 384)*p_vout->i_bytes_per_pixel;
-    p_vout->p_trans_gray =      p_vout->p_trans_base + (3*1024 + 384)*p_vout->i_bytes_per_pixel;
-    p_vout->p_trans_optimized = p_vout->p_trans_base + (4*1024      )*p_vout->i_bytes_per_pixel;    
-    
-    /* Build translation tables */
-    BuildTables( p_vout );
     
     /* Mark thread as running and return */
     p_vout->b_active =          1;    
@@ -631,19 +500,19 @@ static void RunThread( vout_thread_t *p_vout)
      * initialization
      */
     while( (!p_vout->b_die) && (!p_vout->b_error) )
-    {
+    {            
         /* 
 	 * Find the picture to display - this operation does not need lock,
          * since only READY_PICTURES are handled 
          */
         p_pic = NULL;         
-	for( i_picture = 0; i_picture < VOUT_MAX_PICTURES; i_picture++ )
+        for( i_picture = 0; i_picture < VOUT_MAX_PICTURES; i_picture++ )
 	{
 	    if( (p_vout->p_picture[i_picture].i_status == READY_PICTURE) &&
 		( (p_pic == NULL) || 
 		  (p_vout->p_picture[i_picture].date < pic_date) ) )
 	    {
-		p_pic = &p_vout->p_picture[i_picture];
+                p_pic = &p_vout->p_picture[i_picture];
                 pic_date = p_pic->date;                
 	    }
 	}
@@ -700,8 +569,9 @@ static void RunThread( vout_thread_t *p_vout)
          */
         if( p_vout->b_gamma_change )
         {
+            //??
             p_vout->b_gamma_change = 0;            
-            BuildTables( p_vout );            
+            vout_ResetTables( p_vout );            // ?? test return value
         }        
 
         /*
@@ -818,7 +688,7 @@ static void EndThread( vout_thread_t *p_vout )
     }
 
     /* Destroy translation tables */
-    free( p_vout->p_trans_base );
+    vout_EndTables( p_vout );
     
     /* Destroy thread structures allocated by InitThread */
     vout_SysEnd( p_vout );
@@ -830,100 +700,24 @@ static void EndThread( vout_thread_t *p_vout )
 }
 
 /*******************************************************************************
- * BuildTables: build YUV translation tables
- *******************************************************************************
- * This function will build translations tables according to pixel width and
- * gamma.
- *******************************************************************************/  
-static void BuildTables( vout_thread_t *p_vout )
-{
-    u16 *       p_trans16_red =         (u16 *) p_vout->p_trans_red;
-    u16 *       p_trans16_green =       (u16 *) p_vout->p_trans_green;
-    u16 *       p_trans16_blue =        (u16 *) p_vout->p_trans_blue;
-    u16 *       p_trans16_gray =        (u16 *) p_vout->p_trans_gray;
-    u32 *       p_trans32_red =         (u32 *) p_vout->p_trans_red;
-    u32 *       p_trans32_green =       (u32 *) p_vout->p_trans_green;
-    u32 *       p_trans32_blue =        (u32 *) p_vout->p_trans_blue;
-    u32 *       p_trans32_gray =        (u32 *) p_vout->p_trans_gray;          
-    u8          i_gamma[256];                                   /* gamma table */    
-    int         i_index;                                    /* index in tables */
-    
-    /* Build gamma table */     
-    for( i_index = 0; i_index < 256; i_index++ )
-    {
-        i_gamma[i_index] = 255. * pow( (double)i_index / 255., p_vout->f_gamma );        
-    }
-        
-    /* Build red, green, blue and gray tables */
-    switch( p_vout->i_screen_depth )
-    {
-    case 15:
-        for( i_index = -384; i_index < 640; i_index++) 
-        {
-            p_trans16_red[i_index]     = (i_gamma[CLIP_BYTE( i_index )] & 0xf8)<<7;
-            p_trans16_green[i_index]   = (i_gamma[CLIP_BYTE( i_index )] & 0xf8)<<2;
-            p_trans16_blue[i_index]    =  i_gamma[CLIP_BYTE( i_index )] >> 3;
-            p_trans16_gray[i_index]    = p_trans16_red[i_index] | 
-                p_trans16_green[i_index] | p_trans16_blue[i_index];            
-        }
-        break;        
-    case 16:
-        for( i_index = -384; i_index < 640; i_index++) 
-        {
-            p_trans16_red[i_index]     = (i_gamma[CLIP_BYTE( i_index )] & 0xf8)<<8;
-            p_trans16_green[i_index]   = (i_gamma[CLIP_BYTE( i_index )] & 0xfc)<<3;
-            p_trans16_blue[i_index]    =  i_gamma[CLIP_BYTE( i_index )] >> 3;
-            p_trans16_gray[i_index]    = p_trans16_red[i_index] |
-                p_trans16_green[i_index] | p_trans16_blue[i_index];
-        }        
-        break;        
-    case 32:        
-        for( i_index = -384; i_index < 640; i_index++) 
-        {
-            p_trans32_red[i_index]     = i_gamma[CLIP_BYTE( i_index )] <<16;
-            p_trans32_green[i_index]   = i_gamma[CLIP_BYTE( i_index )] <<8;
-            p_trans32_blue[i_index]    = i_gamma[CLIP_BYTE( i_index )] ;
-            p_trans32_gray[i_index]    = p_trans32_red[i_index] |
-                p_trans32_green[i_index] | p_trans32_blue[i_index];
-        }
-        break;        
-#ifdef DEBUG
-    default:
-        intf_DbgMsg("error: invalid screen depth %d\n", p_vout->i_screen_depth );
-        break;      
-#endif
-    } 
-
-    /* Build red, green and blue tables for optimized transformation */
-    //????
-    switch( p_vout->i_screen_depth )
-    {
-    case 16:
-        rgbTable16( (short *) p_vout->p_trans_optimized, 0xf800, 0x07e0, 0x01f, i_gamma );
-        break;        
-    }    
-}
-
-/*******************************************************************************
  * RenderPicture: render a picture
  *******************************************************************************
  * This function convert a picture from a video heap to a pixel-encoded image
  * and copy it to the current rendering buffer. No lock is required, since the
  * rendered picture has been determined as existant, and will only be destroyed
  * by the vout thread later.
- * ???? 24 and 32 bpp should probably be separated
  *******************************************************************************/
 static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
 #ifdef DEBUG_VIDEO
-    /* Send picture informations */
+    /* Send picture informations and store rendering start date */
     intf_DbgMsg("picture %p\n", p_pic );
-
-    /* Store rendering start date */
     p_vout->picture_render_time = mdate();    
 #endif
 
-    /* Change aspect ratio or resize frame to fit frame */
+    /* 
+     * Prepare scaling 
+     */
     if( (p_pic->i_width > p_vout->i_width) || (p_pic->i_height > p_vout->i_height) )
     {
 #ifdef VIDEO_X11
@@ -940,25 +734,33 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #endif
     }    
 
-    /* Choose appropriate rendering function */
+    /*
+     * Choose appropriate rendering function and render picture
+     */
     switch( p_pic->i_type )
     {
-    case YUV_420_PICTURE:                   /* YUV picture: YUV transformation */        
-    case YUV_422_PICTURE:
-    case YUV_444_PICTURE:
-        if( p_vout->b_grayscale )                                 /* grayscale */
-        {
-            RenderYUVGrayPicture( p_vout, p_pic );            
-        }
-        else if( p_vout->i_bytes_per_pixel == 2 )        /* color 15 or 16 bpp */
-        {
-            RenderYUV16Picture( p_vout, p_pic );        
-        }
-        else if( p_vout->i_bytes_per_pixel == 4 )              /* color 32 bpp */
-        {
-            RenderYUV32Picture( p_vout, p_pic );            
-        }
+    case YUV_420_PICTURE:
+        p_vout->p_ConvertYUV420( p_vout, vout_SysGetPicture( p_vout ),
+                                 p_pic->p_y, p_pic->p_u, p_pic->p_v,
+                                 p_pic->i_width, p_pic->i_height, 0, 0,
+                                 4 );
         break;        
+    case YUV_422_PICTURE:
+/*     ???   p_vout->p_convert_yuv_420( p_vout, 
+                                   p_pic->p_y, p_pic->p_u, p_pic->p_v,
+                                   i_chroma_width, i_chroma_height,
+                                   p_vout->i_width / 2, p_vout->i_height,
+                                   p_vout->i_bytes_per_line,
+                                   0, 0, 0 );
+  */      break;        
+    case YUV_444_PICTURE:
+/*  ???      p_vout->p_convert_yuv_420( p_vout, 
+                                   p_pic->p_y, p_pic->p_u, p_pic->p_v,
+                                   i_chroma_width, i_chroma_height,
+                                   p_vout->i_width, p_vout->i_height,
+                                   p_vout->i_bytes_per_line,
+                                   0, 0, 0 );
+  */      break;                
 #ifdef DEBUG
     default:        
         intf_DbgMsg("error: unknown picture type %d\n", p_pic->i_type );
@@ -966,208 +768,18 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #endif
     }
 
+    /* 
+     * Terminate scaling 
+     */
+    //??
+
 #ifdef DEBUG_VIDEO
     /* Computes rendering time */
     p_vout->picture_render_time = mdate() - p_vout->picture_render_time;    
 #endif
 }
 
-/*******************************************************************************
- * RenderYUVGrayPicture: render YUV picture in grayscale
- *******************************************************************************
- * Performs the YUV convertion. The picture sent to this function should only
- * have YUV_420, YUV_422 or YUV_444 types.
- *******************************************************************************/
-static void RenderYUVGrayPicture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    int         i_pic_x, i_pic_y;                /* x,y coordinates in picture */
-    int         i_width, i_height;                             /* picture size */
-    int         i_eol_offset;          /* pixels from end of line to next line */   
-    yuv_data_t *p_y;                                     /* Y data base adress */
-    u16 *       p_pic16;                  /* destination picture, 15 or 16 bpp */
-    u32 *       p_pic32;                        /* destination picture, 32 bpp */
-    u16 *       p_trans16_gray;          /* transformation table, 15 or 16 bpp */
-    u32 *       p_trans32_gray;                /* transformation table, 32 bpp */
- 
-    /* Set the base pointers and transformation parameters */
-    p_y =               p_pic->p_y;
-    i_width =           p_pic->i_width;
-    i_height =          p_pic->i_height;
-    i_eol_offset =      p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - i_width;
 
-    /* Get base adress for destination image and translation tables, then
-     * transform image */
-    switch( p_vout->i_screen_depth )
-    {
-    case 15:
-    case 16:
-        p_trans16_gray =       (u16 *) p_vout->p_trans_gray;
-        p_pic16 =              (u16 *) vout_SysGetPicture( p_vout );
-        YUV_GRAYSCALE( p_trans16_gray, p_pic16 );
-        break;        
-    case 32:
-        p_trans32_gray =       (u32 *) p_vout->p_trans_gray;
-        p_pic32 =              (u32 *) vout_SysGetPicture( p_vout );
-        YUV_GRAYSCALE( p_trans32_gray, p_pic32 );
-        break;        
-#ifdef DEBUG
-    default:
-        intf_DbgMsg("error: invalid screen depth %d\n", p_vout->i_screen_depth );
-        break;    
-#endif      
-    }
-}
-
-
-/*******************************************************************************
- * RenderYUV16Picture: render a 15 or 16 bpp YUV picture
- *******************************************************************************
- * Performs the YUV convertion. The picture sent to this function should only
- * have YUV_420, YUV_422 or YUV_444 types.
- *******************************************************************************/
-static void RenderYUV16Picture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    int         i_crv, i_cbu, i_cgu, i_cgv;     /* transformation coefficients */
-    int         i_pic_x, i_pic_y;                /* x,y coordinates in picture */
-    int         i_y, i_u, i_v;                           /* Y, U and V samples */
-    int         i_width, i_height;                             /* picture size */
-    int         i_chroma_width;                                /* chroma width */    
-    int         i_eol_offset;          /* pixels from end of line to next line */
-    yuv_data_t *p_y;                                     /* Y data base adress */
-    yuv_data_t *p_u;                                     /* U data base adress */
-    yuv_data_t *p_v;                                     /* V data base adress */
-    u16 *       p_data;                 /* base adress for destination picture */
-    u16 *       p_trans_red;                       /* red transformation table */
-    u16 *       p_trans_green;                   /* green transformation table */
-    u16 *       p_trans_blue;                     /* blue transformation table */
- 
-    /* Choose transformation matrix coefficients */
-    i_crv = MATRIX_COEFFICIENTS_TABLE[p_pic->i_matrix_coefficients][0];
-    i_cbu = MATRIX_COEFFICIENTS_TABLE[p_pic->i_matrix_coefficients][1];
-    i_cgu = MATRIX_COEFFICIENTS_TABLE[p_pic->i_matrix_coefficients][2];
-    i_cgv = MATRIX_COEFFICIENTS_TABLE[p_pic->i_matrix_coefficients][3];
-
-    /* Choose the conversions tables and picture address */
-    p_trans_red =       (u16 *) p_vout->p_trans_red;
-    p_trans_green =     (u16 *) p_vout->p_trans_green;
-    p_trans_blue =      (u16 *) p_vout->p_trans_blue;    
-    p_data =            (u16 *) vout_SysGetPicture( p_vout );
-
-    /* Set the base pointers and transformation parameters */
-    p_y =               p_pic->p_y;
-    p_u =               p_pic->p_u;
-    p_v =               p_pic->p_v;
-    i_width =           p_pic->i_width;
-    i_height =          p_pic->i_height;
-    i_chroma_width =    i_width / 2;
-    i_eol_offset =      p_vout->i_bytes_per_line / 2 - i_width;    
-        
-    /* Do YUV transformation - the loops are repeated for optimization */
-    switch( p_pic->i_type )
-    {
-    case YUV_420_PICTURE:                   /* 15 or 16 bpp 420 transformation */
-#ifdef HAVE_MMX
-        vout_YUV420_16_MMX( p_y, p_u, p_v, 
-                            i_width, i_height, 
-                            i_width, i_chroma_width,
-                            0, p_data, 
-                            0, 0, p_vout->i_bytes_per_line, 
-                            p_vout->i_screen_depth == 15 );
-#else
-        YUV_TRANSFORM( 420,
-                       p_trans_red, 
-                       p_trans_green, 
-                       p_trans_blue,
-                       p_data );            
-  //???      yuvToRgb16( p_y, p_u, p_v, p_data, p_vout->p_trans_optimized, i_width*i_height );
-#endif
-        break;
-    case YUV_422_PICTURE:                   /* 15 or 16 bpp 422 transformation */
-        YUV_TRANSFORM( 422,
-                       p_trans_red, 
-                       p_trans_green, 
-                       p_trans_blue,
-                       p_data );            
-        break;
-    case YUV_444_PICTURE:                   /* 15 or 16 bpp 444 transformation */
-        YUV_TRANSFORM( 444,
-                       p_trans_red, 
-                       p_trans_green, 
-                       p_trans_blue,
-                       p_data );            
-        break;                 
-    }
-}
-
-/*******************************************************************************
- * RenderYUV32Picture: render a 32 bpp YUV picture
- *******************************************************************************
- * Performs the YUV convertion. The picture sent to this function should only
- * have YUV_420, YUV_422 or YUV_444 types.
- *******************************************************************************/
-static void RenderYUV32Picture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    int         i_crv, i_cbu, i_cgu, i_cgv;     /* transformation coefficients */
-    int         i_pic_x, i_pic_y;                /* x,y coordinates in picture */
-    int         i_y, i_u, i_v;                           /* Y, U and V samples */
-    int         i_width, i_height;                             /* picture size */
-    int         i_chroma_width;                                /* chroma width */    
-    int         i_eol_offset;          /* pixels from end of line to next line */
-    yuv_data_t *p_y;                                     /* Y data base adress */
-    yuv_data_t *p_u;                                     /* U data base adress */
-    yuv_data_t *p_v;                                     /* V data base adress */
-    u32 *       p_data;                 /* base adress for destination picture */
-    u32 *       p_trans_red;                       /* red transformation table */
-    u32 *       p_trans_green;                   /* green transformation table */
-    u32 *       p_trans_blue;                     /* blue transformation table */
- 
-    /* Choose transformation matrix coefficients */
-    i_crv = MATRIX_COEFFICIENTS_TABLE[p_pic->i_matrix_coefficients][0];
-    i_cbu = MATRIX_COEFFICIENTS_TABLE[p_pic->i_matrix_coefficients][1];
-    i_cgu = MATRIX_COEFFICIENTS_TABLE[p_pic->i_matrix_coefficients][2];
-    i_cgv = MATRIX_COEFFICIENTS_TABLE[p_pic->i_matrix_coefficients][3];
-
-    /* Choose the conversions tables and picture address */
-    p_trans_red =       (u32 *) p_vout->p_trans_red;
-    p_trans_green =     (u32 *) p_vout->p_trans_green;
-    p_trans_blue =      (u32 *) p_vout->p_trans_blue;    
-    p_data =            (u32 *) vout_SysGetPicture( p_vout );
-
-    /* Set the base pointers and transformation parameters */
-    p_y =               p_pic->p_y;
-    p_u =               p_pic->p_u;
-    p_v =               p_pic->p_v;
-    i_width =           p_pic->i_width;
-    i_height =          p_pic->i_height;
-    i_chroma_width =    i_width / 2;
-    i_eol_offset =      p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - i_width;
-        
-    /* Do YUV transformation - the loops are repeated for optimization */
-    switch( p_pic->i_type )
-    {
-    case YUV_420_PICTURE:                         /* 32 bpp 420 transformation */
-        YUV_TRANSFORM( 420,
-                       p_trans_red, 
-                       p_trans_green, 
-                       p_trans_blue,
-                       p_data );            
-        break;
-    case YUV_422_PICTURE:                         /* 32 bpp 422 transformation */
-        YUV_TRANSFORM( 422,
-                       p_trans_red, 
-                       p_trans_green, 
-                       p_trans_blue,
-                       p_data );            
-        break;
-    case YUV_444_PICTURE:                         /* 32 bpp 444 transformation */
-        YUV_TRANSFORM( 444,
-                       p_trans_red, 
-                       p_trans_green, 
-                       p_trans_blue,
-                       p_data );            
-        break;                 
-    }
-}
 
 /*******************************************************************************
  * RenderPictureInfo: print additionnal informations on a picture
