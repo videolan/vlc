@@ -154,6 +154,9 @@ case "x${target_os}" in
     LDFLAGS_vlc="${LDFLAGS_vlc} -lbe"
     LDFLAGS_plugins="${LDFLAGS_plugins} -nostart"
     LDFLAGS_beos="${LDFLAGS_beos} -lbe -lmedia -lroot -ltracker -lstdc++.r4 -ltranslation"
+    LDFLAGS_access_mms="${LDFLAGS_access_mms} -lsocket"
+    LDFLAGS_ipv4="${LDFLAGS_ipv4} -lsocket"
+    LDFLAGS_httpd="${LDFLAGS_httpd} -lsocket"
     dnl BONE or not BONE ? only BONE has libbind.so
     AC_CHECK_LIB( bind, inet_ntoa,
         [ LDFLAGS_access_mms="${LDFLAGS_access_mms} -lbind"
