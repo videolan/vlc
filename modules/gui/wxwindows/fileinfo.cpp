@@ -122,13 +122,13 @@ void FileInfo::UpdateFileInfo()
         info_category_t *p_cat = p_input->input.p_item->pp_categories[i];
 
         wxTreeItemId cat = fileinfo_tree->AppendItem( fileinfo_root,
-                                                      wxL2U(p_cat->psz_name) );
+                                                      wxU(p_cat->psz_name) );
         for( int j = 0; j < p_cat->i_infos; j++ )
         {
             info_t *p_info = p_cat->pp_infos[j];
 
-            fileinfo_tree->AppendItem( cat, (wxString)wxL2U(p_info->psz_name) +
-                                       wxT(": ") + wxL2U(p_info->psz_value) );
+            fileinfo_tree->AppendItem( cat, (wxString)wxU(p_info->psz_name) +
+                                       wxT(": ") + wxU(p_info->psz_value) );
         }
         fileinfo_tree->Expand( cat );
     }
