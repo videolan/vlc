@@ -803,16 +803,8 @@
 				8E9390CB0565D6D300C7661C,
 				8E9390CC0565D6D300C7661C,
 				8E9390CD0565D6D300C7661C,
-				8E49720206417F6800370C9F,
-				8E49720306417F6800370C9F,
-				2A16E04106C4F08700C87B09,
-				2A16E04206C4F08700C87B09,
 				2A16E08006C5074F00C87B09,
 				2A16E08106C5074F00C87B09,
-				8E9CA1BE06D7DEE800B7186C,
-				8E9CA1BF06D7DEE800B7186C,
-				8E9CA1C006D7DEE800B7186C,
-				8E9CA1C106D7DEE800B7186C,
 				DCA00AA9075F948800E6BF46,
 				DCF358BB077F10BA007DB450,
 				DCA693C30789DF8700139EC6,
@@ -991,18 +983,6 @@
 			path = ../../modules/gui/macosx/equalizer.m;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
-		};
-		2A16E04106C4F08700C87B09 = {
-			fileRef = 2A16E03F06C4F08700C87B09;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		2A16E04206C4F08700C87B09 = {
-			fileRef = 2A16E04006C4F08700C87B09;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		2A16E07E06C5074F00C87B09 = {
 			isa = PBXFileReference;
@@ -1405,18 +1385,6 @@
 			path = ../../modules/gui/macosx/playlistinfo.m;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
-		};
-		8E49720206417F6800370C9F = {
-			fileRef = 8E49720006417F6800370C9F;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8E49720306417F6800370C9F = {
-			fileRef = 8E49720106417F6800370C9F;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		8E55FB7F0459B0FD00FB3317 = {
 			fileEncoding = 30;
@@ -1862,30 +1830,6 @@
 			path = ../../modules/gui/macosx/voutqt.m;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
-		};
-		8E9CA1BE06D7DEE800B7186C = {
-			fileRef = 8E9CA1A306D7DEE800B7186C;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8E9CA1BF06D7DEE800B7186C = {
-			fileRef = 8E9CA1A406D7DEE800B7186C;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8E9CA1C006D7DEE800B7186C = {
-			fileRef = 8E9CA1A506D7DEE800B7186C;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8E9CA1C106D7DEE800B7186C = {
-			fileRef = 8E9CA1A606D7DEE800B7186C;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		8E9CC7B1046EFD700059A3A7 = {
 			fileEncoding = 12;
