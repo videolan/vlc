@@ -753,7 +753,11 @@ lib/sdl.so: $(PLUGIN_SDL)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_SDL)
 
 lib/ts.so: $(PLUGIN_TS)
+ifeq ($(SYS),darwin)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -framework AGL -framework Carbon
+else
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+endif
 
 lib/x11.so: $(PLUGIN_X11)
 ifeq ($(SYS),nto-qnx)

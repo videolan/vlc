@@ -2,7 +2,7 @@
  * idctaltivec.c : Altivec IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctaltivec.c,v 1.2 2001/03/21 02:58:29 sam Exp $
+ * $Id: idctaltivec.c,v 1.3 2001/03/26 19:06:18 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -148,7 +148,8 @@ static int idct_Probe( probedata_t *p_data )
         }
         else
         {
-            return( 200 );
+            /* The Altivec iDCT is deactivated until it really works */
+            return( 0 /* 200 */ );
         }
     }
     else
