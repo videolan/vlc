@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.5 2002/07/23 00:39:17 sam Exp $
+ * $Id: mp4.c,v 1.6 2002/07/23 17:19:02 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -89,7 +89,7 @@ static int  MP4_ReadSample();
 static int  MP4_DecodeSample();
 
 #define MP4_Set4BytesLE( p, dw ) \
-    *((u8*)p) = ( dw&0xff ); \
+    *((u8*)p)   = ( (dw)&0xff ); \
     *((u8*)p+1) = ( ((dw)>> 8)&0xff ); \
     *((u8*)p+2) = ( ((dw)>>16)&0xff ); \
     *((u8*)p+3) = ( ((dw)>>24)&0xff )
@@ -186,7 +186,11 @@ static int MP4Init( input_thread_t *p_input )
                 break;
             default:
                 msg_Info( p_input,
-                          "Unrecognize major file specification." );
+                          "Unrecognize major file specification (%c%c%c%c).",
+                           p_ftyp->data.p_ftyp->i_major_brand&0xff,
+                           ( p_ftyp->data.p_ftyp->i_major_brand >>  8)&0xff,
+                           ( p_ftyp->data.p_ftyp->i_major_brand >> 16 )&0xff,
+                           ( p_ftyp->data.p_ftyp->i_major_brand >> 24 )&0xff );
                 break;
         }
     }
@@ -406,14 +410,7 @@ static void MP4End( input_thread_t *p_input )
                FREE(p_demux->track[i_track].chunk[i_chunk].p_sample_delta_dts );
             }
         }
-#if 0
-/*        if( p_demux->track->p_data_init )
-        {
-            input_DeletePacket( p_input->p_method_data, 
-                                p_demux->track->p_data_init );
-        }
-        */
-#endif 
+
         if( !p_demux->track[i_track].i_sample_size )
         {
             FREE( p_demux->track[i_track].p_sample_size );
@@ -754,7 +751,11 @@ static void MP4_StartDecoder( input_thread_t *p_input,
     MP4_Box_t *p_sample;
     int i;
     int i_chunk;
-    u8  *p_bmih;
+
+    int i_decoder_specific_info_len;
+    u8  *p_decoder_specific_info;
+    
+    u8  *p_init;
  
     MP4_Box_t *p_esds;
 
@@ -772,20 +773,29 @@ static void MP4_StartDecoder( input_thread_t *p_input,
 
     if( !p_demux_track->chunk[i_chunk].i_sample_description_index )
     {
-        msg_Warn( p_input, "invalid SampleEntry index for this track i_cat %d" );
+        msg_Warn( p_input, 
+                  "invalid SampleEntry index (track ID 0x%x)",
+                  p_demux_track->i_track_ID );
         return;
     } 
     
     p_sample = MP4_FindNbBox( p_demux_track->p_stsd,
-                              p_demux_track->chunk[i_chunk].i_sample_description_index - 1);
+                 p_demux_track->chunk[i_chunk].i_sample_description_index - 1);
 
-    if( !p_sample )
+    if( ( !p_sample )||( !p_sample->data.p_data ) )
     {
-        msg_Warn( p_input, "cannot find SampleEntry for this track" );
+        msg_Warn( p_input, 
+                  "cannot find SampleEntry (track ID 0x%x)",
+                  p_demux_track->i_track_ID );
         return;
     }
 
-    
+    if( !p_sample->data.p_data )
+    {
+        printf( "\nAhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh %.4s\n",
+                &p_sample->i_type );
+        return;
+    } 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_demux_track->p_es = input_AddES( p_input,
                                        p_input->stream.p_selected_program, 
@@ -803,75 +813,155 @@ static void MP4_StartDecoder( input_thread_t *p_input,
 
     p_demux_track->p_es->i_fourcc = p_sample->i_type;
     p_demux_track->p_es->i_cat = p_demux_track->i_cat;
+    
+    i_decoder_specific_info_len = 0;
+    p_decoder_specific_info = NULL;
 
     /* now see if esds is present and if so create a data packet 
         with decoder_specific_info  */
 #define p_decconfig p_esds->data.p_esds->es_descriptor.p_decConfigDescr
-    if( ( p_esds = MP4_FindBox( p_sample, FOURCC_esds ) )
-         && p_decconfig && p_decconfig->i_decoder_specific_info_len )
+    if( ( p_esds = MP4_FindBox( p_sample, FOURCC_esds ) )&&
+        ( p_esds->data.p_esds )&&
+        ( p_decconfig ) )
     {
-        data_packet_t *p_data;
-        int i_size = p_decconfig->i_decoder_specific_info_len;
-
-        /* data packet for the data */
-        if( !(p_data = input_NewPacket( p_input->p_method_data, i_size ) ) )
+        /* First update information based on i_objectTypeIndication */
+        switch( p_decconfig->i_objectTypeIndication )
         {
-            return;
+            case( 0x20 ): /* MPEG4 VIDEO */
+                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm','p','4','v' );
+                break;
+            case( 0x40):
+                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm','p','4','a' );
+                break;
+            case( 0x60):
+            case( 0x61):
+            case( 0x62):
+            case( 0x63):
+            case( 0x64):
+            case( 0x65): /* MPEG2 video */
+                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm','p','g','v' );
+                break;
+            /* Theses are MPEG2-AAC (what is this codec ?) */
+            case( 0x66): /* main profile */
+            case( 0x67): /* Low complexity profile */
+            case( 0x68): /* Scaleable Sampling rate profile */
+                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm','p','4','a' );
+                break;
+            /* true MPEG 2 audio */
+            case( 0x69): 
+                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm','p','g','a' );
+                break;
+            case( 0x6a): /* MPEG1 video */
+                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm','p','g','v' );
+                break;
+            case( 0x6b): /* MPEG1 audio */
+                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm','p','g','a' );
+                break;
+            case( 0x6c ): /* jpeg */
+                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'j','p','e','g' );
+                break;
+            default:
+                /* Unknown entry, but don't touch i_fourcc */
+                msg_Warn( p_input, 
+                          "objectTypeIndication(0x%x) unknow (Track ID 0x%x)",
+                          p_decconfig->i_objectTypeIndication,
+                          p_demux_track->i_track_ID );
+                break;
         }
-
-        memcpy( p_data->p_payload_start,
-                p_decconfig->p_decoder_specific_info,
-                i_size ); 
-        p_demux_track->p_data_init = p_data;
+        i_decoder_specific_info_len = 
+                p_decconfig->i_decoder_specific_info_len;
+        p_decoder_specific_info = 
+                p_decconfig->p_decoder_specific_info;
     }
+
 #undef p_decconfig
 
     /* some last initialisation */
+    /* XXX I create a bitmapinfoheader_t or 
+       waveformatex_t for each stream, up to now it's the best thing 
+       I've found but it could exist a better solution :) as something 
+       like adding some new fields in p_es ...
+
+       XXX I don't set all values, only thoses that are interesting or known
+        --> bitmapinfoheader_t : width and height 
+        --> waveformatex_t : channels, samplerate, bitspersample
+        and at the end I add p_decoder_specific_info 
+        
+        TODO set more values
+     
+     */
+
     switch( p_demux_track->i_cat )
     {
         case( VIDEO_ES ):    
-            /* now create a bitmapinfoheader_t for decoder */
-            p_bmih = malloc( 40 );
-            memset( p_bmih, 0, 40);
-            MP4_Set4BytesLE( p_bmih, 40 );
-            if( p_sample->data.p_sample_mp4v
-                 && p_sample->data.p_sample_mp4v->i_width )
+            /* now create a bitmapinfoheader_t for decoder and 
+               add information found in p_esds */
+            p_init = malloc( 40 + i_decoder_specific_info_len);
+            memset( p_init, 0, 40 + i_decoder_specific_info_len);
+            MP4_Set4BytesLE( p_init, 40 + i_decoder_specific_info_len );
+            if( p_sample->data.p_sample_vide->i_width )
             {
-                MP4_Set4BytesLE( p_bmih + 4, 
-                                 p_sample->data.p_sample_mp4v->i_width );
+                MP4_Set4BytesLE( p_init + 4, 
+                                 p_sample->data.p_sample_vide->i_width );
             }
             else
             {
                 /* use display size */
-                MP4_Set4BytesLE( p_bmih + 4, p_demux_track->i_width );
+                MP4_Set4BytesLE( p_init + 4, p_demux_track->i_width );
             }
-            if( p_sample->data.p_sample_mp4v
-                 && p_sample->data.p_sample_mp4v->i_height )
+            if( p_sample->data.p_sample_vide->i_height )
             {
-                MP4_Set4BytesLE( p_bmih + 8, 
-                                 p_sample->data.p_sample_mp4v->i_height );
+                MP4_Set4BytesLE( p_init + 8, 
+                                 p_sample->data.p_sample_vide->i_height );
             }
             else
             {
-                MP4_Set4BytesLE( p_bmih + 8, p_demux_track->i_height );
+                MP4_Set4BytesLE( p_init + 8, p_demux_track->i_height );
             }
+            if( i_decoder_specific_info_len )
+            {
+                memcpy( p_init + 40, 
+                        p_decoder_specific_info,
+                        i_decoder_specific_info_len);
+            }
+            break;
 
-            p_demux_track->p_es->p_demux_data = p_bmih;
-            break;
         case( AUDIO_ES ):
+            p_init = malloc( 18 + i_decoder_specific_info_len);
+            memset( p_init, 0, 18 + i_decoder_specific_info_len);
+            MP4_Set2BytesLE( p_init + 2, /* i_channel */
+                             p_sample->data.p_sample_soun->i_channelcount );
+            MP4_Set4BytesLE( p_init + 4, /* samplepersec */
+                             p_sample->data.p_sample_soun->i_sampleratehi );
+            MP4_Set4BytesLE( p_init + 8, /* avgbytespersec */
+                             p_sample->data.p_sample_soun->i_channelcount *
+                                p_sample->data.p_sample_soun->i_sampleratehi *
+                             (p_sample->data.p_sample_soun->i_samplesize/8) );
+            MP4_Set2BytesLE( p_init + 14, /* bits/sample */
+                             p_sample->data.p_sample_soun->i_samplesize );
+
+            MP4_Set2BytesLE( p_init + 16, /* i_size, specific info len*/
+                             i_decoder_specific_info_len );
+            if( i_decoder_specific_info_len )
+            {
+                memcpy( p_init + 18, 
+                        p_decoder_specific_info,
+                        i_decoder_specific_info_len);
+            }
             break;
+
         default:
+            p_init = NULL;
             break;
     }
 
-
+    p_demux_track->p_es->p_demux_data = p_init;
     vlc_mutex_lock( &p_input->stream.stream_lock );
     input_SelectES( p_input, p_demux_track->p_es );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     p_demux_track->b_ok = 1;
 }
-
 
 static void MP4_StopDecoder( input_thread_t *p_input,
                              track_data_mp4_t *p_demux_track )
@@ -881,13 +971,6 @@ static void MP4_StopDecoder( input_thread_t *p_input,
 
     input_UnselectES( p_input, p_demux_track->p_es );
     p_demux_track->p_es = NULL;
-    if( p_demux_track->p_data_init )
-    {
-        input_DeletePacket( p_input->p_method_data, 
-                            p_demux_track->p_data_init );
-        p_demux_track->p_data_init = NULL;
-    }
-    
 }
 
 static int  MP4_ReadSample( input_thread_t *p_input,
@@ -908,7 +991,8 @@ static int  MP4_ReadSample( input_thread_t *p_input,
     }
     /* caculate size and position for this sample */
     i_size = p_demux_track->i_sample_size ? 
-        p_demux_track->i_sample_size : p_demux_track->p_sample_size[p_demux_track->i_sample];
+                    p_demux_track->i_sample_size : 
+                    p_demux_track->p_sample_size[p_demux_track->i_sample];
     /* TODO */
     i_pos  = MP4_GetTrackPos( p_demux_track );
 
@@ -974,28 +1058,6 @@ static int  MP4_DecodeSample( input_thread_t *p_input,
                                          p_pes->i_pts * 9/100);
 
     
-    if( p_demux_track->p_data_init )
-    {
-        pes_packet_t *p_pes_init;
-        /* create a pes packet containing decoder initialisation 
-           with the one we will send to decoder */
-        if( !(p_pes_init = input_NewPES( p_input->p_method_data ) ) )
-        {
-            msg_Err( p_input, "out of memory" );
-            return( 0 );
-        }
-        
-        p_pes_init->p_first = 
-            p_pes_init->p_last = p_demux_track->p_data_init;
-
-        p_pes_init->i_pes_size = p_demux_track->p_data_init->p_payload_end - 
-                                   p_demux_track->p_data_init->p_payload_start;
-        p_pes_init->i_nb_data = 1;
-
-        input_DecodePES( p_demux_track->p_es->p_decoder_fifo, p_pes_init );
-        p_demux_track->p_data_init = NULL;
-    }
-
     input_DecodePES( p_demux_track->p_es->p_decoder_fifo, p_pes );
     
     /* now update sample position */
@@ -1020,8 +1082,10 @@ static int  MP4_DecodeSample( input_thread_t *p_input,
               != p_demux_track->chunk[p_demux_track->i_chunk].i_sample_description_index  )
         {
             /* FIXME */
-            msg_Err( p_input, "I need to change the decoder but not yet implemented" );
-            return( 0 );
+            msg_Warn( p_input, 
+                      "SampleEntry have changed, starting a new decoder" );
+            MP4_StopDecoder( p_input, p_demux_track );
+            MP4_StartDecoder( p_input, p_demux_track );
         }
     }
 

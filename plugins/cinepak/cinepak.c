@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.3 2002/07/23 00:39:16 sam Exp $
+ * $Id: cinepak.c,v 1.4 2002/07/23 17:19:02 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -92,7 +92,14 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int decoder_Probe( vlc_fourcc_t *pi_type )
 {
-    return( ( *pi_type == VLC_FOURCC('c','v','i','d') ) ? 0 : -1 );
+    switch(  *pi_type )
+    {
+        case( VLC_FOURCC('c','v','i','d') ):
+        case( VLC_FOURCC('C','V','I','D') ):
+            return( 0);
+        default:
+            return( -1 );
+    }
 }
 
 /*****************************************************************************

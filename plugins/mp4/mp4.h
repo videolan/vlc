@@ -2,7 +2,7 @@
  * mp4.h : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.h,v 1.5 2002/07/23 00:39:17 sam Exp $
+ * $Id: mp4.h,v 1.6 2002/07/23 17:19:02 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -23,12 +23,11 @@
 
 
 /*****************************************************************************
- * Structure needed for ffmpeg decoder
+ * Structure needed for decoder
  *****************************************************************************/
-
 typedef struct bitmapinfoheader_s
 {
-    u32 i_size; /* size of header */
+    u32 i_size; /* size of header 40 + size of data follwoing this header */
     u32 i_width;
     u32 i_height;
     u16 i_planes;
@@ -41,7 +40,17 @@ typedef struct bitmapinfoheader_s
     u32 i_clrimportant;
 } bitmapinfoheader_t;
 
-
+typedef struct waveformatex_s
+{
+    u16 i_format;
+    u16 i_channels;
+    u32 i_samplepersec;
+    u32 i_avgbytespersec;
+    u16 i_blockalign;
+    u16 i_bitspersample;
+    u16 i_size;          /* This give size of data 
+                            imediatly following this header. */
+} waveformatex_t;
 
 /*****************************************************************************
  * Contain all information about a chunk
@@ -103,8 +112,6 @@ typedef struct track_data_mp4_s
                                     too much time to do sumations each time*/
     
     es_descriptor_t *p_es; /* vlc es for this track */
-    data_packet_t   *p_data_init; /* send this with the first packet, 
-                                        and then discarded it*/
 
     MP4_Box_t *p_stbl;  /* will contain all timing information */
     MP4_Box_t *p_stsd;  /* will contain all data to initialize decoder */
@@ -199,4 +206,3 @@ static inline mtime_t MP4_GetMoviePTS(demux_data_mp4_t *p_demux )
                 (mtime_t)p_demux->i_timescale )
           );
 }
-

@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.4 2002/07/23 00:39:17 sam Exp $
+ * $Id: libmp4.c,v 1.5 2002/07/23 17:19:02 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -1208,6 +1208,9 @@ int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_sampleratehi );
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_sampleratelo );
     
+    MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) + 28 );
+    MP4_ReadBoxContainerRaw( p_stream, p_box ); /* esds */
+   
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream->p_input, "Read Box: \"soun\" in stsd channel %d sample size %d sampl rate %f",
                       p_box->data.p_sample_soun->i_channelcount,
@@ -1219,6 +1222,7 @@ int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+#if 0
 int MP4_ReadBox_sample_mp4a( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     int i;    
@@ -1257,6 +1261,7 @@ int MP4_ReadBox_sample_mp4a( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 #endif
     MP4_READBOX_EXIT( 1 );
 }
+#endif
 
 int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -1991,7 +1996,7 @@ static struct
     /* for codecs */
     { FOURCC_soun,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
     { FOURCC__mp3,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_mp4a,  MP4_ReadBox_sample_mp4a,    MP4_FreeBox_Common },
+    { FOURCC_mp4a,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
 
     { FOURCC_vide,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_mp4v,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },

@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.19 2002/07/23 00:39:17 sam Exp $
+ * $Id: ffmpeg.c,v 1.20 2002/07/23 17:19:02 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -174,19 +174,33 @@ static int decoder_Run ( decoder_fifo_t * p_fifo )
     (  *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) + \
       ( *((u8*)(p)+2) << 16 ) + ( *((u8*)(p)+3) << 24 ) )
 
-static void __ParseBitMapInfoHeader( bitmapinfoheader_t *h, byte_t *p_data )
+static void ffmpeg_ParseBitMapInfoHeader( bitmapinfoheader_t *p_bh, 
+                                          u8 *p_data )
 {
-    h->i_size          = GetDWLE( p_data );
-    h->i_width         = GetDWLE( p_data + 4 );
-    h->i_height        = GetDWLE( p_data + 8 );
-    h->i_planes        = GetWLE( p_data + 12 );
-    h->i_bitcount      = GetWLE( p_data + 14 );
-    h->i_compression   = GetDWLE( p_data + 16 );
-    h->i_sizeimage     = GetDWLE( p_data + 20 );
-    h->i_xpelspermeter = GetDWLE( p_data + 24 );
-    h->i_ypelspermeter = GetDWLE( p_data + 28 );
-    h->i_clrused       = GetDWLE( p_data + 32 );
-    h->i_clrimportant  = GetDWLE( p_data + 36 );
+    p_bh->i_size          = GetDWLE( p_data );
+    p_bh->i_width         = GetDWLE( p_data + 4 );
+    p_bh->i_height        = GetDWLE( p_data + 8 );
+    p_bh->i_planes        = GetWLE( p_data + 12 );
+    p_bh->i_bitcount      = GetWLE( p_data + 14 );
+    p_bh->i_compression   = GetDWLE( p_data + 16 );
+    p_bh->i_sizeimage     = GetDWLE( p_data + 20 );
+    p_bh->i_xpelspermeter = GetDWLE( p_data + 24 );
+    p_bh->i_ypelspermeter = GetDWLE( p_data + 28 );
+    p_bh->i_clrused       = GetDWLE( p_data + 32 );
+    p_bh->i_clrimportant  = GetDWLE( p_data + 36 );
+
+    if( p_bh->i_size > 40 )
+    {
+        p_bh->i_data = p_bh->i_size - 40;
+        p_bh->p_data = malloc( p_bh->i_data ); 
+        memcpy( p_bh->p_data, p_data + 40, p_bh->i_data );
+    }
+    else
+    {
+        p_bh->i_data = 0;
+        p_bh->p_data = NULL;
+    } 
+
 }
 /* get the first pes from fifo */
 static pes_packet_t *__PES_GET( decoder_fifo_t *p_fifo )
@@ -423,89 +437,6 @@ static vout_thread_t *ffmpeg_CreateVout( videodec_thread_t *p_vdec,
     return( p_vout );
 }
 
-#if 0
-/* segfault some^Wevery times*/
-static void ffmpeg_ConvertPictureI410toI420( picture_t *p_pic,
-                                             AVPicture *p_avpicture,
-                                             videodec_thread_t   *p_vdec )
-{
-    int i_plane; 
-    
-    int i_x, i_y;
-    int i_x_max, i_y_max;
-
-    int i_width;
-    int i_height; 
-
-    int i_dst_stride;
-    int i_src_stride;
-    
-    u8  *p_dest;
-    u8  *p_src;
-
-    i_width = p_vdec->p_context->width;
-    i_height= p_vdec->p_context->height;
-    
-
-    p_dest = p_pic->p[0].p_pixels;
-    p_src  = p_avpicture->data[0];
-
-    i_src_stride = p_avpicture->linesize[0];
-    i_dst_stride = p_pic->p[0].i_pitch;
-    
-    if( i_src_stride == i_dst_stride )
-    {
-        p_vdec->p_fifo->p_vlc->pf_memcpy( p_dest, p_src, i_src_stride * i_height  );
-    }
-    else
-    {
-        for( i_y = 0; i_y < i_height; i_y++ )
-        {
-            p_vdec->p_fifo->p_vlc->pf_memcpy( p_dest, p_src, i_width );
-            p_dest += i_dst_stride;
-            p_src  += i_src_stride;
-        }
-    }
-
-    for( i_plane = 1; i_plane < 3; i_plane++ )
-    {
-        i_y_max = p_pic->p[i_plane].i_lines;
-        
-        p_src  = p_avpicture->data[i_plane];
-        p_dest = p_pic->p[i_plane].p_pixels;
-        i_dst_stride = p_pic->p[i_plane].i_pitch;
-        i_src_stride = p_avpicture->linesize[i_plane];
-
-        i_x_max = __MIN( i_dst_stride / 2, i_src_stride );
-
-        for( i_y = 0; i_y <( i_y_max + 1 ) / 2 ; i_y++ )
-        {
-            for( i_x = 0; i_x < i_x_max - 1; i_x++ )
-            {
-                p_dest[2 * i_x    ] = p_src[i_x];
-                p_dest[2 * i_x + 1] = ( p_src[i_x] + p_src[i_x + 1] ) / 2;
-            }
-            p_dest[2 * i_x_max - 2] = p_src[i_x];
-            p_dest[2 * i_x_max - 1] = p_src[i_x];
-
-            p_dest += 2 * i_dst_stride;
-            p_src  += i_src_stride;
-        }
-        
-        p_src  = p_pic->p[i_plane].p_pixels;
-        p_dest = p_src + i_dst_stride;
-
-        for( i_y = 0; i_y < ( i_y_max + 1 ) / 2 ; i_y++ )
-        {
-            p_vdec->p_fifo->p_vlc->pf_memcpy( p_dest, p_src, i_dst_stride ); 
-            p_dest += 2*i_dst_stride;
-            p_src  += 2*i_dst_stride;
-        }
-
-    }
-}
-#endif
-
 /* FIXME FIXME FIXME this is a big shit
    does someone want to rewrite this function ? 
    or said to me how write a better thing
@@ -679,8 +610,8 @@ static int InitThread( videodec_thread_t *p_vdec )
     
     if( p_vdec->p_fifo->p_demux_data )
     {
-        __ParseBitMapInfoHeader( &p_vdec->format, 
-                                (byte_t*)p_vdec->p_fifo->p_demux_data );
+        ffmpeg_ParseBitMapInfoHeader( &p_vdec->format, 
+                                      (u8*)p_vdec->p_fifo->p_demux_data );
     }
     else
     {
@@ -755,10 +686,29 @@ static int InitThread( videodec_thread_t *p_vdec )
         msg_Dbg( p_vdec->p_fifo, "ffmpeg codec (%s) started",
                                  p_vdec->psz_namecodec );
     }
-
+    
+    /* first give init data */
+    if( p_vdec->format.i_data )
+    {
+        AVPicture avpicture;
+        int b_gotpicture;
+        
+        switch( i_ffmpeg_codec )
+        {
+            case( CODEC_ID_MPEG4 ):
+                avcodec_decode_video( p_vdec->p_context, &avpicture, 
+                                      &b_gotpicture,
+                                      p_vdec->format.p_data,
+                                      p_vdec->format.i_data );
+                break;
+            default:
+                break;
+        }
+    }
+    
     /* This will be created after the first decoded frame */
     p_vdec->p_vout = NULL;
-
+    
     return( 0 );
 }
 
@@ -920,6 +870,11 @@ static void EndThread( videodec_thread_t *p_vdec )
         /* We are about to die. Reattach video output to p_vlc. */
         vlc_object_detach( p_vdec->p_vout, p_vdec->p_fifo );
         vlc_object_attach( p_vdec->p_vout, p_vdec->p_fifo->p_vlc );
+    }
+
+    if( p_vdec->format.p_data != NULL)
+    {
+        free( p_vdec->format.p_data );
     }
     
     free( p_vdec );

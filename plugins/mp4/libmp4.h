@@ -2,7 +2,7 @@
  * libmp4.h : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.h,v 1.4 2002/07/23 00:39:17 sam Exp $
+ * $Id: libmp4.h,v 1.5 2002/07/23 17:19:02 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -321,22 +321,6 @@ typedef struct MP4_Box_data_sample_soun_s
     
 } MP4_Box_data_sample_soun_t;
 
-typedef struct MP4_Box_data_sample_mp4a_s
-{
-    u8  i_reserved1[6];
-    u16 i_data_reference_index;
-
-    u32 i_reserved2[2];
-    u16 i_channelcount;
-    u16 i_samplesize;
-    u16 i_predefined;
-    u16 i_reserved3;
-    u16 i_sampleratehi; /* timescale of track */
-    u16 i_sampleratelo;
-    
-} MP4_Box_data_sample_mp4a_t;
-
-
 typedef struct MP4_Box_data_sample_vide_s
 {
     u8  i_reserved1[6];
@@ -361,34 +345,6 @@ typedef struct MP4_Box_data_sample_vide_s
     s16 i_predefined4;
     
 } MP4_Box_data_sample_vide_t;
-
-/*
-typedef struct MP4_Box_data_sample_mp4v_s
-{
-    u8  i_reserved1[6];
-    u16 i_data_reference_index;
-
-    u16 i_predefined1;
-    u16 i_reserved2;
-    u32 i_predefined2[3];
-
-    s16 i_width;
-    s16 i_height;
-
-    u32 i_horizresolution;
-    u32 i_vertresolution;
-
-    u32 i_reserved3;
-    u16 i_predefined3;
-    
-    u8  i_compressorname[32];
-    s16 i_depth;
-
-    s16 i_predefined4;
-    
-} MP4_Box_data_sample_mp4v_t;
-
-*/
 
 typedef struct MP4_Box_data_sample_hint_s
 {
@@ -648,9 +604,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_ctts_t *p_ctts;
     MP4_Box_data_stsd_t *p_stsd;
         MP4_Box_data_sample_vide_t *p_sample_vide;
-        MP4_Box_data_sample_vide_t *p_sample_mp4v;
         MP4_Box_data_sample_soun_t *p_sample_soun;
-        MP4_Box_data_sample_soun_t *p_sample_mp4a;
         MP4_Box_data_sample_hint_t *p_sample_hint;
 
         MP4_Box_data_esds_t *p_esds;
