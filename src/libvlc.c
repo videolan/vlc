@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.63 2003/02/06 23:59:40 sam Exp $
+ * $Id: libvlc.c,v 1.64 2003/02/14 18:22:23 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -97,6 +97,7 @@ static void Version       ( void );
 #ifdef WIN32
 static void ShowConsole   ( void );
 #endif
+static int  ConsoleWidth  ( void );
 
 /*****************************************************************************
  * VLC_Version: return the libvlc version.
@@ -417,7 +418,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
      */
     msg_Flush( p_vlc );
 
-    /* p_vlc inititalization. FIXME ? */
+    /* p_vlc initialization. FIXME ? */
     p_vlc->i_desync = config_GetInt( p_vlc, "desync" ) * (mtime_t)1000;
 
 #if defined( __i386__ )
@@ -1055,14 +1056,15 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
  *****************************************************************************/
 static void Usage( vlc_t *p_this, char const *psz_module_name )
 {
-#define FORMAT_STRING "      --%s%s%s%s%s%s%s %s%s\n"
-    /* option name -------------'     | | | |  | |
-     * <bra --------------------------' | | |  | |
-     * option type or "" ---------------' | |  | |
-     * ket> ------------------------------' |  | |
-     * padding spaces ----------------------'  | |
-     * comment --------------------------------' |
-     * comment suffix ---------------------------'
+#define FORMAT_STRING "  %s --%s%s%s%s%s%s%s "
+    /* short option ------'    |     | | | |  | |
+     * option name ------------'     | | | |  | |
+     * <bra -------------------------' | | |  | |
+     * option type or "" --------------' | |  | |
+     * ket> -----------------------------' |  | |
+     * padding spaces ---------------------'  | |
+     * comment -------------------------------' |
+     * comment suffix --------------------------'
      *
      * The purpose of having bra and ket is that we might i18n them as well.
      */
@@ -1073,7 +1075,10 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
     module_config_t *p_item;
     char psz_spaces[PADDING_SPACES+LINE_START+1];
     char psz_format[sizeof(FORMAT_STRING)];
+    char psz_buffer[1000];
+    char psz_short[4];
     int i_index;
+    int i_width = ConsoleWidth() - (PADDING_SPACES+LINE_START+1);
 
     memset( psz_spaces, ' ', PADDING_SPACES+LINE_START );
     psz_spaces[PADDING_SPACES+LINE_START] = '\0';
@@ -1113,6 +1118,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
              p_item->i_type != CONFIG_HINT_END;
              p_item++ )
         {
+            char *psz_text;
             char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
             char *psz_suf = "", *psz_prefix = NULL;
             int i;
@@ -1134,16 +1140,15 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
                 }
                 else
                 {
-                    psz_bra = " [";
-                    psz_type = malloc( 1000 );
-                    memset( psz_type, 0, 1000 );
-                    for( i=0; p_item->ppsz_list[i]; i++ )
+                    psz_bra = " {";
+                    psz_type = psz_buffer;
+                    psz_type[0] = '\0';
+                    for( i = 0; p_item->ppsz_list[i]; i++ )
                     {
+                        if( i ) strcat( psz_type, "," );
                         strcat( psz_type, p_item->ppsz_list[i] );
-                        strcat( psz_type, "|" );
                     }
-                    psz_type[ strlen( psz_type ) - 1 ] = '\0';
-                    psz_ket = "]";
+                    psz_ket = "}";
                     break;
                 }
             case CONFIG_ITEM_INTEGER:
@@ -1162,82 +1167,108 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
                 break;
             }
 
+            if( !psz_type )
+            {
+                continue;
+            }
+
             /* Add short option if any */
             if( p_item->i_short )
             {
-                psz_format[2] = '-';
-                psz_format[3] = p_item->i_short;
-                psz_format[4] = ',';
+                sprintf( psz_short, "-%c,", p_item->i_short );
             }
             else
             {
-                psz_format[2] = ' ';
-                psz_format[3] = ' ';
-                psz_format[4] = ' ';
+                strcpy( psz_short, "   " );
             }
 
-            if( psz_type )
+            i = PADDING_SPACES - strlen( p_item->psz_name )
+                 - strlen( psz_bra ) - strlen( psz_type )
+                 - strlen( psz_ket ) - 1;
+
+            if( p_item->i_type == CONFIG_ITEM_BOOL && !b_help_module )
             {
-                i = PADDING_SPACES - strlen( p_item->psz_name )
-                     - strlen( psz_bra ) - strlen( psz_type )
-                     - strlen( psz_ket ) - 1;
-                if( p_item->i_type == CONFIG_ITEM_BOOL
-                     && !b_help_module )
-                {
-                    /* If option is of type --foo-bar, we print its counterpart
-                     * as --no-foo-bar, but if it is of type --foobar (without
-                     * dashes in the name) we print it as --nofoobar. Both
-                     * values are of course valid, only the display changes. */
-                    vlc_bool_t b_dash = VLC_FALSE;
-                    psz_prefix = p_item->psz_name;
-                    while( *psz_prefix )
-                    {
-                        if( *psz_prefix++ == '-' )
-                        {
-                            b_dash = VLC_TRUE;
-                            break;
-                        }
-                    }
+                /* If option is of type --foo-bar, we print its counterpart
+                 * as --no-foo-bar, but if it is of type --foobar (without
+                 * dashes in the name) we print it as --nofoobar. Both
+                 * values are of course valid, only the display changes. */
+                psz_prefix = strchr( p_item->psz_name, '-' ) ? ", --no-"
+                                                             : ", --no";
+                i -= strlen( p_item->psz_name ) + strlen( psz_prefix );
+            }
 
-                    if( b_dash )
-                    {
-                        psz_prefix = ", --no-";
-                        i -= strlen( p_item->psz_name ) + strlen( ", --no-" );
-                    }
-                    else
-                    {
-                        psz_prefix = ", --no";
-                        i -= strlen( p_item->psz_name ) + strlen( ", --no" );
-                    }
+            if( i < 0 )
+            {
+                psz_spaces[0] = '\n';
+                i = 0;
+            }
+            else
+            {
+                psz_spaces[i] = '\0';
+            }
+
+            if( p_item->i_type == CONFIG_ITEM_BOOL && !b_help_module )
+            {
+                fprintf( stdout, psz_format, psz_short, p_item->psz_name,
+                         psz_prefix, p_item->psz_name, psz_bra, psz_type,
+                         psz_ket, psz_spaces );
+            }
+            else
+            {
+                fprintf( stdout, psz_format, psz_short, p_item->psz_name,
+                         "", "", psz_bra, psz_type, psz_ket, psz_spaces );
+            }
+
+            psz_spaces[i] = ' ';
+
+            /* We wrap the rest of the output */
+            sprintf( psz_buffer, "%s%s", p_item->psz_text, psz_suf );
+            psz_text = psz_buffer;
+            while( *psz_text )
+            {
+                char *psz_parser, *psz_word;
+                int i_end = strlen( psz_text );
+
+                /* If the remaining text fits in a line, print it. */
+                if( i_end <= i_width )
+                {
+                    fprintf( stdout, "%s\n", psz_text );
+                    break;
                 }
 
-                if( i < 0 )
+                /* Otherwise, eat as many words as possible */
+                psz_parser = psz_text;
+                do
                 {
-                    i = 0;
-                    psz_spaces[i] = '\n';
+                    psz_word = psz_parser;
+                    psz_parser = strchr( psz_word, ' ' );
+                    /* If no space was found, we reached the end of the text
+                     * block; otherwise, we skip the space we just found. */
+                    psz_parser = psz_parser ? psz_parser + 1
+                                            : psz_text + i_end;
+
+                } while( psz_parser - psz_text <= i_width );
+
+                /* We cut a word in one of these cases:
+                 *  - it's the only word in the line and it's too long.
+                 *  - we used less than 80% of the width and the word we are
+                 *    going to wrap is longer than 40% of the width, and even
+                 *    if the word would have fit in the next line. */
+                if( psz_word == psz_text
+                     || ( psz_word - psz_text < 80 * i_width / 100
+                           && psz_parser - psz_word > 40 * i_width / 100 ) )
+                {
+                    char c = psz_text[i_width];
+                    psz_text[i_width] = '\0';
+                    fprintf( stdout, "%s\n%s", psz_text, psz_spaces );
+                    psz_text += i_width;
+                    psz_text[0] = c;
                 }
                 else
                 {
-                    psz_spaces[i] = '\0';
-                }
-
-                if( p_item->i_type == CONFIG_ITEM_BOOL &&
-                    !b_help_module )
-                {
-                    fprintf( stdout, psz_format, p_item->psz_name, psz_prefix,
-                             p_item->psz_name, psz_bra, psz_type, psz_ket,
-                             psz_spaces, p_item->psz_text, psz_suf );
-                }
-                else
-                {
-                    fprintf( stdout, psz_format, p_item->psz_name, "", "",
-                             psz_bra, psz_type, psz_ket, psz_spaces,
-                             p_item->psz_text, psz_suf );
-                }
-                psz_spaces[i] = ' ';
-                if ( p_item->ppsz_list )
-                {
-                    free( psz_type );
+                    psz_word[-1] = '\0';
+                    fprintf( stdout, "%s\n%s", psz_text, psz_spaces );
+                    psz_text = psz_word;
                 }
             }
         }
@@ -1247,8 +1278,8 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
     vlc_list_release( p_list );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-        fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
-        getchar();
+    fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
+    getchar();
 #endif
 }
 
@@ -1348,3 +1379,40 @@ static void ShowConsole( void )
     return;
 }
 #endif
+
+/*****************************************************************************
+ * ConsoleWidth: Return the console width in characters
+ *****************************************************************************
+ * We use the stty shell command to get the console width; if this fails or
+ * if the width is less than 80, we default to 80.
+ *****************************************************************************/
+static int ConsoleWidth( void )
+{
+    char buf[20], *psz_parser;
+    FILE *file;
+    int i_ret, i_width = 80;
+
+    file = popen( "stty size 2>/dev/null", "r" );
+    if( file )
+    {
+        i_ret = fread( buf, 1, 20, file );
+        if( i_ret > 0 )
+        {
+            buf[19] = '\0';
+            psz_parser = strchr( buf, ' ' );
+            if( psz_parser )
+            {
+                i_ret = atoi( psz_parser + 1 );
+                if( i_ret >= 80 )
+                {
+                    i_width = i_ret;
+                }
+            }
+        }
+
+        pclose( file );
+    }
+
+    return i_width;
+}
+
