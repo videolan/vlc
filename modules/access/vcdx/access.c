@@ -1013,64 +1013,40 @@ VCDUpdateVar( input_thread_t *p_input, int i_num, int i_action,
 
 
 static inline void
-MetaInfoAddStr(input_thread_t *p_input, input_info_category_t *p_cat,
-               playlist_t *p_playlist, char *title,
-               const char *str)
+MetaInfoAddStr(input_thread_t *p_input, char *p_cat,
+               char *title, const char *str)
 {
   thread_vcd_data_t *p_vcd = (thread_vcd_data_t *) p_input->p_access_data;
-  playlist_item_t *p_item;
   if ( str ) {
     dbg_print( INPUT_DBG_META, "field: %s: %s\n", title, str);
-    input_AddInfo( p_cat, title, "%s", str );
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-    p_item = playlist_ItemGetByPos( p_playlist, -1 );
-    vlc_mutex_unlock( &p_playlist->object_lock );
-
-    vlc_mutex_lock( &p_item->lock );
-    playlist_ItemAddInfo( p_item, p_cat->psz_name, title,
-                          "%s",str );
-    vlc_mutex_unlock( &p_item->lock );
+    input_Control( p_input, INPUT_ADD_INFO, p_cat, title, "%s", str);
   }
 }
 
 
 static inline void
-MetaInfoAddNum(input_thread_t *p_input, input_info_category_t *p_cat,
-               playlist_t *p_playlist, char *title, int num)
+MetaInfoAddNum(input_thread_t *p_input, char *p_cat, char *title, int num)
 {
   thread_vcd_data_t *p_vcd = (thread_vcd_data_t *) p_input->p_access_data;
-  playlist_item_t *p_item;
-
-  vlc_mutex_lock( &p_playlist->object_lock );
-  p_item = playlist_ItemGetByPos( p_playlist, -1 );
-  vlc_mutex_unlock( &p_playlist->object_lock );
-
   dbg_print( INPUT_DBG_META, "field %s: %d\n", title, num);
-  input_AddInfo( p_cat, title, "%d", num );
-
-  vlc_mutex_lock( &p_item->lock );
-  playlist_ItemAddInfo( p_item ,  p_cat->psz_name, title, "%d",num );
-  vlc_mutex_unlock( &p_item->lock );
+  input_Control( p_input, INPUT_ADD_INFO, p_cat, title, "%d", num );
 }
 
 #define addstr(title, str) \
-  MetaInfoAddStr( p_input, p_cat, p_playlist, title, str );
+  MetaInfoAddStr( p_input, p_cat, title, str );
 
 #define addnum(title, num) \
-  MetaInfoAddNum( p_input, p_cat, p_playlist, title, num );
+  MetaInfoAddNum( p_input, p_cat, title, num );
 
 static void InformationCreate( input_thread_t *p_input  )
 {
   thread_vcd_data_t *p_vcd = (thread_vcd_data_t *) p_input->p_access_data;
   unsigned int i_nb = vcdinfo_get_num_entries(p_vcd->vcd);
   unsigned int last_entry = 0;
-  input_info_category_t *p_cat;
+  char *p_cat;
   track_t i_track;
-  playlist_t *p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
-                                                 FIND_PARENT );
 
-  p_cat = input_InfoCategory( p_input, "General" );
+  p_cat = _("General");
 
   addstr( _("VCD Format"),  vcdinfo_get_format_version_str(p_vcd->vcd) );
   addstr( _("Album"),       vcdinfo_get_album_id(p_vcd->vcd));
@@ -1096,7 +1072,7 @@ static void InformationCreate( input_thread_t *p_input  )
     unsigned int audio_type = vcdinfo_get_track_audio_type(p_vcd->vcd, 
 							   i_track);
     snprintf(psz_track, TITLE_MAX, "%s%02d", _("Track "), i_track);
-    p_cat = input_InfoCategory( p_input, psz_track );
+    p_cat = psz_track;
 
     if (p_vcd->b_svd) {
       addnum(_("Audio Channels"),  
