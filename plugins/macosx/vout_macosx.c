@@ -364,6 +364,9 @@ static int create_QTSequenceBestCodec( vout_thread_t *p_vout )
 
 static void dispose_QTSequence( vout_thread_t *p_vout )
 {
+    if (p_vout->p_sys->c_codec == 'NONE')
+    	return ;
+    	
     CDSequenceEnd( p_vout->p_sys->i_seq ) ;
     switch (p_vout->p_sys->c_codec)
     {
@@ -371,8 +374,8 @@ static void dispose_QTSequence( vout_thread_t *p_vout )
             free( (void *)p_vout->p_sys->p_yuv2 ) ;
             p_vout->p_sys->i_yuv2_size = 0 ;
             break ;
-        case 'y420': 
-            break ;
+        default:
+	    break ;            
     }
     p_vout->p_sys->c_codec = 'NONE' ;
 }

@@ -3,7 +3,7 @@
  * (hard-linked) and adds a readv call function to tha API.
  *****************************************************************************
  * Copyright (C) 2001 Billy Biggs <vektor@dumbterm.net>.
- * $Id: dvdread.c,v 1.1 2001/11/25 05:04:38 stef Exp $
+ * $Id: dvdread.c,v 1.2 2001/11/26 22:28:05 fgp Exp $
  *
  * Author: Billy Biggs <vektor@dumbterm.net>
  *         Stéphane Borel <stef@via.ecp.fr>
@@ -33,11 +33,16 @@
 #include <string.h>
 #include <unistd.h>
 #include <limits.h>
-#include <dlfcn.h>
 #include <dirent.h>
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__)
 #define SYS_BSD 1
+#endif
+
+#ifdef SYS_DARWIN
+#define off64_t off_t
+#define stat64 stat
+#define lseek64 lseek
 #endif
 
 #if defined(__sun)

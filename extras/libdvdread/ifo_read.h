@@ -20,8 +20,10 @@
 #ifndef IFO_READ_H_INCLUDED
 #define IFO_READ_H_INCLUDED
 
-#include <dvdread/ifo_types.h>
-#include <dvdread/dvd_reader.h>
+//#include <dvdread/ifo_types.h>
+//#include <dvdread/dvd_reader.h>
+#include "ifo_types.h"
+#include "dvd_reader.h"
 
 #ifdef __cplusplus
 extern "C" {
