@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: prefs.m,v 1.6 2003/01/05 16:23:57 massiot Exp $
+ * $Id: prefs.m,v 1.7 2003/01/16 23:00:47 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -186,7 +186,7 @@
 
     /* We found it, now we can start building its configuration interface */
 
-    s_panel_rc = NSMakeRect( 0, 0, 450, 450 );
+    s_panel_rc = NSMakeRect( 0, 0, 550, 450 );
     o_panel = [[NSPanel alloc] initWithContentRect: s_panel_rc
                                styleMask: NSTitledWindowMask
                                backing: NSBackingStoreBuffered

@@ -2,7 +2,7 @@
  * ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ifo.c,v 1.3 2002/11/08 10:26:52 gbazin Exp $
+ * $Id: ifo.c,v 1.4 2003/01/16 23:00:47 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -93,6 +93,8 @@ int IfoCreate( thread_dvd_data_t * p_dvd )
     {
         return -1;
     }
+    /* memset to 0 to avoid crashing on deallocation later */
+    memset( p_dvd->p_ifo, 0, sizeof(ifo_t) );
 
     /* if we are here the dvd device has already been opened */
     p_dvd->p_ifo->dvdhandle = p_dvd->dvdhandle;
@@ -841,12 +843,15 @@ void IfoDestroy( ifo_t * p_ifo )
         {
             for( j = 0 ; j < 8 ; j++ )
             {
-                free( p_ifo->vmg.parental_inf.p_parental_mask[i].ppi_mask[j] );
+                if ( p_ifo->vmg.parental_inf.p_parental_mask[i].ppi_mask[j] != NULL )
+                    free( p_ifo->vmg.parental_inf.p_parental_mask[i].ppi_mask[j] );
             }
         }
 
-        free( p_ifo->vmg.parental_inf.p_parental_mask );
-        free( p_ifo->vmg.parental_inf.p_parental_desc );
+        if ( p_ifo->vmg.parental_inf.p_parental_mask != NULL )
+            free( p_ifo->vmg.parental_inf.p_parental_mask );
+        if ( p_ifo->vmg.parental_inf.p_parental_desc != NULL )
+            free( p_ifo->vmg.parental_inf.p_parental_desc );
     }
 
     if( p_ifo->vmg.manager_inf.i_title_unit_start_sector )

@@ -213,7 +213,7 @@
 	<key>CFBundleSignature</key>
 	<string>VLC#</string>
 	<key>CFBundleVersion</key>
-	<string>0.5.0-test2</string>
+	<string>0.5.0-test3</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-01-15 23:02+0100\n"
+"POT-Creation-Date: 2003-01-16 23:15+0100\n"
 "PO-Revision-Date: 2002-28-02 23.35+0100\n"
 "Last-Translator: Sigmund Augdal <sigmunau@idi.ntnu.no>.\n"
 "Language-Team: \n"
@@ -731,12 +731,13 @@ msgstr "Grensesnitt"
 
 #. Audio options
 #: src/libvlc.h:413 modules/audio_output/file.c:108
+#: modules/gui/macosx/intf.m:249
 msgid "Audio"
 msgstr "Lyd"
 
 #. Video options
-#: src/libvlc.h:425 modules/misc/dummy/dummy.c:64
-#: modules/video_output/directx/directx.c:107
+#: src/libvlc.h:425 modules/gui/macosx/intf.m:256
+#: modules/misc/dummy/dummy.c:64 modules/video_output/directx/directx.c:107
 msgid "Video"
 msgstr "Video"
 
@@ -765,8 +766,8 @@ msgstr ""
 #: src/libvlc.h:505 modules/gui/gtk/gnome_interface.c:512
 #: modules/gui/gtk/gnome_interface.c:2083
 #: modules/gui/gtk/gnome_interface.c:2108 modules/gui/gtk/gtk_interface.c:627
-#: modules/gui/gtk/gtk_interface.c:2364 modules/gui/macosx/intf.m:190
-#: modules/gui/macosx/intf.m:228 modules/gui/win32/strings.cpp:114
+#: modules/gui/gtk/gtk_interface.c:2364 modules/gui/macosx/intf.m:196
+#: modules/gui/macosx/intf.m:265 modules/gui/win32/strings.cpp:114
 #: modules/gui/win32/strings.cpp:170
 msgid "Playlist"
 msgstr "Spilleliste"
@@ -1510,7 +1511,7 @@ msgstr "Åpne fil"
 #. * from modules/gui/win32/preferences.dfm:
 #.
 #: modules/gui/familiar/interface.c:107 modules/gui/familiar/interface.c:108
-#: modules/gui/macosx/intf.m:198 modules/gui/macosx/intf.m:206
+#: modules/gui/macosx/intf.m:204 modules/gui/macosx/intf.m:214
 #: modules/gui/macosx/prefs.m:196 modules/gui/win32/strings.cpp:201
 msgid "Preferences"
 msgstr "Innstillinger"
@@ -1526,9 +1527,7 @@ msgstr "Stopp strøm"
 
 #: modules/gui/familiar/interface.c:135 modules/gui/gtk/gnome_interface.c:471
 #: modules/gui/gtk/gnome_interface.c:845 modules/gui/gtk/gtk_interface.c:589
-#: modules/gui/gtk/gtk_interface.c:1008 modules/gui/macosx/intf.m:194
-#: modules/gui/macosx/intf.m:233 modules/gui/macosx/intf.m:261
-#: modules/gui/macosx/controls.m:410 modules/gui/win32/strings.cpp:100
+#: modules/gui/gtk/gtk_interface.c:1008 modules/gui/win32/strings.cpp:100
 msgid "Pause"
 msgstr "Pause"
 
@@ -1537,11 +1536,9 @@ msgstr "Pause"
 msgid "Pause stream"
 msgstr "Pause strøm"
 
-#. dock menu
 #: modules/gui/familiar/interface.c:148 modules/gui/gtk/gnome_interface.c:459
 #: modules/gui/gtk/gnome_interface.c:838 modules/gui/gtk/gtk_interface.c:578
-#: modules/gui/macosx/intf.m:193 modules/gui/macosx/intf.m:232
-#: modules/gui/macosx/intf.m:260 modules/gui/macosx/playlist.m:67
+#: modules/gui/macosx/intf.m:199 modules/gui/macosx/playlist.m:67
 #: modules/gui/win32/strings.cpp:98 modules/gui/win32/strings.cpp:194
 msgid "Play"
 msgstr "Spill"
@@ -1553,9 +1550,9 @@ msgstr "Spill strøm"
 
 #: modules/gui/familiar/interface.c:161 modules/gui/gtk/gnome_interface.c:435
 #: modules/gui/gtk/gnome_interface.c:852 modules/gui/gtk/gtk_interface.c:556
-#: modules/gui/gtk/gtk_interface.c:1016 modules/gui/macosx/intf.m:195
-#: modules/gui/macosx/intf.m:234 modules/gui/macosx/intf.m:262
-#: modules/gui/macosx/controls.m:427 modules/gui/win32/strings.cpp:102
+#: modules/gui/gtk/gtk_interface.c:1016 modules/gui/macosx/intf.m:200
+#: modules/gui/macosx/intf.m:237 modules/gui/macosx/intf.m:272
+#: modules/gui/macosx/controls.m:528 modules/gui/win32/strings.cpp:102
 msgid "Stop"
 msgstr "Stopp"
 
@@ -1753,7 +1750,9 @@ msgstr "_Åpne fil..."
 #: modules/gui/gtk/gnome_interface.c:20 modules/gui/gtk/gnome_interface.c:373
 #: modules/gui/gtk/gnome_interface.c:811 modules/gui/gtk/gtk_interface.c:162
 #: modules/gui/gtk/gtk_interface.c:499 modules/gui/gtk/gtk_interface.c:1182
-msgid "Open a File"
+#: modules/gui/win32/strings.cpp:92
+#, fuzzy
+msgid "Open a file"
 msgstr "Åpne en fil"
 
 #: modules/gui/gtk/gnome_interface.c:26 modules/gui/gtk/gnome_interface.c:817
@@ -1896,7 +1895,7 @@ msgstr "VideoLAN Client"
 #: modules/gui/gtk/gnome_interface.c:1327
 #: modules/gui/gtk/gnome_interface.c:1973 modules/gui/gtk/gtk_interface.c:498
 #: modules/gui/gtk/gtk_interface.c:1615 modules/gui/gtk/gtk_interface.c:2400
-#: modules/gui/gtk/gtk_interface.c:2517 modules/gui/macosx/intf.m:212
+#: modules/gui/gtk/gtk_interface.c:2517 modules/gui/macosx/intf.m:220
 #: modules/gui/macosx/open.m:176 modules/gui/macosx/open.m:212
 #: modules/gui/macosx/open.m:316 modules/gui/macosx/open.m:727
 #: modules/gui/macosx/open.m:759 modules/gui/win32/strings.cpp:91
@@ -1997,8 +1996,8 @@ msgstr "Forrige fil"
 #: modules/gui/gtk/gnome_interface.c:536 modules/gui/gtk/gnome_interface.c:896
 #: modules/gui/gtk/gtk_interface.c:649 modules/gui/gtk/gtk_interface.c:732
 #: modules/gui/gtk/gtk_interface.c:776 modules/gui/gtk/gtk_interface.c:1085
-#: modules/gui/macosx/intf.m:197 modules/gui/macosx/intf.m:238
-#: modules/gui/macosx/controls.m:432 modules/gui/win32/strings.cpp:112
+#: modules/gui/macosx/intf.m:203 modules/gui/macosx/intf.m:241
+#: modules/gui/macosx/controls.m:533 modules/gui/win32/strings.cpp:112
 #: modules/gui/win32/strings.cpp:128 modules/gui/win32/strings.cpp:132
 msgid "Next"
 msgstr "Neste"
@@ -2062,7 +2061,7 @@ msgid "Got directly so specified point"
 msgstr "Fikk direkte så spesifisert punkt"
 
 #: modules/gui/gtk/gnome_interface.c:917 modules/gui/gtk/gtk_interface.c:1110
-#: modules/gui/kde/interface.cpp:143 modules/gui/macosx/intf.m:248
+#: modules/gui/kde/interface.cpp:143 modules/gui/macosx/intf.m:243
 #: modules/gui/win32/strings.cpp:83
 #, fuzzy
 msgid "Program"
@@ -2130,14 +2129,14 @@ msgstr "Utforsk"
 
 #: modules/gui/gtk/gnome_interface.c:1344 modules/gui/gtk/gtk_interface.c:1632
 #: modules/gui/gtk/menu.c:905 modules/gui/gtk/menu.c:926
-#: modules/gui/kde/interface.cpp:145 modules/gui/macosx/intf.m:249
+#: modules/gui/kde/interface.cpp:145 modules/gui/macosx/intf.m:244
 #: modules/gui/macosx/open.m:184
 msgid "Title"
 msgstr "Tittel"
 
 #: modules/gui/gtk/gnome_interface.c:1354 modules/gui/gtk/gtk_interface.c:1642
 #: modules/gui/gtk/menu.c:800 modules/gui/gtk/menu.c:935
-#: modules/gui/kde/interface.cpp:147 modules/gui/macosx/intf.m:250
+#: modules/gui/kde/interface.cpp:147 modules/gui/macosx/intf.m:245
 #: modules/gui/macosx/open.m:185
 msgid "Chapter"
 msgstr "Kapittel"
@@ -2257,9 +2256,7 @@ msgstr "Moduler"
 msgid ""
 "Sorry, the module manager isn't functional yet. Please retry in a later "
 "version."
-msgstr ""
-"Beklager, modul håndtereren virker ikke ennå. Vennligst prøv på nytt i en "
-"senere versjon."
+msgstr "Beklager, modul håndtereren virker ikke ennå. Vennligst prøv på nytt i en senere versjon."
 
 #: modules/gui/gtk/gnome_interface.c:1987
 #: modules/gui/gtk/gnome_interface.c:2128 modules/gui/gtk/gtk_interface.c:2414
@@ -2325,8 +2322,8 @@ msgstr "h:"
 
 #. messages panel
 #: modules/gui/gtk/gnome_interface.c:2391 modules/gui/gtk/gtk_interface.c:2614
-#: modules/gui/kde/messages.cpp:8 modules/gui/macosx/intf.m:201
-#: modules/gui/macosx/intf.m:229 modules/gui/win32/strings.cpp:145
+#: modules/gui/kde/messages.cpp:8 modules/gui/macosx/intf.m:209
+#: modules/gui/macosx/intf.m:266 modules/gui/win32/strings.cpp:145
 msgid "Messages"
 msgstr "Beskjeder"
 
@@ -2504,7 +2501,7 @@ msgstr "Valgte"
 msgid "Languages"
 msgstr ""
 
-#: modules/gui/kde/interface.cpp:94 modules/gui/macosx/intf.m:252
+#: modules/gui/kde/interface.cpp:94 modules/gui/macosx/intf.m:247
 #: modules/gui/win32/strings.cpp:85
 #, fuzzy
 msgid "Subtitles"
@@ -2532,200 +2529,221 @@ msgstr "Standard grensesnitt: "
 msgid "Messages:"
 msgstr "Beskjeder"
 
-#: modules/gui/macosx/intf.m:191 modules/gui/macosx/intf.m:237
-#: modules/gui/macosx/controls.m:431
+#: modules/gui/macosx/intf.m:191
+msgid "VLC - Controller"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:197 modules/gui/macosx/intf.m:240
+#: modules/gui/macosx/controls.m:532
 #, fuzzy
 msgid "Previous"
 msgstr "Forrige fil"
 
-#: modules/gui/macosx/intf.m:192 modules/gui/macosx/intf.m:236
-#: modules/gui/macosx/controls.m:412
+#: modules/gui/macosx/intf.m:198 modules/gui/macosx/intf.m:239
+#: modules/gui/macosx/controls.m:513
 #, fuzzy
 msgid "Slower"
 msgstr "Sakte"
 
-#: modules/gui/macosx/intf.m:196 modules/gui/macosx/intf.m:235
-#: modules/gui/macosx/controls.m:411
-#, fuzzy
-msgid "Faster"
-msgstr "Fort"
+#: modules/gui/macosx/intf.m:201
+msgid "Fast Forward"
+msgstr ""
 
-#: modules/gui/macosx/intf.m:202
+#: modules/gui/macosx/intf.m:205
+msgid "Volume"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:206
+#, fuzzy
+msgid "Position"
+msgstr "_Navigasjon"
+
+#: modules/gui/macosx/intf.m:210
 msgid "Close"
 msgstr ""
 
 #. main menu
-#: modules/gui/macosx/intf.m:205
+#: modules/gui/macosx/intf.m:213
 msgid "About VLC Media Player"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:207
+#: modules/gui/macosx/intf.m:215
 msgid "Hide VLC"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:208
+#: modules/gui/macosx/intf.m:216
 #, fuzzy
 msgid "Hide Others"
 msgstr "_Gjem grensesnitt"
 
-#: modules/gui/macosx/intf.m:209
+#: modules/gui/macosx/intf.m:217
 msgid "Show All"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:210
+#: modules/gui/macosx/intf.m:218
 #, fuzzy
 msgid "Quit VLC"
 msgstr "Om"
 
-#: modules/gui/macosx/intf.m:213
+#: modules/gui/macosx/intf.m:221
 #, fuzzy
 msgid "Open..."
 msgstr "Åpne fil"
 
-#: modules/gui/macosx/intf.m:214 modules/gui/win32/strings.cpp:88
+#: modules/gui/macosx/intf.m:222 modules/gui/win32/strings.cpp:88
 #, fuzzy
 msgid "Open File..."
 msgstr "_Åpne fil..."
 
-#: modules/gui/macosx/intf.m:215 modules/gui/win32/strings.cpp:89
+#: modules/gui/macosx/intf.m:223 modules/gui/win32/strings.cpp:89
 #, fuzzy
 msgid "Open Disc..."
 msgstr "Åpne en _disk"
 
-#: modules/gui/macosx/intf.m:216
+#: modules/gui/macosx/intf.m:224
 #, fuzzy
 msgid "Open Network..."
 msgstr "Åpne nettverk"
 
-#: modules/gui/macosx/intf.m:217
+#: modules/gui/macosx/intf.m:225
 #, fuzzy
 msgid "Open Recent"
 msgstr "Stopp strøm"
 
 #. Recent Items Menu
-#: modules/gui/macosx/intf.m:218 modules/gui/macosx/intf.m:1111
+#: modules/gui/macosx/intf.m:226 modules/gui/macosx/intf.m:1141
 msgid "Clear Menu"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:220
+#: modules/gui/macosx/intf.m:228
 #, fuzzy
 msgid "Edit"
 msgstr "_Avslutt"
 
-#: modules/gui/macosx/intf.m:221
+#: modules/gui/macosx/intf.m:229
 msgid "Cut"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:222
+#: modules/gui/macosx/intf.m:230
 #, fuzzy
 msgid "Copy"
 msgstr "Crop?"
 
-#: modules/gui/macosx/intf.m:223
+#: modules/gui/macosx/intf.m:231
 #, fuzzy
 msgid "Paste"
 msgstr "Pause"
 
-#: modules/gui/macosx/intf.m:224
+#: modules/gui/macosx/intf.m:232
 msgid "Clear"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:225 modules/gui/macosx/playlist.m:69
+#: modules/gui/macosx/intf.m:233 modules/gui/macosx/playlist.m:69
 #, fuzzy
 msgid "Select All"
 msgstr "Velg fil"
 
-#: modules/gui/macosx/intf.m:227
-#, fuzzy
-msgid "View"
-msgstr "_Vis"
-
-#: modules/gui/macosx/intf.m:231 modules/gui/win32/strings.cpp:76
+#: modules/gui/macosx/intf.m:235 modules/gui/win32/strings.cpp:76
 msgid "Controls"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:239
+#. dock menu
+#: modules/gui/macosx/intf.m:236 modules/gui/macosx/intf.m:271
+#, fuzzy
+msgid "Play/Pause"
+msgstr "Pause"
+
+#: modules/gui/macosx/intf.m:238 modules/gui/macosx/controls.m:512
+#, fuzzy
+msgid "Faster"
+msgstr "Fort"
+
+#: modules/gui/macosx/intf.m:242
 msgid "Loop"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:240 modules/gui/macosx/controls.m:449
+#: modules/gui/macosx/intf.m:246 modules/gui/win32/strings.cpp:84
+msgid "Language"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:250
 msgid "Volume Up"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:241 modules/gui/macosx/controls.m:450
+#: modules/gui/macosx/intf.m:251
 msgid "Volume Down"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:242 modules/gui/macosx/controls.m:451
+#: modules/gui/macosx/intf.m:252
 msgid "Mute"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:243 modules/gui/win32/strings.cpp:80
+#: modules/gui/macosx/intf.m:253 modules/gui/win32/strings.cpp:80
 msgid "Channels"
 msgstr "Kanaler"
 
-#: modules/gui/macosx/intf.m:244 modules/gui/win32/strings.cpp:79
+#: modules/gui/macosx/intf.m:254 modules/gui/win32/strings.cpp:79
 #, fuzzy
 msgid "Device"
 msgstr "Navn på enhet"
 
-#: modules/gui/macosx/intf.m:245 modules/gui/macosx/controls.m:465
+#: modules/gui/macosx/intf.m:257 modules/gui/macosx/controls.m:550
 #, fuzzy
 msgid "Fullscreen"
 msgstr "_Fullskjerm"
 
-#: modules/gui/macosx/intf.m:246 modules/gui/win32/strings.cpp:81
+#: modules/gui/macosx/intf.m:258 modules/gui/win32/strings.cpp:81
 #, fuzzy
 msgid "Screen"
 msgstr "_Fullskjerm"
 
-#: modules/gui/macosx/intf.m:247 modules/gui/macosx/controls.m:480
+#: modules/gui/macosx/intf.m:259 modules/gui/macosx/controls.m:565
 #, fuzzy
 msgid "Deinterlace"
 msgstr "Standard grensesnitt: "
 
-#: modules/gui/macosx/intf.m:251 modules/gui/win32/strings.cpp:84
-msgid "Language"
-msgstr ""
-
-#: modules/gui/macosx/intf.m:254
+#: modules/gui/macosx/intf.m:261
 msgid "Window"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:255
+#: modules/gui/macosx/intf.m:262
 msgid "Minimize Window"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:256
+#: modules/gui/macosx/intf.m:263
 #, fuzzy
 msgid "Close Window"
 msgstr "Åpne spilleliste-vinduet"
 
-#: modules/gui/macosx/intf.m:257
+#: modules/gui/macosx/intf.m:264
+msgid "Controller"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:268
 msgid "Bring All to Front"
 msgstr ""
 
 #. error panel
-#: modules/gui/macosx/intf.m:265
+#: modules/gui/macosx/intf.m:275
 msgid "Error"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:266
+#: modules/gui/macosx/intf.m:276
 msgid ""
 "An error has occurred which probably prevented the execution of your "
 "request :"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:267
+#: modules/gui/macosx/intf.m:277
 msgid "If you believe that it is a bug, please follow the instructions at :"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:268
+#: modules/gui/macosx/intf.m:278
 #, fuzzy
 msgid "Open Messages Window"
 msgstr "Åpne spilleliste-vinduet"
 
-#: modules/gui/macosx/intf.m:269
+#: modules/gui/macosx/intf.m:279
 msgid "Dismiss"
 msgstr ""
 
@@ -3020,11 +3038,6 @@ msgstr "Stopp strøm"
 #, fuzzy
 msgid "Network Stream..."
 msgstr "_Nettverksstrøm"
-
-#: modules/gui/win32/strings.cpp:92
-#, fuzzy
-msgid "Open a file"
-msgstr "Åpne en fil"
 
 #: modules/gui/win32/strings.cpp:107
 #, fuzzy
@@ -3711,6 +3724,13 @@ msgstr "Standard grensesnitt: "
 #, fuzzy
 msgid "xosd interface module"
 msgstr "Standard grensesnitt: "
+
+#~ msgid "Open a File"
+#~ msgstr "Åpne en fil"
+
+#, fuzzy
+#~ msgid "View"
+#~ msgstr "_Vis"
 
 #, fuzzy
 #~ msgid "Open a network stream"
