@@ -3,7 +3,7 @@
  *               using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 Rocky Bernstein <rocky@panix.com>
- * $Id: vcdplayer.c,v 1.9 2003/12/13 12:56:14 rocky Exp $
+ * $Id: vcdplayer.c,v 1.10 2003/12/20 15:25:32 rocky Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,7 +86,6 @@ vcdplayer_non_pbc_nav ( input_thread_t * p_input )
   switch (p_vcd->play_item.type) {
   case VCDINFO_ITEM_TYPE_TRACK:
   case VCDINFO_ITEM_TYPE_ENTRY: {
-    input_area_t *p_area;
 
     dbg_print( INPUT_DBG_LSN, "new track %d, lsn %d", p_vcd->cur_track, 
                p_vcd->p_sectors[p_vcd->cur_track+1] );
