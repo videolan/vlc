@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.21 2001/04/15 15:32:48 stef Exp $
+ * $Id: dvd_ifo.c,v 1.22 2001/04/15 21:17:50 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -78,9 +78,9 @@ static __inline__ u8 ReadByte( ifo_t * p_ifo, u8* pi_buffer, u8** pp_current )
 {
     u8      i_ret;
 
-    if( *pp_current >= pi_buffer + DVD_LB_SIZE )
+    if( *pp_current > pi_buffer + DVD_LB_SIZE )
     {
-        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos );
+        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos + DVD_LB_SIZE );
     }
 
     i_ret = *(*pp_current)++;
@@ -92,9 +92,9 @@ static __inline__ u16 ReadWord( ifo_t* p_ifo, u8* pi_buffer, u8** pp_current )
 {
     u16     i_ret;
 
-    if( *pp_current >= pi_buffer + DVD_LB_SIZE - 2 )
+    if( *pp_current > pi_buffer + DVD_LB_SIZE - 2 )
     {
-        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos );
+        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos + DVD_LB_SIZE );
     }
 
     i_ret = U16_AT(*pp_current);
@@ -108,9 +108,10 @@ static __inline__ u32 ReadDouble( ifo_t * p_ifo, u8* pi_buffer,
 {
     u32     i_ret;
 
-    if( *pp_current >= pi_buffer + DVD_LB_SIZE - 4 )
+    if( *pp_current > pi_buffer + DVD_LB_SIZE - 4 )
     {
-        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos );
+        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos + DVD_LB_SIZE);
+//	intf_WarnMsg( 1, "new buffer in double @ %lld", p_ifo->i_pos );
     }
 
     i_ret = U32_AT(*pp_current);
@@ -123,9 +124,9 @@ static __inline__ u64 ReadQuad( ifo_t* p_ifo, u8* pi_buffer, u8** pp_current )
 {
     u64     i_ret;
 
-    if( *pp_current >= pi_buffer + DVD_LB_SIZE - 8 )
+    if( *pp_current > pi_buffer + DVD_LB_SIZE - 8 )
     {
-        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos );
+        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos + DVD_LB_SIZE );
     }
 
     i_ret = U64_AT(*pp_current);
@@ -137,9 +138,9 @@ static __inline__ u64 ReadQuad( ifo_t* p_ifo, u8* pi_buffer, u8** pp_current )
 static __inline__ void ReadBits( ifo_t* p_ifo, u8* pi_buffer, u8** pp_current,
                                   u8* pi_dest, int i_nb )
 {
-    if( *pp_current >= pi_buffer + DVD_LB_SIZE - i_nb )
+    if( *pp_current > pi_buffer + DVD_LB_SIZE - i_nb )
     {
-        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos );
+        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos + DVD_LB_SIZE );
     }
 
     memcpy( pi_dest, *pp_current, i_nb );
@@ -151,9 +152,9 @@ static __inline__ void ReadBits( ifo_t* p_ifo, u8* pi_buffer, u8** pp_current,
 static __inline__ void DumpBits( ifo_t* p_ifo, u8* pi_buffer,
                                  u8** pp_current, int i_nb )
 {
-    if( *pp_current >= pi_buffer + DVD_LB_SIZE - i_nb )
+    if( *pp_current > pi_buffer + DVD_LB_SIZE - i_nb )
     {
-        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos );
+        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos + DVD_LB_SIZE );
     }
 
     *pp_current += i_nb;
@@ -1320,7 +1321,7 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, off_t i_pos )
     DumpBits( p_ifo, pi_buffer, &p_current, 2 );
     p_cell_inf->i_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
 
-    p_cell_inf->i_cell_nb = (p_cell_inf->i_end_byte - 8) / sizeof(cell_map_t);
+    p_cell_inf->i_cell_nb = (p_cell_inf->i_end_byte/* - 7*/) / sizeof(cell_map_t);
 
 //fprintf( stderr, "Cell inf: vob %d end %d cell %d\n", p_cell_inf->i_vob_nb, p_cell_inf->i_end_byte,  p_cell_inf->i_cell_nb );
 
@@ -1338,6 +1339,7 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, off_t i_pos )
         p_cell_inf->p_cell_map[i].i_cell_id = ReadByte( p_ifo, pi_buffer, &p_current );
         DumpBits( p_ifo, pi_buffer, &p_current, 1 );
         p_cell_inf->p_cell_map[i].i_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+//	fprintf(stderr, "sector[%d] %d (%lld)\n", i,ntohl(*(u32*)(p_current)), p_ifo->i_pos);
         p_cell_inf->p_cell_map[i].i_end_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
     }
     

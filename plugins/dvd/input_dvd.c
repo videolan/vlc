@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.46 2001/04/15 04:19:57 sam Exp $
+ * $Id: input_dvd.c,v 1.47 2001/04/15 21:17:50 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -350,35 +350,34 @@ static int DVDFindCell( thread_dvd_data_t * p_dvd )
 #define title \
         p_dvd->p_ifo->vts.title_unit.p_title[p_dvd->i_program_chain-1].title
 #define cell  p_dvd->p_ifo->vts.cell_inf
-
+		
     i_cell = p_dvd->i_cell;
     i_index = p_dvd->i_prg_cell;
+
+    if( i_cell >= cell.i_cell_nb )
+    {
+        return -1;
+    }
+
 
     while( ( ( title.p_cell_pos[i_index].i_vob_id !=
                    cell.p_cell_map[i_cell].i_vob_id ) ||
       ( title.p_cell_pos[i_index].i_cell_id !=
                    cell.p_cell_map[i_cell].i_cell_id ) ) &&
-           ( i_cell < cell.i_cell_nb ) )
+           ( i_cell < cell.i_cell_nb - 1 ) )
     {
         i_cell++;
     }
-/*
+
 intf_WarnMsg( 1, "FindCell: i_cell %d i_index %d found %d nb %d",
                     p_dvd->i_cell,
                     p_dvd->i_prg_cell,
                     i_cell,
                     cell.i_cell_nb );
-*/
-    if( i_cell == cell.i_cell_nb )
-    {
-        intf_ErrMsg( "dvd error: can't find cell" );
-        return -1;
-    }
-    else
-    {
-        p_dvd->i_cell = i_cell;
-        return 0;
-    }
+
+    p_dvd->i_cell = i_cell;
+    return 0;
+    
 #undef title
 #undef cell
 }
@@ -411,15 +410,15 @@ static int DVDFindSector( thread_dvd_data_t * p_dvd )
          p_dvd->p_ifo->vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector,
          title.p_cell_play[p_dvd->i_prg_cell].i_end_sector );
 
-/*    intf_WarnMsg( 1, "cell: %d sector1: 0x%x end1: 0x%x\n"
-                     "index: %d sector2: 0x%x end2: 0x%x", 
+    intf_WarnMsg( 1, "cell: %d sector1: 0x%x end1: 0x%x\n"
+                   "index: %d sector2: 0x%x end2: 0x%x", 
         p_dvd->i_cell,
         p_dvd->p_ifo->vts.cell_inf.p_cell_map[p_dvd->i_cell].i_start_sector,
         p_dvd->p_ifo->vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector,
         p_dvd->i_prg_cell,
         title.p_cell_play[p_dvd->i_prg_cell].i_start_sector,
         title.p_cell_play[p_dvd->i_prg_cell].i_end_sector );
-*/
+
 #undef title
 
     return 0;
@@ -427,7 +426,6 @@ static int DVDFindSector( thread_dvd_data_t * p_dvd )
 
 /*****************************************************************************
  * DVDChapterSelect: find the cell corresponding to requested chapter
- * When called to find chapter 1, also sets title size and end.
  *****************************************************************************/
 static int DVDChapterSelect( thread_dvd_data_t * p_dvd, int i_chapter )
 {
@@ -448,7 +446,7 @@ static int DVDChapterSelect( thread_dvd_data_t * p_dvd, int i_chapter )
 
     /* start is : beginning of vts vobs + offset to vob x */
     p_dvd->i_start = p_dvd->i_title_start +
-                     DVD_LB_SIZE * (off_t)( p_dvd->i_sector );
+	             DVD_LB_SIZE * (off_t)( p_dvd->i_sector );
 
     /* Position the fd pointer on the right address */
     p_dvd->i_start = lseek( p_dvd->i_fd, p_dvd->i_start, SEEK_SET );
@@ -574,11 +572,13 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         {
             p_dvd->i_cell = vts.cell_inf.i_cell_nb - 1;
         }
-
+	
+			
         p_dvd->i_sector = 0;
         p_dvd->i_size = DVD_LB_SIZE *
           (off_t)( vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector );
-
+        intf_WarnMsg( 2, "dvd info: stream size 1: %lld @ %d", p_dvd->i_size,vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector );
+	
         if( DVDChapterSelect( p_dvd, 1 ) < 0 )
         {
             intf_ErrMsg( "dvd error: can't find first chapter" );
@@ -1217,6 +1217,7 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     /* Find first title cell which is inside program cell */
     if( DVDFindCell( p_dvd ) < 0 )
     {
+	/* no following cell : we're at eof */
         intf_ErrMsg( "dvd error: cell seeking failed" );
         p_input->b_error = 1;
         return;
