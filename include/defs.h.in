@@ -259,6 +259,9 @@
 /* Define if you have the <pthread.h> header file.  */
 #undef HAVE_PTHREAD_H
 
+/* Define if you have the <soundcard.h> header file.  */
+#undef HAVE_SOUNDCARD_H
+
 /* Define if you have the <stddef.h> header file.  */
 #undef HAVE_STDDEF_H
 

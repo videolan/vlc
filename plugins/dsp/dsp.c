@@ -2,7 +2,7 @@
  * dsp.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dsp.c,v 1.13 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: dsp.c,v 1.14 2002/02/27 18:19:21 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -38,11 +38,9 @@ void _M( aout_getfunctions )( function_list_t * p_function_list );
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
-#define DSP_DEV_VAR                    "dsp_dev"
-
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( "Misc Options", NULL )
-ADD_FILE  ( DSP_DEV_VAR, "/dev/dsp", NULL,"OSS dsp device",NULL )
+ADD_FILE  ( "dsp_dev", "/dev/dsp", NULL,"OSS dsp device",NULL )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_dsp.c,v 1.24 2002/02/24 22:12:10 sam Exp $
+ * $Id: aout_dsp.c,v 1.25 2002/02/27 18:19:21 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -43,17 +43,18 @@
 
 #include <videolan/vlc.h>
 
-#ifdef SYS_BSD
-#include <machine/soundcard.h>       /* SNDCTL_DSP_RESET, SNDCTL_DSP_SETFMT,
-                   SNDCTL_DSP_STEREO, SNDCTL_DSP_SPEED, SNDCTL_DSP_GETOSPACE */
-#else
-#include <sys/soundcard.h>           /* SNDCTL_DSP_RESET, SNDCTL_DSP_SETFMT,
-                   SNDCTL_DSP_STEREO, SNDCTL_DSP_SPEED, SNDCTL_DSP_GETOSPACE */
+/* SNDCTL_DSP_RESET, SNDCTL_DSP_SETFMT, SNDCTL_DSP_STEREO, SNDCTL_DSP_SPEED,
+ * SNDCTL_DSP_GETOSPACE */
+#ifdef HAVE_SOUNDCARD_H
+#   include <soundcard.h>
+#elif defined( HAVE_SYS_SOUNDCARD_H )
+#   include <sys/soundcard.h>
+#elif defined( HAVE_MACHINE_SOUNDCARD_H )
+#   include <machine/soundcard.h>
 #endif
 
 #include "audio_output.h"                                   /* aout_thread_t */
 
-#define DSP_DEV_VAR "dsp_dev"
 /*****************************************************************************
  * aout_sys_t: dsp audio output method descriptor
  *****************************************************************************
@@ -110,7 +111,7 @@ static int aout_Open( aout_thread_t *p_aout )
     }
 
     /* Initialize some variables */
-    if( !(p_aout->p_sys->psz_device = config_GetPszVariable( DSP_DEV_VAR )) )
+    if( !(p_aout->p_sys->psz_device = config_GetPszVariable( "dsp_dev" )) )
     {
         intf_ErrMsg( "aout error: don't know which audio device to open" );
         free( p_aout->p_sys );

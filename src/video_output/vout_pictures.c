@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.17 2002/02/27 03:47:56 sam Exp $
+ * $Id: vout_pictures.c,v 1.18 2002/02/27 18:19:21 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -192,9 +192,6 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
 
         vlc_mutex_unlock( &p_vout->picture_lock );
 
-        /* Initialize mutex */
-        vlc_mutex_init( &(p_freepic->lock_deccount) );
-
         return( p_freepic );
     }
 
@@ -229,9 +226,6 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     p_pic->i_status = DESTROYED_PICTURE;
     p_vout->i_heap_size--;
-
-    /* destroy the lock that had been initialized in CreatePicture */
-    vlc_mutex_destroy( &(p_pic->lock_deccount) );
 
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
