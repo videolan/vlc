@@ -2,7 +2,7 @@
  * info.c : Playlist info management
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: info.c,v 1.9 2004/02/08 18:17:22 gbazin Exp $
+ * $Id: info.c,v 1.10 2004/02/28 17:10:23 gbazin Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -322,42 +322,6 @@ int playlist_ItemAddInfo( playlist_item_t *p_item,
                      p_cat->i_infos,
                      p_info );
     }
-
-    return VLC_SUCCESS;
-}
-
-/**
- * Add a special info : option
- *
- * \param p_playlist the playlist
- * \param i_item the position of the item on which we
- *               add the option ( -1 for current )
- * \param psz_value the option to add
- * \return the info category.
- */
-int playlist_AddOption( playlist_t *p_playlist, int i_pos,
-                        const char *psz_option)
-{
-    playlist_item_t *p_item;
-
-    /* Check the existence of the playlist */
-    if( p_playlist == NULL)
-    {
-        return VLC_EGENERIC;
-    }
-
-    p_item = playlist_ItemGetByPos( p_playlist , i_pos );
-    if( !p_item )
-    {
-            return VLC_ENOOBJ;
-    }
-
-    vlc_mutex_lock( &p_item->lock );
-    INSERT_ELEM( p_item->ppsz_options,
-                 p_item->i_options,
-                 p_item->i_options,
-                 (char *)psz_option );
-    vlc_mutex_unlock( &p_item->lock );
 
     return VLC_SUCCESS;
 }

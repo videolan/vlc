@@ -2,7 +2,7 @@
  * item-ext.c : Playlist item management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: item-ext.c,v 1.13 2004/01/29 17:51:08 zorglub Exp $
+ * $Id: item-ext.c,v 1.14 2004/02/28 17:10:23 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -446,8 +446,6 @@ int playlist_SetDuration( playlist_t *p_playlist, int i_pos, mtime_t i_duration 
 int playlist_Delete( playlist_t * p_playlist, int i_pos )
 {
     vlc_value_t     val;
-    int i,j;
-    int i_delay=0;
 
     /* if i_pos is the current played item, playlist should stop playing it */
     if( ( p_playlist->i_status == PLAYLIST_RUNNING) &&
@@ -461,9 +459,11 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
     {
         playlist_item_t *p_item = p_playlist->pp_items[i_pos];
 
-        msg_Dbg( p_playlist, "deleting playlist item « %s »",
+        msg_Dbg( p_playlist, "deleting playlist item `%s'",
                  p_item->psz_name );
 #if 0
+        int i,j;
+
         vlc_mutex_lock( &p_item->lock );
 
         if( p_item->psz_name )
@@ -577,7 +577,7 @@ int playlist_Disable( playlist_t * p_playlist, int i_pos )
 
     if( i_pos >= 0 && i_pos < p_playlist->i_size )
     {
-        msg_Dbg( p_playlist, "disabling playlist item « %s »",
+        msg_Dbg( p_playlist, "disabling playlist item `%s'",
                              p_playlist->pp_items[i_pos]->psz_name );
 
         if( p_playlist->pp_items[i_pos]->b_enabled == VLC_TRUE )
@@ -607,7 +607,7 @@ int playlist_Enable( playlist_t * p_playlist, int i_pos )
 
     if( i_pos >= 0 && i_pos < p_playlist->i_size )
     {
-        msg_Dbg( p_playlist, "enabling playlist item « %s »",
+        msg_Dbg( p_playlist, "enabling playlist item `%s'",
                              p_playlist->pp_items[i_pos]->psz_name );
 
         if( p_playlist->pp_items[i_pos]->b_enabled == VLC_FALSE )
@@ -642,7 +642,7 @@ int playlist_DisableGroup( playlist_t * p_playlist, int i_group)
     {
         if( p_playlist->pp_items[i]->i_group == i_group )
         {
-            msg_Dbg( p_playlist, "disabling playlist item « %s »",
+            msg_Dbg( p_playlist, "disabling playlist item `%s'",
                            p_playlist->pp_items[i]->psz_name );
 
             if( p_playlist->pp_items[i]->b_enabled == VLC_TRUE )
@@ -675,7 +675,7 @@ int playlist_EnableGroup( playlist_t * p_playlist, int i_group)
     {
         if( p_playlist->pp_items[i]->i_group == i_group )
         {
-            msg_Dbg( p_playlist, "enabling playlist item « %s »",
+            msg_Dbg( p_playlist, "enabling playlist item `%s'",
                            p_playlist->pp_items[i]->psz_name );
 
             if( p_playlist->pp_items[i]->b_enabled == VLC_FALSE )
@@ -715,7 +715,7 @@ int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
     {
         playlist_item_t * temp;
 
-        msg_Dbg( p_playlist, "moving playlist item « %s » (%i -> %i)",
+        msg_Dbg( p_playlist, "moving playlist item `%s' (%i -> %i)",
                              p_playlist->pp_items[i_pos]->psz_name, i_pos,
                              i_newpos );
 
@@ -758,6 +758,40 @@ int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
 
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-change", val );
+
+    return VLC_SUCCESS;
+}
+
+/**
+ * Add a special info : option
+ *
+ * \param p_playlist the playlist
+ * \param i_item the position of the item on which we
+ *               add the option ( -1 for current )
+ * \param psz_value the option to add
+ * \return the info category.
+ */
+int playlist_AddOption( playlist_t *p_playlist, int i_pos,
+                        const char *psz_option )
+{
+    playlist_item_t *p_item;
+
+    /* Check the existence of the playlist */
+    if( p_playlist == NULL)
+    {
+        return VLC_EGENERIC;
+    }
+
+    p_item = playlist_ItemGetByPos( p_playlist , i_pos );
+    if( !p_item )
+    {
+            return VLC_ENOOBJ;
+    }
+
+    vlc_mutex_lock( &p_item->lock );
+    INSERT_ELEM( p_item->ppsz_options, p_item->i_options, p_item->i_options,
+                 strdup( psz_option ) );
+    vlc_mutex_unlock( &p_item->lock );
 
     return VLC_SUCCESS;
 }

@@ -2,7 +2,7 @@
  * item.c : Playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: item.c,v 1.14 2004/02/08 18:17:22 gbazin Exp $
+ * $Id: item.c,v 1.15 2004/02/28 17:10:23 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -86,7 +86,8 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
     }
 
 
-    msg_Dbg( p_playlist, "adding playlist item « %s » ( %s )", p_item->psz_name, p_item->psz_uri);
+    msg_Dbg( p_playlist, "adding playlist item `%s' ( %s )",
+             p_item->psz_name, p_item->psz_uri );
 
 
     p_item->i_id = ++p_playlist->i_last_id;
