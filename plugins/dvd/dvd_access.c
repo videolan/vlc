@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.7 2002/03/15 00:57:16 stef Exp $
+ * $Id: dvd_access.c,v 1.8 2002/03/15 04:41:54 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -662,7 +662,7 @@ static char * DVDParse( input_thread_t * p_input )
     }
     else
     {
-        psz_raw = NULL;
+        psz_raw = "";
     }
 
     if( *psz_parser && !strtol( psz_parser, NULL, 10 ) )
@@ -695,7 +695,7 @@ static char * DVDParse( input_thread_t * p_input )
                 {
                     /* we have only a partial list of options, no device */
                     psz_parser = psz_raw;
-                    psz_raw = NULL;
+                    psz_raw = "";
                     b_options = 1;
                     break;
                 }
@@ -706,7 +706,7 @@ static char * DVDParse( input_thread_t * p_input )
     else
     {
         /* found beginning of options ; no raw device specified */
-        psz_raw = NULL;
+        psz_raw = "";
         b_options = 1;
     }
 
@@ -729,7 +729,7 @@ static char * DVDParse( input_thread_t * p_input )
         p_dvd->i_angle = i_angle ? i_angle : 1;
     }
 
-    if( psz_raw )
+    if( *psz_raw )
     {
         if( *psz_raw )
         {
@@ -741,7 +741,7 @@ static char * DVDParse( input_thread_t * p_input )
                              psz_raw, strerror(errno));
                 /* put back '@' */
                 *(psz_raw - 1) = '@';
-                psz_raw = NULL;
+                psz_raw = "";
             }
             else
             {
@@ -754,7 +754,7 @@ static char * DVDParse( input_thread_t * p_input )
                                      " not a valid char device", psz_raw );
                     /* put back '@' */
                     *(psz_raw - 1) = '@';
-                    psz_raw = NULL;
+                    psz_raw = "";
                 }
                 else
 #endif
@@ -768,7 +768,7 @@ static char * DVDParse( input_thread_t * p_input )
         }
         else
         {
-            psz_raw = NULL;
+            psz_raw = "";
         }
     }
     

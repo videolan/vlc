@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.5 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: ipv4.c,v 1.6 2002/03/15 04:41:54 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -104,7 +104,7 @@ static int BuildAddr( struct sockaddr_in * p_socket,
     memset( p_socket, 0, sizeof( struct sockaddr_in ) );
     p_socket->sin_family = AF_INET;                                /* family */
     p_socket->sin_port = htons( i_port );
-    if( psz_address == NULL )
+    if( !*psz_address )
     {
         p_socket->sin_addr.s_addr = INADDR_ANY;
     }
@@ -229,7 +229,7 @@ static int OpenUDP( network_socket_t * p_socket )
 
     if (IN_MULTICAST( ntohl( inet_addr(psz_bind_addr) ) ) )
     {
-        psz_bind_win32 = NULL ;
+        psz_bind_win32 = "";
     }
     if ( BuildAddr( &sock, psz_bind_win32, i_bind_port ) == -1 )
 #else
@@ -249,7 +249,7 @@ static int OpenUDP( network_socket_t * p_socket )
     }
 
     /* Allow broadcast reception if we bound on INADDR_ANY */
-    if( psz_bind_addr == NULL )
+    if( !*psz_bind_addr )
     {
         i_opt = 1;
         if( setsockopt( i_handle, SOL_SOCKET, SO_BROADCAST,
@@ -289,7 +289,7 @@ static int OpenUDP( network_socket_t * p_socket )
         }
     }
 
-    if( psz_server_addr != NULL )
+    if( *psz_server_addr )
     {
         /* Build socket for remote connection */
         if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )

@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.11 2002/03/14 01:35:28 stef Exp $
+ * $Id: spu_decoder.c,v 1.12 2002/03/15 04:41:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -57,6 +57,8 @@ static int  SyncPacket           ( spudec_thread_t * );
 static void ParsePacket          ( spudec_thread_t * );
 static int  ParseControlSequences( spudec_thread_t *, subpicture_t * );
 static int  ParseRLE             ( spudec_thread_t *, subpicture_t *, u8 * );
+static void RenderSPU            ( const vout_thread_t *, picture_t *,
+                                   const subpicture_t * );
 
 /*****************************************************************************
  * Capabilities
@@ -102,8 +104,6 @@ static int decoder_Probe( u8 *pi_type )
 static int decoder_Run( decoder_config_t * p_config )
 {
     spudec_thread_t *     p_spudec;
-    int                   i;
-    u32 *                 pi_yuv_color;
    
     intf_WarnMsg( 3, "spudec: thread launched. Initializing ..." );
 
@@ -129,17 +129,6 @@ static int decoder_Run( decoder_config_t * p_config )
      * Initialize thread and free configuration
      */
     p_spudec->p_fifo->b_error = InitThread( p_spudec );
-
-    pi_yuv_color = p_config->p_demux_data;
-    for( i=0 ; i<16 ; i++ )
-    {
-        intf_WarnMsg( 12, "spudec info: 0x%02x 0x%02x 0x%02x 0x%02x",
-                          *((u8*)(pi_yuv_color)),
-                          *((u8*)(pi_yuv_color) + 1),
-                          *((u8*)(pi_yuv_color) + 2),
-                          *((u8*)(pi_yuv_color) + 3));
-        pi_yuv_color++;
-    }
 
     /*
      * Main loop - it is not executed if an error occured during
@@ -273,8 +262,9 @@ static void ParsePacket( spudec_thread_t *p_spudec )
     }
 
     /* Allocate the subpicture internal data. */
-    p_spu = vout_CreateSubPicture( p_spudec->p_vout, DVD_SUBPICTURE,
-                                   p_spudec->i_rle_size * 4 );
+    p_spu = vout_CreateSubPicture( p_spudec->p_vout, MEMORY_SUBPICTURE,
+                                   sizeof( struct subpicture_sys_s )
+                                    + p_spudec->i_rle_size * 4 );
     /* Rationale for the "p_spudec->i_rle_size * 4": we are going to
      * expand the RLE stuff so that we won't need to read nibbles later
      * on. This will speed things up a lot. Plus, we'll only need to do
@@ -285,8 +275,13 @@ static void ParsePacket( spudec_thread_t *p_spudec )
         return;
     }
 
+    /* Fill the p_spu structure */
+    p_spu->pf_render = RenderSPU;
+    p_spu->p_sys->p_data = (void*)p_spu->p_sys
+                            + sizeof( struct subpicture_sys_s );
+
     /* Get display time now. If we do it later, we may miss the PTS. */
-    p_spudec->i_pts = p_spudec->p_fifo->p_first->i_pts;
+    p_spu->p_sys->i_pts = p_spudec->p_fifo->p_first->i_pts;
 
     /* Allocate the temporary buffer we will parse */
     p_src = malloc( p_spudec->i_rle_size );
@@ -319,7 +314,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
 
 #if 0
     /* Dump the subtitle info */
-    intf_WarnHexDump( 5, p_spu->p_data, p_spudec->i_rle_size );
+    intf_WarnHexDump( 5, p_spu->p_sys->p_data, p_spudec->i_rle_size );
 #endif
 
     /* Getting the control part */
@@ -345,7 +340,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
 
     intf_WarnMsg( 3, "spudec: total size: 0x%x, RLE offsets: 0x%x 0x%x",
                   p_spudec->i_spu_size,
-                  p_spu->type.spu.i_offset[0], p_spu->type.spu.i_offset[1] );
+                  p_spu->p_sys->pi_offset[0], p_spu->p_sys->pi_offset[1] );
 
     /* SPU is finished - we can ask the video output to display it */
     vout_DisplaySubPicture( p_spudec->p_vout, p_spu );
@@ -373,6 +368,10 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
     /* Command time and date */
     u8  i_command;
     int i_date;
+
+    /* Dummy stuff */
+    u8 *pi_color;
+    int i;
 
     /* XXX: temporary variables */
     boolean_t b_force_display = 0;
@@ -403,7 +402,7 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                 case SPU_CMD_FORCE_DISPLAY:
 
                     /* 00 (force displaying) */
-                    p_spu->i_start = p_spudec->i_pts + ( i_date * 11000 );
+                    p_spu->i_start = p_spu->p_sys->i_pts + ( i_date * 11000 );
                     b_force_display = 1;
  
                     break;
@@ -412,29 +411,50 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                 case SPU_CMD_START_DISPLAY:
  
                     /* 01 (start displaying) */
-                    p_spu->i_start = p_spudec->i_pts + ( i_date * 11000 );
+                    p_spu->i_start = p_spu->p_sys->i_pts + ( i_date * 11000 );
  
                     break;
  
                 case SPU_CMD_STOP_DISPLAY:
  
                     /* 02 (stop displaying) */
-                    p_spu->i_stop = p_spudec->i_pts + ( i_date * 11000 );
+                    p_spu->i_stop = p_spu->p_sys->i_pts + ( i_date * 11000 );
  
                     break;
  
                 case SPU_CMD_SET_PALETTE:
  
-                    /* 03xxxx (palette) - trashed */
-                    RemoveBits( &p_spudec->bit_stream, 16 );
+                    /* 03xxxx (palette) */
+                    for( i = 0; i < 4 ; i++ )
+                    {
+                        pi_color = (u8*)p_spudec->p_config->p_demux_data
+                                + 4 * GetBits( &p_spudec->bit_stream, 4 );
+                        if( p_spudec->p_config->p_demux_data )
+                        {
+                            p_spu->p_sys->pi_yuv[3-i][0] = pi_color[2];
+                            p_spu->p_sys->pi_yuv[3-i][1] = pi_color[0];
+                            p_spu->p_sys->pi_yuv[3-i][2] = pi_color[1];
+                        }
+                        else
+                        {
+                            /* No data was available from the IFO file */
+                            p_spu->p_sys->pi_yuv[i][0] = 0x50 * i;
+                            p_spu->p_sys->pi_yuv[i][1] = 0x80;
+                            p_spu->p_sys->pi_yuv[i][2] = 0x80;
+                        }
+                    }
                     i_index += 2;
  
                     break;
  
                 case SPU_CMD_SET_ALPHACHANNEL:
  
-                    /* 04xxxx (alpha channel) - trashed */
-                    RemoveBits( &p_spudec->bit_stream, 16 );
+                    /* 04xxxx (alpha channel) */
+                    for( i = 0; i < 4 ; i++ )
+                    {
+                        p_spu->p_sys->pi_alpha[3-i]
+                                       = GetBits( &p_spudec->bit_stream, 4 );
+                    }
                     i_index += 2;
  
                     break;
@@ -457,10 +477,10 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                 case SPU_CMD_SET_OFFSETS:
  
                     /* 06xxxxyyyy (byte offsets) */
-                    p_spu->type.spu.i_offset[0] =
+                    p_spu->p_sys->pi_offset[0] =
                         GetBits( &p_spudec->bit_stream, 16 ) - 4;
  
-                    p_spu->type.spu.i_offset[1] =
+                    p_spu->p_sys->pi_offset[1] =
                         GetBits( &p_spudec->bit_stream, 16 ) - 4;
  
                     i_index += 4;
@@ -570,7 +590,7 @@ static int ParseRLE( spudec_thread_t *p_spudec,
     unsigned int i_height = p_spu->i_height;
     unsigned int i_x, i_y;
 
-    u16 *p_dest = (u16 *)p_spu->p_data;
+    u16 *p_dest = (u16 *)p_spu->p_sys->p_data;
 
     /* The subtitles are interlaced, we need two offsets */
     unsigned int  i_id = 0;                   /* Start on the even SPU layer */
@@ -582,8 +602,8 @@ static int ParseRLE( spudec_thread_t *p_spudec,
     unsigned int i_skipped_top = 0,
                  i_skipped_bottom = 0;
 
-    pi_table[ 0 ] = p_spu->type.spu.i_offset[ 0 ] << 1;
-    pi_table[ 1 ] = p_spu->type.spu.i_offset[ 1 ] << 1;
+    pi_table[ 0 ] = p_spu->p_sys->pi_offset[ 0 ] << 1;
+    pi_table[ 1 ] = p_spu->p_sys->pi_offset[ 1 ] << 1;
 
     for( i_y = 0 ; i_y < i_height ; i_y++ )
     {
@@ -633,7 +653,8 @@ static int ParseRLE( spudec_thread_t *p_spudec,
                 return( 1 );
             }
 
-            if( i_code == (i_width << 2) ) /* FIXME: we assume 0 is transp */
+            if( (i_code >> 2) == i_width
+                 && !p_spu->p_sys->pi_alpha[ i_code & 0x3 ] )
             {
                 if( b_empty_top )
                 {
@@ -711,5 +732,190 @@ static int ParseRLE( spudec_thread_t *p_spudec,
     }
 
     return( 0 );
+}
+
+/*****************************************************************************
+ * RenderSPU: draw an SPU on a picture
+ *****************************************************************************
+ * This is a fast implementation of the subpicture drawing code. The data
+ * has been preprocessed once, so we don't need to parse the RLE buffer again
+ * and again. Most sanity checks are already done so that this routine can be
+ * as fast as possible.
+ *****************************************************************************/
+static void RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
+                       const subpicture_t *p_spu )
+{
+    /* Common variables */
+    u16  p_clut16[4];
+    u8  *p_dest;
+    u16 *p_source = (u16 *)p_spu->p_sys->p_data;
+
+    int i_x, i_y;
+    int i_len, i_color;
+
+    /* RGB-specific */
+    int i_xscale, i_yscale, i_width, i_height, i_ytmp, i_yreal, i_ynext;
+
+    switch( p_vout->output.i_chroma )
+    {
+    /* I420 target, no scaling */
+    case FOURCC_I420:
+    case FOURCC_IYUV:
+    case FOURCC_YV12:
+
+    p_dest = p_pic->p->p_pixels + p_spu->i_x + p_spu->i_width
+              + p_vout->output.i_width * ( p_spu->i_y + p_spu->i_height );
+
+    /* Draw until we reach the bottom of the subtitle */
+    for( i_y = p_spu->i_height * p_vout->output.i_width ;
+         i_y ;
+         i_y -= p_vout->output.i_width )
+    {
+        /* Draw until we reach the end of the line */
+        for( i_x = p_spu->i_width ; i_x ; )
+        {
+            /* Get the RLE part, then draw the line */
+            i_color = *p_source & 0x3;
+
+            switch( p_spu->p_sys->pi_alpha[ i_color ] )
+            {
+                case 0x00:
+                    i_x -= *p_source++ >> 2;
+                    break;
+
+                case 0x0f:
+                    i_len = *p_source++ >> 2;
+                    memset( p_dest - i_x - i_y,
+                            p_spu->p_sys->pi_yuv[i_color][0], i_len );
+                    i_x -= i_len;
+                    break;
+
+                default:
+                    /* FIXME: we should do transparency */
+                    i_len = *p_source++ >> 2;
+                    memset( p_dest - i_x - i_y,
+                            p_spu->p_sys->pi_yuv[i_color][0], i_len );
+                    i_x -= i_len;
+                    break;
+            }
+        }
+    }
+
+    break;
+
+    /* RV16 target, scaling */
+    case FOURCC_RV16:
+
+    /* FIXME: get this from the DVD */
+    p_clut16[0] = 0xaaaa; p_clut16[1] = 0xffff;
+    p_clut16[2] = 0x8888; p_clut16[3] = 0x0000;
+
+    i_xscale = ( p_vout->output.i_width << 6 ) / p_vout->render.i_width;
+    i_yscale = ( p_vout->output.i_height << 6 ) / p_vout->render.i_height;
+
+    i_width  = p_spu->i_width  * i_xscale;
+    i_height = p_spu->i_height * i_yscale;
+
+    p_dest = p_pic->p->p_pixels + ( i_width >> 6 ) * 2
+              /* Add the picture coordinates and the SPU coordinates */
+              + ( (p_spu->i_x * i_xscale) >> 6 ) * 2
+              + ( (p_spu->i_y * i_yscale) >> 6 ) * p_vout->output.i_width * 2;
+
+    /* Draw until we reach the bottom of the subtitle */
+    for( i_y = 0 ; i_y < i_height ; )
+    {
+        i_ytmp = i_y >> 6;
+        i_y += i_yscale;
+
+        /* Check whether we need to draw one line or more than one */
+        if( i_ytmp + 1 >= ( i_y >> 6 ) )
+        {
+            /* Just one line : we precalculate i_y >> 6 */
+            i_yreal = p_vout->output.i_width * 2 * i_ytmp;
+
+            /* Draw until we reach the end of the line */
+            for( i_x = i_width ; i_x ; )
+            {
+                /* Get the RLE part, then draw the line */
+                i_color = *p_source & 0x3;
+
+                switch( p_spu->p_sys->pi_alpha[ i_color ] )
+                {
+                case 0x00:
+                    i_x -= i_xscale * ( *p_source++ >> 2 );
+                    break;
+
+                case 0x0f:
+                    i_len = i_xscale * ( *p_source++ >> 2 );
+                    memset( p_dest - 2 * ( i_x >> 6 ) + i_yreal,
+                            p_clut16[ i_color ],
+                            2 * ( ( i_len >> 6 ) + 1 ) );
+                    i_x -= i_len;
+                    break;
+
+                default:
+                    /* FIXME: we should do transparency */
+                    i_len = i_xscale * ( *p_source++ >> 2 );
+                    memset( p_dest - 2 * ( i_x >> 6 ) + i_yreal,
+                            p_clut16[ i_color ],
+                            2 * ( ( i_len >> 6 ) + 1 ) );
+                    i_x -= i_len;
+                    break;
+                }
+
+            }
+        }
+        else
+        {
+            i_yreal = p_vout->output.i_width * 2 * i_ytmp;
+            i_ynext = p_vout->output.i_width * 2 * i_y >> 6;
+
+            /* Draw until we reach the end of the line */
+            for( i_x = i_width ; i_x ; )
+            {
+                /* Get the RLE part, then draw as many lines as needed */
+                i_color = *p_source & 0x3;
+
+                switch( p_spu->p_sys->pi_alpha[ i_color ] )
+                {
+                case 0x00:
+                    i_x -= i_xscale * ( *p_source++ >> 2 );
+                    break;
+
+                case 0x0f:
+                    i_len = i_xscale * ( *p_source++ >> 2 );
+                    for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
+                         i_ytmp += p_vout->output.i_width * 2 )
+                    {
+                        memset( p_dest - 2 * ( i_x >> 6 ) + i_ytmp,
+                                p_clut16[ i_color ],
+                                2 * ( ( i_len >> 6 ) + 1 ) );
+                    }
+                    i_x -= i_len;
+                    break;
+
+                default:
+                    /* FIXME: we should do transparency */
+                    i_len = i_xscale * ( *p_source++ >> 2 );
+                    for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
+                         i_ytmp += p_vout->output.i_width * 2 )
+                    {
+                        memset( p_dest - 2 * ( i_x >> 6 ) + i_ytmp,
+                                p_clut16[ i_color ],
+                                2 * ( ( i_len >> 6 ) + 1 ) );
+                    }
+                    i_x -= i_len;
+                    break;
+                }
+            }
+        }
+    }
+
+    break;
+
+    default:
+        intf_ErrMsg( "vout error: unknown chroma, can't render SPU" );
+        break;
+    }
 }
 

@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.3 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: udp.c,v 1.4 2002/03/15 04:41:54 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -98,12 +98,12 @@ static int UDPOpen( input_thread_t * p_input )
 {
     input_socket_t *    p_access_data;
     struct module_s *   p_network;
-    char *              psz_network = NULL;
+    char *              psz_network = "";
     char *              psz_parser = p_input->psz_name;
-    char *              psz_server_addr = NULL;
-    char *              psz_server_port = NULL;
-    char *              psz_bind_addr = NULL;
-    char *              psz_bind_port = NULL;
+    char *              psz_server_addr = "";
+    char *              psz_server_port = "";
+    char *              psz_bind_addr = "";
+    char *              psz_bind_port = "";
     int                 i_bind_port = 0, i_server_port = 0;
     network_socket_t    socket_desc;
 
@@ -116,7 +116,7 @@ static int UDPOpen( input_thread_t * p_input )
         psz_network = "ipv6";
     }
 
-    if( p_input->psz_access != NULL )
+    if( *p_input->psz_access )
     {
         /* Find out which shortcut was used */
         if( !strncmp( p_input->psz_access, "udp6", 5 ) )
@@ -200,7 +200,7 @@ static int UDPOpen( input_thread_t * p_input )
     }
 
     /* Convert ports format */
-    if( psz_server_port != NULL )
+    if( *psz_server_port )
     {
         i_server_port = strtol( psz_server_port, &psz_parser, 10 );
         if( *psz_parser )
@@ -211,7 +211,7 @@ static int UDPOpen( input_thread_t * p_input )
         }
     }
 
-    if( psz_bind_port != NULL )
+    if( *psz_bind_port )
     {
         i_bind_port = strtol( psz_bind_port, &psz_parser, 10 );
         if( *psz_parser )

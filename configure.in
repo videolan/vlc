@@ -117,18 +117,18 @@ EOF
           if ${CC-cc} conftest.c -o conftest.o >config.log 2>&1 \
               && test -f conftest.o
           then
-            if test `grep -l BIGenDianSyS conftest.o`
+            if test "`strings conftest.o | grep BIGenDianSyS`"
             then
               ac_cv_c_bigendian=yes
             fi
-            if test `grep -l LiTTleEnDian conftest.o`
+            if test "`strings conftest.o | grep LiTTleEnDian`"
             then
               ac_cv_c_bigendian=no
             fi
           fi
         fi
       ])
-      if test $ac_cv_c_bigendian = xunknown
+      if test x$ac_cv_c_bigendian = xunknown
       then
         AC_MSG_ERROR([Could not guess endianness, please use --with-words])
       fi
@@ -1655,9 +1655,9 @@ which modules get compiled as plugins.
 "
 if test x${HAVE_VLC} = x1
 then
-  echo "To build vlc and its plugins, type \`make vlc plugins'."
+  echo "To build vlc and its plugins, type \`make'."
 fi
-if test x${HAVE_LIBDVDCSS} = x1
+if test x${NEED_LIBDVDCSS} = x1
 then
   echo "To build libdvdcss only, type \`make libdvdcss'."
 fi

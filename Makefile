@@ -533,7 +533,7 @@ gnome-vlc gvlc kvlc qvlc: vlc
 	rm -f $@ && ln -s vlc $@
 
 .PHONY: vlc.app
-vlc.app: Makefile.opts
+vlc.app: vlc plugins
 ifneq (,$(findstring darwin,$(SYS)))
 	rm -Rf vlc.app
 	cd extras/MacOSX ; pbxbuild | grep -v '^ ' | grep -v '^\t'

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.189 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: input.c,v 1.190 2002/03/15 04:41:54 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Alexis Guillard <alexis.guillard@bt.com>
@@ -451,7 +451,7 @@ static int InitThread( input_thread_t * p_input )
 
     if( !*psz_parser )
     {
-        p_input->psz_access = p_input->psz_demux = NULL;
+        p_input->psz_access = p_input->psz_demux = "";
         p_input->psz_name = p_input->psz_source;
     }
     else
@@ -466,12 +466,12 @@ static int InitThread( input_thread_t * p_input )
         if( !*psz_parser )
         {
             /* No access */
-            p_input->psz_access = NULL;
+            p_input->psz_access = "";
         }
         else if( *psz_parser == '/' )
         {
             /* No access */
-            p_input->psz_access = NULL;
+            p_input->psz_access = "";
             psz_parser++;
         }
         else
@@ -492,7 +492,7 @@ static int InitThread( input_thread_t * p_input )
         if( !*psz_parser )
         {
             /* No demux */
-            p_input->psz_demux = NULL;
+            p_input->psz_demux = "";
         }
         else
         {
@@ -500,7 +500,7 @@ static int InitThread( input_thread_t * p_input )
         }
     }
 
-    intf_WarnMsg( 2, "input: access=%s demux=%s name=%s",
+    intf_WarnMsg( 2, "input: access `%s', demux `%s', name `%s'",
                   p_input->psz_access, p_input->psz_demux,
                   p_input->psz_name );
 

@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.10 2002/03/11 07:23:10 gbazin Exp $
+ * $Id: vout_subpictures.c,v 1.11 2002/03/15 04:41:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -34,12 +34,6 @@
 
 #include "video.h"
 #include "video_output.h"
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static void vout_RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
-                            const subpicture_t *p_spu );
 
 /*****************************************************************************
  * vout_DisplaySubPicture: display a subpicture unit
@@ -132,7 +126,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
     {
         /* No free subpicture or matching destroyed subpictures have been
          * found, but a destroyed subpicture is still avalaible */
-        free( p_destroyed_subpic->p_data );
+        free( p_destroyed_subpic->p_sys );
         p_free_subpic = p_destroyed_subpic;
     }
 
@@ -144,22 +138,9 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
         return( NULL );
     }
 
-    /* Prepare subpicture */
-    switch( i_type )
-    {
-    case TEXT_SUBPICTURE:                             /* text subpicture */
-        p_free_subpic->p_data = memalign( 16, i_size + 1 );
-        break;
-    case DVD_SUBPICTURE:                          /* DVD subpicture unit */
-        p_free_subpic->p_data = memalign( 16, i_size );
-        break;
-    default:
-        intf_ErrMsg( "vout error: unknown subpicture type %d", i_type );
-        p_free_subpic->p_data   =  NULL;
-        break;
-    }
+    p_free_subpic->p_sys = memalign( 16, i_size );
 
-    if( p_free_subpic->p_data != NULL )
+    if( p_free_subpic->p_sys != NULL )
     {
         /* Copy subpicture information, set some default values */
         p_free_subpic->i_type   = i_type;
@@ -209,61 +190,14 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 /*****************************************************************************
  * vout_RenderSubPictures: render a subpicture list
  *****************************************************************************
- * This function renders a sub picture unit.
+ * This function renders all sub picture units in the list.
  *****************************************************************************/
 void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic,
                              subpicture_t *p_subpic )
 {
-#if 0
-    p_vout_font_t       p_font;                                 /* text font */
-    int                 i_width, i_height;          /* subpicture dimensions */
-#endif
-
     while( p_subpic != NULL )
     {
-        switch( p_subpic->i_type )
-        {
-        case DVD_SUBPICTURE:                          /* DVD subpicture unit */
-            vout_RenderSPU( p_vout, p_pic, p_subpic );
-            break;
-
-#if 0
-        case TEXT_SUBPICTURE:                            /* single line text */
-            /* Select default font if not specified */
-            p_font = p_subpic->type.text.p_font;
-            if( p_font == NULL )
-            {
-                p_font = p_vout->p_default_font;
-            }
-
-            /* Compute text size (width and height fields are ignored)
-             * and print it */
-            vout_TextSize( p_font, p_subpic->type.text.i_style,
-                           p_subpic->p_data, &i_width, &i_height );
-            if( !Align( p_vout, &p_subpic->i_x, &p_subpic->i_y,
-                        i_width, i_height, p_subpic->i_horizontal_align,
-                        p_subpic->i_vertical_align ) )
-            {
-                vout_Print( p_font,
-                            p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
-                            p_subpic->i_x * p_vout->i_bytes_per_pixel +
-                            p_subpic->i_y * p_vout->i_bytes_per_line,
-                            p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,                            p_subpic->type.text.i_char_color,
-                            p_subpic->type.text.i_border_color,
-                            p_subpic->type.text.i_bg_color,
-                            p_subpic->type.text.i_style, p_subpic->p_data, 100 );
-                SetBufferArea( p_vout, p_subpic->i_x, p_subpic->i_y,
-                               i_width, i_height );
-            }
-            break;
-#endif
-
-        default:
-            intf_ErrMsg( "vout error: unknown subpicture %p type %d",
-                         p_subpic, p_subpic->i_type );
-            break;
-        }
-
+        p_subpic->pf_render( p_vout, p_pic, p_subpic );
         p_subpic = p_subpic->p_next;
     }
 }
@@ -294,7 +228,7 @@ subpicture_t *vout_SortSubPictures( vout_thread_t *p_vout,
         if( p_vout->p_subpicture[i_index].i_status == READY_SUBPICTURE )
         {
             /* If it is a DVD subpicture, check its date */
-            if( p_vout->p_subpicture[i_index].i_type == DVD_SUBPICTURE )
+            if( p_vout->p_subpicture[i_index].i_type == MEMORY_SUBPICTURE )
             {
                 if( display_date > p_vout->p_subpicture[i_index].i_stop )
                 {
@@ -376,196 +310,5 @@ subpicture_t *vout_SortSubPictures( vout_thread_t *p_vout,
     }
 
     return p_subpic;
-}
-
-/*****************************************************************************
- * vout_RenderSPU: draw an SPU on a picture
- *****************************************************************************
- * This is a fast implementation of the subpicture drawing code. The data
- * has been preprocessed once in spu_decoder.c, so we don't need to parse the
- * RLE buffer again and again. Most sanity checks are done in spu_decoder.c
- * so that this routine can be as fast as possible.
- *****************************************************************************/
-static void vout_RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
-                            const subpicture_t *p_spu )
-{
-    /* Common variables */
-    u8   p_clut8[4], p_trsp[4];
-    u16  p_clut16[4];
-    u8  *p_dest;
-    u16 *p_source = (u16 *)p_spu->p_data;
-
-    int i_x, i_y;
-    int i_len, i_color;
-
-    /* RGB-specific */
-    int i_xscale, i_yscale, i_width, i_height, i_ytmp, i_yreal, i_ynext;
-
-    /* FIXME: get this from the DVD */
-    p_trsp[0] = 0x00; p_trsp[1] = 0xff; p_trsp[2] = 0xff; p_trsp[3] = 0xff;
-
-    switch( p_vout->output.i_chroma )
-    {
-    /* I420 target, no scaling */
-    case FOURCC_I420:
-    case FOURCC_IYUV:
-    case FOURCC_YV12:
-
-    /* FIXME: get this from the DVD */
-    p_clut8[0] = 0xaa; p_clut8[1] = 0x44;
-    p_clut8[2] = 0xff; p_clut8[3] = 0x88;
-
-    p_dest = p_pic->p->p_pixels + p_spu->i_x + p_spu->i_width
-              + p_vout->output.i_width * ( p_spu->i_y + p_spu->i_height );
-
-    /* Draw until we reach the bottom of the subtitle */
-    for( i_y = p_spu->i_height * p_vout->output.i_width ;
-         i_y ;
-         i_y -= p_vout->output.i_width )
-    {
-        /* Draw until we reach the end of the line */
-        for( i_x = p_spu->i_width ; i_x ; )
-        {
-            /* Get the RLE part, then draw the line */
-            i_color = *p_source & 0x3;
-
-            switch( p_trsp[ i_color ] )
-            {
-                case 0x00:
-                    i_x -= *p_source++ >> 2;
-                    break;
-
-                case 0xff:
-                    i_len = *p_source++ >> 2;
-                    memset( p_dest - i_x - i_y, p_clut8[ i_color ], i_len );
-                    i_x -= i_len;
-                    break;
-
-                default:
-                    /* FIXME: we should do transparency */
-                    i_len = *p_source++ >> 2;
-                    memset( p_dest - i_x - i_y, p_clut8[ i_color ], i_len );
-                    i_x -= i_len;
-                    break;
-            }
-        }
-    }
-
-    break;
-
-    /* RV16 target, scaling */
-    case FOURCC_RV16:
-
-    /* FIXME: get this from the DVD */
-    p_clut16[0] = 0xaaaa; p_clut16[1] = 0x4444;
-    p_clut16[2] = 0xffff; p_clut16[3] = 0x8888;
-
-    i_xscale = ( p_vout->output.i_width << 6 ) / p_vout->render.i_width;
-    i_yscale = ( p_vout->output.i_height << 6 ) / p_vout->render.i_height;
-
-    i_width  = p_spu->i_width  * i_xscale;
-    i_height = p_spu->i_height * i_yscale;
-
-    p_dest = p_pic->p->p_pixels + ( i_width >> 6 ) * 2
-              /* Add the picture coordinates and the SPU coordinates */
-              + ( (p_spu->i_x * i_xscale) >> 6 ) * 2
-              + ( (p_spu->i_y * i_yscale) >> 6 ) * p_vout->output.i_width * 2;
-
-    /* Draw until we reach the bottom of the subtitle */
-    for( i_y = 0 ; i_y < i_height ; )
-    {
-        i_ytmp = i_y >> 6;
-        i_y += i_yscale;
-
-        /* Check whether we need to draw one line or more than one */
-        if( i_ytmp + 1 >= ( i_y >> 6 ) )
-        {
-            /* Just one line : we precalculate i_y >> 6 */
-            i_yreal = p_vout->output.i_width * 2 * i_ytmp;
-
-            /* Draw until we reach the end of the line */
-            for( i_x = i_width ; i_x ; )
-            {
-                /* Get the RLE part, then draw the line */
-                i_color = *p_source & 0x3;
-
-                switch( p_trsp[ i_color ] )
-                {
-                case 0x00:
-                    i_x -= i_xscale * ( *p_source++ >> 2 );
-                    break;
-
-                case 0xff:
-                    i_len = i_xscale * ( *p_source++ >> 2 );
-                    memset( p_dest - 2 * ( i_x >> 6 ) + i_yreal,
-                            p_clut16[ i_color ],
-                            2 * ( ( i_len >> 6 ) + 1 ) );
-                    i_x -= i_len;
-                    break;
-
-                default:
-                    /* FIXME: we should do transparency */
-                    i_len = i_xscale * ( *p_source++ >> 2 );
-                    memset( p_dest - 2 * ( i_x >> 6 ) + i_yreal,
-                            p_clut16[ i_color ],
-                            2 * ( ( i_len >> 6 ) + 1 ) );
-                    i_x -= i_len;
-                    break;
-                }
-
-            }
-        }
-        else
-        {
-            i_yreal = p_vout->output.i_width * 2 * i_ytmp;
-            i_ynext = p_vout->output.i_width * 2 * i_y >> 6;
-
-            /* Draw until we reach the end of the line */
-            for( i_x = i_width ; i_x ; )
-            {
-                /* Get the RLE part, then draw as many lines as needed */
-                i_color = *p_source & 0x3;
-
-                switch( p_trsp[ i_color ] )
-                {
-                case 0x00:
-                    i_x -= i_xscale * ( *p_source++ >> 2 );
-                    break;
-
-                case 0xff:
-                    i_len = i_xscale * ( *p_source++ >> 2 );
-                    for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
-                         i_ytmp += p_vout->output.i_width * 2 )
-                    {
-                        memset( p_dest - 2 * ( i_x >> 6 ) + i_ytmp,
-                                p_clut16[ i_color ],
-                                2 * ( ( i_len >> 6 ) + 1 ) );
-                    }
-                    i_x -= i_len;
-                    break;
-
-                default:
-                    /* FIXME: we should do transparency */
-                    i_len = i_xscale * ( *p_source++ >> 2 );
-                    for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
-                         i_ytmp += p_vout->output.i_width * 2 )
-                    {
-                        memset( p_dest - 2 * ( i_x >> 6 ) + i_ytmp,
-                                p_clut16[ i_color ],
-                                2 * ( ( i_len >> 6 ) + 1 ) );
-                    }
-                    i_x -= i_len;
-                    break;
-                }
-            }
-        }
-    }
-
-    break;
-
-    default:
-        intf_ErrMsg( "vout error: unknown chroma, can't render SPU" );
-        break;
-    }
 }
 

@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.2 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: ipv6.c,v 1.3 2002/03/15 04:41:54 sam Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -104,7 +104,7 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
     memset( p_socket, 0, sizeof( struct sockaddr_in6 ) );
     p_socket->sin6_family = AF_INET6;                               /* family */
     p_socket->sin6_port = htons( i_port );
-    if( psz_address == NULL )
+    if( !*psz_address )
     {
         p_socket->sin6_addr = in6addr_any;
     }
@@ -214,7 +214,7 @@ static int OpenUDP( network_socket_t * p_socket )
     }
 
     /* Allow broadcast reception if we bound on in6addr_any */
-    if( psz_bind_addr == NULL )
+    if( !*psz_bind_addr )
     {
         i_opt = 1;
         if( setsockopt( i_handle, SOL_SOCKET, SO_BROADCAST,
@@ -229,7 +229,7 @@ static int OpenUDP( network_socket_t * p_socket )
     /* Join the multicast group if the socket is a multicast address */
     /* FIXME: To be written */
 
-    if( psz_server_addr != NULL )
+    if( *psz_server_addr )
     {
         /* Build socket for remote connection */
         if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )

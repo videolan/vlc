@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.44 2002/03/01 00:33:18 massiot Exp $
+ * $Id: video.h,v 1.45 2002/03/15 04:41:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -314,6 +314,7 @@ typedef struct subpicture_s
     int             i_width;                                /* picture width */
     int             i_height;                              /* picture height */
 
+#if 0
     /* Additionnal properties depending of the subpicture type */
     union
     {
@@ -327,22 +328,22 @@ typedef struct subpicture_s
             u32                 i_border_color;              /* border color */
             u32                 i_bg_color;              /* background color */
         } text;
-        /* DVD subpicture units properties */
-        struct
-        {
-            int                 i_offset[2];         /* byte offsets to data */
-        } spu;
     } type;
+#endif
 
-    /* Subpicture data, format depends of type - data can always be freely
-     * modified. p_data itself (the pointer) should NEVER be modified. */
-    void *          p_data;                               /* subpicture data */
+    /* The subpicture rendering routine */
+    void ( *pf_render ) ( const struct vout_thread_s *, picture_t *,
+                          const struct subpicture_s * );
+
+    /* Private data - the subtitle plugin might want to put stuff here to
+     * keep track of the subpicture */
+    struct subpicture_sys_s *p_sys;                       /* subpicture data */
+
 } subpicture_t;
 
 /* Subpicture type */
 #define EMPTY_SUBPICTURE       0     /* subtitle slot is empty and available */
-#define DVD_SUBPICTURE         100                    /* DVD subpicture unit */
-#define TEXT_SUBPICTURE        200                       /* single line text */
+#define MEMORY_SUBPICTURE      100            /* subpicture stored in memory */
 
 /* Subpicture status */
 #define FREE_SUBPICTURE        0                   /* free and not allocated */

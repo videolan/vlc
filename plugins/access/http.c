@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.3 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: http.c,v 1.4 2002/03/15 04:41:54 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -216,9 +216,9 @@ static int HTTPOpen( input_thread_t * p_input )
 {
     _input_socket_t *   p_access_data;
     char *              psz_parser = p_input->psz_name;
-    char *              psz_server_addr = NULL;
-    char *              psz_server_port = NULL;
-    char *              psz_path = NULL;
+    char *              psz_server_addr = "";
+    char *              psz_server_port = "";
+    char *              psz_path = "";
     char *              psz_proxy;
     int                 i_server_port = 0;
 
@@ -229,7 +229,7 @@ static int HTTPOpen( input_thread_t * p_input )
         return( -1 );
     }
 
-    p_access_data->psz_network = NULL;
+    p_access_data->psz_network = "";
     if( config_GetIntVariable( "ipv4" ) )
     {
         p_access_data->psz_network = "ipv4";
@@ -238,7 +238,7 @@ static int HTTPOpen( input_thread_t * p_input )
     {
         p_access_data->psz_network = "ipv6";
     }
-    if( p_input->psz_access != NULL )
+    if( *p_input->psz_access )
     {
         /* Find out which shortcut was used */
         if( !strncmp( p_input->psz_access, "http6", 5 ) )
@@ -284,7 +284,7 @@ static int HTTPOpen( input_thread_t * p_input )
     }
 
     /* Convert port format */
-    if( psz_server_port != NULL )
+    if( *psz_server_port )
     {
         i_server_port = strtol( psz_server_port, &psz_parser, 10 );
         if( *psz_parser )
@@ -301,7 +301,7 @@ static int HTTPOpen( input_thread_t * p_input )
         i_server_port = 80;
     }
 
-    if( psz_server_addr == NULL )
+    if( !*psz_server_addr )
     {
         intf_ErrMsg( "input error: no server given" );
         free( p_input->p_access_data );
