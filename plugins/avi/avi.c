@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.25 2002/06/28 19:31:40 fenrir Exp $
+ * $Id: avi.c,v 1.26 2002/06/29 14:16:17 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -902,19 +902,39 @@ static inline mtime_t AVI_PTSToByte( AVIStreamInfo_t *p_info,
 }
 static mtime_t AVI_GetPTS( AVIStreamInfo_t *p_info )
 {
-    /* p_info->p_index[p_info->i_idxposc] need to be valid !! */
-    /* be careful to  *1000000 before round  ! */
-    if( p_info->header.i_samplesize != 0 )
+    
+    if( p_info->header.i_samplesize )
     {
+        /* we need a valid entry we will emulate one */
+        int i_len;
+        if( p_info->i_idxposc == p_info->i_idxnb )
+        {
+            if( p_info->i_idxposc )
+            {
+                /* use the last entry */
+                i_len = p_info->p_index[p_info->i_idxnb - 1].i_lengthtotal
+                            + p_info->p_index[p_info->i_idxnb - 1].i_length
+                            + p_info->i_idxposb; /* should be 0 */
+            }
+            else
+            {
+                i_len = 0; /* no valid zntry */
+            }
+        }
+        else
+        {
+            i_len = p_info->p_index[p_info->i_idxposc].i_lengthtotal
+                                + p_info->i_idxposb;
+        }
         return( (mtime_t)( (s64)1000000 *
-                   (s64)(p_info->p_index[p_info->i_idxposc].i_lengthtotal +
-                             p_info->i_idxposb )*
+                   (s64)i_len *
                     (s64)p_info->header.i_scale /
                     (s64)p_info->header.i_rate /
                     (s64)p_info->header.i_samplesize ) );
     }
     else
     {
+        /* even if p_info->i_idxposc isn't valid, there isn't any probllem */
         return( (mtime_t)( (s64)1000000 *
                     (s64)(p_info->i_idxposc ) *
                     (s64)p_info->header.i_scale /
@@ -927,7 +947,7 @@ static mtime_t AVI_GetPTS( AVIStreamInfo_t *p_info )
  * Functions to acces streams data 
  * Uses it, because i plane to read unseekable stream
  * Don't work for the moment for unseekable stream 
- * XXX NEVER set directly i_idxposc and i_idxposb
+ * XXX NEVER set directly i_idxposc and i_idxposb unless you know what you do 
  *****************************************************************************/
 
 /* FIXME FIXME change b_pad to number of bytes to skipp after reading */
@@ -1028,7 +1048,6 @@ static int __AVI_GetChunk( input_thread_t  *p_input,
             AVI_PESBuffer_Drop( p_input->p_method_data, p_info );
         }
     }
-    
     /* up to now we handle only one audio and one video stream at the same time */
     p_other = (p_info == p_video ) ? p_audio : p_video ;
     if( p_other )
@@ -1540,7 +1559,7 @@ static pes_packet_t *AVI_GetFrameInPES( input_thread_t *p_input,
         for( i = 0; i < i_chunk; i++ )
         {
             /* get pts while is valid */
-            i_pts = AVI_GetPTS( p_info ); /* FIXME will segfault with bad index */
+            i_pts = AVI_GetPTS( p_info ); 
  
             p_pes_tmp = AVI_ReadStreamChunkInPES( p_input, p_info );
 
@@ -1569,7 +1588,7 @@ static pes_packet_t *AVI_GetFrameInPES( input_thread_t *p_input,
         {
             return( NULL );
         }
-        i_pts = AVI_GetPTS( p_info ); /* FIXME will segfault with bad index */
+        i_pts = AVI_GetPTS( p_info ); 
         p_pes = AVI_ReadStreamBytesInPES( p_input, p_info, i_byte);
 
         if( p_pes )
@@ -1683,6 +1702,7 @@ static int AVIDemux( input_thread_t *p_input )
         }
         AVI_SynchroReInit( p_input ); 
     }
+
     /* manage rate, if not default: skeep audio */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( p_input->stream.control.i_rate != p_avi_demux->i_rate )
