@@ -61,41 +61,68 @@ static inline seekpoint_t *vlc_seekpoint_Duplicate( seekpoint_t *src )
 
 typedef struct
 {
-    vlc_bool_t  b_menu;      /* Is it a menu or a normal entry */
-    int64_t     i_length;    /* length if known, else 0 */
-    int         i_seekpoints;/* How many seekpoint, (0/1 has same meaning)*/
-
     char        *psz_name;
+
+    vlc_bool_t  b_menu;      /* Is it a menu or a normal entry */
+
+    int64_t     i_length;   /* Length(microsecond) if known, else 0 */
+    int64_t     i_size;     /* Size (bytes) if known, else 0 */
+
+    /* Title seekpoint */
+    int         i_seekpoint;
+    seekpoint_t **seekpoint;
+
 } input_title_t;
 
 static inline input_title_t *vlc_input_title_New( )
 {
     input_title_t *t = (input_title_t*)malloc( sizeof( input_title_t ) );
 
+    t->psz_name = NULL;
     t->b_menu = VLC_FALSE;
     t->i_length = 0;
-    t->i_seekpoints = 0;
-    t->psz_name = NULL;
+    t->i_size   = 0;
+    t->i_seekpoint = 0;
+    t->seekpoint = NULL;
 
     return t;
 }
 static inline void vlc_input_title_Delete( input_title_t *t )
 {
-    if( t )
+    int i;
+    if( t == NULL )
+        return;
+
+    if( t->psz_name ) free( t->psz_name );
+    for( i = 0; i < t->i_seekpoint; i++ )
     {
-        if( t->psz_name ) free( t->psz_name );
-        free( t );
+        if( t->seekpoint[i]->psz_name ) free( t->seekpoint[i]->psz_name );
+        free( t->seekpoint[i] );
     }
+    if( t->seekpoint ) free( t->seekpoint );
+    free( t );
 }
 
 static inline input_title_t *vlc_input_title_Duplicate( input_title_t *t )
 {
     input_title_t *dup = vlc_input_title_New( );
+    int i;
 
+    if( t->psz_name ) dup->psz_name = strdup( t->psz_name );
     dup->b_menu      = t->b_menu;
     dup->i_length    = t->i_length;
-    dup->i_seekpoints= t->i_seekpoints;
-    if( t->psz_name ) dup->psz_name = strdup( t->psz_name );
+    dup->i_size      = t->i_size;
+    dup->i_seekpoint = t->i_seekpoint;
+    if( t->i_seekpoint > 0 )
+    {
+        dup->seekpoint = (seekpoint_t**)calloc( t->i_seekpoint,
+                                                sizeof(seekpoint_t*) );
+
+        for( i = 0; i < t->i_seekpoint; i++ )
+        {
+            dup->seekpoint[i] = vlc_seekpoint_Duplicate( t->seekpoint[i] );
+        }
+    }
 
     return dup;
 }
@@ -203,7 +230,6 @@ enum access_query_e
     ACCESS_GET_PTS_DELAY,   /* arg1= int64_t*       cannot fail */
     /* */
     ACCESS_GET_TITLE_INFO,      /* arg1=input_title_t*** arg2=int* can fail */
-    ACCESS_GET_SEEKPOINT_INFO,  /* arg1=seekpoint_t ***  arg2=int* can fail */
 
     /* */
     ACCESS_SET_PAUSE_STATE, /* arg1= vlc_bool_t     can fail */
@@ -477,7 +503,6 @@ enum demux_query_e
     DEMUX_GET_META,             /* arg1= vlc_meta_t **  res=can fail    */
 
     DEMUX_GET_TITLE_INFO,       /* arg1=input_title_t*** arg2=int* can fail */
-    DEMUX_GET_SEEKPOINT_INFO,   /* arg1=seekpoint_t ***  arg2=int* can fail */
 
     DEMUX_SET_TITLE,            /* arg1= int            can fail */
     DEMUX_SET_SEEKPOINT,        /* arg1= int            can fail */
