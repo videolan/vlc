@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.25 2003/12/07 17:09:33 gbazin Exp $
+ * $Id: ogg.c,v 1.26 2003/12/08 13:02:40 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -485,7 +485,8 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         int i;
 
-        if( ( p_og = OggStreamFlush( p_mux, &p_stream->os, 0 ) ) )
+        if( !p_stream->b_new &&
+            ( p_og = OggStreamFlush( p_mux, &p_stream->os, 0 ) ) )
         {
             OggSetDate( p_og, p_stream->i_dts, p_stream->i_length );
             sout_AccessOutWrite( p_mux->p_access, p_og );

@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.18 2003/12/07 18:15:46 gbazin Exp $
+ * $Id: theora.c,v 1.19 2003/12/08 13:02:39 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -444,6 +444,15 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     if( p_enc->fmt_out.i_codec != VLC_FOURCC('t','h','e','o') )
     {
+        return VLC_EGENERIC;
+    }
+
+    if( p_enc->fmt_in.video.i_width % 16 ||
+        p_enc->fmt_in.video.i_height % 16 )
+    {
+        msg_Err( p_enc, "Theora video encoding requires dimensions which are "
+                 "multiples of 16. Which is not the case here (%dx%d)",
+                 p_enc->fmt_in.video.i_width, p_enc->fmt_in.video.i_height );
         return VLC_EGENERIC;
     }
 

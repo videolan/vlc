@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.62 2003/12/07 19:09:37 jpsaman Exp $
+ * $Id: transcode.c,v 1.63 2003/12/08 13:02:40 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -94,6 +94,7 @@ struct sout_stream_sys_t
     vlc_fourcc_t    i_vcodec;   /*    "   video  " "   "      " */
     int             i_vbitrate;
     int             i_vtolerance;
+    double          f_scale;
     int             i_width;
     int             i_height;
     int             i_b_frames;
@@ -128,6 +129,7 @@ static int Open( vlc_object_t *p_this )
     memset( p_sys, 0, sizeof(struct sout_stream_sys_t) );
     p_sys->p_out = sout_stream_new( p_stream->p_sout, p_stream->psz_next );
 
+    p_sys->f_scale      = 1;
     p_sys->i_vtolerance = -1;
     p_sys->i_key_int    = -1;
     p_sys->i_qmin       = 2;
@@ -178,6 +180,10 @@ static int Open( vlc_object_t *p_this )
 
         p_sys->i_vcodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
 
+        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "scale" ) ) )
+        {
+            p_sys->f_scale = atof( val );
+        }
         if( ( val = sout_cfg_find_value( p_stream->p_cfg, "width" ) ) )
         {
             p_sys->i_width = atoi( val );
@@ -274,9 +280,8 @@ static int Open( vlc_object_t *p_this )
             p_sys->i_qmax   = atoi( val );
         }
 
-        msg_Dbg( p_stream, "codec video=%4.4s %dx%d %dkb/s",
-                 fcc,
-                 p_sys->i_width, p_sys->i_height,
+        msg_Dbg( p_stream, "codec video=%4.4s %dx%d scaling: %f %dkb/s",
+                 fcc, p_sys->i_width, p_sys->i_height, p_sys->f_scale,
                  p_sys->i_vbitrate / 1024 );
     }
 
@@ -286,10 +291,10 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
+
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
-
     p_stream->p_sys     = p_sys;
 
     avcodec_init();
@@ -407,8 +412,8 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         /* create dst format */
         id->f_dst.i_cat         = VIDEO_ES;
         id->f_dst.i_codec       = p_sys->i_vcodec;
-        id->f_dst.video.i_width = p_sys->i_width ; /* > 0 ? p_sys->i_width : id->f_src.i_width; */
-        id->f_dst.video.i_height= p_sys->i_height; /* > 0 ? p_sys->i_height: id->f_src.i_height; */
+        id->f_dst.video.i_width = p_sys->i_width;
+        id->f_dst.video.i_height= p_sys->i_height;
         id->f_dst.i_bitrate     = p_sys->i_vbitrate > 0 ? p_sys->i_vbitrate : 800*1000;
         id->f_dst.i_extra       = 0;
         id->f_dst.p_extra       = NULL;
@@ -474,11 +479,17 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         sout_buffer_t *p_buffer_out;
         if( id->f_src.i_cat == AUDIO_ES )
         {
-            transcode_audio_ffmpeg_process( p_stream, id, p_buffer, &p_buffer_out );
+            transcode_audio_ffmpeg_process( p_stream, id, p_buffer,
+                                            &p_buffer_out );
         }
         else if( id->f_src.i_cat == VIDEO_ES )
         {
-            transcode_video_ffmpeg_process( p_stream, id, p_buffer, &p_buffer_out );
+            if( transcode_video_ffmpeg_process( p_stream, id, p_buffer,
+                &p_buffer_out ) != VLC_SUCCESS )
+            {
+                sout_BufferDelete( p_stream->p_sout, p_buffer );
+                return VLC_EGENERIC;
+            }
         }
         sout_BufferDelete( p_stream->p_sout, p_buffer );
 
@@ -1023,21 +1034,12 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
 
     /* Initialization of encoder format structures */
     es_format_Init( &id->p_encoder->fmt_in,
-		    id->f_src.i_cat, get_vlc_chroma(id->ff_dec_c->pix_fmt) );
+                    id->f_src.i_cat, get_vlc_chroma(id->ff_dec_c->pix_fmt) );
 
-    id->p_encoder->fmt_in.video.i_width = id->f_dst.video.i_width;
-    id->p_encoder->fmt_in.video.i_height = id->f_dst.video.i_height;
-
-    if( id->p_encoder->fmt_in.video.i_width <= 0 )
-    {
-        id->p_encoder->fmt_in.video.i_width = id->f_dst.video.i_width =
-            id->ff_dec_c->width - p_sys->i_crop_left - p_sys->i_crop_right;
-    }
-    if( id->p_encoder->fmt_in.video.i_height <= 0 )
-    {
-        id->p_encoder->fmt_in.video.i_height = id->f_dst.video.i_height =
-            id->ff_dec_c->height - p_sys->i_crop_top - p_sys->i_crop_bottom;
-    }
+    /* The dimensions will be set properly later on.
+     * Just put sensible values so we can test if there is an encoder. */
+    id->p_encoder->fmt_in.video.i_width = 16;
+    id->p_encoder->fmt_in.video.i_height = 16;
 
     id->p_encoder->fmt_in.video.i_frame_rate = 25; /* FIXME as it break mpeg */
     id->p_encoder->fmt_in.video.i_frame_rate_base= 1;
@@ -1212,22 +1214,39 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
         if( !id->b_enc_inited )
         {
-            /* XXX hack because of copy packetizer and mpeg4video that can fail
-             * detecting size */
-            if( id->p_encoder->fmt_in.video.i_width <= 0 )
+            /* Hack because of the copy packetizer which can fail to detect the
+             * proper size (which forces us to wait until the 1st frame
+             * is decoded) */
+            int i_width = id->ff_dec_c->width - p_sys->i_crop_left -
+                          p_sys->i_crop_right;
+            int i_height = id->ff_dec_c->height - p_sys->i_crop_top -
+                           p_sys->i_crop_bottom;
+
+            if( id->f_dst.video.i_width <= 0 && id->f_dst.video.i_height <= 0 )
             {
-                id->p_encoder->fmt_in.video.i_width =
-                  id->p_encoder->fmt_out.video.i_width = id->f_dst.video.i_width =
-                    id->ff_dec_c->width - p_sys->i_crop_left -
-                      p_sys->i_crop_right;
+                /* Apply the scaling */
+                id->f_dst.video.i_width = i_width * p_sys->f_scale;
+                id->f_dst.video.i_height = i_height * p_sys->f_scale;
             }
-            if( id->p_encoder->fmt_in.video.i_height <= 0 )
+            else if( id->f_dst.video.i_width > 0 &&
+                     id->f_dst.video.i_height <= 0 )
             {
-                id->p_encoder->fmt_in.video.i_height =
-                  id->p_encoder->fmt_out.video.i_height = id->f_dst.video.i_height =
-                    id->ff_dec_c->height - p_sys->i_crop_top -
-                      p_sys->i_crop_bottom;
+                id->f_dst.video.i_height =
+                    id->f_dst.video.i_width / (double)i_width * i_height;
             }
+            else if( id->f_dst.video.i_width <= 0 &&
+                     id->f_dst.video.i_height > 0 )
+            {
+                id->f_dst.video.i_width =
+                    id->f_dst.video.i_height / (double)i_height * i_width;
+            }
+
+            id->p_encoder->fmt_in.video.i_width =
+              id->p_encoder->fmt_out.video.i_width =
+                id->f_dst.video.i_width;
+            id->p_encoder->fmt_in.video.i_height =
+              id->p_encoder->fmt_out.video.i_height =
+                id->f_dst.video.i_height;
 
             id->p_encoder->fmt_out.i_extra = 0;
             id->p_encoder->fmt_out.p_extra = NULL;
@@ -1238,6 +1257,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             {
                 vlc_object_destroy( id->p_encoder );
                 msg_Err( p_stream, "cannot find encoder" );
+                id->b_transcode = VLC_FALSE;
                 return VLC_EGENERIC;
             }
 
@@ -1343,7 +1363,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         if( id->ff_dec_c->width  != id->f_dst.video.i_width ||
             id->ff_dec_c->height != id->f_dst.video.i_height ||
             p_sys->i_crop_top > 0 || p_sys->i_crop_bottom > 0 ||
-            p_sys->i_crop_left > 0 || p_sys->i_crop_right )
+            p_sys->i_crop_left > 0 || p_sys->i_crop_right > 0 )
         {
             if( id->p_ff_pic_tmp2 == NULL )
             {
