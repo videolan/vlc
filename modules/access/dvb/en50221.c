@@ -42,6 +42,23 @@
 #include <linux/dvb/frontend.h>
 #include <linux/dvb/ca.h>
 
+/* Include dvbpsi headers */
+#ifdef HAVE_DVBPSI_DR_H
+#   include <dvbpsi/dvbpsi.h>
+#   include <dvbpsi/descriptor.h>
+#   include <dvbpsi/pat.h>
+#   include <dvbpsi/pmt.h>
+#   include <dvbpsi/dr.h>
+#   include <dvbpsi/psi.h>
+#else
+#   include "dvbpsi.h"
+#   include "descriptor.h"
+#   include "tables/pat.h"
+#   include "tables/pmt.h"
+#   include "descriptors/dr.h"
+#   include "psi.h"
+#endif
+
 #include "dvb.h"
 
 #undef DEBUG_TPDU
@@ -622,6 +639,10 @@ static int APDUSend( access_t * p_access, int i_session_id, int i_tag,
     return i_ret;
 }
 
+/*
+ * Resource Manager
+ */
+
 /*****************************************************************************
  * ResourceManagerHandle
  *****************************************************************************/
@@ -667,6 +688,10 @@ static void ResourceManagerOpen( access_t * p_access, int i_session_id )
 
     APDUSend( p_access, i_session_id, AOT_PROFILE_ENQ, NULL, 0 );
 }
+
+/*
+ * Application Information
+ */
 
 /*****************************************************************************
  * ApplicationInformationHandle
@@ -719,6 +744,274 @@ static void ApplicationInformationOpen( access_t * p_access, int i_session_id )
     APDUSend( p_access, i_session_id, AOT_APPLICATION_INFO_ENQ, NULL, 0 );
 }
 
+/*
+ * Conditional Access
+ */
+
+#define MAX_CASYSTEM_IDS 16
+
+typedef struct
+{
+    uint16_t pi_system_ids[MAX_CASYSTEM_IDS + 1];
+} system_ids_t;
+
+static vlc_bool_t CheckSystemID( system_ids_t *p_ids, uint16_t i_id )
+{
+    int i = 0;
+    while ( p_ids->pi_system_ids[i] )
+    {
+        if ( p_ids->pi_system_ids[i] == i_id )
+            return VLC_TRUE;
+        i++;
+    }
+
+    return VLC_FALSE;
+}
+
+/*****************************************************************************
+ * CAPMTNeedsDescrambling
+ *****************************************************************************/
+static vlc_bool_t CAPMTNeedsDescrambling( dvbpsi_pmt_t *p_pmt )
+{
+    dvbpsi_descriptor_t *p_dr;
+    dvbpsi_pmt_es_t *p_es;
+
+    for( p_dr = p_pmt->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
+    {
+        if( p_dr->i_tag == 0x9 )
+        {
+            return VLC_TRUE;
+        }
+    }
+    
+    for( p_es = p_pmt->p_first_es; p_es != NULL; p_es = p_es->p_next )
+    {
+        for( p_dr = p_es->p_first_descriptor; p_dr != NULL;
+             p_dr = p_dr->p_next )
+        {
+            if( p_dr->i_tag == 0x9 )
+            {
+                return VLC_TRUE;
+            }
+        }
+    }
+
+    return VLC_FALSE;
+}
+
+/*****************************************************************************
+ * CAPMTBuild
+ *****************************************************************************/
+static int GetCADSize( system_ids_t *p_ids, dvbpsi_descriptor_t *p_dr )
+{
+    int i_cad_size = 0;
+
+    while ( p_dr != NULL )
+    {
+        if( p_dr->i_tag == 0x9 )
+        {
+            uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
+                                    | p_dr->p_data[1];
+            if ( CheckSystemID( p_ids, i_sysid ) )
+                i_cad_size += p_dr->i_length + 2;
+        }
+        p_dr = p_dr->p_next;
+    }
+
+    return i_cad_size;
+}
+
+static uint8_t *CAPMTHeader( system_ids_t *p_ids, uint8_t i_list_mgt,
+                             uint16_t i_program_number, uint8_t i_version,
+                             int i_size, dvbpsi_descriptor_t *p_dr )
+{
+    uint8_t *p_data;
+
+    if ( i_size )
+        p_data = malloc( 7 + i_size );
+    else
+        p_data = malloc( 6 );
+
+    p_data[0] = i_list_mgt;
+    p_data[1] = i_program_number >> 8;
+    p_data[2] = i_program_number & 0xff;
+    p_data[3] = ((i_version & 0x1f) << 1) | 0x1;
+
+    if ( i_size )
+    {
+        int i;
+
+        p_data[4] = (i_size + 1) >> 8;
+        p_data[5] = (i_size + 1) & 0xff;
+        p_data[6] = 0x1; /* ok_descrambling */
+        i = 7;
+
+        while ( p_dr != NULL )
+        {
+            if( p_dr->i_tag == 0x9 )
+            {
+                uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
+                                    | p_dr->p_data[1];
+                if ( CheckSystemID( p_ids, i_sysid ) )
+                {
+                    p_data[i] = 0x9;
+                    p_data[i + 1] = p_dr->i_length;
+                    memcpy( &p_data[i + 2], p_dr->p_data, p_dr->i_length );
+                    i += p_dr->i_length + 2;
+                }
+            }
+            p_dr = p_dr->p_next;
+        }
+    }
+    else
+    {
+        p_data[4] = 0;
+        p_data[5] = 0;
+    }
+
+    return p_data;
+}
+
+static uint8_t *CAPMTES( system_ids_t *p_ids, uint8_t *p_capmt,
+                         int i_capmt_size, uint8_t i_type, uint16_t i_pid,
+                         int i_size, dvbpsi_descriptor_t *p_dr )
+{
+    uint8_t *p_data;
+    int i;
+    
+    if ( i_size )
+        p_data = realloc( p_capmt, i_capmt_size + 6 + i_size );
+    else
+        p_data = realloc( p_capmt, i_capmt_size + 5 );
+
+    i = i_capmt_size;
+
+    p_data[i] = i_type;
+    p_data[i + 1] = i_pid >> 8;
+    p_data[i + 2] = i_pid & 0xff;
+
+    if ( i_size )
+    {
+        p_data[i + 3] = (i_size + 1) >> 8;
+        p_data[i + 4] = (i_size + 1) & 0xff;
+        p_data[i + 5] = 0x1; /* ok_descrambling */
+        i += 6;
+
+        while ( p_dr != NULL )
+        {
+            if( p_dr->i_tag == 0x9 )
+            {
+                uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
+                                    | p_dr->p_data[1];
+                if ( CheckSystemID( p_ids, i_sysid ) )
+                {
+                    p_data[i] = 0x9;
+                    p_data[i + 1] = p_dr->i_length;
+                    memcpy( &p_data[i + 2], p_dr->p_data, p_dr->i_length );
+                    i += p_dr->i_length + 2;
+                }
+            }
+            p_dr = p_dr->p_next;
+        }
+    }
+    else
+    {
+        p_data[i + 3] = 0;
+        p_data[i + 4] = 0;
+    }
+
+    return p_data;
+}
+
+static uint8_t *CAPMTBuild( access_t * p_access, int i_session_id,
+                            dvbpsi_pmt_t *p_pmt, uint8_t i_list_mgt,
+                            int *pi_capmt_size )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    system_ids_t *p_ids =
+        (system_ids_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+    dvbpsi_pmt_es_t *p_es;
+    int i_cad_size, i_cad_program_size;
+    uint8_t *p_capmt;
+
+    i_cad_size = i_cad_program_size =
+            GetCADSize( p_ids, p_pmt->p_first_descriptor );
+    for( p_es = p_pmt->p_first_es; p_es != NULL; p_es = p_es->p_next )
+    {
+        i_cad_size += GetCADSize( p_ids, p_es->p_first_descriptor );
+    }
+
+    if ( !i_cad_size )
+    {
+        msg_Warn( p_access,
+                  "no compatible scrambling system for SID %d on session %d",
+                  p_pmt->i_program_number, i_session_id );
+    }
+
+    p_capmt = CAPMTHeader( p_ids, i_list_mgt, p_pmt->i_program_number,
+                           p_pmt->i_version, i_cad_program_size,
+                           p_pmt->p_first_descriptor );
+
+    if ( i_cad_program_size )
+        *pi_capmt_size = 7 + i_cad_program_size;
+    else
+        *pi_capmt_size = 6;
+
+    for( p_es = p_pmt->p_first_es; p_es != NULL; p_es = p_es->p_next )
+    {
+        i_cad_size = GetCADSize( p_ids, p_es->p_first_descriptor );
+
+        if ( i_cad_size || i_cad_program_size )
+        {
+            p_capmt = CAPMTES( p_ids, p_capmt, *pi_capmt_size, p_es->i_type,
+                               p_es->i_pid, i_cad_size,
+                               p_es->p_first_descriptor );
+            if ( i_cad_size )
+                *pi_capmt_size += 6 + i_cad_size;
+            else
+                *pi_capmt_size += 5;
+        }
+    }
+
+    return p_capmt;
+}
+
+/*****************************************************************************
+ * CAPMTAdd
+ *****************************************************************************/
+static void CAPMTAdd( access_t * p_access, int i_session_id,
+                      dvbpsi_pmt_t *p_pmt )
+{
+    uint8_t *p_capmt;
+    int i_capmt_size;
+
+    msg_Dbg( p_access, "adding CAPMT for SID %d on session %d",
+             p_pmt->i_program_number, i_session_id );
+
+    p_capmt = CAPMTBuild( p_access, i_session_id, p_pmt,
+                          0x4 /* add */, &i_capmt_size );
+
+    APDUSend( p_access, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
+}
+
+/*****************************************************************************
+ * CAPMTUpdate
+ *****************************************************************************/
+static void CAPMTUpdate( access_t * p_access, int i_session_id,
+                         dvbpsi_pmt_t *p_pmt )
+{
+    uint8_t *p_capmt;
+    int i_capmt_size;
+
+    msg_Dbg( p_access, "updating CAPMT for SID %d on session %d",
+             p_pmt->i_program_number, i_session_id );
+
+    p_capmt = CAPMTBuild( p_access, i_session_id, p_pmt,
+                          0x5 /* update */, &i_capmt_size );
+
+    APDUSend( p_access, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
+}
+
 /*****************************************************************************
  * ConditionalAccessHandle
  *****************************************************************************/
@@ -726,28 +1019,38 @@ static void ConditionalAccessHandle( access_t * p_access, int i_session_id,
                                      uint8_t *p_apdu, int i_size )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    system_ids_t *p_ids =
+        (system_ids_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
     int i_tag = APDUGetTag( p_apdu, i_size );
 
     switch ( i_tag )
     {
     case AOT_CA_INFO:
     {
-        if ( p_sys->i_nb_capmts )
+        int i;
+        int l = 0;
+        uint8_t *d = APDUGetLength( p_apdu, &l );
+        msg_Dbg( p_access, "CA system IDs supported by the application :" );
+
+        for ( i = 0; i < l / 2; i++ )
         {
-            int i;
-            msg_Dbg( p_access, "sending CAPMT on session %d", i_session_id );
-            for ( i = 0; i < p_sys->i_nb_capmts; i++ )
+            p_ids->pi_system_ids[i] = ((uint16_t)d[0] << 8) | d[1];
+            d += 2;
+            msg_Dbg( p_access, "- 0x%x", p_ids->pi_system_ids[i] );
+        }
+        p_ids->pi_system_ids[i] = 0;
+
+        for ( i = 0; i < MAX_PROGRAMS; i++ )
+        {
+            if ( p_sys->pp_selected_programs[i] != NULL )
             {
-                int i_size;
-                uint8_t *p;
-                p = GetLength( &p_sys->pp_capmts[i][3], &i_size );
-                SPDUSend( p_access, i_session_id, p_sys->pp_capmts[i],
-                          i_size + (p - p_sys->pp_capmts[i]) );
+                CAPMTAdd( p_access, i_session_id,
+                          p_sys->pp_selected_programs[i] );
             }
-            p_sys->i_ca_next_pmt = 0;
         }
         break;
     }
+
     default:
         msg_Err( p_access,
                  "unexpected tag in ConditionalAccessHandle (0x%x)",
@@ -765,9 +1068,16 @@ static void ConditionalAccessOpen( access_t * p_access, int i_session_id )
     msg_Dbg( p_access, "opening ConditionalAccess session (%d)", i_session_id );
 
     p_sys->p_sessions[i_session_id - 1].pf_handle = ConditionalAccessHandle;
+    p_sys->p_sessions[i_session_id - 1].p_sys = malloc(sizeof(system_ids_t));
+    memset( p_sys->p_sessions[i_session_id - 1].p_sys, 0,
+            sizeof(system_ids_t) );
 
     APDUSend( p_access, i_session_id, AOT_CA_INFO_ENQ, NULL, 0 );
 }
+
+/*
+ * Date Time
+ */
 
 typedef struct
 {
@@ -882,6 +1192,10 @@ static void DateTimeOpen( access_t * p_access, int i_session_id )
 
     DateTimeSend( p_access, i_session_id );
 }
+
+/*
+ * MMI
+ */
 
 /*****************************************************************************
  * MMIHandle
@@ -1073,30 +1387,6 @@ int E_(en50221_Poll)( access_t * p_access )
         }
     }
 
-    if ( p_sys->i_ca_next_pmt && p_sys->i_ca_next_pmt <= mdate() )
-    {
-        for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
-        {
-            int i;
-
-            if ( p_sys->p_sessions[i_session_id - 1].i_resource_id
-                  != RI_CONDITIONAL_ACCESS_SUPPORT )
-                continue;
-
-            msg_Dbg( p_access, "sending CAPMT on session %d", i_session_id );
-            for ( i = 0; i < p_sys->i_nb_capmts; i++ )
-            {
-                int i_size;
-                uint8_t *p;
-                p = GetLength( &p_sys->pp_capmts[i][3], &i_size );
-                SPDUSend( p_access, i_session_id, p_sys->pp_capmts[i],
-                          i_size + (p - p_sys->pp_capmts[i]) );
-            }
-        }
-
-        p_sys->i_ca_next_pmt = 0;
-    }
-
     return VLC_SUCCESS;
 }
 
@@ -1104,23 +1394,52 @@ int E_(en50221_Poll)( access_t * p_access )
 /*****************************************************************************
  * en50221_SetCAPMT :
  *****************************************************************************/
-int E_(en50221_SetCAPMT)( access_t * p_access, uint8_t **pp_capmts,
-                          int i_nb_capmts )
+int E_(en50221_SetCAPMT)( access_t * p_access, dvbpsi_pmt_t *p_pmt )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    int i, i_session_id;
+    vlc_bool_t b_update = VLC_FALSE;
+    vlc_bool_t b_needs_descrambling = CAPMTNeedsDescrambling( p_pmt );
 
-    if ( p_sys->i_nb_capmts )
+    for ( i = 0; i < MAX_PROGRAMS; i++ )
     {
-        int i;
-        for ( i = 0; i < p_sys->i_nb_capmts; i++ )
+        if ( p_sys->pp_selected_programs[i] != NULL
+              && p_sys->pp_selected_programs[i]->i_program_number
+                  == p_pmt->i_program_number )
         {
-            free( p_sys->pp_capmts[i] );
+            b_update = VLC_TRUE;
+            dvbpsi_DeletePMT( p_sys->pp_selected_programs[i] );
+            if ( b_needs_descrambling )
+                p_sys->pp_selected_programs[i] = p_pmt;
+            else
+                p_sys->pp_selected_programs[i] = NULL;
+            break;
         }
-        free( p_sys->pp_capmts );
     }
-    p_sys->pp_capmts = pp_capmts;
-    p_sys->i_nb_capmts = i_nb_capmts;
-    p_sys->i_ca_next_pmt = mdate() + 1000000;
+
+    if ( !b_update && b_needs_descrambling )
+    {
+        for ( i = 0; i < MAX_PROGRAMS; i++ )
+        {
+            if ( p_sys->pp_selected_programs[i] == NULL )
+            {
+                p_sys->pp_selected_programs[i] = p_pmt;
+                break;
+            }
+        }
+    }
+
+    for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+    {
+        if ( p_sys->p_sessions[i_session_id - 1].i_resource_id
+                == RI_CONDITIONAL_ACCESS_SUPPORT )
+        {
+            if ( b_update )
+                CAPMTUpdate( p_access, i_session_id, p_pmt );
+            else
+                CAPMTAdd( p_access, i_session_id, p_pmt );
+        }
+    }
 
     return VLC_SUCCESS;
 }
@@ -1131,15 +1450,14 @@ int E_(en50221_SetCAPMT)( access_t * p_access, uint8_t **pp_capmts,
 void E_(en50221_End)( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    int i;
 
-    if ( p_sys->i_nb_capmts )
+    for ( i = 0; i < MAX_PROGRAMS; i++ )
     {
-        int i;
-        for ( i = 0; i < p_sys->i_nb_capmts; i++ )
+        if ( p_sys->pp_selected_programs[i] != NULL )
         {
-            free( p_sys->pp_capmts[i] );
+            dvbpsi_DeletePMT( p_sys->pp_selected_programs[i] );
         }
-        free( p_sys->pp_capmts );
     }
 
     /* TODO */

@@ -202,10 +202,6 @@ typedef struct
     /* IOD stuff (mpeg4) */
     iod_descriptor_t *iod;
 
-    /* Conditional Access PMT (EN 50 221) */
-    uint8_t         *p_capmt;
-    int             i_capmt_size;
-
 } ts_prg_psi_t;
 
 typedef struct
@@ -308,8 +304,6 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *, block_t * );
 
 static iod_descriptor_t *IODNew( int , uint8_t * );
 static void              IODFree( iod_descriptor_t * );
-
-static void DVBCAPMTSend( demux_t *p_demux );
 
 #define TS_PACKET_SIZE_188 188
 #define TS_PACKET_SIZE_192 192
@@ -962,9 +956,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                             }
                         }
                     }
-
-                    /* Set CAM descrambling */
-                    DVBCAPMTSend( p_demux );
                 }
             }
             else
@@ -1015,8 +1006,6 @@ static void PIDInit( ts_pid_t *pid, vlc_bool_t b_psi, ts_psi_t *p_owner )
             prg->i_pid_pcr  = -1;
             prg->i_pid_pmt  = -1;
             prg->iod        = NULL;
-            prg->p_capmt    = NULL;
-            prg->i_capmt_size = 0;
             prg->handle     = NULL;
 
             TAB_APPEND( pid->psi->i_prg, pid->psi->prg, prg );
@@ -1049,8 +1038,6 @@ static void PIDClean( es_out_t *out, ts_pid_t *pid )
         {
             if( pid->psi->prg[i]->iod )
                 IODFree( pid->psi->prg[i]->iod );
-            if ( pid->psi->prg[i]->i_capmt_size )
-                free( pid->psi->prg[i]->p_capmt );
             if( pid->psi->prg[i]->handle )
                 dvbpsi_DetachPMT( pid->psi->prg[i]->handle );
             free( pid->psi->prg[i] );
@@ -1955,7 +1942,6 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
     ts_pid_t             *pmt = NULL;
     ts_prg_psi_t         *prg = NULL;
 
-    int                  i_cad_length = 0;
     ts_pid_t             **pp_clean = NULL;
     int                  i_clean = 0, i;
 
@@ -2008,9 +1994,6 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         IODFree( prg->iod );
         prg->iod = NULL;
     }
-    if ( prg->i_capmt_size )
-        free( prg->p_capmt );
-    prg->i_capmt_size = 0;
 
     msg_Dbg( p_demux, "new PMT program number=%d version=%d pid_pcr=%d",
              p_pmt->i_program_number, p_pmt->i_version, p_pmt->i_pcr_pid );
@@ -2037,7 +2020,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         if( p_dr->i_tag == 0x1d )
         {
             /* We have found an IOD descriptor */
-            msg_Warn( p_demux, " * descriptor : IOD (0x1d)" );
+            msg_Dbg( p_demux, " * descriptor : IOD (0x1d)" );
 
             prg->iod = IODNew( p_dr->i_length, p_dr->p_data );
         }
@@ -2046,42 +2029,10 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
                                 | p_dr->p_data[1];
             msg_Dbg( p_demux, " * descriptor : CA (0x9) SysID 0x%x", i_sysid );
-            if ( !p_sys->i_capmt_sysid || p_sys->i_capmt_sysid == i_sysid )
-                i_cad_length += p_dr->i_length + 2;
         }
         else
         {
             msg_Dbg( p_demux, " * descriptor : unknown (0x%x)", p_dr->i_tag );
-        }
-    }
-
-    if ( i_cad_length )
-    {
-        prg->p_capmt = malloc( 6 + i_cad_length );
-        prg->i_capmt_size = 6 + i_cad_length;
-
-        prg->p_capmt[0] = p_pmt->i_program_number >> 8;
-        prg->p_capmt[1] = p_pmt->i_program_number & 0xff;
-        prg->p_capmt[2] = ((p_pmt->i_version & 0x1f) << 1) | 0x1;
-        prg->p_capmt[3] = (i_cad_length + 1) >> 8;
-        prg->p_capmt[4] = (i_cad_length + 1) & 0xff;
-        prg->p_capmt[5] = 0x1; /* ok_descrambling */
-
-        i = 6;
-        for( p_dr = p_pmt->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
-        {
-            if( p_dr->i_tag == 0x9 )
-            {
-                uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
-                                    | p_dr->p_data[1];
-                if ( !p_sys->i_capmt_sysid || p_sys->i_capmt_sysid == i_sysid )
-                {
-                    prg->p_capmt[i] = 0x9;
-                    prg->p_capmt[i+1] = p_dr->i_length;
-                    memcpy( &prg->p_capmt[i+2], p_dr->p_data, p_dr->i_length );
-                    i += p_dr->i_length + 2;
-                }
-            }
         }
     }
 
@@ -2453,7 +2404,6 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             }
         }
 
-        i_cad_length = 0;
         /* Add ES to the list */
         if( old_pid )
         {
@@ -2471,77 +2421,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                                     | p_dr->p_data[1];
                 msg_Dbg( p_demux, "   * descriptor : CA (0x9) SysID 0x%x",
                          i_sysid );
-                if ( !p_sys->i_capmt_sysid || p_sys->i_capmt_sysid == i_sysid )
-                    i_cad_length += p_dr->i_length + 2;
             }
-            else
-            {
-                msg_Dbg( p_demux, "   * descriptor : unknown (0x%x)",
-                         p_dr->i_tag );
-            }
-        }
-
-        if ( i_cad_length )
-        {
-            if ( !prg->i_capmt_size )
-            {
-                prg->p_capmt = malloc( 5 + 6 + i_cad_length );
-                prg->i_capmt_size = 5 + 6 + i_cad_length;
-
-                prg->p_capmt[0] = p_pmt->i_program_number >> 8;
-                prg->p_capmt[1] = p_pmt->i_program_number & 0xff;
-                prg->p_capmt[2] = ((p_pmt->i_version & 0x1f) << 1) | 0x1;
-                prg->p_capmt[3] = 0; /* cad length */
-                prg->p_capmt[4] = 0;
-
-                i = 5;
-            }
-            else
-            {
-                prg->p_capmt = realloc( prg->p_capmt,
-                                        prg->i_capmt_size + 6 + i_cad_length );
-                i = prg->i_capmt_size;
-                prg->i_capmt_size += 6 + i_cad_length;
-            }
-
-            prg->p_capmt[i] = p_es->i_type;
-            prg->p_capmt[i+1] = p_es->i_pid >> 8;
-            prg->p_capmt[i+2] = p_es->i_pid & 0xff;
-            prg->p_capmt[i+3] = (i_cad_length + 1) >> 8;
-            prg->p_capmt[i+4] = (i_cad_length + 1) & 0xff;
-            prg->p_capmt[i+5] = 0x1; /* ok_descrambling */
-            i += 6;
-
-            for( p_dr = p_es->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
-            {
-                if( p_dr->i_tag == 0x9 )
-                {
-                    uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
-                                        | p_dr->p_data[1];
-                    if ( !p_sys->i_capmt_sysid
-                           || p_sys->i_capmt_sysid == i_sysid )
-                    {
-                        prg->p_capmt[i] = 0x9;
-                        prg->p_capmt[i+1] = p_dr->i_length;
-                        memcpy( &prg->p_capmt[i+2], p_dr->p_data, p_dr->i_length );
-                        i += p_dr->i_length + 2;
-                    }
-                }
-            }
-        }
-        else if ( prg->i_capmt_size )
-        {
-            prg->p_capmt = realloc( prg->p_capmt,
-                                    prg->i_capmt_size + 5 );
-            i = prg->i_capmt_size;
-            prg->i_capmt_size += 5;
-
-            prg->p_capmt[i] = p_es->i_type;
-            prg->p_capmt[i+1] = p_es->i_pid >> 8;
-            prg->p_capmt[i+2] = p_es->i_pid & 0xff;
-            prg->p_capmt[i+3] = 0;
-            prg->p_capmt[i+4] = 0;
-            i += 5;
         }
 
         if( DVBProgramIsSelected( p_demux, prg->i_number ) )
@@ -2553,7 +2433,16 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         }
     }
 
-    dvbpsi_DeletePMT( p_pmt );
+    if( DVBProgramIsSelected( p_demux, prg->i_number ) )
+    {
+        /* Set CAM descrambling */
+        stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                        ACCESS_SET_PRIVATE_ID_CA, p_pmt );
+    }
+    else
+    {
+        dvbpsi_DeletePMT( p_pmt );
+    }
 
     for ( i = 0; i < i_clean; i++ )
     {
@@ -2567,12 +2456,6 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         PIDClean( p_demux->out, pp_clean[i] );
     }
     if( i_clean ) free( pp_clean );
-
-    if( DVBProgramIsSelected( p_demux, prg->i_number ) )
-    {
-        /* Set CAM descrambling */
-        DVBCAPMTSend( p_demux );
-    }
 }
 
 static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
@@ -2747,117 +2630,3 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
     dvbpsi_DeletePAT( p_pat );
 }
 
-static void DVBCAPMTSend( demux_t *p_demux )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    int i_nb_capmts = 0;
-    int i;
-
-    for( i = 0; i < p_sys->i_pmt; i++ )
-    {
-        ts_pid_t *pmt = p_sys->pmt[i];
-        int i_prg;
-
-        for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
-        {
-            if( DVBProgramIsSelected( p_demux, pmt->psi->prg[i_prg]->i_number )
-                 && pmt->psi->prg[i_prg]->i_capmt_size )
-            {
-                i_nb_capmts++;
-            }
-        }
-    }
-
-    if ( i_nb_capmts )
-    {
-        uint8_t **pp_capmts = malloc( i_nb_capmts * sizeof(uint8_t *) );
-        int i_current_capmt = 0;
-
-        for( i = 0; i < p_sys->i_pmt; i++ )
-        {
-            ts_pid_t *pmt = p_sys->pmt[i];
-            int i_prg;
-
-            for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
-            {
-                if( DVBProgramIsSelected( p_demux, pmt->psi->prg[i_prg]->i_number )
-                     && pmt->psi->prg[i_prg]->i_capmt_size )
-                {
-                    uint8_t *p_capmt = malloc( pmt->psi->prg[i_prg]->i_capmt_size + 10 );
-                    int i_pos = 0;
-                    pp_capmts[i_current_capmt] = p_capmt;
-
-                    p_capmt[i_pos] = 0x9F;
-                    p_capmt[i_pos+1] = 0x80;
-                    p_capmt[i_pos+2] = 0x32;
-                    i_pos += 3;
-
-                    if ( (pmt->psi->prg[i_prg]->i_capmt_size + 1) < 128 )
-                    {
-                        p_capmt[i_pos] = (pmt->psi->prg[i_prg]->i_capmt_size + 1);
-                        i_pos++;
-                    }
-                    else if ( (pmt->psi->prg[i_prg]->i_capmt_size + 1) < 256 )
-                    {
-                        p_capmt[i_pos] = 0x81;
-                        p_capmt[i_pos+1] = (pmt->psi->prg[i_prg]->i_capmt_size + 1);
-                        i_pos += 2;
-                    }
-                    else if ( (pmt->psi->prg[i_prg]->i_capmt_size + 1) < 65536 )
-                    {
-                        p_capmt[i_pos] = 0x82;
-                        p_capmt[i_pos+1] =
-                            (pmt->psi->prg[i_prg]->i_capmt_size + 1) >> 8;
-                        p_capmt[i_pos+2] =
-                            (pmt->psi->prg[i_prg]->i_capmt_size + 1) & 0xff;
-                        i_pos += 3;
-                    }
-                    else if ( (pmt->psi->prg[i_prg]->i_capmt_size + 1) < 16777216 )
-                    {
-                        p_capmt[i_pos] = 0x83;
-                        p_capmt[i_pos+1] =
-                            (pmt->psi->prg[i_prg]->i_capmt_size + 1) >> 16;
-                        p_capmt[i_pos+2] =
-                            ((pmt->psi->prg[i_prg]->i_capmt_size + 1) >> 8) & 0xff;
-                        p_capmt[i_pos+3] =
-                            (pmt->psi->prg[i_prg]->i_capmt_size + 1) & 0xff;
-                        i_pos += 4;
-                    }
-                    else
-                    {
-                        p_capmt[i_pos] = 0x84;
-                        p_capmt[i_pos+1] =
-                            (pmt->psi->prg[i_prg]->i_capmt_size + 1) >> 24;
-                        p_capmt[i_pos+2] =
-                            ((pmt->psi->prg[i_prg]->i_capmt_size + 1) >> 16) & 0xff;
-                        p_capmt[i_pos+3] =
-                            ((pmt->psi->prg[i_prg]->i_capmt_size + 1) >> 8) & 0xff;
-                        p_capmt[i_pos+4] =
-                            (pmt->psi->prg[i_prg]->i_capmt_size + 1) & 0xff;
-                        i_pos += 5;
-                    }
-
-                    if ( i_nb_capmts > 1 )
-                    {
-                        if ( i_current_capmt == 0 )
-                            p_capmt[i_pos] = 0x1; /* first */
-                        else if ( i_current_capmt == i_nb_capmts - 1 )
-                            p_capmt[i_pos] = 0x2; /* last */
-                        else
-                            p_capmt[i_pos] = 0x0; /* more */
-                    }
-                    else
-                        p_capmt[i_pos] = 0x3; /* only */
-                    i_pos++;
-                    i_current_capmt++;
-
-                    memcpy( &p_capmt[i_pos], pmt->psi->prg[i_prg]->p_capmt,
-                            pmt->psi->prg[i_prg]->i_capmt_size );
-                }
-            }
-        }
-
-        stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                        ACCESS_SET_PRIVATE_ID_CA, pp_capmts, i_nb_capmts );
-    }
-}

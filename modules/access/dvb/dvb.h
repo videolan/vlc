@@ -57,10 +57,11 @@ typedef struct
 #define MAX_DEMUX 256
 #define MAX_CI_SLOTS 16
 #define MAX_SESSIONS 32
+#define MAX_PROGRAMS 24
 
 struct access_sys_t
 {
-    int i_handle;
+    int i_handle, i_frontend_handle;
     demux_handle_t p_demux_handles[MAX_DEMUX];
     frontend_t *p_frontend;
     vlc_bool_t b_budget_mode;
@@ -71,9 +72,8 @@ struct access_sys_t
     vlc_bool_t pb_active_slot[MAX_CI_SLOTS];
     vlc_bool_t pb_tc_has_data[MAX_CI_SLOTS];
     en50221_session_t p_sessions[MAX_SESSIONS];
-    mtime_t i_ca_timeout, i_ca_next_event, i_ca_next_pmt;
-    uint8_t **pp_capmts;
-    int i_nb_capmts;
+    mtime_t i_ca_timeout, i_ca_next_event;
+    dvbpsi_pmt_t *pp_selected_programs[MAX_PROGRAMS];
 };
 
 #define VIDEO0_TYPE     1
@@ -88,6 +88,7 @@ struct access_sys_t
  * Prototypes
  *****************************************************************************/
 int  E_(FrontendOpen)( access_t * );
+void E_(FrontendPoll)( access_t *p_access );
 int  E_(FrontendSet)( access_t * );
 void E_(FrontendClose)( access_t * );
 
@@ -99,10 +100,10 @@ void E_(DVRClose)( access_t * );
 
 int  E_(CAMOpen)( access_t * );
 int  E_(CAMPoll)( access_t * );
-int  E_(CAMSet)( access_t *, uint8_t **, int );
+int  E_(CAMSet)( access_t *, dvbpsi_pmt_t * );
 void E_(CAMClose)( access_t * );
 
 int E_(en50221_Poll)( access_t * );
-int E_(en50221_SetCAPMT)( access_t *, uint8_t **, int );
+int E_(en50221_SetCAPMT)( access_t *, dvbpsi_pmt_t * );
 void E_(en50221_End)( access_t * );
 
