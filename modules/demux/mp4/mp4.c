@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.6 2002/11/19 17:23:21 fenrir Exp $
+ * $Id: mp4.c,v 1.7 2002/11/26 17:28:22 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -276,9 +276,16 @@ static int MP4Init( vlc_object_t * p_this )
     }
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
     /* XXX beurk and beurk, see MP4Demux and MP4Seek */
-    p_input->stream.i_mux_rate =  
-        p_input->stream.p_selected_area->i_size / 50 / 
-        ( p_demux->i_duration / p_demux->i_timescale );
+    if( p_demux->i_duration/p_demux->i_timescale > 0 )
+    {
+        p_input->stream.i_mux_rate =  
+            p_input->stream.p_selected_area->i_size / 50 / 
+            ( p_demux->i_duration / p_demux->i_timescale );
+    }
+    else
+    {
+        p_input->stream.i_mux_rate = 0;
+    }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
    
     
