@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.14 2002/10/20 12:23:47 massiot Exp $
+ * $Id: esd.c,v 1.15 2002/11/15 17:17:29 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -100,7 +100,8 @@ static int Open( vlc_object_t *p_this )
     {
         /* EsounD doesn't support more than two channels. */
         i_nb_channels = 2;
-        p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
+        p_aout->output.output.i_physical_channels =
+            AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     }
 
     switch( i_nb_channels )

@@ -2,7 +2,7 @@
  * arts.c : aRts module
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: arts.c,v 1.15 2002/11/08 10:26:53 gbazin Exp $
+ * $Id: arts.c,v 1.16 2002/11/15 17:17:29 gbazin Exp $
  *
  * Authors: Emmanuel Blindauer <manu@agat.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -106,7 +106,8 @@ static int Open( vlc_object_t *p_this )
     {
         /* aRts doesn't support more than two channels. */
         i_nb_channels = 2;
-        p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
+        p_aout->output.output.i_physical_channels =
+            AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     }
 
     /* Open a socket for playing a stream, set format to 16 bits */
