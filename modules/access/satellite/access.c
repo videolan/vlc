@@ -30,6 +30,8 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#include "../../demux/mpeg/system.h"
+
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif

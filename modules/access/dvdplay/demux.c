@@ -2,7 +2,7 @@
  * demux.c: demux functions for dvdplay.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: demux.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: demux.c,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -30,6 +30,8 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+
+#include "../../demux/mpeg/system.h"
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -59,12 +61,24 @@
 static int  Demux         ( input_thread_t * );
 
 /*****************************************************************************
+ * Private structure
+ *****************************************************************************/
+struct demux_sys_t
+{
+    dvd_data_t * p_dvd;
+
+    module_t *   p_module;
+    mpeg_demux_t mpeg;
+};
+
+/*****************************************************************************
  * InitDVD: initializes dvdplay structures
  *****************************************************************************/
 int E_(InitDVD) ( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    dvd_data_t *    p_dvd;
+    dvd_data_t *    p_dvd = (dvd_data_t *)p_input->p_access_data;
+    demux_sys_t *   p_demux;
     char *          psz_intf = NULL;
 
     if( p_input->stream.i_method != INPUT_METHOD_DVD )
@@ -72,8 +86,21 @@ int E_(InitDVD) ( vlc_object_t *p_this )
         return -1;
     }
 
-    p_input->p_demux_data = (void*)p_input->p_access_data;
-    p_dvd = (dvd_data_t *)p_input->p_demux_data;
+    p_demux = p_input->p_demux_data = malloc( sizeof(demux_sys_t ) );
+    if( p_demux == NULL )
+    {
+        return -1;
+    }
+
+    p_input->p_private = (void*)&p_demux->mpeg;
+    p_demux->p_module = module_Need( p_input, "mpeg-system", NULL );
+    if( p_demux->p_module == NULL )
+    {
+        free( p_input->p_demux_data );
+        return -1;
+    }
+
+    p_input->p_demux_data->p_dvd = p_dvd;
 
     p_input->pf_demux = Demux;
     p_input->pf_rewind = NULL;
@@ -98,7 +125,7 @@ int E_(InitDVD) ( vlc_object_t *p_this )
 void E_(EndDVD) ( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    dvd_data_t *    p_dvd;
+    dvd_data_t *    p_dvd = p_input->p_demux_data->p_dvd;
     intf_thread_t * p_intf = NULL;
 
     p_intf = vlc_object_find( p_input, VLC_OBJECT_INTF, FIND_CHILD );
@@ -110,8 +137,10 @@ void E_(EndDVD) ( vlc_object_t *p_this )
         intf_Destroy( p_intf );
     }
 
-    p_dvd = (dvd_data_t *)p_input->p_demux_data;
     p_dvd->p_intf = NULL;
+
+    module_Unneed( p_input, p_input->p_demux_data->p_module );
+    free( p_input->p_demux_data );
 }
 
 /*****************************************************************************
@@ -125,19 +154,21 @@ static int Demux( input_thread_t * p_input )
     ptrdiff_t               i_remains;
     int                     i_data_nb = 0;
 
-    p_dvd = (dvd_data_t *)p_input->p_demux_data;
+    p_dvd = p_input->p_demux_data->p_dvd;
    
     /* Read headers to compute payload length */
     do
     {
-        if( ( i_result = input_ReadPS( p_input, &p_data ) ) <= 0)
+        i_result = p_input->p_demux_data->mpeg.pf_read_ps( p_input, &p_data );
+
+        if( i_result <= 0 )
         {
             return i_result;
         }
 
         i_remains = p_input->p_last_data - p_input->p_current_data;
 
-        input_DemuxPS( p_input, p_data );
+        p_input->p_demux_data->mpeg.pf_demux_ps( p_input, p_data );
         
 
         ++i_data_nb;

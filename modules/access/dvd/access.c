@@ -8,7 +8,7 @@
  *  -udf.* to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: access.c,v 1.1 2002/08/04 17:23:41 sam Exp $
+ * $Id: access.c,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -36,6 +36,8 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+
+#include "../../demux/mpeg/system.h"
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>

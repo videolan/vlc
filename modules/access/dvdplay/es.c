@@ -2,7 +2,7 @@
  * es.c: functions to handle elementary streams.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: es.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: es.c,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -204,7 +204,7 @@ void dvdplay_Subp( input_thread_t * p_input )
             if( pi_palette )
             {
                 ADDES( i_id, VLC_FOURCC('s','p','u',' '), SPU_ES,
-                       p_attr->lang_code, 16*sizeof(u32) );
+                       p_attr->lang_code, sizeof(int) + 16*sizeof(u32) );
                 *(int*)p_es->p_demux_data = 0xBeeF;
                 memcpy( (void*)p_es->p_demux_data + sizeof(int),
                         pi_palette, 16*sizeof(u32) ); 

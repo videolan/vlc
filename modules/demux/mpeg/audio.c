@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: audio.c,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -94,7 +94,7 @@ typedef struct mpegaudio_xing_header_s
     int i_avgbitrate; /* calculated, XXX: bits/sec not Kb */
 } mpegaudio_xing_header_t;
 
-typedef struct demux_data_mpegaudio_s
+struct demux_sys_t
 {
     mtime_t i_pts;
 
@@ -103,8 +103,7 @@ typedef struct demux_data_mpegaudio_s
     es_descriptor_t         *p_es;
     mpegaudio_format_t      mpeg;
     mpegaudio_xing_header_t xingheader;
-
-} demux_data_mpegaudio_t;
+};
 
 
 static int mpegaudio_bitrate[2][3][16] =
@@ -422,7 +421,7 @@ static void MPEGAudio_ExtractXingHeader( input_thread_t *p_input,
 static int Activate( vlc_object_t * p_this )
 {
     input_thread_t * p_input = (input_thread_t *)p_this;
-    demux_data_mpegaudio_t * p_mpegaudio;
+    demux_sys_t * p_mpegaudio;
     mpegaudio_format_t mpeg;
     es_descriptor_t * p_es;
     int i_pos;
@@ -507,8 +506,7 @@ static int Activate( vlc_object_t * p_this )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     /* create p_mpegaudio and init it */
-    p_input->p_demux_data =
-           p_mpegaudio = malloc( sizeof( demux_data_mpegaudio_t ));
+    p_mpegaudio = p_input->p_demux_data = malloc( sizeof(demux_sys_t) );
 
     if( !p_mpegaudio )
     {
@@ -575,8 +573,8 @@ static int Demux( input_thread_t * p_input )
     int i_toread;
     pes_packet_t    *p_pes;
     mpegaudio_format_t mpeg;
-    demux_data_mpegaudio_t *p_mpegaudio = 
-                        (demux_data_mpegaudio_t*) p_input->p_demux_data;
+    demux_sys_t *p_mpegaudio = p_input->p_demux_data;
+
     /*  look for a frame */
     if( !MPEGAudio_FindFrame( p_input, &i_pos, &mpeg, 4096 ) )
     {

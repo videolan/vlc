@@ -32,7 +32,7 @@ RELEASE = @RELEASE@
 # Build environment
 # 
 CC = @CC@
-CFLAGS = @CFLAGS@
+CFLAGS += @CFLAGS@
 SHELL = @SHELL@
 RANLIB = @RANLIB@
 STRIP = @STRIP@

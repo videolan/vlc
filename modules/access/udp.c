@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.1 2002/08/04 17:23:41 sam Exp $
+ * $Id: udp.c,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -237,7 +237,9 @@ static int Open( vlc_object_t *p_this )
     }
     module_Unneed( p_input, p_network );
     
-    p_access_data = p_input->p_access_data = malloc( sizeof(input_socket_t) );
+    p_access_data = malloc( sizeof(input_socket_t) );
+    p_input->p_access_data = (access_sys_t *)p_access_data;
+
     if( p_access_data == NULL )
     {
         msg_Err( p_input, "out of memory" );

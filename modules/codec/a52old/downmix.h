@@ -2,7 +2,7 @@
  * downmix.h : A52 downmix types
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: downmix.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: downmix.h,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -21,6 +21,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+VLC_DECLARE_STRUCT(dm_par_t)
+VLC_DECLARE_STRUCT(downmix_t)
 
 struct dm_par_t
 {

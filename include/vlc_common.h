@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.13 2002/07/31 20:56:50 sam Exp $
+ * $Id: vlc_common.h,v 1.14 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -147,7 +147,6 @@ VLC_DECLARE_STRUCT(module_bank_t)
 VLC_DECLARE_STRUCT(module_t)
 VLC_DECLARE_STRUCT(module_config_t)
 VLC_DECLARE_STRUCT(module_symbols_t)
-VLC_DECLARE_STRUCT(module_functions_t)
 
 /* Interface */
 VLC_DECLARE_STRUCT(intf_thread_t)
@@ -159,10 +158,19 @@ VLC_DECLARE_STRUCT(intf_channel_t)
 /* Input */
 VLC_DECLARE_STRUCT(input_thread_t)
 VLC_DECLARE_STRUCT(input_channel_t)
-VLC_DECLARE_STRUCT(input_cfg_t)
 VLC_DECLARE_STRUCT(input_area_t)
 VLC_DECLARE_STRUCT(input_buffers_t)
 VLC_DECLARE_STRUCT(input_socket_t)
+VLC_DECLARE_STRUCT(input_info_t)
+VLC_DECLARE_STRUCT(input_info_category_t)
+VLC_DECLARE_STRUCT(access_sys_t)
+VLC_DECLARE_STRUCT(demux_sys_t)
+VLC_DECLARE_STRUCT(es_descriptor_t)
+VLC_DECLARE_STRUCT(es_sys_t)
+VLC_DECLARE_STRUCT(pgrm_descriptor_t)
+VLC_DECLARE_STRUCT(pgrm_sys_t)
+VLC_DECLARE_STRUCT(stream_descriptor_t)
+VLC_DECLARE_STRUCT(stream_sys_t)
 
 /* Audio */
 VLC_DECLARE_STRUCT(aout_thread_t)
@@ -184,24 +192,14 @@ VLC_DECLARE_STRUCT(subpicture_sys_t)
 VLC_DECLARE_STRUCT(decoder_fifo_t)
 
 /* Misc */
-VLC_DECLARE_STRUCT(macroblock_t)
 VLC_DECLARE_STRUCT(data_packet_t)
 VLC_DECLARE_STRUCT(data_buffer_t)
-VLC_DECLARE_STRUCT(downmix_t)
-VLC_DECLARE_STRUCT(imdct_t)
-VLC_DECLARE_STRUCT(complex_t)
-VLC_DECLARE_STRUCT(dm_par_t)
-VLC_DECLARE_STRUCT(es_descriptor_t)
-VLC_DECLARE_STRUCT(pgrm_descriptor_t)
-VLC_DECLARE_STRUCT(stream_descriptor_t)
 VLC_DECLARE_STRUCT(stream_position_t)
 VLC_DECLARE_STRUCT(stream_ctrl_t)
 VLC_DECLARE_STRUCT(pes_packet_t)
 VLC_DECLARE_STRUCT(bit_stream_t)
 VLC_DECLARE_STRUCT(network_socket_t)
 VLC_DECLARE_STRUCT(iso639_lang_t)
-VLC_DECLARE_STRUCT(input_info_t)
-VLC_DECLARE_STRUCT(input_info_category_t)
 
 /*****************************************************************************
  * Plug-in stuff

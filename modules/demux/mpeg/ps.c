@@ -1,8 +1,8 @@
 /*****************************************************************************
- * mpeg_ps.c : Program Stream input module for vlc
+ * ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ps.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: ps.c,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -33,16 +33,28 @@
 
 #include <sys/types.h>
 
+#include "system.h"
+
 /*****************************************************************************
  * Constants
  *****************************************************************************/
 #define PS_READ_ONCE 50
 
 /*****************************************************************************
+ * Private structure
+ *****************************************************************************/
+struct demux_sys_t
+{
+    module_t *   p_module;
+    mpeg_demux_t mpeg;
+};
+
+/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Activate ( vlc_object_t * );
-static int  Demux ( input_thread_t * );
+static int  Activate   ( vlc_object_t * );
+static void Deactivate ( vlc_object_t * );
+static int  Demux      ( input_thread_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -50,16 +62,17 @@ static int  Demux ( input_thread_t * );
 vlc_module_begin();
     set_description( _("ISO 13818-1 MPEG Program Stream input") );
     set_capability( "demux", 100 );
-    set_callbacks( Activate, NULL );
+    set_callbacks( Activate, Deactivate );
     add_shortcut( "ps" );
 vlc_module_end();
 
 /*****************************************************************************
- * Activate: initializes PS structures
+ * Activate: initialize PS structures
  *****************************************************************************/
 static int Activate( vlc_object_t * p_this )
 {
     input_thread_t *    p_input = (input_thread_t *)p_this;
+    demux_sys_t *       p_demux;
     byte_t *            p_peek;
 
     /* Set the demux function */
@@ -77,7 +90,7 @@ static int Activate( vlc_object_t * p_this )
     {
         /* Stream shorter than 4 bytes... */
         msg_Err( p_input, "cannot peek()" );
-        return( -1 );
+        return -1;
     }
 
     if( *p_peek || *(p_peek + 1) || *(p_peek + 2) != 1 )
@@ -106,9 +119,25 @@ static int Activate( vlc_object_t * p_this )
         }
     }
 
+    p_demux = p_input->p_demux_data = malloc( sizeof(demux_sys_t ) );
+    if( p_demux == NULL )
+    {
+        return -1;
+    }
+
+    p_input->p_private = (void*)&p_demux->mpeg;
+    p_demux->p_module = module_Need( p_input, "mpeg-system", NULL );
+    if( p_demux->p_module == NULL )
+    {
+        free( p_input->p_demux_data );
+        return -1;
+    }
+
     if( input_InitStream( p_input, sizeof( stream_ps_data_t ) ) == -1 )
     {
-        return( -1 );
+        module_Unneed( p_input, p_demux->p_module );
+        free( p_input->p_demux_data );
+        return -1;
     }
     input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
     
@@ -130,7 +159,7 @@ static int Activate( vlc_object_t * p_this )
             ssize_t             i_result;
             data_packet_t *     p_data;
 
-            i_result = input_ReadPS( p_input, &p_data );
+            i_result = p_demux->mpeg.pf_read_ps( p_input, &p_data );
 
             if( i_result == 0 )
             {
@@ -146,7 +175,7 @@ static int Activate( vlc_object_t * p_this )
                 break;
             }
 
-            input_ParsePS( p_input, p_data );
+            p_demux->mpeg.pf_parse_ps( p_input, p_data );
             input_DeletePacket( p_input->p_method_data, p_data );
 
             /* File too big. */
@@ -246,7 +275,18 @@ static int Activate( vlc_object_t * p_this )
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
 
-    return( 0 );
+    return 0;
+}
+
+/*****************************************************************************
+ * Deactivate: deinitialize PS structures
+ *****************************************************************************/
+static void Deactivate( vlc_object_t * p_this )
+{
+    input_thread_t *    p_input = (input_thread_t *)p_this;
+
+    module_Unneed( p_input, p_input->p_demux_data->p_module );
+    free( p_input->p_demux_data );
 }
 
 /*****************************************************************************
@@ -257,22 +297,22 @@ static int Activate( vlc_object_t * p_this )
  *****************************************************************************/
 static int Demux( input_thread_t * p_input )
 {
-    int                 i;
+    int i;
 
     for( i = 0; i < PS_READ_ONCE; i++ )
     {
         data_packet_t *     p_data;
         ssize_t             i_result;
-        i_result = input_ReadPS( p_input, &p_data );
+        i_result = p_input->p_demux_data->mpeg.pf_read_ps( p_input, &p_data );
 
         if( i_result <= 0 )
         {
-            return( i_result );
+            return i_result;
         }
 
-        input_DemuxPS( p_input, p_data );
+        p_input->p_demux_data->mpeg.pf_demux_ps( p_input, p_data );
     }
 
-    return( i );
+    return i;
 }
 

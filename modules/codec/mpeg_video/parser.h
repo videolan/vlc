@@ -1,8 +1,8 @@
 /*****************************************************************************
- * video_parser.h : video parser thread
+ * parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: parser.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: parser.h,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -60,11 +60,11 @@ extern u8       pi_scan[2][64];
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void vpar_InitScanTable( struct vpar_thread_s * p_vpar );
+void vpar_InitScanTable( vpar_thread_t * p_vpar );
 
-typedef void (*f_picture_data_t)( struct vpar_thread_s * p_vpar );
+typedef void (*f_picture_data_t)( vpar_thread_t * p_vpar );
 #define PROTO_PICD( FUNCNAME )                                              \
-void FUNCNAME( struct vpar_thread_s * p_vpar );
+void FUNCNAME( vpar_thread_t * p_vpar );
 
 PROTO_PICD( vpar_PictureDataGENERIC )
 #if (VPAR_OPTIM_LEVEL > 0)
@@ -232,8 +232,8 @@ typedef struct picture_parsing_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-int vpar_NextSequenceHeader( struct vpar_thread_s * p_vpar );
-int vpar_ParseHeader( struct vpar_thread_s * p_vpar );
+int vpar_NextSequenceHeader( vpar_thread_t * p_vpar );
+int vpar_ParseHeader( vpar_thread_t * p_vpar );
 
 
 /*
@@ -286,20 +286,13 @@ typedef struct video_synchro_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void vpar_SynchroInit           ( struct vpar_thread_s * p_vpar );
-vlc_bool_t vpar_SynchroChoose   ( struct vpar_thread_s * p_vpar,
-                                  int i_coding_type, int i_structure );
-void vpar_SynchroTrash          ( struct vpar_thread_s * p_vpar,
-                                  int i_coding_type, int i_structure );
-void vpar_SynchroDecode         ( struct vpar_thread_s * p_vpar,
-                                  int i_coding_type, int i_structure );
-void vpar_SynchroEnd            ( struct vpar_thread_s * p_vpar,
-                                  int i_coding_type, int i_structure,
-                                  int i_garbage );
-mtime_t vpar_SynchroDate        ( struct vpar_thread_s * p_vpar );
-void vpar_SynchroNewPicture( struct vpar_thread_s * p_vpar, int i_coding_type,
-                             int i_repeat_field );
-
+void vpar_SynchroInit           ( vpar_thread_t * p_vpar );
+vlc_bool_t vpar_SynchroChoose   ( vpar_thread_t * p_vpar, int, int );
+void vpar_SynchroTrash          ( vpar_thread_t * p_vpar, int, int );
+void vpar_SynchroDecode         ( vpar_thread_t * p_vpar, int, int );
+void vpar_SynchroEnd            ( vpar_thread_t * p_vpar, int, int, int );
+mtime_t vpar_SynchroDate        ( vpar_thread_t * p_vpar );
+void vpar_SynchroNewPicture     ( vpar_thread_t * p_vpar, int, int );
 
 /*
  * Video parser structures
@@ -308,7 +301,7 @@ void vpar_SynchroNewPicture( struct vpar_thread_s * p_vpar, int i_coding_type,
 /*****************************************************************************
  * vpar_thread_t: video parser thread descriptor
  *****************************************************************************/
-typedef struct vpar_thread_s
+struct vpar_thread_t
 {
     bit_stream_t            bit_stream;
 
@@ -360,7 +353,7 @@ typedef struct vpar_thread_s
                                                    *        pictures decoded */
     count_t         pc_malformed_pictures[4];  /* number of pictures trashed
                                                 * during parsing             */
-} vpar_thread_t;
+};
 
 /*****************************************************************************
  * NextStartCode : Find the next start code
@@ -382,7 +375,7 @@ static inline void NextStartCode( bit_stream_t * p_bit_stream )
  *****************************************************************************
  * Quantizer scale factor (ISO/IEC 13818-2 7.4.2.2)
  *****************************************************************************/
-static inline void LoadQuantizerScale( struct vpar_thread_s * p_vpar )
+static inline void LoadQuantizerScale( vpar_thread_t * p_vpar )
 {
     /* Quantization coefficient table */
     static u8   pi_non_linear_quantizer_scale[32] =

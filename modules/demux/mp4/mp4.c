@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: mp4.c,v 1.2 2002/08/07 00:29:36 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -86,7 +86,7 @@ static int MP4Init( vlc_object_t * p_this )
     u8  *p_peek;
     u32 i_type;
     
-    demux_data_mp4_t *p_demux;
+    demux_sys_t *p_demux;
     
     MP4_Box_t *p_moov;    
     MP4_Box_t *p_ftyp;
@@ -138,12 +138,12 @@ static int MP4Init( vlc_object_t * p_this )
 
     /* create our structure that will contains all data */
     if( !( p_input->p_demux_data = 
-                p_demux = malloc( sizeof( demux_data_mp4_t ) ) ) )
+                p_demux = malloc( sizeof( demux_sys_t ) ) ) )
     {
         msg_Err( p_input, "out of memory" );
         return( -1 );
     }
-    memset( p_demux, 0, sizeof( demux_data_mp4_t ) );
+    memset( p_demux, 0, sizeof( demux_sys_t ) );
     p_input->p_demux_data = p_demux;
        
 
@@ -299,7 +299,7 @@ static int MP4Init( vlc_object_t * p_this )
  *****************************************************************************/
 static int MP4Demux( input_thread_t *p_input )
 {
-    demux_data_mp4_t *p_demux = p_input->p_demux_data;
+    demux_sys_t *p_demux = p_input->p_demux_data;
     int i_track;
 
     /* first wait for the good time to read a packet */
@@ -376,7 +376,7 @@ static void __MP4End ( vlc_object_t * p_this )
     if( p ) { free( p ); } 
     int i_track;
     input_thread_t *  p_input = (input_thread_t *)p_this;
-    demux_data_mp4_t *p_demux = p_input->p_demux_data;
+    demux_sys_t *p_demux = p_input->p_demux_data;
     
     msg_Dbg( p_input, "Freeing all memory" );
     MP4_FreeBox( p_input, &p_demux->box_root );
@@ -942,7 +942,7 @@ static void MP4_StartDecoder( input_thread_t *p_input,
             break;
     }
 
-    p_demux_track->p_es->p_demux_data = p_init;
+    p_demux_track->p_es->p_demux_data = (es_sys_t *)p_init;
     vlc_mutex_lock( &p_input->stream.stream_lock );
     input_SelectES( p_input, p_demux_track->p_es );
     vlc_mutex_unlock( &p_input->stream.stream_lock );

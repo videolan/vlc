@@ -16,7 +16,6 @@ struct module_symbols_t
     data_packet_t * (* input_ShareBuffer_inner) ( input_buffers_t *, data_buffer_t * ) ;
     es_descriptor_t * (* input_AddES_inner) ( input_thread_t *, pgrm_descriptor_t *, u16, size_t ) ;
     es_descriptor_t * (* input_FindES_inner) ( input_thread_t *, u16 ) ;
-    es_descriptor_t * (* input_ParsePS_inner) ( input_thread_t *, data_packet_t * ) ;
     float (* __config_GetFloat_inner) (vlc_object_t *, const char *) ;
     input_area_t * (* input_AddArea_inner) ( input_thread_t * ) ;
     input_info_category_t * (* input_InfoCategory_inner) ( input_thread_t *, char * ) ;
@@ -61,8 +60,6 @@ struct module_symbols_t
     ssize_t (* input_FDRead_inner) ( input_thread_t *, byte_t *, size_t ) ;
     ssize_t (* input_FillBuffer_inner) ( input_thread_t * ) ;
     ssize_t (* input_Peek_inner) ( input_thread_t *, byte_t **, size_t ) ;
-    ssize_t (* input_ReadPS_inner) ( input_thread_t *, data_packet_t ** ) ;
-    ssize_t (* input_ReadTS_inner) ( input_thread_t *, data_packet_t ** ) ;
     ssize_t (* input_SplitBuffer_inner) ( input_thread_t *, data_packet_t **, size_t ) ;
     subpicture_t * (* vout_CreateSubPicture_inner) ( vout_thread_t *, int, int ) ;
     u32 (* UnalignedGetBits_inner) ( bit_stream_t *, unsigned int ) ;
@@ -112,13 +109,9 @@ struct module_symbols_t
     void (* input_DelProgram_inner) ( input_thread_t *, pgrm_descriptor_t * ) ;
     void (* input_DeletePES_inner) ( input_buffers_t *, pes_packet_t * ) ;
     void (* input_DeletePacket_inner) ( input_buffers_t *, data_packet_t * ) ;
-    void (* input_DemuxPS_inner) ( input_thread_t *, data_packet_t * ) ;
-    void (* input_DemuxTS_inner) ( input_thread_t *, data_packet_t *, void(*) ( input_thread_t *, data_packet_t *, es_descriptor_t *, vlc_bool_t ) ) ;
     void (* input_DumpStream_inner) ( input_thread_t * ) ;
     void (* input_EndStream_inner) ( input_thread_t * ) ;
     void (* input_FDSeek_inner) ( input_thread_t *, off_t ) ;
-    void (* input_GatherPES_inner) ( input_thread_t *, data_packet_t *, es_descriptor_t *, vlc_bool_t, vlc_bool_t ) ;
-    void (* input_ParsePES_inner) ( input_thread_t *, es_descriptor_t * ) ;
     void (* input_ReleaseBuffer_inner) ( input_buffers_t *, data_buffer_t * ) ;
     void (* intf_Destroy_inner) ( intf_thread_t * ) ;
     void (* intf_StopThread_inner) ( intf_thread_t * ) ;
@@ -225,8 +218,6 @@ struct module_symbols_t
 #   define input_DelProgram p_symbols->input_DelProgram_inner
 #   define input_DeletePES p_symbols->input_DeletePES_inner
 #   define input_DeletePacket p_symbols->input_DeletePacket_inner
-#   define input_DemuxPS p_symbols->input_DemuxPS_inner
-#   define input_DemuxTS p_symbols->input_DemuxTS_inner
 #   define input_DumpStream p_symbols->input_DumpStream_inner
 #   define input_EndStream p_symbols->input_EndStream_inner
 #   define input_FDNetworkRead p_symbols->input_FDNetworkRead_inner
@@ -235,18 +226,13 @@ struct module_symbols_t
 #   define input_FillBuffer p_symbols->input_FillBuffer_inner
 #   define input_FindES p_symbols->input_FindES_inner
 #   define input_FindProgram p_symbols->input_FindProgram_inner
-#   define input_GatherPES p_symbols->input_GatherPES_inner
 #   define input_InfoCategory p_symbols->input_InfoCategory_inner
 #   define input_InitStream p_symbols->input_InitStream_inner
 #   define input_NewBuffer p_symbols->input_NewBuffer_inner
 #   define input_NewPES p_symbols->input_NewPES_inner
 #   define input_NewPacket p_symbols->input_NewPacket_inner
 #   define input_OffsetToTime p_symbols->input_OffsetToTime_inner
-#   define input_ParsePES p_symbols->input_ParsePES_inner
-#   define input_ParsePS p_symbols->input_ParsePS_inner
 #   define input_Peek p_symbols->input_Peek_inner
-#   define input_ReadPS p_symbols->input_ReadPS_inner
-#   define input_ReadTS p_symbols->input_ReadTS_inner
 #   define input_ReleaseBuffer p_symbols->input_ReleaseBuffer_inner
 #   define input_SelectES p_symbols->input_SelectES_inner
 #   define input_SetProgram p_symbols->input_SetProgram_inner

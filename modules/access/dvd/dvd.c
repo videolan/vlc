@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dvd.c,v 1.1 2002/08/04 17:23:41 sam Exp $
+ * $Id: dvd.c,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -51,6 +51,7 @@ int  E_(DVDOpen)   ( vlc_object_t * );
 void E_(DVDClose)  ( vlc_object_t * );
 
 int  E_(DVDInit)   ( vlc_object_t * );
+void E_(DVDEnd)    ( vlc_object_t * );
 
 #ifdef GOD_DAMN_DMCA
 static void *p_libdvdcss;
@@ -97,7 +98,7 @@ vlc_module_begin();
         set_callbacks( E_(DVDOpen), E_(DVDClose) );
     add_submodule();
         set_capability( "demux", 0 );
-        set_callbacks( E_(DVDInit), NULL );
+        set_callbacks( E_(DVDInit), E_(DVDEnd) );
 #ifdef GOD_DAMN_DMCA
     ProbeLibDVDCSS();
 #endif

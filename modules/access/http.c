@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.1 2002/08/04 17:23:41 sam Exp $
+ * $Id: http.c,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -91,7 +91,7 @@ typedef struct _input_socket_s
  *****************************************************************************/
 static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 {
-    _input_socket_t *   p_access_data = p_input->p_access_data;
+    _input_socket_t *   p_access_data;
     module_t *          p_network;
     char                psz_buffer[256];
     byte_t *            psz_parser;
@@ -99,6 +99,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     char *              psz_return_alpha;
 
     /* Find an appropriate network module */
+    p_access_data = (_input_socket_t *)p_input->p_access_data;
     p_input->p_private = (void*) &p_access_data->socket_desc;
     p_network = module_Need( p_input, "network", p_access_data->psz_network );
     if( p_network == NULL )
@@ -260,7 +261,8 @@ static int Open( vlc_object_t *p_this )
     char *              psz_proxy;
     int                 i_server_port = 0;
 
-    p_access_data = p_input->p_access_data = malloc( sizeof(_input_socket_t) );
+    p_access_data = malloc( sizeof(_input_socket_t) );
+    p_input->p_access_data = (access_sys_t *)p_access_data;
     if( p_access_data == NULL )
     {
         msg_Err( p_input, "out of memory" );
@@ -492,7 +494,7 @@ static int SetProgram( input_thread_t * p_input,
  *****************************************************************************/
 static void Seek( input_thread_t * p_input, off_t i_pos )
 {
-    _input_socket_t *   p_access_data = p_input->p_access_data;
+    _input_socket_t *p_access_data = (_input_socket_t*)p_input->p_access_data;
     close( p_access_data->_socket.i_handle );
     msg_Dbg( p_input, "seeking to position %lld", i_pos );
     HTTPConnect( p_input, i_pos );

@@ -245,13 +245,6 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->input_AccessInit_inner = input_AccessInit; \
     (p_symbols)->input_AccessReinit_inner = input_AccessReinit; \
     (p_symbols)->input_AccessEnd_inner = input_AccessEnd; \
-    (p_symbols)->input_ParsePES_inner = input_ParsePES; \
-    (p_symbols)->input_GatherPES_inner = input_GatherPES; \
-    (p_symbols)->input_ReadPS_inner = input_ReadPS; \
-    (p_symbols)->input_ParsePS_inner = input_ParsePS; \
-    (p_symbols)->input_ReadTS_inner = input_ReadTS; \
-    (p_symbols)->input_DemuxPS_inner = input_DemuxPS; \
-    (p_symbols)->input_DemuxTS_inner = input_DemuxTS; \
     (p_symbols)->__input_FDClose_inner = __input_FDClose; \
     (p_symbols)->__input_FDNetworkClose_inner = __input_FDNetworkClose; \
     (p_symbols)->input_FDRead_inner = input_FDRead; \

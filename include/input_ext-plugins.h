@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.33 2002/07/31 20:56:50 sam Exp $
+ * $Id: input_ext-plugins.h,v 1.34 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -141,130 +141,6 @@ static inline void input_NullPacket( input_thread_t * p_input,
         input_DecodePES( p_es->p_decoder_fifo, p_pes );
     }
 }
-
-
-/*
- * Optional MPEG demultiplexing
- */
-
-/*****************************************************************************
- * Constants
- *****************************************************************************/
-#define TS_PACKET_SIZE      188                       /* Size of a TS packet */
-#define TS_SYNC_CODE        0x47                /* First byte of a TS packet */
-#define PSI_SECTION_SIZE    4096            /* Maximum size of a PSI section */
-
-#define PAT_UNINITIALIZED    (1 << 6)
-#define PMT_UNINITIALIZED    (1 << 6)
-
-#define PSI_IS_PAT          0x00
-#define PSI_IS_PMT          0x01
-#define UNKNOWN_PSI         0xff
-
-/****************************************************************************
- * psi_callback_t
- ****************************************************************************
- * Used by TS demux to handle a PSI, either with the builtin decoder, either
- * with a library such as libdvbpsi
- ****************************************************************************/
-typedef void( * psi_callback_t )( 
-        input_thread_t  * p_input,
-        data_packet_t   * p_data,
-        es_descriptor_t * p_es,
-        vlc_bool_t        b_unit_start );
-
-
-/*****************************************************************************
- * psi_section_t
- *****************************************************************************
- * Describes a PSI section. Beware, it doesn't contain pointers to the TS
- * packets that contain it as for a PES, but the data themselves
- *****************************************************************************/
-typedef struct psi_section_t
-{
-    byte_t                  buffer[PSI_SECTION_SIZE];
-
-    u8                      i_section_number;
-    u8                      i_last_section_number;
-    u8                      i_version_number;
-    u16                     i_section_length;
-    u16                     i_read_in_section;
-    
-    /* the PSI is complete */
-    vlc_bool_t              b_is_complete;
-    
-    /* packet missed up ? */
-    vlc_bool_t              b_trash;
-
-    /*about sections  */ 
-    vlc_bool_t              b_section_complete;
-
-    /* where are we currently ? */
-    byte_t                * p_current;
-
-} psi_section_t;
-
-/*****************************************************************************
- * es_ts_data_t: extension of es_descriptor_t
- *****************************************************************************/
-typedef struct es_ts_data_t
-{
-    vlc_bool_t              b_psi;   /* Does the stream have to be handled by
-                                      *                    the PSI decoder ? */
-
-    int                     i_psi_type;  /* There are different types of PSI */
-    
-    psi_section_t *         p_psi_section;                    /* PSI packets */
-
-    /* Markers */
-    int                     i_continuity_counter;
-} es_ts_data_t;
-
-/*****************************************************************************
- * pgrm_ts_data_t: extension of pgrm_descriptor_t
- *****************************************************************************/
-typedef struct pgrm_ts_data_t
-{
-    u16                     i_pcr_pid;             /* PCR ES, for TS streams */
-    int                     i_pmt_version;
-    /* libdvbpsi pmt decoder handle */
-    void *                  p_pmt_handle;
-} pgrm_ts_data_t;
-
-/*****************************************************************************
- * stream_ts_data_t: extension of stream_descriptor_t
- *****************************************************************************/
-typedef struct stream_ts_data_t
-{
-    int i_pat_version;          /* Current version of the PAT */
-    /* libdvbpsi pmt decoder handle */
-    void *                  p_pat_handle;
-} stream_ts_data_t;
-
-/*****************************************************************************
- * stream_ps_data_t: extension of stream_descriptor_t
- *****************************************************************************/
-typedef struct stream_ps_data_t
-{
-    vlc_bool_t              b_has_PSM;                 /* very rare, in fact */
-
-    u8                      i_PSM_version;
-} stream_ps_data_t;
-
-/* PSM version is 5 bits, so -1 is not a valid value */
-#define EMPTY_PSM_VERSION   -1
-
-
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-VLC_EXPORT( void, input_ParsePES,  ( input_thread_t *, es_descriptor_t * ) );
-VLC_EXPORT( void, input_GatherPES, ( input_thread_t *, data_packet_t *, es_descriptor_t *, vlc_bool_t, vlc_bool_t ) );
-VLC_EXPORT( ssize_t, input_ReadPS, ( input_thread_t *, data_packet_t ** ) );
-VLC_EXPORT( es_descriptor_t *, input_ParsePS, ( input_thread_t *, data_packet_t * ) );
-VLC_EXPORT( ssize_t, input_ReadTS, ( input_thread_t *, data_packet_t ** ) );
-VLC_EXPORT( void, input_DemuxPS,   ( input_thread_t *, data_packet_t * ) );
-VLC_EXPORT( void, input_DemuxTS,   ( input_thread_t *, data_packet_t *, void(*) ( input_thread_t *, data_packet_t *, es_descriptor_t *, vlc_bool_t ) ) );
 
 /*
  * Optional standard file descriptor operations (input_ext-plugins.h)

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vdec_ext-plugins.h : structures from the video decoder exported to plug-ins
+ * plugins.h : structures from the video decoder exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: plugins.h,v 1.1 2002/08/04 18:39:41 sam Exp $
+ * $Id: plugins.h,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -47,7 +47,7 @@ typedef struct motion_inner_t
     vlc_bool_t              b_second_half;
 } motion_inner_t;
 
-struct macroblock_t
+typedef struct macroblock_t
 {
     int                     i_mb_modes;
 
@@ -64,7 +64,8 @@ struct macroblock_t
     motion_inner_t          p_motions[8];
     int                     i_nb_motions;
     yuv_data_t *            pp_dest[3];
-};
+
+} macroblock_t;
 
 /* Macroblock Modes */
 #define MB_INTRA                        1

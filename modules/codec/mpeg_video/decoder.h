@@ -1,8 +1,8 @@
 /*****************************************************************************
- * video_decoder.h : video decoder thread
+ * decoder.h : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: decoder.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: decoder.h,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -21,20 +21,23 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
  
+VLC_DECLARE_STRUCT(vpar_thread_t)
+VLC_DECLARE_STRUCT(vdec_thread_t)
+VLC_DECLARE_STRUCT(vdec_pool_t)
+
 /*****************************************************************************
  * vdec_thread_t: video decoder thread descriptor
  *****************************************************************************/
-typedef struct vdec_thread_s
+struct vdec_thread_t
 {
     VLC_COMMON_MEMBERS
 
     /* IDCT iformations */
-    void *               p_idct_data;
+    void *        p_idct_data;
 
     /* Input properties */
-    struct vdec_pool_s * p_pool;
-
-} vdec_thread_t;
+    vdec_pool_t * p_pool;
+};
 
 /*****************************************************************************
  * Prototypes
@@ -45,6 +48,6 @@ void            vdec_DecodeMacroblockBW ( vdec_thread_t *, macroblock_t * );
 void            vdec_DecodeMacroblock420( vdec_thread_t *, macroblock_t * );
 void            vdec_DecodeMacroblock422( vdec_thread_t *, macroblock_t * );
 void            vdec_DecodeMacroblock444( vdec_thread_t *, macroblock_t * );
-vdec_thread_t * vdec_CreateThread       ( struct vdec_pool_s * );
+vdec_thread_t * vdec_CreateThread       ( vdec_pool_t * );
 void            vdec_DestroyThread      ( vdec_thread_t * );
 

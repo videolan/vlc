@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.74 2002/08/04 17:23:41 sam Exp $
+ * $Id: input_ext-intf.h,v 1.75 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -56,7 +56,7 @@ struct es_descriptor_t
                                            *  available */
 
     /* Demultiplexer information */
-    void *                  p_demux_data;
+    es_sys_t *              p_demux_data;
     pgrm_descriptor_t *     p_pgrm;  /* very convenient in the demultiplexer */
 
     /* PES parser information */
@@ -112,7 +112,7 @@ struct pgrm_descriptor_t
     int                     i_synchro_state;
 
     /* Demultiplexer data */
-    void *                  p_demux_data;
+    pgrm_sys_t *            p_demux_data;
 
     int                     i_es_number;      /* size of the following array */
     es_descriptor_t **      pp_es;                /* array of pointers to ES */
@@ -213,7 +213,7 @@ struct stream_descriptor_t
                                           * status change request            */
 
     /* Demultiplexer data */
-    void *                  p_demux_data;
+    stream_sys_t *          p_demux_data;
 
     /* Programs descriptions */
     int                     i_pgrm_number;    /* size of the following array */
@@ -275,7 +275,7 @@ struct input_thread_t
     int           (* pf_set_program )( input_thread_t *, pgrm_descriptor_t * );
     int           (* pf_set_area )( input_thread_t *, input_area_t * );
     void          (* pf_seek ) ( input_thread_t *, off_t );
-    void *           p_access_data;
+    access_sys_t *   p_access_data;
     size_t           i_mtu;
 
     /* Demux module */
@@ -284,7 +284,7 @@ struct input_thread_t
     int           (* pf_rewind ) ( input_thread_t * );
                                            /* NULL if we don't support going *
                                             * backwards (it's gonna be fun)  */
-    void *           p_demux_data;                      /* data of the demux */
+    demux_sys_t *    p_demux_data;                      /* data of the demux */
 
     /* Buffer manager */
     input_buffers_t *p_method_data;     /* data of the packet manager */

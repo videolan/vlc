@@ -5538,7 +5538,7 @@ esac
 BUILTINS="${BUILTINS}"
 PLUGINS="${PLUGINS} misc/dummy/dummy misc/null/null"
 PLUGINS="${PLUGINS} control/rc/rc misc/logger/logger access/file access/udp access/http misc/network/ipv4 misc/memcpy/memcpy"
-PLUGINS="${PLUGINS} demux/mpeg/es demux/mpeg/audio demux/mpeg/ps demux/mpeg/ts"
+PLUGINS="${PLUGINS} demux/mpeg/es demux/mpeg/audio demux/mpeg/mpeg_system demux/mpeg/ps demux/mpeg/ts"
 PLUGINS="${PLUGINS} codec/mpeg_video/idct/idct codec/mpeg_video/idct/idctclassic codec/mpeg_video/motion/motion codec/a52old/imdct/imdct codec/a52old/downmix/downmix codec/mpeg_audio/mpeg_audio codec/a52old/a52old codec/mpeg_video/mpeg_video codec/lpcm/lpcm codec/spdif/spdif codec/spudec/spudec"
 PLUGINS="${PLUGINS} video_filter/deinterlace/deinterlace video_filter/invert video_filter/wall video_filter/transform video_filter/distort video_filter/clone video_filter/crop"
 PLUGINS="${PLUGINS} visualization/scope/scope"

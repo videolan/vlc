@@ -1,13 +1,13 @@
 /*****************************************************************************
- * mpeg_system.c: TS, PS and PES management
+ * system.c: helper module for TS, PS and PES management
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.101 2002/08/04 17:23:44 sam Exp $
+ * Copyright (C) 1998-2002 VideoLAN
+ * $Id: system.c,v 1.1 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
  *          Benoît Steiner <benny@via.ecp.fr>
- *          Samuel Hocevar <sam@via.ecp.fr>
+ *          Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,11 +33,44 @@
 #include <sys/types.h>                                              /* off_t */
 
 #include <vlc/vlc.h>
+#include <vlc/input.h>
 
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
+#include "system.h"
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static int Activate ( vlc_object_t * );
+
+static ssize_t           ReadPS  ( input_thread_t *, data_packet_t ** );
+static es_descriptor_t * ParsePS ( input_thread_t *, data_packet_t * );
+static void              DemuxPS ( input_thread_t *, data_packet_t * );
+
+static ssize_t           ReadTS  ( input_thread_t *, data_packet_t ** );
+static void              DemuxTS ( input_thread_t *, data_packet_t *,
+                                   psi_callback_t );
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+vlc_module_begin();
+    set_description( _("generic ISO 13818-1 MPEG demultiplexing") );
+    set_capability( "mpeg-system", 100 );
+    set_callbacks( Activate, NULL );
+vlc_module_end();
+
+/*****************************************************************************
+ * Activate: initializes helper functions
+ *****************************************************************************/
+static int Activate ( vlc_object_t *p_this )
+{
+    static mpeg_demux_t mpeg_demux =
+                    { NULL, ReadPS, ParsePS, DemuxPS, ReadTS, DemuxTS };
+
+    memcpy( p_this->p_private, &mpeg_demux, sizeof( mpeg_demux ) );
+
+    return VLC_SUCCESS;
+}
 
 /*
  * PES Packet management
@@ -96,12 +129,12 @@ static inline size_t MoveChunk( byte_t * p_dest, data_packet_t ** pp_data_src,
 }
 
 /*****************************************************************************
- * input_ParsePES
+ * ParsePES
  *****************************************************************************
  * Parse a finished PES packet and analyze its header.
  *****************************************************************************/
 #define PES_HEADER_SIZE     7
-void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
+static void ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
     data_packet_t * p_data;
     byte_t *        p_byte;
@@ -396,13 +429,13 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
 }
 
 /*****************************************************************************
- * input_GatherPES:
+ * GatherPES:
  *****************************************************************************
  * Gather a PES packet.
  *****************************************************************************/
-void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
-                      es_descriptor_t * p_es,
-                      vlc_bool_t b_unit_start, vlc_bool_t b_packet_lost )
+static void GatherPES( input_thread_t * p_input, data_packet_t * p_data,
+                       es_descriptor_t * p_es,
+                       vlc_bool_t b_unit_start, vlc_bool_t b_packet_lost )
 {
 #define p_pes (p_es->p_pes)
 
@@ -419,7 +452,7 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
         /* If the data packet contains the begining of a new PES packet, and
          * if we were reassembling a PES packet, then the PES should be
          * complete now, so parse its header and give it to the decoders. */
-        input_ParsePES( p_input, p_es );
+        ParsePES( p_input, p_es );
     }
 
     if( !b_unit_start && p_pes == NULL )
@@ -475,7 +508,7 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
         if( p_pes->i_pes_size == p_es->i_pes_real_size )
         {
             /* The packet is finished, parse it */
-            input_ParsePES( p_input, p_es );
+            ParsePES( p_input, p_es );
         }
     }
 #undef p_pes
@@ -656,7 +689,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
 }
 
 /*****************************************************************************
- * input_ReadPS: store a PS packet into a data_buffer_t
+ * ReadPS: store a PS packet into a data_buffer_t
  *****************************************************************************/
 #define PEEK( SIZE )                                                        \
     i_error = input_Peek( p_input, &p_peek, SIZE );                         \
@@ -670,7 +703,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
         return( 0 );                                                        \
     }
 
-ssize_t input_ReadPS( input_thread_t * p_input, data_packet_t ** pp_data )
+static ssize_t ReadPS( input_thread_t * p_input, data_packet_t ** pp_data )
 {
     byte_t *            p_peek;
     size_t              i_packet_size;
@@ -761,10 +794,10 @@ ssize_t input_ReadPS( input_thread_t * p_input, data_packet_t ** pp_data )
 #undef PEEK
 
 /*****************************************************************************
- * input_ParsePS: read the PS header
+ * ParsePS: read the PS header
  *****************************************************************************/
-es_descriptor_t * input_ParsePS( input_thread_t * p_input,
-                                 data_packet_t * p_data )
+static es_descriptor_t * ParsePS( input_thread_t * p_input,
+                                  data_packet_t * p_data )
 {
     u32                 i_code;
     es_descriptor_t *   p_es = NULL;
@@ -896,9 +929,9 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
 }
 
 /*****************************************************************************
- * input_DemuxPS: first step of demultiplexing: the PS header
+ * DemuxPS: first step of demultiplexing: the PS header
  *****************************************************************************/
-void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
+static void DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
 {
     u32                 i_code;
     vlc_bool_t          b_trash = 0;
@@ -1012,7 +1045,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     }
     else
     {
-        p_es = input_ParsePS( p_input, p_data );
+        p_es = ParsePS( p_input, p_data );
 
         vlc_mutex_lock( &p_input->stream.control.control_lock );
         if( p_es != NULL && p_es->p_decoder_fifo != NULL
@@ -1020,7 +1053,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
         {
             vlc_mutex_unlock( &p_input->stream.control.control_lock );
             p_es->c_packets++;
-            input_GatherPES( p_input, p_data, p_es, 1, 0 );
+            GatherPES( p_input, p_data, p_es, 1, 0 );
         }
         else
         {
@@ -1043,7 +1076,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
  */
 
 /*****************************************************************************
- * input_ReadTS: store a TS packet into a data_buffer_t
+ * ReadTS: store a TS packet into a data_buffer_t
  *****************************************************************************/
 #define PEEK( SIZE )                                                        \
     i_error = input_Peek( p_input, &p_peek, SIZE );                         \
@@ -1057,7 +1090,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
         return( 0 );                                                        \
     }
 
-ssize_t input_ReadTS( input_thread_t * p_input, data_packet_t ** pp_data )
+static ssize_t ReadTS( input_thread_t * p_input, data_packet_t ** pp_data )
 {
     byte_t *            p_peek;
     ssize_t             i_error, i_read;
@@ -1100,10 +1133,10 @@ ssize_t input_ReadTS( input_thread_t * p_input, data_packet_t ** pp_data )
 }
 
 /*****************************************************************************
- * input_DemuxTS: first step of demultiplexing: the TS header
+ * DemuxTS: first step of demultiplexing: the TS header
  *****************************************************************************/
-void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
-                        psi_callback_t pf_psi_callback )
+static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
+                     psi_callback_t pf_psi_callback )
 {
     u16                 i_pid;
     int                 i_dummy;
@@ -1324,7 +1357,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
         else
         {
             /* The payload carries a PES stream */
-            input_GatherPES( p_input, p_data, p_es, b_unit_start, b_lost ); 
+            GatherPES( p_input, p_data, p_es, b_unit_start, b_lost ); 
         }
 
     }
@@ -1332,3 +1365,4 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
 #undef p
 
 }
+

@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: vcd.c,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -29,6 +29,8 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+
+#include "../../demux/mpeg/system.h"
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>

@@ -2,7 +2,7 @@
  * mp4.h : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: mp4.h,v 1.2 2002/08/07 00:29:36 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -123,7 +123,7 @@ typedef struct track_data_mp4_s
 /*****************************************************************************
  *
  *****************************************************************************/
-typedef struct demux_data_mp4_s
+struct demux_sys_t
 {
 
     MP4_Box_t   box_root;       /* container for the hole file */
@@ -137,7 +137,7 @@ typedef struct demux_data_mp4_s
     track_data_mp4_t *track; /* array of track */
     
   
-} demux_data_mp4_t;
+};
 
 static inline u64 MP4_GetTrackPos( track_data_mp4_t *p_track )
 {
@@ -198,7 +198,7 @@ static inline mtime_t MP4_GetTrackPTS( track_data_mp4_t *p_track )
                 (mtime_t)p_track->i_timescale ) );
 }
 
-static inline mtime_t MP4_GetMoviePTS(demux_data_mp4_t *p_demux )
+static inline mtime_t MP4_GetMoviePTS(demux_sys_t *p_demux )
 {
     return( (mtime_t)(
                 (mtime_t)1000000 *

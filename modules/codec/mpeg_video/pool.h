@@ -2,7 +2,7 @@
  * vpar_pool.h : video parser/video decoders communication
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: pool.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: pool.h,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -27,9 +27,7 @@
  * This structure is used for the communication between the parser and the
  * decoders.
  *****************************************************************************/
-typedef struct vdec_pool_s vdec_pool_t;
-
-struct vdec_pool_s
+struct vdec_pool_t
 {
     /* Locks */
     vlc_mutex_t         lock;                         /* Structure data lock */
@@ -68,8 +66,7 @@ struct vdec_pool_s
     void             (* pf_decode_mb) ( vdec_pool_t *, macroblock_t * );
 
     /* Pointer to the decoding function - used for B&W switching */
-    void             (* pf_vdec_decode) ( struct vdec_thread_s *,
-                                          macroblock_t * );
+    void             (* pf_vdec_decode) ( vdec_thread_t *, macroblock_t * );
     vlc_bool_t          b_bw;                      /* Current value for B&W */
 
     /* Access to the plug-ins needed by the video decoder thread */
@@ -77,15 +74,15 @@ struct vdec_pool_s
     void ( * ppppf_motion[2][2][4] ) ( yuv_data_t *, yuv_data_t *,
                                        int, int );
 
-    struct vpar_thread_s * p_vpar;
+    vpar_thread_t * p_vpar;
 };
 
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void vpar_InitPool  ( struct vpar_thread_s * );
-void vpar_SpawnPool ( struct vpar_thread_s * );
-void vpar_EndPool   ( struct vpar_thread_s * );
+void vpar_InitPool  ( vpar_thread_t * );
+void vpar_SpawnPool ( vpar_thread_t * );
+void vpar_EndPool   ( vpar_thread_t * );
 
 /*****************************************************************************
  * vpar_GetMacroblock: In a vdec thread, get the next available macroblock

@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.80 2002/08/06 00:26:48 sam Exp $
+ * $Id: modules.c,v 1.81 2002/08/07 00:29:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -88,7 +88,7 @@
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
 static void AllocateAllPlugins   ( vlc_object_t * );
-static void AllocatePluginDir    ( vlc_object_t *, const char * );
+static void AllocatePluginDir    ( vlc_object_t *, const char *, int );
 static int  AllocatePluginFile   ( vlc_object_t *, char * );
 #endif
 static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
@@ -630,7 +630,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 
         msg_Dbg( p_this, "recursively browsing `%s'", psz_fullpath );
 
-        AllocatePluginDir( p_this, psz_fullpath );
+        /* Don't go deeper than 5 subdirectories */
+        AllocatePluginDir( p_this, psz_fullpath, 5 );
 
 #if defined( SYS_BEOS ) || defined( SYS_DARWIN )
         if( b_notinroot )
@@ -644,7 +645,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 /*****************************************************************************
  * AllocatePluginDir: recursively parse a directory to look for plugins
  *****************************************************************************/
-static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir )
+static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
+                               int i_maxdepth )
 {
 #define PLUGIN_EXT ".so"
     int    i_dirlen;
@@ -652,6 +654,11 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir )
     char * psz_file;
 
     struct dirent * file;
+
+    if( i_maxdepth < 0 )
+    {
+        return;
+    }
 
     dir = opendir( psz_dir );
 
@@ -679,7 +686,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir )
 
         if( !stat( psz_file, &statbuf ) && statbuf.st_mode & S_IFDIR )
         {
-            AllocatePluginDir( p_this, psz_file );
+            AllocatePluginDir( p_this, psz_file, i_maxdepth - 1 );
         }
         else if( i_len > strlen( PLUGIN_EXT )
                   /* We only load files ending with ".so" */
@@ -763,8 +770,8 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file )
     p_this->p_vlc->p_module_bank->first = p_module;
     p_this->p_vlc->p_module_bank->i_count++;
 
-    msg_Dbg( p_this, "plugin \"%s\", %s",
-             p_module->psz_object_name, p_module->psz_longname );
+    //msg_Dbg( p_this, "plugin \"%s\", %s",
+    //         p_module->psz_object_name, p_module->psz_longname );
 
     vlc_object_attach( p_module, p_this->p_vlc->p_module_bank );
 
@@ -881,8 +888,8 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
     p_this->p_vlc->p_module_bank->first = p_module;
     p_this->p_vlc->p_module_bank->i_count++;
 
-    msg_Dbg( p_this, "builtin \"%s\", %s",
-             p_module->psz_object_name, p_module->psz_longname );
+    //msg_Dbg( p_this, "builtin \"%s\", %s",
+    //         p_module->psz_object_name, p_module->psz_longname );
 
     vlc_object_attach( p_module, p_this->p_vlc->p_module_bank );
 

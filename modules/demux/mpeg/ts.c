@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: ts.c,v 1.2 2002/08/07 00:29:36 sam Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -50,16 +50,28 @@
 #   endif
 #endif
 
+#include "system.h"
+
 /*****************************************************************************
  * Constants
  *****************************************************************************/
 #define TS_READ_ONCE 200
 
 /*****************************************************************************
+ * Private structure
+ *****************************************************************************/
+struct demux_sys_t
+{
+    module_t *   p_module;
+    mpeg_demux_t mpeg;
+};
+
+/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Activate ( vlc_object_t * );
-static int  Demux ( input_thread_t * );
+static int  Activate   ( vlc_object_t * );
+static void Deactivate ( vlc_object_t * );
+static int  Demux      ( input_thread_t * );
 
 #if defined MODULE_NAME_IS_ts
 static void TSDemuxPSI ( input_thread_t *, data_packet_t *,
@@ -88,19 +100,20 @@ vlc_module_begin();
     set_capability( "demux", 170 );
     add_shortcut( "ts_dvbpsi" );
 #endif
-    set_callbacks( Activate, NULL );
+    set_callbacks( Activate, Deactivate );
 vlc_module_end();
 
 /*****************************************************************************
- * Activate: initializes TS structures
+ * Activate: initialize TS structures
  *****************************************************************************/
 static int Activate( vlc_object_t * p_this )
 {
     input_thread_t *    p_input = (input_thread_t *)p_this;
-    es_descriptor_t     * p_pat_es;
-    es_ts_data_t        * p_demux_data;
-    stream_ts_data_t    * p_stream_data;
-    byte_t              * p_peek;
+    demux_sys_t *       p_demux;
+    es_descriptor_t *   p_pat_es;
+    es_ts_data_t *      p_demux_data;
+    stream_ts_data_t *  p_stream_data;
+    byte_t *            p_peek;
 
     /* Set the demux function */
     p_input->pf_demux = Demux;
@@ -116,7 +129,7 @@ static int Activate( vlc_object_t * p_this )
     if( input_Peek( p_input, &p_peek, 1 ) < 1 )
     {
         msg_Err( p_input, "cannot peek()" );
-        return( -1 );
+        return -1;
     }
 
     if( *p_peek != TS_SYNC_CODE )
@@ -129,7 +142,7 @@ static int Activate( vlc_object_t * p_this )
         else
         {
             msg_Warn( p_input, "TS module discarded (no sync)" );
-            return( -1 );
+            return -1;
         }
     }
 
@@ -140,13 +153,29 @@ static int Activate( vlc_object_t * p_this )
         p_input->i_bufsize = (p_input->i_mtu / TS_PACKET_SIZE) * TS_PACKET_SIZE;
     }
 
+    p_demux = p_input->p_demux_data = malloc( sizeof(demux_sys_t ) );
+    if( p_demux == NULL )
+    {
+        return -1;
+    }
+
+    p_input->p_private = (void*)&p_demux->mpeg;
+    p_demux->p_module = module_Need( p_input, "mpeg-system", NULL );
+    if( p_demux->p_module == NULL )
+    {
+        free( p_input->p_demux_data );
+        return -1;
+    }
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     if( input_InitStream( p_input, sizeof( stream_ts_data_t ) ) == -1 )
     {
-        return( -1 );
+        module_Unneed( p_input, p_demux->p_module );
+        free( p_input->p_demux_data );
+        return -1;
     }
-    
+
     p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;
     p_stream_data->i_pat_version = PAT_UNINITIALIZED ;
 
@@ -157,7 +186,9 @@ static int Activate( vlc_object_t * p_this )
     if( p_stream_data->p_pat_handle == NULL )
     {
         msg_Err( p_input, "could not create PAT decoder" );
-        return( -1 );
+        module_Unneed( p_input, p_demux->p_module );
+        free( p_input->p_demux_data );
+        return -1;
     }
 #endif
     
@@ -174,7 +205,18 @@ static int Activate( vlc_object_t * p_this )
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
     
-    return( 0 );
+    return 0;
+}
+
+/*****************************************************************************
+ * Deactivate: deinitialize TS structures
+ *****************************************************************************/
+static void Deactivate( vlc_object_t * p_this )
+{
+    input_thread_t *    p_input = (input_thread_t *)p_this;
+
+    module_Unneed( p_input, p_input->p_demux_data->p_module );
+    free( p_input->p_demux_data );
 }
 
 /*****************************************************************************
@@ -185,6 +227,7 @@ static int Activate( vlc_object_t * p_this )
  *****************************************************************************/
 static int Demux( input_thread_t * p_input )
 {
+    demux_sys_t *   p_demux = p_input->p_demux_data;
     int             i_read_once = (p_input->i_mtu ?
                                    p_input->i_bufsize / TS_PACKET_SIZE :
                                    TS_READ_ONCE);
@@ -195,17 +238,18 @@ static int Demux( input_thread_t * p_input )
         data_packet_t *     p_data;
         ssize_t             i_result;
 
-        i_result = input_ReadTS( p_input, &p_data );
+        i_result = p_demux->mpeg.pf_read_ts( p_input, &p_data );
 
         if( i_result <= 0 )
         {
-            return( i_result );
+            return i_result;
         }
 
-        input_DemuxTS( p_input, p_data, (psi_callback_t) &PSI_CALLBACK );
+        p_demux->mpeg.pf_demux_ts( p_input, p_data,
+                                   (psi_callback_t) &PSI_CALLBACK );
     }
 
-    return( i_read_once );
+    return i_read_once;
 }
 
 
