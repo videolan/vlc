@@ -851,12 +851,54 @@ dnl  a52 AC3 decoder plugin
 dnl
 AC_ARG_ENABLE(a52,
   [  --enable-a52            AC3 support with liba52 (default enabled)])
-if test "x$enable_a52" != "xno" -a x$SYS != xmingw32
+if test "x$enable_a52" != "xno"
+then
+  AC_ARG_WITH(a52-tree,
+    [    --with-a52-tree=PATH  a52dec tree for static linking ],[],[])
+  if test "x$with_a52_tree" != "xno" -a "x$with_a52_tree" != "x"
   then
-    AC_CHECK_HEADERS(a52dec/a52.h, [
-      BUILTINS="${BUILTINS} a52"
-      a52_LDFLAGS="${a52_LDFLAGS} -la52 -lm"
-     ],[])
+    real_a52_tree="`cd ${with_a52_tree} 2>/dev/null && pwd`"
+    if test "x$real_a52_tree" = x
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([${with_a52_tree} directory doesn't exist])
+    fi
+    dnl  Use a custom a52dec
+    AC_MSG_CHECKING(for a52.h in ${real_a52_tree}/include)
+    if test -f ${real_a52_tree}/include/a52.h
+    then
+      AC_MSG_RESULT(yes)
+      a52_CFLAGS="${a52_CFLAGS} -I${real_a52_tree}"
+      a52_LDFLAGS="${a52_LDFLAGS} -L${real_a52_tree}/liba52/.libs"
+      save_LDFLAGS=$LDFLAGS
+      LDFLAGS="$a52_LDFLAGS $LDFLAGS"
+      AC_CHECK_LIB(a52, a52_free, [
+        BUILTINS="${BUILTINS} a52"
+        a52_LDFLAGS="${a52_LDFLAGS} -la52 -lm"
+        a52_CFLAGS="${a52_CFLAGS} -DUSE_A52DEC_TREE"
+        ],[
+        if test -f ${real_a52_tree}/liba52/.libs/liba52.a
+        then
+          AC_MSG_ERROR([make sure you have at least a52dec-0.7.3])
+        else
+          AC_MSG_ERROR([the specified tree hasn't been compiled])
+        fi
+      ],[-lm])
+      LDFLAGS=$save_LDFLAGS
+    else
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([the specified tree doesn't have a52.h])
+    fi
+  else dnl  no with args
+    AC_CHECK_HEADER(a52dec/a52.h, [
+      AC_CHECK_LIB(a52, a52_free, [
+        BUILTINS="${BUILTINS} a52"
+        a52_LDFLAGS="${a52_LDFLAGS} -la52 -lm"
+        a52_CFLAGS="${a52_CFLAGS}"
+      ],[],[-lm])
+    ])
+  fi
 fi
 
 dnl
@@ -1536,6 +1578,7 @@ AC_SUBST(vlc_CFLAGS)
 AC_SUBST(plugins_CFLAGS)
 AC_SUBST(builtins_CFLAGS)
 
+AC_SUBST(a52_CFLAGS)
 AC_SUBST(arts_CFLAGS)
 AC_SUBST(dvd_CFLAGS)
 AC_SUBST(dvdread_CFLAGS)

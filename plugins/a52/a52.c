@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.8 2002/04/25 21:52:42 sam Exp $
+ * $Id: a52.c,v 1.9 2002/05/01 19:59:42 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -37,7 +37,12 @@
 #include "stream_control.h"
 #include "input_ext-dec.h"
 
-#include <a52dec/a52.h>                                /* liba52 header file */
+#ifdef USE_A52DEC_TREE                                 /* liba52 header file */
+#include "include/a52.h"
+#else
+#include "a52dec/a52.h"
+#endif
+
 #include "a52.h"
 
 #define AC3DEC_FRAME_SIZE 1536 

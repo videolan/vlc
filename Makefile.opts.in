@@ -70,6 +70,7 @@ vlc_CFLAGS = @vlc_CFLAGS@
 plugins_CFLAGS := @plugins_CFLAGS@
 builtins_CFLAGS := @builtins_CFLAGS@
 
+a52_CFLAGS = @a52_CFLAGS@
 arts_CFLAGS = @arts_CFLAGS@
 dvd_CFLAGS = @dvd_CFLAGS@
 dvdread_CFLAGS = @dvdread_CFLAGS@
