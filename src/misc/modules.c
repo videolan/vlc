@@ -1745,7 +1745,7 @@ int CacheLoadConfig( module_t *p_module, FILE *file )
             }
         }
 
-        p_module->p_config[i].pf_callback = 0;
+        LOAD_IMMEDIATE( p_module->p_config[i].pf_callback );
     }
 
     p_module->p_config[i].i_type = CONFIG_HINT_END;
@@ -1936,6 +1936,8 @@ void CacheSaveConfig( module_t *p_module, FILE *file )
 
         for( j = 0; j < p_module->p_config[i].i_action; j++ )
             SAVE_STRING( p_module->p_config[i].ppsz_action_text[j] );
+
+        SAVE_IMMEDIATE( p_module->p_config[i].pf_callback );
     }
 }
 
