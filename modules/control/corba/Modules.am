@@ -2,7 +2,7 @@
 
 SOURCES_corba = corba.c mediacontrol-core.c mediacontrol-plugin.c
 
-EXTRA_DIST = MediaControl.so
+EXTRA_DIST += MediaControl.so
 
 nodist_SOURCES_corba = \
 	MediaControl-common.c \
