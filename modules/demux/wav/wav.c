@@ -2,14 +2,14 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.10 2003/01/25 16:58:35 fenrir Exp $
+ * $Id: wav.c,v 1.11 2003/02/24 09:18:07 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -52,7 +52,7 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
- * Declaration of local function 
+ * Declaration of local function
  *****************************************************************************/
 
 #define FREE( p ) if( p ) free( p ); (p) = NULL
@@ -80,39 +80,14 @@ static uint32_t CreateDWLE( int a, int b, int c, int d )
 static off_t TellAbsolute( input_thread_t *p_input )
 {
     off_t i_pos;
-    
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    
+
     i_pos= p_input->stream.p_selected_area->i_tell;
-//          - ( p_input->p_last_data - p_input->p_current_data  );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return( i_pos );
-}
- 
-static int SeekAbsolute( input_thread_t *p_input,
-                         off_t i_pos)
-{
-    off_t i_filepos;
-
-    if( i_pos >= p_input->stream.p_selected_area->i_size )
-    {
-    //    return( 0 );
-    }
-            
-    i_filepos = TellAbsolute( p_input );
-    if( i_pos != i_filepos )
-    {
-        p_input->pf_seek( p_input, i_pos );
-        input_AccessReinit( p_input );
-    }
-    return( 1 );
-}
-
-static int SkipBytes( input_thread_t *p_input, int i_skip )
-{
-    return( SeekAbsolute( p_input, TellAbsolute( p_input ) + i_skip ) );
 }
 
 /* return 1 if success, 0 if fail */
@@ -120,35 +95,85 @@ static int ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
 {
     data_packet_t *p_data;
 
-    int i_read;
-
+    int i_count = 0;
 
     if( !i_size )
     {
-        return( 1 );
+        return( 0 );
     }
 
     do
     {
+        int i_read;
+
         i_read = input_SplitBuffer(p_input, &p_data, __MIN( i_size, 1024 ) );
         if( i_read <= 0 )
         {
-            return( 0 );
+            return( i_count );
         }
         memcpy( p_buff, p_data->p_payload_start, i_read );
         input_DeletePacket( p_input->p_method_data, p_data );
 
         p_buff += i_read;
         i_size -= i_read;
+        i_count += i_read;
 
     } while( i_size );
 
-    return( 1 );
+    return( i_count );
 }
 
+static int SeekAbsolute( input_thread_t *p_input,
+                         off_t i_pos)
+{
+    int         i_skip;
+#if 0
+    if( i_pos >= p_input->stream.p_selected_area->i_size )
+    {
+        return( 0 );
+    }
+#endif
 
-static int ReadPES( input_thread_t *p_input, 
-                    pes_packet_t **pp_pes, 
+    i_skip    = i_pos - TellAbsolute( p_input );
+    if( i_skip == 0 )
+    {
+        return( VLC_SUCCESS );
+    }
+    if( i_skip < 0 && !p_input->stream.b_seekable )
+    {
+        return( VLC_EGENERIC );
+    }
+    else if( !p_input->stream.b_seekable ||
+             ( i_skip > 0 && i_skip < 1024 && p_input->stream.i_method != INPUT_METHOD_FILE ) )
+    {
+        while( i_skip > 0 )
+        {
+            uint8_t dummy[1024];
+            int     i_read;
+
+            i_read = ReadData( p_input, dummy, __MIN( i_skip, 1024 ) );
+            if( i_read <= 0 )
+            {
+                return( VLC_EGENERIC );
+            }
+            i_skip -= i_read;
+        }
+        return( VLC_SUCCESS );
+    }
+    else
+    {
+            input_AccessReinit( p_input );
+            p_input->pf_seek( p_input, i_pos );
+    }
+}
+
+static int SkipBytes( input_thread_t *p_input, int i_skip )
+{
+    return( SeekAbsolute( p_input, TellAbsolute( p_input ) + i_skip ) );
+}
+
+static int ReadPES( input_thread_t *p_input,
+                    pes_packet_t **pp_pes,
                     int i_size )
 {
     pes_packet_t *p_pes;
@@ -166,8 +191,8 @@ static int ReadPES( input_thread_t *p_input,
         data_packet_t   *p_data;
         int i_read;
 
-        if( (i_read = input_SplitBuffer( p_input, 
-                                         &p_data, 
+        if( (i_read = input_SplitBuffer( p_input,
+                                         &p_data,
                                          __MIN( i_size, 1024 ) ) ) <= 0 )
         {
             input_DeletePES( p_input->p_method_data, p_pes );
@@ -223,7 +248,7 @@ static int FindTag( input_thread_t *p_input, uint32_t i_tag )
     }
 }
 
-static int LoadTag_fmt( input_thread_t *p_input, 
+static int LoadTag_fmt( input_thread_t *p_input,
                         demux_sys_t *p_demux )
 {
     uint8_t  *p_peek;
@@ -279,8 +304,8 @@ static int PCM_GetFrame( input_thread_t *p_input,
     i_samples = __MAX( p_wf->nSamplesPerSec / 20, 1 );
 
 
-    *pi_length = (mtime_t)1000000 * 
-                 (mtime_t)i_samples / 
+    *pi_length = (mtime_t)1000000 *
+                 (mtime_t)i_samples /
                  (mtime_t)p_wf->nSamplesPerSec;
 
     i_bytes = i_samples * p_wf->nChannels * ( (p_wf->wBitsPerSample + 7) / 8 );
@@ -303,7 +328,7 @@ static int MS_ADPCM_GetFrame( input_thread_t *p_input,
 {
     int i_samples;
 
-    i_samples = 2 + 2 * ( p_wf->nBlockAlign - 
+    i_samples = 2 + 2 * ( p_wf->nBlockAlign -
                                 7 * p_wf->nChannels ) / p_wf->nChannels;
 
     *pi_length = (mtime_t)1000000 *
@@ -320,9 +345,9 @@ static int IMA_ADPCM_GetFrame( input_thread_t *p_input,
 {
     int i_samples;
 
-    i_samples = 2 * ( p_wf->nBlockAlign - 
+    i_samples = 2 * ( p_wf->nBlockAlign -
                         4 * p_wf->nChannels ) / p_wf->nChannels;
-    
+
     *pi_length = (mtime_t)1000000 *
                  (mtime_t)i_samples /
                  (mtime_t)p_wf->nSamplesPerSec;
@@ -334,13 +359,13 @@ static int IMA_ADPCM_GetFrame( input_thread_t *p_input,
  * WAVInit: check file and initializes structures
  *****************************************************************************/
 static int WAVInit( vlc_object_t * p_this )
-{   
+{
     input_thread_t *p_input = (input_thread_t *)p_this;
     uint8_t  *p_peek;
     uint32_t i_size;
-    
+
     demux_sys_t *p_demux;
-    
+
 
 
     /* Initialize access plug-in structures. */
@@ -373,7 +398,7 @@ static int WAVInit( vlc_object_t * p_this )
     }
 
     /* create our structure that will contains all data */
-    if( !( p_input->p_demux_data = 
+    if( !( p_input->p_demux_data =
                 p_demux = malloc( sizeof( demux_sys_t ) ) ) )
     {
         msg_Err( p_input, "out of memory" );
@@ -451,38 +476,38 @@ static int WAVInit( vlc_object_t * p_this )
             p_demux->psz_demux = strdup( "" );
             break;
         default:
-            msg_Warn( p_input,"unrecognize audio format(0x%x)", 
+            msg_Warn( p_input,"unrecognize audio format(0x%x)",
                       p_demux->p_wf->wFormatTag );
-            p_demux->i_fourcc = 
-                VLC_FOURCC( 'm', 's', 
+            p_demux->i_fourcc =
+                VLC_FOURCC( 'm', 's',
                             (p_demux->p_wf->wFormatTag >> 8)&0xff,
                             (p_demux->p_wf->wFormatTag )&0xff);
             p_demux->GetFrame = NULL;
             p_demux->psz_demux = strdup( "" );
             break;
     }
-    
+
     if( p_demux->GetFrame )
     {
         msg_Dbg( p_input, "using internal demux" );
 
         p_input->pf_demux = WAVDemux;
         p_input->p_demux_data = p_demux;
-        
+
         /*  create one program */
         vlc_mutex_lock( &p_input->stream.stream_lock );
         if( input_InitStream( p_input, 0 ) == -1)
         {
             vlc_mutex_unlock( &p_input->stream.stream_lock );
             msg_Err( p_input, "cannot init stream" );
-            // FIXME 
+            // FIXME
             return( -1 );
         }
         if( input_AddProgram( p_input, 0, 0) == NULL )
         {
             vlc_mutex_unlock( &p_input->stream.stream_lock );
             msg_Err( p_input, "cannot add program" );
-            // FIXME 
+            // FIXME
             return( -1 );
         }
         p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
@@ -507,7 +532,7 @@ static int WAVInit( vlc_object_t * p_this )
         char *psz_sav;
         /* call an external demux */
         msg_Warn( p_input, "unsupported formattag, using external demux" );
-        
+
         psz_sav = p_input->psz_demux;
         p_input->psz_demux = p_demux->psz_demux;
 
@@ -517,7 +542,7 @@ static int WAVInit( vlc_object_t * p_this )
 
         if( !p_demux->p_demux )
         {
-            msg_Err( p_input, 
+            msg_Err( p_input,
                      "cannot get external demux for formattag 0x%x",
                      p_demux->p_wf->wFormatTag );
             FREE( p_demux->psz_demux );
@@ -534,7 +559,7 @@ static int WAVInit( vlc_object_t * p_this )
 
     }
 
-    return( 0 );    
+    return( 0 );
 }
 
 /*****************************************************************************
@@ -547,7 +572,7 @@ static int WAVCallDemux( input_thread_t *p_input )
     demux_sys_t  *p_demux = p_input->p_demux_data;
     int i_status;
     char *psz_sav;
-    
+
     /* save context */
     psz_sav = p_input->psz_demux;
 
@@ -562,7 +587,7 @@ static int WAVCallDemux( input_thread_t *p_input )
     /* save (new?) state */
     p_demux->pf_demux = p_input->pf_demux;
     p_demux->p_demux_data = p_input->p_demux_data;
-    
+
     /* switch back */
     p_input->psz_demux = psz_sav;
     p_input->pf_demux = WAVCallDemux;
