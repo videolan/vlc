@@ -32,7 +32,7 @@ Description: GGI plugin for the VideoLAN Client
  This is a GGI plugin for the VideoLAN Client.
 
 Package: vlc-glide
-Architecture: any
+Architecture: i386
 Depends: vlc (= ${Source-Version}), libglide2
 Description: Glide plugin for the VideoLAN Client
  VideoLAN is a free MPEG, MPEG2 and DVD software solution.

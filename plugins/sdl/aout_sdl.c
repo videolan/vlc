@@ -107,7 +107,7 @@ static int aout_Probe( probedata_t *p_data )
     SDL_AudioSpec desired, obtained;
 
     /* Start AudioSDL */
-    if( SDL_Init(SDL_INIT_AUDIO) != 0 )
+    if( SDL_Init(SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE) != 0 )
     {
         intf_DbgMsg( "aout: SDL_Init failed (%s)", SDL_GetError() );
         return( 0 );

@@ -12,11 +12,20 @@ build: build-stamp
 build-stamp:
 	dh_testdir
 
+	if [ $(DEB_BUILD_ARCH) = i386 ]; then \
 	./configure --prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
 		--enable-gnome --enable-fb --with-glide --with-ggi \
-		--with-sdl --enable-esd --enable-alsa
+		--with-sdl --enable-esd --enable-alsa --disable-ppro ; \
+	else \
+	./configure --prefix=/usr \
+		--mandir=\$${prefix}/share/man \
+		--infodir=\$${prefix}/share/info \
+		--enable-gnome --enable-fb --with-ggi \
+		--with-sdl --enable-esd --enable-alsa ; \
+	fi
+
 	$(MAKE)
 
 	touch build-stamp

@@ -16,7 +16,6 @@ OPTIMS=@OPTIMS@
 
 SYS=@SYS@
 PLUGINS=@PLUGINS@
-SNAPSHOTDIR=vlc-@VLC_VERSION@
 INSTALL=@INSTALL@
 ARCH=@ARCH@
 prefix=@prefix@
@@ -441,23 +440,34 @@ show:
 
 # ugliest of all, but I have no time to do it -- sam
 snapshot:
-	rm -rf /tmp/vlc-@VLC_VERSION@ /tmp/vlc-@VLC_VERSION@-nocss
+	rm -rf /tmp/vlc-@VLC_VERSION@ /tmp/vlc-@VLC_VERSION@nocss
 	# copy archive in /tmp
-	find include src plugins -type d | while read i ; \
+	find -type d | while read i ; \
 		do mkdir -p /tmp/vlc-@VLC_VERSION@/$$i ; \
 	done
-	find /tmp/vlc-@VLC_VERSION@ -type d -name CVS | xargs rmdir
-	for i in debian doc lib share ; \
-		do mkdir /tmp/vlc-@VLC_VERSION@/$$i ; \
+	find debian -mindepth 1 -type d | grep -v CVS | while read i ; \
+		do rmdir $$i ; \
+	done
+	# CVS entries
+	find . -type f | grep CVS | while read i ; \
+		do cp $$i /tmp/vlc-@VLC_VERSION@/$$i ; \
 	done
 	# .c .h .in .cpp
 	find include src plugins -type f -name '*.[chi]*' | while read i ; \
 		do cp $$i /tmp/vlc-@VLC_VERSION@/$$i ; \
 	done
+	# copy misc files
 	cp vlc.spec AUTHORS COPYING ChangeLog INSTALL README TODO \
 		Makefile.in Makefile.dep configure configure.in install-sh \
 		config.sub config.guess todo.pl \
 			/tmp/vlc-@VLC_VERSION@/
+	for file in control vlc-gnome.menu vlc.copyright vlc.docs changelog \
+		rules vlc.1 vlc.dirs vlc.menu ; do \
+			cp debian/$$file /tmp/vlc-@VLC_VERSION@/debian/ ; done
+	for file in default8x16.psf default8x9.psf gvlc.png vlc.png ; do \
+		cp share/$$file /tmp/vlc-@VLC_VERSION@/share/ ; done
+
+	# build css-enabled archives
 	(cd /tmp ; tar cf vlc-@VLC_VERSION@.tar vlc-@VLC_VERSION@ ; \
 		bzip2 -f -9 < vlc-@VLC_VERSION@.tar \
 			> vlc-@VLC_VERSION@.tar.bz2 ; \
@@ -473,16 +483,21 @@ snapshot:
 			elsif (!$$i || /^#/) { print $$_; }' \
 		< $$x | grep -vi css >| /tmp/vlc-@VLC_VERSION@/$$x ; \
 	done
-	(cd /tmp ; mv vlc-@VLC_VERSION@ vlc-@VLC_VERSION@-nocss ; \
-		tar cf vlc-@VLC_VERSION@-nocss.tar vlc-@VLC_VERSION@-nocss ; \
-		bzip2 -f -9 < vlc-@VLC_VERSION@-nocss.tar \
-			> vlc-@VLC_VERSION@-nocss.tar.bz2 ; \
-		gzip -f -9 vlc-@VLC_VERSION@-nocss.tar )
-	mv /tmp/vlc-@VLC_VERSION@-nocss.tar.gz \
-		/tmp/vlc-@VLC_VERSION@-nocss.tar.bz2 ..
+	rm -f /tmp/vlc-@VLC_VERSION@/debian/changelog
+	sed 's/\(^vlc ([^-]*\)-/\1nocss-/' < debian/changelog \
+		> /tmp/vlc-@VLC_VERSION@/debian/changelog
+
+	# build nocss archives
+	(cd /tmp ; mv vlc-@VLC_VERSION@ vlc-@VLC_VERSION@nocss ; \
+		tar cf vlc-@VLC_VERSION@nocss.tar vlc-@VLC_VERSION@nocss ; \
+		bzip2 -f -9 < vlc-@VLC_VERSION@nocss.tar \
+			> vlc-@VLC_VERSION@nocss.tar.bz2 ; \
+		gzip -f -9 vlc-@VLC_VERSION@nocss.tar )
+	mv /tmp/vlc-@VLC_VERSION@nocss.tar.gz \
+		/tmp/vlc-@VLC_VERSION@nocss.tar.bz2 ..
 
 	# clean up
-	rm -rf /tmp/vlc-@VLC_VERSION@-nocss
+	rm -rf /tmp/vlc-@VLC_VERSION@nocss
 
 plugins: $(PLUGINS:%=lib/%.so)
 

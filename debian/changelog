@@ -1,5 +1,12 @@
 vlc (0.2.50-1) unstable; urgency=low
 
+  * Only build vlc-glide under x86 (Closes: #84046).
+  * Switched PentiumPro optimization off (Closes: #83707).
+
+ -- Samuel Hocevar <sam@zoy.org>  Mon,  5 Feb 2001 20:49:15 +0100
+
+vlc (0.2.50-1) unstable; urgency=low
+
   * Unstable release.
 
  -- Samuel Hocevar <sam@zoy.org>  Wed, 31 Jan 2001 04:30:37 +0100
