@@ -165,6 +165,7 @@ struct  sdp_t
     int         i_in; /* IP version */
 
     int           i_media;
+    int           i_media_type;
 
     int           i_attributes;
     attribute_t  **pp_attributes;
@@ -207,6 +208,11 @@ struct services_discovery_sys_t
     vlc_bool_t  b_parse;
 
     int i_timeout;
+};
+
+struct demux_sys_t
+{
+    sdp_t *p_sdp;
 };
 
 /*****************************************************************************
@@ -339,7 +345,17 @@ static int OpenDemux( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     uint8_t *p_peek;
+    int i_max_sdp = 1024;
+    int i_sdp = 0;
+    char *psz_sdp = (char *)malloc( i_max_sdp );
+    sdp_t *p_sdp = NULL;
 
+    if( !psz_sdp )
+    {
+        return VLC_EGENERIC;
+    }
+
+    
     /* Probe for SDP */
     if( p_demux->s )
     {
@@ -357,10 +373,67 @@ static int OpenDemux( vlc_object_t *p_this )
         }
     }
 
+    /* Gather the complete sdp file */
+    for( ;; )
+    {
+        int i_read = stream_Read( p_demux->s,
+                                  &psz_sdp[i_sdp], i_max_sdp - i_sdp - 1 );
+        
+        if( i_read < 0 )
+            
+        {
+            msg_Err( p_demux, "failed to read SDP" );
+            goto error;
+        }
+
+        i_sdp += i_read;
+
+        if( i_read < i_max_sdp - i_sdp - 1 )
+        {
+            psz_sdp[i_sdp] = '\0';
+            break;
+        }
+
+        i_max_sdp += 1000;
+        psz_sdp = (uint8_t*)realloc( psz_sdp, i_max_sdp );
+    }
+    
+    p_sdp = ParseSDP( VLC_OBJECT(p_demux), psz_sdp );
+    
+    if( !p_sdp )
+    {
+        msg_Warn( p_demux, "invalid SDP");
+        goto error;
+    }
+    
+    if( p_sdp->i_media > 1 )
+    {
+        goto error;
+    }
+    
+    if( ParseConnection( VLC_OBJECT( p_demux ), p_sdp ) )
+    {
+        p_sdp->psz_uri = NULL;
+    }
+    if( p_sdp->i_media_type != 33 && p_sdp->i_media_type != 32 && p_sdp->i_media_type != 14 )
+        goto error;
+    
+    if( p_sdp->psz_uri == NULL ) goto error;
+
+    p_demux->p_sys = (demux_sys_t *)malloc( sizeof(demux_sys_t) );
+    p_demux->p_sys->p_sdp = p_sdp;
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
 
+    free( psz_sdp );
+    if( p_sdp ) FreeSDP( p_sdp );
     return VLC_SUCCESS;
+    
+error:
+    free( psz_sdp );
+    if( p_sdp ) FreeSDP( p_sdp );
+    stream_Seek( p_demux->s, 0 );
+    return VLC_EGENERIC;    
 }
 
 /*****************************************************************************
@@ -505,59 +578,8 @@ static void Run( services_discovery_t *p_sd )
  **********************************************************************/
 static int Demux( demux_t *p_demux )
 {
-   int i_max_sdp = 1024;
-   int i_sdp = 0;
-   char *psz_sdp = (char *)malloc( i_max_sdp );
-   sdp_t *p_sdp;
-
-   playlist_t *p_playlist;
-
-   if( !psz_sdp ) return -1;
-
-   /* Gather the complete sdp file */
-   for( ;; )
-   {
-        int i_read = stream_Read( p_demux->s,
-                                  &psz_sdp[i_sdp], i_max_sdp - i_sdp - 1 );
-
-        if( i_read < 0 )
-
-        {
-            msg_Err( p_demux, "failed to read SDP" );
-            return VLC_EGENERIC;
-        }
-
-        i_sdp += i_read;
-
-        if( i_read < i_max_sdp - i_sdp - 1 )
-        {
-            psz_sdp[i_sdp] = '\0';
-            break;
-        }
-
-        i_max_sdp += 1000;
-        psz_sdp = (uint8_t*)realloc( psz_sdp, i_max_sdp );
-   }
-
-   p_sdp = ParseSDP( VLC_OBJECT(p_demux), psz_sdp );
-
-   if( !p_sdp )
-   {
-       msg_Warn( p_demux, "invalid SDP");
-       return -1;
-   }
-
-   if( p_sdp->i_media > 1 )
-   {
-        return -1;
-   }
-
-   if( ParseConnection( VLC_OBJECT( p_demux ), p_sdp ) )
-   {
-       p_sdp->psz_uri = NULL;
-   }
-
-   if( p_sdp->psz_uri == NULL ) return VLC_EGENERIC;
+    sdp_t *p_sdp = p_demux->p_sys->p_sdp;
+    playlist_t *p_playlist;
 
    p_playlist = (playlist_t *)vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
                                                FIND_ANYWHERE );
@@ -568,9 +590,6 @@ static int Demux( demux_t *p_demux )
                  PLAYLIST_APPEND, PLAYLIST_END );
 
    vlc_object_release( p_playlist );
-
-   FreeSDP( p_sdp );
-   free( psz_sdp );
 
    return VLC_SUCCESS;
 }
@@ -597,6 +616,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
     int                 i_decompressed_size;
     uint8_t             *p_decompressed_buffer;
 #endif
+    uint8_t             *psz_foo;
 
     /* First, check the sap announce is correct */
     i_version = p_buffer[0] >> 5;
@@ -682,6 +702,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
         return VLC_EGENERIC;
     }
     psz_sdp += p_buffer[1];
+    psz_foo = psz_sdp;
 
     /* Skip payload type */
     /* Handle announces without \0 between SAP and SDP */
@@ -697,6 +718,15 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
     if( *psz_sdp == '\0' )
     {
         psz_sdp++;
+    }
+    if( psz_sdp != psz_foo && strcasecmp( psz_foo, "application/sdp" ) )
+    {
+        msg_Dbg( p_sd, "unhandled content type: %s", psz_foo );        
+    }
+    if( psz_sdp -p_buffer >= i_read )
+    {
+        msg_Warn( p_sd, "package without content" );
+        return VLC_EGENERIC;
     }
 
     /* Parse SDP info */
@@ -968,12 +998,18 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         if( psz_eof )
         {
             *psz_eof = '\0';
+            psz_proto = strdup( psz_parse );
+
+            psz_parse = psz_eof + 1;
+            p_sdp->i_media_type = atoi( psz_parse );
+            
         }
         else
         {
             msg_Dbg( p_obj, "incorrect m field");
+            p_sdp->i_media_type = 33;
+            psz_proto = strdup( psz_parse );
         }
-        psz_proto = strdup( psz_parse );
     }
 
     if( psz_proto && !strncmp( psz_proto, "RTP/AVP", 7 ) )
@@ -1026,8 +1062,7 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
 
     if( psz_sdp[0] != 'v' || psz_sdp[1] != '=' )
     {
-        msg_Warn( p_obj, "bad SDP packet, begins with 0x%x(%c) 0x%x(%c)",
-                         psz_sdp[0],psz_sdp[0],psz_sdp[1],psz_sdp[1]);
+        msg_Warn( p_obj, "Bad packet" );
         return NULL;
     }
 
