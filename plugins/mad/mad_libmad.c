@@ -302,7 +302,7 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
         	return( -1 );
     	}
 
-      intf_ErrMsg("mad_adec debug: in libmad_output aout fifo created");
+      intf_WarnMsg( 4, "mad_adec debug: in libmad_output aout fifo created");
     }
 
     if (p_mad_adec->p_aout_fifo->i_rate != p_libmad_pcm->samplerate)
@@ -375,7 +375,7 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
     /* DEBUG */
     /*
     if (p_libmad_pcm->channels == 1) {
-       intf_ErrMsg( "mad debug: libmad_output channels [%d]", p_libmad_pcm->channels);
+       intf_WarnMsg( 4, "mad debug: libmad_output channels [%d]", p_libmad_pcm->channels);
     }
     */
 

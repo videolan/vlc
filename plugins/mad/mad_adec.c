@@ -106,7 +106,7 @@ static int decoder_Run ( decoder_config_t * p_config )
 {
     mad_adec_thread_t *   p_mad_adec;
 
-    intf_ErrMsg( "mad_adec debug: mad_adec thread launched, initializing" );
+    intf_WarnMsg( 4, "mad_adec debug: mad_adec thread launched, initializing" );
 
     /* Allocate the memory needed to store the thread's structure */
     p_mad_adec = (mad_adec_thread_t *) malloc(sizeof(mad_adec_thread_t));
@@ -175,17 +175,17 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
     if ( strncmp(psz_downscale,"fast",4)==0 )
     {
         p_mad_adec->audio_scaling = FAST_SCALING;
-        intf_ErrMsg( "mad_adec debug: downscale fast selected" );
+        intf_WarnMsg( 4, "mad_adec debug: downscale fast selected" );
     }
     else if ( strncmp(psz_downscale,"mpg321",7)==0 )
     {
         p_mad_adec->audio_scaling = MPG321_SCALING;
-        intf_ErrMsg( "mad_adec debug: downscale mpg321 selected" );
+        intf_WarnMsg( 4, "mad_adec debug: downscale mpg321 selected" );
     }
     else
     {
         p_mad_adec->audio_scaling = FAST_SCALING;
-        intf_ErrMsg( "mad_adec debug: downscale default fast selected" );
+        intf_WarnMsg( 4, "mad_adec debug: downscale default fast selected" );
     }
 
 		if (psz_downscale) free(psz_downscale);
@@ -234,7 +234,7 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
     vlc_mutex_unlock( &p_fifo->data_lock );
     p_mad_adec->p_data = p_fifo->p_first->p_first;
 
-    intf_ErrMsg("mad_adec debug: mad decoder thread %p initialized", p_mad_adec);
+    intf_WarnMsg( 4, "mad_adec debug: mad decoder thread %p initialized", p_mad_adec);
 
     return( 0 );
 }
@@ -244,7 +244,7 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
  *****************************************************************************/
 static void EndThread (mad_adec_thread_t * p_mad_adec)
 {
-    intf_ErrMsg ("mad_adec debug: destroying mad decoder thread %p", p_mad_adec);
+    intf_WarnMsg( 4, "mad_adec debug: destroying mad decoder thread %p", p_mad_adec);
 
     /* If the audio output fifo was created, we destroy it */
     if (p_mad_adec->p_aout_fifo != NULL)
@@ -264,6 +264,6 @@ static void EndThread (mad_adec_thread_t * p_mad_adec)
     free( p_mad_adec->libmad_decoder );
     free( p_mad_adec );
 
-    intf_ErrMsg ("mad_adec debug: mad decoder thread %p destroyed", p_mad_adec);
+    intf_WarnMsg( 4, "mad_adec debug: mad decoder thread %p destroyed", p_mad_adec);
 }
 
