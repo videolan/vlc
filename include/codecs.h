@@ -2,7 +2,7 @@
  * codecs.h: codec related structures needed by the demuxers and decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: codecs.h,v 1.2 2002/11/07 19:31:07 gbazin Exp $
+ * $Id: codecs.h,v 1.3 2002/12/03 17:00:15 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -70,6 +70,7 @@ typedef struct {
 #define  WAVE_FORMAT_ALAW               0x0006 /* Microsoft Corporation */
 #define  WAVE_FORMAT_MULAW              0x0007 /* Microsoft Corporation */
 #define  WAVE_FORMAT_DTS                0x0008 /* Microsoft Corporation */
+#define  WAVE_FORMAT_IMA_ADPCM          0x0011
 #define  WAVE_FORMAT_MPEG               0x0050 /* Microsoft Corporation */
 #define  WAVE_FORMAT_MPEGLAYER3         0x0055 /* ISO/MPEG Layer3 Format Tag */
 #define  WAVE_FORMAT_DOLBY_AC3_SPDIF    0x0092 /* Sonic Foundry */
@@ -78,6 +79,7 @@ typedef struct {
 #define WAVE_FORMAT_A52             0x2000
 #define WAVE_FORMAT_WMA1            0x0160
 #define WAVE_FORMAT_WMA2            0x0161
+#define WAVE_FORMAT_WMA3            0x0162
 
 #if !defined(WAVE_FORMAT_EXTENSIBLE)
 #define  WAVE_FORMAT_EXTENSIBLE                 0xFFFE /* Microsoft */

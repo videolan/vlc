@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.10 2002/11/28 18:35:19 fenrir Exp $
+ * $Id: asf.c,v 1.11 2002/12/03 17:00:16 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -235,7 +235,7 @@ static int Activate( vlc_object_t * p_this )
                     break;
                 default:
                     p_stream->p_es->i_fourcc = 
-                        VLC_FOURCC( 'u','n','d','f' );
+                        VLC_FOURCC( 'm','s',(i_codec >> 8)&0xff,i_codec&0xff );
             }
             if( p_sp->i_type_specific_data_length > 0 )
             {

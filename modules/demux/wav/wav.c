@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.4 2002/11/28 16:32:29 fenrir Exp $
+ * $Id: wav.c,v 1.5 2002/12/03 17:00:16 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -98,7 +98,7 @@ static int SeekAbsolute( input_thread_t *p_input,
 
     if( i_pos >= p_input->stream.p_selected_area->i_size )
     {
-        return( 0 );
+    //    return( 0 );
     }
             
     i_filepos = TellAbsolute( p_input );
@@ -296,6 +296,40 @@ static int PCM_GetFrame( input_thread_t *p_input,
     return( ReadPES( p_input, pp_pes, i_bytes ) );
 }
 
+static int MS_ADPCM_GetFrame( input_thread_t *p_input,
+                              WAVEFORMATEX   *p_wf,
+                              pes_packet_t   **pp_pes,
+                              mtime_t        *pi_length )
+{
+    int i_samples;
+
+    i_samples = 2 + 2 * ( p_wf->nBlockAlign - 
+                                7 * p_wf->nChannels ) / p_wf->nChannels;
+    
+    *pi_length = (mtime_t)1000000 *
+                 (mtime_t)i_samples /
+                 (mtime_t)p_wf->nSamplesPerSec;
+
+    return( ReadPES( p_input, pp_pes, p_wf->nBlockAlign ) );
+}
+
+static int IMA_ADPCM_GetFrame( input_thread_t *p_input,
+                               WAVEFORMATEX   *p_wf,
+                               pes_packet_t   **pp_pes,
+                               mtime_t        *pi_length )
+{
+    int i_samples;
+
+    i_samples = 2 * ( p_wf->nBlockAlign - 
+                        4 * p_wf->nChannels ) / p_wf->nChannels;
+    
+    *pi_length = (mtime_t)1000000 *
+                 (mtime_t)i_samples /
+                 (mtime_t)p_wf->nSamplesPerSec;
+
+    return( ReadPES( p_input, pp_pes, p_wf->nBlockAlign ) );
+}
+
 /*****************************************************************************
  * WAVInit: check file and initializes structures
  *****************************************************************************/
@@ -385,24 +419,36 @@ static int WAVInit( vlc_object_t * p_this )
     /* XXX p_demux->psz_demux shouldn't be NULL ! */
     switch( p_demux->p_wf->wFormatTag )
     {
-        case( 0x01 ):
+        case( WAVE_FORMAT_PCM ):
             msg_Dbg( p_input,"found raw pcm audio format" );
             p_demux->i_fourcc = VLC_FOURCC( 'a', 'r', 'a', 'w' );
             p_demux->GetFrame = PCM_GetFrame;
             p_demux->psz_demux = strdup( "" );
             break;
-        case( 0x50 ):
-        case( 0x55 ):
+        case( WAVE_FORMAT_MPEG ):
+        case( WAVE_FORMAT_MPEGLAYER3 ):
             msg_Dbg( p_input, "found mpeg audio format" );
             p_demux->i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'a' );
             p_demux->GetFrame = NULL;
             p_demux->psz_demux = strdup( "mpegaudio" );
             break;
-        case( 0x2000 ):
+        case( WAVE_FORMAT_A52 ):
             msg_Dbg( p_input,"found a52 audio format" );
             p_demux->i_fourcc = VLC_FOURCC( 'a', '5', '2', ' ' );
             p_demux->GetFrame = NULL;
             p_demux->psz_demux = strdup( "a52" );
+            break;
+        case( WAVE_FORMAT_ADPCM ):
+            msg_Dbg( p_input, "found ms adpcm audio format" );
+            p_demux->i_fourcc = VLC_FOURCC( 'm', 's', 0x00, 0x02 );
+            p_demux->GetFrame = MS_ADPCM_GetFrame;
+            p_demux->psz_demux = strdup( "" );
+            break;
+        case( WAVE_FORMAT_IMA_ADPCM ):
+            msg_Dbg( p_input, "found ima adpcm audio format" );
+            p_demux->i_fourcc = VLC_FOURCC( 'm', 's', 0x00, 0x11 );
+            p_demux->GetFrame = IMA_ADPCM_GetFrame;
+            p_demux->psz_demux = strdup( "" );
             break;
         default:
             msg_Warn( p_input,"unrecognize audio format(0x%x)", 
@@ -544,15 +590,14 @@ static int WAVDemux( input_thread_t *p_input )
         i_offset = TellAbsolute( p_input ) - p_demux->i_data_pos;
         if( i_offset < 0 )
         {
-            SeekAbsolute( p_input, p_demux->i_data_pos );
+            i_offset = 0;
         }
-        else
         if( p_demux->p_wf->nBlockAlign != 0 )
         {
-            
-            i_offset = i_offset - i_offset % p_demux->p_wf->nBlockAlign;
-            SeekAbsolute( p_input, p_demux->i_data_pos + i_offset );
+            i_offset += p_demux->p_wf->nBlockAlign - 
+                                i_offset % p_demux->p_wf->nBlockAlign;
         }
+        SeekAbsolute( p_input, p_demux->i_data_pos + i_offset );
     }
     
     input_ClockManageRef( p_input,

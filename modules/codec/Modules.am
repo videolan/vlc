@@ -7,3 +7,4 @@ SOURCES_theora = modules/codec/theora.c
 SOURCES_tremor = modules/codec/vorbis.c
 SOURCES_dv = modules/codec/dv.c
 SOURCES_xvid = modules/codec/xvid.c
+SOURCES_adpcm = modules/codec/adpcm.c
