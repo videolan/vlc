@@ -173,7 +173,7 @@ static int aout_Open( aout_thread_t *p_aout )
     
    
     p_aout->p_sys->i_audio_end = 0;
-    p_aout->p_sys->audio_buf = NULL;
+    p_aout->p_sys->audio_buf = malloc( OVERFLOWLIMIT );
     
     /* Initialize some variables */
     p_aout->psz_device = 0;
@@ -260,6 +260,11 @@ static int aout_SetFormat( aout_thread_t *p_aout )
  *****************************************************************************/
 static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
+    if(l_buffer_limit > p_aout->p_sys->i_audio_end)
+    {
+        /* returning 0 here juste gives awful sound in the speakers :/ */
+        return( l_buffer_limit );
+    }
     return( p_aout->p_sys->i_audio_end-l_buffer_limit);
 }
 
@@ -284,7 +289,6 @@ static void SDL_aout_callback(void *userdata, byte_t *stream, int len)
     {
         memcpy(stream, p_sys->audio_buf, len);
         memmove(p_sys->audio_buf, &(p_sys->audio_buf[len]), end-len);
-        p_sys->audio_buf = realloc(p_sys->audio_buf, end-len);
         p_sys->i_audio_end -= len;
     }
 }
@@ -304,7 +308,6 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
     memcpy(&(audio_buf[p_aout->p_sys->i_audio_end]), buffer, i_size);
     p_aout->p_sys->i_audio_end += i_size; 
     p_aout->p_sys->audio_buf = audio_buf;
-    
     
     SDL_UnlockAudio();                                  /* go on callbacking */
 }
