@@ -51,6 +51,12 @@ movq      (%0), %%mm6       # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
 #movl      $0, (%3)         # cache preload for image                       \n\
 "
 
+#define MMX_INIT_16_GRAY "                                                  \n\
+                                                                            \n\
+movq      (%0), %%mm6       # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
+#movl      $0, (%3)         # cache preload for image                       \n\
+"
+
 #define MMX_INIT_32 "                                                       \n\
                                                                             \n\
 movd      (%1), %%mm0       # Load 4 Cb       00 00 00 00 u3 u2 u1 u0       \n\
@@ -132,6 +138,49 @@ punpcklbw %%mm3, %%mm0          #                 B7 B6 B5 B4 B3 B2 B1 B0   \n\
 punpcklbw %%mm4, %%mm1          #                 R7 R6 R5 R4 R3 R2 R1 R0   \n\
 punpcklbw %%mm5, %%mm2          #                 G7 G6 G5 G4 G3 G2 G1 G0   \n\
 "
+
+/*
+ * Grayscale case, only use Y
+ */
+
+#define MMX_YUV_GRAY "                                                      \n\
+                                                                            \n\
+# convert the luma part                                                     \n\
+psubusb   mmx_10w, %%mm6                                                    \n\
+movq      %%mm6, %%mm7                                                      \n\
+pand      mmx_00ffw, %%mm6                                                  \n\
+psrlw     $8, %%mm7                                                         \n\
+psllw     $3, %%mm6                                                         \n\
+psllw     $3, %%mm7                                                         \n\
+pmulhw    mmx_Y_coeff, %%mm6                                                \n\
+pmulhw    mmx_Y_coeff, %%mm7                                                \n\
+packuswb  %%mm6, %%mm6                                                      \n\
+packuswb  %%mm7, %%mm7                                                      \n\
+punpcklbw %%mm7, %%mm6                                                      \n\
+"
+
+#define MMX_UNPACK_16_GRAY "                                                \n\
+movq      %%mm6, %%mm5                                                      \n\
+pand      mmx_redmask, %%mm6                                                \n\
+pand      mmx_grnmask, %%mm5                                                \n\
+movq      %%mm6, %%mm7                                                      \n\
+psrlw     mmx_blueshift, %%mm7                                              \n\
+pxor      %%mm3, %%mm3                                                      \n\
+movq      %%mm7, %%mm2                                                      \n\
+movq      %%mm5, %%mm0                                                      \n\
+punpcklbw %%mm3, %%mm5                                                      \n\
+punpcklbw %%mm6, %%mm7                                                      \n\
+psllw     mmx_blueshift, %%mm5                                              \n\
+por       %%mm5, %%mm7                                                      \n\
+movq      %%mm7, (%3)                                                       \n\
+punpckhbw %%mm3, %%mm0                                                      \n\
+punpckhbw %%mm6, %%mm2                                                      \n\
+psllw     mmx_blueshift, %%mm0                                              \n\
+movq      8(%0), %%mm6                                                      \n\
+por       %%mm0, %%mm2                                                      \n\
+movq      %%mm2, 8(%3)                                                      \n\
+"
+
 
 /*
  * convert RGB plane to RGB 16 bits,

@@ -46,8 +46,8 @@
 #include "intf_msg.h"
 #include "main.h"
 
-#define WIDTH 640
-#define HEIGHT 480
+#define WIDTH 800
+#define HEIGHT 600
 #define BITS_PER_PLANE 16
 #define BYTES_PER_PIXEL 2
 
@@ -168,7 +168,7 @@ static int GlideOpenDisplay( vout_thread_t *p_vout )
 {
     static char version[80];
     GrHwConfiguration hwconfig;
-    GrScreenResolution_t resolution = GR_RESOLUTION_640x480;
+    GrScreenResolution_t resolution = GR_RESOLUTION_800x600;
     GrLfbInfo_t p_front_buffer_info;                    /* front buffer info */
 
     p_vout->i_width =                   WIDTH;

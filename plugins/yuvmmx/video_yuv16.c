@@ -52,7 +52,57 @@
  *****************************************************************************/
 void ConvertY4Gray16( YUV_ARGS_16BPP )
 {
-    intf_ErrMsg( "yuvmmx error: unhandled function, grayscale, bpp = 16\n" );
+    boolean_t   b_horizontal_scaling;             /* horizontal scaling type */
+    int         i_vertical_scaling;                 /* vertical scaling type */
+    int         i_x, i_y;                 /* horizontal and vertical indexes */
+    int         i_scale_count;                       /* scale modulo counter */
+    int         i_chroma_width;                              /* chroma width */
+    u16 *       p_pic_start;       /* beginning of the current line for copy */
+    u16 *       p_buffer_start;                   /* conversion buffer start */
+    u16 *       p_buffer;                       /* conversion buffer pointer */
+    int *       p_offset_start;                        /* offset array start */
+    int *       p_offset;                            /* offset array pointer */
+
+    /*
+     * Initialize some values  - i_pic_line_width will store the line skip
+     */
+    i_pic_line_width -= i_pic_width;
+    i_chroma_width =    i_width / 2;
+    p_buffer_start =    p_vout->yuv.p_buffer;
+    p_offset_start =    p_vout->yuv.p_offset;
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height,
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start, 0 );
+
+    /*
+     * Perform conversion
+     */
+    i_scale_count = ( i_vertical_scaling == 1 ) ? i_pic_height : i_height;
+    for( i_y = 0; i_y < i_height; i_y++ )
+    {
+        /* Mark beginnning of line for possible later line copy, and initialize
+         * buffer */
+        p_pic_start =   p_pic;
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
+
+        for ( i_x = i_width / 8; i_x--; )
+        {
+            __asm__( MMX_INIT_16_GRAY
+                     : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+
+            __asm__( ".align 8"
+                     MMX_YUV_GRAY
+                     MMX_UNPACK_16_GRAY
+                     : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+
+            p_y += 8;
+            p_u += 4;
+            p_v += 4;
+            p_buffer += 8;
+        }
+
+        SCALE_WIDTH;
+        SCALE_HEIGHT( 420, 2 );
+    }
 }
 
 /*****************************************************************************

@@ -296,12 +296,12 @@ void SetYUV( vout_thread_t *p_vout )
             p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray16;
             break;
         case 3:
-            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertY4Gray24;
+            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertYUV420RGB24;
             p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertY4Gray24;
             p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray24;
             break;
         case 4:
-            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertY4Gray32;
+            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertYUV420RGB32;
             p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertY4Gray32;
             p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray32;
             break;
