@@ -3,7 +3,7 @@
  *               using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 Rocky Bernstein <rocky@panix.com>
- * $Id: vcdplayer.c,v 1.3 2003/11/23 03:58:33 rocky Exp $
+ * $Id: vcdplayer.c,v 1.4 2003/11/23 18:24:38 rocky Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ vcdplayer_update_entry( input_thread_t * p_input, uint16_t ofs,
     vcdinfo_offset_t *off_t = vcdinfo_get_offset_t(p_vcd->vcd, ofs);
     if (off_t != NULL) {
       *entry = off_t->lid;
-      dbg_print(INPUT_DBG_PBC, "%s: %d\n", label, off_t->lid);
+      dbg_print(INPUT_DBG_PBC, "%s: %d lid\n", label, off_t->lid);
     } else
       *entry = VCDINFO_INVALID_ENTRY;
   }
@@ -389,6 +389,7 @@ vcdplayer_play_next( input_thread_t * p_input )
       vcdplayer_update_entry( p_input, 
 			      vcdinf_psd_get_next_offset(p_vcd->pxd.psd), 
 			      &itemid.num, "next");
+      itemid.type = VCDINFO_ITEM_TYPE_LID;
       break;
 
     case PSD_TYPE_PLAY_LIST: 
@@ -396,6 +397,7 @@ vcdplayer_play_next( input_thread_t * p_input )
       vcdplayer_update_entry( p_input, 
 			      vcdinf_pld_get_next_offset(p_vcd->pxd.pld), 
 			      &itemid.num, "next");
+      itemid.type = VCDINFO_ITEM_TYPE_LID;
       break;
       
     case PSD_TYPE_END_LIST:
@@ -481,6 +483,7 @@ vcdplayer_play_prev( input_thread_t * p_input )
       vcdplayer_update_entry( p_input, 
 			      vcdinf_psd_get_prev_offset(p_vcd->pxd.psd), 
 			      &itemid.num, "prev");
+      itemid.type = VCDINFO_ITEM_TYPE_LID;
       break;
 
     case PSD_TYPE_PLAY_LIST: 
@@ -488,6 +491,7 @@ vcdplayer_play_prev( input_thread_t * p_input )
       vcdplayer_update_entry( p_input, 
 			      vcdinf_pld_get_prev_offset(p_vcd->pxd.pld), 
 			      &itemid.num, "prev");
+      itemid.type = VCDINFO_ITEM_TYPE_LID;
       break;
       
     case PSD_TYPE_END_LIST:
@@ -545,6 +549,7 @@ vcdplayer_play_return( input_thread_t * p_input )
       vcdplayer_update_entry( p_input, 
 			      vcdinf_psd_get_return_offset(p_vcd->pxd.psd), 
 			      &itemid.num, "return");
+      itemid.type = VCDINFO_ITEM_TYPE_LID;
       break;
 
     case PSD_TYPE_PLAY_LIST: 
@@ -552,6 +557,7 @@ vcdplayer_play_return( input_thread_t * p_input )
       vcdplayer_update_entry( p_input, 
 			      vcdinf_pld_get_return_offset(p_vcd->pxd.pld), 
 			      &itemid.num, "return");
+      itemid.type = VCDINFO_ITEM_TYPE_LID;
       break;
       
     case PSD_TYPE_END_LIST:
