@@ -573,25 +573,25 @@ static void MuxWritePackHeader( sout_mux_t *p_mux, block_t **p_buf,
     }
 
     bits_write( &bits, 3, ( i_scr >> 30 )&0x07 );
-    bits_write( &bits, 1,  1 );
+    bits_write( &bits, 1,  1 ); // marker
     bits_write( &bits, 15, ( i_scr >> 15 )&0x7fff );
-    bits_write( &bits, 1,  1 );
+    bits_write( &bits, 1,  1 ); // marker
     bits_write( &bits, 15, i_scr&0x7fff );
-    bits_write( &bits, 1,  1 );
+    bits_write( &bits, 1,  1 ); // marker
 
     if( p_sys->b_mpeg2 )
     {
         bits_write( &bits, 9,  0 ); // src extention
     }
-    bits_write( &bits, 1,  1 );
+    bits_write( &bits, 1,  1 );     // marker
 
-    bits_write( &bits, 22,  i_mux_rate);  // FIXME mux rate
-    bits_write( &bits, 1,  1 );
+    bits_write( &bits, 22, i_mux_rate);
+    bits_write( &bits, 1,  1 );     // marker
 
     if( p_sys->b_mpeg2 )
     {
-        bits_write( &bits, 1,  1 );
-        bits_write( &bits, 5,  0x1f );  // FIXME reserved
+        bits_write( &bits, 1,  1 );     // marker
+        bits_write( &bits, 5,  0x1f );  // reserved
         bits_write( &bits, 3,  0 );     // stuffing bytes
     }
 
@@ -638,9 +638,9 @@ static void MuxWriteSystemHeader( sout_mux_t *p_mux, block_t **p_buf,
     bits_initwrite( &bits, 12 + i_nb_stream * 3, p_hdr->p_buffer );
     bits_write( &bits, 32, 0x01bb );
     bits_write( &bits, 16, 12 - 6 + i_nb_stream * 3 );
-    bits_write( &bits, 1,  1 );
+    bits_write( &bits, 1,  1 ); // marker bit
     bits_write( &bits, 22, i_mux_rate); // FIXME rate bound
-    bits_write( &bits, 1,  1 );
+    bits_write( &bits, 1,  1 ); // marker bit
 
     bits_write( &bits, 6,  p_sys->i_audio_bound );
     bits_write( &bits, 1,  0 ); // fixed flag
@@ -678,7 +678,8 @@ static void MuxWriteSystemHeader( sout_mux_t *p_mux, block_t **p_buf,
             /* Write stream id */
             bits_write( &bits, 8, p_stream->i_stream_id&0xff );
         }
-        bits_write( &bits, 2, 0x03 );
+
+        bits_write( &bits, 2, 0x03 ); /* reserved */
         if( p_input->p_fmt->i_cat == AUDIO_ES )
         {
             bits_write( &bits, 1, 0 );
