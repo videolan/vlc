@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-06-07 11:11+0200\n"
+"POT-Creation-Date: 2002-06-07 16:50+0200\n"
 "PO-Revision-Date: 2002-04-22 09:56+0200\n"
 "Last-Translator: Samuel Hocevar <sam@zoy.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -289,13 +289,12 @@ msgid "grayscale video output"
 msgstr "greyscale video output"
 
 #: src/libvlc.h:132
-#, fuzzy
 msgid ""
 "When enabled, the color information from the video won't be decoded (this "
 "can also allow you to save some processing power)."
 msgstr ""
-"Using this option, vlc will not decode the colour information from the video "
-"(this can also allow you to save some processing power)."
+"When enabled, the colour information from the video won't be decoded (this "
+"can also allow you to save some processing power)."
 
 #: src/libvlc.h:135
 msgid "fullscreen video output"
@@ -307,9 +306,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:140
-#, fuzzy
 msgid "overlay video output"
-msgstr "greyscale video output"
+msgstr ""
 
 #: src/libvlc.h:142
 msgid ""
@@ -2030,13 +2028,3 @@ msgstr ""
 #: plugins/x11/xvideo.c:73
 msgid "XVideo extension module"
 msgstr ""
-
-#, fuzzy
-#~ msgid ""
-#~ "This option allows you to select the video filter module that vlc will "
-#~ "use.\n"
-#~ "Note that by default no video filter is used."
-#~ msgstr ""
-#~ "This option allows you to select the video output method used by vlc.\n"
-#~ "Note that the default behaviour is to automatically select the best "
-#~ "method available."

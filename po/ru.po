@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-vlc\n"
-"POT-Creation-Date: 2002-06-07 11:11+0200\n"
+"POT-Creation-Date: 2002-06-07 16:50+0200\n"
 "PO-Revision-Date: 2001-02-19 19:58+03:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"

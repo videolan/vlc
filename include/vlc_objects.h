@@ -2,7 +2,7 @@
  * vlc_objects.h: vlc_object_t definition.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlc_objects.h,v 1.3 2002/06/07 14:30:40 sam Exp $
+ * $Id: vlc_objects.h,v 1.4 2002/06/07 14:59:40 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -60,8 +60,9 @@ VLC_EXPORT( void, __vlc_dumpstructure, ( vlc_object_t * ) );
 #define vlc_object_create(a,b) \
     __vlc_object_create( CAST_TO_VLC_OBJECT(a), b )
 
-#define vlc_object_destroy(a) \
-    __vlc_object_destroy( CAST_TO_VLC_OBJECT(a) )
+#define vlc_object_destroy(a) do { \
+    __vlc_object_destroy( CAST_TO_VLC_OBJECT(a) ); \
+    (a) = NULL; } while(0)
 
 #define vlc_object_find(a,b,c) \
     __vlc_object_find( CAST_TO_VLC_OBJECT(a),b,c)

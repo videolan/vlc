@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2002-06-07 11:11+0200\n"
+"POT-Creation-Date: 2002-06-07 16:50+0200\n"
 "PO-Revision-Date: 2002-05-26 18:31+0200\n"
 "Last-Translator: Arkadiusz Lipiec <alipiec@elka.pw.edu.pl>\n"
 "Language-Team: polish <pl@li.org>\n"
@@ -20,11 +20,13 @@ msgstr "U¿ycie: %s [opcje] [parametry] [plik]...\n"
 
 #. Print module name
 #: src/libvlc.c:898
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "%s module options:\n"
 "\n"
-msgstr "opcje modu³u %s:\n"
+msgstr ""
+"opcje modu³u %s:\n"
+"\n"
 
 #. We could also have "=<" here
 #: src/libvlc.c:918 src/misc/configuration.c:798
@@ -41,14 +43,13 @@ msgstr "liczba zmiennoprz."
 
 #: src/libvlc.c:930
 msgid " (default enabled)"
-msgstr ""
+msgstr " (domy¶lnie w³±czone)"
 
 #: src/libvlc.c:931
 msgid " (default disabled)"
-msgstr ""
+msgstr " (domy¶lnie wy³±czone)"
 
 #: src/libvlc.c:1013
-#, fuzzy
 msgid ""
 "\n"
 "Playlist items:\n"
@@ -74,32 +75,31 @@ msgstr ""
 "                                 strumieñ UDP wysy³any przez VLS\n"
 "  vlc:loop                       wykonywanie pêtli listy odtwarzania\n"
 "  vlc:pause                      zatrzymanie odtwarzania obiektów listy\n"
-"  vlc:quit                       wyj¶cie z VLC"
+"  vlc:quit                       wyj¶cie z VLC\n"
 
 #: src/libvlc.c:1034 src/libvlc.c:1083 src/libvlc.c:1107 src/libvlc.c:1126
-#, fuzzy
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
 msgstr ""
 "\n"
-"Naci¶nij klawisz ENTER aby kontynuowaæ..."
+"Naci¶nij klawisz ENTER aby kontynuowaæ...\n"
 
 #. Usage
 #: src/libvlc.c:1057
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Usage: %s [options] [parameters] [file]...\n"
 "\n"
-msgstr "U¿ycie: %s [opcje] [parametry] [plik]...\n"
+msgstr ""
+"U¿ycie: %s [opcje] [parametry] [plik]...\n"
+"\n"
 
 #: src/libvlc.c:1060
-#, fuzzy
 msgid "[module]              [description]\n"
-msgstr "[modu³]               [opis]"
+msgstr "[modu³]               [opis]\n"
 
 #: src/libvlc.c:1101
-#, fuzzy
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -108,8 +108,8 @@ msgid ""
 msgstr ""
 "Ten program jest dostarczany BEZ ¯ADNEJ GWARANCJI, w granicach dozwolonych\n"
 "przez prawo. Mo¿na go rozpowszechniaæ na zasadach licencji GNU General\n"
-"Public License; zajrzyj do pliku COPYING aby uzyskaæ wiêcej szczegó³ów.\n"
-"Program napisany przez zespó³ VideoLAN na uczelni Ecole Centrale, Pary¿."
+"Public License; zajrzyj do pliku COPYING, aby uzyskaæ wiêcej szczegó³ów.\n"
+"Program napisany przez zespó³ VideoLAN na uczelni Ecole Centrale, Pary¿.\n"
 
 #. ****************************************************************************
 #. * Configuration options for the main program. Each module will also separatly
@@ -122,41 +122,40 @@ msgid "interface module"
 msgstr "modu³ interfejsu"
 
 #: src/libvlc.h:36
-#, fuzzy
 msgid ""
 "This option allows you to select the interface used by vlc. The default "
 "behavior is to automatically select the best module available."
 msgstr ""
-"Ta opcja umo¿liwia wybranie interfejsu u¿ywanego przez vlc.\n"
-"Zauwa¿, ¿e domy¶lnym zachowaniem jest automatyczny wybór najlepszego "
-"dostêpnego modu³u."
+"Ta opcja umo¿liwia wybranie interfejsu u¿ywanego przez vlc. Domy¶lnym "
+"zachowaniem jest automatyczny wybór najlepszego dostêpnego modu³u."
 
 #: src/libvlc.h:40
 msgid "be verbose"
-msgstr ""
+msgstr "tryb gadatliwy"
 
 #: src/libvlc.h:42
 msgid "This options activates the output of information messages."
-msgstr ""
+msgstr "Ta opcja aktywuje wyj¶cie komunikatów informacyjnych."
 
 #: src/libvlc.h:44
 msgid "be quiet"
-msgstr ""
+msgstr "tryb cichy"
 
 #: src/libvlc.h:46
 msgid "This options turns off all warning and information messages."
-msgstr ""
+msgstr "Ta opcja wy³±cza wszelkie ostrze¿enia i komunikaty informacyjne."
 
 #: src/libvlc.h:48
-#, fuzzy
 msgid "color messages"
-msgstr "Komunikaty"
+msgstr "kolorowe komunikaty"
 
 #: src/libvlc.h:50
 msgid ""
 "When this option is turned on, the messages sent to the console will be "
 "colorized. Your terminal needs Linux color support for this to work."
 msgstr ""
+"Po w³±czeniu tej opcji, komunikaty wysy³ane do konsoli bêd± kolorozyowane. "
+"Terminal powinien obs³ugiwaæ kolory aby funkcja zadzia³a³a."
 
 #: src/libvlc.h:53
 msgid "interface default search path"
@@ -179,29 +178,24 @@ msgid ""
 "This option allows you to select the audio output method used by vlc. The "
 "default behavior is to automatically select the best method available."
 msgstr ""
-"Ta opcja umo¿liwia wybranie metody wyj¶ciowej d¼wiêku u¿ywanej przez vlc.\n"
-"Zauwa¿, ¿e domy¶lnym zachowaniem jest automatyczne wybranie najlepszej "
-"dostêpnej metody."
+"Ta opcja umo¿liwia wybranie metody wyj¶ciowej d¼wiêku u¿ywanej przez vlc. "
+"Domy¶lnym zachowaniem jest automatyczne wybranie najlepszej dostêpnej metody."
 
 #: src/libvlc.h:64
-#, fuzzy
 msgid "enable audio"
-msgstr "wy³±czenie d¼wiêku"
+msgstr "w³±czenie d¼wiêku"
 
 #: src/libvlc.h:66
-#, fuzzy
 msgid ""
 "You can completely disable the audio output. In this case the audio decoding "
 "stage won't be done, and it will save some processing power."
 msgstr ""
-"Ta opcja powoduje ca³kowite wy³±czenie wyj¶cia d¼wiêku. Etap dekodowania "
-"d¼wiêku nie zostanie wykonany, wiêc bêdzie mo¿na zaoszczêdziæ trochê mocy "
-"procesora."
+"Mo¿na ca³kiem wy³±czyæ d¼wiêk. W tym przypadku etap dekodowania d¼wiêku nie "
+"zostanie wykonany, wiêc bêdzie mo¿na zaoszczêdziæ trochê mocy procesora."
 
 #: src/libvlc.h:69
-#, fuzzy
 msgid "force mono audio"
-msgstr "d¼wiêk mono"
+msgstr "wymuszenie d¼wiêku mono"
 
 #: src/libvlc.h:70
 msgid "This will force a mono audio output"
@@ -251,13 +245,12 @@ msgid "audio output frequency (Hz)"
 msgstr "czêstotliwo¶æ wyj¶ciowa d¼wiêku (Hz)"
 
 #: src/libvlc.h:92
-#, fuzzy
 msgid ""
 "You can force the audio output frequency here. Common values are 48000, "
 "44100, 32000, 22050, 16000, 11025, 8000."
 msgstr ""
-"W tym miejscu mo¿na wymusiæ czêstotliwo¶æ wyj¶ciow± d¼wiêku.\n"
-"Czêstymi warto¶ciami s± 48000, 44100, 32000, 22050, 16000, 11025, 8000."
+"W tym miejscu mo¿na wymusiæ czêstotliwo¶æ wyj¶ciow± d¼wiêku. Zwyk³ymi "
+"warto¶ciami s± 48000, 44100, 32000, 22050, 16000, 11025, 8000."
 
 #: src/libvlc.h:95
 msgid "compensate desynchronization of audio (in ms)"
@@ -276,28 +269,25 @@ msgid "video output module"
 msgstr "modu³ wyj¶ciowy obrazu"
 
 #: src/libvlc.h:102
-#, fuzzy
 msgid ""
 "This option allows you to select the video output method used by vlc. The "
 "default behavior is to automatically select the best method available."
 msgstr ""
-"Ta opcja umo¿liwia wybranie metody wyj¶ciowej obrazu u¿ywanej przez vlc.\n"
-"Nale¿y zauwa¿yæ, ¿e domy¶lne zachowanie to automatyczny wybór najlepszej "
-"dostêpnej metody."
+"Ta opcja umo¿liwia wybranie metody wyj¶ciowej obrazu u¿ywanej przez vlc. "
+"Domy¶lnym zachowaniem jest automatyczny wybór najlepszej dostêpnej metody."
 
 #: src/libvlc.h:106
-#, fuzzy
 msgid "enable video"
-msgstr "wy³±czony obraz"
+msgstr "w³±czony obraz"
 
 #: src/libvlc.h:108
-#, fuzzy
 msgid ""
 "You can completely disable the video output. In this case the video decoding "
 "stage won't be done, which will save some processing power."
 msgstr ""
-"Ta opcja ca³kowicie wy³±cza wyj¶cie obrazu. Etap dekodowania obrazu nie "
-"powinien byæ wykonany, wiêc mo¿na bêdzie zaoszczêdziæ trochê mocy procesora."
+"Mo¿na ca³kowicie wy³±czyæ wyj¶cie obrazu. W tym przypadku etap dekodowania "
+"obrazu nie zostanie wykonany, co umo¿liwi zaoszczêdzenie trochê mocy "
+"procesora."
 
 #: src/libvlc.h:111
 msgid "display identifier"
@@ -314,26 +304,24 @@ msgid "video width"
 msgstr "szeroko¶æ obrazu"
 
 #: src/libvlc.h:118
-#, fuzzy
 msgid ""
 "You can enforce the video width here. By default vlc will adapt to the video "
 "characteristics."
 msgstr ""
-"Mo¿na wymusiæ w tym miejscu szeroko¶æ obrazu.\n"
-"Zauwa¿, ¿e domy¶lnie vlc zaadoptuje charakterystyki obrazu."
+"Mo¿na wymusiæ w tym miejscu szeroko¶æ obrazu. Domy¶lnie vlc zaadoptuje "
+"charakterystyki obrazu."
 
 #: src/libvlc.h:121
 msgid "video height"
 msgstr "wysoko¶æ obrazu"
 
 #: src/libvlc.h:123
-#, fuzzy
 msgid ""
 "You can enforce the video height here. By default vlc will adapt to the "
 "video characteristics."
 msgstr ""
-"Mo¿na wymusiæ w tym miejscu wysoko¶æ obrazu.\n"
-"Zauwa¿, ¿e domy¶lnie vlc zaadoptuje charakterystyki obrazu."
+"Mo¿na wymusiæ w tym miejscu wysoko¶æ obrazu. Domy¶lnie vlc zaadoptuje "
+"charakterystyki obrazu."
 
 #: src/libvlc.h:126
 msgid "zoom video"
@@ -348,13 +336,12 @@ msgid "grayscale video output"
 msgstr "wyj¶cie obrazu w skali szaro¶ci"
 
 #: src/libvlc.h:132
-#, fuzzy
 msgid ""
 "When enabled, the color information from the video won't be decoded (this "
 "can also allow you to save some processing power)."
 msgstr ""
-"Uzywaj±c tej opcji vlc nie bêdzie dekodowa³ informacji o kolorze z obrazu "
-"(pozwala to tak¿e na oszczêdzenie trochê mocy procesora)."
+"Po w³±czeniu informacje o kolorze z obrazu nie zostan± zdekodowane (pozwala "
+"to tak¿e na oszczêdzenie trochê mocy procesora)."
 
 #: src/libvlc.h:135
 msgid "fullscreen video output"
@@ -367,24 +354,22 @@ msgstr ""
 "Po w³±czeniu tej opcji, vlc zawsze wy¶wietli obraz w trybie pe³noekranowym."
 
 #: src/libvlc.h:140
-#, fuzzy
 msgid "overlay video output"
-msgstr "wyj¶cie obrazu w skali szaro¶ci"
+msgstr "wyj¶cie obrazu w trybie overlay"
 
 #: src/libvlc.h:142
-#, fuzzy
 msgid ""
 "If enabled, vlc will try to take advantage of the overlay capabilities of "
 "you graphics card."
 msgstr ""
-"Domy¶lnie vlc bêdzie próbowaæ wykorzystaæ w³a¶ciwo¶ci karty graficznej."
+"Po w³±czeniu, vlc bêdzie próbowa³ skorzystaæ z w³a¶ciwo¶ci overlay karty "
+"graficznej."
 
 #: src/libvlc.h:145
 msgid "force SPU position"
 msgstr "wymuszanie pozycji SPU"
 
 #: src/libvlc.h:147
-#, fuzzy
 msgid ""
 "You can use this option to place the subtitles under the movie, instead of "
 "over the movie. Try several positions."
@@ -555,74 +540,58 @@ msgstr ""
 "wyboru s± wbudowana i a52."
 
 #: src/libvlc.h:223
-#, fuzzy
 msgid "enable CPU MMX support"
-msgstr "wy³±czona obs³uga MMX procesora"
+msgstr "w³±czona obs³uga MMX procesora"
 
 #: src/libvlc.h:225
-#, fuzzy
 msgid ""
 "If your processor supports the MMX instructions set, vlc can take advantage "
 "of them."
-msgstr ""
-"Je¶li procesor obs³uguje zbiór istrukcji MMX lecz nie chcesz aby vlc ich "
-"u¿ywa³, mo¿na u¿yæ tej opcji."
+msgstr "Je¶li procesor obs³uguje zbiór istrukcji MMX, mo¿na z nich skorzystaæ."
 
 #: src/libvlc.h:228
-#, fuzzy
 msgid "enable CPU 3D Now! support"
-msgstr "wy³±czona obs³uga 3D Now!"
+msgstr "w³±czona obs³uga 3D Now!"
 
 #: src/libvlc.h:230
-#, fuzzy
 msgid ""
 "If your processor supports the 3D Now! instructions set, vlc can take "
 "advantage of them."
 msgstr ""
-"Je¶li procesor obs³uguje zbiór istrukcji 3D Now! lecz nie chcesz aby vlc ich "
-"u¿ywa³, mo¿na u¿yæ tej opcji."
+"Je¶li procesor obs³uguje zbiór istrukcji 3D Now!, mo¿na z nich skorzystaæ."
 
 #: src/libvlc.h:233
-#, fuzzy
 msgid "enable CPU MMX EXT support"
-msgstr "wy³±czona obs³uga MMX EXT"
+msgstr "w³±czona obs³uga MMX EXT"
 
 #: src/libvlc.h:235
-#, fuzzy
 msgid ""
 "If your processor supports the MMX EXT instructions set, vlc can take "
 "advantage of them."
 msgstr ""
-"Je¶li procesor obs³uguje rozszerzony zbiór istrukcji MMX lecz nie chcesz aby "
-"vlc ich u¿ywa³, mo¿na u¿yæ tej opcji."
+"Je¶li procesor obs³uguje rozszerzony zbiór istrukcji MMX, mo¿na z nich "
+"skorzystaæ."
 
 #: src/libvlc.h:238
-#, fuzzy
 msgid "enable CPU SSE support"
-msgstr "wy³±czona obs³uga SSE"
+msgstr "w³±czona obs³uga SSE"
 
 #: src/libvlc.h:240
-#, fuzzy
 msgid ""
 "If your processor supports the SSE instructions set, vlc can take can take "
 "advantage of them."
-msgstr ""
-"Je¶li procesor obs³uguje zbiór istrukcji SSE lecz nie chcesz aby vlc ich "
-"u¿ywa³, mo¿na u¿yæ tej opcji."
+msgstr "Je¶li procesor obs³uguje zbiór istrukcji SSE, mo¿na z nich skorzystaæ."
 
 #: src/libvlc.h:243
-#, fuzzy
 msgid "enable CPU AltiVec support"
-msgstr "wy³±czona obs³uga AltiVec"
+msgstr "w³±czona obs³uga AltiVec"
 
 #: src/libvlc.h:245
-#, fuzzy
 msgid ""
 "If your processor supports the AltiVec instructions set, vlc can take "
 "advantage of them."
 msgstr ""
-"Je¶li procesor obs³uguje zbiór istrukcji AltiVec lecz nie chcesz aby vlc ich "
-"u¿ywa³, mo¿na u¿yæ tej opcji."
+"Je¶li procesor obs³uguje zbiór istrukcji AltiVec, mo¿na z nich skorzystaæ."
 
 #: src/libvlc.h:248
 msgid "launch playlist on startup"
@@ -635,9 +604,8 @@ msgstr ""
 "opcjê."
 
 #: src/libvlc.h:252
-#, fuzzy
 msgid "enqueue items in playlist"
-msgstr "domy¶lne kolejkowanie listy odtwarzania"
+msgstr "kolejkowanie obiektów listy odtwarzania"
 
 #: src/libvlc.h:254
 msgid ""
@@ -672,22 +640,20 @@ msgstr ""
 "vlc wybierze najszybszy obs³ugiwany przez sprzêt modu³."
 
 #: src/libvlc.h:267
-#, fuzzy
 msgid "access module"
-msgstr "modu³ interfejsu"
+msgstr "modu³ dostêpu"
 
 #: src/libvlc.h:269
 msgid "This is a legacy entry to let you configure access modules"
-msgstr ""
+msgstr "To jest zapis dostêpu umo¿liwiaj±cy konfigurownie modu³ów dostêpu"
 
 #: src/libvlc.h:271
-#, fuzzy
 msgid "demux module"
-msgstr "modu³ pomocy"
+msgstr "modu³ demux"
 
 #: src/libvlc.h:273
 msgid "This is a legacy entry to let you configure demux modules"
-msgstr ""
+msgstr "To jest zapis umo¿liwiaj±cy konfigurowanie modu³ów demux"
 
 #: src/libvlc.h:275
 msgid "fast pthread on NT/2K/XP (developpers only)"
@@ -769,18 +735,16 @@ msgid "print a list of available modules"
 msgstr "wy¶wietl listê dostêpnych modu³ów"
 
 #: src/libvlc.h:398
-#, fuzzy
 msgid "print help on module"
-msgstr "wy¶wietl pomoc na temat modu³u <napis>"
+msgstr "wy¶wietl pomoc na temat modu³u"
 
 #: src/libvlc.h:401
 msgid "print version information"
 msgstr "Wy¶wietl informacje o wersji"
 
 #: src/libvlc.h:403
-#, fuzzy
 msgid "print build information"
-msgstr "Wy¶wietl informacje o wersji"
+msgstr "Wy¶wietl informacje o budowaniu"
 
 #: src/misc/configuration.c:783
 msgid "boolean"
@@ -790,12 +754,10 @@ msgstr "zm. logiczna"
 #. * Build configuration structure.
 #. ****************************************************************************
 #: plugins/a52/a52.c:76
-#, fuzzy
 msgid "A/52 dynamic range compression"
-msgstr "wy³±czona kompresja dynamicznego zakresu A/52"
+msgstr "Kompresja dynamicznego zakresu A/52"
 
 #: plugins/a52/a52.c:78
-#, fuzzy
 msgid ""
 "Dynamic range compression makes the loud sounds softer, and the soft sounds "
 "louder, so you can more easily listen to the stream in a noisy environment "
@@ -884,23 +846,20 @@ msgstr "konwersje MMX z "
 #. * Building configuration tree
 #. ****************************************************************************
 #: plugins/directx/directx.c:41
-#, fuzzy
 msgid "use hardware YUV->RGB conversions"
-msgstr "Wy³±czona konwersja sprzêtowa YUV->RGB"
+msgstr "u¿ywanie konwersji sprzêtowej YUV->RGB"
 
 #: plugins/directx/directx.c:43
-#, fuzzy
 msgid ""
 "Try to use hardware acceleration for YUV->RGB conversions. This option "
 "doesn't have any effect when using overlays."
 msgstr ""
-"Nie próbuj u¿ywaæ akceleracji sprzêtowej dla konwersji YUV->RGB. Ta opcja "
-"nie przynosi ¿adnych efektów w trybie overlay."
+"Spróbuj u¿yæ akceleracji sprzêtowej dla konwersji YUV->RGB. Ta opcja nie "
+"przynosi ¿adnych efektów w trybie overlay."
 
 #: plugins/directx/directx.c:45
-#, fuzzy
 msgid "use video buffers in system memory"
-msgstr "U¿ywanie buforów obrazu w pamiêci systemowej"
+msgstr "u¿ywanie buforów obrazu w pamiêci systemowej"
 
 #: plugins/directx/directx.c:47
 msgid ""
@@ -991,26 +950,24 @@ msgid "Linux console framebuffer module"
 msgstr "modu³ bufora ramek konsoli linuksowej"
 
 #: plugins/filter/deinterlace.c:51
-#, fuzzy
 msgid "Deinterlace mode"
-msgstr "modu³ interfejsu"
+msgstr "Tryb antyprzeplotowy"
 
 #: plugins/filter/deinterlace.c:52
 msgid "one of 'bob' and 'blend'"
-msgstr ""
+msgstr "jedna z opcji \"bob\" i \"blend\""
 
 #: plugins/filter/deinterlace.c:56
 msgid "deinterlacing module"
 msgstr "modu³ przeplotu"
 
 #: plugins/filter/distort.c:51
-#, fuzzy
 msgid "distort mode"
-msgstr "Tryb sieci"
+msgstr "Tryb zniekszta³ceñ"
 
 #: plugins/filter/distort.c:52
 msgid "one of \"wave\" and \"ripple\""
-msgstr ""
+msgstr "jedna z opcji \"wave\" i \"ripple\""
 
 #: plugins/filter/distort.c:56
 msgid "miscellaneous video effects module"
@@ -1022,11 +979,11 @@ msgstr "modu³ odwracania obrazu"
 
 #: plugins/filter/transform.c:52
 msgid "Transform type"
-msgstr ""
+msgstr "Typ przekszta³cenia"
 
 #: plugins/filter/transform.c:53
 msgid "One of '90', '180', '270', 'hflip' and 'vflip'"
-msgstr ""
+msgstr "Jeden z \"90\", \"180\", \"270\", \"hflip\" i \"vflip\""
 
 #: plugins/filter/transform.c:57
 msgid "image transformation module"
@@ -1034,28 +991,28 @@ msgstr "modu³ transformacji obrazu"
 
 #: plugins/filter/wall.c:46
 msgid "Number of columns"
-msgstr ""
+msgstr "Liczba kolumn"
 
 #: plugins/filter/wall.c:47
 msgid ""
 "Select the number of horizontal videowindows in which to split the video"
-msgstr ""
+msgstr "Wybierz liczbê poziomych okien, na które bêdzie on rozdzielony obraz"
 
 #: plugins/filter/wall.c:49
 msgid "Number of rows"
-msgstr ""
+msgstr "Liczba wierszy"
 
 #: plugins/filter/wall.c:50
 msgid "Select the number of vertical videowindows in which to split the video"
-msgstr ""
+msgstr "Wybierz liczbê pionowych okien, na które bêdzie on rozdzielony obraz"
 
 #: plugins/filter/wall.c:52
 msgid "Active windows"
-msgstr ""
+msgstr "Aktywne okna"
 
 #: plugins/filter/wall.c:53
 msgid "comma separated list of active windows, defaults to all"
-msgstr ""
+msgstr "rozdzielana przecinkami lista aktywnych okien, domy¶lnie na wszystkie"
 
 #: plugins/filter/wall.c:57
 msgid "image wall video module"
@@ -1089,14 +1046,12 @@ msgstr "modu³ 3dfx Glide"
 #. * Building configuration tree
 #. ****************************************************************************
 #: plugins/gtk/gnome.c:61 plugins/gtk/gtk.c:62
-#, fuzzy
 msgid "show tooltips"
-msgstr "ukrywanie podpowiedzi"
+msgstr "wy¶wietlanie podpowiedzi"
 
 #: plugins/gtk/gnome.c:62 plugins/gtk/gtk.c:63
-#, fuzzy
 msgid "Show tooltips for configuration options."
-msgstr "Podpowiedzi dla opcji konfiguracji nie maj± byæ wy¶wietlane."
+msgstr "Wy¶wietlanie podpowiedzi dla opcji konfiguracji."
 
 #: plugins/gtk/gnome.c:67 plugins/gtk/gtk.c:65
 msgid "maximum height for the configuration windows"
@@ -1115,14 +1070,12 @@ msgid "Gtk+ interface module"
 msgstr "Modu³ interfejsu Gtk+"
 
 #: plugins/gtk/gnome.c:64
-#, fuzzy
 msgid "show text on toolbar buttons"
-msgstr "ukrywanie tekstu na przyciskach"
+msgstr "wy¶wietlanie tekstu na przyciskach"
 
 #: plugins/gtk/gnome.c:65
-#, fuzzy
 msgid "Show the text below icons on the toolbar."
-msgstr "Ukrywanie tekstu pod ikonami paska narzêdziowego."
+msgstr "Wy¶wietlanie tekstu pod ikonami paska narzêdziowego."
 
 #: plugins/gtk/gnome.c:84
 msgid "Gnome interface module"
@@ -1840,9 +1793,8 @@ msgid "IDCT module"
 msgstr "modu³ IDCT"
 
 #: plugins/idct/idctaltivec.c:51
-#, fuzzy
 msgid "AltiVec IDCT module"
-msgstr "modu³ Altivec IDCT"
+msgstr "modu³ AltiVec IDCT"
 
 #: plugins/idct/idctclassic.c:47
 msgid "classic IDCT module"
@@ -1888,13 +1840,10 @@ msgid "Mad audio downscale routine (fast,mp321)"
 msgstr ""
 
 #: plugins/mad/mad_adec.c:62
-#, fuzzy
 msgid ""
 "Specify the mad audio downscale routine you want to use. By default the mad "
 "plugin will use the fastest routine."
 msgstr ""
-"Okre¶la u¿ywany ekran sprzêtowy X11.\n"
-"Domy¶lnie vlc u¿yje warto¶ci ze zmiennej ¶rodowiskowej DISPLAY."
 
 #: plugins/mad/mad_adec.c:71
 msgid "libmad MPEG 1/2/3 audio decoder library"
@@ -1948,13 +1897,12 @@ msgstr ""
 "byæ wy¶wietlane na górze obrazu."
 
 #: plugins/mga/xmga.c:102 plugins/x11/x11.c:51 plugins/x11/xvideo.c:56
-#, fuzzy
 msgid ""
 "Specify the X11 hardware display you want to use. By default vlc will use "
 "the value of the DISPLAY environment variable."
 msgstr ""
-"Okre¶la u¿ywany ekran sprzêtowy X11.\n"
-"Domy¶lnie vlc u¿yje warto¶ci ze zmiennej ¶rodowiskowej DISPLAY."
+"Okre¶la u¿ywany ekran sprzêtowy X11. Domy¶lnie vlc u¿yje warto¶ci ze "
+"zmiennej ¶rodowiskowej DISPLAY."
 
 #: plugins/mga/xmga.c:112
 msgid "X11 MGA module"
@@ -2001,26 +1949,23 @@ msgid "ISO 13818-1 MPEG Transport Stream input (libdvbpsi)"
 msgstr "Wej¶cie transportu strumienia ISO 13818-1 MPEG (libdvbpsi)"
 
 #: plugins/mpeg_vdec/video_parser.c:73
-#, fuzzy
 msgid ""
 "This option allows you to select the IDCT module used by this video decoder. "
 "The default behavior is to automatically select the best module available."
 msgstr ""
-"Ta opcja umo¿liwia wybranie modu³u IDCT u¿ywanego przez ten dekoder obrazu.\n"
+"Ta opcja umo¿liwia wybranie modu³u IDCT u¿ywanego przez ten dekoder obrazu. "
 "Nale¿y zauwa¿yæ, ¿e domy¶lnym zachowaniem jest automatyczny wybór "
 "najlepszego dostêpnego modu³u."
 
 #: plugins/mpeg_vdec/video_parser.c:79
-#, fuzzy
 msgid ""
 "This option allows you to select the motion compensation module used by this "
 "video decoder. The default behavior is to automatically select the best "
 "module available."
 msgstr ""
 "Ta opcja umo¿liwia wybranie modu³u kompensacji ruchu u¿ywanego przez ten "
-"dekoder obrazu.\n"
-"Nale¿y zauwa¿yæ, ¿e domy¶lnym zachowaniem jest automatyczny wybór "
-"najlepszego dostêpnego modu³u."
+"dekoder obrazu. Domy¶lnym zachowaniem jest automatyczny wybór najlepszego "
+"dostêpnego modu³u."
 
 #: plugins/mpeg_vdec/video_parser.c:83
 msgid "use additional processors"
@@ -2118,20 +2063,21 @@ msgstr "modu³ dekodera podtytu³ów DVD"
 
 #: plugins/text/logger.c:87
 msgid "log filename"
-msgstr ""
+msgstr "nazwa pliku dziennika"
 
 #: plugins/text/logger.c:87
 msgid "Specify the log filename."
-msgstr ""
+msgstr "Okre¶la nazwê pliku dziennika"
 
 #: plugins/text/logger.c:88
 msgid "log format"
-msgstr ""
+msgstr "format dziennika"
 
 #: plugins/text/logger.c:88
 msgid ""
 "Specify the log format. Available choices are \"text\" (default) and \"html\""
 msgstr ""
+"Okre¶la format dziennika. Mo¿liwe opcje to \"text\" (domy¶lnie) i \"html\""
 
 #: plugins/text/logger.c:92
 msgid "file logging interface module"
@@ -2142,6 +2088,8 @@ msgid ""
 "\n"
 "Using the logger interface plugin..."
 msgstr ""
+"\n"
+"U¿ywanie wtyczku interfejsu zapisu do dziennika..."
 
 #: plugins/text/ncurses.c:70
 msgid "ncurses interface module"
@@ -2164,13 +2112,15 @@ msgstr "modu³ rozszerzenia waveOut Win32"
 #. ****************************************************************************
 #: plugins/win32/win32.cpp:42
 msgid "maximum number of lines in the log window"
-msgstr ""
+msgstr "maksymalna liczba wierszy w oknie dziennika"
 
 #: plugins/win32/win32.cpp:44
 msgid ""
 "You can set the maximum number of lines that the log window will display. "
 "Enter -1 if you want to keep all messages."
 msgstr ""
+"Mo¿na ustawiæ maksymaln± liczbê wierszy, które bêd± wy¶wietlane w oknie "
+"dziennika. Wprowad¼ -1 je¶li maj± byæ zapamiêtywane wszystkie komunikaty."
 
 #: plugins/win32/win32.cpp:53
 msgid "Win32 interface module"
@@ -2211,56 +2161,3 @@ msgstr ""
 #: plugins/x11/xvideo.c:73
 msgid "XVideo extension module"
 msgstr "modu³ rozszerzenia XVideo"
-
-#~ msgid "disable hardware acceleration for the video output"
-#~ msgstr "wy³±czona akceleracja sprzêtowa dla wyj¶cia obrazu"
-
-#~ msgid "-:--:--"
-#~ msgstr "-:--:--"
-
-#~ msgid "--"
-#~ msgstr "--"
-
-#~ msgid "---"
-#~ msgstr "---"
-
-#~ msgid "1/2"
-#~ msgstr "1/2"
-
-#~ msgid "2/3"
-#~ msgstr "2/3"
-
-#~ msgid "3/4"
-#~ msgstr "3/4"
-
-#~ msgid "4/5"
-#~ msgstr "4/5"
-
-#~ msgid "5/6"
-#~ msgstr "5/6"
-
-#~ msgid "7/8"
-#~ msgstr "7/8"
-
-#~ msgid "6/7"
-#~ msgstr "6/7"
-
-#~ msgid "warning level (or use -v, -vv, etc...)"
-#~ msgstr "poziom ostrzegania (lub u¿yj -v, -vv, itd...)"
-
-#~ msgid ""
-#~ "Increasing the warning level will allow you to see more debug messages "
-#~ "and can sometimes help you to troubleshoot a problem."
-#~ msgstr ""
-#~ "Zwiêkszanie poziomu ostrzegania pozwoli na wy¶wietlenie wiêksze ilo¶ci "
-#~ "komunikatów o b³êdach oraz mo¿e czasem pomóc rozwi±zaæ problem."
-
-#~ msgid "output statistics"
-#~ msgstr "statystyki wyj¶ciowe"
-
-#~ msgid ""
-#~ "Enabling the stats mode will flood your log console with various "
-#~ "statistics messages."
-#~ msgstr ""
-#~ "W³±czenie trybu statystyk zape³ni dziennik konsoli ró¿nymi komunikatami "
-#~ "statystycznymi."

@@ -5,6 +5,10 @@
 0.5.0
 Not released yet
 
+  * ./include/vlc_objects.h: pointers are set to NULL after a call to
+    vlc_object_destroy.
+  * ./po/pl.po: updated polish translation, thanks to Arkadiusz Lipiec
+    <alipiec@adrenalina.pl>.
   * ./src/playlist/playlist.c: lots of playlist behaviour enhancements.
   * ./src/misc/objects.c: we do not hang on attempt to destroy an object with
     a non-zero reference count, but we still complain.

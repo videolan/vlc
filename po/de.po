@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.73.3\n"
-"POT-Creation-Date: 2002-06-07 11:11+0200\n"
+"POT-Creation-Date: 2002-06-07 16:50+0200\n"
 "PO-Revision-Date: 2002-04-18 23:38+0100\n"
 "Last-Translator: Thomas Graf <tgr@reeler.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"

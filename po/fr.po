@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-06-07 11:11+0200\n"
+"POT-Creation-Date: 2002-06-07 16:50+0200\n"
 "PO-Revision-Date: 2001-12-10 13:32+0100\n"
 "Last-Translator: Samuel Hocevar <sam@zoy.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,11 +43,11 @@ msgstr "flottant"
 
 #: src/libvlc.c:930
 msgid " (default enabled)"
-msgstr ""
+msgstr " (activé par défaut)"
 
 #: src/libvlc.c:931
 msgid " (default disabled)"
-msgstr ""
+msgstr " (désactivé par défaut)"
 
 #: src/libvlc.c:1013
 msgid ""
@@ -132,19 +132,20 @@ msgstr ""
 
 #: src/libvlc.h:40
 msgid "be verbose"
-msgstr ""
+msgstr "plus de messages"
 
 #: src/libvlc.h:42
 msgid "This options activates the output of information messages."
-msgstr ""
+msgstr "Cette option active l'affichage de messages d'information."
 
 #: src/libvlc.h:44
 msgid "be quiet"
-msgstr ""
+msgstr "moins de messages"
 
 #: src/libvlc.h:46
 msgid "This options turns off all warning and information messages."
 msgstr ""
+"Cette option désactive tous les messages d'avertissement et d'information."
 
 #: src/libvlc.h:48
 msgid "color messages"
@@ -155,6 +156,9 @@ msgid ""
 "When this option is turned on, the messages sent to the console will be "
 "colorized. Your terminal needs Linux color support for this to work."
 msgstr ""
+"Lorsque cette option est activée, les messages envoyés dans la console sont "
+"en couleurs. Vous devez avoir un terminal avec le support des couleurs Linux "
+"pour profiter de cette option."
 
 #: src/libvlc.h:53
 msgid "interface default search path"
