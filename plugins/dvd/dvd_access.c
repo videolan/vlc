@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.18 2002/05/21 13:27:32 lool Exp $
+ * $Id: dvd_access.c,v 1.19 2002/05/21 13:34:31 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -641,8 +641,14 @@ static char * DVDParse( input_thread_t * p_input )
     int                  i_chapter = 1;
     int                  i_angle = 1;
     int                  i;
-    
+
     p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
+
+#ifdef WIN32
+    /* On Win32 we want the DVD access plugin to be explicitly requested,
+     * we end up with lots of problems otherwise */
+    if( !p_input->psz_access || !*p_input->psz_access ) return NULL;
+#endif
 
     psz_parser = psz_device = strdup( p_input->psz_name );
     if( !psz_parser )
