@@ -2,7 +2,7 @@
  * vlc_meta.h
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: vlc_meta.h,v 1.1 2004/01/31 05:24:55 fenrir Exp $
+ * $Id: vlc_meta.h,v 1.2 2004/03/03 12:01:17 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -54,7 +54,7 @@ struct vlc_meta_t
 
 static inline vlc_meta_t *vlc_meta_New( void )
 {
-    vlc_meta_t *m = malloc( sizeof( vlc_meta_t ) );
+    vlc_meta_t *m = (vlc_meta_t*)malloc( sizeof( vlc_meta_t ) );
 
     m->i_meta = 0;
     m->name   = NULL;

@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.28 2004/02/14 01:53:17 gbazin Exp $
+ * $Id: ninput.h,v 1.29 2004/03/03 12:01:17 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -297,6 +297,7 @@ VLC_EXPORT( int, demux_vaControlDefault, ( input_thread_t *, int i_query, va_lis
 #define demux2_New( a, b, c, d ) __demux2_New(VLC_OBJECT(a), b, c, d)
 VLC_EXPORT( demux_t *, __demux2_New,  ( vlc_object_t *p_obj, char *psz_mrl, stream_t *s, es_out_t *out ) );
 VLC_EXPORT( void,      demux2_Delete, ( demux_t * ) );
+VLC_EXPORT( int,       demux2_vaControlHelper, ( stream_t *, int64_t i_start, int64_t i_end, int i_bitrate, int i_align, int i_query, va_list args ) );
 
 static inline int demux2_Demux( demux_t *p_demux )
 {
