@@ -2,7 +2,7 @@
  * mp4.h : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.h,v 1.10 2004/01/05 12:37:52 jlj Exp $
+ * $Id: mp4.h,v 1.11 2004/01/09 04:37:43 jlj Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -86,7 +86,8 @@ typedef struct track_data_mp4_s
     MP4_Box_t *p_stsd;  /* will contain all data to initialize decoder */
     MP4_Box_t *p_sample;/* point on actual sdsd */
 
-    void *p_drms;
+    vlc_bool_t b_drms;
+    void      *p_drms;
 
 } track_data_mp4_t;
 

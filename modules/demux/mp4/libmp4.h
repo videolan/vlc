@@ -2,7 +2,7 @@
  * libmp4.h : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.h,v 1.18 2004/01/05 12:37:52 jlj Exp $
+ * $Id: libmp4.h,v 1.19 2004/01/09 04:37:43 jlj Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -157,6 +157,8 @@
 #define FOURCC_drms VLC_FOURCC( 'd', 'r', 'm', 's' )
 #define FOURCC_sinf VLC_FOURCC( 's', 'i', 'n', 'f' )
 #define FOURCC_schi VLC_FOURCC( 's', 'c', 'h', 'i' )
+#define FOURCC_user VLC_FOURCC( 'u', 's', 'e', 'r' )
+#define FOURCC_key  VLC_FOURCC( 'k', 'e', 'y', ' ' )
 #define FOURCC_iviv VLC_FOURCC( 'i', 'v', 'i', 'v' )
 #define FOURCC_name VLC_FOURCC( 'n', 'a', 'm', 'e' )
 #define FOURCC_priv VLC_FOURCC( 'p', 'r', 'i', 'v' )

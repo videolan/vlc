@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.49 2004/01/06 01:41:10 jlj Exp $
+ * $Id: mp4.c,v 1.50 2004/01/09 04:37:43 jlj Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -460,7 +460,7 @@ static int Demux( input_thread_t *p_input )
                     break;
                 }
 
-                if( track.p_drms != NULL )
+                if( track.b_drms && track.p_drms )
                 {
                     drms_decrypt( track.p_drms,
                                   (uint32_t *)p_block->p_buffer,
@@ -485,7 +485,10 @@ static int Demux( input_thread_t *p_input )
                                           MP4_GetTrackPTS( &track ) * 9/100 );
                 }
 
-                es_out_Send( p_input->p_es_out, track.p_es, p_block );
+                if( !track.b_drms || ( track.b_drms && track.p_drms ) )
+                {
+                    es_out_Send( p_input->p_es_out, track.p_es, p_block );
+                }
 
                 if( MP4_TrackNextSample( p_input, &track ) )
                 {
@@ -1333,11 +1336,9 @@ static void MP4_TrackCreate( input_thread_t *p_input,
     }
 
     p_drms = MP4_BoxGet( p_track->p_stsd, "drms" );
-    p_track->p_drms = p_drms != NULL ?
+    p_track->b_drms = p_drms != NULL;
+    p_track->p_drms = p_track->b_drms ?
         p_drms->data.p_sample_soun->p_drms : NULL;
-
-    msg_Dbg( p_input, "drms%sinitialized",
-             p_track->p_drms == NULL ? " not " : " " );
 
     /* Set language */
     if( strcmp( language, "```" ) && strcmp( language, "und" ) )

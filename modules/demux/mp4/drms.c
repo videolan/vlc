@@ -2,7 +2,7 @@
  * drms.c : DRMS
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: drms.c,v 1.1 2004/01/05 12:37:52 jlj Exp $
+ * $Id: drms.c,v 1.2 2004/01/09 04:37:43 jlj Exp $
  *
  * Author: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -23,7 +23,17 @@
 
 #include <stdlib.h>                                      /* malloc(), free() */
 
+#ifdef WIN32
+#include <io.h>
+#else
+#include <stdio.h>
+#endif
+
 #include <vlc/vlc.h>
+
+#ifdef HAVE_ERRNO_H
+#include <errno.h>
+#endif
 
 #ifdef WIN32
 #include <tchar.h>
@@ -33,6 +43,8 @@
 
 #include "drms.h"
 #include "drmstables.h"
+
+#include "libmp4.h"
 
 #define TAOS_INIT( tmp, i ) \
     memset( tmp, 0, sizeof(tmp) ); \
@@ -584,7 +596,7 @@ static int taos_osi( uint32_t *p_buffer )
     return( i_ret );
 }
 
-static int get_sci_data( uint32_t p_sci[ 11 ][ 4 ] )
+static int get_sci_data( uint32_t **pp_sci, uint32_t *p_sci_size )
 {
     int i_ret = -1;
 
@@ -604,17 +616,23 @@ static int get_sci_data( uint32_t p_sci[ 11 ][ 4 ] )
                              OPEN_EXISTING, 0, NULL );
         if( i_file != INVALID_HANDLE_VALUE )
         {
-            i_read = sizeof(p_sci[ 0 ]) * 11;
             i_size = GetFileSize( i_file, NULL );
-            if( i_size != INVALID_FILE_SIZE && i_size >= i_read )
+            if( i_size != INVALID_FILE_SIZE &&
+                i_size > (sizeof(*pp_sci[ 0 ]) * 22) )
             {
-                i_size = SetFilePointer( i_file, 4, NULL, FILE_BEGIN );
-                if( i_size != INVALID_SET_FILE_POINTER )
+                *pp_sci = malloc( i_size * 2 );
+                if( *pp_sci != NULL )
                 {
-                    if( ReadFile( i_file, p_sci, i_read, &i_size, NULL ) &&
-                        i_size == i_read )
+                    if( ReadFile( i_file, *pp_sci, i_size, &i_read, NULL ) &&
+                        i_read == i_size )
                     {
+                        *p_sci_size = i_size;
                         i_ret = 0;
+                    }
+                    else
+                    {
+                        free( (void *)*pp_sci );
+                        *pp_sci = NULL;
                     }
                 }
             }
@@ -749,7 +767,7 @@ static inline void block_xor( uint32_t *p_in, uint32_t *p_key,
     }
 }
 
-int drms_get_sys_key( uint32_t *p_sys_key )
+static int get_sys_key( uint32_t *p_sys_key )
 {
     uint32_t p_tmp[ 128 ];
     uint32_t p_tmp_key[ 4 ];
@@ -774,64 +792,11 @@ int drms_get_sys_key( uint32_t *p_sys_key )
     return( 0 );
 }
 
-int drms_get_user_key( uint32_t *p_sys_key, uint32_t *p_user_key )
-{
-    uint32_t i;
-    uint32_t p_tmp[ 4 ];
-    uint32_t *p_cur_key;
-    uint32_t p_acei[ 41 ];
-    uint32_t p_ctx[ 128 ];
-    uint32_t p_sci[ 2 ][ 11 ][ 4 ];
-
-    uint32_t p_sci_key[ 4 ] =
-    {
-        0x6E66556D, 0x6E676F70, 0x67666461, 0x33373866
-    };
-
-    if( p_sys_key == NULL )
-    {
-        if( drms_get_sys_key( p_tmp ) )
-        {
-            return( -1 );
-        }
-
-        p_sys_key = p_tmp;
-    }
-
-    if( get_sci_data( p_sci[ 0 ] ) )
-    {
-        return( -1 );
-    }
-
-    init_ctx( p_ctx, p_sys_key );
-
-    for( i = 0, p_cur_key = p_sci_key;
-         i < sizeof(p_sci[ 0 ])/sizeof(p_sci[ 0 ][ 0 ]); i++ )
-    {
-        ctx_xor( p_ctx, &p_sci[ 0 ][ i ][ 0 ], &p_sci[ 1 ][ i ][ 0 ],
-                 p_drms_tab3, p_drms_tab4 );
-        block_xor( &p_sci[ 1 ][ i ][ 0 ], p_cur_key, &p_sci[ 1 ][ i ][ 0 ] );
-
-        p_cur_key = &p_sci[ 0 ][ i ][ 0 ];
-    }
-
-    acei_init( p_acei, p_sys_key );
-
-    for( i = 0; i < sizeof(p_sci[ 1 ])/sizeof(p_sci[ 1 ][ 0 ]); i++ )
-    {
-        acei( p_acei, (uint8_t *)&p_sci[ 1 ][ i ][ 0 ],
-              sizeof(p_sci[ 1 ][ i ]) );
-    }
-
-    memcpy( p_user_key, &p_sci[ 1 ][ 10 ][ 0 ], sizeof(p_sci[ 1 ][ i ]) );
-
-    return( 0 );
-}
-
 struct drms_s
 {
+    uint32_t i_user;
+    uint32_t i_key;
     uint8_t *p_iviv;
-    uint32_t i_iviv_len;
     uint8_t *p_name;
     uint32_t i_name_len;
 
@@ -840,11 +805,184 @@ struct drms_s
 
     uint32_t p_key[ 4 ];
     uint32_t p_ctx[ 128 ];
+
+    char    *psz_homedir;
 };
 
 #define P_DRMS ((struct drms_s *)p_drms)
 
-void *drms_alloc()
+static int rw_user_key( void *p_drms, uint32_t i_rw, uint32_t *p_user_key )
+{
+    FILE *file;
+    int i_ret = -1;
+    char sz_path[ MAX_PATH ];
+
+#define DRMS_PI_DIRNAME "drms"
+#ifdef WIN32
+#define DRMS_DIRNAME DRMS_PI_DIRNAME
+#else
+#define DRMS_DIRNAME "." DRMS_PI_DIRNAME
+#endif
+
+    if( i_rw )
+    {
+        snprintf( sz_path, (sizeof(sz_path)/sizeof(sz_path[ 0 ])) - 1,
+                  "%s/" DRMS_DIRNAME "/%08X.%03d", P_DRMS->psz_homedir,
+                  P_DRMS->i_user, P_DRMS->i_key );
+
+        file = fopen( sz_path, "r" );
+        if( file != NULL )
+        {
+            i_ret = fread( p_user_key, sizeof(*p_user_key),
+                           4, file ) == 4 ? 0 : -1;
+            fclose( file );
+        }
+    }
+    else
+    {
+        snprintf( sz_path, (sizeof(sz_path)/sizeof(sz_path[ 0 ])) - 1,
+                  "%s/" DRMS_DIRNAME, P_DRMS->psz_homedir );
+
+#if defined( HAVE_ERRNO_H )
+#   if defined( WIN32 )
+        if( !mkdir( sz_path ) || errno == EEXIST )
+#   else
+        if( !mkdir( sz_path, 0755 ) || errno == EEXIST )
+#   endif
+#else
+        if( !mkdir( sz_path ) )
+#endif
+        {
+            snprintf( sz_path, (sizeof(sz_path)/sizeof(sz_path[ 0 ])) - 1,
+                      "%s/" DRMS_DIRNAME "/%08X.%03d", P_DRMS->psz_homedir,
+                      P_DRMS->i_user, P_DRMS->i_key );
+
+            file = fopen( sz_path, "w" );
+            if( file != NULL )
+            {
+                i_ret = fwrite( p_user_key, sizeof(*p_user_key),
+                                4, file ) == 4 ? 0 : -1;
+                fclose( file );
+            }
+        }
+    }
+
+    return( i_ret );
+}
+
+static int get_user_key( void *p_drms, uint32_t *p_user_key )
+{
+    uint32_t i, y;
+    uint32_t *p_tmp;
+    uint32_t *p_cur_key;
+    uint32_t p_acei[ 41 ];
+    uint32_t p_ctx[ 128 ];
+    uint32_t p_sys_key[ 4 ];
+    uint32_t i_sci_size;
+    uint32_t *p_sci[ 2 ];
+    int i_ret = -1;
+
+    uint32_t p_sci_key[ 4 ] =
+    {
+        0x6E66556D, 0x6E676F70, 0x67666461, 0x33373866
+    };
+
+    if( !rw_user_key( p_drms, 1, p_user_key ) )
+    {
+        return( 0 );
+    }
+
+    if( get_sys_key( p_sys_key ) )
+    {
+        return( -1 );
+    }
+
+
+    if( get_sci_data( &p_sci[ 0 ], &i_sci_size ) )
+    {
+        return( -1 );
+    }
+
+    p_tmp = p_sci[ 0 ];
+    p_sci[ 1 ] = (uint32_t *)(((uint8_t *)p_sci[ 0 ]) + i_sci_size);
+    i_sci_size -= sizeof(*p_sci[ 0 ]);
+
+    init_ctx( p_ctx, p_sys_key );
+
+    for( i = 0, p_cur_key = p_sci_key;
+         i < i_sci_size / sizeof(P_DRMS->p_key); i++ )
+    {
+        y = i * sizeof(*p_sci[ 0 ]);
+
+        ctx_xor( p_ctx, p_sci[ 0 ] + y + 1, p_sci[ 1 ] + y + 1,
+                 p_drms_tab3, p_drms_tab4 );
+        block_xor( p_sci[ 1 ] + y + 1, p_cur_key, p_sci[ 1 ] + y + 1 );
+
+        p_cur_key = p_sci[ 0 ] + y + 1;
+    }
+
+    acei_init( p_acei, p_sys_key );
+
+    for( i = 0; i < i_sci_size / sizeof(P_DRMS->p_key); i++ )
+    {
+        y = i * sizeof(*p_sci[ 1 ]);
+
+        acei( p_acei, (uint8_t *)(p_sci[ 1 ] + y + 1),
+              sizeof(P_DRMS->p_key) );
+    }
+
+    y = 0;
+    i = U32_AT( &p_sci[ 1 ][ 5 ] );
+    i_sci_size -= 21 * sizeof(*p_sci[ 1 ]);
+    p_sci[ 1 ] += 22;
+    p_sci[ 0 ] = NULL;
+
+    while( i_sci_size > 0 && i > 0 )
+    {
+        if( p_sci[ 0 ] == NULL )
+        {
+            i_sci_size -= 18 * sizeof(*p_sci[ 1 ]);
+            if( i_sci_size <= 0 )
+            {
+                break;
+            }
+
+            p_sci[ 0 ] = p_sci[ 1 ];
+            y = U32_AT( &p_sci[ 1 ][ 17 ] );
+            p_sci[ 1 ] += 18;
+        }
+
+        if( !y )
+        {
+            i--;
+            p_sci[ 0 ] = NULL;
+            continue;
+        }
+
+        if( U32_AT( &p_sci[ 0 ][ 0 ] ) == P_DRMS->i_user &&
+            ( i_sci_size >=
+              (sizeof(P_DRMS->p_key) + sizeof(p_sci[ 1 ][ 0 ]) ) ) &&
+            ( ( U32_AT( &p_sci[ 1 ][ 0 ] ) == P_DRMS->i_key ) ||
+              ( !P_DRMS->i_key ) || ( p_sci[ 1 ] == (p_sci[ 0 ] + 18) ) ) )
+        {
+            memcpy( p_user_key, &p_sci[ 1 ][ 1 ], sizeof(P_DRMS->p_key) );
+            rw_user_key( p_drms, 0, p_user_key );
+            i_ret = 0;
+            break;
+        }
+
+        y--;
+        p_sci[ 1 ] += 5;
+        i_sci_size -= 5 * sizeof(*p_sci[ 1 ]);
+    }
+
+    free( (void *)p_tmp );
+
+    return( i_ret );
+}
+
+
+void *drms_alloc( char *psz_homedir )
 {
     struct drms_s *p_drms;
 
@@ -858,6 +996,19 @@ void *drms_alloc()
         p_drms->p_tmp = malloc( p_drms->i_tmp_len );
         if( p_drms->p_tmp == NULL )
         {
+            free( (void *)p_drms );
+            p_drms = NULL;
+        }
+
+        p_drms->psz_homedir = malloc( MAX_PATH );
+        if( p_drms->psz_homedir != NULL )
+        {
+            strncpy( p_drms->psz_homedir, psz_homedir, MAX_PATH );
+            p_drms->psz_homedir[ MAX_PATH - 1 ] = '\0';
+        }
+        else
+        {
+            free( (void *)p_drms->p_tmp );
             free( (void *)p_drms );
             p_drms = NULL;
         }
@@ -876,6 +1027,11 @@ void drms_free( void *p_drms )
     if( P_DRMS->p_iviv != NULL )
     {
         free( (void *)P_DRMS->p_iviv );
+    }
+
+    if( P_DRMS->psz_homedir != NULL )
+    {
+        free( (void *)P_DRMS->psz_homedir );
     }
 
     if( P_DRMS->p_tmp != NULL )
@@ -925,53 +1081,65 @@ int drms_init( void *p_drms, uint32_t i_type,
 
     switch( i_type )
     {
-        case DRMS_INIT_UKEY:
+        case FOURCC_user:
         {
-            if( i_len != sizeof(P_DRMS->p_key) )
+            if( i_len < sizeof(P_DRMS->i_user) )
             {
                 i_ret = -1;
                 break;
             }
 
-            init_ctx( P_DRMS->p_ctx, (uint32_t *)p_info );
+            P_DRMS->i_user = U32_AT( p_info );
         }
         break;
 
-        case DRMS_INIT_IVIV:
+        case FOURCC_key:
         {
-            if( i_len != sizeof(P_DRMS->p_key) )
+            if( i_len < sizeof(P_DRMS->i_key) )
             {
                 i_ret = -1;
                 break;
             }
 
-            P_DRMS->p_iviv = malloc( i_len );
+            P_DRMS->i_key = U32_AT( p_info );
+        }
+        break;
+
+        case FOURCC_iviv:
+        {
+            if( i_len < sizeof(P_DRMS->p_key) )
+            {
+                i_ret = -1;
+                break;
+            }
+
+            P_DRMS->p_iviv = malloc( sizeof(P_DRMS->p_key) );
             if( P_DRMS->p_iviv == NULL )
             {
                 i_ret = -1;
                 break;
             }
 
-            memcpy( P_DRMS->p_iviv, p_info, i_len );
-            P_DRMS->i_iviv_len = i_len;
+            memcpy( P_DRMS->p_iviv, p_info, sizeof(P_DRMS->p_key) );
         }
         break;
 
-        case DRMS_INIT_NAME:
+        case FOURCC_name:
         {
-            P_DRMS->p_name = malloc( i_len );
+            P_DRMS->i_name_len = strlen( p_info );
+
+            P_DRMS->p_name = malloc( P_DRMS->i_name_len );
             if( P_DRMS->p_name == NULL )
             {
                 i_ret = -1;
                 break;
             }
 
-            memcpy( P_DRMS->p_name, p_info, i_len );
-            P_DRMS->i_name_len = i_len;
+            memcpy( P_DRMS->p_name, p_info, P_DRMS->i_name_len );
         }
         break;
 
-        case DRMS_INIT_PRIV:
+        case FOURCC_priv:
         {
             uint32_t i;
             uint32_t p_priv[ 64 ];
@@ -985,12 +1153,20 @@ int drms_init( void *p_drms, uint32_t i_type,
 
             TAOS_INIT( p_tmp, 0 );
             taos_add3( p_tmp, P_DRMS->p_name, P_DRMS->i_name_len );
-            taos_add3( p_tmp, P_DRMS->p_iviv, P_DRMS->i_iviv_len );
+            taos_add3( p_tmp, P_DRMS->p_iviv, sizeof(P_DRMS->p_key) );
             memcpy( p_priv, &p_tmp[ 4 ], sizeof(p_priv[ 0 ]) * 2 );
             i = (p_tmp[ 4 ] / 8) & 63;
             i = i >= 56 ? 120 - i : 56 - i;
             taos_add3( p_tmp, p_drms_tab_tend, i );
             taos_add3( p_tmp, (uint8_t *)p_priv, sizeof(p_priv[ 0 ]) * 2 );
+
+            if( get_user_key( p_drms, P_DRMS->p_key ) )
+            {
+                i_ret = -1;
+                break;
+            }
+
+            init_ctx( P_DRMS->p_ctx, P_DRMS->p_key );
 
             memcpy( p_priv, p_info, 64 );
             memcpy( P_DRMS->p_key, p_tmp, sizeof(P_DRMS->p_key) );
@@ -999,6 +1175,8 @@ int drms_init( void *p_drms, uint32_t i_type,
             init_ctx( P_DRMS->p_ctx, &p_priv[ 6 ] );
             memcpy( P_DRMS->p_key, &p_priv[ 12 ], sizeof(P_DRMS->p_key) );
 
+            free( (void *)P_DRMS->psz_homedir );
+            P_DRMS->psz_homedir = NULL;
             free( (void *)P_DRMS->p_name );
             P_DRMS->p_name = NULL;
             free( (void *)P_DRMS->p_iviv );
