@@ -2,7 +2,7 @@
  * item-ext.c : Exported playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: item-ext.c,v 1.6 2004/01/10 03:36:03 hartman Exp $
+ * $Id: item-ext.c,v 1.7 2004/01/10 14:24:33 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -151,11 +151,11 @@ playlist_item_t * playlist_GetItemById( playlist_t * p_playlist , int i_id )
  * Set the group of a playlist item
  *
  * \param p_playlist the playlist
- * \param i_item the item of which we change the group (position)
+ * \param i_pos the postition of the item of which we change the group
  * \param i_group the new group
  * \return 0 on success, -1 on failure
  */
-int playlist_SetGroup( playlist_t *p_playlist, int i_item, int i_group )
+int playlist_SetGroup( playlist_t *p_playlist, int i_pos, int i_group )
 {
     char *psz_group;
     /* Check the existence of the playlist */
@@ -164,12 +164,12 @@ int playlist_SetGroup( playlist_t *p_playlist, int i_item, int i_group )
         return -1;
     }
     /* Get a correct item */
-    if( i_item >= 0 && i_item < p_playlist->i_size )
+    if( i_pos >= 0 && i_pos < p_playlist->i_size )
     {
     }
     else if( p_playlist->i_size > 0 )
     {
-        i_item = p_playlist->i_index;
+        i_pos = p_playlist->i_index;
     }
     else
     {
@@ -179,7 +179,7 @@ int playlist_SetGroup( playlist_t *p_playlist, int i_item, int i_group )
     psz_group = playlist_FindGroup( p_playlist , i_group );
     if( psz_group != NULL)
     {
-        p_playlist->pp_items[i_item]->i_group = i_group ;
+        p_playlist->pp_items[i_pos]->i_group = i_group ;
     }
     return 0;
 }
@@ -188,11 +188,11 @@ int playlist_SetGroup( playlist_t *p_playlist, int i_item, int i_group )
  * Set the name of a playlist item
  *
  * \param p_playlist the playlist
- * \param i_item the item of which we change the name
+ * \param i_pos the position of the item of which we change the name
  * \param psz_name the new name
  * \return VLC_SUCCESS on success, VLC_EGENERIC on failure
  */
-int playlist_SetName( playlist_t *p_playlist, int i_item, char *psz_name )
+int playlist_SetName( playlist_t *p_playlist, int i_pos, char *psz_name )
 {
     vlc_value_t val;
 
@@ -202,25 +202,25 @@ int playlist_SetName( playlist_t *p_playlist, int i_item, char *psz_name )
         return -1;
     }
     /* Get a correct item */
-    if( i_item >= 0 && i_item < p_playlist->i_size )
+    if( i_pos >= 0 && i_pos < p_playlist->i_size )
     {
     }
     else if( p_playlist->i_size > 0 )
     {
-        i_item = p_playlist->i_index;
+        i_pos = p_playlist->i_index;
     }
     else
     {
         return -1;
     }
 
-    if( p_playlist->pp_items[i_item]->psz_name)
-        free( p_playlist->pp_items[i_item]->psz_name );
+    if( p_playlist->pp_items[i_pos]->psz_name)
+        free( p_playlist->pp_items[i_pos]->psz_name );
 
     if( psz_name )
-        p_playlist->pp_items[i_item]->psz_name = strdup( psz_name );
+        p_playlist->pp_items[i_pos]->psz_name = strdup( psz_name );
 
-    val.b_bool = i_item;
+    val.b_bool = i_pos;
     var_Set( p_playlist, "item-change", val );
     return VLC_SUCCESS;
 }
@@ -229,11 +229,11 @@ int playlist_SetName( playlist_t *p_playlist, int i_item, char *psz_name )
  * Set the duration of a playlist item
  *
  * \param p_playlist the playlist
- * \param i_item the item of which we change the name
+ * \param i_pos the position of the item of which we change the duration
  * \param i_duration the duration to set
  * \return VLC_SUCCESS on success, VLC_EGENERIC on failure
  */
-int playlist_SetDuration( playlist_t *p_playlist, int i_item, mtime_t i_duration )
+int playlist_SetDuration( playlist_t *p_playlist, int i_pos, mtime_t i_duration )
 {
     char psz_buffer[MSTRTIME_MAX_SIZE];
     vlc_value_t val;
@@ -244,19 +244,19 @@ int playlist_SetDuration( playlist_t *p_playlist, int i_item, mtime_t i_duration
         return -1;
     }
     /* Get a correct item */
-    if( i_item >= 0 && i_item < p_playlist->i_size )
+    if( i_pos >= 0 && i_pos < p_playlist->i_size )
     {
     }
     else if( p_playlist->i_size > 0 )
     {
-        i_item = p_playlist->i_index;
+        i_pos = p_playlist->i_index;
     }
     else
     {
         return VLC_EGENERIC;
     }
 
-    p_playlist->pp_items[i_item]->i_duration = i_duration;
+    p_playlist->pp_items[i_pos]->i_duration = i_duration;
     if( i_duration != -1 )
     {
         secstotimestr( psz_buffer, i_duration/1000000 );
@@ -265,10 +265,10 @@ int playlist_SetDuration( playlist_t *p_playlist, int i_item, mtime_t i_duration
     {
         memcpy( psz_buffer, "--:--:--", sizeof("--:--:--") );
     }
-    playlist_AddInfo( p_playlist, i_item, _("General") , _("Duration"),
+    playlist_AddInfo( p_playlist, i_pos, _("General") , _("Duration"),
                       "%s", psz_buffer );
 
-    val.b_bool = i_item;
+    val.b_bool = i_pos;
     var_Set( p_playlist, "item-change", val );
     return VLC_SUCCESS;
 }
@@ -457,7 +457,7 @@ int playlist_Enable( playlist_t * p_playlist, int i_pos )
  * Disables a playlist group
  *
  * \param p_playlist the playlist to disable from.
- * \param i_pos the id of the group to disable
+ * \param i_group the id of the group to disable
  * \return returns 0
  */
 int playlist_DisableGroup( playlist_t * p_playlist, int i_group)
@@ -491,7 +491,7 @@ int playlist_DisableGroup( playlist_t * p_playlist, int i_group)
  * Enables a playlist group
  *
  * \param p_playlist the playlist to enable from.
- * \param i_pos the id of the group to enable
+ * \param i_group the id of the group to enable
  * \return returns 0
  */
 int playlist_EnableGroup( playlist_t * p_playlist, int i_group)

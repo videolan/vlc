@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: vlc_playlist.h,v 1.22 2004/01/10 03:36:03 hartman Exp $
+ * $Id: vlc_playlist.h,v 1.23 2004/01/10 14:24:33 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -120,14 +120,16 @@ struct playlist_t
     input_thread_t *      p_input;  /**< the input thread ascosiated
                                      * with the current item */
     int                   i_last_id; /**< Last id to an item */
+    int                   i_sort; /**< Last sorting applied to the playlist */
+    int                   i_order; /**< Last ordering applied to the playlist */
     /*@}*/
 };
 
-#define SORT_TITLE 0
-#define SORT_AUTHOR 1
-#define SORT_GROUP 2
-#define SORT_RANDOM 3
-#define SORT_ID 4
+#define SORT_ID 0
+#define SORT_TITLE 1
+#define SORT_AUTHOR 2
+#define SORT_GROUP 3
+#define SORT_RANDOM 4
 
 #define ORDER_NORMAL 0
 #define ORDER_REVERSE 1
@@ -199,6 +201,7 @@ VLC_EXPORT( int, playlist_AddOption, (playlist_t *, int, const char *, ...) );
 VLC_EXPORT( int, playlist_AddItemOption, (playlist_item_t *, const char *, ...) );
 
 /* Playlist sorting */
+#define playlist_SortID(p, i) playlist_Sort( p, SORT_ID, i)
 #define playlist_SortTitle(p, i) playlist_Sort( p, SORT_TITLE, i)
 #define playlist_SortAuthor(p, i) playlist_Sort( p, SORT_AUTHOR, i)
 #define playlist_SortGroup(p, i) playlist_Sort( p, SORT_GROUP, i)

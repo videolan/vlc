@@ -2,7 +2,7 @@
  * sort.c : Playlist sorting functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: sort.c,v 1.6 2004/01/10 03:36:03 hartman Exp $
+ * $Id: sort.c,v 1.7 2004/01/10 14:24:33 hartman Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -33,7 +33,7 @@
 /**
  * Sort the playlist
  * \param p_playlist the playlist
- * \param i_mode: SORT_TITLE, SORT_GROUP, SORT_AUTHOR, SORT_RANDOM SORT_ID
+ * \param i_mode: SORT_ID, SORT_TITLE, SORT_GROUP, SORT_AUTHOR, SORT_RANDOM
  * \param i_type: ORDER_NORMAL or ORDER_REVERSE (reversed order)
  * \return 0 on success
  */
@@ -45,6 +45,9 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
     val.b_bool = VLC_TRUE;
 
     vlc_mutex_lock( &p_playlist->object_lock );
+
+    p_playlist->i_sort = i_mode;
+    p_playlist->i_order = i_type;
 
     if( i_mode == SORT_RANDOM )
     {
@@ -77,7 +80,12 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
         {
             int i_test = 0;
 
-            if( i_mode == SORT_TITLE )
+            if( i_mode == SORT_ID )
+            {
+                i_test = p_playlist->pp_items[i]->i_id,
+                                 p_playlist->pp_items[i_small]->i_id;
+            }
+            else if( i_mode == SORT_TITLE )
             {
                 i_test = strcasecmp( p_playlist->pp_items[i]->psz_name,
                                  p_playlist->pp_items[i_small]->psz_name );

@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: playlist.c,v 1.72 2004/01/06 08:50:20 zorglub Exp $
+ * $Id: playlist.c,v 1.73 2004/01/10 14:24:33 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -101,6 +101,8 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     p_playlist->pp_groups = NULL;
     p_playlist->i_last_group = 0;
     p_playlist->i_last_id = 0;
+    p_playlist->i_sort = SORT_ID;
+    p_playlist->i_order = ORDER_NORMAL;
 
     playlist_CreateGroup( p_playlist, "Normal" );
 
