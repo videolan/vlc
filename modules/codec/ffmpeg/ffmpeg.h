@@ -71,6 +71,8 @@ void E_(CloseDemux)( vlc_object_t * );
 /* Video filter module */
 int  E_(OpenFilter)( vlc_object_t * );
 void E_(CloseFilter)( vlc_object_t * );
+int  E_(OpenDeinterlace)( vlc_object_t * );
+void E_(CloseDeinterlace)( vlc_object_t * );
 
 /* Postprocessing module */
 void *E_(OpenPostproc)( decoder_t *, vlc_bool_t * );

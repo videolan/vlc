@@ -899,7 +899,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         id->p_decoder->p_module = 0;
         return VLC_EGENERIC;
     }
-    id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.audio.i_codec;
+    id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.i_codec;
 
     /* Check if we need a filter for chroma conversion or resizing */
     if( id->p_decoder->fmt_out.i_codec !=
@@ -1390,6 +1390,32 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 id->b_transcode = VLC_FALSE;
             }
 
+            /* Deinterlace */
+            if( p_stream->p_sys->b_deinterlace )
+            {
+                id->pp_filter[id->i_filter] =
+                    vlc_object_create( p_stream, VLC_OBJECT_FILTER );
+                vlc_object_attach( id->pp_filter[id->i_filter], p_stream );
+
+                id->pp_filter[id->i_filter]->pf_vout_buffer_new =
+                    video_new_buffer;
+                id->pp_filter[id->i_filter]->pf_vout_buffer_del =
+                    video_del_buffer;
+
+                id->pp_filter[id->i_filter]->fmt_in = id->p_decoder->fmt_out;
+                id->pp_filter[id->i_filter]->fmt_out = id->p_decoder->fmt_out;
+                id->pp_filter[id->i_filter]->p_module =
+                    module_Need( id->pp_filter[id->i_filter],
+                                 "video filter2", "deinterlace", 0 );
+                if( id->pp_filter[id->i_filter]->p_module ) id->i_filter++;
+                else
+                {
+                    msg_Dbg( p_stream, "no video filter found" );
+                    vlc_object_detach( id->pp_filter[id->i_filter] );
+                    vlc_object_destroy( id->pp_filter[id->i_filter] );
+                }
+            }
+
             /* Check if we need a filter for chroma conversion or resizing */
             if( id->p_decoder->fmt_out.video.i_chroma !=
                 id->p_encoder->fmt_in.video.i_chroma ||
@@ -1400,30 +1426,28 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 p_sys->i_crop_top > 0 || p_sys->i_crop_bottom > 0 ||
                 p_sys->i_crop_left > 0 || p_sys->i_crop_right > 0 )
             {
-                id->pp_filter[0] =
+                id->pp_filter[id->i_filter] =
                     vlc_object_create( p_stream, VLC_OBJECT_FILTER );
-                vlc_object_attach( id->pp_filter[0], p_stream );
+                vlc_object_attach( id->pp_filter[id->i_filter], p_stream );
 
-                id->pp_filter[0]->pf_vout_buffer_new = video_new_buffer;
-                id->pp_filter[0]->pf_vout_buffer_del = video_del_buffer;
+                id->pp_filter[id->i_filter]->pf_vout_buffer_new =
+                    video_new_buffer;
+                id->pp_filter[id->i_filter]->pf_vout_buffer_del =
+                    video_del_buffer;
 
-                id->pp_filter[0]->fmt_in = id->p_decoder->fmt_out;
-                id->pp_filter[0]->fmt_out = id->p_encoder->fmt_in;
-                id->pp_filter[0]->p_module =
-                    module_Need( id->pp_filter[0], "video filter2", 0, 0 );
-                if( id->pp_filter[0]->p_module ) id->i_filter++;
+                id->pp_filter[id->i_filter]->fmt_in = id->p_decoder->fmt_out;
+                id->pp_filter[id->i_filter]->fmt_out = id->p_encoder->fmt_in;
+                id->pp_filter[id->i_filter]->p_module =
+                    module_Need( id->pp_filter[id->i_filter],
+                                 "video filter2", 0, 0 );
+                if( id->pp_filter[id->i_filter]->p_module ) id->i_filter++;
                 else
                 {
                     msg_Dbg( p_stream, "no video filter found" );
-                    vlc_object_detach( id->pp_filter[0] );
-                    vlc_object_destroy( id->pp_filter[0] );
+                    vlc_object_detach( id->pp_filter[id->i_filter] );
+                    vlc_object_destroy( id->pp_filter[id->i_filter] );
                 }
             }
-        }
-
-        /* Deinterlace */
-        if( p_stream->p_sys->b_deinterlace )
-        {
         }
 
         /* Run filter chain */

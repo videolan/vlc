@@ -169,6 +169,13 @@ vlc_module_begin();
     set_callbacks( E_(OpenFilter), E_(CloseFilter) );
     set_description( _("ffmpeg video filter") );
 
+    /* video filter submodule */
+    add_submodule();
+    set_capability( "video filter2", 0 );
+    set_callbacks( E_(OpenDeinterlace), E_(CloseDeinterlace) );
+    set_description( _("ffmpeg deinterlace video filter") );
+    add_shortcut( "deinterlace" );
+
     var_Create( p_module->p_libvlc, "avcodec", VLC_VAR_MUTEX );
 vlc_module_end();
 
