@@ -181,7 +181,7 @@ endif
 # Libraries
 #
 ifneq (,$(findstring mingw32,$(SYS)))
-LIB += -lws2_32 -lnetapi32 -lmsvcrt40
+LIB += -lws2_32 -lnetapi32
 endif
 
 LIB += -L/usr/local/lib @LIB@
