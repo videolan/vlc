@@ -138,15 +138,17 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             for( i = 0; i < p_input->input.p_item->i_categories; i++ )
             {
                 if( !strcmp( p_input->input.p_item->pp_categories[i]->psz_name,
-                             psz_cat ) )
-                    return VLC_EGENERIC;
+                             psz_cat ) ) break;
             }
 
             if( i == p_input->input.p_item->i_categories )
             {
                 p_cat = malloc( sizeof( info_category_t ) );
                 if( !p_cat )
+                {
+                    vlc_mutex_lock( &p_input->input.p_item->lock );
                     return VLC_EGENERIC;
+                }
                 p_cat->psz_name = strdup( psz_cat );
                 p_cat->i_infos = 0;
                 p_cat->pp_infos = NULL;
@@ -163,7 +165,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 {
                     if( p_cat->pp_infos[i]->psz_value )
                         free( p_cat->pp_infos[i]->psz_value );
-                    return VLC_EGENERIC;
+                    break;
                 }
             }
 
@@ -171,7 +173,11 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             {
                 p_info = malloc( sizeof( info_t ) );
                 if( !p_info )
+                {
+                    vlc_mutex_lock( &p_input->input.p_item->lock );
                     return VLC_EGENERIC;
+                }
+
                 INSERT_ELEM( p_cat->pp_infos, p_cat->i_infos,
                              p_cat->i_infos, p_info );
                 p_info->psz_name = strdup( psz_name );
@@ -199,8 +205,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             for( i = 0; i < p_input->input.p_item->i_categories; i++ )
             {
                 if( !strcmp( p_input->input.p_item->pp_categories[i]->psz_name,
-                             psz_cat ) )
-                    return VLC_EGENERIC;
+                             psz_cat ) ) break;
             }
 
             if( i != p_input->input.p_item->i_categories )
@@ -229,8 +234,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
         {
             char *psz_name = (char *)va_arg( args, char * );
 
-            if( !psz_name )
-                return VLC_EGENERIC;
+            if( !psz_name ) return VLC_EGENERIC;
 
             vlc_mutex_lock( &p_input->input.p_item->lock );
             if( p_input->input.p_item->psz_name )
