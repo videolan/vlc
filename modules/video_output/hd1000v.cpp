@@ -115,23 +115,41 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_display = Display;
 
     /* Get current screen resolution */
-    msg_Dbg( p_vout, "Number of screen resolutions supported %u",
+    msg_Dbg( p_vout, "number of screen resolutions supported %u",
       p_vout->p_sys->p_screen->GetNumScreenResolutionsSupported() );
       
-    p_vout->p_sys->p_screen->GetCurrentOutputResolution( (u32) p_vout->p_sys->u_current );
+    p_vout->p_sys->p_screen->GetCurrentScreenResolution( (u32) p_vout->p_sys->u_current );
+    p_vout->p_sys->p_screen->SetScreenResolution( (u32) p_vout->p_sys->u_current );
+
+#if 1
+    msg_Dbg( p_vout, "available screen resolutions:" );
+    for (u32 i=0; i<p_vout->p_sys->p_screen->GetNumScreenResolutionsSupported(); i++)
+    {
+        u32 i_width=0; 
+	u32 i_height=0; 
+	u8 i_screen_depth=0; 
+	bool b_buffered;
+	
+        p_vout->p_sys->p_screen->GetSupportedScreenResolutionAt( i,
+            i_width, i_height, i_screen_depth, b_buffered);
+        msg_Dbg( p_vout, "  screen index = %u, width = %u, height = %u, depth = %u, double buffered = %s",
+            i, i_width, i_height, i_screen_depth, (b_buffered ? "yes" : "no") );
+    }
+#endif        
+    
     p_vout->p_sys->p_screen->GetSupportedScreenResolutionAt( (u32) p_vout->p_sys->u_current,
             (u32) p_vout->p_sys->i_width,
             (u32) p_vout->p_sys->i_height,
             (u8) p_vout->p_sys->i_screen_depth,
             b_double_buffered);
     p_vout->p_sys->b_double_buffered = (vlc_bool_t) b_double_buffered;
-    msg_Dbg( p_vout, "index = %u, width = %u, height = %u, depth = %u, double buffered = %d",
-            p_vout->p_sys->u_current,
+    msg_Dbg( p_vout, "using screen index = %u, width = %u, height = %u, depth = %u, double buffered = %d",
+            p_vout->p_sys->u_current, /* Current screen. */
             p_vout->p_sys->i_width,
             p_vout->p_sys->i_height,
             p_vout->p_sys->i_screen_depth,
             p_vout->p_sys->b_double_buffered );
-
+        
     return VLC_SUCCESS;
 }
 
