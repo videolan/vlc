@@ -1,3 +1,10 @@
+vlc (0.7.0-3) unstable; urgency=medium
+
+  * ppc/mpegvideo_altivec.c:
+    + Build this file with GCC 3.2 to work around an ICE.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Wed, 21 Jan 2004 15:36:30 +0100
+
 vlc (0.7.0-2) unstable; urgency=low
 
   * debian/rules:
