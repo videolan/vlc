@@ -230,6 +230,9 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_ff_pic = avcodec_alloc_frame();
 
     /* ***** Fill p_context with init values ***** */
+    /* FIXME: remove when ffmpeg deals properly with avc1 */
+    if( p_dec->fmt_in.i_codec != VLC_FOURCC('a','v','c','1') )
+    /* End FIXME */
     p_sys->p_context->codec_tag = ffmpeg_CodecTag( p_dec->fmt_in.i_codec );
     p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
     p_sys->p_context->height = p_dec->fmt_in.video.i_height;
@@ -364,6 +367,12 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
                           p_sys->p_context->sub_id );
             }
         }
+        /* FIXME: remove when ffmpeg deals properly with avc1 */
+        else if( p_dec->fmt_in.i_codec == VLC_FOURCC('a','v','c','1') )
+        {
+            ;
+        }
+        /* End FIXME */
         else
         {
             p_sys->p_context->extradata_size = i_size;
