@@ -175,7 +175,8 @@ static int Create( vlc_object_t *p_this )
         p_sys->pi_gamma[i] = (uint8_t)( pow( (double)i * 255.0f, 0.5f ) );
     }
 
-    var_Create( p_filter, "freetype-font", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_filter, "freetype-font",
+                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_filter, "freetype-fontsize",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_filter, "freetype-rel-fontsize",
@@ -365,7 +366,7 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
             }
 
             i_offset = ( p_line->p_glyph_pos[ i ].y +
-                i_glyph_tmax - p_glyph->top ) *
+                i_glyph_tmax - p_glyph->top + 1 ) *
                 i_pitch + p_line->p_glyph_pos[ i ].x + p_glyph->left + 1;
 
             for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
