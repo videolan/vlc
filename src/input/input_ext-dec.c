@@ -72,15 +72,8 @@ void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo )
  *****************************************************************************/
 void NextDataPacket( bit_stream_t * p_bit_stream )
 {
-    WORD_TYPE           buffer_left;
-    ptrdiff_t           i_bytes_left;
     decoder_fifo_t *    p_fifo = p_bit_stream->p_decoder_fifo;
     boolean_t           b_new_pes;
-
-    /* Put the remaining bytes (not aligned on a word boundary) in a
-     * temporary buffer. */
-    i_bytes_left = p_bit_stream->p_end - p_bit_stream->p_byte;
-    buffer_left = *((WORD_TYPE *)p_bit_stream->p_end - 1);
 
     /* We are looking for the next data packet that contains real data,
      * and not just a PES header */
@@ -133,8 +126,176 @@ void NextDataPacket( bit_stream_t * p_bit_stream )
     {
         p_bit_stream->pf_bitstream_callback( p_bit_stream, b_new_pes );
     }
+}
+
+void OldKludge( bit_stream_t * p_bit_stream )
+{
+    WORD_TYPE           buffer_left;
+    ptrdiff_t           i_bytes_left;
+
+    /* Put the remaining bytes (not aligned on a word boundary) in a
+     * temporary buffer. */
+    i_bytes_left = p_bit_stream->p_end - p_bit_stream->p_byte;
+    buffer_left = *((WORD_TYPE *)p_bit_stream->p_end - 1);
+
+    p_bit_stream->pf_next_data_packet( p_bit_stream );
 
     /* Copy remaining bits of the previous packet */
     *((WORD_TYPE *)p_bit_stream->p_byte - 1) = buffer_left;
     p_bit_stream->p_byte -= i_bytes_left;
 }
+
+/*****************************************************************************
+ * UnalignedShowBits : return i_bits bits from the bit stream, even when
+ * not aligned on a word boundary
+ *****************************************************************************/
+u32 UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
+{
+    /* We just fill in the bit buffer. */
+    while( p_bit_stream->fifo.i_available < i_bits )
+    {
+        if( p_bit_stream->p_byte < p_bit_stream->p_end )
+        {
+            p_bit_stream->fifo.buffer |= *(p_bit_stream->p_byte++)
+                                            << (8 * sizeof(WORD_TYPE) - 8
+                                            - p_bit_stream->fifo.i_available);
+            p_bit_stream->fifo.i_available += 8;
+        }
+        else
+        {
+            p_bit_stream->pf_next_data_packet( p_bit_stream );
+            p_bit_stream->fifo.buffer |= *(p_bit_stream->p_byte++)
+                                            << (8 * sizeof(WORD_TYPE) - 8
+                                            - p_bit_stream->fifo.i_available);
+            p_bit_stream->fifo.i_available += 8;
+        }
+    }
+    return( p_bit_stream->fifo.buffer >> (8 * sizeof(WORD_TYPE) - i_bits) );
+}
+
+/*****************************************************************************
+ * UnalignedGetBits : returns i_bits bits from the bit stream and removes
+ * them from the buffer, even when the bit stream is not aligned on a word
+ * boundary
+ *****************************************************************************/
+u32 UnalignedGetBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
+{
+    u32         i_result;
+
+    i_result = p_bit_stream->fifo.buffer
+                    >> (8 * sizeof(WORD_TYPE) - i_bits);
+    i_bits -= p_bit_stream->fifo.i_available;
+
+    /* Gather missing bytes. */
+    while( i_bits >= 8 )
+    {
+        if( p_bit_stream->p_byte < p_bit_stream->p_end )
+        {
+            i_result |= *(p_bit_stream->p_byte++) << (i_bits - 8);
+            i_bits -= 8;
+        }
+        else
+        {
+            p_bit_stream->pf_next_data_packet( p_bit_stream );
+            i_result |= *(p_bit_stream->p_byte++) << (i_bits - 8);
+            i_bits -= 8;
+        }
+    }
+
+    /* Gather missing bits. */
+    if( i_bits > 0 )
+    {
+        unsigned int    i_tmp = 8 - i_bits;
+
+        if( p_bit_stream->p_byte < p_bit_stream->p_end )
+        {
+            i_result |= *p_bit_stream->p_byte >> i_tmp;
+            p_bit_stream->fifo.buffer = *(p_bit_stream->p_byte++)
+                 << ( sizeof(WORD_TYPE) * 8 - i_tmp );
+            p_bit_stream->fifo.i_available = i_tmp;
+        }
+        else
+        {
+            p_bit_stream->pf_next_data_packet( p_bit_stream );
+            i_result |= *p_bit_stream->p_byte >> i_tmp;
+            p_bit_stream->fifo.buffer = *(p_bit_stream->p_byte++)
+                 << ( sizeof(WORD_TYPE) * 8 - i_tmp );
+            p_bit_stream->fifo.i_available = i_tmp;
+        }
+    }
+    else
+    {
+        p_bit_stream->fifo.i_available = 0;
+        p_bit_stream->fifo.buffer = 0;
+    }
+
+    if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
+    {
+        /* Get aligned on a word boundary. Otherwise it is safer
+         * to do it the next time.
+         * NB : we _will_ get aligned, because we have at most 
+         * sizeof(WORD_TYPE) - 1 bytes to store, and at least
+         * sizeof(WORD_TYPE) - 1 empty bytes in the bit buffer. */
+        AlignWord( p_bit_stream );
+    }
+
+    return( i_result );
+}
+
+/*****************************************************************************
+ * UnalignedRemoveBits : removes i_bits (== -i_available) from the bit
+ * buffer, even when the bit stream is not aligned on a word boundary
+ *****************************************************************************/
+void UnalignedRemoveBits( bit_stream_t * p_bit_stream )
+{
+    /* First remove all unnecessary bytes. */
+    while( p_bit_stream->fifo.i_available <= -8 )
+    {
+        if( p_bit_stream->p_byte < p_bit_stream->p_end )
+        {
+            p_bit_stream->p_byte++;
+            p_bit_stream->fifo.i_available += 8;
+        }
+        else
+        {
+            p_bit_stream->pf_next_data_packet( p_bit_stream );
+            p_bit_stream->p_byte++;
+            p_bit_stream->fifo.i_available += 8;
+        }
+    }
+
+    /* Remove unnecessary bits. */
+    if( p_bit_stream->fifo.i_available < 0 )
+    {
+        if( p_bit_stream->p_byte < p_bit_stream->p_end )
+        {
+            p_bit_stream->fifo.buffer = *(p_bit_stream->p_byte++)
+                 << ( sizeof(WORD_TYPE) * 8 - 8
+                         - p_bit_stream->fifo.i_available );
+            p_bit_stream->fifo.i_available += 8;
+        }
+        else
+        {
+            p_bit_stream->pf_next_data_packet( p_bit_stream );
+            p_bit_stream->fifo.buffer = *(p_bit_stream->p_byte++)
+                 << ( sizeof(WORD_TYPE) * 8 - 8
+                         - p_bit_stream->fifo.i_available );
+            p_bit_stream->fifo.i_available += 8;
+        }
+    }
+    else
+    {
+        p_bit_stream->fifo.buffer = 0;
+    }
+
+    if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
+    {
+        /* Get aligned on a word boundary. Otherwise it is safer
+         * to do it the next time.
+         * NB : we _will_ get aligned, because we have at most 
+         * sizeof(WORD_TYPE) - 1 bytes to store, and at least
+         * sizeof(WORD_TYPE) - 1 empty bytes in the bit buffer. */
+        AlignWord( p_bit_stream );
+    }
+}
+

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.25 2001/01/18 05:13:22 sam Exp $
+ * $Id: common.h,v 1.26 2001/01/18 17:40:06 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -155,31 +155,6 @@ struct macroblock_s;
 #define MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
 
-/*
- * This is stolen from the livid source who stole it from the kernel
- */
-
-#if defined(SYS_BEOS)
-#   define swab32(x) B_BENDIAN_TO_HOST_INT32(x)
-#else
-#   ifdef WORDS_BIG_ENDIAN
-#       define swab32(x) (x)
-#   else
-#       if defined (HAVE_X86_BSWAP)
-static __inline__ const u32 __i386_swab32( u32 x )
-{
-    __asm__("bswap %0" : "=r" (x) : "0" (x));
-    return x;
-}
-#           define swab32(x) __i386_swab32(x)
-#       else
-#           define swab32(x)                                                 \
-            ( ( (u32)(((u8*)&x)[0]) << 24 ) | ( (u32)(((u8*)&x)[1]) << 16 ) |\
-              ( (u32)(((u8*)&x)[2]) << 8 )  | ( (u32)(((u8*)&x)[3])) )
-#       endif
-#   endif
-#endif
-
 /* MSB (big endian)/LSB (little endian) conversions - network order is always
  * MSB, and should be used for both network communications and files. Note that
  * byte orders other than little and big endians are not supported, but only
@@ -204,6 +179,7 @@ static __inline__ const u32 __i386_swab32( u32 x )
 #endif
 
 /* Macros with automatic casts */
-#define U32_AT(p)   ( swab32 ( *( (u32 *)(p) ) ) )
-#define U16_AT(p)   ( ntohs ( *( (u16 *)(p) ) ) )
+#define U64_AT(p)   ( ntoh64 ( *( (u64 *)(p) ) ) )
+#define U32_AT(p)   ( ntoh32 ( *( (u32 *)(p) ) ) )
+#define U16_AT(p)   ( ntoh16 ( *( (u16 *)(p) ) ) )
 

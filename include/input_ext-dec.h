@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.14 2001/01/13 12:57:19 sam Exp $
+ * $Id: input_ext-dec.h,v 1.15 2001/01/18 17:40:06 massiot Exp $
  *
  * Authors:
  *
@@ -113,7 +113,7 @@ typedef struct decoder_fifo_s
  * This type describes a bit fifo used to store bits while working with the
  * input stream at the bit level.
  *****************************************************************************/
-typedef u32         WORD_TYPE;        /* only u32 is supported at the moment */
+typedef u32         WORD_TYPE;
 
 typedef struct bit_fifo_s
 {
@@ -172,123 +172,88 @@ typedef struct bit_stream_s
  *****************************************************************************/
 
 /*
- * Philosophy of the first implementation : the bit buffer is first filled by
- * NeedBits, then the buffer can be read via p_bit_stream->fifo.buffer, and
- * unnecessary bits are dumped with a DumpBits() call.
+ * DISCUSSION : How to use the bit_stream structures
+ *
+ * sizeof(WORD_TYPE) (usually 32) bits are read at the same time, thus
+ * minimizing the number of p_byte changes.
+ * Bits are read via GetBits() or ShowBits.
+ *
+ * XXX : Be aware that if, in the forthcoming functions, i_bits > 24,
+ * the data have to be already aligned on an 8-bit boundary, or wrong
+ * results will be returned. Use RealignBits() if unsure.
  */
 
-/*****************************************************************************
- * GetByte : reads the next byte in the input stream (PRIVATE)
- *****************************************************************************/
-static __inline__ byte_t _GetByte( bit_stream_t * p_bit_stream )
-{
-    /* Are there some bytes left in the current data packet ? */
-    /* could change this test to have a if (! (bytes--)) instead */
-    if ( p_bit_stream->p_byte >= p_bit_stream->p_end )
-    {
-        /* no, switch to next data packet */
-        p_bit_stream->pf_next_data_packet( p_bit_stream );
-    }
-
-    return( *(p_bit_stream->p_byte++) );
-}
-
-/*****************************************************************************
- * NeedBits : reads i_bits new bits in the bit stream and stores them in the
- *            bit buffer
- *****************************************************************************
- * - i_bits must be less or equal 32 !
- * - There is something important to notice with that function : if the number
- * of bits available in the bit buffer when calling NeedBits() is greater than
- * 24 (i_available > 24) but less than the number of needed bits
- * (i_available < i_bits), the byte returned by GetByte() will be shifted with
- * a negative value and the number of bits available in the bit buffer will be
- * set to more than 32 !
- *****************************************************************************/
-static __inline__ void NeedBits( bit_stream_t * p_bit_stream, int i_bits )
-{
-    while ( p_bit_stream->fifo.i_available < i_bits )
-    {
-        p_bit_stream->fifo.buffer |= ((WORD_TYPE)_GetByte( p_bit_stream ))
-                                     << (sizeof(WORD_TYPE) - 8
-                                            - p_bit_stream->fifo.i_available);
-        p_bit_stream->fifo.i_available += 8;
-    }
-}
-
-/*****************************************************************************
- * DumpBits : removes i_bits bits from the bit buffer
- *****************************************************************************
- * - i_bits <= i_available
- * - i_bits < 32 (because (u32 << 32) <=> (u32 = u32))
- *****************************************************************************/
-static __inline__ void DumpBits( bit_stream_t * p_bit_stream, int i_bits )
-{
-    p_bit_stream->fifo.buffer <<= i_bits;
-    p_bit_stream->fifo.i_available -= i_bits;
-}
-
-
-/*
- * Philosophy of the second implementation : WORD_LENGTH (usually 32) bits
- * are read at the same time, thus minimizing the number of p_byte changes.
- * Bits are read via GetBits() or ShowBits. This is slightly faster. Be
- * aware that if, in the forthcoming functions, i_bits > 24, the data have to
- * be already aligned on an 8-bit boundary, or wrong results will be
- * returned.
- */
-
-#if (WORD_TYPE != u32)
-#   error Not supported word
+#if (WORD_TYPE == u32)
+#   define WORD_AT      U32_AT
+#elif (WORD_TYPE == u64)
+#   define WORD_AT      U64_AT
+#else
+#   error Unsupported WORD_TYPE
 #endif
+
+/*****************************************************************************
+ * Protoypes from input_ext-dec.c
+ *****************************************************************************/
+u32  UnalignedShowBits( struct bit_stream_s *, unsigned int );
+void UnalignedRemoveBits( struct bit_stream_s * );
+u32  UnalignedGetBits( struct bit_stream_s *, unsigned int );
+
+/*****************************************************************************
+ * AlignWord : fill in the bit buffer so that the byte pointer be aligned
+ * on a word boundary (XXX: there must be at least sizeof(WORD_TYPE) - 1
+ * empty bytes in the bit buffer)
+ *****************************************************************************/
+static __inline__ void AlignWord( bit_stream_t * p_bit_stream )
+{
+    while( (p_bit_stream->p_byte - p_bit_stream->p_data->p_buffer)
+             & (sizeof(WORD_TYPE) - 1) )
+    {
+        if( p_bit_stream->p_byte < p_bit_stream->p_end )
+        {
+            p_bit_stream->fifo.buffer |= *(p_bit_stream->p_byte++)
+                << (8 * sizeof(WORD_TYPE) - 8
+                     - p_bit_stream->fifo.i_available);
+            p_bit_stream->fifo.i_available += 8;
+        }
+        else
+        {
+            p_bit_stream->pf_next_data_packet( p_bit_stream );
+            p_bit_stream->fifo.buffer |= *(p_bit_stream->p_byte++)
+                << (8 * sizeof(WORD_TYPE) - 8
+                     - p_bit_stream->fifo.i_available);
+            p_bit_stream->fifo.i_available += 8;
+        }
+    }
+}
 
 /*****************************************************************************
  * ShowBits : return i_bits bits from the bit stream
  *****************************************************************************/
-static __inline__ WORD_TYPE _ShowWord( bit_stream_t * p_bit_stream )
-{
-    if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
-    {
-        return( swab32( *((WORD_TYPE *)p_bit_stream->p_byte) ) );
-    }
-
-    p_bit_stream->pf_next_data_packet( p_bit_stream );
-    return( swab32( *((WORD_TYPE *)p_bit_stream->p_byte) ) );
-}
-
-static __inline__ WORD_TYPE ShowBits( bit_stream_t * p_bit_stream, int i_bits )
+static __inline__ u32 ShowBits( bit_stream_t * p_bit_stream,
+                                unsigned int i_bits )
 {
     if( p_bit_stream->fifo.i_available >= i_bits )
     {
         return( p_bit_stream->fifo.buffer >> (8 * sizeof(WORD_TYPE) - i_bits) );
     }
 
-    return( (p_bit_stream->fifo.buffer |
-            (_ShowWord( p_bit_stream ) >> p_bit_stream->fifo.i_available))
-                    >> (8 * sizeof(WORD_TYPE) - i_bits) );
-}
-
-/*****************************************************************************
- * GetWord : returns the next word to be read (PRIVATE)
- *****************************************************************************/
-static __inline__ WORD_TYPE _GetWord( bit_stream_t * p_bit_stream )
-{
     if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
     {
-        return( swab32( *(((WORD_TYPE *)p_bit_stream->p_byte)++) ) );
+        return( (p_bit_stream->fifo.buffer |
+                    (WORD_AT( p_bit_stream->p_byte )
+                        >> p_bit_stream->fifo.i_available))
+                    >> (8 * sizeof(WORD_TYPE) - i_bits) );
     }
-    else
-    {
-        p_bit_stream->pf_next_data_packet( p_bit_stream );
-        return( swab32( *(((WORD_TYPE *)p_bit_stream->p_byte)++) ) );
-    }
+
+    return UnalignedShowBits( p_bit_stream, i_bits );
 }
 
 /*****************************************************************************
  * RemoveBits : removes i_bits bits from the bit buffer
  *              XXX: do not use for 32 bits, see RemoveBits32
  *****************************************************************************/
-static __inline__ void RemoveBits( bit_stream_t * p_bit_stream, int i_bits )
+static __inline__ void RemoveBits( bit_stream_t * p_bit_stream,
+                                   unsigned int i_bits )
 {
     p_bit_stream->fifo.i_available -= i_bits;
 
@@ -297,78 +262,122 @@ static __inline__ void RemoveBits( bit_stream_t * p_bit_stream, int i_bits )
         p_bit_stream->fifo.buffer <<= i_bits;
         return;
     }
-    p_bit_stream->fifo.buffer = _GetWord( p_bit_stream )
-                            << ( -p_bit_stream->fifo.i_available );
-    p_bit_stream->fifo.i_available += sizeof(WORD_TYPE) * 8;
+
+    if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
+    {
+        p_bit_stream->fifo.buffer = WORD_AT( p_bit_stream->p_byte )
+                                        << ( -p_bit_stream->fifo.i_available );
+        ((WORD_TYPE *)p_bit_stream->p_byte)++;
+        p_bit_stream->fifo.i_available += sizeof(WORD_TYPE) * 8;
+        return;
+    }
+
+    UnalignedRemoveBits( p_bit_stream );
 }
 
 /*****************************************************************************
  * RemoveBits32 : removes 32 bits from the bit buffer (and as a side effect,
  *                refill it)
  *****************************************************************************/
+#if (WORD_TYPE == u32)
 static __inline__ void RemoveBits32( bit_stream_t * p_bit_stream )
 {
-    if( p_bit_stream->fifo.i_available )
+    if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
     {
-        p_bit_stream->fifo.buffer = _GetWord( p_bit_stream )
+        if( p_bit_stream->fifo.i_available )
+        {
+            p_bit_stream->fifo.buffer = WORD_AT( p_bit_stream->p_byte )
                             << (32 - p_bit_stream->fifo.i_available);
+            ((WORD_TYPE *)p_bit_stream->p_byte)++;
+            return;
+        }
+
+        ((WORD_TYPE *)p_bit_stream->p_byte)++;
+        return;
     }
-    else
-    {
-        _GetWord( p_bit_stream );
-    }
+
+    p_bit_stream->fifo.i_available -= 32;
+    UnalignedRemoveBits( p_bit_stream );
 }
+#else
+#   define RemoveBits32( p_bit_stream )     RemoveBits( p_bit_stream, 32 )
+#endif
 
 /*****************************************************************************
  * GetBits : returns i_bits bits from the bit stream and removes them
  *           XXX: do not use for 32 bits, see GetBits32
  *****************************************************************************/
-static __inline__ WORD_TYPE GetBits( bit_stream_t * p_bit_stream, int i_bits )
+static __inline__ u32 GetBits( bit_stream_t * p_bit_stream,
+                               unsigned int i_bits )
 {
     u32             i_result;
 
-    p_bit_stream->fifo.i_available -= i_bits;
-    if( p_bit_stream->fifo.i_available >= 0 )
+    if( p_bit_stream->fifo.i_available >= i_bits )
     {
-        i_result = p_bit_stream->fifo.buffer >> (8 * sizeof(WORD_TYPE) - i_bits);
+        p_bit_stream->fifo.i_available -= i_bits;
+        i_result = p_bit_stream->fifo.buffer
+                        >> (8 * sizeof(WORD_TYPE) - i_bits);
         p_bit_stream->fifo.buffer <<= i_bits;
         return( i_result );
     }
 
-    i_result = p_bit_stream->fifo.buffer >> (8 * sizeof(WORD_TYPE) - i_bits);
-    p_bit_stream->fifo.buffer = _GetWord( p_bit_stream );
-    i_result |= p_bit_stream->fifo.buffer
-                             >> (8 * sizeof(WORD_TYPE)
+    if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
+    {
+        p_bit_stream->fifo.i_available -= i_bits;
+        i_result = p_bit_stream->fifo.buffer
+                        >> (8 * sizeof(WORD_TYPE) - i_bits);
+        p_bit_stream->fifo.buffer = WORD_AT( p_bit_stream->p_byte );
+        ((WORD_TYPE *)p_bit_stream->p_byte)++;
+        i_result |= p_bit_stream->fifo.buffer
+                        >> (8 * sizeof(WORD_TYPE)
                                      + p_bit_stream->fifo.i_available);
-    p_bit_stream->fifo.buffer <<= ( -p_bit_stream->fifo.i_available );
-    p_bit_stream->fifo.i_available += sizeof(WORD_TYPE) * 8;
+        p_bit_stream->fifo.buffer <<= ( -p_bit_stream->fifo.i_available );
+        p_bit_stream->fifo.i_available += sizeof(WORD_TYPE) * 8;
+        return( i_result );
+    }
 
-    return( i_result );
+    return UnalignedGetBits( p_bit_stream, i_bits );
 }
 
 /*****************************************************************************
  * GetBits32 : returns 32 bits from the bit stream and removes them
  *****************************************************************************/
-static __inline__ WORD_TYPE GetBits32( bit_stream_t * p_bit_stream )
+#if (WORD_TYPE == u32)
+static __inline__ u32 GetBits32( bit_stream_t * p_bit_stream )
 {
-    WORD_TYPE               i_result;
+    u32             i_result;
 
-    if( p_bit_stream->fifo.i_available )
+    if( p_bit_stream->fifo.i_available == 32 )
     {
+        p_bit_stream->fifo.i_available = 0;
         i_result = p_bit_stream->fifo.buffer;
-        p_bit_stream->fifo.buffer = _GetWord( p_bit_stream );
-
-        i_result |= p_bit_stream->fifo.buffer
-                             >> (p_bit_stream->fifo.i_available);
-        p_bit_stream->fifo.buffer <<= (8 * sizeof(WORD_TYPE)
-                                    - p_bit_stream->fifo.i_available);
+        p_bit_stream->fifo.buffer = 0;
         return( i_result );
     }
-    else
+
+    if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
     {
-        return( _GetWord( p_bit_stream ) );
+        if( p_bit_stream->fifo.i_available )
+        {
+            i_result = p_bit_stream->fifo.buffer;
+            p_bit_stream->fifo.buffer = WORD_AT( p_bit_stream->p_byte );
+            ((WORD_TYPE *)p_bit_stream->p_byte)++;
+            i_result |= p_bit_stream->fifo.buffer
+                             >> (p_bit_stream->fifo.i_available);
+            p_bit_stream->fifo.buffer <<= (32 - p_bit_stream->fifo.i_available);
+            return( i_result );
+        }
+
+        i_result = WORD_AT( p_bit_stream->p_byte );
+        ((WORD_TYPE *)p_bit_stream->p_byte)++;
+        return( i_result );
     }
+
+    return UnalignedGetBits( p_bit_stream, 32 );
 }
+#else
+#   define GetBits32( p_bit_stream )    GetBits( p_bit_stream, 32 )
+#endif
 
 /*****************************************************************************
  * RealignBits : realigns the bit buffer on an 8-bit boundary
@@ -379,11 +388,6 @@ static __inline__ void RealignBits( bit_stream_t * p_bit_stream )
     p_bit_stream->fifo.i_available &= ~0x7;
 }
 
-
-/*
- * Philosophy of the third implementation : the decoder asks for n bytes,
- * and we will copy them in its buffer.
- */
 
 /*****************************************************************************
  * GetChunk : reads a large chunk of data
@@ -396,6 +400,15 @@ static __inline__ void GetChunk( bit_stream_t * p_bit_stream,
                                  byte_t * p_buffer, size_t i_buf_len )
 {
     ptrdiff_t           i_available;
+
+    if( p_bit_stream->fifo.i_available )
+    {
+        *((WORD_TYPE *)p_buffer) = WORD_AT( p_bit_stream->fifo.buffer );
+        p_buffer += p_bit_stream->fifo.i_available >> 3;
+        i_buf_len -= p_bit_stream->fifo.i_available >> 3;
+        p_bit_stream->fifo.buffer = 0;
+        p_bit_stream->fifo.i_available = 0;
+    }
 
     if( (i_available = p_bit_stream->p_end - p_bit_stream->p_byte)
             >= i_buf_len )
@@ -422,6 +435,43 @@ static __inline__ void GetChunk( bit_stream_t * p_bit_stream,
             p_bit_stream->p_byte += i_buf_len;
         }
     }
+
+    if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
+    {
+        AlignWord( p_bit_stream );
+    }
+}
+
+
+/*
+ * The following functions are now deprecated.
+ */
+
+static __inline__ byte_t _GetByte( bit_stream_t * p_bit_stream )
+{
+    if ( p_bit_stream->p_byte >= p_bit_stream->p_end )
+    {
+        p_bit_stream->pf_next_data_packet( p_bit_stream );
+    }
+
+    return( *(p_bit_stream->p_byte++) );
+}
+
+static __inline__ void NeedBits( bit_stream_t * p_bit_stream, int i_bits )
+{
+    while ( p_bit_stream->fifo.i_available < i_bits )
+    {
+        p_bit_stream->fifo.buffer |= ((WORD_TYPE)_GetByte( p_bit_stream ))
+                                     << (8 * sizeof(WORD_TYPE) - 8
+                                            - p_bit_stream->fifo.i_available);
+        p_bit_stream->fifo.i_available += 8;
+    }
+}
+
+static __inline__ void DumpBits( bit_stream_t * p_bit_stream, int i_bits )
+{
+    p_bit_stream->fifo.buffer <<= i_bits;
+    p_bit_stream->fifo.i_available -= i_bits;
 }
 
 

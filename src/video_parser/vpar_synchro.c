@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.78 2001/01/18 05:13:23 sam Exp $
+ * $Id: vpar_synchro.c,v 1.79 2001/01/18 17:40:06 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -222,7 +222,8 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                                             + tau_yuv)
 #define S                           p_vpar->synchro
         /* VPAR_SYNCHRO_DEFAULT */
-        mtime_t         now, pts, period, tau_yuv;
+        mtime_t         now, period, tau_yuv;
+        mtime_t         pts = 0;
         boolean_t       b_decode = 0;
 #ifdef DEBUG_VPAR
         char            p_date[MSTRTIME_MAX_SIZE];
