@@ -2,7 +2,7 @@
  * intf.c: interface for DVD video manager
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.5 2003/01/12 15:38:35 sigmunau Exp $
+ * $Id: intf.c,v 1.6 2003/01/29 15:55:44 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -310,15 +310,21 @@ static void RunIntf( intf_thread_t *p_intf )
  *****************************************************************************/
 static int InitThread( intf_thread_t * p_intf )
 {
-    /* we might need some locking here */
+    /* We might need some locking here */
     if( !p_intf->b_die )
     {
         input_thread_t * p_input;
         dvd_data_t * p_dvd;
 
         p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_PARENT );
-        p_dvd = (dvd_data_t*)p_input->p_access_data;
 
+        /* Maybe the input just died */
+        if( p_input == NULL )
+        {
+            return VLC_EGENERIC;
+        }
+
+        p_dvd = (dvd_data_t*)p_input->p_access_data;
         p_dvd->p_intf = p_intf;
 
         vlc_mutex_lock( &p_intf->change_lock );
@@ -332,11 +338,11 @@ static int InitThread( intf_thread_t * p_intf )
 
         vlc_mutex_unlock( &p_intf->change_lock );
 
-        return 0;
+        return VLC_SUCCESS;
     }
     else
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 }
 
