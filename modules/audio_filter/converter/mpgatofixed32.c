@@ -3,7 +3,7 @@
  * using MAD (MPEG Audio Decoder)
  *****************************************************************************
  * Copyright (C) 2001 by Jean-Paul Saman
- * $Id: mpgatofixed32.c,v 1.2 2003/01/20 10:59:29 massiot Exp $
+ * $Id: mpgatofixed32.c,v 1.3 2003/01/20 17:52:26 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -79,15 +79,7 @@ static int Create( vlc_object_t * _p_filter )
         return -1;
     }
 
-    if ( p_filter->input.i_rate != p_filter->output.i_rate )
-    {
-        return -1;
-    }
-
-    if ( p_filter->input.i_original_channels !=
-         p_filter->output.i_original_channels
-          || p_filter->input.i_physical_channels !=
-             p_filter->output.i_physical_channels )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
     {
         return -1;
     }
