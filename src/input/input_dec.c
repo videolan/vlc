@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.57 2003/01/25 03:12:20 fenrir Exp $
+ * $Id: input_dec.c,v 1.58 2003/02/18 00:20:01 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -120,7 +120,7 @@ decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
 
     if( p_fifo->p_module == NULL )
     {
-        msg_Err( p_fifo, "no suitable decoder module for fourcc `%4.4s'",
+        msg_Err( p_fifo, "no suitable decoder module for fourcc `%4.4s'.\nVLC probably does not support this sound or video format.",
                        (char*)&p_fifo->i_fourcc );
         DeleteDecoderFifo( p_fifo );
         vlc_object_destroy( p_fifo );
