@@ -2,9 +2,10 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.12 2003/02/23 05:53:53 jlj Exp $
+ * $Id: playlist.m,v 1.13 2003/03/06 11:43:07 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
+ *          Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -122,6 +123,9 @@
     [o_mi_play setTitle: _NS("Play")];
     [o_mi_delete setTitle: _NS("Delete")];
     [o_mi_selectall setTitle: _NS("Select All")];
+    
+    [o_btn_add setToolTip: _NS("Add")];
+    [o_btn_remove setToolTip: _NS("Delete")];
 }
 
 - (BOOL)tableView:(NSTableView *)o_tv 

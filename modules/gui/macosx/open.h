@@ -1,8 +1,8 @@
 /*****************************************************************************
  * open.h: MacOS X plugin for vlc
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: open.h,v 1.11 2003/02/16 01:29:40 massiot Exp $
+ * Copyright (C) 2002-2003 VideoLAN
+ * $Id: open.h,v 1.12 2003/03/06 11:43:07 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -125,7 +125,4 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 
 - (IBAction)openFile:(id)sender;
 
-@end
-
-@interface VLGetURLScriptCommand : NSScriptCommand
 @end

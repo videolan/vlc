@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.65 2003/03/04 23:36:57 massiot Exp $
+ * $Id: intf.m,v 1.66 2003/03/06 11:43:07 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -416,6 +416,15 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         [NSArray arrayWithObject: o_filename] atPos: -1 enqueue: NO];
 
     return( TRUE );
+}
+
+- (id)getControls
+{
+    if ( o_controls )
+    {
+        return o_controls;
+    }
+    return nil;
 }
 
 - (void)manage

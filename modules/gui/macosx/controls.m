@@ -1,8 +1,8 @@
 /*****************************************************************************
  * controls.m: MacOS X interface plugin
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.28 2003/02/12 14:22:23 hartman Exp $
+ * Copyright (C) 2002-2003 VideoLAN
+ * $Id: controls.m,v 1.29 2003/03/06 11:43:07 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -32,49 +32,7 @@
 
 #include "intf.h"
 #include "vout.h"
-
-/*****************************************************************************
- * VLCControls interface 
- *****************************************************************************/
-@interface VLCControls : NSObject
-{
-    IBOutlet id o_open;
-    IBOutlet id o_main;
-
-    IBOutlet id o_volumeslider;
-}
-
-- (IBAction)play:(id)sender;
-- (IBAction)stop:(id)sender;
-- (IBAction)faster:(id)sender;
-- (IBAction)slower:(id)sender;
-
-- (IBAction)prev:(id)sender;
-- (IBAction)next:(id)sender;
-- (IBAction)loop:(id)sender;
-
-- (IBAction)forward:(id)sender;
-- (IBAction)backward:(id)sender;
-
-- (IBAction)volumeUp:(id)sender;
-- (IBAction)volumeDown:(id)sender;
-- (IBAction)mute:(id)sender;
-- (IBAction)volumeSliderUpdated:(id)sender;
-- (void)updateVolumeSlider;
-
-- (IBAction)halfWindow:(id)sender;
-- (IBAction)normalWindow:(id)sender;
-- (IBAction)doubleWindow:(id)sender;
-- (IBAction)fullscreen:(id)sender;
-- (IBAction)deinterlace:(id)sender;
-
-- (IBAction)toggleProgram:(id)sender;
-- (IBAction)toggleTitle:(id)sender;
-- (IBAction)toggleChapter:(id)sender;
-- (IBAction)toggleLanguage:(id)sender;
-- (IBAction)toggleVar:(id)sender;
-
-@end
+#include "controls.h"
 
 /*****************************************************************************
  * VLCControls implementation 

@@ -501,7 +501,10 @@
 		};
 		08FB77AFFE84173DC02AAC07 = {
 			children = (
+				8E6BC6F6041643860059A3A7,
+				8E6BC6F7041643860059A3A7,
 				8ED6C27A03E2EB1C0059A3A7,
+				8E6BC6FA041684EC0059A3A7,
 				8ED6C27B03E2EB1C0059A3A7,
 				8ED6C27C03E2EB1C0059A3A7,
 				8ED6C27D03E2EB1C0059A3A7,
@@ -601,6 +604,27 @@
 			isa = PBXBuildFile;
 			settings = {
 			};
+		};
+		8E6BC6F6041643860059A3A7 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			name = applescript.h;
+			path = ../../modules/gui/macosx/applescript.h;
+			refType = 2;
+		};
+		8E6BC6F7041643860059A3A7 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			name = applescript.m;
+			path = ../../modules/gui/macosx/applescript.m;
+			refType = 2;
+		};
+		8E6BC6FA041684EC0059A3A7 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			name = controls.h;
+			path = ../../modules/gui/macosx/controls.h;
+			refType = 2;
 		};
 		8E88833C03DD6E870059A3A7 = {
 			isa = PBXFileReference;

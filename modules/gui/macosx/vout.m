@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.36 2003/03/04 23:32:06 hartman Exp $
+ * $Id: vout.m,v 1.37 2003/03/06 11:43:07 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -934,6 +934,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void)otherMouseDown:(NSEvent *)o_event
 {
+    /* This is not the the wheel button. you need to poll the
+     * mouseWheel event for that. other is a third, forth or fifth button */
     vout_thread_t * p_vout;
     id o_window = [self window];
     p_vout = (vout_thread_t *)[o_window getVout];

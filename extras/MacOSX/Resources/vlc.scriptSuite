@@ -13,5 +13,37 @@
             AppleEventCode = "GURL";
             CommandClass = "VLGetURLScriptCommand";
         };
+        "play" = {
+            AppleEventCode = "VLC1";
+            CommandClass = "VLControlScriptCommand";
+        };
+        "stop" = {
+            AppleEventCode = "VLC2";
+            CommandClass = "VLControlScriptCommand";
+        };
+        "previous" = {
+            AppleEventCode = "GURL";
+            CommandClass = "VLControlScriptCommand";
+        };
+        "next" = {
+            AppleEventCode = "VLC3";
+            CommandClass = "VLControlScriptCommand";
+        };
+        "fullscreen" = {
+            AppleEventCode = "VLC4";
+            CommandClass = "VLControlScriptCommand";
+        };
+        "mute" = {
+            AppleEventCode = "VLC5";
+            CommandClass = "VLControlScriptCommand";
+        };
+        "volumeUp" = {
+            AppleEventCode = "VLC6";
+            CommandClass = "VLControlScriptCommand";
+        };
+        "volumeDown" = {
+            AppleEventCode = "VLC7";
+            CommandClass = "VLControlScriptCommand";
+        };
     };
 }
