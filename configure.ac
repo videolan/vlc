@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.176 2004/02/10 13:29:04 sam Exp $
+dnl $Id: configure.ac,v 1.177 2004/02/10 14:04:55 sam Exp $
 
 AC_INIT(vlc,0.7.1-test1)
 
@@ -1111,15 +1111,39 @@ dnl  live.com input
 dnl
 AC_ARG_ENABLE(livedotcom,
 [  --enable-livedotcom     live.com input plugin (default disabled)])
-if test "${enable_livedotcom}" = "yes"
-then
+if test "${enable_livedotcom}" = "yes"; then
   AC_ARG_WITH(livedotcom-tree,
-    [    --with-livedotcom-tree=PATH live.com tree for static linking (required)])
+    [    --with-livedotcom-tree=PATH live.com tree for static linking])
 
   dnl
   dnl test for --with-livedotcom-tree
   dnl
-  if test "${with_livedotcom_tree}" != "no" -a -n "${with_livedotcom_tree}"; then
+  if test -z "${with_livedotcom_tree}"; then
+    AC_LANG_PUSH(C++)
+    CPPFLAGS_save="${CPPFLAGS}"
+    CPPFLAGS_livedotcom="-I/usr/include/liveMedia -I/usr/include/groupsock -I/usr/include/BasicUsageEnvironment -I/usr/include/UsageEnvironment"
+    CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_livedotcom}"
+    AC_CHECK_HEADERS(liveMedia.hh, [
+      AX_ADD_CXXFLAGS([livedotcom], [${CPPFLAGS_livedotcom}])
+      AC_CHECK_LIB(liveMedia_pic, main, [
+        # We have -lliveMedia_pic, build plugins
+        AX_ADD_PLUGINS([livedotcom])
+        AX_ADD_LDFLAGS([livedotcom], [-lliveMedia_pic -lgroupsock_pic -lBasicUsageEnvironment_pic -lUsageEnvironment_pic])
+      ], [
+        AC_CHECK_LIB(liveMedia, main, [
+          # We only have -lliveMedia, do builtins
+          AX_ADD_BUILTINS([livedotcom])
+          AX_ADD_LDFLAGS([livedotcom], [-lliveMedia -lgroupsock -lBasicUsageEnvironment -lUsageEnvironment])
+        ])
+      ])
+      if test "${SYS}" = "mingw32"; then
+        # add ws2_32 for closesocket, select, recv
+        AX_ADD_LDFLAGS([livedotcom],[-lws2_32])
+      fi
+    ])
+    CPPFLAGS="${CPPFLAGS_save}"
+    AC_LANG_POP(C++)
+  else
     AC_MSG_CHECKING(for liveMedia/libliveMedia.a in ${with_livedotcom_tree})
     real_livedotcom_tree="`cd ${with_livedotcom_tree} 2>/dev/null && pwd`"
     if test -z "${real_livedotcom_tree}"; then
@@ -1151,10 +1175,6 @@ then
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot find ${real_livedotcom_tree}/liveMedia/libliveMedia.a, make sure you compiled live.com in ${with_livedotcom_tree}])
     fi
-  else
-    dnl  The --with-livedotcom-tree isn't specified wasn't built
-    AC_MSG_RESULT(no)
-    AC_MSG_ERROR([You have to specify a tree with --with-livedotcom-tree])
   fi
 fi
 
