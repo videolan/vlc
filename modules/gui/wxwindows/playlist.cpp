@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.19 2003/09/10 10:21:09 zorglub Exp $
+ * $Id: playlist.cpp,v 1.20 2003/09/21 18:07:51 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -88,7 +88,6 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
     EVT_LIST_KEY_DOWN(ListView_Event, Playlist::OnKeyDown)
 
     /* Button events */
-    EVT_BUTTON( Close_Event, Playlist::OnClose)
     EVT_BUTTON( Search_Event, Playlist::OnSearch)
     EVT_BUTTON( Save_Event, Playlist::OnSave)
 
@@ -155,11 +154,6 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     listview->SetColumnWidth( 0, 250 );
     listview->SetColumnWidth( 1, 100 );
 
-    /* Create the Close button */
-    wxButton *close_button = new wxButton( playlist_panel, Close_Event,
-                                           wxU(_("Close")) );
-    close_button->SetDefault();
-   
     /* Create the Random checkbox */
     wxCheckBox *random_checkbox = 
         new wxCheckBox( playlist_panel, Random_Event, wxU(_("Random")) );
@@ -193,20 +187,11 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 		              wxEXPAND|wxALIGN_RIGHT|wxALL, 5);
     search_sizer->Layout();
 
-    wxBoxSizer *close_button_sizer = new wxBoxSizer( wxHORIZONTAL );
-    close_button_sizer->Add( close_button, 0, wxALL, 5 );
-/*    close_button_sizer->Add( random_checkbox, 0, 
-			     wxEXPAND|wxALIGN_RIGHT|wxALL, 5);
-    close_button_sizer->Add( loop_checkbox, 0, 
-		              wxEXPAND|wxALIGN_RIGHT|wxALL, 5);*/
-    close_button_sizer->Layout();
-
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
 
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     panel_sizer->Add( listview, 1, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( search_sizer, 0 , wxALIGN_CENTRE);
-    panel_sizer->Add( close_button_sizer, 0, wxALIGN_CENTRE );
     panel_sizer->Layout();
 
     playlist_panel->SetSizerAndFit( panel_sizer );

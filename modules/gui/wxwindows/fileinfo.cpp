@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: fileinfo.cpp,v 1.18 2003/08/27 11:53:26 gbazin Exp $
+ * $Id: fileinfo.cpp,v 1.19 2003/09/21 18:07:51 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -76,18 +76,10 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     fileinfo_root_label = wxT("");
 
-    /* Create the OK button */
-    wxButton *ok_button = new wxButton( panel, wxID_OK, wxU(_("Close")) );
-    ok_button->SetDefault();
-
     /* Place everything in sizers */
-    wxBoxSizer *ok_button_sizer = new wxBoxSizer( wxHORIZONTAL );
-    ok_button_sizer->Add( ok_button, 0, wxALL, 5 );
-    ok_button_sizer->Layout();
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     panel_sizer->Add( fileinfo_tree, 1, wxEXPAND | wxALL, 5 );
-    panel_sizer->Add( ok_button_sizer, 0, wxALIGN_CENTRE );
     panel_sizer->Layout();
     panel->SetSizerAndFit( panel_sizer );
     main_sizer->Add( panel, 1, wxEXPAND, 0 );
