@@ -13,14 +13,15 @@
 #CC=gcc
 #SHELL=/bin/sh
 
+# Audio output settings
+AUDIO_DSP=YES
+
 # Video output settings
 VIDEO_X11=YES
 VIDEO_FB=YES
 #VIDEO_GGI=YES
-
-# Highly experimental
+# You probably won't need this one
 #VIDEO_GLIDE=YES
-
 # Not yet supported
 #VIDEO_BEOS=YES
 #VIDEO_DGA=YES
@@ -54,6 +55,15 @@ DEBUG=1
 
 # Program version - may only be changed by the project leader
 PROGRAM_VERSION = 1.0-dev
+
+# AUDIO_OPTIONS describes all used audio options
+AUDIO_OPTIONS = dummy
+aout_method = audio_output/aout_dummy.o
+ifeq ($(AUDIO_DSP), YES)
+AUDIO_OPTIONS += dsp
+DEFINE += -DAUDIO_DSP
+aout_method += audio_output/aout_dsp.o
+endif
 
 # VIDEO_OPTIONS describes all used video options
 VIDEO_OPTIONS = dummy
@@ -109,16 +119,14 @@ PROGRAM_BUILD = `date -R` $(USER)@`hostname`
 # including ARCH_xx and SYS_xx. It will be passed to C compiler.
 DEFINE += -DARCH_$(ARCH)
 DEFINE += -DSYS_$(SYS)
-DEFINE += -DVIDEO_OPTIONS="\"$(VIDEO_OPTIONS)\""
+DEFINE += -DAUDIO_OPTIONS="\"$(shell echo $(AUDIO_OPTIONS) | tr 'A-Z' 'a-z')\""
+DEFINE += -DVIDEO_OPTIONS="\"$(shell echo $(VIDEO_OPTIONS) | tr 'A-Z' 'a-z')\""
 DEFINE += -DPROGRAM_VERSION="\"$(PROGRAM_VERSION)\""
 DEFINE += -DPROGRAM_OPTIONS="\"$(PROGRAM_OPTIONS)\""
 DEFINE += -DPROGRAM_BUILD="\"$(PROGRAM_BUILD)\""
 ifeq ($(DEBUG),1)
 DEFINE += -DDEBUG
 endif
-
-# video is a lowercase version of VIDEO used for filenames
-video = $(shell echo $(VIDEO) | tr 'A-Z' 'a-z')
 
 ################################################################################
 # Tuning and other variables - do not change anything except if you know

@@ -36,18 +36,24 @@
 /* Long options return values - note that values corresponding to short options
  * chars, and in general any regular char, should be avoided */
 #define OPT_NOAUDIO             150
-#define OPT_STEREO              151
-#define OPT_MONO                152
+#define OPT_AOUT                151
+#define OPT_STEREO              152
+#define OPT_MONO                153
 
 #define OPT_NOVIDEO             160
-#define OPT_DISPLAY             161
-#define OPT_WIDTH               162
-#define OPT_HEIGHT              163
-#define OPT_COLOR               164
+#define OPT_VOUT                161
+#define OPT_DISPLAY             162
+#define OPT_WIDTH               163
+#define OPT_HEIGHT              164
+#define OPT_COLOR               165
 
 #define OPT_NOVLANS             170
 #define OPT_SERVER              171
 #define OPT_PORT                172
+
+/* Usage fashion */
+#define SHORT_HELP                0
+#define LONG_HELP                 1
 
 /* Long options */
 static const struct option longopts[] =
@@ -56,15 +62,18 @@ static const struct option longopts[] =
 
     /* General/common options */
     {   "help",             0,          0,      'h' },
+    {   "long-help",        0,          0,      'H' },
     {   "version",          0,          0,      'v' },
 
     /* Audio options */
     {   "noaudio",          0,          0,      OPT_NOAUDIO },
+    {   "aout",             1,          0,      OPT_AOUT },
     {   "stereo",           0,          0,      OPT_STEREO },
     {   "mono",             0,          0,      OPT_MONO },
 
     /* Video options */
     {   "novideo",          0,          0,      OPT_NOVIDEO },
+    {   "vout",             1,          0,      OPT_VOUT },
     {   "display",          1,          0,      OPT_DISPLAY },
     {   "width",            1,          0,      OPT_WIDTH },
     {   "height",           1,          0,      OPT_HEIGHT },
@@ -80,7 +89,7 @@ static const struct option longopts[] =
 };
 
 /* Short options */
-static const char *psz_shortopts = "hvg";
+static const char *psz_shortopts = "hHvg";
 
 /*****************************************************************************
  * Global variable program_data - this is the one and only, see main.h
@@ -92,7 +101,7 @@ main_t *p_main;
  *****************************************************************************/
 static void SetDefaultConfiguration ( void );
 static int  GetConfiguration        ( int i_argc, char *ppsz_argv[], char *ppsz_env[] );
-static void Usage                   ( void );
+static void Usage                   ( int i_fashion );
 static void Version                 ( void );
 
 static void InitSignalHandler       ( void );
@@ -144,7 +153,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     if( main_data.b_vlans && input_VlanCreate() )
     {
         /* On error during vlans initialization, switch of vlans */
-        intf_Msg("Virtual LANs initialization failed : vlans management is desactivated\n");
+        intf_Msg("Virtual LANs initialization failed : vlans management is deactivated\n");
         main_data.b_vlans = 0;
     }
 
@@ -157,7 +166,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         if( main_data.p_aout == NULL )
         {
             /* On error during audio initialization, switch of audio */
-            intf_Msg("Audio initialization failed : audio is desactivated\n");
+            intf_Msg("Audio initialization failed : audio is deactivated\n");
             main_data.b_audio = 0;
         }
     }
@@ -325,7 +334,11 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         {
         /* General/common options */
         case 'h':                                              /* -h, --help */
-            Usage();
+            Usage( SHORT_HELP );
+            return( -1 );
+            break;
+        case 'H':                                         /* -H, --long-help */
+            Usage( LONG_HELP );
             return( -1 );
             break;
         case 'v':                                           /* -v, --version */
@@ -337,6 +350,9 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_NOAUDIO:                                       /* --noaudio */
             p_main->b_audio = 0;
             break;
+        case OPT_AOUT:                                             /* --aout */
+            main_PutPszVariable( AOUT_METHOD_VAR, optarg );
+            break;
         case OPT_STEREO:                                         /* --stereo */
             main_PutIntVariable( AOUT_STEREO_VAR, 1 );
             break;
@@ -347,6 +363,9 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         /* Video options */
         case OPT_NOVIDEO:                                       /* --novideo */
             p_main->b_video = 0;
+            break;
+        case OPT_VOUT:                                             /* --vout */
+            main_PutPszVariable( VOUT_METHOD_VAR, optarg );
             break;
         case OPT_DISPLAY:                                       /* --display */
             main_PutPszVariable( VOUT_DISPLAY_VAR, optarg );
@@ -398,7 +417,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
  *****************************************************************************
  * Print a short inline help. Message interface is initialized at this stage.
  *****************************************************************************/
-static void Usage( void )
+static void Usage( int i_fashion )
 {
     intf_Msg(COPYRIGHT_MESSAGE "\n");
 
@@ -407,15 +426,21 @@ static void Usage( void )
 
     /* Options */
     intf_Msg("Options:\n" \
-             "  -h, --help, -v, --version         \tprint usage or version\n" \
+             "  -h, --help, -H, --long-help       \tprint short/long usage\n" \
+             "  -v, --version                     \tprint version information\n" \
              "  --noaudio, --novideo              \tdisable audio/video\n" \
+             "  --aout {" AUDIO_OPTIONS "}            \taudio output method\n" \
              "  --stereo, --mono                  \tstereo/mono audio\n" \
+             "  --vout {" VIDEO_OPTIONS "}            \tvideo output method\n" \
              "  --display <display>               \tdisplay string\n" \
              "  --width <w>, --height <h>         \tdisplay dimensions\n" \
              "  -g, --grayscale, --color          \tgrayscale/color video\n" \
              "  --novlans                         \tdisable vlans\n" \
              "  --server <host>, --port <port>    \tvideo server adress\n" \
              );
+
+    if( i_fashion == SHORT_HELP )
+        return;
 
     /* Interface parameters */
     intf_Msg("Interface parameters:\n" \
@@ -425,6 +450,7 @@ static void Usage( void )
 
     /* Audio parameters */
     intf_Msg("Audio parameters:\n" \
+             "  " AOUT_METHOD_VAR "=<method name>        \taudio method (" AUDIO_OPTIONS ")\n" \
              "  " AOUT_DSP_VAR "=<filename>              \tdsp device path\n" \
              "  " AOUT_STEREO_VAR "={1|0}                \tstereo or mono output\n" \
              "  " AOUT_RATE_VAR "=<rate>             \toutput rate\n" \
@@ -432,8 +458,7 @@ static void Usage( void )
 
     /* Video parameters */
     intf_Msg("Video parameters:\n" \
-             "  " VOUT_METHOD_VAR "=<method name>        \tmethod used\n" \
-             "    ( available: " VIDEO_OPTIONS " )\n" \
+             "  " VOUT_METHOD_VAR "=<method name>        \tdisplay method (" VIDEO_OPTIONS ")\n" \
              "  " VOUT_DISPLAY_VAR "=<display name>      \tdisplay used\n" \
              "  " VOUT_WIDTH_VAR "=<width>               \tdisplay width\n" \
              "  " VOUT_HEIGHT_VAR "=<height>             \tdislay height\n" \

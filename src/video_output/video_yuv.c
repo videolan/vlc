@@ -28,39 +28,6 @@
  * Constants
  *****************************************************************************/
 
-/* Color masks for different color depths - 8bpp masks can be choosen, since
- * colormaps instead of hardware-defined colors are used. */
-//?? remove
-#define RED_8BPP_MASK           0xe0
-#define GREEN_8BPP_MASK         0x1c
-#define BLUE_8BPP_MASK          0x03
-
-#define RED_15BPP_MASK          0xf800
-#define GREEN_15BPP_MASK        0x03e0
-#define BLUE_15BPP_MASK         0x001f
-
-#define RED_16BPP_MASK          0xf800
-#define GREEN_16BPP_MASK        0x07e0
-#define BLUE_16BPP_MASK         0x001f
-
-#define RED_24BPP_MASK          0xff0000
-#define GREEN_24BPP_MASK        0x00ff00
-#define BLUE_24BPP_MASK         0x0000ff
-
-/* RGB/YUV inversion matrix (ISO/IEC 13818-2 section 6.3.6, table 6.9) */
-//?? no more used ?
-const int MATRIX_COEFFICIENTS_TABLE[8][4] =
-{
-  {117504, 138453, 13954, 34903},       /* no sequence_display_extension */
-  {117504, 138453, 13954, 34903},       /* ITU-R Rec. 709 (1990) */
-  {104597, 132201, 25675, 53279},       /* unspecified */
-  {104597, 132201, 25675, 53279},       /* reserved */
-  {104448, 132798, 24759, 53109},       /* FCC */
-  {104597, 132201, 25675, 53279},       /* ITU-R Rec. 624-4 System B, G */
-  {104597, 132201, 25675, 53279},       /* SMPTE 170M */
-  {117579, 136230, 16907, 35559}        /* SMPTE 240M (1987) */
-};
-
 /* Margins and offsets in conversion tables - Margins are used in case a RGB
  * RGB conversion would give a value outside the 0-255 range. Offsets have been
  * calculated to avoid using the same cache line for 2 tables. conversion tables
@@ -78,7 +45,7 @@ const int MATRIX_COEFFICIENTS_TABLE[8][4] =
 
 #define PALETTE_TABLE_SIZE 2176          /* YUV -> 8bpp palette lookup table */
 
-//??
+/* macros used for YUV pixel conversions */
 #define SHIFT 20
 #define U_GREEN_COEF    ((int)(-0.391 * (1<<SHIFT) / 1.164))
 #define U_BLUE_COEF     ((int)(2.018 * (1<<SHIFT) / 1.164))
@@ -609,10 +576,7 @@ static void SetYUV( vout_thread_t *p_vout )
             {
                 #define RGB_MIN 0
                 #define RGB_MAX 255
-                #define SATURATE( x )    \
-                x = x + ( x >> 3 ) - 16; \
-                if( x < 0 ) x = 0;       \
-                if( x > 255 ) x = 255;
+                #define CLIP( x ) ( ((x < 0) ? 0 : (x > 255) ? 255 : x) << 8 )
 
                 int y,u,v;
                 int r,g,b;
@@ -641,16 +605,12 @@ static void SetYUV( vout_thread_t *p_vout )
                                 && r <= RGB_MAX && g <= RGB_MAX && b <= RGB_MAX )
                         {
                             /* this one should never happen unless someone fscked up my code */
-                            if(j == 256) { intf_DbgMsg( "sorry, no colors left\n" ); exit( 1 ); }
+                            if(j == 256) { intf_ErrMsg( "vout error: no colors left to build palette\n" ); break; }
 
-                            /* saturate the colors */
-                            SATURATE( r );
-                            SATURATE( g );
-                            SATURATE( b );
-
-                            red[j] = r << 8;
-                            green[j] = g << 8;
-                            blue[j] = b << 8;
+                            /* clip the colors */
+                            red[j] = CLIP( r );
+                            green[j] = CLIP( g );
+                            blue[j] = CLIP( b );
                             transp[j] = 0;
 
                             /* allocate color */
@@ -1112,14 +1072,15 @@ static void ConvertYUV420RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
 
-    int dither10[4] = { 0x0, 0x8, 0x2, 0xa };
-    int dither11[4] = { 0xc, 0x4, 0xe, 0x6 };
-    int dither12[4] = { 0x3, 0xb, 0x1, 0x9 };
-    int dither13[4] = { 0xf, 0x7, 0xd, 0x5 };
-    int dither20[4] = { 0x00, 0x10, 0x04, 0x14 };
-    int dither21[4] = { 0x18, 0x08, 0x1c, 0x0c };
-    int dither22[4] = { 0x06, 0x16, 0x02, 0x12 };
-    int dither23[4] = { 0x1e, 0x0e, 0x1a, 0x0a };
+    int dither10[4] = {  0x0,  0x8,  0x2,  0xa };
+    int dither11[4] = {  0xc,  0x4,  0xe,  0x6 };
+    int dither12[4] = {  0x3,  0xb,  0x1,  0x9 };
+    int dither13[4] = {  0xf,  0x7,  0xd,  0x5 };
+
+    int dither20[4] = {  0x0, 0x10,  0x4, 0x14 };
+    int dither21[4] = { 0x18,  0x8, 0x1c,  0xc };
+    int dither22[4] = {  0x6, 0x16,  0x2, 0x12 };
+    int dither23[4] = { 0x1e,  0xe, 0x1a,  0xa };
 
     /* other matrices that can be interesting, either for debugging or for effects */
     //int dither[4][4] = { { 0, 8, 2, 10 }, { 12, 4, 14, 16 }, { 3, 11, 1, 9}, {15, 7, 13, 5} };
@@ -1128,6 +1089,7 @@ static void ConvertYUV420RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     //int dither[4][4] = { { 15, 15, 0, 0 }, { 15, 15, 0, 0 }, { 0, 0, 15, 15 }, { 0, 0, 15, 15 } };
     //int dither[4][4] = { { 8, 8, 8, 8 }, { 8, 8, 8, 8 }, { 8, 8, 8, 8 }, { 8, 8, 8, 8 } };
     //int dither[4][4] = { { 0, 1, 2, 3 }, { 4, 5, 6, 7 }, { 8, 9, 10, 11 }, { 12, 13, 14, 15 } };
+
     /*
      * Initialize some values  - i_pic_line_width will store the line skip
      */
