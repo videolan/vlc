@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.35 2003/06/09 12:33:16 asmax Exp $
+ * $Id: skin_main.cpp,v 1.36 2003/06/09 21:14:17 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -232,25 +232,29 @@ static void Run( intf_thread_t *p_intf )
     if( skin_last == NULL || ! Loader->Load( skin_last ) )
     {
         // Too bad, it failed. Let's try with the default theme
-#if 0
-        if( ! Loader->Load( DEFAULT_SKIN_FILE ) )
-#else
+//        if( ! Loader->Load( DEFAULT_SKIN_FILE ) )
 #ifdef WIN32
         string default_dir = (string)p_intf->p_libvlc->psz_vlcpath +
                              DIRECTORY_SEPARATOR + "skins" +
                              DIRECTORY_SEPARATOR + "default" +
                              DIRECTORY_SEPARATOR + "theme.xml";
-#else
-// FIXME: find VLC directory 
-        string default_dir = (string)"./share" +
-                             DIRECTORY_SEPARATOR + "skins" +
-                             DIRECTORY_SEPARATOR + "default" +
-                             DIRECTORY_SEPARATOR + "theme.xml";
-#endif
         if( ! Loader->Load( default_dir ) )
-#endif
         {
             // Last chance: the user can  select a new theme file
+#else
+        string user_skin = (string)p_intf->p_vlc->psz_homedir +
+                              DIRECTORY_SEPARATOR + CONFIG_DIR +
+                              DIRECTORY_SEPARATOR + "skins" +
+                              DIRECTORY_SEPARATOR + "default" +
+                              DIRECTORY_SEPARATOR + "theme.xml";
+
+        string default_skin = (string)DATA_PATH +
+                              DIRECTORY_SEPARATOR + "skins" +
+                              DIRECTORY_SEPARATOR + "default" +
+                              DIRECTORY_SEPARATOR + "theme.xml";
+        if( !Loader->Load( user_skin ) && !Loader->Load( default_skin ) )
+        {
+#endif
 #ifndef BASIC_SKINS
             wxMutexGuiEnter();
             wxFileDialog dialog( NULL,
