@@ -10,3 +10,4 @@ SOURCES_wav = wav.c
 SOURCES_aac = aac.c
 SOURCES_mkv = mkv.cpp
 SOURCES_sdp = sdp.c
+SOURCES_livedotcom = livedotcom.cpp
