@@ -2,7 +2,7 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.24 2003/12/22 14:32:55 sam Exp $
+ * $Id: sdl.c,v 1.25 2004/01/25 17:32:29 murray Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Sam Hocevar <sam@zoy.org>
@@ -65,7 +65,7 @@ static void SDLCallback ( void *, byte_t *, int );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Simple DirectMedia Layer audio output") );
+    set_description( _("Simple DirectMedia Layer Audio Output") );
     set_capability( "audio output", 40 );
     add_shortcut( "sdl" );
     set_callbacks( Open, Close );
@@ -173,7 +173,7 @@ static int Open ( vlc_object_t *p_this )
         {
             var_Create( p_aout, "audio-device",
                         VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-            text.psz_string = _("Audio device");
+            text.psz_string = _("Audio Device");
             var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
 
             val.i_int = (obtained.channels == 2) ? AOUT_VAR_STEREO :
@@ -191,7 +191,7 @@ static int Open ( vlc_object_t *p_this )
         /* First launch. */
         var_Create( p_aout, "audio-device",
                     VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-        text.psz_string = _("Audio device");
+        text.psz_string = _("Audio Device");
         var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
 
         val.i_int = AOUT_VAR_STEREO;

@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.36 2003/10/25 00:49:13 sam Exp $
+ * $Id: alsa.c,v 1.37 2004/01/25 17:32:29 murray Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -79,7 +79,7 @@ struct aout_sys_t
 /* Why not ? --Bozo */
 /* Right. --Meuuh */
 
-#define DEFAULT_ALSA_DEVICE "default"
+#define DEFAULT_ALSA_DEVICE N_("default")
 
 /*****************************************************************************
  * Local prototypes
@@ -96,8 +96,8 @@ static void ALSAFill     ( aout_instance_t * );
 vlc_module_begin();
     add_category_hint( N_("ALSA"), NULL, VLC_FALSE );
     add_string( "alsadev", DEFAULT_ALSA_DEVICE, aout_FindAndRestart,
-                N_("ALSA device name"), NULL, VLC_FALSE );
-    set_description( _("ALSA audio output") );
+                N_("ALSA Device Name"), NULL, VLC_FALSE );
+    set_description( _("ALSA Audio Output") );
     set_capability( "audio output", 150 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -114,7 +114,7 @@ static void Probe( aout_instance_t * p_aout,
     int i_ret;
 
     var_Create ( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-    text.psz_string = _("Audio device");
+    text.psz_string = _("Audio Device");
     var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
 
     /* We'll open the audio device in non blocking mode so we can just exit

@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.61 2003/12/22 14:32:55 sam Exp $
+ * $Id: oss.c,v 1.62 2004/01/25 17:32:29 murray Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Sam Hocevar <sam@zoy.org>
@@ -109,7 +109,7 @@ vlc_module_begin();
     add_file( "dspdev", "/dev/dsp", aout_FindAndRestart,
               N_("OSS dsp device"), NULL, VLC_FALSE );
     add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT, VLC_TRUE );
-    set_description( _("Linux OSS audio output") );
+    set_description( _("Linux OSS Audio Output") );
     set_capability( "audio output", 100 );
 
     add_shortcut( "oss" );
@@ -126,7 +126,7 @@ static void Probe( aout_instance_t * p_aout )
     int i_format, i_nb_channels;
 
     var_Create( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-    text.psz_string = _("Audio device");
+    text.psz_string = _("Audio Device");
     var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Test for multi-channel. */

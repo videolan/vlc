@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.24 2003/12/15 21:35:37 gbazin Exp $
+ * $Id: directx.c,v 1.25 2004/01/25 17:32:29 murray Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -206,7 +206,7 @@ static void InterleaveS16     ( int16_t *, int16_t *, int *, int );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("DirectX audio output") );
+    set_description( _("DirectX Audio Output") );
     set_capability( "audio output", 100 );
     add_shortcut( "directx" );
     set_callbacks( OpenAudio, CloseAudio );
@@ -380,7 +380,7 @@ static void Probe( aout_instance_t * p_aout )
     DWORD ui_speaker_config;
 
     var_Create( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-    text.psz_string = _("Audio device");
+    text.psz_string = _("Audio Device");
     var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Test for 5.1 support */

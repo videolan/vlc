@@ -2,7 +2,7 @@
  * coreaudio.c: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: coreaudio.c,v 1.7 2003/11/25 21:21:36 hartman Exp $
+ * $Id: coreaudio.c,v 1.8 2004/01/25 17:32:29 murray Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -215,13 +215,13 @@ static OSStatus StreamListener   ( AudioStreamID inStream,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ADEV_TEXT N_("Audio device")
+#define ADEV_TEXT N_("Audio Device")
 #define ADEV_LONGTEXT N_("Choose a number corresponding to the number of an " \
-    "audio device, as listed in your 'audio device' menu. This device will " \
+    "audio device, as listed in your 'Audio Device' menu. This device will " \
     "then be used by default for audio playback.")
 
 vlc_module_begin();
-    set_description( _("CoreAudio output") );
+    set_description( _("CoreAudio Output") );
     set_capability( "audio output", 100 );
     set_callbacks( Open, Close );
     add_category_hint( N_("Audio"), NULL, VLC_FALSE );
@@ -653,7 +653,7 @@ static int InitHardwareInfo( aout_instance_t * p_aout )
                                         &i_param_size, NULL );
     if( err != noErr )
     {
-        msg_Err( p_aout, "Could not get number of devices: [%4.4s]",
+        msg_Err( p_aout, "could not get number of devices: [%4.4s]",
                  (char *)&err );
         vlc_mutex_unlock( &p_sys->lock );
         return( VLC_EGENERIC );
@@ -684,7 +684,7 @@ static int InitHardwareInfo( aout_instance_t * p_aout )
                                     &i_param_size, (void *)p_devices );
     if( err != noErr )
     {
-        msg_Err( p_aout, "Could not get the device ID's: [%4.4s]",
+        msg_Err( p_aout, "could not get the device ID's: [%4.4s]",
                  (char *)&err );
         free( (void *)p_devices );
         vlc_mutex_unlock( &p_sys->lock );
@@ -696,7 +696,7 @@ static int InitHardwareInfo( aout_instance_t * p_aout )
                                     &i_param_size, (void *)&devid_def );
     if( err != noErr )
     {
-        msg_Err( p_aout, "Could not get default audio device: [%4.4s]",
+        msg_Err( p_aout, "could not get default audio device: [%4.4s]",
                  (char *)&err );
         free( (void *)p_devices );
         vlc_mutex_unlock( &p_sys->lock );
@@ -772,7 +772,7 @@ static int InitDeviceInfo( UInt32 i_dev, aout_instance_t * p_aout )
                                       &i_param_size, NULL ); 
     if( err != noErr )
     {
-        msg_Err( p_aout, "Could not get size of devicename: [%4.4s]",
+        msg_Err( p_aout, "could not get size of devicename: [%4.4s]",
                  (char *)&err ); 
         return( VLC_EGENERIC );
     }
@@ -791,7 +791,7 @@ static int InitDeviceInfo( UInt32 i_dev, aout_instance_t * p_aout )
                                   &i_param_size, p_dev->psz_device_name ); 
     if( err != noErr )
     {
-        msg_Err( p_aout, "Could not get devicename: [%4.4s]",
+        msg_Err( p_aout, "could not get devicename: [%4.4s]",
                  (char *)&err );
         free( (void *)p_dev->psz_device_name );
         return( VLC_EGENERIC );
@@ -805,7 +805,7 @@ static int InitDeviceInfo( UInt32 i_dev, aout_instance_t * p_aout )
                                       &i_param_size, NULL );
     if( err != noErr )
     {
-        msg_Err( p_aout, "Could not get size of stream configuration: [%4.4s]",
+        msg_Err( p_aout, "could not get size of stream configuration: [%4.4s]",
                  (char *)&err );
         free( (void *)p_dev->psz_device_name );
         return( VLC_EGENERIC );
@@ -824,7 +824,7 @@ static int InitDeviceInfo( UInt32 i_dev, aout_instance_t * p_aout )
                                   &i_param_size, p_buffer_list );
     if( err != noErr )
     {
-        msg_Err( p_aout, "Could not get stream configuration: [%4.4s]",
+        msg_Err( p_aout, "could not get stream configuration: [%4.4s]",
                  (char *)&err );
         free( (void *)p_dev->psz_device_name );
         free( (void *)p_buffer_list );
@@ -995,7 +995,7 @@ static int InitStreamInfo( UInt32 i_dev, aout_instance_t * p_aout,
                                       &i_param_size, NULL );
     if( err != noErr )
     {
-        msg_Err( p_aout, "Could not retrieve the number of streams: [%4.4s]",
+        msg_Err( p_aout, "could not retrieve the number of streams: [%4.4s]",
                  (char *)&err );
         return( VLC_EGENERIC );
     }
@@ -1019,7 +1019,7 @@ static int InitStreamInfo( UInt32 i_dev, aout_instance_t * p_aout,
                                   &i_param_size, P_STREAMS );
     if( err != noErr )
     {
-        msg_Err( p_aout, "Could no get the streams: [%4.4s]",
+        msg_Err( p_aout, "could no get the streams: [%4.4s]",
                  (char *)&err );
         free( (void *)P_STREAMS );
         return( VLC_EGENERIC );
@@ -1141,7 +1141,7 @@ static int InitDevice( aout_instance_t * p_aout )
                                   &i_param_size, &p_sys->b_dev_alive );
     if( err != noErr )
     {
-        msg_Err( p_aout, "Could not check whether device is alive: %4.4s",
+        msg_Err( p_aout, "could not check whether device is alive: %4.4s",
                  (char *)&err );
         return( VLC_EGENERIC );
     }
@@ -1171,7 +1171,7 @@ static int InitDevice( aout_instance_t * p_aout )
                                   (void *)&p_sys->sfmt_revert );
     if( err != noErr )
     {
-        msg_Err( p_aout, "Could not retrieve the original streamformat: [%4.4s]",
+        msg_Err( p_aout, "could not retrieve the original streamformat: [%4.4s]",
                  (char *)&err );
         return( VLC_EGENERIC ); 
     }
@@ -1212,7 +1212,7 @@ static int InitDevice( aout_instance_t * p_aout )
                                       &P_STREAMS[i_stream] ); 
         if( err != noErr )
         {
-            msg_Err( p_aout, "Could not set the stream format: [%4.4s]",
+            msg_Err( p_aout, "could not set the stream format: [%4.4s]",
                      (char *)&err );
             vlc_mutex_unlock( &w.lock );
             vlc_mutex_destroy( &w.lock );
@@ -1409,7 +1409,7 @@ static OSStatus DeviceListener( AudioDeviceID inDevice,
                                           &i_param_size, &p_sys->b_dev_alive );
             if( err != noErr )
             {
-                msg_Err( p_aout, "Could not determine wether device is alive: %4.4s",
+                msg_Err( p_aout, "could not determine wether device is alive: %4.4s",
                          (char *)&err );
             }
         }
@@ -1470,7 +1470,7 @@ static void InitDeviceVar( aout_instance_t * p_aout, int i_option,
     }
 
     var_Create( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-    text.psz_string = _("Audio device");
+    text.psz_string = ADEV_TEXT;
     var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
 
     for( i = 0; i < p_sys->i_options; i++ )

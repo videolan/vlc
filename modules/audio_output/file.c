@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.24 2003/11/05 00:39:16 gbazin Exp $
+ * $Id: file.c,v 1.25 2004/01/25 17:32:29 murray Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -79,7 +79,7 @@ static void    Play        ( aout_instance_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define FORMAT_TEXT N_("Output format")
+#define FORMAT_TEXT N_("Output Format")
 #define FORMAT_LONGTEXT N_("One of \"u8\", \"s8\", \"u16\", \"s16\", " \
                         "\"u16_le\", \"s16_le\", \"u16_be\", " \
                         "\"s16_be\", \"fixed32\", \"float32\" or \"spdif\"")
@@ -101,7 +101,7 @@ static int format_int[] = { VLC_FOURCC('u','8',' ',' '),
                             VLC_FOURCC('f','l','3','2'),
                             VLC_FOURCC('s','p','i','f') };
 
-#define FILE_TEXT N_("Output file")
+#define FILE_TEXT N_("Output File")
 #define FILE_LONGTEXT N_("File to which the audio samples will be written to")
 
 vlc_module_begin();
@@ -159,7 +159,7 @@ static int Open( vlc_object_t * p_this )
 
     if ( *ppsz_compare == NULL )
     {
-        msg_Err( p_aout, "Cannot understand the format string (%s)",
+        msg_Err( p_aout, "cannot understand the format string (%s)",
                  psz_format );
         fclose( p_aout->output.p_sys->p_file );
         free( p_aout->output.p_sys );

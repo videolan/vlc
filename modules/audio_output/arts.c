@@ -2,7 +2,7 @@
  * arts.c : aRts module
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: arts.c,v 1.18 2003/03/30 18:14:36 gbazin Exp $
+ * $Id: arts.c,v 1.19 2004/01/25 17:32:29 murray Exp $
  *
  * Authors: Emmanuel Blindauer <manu@agat.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -63,7 +63,7 @@ static void Play         ( aout_instance_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-   set_description( _("aRts audio output") );
+   set_description( _("aRts Audio Output") );
    set_capability( "audio output", 50 );
    set_callbacks( Open, Close );
 vlc_module_end();
