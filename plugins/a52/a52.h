@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.h,v 1.1 2002/02/06 20:44:22 gbazin Exp $
+ * $Id: a52.h,v 1.2 2002/03/12 20:39:50 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -31,12 +31,11 @@ typedef struct a52_adec_thread_s
     /*
      * liba52 properties
      */
-    a52_state_t a52_state;
+    a52_state_t *p_a52_state;
     int         frame_size;
     int         flags;
     int         sample_rate;
     int         bit_rate;
-    sample_t    *p_decoded_samples;
 
     /* The bit stream structure handles the PES stream at the bit level */
     bit_stream_t        bit_stream;

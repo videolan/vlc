@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.5 2002/02/24 22:06:50 sam Exp $
+ * $Id: a52.c,v 1.6 2002/03/12 20:39:50 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -187,8 +187,8 @@ static int InitThread( a52_adec_thread_t * p_a52_adec )
     intf_WarnMsg( 3, "a52: InitThread" );
 
     /* Initialize liba52 */
-    p_a52_adec->p_decoded_samples = a52_init( 0 );
-    if( p_a52_adec->p_decoded_samples == NULL )
+    p_a52_adec->p_a52_state = a52_init( 0 );
+    if( p_a52_adec->p_a52_state == NULL )
     {
         intf_ErrMsg ( "a52 error: InitThread() unable to initialize "
                       "liba52" );
@@ -266,15 +266,15 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
               p_a52_adec->frame_size - 7 );
 
     /* do the actual decoding now */
-    a52_frame( &p_a52_adec->a52_state, p_a52_adec->p_frame_buffer,
+    a52_frame( p_a52_adec->p_a52_state, p_a52_adec->p_frame_buffer,
                &p_a52_adec->flags, &sample_level, 384 );
 
     for( i = 0; i < 6; i++ )
     {
-        if( a52_block(&p_a52_adec->a52_state, p_a52_adec->p_decoded_samples) )
+        if( a52_block( p_a52_adec->p_a52_state ) )
             intf_WarnMsg( 5, "a52: a52_block failed for block %i", i );
 
-        float2s16_2( p_a52_adec->p_decoded_samples,
+        float2s16_2( a52_samples( p_a52_adec->p_a52_state ),
                      ((int16_t *)p_buffer) + i * 256 * p_a52_adec->i_channels );
     }
 
@@ -306,6 +306,7 @@ static void EndThread (a52_adec_thread_t *p_a52_adec)
         vlc_mutex_unlock (&(p_a52_adec->p_aout_fifo->data_lock));
     }
 
+    a52_free( p_a52_adec->p_a52_state );
     free( p_a52_adec );
 
 }
