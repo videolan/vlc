@@ -2,7 +2,7 @@
  * aout_darwin.c : Darwin audio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.c,v 1.4 2001/10/08 16:20:25 massiot Exp $
+ * $Id: aout_macosx.c,v 1.5 2001/10/30 23:45:08 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *
@@ -34,6 +34,7 @@
  * Find 8 bits files and adapt output
  */
  
+#define MODULE_NAME macosx
 #include "modules_inner.h"
 
 /*****************************************************************************
