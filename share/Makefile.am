@@ -103,4 +103,7 @@ DIST_http = \
 	http/vlm/index.html \
 	http/vlm/new.html \
 	http/style.css \
+	http/favico.ico \
+	http/cone_minus.png \
+	http/cone_plus.png \
 	$(NULL)
