@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.10 2003/03/30 18:14:38 gbazin Exp $
+ * $Id: sap.c,v 1.11 2003/05/25 18:02:20 nitrox Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *
@@ -89,7 +89,7 @@ static int  sess_toitem( intf_thread_t *, sess_descr_t * );
 
 /* sap/sdp related functions */
 static int parse_sap ( char * );
-static int packet_handle ( intf_thread_t *, char * );
+static int packet_handle ( intf_thread_t *, char *, int );
 static sess_descr_t *  parse_sdp( intf_thread_t *, char * ) ;
 
 /* specific sdp fields parsing */
@@ -212,7 +212,7 @@ static void Run( intf_thread_t *p_intf )
         }
         buffer[i_read] = '\0';
 
-        packet_handle( p_intf, buffer );
+        packet_handle( p_intf, buffer, i_read );
 
     }
 
@@ -451,12 +451,20 @@ static void mfield_parse( char *psz_mfield, char **ppsz_proto,
  * parse_sap : Takes care of the SAP headers
  ***********************************************************************
  * checks if the packet has the true headers ;
+ * returns the SAP header lenhth
  ***********************************************************************/
 
 static int parse_sap( char *p_packet )
-{  /* Dummy Parser : does nothing !*/
+{
+    // According to RFC 2974
+    int i_hlen = 4;                           // Minimum header length is 4
+    i_hlen += (p_packet[0] & 0x10) ? 16 : 4;  // Address type IPv6=16bytes
+    i_hlen +=  p_packet[1];                   // Authentification length
 
-    return( VLC_TRUE );
+    //Looks for the first '\0' byte after length
+    for(;p_packet[i_hlen]!='\0'; i_hlen++);
+
+    return(i_hlen);
 }
 
 /*************************************************************************
@@ -464,18 +472,22 @@ static int parse_sap( char *p_packet )
  * the understated session
  *************************************************************************/
 
-static int packet_handle( intf_thread_t * p_intf, char *p_packet )
+static int packet_handle( intf_thread_t * p_intf, char *p_packet, int i_len )
 {
     sess_descr_t * p_sd;
+    int i_hlen;                             // Header length
 
-    if( parse_sap( p_packet ) )
+    i_hlen = parse_sap(p_packet);
+
+    if( (i_hlen > 0) && (i_hlen < i_len) )
     {
-        p_sd = parse_sdp( p_intf, p_packet);
-
-        sess_toitem ( p_intf, p_sd );
-
-        free_sd ( p_sd );
-        return VLC_TRUE;
+        p_sd = parse_sdp( p_intf, p_packet + i_hlen +1);
+        if(p_sd)
+        {
+            sess_toitem ( p_intf, p_sd );
+            free_sd ( p_sd );
+            return VLC_TRUE;
+        }
     }
 
     return VLC_FALSE; // Invalid Packet
@@ -493,6 +505,13 @@ static int packet_handle( intf_thread_t * p_intf, char *p_packet )
 static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
 {
     sess_descr_t *  sd;
+
+    // According to RFC 2327, the first bytes should be exactly "v="
+    if((p_packet[0] != 'v') || (p_packet[1] != '='))
+    {
+        msg_Warn(p_intf, "Bad SDP packet");
+        return NULL;
+    }
 
     if( ( sd = malloc( sizeof(sess_descr_t) ) ) == NULL )
     {
@@ -513,7 +532,6 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
     sd->psz_connection = NULL;
 
     sd->i_media = 0;
-
 
     while( *p_packet != '\0'  )
     {
@@ -578,7 +596,7 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
                     {
                         sd->pp_media =
                             realloc( sd->pp_media,
-                                     sizeof( media_descr_t ) * ( sd->i_media + 1 ) );
+                               sizeof( media_descr_t ) * ( sd->i_media + 1 ) );
                     }
                     else
                     {
@@ -597,11 +615,11 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
                 case( 'c' ):
                     if( sd->i_media <= 0 )
                     {
-                        sd->psz_connection = strndup( &p_packet[2], i_field_len );
+                        FIELD_COPY(sd->psz_connection);
                     }
                     else
                     {
-                        sd->pp_media[sd->i_media - 1]->psz_mediaconnection = strndup( &p_packet[2], i_field_len );
+                        FIELD_COPY(sd->pp_media[sd->i_media - 1]->psz_mediaconnection);
                     }
                    break;
                 default:
