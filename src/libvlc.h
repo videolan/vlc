@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.32 2003/01/06 00:37:30 garf Exp $
+ * $Id: libvlc.h,v 1.33 2003/01/07 13:26:22 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -58,7 +58,7 @@
 
 #define PLUGIN_PATH_TEXT N_("plugin search path")
 #define PLUGIN_PATH_LONGTEXT N_( \
-    "This option allows you to specify an additional path for vlc to look" \
+    "This option allows you to specify an additional path for vlc to look " \
     "for its plugins.")
 
 #define AOUT_TEXT N_("audio output module")

@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-01-06 22:35+0100\n"
+"POT-Creation-Date: 2003-01-07 11:33+0100\n"
 "PO-Revision-Date: 2002-28-02 23.35+0100\n"
 "Last-Translator: Sigmund Augdal <sigmunau@idi.ntnu.no>.\n"
 "Language-Team: \n"
@@ -12,49 +12,50 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/libvlc.c:252
+#. Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
+#: src/libvlc.c:254
 msgid "C"
 msgstr "no"
 
 #. Usage
-#: src/libvlc.c:282 src/libvlc.c:1256
+#: src/libvlc.c:284 src/libvlc.c:1258
 #, c-format
 msgid ""
 "Usage: %s [options] [items]...\n"
 "\n"
 msgstr ""
 
-#: src/libvlc.c:1113 src/misc/configuration.c:916
+#: src/libvlc.c:1115 src/misc/configuration.c:916
 msgid "string"
 msgstr ""
 
-#: src/libvlc.c:1131 src/misc/configuration.c:901
+#: src/libvlc.c:1133 src/misc/configuration.c:901
 msgid "integer"
 msgstr ""
 
-#: src/libvlc.c:1134 src/misc/configuration.c:908
+#: src/libvlc.c:1136 src/misc/configuration.c:908
 msgid "float"
 msgstr ""
 
-#: src/libvlc.c:1140
+#: src/libvlc.c:1142
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc.c:1141
+#: src/libvlc.c:1143
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc.c:1231 src/libvlc.c:1286 src/libvlc.c:1310
+#: src/libvlc.c:1233 src/libvlc.c:1288 src/libvlc.c:1312
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
 msgstr ""
 
-#: src/libvlc.c:1259
+#: src/libvlc.c:1261
 msgid "[module]              [description]\n"
 msgstr ""
 
-#: src/libvlc.c:1304
+#: src/libvlc.c:1306
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -124,7 +125,7 @@ msgstr ""
 
 #: src/libvlc.h:61
 msgid ""
-"This option allows you to specify an additional path for vlc to lookfor its "
+"This option allows you to specify an additional path for vlc to look for its "
 "plugins."
 msgstr ""
 
@@ -2231,7 +2232,9 @@ msgstr "Moduler"
 msgid ""
 "Sorry, the module manager isn't functional yet. Please retry in a later "
 "version."
-msgstr "Beklager, modul håndtereren virker ikke ennå. Vennligst prøv på nytt i en senere versjon."
+msgstr ""
+"Beklager, modul håndtereren virker ikke ennå. Vennligst prøv på nytt i en "
+"senere versjon."
 
 #: modules/gui/gtk/gnome_interface.c:1987
 #: modules/gui/gtk/gnome_interface.c:2128 modules/gui/gtk/gtk_interface.c:2414

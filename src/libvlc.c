@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.55 2002/12/27 00:17:48 massiot Exp $
+ * $Id: libvlc.c,v 1.56 2003/01/07 13:26:22 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -249,6 +249,8 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
      * Support for gettext
      */
     SetLanguage( "" );
+
+    /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
     msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
 
     /* Hack: insert the help module here */
@@ -1283,8 +1285,8 @@ static void ListModules( vlc_t *p_this )
     vlc_list_release( &list );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-        fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
-        getchar();
+    fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
+    getchar();
 #endif
 }
 

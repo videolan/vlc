@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-01-06 22:35+0100\n"
+"POT-Creation-Date: 2003-01-07 11:33+0100\n"
 "PO-Revision-Date: 2002-07-12 11:49+0100\n"
 "Last-Translator: Arkadiusz Lipiec <alipiec@elka.pw.edu.pl>\n"
 "Language-Team: polish <pl@li.org>\n"
@@ -13,12 +13,13 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/libvlc.c:252
+#. Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
+#: src/libvlc.c:254
 msgid "C"
 msgstr "pl"
 
 #. Usage
-#: src/libvlc.c:282 src/libvlc.c:1256
+#: src/libvlc.c:284 src/libvlc.c:1258
 #, fuzzy, c-format
 msgid ""
 "Usage: %s [options] [items]...\n"
@@ -27,27 +28,27 @@ msgstr ""
 "U¿ycie: %s [opcje] [parametry] [plik]...\n"
 "\n"
 
-#: src/libvlc.c:1113 src/misc/configuration.c:916
+#: src/libvlc.c:1115 src/misc/configuration.c:916
 msgid "string"
 msgstr "napis"
 
-#: src/libvlc.c:1131 src/misc/configuration.c:901
+#: src/libvlc.c:1133 src/misc/configuration.c:901
 msgid "integer"
 msgstr "liczba ca³kowita"
 
-#: src/libvlc.c:1134 src/misc/configuration.c:908
+#: src/libvlc.c:1136 src/misc/configuration.c:908
 msgid "float"
 msgstr "liczba zmiennoprz."
 
-#: src/libvlc.c:1140
+#: src/libvlc.c:1142
 msgid " (default enabled)"
 msgstr " (domy¶lnie w³±czone)"
 
-#: src/libvlc.c:1141
+#: src/libvlc.c:1143
 msgid " (default disabled)"
 msgstr " (domy¶lnie wy³±czone)"
 
-#: src/libvlc.c:1231 src/libvlc.c:1286 src/libvlc.c:1310
+#: src/libvlc.c:1233 src/libvlc.c:1288 src/libvlc.c:1312
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -55,11 +56,11 @@ msgstr ""
 "\n"
 "Naci¶nij klawisz ENTER aby kontynuowaæ...\n"
 
-#: src/libvlc.c:1259
+#: src/libvlc.c:1261
 msgid "[module]              [description]\n"
 msgstr "[modu³]               [opis]\n"
 
-#: src/libvlc.c:1304
+#: src/libvlc.c:1306
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -85,7 +86,9 @@ msgstr "modu³ interfejsu"
 msgid ""
 "This option allows you to select the interface used by vlc. The default "
 "behavior is to automatically select the best module available."
-msgstr "Ta opcja umo¿liwia wybranie interfejsu u¿ywanego przez vlc. Domy¶lnym zachowaniem jest automatyczny wybór najlepszego dostêpnego modu³u."
+msgstr ""
+"Ta opcja umo¿liwia wybranie interfejsu u¿ywanego przez vlc. Domy¶lnym "
+"zachowaniem jest automatyczny wybór najlepszego dostêpnego modu³u."
 
 #: src/libvlc.h:40
 msgid "verbosity (0,1,2)"
@@ -113,7 +116,9 @@ msgstr "kolorowe komunikaty"
 msgid ""
 "When this option is turned on, the messages sent to the console will be "
 "colorized. Your terminal needs Linux color support for this to work."
-msgstr "Po w³±czeniu tej opcji, komunikaty wysy³ane do konsoli bêd± kolorozyowane. Terminal powinien obs³ugiwaæ kolory aby funkcja zadzia³a³a."
+msgstr ""
+"Po w³±czeniu tej opcji, komunikaty wysy³ane do konsoli bêd± kolorozyowane. "
+"Terminal powinien obs³ugiwaæ kolory aby funkcja zadzia³a³a."
 
 #: src/libvlc.h:54
 msgid "interface default search path"
@@ -123,17 +128,22 @@ msgstr "domy¶lna ¶cie¿ka wyszukiwania interfejsu"
 msgid ""
 "This option allows you to set the default path that the interface will open "
 "when looking for a file."
-msgstr "Ta opcja umo¿liwia ustawienie domy¶lnej ¶cie¿ki, któr± interfejs bêdzie otwiera³ w poszukiwaniu pliku."
+msgstr ""
+"Ta opcja umo¿liwia ustawienie domy¶lnej ¶cie¿ki, któr± interfejs bêdzie "
+"otwiera³ w poszukiwaniu pliku."
 
 #: src/libvlc.h:59
 msgid "plugin search path"
 msgstr "¶cie¿ka wyszukiwania wtyczek"
 
 #: src/libvlc.h:61
+#, fuzzy
 msgid ""
-"This option allows you to specify an additional path for vlc to lookfor its "
+"This option allows you to specify an additional path for vlc to look for its "
 "plugins."
-msgstr "Ta opcja umo¿liwia ustawienie dodatkowej ¶cie¿ki dla vlc, wykorzystywanej przy wyszukiwaniu wtyczek programu."
+msgstr ""
+"Ta opcja umo¿liwia ustawienie dodatkowej ¶cie¿ki dla vlc, wykorzystywanej "
+"przy wyszukiwaniu wtyczek programu."
 
 #: src/libvlc.h:64
 msgid "audio output module"
@@ -143,7 +153,9 @@ msgstr "modu³ wyj¶ciowy d¼wiêku"
 msgid ""
 "This option allows you to select the audio output method used by vlc. The "
 "default behavior is to automatically select the best method available."
-msgstr "Ta opcja umo¿liwia wybranie metody wyj¶ciowej d¼wiêku u¿ywanej przez vlc. Domy¶lnym zachowaniem jest automatyczne wybranie najlepszej dostêpnej metody."
+msgstr ""
+"Ta opcja umo¿liwia wybranie metody wyj¶ciowej d¼wiêku u¿ywanej przez vlc. "
+"Domy¶lnym zachowaniem jest automatyczne wybranie najlepszej dostêpnej metody."
 
 #: src/libvlc.h:70
 msgid "enable audio"
@@ -153,7 +165,9 @@ msgstr "w³±czenie d¼wiêku"
 msgid ""
 "You can completely disable the audio output. In this case the audio decoding "
 "stage won't be done, and it will save some processing power."
-msgstr "Mo¿na ca³kiem wy³±czyæ d¼wiêk. W tym przypadku etap dekodowania d¼wiêku nie zostanie wykonany, wiêc bêdzie mo¿na zaoszczêdziæ trochê mocy procesora."
+msgstr ""
+"Mo¿na ca³kiem wy³±czyæ d¼wiêk. W tym przypadku etap dekodowania d¼wiêku nie "
+"zostanie wykonany, wiêc bêdzie mo¿na zaoszczêdziæ trochê mocy procesora."
 
 #: src/libvlc.h:75
 msgid "force mono audio"
@@ -170,7 +184,9 @@ msgstr "g³o¶no¶æ wyj¶cia d¼wiêku"
 #: src/libvlc.h:80
 msgid ""
 "You can set the default audio output volume here, in a range from 0 to 1024."
-msgstr "Mo¿na ustawiæ domy¶lny poziom g³o¶no¶ci wyj¶cia d¼wiêku w zakresie od 0 do 1024."
+msgstr ""
+"Mo¿na ustawiæ domy¶lny poziom g³o¶no¶ci wyj¶cia d¼wiêku w zakresie od 0 do "
+"1024."
 
 #: src/libvlc.h:83
 msgid "audio output format"
@@ -209,7 +225,9 @@ msgstr "czêstotliwo¶æ wyj¶ciowa d¼wiêku (Hz)"
 msgid ""
 "You can force the audio output frequency here. Common values are 48000, "
 "44100, 32000, 22050, 16000, 11025, 8000."
-msgstr "W tym miejscu mo¿na wymusiæ czêstotliwo¶æ wyj¶ciow± d¼wiêku. Zwyk³ymi warto¶ciami s± 48000, 44100, 32000, 22050, 16000, 11025, 8000."
+msgstr ""
+"W tym miejscu mo¿na wymusiæ czêstotliwo¶æ wyj¶ciow± d¼wiêku. Zwyk³ymi "
+"warto¶ciami s± 48000, 44100, 32000, 22050, 16000, 11025, 8000."
 
 #: src/libvlc.h:101
 msgid "number of channels of audio output"
@@ -229,7 +247,9 @@ msgstr "kompensacja rozsynchronizowania d¼wiêku (w ms)"
 msgid ""
 "This option allows you to delay the audio output. This can be handy if you "
 "notice a lag between the video and the audio."
-msgstr "Ta opcja umo¿liwia opó¼nienie wyj¶cia d¼wiêku. To mo¿e byæ u¿yteczne w razie wystêpowania opó¼nieñ miêdzy d¼wiêkiem a obrazem."
+msgstr ""
+"Ta opcja umo¿liwia opó¼nienie wyj¶cia d¼wiêku. To mo¿e byæ u¿yteczne w razie "
+"wystêpowania opó¼nieñ miêdzy d¼wiêkiem a obrazem."
 
 #: src/libvlc.h:111
 msgid "headphone virtual spatialization effect"
@@ -262,7 +282,9 @@ msgstr "modu³ wyj¶ciowy obrazu"
 msgid ""
 "This option allows you to select the video output method used by vlc. The "
 "default behavior is to automatically select the best method available."
-msgstr "Ta opcja umo¿liwia wybranie metody wyj¶ciowej obrazu u¿ywanej przez vlc. Domy¶lnym zachowaniem jest automatyczny wybór najlepszej dostêpnej metody."
+msgstr ""
+"Ta opcja umo¿liwia wybranie metody wyj¶ciowej obrazu u¿ywanej przez vlc. "
+"Domy¶lnym zachowaniem jest automatyczny wybór najlepszej dostêpnej metody."
 
 #: src/libvlc.h:131
 msgid "enable video"
@@ -272,7 +294,10 @@ msgstr "w³±czony obraz"
 msgid ""
 "You can completely disable the video output. In this case the video decoding "
 "stage won't be done, which will save some processing power."
-msgstr "Mo¿na ca³kowicie wy³±czyæ wyj¶cie obrazu. W tym przypadku etap dekodowania obrazu nie zostanie wykonany, co umo¿liwi zaoszczêdzenie trochê mocy procesora."
+msgstr ""
+"Mo¿na ca³kowicie wy³±czyæ wyj¶cie obrazu. W tym przypadku etap dekodowania "
+"obrazu nie zostanie wykonany, co umo¿liwi zaoszczêdzenie trochê mocy "
+"procesora."
 
 #: src/libvlc.h:136
 msgid "display identifier"
@@ -292,7 +317,9 @@ msgstr "szeroko¶æ obrazu"
 msgid ""
 "You can enforce the video width here. By default vlc will adapt to the video "
 "characteristics."
-msgstr "Mo¿na wymusiæ w tym miejscu szeroko¶æ obrazu. Domy¶lnie vlc zaadoptuje charakterystyki obrazu."
+msgstr ""
+"Mo¿na wymusiæ w tym miejscu szeroko¶æ obrazu. Domy¶lnie vlc zaadoptuje "
+"charakterystyki obrazu."
 
 #: src/libvlc.h:146
 msgid "video height"
@@ -302,7 +329,9 @@ msgstr "wysoko¶æ obrazu"
 msgid ""
 "You can enforce the video height here. By default vlc will adapt to the "
 "video characteristics."
-msgstr "Mo¿na wymusiæ w tym miejscu wysoko¶æ obrazu. Domy¶lnie vlc zaadoptuje charakterystyki obrazu."
+msgstr ""
+"Mo¿na wymusiæ w tym miejscu wysoko¶æ obrazu. Domy¶lnie vlc zaadoptuje "
+"charakterystyki obrazu."
 
 #: src/libvlc.h:151
 msgid "zoom video"
@@ -320,7 +349,9 @@ msgstr "wyj¶cie obrazu w skali szaro¶ci"
 msgid ""
 "When enabled, the color information from the video won't be decoded (this "
 "can also allow you to save some processing power)."
-msgstr "Po w³±czeniu informacje o kolorze z obrazu nie zostan± zdekodowane (pozwala to tak¿e na oszczêdzenie trochê mocy procesora)."
+msgstr ""
+"Po w³±czeniu informacje o kolorze z obrazu nie zostan± zdekodowane (pozwala "
+"to tak¿e na oszczêdzenie trochê mocy procesora)."
 
 #: src/libvlc.h:160
 msgid "fullscreen video output"
@@ -329,7 +360,8 @@ msgstr "wyj¶cie pe³noekranowe obrazu"
 #: src/libvlc.h:162
 msgid ""
 "If this option is enabled, vlc will always start a video in fullscreen mode."
-msgstr "Po w³±czeniu tej opcji, vlc zawsze wy¶wietli obraz w trybie pe³noekranowym."
+msgstr ""
+"Po w³±czeniu tej opcji, vlc zawsze wy¶wietli obraz w trybie pe³noekranowym."
 
 #: src/libvlc.h:165
 msgid "overlay video output"
@@ -340,7 +372,9 @@ msgstr "wyj¶cie obrazu w trybie overlay"
 msgid ""
 "If enabled, vlc will try to take advantage of the overlay capabilities of "
 "your graphic card."
-msgstr "Po w³±czeniu, vlc bêdzie próbowa³ skorzystaæ z w³a¶ciwo¶ci overlay karty graficznej."
+msgstr ""
+"Po w³±czeniu, vlc bêdzie próbowa³ skorzystaæ z w³a¶ciwo¶ci overlay karty "
+"graficznej."
 
 #: src/libvlc.h:170
 msgid "force SPU position"
@@ -350,7 +384,9 @@ msgstr "wymuszanie pozycji SPU"
 msgid ""
 "You can use this option to place the subtitles under the movie, instead of "
 "over the movie. Try several positions."
-msgstr "Mo¿na u¿yæ tej opcji do umieszczania podtytu³ów pod filmem, zamiast nad nim. Wypróbuj ró¿ne pozycje."
+msgstr ""
+"Mo¿na u¿yæ tej opcji do umieszczania podtytu³ów pod filmem, zamiast nad nim. "
+"Wypróbuj ró¿ne pozycje."
 
 #: src/libvlc.h:175
 msgid "video filter module"
@@ -360,7 +396,9 @@ msgstr "modu³ filtru obrazu"
 msgid ""
 "This will allow you to add a post-processing filter to enhance the picture "
 "quality, for instance deinterlacing, or to clone or distort the video window."
-msgstr "Ta opcja umo¿liwia dodawanie filtrów polepszaj±cych jako¶æ obrazu, np. filtr przeciwko migotaniu, lub klonowanie zak³óceñ obrazu."
+msgstr ""
+"Ta opcja umo¿liwia dodawanie filtrów polepszaj±cych jako¶æ obrazu, np. filtr "
+"przeciwko migotaniu, lub klonowanie zak³óceñ obrazu."
 
 #: src/libvlc.h:181
 msgid "source aspect ratio"
@@ -429,7 +467,9 @@ msgstr "port serwera kana³ów"
 
 #: src/libvlc.h:219
 msgid "Indicate here the port on which the VideoLAN Channel Server runs."
-msgstr "Tutaj nale¿y okre¶liæ port na którym uruchomiony jest serwer kana³ów VideoLAN."
+msgstr ""
+"Tutaj nale¿y okre¶liæ port na którym uruchomiony jest serwer kana³ów "
+"VideoLAN."
 
 #: src/libvlc.h:221
 msgid "network interface"
@@ -439,7 +479,9 @@ msgstr "interfejs sieciowy"
 msgid ""
 "If you have several interfaces on your Linux machine and use the VLAN "
 "solution, you may indicate here which interface to use."
-msgstr "Je¶li istnieje kilka interfejsów sieciowych na komputerze i u¿ywane jest rozwi±zanie VLAN, mo¿na wskazaæ który interfejs bêdzie u¿ywany."
+msgstr ""
+"Je¶li istnieje kilka interfejsów sieciowych na komputerze i u¿ywane jest "
+"rozwi±zanie VLAN, mo¿na wskazaæ który interfejs bêdzie u¿ywany."
 
 #: src/libvlc.h:226
 #, fuzzy
@@ -452,7 +494,9 @@ msgid ""
 "If you have several interfaces on your machine and use the multicast "
 "solution, you will probably have to indicate the IP address of your "
 "multicasting interface here."
-msgstr "Je¶li istnieje kilka interfejsów sieciowych na komputerze i u¿ywane jest rozwi±zanie VLAN, mo¿na wskazaæ który interfejs bêdzie u¿ywany."
+msgstr ""
+"Je¶li istnieje kilka interfejsów sieciowych na komputerze i u¿ywane jest "
+"rozwi±zanie VLAN, mo¿na wskazaæ który interfejs bêdzie u¿ywany."
 
 #: src/libvlc.h:232
 msgid "choose program (SID)"
@@ -478,7 +522,9 @@ msgstr "wybierz kana³"
 msgid ""
 "Give the stream number of the audio channel you want to use in a DVD (from 1 "
 "to n)."
-msgstr "Podaj numer strumienia kana³u d¼wiekowego u¿ywany przy odtwarzaniu DVD (od 1 do n)."
+msgstr ""
+"Podaj numer strumienia kana³u d¼wiekowego u¿ywany przy odtwarzaniu DVD (od 1 "
+"do n)."
 
 #: src/libvlc.h:245
 msgid "choose subtitles"
@@ -488,7 +534,9 @@ msgstr "wybierz podtytu³y"
 msgid ""
 "Give the stream number of the subtitle channel you want to use in a DVD "
 "(from 1 to n)."
-msgstr "Podaj numer strumienia kana³u podtytu³ów u¿ywanego przy odtwarzaniu DVD (od 1 do n)."
+msgstr ""
+"Podaj numer strumienia kana³u podtytu³ów u¿ywanego przy odtwarzaniu DVD (od "
+"1 do n)."
 
 #: src/libvlc.h:250
 msgid "DVD device"
@@ -520,7 +568,9 @@ msgstr "wymu¶ IPv6"
 msgid ""
 "If you check this box, IPv6 will be used by default for all UDP and HTTP "
 "connections."
-msgstr "Zaznaczenie tej opcji powoduje, ¿e IPv6 bêdzie u¿ywany domy¶lnie dla wszystkich po³±czeñ UDP i HTTP."
+msgstr ""
+"Zaznaczenie tej opcji powoduje, ¿e IPv6 bêdzie u¿ywany domy¶lnie dla "
+"wszystkich po³±czeñ UDP i HTTP."
 
 #: src/libvlc.h:269
 msgid "force IPv4"
@@ -530,7 +580,9 @@ msgstr "wymu¶ IPv4"
 msgid ""
 "If you check this box, IPv4 will be used by default for all UDP and HTTP "
 "connections."
-msgstr "Zaznaczenie tej opcji powoduje, ¿e IPv4 bêdzie u¿ywany domy¶lnie dla wszystkich po³±czeñ UDP i HTTP."
+msgstr ""
+"Zaznaczenie tej opcji powoduje, ¿e IPv4 bêdzie u¿ywany domy¶lnie dla "
+"wszystkich po³±czeñ UDP i HTTP."
 
 #: src/libvlc.h:274
 msgid "choose prefered codec list"
@@ -616,7 +668,8 @@ msgstr "w³±czona obs³uga 3D Now!"
 msgid ""
 "If your processor supports the 3D Now! instructions set, vlc can take "
 "advantage of them."
-msgstr "Je¶li procesor obs³uguje zbiór istrukcji 3D Now!, mo¿na z nich skorzystaæ."
+msgstr ""
+"Je¶li procesor obs³uguje zbiór istrukcji 3D Now!, mo¿na z nich skorzystaæ."
 
 #: src/libvlc.h:321
 msgid "enable CPU MMX EXT support"
@@ -626,7 +679,9 @@ msgstr "w³±czona obs³uga MMX EXT"
 msgid ""
 "If your processor supports the MMX EXT instructions set, vlc can take "
 "advantage of them."
-msgstr "Je¶li procesor obs³uguje rozszerzony zbiór istrukcji MMX, mo¿na z nich skorzystaæ."
+msgstr ""
+"Je¶li procesor obs³uguje rozszerzony zbiór istrukcji MMX, mo¿na z nich "
+"skorzystaæ."
 
 #: src/libvlc.h:326
 msgid "enable CPU SSE support"
@@ -647,7 +702,8 @@ msgstr "w³±czona obs³uga AltiVec"
 msgid ""
 "If your processor supports the AltiVec instructions set, vlc can take "
 "advantage of them."
-msgstr "Je¶li procesor obs³uguje zbiór istrukcji AltiVec, mo¿na z nich skorzystaæ."
+msgstr ""
+"Je¶li procesor obs³uguje zbiór istrukcji AltiVec, mo¿na z nich skorzystaæ."
 
 #: src/libvlc.h:336
 msgid "play files randomly forever"
@@ -665,7 +721,9 @@ msgstr "w³±czanie listy odtwarzania przy uruchamianiu"
 
 #: src/libvlc.h:343
 msgid "If you want vlc to start playing on startup, then enable this option."
-msgstr "Je¶li vlc ma w³±czaæ odtwarzanie po uruchomieniu wówczas nale¿y zaznaczyæ t± opcjê."
+msgstr ""
+"Je¶li vlc ma w³±czaæ odtwarzanie po uruchomieniu wówczas nale¿y zaznaczyæ t± "
+"opcjê."
 
 #: src/libvlc.h:345
 msgid "enqueue items in playlist"
@@ -675,7 +733,9 @@ msgstr "kolejkowanie obiektów listy odtwarzania"
 msgid ""
 "If you want vlc to add items to the playlist as you open them, then enable "
 "this option."
-msgstr "Je¶li vlc ma dodawaæ pliki do listy odtwarzania po ich otwarciu wówczas nale¿y zaznaczyæ t± opcjê."
+msgstr ""
+"Je¶li vlc ma dodawaæ pliki do listy odtwarzania po ich otwarciu wówczas "
+"nale¿y zaznaczyæ t± opcjê."
 
 #: src/libvlc.h:350
 msgid "loop playlist on end"
@@ -685,7 +745,9 @@ msgstr "zapêtlanie listy odtwarzania"
 msgid ""
 "If you want vlc to keep playing the playlist indefinitely then enable this "
 "option."
-msgstr "Je¶li vlc ma odtwarzaæ w nieskoñczono¶æ listê odtwarzania wówczas nale¿y zaznaczyæ t± opcjê."
+msgstr ""
+"Je¶li vlc ma odtwarzaæ w nieskoñczono¶æ listê odtwarzania wówczas nale¿y "
+"zaznaczyæ t± opcjê."
 
 #: src/libvlc.h:355
 msgid "memory copy module"
@@ -696,7 +758,9 @@ msgstr "modu³ kopiowania pamiêci"
 msgid ""
 "You can select which memory copy module you want to use. By defaultvlc will "
 "select the fastest one supported by your hardware."
-msgstr "Mo¿na wybraæ który z modu³ów kopiowania pamiêci ma byæ u¿ywany. Domy¶lnie vlc wybierze najszybszy obs³ugiwany przez sprzêt modu³."
+msgstr ""
+"Mo¿na wybraæ który z modu³ów kopiowania pamiêci ma byæ u¿ywany. Domy¶lnie "
+"vlc wybierze najszybszy obs³ugiwany przez sprzêt modu³."
 
 #: src/libvlc.h:360
 msgid "access module"
@@ -725,7 +789,10 @@ msgid ""
 "On Windows NT/2K/XP we use a slow mutex implementation but which allows us "
 "to correctely implement condition variables. You can also use the faster "
 "Win9x implementation but you might experience problems with it."
-msgstr "W systemie Windows NT/2K/XP u¿ywana jest wolna lecz poprawna implementacja w±tków pthread, mo¿na tak¿e wybraæ szybsz± implementacjê lecz wówczas mo¿na napotkaæ problemy."
+msgstr ""
+"W systemie Windows NT/2K/XP u¿ywana jest wolna lecz poprawna implementacja "
+"w±tków pthread, mo¿na tak¿e wybraæ szybsz± implementacjê lecz wówczas mo¿na "
+"napotkaæ problemy."
 
 #: src/libvlc.h:375
 msgid "Condition variables implementation for Win9x (developers only)"
@@ -1070,8 +1137,11 @@ msgid ""
 "without disturbing anyone. If you disable the dynamic range compression the "
 "playback will be more adapted to a movie theater or a listening room."
 msgstr ""
-"Kompresja dynamicznego zakresu wyg³adza g³o¶ne d¼wiêki, za¶ ciche czyni g³o¶niejszymi, tak wiêc mo¿na ³atwiej ods³uchiwaæ strumienia w g³o¶nym ¶rodowisku bez przeszkadzania komukolwiek.\n"
-"Je¶li zostanie wy³±czona kompresja dynamicznego zakresu bêdzie to lepiej pasuj±ca opcja w przypadku sali kinowej lub pokoju akustycznego."
+"Kompresja dynamicznego zakresu wyg³adza g³o¶ne d¼wiêki, za¶ ciche czyni "
+"g³o¶niejszymi, tak wiêc mo¿na ³atwiej ods³uchiwaæ strumienia w g³o¶nym "
+"¶rodowisku bez przeszkadzania komukolwiek.\n"
+"Je¶li zostanie wy³±czona kompresja dynamicznego zakresu bêdzie to lepiej "
+"pasuj±ca opcja w przypadku sali kinowej lub pokoju akustycznego."
 
 #: modules/audio_filter/converter/a52tofloat32.c:86
 #, fuzzy
@@ -1386,14 +1456,20 @@ msgstr "modu³ kompensacji ruchu MMXEXT"
 msgid ""
 "This option allows you to select the IDCT module used by this video decoder. "
 "The default behavior is to automatically select the best module available."
-msgstr "Ta opcja umo¿liwia wybranie modu³u IDCT u¿ywanego przez ten dekoder obrazu. Nale¿y zauwa¿yæ, ¿e domy¶lnym zachowaniem jest automatyczny wybór najlepszego dostêpnego modu³u."
+msgstr ""
+"Ta opcja umo¿liwia wybranie modu³u IDCT u¿ywanego przez ten dekoder obrazu. "
+"Nale¿y zauwa¿yæ, ¿e domy¶lnym zachowaniem jest automatyczny wybór "
+"najlepszego dostêpnego modu³u."
 
 #: modules/codec/mpeg_video/parser.c:67
 msgid ""
 "This option allows you to select the motion compensation module used by this "
 "video decoder. The default behavior is to automatically select the best "
 "module available."
-msgstr "Ta opcja umo¿liwia wybranie modu³u kompensacji ruchu u¿ywanego przez ten dekoder obrazu. Domy¶lnym zachowaniem jest automatyczny wybór najlepszego dostêpnego modu³u."
+msgstr ""
+"Ta opcja umo¿liwia wybranie modu³u kompensacji ruchu u¿ywanego przez ten "
+"dekoder obrazu. Domy¶lnym zachowaniem jest automatyczny wybór najlepszego "
+"dostêpnego modu³u."
 
 #: modules/codec/mpeg_video/parser.c:71
 msgid "use additional processors"
@@ -1403,7 +1479,9 @@ msgstr "u¿ywanie dodatkowych procesorów"
 msgid ""
 "This video decoder can benefit from a multiprocessor computer. If you have "
 "one, you can specify the number of processors here."
-msgstr "Tek dekoder obrazu przynosi korzy¶ci przy komputerze wieloprocesorowym.Je¶li posiadasz taki, mo¿na tutaj okre¶liæ liczbê procesorów."
+msgstr ""
+"Tek dekoder obrazu przynosi korzy¶ci przy komputerze wieloprocesorowym.Je¶li "
+"posiadasz taki, mo¿na tutaj okre¶liæ liczbê procesorów."
 
 #: modules/codec/mpeg_video/parser.c:76
 msgid "force synchro algorithm {I|I+|IP|IP+|IPB}"
@@ -1415,7 +1493,10 @@ msgid ""
 "types of picture you want to decode. Please bear in mind that if you select "
 "more pictures than what your CPU is capable to decode, you won't get "
 "anything."
-msgstr "Ta opcja umo¿liwia wymuszenie algorytmu synchronizacji, poprzez bezpo¶redni wybór typów dekodowanego obrazu. Nale¿y zwróciæ uwagê, ¿e wybranie wiêcej obrazów ni¿ procesor jest zdolny zdekodowaæ nie daje niczego."
+msgstr ""
+"Ta opcja umo¿liwia wymuszenie algorytmu synchronizacji, poprzez bezpo¶redni "
+"wybór typów dekodowanego obrazu. Nale¿y zwróciæ uwagê, ¿e wybranie wiêcej "
+"obrazów ni¿ procesor jest zdolny zdekodowaæ nie daje niczego."
 
 #: modules/codec/mpeg_video/parser.c:92
 msgid "MPEG I/II video decoder module"
@@ -1785,7 +1866,9 @@ msgstr "maksymalna wysoko¶æ okien konfiguracji"
 msgid ""
 "You can set the maximum height that the configuration windows in the "
 "preferences menu will occupy."
-msgstr "Mo¿na ustawiæ maksymalny rozmiar, jaki bêd± mog³y mieæ okna konfiguracji w menu preferencji."
+msgstr ""
+"Mo¿na ustawiæ maksymalny rozmiar, jaki bêd± mog³y mieæ okna konfiguracji w "
+"menu preferencji."
 
 #: modules/gui/gtk/gnome.c:72
 msgid "GNOME"
@@ -2101,7 +2184,9 @@ msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - Zespó³ VideoLAN"
 msgid ""
 "This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and "
 "MPEG 2 files from a file or from a network source."
-msgstr "Klient VideoLAN, odtwarzacz DVD i MPEG. Program potrafi odtwarzaæ MPEG i MPEG2 z pliku lub ze ¼ród³a sieciowego."
+msgstr ""
+"Klient VideoLAN, odtwarzacz DVD i MPEG. Program potrafi odtwarzaæ MPEG i "
+"MPEG2 z pliku lub ze ¼ród³a sieciowego."
 
 #: modules/gui/gtk/gnome_interface.c:1217
 msgid "Open Stream"
@@ -2251,7 +2336,9 @@ msgstr "Modu³y"
 msgid ""
 "Sorry, the module manager isn't functional yet. Please retry in a later "
 "version."
-msgstr "Przepraszamy, mened¿er modu³ów jeszcze nie jest funkcjonalny. Spróbuj u¿yæ funkcji pó¼niejszej wersji programu."
+msgstr ""
+"Przepraszamy, mened¿er modu³ów jeszcze nie jest funkcjonalny. Spróbuj u¿yæ "
+"funkcji pó¼niejszej wersji programu."
 
 #: modules/gui/gtk/gnome_interface.c:1987
 #: modules/gui/gtk/gnome_interface.c:2128 modules/gui/gtk/gtk_interface.c:2414
@@ -2804,7 +2891,9 @@ msgstr "maksymalna liczba wierszy w oknie dziennika"
 msgid ""
 "You can set the maximum number of lines that the log window will display. "
 "Enter -1 if you want to keep all messages."
-msgstr "Mo¿na ustawiæ maksymaln± liczbê wierszy, które bêd± wy¶wietlane w oknie dziennika. Wprowad¼ -1 je¶li maj± byæ zapamiêtywane wszystkie komunikaty."
+msgstr ""
+"Mo¿na ustawiæ maksymaln± liczbê wierszy, które bêd± wy¶wietlane w oknie "
+"dziennika. Wprowad¼ -1 je¶li maj± byæ zapamiêtywane wszystkie komunikaty."
 
 #: modules/gui/win32/win32.cpp:261
 #, fuzzy
@@ -2822,7 +2911,10 @@ msgstr "format chroma fikcyjnych obrazów"
 msgid ""
 "Force the dummy video output to create images using a specific chroma format "
 "instead of trying to improve performances by using the most efficient one."
-msgstr "Wymusza format fikcyjny wyj¶cia obrazów przy tworzeniu okre¶lonego formatu chroma zamiast próby zwiêkszania wydajno¶ci przez u¿ycie najbardziej wydajnego formatu."
+msgstr ""
+"Wymusza format fikcyjny wyj¶cia obrazów przy tworzeniu okre¶lonego formatu "
+"chroma zamiast próby zwiêkszania wydajno¶ci przez u¿ycie najbardziej "
+"wydajnego formatu."
 
 #: modules/misc/dummy/dummy.c:44
 msgid "dummy functions module"
@@ -2855,7 +2947,8 @@ msgstr "format dziennika"
 #: modules/misc/logger/logger.c:87
 msgid ""
 "Specify the log format. Available choices are \"text\" (default) and \"html\""
-msgstr "Okre¶la format dziennika. Mo¿liwe opcje to \"text\" (domy¶lnie) i \"html\""
+msgstr ""
+"Okre¶la format dziennika. Mo¿liwe opcje to \"text\" (domy¶lnie) i \"html\""
 
 #: modules/misc/logger/logger.c:88
 msgid "file logging interface module"
@@ -3092,7 +3185,9 @@ msgstr "u¿ywanie konwersji sprzêtowej YUV->RGB"
 msgid ""
 "Try to use hardware acceleration for YUV->RGB conversions. This option "
 "doesn't have any effect when using overlays."
-msgstr "Spróbuj u¿yæ akceleracji sprzêtowej dla konwersji YUV->RGB. Ta opcja nie przynosi ¿adnych efektów w trybie overlay."
+msgstr ""
+"Spróbuj u¿yæ akceleracji sprzêtowej dla konwersji YUV->RGB. Ta opcja nie "
+"przynosi ¿adnych efektów w trybie overlay."
 
 #: modules/video_output/directx/directx.c:95
 msgid "use video buffers in system memory"
@@ -3104,7 +3199,11 @@ msgid ""
 "recommended as usually using video memory allows to benefit from more "
 "hardware acceleration (like rescaling or YUV->RGB conversions). This option "
 "doesn't have any effect when using overlays."
-msgstr "Tworzenie buforów obrazu w pamiêci systemowej zamiast w pamiêci karty. To nie jest zalecane gdy¿ zazwyczaj u¿ywanie pamiêci karty daje korzy¶ci z akceleracji sprzêtowej (jak przeskalowywanie lub konwersje YUV->RGB). Ta opcja nie przynosi ¿adnych efektów w trybie overlay."
+msgstr ""
+"Tworzenie buforów obrazu w pamiêci systemowej zamiast w pamiêci karty. To "
+"nie jest zalecane gdy¿ zazwyczaj u¿ywanie pamiêci karty daje korzy¶ci z "
+"akceleracji sprzêtowej (jak przeskalowywanie lub konwersje YUV->RGB). Ta "
+"opcja nie przynosi ¿adnych efektów w trybie overlay."
 
 #: modules/video_output/directx/directx.c:101
 #, fuzzy
@@ -3116,7 +3215,9 @@ msgstr "Otwiera okno listy odtwarzania"
 msgid ""
 "Specify a window to use instead of opening a new one. This option is "
 "DANGEROUS, use with care."
-msgstr "Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
+msgstr ""
+"Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta "
+"opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
 
 #: modules/video_output/directx/directx.c:111
 #, fuzzy
@@ -3173,16 +3274,21 @@ msgid ""
 "2) Completly bypass the window manager, but then nothing will be able to "
 "show on top of the video."
 msgstr ""
-"Istniej± dwa sposobu na prze³±czenie okna w tryb pe³noekranowy, ka¿dy niesety ma swoje wady.\n"
-"1) Pozwól mened¿erowi okien obs³ugiwaæ oknem pe³noekranowym (domy¶lnie). Lecz elementy takie jak paski stanu bêd± wy¶wietlane na górze obrazu.\n"
-"2) Ca³kowite pominiêcie mened¿era okien, lecz wówczas nic nie bêdzie mog³o byæ wy¶wietlane na górze obrazu."
+"Istniej± dwa sposobu na prze³±czenie okna w tryb pe³noekranowy, ka¿dy "
+"niesety ma swoje wady.\n"
+"1) Pozwól mened¿erowi okien obs³ugiwaæ oknem pe³noekranowym (domy¶lnie). "
+"Lecz elementy takie jak paski stanu bêd± wy¶wietlane na górze obrazu.\n"
+"2) Ca³kowite pominiêcie mened¿era okien, lecz wówczas nic nie bêdzie mog³o "
+"byæ wy¶wietlane na górze obrazu."
 
 #: modules/video_output/mga/xmga.c:100 modules/video_output/x11/x11.c:54
 #: modules/video_output/x11/xvideo.c:60
 msgid ""
 "Specify the X11 hardware display you want to use. By default vlc will use "
 "the value of the DISPLAY environment variable."
-msgstr "Okre¶la u¿ywany ekran sprzêtowy X11. Domy¶lnie vlc u¿yje warto¶ci ze zmiennej ¶rodowiskowej DISPLAY."
+msgstr ""
+"Okre¶la u¿ywany ekran sprzêtowy X11. Domy¶lnie vlc u¿yje warto¶ci ze "
+"zmiennej ¶rodowiskowej DISPLAY."
 
 #: modules/video_output/mga/xmga.c:107
 msgid "X11 MGA module"
@@ -3198,7 +3304,9 @@ msgstr "nazwa ekranu X11"
 msgid ""
 "Specify the Qt Embedded hardware display you want to use. By default vlc "
 "will use the value of the DISPLAY environment variable."
-msgstr "Okre¶la u¿ywany ekran sprzêtowy X11. Domy¶lnie vlc u¿yje warto¶ci ze zmiennej ¶rodowiskowej DISPLAY."
+msgstr ""
+"Okre¶la u¿ywany ekran sprzêtowy X11. Domy¶lnie vlc u¿yje warto¶ci ze "
+"zmiennej ¶rodowiskowej DISPLAY."
 
 #: modules/video_output/qte/qte.cpp:92
 msgid "QT Embedded drawable"
@@ -3209,7 +3317,9 @@ msgstr ""
 msgid ""
 "Specify a QT Embedded drawable to use instead of opening a new window. This "
 "option is DANGEROUS, use with care."
-msgstr "Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
+msgstr ""
+"Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta "
+"opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
 
 #.    add_category_hint( N_("QT Embedded"), NULL );
 #.    add_string( "qte-display", "landscape", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT);
@@ -3238,7 +3348,9 @@ msgstr "obiekt rysunkowy X11"
 msgid ""
 "Specify a X11 drawable to use instead of opening a new window. This option "
 "is DANGEROUS, use with care."
-msgstr "Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
+msgstr ""
+"Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta "
+"opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
 
 #: modules/video_output/x11/x11.c:62 modules/video_output/x11/xvideo.c:73
 msgid "use shared memory"
@@ -3267,7 +3379,9 @@ msgstr "Numer karty XVideo"
 msgid ""
 "If you graphics card provides several adaptors, this option allows you to "
 "choose which one will be used (you shouldn't have to change this)."
-msgstr "Je¶li karta graficzna obs³uguje kilka kart, ta opcja umo¿liwia wybranie która z nich ma byæ u¿ywana (nie powinno siê tego zmieniaæ)."
+msgstr ""
+"Je¶li karta graficzna obs³uguje kilka kart, ta opcja umo¿liwia wybranie "
+"która z nich ma byæ u¿ywana (nie powinno siê tego zmieniaæ)."
 
 #: modules/video_output/x11/xvideo.c:63
 msgid "XVimage chroma format"
@@ -3277,7 +3391,10 @@ msgstr "format XVimage chroma"
 msgid ""
 "Force the XVideo renderer to use a specific chroma format instead of trying "
 "to improve performances by using the most efficient one."
-msgstr "Wymusza renderowanie XVideo w trybie u¿ywaj±cym formatu chroma zamiast próbowania polepszenia wydajno¶ci przez u¿ycie najbardziej wydajnego formatu. "
+msgstr ""
+"Wymusza renderowanie XVideo w trybie u¿ywaj±cym formatu chroma zamiast "
+"próbowania polepszenia wydajno¶ci przez u¿ycie najbardziej wydajnego "
+"formatu. "
 
 #: modules/video_output/x11/xvideo.c:78
 #, fuzzy
@@ -3359,7 +3476,8 @@ msgstr "modu³ interfejsu"
 #~ msgid ""
 #~ "If your processor supports the SSE instructions set, vlc can take can "
 #~ "take advantage of them."
-#~ msgstr "Je¶li procesor obs³uguje zbiór istrukcji SSE, mo¿na z nich skorzystaæ."
+#~ msgstr ""
+#~ "Je¶li procesor obs³uguje zbiór istrukcji SSE, mo¿na z nich skorzystaæ."
 
 #~ msgid "Usage: %s [options] [parameters] [file]...\n"
 #~ msgstr "U¿ycie: %s [opcje] [parametry] [plik]...\n"
@@ -3383,12 +3501,16 @@ msgstr "modu³ interfejsu"
 #~ msgid ""
 #~ "This allows you to select the MPEG audio decoder you want to use. Common "
 #~ "choices are builtin and mad."
-#~ msgstr "Ta opcja umozliwia wybranie u¿ywanego dekodera d¼wiêku MPEG. Normalne opcje wyboru to wbudowana i szalona."
+#~ msgstr ""
+#~ "Ta opcja umozliwia wybranie u¿ywanego dekodera d¼wiêku MPEG. Normalne "
+#~ "opcje wyboru to wbudowana i szalona."
 
 #~ msgid ""
 #~ "This allows you to select the AC3/A52 audio decoder you want to use. "
 #~ "Common choices are builtin and a52."
-#~ msgstr "Ta opcja umo¿liwia wybranie u¿ywanego dekodera d¼wiêku AC3/A52. Zwyk³e opcje wyboru s± wbudowana i a52."
+#~ msgstr ""
+#~ "Ta opcja umo¿liwia wybranie u¿ywanego dekodera d¼wiêku AC3/A52. Zwyk³e "
+#~ "opcje wyboru s± wbudowana i a52."
 
 #~ msgid "print build information"
 #~ msgstr "Wy¶wietl informacje o budowaniu"
