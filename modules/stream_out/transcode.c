@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.36 2003/10/08 23:00:40 gbazin Exp $
+ * $Id: transcode.c,v 1.37 2003/10/09 09:39:16 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1293,7 +1293,7 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     p_sys->i_buggy_pts_detect = 0;
 
     /* This is enough for external encoders */
-    if( id->p_encoder->p_module ) return VLC_SUCCESS;
+    if( id->p_encoder && id->p_encoder->p_module ) return VLC_SUCCESS;
 
     if( id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','1','v' )||
         id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','2','v' ) )
