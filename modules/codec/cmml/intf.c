@@ -315,8 +315,14 @@ static int DisplayPendingAnchor( intf_thread_t *p_intf, vout_thread_t *p_vout )
             if( var_Get( p_primary_intf, "intf-displays-cmml-description", &val )
                     == VLC_SUCCESS )
             {
-                if( val.b_bool == VLC_TRUE ) return VLC_TRUE;
+                if( val.b_bool == VLC_TRUE )
+                {
+                    vlc_object_release( p_primary_intf );
+                    return VLC_TRUE;
+                }
             }
+
+            vlc_object_release( p_primary_intf );
         }
 
         /* display anchor as subtitle on-screen */
