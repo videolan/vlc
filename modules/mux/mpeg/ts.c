@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.32 2003/10/27 13:35:15 nitrox Exp $
+ * $Id: ts.c,v 1.33 2003/11/07 18:41:09 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -179,6 +179,8 @@ struct sout_mux_sys_t
     int             i_audio_bound;
     int             i_video_bound;
 
+    int             i_pid_video;
+    int             i_pid_audio;
     int             i_pid_free; // first usable pid
 
     int             i_pat_version_number;
@@ -205,9 +207,24 @@ struct sout_mux_sys_t
 
 
 /* Reserve a pid and return it */
-static int  AllocatePID( sout_mux_sys_t *p_sys )
+static int  AllocatePID( sout_mux_sys_t *p_sys, int i_cat )
 {
-    return( ++p_sys->i_pid_free );
+    int i_pid;
+    if ( i_cat == VIDEO_ES && p_sys->i_pid_video )
+    {
+        i_pid = p_sys->i_pid_video;
+        p_sys->i_pid_video = 0;
+    }
+    else if ( i_cat == AUDIO_ES && p_sys->i_pid_audio )
+    {
+        i_pid = p_sys->i_pid_audio;
+        p_sys->i_pid_audio = 0;
+    }
+    else
+    {
+        i_pid = ++p_sys->i_pid_free;
+    }
+    return i_pid;
 }
 
 static void GetPAT( sout_mux_t *p_mux, sout_buffer_chain_t *c );
@@ -257,6 +274,25 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_pid_free = 0x43;
 
+    p_sys->i_pid_video = 0;
+    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "pid-video" ) ) )
+    {
+        p_sys->i_pid_video = strtol( val, NULL, 0 );
+        if ( p_sys->i_pid_video > p_sys->i_pid_free )
+        {
+            p_sys->i_pid_free = p_sys->i_pid_video + 1;
+        }
+    }
+    p_sys->i_pid_audio = 0;
+    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "pid-audio" ) ) )
+    {
+        p_sys->i_pid_audio = strtol( val, NULL, 0 );
+        if ( p_sys->i_pid_audio > p_sys->i_pid_free )
+        {
+            p_sys->i_pid_free = p_sys->i_pid_audio + 1;
+        }
+    }
+
     p_sys->i_pcr_pid = 0x1fff;
     p_sys->p_pcr_input = NULL;
 
@@ -283,16 +319,16 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_bitrate_min = 0;
         p_sys->i_bitrate_max = 0;
     }
-    p_sys->i_pcr_delay = 100000;
+    p_sys->i_pcr_delay = 90000;
     if( ( val = sout_cfg_find_value( p_mux->p_cfg, "pcr" ) ) )
     {
         p_sys->i_pcr_delay = (int64_t)atoi( val ) * 1000;
         if( p_sys->i_pcr_delay <= 0 )
         {
             msg_Err( p_mux,
-                     "invalid pcr delay ("I64Fd"ms) reseting to 100ms",
+                     "invalid pcr delay ("I64Fd"ms) reseting to 90ms",
                      p_sys->i_pcr_delay / 1000 );
-            p_sys->i_pcr_delay = 100000;
+            p_sys->i_pcr_delay = 90000;
         }
     }
     p_sys->i_pcr_soft_delay = 0;
@@ -312,7 +348,7 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_mux, "pcr_delay="I64Fd" pcr_soft_delay="I64Fd,
              p_sys->i_pcr_delay, p_sys->i_pcr_soft_delay );
 
-    /* for TS génération */
+    /* for TS generation */
     p_sys->i_pcr    = 0;
     p_sys->i_dts    = 0;
     p_sys->i_length = 0;
@@ -368,7 +404,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_input->p_sys = (void*)p_stream = malloc( sizeof( ts_stream_t ) );
 
     /* Init this new stream */
-    p_stream->i_pid = AllocatePID( p_sys );
+    p_stream->i_pid = AllocatePID( p_sys, p_input->p_fmt->i_cat );
     p_stream->i_continuity_counter    = 0;
     p_stream->i_decoder_specific_info = 0;
     p_stream->p_decoder_specific_info = NULL;
