@@ -601,73 +601,78 @@ remove_distdir_woody = \
 #
 package-win32-base:
 # Check that tmp isn't in the way
-	@if test -e "$(srcdir)/vlc-${VERSION}"; then \
-	  echo "Error: please remove $(srcdir)/vlc-${VERSION}, it is in the way"; \
+	@if test -e "$(top_builddir)/vlc-${VERSION}"; then \
+	  echo "Error: please remove $(top_builddir)/vlc-${VERSION}, it is in the way"; \
 	  false; \
 	else \
-	  echo "OK."; mkdir -p "$(srcdir)/vlc-${VERSION}"; \
+	  echo "OK."; mkdir -p "$(top_builddir)/vlc-${VERSION}"; \
 	fi
 
 # Copy relevant files
-	cp "$(srcdir)/vlc.win32.nsi" "$(srcdir)/vlc-${VERSION}/"
-	cp "$(top_builddir)/vlc$(EXEEXT)" "$(srcdir)/vlc-${VERSION}/"
-	cp "$(top_builddir)/vlc.exe.manifest" "$(srcdir)/vlc-${VERSION}/"
-	$(STRIP) "$(srcdir)/vlc-${VERSION}/vlc$(EXEEXT)"
+	cp "$(srcdir)/vlc.win32.nsi" "$(top_builddir)/vlc-${VERSION}/"
+	cp "$(top_builddir)/vlc$(EXEEXT)" "$(top_builddir)/vlc-${VERSION}/"
+	cp "$(top_srcdir)/vlc.exe.manifest" "$(top_builddir)/vlc-${VERSION}/"
+	$(STRIP) "$(top_builddir)/vlc-${VERSION}/vlc$(EXEEXT)"
 
 	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
-	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(srcdir)/vlc-${VERSION}/$${file}.txt" ; \
-	  unix2dos "$(srcdir)/vlc-${VERSION}/$${file}.txt" ; done
+	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(top_builddir)/vlc-${VERSION}/$${file}.txt" ; \
+	  unix2dos "$(top_builddir)/vlc-${VERSION}/$${file}.txt" ; done
 
-	mkdir -p "$(srcdir)/vlc-${VERSION}/plugins"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/plugins"
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; then \
-	    $(INSTALL) "$(srcdir)/$$i$(LIBEXT)" \
-            "$(srcdir)/vlc-${VERSION}/plugins/" ; \
+	    $(INSTALL) "$(top_builddir)/$$i$(LIBEXT)" \
+            "$(top_builddir)/vlc-${VERSION}/plugins/" ; \
 	  fi ; done
 
-	for i in "" $(srcdir)/vlc-${VERSION}/plugins/*$(LIBEXT) ; \
+	for i in "" $(top_builddir)/vlc-${VERSION}/plugins/*$(LIBEXT) ; \
 	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi ; done
 
-	mkdir $(srcdir)/vlc-${VERSION}/locale
+	mkdir $(top_builddir)/vlc-${VERSION}/locale
 	for i in $(ALL_LINGUAS); do \
-	  mkdir -p "$(srcdir)/vlc-${VERSION}/locale/$${i}/LC_MESSAGES" ; \
+	  mkdir -p "$(top_builddir)/vlc-${VERSION}/locale/$${i}/LC_MESSAGES" ; \
 	  cp "$(srcdir)/po/$${i}.gmo" \
-	    "$(srcdir)/vlc-${VERSION}/locale/$${i}/LC_MESSAGES/vlc.mo" \
+	    "$(top_builddir)/vlc-${VERSION}/locale/$${i}/LC_MESSAGES/vlc.mo" \
             || true ; \
 	done
 
-	mkdir -p $(srcdir)/vlc-${VERSION}/skins/fonts
+	mkdir -p $(top_builddir)/vlc-${VERSION}/skins/fonts
 	for i in $(srcdir)/share/skins2/fonts/*.*; do \
-	  cp $$i $(srcdir)/vlc-${VERSION}/skins/fonts/ || true ; \
+	  cp $$i $(top_builddir)/vlc-${VERSION}/skins/fonts/ || true ; \
 	done
 	for i in $(srcdir)/share/skins2/*.*; do \
-	  cp $$i $(srcdir)/vlc-${VERSION}/skins/ || true ; \
+	  cp $$i $(top_builddir)/vlc-${VERSION}/skins/ || true ; \
 	done
 
-	mkdir -p "$(srcdir)/vlc-${VERSION}/http/admin"
-	mkdir -p "$(srcdir)/vlc-${VERSION}/http/vlm"
-	cp $(srcdir)/share/http/*.html $(srcdir)/vlc-${VERSION}/http/ ;
-	cp $(srcdir)/share/http/*.css $(srcdir)/vlc-${VERSION}/http/ ;
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/admin"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/vlm"
+	cp $(srcdir)/share/http/*.html $(top_builddir)/vlc-${VERSION}/http/ ;
+	cp $(srcdir)/share/http/*.css $(top_builddir)/vlc-${VERSION}/http/ ;
 	cp $(srcdir)/share/http/admin/*.html \
-           $(srcdir)/vlc-${VERSION}/http/admin/ ;
+           $(top_builddir)/vlc-${VERSION}/http/admin/ ;
 	cp $(srcdir)/share/http/admin/.access \
-           $(srcdir)/vlc-${VERSION}/http/admin/ ;
+           $(top_builddir)/vlc-${VERSION}/http/admin/ ;
 	cp $(srcdir)/share/http/vlm/*.html \
-           $(srcdir)/vlc-${VERSION}/http/vlm/ ;
+           $(top_builddir)/vlc-${VERSION}/http/vlm/ ;
 
-	cp $(srcdir)/share/vlc48x48.ico $(srcdir)/vlc-${VERSION}/ ;
+	cp $(srcdir)/share/vlc48x48.ico $(top_builddir)/vlc-${VERSION}/ ;
 
-	mkdir -p "$(srcdir)/vlc-${VERSION}/mozilla"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/mozilla"
 if BUILD_MOZILLA
-	cp $(srcdir)/mozilla/*$(LIBEXT) $(srcdir)/vlc-${VERSION}/mozilla/ ;
-	$(STRIP) $(srcdir)/vlc-${VERSION}/mozilla/*$(LIBEXT);
-	cp $(srcdir)/mozilla/vlcintf.xpt  $(srcdir)/vlc-${VERSION}/mozilla/ ;
+	cp $(top_builddir)/mozilla/*$(LIBEXT) $(top_builddir)/vlc-${VERSION}/mozilla/ ;
+	$(STRIP) $(top_builddir)/vlc-${VERSION}/mozilla/*$(LIBEXT);
+	cp $(top_builddir)/mozilla/vlcintf.xpt  $(top_builddir)/vlc-${VERSION}/mozilla/ ;
 endif
 
 package-win32-base-exe:
-# Create package 
+# Create package
 	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe \
-             /DVERSION=${VERSION} $(srcdir)/vlc-${VERSION}/vlc.win32.nsi
+             /DVERSION=${VERSION} $(top_builddir)/vlc-${VERSION}/vlc.win32.nsi
+
+package-win32-base-exe-cygwin:
+# Create package
+	C:/Program\ Files/NSIS/makensis.exe \
+             /DVERSION=${VERSION} $(top_builddir)/vlc-${VERSION}/vlc.win32.nsi
 
 package-win32-base-zip:
 # Create package 
@@ -675,15 +680,15 @@ package-win32-base-zip:
 
 package-win32-exe: package-win32-base package-win32-base-exe
 # Clean up
-	rm -Rf $(srcdir)/vlc-${VERSION}
+	rm -Rf $(top_builddir)/vlc-${VERSION}
 
 package-win32-zip: package-win32-base package-win32-base-zip
 # Clean up
-	rm -Rf $(srcdir)/vlc-${VERSION}
+	rm -Rf $(top_builddir)/vlc-${VERSION}
 
 package-win32: package-win32-base package-win32-base-exe package-win32-base-zip
 # Clean up
-	rm -Rf $(srcdir)/vlc-${VERSION}
+	rm -Rf $(top_builddir)/vlc-${VERSION}
 
 package-beos:
 # Check that tmp isn't in the way
