@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.14 2002/01/07 02:12:29 sam Exp $
+ * $Id: gtk_open.c,v 1.15 2002/01/31 23:18:27 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -386,7 +386,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
                             GTK_WIDGET(button), "network_broadcast" ) ) );
             /* Allocate room for "protocol://server:port" */
             psz_source = malloc( strlen( psz_protocol ) + 3 /* "://" */
-                                   + strlen( psz_server ) + 1 /* ":" */
+                                   + strlen( psz_server ) + 2 /* "@:" */
                                    + 5 /* 0-65535 */
                                    + strlen( psz_broadcast ) + 2 /* "::" */ 
                                    + 1 /* "\0" */ );
@@ -396,7 +396,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
             }
 
             /* Build source name and add it to playlist */
-            sprintf( psz_source, "%s://%s:%i/%s", psz_protocol,
+            sprintf( psz_source, "%s://%s@:%i/%s", psz_protocol,
                                                   psz_server,
                                                   i_port,
                                                   psz_broadcast );
@@ -405,7 +405,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
         {
             /* Allocate room for "protocol://server:port" */
             psz_source = malloc( strlen( psz_protocol ) + 3 /* "://" */
-                                   + strlen( psz_server ) + 1 /* ":" */
+                                   + strlen( psz_server ) + 2 /* "@:" */
                                    + 5 /* 0-65535 */ + 1 /* "\0" */ );
             if( psz_source == NULL )
             {
@@ -413,7 +413,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
             }
            
             /* Build source name and add it to playlist */
-            sprintf( psz_source, "%s://%s:%i",
+            sprintf( psz_source, "%s://%s@:%i",
                      psz_protocol, psz_server, i_port );
         }
 
