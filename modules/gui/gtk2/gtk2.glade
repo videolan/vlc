@@ -194,7 +194,7 @@
 	      <child>
 		<widget class="button" id="button1">
 		  <property name="visible">True</property>
-		  <property name="label" translatable="yes">button1</property>
+		  <property name="label">button1</property>
 		  <property name="use_underline">True</property>
 		  <property name="stock_pixmap">gtk-open</property>
 		</widget>
@@ -203,7 +203,7 @@
 	      <child>
 		<widget class="button" id="button2">
 		  <property name="visible">True</property>
-		  <property name="label" translatable="yes">button2</property>
+		  <property name="label">button2</property>
 		  <property name="use_underline">True</property>
 		  <property name="stock_pixmap">gtk-cdrom</property>
 		</widget>
@@ -212,7 +212,7 @@
 	      <child>
 		<widget class="button" id="button3">
 		  <property name="visible">True</property>
-		  <property name="label" translatable="yes">button3</property>
+		  <property name="label">button3</property>
 		  <property name="use_underline">True</property>
 		  <property name="stock_pixmap">gtk-refresh</property>
 		</widget>

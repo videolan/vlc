@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.24 2004/01/05 13:07:03 zorglub Exp $
+ * $Id: pda_callbacks.c,v 1.25 2004/01/25 14:15:21 kuehne Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -349,7 +349,7 @@ gboolean onPDADeleteEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_vlc->b_die = VLC_TRUE;
     vlc_mutex_unlock( &p_intf->change_lock );
-    msg_Dbg( p_intf, "about to exit vlc ... signalled" );
+    msg_Dbg( p_intf, "about to exit vlc ... signaled" );
 
     return TRUE;
 }

@@ -230,7 +230,7 @@
 		<widget class="button" id="button4">
 		  <property name="visible">True</property>
 		  <property name="tooltip" translatable="yes">Open File</property>
-		  <property name="label" translatable="yes">button4</property>
+		  <property name="label">button4</property>
 		  <property name="use_underline">True</property>
 		  <property name="stock_pixmap">gtk-cdrom</property>
 		</widget>
@@ -240,7 +240,7 @@
 		<widget class="button" id="button3">
 		  <property name="visible">True</property>
 		  <property name="tooltip" translatable="yes">Save File</property>
-		  <property name="label" translatable="yes">button3</property>
+		  <property name="label">button3</property>
 		  <property name="use_underline">True</property>
 		  <property name="stock_pixmap">gtk-refresh</property>
 		</widget>
