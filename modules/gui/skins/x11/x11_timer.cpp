@@ -2,7 +2,7 @@
  * x11_timer.cpp: helper class to implement timers
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_timer.cpp,v 1.5 2003/07/25 22:50:12 gbazin Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -26,7 +26,6 @@
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
-#include <mtime.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "x11_timer.h"
