@@ -865,7 +865,7 @@ private:
     void OnPopupDel( wxMenuEvent& event );
     void OnPopupEna( wxMenuEvent& event );
     void OnPopupInfo( wxMenuEvent& event );
-    void Rebuild();
+    void Rebuild( vlc_bool_t );
 
     void Preparse( playlist_t *p_playlist );
 

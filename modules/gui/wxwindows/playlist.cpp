@@ -395,7 +395,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     var_AddCallback( p_playlist, "item-deleted", ItemDeleted, this );
 
     /* Update the playlist */
-    Rebuild();
+    Rebuild( VLC_TRUE );
 
     vlc_object_release( p_playlist );
 }
@@ -812,7 +812,7 @@ wxTreeItemId Playlist::FindItemByName( wxTreeItemId root, wxString search_string
 /**********************************************************************
  * Rebuild the playlist
  **********************************************************************/
-void Playlist::Rebuild()
+void Playlist::Rebuild( vlc_bool_t b_root )
 {
     playlist_view_t *p_view;
     playlist_t *p_playlist =
@@ -825,14 +825,17 @@ void Playlist::Rebuild()
 
     /* We can remove the callbacks before locking, anyway, we won't
      * miss anything */
-    var_DelCallback( p_playlist, "item-change", ItemChanged, this );
-    var_DelCallback( p_playlist, "playlist-current", PlaylistNext, this );
-    var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
-    var_DelCallback( p_playlist, "item-append", ItemAppended, this );
-    var_DelCallback( p_playlist, "item-deleted", ItemDeleted, this );
+    if( b_root )
+    {
+        var_DelCallback( p_playlist, "item-change", ItemChanged, this );
+        var_DelCallback( p_playlist, "playlist-current", PlaylistNext, this );
+        var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
+        var_DelCallback( p_playlist, "item-append", ItemAppended, this );
+        var_DelCallback( p_playlist, "item-deleted", ItemDeleted, this );
 
-    /* ...and rebuild it */
-    vlc_mutex_lock( &p_playlist->object_lock );
+        /* ...and rebuild it */
+        vlc_mutex_lock( &p_playlist->object_lock );
+    }
 
     p_view = playlist_ViewFind( p_playlist, i_current_view ); /* FIXME */
 
@@ -845,35 +848,13 @@ void Playlist::Rebuild()
     wxTreeItemId root = treectrl->GetRootItem();
     UpdateNode( p_playlist, p_view->p_root, root );
 
-/*
-    wxTreeItemId item;
-    if( p_playlist->status.p_item != NULL )
-    {
-        item = FindItem( root, p_playlist->status.p_item );
-    }
-    else if( p_playlist->status.p_node != NULL )
-    {
-        item = FindItem( root, p_playlist->status.p_node );
-    }
-    else
-    {
-        item = root;
-    }
-
-    if( p_playlist->i_size )
-    {
-        SetCurrentItem( item );
-    }
-*/
     int i_count = CountItems( treectrl->GetRootItem() );
 
     if( i_count < p_playlist->i_size && !b_changed_view )
     {
         i_current_view = VIEW_CATEGORY;
         b_changed_view = VLC_TRUE;
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        Rebuild();
-        vlc_mutex_lock( &p_playlist->object_lock );
+        Rebuild( VLC_FALSE );
     }
     else if( i_count != p_playlist->i_size )
     {
@@ -889,15 +870,17 @@ void Playlist::Rebuild()
                                   p_playlist->i_size ), 0 );
     }
 
-    /* Put callbacks back online */
-    var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
-    var_AddCallback( p_playlist, "playlist-current", PlaylistNext, this );
-    var_AddCallback( p_playlist, "item-change", ItemChanged, this );
-    var_AddCallback( p_playlist, "item-append", ItemAppended, this );
-    var_AddCallback( p_playlist, "item-deleted", ItemDeleted, this );
+    if( b_root )
+    {
+        /* Put callbacks back online */
+        var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
+        var_AddCallback( p_playlist, "playlist-current", PlaylistNext, this );
+        var_AddCallback( p_playlist, "item-change", ItemChanged, this );
+        var_AddCallback( p_playlist, "item-append", ItemAppended, this );
+        var_AddCallback( p_playlist, "item-deleted", ItemDeleted, this );
 
-    vlc_mutex_unlock( &p_playlist->object_lock );
-
+        vlc_mutex_unlock( &p_playlist->object_lock );
+    }
     vlc_object_release( p_playlist );
 }
 
@@ -905,7 +888,7 @@ void Playlist::Rebuild()
 
 void Playlist::ShowPlaylist( bool show )
 {
-    if( show ) Rebuild();
+    if( show ) Rebuild( VLC_TRUE );
     Show( show );
 }
 
@@ -920,7 +903,7 @@ void Playlist::UpdatePlaylist()
     if( this->b_need_update )
     {
         this->b_need_update = VLC_FALSE;
-        Rebuild();
+        Rebuild( VLC_TRUE );
     }
 
     /* Updating the playing status every 0.5s is enough */
@@ -1094,7 +1077,7 @@ void Playlist::OnSort( wxCommandEvent& event )
     vlc_mutex_unlock( &p_playlist->object_lock );
 
     vlc_object_release( p_playlist );
-    Rebuild();
+    Rebuild( VLC_TRUE );
 }
 
 /**********************************************************************
@@ -1143,7 +1126,7 @@ void Playlist::OnInvertSelection( wxCommandEvent& WXUNUSED(event) )
 
 void Playlist::OnDeleteSelection( wxCommandEvent& WXUNUSED(event) )
 {
-    Rebuild();
+    Rebuild( VLC_TRUE );
 }
 
 void Playlist::OnSelectAll( wxCommandEvent& WXUNUSED(event) )
@@ -1314,7 +1297,7 @@ void Playlist::OnMenuEvent( wxCommandEvent& event )
             b_changed_view = VLC_TRUE;
             i_current_view = i_new_view;
             playlist_ViewUpdate( p_playlist, i_new_view );
-            Rebuild();
+            Rebuild( VLC_TRUE );
             vlc_object_release( p_playlist );
             return;
         }
@@ -1327,7 +1310,7 @@ void Playlist::OnMenuEvent( wxCommandEvent& event )
 
             i_current_view = i_new_view;
 
-            Rebuild();
+            Rebuild( VLC_TRUE );
         }
     }
     else if( event.GetId() >= FirstSD_Event && event.GetId() < LastSD_Event )
@@ -1670,6 +1653,7 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
     Playlist *p_playlist_dialog = (Playlist *)param;
 
     playlist_add_t *p_add = (playlist_add_t *)malloc(sizeof( playlist_add_t));
+
     memcpy( p_add, nval.p_address, sizeof( playlist_add_t ) );
 
     wxCommandEvent event( wxEVT_PLAYLIST, AppendItem_Event );

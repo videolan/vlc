@@ -508,6 +508,7 @@ static int EnumerateCallback( DAAP_SClient *p_client,
     if( !b_found )
     {
         dhost_t *p_vlchost = (dhost_t *)malloc( sizeof( dhost_t ) );
+        p_vlchost->p_node = NULL;
         p_vlchost->p_host = p_host;
         p_vlchost->psz_name = psz_buffer;
         p_vlchost->b_new = VLC_TRUE;
@@ -632,7 +633,9 @@ static void FreeHost( services_discovery_t *p_sd, dhost_t *p_host )
                                                  FIND_ANYWHERE );
     if( p_playlist )
     {
-        playlist_NodeDelete( p_playlist, p_host->p_node, VLC_TRUE , VLC_TRUE);
+        if( p_host->p_node )
+            playlist_NodeDelete( p_playlist, p_host->p_node, VLC_TRUE ,
+                                                             VLC_TRUE);
         vlc_object_release( p_playlist );
     }
 
