@@ -48,6 +48,8 @@ struct filter_sys_t
 {
     int i_xoff, i_yoff;  /* offsets for the display string in the video window */
     char *psz_head;  /* text to put before the day/time */
+
+    time_t last_time;
 };
 
 #define MSG_TEXT N_("Timestamp Prefix")
@@ -98,6 +100,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
+    p_sys->last_time = ((time_t)-1);
 
     return VLC_SUCCESS;
 }
@@ -131,13 +134,14 @@ char *myCtime( time_t *t )
  ****************************************************************************/
 static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 {
+    filter_sys_t *p_sys = p_filter->p_sys;
     subpicture_t *p_spu;
     video_format_t fmt;
     time_t t;
     char *psz_time, *psz_string;
-    filter_sys_t *p_sys;
 
-    p_sys = p_filter->p_sys;
+    if( p_sys->last_time == time( NULL ) ) return NULL;
+
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu ) return NULL;
     
@@ -154,7 +158,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         p_filter->pf_sub_buffer_del( p_filter, p_spu );
         return NULL;
     }
-    t = time(NULL);
+
+    t = p_sys->last_time = time( NULL );
  
     psz_time = myCtime( &t );
     asprintf( &psz_string, "%s%s", p_sys->psz_head, psz_time );
