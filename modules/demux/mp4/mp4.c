@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.19 2003/03/11 18:57:50 fenrir Exp $
+ * $Id: mp4.c,v 1.20 2003/04/06 17:48:06 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1156,7 +1156,7 @@ static int  TrackTimeToSampleChunk( input_thread_t *p_input,
                 {
                     msg_Dbg( p_input, "stts gives %d --> %d (sample number)",
                             i_sample,
-                            p_stss->data.p_stss->i_sample_number[i_index-1] );
+                            p_stss->data.p_stss->i_sample_number[i_index] );
                     i_sample = p_stss->data.p_stss->i_sample_number[i_index];
                     /* new i_sample is more than old so i_chunk can only increased */
                     while( i_chunk < p_track->i_chunk_count - 1 &&
