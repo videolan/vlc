@@ -68,11 +68,11 @@ typedef struct vpar_thread_s
    /* tables for macroblock types 0=P 1=B */
     lookup_t                ppl_mb_type[2][64];
     /* table for coded_block_pattern */
-    lookup_t                pl_coded_pattern[512];
+    lookup_t *              pl_coded_pattern;
     /* variable length codes for the structure dct_dc_size for intra blocks */
-    lookup_t                pppl_dct_dc_size[2][2][32];
+    lookup_t *              pppl_dct_dc_size[2][2];
     /* structure to store the tables B14 & B15 */
-    dct_lookup_t            * pppl_dct_coef[2][65536];
+    dct_lookup_t *          pppl_dct_coef[2][65536];
 
 #ifdef STATS
     /* Statistics */

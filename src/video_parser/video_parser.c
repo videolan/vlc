@@ -58,6 +58,9 @@ static void     EndThread           ( vpar_thread_t *p_vpar );
  * Following configuration properties are used:
  * ??
  *******************************************************************************/
+#include "main.h"
+#include "interface.h"
+extern main_t* p_main;
 vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_input /*,
                                    vout_thread_t *p_vout, int *pi_status */ )
 {
@@ -92,6 +95,9 @@ vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
     p_vpar->bit_stream.p_decoder_fifo = &p_vpar->fifo;
     p_vpar->bit_stream.fifo.buffer = 0;
     p_vpar->bit_stream.fifo.i_available = 0;
+
+/* FIXME !!!! */
+p_vpar->p_vout = p_main->p_intf->p_vout;
 
     /* Spawn the video parser thread */
     if ( vlc_thread_create(&p_vpar->thread_id, "video parser", (vlc_thread_func_t)RunThread, (void *)p_vpar) )

@@ -116,15 +116,15 @@ typedef struct slice_parsing_s
 /*****************************************************************************
  * Standard codes
  *****************************************************************************/
-#define PICTURE_START_CODE      0x100
-#define SLICE_START_CODE_MIN    0x101
-#define SLICE_START_CODE_MAX    0x1AF
-#define USER_DATA_START_CODE    0x1B2
-#define SEQUENCE_HEADER_CODE    0x1B3
-#define SEQUENCE_ERROR_CODE     0x1B4
-#define EXTENSION_START_CODE    0x1B5
-#define SEQUENCE_END_CODE       0x1B7
-#define GROUP_START_CODE        0x1B8
+#define PICTURE_START_CODE      0x100L
+#define SLICE_START_CODE_MIN    0x101L
+#define SLICE_START_CODE_MAX    0x1AFL
+#define USER_DATA_START_CODE    0x1B2L
+#define SEQUENCE_HEADER_CODE    0x1B3L
+#define SEQUENCE_ERROR_CODE     0x1B4L
+#define EXTENSION_START_CODE    0x1B5L
+#define SEQUENCE_END_CODE       0x1B7L
+#define GROUP_START_CODE        0x1B8L
 
 /* extension start code IDs */
 #define SEQUENCE_EXTENSION_ID                    1

@@ -164,11 +164,10 @@ static __inline__ void NextStartCode( vpar_thread_t * p_vpar )
     /* Re-align the buffer on an 8-bit boundary */
     RealignBits( &p_vpar->bit_stream );
 
-    while( ShowBits( &p_vpar->bit_stream, 16 ) != 0 && !p_vpar->b_die )
+    while( ShowBits( &p_vpar->bit_stream, 24 ) != 0x01L && !p_vpar->b_die )
     {
         DumpBits( &p_vpar->bit_stream, 8 );
     }
-    DumpBits( &p_vpar->bit_stream, 16 );
 }
 
 /*****************************************************************************
@@ -263,8 +262,9 @@ int vpar_NextSequenceHeader( vpar_thread_t * p_vpar )
     while( !p_vpar->b_die )
     {
         NextStartCode( p_vpar );
-        if( ShowBits( &p_vpar->bit_stream, 16 ) == SEQUENCE_HEADER_CODE )
+        if( ShowBits( &p_vpar->bit_stream, 32 ) == SEQUENCE_HEADER_CODE )
             return 0;
+        DumpBits( &p_vpar->bit_stream, 8 );
     }
     return 1;
 }
@@ -294,9 +294,7 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
             break;
 
         case PICTURE_START_CODE:
-            fprintf( stderr, "begin picture\n" );
             PictureHeader( p_vpar );
-            fprintf( stderr, "end picture\n" );
             return 0;
             break;
 
@@ -513,8 +511,8 @@ static void GroupHeader( vpar_thread_t * p_vpar )
  *****************************************************************************/
 static void PictureHeader( vpar_thread_t * p_vpar )
 {
-    static f_macroblock_type_t ppf_macroblock_type[4] =
-                                                 {vpar_IMBType, vpar_PMBType,
+    static f_macroblock_type_t ppf_macroblock_type[5] = {NULL,
+                                                  vpar_IMBType, vpar_PMBType,
                                                   vpar_BMBType, vpar_DMBType};
 
     int                 i_structure;
@@ -544,7 +542,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     /* 
      * Picture Coding Extension
      */
-    fprintf( stderr, "picture1\n" );
+
     NextStartCode( p_vpar );
     if( ShowBits( &p_vpar->bit_stream, 16 ) == EXTENSION_START_CODE )
     {
@@ -616,7 +614,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         
         p_vpar->picture.i_current_structure = 0;
 
-        intf_DbgMsg("vpar debug: odd number of field picture.");
+        intf_DbgMsg("vpar debug: odd number of field picture.\n");
     }
 
     if( p_vpar->picture.i_current_structure )
@@ -657,6 +655,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
         return;
     }
+    fprintf(stderr, "begin picture\n");
 
     /* OK, now we are sure we will decode the picture. */
 #define P_picture p_vpar->picture.p_picture
@@ -722,9 +721,9 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         DumpBits32( &p_vpar->bit_stream );
         
         /* Decode slice data. */
-        SliceHeader( p_vpar, &i_mb_address, i_mb_base, i_dummy & 255 );
+        p_vpar->sequence.pf_slice_header( p_vpar, &i_mb_address, i_mb_base, i_dummy & 255 );
     }
-    
+
     /* Link referenced pictures for the decoder 
      * They are unlinked in vpar_ReleaseMacroblock() & vpar_DestroyMacroblock() */
     if( p_vpar->sequence.p_forward != NULL )
@@ -739,6 +738,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     if( p_vpar->picture.b_error )
     {
         /* Trash picture. */
+fprintf(stderr, "Image trashee\n");
         for( i_mb = 0; p_vpar->picture.pp_mb[i_mb]; i_mb++ )
         {
             vpar_DestroyMacroblock( &p_vpar->vfifo, p_vpar->picture.pp_mb[i_mb] );
@@ -759,9 +759,12 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
         /* Prepare context for the next picture. */
         P_picture = NULL;
+        if( p_vpar->picture.i_current_structure == FRAME_STRUCTURE )
+            p_vpar->picture.i_current_structure = 0;
     }
     else if( p_vpar->picture.i_current_structure == FRAME_STRUCTURE )
     {
+fprintf(stderr, "Image decodee\n");
         /* Frame completely parsed. */
         P_picture->i_deccount = p_vpar->sequence.i_mb_size;
         for( i_mb = 0; i_mb < p_vpar->sequence.i_mb_size; i_mb++ )
@@ -771,6 +774,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
         /* Prepare context for the next picture. */
         P_picture = NULL;
+    p_vpar->picture.i_current_structure = 0;
     }
 #undef P_picture
 }
@@ -786,7 +790,7 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
     static int              pi_dc_dct_reinit[4] = {128,256,512,1024};
 
     int                     i_mb_address_save = *pi_mb_address;
-
+    
     /* slice_vertical_position_extension and priority_breakpoint already done */
     LoadQuantizerScale( p_vpar );
 
@@ -818,7 +822,8 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
                               i_mb_base );
         i_mb_address_save = *pi_mb_address;
     }
-    while( !ShowBits( &p_vpar->bit_stream, 23 ) );
+    while( ShowBits( &p_vpar->bit_stream, 23 ) );
+    NextStartCode( p_vpar );
 }
 
 /*****************************************************************************
