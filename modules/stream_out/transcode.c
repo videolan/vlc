@@ -631,6 +631,7 @@ static struct
     { VLC_FOURCC( 'S', 'V', 'Q', '1' ), CODEC_ID_SVQ1 },
 #if LIBAVCODEC_BUILD >= 4666
     { VLC_FOURCC( 'S', 'V', 'Q', '3' ), CODEC_ID_SVQ3 },
+    { VLC_FOURCC( 'h', '2', '6', '4' ), CODEC_ID_H264 },
 #endif
 
     /* raw video code, only used for 'encoding' */

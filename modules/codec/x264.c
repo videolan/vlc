@@ -2,7 +2,7 @@
  * x264.c: h264 video encoder
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: encoder.c 7342 2004-04-13 14:13:07Z gbazin $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -38,7 +38,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("h264 video encoder using x264 library"));
-    set_capability( "encoder", 10 );
+    set_capability( "encoder", 200 );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -100,9 +100,11 @@ static int  Open ( vlc_object_t *p_this )
 
     if( p_enc->fmt_in.video.i_aspect > 0 )
     {
-        /* TODO */
-        p_sys->param.vui.i_sar_width = 0;
-        p_sys->param.vui.i_sar_height = 0;
+        p_sys->param.vui.i_sar_width = p_enc->fmt_in.video.i_aspect *
+                                       p_enc->fmt_in.video.i_height *
+                                       p_enc->fmt_in.video.i_height /
+                                       p_enc->fmt_in.video.i_width;
+        p_sys->param.vui.i_sar_height = p_enc->fmt_in.video.i_height;
     }
     if( p_enc->fmt_in.video.i_frame_rate_base > 0 )
     {
