@@ -65,6 +65,15 @@ void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo )
     p_bit_stream->fifo.buffer = 0;
     p_bit_stream->fifo.i_available = 0;
     vlc_mutex_unlock( &p_fifo->data_lock );
+
+    if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
+    {
+        /* Get aligned on a word boundary.
+         * NB : we _will_ get aligned, because we have at most 
+         * sizeof(WORD_TYPE) - 1 bytes to store, and at least
+         * sizeof(WORD_TYPE) - 1 empty bytes in the bit buffer. */
+        AlignWord( p_bit_stream );
+    }
 }
 
 /*****************************************************************************
