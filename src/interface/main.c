@@ -207,9 +207,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
     else
     {
-        p_playlist = malloc( sizeof(int) );
-        p_playlist[ 0 ] = "-";
-        i_list_index = 1;
+        p_playlist = NULL;
     }
 
     intf_MsgImm( COPYRIGHT_MESSAGE "\n" );          /* print welcome message */
