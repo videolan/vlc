@@ -132,7 +132,7 @@ build-stamp:
 
 	# Build only VLC, with the non-PIC libs
 	$(MAKE) include/vlc_symbols.h
-	cd modules && $(MAKE)
+	cd modules && AM_MAKEFLAGS='plugin=no pic=no' $(MAKE)
 	$(MAKE) vlc
 
 ifneq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
@@ -162,7 +162,7 @@ ifneq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 endif
 
 	# Build all the rest, with the PIC libs
-	$(MAKE)
+	AM_MAKEFLAGS='builtin=no' $(MAKE)
 
 	touch build-stamp
 

@@ -1,3 +1,19 @@
+vlc (0.6.0+cvs-20030704-1) unstable; urgency=low
+
+  * New CVS snapshot.
+    + Includes previous Debian fixes.
+    + Errors in plugins now properly trigger build abort so that no build
+      failures are missed. Thanks to LaMont Jones for pointing out the problem.
+  * debian/rules:
+    + Only build builtins in the first compile pass so that we don't mix PIC
+      and non-PIC code (Closes: #199968). Phew, I hope I got it right this
+      time.
+  * extras/ffmpeg:
+    + Re-applied the Alpha build fix from 0.6.0+cvs-20030627-2 that had
+      disappeared in 0.6.0+cvs-20030703-1.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Thu,  3 Jul 2003 11:25:57 +0200
+
 vlc (0.6.0+cvs-20030703-1) unstable; urgency=low
 
   * New CVS snapshot.

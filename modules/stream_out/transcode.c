@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.21 2003/06/30 20:44:35 gbazin Exp $
+ * $Id: transcode.c,v 1.22 2003/07/04 16:35:20 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -41,6 +41,9 @@
 /* vorbis header */
 #ifdef HAVE_VORBIS_VORBISENC_H
 #   include <vorbis/vorbisenc.h>
+#   ifndef OV_ECTL_RATEMANAGE_AVG
+#       define OV_ECTL_RATEMANAGE_AVG 0x0
+#   endif
 #endif
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * preferences.cpp: preferences window for the kde gui
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.cpp,v 1.16 2003/05/05 14:58:45 sigmunau Exp $
+ * $Id: preferences.cpp,v 1.17 2003/07/04 16:35:20 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -40,6 +40,7 @@
 #include <klocale.h>
 #include <knuminput.h>
 #include <kurlrequester.h>
+#include <kfiledialog.h>
 #include <kcombobox.h>
 
 #include "QConfigItem.h"
@@ -214,7 +215,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                                                           hb );
                 if ( p_item->i_type == CONFIG_ITEM_DIRECTORY )
                 {
-                    kfile->setMode(KFile::Directory|KFile::ExistingOnly|KFile::LocalOnly);
+                    kfile->fileDialog()->setMode(KFile::Directory|KFile::ExistingOnly|KFile::LocalOnly);
                 }
                 connect(kfile, SIGNAL(textChanged ( const QString & )),
                         ci, SLOT(setValue( const QString &)));

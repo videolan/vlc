@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.16 2003/06/28 12:07:00 massiot Exp $
+ * $Id: mkv.cpp,v 1.17 2003/07/04 16:35:20 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -319,7 +319,9 @@ static int Activate( vlc_object_t * p_this )
     /* is a valid file */
     if( p_peek[0] != 0x1a || p_peek[1] != 0x45 || p_peek[2] != 0xdf || p_peek[3] != 0xa3 )
     {
-        msg_Warn( p_input, "matroska module discarded (invalid header)" );
+        msg_Warn( p_input, "matroska module discarded "
+                           "(invalid header 0x%.2x%.2x%.2x%.2x)",
+                           p_peek[0], p_peek[1], p_peek[2], p_peek[3] );
         return VLC_EGENERIC;
     }
 
