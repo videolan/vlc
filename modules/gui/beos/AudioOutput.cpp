@@ -2,7 +2,7 @@
  * AudioOutput.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.21 2002/12/16 20:18:42 titer Exp $
+ * $Id: AudioOutput.cpp,v 1.22 2002/12/26 18:17:38 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -34,9 +34,12 @@
 #include <SoundPlayer.h>
 #include <media/MediaDefs.h>
 
+
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
+extern "C" {
 #include <aout_internal.h>
+}
 
 /*****************************************************************************
  * aout_sys_t: BeOS audio output method descriptor
