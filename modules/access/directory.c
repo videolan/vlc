@@ -364,6 +364,11 @@ static int ReadDir( playlist_t *p_playlist,
 
     /* get the first directory entry */
     i_dir_content = scandir( psz_name, &pp_dir_content, Filter, alphasort );
+    if( i_dir_content == -1 )
+    {
+        msg_Warn( p_playlist, "Failed to read directory" );
+        return VLC_EGENERIC;
+    }
     p_dir_content = pp_dir_content[0];
 
     /* while we still have entries in the directory */
