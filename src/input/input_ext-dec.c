@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.33 2002/07/24 15:21:47 sam Exp $
+ * $Id: input_ext-dec.c,v 1.34 2002/08/26 23:00:23 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -429,7 +429,32 @@ void CurrentPTS( bit_stream_t * p_bit_stream, mtime_t * pi_pts,
 {
     /* Check if the current PTS is already valid (ie. if the first byte
      * of the packet has already been used in the decoder). */
-    ptrdiff_t p_diff = p_bit_stream->p_byte - p_bit_stream->p_pts_validity;
+    ptrdiff_t p_diff = p_bit_stream->p_pts_validity - p_bit_stream->p_byte;
+    if( p_diff < 0 || p_diff > 4 /* We are far away so it is valid */
+         || (p_diff * 8) >= p_bit_stream->fifo.i_available
+            /* We have buffered less bytes than actually read */ )
+    {
+        *pi_pts = p_bit_stream->i_pts;
+        if( pi_dts != NULL ) *pi_dts = p_bit_stream->i_dts;
+        p_bit_stream->i_pts = 0;
+        p_bit_stream->i_dts = 0;
+    }
+    else
+    {
+        *pi_pts = 0;
+        if( pi_dts != NULL) *pi_dts = 0;
+    }
+}
+
+/*****************************************************************************
+ * NextPTS: returns the PTS and DTS for the next starting byte
+ *****************************************************************************/
+void NextPTS( bit_stream_t * p_bit_stream, mtime_t * pi_pts,
+              mtime_t * pi_dts )
+{
+    /* Check if the current PTS is already valid (ie. if the first byte
+     * of the packet has already been used in the decoder). */
+    ptrdiff_t p_diff = p_bit_stream->p_pts_validity - p_bit_stream->p_byte - 1;
     if( p_diff < 0 || p_diff > 4 /* We are far away so it is valid */
          || (p_diff * 8) >= p_bit_stream->fifo.i_available
             /* We have buffered less bytes than actually read */ )

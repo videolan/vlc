@@ -2,7 +2,7 @@
  * a52tospdif.c : encapsulates A/52 frames into S/PDIF packets
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: a52tospdif.c,v 1.9 2002/08/21 22:41:59 massiot Exp $
+ * $Id: a52tospdif.c,v 1.10 2002/08/26 23:00:22 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -98,14 +98,14 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     /* Copy the S/PDIF headers. */
     memcpy( p_out, p_sync, 6 );
     pi_length = (u16 *)(p_out + 6);
-    *pi_length = i_length;
+    *pi_length = i_length * 8;
 
     /* FIXME : if i_length is odd, the following code sucks. What should
      * we do ? --Meuuh */
 
 #ifndef WORDS_BIGENDIAN
 #   ifdef HAVE_SWAB
-    swab( p_out + 8, p_in, i_length );
+    swab( p_in, p_out + 8, i_length );
 #   else
     p_out += 8;
     for ( i = i_length / 2 ; i-- ; )

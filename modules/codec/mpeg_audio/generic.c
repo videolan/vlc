@@ -2,7 +2,7 @@
  * generic.c: MPEG audio decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: generic.c,v 1.2 2002/08/17 15:35:10 fenrir Exp $
+ * $Id: generic.c,v 1.3 2002/08/26 23:00:22 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -46,24 +46,24 @@ int adec_Init( adec_thread_t * p_adec )
 
 int adec_SyncFrame( adec_thread_t * p_adec, adec_sync_info_t * p_sync_info )
 {
-    static int mpeg1_sample_rate[3] = {44100, 48000, 32000};
-    static int mpeg1_layer1_bit_rate[15] =
+    static const int mpeg1_sample_rate[3] = {44100, 48000, 32000};
+    static const int mpeg1_layer1_bit_rate[15] =
     {
         0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448
     };
-    static int mpeg1_layer2_bit_rate[15] =
+    static const int mpeg1_layer2_bit_rate[15] =
     {
         0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384
     };
-    static int mpeg2_layer1_bit_rate[15] =
+    static const int mpeg2_layer1_bit_rate[15] =
     {
         0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192, 224, 256
     };
-    static int mpeg2_layer2_bit_rate[15] =
+    static const int mpeg2_layer2_bit_rate[15] =
     {
         0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160
     };
-    static int * bit_rate_table[8] =
+    static const int * bit_rate_table[8] =
     {
         NULL, NULL, mpeg2_layer2_bit_rate, mpeg2_layer1_bit_rate,
         NULL, NULL, mpeg1_layer2_bit_rate, mpeg1_layer1_bit_rate

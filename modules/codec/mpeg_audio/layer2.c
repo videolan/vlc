@@ -2,7 +2,7 @@
  * layer2.c: MPEG Layer II audio decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: layer2.c,v 1.3 2002/08/17 15:35:10 fenrir Exp $
+ * $Id: layer2.c,v 1.4 2002/08/26 23:00:22 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -434,13 +434,9 @@ int adec_layer2_mono( adec_thread_t * p_adec, float * buffer )
             for (s = 0; s < 3; s++)
             {
                 DCT32( &p_adec->bank_0, sample[s] );
-                PCM( &p_adec->bank_0, buffer, 2 );
+                PCM( &p_adec->bank_0, buffer, 1 );
 
-                /* FIXME: one shouldn't have to do it twice ! */
-                DCT32( &p_adec->bank_1, sample[s] );
-                PCM( &p_adec->bank_1, buffer + 1, 2 );
-
-                buffer += 64;
+                buffer += 32;
             }
         }
     }

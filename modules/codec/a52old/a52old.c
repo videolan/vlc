@@ -2,7 +2,7 @@
  * a52old.c: A52 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: a52old.c,v 1.4 2002/08/23 14:05:22 sam Exp $
+ * $Id: a52old.c,v 1.5 2002/08/26 23:00:22 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -186,7 +186,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             continue;
         }
 
-        CurrentPTS( &p_a52dec->bit_stream, &i_pts, NULL );
+        NextPTS( &p_a52dec->bit_stream, &i_pts, NULL );
         if( i_pts != 0 && i_pts != aout_DateGet( &end_date ) )
         {
             aout_DateSet( &end_date, i_pts );

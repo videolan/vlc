@@ -78,6 +78,7 @@ struct module_symbols_t
     void (* CurrentPTS_inner) ( bit_stream_t *, mtime_t *, mtime_t * ) ;
     void (* DecoderError_inner) ( decoder_fifo_t * p_fifo ) ;
     void (* InitBitstream_inner) ( bit_stream_t *, decoder_fifo_t *, void ( * )( bit_stream_t *, vlc_bool_t ), void * p_callback_arg ) ;
+    void (* NextPTS_inner) ( bit_stream_t *, mtime_t *, mtime_t * ) ;
     void (* UnalignedRemoveBits_inner) ( bit_stream_t * ) ;
     void (* __config_PutFloat_inner) (vlc_object_t *, const char *, float) ;
     void (* __config_PutInt_inner) (vlc_object_t *, const char *, int) ;
@@ -159,6 +160,7 @@ struct module_symbols_t
 #   define GetLang_2T p_symbols->GetLang_2T_inner
 #   define InitBitstream p_symbols->InitBitstream_inner
 #   define NextDataPacket p_symbols->NextDataPacket_inner
+#   define NextPTS p_symbols->NextPTS_inner
 #   define UnalignedGetBits p_symbols->UnalignedGetBits_inner
 #   define UnalignedRemoveBits p_symbols->UnalignedRemoveBits_inner
 #   define UnalignedShowBits p_symbols->UnalignedShowBits_inner

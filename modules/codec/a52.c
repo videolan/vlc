@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52.c,v 1.6 2002/08/21 22:41:59 massiot Exp $
+ * $Id: a52.c,v 1.7 2002/08/26 23:00:22 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -167,6 +167,13 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             RemoveBits( &p_dec->bit_stream, 8 );
         }
 
+        /* Set the Presentation Time Stamp */
+        NextPTS( &p_dec->bit_stream, &pts, NULL );
+        if ( pts != 0 && pts != aout_DateGet( &p_dec->end_date ) )
+        {
+            aout_DateSet( &p_dec->end_date, pts );
+        }
+
         /* Get A/52 frame header */
         GetChunk( &p_dec->bit_stream, p_frame_buffer, 7 );
         if( p_dec->p_fifo->b_die ) break;
@@ -205,13 +212,6 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                 p_dec->p_fifo->b_error = 1;
                 break;
             }
-        }
-
-        /* Set the Presentation Time Stamp */
-        CurrentPTS( &p_dec->bit_stream, &pts, NULL );
-        if ( pts != 0 && pts != aout_DateGet( &p_dec->end_date ) )
-        {
-            aout_DateSet( &p_dec->end_date, pts );
         }
 
         /* Get the complete frame */

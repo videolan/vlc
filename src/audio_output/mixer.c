@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.9 2002/08/21 22:41:59 massiot Exp $
+ * $Id: mixer.c,v 1.10 2002/08/26 23:00:23 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -249,10 +249,14 @@ static int MixBuffer( aout_instance_t * p_aout )
         vlc_mutex_unlock( &p_aout->mixer_lock );
         return -1;
     }
-    p_output_buffer->i_nb_samples = p_aout->output.i_nb_samples;
-    p_output_buffer->i_nb_bytes = p_aout->output.i_nb_samples
+    /* This is again a bit kludgy - for the S/PDIF mixer. */
+    if ( p_aout->mixer.output_alloc.i_alloc_type != AOUT_ALLOC_NONE )
+    {
+        p_output_buffer->i_nb_samples = p_aout->output.i_nb_samples;
+        p_output_buffer->i_nb_bytes = p_aout->output.i_nb_samples
                               * p_aout->mixer.mixer.i_bytes_per_frame
                               / p_aout->mixer.mixer.i_frame_length;
+    }
     p_output_buffer->start_date = start_date;
     p_output_buffer->end_date = end_date;
 

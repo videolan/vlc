@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.8 2002/08/24 10:19:43 sam Exp $
+ * $Id: input.c,v 1.9 2002/08/26 23:00:23 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -28,6 +28,10 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
+
+#ifdef HAVE_ALLOCA_H
+#   include <alloca.h>
+#endif
 
 #include "audio_output.h"
 #include "aout_internal.h"

@@ -214,6 +214,7 @@ static const char * module_error( char *psz_buffer )
     (p_symbols)->UnalignedRemoveBits_inner = UnalignedRemoveBits; \
     (p_symbols)->UnalignedGetBits_inner = UnalignedGetBits; \
     (p_symbols)->CurrentPTS_inner = CurrentPTS; \
+    (p_symbols)->NextPTS_inner = NextPTS; \
     (p_symbols)->DecoderError_inner = DecoderError; \
     (p_symbols)->__input_SetStatus_inner = __input_SetStatus; \
     (p_symbols)->__input_Seek_inner = __input_Seek; \

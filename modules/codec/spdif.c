@@ -1,8 +1,8 @@
 /*****************************************************************************
- * spdif.c: A52 pass-through to external decoder with enabled soundcard
+ * spdif.c: A/52 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: spdif.c,v 1.6 2002/08/19 21:31:11 massiot Exp $
+ * $Id: spdif.c,v 1.7 2002/08/26 23:00:22 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -117,7 +117,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 static int RunDecoder( decoder_fifo_t *p_fifo )
 {
     spdif_thread_t * p_dec;
-    mtime_t last_date = 0;
+    audio_date_t end_date;
     
     /* Allocate the memory needed to store the thread's structure */
     p_dec = malloc( sizeof(spdif_thread_t) );
@@ -154,6 +154,13 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             RemoveBits( &p_dec->bit_stream, 8 );
         }
 
+        /* Set the Presentation Time Stamp */
+        NextPTS( &p_dec->bit_stream, &pts, NULL );
+        if ( pts != 0 && pts != aout_DateGet( &end_date ) )
+        {
+            aout_DateSet( &end_date, pts );
+        }
+
         /* Get A/52 frame header */
         GetChunk( &p_dec->bit_stream, p_header, 7 );
         if( p_dec->p_fifo->b_die ) break;
@@ -183,7 +190,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             p_dec->output_format.i_rate = i_rate;
             p_dec->output_format.i_bytes_per_frame = i_frame_size;
             p_dec->output_format.i_frame_length = A52_FRAME_NB;
-            /* p_dec->output_format.i_channels = i_channels; */
+            aout_DateInit( &end_date, i_rate );
             p_dec->p_aout_input = aout_InputNew( p_dec->p_fifo,
                                                  &p_dec->p_aout,
                                                  &p_dec->output_format );
@@ -195,14 +202,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             }
         }
 
-        /* Set the Presentation Time Stamp */
-        CurrentPTS( &p_dec->bit_stream, &pts, NULL );
-        if ( pts != 0 )
-        {
-            last_date = pts;
-        }
-
-        if ( !last_date )
+        if ( !aout_DateGet( &end_date ) )
         {
             byte_t p_junk[3840];
 
@@ -214,10 +214,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         p_buffer = aout_BufferNew( p_dec->p_aout, p_dec->p_aout_input,
                                    A52_FRAME_NB );
         if ( p_buffer == NULL ) return -1;
-        p_buffer->start_date = last_date;
-        last_date += (mtime_t)(A52_FRAME_NB * 1000000)
-                       / p_dec->output_format.i_rate;
-        p_buffer->end_date = last_date;
+        p_buffer->start_date = aout_DateGet( &end_date );
+        p_buffer->end_date = aout_DateIncrement( &end_date,
+                                                 A52_FRAME_NB );
 
         /* Get the whole frame. */
         memcpy( p_buffer->p_buffer, p_header, 7 );
