@@ -2,7 +2,7 @@
  * aout_darwin.c : Darwin audio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.c,v 1.3 2001/07/12 20:44:52 reno Exp $
+ * $Id: aout_macosx.c,v 1.4 2001/10/08 16:20:25 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *
@@ -34,7 +34,6 @@
  * Find 8 bits files and adapt output
  */
  
-#define MODULE_NAME macosx
 #include "modules_inner.h"
 
 /*****************************************************************************
@@ -96,17 +95,17 @@ static void    aout_Play        ( aout_thread_t *p_aout,
                                   byte_t *buffer, int i_size );
 static void    aout_Close       ( aout_thread_t *p_aout );
 
-OSStatus appIOProc( AudioDeviceID inDevice, const AudioTimeStamp* inNow, 
+static OSStatus appIOProc( AudioDeviceID inDevice, const AudioTimeStamp* inNow, 
                     const void* inInputData, const AudioTimeStamp* inInputTime,
                     AudioBufferList* outOutputData, 
                     const AudioTimeStamp* inOutputTime, 
                     void* threadGlobals );
-void Convert16BitIntegerTo32Float( Ptr p_in16BitDataPtr, Ptr p_out32BitDataPtr, 
+static void Convert16BitIntegerTo32Float( Ptr p_in16BitDataPtr, Ptr p_out32BitDataPtr, 
                                    UInt32 ui_totalBytes );
-void Convert16BitIntegerTo32FloatWithByteSwap( Ptr p_in16BitDataPtr, 
+static void Convert16BitIntegerTo32FloatWithByteSwap( Ptr p_in16BitDataPtr, 
                                                Ptr p_out32BitDataPtr, 
                                                UInt32 p_totalBytes );
-void Convert8BitIntegerTo32Float( Ptr in8BitDataPtr, Ptr p_out32BitDataPtr, 
+static void Convert8BitIntegerTo32Float( Ptr in8BitDataPtr, Ptr p_out32BitDataPtr, 
                                   UInt32 ui_totalBytes );
 
 /*****************************************************************************
@@ -371,7 +370,7 @@ static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 /*****************************************************************************
  * appIOProc : callback for audio output
  *****************************************************************************/
-OSStatus appIOProc( AudioDeviceID  inDevice, const AudioTimeStamp*  inNow, 
+static OSStatus appIOProc( AudioDeviceID  inDevice, const AudioTimeStamp*  inNow, 
                     const void*  inInputData, const AudioTimeStamp*  inInputTime, 
                     AudioBufferList*  outOutputData, const AudioTimeStamp* inOutputTime, 
                     void* threadGlobals )
@@ -436,7 +435,7 @@ static void aout_Close( aout_thread_t *p_aout )
 /*****************************************************************************
  * Convert16BitIntegerTo32Float
  *****************************************************************************/
-void Convert16BitIntegerTo32Float( Ptr p_in16BitDataPtr, Ptr p_out32BitDataPtr, 
+static void Convert16BitIntegerTo32Float( Ptr p_in16BitDataPtr, Ptr p_out32BitDataPtr, 
                                    UInt32 ui_totalBytes )
 {
     UInt32	i, ui_samples = ui_totalBytes / 2 /* each 16 bit sample is 2 bytes */;
@@ -458,7 +457,7 @@ void Convert16BitIntegerTo32Float( Ptr p_in16BitDataPtr, Ptr p_out32BitDataPtr,
 /*****************************************************************************
  * Convert16BitIntegerTo32FloatWithByteSwap
  *****************************************************************************/
-void Convert16BitIntegerTo32FloatWithByteSwap( Ptr p_in16BitDataPtr, 
+static void Convert16BitIntegerTo32FloatWithByteSwap( Ptr p_in16BitDataPtr, 
                                                Ptr p_out32BitDataPtr, 
                                                UInt32 ui_totalBytes )
 {
@@ -482,7 +481,7 @@ void Convert16BitIntegerTo32FloatWithByteSwap( Ptr p_in16BitDataPtr,
 /*****************************************************************************
  * Convert8BitIntegerTo32Float
  *****************************************************************************/
-void Convert8BitIntegerTo32Float( Ptr p_in8BitDataPtr, Ptr p_out32BitDataPtr, 
+static void Convert8BitIntegerTo32Float( Ptr p_in8BitDataPtr, Ptr p_out32BitDataPtr, 
                                   UInt32 ui_totalBytes )
 {
     UInt32	i, ui_samples = ui_totalBytes;

@@ -55,8 +55,8 @@ E: ndeb@ece.cmu.edu
 D: Minor autoconf and Makefile fixes
 
 N: Cyril Deguet
-C: asmax
 E: asmax@via.ecp.fr
+C: asmax
 D: PS input packet allocator
 
 N: Colin Delacroix
@@ -190,10 +190,15 @@ C: massiot
 D: MPEG PS input
 D: bitstream and input core functions
 D: MPEG video decoder
+D: Many ports
 
 N: Arkadiusz Miskiewicz
 E: misiek@pld.ORG.PL
 D: autoconf and Makefile patches
+
+N: Florian G. Pflug
+E: fgp@phlo.org
+D: MacOS X port
 
 N: Olivier Pomel
 E: pomel@via.ecp.fr

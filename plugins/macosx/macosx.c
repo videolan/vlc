@@ -2,7 +2,7 @@
  * macosx.c : MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: macosx.c,v 1.5 2001/05/30 17:03:12 sam Exp $
+ * $Id: macosx.c,v 1.6 2001/10/08 16:20:25 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME macosx
 #include "modules_inner.h"
 
 /*****************************************************************************

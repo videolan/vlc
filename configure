@@ -4330,9 +4330,9 @@ fi
 if test "x$withval" != "x"; then
     TUNING=$withval
 else
-    if test x$ARCH = xi686; then TUNING="pentiumpro"
+    if test x${target_cpu} = xi686; then TUNING="pentiumpro"
     else
-        if test x$ARCH = ppc; then TUNING="750"; fi
+        if test x${target_cpu} = xpowerpc; then TUNING="750"; fi
     fi
 fi
 
@@ -4677,8 +4677,8 @@ if test "${enable_macosx+set}" = set; then
   enableval="$enable_macosx"
   if test x$enable_macosx = xyes
    then
-     BUILTINS="${BUILTINS} macosx"
-     LIB_MACOSX="-framework CoreAudio -framework Carbon -framework AGL"
+     BUILTINS="${BUILTINS} macosx macosx_qt"
+     LIB_MACOSX="-framework CoreAudio -framework Carbon -framework AGL -framework QuickTime"
      LIB_TS="${LIB_TS} -framework AGL -framework Carbon"
      LIB_SDL="${LIB_SDL} -framework AGL -framework Carbon"
    fi
@@ -4717,8 +4717,8 @@ if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   cat >> confdefs.h <<EOF
 #define $ac_tr_hdr 1
 EOF
- BUILTINS="${BUILTINS} macosx"
-     LIB_MACOSX="-framework CoreAudio -framework Carbon -framework AGL"
+ BUILTINS="${BUILTINS} macosx macosx_qt"
+     LIB_MACOSX="-framework CoreAudio -framework Carbon -framework AGL -framework QuickTime"
      LIB_TS="${LIB_TS} -framework AGL -framework Carbon"
      LIB_SDL="${LIB_SDL} -framework AGL -framework Carbon"
    
