@@ -55,7 +55,7 @@ all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
-	.png .gpgerror .gcrypt .gnutls .daap .cdio .vcdimager
+	.png .gpgerror .gcrypt .gnutls .daap .cddb .cdio .vcdimager
 endif
 ifeq ($(SYS),BEOS)
 all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
@@ -880,7 +880,7 @@ libcddb: libcddb-$(CDDB_VERSION).tar.gz
 	patch -p 0 < Patches/libcddb.patch
 
 .cddb: libcddb
-	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" LDFLAGS="-liconv" && make && make install)
 	touch $@
 
 CLEAN_FILE += .cddb
