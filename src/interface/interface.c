@@ -186,7 +186,7 @@ void intf_Run( intf_thread_t *p_intf )
     while( !p_intf->b_die )
     {
         /* Select the next playlist item */
-        playlist_Next( p_main->p_playlist );
+        intf_PlstNext( p_main->p_playlist );
 
         if( p_main->p_playlist->i_index == -1 )
         {

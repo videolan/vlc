@@ -236,14 +236,14 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Initialize playlist and get commandline files
      */
-    p_main->p_playlist = playlist_Create( );
+    p_main->p_playlist = intf_PlstCreate( );
     if( !p_main->p_playlist )
     {
         intf_ErrMsg( "playlist error: playlist initialization failed" );
         intf_MsgDestroy();
         return( errno );
     }
-    playlist_Init( p_main->p_playlist );
+    intf_PlstInit( p_main->p_playlist );
 
     /*
      * Read configuration
@@ -261,7 +261,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     if( !p_main->p_bank )
     {
         intf_ErrMsg( "plugin error: plugin bank initialization failed" );
-        playlist_Destroy( p_main->p_playlist );
+        intf_PlstDestroy( p_main->p_playlist );
         intf_MsgDestroy();
         return( errno );
     }
@@ -275,7 +275,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     {
         intf_ErrMsg( "module error: module bank initialization failed" );
         bank_Destroy( p_main->p_bank );
-        playlist_Destroy( p_main->p_playlist );
+        intf_PlstDestroy( p_main->p_playlist );
         intf_MsgDestroy();
         return( errno );
     }
@@ -362,7 +362,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Free playlist
      */
-    playlist_Destroy( p_main->p_playlist );
+    intf_PlstDestroy( p_main->p_playlist );
 
 #ifdef SYS_BEOS
     /*
@@ -648,7 +648,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /* We assume that the remaining parameters are filenames */
     for( i_opt = optind; i_opt < i_argc; i_opt++ )
     {
-        playlist_Add( p_main->p_playlist, PLAYLIST_END, ppsz_argv[ i_opt ] );
+        intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, ppsz_argv[ i_opt ] );
     }
 
     return( 0 );

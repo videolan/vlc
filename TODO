@@ -74,7 +74,7 @@ Difficulty: Hard
 Urgency: Normal
 Description: Make input plugins dynamically loadable
  With a probe() function, and stuff...
-Status: Todo
+Status: Done 7 Feb 2001 (sam)
 
 Task: 0x45
 Difficulty: Guru
@@ -375,7 +375,7 @@ Description: Implement pause
  displaying and sound playback, but the streams continues to
  be decoded. One will have to do a file implementation as
  well as a network implementation.
-Status: Todo
+Status: Done 8 Feb 2001 (Meuuh)
 
 Task: 0x20
 Difficulty: Hard
@@ -432,7 +432,6 @@ Task: 0x1a
 Difficulty: Easy
 Urgency: Normal
 Description: Make interface more responsive
-Status: Todo
  When in "waiting for stream" mode, the interface is refreshed
  every 5 seconds. This is too long, and can be confusing for
  the user. Make it refresh at least after a keyboard/mouse event.
@@ -642,7 +641,7 @@ Description: Playlist API
  one after the other. We need a smarter way to handle this,
  through AddFile(), MoveFile(), etc. functions. input_file
  has to be modified to support this as well.
-Status: Todo
+Status: Done 8 Feb 2001 (sam)
 
 Task: 0x02
 Difficulty: Medium
@@ -668,6 +667,4 @@ Description: Splash screen
  The vlc needs a splash screen with a vlc logo, instead of
  the "waiting for stream" message.
 Status: Todo
-
-
 

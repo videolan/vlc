@@ -20,6 +20,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/*****************************************************************************
+ * playlist_item_t: playlist item
+ *****************************************************************************/
 typedef struct playlist_item_s
 {
     char*             psz_name;
@@ -27,6 +30,13 @@ typedef struct playlist_item_s
     int               i_status; /* unused yet */
 } playlist_item_t;
 
+/*****************************************************************************
+ * playlist_t: playlist structure
+ *****************************************************************************
+ * The structure contains information about the size and browsing mode of
+ * the playlist, a change lock, a dynamic array of playlist items, and a
+ * current item which is an exact copy of one of the array members.
+ *****************************************************************************/
 typedef struct playlist_s
 {
     int                   i_index;                          /* current index */
@@ -41,7 +51,7 @@ typedef struct playlist_s
     playlist_item_t*      p_item;
 } playlist_t;
 
-/* Used by playlist_Add */
+/* Used by intf_PlstAdd */
 #define PLAYLIST_START            0
 #define PLAYLIST_END             -1
 
@@ -54,11 +64,14 @@ typedef struct playlist_s
 #define PLAYLIST_RANDOM           3                          /* Shuffle play */
 #define PLAYLIST_REVERSE_RANDOM  -3                  /* Reverse shuffle play */
 
-playlist_t * playlist_Create   ( void );
-void         playlist_Init     ( playlist_t * p_playlist );
-int          playlist_Add      ( playlist_t * p_playlist,
+/*****************************************************************************
+ * Prototypes
+ *****************************************************************************/
+playlist_t * intf_PlstCreate   ( void );
+void         intf_PlstInit     ( playlist_t * p_playlist );
+int          intf_PlstAdd      ( playlist_t * p_playlist,
                                  int i_pos, char * psz_item );
-void         playlist_Next     ( playlist_t * p_playlist );
-void         playlist_Prev     ( playlist_t * p_playlist );
-void         playlist_Destroy  ( playlist_t * p_playlist );
+void         intf_PlstNext     ( playlist_t * p_playlist );
+void         intf_PlstPrev     ( playlist_t * p_playlist );
+void         intf_PlstDestroy  ( playlist_t * p_playlist );
 

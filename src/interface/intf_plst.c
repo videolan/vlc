@@ -36,9 +36,17 @@
 
 #include "main.h"
 
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
 static void NextItem( playlist_t * p_playlist );
 
-playlist_t * playlist_Create ( void )
+/*****************************************************************************
+ * intf_PlstCreate: create playlist
+ *****************************************************************************
+ * Create a playlist structure.
+ *****************************************************************************/
+playlist_t * intf_PlstCreate ( void )
 {
     playlist_t *p_playlist;
 
@@ -54,11 +62,16 @@ playlist_t * playlist_Create ( void )
     return( p_playlist );
 }
 
-void playlist_Init ( playlist_t * p_playlist )
+/*****************************************************************************
+ * intf_PlstInit: initialize playlist
+ *****************************************************************************
+ * Initialize a playlist structure.
+ *****************************************************************************/
+void intf_PlstInit ( playlist_t * p_playlist )
 {
     vlc_mutex_init( &p_playlist->change_lock );
 
-    p_playlist->i_index = -1; /* -1 means we are not playing anything yet */
+    p_playlist->i_index = -1;    /* -1 means we are not playing anything yet */
     p_playlist->i_size = 0;
 
     p_playlist->i_mode = PLAYLIST_FORWARD;
@@ -75,7 +88,13 @@ void playlist_Init ( playlist_t * p_playlist )
     intf_Msg("intf: playlist initialized");
 }
 
-int playlist_Add( playlist_t * p_playlist, int i_pos, char * psz_item )
+/*****************************************************************************
+ * intf_PlstAdd: add an item to the playlist
+ *****************************************************************************
+ * Add an item to the playlist at position i_pos. If i_pos is PLAYLIST_END,
+ * add it at the end regardless of the playlist current size.
+ *****************************************************************************/
+int intf_PlstAdd( playlist_t * p_playlist, int i_pos, char * psz_item )
 {
     int i_index;
     playlist_item_t * p_item;
@@ -118,7 +137,13 @@ int playlist_Add( playlist_t * p_playlist, int i_pos, char * psz_item )
     return( 0 );
 }
 
-void playlist_Next( playlist_t * p_playlist )
+/*****************************************************************************
+ * intf_PlstNext: switch to next playlist item
+ *****************************************************************************
+ * Switch to the next item of the playlist. If there is no next item, the
+ * position of the resulting item is set to -1.
+ *****************************************************************************/
+void intf_PlstNext( playlist_t * p_playlist )
 {
     vlc_mutex_lock( &p_playlist->change_lock );
 
@@ -127,7 +152,13 @@ void playlist_Next( playlist_t * p_playlist )
     vlc_mutex_unlock( &p_playlist->change_lock );
 }
 
-void playlist_Prev( playlist_t * p_playlist )
+/*****************************************************************************
+ * intf_PlstPrev: switch to previous playlist item
+ *****************************************************************************
+ * Switch to the previous item of the playlist. If there is no previous
+ * item, the position of the resulting item is set to -1.
+ *****************************************************************************/
+void intf_PlstPrev( playlist_t * p_playlist )
 {
     vlc_mutex_lock( &p_playlist->change_lock );
     p_playlist->i_mode = -p_playlist->i_mode;
@@ -138,7 +169,12 @@ void playlist_Prev( playlist_t * p_playlist )
     vlc_mutex_unlock( &p_playlist->change_lock );
 }
 
-int playlist_Delete( playlist_t * p_playlist, int i_pos )
+/*****************************************************************************
+ * intf_PlstDelete: delete an item from the playlist
+ *****************************************************************************
+ * Delete the item in the playlist with position i_pos.
+ *****************************************************************************/
+int intf_PlstDelete( playlist_t * p_playlist, int i_pos )
 {
     int i_index;
     char * psz_name;
@@ -176,13 +212,18 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
     return( 0 );
 }
 
-void playlist_Destroy( playlist_t * p_playlist )
+/*****************************************************************************
+ * intf_PlstDestroy: destroy the playlist
+ *****************************************************************************
+ * Delete all items in the playlist and free the playlist structure.
+ *****************************************************************************/
+void intf_PlstDestroy( playlist_t * p_playlist )
 {
     int i_index;
 
     for( i_index = p_playlist->i_size - 1; p_playlist->i_size; i_index-- )
     {
-        playlist_Delete( p_playlist, i_index );
+        intf_PlstDelete( p_playlist, i_index );
     }
 
     vlc_mutex_destroy( &p_playlist->change_lock );
@@ -197,6 +238,16 @@ void playlist_Destroy( playlist_t * p_playlist )
     intf_Msg("intf: playlist destroyed");
 }
 
+/*****************************************************************************
+ * Following functions are local
+ *****************************************************************************/
+
+/*****************************************************************************
+ * NextItem: select next playlist item
+ *****************************************************************************
+ * This function copies the next playlist item to the current structure,
+ * depending on the playlist browsing mode.
+ *****************************************************************************/
 static void NextItem( playlist_t * p_playlist )
 {
     if( !p_playlist->i_size )
