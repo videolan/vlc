@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.11 2001/11/28 15:08:05 massiot Exp $
+ * $Id: alsa.c,v 1.11.2.1 2001/12/17 12:42:52 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -58,6 +58,7 @@ MODULE_INIT_START
     p_module->i_capabilities =  MODULE_CAPABILITY_NULL
                                 | MODULE_CAPABILITY_AOUT;
     p_module->psz_longname = "Alsa audio module";
+    fprintf( stderr, "error: your have installed the alsa.so plugin. It is currently broken, please use ALSA's OSS emulation and the dsp.so plugin instead\n" );
 MODULE_INIT_STOP
     
 MODULE_ACTIVATE_START

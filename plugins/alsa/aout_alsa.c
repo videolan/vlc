@@ -2,7 +2,7 @@
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: aout_alsa.c,v 1.22.2.1 2001/12/17 01:36:59 sam Exp $
+ * $Id: aout_alsa.c,v 1.22.2.2 2001/12/17 12:42:52 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -85,6 +85,9 @@ static int aout_Probe( probedata_t *p_data )
 {
     int i_open_return, i_close_return;
     aout_sys_t local_sys;
+
+    /* XXX: alsa output is DISABLED */
+    return 0;
 
     /* Open device */
     i_open_return = snd_pcm_open( &(local_sys.p_alsa_handle), "default",
