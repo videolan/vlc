@@ -72,6 +72,11 @@
     IBOutlet id o_channel_name;
     IBOutlet id o_channel_name_lbl;
     
+    IBOutlet id o_sdp_url;
+    IBOutlet id o_sdp_url_lbl;
+    IBOutlet id o_rtsp_chkbox;
+    IBOutlet id o_http_chkbox;
+    
     NSString *o_mrl;
     NSString *o_transcode;
 }
