@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.20 2000/12/27 18:35:45 massiot Exp $
+ * $Id: mpeg_system.c,v 1.21 2000/12/28 17:57:39 massiot Exp $
  *
  * Authors: 
  *
@@ -718,21 +718,21 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
     intf_Msg("input info: Your stream contains Program Stream Map information");
     intf_Msg("input info: Please send a mail to <massiot@via.ecp.fr>");
 
-    p_demux->b_has_PSM = 1;
-
     if( p_data->p_payload_start + 10 > p_data->p_payload_end )
     {
         intf_ErrMsg( "PSM too short : packet corrupt" );
         return;
     }
 
-    if( p_demux->i_PSM_version == (p_data->p_buffer[6] & 0x1F) )
+    if( p_demux->b_has_PSM
+        && p_demux->i_PSM_version == (p_data->p_buffer[6] & 0x1F) )
     {
         /* Already got that one. */
         return;
     }
 
     intf_DbgMsg( "Building PSM" );
+    p_demux->b_has_PSM = 1;
     p_demux->i_PSM_version = p_data->p_buffer[6] & 0x1F;
 
     /* Go to elementary_stream_map_length, jumping over
@@ -746,8 +746,8 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
     }
     /* This is the full size of the elementary_stream_map.
      * 2 == elementary_stream_map_length
-     * 4 == CRC_32 */
-    p_end = p_byte + 2 + U16_AT(p_byte) - 4;
+     * Please note that CRC_32 is not included in the length. */
+    p_end = p_byte + 2 + U16_AT(p_byte);
     p_byte += 2;
     if( p_end > p_data->p_payload_end )
     {
@@ -782,11 +782,11 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
                 else
                 {
                     /* Move the ES to the beginning. */
-                    i_new_es_number++;
                     p_input->stream.pp_programs[0]->pp_es[i]
                         = p_input->stream.pp_programs[0]->pp_es[ i_new_es_number ];
                     p_input->stream.pp_programs[0]->pp_es[ i_new_es_number ]
                         = p_es;
+                    i_new_es_number++;
                 }
                 break;
             }
@@ -800,13 +800,13 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
             p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
                                 i_stream_id, 0 );
             p_es->i_type = p_byte[0];
-            i_new_es_number++;
 
             /* input_AddES has inserted the new element at the end. */
             p_input->stream.pp_programs[0]->pp_es[
                 p_input->stream.pp_programs[0]->i_es_number ]
                 = p_input->stream.pp_programs[0]->pp_es[ i_new_es_number ];
             p_input->stream.pp_programs[0]->pp_es[ i_new_es_number ] = p_es;
+            i_new_es_number++;
         }
         p_byte += 4 + U16_AT(&p_byte[2]);
     }
@@ -820,6 +820,12 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
                      p_input->stream.pp_programs[0]->pp_es[i_new_es_number] );
         /* Yes, I wrote *i_new_es_number* */
     }
+
+#ifdef STATS
+    intf_Msg( "input info: The stream map after the PSM is now :" );
+    input_DumpStream( p_input );
+#endif
+
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
 
