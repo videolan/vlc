@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.20 2001/04/13 05:36:12 stef Exp $
+ * $Id: dvd_ifo.c,v 1.21 2001/04/15 15:32:48 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -1312,7 +1312,7 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, off_t i_pos )
     off_t           i_start;
     int             i;
 
-    p_current = FillBuffer( p_ifo, pi_buffer,  i_pos );
+    p_current = FillBuffer( p_ifo, pi_buffer, i_pos );
     i_start = p_ifo->i_pos;
 //fprintf( stderr, "CELL ADD\n" );
 
@@ -1320,9 +1320,7 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, off_t i_pos )
     DumpBits( p_ifo, pi_buffer, &p_current, 2 );
     p_cell_inf->i_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
 
-    p_cell_inf->i_cell_nb =
-        ( i_start + p_cell_inf->i_end_byte + 1 - p_ifo->i_pos )
-        / sizeof(cell_map_t);
+    p_cell_inf->i_cell_nb = (p_cell_inf->i_end_byte - 8) / sizeof(cell_map_t);
 
 //fprintf( stderr, "Cell inf: vob %d end %d cell %d\n", p_cell_inf->i_vob_nb, p_cell_inf->i_end_byte,  p_cell_inf->i_cell_nb );
 
