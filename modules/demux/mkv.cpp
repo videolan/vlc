@@ -1142,6 +1142,7 @@ static int Open( vlc_object_t * p_this )
             tk.fmt.subs.psz_encoding = strdup( "UTF-8" );
         }
         else if( !strcmp( tk.psz_codec, "S_TEXT/SSA" ) ||
+                 !strcmp( tk.psz_codec, "S_TEXT/ASS" ) ||
                  !strcmp( tk.psz_codec, "S_SSA" ) ||
                  !strcmp( tk.psz_codec, "S_ASS" ))
         {
