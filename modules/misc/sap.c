@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.30 2003/11/05 23:28:36 fenrir Exp $
+ * $Id: sap.c,v 1.31 2003/11/06 09:59:45 gbazin Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -116,7 +116,7 @@ vlc_module_end();
  *****************************************************************************/
 
 static void Run    ( intf_thread_t *p_intf );
-static int  NetRead( intf_thread_t *, int fd[2], uint8_t *, int );
+static ssize_t NetRead( intf_thread_t *, int fd[2], uint8_t *, int );
 
 typedef struct media_descr_t media_descr_t;
 typedef struct sess_descr_t sess_descr_t;
@@ -736,7 +736,7 @@ static int ismult( char *psz_uri )
  * Read: read on a file descriptor, checking b_die periodically
  *****************************************************************************
  * Taken from udp.c
- ******************************************************************************/
+ *****************************************************************************/
 static ssize_t NetRead( intf_thread_t *p_intf,
                         int fd[2], uint8_t *p_buffer, int i_len )
 {
