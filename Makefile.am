@@ -400,31 +400,36 @@ if HAVE_DARWIN
 vlc_app_DATA = VLC.app
 vlc_appdir = $(bindir)
 VLC.app: vlc
+	cd $(top_builddir)
 	rm -Rf VLC.app
-	cd $(srcdir)/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'
-	cp -r $(srcdir)/extras/MacOSX/build/vlc.bundle $(srcdir)/VLC.app
-	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS
-	$(INSTALL) vlc $(srcdir)/VLC.app/Contents/MacOS/VLC
-	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/modules
+	rm -Rf extras
+	mkdir extras
+	cp -r $(srcdir)/extras/MacOSX extras
+	cd extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'
+	cd $(top_builddir)
+	cp -r extras/MacOSX/build/vlc.bundle VLC.app
+	$(INSTALL) -d VLC.app/Contents/MacOS
+	$(INSTALL) vlc VLC.app/Contents/MacOS/VLC
+	$(INSTALL) -d VLC.app/Contents/MacOS/modules
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
-	  if test -n "$$i" ; then $(INSTALL) "$(srcdir)/$$i$(LIBEXT)" \
-	    "$(srcdir)/VLC.app/Contents/MacOS/modules" ; \
+	  if test -n "$$i" ; then $(INSTALL) "$$i$(LIBEXT)" \
+	    "VLC.app/Contents/MacOS/modules" ; \
 	  fi ; done
-	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/share
-	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/share/http
-	$(INSTALL) -m 644 $(srcdir)/share/http/*.html $(srcdir)/VLC.app/Contents/MacOS/share/http
-	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/share/http/admin
-	$(INSTALL) -m 644 $(srcdir)/share/http/admin/*.html $(srcdir)/VLC.app/Contents/MacOS/share/http/admin
-	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/locale
+	$(INSTALL) -d VLC.app/Contents/MacOS/share
+	$(INSTALL) -d VLC.app/Contents/MacOS/share/http
+	$(INSTALL) -m 644 $(srcdir)/share/http/*.html VLC.app/Contents/MacOS/share/http
+	$(INSTALL) -d VLC.app/Contents/MacOS/share/http/admin
+	$(INSTALL) -m 644 $(srcdir)/share/http/admin/*.html VLC.app/Contents/MacOS/share/http/admin
+	$(INSTALL) -d VLC.app/Contents/MacOS/locale
 	for i in $(ALL_LINGUAS); do \
-	  mkdir -p $(srcdir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
-	  cp $(srcdir)/po/$${i}.gmo $(srcdir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
-	  mkdir -p $(srcdir)/VLC.app/Contents/Resources/$${i}.lproj ; \
-	  ln -sf ../English.lproj/InfoPlist.strings $(srcdir)/VLC.app/Contents/Resources/$${i}.lproj ; \
-	  ln -sf ../English.lproj/MainMenu.nib $(srcdir)/VLC.app/Contents/Resources/$${i}.lproj ; \
-	  ln -sf ../English.lproj/vlc.scriptTerminology $(srcdir)/VLC.app/Contents/Resources/$${i}.lproj ; \
+	  mkdir -p VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
+	  cp $(srcdir)/po/$${i}.gmo VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
+	  mkdir -p VLC.app/Contents/Resources/$${i}.lproj ; \
+	  ln -sf ../English.lproj/InfoPlist.strings VLC.app/Contents/Resources/$${i}.lproj ; \
+	  ln -sf ../English.lproj/MainMenu.nib VLC.app/Contents/Resources/$${i}.lproj ; \
+	  ln -sf ../English.lproj/vlc.scriptTerminology VLC.app/Contents/Resources/$${i}.lproj ; \
 	done
-	printf "APPLVLC#" >| $(srcdir)/VLC.app/Contents/PkgInfo
+	printf "APPLVLC#" >| VLC.app/Contents/PkgInfo
 endif
 
 if HAVE_WIN32
