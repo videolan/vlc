@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse pls, m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.18 2003/04/06 20:08:11 sigmunau Exp $
+ * $Id: m3u.c,v 1.19 2003/06/26 14:42:04 zorglub Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -45,6 +45,7 @@
 #define TYPE_ASX 2
 #define TYPE_HTML 3
 #define TYPE_PLS 4
+#define TYPE_B4S 5
 
 struct demux_sys_t
 {
@@ -69,6 +70,7 @@ vlc_module_begin();
     add_shortcut( "asx" );
     add_shortcut( "html" );
     add_shortcut( "pls" );
+    add_shortcut( "b4s" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -115,6 +117,11 @@ static int Activate( vlc_object_t * p_this )
     {
         i_type = TYPE_PLS;
     }
+    else if( ( psz_ext && !strcasecmp( psz_ext, ".b4s") ) ||
+             ( p_input->psz_demux && !strcmp(p_input->psz_demux, "b4s") ) )
+    {
+        i_type = TYPE_B4S;
+    }
 
     /* we had no luck looking at the file extention, so we have a look
      * at the content. This is useful for .asp, .php and similar files
@@ -129,7 +136,8 @@ static int Activate( vlc_object_t * p_this )
             while ( i_size
                     && strncasecmp( p_peek, "[playlist]", sizeof("[playlist]") - 1 )
                     && strncasecmp( p_peek, "<html>", sizeof("<html>") - 1 )
-                    && strncasecmp( p_peek, "<asx", sizeof("<asx") - 1 ) )
+                    && strncasecmp( p_peek, "<asx", sizeof("<asx") - 1 ) 
+                    && strncasecmp( p_peek, "<?xml", sizeof("<?xml") -1 ) )
             {
                 p_peek++;
                 i_size--;
@@ -150,6 +158,11 @@ static int Activate( vlc_object_t * p_this )
             {
                 i_type2 = TYPE_ASX;
             }
+            else if ( !strncasecmp( p_peek, "<?xml", sizeof("<?xml") -1 ) )
+            {
+                i_type2 = TYPE_B4S;
+            }
+            
         }
     }
     if ( !i_type && !i_type2 )
@@ -190,6 +203,39 @@ static void Deactivate( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
+ * XMLSpecialChars: Handle the special chars in a XML file. 
+ * Returns 0 if successful
+ * ***************************************************************************/
+static int XMLSpecialChars ( char *psz_src , char *psz_dst )
+{
+    unsigned int i;
+    unsigned int j=0;
+    char c_rplc=0;    
+    
+    for( i=0 ; i < strlen(psz_src) ; i++ )
+    {
+        if( psz_src[i]  == '&')
+        {
+            if( !strncasecmp( &psz_src[i], "&#xe0;", 6) ) c_rplc = 'à';
+            else if( !strncasecmp( &psz_src[i], "&#xe9;", 6) ) c_rplc = 'é';
+            else if( !strncasecmp( &psz_src[i], "&#xee;", 6) ) c_rplc = 'î';
+            else if( !strncasecmp( &psz_src[i], "&apos;", 6) ) c_rplc = '\'';
+            else if( !strncasecmp( &psz_src[i], "&#xe8;", 6) ) c_rplc = 'è';
+            else if( !strncasecmp( &psz_src[i], "&#xea;", 6) ) c_rplc = 'ê';
+            else if( !strncasecmp( &psz_src[i], "&#xea;", 6) ) c_rplc = 'ê';
+            psz_dst[j]=c_rplc;
+            j++;
+            i = i+6;
+        }
+        psz_dst[j] = psz_src[i];
+        j++;
+    }        
+    psz_dst[j]='\0';
+    return 0;
+}
+
+
+/*****************************************************************************
  * ProcessLine: read a "line" from the file and add any entries found
  * to the playlist. Return number of items added ( 0 or 1 )
  *****************************************************************************/
@@ -197,6 +243,7 @@ static int ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
         , playlist_t *p_playlist , char psz_line[MAX_LINE], int i_position )
 {
     char          *psz_bol, *psz_name;
+    
     psz_bol = psz_line;
 
     /* Remove unnecessary tabs or spaces at the beginning of line */
@@ -299,6 +346,33 @@ static int ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
 
         *psz_eol = '\0';
 
+    }
+    else if ( p_m3u->i_type == TYPE_B4S )
+    {
+        /* We are dealing with a B4S file from Winamp3
+         * We are looking for <entry Playstring="blabla"> */
+
+        char *psz_eol;
+            
+         while ( *psz_bol &&
+         strncasecmp( psz_bol,"Playstring",sizeof("Playstring") -1 ) )
+               psz_bol++;
+
+       if( !*psz_bol ) return 0;
+
+        psz_bol = strchr( psz_bol, '=' );
+        if ( !psz_bol ) return 0;
+              psz_bol++;
+              psz_bol++;
+
+        psz_eol= strchr(psz_bol, '"');
+        if( !psz_eol ) return 0;
+
+        *psz_eol= '\0';
+
+        /* Handle the XML special characters */    
+        if( XMLSpecialChars( psz_bol , psz_bol ) )
+                return 0;
     }
     else
     {
@@ -418,7 +492,8 @@ static int Demux ( input_thread_t *p_input )
 
     /* Depending on wether we are dealing with an m3u/asf file, the end of
      * line token will be different */
-    if( p_m3u->i_type == TYPE_ASX || p_m3u->i_type == TYPE_HTML )
+    if( p_m3u->i_type == TYPE_ASX || p_m3u->i_type == TYPE_HTML 
+                    || p_m3u->i_type == TYPE_B4S )
         eol_tok = '>';
     else
         eol_tok = '\n';
@@ -461,8 +536,10 @@ static int Demux ( input_thread_t *p_input )
 
             psz_line[i_linepos] = '\0';
             i_linepos = 0;
+            
             i_position += ProcessLine ( p_input, p_m3u , p_playlist ,
                                         psz_line, i_position );
+
         }
 
         input_DeletePacket( p_input->p_method_data, p_data );
