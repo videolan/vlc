@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.144 2002/01/09 10:22:37 sam Exp $
+ * $Id: main.c,v 1.145 2002/01/17 23:02:45 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -103,7 +103,7 @@
 #define OPT_HEIGHT              163
 #define OPT_COLOR               164
 #define OPT_FULLSCREEN          165
-#define OPT_OVERLAY             166
+#define OPT_NOOVERLAY           166
 #define OPT_XVADAPTOR           167
 #define OPT_SMP                 168
 #define OPT_FILTER              169
@@ -182,7 +182,7 @@ static const struct option longopts[] =
     {   "idct",             1,          0,      OPT_IDCT },
     {   "yuv",              1,          0,      OPT_YUV },
     {   "fullscreen",       0,          0,      OPT_FULLSCREEN },
-    {   "overlay",          0,          0,      OPT_OVERLAY },
+    {   "nooverlay",        0,          0,      OPT_NOOVERLAY },
     {   "xvadaptor",        1,          0,      OPT_XVADAPTOR },
     {   "smp",              1,          0,      OPT_SMP },
     {   "filter",           1,          0,      OPT_FILTER },
@@ -777,8 +777,8 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_FULLSCREEN:                                 /* --fullscreen */
             main_PutIntVariable( VOUT_FULLSCREEN_VAR, 1 );
             break;
-        case OPT_OVERLAY:                                       /* --overlay */
-            main_PutIntVariable( VOUT_OVERLAY_VAR, 1 );
+        case OPT_NOOVERLAY:                                   /* --nooverlay */
+            main_PutIntVariable( VOUT_NOOVERLAY_VAR, 1 );
             break;
         case OPT_XVADAPTOR:                                   /* --xvadaptor */
             main_PutIntVariable( VOUT_XVADAPTOR_VAR, atoi(optarg) );
@@ -966,7 +966,7 @@ static void Usage( int i_fashion )
           "\n      --width <w>, --height <h>  \tdisplay dimensions"
           "\n  -g, --grayscale                \tgrayscale output"
           "\n      --fullscreen               \tfullscreen output"
-          "\n      --overlay                  \taccelerated display"
+          "\n      --nooverlay                \tdisable accelerated display"
           "\n      --xvadaptor <adaptor>      \tXVideo adaptor"
           "\n      --color                    \tcolor output"
           "\n      --motion <module>          \tmotion compensation method"
@@ -1041,7 +1041,7 @@ static void Usage( int i_fashion )
         "\n  " VOUT_FB_DEV_VAR "=<filename>           \tframebuffer device path"
         "\n  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output"
         "\n  " VOUT_FULLSCREEN_VAR "={1|0}            \tfullscreen"
-        "\n  " VOUT_OVERLAY_VAR "={1|0}               \toverlay"
+        "\n  " VOUT_NOOVERLAY_VAR "={1|0}             \tnooverlay"
         "\n  " VOUT_XVADAPTOR_VAR "=<adaptor>         \tXVideo adaptor"
         "\n  " MOTION_METHOD_VAR "=<method name>      \tmotion compensation method"
         "\n  " IDCT_METHOD_VAR "=<method name>        \tIDCT method"
@@ -1445,4 +1445,3 @@ static void ShowConsole( void )
 #endif
     return;
 }
-

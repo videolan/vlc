@@ -2,7 +2,7 @@
  * directx.c : Windows DirectX plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.4 2001/12/30 07:09:54 sam Exp $
+ * $Id: directx.c,v 1.5 2002/01/17 23:02:45 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -44,15 +44,15 @@ void _M( vout_getfunctions )( function_list_t * p_function_list );
  * Building configuration tree
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for Windows DirectX module" )
+    ADD_WINDOW( "Configuration for Windows DirectX module" )
     ADD_COMMENT( "For now, the Windows DirectX module cannot be configured" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                               | MODULE_CAPABILITY_VOUT
-                               | MODULE_CAPABILITY_AOUT;
-    p_module->psz_longname = "DirectX module";
+    SET_DESCRIPTION( "DirectX extension module" )
+    ADD_CAPABILITY( AOUT, 150 )
+    ADD_CAPABILITY( VOUT, 150 )
+    ADD_SHORTCUT( "directx" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -62,4 +62,3 @@ MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
-

@@ -162,8 +162,8 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->b_fullscreen = 
         main_GetIntVariable( VOUT_FULLSCREEN_VAR, VOUT_FULLSCREEN_DEFAULT );
     p_vout->p_sys->i_mode = 
-        main_GetIntVariable( VOUT_OVERLAY_VAR, VOUT_OVERLAY_DEFAULT ) ?
-        MODE_VIDEO_OVERLAY : MODE_NORMAL_MEM;
+        main_GetIntVariable( VOUT_NOOVERLAY_VAR, VOUT_NOOVERLAY_DEFAULT ) ?
+        MODE_NORMAL_MEM : MODE_VIDEO_OVERLAY;
     p_vout->p_sys->dim.w =
         main_GetIntVariable( VOUT_WIDTH_VAR, VOUT_WIDTH_DEFAULT );
     p_vout->p_sys->dim.h =

@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.10 2002/01/12 01:25:57 sam Exp $
+ * $Id: vout_pictures.c,v 1.11 2002/01/17 23:02:45 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -394,6 +394,9 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
 void vout_PlacePicture( vout_thread_t *p_vout, int i_width, int i_height,
                         int *pi_x, int *pi_y, int *pi_width, int *pi_height )
 {
+    if( (i_width <= 0) || (i_height <=0) )
+        return;
+
     if( p_vout->b_scale )
     {
         *pi_width = i_width;

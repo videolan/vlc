@@ -2,7 +2,7 @@
  * aout_directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_directx.c,v 1.14 2001/12/30 07:09:54 sam Exp $
+ * $Id: aout_directx.c,v 1.15 2002/01/17 23:02:45 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -40,6 +40,14 @@
 #endif
 
 #include "audio_output.h"                                   /* aout_thread_t */
+
+/*****************************************************************************
+ * DirectSound GUIDs.
+ * Defining them here allows us to get rid of the dxguid library during
+ * the linking stage.
+ *****************************************************************************/
+#include <initguid.h>
+DEFINE_GUID(IID_IDirectSoundNotify, 0xb0210783, 0x89cd, 0x11d0, 0xaf, 0x8, 0x0, 0xa0, 0xc9, 0x25, 0xcd, 0x16);
 
 /*****************************************************************************
  * aout_sys_t: directx audio output method descriptor
@@ -120,10 +128,6 @@ void _M( aout_getfunctions )( function_list_t * p_function_list )
 static int aout_Probe( probedata_t *p_data )
 {
     /* For now just assume the computer has a sound device */
-    if( TestMethod( AOUT_METHOD_VAR, "directx" ) )
-    {
-        return( 999 );
-    }
     return( 1 );
 }
 

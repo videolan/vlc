@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.7 2001/12/30 07:09:54 sam Exp $
+ * $Id: vout_events.c,v 1.8 2002/01/17 23:02:45 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -39,12 +39,9 @@
 
 #include <windows.h>
 #include <windowsx.h>
+#include <shellapi.h>
 
-#if defined( _MSC_VER )
-#   include <ddraw.h>
-#else
-#   include <directx.h>
-#endif
+#include <ddraw.h>
 
 #include "interface.h"
 
@@ -55,18 +52,9 @@
  *****************************************************************************/
 static int  DirectXCreateWindow( vout_thread_t *p_vout );
 static void DirectXCloseWindow ( vout_thread_t *p_vout );
+static void DirectXUpdateRects( vout_thread_t *p_vout );
 static long FAR PASCAL DirectXEventProc ( HWND hwnd, UINT message,
                                           WPARAM wParam, LPARAM lParam );
-
-/*****************************************************************************
- * Global variables.
- * I really hate them, but here I don't have any choice. And anyway, this
- * shouldn't really affect reentrancy.
- * This variable is used to know if we have to update the overlay position
- * and size. This is to fix the bug we've got when the Windows option, to show
- * the content of a window when you drag it, is enabled.
- *****************************************************************************/
-int b_directx_update_overlay = 0;
 
 /*****************************************************************************
  * DirectXEventThread: Create video window & handle its messages
@@ -79,7 +67,6 @@ int b_directx_update_overlay = 0;
 void DirectXEventThread( vout_thread_t *p_vout )
 {
     MSG             msg;
-    boolean_t       b_dispatch_msg = TRUE;
 
     /* Initialisation */
 
@@ -104,191 +91,147 @@ void DirectXEventThread( vout_thread_t *p_vout )
     vlc_mutex_unlock( &p_vout->p_sys->event_thread_lock );
 
     /* Main loop */
-    while( !p_vout->b_die && !p_vout->p_sys->b_event_thread_die )
+    /* GetMessage will sleep if there's no message in the queue */
+    while( GetMessage( &msg, p_vout->p_sys->hwnd, 0, 0 ) )
     {
 
-        /* GetMessage will sleep if there's no message in the queue */
-        if( GetMessage( &msg, NULL, 0, 0 ) >= 0 )
+        /* Check if we are asked to exit */
+        if( p_vout->b_die || p_vout->p_sys->b_event_thread_die )
+            break;
+
+        switch( msg.message )
         {
-            switch( msg.message )
-            {
-                
-            case WM_CLOSE:
-                intf_WarnMsg( 3, "vout: vout_Manage WM_CLOSE" );
-                break;
-                
-            case WM_QUIT:
-                intf_WarnMsg( 3, "vout: vout_Manage WM_QUIT" );
-                p_vout->p_sys->b_event_thread_die = 1;
-                p_main->p_intf->b_die = 1;
-                break;
-                
-            case WM_MOVE:
-                intf_WarnMsg( 3, "vout: vout_Manage WM_MOVE" );
-                if( !p_vout->b_need_render )
-                {
-                    p_vout->p_sys->i_changes |= VOUT_SIZE_CHANGE;
-                }
-                /* don't create a never ending loop */
-                b_dispatch_msg = FALSE;
-                break;
-          
-            case WM_APP:
-                intf_WarnMsg( 3, "vout: vout_Manage WM_APP" );
-                if( !p_vout->b_need_render )
-                {
-                    p_vout->p_sys->i_changes |= VOUT_SIZE_CHANGE;
-                }
-                /* size change has been handled (to fix a bug)*/
-                b_directx_update_overlay = 0;
-                /* don't create a never ending loop */
-                b_dispatch_msg = FALSE;
-                break;
-              
+
 #if 0
-            case WM_PAINT:
-                intf_WarnMsg( 4, "vout: vout_Manage WM_PAINT" );
-                break;
-              
-            case WM_ERASEBKGND:
-                intf_WarnMsg( 4, "vout: vout_Manage WM_ERASEBKGND" );
-                break;
-#endif
-              
-            case WM_MOUSEMOVE:
-                intf_WarnMsg( 4, "vout: vout_Manage WM_MOUSEMOVE" );
-                if( p_vout->p_sys->b_cursor )
-                {
-                    if( p_vout->p_sys->b_cursor_autohidden )
-                    {
-                        p_vout->p_sys->b_cursor_autohidden = 0;
-                        p_vout->p_sys->i_lastmoved = mdate();
-                        ShowCursor( TRUE );
-                    }
-                    else
-                    {
-                        p_vout->p_sys->i_lastmoved = mdate();
-                    }
-                }               
-                break;
-                
-            case WM_RBUTTONUP:
-                intf_WarnMsg( 4, "vout: vout_Manage WM_RBUTTONUP" );
-                p_main->p_intf->b_menu_change = 1;
-                break;
+        case WM_PAINT:
+            intf_WarnMsg( 4, "vout: vout_Manage WM_PAINT" );
+            break;
 
-            case WM_KEYDOWN:
-                /* the key events are first processed here. The next
-                 * message processed by this main message loop will be the
-                 * char translation of the key event */
-                intf_WarnMsg( 3, "vout: vout_Manage WM_KEYDOWN" );
-                switch( msg.wParam )
-                {
-                case VK_ESCAPE:
-                case VK_F12:
-                    PostQuitMessage( 0 );
-                    break;
-                }
-                TranslateMessage(&msg);
-                b_dispatch_msg = FALSE;
-                break;
-              
-            case WM_CHAR:
-                intf_WarnMsg( 3, "vout: vout_Manage WM_CHAR" );
-                switch( msg.wParam )
-                {
-                case 'q':
-                case 'Q':
-                    PostQuitMessage( 0 );
-                    break;
-                  
-                case 'f':                            /* switch to fullscreen */
-                case 'F':
-                    p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                    break;
-                  
-                case 'y':                              /* switch to hard YUV */
-                case 'Y':
-                    p_vout->p_sys->i_changes |= VOUT_YUV_CHANGE;
-                    break;
-                  
-                case 'c':                                /* toggle grayscale */
-                case 'C':
-                    p_vout->b_grayscale = ! p_vout->b_grayscale;
-                    p_vout->p_sys->i_changes |= VOUT_GRAYSCALE_CHANGE;
-                    break;
-                  
-                case 'i':                                     /* toggle info */
-                case 'I':
-                    p_vout->b_info = ! p_vout->b_info;
-                    p_vout->p_sys->i_changes |= VOUT_INFO_CHANGE;
-                    break;
-                  
-                case 's':                                  /* toggle scaling */
-                case 'S':
-                    p_vout->b_scale = ! p_vout->b_scale;
-                    p_vout->p_sys->i_changes |= VOUT_SCALE_CHANGE;
-                    break;
-                  
-                case ' ':                                /* toggle interface */
-                    p_vout->b_interface = ! p_vout->b_interface;
-                    p_vout->p_sys->i_changes |= VOUT_INTF_CHANGE;
-                    break;
-                  
-                case '0': network_ChannelJoin( 0 ); break;
-                case '1': network_ChannelJoin( 1 ); break;
-                case '2': network_ChannelJoin( 2 ); break;
-                case '3': network_ChannelJoin( 3 ); break;
-                case '4': network_ChannelJoin( 4 ); break;
-                case '5': network_ChannelJoin( 5 ); break;
-                case '6': network_ChannelJoin( 6 ); break;
-                case '7': network_ChannelJoin( 7 ); break;
-                case '8': network_ChannelJoin( 8 ); break;
-                case '9': network_ChannelJoin( 9 ); break;
-                  
-                default:
-                    if( intf_ProcessKey( p_main->p_intf,
-                                         (char )msg.wParam ) )
-                    {
-                        intf_DbgMsg( "unhandled key '%c' (%i)",
-                                     (char)msg.wParam, msg.wParam );
-                    }
-                    break;
-                }
-              
-#if 0          
-            default:
-                intf_WarnMsg( 4, "vout: vout_Manage WM Default %i",
-                              msg.message );
-                break;
+        case WM_ERASEBKGND:
+            intf_WarnMsg( 4, "vout: vout_Manage WM_ERASEBKGND" );
+            break;
 #endif
 
-            } /* End Switch */
-
-            /* don't create a never ending loop */
-            if( b_dispatch_msg )
+        case WM_MOUSEMOVE:
+            if( p_vout->p_sys->b_cursor )
             {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
+                if( p_vout->p_sys->b_cursor_autohidden )
+                {
+                    p_vout->p_sys->b_cursor_autohidden = 0;
+                    p_vout->p_sys->i_lastmoved = mdate();
+                    ShowCursor( TRUE );
+                }
+                else
+                {
+                    p_vout->p_sys->i_lastmoved = mdate();
+                }
             }
-            b_dispatch_msg = TRUE;
+            break;
 
-        } /* if( GetMessage() ) */
-        else
-        {
-            intf_ErrMsg("vout error: GetMessage failed in DirectXEventThread");
-            p_vout->p_sys->b_event_thread_die = 1;
-        } /* End if( GetMessage() ) */
+        case WM_RBUTTONUP:
+            intf_WarnMsg( 4, "vout: vout_Manage WM_RBUTTONUP" );
+            p_main->p_intf->b_menu_change = 1;
+            break;
 
+        case WM_KEYDOWN:
+            /* the key events are first processed here. The next
+             * message processed by this main message loop will be the
+             * char translation of the key event */
+            intf_WarnMsg( 3, "vout: vout_Manage WM_KEYDOWN" );
+            switch( msg.wParam )
+            {
+            case VK_ESCAPE:
+            case VK_F12:
+                PostQuitMessage( 0 );
+                break;
+            }
+            TranslateMessage(&msg);
+            break;
+
+        case WM_CHAR:
+            intf_WarnMsg( 3, "vout: vout_Manage WM_CHAR" );
+            switch( msg.wParam )
+            {
+            case 'q':
+            case 'Q':
+                PostQuitMessage( 0 );
+                break;
+
+            case 'f':                            /* switch to fullscreen */
+            case 'F':
+                p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                break;
+
+            case 'c':                                /* toggle grayscale */
+            case 'C':
+                p_vout->b_grayscale = ! p_vout->b_grayscale;
+                p_vout->p_sys->i_changes |= VOUT_GRAYSCALE_CHANGE;
+                break;
+
+            case 'i':                                     /* toggle info */
+            case 'I':
+                p_vout->b_info = ! p_vout->b_info;
+                p_vout->p_sys->i_changes |= VOUT_INFO_CHANGE;
+                break;
+
+            case 's':                                  /* toggle scaling */
+            case 'S':
+                p_vout->b_scale = ! p_vout->b_scale;
+                p_vout->p_sys->i_changes |= VOUT_SCALE_CHANGE;
+                break;
+
+            case ' ':                                /* toggle interface */
+                p_vout->b_interface = ! p_vout->b_interface;
+                p_vout->p_sys->i_changes |= VOUT_INTF_CHANGE;
+                break;
+
+            case '0': network_ChannelJoin( 0 ); break;
+            case '1': network_ChannelJoin( 1 ); break;
+            case '2': network_ChannelJoin( 2 ); break;
+            case '3': network_ChannelJoin( 3 ); break;
+            case '4': network_ChannelJoin( 4 ); break;
+            case '5': network_ChannelJoin( 5 ); break;
+            case '6': network_ChannelJoin( 6 ); break;
+            case '7': network_ChannelJoin( 7 ); break;
+            case '8': network_ChannelJoin( 8 ); break;
+            case '9': network_ChannelJoin( 9 ); break;
+
+            default:
+                intf_DbgMsg( "unhandled key '%c' (%i)",
+                             (char)msg.wParam, msg.wParam );
+                break;
+            }
+
+        default:
+            /* Messages we don't handle directly are dispatched to the
+             * window procedure */
+#if 0
+            intf_WarnMsg( 5, "vout: vout_Manage unhandled message",
+                          msg.message );
+#endif
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+            break;
+
+        } /* End Switch */
 
     } /* End Main loop */
 
-    /* Destroy the window */
+    if( msg.message == WM_QUIT )
+    {
+        intf_WarnMsg( 3, "vout: DirectXEventThread WM_QUIT" );
+        p_vout->p_sys->hwnd = NULL; /* Window already destroyed */
+
+        /* exit application */
+        p_main->p_intf->b_die = 1;
+    }
+
+    intf_WarnMsg( 3, "vout: DirectXEventThread Terminating" );
+
+    /* clear the changes formerly signaled */
+    p_vout->p_sys->i_changes = 0;
+
     DirectXCloseWindow( p_vout );
-
-    /* Set thread Status */
-    p_vout->p_sys->i_event_thread_status = THREAD_OVER;
-
 }
 
 
@@ -308,6 +251,8 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     RECT       rect_window;
     COLORREF   colorkey; 
     HDC        hdc;
+    HICON      vlc_icon = NULL;
+    char       vlc_path[_MAX_PATH+1];
 
     intf_WarnMsg( 3, "vout: DirectXCreateWindow" );
 
@@ -326,18 +271,37 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     /* the first step is to find the colorkey we want to use. The difficulty
      * comes from the potential dithering (depends on the display depth)
      * because we need to know the real RGB value of the chosen colorkey */
-    hdc = GetDC( GetDesktopWindow() );
+    hdc = GetDC( NULL );
     for( colorkey = 5; colorkey < 0xFF /*all shades of red*/; colorkey++ )
     {
         if( colorkey == GetNearestColor( hdc, colorkey ) )
           break;
     }
     intf_WarnMsg(3,"vout: DirectXCreateWindow background color:%i", colorkey);
-    ReleaseDC( p_vout->p_sys->hwnd, hdc );
 
     /* create the actual brush */  
     p_vout->p_sys->hbrush = CreateSolidBrush(colorkey);
-    p_vout->p_sys->i_colorkey = (int)colorkey;
+    p_vout->p_sys->i_rgb_colorkey = (int)colorkey;
+
+    /* Get the current size of the display and its colour depth */
+    p_vout->p_sys->rect_display.right = GetDeviceCaps( hdc, HORZRES );
+    p_vout->p_sys->rect_display.bottom = GetDeviceCaps( hdc, VERTRES );
+    p_vout->p_sys->i_display_depth = GetDeviceCaps( hdc, BITSPIXEL );
+    intf_WarnMsg( 3, "vout: Screen dimensions %ix%i colour depth %i",
+                  p_vout->p_sys->rect_display.right,
+                  p_vout->p_sys->rect_display.bottom,
+                  p_vout->p_sys->i_display_depth );
+
+    ReleaseDC( p_vout->p_sys->hwnd, hdc );
+
+    /* Get the Icon from the main app */
+    if( GetModuleFileName( NULL, vlc_path, _MAX_PATH ) )
+    {
+        vlc_icon = ExtractIcon( hInstance, vlc_path, 0 );
+    }
+    if( !vlc_icon )
+        vlc_icon = LoadIcon( NULL, IDI_APPLICATION );
+
 
     /* fill in the window class structure */
     wc.cbSize        = sizeof(WNDCLASSEX);
@@ -346,12 +310,12 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     wc.cbClsExtra    = 0;                             /* no extra class data */
     wc.cbWndExtra    = 0;                            /* no extra window data */
     wc.hInstance     = hInstance;                                /* instance */
-    wc.hIcon         = LoadIcon(NULL, IDI_APPLICATION); /* load the vlc icon */
+    wc.hIcon         = CopyIcon( vlc_icon );            /* load the vlc icon */
     wc.hCursor       = LoadCursor(NULL, IDC_ARROW); /* load a default cursor */
     wc.hbrBackground = p_vout->p_sys->hbrush;            /* background color */
     wc.lpszMenuName  = NULL;                                      /* no menu */
     wc.lpszClassName = "VLC DirectX";                 /* use a special class */
-    wc.hIconSm       = LoadIcon(NULL, IDI_APPLICATION); /* load the vlc icon */
+    wc.hIconSm       = CopyIcon( vlc_icon );            /* load the vlc icon */
 
     /* register the window class */
     if (!RegisterClassEx(&wc))
@@ -374,7 +338,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     p_vout->p_sys->hwnd = CreateWindow("VLC DirectX",/* name of window class */
                     "VLC DirectX",                  /* window title bar text */
                     WS_OVERLAPPEDWINDOW
-                    | WS_SIZEBOX | WS_VISIBLE,               /* window style */
+                    | WS_SIZEBOX,               /* window style */
                     10,                              /* default X coordinate */
                     10,                              /* default Y coordinate */
                     rect_window.right - rect_window.left,    /* window width */
@@ -388,6 +352,11 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
         intf_WarnMsg( 3, "vout: DirectXCreateWindow create window FAILED" );
         return (1);
     }
+
+    /* store a p_vout pointer into the window local storage (for later use
+     * in DirectXEventProc).
+     * We need to use SetWindowLongPtr when it is available in mingw */
+    SetWindowLong( p_vout->p_sys->hwnd, GWL_USERDATA, (LONG)p_vout );
 
     /* now display the window */
     ShowWindow(p_vout->p_sys->hwnd, SW_SHOW);
@@ -424,29 +393,137 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
+ * DirectXUpdateRects: 
+ *****************************************************************************
+ * This function is called when the window position and size is changed, and
+ * its job is to update the source and destination RECTs used to display the
+ * picture.
+ *****************************************************************************/
+static void DirectXUpdateRects( vout_thread_t *p_vout )
+{
+    int i_width, i_height, i_x, i_y;
+
+#define rect_src p_vout->p_sys->rect_src
+#define rect_src_clipped p_vout->p_sys->rect_src_clipped
+#define rect_dest p_vout->p_sys->rect_dest
+#define rect_dest_clipped p_vout->p_sys->rect_dest_clipped
+#define rect_display p_vout->p_sys->rect_display
+
+    vout_PlacePicture( p_vout, p_vout->p_sys->i_window_width,
+                       p_vout->p_sys->i_window_height,
+                       &i_x, &i_y, &i_width, &i_height );
+
+    /* Destination image position and dimensions */
+    rect_dest.left = i_x + p_vout->p_sys->i_window_x;
+    rect_dest.top = i_y + p_vout->p_sys->i_window_y;
+    rect_dest.right = rect_dest.left + i_width;
+    rect_dest.bottom = rect_dest.top + i_height;
+
+
+    /* UpdateOverlay directdraw function doesn't automatically clip to the
+     * display size so we need to do it otherwise it will fails */
+
+    /* Clip the destination window */
+    IntersectRect( &rect_dest_clipped, &rect_dest, &rect_display );
+
+    intf_WarnMsg( 3, "vout: DirectXUpdateRects image_dst_clipped coords:"
+                  " %i,%i,%i,%i",
+                  rect_dest_clipped.left, rect_dest_clipped.top,
+                  rect_dest_clipped.right, rect_dest_clipped.bottom);
+
+    /* the 2 following lines are to fix a bug when clicking on the desktop */
+    if( (rect_dest_clipped.right - rect_dest_clipped.left)==0 ||
+        (rect_dest_clipped.bottom - rect_dest_clipped.top)==0 )
+    {
+        SetRectEmpty( &rect_src_clipped );
+        return;
+    }
+
+    /* src image dimensions */
+    rect_src.left = 0;
+    rect_src.top = 0;
+    rect_src.right = p_vout->render.i_width;
+    rect_src.bottom = p_vout->render.i_height;
+
+    /* Clip the source image */
+    rect_src_clipped.left = (rect_dest_clipped.left - rect_dest.left) *
+      p_vout->render.i_width / (rect_dest.right - rect_dest.left);
+    rect_src_clipped.right = p_vout->render.i_width - 
+      (rect_dest.right - rect_dest_clipped.right) * p_vout->render.i_width /
+      (rect_dest.right - rect_dest.left);
+    rect_src_clipped.top = (rect_dest_clipped.top - rect_dest.top) *
+      p_vout->render.i_height / (rect_dest.bottom - rect_dest.top);
+    rect_src_clipped.bottom = p_vout->render.i_height -
+      (rect_dest.bottom - rect_dest_clipped.bottom) * p_vout->render.i_height /
+      (rect_dest.bottom - rect_dest.top);
+
+    intf_WarnMsg( 3, "vout: DirectXUpdateRects image_src_clipped"
+                  " coords: %i,%i,%i,%i",
+                  rect_src_clipped.left, rect_src_clipped.top,
+                  rect_src_clipped.right, rect_src_clipped.bottom);
+
+#undef rect_src
+#undef rect_src_clipped
+#undef rect_dest
+#undef rect_dest_clipped
+#undef rect_display
+}
+
+/*****************************************************************************
  * DirectXEventProc: This is the window event processing function.
  *****************************************************************************
  * On Windows, when you create a window you have to attach an event processing
  * function to it. The aim of this function is to manage "Queued Messages" and
  * "Nonqueued Messages".
  * Queued Messages are those picked up and retransmitted by vout_Manage
- * (using the GetMessage function).
+ * (using the GetMessage and DispatchMessage functions).
  * Nonqueued Messages are those that Windows will send directly to this
- * function (like WM_DESTROY, WM_WINDOWPOSCHANGED...)
+ * procedure (like WM_DESTROY, WM_WINDOWPOSCHANGED...)
  *****************************************************************************/
 static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
                                          WPARAM wParam, LPARAM lParam )
 {
+    vout_thread_t *p_vout;
+
     switch( message )
     {
 
-#if 0
-    case WM_APP:
-        intf_WarnMsg( 3, "vout: WinProc WM_APP" );
+    case WM_WINDOWPOSCHANGED:
+        {
+        RECT     rect_window;
+        POINT    point_window;
+
+        p_vout = (vout_thread_t *)GetWindowLong( hwnd, GWL_USERDATA );
+
+        /* update the window position */
+        point_window.x = 0;
+        point_window.y = 0;
+        ClientToScreen( hwnd, &point_window );
+        p_vout->p_sys->i_window_x = point_window.x;
+        p_vout->p_sys->i_window_y = point_window.y;
+
+        /* update the window size */
+        GetClientRect( hwnd, &rect_window );
+        p_vout->p_sys->i_window_width = rect_window.right;
+        p_vout->p_sys->i_window_height = rect_window.bottom;
+        intf_WarnMsg( 3, "vout: WinProc WM_WINDOWPOSCHANGED %i,%i,%i,%i",
+                      p_vout->p_sys->i_window_x, p_vout->p_sys->i_window_y,
+                      p_vout->p_sys->i_window_width,
+                      p_vout->p_sys->i_window_height );
+
+        DirectXUpdateRects( p_vout );
+        if( p_vout->p_sys->b_using_overlay )
+            DirectXUpdateOverlay( p_vout );
+
+        /* signal the size change */
+        p_vout->p_sys->i_changes |= VOUT_SIZE_CHANGE;
+
+        return 0;
+        }
         break;
 
     case WM_ACTIVATE:
-        intf_WarnMsg( 4, "vout: WinProc WM_ACTIVED" );
+        intf_WarnMsg( 4, "vout: WinProc WM_ACTIVE" );
         break;
 
     case WM_CREATE:
@@ -457,7 +534,6 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     case WM_CLOSE:
         intf_WarnMsg( 4, "vout: WinProc WM_CLOSE" );
         break;
-#endif
 
     /* the window has been closed so shut down everything now */
     case WM_DESTROY:
@@ -476,46 +552,6 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         break;
 
 #if 0
-    case WM_MOVE:
-        intf_WarnMsg( 4, "vout: WinProc WM_MOVE" );
-        break;
-
-    case WM_SIZE:
-        intf_WarnMsg( 4, "vout: WinProc WM_SIZE" );
-        break;
-
-    case WM_MOVING:
-        intf_WarnMsg( 4, "vout: WinProc WM_MOVING" );
-        break;
-
-    case WM_ENTERSIZEMOVE:
-        intf_WarnMsg( 4, "vout: WinProc WM_ENTERSIZEMOVE" );
-        break;
-
-    case WM_SIZING:
-        intf_WarnMsg( 4, "vout: WinProc WM_SIZING" );
-        break;
-#endif
-
-    case WM_WINDOWPOSCHANGED:
-        intf_WarnMsg( 3, "vout: WinProc WM_WINDOWPOSCHANGED" );
-        b_directx_update_overlay = 1;
-        PostMessage( hwnd, WM_APP, 0, 0);
-        break;
-
-#if 0
-    case WM_WINDOWPOSCHANGING:
-        intf_WarnMsg( 3, "vout: WinProc WM_WINDOWPOSCHANGING" );
-        break;
-
-    case WM_PAINT:
-        intf_WarnMsg( 4, "vout: WinProc WM_PAINT" );
-        break;
-
-    case WM_ERASEBKGND:
-        intf_WarnMsg( 4, "vout: WinProc WM_ERASEBKGND" );
-        break;
-
     default:
         intf_WarnMsg( 4, "vout: WinProc WM Default %i", message );
         break;

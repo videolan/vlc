@@ -354,8 +354,8 @@
 #define VOUT_FULLSCREEN_DEFAULT         0
 
 /* Environment variable for overlay mode, and default value */
-#define VOUT_OVERLAY_VAR                "vlc_overlay"
-#define VOUT_OVERLAY_DEFAULT            0
+#define VOUT_NOOVERLAY_VAR              "vlc_nooverlay"
+#define VOUT_NOOVERLAY_DEFAULT          0
 
 /* Default gamma */
 #define VOUT_GAMMA_VAR                  "vlc_gamma"
