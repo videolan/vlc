@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.18 2003/01/24 06:21:03 hartman Exp $
+ * $Id: vout.m,v 1.19 2003/01/25 12:00:38 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -1035,8 +1035,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         unsigned int i_stylemask = NSTitledWindowMask |
                                    NSMiniaturizableWindowMask |
                                    NSClosableWindowMask |
-                                   NSResizableWindowMask |
-                                   NSTexturedBackgroundWindowMask;
+                                   NSResizableWindowMask; /* |
+                                   NSTexturedBackgroundWindowMask;*/
         
         /* the following is for the resize bar. Dirty hack (hartman) */
         p_vout->p_sys->s_rect.size.height = p_vout->p_sys->s_rect.size.height + 24;
