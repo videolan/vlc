@@ -34,6 +34,11 @@
 #include "codecs.h"                        /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "libasf.h"
 
+/* TODO
+ *  - add support for the newly added object: language, bitrate,
+ *                                            extended stream properties.
+ */
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
