@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.22 2003/07/02 22:47:42 sam Exp $
+dnl $Id: configure.ac,v 1.23 2003/07/03 19:25:51 garf Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -1927,6 +1927,17 @@ You also need to check that you have a libogg posterior to the 1.0 release.])],
       [-logg])
   ])
 fi
+
+dnl
+dnl  Video Filters
+dnl
+
+dnl
+dnl   png
+dnl
+AC_CHECK_HEADERS(png.h, [
+    AX_ADD_LDFLAGS([logo],[-lpng])
+    AX_ADD_PLUGINS([logo])])
 
 dnl
 dnl  Video plugins
