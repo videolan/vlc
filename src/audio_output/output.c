@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: output.c,v 1.42 2004/01/06 12:02:05 zorglub Exp $
+ * $Id: output.c,v 1.43 2004/01/26 21:37:58 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -101,7 +101,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
         /* Mono - create the audio-channels variable. */
         var_Create( p_aout, "audio-channels",
                     VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-        text.psz_string = _("Audio channels");
+        text.psz_string = _("Audio Channels");
         var_Change( p_aout, "audio-channels", VLC_VAR_SETTEXT, &text, NULL );
 
         val.i_int = AOUT_VAR_CHAN_STEREO; text.psz_string = _("Stereo");
@@ -128,7 +128,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
         /* Stereo - create the audio-channels variable. */
         var_Create( p_aout, "audio-channels",
                     VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-        text.psz_string = _("Audio channels");
+        text.psz_string = _("Audio Channels");
         var_Change( p_aout, "audio-channels", VLC_VAR_SETTEXT, &text, NULL );
 
         if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DOLBYSTEREO )

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_programs.c,v 1.129 2004/01/25 17:16:06 zorglub Exp $
+ * $Id: input_programs.c,v 1.130 2004/01/26 21:37:58 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -110,13 +110,13 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
     var_Change( p_input, "navigation", VLC_VAR_SETTEXT, &text, NULL );
 
     var_Create( p_input, "video-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-    text.psz_string = _("Video track");
+    text.psz_string = _("Video Track");
     var_Change( p_input, "video-es", VLC_VAR_SETTEXT, &text, NULL );
     var_Create( p_input, "audio-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-    text.psz_string = _("Audio track");
+    text.psz_string = _("Audio Track");
     var_Change( p_input, "audio-es", VLC_VAR_SETTEXT, &text, NULL );
     var_Create( p_input, "spu-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-    text.psz_string = _("Subtitles track");
+    text.psz_string = _("Subtitles Track");
     var_Change( p_input, "spu-es", VLC_VAR_SETTEXT, &text, NULL );
 
     var_AddCallback( p_input, "program", ProgramCallback, NULL );
