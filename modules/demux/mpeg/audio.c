@@ -2,7 +2,7 @@
  * audio.c : mpeg audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.7 2002/08/18 14:33:00 sigmunau Exp $
+ * $Id: audio.c,v 1.8 2002/08/24 21:35:31 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -31,10 +31,6 @@
 #include <vlc/input.h>
 
 #include <sys/types.h>
-
-#ifdef HAVE_ID3TAG_H
-#include <id3tag.h>
-#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -442,170 +438,6 @@ static void ExtractConfiguration( demux_sys_t *p_demux )
 }
 
 /****************************************************************************
- * ParseID3Tag : parse an id3tag into the info structures
- ****************************************************************************
- *
- * Author : Sigmund Augdal 
- * 
-' ****************************************************************************/
-#ifdef HAVE_ID3TAG_H
-static void ParseID3Tag( input_thread_t *p_input, u8 *p_data, int i_size )
-{
-    struct id3_tag * p_id3_tag;
-    struct id3_frame * p_frame;
-    input_info_category_t * p_category;
-    int i_strings;
-    char * psz_temp;
-    int i;
-    
-    p_id3_tag = id3_tag_parse( p_data, i_size );
-    p_category = input_InfoCategory( p_input, "ID3" );
-    i = 0;
-    while ( ( p_frame = id3_tag_findframe( p_id3_tag , "T", i ) ) )
-    {
-        i_strings = id3_field_getnstrings( &p_frame->fields[1] );
-        while ( i_strings > 0 )
-        {
-            psz_temp = id3_ucs4_latin1duplicate( id3_field_getstrings ( &p_frame->fields[1], --i_strings ) );
-            input_AddInfo( p_category, (char *)p_frame->description, psz_temp );
-            free( psz_temp ); 
-        }
-        i++;
-    }
-    id3_tag_delete( p_id3_tag );
-}
-#endif
-
-/****************************************************************************
- * ParseID3Tag : check if an ID3 header is present and parse and skip it
- ****************************************************************************
- *
- * Author : Sigmund Augdal 
- * 
-' ****************************************************************************/
-static int ParseID3Tags( input_thread_t *p_input )
-{
-    u8  *p_peek;
-    int i_size;
-
-#ifdef HAVE_ID3TAG_H
-    int i_size2;
-    stream_position_t * p_pos;
-
-#else
-    u8  version, revision;
-    int b_footer;
-#endif
-
-    msg_Dbg( p_input, "Checking for ID3 tag" );
-    /* get 10 byte id3 header */    
-    if( input_Peek( p_input, &p_peek, 10 ) < 10 )
-    {
-        msg_Err( p_input, "cannot peek()" );
-        return( -1 );
-    }
-#ifndef HAVE_ID3TAG_H    
-    if ( !( (p_peek[0] == 0x49) && (p_peek[1] == 0x44) && (p_peek[2] == 0x33)))
-    {
-        return( 0 );
-    }
-    
-    version = p_peek[3];  /* These may become usfull later, */
-    revision = p_peek[4]; /* but we ignore them for now */
-
-    b_footer = p_peek[5] & 0x10;
-    i_size = (p_peek[6] << 21) +
-             (p_peek[7] << 14) +
-             (p_peek[8] << 7) +
-             p_peek[9];
-    if ( b_footer )
-    {
-        i_size += 10;
-    }
-    i_size += 10;
-#else
-
-    i_size = id3_tag_query( p_peek, 10 );
-    if ( p_input->stream.b_seekable )
-    {        
-        /*look for a id3v1 tag at the end of the file*/
-        p_pos = malloc( sizeof( stream_position_t ) );
-        if ( p_pos == 0 )
-        {
-            msg_Err( p_input, "no mem" );
-        }
-        input_Tell( p_input, p_pos );
-        p_input->pf_seek( p_input, p_pos->i_size - 128 );
-        input_AccessReinit( p_input );
-
-        /* get 10 byte id3 header */    
-        if( input_Peek( p_input, &p_peek, 10 ) < 10 )
-        {
-            msg_Err( p_input, "cannot peek()" );
-            return( -1 );
-        }
-        i_size2 = id3_tag_query( p_peek, 10 );
-        if ( i_size2 == 128 )
-        {
-            /* peek the entire tag */
-            if ( input_Peek( p_input, &p_peek, i_size2 ) < i_size2 )
-            {
-                msg_Err( p_input, "cannot peek()" );
-                return( -1 );
-            }
-            ParseID3Tag( p_input, p_peek, i_size2 );
-        }
-
-        /* look for id3v2.4 tag at end of file */
-        p_input->pf_seek( p_input, p_pos->i_size - 10 );
-        input_AccessReinit( p_input );
-        /* get 10 byte id3 footer */    
-        if( input_Peek( p_input, &p_peek, 10 ) < 10 )
-        {
-            msg_Err( p_input, "cannot peek()" );
-            return( -1 );
-        }
-        i_size2 = id3_tag_query( p_peek, 10 );
-        if ( i_size2 < 0 ) /* id3v2.4 footer found */
-        {
-            p_input->pf_seek( p_input, p_pos->i_size - i_size2 );
-            input_AccessReinit( p_input );
-            /* peek the entire tag */
-            if ( input_Peek( p_input, &p_peek, i_size2 ) < i_size2 )
-            {
-                msg_Err( p_input, "cannot peek()" );
-                return( -1 );
-            }
-            ParseID3Tag( p_input, p_peek, i_size2 );
-        }
-        free( p_pos );
-        p_input->pf_seek( p_input, 0 );
-        input_AccessReinit( p_input );    
-    }
-    if ( i_size <= 0 )
-    {
-        return 0;
-    }
-#endif
-
-    /* peek the entire tag */
-    if ( input_Peek( p_input, &p_peek, i_size ) < i_size )
-    {
-        msg_Err( p_input, "cannot peek()" );
-        return( -1 );
-    }
-
-#ifdef HAVE_ID3TAG_H
-    ParseID3Tag( p_input, p_peek, i_size );
-#endif
-    msg_Dbg( p_input, "ID3 tag found, skiping %d bytes", i_size );
-    p_input->pf_seek( p_input, i_size );
-    input_AccessReinit( p_input );    
-//    p_input->p_current_data += i_size; /* seek passed end of ID3 tag */
-    return (0);
-}
-
-/****************************************************************************
  * CheckPS : check if this stream could be some ps, 
  *           yes it's ugly ...  but another idea ?
  *
@@ -639,7 +471,8 @@ static int Activate( vlc_object_t * p_this )
     input_thread_t * p_input = (input_thread_t *)p_this;
     demux_sys_t * p_demux;
     input_info_category_t * p_category;
-
+    module_t * p_id3;
+    
     int i_found;
     int b_forced;
     int i_skip;
@@ -664,12 +497,11 @@ static int Activate( vlc_object_t * p_this )
     {
         b_forced = 0;
     }
-
-    if ( ParseID3Tags( p_input ) )
-    {
-        return( -1 );
+    p_id3 = module_Need( p_input, "id3", NULL );
+    if ( p_id3 ) {
+        module_Unneed( p_input, p_id3 );
     }
-
+    
     /* create p_demux and init it */
     if( !( p_demux = p_input->p_demux_data = malloc( sizeof(demux_sys_t) ) ) )
     {

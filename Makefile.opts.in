@@ -145,6 +145,7 @@ waveout_LDFLAGS = @waveout_LDFLAGS@
 x11_LDFLAGS = @x11_LDFLAGS@
 xosd_LDFLAGS = @xosd_LDFLAGS@
 xvideo_LDFLAGS = @xvideo_LDFLAGS@
+id3tag_LDFLAGS = @id3tag_LDFLAGS@
 
 #
 # Other special cases

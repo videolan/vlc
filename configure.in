@@ -454,7 +454,7 @@ PLUGINS="${PLUGINS} audio_mixer/trivial audio_mixer/spdif"
 PLUGINS="${PLUGINS} audio_output/file"
 #PLUGINS="${PLUGINS} visualization/scope/scope"
 PLUGINS="${PLUGINS} video_chroma/i420_rgb video_chroma/i420_yuy2 video_chroma/i422_yuy2 video_chroma/i420_ymga"
-
+PLUGINS="${PLUGINS} demux/util/id3"
 dnl
 dnl  Network modules
 dnl
@@ -1022,7 +1022,9 @@ fi
 dnl
 dnl   libid3tag support
 dnl
-AC_CHECK_HEADERS(id3tag.h, [audio_LDFLAGS="${audio_LDFLAGS} -lz -lid3tag"])
+AC_CHECK_HEADERS(id3tag.h, [
+  id3tag_LDFLAGS="${id3tag_LDFLAGS} -lz -lid3tag"
+  PLUGINS="${PLUGINS} demux/util/id3tag"])
    
 dnl
 dnl  ffmpeg decoder plugin
@@ -2163,7 +2165,8 @@ AC_SUBST(waveout_LDFLAGS)
 AC_SUBST(x11_LDFLAGS)
 AC_SUBST(xvideo_LDFLAGS)
 AC_SUBST(xosd_LDFLAGS)
-
+AC_SUBST(id3tag_LDFLAGS)
+        
 AC_OUTPUT([Makefile.config Makefile.opts po/Makefile.in vlc-config])
 chmod a+x vlc-config
 

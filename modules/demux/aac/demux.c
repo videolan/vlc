@@ -2,7 +2,7 @@
  * demux.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demux.c,v 1.1 2002/08/12 16:59:15 fenrir Exp $
+ * $Id: demux.c,v 1.2 2002/08/24 21:35:31 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -372,59 +372,6 @@ static void ExtractConfiguration( demux_sys_t *p_aac )
 }
 
 /****************************************************************************
- * SkipID3Tag : check if an ID3 header is present and skip it
- ****************************************************************************
- * 
- * Author : Sigmund Augdal
- * 
- ****************************************************************************/
- 
-static int SkipID3Tag( input_thread_t *p_input )
-{
-    int i_count;
-    byte_t *p_peek;
-    byte_t version, revision;
-    int b_footer;
-    int i_size;
-
-    /* get 10 byte id3 header */    
-    if( ( i_count = input_Peek( p_input, &p_peek, 10 ) ) < 10 )
-    {
-        msg_Err( p_input, "cannot peek()" );
-        return( -1 );
-    }
-    
-    if ( !( (p_peek[0] == 0x49) && (p_peek[1] == 0x44) && (p_peek[2] == 0x33)))
-    {
-        return( 0 );
-    }
-    
-    version = p_peek[3];  /* These may become usfull later, */
-    revision = p_peek[4]; /* but we ignore them for now */
-
-    b_footer = p_peek[5] & 0x10;
-    i_size = (p_peek[6] << 21) +
-             (p_peek[7] << 14) +
-             (p_peek[8] << 7) +
-             p_peek[9];  /* Is this safe? */
-    if ( b_footer )
-    {
-        i_size += 10;
-    }
-    i_size += 10;
-    msg_Dbg( p_input, "ID3 tag found, skiping %d bytes", i_size );
-    if ( input_Peek( p_input, &p_peek, i_size ) < i_size )
-    {
-        msg_Err( p_input, "cannot peek()" );
-        return( -1 );
-    }
-        
-    p_input->p_current_data += i_size; /* seek passed end of ID3 tag */
-
-    return (0);
-}
-
-/****************************************************************************
  * CheckPS : check if this stream could be some ps, 
  *           yes it's ugly ...  but another idea ?
  *
@@ -458,7 +405,8 @@ static int Activate( vlc_object_t * p_this )
     input_thread_t * p_input = (input_thread_t *)p_this;
     demux_sys_t * p_aac;
     input_info_category_t * p_category;
-
+    module_t * p_id3;
+    
     int i_skip;
     int b_forced;
 
@@ -480,12 +428,13 @@ static int Activate( vlc_object_t * p_this )
     {
         return( -1 );
     }
-    
+
     /* skip possible id3 header */    
-    if ( SkipID3Tag( p_input ) )
-    {
-        return -1;
+    p_id3 = module_Need( p_input, "id3", NULL );
+    if ( p_id3 ) {
+        module_Unneed( p_input, p_id3 );
     }
+    
     /* allocate p_aac */
     if( !( p_aac = malloc( sizeof( demux_sys_t ) ) ) )
     {
