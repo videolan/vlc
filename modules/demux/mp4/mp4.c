@@ -590,10 +590,17 @@ static int Demux( demux_t *p_demux )
 
                     if( i_size + 2 <= p_block->i_buffer )
                     {
+                        char *p;
                         /* remove the length field, and append a '\0' */
                         memmove( &p_block->p_buffer[0], &p_block->p_buffer[2], i_size );
                         p_block->p_buffer[i_size] = '\0';
                         p_block->i_buffer = i_size + 1;
+
+                        /* convert \r -> \n */
+                        while( ( p = strchr( p_block->p_buffer, '\r' ) ) )
+                        {
+                            *p = '\n';
+                        }
                     }
                     else
                     {
@@ -1108,6 +1115,9 @@ static int  TrackCreateES   ( demux_t   *p_demux,
 
         case( VLC_FOURCC( 't', 'e', 'x', 't' ) ):
             p_track->fmt.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
+            /* FIXME: Not true, could be UTF-16 with a Byte Order Mark (0xfeff) */
+            /* FIXME UTF-8 doesn't work here ? */
+            /* p_track->fmt.subs.psz_encoding = strdup( "UTF-8" ); */
             break;
 
         default:
