@@ -67,11 +67,12 @@ Section "Install"
 	File  /r skins
 
 	CreateDirectory "$SMPROGRAMS\VideoLAN"
-	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc.lnk" "$INSTDIR\vlc.exe" 
-	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc (wxwindows).lnk" \
+	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc.lnk" \
                        "$INSTDIR\vlc.exe" "--intf wxwin"
 	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc (skins).lnk" \
                        "$INSTDIR\vlc.exe" "--intf skins"
+	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc (custom).lnk" \
+                       "$INSTDIR\vlc.exe" 
 	CreateShortCut "$SMPROGRAMS\VideoLAN\FAQ.lnk" "$INSTDIR\FAQ.htm"
 
         WriteRegStr HKLM \

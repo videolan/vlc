@@ -1,15 +1,16 @@
-$Id: NEWS,v 1.40 2003/05/15 02:02:13 hartman Exp $
+$Id: NEWS,v 1.41 2003/05/17 23:57:35 gbazin Exp $
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------
 
 Core Support:
- * Channel Server support was removed
+ * Channel Server support was removed (was deprecated)
 
 Input access:
  * fixed a big bug in ftp and http access that prevented many platforms (OSX most prominently) to view ftp and http streams.
  * fixed large file support on Windows
  * Video 4 Linux support
+ * CD Digital Audio support
 
 Input demux:
  * Better detection of AAC and mp3 files
@@ -23,15 +24,17 @@ Codecs:
  * If ffmpeg cannot keep up, skip and try to recover instead of stopping altogether
 
 Interfaces:
- * The wxWindows interface is now Unicode safe
- * New http interface
+ * The wxWindows interface is now fully useable as well as Unicode safe
+ * New HTTP remote control interface
 
 Stream output:
- *
+ * New stream output scheme. It is now possible to build a chain of stream outputs allowing for instance to stream and display some content at the same time.
+ * The stream output now allows to transcode content on the fly.
 
 Miscellaneous:
- * New reset all option for preferences
+ * New reset option for the preferences
  * You can set your language in the prefences
+ * New video chroma conversion module using ffmpeg
 
 UNIX ports:
  *
@@ -51,6 +54,10 @@ Mac OS X port:
 
 Win32 port:
  * the wxWindows interface is now the default interface
+ * The keyboard shortcuts are now identical to the linux version
+ * Fixed the "no sound" problem on NT4
+ * Improved skinnable interface (it now uses the wxWindows interface dialogs).
+ * Added support for compressed skins files (.vlt files)
 
 BeOS port:
  * Interface localization

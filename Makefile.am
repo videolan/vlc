@@ -575,8 +575,8 @@ package-win32:
 		cp $$i tmp/skins/ || true ; \
 	done
 
-	cd doc/faq ; $(MAKE) html ; cd ../.. ;
-	cp doc/faq/index.html tmp/FAQ.htm ;
+	$(MAKE) -C doc/faq html ;
+	cp doc/faq/faq.html tmp/FAQ.htm ;
 
 # Create package 
 	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe -- /DVERSION=${VERSION} tmp/nsi
