@@ -2,7 +2,7 @@
  * vlc_es.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vlc_es.h,v 1.2 2003/11/21 15:32:08 fenrir Exp $
+ * $Id: vlc_es.h,v 1.3 2003/11/22 18:04:10 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -117,6 +117,13 @@ struct es_format_t
     void    *p_extra;
 
 };
+
+/* ES Categories */
+#define UNKNOWN_ES      0x00
+#define VIDEO_ES        0x01
+#define AUDIO_ES        0x02
+#define SPU_ES          0x03
+#define NAV_ES          0x04
 
 static inline void es_format_Init( es_format_t *fmt,
                                    int i_cat, vlc_fourcc_t i_codec )

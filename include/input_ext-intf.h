@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.98 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: input_ext-intf.h,v 1.99 2003/11/22 18:04:10 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -85,14 +85,6 @@ struct es_descriptor_t
 #define PROGRAM_ASSOCIATION_TABLE_PID   0x0000
 #define CONDITIONNAL_ACCESS_TABLE_PID   0x0001                   /* not used */
 #define EMPTY_ID                        0xffff    /* empty record in a table */
-
-
-/* ES Categories to be used by interface plugins */
-#define UNKNOWN_ES      0x00
-#define VIDEO_ES        0x01
-#define AUDIO_ES        0x02
-#define SPU_ES          0x03
-#define NAV_ES          0x04
 
 /*****************************************************************************
  * pgrm_descriptor_t

@@ -1,12 +1,13 @@
 /*****************************************************************************
- * lpcm.c: lpcm decoder module
+ * lpcm.c: lpcm decoder/packetizer module
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm.c,v 1.18 2003/11/16 21:07:30 gbazin Exp $
+ * Copyright (C) 1999-2003 VideoLAN
+ * $Id: lpcm.c,v 1.19 2003/11/22 18:04:10 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
+ *          Gildas Bazin <gbazin@netcourrier.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,46 +27,29 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                    /* memcpy(), memset() */
-
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
 #include <vlc/decoder.h>
-#include <input_ext-dec.h>
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>                                           /* getpid() */
-#endif
 
 /*****************************************************************************
- * dec_thread_t : lpcm decoder thread descriptor
+ * decoder_sys_t : lpcm decoder descriptor
  *****************************************************************************/
-typedef struct dec_thread_t
+struct decoder_sys_t
 {
-    /*
-     * Input properties
-     */
-    decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
-    /* Some filters don't handle well too small buffers (coreaudio resampler).
-     * Thus an aout buffer will be two PES packets. */
-    pes_packet_t *      p_buffered_pes;
-    data_packet_t *     p_buffered_data;
-    size_t              i_buffered_size;
+    /* Module mode */
+    vlc_bool_t b_packetizer;
 
     /*
      * Output properties
      */
-    aout_instance_t        *p_aout;
-    aout_input_t           *p_aout_input;
-    audio_sample_format_t   output_format;
-    audio_date_t            end_date;
-} dec_thread_t;
+    audio_date_t end_date;
+
+};
 
 /*
  * LPCM header :
  * - PES header
  * - private stream ID (16 bits) == 0xA0 -> not in the bitstream
+ *
  * - frame number (8 bits)
  * - unknown (16 bits) == 0x0003 ?
  * - unknown (4 bits)
@@ -82,19 +66,26 @@ typedef struct dec_thread_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  OpenDecoder    ( vlc_object_t * );
-static int  RunDecoder     ( decoder_fifo_t * );
+static int  OpenDecoder   ( vlc_object_t * );
+static int  OpenPacketizer( vlc_object_t * );
+static void CloseDecoder  ( vlc_object_t * );
 
-static void DecodeFrame    ( dec_thread_t * );
-static void EndThread      ( dec_thread_t * );
+static void *DecodeFrame  ( decoder_t *, block_t ** );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("linear PCM audio parser") );
+
+    set_description( _("linear PCM audio decoder") );
     set_capability( "decoder", 100 );
-    set_callbacks( OpenDecoder, NULL );
+    set_callbacks( OpenDecoder, CloseDecoder );
+
+    add_submodule();
+    set_description( _("linear PCM audio packetizer") );
+    set_capability( "packetizer", 100 );
+    set_callbacks( OpenPacketizer, CloseDecoder );
+
 vlc_module_end();
 
 /*****************************************************************************
@@ -103,118 +94,94 @@ vlc_module_end();
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('l','p','c','m')
          && p_dec->fmt_in.i_codec != VLC_FOURCC('l','p','c','b') )
     {   
         return VLC_EGENERIC;
     }
-    
-    p_dec->pf_run = RunDecoder;
+
+    /* Allocate the memory needed to store the decoder's structure */
+    if( ( p_dec->p_sys = p_sys =
+          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    {
+        msg_Err( p_dec, "out of memory" );
+        return VLC_EGENERIC;
+    }
+
+    /* Misc init */
+    p_sys->b_packetizer = VLC_FALSE;
+    aout_DateSet( &p_sys->end_date, 0 );
+
+    /* Set output properties */
+    p_dec->fmt_out.i_cat = AUDIO_ES;
+    p_dec->fmt_out.i_codec = VLC_FOURCC('s','1','6','b');
+
+    /* Set callback */
+    p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
+        DecodeFrame;
+    p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
+        DecodeFrame;
+
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * RunDecoder: the lpcm decoder
- *****************************************************************************/
-static int RunDecoder( decoder_fifo_t * p_fifo )
+static int OpenPacketizer( vlc_object_t *p_this )
 {
-    dec_thread_t *   p_dec;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    /* Allocate the memory needed to store the thread's structure */
-    if( (p_dec = (dec_thread_t *)malloc( sizeof(dec_thread_t)) )
-            == NULL) 
-    {
-        msg_Err( p_fifo, "out of memory" );
-        DecoderError( p_fifo );
-        return -1;
-    }
+    int i_ret = OpenDecoder( p_this );
 
-    /* Initialize the thread properties */
-    p_dec->p_fifo = p_fifo;
-    p_dec->i_buffered_size = 0;
+    if( i_ret != VLC_SUCCESS ) return i_ret;
 
-    p_dec->output_format.i_format = VLC_FOURCC('s','1','6','b');
-    p_dec->p_aout = NULL;
-    p_dec->p_aout_input = NULL;
+    p_dec->p_sys->b_packetizer = VLC_TRUE;
 
-    /* LPCM decoder thread's main loop */
-    while ( (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error) )
-    {
-        DecodeFrame(p_dec);
-    }
+    p_dec->fmt_out.i_codec = VLC_FOURCC('l','p','c','m');
 
-    /* If b_error is set, the lpcm decoder thread enters the error loop */
-    if ( p_dec->p_fifo->b_error )
-    {
-        DecoderError( p_dec->p_fifo );
-    }
-
-    /* End of the lpcm decoder thread */
-    EndThread( p_dec );
-
-    return 0;
+    return i_ret;
 }
 
 /*****************************************************************************
- * DecodeFrame: decodes a frame.
+ * DecodeFrame: decodes an lpcm frame.
+ ****************************************************************************
+ * Beware, this function must be fed with complete frames (PES packet).
  *****************************************************************************/
-static void DecodeFrame( dec_thread_t * p_dec )
+static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 {
-    pes_packet_t *     p_pes;
-    data_packet_t *    p_data;
-    aout_buffer_t *    p_buffer;
-    void *             p_dest;
-    mtime_t            i_pts;
-    uint8_t            i_header;
-    unsigned int       i_rate = 0, i_original_channels = 0, i_size;
-    int                i;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t       *p_block;
+    unsigned int  i_rate = 0, i_original_channels = 0, i_channels = 0;
+    int           i_frame_length;
+    uint8_t       i_header;
 
-    input_ExtractPES( p_dec->p_fifo, &p_pes );
-    if ( !p_pes )
+    if( !pp_block || !*pp_block ) return NULL;
+
+    p_block = *pp_block;
+    *pp_block = NULL; /* So the packet doesn't get re-sent */
+
+    /* Date management */
+    if( p_block->i_pts > 0 &&
+        p_block->i_pts != aout_DateGet( &p_sys->end_date ) )
     {
-        p_dec->p_fifo->b_error = 1;
-        return;
+        aout_DateSet( &p_sys->end_date, p_block->i_pts );
     }
 
-    /* Compute the size of the PES - i_pes_size includes the PES header. */
-    p_data = p_pes->p_first;
-    i_size = 0;
-    while ( p_data != NULL )
+    if( !aout_DateGet( &p_sys->end_date ) )
     {
-        i_size += p_data->p_payload_end - p_data->p_payload_start;
-        p_data = p_data->p_next;
-    }
-    if ( i_size < LPCM_HEADER_LEN )
-    {
-        msg_Err(p_dec->p_fifo, "PES packet is too short");
-        input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
-        return;
+        /* We've just started the stream, wait for the first PTS. */
+        block_Release( p_block );
+        return NULL;
     }
 
-    i_pts = p_pes->i_pts;
-    if( i_pts != 0 && i_pts != aout_DateGet( &p_dec->end_date ) )
+    if( p_block->i_buffer <= LPCM_HEADER_LEN )
     {
-        aout_DateSet( &p_dec->end_date, i_pts );
+        msg_Err(p_dec, "frame is too short");
+        block_Release( p_block );
+        return NULL;
     }
 
-    p_data = p_pes->p_first;
-    /* It necessarily contains one byte. */
-    /* Get LPCM header. */
-
-    /* Drop the first four bytes. */
-    for ( i = 0; i < 4; i++ )
-    {
-        if ( p_data->p_payload_end == p_data->p_payload_start )
-        {
-            p_data = p_data->p_next;
-        }
-        p_data->p_payload_start++;
-    }
-
-    i_header = p_data->p_payload_start[0];
-    p_data->p_payload_start++;
-
+    i_header = p_block->p_buffer[4];
     switch ( (i_header >> 4) & 0x3 )
     {
     case 0:
@@ -231,7 +198,8 @@ static void DecodeFrame( dec_thread_t * p_dec )
         break;
     }
 
-    switch ( i_header & 0x7 )
+    i_channels = (i_header & 0x7);
+    switch ( i_channels )
     {
     case 0:
         i_original_channels = AOUT_CHAN_CENTER;
@@ -273,137 +241,62 @@ static void DecodeFrame( dec_thread_t * p_dec )
     }
 
     /* Check frame sync and drop it. */
-    if ( p_data->p_payload_end == p_data->p_payload_start )
+    if( p_block->p_buffer[5] != 0x80 )
     {
-        p_data = p_data->p_next;
-    }
-    if ( p_data->p_payload_start[0] != 0x80 )
-    {
-        msg_Warn(p_dec->p_fifo, "no frame sync");
-        input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
-        return;
-    }
-    p_data->p_payload_start++;
-
-    if( (p_dec->p_aout_input != NULL) &&
-        ( (p_dec->output_format.i_rate != i_rate)
-            || (p_dec->output_format.i_original_channels
-                  != i_original_channels) ) )
-    {
-        /* Parameters changed - this should not happen. */
-        aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
-        p_dec->p_aout_input = NULL;
+        msg_Warn( p_dec, "no frame sync" );
+        block_Release( p_block );
+        return NULL;
     }
 
-    /* Creating the audio input if not created yet. */
-    if( p_dec->p_aout_input == NULL )
+    /* Set output properties */
+    if( p_dec->fmt_out.audio.i_rate != i_rate )
     {
-        p_dec->output_format.i_rate = i_rate;
-        p_dec->output_format.i_original_channels = i_original_channels;
-        p_dec->output_format.i_physical_channels
-                   = i_original_channels & AOUT_CHAN_PHYSMASK;
-        aout_DateInit( &p_dec->end_date, i_rate );
-        aout_DateSet( &p_dec->end_date, i_pts );
-        p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
-                                           &p_dec->p_aout,
-                                           &p_dec->output_format );
-
-        if ( p_dec->p_aout_input == NULL )
-        {
-            p_dec->p_fifo->b_error = 1;
-            input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
-            return;
-        }
-
-        if ( p_dec->i_buffered_size )
-        {
-            input_DeletePES( p_dec->p_fifo->p_packets_mgt,
-                             p_dec->p_buffered_pes );
-            p_dec->i_buffered_size = 0;
-        }
+        aout_DateInit( &p_sys->end_date, i_rate );
+        aout_DateSet( &p_sys->end_date, p_block->i_pts );
     }
+    p_dec->fmt_out.audio.i_rate = i_rate;
+    p_dec->fmt_out.audio.i_channels = i_channels + 1;
+    p_dec->fmt_out.audio.i_original_channels = i_original_channels;
+    p_dec->fmt_out.audio.i_physical_channels
+        = i_original_channels & AOUT_CHAN_PHYSMASK;
 
-    if ( !aout_DateGet( &p_dec->end_date ) )
+    i_frame_length = (p_block->i_buffer - LPCM_HEADER_LEN) /
+        ( p_dec->fmt_out.audio.i_channels * 2 );
+
+    if( p_sys->b_packetizer )
     {
-        /* We've just started the stream, wait for the first PTS. */
-        input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
-        return;
-    }
+        p_block->i_pts = p_block->i_dts = aout_DateGet( &p_sys->end_date );
+        p_block->i_length =
+            aout_DateIncrement( &p_sys->end_date, i_frame_length ) -
+            p_block->i_pts;
 
-    if ( p_dec->i_buffered_size != 0 )
-    {
-        p_buffer = aout_DecNewBuffer( p_dec->p_aout, p_dec->p_aout_input,
-                (i_size - LPCM_HEADER_LEN + p_dec->i_buffered_size)
-                    / p_dec->output_format.i_bytes_per_frame );
-
-        if( p_buffer == NULL )
-        {
-            msg_Err( p_dec->p_fifo, "cannot get aout buffer" );
-            p_dec->p_fifo->b_error = 1;
-            input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
-            return;
-        }
-        p_buffer->start_date = aout_DateGet( &p_dec->end_date );
-        p_buffer->end_date = aout_DateIncrement( &p_dec->end_date,
-                (i_size - LPCM_HEADER_LEN + p_dec->i_buffered_size)
-                    / p_dec->output_format.i_bytes_per_frame );
-
-        /* Get the whole frame. */
-        p_dest = p_buffer->p_buffer;
-
-        while ( p_dec->p_buffered_data != NULL )
-        {
-            p_dec->p_fifo->p_vlc->pf_memcpy( p_dest,
-                    p_dec->p_buffered_data->p_payload_start,
-                    p_dec->p_buffered_data->p_payload_end
-                     - p_dec->p_buffered_data->p_payload_start );
-            p_dest += p_dec->p_buffered_data->p_payload_end
-                         - p_dec->p_buffered_data->p_payload_start;
-            p_dec->p_buffered_data = p_dec->p_buffered_data->p_next;
-        }
-        input_DeletePES( p_dec->p_fifo->p_packets_mgt,
-                         p_dec->p_buffered_pes );
-
-        p_dest = p_buffer->p_buffer + p_dec->i_buffered_size;
-
-        while ( p_data != NULL )
-        {
-            p_dec->p_fifo->p_vlc->pf_memcpy( p_dest, p_data->p_payload_start,
-                    p_data->p_payload_end - p_data->p_payload_start );
-            p_dest += p_data->p_payload_end - p_data->p_payload_start;
-            p_data = p_data->p_next;
-        }
-        input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
-
-        /* Send the buffer to the aout core. */
-        aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, p_buffer );
-
-        p_dec->i_buffered_size = 0;
+        /* Just pass on the incoming frame */
+        return p_block;
     }
     else
     {
-        p_dec->i_buffered_size = i_size - LPCM_HEADER_LEN;
-        p_dec->p_buffered_pes = p_pes;
-        p_dec->p_buffered_data = p_data;
+        aout_buffer_t *p_aout_buffer;
+        p_aout_buffer = p_dec->pf_aout_buffer_new( p_dec, i_frame_length );
+        if( p_aout_buffer == NULL ) return NULL;
+
+        p_aout_buffer->start_date = aout_DateGet( &p_sys->end_date );
+        p_aout_buffer->end_date =
+            aout_DateIncrement( &p_sys->end_date, i_frame_length );
+
+        memcpy( p_aout_buffer->p_buffer,
+                p_block->p_buffer + LPCM_HEADER_LEN,
+                p_block->i_buffer - LPCM_HEADER_LEN );
+
+        block_Release( p_block );
+        return p_aout_buffer;
     }
 }
 
 /*****************************************************************************
- * EndThread : lpcm decoder thread destruction
+ * CloseDecoder : lpcm decoder destruction
  *****************************************************************************/
-static void EndThread( dec_thread_t * p_dec )
+static void CloseDecoder( vlc_object_t *p_this )
 {
-    if( p_dec->p_aout_input != NULL )
-    {
-        aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
-    }
-
-    if ( p_dec->i_buffered_size )
-    {
-        input_DeletePES( p_dec->p_fifo->p_packets_mgt,
-                         p_dec->p_buffered_pes );
-        p_dec->i_buffered_size = 0;
-    }
-
-    free( p_dec );
+    decoder_t *p_dec = (decoder_t*)p_this;
+    free( p_dec->p_sys );
 }
