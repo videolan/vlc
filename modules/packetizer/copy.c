@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.8 2003/05/02 00:33:42 fenrir Exp $
+ * $Id: copy.c,v 1.9 2003/05/03 01:12:13 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -542,6 +542,7 @@ static void EndThread ( packetizer_thread_t *p_pack)
     {
         sout_InputDelete( p_pack->p_sout_input );
     }
+    free( p_pack );
 }
 
 static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )

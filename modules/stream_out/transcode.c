@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.9 2003/05/02 19:37:08 fenrir Exp $
+ * $Id: transcode.c,v 1.10 2003/05/03 01:12:13 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -585,7 +585,9 @@ static void transcode_audio_ffmpeg_close ( sout_stream_t *p_stream, sout_stream_
     free( id->ff_dec_c );
     free( id->ff_enc_c );
 
+    free( id->p_buffer_in );
     free( id->p_buffer );
+    free( id->p_buffer_out );
 }
 
 static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_id_t *id,

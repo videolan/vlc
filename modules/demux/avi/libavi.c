@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.19 2003/04/27 13:55:51 fenrir Exp $
+ * $Id: libavi.c,v 1.20 2003/05/03 01:12:13 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -527,7 +527,7 @@ static int AVI_ChunkRead_strf( input_thread_t *p_input,
     {
         case( AVIFOURCC_auds ):
             p_chk->strf.auds.i_cat = AUDIO_ES;
-            p_chk->strf.auds.p_wf = malloc( p_chk->common.i_chunk_size );
+            p_chk->strf.auds.p_wf = malloc( __MAX( p_chk->common.i_chunk_size, sizeof( WAVEFORMATEX ) ) );
             AVI_READ2BYTES( p_chk->strf.auds.p_wf->wFormatTag );
             AVI_READ2BYTES( p_chk->strf.auds.p_wf->nChannels );
             AVI_READ4BYTES( p_chk->strf.auds.p_wf->nSamplesPerSec );
