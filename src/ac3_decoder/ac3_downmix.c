@@ -2,7 +2,7 @@
  * ac3_downmix.c: ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_downmix.c,v 1.20 2001/04/20 12:14:34 reno Exp $
+ * $Id: ac3_downmix.c,v 1.21 2001/04/30 21:04:20 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -29,72 +29,36 @@
 #include "threads.h"
 #include "mtime.h"
 
+#include "tests.h"
+
 #include "stream_control.h"
 #include "input_ext-dec.h"
 #include "ac3_decoder.h"
 #include "ac3_internal.h"
 #include "ac3_downmix.h"
 
-/* Pre-scaled downmix coefficients */
-static const float cmixlev_lut[4] = { 0.2928, 0.2468, 0.2071, 0.2468 };
-static const float smixlev_lut[4] = { 0.2928, 0.2071, 0.0   , 0.2071 };
-
-/* Downmix into _two_ channels...other downmix modes aren't implemented
- * to reduce complexity. Realistically, there aren't many machines around
- * with > 2 channel output anyways */
-
-int __inline__ downmix (ac3dec_t * p_ac3dec, float * channel, s16 * out_buf)
+void downmix_init (downmix_t * p_downmix)
 {
-
-    dm_par_t    dm_par;
-    
-    dm_par.clev = 0.0;
-    dm_par.slev = 0.0;
-    dm_par.unit = 1.0;
-
-    if (p_ac3dec->bsi.acmod & 0x1) /* have center */
-        dm_par.clev = cmixlev_lut[p_ac3dec->bsi.cmixlev];
-
-    if (p_ac3dec->bsi.acmod & 0x4) /* have surround channels */
-        dm_par.slev = smixlev_lut[p_ac3dec->bsi.surmixlev];
-
-    dm_par.unit /= 1.0 + dm_par.clev + dm_par.slev;
-    dm_par.clev *= dm_par.unit;
-    dm_par.slev *= dm_par.unit;
-
-
-    /*
-    if (p_ac3dec->bsi.acmod > 7)
-        intf_ErrMsg( "ac3dec: (downmix) invalid acmod number" );
-    */
-    
-    switch(p_ac3dec->bsi.acmod)
+#if 0
+    if ( TestCPU (CPU_CAPABILITY_MMX) )
     {
-        case 7: // 3/2
-            downmix_3f_2r_to_2ch_c (channel, &dm_par);
-            break;
-        case 6: // 2/2
-            downmix_2f_2r_to_2ch_c (channel, &dm_par);
-            break;
-        case 5: // 3/1
-            downmix_3f_1r_to_2ch_c (channel, &dm_par);
-            break;
-        case 4: // 2/1
-            downmix_2f_1r_to_2ch_c (channel, &dm_par);
-            break;
-        case 3: // 3/0
-            downmix_3f_0r_to_2ch_c (channel, &dm_par);
-            break;
-        case 2:
-            break;
-        default: // 1/0
-            /* FIXME
-            if (p_ac3dec->bsi.acmod == 1)
-                center = p_ac3dec->samples.channel[0];
-            else if (p_ac3dec->bsi.acmod == 0)
-                center = p_ac3dec->samples.channel[0]; */
-            return 1;
+		fprintf(stderr,"Using MMX for downmix\n");
+		p_downmix->downmix_3f_2r_to_2ch = downmix_3f_2r_to_2ch_kni;
+		p_downmix->downmix_2f_2r_to_2ch = downmix_2f_2r_to_2ch_kni;
+		p_downmix->downmix_3f_1r_to_2ch = downmix_3f_1r_to_2ch_kni;
+		p_downmix->downmix_2f_1r_to_2ch = downmix_2f_1r_to_2ch_kni;
+		p_downmix->downmix_3f_0r_to_2ch = downmix_3f_0r_to_2ch_kni;
+		p_downmix->stream_sample_2ch_to_s16 = stream_sample_2ch_to_s16_kni;
+    	p_downmix->stream_sample_1ch_to_s16 = stream_sample_1ch_to_s16_kni;
+    } else 
+#endif
+    {
+		p_downmix->downmix_3f_2r_to_2ch = downmix_3f_2r_to_2ch_c;
+		p_downmix->downmix_2f_2r_to_2ch = downmix_2f_2r_to_2ch_c;
+		p_downmix->downmix_3f_1r_to_2ch = downmix_3f_1r_to_2ch_c;
+		p_downmix->downmix_2f_1r_to_2ch = downmix_2f_1r_to_2ch_c;
+		p_downmix->downmix_3f_0r_to_2ch = downmix_3f_0r_to_2ch_c;
+		p_downmix->stream_sample_2ch_to_s16 = stream_sample_2ch_to_s16_c;
+		p_downmix->stream_sample_1ch_to_s16 = stream_sample_1ch_to_s16_c;
     }
-    return 0;
 }
-

@@ -2,7 +2,7 @@
  * ac3_decoder.h : ac3 decoder interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder.h,v 1.6 2001/04/26 00:12:19 reno Exp $
+ * $Id: ac3_decoder.h,v 1.7 2001/04/30 21:04:20 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -308,6 +308,7 @@ typedef struct audblk_s {
 } audblk_t;
 
 /* Everything you wanted to know about band structure */
+
 /*
  * The entire frequency domain is represented by 256 real
  * floating point fourier coefficients. Only the lower 253
@@ -325,17 +326,6 @@ typedef struct audblk_s {
  * frequency range. The sub-bands are of non-uniform width, and
  * approximate a 1/6 octave scale.
  */
-
-typedef struct stream_coeffs_s
-{
-    float fbw[5][256];
-    float lfe[256];
-} stream_coeffs_t;
-
-typedef struct stream_samples_s
-{
-    float channel[6][256];
-} stream_samples_t;
 
 typedef struct bit_allocate_s
 {
@@ -375,6 +365,7 @@ typedef struct imdct_s
 
     /* Delay buffer for time domain interleaving */
     float delay[6][256];
+    float delay1[6][256];
 
     /* Twiddle factors for IMDCT */
     float xcos1[N/4];
@@ -392,7 +383,31 @@ typedef struct imdct_s
     complex_t w_32[32];
     complex_t w_64[64];
 
+    float xcos_sin_sse[128 * 4] __attribute__((aligned(16)));
+    
+    /* Functions */
+    void (*fft_64p) (complex_t *a);
+    
+    void (*imdct_do_512)(struct imdct_s * p_imdct, float data[], float delay[]);
+    void (*imdct_do_512_nol)(struct imdct_s * p_imdct, float data[], float delay[]);
+
 } imdct_t;
+
+typedef struct dm_par_s {
+    float unit;
+    float clev;
+    float slev;
+} dm_par_t;
+
+typedef struct downmix_s {
+    void (*downmix_3f_2r_to_2ch)(float *samples, dm_par_t * dm_par);
+    void (*downmix_3f_1r_to_2ch)(float *samples, dm_par_t * dm_par);
+    void (*downmix_2f_2r_to_2ch)(float *samples, dm_par_t * dm_par);
+    void (*downmix_2f_1r_to_2ch)(float *samples, dm_par_t * dm_par);
+    void (*downmix_3f_0r_to_2ch)(float *samples, dm_par_t * dm_par);
+    void (*stream_sample_2ch_to_s16)(s16 *s16_samples, float *left, float *right);
+    void (*stream_sample_1ch_to_s16)(s16 *s16_samples, float *center);
+} downmix_t;
 
 struct ac3dec_s
 {
@@ -412,10 +427,12 @@ struct ac3dec_s
     bsi_t               bsi;
     audblk_t            audblk;
 
-    stream_coeffs_t     coeffs;
-    stream_samples_t    samples;
+    float               samples[6][256];
+    dm_par_t            dm_par;
 
     bit_allocate_t      bit_allocate;
     mantissa_t          mantissa;
     imdct_t             imdct;
+    downmix_t           downmix;
+
 };

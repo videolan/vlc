@@ -2,7 +2,7 @@
  * ac3_downmix_c.c: ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_c.c,v 1.5 2001/04/20 12:14:34 reno Exp $
+ * $Id: ac3_downmix_c.c,v 1.6 2001/04/30 21:04:20 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -36,6 +36,7 @@
 #include "ac3_internal.h"
 
 #include "ac3_downmix.h"
+
 void __inline__ downmix_3f_2r_to_2ch_c (float *samples, dm_par_t *dm_par)
 {
     int i;
@@ -137,8 +138,8 @@ void __inline__ stream_sample_2ch_to_s16_c (s16 *out_buf, float *left, float *ri
 {
     int i;
     for (i=0; i < 256; i++) {
-        *out_buf++ = (s16) (*left++  * NORM);
-        *out_buf++ = (s16) (*right++ * NORM);
+        *out_buf++ = (s16) (*left++);
+        *out_buf++ = (s16) (*right++);
     }
 }
 
@@ -149,7 +150,7 @@ void __inline__ stream_sample_1ch_to_s16_c (s16 *out_buf, float *center)
     float tmp;
 
     for (i=0; i < 256; i++) {
-        *out_buf++ = tmp = (s16) (0.7071f * *center++ * NORM);
+        *out_buf++ = tmp = (s16) (0.7071f * *center++);
         *out_buf++ = tmp;
     }
 }

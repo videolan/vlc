@@ -70,6 +70,8 @@ AC3_DECODER =	src/ac3_decoder/ac3_decoder_thread.o \
 		src/ac3_decoder/ac3_mantissa.o \
 		src/ac3_decoder/ac3_rematrix.o \
 		src/ac3_decoder/ac3_imdct.o \
+		src/ac3_decoder/ac3_imdct_c.o \
+		src/ac3_decoder/ac3_srfft.o \
 		src/ac3_decoder/ac3_downmix.o \
 		src/ac3_decoder/ac3_downmix_c.o
 

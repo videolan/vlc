@@ -2,7 +2,7 @@
  * ac3_mantissa.c: ac3 mantissa computation
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_mantissa.c,v 1.24 2001/04/26 00:12:19 reno Exp $
+ * $Id: ac3_mantissa.c,v 1.25 2001/04/30 21:04:20 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -411,10 +411,10 @@ static __inline__ void uncouple_channel (ac3dec_t * p_ac3dec, u32 ch)
              * so the channels are uncorrelated */
             if (p_ac3dec->audblk.dithflag[ch] && !p_ac3dec->audblk.cpl_bap[i])
             {
-                p_ac3dec->coeffs.fbw[ch][i] = cpl_coord * dither_gen(&p_ac3dec->mantissa) *
+                p_ac3dec->samples[ch][i] = cpl_coord * dither_gen(&p_ac3dec->mantissa) *
                     scale_factor[p_ac3dec->audblk.cpl_exp[i]];
             } else {
-                p_ac3dec->coeffs.fbw[ch][i]  = cpl_coord * p_ac3dec->audblk.cpl_flt[i];
+                p_ac3dec->samples[ch][i]  = cpl_coord * p_ac3dec->audblk.cpl_flt[i];
             }
             i++;
         }
@@ -432,7 +432,7 @@ void mantissa_unpack (ac3dec_t * p_ac3dec)
 
     for (i=0; i< p_ac3dec->bsi.nfchans; i++) {
         for (j=0; j < p_ac3dec->audblk.endmant[i]; j++)
-            p_ac3dec->coeffs.fbw[i][j] = coeff_get_float(p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j],
+            p_ac3dec->samples[i][j] = coeff_get_float(p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j],
                     p_ac3dec->audblk.dithflag[i], p_ac3dec->audblk.fbw_exp[i][j]);
 
         if (p_ac3dec->audblk.cplinu && p_ac3dec->audblk.chincpl[i] && !(done_cpl)) {
@@ -458,7 +458,7 @@ void mantissa_unpack (ac3dec_t * p_ac3dec)
     if (p_ac3dec->bsi.lfeon) {
         /* There are always 7 mantissas for lfe, no dither for lfe */
         for (j=0; j < 7 ; j++)
-            p_ac3dec->coeffs.lfe[j] = coeff_get_float(p_ac3dec, p_ac3dec->audblk.lfe_bap[j],
+            p_ac3dec->samples[5][j] = coeff_get_float(p_ac3dec, p_ac3dec->audblk.lfe_bap[j],
                     0, p_ac3dec->audblk.lfe_exp[j]);
     }
 }

@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.29 2001/04/25 10:22:32 massiot Exp $
+ * $Id: ac3_decoder_thread.c,v 1.30 2001/04/30 21:04:20 reno Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -170,13 +170,22 @@ static void RunThread (ac3dec_thread_t * p_ac3dec_t)
     {
         s16 * buffer;
         ac3_sync_info_t sync_info;
-                        
+        int ptr;
+
         if (!sync) {
             do {
                 GetBits(&p_ac3dec_t->ac3_decoder.bit_stream,8);
             } while ((!p_ac3dec_t->sync_ptr) && (!p_ac3dec_t->p_fifo->b_die)
                     && (!p_ac3dec_t->p_fifo->b_error));
+            
+            ptr = p_ac3dec_t->sync_ptr;
 
+            while(ptr-- && (!p_ac3dec_t->p_fifo->b_die)
+                && (!p_ac3dec_t->p_fifo->b_error))
+            {
+                p_ac3dec_t->ac3_decoder.bit_stream.p_byte++;
+            }
+                        
             /* we are in sync now */
             sync = 1;
         }

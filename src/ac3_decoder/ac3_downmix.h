@@ -2,7 +2,7 @@
  * ac3_downmix.h: ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ac3_downmix.h,v 1.5 2001/03/21 13:42:34 sam Exp $
+ * $Id: ac3_downmix.h,v 1.6 2001/04/30 21:04:20 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -21,18 +21,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define NORM 16384
-
-typedef struct dm_par_s {
-    float unit;
-    float clev;
-    float slev;
-} dm_par_t;
-
+/* C functions */
 void downmix_3f_2r_to_2ch_c(float *samples, dm_par_t * dm_par);
 void downmix_3f_1r_to_2ch_c(float *samples, dm_par_t * dm_par);
 void downmix_2f_2r_to_2ch_c(float *samples, dm_par_t * dm_par);
 void downmix_2f_1r_to_2ch_c(float *samples, dm_par_t * dm_par);
 void downmix_3f_0r_to_2ch_c(float *samples, dm_par_t * dm_par);            
 void stream_sample_2ch_to_s16_c(s16 *s16_samples, float *left, float *right);
-void stream_sample_1ch_to_s16_c(s16 *s16_samples, float *center);      
+void stream_sample_1ch_to_s16_c(s16 *s16_samples, float *center); 
+
+#if 0
+/* Kni functions */
+void downmix_3f_2r_to_2ch_kni(float *samples, dm_par_t * dm_par);
+void downmix_3f_1r_to_2ch_kni(float *samples, dm_par_t * dm_par);
+void downmix_2f_2r_to_2ch_kni(float *samples, dm_par_t * dm_par);
+void downmix_2f_1r_to_2ch_kni(float *samples, dm_par_t * dm_par);
+void downmix_3f_0r_to_2ch_kni(float *samples, dm_par_t * dm_par);            
+void stream_sample_2ch_to_s16_kni(s16 *s16_samples, float *left, float *right);
+void stream_sample_1ch_to_s16_kni(s16 *s16_samples, float *center);  
+#endif
