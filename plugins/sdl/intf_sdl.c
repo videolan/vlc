@@ -179,6 +179,8 @@ void intf_SDLManage( intf_thread_t *p_intf )
 
 void intf_SDL_Fullscreen(intf_thread_t * p_intf)
 {
+    SDL_Rect    clipping_rect;
+    
     SDL_FreeSurface( p_intf->p_vout->p_sys->p_display );
     
     if(p_intf->p_sys->b_Fullscreen == 0)
@@ -213,9 +215,13 @@ void intf_SDL_Fullscreen(intf_thread_t * p_intf)
     p_intf->p_vout->p_sys->p_buffer[ 1 ] = p_intf->p_vout->p_sys->p_display->pixels;
     
     SDL_Flip(p_intf->p_vout->p_sys->p_display);
-    SDL_SetClipping(p_intf->p_vout->p_sys->p_display, 0, 0,
-            p_intf->p_vout->p_sys->p_display->w,
-            p_intf->p_vout->p_sys->p_display->h );
+
+    /* Clipping zone for the text */
+    clipping_rect.x = 0;
+    clipping_rect.y = 0;
+    clipping_rect.w = p_intf->p_vout->p_sys->p_display->w;
+    clipping_rect.h = p_intf->p_vout->p_sys->p_display->h;
+    SDL_SetClipRect(p_intf->p_vout->p_sys->p_display, &clipping_rect);
     
     p_intf->p_vout->i_width =           p_intf->p_vout->p_sys->p_display->w;
     p_intf->p_vout->i_height =          p_intf->p_vout->p_sys->p_display->h;
