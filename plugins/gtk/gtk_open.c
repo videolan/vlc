@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.7 2001/10/10 14:25:15 sam Exp $
+ * $Id: gtk_open.c,v 1.8 2001/11/16 00:29:52 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -268,6 +268,41 @@ gboolean GtkNetworkOpenShow( GtkWidget       *widget,
         p_intf->p_sys->p_network = create_intf_network();
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_network ),
                              "p_intf", p_intf );
+
+        gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
+            GTK_OBJECT( p_intf->p_sys->p_network ), "network_server" ) ),
+            main_GetPszVariable( INPUT_SERVER_VAR,
+                                 INPUT_SERVER_DEFAULT ) );
+
+        gtk_spin_button_set_value( GTK_SPIN_BUTTON( gtk_object_get_data(
+            GTK_OBJECT( p_intf->p_sys->p_network ), "network_port" ) ),
+            main_GetIntVariable( INPUT_PORT_VAR,
+                                 INPUT_PORT_DEFAULT ) );
+
+        gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
+            GTK_OBJECT( p_intf->p_sys->p_network ), "network_broadcast" ) ),
+            main_GetPszVariable( INPUT_BCAST_ADDR_VAR,
+                                 INPUT_BCAST_ADDR_DEFAULT ) );
+
+        gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
+            GTK_OBJECT( p_intf->p_sys->p_network ), "network_channel" ) ),
+            main_GetPszVariable( INPUT_CHANNEL_SERVER_VAR,
+                                 INPUT_CHANNEL_SERVER_DEFAULT ) );
+
+        gtk_spin_button_set_value( GTK_SPIN_BUTTON( gtk_object_get_data(
+            GTK_OBJECT( p_intf->p_sys->p_network ), "network_channel_port" ) ),
+            main_GetIntVariable( INPUT_CHANNEL_PORT_VAR,
+                                 INPUT_CHANNEL_PORT_DEFAULT ) );
+
+        gtk_toggle_button_set_active( gtk_object_get_data( GTK_OBJECT(
+            p_intf->p_sys->p_network ), "network_channel_check" ),
+            main_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR,
+                                 INPUT_NETWORK_CHANNEL_DEFAULT ) );
+            
+        gtk_toggle_button_set_active( gtk_object_get_data( GTK_OBJECT(
+            p_intf->p_sys->p_network ), "network_broadcast_check" ),
+            main_GetIntVariable( INPUT_BROADCAST_VAR,
+                                 INPUT_BROADCAST_DEFAULT ) );
     }
 
     gtk_widget_show( p_intf->p_sys->p_network );
@@ -291,6 +326,12 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
     psz_server = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
                                  GTK_WIDGET(button), "network_server" ) ) );
 
+    /* select added item */
+    if( p_intf->p_input != NULL )
+    {
+        p_intf->p_input->b_eof = 1;
+    }
+
     /* Check which protocol was activated */
     if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
                                           "network_ts" ) )->active )
@@ -306,54 +347,6 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
     {
         intf_ErrMsg( "intf error: unknown protocol toggle button position" );
         return;
-    }
-
-    /* Get the port number and make sure it will not overflow 5 characters */
-    i_port = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON(
-                 lookup_widget( GTK_WIDGET(button), "network_port" ) ) );
-    if( i_port > 65535 )
-    {
-        intf_ErrMsg( "intf error: invalid port %i", i_port );
-    }
-
-    /* do we have a broadcast address */
-    b_broadcast = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(
-        lookup_widget( GTK_WIDGET(button), "network_broadcast_check" ) ) );
-    if( b_broadcast )
-    {
-        char *  psz_broadcast;
-        psz_broadcast = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
-                                 GTK_WIDGET(button), "network_broadcast" ) ) );
-        /* Allocate room for "protocol://server:port" */
-        psz_source = malloc( strlen( psz_protocol ) + 3 /* "://" */
-                               + strlen( psz_server ) + 1 /* ":" */
-                               + 5 /* 0-65535 */
-                               + strlen( psz_broadcast ) + 2 /* "::" */ 
-                               + 1 /* "\0" */ );
-        if( psz_source == NULL )
-        {
-            return;
-        }
-
-        /* Build source name and add it to playlist */
-        sprintf( psz_source, "%s://%s:%i/%s", psz_protocol,
-                                              psz_server,
-                                              i_port,
-                                              psz_broadcast );
-    }
-    else
-    {
-        /* Allocate room for "protocol://server:port" */
-        psz_source = malloc( strlen( psz_protocol ) + 3 /* "://" */
-                               + strlen( psz_server ) + 1 /* ":" */
-                               + 5 /* 0-65535 */ + 1 /* "\0" */ );
-        if( psz_source == NULL )
-        {
-            return;
-        }
-       
-        /* Build source name and add it to playlist */
-        sprintf( psz_source, "%s://%s:%i", psz_protocol, psz_server, i_port );
     }
 
     /* Manage channel server */
@@ -380,24 +373,73 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
         {
             main_PutIntVariable( INPUT_CHANNEL_PORT_VAR, i_channel_port );
         }
+
+        p_intf->p_sys->b_playing = 1;
+
     }
-
-    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
-    free( psz_source );
-
-    /* catch the GTK CList */
-    p_playlist_clist = GTK_CLIST( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
-    /* update the display */
-    GtkRebuildCList( p_playlist_clist, p_main->p_playlist );
-
-    /* select added item */
-    if( p_intf->p_input != NULL )
+    else
     {
-        p_intf->p_input->b_eof = 1;
-    }
+        /* Get the port number and make sure it will not
+         * overflow 5 characters */
+        i_port = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON(
+                     lookup_widget( GTK_WIDGET(button), "network_port" ) ) );
+        if( i_port > 65535 )
+        {
+            intf_ErrMsg( "intf error: invalid port %i", i_port );
+        }
 
-    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+        /* do we have a broadcast address */
+        b_broadcast = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(
+            lookup_widget( GTK_WIDGET(button), "network_broadcast_check" ) ) );
+        if( b_broadcast )
+        {
+            char *  psz_broadcast;
+            psz_broadcast = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
+                            GTK_WIDGET(button), "network_broadcast" ) ) );
+            /* Allocate room for "protocol://server:port" */
+            psz_source = malloc( strlen( psz_protocol ) + 3 /* "://" */
+                                   + strlen( psz_server ) + 1 /* ":" */
+                                   + 5 /* 0-65535 */
+                                   + strlen( psz_broadcast ) + 2 /* "::" */ 
+                                   + 1 /* "\0" */ );
+            if( psz_source == NULL )
+            {
+                return;
+            }
+
+            /* Build source name and add it to playlist */
+            sprintf( psz_source, "%s://%s:%i/%s", psz_protocol,
+                                                  psz_server,
+                                                  i_port,
+                                                  psz_broadcast );
+        }
+        else
+        {
+            /* Allocate room for "protocol://server:port" */
+            psz_source = malloc( strlen( psz_protocol ) + 3 /* "://" */
+                                   + strlen( psz_server ) + 1 /* ":" */
+                                   + 5 /* 0-65535 */ + 1 /* "\0" */ );
+            if( psz_source == NULL )
+            {
+                return;
+            }
+           
+            /* Build source name and add it to playlist */
+            sprintf( psz_source, "%s://%s:%i",
+                     psz_protocol, psz_server, i_port );
+        }
+
+        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
+        free( psz_source );
+        
+        /* catch the GTK CList */
+        p_playlist_clist = GTK_CLIST( gtk_object_get_data(
+            GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+        /* update the display */
+        GtkRebuildCList( p_playlist_clist, p_main->p_playlist );
+
+        intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+    }
 }
 
 void GtkNetworkOpenCancel( GtkButton * button, gpointer user_data)
@@ -427,21 +469,49 @@ void GtkNetworkOpenChannel( GtkToggleButton * togglebutton,
                             gpointer user_data )
 {
     GtkWidget *     p_network;
+    boolean_t       b_channel;
+    boolean_t       b_broadcast;
 
     p_network = gtk_widget_get_toplevel( GTK_WIDGET (togglebutton) );
+    b_channel = gtk_toggle_button_get_active( togglebutton );
+    b_broadcast = gtk_toggle_button_get_active( gtk_object_get_data(
+                  GTK_OBJECT( p_network ), "network_broadcast_check" ) );
+        
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
+            "network_channel_combo" ), b_channel ) ;
 
     gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
-            "network_channel_combo" ),
-            gtk_toggle_button_get_active( togglebutton ) );
+            "network_channel" ), b_channel );
 
     gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
-            "network_channel" ),
-            gtk_toggle_button_get_active( togglebutton ) );
+            "network_channel_port" ), b_channel );
 
     gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
-            "network_channel_port" ),
-            gtk_toggle_button_get_active( togglebutton ) );
+            "network_channel_port_label" ), b_channel );
 
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
+            "network_server_combo" ), ! b_channel );
+
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
+            "network_server_label" ), ! b_channel );
+
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
+            "network_server" ), ! b_channel );
+
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
+            "network_port_label" ), ! b_channel );
+
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
+            "network_port" ), ! b_channel );
+
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
+            "network_broadcast_check" ), ! b_channel );
+    
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
+            "network_broadcast_combo" ), b_broadcast && ! b_channel );
+
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
+            "network_broadcast" ), b_broadcast && ! b_channel );
 }
 
 

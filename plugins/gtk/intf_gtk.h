@@ -2,7 +2,7 @@
  * intf_gtk.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.h,v 1.8 2001/10/04 00:50:24 sam Exp $
+ * $Id: intf_gtk.h,v 1.9 2001/11/16 00:29:52 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -43,6 +43,7 @@ static __inline__ intf_thread_t * GetIntf( GtkWidget *item, char * psz_parent )
 typedef struct intf_sys_s
 {
     /* special actions */
+    boolean_t           b_playing;
     boolean_t           b_popup_changed;                   /* display menu ? */
     boolean_t           b_window_changed;        /* window display toggled ? */
     boolean_t           b_playlist_changed;    /* playlist display toggled ? */

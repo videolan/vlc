@@ -644,7 +644,7 @@ create_intf_window (void)
   gtk_widget_show (label_network);
   gtk_box_pack_start (GTK_BOX (network_channel_box), label_network, TRUE, FALSE, 5);
 
-  network_channel_spinbutton_adj = gtk_adjustment_new (1, 0, 100, 1, 10, 10);
+  network_channel_spinbutton_adj = gtk_adjustment_new (0, 0, 100, 1, 10, 10);
   network_channel_spinbutton = gtk_spin_button_new (GTK_ADJUSTMENT (network_channel_spinbutton_adj), 1, 0);
   gtk_widget_ref (network_channel_spinbutton);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "network_channel_spinbutton", network_channel_spinbutton,
@@ -1382,8 +1382,8 @@ create_intf_network (void)
   GtkWidget *network_http;
   GtkWidget *frame4;
   GtkWidget *table2;
-  GtkWidget *label17;
-  GtkWidget *label18;
+  GtkWidget *network_server_label;
+  GtkWidget *network_port_label;
   GtkObject *network_port_adj;
   GtkWidget *network_port;
   GtkWidget *network_broadcast_check;
@@ -1396,7 +1396,7 @@ create_intf_network (void)
   GtkWidget *network_channel_check;
   GtkWidget *network_channel_combo;
   GtkWidget *network_channel;
-  GtkWidget *channel_port;
+  GtkWidget *network_channel_port_label;
   GtkObject *network_channel_port_adj;
   GtkWidget *network_channel_port;
   GtkWidget *hbuttonbox1;
@@ -1478,25 +1478,25 @@ create_intf_network (void)
   gtk_table_set_row_spacings (GTK_TABLE (table2), 5);
   gtk_table_set_col_spacings (GTK_TABLE (table2), 5);
 
-  label17 = gtk_label_new (_("Address"));
-  gtk_widget_ref (label17);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "label17", label17,
+  network_server_label = gtk_label_new (_("Address"));
+  gtk_widget_ref (network_server_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_server_label", network_server_label,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label17);
-  gtk_table_attach (GTK_TABLE (table2), label17, 0, 1, 0, 1,
+  gtk_widget_show (network_server_label);
+  gtk_table_attach (GTK_TABLE (table2), network_server_label, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label17), 0, 0.5);
+  gtk_misc_set_alignment (GTK_MISC (network_server_label), 0, 0.5);
 
-  label18 = gtk_label_new (_("Port"));
-  gtk_widget_ref (label18);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "label18", label18,
+  network_port_label = gtk_label_new (_("Port"));
+  gtk_widget_ref (network_port_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_port_label", network_port_label,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label18);
-  gtk_table_attach (GTK_TABLE (table2), label18, 0, 1, 1, 2,
+  gtk_widget_show (network_port_label);
+  gtk_table_attach (GTK_TABLE (table2), network_port_label, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label18), 0, 0.5);
+  gtk_misc_set_alignment (GTK_MISC (network_port_label), 0, 0.5);
 
   network_port_adj = gtk_adjustment_new (1234, 1024, 65535, 1, 10, 10);
   network_port = gtk_spin_button_new (GTK_ADJUSTMENT (network_port_adj), 1, 0);
@@ -1588,12 +1588,12 @@ create_intf_network (void)
   gtk_widget_show (network_channel);
   gtk_entry_set_text (GTK_ENTRY (network_channel), _("138.195.143.120"));
 
-  channel_port = gtk_label_new (_("port:"));
-  gtk_widget_ref (channel_port);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "channel_port", channel_port,
+  network_channel_port_label = gtk_label_new (_("port:"));
+  gtk_widget_ref (network_channel_port_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel_port_label", network_channel_port_label,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (channel_port);
-  gtk_box_pack_start (GTK_BOX (hbox4), channel_port, FALSE, FALSE, 5);
+  gtk_widget_show (network_channel_port_label);
+  gtk_box_pack_start (GTK_BOX (hbox4), network_channel_port_label, FALSE, FALSE, 5);
 
   network_channel_port_adj = gtk_adjustment_new (6010, 1024, 65535, 1, 10, 10);
   network_channel_port = gtk_spin_button_new (GTK_ADJUSTMENT (network_channel_port_adj), 1, 0);

@@ -909,7 +909,7 @@
 	    <update_policy>GTK_UPDATE_ALWAYS</update_policy>
 	    <snap>False</snap>
 	    <wrap>False</wrap>
-	    <value>1</value>
+	    <value>0</value>
 	    <lower>0</lower>
 	    <upper>100</upper>
 	    <step>1</step>
@@ -1953,7 +1953,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 
 	  <widget>
 	    <class>GtkLabel</class>
-	    <name>label17</name>
+	    <name>network_server_label</name>
 	    <label>Address</label>
 	    <justify>GTK_JUSTIFY_CENTER</justify>
 	    <wrap>False</wrap>
@@ -1979,7 +1979,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 
 	  <widget>
 	    <class>GtkLabel</class>
-	    <name>label18</name>
+	    <name>network_port_label</name>
 	    <label>Port</label>
 	    <justify>GTK_JUSTIFY_CENTER</justify>
 	    <wrap>False</wrap>
@@ -2194,7 +2194,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>channel_port</name>
+	  <name>network_channel_port_label</name>
 	  <label>port:</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>

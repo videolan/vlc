@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.6 2001/08/09 08:20:26 sam Exp $
+ * $Id: gtk_display.c,v 1.7 2001/11/16 00:29:52 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -204,27 +204,39 @@ gint GtkModeManage( intf_thread_t * p_intf )
     }
     else
     {
-//intf_WarnMsg( 2, "intf info: default to file method" );
-        /* default mode */
-        p_label = gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_window ),
-                        "label_status" );
-        gtk_label_set_text( GTK_LABEL( p_label ), "" );
-        gtk_widget_show( GTK_WIDGET( p_file_box ) );
+        if( main_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR,
+                                 INPUT_NETWORK_CHANNEL_DEFAULT  ) )
+        {
+            gtk_widget_show( GTK_WIDGET( p_network_box ) );
 
-        /* unsensitize menus */
-        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_title"), FALSE );
-        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_chapter"),
-                                  FALSE );
-        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_angle"), FALSE );
-        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_audio"), FALSE );
-        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_subpictures"),
-                                  FALSE );
-        gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_navigation"),
-                                  FALSE );
-        gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_angle"), FALSE );
-        gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_audio"), FALSE );
-        gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_subpictures"),
-                                  FALSE );
+            p_channel = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                       p_intf->p_sys->p_window ), "network_channel_box" ) );
+            gtk_widget_show( GTK_WIDGET( p_channel ) );
+        }
+        else
+        {
+//intf_WarnMsg( 2, "intf info: default to file method" );
+            /* default mode */
+            p_label = gtk_object_get_data(
+                    GTK_OBJECT( p_intf->p_sys->p_window ), "label_status" );
+            gtk_label_set_text( GTK_LABEL( p_label ), "" );
+            gtk_widget_show( GTK_WIDGET( p_file_box ) );
+
+            /* unsensitize menus */
+            gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_title"), FALSE );
+            gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_chapter"),
+                                      FALSE );
+            gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_angle"), FALSE );
+            gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_audio"), FALSE );
+            gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_subpictures"),
+                                      FALSE );
+            gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_navigation"),
+                                      FALSE );
+            gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_angle"), FALSE );
+            gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_audio"), FALSE );
+            gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_subpictures"),
+                                      FALSE );
+        }
     }
 
     /* set control items */

@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.25 2001/11/12 04:12:37 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.26 2001/11/16 00:29:52 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -336,7 +336,7 @@ void GtkChannelGo( GtkButton * button, gpointer user_data )
 
     vlc_mutex_unlock( &p_intf->change_lock );
 
-    input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+//    input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
 }
 
 

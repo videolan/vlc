@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.4 2001/10/04 00:50:24 sam Exp $
+ * $Id: intf_gnome.c,v 1.5 2001/11/16 00:29:52 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -145,6 +145,7 @@ static int intf_Open( intf_thread_t *p_intf )
     }
 
     /* Initialize Gnome thread */
+    p_intf->p_sys->b_playing = 1;
     p_intf->p_sys->b_popup_changed = 0;
     p_intf->p_sys->b_window_changed = 0;
     p_intf->p_sys->b_playlist_changed = 0;
@@ -325,6 +326,7 @@ static gint GnomeManage( gpointer p_data )
         {
             GtkModeManage( p_intf );
             GtkSetupMenus( p_intf );
+            p_intf->p_sys->b_playing = 1;
         }
 
         /* Manage the slider */
@@ -370,9 +372,10 @@ static gint GnomeManage( gpointer p_data )
 
         vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
     }
-    else if( !p_intf->b_die )
+    else if( p_intf->p_sys->b_playing && !p_intf->b_die )
     {
         GtkModeManage( p_intf );
+        p_intf->p_sys->b_playing = 0;
     }
 
     /* Manage core vlc functions through the callback */
