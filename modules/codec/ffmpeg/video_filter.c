@@ -171,8 +171,7 @@ static int CheckInit( filter_t *p_filter )
           p_filter->fmt_in.video.i_width * p_filter->fmt_in.video.i_height >
           p_filter->fmt_out.video.i_width * p_filter->fmt_out.video.i_height;
 
-        if( E_(GetFfmpegChroma)( p_filter->fmt_in.video.i_chroma ) !=
-            VLC_FOURCC('I','4','2','0') )
+        if( p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','0') )
             p_sys->b_resize_first = VLC_FALSE;
 
         if( p_sys->b_resize )
@@ -219,7 +218,7 @@ static int CheckInit( filter_t *p_filter )
 static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    AVPicture src_pic, dest_pic, inter_pic;
+    AVPicture src_pic, dest_pic;
     AVPicture *p_src, *p_dst;
     picture_t *p_pic_dst;
     int i;
