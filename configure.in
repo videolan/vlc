@@ -80,9 +80,9 @@ void foo() { int meuh; ntohl(meuh); }],,
 
 dnl Check for special optimization flags
 CFLAGS="${CFLAGS} -fargument-noalias-global -fstrict-aliasing"
-AC_MSG_CHECKING([if \$CC accepts -fargument-noalias-global -fstrict-aliasing])
+AC_MSG_CHECKING([if \$CC accepts -fstrict-aliasing])
 AC_TRY_COMPILE([],,
- BIZARRE_OPTIMS="-fargument-noalias-global -fstrict-aliasing"
+ BIZARRE_OPTIMS="-fstrict-aliasing"
  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl Check for -rdynamic flag

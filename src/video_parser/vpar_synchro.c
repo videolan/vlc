@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.76 2001/01/16 17:59:23 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.77 2001/01/16 18:06:01 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -231,7 +231,9 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
         now = mdate();
         period = 1000000 * 1001 / p_vpar->sequence.i_frame_rate;
 
+        vlc_mutex_lock( &p_vpar->p_vout->change_lock );
         tau_yuv = p_vpar->p_vout->render_time;
+        vlc_mutex_unlock( &p_vpar->p_vout->change_lock );
 
         vlc_mutex_lock( &p_vpar->synchro.fifo_lock );
 

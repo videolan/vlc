@@ -2975,8 +2975,8 @@ fi
 rm -f conftest*
 
 CFLAGS="${CFLAGS} -fargument-noalias-global -fstrict-aliasing"
-echo $ac_n "checking if \$CC accepts -fargument-noalias-global -fstrict-aliasing""... $ac_c" 1>&6
-echo "configure:2980: checking if \$CC accepts -fargument-noalias-global -fstrict-aliasing" >&5
+echo $ac_n "checking if \$CC accepts -fstrict-aliasing""... $ac_c" 1>&6
+echo "configure:2980: checking if \$CC accepts -fstrict-aliasing" >&5
 cat > conftest.$ac_ext <<EOF
 #line 2982 "configure"
 #include "confdefs.h"
@@ -2987,7 +2987,7 @@ int main() {
 EOF
 if { (eval echo configure:2989: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
-  BIZARRE_OPTIMS="-fargument-noalias-global -fstrict-aliasing"
+  BIZARRE_OPTIMS="-fstrict-aliasing"
  echo "$ac_t""yes" 1>&6
 else
   echo "configure: failed program was:" >&5
