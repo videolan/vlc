@@ -2,7 +2,7 @@
  * themeloader.cpp: ThemeLoader class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: themeloader.cpp,v 1.10 2003/05/24 20:54:27 gbazin Exp $
+ * $Id: themeloader.cpp,v 1.11 2003/06/05 21:22:27 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -334,7 +334,7 @@ int tar_extract_all( TAR *t, char *prefix )
         if(len != BLOCKSIZE)
         {
             fprintf(stderr, "gzread: incomplete block read");
-            return -1;
+            //return -1;
         }
 
         /*

@@ -2,10 +2,9 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.2 2003/06/04 16:03:33 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.3 2003/06/05 21:22:27 gbazin Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,6 +65,7 @@ void Dialogs::ShowFileInfo(){}
 #define ShowMessages_Event 2
 #define ShowPrefs_Event    3
 #define ShowFileInfo_Event 4
+#define ShowPopup_Event    5
 #define ExitThread_Event   99
 
 //---------------------------------------------------------------------------
@@ -103,6 +103,7 @@ BEGIN_EVENT_TABLE(Instance, wxApp)
     EVT_COMMAND(ShowMessages_Event, wxEVT_DIALOG, Dialogs::OnShowMessages)
     EVT_COMMAND(ShowPrefs_Event, wxEVT_DIALOG, Dialogs::OnShowPrefs)
     EVT_COMMAND(ShowFileInfo_Event, wxEVT_DIALOG, Dialogs::OnShowFileInfo)
+    EVT_COMMAND(ShowPopup_Event, wxEVT_DIALOG, Dialogs::OnShowPopup)
     EVT_COMMAND(ExitThread_Event, wxEVT_DIALOG, Dialogs::OnExitThread)
 END_EVENT_TABLE()
 
@@ -161,9 +162,13 @@ bool Instance::OnInit()
     if( p_playlist != NULL )
     {
         var_AddCallback( p_playlist, "intf-popupmenu", PopupMenuCB,
-			 p_intf->p_sys->p_dialogs );
+                         p_intf->p_sys->p_dialogs );
         vlc_object_release( p_playlist );
     }
+
+    /* Intercept all menu events in our custom event handler */
+    p_intf->p_sys->p_dialogs->OpenDlg->PushEventHandler(
+        new MenuEvtHandler( p_intf, NULL ) );
 
     return TRUE;
 }
@@ -234,7 +239,7 @@ Dialogs::Dialogs( intf_thread_t *_p_intf )
 
     // Create a new thread for wxWindows
     if( vlc_thread_create( p_thread, "Skins Dialogs Thread",
-			   SkinsDialogsThread, 0, VLC_TRUE ) )
+                           SkinsDialogsThread, 0, VLC_TRUE ) )
     {
         OpenDlg = NULL;
         msg_Err( p_intf, "cannot create SkinsDialogsThread" );
@@ -381,6 +386,20 @@ void Dialogs::OnShowFileInfo( wxCommandEvent& event )
     p_dialogs->FileInfoDlg->Show( !p_dialogs->FileInfoDlg->IsShown() );
 }
 
+void Dialogs::OnShowPopup( wxCommandEvent& event )
+{
+    Dialogs *p_dialogs = (Dialogs *)event.GetClientData();
+
+    wxPoint mousepos = wxGetMousePosition();
+
+    wxMouseEvent mouseevent = wxMouseEvent( wxEVT_RIGHT_UP );
+    mouseevent.m_x = p_dialogs->OpenDlg->ScreenToClient(mousepos).x;
+    mouseevent.m_y = p_dialogs->OpenDlg->ScreenToClient(mousepos).y;
+
+    ::PopupMenu( p_dialogs->p_intf,
+                 p_dialogs->OpenDlg, mouseevent.GetPosition() );
+}
+
 void Dialogs::OnExitThread( wxCommandEvent& event )
 {
     wxTheApp->ExitMainLoop();
@@ -397,7 +416,12 @@ int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
 {
     Dialogs *p_dialogs = (Dialogs *)param;
 
-    p_dialogs->b_popup_change = VLC_TRUE;
+#ifndef BASIC_SKINS
+    wxCommandEvent event( wxEVT_DIALOG, ShowPopup_Event );
+    event.SetClientData( p_dialogs );
+
+    wxTheApp->AddPendingEvent( event );
+#endif // BASIC_SKINS
 
     return VLC_SUCCESS;
 }

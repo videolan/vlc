@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.34 2003/06/03 22:18:58 gbazin Exp $
+ * $Id: wxwindows.h,v 1.35 2003/06/05 21:22:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -58,21 +58,6 @@ struct intf_sys_t
 
     /* special actions */
     vlc_bool_t          b_playing;
-    vlc_bool_t          b_popup_changed;                   /* display menu ? */
-    vlc_bool_t          b_window_changed;        /* window display toggled ? */
-    vlc_bool_t          b_playlist_changed;    /* playlist display toggled ? */
-    vlc_bool_t          b_slider_free;                      /* slider status */
-
-    /* menus handlers */
-    vlc_bool_t          b_program_update;   /* do we need to update programs
-                                                                        menu */
-    vlc_bool_t          b_title_update;  /* do we need to update title menus */
-    vlc_bool_t          b_chapter_update;            /* do we need to update
-                                                               chapter menus */
-    vlc_bool_t          b_audio_update;  /* do we need to update audio menus */
-    vlc_bool_t          b_spu_update;      /* do we need to update spu menus */
-
-    /* windows and widgets */
 
     /* The input thread */
     input_thread_t *    p_input;
@@ -80,6 +65,7 @@ struct intf_sys_t
     /* The slider */
     int                 i_slider_pos;                     /* slider position */
     int                 i_slider_oldpos;                /* previous position */
+    vlc_bool_t          b_slider_free;                      /* slider status */
 
     /* The messages window */
     msg_subscription_t* p_sub;                  /* message bank subscription */
@@ -87,8 +73,10 @@ struct intf_sys_t
     /* Playlist management */
     int                 i_playing;                 /* playlist selected item */
 
-    /* The window labels for DVD mode */
-    unsigned int        i_part;                           /* current chapter */
+    /* Popup menu */
+    wxMenu              *p_popup_menu;
+    vlc_bool_t          b_popup_change;
+
 };
 #endif /* !defined(MODULE_NAME_IS_skins) */
 
@@ -138,9 +126,6 @@ public:
     /* So we don't recreate the open dialog box each time
      * (and keep the last settings) */
     OpenDialog  *p_open_dialog;
-
-    wxMenu      *p_popup_menu;
-    vlc_bool_t  b_popup_change;
 
 private:
     void CreateOurMenuBar();
@@ -401,7 +386,7 @@ class PrefsDialog: public wxFrame
 {
 public:
     /* Constructor */
-    PrefsDialog( intf_thread_t *p_intf, Interface *p_main_interface );
+    PrefsDialog( intf_thread_t *p_intf, wxWindow *p_parent );
     virtual ~PrefsDialog();
 
 private:
@@ -416,7 +401,6 @@ private:
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
-    Interface *p_main_interface;
 
     PrefsTreeCtrl *prefs_tree;
 };
@@ -426,7 +410,7 @@ class Messages: public wxFrame
 {
 public:
     /* Constructor */
-    Messages( intf_thread_t *p_intf, Interface *_p_main_interface );
+    Messages( intf_thread_t *p_intf, wxWindow *p_parent );
     virtual ~Messages();
     void UpdateLog();
 
@@ -438,7 +422,6 @@ private:
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
-    Interface *p_main_interface;
     wxTextCtrl *textctrl;
     wxTextAttr *info_attr;
     wxTextAttr *err_attr;
@@ -490,7 +473,7 @@ class FileInfo: public wxFrame
 {
 public:
     /* Constructor */
-    FileInfo( intf_thread_t *p_intf, Interface *p_main_interface );
+    FileInfo( intf_thread_t *p_intf, wxWindow *p_parent );
     virtual ~FileInfo();
     void UpdateFileInfo();
 
@@ -522,11 +505,11 @@ private:
 #endif
 
 /* Menus */
-void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface,
+void PopupMenu( intf_thread_t *_p_intf, wxWindow *p_parent,
                 const wxPoint& pos );
-wxMenu *AudioMenu( intf_thread_t *_p_intf, Interface *_p_main_interface );
-wxMenu *VideoMenu( intf_thread_t *_p_intf, Interface *_p_main_interface );
-wxMenu *NavigMenu( intf_thread_t *_p_intf, Interface *_p_main_interface );
+wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
+wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
+wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
 
 class MenuEvtHandler : public wxEvtHandler
 {
@@ -548,7 +531,7 @@ class Menu: public wxMenu
 {
 public:
     /* Constructor */
-    Menu( intf_thread_t *p_intf, Interface *p_main_interface, int i_count,
+    Menu( intf_thread_t *p_intf, wxWindow *p_parent, int i_count,
           char **ppsz_names, int *pi_objects, int i_start_id );
     virtual ~Menu();
 
@@ -564,7 +547,6 @@ private:
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
-    Interface *p_main_interface;
 
     int  i_item_id;
 };

@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.14 2003/06/04 16:03:33 gbazin Exp $
+ * $Id: skin_common.h,v 1.15 2003/06/05 21:22:27 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -32,6 +32,7 @@
 
 class Theme;
 class Dialogs;
+class wxMenu;
 class wxIcon;
 
 #ifdef X11_SKINS
@@ -66,6 +67,12 @@ struct intf_sys_t
 
     // Interface dialogs
     Dialogs *p_dialogs;
+
+    // Popup menu
+    vlc_bool_t b_popup_change;
+#ifndef BASIC_SKINS
+    wxMenu     *p_popup_menu;
+#endif
 
 #ifndef BASIC_SKINS
     wxIcon      *p_icon;

@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.21 2003/06/04 16:03:34 gbazin Exp $
+ * $Id: timer.cpp,v 1.22 2003/06/05 21:22:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -69,8 +69,7 @@ Timer::Timer( intf_thread_t *_p_intf, Interface *_p_main_interface )
                                        FIND_ANYWHERE );
     if( p_playlist != NULL )
     {
-        var_AddCallback( p_playlist, "intf-popupmenu", PopupMenuCB,
-			 p_main_interface );
+        var_AddCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
         vlc_object_release( p_playlist );
     }
 
@@ -84,27 +83,6 @@ Timer::~Timer()
 /*****************************************************************************
  * Private methods.
  *****************************************************************************/
-/*****************************************************************************
- * wxModeManage: actualise the aspect of the interface whenever the input
- * changes.
- *****************************************************************************
- * The lock has to be taken before you call the function.
- *****************************************************************************/
-static int wxModeManage( intf_thread_t * p_intf )
-{
-    return 0;
-}
-
-/*****************************************************************************
- * wxSetupMenus: function that generates title/chapter/audio/subpic
- * menus with help from preceding functions
- *****************************************************************************
- * Function called with the lock on stream
- *****************************************************************************/
-static int wxSetupMenus( intf_thread_t * p_intf )
-{
-    return 0;
-}
 
 /*****************************************************************************
  * Manage: manage main thread messages
@@ -119,7 +97,7 @@ void Timer::Notify()
     vlc_mutex_lock( &p_intf->change_lock );
 
     /* If the "display popup" flag has changed */
-    if( p_main_interface->b_popup_change )
+    if( p_intf->p_sys->b_popup_change )
     {
         wxPoint mousepos = wxGetMousePosition();
 
@@ -129,7 +107,7 @@ void Timer::Notify()
 
         p_main_interface->AddPendingEvent(event);
 
-        p_main_interface->b_popup_change = VLC_FALSE;
+        p_intf->p_sys->b_popup_change = VLC_FALSE;
     }
 
     /* Update the log window */
@@ -242,13 +220,6 @@ void Timer::Notify()
                 }
             }
 
-            if( p_intf->p_sys->i_part !=
-                p_input->stream.p_selected_area->i_part )
-            {
-                p_intf->p_sys->b_chapter_update = 1;
-                wxSetupMenus( p_intf );
-            }
-
             /* Manage Playing status */
             if( i_old_playing_status != p_input->stream.control.i_status )
             {
@@ -277,7 +248,6 @@ void Timer::Notify()
     }
     else if( p_intf->p_sys->b_playing && !p_intf->b_die )
     {
-        wxModeManage( p_intf );
         p_intf->p_sys->b_playing = 0;
         p_main_interface->TogglePlayButton( PAUSE_S );
         i_old_playing_status = PAUSE_S;
@@ -325,9 +295,9 @@ void DisplayStreamDate( wxControl *p_slider_frame, intf_thread_t * p_intf ,
 int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                  vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
-    Interface *p_main_interface = (Interface *)param;
+    intf_thread_t *p_intf = (intf_thread_t *)param;
 
-    p_main_interface->b_popup_change = VLC_TRUE;
+    p_intf->p_sys->b_popup_change = VLC_TRUE;
 
     return VLC_SUCCESS;
 }

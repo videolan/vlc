@@ -2,7 +2,7 @@
  * dialogs.h: Dialogs class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.h,v 1.2 2003/06/04 16:03:33 gbazin Exp $
+ * $Id: dialogs.h,v 1.3 2003/06/05 21:22:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -93,6 +93,7 @@ class Dialogs
         void OnShowMessages( wxCommandEvent& event );
         void OnShowPrefs( wxCommandEvent& event );
         void OnShowFileInfo( wxCommandEvent& event );
+        void OnShowPopup( wxCommandEvent& event );
         void OnExitThread( wxCommandEvent& event );
 #endif
 };

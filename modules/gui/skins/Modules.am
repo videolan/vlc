@@ -118,6 +118,7 @@ SOURCES_skins = \
 	modules/gui/wxwindows/preferences.cpp \
 	modules/gui/wxwindows/streamout.cpp \
 	modules/gui/wxwindows/subtitles.cpp \
+	modules/gui/wxwindows/menus.cpp \
 	$(NULL)
 
 SOURCES_basic_skins = \

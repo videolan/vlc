@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.14 2003/05/26 19:06:47 gbazin Exp $
+ * $Id: menus.cpp,v 1.15 2003/06/05 21:22:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -44,6 +44,10 @@
 #include <wx/listctrl.h>
 
 #include <vlc/intf.h>
+
+#if defined MODULE_NAME_IS_skins
+#   include "../skins/src/skin_common.h"
+#endif
 
 #include "wxwindows.h"
 
@@ -92,7 +96,7 @@ BEGIN_EVENT_TABLE(MenuEvtHandler, wxEvtHandler)
     EVT_MENU(-1, MenuEvtHandler::OnMenuEvent)
 END_EVENT_TABLE()
 
-void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface,
+void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
                 const wxPoint& pos )
 {
     vlc_object_t *p_object;
@@ -107,7 +111,7 @@ void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface,
     ppsz_varnames[i++] = _("Audio menu");
     ppsz_varnames[i++] = NULL; /* Separator */
 
-    p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_AOUT,
+    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
     if( p_object != NULL )
     {
@@ -123,7 +127,7 @@ void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface,
     ppsz_varnames[i++] = _("Video menu");
     ppsz_varnames[i++] = NULL; /* Separator */
 
-    p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_VOUT,
+    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                                 FIND_ANYWHERE );
     if( p_object != NULL )
     {
@@ -141,7 +145,7 @@ void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface,
     ppsz_varnames[i++] = _("Input menu");
     ppsz_varnames[i++] = NULL; /* Separator */
 
-    p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INPUT,
+    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                 FIND_ANYWHERE );
     if( p_object != NULL )
     {
@@ -166,18 +170,18 @@ void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface,
 
     /* Misc stuff */
     ppsz_varnames[i++] = NULL; /* Separator */
-    ppsz_varnames[i++] = _("Close");
+    ppsz_varnames[i++] = _("Close Menu");
 
     /* Build menu */
-    Menu popupmenu( _p_intf, _p_main_interface, i,
+    Menu popupmenu( p_intf, p_parent, i,
                      ppsz_varnames, pi_objects, PopupMenu_Events );
 
-    _p_main_interface->p_popup_menu = &popupmenu;
-    _p_main_interface->PopupMenu( &popupmenu, pos.x, pos.y );
-    _p_main_interface->p_popup_menu = NULL;
+    p_intf->p_sys->p_popup_menu = &popupmenu;
+    p_parent->PopupMenu( &popupmenu, pos.x, pos.y );
+    p_intf->p_sys->p_popup_menu = NULL;
 }
 
-wxMenu *AudioMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
+wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
 {
     vlc_object_t *p_object;
     char *ppsz_varnames[5];
@@ -208,11 +212,11 @@ wxMenu *AudioMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
     }
 
     /* Build menu */
-    return new Menu( _p_intf, _p_main_interface, i,
+    return new Menu( _p_intf, p_parent, i,
                      ppsz_varnames, pi_objects, AudioMenu_Events );
 }
 
-wxMenu *VideoMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
+wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
 {
     vlc_object_t *p_object;
     char *ppsz_varnames[6];
@@ -247,11 +251,11 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
     }
 
     /* Build menu */
-    return new Menu( _p_intf, _p_main_interface, i,
+    return new Menu( _p_intf, p_parent, i,
                      ppsz_varnames, pi_objects, VideoMenu_Events );
 }
 
-wxMenu *NavigMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
+wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
 {
     vlc_object_t *p_object;
     char *ppsz_varnames[10];
@@ -287,14 +291,14 @@ wxMenu *NavigMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
     }
 
     /* Build menu */
-    return new Menu( _p_intf, _p_main_interface, i,
+    return new Menu( _p_intf, p_parent, i,
                      ppsz_varnames, pi_objects, NavigMenu_Events );
 }
 
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-Menu::Menu( intf_thread_t *_p_intf, Interface *_p_main_interface,
+Menu::Menu( intf_thread_t *_p_intf, wxWindow *p_parent,
             int i_count, char **ppsz_varnames, int *pi_objects,
             int i_start_id ): wxMenu( )
 {
@@ -303,7 +307,6 @@ Menu::Menu( intf_thread_t *_p_intf, Interface *_p_main_interface,
 
     /* Initializations */
     p_intf = _p_intf;
-    p_main_interface = _p_main_interface;
 
     i_item_id = i_start_id;
 
@@ -555,7 +558,7 @@ MenuEvtHandler::~MenuEvtHandler()
 
 void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event )
 {
-    wxMenuItem *p_menuitem;
+    wxMenuItem *p_menuitem = NULL;
 
     /* Check if this is an auto generated menu item */
     if( event.GetId() < FirstAutoGenerated_Event )
@@ -564,13 +567,14 @@ void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event )
         return;
     }
 
-    if( (p_menuitem = p_main_interface->GetMenuBar()->FindItem(event.GetId()))
+    if( !p_main_interface ||
+        (p_menuitem = p_main_interface->GetMenuBar()->FindItem(event.GetId()))
         == NULL )
     {
-        if( p_main_interface->p_popup_menu )
+        if( p_intf->p_sys->p_popup_menu )
         {
             p_menuitem = 
-                p_main_interface->p_popup_menu->FindItem( event.GetId() );
+                p_intf->p_sys->p_popup_menu->FindItem( event.GetId() );
         }
     }
 
