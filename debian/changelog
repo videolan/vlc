@@ -1,4 +1,4 @@
-vlc (0.6.3+cvs-20031024-1) unstable; urgency=low
+vlc (0.6.2+cvs20031031-1) unstable; urgency=low
 
   * New CVS snapshot.
   * debian/rules:
@@ -11,8 +11,9 @@ vlc (0.6.3+cvs-20031024-1) unstable; urgency=low
     + Activated the PVR input module.
   * debian/control:
     + Depend on ttf-freefont for subtitles.
+    + Upgraded debhelper build-dependency to (>= 4.0).
 
- -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 24 Oct 2003 13:23:27 +0200
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 31 Oct 2003 11:08:57 +0100
 
 vlc (0.6.2-3) unstable; urgency=low
 

@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 # debian/rules for the VideoLAN Client - uses debhelper.
-# $Id: rules,v 1.106 2003/10/24 14:45:24 sam Exp $
+# $Id: rules,v 1.107 2003/10/31 23:57:28 sam Exp $
 # based on Joey Hess's one.
 
 # Uncomment this to turn on verbose mode.
@@ -336,6 +336,7 @@ endif
 
 	# Package: wxvlc
 	mv debian/vlc/usr/bin/wxvlc debian/wxvlc/usr/bin/
+	mv debian/vlc/usr/bin/svlc debian/wxvlc/usr/bin/
 	ln -s vlc debian/wxvlc/usr/share/doc/wxvlc
 	mv debian/vlc/usr/lib/vlc/gui/libwxwindows_plugin.so \
 	  debian/wxvlc/usr/lib/vlc/gui/
@@ -344,6 +345,7 @@ endif
 	mv debian/vlc/usr/share/vlc/skins \
 	  debian/wxvlc/usr/share/vlc/
 	ln -s vlc.1.gz debian/wxvlc/usr/share/man/man1/wxvlc.1.gz
+	ln -s vlc.1.gz debian/wxvlc/usr/share/man/man1/svlc.1.gz
 
 	# Clean up
 	rm -f debian/vlc/$(VIDDIR)/*.png
