@@ -2,7 +2,7 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.9 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: gtk2_graphics.cpp,v 1.10 2003/04/17 16:11:46 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -101,7 +101,7 @@ void GTK2Graphics::DrawRect( int x, int y, int w, int h, int color )
 //---------------------------------------------------------------------------
 void GTK2Graphics::SetClipRegion( Region *rgn )
 {
-/*    SelectClipRgn( Image, ( (GTK2Region *)rgn )->GetHandle() );*/
+    gdk_gc_set_clip_region( Gc, ( (GTK2Region *)rgn )->GetHandle() );
 }
 //---------------------------------------------------------------------------
 
@@ -133,7 +133,7 @@ GTK2Region::~GTK2Region()
 //---------------------------------------------------------------------------
 void GTK2Region::AddPoint( int x, int y )
 {
-/*    AddRectangle( x, y, x + 1, y + 1 );*/
+    AddRectangle( x, y, 1, 1 );
 }
 //---------------------------------------------------------------------------
 void GTK2Region::AddRectangle( int x, int y, int w, int h )
@@ -158,7 +158,7 @@ void GTK2Region::AddElipse( int x, int y, int w, int h )
 //---------------------------------------------------------------------------
 void GTK2Region::Move( int x, int y )
 {
-/*    OffsetRgn( Rgn, x, y );*/
+    gdk_region_offset( Rgn, x, y );
 }
 //---------------------------------------------------------------------------
 bool GTK2Region::Hit( int x, int y )
