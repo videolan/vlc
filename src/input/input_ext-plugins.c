@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.28 2003/02/06 23:55:29 massiot Exp $
+ * $Id: input_ext-plugins.c,v 1.29 2003/02/24 14:40:22 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -610,7 +610,7 @@ int input_AccessInit( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * input_AccessReinit: reinit structures after a random seek
+ * input_AccessReinit: reinit structures before a random seek
  *****************************************************************************/
 void input_AccessReinit( input_thread_t * p_input )
 {
