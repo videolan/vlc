@@ -712,9 +712,14 @@ difficulty to understand how VLC skins work.</para>
   <listitem><para>
     <emphasis>vlc.fullscreen()</emphasis>: Toggle the fullscreen mode.
   </para></listitem>
-  <!-- _Enable it for 0.7.3_ listitem><para>
+<!--  TODO: Enable it for 0.7.3
+  <listitem><para>
+    <emphasis>vlc.ontop()</emphasis>: Toggle the "Always on top" status.
+  </para></listitem>
+  <listitem><para>
     <emphasis>vlc.minimize()</emphasis>: Minimize VLC.
-  </para></listitem-->
+  </para></listitem>
+-->
   <listitem><para>
     <emphasis>vlc.quit()</emphasis>: Quit VLC.
   </para></listitem>

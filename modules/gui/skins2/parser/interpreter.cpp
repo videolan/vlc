@@ -32,6 +32,7 @@
 #include "../commands/cmd_minimize.hpp"
 #include "../commands/cmd_input.hpp"
 #include "../commands/cmd_fullscreen.hpp"
+#include "../commands/cmd_on_top.hpp"
 #include "../commands/cmd_show_window.hpp"
 #include "../src/theme.hpp"
 #include "../src/var_manager.hpp"
@@ -77,6 +78,7 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_CMD( "vlc.slower()", CmdSlower )
     REGISTER_CMD( "vlc.mute()", CmdMute )
     REGISTER_CMD( "vlc.minimize()", CmdMinimize )
+    REGISTER_CMD( "vlc.ontop()", CmdOnTop )
     REGISTER_CMD( "vlc.quit()", CmdQuit )
 
     // Register the constant bool variables in the var manager

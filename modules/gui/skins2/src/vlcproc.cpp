@@ -79,7 +79,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     REGISTER_VAR( m_cVarTime, StreamTime, "time" )
     REGISTER_VAR( m_cVarVolume, Volume, "volume" )
     REGISTER_VAR( m_cVarStream, Stream, "stream" )
-    REGISTER_VAR( m_cVarMute, VarBoolImpl, "vlc.isMute" ) // XXX broken
+    REGISTER_VAR( m_cVarMute, VarBoolImpl, "vlc.isMute" )
     REGISTER_VAR( m_cVarPlaying, VarBoolImpl, "vlc.isPlaying" )
     REGISTER_VAR( m_cVarStopped, VarBoolImpl, "vlc.isStopped" )
     REGISTER_VAR( m_cVarPaused, VarBoolImpl, "vlc.isPaused" )
