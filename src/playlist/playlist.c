@@ -36,7 +36,7 @@
 #define TITLE_SIMPLE   N_( "Manually added" )
 #define TITLE_ALL      N_( "All items, unsorted" )
 
-#define PLAYLIST_PROFILE 1
+#undef PLAYLIST_PROFILE
 #undef PLAYLIST_DEBUG
 
 /*****************************************************************************
@@ -809,7 +809,9 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
     /* Start the real work */
     if( p_playlist->request.b_request )
     {
+#ifdef PLAYLIST_DEBUG
         msg_Dbg( p_playlist,"processing request" );
+#endif
         /* We are not playing from a view */
         if(  p_playlist->request.i_view == -1  )
         {
@@ -923,7 +925,6 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
             }
             else
             {
-                msg_Dbg( p_playlist,"finished" );
                 if( b_loop && p_playlist->i_size > 0)
                 {
                     p_playlist->i_index = 0;
@@ -976,57 +977,10 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
 
     if( p_new == NULL )
     {
-        msg_Info( p_playlist, "Nothing to play" );
+        msg_Info( p_playlist, "nothing to play" );
     }
     return p_new;
 }
-
-
-#if 0
-
-
-static void SkipItem( playlist_t *p_playlist, int i_arg )
-{
-    int i_oldindex = p_playlist->i_index;
-    vlc_bool_t b_random, b_repeat, b_loop;
-    vlc_value_t val;
-    int i_count;
-
-    /* Increment */
-    else if( !b_repeat )
-    {
-        p_playlist->i_index += i_arg;
-    }
-
-    /* Boundary check */
-    if( p_playlist->i_index >= p_playlist->i_size )
-    {
-        if( p_playlist->i_status == PLAYLIST_STOPPED || b_random || b_loop )
-        {
-            p_playlist->i_index -= p_playlist->i_size
-                         * ( p_playlist->i_index / p_playlist->i_size );
-        }
-        else
-        {
-            /* Don't loop by default: stop at playlist end */
-            p_playlist->i_index = i_oldindex;
-            p_playlist->i_status = PLAYLIST_STOPPED;
-        }
-    }
-    else if( p_playlist->i_index < 0 )
-    {
-        p_playlist->i_index = p_playlist->i_size - 1;
-    }
-
-    /* Check that the item is enabled */
-    if( p_playlist->pp_items[p_playlist->i_index]->b_enabled == VLC_FALSE &&
-        p_playlist->i_enabled != 0)
-    {
-        SkipItem( p_playlist , 1 );
-    }
-}
-
-#endif
 
 /*****************************************************************************
  * PlayItem: start the input thread for an item

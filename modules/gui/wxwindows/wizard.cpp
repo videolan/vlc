@@ -721,8 +721,6 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
     {
         int i_from = atoi( from_text->GetValue().mb_str() );
         int i_to = atoi( to_text->GetValue().mb_str() );
-        msg_Dbg( p_intf, "Partial streaming enabled, from %i to %i",
-                         i_from,i_to);
         p_parent->SetPartial( i_from, i_to );
     }
     return;
@@ -1513,12 +1511,10 @@ int WizardDialog::GetAction()
 
 void WizardDialog::Run()
 {
-    msg_Dbg( p_intf,"starting wizard");
     if( RunWizard(page1) )
     {
         int i_size;
         char *psz_opt;
-        msg_Dbg( p_intf,"wizard completed");
 
         if( i_action == ACTION_TRANSCODE )
         {
@@ -1527,7 +1523,7 @@ void WizardDialog::Run()
             msg_Dbg( p_intf,"Using %s (%i kbps) / %s (%i kbps),encap %s",
                                 vcodec,vb,acodec,ab,mux);
             char *psz_transcode;
- 
+
             if( vcodec != NULL || acodec != NULL )
             {
                 int i_tr_size = 14;
@@ -1595,7 +1591,6 @@ void WizardDialog::Run()
                 snprintf( psz_opt, i_size,
                           ":sout=#standard{mux=%s,url=%s,access=%s,%s}",
                           mux, address,method, psz_sap_option);
-                msg_Dbg( p_intf, "Sap enabled: %s", psz_sap_option);
                 if( psz_sap_option ) free( psz_sap_option );
             }
             else
@@ -1618,7 +1613,6 @@ void WizardDialog::Run()
             if( i_from != 0)
             {
                 char psz_from[20];
-                msg_Dbg( p_intf, "Setting starttime");
                 snprintf( psz_from, 20, "start-time=%i", i_from);
                 playlist_ItemAddOption( p_item, psz_from);
             }
@@ -1641,10 +1635,6 @@ void WizardDialog::Run()
             wxMessageBox( wxU( NO_PLAYLIST ), wxU( ERROR_MSG ),
                           wxICON_WARNING | wxOK, this );
         }
-    }
-    else
-    {
-        msg_Dbg( p_intf, "wizard was cancelled");
     }
 }
 /****************************************************************

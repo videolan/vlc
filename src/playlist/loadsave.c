@@ -49,7 +49,7 @@ int playlist_Import( playlist_t * p_playlist, const char *psz_filename )
     char *psz_uri;
     int i_id;
 
-    msg_Dbg( p_playlist, "clearing playlist");
+    msg_Info( p_playlist, "clearing playlist");
     playlist_Clear( p_playlist );
 
 
@@ -83,7 +83,7 @@ int playlist_Load( playlist_t * p_playlist, const char *psz_filename )
     char *psz_uri;
     int i_id;
 
-    msg_Dbg( p_playlist, "clearing playlist");
+    msg_Info( p_playlist, "clearing playlist");
     playlist_Clear( p_playlist );
 
 

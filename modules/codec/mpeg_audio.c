@@ -466,7 +466,7 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
 
     if( p_dec->fmt_out.audio.i_rate != p_sys->i_rate )
     {
-        msg_Info( p_dec, "MPGA channels:%d samplerate:%d bitrate:%d",
+        msg_Dbg( p_dec, "MPGA channels:%d samplerate:%d bitrate:%d",
                   p_sys->i_channels, p_sys->i_rate, p_sys->i_bit_rate );
 
         aout_DateInit( &p_sys->end_date, p_sys->i_rate );

@@ -162,7 +162,6 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     vlc_mutex_lock( &p_item->lock );
     for( i = 0; i < p_item->i_options; i++ )
     {
-//        msg_Dbg( p_input, "option: %s", p_item->ppsz_options[i] );
         ParseOption( p_input, p_item->ppsz_options[i] );
     }
     vlc_mutex_unlock( &p_item->lock );
@@ -710,7 +709,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
             {
                 vlc_value_t s;
 
-                msg_Dbg( p_input, "start-time: %ds",
+                msg_Dbg( p_input, "starting at time: %ds",
                                   (int)( p_input->i_start / I64C(1000000) ) );
 
                 s.i_time = p_input->i_start;
@@ -835,7 +834,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
                     break;
                 }
 
-                msg_Dbg( p_input, "adding slave '%s'", psz );
+                msg_Dbg( p_input, "adding slave input '%s'", psz );
                 slave = InputSourceNew( p_input );
                 if( !InputSourceInit( p_input, slave, psz, NULL, VLC_FALSE ) )
                 {
@@ -1141,8 +1140,9 @@ static void ControlReduce( input_thread_t *p_input )
         const int i_ct = p_input->control[i].i_type;
 
         /* XXX We can't merge INPUT_CONTROL_SET_ES */
-        msg_Dbg( p_input, "[%d/%d] l=%d c=%d", i, p_input->i_control,
+/*        msg_Dbg( p_input, "[%d/%d] l=%d c=%d", i, p_input->i_control,
                  i_lt, i_ct );
+*/
         if( i_lt == i_ct &&
             ( i_ct == INPUT_CONTROL_SET_STATE ||
               i_ct == INPUT_CONTROL_SET_RATE ||
@@ -1154,7 +1154,7 @@ static void ControlReduce( input_thread_t *p_input )
               i_ct == INPUT_CONTROL_SET_BOOKMARK ) )
         {
             int j;
-            msg_Dbg( p_input, "merged at %d", i );
+//            msg_Dbg( p_input, "merged at %d", i );
             /* Remove the i-1 */
             for( j = i; j <  p_input->i_control; j++ )
                 p_input->control[j-1] = p_input->control[j];
@@ -1180,7 +1180,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
     switch( i_type )
     {
         case INPUT_CONTROL_SET_DIE:
-            msg_Dbg( p_input, "control: INPUT_CONTROL_SET_DIE proceed" );
+            msg_Dbg( p_input, "control: stopping input" );
             /* Mark all submodules to die */
             if( p_input->input.p_access )
                 p_input->input.p_access->b_die = VLC_TRUE;

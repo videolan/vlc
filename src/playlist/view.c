@@ -70,8 +70,6 @@ playlist_view_t * playlist_ViewCreate( playlist_t *p_playlist, int i_id,
 {
     playlist_view_t * p_view;
 
-    msg_Dbg( p_playlist, "creating view %i",i_id );
-
     p_view = malloc( sizeof( playlist_view_t ) );
 
     memset( p_view, 0, sizeof( playlist_view_t ) );
@@ -127,6 +125,7 @@ int playlist_ViewDelete( playlist_t *p_playlist,playlist_view_t *p_view )
     return VLC_SUCCESS;
 }
 
+
 /**
  * Dumps the content of a view
  *
@@ -136,9 +135,11 @@ int playlist_ViewDelete( playlist_t *p_playlist,playlist_view_t *p_view )
  */
 int playlist_ViewDump( playlist_t *p_playlist, playlist_view_t *p_view )
 {
+#ifdef PLAYLIST_DEBUG
     msg_Dbg( p_playlist, "dumping view %i",p_view->i_id );
     playlist_NodeDump( p_playlist,p_view->p_root, 1 );
     return VLC_SUCCESS;
+#endif
 }
 
 /**
@@ -907,7 +908,8 @@ playlist_item_t *playlist_FindDirectParent( playlist_t *p_playlist,
 }
 
 
-/* This function dumps a node */
+#ifdef PLAYLIST_DEBUG
+/* This function dumps a node : to be used only for debug*/
 void playlist_NodeDump( playlist_t *p_playlist, playlist_item_t *p_item,
                         int i_level )
 {
@@ -940,3 +942,4 @@ void playlist_NodeDump( playlist_t *p_playlist, playlist_item_t *p_item,
     }
     return;
 }
+#endif

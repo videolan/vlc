@@ -838,7 +838,6 @@ void Playlist::Rebuild( vlc_bool_t b_root )
     p_view = playlist_ViewFind( p_playlist, i_current_view ); /* FIXME */
 
     /* HACK we should really get new*/
-    msg_Dbg( p_intf, "rebuilding tree for view %i", i_current_view );
     treectrl->DeleteAllItems();
     treectrl->AddRoot( wxU(_("root" )), -1, -1,
                          new PlaylistItem( p_view->p_root) );

@@ -48,7 +48,7 @@ access_t *__access2_New( vlc_object_t *p_obj,
     p_access->psz_demux  = strdup( "" );
 
     if( !b_quick )
-        msg_Dbg( p_obj, "access2_New: access='%s' path='%s'",
+        msg_Dbg( p_obj, "creating access '%s' path='%s'",
                  p_access->psz_access, p_access->psz_path );
 
     p_access->pf_read    = NULL;

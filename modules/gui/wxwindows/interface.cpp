@@ -631,7 +631,6 @@ void Interface::SetupHotkeys()
     else
     {
         SetAcceleratorTable( accel );
-        msg_Dbg( p_intf, "accelerator table loaded" );
     }
 
     delete [] p_entries;

@@ -173,7 +173,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     if( p_sys->ppsz_audio_language )
     {
         for( i = 0; p_sys->ppsz_audio_language[i]; i++ )
-            msg_Dbg( p_input, "Select audio in language[%d] %s",
+            msg_Dbg( p_input, "select audio in language[%d] %s",
                      i, p_sys->ppsz_audio_language[i] );
     }
     if( val.psz_string ) free( val.psz_string );
@@ -183,7 +183,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     if( p_sys->ppsz_sub_language )
     {
         for( i = 0; p_sys->ppsz_sub_language[i]; i++ )
-            msg_Dbg( p_input, "Select subtitle in language[%d] %s",
+            msg_Dbg( p_input, "select subtitle in language[%d] %s",
                      i, p_sys->ppsz_sub_language[i] );
     }
     if( val.psz_string ) free( val.psz_string );
@@ -399,7 +399,7 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     if( p_sys->p_pgrm )
     {
         es_out_pgrm_t *old = p_sys->p_pgrm;
-        msg_Dbg( p_input, "Unselecting program id=%d", old->i_id );
+        msg_Dbg( p_input, "unselecting program id=%d", old->i_id );
 
         for( i = 0; i < p_sys->i_es; i++ )
         {
@@ -413,7 +413,7 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
         p_sys->p_es_video = NULL;
     }
 
-    msg_Dbg( p_input, "Selecting program id=%d", p_pgrm->i_id );
+    msg_Dbg( p_input, "selecting program id=%d", p_pgrm->i_id );
 
     /* Mark it selected */
     p_pgrm->b_selected = VLC_TRUE;

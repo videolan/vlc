@@ -57,7 +57,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
 
     if( !b_quick )
     {
-        msg_Dbg( p_obj, "demux2_New: access='%s' demux='%s' path='%s'",
+        msg_Dbg( p_obj, "creating demux: access='%s' demux='%s' path='%s'",
                  p_demux->psz_access, p_demux->psz_demux, p_demux->psz_path );
     }
 

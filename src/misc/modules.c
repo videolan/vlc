@@ -406,7 +406,6 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     char *psz_shortcuts = NULL, *psz_var = NULL;
     vlc_bool_t b_force_backup = p_this->b_force;
 
-    msg_Dbg( p_this, "looking for %s module", psz_capability );
 
     /* Deal with variables */
     if( psz_name && psz_name[0] == '$' )
@@ -602,8 +601,8 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         i_index++;
     }
 
-    msg_Dbg( p_this, "probing %i candidate%s",
-                     i_index, i_index == 1 ? "" : "s" );
+    msg_Dbg( p_this, "looking for %s module: %i candidate%s", psz_capability,
+                                            i_index, i_index == 1 ? "" : "s" );
 
     /* Lock all candidate modules */
     p_tmp = p_first;

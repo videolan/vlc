@@ -151,7 +151,7 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
          i_mode |= PLAYLIST_APPEND;
     }
 
-    msg_Dbg( p_playlist, "adding playlist item `%s' ( %s )",
+    msg_Info( p_playlist, "adding playlist item `%s' ( %s )",
              p_item->input.psz_name, p_item->input.psz_uri );
 
     p_item->input.i_id = ++p_playlist->i_last_id;
@@ -331,7 +331,7 @@ int playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
         i_mode |= PLAYLIST_APPEND;
     }
 
-    msg_Dbg( p_playlist, "adding playlist item `%s' ( %s )",
+    msg_Info( p_playlist, "adding playlist item `%s' ( %s )",
              p_item->input.psz_name, p_item->input.psz_uri );
 
     p_item->input.i_id = ++p_playlist->i_last_id;
@@ -642,7 +642,7 @@ int playlist_Delete( playlist_t * p_playlist, int i_id )
         p_playlist->status.p_item = NULL;
     }
 
-    msg_Dbg( p_playlist, "deleting playlist item `%s'",
+    msg_Info( p_playlist, "deleting playlist item `%s'",
                           p_item->input.psz_name );
 
     /* Remove the item from all its parent nodes */
