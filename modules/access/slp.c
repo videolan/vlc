@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.13 2003/07/23 01:13:47 gbazin Exp $
+ * $Id: slp.c,v 1.14 2003/08/10 12:45:52 zorglub Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -145,6 +145,8 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
     {
         return SLP_TRUE;
     }
+    
+    msg_Dbg(p_input,"URL: %s",psz_srvurl);
 
     /* or there was a problem with getting the data we requested */
     if( (slpe_errcode != SLP_OK) )
@@ -247,12 +249,17 @@ static SLPBoolean SrvTypeCallback( SLPHandle slph_slp,
     input_thread_t * p_input = (input_thread_t  *)p_cookie;
     SLPError slpe_result;
     SLPHandle slph_slp2;
+    char *psz_eos;
+    char *psz_service;
 
+    msg_Dbg(p_input,"Services: %s",psz_srvurl);
     /* our callback was only called to tell us there's nothing more to read */
     if( slpe_errcode == SLP_LAST_CALL )
     {
         return SLP_TRUE;
     }
+    
+    msg_Dbg(p_input,"Services: %s",psz_srvurl);
 
     /* or there was a problem with getting the data we requested */
     if( slpe_errcode != SLP_OK )
@@ -270,23 +277,50 @@ static SLPBoolean SrvTypeCallback( SLPHandle slph_slp,
                  &slph_slp2 ) == SLP_OK )
     {
         /* search for services */
-        slpe_result = SLPFindSrvs( slph_slp2,
-                                   psz_srvurl,
+        while(1)
+        {
+            if( *psz_srvurl == '\0')  break;
+
+            if( !strncasecmp( psz_srvurl, "service:", 8 ) )
+            {
+                while(1)
+                {
+                    psz_eos = strchr( psz_srvurl, ',');
+                    if(!psz_eos) break;
+                    if(!strncasecmp(psz_eos+1,"service:",8)) break;
+                }
+        
+                if(psz_eos) 
+                    *psz_eos = '\0';
+
+                psz_service = strdup( psz_srvurl);
+               
+                msg_Dbg(p_input,"Getting details for %s",psz_service);
+                
+                slpe_result = SLPFindSrvs( slph_slp2,
+                                   psz_service,
                                    config_GetPsz( p_input, "slp-scopelist" ),
                                    config_GetPsz( p_input, "slp-filter" ),
                                    SrvUrlCallback,
                                    p_input );
 
-        SLPClose( slph_slp2 );
+                if(psz_eos)
+                    psz_srvurl = psz_eos;
+                
+//                SLPClose( slph_slp2 );
 
-        if( slpe_result != SLP_OK )
-        {
-            msg_Err( p_input,
-                     "SLPFindSrvs error %i finding servers of type %s",
-                     slpe_result,
-                     psz_srvurl );
+                if( slpe_result != SLP_OK )
+                {
+                   msg_Err( p_input,
+                           "SLPFindSrvs error %i finding servers of type %s",
+                           slpe_result,
+                           psz_service );
+                }
+            }
+            psz_srvurl++;
         }
     }
+                SLPClose( slph_slp2 );
 
     return SLP_TRUE;
 }
