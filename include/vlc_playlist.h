@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_playlist.h,v 1.16 2003/11/12 08:10:21 zorglub Exp $
+ * $Id: vlc_playlist.h,v 1.17 2003/11/26 10:45:21 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -96,6 +96,11 @@ struct playlist_t
     /*@}*/
 };
 
+#define SORT_TITLE 0
+#define SORT_AUTHOR 1
+#define SORT_GROUP 2
+#define SORT_RANDOM 3
+
 #define SORT_NORMAL 0
 #define SORT_REVERSE 1
 
@@ -132,9 +137,11 @@ VLC_EXPORT( int, playlist_DeleteGroup, (playlist_t *, int ) );
 VLC_EXPORT( char *, playlist_FindGroup, (playlist_t *, int ) );
 VLC_EXPORT( int, playlist_GroupToId, (playlist_t *, char * ) );
 
-VLC_EXPORT( int,  playlist_SortTitle, ( playlist_t *, int) );
-VLC_EXPORT( int,  playlist_SortAuthor, ( playlist_t *, int) );
-VLC_EXPORT( int,  playlist_SortGroup, ( playlist_t *, int) );
+#define playlist_SortTitle(p, i) playlist_Sort( p, SORT_TITLE, i)
+#define playlist_SortAuthor(p, i) playlist_Sort( p, SORT_AUTHOR, i)
+#define playlist_SortGroup(p, i) playlist_Sort( p, SORT_GROUP, i)
+
+VLC_EXPORT( int,  playlist_Sort, ( playlist_t *, int, int) );
 
 VLC_EXPORT( int,  playlist_Move, ( playlist_t *, int, int ) );
 VLC_EXPORT( int,  playlist_LoadFile, ( playlist_t *, const char * ) );

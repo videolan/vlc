@@ -2,7 +2,7 @@
  * sort.c : Playlist sorting functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sort.c,v 1.1 2003/10/29 18:00:46 zorglub Exp $
+ * $Id: sort.c,v 1.2 2003/11/26 10:45:21 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -31,109 +31,62 @@
 #include "vlc_playlist.h"
 
 /**
- * Sort the playlist by title
+ * Sort the playlist
  * \param p_playlist the playlist
+ * \param i_mode: SORT_TITLE, SORT_GROUP, SORT_AUTHOR, SORT_RANDOM
  * \param i_type: SORT_NORMAL or SORT_REVERSE (reversed order)
  * \return 0 on success
  */
-int playlist_SortTitle( playlist_t * p_playlist , int i_type )
+int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
 {
     int i , i_small , i_position;
     playlist_item_t *p_temp;
 
     vlc_mutex_lock( &p_playlist->object_lock );
 
+    if( i_mode == SORT_RANDOM )
+    {
+        for( i_position = 0; i_position < p_playlist->i_size ; i_position ++ )
+        {
+            int i_new  = rand() % (p_playlist->i_size - 1);
+
+            /* Keep the correct current index */
+            if( i_new == p_playlist->i_index )
+                p_playlist->i_index = i_position;
+            else if( i_position == p_playlist->i_index )
+                p_playlist->i_index = i_new;
+
+            p_temp = p_playlist->pp_items[i_position];
+            p_playlist->pp_items[i_position] = p_playlist->pp_items[i_new];
+            p_playlist->pp_items[i_new] = p_temp;
+        }
+        vlc_mutex_unlock( &p_playlist->object_lock );
+
+        return 0;
+    }
+
     for( i_position = 0; i_position < p_playlist->i_size -1 ; i_position ++ )
     {
         i_small  = i_position;
         for( i = i_position + 1 ; i<  p_playlist->i_size ; i++)
         {
-            int i_test;
+            int i_test = 0;
 
-            i_test = strcasecmp( p_playlist->pp_items[i]->psz_name,
+            if( i_mode == SORT_TITLE )
+            {
+                i_test = strcasecmp( p_playlist->pp_items[i]->psz_name,
                                  p_playlist->pp_items[i_small]->psz_name );
-
-            if( ( i_type == SORT_NORMAL  && i_test < 0 ) ||
-                ( i_type == SORT_REVERSE && i_test > 0 ) )
-            {
-                i_small = i;
             }
-        }
-        /* Keep the correct current index */
-        if( i_small == p_playlist->i_index )
-            p_playlist->i_index = i_position;
-        else if( i_position == p_playlist->i_index )
-            p_playlist->i_index = i_small;
-
-        p_temp = p_playlist->pp_items[i_position];
-        p_playlist->pp_items[i_position] = p_playlist->pp_items[i_small];
-        p_playlist->pp_items[i_small] = p_temp;
-    }
-    vlc_mutex_unlock( &p_playlist->object_lock );
-
-    return 0;
-}
-
-/**
- * Sort the playlist by author
- * \param p_playlist the playlist
- * \param i_type: SORT_NORMAL or SORT_REVERSE (reversed order)
- * \return 0 on success
- */
-int playlist_SortAuthor( playlist_t * p_playlist , int i_type )
-{
-    int i , i_small , i_position;
-    playlist_item_t *p_temp;
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-
-    for( i_position = 0; i_position < p_playlist->i_size -1 ; i_position ++ )
-    {
-        i_small  = i_position;
-        for( i = i_position + 1 ; i<  p_playlist->i_size ; i++)
-        {
-            int i_test;
-
-            i_test = strcasecmp( p_playlist->pp_items[i]->psz_author,
-                                 p_playlist->pp_items[i_small]->psz_author );
-
-            if( ( i_type == SORT_NORMAL  && i_test < 0 ) ||
-                ( i_type == SORT_REVERSE && i_test > 0 ) )
+            else if( i_mode == SORT_GROUP )
             {
-                i_small = i;
-            }
-        }
-        /* Keep the correct current index */
-        if( i_small == p_playlist->i_index )
-            p_playlist->i_index = i_position;
-        else if( i_position == p_playlist->i_index )
-            p_playlist->i_index = i_small;
-
-        p_temp = p_playlist->pp_items[i_position];
-        p_playlist->pp_items[i_position] = p_playlist->pp_items[i_small];
-        p_playlist->pp_items[i_small] = p_temp;
-    }
-    vlc_mutex_unlock( &p_playlist->object_lock );
-
-    return 0;
-}
-
-int playlist_SortGroup( playlist_t * p_playlist , int i_type )
-{
-    int i , i_small , i_position;
-    playlist_item_t *p_temp;
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-
-    for( i_position = 0; i_position < p_playlist->i_size -1 ; i_position ++ )
-    {
-        i_small  = i_position;
-        for( i = i_position + 1 ; i<  p_playlist->i_size ; i++)
-        {
-            int i_test;
-
-            i_test = p_playlist->pp_items[i]->i_group -
+                i_test = p_playlist->pp_items[i]->i_group -
                                  p_playlist->pp_items[i_small]->i_group;
+            }
+            else if( i_mode == SORT_AUTHOR )
+            {
+                 i_test = strcasecmp( p_playlist->pp_items[i]->psz_author,
+                                 p_playlist->pp_items[i_small]->psz_author );
+            }
 
             if( ( i_type == SORT_NORMAL  && i_test < 0 ) ||
                 ( i_type == SORT_REVERSE && i_test > 0 ) )

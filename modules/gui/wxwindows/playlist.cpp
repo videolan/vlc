@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.26 2003/11/21 18:55:40 gbazin Exp $
+ * $Id: playlist.cpp,v 1.27 2003/11/26 10:45:21 zorglub Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -59,6 +59,7 @@ enum
     RSortAuthor_Event,
     SortGroup_Event,
     RSortGroup_Event,
+    Randomize_Event,
 
     EnableSelection_Event,
     DisableSelection_Event,
@@ -98,6 +99,8 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
     EVT_MENU(RSortAuthor_Event, Playlist::OnSort)
     EVT_MENU(SortGroup_Event, Playlist::OnSort)
     EVT_MENU(RSortGroup_Event, Playlist::OnSort)
+
+    EVT_MENU(Randomize_Event, Playlist::OnSort)
 
     EVT_MENU(EnableSelection_Event, Playlist::OnEnableSelection)
     EVT_MENU(DisableSelection_Event, Playlist::OnDisableSelection)
@@ -180,14 +183,16 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Create our "Sort" menu */
     wxMenu *sort_menu = new wxMenu;
-    sort_menu->Append( SortTitle_Event, wxU(_("&Sort by title")) );
+    sort_menu->Append( SortTitle_Event, wxU(_("Sort by &title")) );
     sort_menu->Append( RSortTitle_Event, wxU(_("&Reverse sort by title")) );
     sort_menu->AppendSeparator();
-    sort_menu->Append( SortAuthor_Event, wxU(_("&Sort by author")) );
+    sort_menu->Append( SortAuthor_Event, wxU(_("Sort by &author")) );
     sort_menu->Append( RSortAuthor_Event, wxU(_("&Reverse sort by author")) );
     sort_menu->AppendSeparator();
-    sort_menu->Append( SortGroup_Event, wxU(_("&Sort by group")) );
+    sort_menu->Append( SortGroup_Event, wxU(_("Sort by &group")) );
     sort_menu->Append( RSortGroup_Event, wxU(_("&Reverse sort by group")) );
+    sort_menu->AppendSeparator();
+    sort_menu->Append( Randomize_Event, wxU(_("&Randomize Playlist")) );
 
     /* Create our "Selection" menu */
     wxMenu *selection_menu = new wxMenu;
@@ -660,6 +665,9 @@ void Playlist::OnSort( wxCommandEvent& event )
            break;
         case RSortGroup_Event:
            playlist_SortGroup( p_playlist , 1 );
+           break;
+        case Randomize_Event:
+           playlist_Sort( p_playlist , SORT_RANDOM, SORT_NORMAL );
            break;
     }
     vlc_object_release( p_playlist );
