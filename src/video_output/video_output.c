@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.225 2003/05/25 11:31:54 gbazin Exp $
+ * $Id: video_output.c,v 1.226 2003/06/24 22:26:01 asmax Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -446,15 +446,38 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
  * update using one of the THREAD_* constants.
  *****************************************************************************/
 void vout_Destroy( vout_thread_t *p_vout )
-{
+{ 
+    vlc_object_t *p_playlist;
+    
     /* Request thread destruction */
     p_vout->b_die = VLC_TRUE;
     vlc_thread_join( p_vout );
 
     var_Destroy( p_vout, "intf-change" );
 
+    p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST, 
+                                  FIND_ANYWHERE );
+
     /* Free structure */
     vlc_object_destroy( p_vout );
+
+    /* If it was the last vout, tell the interface to show up */
+    if( p_playlist != NULL )
+    {
+        vout_thread_t *p_another_vout = vlc_object_find( p_playlist, 
+                                            VLC_OBJECT_VOUT, FIND_ANYWHERE );
+        if( p_another_vout == NULL )
+        {
+            vlc_value_t val;
+            val.b_bool = VLC_TRUE;
+            var_Set( p_playlist, "intf-show", val );
+        }
+        else
+        {
+            vlc_object_release( p_another_vout );
+        }
+        vlc_object_release( p_playlist );
+    }
 }
 
 /*****************************************************************************

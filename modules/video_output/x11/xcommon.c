@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.20 2003/05/28 00:52:05 titer Exp $
+ * $Id: xcommon.c,v 1.21 2003/06/24 22:26:01 asmax Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -542,7 +542,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                         vlc_object_release( p_intf );
                     }
 
-                    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                    p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
                                                            FIND_ANYWHERE );
                     if( p_playlist != NULL )
                     {
@@ -669,9 +669,25 @@ static int ManageVideo( vout_thread_t *p_vout )
                     break;
                     
                 case Button2:
-                    var_Get( p_vout, "mouse-button-down", &val );
-                    val.i_int &= ~2;
-                    var_Set( p_vout, "mouse-button-down", val );
+                    {
+                        playlist_t *p_playlist;
+
+                        var_Get( p_vout, "mouse-button-down", &val );
+                        val.i_int &= ~2;
+                        var_Set( p_vout, "mouse-button-down", val );
+
+                        p_playlist = vlc_object_find( p_vout,
+                                                      VLC_OBJECT_PLAYLIST,
+                                                      FIND_ANYWHERE );
+                        if( p_playlist != NULL )
+                        {
+                            vlc_value_t val;
+                            var_Get( p_playlist, "intf-show", &val );
+                            val.b_bool = !val.b_bool;
+                            var_Set( p_playlist, "intf-show", val );
+                            vlc_object_release( p_playlist );
+                        }
+                    }
                     break;
                     
                 case Button3:
@@ -690,7 +706,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                             vlc_object_release( p_intf );
                         }
 
-                        p_playlist = vlc_object_find( p_intf,
+                        p_playlist = vlc_object_find( p_vout,
                                                       VLC_OBJECT_PLAYLIST,
                                                       FIND_ANYWHERE );
                         if( p_playlist != NULL )

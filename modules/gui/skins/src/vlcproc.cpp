@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.39 2003/06/23 20:35:36 asmax Exp $
+ * $Id: vlcproc.cpp,v 1.40 2003/06/24 22:26:01 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -54,6 +54,10 @@ VlcProc::VlcProc( intf_thread_t *_p_intf )
     {
         // We want to be noticed of playlit changes
         var_AddCallback( p_playlist, "intf-change", RefreshCallback, this );
+        
+        // Raise/lower interface with middle click on vout
+        var_AddCallback( p_playlist, "intf-show", IntfShowCallback, this );
+        
         vlc_object_release( p_playlist );   
     }
 }
@@ -248,6 +252,21 @@ int VlcProc::RefreshCallback( vlc_object_t *p_this, const char *psz_variable,
         vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     ( (VlcProc*)param )->InterfaceRefresh();
+    return VLC_SUCCESS;
+}
+
+// Interface show/hide callback
+int VlcProc::IntfShowCallback( vlc_object_t *p_this, const char *psz_variable,
+        vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    if( new_val.b_bool == VLC_TRUE )
+    {
+        OSAPI_PostMessage( NULL, VLC_SHOW, 1, 0 );
+    }
+    else
+    {
+        OSAPI_PostMessage( NULL, VLC_HIDE, 1, 0 );
+    }
     return VLC_SUCCESS;
 }
 
