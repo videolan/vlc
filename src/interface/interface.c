@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/uio.h>                                        /* for input.h */
+#include <sys/uio.h>                                          /* for input.h */
 
 #include "config.h"
 #include "common.h"

@@ -26,9 +26,8 @@ VIDEO=X11
 #VIDEO=BEOS
 #VIDEO=DGA
 
-# Target architecture and optimization
-#ARCH=
-ARCH=MMX
+# Target architecture
+ARCH=X86
 #ARCH=PPC
 #ARCH=SPARC
 
@@ -36,6 +35,10 @@ ARCH=MMX
 SYS=LINUX
 #SYS=BSD
 #SYS=BEOS
+
+# For x86 architecture, choose MMX support
+MMX=YES
+#MMX=NO
 
 # Decoder choice - ?? old decoder will be removed soon
 #DECODER=old
@@ -126,17 +129,11 @@ CCFLAGS += -O6
 CCFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
 CCFLAGS += -fomit-frame-pointer
 
-# Optimizations for x86 familiy, without MMX
-ifeq ($(ARCH),)
+# Optimizations for x86 familiy
+ifeq ($(ARCH),X86)
 CCFLAGS += -malign-double
 CCFLAGS += -march=pentiumpro
 #CCFLAGS += -march=pentium
-endif
-
-# Optimization for x86 with MMX support
-ifeq ($(ARCH),MMX)
-CCFLAGS += -malign-double
-CCFLAGS += -march=pentiumpro
 endif
 
 # Optimizations for PowerPC
@@ -166,9 +163,11 @@ LCFLAGS += -Wall
 # C compiler flags: common flags
 #
 
-# Optimizations for x86 with MMX support
-ifeq ($(ARCH),MMX)
+# Eventual MMX optimizations for x86
+ifeq ($(ARCH),X86)
+ifeq ($(MMX), YES) # MMX is YES or AUTO
 CFLAGS += -DHAVE_MMX
+endif
 endif
 
 #
@@ -276,13 +275,15 @@ C_OBJ = $(interface_obj) \
 #
 # Assembler Objects
 # 
-ifeq ($(ARCH),MMX)
-ifeq ($(DECODER),old)
-ASM_OBJ = 			video_decoder_ref/idctmmx.o \
-						video_output/video_yuv_mmx.o
-else
+ifeq ($(ARCH),X86)
+ifeq ($(MMX), YES)
+ifeq ($(DECODER),new)
 ASM_OBJ = 			video_decoder/idctmmx.o \
 						video_output/video_yuv_mmx.o
+else
+ASM_OBJ = 			video_decoder_ref/idctmmx.o \
+						video_output/video_yuv_mmx.o
+endif
 endif
 endif
 

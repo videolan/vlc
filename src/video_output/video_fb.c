@@ -1,6 +1,6 @@
 /*****************************************************************************
  * vout_fb.c: Linux framebuffer video output display method
- * (c)1998 VideoLAN
+ * (c)1999 VideoLAN
  *****************************************************************************/
 
 /*****************************************************************************
@@ -133,9 +133,11 @@ int vout_SysManage( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_SysDisplay( vout_thread_t *p_vout )
 {
-    /* tout est bien affiché, on peut échanger les 2 écrans */
-    p_vout->p_sys->var_info.xoffset = 0;
+    /* swap the two Y offsets */
     p_vout->p_sys->var_info.yoffset = p_vout->i_buffer_index ? p_vout->p_sys->var_info.yres : 0;
+    /* the X offset should be 0, but who knows ...
+     * some other app might have played with the framebuffer */
+    p_vout->p_sys->var_info.xoffset = 0;
 
     //ioctl( p_vout->p_sys->i_fb_dev, FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info );	
     ioctl( p_vout->p_sys->i_fb_dev, FBIOPAN_DISPLAY, &p_vout->p_sys->var_info );	
@@ -218,11 +220,8 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
         p_vout->p_sys->fb_cmap.blue = p_vout->p_sys->fb_palette + 2 * 256 * sizeof(unsigned short);
         p_vout->p_sys->fb_cmap.transp = p_vout->p_sys->fb_palette + 3 * 256 * sizeof(unsigned short);
 
+        /* saves the colormap */
         ioctl( p_vout->p_sys->i_fb_dev, FBIOGETCMAP, &p_vout->p_sys->fb_cmap );
-
-        /* initializes black & white palette */
-        //FBInitRGBPalette( p_vout );
-	//FBInitBWPalette( p_vout );
 
         p_vout->i_bytes_per_pixel = 1;
         p_vout->i_bytes_per_line = p_vout->i_width;
@@ -247,7 +246,7 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
     default:                                     /* unsupported screen depth */
         intf_ErrMsg("vout error: screen depth %d is not supported\n",
 		                     p_vout->i_screen_depth);
-        return( 1  );
+        return( 1 );
         break;
     }
 
@@ -303,8 +302,8 @@ static void FBCloseDisplay( vout_thread_t *p_vout )
         free( p_vout->p_sys->fb_palette );
     }
 
-    // Destroy window and close display
-    close( p_vout->p_sys->i_fb_dev );
+    /* Destroy window and close display */
+    close( p_vout->p_sys->i_fb_dev );    
 }
 
 /*****************************************************************************

@@ -97,6 +97,7 @@ static void Version                 ( void );
 
 static void InitSignalHandler       ( void );
 static void SignalHandler           ( int i_signal );
+static int  TestMMX                 ( void );
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads
@@ -116,6 +117,13 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Read configuration, initialize messages interface and set up program
      */
+#ifdef HAVE_MMX
+    if( !TestMMX() )
+    {
+        fprintf( stderr, "Sorry, this program needs an MMX processor. Please run the non-MMX version.\n" );
+	return(0);
+    }
+#endif
     p_main->p_msg = intf_MsgCreate();
     if( !p_main->p_msg )                         /* start messages interface */
     {
@@ -496,5 +504,73 @@ static void SignalHandler( int i_signal )
     p_main->p_intf->b_die = 1;
 }
 
+#ifdef HAVE_MMX
+/*****************************************************************************
+ * TestMMX: tests if the processor has MMX support.
+ *****************************************************************************
+ * This function is called if HAVE_MMX is enabled, to check whether the
+ * cpu really supports MMX.
+ *****************************************************************************/
+static int TestMMX( void )
+{
+    int reg, dummy;
 
+    /* test for a 386 cpu */
+    asm volatile ( "pushfl
+                    popl %%eax
+                    movl %%eax, %%ecx
+                    xorl $0x40000, %%eax
+                    pushl %%eax
+                    popfl
+                    pushfl
+                    popl %%eax
+                    xorl %%ecx, %%eax
+                    andl $0x40000, %%eax"
+                 : "=a" ( reg ) );
+    
+    if( !reg )
+        return( 0 );
 
+    /* test for a 486 cpu */
+    asm volatile ( "movl %%ecx, %%eax
+                    xorl $0x200000, %%eax
+                    pushl %%eax
+                    popfl
+                    pushfl
+                    popl %%eax
+                    xorl %%ecx, %%eax
+                    pushl %%ecx 
+                    popfl
+                    andl $0x200000, %%eax"
+                 : "=a" ( reg ) );
+    
+    if( !reg )
+        return( 0 );
+
+    /* the cpu supports the CPUID instruction - get its level */
+    asm volatile ( "cpuid"
+                 : "=a" ( reg ),
+                   "=b" ( dummy ),
+                   "=c" ( dummy ),
+                   "=d" ( dummy )
+                 : "a"  ( 0 ) ); /* level 0 */
+
+    /* this shouldn't happen on a normal cpu */
+    if( !reg )
+        return( 0 );
+
+    /* test for the MMX flag */
+    asm volatile ( "cpuid
+                    andl $0x00800000, %%edx" /* X86_FEATURE_MMX */
+                 : "=a" ( dummy ),
+                   "=b" ( dummy ),
+                   "=c" ( dummy ),
+                   "=d" ( reg )
+                 : "a"  ( 1 ) ); /* level 1 */
+
+    if( !reg )
+        return( 0 );
+
+    return( 1 );
+}
+#endif
