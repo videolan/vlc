@@ -3,7 +3,7 @@
  * using MAD (MPEG Audio Decoder)
  *****************************************************************************
  * Copyright (C) 2001 by Jean-Paul Saman
- * $Id: mpgatofixed32.c,v 1.6 2003/02/21 15:16:52 hartman Exp $
+ * $Id: mpgatofixed32.c,v 1.7 2003/02/21 16:31:37 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -114,7 +114,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_samples * sizeof(vlc_fixed_t);
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_samples * sizeof(vlc_fixed_t) * 
+                               aout_FormatNbChannels( &p_filter->input );
 
     /* Do the actual decoding now. */
     mad_stream_buffer( &p_sys->mad_stream, p_in_buf->p_buffer,
@@ -123,7 +124,20 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     {
         msg_Warn( p_aout, "libmad error: %s",
                   mad_stream_errorstr( &p_sys->mad_stream ) );
-        memset( p_out_buf->p_buffer, 0, p_out_buf->i_nb_bytes );
+        if( p_filter->output.i_format == VLC_FOURCC('f','l','3','2') )
+        {
+            int i;
+            int i_size = p_out_buf->i_nb_bytes / sizeof(float);
+            
+            float * a = (float *)p_out_buf->p_buffer;
+            for ( i = 0 ; i < i_size ; i++ )
+                *a++ = 0.0;
+        }
+        else
+        {
+            memset( p_out_buf->p_buffer, 0, p_out_buf->i_nb_bytes );
+        }
+        return;
     }
     mad_synth_frame( &p_sys->mad_synth, &p_sys->mad_frame );
 

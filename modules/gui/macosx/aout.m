@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: aout.m,v 1.22 2003/01/21 00:47:43 jlj Exp $
+ * $Id: aout.m,v 1.23 2003/02/21 16:31:37 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -468,8 +468,20 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
     }
     else
     {
-        memset( outOutputData->mBuffers[ 0 ].mData, 
+        if( p_aout->output.output.i_format == VLC_FOURCC('f','l','3','2') )
+        {
+            int i;
+            int i_size = p_sys->i_buffer_size / sizeof(float);
+            
+            float * a = (float *)outOutputData->mBuffers[ 0 ].mData;
+            for ( i = 0 ; i < i_size ; i++ )
+                *a++ = 0.0;
+        }
+        else
+        {
+            memset( outOutputData->mBuffers[ 0 ].mData, 
                 0, p_sys->i_buffer_size );
+        }
     }
 
     return( noErr );     
