@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.42 2001/04/11 04:31:59 sam Exp $
+ * $Id: input_dvd.c,v 1.43 2001/04/12 02:40:09 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -362,13 +362,13 @@ static int DVDFindCell( thread_dvd_data_t * p_dvd )
     {
         i_cell++;
     }
-
+/*
 intf_WarnMsg( 1, "FindCell: i_cell %d i_index %d found %d nb %d",
                     p_dvd->i_cell,
                     p_dvd->i_prg_cell,
                     i_cell,
                     cell.i_cell_nb );
-
+*/
     if( i_cell == cell.i_cell_nb )
     {
         intf_ErrMsg( "dvd error: can't find cell" );
@@ -411,7 +411,7 @@ static int DVDFindSector( thread_dvd_data_t * p_dvd )
          p_dvd->p_ifo->vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector,
          title.p_cell_play[p_dvd->i_prg_cell].i_end_sector );
 
-    intf_WarnMsg( 1, "cell: %d sector1: 0x%x end1: 0x%x\n"
+/*    intf_WarnMsg( 1, "cell: %d sector1: 0x%x end1: 0x%x\n"
                      "index: %d sector2: 0x%x end2: 0x%x", 
         p_dvd->i_cell,
         p_dvd->p_ifo->vts.cell_inf.p_cell_map[p_dvd->i_cell].i_start_sector,
@@ -419,6 +419,7 @@ static int DVDFindSector( thread_dvd_data_t * p_dvd )
         p_dvd->i_prg_cell,
         title.p_cell_play[p_dvd->i_prg_cell].i_start_sector,
         title.p_cell_play[p_dvd->i_prg_cell].i_end_sector );
+*/
 #undef title
 
     return 0;
@@ -439,7 +440,11 @@ static int DVDChapterSelect( thread_dvd_data_t * p_dvd, int i_chapter )
     p_dvd->i_sector = 0;
 
     /* Search for cell_index in cell adress_table and initialize start sector */
-    DVDFindSector( p_dvd );
+    if( DVDFindSector( p_dvd ) < 0 )
+    {
+        intf_ErrMsg( "dvd error: can't select chapter" );
+        return -1;
+    }
 
     /* start is : beginning of vts vobs + offset to vob x */
     p_dvd->i_start = p_dvd->i_title_start +
@@ -504,7 +509,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             return -1;
         }
 
-//intf_WarnMsg( 3, "cell nb %d", p_dvd->p_ifo->vts.title_unit.p_title[p_dvd->i_program_chain-1].title.i_cell_nb );
 #define vmg p_dvd->p_ifo->vmg
 #define vts p_dvd->p_ifo->vts
         /* title position inside the selected vts */
@@ -513,11 +517,11 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_dvd->i_program_chain =
           vts.title_inf.p_title_start[p_dvd->i_vts_title-1].i_program_chain_num;
 
-        intf_WarnMsg( 1, "dvd: title %d vts_title %d pgc %d",
+/*        intf_WarnMsg( 1, "dvd: title %d vts_title %d pgc %d",
                         p_dvd->i_title,
                         p_dvd->i_vts_title,
                         p_dvd->i_program_chain );
-
+*/
         /* css title key for current vts */
         if( p_dvd->b_encrypted )
         {
@@ -558,9 +562,12 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_dvd->i_prg_cell = -1 +
             vts.title_unit.p_title[p_dvd->i_program_chain-1].title.i_cell_nb;
 
-intf_WarnMsg( 3, "cell nb %d", vts.title_unit.p_title[p_dvd->i_program_chain-1].title.i_cell_nb );
-
-        DVDFindCell( p_dvd );
+        if( DVDFindCell( p_dvd ) < 0 )
+        {
+            intf_ErrMsg( "dvd error: can't find title end" );
+            p_input->b_error = 1;
+            return -1;
+        }
 
         /* temporary hack to fix size in some dvds */
         if( p_dvd->i_cell >= vts.cell_inf.i_cell_nb )
@@ -572,7 +579,12 @@ intf_WarnMsg( 3, "cell nb %d", vts.title_unit.p_title[p_dvd->i_program_chain-1].
         p_dvd->i_size = DVD_LB_SIZE *
           (off_t)( vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector );
 
-        DVDChapterSelect( p_dvd, 1 );
+        if( DVDChapterSelect( p_dvd, 1 ) < 0 )
+        {
+            intf_ErrMsg( "dvd error: can't find first chapter" );
+            p_input->b_error = 1;
+            return -1;
+        }
 
         p_dvd->i_size -= (off_t)( p_dvd->i_sector + 1 ) *DVD_LB_SIZE;
 
@@ -769,7 +781,12 @@ intf_WarnMsg( 3, "cell nb %d", vts.title_unit.p_title[p_dvd->i_program_chain-1].
     if( ( p_area->i_part > 0 ) &&
         ( p_area->i_part <= p_area->i_part_nb ) )
     {
-        DVDChapterSelect( p_dvd, p_area->i_part );
+        if( DVDChapterSelect( p_dvd, p_area->i_part ) < 0 )
+        {
+            intf_ErrMsg( "dvd error: can't set chapter in area" );
+            p_input->b_error = 1;
+            return -1;
+        }
 
         p_input->stream.p_selected_area->i_tell = p_dvd->i_start -
                                                   p_area->i_start;
@@ -840,14 +857,14 @@ static void DVDInit( input_thread_t * p_input )
     /* Ifo allocation & initialisation */
     if( IfoCreate( p_dvd ) < 0 )
     {
-        intf_ErrMsg( "dvd error: allcation error in IFO" );
+        intf_ErrMsg( "dvd error: allcation error in ifo" );
         p_input->b_error = 1;
         return;
     }
 
     if( IfoInit( p_dvd->p_ifo ) < 0 )
     {
-        intf_ErrMsg( "dvd error: fatal failure in IFO" );
+        intf_ErrMsg( "dvd error: fatal failure in ifo" );
         free( p_dvd );
         p_input->b_error = 1;
         return;
@@ -859,22 +876,24 @@ static void DVDInit( input_thread_t * p_input )
         p_dvd->p_css = malloc( sizeof(css_t) );
         if( p_dvd->p_css == NULL )
         {
-            intf_ErrMsg( "dvd error: couldn't create CSS structure" );
+            intf_ErrMsg( "dvd error: couldn't create css structure" );
             free( p_dvd );
             p_input->b_error = 1;
             return;
         }
 
+        p_dvd->p_css->i_agid = 0;
+
         if( CSSInit( p_input->i_handle, p_dvd->p_css ) < 0 )
         {
-            intf_ErrMsg( "dvd error: fatal failure in CSS" );
+            intf_ErrMsg( "dvd error: fatal failure in css" );
             free( p_dvd->p_css );
             free( p_dvd );
             p_input->b_error = 1;
             return;
         }
 
-        intf_WarnMsg( 2, "dvd info: CSS initialized" );
+        intf_WarnMsg( 2, "dvd info: css initialized" );
     }
 
     /* Set stream and area data */
@@ -887,7 +906,8 @@ static void DVDInit( input_thread_t * p_input )
     intf_WarnMsg( 2, "dvd info: number of titles: %d", title_inf.i_title_nb );
 
 #define area p_input->stream.pp_areas
-    /* We start from 1 here since area 0 is reserved for video_ts.vob */
+    /* We start from 1 here since the default area 0
+     * is reserved for video_ts.vob */
     for( i = 1 ; i <= title_inf.i_title_nb ; i++ )
     {
         input_AddArea( p_input );
@@ -953,7 +973,7 @@ static void DVDEnd( input_thread_t * p_input )
         free( p_dvd->p_css );
     }
 
-    IfoEnd( p_dvd->p_ifo );
+    IfoDestroy( p_dvd->p_ifo );
     free( p_dvd );
     DVDNetlistEnd( p_netlist );
 }
@@ -990,7 +1010,7 @@ static int DVDRead( input_thread_t * p_input,
     /* Get an iovec pointer */
     if( ( p_vec = DVDGetiovec( p_netlist ) ) == NULL )
     {
-        intf_ErrMsg( "DVD: read error" );
+        intf_ErrMsg( "dvd error: can't get iovec" );
         return -1;
     }
 
@@ -1129,7 +1149,7 @@ static int DVDRead( input_thread_t * p_input,
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     p_input->stream.p_selected_area->i_tell += i_read_bytes;
-    b_eof = p_input->stream.p_selected_area->i_tell < p_dvd->i_size ? 0 : 1;
+    b_eof = !( p_input->stream.p_selected_area->i_tell < p_dvd->i_size );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -1192,9 +1212,15 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     p_dvd->i_cell = 0;
 
     /* Find first title cell which is inside program cell */
-    DVDFindCell( p_dvd );
+    if( DVDFindCell( p_dvd ) < 0 )
+    {
+        intf_ErrMsg( "dvd error: cell seeking failed" );
+        p_input->b_error = 1;
+        return;
+    }
 
     i_cell = p_dvd->i_cell;
+
 #define cell p_dvd->p_ifo->vts.cell_inf.p_cell_map[i_cell]
     /* parse cell address map to find title cell containing sector */
     while( cell.i_end_sector < p_dvd->i_sector )

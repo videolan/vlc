@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.46 2001/04/10 17:47:05 stef Exp $
+ * $Id: input_programs.c,v 1.47 2001/04/12 02:40:09 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -58,8 +58,6 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
     p_input->stream.pp_es = NULL;
     p_input->stream.pp_selected_es = NULL;
     p_input->stream.pp_programs = NULL;
-    p_input->stream.pp_areas = NULL;
-    p_input->stream.p_selected_area = NULL;
 
     if( i_data_len )
     {
@@ -89,6 +87,12 @@ void input_EndStream( input_thread_t * p_input )
     while( p_input->stream.i_es_number )
     {
         input_DelES( p_input, p_input->stream.pp_es[0] );
+    }
+
+    /* Free all areas */
+    while( p_input->stream.i_area_nb )
+    {
+        input_DelArea( p_input, p_input->stream.pp_areas[0] );
     }
 
     if( p_input->stream.p_demux_data != NULL )

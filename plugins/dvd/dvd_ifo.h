@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.11 2001/04/08 07:24:47 stef Exp $
+ * $Id: dvd_ifo.h,v 1.12 2001/04/12 02:40:09 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -99,9 +99,13 @@ typedef struct command_s
     u16             i_post_command_nb;              // 2 bytes
     u16             i_cell_command_nb;              // 2 bytes
 //    char[2]         ???
-    command_desc_t* p_pre_command;                  // i_pre_com_nb * 8 bytes
-    command_desc_t* p_post_command;                 // i_post_com_nb * 8 bytes
-    command_desc_t* p_cell_command;                 // i_cell_com_nb * 8 bytes
+    u64* p_pre_command;                  // i_pre_com_nb * 8 bytes
+    u64* p_post_command;                 // i_post_com_nb * 8 bytes
+    u64* p_cell_command;                  // i_pre_com_nb * 8 bytes
+
+//    command_desc_t* p_cell_command;                 // i_cell_com_nb * 8 bytes
+//    command_desc_t* p_post_command;                 // i_post_com_nb * 8 bytes
+//    command_desc_t* p_cell_command;                 // i_cell_com_nb * 8 bytes
 } command_t;
 
 /* Program Chain Map Table

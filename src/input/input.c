@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.96 2001/04/10 17:47:05 stef Exp $
+ * $Id: input.c,v 1.97 2001/04/12 02:40:09 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -126,12 +126,13 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.i_new_status = p_input->stream.i_new_rate = 0;
     p_input->stream.i_mux_rate = 0;
 
+    /* no stream, no area */
     p_input->stream.i_area_nb = 0;
     p_input->stream.pp_areas = NULL;
+    p_input->stream.p_selected_area = NULL;
     /* By default there is one areas in a stream */
     input_AddArea( p_input );
     p_input->stream.p_selected_area = p_input->stream.pp_areas[0];
-    p_input->stream.p_selected_area->i_seek = NO_SEEK;
 
     /* Initialize stream control properties. */
     p_input->stream.control.i_status = PLAYING_S;
