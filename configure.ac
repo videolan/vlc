@@ -195,7 +195,7 @@ AM_CONDITIONAL(HAVE_WIN32, test "${SYS}" = "mingw32")
 dnl
 dnl Gettext stuff
 dnl
-ALL_LINGUAS="da de en_GB es fr hu it ja nl no pl pt_BR ru sv el"
+ALL_LINGUAS="bn da de el en_GB es fr hi hu it ja my nl no pl ps pt_BR ru sv tet tl"
 AM_GNU_GETTEXT_VERSION(0.11.5)
 AM_GNU_GETTEXT
 if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
