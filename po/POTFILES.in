@@ -151,7 +151,6 @@ modules/access/mms/mmstu.c
 modules/access/mms/mmstu.h
 modules/access/pvr/pvr.c
 modules/access/pvr/videodev2.h
-modules/access/rtsp.c
 modules/access/satellite/access.c
 modules/access/satellite/dvb.c
 modules/access/satellite/dvb.h
