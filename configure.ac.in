@@ -156,6 +156,15 @@ AM_CONDITIONAL(HAVE_WIN32, test "x${SYS}" = "xmingw32")
 AC_MSG_CHECKING(for suffix of libraries)
 AC_MSG_RESULT(${LIBEXT})
 
+dnl Check for the need to include the mingwex lib for mingw32
+if test x$SYS = xmingw32
+then
+    AC_CHECK_LIB(mingwex,opendir,
+        AC_CHECK_LIB(mingw32,opendir,LDFLAGS_vlc="${LDFLAGS_vlc}",
+            LDFLAGS_vlc="${LDFLAGS_vlc} -lmingwex")
+    )
+fi
+
 dnl Check for fnative-struct or mms-bitfields support for mingw32
 if test x$SYS = xmingw32
 then
