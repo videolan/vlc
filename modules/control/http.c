@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.34 2003/11/16 20:41:36 garf Exp $
+ * $Id: http.c,v 1.35 2003/11/17 15:29:03 garf Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -2878,11 +2878,17 @@ playlist_item_t * parse_MRL( char *psz )
     }
 
     /* extract the mrl */
-    s_temp = Find_end_MRL( s_mrl );
-
+    s_temp = strstr( s_mrl , " :" );
     if( s_temp == NULL )
     {
-        return NULL;
+        s_temp = s_mrl + strlen( s_mrl );
+    } else
+    {
+        while( (*s_temp == ' ') && (s_temp != s_mrl ) )
+        {
+            s_temp--;
+        }
+        s_temp++;
     }
 
     /* if the mrl is between " or ', we must remove them */
