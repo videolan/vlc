@@ -2,9 +2,9 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.27 2004/02/26 17:02:17 gbazin Exp $
+ * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -165,22 +165,27 @@ struct aout_sys_t
     int i_frame_size;                         /* Size in bytes of one frame */
 
     vlc_bool_t b_chan_reorder;              /* do we need channel reordering */
-    int *pi_chan_table;
+    int pi_chan_table[AOUT_CHAN_MAX];
     uint32_t i_channel_mask;
+    uint32_t i_bits_per_sample;
+    uint32_t i_channels;
 };
 
-static const uint32_t pi_channels_in[] =
+static const uint32_t pi_channels_src[] =
     { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
+      AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
       AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
-      AOUT_CHAN_CENTER, AOUT_CHAN_LFE };
+      AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0 };
+static const uint32_t pi_channels_in[] =
+    { SPEAKER_FRONT_LEFT, SPEAKER_FRONT_RIGHT,
+      SPEAKER_SIDE_LEFT, SPEAKER_SIDE_RIGHT,
+      SPEAKER_BACK_LEFT, SPEAKER_BACK_RIGHT,
+      SPEAKER_FRONT_CENTER, SPEAKER_LOW_FREQUENCY, 0 };
 static const uint32_t pi_channels_out[] =
     { SPEAKER_FRONT_LEFT, SPEAKER_FRONT_RIGHT,
+      SPEAKER_FRONT_CENTER, SPEAKER_LOW_FREQUENCY,
       SPEAKER_BACK_LEFT, SPEAKER_BACK_RIGHT,
-      SPEAKER_FRONT_CENTER, SPEAKER_LOW_FREQUENCY };
-static const uint32_t pi_channels_ordered[] =
-    { SPEAKER_FRONT_LEFT, SPEAKER_FRONT_RIGHT, SPEAKER_FRONT_CENTER,
-      SPEAKER_LOW_FREQUENCY,
-      SPEAKER_BACK_LEFT, SPEAKER_BACK_RIGHT };
+      SPEAKER_SIDE_LEFT, SPEAKER_SIDE_RIGHT, 0 };
 
 /*****************************************************************************
  * Local prototypes.
@@ -197,10 +202,6 @@ static int  CreateDSBufferPCM ( aout_instance_t *, int*, int, int, int, vlc_bool
 static void DestroyDSBuffer   ( aout_instance_t * );
 static void DirectSoundThread ( notification_thread_t * );
 static int  FillBuffer        ( aout_instance_t *, int, aout_buffer_t * );
-
-static void CheckReordering   ( aout_instance_t *, int );
-static void InterleaveFloat32 ( float *, float *, int *, int );
-static void InterleaveS16     ( int16_t *, int16_t *, int *, int );
 
 /*****************************************************************************
  * Module descriptor
@@ -239,7 +240,6 @@ static int OpenAudio( vlc_object_t *p_this )
     p_aout->output.p_sys->p_dsnotify = NULL;
     p_aout->output.p_sys->p_notif = NULL;
     p_aout->output.p_sys->b_playing = 0;
-    p_aout->output.p_sys->pi_chan_table = NULL;
 
     p_aout->output.pf_play = Play;
     aout_VolumeSoftInit( p_aout );
@@ -557,42 +557,37 @@ static void Play( aout_instance_t *p_aout )
 static void CloseAudio( vlc_object_t *p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    aout_sys_t *p_sys = p_aout->output.p_sys;
 
     msg_Dbg( p_aout, "CloseAudio" );
 
     /* kill the position notification thread, if any */
-    if( p_aout->output.p_sys->p_notif )
+    if( p_sys->p_notif )
     {
-        vlc_object_detach( p_aout->output.p_sys->p_notif );
-        if( p_aout->output.p_sys->p_notif->b_thread )
+        vlc_object_detach( p_sys->p_notif );
+        if( p_sys->p_notif->b_thread )
         {
-            p_aout->output.p_sys->p_notif->b_die = 1;
+            p_sys->p_notif->b_die = 1;
 
-            if( !p_aout->output.p_sys->b_playing )
+            if( !p_sys->b_playing )
                 /* wake up the audio thread */
-                SetEvent(
-                    p_aout->output.p_sys->p_notif->p_events[0].hEventNotify );
+                SetEvent( p_sys->p_notif->p_events[0].hEventNotify );
 
-            vlc_thread_join( p_aout->output.p_sys->p_notif );
+            vlc_thread_join( p_sys->p_notif );
         }
-        vlc_object_destroy( p_aout->output.p_sys->p_notif );
+        vlc_object_destroy( p_sys->p_notif );
     }
 
     /* release the secondary buffer */
     DestroyDSBuffer( p_aout );
 
     /* finally release the DirectSound object */
-    if( p_aout->output.p_sys->p_dsobject )
-        IDirectSound_Release( p_aout->output.p_sys->p_dsobject );
+    if( p_sys->p_dsobject ) IDirectSound_Release( p_sys->p_dsobject );
     
     /* free DSOUND.DLL */
-    if( p_aout->output.p_sys->hdsound_dll )
-       FreeLibrary( p_aout->output.p_sys->hdsound_dll );
+    if( p_sys->hdsound_dll ) FreeLibrary( p_sys->hdsound_dll );
 
-    if( p_aout->output.p_sys->pi_chan_table )
-        free( p_aout->output.p_sys->pi_chan_table );
-
-    free( p_aout->output.p_sys );
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -721,6 +716,9 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
     waveformat.Format.nAvgBytesPerSec =
         waveformat.Format.nSamplesPerSec * waveformat.Format.nBlockAlign;
 
+    p_aout->output.p_sys->i_bits_per_sample = waveformat.Format.wBitsPerSample;
+    p_aout->output.p_sys->i_channels = i_nb_channels;
+
     /* Then fill in the direct sound descriptor */
     memset(&dsbdesc, 0, sizeof(DSBUFFERDESC));
     dsbdesc.dwSize = sizeof(DSBUFFERDESC);
@@ -810,7 +808,16 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
     }
 
     p_aout->output.p_sys->i_channel_mask = waveformat.dwChannelMask;
-    CheckReordering( p_aout, i_nb_channels );
+
+    p_aout->output.p_sys->b_chan_reorder =
+        aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
+                                  waveformat.dwChannelMask, i_nb_channels,
+                                  p_aout->output.p_sys->pi_chan_table );
+
+    if( p_aout->output.p_sys->b_chan_reorder )
+    {
+        msg_Dbg( p_aout, "channel reordering needed" );
+    }
 
     return VLC_SUCCESS;
 
@@ -886,13 +893,14 @@ static int FillBuffer( aout_instance_t *p_aout, int i_frame,
                        aout_buffer_t *p_buffer )
 {
     notification_thread_t *p_notif = p_aout->output.p_sys->p_notif;
+    aout_sys_t *p_sys = p_aout->output.p_sys;
     void *p_write_position, *p_wrap_around;
     long l_bytes1, l_bytes2;
     HRESULT dsresult;
 
     /* Before copying anything, we have to lock the buffer */
     dsresult = IDirectSoundBuffer_Lock(
-                p_aout->output.p_sys->p_dsbuffer,               /* DS buffer */
+                p_sys->p_dsbuffer,                              /* DS buffer */
                 i_frame * p_notif->i_frame_size,             /* Start offset */
                 p_notif->i_frame_size,                    /* Number of bytes */
                 &p_write_position,                  /* Address of lock start */
@@ -902,9 +910,9 @@ static int FillBuffer( aout_instance_t *p_aout, int i_frame,
                 0 );                                                /* Flags */
     if( dsresult == DSERR_BUFFERLOST )
     {
-        IDirectSoundBuffer_Restore( p_aout->output.p_sys->p_dsbuffer );
+        IDirectSoundBuffer_Restore( p_sys->p_dsbuffer );
         dsresult = IDirectSoundBuffer_Lock(
-                               p_aout->output.p_sys->p_dsbuffer,
+                               p_sys->p_dsbuffer,
                                i_frame * p_notif->i_frame_size,
                                p_notif->i_frame_size,
                                &p_write_position,
@@ -924,33 +932,23 @@ static int FillBuffer( aout_instance_t *p_aout, int i_frame,
     {
         memset( p_write_position, 0, l_bytes1 );
     }
-    else if( p_aout->output.p_sys->b_chan_reorder )
-    {
-        /* Do the channel reordering here */
-
-        if( p_aout->output.output.i_format ==  VLC_FOURCC('s','1','6','l') )
-          InterleaveS16( (int16_t *)p_buffer->p_buffer,
-                         (int16_t *)p_write_position,
-                         p_aout->output.p_sys->pi_chan_table,
-                         aout_FormatNbChannels( &p_aout->output.output ) );
-        else
-          InterleaveFloat32( (float *)p_buffer->p_buffer,
-                             (float *)p_write_position,
-                             p_aout->output.p_sys->pi_chan_table,
-                             aout_FormatNbChannels( &p_aout->output.output ) );
-
-        aout_BufferFree( p_buffer );
-    }
     else
     {
+        if( p_sys->b_chan_reorder )
+        {
+            /* Do the channel reordering here */
+            aout_ChannelReorder( p_buffer->p_buffer, p_buffer->i_nb_bytes,
+                                 p_sys->i_channels, p_sys->pi_chan_table,
+                                 p_sys->i_bits_per_sample );
+        }
+
         p_aout->p_vlc->pf_memcpy( p_write_position, p_buffer->p_buffer,
                                   l_bytes1 );
         aout_BufferFree( p_buffer );
     }
 
     /* Now the data has been copied, unlock the buffer */
-    IDirectSoundBuffer_Unlock( p_aout->output.p_sys->p_dsbuffer,
-                               p_write_position, l_bytes1,
+    IDirectSoundBuffer_Unlock( p_sys->p_dsbuffer, p_write_position, l_bytes1,
                                p_wrap_around, l_bytes2 );
 
     return VLC_SUCCESS;
@@ -1092,94 +1090,4 @@ static void DirectSoundThread( notification_thread_t *p_notif )
         CloseHandle( notification_events[i] );
 
     msg_Dbg( p_notif, "DirectSoundThread exiting" );
-}
-
-/*****************************************************************************
- * CheckReordering: Check if we need to do some channel re-ordering (the ac3
- *                  channel order is different from the one chosen by
- *                  Microsoft).
- *****************************************************************************/
-static void CheckReordering( aout_instance_t *p_aout, int i_nb_channels )
-{
-    int i, j, k, l;
-
-#define i_channel_mask p_aout->output.p_sys->i_channel_mask
-#define pi_chan_table p_aout->output.p_sys->pi_chan_table
-
-    p_aout->output.p_sys->b_chan_reorder = VLC_FALSE;
-
-    pi_chan_table = malloc( i_nb_channels * sizeof(int) );
-    if( !pi_chan_table )
-    {
-        return;
-    }
-
-    for( i = 0, j = 0;
-         i < (int)(sizeof(pi_channels_out)/sizeof(uint32_t)); i++ )
-    {
-        if( i_channel_mask & pi_channels_out[i] )
-        {
-            for( k = 0, l = 0;
-                 pi_channels_out[i] != pi_channels_ordered[k]; k++ )
-            {
-                if( i_channel_mask & pi_channels_ordered[k] )
-                {
-                    l++;
-                }
-            }
-
-            pi_chan_table[j] = l;
-
-            j++;
-        }
-    }
-
-    for( i = 0; i < i_nb_channels; i++ )
-    {
-        if( pi_chan_table[i] != i )
-        {
-            p_aout->output.p_sys->b_chan_reorder = VLC_TRUE;
-        }
-    }
-
-    if( p_aout->output.p_sys->b_chan_reorder )
-    {
-        msg_Dbg( p_aout, "channel reordering needed" );
-    }
-
-#undef pi_chan_table
-#undef waveformat
-}
-
-/*****************************************************************************
- * InterleaveFloat32/S16: change the channel order to the Microsoft one.
- *****************************************************************************/
-static void InterleaveFloat32( float *p_buf, float *p_buf_out,
-                               int *pi_chan_table, int i_nb_channels )
-{
-    int i, j;
-
-    for( i = 0; i < FRAME_SIZE; i++ )
-    {
-        for( j = 0; j < i_nb_channels; j++ )
-        {
-            p_buf_out[i*i_nb_channels + pi_chan_table[j]] =
-                p_buf[i*i_nb_channels + j];
-        }
-    }
-}
-
-static void InterleaveS16( int16_t *p_buf, int16_t *p_buf_out,
-                           int *pi_chan_table, int i_nb_channels )
-{
-    int i, j;
-
-    for( i = 0; i < FRAME_SIZE; i++ )
-    {
-        for( j = 0; j < i_nb_channels; j++ )
-        {
-            p_buf_out[ i*i_nb_channels + pi_chan_table[j]] =
-                p_buf[i*i_nb_channels + j];
-        }
-    }
 }
