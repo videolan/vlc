@@ -82,7 +82,7 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-#define MAX_BLOCKS 10
+#define MAX_BLOCKS 100
 #define GOOM_DELAY 400000
 
 typedef struct
