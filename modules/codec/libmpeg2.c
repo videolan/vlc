@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.15 2003/05/03 22:25:44 massiot Exp $
+ * $Id: libmpeg2.c,v 1.16 2003/05/04 01:36:20 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -342,18 +342,21 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             buf[0] = buf[1] = buf[2] = NULL;
 
             msg_Warn( p_dec->p_fifo, "invalid picture encountered" );
-            vout_SynchroReset( p_dec->p_synchro );
-            mpeg2_skip( p_dec->p_mpeg2dec, 1 );
-            mpeg2_set_buf( p_dec->p_mpeg2dec, buf, NULL );
-            if ( p_dec->p_info->current_fbuf != NULL )
-                 p_dec->p_picture_to_destroy
-                    = p_dec->p_info->current_fbuf->id;
-            if( p_dec->p_info->discard_fbuf &&
-                p_dec->p_info->discard_fbuf->id )
+            if ( (p_dec->p_info->current_picture->flags & PIC_MASK_CODING_TYPE)
+                  != B_CODING_TYPE )
             {
-                p_pic = (picture_t *)p_dec->p_info->discard_fbuf->id;
-                vout_UnlinkPicture( p_dec->p_vout, p_pic );
+                vout_SynchroReset( p_dec->p_synchro );
             }
+            mpeg2_skip( p_dec->p_mpeg2dec, 1 );
+
+            if( p_dec->p_info->current_fbuf &&
+                p_dec->p_info->current_fbuf->id )
+            {
+                p_pic = (picture_t *)p_dec->p_info->current_fbuf->id;
+                vout_UnlinkPicture( p_dec->p_vout, p_pic );
+                vout_DestroyPicture( p_dec->p_vout, p_pic );
+            }
+            mpeg2_set_buf( p_dec->p_mpeg2dec, buf, NULL );
             break;
         }
 
