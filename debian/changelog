@@ -1,4 +1,16 @@
-vlc (0.6.2+cvs20031031-1) unstable; urgency=low
+vlc (0.6.2+cvs20031030-2) unstable; urgency=low
+
+  * debian/control:
+    + Build-depend on a newer wxwindows version to avoid incompatibilities.
+    + Build-depend on linux-kernel-headers and build-conflict on dvb-dev
+      because these packages cannot be installed together.
+  * debian/rules:
+    + Temporarily disabled the framebuffer video output plugin because of
+      current code errors in linux-kernel-headers.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sat,  1 Nov 2003 11:01:40 +0100
+
+vlc (0.6.2+cvs20031030-1) unstable; urgency=low
 
   * New CVS snapshot.
   * debian/rules:

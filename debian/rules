@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 # debian/rules for the VideoLAN Client - uses debhelper.
-# $Id: rules,v 1.107 2003/10/31 23:57:28 sam Exp $
+# $Id: rules,v 1.108 2003/11/01 10:07:09 sam Exp $
 # based on Joey Hess's one.
 
 # Uncomment this to turn on verbose mode.
@@ -15,7 +15,7 @@ CONFIG_FLAGS += \
 	--enable-gnome \
 	--enable-gtk \
 	--disable-familiar \
-	--enable-fb \
+	--disable-fb \
 	--enable-ggi \
 	--enable-sdl \
 	--enable-esd \
