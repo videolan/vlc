@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.96 2002/04/21 11:23:03 gbazin Exp $
+ * $Id: common.h,v 1.97 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -682,7 +682,7 @@ typedef struct module_symbols_s
 
 } module_symbols_t;
 
-#ifdef PLUGIN
+#ifdef __PLUGIN__
 extern module_symbols_t* p_symbols;
 #endif
 

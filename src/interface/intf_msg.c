@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: intf_msg.c,v 1.47 2002/03/20 23:00:15 gbazin Exp $
+ * $Id: intf_msg.c,v 1.48 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -291,10 +291,10 @@ void intf_WarnHexDump( int i_level, void *p_data, int i_size )
 /*****************************************************************************
  * QueueMsg: add a message to a queue
  *****************************************************************************
- * This function provide basic functionnalities to other intf_*Msg functions.
- * It add a message to a queue (after having printed all stored messages if it
- * is full. If the message can't be converted to string in memory, it exit the
- * program. If the queue is not used, it prints the message immediately.
+ * This function provides basic functionnalities to other intf_*Msg functions.
+ * It adds a message to a queue (after having printed all stored messages if it
+ * is full). If the message can't be converted to string in memory, it issues
+ * a warning.
  *****************************************************************************/
 static void QueueMsg( int i_type, int i_level, char *psz_format, va_list ap )
 {
@@ -319,7 +319,7 @@ static void QueueMsg( int i_type, int i_level, char *psz_format, va_list ap )
                 strerror(errno) );
         vfprintf(stderr, psz_format, ap );
         fprintf(stderr, "\n" );
-        exit( errno );
+        return;
     }
 
 #ifndef HAVE_VASPRINTF

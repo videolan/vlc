@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.27 2002/02/19 00:50:18 sam Exp $
+ * $Id: interface.h,v 1.28 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -100,7 +100,7 @@ void            intf_Destroy      ( intf_thread_t * p_intf );
 void            intf_MsgCreate    ( void );
 void            intf_MsgDestroy   ( void );
 
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 intf_subscription_t* intf_MsgSub    ( void );
 void                 intf_MsgUnsub  ( intf_subscription_t * );
 #else

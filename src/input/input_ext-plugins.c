@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.5 2002/04/02 22:46:25 massiot Exp $
+ * $Id: input_ext-plugins.c,v 1.6 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -726,7 +726,7 @@ static __inline__ int NetworkSelect( input_thread_t * p_input )
     i_ret = select( p_access_data->i_handle + 1, &fds,
                      NULL, NULL, &timeout );
  
-    if( i_ret == -1 )
+    if( i_ret == -1 && errno != EINTR )
     {
         intf_ErrMsg( "input error: network select error (%s)", strerror(errno) );
     }

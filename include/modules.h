@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.47 2002/04/19 13:56:10 sam Exp $
+ * $Id: modules.h,v 1.48 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -96,7 +96,7 @@ typedef struct module_bank_s
                                     it is to design thread-safe linked lists */
 } module_bank_t;
 
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 extern module_bank_t *p_module_bank;
 #else
 #   define p_module_bank (p_symbols->p_module_bank)
@@ -335,7 +335,7 @@ typedef struct module_functions_s * p_module_functions_t;
 /*****************************************************************************
  * Exported functions.
  *****************************************************************************/
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 void            module_InitBank     ( void );
 void            module_LoadMain     ( void );
 void            module_LoadBuiltins ( void );

@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: main.h,v 1.33 2002/03/21 07:11:57 gbazin Exp $
+ * $Id: main.h,v 1.34 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -69,7 +69,7 @@ typedef struct main_s
     vlc_mutex_t            config_lock;          /* lock for the config file */
 } main_t;
 
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 extern main_t *p_main;
 #else
 #   define p_main (p_symbols->p_main)

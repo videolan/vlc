@@ -251,8 +251,9 @@ endif
 #
 # C compiler flags: plugins and builtins compilation
 #
-plugins_CFLAGS += -DPLUGIN -I../../include -I../../extras
-builtins_CFLAGS += -DBUILTIN -I../../include -I../../extras
+vlc_CFLAGS += -D__VLC__
+plugins_CFLAGS += -D__PLUGIN__ -I../../include -I../../extras
+builtins_CFLAGS += -D__BUILTIN__ -I../../include -I../../extras
 
 #
 # Linker flags: plugins and builtins linking

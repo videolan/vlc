@@ -2,7 +2,7 @@
  * os_specific.h: OS specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: os_specific.h,v 1.1 2002/04/02 23:43:57 gbazin Exp $
+ * $Id: os_specific.h,v 1.2 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -41,7 +41,7 @@ extern "C" {
  ****************************************************************************/
 struct main_sys_s;
 
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 extern struct main_sys_s *p_main_sys;
 #else
 #   define p_main_sys (p_symbols->p_main_sys)

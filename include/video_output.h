@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.73 2002/04/04 05:08:05 sam Exp $
+ * $Id: video_output.h,v 1.74 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -39,7 +39,7 @@ typedef struct vout_bank_s
 
 } vout_bank_t;
 
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 extern vout_bank_t *p_vout_bank;
 #else
 #   define p_vout_bank (p_symbols->p_vout_bank)
@@ -189,7 +189,7 @@ typedef struct vout_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 void            vout_InitBank       ( void );
 void            vout_EndBank        ( void );
 

@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.45 2002/03/26 23:08:40 gbazin Exp $
+ * $Id: audio_output.h,v 1.46 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -37,7 +37,7 @@ typedef struct aout_bank_s
 
 } aout_bank_t;
 
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 extern aout_bank_t *p_aout_bank;
 #else
 #   define p_aout_bank (p_symbols->p_aout_bank)
@@ -207,7 +207,7 @@ typedef struct aout_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 void            aout_InitBank           ( void );
 void            aout_EndBank            ( void );
 

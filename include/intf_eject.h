@@ -2,7 +2,7 @@
  * intf_eject.h: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.h,v 1.1 2002/01/09 02:01:14 sam Exp $
+ * $Id: intf_eject.h,v 1.2 2002/04/24 00:36:24 sam Exp $
  *
  * Author: Julien Blache <jb@technologeek.org>
  *
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 int intf_Eject( const char * );
 #else
 #   define intf_Eject p_symbols->intf_Eject

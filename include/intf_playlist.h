@@ -2,7 +2,7 @@
  * intf_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_playlist.h,v 1.5 2001/12/30 07:09:54 sam Exp $
+ * $Id: intf_playlist.h,v 1.6 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -69,7 +69,7 @@ typedef struct playlist_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 playlist_t * intf_PlaylistCreate   ( void );
 void         intf_PlaylistInit     ( playlist_t * p_playlist );
 int          intf_PlaylistAdd      ( playlist_t * p_playlist,

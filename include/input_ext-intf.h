@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.64 2002/04/23 14:16:20 sam Exp $
+ * $Id: input_ext-intf.h,v 1.65 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -49,7 +49,7 @@ typedef struct input_bank_s
 
 } input_bank_t;
 
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 extern input_bank_t *p_input_bank;
 #else
 #   define p_input_bank (p_symbols->p_input_bank)
@@ -329,7 +329,7 @@ typedef struct input_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 void   input_InitBank       ( void );
 void   input_EndBank        ( void );
 

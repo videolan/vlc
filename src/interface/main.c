@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.186 2002/04/23 14:16:21 sam Exp $
+ * $Id: main.c,v 1.187 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -89,7 +89,7 @@
  * macros.
  *
  *****************************************************************************/
-#define BUILTIN
+#define __BUILTIN__
 #define MODULE_NAME main
 #include "modules_inner.h"                        /* for configuration stuff */
 
@@ -542,11 +542,18 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 
 
     /* Get the executable name (similar to the basename command) */
-    p_main->psz_arg0 = p_tmp = ppsz_argv[ 0 ];
-    while( *p_tmp )
+    if( i_argc > 0 )
     {
-        if( *p_tmp == '/' ) p_main->psz_arg0 = ++p_tmp;
-        else ++p_tmp;
+        p_main->psz_arg0 = p_tmp = ppsz_argv[ 0 ];
+        while( *p_tmp )
+        {
+            if( *p_tmp == '/' ) p_main->psz_arg0 = ++p_tmp;
+            else ++p_tmp;
+        }
+    }
+    else
+    {
+        p_main->psz_arg0 = "vlc";
     }
 
     /*

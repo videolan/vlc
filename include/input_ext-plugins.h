@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.21 2002/03/04 23:56:37 massiot Exp $
+ * $Id: input_ext-plugins.h,v 1.22 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -38,7 +38,7 @@
 /*****************************************************************************
  * Prototypes from input_programs.c
  *****************************************************************************/
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 int  input_InitStream( struct input_thread_s *, size_t );
 void input_EndStream ( struct input_thread_s * );
 struct pgrm_descriptor_s * input_FindProgram( struct input_thread_s *, u16 );
@@ -73,7 +73,7 @@ int  input_UnselectES( struct input_thread_s *, struct es_descriptor_s * );
 /*****************************************************************************
  * Prototypes from input_dec.c
  *****************************************************************************/
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 //decoder_capabilities_s * input_ProbeDecoder( void );
 vlc_thread_t input_RunDecoder( struct input_thread_s *,
                                struct es_descriptor_s * );
@@ -89,7 +89,7 @@ void input_EscapeAudioDiscontinuity( struct input_thread_s * );
 /*****************************************************************************
  * Prototypes from input_clock.c
  *****************************************************************************/
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 void input_ClockInit( struct pgrm_descriptor_s * );
 int  input_ClockManageControl( struct input_thread_s *,
                                struct pgrm_descriptor_s *, mtime_t );
@@ -104,7 +104,7 @@ mtime_t input_ClockGetTS( struct input_thread_s *,
 /*****************************************************************************
  * Prototypes from input_ext-plugins.h (buffers management)
  *****************************************************************************/
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 void * input_BuffersInit( void );
 void input_BuffersEnd( struct input_buffers_s * );
 struct data_buffer_s * input_NewBuffer( struct input_buffers_s *, size_t );
@@ -283,7 +283,7 @@ typedef struct stream_ps_data_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 void input_ParsePES  ( struct input_thread_s *, struct es_descriptor_s * );
 void input_GatherPES ( struct input_thread_s *, struct data_packet_s *,
                        struct es_descriptor_s *, boolean_t, boolean_t );
@@ -323,7 +323,7 @@ typedef struct input_socket_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 void input_FDClose( struct input_thread_s * );
 ssize_t input_FDRead( input_thread_t *, byte_t *, size_t );
 ssize_t input_FDNetworkRead( input_thread_t *, byte_t *, size_t );

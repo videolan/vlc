@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.15 2002/04/23 14:16:20 sam Exp $
+ * $Id: modules_inner.h,v 1.16 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -38,7 +38,7 @@
  * #define MODULE_STRING "foo"
  * #define MODULE_VAR(blah) "VLC_MODULE_foo_blah"
  *
- * and, if BUILTIN is set, we will also need:
+ * and, if __BUILTIN__ is set, we will also need:
  * #define MODULE_FUNC( zog ) module_foo_zog
  *
  * this can't easily be done with the C preprocessor, thus a few ugly hacks.
@@ -55,7 +55,7 @@
 
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
-#ifdef BUILTIN
+#ifdef __BUILTIN__
 #   define _M( function )          CONCATENATE( function, MODULE_NAME )
 #   define __VLC_SYMBOL( symbol )  CONCATENATE( symbol, MODULE_NAME )
 #   define DECLARE_SYMBOLS         ;

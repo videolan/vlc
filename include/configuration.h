@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.8 2002/04/23 14:16:19 sam Exp $
+ * $Id: configuration.h,v 1.9 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -65,7 +65,7 @@ typedef struct module_config_s
  * Prototypes - these methods are used to get, set or manipulate configuration
  * data.
  *****************************************************************************/
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 int    config_GetIntVariable( const char *psz_name );
 float  config_GetFloatVariable( const char *psz_name );
 char * config_GetPszVariable( const char *psz_name );

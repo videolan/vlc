@@ -9,7 +9,7 @@
  * Functions prototyped are implemented in interface/mtime.c.
  *****************************************************************************
  * Copyright (C) 1996, 1997, 1998, 1999, 2000 VideoLAN
- * $Id: mtime.h,v 1.10 2002/01/29 20:11:18 gbazin Exp $
+ * $Id: mtime.h,v 1.11 2002/04/24 00:36:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -50,7 +50,7 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef PLUGIN
+#ifndef __PLUGIN__
 char *  mstrtime ( char *psz_buffer, mtime_t date );
 mtime_t mdate    ( void );
 void    mwait    ( mtime_t date );

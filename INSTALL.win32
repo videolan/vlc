@@ -128,7 +128,7 @@ Building Win32 interface with bcc32 (Borland's compiler)
 2) From the plugin\win32 directory, use Borland C++ command-line tools
 as follows:
 bpr2mak intfwin.bpr -s \
-  | sed 's#^LIBPATH = .*#&;$$(RELEASELIBPATH)# ; s#^USERDEFINES = .*#& -DWIN32 -DPLUGIN -DMODULE_NAME_IS_intfwin -DMODULE_NAME=intfwin#' \
+  | sed 's#^LIBPATH = .*#&;$$(RELEASELIBPATH)# ; s#^USERDEFINES = .*#& -DWIN32 -D__PLUGIN__ -DMODULE_NAME_IS_intfwin -DMODULE_NAME=intfwin#' \
   > intfwin.mak	        // Create a makefile from intfwin.bpr
 make -fintfwin 		// It's Borland's make utility !
 
