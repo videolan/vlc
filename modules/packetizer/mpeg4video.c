@@ -132,6 +132,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     p_sys->i_pts = 0;
+    p_sys->i_dts = 0;
     p_sys->b_vop = VLC_FALSE;
     p_sys->i_buffer = 0;
     p_sys->i_buffer_size = 0;
