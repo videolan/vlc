@@ -72,6 +72,87 @@ static void PictureTemporalScalableExtension( vpar_thread_t * p_vpar );
 static void CopyrightExtension( vpar_thread_t * p_vpar );
 
 /*
+ * Standard variables
+ */
+
+/*****************************************************************************
+ * pi_default_intra_quant : default quantization matrix
+ *****************************************************************************/
+#ifndef VDEC_DFT
+int pi_default_intra_quant[] =
+{
+    8,  16, 19, 22, 26, 27, 29, 34,
+    16, 16, 22, 24, 27, 29, 34, 37,
+    19, 22, 26, 27, 29, 34, 34, 38,
+    22, 22, 26, 27, 29, 34, 37, 40,
+    22, 26, 27, 29, 32, 35, 40, 48,
+    26, 27, 29, 32, 35, 40, 48, 58,
+    26, 27, 29, 34, 38, 46, 56, 69,
+    27, 29, 35, 38, 46, 56, 69, 83
+};	
+#else
+int pi_default_intra_quant[] =
+{
+    2048,   5681,   6355,   6623,   6656,   5431,   4018,   2401,
+    5681,   7880,   10207,  10021,  9587,   8091,   6534,   3625,
+    6355,   10207,  11363,  10619,  9700,   8935,   6155,   3507,
+    6623,   9186,   10226,  9557,   8730,   8041,   6028,   3322,
+    5632,   9232,   9031,   8730,   8192,   7040,   5542,   3390,
+    5230,   7533,   7621,   7568,   7040,   6321,   5225,   3219,
+    3602,   5189,   5250,   5539,   5265,   5007,   4199,   2638,
+    1907,   2841,   3230,   3156,   3249,   3108,   2638,   1617	
+};
+#endif
+
+/*****************************************************************************
+ * pi_default_nonintra_quant : default quantization matrix
+ *****************************************************************************/
+#ifndef VDEC_DFT
+int pi_default_nonintra_quant[] =
+{
+    16, 16, 16, 16, 16, 16, 16, 16,
+    16, 16, 16, 16, 16, 16, 16, 16,
+    16, 16, 16, 16, 16, 16, 16, 16,
+    16, 16, 16, 16, 16, 16, 16, 16,
+    16, 16, 16, 16, 16, 16, 16, 16,
+    16, 16, 16, 16, 16, 16, 16, 16,
+    16, 16, 16, 16, 16, 16, 16, 16,
+    16, 16, 16, 16, 16, 16, 16, 16
+};
+#else
+int pi_default_nonintra_quanit[] =
+{
+    4096,   5680,   5344,   4816,   4096,   3216,   2224,   1136,
+    5680,   7888,   7424,   6688,   5680,   4464,   3072,   1568,
+    5344,   7424,   6992,   6288,   5344,   4208,   2896,   1472,
+    4816,   6688,   6288,   5664,   4816,   3792,   2608,   1328,
+    4096,   5680,   5344,   4816,   4096,   3216,   2224,   1136,
+    3216,   4464,   4208,   3792,   3216,   2528,   1744,   880,
+    2224,   3072,   2896,   2608,   2224,   1744,   1200,   608,
+    1136,   1568,   1472,   1328,   1136,   880,    608,    304	
+};
+#endif
+
+/*****************************************************************************
+ * pi_scan : zig-zag and alternate scan patterns
+ *****************************************************************************/
+u8 pi_scan[2][64] =
+{
+    { /* Zig-Zag pattern */
+        0,1,8,16,9,2,3,10,17,24,32,25,18,11,4,5,
+        12,19,26,33,40,48,41,34,27,20,13,6,7,14,21,28,
+        35,42,49,56,57,50,43,36,29,22,15,23,30,37,44,51,
+        58,59,52,45,38,31,39,46,53,60,61,54,47,55,62,63
+    },
+    { /* Alternate scan pattern */
+        0,8,16,24,1,9,2,10,17,25,32,40,48,56,57,49,
+        41,33,26,18,3,11,4,12,19,27,34,42,50,58,35,43,
+        51,59,20,28,5,13,6,14,21,29,36,44,52,60,37,45,
+        53,61,22,30,7,15,23,31,38,46,54,62,39,47,55,63
+    }
+};
+
+/*
  * Local inline functions.
  */
 
@@ -352,22 +433,22 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     case CHROMA_420:
         p_vpar->sequence.i_chroma_nb_blocks = 2;
         p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width >> 2;
-        p_vpar->i_chroma_mb_width = 8;
-        p_vpar->i_chroma_mb_height = 8;
+        p_vpar->sequence.i_chroma_mb_width = 8;
+        p_vpar->sequence.i_chroma_mb_height = 8;
         break;
 
     case CHROMA_422:
         p_vpar->sequence.i_chroma_nb_blocks = 4;
         p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width >> 1;
-        p_vpar->i_chroma_mb_width = 8;
-        p_vpar->i_chroma_mb_height = 16;
+        p_vpar->sequence.i_chroma_mb_width = 8;
+        p_vpar->sequence.i_chroma_mb_height = 16;
         break;
 
     case CHROMA_444:
         p_vpar->sequence.i_chroma_nb_blocks = 8;
         p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width;
-        p_vpar->i_chroma_mb_width = 16;
-        p_vpar->i_chroma_mb_height = 16;
+        p_vpar->sequence.i_chroma_mb_width = 16;
+        p_vpar->sequence.i_chroma_mb_height = 16;
     }
 
     /* Slice Header functions */
@@ -928,9 +1009,7 @@ static void PictureSpatialScalableExtension( vpar_thread_t * p_vpar )
 {
     /* That's scalable, so we trash it */
     DumpBits32( &p_vpar->bit_stream );
-    DumpBits( &p_vpar->bit_stream, 14 );
-    p_vpar->picture.i_spatial_temporal_weight_code_table_index = GetBits( &p_vpar->bit_stream, 2 );
-    DumpBits( &p_vpar->bit_stream, 2 );
+    DumpBits( &p_vpar->bit_stream, 16 );
 }
 
 

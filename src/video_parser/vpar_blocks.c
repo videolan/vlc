@@ -47,292 +47,17 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
 static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar );
 static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
                                         macroblock_t * p_mb );
-typedef (void *)    f_decode_block_t( vpar_thread_t *, macroblock_t *, int );
+typedef void (*f_decode_block_t)( vpar_thread_t *, macroblock_t *, int );
 static void vpar_DecodeMPEG1Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b );
 static void vpar_DecodeMPEG1Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b );
 static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b );
 static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b );
 
 /*
- * Standard variables
+ * Initialisation tables
  */
-
-/*****************************************************************************
- * pi_default_intra_quant : default quantization matrix
- *****************************************************************************/
-#ifndef VDEC_DFT
-extern int pi_default_intra_quant =
-{
-    8,  16, 19, 22, 26, 27, 29, 34,
-    16, 16, 22, 24, 27, 29, 34, 37,
-    19, 22, 26, 27, 29, 34, 34, 38,
-    22, 22, 26, 27, 29, 34, 37, 40,
-    22, 26, 27, 29, 32, 35, 40, 48,
-    26, 27, 29, 32, 35, 40, 48, 58,
-    26, 27, 29, 34, 38, 46, 56, 69,
-    27, 29, 35, 38, 46, 56, 69, 83
-}:	
-#else
-extern int pi_default_intra_quant =
-{
-    2048,   5681,   6355,   6623,   6656,   5431,   4018,   2401,
-    5681,   7880,   10207,  10021,  9587,   8091,   6534,   3625,
-    6355,   10207,  11363,  10619,  9700,   8935,   6155,   3507,
-    6623,   9186,   10226,  9557,   8730,   8041,   6028,   3322,
-    5632,   9232,   9031,   8730,   8192,   7040,   5542,   3390,
-    5230,   7533,   7621,   7568,   7040,   6321,   5225,   3219,
-    3602,   5189,   5250,   5539,   5265,   5007,   4199,   2638,
-    1907,   2841,   3230,   3156,   3249,   3108,   2638,   1617	
-};
-#endif
-
-/*****************************************************************************
- * pi_default_nonintra_quant : default quantization matrix
- *****************************************************************************/
-#ifndef VDEC_DFT
-extern int pi_default_nonintra_quant =
-{
-    16, 16, 16, 16, 16, 16, 16, 16,
-    16, 16, 16, 16, 16, 16, 16, 16,
-    16, 16, 16, 16, 16, 16, 16, 16,
-    16, 16, 16, 16, 16, 16, 16, 16,
-    16, 16, 16, 16, 16, 16, 16, 16,
-    16, 16, 16, 16, 16, 16, 16, 16,
-    16, 16, 16, 16, 16, 16, 16, 16,
-    16, 16, 16, 16, 16, 16, 16, 16
-};
-#else
-extern int pi_default_nonintra_quant =
-{
-    4096,   5680,   5344,   4816,   4096,   3216,   2224,   1136,
-    5680,   7888,   7424,   6688,   5680,   4464,   3072,   1568,
-    5344,   7424,   6992,   6288,   5344,   4208,   2896,   1472,
-    4816,   6688,   6288,   5664,   4816,   3792,   2608,   1328,
-    4096,   5680,   5344,   4816,   4096,   3216,   2224,   1136,
-    3216,   4464,   4208,   3792,   3216,   2528,   1744,   880,
-    2224,   3072,   2896,   2608,   2224,   1744,   1200,   608,
-    1136,   1568,   1472,   1328,   1136,   880,    608,    304	
-};
-#endif
-
-/*****************************************************************************
- * pi_scan : zig-zag and alternate scan patterns
- *****************************************************************************/
-extern int pi_scan[2][64] =
-{
-    { /* Zig-Zag pattern */
-        0,1,8,16,9,2,3,10,17,24,32,25,18,11,4,5,
-        12,19,26,33,40,48,41,34,27,20,13,6,7,14,21,28,
-        35,42,49,56,57,50,43,36,29,22,15,23,30,37,44,51,
-        58,59,52,45,38,31,39,46,53,60,61,54,47,55,62,63
-    },
-    { /* Alternate scan pattern */
-        0,8,16,24,1,9,2,10,17,25,32,40,48,56,57,49,
-        41,33,26,18,3,11,4,12,19,27,34,42,50,58,35,43,
-        51,59,20,28,5,13,6,14,21,29,36,44,52,60,37,45,
-        53,61,22,30,7,15,23,31,38,46,54,62,39,47,55,63
-    }
-};
-
-/*
- * Initialization of lookup tables
- */
-
-/*****************************************************************************
- * vpar_InitCrop : Initialize the crop table for saturation
- *                 (ISO/IEC 13818-2 section 7.4.3)
- *****************************************************************************/
-#if defined(MPEG2_COMPLIANT) && !defined(VDEC_DFT)
-void vpar_InitCrop( vpar_thread_t * p_vpar )
-{
-    int i_dummy;
-
-    p_vpar->pi_crop = p_vpar->pi_crop_buf + 32768;
-
-    for( i_dummy = -32768; i_dummy < -2048; i_dummy++ )
-    {
-        p_vpar->pi_crop[i_dummy] = -2048;
-    }
-    for( ; i_dummy < 2047; i_dummy++ )
-    {
-        p_vpar->pi_crop[i_dummy] = i_dummy;
-    }
-    for( ; i_dummy < 32767; i_dummy++ )
-    {
-        p_vpar->pi_crop[i_dummy] = 2047;
-    }
-}
-#endif
-
-/*****************************************************************************
- * InitMbAddrInc : Initialize the lookup table for mb_addr_inc               *
- *****************************************************************************/
-
-/* Fonction for filling up the lookup table for mb_addr_inc */
-void __inline__ FillMbAddrIncTable( vpar_thread_t * p_vpar,
-                                    int i_start, int i_end, int i_step, 
-                                    int * pi_value, int i_length )
-{
-    int i_dummy, i_dummy2;
-    for( i_dummy = i_start, i_dummy < i_end, i_dummy += i_step )
-        for( i_dummy2 = 0, i_dummy2 < i_step, i_dummy2 ++ )
-        {
-            p_vpar->pl_mb_addr_inc[i_dummy + i_dummy2].value = * pi_value;
-            p_vpar->pl_mb_addr_inc[i_dummy + i_dummy2].length = i_length;
-        }
-    i_value --;
-}
-    
-/* Fonction that initialize the table using the last one */
-void InitMbAddrInc( vpar_thread_t * p_vpar )
-{
-    int i_dummy;
-    int *  pi_value;
-    for (i_dummy = 0; i_dummy < 8; i_dummy++)
-    {
-        p_vpar->pl_mb_addr_inc[i_dummy].i_value = MB_ERROR;
-        p_vpar->pl_mb_addr_inc[i_dummy].i_length = 0;
-    }
-
-    p_vpar->pl_mb_addr_inc[8].i_value = MB_ADDRINC_ESCAPE;
-    p_vpar->pl_mb_addr_inc[8].i_length = 11;
-
-    for (i_dummy = 9; i_dummy < 15; i_dummy ++) 
-    {
-        p_vpar->pl_mb_addr_inc[i_dummy].i_value =  MB_ERROR;
-        p_vpar->pl_mb_addr_inc[i_dummy].i_length = 0;
-    }
-
-    p_vpar->pl_mb_addr_inc[15].i_value = MB_ADDRINC_STUFFING;
-    p_vpar->pl_mb_addr_inc[15].i_length = 11;
-
-    for (i = 16; i < 24; i++) 
-    {
-        p_vpar->pl_mb_addr_inc[i_dummy].i_value =  MB_ERROR;
-        p_vpar->pl_mb_addr_inc[i_dummy].i_length = 0;
-    }
-    pi_value = (int *) malloc( sizeof( int ) );
-    * pi_value = 33;
-    FillMbAddrIncTable( p_vpar, 1024, 2048, 1024, pi_value, 1 );
-    FillMbAddrIncTable( p_vpar, 512, 1024, 256, pi_value, 3 );
-    FillMbAddrIncTable( p_vpar, 256, 512, 128, pi_value, 4 );
-    FillMbAddrIncTable( p_vpar, 128, 256, 64, pi_value, 5 );
-    FillMbAddrIncTable( p_vpar, 96, 128, 16, pi_value, 7 );
-    FillMbAddrIncTable( p_vpar, 48, 96, 8, pi_value, 8 );
-    FillMbAddrIncTable( p_vpar, 36, 48, 2, pi_value, 10 );
-    FillMbAddrIncTable( p_vpar, 24, 36, 1, pi_value, 11 );
-}
-/*****************************************************************************
- * InitDCT : Initialize tables giving the length of the dct coefficient
- *           from the vlc code
- *****************************************************************************/
-
-void InitDCTTables( vpar_thread_t * p_vpar )
-{
-    /* Tables are cut in two parts to reduce memory occupation */
-    
-    /* Table B-12, dct_dc_size_luminance, codes 00xxx ... 11110 */
-    p_vpar->pppl_dct_dc_size[0][0] =
-    { {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
-      {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
-      {0, 3}, {0, 3}, {0, 3}, {0, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3},
-      {4, 3}, {4, 3}, {4, 3}, {4, 3}, {5, 4}, {5, 4}, {6, 5}, {MB_ERROR, 0}
-    };
-
-    /* Table B-12, dct_dc_size_luminance, codes 111110xxx ... 111111111 */
-    p_vpar->pppl_dct_dc_lum_size[1][0] =
-    { {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6},
-      {8, 7}, {8, 7}, {8, 7}, {8, 7}, {9, 8}, {9, 8}, {10,9}, {11,9}
-      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
-      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
-      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
-      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}
-    };
-
-    /* Table B-13, dct_dc_size_chrominance, codes 00xxx ... 11110 */
-    p_vpar->pppl_dct_dc_chrom_size[0][1] =
-    { {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2},
-      {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
-      {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
-      {3, 3}, {3, 3}, {3, 3}, {3, 3}, {4, 4}, {4, 4}, {5, 5}, {MB_ERROR, 0}
-    };
-
-    /* Table B-13, dct_dc_size_chrominance, codes 111110xxxx ... 1111111111 */
-    p_vpar->pppl_dct_dc_size[1][1] =
-    { {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
-      {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
-      {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7},
-      {8, 8}, {8, 8}, {8, 8}, {8, 8}, {9, 9}, {9, 9}, {10,10}, {11,10}
-    };
-    
-}
-
-/*****************************************************************************
- * Init*MBType : Initialize lookup table for the Macroblock type             *
- * ***************************************************************************/
-
-/* Fonction for filling up the tables */
-static void __inline__ FillMBType( vpar_thread_t * p_vpar,
-                                   int           i_mb_type,
-                                   int           i_start,
-                                   int           i_end,
-                                   int           i_value,
-                                   int           i_length )
-{
-    int i_dummy;
-    for( i_dummy = i_start, i_dummy < i_end, i++ )
-    {
-        p_vpar->pm_mb_type[i_mb_type][i_dummy].i_value = i_value;
-        p_vpar->pm_mb_type[i_mb_type][i_dummy].i_length = i_length;
-    }
-}
-
-/* Fonction that fills the table for P MB_Type */
-void InitPMBType( vpar_thread_t * p_vpar )
-{
-    FillMBType( p_vpar, 0, 32, 64, MB_MOTION_FORWARD|MB_PATTERN, 1 );
-    FillMBType( p_vpar, 0, 16, 32, MB_PATTERN, 2 );
-    FillMBType( p_vpar, 0, 8, 16, MB_MOTION_FORWARD, 3 );
-    FillMBType( p_vpar, 0, 6, 8, MB_INTRA, 5 );
-    FillMBType( p_vpar, 0, 4, 6, MB_QUANT|MB_MOTION_FORWARD|PATTERN, 5 );
-    FillMBType( p_vpar, 0, 2, 4, MB_QUANT|MB_PATTERN, 5 );
-    p_vpar->pm_mb_type[0][1].i_value = MB_QUANT|MB_INTRA;
-    p_vpar->pm_mb_type[0][1].i_length = 6;
-    p_vpar->pm_mb_type[0][0].i_value = MB_ERROR;
-    p_vpar->pm_mb_type[0][0].i_length = 0;
-}
-
-/* Fonction that fills the table for B MB_Type */
-void InitBMBType( vpar_thread_t * p_vpar )
-{
-    FillMBType( p_vpar, 1, 48, 64, MB_MOTION_FORWARD
-                                  |MB_MOTION_BACKWARD|MB_PATTERN, 2 );
-    FillMBType( p_vpar, 1, 32, 48, MB_MOTION_FORWARD|MB_MOTION_BACKWARD, 2 );
-    FillMBType( p_vpar, 1, 24, 32, MB_MOTION_BACKWARD|MB_PATTERN, 3 );
-    FillMBType( p_vpar, 1, 16, 24, MB_MOTION_BACKWARD, 3 );
-    FillMBType( p_vpar, 1, 12, 16, MB_MOTION_FORWARD|MB_PATTERN, 4 );
-    FillMBType( p_vpar, 1, 8, 12, MB_MOTION_FORWARD, 4 );
-    FillMBType( p_vpar, 1, 6, 8, MB_INTRA, 5 );
-    FillMBType( p_vpar, 1, 4, 6, MB_QUANT|MB_MOTION_FORWARD
-                                |MB_MOTION_BACKWARD|MB_PATTERN, 5 );
-    p_vpar->pm_mb_type[1][3].i_value = MB_QUANT|MB_MOTION_FORWARD|MB_PATTERN
-    p_vpar->pm_mb_type[1][3].i_length = 6;
-    p_vpar->pm_mb_type[1][2].i_value = MB_QUANT|MB_MOTION_BACKWARD|MB_PATTERN;
-    p_vpar->pm_mb_type[1][2].i_length = 6;
-    p_vpar->pm_mb_type[1][1].i_value = MB_QUANT|MB_INTRA;
-    p_vpar->pm_mb_type[1][1].i_length = 6;
-    p_vpar->pm_mb_type[1][0].i_value =MB_ERROR;
-    p_vpar->pm_mb_type[1][0].i_length = 0;
-}
-
-/*****************************************************************************
- * InitCodedPattern : Initialize the lookup table for decoding 
- *                    coded block pattern
- *****************************************************************************/
-void InitCodedPattern( vpar_thread_t * p_vpar )
-{
-    p_vpar->pl_coded_pattern = 
-    { {(unsigned int)ERROR, 0}, {(unsigned int)ERROR, 0}, {39, 9}, {27, 9}, {59, 9}, {55, 9}, {47, 9}, {31, 9},
+lookup_t pl_coded_pattern_init_table[512] = 
+    { {MB_ERROR, 0}, {MB_ERROR, 0}, {39, 9}, {27, 9}, {59, 9}, {55, 9}, {47, 9}, {31, 9},
     {58, 8}, {58, 8}, {54, 8}, {54, 8}, {46, 8}, {46, 8}, {30, 8}, {30, 8},
     {57, 8}, {57, 8}, {53, 8}, {53, 8}, {45, 8}, {45, 8}, {29, 8}, {29, 8},
     {38, 8}, {38, 8}, {26, 8}, {26, 8}, {37, 8}, {37, 8}, {25, 8}, {25, 8},
@@ -396,6 +121,209 @@ void InitCodedPattern( vpar_thread_t * p_vpar )
     {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
     {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
     {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3} };
+
+
+/*
+ * Initialization of lookup tables
+ */
+
+/*****************************************************************************
+ * vpar_InitCrop : Initialize the crop table for saturation
+ *                 (ISO/IEC 13818-2 section 7.4.3)
+ *****************************************************************************/
+#if defined(MPEG2_COMPLIANT) && !defined(VDEC_DFT)
+void vpar_InitCrop( vpar_thread_t * p_vpar )
+{
+    int i_dummy;
+
+    p_vpar->pi_crop = p_vpar->pi_crop_buf + 32768;
+
+    for( i_dummy = -32768; i_dummy < -2048; i_dummy++ )
+    {
+        p_vpar->pi_crop[i_dummy] = -2048;
+    }
+    for( ; i_dummy < 2047; i_dummy++ )
+    {
+        p_vpar->pi_crop[i_dummy] = i_dummy;
+    }
+    for( ; i_dummy < 32767; i_dummy++ )
+    {
+        p_vpar->pi_crop[i_dummy] = 2047;
+    }
+}
+#endif
+
+/*****************************************************************************
+ * InitMbAddrInc : Initialize the lookup table for mb_addr_inc               *
+ *****************************************************************************/
+
+/* Fonction for filling up the lookup table for mb_addr_inc */
+void __inline__ FillMbAddrIncTable( vpar_thread_t * p_vpar,
+                                    int i_start, int i_end, int i_step, 
+                                    int * pi_value, int i_length )
+{
+    int i_dummy, i_dummy2;
+    for( i_dummy = i_start ; i_dummy < i_end ; i_dummy += i_step )
+        for( i_dummy2 = 0 ; i_dummy2 < i_step ; i_dummy2 ++ )
+        {
+            p_vpar->pl_mb_addr_inc[i_dummy + i_dummy2].i_value = * pi_value;
+            p_vpar->pl_mb_addr_inc[i_dummy + i_dummy2].i_length = i_length;
+        }
+    (*pi_value)--;
+}
+    
+/* Fonction that initialize the table using the last one */
+void InitMbAddrInc( vpar_thread_t * p_vpar )
+{
+    int i_dummy;
+    int *  pi_value;
+    for( i_dummy = 0 ; i_dummy < 8 ; i_dummy++ )
+    {
+        p_vpar->pl_mb_addr_inc[i_dummy].i_value = MB_ERROR;
+        p_vpar->pl_mb_addr_inc[i_dummy].i_length = 0;
+    }
+
+    p_vpar->pl_mb_addr_inc[8].i_value = MB_ADDRINC_ESCAPE;
+    p_vpar->pl_mb_addr_inc[8].i_length = 11;
+
+    for( i_dummy = 9 ; i_dummy < 15 ; i_dummy ++ ) 
+    {
+        p_vpar->pl_mb_addr_inc[i_dummy].i_value =  MB_ERROR;
+        p_vpar->pl_mb_addr_inc[i_dummy].i_length = 0;
+    }
+
+    p_vpar->pl_mb_addr_inc[15].i_value = MB_ADDRINC_STUFFING;
+    p_vpar->pl_mb_addr_inc[15].i_length = 11;
+
+    for( i_dummy = 16; i_dummy < 24; i_dummy++ ) 
+    {
+        p_vpar->pl_mb_addr_inc[i_dummy].i_value =  MB_ERROR;
+        p_vpar->pl_mb_addr_inc[i_dummy].i_length = 0;
+    }
+    pi_value = (int *) malloc( sizeof( int ) );
+    * pi_value = 33;
+    FillMbAddrIncTable( p_vpar, 1024, 2048, 1024, pi_value, 1 );
+    FillMbAddrIncTable( p_vpar, 512, 1024, 256, pi_value, 3 );
+    FillMbAddrIncTable( p_vpar, 256, 512, 128, pi_value, 4 );
+    FillMbAddrIncTable( p_vpar, 128, 256, 64, pi_value, 5 );
+    FillMbAddrIncTable( p_vpar, 96, 128, 16, pi_value, 7 );
+    FillMbAddrIncTable( p_vpar, 48, 96, 8, pi_value, 8 );
+    FillMbAddrIncTable( p_vpar, 36, 48, 2, pi_value, 10 );
+    FillMbAddrIncTable( p_vpar, 24, 36, 1, pi_value, 11 );
+}
+/*****************************************************************************
+ * InitDCT : Initialize tables giving the length of the dct coefficient
+ *           from the vlc code
+ *****************************************************************************/
+
+void InitDCTTables( vpar_thread_t * p_vpar )
+{
+#if 0
+    /* Tables are cut in two parts to reduce memory occupation */
+    
+    /* Table B-12, dct_dc_size_luminance, codes 00xxx ... 11110 */
+    p_vpar->pppl_dct_dc_size[0][0] =
+    { {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
+      {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
+      {0, 3}, {0, 3}, {0, 3}, {0, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3},
+      {4, 3}, {4, 3}, {4, 3}, {4, 3}, {5, 4}, {5, 4}, {6, 5}, {MB_ERROR, 0}
+    };
+
+    /* Table B-12, dct_dc_size_luminance, codes 111110xxx ... 111111111 */
+    p_vpar->pppl_dct_dc_lum_size[1][0] =
+    { {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6},
+      {8, 7}, {8, 7}, {8, 7}, {8, 7}, {9, 8}, {9, 8}, {10,9}, {11,9}
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}
+    };
+
+    /* Table B-13, dct_dc_size_chrominance, codes 00xxx ... 11110 */
+    p_vpar->pppl_dct_dc_chrom_size[0][1] =
+    { {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2},
+      {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
+      {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
+      {3, 3}, {3, 3}, {3, 3}, {3, 3}, {4, 4}, {4, 4}, {5, 5}, {MB_ERROR, 0}
+    };
+
+    /* Table B-13, dct_dc_size_chrominance, codes 111110xxxx ... 1111111111 */
+    p_vpar->pppl_dct_dc_size[1][1] =
+    { {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
+      {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
+      {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7},
+      {8, 8}, {8, 8}, {8, 8}, {8, 8}, {9, 9}, {9, 9}, {10,10}, {11,10}
+    };
+#endif
+}
+
+/*****************************************************************************
+ * Init*MBType : Initialize lookup table for the Macroblock type
+ * ***************************************************************************/
+
+/* Fonction for filling up the tables */
+static void __inline__ FillMBType( vpar_thread_t * p_vpar,
+                                   int           i_mb_type,
+                                   int           i_start,
+                                   int           i_end,
+                                   int           i_value,
+                                   int           i_length )
+{
+    int i_dummy;
+    
+    for( i_dummy = i_start ; i_dummy < i_end ; i_dummy++ )
+    {
+        p_vpar->pl_mb_type[i_mb_type][i_dummy].i_value = i_value;
+        p_vpar->pl_mb_type[i_mb_type][i_dummy].i_length = i_length;
+    }
+}
+
+/* Fonction that fills the table for P MB_Type */
+void InitPMBType( vpar_thread_t * p_vpar )
+{
+    FillMBType( p_vpar, 0, 32, 64, MB_MOTION_FORWARD|MB_PATTERN, 1 );
+    FillMBType( p_vpar, 0, 16, 32, MB_PATTERN, 2 );
+    FillMBType( p_vpar, 0, 8, 16, MB_MOTION_FORWARD, 3 );
+    FillMBType( p_vpar, 0, 6, 8, MB_INTRA, 5 );
+    FillMBType( p_vpar, 0, 4, 6, MB_QUANT|MB_MOTION_FORWARD|MB_PATTERN, 5 );
+    FillMBType( p_vpar, 0, 2, 4, MB_QUANT|MB_PATTERN, 5 );
+    p_vpar->pl_mb_type[0][1].i_value = MB_QUANT|MB_INTRA;
+    p_vpar->pl_mb_type[0][1].i_length = 6;
+    p_vpar->pl_mb_type[0][0].i_value = MB_ERROR;
+    p_vpar->pl_mb_type[0][0].i_length = 0;
+}
+
+/* Fonction that fills the table for B MB_Type */
+void InitBMBType( vpar_thread_t * p_vpar )
+{
+    FillMBType( p_vpar, 1, 48, 64, MB_MOTION_FORWARD
+                                  |MB_MOTION_BACKWARD|MB_PATTERN, 2 );
+    FillMBType( p_vpar, 1, 32, 48, MB_MOTION_FORWARD|MB_MOTION_BACKWARD, 2 );
+    FillMBType( p_vpar, 1, 24, 32, MB_MOTION_BACKWARD|MB_PATTERN, 3 );
+    FillMBType( p_vpar, 1, 16, 24, MB_MOTION_BACKWARD, 3 );
+    FillMBType( p_vpar, 1, 12, 16, MB_MOTION_FORWARD|MB_PATTERN, 4 );
+    FillMBType( p_vpar, 1, 8, 12, MB_MOTION_FORWARD, 4 );
+    FillMBType( p_vpar, 1, 6, 8, MB_INTRA, 5 );
+    FillMBType( p_vpar, 1, 4, 6, MB_QUANT|MB_MOTION_FORWARD
+                                |MB_MOTION_BACKWARD|MB_PATTERN, 5 );
+    p_vpar->pl_mb_type[1][3].i_value = MB_QUANT|MB_MOTION_FORWARD|MB_PATTERN;
+    p_vpar->pl_mb_type[1][3].i_length = 6;
+    p_vpar->pl_mb_type[1][2].i_value = MB_QUANT|MB_MOTION_BACKWARD|MB_PATTERN;
+    p_vpar->pl_mb_type[1][2].i_length = 6;
+    p_vpar->pl_mb_type[1][1].i_value = MB_QUANT|MB_INTRA;
+    p_vpar->pl_mb_type[1][1].i_length = 6;
+    p_vpar->pl_mb_type[1][0].i_value =MB_ERROR;
+    p_vpar->pl_mb_type[1][0].i_length = 0;
+}
+
+/*****************************************************************************
+ * InitCodedPattern : Initialize the lookup table for decoding 
+ *                    coded block pattern
+ *****************************************************************************/
+void InitCodedPattern( vpar_thread_t * p_vpar )
+{
+    memcpy( p_vpar->pl_coded_pattern, pl_coded_pattern_init_table ,
+            sizeof(pl_coded_pattern_init_table) );
 }
 
 /*
@@ -453,7 +381,7 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
         }
 
         InitMacroblock( p_vpar, p_mb );
-
+       
         /* No IDCT nor AddBlock. */
         for( i_b = 0; i_b < 12; i_b++ )
         {
@@ -464,6 +392,10 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
         /* Motion type is picture structure. */
         p_mb->pf_motion = pf_motion_skipped[p_vpar->picture.i_structure];
 
+        /* Set the field we use for motion compensation */
+        p_mb->ppi_field_select[0][0] = p_mb->ppi_field_select[0][1]
+                                     = ( p_vpar->picture.i_current_structure == BOTTOM_FIELD );
+        
         /* Predict from field of same parity. */
         /* ??? */
     }
@@ -489,12 +421,12 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
 
     if( p_vpar->mb.i_mb_type & MB_MOTION_FORWARD )
     {
-        (*p_vpar->sequence.pf_decode_mv)( p_vpar, 0 );
+        (*p_vpar->sequence.pf_decode_mv)( p_vpar, p_mb, 0 );
     }
 
     if( p_vpar->mb.i_mb_type & MB_MOTION_BACKWARD )
     {
-        (*p_vpar->sequence.pf_decode_mv)( p_vpar, 1 );
+        (*p_vpar->sequence.pf_decode_mv)( p_vpar, p_mb, 1 );
     }
 
     if( p_vpar->picture.b_concealment_mv && (p_vpar->mb.i_mb_type & MB_INTRA) )
@@ -523,10 +455,10 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
     i_mask = 1 << (3 + 2*p_vpar->sequence.i_chroma_nb_blocks);
 
     /* luminance */
-    p_data1 = p_mb->p_picture->p_y
-              + p_mb->i_l_x + p_mb->i_l_y*(p_vpar->sequence.i_width);
+    p_data1 = (elem_t*) p_mb->p_picture->p_y;
+             // + p_mb->i_l_x + p_mb->i_l_y*(p_vpar->sequence.i_width);
 
-    for( i_b = 0; i_b < 4; i_b++, i_mask >>= 1 )
+    for( i_b = 0 ; i_b < 4 ; i_b++, i_mask >>= 1 )
     {
         if( p_vpar->mb.i_coded_block_pattern & i_mask )
         {
@@ -552,12 +484,12 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
     }
 
     /* chrominance U */
-    p_data1 = p_mb->p_picture->p_u
-              + p_mb->i_c_x >> pi_chroma_hor[p_vpar->sequence.i_chroma_format]
+    p_data1 = (elem_t*) p_mb->p_picture->p_u
+              + (p_mb->i_c_x >> pi_chroma_hor[p_vpar->sequence.i_chroma_format])
               + (p_mb->i_c_y >> pi_chroma_ver[p_vpar->sequence.i_chroma_format])
                 * (p_vpar->sequence.i_chroma_width);
-    p_data2 = p_mb->p_picture->p_v
-              + p_mb->i_c_x >> pi_chroma_hor[p_vpar->sequence.i_chroma_format]
+    p_data2 = (elem_t*) p_mb->p_picture->p_v
+              + (p_mb->i_c_x >> pi_chroma_hor[p_vpar->sequence.i_chroma_format])
               + (p_mb->i_c_y >> pi_chroma_ver[p_vpar->sequence.i_chroma_format])
                 * (p_vpar->sequence.i_chroma_width);
 
@@ -603,17 +535,6 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
         /* Reset MV predictors. */
         bzero( p_vpar->slice.pppi_pmv, 8*sizeof(int) );
     }
-
-    if( (p_vpar->picture.i_coding_type == P_CODING_TYPE) &&
-        !(p_vpar->mb.i_mb_type & (MB_MOTION_FORWARD|MB_INTRA)) )
-    {
-        /* Special No-MC macroblock in P pictures (7.6.3.5). */
-        p_vpar->slice.pppi_pmv[0][0][0] = p_vpar->slice.pppi_pmv[0][0][1] =
-        p_vpar->slice.pppi_pmv[1][0][0] = p_vpar->slice.pppi_pmv[1][0][1] = 0;
-        
-        /* motion type ?????? */
-        /* predict from field of same parity ????? */
-    }
 }
 
 /*****************************************************************************
@@ -622,6 +543,9 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
 static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
                                        macroblock_t * p_mb )
 {
+    static f_chroma_motion_t pf_chroma_motion[4] =
+    { NULL, vdec_Motion420, vdec_Motion422, vdec_Motion444 };
+    
     p_mb->p_picture = p_vpar->picture.p_picture;
     p_mb->i_structure = p_vpar->picture.i_structure;
     p_mb->i_l_x = p_vpar->mb.i_l_x;
@@ -629,7 +553,11 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
     p_mb->i_c_x = p_vpar->mb.i_c_x;
     p_mb->i_c_y = p_vpar->mb.i_c_y;
     p_mb->i_chroma_nb_blocks = p_vpar->sequence.i_chroma_nb_blocks;
+    p_mb->pf_chroma_motion = pf_chroma_motion[p_vpar->sequence.i_chroma_format];
 
+    p_mb->p_forward = p_vpar->sequence.p_forward;
+    p_mb->p_backward = p_vpar->sequence.p_backward;
+    
     p_mb->i_addb_l_stride = p_mb->i_l_stride = p_vpar->picture.i_l_stride;
     p_mb->i_addb_c_stride = p_mb->i_c_stride = p_vpar->picture.i_c_stride;
 
@@ -653,7 +581,7 @@ static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
 {
     /* Index in the lookup table mb_addr_inc */
     int    i_index = ShowBits( &p_vpar->bit_stream, 11 );
-    p_vpar->pl_mb.i_addr_inc = 0;
+    p_vpar->mb.i_addr_inc = 0;
     /* Test the presence of the escape character */
     while( i_index == 8 )
     {
@@ -662,7 +590,7 @@ static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
         i_index = ShowBits( &p_vpar->bit_stream, 11 );
     }
     /* Affect the value from the lookup table */
-    p_vpar->pl_mb.i_addr_inc += p_vpar->pl_mb_addr_inc[i_index].i_value;
+    p_vpar->mb.i_addr_inc += p_vpar->pl_mb_addr_inc[i_index].i_value;
     /* Dump the good number of bits */
     DumpBits( &p_vpar->bit_stream, p_vpar->pl_mb_addr_inc[i_index].i_length );
 }
@@ -680,15 +608,24 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
     static int          ppi_mv_format[2][4] = { {0, 1, 1, 1}, {0, 1, 2, 1} };
 
     /* Get macroblock_type. */
-    p_vpar->mb.i_mb_type = (p_vpar->picture.pf_macroblock_type)
-                                  ( vpar_thread_t * p_vpar );
+    p_vpar->mb.i_mb_type = (p_vpar->picture.pf_macroblock_type)( p_vpar );
 
     /* SCALABILITY : warning, we don't know if spatial_temporal_weight_code
      * has to be dropped, take care if you use scalable streams. */
     /* DumpBits( &p_vpar->bit_stream, 2 ); */
     
-    if( !(p_vpar->mb.i_mb_type & (MB_MOTION_FORWARD | MB_MOTION_BACKWARD))
-        || p_vpar->picture.b_frame_pred_frame_dct )
+    if( (p_vpar->picture.i_coding_type == P_CODING_TYPE) &&
+        !(p_vpar->mb.i_mb_type & (MB_MOTION_FORWARD|MB_INTRA)) )
+    {
+        /* Special No-MC macroblock in P pictures (7.6.3.5). */
+        memset( p_vpar->slice.pppi_pmv, 0, 8*sizeof(int) );
+        memset( p_mb->pppi_motion_vectors, 0, 8*sizeof(int) );
+        
+        p_vpar->mb.i_motion_type = MOTION_FRAME;
+        p_mb->ppi_field_select[0][0] = ( p_vpar->picture.i_current_structure == BOTTOM_FIELD );
+    }
+    else if( !(p_vpar->mb.i_mb_type & (MB_MOTION_FORWARD | MB_MOTION_BACKWARD))
+             || p_vpar->picture.b_frame_pred_frame_dct )
     {
         /* If mb_type has neither MOTION_FORWARD nor MOTION_BACKWARD, this
          * is useless, but also harmless. */
@@ -699,8 +636,17 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
         p_vpar->mb.i_motion_type = GetBits( &p_vpar->bit_stream, 2 );
     }
 
-    p_mb->pf_motion = pf_motion[p_vpar->picture.b_frame_structure]
-                              [p_vpar->mb.i_motion_type];
+     if( p_vpar->mb.i_mb_type & MB_INTRA )
+    {
+        /* For the intra macroblocks, we use an empty motion
+         * compensation function */
+        p_mb->pf_motion = vdec_DummyRecon;
+    }
+    else
+    {
+        p_mb->pf_motion = pf_motion[p_vpar->picture.b_frame_structure]
+                                   [p_vpar->mb.i_motion_type];
+    }
     p_vpar->mb.i_mv_count = ppi_mv_count[p_vpar->picture.b_frame_structure]
                                         [p_vpar->mb.i_motion_type];
     p_vpar->mb.i_mv_format = ppi_mv_format[p_vpar->picture.b_frame_structure]
@@ -718,7 +664,7 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
             p_mb->i_addb_l_stride <<= 1;
 	    p_mb->i_addb_l_stride += 8;
             /* With CHROMA_420, the DCT is necessarily frame-coded. */
-            if( p_vpar->picture.sequence.i_chroma_format != CHROMA_420 )
+            if( p_vpar->sequence.i_chroma_format != CHROMA_420 )
             {
 	        p_mb->i_addb_c_stride <<= 1;
 	        p_mb->i_addb_c_stride += 8;
@@ -743,7 +689,7 @@ int vpar_IMBType( vpar_thread_t * p_vpar )
                                           {MB_INTRA, 2} };
     /* Dump the good number of bits */
     DumpBits( &p_vpar->bit_stream, pl_mb_Itype[i_type].i_length );
-    return pl_mb_Itype[i_type];
+    return pl_mb_Itype[i_type].i_value;
 }
 
 /*****************************************************************************
@@ -754,9 +700,9 @@ int vpar_PMBType( vpar_thread_t * p_vpar )
     /* Testing on 6 bits */
     int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
     /* Dump the good number of bits */
-    DumpBits( &p_vpar->bit_stream, p_vpar->pm_mb_type[0][i_type].i_length );
+    DumpBits( &p_vpar->bit_stream, p_vpar->pl_mb_type[0][i_type].i_length );
     /* return the value from the lookup table for P type */
-    return p_vpar->pm_mb_type[0][i_type].i_value;
+    return p_vpar->pl_mb_type[0][i_type].i_value;
 }
 
 /*****************************************************************************
@@ -767,9 +713,9 @@ int vpar_BMBType( vpar_thread_t * p_vpar )
      /* Testing on 6 bits */
     int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
     /* Dump the good number of bits */
-    DumpBits( &p_vpar->bit_stream, p_vpar->pm_mb_type[1][i_type].i_length );
+    DumpBits( &p_vpar->bit_stream, p_vpar->pl_mb_type[1][i_type].i_length );
     /* return the value from the lookup table for B type */
-    return p_vpar->pm_mb_type[1][i_type].i_value;
+    return p_vpar->pl_mb_type[1][i_type].i_value;
 }
 
 /*****************************************************************************
@@ -789,8 +735,8 @@ int vpar_DMBType( vpar_thread_t * p_vpar )
  *****************************************************************************/
 int vpar_CodedPattern420( vpar_thread_t * p_vpar )
 {
-    int      i_vlc = ShowBits( p_vpar->bit_stream, 9 );
-    DumpBits( p_vpar->bit_stream, p_vpar->pl_coded_pattern[i_vlc].i_length );
+    int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
+    DumpBits( &p_vpar->bit_stream, p_vpar->pl_coded_pattern[i_vlc].i_length );
     return p_vpar->pl_coded_pattern[i_vlc].i_value;
 }
 
@@ -881,11 +827,11 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
     i_dct_dc_size = p_vpar->pppl_dct_dc_size[i_select][i_type][i_pos].i_value;
     /* Dump the variable length code */
     DumpBits( &p_vpar->bit_stream, 
-              pppl_dct_dc_size[i_select][i_type][i_pos].i_length );
-    i_dct_diff = GetBits( &p_vpar->bit_stream, i_dct_dc_size );
-    p_vpar->slice.pi_dct_dc_pred[i_cc] += i_dct_diff;
+              p_vpar->pppl_dct_dc_size[i_select][i_type][i_pos].i_length );
+    i_dct_dc_diff = GetBits( &p_vpar->bit_stream, i_dct_dc_size );
+    p_vpar->slice.pi_dc_dct_pred[i_cc] += i_dct_dc_diff;
     
     /* Decoding of the AC coefficients */
-    int        i_dummy = 1;
+    //int        i_dummy = 1;
     
 }

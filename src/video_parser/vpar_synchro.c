@@ -46,8 +46,8 @@
 /*****************************************************************************
  * vpar_SynchroChoose : Decide whether we will decode a picture or not
  *****************************************************************************/
-void vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
-                         int i_structure )
+boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
+                              int i_structure )
 {
 
 }

@@ -94,7 +94,7 @@ vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
     p_vpar->bit_stream.fifo.i_available = 0;
 
     /* Spawn the video parser thread */
-    if ( vlc_thread_create(&p_vpar->thread_id, "video parser", (vlc_thread_func)RunThread, (void *)p_vpar) )
+    if ( vlc_thread_create(&p_vpar->thread_id, "video parser", (vlc_thread_func_t)RunThread, (void *)p_vpar) )
     {
         intf_ErrMsg("vpar error: can't spawn video parser thread\n");
         free( p_vpar );
