@@ -6,6 +6,7 @@ SOURCES_a52tospdif = modules/audio_filter/converter/a52tospdif.c
 SOURCES_a52tofloat32 = modules/audio_filter/converter/a52tofloat32.c
 SOURCES_dtstospdif = modules/audio_filter/converter/dtstospdif.c
 SOURCES_fixed32tos16 = modules/audio_filter/converter/fixed32tos16.c
+SOURCES_s16tofixed32 = modules/audio_filter/converter/s16tofixed32.c
 SOURCES_fixed32tofloat32 = modules/audio_filter/converter/fixed32tofloat32.c
 SOURCES_s16tofloat32 = modules/audio_filter/converter/s16tofloat32.c
 SOURCES_s16tofloat32swab = modules/audio_filter/converter/s16tofloat32swab.c
