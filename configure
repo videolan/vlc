@@ -7580,7 +7580,7 @@ if test "${enable_macosx+set}" = set; then
   if test x$enable_macosx = xyes
    then
      BUILTINS="${BUILTINS} macosx"
-     macosx_LDFLAGS="${macosx_LDFLAGS} -framework CoreAudio -framework AudioToolbox -framework Cocoa -framework AGL -framework QuickTime -lobjc"
+     macosx_LDFLAGS="${macosx_LDFLAGS} -framework CoreAudio -framework AudioToolbox -framework IOKit -framework Cocoa -framework AGL -framework QuickTime -lobjc"
      macosx_CFLAGS="${macosx_CFLAGS} -ObjC"
      LDFLAGS="${LDFLAGS} -ObjC"
    fi
@@ -7620,7 +7620,7 @@ if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
 #define $ac_tr_hdr 1
 EOF
  BUILTINS="${BUILTINS} macosx"
-     macosx_LDFLAGS="${macosx_LDFLAGS} -framework CoreAudio -framework AudioToolbox -framework Cocoa -framework AGL -framework QuickTime -lobjc"
+     macosx_LDFLAGS="${macosx_LDFLAGS} -framework CoreAudio -framework AudioToolbox -framework IOKit -framework Cocoa -framework AGL -framework QuickTime -lobjc"
      macosx_CFLAGS="${macosx_CFLAGS} -ObjC"
      LDFLAGS="${LDFLAGS} -ObjC"
    
