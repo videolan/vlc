@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.6 2003/06/10 11:43:40 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.7 2003/06/11 10:42:34 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -42,7 +42,7 @@
 int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                  vlc_value_t old_val, vlc_value_t new_val, void *param );
 
-#ifdef BASIC_SKINS
+#if defined(MODULE_NAME_IS_basic_skins)
 
 // Constructor
 Dialogs::Dialogs( intf_thread_t *_p_intf ){}
@@ -56,7 +56,7 @@ void Dialogs::ShowPrefs(){}
 void Dialogs::ShowFileInfo(){}
 void Dialogs::ShowPopup(){}
 
-#else // BASIC_SKINS
+#else // !MODULE_NAME_IS_basic_skins
 
 #include "../../wxwindows/wxwindows.h"
 #include "share/vlc32x32.xpm"       // include the graphic icon
@@ -413,7 +413,7 @@ void Dialogs::OnExitThread( wxCommandEvent& event )
 {
     wxTheApp->ExitMainLoop();
 }
-#endif // BASIC_SKINS
+#endif // MODULE_NAME_IS_basic_skins
 
 /*****************************************************************************
  * PopupMenuCB: callback triggered by the intf-popupmenu playlist variable.
@@ -423,11 +423,11 @@ void Dialogs::OnExitThread( wxCommandEvent& event )
 int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                  vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
-#ifndef BASIC_SKINS
+#if !defined(MODULE_NAME_IS_basic_skins)
     Dialogs *p_dialogs = (Dialogs *)param;
 
     p_dialogs->ShowPopup();
-#endif // BASIC_SKINS
+#endif
 
     return VLC_SUCCESS;
 }

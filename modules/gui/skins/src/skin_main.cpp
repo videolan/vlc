@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.36 2003/06/09 21:14:17 asmax Exp $
+ * $Id: skin_main.cpp,v 1.37 2003/06/11 10:42:34 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -29,7 +29,7 @@
 #include <vlc/aout.h>
 
 //--- GENERAL ---------------------------------------------------------------
-#ifndef BASIC_SKINS
+#if !defined(MODULE_NAME_IS_basic_skins)
 #ifdef WIN32                                               /* mingw32 hack */
 #   undef Yield
 #   undef CreateDialog
@@ -51,7 +51,7 @@
 #include "skin_common.h"
 #include "dialogs.h"
 
-#ifndef BASIC_SKINS
+#if !defined(MODULE_NAME_IS_basic_skins)
 #include "../../wxwindows/wxwindows.h"
 #endif
 
@@ -218,7 +218,7 @@ static void Run( intf_thread_t *p_intf )
 
     int a = OSAPI_GetTime();
 
-#ifndef BASIC_SKINS
+#if !defined(MODULE_NAME_IS_basic_skins)
     // Initialize the dialog boxes
     p_intf->p_sys->p_dialogs = new Dialogs( p_intf );
     if( !p_intf->p_sys->p_dialogs ||
@@ -255,7 +255,7 @@ static void Run( intf_thread_t *p_intf )
         if( !Loader->Load( user_skin ) && !Loader->Load( default_skin ) )
         {
 #endif
-#ifndef BASIC_SKINS
+#if !defined(MODULE_NAME_IS_basic_skins)
             wxMutexGuiEnter();
             wxFileDialog dialog( NULL,
                 wxU(_("Open a skin file")), wxT(""), wxT(""),
@@ -278,7 +278,7 @@ static void Run( intf_thread_t *p_intf )
 #endif
             {
                 delete Loader;
-#ifndef BASIC_SKINS
+#if !defined(MODULE_NAME_IS_basic_skins)
                 wxMutexGuiLeave();
 #endif
                 return;
@@ -299,7 +299,7 @@ static void Run( intf_thread_t *p_intf )
 
     OSRun( p_intf );
 
-#ifndef BASIC_SKINS
+#if !defined(MODULE_NAME_IS_basic_skins)
     // clean up the dialog boxes
     delete p_intf->p_sys->p_dialogs;
 #endif
@@ -353,7 +353,7 @@ int SkinManage( intf_thread_t *p_intf )
 
     OSAPI_PostMessage( NULL, VLC_INTF_REFRESH, 0, (long)false );
 
-#ifndef BASIC_SKINS //FIXME
+#if !defined(MODULE_NAME_IS_basic_skins) //FIXME
     // Update the log window
     p_intf->p_sys->p_dialogs->MessagesDlg->UpdateLog();
 

@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.25 2003/06/03 22:18:58 gbazin Exp $
+ * $Id: gtk2_run.cpp,v 1.26 2003/06/11 10:42:33 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -164,7 +164,7 @@ void GTK2Proc( GdkEvent *event, gpointer data )
     // Check if vlc is closing
     proc->IsClosing();
 
-#ifndef BASIC_SKINS
+#if !defined(MODULE_NAME_IS_basic_skins)
     gtk_main_do_event( event );
 #endif
 
@@ -194,7 +194,7 @@ void OSRun( intf_thread_t *p_intf )
     CallBackObjects *callbackobj = new CallBackObjects();
     callbackobj->Proc = new VlcProc( p_intf );
 
-#ifndef BASIC_SKINS
+#if !defined(MODULE_NAME_IS_basic_skins)
     wxTheApp = new Instance( p_intf, callbackobj );
     wxEntry( 1, p_args );
 #else

@@ -1,4 +1,4 @@
-COMMON_skins = \
+SOURCES_skins = \
 	modules/gui/skins/os_api.h \
 	modules/gui/skins/os_bitmap.h \
 	modules/gui/skins/os_event.h \
@@ -92,10 +92,8 @@ COMMON_skins = \
 	modules/gui/skins/x11/x11_timer.cpp \
 	modules/gui/skins/x11/x11_timer.h \
 	modules/gui/skins/x11/x11_window.cpp \
-	modules/gui/skins/x11/x11_window.h
-
-SOURCES_skins = \
-	$(COMMON_skins) \
+	modules/gui/skins/x11/x11_window.h \
+	\
 	modules/gui/wxwindows/wxwindows.h \
 	modules/gui/wxwindows/fileinfo.cpp \
 	modules/gui/wxwindows/messages.cpp \
@@ -107,7 +105,100 @@ SOURCES_skins = \
 	$(NULL)
 
 SOURCES_basic_skins = \
-	$(COMMON_skins) \
+	modules/gui/skins/os_api.h \
+	modules/gui/skins/os_bitmap.h \
+	modules/gui/skins/os_event.h \
+	modules/gui/skins/os_font.h \
+	modules/gui/skins/os_graphics.h \
+	modules/gui/skins/os_theme.h \
+	modules/gui/skins/os_window.h \
+	\
+	modules/gui/skins/controls/controls.h \
+	modules/gui/skins/controls/button.cpp \
+	modules/gui/skins/controls/button.h \
+	modules/gui/skins/controls/checkbox.cpp \
+	modules/gui/skins/controls/checkbox.h \
+	modules/gui/skins/controls/generic.cpp \
+	modules/gui/skins/controls/generic.h \
+	modules/gui/skins/controls/image.cpp \
+	modules/gui/skins/controls/image.h \
+	modules/gui/skins/controls/playlist.cpp \
+	modules/gui/skins/controls/playlist.h \
+	modules/gui/skins/controls/rectangle.cpp \
+	modules/gui/skins/controls/rectangle.h \
+	modules/gui/skins/controls/slider.cpp \
+	modules/gui/skins/controls/slider.h \
+	modules/gui/skins/controls/text.cpp \
+	modules/gui/skins/controls/text.h \
+	\
+	modules/gui/skins/parser/flex.c \
+	modules/gui/skins/parser/skin.h \
+	modules/gui/skins/parser/skin.c \
+	modules/gui/skins/parser/wrappers.h \
+	modules/gui/skins/parser/wrappers.cpp \
+	\
+	modules/gui/skins/src/anchor.cpp \
+	modules/gui/skins/src/anchor.h \
+	modules/gui/skins/src/banks.cpp \
+	modules/gui/skins/src/banks.h \
+	modules/gui/skins/src/bezier.cpp \
+	modules/gui/skins/src/bezier.h \
+	modules/gui/skins/src/bitmap.cpp \
+	modules/gui/skins/src/bitmap.h \
+	modules/gui/skins/src/dialogs.cpp \
+	modules/gui/skins/src/dialogs.h \
+	modules/gui/skins/src/event.cpp \
+	modules/gui/skins/src/event.h \
+	modules/gui/skins/src/font.cpp \
+	modules/gui/skins/src/font.h \
+	modules/gui/skins/src/graphics.cpp \
+	modules/gui/skins/src/graphics.h \
+	modules/gui/skins/src/skin_main.cpp \
+	modules/gui/skins/src/skin_common.h \
+	modules/gui/skins/src/theme.cpp \
+	modules/gui/skins/src/theme.h \
+	modules/gui/skins/src/themeloader.cpp \
+	modules/gui/skins/src/themeloader.h \
+	modules/gui/skins/src/vlcproc.cpp \
+	modules/gui/skins/src/vlcproc.h \
+	modules/gui/skins/src/window.cpp \
+	modules/gui/skins/src/window.h \
+	\
+	modules/gui/skins/win32/win32_api.cpp \
+	modules/gui/skins/win32/win32_bitmap.cpp \
+	modules/gui/skins/win32/win32_bitmap.h \
+	modules/gui/skins/win32/win32_dragdrop.cpp \
+	modules/gui/skins/win32/win32_dragdrop.h \
+	modules/gui/skins/win32/win32_event.cpp \
+	modules/gui/skins/win32/win32_event.h \
+	modules/gui/skins/win32/win32_font.cpp \
+	modules/gui/skins/win32/win32_font.h \
+	modules/gui/skins/win32/win32_graphics.cpp \
+	modules/gui/skins/win32/win32_graphics.h \
+	modules/gui/skins/win32/win32_run.cpp \
+	modules/gui/skins/win32/win32_theme.cpp \
+	modules/gui/skins/win32/win32_theme.h \
+	modules/gui/skins/win32/win32_window.cpp \
+	modules/gui/skins/win32/win32_window.h \
+	\
+	modules/gui/skins/x11/x11_api.cpp \
+	modules/gui/skins/x11/x11_bitmap.cpp \
+	modules/gui/skins/x11/x11_bitmap.h \
+	modules/gui/skins/x11/x11_dragdrop.cpp \
+	modules/gui/skins/x11/x11_dragdrop.h \
+	modules/gui/skins/x11/x11_event.cpp \
+	modules/gui/skins/x11/x11_event.h \
+	modules/gui/skins/x11/x11_font.cpp \
+	modules/gui/skins/x11/x11_font.h \
+	modules/gui/skins/x11/x11_graphics.cpp \
+	modules/gui/skins/x11/x11_graphics.h \
+	modules/gui/skins/x11/x11_run.cpp \
+	modules/gui/skins/x11/x11_theme.cpp \
+	modules/gui/skins/x11/x11_theme.h \
+	modules/gui/skins/x11/x11_timer.cpp \
+	modules/gui/skins/x11/x11_timer.h \
+	modules/gui/skins/x11/x11_window.cpp \
+	modules/gui/skins/x11/x11_window.h \
 	$(NULL)
 
 EXTRA_DIST += \

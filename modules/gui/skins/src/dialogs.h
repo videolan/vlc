@@ -2,7 +2,7 @@
  * dialogs.h: Dialogs class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.h,v 1.5 2003/06/10 11:43:40 gbazin Exp $
+ * $Id: dialogs.h,v 1.6 2003/06/11 10:42:34 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -32,7 +32,7 @@ using namespace std;
 //---------------------------------------------------------------------------
 struct intf_thread_t;
 
-#ifndef BASIC_SKINS
+#if !defined(MODULE_NAME_IS_basic_skins)
 
 #ifdef WIN32                                               /* mingw32 hack */
 #   undef Yield
@@ -80,7 +80,7 @@ class Dialogs
 
         vlc_bool_t b_popup_change;
 
-#ifndef BASIC_SKINS
+#if !defined(MODULE_NAME_IS_basic_skins)
         // Dialogs
         OpenDialog  *OpenDlg;
         Messages    *MessagesDlg;

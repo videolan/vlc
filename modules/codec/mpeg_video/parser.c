@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: parser.c,v 1.13 2003/05/15 22:27:37 massiot Exp $
+ * $Id: parser.c,v 1.14 2003/06/11 10:42:33 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -139,7 +139,12 @@ static int RunDecoder ( decoder_fifo_t * p_fifo )
      * Initialize thread
      */
     p_vpar->p_fifo->b_error = InitThread( p_vpar );
-     
+    if( p_vpar->p_fifo->b_error )
+    {
+        free( p_vpar );
+        return( -1 );
+    )
+
     /*
      * Main loop - it is not executed if an error occured during
      * initialization
@@ -196,7 +201,6 @@ static int InitThread( vpar_thread_t *p_vpar )
     if( p_vpar->p_motion == NULL )
     {
         msg_Err( p_vpar->p_fifo, "no suitable motion compensation module" );
-        free( p_vpar );
         return( -1 );
     }
 
@@ -212,7 +216,6 @@ static int InitThread( vpar_thread_t *p_vpar )
     {
         msg_Err( p_vpar->p_fifo, "no suitable IDCT module" );
         module_Unneed( p_vpar->p_fifo, p_vpar->p_motion );
-        free( p_vpar );
         return( -1 );
     }
 
@@ -229,7 +232,6 @@ static int InitThread( vpar_thread_t *p_vpar )
     {
         msg_Err( p_vpar->p_fifo, "cannot initialize bitstream" );
         module_Unneed( p_vpar->p_fifo, p_vpar->p_motion );
-        free( p_vpar );
         return( -1 );
     }
 

@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.34 2003/06/10 11:43:40 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.35 2003/06/11 10:42:34 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -28,16 +28,6 @@
 #include <vlc/intf.h>
 #include <vlc/aout.h>
 #include <vlc/vout.h>
-
-#ifndef BASIC_SKINS
-#ifdef WIN32                                               /* mingw32 hack */
-#   undef Yield
-#   undef CreateDialog
-#endif
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-#include <wx/wx.h>
-#endif
 
 //--- SKIN ------------------------------------------------------------------
 #include "../os_api.h"

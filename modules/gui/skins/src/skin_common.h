@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.19 2003/06/10 11:43:40 gbazin Exp $
+ * $Id: skin_common.h,v 1.20 2003/06/11 10:42:34 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -77,11 +77,9 @@ struct intf_sys_t
 
     // Popup menu
     vlc_bool_t b_popup_change;
-#ifndef BASIC_SKINS
+#if !defined(MODULE_NAME_IS_basic_skins)
     wxMenu     *p_popup_menu;
-#endif
 
-#ifndef BASIC_SKINS
     wxIcon      *p_icon;
 #endif
 
