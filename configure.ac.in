@@ -154,7 +154,7 @@ case "x${target_os}" in
     LDFLAGS_vlc="${LDFLAGS_vlc} -lbe"
     LDFLAGS_plugins="${LDFLAGS_plugins} -nostart"
     LDFLAGS_beos="${LDFLAGS_beos} -lbe -lmedia -lroot -ltracker -lstdc++.r4 -ltranslation"
-    dnl BONE or not BONE ?
+    dnl BONE or not BONE ? only BONE has libbind.so
     AC_CHECK_LIB( bind, inet_ntoa,
         [ LDFLAGS_access_mms="${LDFLAGS_access_mms} -lbind"
           LDFLAGS_ipv4="${LDFLAGS_ipv4} -lbind"
@@ -681,12 +681,16 @@ if test "x${ac_cv_c_fast_math}" != "xno"; then
 fi
 
 dnl Check for -funroll-loops
-AC_CACHE_CHECK([if \$CC accepts -funroll-loops],
-    [ac_cv_c_unroll_loops],
-    [CFLAGS="${CFLAGS_save} -funroll-loops"
-     AC_TRY_COMPILE([],,ac_cv_c_unroll_loops=yes, ac_cv_c_unroll_loops=no)])
-if test "x${ac_cv_c_unroll_loops}" != "xno"; then
-    CFLAGS_OPTIM="${CFLAGS_OPTIM} -funroll-loops"
+dnl Disabled on BeOS because BeOS' gcc is buggy and may crash with it
+if test "x${SYS}" != "xbeos"
+then
+  AC_CACHE_CHECK([if \$CC accepts -funroll-loops],
+      [ac_cv_c_unroll_loops],
+      [CFLAGS="${CFLAGS_save} -funroll-loops"
+       AC_TRY_COMPILE([],,ac_cv_c_unroll_loops=yes, ac_cv_c_unroll_loops=no)])
+  if test "x${ac_cv_c_unroll_loops}" != "xno"; then
+      CFLAGS_OPTIM="${CFLAGS_OPTIM} -funroll-loops"
+  fi
 fi
 
 dnl Check for -fomit-frame-pointer
