@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.27 2003/07/07 16:59:00 sam Exp $
+dnl $Id: configure.ac,v 1.28 2003/07/11 11:58:12 gbazin Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -311,7 +311,10 @@ AC_CHECK_FUNCS(inet_aton,,[
   ])
 ])
 
-dnl Check for getopt
+dnl Check for getopt (always use builtin one on win32)
+if test "${SYS}" = "mingw32"; then
+need_getopt=:
+else
 need_getopt=false
 AC_CHECK_FUNCS(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
 [ # FreeBSD has a gnugetopt library for this:
@@ -319,6 +322,7 @@ AC_CHECK_FUNCS(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
     [AC_DEFINE(HAVE_GETOPT_LONG,1,getopt support)
      AX_ADD_LDFLAGS([vlc],[-lgnugetopt])],
     [need_getopt=:])])
+fi
 AM_CONDITIONAL(BUILD_GETOPT, ${need_getopt})
 
 if test "${SYS}" != "mingw32"; then
@@ -972,7 +976,7 @@ AC_ARG_ENABLE(sout,
 if test "${enable_sout}" != "no"
 then
   AX_ADD_PLUGINS([access_output_dummy access_output_udp access_output_file access_output_http])
-  AX_ADD_PLUGINS([mux_ts mux_ps mux_avi mux_dummy])
+  AX_ADD_PLUGINS([mux_ts mux_ps mux_avi mux_mp4 mux_dummy])
   AX_ADD_PLUGINS([packetizer_mpegaudio packetizer_mpegvideo packetizer_a52])
   AX_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
   AX_ADD_PLUGINS([packetizer_copy])
@@ -2540,20 +2544,20 @@ then
 fi
 
 dnl
-dnl  Gtk+2 module
+dnl  Gtk+2 module ! Disabled for know as it is unuseable and confuses users
 dnl
-AC_ARG_ENABLE(gtk2,
-  [  --enable-gtk2           Gtk2 support (default disabled)])
-if test "${enable_gtk2}" = "yes"
-then
-  PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
-  AX_ADD_CFLAGS([gtk2],[${GTK2_CFLAGS}])
-  AX_ADD_LDFLAGS([gtk2],[${GTK2_LIBS}])
-  AX_ADD_PLUGINS([gtk2])
-  if test "${SYS}" != "mingw32"; then
-    NEED_GTK2_MAIN=yes
-  fi
-fi
+dnl AC_ARG_ENABLE(gtk2,
+dnl   [  --enable-gtk2           Gtk2 support (default disabled)])
+dnl if test "${enable_gtk2}" = "yes"
+dnl then
+dnl   PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
+dnl   AX_ADD_CFLAGS([gtk2],[${GTK2_CFLAGS}])
+dnl   AX_ADD_LDFLAGS([gtk2],[${GTK2_LIBS}])
+dnl   AX_ADD_PLUGINS([gtk2])
+dnl   if test "${SYS}" != "mingw32"; then
+dnl     NEED_GTK2_MAIN=yes
+dnl   fi
+dnl fi
 
 dnl
 dnl  Familiar module uses Gtk+ library
@@ -2672,20 +2676,20 @@ developement tools or remove the --enable-gnome option])
   fi])
 
 dnl
-dnl  Gnome2 module
+dnl  Gnome2 module ! Disabled for know as it is unuseable and confuses users
 dnl
-AC_ARG_ENABLE(gnome2,
-  [  --enable-gnome2         Gnome2 support (default disabled)])
-if test "${enable_gnome2}" = "yes"
-then
-  PKG_CHECK_MODULES(GNOME2, [libgnomeui-2.0])
-  AX_ADD_CFLAGS([gnome2],[${GNOME2_CFLAGS}])
-  AX_ADD_LDFLAGS([gnome2],[${GNOME2_LIBS}])
-  AX_ADD_PLUGINS([gnome2])
-  if test "${SYS}" != "mingw32"; then
-    NEED_GNOME2_MAIN=yes
-  fi
-fi
+dnl AC_ARG_ENABLE(gnome2,
+dnl   [  --enable-gnome2         Gnome2 support (default disabled)])
+dnl if test "${enable_gnome2}" = "yes"
+dnl then
+dnl   PKG_CHECK_MODULES(GNOME2, [libgnomeui-2.0])
+dnl   AX_ADD_CFLAGS([gnome2],[${GNOME2_CFLAGS}])
+dnl   AX_ADD_LDFLAGS([gnome2],[${GNOME2_LIBS}])
+dnl   AX_ADD_PLUGINS([gnome2])
+dnl   if test "${SYS}" != "mingw32"; then
+dnl     NEED_GNOME2_MAIN=yes
+dnl   fi
+dnl fi
 
 dnl
 dnl  wxWindows module

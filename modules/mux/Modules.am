@@ -1,3 +1,4 @@
 SOURCES_mux_dummy = dummy.c
 SOURCES_mux_avi = avi.c
 SOURCES_mux_ogg = ogg.c
+SOURCES_mux_mp4 = mp4.c
