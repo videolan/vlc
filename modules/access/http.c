@@ -632,7 +632,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
         if( p_sys->url.psz_path )
         {
             net_Printf( VLC_OBJECT(p_access), p_sys->fd,
-                        "GET http://%s:%d/%s HTTP/1.%d\r\n",
+                        "GET http://%s:%d%s HTTP/1.%d\r\n",
                         p_sys->url.psz_host, p_sys->url.i_port,
                         p_sys->url.psz_path, p_sys->i_version );
         }
@@ -642,7 +642,6 @@ static int Connect( access_t *p_access, int64_t i_tell )
                         "GET http://%s:%d/ HTTP/1.%d\r\n",
                         p_sys->url.psz_host, p_sys->url.i_port,
                         p_sys->i_version );
-
         }
     }
     else
