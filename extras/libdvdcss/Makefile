@@ -26,7 +26,7 @@ $(OBJ_C): %.o: .dep/%.d
 $(OBJ_C): %.o: %.c
 	$(CC) $(CFLAGS) $(CFLAGS_LIBDVDCSS) $(PCFLAGS) -c -o $@ $<
 
-bsdi_dvdioctl.o: ../BSDI_ioctl/dvdioctl.c
+bsdi_dvdioctl.o: ../BSDI_dvdioctl/dvdioctl.c
 	$(CC) $(CFLAGS) $(CFLAGS_LIBDVDCSS) $(PCFLAGS) -c -o $@ $<
 
 ../../lib/$(FULL_SO): $(OBJ_C) $(OBJ_LIBDVDCSS)
