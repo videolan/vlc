@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.36 2003/02/27 13:19:43 gbazin Exp $
+ * $Id: avi.c,v 1.37 2003/02/27 16:38:39 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -59,11 +59,11 @@ static int    AVIDemux_UnSeekable( input_thread_t *p_input );
 vlc_module_begin();
     add_category_hint( N_("avi-demuxer"), NULL, VLC_TRUE );
         add_bool( "avi-interleaved", 0, NULL,
-                  _("force interleaved method"),
-                  _("force interleaved method"), VLC_TRUE );
+                  N_("force interleaved method"),
+                  N_("force interleaved method"), VLC_TRUE );
         add_bool( "avi-index", 0, NULL,
-                  _("force index creation"),
-                  _("force index creation"), VLC_TRUE );
+                  N_("force index creation"),
+                  N_("force index creation"), VLC_TRUE );
 
     set_description( _("avi demuxer") );
     set_capability( "demux", 212 );
