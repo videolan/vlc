@@ -225,13 +225,13 @@ static void Run( intf_thread_t *p_intf )
                 free( psz_display );
                 psz_display = NULL;
             }
-            if( p_playlist->i_status == PLAYLIST_STOPPED )
+            if( p_playlist->status.i_status == PLAYLIST_STOPPED )
             {
                 psz_display = (char *)malloc( sizeof(char )*strlen(_("Stop")));
                 sprintf( psz_display,_("Stop") );
                 vlc_object_release( p_playlist );
             }
-            else if( p_playlist->i_status == PLAYLIST_PAUSED )
+            else if( p_playlist->status.i_status == PLAYLIST_PAUSED )
             {
                 psz_display = (char *)malloc( sizeof(char )*strlen(_("Pause")));
                 sprintf( psz_display,_("Pause") );
