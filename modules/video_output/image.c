@@ -139,7 +139,7 @@ static int Init( vout_thread_t *p_vout )
     picture_t *p_pic;
 
     /* Initialize the output structure */
-    p_vout->output.i_chroma = VLC_FOURCC( 'R', 'V', '2', '4' );
+    p_vout->output.i_chroma = p_vout->render.i_chroma;
     p_vout->output.pf_setpalette = NULL;
     p_vout->output.i_width = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
@@ -218,9 +218,12 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
         return;
     }
     p_vout->p_sys->i_frames++;
-    fmt_out.i_chroma = VLC_FOURCC( 'p', 'n', 'g', ' ');
     psz_filename = (char *)malloc( strlen( p_vout->p_sys->psz_prefix ) +
                                          10 );
+
+    fmt_in.i_chroma = p_vout->render.i_chroma;
+    fmt_in.i_width = p_vout->render.i_width;
+    fmt_in.i_height = p_vout->render.i_height;
 
     p_vout->p_sys->i_current++;
 
