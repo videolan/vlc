@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.160 2002/03/04 23:56:38 massiot Exp $
+ * $Id: main.c,v 1.161 2002/03/06 23:54:28 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -317,6 +317,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 #   ifdef DEBUG
     /* Activate malloc checking routines to detect heap corruptions. */
     putenv( "MALLOC_CHECK_=2" );
+    putenv( "GNOME_DISABLE_CRASH_DIALOG=1" );
 #   endif
 #endif
 
