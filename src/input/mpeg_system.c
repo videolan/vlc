@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.22 2000/12/29 10:52:40 massiot Exp $
+ * $Id: mpeg_system.c,v 1.23 2000/12/29 14:04:59 sam Exp $
  *
  * Authors: 
  *
@@ -926,7 +926,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         /* Subtitles video (0x20->0x3F) */
                         p_es->i_type = DVD_SPU_ES;
 #ifdef AUTO_SPAWN
-                        if( main_GetIntVariable( INPUT_DVD_SUBTITLE_VAR, 0 )
+                        if( main_GetIntVariable( INPUT_DVD_SUBTITLE_VAR, -1 )
                                 == ((p_es->i_id & 0x1F00) >> 8) )
                         {
                             if( !p_input->stream.b_seekable )

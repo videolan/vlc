@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.16 2000/12/28 17:57:39 massiot Exp $
+ * $Id: input_ps.c,v 1.17 2000/12/29 14:04:59 sam Exp $
  *
  * Authors: 
  *
@@ -197,16 +197,19 @@ static void PSInit( input_thread_t * p_input )
                         {
                             input_SelectES( p_input, p_es );
                         }
+                        break;
 
                     case DVD_SPU_ES:
-                        if( main_GetIntVariable( INPUT_DVD_SUBTITLE_VAR, 0 )
+                        if( main_GetIntVariable( INPUT_DVD_SUBTITLE_VAR, -1 )
                                 == ((p_es->i_id & 0x1F00) >> 8) )
                         {
                             input_SelectES( p_input, p_es );
                         }
+                        break;
 
                     case LPCM_AUDIO_ES:
                         /* FIXME ! */
+                        break;
                 }
             }
                     
