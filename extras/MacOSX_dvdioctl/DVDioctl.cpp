@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 1998-2000 Apple Computer, Inc. All rights reserved.
  * Copyright (C) 2001 VideoLAN
- * $Id: DVDioctl.cpp,v 1.5 2001/04/17 14:39:51 sam Exp $
+ * $Id: DVDioctl.cpp,v 1.6 2001/05/25 04:23:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,9 +28,6 @@
  * - find a way to prevent user from ejecting DVD using the GUI while
  *   it is still in use
  *****************************************************************************/
-
-//XXX: uncomment to activate the key exchange ioctls - may hang the machine
-//#define ACTIVATE_DANGEROUS_IOCTL 1
 
 /*****************************************************************************
  * Preamble
@@ -453,7 +450,12 @@ static void DVDStrategy( buf_t * bp )
 static int DVDBlockIoctl( dev_t dev, u_long cmd, caddr_t addr, int flags,
                           struct proc *p )
 {
-    dvdioctl_data_t * p_data = (dvdioctl_data_t *)addr;
+    dvdioctl_data_t    *p_data = (dvdioctl_data_t *)addr;
+    IOMemoryDescriptor *p_mem;
+    
+    p_mem = IOMemoryDescriptor::withAddress( p_data->p_buffer,
+                                             p_data->i_size,
+                                             kIODirectionOutIn );
 
     switch( cmd )
     {
@@ -468,19 +470,14 @@ static int DVDBlockIoctl( dev_t dev, u_long cmd, caddr_t addr, int flags,
         case IODVD_SEND_KEY:
 
             log( LOG_INFO, "DVD ioctl: send key to `%s', "
-                 "buf %d, format %d, class %d, agid %d\n",
+                 "buf %d, class %d, lba N/A, agid %d, format %d\n",
                  p_drive->getDeviceTypeName(),
-                 (int)p_data->p_buffer, p_data->i_keyformat,
-                 p_data->i_keyclass, p_data->i_agid );
+                 (int)p_data->p_buffer, p_data->i_keyclass,
+                 p_data->i_agid, p_data->i_keyformat );
 
-#ifdef ACTIVATE_DANGEROUS_IOCTL
-            return p_drive->sendKey( (IOMemoryDescriptor *)p_data->p_buffer,
-                                     (DVDKeyClass)p_data->i_keyclass,
+            return p_drive->sendKey( p_mem, (DVDKeyClass)p_data->i_keyclass,
                                      p_data->i_agid,
                                      (DVDKeyFormat)p_data->i_keyformat );
-#else
-            return -1;
-#endif
 
         case IODVD_REPORT_KEY:
 
@@ -490,14 +487,9 @@ static int DVDBlockIoctl( dev_t dev, u_long cmd, caddr_t addr, int flags,
                  (int)p_data->p_buffer, p_data->i_keyclass, p_data->i_lba,
                  p_data->i_agid, p_data->i_keyformat );
 
-#ifdef ACTIVATE_DANGEROUS_IOCTL
-            return p_drive->reportKey( (IOMemoryDescriptor *)p_data->p_buffer,
-                                       (DVDKeyClass)p_data->i_keyclass,
+            return p_drive->reportKey( p_mem, (DVDKeyClass)p_data->i_keyclass,
                                        p_data->i_lba, p_data->i_agid,
                                        (DVDKeyFormat)p_data->i_keyformat );
-#else
-            return -1;
-#endif
 
         default:
 

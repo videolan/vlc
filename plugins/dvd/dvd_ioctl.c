@@ -2,7 +2,7 @@
  * dvd_ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.c,v 1.11 2001/05/02 20:01:44 sam Exp $
+ * $Id: dvd_ioctl.c,v 1.12 2001/05/25 04:23:37 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -59,14 +59,29 @@
 #include "dvd_ioctl.h"
 
 /*****************************************************************************
- * Local prototypes - BeOS specific
+ * Local prototypes, BeOS specific
  *****************************************************************************/
 #if defined( SYS_BEOS )
-static void BeInitRDC ( raw_device_command *, void *, int, int );
+static void BeInitRDC ( raw_device_command *, int );
 #define INIT_RDC( TYPE, SIZE ) \
     raw_device_command rdc; \
     u8 p_buffer[ (SIZE) ]; \
-    BeInitRDC( &rdc, p_buffer, (TYPE), (SIZE) );
+    rdc.data = (char *)p_buffer; \
+    rdc.data_length = (SIZE); \
+    BeInitRDC( &rdc, (TYPE) );
+#endif
+
+/*****************************************************************************
+ * Local prototypes, Darwin specific
+ *****************************************************************************/
+#if defined( SYS_DARWIN1_3 )
+#define INIT_DVDIOCTL( SIZE ) \
+    dvdioctl_data_t dvdioctl; \
+    u8 p_buffer[ (SIZE) ]; \
+    dvdioctl.p_buffer = p_buffer; \
+    dvdioctl.i_size = (SIZE); \
+    dvdioctl.i_keyclass = kCSS_CSS2_CPRM; \
+    memset( p_buffer, 0, (SIZE) );
 #endif
 
 /*****************************************************************************
@@ -108,9 +123,9 @@ int ioctl_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
 
 #elif defined( SYS_DARWIN1_3 )
     intf_ErrMsg( "css error: DVD ioctls not fully functional yet" );
+    intf_ErrMsg( "css error: assuming disc is encrypted" );
 
-    intf_ErrMsg( "css error: assuming disc is unencrypted" );
-    *pi_copyright = 0;
+    *pi_copyright = 1;
 
     i_ret = 0;
 
@@ -176,6 +191,14 @@ int ioctl_ReadKey( int i_fd, int *pi_agid, u8 *p_key )
 
     memcpy( p_key, p_buffer + 4, 2048 );
 
+#elif defined( SYS_DARWIN1_3 )
+    intf_ErrMsg( "css error: DVD ioctls not fully functional yet" );
+    intf_ErrMsg( "css error: sending an empty key" );
+
+    i_ret = 0;
+
+    memset( p_key, 0x00, 2048 );
+
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
     i_ret = -1;
@@ -214,11 +237,22 @@ int ioctl_ReportAgid( int i_fd, int *pi_agid )
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_REPORT_KEY, 8 );
 
-    rdc.command[ 10 ] = 0x00 | (*pi_agid << 6);
+    rdc.command[ 10 ] = DVD_REPORT_AGID | (*pi_agid << 6);
 
     i_ret = ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
     *pi_agid = p_buffer[ 7 ] >> 6;
+
+#elif defined( SYS_DARWIN1_3 )
+    INIT_DVDIOCTL( 8 );
+
+    dvdioctl.i_keyformat = kCSSAGID;
+    dvdioctl.i_agid = *pi_agid;
+    dvdioctl.i_lba = 0;
+
+    i_ret = ioctl( i_fd, IODVD_REPORT_KEY, &dvdioctl );
+
+    *pi_asf = p_buffer[ 7 ] >> 6;
 
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
@@ -258,9 +292,20 @@ int ioctl_ReportChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_REPORT_KEY, 16 );
 
-    rdc.command[ 10 ] = 0x01 | (*pi_agid << 6);
+    rdc.command[ 10 ] = DVD_REPORT_CHALLENGE | (*pi_agid << 6);
 
     i_ret = ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
+
+    memcpy( p_challenge, p_buffer + 4, 12 );
+
+#elif defined( SYS_DARWIN1_3 )
+    INIT_DVDIOCTL( 16 );
+
+    dvdioctl.i_keyformat = kChallengeKey;
+    dvdioctl.i_agid = *pi_agid;
+    dvdioctl.i_lba = 0;
+
+    i_ret = ioctl( i_fd, IODVD_REPORT_KEY, &dvdioctl );
 
     memcpy( p_challenge, p_buffer + 4, 12 );
 
@@ -304,23 +349,20 @@ int ioctl_ReportASF( int i_fd, int *pi_agid, int *pi_asf )
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_REPORT_KEY, 8 );
 
-    rdc.command[ 10 ] = 0x05 | (*pi_agid << 6);
+    rdc.command[ 10 ] = DVD_REPORT_ASF | (*pi_agid << 6);
 
     i_ret = ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
     *pi_asf = p_buffer[ 7 ] & 1;
 
 #elif defined( SYS_DARWIN1_3 )
-    dvdioctl_data_t data;
-    u8 p_buffer[ 8 ];
+    INIT_DVDIOCTL( 8 );
 
-    data.p_buffer = p_buffer;
-    data.i_lba = 0;
-    data.i_agid = *pi_agid;
-    data.i_keyclass = kCSS_CSS2_CPRM;
-    data.i_keyformat = kASF;
+    dvdioctl.i_keyformat = kASF;
+    dvdioctl.i_agid = *pi_agid;
+    dvdioctl.i_lba = 0;
 
-    i_ret = ioctl( i_fd, IODVD_REPORT_KEY, &data );
+    i_ret = ioctl( i_fd, IODVD_REPORT_KEY, &dvdioctl );
 
     *pi_asf = p_buffer[ 7 ] & 1;
 
@@ -362,9 +404,19 @@ int ioctl_ReportKey1( int i_fd, int *pi_agid, u8 *p_key )
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_REPORT_KEY, 12 );
 
-    rdc.command[ 10 ] = 0x02 | (*pi_agid << 6);
+    rdc.command[ 10 ] = DVD_REPORT_KEY1 | (*pi_agid << 6);
 
     i_ret = ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
+
+    memcpy( p_key, p_buffer + 4, 8 );
+
+#elif defined( SYS_DARWIN1_3 )
+    INIT_DVDIOCTL( 12 );
+
+    dvdioctl.i_keyformat = kKey1;
+    dvdioctl.i_agid = *pi_agid;
+
+    i_ret = ioctl( i_fd, IODVD_SEND_KEY, &dvdioctl );
 
     memcpy( p_key, p_buffer + 4, 8 );
 
@@ -406,9 +458,17 @@ int ioctl_InvalidateAgid( int i_fd, int *pi_agid )
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_REPORT_KEY, 0 );
 
-    rdc.command[ 10 ] = 0x3f | (*pi_agid << 6);
+    rdc.command[ 10 ] = DVD_INVALIDATE_AGID | (*pi_agid << 6);
 
     i_ret = ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
+
+#elif defined( SYS_DARWIN1_3 )
+    INIT_DVDIOCTL( 0 );
+
+    dvdioctl.i_keyformat = kInvalidateAGID;
+    dvdioctl.i_agid = *pi_agid;
+
+    i_ret = ioctl( i_fd, IODVD_SEND_KEY, &dvdioctl );
 
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
@@ -446,12 +506,23 @@ int ioctl_SendChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_SEND_KEY, 16 );
 
-    rdc.command[ 10 ] = 0x01 | (*pi_agid << 6);
+    rdc.command[ 10 ] = DVD_SEND_CHALLENGE | (*pi_agid << 6);
 
     p_buffer[ 1 ] = 0xe;
     memcpy( p_buffer + 4, p_challenge, 12 );
 
     return ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
+
+#elif defined( SYS_DARWIN1_3 )
+    INIT_DVDIOCTL( 16 );
+
+    dvdioctl.i_keyformat = kChallengeKey;
+    dvdioctl.i_agid = *pi_agid;
+
+    p_buffer[ 1 ] = 0xe;
+    memcpy( p_buffer + 4, p_challenge, 12 );
+
+    return ioctl( i_fd, IODVD_SEND_KEY, &dvdioctl );
 
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
@@ -488,12 +559,23 @@ int ioctl_SendKey2( int i_fd, int *pi_agid, u8 *p_key )
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_SEND_KEY, 12 );
 
-    rdc.command[ 10 ] = 0x3 | (*pi_agid << 6);
+    rdc.command[ 10 ] = DVD_SEND_KEY2 | (*pi_agid << 6);
 
     p_buffer[ 1 ] = 0xa;
     memcpy( p_buffer + 4, p_key, 8 );
 
     return ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
+
+#elif defined( SYS_DARWIN1_3 )
+    INIT_DVDIOCTL( 12 );
+
+    dvdioctl.i_keyformat = kKey2;
+    dvdioctl.i_agid = *pi_agid;
+
+    p_buffer[ 1 ] = 0xa;
+    memcpy( p_buffer + 4, p_key, 8 );
+
+    return ioctl( i_fd, IODVD_SEND_KEY, &dvdioctl );
 
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
@@ -511,11 +593,10 @@ int ioctl_SendKey2( int i_fd, int *pi_agid, u8 *p_key )
  * This function initializes a BeOS raw device command structure for future
  * use, either a read command or a write command.
  *****************************************************************************/
-static void BeInitRDC( raw_device_command *p_rdc,
-                       void *p_buffer, int i_type, int i_len )
+static void BeInitRDC( raw_device_command *p_rdc, int i_type )
 {
     memset( p_rdc, 0, sizeof( raw_device_command ) );
-    memset( p_buffer, 0, i_len );
+    memset( p_rdc->data, 0, p_rdc->data_length );
 
     switch( i_type )
     {
@@ -531,12 +612,9 @@ static void BeInitRDC( raw_device_command *p_rdc,
 
     p_rdc->command[ 0 ]      = i_type;
 
-    p_rdc->command[ 8 ]      = (i_len >> 8) & 0xff;
-    p_rdc->command[ 9 ]      =  i_len       & 0xff;
+    p_rdc->command[ 8 ]      = (p_rdc->data_length >> 8) & 0xff;
+    p_rdc->command[ 9 ]      =  p_rdc->data_length       & 0xff;
     p_rdc->command_length    = 12;
-
-    p_rdc->data              = (char *)p_buffer;
-    p_rdc->data_length       = i_len;
 
     p_rdc->sense_data        = NULL;
     p_rdc->sense_data_length = 0;

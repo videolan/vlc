@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: audio_output.c,v 1.60 2001/05/06 04:32:02 sam Exp $
+ * $Id: audio_output.c,v 1.61 2001/05/25 04:23:37 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -188,9 +188,9 @@ aout_thread_t *aout_CreateThread( int *pi_status )
  *****************************************************************************/
 static int aout_SpawnThread( aout_thread_t * p_aout )
 {
-    int             i_fifo;
-    long            l_bytes;
-    void *          aout_thread = NULL;
+    int     i_fifo;
+    long    l_bytes;
+    void (* pf_aout_thread)( aout_thread_t * ) = NULL;
 
     /* We want the audio output thread to live */
     p_aout->b_die = 0;
@@ -212,7 +212,7 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
     p_aout->l_units = (long)( ((s64)p_aout->l_rate * AOUT_BUFFER_DURATION) / 1000000 );
     p_aout->l_msleep = (long)( ((s64)p_aout->l_units * 1000000) / (s64)p_aout->l_rate );
 
-    /* Make aout_thread point to the right thread function, and compute the
+    /* Make pf_aout_thread point to the right thread function, and compute the
      * byte size of the audio output buffer */
     switch ( p_aout->i_channels )
     {
@@ -223,32 +223,33 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
         case AOUT_FMT_U8:
             intf_WarnMsg( 2, "aout info: unsigned 8 bits mono thread" );
             l_bytes = 1 * sizeof(u8) * p_aout->l_units;
-            aout_thread = (void *)aout_U8MonoThread;
+            pf_aout_thread = aout_U8MonoThread;
             break;
 
         case AOUT_FMT_S8:
             intf_WarnMsg( 2, "aout info: signed 8 bits mono thread" );
             l_bytes = 1 * sizeof(s8) * p_aout->l_units;
-            aout_thread = (void *)aout_S8MonoThread;
+            pf_aout_thread = aout_S8MonoThread;
             break;
 
         case AOUT_FMT_U16_LE:
         case AOUT_FMT_U16_BE:
             intf_WarnMsg( 2, "aout info: unsigned 16 bits mono thread" );
             l_bytes = 1 * sizeof(u16) * p_aout->l_units;
-            aout_thread = (void *)aout_U16MonoThread;
+            pf_aout_thread = aout_U16MonoThread;
             break;
 
         case AOUT_FMT_S16_LE:
         case AOUT_FMT_S16_BE:
             intf_WarnMsg( 2, "aout info: signed 16 bits mono thread" );
             l_bytes = 1 * sizeof(s16) * p_aout->l_units;
-            aout_thread = (void *)aout_S16MonoThread;
+            pf_aout_thread = aout_S16MonoThread;
             break;
+
         case AOUT_FMT_AC3:
             intf_WarnMsg( 2, "aout info: ac3 pass-through thread" );
             l_bytes = 0;
-            aout_thread = (void *)aout_SpdifThread;
+            pf_aout_thread = aout_SpdifThread;
             break;
 
         default:
@@ -265,27 +266,27 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
         case AOUT_FMT_U8:
             intf_WarnMsg( 2, "aout info: unsigned 8 bits stereo thread" );
             l_bytes = 2 * sizeof(u8) * p_aout->l_units;
-            aout_thread = (void *)aout_U8StereoThread;
+            pf_aout_thread = aout_U8StereoThread;
             break;
 
         case AOUT_FMT_S8:
             intf_WarnMsg( 2, "aout info: signed 8 bits stereo thread" );
             l_bytes = 2 * sizeof(s8) * p_aout->l_units;
-            aout_thread = (void *)aout_S8StereoThread;
+            pf_aout_thread = aout_S8StereoThread;
             break;
 
         case AOUT_FMT_U16_LE:
         case AOUT_FMT_U16_BE:
             intf_WarnMsg( 2, "aout info: unsigned 16 bits stereo thread" );
             l_bytes = 2 * sizeof(u16) * p_aout->l_units;
-            aout_thread = (void *)aout_U16StereoThread;
+            pf_aout_thread = aout_U16StereoThread;
             break;
 
         case AOUT_FMT_S16_LE:
         case AOUT_FMT_S16_BE:
             intf_WarnMsg( 2, "aout info: signed 16 bits stereo thread" );
             l_bytes = 2 * sizeof(s16) * p_aout->l_units;
-            aout_thread = (void *)aout_S16StereoThread;
+            pf_aout_thread = aout_S16StereoThread;
             break;
         default:
             intf_ErrMsg( "aout error: unknown audio output format %i",
@@ -323,7 +324,7 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
 
     /* Launch the thread */
     if ( vlc_thread_create( &p_aout->thread_id, "audio output",
-                            (vlc_thread_func_t)aout_thread, p_aout ) )
+                            (vlc_thread_func_t)pf_aout_thread, p_aout ) )
     {
         intf_ErrMsg( "aout error: cannot spawn audio output thread" );
         free( p_aout->buffer );

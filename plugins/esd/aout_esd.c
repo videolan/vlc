@@ -2,7 +2,7 @@
  * aout_esd.c : Esound functions library
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: aout_esd.c,v 1.11 2001/03/21 13:42:33 sam Exp $
+ * $Id: aout_esd.c,v 1.12 2001/05/25 04:23:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -141,9 +141,13 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys->esd_format = (i_bits | i_mode | i_func) & (~ESD_MASK_CHAN);
 
     if( p_aout->i_channels == 1 )
+    {
         p_aout->p_sys->esd_format |= ESD_MONO;
+    }
     else
+    {
         p_aout->p_sys->esd_format |= ESD_STEREO;
+    }
 
     /* open a socket for playing a stream
      * and try to open /dev/dsp if there's no EsounD */
@@ -156,6 +160,10 @@ static int aout_Open( aout_thread_t *p_aout )
                      p_aout->p_sys->esd_format, p_aout->l_rate );
         return( -1 );
     }
+
+    intf_ErrMsg( "aout error: you are using the Esound plugin. There is no way yet to get the\n"
+                 "            driver latency because esd_get_latency() hangs, so expect a one\n"
+                 "            second delay with sound. Type `esdctl off' to disable esd." );
 
     return( 0 );
 }
@@ -184,24 +192,30 @@ static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
  *****************************************************************************/
 static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
-    int amount;
+    int i_amount;
 
     if (p_aout->p_sys->esd_format & ESD_STEREO)
     {
         if (p_aout->p_sys->esd_format & ESD_BITS16)
-            amount = (44100 * (ESD_BUF_SIZE + 64)) / p_aout->l_rate;
+        {
+            i_amount = (44100 * (ESD_BUF_SIZE + 64)) / p_aout->l_rate;
+        }
         else
-            amount = (44100 * (ESD_BUF_SIZE + 128)) / p_aout->l_rate;
+        {
+            i_amount = (44100 * (ESD_BUF_SIZE + 128)) / p_aout->l_rate;
+        }
     }
     else
     {
         if (p_aout->p_sys->esd_format & ESD_BITS16)
-            amount = (2 * 44100 * (ESD_BUF_SIZE + 128)) / p_aout->l_rate;
+        {
+            i_amount = (2 * 44100 * (ESD_BUF_SIZE + 128)) / p_aout->l_rate;
+        }
         else
-            amount = (2 * 44100 * (ESD_BUF_SIZE + 256)) / p_aout->l_rate;
+        {
+            i_amount = (2 * 44100 * (ESD_BUF_SIZE + 256)) / p_aout->l_rate;
+        }
     }
-
-    intf_DbgMsg( "aout: latency is %i", amount );
 
     write( p_aout->i_fd, buffer, i_size );
 }

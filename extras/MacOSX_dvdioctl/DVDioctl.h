@@ -2,7 +2,7 @@
  * DVDioctl.h: Linux-like DVD driver for Darwin and MacOS X
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: DVDioctl.h,v 1.2 2001/04/04 02:49:18 sam Exp $
+ * $Id: DVDioctl.h,v 1.3 2001/05/25 04:23:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -51,9 +51,11 @@ typedef struct dvdioctl_data
     void         *p_buffer;
 
 #if defined(KERNEL)
+    UInt32        i_size;
     UInt32        i_lba;
     UInt8         i_agid;
 #else
+    u32           i_size;
     u32           i_lba;
     u8            i_agid;
 #endif
