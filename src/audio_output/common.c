@@ -1,8 +1,8 @@
 /*****************************************************************************
- * audio_output.c : audio output instance miscellaneous functions
+ * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.c,v 1.103 2002/09/20 23:27:04 massiot Exp $
+ * $Id: common.c,v 1.1 2002/09/26 22:40:25 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -29,21 +29,18 @@
 
 #include <vlc/vlc.h>
 
-#ifdef HAVE_ALLOCA_H
-#   include <alloca.h>
-#endif
-
 #include "audio_output.h"
 #include "aout_internal.h"
 
+
 /*
- * Instances management (see also input.c:aout_InputNew())
+ * Instances management (internal and external)
  */
 
 /*****************************************************************************
- * aout_NewInstance: initialize aout structure
+ * aout_New: initialize aout structure
  *****************************************************************************/
-aout_instance_t * __aout_NewInstance( vlc_object_t * p_parent )
+aout_instance_t * __aout_New( vlc_object_t * p_parent )
 {
     aout_instance_t * p_aout;
 
@@ -60,6 +57,7 @@ aout_instance_t * __aout_NewInstance( vlc_object_t * p_parent )
     vlc_mutex_init( p_parent, &p_aout->output_fifo_lock );
     p_aout->i_nb_inputs = 0;
     p_aout->mixer.f_multiplier = 1.0;
+    p_aout->mixer.b_error = 1;
 
     vlc_object_attach( p_aout, p_parent->p_vlc );
 
@@ -67,9 +65,9 @@ aout_instance_t * __aout_NewInstance( vlc_object_t * p_parent )
 }
 
 /*****************************************************************************
- * aout_DeleteInstance: destroy aout structure
+ * aout_Delete: destroy aout structure
  *****************************************************************************/
-void aout_DeleteInstance( aout_instance_t * p_aout )
+void aout_Delete( aout_instance_t * p_aout )
 {
     vlc_mutex_destroy( &p_aout->input_fifos_lock );
     vlc_mutex_destroy( &p_aout->mixer_lock );
@@ -81,77 +79,7 @@ void aout_DeleteInstance( aout_instance_t * p_aout )
 
 
 /*
- * Buffer management (interface to the decoders)
- */
-
-/*****************************************************************************
- * aout_BufferNew : ask for a new empty buffer
- *****************************************************************************/
-aout_buffer_t * aout_BufferNew( aout_instance_t * p_aout,
-                                aout_input_t * p_input,
-                                size_t i_nb_samples )
-{
-    aout_buffer_t * p_buffer;
-    mtime_t duration = (1000000 * (mtime_t)i_nb_samples)
-                        / p_input->input.i_rate;
-
-    /* This necessarily allocates in the heap. */
-    aout_BufferAlloc( &p_input->input_alloc, duration, NULL, p_buffer );
-    p_buffer->i_nb_samples = i_nb_samples;
-    p_buffer->i_nb_bytes = i_nb_samples * p_input->input.i_bytes_per_frame
-                              / p_input->input.i_frame_length;
-
-    if ( p_buffer == NULL )
-    {
-        msg_Err( p_aout, "NULL buffer !" );
-    }
-    else
-    {
-        p_buffer->start_date = p_buffer->end_date = 0;
-    }
-
-    return p_buffer;
-}
-
-/*****************************************************************************
- * aout_BufferDelete : destroy an undecoded buffer
- *****************************************************************************/
-void aout_BufferDelete( aout_instance_t * p_aout, aout_input_t * p_input,
-                        aout_buffer_t * p_buffer )
-{
-    aout_BufferFree( p_buffer );
-}
-
-/*****************************************************************************
- * aout_BufferPlay : filter & mix the decoded buffer
- *****************************************************************************/
-int aout_BufferPlay( aout_instance_t * p_aout, aout_input_t * p_input,
-                     aout_buffer_t * p_buffer )
-{
-    if ( p_buffer->start_date == 0 )
-    {
-        msg_Warn( p_aout, "non-dated buffer received" );
-        aout_BufferFree( p_buffer );
-    }
-    else
-    {
-        p_buffer->end_date = p_buffer->start_date
-                                + (mtime_t)(p_buffer->i_nb_samples * 1000000)
-                                    / p_input->input.i_rate;
-    }
-
-    /* If the buffer is too early, wait a while. */
-    mwait( p_buffer->start_date - AOUT_MAX_PREPARE_TIME );
-
-    if ( aout_InputPlay( p_aout, p_input, p_buffer ) == -1 ) return -1;
-
-    /* Run the mixer if it is able to run. */
-    aout_MixerRun( p_aout );
-}
-
-
-/*
- * Formats management
+ * Formats management (internal and external)
  */
 
 /*****************************************************************************

@@ -3,7 +3,7 @@
  *                      with endianness change
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: s16tofloat32swab.c,v 1.3 2002/09/20 23:27:03 massiot Exp $
+ * $Id: s16tofloat32swab.c,v 1.4 2002/09/26 22:40:19 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -115,7 +115,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 #ifndef HAVE_SWAB
         p_tmp[0] = ((byte_t *)p_in)[1];
         p_tmp[1] = ((byte_t *)p_in)[0];
-        *p_out = (float)*( *(s16 *)p_tmp ) / 32768.0;
+        *p_out = (float)( *(s16 *)p_tmp ) / 32768.0;
 #else
         *p_out = (float)*p_in / 32768.0;
 #endif

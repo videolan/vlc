@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.2 2002/08/23 14:05:22 sam Exp $
+ * $Id: decoder.c,v 1.3 2002/09/26 22:40:21 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -447,15 +447,15 @@ static void DecodeThread( adec_thread_t *p_adec )
         if( p_adec->p_aout_input )
         {
             /* **** Delete the old **** */
-            aout_InputDelete( p_adec->p_aout, p_adec->p_aout_input );
+            aout_DecDelete( p_adec->p_aout, p_adec->p_aout_input );
         }
 
         /* **** Create a new audio output **** */
         p_adec->output_format.i_channels = faad_frame.channels;
         aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
-        p_adec->p_aout_input = aout_InputNew( p_adec->p_fifo,
-                                              &p_adec->p_aout,
-                                              &p_adec->output_format );
+        p_adec->p_aout_input = aout_DecNew( p_adec->p_fifo,
+                                            &p_adec->p_aout,
+                                            &p_adec->output_format );
     }
 
     if( !p_adec->p_aout_input )
@@ -473,9 +473,9 @@ static void DecodeThread( adec_thread_t *p_adec )
         return;
     }
 
-    p_aout_buffer = aout_BufferNew( p_adec->p_aout, 
-                                    p_adec->p_aout_input,
-                                    faad_frame.samples / faad_frame.channels );
+    p_aout_buffer = aout_DecNewBuffer( p_adec->p_aout, 
+                                       p_adec->p_aout_input,
+                                       faad_frame.samples / faad_frame.channels );
     if( !p_aout_buffer )
     {
         msg_Err( p_adec->p_fifo, "cannot get aout buffer" );
@@ -490,7 +490,7 @@ static void DecodeThread( adec_thread_t *p_adec )
             p_faad_buffer,
             p_aout_buffer->i_nb_bytes );
 
-    aout_BufferPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
+    aout_DecPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
 }
 
 
@@ -501,7 +501,7 @@ static void EndThread (adec_thread_t *p_adec)
 {
     if( p_adec->p_aout_input )
     {
-        aout_InputDelete( p_adec->p_aout, p_adec->p_aout_input );
+        aout_DecDelete( p_adec->p_aout, p_adec->p_aout_input );
     }
 
     if( p_adec->p_handle )

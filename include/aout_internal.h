@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.20 2002/09/20 23:27:03 massiot Exp $
+ * $Id: aout_internal.h,v 1.21 2002/09/26 22:40:18 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -120,6 +120,8 @@ typedef struct aout_mixer_t
     void                 (* pf_do_work)( struct aout_instance_t *,
                                          struct aout_buffer_t * );
 
+    /* If b_error == 1, there is no mixer nor audio output pipeline. */
+    vlc_bool_t              b_error;
     /* Multiplier used to raise or lower the volume of the sound in
      * software. Beware, this creates sound distortion and should be avoided
      * as much as possible. This isn't available for non-float32 mixer. */
@@ -147,8 +149,10 @@ struct aout_input_t
     /* Mixer information */
     byte_t *                p_first_byte_to_mix;
 
-    /* Is the input dead ? */
+    /* If b_error == 1, there is no input pipeline. */
     vlc_bool_t              b_error;
+    /* Did we just change the output format ? (expect buffer inconsistencies) */
+    vlc_bool_t              b_changed;
 };
 
 /*****************************************************************************
@@ -186,7 +190,7 @@ struct aout_instance_t
 
     /* Locks : please note that if you need several of these locks, it is
      * mandatory (to avoid deadlocks) to take them in the following order :
-     * p_input->lock, mixer_lock, output_fifo_lock, input_fifos_lock.
+     * mixer_lock, p_input->lock, output_fifo_lock, input_fifos_lock.
      * --Meuuh */
     /* When input_fifos_lock is taken, none of the p_input->fifo structures
      * can be read or modified by a third-party thread. */
@@ -214,6 +218,8 @@ struct aout_instance_t
  * Prototypes
  *****************************************************************************/
 /* From input.c : */
+int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input );
+int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input );
 int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                     aout_buffer_t * p_buffer );
 
@@ -235,7 +241,7 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
 
 /* From mixer.c : */
 int aout_MixerNew( aout_instance_t * p_aout );
-void aout_MixerDelete( aout_instance_t * p_aout );
+int aout_MixerDelete( aout_instance_t * p_aout );
 void aout_MixerRun( aout_instance_t * p_aout );
 int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier );
 int aout_MixerMultiplierGet( aout_instance_t * p_aout, float * pf_multiplier );
@@ -247,7 +253,7 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer );
 void aout_OutputDelete( aout_instance_t * p_aout );
 VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t, vlc_bool_t ) );
 
-/* From audio_output.c : */
+/* From common.c : */
 VLC_EXPORT( int, aout_FormatNbChannels, ( audio_sample_format_t * p_format ) );
 void aout_FormatPrepare( audio_sample_format_t * p_format );
 void aout_FifoInit( aout_instance_t *, aout_fifo_t *, u32 );

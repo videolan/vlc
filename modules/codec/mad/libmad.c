@@ -155,7 +155,7 @@ enum mad_flow libmad_output( void *p_data, struct mad_header const *p_header,
            || p_dec->output_format.i_channels != p_pcm->channels) )
     {
         /* Parameters changed - this should not happen. */
-        aout_InputDelete( p_dec->p_aout, p_dec->p_aout_input );
+        aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
         p_dec->p_aout_input = NULL;
     }
 
@@ -165,9 +165,9 @@ enum mad_flow libmad_output( void *p_data, struct mad_header const *p_header,
         p_dec->output_format.i_rate = p_pcm->samplerate;
         p_dec->output_format.i_channels = p_pcm->channels;
         aout_DateInit( &p_dec->end_date, p_pcm->samplerate );
-        p_dec->p_aout_input = aout_InputNew( p_dec->p_fifo,
-                                             &p_dec->p_aout,
-                                             &p_dec->output_format );
+        p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
+                                           &p_dec->p_aout,
+                                           &p_dec->output_format );
 
         if ( p_dec->p_aout_input == NULL )
         {
@@ -199,7 +199,7 @@ enum mad_flow libmad_output( void *p_data, struct mad_header const *p_header,
         return MAD_FLOW_CONTINUE;
     }
 
-    p_buffer = aout_BufferNew( p_dec->p_aout, p_dec->p_aout_input, i_samples );
+    p_buffer = aout_DecNewBuffer( p_dec->p_aout, p_dec->p_aout_input, i_samples );
 
     if ( p_buffer == NULL )
     {
@@ -233,7 +233,7 @@ enum mad_flow libmad_output( void *p_data, struct mad_header const *p_header,
                                 p_pcm->channels );
     }
 
-    aout_BufferPlay( p_dec->p_aout, p_dec->p_aout_input, p_buffer );
+    aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, p_buffer );
 
     return MAD_FLOW_CONTINUE;
 }

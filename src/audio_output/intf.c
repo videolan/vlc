@@ -2,7 +2,7 @@
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.3 2002/09/19 21:56:40 massiot Exp $
+ * $Id: intf.c,v 1.4 2002/09/26 22:40:25 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -31,6 +31,7 @@
 
 #include "audio_output.h"
 #include "aout_internal.h"
+
 
 /*
  * Volume management
@@ -64,7 +65,7 @@ int aout_VolumeGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
 
     vlc_mutex_lock( &p_aout->mixer_lock );
 
-    if ( p_aout->i_nb_inputs == 0 )
+    if ( p_aout->mixer.b_error )
     {
         /* The output module is destroyed. */
         vlc_mutex_unlock( &p_aout->mixer_lock );
@@ -87,7 +88,7 @@ int aout_VolumeSet( aout_instance_t * p_aout, audio_volume_t i_volume )
 
     vlc_mutex_lock( &p_aout->mixer_lock );
 
-    if ( p_aout->i_nb_inputs == 0 )
+    if ( p_aout->mixer.b_error )
     {
         /* The output module is destroyed. */
         vlc_mutex_unlock( &p_aout->mixer_lock );
@@ -110,7 +111,7 @@ int aout_VolumeInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )
 
     vlc_mutex_lock( &p_aout->mixer_lock );
 
-    if ( p_aout->i_nb_inputs == 0 )
+    if ( p_aout->mixer.b_error )
     {
         /* The output module is destroyed. */
         vlc_mutex_unlock( &p_aout->mixer_lock );
@@ -138,7 +139,7 @@ int aout_VolumeUp( aout_instance_t * p_aout, int i_nb_steps,
 
     vlc_mutex_lock( &p_aout->mixer_lock );
 
-    if ( p_aout->i_nb_inputs == 0 )
+    if ( p_aout->mixer.b_error )
     {
         /* The output module is destroyed. */
         vlc_mutex_unlock( &p_aout->mixer_lock );
@@ -177,7 +178,7 @@ int aout_VolumeDown( aout_instance_t * p_aout, int i_nb_steps,
 
     vlc_mutex_lock( &p_aout->mixer_lock );
 
-    if ( p_aout->i_nb_inputs == 0 )
+    if ( p_aout->mixer.b_error )
     {
         /* The output module is destroyed. */
         vlc_mutex_unlock( &p_aout->mixer_lock );
@@ -275,10 +276,82 @@ int aout_VolumeNoneGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
     return -1;
 }
 
-
 /* Placeholder for pf_volume_set(). */
 int aout_VolumeNoneSet( aout_instance_t * p_aout, audio_volume_t i_volume )
 {
     return -1;
+}
+
+
+/*
+ * Pipelines management
+ */
+
+/*****************************************************************************
+ * aout_Restart : re-open the output device and rebuild the input and output
+ *                pipelines
+ *****************************************************************************
+ * This function is used whenever the parameters of the output plug-in are
+ * changed (eg. selecting S/PDIF or PCM).
+ *****************************************************************************/
+int aout_Restart( aout_instance_t * p_aout )
+{
+    int i;
+    vlc_bool_t b_error = 0;
+
+    vlc_mutex_lock( &p_aout->mixer_lock );
+
+    if ( p_aout->i_nb_inputs == 0 )
+    {
+        vlc_mutex_unlock( &p_aout->mixer_lock );
+        msg_Err( p_aout, "no decoder thread" );
+        return -1;
+    }
+
+    /* Lock all inputs. */
+    for ( i = 0; i < p_aout->i_nb_inputs; i++ )
+    {
+        vlc_mutex_lock( &p_aout->pp_inputs[i]->lock );
+        aout_InputDelete( p_aout, p_aout->pp_inputs[i] );
+    }
+
+    aout_MixerDelete( p_aout );
+
+    /* Re-open the output plug-in. */
+    aout_OutputDelete( p_aout );
+    if ( aout_OutputNew( p_aout, &p_aout->pp_inputs[0]->input ) == -1 )
+    {
+        /* Release all locks and report the error. */
+        for ( i = 0; i < p_aout->i_nb_inputs; i++ )
+        {
+            vlc_mutex_unlock( &p_aout->pp_inputs[i]->lock );
+        }
+        vlc_mutex_unlock( &p_aout->mixer_lock );
+        return -1;
+    }
+
+    if ( aout_MixerNew( p_aout ) == -1 )
+    {
+        aout_OutputDelete( p_aout );
+        for ( i = 0; i < p_aout->i_nb_inputs; i++ )
+        {
+            vlc_mutex_unlock( &p_aout->pp_inputs[i]->lock );
+        }
+        vlc_mutex_unlock( &p_aout->mixer_lock );
+        return -1;
+    }
+
+    /* Re-open all inputs. */
+    for ( i = 0; i < p_aout->i_nb_inputs; i++ )
+    {
+        aout_input_t * p_input = p_aout->pp_inputs[i];
+
+        b_error |= aout_InputNew( p_aout, p_input );
+        vlc_mutex_unlock( &p_input->lock );
+    }
+
+    vlc_mutex_unlock( &p_aout->mixer_lock );
+
+    return b_error;
 }
 

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.31 2002/09/17 14:56:13 sam Exp $
+ * $Id: libvlc.c,v 1.32 2002/09/26 22:40:24 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -677,7 +677,7 @@ vlc_error_t vlc_destroy_r( vlc_t *p_vlc )
         {
             vlc_object_detach( (vlc_object_t *)p_aout );
             vlc_object_release( (vlc_object_t *)p_aout );
-            aout_DeleteInstance( p_aout );
+            aout_Delete( p_aout );
         }
 
         /* Update the handle status */

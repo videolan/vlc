@@ -2,7 +2,7 @@
  * a52old.c: A52 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: a52old.c,v 1.6 2002/08/30 22:22:24 massiot Exp $
+ * $Id: a52old.c,v 1.7 2002/09/26 22:40:20 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -167,7 +167,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             {
                 /* Delete old output */
                 msg_Warn( p_a52dec->p_fifo, "opening a new aout" );
-                aout_InputDelete( p_a52dec->p_aout, p_a52dec->p_aout_input );
+                aout_DecDelete( p_a52dec->p_aout, p_a52dec->p_aout_input );
             }
 
             /* Set output configuration */
@@ -175,9 +175,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             output_format.i_channels = 2; /* FIXME ! */
             output_format.i_rate     = sync_info.sample_rate;
             aout_DateInit( &end_date, output_format.i_rate );
-            p_a52dec->p_aout_input = aout_InputNew( p_a52dec->p_fifo,
-                                                    &p_a52dec->p_aout,
-                                                    &output_format );
+            p_a52dec->p_aout_input = aout_DecNew( p_a52dec->p_fifo,
+                                                  &p_a52dec->p_aout,
+                                                  &output_format );
         }
 
         if( p_a52dec->p_aout_input == NULL )
@@ -198,9 +198,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             continue;
         }
 
-        p_aout_buffer = aout_BufferNew( p_a52dec->p_aout,
-                                        p_a52dec->p_aout_input,
-                                        A52DEC_FRAME_SIZE );
+        p_aout_buffer = aout_DecNewBuffer( p_a52dec->p_aout,
+                                           p_a52dec->p_aout_input,
+                                           A52DEC_FRAME_SIZE );
         if( !p_aout_buffer )
         {
             msg_Err( p_a52dec->p_fifo, "cannot get aout buffer" );
@@ -215,14 +215,14 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         if (decode_frame (p_a52dec, (s16*)p_aout_buffer->p_buffer))
         {
             b_sync = 0;
-            aout_BufferDelete( p_a52dec->p_aout, p_a52dec->p_aout_input,
-                                                 p_aout_buffer );
+            aout_DecDeleteBuffer( p_a52dec->p_aout, p_a52dec->p_aout_input,
+                                  p_aout_buffer );
             continue;
         }
         else
         {
-            aout_BufferPlay( p_a52dec->p_aout, p_a52dec->p_aout_input,
-                                               p_aout_buffer );
+            aout_DecPlay( p_a52dec->p_aout, p_a52dec->p_aout_input,
+                          p_aout_buffer );
         }
 
         RealignBits(&p_a52dec->bit_stream);
@@ -344,7 +344,7 @@ static void EndThread (a52dec_t * p_a52dec)
     /* If the audio output fifo was created, we destroy it */
     if( p_a52dec->p_aout_input )
     {
-        aout_InputDelete( p_a52dec->p_aout, p_a52dec->p_aout_input );
+        aout_DecDelete( p_a52dec->p_aout, p_a52dec->p_aout_input );
     }
 
     /* Free allocated structures */

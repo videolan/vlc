@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.14 2002/08/30 23:27:06 massiot Exp $
+ * $Id: output.c,v 1.15 2002/09/26 22:40:25 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -35,7 +35,7 @@
 /*****************************************************************************
  * aout_OutputNew : allocate a new output and rework the filter pipeline
  *****************************************************************************
- * This function is entered with the mixer_lock.
+ * This function is entered with the mixer lock.
  *****************************************************************************/
 int aout_OutputNew( aout_instance_t * p_aout,
                     audio_sample_format_t * p_format )
@@ -132,7 +132,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
 /*****************************************************************************
  * aout_OutputDelete : delete the output
  *****************************************************************************
- * This function is entered with the mixer_lock.
+ * This function is entered with the mixer lock.
  *****************************************************************************/
 void aout_OutputDelete( aout_instance_t * p_aout )
 {
@@ -146,7 +146,7 @@ void aout_OutputDelete( aout_instance_t * p_aout )
 /*****************************************************************************
  * aout_OutputPlay : play a buffer
  *****************************************************************************
- * This function is entered with the mixer_lock.
+ * This function is entered with the mixer lock.
  *****************************************************************************/
 void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 {
@@ -166,6 +166,7 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
  * If b_can_sleek is 1, the aout core functions won't try to resample
  * new buffers to catch up - that is we suppose that the output plug-in can
  * compensate it by itself. S/PDIF outputs should always set b_can_sleek = 1.
+ * This function is entered with no lock at all :-).
  *****************************************************************************/
 aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
                                        mtime_t start_date,

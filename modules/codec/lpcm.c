@@ -2,7 +2,7 @@
  * lpcm.c: lpcm decoder module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm.c,v 1.1 2002/09/20 23:27:03 massiot Exp $
+ * $Id: lpcm.c,v 1.2 2002/09/26 22:40:20 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -131,9 +131,9 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     p_dec->output_format.i_rate = 48000;
     
     aout_DateInit( &p_dec->end_date, 48000 );
-    p_dec->p_aout_input = aout_InputNew( p_dec->p_fifo,
-                                         &p_dec->p_aout,
-                                         &p_dec->output_format );
+    p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
+                                       &p_dec->p_aout,
+                                       &p_dec->output_format );
 
     if ( p_dec->p_aout_input == NULL )
     {
@@ -175,9 +175,9 @@ void DecodeFrame( dec_thread_t * p_dec )
         aout_DateSet( &p_dec->end_date, i_pts );
     }
     
-    p_aout_buffer = aout_BufferNew( p_dec->p_aout,
-                                  p_dec->p_aout_input,
-                                  LPCM_FRAME_NB );
+    p_aout_buffer = aout_DecNewBuffer( p_dec->p_aout,
+                                       p_dec->p_aout_input,
+                                       LPCM_FRAME_NB );
     
     if( !p_aout_buffer )
     {
@@ -200,13 +200,13 @@ void DecodeFrame( dec_thread_t * p_dec )
 
     if( p_dec->p_fifo->b_die )
     {
-        aout_BufferDelete( p_dec->p_aout, p_dec->p_aout_input,
-                           p_aout_buffer );
+        aout_DecDeleteBuffer( p_dec->p_aout, p_dec->p_aout_input,
+                              p_aout_buffer );
         return;
     }
 
-    aout_BufferPlay( p_dec->p_aout, p_dec->p_aout_input, 
-                     p_aout_buffer );
+    aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, 
+                  p_aout_buffer );
 }
 
 /*****************************************************************************
@@ -216,7 +216,7 @@ static void EndThread( dec_thread_t * p_dec )
 {
     if( p_dec->p_aout_input != NULL )
     {
-        aout_InputDelete( p_dec->p_aout, p_dec->p_aout_input );
+        aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
     }
 
     free( p_dec );

@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.66 2002/09/20 23:27:03 massiot Exp $
+ * $Id: audio_output.h,v 1.67 2002/09/26 22:40:18 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -168,23 +168,23 @@ struct audio_date_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-/* From audio_output.c : */
-#define aout_NewInstance(a) __aout_NewInstance(VLC_OBJECT(a))
-VLC_EXPORT( aout_instance_t *, __aout_NewInstance,    ( vlc_object_t * ) );
-VLC_EXPORT( void,              aout_DeleteInstance, ( aout_instance_t * ) );
-VLC_EXPORT( aout_buffer_t *, aout_BufferNew, ( aout_instance_t *, aout_input_t *, size_t ) );
-VLC_EXPORT( void, aout_BufferDelete, ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) );
-VLC_EXPORT( int, aout_BufferPlay, ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) );
+/* From common.c : */
+#define aout_New(a) __aout_New(VLC_OBJECT(a))
+VLC_EXPORT( aout_instance_t *, __aout_New, ( vlc_object_t * ) );
+VLC_EXPORT( void, aout_Delete, ( aout_instance_t * ) );
 VLC_EXPORT( void, aout_DateInit, ( audio_date_t *, u32 ) );
 VLC_EXPORT( void, aout_DateSet, ( audio_date_t *, mtime_t ) );
 VLC_EXPORT( void, aout_DateMove, ( audio_date_t *, mtime_t ) );
 VLC_EXPORT( mtime_t, aout_DateGet, ( const audio_date_t * ) );
 VLC_EXPORT( mtime_t, aout_DateIncrement, ( audio_date_t *, u32 ) );
 
-/* From input.c : */
-#define aout_InputNew(a,b,c) __aout_InputNew(VLC_OBJECT(a),b,c)
-VLC_EXPORT( aout_input_t *, __aout_InputNew, ( vlc_object_t *, aout_instance_t **, audio_sample_format_t * ) );
-VLC_EXPORT( void, aout_InputDelete, ( aout_instance_t *, aout_input_t * ) );
+/* From dec.c : */
+#define aout_DecNew(a, b, c) __aout_DecNew(VLC_OBJECT(a), b, c)
+VLC_EXPORT( aout_input_t *, __aout_DecNew, ( vlc_object_t *, aout_instance_t **, audio_sample_format_t * ) );
+VLC_EXPORT( int, aout_DecDelete, ( aout_instance_t *, aout_input_t * ) );
+VLC_EXPORT( aout_buffer_t *, aout_DecNewBuffer, ( aout_instance_t *, aout_input_t *, size_t ) );
+VLC_EXPORT( void, aout_DecDeleteBuffer, ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) );
+VLC_EXPORT( int, aout_DecPlay, ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) );
 
 /* From intf.c : */
 VLC_EXPORT( int, aout_VolumeGet, ( aout_instance_t *, audio_volume_t * ) );
@@ -192,4 +192,5 @@ VLC_EXPORT( int, aout_VolumeSet, ( aout_instance_t *, audio_volume_t ) );
 VLC_EXPORT( int, aout_VolumeInfos, ( aout_instance_t *, audio_volume_t * ) );
 VLC_EXPORT( int, aout_VolumeUp, ( aout_instance_t *, int, audio_volume_t * ) );
 VLC_EXPORT( int, aout_VolumeDown, ( aout_instance_t *, int, audio_volume_t * ) );
+VLC_EXPORT( int, aout_Restart, ( aout_instance_t * p_aout ) );
 

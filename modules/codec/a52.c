@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.12 2002/09/20 23:27:03 massiot Exp $
+ * $Id: a52.c,v 1.13 2002/09/26 22:40:20 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -174,7 +174,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                 || (p_dec->output_format.i_bytes_per_frame != i_frame_size) ) )
         {
             /* Parameters changed - this should not happen. */
-            aout_InputDelete( p_dec->p_aout, p_dec->p_aout_input );
+            aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
             p_dec->p_aout_input = NULL;
         }
 
@@ -186,9 +186,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             p_dec->output_format.i_bytes_per_frame = i_frame_size;
             p_dec->output_format.i_frame_length = A52_FRAME_NB;
             aout_DateInit( &end_date, i_rate );
-            p_dec->p_aout_input = aout_InputNew( p_dec->p_fifo,
-                                                 &p_dec->p_aout,
-                                                 &p_dec->output_format );
+            p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
+                                               &p_dec->p_aout,
+                                               &p_dec->output_format );
 
             if ( p_dec->p_aout_input == NULL )
             {
@@ -206,8 +206,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             continue;
         }
 
-        p_buffer = aout_BufferNew( p_dec->p_aout, p_dec->p_aout_input,
-                                   A52_FRAME_NB );
+        p_buffer = aout_DecNewBuffer( p_dec->p_aout, p_dec->p_aout_input,
+                                      A52_FRAME_NB );
         if ( p_buffer == NULL ) return -1;
         p_buffer->start_date = aout_DateGet( &end_date );
         p_buffer->end_date = aout_DateIncrement( &end_date,
@@ -219,13 +219,13 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                   i_frame_size - 7 );
         if( p_dec->p_fifo->b_die )
         {
-            aout_BufferDelete( p_dec->p_aout, p_dec->p_aout_input,
-                               p_buffer );
+            aout_DecDeleteBuffer( p_dec->p_aout, p_dec->p_aout_input,
+                                  p_buffer );
             break;
         }
 
         /* Send the buffer to the mixer. */
-        aout_BufferPlay( p_dec->p_aout, p_dec->p_aout_input, p_buffer );
+        aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, p_buffer );
     }
 
     /* If b_error is set, the spdif thread enters the error loop */
@@ -247,7 +247,7 @@ static void EndThread( dec_thread_t * p_dec )
 {
     if ( p_dec->p_aout_input != NULL )
     {
-        aout_InputDelete( p_dec->p_aout, p_dec->p_aout_input );
+        aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
     }
 
     free( p_dec );

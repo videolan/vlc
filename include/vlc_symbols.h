@@ -2,11 +2,11 @@
 
 struct module_symbols_t
 {
-    aout_buffer_t * (* aout_BufferNew_inner) ( aout_instance_t *, aout_input_t *, size_t ) ;
+    aout_buffer_t * (* aout_DecNewBuffer_inner) ( aout_instance_t *, aout_input_t *, size_t ) ;
     aout_buffer_t * (* aout_FifoPop_inner) ( aout_instance_t * p_aout, aout_fifo_t * p_fifo ) ;
     aout_buffer_t * (* aout_OutputNextBuffer_inner) ( aout_instance_t *, mtime_t, vlc_bool_t ) ;
-    aout_input_t * (* __aout_InputNew_inner) ( vlc_object_t *, aout_instance_t **, audio_sample_format_t * ) ;
-    aout_instance_t * (* __aout_NewInstance_inner) ( vlc_object_t * ) ;
+    aout_input_t * (* __aout_DecNew_inner) ( vlc_object_t *, aout_instance_t **, audio_sample_format_t * ) ;
+    aout_instance_t * (* __aout_New_inner) ( vlc_object_t * ) ;
     char * (* __config_GetPsz_inner) (vlc_object_t *, const char *) ;
     char * (* config_GetHomeDir_inner) ( void ) ;
     char * (* input_OffsetToTime_inner) ( input_thread_t *, char *, off_t ) ;
@@ -37,8 +37,10 @@ struct module_symbols_t
     int (* __vlc_thread_create_inner) ( vlc_object_t *, char *, int, char *, void * ( * ) ( void * ), int, vlc_bool_t ) ;
     int (* __vlc_threads_end_inner) ( vlc_object_t * ) ;
     int (* __vlc_threads_init_inner) ( vlc_object_t * ) ;
-    int (* aout_BufferPlay_inner) ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) ;
+    int (* aout_DecDelete_inner) ( aout_instance_t *, aout_input_t * ) ;
+    int (* aout_DecPlay_inner) ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) ;
     int (* aout_FormatNbChannels_inner) ( audio_sample_format_t * p_format ) ;
+    int (* aout_Restart_inner) ( aout_instance_t * p_aout ) ;
     int (* aout_VolumeDown_inner) ( aout_instance_t *, int, audio_volume_t * ) ;
     int (* aout_VolumeGet_inner) ( aout_instance_t *, audio_volume_t * ) ;
     int (* aout_VolumeInfos_inner) ( aout_instance_t *, audio_volume_t * ) ;
@@ -111,12 +113,11 @@ struct module_symbols_t
     void (* __vlc_object_yield_inner) ( vlc_object_t * ) ;
     void (* __vlc_thread_join_inner) ( vlc_object_t *, char *, int ) ;
     void (* __vlc_thread_ready_inner) ( vlc_object_t * ) ;
-    void (* aout_BufferDelete_inner) ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) ;
     void (* aout_DateInit_inner) ( audio_date_t *, u32 ) ;
     void (* aout_DateMove_inner) ( audio_date_t *, mtime_t ) ;
     void (* aout_DateSet_inner) ( audio_date_t *, mtime_t ) ;
-    void (* aout_DeleteInstance_inner) ( aout_instance_t * ) ;
-    void (* aout_InputDelete_inner) ( aout_instance_t *, aout_input_t * ) ;
+    void (* aout_DecDeleteBuffer_inner) ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) ;
+    void (* aout_Delete_inner) ( aout_instance_t * ) ;
     void (* aout_VolumeNoneInit_inner) ( aout_instance_t * ) ;
     void (* aout_VolumeSoftInit_inner) ( aout_instance_t * ) ;
     void (* config_Duplicate_inner) ( module_t *, module_config_t * ) ;
@@ -172,8 +173,8 @@ struct module_symbols_t
 #   define UnalignedGetBits p_symbols->UnalignedGetBits_inner
 #   define UnalignedRemoveBits p_symbols->UnalignedRemoveBits_inner
 #   define UnalignedShowBits p_symbols->UnalignedShowBits_inner
-#   define __aout_InputNew p_symbols->__aout_InputNew_inner
-#   define __aout_NewInstance p_symbols->__aout_NewInstance_inner
+#   define __aout_DecNew p_symbols->__aout_DecNew_inner
+#   define __aout_New p_symbols->__aout_New_inner
 #   define __config_GetFloat p_symbols->__config_GetFloat_inner
 #   define __config_GetInt p_symbols->__config_GetInt_inner
 #   define __config_GetPsz p_symbols->__config_GetPsz_inner
@@ -222,19 +223,20 @@ struct module_symbols_t
 #   define __vlc_threads_end p_symbols->__vlc_threads_end_inner
 #   define __vlc_threads_init p_symbols->__vlc_threads_init_inner
 #   define __vout_CreateThread p_symbols->__vout_CreateThread_inner
-#   define aout_BufferDelete p_symbols->aout_BufferDelete_inner
-#   define aout_BufferNew p_symbols->aout_BufferNew_inner
-#   define aout_BufferPlay p_symbols->aout_BufferPlay_inner
 #   define aout_DateGet p_symbols->aout_DateGet_inner
 #   define aout_DateIncrement p_symbols->aout_DateIncrement_inner
 #   define aout_DateInit p_symbols->aout_DateInit_inner
 #   define aout_DateMove p_symbols->aout_DateMove_inner
 #   define aout_DateSet p_symbols->aout_DateSet_inner
-#   define aout_DeleteInstance p_symbols->aout_DeleteInstance_inner
+#   define aout_DecDelete p_symbols->aout_DecDelete_inner
+#   define aout_DecDeleteBuffer p_symbols->aout_DecDeleteBuffer_inner
+#   define aout_DecNewBuffer p_symbols->aout_DecNewBuffer_inner
+#   define aout_DecPlay p_symbols->aout_DecPlay_inner
+#   define aout_Delete p_symbols->aout_Delete_inner
 #   define aout_FifoPop p_symbols->aout_FifoPop_inner
 #   define aout_FormatNbChannels p_symbols->aout_FormatNbChannels_inner
-#   define aout_InputDelete p_symbols->aout_InputDelete_inner
 #   define aout_OutputNextBuffer p_symbols->aout_OutputNextBuffer_inner
+#   define aout_Restart p_symbols->aout_Restart_inner
 #   define aout_VolumeDown p_symbols->aout_VolumeDown_inner
 #   define aout_VolumeGet p_symbols->aout_VolumeGet_inner
 #   define aout_VolumeInfos p_symbols->aout_VolumeInfos_inner

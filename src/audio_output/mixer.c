@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.15 2002/09/23 23:05:58 massiot Exp $
+ * $Id: mixer.c,v 1.16 2002/09/26 22:40:25 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -49,6 +49,7 @@ int aout_MixerNew( aout_instance_t * p_aout )
         msg_Err( p_aout, "no suitable aout mixer" );
         return -1;
     }
+    p_aout->mixer.b_error = 0;
     return 0;
 }
 
@@ -57,22 +58,48 @@ int aout_MixerNew( aout_instance_t * p_aout )
  *****************************************************************************
  * Please note that you must hold the mixer lock.
  *****************************************************************************/
-void aout_MixerDelete( aout_instance_t * p_aout )
+int aout_MixerDelete( aout_instance_t * p_aout )
 {
+    if ( p_aout->mixer.b_error ) return 0;
     module_Unneed( p_aout, p_aout->mixer.p_module );
+    p_aout->mixer.b_error = 1;
+
+    return 0;
 }
 
 /*****************************************************************************
  * MixBuffer: try to prepare one output buffer
+ *****************************************************************************
+ * Please note that you must hold the mixer lock.
  *****************************************************************************/
 static int MixBuffer( aout_instance_t * p_aout )
 {
-    int             i;
+    int             i, i_nb_real_inputs = 0;
     aout_buffer_t * p_output_buffer;
     mtime_t start_date, end_date;
     audio_date_t exact_start_date;
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    if ( p_aout->mixer.b_error )
+    {
+        /* Free all incoming buffers. */
+        vlc_mutex_lock( &p_aout->input_fifos_lock );
+        for ( i = 0; i < p_aout->i_nb_inputs; i++ )
+        {
+            aout_input_t * p_input = p_aout->pp_inputs[i];
+            aout_buffer_t * p_buffer = p_input->fifo.p_first;
+            if ( p_input->b_error ) continue;
+            while ( p_buffer != NULL )
+            {
+                aout_buffer_t * p_next = p_buffer->p_next;
+                aout_BufferFree( p_buffer );
+                p_buffer = p_next;
+            }
+        }
+        vlc_mutex_unlock( &p_aout->input_fifos_lock );
+        return -1;
+    }
+
+
     vlc_mutex_lock( &p_aout->output_fifo_lock );
     vlc_mutex_lock( &p_aout->input_fifos_lock );
 
@@ -125,7 +152,6 @@ static int MixBuffer( aout_instance_t * p_aout )
         {
             /* Interrupted before the end... We can't run. */
             vlc_mutex_unlock( &p_aout->input_fifos_lock );
-            vlc_mutex_unlock( &p_aout->mixer_lock );
             return -1;
         }
     }
@@ -143,6 +169,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         vlc_bool_t b_drop_buffers;
 
         if ( p_input->b_error ) continue;
+        i_nb_real_inputs++;
 
         p_buffer = p_fifo->p_first;
         if ( p_buffer == NULL )
@@ -241,11 +268,10 @@ static int MixBuffer( aout_instance_t * p_aout )
         if ( p_buffer == NULL ) break;
     }
 
-    if ( i < p_aout->i_nb_inputs )
+    if ( i < p_aout->i_nb_inputs || !i_nb_real_inputs )
     {
         /* Interrupted before the end... We can't run. */
         vlc_mutex_unlock( &p_aout->input_fifos_lock );
-        vlc_mutex_unlock( &p_aout->mixer_lock );
         return -1;
     }
 
@@ -261,7 +287,6 @@ static int MixBuffer( aout_instance_t * p_aout )
     {
         msg_Err( p_aout, "out of memory" );
         vlc_mutex_unlock( &p_aout->input_fifos_lock );
-        vlc_mutex_unlock( &p_aout->mixer_lock );
         return -1;
     }
     /* This is again a bit kludgy - for the S/PDIF mixer. */
@@ -281,13 +306,13 @@ static int MixBuffer( aout_instance_t * p_aout )
 
     aout_OutputPlay( p_aout, p_output_buffer );
 
-    vlc_mutex_unlock( &p_aout->mixer_lock );
-
     return 0;
 }
 
 /*****************************************************************************
  * aout_MixerRun: entry point for the mixer & post-filters processing
+ *****************************************************************************
+ * Please note that you must hold the mixer lock.
  *****************************************************************************/
 void aout_MixerRun( aout_instance_t * p_aout )
 {
@@ -303,12 +328,17 @@ void aout_MixerRun( aout_instance_t * p_aout )
 int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier )
 {
     float f_old = p_aout->mixer.f_multiplier;
+    vlc_bool_t b_new_mixer = 0;
 
-    aout_MixerDelete( p_aout );
+    if ( !p_aout->mixer.b_error )
+    {
+        aout_MixerDelete( p_aout );
+        b_new_mixer = 1;
+    }
 
     p_aout->mixer.f_multiplier = f_multiplier;
 
-    if ( aout_MixerNew( p_aout ) )
+    if ( b_new_mixer && aout_MixerNew( p_aout ) )
     {
         p_aout->mixer.f_multiplier = f_old;
         aout_MixerNew( p_aout );

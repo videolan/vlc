@@ -2,7 +2,7 @@
  * decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: decoder.c,v 1.3 2002/08/26 23:00:22 massiot Exp $
+ * $Id: decoder.c,v 1.4 2002/09/26 22:40:23 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -174,7 +174,7 @@ static void DecodeThread( adec_thread_t * p_dec )
             {
                 /* Delete old output */
                 msg_Warn( p_dec->p_fifo, "opening a new aout" );
-                aout_InputDelete( p_dec->p_aout, p_dec->p_aout_input );
+                aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
             }
 
             /* Set output configuration */
@@ -182,9 +182,9 @@ static void DecodeThread( adec_thread_t * p_dec )
             p_dec->output_format.i_channels = ( sync_info.b_stereo ? 2 : 1 );
             p_dec->output_format.i_rate     = sync_info.sample_rate;
             aout_DateInit( &p_dec->end_date, sync_info.sample_rate );
-            p_dec->p_aout_input = aout_InputNew( p_dec->p_fifo,
-                                                  &p_dec->p_aout,
-                                                  &p_dec->output_format );
+            p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
+                                               &p_dec->p_aout,
+                                               &p_dec->output_format );
         }
 
         if( p_dec->p_aout_input == NULL )
@@ -200,9 +200,9 @@ static void DecodeThread( adec_thread_t * p_dec )
             return;
         }
 
-        p_aout_buffer = aout_BufferNew( p_dec->p_aout,
-                                        p_dec->p_aout_input,
-                                        ADEC_FRAME_NB );
+        p_aout_buffer = aout_DecNewBuffer( p_dec->p_aout,
+                                           p_dec->p_aout_input,
+                                           ADEC_FRAME_NB );
         if( !p_aout_buffer )
         {
             msg_Err( p_dec->p_fifo, "cannot get aout buffer" );
@@ -216,11 +216,11 @@ static void DecodeThread( adec_thread_t * p_dec )
         if( adec_DecodeFrame (p_dec, (float*)p_aout_buffer->p_buffer ) )
         {
             /* Ouch, failed decoding... We'll have to resync */
-            aout_BufferDelete( p_dec->p_aout, p_dec->p_aout_input, p_aout_buffer );
+            aout_DecDeleteBuffer( p_dec->p_aout, p_dec->p_aout_input, p_aout_buffer );
         }
         else
         {
-            aout_BufferPlay( p_dec->p_aout, p_dec->p_aout_input, p_aout_buffer );
+            aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, p_aout_buffer );
         }
     }
 }
@@ -236,7 +236,7 @@ static void EndThread ( adec_thread_t *p_dec )
     /* If the audio output fifo was created, we destroy it */
     if( p_dec->p_aout_input )
     {
-        aout_InputDelete( p_dec->p_aout, p_dec->p_aout_input );
+        aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
         
     }
 
