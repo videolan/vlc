@@ -47,18 +47,17 @@ static subpicture_t *Filter( filter_t *, mtime_t );
 struct filter_sys_t
 {
     int i_xoff, i_yoff;  /* offsets for the display string in the video window */
-    char *psz_head;  /* text to put before the day/time */
+    char *psz_format;    /* time format string */
 
     time_t last_time;
 };
 
-#define MSG_TEXT N_("Timestamp Prefix")
-#define MSG_LONGTEXT N_("Text (name) to display before the date and time")
-#define POSX_TEXT N_("X coordinate of the timestamp")
-#define POSX_LONGTEXT N_("Positive offset, from the left" )
-#define POSY_TEXT N_("Y coordinate of the timestamp")
-#define POSY_LONGTEXT N_("Positive offset, down from the top" )
-#define TRANS_TEXT N_("Transparency of the timestamp")
+#define MSG_TEXT N_("Time format string (%Y%m%d %H%M%S)")
+#define MSG_LONGTEXT N_("Time format string (%Y = year, %m = month, %d = day, %H = hour, %M = minute, %S = second")
+#define POSX_TEXT N_("X offset, from left")
+#define POSX_LONGTEXT N_("X offset, from the left screen edge" )
+#define POSY_TEXT N_("Y offset, from the top")
+#define POSY_LONGTEXT N_("Y offset, down from the top" )
 
 /*****************************************************************************
  * Module descriptor
@@ -66,7 +65,7 @@ struct filter_sys_t
 vlc_module_begin();
     set_capability( "sub filter", 0 );
     set_callbacks( CreateFilter, DestroyFilter );
-    add_string( "time-text", NULL, NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
+    add_string( "time-format", "%Y-%m-%d   %H:%M:%S", NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
     add_integer( "time-x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
     add_integer( "time-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
     set_description( _("Time display sub filter") );
@@ -96,7 +95,7 @@ static int CreateFilter( vlc_object_t *p_this )
     var_Create( p_this, "time-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_filter, "time-y", &val );
     p_sys->i_yoff = val.i_int;
-    p_sys->psz_head = var_CreateGetString( p_this, "time-text" );
+    p_sys->psz_format = var_CreateGetString( p_this, "time-format" );
 
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
@@ -112,19 +111,33 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( p_sys->psz_head ) free( p_sys->psz_head );
+    if( p_sys->psz_format ) free( p_sys->psz_format );
     free( p_sys );
 }
 
-char *myCtime( time_t *t )
+
+static char *FormatTime(char *tformat, time_t *t )
 {
-#ifdef HAVE_CTIME_R
-    char tmp[27];
-    ctime_r( t, tmp );
-    return strdup( tmp );
+  char buffer[255];
+  time_t curtime;
+#if defined(HAVE_LOCALTIME_R)
+  struct tm loctime;
 #else
-    return strdup( ctime(t) );
+  struct tm *loctime;
 #endif
+
+  /* Get the current time.  */
+  curtime = time( NULL );
+
+  /* Convert it to local time representation.  */
+#if defined(HAVE_LOCALTIME_R)
+  localtime_r( &curtime, &loctime );
+  strftime( buffer, 255, tformat, &loctime );
+#else
+  loctime = localtime( &curtime );
+  strftime( buffer, 255, tformat, loctime );
+#endif
+  return strdup( buffer );
 }
 
 /****************************************************************************
@@ -138,7 +151,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     subpicture_t *p_spu;
     video_format_t fmt;
     time_t t;
-    char *psz_time, *psz_string;
 
     if( p_sys->last_time == time( NULL ) ) return NULL;
 
@@ -160,12 +172,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     }
 
     t = p_sys->last_time = time( NULL );
- 
-    psz_time = myCtime( &t );
-    asprintf( &psz_string, "%s%s", p_sys->psz_head, psz_time );
-    free( psz_time );
 
-    p_spu->p_region->psz_text = psz_string;
+    p_spu->p_region->psz_text = FormatTime( p_sys->psz_format, &t );
     p_spu->i_start = date;
     p_spu->i_stop  = date + 1000000;
     p_spu->b_ephemer = VLC_TRUE;
