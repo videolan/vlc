@@ -864,26 +864,35 @@ void ExtraPanel::OnAdjustUpdate( wxScrollEvent &event)
             case Hue_Event:
                 val.i_int = event.GetPosition();
                 var_Set( p_vout, "hue", val );
+                config_PutInt( p_intf , "hue" , event.GetPosition() );
                 break;
 
             case Saturation_Event:
                 val.f_float = (float)event.GetPosition() / 100;
                 var_Set( p_vout, "saturation", val );
+                config_PutFloat( p_intf , "saturation" ,
+                                (float)event.GetPosition()/100 );
                 break;
 
             case Brightness_Event:
                 val.f_float = (float)event.GetPosition() / 100;
                 var_Set( p_vout, "brightness", val );
+                config_PutFloat( p_intf , "brightness" ,
+                                (float)event.GetPosition()/100 );
                 break;
 
             case Contrast_Event:
                 val.f_float = (float)event.GetPosition() / 100;
                 var_Set( p_vout, "contrast", val );
+                config_PutFloat( p_intf , "contrast" ,
+                                (float)event.GetPosition()/100 );
                 break;
 
             case Gamma_Event:
                 val.f_float = (float)event.GetPosition() / 10;
                 var_Set( p_vout, "gamma", val );
+                config_PutFloat( p_intf , "gamma" ,
+                                (float)event.GetPosition()/10 );
                 break;
         }
         vlc_object_release(p_vout);
