@@ -303,7 +303,7 @@ need_libc=false
 AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol strtof strtoll strtoull isatty vasprintf asprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2 if_nametoindex atoll getenv putenv setenv gmtime_r ctime_r localtime_r lrintf daemon)
 
 dnl Check for usual libc functions
-AC_CHECK_FUNCS(strdup strndup atof lseek)
+AC_CHECK_FUNCS(strdup strndup atof)
 AC_CHECK_FUNCS(strcasecmp,,[AC_CHECK_FUNCS(stricmp)])
 AC_CHECK_FUNCS(strncasecmp,,[AC_CHECK_FUNCS(strnicmp)])
 AC_CHECK_FUNCS(strcasestr,,[AC_CHECK_FUNCS(stristr)])
@@ -1756,20 +1756,46 @@ AC_ARG_ENABLE(mkv,
 if test "${enable_mkv}" != "no" -a "${CXX}" != ""; then
   AC_LANG_PUSH(C++)
   AC_CHECK_HEADERS(ebml/EbmlVersion.h, [
-    AC_CHECK_HEADERS(matroska/KaxVersion.h, [
-      AC_CHECK_HEADERS(matroska/KaxAttachments.h)
-      VLC_ADD_CXXFLAGS([mkv],[])
-      AC_CHECK_LIB(ebml_pic, main, [
-        # We have ebml_pic, that's good, we can build an mkv.so plugin !
-        VLC_ADD_PLUGINS([mkv])
-        VLC_ADD_LDFLAGS([mkv],[-lmatroska_pic -lebml_pic])
-      ], [
-        AC_CHECK_LIB(ebml, main, [
-          # We only have libebml, make mkv.a a builtin
-          VLC_ADD_BUILTINS([mkv])
-          VLC_ADD_LDFLAGS([mkv],[-lmatroska -lebml])
+    AC_MSG_CHECKING(for libebml version >= 0.7.3)
+    AC_EGREP_CPP(yes,
+      [#include <ebml/EbmlVersion.h>
+       #ifdef LIBEBML_VERSION
+       #if LIBEBML_VERSION >= 0x000703
+       yes
+       #endif
+       #endif],
+      [AC_MSG_RESULT([yes])
+        AC_CHECK_HEADERS(matroska/KaxVersion.h, [
+          AC_MSG_CHECKING(for libmatroska version >= 0.7.5)
+          AC_EGREP_CPP(yes,
+            [#include <matroska/KaxVersion.h>
+             #ifdef LIBMATROSKA_VERSION
+             #if LIBMATROSKA_VERSION >= 0x000705
+             yes
+             #endif
+             #endif],
+            [AC_MSG_RESULT([yes])
+              AC_CHECK_HEADERS(matroska/KaxAttachments.h)
+              VLC_ADD_CXXFLAGS([mkv],[])
+              AC_CHECK_LIB(ebml_pic, main, [
+                # We have ebml_pic, that's good, we can build an mkv.so plugin !
+                VLC_ADD_PLUGINS([mkv])
+                VLC_ADD_LDFLAGS([mkv],[-lmatroska_pic -lebml_pic])
+              ], [
+                AC_CHECK_LIB(ebml, main, [
+                  # We only have libebml, make mkv.a a builtin
+                  VLC_ADD_BUILTINS([mkv])
+                  VLC_ADD_LDFLAGS([mkv],[-lmatroska -lebml])
+                ])
+              ])
+            ],
+            [AC_MSG_RESULT([no])
+              AC_MSG_ERROR([Your libmatroska is too old: you may get a more recent one from http://dl.matroska.org/downloads/libmatroska/. Alternatively you can use --disable-mkv to disable the matroska plugin.])
+          ])
         ])
-      ])
+      ],
+      [AC_MSG_RESULT([no])
+        AC_MSG_ERROR([Your libebml is too old: you may get a more recent one from http://dl.matroska.org/downloads/libebml/. Alternatively you can use --disable-mkv to disable the matroska plugin.])
     ])
   ])
   AC_LANG_POP(C++)

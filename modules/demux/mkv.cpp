@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Steve Lhomme <steve.lhomme@free.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,6 +42,16 @@
 #include <iostream>
 #include <cassert>
 #include <typeinfo>
+#include <string>
+#include <vector>
+
+#ifdef HAVE_DIRENT_H
+#   include <dirent.h>
+#elif defined( UNDER_CE )
+#   include <windows.h>                               /* GetFileAttributes() */
+#else
+#   include "../../src/extras/dirent.h"
+#endif
 
 /* libebml and matroska */
 #include "ebml/EbmlHead.h"
@@ -49,8 +60,8 @@
 #include "ebml/EbmlContexts.h"
 #include "ebml/EbmlVersion.h"
 #include "ebml/EbmlVoid.h"
+#include "ebml/StdIOCallback.h"
 
-#include "matroska/FileKax.h"
 #include "matroska/KaxAttachments.h"
 #include "matroska/KaxBlock.h"
 #include "matroska/KaxBlockData.h"
@@ -84,6 +95,15 @@ extern "C" {
 
 #define MATROSKA_COMPRESSION_NONE 0
 #define MATROSKA_COMPRESSION_ZLIB 1
+
+/**
+ * What's between a directory and a filename?
+ */
+#if defined( WIN32 )
+    #define DIRECTORY_SEPARATOR '\\'
+#else
+    #define DIRECTORY_SEPARATOR '/'
+#endif
 
 using namespace LIBMATROSKA_NAMESPACE;
 using namespace std;
@@ -298,8 +318,36 @@ typedef struct
     vlc_bool_t b_key;
 } mkv_index_t;
 
-struct demux_sys_t
+class demux_sys_t
 {
+public:
+    demux_sys_t()
+        :in(NULL)
+        ,es(NULL)
+        ,ep(NULL)
+        ,i_timescale(0)
+        ,f_duration(0.0)
+        ,i_track(0)
+        ,track(NULL)
+        ,i_cues_position(0)
+        ,i_chapters_position(0)
+        ,i_tags_position(0)
+        ,segment(NULL)
+        ,cluster(NULL)
+        ,i_pts(0)
+        ,b_cues(false)
+        ,i_index(0)
+        ,i_index_max(0)
+        ,index(NULL)
+        ,psz_muxing_application(NULL)
+        ,psz_writing_application(NULL)
+        ,psz_segment_filename(NULL)
+        ,psz_title(NULL)
+        ,psz_date_utc(NULL)
+        ,meta(NULL)
+        ,title(NULL)
+    {}
+
     vlc_stream_io_callback  *in;
     EbmlStream              *es;
     EbmlParser              *ep;
@@ -322,6 +370,7 @@ struct demux_sys_t
     /* current data */
     KaxSegment              *segment;
     KaxCluster              *cluster;
+    KaxSegmentUID           segment_uid;
 
     mtime_t                 i_pts;
 
@@ -340,6 +389,9 @@ struct demux_sys_t
     vlc_meta_t              *meta;
 
     input_title_t           *title;
+
+    std::vector<KaxSegmentFamily> families;
+    std::vector<KaxSegment*> family_members;
 };
 
 #define MKVD_TIMECODESCALE 1000000
@@ -364,6 +416,9 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     uint8_t     *p_peek;
+    std::string  s_path, s_filename;
+    int          i_upper_lvl;
+    size_t       i, j;
 
     int          i_track;
 
@@ -389,9 +444,8 @@ static int Open( vlc_object_t * p_this )
     /* Set the demux function */
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys      = p_sys = (demux_sys_t*)malloc(sizeof( demux_sys_t ));
+    p_demux->p_sys      = p_sys = new demux_sys_t;
 
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
     p_sys->in = new vlc_stream_io_callback( p_demux->s );
     p_sys->es = new EbmlStream( *p_sys->in );
     p_sys->f_duration   = -1;
@@ -421,7 +475,7 @@ static int Open( vlc_object_t * p_this )
     {
         msg_Err( p_demux, "failed to create EbmlStream" );
         delete p_sys->in;
-        free( p_sys );
+        delete p_sys;
         return VLC_EGENERIC;
     }
     /* Find the EbmlHead element */
@@ -495,6 +549,139 @@ static int Open( vlc_object_t * p_this )
             msg_Dbg( p_demux, "|   + Unknown (%s)", typeid(*el1).name() );
         }
     }
+
+    /* get the files from the same dir from the same family (based on p_demux->psz_path) */
+    /* _todo_ handle multi-segment files */
+    if (p_demux->psz_path[0] != '\0' && (!strcmp(p_demux->psz_access, "") || !strcmp(p_demux->psz_access, "")))
+    {
+        // assume it's a regular file
+        // get the directory path
+        s_path = p_demux->psz_path;
+        if (s_path.at(s_path.length() - 1) == DIRECTORY_SEPARATOR)
+        {
+            s_path = s_path.substr(0,s_path.length()-1);
+        }
+        else
+        {
+            if (s_path.find_last_of(DIRECTORY_SEPARATOR) > 0) 
+            {
+                s_path = s_path.substr(0,s_path.find_last_of(DIRECTORY_SEPARATOR));
+            }
+        }
+
+        struct dirent *p_file_item;
+        DIR *p_src_dir = opendir(s_path.c_str());
+
+        if (p_src_dir != NULL)
+        {
+            while (p_file_item = readdir(p_src_dir))
+            {
+                if (p_file_item->d_namlen > 4)
+                {
+                    s_filename = s_path + DIRECTORY_SEPARATOR + p_file_item->d_name;
+
+                    if (!s_filename.compare(p_demux->psz_path))
+                        continue;
+
+                    if (!s_filename.compare(s_filename.length() - 3, 3, "mkv") || 
+                        !s_filename.compare(s_filename.length() - 3, 3, "mka"))
+                    {
+                        // test wether this file belongs to the our family
+                        bool b_keep_file_opened = false;
+                        StdIOCallback *p_file_io = new StdIOCallback(s_filename.c_str(), MODE_READ);
+                        EbmlStream *p_stream = new EbmlStream(*p_file_io);
+                        EbmlElement *p_l0, *p_l1, *p_l2;
+
+                        // verify the EBML Header
+                        p_l0 = p_stream->FindNextID(EbmlHead::ClassInfos, 0xFFFFFFFFL);
+                        if (p_l0 == NULL)
+                        {
+                            delete p_stream;
+                            delete p_file_io;
+                            continue;
+                        }
+
+                        p_l0->SkipData(*p_stream, EbmlHead_Context);
+                        delete p_l0;
+
+                        // find all segments in this file
+                        p_l0 = p_stream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
+                        if (p_l0 == NULL)
+                        {
+                            delete p_stream;
+                            delete p_file_io;
+                            continue;
+                        }
+
+                        i_upper_lvl = 0;
+
+                        while (p_l0 != 0)
+                        {
+                            if (EbmlId(*p_l0) == KaxSegment::ClassInfos.GlobalId)
+                            {
+                                EbmlParser  *ep;
+                                KaxSegmentUID *p_uid = NULL;
+
+                                ep = new EbmlParser(p_stream, p_l0);
+                                bool b_this_segment_matches = false;
+                                while (p_l1 = ep->Get())
+                                {
+                                    if (MKV_IS_ID(p_l1, KaxInfo))
+                                    {
+                                        // find the families of this segment
+                                        KaxInfo *p_info = static_cast<KaxInfo*>(p_l1);
+
+                                        p_info->Read(*p_stream, KaxInfo::ClassInfos.Context, i_upper_lvl, p_l2, true);
+                                        for( i = 0; i < p_info->ListSize() && !b_this_segment_matches; i++ )
+                                        {
+                                            EbmlElement *l = (*p_info)[i];
+
+                                            if( MKV_IS_ID( l, KaxSegmentUID ) )
+                                            {
+                                                p_uid = static_cast<KaxSegmentUID*>(l);
+                                                if (p_sys->segment_uid == *p_uid)
+                                                    break;
+                                            }
+                                            else if( MKV_IS_ID( l, KaxSegmentFamily ) )
+                                            {
+                                                KaxSegmentFamily *p_fam = static_cast<KaxSegmentFamily*>(l);
+                                                for (j=0; j<p_sys->families.size(); j++)
+                                                {
+                                                    if (p_sys->families.at(j) == *p_fam)
+                                                    {
+                                                        b_this_segment_matches = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+
+                                if (b_this_segment_matches)
+                                {
+                                    b_keep_file_opened = true;
+                                }
+                            }
+
+                            p_l0->SkipData(*p_stream, EbmlHead_Context);
+                            delete p_l0;
+                            p_l0 = p_stream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
+                        }
+
+                        if (!b_keep_file_opened)
+                        {
+                            delete p_stream;
+                            delete p_file_io;
+                        }
+                    }
+                }
+            }
+            closedir( p_src_dir );
+        }
+    }
+
 
     if( p_sys->cluster == NULL )
     {
@@ -739,6 +926,18 @@ static int Open( vlc_object_t * p_this )
             }
             tk.fmt.audio.i_blockalign = ( tk.fmt.audio.i_bitspersample + 7 ) / 8 * tk.fmt.audio.i_channels;
         }
+        else if( !strcmp( tk.psz_codec, "A_TTA1" ) )
+        {
+            /* FIXME: support this codec */
+            msg_Err( p_demux, "TTA not supported yet[%d, n=%d]", i_track, tk.i_number );
+            tk.fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+        }
+        else if( !strcmp( tk.psz_codec, "A_WAVPACK4" ) )
+        {
+            /* FIXME: support this codec */
+            msg_Err( p_demux, "Wavpack not supported yet[%d, n=%d]", i_track, tk.i_number );
+            tk.fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+        }
         else if( !strcmp( tk.psz_codec, "S_TEXT/UTF8" ) )
         {
             tk.fmt.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
@@ -775,6 +974,12 @@ static int Open( vlc_object_t * p_this )
                 free( p_buf );
             }
         }
+        else if( !strcmp( tk.psz_codec, "B_VOBBTN" ) )
+        {
+            /* FIXME: support this codec */
+            msg_Err( p_demux, "Vob Buttons not supported yet[%d, n=%d]", i_track, tk.i_number );
+            tk.fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+        }
         else
         {
             msg_Err( p_demux, "unknow codec id=`%s'", tk.psz_codec );
@@ -797,7 +1002,7 @@ static int Open( vlc_object_t * p_this )
 error:
     delete p_sys->es;
     delete p_sys->in;
-    free( p_sys );
+    delete p_sys;
     return VLC_EGENERIC;
 }
 
@@ -843,8 +1048,7 @@ static void Close( vlc_object_t *p_this )
     delete p_sys->ep;
     delete p_sys->es;
     delete p_sys->in;
-
-    free( p_sys );
+    delete p_sys;
 }
 
 /*****************************************************************************
@@ -1100,6 +1304,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
     }
     if( tk.p_es == NULL )
     {
+        msg_Err( p_demux, "unknown track number=%d", block->TrackNum() );
         return;
     }
 
@@ -2311,9 +2516,9 @@ static void ParseInfo( demux_t *p_demux, EbmlElement *info )
 
         if( MKV_IS_ID( l, KaxSegmentUID ) )
         {
-            KaxSegmentUID &uid = *(KaxSegmentUID*)l;
+            p_sys->segment_uid = *(new KaxSegmentUID(*static_cast<KaxSegmentUID*>(l)));
 
-            msg_Dbg( p_demux, "|   |   + UID=%d", uint32(uid) );
+            msg_Dbg( p_demux, "|   |   + UID=%d", *(uint32*)p_sys->segment_uid.GetBuffer() );
         }
         else if( MKV_IS_ID( l, KaxTimecodeScale ) )
         {
@@ -2367,6 +2572,14 @@ static void ParseInfo( demux_t *p_demux, EbmlElement *info )
             p_sys->psz_title = UTF8ToStr( UTFstring( title ) );
 
             msg_Dbg( p_demux, "|   |   + Title=%s", p_sys->psz_title );
+        }
+        if( MKV_IS_ID( l, KaxSegmentFamily ) )
+        {
+            KaxSegmentFamily *uid = static_cast<KaxSegmentFamily*>(l);
+
+            p_sys->families.push_back(*uid);
+
+            msg_Dbg( p_demux, "|   |   + family=%d", *(uint32*)uid->GetBuffer() );
         }
 #if defined( HAVE_GMTIME_R ) && !defined( SYS_DARWIN )
         else if( MKV_IS_ID( l, KaxDateUTC ) )
