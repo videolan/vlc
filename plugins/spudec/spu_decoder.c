@@ -2,9 +2,10 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.17 2002/04/23 22:07:05 gbazin Exp $
+ * $Id: spu_decoder.c,v 1.18 2002/05/01 19:18:09 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -821,6 +822,7 @@ static void RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
 
     int i_x, i_y;
     int i_len, i_color;
+    u8  i_cnt;
 
     /* RGB-specific */
     int i_xscale, i_yscale, i_width, i_height, i_ytmp, i_yreal, i_ynext;
@@ -1097,6 +1099,78 @@ static void RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
     }
 
     break;
+
+    /* NVidia overlay, no scaling */
+    case FOURCC_YUY2:
+
+    p_dest = p_pic->p->p_pixels +
+              (p_spu->i_x + p_spu->i_width +
+               p_vout->output.i_width * ( p_spu->i_y + p_spu->i_height )) * 2;
+    /* Draw until we reach the bottom of the subtitle */
+    for( i_y = p_spu->i_height * p_vout->output.i_width;
+         i_y ;
+         i_y -= p_vout->output.i_width )
+    {
+        /* Draw until we reach the end of the line */
+        for( i_x = p_spu->i_width ; i_x ; )
+        {
+            /* Get the RLE part, then draw the line */
+            i_color = *p_source & 0x3;
+
+            switch( p_spu->p_sys->pi_alpha[ i_color ] )
+            {
+            case 0x00:
+                i_x -= *p_source++ >> 2;
+                break;
+
+            case 0x0f:
+                i_len = *p_source++ >> 2;
+                for( i_cnt = 0; i_cnt < i_len; i_cnt++ )
+                {
+                    /* draw a pixel */
+                    /* Y */
+                    memset( p_dest - i_x * 2 - i_y * 2 + i_cnt * 2,
+                            p_spu->p_sys->pi_yuv[i_color][0], 1);
+
+                    if (!(i_cnt & 0x01))
+                    {
+                        /* U and V */
+                        memset( p_dest - i_x * 2 - i_y * 2 + i_cnt * 2 + 1,
+                                0x80, 1);
+                        memset( p_dest - i_x * 2 - i_y * 2 + i_cnt * 2 + 3,
+                                0x80, 1);
+                    }
+                }
+                i_x -= i_len;
+                break;
+
+            default:
+                /* FIXME: we should do transparency */
+                i_len = *p_source++ >> 2;
+                for( i_cnt = 0; i_cnt < i_len; i_cnt++ )
+                {
+                    /* draw a pixel */
+                    /* Y */
+                    memset( p_dest - i_x * 2 - i_y * 2 + i_cnt * 2,
+                            p_spu->p_sys->pi_yuv[i_color][0], 1);
+
+                    if (!(i_cnt & 0x01))
+                    {
+                        /* U and V */
+                        memset( p_dest - i_x * 2 - i_y * 2 + i_cnt * 2 + 1,
+                                0x80, 1);
+                        memset( p_dest - i_x * 2 - i_y * 2 + i_cnt * 2 + 3,
+                                0x80, 1);
+                    }
+                }
+                i_x -= i_len;
+                break;
+            }
+        }
+    }
+
+    break;
+
 
     default:
         intf_ErrMsg( "vout error: unknown chroma, can't render SPU" );
