@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.132 2001/12/07 18:33:08 sam Exp $
+ * $Id: main.c,v 1.132.2.1 2001/12/10 04:54:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -386,17 +386,17 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
      */
     p_main->p_memcpy_module = module_Need( MODULE_CAPABILITY_MEMCPY, NULL );
 
-    if( p_main->p_memcpy_module == NULL )
-    {
-        intf_ErrMsg( "intf error: no suitable memcpy module, "
-                     "using libc default" );
-        p_main->fast_memcpy = memcpy;
-    }
-    else
+    if( p_main->p_memcpy_module != NULL )
     {
 #define f p_main->p_memcpy_module->p_functions->memcpy.functions.memcpy
         p_main->fast_memcpy = f.fast_memcpy;
 #undef f
+    }
+    else
+    {
+        intf_ErrMsg( "intf error: no suitable memcpy module, "
+                     "using libc default" );
+        p_main->fast_memcpy = memcpy;
     }
 
     /*
@@ -450,7 +450,10 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Free memcpy module
      */
-    module_Unneed( p_main->p_memcpy_module );
+    if( p_main->p_memcpy_module != NULL )
+    {
+        module_Unneed( p_main->p_memcpy_module );
+    }
 
     /*
      * Free module, aout and vout banks
