@@ -162,12 +162,12 @@ static int Open ( vlc_object_t *p_this )
     if( p_sys->i_tracks > 0 )
     {
         int i;
-        for( i = 0; i < p_sys->i_tracks )
+        for( i = 0; i < p_sys->i_tracks; i++ )
         {
-            if( p_sys->track[i]->i_subtitles > 1 )
+            if( p_sys->track[i].i_subtitles > 1 )
             {
-                if( p_sys->track[i]->p_subtitles[p_sys->track[i]->i_subtitles-1]->i_start > p_sys->i_length )
-                    p_sys->i_length = (mtime_t) p_sys->track[i]->p_subtitles[p_sys->track[i]->i_subtitles-1]->i_start + 1 * 1000 * 1000;
+                if( p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start > p_sys->i_length )
+                    p_sys->i_length = (mtime_t) p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start + 1 * 1000 * 1000;
             }
         }
     }
