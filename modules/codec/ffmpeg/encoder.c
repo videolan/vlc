@@ -233,7 +233,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->dsp_mask |= FF_MM_SSE2;
     }
 
-    sout_ParseCfg( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
+    sout_CfgParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
     var_Get( p_enc, ENC_CFG_PREFIX "keyint", &val );
     p_sys->i_key_int = val.i_int;

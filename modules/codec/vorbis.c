@@ -608,7 +608,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->fmt_in.i_codec = VLC_FOURCC('f','l','3','2');
     p_enc->fmt_out.i_codec = VLC_FOURCC('v','o','r','b');
 
-    sout_ParseCfg( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
+    sout_CfgParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
     var_Get( p_enc, ENC_CFG_PREFIX "quality", &val );
     i_quality = val.i_int;
