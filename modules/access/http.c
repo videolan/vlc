@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.26 2003/03/17 15:05:55 sigmunau Exp $
+ * $Id: http.c,v 1.27 2003/03/22 23:03:02 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -692,7 +692,8 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
 }
 
 /*****************************************************************************
- * Read: read on a file descriptor, checking b_die periodically
+ * Read: Read up to i_len bytes from the http connection and place in
+ * p_buffer. Return the actual number of bytes read
  *****************************************************************************/
 static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 {
