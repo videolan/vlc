@@ -113,13 +113,13 @@
 - (void)initStrings
 {
     NSArray *o_muxers = [NSArray arrayWithObjects: @"MPEG TS", @"MPEG PS", @"MPEG 1",
-        @"Ogg", @"AVI", @"ASF", @"MPEG 4", @"Quicktime", nil];
+        @"Ogg", @"AVI", @"ASF", @"MPEG 4", @"Quicktime", @"Raw", nil];
     NSArray *o_a_channels = [NSArray arrayWithObjects: @"1", @"2", @"4", @"6", nil];
     NSArray *o_a_bitrates = [NSArray arrayWithObjects: @"16", @"32", @"64", @"96",
         @"128", @"192", @"256", @"512", nil];
     NSArray *o_v_bitrates = [NSArray arrayWithObjects: @"16", @"32", @"64", @"96",
         @"128", @"192", @"256", @"384", @"512", @"768", @"1024", @"2048", @"3072", nil];
-    NSArray *o_a_codecs = [NSArray arrayWithObjects: @"mpga", @"mp3 ", @"a52 ", @"vorb", @"flac", @"spx ", nil];
+    NSArray *o_a_codecs = [NSArray arrayWithObjects: @"mpga", @"mp3 ", @"mp4a", @"a52 ", @"vorb", @"flac", @"spx ", nil];
     NSArray *o_v_codecs = [NSArray arrayWithObjects: @"mp1v", @"mp2v", @"mp4v", @"DIV1",
         @"DIV2", @"DIV3", @"H263", @"I263", @"WMV1", @"WMV2", @"MJPG", @"theo", nil];
     
@@ -128,7 +128,7 @@
     [o_btn_ok setTitle: _NS("OK")];
     
     [o_options_lbl setTitle: _NS("Output Options")];
-    [o_display setTitle: _NS("Screen")];
+    [o_display setTitle: _NS("Play locally")];
     [[o_method cellAtRow:0 column:0] setTitle: _NS("File")];
     [[o_method cellAtRow:1 column:0] setTitle: _NS("Stream")];
     [o_dump_chkbox setTitle: _NS("Dump raw input")];
@@ -225,6 +225,7 @@
         [[o_mux_selector itemAtIndex: 5] setEnabled: YES]; // ASF
         [[o_mux_selector itemAtIndex: 6] setEnabled: YES]; // MPEG 4
         [[o_mux_selector itemAtIndex: 7] setEnabled: YES]; // QuickTime
+        [[o_mux_selector itemAtIndex: 8] setEnabled: YES]; // Raw
     }
     else if( [o_mode isEqualToString: _NS("Stream")] )
     {
@@ -247,9 +248,10 @@
             [[o_mux_selector itemAtIndex: 2] setEnabled: YES];
             [[o_mux_selector itemAtIndex: 3] setEnabled: YES];
             [[o_mux_selector itemAtIndex: 4] setEnabled: NO];
-            [[o_mux_selector itemAtIndex: 5] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 5] setEnabled: YES];
             [[o_mux_selector itemAtIndex: 6] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 7] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 8] setEnabled: YES];
         }
         else if( [o_mode isEqualToString: @"MMSH"] )
         {
@@ -264,6 +266,7 @@
             [[o_mux_selector itemAtIndex: 5] setEnabled: YES];
             [[o_mux_selector itemAtIndex: 6] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 7] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 8] setEnabled: NO];
         }
         else if( [o_mode isEqualToString: @"UDP"] )
         {
@@ -277,6 +280,7 @@
             [[o_mux_selector itemAtIndex: 5] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 6] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 7] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 8] setEnabled: YES];
             [o_sap_chkbox setEnabled: YES];
             [o_slp_chkbox setEnabled: YES];
             [o_channel_name setEnabled: YES];
@@ -293,6 +297,7 @@
             [[o_mux_selector itemAtIndex: 5] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 6] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 7] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 8] setEnabled: YES];
         }
     }
     if( ![[o_mux_selector selectedItem] isEnabled] )
@@ -323,6 +328,7 @@
     else if ( [o_mux isEqualToString: @"MPEG 1"] ) o_mux_string = @"mpeg1";
     else if ( [o_mux isEqualToString: @"Quicktime"] ) o_mux_string = @"mov";
     else if ( [o_mux isEqualToString: @"ASF"] ) o_mux_string = @"asf";
+    else if ( [o_mux isEqualToString: @"Raw"] ) o_mux_string = @"raw";
     else o_mux_string = @"ts";
 
     if( [o_mode isEqualToString: _NS("File")] )
@@ -413,6 +419,8 @@
         o_mux_string = @"mp4";
     else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"Quicktime"] )
         o_mux_string = @"mov";
+    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"Raw"] )
+        o_mux_string = @"raw";
     else
         o_mux_string = @"ts";
 

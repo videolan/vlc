@@ -444,7 +444,7 @@
         return;
     }
 
-    if( val.psz_string ) free( val.psz_string );
+    if( ( i_type & VLC_VAR_TYPE ) == VLC_VAR_STRING ) free( val.psz_string );
     if( text.psz_string ) free( text.psz_string );
 }
 
@@ -559,7 +559,7 @@
     }
     
     /* clean up everything */
-    if( val.psz_string ) free( val.psz_string );
+    if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
     var_Change( p_object, psz_variable, VLC_VAR_FREELIST, &val_list, &text_list );
 }
 
@@ -705,17 +705,16 @@
         NSEnumerator *o_enumerator = [o_windows objectEnumerator];
         bEnabled = FALSE;
         
-        if ( [[o_mi title] isEqualToString: _NS("Float on Top")] )
-        {
-            int i_state = config_GetInt( p_playlist, "video-on-top" ) ?
-                      NSOnState : NSOffState;
-            [o_mi setState: i_state];
-        }
-        
         vout_thread_t   *p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                               FIND_ANYWHERE );
         if( p_vout != NULL )
         {
+            if ( [[o_mi title] isEqualToString: _NS("Float on Top")] )
+            {
+                var_Get( p_vout, "video-on-top", &val );
+                [o_mi setState: val.b_bool ?  NSOnState : NSOffState];
+            }
+
             while ((o_window = [o_enumerator nextObject]))
             {
                 if( [[o_window className] isEqualToString: @"VLCWindow"] )
