@@ -29,11 +29,18 @@
 #include "../src/os_factory.hpp"
 #include "../src/window_manager.hpp"
 
-#include <fcntl.h>
+#ifdef HAVE_FCNTL_H
+#   include <fcntl.h>
+#endif
 #if !defined( WIN32 )
 #   include <unistd.h>
 #else
 #   include <direct.h>
+#endif
+
+#if (!defined( WIN32 ) || defined(__MINGW32__))
+/* Mingw has its own version of dirent */
+#   include <dirent.h>
 #endif
 
 
@@ -134,9 +141,9 @@ bool ThemeLoader::extract( const string &fileName )
     if( ! extractTarGz( fileName, tempPath ) )
         return false;
 
-    // Parse the extracted XML file
-    const string &sep = OSFactory::instance( getIntf() )->getDirSeparator();
-    if( ! parse( tempPath + sep + string( DEFAULT_XML_FILE ) ) )
+    // Find the XML file and parse it
+    string xmlFile;
+    if( ! findThemeFile( tempPath, xmlFile ) || ! parse( xmlFile ) )
     {
         msg_Err( getIntf(), "%s doesn't contain a " DEFAULT_XML_FILE " file",
                  fileName.c_str() );
@@ -162,28 +169,24 @@ bool ThemeLoader::parse( const string &xmlFile )
     // File loaded
     msg_Dbg( getIntf(), "Using skin file: %s", xmlFile.c_str() );
 
-    // Save current working directory
-    char *cwd = new char[PATH_MAX];
-    getcwd( cwd, PATH_MAX );
-
-    // Change current working directory to xml file
+    // Extract the path of the XML file
+    string path;
     const string &sep = OSFactory::instance( getIntf() )->getDirSeparator();
     unsigned int p = xmlFile.rfind( sep, xmlFile.size() );
     if( p != string::npos )
     {
-        string path = xmlFile.substr( 0, p );
-        chdir( path.c_str() );
+        path = xmlFile.substr( 0, p + 1 );
+    }
+    else
+    {
+        path = "";
     }
 
     // Start the parser
-    SkinParser parser( getIntf(), xmlFile );
-    bool ret = parser.parse();
-    if( !ret )
+    SkinParser parser( getIntf(), xmlFile, path );
+    if( ! parser.parse() )
     {
         msg_Err( getIntf(), "Failed to parse %s", xmlFile.c_str() );
-        // Set old working directory to current
-        chdir( cwd );
-        delete[] cwd;
         return false;
     }
 
@@ -191,13 +194,72 @@ bool ThemeLoader::parse( const string &xmlFile )
     Builder builder( getIntf(), parser.getData() );
     getIntf()->p_sys->p_theme = builder.build();
 
-    // Set old working directory to current.
-    // We need to do that _after_ calling Builder:build(), otherwise the
-    // opening of the files will fail
-    chdir( cwd );
-    delete[] cwd;
-
     return true;
+}
+
+
+bool ThemeLoader::findThemeFile( const string &rootDir, string &themeFilePath )
+{
+    // Path separator
+    const string &sep = OSFactory::instance( getIntf() )->getDirSeparator();
+
+    DIR *pCurrDir;
+    struct dirent *pDirContent;
+
+    // Open the dir
+    pCurrDir = opendir( rootDir.c_str() );
+
+    if( pCurrDir == NULL )
+    {
+        // An error occurred
+        msg_Dbg( getIntf(), "Cannot open directory %s", rootDir.c_str() );
+        return false;
+    }
+
+    // Get the first directory entry
+    pDirContent = readdir( pCurrDir );
+
+    // While we still have entries in the directory
+    while( pDirContent != NULL )
+    {
+        string newURI = rootDir + sep + pDirContent->d_name;
+
+        // Skip . and ..
+        if( string( pDirContent->d_name ) != "." &&
+            string( pDirContent->d_name ) != ".." )
+        {
+#if defined( S_ISDIR )
+            struct stat stat_data;
+            stat( newURI.c_str(), &stat_data );
+            if( S_ISDIR(stat_data.st_mode) )
+#elif defined( DT_DIR )
+            if( pDirContent->d_type == DT_DIR )
+#else
+            if( 0 )
+#endif
+            {
+                // Can we find the theme file in this subdirectory?
+                if( findThemeFile( newURI, themeFilePath ) )
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                // Found the theme file?
+                if( string( DEFAULT_XML_FILE ) ==
+                    string( pDirContent->d_name ) )
+                {
+                    themeFilePath = newURI;
+                    return true;
+                }
+            }
+        }
+
+        pDirContent = readdir( pCurrDir );
+    }
+
+    return false;
 }
 
 

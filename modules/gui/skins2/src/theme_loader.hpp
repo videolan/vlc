@@ -2,7 +2,7 @@
  * theme_loader.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme_loader.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -39,11 +39,24 @@ class ThemeLoader: public SkinObject
 
     private:
 #if defined( HAVE_ZLIB_H )
-        bool extractTarGz( const string &tarFile, const string &rootDir );
+        /// Extract files from an archive (currently only handles tar.gz)
         bool extract( const string &fileName );
+
+        /// Extract files from a tar.gz archive
+        bool extractTarGz( const string &tarFile, const string &rootDir );
+
+        /// Clean up the temporary files created by the extraction
         void deleteTempFiles( const string &path );
 #endif
+
+        /// Parse the XML file given as a parameter and build the skin
         bool parse( const string &xmlFile );
+
+        /// Recursively look for the XML file from rootDir.
+        /// The first corresponding file found will be chosen and themeFilePath
+        /// will be updated accordingly.
+        /// The method returns true if a theme file was found, false otherwise
+        bool findThemeFile( const string &rootDir, string &themeFilePath );
 };
 
 #endif

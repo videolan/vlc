@@ -28,8 +28,10 @@
 #define SKINS_DTD_VERSION "2.0"
 
 
-SkinParser::SkinParser( intf_thread_t *pIntf, const string &rFileName ):
-    XMLParser( pIntf, rFileName ), m_xOffset( 0 ), m_yOffset( 0 )
+SkinParser::SkinParser( intf_thread_t *pIntf, const string &rFileName,
+                        const string &rPath ):
+    XMLParser( pIntf, rFileName ), m_xOffset( 0 ), m_yOffset( 0 ),
+    m_path( rPath )
 {
 }
 
@@ -46,14 +48,16 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "Bitmap" )
     {
-        const BuilderData::Bitmap bitmap( attr["id"] , attr["file"],
+        const BuilderData::Bitmap bitmap( attr["id"] ,
+                ConvertFileName( attr["file"] ),
                 ConvertColor( attr["alphacolor"] ) );
         m_data.m_listBitmap.push_back( bitmap );
     }
 
     else if( rName == "BitmapFont" )
     {
-        const BuilderData::BitmapFont font( attr["id"] , attr["file"],
+        const BuilderData::BitmapFont font( attr["id"],
+                ConvertFileName( attr["file"] ),
                 attr["type"] );
         m_data.m_listBitmapFont.push_back( font );
     }
@@ -84,7 +88,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "Font" )
     {
-        const BuilderData::Font fontData( attr["id"], attr["file"],
+        const BuilderData::Font fontData( attr["id"],
+                ConvertFileName( attr["file"] ),
                 atoi( attr["size"] ) );
         m_data.m_listFont.push_back( fontData );
     }
@@ -257,6 +262,11 @@ int SkinParser::ConvertColor( const char *transcolor ) const
     iRed = iGreen = iBlue = 0;
     sscanf( transcolor, "#%2lX%2lX%2lX", &iRed, &iGreen, &iBlue );
     return ( iRed << 16 | iGreen << 8 | iBlue );
+}
+
+string SkinParser::ConvertFileName( const char *fileName ) const
+{
+    return m_path + string( fileName );
 }
 
 const string SkinParser::generateId() const

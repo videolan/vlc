@@ -2,7 +2,7 @@
  * skin_parser.hpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: skin_parser.hpp,v 1.2 2004/03/01 18:33:31 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -33,7 +33,8 @@
 class SkinParser: public XMLParser
 {
     public:
-        SkinParser( intf_thread_t *pIntf, const string &rFileName );
+        SkinParser( intf_thread_t *pIntf, const string &rFileName,
+                    const string &rPath );
         virtual ~SkinParser() {}
 
         const BuilderData &getData() const { return m_data; }
@@ -52,14 +53,18 @@ class SkinParser: public XMLParser
         int m_curLayer;
         /// Set of used id
         set<string> m_idSet;
+        /// Path of the XML file being parsed
+        const string m_path;
 
         /// Callbacks
-        virtual void handleBeginElement( const string &rName, AttrList_t &attr );
+        virtual void handleBeginElement( const string &rName,
+                                         AttrList_t &attr );
         virtual void handleEndElement( const string &rName );
 
         /// Helper functions
         bool ConvertBoolean( const char *value ) const;
         int ConvertColor( const char *transcolor ) const;
+        string ConvertFileName( const char *fileName ) const;
 
         /// Generate a new id
         const string generateId() const;
