@@ -49,6 +49,19 @@
 #define URL_LONGTEXT N_( \
     "Allows you to pecify the output URL used for the streaming output." )
 
+#define NAME_TEXT N_("Session name")
+#define NAME_LONGTEXT N_( \
+    "Name of the session that will be announced with SAP or SLP" )
+
+#define SAP_TEXT N_("SAP announcing")
+#define SAP_LONGTEXT N_("Announce this session with SAP")
+
+#define SAPv6_TEXT N_("SAP IPv6 announcing")
+#define SAPv6_LONGTEXT N_("Use IPv6 to announce this session with SAP")
+
+#define SLP_TEXT N_("SLP announcing")
+#define SLP_LONGTEXT N_("Announce this session with SLP")
+
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
 
@@ -67,12 +80,13 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "url", "", NULL, URL_TEXT,
                 URL_LONGTEXT, VLC_FALSE );
 
-    add_bool( SOUT_CFG_PREFIX "sap", 0, NULL, "sap", "", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "sap-name", "", NULL, "sap name", "", VLC_TRUE );
-    add_bool( SOUT_CFG_PREFIX "sap-ipv6", 0, NULL, "sap ipv6", "", VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "sap", 0, NULL, SAP_TEXT, SAP_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT,NAME_LONGTEXT
+                                     , VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "sap-ipv6", 0, NULL, SAPv6_TEXT, SAPv6_LONGTEXT,
+                                        VLC_TRUE );
 
-    add_bool( SOUT_CFG_PREFIX "slp", 0, NULL, "slp", "", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "slp-name", "", NULL, "slp name", "", VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "slp", 0, NULL, SLP_TEXT, SLP_LONGTEXT, VLC_TRUE );
 
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -83,9 +97,8 @@ vlc_module_end();
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
     "access", "mux", "url",
-    "sap", "sap-name", "sap-ipv6",
-    "slp", "slp-name",
-    NULL
+    "sap", "name", "sap-ipv6",
+    "slp",NULL
 };
 
 #define DEFAULT_IPV6_SCOPE '8'
@@ -293,7 +306,7 @@ static int Open( vlc_object_t *p_this )
             sout_AnnounceMethodCreate( METHOD_TYPE_SAP );
         vlc_url_t url;
 
-        var_Get( p_stream, SOUT_CFG_PREFIX "sap-name", &val );
+        var_Get( p_stream, SOUT_CFG_PREFIX "name", &val );
         if( *val.psz_string )
         {
             p_session->psz_name = val.psz_string;
@@ -343,7 +356,7 @@ static int Open( vlc_object_t *p_this )
         int i_ret;
 
         msg_Info( p_this, "SLP Enabled");
-        var_Get( p_stream, SOUT_CFG_PREFIX "sap-name", &val );
+        var_Get( p_stream, SOUT_CFG_PREFIX "name", &val );
         if( *val.psz_string )
         {
             i_ret = sout_SLPReg( p_sout, psz_url, val.psz_string );
@@ -352,7 +365,6 @@ static int Open( vlc_object_t *p_this )
         {
             i_ret = sout_SLPReg( p_sout, psz_url, psz_url );
         }
-        free( val.psz_string );
 
         if( i_ret )
         {
@@ -362,9 +374,10 @@ static int Open( vlc_object_t *p_this )
         {
             p_slp = malloc(sizeof(slp_session_t));
             p_slp->psz_url= strdup(psz_url);
-            p_slp->psz_name = strdup(
-                    p_slp_cfg->psz_value ? p_slp_cfg->psz_value : psz_url);
+            p_slp->psz_name = strdup( *val.psz_string ? val.psz_string :
+                                    psz_url );
         }
+        free( val.psz_string );
     }
 #endif
 
