@@ -1539,7 +1539,7 @@ static void httpd_ClientClean( httpd_client_t *cl )
     if( cl->fd >= 0 )
     {
         if( cl->p_tls != NULL )
-            tls_SessionClose( cl->p_tls );
+            tls_ServerSessionClose( cl->p_tls );
         net_Close( cl->fd );
         cl->fd = -1;
     }
@@ -2480,7 +2480,7 @@ static void httpd_HostThread( httpd_host_t *host )
 
                 if( p_tls != NULL)
                 {
-                    switch ( tls_SessionHandshake( p_tls, fd ) )
+                    switch ( tls_ServerSessionHandshake( p_tls, fd ) )
                     {
                         case -1:
                             msg_Err( host, "Rejecting TLS connection" );
@@ -2553,6 +2553,9 @@ static void httpd_HostThread( httpd_host_t *host )
         }
         vlc_mutex_unlock( &host->lock );
     }
+
+    if( p_tls != NULL )
+        tls_ServerSessionClose( p_tls );
 }
 
 #ifndef HAVE_GETADDRINFO

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * tls.c
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004-2005 VideoLAN
  * $Id: httpd.c 8263 2004-07-24 09:06:58Z courmisch $
  *
  * Authors: Remi Denis-Courmont <courmisch@via.ecp.fr>
@@ -55,18 +55,18 @@ tls_ServerCreate( vlc_object_t *p_this, const char *psz_cert,
         if( psz_key == NULL )
             psz_key = psz_cert;
 
-        p_server = __tls_ServerCreate( p_tls, psz_cert, psz_key );
+        p_server = p_tls->pf_server_create( p_tls, psz_cert, psz_key );
         if( p_server != NULL )
         {
-            msg_Dbg( p_this, "TLS/SSL provider initialized" );
+            msg_Dbg( p_tls, "TLS/SSL provider initialized" );
             return p_server;
         }
         else
-            msg_Err( p_this, "TLS/SSL provider error" );
+            msg_Err( p_tls, "TLS/SSL provider error" );
         module_Unneed( p_tls, p_tls->p_module );
     }
     else
-        msg_Err( p_this, "TLS/SSL provider not found" );
+        msg_Err( p_tls, "TLS/SSL provider not found" );
 
     vlc_object_detach( p_tls );
     vlc_object_destroy( p_tls );
@@ -82,9 +82,9 @@ tls_ServerCreate( vlc_object_t *p_this, const char *psz_cert,
 void
 tls_ServerDelete( tls_server_t *p_server )
 {
-    tls_t *p_tls = p_server->p_tls;
+    tls_t *p_tls = (tls_t *)p_server->p_parent;
 
-    __tls_ServerDelete( p_server );
+    p_server->pf_delete( p_server );
 
     module_Unneed( p_tls, p_tls->p_module );
     vlc_object_detach( p_tls );
@@ -99,7 +99,7 @@ tls_ServerDelete( tls_server_t *p_server )
  * Returns NULL on error. This is a blocking network operation.
  *****************************************************************************/
 tls_session_t *
-tls_ClientCreate( vlc_object_t *p_this, const char *psz_ca, int fd )
+tls_ClientCreate( vlc_object_t *p_this, int fd, const char *psz_hostname )
 {
     tls_t *p_tls;
     tls_session_t *p_session;
@@ -110,12 +110,14 @@ tls_ClientCreate( vlc_object_t *p_this, const char *psz_ca, int fd )
     p_tls->p_module = module_Need( p_tls, "tls", 0, 0 );
     if( p_tls->p_module != NULL )
     {
-        p_session = __tls_ClientCreate( p_tls, psz_ca );
+        p_session = p_tls->pf_client_create( p_tls );
         if( p_session != NULL )
         {
             int i_val;
 
-            for( i_val = tls_SessionHandshake( p_session, fd ); i_val > 0;
+            for( i_val = tls_ClientSessionHandshake( p_session, fd,
+                                                     psz_hostname );
+                 i_val > 0;
                  i_val = tls_SessionContinueHandshake( p_session ) );
             
             if( i_val == 0 )
@@ -146,9 +148,9 @@ tls_ClientCreate( vlc_object_t *p_this, const char *psz_ca, int fd )
 void
 tls_ClientDelete( tls_session_t *p_session )
 {
-    tls_t *p_tls = p_session->p_tls;
+    tls_t *p_tls = (tls_t *)p_session->p_parent;
 
-    tls_SessionClose( p_session );
+    p_session->pf_close( p_session );
 
     module_Unneed( p_tls, p_tls->p_module );
     vlc_object_detach( p_tls );
