@@ -165,6 +165,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         switch ( p_pcm->channels )
         {
         case 2:
+            if ( p_filter->output.i_original_channels == AOUT_CHAN_CENTER )
+            while ( i_samples-- )
+            {
+                *p_samples++ = (*p_left++ >> 1) + (*p_right++ >> 1);
+            }
+            else
             while ( i_samples-- )
             {
                 *p_samples++ = *p_left++;
@@ -191,10 +197,17 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         mad_fixed_t const * p_left = p_pcm->samples[0];
         mad_fixed_t const * p_right = p_pcm->samples[1];
         float f_temp = (float)FIXED32_ONE;
-        
+
         switch ( p_pcm->channels )
         {
         case 2:
+            if ( p_filter->output.i_original_channels == AOUT_CHAN_CENTER )
+            while ( i_samples-- )
+            {
+                *p_samples++ = (float)*p_left++ / f_temp / 2 +
+                               (float)*p_right++ / f_temp / 2;
+            }
+            else
             while ( i_samples-- )
             {
                 *p_samples++ = (float)*p_left++ / f_temp;
