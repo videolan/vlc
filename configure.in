@@ -4,7 +4,7 @@ AC_CONFIG_HEADER(include/defs.h)
 AC_CANONICAL_SYSTEM
 
 PACKAGE="vlc"
-VERSION="0.4.3"
+VERSION="0.4.4"
 CODENAME=Ourumov
 
 dnl Save CFLAGS and LDFLAGS

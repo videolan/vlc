@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.24.2.2 2002/06/27 19:44:54 sam Exp $
+ * $Id: spu_decoder.c,v 1.24.2.3 2002/08/07 20:42:36 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -465,15 +465,9 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                                         p_demux_data + sizeof(int)))[
                                           GetBits(&p_spudec->bit_stream, 4) ];
 
-#ifndef WORDS_BIGENDIAN
                             p_spu->p_sys->pi_yuv[3-i][0] = (i_color>>16) & 0xff;
                             p_spu->p_sys->pi_yuv[3-i][1] = (i_color>>0) & 0xff;
                             p_spu->p_sys->pi_yuv[3-i][2] = (i_color>>8) & 0xff;
-#else
-                            p_spu->p_sys->pi_yuv[3-i][0] = (i_color>>8) & 0xff;
-                            p_spu->p_sys->pi_yuv[3-i][1] = (i_color>>24) & 0xff;
-                            p_spu->p_sys->pi_yuv[3-i][2] = (i_color>>16) & 0xff;
-#endif
                         }
                     }
                     else

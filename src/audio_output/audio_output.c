@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.84 2002/04/23 14:16:20 sam Exp $
+ * $Id: audio_output.c,v 1.84.2.1 2002/08/07 20:42:37 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -112,9 +112,7 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, int i_rate )
 
     if( p_aout->i_rate == 0 )
     {
-        intf_ErrMsg( "aout error: null sample rate" );
-        free( p_aout );
-        return( NULL );
+        p_aout->i_rate = i_rate;
     }
 
     /* Choose the best module */

@@ -775,7 +775,7 @@ test "$host_alias" != "$target_alias" &&
 
 
 PACKAGE="vlc"
-VERSION="0.4.3"
+VERSION="0.4.4"
 CODENAME=Ourumov
 
 save_CFLAGS="${CFLAGS}"
