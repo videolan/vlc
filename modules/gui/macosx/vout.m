@@ -69,8 +69,58 @@
     NSScreen * o_screen;
     vlc_bool_t b_main_screen;
 
+    var_Create( p_vout, "macosx-vdev", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "macosx-fill", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "macosx-stretch", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "macosx-opaqueness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+
+    /* Setup the menuitem for the multiple displays. Read the vlc preference (macosx-vdev) for the primary display */
+    NSArray * o_screens = [NSScreen screens];
+    if( [o_screens count] > 0 && var_Type( p_real_vout, "video-device" ) == 0 )
+    {
+        int i = 1;
+        vlc_value_t val, val2, text;
+        NSScreen * o_screen;
+
+        var_Get( p_real_vout, "macosx-vdev", &val );
+
+        var_Create( p_real_vout, "video-device", VLC_VAR_INTEGER |
+                                            VLC_VAR_HASCHOICE );
+        text.psz_string = _("Video device");
+        var_Change( p_real_vout, "video-device", VLC_VAR_SETTEXT, &text, NULL );
+
+        NSEnumerator * o_enumerator = [o_screens objectEnumerator];
+
+        while( (o_screen = [o_enumerator nextObject]) != NULL )
+        {
+            char psz_temp[255];
+            NSRect s_rect = [o_screen frame];
+
+            snprintf( psz_temp, sizeof(psz_temp)/sizeof(psz_temp[0])-1,
+                      "%s %d (%dx%d)", _("Screen"), i,
+                      (int)s_rect.size.width, (int)s_rect.size.height );
+
+            text.psz_string = psz_temp;
+            val2.i_int = i;
+            var_Change( p_real_vout, "video-device",
+                        VLC_VAR_ADDCHOICE, &val2, &text );
+
+            if( ( i - 1 ) == val.i_int )
+            {
+                var_Set( p_real_vout, "video-device", val2 );
+            }
+            i++;
+        }
+
+        var_AddCallback( p_real_vout, "video-device", vout_VarCallback,
+                         NULL );
+
+        val2.b_bool = VLC_TRUE;
+        var_Set( p_real_vout, "intf-change", val2 );
+    }
+
     /* Find out on which screen to open the window */
-    int i_device = var_GetInteger( p_vout, "video-device" );
+    int i_device = var_GetInteger( p_real_vout, "video-device" );
     if( i_device < 0 )
     {
          /* No preference specified. Use the main screen */
@@ -90,7 +140,7 @@
         {
             i_device--;
             o_screen = [o_screens objectAtIndex: i_device];
-            var_SetInteger( p_vout, "macosx-vdev", i_device );
+            var_SetInteger( p_real_vout, "macosx-vdev", i_device );
             b_main_screen = ( i_device == 0 );
         }
     }

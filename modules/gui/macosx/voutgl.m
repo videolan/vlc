@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vout.m: MacOS X video output module
+ * voutgl.m: MacOS X OpenGL provider
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
  * $Id: vout.m 8351 2004-08-02 13:06:38Z hartman $
@@ -60,7 +60,7 @@ struct vout_sys_t
     VLCGLView         * o_glview;
     vlc_bool_t          b_saved_frame;
     NSRect              s_frame;
-    vlc_bool_t        * b_got_frame;
+    vlc_bool_t          b_got_frame;
 };
 
 /*****************************************************************************
@@ -77,7 +77,6 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *) p_this;
     int i_timeout;
-    vlc_value_t val;
 
 /* OpenGL interface disabled until
  * - the green line is gone
@@ -122,58 +121,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     p_vout->pf_control= Control;
     p_vout->pf_swap   = Swap;
 
-
     p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
-
-    var_Create( p_vout, "macosx-vdev", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "macosx-fill", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "macosx-stretch", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "macosx-opaqueness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-
-    /* Setup the menuitem for the multiple displays. Read the vlc preference (macosx-vdev) for the primary display */
-    NSArray * o_screens = [NSScreen screens];
-    if( [o_screens count] > 0 && var_Type( p_vout, "video-device" ) == 0 )
-    {
-        int i = 1;
-        vlc_value_t val2, text;
-        NSScreen * o_screen;
-
-        var_Get( p_vout, "macosx-vdev", &val );
-
-        var_Create( p_vout, "video-device", VLC_VAR_INTEGER |
-                                            VLC_VAR_HASCHOICE ); 
-        text.psz_string = _("Video device");
-        var_Change( p_vout, "video-device", VLC_VAR_SETTEXT, &text, NULL );
-        
-        NSEnumerator * o_enumerator = [o_screens objectEnumerator];
-
-        while( (o_screen = [o_enumerator nextObject]) != NULL )
-        {
-            char psz_temp[255];
-            NSRect s_rect = [o_screen frame];
-
-            snprintf( psz_temp, sizeof(psz_temp)/sizeof(psz_temp[0])-1, 
-                      "%s %d (%dx%d)", _("Screen"), i,
-                      (int)s_rect.size.width, (int)s_rect.size.height ); 
-
-            text.psz_string = psz_temp;
-            val2.i_int = i;
-            var_Change( p_vout, "video-device",
-                        VLC_VAR_ADDCHOICE, &val2, &text );
-
-            if( ( i - 1 ) == val.i_int )
-            {
-                var_Set( p_vout, "video-device", val2 );
-            }
-            i++;
-        }
-
-        var_AddCallback( p_vout, "video-device", vout_VarCallback,
-                         NULL );
-
-        val2.b_bool = VLC_TRUE;
-        var_Set( p_vout, "intf-change", val2 );
-    }
 
     /* Spawn window */
     p_vout->p_sys->b_got_frame = VLC_FALSE;

@@ -106,7 +106,6 @@ static void QTFreePicture       ( vout_thread_t *, picture_t * );
 int E_(OpenVideoQT) ( vlc_object_t *p_this )
 {   
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
-    vlc_value_t val;
     OSErr err;
     int i_timeout;
 
@@ -145,11 +144,6 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
 
     p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
 
-    var_Create( p_vout, "macosx-vdev", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "macosx-fill", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "macosx-stretch", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "macosx-opaqueness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    
     p_vout->p_sys->b_altivec = p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_ALTIVEC;
     msg_Dbg( p_vout, "We do%s have Altivec", p_vout->p_sys->b_altivec ? "" : "n't" );
     
@@ -208,51 +202,6 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
         free( p_vout->p_sys );
         return VLC_EGENERIC;        
-    }
-
-    /* Setup the menuitem for the multiple displays. Read the vlc preference (macosx-vdev) for the primary display */
-    NSArray * o_screens = [NSScreen screens];
-    if( [o_screens count] > 0 && var_Type( p_vout, "video-device" ) == 0 )
-    {
-        int i = 1;
-        vlc_value_t val2, text;
-        NSScreen * o_screen;
-
-        var_Get( p_vout, "macosx-vdev", &val );
-
-        var_Create( p_vout, "video-device", VLC_VAR_INTEGER |
-                                            VLC_VAR_HASCHOICE ); 
-        text.psz_string = _("Video device");
-        var_Change( p_vout, "video-device", VLC_VAR_SETTEXT, &text, NULL );
-        
-        NSEnumerator * o_enumerator = [o_screens objectEnumerator];
-
-        while( (o_screen = [o_enumerator nextObject]) != NULL )
-        {
-            char psz_temp[255];
-            NSRect s_rect = [o_screen frame];
-
-            snprintf( psz_temp, sizeof(psz_temp)/sizeof(psz_temp[0])-1, 
-                      "%s %d (%dx%d)", _("Screen"), i,
-                      (int)s_rect.size.width, (int)s_rect.size.height ); 
-
-            text.psz_string = psz_temp;
-            val2.i_int = i;
-            var_Change( p_vout, "video-device",
-                        VLC_VAR_ADDCHOICE, &val2, &text );
-
-            if( ( i - 1 ) == val.i_int )
-            {
-                var_Set( p_vout, "video-device", val2 );
-            }
-            i++;
-        }
-
-        var_AddCallback( p_vout, "video-device", vout_VarCallback,
-                         NULL );
-
-        val2.b_bool = VLC_TRUE;
-        var_Set( p_vout, "intf-change", val2 );
     }
 
     /* Spawn window */
