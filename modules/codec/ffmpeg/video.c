@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.55 2003/11/29 18:06:12 fenrir Exp $
+ * $Id: video.c,v 1.56 2003/12/01 09:39:04 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -282,6 +282,23 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
             memset( &p[4], 0, 8 );
             memcpy( &p[12], p_dec->fmt_in.p_extra, i_size );
         }
+        else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'R', 'V', '1', '0' ) ||
+                 p_dec->fmt_in.i_codec == VLC_FOURCC( 'R', 'V', '1', '3' ) ||
+                 p_dec->fmt_in.i_codec == VLC_FOURCC( 'R', 'V', '2', '0' ) )
+        {
+            if( p_dec->fmt_in.i_extra == 8 )
+            {
+                p_sys->p_context->extradata_size = 8;
+                p_sys->p_context->extradata = malloc( 8 );
+
+                memcpy( p_sys->p_context->extradata,
+                        p_dec->fmt_in.p_extra,
+                        p_dec->fmt_in.i_extra );
+                p_sys->p_context->sub_id= ((uint32_t*)p_dec->fmt_in.p_extra)[1];
+
+                msg_Warn( p_dec, "using extra data for RV codec sub_id=%08x", p_sys->p_context->sub_id );
+            }
+        }
         else
         {
             p_sys->p_context->extradata_size = i_size;
@@ -344,6 +361,20 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
+    if( p_sys->i_late_frames > 0 &&
+        mdate() - p_sys->i_late_frames_start > I64C(5000000) )
+    {
+        if( p_sys->i_pts )
+        {
+            msg_Err( p_dec, "more than 5 seconds of late video -> "
+                     "dropping frame (computer too slow ?)" );
+            p_sys->i_pts = 0; /* To make sure we recover properly */
+        }
+        block_Release( p_block );
+        p_sys->i_late_frames--;
+        return NULL;
+    }
+
     if( p_block->i_pts > 0 || p_block->i_dts > 0 )
     {
         p_sys->input_pts = p_block->i_pts;
@@ -379,16 +410,6 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         p_sys->p_context->hurry_up = 0;
     }
 
-    if( p_sys->i_late_frames > 0 &&
-        mdate() - p_sys->i_late_frames_start > I64C(5000000) )
-    {
-        msg_Err( p_dec, "more than 5 seconds of late video -> "
-                 "dropping frame (computer too slow ?)" );
-        block_Release( p_block );
-        p_sys->i_pts = 0; /* To make sure we recover properly */
-        p_sys->i_late_frames--;
-        return NULL;
-    }
 
     if( p_sys->p_context->width <= 0 || p_sys->p_context->height <= 0 )
     {
