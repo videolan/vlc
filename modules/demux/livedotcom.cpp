@@ -637,7 +637,7 @@ static void Close( vlc_object_t *p_this )
 }
 
 
-static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts );
+static void StreamRead( void *p_private, unsigned int i_size, unsigned int i_truncated_bytes, struct timeval pts, unsigned int i_duration );
 static void StreamClose( void *p_private );
 static void TaskInterrupt( void *p_private );
 
@@ -857,7 +857,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 /*****************************************************************************
  *
  *****************************************************************************/
-static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts )
+static void StreamRead( void *p_private, unsigned int i_size, unsigned int i_truncated_bytes, struct timeval pts, unsigned int duration )
 {
     live_track_t   *tk = (live_track_t*)p_private;
     demux_t        *p_demux = tk->p_demux;
@@ -901,9 +901,10 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
 
     /* grow buffer if it looks like buffer is too small, but don't eat
      * up all the memory on strange streams */
-    if( tk->i_buffer < i_size + 1500 && tk->i_buffer < 2000000 )
+    if( i_truncated_bytes > 0 && tk->i_buffer < 2000000 )
     {
         void *p_tmp;
+        msg_Dbg( p_demux, "lost %d bytes", i_truncated_bytes );
         msg_Dbg( p_demux, "increasing buffer size to %d", tk->i_buffer * 2 );
         tk->i_buffer *= 2;
         p_tmp = realloc( tk->p_buffer, tk->i_buffer );
