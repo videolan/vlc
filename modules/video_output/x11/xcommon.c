@@ -700,7 +700,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                                                       FIND_ANYWHERE );
                         if( p_playlist != NULL )
                         {
-                            vlc_value_t val;
+                            vlc_value_t val; val.b_bool = VLC_TRUE;
                             var_Set( p_playlist, "intf-popupmenu", val );
                             vlc_object_release( p_playlist );
                         }
