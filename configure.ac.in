@@ -2675,7 +2675,7 @@ then
     if test "x${have_slp}" = "xtrue"
     then
       PLUGINS="${PLUGINS} slp"
-      LDFLAGS_slp="${LDFLAGS_slp} -lslp"
+      LDFLAGS_slp="-lslp ${LDFLAGS_slp}"
     fi
   else
     AC_MSG_CHECKING(for slp headers in ${with_slp})
@@ -2684,7 +2684,7 @@ then
       dnl  Use ${with_slp}/libslp/slp.h
       AC_MSG_RESULT(yes)
       PLUGINS="${PLUGINS} slp"
-      LDFLAGS_slp="${LDFLAGS_slp} -L${with_slp} -lslp"
+      LDFLAGS_slp="-L${with_slp} -lslp ${LDFLAGS_slp}"
       CPPFLAGS_slp="${CPPFLAGS_slp} -I${with_slp}"
     else
       dnl  No libslp could be found, sorry
