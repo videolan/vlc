@@ -674,6 +674,11 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
                                                         : i_level;
                 break;
             case DCT_EOB:
+#ifdef HAVE_MMX
+                /* The MMX IDCT has a precision problem with non-intra
+                 * blocks. */
+                p_mb->ppi_blocks[i_b][0] += 4;
+#endif
                 if( i_nc <= 1 )
                 {
                     p_mb->pf_idct[i_b] = vdec_SparseIDCT;
@@ -820,6 +825,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
 
     p_mb->ppi_blocks[i_b][0] = ( p_vpar->mb.pi_dc_dct_pred[i_cc] <<
                                ( 3 - p_vpar->picture.i_intra_dc_precision ) );
+
     i_nc = ( p_vpar->mb.pi_dc_dct_pred[i_cc] != 0 );
 
     /* Decoding of the AC coefficients */
