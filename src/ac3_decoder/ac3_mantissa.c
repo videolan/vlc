@@ -2,7 +2,7 @@
  * ac3_mantissa.c: ac3 mantissa computation
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_mantissa.c,v 1.23 2001/04/20 12:14:34 reno Exp $
+ * $Id: ac3_mantissa.c,v 1.24 2001/04/26 00:12:19 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -187,7 +187,7 @@ static const u16 qnttztab[16] =
     0, 0, 0, 3, 0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16
 };
 
-static const float exp_lut[ 25 ] =
+static const float scale_factor[25] =
 {
     6.10351562500000000000000000e-05,
     3.05175781250000000000000000e-05,
@@ -264,107 +264,113 @@ static __inline__ u16 dither_gen (mantissa_t * p_mantissa)
 
 
 /* Fetch an unpacked, left justified, and properly biased/dithered mantissa value */
-static __inline__ float float_get (ac3dec_t * p_ac3dec, u16 bap, u16 dithflag,
+static __inline__ float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithflag,
                                    u16 exp)
 {
-    u32 group_code;
+    u16 group_code = 0;
 
     /* If the bap is 0-5 then we have special cases to take care of */
     switch (bap)
     {
-    case 0:
-        if (dithflag)
-        {
-            return ( dither_gen(&p_ac3dec->mantissa) * exp_lut[exp] );
-        }    
-        return (0);
+        case 0:
+            if (dithflag)
+            {
+                return ( dither_gen(&p_ac3dec->mantissa) * scale_factor[exp] );
+            }    
+            return (0);
 
-    case 1:
-        if (p_ac3dec->mantissa.q_1_pointer >= 0)
-        {
-            return (p_ac3dec->mantissa.q_1[p_ac3dec->mantissa.q_1_pointer--] *
-                    exp_lut[exp]);
-        }
+        case 1:
+            if (p_ac3dec->mantissa.q_1_pointer >= 0)
+            {
+                return (p_ac3dec->mantissa.q_1[p_ac3dec->mantissa.q_1_pointer--] *
+                        scale_factor[exp]);
+            }
 
-        if ((group_code = GetBits (&p_ac3dec->bit_stream,5)) >= 27)
-        {
-            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (1)" );
-        }
-        p_ac3dec->total_bits_read += 5;
+            p_ac3dec->total_bits_read += 5;
+            if ((group_code = GetBits (&p_ac3dec->bit_stream,5)) > 26)
+            {
+                intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (1)" );
+                return 0;
+            }
+    
+            p_ac3dec->mantissa.q_1[ 1 ] = q_1_1[ group_code ];
+            p_ac3dec->mantissa.q_1[ 0 ] = q_1_2[ group_code ];
+    
+            p_ac3dec->mantissa.q_1_pointer = 1;
+    
+            return (q_1_0[group_code] * scale_factor[exp]);
+    
+        case 2:
+            if (p_ac3dec->mantissa.q_2_pointer >= 0)
+            {
+                return (p_ac3dec->mantissa.q_2[p_ac3dec->mantissa.q_2_pointer--] *
+                        scale_factor[exp]);
+            }
+            
+            p_ac3dec->total_bits_read += 7;
+            if ((group_code = GetBits (&p_ac3dec->bit_stream,7)) > 124)
+            {
+                intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (2)" );
+                return 0;
+            }
 
-        p_ac3dec->mantissa.q_1[ 1 ] = q_1_1[ group_code ];
-        p_ac3dec->mantissa.q_1[ 0 ] = q_1_2[ group_code ];
+            p_ac3dec->mantissa.q_2[ 1 ] = q_2_1[ group_code ];
+            p_ac3dec->mantissa.q_2[ 0 ] = q_2_2[ group_code ];
 
-        p_ac3dec->mantissa.q_1_pointer = 1;
+            p_ac3dec->mantissa.q_2_pointer = 1;
 
-        return (q_1_0[group_code] * exp_lut[exp]);
+            return (q_2_0[group_code] * scale_factor[exp]);
 
-    case 2:
-        if (p_ac3dec->mantissa.q_2_pointer >= 0)
-        {
-            return (p_ac3dec->mantissa.q_2[p_ac3dec->mantissa.q_2_pointer--] *
-                    exp_lut[exp]);
-        }
-        
-        if ((group_code = GetBits (&p_ac3dec->bit_stream,7)) >= 125)
-        {
-            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (2)" );
-        }
-        p_ac3dec->total_bits_read += 7;
+        case 3:
+            p_ac3dec->total_bits_read += 3;
+            if ((group_code = GetBits (&p_ac3dec->bit_stream,3)) > 6)
+            {
+                intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (3)" );
+                return 0;
+            }
 
-        p_ac3dec->mantissa.q_2[ 1 ] = q_2_1[ group_code ];
-        p_ac3dec->mantissa.q_2[ 0 ] = q_2_2[ group_code ];
+            return (q_3[group_code] * scale_factor[exp]);
 
-        p_ac3dec->mantissa.q_2_pointer = 1;
+        case 4:
+            if (p_ac3dec->mantissa.q_4_pointer >= 0)
+            {
+                return (p_ac3dec->mantissa.q_4[p_ac3dec->mantissa.q_4_pointer--] *
+                        scale_factor[exp]);
+            }
 
-        return (q_2_0[ group_code ] * exp_lut[exp]);
+            p_ac3dec->total_bits_read += 7;
+            if ((group_code = GetBits (&p_ac3dec->bit_stream,7)) > 120)
+            {
+                intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (4)" );
+                return 0;
+            }
 
-    case 3:
-        if ((group_code = GetBits (&p_ac3dec->bit_stream,3)) >= 7)
-        {
-            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (3)" );
-        }
-        p_ac3dec->total_bits_read += 7;
+            p_ac3dec->mantissa.q_4[ 0 ] = q_4_1[group_code];
 
-        return (q_3[group_code] * exp_lut[exp]);
+            p_ac3dec->mantissa.q_4_pointer = 0;
 
-    case 4:
-        if (p_ac3dec->mantissa.q_4_pointer >= 0)
-        {
-            return (p_ac3dec->mantissa.q_4[p_ac3dec->mantissa.q_4_pointer--] *
-                    exp_lut[exp]);
-        }
+            return (q_4_0[group_code] * scale_factor[exp]);
 
-        if ((group_code = GetBits (&p_ac3dec->bit_stream,7)) >= 121)
-        {
-            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (4)" );
-        }
-        p_ac3dec->total_bits_read += 7;
+        case 5:
+            p_ac3dec->total_bits_read += 4;
+            if ((group_code = GetBits (&p_ac3dec->bit_stream,4)) > 14)
+            {
+                intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (5)" );
+                return 0;
+            }
 
-        p_ac3dec->mantissa.q_4[ 0 ] = q_4_1[ group_code ];
+            return (q_5[group_code] * scale_factor[exp]);
 
-        p_ac3dec->mantissa.q_4_pointer = 0;
+        default:
+            group_code = GetBits (&p_ac3dec->bit_stream,qnttztab[bap]);
+            group_code <<= 16 - qnttztab[bap];
+            p_ac3dec->total_bits_read += qnttztab[bap];
 
-        return (q_4_0[ group_code ] * exp_lut[exp]);
-
-    case 5:
-        if ((group_code = GetBits (&p_ac3dec->bit_stream,4)) >= 15)
-        {
-            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (5)" );
-        }
-        p_ac3dec->total_bits_read += 4;
-
-        return (q_5[group_code] * exp_lut[exp]);
-
-    default:
-        group_code = GetBits (&p_ac3dec->bit_stream,qnttztab[bap]);
-        group_code <<= 16 - qnttztab[bap];
-        p_ac3dec->total_bits_read += qnttztab[bap];
-
-        return ((s16)(group_code) * exp_lut[exp]);
+            return ((s16)(group_code) * scale_factor[exp]);
     }
 }
 
+/* Uncouple the coupling channel into a fbw channel */
 static __inline__ void uncouple_channel (ac3dec_t * p_ac3dec, u32 ch)
 {
     u32 bnd = 0;
@@ -388,7 +394,7 @@ static __inline__ void uncouple_channel (ac3dec_t * p_ac3dec, u32 ch)
             {
                 cpl_mant_tmp = ((0x10) | p_ac3dec->audblk.cplcomant[ch][bnd]) << 10;
             }
-            cpl_coord = ((s16)cpl_mant_tmp) * exp_lut[cpl_exp_tmp] * 8.0f;
+            cpl_coord = (cpl_mant_tmp) * scale_factor[cpl_exp_tmp] * 8.0f;
 
             /* Invert the phase for the right channel if necessary */
             if (p_ac3dec->bsi.acmod == 0x02 && p_ac3dec->audblk.phsflginu &&
@@ -406,9 +412,9 @@ static __inline__ void uncouple_channel (ac3dec_t * p_ac3dec, u32 ch)
             if (p_ac3dec->audblk.dithflag[ch] && !p_ac3dec->audblk.cpl_bap[i])
             {
                 p_ac3dec->coeffs.fbw[ch][i] = cpl_coord * dither_gen(&p_ac3dec->mantissa) *
-                    exp_lut[p_ac3dec->audblk.cpl_exp[i]];
+                    scale_factor[p_ac3dec->audblk.cpl_exp[i]];
             } else {
-                p_ac3dec->coeffs.fbw[ch][i]  = cpl_coord * p_ac3dec->audblk.cplfbw[i];
+                p_ac3dec->coeffs.fbw[ch][i]  = cpl_coord * p_ac3dec->audblk.cpl_flt[i];
             }
             i++;
         }
@@ -418,70 +424,42 @@ static __inline__ void uncouple_channel (ac3dec_t * p_ac3dec, u32 ch)
 void mantissa_unpack (ac3dec_t * p_ac3dec)
 {
     int i, j;
+    u32 done_cpl = 0;
 
     p_ac3dec->mantissa.q_1_pointer = -1;
     p_ac3dec->mantissa.q_2_pointer = -1;
     p_ac3dec->mantissa.q_4_pointer = -1;
-    
-    if (p_ac3dec->audblk.cplinu)
-    {
-        /* 1 */
-        for (i = 0; !p_ac3dec->audblk.chincpl[i]; i++)
-        {
-            for (j = 0; j < p_ac3dec->audblk.endmant[i]; j++)
-            {
-                p_ac3dec->coeffs.fbw[i][j] = float_get (p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j],
-                        p_ac3dec->audblk.dithflag[i], p_ac3dec->audblk.fbw_exp[i][j]);
-            }
-        }
 
-        /* 2 */
-        for (j = 0; j < p_ac3dec->audblk.endmant[i]; j++)
-        {
-            p_ac3dec->coeffs.fbw[i][j] = float_get (p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j],
+    for (i=0; i< p_ac3dec->bsi.nfchans; i++) {
+        for (j=0; j < p_ac3dec->audblk.endmant[i]; j++)
+            p_ac3dec->coeffs.fbw[i][j] = coeff_get_float(p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j],
                     p_ac3dec->audblk.dithflag[i], p_ac3dec->audblk.fbw_exp[i][j]);
-        }
-        for (j = p_ac3dec->audblk.cplstrtmant; j < p_ac3dec->audblk.cplendmant; j++)
-        {
-            p_ac3dec->audblk.cplfbw[j] = float_get (p_ac3dec, p_ac3dec->audblk.cpl_bap[j], 0,
-                    p_ac3dec->audblk.cpl_exp[j]);
-        }
-        uncouple_channel (p_ac3dec, i);
 
-        /* 3 */
-        for (i++; i < p_ac3dec->bsi.nfchans; i++)
-        {
-            for (j = 0; j < p_ac3dec->audblk.endmant[i]; j++)
-            {
-                p_ac3dec->coeffs.fbw[i][j] = float_get (p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j],
-                        p_ac3dec->audblk.dithflag[i], p_ac3dec->audblk.fbw_exp[i][j]);
-            }
+        if (p_ac3dec->audblk.cplinu && p_ac3dec->audblk.chincpl[i] && !(done_cpl)) {
+        /* ncplmant is equal to 12 * ncplsubnd
+         * Don't dither coupling channel until channel
+         * separation so that interchannel noise is uncorrelated 
+         */
+            for (j=p_ac3dec->audblk.cplstrtmant; j < p_ac3dec->audblk.cplendmant; j++)
+                p_ac3dec->audblk.cpl_flt[j] = coeff_get_float(p_ac3dec, p_ac3dec->audblk.cpl_bap[j],
+                        0, p_ac3dec->audblk.cpl_exp[j]);
+            done_cpl = 1;
+        }
+    }
+    
+    /* uncouple the channel if necessary */
+    if (p_ac3dec->audblk.cplinu) {
+        for (i=0; i< p_ac3dec->bsi.nfchans; i++) {
             if (p_ac3dec->audblk.chincpl[i])
-            {
-                uncouple_channel (p_ac3dec, i);
-            }
-        }
-    }
-    else
-    {
-        for (i = 0; i < p_ac3dec->bsi.nfchans; i++)
-        {
-            for (j = 0; j < p_ac3dec->audblk.endmant[i]; j++)
-            {
-                p_ac3dec->coeffs.fbw[i][j] = float_get (p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j],
-                        p_ac3dec->audblk.dithflag[i], p_ac3dec->audblk.fbw_exp[i][j]);
-            }
+                uncouple_channel(p_ac3dec, i);
         }
     }
 
-    if (p_ac3dec->bsi.lfeon)
-    {
+    if (p_ac3dec->bsi.lfeon) {
         /* There are always 7 mantissas for lfe, no dither for lfe */
-        for (j = 0; j < 7; j++)
-        {
-            p_ac3dec->coeffs.lfe[j] = float_get (p_ac3dec, p_ac3dec->audblk.lfe_bap[j], 0,
-                    p_ac3dec->audblk.lfe_exp[j]);
-        }
+        for (j=0; j < 7 ; j++)
+            p_ac3dec->coeffs.lfe[j] = coeff_get_float(p_ac3dec, p_ac3dec->audblk.lfe_bap[j],
+                    0, p_ac3dec->audblk.lfe_exp[j]);
     }
 }
 

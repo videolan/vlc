@@ -2,7 +2,7 @@
  * ac3_decoder.h : ac3 decoder interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder.h,v 1.5 2001/04/20 12:14:34 reno Exp $
+ * $Id: ac3_decoder.h,v 1.6 2001/04/26 00:12:19 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -265,7 +265,7 @@ typedef struct audblk_s {
 //      u16 chmant[5][256];
 
     /* coupling mantissas */
-    float cplfbw[ 256 ];
+    float cpl_flt[ 256 ];
 //      u16 cplmant[256];
 
     /* coupling mantissas */

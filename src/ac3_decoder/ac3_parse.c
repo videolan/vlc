@@ -2,7 +2,7 @@
  * ac3_parse.c: ac3 parsing procedures
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_parse.c,v 1.18 2001/04/20 12:14:34 reno Exp $
+ * $Id: ac3_parse.c,v 1.19 2001/04/26 00:12:19 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -612,6 +612,7 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
                 }
             }
             p_ac3dec->audblk.gainrng[i] = GetBits (&p_ac3dec->bit_stream,2);
+            p_ac3dec->total_bits_read += 2;
         }
     }
 
