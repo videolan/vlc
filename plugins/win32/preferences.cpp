@@ -357,9 +357,8 @@ void __fastcall TPreferencesDlg::FormHide( TObject *Sender )
 
 void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 {
-    module_t           *p_module;
-    module_t           *p_module_plugins;
-    unsigned int        i;
+    module_t           *p_module, *p_module_plugins;
+    module_config_t    *p_item;
     int                 i_pages, i_ctrl;
     
     TTabSheet          *TabSheet;
@@ -385,16 +384,17 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
      */
 
     /* Enumerate config options and add corresponding config boxes */
-    for( i = 0; i < p_module->i_config_lines; i++ )
+    p_item = p_module->p_config;
+    do
     {
-        switch( p_module->p_config[i].i_type )
+        switch( p_item->i_type )
         {
         case MODULE_CONFIG_HINT_CATEGORY:
 
             /* create a new tabsheet. */
             TabSheet = new TTabSheet( this );
             TabSheet->PageControl = PageControlPref;
-            TabSheet->Caption = p_module->p_config[i].psz_text;
+            TabSheet->Caption = p_item->psz_text;
             TabSheet->Visible = true;
 
             /* pack a scrollbox into the tabsheet */
@@ -410,7 +410,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
         case MODULE_CONFIG_ITEM_MODULE:
 
             /* add new groupbox for the config option */
-            GroupBoxPlugin = new TGroupBoxPlugin( this, &p_module->p_config[i] );
+            GroupBoxPlugin = new TGroupBoxPlugin( this, p_item );
             GroupBoxPlugin->Parent = ScrollBox;
 
             /* add panel as separator */
@@ -422,7 +422,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
                  p_module_plugins = p_module_plugins->next )
             {
                 if( p_module_plugins->i_capabilities &
-                    ( 1 << p_module->p_config[i].i_value ) )
+                    ( 1 << p_item->i_value ) )
                 {
                     ListItem = GroupBoxPlugin->ListView->Items->Add();
                     ListItem->Caption = p_module_plugins->psz_name;
@@ -436,7 +436,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
         case MODULE_CONFIG_ITEM_STRING:
 
             /* add new groupbox for the config option */
-            GroupBoxString = new TGroupBoxString( this, &p_module->p_config[i] );
+            GroupBoxString = new TGroupBoxString( this, p_item );
             GroupBoxString->Parent = ScrollBox;
 
             /* add panel as separator */
@@ -447,7 +447,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
         case MODULE_CONFIG_ITEM_INTEGER:
 
             /* add new groupbox for the config option */
-            GroupBoxInteger = new TGroupBoxInteger( this, &p_module->p_config[i] );
+            GroupBoxInteger = new TGroupBoxInteger( this, p_item );
             GroupBoxInteger->Parent = ScrollBox;
 
             /* add panel as separator */
@@ -458,7 +458,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
         case MODULE_CONFIG_ITEM_BOOL:
 
             /* add new groupbox for the config option */
-            GroupBoxBool = new TGroupBoxBool( this, &p_module->p_config[i] );
+            GroupBoxBool = new TGroupBoxBool( this, p_item );
             GroupBoxBool->Parent = ScrollBox;
 
             /* add panel as separator */
@@ -466,7 +466,10 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 
             break;
         }
+        
+        p_item++;
     }
+    while( p_item->i_type != MODULE_CONFIG_HINT_END );
 
     /* Reorder groupboxes inside the tabsheets */
     for( i_pages = 0; i_pages < PageControlPref->PageCount; i_pages++ )
