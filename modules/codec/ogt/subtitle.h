@@ -35,7 +35,7 @@
 #define DECODE_DBG_PNG        64 /* Extract subtitles to PNG files. */
 #define DECODE_DBG_INFO      128
 
-#define DEBUG_TEXT N_(					    \
+#define DEBUG_TEXT N_( \
      "If nonzero, this gives additional debug information." \
      )
 
@@ -51,7 +51,7 @@
     "misc info            128\n" )
 
 #define SUB_ASPECT_RATIO_TEXT N_("Subtitle aspect-ratio correction")
-#define SUB_ASPECT_RATIO_LONGTEXT N_(					\
+#define SUB_ASPECT_RATIO_LONGTEXT N_( \
     "Use this to force the subtitle aspect ratio. If you give a null string " \
     "the right value will be determined automatically. Usually this is what " \
     "you want. For OGT and CVD subtitles this undoes the effect " \
@@ -66,26 +66,26 @@
     )
 
 #define DURATION_SCALE_TEXT N_("Factor to increase subtitle display interval")
-#define DURATION_SCALE_LONGTEXT N_(			    \
+#define DURATION_SCALE_LONGTEXT N_( \
   "If you find you need extra time for reading subtitles, " \
-  "you can set this higher and it will multiply the display "	\
-  "time by that amount. Use 0 to mean until the next "		\
+  "you can set this higher and it will multiply the display " \
+  "time by that amount. Use 0 to mean until the next " \
   "subtitle.")
 
 #define HORIZONTAL_CORRECT \
   N_("Add this to starting horizontal position of subtitle.")
-#define HORIZONTAL_CORRECT_LONGTEXT N_(			    \
+#define HORIZONTAL_CORRECT_LONGTEXT N_( \
   "If you need to adjust the subtitle starting position horizontally, " \
   "set this. Negative values shift left and positive values right. 0 would " \
-  "be no deviation from where the position specified in the subtitle."	\
+  "be no deviation from where the position specified in the subtitle." \
   )
 
 #define VERTICAL_CORRECT \
   N_("Add this to starting vertical position of subtitle.")
-#define VERTICAL_CORRECT_LONGTEXT N_(			    \
+#define VERTICAL_CORRECT_LONGTEXT N_( \
   "If you need to adjust the subtitle starting position vertically, " \
-  "set this. Negative values shift up, positive values down. 0 would "	\
-  "be no deviation from where the position specified in the subtitle."	\
+  "set this. Negative values shift up, positive values down. 0 would " \
+  "be no deviation from where the position specified in the subtitle." \
   )
 
 #define DECODE_DEBUG 1
@@ -107,7 +107,7 @@
 
 
 /* The number of color palette entries allowed in a subtitle. */
-#define NUM_SUBTITLE_COLORS 4 
+#define NUM_SUBTITLE_COLORS 4
 
 typedef enum  {
   SUBTITLE_BLOCK_EMPTY,
@@ -118,7 +118,7 @@ typedef enum  {
 /* The byte storage used by one pixel */
 #define PIXEL_SIZE 4
 
-/* Size in bytes of YUV portion above. */ 
+/* Size in bytes of YUV portion above. */
 #define YUV_SIZE 3
 
 
@@ -133,50 +133,52 @@ struct decoder_sys_t
   int            i_spu;
   packet_state_t state;   /* data-gathering state for this subtitle */
 
-  uint16_t       i_image; /* image number in the subtitle stream; 0 is the 
-			     first one. */
-  uint8_t        i_packet;/* packet number for above image number; 0 is the 
-			     first one. */
+  uint16_t       i_image; /* image number in the subtitle stream; 0 is the
+                             first one. */
+  uint8_t        i_packet;/* packet number for above image number; 0 is the
+                             first one. */
   block_t        *p_block;/* Bytes of the packet. */
-  
+
   uint8_t buffer[65536 + 20 ]; /* we will never overflow more than 11
-				  bytes if I'm right */
+                                  bytes if I'm right */
   int     b_packetizer;
-  int     i_spu_size;	  /* goal for subtitle_data_pos while gathering,
-			     size of used subtitle_data later */
+  int     i_spu_size;     /* goal for subtitle_data_pos while gathering,
+                             size of used subtitle_data later */
   vout_thread_t *p_vout;
 
+  int i_subpic_channel;   /* Subpicture channel in which subtitles will
+                             be written */
+
   /* FIXME: Remove this? */
-  uint8_t *subtitle_data;	/* buffer used to accumulate data from
-				   successive packets in the same subtitle */
-  int subtitle_data_size;	/* size of the allocated subtitle_data */
+  uint8_t *subtitle_data;   /* buffer used to accumulate data from
+                               successive packets in the same subtitle */
+  int subtitle_data_size;   /* size of the allocated subtitle_data */
 
   /* Move into subpicture_sys_t? */
-  uint16_t i_image_offset;	/* offset from subtitle_data to compressed
-				   image data */
-  int i_image_length;	        /* size of the compressed image data */
+  uint16_t i_image_offset;      /* offset from subtitle_data to compressed
+                                   image data */
+  int i_image_length;           /* size of the compressed image data */
   int first_field_offset;       /* offset of even raster lines. Used
-				   only for CVD.
-				 */
+                                   only for CVD. */
   int second_field_offset;      /* offset of odd raster lines */
   int metadata_offset;          /* offset to data describing the image */
   int metadata_length;          /* length of metadata */
 
-  int subtitle_data_pos;	/* where to write next chunk */
+  int subtitle_data_pos;    /* where to write next chunk */
 
-  mtime_t i_duration;		/* how long to display the image, 0 stands
-				   for "until next subtitle" */
+  mtime_t i_duration;   /* how long to display the image, 0 stands
+                           for "until next subtitle" */
 
   uint16_t i_x_start, i_y_start; /* position of top leftmost pixel of
-				     image when displayed */
-  uint16_t i_width, i_height;	/* dimensions in pixels of image */
+                                    image when displayed */
+  uint16_t i_width, i_height;    /* dimensions in pixels of image */
 
   ogt_yuvt_t p_palette[NUM_SUBTITLE_COLORS];  /* Palette of colors used
-						  in subtitle */
+                                                 in subtitle */
 
 
   ogt_yuvt_t p_palette_highlight[NUM_SUBTITLE_COLORS]; /* Only used
-							   for CVD */
+                                                          for CVD */
 
   uint8_t i_options;
   uint8_t i_options2;
@@ -194,7 +196,7 @@ struct subpicture_sys_t
 
   /* Link to our input */
   vlc_object_t * p_input;
-  
+
   /* Cropping properties */
   vlc_mutex_t  lock;
   vlc_bool_t   b_crop;
@@ -202,6 +204,6 @@ struct subpicture_sys_t
 
   /* This is only used for color palette Chromas like RGB2. */
   ogt_yuvt_t p_palette[NUM_SUBTITLE_COLORS];  /* Palette of colors used
-						  in subtitle */
+                                                 in subtitle */
 
 };

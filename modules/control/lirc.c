@@ -45,6 +45,8 @@ struct intf_sys_t
     struct lirc_config *config;
     vlc_mutex_t         change_lock;
 
+    int                 i_osd_channel;
+
     input_thread_t *    p_input;
     vout_thread_t *     p_vout;
 };
@@ -189,21 +191,21 @@ static void Run( intf_thread_t *p_intf )
             if( !strcmp( c, "QUIT" ) )
             {
                 p_intf->p_vlc->b_die = VLC_TRUE;
-                vout_OSDMessage( p_intf, SOLO_CHAN, _("Quit" ) );
+                vout_OSDMessage( p_intf, DEFAULT_CHAN, _("Quit" ) );
                 continue;
             }
             else if( !strcmp( c, "VOL_UP" ) )
             {
                 audio_volume_t i_newvol;
                 aout_VolumeUp( p_intf, 1, &i_newvol );
-                vout_OSDMessage( p_intf, SOLO_CHAN, _("Vol %%%d"),
+                vout_OSDMessage( p_intf, DEFAULT_CHAN, _("Vol %%%d"),
                                  i_newvol * 100 / AOUT_VOLUME_MAX );
             }
             else if( !strcmp( c, "VOL_DOWN" ) )
             {
                 audio_volume_t i_newvol;
                 aout_VolumeDown( p_intf, 1, &i_newvol );
-                vout_OSDMessage( p_intf, SOLO_CHAN, _("Vol %%%d"),
+                vout_OSDMessage( p_intf, DEFAULT_CHAN, _("Vol %%%d"),
                                  i_newvol * 100 / AOUT_VOLUME_MAX );
             }
             else if( !strcmp( c, "MUTE" ) )
@@ -212,11 +214,11 @@ static void Run( intf_thread_t *p_intf )
                 aout_VolumeMute( p_intf, &i_newvol );
                 if( i_newvol == 0 )
                 {
-                    vout_OSDMessage( p_intf, SOLO_CHAN, _( "Mute" ) );
+                    vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Mute" ) );
                 }
                 else
                 {
-                    vout_OSDMessage( p_intf, SOLO_CHAN, _("Vol %d%%"),
+                    vout_OSDMessage( p_intf, DEFAULT_CHAN, _("Vol %d%%"),
                                      i_newvol * 100 / AOUT_VOLUME_MAX );
                 }
             }
@@ -305,7 +307,7 @@ static void Run( intf_thread_t *p_intf )
                 }
                 if( p_input && val.i_int != PAUSE_S )
                 {
-                    vout_OSDMessage( VLC_OBJECT(p_intf), SOLO_CHAN,
+                    vout_OSDMessage( VLC_OBJECT(p_intf), DEFAULT_CHAN,
                                      _( "Pause" ) );
                     val.i_int = PAUSE_S;
                     var_Set( p_input, "state", val );
@@ -320,7 +322,7 @@ static void Run( intf_thread_t *p_intf )
                         if( p_playlist->i_size )
                         {
                             vlc_mutex_unlock( &p_playlist->object_lock );
-                            vout_OSDMessage( p_intf, SOLO_CHAN, _( "Play" ) );
+                            vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Play" ) );
                             playlist_Play( p_playlist );
                             vlc_object_release( p_playlist );
                         }
@@ -367,7 +369,7 @@ static void Run( intf_thread_t *p_intf )
                                  list.p_list->p_values[i+1] );
                         i++;
                     }
-                    vout_OSDMessage( VLC_OBJECT(p_input), SOLO_CHAN,
+                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                      _("Audio track: %s"),
                                      list2.p_list->p_values[i].psz_string );
                 }
@@ -403,14 +405,14 @@ static void Run( intf_thread_t *p_intf )
                         var_Set( p_input, "spu-es", list.p_list->p_values[i+1] );
                         i = i + 1;
                     }
-                    vout_OSDMessage( VLC_OBJECT(p_input), SOLO_CHAN,
+                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                      _("Subtitle track: %s"),
                                      list2.p_list->p_values[i].psz_string );
                 }
                 else if( !strcmp( c, "PAUSE" ) )
                 {
                     vlc_value_t val;
-                    vout_OSDMessage( p_intf, SOLO_CHAN, _( "Pause" ) );
+                    vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Pause" ) );
                     val.i_int = PAUSE_S;
                     var_Set( p_input, "state", val );
                 }

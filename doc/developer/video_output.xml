@@ -126,8 +126,9 @@ and <function> vout_DatePicture </function> upon necessary.
 
       <listitem> <para> <type> subpicture_t * </type> <function>
       vout_CreateSubPicture </function> <parameter> ( vout_thread_t *p_vout,
-      int i_type, int i_size ) </parameter> :
-      Returns an allocated subpicture buffer. <parameter> i_type
+      int i_channel, int i_type ) </parameter> :
+      Returns an allocated subpicture buffer. <parameter> i_channel
+      </parameter> is the ID of the subpicture channel, <parameter> i_type
       </parameter> is <constant> DVD_SUBPICTURE </constant> or
       <constant> TEXT_SUBPICTURE</constant>, <parameter> i_size
       </parameter> is the length in bytes of the packet.

@@ -42,7 +42,7 @@
  * \param p_vout the video output this subpicture should be displayed on
  * \param p_subpic the subpicture to display
  */
-void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
+void vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
     int         i_margin;
 
@@ -83,43 +83,19 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
  * \return NULL on error, a reserved subpicture otherwise
  */
 subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_channel,
-                                     int i_content, int i_type )
+                                     int i_type )
 {
     int                 i_subpic;                        /* subpicture index */
     subpicture_t *      p_subpic = NULL;            /* first free subpicture */
 
+    /* Clear the default channel before writing into it */
+    if( i_channel == DEFAULT_CHAN )
+    {
+        vout_ClearOSDChannel( p_vout, DEFAULT_CHAN );
+    }
+
     /* Get lock */
     vlc_mutex_lock( &p_vout->subpicture_lock );
-
-    /*
-     * Destroy all subpics which are not in the correct channel and
-     * subpics which are in the right channel and have the same content type
-     * (only concerns exclusive channels)
-     */
-    if( i_channel >= BEGIN_EXCLUSIVE_CHAN )
-    {
-        for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
-        {
-            p_subpic = &p_vout->p_subpicture[i_subpic];
-            if( p_subpic->i_status == FREE_SUBPICTURE
-                || ( p_subpic->i_status != RESERVED_SUBPICTURE
-                     && p_subpic->i_status != READY_SUBPICTURE ) )
-            {
-                continue;
-            }
-            if( ( p_subpic->i_channel != i_channel
-                  && p_subpic->i_channel >= BEGIN_EXCLUSIVE_CHAN )
-                || ( p_subpic->i_channel == i_channel
-                     && p_subpic->i_content == i_content ) )
-            {
-                if( p_subpic->pf_destroy )
-                {
-                    p_subpic->pf_destroy( p_subpic );
-                }
-                p_subpic->i_status = FREE_SUBPICTURE;
-            }
-        }
-    }
 
     /*
      * Look for an empty place
@@ -146,8 +122,6 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_channel,
 
     /* Copy subpicture information, set some default values */
     p_subpic->i_channel = i_channel;
-    p_subpic->i_content = i_content;
-
     p_subpic->i_type    = i_type;
     p_subpic->i_status  = RESERVED_SUBPICTURE;
 
@@ -159,6 +133,12 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_channel,
     p_subpic->i_y       = 0;
     p_subpic->i_width   = 0;
     p_subpic->i_height  = 0;
+
+    /* Remain last subpicture displayed in DEFAULT_CHAN */
+    if( i_channel == DEFAULT_CHAN )
+    {
+        p_vout->p_default_channel = p_subpic;
+    }
 
     vlc_mutex_unlock( &p_vout->subpicture_lock );
 
@@ -337,3 +317,58 @@ subpicture_t *vout_SortSubPictures( vout_thread_t *p_vout,
     return p_subpic;
 }
 
+/*****************************************************************************
+ * vout_RegisterOSDChannel: register an OSD channel
+ *****************************************************************************
+ * This function affects an ID to an OSD channel
+ *****************************************************************************/
+int vout_RegisterOSDChannel( vout_thread_t *p_vout )
+{
+    msg_Dbg( p_vout, "Registering OSD channel, ID: %i", p_vout->i_channel_count + 1 );
+    return ++p_vout->i_channel_count;
+}
+
+/*****************************************************************************
+ * vout_ClearOSDChannel: clear an OSD channel
+ *****************************************************************************
+ * This function destroys the subpictures which belong to the OSD channel
+ * corresponding to i_channel_id.
+ *****************************************************************************/
+void vout_ClearOSDChannel( vout_thread_t *p_vout, int i_channel )
+{
+    int                 i_subpic;                        /* subpicture index */
+    subpicture_t *      p_subpic = NULL;            /* first free subpicture */
+
+    if( i_channel == DEFAULT_CHAN )
+    {
+        if( p_vout->p_default_channel != NULL )
+        {
+            vout_DestroySubPicture( p_vout, p_vout->p_default_channel );
+        }
+        p_vout->p_default_channel = NULL;
+        return;
+    }
+
+    vlc_mutex_lock( &p_vout->subpicture_lock );
+
+    for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
+    {
+        p_subpic = &p_vout->p_subpicture[i_subpic];
+        if( p_subpic->i_status == FREE_SUBPICTURE
+            || ( p_subpic->i_status != RESERVED_SUBPICTURE
+                 && p_subpic->i_status != READY_SUBPICTURE ) )
+        {
+            continue;
+        }
+        if( p_subpic->i_channel == i_channel )
+        {
+            if( p_subpic->pf_destroy )
+            {
+                p_subpic->pf_destroy( p_subpic );
+            }
+            p_subpic->i_status = FREE_SUBPICTURE;
+        }
+    }
+
+    vlc_mutex_unlock( &p_vout->subpicture_lock );
+}

@@ -742,8 +742,8 @@ mediacontrol_display_text( mediacontrol_Instance *self,
                                                        mediacontrol_MediaTime,
                                                        end->value );
 
-        vout_ShowTextRelative( p_vout, SUBT1_CHAN, ( char* ) message, NULL, 
-                               OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 20, 20, 
+        vout_ShowTextRelative( p_vout, DEFAULT_CHAN, ( char* ) message, NULL, 
+			                   OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 20, 20, 
                                i_duration );
     }
     else
@@ -768,9 +768,9 @@ mediacontrol_display_text( mediacontrol_Instance *self,
                                                    ( mediacontrol_Position * ) end );
         i_fin += i_now;
       
-        vout_ShowTextAbsolute( p_vout, SUBT1_CHAN, ( char* )message, NULL, 
-                               OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 20, 20, 
-                               i_debut, i_fin );
+        vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN, ( char* ) message, NULL, 
+			                   OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 20, 20, 
+			                   i_debut, i_fin );
     }
   
     vlc_object_release( p_vout );

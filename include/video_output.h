@@ -125,6 +125,10 @@ struct vout_thread_t
     /* Picture and subpicture heaps */
     picture_t           p_picture[2*VOUT_MAX_PICTURES];        /**< pictures */
     subpicture_t        p_subpicture[VOUT_MAX_PICTURES];    /**< subpictures */
+    subpicture_t        *p_default_channel;   /**< subpicture in the default
+                                                   channel */
+    int                 i_channel_count;       /**< index of last subpicture
+                                                    channel registered */
 
     /* Statistics */
     count_t          c_loops;
@@ -256,9 +260,11 @@ enum output_query_e
  * \addtogroup subpicture
  * @{
  */
-VLC_EXPORT( subpicture_t *,  vout_CreateSubPicture,   ( vout_thread_t *, int, int, int ) );
+VLC_EXPORT( subpicture_t *,  vout_CreateSubPicture,   ( vout_thread_t *, int, int ) );
 VLC_EXPORT( void,            vout_DestroySubPicture,  ( vout_thread_t *, subpicture_t * ) );
 VLC_EXPORT( void,            vout_DisplaySubPicture,  ( vout_thread_t *, subpicture_t * ) );
+VLC_EXPORT( int,             vout_RegisterOSDChannel, ( vout_thread_t * ) );
+VLC_EXPORT( void,            vout_ClearOSDChannel,    ( vout_thread_t *, int ) );
 
 subpicture_t *  vout_SortSubPictures    ( vout_thread_t *, mtime_t );
 void            vout_RenderSubPictures  ( vout_thread_t *, picture_t *,

@@ -165,7 +165,7 @@ E_(ParsePacket)( decoder_t *p_dec)
     dbg_print( (DECODE_DBG_CALL|DECODE_DBG_EXT) , "");
     
     /* Allocate the subpicture internal data. */
-    p_spu = vout_CreateSubPicture( p_sys->p_vout, SUBT1_CHAN, TEXT_CONTENT,
+    p_spu = vout_CreateSubPicture( p_sys->p_vout, p_sys->i_subpic_channel,
                                    MEMORY_SUBPICTURE );
     if( p_spu == NULL )
     {

@@ -382,8 +382,7 @@ subpicture_t *vout_CreateWidget( vout_thread_t *p_vout, int i_channel )
     p_widget = 0;
 
     /* Create and initialize a subpicture */
-    p_subpic = vout_CreateSubPicture( p_vout, i_channel, GRAPH_CONTENT,
-                                      MEMORY_SUBPICTURE );
+    p_subpic = vout_CreateSubPicture( p_vout, i_channel, MEMORY_SUBPICTURE );
     if( p_subpic == NULL )
     {
         return NULL;
@@ -493,27 +492,17 @@ void vout_OSDSlider( vlc_object_t *p_caller, int i_channel, int i_position,
  * Displays an OSD icon.
  * Types are: OSD_PLAY_ICON, OSD_PAUSE_ICON, OSD_SPEAKER_ICON, OSD_MUTE_ICON
  *****************************************************************************/
-void vout_OSDIcon( vlc_object_t *p_caller, short i_type )
+void vout_OSDIcon( vlc_object_t *p_caller, int i_channel, short i_type )
 {
     vout_thread_t *p_vout = vlc_object_find( p_caller, VLC_OBJECT_VOUT,
                                              FIND_ANYWHERE );
     subpicture_t *p_subpic;
     subpicture_sys_t *p_widget;
-    int i_x_margin, i_y_margin, i_channel;
+    int i_x_margin, i_y_margin;
 
     if( p_vout == NULL || !config_GetInt( p_caller, "osd" ) )
     {
         return;
-    }
-
-    switch( i_type )
-    {
-        case OSD_SPEAKER_ICON:
-            i_channel = VOLUME_CHAN;
-            break;
-        default:
-            i_channel = SOLO_CHAN;
-            break;
     }
 
     p_subpic = vout_CreateWidget( p_vout, i_channel );

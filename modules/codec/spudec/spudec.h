@@ -2,7 +2,7 @@
  * spudec.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: spudec.h,v 1.8 2003/11/22 19:55:47 fenrir Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,6 +29,8 @@ struct decoder_sys_t
     int i_spu_size;
     int i_rle_size;
     int i_spu;
+
+    int i_subpic_channel;
 
     block_t *p_block;
 

@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.33 2004/01/30 16:50:26 fenrir Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -153,10 +153,11 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Decode:
  *****************************************************************************/
-static void     Decode   ( decoder_t *p_dec, block_t **pp_block )
+static void Decode( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t       *p_spu = Reassemble( p_dec, pp_block );
+    vout_thread_t *p_last_vout = p_dec->p_sys->p_vout;
 
     if( p_spu )
     {
@@ -166,6 +167,12 @@ static void     Decode   ( decoder_t *p_dec, block_t **pp_block )
 
         if( ( p_sys->p_vout = FindVout( p_dec ) ) )
         {
+            if( p_last_vout != p_sys->p_vout )
+            {
+                p_sys->i_subpic_channel =
+                    vout_RegisterOSDChannel( p_sys->p_vout );
+            }
+
             /* Parse and decode */
             E_(ParsePacket)( p_dec );
 

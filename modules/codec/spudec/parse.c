@@ -70,9 +70,10 @@ void E_(ParsePacket)( decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     subpicture_t  *p_spu;
+    int           i_spu_channel;
 
     /* Allocate the subpicture internal data. */
-    p_spu = vout_CreateSubPicture( p_sys->p_vout, SUBT1_CHAN, TEXT_CONTENT,
+    p_spu = vout_CreateSubPicture( p_sys->p_vout, p_sys->i_subpic_channel,
                                    MEMORY_SUBPICTURE );
     if( p_spu == NULL )
     {

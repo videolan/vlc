@@ -253,6 +253,10 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     /* No images in the heap */
     p_vout->i_heap_size = 0;
 
+    /* Register the default subpicture channel */
+    p_vout->p_default_channel = NULL;
+    p_vout->i_channel_count = 1;
+
     /* Initialize the rendering heap */
     I_RENDERPICTURES = 0;
     p_vout->render.i_width    = i_width;

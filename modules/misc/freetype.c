@@ -706,8 +706,7 @@ static subpicture_t *AddText ( vout_thread_t *p_vout, int i_channel,
     p_subpic = 0;
 
     /* Create and initialize a subpicture */
-    p_subpic = vout_CreateSubPicture( p_vout, i_channel, TEXT_CONTENT,
-                                      MEMORY_SUBPICTURE );
+    p_subpic = vout_CreateSubPicture( p_vout, i_channel, MEMORY_SUBPICTURE );
     if ( p_subpic == NULL )
     {
         return NULL;

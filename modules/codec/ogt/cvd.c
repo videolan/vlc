@@ -48,7 +48,7 @@ vlc_module_begin();
     set_callbacks( VCDSubOpen, VCDSubClose );
 
     add_integer ( MODULE_STRING "-debug", 0, NULL,
-		  DEBUG_TEXT, DEBUG_LONGTEXT, VLC_TRUE );
+                  DEBUG_TEXT, DEBUG_LONGTEXT, VLC_TRUE );
 
     add_integer ( MODULE_STRING "-horizontal-correct", 0, NULL,
                   HORIZONTAL_CORRECT, HORIZONTAL_CORRECT_LONGTEXT, VLC_FALSE );
@@ -57,12 +57,12 @@ vlc_module_begin();
                   VERTICAL_CORRECT, VERTICAL_CORRECT_LONGTEXT, VLC_FALSE );
 
     add_string( MODULE_STRING "-aspect-ratio", "", NULL,
-                SUB_ASPECT_RATIO_TEXT, SUB_ASPECT_RATIO_LONGTEXT, 
-		VLC_TRUE );
+                SUB_ASPECT_RATIO_TEXT, SUB_ASPECT_RATIO_LONGTEXT,
+                VLC_TRUE );
 
     add_integer( MODULE_STRING "-duration-scaling", 3, NULL,
-		 DURATION_SCALE_TEXT, DURATION_SCALE_LONGTEXT,
-		 VLC_TRUE );
+                 DURATION_SCALE_TEXT, DURATION_SCALE_LONGTEXT,
+                 VLC_TRUE );
 
     add_submodule();
     set_description( _("Chaoji VCD subtitle packetizer") );
@@ -145,6 +145,7 @@ Decode ( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t       *p_spu = Reassemble( p_dec, pp_block );
+    vout_thread_t *p_last_vout = p_dec->p_sys->p_vout;
 
     dbg_print( (DECODE_DBG_CALL) , "");
 
@@ -156,6 +157,12 @@ Decode ( decoder_t *p_dec, block_t **pp_block )
 
         if( ( p_sys->p_vout = VCDSubFindVout( p_dec ) ) )
         {
+            if( p_last_vout != p_sys->p_vout )
+            {
+                p_sys->i_subpic_channel =
+                    vout_RegisterOSDChannel( p_sys->p_vout );
+            }
+
             /* Parse and decode */
             E_(ParsePacket)( p_dec );
 
@@ -229,36 +236,37 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 
     p_buffer = p_block->p_buffer;
 
-    dbg_print( (DECODE_DBG_CALL|DECODE_DBG_PACKET), 
-	       "header: 0x%02x 0x%02x 0x%02x 0x%02x, 0x%02x, 0x%02x, size: %i",
-	       p_buffer[1], p_buffer[2], p_buffer[3], p_buffer[4],
-	       p_buffer[5], p_buffer[6],
-	       p_block->i_buffer);
+    dbg_print( (DECODE_DBG_CALL|DECODE_DBG_PACKET),
+               "header: 0x%02x 0x%02x 0x%02x 0x%02x, 0x%02x, 0x%02x, size: %i",
+               p_buffer[1], p_buffer[2], p_buffer[3], p_buffer[4],
+               p_buffer[5], p_buffer[6],
+               p_block->i_buffer);
 
 
     /* Attach to our input thread and see if subtitle is selected. */
     {
         vlc_object_t * p_input;
         vlc_value_t val;
-      
-	p_input = vlc_object_find( p_dec, VLC_OBJECT_INPUT, FIND_PARENT );
 
-	if( !p_input ) return NULL;
+        p_input = vlc_object_find( p_dec, VLC_OBJECT_INPUT, FIND_PARENT );
 
-	if( var_Get( p_input, "spu-channel", &val ) ) {
-	  vlc_object_release( p_input );
-	  return NULL;
-	}
-	
+        if( !p_input ) return NULL;
+
+        if( var_Get( p_input, "spu-channel", &val ) )
+        {
+          vlc_object_release( p_input );
+          return NULL;
+        }
+
         vlc_object_release( p_input );
 
-	/* Number could be 0bd, 1bd, 2bd, 3bd for 0..3. If so 
-	   reduce it to 0..3.
-	 */
-	if ( (val.i_int & 0xff) == 0xbd ) val.i_int >>= 8;
-	
-	if( val.i_int == -1 || val.i_int != p_buffer[0] )
-	  return NULL;
+        /* Number could be 0bd, 1bd, 2bd, 3bd for 0..3. If so
+           reduce it to 0..3.
+         */
+        if ( (val.i_int & 0xff) == 0xbd ) val.i_int >>= 8;
+
+        if( val.i_int == -1 || val.i_int != p_buffer[0] )
+          return NULL;
     }
 
 
@@ -268,8 +276,8 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
        image don't. */
 
     if ( p_sys->state == SUBTITLE_BLOCK_EMPTY && p_block->i_pts == 0 ) {
-      msg_Warn( p_dec, 
-		"first packet expected but no PTS present -- skipped\n");
+      msg_Warn( p_dec,
+                "first packet expected but no PTS present -- skipped\n");
       return NULL;
     }
 
@@ -280,8 +288,8 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* FIXME - remove append_data and use chainappend */
-    VCDSubAppendData( p_dec, p_buffer + SPU_HEADER_LEN, 
-		      p_block->i_buffer - SPU_HEADER_LEN );
+    VCDSubAppendData( p_dec, p_buffer + SPU_HEADER_LEN,
+                      p_block->i_buffer - SPU_HEADER_LEN );
 
     block_ChainAppend( &p_sys->p_block, p_block );
 
@@ -295,6 +303,5 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
       p_sys->state = SUBTITLE_BLOCK_PARTIAL;
     }
 
-    
     return NULL;
 }

@@ -193,10 +193,9 @@ struct picture_heap_t
  */
 struct subpicture_t
 {
-    /** \name Channel and content type */
+    /** \name Channel ID */
     /**@{*/
-    int             i_channel;                      /**< subpicture channel */
-    int             i_content;                            /**< content type */
+    int             i_channel;                    /**< subpicture channel ID */
     /**@}*/
 
     /** \name Type and flags
@@ -241,23 +240,13 @@ struct subpicture_t
 #define EMPTY_SUBPICTURE       0     /* subtitle slot is empty and available */
 #define MEMORY_SUBPICTURE      100            /* subpicture stored in memory */
 
+/* Default subpicture channel ID */
+#define DEFAULT_CHAN           1
+
 /* Subpicture status */
 #define FREE_SUBPICTURE        0                   /* free and not allocated */
 #define RESERVED_SUBPICTURE    1                   /* allocated and reserved */
 #define READY_SUBPICTURE       2                        /* ready for display */
-
-/* Subpicture channel */
-#define SUBT1_CHAN             1
-#define SUBT2_CHAN             2
-#define BEGIN_EXCLUSIVE_CHAN   3           /* exclusive subpic-channels list */
-#define POSITION_CHAN          3
-#define VOLUME_CHAN            4
-#define SOLO_CHAN              5
-#define END_EXCLUSIVE_CHAN     5                               /*end of list */
-
-/* Subpicture content type */
-#define TEXT_CONTENT           0
-#define GRAPH_CONTENT          1             /* used for OSD icon, slider... */
 
 /*****************************************************************************
  * Prototypes

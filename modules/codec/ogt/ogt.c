@@ -48,7 +48,7 @@ vlc_module_begin();
     set_callbacks( VCDSubOpen, VCDSubClose );
 
     add_integer ( MODULE_STRING "-debug", 0, NULL,
-		  DEBUG_TEXT, DEBUG_LONGTEXT, VLC_TRUE );
+                  DEBUG_TEXT, DEBUG_LONGTEXT, VLC_TRUE );
 
     add_integer ( MODULE_STRING "-horizontal-correct", 0, NULL,
                   HORIZONTAL_CORRECT, HORIZONTAL_CORRECT_LONGTEXT, VLC_FALSE );
@@ -57,12 +57,10 @@ vlc_module_begin();
                   VERTICAL_CORRECT, VERTICAL_CORRECT_LONGTEXT, VLC_FALSE );
 
     add_string( MODULE_STRING "-aspect-ratio", "", NULL,
-                SUB_ASPECT_RATIO_TEXT, SUB_ASPECT_RATIO_LONGTEXT, 
-		VLC_TRUE );
+                SUB_ASPECT_RATIO_TEXT, SUB_ASPECT_RATIO_LONGTEXT, VLC_TRUE );
 
     add_integer( MODULE_STRING "-duration-scaling", 9, NULL,
-		 DURATION_SCALE_TEXT, DURATION_SCALE_LONGTEXT,
-		 VLC_TRUE );
+                 DURATION_SCALE_TEXT, DURATION_SCALE_LONGTEXT, VLC_TRUE );
 
     add_submodule();
     set_description( _("Philips OGT (SVCD subtitle) packetizer") );
@@ -145,6 +143,7 @@ Decode ( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t       *p_spu = Reassemble( p_dec, pp_block );
+    vout_thread_t *p_last_vout = p_dec->p_sys->p_vout;
 
     dbg_print( (DECODE_DBG_CALL) , "");
 
@@ -156,6 +155,12 @@ Decode ( decoder_t *p_dec, block_t **pp_block )
 
         if( ( p_sys->p_vout = VCDSubFindVout( p_dec ) ) )
         {
+            if( p_last_vout != p_sys->p_vout )
+            {
+                p_sys->i_subpic_channel =
+                    vout_RegisterOSDChannel( p_sys->p_vout );
+            }
+
             /* Parse and decode */
             E_(ParsePacket)( p_dec );
 
@@ -239,34 +244,36 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 
     p_buffer = p_block->p_buffer;
 
-    dbg_print( (DECODE_DBG_CALL|DECODE_DBG_PACKET), 
-	       "header: 0x%02x 0x%02x 0x%02x 0x%02x, size: %i",
-	       p_buffer[1], p_buffer[2], p_buffer[3], p_buffer[4],
-	       p_block->i_buffer);
+    dbg_print( (DECODE_DBG_CALL|DECODE_DBG_PACKET),
+               "header: 0x%02x 0x%02x 0x%02x 0x%02x, size: %i",
+               p_buffer[1], p_buffer[2], p_buffer[3], p_buffer[4],
+               p_block->i_buffer);
 
     /* Attach to our input thread and see if subtitle is selected. */
     {
         vlc_object_t * p_input;
         vlc_value_t val;
-      
-	p_input = vlc_object_find( p_dec, VLC_OBJECT_INPUT, FIND_PARENT );
 
-	if( !p_input ) return NULL;
+        p_input = vlc_object_find( p_dec, VLC_OBJECT_INPUT, FIND_PARENT );
 
-        if( var_Get( p_input, "spu-channel", &val ) ) {
-	  vlc_object_release( p_input );
+        if( !p_input ) return NULL;
+
+        if( var_Get( p_input, "spu-channel", &val ) )
+        {
+            vlc_object_release( p_input );
           return NULL;
         }
-	
+
         vlc_object_release( p_input );
-        dbg_print( (DECODE_DBG_PACKET), 
+        dbg_print( (DECODE_DBG_PACKET),
                    "val.i_int %x p_buffer[i] %x", val.i_int, p_buffer[1]);
 
         /* The dummy ES that the menu selection uses has an 0x70 at
            the head which we need to strip off. */
-	if( val.i_int == -1 || (val.i_int & 0x03) != p_buffer[1] ) {
-          dbg_print( DECODE_DBG_PACKET, "subtitle not for us.\n");
-	  return NULL;
+        if( val.i_int == -1 || (val.i_int & 0x03) != p_buffer[1] )
+        {
+            dbg_print( DECODE_DBG_PACKET, "subtitle not for us.\n");
+            return NULL;
         }
     }
 
@@ -332,7 +339,7 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 }
 
 
-/* 
+/*
  * Local variables:
  *  c-file-style: "gnu"
  *  tab-width: 8

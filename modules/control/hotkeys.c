@@ -36,6 +36,12 @@
 #include "vlc_keys.h"
 
 #define BUFFER_SIZE 10
+
+#define CHANNELS_NUMBER 4
+#define VOLUME_TEXT_CHAN     p_intf->p_sys->p_channels[ 0 ]
+#define VOLUME_WIDGET_CHAN   p_intf->p_sys->p_channels[ 1 ]
+#define POSITION_TEXT_CHAN   p_intf->p_sys->p_channels[ 2 ]
+#define POSITION_WIDGET_CHAN p_intf->p_sys->p_channels[ 3 ]
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface
  *****************************************************************************/
@@ -48,6 +54,8 @@ struct intf_sys_t
     int                 p_keys[ BUFFER_SIZE ]; /* buffer that contains
                                                 * keyevents */
     int                 i_size;        /* number of events in buffer */
+    int                 p_channels[ CHANNELS_NUMBER ]; /* contains registered
+                                                        * channel IDs */
     input_thread_t *    p_input;       /* pointer to input */
     vout_thread_t *     p_vout;        /* pointer to vout object */
 };
@@ -65,8 +73,9 @@ static int  ActionKeyCB( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 static void PlayBookmark( intf_thread_t *, int );
 static void SetBookmark ( intf_thread_t *, int );
-static void DisplayPosition( vout_thread_t *, input_thread_t * );
-static void DisplayVolume  ( vout_thread_t *, audio_volume_t );
+static void DisplayPosition( intf_thread_t *, vout_thread_t *, input_thread_t * );
+static void DisplayVolume  ( intf_thread_t *, vout_thread_t *, audio_volume_t );
+static void ClearChannels  ( intf_thread_t *, vout_thread_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -163,6 +172,7 @@ static void Run( intf_thread_t *p_intf )
     playlist_t *p_playlist;
     input_thread_t *p_input;
     vout_thread_t *p_vout = NULL;
+    vout_thread_t *p_last_vout;
     struct hotkey *p_hotkeys = p_intf->p_vlc->p_hotkeys;
     vlc_value_t val;
     int i;
@@ -200,6 +210,7 @@ static void Run( intf_thread_t *p_intf )
         p_input = p_intf->p_sys->p_input;
 
         /* Update the vout */
+        p_last_vout = p_intf->p_sys->p_vout;
         if( p_vout == NULL )
         {
             p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
@@ -210,6 +221,16 @@ static void Run( intf_thread_t *p_intf )
             vlc_object_release( p_vout );
             p_vout = NULL;
             p_intf->p_sys->p_vout = NULL;
+        }
+
+        /* Register OSD channels */
+        if( p_vout && p_vout != p_last_vout )
+        {
+            for( i = 0; i < CHANNELS_NUMBER; i++ )
+            {
+                p_intf->p_sys->p_channels[ i ] =
+                    vout_RegisterOSDChannel( p_vout );
+            }
         }
 
         /* Find action triggered by hotkey */
@@ -233,20 +254,21 @@ static void Run( intf_thread_t *p_intf )
         if( i_action == ACTIONID_QUIT )
         {
             p_intf->p_vlc->b_die = VLC_TRUE;
-            vout_OSDMessage( p_intf, SOLO_CHAN, _( "Quit" ) );
+            ClearChannels( p_intf, p_vout );
+            vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Quit" ) );
             continue;
         }
         else if( i_action == ACTIONID_VOL_UP )
         {
             audio_volume_t i_newvol;
             aout_VolumeUp( p_intf, 1, &i_newvol );
-            DisplayVolume( p_vout, i_newvol );
+            DisplayVolume( p_intf, p_vout, i_newvol );
         }
         else if( i_action == ACTIONID_VOL_DOWN )
         {
             audio_volume_t i_newvol;
             aout_VolumeDown( p_intf, 1, &i_newvol );
-            DisplayVolume( p_vout, i_newvol );
+            DisplayVolume( p_intf, p_vout, i_newvol );
         }
         else if( i_action == ACTIONID_VOL_MUTE )
         {
@@ -256,11 +278,13 @@ static void Run( intf_thread_t *p_intf )
             {
                 if( i_newvol == 0 )
                 {
-                    vout_OSDIcon( VLC_OBJECT( p_intf ), OSD_MUTE_ICON );
+                    ClearChannels( p_intf, p_vout );
+                    vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                                  OSD_MUTE_ICON );
                 }
                 else
                 {
-                    DisplayVolume( p_vout, i_newvol );
+                    DisplayVolume( p_intf, p_vout, i_newvol );
                 }
             }
         }
@@ -273,7 +297,8 @@ static void Run( intf_thread_t *p_intf )
             {
                 i_delay--;
                 input_Control( p_input, INPUT_SET_SUBDELAY, i_delay );
-                vout_OSDMessage( p_intf, SOLO_CHAN, "Subtitle delay %i ms",
+                ClearChannels( p_intf, p_vout );
+                vout_OSDMessage( p_intf, DEFAULT_CHAN, "Subtitle delay %i ms",
                                  i_delay*100);
             }
         }
@@ -285,7 +310,8 @@ static void Run( intf_thread_t *p_intf )
             {
                 i_delay++;
                 input_Control( p_input, INPUT_SET_SUBDELAY, i_delay );
-                vout_OSDMessage( p_intf, SOLO_CHAN, "Subtitle delay %i ms", 
+                ClearChannels( p_intf, p_vout );
+                vout_OSDMessage( p_intf, DEFAULT_CHAN, "Subtitle delay %i ms",
                                  i_delay*100);
             }
         }
@@ -313,7 +339,9 @@ static void Run( intf_thread_t *p_intf )
             }
             if( p_input && val.i_int != PAUSE_S )
             {
-                vout_OSDIcon( VLC_OBJECT( p_intf ), OSD_PAUSE_ICON );
+                ClearChannels( p_intf, p_vout );
+                vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                              OSD_PAUSE_ICON );
                 val.i_int = PAUSE_S;
                 var_Set( p_input, "state", val );
             }
@@ -323,7 +351,9 @@ static void Run( intf_thread_t *p_intf )
                                               FIND_ANYWHERE );
                 if( p_playlist )
                 {
-                    vout_OSDIcon( VLC_OBJECT( p_intf ), OSD_PLAY_ICON );
+                    ClearChannels( p_intf, p_vout );
+                    vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                                  OSD_PLAY_ICON );
                     playlist_Play( p_playlist );
                     vlc_object_release( p_playlist );
                 }
@@ -335,7 +365,9 @@ static void Run( intf_thread_t *p_intf )
 
             if( i_action == ACTIONID_PAUSE )
             {
-                vout_OSDMessage( p_intf, SOLO_CHAN, _( "Pause" ) );
+                ClearChannels( p_intf, p_vout );
+                vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                              OSD_PAUSE_ICON );
                 val.i_int = PAUSE_S;
                 var_Set( p_input, "state", val );
             }
@@ -343,37 +375,37 @@ static void Run( intf_thread_t *p_intf )
             {
                 val.i_time = -10000000;
                 var_Set( p_input, "time-offset", val );
-                DisplayPosition( p_vout, p_input );
+                DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_10SEC && b_seekable )
             {
                 val.i_time = 10000000;
                 var_Set( p_input, "time-offset", val );
-                DisplayPosition( p_vout, p_input );
+                DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_1MIN && b_seekable )
             {
                 val.i_time = -60000000;
                 var_Set( p_input, "time-offset", val );
-                DisplayPosition( p_vout, p_input );
+                DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_1MIN && b_seekable )
             {
                 val.i_time = 60000000;
                 var_Set( p_input, "time-offset", val );
-                DisplayPosition( p_vout, p_input );
+                DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_5MIN && b_seekable )
             {
                 val.i_time = -300000000;
                 var_Set( p_input, "time-offset", val );
-                DisplayPosition( p_vout, p_input );
+                DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_5MIN && b_seekable )
             {
                 val.i_time = 300000000;
                 var_Set( p_input, "time-offset", val );
-                DisplayPosition( p_vout, p_input );
+                DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_NEXT )
             {
@@ -417,7 +449,7 @@ static void Run( intf_thread_t *p_intf )
             }
             else if( i_action == ACTIONID_POSITION && b_seekable )
             {
-                DisplayPosition( p_vout, p_input );
+                DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action >= ACTIONID_PLAY_BOOKMARK1 &&
                      i_action <= ACTIONID_PLAY_BOOKMARK10 )
@@ -544,7 +576,8 @@ static void SetBookmark( intf_thread_t *p_intf, int i_num )
     }
 }
 
-static void DisplayPosition( vout_thread_t *p_vout, input_thread_t *p_input )
+static void DisplayPosition( intf_thread_t *p_intf, vout_thread_t *p_vout,
+                             input_thread_t *p_input )
 {
     char psz_duration[MSTRTIME_MAX_SIZE];
     char psz_time[MSTRTIME_MAX_SIZE];
@@ -555,6 +588,7 @@ static void DisplayPosition( vout_thread_t *p_vout, input_thread_t *p_input )
     {
         return;
     }
+    ClearChannels( p_intf, p_vout );
 
     var_Get( p_input, "time", &time );
     i_seconds = time.i_time / 1000000;
@@ -564,37 +598,50 @@ static void DisplayPosition( vout_thread_t *p_vout, input_thread_t *p_input )
     if( time.i_time > 0 )
     {
         secstotimestr( psz_duration, time.i_time / 1000000 );
-        vout_OSDMessage( p_input, POSITION_CHAN, "%s / %s",
+        vout_OSDMessage( p_input, POSITION_TEXT_CHAN, "%s / %s",
                          psz_time, psz_duration );
     }
     else if( i_seconds > 0 )
     {
-        vout_OSDMessage( p_input, POSITION_CHAN, psz_time );
+        vout_OSDMessage( p_input, POSITION_TEXT_CHAN, psz_time );
     }
 
     if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
     {
         var_Get( p_input, "position", &pos );
-        vout_OSDSlider( VLC_OBJECT( p_input ), POSITION_CHAN,
+        vout_OSDSlider( VLC_OBJECT( p_input ), POSITION_WIDGET_CHAN,
                         pos.f_float * 100, OSD_HOR_SLIDER );
     }
 }
 
-static void DisplayVolume( vout_thread_t *p_vout, audio_volume_t i_vol )
+static void DisplayVolume( intf_thread_t *p_intf, vout_thread_t *p_vout,
+                           audio_volume_t i_vol )
 {
     if( p_vout == NULL )
     {
         return;
     }
+    ClearChannels( p_intf, p_vout );
 
     if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
     {
-        vout_OSDSlider( VLC_OBJECT( p_vout ), VOLUME_CHAN,
+        vout_OSDSlider( VLC_OBJECT( p_vout ), VOLUME_WIDGET_CHAN,
             i_vol*100/AOUT_VOLUME_MAX, OSD_VERT_SLIDER );
     }
     else
     {
-        vout_OSDMessage( p_vout, VOLUME_CHAN, "Vol %d%%",
+        vout_OSDMessage( p_vout, VOLUME_TEXT_CHAN, "Vol %d%%",
                          2*i_vol*100/AOUT_VOLUME_MAX );
+    }
+}
+
+static void ClearChannels( intf_thread_t *p_intf, vout_thread_t *p_vout )
+{
+    int i;
+
+    vout_ClearOSDChannel( p_vout, DEFAULT_CHAN );
+    for( i = 0; i < CHANNELS_NUMBER; i++ )
+    {
+        vout_ClearOSDChannel( p_vout, p_intf->p_sys->p_channels[ i ] );
     }
 }

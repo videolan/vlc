@@ -43,6 +43,9 @@
 struct decoder_sys_t
 {
     int                 i_align;          /* Subtitles alignment on the vout */
+    int                 i_subpic_channel;    /* Subpic channel for subtitles */
+
+    vout_thread_t       *p_vout;                           /* last vout used */
 
 #if defined(HAVE_ICONV)
     iconv_t             iconv_handle;            /* handle to iconv instance */
@@ -182,6 +185,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     msg_Dbg( p_dec, "no iconv support available" );
 #endif
+    
+    p_dec->p_sys->p_vout = NULL;
 
     return VLC_SUCCESS;
 }
@@ -204,6 +209,10 @@ static void DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     if( p_vout )
     {
+        if( p_dec->p_sys->p_vout != p_vout )
+        {
+            p_dec->p_sys->i_subpic_channel = vout_RegisterOSDChannel( p_vout );
+        }                
         ParseText( p_dec, *pp_block, p_vout );
         vlc_object_release( p_vout );
     }
@@ -211,6 +220,7 @@ static void DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         msg_Warn( p_dec, "couldn't find a video output, trashing subtitle" );
     }
+    p_dec->p_sys->p_vout = p_vout;
 
     block_Release( *pp_block );
     *pp_block = NULL;
@@ -271,7 +281,7 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
         msg_Warn( p_dec, "subtitle without a date" );
         return;
     }
-    
+
     /* Check validity of packet data */
     if( p_block->i_buffer <= 1 ||  p_block->p_buffer[0] == '\0' )
     {
@@ -281,7 +291,7 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
 
     /* Should be resiliant against bad subtitles */
     psz_subtitle = strndup( p_block->p_buffer, p_block->i_buffer );
-    
+
     i_align_h = p_sys->i_align ? 20 : 0;
     i_align_v = 10;
 
@@ -371,7 +381,7 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
         }
     }
     StripTags( psz_subtitle );
-    vout_ShowTextAbsolute( p_vout, SUBT1_CHAN, psz_subtitle, NULL,
+    vout_ShowTextAbsolute( p_vout, p_sys->i_subpic_channel, psz_subtitle, NULL,
         OSD_ALIGN_BOTTOM | p_sys->i_align, i_align_h,
         i_align_v, p_block->i_pts,
         p_block->i_length ? p_block->i_pts + p_block->i_length : 0 );
@@ -421,4 +431,3 @@ static void StripTags( char *psz_text )
     }
     psz_text[ i - i_left_moves ] = '\0';
 }
-                            

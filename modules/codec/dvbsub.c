@@ -175,6 +175,7 @@ typedef struct
     dvbsub_page_t*          p_page;
     dvbsub_object_t*        p_objects;
     subpicture_t*           p_spu[16];
+    int                     i_subpic_channel;
 
 } dvbsub_all_t;
 
@@ -295,6 +296,7 @@ static void Decode( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t       *p_block;
+    vout_thread_t *p_last_vout;
 
     if( pp_block == NULL || *pp_block == NULL )
     {
@@ -311,6 +313,7 @@ static void Decode( decoder_t *p_dec, block_t **pp_block )
         return;
     }
 
+    p_last_vout = p_sys->p_vout;
     if( ( p_sys->p_vout = FindVout( p_dec ) ) )
     {
         int i_data_identifier;
@@ -331,6 +334,12 @@ static void Decode( decoder_t *p_dec, block_t **pp_block )
             decode_segment( p_dec, &p_sys->dvbsub, &p_sys->bs );
         }
         i_end_data_marker = bs_read( &p_sys->bs, 8 );
+
+        if( p_last_vout != p_sys->p_vout )
+        {
+            p_sys->dvbsub.i_subpic_channel =
+                vout_RegisterOSDChannel( p_sys->p_vout );
+        }
 
         /* Check if the page is to be displayed */
         if( p_sys->dvbsub.p_page && p_sys->dvbsub.p_objects )
@@ -1258,7 +1267,7 @@ static void render( dvbsub_all_t *dvbsub, vout_thread_t *p_vout )
 
             /* Allocate the subpicture internal data. */
             dvbsub->p_spu[j] =
-                vout_CreateSubPicture( p_vout, SUBT1_CHAN, TEXT_CONTENT,
+                vout_CreateSubPicture( p_vout, dvbsub->i_subpic_channel,
                                        MEMORY_SUBPICTURE );
             if( dvbsub->p_spu[j] == NULL )
             {
