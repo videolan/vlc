@@ -1489,19 +1489,25 @@ CATCH_MOUSE_EVENTS
         f_x = 1.0;
         f_y = 1.0;
     }
-    /* Quad size is set in order to preserve the aspect ratio */
-    else if( bounds.size.height * p_vout->output.i_aspect <
-        bounds.size.width * VOUT_ASPECT_FACTOR )
-    {
-        f_x = bounds.size.height * p_vout->output.i_aspect /
-            VOUT_ASPECT_FACTOR / bounds.size.width;
-        f_y = 1.0;
-    }
     else
     {
-        f_x = 1.0;
-        f_y = bounds.size.width * VOUT_ASPECT_FACTOR /
-            p_vout->output.i_aspect / bounds.size.height;
+        /* Quad size is set in order to preserve the aspect ratio */
+        int fill = ( config_GetInt( p_vout, "macosx-fill" ) &&
+                     p_vout->b_fullscreen );
+        int large = ( bounds.size.height * p_vout->output.i_aspect <
+                      bounds.size.width * VOUT_ASPECT_FACTOR );
+        if( ( large && !fill ) || ( !large && fill ) )
+        {
+            f_x = bounds.size.height * p_vout->output.i_aspect /
+                VOUT_ASPECT_FACTOR / bounds.size.width;
+            f_y = 1.0;
+        }
+        else
+        {
+            f_x = 1.0;
+            f_y = bounds.size.width * VOUT_ASPECT_FACTOR /
+                p_vout->output.i_aspect / bounds.size.height;
+        }
     }
 }
 
