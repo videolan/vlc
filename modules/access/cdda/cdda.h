@@ -3,7 +3,7 @@
  *          using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cdda.h,v 1.2 2003/11/30 18:14:20 rocky Exp $
+ * $Id: cdda.h,v 1.3 2003/11/30 22:26:49 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
@@ -62,28 +62,16 @@ typedef struct cdda_data_s
     lsn_t *     p_sectors;                                  /* Track sectors */
     vlc_bool_t  b_end_of_track;           /* If the end of track was reached */
     int         i_debug;                  /* Debugging mask */
+    char *      mcn;                      /* Media Catalog Number            */
     intf_thread_t *p_intf;
 
 #ifdef HAVE_LIBCDDB
+    int         i_cddb_enabled;
   struct  {
     bool             have_info;      /* True if we have any info */
     cddb_disc_t     *disc;           /* libcdio uses this to get disc info */
-    char            *cdiscid;
-    char            *disc_title;
-    char             disc_year[5];   /* Year. Probably 19XX or 20XX */
-    char            *disc_artist;
-    char            *disc_genre;
-    cddb_cat_t       disc_category;  /* CDDB category */
-    int              disc_seconds;   /* Length in seconds listed in CDDB
-				        catalog. May or may not match
-					length below.
-				     */
-
     int              disc_length;    /* Length in frames of cd. Used in 
 					CDDB lookups */
-    unsigned int     disc_id;        /* This along with the length and 
-					num_tracks below is what CDDB uses
-					to look up CD info */
   } cddb;
 #endif
 

@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: cdda.c,v 1.3 2003/11/30 18:14:20 rocky Exp $
+ * $Id: cdda.c,v 1.4 2003/11/30 22:26:48 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -73,6 +73,27 @@ int  E_(DebugCallback)       ( vlc_object_t *p_this, const char *psz_name,
     "Allows you to modify the default caching value for cdda streams. This " \
     "value should be set in millisecond units." )
 
+#define TITLE_FMT_LONGTEXT N_( \
+"Format used in the GUI Playlist Title. Similar to the Unix date \n" \
+"Format specifiers that start with a percent sign. Specifiers are: \n" \
+"   %a : The artist\n" \
+"   %A : The album information \n" \
+"   %C : Category\n" \
+"   %I : CDDB disk ID\n" \
+"   %G : Genre\n" \
+"   %M : The current MRL\n" \
+"   %m : The CD-DA Media Catalog Number (MCN)\n" \
+"   %T : The track number\n" \
+"   %t : The name\n" \
+"   %Y : The year 19xx or 20xx\n" \
+"   %% : a %\n")
+
+#ifdef HAVE_LIBCDDB
+#define DEFAULT_TITLE_FORMAT "%T %t",
+#else 
+#define DEFAULT_TILTE_FORMAT "%T %M",
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -100,6 +121,10 @@ vlc_module_begin();
     add_string( MODULE_STRING "-device", "", NULL, 
 		N_("CD-ROM device name"),
                 DEV_LONGTEXT, VLC_FALSE );
+
+    add_string( MODULE_STRING "-title-format", DEFAULT_TITLE_FORMAT, NULL, 
+		N_("Format to use in playlist 'title' field"),
+                TITLE_FMT_LONGTEXT, VLC_TRUE );
 
 #ifdef HAVE_LIBCDDB
     add_bool( MODULE_STRING "-cddb-enabled", 1, NULL,

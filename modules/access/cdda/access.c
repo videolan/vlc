@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.4 2003/11/30 18:14:20 rocky Exp $
+ * $Id: access.c,v 1.5 2003/11/30 22:26:48 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -66,7 +66,7 @@ static int  CDDASetProgram   ( input_thread_t *, pgrm_descriptor_t * );
 
 static int  CDDAFixupPlayList(const input_thread_t *p_input, 
 			      cdda_data_t *p_cdda, const char *psz_source, 
-			      bool play_single_track, unsigned int i_track);
+			      bool play_single_track);
 
 /****************************************************************************
  * Private functions
@@ -312,9 +312,9 @@ E_(Open)( vlc_object_t *p_this )
     }
 #undef area
 
-    CDDAFixupPlayList(p_input, p_cdda, psz_source, play_single_track, i_track);
-
     CDDAPlay( p_input, i_track);
+
+    CDDAFixupPlayList(p_input, p_cdda, psz_source, play_single_track);
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -518,6 +518,12 @@ static void CDDASeek( input_thread_t * p_input, off_t i_off )
 }
 
 #ifdef HAVE_LIBCDDB
+
+#define free_and_dup(var, val) \
+  if (var) free(var);	       \
+  if (val) var=strdup(val);	       
+  
+
 static void
 GetCDDBInfo( const input_thread_t *p_input, cdda_data_t *p_cdda )
 {
@@ -600,10 +606,6 @@ GetCDDBInfo( const input_thread_t *p_input, cdda_data_t *p_cdda )
       if (p_cdda->i_debug & INPUT_DBG_CDDB) 
 	cddb_disc_print(p_cdda->cddb.disc);
 
-#if FIXED
-      if ((_cdda_is_cd_changed(this) == 1)) 
-#endif
-	/**** _cdda_cddb_set_info(this, this->cddb.disc); ***/
     } else {
       msg_Warn( p_input, "CDDB error: %s", cddb_error_str(errno));
     }
@@ -615,47 +617,178 @@ GetCDDBInfo( const input_thread_t *p_input, cdda_data_t *p_cdda )
 }
 #endif /*HAVE_LIBCDDB*/
 
+#define add_format_str_info(val)			\
+  {							\
+    const char *str = val;				\
+    unsigned int len;					\
+    if (val != NULL) {					\
+      len=strlen(str);					\
+      if (len != 0) {					\
+	strncat(tp, str, TEMP_STR_LEN-(tp-temp_str));	\
+	tp += len;					\
+      }							\
+      saw_control_prefix = false;			\
+    }							\
+  }
+
+#define add_format_num_info(val, fmt)			\
+  {							\
+    char num_str[10];					\
+    unsigned int len;                                   \
+    sprintf(num_str, fmt, val);				\
+    len=strlen(num_str);                                \
+    if (len != 0) {					\
+      strncat(tp, num_str, TEMP_STR_LEN-(tp-temp_str));	\
+      tp += len;					\
+    }							\
+    saw_control_prefix = false;				\
+  }
+
+/*!
+   Take a format string and expand escape sequences, that is sequences that
+   begin with %, with information from the current CD. 
+   The expanded string is returned. Here is a list of escape sequences:
+
+   %a : The artist
+   %A : The album information 
+   %C : Category
+   %I : CDDB disk ID
+   %G : Genre
+   %M : The current MRL
+   %m : The CD-DA Media Catalog Number (MCN)
+   %T : The track number
+   %t : The name
+   %Y : The year 19xx or 20xx
+   %% : a %
+*/
+static char *
+CDDAFormatStr(const input_thread_t *p_input, cdda_data_t *p_cdda,
+	      const char format_str[], const char *mrl, int i_track)
+{
+#define TEMP_STR_SIZE 256
+#define TEMP_STR_LEN (TEMP_STR_SIZE-1)
+  static char    temp_str[TEMP_STR_SIZE];
+  size_t i;
+  char * tp = temp_str;
+  bool saw_control_prefix = false;
+  size_t format_len = strlen(format_str);
+
+  bzero(temp_str, TEMP_STR_SIZE);
+
+  for (i=0; i<format_len; i++) {
+
+    if (!saw_control_prefix && format_str[i] != '%') {
+      *tp++ = format_str[i];
+      saw_control_prefix = false;
+      continue;
+    }
+
+    switch(format_str[i]) {
+    case '%':
+      if (saw_control_prefix) {
+	*tp++ = '%';
+      }
+      saw_control_prefix = !saw_control_prefix;
+      break;
+#ifdef HAVE_LIBCDDB      
+    case 'a':
+      if (!p_cdda->i_cddb_enabled) goto not_special;
+      add_format_str_info(p_cdda->cddb.disc->artist);
+      break;
+    case 'A':
+      if (!p_cdda->i_cddb_enabled) goto not_special;
+      add_format_str_info(p_cdda->cddb.disc->title);
+      break;
+    case 'C':
+      if (!p_cdda->i_cddb_enabled) goto not_special;
+      add_format_str_info(CDDB_CATEGORY[p_cdda->cddb.disc->category]);
+      break;
+    case 'G':
+      if (!p_cdda->i_cddb_enabled) goto not_special;
+      add_format_str_info(p_cdda->cddb.disc->genre);
+      break;
+    case 'I':
+      if (!p_cdda->i_cddb_enabled) goto not_special;
+      add_format_num_info(p_cdda->cddb.disc->discid, "%x");
+      break;
+    case 'Y':
+      if (!p_cdda->i_cddb_enabled) goto not_special;
+      add_format_num_info(p_cdda->cddb.disc->year, "%5d");
+      break;
+    case 't':
+      if (p_cdda->i_cddb_enabled) {
+	cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc, 
+					    i_track-1);
+	if (t != NULL && t->title != NULL) 
+	  add_format_str_info(t->title);
+      } else goto not_special;
+      break;
+
+#endif
+
+    case 'M':
+      add_format_str_info(mrl);
+      break;
+#if FINISHED
+    case 'm':
+      add_format_str_info(p_cdda->mcn);
+      break;
+#endif
+    case 'T':
+      add_format_num_info(i_track, "%d");
+      break;
+#ifdef HAVE_LIBCDDB      
+    not_special:
+#endif
+    default:
+      *tp++ = '%'; 
+      *tp++ = format_str[i];
+      saw_control_prefix = false;
+    }
+  }
+  return strdup(temp_str);
+}
+
 static void
 CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda, 
 		       playlist_t *p_playlist, unsigned int i_track, 
 		       char *psz_mrl, int psz_mrl_max, 
-		       const char *psz_source, int i_cddb_enabled, 
-		       int playlist_operation, unsigned int i_pos)
+		       const char *psz_source, int playlist_operation, 
+		       unsigned int i_pos)
 {
   mtime_t i_duration = 
     (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1]) 
     * 1000 / CDIO_CD_FRAMES_PER_SEC;
-  char *p_title = psz_mrl;
+  char *p_title;
   
   snprintf(psz_mrl, psz_mrl_max, "%s%s@T%u", 
 	   CDDA_MRL_PREFIX, psz_source, i_track);
-  if (i_cddb_enabled) {
-    cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc, i_track-1);
-    if (t != NULL && t->title != NULL) 
-      p_title = t->title;
-  }
+
+  p_title = CDDAFormatStr(p_input, p_cdda, 
+			  config_GetPsz( p_input, 
+					 MODULE_STRING "-title-format" ),
+			  psz_mrl, i_track);
+
   playlist_AddExt( p_playlist, psz_mrl, p_title, i_duration, 
 		   0, 0, playlist_operation, i_pos );
 }
 
 static int
 CDDAFixupPlayList(const input_thread_t *p_input, cdda_data_t *p_cdda, 
-		  const char *psz_source, bool play_single_track, 
-		  unsigned int i_track)
+		  const char *psz_source, bool play_single_track) 
 {
   int i;
   playlist_t * p_playlist;
   char       * psz_mrl;
   unsigned int psz_mrl_max = strlen(CDDA_MRL_PREFIX) + strlen(psz_source) + 
     strlen("@T") + strlen("100") + 1;
-  int i_cddb_enabled = 
+
 #ifdef HAVE_LIBCDDB
+  p_cdda->i_cddb_enabled = 
     config_GetInt( p_input, MODULE_STRING "-cddb-enabled" );
-#else
-     0
 #endif
   
-  if (play_single_track && !i_cddb_enabled) return 0;
+  if (play_single_track && !p_cdda->i_cddb_enabled) return 0;
 
   psz_mrl = malloc( psz_mrl_max );
 
@@ -675,7 +808,7 @@ CDDAFixupPlayList(const input_thread_t *p_input, cdda_data_t *p_cdda,
     }
 
 #ifdef HAVE_LIBCDDB
-  if (i_cddb_enabled)
+  if (p_cdda->i_cddb_enabled)
     GetCDDBInfo(p_input, p_cdda);
 #endif
   
@@ -683,10 +816,9 @@ CDDAFixupPlayList(const input_thread_t *p_input, cdda_data_t *p_cdda,
     /* May fill out more information when the playlist user interface becomes
        more mature.
      */
-    CDDACreatePlayListItem(p_input, p_cdda, p_playlist, i_track, 
-		       psz_mrl, psz_mrl_max, 
-		       psz_source, i_cddb_enabled,
-		       PLAYLIST_REPLACE, p_playlist->i_index);
+    CDDACreatePlayListItem(p_input, p_cdda, p_playlist, p_cdda->i_track+1, 
+			   psz_mrl, psz_mrl_max, psz_source, PLAYLIST_REPLACE, 
+			   p_playlist->i_index);
   } else {
   
     playlist_Delete( p_playlist, p_playlist->i_index);
@@ -694,8 +826,8 @@ CDDAFixupPlayList(const input_thread_t *p_input, cdda_data_t *p_cdda,
     for( i = 1 ; i <= p_cdda->i_nb_tracks ; i++ )
       {
 	CDDACreatePlayListItem(p_input, p_cdda, p_playlist, i, psz_mrl, 
-			       psz_mrl_max, psz_source, i_cddb_enabled,
-			       PLAYLIST_APPEND, PLAYLIST_END);
+			       psz_mrl_max, psz_source, PLAYLIST_APPEND, 
+			       PLAYLIST_END);
 
       }
 
