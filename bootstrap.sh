@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap.sh file for vlc, the VideoLAN Client
-##  $Id: bootstrap.sh,v 1.2 2002/06/01 17:09:25 sam Exp $
+##  $Id: bootstrap.sh,v 1.3 2002/06/01 17:11:41 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -21,8 +21,7 @@ echo "autoheader."
 file=src/misc/modules_plugin.h
 echo -n "creating headers: "
 rm -f $file
-sed 's#.*\$Id: bootstrap.sh,v 1.2 2002/06/01 17:09:25 sam Exp $file'.in by bootstrap.sh#' \
-	< $file.in > $file
+sed 's#.*\$[I][d]:.*# * Automatically generated from '$file'.in by bootstrap.sh#' < $file.in > $file
 echo '#define STORE_SYMBOLS( p_symbols ) \' >> $file
 cat include/*.h | grep '^ *VLC_EXPORT.*;' | \
        sed 's/VLC_EXPORT( *\([^,]*\), *\([^,]*\), *\(.*\));.*/    (p_symbols)->\2_inner = \2; \\/' >> $file
