@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.22 2001/11/19 15:13:11 stef Exp $
+ * $Id: libdvdcss.c,v 1.23 2001/11/26 15:56:36 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -73,6 +73,8 @@ static int _win32_dvdcss_aopen  ( char c_drive, dvdcss_handle dvdcss );
 static int _win32_dvdcss_aclose ( int i_fd );
 static int _win32_dvdcss_aseek  ( int i_fd, int i_blocks, int i_method );
 static int _win32_dvdcss_aread  ( int i_fd, void *p_data, int i_blocks );
+#else
+static int _dvdcss_raw_open     ( dvdcss_handle, char *psz_target );
 #endif
 
 /*****************************************************************************
@@ -84,6 +86,9 @@ extern dvdcss_handle dvdcss_open ( char *psz_target )
 
     char *psz_method = getenv( "DVDCSS_METHOD" );
     char *psz_verbose = getenv( "DVDCSS_VERBOSE" );
+#ifndef WIN32
+    char *psz_raw_device = getenv( "DVDCSS_RAW_DEVICE" );
+#endif
 
     dvdcss_handle dvdcss;
 
@@ -181,6 +186,13 @@ extern dvdcss_handle dvdcss_open ( char *psz_target )
             return NULL;
         }
     }
+
+#ifndef WIN32
+    if( psz_raw_device != NULL )
+    {
+        _dvdcss_raw_open( dvdcss, psz_raw_device );
+    }
+#endif
 
     return dvdcss;
 }
@@ -457,7 +469,7 @@ static int _dvdcss_open ( dvdcss_handle dvdcss, char *psz_target )
     dvdcss->i_readv_buf_size = 0;
 
 #else
-    dvdcss->i_fd = open( psz_target, 0 );
+    dvdcss->i_fd = dvdcss->i_read_fd = open( psz_target, 0 );
 
     if( dvdcss->i_fd == -1 )
     {
@@ -469,6 +481,22 @@ static int _dvdcss_open ( dvdcss_handle dvdcss, char *psz_target )
 
     return 0;
 }
+
+#ifndef WIN32
+static int _dvdcss_raw_open ( dvdcss_handle dvdcss, char *psz_target )
+{
+    dvdcss->i_raw_fd = open( psz_target, 0 );
+
+    if( dvdcss->i_raw_fd == -1 )
+    {
+        _dvdcss_error( dvdcss, "failed opening raw device, continuing" );
+    }
+    else
+    {
+        dvdcss->i_read_fd = dvdcss->i_raw_fd;
+    }
+}
+#endif
 
 static int _dvdcss_close ( dvdcss_handle dvdcss )
 {
@@ -492,6 +520,12 @@ static int _dvdcss_close ( dvdcss_handle dvdcss )
 
 #else
     close( dvdcss->i_fd );
+
+    if( dvdcss->i_raw_fd >= 0 )
+    {
+        close( dvdcss->i_raw_fd );
+        dvdcss->i_raw_fd = -1;
+    }
 
 #endif
 
@@ -530,11 +564,11 @@ int _dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks )
         return ( _win32_dvdcss_aseek( dvdcss->i_fd, i_blocks, SEEK_SET ) );
     }
 #else
-    off_t i_read;
+    off_t   i_read;
 
     dvdcss->i_seekpos = i_blocks;
 
-    i_read = lseek( dvdcss->i_fd,
+    i_read = lseek( dvdcss->i_read_fd,
                     (off_t)i_blocks * (off_t)DVDCSS_BLOCK_SIZE, SEEK_SET );
 
     return i_read / DVDCSS_BLOCK_SIZE;
@@ -565,7 +599,7 @@ int _dvdcss_read ( dvdcss_handle dvdcss, void *p_buffer, int i_blocks )
 #else
     int i_bytes;
 
-    i_bytes = read( dvdcss->i_fd, p_buffer,
+    i_bytes = read( dvdcss->i_read_fd, p_buffer,
                     (size_t)i_blocks * DVDCSS_BLOCK_SIZE );
     return i_bytes / DVDCSS_BLOCK_SIZE;
 #endif
@@ -601,7 +635,7 @@ static int _dvdcss_readv ( dvdcss_handle dvdcss, struct iovec *p_iovec,
     return i_read;
 
 #else
-    i_read = readv( dvdcss->i_fd, p_iovec, i_blocks );
+    i_read = readv( dvdcss->i_read_fd, p_iovec, i_blocks );
     return i_read / DVDCSS_BLOCK_SIZE;
 
 #endif
