@@ -48,7 +48,6 @@ MODULE_CONFIG_END
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
-void _M( aout_getfunctions )( function_list_t * p_function_list );
 void _M( vout_getfunctions )( function_list_t * p_function_list );
 void _M( intf_getfunctions )( function_list_t * p_function_list );
 
@@ -89,7 +88,6 @@ MODULE_ACTIVATE
         return( -1 );
     }
 
-    _M( aout_getfunctions )( &p_module->p_functions->aout );
     _M( vout_getfunctions )( &p_module->p_functions->vout );
     _M( intf_getfunctions )( &p_module->p_functions->intf );
 
