@@ -205,6 +205,23 @@ void CtrlText::displayText( const UString &rText )
 
     // Update the current image used, as if the control size had changed
     onChangePosition();
+    m_xPos = 0;
+
+    // If the control was in the moving state, check if the scrolling is
+    // still necessary
+    const string &rState = m_fsm.getState();
+    if( rState == "moving" || rState == "outMoving" )
+    {
+        if( m_pImg && m_pImg->getWidth() >= getPosition()->getWidth() )
+        {
+            m_pCurrImg = m_pImgDouble;
+            m_pTimer->start( MOVING_TEXT_DELAY, false );
+        }
+        else
+        {
+            m_pTimer->stop();
+        }
+    }
 
     notifyLayout();
 }
@@ -314,10 +331,10 @@ void CtrlText::adjust( int &position )
     {
         return;
     }
-    position %= m_pImgDouble->getWidth()  - m_pImg->getWidth();
+    position %= m_pImgDouble->getWidth() - m_pImg->getWidth();
     if( position > 0 )
     {
-        position -= m_pImgDouble->getWidth()  - m_pImg->getWidth();
+        position -= m_pImgDouble->getWidth() - m_pImg->getWidth();
     }
 }
 
