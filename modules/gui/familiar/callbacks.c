@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.17 2002/12/17 21:04:49 jpsaman Exp $
+ * $Id: callbacks.c,v 1.18 2002/12/20 21:33:40 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -119,9 +119,9 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
 {
     intf_thread_t *p_intf = GtkGetIntf( GTK_WIDGET(clist) );
     struct dirent **namelist;
-    int n,status;
+    int n=-1, status=-1;
 
-    msg_Dbg(p_intf, "changing to dir %s\n", psz_dir);
+    msg_Dbg(p_intf, "changing to dir %s", psz_dir);
     if (psz_dir)
     {
        status = chdir(psz_dir);
@@ -134,18 +134,23 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
         perror("scandir");
     else
     {
-        gchar *ppsz_text[2];
         int i;
 
+//        msg_Dbg( p_intf, "updating interface" );
         gtk_clist_freeze( clist );
         gtk_clist_clear( clist );
         for (i=0; i<n; i++)
         {
+            gchar *ppsz_text[5];
+
             /* This is a list of strings. */
             ppsz_text[0] = namelist[i]->d_name;
             ppsz_text[1] = get_file_perm(namelist[i]->d_name);
+			ppsz_text[2] = "";
+			ppsz_text[3] = "";
+			ppsz_text[4] = "";
 //            msg_Dbg(p_intf, "(%d) file: %s permission: %s", i, ppsz_text[0], ppsz_text[1] );
-            gtk_clist_insert( clist, i, ppsz_text );
+  			gtk_clist_insert( GTK_CLIST(clist), i, ppsz_text );
             free(namelist[i]);
         }
         gtk_clist_thaw( clist );
@@ -467,6 +472,8 @@ on_clistmedia_select_row               (GtkCList        *clist,
     gint ret;
     struct stat st;
 
+    if (!p_intf->p_sys->p_clist)
+		msg_Err(p_intf, "p_clist pointer is invalid.");
     ret = gtk_clist_get_text (p_intf->p_sys->p_clist, row, 0, text);
     if (ret)
     {

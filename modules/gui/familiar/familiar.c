@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.17 2002/12/17 21:04:49 jpsaman Exp $
+ * $Id: familiar.c,v 1.18 2002/12/20 21:33:40 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -60,6 +60,10 @@ static int Manage        ( intf_thread_t *p_intf );
 #define AUTOPLAYFILE_LONGTEXT N_("automatically play a file when selected in the "\
         "file selection list")
 
+#ifndef NEED_GTK_MAIN
+#define NEED_GTK_MAIN
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -87,6 +91,7 @@ static int Open( vlc_object_t *p_this )
     }
 
 #ifdef NEED_GTK_MAIN
+    msg_Dbg( p_intf, "Using gtk_main" );
     p_intf->p_sys->p_gtk_main = module_Need( p_this, "gtk_main", "gtk" );
     if( p_intf->p_sys->p_gtk_main == NULL )
     {
@@ -117,6 +122,7 @@ static void Close( vlc_object_t *p_this )
     }
 
 #ifdef NEED_GTK_MAIN
+    msg_Dbg( p_intf, "Releasin gtk_main" );
     module_Unneed( p_intf, p_intf->p_sys->p_gtk_main );
 #endif
 
@@ -143,14 +149,17 @@ static void Run( intf_thread_t *p_intf )
 
 #ifdef HAVE_GPE_INIT_H
     /* Initialize GPE interface */
+    msg_Dbg( p_intf, "Starting familiar GPE interface" );
     if (gpe_application_init(&i_args, &pp_args) == FALSE)
         exit (1);
 #else
     gtk_set_locale ();
  #ifndef NEED_GTK_MAIN
+    msg_Dbg( p_intf, "Starting familiar GTK+ interface" );
     gtk_init( &i_args, &pp_args );
  #else
     /* Initialize Gtk+ */
+    msg_Dbg( p_intf, "Starting familiar GTK+ interface thread" );
     gdk_threads_enter();
  #endif
 #endif
@@ -207,6 +216,7 @@ static void Run( intf_thread_t *p_intf )
      * keyboard events, a 100ms delay is a good compromise */
     i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, (GtkFunction)Manage,
                                p_intf );
+
     /* Enter Gtk mode */
     gtk_main();
     /* Remove the timeout */
