@@ -35,7 +35,9 @@
 #include <vlc/vout.h>
 #include "aout_internal.h"
 
+#ifndef WIN32
 #include "goom_core.h"
+#endif
 
 /*****************************************************************************
  * Module descriptor
