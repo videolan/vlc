@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.19 2003/11/27 04:11:40 fenrir Exp $
+ * $Id: ninput.h,v 1.20 2003/11/30 14:49:23 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -50,6 +50,10 @@ enum es_out_query_e
     /* force selection/unselection of the ES (bypass current mode)*/
     ES_OUT_SET_ES_STATE,/* arg1= es_out_id_t* arg2=vlc_bool_t   */
     ES_OUT_GET_ES_STATE,/* arg1= es_out_id_t* arg2=vlc_bool_t*  */
+
+    /* XXX XXX XXX Don't use them YET !!! */
+    ES_OUT_SET_PCR,     /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
+    ES_OUT_RESET_PCR,   /* no arg */
 };
 
 struct es_out_t
