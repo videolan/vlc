@@ -55,6 +55,7 @@
 #endif
 
 vlc_module_begin();
+    set_shortname( _("Dummy"));
     set_description( _("Dummy interface function") );
     set_capability( "interface", 0 );
     set_category( CAT_INTERFACE );

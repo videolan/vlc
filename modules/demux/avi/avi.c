@@ -48,6 +48,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
+    set_shortname( "AVI" );
     set_description( _("AVI demuxer") );
     set_capability( "demux2", 212 );
     set_category( CAT_INPUT );

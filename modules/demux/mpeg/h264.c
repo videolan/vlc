@@ -36,12 +36,17 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#define FPS_TEXT N_("Frames per Second")
+#define FPS_LONGTEXT N_("Allows you to set the desired frame rate.")
+
+
 vlc_module_begin();
+    set_shortname( "H264");
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_description( _("H264 video demuxer" ) );
     set_capability( "demux2", 0 );
-    add_float( "h264-fps", 25.0, NULL, "fps", "fps", VLC_TRUE );
+    add_float( "h264-fps", 25.0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, Close );
     add_shortcut( "h264" );
 vlc_module_end();
