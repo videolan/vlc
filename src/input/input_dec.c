@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.72 2003/11/21 15:32:08 fenrir Exp $
+ * $Id: input_dec.c,v 1.73 2003/11/22 20:26:39 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -154,6 +154,7 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
     decoder_t *p_dec = p_es->p_decoder_fifo->p_dec;
 
     p_es->p_decoder_fifo->b_die = 1;
+    p_es->p_decoder_fifo->p_dec->b_die = 1;
 
     /* Make sure the thread leaves the NextDataPacket() function by
      * sending it a few null packets. */
