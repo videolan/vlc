@@ -2,7 +2,7 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.3 2002/01/11 03:07:36 sam Exp $
+ * $Id: intf_eject.c,v 1.4 2002/01/12 02:02:44 jlj Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
@@ -76,10 +76,51 @@ static int EjectSCSI ( int i_fd );
  *****************************************************************************/
 int intf_Eject( const char *psz_device )
 {
+    int i_fd;
     int i_ret;
 
+#ifdef SYS_DARWIN
+    FILE *p_eject;
+    char *psz_disk;
+    char sz_cmd[32];
+
+    /*
+     * The only way to cleanly unmount the disc under MacOS X
+     * is to use the 'disktool' command line utility. It uses
+     * the non-public Disk Arbitration API, which can not be
+     * used by Cocoa or Carbon applications. 
+     */
+
+    if( ( psz_disk = (char *)strstr( psz_device, "disk" ) ) != NULL &&
+        strlen( psz_disk ) > 4 )
+    {
+#define EJECT_CMD "disktool -e %s 0"
+        snprintf( sz_cmd, sizeof(sz_cmd), EJECT_CMD, psz_disk );
+#undef EJECT_CMD
+
+        if( ( p_eject = popen( sz_cmd, "r" ) ) != NULL )
+        {
+            char psz_result[0x200];
+            i_ret = fread( psz_result, 1, sizeof(psz_result), p_eject );
+            pclose( p_eject );
+
+            if( i_ret == 0 && ferror( p_eject ) != 0 )
+            {
+                return 1;
+            }
+
+            if( strstr( psz_result, "Disk Ejected" ) != NULL )
+            {
+                return 0;
+            }
+        }
+    }
+
+    return 1;
+
+#endif
+
     /* This code could be extended to support CD/DVD-ROM chargers */
-    int i_fd = 0;
 
     i_fd = open( psz_device, O_RDONLY | O_NONBLOCK );
    
