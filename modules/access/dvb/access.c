@@ -108,7 +108,7 @@ static void    CloseProgram( input_thread_t * p_input );
 #define BUDGET_LONGTEXT N_("This allows you to stream an entire transponder with a budget card. Budget mode is compatible with the ts2 demux.")
 
 #define SATNO_TEXT N_("Satellite number in the Diseqc system")
-#define SATNO_LONGTEXT N_("[0=no diseqc, 1-4=normal diseqc, -1=A, -2=B simple diseqc")
+#define SATNO_LONGTEXT N_("[0=no diseqc, 1-4=normal diseqc, -1=A, -2=B simple diseqc]")
 
 #define VOLTAGE_TEXT N_("LNB voltage")
 #define VOLTAGE_LONGTEXT N_("In Volts [0, 13=vertical, 18=horizontal]")

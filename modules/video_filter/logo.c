@@ -56,13 +56,13 @@ static int MouseEvent( vlc_object_t *, char const *,
  *****************************************************************************/
 
 #define FILE_TEXT N_("Logo filename")
-#define FILE_LONGTEXT N_("The file must be in PNG RGBA 8bits format (for now)")
+#define FILE_LONGTEXT N_("The file must be in PNG RGBA 8bits format (for now).")
 #define POSX_TEXT N_("X coordinate of the logo")
-#define POSX_LONGTEXT N_("You can move the logo by left-clicking on it" )
+#define POSX_LONGTEXT N_("You can move the logo by left-clicking on it." )
 #define POSY_TEXT N_("Y coordinate of the logo")
-#define POSY_LONGTEXT N_("You can move the logo by left-clicking on it" )
+#define POSY_LONGTEXT N_("You can move the logo by left-clicking on it." )
 #define TRANS_TEXT N_("Transparency of the logo (255-0)")
-#define TRANS_LONGTEXT N_("You can change it by middle-clicking and moving mouse left or right")
+#define TRANS_LONGTEXT N_("You can change it by middle-clicking and moving mouse left or right.")
 
 vlc_module_begin();
     set_description( _("Logo video filter") );

@@ -52,7 +52,7 @@ static int  SendEvents( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 #define MODE_TEXT N_("Blur factor (1-127)")
-#define MODE_LONGTEXT N_("The degree of blurring from 1 to 127")
+#define MODE_LONGTEXT N_("The degree of blurring from 1 to 127.")
 
 vlc_module_begin();
     set_description( _("Motion blur filter") );
