@@ -2,7 +2,7 @@
  * demux.c: demux functions for dvdplay.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: demux.c,v 1.4 2003/02/06 23:59:40 sam Exp $
+ * $Id: demux.c,v 1.5 2003/02/07 00:26:23 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -30,6 +30,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc/intf.h>
 
 #include "../../demux/mpeg/system.h"
 
@@ -147,7 +148,7 @@ static int Demux( input_thread_t * p_input )
     int                     i_data_nb = 0;
 
     p_dvd = p_input->p_demux_data->p_dvd;
-   
+
     /* Read headers to compute payload length */
     do
     {
@@ -161,14 +162,14 @@ static int Demux( input_thread_t * p_input )
         i_remains = p_input->p_last_data - p_input->p_current_data;
 
         p_input->p_demux_data->mpeg.pf_demux_ps( p_input, p_data );
-        
+
 
         ++i_data_nb;
     }
     while( i_remains );
-    
 
-    
+
+
 //    if( p_dvd->b_still && p_dvd->b_end_of_cell && p_dvd->p_intf != NULL )
     if( p_dvd->i_still_time && p_dvd->b_end_of_cell && p_dvd->p_intf != NULL )
     {
@@ -179,14 +180,14 @@ static int Demux( input_thread_t * p_input )
 
         dvdIntfStillTime( p_dvd->p_intf, p_dvd->i_still_time );
         p_dvd->i_still_time = 0;
-        
+
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        
+
         p_pgrm = p_input->stream.p_selected_program;
         p_pgrm->i_synchro_state = SYNCHRO_REINIT;
-        
+
         vlc_mutex_unlock( &p_input->stream.stream_lock );
-        
+
         input_ClockManageControl( p_input, p_pgrm, 0 );
     }
 

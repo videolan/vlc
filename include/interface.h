@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.38 2003/02/06 23:59:40 sam Exp $
+ * $Id: interface.h,v 1.39 2003/02/07 00:26:23 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -39,7 +39,7 @@ struct intf_thread_t
     /* Specific interfaces */
     intf_console_t *    p_console;                                /* console */
     intf_sys_t *        p_sys;                           /* system interface */
-    
+
     /* Interface module */
     module_t *   p_module;
     void      ( *pf_run )    ( intf_thread_t * );
