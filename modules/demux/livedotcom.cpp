@@ -936,14 +936,32 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
              i_size,
              pts.tv_sec * 1000000LL + pts.tv_usec );
 #endif
+    if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','1') )
+    {
+        i_size += 4;        
+    }
+    
     if( i_size > 65536 )
     {
         msg_Warn( p_demux, "buffer overflow" );
     }
     /* FIXME could i_size be > buffer size ? */
     p_block = block_New( p_demux, i_size );
-
-    memcpy( p_block->p_buffer, tk->buffer, i_size );
+    if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','1') )
+    {
+        H261VideoRTPSource *h261Source = (H261VideoRTPSource*)tk->rtpSource;
+        uint32_t header = h261Source->lastSpecialHeader();
+        memcpy( p_block->p_buffer, &header, 4 );
+        memcpy( p_block->p_buffer + 4, tk->buffer, i_size );        
+    }
+    else
+    {
+        memcpy( p_block->p_buffer, tk->buffer, i_size );
+    }
+    if( tk->rtpSource->curPacketMarkerBit() )
+    {        
+        p_block->i_flags |= BLOCK_FLAG_HEADER;
+    }
     //p_block->i_rate = p_input->stream.control.i_rate;
 
     if( i_pts != tk->i_pts && !tk->b_muxed )
