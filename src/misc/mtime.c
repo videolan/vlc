@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mtime.c,v 1.28 2002/02/25 23:59:07 sam Exp $
+ * $Id: mtime.c,v 1.29 2002/05/17 15:14:47 lool Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -141,11 +141,7 @@ void mwait( mtime_t date )
 
 #else
 
-#   ifdef HAVE_USLEEP
-    struct timeval tv_date;
-#   else
     struct timeval tv_date, tv_delay;
-#   endif
     mtime_t        delay;          /* delay in msec, signed to detect errors */
 
     /* see mdate() about gettimeofday() possible errors */
@@ -168,9 +164,6 @@ void mwait( mtime_t date )
 
 #   elif defined( ST_INIT_IN_ST_H )
     st_usleep( delay );
-
-#   elif defined( HAVE_USLEEP )
-    usleep( delay );
 
 #   else
     tv_delay.tv_sec = delay / 1000000;
@@ -198,9 +191,6 @@ void msleep( mtime_t delay )
 
 #elif defined( ST_INIT_IN_ST_H )
     st_usleep( delay );
-
-#elif defined( HAVE_USLEEP )
-    usleep( delay );
 
 #elif defined( WIN32 )
     Sleep( (int) (delay / 1000) );
