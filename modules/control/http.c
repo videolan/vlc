@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.44 2004/01/17 12:28:57 gbazin Exp $
+ * $Id: http.c,v 1.45 2004/01/17 13:25:21 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -297,10 +297,12 @@ static int Activate( vlc_object_t *p_this )
         goto failed;
     }
     p_intf->pf_run = Run;
+    free( psz_src );
 
     return VLC_SUCCESS;
 
 failed:
+    if( psz_src ) free( psz_src );
     free( p_sys->pp_files );
     p_sys->p_httpd->pf_unregister_host( p_sys->p_httpd,
                                         p_sys->p_httpd_host );
@@ -585,6 +587,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
             if( !f )
             {
                 msg_Err( p_intf, "Out of memory" );
+                closedir( p_dir );
                 return( VLC_ENOMEM );
             }
             f->p_intf  = p_intf;
@@ -595,6 +598,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
             if( !f->name || !f->mime )
             {
                 msg_Err( p_intf , "Unable to parse directory" );
+                closedir( p_dir );
                 return( VLC_ENOMEM );
             }
             msg_Dbg( p_intf, "file=%s (url=%s mime=%s)",
@@ -622,6 +626,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
                 if( !f )
                 {
                     msg_Err( p_intf, "Out of memory" );
+                    closedir( p_dir );
                     return( VLC_ENOMEM );
                 }
                 f->p_intf  = p_intf;
@@ -659,6 +664,9 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
     {
         free( password );
     }
+
+    closedir( p_dir );
+
     return VLC_SUCCESS;
 }
 
@@ -1966,6 +1974,7 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                 case MVLC_STRING:
                     psz = config_GetPsz( p_intf, m->param1 );
                     sprintf( value, "%s", psz ? psz : "" );
+                    if( psz ) free( psz );
                     break;
                 default:
                     sprintf( value, "invalid type(%s) in set", m->param2 );
@@ -2036,6 +2045,8 @@ static uint8_t *MacroSearch( uint8_t *src, uint8_t *end, int i_mvlc, vlc_bool_t 
                 default:
                     break;
             }
+
+            MacroClean( &m );
 
             if( ( i_mvlc == MVLC_END && i_level == -1 ) ||
                 ( i_mvlc != MVLC_END && i_level == 0 && i_mvlc == i_id ) )
@@ -2910,13 +2921,18 @@ playlist_item_t * parse_MRL( char *psz )
                 if( s_temp == NULL )
                 {
                     i_error = 1;
-                } else
+                }
+                else
                 {
                     i_options++;
-                    ppsz_options = (char **)realloc( ppsz_options , i_options * sizeof(char *) );
-                    ppsz_options[ i_options - 1 ] = (char *)malloc( (s_temp - s_mrl + 1) * sizeof( char ) );
+                    ppsz_options = realloc( ppsz_options , i_options *
+                                            sizeof(char *) );
+                    ppsz_options[ i_options - 1 ] =
+                        malloc( (s_temp - s_mrl + 1) * sizeof(char) );
 
-                    strncpy( ppsz_options[ i_options - 1 ] , s_mrl , s_temp - s_mrl );
+                    strncpy( ppsz_options[ i_options - 1 ] , s_mrl ,
+                             s_temp - s_mrl );
+
                     /* don't forget to finish the string with a '\0' */
                     (ppsz_options[ i_options - 1 ])[ s_temp - s_mrl ] = '\0';
 
@@ -2935,13 +2951,8 @@ playlist_item_t * parse_MRL( char *psz )
     if( i_error != 0 )
     {
         free( mrl );
-        for( i = 0 ; i < i_options ; i++ )
-        {
-            free( ppsz_options[i] );
-        }
-        free( ppsz_options );
-        return NULL;
-    } else
+    }
+    else
     {
         /* now create an item */
         p_item = malloc( sizeof( playlist_item_t ) );
@@ -2956,7 +2967,14 @@ playlist_item_t * parse_MRL( char *psz )
         {
             playlist_AddItemOption( p_item, ppsz_options[i] );
         }
-
-        return p_item;
     }
+
+    for( i = 0 ; i < i_options ; i++ )
+    {
+        free( ppsz_options[i] );
+    }
+    free( ppsz_options );
+
+    if( i_error != 0 ) return NULL;
+    else return p_item;
 }
