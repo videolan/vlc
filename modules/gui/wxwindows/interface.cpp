@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001,2003 VideoLAN
- * $Id: interface.cpp,v 1.73 2003/12/03 00:24:16 rocky Exp $
+ * $Id: interface.cpp,v 1.74 2003/12/03 04:19:59 rocky Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1204,13 +1204,10 @@ void Interface::OnPrevStream( wxCommandEvent& WXUNUSED(event) )
         if( p_playlist->p_input->stream.p_selected_area->i_id > 1 )
         {
             vlc_value_t val; val.b_bool = VLC_TRUE;
-            vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+	    vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
             var_Set( p_playlist->p_input, "prev-title", val );
-            vlc_mutex_unlock( &p_playlist->object_lock );
-            vlc_object_release( p_playlist );  
-            return;
-        }
-        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+        } else 
+	    vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 
@@ -1237,13 +1234,10 @@ void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
               p_playlist->p_input->stream.i_area_nb - 1 )
         {
             vlc_value_t val; val.b_bool = VLC_TRUE;
-            vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+	    vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
             var_Set( p_playlist->p_input, "next-title", val );
-            vlc_mutex_unlock( &p_playlist->object_lock );
-            vlc_object_release( p_playlist );
-            return;
-        }
-        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+        } else 
+	    vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 
