@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.10 2003/04/20 20:28:39 ipkiss Exp $
+ * $Id: vlcproc.cpp,v 1.11 2003/04/21 00:18:37 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -232,10 +232,8 @@ void VlcProc::InterfaceRefresh( bool All )
     Theme       *Thema    = Sys->p_theme;
     playlist_t  *PlayList = Sys->p_playlist;
 
-
     // Refresh
-    if( PlayList != NULL && Sys->p_input != NULL &&
-        Sys->p_input->stream.b_seekable )
+    if( PlayList != NULL )
     {
         // Refresh stream control controls ! :)
         switch( PlayList->i_status )

@@ -2,7 +2,7 @@
  * playlist.cpp: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.5 2003/04/20 15:00:19 karibu Exp $
+ * $Id: playlist.cpp,v 1.6 2003/04/21 00:18:37 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -215,11 +215,13 @@ bool ControlPlayList::ProcessEvent( Event *evt )
         case PLAYLIST_ID_DEL:
             if( (GenericControl *)evt->GetParam1() == this )
             {
+                vlc_mutex_lock( &PlayList->object_lock );
                 for( int i = PlayList->i_size - 1; i >= 0; i-- )
                 {
                     if( Select[i] && i != PlayList->i_index )
                         playlist_Delete( PlayList, i );
                 }
+                vlc_mutex_unlock( &PlayList->object_lock );
                 RefreshAll();
             }
             break;
@@ -229,6 +231,8 @@ bool ControlPlayList::ProcessEvent( Event *evt )
 //---------------------------------------------------------------------------
 void ControlPlayList::RefreshList()
 {
+    vlc_mutex_lock( &PlayList->object_lock );
+    
     if( NumOfItems != PlayList->i_size )
     {
         if( NumOfItems > 0 )
@@ -252,6 +256,8 @@ void ControlPlayList::RefreshList()
         Slider->ChangeSliderRange( Range );
         StartIndex = Slider->GetCursorPosition();
     }
+
+    vlc_mutex_unlock( &PlayList->object_lock );
 }
 //---------------------------------------------------------------------------
 void ControlPlayList::RefreshAll()
@@ -290,7 +296,7 @@ void ControlPlayList::Draw( int x, int y, int w, int h, Graphics *dest )
 void ControlPlayList::DrawAllCase( Graphics *dest, int x, int y, int w, int h )
 {
     int i;
-    for( i = 0; i < PlayList->i_size - StartIndex && i < Line * Column; i++ )
+    for( i = 0; i < NumOfItems - StartIndex && i < Line * Column; i++ )
     {
         DrawCase( dest, i + StartIndex, x, y, w, h );
     }
