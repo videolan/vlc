@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.10 2003/02/27 13:19:44 gbazin Exp $
+ * $Id: cinepak.c,v 1.11 2003/08/17 23:02:51 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -131,17 +131,6 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 /*****************************************************************************
  * locales Functions
  *****************************************************************************/
-
-static inline u16 GetWBE( u8 *p_buff )
-{
-    return( (p_buff[0]<<8) + p_buff[1] );
-}
-
-static inline u32 GetDWBE( u8 *p_buff )
-{
-    return( (p_buff[0] << 24) + ( p_buff[1] <<16 ) +
-            ( p_buff[2] <<8 ) + p_buff[3] );
-}
 
 #define GET2BYTES( p ) \
     GetWBE( p ); p+= 2;

@@ -2,7 +2,7 @@
  * mms.h: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.h,v 1.9 2003/04/20 19:29:43 fenrir Exp $
+ * $Id: mms.h,v 1.10 2003/08/17 23:02:51 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -34,17 +34,6 @@ void E_( MMSTUClose ) ( input_thread_t * );
 /* mmsh */
 int  E_( MMSHOpen )  ( input_thread_t * );
 void E_( MMSHClose ) ( input_thread_t * );
-
-static inline uint16_t GetWLE( uint8_t *p_buff )
-{
-    return( (p_buff[0]) + ( p_buff[1] <<8 ) );
-}
-
-static inline uint32_t GetDWLE( uint8_t *p_buff )
-{
-    return( p_buff[0] + ( p_buff[1] <<8 ) +
-            ( p_buff[2] <<16 ) + ( p_buff[3] <<24 ) );
-}
 
 #define FREE( p ) if( p ) { free( p ); (p) = NULL; }
 

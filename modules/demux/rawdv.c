@@ -2,7 +2,7 @@
  * rawdv.c : raw dv input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rawdv.c,v 1.8 2003/05/05 22:23:34 gbazin Exp $
+ * $Id: rawdv.c,v 1.9 2003/08/17 23:02:52 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -101,12 +101,6 @@ struct demux_sys_t
 static int  Activate  ( vlc_object_t * );
 static void Deactivate( vlc_object_t * );
 static int  Demux     ( input_thread_t * );
-
-static uint32_t GetDWBE( uint8_t *p_buff )
-{
-    return (uint32_t)p_buff[3] | ( ((uint32_t)p_buff[2]) << 8 ) |
-            ( ((uint32_t)p_buff[1]) << 16 ) | ( ((uint32_t)p_buff[0]) << 24 );
-}
 
 /*****************************************************************************
  * Module descriptor

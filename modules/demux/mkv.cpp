@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.20 2003/08/12 08:19:20 sam Exp $
+ * $Id: mkv.cpp,v 1.21 2003/08/17 23:02:52 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -158,18 +158,7 @@ class EbmlParser
 /*****************************************************************************
  * Some functions to manipulate memory
  *****************************************************************************/
-#define GetWLE( p )     __GetWLE( (uint8_t*)p )
-#define GetDWLE( p )    __GetDWLE( (uint8_t*)p )
 #define GetFOURCC( p )  __GetFOURCC( (uint8_t*)p )
-static uint16_t __GetWLE( uint8_t *p )
-{
-    return (uint16_t)p[0] | ( ((uint16_t)p[1]) << 8 );
-}
-static uint32_t __GetDWLE( uint8_t *p )
-{
-    return (uint32_t)p[0] | ( ((uint32_t)p[1]) << 8 ) |
-            ( ((uint32_t)p[2]) << 16 ) | ( ((uint32_t)p[3]) << 24 );
-}
 static vlc_fourcc_t __GetFOURCC( uint8_t *p )
 {
     return VLC_FOURCC( p[0], p[1], p[2], p[3] );

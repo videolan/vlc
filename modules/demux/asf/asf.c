@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.30 2003/08/01 00:16:37 fenrir Exp $
+ * $Id: asf.c,v 1.31 2003/08/17 23:02:52 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,16 +50,6 @@ vlc_module_begin();
     set_callbacks( Activate, Deactivate );
     add_shortcut( "asf" );
 vlc_module_end();
-
-static uint16_t GetWLE( uint8_t *p_buff )
-{
-    return( (p_buff[0]) + ( p_buff[1] <<8 ) );
-}
-static uint32_t GetDWLE( uint8_t *p_buff )
-{
-    return( p_buff[0] + ( p_buff[1] <<8 ) +
-            ( p_buff[2] <<16 ) + ( p_buff[3] <<24 ) );
-}
 
 /*****************************************************************************
  * Activate: check file and initializes ASF structures

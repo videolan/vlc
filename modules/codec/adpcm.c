@@ -2,7 +2,7 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.11 2003/05/22 20:56:07 hartman Exp $
+ * $Id: adpcm.c,v 1.12 2003/08/17 23:02:51 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -216,12 +216,6 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
 
 #define FREE( p ) if( p ) free( p ); p = NULL
-#define GetWLE( p ) \
-    ( *(uint8_t*)(p) + ( *((uint8_t*)(p)+1) << 8 ) )
-
-#define GetDWLE( p ) \
-    (  *(uint8_t*)(p) + ( *((uint8_t*)(p)+1) << 8 ) + \
-        ( *((uint8_t*)(p)+2) << 16 ) + ( *((uint8_t*)(p)+3) << 24 ) )
 
 /*****************************************************************************
  * InitThread: initialize data before entering main loop

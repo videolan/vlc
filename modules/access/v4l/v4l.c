@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.19 2003/07/24 22:05:16 sam Exp $
+ * $Id: v4l.c,v 1.20 2003/08/17 23:02:51 fenrir Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -195,16 +195,6 @@ static void    SetQWBE( uint8_t *p, uint64_t qw )
 {
     SetDWBE( p,     (qw >> 32)&0xffffffff );
     SetDWBE( &p[4], qw&0xffffffff);
-}
-
-static uint32_t GetDWBE( uint8_t *p_buff )
-{
-    return( ( p_buff[0] << 24 ) + ( p_buff[1] << 16 ) +
-            ( p_buff[2] <<  8 ) + p_buff[3] );
-}
-static uint64_t GetQWBE( uint8_t *p )
-{
-    return( ( (uint64_t)GetDWBE( p ) << 32) | (uint64_t)GetDWBE( &p[4] ) );
 }
 
 /*****************************************************************************

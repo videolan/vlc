@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.73 2003/08/14 20:02:55 zorglub Exp $
+ * $Id: vlc_common.h,v 1.74 2003/08/17 23:02:51 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -457,6 +457,32 @@ static inline uint64_t U64_AT( void * _p )
               | ((uint64_t)p[4] << 24) | ((uint64_t)p[5] << 16)
               | ((uint64_t)p[6] << 8) | p[7] );
 }
+
+static inline uint16_t GetWLE( void * _p )
+{
+    uint8_t * p = (uint8_t *)_p;
+    return ( ((uint16_t)p[1] << 8) | p[0] );
+}
+static inline uint32_t GetDWLE( void * _p )
+{
+    uint8_t * p = (uint8_t *)_p;
+    return ( ((uint32_t)p[3] << 24) | ((uint32_t)p[2] << 16)
+              | ((uint32_t)p[1] << 8) | p[0] );
+}
+static inline uint64_t GetQWLE( void * _p )
+{
+    uint8_t * p = (uint8_t *)_p;
+    return ( ((uint64_t)p[7] << 56) | ((uint64_t)p[6] << 48)
+              | ((uint64_t)p[5] << 40) | ((uint64_t)p[4] << 32)
+              | ((uint64_t)p[3] << 24) | ((uint64_t)p[2] << 16)
+              | ((uint64_t)p[1] << 8) | p[0] );
+}
+
+#define GetWBE( p )     U16_AT( p )
+#define GetDWBE( p )    U32_AT( p )
+#define GetQWBE( p )    U64_AT( p )
+
+
 #if WORDS_BIGENDIAN
 #   define hton16(i)   ( i )
 #   define hton32(i)   ( i )

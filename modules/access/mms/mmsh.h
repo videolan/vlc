@@ -2,7 +2,7 @@
  * mmsh.h:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmsh.h,v 1.2 2003/05/06 02:01:35 fenrir Exp $
+ * $Id: mmsh.h,v 1.3 2003/08/17 23:02:51 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -100,7 +100,7 @@ typedef struct
 
 static http_answer_t    *http_answer_parse  ( uint8_t *, int );
 static void              http_answer_free   ( http_answer_t * );
-static char             *http_field_get_value   ( http_answer_t *, char * );
+/* static char             *http_field_get_value   ( http_answer_t *, char * ); */
 static http_field_t     *http_field_find    ( http_field_t *, char * );
 
 static int  mmsh_start( input_thread_t *, access_sys_t *, off_t );

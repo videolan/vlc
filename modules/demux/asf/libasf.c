@@ -2,7 +2,7 @@
  * libasf.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.12 2003/03/14 00:24:08 sigmunau Exp $
+ * $Id: libasf.c,v 1.13 2003/08/17 23:02:52 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -42,24 +42,6 @@
     (guid).v3,              \
     (guid).v4[0],(guid).v4[1],(guid).v4[2],(guid).v4[3],    \
     (guid).v4[4],(guid).v4[5],(guid).v4[6],(guid).v4[7]
-
-/* Some functions to manipulate memory */
-static uint16_t GetWLE( uint8_t *p_buff )
-{
-    return( (p_buff[0]) + ( p_buff[1] <<8 ) );
-}
-
-static uint32_t GetDWLE( uint8_t *p_buff )
-{
-    return( p_buff[0] + ( p_buff[1] <<8 ) +
-            ( p_buff[2] <<16 ) + ( p_buff[3] <<24 ) );
-}
-
-static uint64_t GetQWLE( uint8_t *p_buff )
-{
-    return( ( (uint64_t)GetDWLE( p_buff ) )|
-            ( (uint64_t)GetDWLE( p_buff + 4 ) << 32) );
-}
 
 void GetGUID( guid_t *p_guid, uint8_t *p_data )
 {

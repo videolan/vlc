@@ -2,7 +2,7 @@
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpga.c,v 1.1 2003/08/01 00:37:06 fenrir Exp $
+ * $Id: mpga.c,v 1.2 2003/08/17 23:02:52 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -63,12 +63,6 @@ struct demux_sys_t
     int             i_bitrate_avg;  /* extracted from Xing header */
     es_descriptor_t *p_es;
 };
-
-
-static inline uint32_t GetDWBE( uint8_t *p )
-{
-    return( ( p[0] << 24 )|( p[1] << 16 )|( p[2] <<  8 )|( p[3] ) );
-}
 
 static int HeaderCheck( uint32_t h )
 {

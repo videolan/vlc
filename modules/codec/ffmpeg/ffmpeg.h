@@ -2,7 +2,7 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.23 2003/08/15 13:16:38 fenrir Exp $
+ * $Id: ffmpeg.h,v 1.24 2003/08/17 23:02:52 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -54,13 +54,6 @@ typedef struct generic_thread_s
 #else
 #   undef  LIBAVCODEC_PP
 #endif
-
-#define GetWLE( p ) \
-    ( *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) )
-
-#define GetDWLE( p ) \
-    (  *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) + \
-     ( *((u8*)(p)+2) << 16 ) + ( *((u8*)(p)+3) << 24 ) )
 
 #define FREE( p ) if( p ) free( p ); p = NULL
 

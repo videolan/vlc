@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.30 2003/08/17 20:45:50 fenrir Exp $
+ * $Id: libmp4.c,v 1.31 2003/08/17 23:02:52 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -122,40 +122,10 @@
 
 */
 
-/* Some functions to manipulate memory */
-static uint16_t GetWLE( uint8_t *p_buff )
-{
-    return( (p_buff[0]) + ( p_buff[1] <<8 ) );
-}
-
-static uint32_t GetDWLE( uint8_t *p_buff )
-{
-    return( p_buff[0] + ( p_buff[1] <<8 ) +
-            ( p_buff[2] <<16 ) + ( p_buff[3] <<24 ) );
-}
-
-static uint16_t GetWBE( uint8_t *p_buff )
-{
-    return( (p_buff[0]<<8) + p_buff[1] );
-}
-
 static uint32_t Get24bBE( uint8_t *p_buff )
 {
     return( ( p_buff[0] <<16 ) + ( p_buff[1] <<8 ) + p_buff[2] );
 }
-
-
-static uint32_t GetDWBE( uint8_t *p_buff )
-{
-    return( (p_buff[0] << 24) + ( p_buff[1] <<16 ) +
-            ( p_buff[2] <<8 ) + p_buff[3] );
-}
-
-static uint64_t GetQWBE( uint8_t *p_buff )
-{
-    return( ( (uint64_t)GetDWBE( p_buff ) << 32 )|( (uint64_t)GetDWBE( p_buff + 4 ) ) );
-}
-
 
 static void GetUUID( UUID_t *p_uuid, uint8_t *p_buff )
 {

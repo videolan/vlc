@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.15 2003/05/17 20:30:31 gbazin Exp $
+ * $Id: araw.c,v 1.16 2003/08/17 23:02:51 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -228,13 +228,6 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
 
 #define FREE( p ) if( p ) free( p ); p = NULL
-#define GetWLE( p ) \
-    ( *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) )
-
-#define GetDWLE( p ) \
-    (  *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) + \
-        ( *((u8*)(p)+2) << 16 ) + ( *((u8*)(p)+3) << 24 ) )
-
 
 /*****************************************************************************
  * InitThread: initialize data before entering main loop

@@ -2,7 +2,7 @@
  * au.c : au file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: au.c,v 1.3 2003/08/01 00:05:57 fenrir Exp $
+ * $Id: au.c,v 1.4 2003/08/17 23:02:52 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -54,12 +54,6 @@ vlc_module_end();
  *****************************************************************************/
 static int    DemuxPCM   ( input_thread_t * );
 /* TODO static int    DemuxADPCM   ( input_thread_t * ); */
-
-#define GetDWBE( p ) __GetDWBE( (uint8_t*)(p) )
-static inline uint32_t __GetDWBE( uint8_t *p )
-{
-    return( ( p[0] << 24 ) + ( p[1] << 16 ) + ( p[2] << 8 ) + p[3] );
-}
 
 enum AuType_e
 {

@@ -2,7 +2,7 @@
  * mmsh.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmsh.c,v 1.4 2003/07/31 23:44:49 fenrir Exp $
+ * $Id: mmsh.c,v 1.5 2003/08/17 23:02:51 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -974,6 +974,7 @@ static http_field_t *http_field_find( http_field_t *p_field, char *psz_name )
 
     return NULL;
 }
+#if 0
 static char *http_field_get_value( http_answer_t *ans, char *psz_name )
 {
     http_field_t  *p_field = ans->p_fields;
@@ -990,7 +991,7 @@ static char *http_field_get_value( http_answer_t *ans, char *psz_name )
 
     return NULL;
 }
-
+#endif
 
 
 static int chunk_parse( chunk_t *ck, uint8_t *p_data, int i_data )

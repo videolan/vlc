@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.2 2003/08/01 00:40:05 fenrir Exp $
+ * $Id: wav.c,v 1.3 2003/08/17 23:02:52 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -71,17 +71,6 @@ struct demux_sys_t
  * Declaration of local function
  *****************************************************************************/
 #define __EVEN( x ) ( ( (x)%2 != 0 ) ? ((x)+1) : (x) )
-
-#define GetWLE( p ) __GetWLE( (uint8_t*)(p) )
-static inline uint32_t __GetWLE( uint8_t *p )
-{
-    return( p[0] + ( p[1] << 8 ) );
-}
-#define GetDWLE( p ) __GetDWLE( (uint8_t*)(p) )
-static inline uint32_t __GetDWLE( uint8_t *p )
-{
-    return( p[0] + ( p[1] << 8 ) + ( p[2] << 16 ) + ( p[3] << 24 ) );
-}
 
 static int ChunkFind( input_thread_t *, char *, unsigned int * );
 

@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.21 2003/08/01 00:05:07 gbazin Exp $
+ * $Id: libavi.c,v 1.22 2003/08/17 23:02:52 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,26 +36,6 @@
     if( p ) {free( p ); p = NULL; }
 
 #define __EVEN( x ) ( (x)&0x01 ? (x)+1 : (x) )
-
-/* Some functions to manipulate memory */
-static uint16_t GetWLE( uint8_t *p_buff )
-{
-    return (uint16_t)p_buff[0] | ( ((uint16_t)p_buff[1]) << 8 );
-}
-
-static uint32_t GetDWLE( uint8_t *p_buff )
-{
-    return (uint32_t)p_buff[0] | ( ((uint32_t)p_buff[1]) << 8 ) |
-            ( ((uint32_t)p_buff[2]) << 16 ) | ( ((uint32_t)p_buff[3]) << 24 );
-}
-
-static uint64_t GetQWLE( uint8_t *p )
-{
-    return    (uint64_t)p[0]          | ( ((uint64_t)p[1]) << 8  ) |
-           ( ((uint64_t)p[2]) << 16 ) | ( ((uint64_t)p[3]) << 24 ) |
-           ( ((uint64_t)p[4]) << 32 ) | ( ((uint64_t)p[5]) << 40 ) |
-           ( ((uint64_t)p[6]) << 48 ) | ( ((uint64_t)p[7]) << 56 );
-}
 
 static vlc_fourcc_t GetFOURCC( byte_t *p_buff )
 {

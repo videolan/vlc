@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.53 2003/07/20 12:34:36 sigmunau Exp $
+ * $Id: avi.c,v 1.54 2003/08/17 23:02:52 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -70,26 +70,6 @@ vlc_module_begin();
     set_callbacks( AVIInit, __AVIEnd );
 vlc_module_end();
 
-/*****************************************************************************
- * Some useful functions to manipulate memory
- *****************************************************************************/
-
-static uint16_t GetWLE( uint8_t *p_buff )
-{
-    return (uint16_t)p_buff[0] | ( ((uint16_t)p_buff[1]) << 8 );
-}
-
-static uint32_t GetDWLE( uint8_t *p_buff )
-{
-    return (uint32_t)p_buff[0] | ( ((uint32_t)p_buff[1]) << 8 ) |
-            ( ((uint32_t)p_buff[2]) << 16 ) | ( ((uint32_t)p_buff[3]) << 24 );
-}
-
-static uint32_t GetDWBE( uint8_t *p_buff )
-{
-    return (uint32_t)p_buff[3] | ( ((uint32_t)p_buff[2]) << 8 ) |
-            ( ((uint32_t)p_buff[1]) << 16 ) | ( ((uint32_t)p_buff[0]) << 24 );
-}
 static vlc_fourcc_t GetFOURCC( byte_t *p_buff )
 {
     return VLC_FOURCC( p_buff[0], p_buff[1], p_buff[2], p_buff[3] );

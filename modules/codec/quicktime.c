@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.10 2003/08/01 20:06:43 gbazin Exp $
+ * $Id: quicktime.c,v 1.11 2003/08/17 23:02:51 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -229,18 +229,6 @@ static int pi_channels_maps[6] =
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARLEFT
 };
-
-
-static uint16_t GetWBE( uint8_t *p_buff )
-{
-    return( (p_buff[0]<<8) + p_buff[1] );
-}
-
-static uint32_t GetDWBE( uint8_t *p_buff )
-{
-    return( (p_buff[0] << 24) + ( p_buff[1] <<16 ) +
-            ( p_buff[2] <<8 ) + p_buff[3] );
-}
 
 
 static int GetPESData( uint8_t *p_buf, int i_max, pes_packet_t *p_pes )

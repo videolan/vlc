@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.30 2003/08/09 19:49:13 gbazin Exp $
+ * $Id: ogg.c,v 1.31 2003/08/17 23:02:52 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -145,22 +145,6 @@ typedef struct stream_header
 #define PACKET_LEN_BITS2     0x02
 #define PACKET_IS_SYNCPOINT  0x08
 
-/* Some functions to manipulate memory */
-static uint16_t GetWLE( uint8_t *p_buff )
-{
-    return( (p_buff[0]) + ( p_buff[1] <<8 ) );
-}
-
-static uint32_t GetDWLE( uint8_t *p_buff )
-{
-    return( p_buff[0] + ( p_buff[1] <<8 ) +
-            ( p_buff[2] <<16 ) + ( p_buff[3] <<24 ) );
-}
-
-static uint64_t GetQWLE( uint8_t *p_buff )
-{
-    return( GetDWLE( p_buff ) + ( ((uint64_t)GetDWLE( p_buff + 4 )) << 32 ) );
-}
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -883,13 +867,13 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                                  (char *)&p_stream->i_fourcc );
 
                         p_stream->f_rate = 10000000.0 /
-                            GetQWLE((uint8_t *)&st->time_unit);
+                            GetQWLE(&st->time_unit);
                         p_stream->p_bih->biBitCount =
-                            GetWLE((uint8_t *)&st->bits_per_sample);
+                            GetWLE(&st->bits_per_sample);
                         p_stream->p_bih->biWidth =
-                            GetDWLE((uint8_t *)&st->sh.video.width);
+                            GetDWLE(&st->sh.video.width);
                         p_stream->p_bih->biHeight =
-                            GetDWLE((uint8_t *)&st->sh.video.height);
+                            GetDWLE(&st->sh.video.height);
                         p_stream->p_bih->biPlanes= 1 ;
                         p_stream->p_bih->biSizeImage =
                             (p_stream->p_bih->biBitCount >> 3) *
@@ -945,16 +929,16 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                         p_buffer[4] = '\0';
                         p_stream->p_wf->wFormatTag = strtol(p_buffer,NULL,16);
                         p_stream->p_wf->nChannels =
-                            GetWLE((uint8_t *)&st->sh.audio.channels);
+                            GetWLE(&st->sh.audio.channels);
                         p_stream->f_rate = p_stream->p_wf->nSamplesPerSec =
-                            GetQWLE((uint8_t *)&st->samples_per_unit);
+                            GetQWLE(&st->samples_per_unit);
                         p_stream->i_bitrate = p_stream->p_wf->nAvgBytesPerSec =
-                            GetDWLE((uint8_t *)&st->sh.audio.avgbytespersec);
+                            GetDWLE(&st->sh.audio.avgbytespersec);
                         p_stream->i_bitrate *= 8;
                         p_stream->p_wf->nBlockAlign =
-                            GetWLE((uint8_t *)&st->sh.audio.blockalign);
+                            GetWLE(&st->sh.audio.blockalign);
                         p_stream->p_wf->wBitsPerSample =
-                            GetWLE((uint8_t *)&st->bits_per_sample);
+                            GetWLE(&st->bits_per_sample);
                         p_stream->p_wf->cbSize = 0;
 
                         switch( p_stream->p_wf->wFormatTag )

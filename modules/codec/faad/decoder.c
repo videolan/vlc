@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.25 2003/06/22 08:49:11 fenrir Exp $
+ * $Id: decoder.c,v 1.26 2003/08/17 23:02:51 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -134,13 +134,6 @@ static unsigned int pi_channels_maps[7] =
 };
 
 #define FREE( p ) if( p != NULL ) free( p ); p = NULL
-#define GetWLE( p ) \
-    ( *(uint8_t*)(p) + ( *((uint8_t*)(p)+1) << 8 ) )
-
-#define GetDWLE( p ) \
-    (  *(uint8_t*)(p) + ( *((uint8_t*)(p)+1) << 8 ) + \
-        ( *((uint8_t*)(p)+2) << 16 ) + ( *((uint8_t*)(p)+3) << 24 ) )
-
 
 static void GetPESData( uint8_t *p_buf, int i_max, pes_packet_t *p_pes )
 {
