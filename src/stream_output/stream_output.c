@@ -710,59 +710,37 @@ static void mrl_Clean( mrl_t *p_mrl )
  *  XXX: psz_chain is modified
  */
 #define SKIPSPACE( p ) { while( *p && ( *p == ' ' || *p == '\t' ) ) p++; }
+#define SKIPTRAILINGSPACE( p, e ) \
+    { while( e > p && ( *(e-1) == ' ' || *(e-1) == '\t' ) ) e--; }
+
 /* go accross " " and { } */
 static char *_get_chain_end( char *str )
 {
-    char *p = str;
+    char c, *p = str;
 
     SKIPSPACE( p );
 
     for( ;; )
     {
-        if( *p == '{' || *p == '"' || *p == '\'')
-        {
-            char c;
+        if( !*p || *p == ',' || *p == '}' ) return p;
 
-            if( *p == '{' )
-            {
-                c = '}';
-            }
-            else
-            {
-                c = *p;
-            }
-            p++;
-
-            for( ;; )
-            {
-                if( *p == '\0' )
-                {
-                    return p;
-                }
-
-                if( *p == c )
-                {
-                    p++;
-                    return p;
-                }
-                else if( *p == '{' && c == '}' )
-                {
-                    p = _get_chain_end( p );
-                }
-                else
-                {
-                    p++;
-                }
-            }
-        }
-        else if( *p == '\0' || *p == ',' || *p == '}' ||
-                 *p == ' ' || *p == '\t' )
-        {
-            return p;
-        }
-        else
+        if( *p != '{' && *p != '"' && *p != '\'' )
         {
             p++;
+            continue;
+        }
+
+        if( *p == '{' ) c = '}';
+        else c = *p;
+        p++;
+
+        for( ;; )
+        {
+            if( !*p ) return p;
+
+            if( *p == c ) return ++p;
+            else if( *p == '{' && c == '}' ) p = _get_chain_end( p );
+            else p++;
         }
     }
 }
@@ -829,14 +807,35 @@ char *sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
                 }
                 else
                 {
-                    if( *p == '\'' || *p =='"' ||
+                    /* Skip heading and trailing spaces.
+                     * This ain't necessary but will avoid simple
+                     * user mistakes. */
+                    SKIPSPACE( p );
+                }
+
+                if( end <= p )
+                {
+                    cfg.psz_value = NULL;
+                }
+                else
+                {
+                    if( *p == '\'' || *p == '"' ||
                         ( !b_keep_brackets && *p == '{' ) )
                     {
                         p++;
-                        end--;
+
+                        if( *(end-1) != '\'' && *(end-1) == '"' )
+                            SKIPTRAILINGSPACE( p, end );
+
+                        if( end - 1 <= p ) cfg.psz_value = NULL;
+                        else cfg.psz_value = strndup( p, end -1 - p );
                     }
-                    if( end <= p ) cfg.psz_value = NULL;
-                    else cfg.psz_value = strndup( p, end - p );
+                    else
+                    {
+                        SKIPTRAILINGSPACE( p, end );
+                        if( end <= p ) cfg.psz_value = NULL;
+                        else cfg.psz_value = strndup( p, end - p );
+                    }
                 }
 
                 p = end;
