@@ -26,6 +26,8 @@
  *****************************************************************************/
 #include <stdlib.h>
 
+#include <errno.h>
+
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <unistd.h>
