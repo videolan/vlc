@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.85 2003/10/05 21:29:23 sam Exp $
+dnl $Id: configure.ac,v 1.86 2003/10/07 18:53:01 sam Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -393,10 +393,12 @@ fi
 
 # Win32 style
 if test "${ac_cv_have_plugins}" = "no"; then
-  AC_CHECK_LIB(kernel32, main,
-   [AX_ADD_LDFLAGS([vlc],[-lkernel32])
-    AC_DEFINE(HAVE_DL_WINDOWS, 1, [Define if you have Windows' LoadLibrary])
-    ac_cv_have_plugins=yes])
+  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
+    AC_CHECK_LIB(kernel32, main,
+     [AX_ADD_LDFLAGS([vlc],[-lkernel32])
+      AC_DEFINE(HAVE_DL_WINDOWS, 1, [Define if you have Windows' LoadLibrary])
+      ac_cv_have_plugins=yes])
+  fi
 fi
 
 # BeOS style
