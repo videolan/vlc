@@ -55,7 +55,7 @@ all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
-	.png .gpgerror .gcrypt .gnutls .daap
+	.png .gpgerror .gcrypt .gnutls .daap .cddb .cdio .vcdimager
 endif
 ifeq ($(SYS),BEOS)
 all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
@@ -896,7 +896,6 @@ vcdimager-$(VCDIMAGER_VERSION).tar.gz:
 
 vcdimager: vcdimager-$(VCDIMAGER_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/vcdimager.patch
 
 ifeq ($(SYS),DARWIN)
 .vcdimager: vcdimager
