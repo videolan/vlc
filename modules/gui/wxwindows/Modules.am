@@ -22,4 +22,6 @@ EXTRA_DIST += \
 	modules/gui/wxwindows/bitmaps/pause.xpm \
 	modules/gui/wxwindows/bitmaps/playlist.xpm \
 	modules/gui/wxwindows/bitmaps/previous.xpm \
-	modules/gui/wxwindows/bitmaps/next.xpm
+	modules/gui/wxwindows/bitmaps/next.xpm \
+	modules/gui/wxwindows/bitmaps/slow.xpm \
+	modules/gui/wxwindows/bitmaps/fast.xpm
