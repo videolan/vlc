@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.31 2003/07/16 16:06:56 sam Exp $
+dnl $Id: configure.ac,v 1.32 2003/07/17 12:06:10 sam Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -3193,7 +3193,7 @@ AC_SUBST(PLUGIN_PATH)
 dnl
 dnl  Handle substvars that use $(top_srcdir)
 dnl
-VLC_CONFIG="\$(top_builddir)/vlc-config"
+VLC_CONFIG="top_srcdir=\"\$(top_srcdir)\" \$(top_builddir)/vlc-config"
 AC_SUBST(VLC_CONFIG)
 CPPFLAGS_save="${CPPFLAGS_save} -I\$(top_srcdir)/include"
 
@@ -3239,6 +3239,7 @@ AC_OUTPUT([
   ipkg/Makefile
   lib/Makefile
   modules/Makefile
+  mozilla/Makefile
   m4/Makefile
   po/Makefile.in
   share/Makefile

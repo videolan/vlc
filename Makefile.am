@@ -7,7 +7,7 @@ NULL =
 # SUBDIRS stores the directories where a "make" is required when building
 # something. DIST_SUBDIRS stores the directories where nothing is built but
 # which have makefiles with distribution information.
-SUBDIRS = intl modules . share po m4
+SUBDIRS = intl modules mozilla . share po m4
 DIST_SUBDIRS = $(SUBDIRS) src debian doc ipkg lib autotools
 
 EXTRA_DIST = \
@@ -564,89 +564,6 @@ package-macosx:
 
 # Clean up
 	rm -Rf $(srcdir)/tmp
-
-###############################################################################
-# Building the Mozilla plugin
-###############################################################################
-
-noinst_LIBRARIES = $(noinst_LIBRARIES_mozilla)
-
-MOSTLYCLEANFILES = $(LIBRARIES_mozilla)
-
-EXTRA_DIST += $(SOURCES_mozilla) mozilla/vlcintf.idl
-
-BUILT_SOURCES += $(BUILT_SOURCES_mozilla)
-
-SOURCES_mozilla = \
-	mozilla/vlcshell.cpp \
-	mozilla/vlcplugin.cpp \
-	mozilla/vlcplugin.h \
-	mozilla/vlcpeer.cpp \
-	mozilla/vlcpeer.h \
-	mozilla/support/classinfo.h \
-	$(SOURCES_mozilla_win32) \
-	$(SOURCES_mozilla_macosx) \
-	$(SOURCES_mozilla_unix) \
-	$(NULL)
-
-# Under Win32, Mozilla plugins need to be named NP******.DLL, but under Unix
-# the common naming scheme is lib******plugin.so. Also, we need npwin.cpp
-# under Win32 and npunix.c under Unix.
-if HAVE_WIN32
-LIBRARIES_mozilla = mozilla/npvlc$(LIBEXT)
-SOURCES_mozilla_win32 = mozilla/support/npwin.cpp
-CPPFLAGS_mozilla_EXTRA = -DXP_WIN -DXP_WIN32
-else
-if HAVE_DARWIN
-# We don't define LIBRARIES_mozilla because we'll be using project builder
-SOURCES_mozilla_macosx = mozilla/support/npmac.cpp
-else
-LIBRARIES_mozilla = mozilla/libvlcplugin$(LIBEXT)
-SOURCES_mozilla_unix = mozilla/support/npunix.c
-endif
-endif
-
-if BUILD_MOZILLA
-if UNTRUE
-noinst_LIBRARIES_mozilla = mozilla/libplugin.a
-endif
-
-mozilla_libplugin_a_SOURCES = $(SOURCES_mozilla)
-mozilla_libplugin_a_CFLAGS = `$(VLC_CONFIG) --cflags mozilla pic` \
-                             $(CPPFLAGS_mozilla_EXTRA) -Imozilla
-mozilla_libplugin_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla pic` \
-                               $(CPPFLAGS_mozilla_EXTRA) -Imozilla
-mozilla_libplugin_a_DEPENDENCIES = lib/libvlc_pic.a $(DATA_npvlc_rc)
-
-BUILT_SOURCES_mozilla = mozilla/vlcintf.h
-$(SOURCES_mozilla): mozilla/vlcintf.h
-
-mozilla_plugin_DATA = $(LIBRARIES_mozilla)
-mozilla_plugindir = $(libdir)/mozilla/plugins
-$(LIBRARIES_mozilla): $(mozilla_libplugin_a_OBJECTS) \
-                      $(mozilla_libplugin_a_DEPENDENCIES) stamp-pic
-	$(CXXLINK) $(mozilla_libplugin_a_OBJECTS) $(DATA_npvlc_rc) \
-	  lib/libvlc_pic.a -shared \
-	  `$(VLC_CONFIG) --libs vlc mozilla builtin pic`
-
-mozilla_vlcintf_xpt_DATA = mozilla/vlcintf.xpt
-mozilla_vlcintf_xptdir = $(libdir)/mozilla/components
-mozilla/vlcintf.xpt: mozilla/vlcintf.idl
-	$(XPIDL) -I/usr/share/idl/mozilla -I/usr/lib/mozilla/include/idl \
-	  -m typelib -o mozilla/vlcintf $(srcdir)/mozilla/vlcintf.idl
-
-mozilla/vlcintf.h: mozilla/vlcintf.idl
-	$(XPIDL) -I/usr/share/idl/mozilla -I/usr/lib/mozilla/include/idl \
-	  -m header -o mozilla/vlcintf $(srcdir)/mozilla/vlcintf.idl
-
-if HAVE_WIN32
-DATA_npvlc_rc = $(noinst_mozilla_npvlc_rc_DATA)
-noinst_mozilla_npvlc_rc_DATA = mozilla/npvlc_rc.$(OBJEXT)
-noinst_mozilla_npvlc_rcdir = $(libdir)
-mozilla/npvlc_rc.$(OBJEXT): mozilla/npvlc_rc.rc
-	$(WINDRES) --include-dir $(srcdir)/mozilla -i $< -o $@
-endif
-endif
 
 ###############################################################################
 # Stamp rules

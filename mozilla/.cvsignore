@@ -1,5 +1,12 @@
-*.dll
-vlcintf.h
-vlcintf.xpt
 .deps
 .dirstamp
+*.lo
+*.la
+*.dll
+*.dylib
+*.sl
+*.so
+Makefile.in
+Makefile
+vlcintf.h
+vlcintf.xpt
