@@ -27,6 +27,7 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
@@ -672,7 +673,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         if( p_sys->f_fps > 0 )
         {
             id->p_encoder->fmt_out.video.i_frame_rate =
-                p_sys->f_fps * 1001 + 0.5;
+                nearbyint(p_sys->f_fps * 1001);
             id->p_encoder->fmt_out.video.i_frame_rate_base = 1001;
         }
     }
