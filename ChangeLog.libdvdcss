@@ -4,6 +4,11 @@
 
 HEAD
 
+  * Nothing yet.
+
+0.2.83
+Wed, 22 Aug 2001 15:18:01 +0200
+
   * Added BSD/OS libdvd by Steven M. Schultz <sms@TO.GD-ES.COM> in
     extras/BSDI_dvdioctl after he suggested us to do so. License is GPL.
   * ./configure now checks for an installed libdvd under BSD/OS and
