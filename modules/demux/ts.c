@@ -2224,15 +2224,16 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 else if( p_dr->i_tag == 0x73 )
                 {
                     /* DTS audio descriptor (ETSI TS 101 154 Annex F) */
-                    msg_Dbg( p_demux, "  * DTS audio descriptor not decoded" );
+                    msg_Dbg( p_demux, "   * DTS audio descriptor not decoded" );
                     pid->es->fmt.i_cat = AUDIO_ES;
                     pid->es->fmt.i_codec = VLC_FOURCC( 'd', 't', 's', ' ' );
                 }
                 else if( p_dr->i_tag == 0x45 )
                 {
-                    msg_Dbg( p_demux, "  * VBI Data descriptor" );
+                    msg_Dbg( p_demux, "   * VBI Data descriptor" );
                     pid->es->fmt.i_cat = SPU_ES;
                     pid->es->fmt.i_codec = VLC_FOURCC( 'v', 'b', 'i', 'd' );
+                    pid->es->fmt.psz_description = strdup( "VBI Data" );
                     pid->es->fmt.i_extra = p_dr->i_length;
                     pid->es->fmt.p_extra = malloc( p_dr->i_length );
                     memcpy( pid->es->fmt.p_extra, p_dr->p_data,
@@ -2243,6 +2244,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     msg_Dbg( p_demux, "  * VBI Teletext descriptor" );
                     pid->es->fmt.i_cat = SPU_ES;
                     pid->es->fmt.i_codec = VLC_FOURCC( 'v', 'b', 'i', 't' );
+                    pid->es->fmt.psz_description = strdup( "VBI Teletext" );
                     pid->es->fmt.i_extra = p_dr->i_length;
                     pid->es->fmt.p_extra = malloc( p_dr->i_length );
                     memcpy( pid->es->fmt.p_extra, p_dr->p_data,
@@ -2250,9 +2252,10 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 }
                 else if( p_dr->i_tag == 0x56 )
                 {
-                    msg_Dbg( p_demux, "  * EBU Teletext descriptor" );
+                    msg_Dbg( p_demux, "   * EBU Teletext descriptor" );
                     pid->es->fmt.i_cat = SPU_ES;
                     pid->es->fmt.i_codec = VLC_FOURCC( 't', 'e', 'l', 'x' );
+                    pid->es->fmt.psz_description = strdup( "Teletext" );
                     pid->es->fmt.i_extra = p_dr->i_length;
                     pid->es->fmt.p_extra = malloc( p_dr->i_length );
                     memcpy( pid->es->fmt.p_extra, p_dr->p_data,
