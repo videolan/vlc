@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.65 2004/02/08 18:49:53 gbazin Exp $
+ * $Id: video.c,v 1.66 2004/02/08 22:37:37 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -747,7 +747,7 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
     decoder_t *p_dec = (decoder_t *)p_context->opaque;
     picture_t *p_pic;
 
-    if( p_ff_pic->type != FF_BUFFER_TYPE_USER )
+    if( !p_ff_pic->opaque )
     {
         avcodec_default_release_buffer( p_context, p_ff_pic );
         return;
