@@ -66,6 +66,7 @@ Section "Install"
 	File  /r locale
 	File  /r skins
 	File  /r http
+	File  /r mozilla
 
         SetShellVarContext all
 

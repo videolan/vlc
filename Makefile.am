@@ -566,6 +566,12 @@ package-win32-base:
 	cp $(srcdir)/share/http/admin/.access \
            $(srcdir)/vlc-${VERSION}/http/admin/ ;
 
+	mkdir -p "$(srcdir)/vlc-${VERSION}/mozilla"
+if BUILD_MOZILLA
+	cp $(srcdir)/mozilla/npvlc.dll $(srcdir)/vlc-${VERSION}/mozilla/ ;
+	cp $(srcdir)/mozilla/vlcintf.xpt  $(srcdir)/vlc-${VERSION}/mozilla/ ;
+endif
+
 package-win32-base-exe:
 # Create package 
 	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe \
