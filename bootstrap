@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.22 2002/11/04 15:04:44 sam Exp $
+##  $Id: bootstrap,v 1.23 2002/11/04 18:27:30 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -199,28 +199,33 @@ fi
 
 # Check for automake
 amvers="none"
-if automake-1.6 --version >/dev/null 2>&1
+if automake-1.7 --version >/dev/null 2>&1
 then
-  amvers="-1.6"
-  if expr "`automake-1.6 --version | sed -e '1s/[^0-9]*//' -e q`" "<=" "1.6.1" > /dev/null 2>&1
-  then AUTOMAKESUCKS=yes
-  fi
+  amvers="-1.7"
 else
-  if automake-1.5 --version >/dev/null 2>&1
+  if automake-1.6 --version >/dev/null 2>&1
   then
-    amvers="-1.5"
+    amvers="-1.6"
+    if expr "`automake-1.6 --version | sed -e '1s/[^0-9]*//' -e q`" "<=" "1.6.1" > /dev/null 2>&1
+    then AUTOMAKESUCKS=yes
+    fi
   else
-    if automake --version > /dev/null 2>&1
+    if automake-1.5 --version >/dev/null 2>&1
     then
-      amvers=`automake --version | sed -e '1s/[^0-9]*//' -e q`
-      case $amvers in
-      1.6|1.6.0|1.6.1)
-        AUTOMAKESUCKS=yes ;;
-      esac
+      amvers="-1.5"
+    else
+      if automake --version > /dev/null 2>&1
+      then
+        amvers=`automake --version | sed -e '1s/[^0-9]*//' -e q`
+        case $amvers in
+        1.6|1.6.0|1.6.1)
+          AUTOMAKESUCKS=yes ;;
+        esac
 
-      if expr "$amvers" "<" "1.5" > /dev/null 2>&1
-      then amvers="none"
-      else amvers=""
+        if expr "$amvers" "<" "1.5" > /dev/null 2>&1
+        then amvers="none"
+        else amvers=""
+        fi
       fi
     fi
   fi
