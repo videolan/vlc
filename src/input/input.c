@@ -340,7 +340,8 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
  *****************************************************************************/
 void input_StopThread( input_thread_t *p_input )
 {
-    demux_t *p_demux;
+    demux_t  *p_demux;
+    access_t *p_access;
 
     /* Make the thread exit from a possible vlc_cond_wait() */
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -348,12 +349,19 @@ void input_StopThread( input_thread_t *p_input )
     /* Request thread destruction */
 
     /* Temporary demux2 hack */
-    p_demux = (demux_t *)vlc_object_find( p_input, VLC_OBJECT_DEMUX,
-                                          FIND_CHILD );
+    p_demux = (demux_t *)vlc_object_find( p_input, VLC_OBJECT_DEMUX, FIND_CHILD );
     if( p_demux )
     {
         p_demux->b_die = 1;
         vlc_object_release( p_demux );
+    }
+
+    /* Temporary access2 hack */
+    p_access = (access_t *)vlc_object_find( p_input, VLC_OBJECT_ACCESS, FIND_CHILD );
+    if( p_access )
+    {
+        p_access->b_die = 1;
+        vlc_object_release( p_access );
     }
 
     p_input->b_die = 1;
