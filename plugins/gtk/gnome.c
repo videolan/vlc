@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.10 2002/02/19 00:50:19 sam Exp $
+ * $Id: gnome.c,v 1.11 2002/02/20 05:56:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -141,6 +141,8 @@ static int intf_Open( intf_thread_t *p_intf )
         return( 1 );
     }
 
+    p_intf->p_sys->p_sub = intf_MsgSub();
+
     /* Initialize Gnome thread */
     p_intf->p_sys->b_playing = 0;
     p_intf->p_sys->b_popup_changed = 0;
@@ -160,6 +162,8 @@ static int intf_Open( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Close( intf_thread_t *p_intf )
 {
+    intf_MsgUnsub( p_intf->p_sys->p_sub );
+
     /* Destroy structure */
     free( p_intf->p_sys );
 }
@@ -195,6 +199,7 @@ static void intf_Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_window = create_intf_window( );
     p_intf->p_sys->p_popup = create_intf_popup( );
     p_intf->p_sys->p_playlist = create_intf_playlist();
+    p_intf->p_sys->p_messages = create_intf_messages();
 
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
@@ -210,9 +215,17 @@ static void intf_Run( intf_thread_t *p_intf )
                        GTK_DEST_DEFAULT_ALL, target_table,
                        1, GDK_ACTION_COPY );
 
-    /* Get the interface labels */
+    /* Get the slider object */
     p_intf->p_sys->p_slider_frame = gtk_object_get_data(
                       GTK_OBJECT( p_intf->p_sys->p_window ), "slider_frame" );
+
+    /* Configure the log window */
+    p_intf->p_sys->p_messages_text = GTK_TEXT( gtk_object_get_data(
+        GTK_OBJECT(p_intf->p_sys->p_messages ), "messages_textbox" ) );
+    gtk_text_set_line_wrap( p_intf->p_sys->p_messages_text, TRUE);
+    gtk_text_set_word_wrap( p_intf->p_sys->p_messages_text, FALSE);
+
+    /* Get the interface labels */
     #define P_LABEL( name ) GTK_LABEL( gtk_object_get_data( \
                          GTK_OBJECT( p_intf->p_sys->p_window ), name ) )
     p_intf->p_sys->p_label_title = P_LABEL( "title_label" );
@@ -246,6 +259,9 @@ static void intf_Run( intf_thread_t *p_intf )
                          "p_intf", p_intf );
 
     gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_playlist ),
+                         "p_intf", p_intf );
+
+    gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_messages ),
                          "p_intf", p_intf );
 
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_adj),
@@ -284,6 +300,12 @@ static void intf_Run( intf_thread_t *p_intf )
 static gint GnomeManage( gpointer p_data )
 {
 #define p_intf ((intf_thread_t *)p_data)
+    static GdkColor white = { 0, 0xffff, 0xffff, 0xffff };
+    static GdkColor red   = { 0, 0xffff, 0x6666, 0x6666 };
+    static GdkColor gray  = { 0, 0xaaaa, 0xaaaa, 0xaaaa };
+    GdkColor *p_color;
+
+    int i_start, i_stop;
 
     vlc_mutex_lock( &p_intf->change_lock );
 
@@ -302,7 +324,46 @@ static gint GnomeManage( gpointer p_data )
         p_intf->b_menu_change = 0;
     }
 
-    /* update the playlist */
+    /* Update the log window */
+    vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
+    i_stop = *p_intf->p_sys->p_sub->pi_stop;
+    vlc_mutex_unlock( p_intf->p_sys->p_sub->p_lock );
+
+    if( p_intf->p_sys->p_sub->i_start != i_stop )
+    {
+        for( i_start = p_intf->p_sys->p_sub->i_start;
+             i_start != i_stop;
+             i_start = (i_start+1) % INTF_MSG_QSIZE )
+        {
+            /* Append all messages to log window */
+            switch( p_intf->p_sys->p_sub->p_msg[i_start].i_type )
+            {
+            case INTF_MSG_ERR:
+                p_color = &red;
+                break;
+            case INTF_MSG_WARN:
+                p_color = &gray;
+                break;
+            default:
+                p_color = &white;
+                break;
+            }
+
+            gtk_text_insert( p_intf->p_sys->p_messages_text, NULL, p_color,
+                NULL, p_intf->p_sys->p_sub->p_msg[i_start].psz_msg, -1 );
+            gtk_text_insert( p_intf->p_sys->p_messages_text, NULL, p_color,
+                NULL, "\n", -1 );
+        }
+
+        vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
+        p_intf->p_sys->p_sub->i_start = i_start;
+        vlc_mutex_unlock( p_intf->p_sys->p_sub->p_lock );
+
+        gtk_text_set_point( p_intf->p_sys->p_messages_text,
+                    gtk_text_get_length( p_intf->p_sys->p_messages_text ) );
+    }
+
+    /* Update the playlist */
     GtkPlayListManage( p_intf ); 
 
     if( p_input_bank->pp_input[0] != NULL && !p_intf->b_die )

@@ -265,3 +265,12 @@ GnomePopupJumpActivate                 (GtkMenuItem     *menuitem,
 {
     GtkJumpShow( GTK_WIDGET( menuitem ), NULL, "intf_popup" );
 }
+
+
+void
+GnomeMenubarMessagesActivate           (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    GtkMessagesShow( GTK_WIDGET( menuitem ), NULL, "intf_window" );
+}
+

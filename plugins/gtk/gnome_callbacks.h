@@ -146,3 +146,7 @@ void
 GtkNetworkOpenChannel                  (GtkToggleButton *togglebutton,
                                         gpointer         user_data);
 
+
+void
+GnomeMenubarMessagesActivate           (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);

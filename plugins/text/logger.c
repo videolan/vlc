@@ -2,7 +2,7 @@
  * logger.c : file logging plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: logger.c,v 1.2 2002/02/19 03:54:56 sam Exp $
+ * $Id: logger.c,v 1.3 2002/02/20 05:56:18 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -187,18 +187,21 @@ static void FlushQueue( intf_subscription_t *p_sub, FILE *p_file )
     i_stop = *p_sub->pi_stop;
     vlc_mutex_unlock( p_sub->p_lock );
 
-    /* Append all messages to log file */
-    for( i_start = p_sub->i_start;
-         i_start != i_stop;
-         i_start = (i_start+1) % INTF_MSG_QSIZE )
+    if( p_sub->i_start != i_stop )
     {
-        psz_msg = p_sub->p_msg[i_start].psz_msg;
-        LOG_STRING( psz_msg, p_file );
-        LOG_STRING( "\n", p_file );
-    }
+        /* Append all messages to log file */
+        for( i_start = p_sub->i_start;
+             i_start != i_stop;
+             i_start = (i_start+1) % INTF_MSG_QSIZE )
+        {
+            psz_msg = p_sub->p_msg[i_start].psz_msg;
+            LOG_STRING( psz_msg, p_file );
+            LOG_STRING( "\n", p_file );
+        }
 
-    vlc_mutex_lock( p_sub->p_lock );
-    p_sub->i_start = i_start;
-    vlc_mutex_unlock( p_sub->p_lock );
+        vlc_mutex_lock( p_sub->p_lock );
+        p_sub->i_start = i_start;
+        vlc_mutex_unlock( p_sub->p_lock );
+    }
 }
 

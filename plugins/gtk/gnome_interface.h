@@ -13,3 +13,4 @@ GtkWidget* create_intf_playlist (void);
 GtkWidget* create_intf_jump (void);
 GtkWidget* create_intf_preferences (void);
 GtkWidget* create_intf_open (void);
+GtkWidget* create_intf_messages (void);

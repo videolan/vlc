@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.32 2002/02/19 03:54:55 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.33 2002/02/20 05:56:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -532,9 +532,21 @@ gboolean GtkMessagesShow( GtkWidget       *widget,
                           GdkEventButton  *event,
                           gpointer         user_data)
 {
+    static GdkColor black = { 0, 0x0000, 0x0000, 0x0000 };
+    static GdkColormap *colormap;
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+
     gtk_widget_show( p_intf->p_sys->p_messages );
+    colormap = gdk_colormap_get_system ();
+    gdk_color_alloc( colormap, &black );
+    gdk_window_set_background( p_intf->p_sys->p_messages_text->text_area,
+                               &black );
+
     gdk_window_raise( p_intf->p_sys->p_messages->window );
+
+    gtk_text_set_point( p_intf->p_sys->p_messages_text,
+                    gtk_text_get_length( p_intf->p_sys->p_messages_text ) );
+
     return TRUE;
 }
 

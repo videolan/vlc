@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: intf_msg.c,v 1.44 2002/02/19 03:54:56 sam Exp $
+ * $Id: intf_msg.c,v 1.45 2002/02/20 05:56:18 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -69,8 +69,8 @@ msg_bank_t msg_bank;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void QueueMsg        ( int, char *, va_list );
-static void FlushLockedMsg  ( void );
+static void QueueMsg ( int, int, char *, va_list );
+static void FlushMsg ( void );
 
 #if defined( WIN32 )
 static char *ConvertPrintfFormatString ( char *psz_format );
@@ -111,7 +111,7 @@ void intf_MsgDestroy( void )
     }
 
     /* Free remaining messages */
-    FlushLockedMsg( );
+    FlushMsg( );
 }
 
 /*****************************************************************************
@@ -190,7 +190,7 @@ void intf_Msg( char *psz_format, ... )
     va_list ap;
 
     va_start( ap, psz_format );
-    QueueMsg( INTF_MSG_STD, psz_format, ap );
+    QueueMsg( INTF_MSG_STD, 0, psz_format, ap );
     va_end( ap );
 }
 
@@ -205,7 +205,7 @@ void intf_ErrMsg( char *psz_format, ... )
     va_list ap;
 
     va_start( ap, psz_format );
-    QueueMsg( INTF_MSG_ERR, psz_format, ap );
+    QueueMsg( INTF_MSG_ERR, 0, psz_format, ap );
     va_end( ap );
 }
 
@@ -219,12 +219,9 @@ void intf_WarnMsg( int i_level, char *psz_format, ... )
 {
     va_list ap;
     
-    if( i_level <= p_main->i_warning_level )
-    {
-        va_start( ap, psz_format );
-        QueueMsg( INTF_MSG_WARN, psz_format, ap );
-        va_end( ap );
-    }
+    va_start( ap, psz_format );
+    QueueMsg( INTF_MSG_WARN, i_level, psz_format, ap );
+    va_end( ap );
 }
 
 /*****************************************************************************
@@ -240,7 +237,7 @@ void intf_StatMsg( char *psz_format, ... )
     if( p_main->b_stats )
     {
         va_start( ap, psz_format );
-        QueueMsg( INTF_MSG_STAT, psz_format, ap );
+        QueueMsg( INTF_MSG_STAT, 0, psz_format, ap );
         va_end( ap );
     }
 }
@@ -292,7 +289,7 @@ void intf_WarnHexDump( int i_level, void *p_data, int i_size )
  * is full. If the message can't be converted to string in memory, it exit the
  * program. If the queue is not used, it prints the message immediately.
  *****************************************************************************/
-static void QueueMsg( int i_type, char *psz_format, va_list ap )
+static void QueueMsg( int i_type, int i_level, char *psz_format, va_list ap )
 {
     char *                  psz_str;             /* formatted message string */
     msg_item_t *            p_item;                /* pointer to message */
@@ -332,11 +329,15 @@ static void QueueMsg( int i_type, char *psz_format, va_list ap )
     vlc_mutex_lock( &msg_bank.lock );
 
     /* Send the message to stderr */
-    fprintf( stderr, "%s\n", psz_str );
+    if( i_level <= p_main->i_warning_level )
+    {
+        fprintf( stderr, "%s\n", psz_str );
+    }
 
+    /* Put the message in the queue if there is room for it */
     if( ((msg_bank.i_stop - msg_bank.i_start + 1) % INTF_MSG_QSIZE) == 0 )
     {
-        FlushLockedMsg( );
+        FlushMsg( );
 
         if( ((msg_bank.i_stop - msg_bank.i_start + 1) % INTF_MSG_QSIZE) == 0 )
         {
@@ -357,12 +358,12 @@ static void QueueMsg( int i_type, char *psz_format, va_list ap )
 }
 
 /*****************************************************************************
- * FlushLockedMsg                                                       (ok ?)
+ * FlushMsg
  *****************************************************************************
  * Print all messages remaining in queue. MESSAGE QUEUE MUST BE LOCKED, since
  * this function does not check the lock.
  *****************************************************************************/
-static void FlushLockedMsg ( void )
+static void FlushMsg ( void )
 {
     int i_index, i_start, i_stop;
 

@@ -102,6 +102,13 @@ static GnomeUIInfo menubar_view_menu_uiinfo[] =
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ATTACH,
     0, (GdkModifierType) 0, NULL
   },
+  {
+    GNOME_APP_UI_ITEM, N_("Messages..."),
+    N_("Open the messages window"),
+    (gpointer) GnomeMenubarMessagesActivate, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
   GNOMEUIINFO_END
 };
 
@@ -296,6 +303,11 @@ create_intf_window (void)
                             menubar_view_menu_uiinfo[8].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_set_sensitive (menubar_view_menu_uiinfo[8].widget, FALSE);
+
+  gtk_widget_ref (menubar_view_menu_uiinfo[9].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_messages",
+                            menubar_view_menu_uiinfo[9].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (menubar_uiinfo[2].widget);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_settings",
@@ -3492,5 +3504,67 @@ create_intf_open (void)
   GTK_WIDGET_SET_FLAGS (button3, GTK_CAN_DEFAULT);
 
   return intf_open;
+}
+
+GtkWidget*
+create_intf_messages (void)
+{
+  GtkWidget *intf_messages;
+  GtkWidget *dialog_vbox6;
+  GtkWidget *scrolledwindow1;
+  GtkWidget *messages_textbox;
+  GtkWidget *dialog_action_area6;
+  GtkWidget *messages_ok;
+
+  intf_messages = gnome_dialog_new (_("Messages"), NULL);
+  gtk_object_set_data (GTK_OBJECT (intf_messages), "intf_messages", intf_messages);
+  gtk_window_set_policy (GTK_WINDOW (intf_messages), TRUE, TRUE, FALSE);
+  gnome_dialog_close_hides (GNOME_DIALOG (intf_messages), TRUE);
+
+  dialog_vbox6 = GNOME_DIALOG (intf_messages)->vbox;
+  gtk_object_set_data (GTK_OBJECT (intf_messages), "dialog_vbox6", dialog_vbox6);
+  gtk_widget_show (dialog_vbox6);
+
+  scrolledwindow1 = gtk_scrolled_window_new (NULL, NULL);
+  gtk_widget_ref (scrolledwindow1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_messages), "scrolledwindow1", scrolledwindow1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (scrolledwindow1);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox6), scrolledwindow1, TRUE, TRUE, 0);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow1), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+
+  messages_textbox = gtk_text_new (NULL, NULL);
+  gtk_widget_ref (messages_textbox);
+  gtk_object_set_data_full (GTK_OBJECT (intf_messages), "messages_textbox", messages_textbox,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (messages_textbox);
+  gtk_container_add (GTK_CONTAINER (scrolledwindow1), messages_textbox);
+  gtk_widget_set_usize (messages_textbox, 600, 400);
+
+  dialog_action_area6 = GNOME_DIALOG (intf_messages)->action_area;
+  gtk_object_set_data (GTK_OBJECT (intf_messages), "dialog_action_area6", dialog_action_area6);
+  gtk_widget_show (dialog_action_area6);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area6), GTK_BUTTONBOX_END);
+  gtk_button_box_set_spacing (GTK_BUTTON_BOX (dialog_action_area6), 8);
+
+  gnome_dialog_append_button (GNOME_DIALOG (intf_messages), GNOME_STOCK_BUTTON_OK);
+  messages_ok = GTK_WIDGET (g_list_last (GNOME_DIALOG (intf_messages)->buttons)->data);
+  gtk_widget_ref (messages_ok);
+  gtk_object_set_data_full (GTK_OBJECT (intf_messages), "messages_ok", messages_ok,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (messages_ok);
+  GTK_WIDGET_SET_FLAGS (messages_ok, GTK_CAN_DEFAULT);
+
+  gtk_signal_connect (GTK_OBJECT (intf_messages), "destroy",
+                      GTK_SIGNAL_FUNC (gtk_widget_hide),
+                      "intf_playlist");
+  gtk_signal_connect (GTK_OBJECT (intf_messages), "delete_event",
+                      GTK_SIGNAL_FUNC (gtk_widget_hide),
+                      "intf_playlist");
+  gtk_signal_connect (GTK_OBJECT (messages_ok), "clicked",
+                      GTK_SIGNAL_FUNC (GtkMessagesOk),
+                      "intf_messages");
+
+  return intf_messages;
 }
 

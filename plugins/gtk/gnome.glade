@@ -267,6 +267,19 @@
 	      <right_justify>False</right_justify>
 	      <stock_icon>GNOME_STOCK_MENU_ATTACH</stock_icon>
 	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_messages</name>
+	      <tooltip>Open the messages window</tooltip>
+	      <signal>
+		<name>activate</name>
+		<handler>GnomeMenubarMessagesActivate</handler>
+		<last_modification_time>Wed, 20 Feb 2002 05:43:55 GMT</last_modification_time>
+	      </signal>
+	      <label>Messages...</label>
+	      <right_justify>False</right_justify>
+	    </widget>
 	  </widget>
 	</widget>
 
@@ -5361,6 +5374,101 @@ Stereo
 	<yalign>0.5</yalign>
 	<xpad>0</xpad>
 	<ypad>0</ypad>
+      </widget>
+    </widget>
+  </widget>
+</widget>
+
+<widget>
+  <class>GnomeDialog</class>
+  <name>intf_messages</name>
+  <signal>
+    <name>destroy</name>
+    <handler>gtk_widget_hide</handler>
+    <data>&quot;intf_playlist&quot;</data>
+    <last_modification_time>Wed, 20 Feb 2002 05:11:27 GMT</last_modification_time>
+  </signal>
+  <signal>
+    <name>delete_event</name>
+    <handler>gtk_widget_hide</handler>
+    <data>&quot;intf_playlist&quot;</data>
+    <last_modification_time>Wed, 20 Feb 2002 05:11:27 GMT</last_modification_time>
+  </signal>
+  <title>Messages</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
+  <allow_shrink>True</allow_shrink>
+  <allow_grow>True</allow_grow>
+  <auto_shrink>False</auto_shrink>
+  <auto_close>False</auto_close>
+  <hide_on_close>True</hide_on_close>
+
+  <widget>
+    <class>GtkVBox</class>
+    <child_name>GnomeDialog:vbox</child_name>
+    <name>dialog-vbox6</name>
+    <homogeneous>False</homogeneous>
+    <spacing>8</spacing>
+    <child>
+      <padding>4</padding>
+      <expand>True</expand>
+      <fill>True</fill>
+    </child>
+
+    <widget>
+      <class>GtkHButtonBox</class>
+      <child_name>GnomeDialog:action_area</child_name>
+      <name>dialog-action_area6</name>
+      <layout_style>GTK_BUTTONBOX_END</layout_style>
+      <spacing>8</spacing>
+      <child_min_width>85</child_min_width>
+      <child_min_height>27</child_min_height>
+      <child_ipad_x>7</child_ipad_x>
+      <child_ipad_y>0</child_ipad_y>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>True</fill>
+	<pack>GTK_PACK_END</pack>
+      </child>
+
+      <widget>
+	<class>GtkButton</class>
+	<name>messages_ok</name>
+	<can_default>True</can_default>
+	<can_focus>True</can_focus>
+	<signal>
+	  <name>clicked</name>
+	  <handler>GtkMessagesOk</handler>
+	  <data>&quot;intf_messages&quot;</data>
+	  <last_modification_time>Wed, 20 Feb 2002 05:12:11 GMT</last_modification_time>
+	</signal>
+	<stock_button>GNOME_STOCK_BUTTON_OK</stock_button>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkScrolledWindow</class>
+      <name>scrolledwindow1</name>
+      <hscrollbar_policy>GTK_POLICY_NEVER</hscrollbar_policy>
+      <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
+      <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
+      <vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
+      <child>
+	<padding>0</padding>
+	<expand>True</expand>
+	<fill>True</fill>
+      </child>
+
+      <widget>
+	<class>GtkText</class>
+	<name>messages_textbox</name>
+	<width>600</width>
+	<height>400</height>
+	<can_focus>True</can_focus>
+	<editable>False</editable>
+	<text></text>
       </widget>
     </widget>
   </widget>
