@@ -131,7 +131,7 @@ struct sout_stream_sys_t
     sout_stream_t   *p_out;
     int             i_gop;
     int             i_qscale;
-    AVRational      sample_aspect_ratio;
+    int             i_aspect;
     sout_stream_id_t *pp_audio_ids[MAX_AUDIO];
 
     /* Pictures */
@@ -233,22 +233,20 @@ static int Open( vlc_object_t *p_this )
         if( psz_parser )
         {
             *psz_parser++ = '\0';
-            p_sys->sample_aspect_ratio.num = atoi( val.psz_string );
-            p_sys->sample_aspect_ratio.den = atoi( psz_parser );
+            p_sys->i_aspect = atoi( val.psz_string ) * VOUT_ASPECT_FACTOR
+                / atoi( psz_parser );
         }
         else
         {
             msg_Warn( p_stream, "bad aspect ratio %s", val.psz_string );
-            p_sys->sample_aspect_ratio.num = 4;
-            p_sys->sample_aspect_ratio.den = 3;
+            p_sys->i_aspect = 4 * VOUT_ASPECT_FACTOR / 3;
         }
 
         free( val.psz_string );
     }
     else
     {
-        p_sys->sample_aspect_ratio.num = 4;
-        p_sys->sample_aspect_ratio.den = 3;
+        p_sys->i_aspect = 4 * VOUT_ASPECT_FACTOR / 3;
     }
 
     var_Get( p_stream, SOUT_CFG_PREFIX "port", &val );
@@ -695,6 +693,8 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
     {
         /* Create a new encoder. */
         int i_ff_codec = CODEC_ID_MPEG2VIDEO;
+        int i_aspect_num, i_aspect_den;
+
         if( i_ff_codec == 0 )
         {
             msg_Err( p_stream, "cannot find encoder" );
@@ -732,11 +732,16 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
 
         id->ff_enc_c->width = p_sys->p_pictures[p_sys->i_cmd-1].format.i_width;
         id->ff_enc_c->height = p_sys->p_pictures[p_sys->i_cmd-1].format.i_height;
+        av_reduce( &i_aspect_num, &i_aspect_den,
+                   p_sys->i_aspect,
+                   VOUT_ASPECT_FACTOR, 1 << 30 /* something big */ );
+        av_reduce( &id->ff_enc_c->sample_aspect_ratio.num,
+                   &id->ff_enc_c->sample_aspect_ratio.den,
+                   i_aspect_num * (int64_t)id->ff_enc_c->height,
+                   i_aspect_den * (int64_t)id->ff_enc_c->width, 1 << 30 );
 
         id->ff_enc_c->frame_rate    = 25; /* FIXME */
         id->ff_enc_c->frame_rate_base = 1;
-        memcpy( &id->ff_enc_c->sample_aspect_ratio, &p_sys->sample_aspect_ratio,
-                sizeof(AVRational) );
 
         id->ff_enc_c->gop_size = 200;
         id->ff_enc_c->max_b_frames = 0;
