@@ -1,12 +1,12 @@
 /*****************************************************************************
  * intf.h: MacOS X interface plugin
  *****************************************************************************
- * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.54 2004/01/04 21:44:44 kuehne Exp $
+ * Copyright (C) 2002-2004 VideoLAN
+ * $Id: intf.h,v 1.55 2004/01/09 22:11:04 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
- *          Derk-Jan Hartman <thedj@users.sourceforge.net>
+ *          Derk-Jan Hartman <hartman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -130,6 +130,7 @@ struct intf_sys_t
     IBOutlet id o_err_bug_lbl;
     IBOutlet id o_err_btn_msgs; /* Open Messages  */
     IBOutlet id o_err_btn_dismiss;
+    IBOutlet id o_err_ckbk_surpress;
 
     IBOutlet id o_info_window;  /* Info panel     */
 

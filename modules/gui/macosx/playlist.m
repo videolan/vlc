@@ -1,11 +1,11 @@
 /*****************************************************************************
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
- * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.50 2004/01/05 13:07:03 zorglub Exp $
+ * Copyright (C) 2002-2004 VideoLAN
+ * $Id: playlist.m,v 1.51 2004/01/09 22:11:04 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Derk-Jan Hartman <thedj@users.sourceforge.net>
+ *          Derk-Jan Hartman <hartman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -145,6 +145,7 @@
     [o_mi_selectall setTitle: _NS("Select All")];
     [[o_tc_name headerCell] setStringValue:_NS("Name")];
     [[o_tc_author headerCell] setStringValue:_NS("Author")];
+    [[o_tc_duration headerCell] setStringValue:_NS("Duration")];
     [o_random_ckb setTitle: _NS("Shuffle")];
     [o_loop_ckb setTitle: _NS("Repeat Playlist")];
     [o_repeat_ckb setTitle: _NS("Repeat Item")];
@@ -342,25 +343,24 @@
     {
         /* One item */
         NSDictionary *o_one_item;
-        int j;
-        int i_total_options = 0;
+        int j, i_new_position = -1;
         int i_mode = PLAYLIST_INSERT;
         BOOL b_rem = FALSE, b_dir = FALSE;
-        NSString *o_url, *o_name;
+        NSString *o_uri, *o_name;
         NSArray *o_options;
-        char **ppsz_options = NULL;
+        NSURL *o_true_file;
     
         /* Get the item */
         o_one_item = [o_array objectAtIndex: i_item];
-        o_url = (NSString *)[o_one_item objectForKey: @"ITEM_URL"];
+        o_uri = (NSString *)[o_one_item objectForKey: @"ITEM_URL"];
         o_name = (NSString *)[o_one_item objectForKey: @"ITEM_NAME"];
         o_options = (NSArray *)[o_one_item objectForKey: @"ITEM_OPTIONS"];
         
         /* If no name, then make a guess */
-        if( !o_name) o_name = [[NSFileManager defaultManager] displayNameAtPath: o_url];
+        if( !o_name) o_name = [[NSFileManager defaultManager] displayNameAtPath: o_uri];
     
-        if( [[NSFileManager defaultManager] fileExistsAtPath:o_url isDirectory:&b_dir] && b_dir &&
-            [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath: o_url isRemovable: &b_rem
+        if( [[NSFileManager defaultManager] fileExistsAtPath:o_uri isDirectory:&b_dir] && b_dir &&
+            [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath: o_uri isRemovable: &b_rem
                     isWritable:NULL isUnmountable:NULL description:NULL type:NULL] && b_rem   )
         {
             /* All of this is to make sure CD's play when you D&D them on VLC */
@@ -368,50 +368,38 @@
             struct statfs *buf;
             char *psz_dev, *temp;
             buf = (struct statfs *) malloc (sizeof(struct statfs));
-            statfs( [o_url fileSystemRepresentation], buf );
+            statfs( [o_uri fileSystemRepresentation], buf );
             psz_dev = strdup(buf->f_mntfromname);
             free( buf );
             temp = strrchr( psz_dev , 's' );
             psz_dev[temp - psz_dev] = '\0';
-            o_url = [NSString stringWithCString: psz_dev ];
+            o_uri = [NSString stringWithCString: psz_dev ];
         }
     
         if (i_item == 0 && !b_enqueue)
             i_mode |= PLAYLIST_GO;
-    
-        if( o_options && [o_options count] > 0 )
+        
+        /* Add the item */
+        i_new_position = playlist_Add( p_playlist, [o_uri fileSystemRepresentation], 
+                      [o_name UTF8String], i_mode, 
+                      i_position == -1 ? PLAYLIST_END : i_position + i_item);
+        
+        /* Add the options, when there are any */
+        if( o_options )
         {
-            /* Count the input options */
-            i_total_options = [o_options count];
-    
-            /* Allocate ppsz_options */
-            for( j = 0; j < i_total_options; j++ )
+            for( j = 0; j < [o_options count]; j++ )
             {
-                if( !ppsz_options )
-                    ppsz_options = (char **)malloc( sizeof(char *) * i_total_options );
-    
-                ppsz_options[j] = strdup([[o_options objectAtIndex:j] UTF8String]);
+                playlist_AddOption( p_playlist, i_new_position,
+                 strdup( [[o_options objectAtIndex:j] UTF8String] ) );
             }
         }
     
-        playlist_Add( p_playlist, [o_url fileSystemRepresentation], 
-                      [o_name UTF8String], i_mode, 
-                      i_position == -1 ? PLAYLIST_END : i_position + i_item);
-/*-1, 
-            (ppsz_options != NULL ) ? (const char **)ppsz_options : 0, i_total_options,
-            i_mode, i_position == -1 ? PLAYLIST_END : i_position + i_item);*/
-    
-        /* clean up */
-        for( j = 0; j < i_total_options; j++ )
-            free( ppsz_options[j] );
-        if( ppsz_options ) free( ppsz_options );
-    
         /* Recent documents menu */
-        NSURL *o_true_url = [NSURL fileURLWithPath: o_url];
-        if( o_true_url != nil )
+        o_true_file = [NSURL fileURLWithPath: o_uri];
+        if( o_true_file != nil )
         { 
             [[NSDocumentController sharedDocumentController]
-                noteNewRecentDocumentURL: o_true_url]; 
+                noteNewRecentDocumentURL: o_true_file]; 
         }
     }
 
@@ -505,7 +493,7 @@
     {
         vlc_mutex_lock( &p_playlist->object_lock );
         o_value = [[NSString stringWithUTF8String: 
-            p_playlist->pp_items[i_row]->psz_name] lastPathComponent]; 
+            p_playlist->pp_items[i_row]->psz_name] lastPathComponent];
         vlc_mutex_unlock( &p_playlist->object_lock );
     }
     else if( [[o_tc identifier] isEqualToString:@"2"] )
@@ -514,6 +502,20 @@
         o_value = [NSString stringWithUTF8String: 
             playlist_GetInfo(p_playlist, i_row ,_("General"),_("Author") )];
         vlc_mutex_unlock( &p_playlist->object_lock );
+    }
+    else if( [[o_tc identifier] isEqualToString:@"3"] )
+    {
+        char psz_duration[MSTRTIME_MAX_SIZE];
+        mtime_t dur = p_playlist->pp_items[i_row]->i_duration;
+        if( dur != -1 )
+        {
+            secstotimestr( psz_duration, dur/1000000 );
+            o_value = [NSString stringWithUTF8String: psz_duration];
+        }
+        else
+        {
+            o_value = @"-:--:--";
+        }
     }
 
     vlc_object_release( p_playlist );

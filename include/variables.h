@@ -1,10 +1,11 @@
 /*****************************************************************************
  * variables.h: variables handling
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.20 2004/01/09 20:36:21 hartman Exp $
+ * Copyright (C) 2002-2004 VideoLAN
+ * $Id: variables.h,v 1.21 2004/01/09 22:11:04 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Gildas Bazin <gbazin@netcourrier.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

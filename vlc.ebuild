@@ -1,10 +1,10 @@
 ###############################################################################
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
-# Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.24 2004/01/08 22:37:59 hartman Exp $
+# Copyright (C) 2003-2004 VideoLAN
+# $Id: vlc.ebuild,v 1.25 2004/01/09 22:11:04 hartman Exp $
 #
-# Authors: Derk-Jan Hartman <thedj at users.sf.net>
+# Authors: Derk-Jan Hartman <hartman at videolan dot org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

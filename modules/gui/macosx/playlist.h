@@ -1,11 +1,11 @@
 /*****************************************************************************
  * playlist.h: MacOS X interface plugin
  *****************************************************************************
- * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.h,v 1.16 2003/12/11 19:34:46 hartman Exp $
+ * Copyright (C) 2002-2004 VideoLAN
+ * $Id: playlist.h,v 1.17 2004/01/09 22:11:04 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Derk-Jan Hartman <thedj@users.sourceforge.net>
+ *          Derk-Jan Hartman <hartman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@
     IBOutlet id o_status_field;
     IBOutlet id o_tc_name;
     IBOutlet id o_tc_author;
+    IBOutlet id o_tc_duration;
 
     IBOutlet id o_ctx_menu;
     IBOutlet id o_mi_save_playlist;

@@ -2,9 +2,9 @@
  * info.m: MacOS X info panel
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: info.m,v 1.8 2003/10/19 13:39:12 hartman Exp $
+ * $Id: info.m,v 1.9 2004/01/09 22:11:04 hartman Exp $
  *
- * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
+ * Authors: Derk-Jan Hartman <hartman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

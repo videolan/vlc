@@ -1,8 +1,8 @@
 /*****************************************************************************
  * intf.m: MacOS X interface plugin
  *****************************************************************************
- * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.112 2004/01/05 18:43:17 bigben Exp $
+ * Copyright (C) 2002-2004 VideoLAN
+ * $Id: intf.m,v 1.113 2004/01/09 22:11:04 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -556,6 +556,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     [o_err_bug_lbl setStringValue: _NS("If you believe that it is a bug, please follow the instructions at:")]; 
     [o_err_btn_msgs setTitle: _NS("Open Messages Window")];
     [o_err_btn_dismiss setTitle: _NS("Dismiss")];
+    [o_err_ckbk_surpress setTitle: _NS("Surpress further errors")];
 
     [o_info_window setTitle: _NS("Info")];
 }
@@ -940,6 +941,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 {
     int i_start, i_stop;
     intf_thread_t * p_intf = [NSApp getIntf];
+    vlc_value_t quiet;
 
     vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
     i_stop = *p_intf->p_sys->p_sub->pi_stop;
@@ -994,7 +996,9 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
             [o_msg_lock unlock];
 
-            if( i_type == 1 )
+            var_Get( p_intf->p_vlc, "verbose", &quiet );
+
+            if( i_type == 1 && quiet.i_int > -1 )
             {
                 NSString *o_my_msg = [NSString stringWithFormat: @"%s: %s\n",
                     p_intf->p_sys->p_sub->p_msg[i_start].psz_module,
@@ -1212,6 +1216,14 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
 - (IBAction)closeError:(id)sender
 {
+    vlc_value_t val;
+    intf_thread_t * p_intf = [NSApp getIntf];
+    
+    if( [o_err_ckbk_surpress state] == NSOnState )
+    {
+        val.i_int = -1;
+        var_Set( p_intf->p_vlc, "verbose", val );
+    }
     [o_err_msg setString: @""];
     [o_error performClose: self];
 }

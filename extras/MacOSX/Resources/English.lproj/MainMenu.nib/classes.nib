@@ -90,6 +90,7 @@
                 "o_err_btn_dismiss" = id; 
                 "o_err_btn_msgs" = id; 
                 "o_err_bug_lbl" = id; 
+                "o_err_ckbk_surpress" = id; 
                 "o_err_lbl" = id; 
                 "o_err_msg" = id; 
                 "o_error" = id; 
@@ -349,6 +350,7 @@
                 "o_status_field" = id; 
                 "o_table_view" = id; 
                 "o_tc_author" = id; 
+                "o_tc_duration" = id; 
                 "o_tc_name" = id; 
                 "o_window" = id; 
             }; 
