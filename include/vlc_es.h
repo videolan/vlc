@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vlc_es.h
+ * vlc_es.h: Elementary stream formats descriptions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vlc_es.h,v 1.6 2004/01/19 18:15:29 fenrir Exp $
+ * $Id: vlc_es.h,v 1.7 2004/01/25 21:39:37 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -25,25 +25,42 @@
 #define _VLC_ES_H 1
 
 /**
- * Description of a audio frame
+ * \file
+ * This file defines the elementary streams format types
+ */
+
+/**
+ * video palette data
+ * \see viedo_format_t
+ * \see subs_format_t
+ */
+struct video_palette_t
+{
+    int i_dummy; /**< to keep the compatibility with ffmpeg's palette */
+
+    uint32_t palette[256]; /**< 4-byte ARGB palette entries, stored in native
+                            * byte order */
+};
+
+/**
+ * audio format description
  */
 struct audio_format_t
 {
-    vlc_fourcc_t        i_format;
-
-    unsigned int        i_rate;
+    vlc_fourcc_t i_format;                          /**< audio format fourcc */
+    unsigned int i_rate;                              /**< audio sample-rate */
 
     /* Describes the channels configuration of the samples (ie. number of
      * channels which are available in the buffer, and positions). */
-    uint32_t            i_physical_channels;
+    uint32_t     i_physical_channels;
 
     /* Describes from which original channels, before downmixing, the
      * buffer is derived. */
-    uint32_t            i_original_channels;
+    uint32_t     i_original_channels;
 
     /* Optional - for A/52, SPDIF and DTS types : */
     /* Bytes used by one compressed frame, depends on bitrate. */
-    unsigned int        i_bytes_per_frame;
+    unsigned int i_bytes_per_frame;
 
     /* Number of sampleframes contained in one compressed frame. */
     unsigned int        i_frame_length;
@@ -60,7 +77,7 @@ struct audio_format_t
 };
 
 /**
- * Description of a video frame
+ * video format description
  */
 struct video_format_t
 {
@@ -78,10 +95,12 @@ struct video_format_t
 
     unsigned int i_frame_rate;                     /**< frame rate numerator */
     unsigned int i_frame_rate_base;              /**< frame rate denominator */
+
+    video_palette_t *p_palette;              /**< video palette from demuxer */
 };
 
 /**
- * Description of subs
+ * subtitles format description
  */
 struct subs_format_t
 {
@@ -174,4 +193,3 @@ static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
 }
 
 #endif
-

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.104 2004/01/24 20:40:46 fenrir Exp $
+ * $Id: vlc_common.h,v 1.105 2004/01/25 21:39:37 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -228,7 +228,8 @@ typedef struct stream_sys_t stream_sys_t;
 typedef struct audio_format_t audio_format_t;
 typedef struct video_format_t video_format_t;
 typedef struct subs_format_t subs_format_t;
-typedef struct es_format_t  es_format_t;
+typedef struct es_format_t es_format_t;
+typedef struct video_palette_t video_palette_t;
 
 /* NInput */
 typedef struct stream_t stream_t;

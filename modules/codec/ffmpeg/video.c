@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.61 2004/01/18 21:30:25 fenrir Exp $
+ * $Id: video.c,v 1.62 2004/01/25 21:39:37 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -335,9 +335,13 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_dec->fmt_out.i_cat = VIDEO_ES;
     p_dec->fmt_out.i_codec = ffmpeg_PixFmtToChroma( p_context->pix_fmt );
 
-    /* Setup dummy palette to avoid segfaults with some codecs */
+    /* Setup palette */
 #if LIBAVCODEC_BUILD >= 4688
-    p_sys->p_context->palctrl = &palette_control;
+    if( p_dec->fmt_in.video.p_palette )
+        p_sys->p_context->palctrl =
+            (AVPaletteControl *)p_dec->fmt_in.video.p_palette;
+    else
+        p_sys->p_context->palctrl = &palette_control;
 #endif
 
     /* ***** Open the codec ***** */

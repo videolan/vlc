@@ -2,7 +2,7 @@
  * demux.c: demuxer using ffmpeg (libavformat).
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: demux.c,v 1.3 2004/01/15 19:46:32 gbazin Exp $
+ * $Id: demux.c,v 1.4 2004/01/25 21:39:37 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -176,6 +176,11 @@ int E_(OpenDemux)( vlc_object_t *p_this )
             es_format_Init( &fmt, VIDEO_ES, fcc );
             fmt.video.i_width = cc->width;
             fmt.video.i_height = cc->height;
+            if( cc->palctrl )
+            {
+                fmt.video.p_palette = malloc( sizeof(video_palette_t) );
+                *fmt.video.p_palette = *(video_palette_t *)cc->palctrl;
+            }
             break;
         default:
             break;
