@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.5 2003/11/23 05:30:56 fenrir Exp $
+ * $Id: cinepak.c,v 1.6 2003/11/23 13:25:32 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -184,7 +184,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
         }
 
-        p_pic->date = p_block->i_pts;
+        p_pic->date = p_block->i_pts ? p_block->i_pts : p_block->i_dts;
     }
 
     block_Release( p_block );

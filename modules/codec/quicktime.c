@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.17 2003/11/23 03:45:11 fenrir Exp $
+ * $Id: quicktime.c,v 1.18 2003/11/23 13:25:32 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -812,9 +812,10 @@ exit_error:
 static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t       *p_block;
+    picture_t     *p_pic;
+    mtitme        i_pts;
 
-    block_t         *p_block;
-    picture_t       *p_pic;
     ComponentResult cres;
 
 #ifdef LOADER
@@ -839,7 +840,9 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
     *pp_block = NULL;
 
-    if( p_block->i_pts < mdate() )
+    i_pts = p_block->i_pts ? p_block->i_pts : p_block->i_dts;
+
+    if( i_pts < mdate() )
     {
         p_sys->i_late++;
     }
@@ -877,10 +880,9 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                      (int)cres,(int)-cres, (int)cres );
         }
 
-        memcpy( p_pic->p[0].p_pixels,
-                p_sys->plane,
+        memcpy( p_pic->p[0].p_pixels, p_sys->plane,
                 p_dec->fmt_in.video.i_width * p_dec->fmt_in.video.i_height * 2 );
-        p_pic->date = p_block->i_pts;
+        p_pic->date = i_pts;
     }
     block_Release( p_block );
 
