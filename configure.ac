@@ -3587,7 +3587,7 @@ dnl
 dnl  WinCE GUI module
 dnl
 if test "${SYS}" = "mingwce"; then
-  VLC_ADD_PLUGINS([wince])
+  VLC_ADD_BUILTINS([wince])
   VLC_ADD_CXXFLAGS([wince],[])
   VLC_ADD_LDFLAGS([wince],[-lcommctrl -lcommdlg -laygshell])
   dnl Gross hack
