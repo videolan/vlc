@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.23 2001/03/25 17:09:14 richards Exp $
+ * $Id: vout_beos.cpp,v 1.24 2001/04/02 22:40:07 richards Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -129,7 +129,15 @@ int32 DrawingThread(void *data)
     w->Lock();
        if( w->fDirty )
             {
-           	w->view->DrawBitmap(w->bitmap[w->i_buffer_index], w->bitmap[w->i_buffer_index]->Bounds(), w->Bounds());
+           	if(w->fUsingOverlay)
+				{
+				rgb_color key;
+				w->view->SetViewOverlay(w->bitmap[w->i_buffer_index], w->bitmap[w->i_buffer_index]->Bounds(), w->Bounds(), &key, B_FOLLOW_ALL,
+				B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL|B_OVERLAY_TRANSFER_CHANNEL);
+				w->view->SetViewColor(key);
+				}
+           	else
+           		w->view->DrawBitmap(w->bitmap[w->i_buffer_index], w->bitmap[w->i_buffer_index]->Bounds(), w->Bounds());
             w->fDirty = false;
             }
     w->Unlock();
@@ -158,13 +166,15 @@ VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_o
     view = new VLCView(Bounds());
     AddChild(view);
 	bitmap[0] = new BBitmap(Bounds(), B_BITMAP_WILL_OVERLAY|B_BITMAP_RESERVE_OVERLAY_CHANNEL, B_YCbCr422);
+	bitmap[1] = new BBitmap(Bounds(), B_BITMAP_WILL_OVERLAY, B_YCbCr422);
 	fUsingOverlay = true;
 	i_screen_depth = 16;
 	p_vout->b_YCbr = true;
 	
-	if (bitmap[0]->InitCheck() != B_OK)
+	if ((bitmap[0]->InitCheck() != B_OK) || (bitmap[1]->InitCheck() != B_OK))
 	{
 		delete bitmap[0];
+		delete bitmap[1];
 		p_vout->b_YCbr = false;
 		fUsingOverlay = false;
 		BScreen *screen;
@@ -190,8 +200,6 @@ VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_o
 			bitmap[1] = new BBitmap(Bounds(), B_RGB32);
 	   		i_screen_depth = 32;
 			}
-		memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
-	 	memset(bitmap[1]->Bits(), 0, bitmap[1]->BitsLength());
 	 	SetTitle(VOUT_TITLE " (BBitmap output)");
 	 }
 
@@ -204,15 +212,16 @@ VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_o
 	 	SetTitle(VOUT_TITLE " (Overlay output)");
 		GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight); 
 		SetSizeLimits((float) Bounds().IntegerWidth(), maxWidth, (float) Bounds().IntegerHeight(), maxHeight);
-		memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
 		}
-	else
+//	else
 		{
     	fDrawThreadID = spawn_thread(DrawingThread, "drawing_thread",
                     B_DISPLAY_PRIORITY, (void*) this);
     	resume_thread(fDrawThreadID);
     	}
 
+	memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
+ 	memset(bitmap[1]->Bits(), 0, bitmap[1]->BitsLength());
 	i_bytes_per_pixel = bitmap[0]->BytesPerRow()/bitmap[0]->Bounds().IntegerWidth();
     fRowBytes = bitmap[0]->BytesPerRow();
     fDirty = false;
@@ -225,13 +234,13 @@ VideoWindow::~VideoWindow()
 
     Hide();
     Sync();
-    if(!fUsingOverlay)
-    	{
+//    if(!fUsingOverlay)
+//    	{
 	    teardownwindow = true;
 	    wait_for_thread(fDrawThreadID, &result);
     	delete bitmap[0];
     	delete bitmap[1];
-    	}
+//    	}
  }
 
 
@@ -430,7 +439,7 @@ int vout_Init( vout_thread_t *p_vout )
     p_vout->p_sys->i_width =         p_vout->i_width;
     p_vout->p_sys->i_height =        p_vout->i_height;    
 
-    if(p_win->fUsingOverlay)
+/*    if(p_win->fUsingOverlay)
     	{
 	    if(p_win->bitmap[0] != NULL)
 	    	{
@@ -447,7 +456,13 @@ int vout_Init( vout_thread_t *p_vout )
 	    	vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
    	                 (byte_t *)p_win->bitmap[1]->Bits());
    	        }
-    	}
+    	}*/
+	    if((p_win->bitmap[0] != NULL) && (p_win->bitmap[1] != NULL))
+	    	{
+	    	vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
+   	                 (byte_t *)p_win->bitmap[1]->Bits());
+   	        }
+    
     return( 0 );
 }
 
@@ -491,6 +506,8 @@ if( (p_vout->i_width  != p_vout->p_sys->i_width) ||
         	{
 	        p_win->Lock();
 	        p_win->view->ClearViewOverlay();
+	        delete p_win->bitmap[0];
+	        delete p_win->bitmap[1];
 	        p_vout->p_sys->i_width =    p_vout->i_width;
 	        p_vout->p_sys->i_height =   p_vout->i_height;;
 			p_win->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight); 
@@ -499,9 +516,12 @@ if( (p_vout->i_width  != p_vout->p_sys->i_width) ||
 	        p_win->bitmap[0] = new BBitmap(p_win->Bounds(),
         					B_BITMAP_WILL_OVERLAY|B_BITMAP_RESERVE_OVERLAY_CHANNEL,
         					B_YCbCr422);
+	        p_win->bitmap[0] = new BBitmap(p_win->Bounds(),
+        					B_BITMAP_WILL_OVERLAY, B_YCbCr422);
 			memset(p_win->bitmap[0]->Bits(), 0, p_win->bitmap[0]->BitsLength());
+			memset(p_win->bitmap[1]->Bits(), 0, p_win->bitmap[1]->BitsLength());
 			p_win->view->SetViewOverlay(p_win->bitmap[0], p_win->bitmap[0]->Bounds(), p_win->Bounds(), &key, B_FOLLOW_ALL,
-					B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL);
+					B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL|B_OVERLAY_TRANSFER_CHANNEL);
 			p_win->view->SetViewColor(key);
 			p_win->Unlock();
 		    vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
@@ -523,7 +543,10 @@ void vout_Display( vout_thread_t *p_vout )
     VideoWindow * p_win = p_vout->p_sys->p_window;
     
    	p_win->i_buffer_index = p_vout->i_buffer_index;
-   	p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
+   	if(p_win->fUsingOverlay)
+   		p_vout->i_buffer_index = p_vout->i_buffer_index & 1;
+   	else
+   		p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
     p_win->fDirty = true;
 }
 
