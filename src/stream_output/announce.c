@@ -467,7 +467,7 @@ int sout_SLPReg( sout_instance_t *p_sout, char * psz_url,
     return 0;
 
 #else /* This function should never be called if this is false */
-    return -1 
+    return -1;
 #endif
 }
 
@@ -507,6 +507,6 @@ int sout_SLPDereg( sout_instance_t *p_sout, char * psz_url,
     return 0;
 
 #else /* This function should never be called if this is false */
-    return -1 
+    return -1; 
 #endif
 }

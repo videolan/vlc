@@ -2,7 +2,7 @@
  * standard.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.9 2003/08/13 14:17:26 zorglub Exp $
+ * $Id: standard.c,v 1.10 2003/08/13 19:38:28 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -78,7 +78,9 @@ static int Open( vlc_object_t *p_this )
     char *psz_v6_scope = sout_cfg_find_value( p_stream->p_cfg, "sap_v6scope" );
     
     sout_cfg_t *p_sap_cfg = sout_cfg_find( p_stream->p_cfg, "sap" );
+#ifdef HAVE_SLP_H
     sout_cfg_t *p_slp_cfg = sout_cfg_find( p_stream->p_cfg, "slp" );
+#endif
     
     sout_access_out_t   *p_access;
     sout_mux_t          *p_mux;    
@@ -132,7 +134,7 @@ static int Open( vlc_object_t *p_this )
     }   
 
     /* *** Register with slp *** */
-    #ifdef HAVE_SLP_H
+#ifdef HAVE_SLP_H
     if( p_slp_cfg && ( strstr( psz_access, "udp" ) ||
                        strstr( psz_access ,  "rtp" ) ) )
     {
@@ -156,7 +158,7 @@ static int Open( vlc_object_t *p_this )
                     p_slp_cfg->psz_value ? p_slp_cfg->psz_value : psz_url);
         }
     }        
-    #endif
+#endif
     
     /* XXX beurk */
     p_sout->i_preheader = __MAX( p_sout->i_preheader, p_mux->i_preheader );
@@ -185,7 +187,7 @@ static void Close( vlc_object_t * p_this )
     if( p_sys->p_sap )
         sout_SAPDelete( (sout_instance_t *)p_this , p_sys->p_sap ); 
 
-    #ifdef HAVE_SLP_H
+#ifdef HAVE_SLP_H
     if( p_sys->p_slp )
     {
             sout_SLPDereg( (sout_instance_t *)p_this, 
@@ -193,7 +195,7 @@ static void Close( vlc_object_t * p_this )
                         p_sys->p_slp->psz_name);
             free( p_sys->p_slp);
     }
-    #endif
+#endif
     
     
     sout_MuxDelete( p_sys->p_mux );

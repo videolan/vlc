@@ -2,7 +2,7 @@
  * announce.h : Session announcement
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: announce.h,v 1.8 2003/08/13 14:17:26 zorglub Exp $
+ * $Id: announce.h,v 1.9 2003/08/13 19:38:27 gbazin Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -67,11 +67,9 @@ struct slp_session_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( sap_session_t *,            sout_SAPNew,         ( sout_instance_t *,char * , char * , int , char *) );
-VLC_EXPORT( void,            sout_SAPSend,        ( sout_instance_t *,sap_session_t *) );
-VLC_EXPORT( void,            sout_SAPDelete,      ( sout_instance_t *,sap_session_t * ) );
+VLC_EXPORT( sap_session_t *, sout_SAPNew, ( sout_instance_t *,char * , char * , int , char *) );
+VLC_EXPORT( void, sout_SAPSend, ( sout_instance_t *,sap_session_t *) );
+VLC_EXPORT( void, sout_SAPDelete, ( sout_instance_t *,sap_session_t * ) );
 
-#ifdef HAVE_SLP_H
-VLC_EXPORT( int,        sout_SLPReg,            (sout_instance_t*,char*,char*) );
-VLC_EXPORT( int,        sout_SLPDereg,          (sout_instance_t*,char*,char*) );
-#endif
+VLC_EXPORT( int, sout_SLPReg, (sout_instance_t*,char*,char*) );
+VLC_EXPORT( int, sout_SLPDereg, (sout_instance_t*,char*,char*) );
