@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.34 2003/11/05 17:57:29 gbazin Exp $
+ * $Id: streamout.cpp,v 1.35 2003/11/05 20:06:36 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -137,33 +137,6 @@ BEGIN_EVENT_TABLE(SoutDialog, wxDialog)
     EVT_TEXT(AnnounceAddr_Event, SoutDialog::OnAnnounceAddrChange)
 
 END_EVENT_TABLE()
-
-#if 0
-/*****************************************************************************
- * Demux dump event methods.
- *****************************************************************************/
-void OpenDialog::OnDemuxDumpEnable( wxCommandEvent& event )
-{
-    demuxdump_textctrl->Enable( event.GetInt() != 0 );
-    demuxdump_button->Enable( event.GetInt() != 0 );
-
-    if( event.GetInt() )
-    {
-        sout_checkbox->SetValue( 0 );
-        subsfile_checkbox->SetValue( 0 );
-        wxCommandEvent event = wxCommandEvent( wxEVT_NULL );
-        event.SetInt( 0 );
-        OnSoutEnable( event );
-        OnSubsFileEnable( event );
-    }
-
-    UpdateMRL( i_current_access_method );
-}
-
-void OpenDialog::OnDemuxDumpChange( wxCommandEvent& WXUNUSED(event) )
-{
-}
-#endif
 
 /*****************************************************************************
  * Constructor.
@@ -457,8 +430,6 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
                          wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     subpanel_sizer->Add( browse_button, 0,
                          wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
-    subpanel_sizer->Add( new wxPanel(access_subpanels[1], -1), 0,
-                         wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     subpanel_sizer->Add( new wxPanel(access_subpanels[1], -1), 0,
                          wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     dump_checkbox = new wxCheckBox( access_subpanels[1], FileDump_Event,
@@ -877,8 +848,9 @@ void SoutDialog::OnFileDump( wxCommandEvent& event )
     {
         if( i != FILE_ACCESS_OUT )
         {
-            access_subpanels[i]->Enable( !event.GetInt() );
             access_checkboxes[i]->Enable( !event.GetInt() );
+            access_subpanels[i]->Enable( !event.GetInt() &&
+                                         access_checkboxes[i]->IsChecked() );
         }
     }
 
