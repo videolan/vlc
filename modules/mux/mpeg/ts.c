@@ -77,16 +77,23 @@ static int     Open   ( vlc_object_t * );
 static void    Close  ( vlc_object_t * );
 
 #define VPID_TEXT N_("Video PID")
-#define VPID_LONGTEXT N_("Assign a fixed PID to the video stream")
+#define VPID_LONGTEXT N_("Assigns a fixed PID to the video stream. The PCR " \
+  "PID will automatically be the video.")
 #define APID_TEXT N_("Audio PID")
-#define APID_LONGTEXT N_("Assign a fixed PID to the audio stream")
+#define APID_LONGTEXT N_("Assigns a fixed PID to the audio stream.")
 
 #define SHAPING_TEXT N_("Shaping delay (ms)")
-#define SHAPING_LONGTEXT N_("This allows you to change the caching done " \
-  "inside the muxer itself.")
+#define SHAPING_LONGTEXT N_("If enabled, the TS muxer will cut the " \
+  "stream in slices of the given duration, and ensure a constant bitrate " \
+  "between the two boundaries. This avoids having huge bitrate peaks for " \
+  "reference frames, in particular.")
 #define KEYF_TEXT N_("Use keyframes")
-#define KEYF_LONGTEXT N_("If enabled, the shaping delay will be " \
-  "automatically optimized for the GOP size used in the video stream.")
+#define KEYF_LONGTEXT N_("If enabled, and shaping is specified, " \
+  "the TS muxer will place the boundaries at the end of I pictures. In " \
+  "that case, the shaping duration given by the user is a worse case " \
+  "used when no reference frame is available. This enhances the efficiency " \
+  "of the shaping algorithm, since I frames are usually the biggest " \
+  "frames in the stream.")
 
 #define PCR_TEXT N_("PCR delay (ms)")
 #define PCR_LONGTEXT N_("This option allows you to set at which interval " \

@@ -166,8 +166,8 @@ void E_(ClosePostproc)( decoder_t *, void * );
   "tolerance in kbit/s." )
 
 #define ENC_INTERLACE_TEXT N_( "Enable interlaced encoding" )
-#define ENC_INTERLACE_LONGTEXT N_( "Allows you to enable interlaced " \
-  "encoding." )
+#define ENC_INTERLACE_LONGTEXT N_( "Allows you to enable dedicated " \
+  "algorithms for interlaced frames." )
 
 #define ENC_PRE_ME_TEXT N_( "Enable pre motion estimation" )
 #define ENC_PRE_ME_LONGTEXT N_( "Allows you to enable the pre motion " \
@@ -183,28 +183,35 @@ void E_(ClosePostproc)( decoder_t *, void * );
 
 #define ENC_RC_BUF_AGGR_TEXT N_( "Rate control buffer aggressivity" )
 #define ENC_RC_BUF_AGGR_LONGTEXT N_( "Allows you to specify the rate control "\
-  "buffer agressivity." )
+  "buffer aggressivity." )
 
-#define ENC_QUANT_FACTOR_TEXT N_( "Quantization factor" )
-#define ENC_QUANT_FACTOR_LONGTEXT N_( "Allows you to specify the " \
-  "quantization factor." )
+#define ENC_IQUANT_FACTOR_TEXT N_( "I quantization factor" )
+#define ENC_IQUANT_FACTOR_LONGTEXT N_( "Allows you to specify the " \
+  "quantization factor of I frames, compared with P frames (for instance " \
+  "1.0 => same qscale for I and P frames)." )
 
 #define ENC_NOISE_RED_TEXT N_( "Noise reduction" )
-#define ENC_NOISE_RED_LONGTEXT N_( "Allows you to specify the noise " \
-  "reduction." )
+#define ENC_NOISE_RED_LONGTEXT N_( "Allows you to enable a simple noise " \
+  "reduction algorithm to lower the encoding length and bitrate, at the " \
+  "expense of lower quality frames." )
 
 #define ENC_MPEG4_MATRIX_TEXT N_( "Enable mpeg4 quantization matrix" )
 #define ENC_MPEG4_MATRIX_LONGTEXT N_( "Allows you to use the mpeg4 " \
-  "quantization matrix for mpeg2 encoding." )
+  "quantization matrix for mpeg2 encoding. This generally yields a " \
+  "better looking picture, while still retaining the compatibility with " \
+  "standard MPEG-2 decoders.")
 
 #define ENC_HQ_TEXT N_( "Quality level" )
 #define ENC_HQ_LONGTEXT N_( "Allows you to specify the quality level " \
-  "for the encoding." )
+  "for the encoding of motions vectors (this can slow down the encoding " \
+  "very much)." )
 
 #define ENC_HURRYUP_TEXT N_( "Hurry up" )
 #define ENC_HURRYUP_LONGTEXT N_( "Allows you to specify if the encoder " \
   "should make on-the-fly quality tradeoffs if your CPU can't keep up with " \
-  "the encoding rate." )
+  "the encoding rate. It will disable trellis quantization, then the rate " \
+  "distorsion of motion vectors (hq), and raise the noise reduction " \
+  "threshold to ease the encoder's task." )
 
 #define ENC_QMIN_TEXT N_( "Minimum video quantizer scale" )
 #define ENC_QMIN_LONGTEXT N_( "Allows you to specify the minimum video " \
@@ -216,4 +223,4 @@ void E_(ClosePostproc)( decoder_t *, void * );
 
 #define ENC_TRELLIS_TEXT N_( "Enable trellis quantization" )
 #define ENC_TRELLIS_LONGTEXT N_( "Allows you to enable trellis " \
-  "quantization." )
+  "quantization (rate distorsion for block coefficients)." )

@@ -132,7 +132,7 @@ vlc_module_begin();
     add_float( ENC_CFG_PREFIX "rc-buffer-aggressivity", 0.1, NULL,
                ENC_RC_BUF_AGGR_TEXT, ENC_RC_BUF_AGGR_LONGTEXT, VLC_TRUE );
     add_float( ENC_CFG_PREFIX "i-quant-factor", 0, NULL,
-               ENC_QUANT_FACTOR_TEXT, ENC_QUANT_FACTOR_LONGTEXT, VLC_TRUE );
+               ENC_IQUANT_FACTOR_TEXT, ENC_IQUANT_FACTOR_LONGTEXT, VLC_TRUE );
     add_integer( ENC_CFG_PREFIX "noise-reduction", 0, NULL,
                  ENC_NOISE_RED_TEXT, ENC_NOISE_RED_LONGTEXT, VLC_TRUE );
     add_bool( ENC_CFG_PREFIX "mpeg4-matrix", 0, NULL,

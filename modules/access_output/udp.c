@@ -72,7 +72,9 @@ static void Close( vlc_object_t * );
 #define GROUP_TEXT N_("Group packets")
 #define GROUP_LONGTEXT N_("Packets can be sent one by one at the right time " \
                           "or by groups. This allows you to give the number " \
-                          "of packets that will be sent at a time." )
+                          "of packets that will be sent at a time. It " \
+                          "helps reducing the scheduling load on " \
+                          "heavily-loaded systems." )
 #define LATE_TEXT N_("Late delay (ms)" )
 #define LATE_LONGTEXT N_("Late packets are dropped. This allows you to give " \
                        "the time (in milliseconds) a packet is allowed to be" \
