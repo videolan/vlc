@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.69 2002/06/04 00:11:12 sam Exp $
+ * $Id: netutils.c,v 1.70 2002/06/07 21:45:30 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -75,6 +75,7 @@
 #endif
 
 #include "netutils.h"
+#include "playlist.h"
 
 #include "network.h"
 
@@ -263,26 +264,18 @@ int __network_ChannelJoin( vlc_object_t *p_this, int i_channel )
     {
         msg_Dbg( p_this, "vlcs said '%s'", psz_mess + 2 );
     }
-    else /* We got something to play ! FIXME: not very nice */
+    else
     {
-#if 0
-#   define p_item (&p_this->p_vlc->p_playlist->p_item \
-                       [ p_this->p_vlc->p_playlist->i_index + 1])
-        vlc_mutex_lock( &p_this->p_vlc->p_playlist->change_lock );
-        if( p_item )
+        /* We got something to play ! */
+        playlist_t *p_playlist;
+        p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
+                                              FIND_ANYWHERE );
+        if( p_playlist != NULL )
         {
-            free( p_item->psz_name );
-            p_item->psz_name = strdup( psz_mess );
-            /* Unlock _afterwards_ */
-            vlc_mutex_unlock( &p_this->p_vlc->p_playlist->change_lock );
+            playlist_Add( p_playlist, psz_mess,
+                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+            vlc_object_release( p_playlist );
         }
-        else
-        {
-            /* Unlock _before_ */
-            vlc_mutex_unlock( &p_this->p_vlc->p_playlist->change_lock );
-            intf_PlaylistAdd( p_this->p_vlc->p_playlist, 0, psz_mess );
-        }
-#endif
     }
 
     /* Close the socket and return nicely */
