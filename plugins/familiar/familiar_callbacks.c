@@ -2,7 +2,7 @@
  * familiar_callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: familiar_callbacks.c,v 1.6.2.11 2002/10/29 20:53:30 jpsaman Exp $
+ * $Id: familiar_callbacks.c,v 1.6.2.12 2002/10/30 22:42:26 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -56,8 +56,8 @@
 
 #include "netutils.h"
 
-void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url );
-char* get_file_perm(const char *path);
+static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url );
+static char* get_file_perm(const char *path);
 
 /*****************************************************************************
  * Useful function to retrieve p_intf
@@ -96,7 +96,7 @@ void * __GtkGetIntf( GtkWidget * widget )
 /*****************************************************************************
  * Helper functions for URL changes in Media and Preferences notebook pages.
  ****************************************************************************/
-void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
+static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
     int            i_end = p_main->p_playlist->i_size;
@@ -130,7 +130,7 @@ void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
 void ReadDirectory( GtkCList *clist, char *psz_dir )
 {
     intf_thread_t *p_intf = GtkGetIntf( clist );
-    struct dirent **namelist=NULL;
+    struct dirent **namelist;
     int n=-1;
     int status=-1;
 
@@ -138,13 +138,12 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
     if (psz_dir)
     {
        status = chdir(psz_dir);
+       if (status<0)
+          intf_ErrMsg("File is not a directory.");
     }
-    if (status<0)
-      intf_ErrMsg("File is not a directory.");
-    else
-      n = scandir(".", &namelist, NULL, NULL);
+    n = scandir(psz_dir, &namelist, 0, NULL);
 
-//    printf( "n=%d\n", n);
+    printf( "n=%d\n", n);
     if (n<0)
         perror("scandir");
     else
@@ -152,18 +151,14 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
         gchar *ppsz_text[2];
         int i;
 
-        if( p_intf->p_sys->p_clist == NULL )
-           intf_ErrMsg("ReadDirectory - ERROR p_intf->p_sys->p_clist == NULL");
         gtk_clist_freeze( p_intf->p_sys->p_clist );
         gtk_clist_clear( p_intf->p_sys->p_clist );
         for (i=0; i<n; i++)
         {
             /* This is a list of strings. */
-            ppsz_text[0] =  &(namelist[i])->d_name[0];
-            ppsz_text[1] =  get_file_perm(&(namelist[i])->d_name[0]);
- //           printf( "Entry: %s, %s\n", &(namelist[i])->d_name[0], ppsz_text[1] );
-            if (strcmp(ppsz_text[1],"") == 0)
-                intf_ErrMsg("File system error unknown filetype encountered.");
+            ppsz_text[0] = namelist[i]->d_name;
+            ppsz_text[1] = get_file_perm(namelist[i]->d_name);
+            printf( "Entry: %s, %s\n", namelist[i]->d_name, ppsz_text[1] );
             gtk_clist_insert( p_intf->p_sys->p_clist, i, ppsz_text );
             free(namelist[i]);
         }
@@ -234,7 +229,7 @@ void OpenDirectory( GtkCList *clist, char *psz_dir )
     gtk_clist_thaw( p_intf->p_sys->p_clist );
 }
 
-char* get_file_perm(const char *path)
+static char* get_file_perm(const char *path)
 {
     struct stat st;
     char *perm;
