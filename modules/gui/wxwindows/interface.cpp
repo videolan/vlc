@@ -384,7 +384,7 @@ void Interface::CreateOurMenuBar()
         menubar->GetTextExtent( menubar->GetLabelTop(i), &i_width, &i_height );
         i_size += i_width +
 #if defined(__WXGTK__)
-            20 /* approximate margin */;
+            22 /* approximate margin */;
 #else
             4 /* approximate margin */;
 #endif
@@ -410,25 +410,33 @@ public:
 
   private:
     DECLARE_EVENT_TABLE()
+    int i_y_offset;
 };
 
 BEGIN_EVENT_TABLE(VLCVolCtrl, wxControl)
    EVT_PAINT(VLCVolCtrl::OnPaint)
 END_EVENT_TABLE()
 
+#if defined(__WXGTK__)
+#define VLCVOL_HEIGHT p_parent->GetSize().GetHeight()
+#else
+#define VLCVOL_HEIGHT TOOLBAR_BMP_HEIGHT
+#endif
 VLCVolCtrl::VLCVolCtrl( intf_thread_t *p_intf, wxWindow *p_parent,
                         wxGauge **pp_volctrl )
-  :wxControl( p_parent, -1, wxDefaultPosition, wxSize(64, 16), wxBORDER_NONE )
+  :wxControl( p_parent, -1, wxDefaultPosition, wxSize(64, VLCVOL_HEIGHT ),
+              wxBORDER_NONE ),
+   i_y_offset((VLCVOL_HEIGHT - TOOLBAR_BMP_HEIGHT) / 2)
 {
-    *pp_volctrl = new wxVolCtrl( p_intf, this, -1, wxPoint( 18, 0 ),
-                                 wxSize( 44, 16 ) );
+    *pp_volctrl = new wxVolCtrl( p_intf, this, -1, wxPoint( 18, i_y_offset ),
+                                 wxSize( 44, TOOLBAR_BMP_HEIGHT ) );
 }
 
 void VLCVolCtrl::OnPaint( wxPaintEvent &evt )
 {
     wxPaintDC dc( this );
     wxBitmap mPlayBitmap( speaker_xpm );
-    dc.DrawBitmap( mPlayBitmap, 1, 0, TRUE );
+    dc.DrawBitmap( mPlayBitmap, 0, i_y_offset, TRUE );
 }
 
 void Interface::CreateOurToolBar()
