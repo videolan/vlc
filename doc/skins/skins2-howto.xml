@@ -829,6 +829,14 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>playlist.isRandom</emphasis>: True when the playlist items are played in a random order, false otherwise.
   </para></listitem>
   <listitem><para>
+    <emphasis>playlist.isLoop</emphasis>: True when the playlist is looping, false otherwise.
+  </para></listitem>
+<!--  TODO: Enable it for 0.7.3
+  <listitem><para>
+    <emphasis>playlist.isRepeat</emphasis>: True when the current playlist item is being repeated, false otherwise.
+  </para></listitem>
+-->
+  <listitem><para>
     <emphasis>window_name.isVisible</emphasis>: True when the window whose <link linkend="windowid">id</link> is "window_name" is visible, false otherwise.
   </para></listitem>
 </itemizedlist>
