@@ -1,6 +1,7 @@
 $Id$
 
 Changes between 0.7.2 and 0.7.3:
+This version is in development and not yet released.
 --------------------------------
 
 Core support:
@@ -15,34 +16,42 @@ Demux:
  * Support iTunes Music Store previews
  * Support for MJPEG webcams (i.e. AXIS cams)
  * Added initial mp4 and mpeg-ts text track support
+ * Windows Media Server RTSP support
 
 Codecs:
  * G.726 audio support
  * 14496-17 MPEG TS text support
  * MPEG-4 text support
+ * DirectX Media Object decoder (allows playing some media types, like WMV3 on Windows)
 
 Stream Output:
- * text track muxing for mp4
+ * Text track muxing for mp4
+ * Multipart mjpeg muxing. Your video is directly viewable in a Mozilla Browser
  * 14496-17 text track muxing for MPEG TS
  * H.263 RTP streaming support
 
 Interfaces:
- * added search, volume, loop and random functions to the ncurses interface
- * added a filesystem browser to the ncurses interface
+ * Added search, volume, loop and random functions to the ncurses interface
+ * Added a filesystem browser to the ncurses interface
  * OSD sliders for volume and postition information
  * OSD icons for Play and Pause
  * New Streaming Wizard for Windows and Linux default interfaces
 
 Mac OS X port:
  * Fixed the "cannot set buffersize:[nope]" coreaudio problem
+ * The MacOSX interface is no longer required to display video
+
+Windows CE PocketPC port:
+ * Brand new port of VLC. Still very experimental
+ * Works with MPEG and Divx
 
 Mozilla plugin:
- * added a lot of javascript accessible funtionality
- * volume, position, length, seek etc etc etc.
+ * Added a lot of Javascript accessible funtionality
+ * Volume, position, length, seek etc etc etc.
 
 Misc:
  * Roku HD1000 Video output
- * Experimental network synchronization module
+ * Server-network synchronization module
  * Experimental SVG rendering module
  * VBrick streams fully supported
  * Kasenna MediaBase streams largely supported

@@ -47,16 +47,17 @@ Task
 Difficulty: Hard
 Platform: WinCE
 Urgency: Wishlist
-Description: WinCE port
- A WinCE port for PocketPC and the likes. (95% finished)
+Description: WinCE port finalizing
+Sources need to be imported into the VLC source tree.
+Downloads should be added to the main vlc download page. We need an icon for this. 
 Status: Assigned to MixerAnderson
 
 Task
 Difficulty: Hard
 Urgency: Normal
 Platform: any
-Description: Embedded video outputs
- Embedded video outputs support
+Description: Dual window in embed mode
+Windows ttaskbar reports two windows in the video embed mode.
 Status: Assigned to gibalou
 
 Task
@@ -146,7 +147,7 @@ Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: MusePack decoder
-Need I say more? <a href="http://www.hydrogenaudio.org/index.php?showtopic=21775&">MPCdec</a>
+Need I say more? <a href="http://www.hydrogenaudio.org/index.php?showtopic=21775&">MPCdec</a>. We are awaiting MPC 7.5 or 8.0 specification which should split the codec from the fileformat.
 Status: Todo
 
 Task
@@ -159,10 +160,18 @@ Status: Todo
 
 Task
 Difficulty: Easy
+Urgency: Normal
+Platform: any
+Description: LPCM on mac
+The LPCM decoder outputs really small samples which aren't accepted properly by the macosx coreaudio resampler, causing VLC to not output any sound with many DVD's. A test sample that shows this effect on the mac is the Madonna clip.
+Status: Todo
+
+Task
+Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: APE decoder
-Need I say more? <a href="http://www.monkeysaudio.com/">Monkeys Audio (APE)</a> website.
+Need I say more? <a href="http://www.monkeysaudio.com/">Monkeys Audio (APE)</a> website. This codec is currently not GPL compatible. We will have to await a GPL compatible implementation of this.
 Status: Todo
 
 Task
@@ -230,7 +239,6 @@ Urgency: Normal
 Platform: any
 Description: Fix up text subtitles
 Currently the subtitle dialog boxes are out of date and not really useable. Also we need more files to test and verify the current support, and the rendering of the subs should be sped up quite a bit (issue with outlining?) Other issues should mostly be dealt with after the vout systems are improved.
-
 Status: Todo
 
 Task
@@ -241,7 +249,7 @@ Description: Rework spu decoder
  The spu decoder needs some serious work
   - Split/merge for dvd menu highlighting
   - Downscaling for divx/mkv etc
-  - Chroma independence
+  - Chroma independence (YUVA ???)
   - .sub/.idx support
 Status: todo
 
@@ -292,7 +300,8 @@ Urgency: Wishlist
 Platform: Mac OS X
 Description: intf / vout dependency
 The application specific parts of the intf need to be brougth to the VLC application core. A valid NSApplication needs to be created on VLC opening, with the dock and menu hidden/disabled, only being generated on VLC intf loading.
-(70% done) need to fix the interfaces again.
+(70% done) need to fix the interfaces again.<br />
+This is mostly implemented, but some mem leaks are now bothering the macosx part. this should be fixed.
 Status: Assigned to DJ
 
 Task
@@ -307,8 +316,8 @@ Task
 Difficulty: Hard
 Urgency: Wishlist
 Platform: any
-Description: Equalizer
-Implement an equilizer for VLC.
+Description: Equalizer Graphic control
+Now that VLC has an equalizer, we need a way to control it easily from the GUI.
 Status: Todo
 
 Task
@@ -316,10 +325,10 @@ Difficulty: Hard
 Urgency: Wishlist
 Platform: any
 Description: informing user.
-Implement a system to
- - Alert the user of critical errors (cannot play file)
- - Ask the user a question (Are you sure? or Try to Fix index of avi? or Overwrite File?)
- - Inform the user, without disturbing him. (Buffering stream)
+Implement a system to: <br />
+ - Alert the user of critical errors (cannot play file). Should be blocking. <br />
+ - Ask the user a question (Are you sure? or Try to Fix index of avi? or Overwrite File?)<br />
+ - Inform the user, without disturbing him. (Buffering stream). This might require a time bases or something perhaps. Because how do we know how long this information should be displayed? Also think of buffering 0-100%<br /> 
 Status: Todo
 
 Task
@@ -479,7 +488,8 @@ Urgency: Wishlist
 Platform: any
 Description: Protocol rollover
 It would be cool if VLC supported something like a protocol rollover mechanism, much like WM server has as well. Multicast, UDP, TCP, HTTP etc.
-However, how spec compliant can this be?
+However, how spec compliant can this be?<br />
+We require a timeout on udp connecting. Beyond this a playlist file can be used to do a form of protocol rollover when one of the links fails.
 Status: Todo
 
 Task
@@ -488,6 +498,7 @@ Urgency: Wishlist
 Platform: any
 Description: NAT issues
 Find a way to deal with clients behind a NAT. Multicast and RTSP work 'poorly' in these setups. NATP2P, STUN, UDP hole punching, other techniques ????
+Protocol rollover can be a solution for a lot of these issues.
 Status: Todo
 
 Task
