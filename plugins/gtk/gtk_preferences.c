@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.20 2002/03/31 22:35:44 gbazin Exp $
+ * $Id: gtk_preferences.c,v 1.21 2002/03/31 22:59:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -155,6 +155,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     GtkWidget *plugin_config_button;
     GtkWidget *plugin_select_button;
 
+    gint category_max_height;
 
     /* Check if the dialog box is already opened, if so this will save us
      * quite a bit of work. (the interface will be destroyed when you actually
@@ -185,15 +186,19 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
     /* We found it, now we can start building its configuration interface */
     /* Create the configuration dialog box */
+
 #ifdef MODULE_NAME_IS_gnome
     config_dialog = gnome_dialog_new( p_module->psz_longname, NULL );
     config_dialog_vbox = GNOME_DIALOG(config_dialog)->vbox;
+    category_max_height = config_GetIntVariable( "gnome_prefs_maxh" );
 #else
     config_dialog = gtk_dialog_new();
     gtk_window_set_title( GTK_WINDOW(config_dialog), p_module->psz_longname );
     config_dialog_vbox = GTK_DIALOG(config_dialog)->vbox;
+    category_max_height = config_GetIntVariable( "gtk_prefs_maxh" );
 #endif
 
+    gtk_window_set_policy( GTK_WINDOW(config_dialog), TRUE, TRUE, FALSE );
     gtk_container_set_border_width( GTK_CONTAINER(config_dialog_vbox), 0 );
 
     /* Create our config hash table and associate it with the dialog box */
@@ -227,12 +232,6 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                 GtkWidget *_viewport;
                 GtkWidget *_vbox;
                 GtkRequisition _requisition;
-		gint height =
-#ifdef MODULE_NAME_IS_gnome
-		    config_GetIntVariable( "gnome_prefs_maxh" );
-#else
-		    config_GetIntVariable( "gtk_prefs_maxh" );
-#endif
 
                 /* create a vbox to deal with EXPAND/FILL issues in the
                  * notebook page, and pack it with the previously generated
@@ -259,11 +258,17 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                 gtk_container_add( GTK_CONTAINER(_scrolled_window),
                                    _viewport );
 
+                /* set the size of the scrolled window to the size of the
+                 * child widget */
                 gtk_widget_show_all( _vbox );
                 gtk_widget_size_request( _vbox, &_requisition );
-                if( _requisition.height < height )
-                    height = _requisition.height;
-                gtk_widget_set_usize( _scrolled_window, -1, height );
+                if( _requisition.height > category_max_height )
+                    gtk_widget_set_usize( _scrolled_window, -1,
+                                          category_max_height );
+                else
+                    gtk_widget_set_usize( _scrolled_window, -1,
+                                          _requisition.height );
+
             }
             if( p_module->p_config[i].i_type == MODULE_CONFIG_HINT_END ) break;
 
