@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.61 2002/07/20 18:01:42 sam Exp $
+ * $Id: vout_beos.cpp,v 1.62 2002/07/22 11:39:56 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -42,6 +42,8 @@
 
 #include "VideoWindow.h"
 #include "DrawingTidbits.h"
+#include "MsgVals.h"
+
 
 /*****************************************************************************
  * vout_sys_t: BeOS video output method descriptor
@@ -56,7 +58,7 @@ struct vout_sys_t
     s32 i_width;
     s32 i_height;
 
-    u8 *pp_buffer[3];
+    u32 source_chroma;
     int i_index;
 };
 
@@ -84,44 +86,6 @@ BWindow *beos_GetAppWindow(char *name)
         }
     }
     return window; 
-}
-
-/****************************************************************************
- * DrawingThread : thread that really does the drawing
- ****************************************************************************/
-int32 Draw(void *data)
-{
-    VideoWindow* p_win;
-    p_win = (VideoWindow *) data;
-
-    if ( p_win->LockWithTimeout(50000) == B_OK )
-    {
-        if (p_win->vsync)
-        {
-            BScreen *screen;
-            screen = new BScreen(p_win);
-            screen-> WaitForRetrace(22000);
-            delete screen;
-        }
-        if (p_win-> mode == OVERLAY)
-        {
-            rgb_color key;
-            p_win-> view->SetViewOverlay(p_win-> bitmap[p_win-> i_buffer], 
-                                         p_win-> bitmap[p_win-> i_buffer]->Bounds() ,
-                                         p_win-> view->Bounds(),
-                                         &key, B_FOLLOW_ALL,
-		                                 B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL|
-		                                 B_OVERLAY_TRANSFER_CHANNEL);
-		    p_win-> view->SetViewColor(key);
-        }
-        else
-        {
-            p_win-> view-> DrawBitmap( p_win-> bitmap[p_win-> i_buffer], 
-                                       p_win-> view->Bounds() );
-        }                                
-        p_win-> Unlock();
-    }
-    return B_OK;
 }
 
 /*****************************************************************************
@@ -163,36 +127,75 @@ VideoWindow::VideoWindow( int v_width, int v_height,
     } 
     delete screen;
     
+    mode = SelectDrawingMode(v_width, v_height);
+
     // remember current settings
     i_width = frame.IntegerWidth();
     i_height = frame.IntegerHeight();
     FrameResized(frame.IntegerWidth(), frame.IntegerHeight());
 
-    mode = SelectDrawingMode(v_width, v_height);
+    if (mode == OVERLAY)
+    {
+       overlay_restrictions r;
+
+       bitmap[1]->GetOverlayRestrictions(&r);
+       SetSizeLimits((i_width * r.min_width_scale), i_width * r.max_width_scale,
+                     (i_height * r.min_height_scale), i_height * r.max_height_scale);
+    }
     Show();
 }
 
 VideoWindow::~VideoWindow()
 {
-    int32 result;
-
     teardownwindow = true;
-    wait_for_thread(fDrawThreadID, &result);
     delete bitmap[0];
     delete bitmap[1];
     delete bitmap[2];
 }
 
-bool VideoWindow::QuitRequested()
+void VideoWindow::MessageReceived( BMessage *p_message )
 {
-    return true;
+    switch( p_message->what )
+    {
+    case TOGGLE_FULL_SCREEN:
+        ((BWindow *)this)->Zoom();
+        break;
+    case RESIZE_100:
+        if (is_zoomed)
+        {
+           ((BWindow *)this)->Zoom();
+        }
+        ResizeTo(i_width, i_height);
+        break;
+    case RESIZE_200:
+        if (is_zoomed)
+        {
+           ((BWindow *)this)->Zoom();
+        }
+        ResizeTo(i_width * 2, i_height * 2);
+        break;
+    case VERT_SYNC:
+        vsync = !vsync;
+        break;
+    case WINDOW_FEEL:
+        {
+            int16 winFeel;
+            if (p_message->FindInt16("WinFeel", &winFeel) == B_OK)
+            {
+                SetFeel((window_feel)winFeel);
+            }
+        }
+        break;
+    default:
+        BWindow::MessageReceived( p_message );
+        break;
+    }
 }
 
 void VideoWindow::drawBuffer(int bufferIndex)
 {
-    status_t status;
-
     i_buffer = bufferIndex;
+
     // sync to the screen if required
     if (vsync)
     {
@@ -213,7 +216,7 @@ void VideoWindow::drawBuffer(int bufferIndex)
                             &key, B_FOLLOW_ALL,
 		                    B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL|
 		                    B_OVERLAY_TRANSFER_CHANNEL);
-		   //view->SetViewColor(key);
+		   view->SetViewColor(key);
 	   }
        else
        {
@@ -297,13 +300,6 @@ void VideoWindow::ScreenChanged(BRect frame, color_space mode)
     { 
         vsync = true; 
     } 
-    rgb_color key;
-    view->SetViewOverlay(bitmap[i_buffer], 
-                         bitmap[i_buffer]->Bounds() ,
-                         view->Bounds(),
-                         &key, B_FOLLOW_ALL,
-                         B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL);
-    view->SetViewColor(key);
 }
 
 void VideoWindow::WindowActivated(bool active)
@@ -313,8 +309,9 @@ void VideoWindow::WindowActivated(bool active)
 int VideoWindow::SelectDrawingMode(int width, int height)
 {
     int drawingMode = BITMAP;
+    int noOverlay = 0;
 
-    int noOverlay = !config_GetInt( p_vout, "overlay" );
+//    int noOverlay = !config_GetIntVariable( "overlay" );
     for (int i = 0; i < COLOR_COUNT; i++)
     {
         if (noOverlay) break;
@@ -358,7 +355,7 @@ int VideoWindow::SelectDrawingMode(int width, int height)
 
     if (drawingMode == BITMAP)
 	{
-        // fallback to RGB32
+        // fallback to RGB16
         colspace_index = DEFAULT_COL;
         SetTitle(VOUT_TITLE " (Bitmap)");
         bitmap[0] = new BBitmap( BRect( 0, 0, width, height ), colspace[colspace_index].colspace);
@@ -390,8 +387,66 @@ VLCView::~VLCView()
  *****************************************************************************/
 void VLCView::MouseDown(BPoint point)
 {
-    BWindow *win = Window();
-    win->Zoom();
+    BMessage* msg = Window()->CurrentMessage();
+    int32 clicks = msg->FindInt32("clicks");
+
+    VideoWindow *vWindow = (VideoWindow *)Window();
+    uint32 mouseButtons;
+    BPoint where;
+    GetMouse(&where, &mouseButtons, true);
+
+    if ((mouseButtons & B_PRIMARY_MOUSE_BUTTON) && (clicks == 2))
+    {
+       Window()->Zoom();
+       return;
+    }
+    else
+    {
+       if (mouseButtons & B_SECONDARY_MOUSE_BUTTON) 
+       {
+           BPopUpMenu *menu = new BPopUpMenu("context menu");
+           menu->SetRadioMode(false);
+           // Toggle FullScreen
+           BMenuItem *zoomItem = new BMenuItem("Fullscreen", new BMessage(TOGGLE_FULL_SCREEN));
+           zoomItem->SetMarked(vWindow->is_zoomed);
+           menu->AddItem(zoomItem);
+           // Resize to 100%
+           BMenuItem *origItem = new BMenuItem("100%", new BMessage(RESIZE_100));
+           menu->AddItem(origItem);
+           // Resize to 200%
+           BMenuItem *doubleItem = new BMenuItem("200%", new BMessage(RESIZE_200));
+           menu->AddItem(doubleItem);
+           menu->AddSeparatorItem();
+           // Toggle vSync
+           BMenuItem *vsyncItem = new BMenuItem("Vertical Sync", new BMessage(VERT_SYNC));
+           vsyncItem->SetMarked(vWindow->vsync);
+           menu->AddItem(vsyncItem);
+           menu->AddSeparatorItem();
+
+		   // Windwo Feel Items
+		   BMessage *winNormFeel = new BMessage(WINDOW_FEEL);
+		   winNormFeel->AddInt16("WinFeel", (int16)B_NORMAL_WINDOW_FEEL);
+           BMenuItem *normWindItem = new BMenuItem("Normal Window", winNormFeel);
+           normWindItem->SetMarked(vWindow->Feel() == B_NORMAL_WINDOW_FEEL);
+           menu->AddItem(normWindItem);
+           
+		   BMessage *winFloatFeel = new BMessage(WINDOW_FEEL);
+		   winFloatFeel->AddInt16("WinFeel", (int16)B_FLOATING_APP_WINDOW_FEEL);
+           BMenuItem *onTopWindItem = new BMenuItem("App Top", winFloatFeel);
+           onTopWindItem->SetMarked(vWindow->Feel() == B_FLOATING_APP_WINDOW_FEEL);
+           menu->AddItem(onTopWindItem);
+           
+		   BMessage *winAllFeel = new BMessage(WINDOW_FEEL);
+		   winAllFeel->AddInt16("WinFeel", (int16)B_FLOATING_ALL_WINDOW_FEEL);
+           BMenuItem *allSpacesWindItem = new BMenuItem("On Top All Workspaces", winAllFeel);
+           allSpacesWindItem->SetMarked(vWindow->Feel() == B_FLOATING_ALL_WINDOW_FEEL);
+           menu->AddItem(allSpacesWindItem);
+		   
+           menu->SetTargetForItems(this);
+           ConvertToScreen(&where);
+           menu->Go(where, true, false, true);
+        }
+	} 
 }
 
 /*****************************************************************************
@@ -453,6 +508,7 @@ int vout_Create( vout_thread_t *p_vout )
     }
     p_vout->p_sys->i_width = p_vout->render.i_width;
     p_vout->p_sys->i_height = p_vout->render.i_height;
+    p_vout->p_sys->source_chroma = p_vout->render.i_chroma;
 
     return( 0 );
 }
@@ -470,13 +526,9 @@ int vout_Init( vout_thread_t *p_vout )
     /* Open and initialize device */
     if( BeosOpenDisplay( p_vout ) )
     {
-        msg_Err( p_vout, "cannot open display" );
+        msg_Err(p_vout, "vout error: can't open display");
         return 0;
     }
-    /* Set the buffers */
-    p_vout->p_sys->pp_buffer[0] = (u8*)p_vout->p_sys->p_window->bitmap[0]->Bits();
-    p_vout->p_sys->pp_buffer[1] = (u8*)p_vout->p_sys->p_window->bitmap[1]->Bits();
-    p_vout->p_sys->pp_buffer[2] = (u8*)p_vout->p_sys->p_window->bitmap[2]->Bits();
     p_vout->output.i_width  = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
 
@@ -485,6 +537,8 @@ int vout_Init( vout_thread_t *p_vout )
                                * VOUT_ASPECT_FACTOR / p_vout->p_sys->i_height;
     p_vout->output.i_chroma = colspace[p_vout->p_sys->p_window->colspace_index].chroma;
     p_vout->p_sys->i_index = 0;
+
+    p_vout->b_direct = 1;
 
     p_vout->output.i_rmask  = 0x00ff0000;
     p_vout->output.i_gmask  = 0x0000ff00;
@@ -508,16 +562,16 @@ int vout_Init( vout_thread_t *p_vout )
        {
            return 0;
        }
-       p_pic->p->p_pixels = p_vout->p_sys->pp_buffer[0];
+       p_pic->p->p_pixels = (u8*)p_vout->p_sys->p_window->bitmap[buffer_index]->Bits();
        p_pic->p->i_lines = p_vout->p_sys->i_height;
 
        p_pic->p->i_pixel_bytes = colspace[p_vout->p_sys->p_window->colspace_index].pixel_bytes;
        p_pic->i_planes = colspace[p_vout->p_sys->p_window->colspace_index].planes;
-       p_pic->p->i_pitch = p_vout->p_sys->p_window->bitmap[0]->BytesPerRow(); 
+       p_pic->p->i_pitch = p_vout->p_sys->p_window->bitmap[buffer_index]->BytesPerRow(); 
 
        if (p_vout->p_sys->p_window->mode == OVERLAY)
        {
-          p_pic->p->i_visible_bytes = (p_vout->p_sys->p_window->bitmap[0]->Bounds().IntegerWidth()+1) 
+          p_pic->p->i_visible_bytes = (p_vout->p_sys->p_window->bitmap[buffer_index]->Bounds().IntegerWidth()+1) 
                                      * p_pic->p->i_pixel_bytes; 
           p_pic->p->b_margin = 1;
           p_pic->p->b_hidden = 0;
@@ -594,7 +648,7 @@ void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     }
     /* change buffer */
     p_vout->p_sys->i_index = ++p_vout->p_sys->i_index % 3;
-    p_pic->p->p_pixels = p_vout->p_sys->pp_buffer[p_vout->p_sys->i_index];
+    p_pic->p->p_pixels = (u8*)p_vout->p_sys->p_window->bitmap[p_vout->p_sys->i_index]->Bits();
 }
 
 /* following functions are local */
