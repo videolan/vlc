@@ -7,7 +7,6 @@
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
  *
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -77,6 +76,36 @@
 static int     Open   ( vlc_object_t * );
 static void    Close  ( vlc_object_t * );
 
+#define VPID_TEXT N_("Video PID")
+#define VPID_LONGTEXT N_("Assign a fixed PID to the video stream")
+#define APID_TEXT N_("Audio PID")
+#define APID_LONGTEXT N_("Assign a fixed PID to the audio stream")
+
+#define SHAPING_TEXT N_("Shaping delay (ms)")
+#define SHAPING_LONGTEXT N_("This allows you to change the caching done " \
+  "inside the muxer itself.")
+#define KEYF_TEXT N_("Use keyframes")
+#define KEYF_LONGTEXT N_("If enabled, the shaping delay will be " \
+  "automatically optimized for the GOP size used in the video stream.")
+
+#define PCR_TEXT N_("PCR delay (ms)")
+#define PCR_LONGTEXT N_("This option allows you to set at which interval " \
+  "PCRs (Program Clock Reference) will be sent. " \
+  "This value should be below 100ms. (default is 30)")
+
+#define DTS_TEXT N_("DTS delay (ms)")
+#define DTS_LONGTEXT N_("This option will delay the DTS (decoding time " \
+  "stamps) and PTS (presentation timestamps) of the data in the " \
+  "stream, compared to the PCRs. This allows for some buffering inside " \
+  "the client decoder.")
+
+#define ACRYPT_TEXT N_("Crypt audio")
+#define ACRYPT_LONGTEXT N_("Crypt audio using CSA")
+
+#define CK_TEXT N_("CSA Key")
+#define CK_LONGTEXT N_("Defines the CSA encryption key. This must be a " \
+  "16 char string (8 hexadecimal bytes).")
+
 #define SOUT_CFG_PREFIX "sout-ts-"
 
 vlc_module_begin();
@@ -92,66 +121,26 @@ vlc_module_begin();
     add_shortcut( "ts_dvbpsi" );
 #endif
 
-#define VPID_TEXT N_("Video PID")
-#define VPID_LONGTEXT N_("Assign a fixed PID to the video stream")
-#define APID_TEXT N_("Audio PID")
-#define APID_LONGTEXT N_("Assign a fixed PID to the audio stream")
-
-#define BMIN_TEXT N_("Minimum bitrate warning")
-#define BMIN_LONGTEXT N_("A warning will be emitted if the bitrate drops below this limit. THIS OPTION IS NO MORE SUPPORTED.")
-#define BMAX_TEXT N_("Maximum bitrate warning")
-#define BMAX_LONGTEXT N_("A warning will be emitted if the bitrate exceeds this limit. THIS OPTION IS NO MORE SUPPORTED.")
-
-#define SHAPING_TEXT N_("Shaping delay (ms)")
-#define SHAPING_LONGTEXT N_("")
-
-#define PCR_TEXT N_("PCR delay (ms)")
-#define PCR_LONGTEXT N_("This options sets the interval between two PCR " \
-                        "sendings. PCR is the synchronisation clock. " \
-                        "This value should be below 100ms. (default is 30)")
-
-#define DTS_TEXT N_("DTS delay (ms)")
-#define DTS_LONGTEXT N_("This option will delay the DTS and PTS of the " \
-                        "stream, compared to the PCR. (DTS and PTS are two" \
-                        " timestamps that give the time at which a packet " \
-                        "must be decoded and displayed). This allows for " \
-                        "some buffering inside the client decoder.")
-
-#define KEYF_TEXT N_("Use keyframes")
-#define KEYF_LONGTEXT N_("")
-
-#define ACRYPT_TEXT N_("Crypt audio")
-#define ACRYPT_LONGTEXT N_("Crypt audio using CSA")
-
-#define CK_TEXT N_("CSA Key")
-#define CK_LONGTEXT N_("Defines the CSA encryption key. This must be a " \
-                        "16 char string (8 hexadecimal bytes).")
-
     add_integer( SOUT_CFG_PREFIX "pid-video", 0, NULL,VPID_TEXT, VPID_LONGTEXT,
                                   VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "pid-audio", 0, NULL, APID_TEXT, APID_LONGTEXT,
-                                  VLC_TRUE );
-
-    add_integer( SOUT_CFG_PREFIX "bmin", 0, NULL, BMIN_TEXT, BMIN_LONGTEXT,
-                                 VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "bmax", 0, NULL, BMAX_TEXT, BMAX_LONGTEXT,
-                                 VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "pid-audio", 0, NULL, APID_TEXT,
+                 APID_LONGTEXT, VLC_TRUE );
 
     add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL,SHAPING_TEXT,
-                                 SHAPING_LONGTEXT,  VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "pcr", 30, NULL, PCR_TEXT, PCR_LONGTEXT,
-                                 VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "dts-delay", 200, NULL, DTS_TEXT, DTS_LONGTEXT
-                               ,  VLC_TRUE );
-
+                 SHAPING_LONGTEXT, VLC_TRUE );
     add_bool( SOUT_CFG_PREFIX "use-key-frames", VLC_FALSE, NULL, KEYF_TEXT,
-                             KEYF_LONGTEXT,  VLC_TRUE );
+              KEYF_LONGTEXT, VLC_TRUE );
+
+    add_integer( SOUT_CFG_PREFIX "pcr", 30, NULL, PCR_TEXT, PCR_LONGTEXT,
+                 VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "dts-delay", 200, NULL, DTS_TEXT,
+                 DTS_LONGTEXT, VLC_TRUE );
 
     add_bool( SOUT_CFG_PREFIX "crypt-audio", VLC_TRUE, NULL, ACRYPT_TEXT,
-                               ACRYPT_LONGTEXT,  VLC_TRUE );
+              ACRYPT_LONGTEXT, VLC_TRUE );
 
-    add_string( SOUT_CFG_PREFIX "csa-ck", "", NULL, CK_TEXT, CK_LONGTEXT,
-                               VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "csa-ck", NULL, NULL, CK_TEXT, CK_LONGTEXT,
+                VLC_TRUE );
 
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -160,22 +149,15 @@ vlc_module_end();
  * Local data structures
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "pid-video", "pid-audio",
-    "bmin", "bmax",
-    "shaping",
-    "pcr",
-    "use-key-frames",
-    "dts-delay",
-    "csa-ck",
-    "crypt-audio",
-    NULL
+    "pid-video", "pid-audio", "shaping", "pcr",
+    "use-key-frames", "dts-delay", "csa-ck", "crypt-audio", NULL
 };
 
 #define SOUT_BUFFER_FLAGS_PRIVATE_PCR  ( 1 << BLOCK_FLAG_PRIVATE_SHIFT )
 #define SOUT_BUFFER_FLAGS_PRIVATE_CSA  ( 2 << BLOCK_FLAG_PRIVATE_SHIFT )
 typedef struct
 {
-    int           i_depth;
+    int     i_depth;
     block_t *p_first;
     block_t **pp_last;
 } sout_buffer_chain_t;
@@ -400,10 +382,10 @@ static int Open( vlc_object_t *p_this )
 
     /* Allow to create constrained stream */
     var_Get( p_mux, SOUT_CFG_PREFIX "bmin", &val );
-    p_sys->i_bitrate_min = val.i_int;
+    p_sys->i_bitrate_min = 0;/*val.i_int;*/
 
     var_Get( p_mux, SOUT_CFG_PREFIX "bmax", &val );
-    p_sys->i_bitrate_max = val.i_int;
+    p_sys->i_bitrate_max = 0;/*val.i_int;*/
 
     if( p_sys->i_bitrate_min > 0 && p_sys->i_bitrate_max > 0 &&
         p_sys->i_bitrate_min > p_sys->i_bitrate_max )
