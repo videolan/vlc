@@ -1,5 +1,5 @@
 List of vlc plugins (221)
-$Id: LIST,v 1.17 2003/11/17 06:31:22 hartman Exp $
+$Id: LIST,v 1.18 2003/12/06 22:47:37 jpsaman Exp $
 
  * a52: A/52 basic parser/packetizer
 
@@ -272,7 +272,7 @@ $Id: LIST,v 1.17 2003/11/17 06:31:22 hartman Exp $
 
  * ogg: input module for OGG decapsulation.
 
- * opie: OPIE interface module
+ * opie: interface for Opie using QT/Embedded library.
 
  * oss: audio output module using the OSS /dev/dsp interface.
  
