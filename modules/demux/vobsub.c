@@ -444,7 +444,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
         }
         else if( !strncmp( "id:", line, 3 ) )
         {
-            char *language[20];
+            char language[20];
             int i_track_id;
             es_format_t fmt;
 
