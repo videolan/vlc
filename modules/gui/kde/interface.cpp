@@ -162,8 +162,8 @@ void KInterface::initActions()
     prev->setStatusText( i18n( "Prev" ) );
     next->setStatusText( i18n( "Next" ) );
     // use the absolute path to your ktestui.rc file for testing purpose in createGUI();
-    char *uifile = config_GetPsz( p_intf, "kdeuirc" );
-    createGUI( uifile );
+    char *psz_uifile = config_GetPsz( p_intf, "kde-uirc" );
+    createGUI( psz_uifile );
 //    createGUI( "./modules/gui/kde/ui.rc" );
 }
 

@@ -2,7 +2,7 @@
  * kde.cpp : KDE plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: kde.cpp,v 1.10 2003/03/30 18:14:37 gbazin Exp $
+ * $Id: kde.cpp,v 1.11 2003/05/20 16:08:59 sigmunau Exp $
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001
  *
@@ -52,7 +52,7 @@ static void run(intf_thread_t *p_intf);
 vlc_module_begin();
     int i = getenv( "DISPLAY" ) == NULL ? 8 : 85;
     add_category_hint( "kde", NULL, VLC_TRUE );
-    add_file( "kdeuirc", DATA_PATH "/ui.rc", NULL, N_( "path to ui.rc file" ), NULL, VLC_TRUE );
+    add_file( "kde-uirc", DATA_PATH "/ui.rc", NULL, N_( "path to ui.rc file" ), NULL, VLC_TRUE );
     set_description( _("KDE interface") );
     set_capability( "interface", i );
     set_program( "kvlc" );
@@ -104,7 +104,7 @@ static void close(vlc_object_t *p_this)
 void run(intf_thread_t *p_intf)
 {
     p_intf->p_sys->p_about =
-      new KAboutData( "VideoLAN Client", I18N_NOOP("Kvlc"), VERSION,
+      new KAboutData( "kvlc", I18N_NOOP("Kvlc"), VERSION,
          _("This is the VideoLAN Client, a DVD, MPEG and DivX player. It can "
            "play MPEG and MPEG2 files from a file or from a network source."),
          KAboutData::License_GPL,
@@ -114,8 +114,8 @@ void run(intf_thread_t *p_intf)
     p_intf->p_sys->p_about->addAuthor( "the VideoLAN team", 0,
                                        "<videolan@videolan.org>" );
 
-    int argc = 1;
-    char *argv[] = { p_intf->p_vlc->psz_object_name, NULL };
+    int argc = 5;
+    char *argv[] = { "vlc", "--icon", DATA_PATH "/kvlc32x32.png", "--miniicon", DATA_PATH "/kvlc16x16.png" };
     KCmdLineArgs::init( argc, argv, p_intf->p_sys->p_about );
 
     /* Subscribe to message queue */
