@@ -406,7 +406,7 @@ static char *TitleGet( vlc_object_t *p_this )
 
     if( p_input )
     {
-        char *psz = strrchr( p_input->psz_source, '/' );
+        char *psz = strrchr( p_input->input.p_item->psz_uri, '/' );
 
         if( psz )
         {
@@ -414,7 +414,7 @@ static char *TitleGet( vlc_object_t *p_this )
         }
         else
         {
-            psz = p_input->psz_source;
+            psz = p_input->input.p_item->psz_uri;
         }
         if( psz && *psz )
         {
