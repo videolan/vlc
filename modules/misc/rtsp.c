@@ -877,6 +877,8 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             break;
 
         case HTTPD_MSG_PLAY:
+            /* This is kind of a kludge. Should we only support Aggregate
+             * Operations ? */
             psz_session = httpd_MsgGet( query, "Session" );
             msg_Dbg( p_vod, "HTTPD_MSG_PLAY for session: %s", psz_session );
 
@@ -899,18 +901,26 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 }
             }
 
-            answer->i_status = 460;
-            answer->psz_status = strdup( "Only Aggregate Operation Allowed" );
+            answer->i_status = 200;
+            answer->psz_status = strdup( "OK" );
             answer->i_body = 0;
             answer->p_body = NULL;
             break;
 
         case HTTPD_MSG_PAUSE:
+            /* This is kind of a kludge. Should we only support Aggregate
+             * Operations ? */
             psz_session = httpd_MsgGet( query, "Session" );
             msg_Dbg( p_vod, "HTTPD_MSG_PAUSE for session: %s", psz_session );
 
-            answer->i_status = 460;
-            answer->psz_status = strdup( "Only Aggregate Operation Allowed" );
+            p_rtsp = RtspClientGet( p_media, psz_session );
+            if( !p_rtsp ) break;
+
+            vod_MediaControl( p_vod, p_media, psz_session, VOD_MEDIA_PAUSE );
+            p_rtsp->b_paused = VLC_TRUE;
+
+            answer->i_status = 200;
+            answer->psz_status = strdup( "OK" );
             answer->i_body = 0;
             answer->p_body = NULL;
             break;
