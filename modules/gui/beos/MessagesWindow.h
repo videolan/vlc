@@ -2,7 +2,7 @@
  * MessagesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MessagesWindow.h,v 1.4 2003/05/17 18:30:41 titer Exp $
+ * $Id$
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -36,7 +36,6 @@ class MessagesView : public BTextView
                                               resizingMode, flags )
                              {
                                  p_intf = _p_intf;
-                                 p_sub = ((intf_sys_t*)p_intf->p_sys)->p_sub;
                              }
         virtual void         Pulse();
 

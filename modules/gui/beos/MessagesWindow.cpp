@@ -2,7 +2,7 @@
  * MessagesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MessagesWindow.cpp,v 1.12 2004/01/26 16:52:31 zorglub Exp $
+ * $Id$
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -30,7 +30,6 @@
 #include <vlc/intf.h>
 
 /* BeOS module headers */
-#include "VlcWrapper.h"
 #include "InterfaceWindow.h"
 #include "MessagesWindow.h"
 
@@ -39,6 +38,7 @@
  *****************************************************************************/
 void MessagesView::Pulse()
 {
+#if 0
     bool isScrolling = false;
     if( fScrollBar->LockLooper() )
     {
@@ -123,6 +123,7 @@ void MessagesView::Pulse()
     }
 
     BTextView::Pulse();
+#endif
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * PlayListWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.h,v 1.8 2004/01/26 16:52:31 zorglub Exp $
+ * $Id$
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -75,7 +75,6 @@ class PlayListWindow : public BWindow
 			BMenu*				fViewMenu;
 			
 			intf_thread_t *     p_intf;
-			VlcWrapper *		p_wrapper;
 };
 
 #endif	// BEOS_PLAY_LIST_WINDOW_H

@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.15 2004/01/26 16:52:31 zorglub Exp $
+ * $Id$
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -36,7 +36,6 @@ class PlayListWindow;
 class BFilePanel;
 class PreferencesWindow;
 class MessagesWindow;
-class VlcWrapper;
 
 class CDMenu : public BMenu
 {
@@ -53,16 +52,16 @@ class CDMenu : public BMenu
 class LanguageMenu : public BMenu
 {
  public:
-                            LanguageMenu( const char* name,
-                                          int menu_kind,
-                                          VlcWrapper *p_wrapper );
+                            LanguageMenu( intf_thread_t * p_intf,
+                                          const char * psz_name,
+                                          char * psz_variable );
     virtual                 ~LanguageMenu();
 
     virtual void            AttachedToWindow();
 
  private:
-    VlcWrapper *            p_wrapper;
-    int                     kind;
+    intf_thread_t         * p_intf;
+    char                  * psz_variable;
 };
 
 class TitleMenu : public BMenu
@@ -91,9 +90,9 @@ class ChapterMenu : public BMenu
 class InterfaceWindow : public BWindow
 {
  public:
-                            InterfaceWindow( BRect frame,
-                                             const char* name,
-                                             intf_thread_t* p_interface );
+                            InterfaceWindow( intf_thread_t * p_intf,
+                                             BRect frame,
+                                             const char * name );
     virtual                 ~InterfaceWindow();
 
                             // BWindow
@@ -119,10 +118,11 @@ class InterfaceWindow : public BWindow
 			void			_RestoreSettings();
 			void			_StoreSettings();
 
-    intf_thread_t*          p_intf;
-    es_descriptor_t*        p_spu_es;
+    intf_thread_t         * p_intf;
+    input_thread_t        * p_input;
+    playlist_t            * p_playlist;
+    es_descriptor_t       * p_spu_es;
 
-    bool                    fPlaylistIsEmpty;
     BFilePanel*             fFilePanel;
     PlayListWindow*         fPlaylistWindow;
     PreferencesWindow*      fPreferencesWindow;
@@ -151,7 +151,6 @@ class InterfaceWindow : public BWindow
     bigtime_t               fLastUpdateTime;
 	BMessage*				fSettings;	// we keep the message arround
 										// for forward compatibility
-    VlcWrapper*				p_wrapper;
 };
 
 

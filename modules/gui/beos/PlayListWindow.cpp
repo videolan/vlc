@@ -2,7 +2,7 @@
  * PlayListWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.cpp,v 1.10 2004/01/26 16:52:31 zorglub Exp $
+ * $Id$
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -35,7 +35,6 @@
 #include <vlc/intf.h>
 
 /* BeOS interface headers */
-#include "VlcWrapper.h"
 #include "InterfaceWindow.h"
 #include "ListViews.h"
 #include "MsgVals.h"
@@ -67,8 +66,12 @@ PlayListWindow::PlayListWindow( BRect frame, const char* name,
 				 B_WILL_ACCEPT_FIRST_CLICK | B_ASYNCHRONOUS_CONTROLS ),
 		fMainWindow( mainWindow )
 {
+    char psz_tmp[1024];
+#define ADD_ELLIPSIS( a ) \
+    memset( psz_tmp, 0, 1024 ); \
+    snprintf( psz_tmp, 1024, "%s%s", a, B_UTF8_ELLIPSIS );
+
 	p_intf = p_interface;
-    p_wrapper = p_intf->p_sys->p_wrapper;
     
     SetName( _("playlist") );
 
@@ -81,8 +84,8 @@ PlayListWindow::PlayListWindow( BRect frame, const char* name,
 	// Add the File menu
 	BMenu *fileMenu = new BMenu( _("File") );
 	fMenuBar->AddItem( fileMenu );
-	BMenuItem* item = new BMenuItem( _AddEllipsis(_("Open File")),
-									 new BMessage( OPEN_FILE ), 'O' );
+	ADD_ELLIPSIS( _("Open File") );
+	BMenuItem* item = new BMenuItem( psz_tmp, new BMessage( OPEN_FILE ), 'O' );
 	item->SetTarget( fMainWindow );
 	fileMenu->AddItem( item );
 
@@ -154,7 +157,7 @@ fRandomizeMI->SetEnabled( false );
 	frame.top += fMenuBar->Bounds().IntegerHeight() + 1;
 	frame.right -= B_V_SCROLL_BAR_WIDTH;
 
-	fListView = new PlaylistView( frame, fMainWindow, p_wrapper,
+	fListView = new PlaylistView( p_intf, frame, fMainWindow,
 								  new BMessage( MSG_SELECTION_CHANGED ) );
 	fBackgroundView = new BScrollView( "playlist scrollview",
 									   fListView, B_FOLLOW_ALL_SIDES,
@@ -282,9 +285,10 @@ PlayListWindow::UpdatePlaylist( bool rebuild )
 {
 	if ( rebuild )
 		fListView->RebuildList();
+#if 0
 	fListView->SetCurrent( p_wrapper->PlaylistCurrent() );
 	fListView->SetPlaying( p_wrapper->IsPlaying() );
-
+#endif
 	_CheckItemsEnableState();
 }
 

@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: Interface.cpp,v 1.16 2004/01/26 16:52:31 zorglub Exp $
+ * $Id$
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -41,9 +41,16 @@
 #include <vlc/aout.h>
 #include <aout_internal.h>
 
-#include "VlcWrapper.h"
 #include "InterfaceWindow.h"
 #include "MsgVals.h"
+
+/*****************************************************************************
+ * intf_sys_t: internal variables of the BeOS interface
+ *****************************************************************************/
+struct intf_sys_t
+{
+    InterfaceWindow * p_window;
+};
 
 /*****************************************************************************
  * Local prototype
@@ -59,44 +66,36 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
 
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_t*) malloc( sizeof( intf_sys_t ) );
-    if( p_intf->p_sys == NULL )
+    if( !p_intf->p_sys )
     {
         msg_Err( p_intf, "out of memory" );
-        return( 1 );
+        return VLC_EGENERIC;
     }
     
-    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
-    p_intf->p_sys->p_wrapper = new VlcWrapper( p_intf );
     p_intf->pf_run = Run;
 
     /* Create the interface window */
-    BScreen screen(B_MAIN_SCREEN_ID);
-    BRect rect = screen.Frame();
-    rect.top = rect.bottom-100;
+    BScreen screen( B_MAIN_SCREEN_ID );
+    BRect rect   = screen.Frame();
+    rect.top     = rect.bottom - 100;
     rect.bottom -= 50;
-    rect.left += 50;
-    rect.right = rect.left + 350;
+    rect.left   += 50;
+    rect.right   = rect.left + 350;
     p_intf->p_sys->p_window =
-        new InterfaceWindow( rect,
-                             "VLC " PACKAGE_VERSION,
-                             p_intf );
-    if( p_intf->p_sys->p_window == 0 )
+        new InterfaceWindow( p_intf, rect, "VLC " VERSION );
+    if( !p_intf->p_sys->p_window )
     {
         free( p_intf->p_sys );
         msg_Err( p_intf, "cannot allocate InterfaceWindow" );
-        return( 1 );
+        return VLC_EGENERIC;
     }
-    else
-    {
-        /* Make the be_app aware the interface has been created */
-        BMessage message(INTERFACE_CREATED);
-        message.AddPointer("window", p_intf->p_sys->p_window);
-        be_app->PostMessage(&message);
-    }
-    p_intf->p_sys->b_loop = 0;
-    p_intf->p_sys->b_mute = 0;
-    
-    return( 0 );
+
+    /* Make the be_app aware the interface has been created */
+    BMessage message( INTERFACE_CREATED );
+    message.AddPointer( "window", p_intf->p_sys->p_window );
+    be_app->PostMessage( &message );
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -106,14 +105,11 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 
-    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-
     /* Destroy the interface window */
     if( p_intf->p_sys->p_window->Lock() )
         p_intf->p_sys->p_window->Quit();
 
     /* Destroy structure */
-    delete p_intf->p_sys->p_wrapper;
     free( p_intf->p_sys );
 }
 
@@ -125,13 +121,7 @@ static void Run( intf_thread_t *p_intf )
 {
     while( !p_intf->b_die )
     {
-        /* Update VlcWrapper internals (p_input, etc) */
-        p_intf->p_sys->p_wrapper->UpdateInput();
-
-        /* Manage the slider */
         p_intf->p_sys->p_window->UpdateInterface();
-
-        /* Wait a bit */
         msleep( INTF_IDLE_SLEEP );
     }
 }

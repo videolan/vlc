@@ -19,8 +19,6 @@ SOURCES_beos = \
 	MessagesWindow.h \
 	MediaControlView.cpp \
 	MediaControlView.h \
-	VlcWrapper.cpp \
-	VlcWrapper.h \
 	Bitmaps.h \
 	MsgVals.h \
 	VideoWindow.h \

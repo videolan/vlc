@@ -38,7 +38,6 @@ extern "C"
 }
 
 /* BeOS interface headers */
-#include "VlcWrapper.h"
 #include "Bitmaps.h"
 #include "DrawingTidbits.h"
 #include "InterfaceWindow.h"
@@ -67,6 +66,7 @@ const rgb_color kSeekRedLight = (rgb_color){ 255, 152, 152, 255 };
 const rgb_color kSeekRedShadow = (rgb_color){ 178, 0, 0, 255 };
 
 #define DISABLED_SEEK_MESSAGE _("Drop files to play")
+#define SEEKSLIDER_RANGE 2048
 
 enum
 {
@@ -77,17 +77,16 @@ enum
 };
 
 // constructor
-MediaControlView::MediaControlView(BRect frame, intf_thread_t *p_interface)
+MediaControlView::MediaControlView( intf_thread_t * _p_intf, BRect frame)
 	: BBox(frame, NULL, B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED,
 		   B_PLAIN_BORDER),
+      p_intf( _p_intf ),
       fScrubSem(B_ERROR),
       fCurrentRate(INPUT_RATE_DEFAULT),
       fCurrentStatus(-1),
       fBottomControlHeight(0.0),
       fIsEnabled( true )
 {
-    p_intf = p_interface;
-
 	BRect frame(0.0, 0.0, 10.0, 10.0);
 	
     // Seek Slider
@@ -1335,6 +1334,7 @@ PositionInfoView::Pulse()
 	bigtime_t now = system_time();
 	if ( now - fLastPulseUpdate > 900000 )
 	{
+#if 0
 		int32 index, size;
 		p_intf->p_sys->p_wrapper->GetPlaylistInfo( index, size );
 		SetFile( index + 1, size );
@@ -1344,6 +1344,7 @@ PositionInfoView::Pulse()
 		SetChapter( index, size );
 		SetTime( p_intf->p_sys->p_wrapper->GetTimeAsString() );
 		fLastPulseUpdate = now;
+#endif
 	}
 }
 

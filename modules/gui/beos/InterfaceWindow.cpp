@@ -44,7 +44,6 @@
 #include <vlc/input.h>
 
 /* BeOS interface headers */
-#include "VlcWrapper.h"
 #include "MsgVals.h"
 #include "MediaControlView.h"
 #include "PlayListWindow.h"
@@ -52,34 +51,34 @@
 #include "MessagesWindow.h"
 #include "InterfaceWindow.h"
 
-#define INTERFACE_UPDATE_TIMEOUT 80000 // 2 frames if at 25 fps
+#define INTERFACE_UPDATE_TIMEOUT  80000 // 2 frames if at 25 fps
 #define INTERFACE_LOCKING_TIMEOUT 5000
 
 // make_sure_frame_is_on_screen
 bool
 make_sure_frame_is_on_screen( BRect& frame )
 {
-	BScreen screen( B_MAIN_SCREEN_ID );
-	if (frame.IsValid() && screen.IsValid()) {
-		if (!screen.Frame().Contains(frame)) {
-			// make sure frame fits in the screen
-			if (frame.Width() > screen.Frame().Width())
-				frame.right -= frame.Width() - screen.Frame().Width() + 10.0;
-			if (frame.Height() > screen.Frame().Height())
-				frame.bottom -= frame.Height() - screen.Frame().Height() + 30.0;
-			// frame is now at the most the size of the screen
-			if (frame.right > screen.Frame().right)
-				frame.OffsetBy(-(frame.right - screen.Frame().right), 0.0);
-			if (frame.bottom > screen.Frame().bottom)
-				frame.OffsetBy(0.0, -(frame.bottom - screen.Frame().bottom));
-			if (frame.left < screen.Frame().left)
-				frame.OffsetBy((screen.Frame().left - frame.left), 0.0);
-			if (frame.top < screen.Frame().top)
-				frame.OffsetBy(0.0, (screen.Frame().top - frame.top));
-		}
-		return true;
-	}
-	return false;
+    BScreen screen( B_MAIN_SCREEN_ID );
+    if (frame.IsValid() && screen.IsValid()) {
+        if (!screen.Frame().Contains(frame)) {
+            // make sure frame fits in the screen
+            if (frame.Width() > screen.Frame().Width())
+                frame.right -= frame.Width() - screen.Frame().Width() + 10.0;
+            if (frame.Height() > screen.Frame().Height())
+                frame.bottom -= frame.Height() - screen.Frame().Height() + 30.0;
+            // frame is now at the most the size of the screen
+            if (frame.right > screen.Frame().right)
+                frame.OffsetBy(-(frame.right - screen.Frame().right), 0.0);
+            if (frame.bottom > screen.Frame().bottom)
+                frame.OffsetBy(0.0, -(frame.bottom - screen.Frame().bottom));
+            if (frame.left < screen.Frame().left)
+                frame.OffsetBy((screen.Frame().left - frame.left), 0.0);
+            if (frame.top < screen.Frame().top)
+                frame.OffsetBy(0.0, (screen.Frame().top - frame.top));
+        }
+        return true;
+    }
+    return false;
 }
 
 // make_sure_frame_is_within_limits
@@ -101,78 +100,78 @@ make_sure_frame_is_within_limits( BRect& frame, float minWidth, float minHeight,
 bool
 get_volume_info( BVolume& volume, BString& volumeName, bool& isCDROM, BString& deviceName )
 {
-	bool success = false;
-	isCDROM = false;
-	deviceName = "";
-	volumeName = "";
-	char name[B_FILE_NAME_LENGTH];
-	if ( volume.GetName( name ) >= B_OK )	// disk is currently mounted
-	{
-		volumeName = name;
-		dev_t dev = volume.Device();
-		fs_info info;
-		if ( fs_stat_dev( dev, &info ) == B_OK )
-		{
-			success = true;
-			deviceName = info.device_name;
-			if ( volume.IsReadOnly() )
-			{
-				int i_dev = open( info.device_name, O_RDONLY );
-				if ( i_dev >= 0 )
-				{
-					device_geometry g;
-					if ( ioctl( i_dev, B_GET_GEOMETRY, &g, sizeof( g ) ) >= 0 )
-						isCDROM = ( g.device_type == B_CD );
-					close( i_dev );
-				}
-			}
-		}
- 	}
- 	return success;
+    bool success = false;
+    isCDROM = false;
+    deviceName = "";
+    volumeName = "";
+    char name[B_FILE_NAME_LENGTH];
+    if ( volume.GetName( name ) >= B_OK )    // disk is currently mounted
+    {
+        volumeName = name;
+        dev_t dev = volume.Device();
+        fs_info info;
+        if ( fs_stat_dev( dev, &info ) == B_OK )
+        {
+            success = true;
+            deviceName = info.device_name;
+            if ( volume.IsReadOnly() )
+            {
+                int i_dev = open( info.device_name, O_RDONLY );
+                if ( i_dev >= 0 )
+                {
+                    device_geometry g;
+                    if ( ioctl( i_dev, B_GET_GEOMETRY, &g, sizeof( g ) ) >= 0 )
+                        isCDROM = ( g.device_type == B_CD );
+                    close( i_dev );
+                }
+            }
+        }
+     }
+     return success;
 }
 
 // collect_folder_contents
 void
 collect_folder_contents( BDirectory& dir, BList& list, bool& deep, bool& asked, BEntry& entry )
 {
-	while ( dir.GetNextEntry( &entry, true ) == B_OK )
-	{
-		if ( !entry.IsDirectory() )
-		{
-			BPath path;
-			// since the directory will give us the entries in reverse order,
-			// we put them each at the same index, effectively reversing the
-			// items while adding them
-			if ( entry.GetPath( &path ) == B_OK )
-			{
-				BString* string = new BString( path.Path() );
-				if ( !list.AddItem( string, 0 ) )
-					delete string;	// at least don't leak
-			}
-		}
-		else
-		{
-			if ( !asked )
-			{
-				// ask user if we should parse sub-folders as well
-				BAlert* alert = new BAlert( "sub-folders?",
-											_("Open files from all sub-folders as well?"),
-											_("Cancel"), _("Open"), NULL, B_WIDTH_AS_USUAL,
-											B_IDEA_ALERT );
-				int32 buttonIndex = alert->Go();
-				deep = buttonIndex == 1;
-				asked = true;
-				// never delete BAlerts!!
-			}
-			if ( deep )
-			{
-				BDirectory subDir( &entry );
-				if ( subDir.InitCheck() == B_OK )
-					collect_folder_contents( subDir, list,
-											 deep, asked, entry );
-			}
-		}
-	}
+    while ( dir.GetNextEntry( &entry, true ) == B_OK )
+    {
+        if ( !entry.IsDirectory() )
+        {
+            BPath path;
+            // since the directory will give us the entries in reverse order,
+            // we put them each at the same index, effectively reversing the
+            // items while adding them
+            if ( entry.GetPath( &path ) == B_OK )
+            {
+                BString* string = new BString( path.Path() );
+                if ( !list.AddItem( string, 0 ) )
+                    delete string;    // at least don't leak
+            }
+        }
+        else
+        {
+            if ( !asked )
+            {
+                // ask user if we should parse sub-folders as well
+                BAlert* alert = new BAlert( "sub-folders?",
+                                            _("Open files from all sub-folders as well?"),
+                                            _("Cancel"), _("Open"), NULL, B_WIDTH_AS_USUAL,
+                                            B_IDEA_ALERT );
+                int32 buttonIndex = alert->Go();
+                deep = buttonIndex == 1;
+                asked = true;
+                // never delete BAlerts!!
+            }
+            if ( deep )
+            {
+                BDirectory subDir( &entry );
+                if ( subDir.InitCheck() == B_OK )
+                    collect_folder_contents( subDir, list,
+                                             deep, asked, entry );
+            }
+        }
+    }
 }
 
 
@@ -180,18 +179,25 @@ collect_folder_contents( BDirectory& dir, BList& list, bool& deep, bool& asked, 
  * InterfaceWindow
  *****************************************************************************/
 
-InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
-                                  intf_thread_t* p_interface )
+InterfaceWindow::InterfaceWindow( intf_thread_t * _p_intf, BRect frame,
+                                  const char * name )
     : BWindow( frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
                B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK | B_ASYNCHRONOUS_CONTROLS ),
-      p_intf( p_interface ),
+      
+      /* Initializations */
+      p_intf( _p_intf ),
+      p_input( NULL ),
+      p_playlist( NULL ),
+      
       fFilePanel( NULL ),
       fLastUpdateTime( system_time() ),
-	  fSettings( new BMessage( 'sett' ) ),
-	  p_wrapper( p_intf->p_sys->p_wrapper )
+      fSettings( new BMessage( 'sett' ) )
 {
-    fPlaylistIsEmpty = !( p_wrapper->PlaylistSize() > 0 );
-    
+    char psz_tmp[1024];
+#define ADD_ELLIPSIS( a ) \
+    memset( psz_tmp, 0, 1024 ); \
+    snprintf( psz_tmp, 1024, "%s%s", a, B_UTF8_ELLIPSIS );
+
     BScreen screen;
     BRect screen_rect = screen.Frame();
     BRect window_rect;
@@ -212,8 +218,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
     fMessagesWindow = new MessagesWindow( p_intf, window_rect, _("Messages") );
 
     // the media control view
-    p_mediaControl = new MediaControlView( BRect( 0.0, 0.0, 250.0, 50.0 ),
-                                           p_intf );
+    p_mediaControl = new MediaControlView( p_intf, BRect( 0.0, 0.0, 250.0, 50.0 ) );
     p_mediaControl->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
 
     float width, height;
@@ -234,26 +239,25 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
     p_mediaControl->MoveTo( fMenuBar->Bounds().LeftBottom() + BPoint(0.0, 1.0) );
     AddChild( fMenuBar );
 
+
     // Add the file Menu
     BMenu* fileMenu = new BMenu( _("File") );
     fMenuBar->AddItem( fileMenu );
-    fileMenu->AddItem( new BMenuItem( _AddEllipsis(_("Open File")),
-                                      new BMessage( OPEN_FILE ), 'O') );
-    
+    ADD_ELLIPSIS( _("Open File") );
+    fileMenu->AddItem( new BMenuItem( psz_tmp, new BMessage( OPEN_FILE ), 'O') );
     fileMenu->AddItem( new CDMenu( _("Open Disc") ) );
-
-    fileMenu->AddItem( new BMenuItem( _AddEllipsis(_("Open Subtitles")),
-                                      new BMessage( LOAD_SUBFILE ) ) );
+    ADD_ELLIPSIS( _("Open Subtitles") );
+    fileMenu->AddItem( new BMenuItem( psz_tmp, new BMessage( LOAD_SUBFILE ) ) );
 
     fileMenu->AddSeparatorItem();
-    BMenuItem* item = new BMenuItem( _AddEllipsis(_("About")),
-                                     new BMessage( B_ABOUT_REQUESTED ), 'A');
+    ADD_ELLIPSIS( _("About") );
+    BMenuItem* item = new BMenuItem( psz_tmp, new BMessage( B_ABOUT_REQUESTED ), 'A');
     item->SetTarget( be_app );
     fileMenu->AddItem( item );
     fileMenu->AddItem( new BMenuItem( _("Quit"), new BMessage( B_QUIT_REQUESTED ), 'Q') );
 
-    fLanguageMenu = new LanguageMenu( _("Language"), AUDIO_ES, p_wrapper);
-    fSubtitlesMenu = new LanguageMenu( _("Subtitles"), SPU_ES, p_wrapper);
+    fLanguageMenu = new LanguageMenu( p_intf, _("Language"), "audio-es" );
+    fSubtitlesMenu = new LanguageMenu( p_intf, _("Subtitles"), "spu-es" );
 
     /* Add the Audio menu */
     fAudioMenu = new BMenu( _("Audio") );
@@ -301,17 +305,17 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
 
     /* Add the Show menu */
     fShowMenu = new BMenu( _("Window") );
-    fShowMenu->AddItem( new BMenuItem( _AddEllipsis(_("Playlist")),
-                                       new BMessage( OPEN_PLAYLIST ), 'P') );
-    fShowMenu->AddItem( new BMenuItem( _AddEllipsis(_("Messages")),
-                                       new BMessage( OPEN_MESSAGES ), 'M' ) );
-    fShowMenu->AddItem( new BMenuItem( _AddEllipsis(_("Preferences")),
-                                       new BMessage( OPEN_PREFERENCES ), 'S' ) );
+    ADD_ELLIPSIS( _("Playlist") );
+    fShowMenu->AddItem( new BMenuItem( psz_tmp, new BMessage( OPEN_PLAYLIST ), 'P') );
+    ADD_ELLIPSIS( _("Messages") );
+    fShowMenu->AddItem( new BMenuItem( psz_tmp, new BMessage( OPEN_MESSAGES ), 'M' ) );
+    ADD_ELLIPSIS( _("Preferences") );
+    fShowMenu->AddItem( new BMenuItem( psz_tmp, new BMessage( OPEN_PREFERENCES ), 'S' ) );
     fMenuBar->AddItem( fShowMenu );
 
-	// add the media control view after the menubar is complete
-	// because it will set the window size limits in AttachedToWindow()
-	// and the menubar needs to report the correct PreferredSize()
+    // add the media control view after the menubar is complete
+    // because it will set the window size limits in AttachedToWindow()
+    // and the menubar needs to report the correct PreferredSize()
     AddChild( p_mediaControl );
 
     /* Prepare fow showing */
@@ -325,17 +329,28 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
 
 InterfaceWindow::~InterfaceWindow()
 {
+    if( p_input )
+    {
+        vlc_object_release( p_input );
+    }
+    if( p_playlist )
+    {
+        vlc_object_release( p_playlist );
+    }
     if( fPlaylistWindow )
+    {
         fPlaylistWindow->ReallyQuit();
-    fPlaylistWindow = NULL;
+    }
     if( fMessagesWindow )
+    {
         fMessagesWindow->ReallyQuit();
-    fMessagesWindow = NULL;
+    }
     if( fPreferencesWindow )
+    {
         fPreferencesWindow->ReallyQuit();
-    fPreferencesWindow = NULL;
-	delete fFilePanel;
-	delete fSettings;
+    }
+    delete fFilePanel;
+    delete fSettings;
 }
 
 /*****************************************************************************
@@ -357,16 +372,16 @@ InterfaceWindow::FrameResized(float width, float height)
  *****************************************************************************/
 void InterfaceWindow::MessageReceived( BMessage * p_message )
 {
-    int playback_status;      // remember playback state
-    playback_status = p_wrapper->InputStatus();
-
     switch( p_message->what )
     {
         case B_ABOUT_REQUESTED:
         {
-            BAlert* alert = new BAlert( "VLC " PACKAGE_VERSION,
-                                        "VLC " PACKAGE_VERSION " for BeOS"
-                                        "\n\n<www.videolan.org>", _("OK"));
+            BAlert * alert;
+            
+            alert = new BAlert( "VLC media player" VERSION,
+                                "VLC media player" VERSION " (BeOS interface)\n\n"
+                                "The VideoLAN team <videolan@videolan.org>\n"
+                                "http://www.videolan.org/", _("OK") );
             alert->Go();
             break;
         }
@@ -374,11 +389,11 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             break;
 
         case OPEN_FILE:
-        	_ShowFilePanel( B_REFS_RECEIVED, _("VLC media player: Open Media Files") );
+            _ShowFilePanel( B_REFS_RECEIVED, _("VLC media player: Open Media Files") );
             break;
 
         case LOAD_SUBFILE:
-        	_ShowFilePanel( SUBFILE_RECEIVED, _("VLC media player: Open Subtitle File") );
+            _ShowFilePanel( SUBFILE_RECEIVED, _("VLC media player: Open Subtitle File") );
             break;
 
         case OPEN_PLAYLIST:
@@ -391,14 +406,18 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                 fPlaylistWindow->Unlock();
             }
             break;
+
         case OPEN_DVD:
             {
-                const char *psz_device;
-                BString type( "dvd" );
-                if( p_message->FindString( "device", &psz_device ) == B_OK )
+                const char * psz_device;
+                if( p_playlist &&
+                    p_message->FindString( "device", &psz_device ) == B_OK )
                 {
-                    BString device( psz_device );
-                    p_wrapper->OpenDisc( type, device, 0, 0 );
+                    char psz_uri[1024];
+                    memset( psz_uri, 0, 1024 );
+                    snprintf( psz_uri, 1024, "dvdnav:%s", psz_device );
+                    playlist_Add( p_playlist, psz_uri, psz_device,
+                                  PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
                 }
                 _UpdatePlaylist();
             }
@@ -411,280 +430,324 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             {
                 BPath path( &ref );
                 if ( path.InitCheck() == B_OK )
-                    p_wrapper->LoadSubFile( path.Path() );
+                    config_PutPsz( p_intf, "sub-file", path.Path() );
             }
             break;
         }
 
         case STOP_PLAYBACK:
-            // this currently stops playback not nicely
-            if (playback_status != -1)
+            if( p_playlist )
             {
-                p_wrapper->PlaylistStop();
-                p_mediaControl->SetStatus(-1, INPUT_RATE_DEFAULT);
+                playlist_Stop( p_playlist );
             }
+            p_mediaControl->SetStatus(-1, INPUT_RATE_DEFAULT);
             break;
     
         case START_PLAYBACK:
             /*  starts playing in normal mode */
     
         case PAUSE_PLAYBACK:
-            /* toggle between pause and play */
-            if (playback_status > -1)
+            if( p_input )
             {
-                /* pause if currently playing */
-                if ( playback_status == PLAYING_S )
+                if( var_GetInteger( p_input, "state" ) == PAUSE_S )
                 {
-                    p_wrapper->PlaylistPause();
+                    if( p_playlist )
+                    {
+                        playlist_Play( p_playlist );
+                    }
                 }
                 else
                 {
-                    p_wrapper->PlaylistPlay();
+                    var_SetInteger( p_input, "state", PAUSE_S );
                 }
             }
-            else
-            {
-                /* Play a new file */
-                p_wrapper->PlaylistPlay();
-            }    
             break;
     
         case HEIGHTH_PLAY:
-            p_wrapper->InputSetRate( INPUT_RATE_DEFAULT * 8 );
+            if( p_input )
+            {
+                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT * 8 );
+            }
             break;
 
         case QUARTER_PLAY:
-            p_wrapper->InputSetRate( INPUT_RATE_DEFAULT * 4 );
+            if( p_input )
+            {
+                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT * 4 );
+            }
             break;
 
         case HALF_PLAY:
-            p_wrapper->InputSetRate( INPUT_RATE_DEFAULT * 2 );
+            if( p_input )
+            {
+                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT * 2 );
+            }
             break;
 
         case NORMAL_PLAY:
-            p_wrapper->InputSetRate( INPUT_RATE_DEFAULT );
+            if( p_input )
+            {
+                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT );
+            }
             break;
 
         case TWICE_PLAY:
-            p_wrapper->InputSetRate( INPUT_RATE_DEFAULT / 2 );
+            if( p_input )
+            {
+                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT / 2 );
+            }
             break;
 
         case FOUR_PLAY:
-            p_wrapper->InputSetRate( INPUT_RATE_DEFAULT / 4 );
+            if( p_input )
+            {
+                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT / 4 );
+            }
             break;
 
         case HEIGHT_PLAY:
-            p_wrapper->InputSetRate( INPUT_RATE_DEFAULT / 8 );
+            if( p_input )
+            {
+                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT / 8 );
+            }
             break;
 
         case SEEK_PLAYBACK:
             /* handled by semaphores */
             break;
-        // volume related messages
+
         case VOLUME_CHG:
-            /* adjust the volume */
-            if (playback_status > -1)
-            {
-                p_wrapper->SetVolume( p_mediaControl->GetVolume() );
-                p_mediaControl->SetMuted( p_wrapper->IsMuted() );
-            }
+            aout_VolumeSet( p_intf, p_mediaControl->GetVolume() );
             break;
     
         case VOLUME_MUTE:
-            // toggle muting
-            if( p_wrapper->IsMuted() )
-                p_wrapper->VolumeRestore();
-            else
-                p_wrapper->VolumeMute();
-            p_mediaControl->SetMuted( p_wrapper->IsMuted() );
+            aout_VolumeMute( p_intf, NULL );
             break;
     
         case SELECT_CHANNEL:
-            if ( playback_status > -1 )
+        {
+            int32 channel;
+            if( p_input )
             {
-                int32 channel;
-                if ( p_message->FindInt32( "channel", &channel ) == B_OK )
+                if( p_message->FindInt32( "audio-es", &channel ) == B_OK )
                 {
-                    p_wrapper->ToggleLanguage( channel );
+                    var_SetInteger( p_input, "audio-es", channel );
+                }
+                else if( p_message->FindInt32( "spu-es", &channel ) == B_OK )
+                {
+                    var_SetInteger( p_input, "spu-es", channel );
                 }
             }
             break;
+        }
     
-        case SELECT_SUBTITLE:
-            if ( playback_status > -1 )
-            {
-                int32 subtitle;
-                if ( p_message->FindInt32( "subtitle", &subtitle ) == B_OK )
-                     p_wrapper->ToggleSubtitle( subtitle );
-            }
-            break;
-    
-        // specific navigation messages
         case PREV_TITLE:
-        {
-            p_wrapper->PrevTitle();
+            if( p_input )
+            {
+                var_SetVoid( p_input, "prev-title" );
+            }
             break;
-        }
+
         case NEXT_TITLE:
-        {
-            p_wrapper->NextTitle();
+            if( p_input )
+            {
+                var_SetVoid( p_input, "next-title" );
+            }
             break;
-        }
+
         case NAVIGATE_MENU:
-        	p_wrapper->ToggleTitle( 0 );
-        	break;
+            if( p_input )
+            {
+                var_SetInteger( p_input, "title", 0 );
+            }
+            break;
+
         case TOGGLE_TITLE:
-            if ( playback_status > -1 )
+        {
+            int32 index;
+            if( p_input &&
+                p_message->FindInt32( "index", &index ) == B_OK )
             {
-                int32 index;
-                if( p_message->FindInt32( "index", &index ) == B_OK )
-                    p_wrapper->ToggleTitle( index );
+                var_SetInteger( p_input, "title", index );
             }
             break;
+        }
+
         case PREV_CHAPTER:
-        {
-            p_wrapper->PrevChapter();
-            break;
-        }
-        case NEXT_CHAPTER:
-        {
-            p_wrapper->NextChapter();
-            break;
-        }
-        case TOGGLE_CHAPTER:
-            if ( playback_status > -1 )
+            if( p_input )
             {
-                int32 index;
-                if( p_message->FindInt32( "index", &index ) == B_OK )
-                    p_wrapper->ToggleChapter( index );
+                var_SetVoid( p_input, "prev-chapter" );
             }
             break;
+
+        case NEXT_CHAPTER:
+            if( p_input )
+            {
+                var_SetVoid( p_input, "next-chapter" );
+            }
+            break;
+
+        case TOGGLE_CHAPTER:
+        {
+            int32 index;
+            if( p_input &&
+                p_message->FindInt32( "index", &index ) == B_OK )
+            {
+                var_SetInteger( p_input, "chapter", index );
+            }
+            break;
+        }
+
         case PREV_FILE:
-            p_wrapper->PlaylistPrev();
+            if( p_playlist )
+            {
+                playlist_Prev( p_playlist );
+            }
             break;
+
         case NEXT_FILE:
-            p_wrapper->PlaylistNext();
+            if( p_playlist )
+            {
+                playlist_Next( p_playlist );
+            }
             break;
-        // general next/prev functionality (skips to whatever makes most sense)
+
         case NAVIGATE_PREV:
-            p_wrapper->NavigatePrev();
+            if( p_input )
+            {
+                vlc_value_t val;
+
+                /* First try to go to previous chapter */
+                if( !var_Get( p_input, "chapter", &val ) )
+                {
+                    if( val.i_int > 1 )
+                    {
+                        var_SetVoid( p_input, "prev-chapter" );
+                        break;
+                    }
+                }
+
+                /* Try to go to previous title */
+                if( !var_Get( p_input, "title", &val ) )
+                {
+                    if( val.i_int > 1 )
+                    {
+                        var_SetVoid( p_input, "prev-title" );
+                        break;
+                    }
+                }
+
+                /* Try to go to previous file */
+                if( p_playlist )
+                {
+                    playlist_Prev( p_playlist );
+                }
+            }
             break;
+
         case NAVIGATE_NEXT:
-            p_wrapper->NavigateNext();
+            if( p_input )
+            {
+                vlc_value_t val, val_list;
+
+                /* First try to go to next chapter */
+                if( !var_Get( p_input, "chapter", &val ) )
+                {
+                    var_Change( p_input, "chapter", VLC_VAR_GETCHOICES,
+                                &val_list, NULL );
+                    if( val_list.p_list->i_count > val.i_int )
+                    {
+                        var_Change( p_input, "chapter", VLC_VAR_FREELIST,
+                                    &val_list, NULL );
+                        var_SetVoid( p_input, "next-chapter" );
+                        break;
+                    }
+                    var_Change( p_input, "chapter", VLC_VAR_FREELIST,
+                                &val_list, NULL );
+                }
+
+                /* Try to go to next title */
+                if( !var_Get( p_input, "title", &val ) )
+                {
+                    var_Change( p_input, "title", VLC_VAR_GETCHOICES,
+                                &val_list, NULL );
+                    if( val_list.p_list->i_count > val.i_int )
+                    {
+                        var_Change( p_input, "title", VLC_VAR_FREELIST,
+                                    &val_list, NULL );
+                        var_SetVoid( p_input, "next-title" );
+                        break;
+                    }
+                    var_Change( p_input, "title", VLC_VAR_FREELIST,
+                                &val_list, NULL );
+                }
+
+                /* Try to go to next file */
+                if( p_playlist )
+                {
+                    playlist_Next( p_playlist );
+                }
+            }
             break;
+
         // drag'n'drop and system messages
         case MSG_SOUNDPLAY:
-        	// convert soundplay drag'n'drop message (containing paths)
-        	// to normal message (containing refs)
-        	{
-	        	const char* path;
-	        	for ( int32 i = 0; p_message->FindString( "path", i, &path ) == B_OK; i++ )
-	        	{
-	        		entry_ref ref;
-	        		if ( get_ref_for_path( path, &ref ) == B_OK )
-		        		p_message->AddRef( "refs", &ref );
-	        	}
-        	}
-        	// fall through
+            // convert soundplay drag'n'drop message (containing paths)
+            // to normal message (containing refs)
+            {
+                const char* path;
+                for ( int32 i = 0; p_message->FindString( "path", i, &path ) == B_OK; i++ )
+                {
+                    entry_ref ref;
+                    if ( get_ref_for_path( path, &ref ) == B_OK )
+                        p_message->AddRef( "refs", &ref );
+                }
+            }
+            // fall through
         case B_REFS_RECEIVED:
         case B_SIMPLE_DATA:
+        {
+            /* file(s) opened by the File menu -> append to the playlist;
+               file(s) opened by drag & drop -> replace playlist;
+               file(s) opened by 'shift' + drag & drop -> append */
+
+            int32 count;
+            type_code dummy;
+            if( p_message->GetInfo( "refs", &dummy, &count ) != B_OK ||
+                count < 1 )
             {
-                /* file(s) opened by the File menu -> append to the playlist;
-                 * file(s) opened by drag & drop -> replace playlist;
-                 * file(s) opened by 'shift' + drag & drop -> append */
-                bool replace = false;
-                bool reverse = false;
-                if ( p_message->WasDropped() )
-                {
-                    replace = !( modifiers() & B_SHIFT_KEY );
-                    reverse = true;
-                }
-                    
-                // build list of files to be played from message contents
-                entry_ref ref;
-                BList files;
-                
-                // if we should parse sub-folders as well
-           		bool askedAlready = false;
-           		bool parseSubFolders = askedAlready;
-           		// traverse refs in reverse order
-           		int32 count;
-           		type_code dummy;
-           		if ( p_message->GetInfo( "refs", &dummy, &count ) == B_OK && count > 0 )
-           		{
-           			int32 i = reverse ? count - 1 : 0;
-           			int32 increment = reverse ? -1 : 1;
-	                for ( ; p_message->FindRef( "refs", i, &ref ) == B_OK; i += increment )
-	                {
-	                    BPath path( &ref );
-	                    if ( path.InitCheck() == B_OK )
-	                    {
-	                        bool add = true;
-	                        // has the user dropped a folder?
-	                        BDirectory dir( &ref );
-	                        if ( dir.InitCheck() == B_OK)
-	                        {
-		                        // has the user dropped a dvd disk icon?
-								if ( dir.IsRootDirectory() )
-								{
-									BVolumeRoster volRoster;
-									BVolume vol;
-									BDirectory volumeRoot;
-									status_t status = volRoster.GetNextVolume( &vol );
-									while ( status == B_NO_ERROR )
-									{
-										if ( vol.GetRootDirectory( &volumeRoot ) == B_OK
-											 && dir == volumeRoot )
-										{
-											BString volumeName;
-											BString deviceName;
-											bool isCDROM;
-											if ( get_volume_info( vol, volumeName, isCDROM, deviceName )
-												 && isCDROM )
-											{
-												BMessage msg( OPEN_DVD );
-												msg.AddString( "device", deviceName.String() );
-												PostMessage( &msg );
-												add = false;
-											}
-									 		break;
-										}
-										else
-										{
-									 		vol.Unset();
-											status = volRoster.GetNextVolume( &vol );
-										}
-									}
-								}
-	                        	if ( add )
-	                        	{
-	                        		add = false;
-	                        		dir.Rewind();	// defensive programming
-	                        		BEntry entry;
-									collect_folder_contents( dir, files,
-															 parseSubFolders,
-															 askedAlready,
-															 entry );
-	                        	}
-	                        }
-	                        if ( add )
-	                        {
-	                        	BString* string = new BString( path.Path() );
-	                        	if ( !files.AddItem( string, 0 ) )
-	                        		delete string;	// at least don't leak
-	                        }
-	                    }
-	                }
-	                // give the list to VLC
-	                // BString objects allocated here will be deleted there
-	                int32 index;
-	                if ( p_message->FindInt32("drop index", &index) != B_OK )
-	                	index = -1;
-	                p_wrapper->OpenFiles( &files, replace, index );
-	                _UpdatePlaylist();
-           		}
+                break;
             }
+            
+            vlc_bool_t b_remove = ( p_message->WasDropped() &&
+                                    !( modifiers() & B_SHIFT_KEY ) ); 
+
+            if( b_remove && p_playlist )
+            {
+                /* Empty playlist */
+                while( p_playlist->i_size > 0 )
+                {
+                    playlist_Delete( p_playlist, 0 );
+                }
+            }
+
+            entry_ref ref;
+            for( int i = 0; p_message->FindRef( "refs", i, &ref ) == B_OK; i++ )
+            {
+                BPath path( &ref );
+
+                /* TODO: find out if this is a DVD icon */
+
+                if( p_playlist )
+                {
+                    playlist_Add( p_playlist, path.Path(), path.Path(),
+                                  PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+                }
+            }
+
+            _UpdatePlaylist();
             break;
+        }
 
         case OPEN_PREFERENCES:
         {
@@ -712,13 +775,12 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             break;
         }
         case MSG_UPDATE:
-        	UpdateInterface();
-        	break;
+            UpdateInterface();
+            break;
         default:
             BWindow::MessageReceived( p_message );
             break;
     }
-
 }
 
 /*****************************************************************************
@@ -726,10 +788,13 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
  *****************************************************************************/
 bool InterfaceWindow::QuitRequested()
 {
-    p_wrapper->PlaylistStop();
+    if( p_playlist )
+    {
+        playlist_Stop( p_playlist );
+    }
     p_mediaControl->SetStatus(-1, INPUT_RATE_DEFAULT);
 
- 	_StoreSettings();
+     _StoreSettings();
    
     p_intf->b_die = 1;
 
@@ -741,41 +806,57 @@ bool InterfaceWindow::QuitRequested()
  *****************************************************************************/
 void InterfaceWindow::UpdateInterface()
 {
-    if( p_wrapper->HasInput() )
+    /* Manage the input part */
+    if( !p_playlist )
     {
-        if ( acquire_sem( p_mediaControl->fScrubSem ) == B_OK )
-        {
-            p_wrapper->SetTimeAsFloat( p_mediaControl->GetSeekTo() );
-        }
-        else if ( LockWithTimeout( INTERFACE_LOCKING_TIMEOUT ) == B_OK )
-        {
-            p_mediaControl->SetEnabled( true );
-            bool hasTitles = p_wrapper->HasTitles();
-            bool hasChapters = p_wrapper->HasChapters();
-            p_mediaControl->SetStatus( p_wrapper->InputStatus(), 
-                                       p_wrapper->InputRate() );
-            p_mediaControl->SetProgress( p_wrapper->GetTimeAsFloat() );
-            _SetMenusEnabled( true, hasChapters, hasTitles );
+        p_playlist = (playlist_t *)
+            vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    }
+    if( !p_input )
+    {
+        p_input = (input_thread_t *)
+            vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    }
+    else if( p_input->b_dead )
+    {
+        vlc_object_release( p_input );
+        p_input = NULL;
+    }
 
-            _UpdateSpeedMenu( p_wrapper->InputRate() );
+    /* Get ready to update the interface */
+    if( LockWithTimeout( INTERFACE_LOCKING_TIMEOUT ) != B_OK )
+    {
+        return;
+    }
+    
+    if( p_input )
+    {
+        vlc_value_t val;
+        p_mediaControl->SetEnabled( true );
+        bool hasTitles   = var_Get( p_input, "title", &val );
+        bool hasChapters = var_Get( p_input, "chapter", &val );
+        p_mediaControl->SetStatus( var_GetInteger( p_input, "state" ), 
+                                   var_GetInteger( p_input, "rate" ) );
+        var_Get( p_input, "position", &val );
+        p_mediaControl->SetProgress( val.f_float );
+        _SetMenusEnabled( true, hasChapters, hasTitles );
+        _UpdateSpeedMenu( var_GetInteger( p_input, "rate" ) );
 
-            // enable/disable skip buttons
-            bool canSkipPrev;
-            bool canSkipNext;
-            p_wrapper->GetNavCapabilities( &canSkipPrev, &canSkipNext );
-            p_mediaControl->SetSkippable( canSkipPrev, canSkipNext );
+        // enable/disable skip buttons
+#if 0
+        bool canSkipPrev;
+        bool canSkipNext;
+        p_wrapper->GetNavCapabilities( &canSkipPrev, &canSkipNext );
+        p_mediaControl->SetSkippable( canSkipPrev, canSkipNext );
+#endif
 
-            if ( p_wrapper->HasInput() )
-            {
-                p_mediaControl->SetAudioEnabled( true );
-                p_mediaControl->SetMuted( p_wrapper->IsMuted() );
-            } else
-                p_mediaControl->SetAudioEnabled( false );
+        audio_volume_t i_volume;
+        aout_VolumeGet( p_input, &i_volume );
+        p_mediaControl->SetAudioEnabled( true );
+        p_mediaControl->SetMuted( i_volume );
 
-            Unlock();
-        }
         // update playlist as well
-        if ( fPlaylistWindow->LockWithTimeout( INTERFACE_LOCKING_TIMEOUT ) == B_OK )
+        if( fPlaylistWindow->LockWithTimeout( INTERFACE_LOCKING_TIMEOUT ) == B_OK )
         {
             fPlaylistWindow->UpdatePlaylist();
             fPlaylistWindow->Unlock();
@@ -783,24 +864,29 @@ void InterfaceWindow::UpdateInterface()
     }
     else
     {
-		if ( LockWithTimeout(INTERFACE_LOCKING_TIMEOUT) == B_OK )
-		{
-	        _SetMenusEnabled( false );
-	        if( !( p_wrapper->PlaylistSize() > 0 ) )
-	            p_mediaControl->SetEnabled( false );
-	        else
-	        {
-	            p_mediaControl->SetProgress( 0 );
-	            // enable/disable skip buttons
-	            bool canSkipPrev;
-	            bool canSkipNext;
-	            p_wrapper->GetNavCapabilities( &canSkipPrev, &canSkipNext );
-	            p_mediaControl->SetSkippable( canSkipPrev, canSkipNext );
-			}
-            Unlock();
+        p_mediaControl->SetAudioEnabled( false );
+
+        _SetMenusEnabled( false );
+        
+        if( !p_playlist || p_playlist->i_size <= 0 )
+        {
+            p_mediaControl->SetProgress( 0 );
+            
+#if 0
+            // enable/disable skip buttons
+            bool canSkipPrev;
+            bool canSkipNext;
+            p_wrapper->GetNavCapabilities( &canSkipPrev, &canSkipNext );
+            p_mediaControl->SetSkippable( canSkipPrev, canSkipNext );
+#endif
+        }
+        else
+        {
+            p_mediaControl->SetEnabled( false );
         }
     }
-
+    
+    Unlock();
     fLastUpdateTime = system_time();
 }
 
@@ -819,12 +905,12 @@ InterfaceWindow::IsStopped() const
 void
 InterfaceWindow::_UpdatePlaylist()
 {
-    if ( fPlaylistWindow->Lock() )
+    if( fPlaylistWindow->Lock() )
     {
         fPlaylistWindow->UpdatePlaylist( true );
         fPlaylistWindow->Unlock();
-        p_mediaControl->SetEnabled( p_wrapper->PlaylistSize() );
     }
+    p_mediaControl->SetEnabled( p_playlist->i_size );
 }
 
 /*****************************************************************************
@@ -862,10 +948,7 @@ InterfaceWindow::_SetMenusEnabled(bool hasFile, bool hasChapters, bool hasTitles
              fSubtitlesMenu->SetEnabled( hasFile );
         if ( fSpeedMenu->IsEnabled() != hasFile )
              fSpeedMenu->SetEnabled( hasFile );
-        // "goto menu" menu item
-        bool hasMenu = p_wrapper->IsUsingMenus();
-        if ( fGotoMenuMI->IsEnabled() != hasMenu )
-             fGotoMenuMI->SetEnabled( hasMenu );
+        fGotoMenuMI->SetEnabled( true );
         Unlock();
     }
 }
@@ -909,8 +992,10 @@ InterfaceWindow::_UpdateSpeedMenu( int rate )
             break;
     }
 
-    if ( !toMark->IsMarked() )
+    if ( toMark && !toMark->IsMarked() )
+    {
         toMark->SetMarked( true );
+    }
 }
 
 /*****************************************************************************
@@ -919,58 +1004,58 @@ InterfaceWindow::_UpdateSpeedMenu( int rate )
 void
 InterfaceWindow::_ShowFilePanel( uint32 command, const char* windowTitle )
 {
-	if( !fFilePanel )
-	{
-		fFilePanel = new BFilePanel( B_OPEN_PANEL, NULL, NULL,
-									 B_FILE_NODE | B_DIRECTORY_NODE );
-		fFilePanel->SetTarget( this );
-	}
-	fFilePanel->Window()->SetTitle( windowTitle );
-	BMessage message( command );
-	fFilePanel->SetMessage( &message );
-	if ( !fFilePanel->IsShowing() )
-	{
-		fFilePanel->Refresh();
-		fFilePanel->Show();
-	}
+    if( !fFilePanel )
+    {
+        fFilePanel = new BFilePanel( B_OPEN_PANEL, NULL, NULL,
+                                     B_FILE_NODE | B_DIRECTORY_NODE );
+        fFilePanel->SetTarget( this );
+    }
+    fFilePanel->Window()->SetTitle( windowTitle );
+    BMessage message( command );
+    fFilePanel->SetMessage( &message );
+    if ( !fFilePanel->IsShowing() )
+    {
+        fFilePanel->Refresh();
+        fFilePanel->Show();
+    }
 }
 
 // set_window_pos
 void
 set_window_pos( BWindow* window, BRect frame )
 {
-	// sanity checks: make sure window is not too big/small
-	// and that it's not off-screen
-	float minWidth, maxWidth, minHeight, maxHeight;
-	window->GetSizeLimits( &minWidth, &maxWidth, &minHeight, &maxHeight );
+    // sanity checks: make sure window is not too big/small
+    // and that it's not off-screen
+    float minWidth, maxWidth, minHeight, maxHeight;
+    window->GetSizeLimits( &minWidth, &maxWidth, &minHeight, &maxHeight );
 
-	make_sure_frame_is_within_limits( frame,
-									  minWidth, minHeight, maxWidth, maxHeight );
-	if ( make_sure_frame_is_on_screen( frame ) )
-	{
-		window->MoveTo( frame.LeftTop() );
-		window->ResizeTo( frame.Width(), frame.Height() );
-	}
+    make_sure_frame_is_within_limits( frame,
+                                      minWidth, minHeight, maxWidth, maxHeight );
+    if ( make_sure_frame_is_on_screen( frame ) )
+    {
+        window->MoveTo( frame.LeftTop() );
+        window->ResizeTo( frame.Width(), frame.Height() );
+    }
 }
 
 // set_window_pos
 void
 launch_window( BWindow* window, bool showing )
 {
-	if ( window->Lock() )
-	{
-		if ( showing )
-		{
-			if ( window->IsHidden() )
-				window->Show();
-		}
-		else
-		{
-			if ( !window->IsHidden() )
-				window->Hide();
-		}
-		window->Unlock();
-	}
+    if ( window->Lock() )
+    {
+        if ( showing )
+        {
+            if ( window->IsHidden() )
+                window->Show();
+        }
+        else
+        {
+            if ( !window->IsHidden() )
+                window->Hide();
+        }
+        window->Unlock();
+    }
 }
 
 /*****************************************************************************
@@ -979,35 +1064,35 @@ launch_window( BWindow* window, bool showing )
 void
 InterfaceWindow::_RestoreSettings()
 {
-	if ( load_settings( fSettings, "interface_settings", "VideoLAN Client" ) == B_OK )
-	{
-		BRect frame;
-		if ( fSettings->FindRect( "main frame", &frame ) == B_OK )
-			set_window_pos( this, frame );
-		if (fSettings->FindRect( "playlist frame", &frame ) == B_OK )
-			set_window_pos( fPlaylistWindow, frame );
-		if (fSettings->FindRect( "messages frame", &frame ) == B_OK )
-			set_window_pos( fMessagesWindow, frame );
-		if (fSettings->FindRect( "settings frame", &frame ) == B_OK )
-		{
-		    /* FIXME: Preferences resizing doesn't work correctly yet */
-		    frame.right = frame.left + fPreferencesWindow->Frame().Width();
-		    frame.bottom = frame.top + fPreferencesWindow->Frame().Height();
-			set_window_pos( fPreferencesWindow, frame );
-		}
-		
-		bool showing;
-		if ( fSettings->FindBool( "playlist showing", &showing ) == B_OK )
-			launch_window( fPlaylistWindow, showing );
-		if ( fSettings->FindBool( "messages showing", &showing ) == B_OK )
-			launch_window( fMessagesWindow, showing );
-		if ( fSettings->FindBool( "settings showing", &showing ) == B_OK )
-			launch_window( fPreferencesWindow, showing );
+    if ( load_settings( fSettings, "interface_settings", "VideoLAN Client" ) == B_OK )
+    {
+        BRect frame;
+        if ( fSettings->FindRect( "main frame", &frame ) == B_OK )
+            set_window_pos( this, frame );
+        if (fSettings->FindRect( "playlist frame", &frame ) == B_OK )
+            set_window_pos( fPlaylistWindow, frame );
+        if (fSettings->FindRect( "messages frame", &frame ) == B_OK )
+            set_window_pos( fMessagesWindow, frame );
+        if (fSettings->FindRect( "settings frame", &frame ) == B_OK )
+        {
+            /* FIXME: Preferences resizing doesn't work correctly yet */
+            frame.right = frame.left + fPreferencesWindow->Frame().Width();
+            frame.bottom = frame.top + fPreferencesWindow->Frame().Height();
+            set_window_pos( fPreferencesWindow, frame );
+        }
+        
+        bool showing;
+        if ( fSettings->FindBool( "playlist showing", &showing ) == B_OK )
+            launch_window( fPlaylistWindow, showing );
+        if ( fSettings->FindBool( "messages showing", &showing ) == B_OK )
+            launch_window( fMessagesWindow, showing );
+        if ( fSettings->FindBool( "settings showing", &showing ) == B_OK )
+            launch_window( fPreferencesWindow, showing );
 
-		uint32 displayMode;
-		if ( fSettings->FindInt32( "playlist display mode", (int32*)&displayMode ) == B_OK )
-			fPlaylistWindow->SetDisplayMode( displayMode );
-	}
+        uint32 displayMode;
+        if ( fSettings->FindInt32( "playlist display mode", (int32*)&displayMode ) == B_OK )
+            fPlaylistWindow->SetDisplayMode( displayMode );
+    }
 }
 
 /*****************************************************************************
@@ -1021,37 +1106,37 @@ InterfaceWindow::_StoreSettings()
     config_SaveConfigFile( p_intf, "main" );
 
     /* Save the windows positions */
-	if ( fSettings->ReplaceRect( "main frame", Frame() ) != B_OK )
-		fSettings->AddRect( "main frame", Frame() );
-	if ( fPlaylistWindow->Lock() )
-	{
-		if (fSettings->ReplaceRect( "playlist frame", fPlaylistWindow->Frame() ) != B_OK)
-			fSettings->AddRect( "playlist frame", fPlaylistWindow->Frame() );
-		if (fSettings->ReplaceBool( "playlist showing", !fPlaylistWindow->IsHidden() ) != B_OK)
-			fSettings->AddBool( "playlist showing", !fPlaylistWindow->IsHidden() );
-		fPlaylistWindow->Unlock();
-	}
-	if ( fMessagesWindow->Lock() )
-	{
-		if (fSettings->ReplaceRect( "messages frame", fMessagesWindow->Frame() ) != B_OK)
-			fSettings->AddRect( "messages frame", fMessagesWindow->Frame() );
-		if (fSettings->ReplaceBool( "messages showing", !fMessagesWindow->IsHidden() ) != B_OK)
-			fSettings->AddBool( "messages showing", !fMessagesWindow->IsHidden() );
-		fMessagesWindow->Unlock();
-	}
-	if ( fPreferencesWindow->Lock() )
-	{
-		if (fSettings->ReplaceRect( "settings frame", fPreferencesWindow->Frame() ) != B_OK)
-			fSettings->AddRect( "settings frame", fPreferencesWindow->Frame() );
-		if (fSettings->ReplaceBool( "settings showing", !fPreferencesWindow->IsHidden() ) != B_OK)
-			fSettings->AddBool( "settings showing", !fPreferencesWindow->IsHidden() );
-		fPreferencesWindow->Unlock();
-	}
-	uint32 displayMode = fPlaylistWindow->DisplayMode();
-	if (fSettings->ReplaceInt32( "playlist display mode", displayMode ) != B_OK )
-		fSettings->AddInt32( "playlist display mode", displayMode );
+    if ( fSettings->ReplaceRect( "main frame", Frame() ) != B_OK )
+        fSettings->AddRect( "main frame", Frame() );
+    if ( fPlaylistWindow->Lock() )
+    {
+        if (fSettings->ReplaceRect( "playlist frame", fPlaylistWindow->Frame() ) != B_OK)
+            fSettings->AddRect( "playlist frame", fPlaylistWindow->Frame() );
+        if (fSettings->ReplaceBool( "playlist showing", !fPlaylistWindow->IsHidden() ) != B_OK)
+            fSettings->AddBool( "playlist showing", !fPlaylistWindow->IsHidden() );
+        fPlaylistWindow->Unlock();
+    }
+    if ( fMessagesWindow->Lock() )
+    {
+        if (fSettings->ReplaceRect( "messages frame", fMessagesWindow->Frame() ) != B_OK)
+            fSettings->AddRect( "messages frame", fMessagesWindow->Frame() );
+        if (fSettings->ReplaceBool( "messages showing", !fMessagesWindow->IsHidden() ) != B_OK)
+            fSettings->AddBool( "messages showing", !fMessagesWindow->IsHidden() );
+        fMessagesWindow->Unlock();
+    }
+    if ( fPreferencesWindow->Lock() )
+    {
+        if (fSettings->ReplaceRect( "settings frame", fPreferencesWindow->Frame() ) != B_OK)
+            fSettings->AddRect( "settings frame", fPreferencesWindow->Frame() );
+        if (fSettings->ReplaceBool( "settings showing", !fPreferencesWindow->IsHidden() ) != B_OK)
+            fSettings->AddBool( "settings showing", !fPreferencesWindow->IsHidden() );
+        fPreferencesWindow->Unlock();
+    }
+    uint32 displayMode = fPlaylistWindow->DisplayMode();
+    if (fSettings->ReplaceInt32( "playlist display mode", displayMode ) != B_OK )
+        fSettings->AddInt32( "playlist display mode", displayMode );
 
-	save_settings( fSettings, "interface_settings", "VideoLAN Client" );
+    save_settings( fSettings, "interface_settings", "VideoLAN Client" );
 }
 
 
@@ -1087,38 +1172,38 @@ void CDMenu::AttachedToWindow(void)
  *****************************************************************************/
 int CDMenu::GetCD( const char *directory )
 {
-	BVolumeRoster volRoster;
-	BVolume vol;
-	BDirectory dir;
-	status_t status = volRoster.GetNextVolume( &vol );
-	while ( status ==  B_NO_ERROR )
-	{
-		BString deviceName;
-		BString volumeName;
-		bool isCDROM;
-		if ( get_volume_info( vol, volumeName, isCDROM, deviceName )
-			 && isCDROM )
-		{
-			BMessage* msg = new BMessage( OPEN_DVD );
-			msg->AddString( "device", deviceName.String() );
-			BMenuItem* item = new BMenuItem( volumeName.String(), msg );
-			AddItem( item );
-		}
- 		vol.Unset();
-		status = volRoster.GetNextVolume( &vol );
-	}
-	return 0;
+    BVolumeRoster volRoster;
+    BVolume vol;
+    BDirectory dir;
+    status_t status = volRoster.GetNextVolume( &vol );
+    while ( status ==  B_NO_ERROR )
+    {
+        BString deviceName;
+        BString volumeName;
+        bool isCDROM;
+        if ( get_volume_info( vol, volumeName, isCDROM, deviceName )
+             && isCDROM )
+        {
+            BMessage* msg = new BMessage( OPEN_DVD );
+            msg->AddString( "device", deviceName.String() );
+            BMenuItem* item = new BMenuItem( volumeName.String(), msg );
+            AddItem( item );
+        }
+         vol.Unset();
+        status = volRoster.GetNextVolume( &vol );
+    }
+    return 0;
 }
 
 /*****************************************************************************
  * LanguageMenu::LanguageMenu
  *****************************************************************************/
-LanguageMenu::LanguageMenu( const char *name, int menu_kind,
-                            VlcWrapper *p_wrapper )
-    :BMenu(name)
+LanguageMenu::LanguageMenu( intf_thread_t * _p_intf, const char * psz_name,
+                            char * _psz_variable )
+    : BMenu( psz_name )
 {
-    kind = menu_kind;
-    this->p_wrapper = p_wrapper;
+    p_intf       = _p_intf;
+    psz_variable = strdup( _psz_variable );
 }
 
 /*****************************************************************************
@@ -1126,6 +1211,7 @@ LanguageMenu::LanguageMenu( const char *name, int menu_kind,
  *****************************************************************************/
 LanguageMenu::~LanguageMenu()
 {
+    free( psz_variable );
 }
 
 /*****************************************************************************
@@ -1133,19 +1219,44 @@ LanguageMenu::~LanguageMenu()
  *****************************************************************************/
 void LanguageMenu::AttachedToWindow()
 {
+    BMenuItem * item;
+
     // remove all items
-    while ( BMenuItem* item = RemoveItem( 0L ) )
+    while( ( item = RemoveItem( 0L ) ) )
+    {
         delete item;
+    }
 
     SetRadioMode( true );
-	if ( BList *list = p_wrapper->GetChannels( kind ) )
-	{
-	    for ( int32 i = 0; BMenuItem* item = (BMenuItem*)list->ItemAt( i ); i++ )
-	        AddItem( item );
-	    
-	    if ( list->CountItems() > 1 )
-	        AddItem( new BSeparatorItem(), 1 );
-	}
+
+    input_thread_t * p_input = (input_thread_t *)
+            vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
+    {
+        return;
+    }
+    
+    vlc_value_t val_list, text_list;
+    BMessage * message;
+    int i_current;
+    
+    i_current = var_GetInteger( p_input, psz_variable );
+    var_Change( p_input, psz_variable, VLC_VAR_GETLIST, &val_list, &text_list );
+    for( int i = 0; i < val_list.p_list->i_count; i++ )
+    {
+        message = new BMessage( SELECT_CHANNEL );
+        message->AddInt32( psz_variable, val_list.p_list->p_values[i].i_int );
+        item = new BMenuItem( text_list.p_list->p_values[i].psz_string, message );
+        if( val_list.p_list->p_values[i].i_int == i_current )
+        {
+            item->SetMarked( true );
+        }
+        AddItem( item );
+    }
+    var_Change( p_input, psz_variable, VLC_VAR_FREELIST, &val_list, &text_list );
+    
+    vlc_object_release( p_input );
+    
     BMenu::AttachedToWindow();
 }
 
@@ -1170,14 +1281,41 @@ TitleMenu::~TitleMenu()
  *****************************************************************************/
 void TitleMenu::AttachedToWindow()
 {
-    while( BMenuItem* item = RemoveItem( 0L ) )
+    BMenuItem * item;
+    while( ( item = RemoveItem( 0L ) ) )
+    {
         delete item;
+    }
 
-    if ( BList *list = p_intf->p_sys->p_wrapper->GetTitles() )
-	{    
-		for( int i = 0; BMenuItem* item = (BMenuItem*)list->ItemAt( i ); i++ )
-	        AddItem( item );
-	}
+    input_thread_t * p_input;
+    p_input = (input_thread_t *)
+        vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
+    {
+        return;
+    }
+
+    vlc_value_t val;
+    if( !var_Get( p_input, "title", &val ) )
+    {
+        vlc_value_t val_list, text_list;
+        var_Change( p_input, "title", VLC_VAR_GETCHOICES,
+                    &val_list, &text_list );
+        
+        for( int i = 0; i < val_list.p_list->i_count; i++ )
+        {
+            item = new BMenuItem( text_list.p_list->p_values[i].psz_string,
+                                  NULL );
+            if( val_list.p_list->p_values[i].i_int == val.i_int )
+            {
+                item->SetMarked( true );
+            }
+            AddItem( item );
+        }
+
+        var_Change( p_input, "title", VLC_VAR_FREELIST,
+                    &val_list, &text_list );
+    }
     BMenu::AttachedToWindow();
 }
 
@@ -1203,24 +1341,43 @@ ChapterMenu::~ChapterMenu()
  *****************************************************************************/
 void ChapterMenu::AttachedToWindow()
 {
-    while( BMenuItem* item = RemoveItem( 0L ) )
+    BMenuItem * item;
+    while( ( item = RemoveItem( 0L ) ) )
+    {
         delete item;
+    }
 
-    if ( BList* list = p_intf->p_sys->p_wrapper->GetChapters() )
-	{    
-	    for( int i = 0; BMenuItem* item = (BMenuItem*)list->ItemAt( i ); i++ )
-	        AddItem( item );
-	}
-    
+    input_thread_t * p_input;
+    p_input = (input_thread_t *)
+        vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
+    {
+        return;
+    }
+
+    vlc_value_t val;
+    if( !var_Get( p_input, "chapter", &val ) )
+    {
+        vlc_value_t val_list, text_list;
+        var_Change( p_input, "chapter", VLC_VAR_GETCHOICES,
+                    &val_list, &text_list );
+        
+        for( int i = 0; i < val_list.p_list->i_count; i++ )
+        {
+            item = new BMenuItem( text_list.p_list->p_values[i].psz_string,
+                                  NULL );
+            if( val_list.p_list->p_values[i].i_int == val.i_int )
+            {
+                item->SetMarked( true );
+            }
+            AddItem( item );
+        }
+
+        var_Change( p_input, "chapter", VLC_VAR_FREELIST,
+                    &val_list, &text_list );
+    }
     BMenu::AttachedToWindow();
 }
-
-
-
-
-
-
-
 
 
 /*****************************************************************************
@@ -1229,27 +1386,27 @@ void ChapterMenu::AttachedToWindow()
 status_t
 load_settings( BMessage* message, const char* fileName, const char* folder )
 {
-	status_t ret = B_BAD_VALUE;
-	if ( message )
-	{
-		BPath path;
-		if ( ( ret = find_directory( B_USER_SETTINGS_DIRECTORY, &path ) ) == B_OK )
-		{
-			// passing folder is optional
-			if ( folder )
-				ret = path.Append( folder );
-			if ( ret == B_OK && ( ret = path.Append( fileName ) ) == B_OK )
-			{
-				BFile file( path.Path(), B_READ_ONLY );
-				if ( ( ret = file.InitCheck() ) == B_OK )
-				{
-					ret = message->Unflatten( &file );
-					file.Unset();
-				}
-			}
-		}
-	}
-	return ret;
+    status_t ret = B_BAD_VALUE;
+    if ( message )
+    {
+        BPath path;
+        if ( ( ret = find_directory( B_USER_SETTINGS_DIRECTORY, &path ) ) == B_OK )
+        {
+            // passing folder is optional
+            if ( folder )
+                ret = path.Append( folder );
+            if ( ret == B_OK && ( ret = path.Append( fileName ) ) == B_OK )
+            {
+                BFile file( path.Path(), B_READ_ONLY );
+                if ( ( ret = file.InitCheck() ) == B_OK )
+                {
+                    ret = message->Unflatten( &file );
+                    file.Unset();
+                }
+            }
+        }
+    }
+    return ret;
 }
 
 /*****************************************************************************
@@ -1258,25 +1415,25 @@ load_settings( BMessage* message, const char* fileName, const char* folder )
 status_t
 save_settings( BMessage* message, const char* fileName, const char* folder )
 {
-	status_t ret = B_BAD_VALUE;
-	if ( message )
-	{
-		BPath path;
-		if ( ( ret = find_directory( B_USER_SETTINGS_DIRECTORY, &path ) ) == B_OK )
-		{
-			// passing folder is optional
-			if ( folder && ( ret = path.Append( folder ) ) == B_OK )
-				ret = create_directory( path.Path(), 0777 );
-			if ( ret == B_OK && ( ret = path.Append( fileName ) ) == B_OK )
-			{
-				BFile file( path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
-				if ( ( ret = file.InitCheck() ) == B_OK )
-				{
-					ret = message->Flatten( &file );
-					file.Unset();
-				}
-			}
-		}
-	}
-	return ret;
+    status_t ret = B_BAD_VALUE;
+    if ( message )
+    {
+        BPath path;
+        if ( ( ret = find_directory( B_USER_SETTINGS_DIRECTORY, &path ) ) == B_OK )
+        {
+            // passing folder is optional
+            if ( folder && ( ret = path.Append( folder ) ) == B_OK )
+                ret = create_directory( path.Path(), 0777 );
+            if ( ret == B_OK && ( ret = path.Append( fileName ) ) == B_OK )
+            {
+                BFile file( path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
+                if ( ( ret = file.InitCheck() ) == B_OK )
+                {
+                    ret = message->Flatten( &file );
+                    file.Unset();
+                }
+            }
+        }
+    }
+    return ret;
 }
