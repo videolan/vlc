@@ -90,7 +90,7 @@ int E_(Open) ( vlc_object_t *p_this )
     int                 i_guard = 0;
     int                 i_transmission = 0;
     int                 i_hierarchy = 0;
-    vlc_bool_t          b_polarisation = 0;
+    int                 i_polarisation = 0;
     int                 i_fec = 0;
     int                 i_code_rate_HP = 0;
     int                 i_code_rate_LP = 0;
@@ -130,7 +130,6 @@ int E_(Open) ( vlc_object_t *p_this )
     i_guard = config_GetInt(p_input, "guard");
     i_hierarchy = config_GetInt(p_input, "hierarchy");
 
-
     /* Determine frontend device information and capabilities */
     b_probe = config_GetInt( p_input, "probe" );
     if (b_probe)
@@ -161,9 +160,6 @@ int E_(Open) ( vlc_object_t *p_this )
             frontend_info.type = FE_QAM;
         else if (strncmp( p_input->psz_access, "terrestrial",11) ==0)
             frontend_info.type = FE_OFDM;
-
-//        frontend_info.frequency_max =   12999000; /* in KHz, lnb_lof2 */
-//        frontend_info.frequency_min =    9750000; /* lnb_lof1 */
 
         frontend_info.frequency_max = u_lnb_lof2; /* in KHz, lnb_lof2 */
         frontend_info.frequency_min = u_lnb_lof1; /* lnb_lof1 */
@@ -205,7 +201,7 @@ int E_(Open) ( vlc_object_t *p_this )
                    (!strncmp( psz_parser_init, "V" ,
                      psz_parser - psz_parser_init ) ) )
                 {
-                    b_polarisation = VLC_FALSE;
+                    i_polarisation = 0; //VLC_FALSE;
                 }
                 else if ((!strncmp( psz_parser_init, "H" ,
                      psz_parser - psz_parser_init ) ) ||
@@ -213,7 +209,15 @@ int E_(Open) ( vlc_object_t *p_this )
                      psz_parser - psz_parser_init ) ) )
 
                 {
-                    b_polarisation = VLC_TRUE;
+                    i_polarisation = 1; //VLC_TRUE;
+                }
+                else if ((!strncmp( psz_parser_init, "A" ,
+                     psz_parser - psz_parser_init ) ) ||
+                   (!strncmp( psz_parser_init, "a" ,
+                     psz_parser - psz_parser_init ) ) )
+
+                {
+                    i_polarisation = 2;
                 }
             }
             else if( !strncmp( psz_parser, "fec=",
@@ -247,21 +251,23 @@ int E_(Open) ( vlc_object_t *p_this )
                                strlen( "lnb-lof1=" ) ) )
             {
                 u_lnb_lof1 =
-                (unsigned int)strtol( psz_parser + strlen( "lnb_lof1=" ),
-                            &psz_parser, 0 );
+                (unsigned int)strtol( psz_parser + strlen( "lnb-lof1=" ),
+                            &psz_parser, 0 );                
+                frontend_info.frequency_min = u_lnb_lof1; /* lnb_lof1 */
             }
             else if( !strncmp( psz_parser, "lnb-lof2=",
                                strlen( "lnb-lof2=" ) ) )
             {
                 u_lnb_lof2 =
-                (unsigned int)strtol( psz_parser + strlen( "lnb_lof2=" ),
+                (unsigned int)strtol( psz_parser + strlen( "lnb-lof2=" ),
                             &psz_parser, 0 );
+                frontend_info.frequency_max = u_lnb_lof2; /* in KHz, lnb_lof2 */
             }
             else if( !strncmp( psz_parser, "lnb-slof=",
                                strlen( "lnb-slof=" ) ) )
             {
                 u_lnb_slof =
-                (unsigned int)strtol( psz_parser + strlen( "lnb_slof=" ),
+                (unsigned int)strtol( psz_parser + strlen( "lnb-slof=" ),
                             &psz_parser, 0 );
             }
             else if( !strncmp( psz_parser, "device=",
@@ -339,7 +345,7 @@ int E_(Open) ( vlc_object_t *p_this )
         if( *psz_next )
         {
             psz_parser = psz_next + 1;
-            b_polarisation = (vlc_bool_t)strtol( psz_parser, &psz_next, 10 );
+            i_polarisation = strtol( psz_parser, &psz_next, 10 );
             if( *psz_next )
             {
                 psz_parser = psz_next + 1;
@@ -378,22 +384,11 @@ int E_(Open) ( vlc_object_t *p_this )
          ((u_srate) < frontend_info.symbol_rate_min) )
     {
         msg_Warn( p_input, "invalid symbol rate, using default one" );
-        u_srate = config_GetInt( p_input, "symbol-rate" );
+        u_srate = config_GetInt( p_input, "symbol-rate"s );
         if ( ((u_srate) > frontend_info.symbol_rate_max) ||
              ((u_srate) < frontend_info.symbol_rate_min) )
         {
             msg_Err( p_input, "invalid default symbol rate" );
-            return -1;
-        }
-    }
-
-    if( b_polarisation && (b_polarisation != 1) )
-    {
-        msg_Warn( p_input, "invalid polarization, using default one" );
-        b_polarisation = config_GetInt( p_input, "polarization" );
-        if( b_polarisation && b_polarisation != 1 )
-        {
-            msg_Err( p_input, "invalid default polarization" );
             return -1;
         }
     }
@@ -416,16 +411,16 @@ int E_(Open) ( vlc_object_t *p_this )
         /* DVB-S: satellite and budget cards (nova) */
         case FE_QPSK:
             fep.frequency = u_freq; /* KHz */
-            fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
+            fep.inversion = dvb_DecodeInversion(p_input, i_polarisation);
             fep.u.qpsk.symbol_rate = u_srate;
             fep.u.qpsk.fec_inner = dvb_DecodeFEC(p_input, i_fec); 
-            msg_Dbg( p_input, "satellite (QPSK) frontend found on %s", frontend_info.name );
+            msg_Dbg( p_input, "DVB-S: satellite (QPSK) frontend %s found", frontend_info.name );
 
-            if (ioctl_SetQPSKFrontend (p_input, fep, b_polarisation,
+            if (ioctl_SetQPSKFrontend (p_input, fep, i_polarisation,
                                u_lnb_lof1, u_lnb_lof2, u_lnb_slof,
                                u_adapter, u_device )<0)
             {
-                msg_Err( p_input, "DVB-S frontend returned a failure event" );
+                msg_Err( p_input, "DVB-S: tuning failed" );
                 return -1;
             }
             break;
@@ -433,14 +428,14 @@ int E_(Open) ( vlc_object_t *p_this )
         /* DVB-C */
         case FE_QAM:
             fep.frequency = u_freq; /* KHz */
-            fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
+            fep.inversion = dvb_DecodeInversion(p_input, i_polarisation);
             fep.u.qam.symbol_rate = u_srate;
             fep.u.qam.fec_inner = dvb_DecodeFEC(p_input, i_fec); 
             fep.u.qam.modulation = dvb_DecodeModulation(p_input, i_modulation); 
-            msg_Dbg( p_input, "cable (QAM) frontend found on %s", frontend_info.name );
+            msg_Dbg( p_input, "DVB-C: cable (QAM) frontend %s found", frontend_info.name );
             if (ioctl_SetQAMFrontend (p_input, fep, u_adapter, u_device )<0)
             {
-                msg_Err( p_input, "DVB-C frontend returned a failure event" );
+                msg_Err( p_input, "DVB-C: tuning failed" );
                 return -1;
             }
             break;
@@ -448,7 +443,7 @@ int E_(Open) ( vlc_object_t *p_this )
         /* DVB-T */
         case FE_OFDM:
             fep.frequency = u_freq; /* KHz */
-            fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
+            fep.inversion = dvb_DecodeInversion(p_input, i_polarisation);
             fep.u.ofdm.bandwidth = dvb_DecodeBandwidth(p_input, i_bandwidth);
             fep.u.ofdm.code_rate_HP = dvb_DecodeFEC(p_input, i_code_rate_HP); 
             fep.u.ofdm.code_rate_LP = dvb_DecodeFEC(p_input, i_code_rate_LP);
@@ -456,10 +451,10 @@ int E_(Open) ( vlc_object_t *p_this )
             fep.u.ofdm.transmission_mode = dvb_DecodeTransmission(p_input, i_transmission);
             fep.u.ofdm.guard_interval = dvb_DecodeGuardInterval(p_input, i_guard);
             fep.u.ofdm.hierarchy_information = dvb_DecodeHierarchy(p_input, i_hierarchy);
-            msg_Dbg( p_input, "terrestrial (OFDM) frontend found on %s", frontend_info.name );
+            msg_Dbg( p_input, "DVB-T: terrestrial (OFDM) frontend %s found", frontend_info.name );
             if (ioctl_SetOFDMFrontend (p_input, fep,u_adapter, u_device )<0)
             {
-                msg_Err( p_input, "DVB-T frontend returned a failure event" );
+                msg_Err( p_input, "DVB-T: tuning failed" );
                 return -1;
             }
             break;

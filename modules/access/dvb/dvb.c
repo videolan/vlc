@@ -430,14 +430,22 @@ int ioctl_SetQAMFrontend (input_thread_t * p_input, struct dvb_frontend_paramete
         return -1;
     }
 
+    /* Show more info on the tuning parameters used. */
+    msg_Dbg(p_input, "DVB-C: Tuning with the following paramters:");
+    msg_Dbg(p_input, "DVB-C:   Frequency %d KHz", fep.frequency );
+    msg_Dbg(p_input, "DVB-C:   Inversion/polarisation: %d",fep.inversion);
+    msg_Dbg(p_input, "DVB-C:   Symbolrate %d", fep.u.qam.symbol_rate);
+    msg_Dbg(p_input, "DVB-C:   FEC Inner %d", fep.u.qam.fec_inner);
+    msg_Dbg(p_input, "DVB-C:   Modulation %d", fep.u.qam.modulation);
+
     /* Now send it all to the frontend device */
     if ((ret=ioctl(front, FE_SET_FRONTEND, &fep)) < 0)
     {
         close(front);
 #   ifdef HAVE_ERRNO_H
-        msg_Err(p_input, "DVB-C: setting frontend failed (%d) %s", ret, strerror(errno));
+        msg_Err(p_input, "DVB-C: tuning channel failed (frontend returned %d:%s)", ret, strerrror(errno));
 #   else
-        msg_Err(p_input, "DVB-C: setting frontend failed (%d)", ret);
+        msg_Err(p_input, "DVB-C: tuning channel failed (frontend returned %d)", ret);
 #   endif
         return -1;
     }
