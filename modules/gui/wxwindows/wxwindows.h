@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.77 2003/12/10 21:54:17 courmisch Exp $
+ * $Id: wxwindows.h,v 1.78 2003/12/13 00:45:49 rocky Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -376,6 +376,11 @@ private:
     wxTextCtrl *disc_device;
     wxSpinCtrl *disc_title;
     wxSpinCtrl *disc_chapter;
+
+    /* The media equivalent name for a DVD names. For example,
+       "Title", is "Track" for a CD-DA */
+    wxStaticText *disc_title_label;
+    wxStaticText *disc_chapter_label;
     
     /* Indicates if the disc device control was modified */
     bool b_disc_device_changed;
