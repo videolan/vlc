@@ -205,8 +205,8 @@ int  E_(MMSTUOpen)( input_thread_t *p_input )
     {
         p_input->stream.b_seekable = 1;
         p_input->stream.p_selected_area->i_size =
-            p_sys->i_header +
-            p_sys->i_packet_count * p_sys->i_packet_length;
+            (uint64_t)p_sys->i_header +
+            (uint64_t)p_sys->i_packet_count * (uint64_t)p_sys->i_packet_length;
     }
 
     p_input->stream.i_method = INPUT_METHOD_NETWORK;
