@@ -501,6 +501,8 @@ VLC.app: vlc
 	    prefs.h \
 	    prefs.m \
 	    vout.h \
+	    voutqt.m \
+	    voutgl.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \

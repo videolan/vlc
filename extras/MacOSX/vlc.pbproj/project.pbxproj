@@ -100,7 +100,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				JAVAC_SOURCE_FILE_ENCODING = "ISO-8859-1";
-				LIBRARY_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = /Volumes/Genitus/vlc/modules/gui/macosx;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -715,6 +715,10 @@
 				2A16E04206C4F08700C87B09,
 				2A16E08006C5074F00C87B09,
 				2A16E08106C5074F00C87B09,
+				8E9CA1BE06D7DEE800B7186C,
+				8E9CA1BF06D7DEE800B7186C,
+				8E9CA1C006D7DEE800B7186C,
+				8E9CA1C106D7DEE800B7186C,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -765,32 +769,36 @@
 		};
 		08FB77AFFE84173DC02AAC07 = {
 			children = (
-				8EE1AF9F044465080059A3A7,
-				8EE1AFA0044465080059A3A7,
-				8E6BC6F6041643860059A3A7,
-				8E6BC6F7041643860059A3A7,
-				8ED6C27A03E2EB1C0059A3A7,
-				8E6BC6FA041684EC0059A3A7,
-				8ED6C27B03E2EB1C0059A3A7,
+				8ED6C27E03E2EB1C0059A3A7,
 				8ED6C27C03E2EB1C0059A3A7,
 				8ED6C27D03E2EB1C0059A3A7,
-				8ED6C27E03E2EB1C0059A3A7,
+				8E6BC6FA041684EC0059A3A7,
+				8ED6C27B03E2EB1C0059A3A7,
+				8E6BC6F6041643860059A3A7,
+				8E6BC6F7041643860059A3A7,
 				8ED6C27F03E2EB1C0059A3A7,
 				8ED6C28003E2EB1C0059A3A7,
+				8EE1AF9F044465080059A3A7,
+				8EE1AFA0044465080059A3A7,
 				8ED6C28103E2EB1C0059A3A7,
 				8ED6C28203E2EB1C0059A3A7,
 				8ED6C28303E2EB1C0059A3A7,
 				8ED6C28403E2EB1C0059A3A7,
-				8E49720006417F6800370C9F,
-				8E49720106417F6800370C9F,
 				8ED6C28503E2EB1C0059A3A7,
 				8ED6C28603E2EB1C0059A3A7,
+				8E9CA1A306D7DEE800B7186C,
+				8E9CA1A406D7DEE800B7186C,
+				8E49720006417F6800370C9F,
+				8E49720106417F6800370C9F,
 				8E55FB7F0459B0FD00FB3317,
 				8E55FB800459B0FD00FB3317,
-				8ED6C28703E2EB1C0059A3A7,
-				8ED6C28803E2EB1C0059A3A7,
 				2A16E03F06C4F08700C87B09,
 				2A16E04006C4F08700C87B09,
+				8ED6C27A03E2EB1C0059A3A7,
+				8ED6C28703E2EB1C0059A3A7,
+				8ED6C28803E2EB1C0059A3A7,
+				8E9CA1A506D7DEE800B7186C,
+				8E9CA1A606D7DEE800B7186C,
 			);
 			isa = PBXGroup;
 			name = Classes;
@@ -1718,6 +1726,66 @@
 		};
 		8E9390CD0565D6D300C7661C = {
 			fileRef = 8E9390B30565D6D300C7661C;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E9CA1A306D7DEE800B7186C = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = prefs_widgets.h;
+			path = ../../modules/gui/macosx/prefs_widgets.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		8E9CA1A406D7DEE800B7186C = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = prefs_widgets.m;
+			path = ../../modules/gui/macosx/prefs_widgets.m;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		8E9CA1A506D7DEE800B7186C = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = voutgl.m;
+			path = ../../modules/gui/macosx/voutgl.m;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		8E9CA1A606D7DEE800B7186C = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = voutqt.m;
+			path = ../../modules/gui/macosx/voutqt.m;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		8E9CA1BE06D7DEE800B7186C = {
+			fileRef = 8E9CA1A306D7DEE800B7186C;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E9CA1BF06D7DEE800B7186C = {
+			fileRef = 8E9CA1A406D7DEE800B7186C;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E9CA1C006D7DEE800B7186C = {
+			fileRef = 8E9CA1A506D7DEE800B7186C;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E9CA1C106D7DEE800B7186C = {
+			fileRef = 8E9CA1A606D7DEE800B7186C;
 			isa = PBXBuildFile;
 			settings = {
 			};
