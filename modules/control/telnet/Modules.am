@@ -1,0 +1,1 @@
+SOURCES_telnet = telnet.c vlm.c
