@@ -135,7 +135,6 @@ void __fastcall Translate( TForm *Form )
                         Object->Caption = _( Object->Caption.c_str() );
                     }
                 }
-#if 0
                 else if( Component->InheritsFrom( __classid( TToolButton ) ) )
                 {
                     TToolButton *Object = (TToolButton *) Component;
@@ -144,7 +143,6 @@ void __fastcall Translate( TForm *Form )
                         Object->Caption = _( Object->Caption.c_str() );
                     }
                 }
-#endif
                 else if( Component->InheritsFrom( __classid( TListView ) ) )
                 {
                     TListView *ListView = (TListView *) Component;

@@ -2,7 +2,7 @@ object MainFrameDlg: TMainFrameDlg
   Tag = 3
   Left = 356
   Top = 227
-  Width = 541
+  Width = 462
   Height = 306
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'VLC media player'
@@ -141,15 +141,14 @@ object MainFrameDlg: TMainFrameDlg
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 533
-    Height = 50
-    ButtonHeight = 46
+    Width = 454
+    Height = 41
+    ButtonHeight = 37
     ButtonWidth = 39
     Caption = 'ToolBar'
     EdgeBorders = [ebTop, ebBottom]
     Flat = True
     Images = ImageListToolbar
-    ShowCaptions = True
     TabOrder = 0
     object ToolButtonFile: TToolButton
       Tag = 3
@@ -177,38 +176,26 @@ object MainFrameDlg: TMainFrameDlg
       ImageIndex = 3
       Style = tbsSeparator
     end
-    object ToolButtonBack: TToolButton
-      Tag = 3
-      Left = 125
-      Top = 0
-      Action = BackAction
-    end
     object ToolButtonPlay: TToolButton
       Tag = 3
-      Left = 164
+      Left = 125
       Top = 0
       Action = PlayAction
     end
     object ToolButtonPause: TToolButton
       Tag = 3
-      Left = 203
+      Left = 164
       Top = 0
       Action = PauseAction
     end
     object ToolButtonStop: TToolButton
       Tag = 3
-      Left = 242
+      Left = 203
       Top = 0
       Action = StopAction
     end
-    object ToolButtonEject: TToolButton
-      Tag = 3
-      Left = 281
-      Top = 0
-      Action = EjectAction
-    end
     object ToolButtonSep2: TToolButton
-      Left = 320
+      Left = 242
       Top = 0
       Width = 8
       Caption = 'ToolButtonSep2'
@@ -217,18 +204,18 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonSlow: TToolButton
       Tag = 3
-      Left = 328
+      Left = 250
       Top = 0
       Action = SlowAction
     end
     object ToolButtonFast: TToolButton
       Tag = 3
-      Left = 367
+      Left = 289
       Top = 0
       Action = FastAction
     end
     object ToolButtonSep3: TToolButton
-      Left = 406
+      Left = 328
       Top = 0
       Width = 8
       Caption = 'ToolButtonSep3'
@@ -237,20 +224,20 @@ object MainFrameDlg: TMainFrameDlg
     end
     object ToolButtonPlaylist: TToolButton
       Tag = 3
-      Left = 414
+      Left = 336
       Top = 0
       Action = PlaylistAction
       Style = tbsCheck
     end
     object ToolButtonPrev: TToolButton
       Tag = 3
-      Left = 453
+      Left = 375
       Top = 0
       Action = PreviousAction
     end
     object ToolButtonNext: TToolButton
       Tag = 3
-      Left = 492
+      Left = 414
       Top = 0
       Action = NextAction
     end
@@ -258,7 +245,7 @@ object MainFrameDlg: TMainFrameDlg
   object StatusBar: TStatusBar
     Left = 0
     Top = 241
-    Width = 533
+    Width = 454
     Height = 19
     Panels = <>
     ParentShowHint = False
@@ -268,8 +255,8 @@ object MainFrameDlg: TMainFrameDlg
   object GroupBoxFile: TGroupBox
     Tag = 3
     Left = 0
-    Top = 90
-    Width = 533
+    Top = 81
+    Width = 454
     Height = 32
     Align = alTop
     TabOrder = 2
@@ -278,7 +265,7 @@ object MainFrameDlg: TMainFrameDlg
       Tag = 3
       Left = 2
       Top = 15
-      Width = 529
+      Width = 450
       Height = 15
       Align = alClient
       Alignment = taCenter
@@ -287,8 +274,8 @@ object MainFrameDlg: TMainFrameDlg
   end
   object GroupBoxNetwork: TGroupBox
     Left = 0
-    Top = 154
-    Width = 533
+    Top = 145
+    Width = 454
     Height = 40
     Align = alTop
     TabOrder = 3
@@ -332,15 +319,15 @@ object MainFrameDlg: TMainFrameDlg
   end
   object GroupBoxDisc: TGroupBox
     Left = 0
-    Top = 122
-    Width = 533
+    Top = 113
+    Width = 454
     Height = 32
     Align = alTop
     TabOrder = 4
     Visible = False
     object LabelDisc: TLabel
       Tag = 3
-      Left = 32
+      Left = 24
       Top = 11
       Width = 21
       Height = 13
@@ -416,8 +403,8 @@ object MainFrameDlg: TMainFrameDlg
   object GroupBoxSlider: TGroupBox
     Tag = 3
     Left = 0
-    Top = 50
-    Width = 533
+    Top = 41
+    Width = 454
     Height = 40
     Align = alTop
     Caption = '0:00:00'
@@ -426,7 +413,7 @@ object MainFrameDlg: TMainFrameDlg
     object TrackBar: TTrackBar
       Left = 2
       Top = 15
-      Width = 529
+      Width = 450
       Height = 21
       Align = alTop
       Orientation = trHorizontal
@@ -469,9 +456,15 @@ object MainFrameDlg: TMainFrameDlg
         Tag = 3
         Action = StreamOutputAction
       end
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object MenuEjectDisc: TMenuItem
+        Tag = 3
+        Action = EjectAction
+      end
       object N8: TMenuItem
         Caption = '-'
-        Visible = False
       end
       object MenuExit: TMenuItem
         Tag = 3
@@ -2572,7 +2565,7 @@ object MainFrameDlg: TMainFrameDlg
     object EjectAction: TAction
       Tag = 3
       Category = 'Control'
-      Caption = 'Eject'
+      Caption = 'Eject disc'
       Enabled = False
       Hint = 'Eject disc'
       ImageIndex = 7

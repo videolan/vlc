@@ -54,9 +54,7 @@ __published:	// IDE-managed Components
     TToolButton *ToolButtonDisc;
     TToolButton *ToolButtonNet;
     TToolButton *ToolButtonSep1;
-    TToolButton *ToolButtonBack;
     TToolButton *ToolButtonStop;
-    TToolButton *ToolButtonEject;
     TToolButton *ToolButtonPlay;
     TToolButton *ToolButtonPause;
     TToolButton *ToolButtonSep2;
@@ -192,6 +190,8 @@ __published:	// IDE-managed Components
     TMenuItem *PopupFullscreen;
     TMenuItem *Videosettings1;
     TMenuItem *PopupOnTop;
+    TMenuItem *N2;
+    TMenuItem *MenuEjectDisc;
     void __fastcall TimerManageTimer( TObject *Sender );
     void __fastcall TrackBarChange( TObject *Sender );
     void __fastcall FormClose( TObject *Sender, TCloseAction &Action );

@@ -663,6 +663,11 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     p_item = p_parser->p_config;
     if( p_item ) do
     {
+        if( p_item->b_advanced && !config_GetInt( p_intf, "advanced" ) )
+        {
+            continue;
+        }
+
         switch( p_item->i_type )
         {
         case CONFIG_HINT_CATEGORY:
@@ -759,10 +764,8 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
             msg_Warn( p_intf, "unknown config type: %i", p_item->i_type );
             break;
         }
-
-        p_item++;
     }
-    while( p_item->i_type != CONFIG_HINT_END );
+    while( p_item->i_type != CONFIG_HINT_END && p_item++ );
 
     /* Reorder panels inside the tabsheets */
     for( i_pages = 0; i_pages < PageControlPref->PageCount; i_pages++ )

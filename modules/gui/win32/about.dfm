@@ -4,8 +4,8 @@ object AboutDlg: TAboutDlg
   Top = 281
   BorderStyle = bsDialog
   Caption = 'About'
-  ClientHeight = 214
-  ClientWidth = 286
+  ClientHeight = 222
+  ClientWidth = 282
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -248,9 +248,9 @@ object AboutDlg: TAboutDlg
   TextHeight = 13
   object Label1: TLabel
     Tag = 3
-    Left = 114
-    Top = 18
-    Width = 132
+    Left = 82
+    Top = 13
+    Width = 141
     Height = 20
     Caption = 'VLC media player'
     Font.Charset = DEFAULT_CHARSET
@@ -262,16 +262,16 @@ object AboutDlg: TAboutDlg
   end
   object Label2: TLabel
     Tag = 3
-    Left = 10
+    Left = 14
     Top = 64
-    Width = 172
+    Width = 161
     Height = 13
     Caption = '(c) 1996-2003 the VideoLAN team'
   end
   object Label4: TLabel
     Tag = 3
-    Left = 15
-    Top = 123
+    Left = 14
+    Top = 131
     Width = 253
     Height = 39
     Caption = 
@@ -281,40 +281,41 @@ object AboutDlg: TAboutDlg
   end
   object Label3: TLabel
     Tag = 3
-    Left = 30
-    Top = 80
-    Width = 227
+    Left = 14
+    Top = 88
+    Width = 216
     Height = 13
     Caption = 'the VideoLAN team <videolan@videolan.org>'
   end
   object Image1: TImage
-    Left = 32
+    Left = 16
     Top = 8
     Width = 49
     Height = 49
   end
   object Label5: TLabel
     Tag = 3
-    Left = 83
-    Top = 96
+    Left = 14
+    Top = 104
     Width = 121
     Height = 13
     Caption = 'http://www.videolan.org/'
   end
   object LabelVersion: TLabel
     Tag = 3
-    Left = 114
-    Top = 40
+    Left = 82
+    Top = 35
     Width = 59
     Height = 13
     Caption = 'Version x.y.z'
   end
   object ButtonOK: TButton
     Tag = 3
-    Left = 70
-    Top = 178
+    Left = 69
+    Top = 188
     Width = 145
-    Height = 25
+    Height = 24
+    Anchors = [akLeft, akBottom]
     Caption = 'OK'
     Default = True
     ModalResult = 1

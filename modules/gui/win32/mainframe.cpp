@@ -68,6 +68,14 @@ __fastcall TMainFrameDlg::TMainFrameDlg(
 
     TrackBar->Max = SLIDER_MAX_VALUE;
 
+    /* do we need to show the captions of the toolbuttons? */
+    if( config_GetInt( p_intf, "intfwin-show-captions" ) )
+    {
+        ToolBar->ShowCaptions = true;
+        /* Add enough room for the text */
+        ToolBar->Height += 9;
+    }
+
     /* default height and caption */
     ClientHeight = 37 + ToolBar->Height;
     Caption = VOUT_TITLE " (Win32 interface)";
@@ -678,8 +686,7 @@ void __fastcall TMainFrameDlg::ModeManage()
     this->Height = i_Height;
 
     /* set control items */
-    ToolButtonBack->Enabled = false;
-    ToolButtonEject->Enabled = !b_control;
+    EjectAction->Enabled = !b_control;
     StopAction->Enabled = true;
     PauseAction->Enabled = b_control;
     SlowAction->Enabled = b_control;

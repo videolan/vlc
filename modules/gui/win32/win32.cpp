@@ -2,7 +2,7 @@
  * win32.cpp : Win32 interface plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: win32.cpp,v 1.16 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: win32.cpp,v 1.17 2003/03/01 21:32:49 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -299,14 +299,21 @@ int Win32Manage( intf_thread_t *p_intf )
  * Module descriptor
  *****************************************************************************/
 
-#define MAX_LINES_TEXT N_("maximum number of lines in the log window")
+#define MAX_LINES_TEXT N_( "maximum number of lines in the log window" )
 #define MAX_LINES_LONGTEXT N_( \
     "You can set the maximum number of lines that the log window will display."\
     " Enter -1 if you want to keep all messages." )
+#define SHOW_CAPTIONS_TEXT N_( "display text under images in the toolbar" )
+#define SHOW_CAPTIONS_LONGTEXT N_( \
+    "Check this option if you want to display the caption of the buttons in " \
+    "the toolbar. Beware, the display may be messed up" )
 
 vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), NULL, VLC_TRUE );
-    add_integer( "intfwin-max-lines", 500, NULL, MAX_LINES_TEXT, MAX_LINES_LONGTEXT, VLC_TRUE );
+    add_integer( "intfwin-max-lines", 500, NULL, MAX_LINES_TEXT,
+                 MAX_LINES_LONGTEXT, VLC_TRUE );
+    add_bool( "intfwin-show-captions", 0, NULL, SHOW_CAPTIONS_TEXT,
+              SHOW_CAPTIONS_LONGTEXT, VLC_FALSE );
     set_description( _("Native Windows interface module") );
     set_capability( "interface", 100 );
     set_callbacks( E_(Open), E_(Close) );
