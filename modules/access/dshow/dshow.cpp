@@ -57,8 +57,9 @@ static int FindDevicesCallback( vlc_object_t *, char const *,
 static int ConfigDevicesCallback( vlc_object_t *, char const *,
                                   vlc_value_t, vlc_value_t, void * );
 
-static void PropertiesPage( vlc_object_t *, IBaseFilter *,
-                            ICaptureGraphBuilder2 *, vlc_bool_t );
+static void ShowPropertyPage( IUnknown * );
+static void ShowDeviceProperties( vlc_object_t *, ICaptureGraphBuilder2 *, 
+                                  IBaseFilter *, vlc_bool_t b_audio );
 
 /*****************************************************************************
  * Module descriptor
@@ -222,6 +223,7 @@ static void DeleteDirectShowGraph( access_sys_t *p_sys )
     }
 }
 
+
 /*****************************************************************************
  * CommonOpen: open direct show device
  *****************************************************************************/
@@ -339,7 +341,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
         msg_Err( p_this, "can't open audio");
     }
 
-    for( i = 0; i < p_sys->i_crossbar_route_depth; i++ )
+    for( i = p_sys->i_crossbar_route_depth-1; i >= 0 ; --i )
     {
         IAMCrossbar *pXbar = p_sys->crossbar_routes[i].pXbar;
         LONG VideoInputIndex = p_sys->crossbar_routes[i].VideoInputIndex;
@@ -364,6 +366,25 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
                 }
             }
         }
+    }
+
+    /*
+    ** Show properties pages from other filters in graph
+    */
+    var_Get( p_this, "dshow-config", &val );
+    if( val.i_int )
+    {
+        for( i = p_sys->i_crossbar_route_depth-1; i >= 0 ; --i )
+        {
+            IAMCrossbar *pXbar = p_sys->crossbar_routes[i].pXbar;
+            IBaseFilter *p_XF;
+            HRESULT hr = pXbar->QueryInterface( IID_IBaseFilter, (void **)&p_XF );
+            if( SUCCEEDED(hr) )
+            {
+                ShowPropertyPage( p_XF );
+                p_XF->Release();
+            }
+        }        
     }
 
     /* Initialize some data */
@@ -428,9 +449,9 @@ static int DemuxOpen( vlc_object_t *p_this )
             if( p_stream->i_fourcc == VLC_FOURCC('R','V','2','4') )
             {
                 /* This is in BGR format */
-              fmt.video.i_bmask = 0x00ff0000;
-              fmt.video.i_gmask = 0x0000ff00;
-              fmt.video.i_rmask = 0x000000ff;
+                fmt.video.i_bmask = 0x00ff0000;
+                fmt.video.i_gmask = 0x0000ff00;
+                fmt.video.i_rmask = 0x000000ff;
             }
         }
         else if( p_stream->mt.majortype == MEDIATYPE_Audio )
@@ -609,8 +630,7 @@ static bool ConnectFilters( vlc_object_t *p_this, access_sys_t *p_sys,
                             if( guid == PIN_CATEGORY_ANALOGVIDEOIN )
                             {
                                 // recursively search crossbar routes
-                                FindCrossbarRoutes( p_this, p_sys, pP,
-                                                    PhysConn_Video_Tuner );
+                                FindCrossbarRoutes( p_this, p_sys, pP, 0 );
                                 // found it
                                 Found = TRUE;
                             }
@@ -724,48 +744,12 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         return VLC_EGENERIC;
     }
 
-    AM_MEDIA_TYPE *mt;
-    AM_MEDIA_TYPE media_types[MAX_MEDIA_TYPES];
+    size_t mt_count = 0;
+    AM_MEDIA_TYPE *mt = NULL;
 
-    size_t mt_count = EnumDeviceCaps( p_this, p_device_filter, p_sys->i_chroma,
-                                      p_sys->i_width, p_sys->i_height,
-                                      0, 0, 0, media_types, MAX_MEDIA_TYPES );
-
-    if( mt_count > 0 )
+    if( !b_audio )
     {
-        mt = (AM_MEDIA_TYPE *)malloc( sizeof(AM_MEDIA_TYPE)*mt_count );
-
-        // Order and copy returned media types according to arbitrary
-        // fourcc priority
-        for( size_t c = 0; c < mt_count; c++ )
-        {
-            int slot_priority =
-                GetFourCCPriority(GetFourCCFromMediaType(media_types[c]));
-            size_t slot_copy = c;
-            for( size_t d = c+1; d < mt_count; d++ )
-            {
-                int priority =
-                    GetFourCCPriority(GetFourCCFromMediaType(media_types[d]));
-                if( priority > slot_priority )
-                {
-                    slot_priority = priority;
-                    slot_copy = d;
-                }
-            }
-            if( slot_copy != c )
-            {
-                mt[c] = media_types[slot_copy];
-                media_types[slot_copy] = media_types[c];
-            }
-            else
-            {
-                mt[c] = media_types[c];
-            }
-        }
-    }
-    else if( !b_audio )
-    {
-        // Use default video media type
+        // insert prefered video media type
         AM_MEDIA_TYPE mtr;
         VIDEOINFOHEADER vh;
 
@@ -789,16 +773,13 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         vh.bmiHeader.biCompression = VLC_FOURCC('I','4','2','0');
         vh.bmiHeader.biSizeImage   = p_sys->i_width * 12 * p_sys->i_height / 8;
 
-        msg_Warn( p_this, "device %s using built-in video media type",
-                  devicename.c_str() );
-
         mt_count = 1;
         mt = (AM_MEDIA_TYPE *)malloc( sizeof(AM_MEDIA_TYPE)*mt_count );
         CopyMediaType(mt, &mtr);
     }
     else
     {
-        // Use default audio media type
+        // insert prefered audio media type
         AM_MEDIA_TYPE mtr;
         WAVEFORMATEX wf;
 
@@ -822,12 +803,50 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
         wf.cbSize = 0;
 
-        msg_Warn( p_this, "device %s using built-in audio media type",
-                  devicename.c_str() );
-
         mt_count = 1;
         mt = (AM_MEDIA_TYPE *)malloc( sizeof(AM_MEDIA_TYPE)*mt_count );
         CopyMediaType(mt, &mtr);
+    }
+
+    // retreive acceptable media types supported by device
+    
+    AM_MEDIA_TYPE media_types[MAX_MEDIA_TYPES];
+    size_t media_count = EnumDeviceCaps( p_this, p_device_filter, p_sys->i_chroma,
+                                      p_sys->i_width, p_sys->i_height,
+                                      0, 0, 0, media_types, MAX_MEDIA_TYPES );
+
+    if( media_count > 0 )
+    {
+        mt = (AM_MEDIA_TYPE *)realloc( mt, sizeof(AM_MEDIA_TYPE)*(mt_count+media_count) );
+
+        // Order and copy returned media types according to arbitrary
+        // fourcc priority
+        for( size_t c = 0; c < media_count; c++ )
+        {
+            int slot_priority =
+                GetFourCCPriority(GetFourCCFromMediaType(media_types[c]));
+            size_t slot_copy = c;
+            for( size_t d = c+1; d < media_count; d++ )
+            {
+                int priority =
+                    GetFourCCPriority(GetFourCCFromMediaType(media_types[d]));
+                if( priority > slot_priority )
+                {
+                    slot_priority = priority;
+                    slot_copy = d;
+                }
+            }
+            if( slot_copy != c )
+            {
+                mt[c+mt_count] = media_types[slot_copy];
+                media_types[slot_copy] = media_types[c];
+            }
+            else
+            {
+                mt[c+mt_count] = media_types[c];
+            }
+        }
+        mt_count += media_count;
     }
 
     /* Create and add our capture filter */
@@ -852,17 +871,15 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         dshow_stream.mt =
             p_capture_filter->CustomGetPin()->CustomGetMediaType();
 
-        /* Show properties. Done here so the VLC stream is setup with the
+        /* Show Device properties. Done here so the VLC stream is setup with the
          * proper parameters. */
         vlc_value_t val;
         var_Get( p_this, "dshow-config", &val );
         if( val.i_int )
         {
-            PropertiesPage( p_this, p_device_filter,
-                            p_sys->p_capture_graph_builder2,
-                            dshow_stream.mt.majortype == MEDIATYPE_Audio );
+            ShowDeviceProperties( p_this, p_sys->p_capture_graph_builder2, p_device_filter, b_audio );
         }
-
+        
         dshow_stream.mt =
             p_capture_filter->CustomGetPin()->CustomGetMediaType();
 
@@ -1509,7 +1526,7 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
         FindCaptureDevice( p_this, &devicename, NULL, b_audio );
     if( p_device_filter )
     {
-        PropertiesPage( p_this, p_device_filter, NULL, b_audio );
+        ShowPropertyPage( p_device_filter );
     }
     else
     {
@@ -1526,47 +1543,47 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     return VLC_SUCCESS;
 }
 
-static void ShowPropertyPage( IUnknown *obj, CAUUID *cauuid )
+/*****************************************************************************
+ * properties
+ *****************************************************************************/
+
+static void ShowPropertyPage( IUnknown *obj )
 {
-    if( cauuid->cElems > 0 )
+    ISpecifyPropertyPages *p_spec;
+
+    HRESULT hr = obj->QueryInterface( IID_ISpecifyPropertyPages,
+                                                  (void **)&p_spec );
+    if( SUCCEEDED(hr) )
     {
-        HWND hwnd_desktop = ::GetDesktopWindow();
+        CAUUID cauuid;
 
-        OleCreatePropertyFrame( hwnd_desktop, 30, 30, NULL, 1, &obj,
-                                cauuid->cElems, cauuid->pElems, 0, 0, NULL );
+        if( SUCCEEDED(p_spec->GetPages( &cauuid )) )
+        {
+            if( cauuid.cElems > 0 )
+            {
+                HWND hwnd_desktop = ::GetDesktopWindow();
 
-        CoTaskMemFree( cauuid->pElems );
+                OleCreatePropertyFrame( hwnd_desktop, 30, 30, NULL, 1, &obj,
+                                        cauuid.cElems, cauuid.pElems, 0, 0, NULL );
+
+                CoTaskMemFree( cauuid.pElems );
+            }
+            p_spec->Release();
+        }
     }
 }
 
-static void PropertiesPage( vlc_object_t *p_this, IBaseFilter *p_device_filter,
-                            ICaptureGraphBuilder2 *p_capture_graph,
-                            vlc_bool_t b_audio )
-{
-    CAUUID cauuid;
-
+static void ShowDeviceProperties( vlc_object_t *p_this,
+                                  ICaptureGraphBuilder2 *p_capture_graph,
+                                  IBaseFilter *p_device_filter, vlc_bool_t b_audio)
+{                    
+    HRESULT hr;
     msg_Dbg( p_this, "Configuring Device Properties" );
 
     /*
      * Video or audio capture filter page
      */
-    ISpecifyPropertyPages *p_spec;
-
-    HRESULT hr = p_device_filter->QueryInterface( IID_ISpecifyPropertyPages,
-                                                  (void **)&p_spec );
-    if( SUCCEEDED(hr) )
-    {
-        if( SUCCEEDED(p_spec->GetPages( &cauuid )) )
-        {
-            ShowPropertyPage( p_device_filter, &cauuid );
-        }
-        p_spec->Release();
-    }
-
-    msg_Dbg( p_this, "looking for WDM Configuration Pages" );
-
-    if( p_capture_graph )
-        msg_Dbg( p_this, "got capture graph for WDM Configuration Pages" );
+    ShowPropertyPage( p_device_filter );
 
     /*
      * Audio capture pin
@@ -1575,50 +1592,30 @@ static void PropertiesPage( vlc_object_t *p_this, IBaseFilter *p_device_filter,
     {
         IAMStreamConfig *p_SC;
 
+        msg_Dbg( p_this, "Showing WDM Audio Configuration Pages" );
+
         hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
-                                             &MEDIATYPE_Audio, p_device_filter,
-                                             IID_IAMStreamConfig,
+                                             &MEDIATYPE_Audio, p_device_filter,                                             IID_IAMStreamConfig,
                                              (void **)&p_SC );
         if( SUCCEEDED(hr) )
         {
-            hr = p_SC->QueryInterface( IID_ISpecifyPropertyPages,
-                                       (void **)&p_spec );
-            if( SUCCEEDED(hr) )
-            {
-                hr = p_spec->GetPages( &cauuid );
-                if( SUCCEEDED(hr) )
-                {
-                    for( unsigned int c = 0; c < cauuid.cElems; c++ )
-                    {
-                        ShowPropertyPage( p_SC, &cauuid );
-                    }
-                    CoTaskMemFree( cauuid.pElems );
-                }
-                p_spec->Release();
-            }
+            ShowPropertyPage(p_SC);
             p_SC->Release();
         }
 
+     
         /*
          * TV Audio filter
          */
         IAMTVAudio *p_TVA;
-        hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE, 
+        HRESULT hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE, 
                                              &MEDIATYPE_Audio, p_device_filter,
                                              IID_IAMTVAudio, (void **)&p_TVA );
         if( SUCCEEDED(hr) )
         {
-            hr = p_TVA->QueryInterface( IID_ISpecifyPropertyPages,
-                                        (void **)&p_spec );
-            if( SUCCEEDED(hr) )
-            {
-                if( SUCCEEDED( p_spec->GetPages( &cauuid ) ) )
-                    ShowPropertyPage(p_TVA, &cauuid);
-
-                p_spec->Release();
-            }
+            ShowPropertyPage(p_TVA);
             p_TVA->Release();
-        }
+        }                
     }
 
     /*
@@ -1627,6 +1624,8 @@ static void PropertiesPage( vlc_object_t *p_this, IBaseFilter *p_device_filter,
     if( p_capture_graph && !b_audio )
     {
         IAMStreamConfig *p_SC;
+
+        msg_Dbg( p_this, "Showing WDM Video Configuration Pages" );
 
         hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                              &MEDIATYPE_Interleaved,
@@ -1644,83 +1643,14 @@ static void PropertiesPage( vlc_object_t *p_this, IBaseFilter *p_device_filter,
 
         if( SUCCEEDED(hr) )
         {
-            hr = p_SC->QueryInterface( IID_ISpecifyPropertyPages,
-                                       (void **)&p_spec );
-            if( SUCCEEDED(hr) )
-            {
-                if( SUCCEEDED( p_spec->GetPages(&cauuid) ) )
-                {
-                    ShowPropertyPage(p_SC, &cauuid);
-                }
-                p_spec->Release();
-            }
+            ShowPropertyPage(p_SC);
             p_SC->Release();
         }
-
-        /*
-         * Video crossbar, and a possible second crossbar
-         */
-        IAMCrossbar *p_X, *p_X2;
-        IBaseFilter *p_XF;
-
-        hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
-                                             &MEDIATYPE_Interleaved,
-                                             p_device_filter,
-                                             IID_IAMCrossbar, (void **)&p_X );
-        if( FAILED(hr) )
-        {
-            hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
-                                                 &MEDIATYPE_Video,
-                                                 p_device_filter,
-                                                 IID_IAMCrossbar,
-                                                 (void **)&p_X );
-        }
-
-        if( SUCCEEDED(hr) )
-        {
-            hr = p_X->QueryInterface( IID_IBaseFilter, (void **)&p_XF );
-            if( SUCCEEDED(hr) )
-            {
-                hr = p_X->QueryInterface( IID_ISpecifyPropertyPages,
-                                          (void **)&p_spec );
-                if( SUCCEEDED(hr) )
-                {
-                    hr = p_spec->GetPages(&cauuid);
-                    if( hr == S_OK && cauuid.cElems > 0 )
-                    {
-                        ShowPropertyPage( p_X, &cauuid );
-                    }
-                    p_spec->Release();
-                }
-
-                hr = p_capture_graph->FindInterface( &LOOK_UPSTREAM_ONLY, NULL,
-                                                     p_XF, IID_IAMCrossbar,
-                                                     (void **)&p_X2 );
-                if( SUCCEEDED(hr) )
-                {
-                    hr = p_X2->QueryInterface( IID_ISpecifyPropertyPages,
-                                               (void **)&p_spec );
-                    if( SUCCEEDED(hr) )
-                    {
-                        hr = p_spec->GetPages( &cauuid );
-                        if( SUCCEEDED(hr) )
-                        {
-                            ShowPropertyPage( p_X2, &cauuid );
-                        }
-                        p_spec->Release();
-                    }
-                    p_X2->Release();
-                }
-
-                p_XF->Release();
-            }
-
-            p_X->Release();
-        }
-
+        
         /*
          * TV Tuner
          */
+ 
         IAMTVTuner *p_TV;
         hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                              &MEDIATYPE_Interleaved,
@@ -1737,18 +1667,8 @@ static void PropertiesPage( vlc_object_t *p_this, IBaseFilter *p_device_filter,
 
         if( SUCCEEDED(hr) )
         {
-            hr = p_TV->QueryInterface( IID_ISpecifyPropertyPages,
-                                       (void **)&p_spec );
-            if( SUCCEEDED(hr) )
-            {
-                hr = p_spec->GetPages(&cauuid);
-                if( SUCCEEDED(hr) )
-                {
-                    ShowPropertyPage(p_TV, &cauuid);
-                }
-                p_spec->Release();
-            }
+            ShowPropertyPage(p_TV);
             p_TV->Release();
-        }
+        }        
     }
 }
