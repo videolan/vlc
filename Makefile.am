@@ -614,7 +614,7 @@ if UNTRUE
 noinst_LIBRARIES_mozilla = mozilla/libplugin.a
 endif
 
-mozilla_libplugin_a_SOURCES = $(SOURCES_mozilla) $(BUILT_SOURCES_mozilla)
+mozilla_libplugin_a_SOURCES = $(SOURCES_mozilla)
 mozilla_libplugin_a_CFLAGS = $(CPPFLAGS_pic) $(CFLAGS_pic) \
                              $(CPPFLAGS_mozilla) $(CFLAGS_mozilla) \
                              $(CPPFLAGS_mozilla_EXTRA)
