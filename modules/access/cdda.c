@@ -1,8 +1,8 @@
 /*****************************************************************************
  * cdda.c : CD digital audio input module for vlc
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: cdda.c,v 1.9 2003/11/29 16:29:24 gbazin Exp $
+ * Copyright (C) 2000, 2003 VideoLAN
+ * $Id: cdda.c,v 1.10 2003/12/11 05:30:11 rocky Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -125,12 +125,13 @@ static int AccessOpen( vlc_object_t *p_this )
 
     if( !*psz_source )
     {
+        /* No source specified, so figure it out. */
         if( !p_input->psz_access )
         {
             free( psz_orig );
             return VLC_EGENERIC;
         }
-        psz_source = config_GetPsz( p_input, "vcd" );
+        psz_source = config_GetPsz( p_input, "cd-audio" );
         if( !psz_source ) return -1;
     }
 
