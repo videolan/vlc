@@ -2,7 +2,7 @@
  * rtp.c: rtp stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: rtp.c,v 1.9 2004/01/30 15:56:28 fenrir Exp $
+ * $Id: rtp.c,v 1.10 2004/01/30 16:45:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1124,8 +1124,8 @@ static int rtp_packetize_mp4a( sout_stream_t *p_stream, sout_stream_id_t *id,
         out->p_buffer[12] = 0;
         out->p_buffer[13] = 2*8;
         /* for each AU length 13 bits + idx 3bits, */
-        out->p_buffer[14] = ( in->i_size >> 5 )&&0xff;
-        out->p_buffer[15] = ( (in->i_size&&0xff)<<3 )|0;
+        out->p_buffer[14] = ( in->i_size >> 5 )&0xff;
+        out->p_buffer[15] = ( (in->i_size&0xff)<<3 )|0;
 
         memcpy( &out->p_buffer[16], p_data, i_payload );
 
