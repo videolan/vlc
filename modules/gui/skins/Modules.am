@@ -91,6 +91,23 @@ SOURCES_skins = \
 	modules/gui/skins/gtk2/gtk2_window.cpp \
 	modules/gui/skins/gtk2/gtk2_window.h \
 	\
+        modules/gui/skins/x11/x11_api.cpp \
+	modules/gui/skins/x11/x11_bitmap.cpp \
+	modules/gui/skins/x11/x11_bitmap.h \
+	modules/gui/skins/x11/x11_dragdrop.cpp \
+	modules/gui/skins/x11/x11_dragdrop.h \
+	modules/gui/skins/x11/x11_event.cpp \
+	modules/gui/skins/x11/x11_event.h \
+	modules/gui/skins/x11/x11_font.cpp \
+	modules/gui/skins/x11/x11_font.h \
+	modules/gui/skins/x11/x11_graphics.cpp \
+	modules/gui/skins/x11/x11_graphics.h \
+	modules/gui/skins/x11/x11_run.cpp \
+	modules/gui/skins/x11/x11_theme.cpp \
+	modules/gui/skins/x11/x11_theme.h \
+	modules/gui/skins/x11/x11_window.cpp \
+	modules/gui/skins/x11/x11_window.h \
+	\
 	modules/gui/wxwindows/fileinfo.cpp \
 	modules/gui/wxwindows/messages.cpp \
 	modules/gui/wxwindows/open.cpp \

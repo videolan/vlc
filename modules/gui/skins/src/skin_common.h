@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.5 2003/04/23 10:29:52 asmax Exp $
+ * $Id: skin_common.h,v 1.6 2003/04/28 14:12:33 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -38,6 +38,10 @@ class Messages;
 class SoutDialog;
 class PrefsDialog;
 class FileInfo;
+
+#ifdef X11_SKINS
+#include <X11/Xlib.h>
+#endif
 
 //---------------------------------------------------------------------------
 // intf_sys_t: description and status of skin interface
@@ -77,6 +81,10 @@ struct intf_sys_t
     // Wait wxwindows initialization
     vlc_mutex_t init_lock;
     vlc_cond_t  init_cond;
+
+#ifdef X11_SKINS
+    Display *display;
+#endif
 
 };
 

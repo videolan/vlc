@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.20 2003/04/28 12:00:14 asmax Exp $
+ * $Id: skin_main.cpp,v 1.21 2003/04/28 14:12:33 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -43,6 +43,9 @@
 #include "skin_common.h"
 #include "wxdialogs.h"
 
+#ifdef X11_SKINS
+#include <X11/Xlib.h>
+#endif
 
 //---------------------------------------------------------------------------
 // Interface thread
@@ -112,6 +115,9 @@ static int Open ( vlc_object_t *p_this )
     char **pp_args  = p_args;
 
     gdk_init( &i_args, &pp_args );
+#elif defined X11_SKINS
+    // Initialize X11
+    p_intf->p_sys->display = XOpenDisplay( NULL );
 #endif
 
     // Initialize conditions and mutexes

@@ -2,7 +2,7 @@
  * os_font.h: Wrapper for the OSFont class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_font.h,v 1.5 2003/04/28 12:00:13 asmax Exp $
+ * $Id: os_font.h,v 1.6 2003/04/28 14:12:32 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -39,5 +39,13 @@
     #define VLC_FONT_ALIGN_LEFT    PANGO_ALIGN_LEFT
     #define VLC_FONT_ALIGN_CENTER  PANGO_ALIGN_CENTER
     #define VLC_FONT_ALIGN_RIGHT   PANGO_ALIGN_RIGHT
+
+#elif defined X11_SKINS
+    #include "x11/x11_font.h"
+    #define OSFont X11Font
+
+    #define VLC_FONT_ALIGN_LEFT    0
+    #define VLC_FONT_ALIGN_CENTER  1
+    #define VLC_FONT_ALIGN_RIGHT   2
 
 #endif

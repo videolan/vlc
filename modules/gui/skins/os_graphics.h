@@ -2,7 +2,7 @@
  * os_graphics.h: Wrapper for the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_graphics.h,v 1.5 2003/04/28 12:00:13 asmax Exp $
+ * $Id: os_graphics.h,v 1.6 2003/04/28 14:12:32 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -36,5 +36,11 @@
     #define SRC_AND    2
     #define OSGraphics GTK2Graphics
     #define OSRegion   GTK2Region
+#elif defined X11_SKINS
+    #include "x11/x11_graphics.h"
+    #define SRC_COPY   1
+    #define SRC_AND    2
+    #define OSGraphics X11Graphics
+    #define OSRegion   X11Region
 #endif
 

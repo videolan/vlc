@@ -2,7 +2,7 @@
  * os_theme.h: Wrapper for the OSTheme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_theme.h,v 1.4 2003/04/28 12:00:13 asmax Exp $
+ * $Id: os_theme.h,v 1.5 2003/04/28 14:12:32 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -30,4 +30,7 @@
 #elif defined GTK2_SKINS
     #include "gtk2/gtk2_theme.h"
     #define OSTheme GTK2Theme
+#elif defined X11_SKINS
+    #include "x11/x11_theme.h"
+    #define OSTheme X11Theme
 #endif

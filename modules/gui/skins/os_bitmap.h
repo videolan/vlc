@@ -2,7 +2,7 @@
  * os_bitmap.h: Wrapper for the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_bitmap.h,v 1.4 2003/04/28 12:00:13 asmax Exp $
+ * $Id: os_bitmap.h,v 1.5 2003/04/28 14:12:32 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -30,6 +30,9 @@
 #elif defined GTK2_SKINS
     #include "gtk2/gtk2_bitmap.h"
     #define OSBitmap GTK2Bitmap
+#elif defined X11_SKINS
+    #include "x11/x11_bitmap.h"
+    #define OSBitmap X11Bitmap
 #endif
 
 
