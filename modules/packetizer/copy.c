@@ -267,7 +267,8 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( p_ret != NULL && p_block->i_pts > p_ret->i_pts )
+    if( p_dec->fmt_in.i_cat != SPU_ES &&
+        p_ret != NULL && p_block->i_pts > p_ret->i_pts )
     {
         p_ret->i_length = p_block->i_pts - p_ret->i_pts;
     }
