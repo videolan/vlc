@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.17 2003/06/08 18:40:10 gbazin Exp $
+ * $Id: x11_window.cpp,v 1.18 2003/06/09 00:07:09 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -85,7 +85,7 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     if( DragDrop )
     {
         // register the listview as a drop target
-        DropObject = new X11DropObject( p_intf );
+        DropObject = new X11DropObject( p_intf, Wnd );
 
         Atom xdndAtom = XInternAtom( display, "XdndAware", False );
         char xdndVersion = 4;
@@ -160,7 +160,9 @@ X11Window::~X11Window()
 //---------------------------------------------------------------------------
 void X11Window::OSShow( bool show )
 {
+    XLOCK;
     XResizeWindow( display, Wnd, 1, 1 ); // Avoid flicker
+    XUNLOCK;
 
     if( show )
     {
@@ -343,8 +345,10 @@ bool X11Window::ProcessOSEvent( Event *evt )
 
         case ClientMessage:
             {
+            XLOCK;
             string type = XGetAtomName( display, ( (XClientMessageEvent*)
                                                     p2 )->message_type );
+            XUNLOCK;
             if( type == "XdndEnter" )
             {
                 DropObject->DndEnter( ((XClientMessageEvent*)p2)->data.l );
