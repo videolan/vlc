@@ -29,11 +29,11 @@ typedef struct macroblock_s
     int                     i_c_x, i_c_y; /* position of macroblock (chroma) */
     int                     i_chroma_nb_blocks;  /* nb of bks for a chr comp */
     int                     i_l_stride;       /* number of yuv_data_t to ignore
-					                               * when changing lines     */
+		                               * when changing lines     */
     int                     i_c_stride;                  /* idem, for chroma */
     
     /* IDCT information */
-    dctelem_t                  ppi_blocks[12][64];                    /* blocks */
+    dctelem_t               ppi_blocks[12][64];                    /* blocks */
     f_idct_t                pf_idct[12];             /* sparse IDCT or not ? */
     int                     pi_sparse_pos[12];
 
@@ -49,7 +49,7 @@ typedef struct macroblock_s
     /* AddBlock information */
     f_addb_t                pf_addb[12];      /* pointer to the Add function */
     yuv_data_t *            p_data[12];              /* pointer to the position
-					                                  * in the final picture */
+                                                      * in the final picture */
     int                     i_addb_l_stride, i_addb_c_stride;
 } macroblock_t;
 

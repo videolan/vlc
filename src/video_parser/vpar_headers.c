@@ -624,7 +624,8 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     {
         /* Do we have the reference pictures ? */
         b_parsable = !((p_vpar->picture.i_coding_type == P_CODING_TYPE) &&
-                       (p_vpar->sequence.p_forward == NULL)) ||
+                       (p_vpar->sequence.p_backward == NULL)) ||
+                        /* p_backward will become p_forward later */
                       ((p_vpar->picture.i_coding_type == B_CODING_TYPE) &&
                        (p_vpar->sequence.p_forward == NULL ||
                         p_vpar->sequence.p_backward == NULL));
@@ -660,16 +661,18 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     if( !p_vpar->picture.i_current_structure )
     {
         /* This is a new frame. Get a structure from the video_output. */
-        if( ( P_picture = vout_CreatePicture( p_vpar->p_vout,
+        while( ( P_picture = vout_CreatePicture( p_vpar->p_vout,
                                         99+p_vpar->sequence.i_chroma_format, /*???*/
                                         p_vpar->sequence.i_width,
-                                        p_vpar->sequence.i_height,
-                                        p_vpar->sequence.i_width*sizeof(yuv_data_t) ) )
+                                        p_vpar->sequence.i_height ) )
              == NULL )
         {
             intf_ErrMsg("vpar debug: allocation error in vout_CreatePicture\n");
-            p_vpar->b_error = 1;
-            return;
+            if( p_vpar->b_die )
+            {
+                return;
+            }
+            mwait( VPAR_IDLE_SLEEP );
         }
 
         /* Initialize values. */
@@ -678,9 +681,9 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                                               i_structure );
         P_picture->i_aspect_ratio = p_vpar->sequence.i_aspect_ratio;
         P_picture->i_matrix_coefficients = p_vpar->sequence.i_matrix_coefficients;
-        p_vpar->picture.i_l_stride = - 8 + ( p_vpar->sequence.i_width
+        p_vpar->picture.i_l_stride = ( p_vpar->sequence.i_width
                     << ( 1 - p_vpar->picture.b_frame_structure ) );
-        p_vpar->picture.i_c_stride = - 8 + ( p_vpar->sequence.i_chroma_width
+        p_vpar->picture.i_c_stride = ( p_vpar->sequence.i_chroma_width
                     << ( 1 - p_vpar->picture.b_frame_structure ));
 
         P_picture->i_deccount = p_vpar->sequence.i_mb_size;
@@ -749,7 +752,7 @@ fprintf(stderr, "Image trashee\n");
     }
     else if( p_vpar->picture.i_current_structure == FRAME_STRUCTURE )
     {
-fprintf(stderr, "Image parsee\n");
+fprintf(stderr, "Image parsee (%d)\n", p_vpar->picture.i_coding_type);
         /* Frame completely parsed. */
         for( i_mb = 1; p_vpar->picture.pp_mb[i_mb]; i_mb++ )
         {

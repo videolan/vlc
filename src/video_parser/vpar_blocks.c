@@ -590,8 +590,8 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
     p_mb->p_forward = p_vpar->sequence.p_forward;
     p_mb->p_backward = p_vpar->sequence.p_backward;
 
-    p_mb->i_addb_l_stride = p_mb->i_l_stride = p_vpar->picture.i_l_stride;
-    p_mb->i_addb_c_stride = p_mb->i_c_stride = p_vpar->picture.i_c_stride;
+    p_mb->i_addb_l_stride = (p_mb->i_l_stride = p_vpar->picture.i_l_stride) - 8;
+    p_mb->i_addb_c_stride = (p_mb->i_c_stride = p_vpar->picture.i_c_stride) - 9;
 
     /* Update macroblock real position. */
     p_vpar->mb.i_l_x += 16;
@@ -639,8 +639,8 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
                                         macroblock_t * p_mb )
 {
     static f_motion_t   pf_motion[2][4] =
-        { {NULL, vdec_FieldFieldRecon, vdec_Field16x8Recon, vdec_FieldDMVRecon},
-          {NULL, vdec_FrameFieldRecon, vdec_FrameFrameRecon, vdec_FrameDMVRecon} };
+        { {NULL, vdec_MotionFieldField, vdec_MotionField16x8, vdec_MotionFieldDMV},
+          {NULL, vdec_MotionFrameField, vdec_MotionFrameFrame, vdec_MotionFrameDMV} };
     static int          ppi_mv_count[2][4] = { {0, 1, 2, 1}, {0, 2, 1, 1} };
     static int          ppi_mv_format[2][4] = { {0, 1, 1, 1}, {0, 1, 2, 1} };
 
@@ -685,7 +685,7 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
     {
         /* For the intra macroblocks, we use an empty motion
          * compensation function */
-        p_mb->pf_motion = vdec_DummyRecon;
+        p_mb->pf_motion = vdec_MotionDummy;
     }
     else
     {
@@ -752,8 +752,8 @@ i_count++;
     {
         /* Skipped macroblock (ISO/IEC 13818-2 7.6.6). */
         static int          pi_dc_dct_reinit[4] = {128,256,512,1024};
-        static f_motion_t   pf_motion_skipped[4] = {NULL, vdec_MotionField,
-                                vdec_MotionField, vdec_MotionFrame};
+        static f_motion_t   pf_motion_skipped[4] = {NULL, vdec_MotionFieldField,
+                                vdec_MotionFieldField, vdec_MotionFrameFrame};
 
         /* Reset DC predictors (7.2.1). */
         p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
