@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.58 2003/12/05 00:03:54 gbazin Exp $
+ * $Id: transcode.c,v 1.59 2003/12/06 22:53:07 jpsaman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -889,7 +889,8 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
         if( id->f_src.audio.i_channels !=
             id->p_encoder->fmt_in.audio.i_channels )
         {
-            int i, j;
+            unsigned int i;
+            int j;
 
             /* This is for liba52 which is what ffmpeg uses to decode ac3 */
             static const int translation[7][6] =

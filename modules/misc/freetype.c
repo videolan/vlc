@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.35 2003/11/22 00:41:07 titer Exp $
+ * $Id: freetype.c,v 1.36 2003/12/06 22:53:07 jpsaman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -73,8 +73,9 @@ static void RenderYUY2( vout_thread_t *, picture_t *,
                         const subpicture_t * );
 static void RenderRV32( vout_thread_t *, picture_t *,
                         const subpicture_t * );
-static int  AddText   ( vout_thread_t *, byte_t *, text_style_t *, int,
+static int  AddText   ( vout_thread_t *, char *, text_style_t *, int,
                         int, int, mtime_t, mtime_t );
+
 static void FreeString( subpicture_t * );
 
 #if !defined(HAVE_ICONV)
@@ -629,7 +630,7 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
  * needed glyphs into memory. It is used as pf_add_string callback in
  * the vout method by this module
  */
-static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
+static int AddText ( vout_thread_t *p_vout, char *psz_string,
                      text_style_t *p_style, int i_flags, int i_hmargin,
                      int i_vmargin, mtime_t i_start, mtime_t i_stop )
 {
