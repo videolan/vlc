@@ -6,7 +6,7 @@ XSLTPROC=xsltproc
 LYNX=lynx
 JADE=jade
 
-XML_DECL := /usr/lib/sgml/declaration/xml.decl
+XML_DECL := /usr/share/sgml/declaration/xml.decl
 XSL_CHUNK = videolan-doc-chunk.xsl
 XSL = videolan-doc.xsl
 
@@ -32,11 +32,11 @@ manual.pdf: *.xml
 	
 # TXT
 manual.txt:  *.xml
-	$(JADE) -t sgml -d stylesheet-txt.dsk $(XML_DECL) manual.xml > text.html
+	$(JADE) -t sgml -d stylesheet-txt.dsl $(XML_DECL) manual.xml > text.html
 	$(LYNX) -force_html -dump text.html > manual.txt
 	rm -f text.html
 
 clean:
-	rm -f manual.txt
-	rm -f *.html *.aux *.log *.tex
+	rm -f manual.txt manual.pdf
+	rm -f *.html *.aux *.log *.tex *.out
 	rm -f html/*.html
