@@ -1263,7 +1263,11 @@ then
           PLUGINS="${PLUGINS} mux_ts_dvbpsi"
           LDFLAGS_mux_ts_dvbpsi="${LDFLAGS_mux_ts_dvbpsi} -ldvbpsi" ],
         [  AC_MSG_WARN([cannot find libdvbpsi headers]) ],
-        [#include <stdint.h>
+        [#if defined( HAVE_STDINT_H )
+#   include <stdint.h>
+#elif defined( HAVE_INTTYPES_H )
+#   include <inttypes.h>
+#endif
 #include <dvbpsi/dvbpsi.h>
 #include <dvbpsi/descriptor.h>
 #include <dvbpsi/pat.h>
