@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.6 2002/10/16 10:31:58 sam Exp $
+ * $Id: variables.c,v 1.7 2002/10/16 19:39:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,6 +29,15 @@
 #ifdef HAVE_STDLIB_H
 #   include <stdlib.h>                                          /* realloc() */
 #endif
+
+/*****************************************************************************
+ * Private types
+ *****************************************************************************/
+struct callback_entry_t
+{
+    vlc_callback_t pf_callback;
+    void *         p_data;
+};
 
 /*****************************************************************************
  * Local prototypes
@@ -96,15 +105,37 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     memset( &p_var->val, 0, sizeof(vlc_value_t) );
 
     p_var->i_usage = 1;
-    p_var->b_set = VLC_FALSE;
-    p_var->b_active = VLC_TRUE;
 
+    p_var->i_entries = 0;
+    p_var->p_entries = NULL;
+
+    /* Always initialize the variable */
     switch( i_type )
     {
+        case VLC_VAR_BOOL:
+            p_var->val.b_bool = VLC_FALSE;
+            break;
+        case VLC_VAR_INTEGER:
+            p_var->val.i_int = 0;
+            break;
+        case VLC_VAR_STRING:
+        case VLC_VAR_MODULE:
+        case VLC_VAR_FILE:
+            p_var->val.psz_string = strdup( "" );
+            break;
+        case VLC_VAR_FLOAT:
+            p_var->val.f_float = 0.0;
+            break;
+        case VLC_VAR_TIME:
+            /* TODO */
+            break;
+        case VLC_VAR_ADDRESS:
+        case VLC_VAR_COMMAND:
+            p_var->val.p_address = NULL;
+            break;
         case VLC_VAR_MUTEX:
             p_var->val.p_address = malloc( sizeof(vlc_mutex_t) );
             vlc_mutex_init( p_this, (vlc_mutex_t*)p_var->val.p_address );
-            p_var->b_set = VLC_TRUE;
             break;
     }
 
@@ -149,16 +180,19 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
         case VLC_VAR_STRING:
         case VLC_VAR_MODULE:
         case VLC_VAR_FILE:
-            if( p_var->b_set && p_var->val.psz_string )
-            {
-                free( p_var->val.psz_string );
-            }
+            free( p_var->val.psz_string );
             break;
 
         case VLC_VAR_MUTEX:
             vlc_mutex_destroy( (vlc_mutex_t*)p_var->val.p_address );
             free( p_var->val.p_address );
             break;
+    }
+
+    /* Free callbacks if needed */
+    if( p_var->p_entries )
+    {
+        free( p_var->p_entries );
     }
 
     free( p_var->psz_name );
@@ -214,6 +248,8 @@ int __var_Type( vlc_object_t *p_this, const char *psz_name )
 int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
 {
     int i_var;
+    variable_t *p_var;
+    vlc_value_t oldval;
 
     vlc_mutex_lock( &p_this->var_lock );
 
@@ -225,28 +261,47 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
         return VLC_ENOVAR;
     }
 
-    /* Duplicate value if needed */
-    switch( p_this->p_vars[i_var].i_type )
+    p_var = &p_this->p_vars[i_var];
+
+    /* Duplicate data if needed */
+    switch( p_var->i_type )
     {
         case VLC_VAR_STRING:
         case VLC_VAR_MODULE:
         case VLC_VAR_FILE:
-            if( p_this->p_vars[i_var].b_set
-                 && p_this->p_vars[i_var].val.psz_string )
-            {
-                free( p_this->p_vars[i_var].val.psz_string );
-            }
-            if( val.psz_string )
-            {
-                val.psz_string = strdup( val.psz_string );
-            }
+            val.psz_string = strdup( val.psz_string );
             break;
     }
 
-    p_this->p_vars[i_var].val = val;
-    p_this->p_vars[i_var].b_set = VLC_TRUE;
+    /* Backup needed stuff */
+    oldval = p_var->val;
 
-    /* XXX: callback stuff will go here */
+    /* Set the variable */
+    p_var->val = val;
+
+    /* Deal with callbacks */
+    if( p_var->i_entries )
+    {
+        int i;
+
+        for( i = p_var->i_entries ; i-- ; )
+        {
+            /* FIXME: oooh, see the deadlocks! see the race conditions! */
+            p_var->p_entries[i].pf_callback( p_this, p_var->psz_name,
+                                             oldval, val,
+                                             p_var->p_entries[i].p_data );
+        }
+    }
+
+    /* Free data if needed */
+    switch( p_var->i_type )
+    {
+        case VLC_VAR_STRING:
+        case VLC_VAR_MODULE:
+        case VLC_VAR_FILE:
+            free( oldval.psz_string );
+            break;
+    }
 
     vlc_mutex_unlock( &p_this->var_lock );
 
@@ -261,6 +316,7 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
 int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
 {
     int i_var;
+    variable_t *p_var;
 
     vlc_mutex_lock( &p_this->var_lock );
 
@@ -272,26 +328,23 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
         return VLC_ENOVAR;
     }
 
-    if( !p_this->p_vars[i_var].b_set )
-    {
-        vlc_mutex_unlock( &p_this->var_lock );
-        return VLC_EBADVAR;
-    }
+    p_var = &p_this->p_vars[i_var];
 
     /* Some variables trigger special behaviour. */
-    switch( p_this->p_vars[i_var].i_type )
+    switch( p_var->i_type )
     {
         case VLC_VAR_COMMAND:
-            if( p_this->p_vars[i_var].b_set )
+            if( p_var->val.p_address )
             {
-                /* We need this to avoid deadlocks */
+                /* We need to save data before releasing the lock */
                 int i_ret;
                 int (*pf_command) (vlc_object_t *, char *, char *) =
-                                          p_this->p_vars[i_var].val.p_address;
-                char *psz_cmd = strdup( p_this->p_vars[i_var].psz_name );
+                                          p_var->val.p_address;
+                char *psz_cmd = strdup( p_var->psz_name );
                 char *psz_arg = strdup( p_val->psz_string );
 
                 vlc_mutex_unlock( &p_this->var_lock );
+
                 i_ret = pf_command( p_this, psz_cmd, psz_arg );
                 free( psz_cmd );
                 free( psz_arg );
@@ -302,10 +355,10 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
     }
 
     /* Really set the variable */
-    *p_val = p_this->p_vars[i_var].val;
+    *p_val = p_var->val;
 
     /* Duplicate value if needed */
-    switch( p_this->p_vars[i_var].i_type )
+    switch( p_var->i_type )
     {
         case VLC_VAR_STRING:
         case VLC_VAR_MODULE:
@@ -315,6 +368,110 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
                 p_val->psz_string = strdup( p_val->psz_string );
             }
             break;
+    }
+
+    vlc_mutex_unlock( &p_this->var_lock );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * var_AddCallback: register a callback in a variable
+ *****************************************************************************
+ * We store a function pointer pf_callback that will be called upon variable
+ * modification. p_data is a generic pointer that will be passed as additional
+ * argument to the callback function.
+ *****************************************************************************/
+int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
+                       vlc_callback_t pf_callback, void *p_data )
+{
+    int i_var, i_entry;
+    variable_t *p_var;
+
+    vlc_mutex_lock( &p_this->var_lock );
+
+    i_var = Lookup( p_this->p_vars, p_this->i_vars, psz_name );
+    if( i_var < 0 )
+    {
+        vlc_mutex_unlock( &p_this->var_lock );
+        return VLC_ENOVAR;
+    }
+
+    p_var = &p_this->p_vars[i_var];
+
+    i_entry = p_var->i_entries++;
+
+    if( i_entry )
+    {
+        p_var->p_entries = realloc( p_var->p_entries,
+                               sizeof( callback_entry_t ) * p_var->i_entries );
+    }
+    else
+    {
+        p_var->p_entries = malloc( sizeof( callback_entry_t ) );
+    }
+
+    p_var->p_entries[ i_entry ].pf_callback = pf_callback;
+    p_var->p_entries[ i_entry ].p_data = p_data;
+        
+    vlc_mutex_unlock( &p_this->var_lock );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * var_DelCallback: remove a callback from a variable
+ *****************************************************************************
+ * pf_callback and p_data have to be given again, because different objects
+ * might have registered the same callback function.
+ *****************************************************************************/
+int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
+                       vlc_callback_t pf_callback, void *p_data )
+{
+    int i_var, i_entry;
+    variable_t *p_var;
+
+    vlc_mutex_lock( &p_this->var_lock );
+
+    i_var = Lookup( p_this->p_vars, p_this->i_vars, psz_name );
+    if( i_var < 0 )
+    {
+        vlc_mutex_unlock( &p_this->var_lock );
+        return VLC_ENOVAR;
+    }
+
+    p_var = &p_this->p_vars[i_var];
+
+    for( i_entry = p_var->i_entries ; i_entry-- ; )
+    {
+        if( p_var->p_entries[i_entry].pf_callback == pf_callback
+            || p_var->p_entries[i_entry].p_data == p_data )
+        {
+            break;
+        }
+    }
+
+    if( i_entry < 0 )
+    {
+        vlc_mutex_unlock( &p_this->var_lock );
+        return VLC_EGENERIC;
+    }
+
+    p_var->i_entries--;
+
+    memmove( p_var->p_entries + i_entry,
+             p_var->p_entries + i_entry + 1,
+             sizeof( callback_entry_t ) * ( p_var->i_entries - i_entry ) );
+
+    if( p_var->i_entries )
+    {
+        p_var->p_entries = realloc( p_var->p_entries,
+                       sizeof( callback_entry_t ) * ( p_var->i_entries ) );
+    }
+    else
+    {
+        free( p_var->p_entries );
+        p_var->p_entries = NULL;
     }
 
     vlc_mutex_unlock( &p_this->var_lock );

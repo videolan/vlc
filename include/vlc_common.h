@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.30 2002/10/16 15:10:39 sam Exp $
+ * $Id: vlc_common.h,v 1.31 2002/10/16 19:39:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -235,6 +235,15 @@ typedef struct pes_packet_t pes_packet_t;
 typedef struct bit_stream_t bit_stream_t;
 typedef struct network_socket_t network_socket_t;
 typedef struct iso639_lang_t iso639_lang_t;
+
+/*****************************************************************************
+ * Variable callbacks
+ *****************************************************************************/
+typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
+                                   char const *,            /* variable name */
+                                   vlc_value_t,                 /* old value */
+                                   vlc_value_t,                 /* new value */
+                                   void * );                /* callback data */
 
 /*****************************************************************************
  * Plug-in stuff
