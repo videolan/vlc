@@ -34,7 +34,7 @@ object PlaylistDlg: TPlaylistDlg
     Top = 10
     Width = 305
     Height = 331
-    Anchors = [akTop, akBottom]
+    Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <
       item
         Caption = 'Filename'

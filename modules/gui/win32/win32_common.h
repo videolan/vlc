@@ -73,6 +73,7 @@ struct intf_sys_t
 
     /* Playlist management */
     int                 i_playing;                 /* playlist selected item */
+    vlc_bool_t          b_play_when_adding;
 
     /* The window labels for DVD mode */
     TLabel            * p_label_title;

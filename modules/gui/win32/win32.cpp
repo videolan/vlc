@@ -2,7 +2,7 @@
  * win32.cpp : Win32 interface plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: win32.cpp,v 1.5 2002/12/13 03:52:58 videolan Exp $
+ * $Id: win32.cpp,v 1.6 2002/12/13 17:05:12 babal Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -76,6 +76,7 @@ static int Open ( vlc_object_t *p_this )
 
     p_intf->p_sys->p_input = NULL;
     p_intf->p_sys->i_playing = -1;
+    p_intf->p_sys->b_play_when_adding = true;
     p_intf->p_sys->b_slider_free = 1;
 
     return( 0 );

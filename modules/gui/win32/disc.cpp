@@ -81,8 +81,9 @@ void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
     /* Build source name and add it to playlist */
     Source = Method + ":" + Device + "@" + Title + "," + Chapter;
 
-    p_intf->p_sys->p_playwin->Add( Source, PLAYLIST_APPEND | PLAYLIST_GO,
-                                   PLAYLIST_END );
+    p_intf->p_sys->p_playwin->Add( Source, PLAYLIST_APPEND
+            | ( p_intf->p_sys->b_play_when_adding ? PLAYLIST_GO : 0 ),
+            PLAYLIST_END );
 }
 //---------------------------------------------------------------------------
 void __fastcall TDiscDlg::RadioGroupTypeClick( TObject *Sender )

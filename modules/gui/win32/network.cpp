@@ -105,8 +105,9 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
             Source = "udp:@:" + IntToStr( i_port );
 
             p_intf->p_sys->p_playwin->Add( Source,
-                                           PLAYLIST_APPEND | PLAYLIST_GO,
-                                           PLAYLIST_END );
+                    PLAYLIST_APPEND
+                    | ( p_intf->p_sys->b_play_when_adding ? PLAYLIST_GO : 0 )
+                    , PLAYLIST_END );
             break;
 
         /* UDP Multicast */
@@ -119,8 +120,9 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
             Source = "udp:@" + Address + ":" + IntToStr( i_port );
 
             p_intf->p_sys->p_playwin->Add( Source,
-                                           PLAYLIST_APPEND | PLAYLIST_GO,
-                                           PLAYLIST_END );
+                    PLAYLIST_APPEND
+                    | ( p_intf->p_sys->b_play_when_adding ? PLAYLIST_GO : 0 )
+                    , PLAYLIST_END );
 
         /* Channel server */
         case 2:
@@ -152,8 +154,9 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
             }
 
             p_intf->p_sys->p_playwin->Add( Source,
-                                           PLAYLIST_APPEND | PLAYLIST_GO,
-                                           PLAYLIST_END );
+                    PLAYLIST_APPEND
+                    | ( p_intf->p_sys->b_play_when_adding ? PLAYLIST_GO : 0 )
+                    , PLAYLIST_END );
 
             break;
     }

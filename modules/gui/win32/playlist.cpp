@@ -189,17 +189,23 @@ void __fastcall TPlaylistDlg::ListViewPlaylistCustomDrawItem(
  ****************************************************************************/
 void __fastcall TPlaylistDlg::MenuAddFileClick( TObject *Sender )
 {
+    p_intf->p_sys->b_play_when_adding = false;
     p_intf->p_sys->p_window->OpenFileActionExecute( Sender );
+    p_intf->p_sys->b_play_when_adding = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::MenuAddDiscClick( TObject *Sender )
 {
+    p_intf->p_sys->b_play_when_adding = false;
     p_intf->p_sys->p_window->OpenDiscActionExecute( Sender );
+    p_intf->p_sys->b_play_when_adding = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::MenuAddNetClick( TObject *Sender )
 {
+    p_intf->p_sys->b_play_when_adding = false;
     p_intf->p_sys->p_window->NetworkStreamActionExecute( Sender );
+    p_intf->p_sys->b_play_when_adding = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::MenuAddUrlClick( TObject *Sender )
