@@ -340,18 +340,6 @@ int64_t vlc_atoll( const char *nptr )
 #endif
 
 /*****************************************************************************
- * lseek: reposition read/write file offset.
- *****************************************************************************
- * FIXME: this cast sucks!
- *****************************************************************************/
-#if !defined( HAVE_LSEEK )
-off_t vlc_lseek( int fildes, off_t offset, int whence )
-{
-    return SetFilePointer( (HANDLE)fildes, (long)offset, NULL, whence );
-}
-#endif
-
-/*****************************************************************************
  * dgettext: gettext for plugins.
  *****************************************************************************/
 char *vlc_dgettext( const char *package, const char *msgid )
