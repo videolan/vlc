@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,8 +29,10 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-
+#include "vlc_codec.h"
 #include "vlc_meta.h"
+
+#define MPGA_PACKET_SIZE 4096
 
 /*****************************************************************************
  * Module descriptor
@@ -45,10 +48,6 @@ vlc_module_begin();
     add_shortcut( "mp3" );
 vlc_module_end();
 
-/* TODO:
- * - free bitrate
- */
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -57,14 +56,20 @@ static int Control( demux_t *, int, va_list );
 
 struct demux_sys_t
 {
-    date_t          pts;
-    mtime_t         i_time_offset;
+    es_out_id_t *p_es;
+    vlc_meta_t  *meta;
 
-    int             i_bitrate_avg;  /* extracted from Xing header */
+    vlc_bool_t  b_start;
+    decoder_t   *p_packetizer;
 
-    vlc_meta_t      *meta;
+    mtime_t     i_pts;
+    mtime_t     i_time_offset;
+    int         i_bitrate_avg;  /* extracted from Xing header */
 
-    es_out_id_t     *p_es;
+    int i_xing_frames;
+    int i_xing_bytes;
+    int i_xing_bitrate_avg;
+    int i_xing_frame_samples;
 };
 
 static int HeaderCheck( uint32_t h )
@@ -76,55 +81,14 @@ static int HeaderCheck( uint32_t h )
         || (((h >> 10) & 0x03) == 0x03 )    /* valide sampling freq ? */
         || ((h & 0x03) == 0x02 ))           /* valid emphasis ? */
     {
-        return( VLC_FALSE );
+        return VLC_FALSE;
     }
-    return( VLC_TRUE );
+    return VLC_TRUE;
 }
-
-static int mpga_sample_rate[2][4] =
-{
-    { 44100, 48000, 32000, 0 },
-    { 22050, 24000, 16000, 0 }
-};
-
-static int mpga_bitrate[2][3][16] =
-{
-  {
-    { 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0},
-    { 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384, 0},
-    { 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 0}
-  },
-  {
-    { 0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192, 224, 256, 0},
-    { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0},
-    { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0}
-  }
-};
-
 
 #define MPGA_VERSION( h )   ( 1 - (((h)>>19)&0x01) )
 #define MPGA_LAYER( h )     ( 3 - (((h)>>17)&0x03) )
-#define MPGA_SAMPLE_RATE(h) \
-    ( mpga_sample_rate[MPGA_VERSION(h)][((h)>>10)&0x03] / ( ((h>>20)&0x01) ? 1 : 2) )
-#define MPGA_CHANNELS(h)    ( (((h)>>6)&0x03) == 3 ? 1 : 2)
-#define MPGA_BITRATE(h)     mpga_bitrate[MPGA_VERSION(h)][MPGA_LAYER(h)][((h)>>12)&0x0f]
-#define MPGA_PADDING(h)     ( ((h)>>9)&0x01 )
 #define MPGA_MODE(h)        (((h)>> 6)&0x03)
-
-static int mpga_frame_size( uint32_t h )
-{
-    switch( MPGA_LAYER(h) )
-    {
-        case 0:
-            return ( ( 12000 * MPGA_BITRATE(h) ) / MPGA_SAMPLE_RATE(h) + MPGA_PADDING(h) ) * 4;
-        case 1:
-            return ( 144000 * MPGA_BITRATE(h) ) / MPGA_SAMPLE_RATE(h) + MPGA_PADDING(h);
-        case 2:
-            return ( ( MPGA_VERSION(h) ? 72000 : 144000 ) * MPGA_BITRATE(h) ) / MPGA_SAMPLE_RATE(h) + MPGA_PADDING(h);
-        default:
-            return 0;
-    }
-}
 
 static int mpga_frame_samples( uint32_t h )
 {
@@ -148,46 +112,34 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    vlc_bool_t   b_forced = VLC_FALSE;
-    vlc_bool_t   b_extention = VLC_FALSE;
+    vlc_bool_t  b_forced = VLC_FALSE;
 
     uint32_t     header;
     uint8_t     *p_peek;
     module_t    *p_id3;
-    es_format_t   fmt;
+    vlc_meta_t  *p_meta;
 
-    if( !strncmp( p_demux->psz_demux, "mpga", 4 ) ||
-        !strncmp( p_demux->psz_demux, "mp3", 3 ) )
-    {
-        b_forced = VLC_TRUE;
-    }
     if( p_demux->psz_path )
     {
         int  i_len = strlen( p_demux->psz_path );
         if( i_len > 4 && !strcasecmp( &p_demux->psz_path[i_len - 4], ".mp3" ) )
         {
-            b_extention = VLC_TRUE;
+            b_forced = VLC_TRUE;
         }
     }
 
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->i_time_offset = 0;
-    p_sys->i_bitrate_avg = 0;
-    p_sys->meta = NULL;
-
-    /* skip/parse possible id3 header */
+    /* Skip/parse possible id3 header */
     if( ( p_id3 = module_Need( p_demux, "id3", NULL, 0 ) ) )
     {
-        p_sys->meta = (vlc_meta_t *)p_demux->p_private;
+        p_meta = (vlc_meta_t *)p_demux->p_private;
         p_demux->p_private = NULL;
-
         module_Unneed( p_demux, p_id3 );
     }
 
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
         msg_Err( p_demux, "cannot peek" );
-        Close( VLC_OBJECT(p_demux ) );
+        if( p_meta ) vlc_meta_Delete( p_meta );
         return VLC_EGENERIC;
     }
 
@@ -196,15 +148,13 @@ static int Open( vlc_object_t * p_this )
         vlc_bool_t b_ok = VLC_FALSE;
         int i_peek;
 
-        if( !b_forced && !b_extention )
+        if( !p_demux->b_force && !b_forced )
         {
-            msg_Warn( p_demux, "mpga module discarded" );
-            Close( VLC_OBJECT(p_demux) );
+            if( p_meta ) vlc_meta_Delete( p_meta );
             return VLC_EGENERIC;
         }
 
         i_peek = stream_Peek( p_demux->s, &p_peek, 8096 );
-
         while( i_peek > 4 )
         {
             if( HeaderCheck( header = GetDWBE( p_peek ) ) )
@@ -212,110 +162,110 @@ static int Open( vlc_object_t * p_this )
                 b_ok = VLC_TRUE;
                 break;
             }
-            p_peek += 4;
-            i_peek -= 4;
+            p_peek += 1;
+            i_peek -= 1;
         }
-        if( !b_ok && !b_forced )
+        if( !b_ok && !p_demux->b_force )
         {
             msg_Warn( p_demux, "mpga module discarded" );
-            Close( VLC_OBJECT(p_demux) );
+            if( p_meta ) vlc_meta_Delete( p_meta );
             return VLC_EGENERIC;
         }
     }
 
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    memset( p_sys, 0, sizeof( demux_sys_t ) );
+    p_sys->p_es = 0;
+    p_sys->p_packetizer = 0;
+    p_sys->b_start = VLC_TRUE;
+    p_sys->meta = p_meta;
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
 
-    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', 'g', 'a' ) );
+    /*
+     * Load the mpeg audio packetizer
+     */
+    p_sys->p_packetizer = vlc_object_create( p_demux, VLC_OBJECT_PACKETIZER );
+    p_sys->p_packetizer->pf_decode_audio = NULL;
+    p_sys->p_packetizer->pf_decode_video = NULL;
+    p_sys->p_packetizer->pf_decode_sub = NULL;
+    p_sys->p_packetizer->pf_packetize = NULL;
+    es_format_Init( &p_sys->p_packetizer->fmt_in, AUDIO_ES,
+                    VLC_FOURCC( 'm', 'p', 'g', 'a' ) );
+    es_format_Init( &p_sys->p_packetizer->fmt_out, UNKNOWN_ES, 0 );
+    p_sys->p_packetizer->p_module =
+        module_Need( p_sys->p_packetizer, "packetizer", NULL, 0 );
 
-    if( HeaderCheck( header ) )
+    if( p_sys->p_packetizer->p_module == NULL )
     {
-        int     i_xing;
-        uint8_t *p_xing;
-        char psz_description[50];
-
-        p_sys->i_bitrate_avg = MPGA_BITRATE( header ) * 1000;
-        if( ( i_xing = stream_Peek( p_demux->s, &p_xing, 1024 ) ) >= 21 )
-        {
-            int i_skip;
-
-            if( MPGA_VERSION( header) == 0 )
-            {
-                i_skip = MPGA_MODE( header ) != 3 ? 36 : 21;
-            }
-            else
-            {
-                i_skip = MPGA_MODE( header ) != 3 ? 21 : 13;
-            }
-            if( i_skip + 8 < i_xing &&
-                !strncmp( &p_xing[i_skip], "Xing", 4 ) )
-            {
-                unsigned int i_flags = GetDWBE( &p_xing[i_skip+4] );
-                unsigned int i_bytes = 0, i_frames = 0;
-
-                p_xing += i_skip + 8;
-                i_xing -= i_skip + 8;
-
-                i_skip = 0;
-                if( i_flags&0x01 && i_skip + 4 <= i_xing )   /* XING_FRAMES */
-                {
-                    i_frames = GetDWBE( &p_xing[i_skip] );
-                    i_skip += 4;
-                }
-                if( i_flags&0x02 && i_skip + 4 <= i_xing )   /* XING_BYTES */
-                {
-                    i_bytes = GetDWBE( &p_xing[i_skip] );
-                    i_skip += 4;
-                }
-                if( i_flags&0x04 )   /* XING_TOC */
-                {
-                    i_skip += 100;
-                }
-#if 0
-// FIXME: doesn't return the right bitrage average, at least with some MP3's
-                if( i_flags&0x08 && i_skip + 4 <= i_xing )   /* XING_VBR */
-                {
-                    p_sys->i_bitrate_avg = GetDWBE( &p_xing[i_skip] );
-    fprintf(stderr,"rate2 %d\n", p_sys->i_bitrate_avg);
-                    msg_Dbg( p_input, "xing vbr value present (%d)", p_sys->i_bitrate_avg );
-                }
-                else
-#endif
-                if( i_frames > 0 && i_bytes > 0 )
-                {
-                    p_sys->i_bitrate_avg = (int64_t)i_bytes *
-                                           (int64_t)8 *
-                                           (int64_t)MPGA_SAMPLE_RATE( header ) /
-                                           (int64_t)i_frames /
-                                           (int64_t)mpga_frame_samples( header );
-                    msg_Dbg( p_demux, "xing frames&bytes value present (%db/s)", p_sys->i_bitrate_avg );
-                }
-            }
-        }
-
-        msg_Dbg( p_demux, "version=%d layer=%d channels=%d samplerate=%d",
-                 MPGA_VERSION( header ) + 1,
-                 MPGA_LAYER( header ) + 1,
-                 MPGA_CHANNELS( header ),
-                 MPGA_SAMPLE_RATE( header ) );
-
-        fmt.audio.i_channels = MPGA_CHANNELS( header );
-        fmt.audio.i_rate = MPGA_SAMPLE_RATE( header );
-        fmt.i_bitrate = p_sys->i_bitrate_avg;
-        sprintf( psz_description, "MPEG Audio Layer %d, version %d",
-                 MPGA_LAYER ( header ) + 1, MPGA_VERSION ( header ) + 1 );
-        fmt.psz_description = strdup( psz_description );
-
-        date_Init( &p_sys->pts, fmt.audio.i_rate, 1 );
-        date_Set( &p_sys->pts, 1 );
+        msg_Err( p_demux, "cannot find mpga packetizer" );
+        Close( VLC_OBJECT(p_demux ) );
+        return VLC_EGENERIC;
     }
 
-    p_sys->p_es = es_out_Add( p_demux->out, &fmt );
-    if( fmt.psz_description ) free( fmt.psz_description );
+    /* Xing header */
+    if( HeaderCheck( header ) )
+    {
+        int i_xing, i_skip;
+        uint8_t *p_xing;
+
+        if( ( i_xing = stream_Peek( p_demux->s, &p_xing, 1024 ) ) < 21 )
+            return VLC_SUCCESS; /* No header */
+
+        if( MPGA_VERSION( header ) == 0 )
+        {
+            i_skip = MPGA_MODE( header ) != 3 ? 36 : 21;
+        }
+        else
+        {
+            i_skip = MPGA_MODE( header ) != 3 ? 21 : 13;
+        }
+
+        if( i_skip + 8 < i_xing && !strncmp( &p_xing[i_skip], "Xing", 4 ) )
+        {
+            unsigned int i_flags = GetDWBE( &p_xing[i_skip+4] );
+
+            p_xing += i_skip + 8;
+            i_xing -= i_skip + 8;
+
+            i_skip = 0;
+            if( i_flags&0x01 && i_skip + 4 <= i_xing )   /* XING_FRAMES */
+            {
+                p_sys->i_xing_frames = GetDWBE( &p_xing[i_skip] );
+                i_skip += 4;
+            }
+            if( i_flags&0x02 && i_skip + 4 <= i_xing )   /* XING_BYTES */
+            {
+                p_sys->i_xing_bytes = GetDWBE( &p_xing[i_skip] );
+                i_skip += 4;
+            }
+            if( i_flags&0x04 )   /* XING_TOC */
+            {
+                i_skip += 100;
+            }
+
+            // FIXME: doesn't return the right bitrage average, at least
+            // with some MP3's
+            if( i_flags&0x08 && i_skip + 4 <= i_xing )   /* XING_VBR */
+            {
+                p_sys->i_xing_bitrate_avg = GetDWBE( &p_xing[i_skip] );
+                msg_Dbg( p_demux, "xing vbr value present (%d)",
+                         p_sys->i_xing_bitrate_avg );
+            }
+
+            if( p_sys->i_xing_frames > 0 && p_sys->i_xing_bytes > 0 )
+            {
+                p_sys->i_xing_frame_samples = mpga_frame_samples( header );
+                msg_Dbg( p_demux, "xing frames&bytes value present "
+                         "(%d bytes, %d frames, %d samples/frame)",
+                         p_sys->i_xing_bytes, p_sys->i_xing_frames,
+                         p_sys->i_xing_frame_samples );
+            }
+        }
+    }
 
     return VLC_SUCCESS;
 }
-
 
 /*****************************************************************************
  * Demux: reads and demuxes data packets
@@ -325,64 +275,49 @@ static int Open( vlc_object_t * p_this )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    block_t     *p_frame;
+    block_t *p_block_in, *p_block_out;
 
-    uint32_t     header;
-    uint8_t     *p_peek;
-
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
+    if( ( p_block_in = stream_Block( p_demux->s, MPGA_PACKET_SIZE ) ) == NULL )
     {
-        msg_Warn( p_demux, "cannot peek" );
         return 0;
     }
 
-    if( !HeaderCheck( header = GetDWBE( p_peek ) ) )
+    p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start ? 1 : 0;
+    p_sys->b_start = VLC_FALSE;
+
+    while( (p_block_out = p_sys->p_packetizer->pf_packetize(
+                                          p_sys->p_packetizer, &p_block_in )) )
     {
-        /* we need to resynch */
-        vlc_bool_t  b_ok = VLC_FALSE;
-        int         i_skip = 0;
-        int         i_peek;
-
-        i_peek = stream_Peek( p_demux->s, &p_peek, 8096 );
-        if( i_peek < 4 )
+        while( p_block_out )
         {
-            msg_Warn( p_demux, "cannot peek" );
-            return 0;
-        }
+            block_t *p_next = p_block_out->p_next;
 
-        while( i_peek >= 4 )
-        {
-            if( HeaderCheck( header = GetDWBE( p_peek ) ) )
+            if( p_sys->p_es == NULL )
             {
-                b_ok = VLC_TRUE;
-                break;
+                p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
+                p_sys->p_es = es_out_Add( p_demux->out,
+                                          &p_sys->p_packetizer->fmt_out);
+
+                p_sys->i_bitrate_avg = p_sys->p_packetizer->fmt_out.i_bitrate;
+
+                if( p_sys->i_xing_bytes && p_sys->i_xing_frames &&
+                    p_sys->i_xing_frame_samples )
+                {
+                    p_sys->i_bitrate_avg = p_sys->i_xing_bytes * I64C(8) *
+                        p_sys->p_packetizer->fmt_out.audio.i_rate /
+                        p_sys->i_xing_frames / p_sys->i_xing_frame_samples;
+                }
             }
 
-            p_peek++;
-            i_peek--;
-            i_skip++;
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
+
+            p_block_out->p_next = NULL;
+            p_sys->i_pts = p_block_out->i_pts;
+            es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
+
+            p_block_out = p_next;
         }
-
-        msg_Warn( p_demux, "garbage=%d bytes", i_skip );
-        stream_Read( p_demux->s, NULL, i_skip );
-        return 1;
     }
-
-    if( ( p_frame = stream_Block( p_demux->s,
-                                  mpga_frame_size( header ) ) ) == NULL )
-    {
-        msg_Warn( p_demux, "cannot read data" );
-        return 0;
-    }
-
-    p_frame->i_dts = p_frame->i_pts =
-        date_Increment( &p_sys->pts, mpga_frame_samples( header ) );
-
-    /* set PCR */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_frame->i_pts );
-
-    es_out_Send( p_demux->out, p_sys->p_es, p_frame );
-
     return 1;
 }
 
@@ -393,10 +328,13 @@ static void Close( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
-    if( p_sys->meta )
-    {
-        vlc_meta_Delete( p_sys->meta );
-    }
+
+    if( p_sys->meta ) vlc_meta_Delete( p_sys->meta );
+
+    if( p_sys->p_packetizer && p_sys->p_packetizer->p_module )
+        module_Unneed( p_sys->p_packetizer, p_sys->p_packetizer->p_module );
+    if( p_sys->p_packetizer )
+        vlc_object_destroy( p_sys->p_packetizer );
 
     free( p_sys );
 }
@@ -415,24 +353,19 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     {
         case DEMUX_GET_META:
             pp_meta = (vlc_meta_t **)va_arg( args, vlc_meta_t** );
-            if( p_sys->meta )
-            {
-                *pp_meta = vlc_meta_Duplicate( p_sys->meta );
-            }
-            else
-            {
-                *pp_meta = NULL;
-            }
+            if( p_sys->meta ) *pp_meta = vlc_meta_Duplicate( p_sys->meta );
+            else *pp_meta = NULL;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = date_Get( &p_sys->pts ) + p_sys->i_time_offset;
+            *pi64 = p_sys->i_pts + p_sys->i_time_offset;
             return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:
             /* FIXME TODO: implement a high precision seek (with mp3 parsing)
              * needed for multi-input */
+
         default:
             i_ret = demux2_vaControlHelper( p_demux->s, 0, -1,
                                             p_sys->i_bitrate_avg, 1, i_query,
@@ -443,9 +376,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 int64_t i_time = I64C(8000000) * stream_Tell(p_demux->s) /
                     p_sys->i_bitrate_avg;
 
-                /* fix time_offset */
-                if( i_time >= 0 )
-                    p_sys->i_time_offset = i_time - date_Get( &p_sys->pts );
+                /* Fix time_offset */
+                if( i_time >= 0 ) p_sys->i_time_offset = i_time - p_sys->i_pts;
             }
             return i_ret;
     }
