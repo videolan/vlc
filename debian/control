@@ -2,14 +2,14 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Sam Hocevar (Debian packages) <sam+deb@zoy.org>
-Build-Depends: debhelper (>=3.0), gettext, fortune-mod, xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt3-mt-dev, libqt3-compat-headers, libasound2-dev (>=0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, libidl0, libglib2.0-0, kdelibs4-dev, dvb-dev, libdv2-dev, libxosd-dev, svgalibg1-dev (>=1.4.0) [i386], libogg-dev, libvorbis-dev, libwxgtk2.4-dev, libdvdplay0-dev (>=1.0.1-2), libdvdread3-dev, libslp-dev, libflac-dev (>=1.1.0), libimlib2-dev, libmatroska-dev
+Build-Depends: debhelper (>=3.4.4), gettext, fortune-mod, xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt3-mt-dev, libqt3-compat-headers, libasound2-dev (>=0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, libidl0, libglib2.0-0, kdelibs4-dev, dvb-dev, libdv2-dev, libxosd-dev, svgalibg1-dev (>=1.4.0) [i386], libogg-dev, libvorbis-dev, libwxgtk2.4-dev, libdvdplay0-dev (>=1.0.1-2), libdvdread3-dev, libslp-dev, libflac-dev (>=1.1.0), libimlib2-dev, libmatroska-dev
 Build-Conflicts: libmpeg2-dev, libmpeg2-0-dev, libmpeg2-1-dev, libmpeg2-2-dev, libmpeg2-3-dev
 Standards-Version: 3.6.0
 
 Package: vlc
 Section: graphics
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: vlc-gui
 Suggests: gnome-vlc
 Replaces: vlc-plugin-dvb (<< 0.5.2-2), vlc-plugin-xosd (<< 0.5.2-2), vlc-plugin-dv (<< 0.5.2-2), vlc-plugin-mad (<< 0.5.2-2), vlc-mad (<< 0.5.0), vlc-plugin-a52 (<< 0.5.2-2), vlc-plugin-ogg (<< 0.5.2-2), vlc-plugin-lirc (<< 0.5.2-2), vlc-lirc (<< 0.5.0), vlc-plugin-aa (<< 0.5.2-2), vlc-aa (<< 0.5.0)
@@ -30,7 +30,7 @@ Description: multimedia player for all audio and video formats
 Package: libvlc0-dev
 Section: libdevel
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: development files for VLC
  This package contains headers and a static library required to build plugins
  for VLC, or standalone applications that use VLC features.
@@ -38,7 +38,7 @@ Description: development files for VLC
 Package: gnome-vlc
 Section: gnome
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Recommends: vlc-plugin-esd
 Conflicts: vlc-gnome (<< 0.5.0)
 Replaces: vlc-gnome (<< 0.5.0)
@@ -49,7 +49,7 @@ Description: GNOME frontend for VLC
 
 Package: gvlc
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: vlc-gnome (<= 0.2.63-2), vlc-gtk (<< 0.5.0)
 Replaces: vlc-gnome (<= 0.2.63-2), vlc-gtk (<< 0.5.0)
 Provides: vlc-gui
@@ -59,7 +59,7 @@ Description: GTK+ frontend for VLC
 
 Package: vlc-plugin-esd
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: vlc-esd (<< 0.5.0)
 Replaces: vlc-esd (<< 0.5.0)
 Description: Esound audio output plugin for VLC
@@ -69,7 +69,7 @@ Description: Esound audio output plugin for VLC
 
 Package: vlc-plugin-alsa
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: vlc-alsa (<< 0.5.0)
 Replaces: vlc-alsa (<< 0.5.0)
 Description: ALSA audio output plugin for VLC
@@ -79,7 +79,7 @@ Description: ALSA audio output plugin for VLC
 
 Package: vlc-plugin-sdl
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: vlc-sdl (<< 0.5.0)
 Replaces: vlc-sdl (<< 0.5.0)
 Description: SDL video and audio output plugin for VLC
@@ -90,7 +90,7 @@ Description: SDL video and audio output plugin for VLC
 
 Package: vlc-plugin-ggi
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: vlc-ggi (<< 0.5.0)
 Replaces: vlc-ggi (<< 0.5.0)
 Description: GGI video output plugin for VLC
@@ -110,7 +110,7 @@ Description: Glide video output plugin for VLC
 
 Package: qvlc
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: vlc-qt (<< 0.5.0)
 Replaces: vlc-qt (<< 0.5.0)
 Provides: vlc-gui
@@ -120,7 +120,7 @@ Description: Qt frontend for VLC
 
 Package: vlc-plugin-arts
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: vlc-arts (<< 0.5.0)
 Replaces: vlc-arts (<< 0.5.0)
 Description: aRts audio output plugin for VLC
@@ -130,7 +130,7 @@ Description: aRts audio output plugin for VLC
 
 Package: mozilla-plugin-vlc
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Recommends: mozilla-browser
 Description: multimedia plugin for Mozilla based on VLC
  This plugin adds support for MPEG, MPEG2, DVD, DivX, Ogg/Vorbis and many
@@ -141,7 +141,7 @@ Description: multimedia plugin for Mozilla based on VLC
 Package: kvlc
 Section: kde
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Recommends: vlc-plugin-arts
 Conflicts: vlc-kde (<< 0.5.0)
 Replaces: vlc-kde (<< 0.5.0)
@@ -152,7 +152,7 @@ Description: KDE frontend for VLC
 
 Package: vlc-plugin-svgalib
 Architecture: i386
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: SVGAlib video output plugin for VLC
  This plugin adds support for SVGAlib to the VLC media player. To
  activate it, use the `--vout svgalib' flag or select the `svgalib' video
@@ -161,7 +161,7 @@ Description: SVGAlib video output plugin for VLC
 
 Package: wxvlc
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Provides: vlc-gui
 Description: wxWindows and skins frontends for VLC
  This plugin adds a wxWindow interface and a skinnable interface to the
@@ -171,50 +171,50 @@ Description: wxWindows and skins frontends for VLC
 
 Package: vlc-alsa
 Architecture: any
-Depends: vlc, vlc-plugin-alsa
+Depends: vlc, vlc-plugin-alsa, ${misc:Depends}
 Description: legacy package that you should remove
  This package is now called vlc-plugin-alsa.
 
 Package: vlc-esd
 Architecture: any
-Depends: vlc, vlc-plugin-esd
+Depends: vlc, vlc-plugin-esd, ${misc:Depends}
 Description: legacy package that you should remove
  This package is now called vlc-plugin-esd.
 
 Package: vlc-ggi
 Architecture: any
-Depends: vlc, vlc-plugin-ggi
+Depends: vlc, vlc-plugin-ggi, ${misc:Depends}
 Description: legacy package that you should remove
  This package is now called vlc-plugin-ggi.
 
 Package: vlc-glide
 Architecture: i386
-Depends: vlc, vlc-plugin-glide
+Depends: vlc, vlc-plugin-glide, ${misc:Depends}
 Description: legacy package that you should remove
  This package is now called vlc-plugin-glide.
 
 Package: vlc-gnome
 Section: gnome
 Architecture: any
-Depends: vlc, gnome-vlc
+Depends: vlc, gnome-vlc, ${misc:Depends}
 Description: legacy package that you should remove
  This package is now called gnome-vlc.
 
 Package: vlc-gtk
 Architecture: any
-Depends: vlc, gvlc
+Depends: vlc, gvlc, ${misc:Depends}
 Description: legacy package that you should remove
  This package is now called gvlc.
 
 Package: vlc-qt
 Architecture: any
-Depends: vlc, qvlc
+Depends: vlc, qvlc, ${misc:Depends}
 Description: legacy package that you should remove
  This package is now called qvlc.
 
 Package: vlc-sdl
 Architecture: any
-Depends: vlc, vlc-plugin-sdl
+Depends: vlc, vlc-plugin-sdl, ${misc:Depends}
 Description: legacy package that you should remove
  This package is now called vlc-plugin-sdl.
 

@@ -1,12 +1,10 @@
 #!/usr/bin/make -f
 # debian/rules for the VideoLAN Client - uses debhelper.
+# $Id: rules,v 1.102 2003/07/17 13:01:59 sam Exp $
 # based on Joey Hess's one.
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
-
-# This is the debhelper compatability version to use.
-export DH_COMPAT=3
 
 #
 # Compilation options
@@ -53,7 +51,7 @@ CONFIG_FLAGS += --enable-ffmpeg --with-ffmpeg-tree=extras/ffmpeg
 CONFIG_FLAGS += --enable-faad --with-faad-tree=extras/faad
 CONFIG_FLAGS += --enable-libmpeg2 --with-libmpeg2-tree=extras/mpeg2dec
 
-# Glide is only for x86
+# Glide and svgalib are only for x86
 ifeq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 CONFIG_FLAGS += --enable-glide
 CONFIG_FLAGS += --enable-svgalib

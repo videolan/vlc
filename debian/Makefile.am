@@ -3,6 +3,7 @@ NULL =
 EXTRA_DIST = \
 	README.Debian \
 	changelog \
+	compat \
 	control \
 	copyright \
 	rules \
