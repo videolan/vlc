@@ -364,44 +364,6 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic_dst,
                              picture_t *p_pic_src, subpicture_t *p_subpic )
 {
-    /* Load the blending module */
-    if( !p_vout->p_blend && p_subpic && p_subpic->p_region )
-    {
-        p_vout->p_blend = vlc_object_create( p_vout, sizeof(filter_t) );
-        vlc_object_attach( p_vout->p_blend, p_vout );
-        p_vout->p_blend->fmt_out.video.i_x_offset =
-            p_vout->p_blend->fmt_out.video.i_y_offset = 0;
-        p_vout->p_blend->fmt_out.video.i_aspect =
-            p_vout->render.i_aspect;
-        p_vout->p_blend->fmt_out.video.i_chroma =
-            p_vout->output.i_chroma;
-
-        p_vout->p_blend->fmt_in.video.i_chroma = VLC_FOURCC('Y','U','V','P');
-
-        p_vout->p_blend->p_module =
-            module_Need( p_vout->p_blend, "video blending", 0, 0 );
-    }
-
-    /* Load the text rendering module */
-    if( !p_vout->p_text && p_subpic && p_subpic->p_region )
-    {
-        p_vout->p_text = vlc_object_create( p_vout, sizeof(filter_t) );
-        vlc_object_attach( p_vout->p_text, p_vout );
-
-        p_vout->p_text->fmt_out.video.i_width =
-            p_vout->p_text->fmt_out.video.i_visible_width =
-                p_vout->output.i_width;
-        p_vout->p_text->fmt_out.video.i_height =
-            p_vout->p_text->fmt_out.video.i_visible_height =
-                p_vout->output.i_height;
-
-        p_vout->p_text->pf_spu_buffer_new = spu_new_buffer;
-        p_vout->p_text->pf_spu_buffer_del = spu_del_buffer;
-
-        p_vout->p_text->p_module =
-            module_Need( p_vout->p_text, "text renderer", 0, 0 );
-    }
-
     /* Get lock */
     vlc_mutex_lock( &p_vout->subpicture_lock );
 
@@ -409,6 +371,44 @@ void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic_dst,
     while( p_subpic != NULL && p_subpic->i_status != FREE_SUBPICTURE )
     {
         subpicture_region_t *p_region = p_subpic->p_region;
+
+        /* Load the blending module */
+        if( !p_vout->p_blend && p_region )
+        {
+            p_vout->p_blend = vlc_object_create( p_vout, sizeof(filter_t) );
+            vlc_object_attach( p_vout->p_blend, p_vout );
+            p_vout->p_blend->fmt_out.video.i_x_offset =
+                p_vout->p_blend->fmt_out.video.i_y_offset = 0;
+            p_vout->p_blend->fmt_out.video.i_aspect =
+                p_vout->render.i_aspect;
+            p_vout->p_blend->fmt_out.video.i_chroma =
+                p_vout->output.i_chroma;
+    
+            p_vout->p_blend->fmt_in.video.i_chroma = VLC_FOURCC('Y','U','V','P');
+    
+            p_vout->p_blend->p_module =
+                module_Need( p_vout->p_blend, "video blending", 0, 0 );
+        }
+    
+        /* Load the text rendering module */
+        if( !p_vout->p_text && p_region )
+        {
+            p_vout->p_text = vlc_object_create( p_vout, sizeof(filter_t) );
+            vlc_object_attach( p_vout->p_text, p_vout );
+    
+            p_vout->p_text->fmt_out.video.i_width =
+                p_vout->p_text->fmt_out.video.i_visible_width =
+                    p_vout->output.i_width;
+            p_vout->p_text->fmt_out.video.i_height =
+                p_vout->p_text->fmt_out.video.i_visible_height =
+                    p_vout->output.i_height;
+    
+            p_vout->p_text->pf_spu_buffer_new = spu_new_buffer;
+            p_vout->p_text->pf_spu_buffer_del = spu_del_buffer;
+    
+            p_vout->p_text->p_module =
+                module_Need( p_vout->p_text, "text renderer", 0, 0 );
+        }
 
         if( p_subpic->pf_render )
         {
