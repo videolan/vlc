@@ -90,8 +90,9 @@ vlc_module_begin();
                 CSSMETHOD_LONGTEXT, VLC_TRUE );
         change_string_list( psz_css_list, psz_css_list_text, 0 );
     set_capability( "access_demux", 0 );
-    add_shortcut( "dvd" );
+    //add_shortcut( "dvd" );
     add_shortcut( "dvdread" );
+    add_shortcut( "dvdsimple" );
     set_callbacks( Open, Close );
 vlc_module_end();
 

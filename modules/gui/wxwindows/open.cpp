@@ -612,7 +612,6 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
         wxU(_("DVD")),
         wxU(_("VCD")),
         wxU(_("Audio CD")),
-        wxU(_("DVD (test)"))
     };
 
     disc_type = new wxRadioBox( panel, DiscType_Event, wxU(_("Disc type")),
@@ -772,7 +771,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
 
       switch ( i_disc_type_selection )
         {
-        case 0: /* DVD with menues */
+        case 0: /* DVD with menus */
           disc_chapter->Enable();
           disc_chapter_label->Enable();
           mrltemp = wxT("dvd://")
@@ -782,7 +781,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
                                       disc_chapter->GetValue() );
           break;
 
-        case 1: /* DVD of some sort */
+        case 1: /* DVD without menus */
           disc_chapter->Enable();
           disc_chapter_label->Enable();
           mrltemp = wxT("dvdsimple://")
@@ -842,16 +841,6 @@ void OpenDialog::UpdateMRL( int i_access_method )
                   + wxString::Format( wxT("@%d"),
                                       disc_title->GetValue() );
 #endif
-          break;
-
-        case 4: /* DVD of some sort */
-          disc_chapter->Enable();
-          disc_chapter_label->Enable();
-          mrltemp = wxT("dvdnav://")
-                  + disc_device->GetValue()
-                  + wxString::Format( wxT("@%d:%d"),
-                                      disc_title->GetValue(),
-                                      disc_chapter->GetValue() );
           break;
 
         default: ;
