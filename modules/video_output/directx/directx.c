@@ -514,26 +514,36 @@ static int Manage( vout_thread_t *p_vout )
 
         /* We need to switch between Maximized and Normal sized window */
         window_placement.length = sizeof(WINDOWPLACEMENT);
-        GetWindowPlacement( p_vout->p_sys->hwnd, &window_placement );
         if( p_vout->b_fullscreen )
         {
-           if( p_vout->p_sys->hparent )
-           {
-               SetParent( p_vout->p_sys->hwnd, GetDesktopWindow() );
-               SetForegroundWindow( p_vout->p_sys->hwnd );
-           }
+            if( p_vout->p_sys->hparent )
+            {
+                POINT point;
+
+                /* Retrieve the window position */
+                point.x = point.y = 0;
+                ClientToScreen( p_vout->p_sys->hwnd, &point );
+                SetParent( p_vout->p_sys->hwnd, GetDesktopWindow() );
+                SetWindowPos( p_vout->p_sys->hwnd, 0, point.x, point.y, 0, 0,
+                              SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
+                SetForegroundWindow( p_vout->p_sys->hwnd );
+            }
 
             /* Maximized window */
+            GetWindowPlacement( p_vout->p_sys->hwnd, &window_placement );
             window_placement.showCmd = SW_SHOWMAXIMIZED;
             /* Change window style, no borders and no title bar */
-            i_style = WS_CLIPCHILDREN;
+            i_style = WS_CLIPCHILDREN | WS_VISIBLE | WS_POPUP;
         }
         else
         {
             if( p_vout->p_sys->hparent )
             {
                 SetParent( p_vout->p_sys->hwnd, p_vout->p_sys->hparent );
+                SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0, 0, 0,
+                              SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
                 i_style = WS_CLIPCHILDREN | WS_VISIBLE | WS_CHILD;
+                SetForegroundWindow( p_vout->p_sys->hparent );
             }
             else
             {
@@ -542,6 +552,7 @@ static int Manage( vout_thread_t *p_vout )
             }
 
             /* Normal window */
+            GetWindowPlacement( p_vout->p_sys->hwnd, &window_placement );
             window_placement.showCmd = SW_SHOWNORMAL;
 
             /* Make sure the mouse cursor is displayed */
@@ -551,6 +562,8 @@ static int Manage( vout_thread_t *p_vout )
         /* Change window style, borders and title bar */
         SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE, i_style );
         SetWindowPlacement( p_vout->p_sys->hwnd, &window_placement );
+        SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0, 0, 0,
+                      SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
 
         /* Update the object variable and trigger callback */
         val.b_bool = p_vout->b_fullscreen;

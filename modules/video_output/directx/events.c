@@ -893,6 +893,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
     double f_arg;
     RECT rect_window;
+    POINT point;
 
     switch( i_query )
     {
@@ -921,12 +922,16 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
         p_vout->p_sys->hparent = 0;
         vlc_mutex_unlock( &p_vout->p_sys->lock );
 
+        /* Retrieve the window position */
+        point.x = point.y = 0;
+        ClientToScreen( p_vout->p_sys->hwnd, &point );
+
         SetParent( p_vout->p_sys->hwnd, GetDesktopWindow() );
         SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE,
                        WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW |
                        WS_SIZEBOX | WS_VISIBLE );
-        SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0, 0, 0,
-                      SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
+        SetWindowPos( p_vout->p_sys->hwnd, 0, point.x, point.y, 0, 0,
+                      SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
 
       return VLC_SUCCESS;
 
