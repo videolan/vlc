@@ -5,7 +5,7 @@
 \vieww17160\viewh15400\viewkind0
 \pard\tx1440\tx2880\tx4320\tx5760\tx7200\qc
 
-\f0\fs48 \cf0 VLC media player, version 0.6\
+\f0\fs48 \cf0 VLC media player, version 0.7\
 Mac OS X-specific information
 \fs24 \
 \pard\tx1440\tx2880\tx4320\tx5760\tx7200\ql\qnatural
@@ -15,7 +15,8 @@ Mac OS X-specific information
 \cf0 Welcome to the VideoLAN Client! VLC media player is a multi-purpose multimedia tool. It can play DVDs, VCDs or read a stream from the network. It plays DivX/MPEG-4 files (and many other files) and is unaffected by the dreaded .avi bug which can cause choppy sound when playing DivX in QuickTime Player. You can also stream content to the network or a file. But above all it is the ONLY media player on Mac OS X, which has support for multi-channel sound-output.\
 For a full list of features visit: \ul http://www.videolan.org/vlc/features.html\ulnone \
 \
-VLC media player was originally developed for GNU/Linux systems, but has been ported to numerous operating systems, including Mac OS X and Win32. The Mac OS X port is still young, but quickly maturing. There are probably still bugs remaining that we have missed during our testing period. We are working hard to improve VLC media player and if you think you can help us in any way, please drop us a line: \ul http://www.videolan.org/support/lists.html\ulnone \
+VLC media player was originally developed for GNU/Linux systems, but has been ported to numerous operating systems, including Mac OS X and Win32. Though there probably are bugs, we are always working hard to improve VLC media player and if you think you can help us in any way, please drop us a line: \ul http://www.videolan.org/support/lists.html\
+http://forum.videolan.org/\ulnone \
 \
 The following frequently asked questions are answered below :\
 
@@ -37,13 +38,13 @@ The following frequently asked questions are answered below :\
 
 \f1\b \ul 1. How do I install ?
 \f0\b0 \ulnone \
-When you download VLC media player, you will end up with a VLC-0.6.x.dmg file. Double-click, or drop it on the application Disk Copy, to open this file. An icon will now appear on your Desktop, right beside your drive(s). Open it and drag the VLC application from the resulting window to the place where you want to install it. Most often this is the directory Applications on your main harddrive.\
+When you download VLC media player, you will end up with a VLC-0.7.x.dmg file. Double-click, or drop it on the application Disk Copy, to open this file. An icon will now appear on your Desktop, right beside your drive(s). Open it and drag the VLC application from the resulting window to the place where you want to install it. Most often this is the directory Applications on your main harddrive.\
 \
 \
 
 \f1\b \ul 2. How do I use VLC media player ?
 \f0\b0 \ulnone \
-To use VLC media player, you will need to open the application first and then from the "File" menu open the file or disk, you would like to view. Double-clicking a file will result in QuickTime Player trying to open it. If you prefer you can change this by selecting your file and choosing "Get Info" from the "File" menu. In the "Open With" section you can select VLC and if you check the checkbox, then all files of the type you have selected will be opened in VLC media player if you double-click them from that moment on.\
+To use VLC media player, you will need to open the application first and then from the "File" menu open the file or disk, you would like to view. Double-clicking a file will result in QuickTime Player trying to open it. If you prefer you can change this by selecting your file and choosing "Get Info" from the "File" menu of the Finder. In the "Open With" section you can select VLC and if you check the checkbox, then all files of the type you have selected will be opened in VLC media player if you double-click them from that moment on.\
 
 \f1\b \ul \
 \
@@ -55,7 +56,7 @@ To view a (S)VCD, DVD or Audio CD, you will need to choose "Open Disc" from the 
 
 \f1\b \ul 4. The video is choppy! It's like we're dropping frames.\
 
-\f0\b0 \ulnone That's the normal behavior when the CPU isn't fast enough to decode all the frames. Though there is some room for improvement, don't ever expect VLC to be able to decode MPEG-2 streams or high resolution DivX on a low-end G3 machine. Apple DVD player uses specific hardware accelerations from the video board of those systems, and we currently lack documentation to do the same. If you think you have information which might help us, please contact us, otherwise please don't complain about this.\
+\f0\b0 \ulnone That's the normal behavior when the CPU isn't fast enough to decode all the frames. Though there is some room for improvement, don't ever expect VLC to be able to decode MPEG-2 streams or high resolution DivX on a low-end G3 machine.\
 \
 If you experience problems playing DivX/Xvid then you can try the following:\
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
@@ -73,7 +74,7 @@ If VLC media player is slow on your G4 system, try to quit or hide all running a
 
 \f1\b \ul 5. How do I remove VLC media player ?
 \f0\b0 \ulnone \
-Simply drag VLC from the place where you have installed it, to the Trash.\
+Simply drag VLC from the place where you had installed it, to the Trash.\
 \
 \
 
@@ -91,7 +92,7 @@ Simply drag VLC from the place where you have installed it, to the Trash.\
 
 \f1\b \ul 8. I think I found a bug. What should I do ?\
 
-\f0\b0 \ulnone Report the exact conditions under which the bug/crash occurred back to the VLC team. For more information on bugreporting please read \ul http://www.videolan.org/support/bug-reporting.html\ulnone \
+\f0\b0 \ulnone First try resetting your preferences by clicking "Reset All" in the preferences dialog. If this doesn't work then you can report the exact conditions under which the bug/crash occurred back to the VLC team. For more information on bugreporting please read \ul http://www.videolan.org/support/bug-reporting.html\ulnone \
 \
 \
 
@@ -99,9 +100,9 @@ Simply drag VLC from the place where you have installed it, to the Trash.\
 
 \f0\b0 \ulnone - VLC will autodected subtitle files when they are in the same directory as your movie and contain the movie name.\
 - DVD and autodectected subtitles  can be enabled trough the Controls->Subtitles menu-item.\
-- Only MicroDVD, SubRIP, SSA1-4. SAMI and vplayer subtitle files are supported at the moment.\
+- Only MicroDVD, SubRIP, SSA1-4. SAMI and vplayer subtitle files are supported at the moment. (so not VobSub [.idx AND .sub file])\
 - You cannot change anything about DVD subtitles.\
-- You can add subtitle files to a video file via the Open.. dialog as well.\
+- You can add any subtitle files to a video file via the Open.. dialog.\
 - A text-encoding is automatically chosen, but for some people this can be incorrect. You can change it in Preferences -> Modules ->  decoder -> subsdec\
 - Text subtitles are by default centered. If you want them to be aligned left or right you can change this in Preferences -> Modules ->  decoder -> subsdec\
 - For Arabic, Hebrew and Japanese etc, you need to select a font compatible with these languages. You can change the default font in Preferences -> Modules ->  text-renderer -> freetype\
@@ -134,4 +135,4 @@ Thanks for reading this file. For additional information, subscribe to the VLC m
 -- \
 Christophe Massiot <massiot@via.ecp.fr> and\
 Derk-Jan Hartman <thedj@users.sourceforge.net> for the VideoLAN team.\
-$Id: README.MacOSX.rtf,v 1.23 2003/10/12 23:28:36 hartman Exp $}
+$Id: README.MacOSX.rtf,v 1.24 2003/12/23 00:23:31 hartman Exp $}
