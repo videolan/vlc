@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.32 2003/11/02 01:41:12 hartman Exp $
+ * $Id: sub.c,v 1.33 2003/11/04 11:11:30 titer Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -233,7 +233,7 @@ static struct
 static char * local_stristr( char *psz_big, char *psz_little)
 {
     char *p_pos = psz_big;
-    
+
     if (!psz_big || !psz_little || !*psz_little) return psz_big;
 
     while (*p_pos)
@@ -283,7 +283,7 @@ static int  sub_open ( subtitle_demux_t *p_sub,
         if( psz_name ) free( psz_name );
         return VLC_EGENERIC;
     }
-    
+
     /* *** load the file *** */
     if( text_load( &txt, psz_name ) )
     {
@@ -1065,12 +1065,13 @@ static int  sub_VobSub( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecp
 
     for( ;; )
     {
+        unsigned int h, m, s, ms, loc;
+
         if( ( p = text_get_line( txt ) ) == NULL )
         {
             return( VLC_EGENERIC );
         }
         i_start = 0;
-        unsigned int h, m, s, ms, loc;
 
         memset( buffer_text, '\0', MAX_LINE );
         if( sscanf( p, "timestamp: %d:%d:%d:%d, filepos: %x%[^\r\n]",

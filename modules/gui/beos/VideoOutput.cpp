@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.23 2003/10/25 00:49:14 sam Exp $
+ * $Id: VideoOutput.cpp,v 1.24 2003/11/04 11:11:30 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -165,10 +165,10 @@ VideoSettings::VideoSettings()
 	if ( ret == B_OK )
 	{
 		uint32_t flags;
-		if ( fSettings->FindInt32( "flags", (int32_t*)&flags ) == B_OK )
+		if ( fSettings->FindInt32( "flags", (int32*)&flags ) == B_OK )
 			SetFlags( flags );
 		uint32_t size;
-		if ( fSettings->FindInt32( "video size", (int32_t*)&size ) == B_OK )
+		if ( fSettings->FindInt32( "video size", (int32*)&size ) == B_OK )
 			SetVideoSize( size );
 	}
 	else
@@ -310,7 +310,7 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame,
 
 VideoWindow::~VideoWindow()
 {
-    int32_t result;
+    int32 result;
 
     teardownwindow = true;
     wait_for_thread(fDrawThreadID, &result);
@@ -345,7 +345,7 @@ VideoWindow::MessageReceived( BMessage *p_message )
 		case WINDOW_FEEL:
 			{
 				window_feel winFeel;
-				if (p_message->FindInt32("WinFeel", (int32_t*)&winFeel) == B_OK)
+				if (p_message->FindInt32("WinFeel", (int32*)&winFeel) == B_OK)
 				{
 					SetFeel(winFeel);
 					fCachedFeel = winFeel;
@@ -916,7 +916,7 @@ VideoWindow::_SaveScreenShot( BBitmap* bitmap, char* path,
 /*****************************************************************************
  * VideoWindow::_save_screen_shot
  *****************************************************************************/
-int32_t
+int32
 VideoWindow::_save_screen_shot( void* cookie )
 {
 	screen_shot_info* info = (screen_shot_info*)cookie;
@@ -968,7 +968,7 @@ VideoWindow::_save_screen_shot( void* cookie )
 
 			// find suitable translator
 			translator_id* ids = NULL;
-			int32_t count = 0;
+			int32 count = 0;
 		
 			status = roster->GetAllTranslators( &ids, &count );
 			if ( status >= B_OK )
@@ -976,7 +976,7 @@ VideoWindow::_save_screen_shot( void* cookie )
 				for ( int tix = 0; tix < count; tix++ )
 				{
 					const translation_format *formats = NULL;
-					int32_t num_formats = 0;
+					int32 num_formats = 0;
 					bool ok = false;
 					status = roster->GetInputFormats( ids[tix],
 													  &formats, &num_formats );
@@ -1029,7 +1029,7 @@ VideoWindow::_save_screen_shot( void* cookie )
 						if ( nodeInfo.InitCheck() == B_OK )
 						{
 							translation_format* formats;
-							int32_t count;
+							int32 count;
 							status = roster->GetOutputFormats( translator,
 															   (const translation_format **) &formats,
 															   &count);
@@ -1105,10 +1105,10 @@ VLCView::MouseDown(BPoint where)
 {
 	VideoWindow* videoWindow = dynamic_cast<VideoWindow*>(Window());
 	BMessage* msg = Window()->CurrentMessage();
-	int32_t clicks;
+	int32 clicks;
 	uint32_t buttons;
 	msg->FindInt32("clicks", &clicks);
-	msg->FindInt32("buttons", (int32_t*)&buttons);
+	msg->FindInt32("buttons", (int32*)&buttons);
 
 	if (videoWindow)
 	{
@@ -1274,7 +1274,7 @@ VLCView::Pulse()
 	    system_time() - fLastMouseMovedTime > 29000000 )
 	{
 	    BPoint where;
-		uint32_t buttons;
+		uint32 buttons;
 		GetMouse(&where, &buttons, false);
 		ConvertToScreen(&where);
 		set_mouse_position((int32_t) where.x, (int32_t) where.y);

@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.7 2003/10/25 00:49:14 sam Exp $
+ * $Id: VideoWindow.h,v 1.8 2003/11/04 11:11:30 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -192,7 +192,7 @@ private:
 			void			_SaveScreenShot( BBitmap* bitmap,
 											 char* path,
 											 uint32_t translatorID ) const;
-	static	int32_t			_save_screen_shot( void* cookie );
+	static	int32			_save_screen_shot( void* cookie );
 
 	struct screen_shot_info
 	{
