@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.74 2001/01/18 05:13:23 sam Exp $
+ * $Id: vpar_headers.c,v 1.75 2001/01/21 01:36:26 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -572,7 +572,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
         p_vpar->picture.i_current_structure = 0;
 
-        intf_DbgMsg("vpar debug: odd number of field picture.");
+        intf_ErrMsg("vpar error: odd number of field pictures.");
     }
 
     /* Do we have the reference pictures ? */
@@ -737,7 +737,68 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     /* Extension and User data. */
     ExtensionAndUserData( p_vpar );
 
-    vpar_PictureData( p_vpar, i_mb_base );
+    /* This is an MP@ML decoder, please note that neither of the following
+     * assertions can be true :
+     *   p_vpar->sequence.i_chroma_format != CHROMA_420
+     *   p_vpar->sequence.i_height > 2800
+     *   p_vpar->sequence.i_scalable_mode == SC_DP
+     * Be cautious if you try to use the decoder for other profiles and
+     * levels.
+     */
+    if( p_vpar->sequence.b_mpeg2 )
+    {
+        static f_picture_data_t ppf_picture_data[4][4] =
+        {
+            {
+                NULL, NULL, NULL, NULL
+            },
+            {
+                /* TOP_FIELD */
+#if (VPAR_OPTIM_LEVEL > 1)
+                NULL, vpar_PictureData2IT, vpar_PictureData2PT,
+                vpar_PictureData2BT
+#else
+                NULL, vpar_PictureDataGENERIC, vpar_PictureDataGENERIC,
+                vpar_PictureDataGENERIC
+#endif
+            },
+            {
+                /* BOTTOM_FIELD */
+#if (VPAR_OPTIM_LEVEL > 1)
+                NULL, vpar_PictureData2IB, vpar_PictureData2PB,
+                vpar_PictureData2BB
+#else
+                NULL, vpar_PictureDataGENERIC, vpar_PictureDataGENERIC,
+                vpar_PictureDataGENERIC
+#endif
+            },
+            {
+                /* FRAME_PICTURE */
+#if (VPAR_OPTIM_LEVEL > 0)
+                NULL, vpar_PictureData2IF, vpar_PictureData2PF,
+                vpar_PictureData2BF
+#else
+                NULL, vpar_PictureDataGENERIC, vpar_PictureDataGENERIC,
+                vpar_PictureDataGENERIC
+#endif
+            }
+        };
+
+        ppf_picture_data[p_vpar->picture.i_structure]
+                        [p_vpar->picture.i_coding_type]( p_vpar, i_mb_base );
+    }
+    else
+    {
+#if (VPAR_OPTIM_LEVEL > 0)
+        static f_picture_data_t pf_picture_data[5] =
+        { NULL, vpar_PictureData1I, vpar_PictureData1P, vpar_PictureData1B,
+          vpar_PictureData1D };
+
+        pf_picture_data[p_vpar->picture.i_coding_type]( p_vpar, i_mb_base );
+#else
+        vpar_PictureDataGENERIC( p_vpar, i_mb_base );
+#endif
+    }
 
     if( p_vpar->p_fifo->b_die || p_vpar->p_fifo->b_error )
     {

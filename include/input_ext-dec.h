@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.17 2001/01/20 13:08:33 sam Exp $
+ * $Id: input_ext-dec.h,v 1.18 2001/01/21 01:36:25 massiot Exp $
  *
  * Authors:
  *
@@ -136,6 +136,11 @@ typedef struct bit_fifo_s
 typedef struct bit_stream_s
 {
     /*
+     * Bit structures
+     */
+    bit_fifo_t              fifo;
+
+    /*
      * Input structures
      */
     /* The decoder fifo contains the data of the PES stream */
@@ -160,11 +165,6 @@ typedef struct bit_stream_s
     byte_t *                p_byte;
     /* Pointer to the last byte that is to be read (in the current TS packet */
     byte_t *                p_end;
-
-    /*
-     * Bit structures
-     */
-    bit_fifo_t              fifo;
 } bit_stream_t;
 
 /*****************************************************************************

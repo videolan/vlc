@@ -2,7 +2,7 @@
  * vpar_blocks.h : video parser blocks management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.h,v 1.32 2001/01/18 05:13:22 sam Exp $
+ * $Id: vpar_blocks.h,v 1.33 2001/01/21 01:36:25 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -172,4 +172,28 @@ void vpar_InitBMBType( struct vpar_thread_s * p_vpar );
 void vpar_InitCodedPattern( struct vpar_thread_s * p_vpar );
 void vpar_InitDCTTables( struct vpar_thread_s * p_vpar );
 void vpar_InitScanTable( struct vpar_thread_s * p_vpar );
-void vpar_PictureData( struct vpar_thread_s * p_vpar, int i_mb_base );
+
+typedef void (*f_picture_data_t)( struct vpar_thread_s * p_vpar,
+                                  int i_mb_base );
+#define PROTO_PICD( FUNCNAME )                                              \
+void FUNCNAME( struct vpar_thread_s * p_vpar, int i_mb_base );
+
+PROTO_PICD( vpar_PictureDataGENERIC )
+#if (VPAR_OPTIM_LEVEL > 0)
+PROTO_PICD( vpar_PictureData1I )
+PROTO_PICD( vpar_PictureData1P )
+PROTO_PICD( vpar_PictureData1B )
+PROTO_PICD( vpar_PictureData1D )
+PROTO_PICD( vpar_PictureData2IF )
+PROTO_PICD( vpar_PictureData2PF )
+PROTO_PICD( vpar_PictureData2BF )
+#endif
+#if (VPAR_OPTIM_LEVEL > 1)
+PROTO_PICD( vpar_PictureData2IT )
+PROTO_PICD( vpar_PictureData2PT )
+PROTO_PICD( vpar_PictureData2BT )
+PROTO_PICD( vpar_PictureData2IB )
+PROTO_PICD( vpar_PictureData2PB )
+PROTO_PICD( vpar_PictureData2BB )
+#endif
+
