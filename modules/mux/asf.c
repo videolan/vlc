@@ -833,6 +833,9 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     /* size of the metadata object */
     for( i = 0; i < p_sys->i_track; i++ )
     {
+        /* Error correction data field */
+        if( p_sys->track[i].b_audio_correction ) i_size += 8;
+
         if( p_sys->track[i].i_cat == VIDEO_ES )
         {
             i_cm_size = 26 + 2 * (16 + 2 * sizeof("AspectRatio?"));
@@ -842,8 +845,6 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
 
     i_header_ext_size = i_cm_size ? i_cm_size + 46 : 0;
     i_size += i_ci_size + i_cd_size + i_header_ext_size ;
-    /* Error correction data field */
-    if( tk->b_audio_correction ) i_size += 8;
 
     if( p_sys->b_asf_http )
     {
