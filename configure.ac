@@ -3634,7 +3634,7 @@ then
       if test -n "${CYGPATH}"; then
         XPIDL="${real_mozilla_sdk}/xpcom/bin/xpidl"
         real_mozilla_sdk="`${CYGPATH} -w ${real_mozilla_sdk}`"
-        XPIDL_INCL="${XPIDL_INCL} -I${real_mozilla_sdk}/xpcom/idl"
+        XPIDL_INCL="${XPIDL_INCL} -I\"${real_mozilla_sdk}/xpcom/idl\""
       fi ])
     CPPFLAGS="${CPPFLAGS_save}"
   ])
