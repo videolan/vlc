@@ -2,7 +2,7 @@
  * rtp.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: rtp.c,v 1.5 2003/11/07 17:43:42 fenrir Exp $
+ * $Id: rtp.c,v 1.6 2003/11/07 18:32:24 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -764,9 +764,8 @@ static int AccessOutGrabberWrite( sout_access_out_t *p_access, sout_buffer_t *p_
 {
     sout_stream_t *p_stream = (sout_stream_t*)p_access->p_sys;
 
-    fprintf( stderr, "received buffer size=%d\n", p_buffer->i_size );
-
-
+    //fprintf( stderr, "received buffer size=%d\n", p_buffer->i_size );
+    //
     while( p_buffer )
     {
         sout_buffer_t *p_next;

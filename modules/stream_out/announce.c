@@ -24,10 +24,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
+
+#include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>                                              /* sprintf() */
-#include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
 #include <vlc/sout.h>
@@ -396,8 +396,7 @@ void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_sap )
     free( psz_head );
 }
 
-
-   
+#ifdef HAVE_SLP_H
 /*****************************************************************************
  * sout_SLPBuildName: Builds a service name according to SLP standard
  *****************************************************************************/
@@ -412,24 +411,23 @@ static char * sout_SLPBuildName(char *psz_url,char *psz_name)
 
     psz_service=(char *)malloc(i_size * sizeof(char));
 
-    snprintf( psz_service , i_size, 
+    snprintf( psz_service , i_size,
               "service:vlc.services.videolan://udp:@%s",
               psz_url);
         /* How piggy  ! */
-      
-    psz_service[i_size]='\0'; /* Just to make sure */    
+
+    psz_service[i_size]='\0'; /* Just to make sure */
 
     return psz_service;
-    
+
 }
 
 /*****************************************************************************
  * sout_SLPReport: Reporting function. Unused at the moment but needed
  *****************************************************************************/
-#ifdef HAVE_SLP_H
 static void sout_SLPReport(SLPHandle slp_handle,SLPError slp_error,void* cookie)
 {
-}  
+}
 #endif
 
 /*****************************************************************************
@@ -439,19 +437,19 @@ int sout_SLPReg( sout_instance_t *p_sout, char * psz_url,
                                char * psz_name)
 {
 #ifdef HAVE_SLP_H
-    SLPHandle   slp_handle; 
+    SLPHandle   slp_handle;
     SLPError    slp_res;
     char *psz_service= sout_SLPBuildName(psz_url,psz_name);
-        
+
     if( SLPOpen( NULL, SLP_FALSE, &slp_handle ) != SLP_OK)
     {
         msg_Warn(p_sout,"Unable to initialize SLP");
         return -1;
-    } 
+    }
 
     msg_Info(p_sout , "Registering %s (name: %s) in SLP",
                       psz_service , psz_name);
-    
+
     slp_res = SLPReg ( slp_handle,
             psz_service,
             SLP_LIFETIME_MAXIMUM,
@@ -460,7 +458,7 @@ int sout_SLPReg( sout_instance_t *p_sout, char * psz_url,
             SLP_TRUE,
             sout_SLPReport,
             NULL );
-    
+
     if( slp_res != SLP_OK )
     {
         msg_Warn(p_sout,"Error while registering service: %i", slp_res );
@@ -483,24 +481,24 @@ int sout_SLPDereg( sout_instance_t *p_sout, char * psz_url,
 {
 #ifdef HAVE_SLP_H
 
-    SLPHandle   slp_handle; 
+    SLPHandle   slp_handle;
     SLPError    slp_res;
     char *psz_service= sout_SLPBuildName(psz_url,psz_name);
-        
+
     if( SLPOpen( NULL, SLP_FALSE, &slp_handle ) != SLP_OK)
     {
         msg_Warn(p_sout,"Unable to initialize SLP");
         return -1;
-    } 
+    }
 
     msg_Info(p_sout , "Unregistering %s from SLP",
                       psz_service);
-    
+
     slp_res = SLPDereg ( slp_handle,
             psz_service,
             sout_SLPReport,
             NULL );
-    
+
     if( slp_res != SLP_OK )
     {
         msg_Warn(p_sout,"Error while registering service: %i", slp_res );
@@ -510,6 +508,6 @@ int sout_SLPDereg( sout_instance_t *p_sout, char * psz_url,
     return 0;
 
 #else /* This function should never be called if this is false */
-    return -1; 
+    return -1;
 #endif
 }
