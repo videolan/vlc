@@ -3573,7 +3573,7 @@ if test "${enable_corba}" = "yes"; then
       AC_MSG_ERROR([Could not find corba development headers])
     ])
     if test "${ac_cv_corba_headers}" = "yes"; then
-      AX_ADD_PLUGINS(corba)
+      AX_ADD_PLUGINS([corba snapshot])
     fi
     CPPFLAGS="${CPPFLAGS_save}"
   fi
