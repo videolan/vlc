@@ -2,7 +2,7 @@
  * theme.cpp: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.11 2003/04/21 21:51:16 asmax Exp $
+ * $Id: theme.cpp,v 1.12 2003/04/22 22:57:40 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -242,7 +242,7 @@ void Theme::MoveSkin( SkinWindow *wnd, int left, int top )
     for( anc = wnd->AnchorList.begin(); anc != wnd->AnchorList.end(); anc++ )
     {
         for( hang = (*anc)->HangList.begin(); hang != (*anc)->HangList.end();
-            hang++ )
+             hang++ )
         {
             win = (*hang)->GetParent();
             win->GetPos( x, y );
@@ -339,16 +339,16 @@ void Theme::HangToAnchors( SkinWindow *wnd, int &x, int &y, bool init )
                 {
                     // Parent anchor is win and child is wnd !!!
 
-
                     if( !(*win_anchor)->Hang( (*wnd_anchor), x, y ) )
                     {
-                        // If child is in parent list and parent doesn't hang ch
+                        // If child is in parent list and parent doesn't hang
+                        // child
                         if( (*win_anchor)->IsInList( (*wnd_anchor) ) )
                             (*win_anchor)->Remove( (*wnd_anchor) );
                     }
                     else
                     {
-                        // If parent hang child and child is not still in list
+                        // If parent hangs child and child is not yet in list
                         if( !(*win_anchor)->IsInList( (*wnd_anchor) ) )
                         {
                             (*win_anchor)->Add( (*wnd_anchor) );
@@ -368,13 +368,16 @@ void Theme::HangToAnchors( SkinWindow *wnd, int &x, int &y, bool init )
                 }
                 else if( (*win_anchor)->Hang( (*wnd_anchor), x, y ) )
                 {
-                    // Move window to stick anchor
-                    (*wnd_anchor)->GetPos( wnd_anchor_x, wnd_anchor_y );
-                    (*win_anchor)->GetPos( win_anchor_x, win_anchor_y );
-                    (*win)->GetPos( win_x, win_y );
+                    if( !(*wnd_anchor)->IsInList( *win_anchor ) )
+                    {
+                        // Move window to stick anchor
+                        (*wnd_anchor)->GetPos( wnd_anchor_x, wnd_anchor_y );
+                        (*win_anchor)->GetPos( win_anchor_x, win_anchor_y );
+                        (*win)->GetPos( win_x, win_y );
 
-                    x = win_x + win_anchor_x - wnd_anchor_x;
-                    y = win_y + win_anchor_y - wnd_anchor_y;
+                        x = win_x + win_anchor_x - wnd_anchor_x;
+                        y = win_y + win_anchor_y - wnd_anchor_y;
+                    }
 
                     break;
                 }

@@ -2,7 +2,7 @@
  * anchor.cpp: Anchor class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: anchor.cpp,v 1.2 2003/04/21 21:51:16 asmax Exp $
+ * $Id: anchor.cpp,v 1.3 2003/04/22 22:57:40 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -39,9 +39,9 @@
 // Anchors
 //---------------------------------------------------------------------------
 Anchor::Anchor( intf_thread_t *_p_intf, int x, int y, int len, int priority,
-               SkinWindow *parent )
+                SkinWindow *parent )
 {
-    p_intf = _p_intf;
+    p_intf   = _p_intf;
     Parent   = parent;
     Left     = x;
     Top      = y;
@@ -55,7 +55,7 @@ bool Anchor::IsInList( Anchor *anc )
     list<Anchor *>::const_iterator elt;
 
     // Iterate through list
-    for( elt = HangList.begin(); elt != HangList.end(); elt++)
+    for( elt = HangList.begin(); elt != HangList.end(); elt++ )
     {
         if( (*elt) == anc )
             return true;
@@ -80,16 +80,11 @@ bool Anchor::Hang( Anchor *anc, int mx, int my )
     int x, y, px, py;
     Parent->GetPos( px, py );
     anc->GetPos( x, y );
-    x += mx - px;
-    y += my - py;
+    x += mx - px - Left;
+    y += my - py - Top;
 
     // Len of 0 is equal to unactivate anchor
-    if( Len > 0 && sqrt( (Left-x)*(Left-x) + (Top-y)*(Top-y) ) <= Len )
-    {
-        return true;
-    }
-
-    return false;
+    return( Len > 0 && sqrt( x*x + y*y ) <= Len );
 }
 //---------------------------------------------------------------------------
 void Anchor::GetPos( int &x, int &y )
