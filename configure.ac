@@ -2355,6 +2355,11 @@ then
   fi
 fi
 
+AC_ARG_WITH(a52-fixed,
+      [    --with-a52-fixed      specify if liba52 has been compiled with fixed point support],
+      [
+        VLC_ADD_CPPFLAGS([a52tofloat32],[-DLIBA52_FIXED]) ])
+
 dnl
 dnl DTS Coherent Acoustics decoder plugin
 dnl
