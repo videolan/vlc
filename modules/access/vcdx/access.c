@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000, 2003, 2004 VideoLAN
- * $Id: access.c,v 1.16 2004/01/06 04:10:18 rocky Exp $
+ * $Id: access.c,v 1.17 2004/01/25 04:53:16 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -76,7 +76,8 @@ static char *VCDParse       ( input_thread_t *,
                               /*out*/ bool *play_single_item );
 
 static void VCDUpdateVar( input_thread_t *p_input, int i_entry, int i_action,
-                          const char *varname, const char *label );
+                          const char *p_varname, char *p_label,
+			  const char *p_debug_label );
 
 static vcdinfo_obj_t *vcd_Open   ( vlc_object_t *p_this, const char *psz_dev );
 
@@ -255,7 +256,7 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
                 ++ p_input->stream.p_selected_area->i_part;
               p_vcd->play_item.type = VCDINFO_ITEM_TYPE_ENTRY;
               VCDUpdateVar( p_input, p_vcd->play_item.num, VLC_VAR_SETVALUE,
-                            "chapter", "Setting entry" );
+                            "chapter", _("Entry"), "Setting entry" );
             }
           vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
@@ -332,13 +333,16 @@ VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
         /* Update the navigation variables without triggering a callback */
 
         VCDUpdateVar( p_input, i_track, VLC_VAR_SETVALUE, "title",
-                      "Setting track");
+                      _("Track"), "Setting track");
 
         var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL, NULL );
         for( i = p_area->i_plugin_data; i < i_nb; i++ )
         {
           VCDUpdateVar( p_input, i , VLC_VAR_ADDCHOICE,
-                        "chapter",  "Adding entry choice");
+                        "chapter",  
+			p_vcd->play_item.type == VCDINFO_ITEM_TYPE_ENTRY ?
+			_("Entry") : _("Segment"), 
+			"Adding entry choice");
         }
 
 	if (p_vcd->b_svd) {
@@ -353,7 +357,7 @@ VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
 	  for( i = 0;  i < i_channels; i++ )
 	    {
 	      VCDUpdateVar( p_input, i , VLC_VAR_ADDCHOICE,
-			    "audio_channels",  "Adding audio choice");
+			    "audio_channels",  NULL, "Adding audio choice");
 	    }
 	}
 
@@ -400,7 +404,7 @@ VCDSeek( input_thread_t * p_input, off_t i_off )
             if( p_vcd->cur_lsn < p_vcd->p_entries[i_entry] )
             {
               VCDUpdateVar( p_input, i_entry, VLC_VAR_SETVALUE,
-                            "chapter", "Setting entry" );
+                            "chapter", _("Entry"), "Setting entry" );
               break;
             }
         }
@@ -431,14 +435,14 @@ VCDPlay( input_thread_t *p_input, vcdinfo_itemid_t itemid )
 {
     thread_vcd_data_t *     p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
     input_area_t *          p_area;
+    bool                    b_was_still;
 
     dbg_print(INPUT_DBG_CALL, "itemid.num: %d, itemid.type: %d\n",
               itemid.num, itemid.type);
 
     if (!p_input->p_access_data) return VLC_EGENERIC;
-
-    p_vcd->in_still = false;
-    p_vcd->cur_lid  = VCDINFO_INVALID_LID;
+    
+    b_was_still = p_vcd->in_still;
 
 #define area p_input->stream.pp_areas
 
@@ -452,6 +456,7 @@ VCDPlay( input_thread_t *p_input, vcdinfo_itemid_t itemid )
         LOG_ERR ("Invalid track number %d", itemid.num );
         return VLC_EGENERIC;
       }
+      p_vcd->in_still  = false;
       p_area           = area[itemid.num];
       p_area->i_part   = p_area->i_plugin_data;
       p_input->stream.b_seekable = 1;
@@ -536,6 +541,7 @@ VCDPlay( input_thread_t *p_input, vcdinfo_itemid_t itemid )
         return VLC_EGENERIC;
       } else {
         track_t cur_track  = vcdinfo_get_track(p_vcd->vcd,  itemid.num);
+        p_vcd->in_still    = false;
         p_area             = area[cur_track];
         p_area->i_part     = itemid.num;
         p_input->stream.b_seekable = 1;
@@ -549,6 +555,15 @@ VCDPlay( input_thread_t *p_input, vcdinfo_itemid_t itemid )
     VCDSetArea( p_input, p_area );
 
 #undef area
+
+#if 1
+    if ( p_vcd->in_still != b_was_still ) {
+      if (p_input->stream.pp_selected_es) {
+	input_SetStatus( p_input, INPUT_STATUS_END );
+	input_SetStatus( p_input, INPUT_STATUS_PLAY );
+      }
+    }
+#endif
 
     p_vcd->play_item = itemid;
 
@@ -670,7 +685,9 @@ VCDSegments( input_thread_t * p_input )
     }
 
     /* Update the navigation variables without triggering a callback */
-    VCDUpdateVar( p_input, 0, VLC_VAR_SETVALUE, "title", "Setting track" );
+    VCDUpdateVar( p_input, 0, VLC_VAR_SETVALUE, "title", _("Track"),
+		  "Setting track" );
+
     var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL, NULL );
 
     for( i = 0 ; i < num_segments ; i++ )
@@ -678,7 +695,7 @@ VCDSegments( input_thread_t * p_input )
       p_vcd->p_segments[i] = vcdinfo_get_seg_lsn(p_vcd->vcd, i);
       area[0]->i_part_nb ++;
       VCDUpdateVar( p_input, i , VLC_VAR_ADDCHOICE,
-                    "chapter", "Adding segment choice");
+                    "chapter", _("Segment"), "Adding segment choice");
     }
 
 #undef area
@@ -908,7 +925,10 @@ VCDSetOrigin( input_thread_t *p_input, lsn_t origin_lsn,
     (off_t) (p_vcd->cur_lsn - p_vcd->origin_lsn) * (off_t)M2F2_SECTOR_SIZE;
 
   VCDUpdateVar( p_input, cur_entry, VLC_VAR_SETVALUE,
-                "chapter", "Setting entry");
+                "chapter", 
+		p_vcd->play_item.type == VCDINFO_ITEM_TYPE_ENTRY ?
+		_("Entry") : _("Segment"), 
+		"Setting entry/segment");
 }
 
 /*****************************************************************************
@@ -964,15 +984,21 @@ VCDReadSector( vlc_object_t *p_this, const vcdinfo_obj_t *p_vcd,
 ****************************************************************************/
 static void
 VCDUpdateVar( input_thread_t *p_input, int i_num, int i_action,
-              const char *varname, const char *label)
+              const char *p_varname, char *p_label, 
+	      const char *p_debug_label)
 {
   vlc_value_t val;
   val.i_int = i_num;
   if (NULL != p_vcd_input) {
     thread_vcd_data_t *p_vcd = (thread_vcd_data_t *)p_vcd_input->p_access_data;
-    dbg_print( INPUT_DBG_PBC, "%s %d", label, i_num );
+    dbg_print( INPUT_DBG_PBC, "%s %d", p_debug_label, i_num );
   }
-  var_Change( p_input, varname, i_action, &val, NULL );
+  if (p_label) {
+    vlc_value_t text;
+    text.psz_string = p_label;
+    var_Change( p_input, p_varname, VLC_VAR_SETTEXT, &text, NULL );
+  }
+  var_Change( p_input, p_varname, i_action, &val, NULL );
 }
 
 
@@ -1522,7 +1548,8 @@ E_(Open) ( vlc_object_t *p_this )
     p_vcd->p_intf->b_block = VLC_FALSE;
     intf_RunThread( p_vcd->p_intf );
 
-    VCDFixupPlayList( p_input, p_vcd, psz_source, &itemid, play_single_item );
+    if (play_single_item)
+      VCDFixupPlayList( p_input, p_vcd, psz_source, &itemid, play_single_item );
 
     free( psz_source );
 
