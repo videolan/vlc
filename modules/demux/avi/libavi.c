@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.11 2002/12/18 15:52:06 fenrir Exp $
+ * $Id: libavi.c,v 1.12 2002/12/18 16:16:30 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -527,7 +527,8 @@ static int AVI_ChunkRead_strf( input_thread_t *p_input,
             AVI_READ4BYTES( p_chk->strf.auds.p_wf->nAvgBytesPerSec );
             AVI_READ2BYTES( p_chk->strf.auds.p_wf->nBlockAlign );
             AVI_READ2BYTES( p_chk->strf.auds.p_wf->wBitsPerSample );
-            if( p_chk->strf.auds.p_wf->wFormatTag != WAVE_FORMAT_PCM )
+            if( p_chk->strf.auds.p_wf->wFormatTag != WAVE_FORMAT_PCM
+                 && p_chk->common.i_chunk_size > sizeof( WAVEFORMATEX ) )
             {
                 AVI_READ2BYTES( p_chk->strf.auds.p_wf->cbSize );
                 /* prevent segfault */
