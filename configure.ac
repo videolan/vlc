@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.138 2004/01/02 23:22:37 zorglub Exp $
+dnl $Id: configure.ac,v 1.139 2004/01/03 23:37:08 asmax Exp $
 
 AC_INIT(vlc,0.7.0)
 
@@ -1940,7 +1940,7 @@ dnl
 dnl MP4 module
 dnl
 AC_CHECK_HEADERS(zlib.h, [
-  AX_ADD_LDFLAGS([mp4 skins sap],[-lz])
+  AX_ADD_LDFLAGS([mp4 skins skins2 sap],[-lz])
 ] )
 
 
@@ -1948,7 +1948,7 @@ dnl
 dnl skins module
 dnl
 AC_CHECK_HEADERS(libtar.h, [
-  AX_ADD_LDFLAGS([skins],[-ltar])
+  AX_ADD_LDFLAGS([skins skins2],[-ltar])
 ] )
 
 
@@ -2724,19 +2724,37 @@ if test "${enable_skins}" != "no"; then
     AX_ADD_LDFLAGS([skins],[-loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32])
 
   else if test "${enable_skins}" = "yes"; then
-    IMLIB2_PATH="${PATH}"
-    AC_PATH_PROG(IMLIB2_CONFIG_SKINS, imlib2-config, no, ${IMLIB2_PATH})
-    if test "${IMLIB2_CONFIG_SKINS}" = "no"; then
-    AC_MSG_ERROR([Couldn't find the imlib2 package. You can download imlib2 from http://enlightenment.org/, or configure with --disable-skins.])
-    fi
-
     AX_ADD_PLUGINS([skins])
     ALIASES="${ALIASES} svlc"
-    AX_ADD_CPPFLAGS([skins],[-Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS])
+    AX_ADD_CPPFLAGS([skins],[-Imodules/gui/skins -I${x_includes} -I/usr/include/freetype2 -DX11_SKINS])
     AX_ADD_CXXFLAGS([skins],[-O2 -fno-rtti])
-    AX_ADD_LDFLAGS([skins],[-L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`])
+    AX_ADD_LDFLAGS([skins],[-L${x_libraries} -lImlib2 -lXext -lX11 -lfreetype -lpng -lz ])
   fi fi
 fi
+
+dnl
+dnl Skins2 module
+dnl
+AC_ARG_ENABLE(skins2,
+  [  --enable-skins2       Skins2 interface module (experimental)])
+if test "${enable_skins2}" != "no"; then
+  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
+
+    AX_ADD_PLUGINS([skins2])
+    ALIASES="${ALIASES} svlc"
+    AX_ADD_CPPFLAGS([skins2],[-U_OFF_T_ -U_off_t -Imodules/gui/skins2])
+    AX_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
+    AX_ADD_LDFLAGS([skins2],[-loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32])
+
+  else if test "${enable_skins2}" = "yes"; then
+    AX_ADD_PLUGINS([skins2])
+    ALIASES="${ALIASES} svlc"
+    AX_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 -I${x_includes} -I/usr/include/freetype2 -DX11_SKINS])
+    AX_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
+    AX_ADD_LDFLAGS([skins2],[-L${x_libraries} -lXext -lX11 -lfreetype -lpng -lz ])
+  fi fi
+fi
+
 
 dnl
 dnl  Gtk+ module
@@ -2810,20 +2828,20 @@ dnl fi
 dnl
 dnl  PDA Gtk+2 module
 dnl
-AC_ARG_ENABLE(pda,
-  [  --enable-pda          PDA interface needs Gtk2 support (default disabled)])
-if test "x${enable_pda}" = "xyes"
-then
-  PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
-  AX_ADD_CFLAGS([gtk2],[${GTK2_CFLAGS}])
-  AX_ADD_LDFLAGS([gtk2],[${GTK2_LIBS}])
-  AX_ADD_CFLAGS([pda],[${GTK2_CFLAGS} ${CFLAGS_pda}])
-  AX_ADD_LDFLAGS([pda],[${GTK2_LIBS} ${LDFLAGS_pda}])
-  AX_ADD_PLUGINS([pda])
-  if test "${SYS}" != "mingw32"; then
-    NEED_GTK2_MAIN=yes
-  fi
-fi
+#AC_ARG_ENABLE(pda,
+#  [  --enable-pda          PDA interface needs Gtk2 support (default disabled)])
+#if test "x${enable_pda}" = "xyes"
+#then
+ # PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
+#  AX_ADD_CFLAGS([gtk2],[${GTK2_CFLAGS}])
+#  AX_ADD_LDFLAGS([gtk2],[${GTK2_LIBS}])
+#  AX_ADD_CFLAGS([pda],[${GTK2_CFLAGS} ${CFLAGS_pda}])
+#  AX_ADD_LDFLAGS([pda],[${GTK2_LIBS} ${LDFLAGS_pda}])
+#  AX_ADD_PLUGINS([pda])
+#  if test "${SYS}" != "mingw32"; then
+#    NEED_GTK2_MAIN=yes
+#  fi
+#fi
 
 dnl
 dnl  Gnome module
@@ -3559,6 +3577,7 @@ AC_CONFIG_FILES([
   modules/gui/qnx/Makefile
   modules/gui/qt/Makefile
   modules/gui/skins/Makefile
+  modules/gui/skins2/Makefile
   modules/gui/wxwindows/Makefile
   modules/misc/Makefile
   modules/misc/dummy/Makefile
