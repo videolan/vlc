@@ -173,11 +173,6 @@ static int InitThread( vpar_thread_t *p_vpar )
 
     /* Initialize parsing data */
     p_vpar->sequence.p_forward = p_vpar->sequence.p_backward = NULL;
-    p_vpar->sequence.p_frame_lum_lookup
-        = p_vpar->sequence.p_field_lum_lookup
-        = p_vpar->sequence.p_frame_chroma_lookup
-        = p_vpar->sequence.p_field_chroma_lookup
-        = NULL;
     p_vpar->sequence.intra_quant.b_allocated = FALSE;
     p_vpar->sequence.nonintra_quant.b_allocated = FALSE;
     p_vpar->sequence.chroma_intra_quant.b_allocated = FALSE;
