@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.30 2003/05/07 02:31:20 fenrir Exp $
+ * $Id: mp4.c,v 1.31 2003/05/09 19:29:57 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -939,6 +939,20 @@ static int  TrackCreateES   ( input_thread_t   *p_input,
                     p_soun->i_sample_per_packet = 64;
                     p_soun->i_bytes_per_packet  = 34;
                     p_soun->i_bytes_per_frame   = 34 * p_soun->i_channelcount;
+                    p_soun->i_bytes_per_sample  = 2;
+                    break;
+                case VLC_FOURCC( 'M', 'A', 'C', '3' ):
+                    p_soun->i_qt_version = 1;
+                    p_soun->i_sample_per_packet = 6;
+                    p_soun->i_bytes_per_packet  = 2;
+                    p_soun->i_bytes_per_frame   = 2 * p_soun->i_channelcount;
+                    p_soun->i_bytes_per_sample  = 2;
+                    break;
+                case VLC_FOURCC( 'M', 'A', 'C', '6' ):
+                    p_soun->i_qt_version = 1;
+                    p_soun->i_sample_per_packet = 12;
+                    p_soun->i_bytes_per_packet  = 2;
+                    p_soun->i_bytes_per_frame   = 2 * p_soun->i_channelcount;
                     p_soun->i_bytes_per_sample  = 2;
                     break;
                 default:
