@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.58 2002/04/11 08:55:49 sam Exp $
+ * $Id: modules.c,v 1.59 2002/05/14 19:47:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -312,23 +312,28 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
             continue;
         }
 
-        /* Test if this plugin exports the required shortcut */
+        /* If we required a shortcut, check this plugin provides it. */
         if( psz_name != NULL && *psz_name )
         {
-            boolean_t b_ok = 0;
+            boolean_t b_trash = 1;
             int i_dummy;
 
             for( i_dummy = 0;
-                 !b_ok && p_module->pp_shortcuts[i_dummy];
+                 b_trash && p_module->pp_shortcuts[i_dummy];
                  i_dummy++ )
             {
-                b_ok = !strcmp( psz_name, p_module->pp_shortcuts[i_dummy] );
+                b_trash = strcmp( psz_name, p_module->pp_shortcuts[i_dummy] );
             }
 
-            if( !b_ok )
+            if( b_trash )
             {
                 continue;
             }
+        }
+        /* If we didn't require a shortcut, trash zero-scored plugins */
+        else if( !p_module->pi_score[i_capability] )
+        {
+            continue;
         }
 
         /* Special case: test if we requested a particular intf plugin */
