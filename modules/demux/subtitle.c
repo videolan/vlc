@@ -35,7 +35,7 @@
 #include <vlc/input.h>
 #include "vlc_video.h"
 
-#include "../ps.h"
+#include "ps.h"
 
 #if (!defined( WIN32 ) || defined(__MINGW32__))
 #    include <dirent.h>
