@@ -2,7 +2,7 @@
  * mpeg4video.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.13 2003/09/02 20:19:26 gbazin Exp $
+ * $Id: mpeg4video.c,v 1.14 2003/09/24 14:59:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -106,8 +106,6 @@ static int Open( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
-    p_dec->pf_run = Run;
-
     switch( p_dec->p_fifo->i_fourcc )
     {
         case VLC_FOURCC( 'm', '4', 's', '2'):
@@ -123,7 +121,7 @@ static int Open( vlc_object_t *p_this )
         case VLC_FOURCC( 'D', 'X', '5', '0'):
         case VLC_FOURCC( 0x04, 0,   0,   0):
         case VLC_FOURCC( '3', 'I', 'V', '2'):
-
+            p_dec->pf_run = Run;
             return VLC_SUCCESS;
         default:
             return VLC_EGENERIC;

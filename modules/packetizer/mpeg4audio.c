@@ -2,7 +2,7 @@
  * mpeg4audio.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4audio.c,v 1.7 2003/09/02 20:19:26 gbazin Exp $
+ * $Id: mpeg4audio.c,v 1.8 2003/09/24 14:59:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -102,16 +102,13 @@ static int Open( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
-    p_dec->pf_run = Run;
+    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC( 'm', 'p', '4', 'a') )
+    {
+        return VLC_EGENERIC;
+    }
 
-    if( p_dec->p_fifo->i_fourcc == VLC_FOURCC( 'm', 'p', '4', 'a') )
-    {
-        return( VLC_SUCCESS );
-    }
-    else
-    {
-        return( VLC_EGENERIC );
-    }
+    p_dec->pf_run = Run;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
