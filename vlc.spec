@@ -5,11 +5,12 @@
 %define	libmajor	0
 %define libname		lib%name%libmajor
 
-%define cvs     	0
+%define cvs     	1
 %if %{cvs}
-%define cvsdate 	20021213
-%define release		0.%{cvsdate}
-%define cvs_name 	%{name}-%version-cvs
+%define	cvsrel		1
+%define cvsdate 	20021220
+%define release		0.%{cvsdate}.%{cvsrel}mdk
+%define cvs_name 	%{name}-snapshot-%cvsdate
 %else
 %define release 	%{rel}mdk
 %endif
@@ -29,14 +30,14 @@
 %define with_sdl 1
 %define with_ggi 1
 %define with_svgalib 0
-%define with_xosd 0
+%define with_xosd 1
 
 %define with_mad 1
 %define with_ogg 1
 %define with_a52 1
 %define with_dv 0
 %define with_dvb 0
-%define	with_ffmpeg 0
+%define	with_ffmpeg 1
 
 %define with_esd 1
 %define with_arts 1
@@ -117,7 +118,9 @@ Group:		Video
 URL:		http://www.videolan.org/
 Requires:	vlc-gui
 # vlc-mad needed by ffmpeg builtin (i want MPEG4 support out of box)
-Requires:	vlc-mad
+Requires:	vlc-plugin-mad
+#DVD working out of box.
+Requires:	vlc-plugin-a52
 
 BuildRoot:	%_tmppath/%name-%version-%release-root
 
@@ -468,7 +471,6 @@ select the `alsa' aout plugin from the preferences menu.
 %setup -q -n %{cvs_name}
 %else
 %setup -q 
-#-n %name-%version-cvs
 %endif
 
 %build
@@ -550,6 +552,11 @@ select the `alsa' aout plugin from the preferences menu.
 	--disable-vorbis \
 	--disable-ogg \
 %endif
+%if %with_dvb
+	--enable-dvb  --enable-dvbpsi --enable-satellite \
+%else
+	--disable-dvb  --disable-dvbpsi --disable-satellite \
+%endif
 %if %with_esd
 	--enable-esd \
 %endif
@@ -630,9 +637,9 @@ install -m 644 %pngdir/qvlc48x48.png %buildroot/%_liconsdir/qvlc.png
 #rpm (>= 4.0.4-20mdk) now checks for installed (but unpackaged) files
 rm -f %pngdir/*
 #rm -f %buildroot/%_libdir/vlc/demux/libts_dvbpsi_plugin.so
-#FIXME: why ?
-#mv %buildroot/%_bindir/i586-mandrake-linux-gnu-vlc %buildroot/%_bindir/vlc
-#mv %buildroot/%_bindir/i586-mandrake-linux-gnu-vlc-config %buildroot/%_bindir/vlc-config
+#FIXME: mandrake configure2_5x macro is broken (force cross compile mode)
+mv %buildroot/%_bindir/%_target_cpu-mandrake-linux-gnu-vlc %buildroot/%_bindir/vlc
+mv %buildroot/%_bindir/%_target_cpu-mandrake-linux-gnu-vlc-config %buildroot/%_bindir/vlc-config
 
 %post
 %update_menus
@@ -645,12 +652,13 @@ rm -fr %buildroot
 %files -f %name.lang
 %defattr(-,root,root)
 %doc README COPYING
-%_bindir/*vlc
+%_bindir/vlc
 
 %dir %_libdir/vlc
 
 %dir %_libdir/vlc/access
 %_libdir/vlc/access/libaccess_file_plugin.so
+%_libdir/vlc/access/libaccess_ftp_plugin.so
 %_libdir/vlc/access/libaccess_http_plugin.so
 %_libdir/vlc/access/libaccess_mms_plugin.so
 %_libdir/vlc/access/libaccess_rtp_plugin.so
@@ -668,8 +676,6 @@ rm -fr %buildroot
 %_libdir/vlc/access_output/libaccess_output_udp_plugin.so
 
 %dir %_libdir/vlc/audio_filter
-%_libdir/vlc/audio_filter/liba52tofloat32_plugin.so
-%_libdir/vlc/audio_filter/liba52tospdif_plugin.so
 %_libdir/vlc/audio_filter/libfixed32tofloat32_plugin.so
 %_libdir/vlc/audio_filter/libfixed32tos16_plugin.so
 %_libdir/vlc/audio_filter/libfloat32tos16_plugin.so
@@ -697,6 +703,7 @@ rm -fr %buildroot
 %_libdir/vlc/audio_output/liboss_plugin.so
 
 %dir %_libdir/vlc/codec
+%_libdir/vlc/codec/liba52_plugin.so
 %_libdir/vlc/codec/libadpcm_plugin.so
 %_libdir/vlc/codec/libaraw_plugin.so
 %_libdir/vlc/codec/libcinepak_plugin.so
@@ -714,6 +721,11 @@ rm -fr %buildroot
 %_libdir/vlc/codec/libmotion_plugin.so
 %_libdir/vlc/codec/libmpeg_audio_plugin.so
 %_libdir/vlc/codec/libmpeg_video_plugin.so
+%if %with_ffmpeg
+%_libdir/vlc/codec/libpostprocessing_c_plugin.so
+%_libdir/vlc/codec/libpostprocessing_mmx_plugin.so
+%_libdir/vlc/codec/libpostprocessing_mmxext_plugin.so
+%endif
 %_libdir/vlc/codec/libspudec_plugin.so
 
 %dir %_libdir/vlc/control
@@ -732,8 +744,8 @@ rm -fr %buildroot
 %_libdir/vlc/demux/libmp4_plugin.so
 %_libdir/vlc/demux/libmpeg_system_plugin.so
 %_libdir/vlc/demux/libps_plugin.so
+%_libdir/vlc/demux/librawdv_plugin.so
 %_libdir/vlc/demux/libts_plugin.so
-%_libdir/vlc/demux/libts_dvbpsi_plugin.so
 %_libdir/vlc/demux/libwav_plugin.so
 
 %dir %_libdir/vlc/misc
@@ -800,7 +812,7 @@ rm -fr %buildroot
 %_includedir/vlc/*
 %_libdir/*a
 %_libdir/vlc/*a
-%_bindir/*vlc-config
+%_bindir/vlc-config
 %_mandir/man1/vlc-config*
 
 %if %with_mozilla
@@ -809,7 +821,7 @@ rm -fr %buildroot
 %doc README
 # FIXME: seems to be mozilla-version/plugin on Mandrake
 #%dir %_libdir/mozilla
-%_libdir/mozilla/*
+%_libdir/mozilla*/*
 %endif
 
 # intf plugins
@@ -958,7 +970,8 @@ rm -fr %buildroot
 %files plugin-a52
 %defattr(-,root,root)
 %doc README
-%_libdir/vlc/codec/liba52_plugin.so
+%_libdir/vlc/audio_filter/liba52tofloat32_plugin.so
+%_libdir/vlc/audio_filter/liba52tospdif_plugin.so
 %endif
 
 # input plugin
@@ -967,6 +980,7 @@ rm -fr %buildroot
 %defattr(-,root,root)
 %doc README
 %_libdir/vlc/access/libsatellite_plugin.so
+%_libdir/vlc/demux/libts_dvbpsi_plugin.so
 %endif
 
 #audio plugins
