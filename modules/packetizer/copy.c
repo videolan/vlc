@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.11 2003/07/20 23:30:07 gbazin Exp $
+ * $Id: copy.c,v 1.12 2003/07/31 19:02:23 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -25,19 +25,31 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <stdlib.h>                                      /* malloc(), free() */
+
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
 #include <vlc/decoder.h>
 #include <vlc/input.h>
 #include <vlc/sout.h>
 
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
-
 #include "codecs.h"
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  Open    ( vlc_object_t * );
+
+vlc_module_begin();
+    set_description( _("Copy packetizer") );
+    set_capability( "packetizer", 1 );
+    set_callbacks( Open, NULL );
+vlc_module_end();
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static int  Run         ( decoder_fifo_t * );
+
 typedef struct packetizer_thread_s
 {
     /* Input properties */
@@ -47,33 +59,21 @@ typedef struct packetizer_thread_s
     sout_packetizer_input_t *p_sout_input;
     sout_format_t           output_format;
 
-//    mtime_t i_last_pts;
+    void                    (*pf_packetize)( struct packetizer_thread_s * );
 
 } packetizer_thread_t;
 
-static int  Open    ( vlc_object_t * );
-static int  Run     ( decoder_fifo_t * );
-
-static int  InitThread     ( packetizer_thread_t * );
-static void PacketizeThread   ( packetizer_thread_t * );
-static void EndThread      ( packetizer_thread_t * );
+static int  Init        ( packetizer_thread_t * );
+static void PacketizeStd( packetizer_thread_t * );
+static void PacketizeSPU( packetizer_thread_t * );
+static void End         ( packetizer_thread_t * );
 
 
+static void AppendPEStoSoutBuffer( sout_instance_t *,sout_buffer_t **,pes_packet_t *);
 static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes );
 
 /*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-
-vlc_module_begin();
-    set_description( _("Copy packetizer") );
-    set_capability( "packetizer", 1 );
-    set_callbacks( Open, NULL );
-vlc_module_end();
-
-
-/*****************************************************************************
- * OpenDecoder: probe the packetizer and return score
+ * Open: probe the packetizer and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able
  * to choose.
@@ -88,59 +88,47 @@ static int Open( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * RunDecoder: this function is called just after the thread is created
+ * Run: this function is called just after the thread is created
  *****************************************************************************/
 static int Run( decoder_fifo_t *p_fifo )
 {
     packetizer_thread_t *p_pack;
-    int b_error;
 
-    msg_Info( p_fifo, "Running copy packetizer" );
-    if( !( p_pack = malloc( sizeof( packetizer_thread_t ) ) ) )
-    {
-        msg_Err( p_fifo, "out of memory" );
-        DecoderError( p_fifo );
-        return( -1 );
-    }
+    msg_Dbg( p_fifo, "Running copy packetizer (fcc=%4.4s)", (char*)&p_fifo->i_fourcc );
+
+    p_pack = malloc( sizeof( packetizer_thread_t ) );
     memset( p_pack, 0, sizeof( packetizer_thread_t ) );
 
     p_pack->p_fifo = p_fifo;
 
-    if( InitThread( p_pack ) != 0 )
+    if( Init( p_pack ) )
     {
         DecoderError( p_fifo );
-        return( -1 );
+        return VLC_EGENERIC;
     }
 
-    while( ( !p_pack->p_fifo->b_die )&&( !p_pack->p_fifo->b_error ) )
+    while( !p_pack->p_fifo->b_die && !p_pack->p_fifo->b_error )
     {
-        PacketizeThread( p_pack );
+        p_pack->pf_packetize( p_pack );
     }
 
-
-    if( ( b_error = p_pack->p_fifo->b_error ) )
+    if( p_pack->p_fifo->b_error )
     {
         DecoderError( p_pack->p_fifo );
     }
 
-    EndThread( p_pack );
-    if( b_error )
-    {
-        return( -1 );
-    }
+    End( p_pack );
 
-    return( 0 );
+    return( p_pack->p_fifo->b_error ? VLC_EGENERIC : VLC_SUCCESS );
 }
 
-
-#define FREE( p ) if( p ) free( p ); p = NULL
-
 /*****************************************************************************
- * InitThread: initialize data before entering main loop
+ * Init: initialize data before entering main loop
  *****************************************************************************/
-
-static int InitThread( packetizer_thread_t *p_pack )
+static int Init( packetizer_thread_t *p_pack )
 {
+
+    p_pack->pf_packetize = PacketizeStd;
 
     switch( p_pack->p_fifo->i_fourcc )
     {
@@ -388,12 +376,16 @@ static int InitThread( packetizer_thread_t *p_pack )
             break;
         }
 
+        /* subtitles */
+        case VLC_FOURCC( 's', 'p', 'u', ' ' ):  /* DVD */
+        case VLC_FOURCC( 's', 'p', 'u', 'b' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 's', 'p', 'u', ' ' );
+            p_pack->output_format.i_cat = SPU_ES;
+            p_pack->pf_packetize = PacketizeSPU;
+            break;
         default:
             msg_Err( p_pack->p_fifo, "unknown es type !!" );
             return VLC_EGENERIC;
-            //p_pack->output_format.i_fourcc = p_pack->p_fifo->i_fourcc;
-            //p_pack->output_format.i_cat = UNKNOWN_ES;
-            //break;
     }
 
     switch( p_pack->output_format.i_cat )
@@ -462,6 +454,11 @@ static int InitThread( packetizer_thread_t *p_pack )
             }
             break;
 
+        case SPU_ES:
+            p_pack->output_format.i_extra_data  = 0;
+            p_pack->output_format.p_extra_data  = NULL;
+            break;
+
         default:
             return VLC_EGENERIC;
     }
@@ -475,92 +472,126 @@ static int InitThread( packetizer_thread_t *p_pack )
         msg_Err( p_pack->p_fifo, "cannot add a new stream" );
         return VLC_EGENERIC;
     }
-//    p_pack->i_last_pts = 0;
+
     return( VLC_SUCCESS );
 }
 
 /*****************************************************************************
- * PacketizeThread: packetize an unit (here copy a complete pes)
+ * PacketizeStd: packetize an unit (here copy a complete pes)
  *****************************************************************************/
-static void PacketizeThread( packetizer_thread_t *p_pack )
+static void PacketizeStd( packetizer_thread_t *p_pack )
 {
-    sout_buffer_t   *p_sout_buffer;
+    sout_buffer_t   *p_out = NULL;
     pes_packet_t    *p_pes;
-    ssize_t         i_size;
-    mtime_t         i_pts;
 
-    /* **** get samples count **** */
     input_ExtractPES( p_pack->p_fifo, &p_pes );
     if( !p_pes )
     {
         p_pack->p_fifo->b_error = 1;
         return;
     }
-    i_pts = p_pes->i_pts;
 
-    if( i_pts <= 0 ) //&& p_pack->i_last_pts <= 0 )
+    msg_Dbg( p_pack->p_fifo,
+             "pes size:%d dts=%lld pts=%lld",
+             p_pes->i_pes_size, p_pes->i_dts, p_pes->i_pts );
+
+
+    if( p_pes->i_pts <= 0 )
     {
         msg_Dbg( p_pack->p_fifo, "need pts != 0" );
         input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
         return;
     }
 
-    i_size = p_pes->i_pes_size;
-
-//    msg_Dbg( p_pack->p_fifo, "pes size:%d", i_size );
-    if( i_size > 0 )
+    if( p_pes->i_pes_size > 0 )
     {
-        pes_packet_t    *p_pes_next;
-        data_packet_t   *p_data;
-        ssize_t          i_buffer;
+        pes_packet_t    *p_next;
 
-        p_sout_buffer =
-            sout_BufferNew( p_pack->p_sout_input->p_sout, i_size );
-        if( !p_sout_buffer )
-        {
-            p_pack->p_fifo->b_error = 1;
-            input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
-            return;
-        }
-        /* TODO: memcpy of the pes packet */
-        for( i_buffer = 0, p_data = p_pes->p_first;
-             p_data != NULL && i_buffer < i_size;
-             p_data = p_data->p_next)
-        {
-            ssize_t i_copy;
+        AppendPEStoSoutBuffer( p_pack->p_sout_input->p_sout, &p_out, p_pes );
 
-            i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start,
-                            i_size - i_buffer );
-            if( i_copy > 0 )
-            {
-                p_pack->p_fifo->p_vlc->pf_memcpy( p_sout_buffer->p_buffer + i_buffer,
-                                                  p_data->p_payload_start,
-                                                  i_copy );
-            }
-            i_buffer += i_copy;
-        }
-        p_sout_buffer->i_length = 0;
-        p_sout_buffer->i_dts = i_pts; //p_pes->i_pts - p_pack->i_pts_start;
-        p_sout_buffer->i_pts = i_pts; //p_pes->i_pts - p_pack->i_pts_start;
-        p_sout_buffer->i_bitrate = 0;
-
-        input_ShowPES( p_pack->p_fifo, &p_pes_next );
-        if( p_pes_next )
+        input_ShowPES( p_pack->p_fifo, &p_next );
+        if( p_next && p_next->i_pts > 0 )
         {
-            p_sout_buffer->i_length = p_pes_next->i_pts - i_pts;
+            p_out->i_length = p_next->i_pts - p_pes->i_pts;
         }
+
         sout_InputSendBuffer( p_pack->p_sout_input,
-                               p_sout_buffer );
+                               p_out );
     }
 
     input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
 }
 
+/*****************************************************************************
+ * PacketizeSPU: packetize an SPU unit (so gather all PES of one subtitle)
+ *****************************************************************************/
+static void PacketizeSPU( packetizer_thread_t *p_pack )
+{
+    sout_buffer_t   *p_out = NULL;
+    pes_packet_t    *p_pes;
+
+    int     i_spu_size = 0;
+
+    for( ;; )
+    {
+        input_ExtractPES( p_pack->p_fifo, &p_pes );
+        if( !p_pes )
+        {
+            p_pack->p_fifo->b_error = 1;
+            return;
+        }
+
+        msg_Dbg( p_pack->p_fifo,
+                 "pes size:%d dts=%lld pts=%lld",
+                 p_pes->i_pes_size, p_pes->i_dts, p_pes->i_pts );
+
+        if( p_out == NULL &&
+            ( p_pes->i_pts <= 0 || p_pes->i_pes_size < 4 ) )
+        {
+            msg_Dbg( p_pack->p_fifo, "invalid starting packet (size < 4 or pts <=0)" );
+            input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
+            return;
+        }
+
+        if( p_pes->i_pes_size > 0 )
+        {
+            AppendPEStoSoutBuffer( p_pack->p_sout_input->p_sout, &p_out, p_pes );
+
+            if( i_spu_size <= 0 )
+            {
+                int i_rle;
+                i_spu_size = ( p_out->p_buffer[0] << 8 )| p_out->p_buffer[1];
+                i_rle      = ( ( p_out->p_buffer[2] << 8 )| p_out->p_buffer[3] ) - 4;
+
+                msg_Dbg( p_pack->p_fifo, "i_spu_size=%d i_rle=%d", i_spu_size, i_rle );
+                if( i_spu_size == 0 || i_rle >= i_spu_size )
+                {
+                    sout_BufferDelete( p_pack->p_sout_input->p_sout, p_out );
+                    input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
+                    return;
+                }
+            }
+        }
+
+        input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
+
+        if( (int)p_out->i_size >= i_spu_size )
+        {
+            break;
+        }
+    }
+    msg_Dbg( p_pack->p_fifo,
+             "SPU packets size=%d should be %d",
+             p_out->i_size, i_spu_size );
+
+    sout_InputSendBuffer( p_pack->p_sout_input, p_out );
+}
+
 
 /*****************************************************************************
- * EndThread : packetizer thread destruction
+ * End : packetizer thread destruction
  *****************************************************************************/
-static void EndThread ( packetizer_thread_t *p_pack)
+static void End ( packetizer_thread_t *p_pack)
 {
     if( p_pack->p_sout_input )
     {
@@ -569,10 +600,54 @@ static void EndThread ( packetizer_thread_t *p_pack)
     free( p_pack );
 }
 
+/*****************************************************************************
+ * AppendPEStoSoutBuffer: copy/cat one pes into a sout_buffer_t.
+ *****************************************************************************/
+static void AppendPEStoSoutBuffer( sout_instance_t *p_sout,
+                                   sout_buffer_t **pp_out,
+                                   pes_packet_t *p_pes )
+{
+    sout_buffer_t *p_out = *pp_out;
+    unsigned int  i_out;
+
+    data_packet_t   *p_data;
+
+    if( p_out == NULL )
+    {
+        i_out = 0;
+        p_out = *pp_out = sout_BufferNew( p_sout, p_pes->i_pes_size );
+        p_out->i_dts = p_pes->i_pts;
+        p_out->i_pts = p_pes->i_pts;
+    }
+    else
+    {
+        i_out = p_out->i_size;
+        sout_BufferRealloc( p_sout, p_out, i_out + p_pes->i_pes_size );
+    }
+    p_out->i_size = i_out + p_pes->i_pes_size;
+
+    for( p_data = p_pes->p_first; p_data != NULL; p_data = p_data->p_next)
+    {
+        int i_copy;
+
+        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start,
+                        p_out->i_size - i_out );
+        if( i_copy > 0 )
+        {
+            memcpy( &p_out->p_buffer[i_out],
+                    p_data->p_payload_start,
+                    i_copy );
+        }
+        i_out += i_copy;
+    }
+    p_out->i_size = i_out;
+}
+
+/*****************************************************************************
+ * input_ShowPES: Show the next PES in the fifo
+ *****************************************************************************/
 static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
 {
-    pes_packet_t *p_pes;
-
     vlc_mutex_lock( &p_fifo->data_lock );
 
     if( p_fifo->p_first == NULL )
@@ -580,7 +655,7 @@ static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
         if( p_fifo->b_die )
         {
             vlc_mutex_unlock( &p_fifo->data_lock );
-            if( pp_pes ) *pp_pes = NULL;
+            *pp_pes = NULL;
             return;
         }
 
@@ -592,12 +667,7 @@ static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
         /* Wait for the input to tell us when we received a packet. */
         vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
     }
-    p_pes = p_fifo->p_first;
+    *pp_pes = p_fifo->p_first;
     vlc_mutex_unlock( &p_fifo->data_lock );
-
-    if( pp_pes )
-    {
-        *pp_pes = p_pes;
-    }
 }
 
