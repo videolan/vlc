@@ -4,6 +4,84 @@
 
 HEAD
 
+  * libdvdcss segfault fixes.
+  * Tuned constants, since it seems to make people happy.
+  * Fixed the "paused movie won't restart" bug.
+  * Removed the outdated generic decoder.
+  * Rewrote the video decoder so that it can use multiple processors (--smp).
+  * Fixed a bug in the video decoder initialization.
+  * Grayscale mode now turns off chroma IDCT decoding.
+  * Kludged so that times displayed in the scrollbar are finally correct
+    for MPEG-2 streams.
+  * FreeBSD compilation fix by Øyvind Kolbu <oyvindk@world-online.no>.
+  * QNX RTOS plug-in by Jon Lech Johansen <jon-vl@nanocrew.net>.
+  * Added IDEALX developer documentation in doc/.
+  * Reactivated SDL parachute in non-debug mode (memory leak otherwise).
+  * Fixed GetChunk for chunks < 4 bytes.
+  * The Win98 DVD input is finally working.
+  * Fixed 2 Win32 bugs in libdvdcss (in _win32_dvdcss_readv), one of them
+    should have prevented the Win9x dvd input from working.
+  * Moved the "if(Win2k)" out of the loop in _win32_dvdcss_readv.
+  * Put a readv() function in input_iovec.h, the input_es now compiles.
+  * Modified input_ts to use this function.
+  * Fixed an initialisation bug in vout_directx.c.
+  * Right clicking on the mouse now displays the navigation menu.
+  * Fixed audio/video synchro bug with esd, should fix buggy sound due
+    to 44100-48000 Hz conversions.
+  * The Win32 GetMessage function has been isolated in a thread. This has
+    been done because this function can block the thread. Thanks to this
+    change, you can now move your window without any video and audio
+    interruption.
+  * libdvdcss enhancements by Billy Biggs <vektor@dumbterm.net>. This breaks
+    vlc's DVD input (looks like decoders are expecting data too early and
+    DVD input can't cope with it due to decryption). Needs to be investigated.
+  * Plugins are now compiled in plugins/* and libraries in lib/*.
+  * The KDE UI compiles again but does not work yet.
+  * ALSA plugin message corrections.
+  * Calculation modules can now be calledwith a shorter name
+    (eg. '--downmix mmx' instead of '--downmix downmixmmx').
+  * Fixed insane verbosity of the SDL plugin.
+  * Fixed the segfault in vout_UnloadFont.
+  * The Xvideo plugin now closes the video window when it XVideoGetPort
+    fails in vout_Create.
+  * Fixed alignement in imdct asm functions.
+  * 16 byte alignement for data (needed for SSE).
+  * Optimization in SSE downmix.
+  * Removed unnecessary translations in the win32 code from block offsets to
+    byte offsets. This was overflowing some variables.
+  * Reduced the complexity of the Win9x ASPI functions because we only need
+    to handle DVD drive access.
+  * Win32 code now handles seeking in areas above 2.1 Go on DVDs.
+  * Probably fixed the "X eats more and more CPU" bug. Please test.
+  * mingw32 cross-compilation issue fixed.
+  * Small optimization in vpar_blocks.c, sparing a few memset() calls.
+  * Additional error checking in vout_sdl.c.
+  * Minor manpage fix, conforming to Debian policy version 3.5.5.0
+    (Closes Debian bug #99561).
+  * Portablility fix: We now control the name to be used in the assembler
+    code for a C function or variable.
+  * Reenabled all the accelerated modules on Win32.
+  * Bugfix for chapters change in DVD.
+  * A few bug fixes for the directx plugin.
+  * Removed the custom usleep function for win32 as we don't really need
+    this accuracy, and it was eating cpu resources.
+  * Elementary Stream input plugin (use it with --input es). Only works with
+    video streams at the moment.
+  * Added command line option '--stdout <filename>' which redirects stdout
+    and stderr to the specified file. This option should mainly be useful
+    on Win32.
+  * On Win32, vlc now has an icon associated to the .exe file, and is a full
+    GUI application (you don't have this annoying dos command box anymore)
+  * Added INSTALL-win32.txt for specific details to the Win32 port.
+  * Compile fix for newer versions of MacOS X by Colin Simmonds
+    <colin_simmonds@Mac.lover.org>.
+  * Additional MacOS X DVD ioctl work by Eugenio Jarosiewicz
+    <ej0@cise.ufl.edu>.
+  * Win32 network support by Boris Dorès <babal@via.ecp.fr>.
+  * Fixed an alignment issue in the ifo parser. The Matrix problem should
+    be solved.
+  * Minor cosmetic fixes and warning removals here and there.
+  * FreeBSD (and probably QNX) shared memory handling fix.
   * First libdvdcss version (0.0.1).
   * Unrolled two loops in dvd_netlist.c to prevent message flooding.
   * DVD input stuttering fix by Jon Lech Johansen.
@@ -50,20 +128,6 @@ HEAD
   * Put most builtins in plugins again due to performances issues.
   * Fixed the painfully slow build process (at last!).
   * Added new dummy input plugin.
-  * Wrote an ES input plug-in for .mpg files which didn't work.
-  * Fixed a bug in GetChunk() for very small chunks of data (hence a bug
-    in the SPU decoder).
-  * Reactivated SDL parachute in non-debug mode (because of a memory
-    leakage).
-  * Added IDEALX developer documentation in doc/.
-  * Removed the outdated generic decoder.
-  * Rewrote the video decoder so that it can use multiple processors (--smp).
-  * Fixed a bug in the video decoder initialization.
-  * Grayscale mode now turns off chroma IDCT decoding.
-  * Kludged so that times displayed in the scrollbar are finally correct
-    for MPEG-2 streams.
-  * FreeBSD compilation fix by Øyvind Kolbu.
-  * QNX RTOS plug-in by Jon Lech Johansen.
 
 0.2.80
 Tue,  5 Jun 2001 04:41:06 +0200
