@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.180.2.2 2002/11/15 12:22:58 sam Exp $
+ * $Id: video_output.c,v 1.180.2.3 2002/11/20 01:47:58 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -358,6 +358,15 @@ static int InitThread( vout_thread_t *p_vout )
         return( 1 );
     }
 
+    if( I_OUTPUTPICTURES > VOUT_MAX_PICTURES )
+    {
+        intf_ErrMsg( "vout error: plugin allocated too many direct buffers, "
+                     "our internal buffers must have overflown." );
+        p_vout->pf_end( p_vout );
+        vlc_mutex_unlock( &p_vout->change_lock );
+        return( 1 );
+    }
+
     intf_WarnMsg( 1, "vout info: got %i direct buffer(s)", I_OUTPUTPICTURES );
 
     i_pgcd = ReduceHeight( p_vout->render.i_aspect );
@@ -432,27 +441,20 @@ static int InitThread( vout_thread_t *p_vout )
         p_vout->chroma.pf_end        = f.pf_end;
 #undef f
 
-        if( I_OUTPUTPICTURES < 2 * VOUT_MAX_PICTURES )
-        {
-            intf_WarnMsg( 2, "vout info: indirect render, mapping "
-                             "render pictures %i-%i to system pictures %i-%i",
-                             I_OUTPUTPICTURES - 1, 2 * VOUT_MAX_PICTURES - 2,
-                             I_OUTPUTPICTURES, 2 * VOUT_MAX_PICTURES - 1 );
-        }
-        else
-        {
-            /* FIXME: if this happens, we don't have any render picture left */
-            intf_WarnMsg( 2, "vout info: indirect render, no system "
-                             "pictures needed, we have %i directbuffers",
-                             I_OUTPUTPICTURES );
-            intf_ErrMsg( "vout: this is a bug!\n");
-        }
+        intf_WarnMsg( 2, "vout info: indirect render, mapping "
+                         "render pictures 0-%i to system pictures %i-%i",
+                         VOUT_MAX_PICTURES - 1, I_OUTPUTPICTURES,
+                         I_OUTPUTPICTURES + VOUT_MAX_PICTURES - 1 );
 
         /* Append render buffers after the direct buffers */
         for( i = I_OUTPUTPICTURES; i < 2 * VOUT_MAX_PICTURES; i++ )
         {
             PP_RENDERPICTURE[ I_RENDERPICTURES ] = &p_vout->p_picture[ i ];
             I_RENDERPICTURES++;
+
+            /* Check if we have enough render pictures */
+            if( I_RENDERPICTURES == VOUT_MAX_PICTURES )
+                break;
         }
     }
 
