@@ -74,9 +74,6 @@ AC_TYPE_SIGNAL
 AC_CHECK_LIB(dl,dlopen,LIB="${LIB} -ldl")
 AC_CHECK_LIB(m,pow,LIB_YUV="${LIB_YUV} -lm")
 
-CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
-CFLAGS="${CFLAGS} -I/usr/local/include"
-
 dnl Check for pthreads - borrowed from XMMS
 THREAD_LIB=error
 if test "x${THREAD_LIB}" = xerror; then

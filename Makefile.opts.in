@@ -167,7 +167,7 @@ DEFINE += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98
 # C headers directories
 #
 INCLUDE += @INCLUDE@
-INCLUDE += -Iinclude -Iextras -I/usr/local/include
+INCLUDE += -Iinclude -Iextras
 
 #
 # Libraries needed by built-in modules
