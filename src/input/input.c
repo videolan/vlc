@@ -891,7 +891,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                         p_pes->i_pts += p_pcr->delta_clock;
                         if( p_pcr->c_pts == 0 )
                         {
-                            p_pcr->delta_decode = mdate() - p_pes->i_pts + 500000;
+                            p_pcr->delta_decode = (s64)mdate() - p_pes->i_pts + 500000;
                         }
                         p_pes->i_pts += p_pcr->delta_decode;
                     }

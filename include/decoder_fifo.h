@@ -41,8 +41,10 @@ typedef struct
 
 } decoder_fifo_t;
 
-/****************************************************************************** * bit_fifo_t : bit fifo descriptor
- ****************************************************************************** * This type describes a bit fifo used to store bits while working with the
+/******************************************************************************
+ * bit_fifo_t : bit fifo descriptor
+ ******************************************************************************
+ * This type describes a bit fifo used to store bits while working with the
  * input stream at the bit level.
  ******************************************************************************/
 typedef struct bit_fifo_s
@@ -57,8 +59,10 @@ typedef struct bit_fifo_s
 
 } bit_fifo_t;
 
-/****************************************************************************** * bit_stream_t : bit stream descriptor
- ****************************************************************************** * This type, based on a PES stream, includes all the structures needed to
+/******************************************************************************
+ * bit_stream_t : bit stream descriptor
+ ******************************************************************************
+ * This type, based on a PES stream, includes all the structures needed to
  * handle the input stream like a bit stream.
  ******************************************************************************/
 typedef struct bit_stream_s
@@ -148,9 +152,11 @@ static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
     }
 }
 
-/****************************************************************************** * NeedBits : reads i_bits new bits in the bit stream and stores them in the
+/******************************************************************************
+ * NeedBits : reads i_bits new bits in the bit stream and stores them in the
  *            bit buffer
- ****************************************************************************** * - i_bits must be less or equal 32 !
+ ******************************************************************************
+ * - i_bits must be less or equal 32 !
  * - There is something important to notice with that function : if the number
  * of bits available in the bit buffer when calling NeedBits() is greater than
  * 24 (i_available > 24) but less than the number of needed bits
@@ -167,8 +173,10 @@ static __inline__ void NeedBits( bit_stream_t * p_bit_stream, int i_bits )
     }
 }
 
-/****************************************************************************** * DumpBits : removes i_bits bits from the bit buffer
- ****************************************************************************** * - i_bits <= i_available
+/******************************************************************************
+ * DumpBits : removes i_bits bits from the bit buffer
+ ******************************************************************************
+ * - i_bits <= i_available
  * - i_bits < 32 (because (u32 << 32) <=> (u32 = u32))
  ******************************************************************************/
 static __inline__ void DumpBits( bit_stream_t * p_bit_stream, int i_bits )
@@ -176,4 +184,3 @@ static __inline__ void DumpBits( bit_stream_t * p_bit_stream, int i_bits )
     p_bit_stream->fifo.buffer <<= i_bits;
     p_bit_stream->fifo.i_available -= i_bits;
 }
-

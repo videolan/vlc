@@ -60,7 +60,7 @@ typedef struct
     boolean_t               b_data_alignment;  /* used to find the beginning of a
                                                 * video or audio unit          */
     boolean_t               b_has_pts;         /* is the following field set ? */
-    u32                     i_pts;   /* the PTS for this packet (if set above) */
+    s64                     i_pts;   /* the PTS for this packet (if set above) */
     boolean_t               b_random_access;
               /* if TRUE, in the payload of this packet, there is the first byte 
                * of a video sequence header, or the first byte of an audio frame.
