@@ -2,7 +2,7 @@
  * aout_macosx.c : CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.c,v 1.19 2002/05/01 22:32:27 massiot Exp $
+ * $Id: aout_macosx.c,v 1.20 2002/05/04 13:48:31 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -334,18 +334,12 @@ static OSStatus CAIOCallback( AudioDeviceID inDevice,
     intf_Msg( "%lld", AudioConvertHostTimeToNanos(host_time.mHostTime) / 1000 + p_aout->p_sys->clock_diff - p_aout->date );
 #endif
 
-    /* see aout_Play below */
-    vlc_mutex_lock( &p_sys->mutex_lock );
-    vlc_cond_signal( &p_sys->cond_sync );
-    
     /* move data into output data buffer */
     if( p_sys->b_buffer_data )
     {
         BlockMoveData( p_sys->p_buffer,
                        outOutputData->mBuffers[ 0 ].mData, 
                        p_sys->ui_buffer_size );
-
-        p_sys->b_buffer_data = 0;
     }
     else
     {
@@ -353,6 +347,10 @@ static OSStatus CAIOCallback( AudioDeviceID inDevice,
         intf_WarnMsg(1, "aout warning: audio output is starving, expect glitches");
     }
 
+    /* see aout_Play below */
+    vlc_mutex_lock( &p_sys->mutex_lock );
+    p_sys->b_buffer_data = 0;
+    vlc_cond_signal( &p_sys->cond_sync );
     vlc_mutex_unlock( &p_sys->mutex_lock );
 
     return( noErr );     
@@ -365,6 +363,17 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     OSStatus err;
     UInt32 ui_buffer_size = p_aout->p_sys->ui_buffer_size;
+
+    /* 
+     * wait for a callback to occur (to flush the buffer), so aout_Play
+     * can't be called twice, losing the data we just wrote. 
+     */
+    vlc_mutex_lock( &p_aout->p_sys->mutex_lock );
+    if ( p_aout->p_sys->b_buffer_data )
+    {
+        vlc_cond_wait( &p_aout->p_sys->cond_sync, &p_aout->p_sys->mutex_lock );
+    }
+    vlc_mutex_unlock( &p_aout->p_sys->mutex_lock );
 
     err = AudioConverterConvertBuffer( p_aout->p_sys->s_converter,
                                        i_size, buffer,
@@ -379,14 +388,6 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
     {
         p_aout->p_sys->b_buffer_data = 1;
     }
-
-    /* 
-     * wait for a callback to occur (to flush the buffer), so aout_Play
-     * can't be called twice, losing the data we just wrote. 
-     */
-    vlc_mutex_lock( &p_aout->p_sys->mutex_lock );
-    vlc_cond_wait( &p_aout->p_sys->cond_sync, &p_aout->p_sys->mutex_lock );
-    vlc_mutex_unlock( &p_aout->p_sys->mutex_lock );
 }
 
 /*****************************************************************************
@@ -429,7 +430,7 @@ static int CABeginFormat( aout_thread_t *p_aout )
                                   kAudioDevicePropertyBufferSize, 
                                   ui_param_size,
                                   &p_aout->p_sys->ui_buffer_size );
-    p_aout->i_latency = p_aout->p_sys->ui_buffer_size;
+    p_aout->i_latency = p_aout->p_sys->ui_buffer_size / 2;
 
     if( err != noErr )
     {
