@@ -186,8 +186,10 @@ typedef struct
     es_format_t  fmt;
     es_out_id_t *id;
     block_t     *p_pes;
+    block_t     **pp_last;
 
     es_mpeg4_descriptor_t *p_mpeg4desc;
+    int         b_gather;
 } ts_es_t;
 
 typedef struct
@@ -790,7 +792,9 @@ static void PIDInit( ts_pid_t *pid, vlc_bool_t b_psi, ts_psi_t *p_owner )
         es_format_Init( &pid->es->fmt, UNKNOWN_ES, 0 );
         pid->es->id      = NULL;
         pid->es->p_pes   = NULL;
+        pid->es->pp_last = &pid->es->p_pes;
         pid->es->p_mpeg4desc = NULL;
+        pid->es->b_gather = VLC_FALSE;
     }
 }
 
@@ -857,6 +861,7 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
 
     /* remove the pes from pid */
     pid->es->p_pes = NULL;
+    pid->es->pp_last = &pid->es->p_pes;
 
     /* FIXME find real max size */
     i_max = block_ChainExtract( p_pes, header, 30 );
@@ -1003,9 +1008,16 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
             p_pes->i_pts = i_pts * 100 / 9;
         }
 
-        /* For mpeg4/mscodec we first gather the packet.
-         * This will make ffmpeg a lot happier */
-        p_block = block_ChainGather( p_pes );
+        if( pid->es->b_gather )
+        {
+            /* For mpeg4/mscodec we first gather the packet.
+             * This will make ffmpeg a lot happier */
+            p_block = block_ChainGather( p_pes );
+        }
+        else
+        {
+            p_block = p_pes;
+        }
 
         for( i = 0; i < pid->i_extra_es; i++ )
         {
@@ -1154,7 +1166,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
                 i_ret = VLC_TRUE;
             }
 
-            pid->es->p_pes = p_bk;
+            block_ChainLastAppend( &pid->es->pp_last, p_bk );
         }
         else
         {
@@ -1167,7 +1179,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
             {
                 /* TODO check if when have gathered enough packets to form a
                  * PES (ie read PES size)*/
-                block_ChainAppend( &pid->es->p_pes, p_bk );
+                block_ChainLastAppend( &pid->es->pp_last, p_bk );
             }
         }
     }
@@ -1196,6 +1208,7 @@ static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
             break;
         case 0x10:  /* MPEG4 (video) */
             es_format_Init( fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', '4', 'v' ) );
+            pid->es->b_gather = VLC_TRUE;
             break;
         case 0x1B:  /* H264 <- check transport syntax/needed descriptor */
             es_format_Init( fmt, VIDEO_ES, VLC_FOURCC( 'h', '2', '6', '4' ) );
@@ -1230,8 +1243,12 @@ static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
             es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 's', 'd', 'd', 'b' ) );
             break;
 
-        case 0x06:  /* PES_PRIVATE  (fixed later) */
         case 0xa0:  /* MSCODEC vlc (video) (fixed later) */
+            es_format_Init( fmt, UNKNOWN_ES, 0 );
+            pid->es->b_gather = VLC_TRUE;
+            break;
+
+        case 0x06:  /* PES_PRIVATE  (fixed later) */
         default:
             es_format_Init( fmt, UNKNOWN_ES, 0 );
             break;
@@ -1849,6 +1866,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                         p_es->fmt = pid->es->fmt;
                         p_es->id = NULL;
                         p_es->p_pes = NULL;
+                        p_es->pp_last = &p_es->p_pes;
                         p_es->p_mpeg4desc = NULL;
 
                         p_es->fmt.psz_language = malloc( 4 );

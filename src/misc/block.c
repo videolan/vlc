@@ -239,7 +239,6 @@ block_t *__block_New( vlc_object_t *p_obj, int i_size )
 
 void block_ChainAppend( block_t **pp_list, block_t *p_block )
 {
-
     if( *pp_list == NULL )
     {
         *pp_list = p_block;
@@ -254,6 +253,18 @@ void block_ChainAppend( block_t **pp_list, block_t *p_block )
         }
         p->p_next = p_block;
     }
+}
+
+void block_ChainLastAppend( block_t ***ppp_last, block_t *p_block  )
+{
+    block_t *p_last = p_block;
+
+    /* Append the block */
+    **ppp_last = p_block;
+
+    /* Update last pointer */
+    while( p_last->p_next ) p_last = p_last->p_next;
+    *ppp_last = &p_last->p_next;
 }
 
 void block_ChainRelease( block_t *p_block )

@@ -112,6 +112,7 @@ static inline block_t *block_Realloc( block_t *p_block, int i_pre, int i_body )
     return p_block->pf_realloc( p_block, i_pre, i_body );
 }
 VLC_EXPORT( void,       block_ChainAppend,  ( block_t **, block_t * ) );
+VLC_EXPORT( void,       block_ChainLastAppend,  ( block_t ***ppp_last, block_t * ) );
 VLC_EXPORT( void,       block_ChainRelease, ( block_t * ) );
 VLC_EXPORT( int,        block_ChainExtract, ( block_t *, void *, int ) );
 VLC_EXPORT( block_t *,  block_ChainGather,  ( block_t * ) );

@@ -82,6 +82,8 @@ struct decoder_sys_t
 
     /* Current frame being built */
     block_t    *p_frame;
+    block_t    **pp_last;
+
     vlc_bool_t b_frame_slice;
     mtime_t i_pts;
     mtime_t i_dts;
@@ -147,6 +149,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_seq = NULL;
     p_sys->p_ext = NULL;
     p_sys->p_frame = NULL;
+    p_sys->pp_last = &p_sys->p_frame;
     p_sys->b_frame_slice = VLC_FALSE;
 
     p_sys->i_dts = p_sys->i_pts = 0;
@@ -216,6 +219,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_state = STATE_NOSYNC;
         if( p_sys->p_frame ) block_ChainRelease( p_sys->p_frame );
         p_sys->p_frame = NULL;
+        p_sys->pp_last = &p_sys->p_frame;
         p_sys->b_frame_slice = VLC_FALSE;
         block_Release( *pp_block );
         return NULL;
@@ -332,6 +336,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         msg_Dbg( p_dec, "waiting for sequence start" );
         if( p_sys->p_frame ) block_ChainRelease( p_sys->p_frame );
         p_sys->p_frame = NULL;
+        p_sys->pp_last = &p_sys->p_frame;
         p_sys->b_frame_slice = VLC_FALSE;
 
     }
@@ -440,6 +445,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
         /* Reset context */
         p_sys->p_frame = NULL;
+        p_sys->pp_last = &p_sys->p_frame;
         p_sys->b_frame_slice = VLC_FALSE;
     }
 
@@ -453,12 +459,10 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             p_sys->i_seq_old > p_sys->i_frame_rate/p_sys->i_frame_rate_base )
         {
             /* Usefull for mpeg1: repeat sequence header every second */
-            block_ChainAppend( &p_sys->p_frame,
-                               block_Duplicate( p_sys->p_seq ) );
+            block_ChainLastAppend( &p_sys->pp_last, block_Duplicate( p_sys->p_seq ) );
             if( p_sys->p_ext )
             {
-                block_ChainAppend( &p_sys->p_frame,
-                                   block_Duplicate( p_sys->p_ext ) );
+                block_ChainLastAppend( &p_sys->pp_last, block_Duplicate( p_sys->p_ext ) );
             }
 
             p_sys->i_seq_old = 0;
@@ -572,7 +576,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
     }
 
     /* Append the block */
-    block_ChainAppend( &p_sys->p_frame, p_frag );
+    block_ChainLastAppend( &p_sys->pp_last, p_frag );
 
     return p_pic;
 }
