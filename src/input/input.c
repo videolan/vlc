@@ -608,11 +608,17 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
     int i_es_out_mode;
     int i, i_delay;
 
-    /* Initialize optional stream output. (before access/demuxer) */
+    /* Initialize optional stream output. (before access/demuxer)
+     * XXX: we add a special case if the uri starts by vlc.
+     * else 'vlc in.file --sout "" vlc:quit'  cannot work (the output will
+     * be destroyed in case of a file).
+     * (this will break playing of file starting by 'vlc:' but I don't
+     * want to add more logic, just force file by file:// or code it ;)
+     */
     if( !b_quick )
     {
         psz = var_GetString( p_input, "sout" );
-        if( *psz )
+        if( *psz && strncasecmp( p_input->input.p_item->psz_uri, "vlc:", 4 ) )
         {
             p_input->p_sout = sout_NewInstance( p_input, psz );
             if( p_input->p_sout == NULL )
@@ -1499,16 +1505,17 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             {
                 demux_t *p_demux = p_input->input.p_demux;
                 int i_seekpoint;
-                mtime_t i_input_time;
-                mtime_t i_seekpoint_time; 
+                int64_t i_input_time;
+                int64_t i_seekpoint_time;
 
                 if( i_type == INPUT_CONTROL_SET_SEEKPOINT_PREV )
                 {
                     i_seekpoint = p_demux->info.i_seekpoint;
                     i_seekpoint_time = p_input->input.title[p_demux->info.i_title]->seekpoint[i_seekpoint]->i_time_offset;
-                    if ( i_seekpoint_time != -1 )
+                    if( i_seekpoint_time >= 0 &&
+                         !demux2_Control( p_demux,
+                                          DEMUX_GET_TIME, &i_input_time ) )
                     {
-                        demux2_Control( p_demux, INPUT_GET_TIME, &i_input_time );
                         if ( i_input_time < i_seekpoint_time + 3000000 )
                             i_seekpoint--;
                     }
@@ -1531,18 +1538,20 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             }
             else if( p_input->input.i_title > 0 )
             {
+                demux_t *p_demux = p_input->input.p_demux;
                 access_t *p_access = p_input->input.p_access;
                 int i_seekpoint;
-                mtime_t i_input_time;
-                mtime_t i_seekpoint_time; 
+                int64_t i_input_time;
+                int64_t i_seekpoint_time;
 
                 if( i_type == INPUT_CONTROL_SET_SEEKPOINT_PREV )
                 {
                     i_seekpoint = p_access->info.i_seekpoint;
                     i_seekpoint_time = p_input->input.title[p_access->info.i_title]->seekpoint[i_seekpoint]->i_time_offset;
-                    if ( i_seekpoint_time != -1 )
+                    if( i_seekpoint_time >= 0 &&
+                        demux2_Control( p_demux,
+                                        DEMUX_GET_TIME, &i_input_time ) )
                     {
-                        access2_Control( p_access, INPUT_GET_TIME, &i_input_time );
                         if ( i_input_time < i_seekpoint_time + 3000000 )
                             i_seekpoint--;
                     }
