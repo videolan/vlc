@@ -9,3 +9,4 @@ GtkWidget* create_intf_fileopen (void);
 GtkWidget* create_intf_modules (void);
 GtkWidget* create_intf_playlist (void);
 GtkWidget* create_intf_disc (void);
+GtkWidget* create_intf_network (void);

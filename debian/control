@@ -26,6 +26,8 @@ Description: Gnome plugin for the VideoLAN Client
 Package: vlc-gtk
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Replaces: vlc-gnome (<= 0.2.63-2)
+Conflicts: vlc-gnome (<= 0.2.63-2)
 Description: Gtk+ plugin for the VideoLAN Client
  VideoLAN is a free MPEG, MPEG2 and DVD software solution.
  .
@@ -73,3 +75,19 @@ Description: Glide plugin for the VideoLAN Client
  VideoLAN is a free MPEG, MPEG2 and DVD software solution.
  .
  This is a Glide (3dfx) plugin for the VideoLAN Client.
+
+Package: vlc-qt
+Architecture: any
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Description: Qt plugin for the VideoLAN Client
+ VideoLAN is a free MPEG, MPEG2 and DVD software solution.
+ .
+ This plugin adds a Qt interface to the VideoLAN Client.
+
+Package: vlc-kde
+Architecture: any
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Description: KDE plugin for the VideoLAN Client
+ VideoLAN is a free MPEG, MPEG2 and DVD software solution.
+ .
+ This plugin adds a KDE interface to the VideoLAN Client.

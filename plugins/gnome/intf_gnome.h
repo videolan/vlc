@@ -1,8 +1,8 @@
 /*****************************************************************************
- * gtk_sys.h: private Gtk+ interface description
+ * intf_gnome.h: private Gnome interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_sys.h,v 1.5 2001/03/09 19:38:47 octplane Exp $
+ * $Id: intf_gnome.h,v 1.3 2001/03/15 01:42:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,39 +28,18 @@
 #define DROP_ACCEPT_TEXT_PLAIN     1
 
 /*****************************************************************************
- * useful inline function
- ****************************************************************************/
-static __inline__ intf_thread_t * GetIntf( GtkWidget *item, char * psz_parent )
-{
-    return( gtk_object_get_data( GTK_OBJECT( lookup_widget(item, psz_parent) ),
-                                                     "p_intf" ) );
-}
-
-
-
-
-/*****************************************************************************
- * intf_sys_t: description and status of Gtk+ interface
+ * intf_sys_t: description and status of Gnome interface
  *****************************************************************************/
 typedef struct intf_sys_s
 {
     /* special actions */
-    vlc_mutex_t         change_lock;                      /* the change lock */
-
     boolean_t           b_popup_changed;                   /* display menu ? */
     boolean_t           b_window_changed;        /* window display toggled ? */
     boolean_t           b_playlist_changed;    /* playlist display toggled ? */
-    boolean_t           b_menus_update;              /* menus have changed ? */
-    boolean_t           b_scale_isfree;       /* user isn't dragging scale ? */
+    boolean_t           b_slider_free;                      /* slider status */
+    boolean_t           b_menus_update;
 
-    /* intf_Manage callback timeout */
-    int                 i_timeout;
-    int                 i_list_timeout;
-
-    /* Playlist selected item */
-    int                 i_playing;
-
-    /* windows and widgets */
+    /* Windows and widgets */
     GtkWidget *         p_window;                             /* main window */
     GtkWidget *         p_popup;                               /* popup menu */
     GtkWidget *         p_playlist;                              /* playlist */
@@ -68,8 +47,17 @@ typedef struct intf_sys_s
     GtkWidget *         p_about;                             /* about window */
     GtkWidget *         p_fileopen;                      /* file open window */
     GtkWidget *         p_disc;                     /* disc selection window */
+    GtkWidget *         p_network;                  /* network stream window */
 
-    /* XXX: ugly kludge */
+    /* The slider */
+    GtkAdjustment *     p_adj;                   /* slider adjustment object */
+    float               f_adj_oldvalue;                    /* previous value */
+
+    /* The window labels */
+    GtkLabel *          p_label_date;
+    GtkLabel *          p_label_status;
+
+    /* XXX: Ugly kludge, see intf_gnome.c */
     void             ( *pf_gtk_callback ) ( void );
     void             ( *pf_gdk_callback ) ( void );
 

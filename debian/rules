@@ -18,13 +18,13 @@ build-stamp:
 		--infodir=\$${prefix}/share/info \
 		--enable-gnome --enable-gtk --enable-fb --with-glide \
 		--with-ggi --with-sdl --enable-esd --enable-alsa \
-		--disable-ppro ; \
+		--with-qt --with-kde --disable-ppro ; \
 	else \
 	./configure --prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
 		--enable-gnome --enable-gtk --enable-fb --with-ggi \
-		--with-sdl --enable-esd --enable-alsa; \
+		--with-qt --with-kde --with-sdl --enable-esd --enable-alsa; \
 	fi
 
 	$(MAKE)
@@ -49,7 +49,12 @@ install: build
 	DESTDIR=`pwd`/debian/vlc/ $(MAKE) install prefix=/usr
 
 	# make symlinks for packages
-	for alias in ggi gtk gnome glide esd sdl alsa ; do \
+	if [ $(DEB_BUILD_ARCH) = i386 ]; then \
+		$$aliases="ggi gtk gnome glide esd sdl alsa qt kde" ; \
+	else \
+		$$aliases="ggi gtk gnome esd sdl alsa qt kde" ; \
+	fi ; \
+	for alias `echo $$aliases` ; do \
 		mkdir -p debian/vlc-$$alias/usr/share/doc/ ; \
 		ln -s vlc debian/vlc-$$alias/usr/share/doc/vlc-$$alias ; \
 		mkdir -p debian/vlc-$$alias/usr/lib/videolan/vlc/ ; \
@@ -59,12 +64,22 @@ install: build
 
 	mkdir -p debian/vlc-gtk/usr/bin/
 	mv debian/vlc/usr/bin/gvlc debian/vlc-gtk/usr/bin/
+	mkdir -p debian/vlc-kde/usr/bin/
+	mv debian/vlc/usr/bin/kvlc debian/vlc-kde/usr/bin/
+	mkdir -p debian/vlc-qt/usr/bin/
+	mv debian/vlc/usr/bin/qvlc debian/vlc-qt/usr/bin/
+
 	mkdir -p debian/vlc-gtk/usr/share/videolan/
 	mv debian/vlc/usr/share/videolan/gvlc.png \
 		debian/vlc/usr/share/videolan/gvlc.xpm \
 			debian/vlc-gtk/usr/share/videolan/
+
 	mkdir -p debian/vlc-gtk/usr/share/man/man1/
 	ln -s vlc.1.gz debian/vlc-gtk/usr/share/man/man1/gvlc.1.gz
+	mkdir -p debian/vlc-kde/usr/share/man/man1/
+	ln -s vlc.1.gz debian/vlc-kde/usr/share/man/man1/kvlc.1.gz
+	mkdir -p debian/vlc-qt/usr/share/man/man1/
+	ln -s vlc.1.gz debian/vlc-qt/usr/share/man/man1/qvlc.1.gz
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -83,10 +98,10 @@ binary-arch: build install
 #	dh_installpam
 #	dh_installinit
 	dh_installcron
-	dh_installmanpages -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa
+	dh_installmanpages -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa -Nvlc-qt -Nvlc-kde doc/vlc.1
 	dh_installinfo
 #	dh_undocumented
-	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa
+	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa -Nvlc-qt -Nvlc-kde
 	dh_link
 	dh_strip
 	dh_compress

@@ -46,7 +46,7 @@
 #include "intf_msg.h"
 #include "interface.h"
 #include "intf_cmd.h"
-#include "intf_plst.h"
+#include "intf_playlist.h"
 #include "intf_channels.h"
 #include "keystrokes.h"
 
@@ -155,7 +155,7 @@ static void intf_Manage( intf_thread_t *p_intf )
     if( p_intf->p_input == NULL && !p_intf->b_die )
     {
         /* Select the next playlist item */
-        intf_PlstNext( p_main->p_playlist );
+        intf_PlaylistNext( p_main->p_playlist );
 
         if( p_main->p_playlist->i_index == -1 )
         {

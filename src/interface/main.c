@@ -50,7 +50,7 @@
 #include "input_ext-intf.h"
 
 #include "intf_msg.h"
-#include "intf_plst.h"
+#include "intf_playlist.h"
 #include "interface.h"
 
 #include "audio_output.h"
@@ -88,13 +88,10 @@
 #define OPT_PORT                172
 #define OPT_BROADCAST           173
 
-#define OPT_AOUT                180
-#define OPT_VOUT                181
-#define OPT_INTF                182
-#define OPT_MOTION              183
-#define OPT_IDCT                184
-#define OPT_YUV                 185
-#define OPT_INPUT               186
+#define OPT_INPUT               180
+#define OPT_MOTION              181
+#define OPT_IDCT                182
+#define OPT_YUV                 183
 
 #define OPT_SYNCHRO             190
 #define OPT_WARNING             191
@@ -116,18 +113,18 @@ static const struct option longopts[] =
     {   "version",          0,          0,      'v' },
 
     /* Interface options */
-    {   "intf",             1,          0,      OPT_INTF },
+    {   "intf",             1,          0,      'I' },
     {   "warning",          1,          0,      OPT_WARNING },
 
     /* Audio options */
     {   "noaudio",          0,          0,      OPT_NOAUDIO },
-    {   "aout",             1,          0,      OPT_AOUT },
+    {   "aout",             1,          0,      'A' },
     {   "stereo",           0,          0,      OPT_STEREO },
     {   "mono",             0,          0,      OPT_MONO },
 
     /* Video options */
     {   "novideo",          0,          0,      OPT_NOVIDEO },
-    {   "vout",             1,          0,      OPT_VOUT },
+    {   "vout",             1,          0,      'V' },
     {   "display",          1,          0,      OPT_DISPLAY },
     {   "width",            1,          0,      OPT_WIDTH },
     {   "height",           1,          0,      OPT_HEIGHT },
@@ -159,7 +156,7 @@ static const struct option longopts[] =
 };
 
 /* Short options */
-static const char *psz_shortopts = "hHvgt:T:a:s:c:";
+static const char *psz_shortopts = "hHvgt:T:a:s:c:I:A:V:";
 #endif
 
 
@@ -256,14 +253,14 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Initialize playlist and get commandline files
      */
-    p_main->p_playlist = intf_PlstCreate( );
+    p_main->p_playlist = intf_PlaylistCreate( );
     if( !p_main->p_playlist )
     {
         intf_ErrMsg( "playlist error: playlist initialization failed" );
         intf_MsgDestroy();
         return( errno );
     }
-    intf_PlstInit( p_main->p_playlist );
+    intf_PlaylistInit( p_main->p_playlist );
 
     /*
      * Get input filenames given as commandline arguments
@@ -277,7 +274,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     if( !p_main->p_bank )
     {
         intf_ErrMsg( "module error: module bank initialization failed" );
-        intf_PlstDestroy( p_main->p_playlist );
+        intf_PlaylistDestroy( p_main->p_playlist );
         intf_MsgDestroy();
         return( errno );
     }
@@ -305,7 +302,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     {
         intf_ErrMsg( "intf error: interface initialization failed" );
         module_DestroyBank( p_main->p_bank );
-        intf_PlstDestroy( p_main->p_playlist );
+        intf_PlaylistDestroy( p_main->p_playlist );
         intf_MsgDestroy();
         return( errno );
     }
@@ -390,7 +387,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Free playlist
      */
-    intf_PlstDestroy( p_main->p_playlist );
+    intf_PlaylistDestroy( p_main->p_playlist );
 
 #ifdef SYS_BEOS
     /*
@@ -566,7 +563,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
 
         /* Interface warning messages level */
-        case OPT_INTF:                                             /* --intf */
+	case 'I':                                              /* -I, --intf */
             main_PutPszVariable( INTF_METHOD_VAR, optarg );
             break;
         case OPT_WARNING:                                       /* --warning */
@@ -577,7 +574,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_NOAUDIO:                                       /* --noaudio */
             p_main->b_audio = 0;
             break;
-        case OPT_AOUT:                                             /* --aout */
+        case 'A':                                              /* -A, --aout */
             main_PutPszVariable( AOUT_METHOD_VAR, optarg );
             break;
         case OPT_STEREO:                                         /* --stereo */
@@ -591,7 +588,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_NOVIDEO:                                       /* --novideo */
             p_main->b_video = 0;
             break;
-        case OPT_VOUT:                                             /* --vout */
+        case 'V':                                              /* -V, --vout */
             main_PutPszVariable( VOUT_METHOD_VAR, optarg );
             break;
         case OPT_DISPLAY:                                       /* --display */
@@ -696,7 +693,8 @@ static int GetFilenames( int i_argc, char *ppsz_argv[] )
     /* We assume that the remaining parameters are filenames */
     for( i_opt = optind; i_opt < i_argc; i_opt++ )
     {
-        intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, ppsz_argv[ i_opt ] );
+        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END,
+                          ppsz_argv[ i_opt ] );
     }
 
     return( 0 );
@@ -722,15 +720,15 @@ static void Usage( int i_fashion )
 
     /* Options */
     intf_MsgImm( "\nOptions:"
-          "\n      --intf <module>            \tinterface method"
+          "\n  -I, --intf <module>            \tinterface method"
           "\n      --warning <level>          \tdisplay warning messages"
           "\n"
           "\n      --noaudio                  \tdisable audio"
-          "\n      --aout <module>            \taudio output method"
+          "\n  -A, --aout <module>            \taudio output method"
           "\n      --stereo, --mono           \tstereo/mono audio"
           "\n"
           "\n      --novideo                  \tdisable video"
-          "\n      --vout <module>            \tvideo output method"
+          "\n  -V, --vout <module>            \tvideo output method"
           "\n      --display <display>        \tdisplay string"
           "\n      --width <w>, --height <h>  \tdisplay dimensions"
           "\n  -g, --grayscale                \tgrayscale output"

@@ -1,3 +1,9 @@
+vlc (0.2.63-3) unstable; urgency=low
+
+  * Added versioned conflicts/replaces to vlc-gtk (Closes: #88796).
+
+ -- Samuel Hocevar <sam@zoy.org>  Wed,  7 Mar 2001 20:47:48 +0100
+
 vlc (0.2.63-2) unstable; urgency=low
 
   * Glide shouldn't cause any non-x86 problems anymore (Closes: #88583).

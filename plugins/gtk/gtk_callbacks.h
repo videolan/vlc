@@ -52,14 +52,8 @@ void
 on_toolbar_next_clicked                (GtkButton       *button,
                                         gpointer         user_data);
 
-gboolean
-on_hscale_button_release_event         (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data);
-
-gboolean
-on_hscale_button_press_event           (GtkWidget       *widget,
-                                        GdkEventButton  *event,
+void
+on_toolbar_network_clicked             (GtkButton       *button,
                                         gpointer         user_data);
 
 void
@@ -283,4 +277,34 @@ on_playlist_clist_drag_motion          (GtkWidget       *widget,
                                         gint             x,
                                         gint             y,
                                         guint            time,
+                                        gpointer         user_data);
+
+void
+on_intf_network_destroy                (GtkObject       *object,
+                                        gpointer         user_data);
+
+void
+on_network_ok_clicked                  (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_network_cancel_clicked              (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_menubar_network_activate            (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_network_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+gboolean
+on_slider_button_release_event         (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+gboolean
+on_slider_button_press_event           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
                                         gpointer         user_data);

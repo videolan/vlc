@@ -177,7 +177,7 @@ char * input_OffsetToTime( input_thread_t * p_input, char * psz_buffer,
     else
     {
         /* Divide by zero is not my friend. */
-        sprintf( psz_buffer, "NA" );
+        sprintf( psz_buffer, "-:--:--" );
         return( psz_buffer );
     }
 }

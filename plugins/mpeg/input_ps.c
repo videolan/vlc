@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.10 2001/03/02 15:51:22 massiot Exp $
+ * $Id: input_ps.c,v 1.11 2001/03/15 01:42:20 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -371,7 +371,7 @@ static int PSRead( input_thread_t * p_input,
                 /* It is common for MPEG-1 streams to pad with zeros
                  * (although it is forbidden by the recommendation), so
                  * don't bother everybody in this case. */
-                intf_WarnMsg( 1, "Garbage at input (%x)", i_startcode );
+                intf_WarnMsg( 1, "Garbage at input (%.8x)", i_startcode );
             }
 
             while( (i_startcode & 0xFFFFFF00) != 0x100L )

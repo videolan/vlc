@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.44 2001/03/15 00:37:04 stef Exp $
+ * $Id: mpeg_system.c,v 1.45 2001/03/15 01:42:20 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -877,7 +877,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
         default:
             /* This should not happen */
             b_trash = 1;
-            intf_WarnMsg( 1, "Unwanted packet received with start code %x",
+            intf_WarnMsg( 1, "Unwanted packet received with start code 0x%.8x",
                           i_code );
         }
     }

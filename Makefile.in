@@ -190,7 +190,7 @@ INTERFACE =	src/interface/main.o \
 		src/interface/intf_msg.o \
 		src/interface/intf_cmd.o \
 		src/interface/intf_ctrl.o \
-		src/interface/intf_plst.o \
+		src/interface/intf_playlist.o \
 		src/interface/intf_channels.o \
 		src/interface/intf_console.o \
 		src/interface/intf_urldecode.o \
@@ -334,9 +334,11 @@ PLUGIN_GNOME =	plugins/gnome/gnome.o \
 		plugins/gnome/gnome_interface.o \
 		plugins/gnome/gnome_support.o
 
+PLUGIN_QT =	plugins/qt/qt.o \
+		plugins/qt/intf_qt.o
+
 PLUGIN_KDE =	plugins/kde/kde.o \
-		plugins/kde/intf_kde.o \
-		plugins/kde/kvlc.o
+		plugins/kde/intf_kde.o
 
 PLUGIN_IDCT =	plugins/idct/idct.o \
 		plugins/idct/idct_common.o
@@ -431,6 +433,7 @@ NONSTD_PLUGIN_OBJ = \
 
 NONSTD_CPP_PLUGIN_OBJ = \
 		$(PLUGIN_BEOS) \
+		$(PLUGIN_QT) \
 		$(PLUGIN_KDE)
 
 #
@@ -456,7 +459,7 @@ all: vlc @ALIASES@ plugins
 clean:
 	rm -f $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ)
 	rm -f plugins/*/*.o src/*/*.o lib/*.so
-	rm -f vlc kvlc gvlc
+	rm -f vlc gvlc kvlc qvlc
 
 distclean: clean
 	rm -f src/*/*.o plugins/*/*.o **/*~ *.log
@@ -494,7 +497,7 @@ show:
 snapshot:
 	rm -rf /tmp/vlc-@VLC_VERSION@* /tmp/vlc-@VLC_VERSION@nocss*
 	# copy archive in /tmp
-	find -type d | grep -v CVS | grep -v '^\.dep' | while read i ; \
+	find -type d | grep -v CVS | grep -v '\.dep' | while read i ; \
 		do mkdir -p /tmp/vlc-@VLC_VERSION@/$$i ; \
 	done
 	find debian -mindepth 1 -maxdepth 1 -type d | \
@@ -534,7 +537,7 @@ FORCE:
 # GTK/Gnome and Framebuffer aliases - don't add new aliases which could bloat
 # the namespace
 #
-gvlc kvlc: vlc
+gvlc kvlc qvlc: vlc
 	rm -f $@ && ln -s vlc $@
 
 
@@ -569,17 +572,24 @@ $(STD_PLUGIN_OBJ): %.o: %.c
 $(PLUGIN_GTK): %.o: Makefile.dep
 $(PLUGIN_GTK): %.o: .dep/%.d
 $(PLUGIN_GTK): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) `glib-config --cflags glib` `gtk-config --cflags gtk` -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) `gtk-config --cflags gtk` -c -o $@ $<
 
 $(PLUGIN_GNOME): %.o: Makefile.dep
 $(PLUGIN_GNOME): %.o: .dep/%.d
 $(PLUGIN_GNOME): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) `glib-config --cflags glib` `gnome-config --cflags gnomeui` -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) `gnome-config --cflags gtk gnomeui` -c -o $@ $<
 
 $(PLUGIN_GLIDE): %.o: Makefile.dep
 $(PLUGIN_GLIDE): %.o: .dep/%.d
 $(PLUGIN_GLIDE): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/glide -c -o $@ $<
+
+$(PLUGIN_QT): %.o: Makefile.dep
+$(PLUGIN_QT): %.o: .dep/%.dpp
+$(PLUGIN_QT): %.o: %.moc
+	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/qt -c -o $@ $(<:%.moc=%.cpp)
+$(PLUGIN_QT:%.o=%.moc): %.moc: %.cpp
+	moc -i $< -o $@
 
 $(PLUGIN_KDE): %.o: Makefile.dep
 $(PLUGIN_KDE): %.o: .dep/%.dpp
@@ -620,6 +630,9 @@ endif
 
 lib/dsp.so: $(PLUGIN_DSP)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
+
+lib/qt.so: $(PLUGIN_QT)
+	$(CC) $(PCFLAGS) -shared -o $@ $^ -lqt
 
 lib/kde.so: $(PLUGIN_KDE)
 	$(CC) $(PCFLAGS) -shared -o $@ $^ -lkdeui -lkdecore -lqt -ldl

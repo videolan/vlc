@@ -3,7 +3,7 @@
  * This header describes miscellanous utility functions shared between several
  * modules.
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
+ * Copyright (C) 1999, 2000, 2001 VideoLAN
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Henri Fallon <henri@videolan.org>
@@ -26,5 +26,6 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-int input_BuildLocalAddr( struct sockaddr_in *, int, boolean_t ); 
-int input_BuildRemoteAddr(struct sockaddr_in *, char * );
+int network_BuildLocalAddr ( struct sockaddr_in *, int, boolean_t ); 
+int network_BuildRemoteAddr( struct sockaddr_in *, char * );
+

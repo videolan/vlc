@@ -44,13 +44,13 @@
 #include "input_ext-intf.h"
 
 #include "interface.h"
-#include "intf_plst.h"
+#include "intf_playlist.h"
 #include "intf_msg.h"
 
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"
 #include "gtk_support.h"
-#include "gtk_sys.h"
+#include "intf_gtk.h"
 
 #include "main.h"
 
@@ -90,7 +90,9 @@ on_menubar_exit_activate               (GtkMenuItem     *menuitem,
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
 
+    vlc_mutex_lock( &p_intf->change_lock );
     p_intf->b_die = 1;
+    vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 void
@@ -187,8 +189,8 @@ on_toolbar_prev_clicked                (GtkButton       *button,
     if( p_intf->p_input != NULL )
     {
         /* FIXME: temporary hack */
-        intf_PlstPrev( p_main->p_playlist );
-        intf_PlstPrev( p_main->p_playlist );
+        intf_PlaylistPrev( p_main->p_playlist );
+        intf_PlaylistPrev( p_main->p_playlist );
         p_intf->p_input->b_eof = 1;
     }
 }
@@ -240,7 +242,9 @@ on_popup_exit_activate                 (GtkMenuItem     *menuitem,
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
 
+    vlc_mutex_lock( &p_intf->change_lock );
     p_intf->b_die = 1;
+    vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 void
@@ -254,7 +258,7 @@ on_fileopen_ok_clicked                 (GtkButton       *button,
     gtk_widget_hide (filesel);
     filename = gtk_file_selection_get_filename (GTK_FILE_SELECTION (filesel));
 
-    intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, (char*)filename );
+    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, (char*)filename );
 }
 
 
@@ -362,48 +366,6 @@ on_toolbar_fast_clicked                (GtkButton       *button,
 }
 
 
-gboolean
-on_hscale_button_release_event         (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), "intf_window" );
-
-    GtkAdjustment *p_adj = gtk_range_get_adjustment( GTK_RANGE(widget) );
-    off_t i_seek;
-
-    vlc_mutex_lock( &p_intf->p_sys->change_lock );
-
-    if( p_intf->p_input != NULL )
-    {
-        i_seek = (p_adj->value *
-                  p_intf->p_input->stream.p_selected_area->i_size) / 100;
-        input_Seek( p_intf->p_input, i_seek );
-    }
-    p_intf->p_sys->b_scale_isfree = 1;
-
-    vlc_mutex_unlock( &p_intf->p_sys->change_lock );
-
-    return FALSE;
-}
-
-
-gboolean
-on_hscale_button_press_event           (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), "intf_window" );
-
-    vlc_mutex_lock( &p_intf->p_sys->change_lock );
-    p_intf->p_sys->b_scale_isfree = 0;
-    vlc_mutex_unlock( &p_intf->p_sys->change_lock );
-
-    return FALSE;
-}
-
-
-
 void
 on_intf_modules_destroy                (GtkObject       *object,
                                         gpointer         user_data)
@@ -477,7 +439,7 @@ on_intf_window_drag_data_received      (GtkWidget       *widget,
         p_intf->p_input->b_eof = 1;
      }
      
-    intf_PlstJumpto( p_main->p_playlist, end-1 );
+    intf_PlaylistJumpto( p_main->p_playlist, end-1 );
 
 }
 
@@ -572,7 +534,7 @@ on_disc_ok_clicked                     (GtkButton       *button,
 
     /* Build source name and add it to playlist */
     sprintf( psz_source, "%s:%s", psz_method, psz_device );
-    intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
+    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
 
     gtk_widget_hide( p_intf->p_sys->p_disc );
 }
@@ -731,7 +693,11 @@ on_intf_window_destroy                 (GtkWidget       *widget,
                                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget),  "intf_window" );
+
+    vlc_mutex_lock( &p_intf->change_lock );
     p_intf->b_die = 1;
+    vlc_mutex_unlock( &p_intf->change_lock );
+
     return TRUE;
 }
 
@@ -764,7 +730,6 @@ on_playlist_clist_drag_motion          (GtkWidget       *widget,
     GtkCList * clist;
     gint row,col;
     int dummy;
-    gchar * text[2];
     GdkColor color;
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget),  "intf_playlist" );
    
@@ -804,5 +769,137 @@ on_playlist_clist_drag_motion          (GtkWidget       *widget,
     gtk_clist_thaw( clist );
     
     return TRUE;
+}
+
+
+void
+on_intf_network_destroy                (GtkObject       *object,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(object), "intf_network" );
+
+    p_intf->p_sys->p_network = NULL;
+}
+
+
+void
+on_network_ok_clicked                  (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_network" );
+    char *psz_source, *psz_server, *psz_protocol;
+    unsigned int i_port;
+
+    psz_server = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
+                                 GTK_WIDGET(button), "network_server" ) ) );
+
+    /* Check which protocol was activated */
+    if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
+                                          "network_ts" ) )->active )
+    {
+        psz_protocol = "ts";
+    }
+    else if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
+                                               "network_rtp" ) )->active )
+    {
+        psz_protocol = "rtp";
+    }
+    else
+    {
+        intf_ErrMsg( "intf error: unknown protocol toggle button position" );
+        return;
+    }
+
+    /* Get the port number and make sure it will not overflow 5 characters */
+    i_port = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON(
+                 lookup_widget( GTK_WIDGET(button), "network_port" ) ) );
+    if( i_port > 65535 )
+    {
+        intf_ErrMsg( "intf error: invalid port %i", i_port );
+    }
+
+    /* Allocate room for "protocol://server:port" */
+    psz_source = malloc( strlen( psz_protocol ) + strlen( psz_server ) + 10 );
+    if( psz_source == NULL )
+    {
+        return;
+    }
+   
+    /* Build source name and add it to playlist */
+    sprintf( psz_source, "%s://%s:%i", psz_protocol, psz_server, i_port );
+    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
+    free( psz_source );
+
+    gtk_widget_hide( p_intf->p_sys->p_network );
+}
+
+
+void
+on_network_cancel_clicked              (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
+}
+
+
+void
+on_menubar_network_activate            (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+
+    gtk_widget_show( p_intf->p_sys->p_network );
+    gdk_window_raise( p_intf->p_sys->p_network->window );
+}
+
+
+void
+on_popup_network_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+
+    gtk_widget_show( p_intf->p_sys->p_network );
+    gdk_window_raise( p_intf->p_sys->p_network->window );
+}
+
+void
+on_toolbar_network_clicked             (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
+
+    gtk_widget_show( p_intf->p_sys->p_network );
+    gdk_window_raise( p_intf->p_sys->p_network->window );
+}
+
+
+gboolean
+on_slider_button_release_event         (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), "intf_window" );
+
+    vlc_mutex_lock( &p_intf->change_lock );
+    p_intf->p_sys->b_slider_free = 1;
+    vlc_mutex_unlock( &p_intf->change_lock );
+
+    return FALSE;
+}
+
+
+gboolean
+on_slider_button_press_event           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), "intf_window" );
+
+    vlc_mutex_lock( &p_intf->change_lock );
+    p_intf->p_sys->b_slider_free = 0;
+    vlc_mutex_unlock( &p_intf->change_lock );
+
+    return FALSE;
 }
 

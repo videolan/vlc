@@ -1,5 +1,5 @@
 /*****************************************************************************
- * intf_plst.h : Playlist functions
+ * intf_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
@@ -51,7 +51,7 @@ typedef struct playlist_s
     playlist_item_t*      p_item;
 } playlist_t;
 
-/* Used by intf_PlstAdd */
+/* Used by intf_PlaylistAdd */
 #define PLAYLIST_START            0
 #define PLAYLIST_END             -1
 
@@ -67,13 +67,13 @@ typedef struct playlist_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-playlist_t * intf_PlstCreate   ( void );
-void         intf_PlstInit     ( playlist_t * p_playlist );
-int          intf_PlstAdd      ( playlist_t * p_playlist,
-                                 int i_pos, char * psz_item );
-int          intf_PlstDelete  ( playlist_t * p_playlist,
-                                 int i_pos );
-void         intf_PlstNext     ( playlist_t * p_playlist );
-void         intf_PlstPrev     ( playlist_t * p_playlist );
-void         intf_PlstDestroy  ( playlist_t * p_playlist );
-void         intf_PlstJumpto   ( playlist_t * p_playlist , int i_pos);
+playlist_t * intf_PlaylistCreate   ( void );
+void         intf_PlaylistInit     ( playlist_t * p_playlist );
+int          intf_PlaylistAdd      ( playlist_t * p_playlist,
+                                     int i_pos, const char * psz_item );
+int          intf_PlaylistDelete   ( playlist_t * p_playlist, int i_pos );
+void         intf_PlaylistNext     ( playlist_t * p_playlist );
+void         intf_PlaylistPrev     ( playlist_t * p_playlist );
+void         intf_PlaylistDestroy  ( playlist_t * p_playlist );
+void         intf_PlaylistJumpto   ( playlist_t * p_playlist , int i_pos);
+

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * intf_plst.c : Playlist management functions
+ * intf_playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
@@ -32,7 +32,7 @@
 #include "threads.h"
 
 #include "intf_msg.h"
-#include "intf_plst.h"
+#include "intf_playlist.h"
 
 #include "main.h"
 
@@ -42,11 +42,11 @@
 static void NextItem( playlist_t * p_playlist );
 
 /*****************************************************************************
- * intf_PlstCreate: create playlist
+ * intf_PlaylistCreate: create playlist
  *****************************************************************************
  * Create a playlist structure.
  *****************************************************************************/
-playlist_t * intf_PlstCreate ( void )
+playlist_t * intf_PlaylistCreate ( void )
 {
     playlist_t *p_playlist;
 
@@ -63,11 +63,11 @@ playlist_t * intf_PlstCreate ( void )
 }
 
 /*****************************************************************************
- * intf_PlstInit: initialize playlist
+ * intf_PlaylistInit: initialize playlist
  *****************************************************************************
  * Initialize a playlist structure.
  *****************************************************************************/
-void intf_PlstInit ( playlist_t * p_playlist )
+void intf_PlaylistInit ( playlist_t * p_playlist )
 {
     vlc_mutex_init( &p_playlist->change_lock );
 
@@ -89,12 +89,13 @@ void intf_PlstInit ( playlist_t * p_playlist )
 }
 
 /*****************************************************************************
- * intf_PlstAdd: add an item to the playlist
+ * intf_PlaylistAdd: add an item to the playlist
  *****************************************************************************
  * Add an item to the playlist at position i_pos. If i_pos is PLAYLIST_END,
  * add it at the end regardless of the playlist current size.
  *****************************************************************************/
-int intf_PlstAdd( playlist_t * p_playlist, int i_pos, char * psz_item )
+int intf_PlaylistAdd( playlist_t * p_playlist, int i_pos,
+                      const char * psz_item )
 {
     int i_index;
     playlist_item_t * p_item;
@@ -130,7 +131,7 @@ int intf_PlstAdd( playlist_t * p_playlist, int i_pos, char * psz_item )
     p_item->i_status = 0;
     p_item->psz_name = strdup( psz_item );
 
-    intf_WarnMsg( 1, "intf: added %s to playlist", psz_item );
+    intf_WarnMsg( 1, "intf: added `%s' to playlist", psz_item );
 
     vlc_mutex_unlock( &p_playlist->change_lock );
 
@@ -138,12 +139,12 @@ int intf_PlstAdd( playlist_t * p_playlist, int i_pos, char * psz_item )
 }
 
 /*****************************************************************************
- * intf_PlstNext: switch to next playlist item
+ * intf_PlaylistNext: switch to next playlist item
  *****************************************************************************
  * Switch to the next item of the playlist. If there is no next item, the
  * position of the resulting item is set to -1.
  *****************************************************************************/
-void intf_PlstNext( playlist_t * p_playlist )
+void intf_PlaylistNext( playlist_t * p_playlist )
 {
     vlc_mutex_lock( &p_playlist->change_lock );
 
@@ -153,12 +154,12 @@ void intf_PlstNext( playlist_t * p_playlist )
 }
 
 /*****************************************************************************
- * intf_PlstPrev: switch to previous playlist item
+ * intf_PlaylistPrev: switch to previous playlist item
  *****************************************************************************
  * Switch to the previous item of the playlist. If there is no previous
  * item, the position of the resulting item is set to -1.
  *****************************************************************************/
-void intf_PlstPrev( playlist_t * p_playlist )
+void intf_PlaylistPrev( playlist_t * p_playlist )
 {
     vlc_mutex_lock( &p_playlist->change_lock );
     p_playlist->i_mode = -p_playlist->i_mode;
@@ -170,11 +171,11 @@ void intf_PlstPrev( playlist_t * p_playlist )
 }
 
 /*****************************************************************************
- * intf_PlstDelete: delete an item from the playlist
+ * intf_PlaylistDelete: delete an item from the playlist
  *****************************************************************************
  * Delete the item in the playlist with position i_pos.
  *****************************************************************************/
-int intf_PlstDelete( playlist_t * p_playlist, int i_pos )
+int intf_PlaylistDelete( playlist_t * p_playlist, int i_pos )
 {
     int i_index;
     char * psz_name;
@@ -206,7 +207,7 @@ int intf_PlstDelete( playlist_t * p_playlist, int i_pos )
     p_playlist->p_item = realloc( p_playlist->p_item,
                     p_playlist->i_size * sizeof( playlist_item_t ) );
 
-    intf_WarnMsg( 1, "intf: removed %s from playlist", psz_name );
+    intf_WarnMsg( 1, "intf: removed `%s' from playlist", psz_name );
     
 
     /* Delete the item */
@@ -218,17 +219,17 @@ int intf_PlstDelete( playlist_t * p_playlist, int i_pos )
 }
 
 /*****************************************************************************
- * intf_PlstDestroy: destroy the playlist
+ * intf_PlaylistDestroy: destroy the playlist
  *****************************************************************************
  * Delete all items in the playlist and free the playlist structure.
  *****************************************************************************/
-void intf_PlstDestroy( playlist_t * p_playlist )
+void intf_PlaylistDestroy( playlist_t * p_playlist )
 {
     int i_index;
 
     for( i_index = p_playlist->i_size - 1; p_playlist->i_size; i_index-- )
     {
-        intf_PlstDelete( p_playlist, i_index );
+        intf_PlaylistDelete( p_playlist, i_index );
     }
 
     vlc_mutex_destroy( &p_playlist->change_lock );
@@ -242,7 +243,7 @@ void intf_PlstDestroy( playlist_t * p_playlist )
 
     intf_WarnMsg( 1, "intf: playlist destroyed" );
 }
-void intf_PlstJumpto( playlist_t * p_playlist , int i_pos)
+void intf_PlaylistJumpto( playlist_t * p_playlist , int i_pos)
 {
     vlc_mutex_lock( &p_playlist->change_lock );
  

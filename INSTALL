@@ -12,11 +12,18 @@ See `./configure --help' for more information.
 
 Then, run `make' to build vlc.
 
-Here is a shortcut to copy-paste for a clean build:
+Here is a shortcut to copy-paste for a complete build:
 
    make distclean 2>/dev/null ; ./configure --prefix=/usr --enable-gnome \
       --enable-fb --with-glide --with-ggi --with-sdl --enable-esd \
-      --enable-alsa --enable-mga --enable-gtk && make
+      --enable-alsa --enable-mga --enable-gtk --enable-qt && make
+
+If you intend to debug stuff, you may want to disable optimizations:
+
+   make distclean 2>/dev/null ; ./configure --prefix=/usr --enable-gnome \
+      --enable-fb --with-glide --with-ggi --with-sdl --enable-esd \
+      --enable-alsa --enable-mga --enable-gtk --enable-qt \
+      --disable-optimizatons && make
 
 
 Installing and running VideoLAN

@@ -145,21 +145,6 @@ void
 on_toolbar_fast_clicked                (GtkButton       *button,
                                         gpointer         user_data);
 
-gboolean
-on_hscale_button_release_event         (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data);
-
-gboolean
-on_hscale_button_release_event         (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data);
-
-gboolean
-on_hscale_button_press_event           (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data);
-
 void
 on_intf_modules_destroy                (GtkObject       *object,
                                         gpointer         user_data);
@@ -253,6 +238,36 @@ on_popup_navigation_toggle             (GtkCheckMenuItem     *menuitem,
 void
 on_menubar_title_toggle                (GtkCheckMenuItem     *menuitem,
                                         gpointer             user_data);
+
+void
+on_menubar_network_activate            (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_toolbar_network_clicked             (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_network_ok_clicked                  (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_network_cancel_clicked              (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_popup_network_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+gboolean
+on_slider_button_press_event           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+gboolean
+on_slider_button_release_event         (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
 
 void
 on_menubar_chapter_toggle              (GtkCheckMenuItem     *menuitem,

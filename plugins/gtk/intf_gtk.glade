@@ -97,12 +97,35 @@
 	      <class>GtkMenuItem</class>
 	      <name>menubar_disc</name>
 	      <tooltip>Open a DVD or VCD</tooltip>
+	      <accelerator>
+		<modifiers>0</modifiers>
+		<key>GDK_F4</key>
+		<signal>activate</signal>
+	      </accelerator>
 	      <signal>
 		<name>activate</name>
 		<handler>on_menubar_disc_activate</handler>
 		<last_modification_time>Sun, 04 Mar 2001 02:53:25 GMT</last_modification_time>
 	      </signal>
 	      <label>Open _Disc...</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_network</name>
+	      <tooltip>Select a Network Stream</tooltip>
+	      <accelerator>
+		<modifiers>0</modifiers>
+		<key>GDK_F5</key>
+		<signal>activate</signal>
+	      </accelerator>
+	      <signal>
+		<name>activate</name>
+		<handler>on_menubar_network_activate</handler>
+		<last_modification_time>Mon, 12 Mar 2001 21:55:15 GMT</last_modification_time>
+	      </signal>
+	      <label>_Network Stream...</label>
 	      <right_justify>False</right_justify>
 	    </widget>
 
@@ -329,6 +352,19 @@
 	<widget>
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_network</name>
+	  <tooltip>Select a Network Stream</tooltip>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_toolbar_network_clicked</handler>
+	    <last_modification_time>Sun, 04 Mar 2001 02:55:35 GMT</last_modification_time>
+	  </signal>
+	  <label>Net</label>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
 	  <name>toolbar_back</name>
 	  <sensitive>False</sensitive>
 	  <tooltip>Go Backwards</tooltip>
@@ -454,55 +490,86 @@
     </widget>
 
     <widget>
-      <class>GtkEntry</class>
-      <name>entry1</name>
-      <can_focus>True</can_focus>
-      <editable>True</editable>
-      <text_visible>True</text_visible>
-      <text_max_length>0</text_max_length>
-      <text>Tired of boring stub messages ? Write your own exciting message here !!</text>
+      <class>GtkHBox</class>
+      <name>hbox7</name>
+      <homogeneous>True</homogeneous>
+      <spacing>0</spacing>
       <child>
 	<padding>0</padding>
-	<expand>False</expand>
+	<expand>True</expand>
 	<fill>True</fill>
       </child>
-    </widget>
 
-    <widget>
-      <class>GtkLabel</class>
-      <name>label6</name>
-      <label>This part of the interface doesn't work yet. You can drag the slider below, though:</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>5</xpad>
-      <ypad>0</ypad>
-      <child>
-	<padding>0</padding>
-	<expand>False</expand>
-	<fill>True</fill>
-      </child>
+      <widget>
+	<class>GtkLabel</class>
+	<name>label_date</name>
+	<label>-:--:--</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+      </widget>
+
+      <widget>
+	<class>GtkLabel</class>
+	<name>label_status</name>
+	<label>Status: foo</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+      </widget>
+
+      <widget>
+	<class>GtkLabel</class>
+	<name>label_bar</name>
+	<label>Bar: baz</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+      </widget>
     </widget>
 
     <widget>
       <class>GtkHScale</class>
-      <name>hscale</name>
+      <name>slider</name>
       <can_focus>True</can_focus>
       <signal>
 	<name>button_release_event</name>
-	<handler>on_hscale_button_release_event</handler>
-	<last_modification_time>Tue, 13 Feb 2001 01:15:41 GMT</last_modification_time>
+	<handler>on_slider_button_release_event</handler>
+	<last_modification_time>Wed, 14 Mar 2001 15:58:36 GMT</last_modification_time>
       </signal>
       <signal>
 	<name>button_press_event</name>
-	<handler>on_hscale_button_press_event</handler>
-	<last_modification_time>Tue, 13 Feb 2001 02:55:04 GMT</last_modification_time>
+	<handler>on_slider_button_press_event</handler>
+	<last_modification_time>Wed, 14 Mar 2001 15:58:42 GMT</last_modification_time>
       </signal>
-      <draw_value>True</draw_value>
-      <value_pos>GTK_POS_BOTTOM</value_pos>
+      <draw_value>False</draw_value>
+      <value_pos>GTK_POS_TOP</value_pos>
       <digits>1</digits>
-      <policy>GTK_UPDATE_DELAYED</policy>
+      <policy>GTK_UPDATE_CONTINUOUS</policy>
       <value>0</value>
       <lower>0</lower>
       <upper>100</upper>
@@ -511,36 +578,18 @@
       <page_size>0</page_size>
       <child>
 	<padding>0</padding>
-	<expand>False</expand>
-	<fill>True</fill>
-      </child>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label13</name>
-      <label>HEY ! YOU CAN DROP A FILE ON VLC TOO :-)</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>5</ypad>
-      <child>
-	<padding>0</padding>
-	<expand>False</expand>
+	<expand>True</expand>
 	<fill>True</fill>
       </child>
     </widget>
 
     <widget>
       <class>GtkStatusbar</class>
-      <name>statusbar1</name>
+      <name>intf_statusbar</name>
       <child>
 	<padding>0</padding>
 	<expand>False</expand>
-	<fill>True</fill>
-	<pack>GTK_PACK_END</pack>
+	<fill>False</fill>
       </child>
     </widget>
   </widget>
@@ -606,27 +655,13 @@
 
   <widget>
     <class>GtkMenuItem</class>
-    <name>popup_open</name>
-    <tooltip>Open a File</tooltip>
+    <name>main_window_toggle</name>
     <signal>
       <name>activate</name>
-      <handler>on_popup_open_activate</handler>
-      <last_modification_time>Sun, 04 Mar 2001 21:00:48 GMT</last_modification_time>
+      <handler>on_main_window_toggle</handler>
+      <last_modification_time>Thu, 08 Mar 2001 10:37:08 GMT</last_modification_time>
     </signal>
-    <label>_Open File...</label>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>popup_disc</name>
-    <tooltip>Open a DVD or VCD</tooltip>
-    <signal>
-      <name>activate</name>
-      <handler>on_popup_disc_activate</handler>
-      <last_modification_time>Sun, 04 Mar 2001 03:04:11 GMT</last_modification_time>
-    </signal>
-    <label>Open _Disc...</label>
+    <label>Toggle _Interface</label>
     <right_justify>False</right_justify>
   </widget>
 
@@ -640,13 +675,7 @@
     <class>GtkMenuItem</class>
     <name>popup_navigation</name>
     <sensitive>False</sensitive>
-    <label>Navigation</label>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>separator10</name>
+    <label>_Navigation</label>
     <right_justify>False</right_justify>
   </widget>
 
@@ -654,7 +683,7 @@
     <class>GtkMenuItem</class>
     <name>popup_audio</name>
     <sensitive>False</sensitive>
-    <label>A_udio</label>
+    <label>_Audio</label>
     <right_justify>False</right_justify>
   </widget>
 
@@ -662,37 +691,82 @@
     <class>GtkMenuItem</class>
     <name>popup_subpictures</name>
     <sensitive>False</sensitive>
-    <label>Sub _Pictures</label>
+    <label>_Subpictures</label>
     <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_file</name>
+    <label>_File</label>
+    <right_justify>False</right_justify>
+
+    <widget>
+      <class>GtkMenu</class>
+      <name>popup_file_menu</name>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>popup_open</name>
+	<tooltip>Open a File</tooltip>
+	<signal>
+	  <name>activate</name>
+	  <handler>on_popup_open_activate</handler>
+	  <last_modification_time>Sun, 04 Mar 2001 21:00:48 GMT</last_modification_time>
+	</signal>
+	<label>_Open File...</label>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>popup_disc</name>
+	<tooltip>Open a DVD or VCD</tooltip>
+	<signal>
+	  <name>activate</name>
+	  <handler>on_popup_disc_activate</handler>
+	  <last_modification_time>Sun, 04 Mar 2001 03:04:11 GMT</last_modification_time>
+	</signal>
+	<label>Open _Disc...</label>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>popup_network</name>
+	<tooltip>Select a Network Stream</tooltip>
+	<signal>
+	  <name>activate</name>
+	  <handler>on_popup_network_activate</handler>
+	  <last_modification_time>Mon, 12 Mar 2001 21:57:31 GMT</last_modification_time>
+	</signal>
+	<label>_Network Stream...</label>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>separator12</name>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>popup_about</name>
+	<signal>
+	  <name>activate</name>
+	  <handler>on_popup_about_activate</handler>
+	  <last_modification_time>Wed, 21 Feb 2001 08:41:04 GMT</last_modification_time>
+	</signal>
+	<label>_About...</label>
+	<right_justify>False</right_justify>
+      </widget>
+    </widget>
   </widget>
 
   <widget>
     <class>GtkMenuItem</class>
     <name>separator9</name>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>main_window_toggle</name>
-    <signal>
-      <name>activate</name>
-      <handler>on_main_window_toggle</handler>
-      <last_modification_time>Thu, 08 Mar 2001 10:37:08 GMT</last_modification_time>
-    </signal>
-    <label>show/hide main _window</label>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>popup_about</name>
-    <signal>
-      <name>activate</name>
-      <handler>on_popup_about_activate</handler>
-      <last_modification_time>Wed, 21 Feb 2001 08:41:04 GMT</last_modification_time>
-    </signal>
-    <label>_About...</label>
     <right_justify>False</right_justify>
   </widget>
 
@@ -882,7 +956,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
   <title>Select File</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
-  <modal>False</modal>
+  <modal>True</modal>
   <allow_shrink>False</allow_shrink>
   <allow_grow>True</allow_grow>
   <auto_shrink>False</auto_shrink>
@@ -925,7 +999,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
   <title>Open Disc</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
-  <modal>False</modal>
+  <modal>True</modal>
   <allow_shrink>False</allow_shrink>
   <allow_grow>False</allow_grow>
   <auto_shrink>False</auto_shrink>
@@ -1434,6 +1508,330 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
 	  <yalign>0.5</yalign>
 	  <xpad>0</xpad>
 	  <ypad>0</ypad>
+	</widget>
+      </widget>
+    </widget>
+  </widget>
+</widget>
+
+<widget>
+  <class>GtkDialog</class>
+  <name>intf_network</name>
+  <signal>
+    <name>destroy</name>
+    <handler>on_intf_network_destroy</handler>
+    <last_modification_time>Mon, 12 Mar 2001 21:45:22 GMT</last_modification_time>
+  </signal>
+  <title>Open Disc</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>True</modal>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>False</allow_grow>
+  <auto_shrink>False</auto_shrink>
+
+  <widget>
+    <class>GtkVBox</class>
+    <child_name>Dialog:vbox</child_name>
+    <name>vbox7</name>
+    <border_width>5</border_width>
+    <homogeneous>False</homogeneous>
+    <spacing>0</spacing>
+
+    <widget>
+      <class>GtkHBox</class>
+      <child_name>Dialog:action_area</child_name>
+      <name>hbox4</name>
+      <border_width>5</border_width>
+      <homogeneous>True</homogeneous>
+      <spacing>5</spacing>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>True</fill>
+	<pack>GTK_PACK_END</pack>
+      </child>
+
+      <widget>
+	<class>GtkHBox</class>
+	<name>hbox5</name>
+	<homogeneous>True</homogeneous>
+	<spacing>5</spacing>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>True</fill>
+	  <pack>GTK_PACK_END</pack>
+	</child>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <name>network_ok</name>
+	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_network_ok_clicked</handler>
+	    <last_modification_time>Mon, 12 Mar 2001 21:45:01 GMT</last_modification_time>
+	  </signal>
+	  <label>OK</label>
+	  <relief>GTK_RELIEF_NORMAL</relief>
+	  <child>
+	    <padding>0</padding>
+	    <expand>False</expand>
+	    <fill>True</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <name>network_cancel</name>
+	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_network_cancel_clicked</handler>
+	    <last_modification_time>Mon, 12 Mar 2001 21:44:52 GMT</last_modification_time>
+	  </signal>
+	  <label>Cancel</label>
+	  <relief>GTK_RELIEF_NORMAL</relief>
+	  <child>
+	    <padding>0</padding>
+	    <expand>False</expand>
+	    <fill>True</fill>
+	  </child>
+	</widget>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkVBox</class>
+      <name>vbox8</name>
+      <border_width>5</border_width>
+      <homogeneous>False</homogeneous>
+      <spacing>5</spacing>
+      <child>
+	<padding>0</padding>
+	<expand>True</expand>
+	<fill>True</fill>
+      </child>
+
+      <widget>
+	<class>GtkHBox</class>
+	<name>hbox6</name>
+	<homogeneous>False</homogeneous>
+	<spacing>5</spacing>
+	<child>
+	  <padding>0</padding>
+	  <expand>True</expand>
+	  <fill>True</fill>
+	</child>
+
+	<widget>
+	  <class>GtkFrame</class>
+	  <name>frame4</name>
+	  <label>Protocol</label>
+	  <label_xalign>0</label_xalign>
+	  <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+	  <child>
+	    <padding>0</padding>
+	    <expand>True</expand>
+	    <fill>True</fill>
+	  </child>
+
+	  <widget>
+	    <class>GtkVBox</class>
+	    <name>vbox9</name>
+	    <homogeneous>False</homogeneous>
+	    <spacing>0</spacing>
+
+	    <widget>
+	      <class>GtkRadioButton</class>
+	      <name>network_ts</name>
+	      <can_focus>True</can_focus>
+	      <signal>
+		<name>toggled</name>
+		<handler>on_disc_dvd_toggled</handler>
+		<last_modification_time>Sun, 04 Mar 2001 02:50:56 GMT</last_modification_time>
+	      </signal>
+	      <label>TS</label>
+	      <active>False</active>
+	      <draw_indicator>True</draw_indicator>
+	      <group>network</group>
+	      <child>
+		<padding>0</padding>
+		<expand>False</expand>
+		<fill>False</fill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>GtkRadioButton</class>
+	      <name>network_rtp</name>
+	      <sensitive>False</sensitive>
+	      <can_focus>True</can_focus>
+	      <signal>
+		<name>toggled</name>
+		<handler>on_disc_vcd_toggled</handler>
+		<last_modification_time>Sun, 04 Mar 2001 02:51:00 GMT</last_modification_time>
+	      </signal>
+	      <label>RTP</label>
+	      <active>False</active>
+	      <draw_indicator>True</draw_indicator>
+	      <group>network</group>
+	      <child>
+		<padding>0</padding>
+		<expand>False</expand>
+		<fill>False</fill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>GtkRadioButton</class>
+	      <name>network_http</name>
+	      <sensitive>False</sensitive>
+	      <can_focus>True</can_focus>
+	      <label>HTTP</label>
+	      <active>False</active>
+	      <draw_indicator>True</draw_indicator>
+	      <group>network</group>
+	      <child>
+		<padding>0</padding>
+		<expand>False</expand>
+		<fill>False</fill>
+	      </child>
+	    </widget>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkFrame</class>
+	  <name>frame5</name>
+	  <label>Server</label>
+	  <label_xalign>0</label_xalign>
+	  <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+	  <child>
+	    <padding>0</padding>
+	    <expand>True</expand>
+	    <fill>True</fill>
+	  </child>
+
+	  <widget>
+	    <class>GtkTable</class>
+	    <name>table2</name>
+	    <border_width>5</border_width>
+	    <rows>2</rows>
+	    <columns>2</columns>
+	    <homogeneous>False</homogeneous>
+	    <row_spacing>5</row_spacing>
+	    <column_spacing>5</column_spacing>
+
+	    <widget>
+	      <class>GtkSpinButton</class>
+	      <name>network_port</name>
+	      <can_focus>True</can_focus>
+	      <climb_rate>1</climb_rate>
+	      <digits>0</digits>
+	      <numeric>False</numeric>
+	      <update_policy>GTK_UPDATE_ALWAYS</update_policy>
+	      <snap>False</snap>
+	      <wrap>False</wrap>
+	      <value>1234</value>
+	      <lower>0</lower>
+	      <upper>65535</upper>
+	      <step>1</step>
+	      <page>10</page>
+	      <page_size>10</page_size>
+	      <child>
+		<left_attach>1</left_attach>
+		<right_attach>2</right_attach>
+		<top_attach>1</top_attach>
+		<bottom_attach>2</bottom_attach>
+		<xpad>0</xpad>
+		<ypad>0</ypad>
+		<xexpand>True</xexpand>
+		<yexpand>False</yexpand>
+		<xshrink>False</xshrink>
+		<yshrink>False</yshrink>
+		<xfill>True</xfill>
+		<yfill>False</yfill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <name>label24</name>
+	      <label>Port</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	      <child>
+		<left_attach>0</left_attach>
+		<right_attach>1</right_attach>
+		<top_attach>1</top_attach>
+		<bottom_attach>2</bottom_attach>
+		<xpad>0</xpad>
+		<ypad>0</ypad>
+		<xexpand>False</xexpand>
+		<yexpand>False</yexpand>
+		<xshrink>False</xshrink>
+		<yshrink>False</yshrink>
+		<xfill>True</xfill>
+		<yfill>False</yfill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <name>label25</name>
+	      <label>Address</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	      <child>
+		<left_attach>0</left_attach>
+		<right_attach>1</right_attach>
+		<top_attach>0</top_attach>
+		<bottom_attach>1</bottom_attach>
+		<xpad>0</xpad>
+		<ypad>0</ypad>
+		<xexpand>False</xexpand>
+		<yexpand>False</yexpand>
+		<xshrink>False</xshrink>
+		<yshrink>False</yshrink>
+		<xfill>True</xfill>
+		<yfill>False</yfill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>GtkEntry</class>
+	      <name>network_server</name>
+	      <can_focus>True</can_focus>
+	      <editable>True</editable>
+	      <text_visible>True</text_visible>
+	      <text_max_length>0</text_max_length>
+	      <text>vls</text>
+	      <child>
+		<left_attach>1</left_attach>
+		<right_attach>2</right_attach>
+		<top_attach>0</top_attach>
+		<bottom_attach>1</bottom_attach>
+		<xpad>0</xpad>
+		<ypad>0</ypad>
+		<xexpand>True</xexpand>
+		<yexpand>False</yexpand>
+		<xshrink>False</xshrink>
+		<yshrink>False</yshrink>
+		<xfill>True</xfill>
+		<yfill>False</yfill>
+	      </child>
+	    </widget>
+	  </widget>
 	</widget>
       </widget>
     </widget>

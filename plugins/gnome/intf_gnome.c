@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.21 2001/03/15 00:37:04 stef Exp $
+ * $Id: intf_gnome.c,v 1.22 2001/03/15 01:42:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,10 +49,10 @@
 #include "intf_msg.h"
 #include "interface.h"
 
-#include "gnome_sys.h"
 #include "gnome_callbacks.h"
 #include "gnome_interface.h"
 #include "gnome_support.h"
+#include "intf_gnome.h"
 
 #include "main.h"
 
@@ -72,6 +72,7 @@ static gint GnomeChapterMenu  ( gpointer, GtkWidget *,
 static gint GnomeTitleMenu    ( gpointer, GtkWidget *, 
                               void (*pf_toggle)(GtkCheckMenuItem *, gpointer) );
 static gint GnomeSetupMenu    ( intf_thread_t * p_intf );
+static void GnomeDisplayDate  ( GtkAdjustment *p_adj );
 
 /*****************************************************************************
  * g_atexit: kludge to avoid the Gnome thread to segfault at exit
@@ -144,13 +145,10 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys->b_playlist_changed = 0;
     p_intf->p_sys->b_menus_update = 1;
 
-    p_intf->p_sys->b_scale_isfree = 1;
+    p_intf->p_sys->b_slider_free = 1;
 
     p_intf->p_sys->pf_gtk_callback = NULL;
     p_intf->p_sys->pf_gdk_callback = NULL;
-
-    /* Initialize lock */
-    vlc_mutex_init( &p_intf->p_sys->change_lock );
 
     return( 0 );
 }
@@ -160,9 +158,6 @@ static int intf_Open( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Close( intf_thread_t *p_intf )
 {
-    /* Destroy lock */
-    vlc_mutex_destroy( &p_intf->p_sys->change_lock );
-
     /* Destroy structure */
     free( p_intf->p_sys );
 }
@@ -180,20 +175,26 @@ static void intf_Run( intf_thread_t *p_intf )
     /* gnome_init needs to know the command line. We don't care, so we
      * give it an empty one */
     char *p_args[] = { "" };
+    int   i_args   = 1;
 
     /* The data types we are allowed to receive */
     static GtkTargetEntry target_table[] =
     {
         { "text/uri-list", 0, DROP_ACCEPT_TEXT_URI_LIST },
-        { "text/plain", 0, DROP_ACCEPT_TEXT_PLAIN }
+        { "text/plain",    0, DROP_ACCEPT_TEXT_PLAIN }
     };
 
+    /* intf_Manage callback timeout */
+    int i_timeout;
+
     /* Initialize Gnome */
-    gnome_init( p_main->psz_arg0, VERSION, 1, p_args );
+    gnome_init( p_main->psz_arg0, VERSION, i_args, p_args );
 
     /* Create some useful widgets that will certainly be used */
     p_intf->p_sys->p_window = create_intf_window( );
     p_intf->p_sys->p_popup = create_intf_popup( );
+    p_intf->p_sys->p_disc = create_intf_disc( );
+    p_intf->p_sys->p_network = create_intf_network( );
 
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
@@ -204,12 +205,28 @@ static void intf_Run( intf_thread_t *p_intf )
                        GTK_DEST_DEFAULT_ALL, target_table,
                        1, GDK_ACTION_COPY );
 
+    /* Get the interface labels */
+    #define P_LABEL( name ) GTK_LABEL( gtk_object_get_data( \
+                         GTK_OBJECT( p_intf->p_sys->p_window ), name ) )
+    p_intf->p_sys->p_label_date = P_LABEL( "label_date" );
+    p_intf->p_sys->p_label_status = P_LABEL( "label_status" );
+    #undef P_LABEL
+
+    /* Connect the date display to the slider */
+    #define P_SLIDER GTK_RANGE( gtk_object_get_data( \
+                         GTK_OBJECT( p_intf->p_sys->p_window ), "slider" ) )
+    p_intf->p_sys->p_adj = gtk_range_get_adjustment( P_SLIDER );
+
+    gtk_signal_connect ( GTK_OBJECT( p_intf->p_sys->p_adj ), "value_changed",
+                         GTK_SIGNAL_FUNC( GnomeDisplayDate ), NULL );
+    p_intf->p_sys->f_adj_oldvalue = 0;
+    #undef P_SLIDER
+
     /* We don't create these ones yet because we perhaps won't need them */
     p_intf->p_sys->p_about = NULL;
     p_intf->p_sys->p_playlist = NULL;
     p_intf->p_sys->p_modules = NULL;
     p_intf->p_sys->p_fileopen = NULL;
-    p_intf->p_sys->p_disc = NULL;
 
     /* Store p_intf to keep an eye on it */
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
@@ -218,27 +235,40 @@ static void intf_Run( intf_thread_t *p_intf )
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_popup),
                          "p_intf", p_intf );
 
+    gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_disc),
+                         "p_intf", p_intf );
+
+    gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_network),
+                         "p_intf", p_intf );
+
+    gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_adj),
+                         "p_intf", p_intf );
+
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
 
     /* Sleep to avoid using all CPU - since some interfaces needs to access
      * keyboard events, a 100ms delay is a good compromise */
-    p_intf->p_sys->i_timeout = gtk_timeout_add( INTF_IDLE_SLEEP / 1000,
-                                                GnomeManage, p_intf );
- 
+    i_timeout = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, GnomeManage, p_intf );
 
     /* Enter gnome mode */
     gtk_main();
 
-    /* launch stored callbacks */
+    /* Remove the timeout */
+    gtk_timeout_remove( i_timeout );
+
+    /* Get rid of stored callbacks so we can unload the plugin */
     if( p_intf->p_sys->pf_gtk_callback != NULL )
     {
-        p_intf->p_sys->pf_gtk_callback();
+        p_intf->p_sys->pf_gtk_callback( );
+        p_intf->p_sys->pf_gtk_callback = NULL;
 
-        if( p_intf->p_sys->pf_gdk_callback != NULL )
-        {
-            p_intf->p_sys->pf_gdk_callback();
-        }
+    }
+
+    if( p_intf->p_sys->pf_gdk_callback != NULL )
+    {
+        p_intf->p_sys->pf_gdk_callback( );
+        p_intf->p_sys->pf_gdk_callback = NULL;
     }
 }
 
@@ -252,9 +282,9 @@ static void intf_Run( intf_thread_t *p_intf )
  *****************************************************************************/
 static gint GnomeManage( gpointer p_data )
 {
-    intf_thread_t *p_intf = (void *)p_data;
+#define p_intf ((intf_thread_t *)p_data)
 
-    vlc_mutex_lock( &p_intf->p_sys->change_lock );
+    vlc_mutex_lock( &p_intf->change_lock );
 
     /* If the "display popup" flag has changed */
     if( p_intf->b_menu_change )
@@ -272,26 +302,34 @@ static gint GnomeManage( gpointer p_data )
     }
 
     /* Manage the slider */
-    if( p_intf->p_input != NULL && p_intf->p_sys->p_window != NULL
-         && p_intf->p_sys->b_scale_isfree )
+    if( p_intf->p_input != NULL )
     {
-        GtkWidget *p_scale;
-        GtkAdjustment *p_adj;
-   
-        p_scale = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                                  p_intf->p_sys->p_window ), "hscale" ) );
-        p_adj = gtk_range_get_adjustment ( GTK_RANGE( p_scale ) );
+        float newvalue = p_intf->p_sys->p_adj->value;
 
-        /* Update the value */
-        p_adj->value = ( 100. *
-                         p_intf->p_input->stream.p_selected_area->i_tell ) /
-                         p_intf->p_input->stream.p_selected_area->i_size;
+#define p_area p_intf->p_input->stream.p_selected_area
+        /* If the user hasn't touched the slider since the last time,
+         * then the input can safely change it */
+        if( newvalue == p_intf->p_sys->f_adj_oldvalue )
+        {
+            /* Update the value */
+            p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue =
+                ( 100. * p_area->i_tell ) / p_area->i_size;
 
-        /* Gtv does it this way. Why not. */
-        gtk_range_set_adjustment ( GTK_RANGE( p_scale ), p_adj );
-        gtk_range_slider_update ( GTK_RANGE( p_scale ) );
-        gtk_range_clear_background ( GTK_RANGE( p_scale ) );
-        gtk_range_draw_background ( GTK_RANGE( p_scale ) );
+            gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
+                                     "value_changed" );
+        }
+        /* Otherwise, send message to the input if the user has
+         * finished dragging the slider */
+        else if( p_intf->p_sys->b_slider_free )
+        {
+            off_t i_seek = ( newvalue * p_area->i_size ) / 100;
+
+            input_Seek( p_intf->p_input, i_seek );
+
+            /* Update the old value */
+            p_intf->p_sys->f_adj_oldvalue = newvalue;
+        }
+#undef p_area
     }
 
     /* Manage core vlc functions through the callback */
@@ -299,19 +337,20 @@ static gint GnomeManage( gpointer p_data )
 
     if( p_intf->b_die )
     {
-        /* Make sure we won't be called again */
-        gtk_timeout_remove( p_intf->p_sys->i_timeout );
-
-        vlc_mutex_unlock( &p_intf->p_sys->change_lock );
+        vlc_mutex_unlock( &p_intf->change_lock );
 
         /* Prepare to die, young Skywalker */
         gtk_main_quit();
+
+        /* Just in case */
         return( FALSE );
     }
 
-    vlc_mutex_unlock( &p_intf->p_sys->change_lock );
+    vlc_mutex_unlock( &p_intf->change_lock );
 
     return( TRUE );
+
+#undef p_intf
 }
 
 /*****************************************************************************
@@ -665,3 +704,33 @@ static gint GnomeSetupMenu( intf_thread_t * p_intf )
 
     return TRUE;
 }
+
+/*****************************************************************************
+ * GnomeDisplayDate: display stream date
+ *****************************************************************************
+ * This function displays the current date related to the position in
+ * the stream. It is called whenever the slider changes its value.
+ *****************************************************************************/
+void GnomeDisplayDate( GtkAdjustment *p_adj )
+{
+    intf_thread_t *p_intf;
+   
+    p_intf = gtk_object_get_data( GTK_OBJECT( p_adj ), "p_intf" );
+
+    if( p_intf->p_input != NULL )
+    {
+#define p_area p_intf->p_input->stream.p_selected_area
+        char psz_time[ OFFSETTOTIME_MAX_SIZE ];
+
+        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
+
+        gtk_label_set_text( p_intf->p_sys->p_label_date,
+                            input_OffsetToTime( p_intf->p_input, psz_time,
+                                   ( p_area->i_size * p_adj->value ) / 100 ) );
+
+        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
+#undef p_area
+     }
+}
+
+

@@ -1,9 +1,9 @@
 /*****************************************************************************
- * playlist_interface.c : Interface for the playlist dialog
+ * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
+ * Copyright (C) 2001 VideoLAN
  *
- * Authors: .Pierre Baillet <oct@zoy.org>
+ * Authors: Pierre Baillet <oct@zoy.org>
  *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,14 +48,14 @@
 #include "input_ext-intf.h"
 
 #include "interface.h"
-#include "intf_plst.h"
+#include "intf_playlist.h"
 #include "intf_msg.h"
 #include "intf_urldecode.h"
 
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"
 #include "gtk_support.h"
-#include "gtk_sys.h"
+#include "intf_gtk.h"
 
 #include "main.h"
 
@@ -142,7 +142,7 @@ void  deleteGListItem(gpointer data, gpointer param)
     int curRow = ( int )data;
     intf_thread_t * p_intf = param;    
     
-    intf_PlstDelete( p_main->p_playlist, curRow );
+    intf_PlaylistDelete( p_main->p_playlist, curRow );
 
     /* are we deleting the current played stream */
     if( p_intf->p_sys->i_playing == curRow )
@@ -205,7 +205,7 @@ on_invertselection_clicked (GtkMenuItem *item, gpointer user_data)
     playlist_p = p_main->p_playlist;
     
     /* lock the struct */
-    vlc_mutex_lock( &p_intf->p_sys->change_lock );
+    vlc_mutex_lock( &p_intf->change_lock );
     clist = GTK_CLIST( lookup_widget(p_intf->p_sys->p_playlist,"playlist_clist") );
     
     /* have to copy the selection to an int *
@@ -228,7 +228,7 @@ on_invertselection_clicked (GtkMenuItem *item, gpointer user_data)
     }
     free( selected );
     gtk_clist_thaw( clist );
-    vlc_mutex_unlock( &p_intf->p_sys->change_lock );
+    vlc_mutex_unlock( &p_intf->change_lock );
 }    
 
 void
@@ -257,7 +257,7 @@ on_delete_clicked                      (GtkMenuItem       *item,
     playlist_p = p_main->p_playlist;
     
     /* lock the struct */
-    vlc_mutex_lock( &p_intf->p_sys->change_lock );
+    vlc_mutex_lock( &p_intf->change_lock );
     clist = GTK_CLIST( lookup_widget(p_intf->p_sys->p_playlist,"playlist_clist") );
     
     /* I use UNDOCUMENTED features to retrieve the selection... */
@@ -276,7 +276,7 @@ on_delete_clicked                      (GtkMenuItem       *item,
         rebuildCList( clist, playlist_p );
     }
     
-    vlc_mutex_unlock( &p_intf->p_sys->change_lock );
+    vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 gboolean
@@ -406,7 +406,7 @@ void on_generic_drop_data_received( intf_thread_t * p_intf,
     if(files != NULL)
     {
         /* lock the interface */
-        vlc_mutex_lock( &p_intf->p_sys->change_lock );
+        vlc_mutex_lock( &p_intf->change_lock );
         intf_WarnMsg( 1, "List has %d elements",g_list_length( files ) ); 
         intf_AppendList( p_playlist, position, files );
 
@@ -417,7 +417,7 @@ void on_generic_drop_data_received( intf_thread_t * p_intf,
         rebuildCList( clist , p_playlist );
         
         /* unlock the interface */
-        vlc_mutex_unlock( &p_intf->p_sys->change_lock );
+        vlc_mutex_unlock( &p_intf->change_lock );
     }
 }
 
@@ -514,7 +514,7 @@ int intf_AppendList( playlist_t * p_playlist, int i_pos, GList * list )
     length = g_list_length( list );
     for( dummy=0; dummy<length; dummy++ )
     {
-        intf_PlstAdd( p_playlist, 
+        intf_PlaylistAdd( p_playlist, 
                 /* ok; this is a really nasty trick to insert
                    the item where they are suppose to go but, hey
                    this works :P (btw, you are really nasty too) */
@@ -553,7 +553,7 @@ on_playlist_clist_event (GtkWidget       *widget,
                 /* FIXME: temporary hack */
                 p_intf->p_input->b_eof = 1;
             }
-            intf_PlstJumpto( p_main->p_playlist, row-1 );
+            intf_PlaylistJumpto( p_main->p_playlist, row-1 );
         }
         return TRUE;
     }
@@ -564,12 +564,13 @@ on_playlist_clist_event (GtkWidget       *widget,
 void GtkPlayListManage( gpointer p_data )
 {
     /* this thing really sucks for now :( */
-    /* TODO speak more with interface/intf_plst.c */
+
+    /* TODO speak more with interface/intf_playlist.c */
 
     intf_thread_t *p_intf = (void *)p_data;
     playlist_t * p_playlist = p_main->p_playlist ;
 
-    vlc_mutex_lock( &p_intf->p_sys->change_lock );
+    vlc_mutex_lock( &p_intf->change_lock );
 
     if( p_intf->p_sys->i_playing != p_playlist->i_index )
     {
@@ -597,6 +598,6 @@ void GtkPlayListManage( gpointer p_data )
         }
         p_intf->p_sys->i_playing = p_playlist->i_index;
     }
-    vlc_mutex_unlock( &p_intf->p_sys->change_lock );
+    vlc_mutex_unlock( &p_intf->change_lock );
 }
 

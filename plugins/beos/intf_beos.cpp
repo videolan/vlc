@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.19 2001/03/07 16:32:59 richards Exp $
+ * $Id: intf_beos.cpp,v 1.20 2001/03/15 01:42:19 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -76,7 +76,7 @@ extern "C"
 #include "input_ext-intf.h"
 
 #include "interface.h"
-#include "intf_plst.h"
+#include "intf_playlist.h"
 #include "intf_msg.h"
 #include "audio_output.h"
 #include "MsgVals.h"
@@ -263,7 +263,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 	    if(p_message->FindString("device", device) != B_ERROR)
 	    	{
 	    	sprintf(device_method_and_name, "dvd:%s", *device); 
-	    	intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, device_method_and_name );
+	    	intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, device_method_and_name );
     		}
     	break;
 
@@ -387,8 +387,8 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             if( p_message->FindRef( "refs", &ref ) == B_OK )
             {
                 BPath path( &ref );
-                char * psz_name = strdup(path.Path());
-                intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, psz_name );
+                intf_PlaylistAdd( p_main->p_playlist,
+                                  PLAYLIST_END, path.Path() );
             }
 
         }

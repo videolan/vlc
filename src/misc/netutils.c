@@ -1,7 +1,7 @@
 /*****************************************************************************
  * netutils.c: various network functions
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
+ * Copyright (C) 1999, 2000, 2001 VideoLAN
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -31,6 +31,7 @@
 #include <stdlib.h>                             /* free(), realloc(), atoi() */
 #include <errno.h>                                                /* errno() */
 #include <string.h>                                      /* bzero(), bcopy() */
+#include <unistd.h>                                         /* gethostname() */
 
 #include <netinet/in.h>                               /* BSD: struct in_addr */
 #include <sys/socket.h>                              /* BSD: struct sockaddr */
@@ -53,15 +54,15 @@
 
 #include "intf_msg.h"
 
+#ifndef SYS_BEOS /* I need help for the BeOS portage */
+
 #include "netutils.h"
 
-
-#ifndef SYS_BEOS /* I need help for the BeOS portage */
 /*****************************************************************************
  * input_BuildLocalAddr : fill a sockaddr_in structure for local binding
  *****************************************************************************/
-int input_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port, 
-                          boolean_t b_broadcast )
+int network_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port, 
+                            boolean_t b_broadcast )
 {
     char                psz_hostname[INPUT_MAX_SOURCE_LENGTH];
     struct hostent    * p_hostent;
@@ -113,10 +114,10 @@ int input_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port,
 /*****************************************************************************
  * input_BuildRemoteAddr : fill a sockaddr_in structure for remote host
  *****************************************************************************/
-int input_BuildRemoteAddr( struct sockaddr_in * p_socket, char * psz_server )
+int network_BuildRemoteAddr( struct sockaddr_in * p_socket, char * psz_server )
 {
     struct hostent            * p_hostent;
-printf("BuildRemoteAddr : psz_server = %s\n",psz_server );    
+
     /* Reset structure */
     memset( p_socket, 0, sizeof( struct sockaddr_in ) );
     p_socket->sin_family = AF_INET;                                 /* family */
@@ -146,3 +147,4 @@ printf("BuildRemoteAddr : psz_server = %s\n",psz_server );
     return( 0 );
 }
 #endif
+

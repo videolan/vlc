@@ -1,7 +1,0 @@
-FreeBSD:
-    -#ifdef __FreeBSD__
-    -remplacer les sys/soundcard.h par machine/soundcard.c
-    -problème avec getopt
-
-LinuxPPC:
-    -problème avec la libpthreads ? (ou avec le serveur X ?)

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.92 2001/03/11 19:00:18 henri Exp $
+ * $Id: input.c,v 1.93 2001/03/15 01:42:20 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -55,10 +55,11 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
+#include "netutils.h"
 #include "modules.h"
 
 #include "intf_msg.h"
-#include "intf_plst.h"
+#include "intf_playlist.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -312,7 +313,8 @@ static int InitThread( input_thread_t * p_input )
 
     if( p_input->p_input_module == NULL )
     {
-        intf_ErrMsg( "input error: no suitable input module" );
+        intf_ErrMsg( "input error: no suitable input module for `%s'",
+                     p_input->p_source );
         return( -1 );
     }
 
@@ -574,7 +576,7 @@ void input_NetworkOpen( input_thread_t * p_input )
     /* TODO : here deal with channel stufs */
     
     /* Build the local socket */
-    if ( input_BuildLocalAddr( &s_socket, i_port, b_broadcast ) 
+    if ( network_BuildLocalAddr( &s_socket, i_port, b_broadcast ) 
          == -1 )
     {
         close( p_input->i_handle );
@@ -593,7 +595,7 @@ void input_NetworkOpen( input_thread_t * p_input )
     }
 
     /* Build socket for remote connection */
-    if ( input_BuildRemoteAddr( &s_socket, p_input->p_source ) 
+    if ( network_BuildRemoteAddr( &s_socket, p_input->p_source ) 
          == -1 )
     {
         close( p_input->i_handle );

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.40 2001/03/07 10:31:10 stef Exp $
+ * $Id: input_programs.c,v 1.41 2001/03/15 01:42:20 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -597,7 +597,7 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 
     if( p_es->p_decoder_fifo != NULL )
     {
-        intf_ErrMsg( "ES %d is already selected", p_es->i_id );
+        intf_ErrMsg( "ES 0x%x is already selected", p_es->i_id );
         return( -1 );
     }
 
@@ -662,7 +662,7 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         break;
 
     default:
-        intf_ErrMsg( "Unknown stream type %d", p_es->i_type );
+        intf_ErrMsg( "Unknown stream type 0x%x", p_es->i_type );
         return( -1 );
         break;
     }
@@ -689,7 +689,7 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
 
     if( p_es->p_decoder_fifo == NULL )
     {
-        intf_ErrMsg( "ES %d is not selected", p_es->i_id );
+        intf_ErrMsg( "ES 0x%x is not selected", p_es->i_id );
         return( -1 );
     }
 
