@@ -1,8 +1,8 @@
 /*****************************************************************************
  * playlist.c : Playlist management functions
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.71 2004/01/05 12:59:43 zorglub Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: playlist.c,v 1.72 2004/01/06 08:50:20 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -82,6 +82,11 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-show", val );
 
+
+    var_Create( p_playlist, "prevent-skip", VLC_VAR_BOOL );
+    val.b_bool = VLC_FALSE;
+    var_Set( p_playlist, "prevent-skip", val );
+
     var_Create( p_playlist, "random", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "repeat", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "loop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -127,6 +132,13 @@ void playlist_Destroy( playlist_t * p_playlist )
 
     var_Destroy( p_playlist, "intf-change" );
     var_Destroy( p_playlist, "item-change" );
+    var_Destroy( p_playlist, "playlist-current" );
+    var_Destroy( p_playlist, "intf-popmenu" );
+    var_Destroy( p_playlist, "intf-show" );
+    var_Destroy( p_playlist, "prevent-skip" );
+    var_Destroy( p_playlist, "random" );
+    var_Destroy( p_playlist, "repeat" );
+    var_Destroy( p_playlist, "loop" );
 
     while( p_playlist->i_groups > 0 )
     {
@@ -229,6 +241,8 @@ void playlist_Destroy( playlist_t * p_playlist )
             {
                 input_StopThread( p_playlist->p_input );
             }
+            val.b_bool = VLC_TRUE;
+            var_Set( p_playlist, "prevent-skip", val );
             p_playlist->i_status = PLAYLIST_RUNNING;
         }
         break;
@@ -352,6 +366,8 @@ static void RunThread ( playlist_t *p_playlist )
                 {
                     vlc_mutex_unlock( &p_playlist->object_lock );
                     playlist_Delete( p_playlist, p_playlist->i_index );
+                    p_playlist->i_index++;
+                    p_playlist->i_status = PLAYLIST_RUNNING;
                 }
                 else
                 {
@@ -381,7 +397,13 @@ static void RunThread ( playlist_t *p_playlist )
         }
         else if( p_playlist->i_status != PLAYLIST_STOPPED )
         {
-            SkipItem( p_playlist, 0 );
+            var_Get( p_playlist, "prevent-skip", &val);
+            if( val.b_bool == VLC_FALSE)
+            {
+                SkipItem( p_playlist, 0 );
+            }
+            val.b_bool = VLC_TRUE;
+            var_Set( p_playlist, "prevent-skip", val);
             PlayItem( p_playlist );
         }
         else if( p_playlist->i_status == PLAYLIST_STOPPED )
@@ -537,7 +559,7 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
     /* Check that the item is enabled */
    if( p_playlist->pp_items[p_playlist->i_index]->b_enabled == VLC_FALSE &&
        p_playlist->i_enabled != 0)
-   {
+    {
         SkipItem( p_playlist , 1 );
     }
 }

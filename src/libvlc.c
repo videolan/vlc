@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.107 2004/01/05 12:59:43 zorglub Exp $
+ * $Id: libvlc.c,v 1.108 2004/01/06 08:50:20 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -910,6 +910,77 @@ int VLC_Get( int i_object, char const *psz_var, vlc_value_t *p_value )
 }
 
 /* FIXME: temporary hacks */
+
+
+/*****************************************************************************
+ * VLC_IsPlaying: Query for Playlist Status
+ *****************************************************************************/
+vlc_bool_t VLC_IsPlaying( int i_object )
+{
+
+    playlist_t * p_playlist;
+    vlc_bool_t   playing;
+
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+    if( !p_playlist )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    playing = playlist_IsPlaying( p_playlist );
+
+    vlc_object_release( p_playlist );
+
+    if( i_object ) vlc_object_release( p_vlc );
+
+    return playing;
+
+}
+
+
+/*****************************************************************************
+ * VLC_ClearPlaylist: Query for Playlist Status
+ *
+ * return: 0
+ *****************************************************************************/
+int VLC_ClearPlaylist( int i_object )
+{
+
+    playlist_t * p_playlist;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+    if( !p_playlist )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    playlist_Clear(p_playlist);
+
+    vlc_object_release( p_playlist );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return 0;
+}
+
 
 /*****************************************************************************
  * VLC_Play: play

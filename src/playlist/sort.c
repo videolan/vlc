@@ -1,8 +1,8 @@
 /*****************************************************************************
  * sort.c : Playlist sorting functions
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: sort.c,v 1.4 2004/01/05 12:59:43 zorglub Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: sort.c,v 1.5 2004/01/06 08:50:20 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *

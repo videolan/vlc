@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_playlist.h,v 1.20 2004/01/06 04:57:34 rocky Exp $
+ * $Id: vlc_playlist.h,v 1.21 2004/01/06 08:50:20 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -157,6 +157,7 @@ VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char *, i
 VLC_EXPORT( int,  playlist_AddWDuration, ( playlist_t *, const char *, const char *, int, int, mtime_t ) );
 /* For internal use. Do not use this one anymore */
 VLC_EXPORT( int,  playlist_AddItem, ( playlist_t *, playlist_item_t *, int, int ) );
+VLC_EXPORT( int,  playlist_Clear, ( playlist_t * ) );
 VLC_EXPORT( int,  playlist_Delete, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_Disable, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_Enable, ( playlist_t *, int ) );

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * info.c : Playlist info management
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: info.c,v 1.1 2004/01/05 12:59:43 zorglub Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: info.c,v 1.2 2004/01/06 08:50:20 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -105,8 +105,6 @@ item_info_category_t *
 playlist_GetCategory( playlist_t *p_playlist, int i_item,
                       const char * psz_cat )
 {
-    int i;
-
     /* Check the existence of the playlist */
     if( p_playlist == NULL)
     {

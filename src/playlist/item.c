@@ -1,8 +1,8 @@
 /*****************************************************************************
  * item.c : Playlist item functions
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: item.c,v 1.10 2004/01/05 12:59:43 zorglub Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: item.c,v 1.11 2004/01/06 08:50:20 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * item-ext.c : Exported playlist item functions
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: item-ext.c,v 1.3 2004/01/06 04:57:34 rocky Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: item-ext.c,v 1.4 2004/01/06 08:50:20 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -45,8 +45,8 @@
  * \return the position of the new item
 */
 int playlist_AddWDuration( playlist_t *p_playlist, const char * psz_uri,
-			   const char *psz_name, int i_mode, int i_pos,
-			   mtime_t i_duration )
+                           const char *psz_name, int i_mode, int i_pos,
+                           mtime_t i_duration )
 {
     playlist_item_t * p_item;
 
@@ -98,8 +98,8 @@ int playlist_AddWDuration( playlist_t *p_playlist, const char * psz_uri,
 int playlist_Add( playlist_t *p_playlist, const char * psz_uri,
                      const char *psz_name, int i_mode, int i_pos )
 {
-  return playlist_AddWDuration ( p_playlist, psz_uri, psz_name, i_mode, i_pos, 
-				 -1 );
+  return playlist_AddWDuration ( p_playlist, psz_uri, psz_name, i_mode, i_pos,
+                                 -1 );
 }
 
 /**
@@ -151,7 +151,7 @@ playlist_item_t * playlist_GetItemById( playlist_t * p_playlist , int i_id )
  * Set the group of a playlist item
  *
  * \param p_playlist the playlist
- * \param i_item the item of which we change the group
+ * \param i_item the item of which we change the group (position)
  * \param i_group the new group
  * \return 0 on success, -1 on failure
  */
@@ -363,6 +363,29 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
 
     return 0;
 }
+
+
+
+/**
+ * Clear all playlist items
+ *
+ * \param p_playlist the playlist to be cleared.
+ * \return returns 0
+ */
+int playlist_Clear( playlist_t * p_playlist ) {
+
+    while( p_playlist->i_groups > 0 )
+    {
+        playlist_DeleteGroup( p_playlist, p_playlist->pp_groups[0]->i_id );
+    }
+
+    while( p_playlist->i_size > 0 )
+    {
+        playlist_Delete( p_playlist, 0 );
+    }
+    return 0;
+}
+
 
 /**
  * Disables a playlist item

@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.28 2003/12/09 19:18:48 gbazin Exp $
+ * $Id: win32_specific.c,v 1.29 2004/01/06 08:50:20 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -297,7 +297,7 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
 
         if( pwm_data->lpData )
         {
-            int i_argc, i_data, i_opt, i_options;
+            int i_argc, i_data, i_opt, i_options,i_id,i_pos,j;
             char **ppsz_argv;
             char *p_data = (char *)pwm_data->lpData;
 
@@ -321,12 +321,16 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                 {
                     i_options++;
                 }
-
-                playlist_Add( p_playlist, ppsz_argv[ i_opt ],
-                    (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
-                    i_options, PLAYLIST_APPEND | (i_opt? 0 : PLAYLIST_GO),
-                    PLAYLIST_END );
-
+                i_id = playlist_Add( p_playlist, ppsz_argv[ i_opt ],
+                              ppsz_argv[ i_opt ],
+                              PLAYLIST_APPEND | (i_opt? 0 : PLAYLIST_GO),
+                              PLAYLIST_END );
+                i_pos = playlist_GetPositionById( p_playlist, i_id );
+                for( j = 0 ; j < i_options ; j++ )
+                {
+                    playlist_AddOption( p_playlist, i_pos ,
+                                        &ppsz_argv[i_opt+1+j] );
+                }
                 i_opt += i_options;
             }
 
