@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.25 2003/03/03 19:39:48 hartman Exp $
+$Id: NEWS,v 1.26 2003/03/04 21:54:03 hartman Exp $
 
 Changes between 0.5.1a and 0.5.2:
 --------------------------------
@@ -6,6 +6,8 @@ Changes between 0.5.1a and 0.5.2:
 Core support:
  * advanced config options are now hidden by default.
  * new --spdif option to use the S/PDIF audio output by default.
+ * fixed a 'clicking' sound when switching between streams.
+ * new bandlimited resampler that should improve audio quality on primarily Mac OS X. 
 
 Codecs:
  * support for DV audio through the ffmpeg library.
