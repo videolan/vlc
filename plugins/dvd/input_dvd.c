@@ -1,8 +1,16 @@
 /*****************************************************************************
- * input_dvd.c: DVD reading
+ * input_dvd.c: DVD raw reading plugin.
+ * ---
+ * This plugins should handle all the known specificities of the DVD format,
+ * especially the 2048 bytes logical block size.
+ * It depends on:
+ *  -input_netlist used to read packets
+ *  -dvd_ifo for ifo parsing and analyse
+ *  -dvd_css for unscrambling
+ *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.1 2001/02/08 04:43:27 sam Exp $
+ * $Id: input_dvd.c,v 1.2 2001/02/08 06:41:56 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -33,18 +41,11 @@
 
 #include <fcntl.h>
 #include <sys/types.h>
+#include <sys/uio.h>
 
 #include <string.h>
 #include <errno.h>
 #include <malloc.h>
-
-#include <sys/ioctl.h>
-#ifdef HAVE_SYS_DVDIO_H
-# include <sys/dvdio.h>
-#endif
-#ifdef LINUX_DVD
-# include <linux/cdrom.h>
-#endif
 
 #include "config.h"
 #include "common.h"
@@ -61,6 +62,8 @@
 #include "input_ext-dec.h"
 
 #include "input.h"
+#include "input_netlist.h"
+
 #include "dvd_ifo.h"
 #include "dvd_css.h"
 #include "input_dvd.h"
@@ -75,8 +78,7 @@
  *****************************************************************************/
 static int  DVDProbe    ( probedata_t *p_data );
 static int  DVDCheckCSS ( struct input_thread_s * );
-static int  DVDRead     ( struct input_thread_s *,
-                          data_packet_t * p_packets[INPUT_READ_ONCE] );
+static int  DVDRead     ( struct input_thread_s *, data_packet_t ** );
 static void DVDInit     ( struct input_thread_s * );
 static void DVDOpen     ( struct input_thread_s * );
 static void DVDClose    ( struct input_thread_s * );
@@ -84,10 +86,6 @@ static void DVDEnd      ( struct input_thread_s * );
 /* FIXME : DVDSeek should be on 64 bits ? Is it possible in input ? */
 static int  DVDSeek     ( struct input_thread_s *, off_t );
 static int  DVDRewind   ( struct input_thread_s * );
-static struct data_packet_s * NewPacket ( void *, size_t );
-static pes_packet_t * NewPES( void * p_garbage );
-static void DeletePacket( void *, struct data_packet_s * );
-static void DeletePES   ( void *, struct pes_packet_s * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -103,12 +101,12 @@ void input_getfunctions( function_list_t * p_function_list )
     input.pf_end              = DVDEnd;
     input.pf_read             = DVDRead;
     input.pf_demux            = input_DemuxPS;
-    input.pf_new_packet       = NewPacket;
-    input.pf_new_pes          = NewPES;
-    input.pf_delete_packet    = DeletePacket;
-    input.pf_delete_pes       = DeletePES;
-    input.pf_rewind           = NULL;
-    input.pf_seek             = NULL;
+    input.pf_new_packet       = input_NetlistNewPacket;
+    input.pf_new_pes          = input_NetlistNewPES;
+    input.pf_delete_packet    = input_NetlistDeletePacket;
+    input.pf_delete_pes       = input_NetlistDeletePES;
+    input.pf_rewind           = DVDRewind;
+    input.pf_seek             = DVDSeek;
 #undef input
 }
 
@@ -117,7 +115,7 @@ void input_getfunctions( function_list_t * p_function_list )
  */
 
 /*****************************************************************************
- * PSProbe: verifies that the stream is a PS stream
+ * DVDProbe: verifies that the stream is a PS stream
  *****************************************************************************/
 static int DVDProbe( probedata_t *p_data )
 {
@@ -135,19 +133,11 @@ static int DVDProbe( probedata_t *p_data )
 static int DVDCheckCSS( input_thread_t * p_input )
 {
 #if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
-    dvd_struct dvd;
-
-    dvd.type = DVD_STRUCT_COPYRIGHT;
-    dvd.copyright.layer_num = 0;
-
-    if( ioctl( p_input->i_handle, DVD_READ_STRUCT, &dvd ) < 0 )
-    {
-        intf_ErrMsg( "DVD ioctl error" );
-        return -1;
-    }
-
-    return dvd.copyright.cpst;
+    return CSSTest( p_input->i_handle );
 #else
+    /* DVD ioctls unavailable.
+     * FIXME: Check the stream to see whether it is encrypted or not 
+     * to give and accurate error message */
     return 0;
 #endif
 }
@@ -171,16 +161,22 @@ static void DVDInit( input_thread_t * p_input )
     p_input->p_method_data = NULL;
 
     p_method->i_fd = p_input->i_handle;
+    /* FIXME: read several packets once */
+    p_method->i_read_once = 1; 
+    p_method->i_title = 0;
 
 
     lseek64( p_input->i_handle, 0, SEEK_SET );
+
+    /* Reading structures initialisation */
+    input_NetlistInit( p_input, 4096, 4096, DVD_LB_SIZE,
+                       p_method->i_read_once ); 
 
     /* Ifo initialisation */
     p_method->ifo = IfoInit( p_input->i_handle );
     IfoRead( &(p_method->ifo) );
     intf_Msg( "Ifo: Initialized" );
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     /* CSS authentication and keys */
     if( ( p_method->b_encrypted = DVDCheckCSS( p_input ) ) )
     {
@@ -205,15 +201,15 @@ static void DVDInit( input_thread_t * p_input )
         CSSGetKeys( &(p_method->css) );
         intf_Msg( "CSS: Initialized" );
     }
-#endif
 
+    /* FIXME: Kludge beginning of vts_01_1.vob */
     i_start = p_method->ifo.p_vts[0].i_pos +
               p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector *DVD_LB_SIZE;
 
     i_start = lseek64( p_input->i_handle, i_start, SEEK_SET );
     intf_Msg( "VOB start at : %lld", (long long)i_start );
 
-#if 1
+    /* Initialize ES structures */
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
     input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
 
@@ -251,7 +247,8 @@ static void DVDInit( input_thread_t * p_input )
             {
                 /* FIXME: use i_p_config_t */
                 input_ParsePS( p_input, pp_packets[i] );
-                DeletePacket( p_input->p_method_data, pp_packets[i] );
+                input_NetlistDeletePacket( p_input->p_method_data,
+                                           pp_packets[i] );
             }
 
             /* File too big. */
@@ -338,12 +335,12 @@ static void DVDInit( input_thread_t * p_input )
     }
     else
     {
-#endif
         /* The programs will be added when we read them. */
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_input->stream.pp_programs[0]->b_is_ok = 0;
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
+
 }
 
 /*****************************************************************************
@@ -388,180 +385,119 @@ static void DVDClose( input_thread_t * p_input )
  *****************************************************************************/
 static void DVDEnd( input_thread_t * p_input )
 {
+    /* FIXME: check order of calls */
+//    CSSEnd( p_input );
+//    IfoEnd( (ifo_t*)(&p_input->p_plugin_data->ifo ) );
     free( p_input->stream.p_demux_data );
     free( p_input->p_plugin_data );
+    input_NetlistEnd( p_input );
 }
 
 /*****************************************************************************
- * SafeRead: reads a chunk of stream and correctly detects errors
- *****************************************************************************/
-static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
-                                size_t i_len )
-{
-    // FIXME : aie aie ugly kludge for testing purposes :)
-    static byte_t       p_tmp[2048];
-
-
-    thread_dvd_data_t * p_method;
-    int                 i_nb;
-    off64_t             i_pos;
-
-    p_method = (thread_dvd_data_t *)p_input->p_plugin_data;
-    i_pos = lseek64( p_input->i_handle, 0, SEEK_CUR );
-    if( !p_method->b_encrypted )
-    {
-        i_nb = read( p_input->i_handle, p_buffer, i_len );
-    }
-    else
-    {
-        lseek64( p_input->i_handle, i_pos & ~0x7FF, SEEK_SET );
-        i_nb = read( p_input->i_handle, p_tmp, 0x800 );
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
-        CSSDescrambleSector( p_method->css.p_title_key[0].key, p_tmp );
-#endif
-        memcpy( p_buffer, p_tmp + (i_pos & 0x7FF ), i_len );
-    }
-    switch( i_nb )
-    {
-        case 0:
-            /* End of File */
-            return( 1 );
-        case -1:
-            intf_ErrMsg( "DVD: Read failed (%s)", strerror(errno) );
-            return( -1 );
-        default:
-            break;
-    }
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.i_tell = 
-                lseek64( p_input->i_handle, i_pos+i_len, SEEK_SET );
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-    return( 0 );
-}
-
-/*****************************************************************************
- * DVDRead: reads data packets
+ * DVDRead: reads data packets into the netlist.
  *****************************************************************************
  * Returns -1 in case of error, 0 if everything went well, and 1 in case of
  * EOF.
  *****************************************************************************/
 static int DVDRead( input_thread_t * p_input,
-                   data_packet_t * pp_packets[INPUT_READ_ONCE] )
+                   data_packet_t ** pp_packets )
 {
-    byte_t              p_header[6];
-    data_packet_t *     p_data;
-    size_t              i_packet_size;
-    int                 i_packet, i_error;
-    thread_dvd_data_t * p_method;
+    thread_dvd_data_t *     p_method;
+    netlist_t *             p_netlist;
+    struct iovec *          p_vec;
+    struct data_packet_s *  p_data;
+    u8 *                    pi_cur;
+    int                     i_packet_size;
+    int                     i_packet;
+    int                     i_pos;
+    int                     i;
+    boolean_t               b_first_packet;
 
-    p_method = (thread_dvd_data_t *)p_input->p_plugin_data;
+    p_method = ( thread_dvd_data_t * ) p_input->p_plugin_data;
+    p_netlist = ( netlist_t * ) p_input->p_method_data;
 
-    memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
-    for( i_packet = 0; i_packet < INPUT_READ_ONCE; i_packet++ )
+    /* Get an iovec pointer */
+    if( ( p_vec = input_NetlistGetiovec( p_netlist, &p_data ) ) == NULL )
     {
-        /* Read what we believe to be a packet header. */
-        if( (i_error = SafeRead( p_input, p_header, 6 )) )
+        intf_ErrMsg( "DVD: read error" );
+        return -1;
+    }
+
+    /* Reads from DVD */
+    readv( p_input->i_handle, p_vec, p_method->i_read_once );
+
+    if( p_method->b_encrypted )
+    {
+        for( i=0 ; i<p_method->i_read_once ; i++ )
         {
-            return( i_error );
+            CSSDescrambleSector(
+                        p_method->css.p_title_key[p_method->i_title].key, 
+                        p_vec[i].iov_base );
+            ((u8*)(p_vec[i].iov_base))[0x14] &= 0x8F;
         }
+    }
 
-        if( (U32_AT(p_header) & 0xFFFFFF00) != 0x100L )
+    /* Update netlist indexes */
+    input_NetlistMviovec( p_netlist, p_method->i_read_once );
+
+    i_packet = 0;
+    /* Read headers to compute payload length */
+    for( i = 0 ; i < p_method->i_read_once ; i++ )
+    {
+        i_pos = 0;
+        b_first_packet = 1;
+        while( i_pos < p_netlist->i_buffer_size )
         {
-            /* This is not the startcode of a packet. Read the stream
-             * until we find one. */
-            u32         i_startcode = U32_AT(p_header);
-            int         i_nb;
-            byte_t      i_dummy;
-
-            if( i_startcode )
+            pi_cur = (u8*)(p_vec[i].iov_base + i_pos);
+            /*default header */
+            if( U32_AT( pi_cur ) != 0x1BA )
             {
-                /* It is common for MPEG-1 streams to pad with zeros
-                 * (although it is forbidden by the recommendation), so
-                 * don't bother everybody in this case. */
-                intf_WarnMsg( 1, "Garbage at input (%x)", i_startcode );
-            }
-
-            while( (i_startcode & 0xFFFFFF00) != 0x100L )
-            {
-                i_startcode <<= 8;
-                if( (i_nb = SafeRead( p_input, &i_dummy, 1 )) != 0 )
-                {
-                    i_startcode |= i_dummy;
-                }
-                else
-                {
-                    return( 1 );
-                }
-            }
-
-            /* Packet found. */
-            *(u32 *)p_header = U32_AT(&i_startcode);
-            if( (i_error = SafeRead( p_input, p_header + 4, 2 )) )
-            {
-                return( i_error );
-            }
-        }
-
-        if( U32_AT(p_header) != 0x1BA )
-        {
-            /* That's the case for all packets, except pack header. */
-            i_packet_size = U16_AT(&p_header[4]);
-        }
-        else
-        {
-            /* Pack header. */
-            if( (p_header[4] & 0xC0) == 0x40 )
-            {
-                /* MPEG-2 */
-                i_packet_size = 8;
-            }
-            else if( (p_header[4] & 0xF0) == 0x20 )
-            {
-                /* MPEG-1 */
-                i_packet_size = 6;
+                /* That's the case for all packets, except pack header. */
+                i_packet_size = U16_AT( pi_cur + 4 );
             }
             else
             {
-                intf_ErrMsg( "Unable to determine stream type" );
-                return( -1 );
-            }
-        }
-
-        /* Fetch a packet of the appropriate size. */
-        if( (p_data = NewPacket( p_input, i_packet_size + 6 )) == NULL )
-        {
-            intf_ErrMsg( "Out of memory" );
-            return( -1 );
-        }
-
-        /* Copy the header we already read. */
-        memcpy( p_data->p_buffer, p_header, 6 );
-
-        /* Read the remaining of the packet. */
-        if( i_packet_size && (i_error =
-                SafeRead( p_input, p_data->p_buffer + 6, i_packet_size )) )
-        {
-            return( i_error );
-        }
-
-        /* In MPEG-2 pack headers we still have to read stuffing bytes. */
-        if( U32_AT(p_header) == 0x1BA )
-        {
-            if( i_packet_size == 8 && (p_data->p_buffer[13] & 0x7) != 0 )
-            {
-                /* MPEG-2 stuffing bytes */
-                byte_t      p_garbage[8];
-                if( (i_error = SafeRead( p_input, p_garbage,
-                                         p_data->p_buffer[13] & 0x7)) )
+                /* Pack header. */
+                if( ( pi_cur[4] & 0xC0 ) == 0x40 )
                 {
-                    return( i_error );
+                    /* MPEG-2 */
+                    i_packet_size = 8;
+                }
+                else if( ( pi_cur[4] & 0xF0 ) == 0x20 )
+                {
+                    /* MPEG-1 */
+                    i_packet_size = 6;
+                }
+                else
+                {
+                    intf_ErrMsg( "Unable to determine stream type" );
+                    return( -1 );
                 }
             }
-        }
+            if( b_first_packet )
+            {
+                p_data->b_discard_payload = 0;
+                b_first_packet = 0;
+            }
+            else
+            { 
+                p_data = input_NetlistNewPacket( p_netlist ,
+                                                 i_packet_size + 6 );
+                memcpy( p_data->p_buffer,
+                        p_vec[i].iov_base + i_pos , i_packet_size + 6 );
+            }
 
-        /* Give the packet to the other input stages. */
-        pp_packets[i_packet] = p_data;
+            p_data->p_payload_end = p_data->p_payload_start + i_packet_size + 6;
+            pp_packets[i_packet] = p_data;
+            i_packet++;
+            i_pos += i_packet_size + 6;
+        }
     }
+    pp_packets[i_packet] = NULL;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.i_tell += p_method->i_read_once *DVD_LB_SIZE;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return( 0 );
 }
@@ -584,100 +520,3 @@ static int DVDSeek( input_thread_t * p_input, off_t i_off )
 {
     return( -1 );
 }
-
-/*
- * Packet management utilities
- */
-
-/*****************************************************************************
- * NewPacket: allocates a data packet
- *****************************************************************************/
-static struct data_packet_s * NewPacket( void * p_garbage,
-                                         size_t i_size )
-{
-    data_packet_t * p_data;
-
-    /* Safety check */
-    if( i_size > INPUT_MAX_PACKET_SIZE )
-    {
-        intf_ErrMsg( "Packet too big (%d)", i_size );
-        return NULL;
-    }
-
-    if( (p_data = (data_packet_t *)malloc( sizeof(data_packet_t) )) == NULL )
-    {
-        intf_DbgMsg( "Out of memory" );
-        return NULL;
-    }
-
-    if( (p_data->p_buffer = (byte_t *)malloc( i_size )) == NULL )
-    {
-        intf_DbgMsg( "Out of memory" );
-        free( p_data );
-        return NULL;
-    }
-
-    /* Initialize data */
-    p_data->p_next = NULL;
-    p_data->b_discard_payload = 0;
-
-    p_data->p_payload_start = p_data->p_buffer;
-    p_data->p_payload_end = p_data->p_buffer + i_size;
-
-    return( p_data );
-}
-
-/*****************************************************************************
- * NewPES: allocates a pes packet
- *****************************************************************************/
-static pes_packet_t * NewPES( void * p_garbage )
-{
-    pes_packet_t * p_pes;
-
-    if( (p_pes = (pes_packet_t *)malloc( sizeof(pes_packet_t) )) == NULL )
-    {
-        intf_DbgMsg( "Out of memory" );
-        return NULL;
-    }
-
-    p_pes->b_messed_up = p_pes->b_data_alignment = p_pes->b_discontinuity =
-        p_pes->i_pts = p_pes->i_dts = 0;
-    p_pes->i_pes_size = 0;
-    p_pes->p_first = NULL;
-
-    return( p_pes );
-}
-
-/*****************************************************************************
- * DeletePacket: deletes a data packet
- *****************************************************************************/
-static void DeletePacket( void * p_garbage,
-                          data_packet_t * p_data )
-{
-    ASSERT(p_data);
-    ASSERT(p_data->p_buffer);
-    free( p_data->p_buffer );
-    free( p_data );
-}
-
-/*****************************************************************************
- * DeletePES: deletes a PES packet and associated data packets
- *****************************************************************************/
-static void DeletePES( void * p_garbage, pes_packet_t * p_pes )
-{
-    data_packet_t *     p_data;
-    data_packet_t *     p_next;
-
-    p_data = p_pes->p_first;
-
-    while( p_data != NULL )
-    {
-        p_next = p_data->p_next;
-        free( p_data->p_buffer );
-        free( p_data );
-        p_data = p_next;
-    }
-
-    free( p_pes );
-}
-
