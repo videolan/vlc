@@ -498,7 +498,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         }
 
         /* Take care of the aspect ratio */
-        if( p_region->fmt.i_sar_num * p_fmt->i_sar_den !=
+        if( p_region && p_region->fmt.i_sar_num * p_fmt->i_sar_den !=
             p_region->fmt.i_sar_den * p_fmt->i_sar_num )
         {
             i_scale_width = i_scale_width *
