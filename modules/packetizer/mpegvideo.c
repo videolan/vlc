@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.4 2003/01/19 08:27:28 fenrir Exp $
+ * $Id: mpegvideo.c,v 1.5 2003/01/20 02:15:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -50,6 +50,7 @@ typedef struct packetizer_s
     mtime_t                 i_last_dts;
     mtime_t                 i_last_ref_pts;
     double                  d_frame_rate;
+    int                     i_progressive_sequence;
     uint8_t                 p_sequence_header[150];
     int                     i_sequence_header_length;
     int                     i_last_sequence_header;
@@ -280,9 +281,17 @@ static void PacketizeThread( packetizer_t *p_pack )
 
         /* sequence_extension (10 bytes) */
         if( ShowBits( &p_pack->bit_stream, 32 ) != 0x1B5 )
+        {
             msg_Dbg( p_pack->p_fifo, "ARRGG no extension_start_code" );
+            p_pack->i_progressive_sequence = 1;
+        }
         else
-            GetChunk( &p_pack->bit_stream, p_temp + i_pos, 10 ); i_pos += 10;
+        {
+            GetChunk( &p_pack->bit_stream, p_temp + i_pos, 10 );
+            p_pack->i_progressive_sequence = ( p_temp[i_pos+5]&0x08 ) ? 1 : 0;
+
+            i_pos += 10;
+        }
 
         /* remember sequence_header and sequence_extention */
         memcpy( p_pack->p_sequence_header, p_temp, i_pos );
@@ -374,6 +383,9 @@ static void PacketizeThread( packetizer_t *p_pack )
     p_sout_buffer->i_pts = p_pack->i_last_ref_pts +
         i_temporal_ref * (mtime_t)( 1000000 / p_pack->d_frame_rate );
 
+    msg_Dbg( p_pack->p_fifo, "dts:%lld pst:%lld tmp_ref:%d",
+             p_sout_buffer->i_dts, p_sout_buffer->i_pts, i_temporal_ref );
+
     p_sout_buffer->i_length = (uint64_t)1000000 / p_pack->d_frame_rate;
     p_sout_buffer->i_bitrate = (int)( 8 * i_pos * p_pack->d_frame_rate );
 
@@ -381,7 +393,14 @@ static void PacketizeThread( packetizer_t *p_pack )
 
     sout_InputSendBuffer( p_pack->p_sout_input, p_sout_buffer );
 
-    p_pack->i_last_dts += (mtime_t)( 1000000 / p_pack->d_frame_rate );
+    if( p_pack->i_progressive_sequence )
+    {
+        p_pack->i_last_dts += (mtime_t)( 1000000 / p_pack->d_frame_rate );
+    }
+    else
+    {
+        p_pack->i_last_dts += (mtime_t)( 1000000 / p_pack->d_frame_rate / 2 );
+    }
 }
 
 
