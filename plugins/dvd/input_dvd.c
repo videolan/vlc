@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.97 2001/11/13 01:25:05 sam Exp $
+ * $Id: input_dvd.c,v 1.98 2001/11/19 15:13:11 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -482,8 +482,9 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         /* Force libdvdcss to check its title key.
          * It is only useful for title cracking method. Methods using the
          * decrypted disc key are fast enough to check the key at each seek */
+
         if( dvdcss_seek( p_dvd->dvdhandle, p_dvd->i_start,
-                                           DVDCSS_NOFLAGS ) < 0 )
+				DVDCSS_SEEK_KEY ) < 0 )
         {
             intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
             return -1;
