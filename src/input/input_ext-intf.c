@@ -39,54 +39,81 @@
 #include "input.h"
 
 /*****************************************************************************
- * input_Play: comes back to the normal pace of reading
+ * input_SetRate: change the reading pace
  *****************************************************************************/
-void input_Play( input_thread_t * p_input )
+void input_SetRate( input_thread_t * p_input, int i_mode )
 {
-    intf_Msg( "input: playing at normal rate" );
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.i_new_status = PLAYING_S;
-    vlc_cond_signal( &p_input->stream.stream_wait );
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-}
 
-/*****************************************************************************
- * input_Forward: manages fast forward and slow motion
- *****************************************************************************
- * Note that if i_rate > DEFAULT_RATE, the pace is slower.
- *****************************************************************************/
-void input_Forward( input_thread_t * p_input, int i_rate )
-{
-    if ( i_rate > DEFAULT_RATE )
+    switch( i_mode )
     {
-        intf_Msg( "input: playing at 1:%i slow motion", i_rate / 1000 );
-    }
-    else if( i_rate < DEFAULT_RATE )
-    {
-        intf_Msg( "input: playing at %i:1 fast forward", 1000 / i_rate );
-    }
-    else
-    {
-        /* Not very joli, but this is going to disappear soon anyway */
-        input_Play( p_input );
-        return;
+    case INPUT_RATE_PLAY:
+        p_input->stream.i_new_status = PLAYING_S;
+        intf_Msg( "input: playing at normal rate" );
+        break;
+
+    case INPUT_RATE_PAUSE:
+        /* XXX: we don't need to check i_status, because input_clock.c
+         * does it for us */
+        p_input->stream.i_new_status = PAUSE_S;
+        intf_Msg( "input: toggling pause" );
+        break;
+
+    case INPUT_RATE_FASTER:
+        /* If we are already going too fast, go back to default rate */
+        if( p_input->stream.control.i_rate * 8 <= DEFAULT_RATE )
+        {
+            p_input->stream.i_new_status = PLAYING_S;
+            intf_Msg( "input: playing at normal rate" );
+        }
+        else
+        {
+            p_input->stream.i_new_status = FORWARD_S;
+
+            if( p_input->stream.control.i_rate < DEFAULT_RATE
+                    && p_input->stream.control.i_status == FORWARD_S )
+            {
+                p_input->stream.i_new_rate =
+                                    p_input->stream.control.i_rate / 2;
+            }
+            else
+            {
+                p_input->stream.i_new_rate = DEFAULT_RATE / 2;
+            }
+            intf_Msg( "input: playing at %i:1 fast forward",
+                      DEFAULT_RATE / p_input->stream.i_new_rate );
+        }
+        break;
+
+    case INPUT_RATE_SLOWER:
+        /* If we are already going too slow, go back to default rate */
+        if( p_input->stream.control.i_rate >= 8 * DEFAULT_RATE )
+        {
+            p_input->stream.i_new_status = PLAYING_S;
+            intf_Msg( "input: playing at normal rate" );
+        }
+        else
+        {
+            p_input->stream.i_new_status = FORWARD_S;
+
+            if( p_input->stream.control.i_rate > DEFAULT_RATE
+                    && p_input->stream.control.i_status == FORWARD_S )
+            {
+                p_input->stream.i_new_rate =
+                                    p_input->stream.control.i_rate * 2;
+            }
+            else
+            {
+                p_input->stream.i_new_rate = DEFAULT_RATE * 2;
+            }
+            intf_Msg( "input: playing at 1:%i slow motion",
+                      p_input->stream.i_new_rate / DEFAULT_RATE );
+        }
+        break;
+
+    default:
     }
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.i_new_status = FORWARD_S;
-    p_input->stream.i_new_rate = i_rate;
-    vlc_cond_signal( &p_input->stream.stream_wait );
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-}
-
-/*****************************************************************************
- * input_Pause: temporarily stops the reading of the stream
- *****************************************************************************/
-void input_Pause( input_thread_t * p_input )
-{
-    intf_Msg( "input: paused" );
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.i_new_status = PAUSE_S;
     vlc_cond_signal( &p_input->stream.stream_wait );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }

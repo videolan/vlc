@@ -251,7 +251,6 @@ int vout_Manage( vout_thread_t *p_vout )
 {
     SDL_Event event;                                            /* SDL event */
     Uint8   i_key;
-    int     i_rate;
 
     /* FIXME: do this nicely */
     input_thread_t * p_input = p_main->p_intf->p_input;
@@ -321,39 +320,21 @@ int vout_Manage( vout_thread_t *p_vout )
             case SDLK_p:
                 if( p_input != NULL )
                 {
-                    if( p_input->stream.control.i_status == PLAYING_S )
-                    {
-                        input_Pause( p_input );
-                    }
-                    else
-                    {
-                        input_Play( p_input );
-                    }
+                    input_SetRate( p_input, INPUT_RATE_PAUSE );
                 }
                 break;
 
             case SDLK_a:
                 if( p_input != NULL )
                 {
-                    i_rate = p_input->stream.control.i_rate/2;
-                    if ( i_rate >= MINIMAL_RATE )
-                    {
-                        input_Forward( p_input, i_rate );
-                    }
+                    input_SetRate( p_input, INPUT_RATE_FASTER );
                 }
                 break;
 
             case SDLK_z:
                 if( p_input != NULL )
                 {
-                    i_rate = p_input->stream.control.i_rate*2;
-                    if ( i_rate <= MAXIMAL_RATE )
-                    {
-                        /* Compensation of int truncature */
-                        if ( i_rate > 500 && i_rate < 1000 )
-                            i_rate = 1000;
-                        input_Forward( p_input, i_rate );
-                    }
+                    input_SetRate( p_input, INPUT_RATE_SLOWER );
                 }
                 break;
 

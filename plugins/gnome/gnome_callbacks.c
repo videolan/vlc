@@ -177,7 +177,7 @@ on_toolbar_play_clicked                (GtkButton       *button,
 
     if( p_intf->p_input != NULL )
     {
-        input_Play( p_intf->p_input );
+        input_SetRate( p_intf->p_input, INPUT_RATE_PLAY );
     }
 }
 
@@ -190,7 +190,7 @@ on_toolbar_pause_clicked               (GtkButton       *button,
 
     if( p_intf->p_input != NULL )
     {
-        input_Pause( p_intf->p_input );
+        input_SetRate( p_intf->p_input, INPUT_RATE_PAUSE );
     }
 }
 
@@ -249,7 +249,7 @@ on_popup_play_activate                 (GtkMenuItem     *menuitem,
 
     if( p_intf->p_input != NULL )
     {
-        input_Play( p_intf->p_input );
+        input_SetRate( p_intf->p_input, INPUT_RATE_PLAY );
     }
 }
 
@@ -262,7 +262,7 @@ on_popup_pause_activate                (GtkMenuItem     *menuitem,
 
     if( p_intf->p_input != NULL )
     {
-        input_Pause( p_intf->p_input );
+        input_SetRate( p_intf->p_input, INPUT_RATE_PAUSE );
     }
 }
 
@@ -380,18 +380,10 @@ on_popup_slow_activate                 (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-    int i_rate;
 
     if( p_intf->p_input != NULL )
     {
-        i_rate = p_intf->p_input->stream.control.i_rate * 2;
-        if ( i_rate <= MAXIMAL_RATE )
-        {
-             if ( i_rate > 500 && i_rate < 1000 )
-                 i_rate = 1000;
-
-             input_Forward( p_intf->p_input, i_rate );
-        }
+        input_SetRate( p_intf->p_input, INPUT_RATE_SLOWER );
     }
 }
 
@@ -401,15 +393,10 @@ on_popup_fast_activate                 (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-    int i_rate;
 
     if( p_intf->p_input != NULL )
     {
-        i_rate = p_intf->p_input->stream.control.i_rate / 2;
-        if ( i_rate >= MINIMAL_RATE )
-        {
-             input_Forward( p_intf->p_input, i_rate );
-        }
+        input_SetRate( p_intf->p_input, INPUT_RATE_FASTER );
     }
 }
 
@@ -419,18 +406,10 @@ on_toolbar_slow_clicked                (GtkButton       *button,
                                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
-    int i_rate;
 
     if( p_intf->p_input != NULL )
     {
-        i_rate = p_intf->p_input->stream.control.i_rate * 2;
-        if ( i_rate <= MAXIMAL_RATE )
-        {
-             if ( i_rate > 500 && i_rate < 1000 )
-                 i_rate = 1000;
-
-             input_Forward( p_intf->p_input, i_rate );
-        }
+        input_SetRate( p_intf->p_input, INPUT_RATE_SLOWER );
     }
 }
 
@@ -440,15 +419,10 @@ on_toolbar_fast_clicked                (GtkButton       *button,
                                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
-    int i_rate;
 
     if( p_intf->p_input != NULL )
     {
-        i_rate = p_intf->p_input->stream.control.i_rate / 2;
-        if ( i_rate >= MINIMAL_RATE )
-        {
-             input_Forward( p_intf->p_input, i_rate );
-        }
+        input_SetRate( p_intf->p_input, INPUT_RATE_FASTER );
     }
 }
 
