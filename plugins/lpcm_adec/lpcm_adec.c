@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.15 2002/05/24 12:42:14 gbazin Exp $
+ * $Id: lpcm_adec.c,v 1.15.2.1 2002/08/11 21:56:04 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -159,7 +159,10 @@ static int InitThread (lpcmdec_thread_t * p_lpcmdec)
  *****************************************************************************/
 void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
 {
-    byte_t * buffer,p_temp[LPCMDEC_FRAME_SIZE];
+    byte_t * buffer;
+#ifndef WORDS_BIGENDIAN
+    byte_t * p_temp[LPCMDEC_FRAME_SIZE];
+#endif
     int i_loop;
     byte_t byte1, byte2;
 
@@ -181,8 +184,8 @@ void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
     
     /* I only have 2 test streams. As far as I understand
      * after the RemoveBits and the 2 GetBits, we should be exactly 
-     * where we whant : the sync word : 0x0180.
-     * If not, we got and find it. */
+     * where we want : the sync word : 0x0180.
+     * If not, we go and find it. */
     while( ( byte1 != 0x01 || byte2 != 0x80 ) && (!p_lpcmdec->p_fifo->b_die)
                                        && (!p_lpcmdec->p_fifo->b_error) )
     {
@@ -190,14 +193,24 @@ void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
         byte2 = GetBits(&p_lpcmdec->bit_stream, 8);
     }
     
+#ifndef WORDS_BIGENDIAN
     GetChunk( &p_lpcmdec->bit_stream, p_temp, LPCMDEC_FRAME_SIZE);
     if( p_lpcmdec->p_fifo->b_die ) return;
 
+#   ifdef HAVE_SWAB
+    swab( buffer, p_temp, LPCMDEC_FRAME_SIZE );
+#   else
     for( i_loop = 0; i_loop < LPCMDEC_FRAME_SIZE/2; i_loop++ )
     {
         buffer[2*i_loop]=p_temp[2*i_loop+1];
         buffer[2*i_loop+1]=p_temp[2*i_loop];
     }
+#   endif
+
+#else
+    GetChunk( &p_lpcmdec->bit_stream, buffer, LPCMDEC_FRAME_SIZE);
+    if( p_lpcmdec->p_fifo->b_die ) return;
+#endif
     
     vlc_mutex_lock (&p_lpcmdec->p_aout_fifo->data_lock);
     p_lpcmdec->p_aout_fifo->i_end_frame = 
