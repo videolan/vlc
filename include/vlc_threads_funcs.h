@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads_funcs.h,v 1.12 2003/01/16 09:02:46 sam Exp $
+ * $Id: vlc_threads_funcs.h,v 1.13 2003/01/22 15:16:02 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -605,24 +605,24 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
     struct timeval now;
     struct timespec timeout;
 
-    for( ; ; )
+    gettimeofday( &now, NULL );
+    timeout.tv_sec = now.tv_sec + THREAD_COND_TIMEOUT;
+    timeout.tv_nsec = now.tv_usec * 1000;
+
+    i_result = pthread_cond_timedwait( &p_condvar->cond, &p_mutex->mutex,
+                                       &timeout );
+
+    if( i_result == ETIMEDOUT )
     {
-        gettimeofday( &now, NULL );
-        timeout.tv_sec = now.tv_sec + THREAD_COND_TIMEOUT;
-        timeout.tv_nsec = now.tv_usec * 1000;
+        /* People keep pissing me off with this. --Meuuh */
+        msg_Dbg( p_condvar->p_this,
+                  "thread %d: secret message triggered "
+                  "at %s:%d (%s)", (int)pthread_self(),
+                  psz_file, i_line, strerror(i_result) );
 
-        i_result = pthread_cond_timedwait( &p_condvar->cond, &p_mutex->mutex,
-                                           &timeout );
-
-        if( i_result == ETIMEDOUT )
-        {
-            msg_Warn( p_condvar->p_this,
-                      "thread %d: possible deadlock detected "
-                      "in cond_wait at %s:%d (%s)", (int)pthread_self(),
-                      psz_file, i_line, strerror(i_result) );
-        }
-        else break;
+        i_result = pthread_cond_wait( &p_condvar->cond, &p_mutex->mutex );
     }
+
 #   else
     i_result = pthread_cond_wait( &p_condvar->cond, &p_mutex->mutex );
 #   endif
