@@ -132,7 +132,7 @@
     </ControlGroup>
   </Window>
 
-  <Window id="PlaylistWindow" x="200" y="205" alpha="255" fadetime="500" movealpha="192">
+  <Window id="PlaylistWindow" x="200" y="205" visible="false" alpha="255" fadetime="500" movealpha="192">
     <ControlGroup x="0" y="0">
       <Anchor x="0" y="0" priority="50"/>
       <ImageControl x="0" y="0" image="playlist_body" onclick="MovePlaylist"/>

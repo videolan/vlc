@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.16 2003/06/08 18:17:50 asmax Exp $
+ * $Id: x11_window.cpp,v 1.17 2003/06/08 18:40:10 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -160,6 +160,8 @@ X11Window::~X11Window()
 //---------------------------------------------------------------------------
 void X11Window::OSShow( bool show )
 {
+    XResizeWindow( display, Wnd, 1, 1 ); // Avoid flicker
+
     if( show )
     {
         // We do the call to XShapeCombineRegion() here because the window
@@ -213,7 +215,7 @@ void X11Window::OSShow( bool show )
         }
 
         XMapWindow( display, Wnd );
-        XMoveWindow( display, Wnd, Left, Top );
+        XMoveResizeWindow( display, Wnd, Left, Top, Width, Height );
         XUNLOCK;
     }
     else
