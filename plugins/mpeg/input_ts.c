@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.18 2001/05/07 04:35:21 henri Exp $
+ * $Id: input_ts.c,v 1.19 2001/05/08 12:53:30 bozo Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -260,6 +260,14 @@ static int TSRead( input_thread_t * p_input,
     struct timeval  s_wait;
     
 
+    /* Get iovecs */
+    p_iovec = input_NetlistGetiovec( p_input->p_method_data );
+    
+    if ( p_iovec == NULL )
+    {
+        return( -1 ); /* empty netlist */
+    } 
+
     /* Init */
     p_method = ( thread_ts_data_t * )p_input->p_plugin_data;
    
@@ -269,20 +277,12 @@ static int TSRead( input_thread_t * p_input,
 
     
     /* We'll wait 0.5 second if nothing happens */
-    s_wait.tv_sec = 0.5;
-    s_wait.tv_usec = 0;
+    s_wait.tv_sec = 0;
+    s_wait.tv_usec = 500000;
     
     /* Reset pointer table */
     memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
     
-    /* Get iovecs */
-    p_iovec = input_NetlistGetiovec( p_input->p_method_data );
-    
-    if ( p_iovec == NULL )
-    {
-        return( -1 ); /* empty netlist */
-    } 
-
     /* Fill if some data is available */
     i_data = select(p_input->i_handle + 1, &(p_method->s_fdset), NULL, NULL, 
                     &s_wait);
