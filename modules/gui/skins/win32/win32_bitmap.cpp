@@ -2,7 +2,7 @@
  * win32_bitmap.cpp: Win32 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_bitmap.cpp,v 1.4 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: win32_bitmap.cpp,v 1.5 2003/04/28 00:18:27 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -73,7 +73,7 @@ Win32Bitmap::Win32Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
     Width  = Bmp.bmWidth;
     Height = Bmp.bmHeight;
 
-    // If alpha color is not 0, then change 0 colors to non black color to avoid
+    // If alpha color is not 0, then change 0 color to non black color to avoid
     // window transparency
     if( (int)AlphaColor != OSAPI_GetNonTransparentColor( 0 ) )
     {
@@ -91,7 +91,17 @@ Win32Bitmap::Win32Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
         DeleteObject( Brush );
         delete r;
 
-        TransparentBlt( bufDC, 0, 0, Width, Height, bmpDC, 0, 0, Width, Height, 0 );
+        if( IS_WINNT )
+        {
+            // This function contains a memory leak on win95/win98
+            TransparentBlt( bufDC, 0, 0, Width, Height, bmpDC, 0, 0,
+                            Width, Height, 0 );
+        }
+        else
+        {
+            BitBlt( bufDC, 0, 0, Width, Height, bmpDC, 0, 0, SRCCOPY );
+        }
+
         BitBlt( bmpDC, 0, 0, Width, Height, bufDC, 0, 0, SRCCOPY );
         DeleteDC( bufDC );
         DeleteObject( HBuf );
@@ -147,9 +157,16 @@ void Win32Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
 {
     HDC destDC = ( (Win32Graphics *)dest )->GetImageHandle();
 
-    // New method, not available in win95
-    TransparentBlt( destDC, xRef, yRef, w, h, bmpDC, x, y, w, h, AlphaColor );
-
+    if( IS_WINNT )
+    {
+        // This function contains a memory leak on win95/win98
+        TransparentBlt( destDC, xRef, yRef, w, h, bmpDC, x, y, w, h,
+                        AlphaColor );
+    }
+    else
+    {
+        BitBlt( destDC, xRef, yRef, w, h, bmpDC, x, y, SRCCOPY );
+    }
 }
 //---------------------------------------------------------------------------
 bool Win32Bitmap::Hit( int x, int y)

@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.9 2003/04/21 21:51:16 asmax Exp $
+ * $Id: win32_run.cpp,v 1.10 2003/04/28 00:18:27 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -99,7 +99,7 @@ bool Instance::OnInit()
     vlc_mutex_lock( &p_intf->p_sys->init_lock );
     vlc_cond_signal( &p_intf->p_sys->init_cond );
     vlc_mutex_unlock( &p_intf->p_sys->init_lock );
-    
+
     return TRUE;
 }
 
@@ -121,10 +121,8 @@ DllMain (HANDLE hModule, DWORD fdwReason, LPVOID lpReserved)
 // We create all wxWindows dialogs in a separate thread because we don't want
 // any interaction with our own message loop
 //---------------------------------------------------------------------------
-DWORD WINAPI ThreadFunc( LPVOID lpParam )
+void SkinsDialogsThread( intf_thread_t *p_intf )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)lpParam;
-
     /* Hack to pass the p_intf pointer to the new wxWindow Instance object */
     wxTheApp = new Instance( p_intf );
 
@@ -138,7 +136,7 @@ DWORD WINAPI ThreadFunc( LPVOID lpParam )
     wxEntry( 1, p_args );
 #endif
 
-    return 0;
+    return;
 }
 
 
@@ -167,13 +165,16 @@ void OSRun( intf_thread_t *p_intf )
     int KeyModifier = 0;
 
     // Create a new thread for wxWindows
-    HANDLE hThread;
-    hThread = CreateThread( NULL, 0, ThreadFunc, (LPVOID) p_intf, 0, 0 );
+    if( vlc_thread_create( p_intf, "Skins Dialogs Thread", SkinsDialogsThread,
+                           0, 0 ) )                                                 {
+        msg_Err( p_intf, "cannot create SkinsDialogsThread" );
+        // Don't even enter the main loop
+        return;
+    }
+//    vlc_mutex_lock( &p_intf->p_sys->init_lock );
+//    vlc_cond_wait( &p_intf->p_sys->init_cond, &p_intf->p_sys->init_lock );
+//    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
 
-    vlc_mutex_lock( &p_intf->p_sys->init_lock );
-    vlc_cond_wait( &p_intf->p_sys->init_cond, &p_intf->p_sys->init_lock );
-    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
- 
      // Create refresh timer
     SetTimer( ((OSTheme *)p_intf->p_sys->p_theme)->GetParentWindow(), 42, 200,
               (TIMERPROC)RefreshTimer );
@@ -183,9 +184,10 @@ void OSRun( intf_thread_t *p_intf )
     {
 
         for( win = p_intf->p_sys->p_theme->WindowList.begin();
-            win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
+             win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
         {
-            if( msg.hwnd == NULL || msg.hwnd == ((Win32Window*)(*win))->GetHandle() )
+            if( msg.hwnd == NULL ||
+                msg.hwnd == ((Win32Window*)(*win))->GetHandle() )
             {
                 break;
             }
@@ -224,8 +226,10 @@ void OSRun( intf_thread_t *p_intf )
             if( msg.wParam == 17 )
                 KeyModifier = 2;
             else if( KeyModifier > 0 )
+            {
                 p_intf->p_sys->p_theme->EvtBank->TestShortcut(
                     msg.wParam, KeyModifier );
+            }
         }
         else if( msg.message == WM_SYSKEYDOWN )
         {
@@ -257,12 +261,12 @@ void OSRun( intf_thread_t *p_intf )
         }
 
         /**********************
-        * Broadcsated message *
+        * Broadcasted message *
         **********************/
         else if( msg.hwnd == NULL )
         {
             for( win = p_intf->p_sys->p_theme->WindowList.begin();
-                win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
+                 win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
             {
                 (*win)->ProcessEvent( ProcessEvent );
             }

@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.18 2003/04/23 10:29:52 asmax Exp $
+ * $Id: skin_main.cpp,v 1.19 2003/04/28 00:18:27 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -117,7 +117,7 @@ static int Open ( vlc_object_t *p_this )
     // Initialize conditions and mutexes
     vlc_mutex_init( p_intf, &p_intf->p_sys->init_lock );
     vlc_cond_init( p_intf, &p_intf->p_sys->init_cond );
-    
+
     p_intf->p_sys->p_theme = (Theme *)new OSTheme( p_intf );
 
     return( 0 );
@@ -150,7 +150,7 @@ static void Close ( vlc_object_t *p_this )
     // Destroy conditions and mutexes
     vlc_cond_destroy( &p_intf->p_sys->init_cond );
     vlc_mutex_destroy( &p_intf->p_sys->init_lock );
-    
+
     // Destroy structure
     free( p_intf->p_sys );
 }
@@ -302,7 +302,7 @@ int SkinManage( intf_thread_t *p_intf )
 
 
         // Refresh slider
-       // if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
+        // if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
         if( p_input->stream.b_seekable )
         {
 #define p_area p_input->stream.p_selected_area

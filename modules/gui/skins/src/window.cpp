@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.19 2003/04/21 21:51:16 asmax Exp $
+ * $Id: window.cpp,v 1.20 2003/04/28 00:18:27 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -98,7 +98,7 @@ void SkinWindow::Open()
 
     Changing = true;
 
-    if( Transition )
+    if( Transition && IS_WINNT )
     {
         SetTransparency( 0 );
         OSAPI_PostMessage( this, WINDOW_SHOW, 0, 0 );
@@ -114,7 +114,7 @@ void SkinWindow::Close()
 {
     Changing = true;
 
-    if( Transition )
+    if( Transition && IS_WINNT )
         Fade( 0, Transition, WINDOW_HIDE );
     else
         OSAPI_PostMessage( this, WINDOW_FADE, WINDOW_HIDE, 1242 );
@@ -140,13 +140,17 @@ void SkinWindow::Hide()
 //---------------------------------------------------------------------------
 void SkinWindow::Fade( int To, int Time, unsigned int evt )
 {
-    StartAlpha = Alpha;
-    EndAlpha   = To;
-    StartTime  = OSAPI_GetTime();
-    EndTime    = StartTime + Time;
-    Lock++;
+    // No fading effect on win9x
+    if( IS_WINNT )
+    {
+        StartAlpha = Alpha;
+        EndAlpha   = To;
+        StartTime  = OSAPI_GetTime();
+        EndTime    = StartTime + Time;
+        Lock++;
 
-    OSAPI_PostMessage( this, WINDOW_FADE, evt, Lock );
+        OSAPI_PostMessage( this, WINDOW_FADE, evt, Lock );
+    }
 }
 //---------------------------------------------------------------------------
 bool SkinWindow::ProcessEvent( Event *evt )
@@ -245,24 +249,27 @@ bool SkinWindow::ProcessEvent( Event *evt )
 //---------------------------------------------------------------------------
 bool SkinWindow::ChangeAlpha( int time )
 {
-    if( time >= EndTime )
+    if( IS_WINNT )
     {
-        if( Lock )
+        if( time >= EndTime )
         {
-            SetTransparency( EndAlpha );
-            Lock = 0;
+            if( Lock )
+            {
+                SetTransparency( EndAlpha );
+                Lock = 0;
+            }
+            return false;
         }
-        return false;
-    }
 
-    int NewAlpha = StartAlpha + (EndAlpha - StartAlpha) * (time - StartTime)
-        / (EndTime - StartTime);
-    if( NewAlpha != Alpha )
-        SetTransparency( NewAlpha );
-    if( NewAlpha == EndAlpha )
-    {
-        Lock = 0;
-        return false;
+        int NewAlpha = StartAlpha + (EndAlpha - StartAlpha) * (time - StartTime)
+            / (EndTime - StartTime);
+        if( NewAlpha != Alpha )
+            SetTransparency( NewAlpha );
+        if( NewAlpha == EndAlpha )
+        {
+            Lock = 0;
+            return false;
+        }
     }
     return true;
 }
