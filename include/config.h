@@ -20,6 +20,8 @@
  * General compilation options
  *******************************************************************************/
 
+#define FRAMEBUFFER
+
 /* Define for DVB support - Note that some extensions or restrictions may be
  * incompatible with native MPEG2 streams */
 //#define DVB_EXTENSIONS
