@@ -7529,16 +7529,16 @@ msgstr "Cerrar"
 #: modules/gui/beos/PlayListWindow.cpp:101 modules/gui/macosx/intf.m:430
 #: modules/gui/wxwindows/bookmarks.cpp:225
 msgid "Edit"
-msgstr "Editar"
+msgstr "Edicíon"
 
 #: modules/gui/beos/PlayListWindow.cpp:103 modules/gui/macosx/intf.m:435
 #: modules/gui/macosx/playlist.m:174
 msgid "Select All"
-msgstr "Elegir Todo"
+msgstr "Seleccionar todo"
 
 #: modules/gui/beos/PlayListWindow.cpp:106
 msgid "Select None"
-msgstr "Elegir Ninguno"
+msgstr "Seleccionar ninguno"
 
 #: modules/gui/beos/PlayListWindow.cpp:111
 msgid "Sort Reverse"
@@ -8795,7 +8795,7 @@ msgstr "Abrir Reciente"
 
 #: modules/gui/macosx/intf.m:428 modules/gui/macosx/intf.m:1388
 msgid "Clear Menu"
-msgstr "Limpiar Menú"
+msgstr "Borrar Menú"
 
 #: modules/gui/macosx/intf.m:431
 msgid "Cut"
@@ -8812,7 +8812,7 @@ msgstr "Pegar"
 #: modules/gui/macosx/intf.m:434 modules/gui/wxwindows/bookmarks.cpp:223
 #: modules/gui/wxwindows/messages.cpp:94
 msgid "Clear"
-msgstr "Limpiar"
+msgstr "Borrar"
 
 #: modules/gui/macosx/intf.m:437
 msgid "Controls"
@@ -9615,7 +9615,7 @@ msgstr "Actualizar"
 
 #: modules/gui/pda/pda_interface.c:1260
 msgid " Clear "
-msgstr " Limpiar "
+msgstr " Borrar "
 
 #: modules/gui/pda/pda_interface.c:1291
 msgid " Save "
