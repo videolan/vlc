@@ -21,7 +21,9 @@ EXTRA_DIST = \
 	install-win32 \
 	src/extras/COPYING \
 	toolbox \
+	vlc.ebuild \
 	vlc.spec \
+	vlc.spec.redhat \
 	$(NULL)
 
 MOSTLYCLEANFILES =
@@ -245,13 +247,35 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/English.lproj/MainMenu.nib/objects.nib \
 	extras/MacOSX/Resources/English.lproj/InfoPlist.strings \
 	extras/MacOSX/Resources/English.lproj/vlc.scriptTerminology \
+	extras/MacOSX/Resources/a52.icns \
+	extras/MacOSX/Resources/aac.icns \
+	extras/MacOSX/Resources/asf.icns \
+	extras/MacOSX/Resources/asx.icns \
+	extras/MacOSX/Resources/avi.icns \
+	extras/MacOSX/Resources/bin.icns \
+	extras/MacOSX/Resources/cue.icns \
+	extras/MacOSX/Resources/dat.icns \
 	extras/MacOSX/Resources/divx.icns \
+	extras/MacOSX/Resources/dv.icns \
 	extras/MacOSX/Resources/generic.icns \
+	extras/MacOSX/Resources/m3u.icns \
+	extras/MacOSX/Resources/mov.icns \
+	extras/MacOSX/Resources/mp3.icns \
+	extras/MacOSX/Resources/mp4.icns \
 	extras/MacOSX/Resources/mpeg.icns \
 	extras/MacOSX/Resources/mpeg1.icns \
 	extras/MacOSX/Resources/mpeg2.icns \
 	extras/MacOSX/Resources/mpeg4.icns \
+	extras/MacOSX/Resources/mpg.icns \
+	extras/MacOSX/Resources/ogg.icns \
+	extras/MacOSX/Resources/ogm.icns \
+	extras/MacOSX/Resources/pls.icns \
+	extras/MacOSX/Resources/srt.icns \
+	extras/MacOSX/Resources/sub.icns \
 	extras/MacOSX/Resources/vlc.icns \
+	extras/MacOSX/Resources/vob.icns \
+	extras/MacOSX/Resources/wma.icns \
+	extras/MacOSX/Resources/wmv.icns \
 	extras/MacOSX/Resources/back.png \
 	extras/MacOSX/Resources/begin.png \
 	extras/MacOSX/Resources/end.png \
