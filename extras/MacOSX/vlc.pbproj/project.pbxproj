@@ -268,6 +268,7 @@
 				A064F9F103CB9EE000B21232,
 				A064F9F203CB9EE000B21232,
 				A064F9F303CB9EE000B21232,
+				8E88833D03DD6E870059A3A7,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -307,6 +308,7 @@
 				A064F9E703CB9EE000B21232,
 				A064F9E803CB9EE000B21232,
 				A064F9E903CB9EE000B21232,
+				8E88833C03DD6E870059A3A7,
 				F69B0CA602E24F6401A80112,
 			);
 			isa = PBXGroup;
@@ -388,6 +390,28 @@
 //192
 //193
 //194
+//8E0
+//8E1
+//8E2
+//8E3
+//8E4
+		8E88833C03DD6E870059A3A7 = {
+			isa = PBXFileReference;
+			name = slow.png;
+			path = Resources/slow.png;
+			refType = 4;
+		};
+		8E88833D03DD6E870059A3A7 = {
+			fileRef = 8E88833C03DD6E870059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+//8E0
+//8E1
+//8E2
+//8E3
+//8E4
 //A00
 //A01
 //A02
