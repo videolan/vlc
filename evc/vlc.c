@@ -2,7 +2,7 @@
  * vlc.c: the vlc player, WinCE version
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlc.c,v 1.4 2002/11/20 16:43:32 sam Exp $
+ * $Id: vlc.c,v 1.5 2002/11/21 13:53:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,8 +52,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     LPTSTR lpCmdLine, int nCmdShow )
 {
     int    i_ret;
-    int    i_argc = 5;
-    char * ppsz_argv[] = { lpCmdLine, "-vv", "--intf", "dummy", "shovel.mpeg", /*"washington.mpeg",*/ NULL };
+    int    i_argc = 4;
+    char * ppsz_argv[] = { lpCmdLine, "-vv", "--intf", "dummy", NULL, NULL };
     HWND   window;
     MSG    message;
 
@@ -63,10 +63,17 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     char     psz_title[100];
     wchar_t  pwz_title[100];
 
+    i_argc = 5;
+    ppsz_argv[4] = "washington.mpeg";
+    ppsz_argv[4] = "shovel.mpeg";
+    ppsz_argv[4] = "11h50.wav";
+    ppsz_argv[4] = "apple_promouse.mpeg";
+
     /* Store our instance for future reference */
     hInst = hInstance;
 
     /* Register window class */
+    memset( &wc, 0, sizeof(wc) );
     wc.style          = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc    = (WNDPROC) WndProc;
     wc.cbClsExtra     = 0;
@@ -86,10 +93,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     /* Create our nice window */
     window = CreateWindow( L"VLC", pwz_title,
-                           WS_VISIBLE | WS_SIZEBOX | WS_CAPTION,
+                           WS_VISIBLE /*| WS_SIZEBOX | WS_CAPTION*/,
                            CW_USEDEFAULT, CW_USEDEFAULT,
                            //CW_USEDEFAULT, CW_USEDEFAULT, 
-                           200,100,
+                           200,200,
                            NULL, NULL, hInst, NULL );
 
     ShowWindow( window, nCmdShow );
@@ -192,10 +199,18 @@ static long FAR PASCAL WndProc ( HWND hWnd, UINT message,
 {
     HDC hdc;
     int wmId, wmEvent;
+    int x, y;
     PAINTSTRUCT ps;
 
     switch( message )
     {
+        case WM_LBUTTONDOWN:
+            x = LOWORD(lParam);
+            y = HIWORD(lParam);
+            hdc = GetDC(hWnd);
+            Rectangle(hdc, x-4, y-4, x+4, y+4);
+            ReleaseDC(hWnd, hdc);
+            break;
         case WM_COMMAND:
             wmId    = LOWORD(wParam);
             wmEvent = HIWORD(wParam);

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.32 2002/11/20 19:07:26 sam Exp $
+##  $Id: bootstrap,v 1.33 2002/11/21 13:53:31 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -79,10 +79,12 @@ then
   #  The evil ^M
   M=''
 
-  #  Sources that get built under Win32
-  LIBVLC_SOURCES=`make show-libvlc-sources | grep '^X: ' | cut -b3-`
-  LIBVLC_HEADERS=`make show-libvlc-headers | grep '^X: ' | cut -b3-`
-  LIBVLC_PKG_HEADERS=`make show-libvlc-pkg-headers | grep '^X: ' | cut -b3-`
+  #  Sources that get built under Win32 - FIXME: anyone wanna deuglify this? :)
+  LIBVLC_SOURCES=`awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_common'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p';  awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_win32'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_dirent'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_getopt'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_libc'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'`
+
+  LIBVLC_HEADERS=`awk 'BEGIN{a=0}{if(!a&&/^'HEADERS_include'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'HEADERS_include_built'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'`
+
+  LIBVLC_PKG_HEADERS=`awk 'BEGIN{a=0}{if(!a&&/^'dist_pkginclude_HEADERS'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'`
 
   # Clean up
   rm -f evc/*.vcp msvc/*.dsp

@@ -4,3 +4,4 @@ SOURCES_ggi = modules/video_output/ggi.c
 SOURCES_glide = modules/video_output/glide.c
 SOURCES_vout_sdl = modules/video_output/sdl.c
 SOURCES_svgalib = modules/video_output/svgalib.c
+SOURCES_wingdi = modules/video_output/wingdi.c

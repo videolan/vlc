@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.4 2002/11/20 13:37:35 sam Exp $
+ * $Id: file.c,v 1.5 2002/11/21 13:53:32 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -123,7 +123,13 @@ static int Open( vlc_object_t *p_this )
             p_input->stream.b_seekable = 0;
             p_input->stream.p_selected_area->i_size = 0;
         }
-#ifdef HAVE_SYS_STAT_H
+#ifdef UNDER_CE
+        else if( VLC_TRUE )
+        {
+            /* We'll update i_size after it's been opened */
+            p_input->stream.b_seekable = 1;
+        }
+#elif defined( HAVE_SYS_STAT_H )
         else if( S_ISREG(stat_info.st_mode) || S_ISCHR(stat_info.st_mode)
                   || S_ISBLK(stat_info.st_mode) )
         {
@@ -139,13 +145,13 @@ static int Open( vlc_object_t *p_this )
             p_input->stream.b_seekable = 0;
             p_input->stream.p_selected_area->i_size = 0;
         }
+#endif
         else
         {
             vlc_mutex_unlock( &p_input->stream.stream_lock );
             msg_Err( p_input, "unknown file type for `%s'", psz_name );
             return VLC_EGENERIC;
         }
-#endif
     }
  
     p_input->stream.p_selected_area->i_tell = 0;
@@ -181,6 +187,8 @@ static int Open( vlc_object_t *p_this )
             free( p_access_data );
             return VLC_EGENERIC;
         }
+        p_input->stream.p_selected_area->i_size =
+                        GetFileSize( (HANDLE)p_access_data->i_handle, NULL );
 #else
         p_access_data->i_handle = open( psz_name,
                                         /*O_NONBLOCK | O_LARGEFILE*/ 0 );
