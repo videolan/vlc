@@ -402,21 +402,23 @@ void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic,
 
             if( p_subpic->i_flags & OSD_ALIGN_BOTTOM )
             {
-                i_y_offset += p_vout->output.i_height - p_region->fmt.i_height;
+                i_y_offset = p_vout->output.i_height - p_region->fmt.i_height -
+                    p_subpic->i_y;
             }
             else if ( !(p_subpic->i_flags & OSD_ALIGN_TOP) )
             {
-                i_y_offset += p_vout->output.i_height / 2 -
+                i_y_offset = p_vout->output.i_height / 2 -
                     p_region->fmt.i_height / 2;
             }
 
             if( p_subpic->i_flags & OSD_ALIGN_RIGHT )
             {
-                i_x_offset += p_vout->output.i_width - p_region->fmt.i_width;
+                i_x_offset = p_vout->output.i_width - p_region->fmt.i_width -
+                    p_subpic->i_x;
             }
             else if ( !(p_subpic->i_flags & OSD_ALIGN_LEFT) )
             {
-                i_x_offset += p_vout->output.i_width / 2 -
+                i_x_offset = p_vout->output.i_width / 2 -
                     p_region->fmt.i_width / 2;
             }
 
