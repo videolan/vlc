@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.11 2003/01/23 22:25:32 hartman Exp $
+ * $Id: controls.m,v 1.12 2003/01/23 22:57:28 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -222,12 +222,14 @@
 
         case NSLeftMouseUp:
             i_ff = 0;
+            
             vlc_mutex_lock( &p_playlist->object_lock );
-            if( p_playlist->i_size )
+            int i_playlist_size =  p_playlist->i_size ;
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            if( i_playlist_size )
             {
                 playlist_Play( p_playlist );
             }
-            vlc_mutex_unlock( &p_playlist->object_lock );
             break;
 
         default:
