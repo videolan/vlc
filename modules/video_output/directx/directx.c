@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.27 2003/12/11 23:12:46 gbazin Exp $
+ * $Id: directx.c,v 1.28 2003/12/13 14:01:51 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -47,6 +47,10 @@
 
 #include <multimon.h>
 #undef GetSystemMetrics
+
+#ifndef MONITOR_DEFAULTTONEAREST
+#   define MONITOR_DEFAULTTONEAREST 2
+#endif
 
 #include "vout.h"
 
