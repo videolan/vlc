@@ -738,7 +738,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                     /* MPEG-2 */
                     scr_time =
                       (( ((mtime_t)(p_data->p_buffer[4] & 0x38) << 27) |
-                         ((mtime_t)(p_data->p_buffer[4] & 0x3) << 26) |
+                         ((mtime_t)(p_data->p_buffer[4] & 0x3) << 28) |
                          ((mtime_t)(p_data->p_buffer[5]) << 20) |
                          ((mtime_t)(p_data->p_buffer[6] & 0xF8) << 12) |
                          ((mtime_t)(p_data->p_buffer[6] & 0x3) << 13) |
