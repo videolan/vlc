@@ -43,12 +43,13 @@ playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
 {
     playlist_item_t * p_item;
 
+    if( psz_uri == NULL ) return NULL;
+
     p_item = malloc( sizeof( playlist_item_t ) );
     if( p_item == NULL ) return NULL;
-    if( psz_uri == NULL) return NULL;
+    memset( p_item, 0, sizeof( playlist_item_t ) );
 
-    vlc_input_item_Init( p_obj, p_item );
-
+    vlc_input_item_Init( p_obj, &p_item->input );
     p_item->input.i_duration = -1;
     p_item->input.psz_uri = strdup( psz_uri );
 
@@ -57,7 +58,6 @@ playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
 
     p_item->b_enabled = VLC_TRUE;
     p_item->i_group = PLAYLIST_TYPE_MANUAL;
-    p_item->i_nb_played = 0;
 
     playlist_ItemCreateCategory( p_item, _("General") );
     return p_item;
@@ -71,7 +71,7 @@ playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
  */
 void playlist_ItemDelete( playlist_item_t *p_item )
 {
-    vlc_input_item_Clean( p_item );
+    vlc_input_item_Clean( &p_item->input );
     free( p_item );
 }
 
