@@ -75,6 +75,8 @@ static int  Input        ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  Playlist     ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
+static int  Other        ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
 static int  Quit         ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  Intf         ( vlc_object_t *, char const *,
@@ -335,14 +337,14 @@ static void Run( intf_thread_t *p_intf )
     var_Create( p_intf, "next", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "next", Playlist, NULL );
   
-    var_Create( p_intf, "marquee", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marquee", Playlist, NULL );
+    var_Create( p_intf, "marq-marquee", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "marq-marquee", Other, NULL );
     var_Create( p_intf, "marq-x", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marq-x", Playlist, NULL );
+    var_AddCallback( p_intf, "marq-x", Other, NULL );
     var_Create( p_intf, "marq-y", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marq-y", Playlist, NULL );
+    var_AddCallback( p_intf, "marq-y", Other, NULL );
     var_Create( p_intf, "marq-timeout", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marq-timeout", Playlist, NULL );
+    var_AddCallback( p_intf, "marq-timeout", Other, NULL );
 
     var_Create( p_intf, "pause", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "pause", Input, NULL );
@@ -625,7 +627,7 @@ static void Run( intf_thread_t *p_intf )
             printf("| \n");
             if (p_intf->p_sys->b_extend)
             {
-	           printf(_("| marquee STRING . . . . . overlay STRING in video\n"));
+	           printf(_("| marq-marquee STRING  . . overlay STRING in video\n"));
                printf(_("| marq-x X . . . . . .offset of marquee, from left\n"));
                printf(_("| marq-y Y . . . . . . offset of marquee, from top\n"));
                printf(_("| marq-timeout T. . . . .timeout of marquee, in ms\n"));
@@ -836,17 +838,45 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             printf( _("| no entries\n") );
         }
     }
-        else if( !strcmp( psz_cmd, "marquee" ) )
+ 
+    /*
+     * sanity check
+     */
+    else
+    {
+        printf( _("unknown command!\n") );
+    }
+
+    vlc_object_release( p_playlist );
+    return VLC_SUCCESS;
+}
+
+static Other( vlc_object_t *p_this, char const *psz_cmd,
+                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    vlc_object_t *p_pl;
+    vlc_value_t     val;
+
+    p_pl = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
+    if( !p_pl )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    /* Parse miscellaneous commands */
+    if( !strcmp( psz_cmd, "marq-marquee" ) )
     {
         if( strlen( newval.psz_string ) > 0 )
         {
             val.psz_string = newval.psz_string;
-            var_Set( p_playlist, "marquee", val );
+            var_Set( p_pl, "marq-marquee", val );
         }
         else 
         {
 	        val.psz_string = "";
-	        var_Set( p_playlist, "marquee", val);
+	        var_Set( p_pl, "marq-marquee", val);
         }
     }
     else if( !strcmp( psz_cmd, "marq-x" ) )
@@ -854,7 +884,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_playlist, "marq-x", val );
+            var_Set( p_pl, "marq-x", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-y" ) )
@@ -862,7 +892,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_playlist, "marq-y", val );
+            var_Set( p_pl, "marq-y", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-timeout" ) )
@@ -870,7 +900,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_playlist, "marq-timeout", val );
+            var_Set( p_pl, "marq-timeout", val );
         }
     }
  
@@ -882,7 +912,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         printf( _("unknown command!\n") );
     }
 
-    vlc_object_release( p_playlist );
+    vlc_object_release( p_pl );
     return VLC_SUCCESS;
 }
 
