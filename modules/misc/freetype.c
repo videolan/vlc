@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.36 2003/12/06 22:53:07 jpsaman Exp $
+ * $Id: freetype.c,v 1.37 2003/12/07 19:00:33 jpsaman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -26,6 +26,10 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
+
+#ifdef HAVE_LINUX_LIMITS_H
+#   include <linux/limits.h>
+#endif
 
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
