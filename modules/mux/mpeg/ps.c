@@ -176,7 +176,7 @@ static int Open( vlc_object_t *p_this )
     {
         uint32_t i, j, k;
 
-        for(i = 0; i < 256; i++)
+        for( i = 0; i < 256; i++ )
         {
             k = 0;
             for( j = (i << 24) | 0x800000; j != 0x80000000; j <<= 1 )
@@ -721,6 +721,7 @@ static void MuxWritePSM( sout_mux_t *p_mux, block_t **p_buf, mtime_t i_dts )
     p_hdr = block_New( p_mux, i_psm_size );
     p_hdr->i_dts = p_hdr->i_pts = i_dts;
 
+    memset( p_hdr->p_buffer, 0, p_hdr->i_buffer );
     bits_initwrite( &bits, i_psm_size, p_hdr->p_buffer );
     bits_write( &bits, 32, 0x01bc );
     bits_write( &bits, 16, i_psm_size - 3 );
