@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.27 2003/09/21 17:52:43 gbazin Exp $
+ * $Id: preferences.cpp,v 1.28 2003/09/22 14:40:10 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -32,6 +32,8 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
+#include <vlc_help.h>
+
 #include "wxwindows.h"
 #include <wx/notebook.h>
 #include <wx/textctrl.h>
@@ -45,6 +47,10 @@
 #ifndef wxRB_SINGLE
 #   define wxRB_SINGLE 0
 #endif
+
+#define GENERAL_ID 1242
+#define PLUGIN_ID 1243
+#define CAPABILITY_ID 1244
 
 /*****************************************************************************
  * Classes declarations.
@@ -78,6 +84,7 @@ private:
     vlc_bool_t b_advanced;
 
     wxTreeItemId root_item;
+    wxTreeItemId general_item;
     wxTreeItemId plugins_item;
 };
 
@@ -114,7 +121,7 @@ public:
 
     PrefsPanel() { }
     PrefsPanel( wxWindow *parent, intf_thread_t *_p_intf,
-                PrefsDialog *_p_prefs_dialog, int i_object_id, char * );
+                PrefsDialog *_p_prefs_dialog, int i_object_id, char *, char * );
     virtual ~PrefsPanel() {}
 
     void ApplyChanges();
@@ -140,6 +147,8 @@ public:
     virtual ~ConfigTreeData() { if( panel ) delete panel; }
 
     vlc_bool_t b_submodule;
+
+    char *psz_help;
 
     PrefsPanel *panel;
     wxBoxSizer *sizer;
@@ -211,7 +220,7 @@ END_EVENT_TABLE()
  *****************************************************************************/
 PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, wxWindow *p_parent)
   :  wxFrame( p_parent, -1, wxU(_("Preferences")), wxDefaultPosition,
-              wxSize(650,450), wxDEFAULT_FRAME_STYLE )
+              wxSize(700,450), wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
     p_intf = _p_intf;
@@ -330,6 +339,42 @@ void PrefsDialog::OnAdvanced( wxCommandEvent& event )
 }
 
 /*****************************************************************************
+ * GetCapabilityHelp: Display the help for one capability.
+ *****************************************************************************/
+static char * GetCapabilityHelp( char *psz_capability)
+{
+    if( psz_capability == NULL)
+	return NULL;
+
+    if( !strcasecmp(psz_capability,"access") )
+	return strdup(ACCESS_HELP);
+    if( !strcasecmp(psz_capability,"audio filter") )
+	return strdup(AUDIO_FILTER_HELP);
+    if( !strcasecmp(psz_capability,"audio output") )
+	return strdup(AOUT_HELP);
+    if( !strcasecmp(psz_capability,"chroma") )
+	return strdup(CHROMA_HELP);
+    if( !strcasecmp(psz_capability,"decoder") )
+	return strdup(DECODER_HELP);
+    if( !strcasecmp(psz_capability,"demux") )
+	return strdup(DEMUX_HELP);
+    if( !strcasecmp(psz_capability,"interface") )
+	return strdup(INTERFACE_HELP);
+    if( !strcasecmp(psz_capability,"sout access") )
+	return strdup(SOUT_HELP);
+    if( !strcasecmp(psz_capability,"subtitle demux") )
+	return strdup(SUBTITLE_DEMUX_HELP);
+    if( !strcasecmp(psz_capability,"text renderer") )
+	return strdup(TEXT_HELP);
+    if( !strcasecmp(psz_capability,"video output") )
+	return strdup(VOUT_HELP);
+    if( !strcasecmp(psz_capability,"video filter") )
+	return strdup(VIDEO_FILTER_HELP);
+
+    return strdup(UNKNOWN_HELP);
+}
+
+/*****************************************************************************
  * PrefsTreeCtrl class definition.
  *****************************************************************************/
 PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
@@ -361,6 +406,14 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     /*
      * Build a tree of the main options
      */
+    ConfigTreeData *config_data = new ConfigTreeData;
+    config_data->psz_section = NULL;
+    config_data->i_object_id = GENERAL_ID;
+    config_data->psz_help = strdup( GENERAL_HELP );
+printf("dans pouet: %i\n",config_data->i_object_id);
+    general_item = AppendItem( root_item, wxU(_("General Settings")),
+				-1, -1, config_data );
+
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
         p_module = (module_t *)p_list->p_values[i_index].p_object;
@@ -382,24 +435,37 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
             case CONFIG_HINT_CATEGORY:
                 ConfigTreeData *config_data = new ConfigTreeData;
                 config_data->psz_section = strdup(p_item->psz_text);
+		if( p_item->psz_longtext )
+		{
+   		    config_data->psz_help = strdup( p_item->psz_longtext);
+		}
+		else
+		{
+		    config_data->psz_help = NULL;
+		}
                 config_data->i_object_id = p_module->i_object_id;
 
                 /* Add the category to the tree */
-                AppendItem( root_item, wxU(p_item->psz_text),
+                AppendItem( general_item, wxU(p_item->psz_text),
                             -1, -1, config_data );
                 break;
             }
         }
         while( p_item->i_type != CONFIG_HINT_END && p_item++ );
 
-        SortChildren( root_item );
+        SortChildren( general_item );
     }
 
 
     /*
      * Build a tree of all the plugins
      */
-    plugins_item = AppendItem( root_item, wxU(_("Plugins")) );
+    config_data = new ConfigTreeData;
+    config_data->psz_section = NULL;
+    config_data->i_object_id = PLUGIN_ID;
+    config_data->psz_help = strdup( PLUGIN_HELP );
+    plugins_item = AppendItem( root_item, wxU(_("Plugins")),
+			-1,-1,config_data );
 
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
@@ -444,8 +510,14 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
             p_module->psz_capability && *p_module->psz_capability )
         {
             /* We didn't find it, add it */
+            ConfigTreeData *config_data = new ConfigTreeData;
+            config_data->psz_section = NULL;
+            config_data->psz_help = 
+		GetCapabilityHelp( p_module->psz_capability );
+    	    config_data->i_object_id = CAPABILITY_ID;
             capability_item = AppendItem( plugins_item,
-                                          wxU(p_module->psz_capability) );
+                                          wxU(p_module->psz_capability),
+  					  -1,-1,config_data );
         }
 
         /* Add the plugin to the tree */
@@ -454,6 +526,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         config_data->i_object_id = p_module->b_submodule ?
             ((module_t *)p_module->p_parent)->i_object_id :
             p_module->i_object_id;
+	config_data->psz_help = strdup( "" );
         AppendItem( capability_item, wxU(p_module->psz_object_name), -1, -1,
                     config_data );
     }
@@ -653,7 +726,8 @@ void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
             config_data->panel =
                 new PrefsPanel( p_parent, p_intf, p_prefs_dialog,
                                 config_data->i_object_id,
-                                config_data->psz_section );
+                                config_data->psz_section,
+				config_data->psz_help);
             config_data->panel->SwitchAdvanced( b_advanced );
         }
         else
@@ -691,7 +765,7 @@ void PrefsTreeCtrl::OnAdvanced( wxCommandEvent& event )
  *****************************************************************************/
 PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                         PrefsDialog *_p_prefs_dialog,
-                        int i_object_id, char *psz_section )
+                        int i_object_id, char *psz_section, char*psz_help )
   :  wxPanel( parent, -1, wxDefaultPosition, wxDefaultSize )
 {
     module_config_t *p_item;
@@ -699,6 +773,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
     module_t        *p_parser;
 
     wxStaticText *label;
+    wxStaticText *help;
     wxComboBox *combo;
     wxSpinCtrl *spin;
     wxCheckBox *checkbox;
@@ -706,6 +781,9 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
     wxButton *button;
     wxArrayString array;
 
+    vlc_bool_t b_has_advanced = VLC_FALSE;
+    module_t *p_module = NULL;
+    
     /* Initializations */
     p_intf = _p_intf;
     p_prefs_dialog =_p_prefs_dialog,
@@ -715,238 +793,297 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
     wxBoxSizer *sizer = new wxBoxSizer( wxVERTICAL );
 
-    /* Get a pointer to the module */
-    module_t *p_module = (module_t *)vlc_object_get( p_intf, i_object_id );
-    if( p_module->i_object_type != VLC_OBJECT_MODULE )
-    {
-        /* 0OOoo something went really bad */
-        return;
-    }
 
-    /* Enumerate config options and add corresponding config boxes
-     * (submodules don't have config options, they are stored in the
-     *  parent module) */
-    if( p_module->b_submodule )
-        p_item = ((module_t *)p_module->p_parent)->p_config;
+    if( i_object_id == PLUGIN_ID || i_object_id == GENERAL_ID ||
+	i_object_id == CAPABILITY_ID ) 
+    {
+ 	wxStaticBox *static_box = new wxStaticBox( this, -1, wxT( "" ) );
+        wxStaticBoxSizer *box_sizer = new wxStaticBoxSizer( static_box,
+                                                            wxVERTICAL );
+    	label = new wxStaticText( this, -1,
+			wxU(_( psz_help) ) );
+
+        box_sizer->Add( label, 1,  wxEXPAND | wxLEFT | wxRIGHT, 5 );
+
+	sizer->Add( box_sizer, 0, wxEXPAND | wxALL , 5 );
+    }	
     else
-        p_item = p_module->p_config;
-
-    /* Find the category if it has been specified */
-    if( psz_section && p_item->i_type == CONFIG_HINT_CATEGORY )
     {
-        while( !p_item->i_type == CONFIG_HINT_CATEGORY ||
-               strcmp( psz_section, p_item->psz_text ) )
+        /* Get a pointer to the module */
+        p_module = (module_t *)vlc_object_get( p_intf,  i_object_id );
+        if( p_module->i_object_type != VLC_OBJECT_MODULE )
         {
-            if( p_item->i_type == CONFIG_HINT_END )
-                break;
-            p_item++;
+            /* 0OOoo something went really bad */
+            return;
         }
-    }
 
-    /* Add a head title to the panel */
-    wxStaticBox *static_box = new wxStaticBox( this, -1, wxT("") );
-    wxStaticBoxSizer *box_sizer = new wxStaticBoxSizer( static_box,
-                                                        wxHORIZONTAL );
-    label = new wxStaticText( this, -1,
-                              wxU(psz_section ? p_item->psz_text :
-                              p_module->psz_longname) );
+        /* Enumerate config options and add corresponding config boxes
+         * (submodules don't have config options, they are stored in the
+         *  parent module) */
+         if( p_module->b_submodule )
+            p_item = ((module_t *)p_module->p_parent)->p_config;
+         else
+            p_item = p_module->p_config;
+    
+         /* Find the category if it has been specified */
+         if( psz_section && p_item->i_type == CONFIG_HINT_CATEGORY )
+         {
+             while( !p_item->i_type == CONFIG_HINT_CATEGORY ||
+                   strcmp( psz_section, p_item->psz_text ) )
+             {
+                if( p_item->i_type == CONFIG_HINT_END )
+                     break;
+                p_item++;
+             }
+         }
+         /* Add a head title to the panel */
+ 	 wxStaticBox *static_box = new wxStaticBox( this, -1, wxT( "" ) );
+         wxStaticBoxSizer *box_sizer = new wxStaticBoxSizer( static_box,
+                                                            wxVERTICAL );
 
-    box_sizer->Add( label, 1, wxALL, 5 );
-    sizer->Add( box_sizer, 0, wxEXPAND | wxLEFT | wxRIGHT, 5 );
+	 wxStaticBox *help_box = NULL;
+	 wxStaticBoxSizer *help_sizer = NULL; 
 
-    /* Now put all the config options into a scrolled window */
-    config_sizer = new wxBoxSizer( wxVERTICAL );
-    config_window = new wxScrolledWindow( this, -1, wxDefaultPosition,
-        wxDefaultSize, wxSTATIC_BORDER | wxHSCROLL | wxVSCROLL );
-    config_window->SetAutoLayout( TRUE );
-    config_window->SetScrollRate( 5, 5 );
+         label = new wxStaticText( this, -1,
+                                   wxU(_(psz_section ? p_item->psz_text :
+                                   p_module->psz_longname )));
+        
+         box_sizer->Add( label, 1,  wxEXPAND | wxLEFT | wxRIGHT, 5 );
 
-    if( p_item ) do
-    {
-        /* If a category has been specified, check we finished the job */
-        if( psz_section && p_item->i_type == CONFIG_HINT_CATEGORY &&
-            strcmp( psz_section, p_item->psz_text ) )
-            break;
+         sizer->Add( box_sizer, 0, wxEXPAND | wxLEFT | wxRIGHT , 5 );
 
-        /* put each config option in a separate panel so we can hide advanced
-         * options easily */
-        wxPanel *panel = new wxPanel( config_window, -1, wxDefaultPosition,
-                                      wxDefaultSize );
-        wxBoxSizer *panel_sizer = new wxBoxSizer( wxHORIZONTAL );
-        ConfigData *config_data =
-            new ConfigData( panel, p_item->i_type,
-                            p_item->b_advanced, p_item->psz_name );
+         if( psz_help && psz_help[1] ) 
+	 /* Check that we have at least something */
+	 {
+	     help_box   = new wxStaticBox( this, -1, wxT( "" ) );
+	     help_sizer = new wxStaticBoxSizer( help_box,
+                                                wxHORIZONTAL ) ;
+	     help = new wxStaticText( this, -1,
+					wxT(_( psz_help) ),
+				wxDefaultPosition, wxDefaultSize,
+				wxST_NO_AUTORESIZE | wxALIGN_LEFT,
+				wxT("") );
+            
+	     help_sizer->Add( help, 1,  wxALL | wxEXPAND , 5 );
+	     sizer->Add( help_sizer ,0 ,wxEXPAND | wxALL, 5 );
+	 } 
 
-        switch( p_item->i_type )
-        {
-        case CONFIG_ITEM_MODULE:
-            label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
-            combo = new wxComboBox( panel, -1, wxU(p_item->psz_value),
-                                    wxDefaultPosition, wxDefaultSize,
-                                    0, NULL, wxCB_READONLY | wxCB_SORT );
+         /* Now put all the config options into a scrolled window */
+         config_sizer = new wxBoxSizer( wxVERTICAL );
+         config_window = new wxScrolledWindow( this, -1, wxDefaultPosition,
+            wxDefaultSize, wxSTATIC_BORDER | wxHSCROLL | wxVSCROLL );
+         config_window->SetAutoLayout( TRUE );
+         config_window->SetScrollRate( 5, 5 );
 
-            /* build a list of available modules */
-            p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-            combo->Append( wxU(_("Default")), (void *)NULL );
-            combo->SetSelection( 0 );
-            for( int i_index = 0; i_index < p_list->i_count; i_index++ )
-            {
-                p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+         if( p_item ) do
+         {
+            /* If a category has been specified, check we finished the job */
+             if( psz_section && p_item->i_type == CONFIG_HINT_CATEGORY &&
+                 strcmp( psz_section, p_item->psz_text ) )
+                 break;
+   
+            /* put each config option in a separate panel so we can hide advanced
+             * options easily */
+             wxPanel *panel = new wxPanel( config_window, -1, wxDefaultPosition,
+                                           wxDefaultSize );
+             wxBoxSizer *panel_sizer = new wxBoxSizer( wxHORIZONTAL );
+             ConfigData *config_data =
+                 new ConfigData( panel, p_item->i_type,
+                                 p_item->b_advanced, p_item->psz_name );
 
-                if( !strcmp( p_parser->psz_capability,
-                             p_item->psz_type ) )
-                {
-                    combo->Append( wxU(p_parser->psz_longname),
-                                   p_parser->psz_object_name );
-                    if( p_item->psz_value &&
-                        !strcmp(p_item->psz_value, p_parser->psz_object_name) )
-                        combo->SetValue( wxU(p_parser->psz_longname) );
-                }
-            }
-            vlc_list_release( p_list );
+             switch( p_item->i_type )
+             {
+                 case CONFIG_ITEM_MODULE:
+                     label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
+                     combo = new wxComboBox( panel, -1, wxU(p_item->psz_value),
+                                             wxDefaultPosition, wxDefaultSize,
+                                             0, NULL, wxCB_READONLY | wxCB_SORT );
 
-            combo->SetToolTip( wxU(p_item->psz_longtext) );
-            config_data->control.combobox = combo;
-            panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-            panel_sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-            break;
+                    /* build a list of available modules */
+                    p_list = vlc_list_find( p_intf, 
+				VLC_OBJECT_MODULE, FIND_ANYWHERE );
+                    combo->Append( wxU(_("Default")), (void *)NULL );
+                    combo->SetSelection( 0 );
+                    for( int i_index = 0; i_index < p_list->i_count; i_index++ )
+                    {
+                        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
-        case CONFIG_ITEM_STRING:
-        case CONFIG_ITEM_FILE:
-        case CONFIG_ITEM_DIRECTORY:
-            label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
-            panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+                        if( !strcmp( p_parser->psz_capability,
+                                 p_item->psz_type ) )
+                        {
+                            combo->Append( wxU(p_parser->psz_longname),
+                                       p_parser->psz_object_name );
+                            if( p_item->psz_value &&
+                               !strcmp(p_item->psz_value, 
+					p_parser->psz_object_name) )
+                                 combo->SetValue( wxU(p_parser->psz_longname) );
+                        }
+                    }
+                    vlc_list_release( p_list );
 
-            if( !p_item->ppsz_list )
-            {
-                textctrl = new wxTextCtrl( panel, -1, wxU(p_item->psz_value),
-                                           wxDefaultPosition, wxDefaultSize,
-                                           wxTE_PROCESS_ENTER);
-                textctrl->SetToolTip( wxU(p_item->psz_longtext) );
-                config_data->control.textctrl = textctrl;
-                panel_sizer->Add( textctrl, 1, wxALL, 5 );
-            }
-            else
-            {
-                combo = new wxComboBox( panel, -1, wxU(p_item->psz_value),
+                    combo->SetToolTip( wxU(p_item->psz_longtext) );
+                    config_data->control.combobox = combo;
+                    panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL
+						| wxALL, 5 );
+                    panel_sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL 
+						| wxALL, 5 );
+                    break;
+
+                case CONFIG_ITEM_STRING:
+                case CONFIG_ITEM_FILE:
+                case CONFIG_ITEM_DIRECTORY:
+                    label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
+                    panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL 
+							| wxALL, 5 );
+ 
+                    if( !p_item->ppsz_list )
+                    {
+                        textctrl = new wxTextCtrl( panel, -1, 
+				wxU(p_item->psz_value),
+                                wxDefaultPosition, wxDefaultSize,
+                                wxTE_PROCESS_ENTER);
+                        textctrl->SetToolTip( wxU(p_item->psz_longtext) );
+                        config_data->control.textctrl = textctrl;
+                        panel_sizer->Add( textctrl, 1, wxALL, 5 );
+                    }
+                    else
+                    {
+                        combo = new wxComboBox( panel, -1, wxU(p_item->psz_value),
                                         wxDefaultPosition, wxDefaultSize,
                                         0, NULL, wxCB_READONLY | wxCB_SORT );
 
-                /* build a list of available options */
-                for( int i_index = 0; p_item->ppsz_list[i_index]; i_index++ )
+                        /* build a list of available options */
+                        for( int i_index = 0; p_item->ppsz_list[i_index];
+						 i_index++ )
+                        {
+                            combo->Append( wxU(p_item->ppsz_list[i_index]) );
+                            if( p_item->psz_value && !strcmp( p_item->psz_value,
+                                      p_item->ppsz_list[i_index] ) )
+                                combo->SetSelection( i_index );
+                        }  
+    
+                        if( p_item->psz_value )
+                            combo->SetValue( wxU(p_item->psz_value) );
+                        combo->SetToolTip( wxU(p_item->psz_longtext) );
+                        config_data->control.combobox = combo;
+                        config_data->b_config_list = VLC_TRUE;
+                        panel_sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL
+							|wxALL, 5 );
+                    }
+  
+                    if( p_item->i_type == CONFIG_ITEM_FILE )
+                    {
+                         button = new wxButton( panel, -1, wxU(_("Browse...")) );
+                         panel_sizer->Add( button, 0, wxALIGN_CENTER_VERTICAL
+  							|wxALL, 5);
+                        button->SetClientData((void *)config_data);
+                    }
+                    if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
+                    break;
+
+                case CONFIG_ITEM_INTEGER:
+                    label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
+                    spin = new wxSpinCtrl( panel, -1,
+                                       wxString::Format(wxT("%d"),p_item->i_value),
+                                       wxDefaultPosition, wxDefaultSize,
+                                       wxSP_ARROW_KEYS,
+                                       -16000, 16000, p_item->i_value);
+                    spin->SetToolTip( wxU(p_item->psz_longtext) );
+                    config_data->control.spinctrl = spin;
+                    panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL 
+						| wxALL, 5 );
+                    panel_sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL 
+						| wxALL, 5 );
+
+                    spin->SetClientData((void *)config_data);
+                    if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
+                    break;
+
+                case CONFIG_ITEM_KEY:
                 {
-                    combo->Append( wxU(p_item->ppsz_list[i_index]) );
-                    if( p_item->psz_value && !strcmp( p_item->psz_value,
-                                 p_item->ppsz_list[i_index] ) )
-                        combo->SetSelection( i_index );
+                    label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
+                    wxCheckBox *alt = new wxCheckBox( panel, -1, wxU(_("Alt")) );
+                    alt->SetValue( p_item->i_value & KEY_MODIFIER_ALT );
+                    wxCheckBox *ctrl = new wxCheckBox( panel, -1, wxU(_("Ctrl")) );
+                    ctrl->SetValue( p_item->i_value & KEY_MODIFIER_CTRL );
+                    wxCheckBox *shift = new wxCheckBox( panel, -1, 
+					wxU(_("Shift")) );
+                    shift->SetValue( p_item->i_value & KEY_MODIFIER_SHIFT );
+                    combo = new wxComboBox( panel, -1, wxU("f"), 
+  				wxDefaultPosition, wxDefaultSize, 0
+				, NULL, wxCB_READONLY | wxCB_SORT );
+                    for( int i = 0; i < sizeof(keys)/sizeof(key_descriptor_s); 
+					i++ )
+                    {
+                        combo->Append( wxU(_(keys[i].psz_key_string)),
+	    		  	     (void*)&keys[i].i_key_code );
+                    }
+                    combo->SetValue( wxU( KeyToString( 
+				p_item->i_value&~KEY_MODIFIER )));
+                    config_data->control.combobox = combo;
+                    panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL 
+						| wxALL, 5 );
+                    panel_sizer->Add( alt, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+                    panel_sizer->Add( ctrl, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+                    panel_sizer->Add( shift, 0, wxALIGN_CENTER_VERTICAL |
+								 wxALL, 5 );
+                    panel_sizer->Add( combo, 0, wxALIGN_CENTER_VERTICAL 
+								| wxALL, 5 );
+                    break;
                 }
+            
+	        case CONFIG_ITEM_FLOAT:
+                    label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
+                    textctrl = new wxTextCtrl( panel, -1,
+                                 wxString::Format(wxT("%f"),p_item->f_value),
+                                 wxDefaultPosition, wxDefaultSize,
+                                 wxTE_PROCESS_ENTER );
+                    textctrl->SetToolTip( wxU(p_item->psz_longtext) );
+                    config_data->control.textctrl = textctrl;
+                    panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL 
+						| wxALL, 5 );
+                    panel_sizer->Add( textctrl, 0, wxALIGN_CENTER_VERTICAL 
+						| wxALL, 5);
+                    if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
+                    break;
 
-                if( p_item->psz_value )
-                    combo->SetValue( wxU(p_item->psz_value) );
-                combo->SetToolTip( wxU(p_item->psz_longtext) );
-                config_data->control.combobox = combo;
-                config_data->b_config_list = VLC_TRUE;
-                panel_sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+                 case CONFIG_ITEM_BOOL:
+                     checkbox = new wxCheckBox( panel, -1, wxU(p_item->psz_text) );
+                     if( p_item->i_value ) checkbox->SetValue(TRUE);
+                     checkbox->SetToolTip( wxU(p_item->psz_longtext) );
+                     config_data->control.checkbox = checkbox;
+                     panel_sizer->Add( checkbox, 0, wxALL, 5 );
+                     if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
+                     break;
+
+
+                 default:
+                    delete panel; panel = NULL;
+                    delete panel_sizer;
+	            delete config_data;
+	            break;
             }
 
-            if( p_item->i_type == CONFIG_ITEM_FILE )
-            {
-                button = new wxButton( panel, -1, wxU(_("Browse...")) );
-                panel_sizer->Add( button, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-                button->SetClientData((void *)config_data);
-            }
-            break;
+            /* Don't add items that were not recognized */  
+            if( panel == NULL ) continue;
+  
+            panel_sizer->Layout();
+            panel->SetSizerAndFit( panel_sizer );
 
-        case CONFIG_ITEM_INTEGER:
-            label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
-            spin = new wxSpinCtrl( panel, -1,
-                                   wxString::Format(wxT("%d"),p_item->i_value),
-                                   wxDefaultPosition, wxDefaultSize,
-                                   wxSP_ARROW_KEYS,
-                                   -16000, 16000, p_item->i_value);
-            spin->SetToolTip( wxU(p_item->psz_longtext) );
-            config_data->control.spinctrl = spin;
-            panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-            panel_sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-
-            spin->SetClientData((void *)config_data);
-            break;
-
-        case CONFIG_ITEM_KEY:
-        {
-            label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
-            wxCheckBox *alt = new wxCheckBox( panel, -1, wxU(_("Alt")) );
-            alt->SetValue( p_item->i_value & KEY_MODIFIER_ALT );
-            wxCheckBox *ctrl = new wxCheckBox( panel, -1, wxU(_("Ctrl")) );
-            ctrl->SetValue( p_item->i_value & KEY_MODIFIER_CTRL );
-            wxCheckBox *shift = new wxCheckBox( panel, -1, wxU(_("Shift")) );
-            shift->SetValue( p_item->i_value & KEY_MODIFIER_SHIFT );
-            combo = new wxComboBox( panel, -1, wxU("f"), wxDefaultPosition,
-                wxDefaultSize, 0, NULL, wxCB_READONLY | wxCB_SORT );
-            for( int i = 0; i < sizeof(keys)/sizeof(key_descriptor_s); i++ )
-            {
-                combo->Append( wxU(_(keys[i].psz_key_string)),
-                               (void*)&keys[i].i_key_code );
-            }
-            combo->SetValue( wxU( KeyToString( p_item->i_value &
-                                               ~KEY_MODIFIER ) ) );
-            config_data->control.combobox = combo;
-            panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-            panel_sizer->Add( alt, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-            panel_sizer->Add( ctrl, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-            panel_sizer->Add( shift, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-            panel_sizer->Add( combo, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-            break;
+            /* Add the config data to our array so we can keep a trace of it */
+            config_array.Add( config_data );
+ 
+            config_sizer->Add( panel, 0, wxEXPAND | wxALL, 2 );
         }
+        while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+        config_sizer->Layout();
+        config_window->SetSizer( config_sizer );
+        sizer->Add( config_window, 1, wxEXPAND | wxALL, 5 );
 
-        case CONFIG_ITEM_FLOAT:
-            label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
-            textctrl = new wxTextCtrl( panel, -1,
-                             wxString::Format(wxT("%f"),p_item->f_value),
-                             wxDefaultPosition, wxDefaultSize,
-                             wxTE_PROCESS_ENTER );
-            textctrl->SetToolTip( wxU(p_item->psz_longtext) );
-            config_data->control.textctrl = textctrl;
-            panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-            panel_sizer->Add( textctrl, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
-            break;
-
-        case CONFIG_ITEM_BOOL:
-            checkbox = new wxCheckBox( panel, -1, wxU(p_item->psz_text) );
-            if( p_item->i_value ) checkbox->SetValue(TRUE);
-            checkbox->SetToolTip( wxU(p_item->psz_longtext) );
-            config_data->control.checkbox = checkbox;
-            panel_sizer->Add( checkbox, 0, wxALL, 5 );
-            break;
-
-        default:
-            delete panel; panel = NULL;
-            delete panel_sizer;
-            delete config_data;
-            break;
-        }
-
-        /* Don't add items that were not recognized */
-        if( panel == NULL ) continue;
-
-        panel_sizer->Layout();
-        panel->SetSizerAndFit( panel_sizer );
-
-        /* Add the config data to our array so we can keep a trace of it */
-        config_array.Add( config_data );
-
-        config_sizer->Add( panel, 0, wxEXPAND | wxALL, 2 );
-    }
-    while( p_item->i_type != CONFIG_HINT_END && p_item++ );
-
-    config_sizer->Layout();
-    config_window->SetSizer( config_sizer );
-    sizer->Add( config_window, 1, wxEXPAND | wxLEFT | wxRIGHT, 5 );
-
-    /* Intercept all menu events in our custom event handler */
-    config_window->PushEventHandler(
-        new ConfigEvtHandler( p_intf, p_prefs_dialog ) );
-
+        /* Intercept all menu events in our custom event handler */
+        config_window->PushEventHandler(
+            new ConfigEvtHandler( p_intf, p_prefs_dialog ) );
+    } 
     sizer->Layout();
     SetSizer( sizer );
 }
@@ -999,21 +1136,25 @@ void PrefsPanel::SwitchAdvanced( vlc_bool_t b_new_advanced )
 {
     if( b_advanced == b_new_advanced ) return;
 
-    b_advanced = b_new_advanced;
-
-    for( size_t i = 0; i < config_array.GetCount(); i++ )
+    if( config_sizer && config_window )
     {
-        ConfigData *config_data = config_array.Item(i);
-        if( config_data->b_advanced )
-        {
-            config_data->panel->Show( b_advanced );
-            config_sizer->Show( config_data->panel, b_advanced );
-        }
-    }
+        b_advanced = b_new_advanced;
 
-    config_sizer->Layout();
-    config_window->FitInside();
-    config_window->Refresh();
+        for( size_t i = 0; i < config_array.GetCount(); i++ )
+        {
+            ConfigData *config_data = config_array.Item(i);
+            if( config_data->b_advanced )
+            {
+                config_data->panel->Show( b_advanced );
+                config_sizer->Show( config_data->panel, b_advanced );
+            }
+        }
+
+        config_sizer->Layout();
+        config_window->FitInside();
+        config_window->Refresh();
+    }
+    return;	
 }
 
 /*****************************************************************************

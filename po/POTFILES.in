@@ -39,6 +39,7 @@ include/vlc_common.h
 include/vlc_config.h
 include/vlc_cpu.h
 include/vlc_error.h
+include/vlc_help.h
 include/vlc_interface.h
 include/vlc_keys.h
 include/vlc_messages.h
@@ -72,6 +73,7 @@ src/input/input_ext-plugins.c
 src/input/input_info.c
 src/input/input_programs.c
 src/input/stream.c
+src/input/subtitles.c
 src/interface/interface.c
 src/interface/intf_eject.c
 src/libvlc.c
@@ -317,6 +319,7 @@ modules/codec/theora.c
 modules/codec/vorbis.c
 modules/codec/xvid.c
 modules/control/corba/corba.c
+modules/control/gestold.c
 modules/control/gestures.c
 modules/control/http.c
 modules/control/joystick.c
@@ -603,6 +606,7 @@ modules/misc/dummy/input.c
 modules/misc/dummy/interface.c
 modules/misc/dummy/renderer.c
 modules/misc/dummy/vout.c
+modules/misc/equalizer.c
 modules/misc/freetype.c
 modules/misc/gtk_main.c
 modules/misc/httpd.c
@@ -684,6 +688,9 @@ modules/video_output/x11/xcommon.h
 modules/video_output/x11/xvideo.c
 modules/visualization/goom.c
 modules/visualization/scope/scope.c
+modules/visualization/scope/scopebeuareu.c
+modules/visualization/scope/scopenoaudio.c
+modules/visualization/scope/scopeold.c
 modules/visualization/visual/effects.c
 modules/visualization/visual/fft.c
 modules/visualization/visual/fft.h

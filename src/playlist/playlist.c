@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.54 2003/09/20 19:37:54 hartman Exp $
+ * $Id: playlist.c,v 1.55 2003/09/22 14:40:12 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -380,7 +380,7 @@ int playlist_Sort( playlist_t * p_playlist , int i_type )
 
     vlc_mutex_lock( &p_playlist->object_lock );
 
-    for( i_position = 0; i_position < p_playlist->i_size -1 ; i_position ++ )
+    for( i_position = 0; i_position <= p_playlist->i_size -1 ; i_position ++ )
     {
         i_small  = i_position;
         for( i = i_position + 1 ; i<  p_playlist->i_size ; i++)
@@ -401,12 +401,6 @@ int playlist_Sort( playlist_t * p_playlist , int i_type )
             p_playlist->pp_items[i_small] = p_temp;
         }
     }
-
-    for( i=0; i < p_playlist->i_size; i++ )
-    {
-        msg_Dbg( p_playlist, "%s", p_playlist->pp_items[i]->psz_name );
-    }
-
     vlc_mutex_unlock( &p_playlist->object_lock );
 
     return 0;
