@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.33 2002/11/14 22:38:47 massiot Exp $
+ * $Id: oss.c,v 1.34 2002/11/21 15:51:57 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -420,7 +420,7 @@ static int Open( vlc_object_t *p_this )
             free( p_sys );
             return VLC_EGENERIC;
         }
-	else
+        else
         {
             /* Number of fragments actually allocated */
             p_aout->output.p_sys->i_fragstotal = audio_buf.fragstotal;
@@ -540,21 +540,21 @@ static int OSSThread( aout_instance_t * p_aout )
 #undef i_fragstotal
             }
 
-            if( !next_date )
-            {
-                /* This is the _real_ presentation date */
-                next_date = mdate() + buffered;
-            }
-            else
-            {
-                /* Give a hint to the audio output about our drift, but
-                 * not too much because we want to make it happy with our
-                 * nicely calculated dates. */
-                next_date = ( (next_date * 7) + (mdate() + buffered) ) / 8;
-            }
+            /* Next buffer will be played at mdate() + buffered */
+            p_buffer = aout_OutputNextBuffer( p_aout, mdate() + buffered,
+                                              VLC_FALSE );
 
-            /* Next buffer will be played at mdate()+buffered */
-            p_buffer = aout_OutputNextBuffer( p_aout, next_date, VLC_FALSE );
+            if( p_buffer == NULL &&
+                buffered > ( p_aout->output.p_sys->max_buffer_duration
+                             / p_aout->output.p_sys->i_fragstotal ) )
+            {
+                /* If we have at least a fragment full, then we can wait a
+                 * little and retry to get a new audio buffer instead of
+                 * playing a blank sample */
+                msleep( ( p_aout->output.p_sys->max_buffer_duration
+                          / p_aout->output.p_sys->i_fragstotal / 2 ) );
+                continue;
+            }
         }
         else
         {
