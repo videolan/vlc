@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.107 2002/05/18 17:47:46 sam Exp $
+ * $Id: common.h,v 1.108 2002/05/20 22:36:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -703,10 +703,10 @@ typedef struct module_symbols_s
     void ( * CurrentPTS )           ( struct bit_stream_s *, mtime_t *,
                                       mtime_t * );
 
-    iso639_lang_t * ( * GetLang_1 ) ( const char * );
-    iso639_lang_t * ( * GetLang_2T ) ( const char * );
-    iso639_lang_t * ( * GetLang_2B ) ( const char * );
-    char * ( * DecodeLanguage ) ( u16 );
+    const iso639_lang_t * ( * GetLang_1 ) ( const char * );
+    const iso639_lang_t * ( * GetLang_2T ) ( const char * );
+    const iso639_lang_t * ( * GetLang_2B ) ( const char * );
+    const char * ( * DecodeLanguage ) ( u16 );
 
     struct module_s * ( * module_Need )   ( int, char *, void * );
     void              ( * module_Unneed ) ( struct module_s * );

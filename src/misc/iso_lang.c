@@ -2,7 +2,7 @@
  * iso_lang.c: function to decode language code (in dvd or a52 for instance).
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: iso_lang.c,v 1.4 2002/05/14 19:33:54 bozo Exp $
+ * $Id: iso_lang.c,v 1.5 2002/05/20 22:36:42 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *         Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -35,77 +35,77 @@
  * Local tables
  *****************************************************************************/
 
-static iso639_lang_t p_iso_languages[] =
-{
 #define DEFINE_LANGUAGE_CODE(engName, nativeName, iso1, iso2T, iso2B) \
           { engName, nativeName, #iso1, #iso2T, #iso2B },
-    { "", "", "", "", "" },
+
+static const iso639_lang_t p_languages[] =
+{
 #include "iso-639.def"
+    { NULL, NULL, NULL, NULL, NULL }
 };
 
+static const iso639_lang_t unknown_language =
+    { "Unknown", "Unknown", "??", "???", "???" };
 
 /*****************************************************************************
- * DecodeLanguage: gives the long language name from the two-letters
+ * DecodeLanguage: gives the long language name from the two-letter
  *                 ISO-639 code
  *****************************************************************************/
-char * DecodeLanguage( u16 i_code )
+const char * DecodeLanguage( u16 i_code )
 {
-    u8 code[2];
-    iso639_lang_t * p_iso;
-    code[0] = i_code >> 8;
-    code[1] = i_code;
-    p_iso = GetLang_1( code );
-    if( p_iso )
+    const iso639_lang_t * p_lang;
+    u8 psz_code[3];
+
+    psz_code[0] = i_code >> 8;
+    psz_code[1] = i_code;
+    psz_code[2] = '\0';
+
+    for( p_lang = p_languages; p_lang->psz_eng_name; p_lang++ )
     {
-        if( p_iso->psz_native_name[0] )
-            return p_iso->psz_native_name;
-        else
-            return p_iso->psz_eng_name;
+        if( !strncmp( p_lang->psz_iso639_1, psz_code, 2 ) )
+        {
+            if( *p_lang->psz_native_name )
+            {
+                return p_lang->psz_native_name;
+            }
+
+            return p_lang->psz_eng_name;
+        }
     }
-    return p_iso_languages[sizeof( p_iso_languages ) /
-                           sizeof( iso639_lang_t ) - 1].psz_native_name;
+
+    return "Unknown";
 }
 
-
-iso639_lang_t * GetLang_1( const char * psz_iso639_1 )
+const iso639_lang_t * GetLang_1( const char * psz_code )
 {
-    unsigned int i;
-    for( i = 0; i < sizeof( p_iso_languages ) / sizeof( iso639_lang_t ); i++ )
-    {
-        if( !strncmp( p_iso_languages[i].psz_iso639_1, psz_iso639_1, 2 ) )
-            break;
-    }
-    if( i < sizeof( p_iso_languages ) / sizeof( iso639_lang_t ) )
-        return &p_iso_languages[i];
-    else
-        return NULL;
+    const iso639_lang_t *p_lang;
+
+    for( p_lang = p_languages; p_lang->psz_eng_name; p_lang++ )
+        if( !strncmp( p_lang->psz_iso639_1, psz_code, 2 ) )
+            return p_lang;
+
+    return &unknown_language;
 }
 
-iso639_lang_t * GetLang_2T( const char * psz_iso639_2T )
+const iso639_lang_t * GetLang_2T( const char * psz_code )
 {
-    unsigned int i;
-    for( i = 0; i < sizeof( p_iso_languages ) / sizeof( iso639_lang_t ); i++ )
-    {
-        if( !strncmp( p_iso_languages[i].psz_iso639_2T, psz_iso639_2T, 2 ) )
-            break;
-    }
-    if( i < sizeof( p_iso_languages ) / sizeof( iso639_lang_t ) )
-        return &p_iso_languages[i];
-    else
-        return NULL;
+    const iso639_lang_t *p_lang;
+    
+    for( p_lang = p_languages; p_lang->psz_eng_name; p_lang++ )
+        if( !strncmp( p_lang->psz_iso639_2T, psz_code, 3 ) )
+            return p_lang;
+
+    return &unknown_language;
 }
 
-iso639_lang_t * GetLang_2B( const char * psz_iso639_2B )
+const iso639_lang_t * GetLang_2B( const char * psz_code )
 {
-    unsigned int i;
-    for( i = 0; i < sizeof( p_iso_languages ) / sizeof( iso639_lang_t ); i++ )
-    {
-        if( !strncmp( p_iso_languages[i].psz_iso639_2B, psz_iso639_2B, 2 ) )
-            break;
-    }
-    if( i < sizeof( p_iso_languages ) / sizeof( iso639_lang_t ) )
-        return &p_iso_languages[i];
-    else
-        return NULL;
+    const iso639_lang_t *p_lang;
+
+    for( p_lang = p_languages; p_lang->psz_eng_name; p_lang++ )
+        if( !strncmp( p_lang->psz_iso639_2B, psz_code, 3 ) )
+            return p_lang;
+
+    return &unknown_language;
 }
 
