@@ -12,11 +12,12 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <net/if.h>
-#include <netinet/in.h>
 #include <sys/ioctl.h>
-#include <sys/socket.h>
 
 #include "config.h"
 #include "common.h"
