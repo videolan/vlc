@@ -39,6 +39,8 @@ $Id$
  
  * adpcm: ADPCM audio decoder
 
+ * aiff: AIFF demuxer
+
  * alsa: audio output module using the ALSA API.
 
  * aout_directx: audio output module using the DirectX API.
@@ -80,8 +82,12 @@ $Id$
  * coreaudio_resampler: Audio resampler based on CoreAudio's AudioConverter
 
  * crop: Crop video filter
+ 
+ * cvdsub: CVD subtitles decoder
 
  * deinterlace: naive deinterlacing filter.
+
+ * demux2: demux compatibility layer
 
  * demuxdump: Pseudo-demuxer that dumps the stream
 
@@ -99,6 +105,8 @@ $Id$
  
  * dtssys: raw DTS stream input module
 
+ * dtstofloat32: DTS Audio converter
+
  * dtstospdif: Audio converter that encapsulates DTS into S/PDIF
 
  * dummy: dummy audio output, video output, interface and input modules.
@@ -111,6 +119,8 @@ $Id$
 
  * dvd: input module for accessing DVDs.
 
+ * dvdnav: access module for DVDs with libdvdnav
+
  * dvdplay: access module for accessing DVDs using libdvdplay
 
  * dvdread: input module for accessing DVDs, uses libdvdread.
@@ -118,6 +128,8 @@ $Id$
  * es: input module for MPEG ES decapsulation.
 
  * esd: audio output module using the Esound sound daemon.
+
+ * export: playlist export module
 
  * faad: AAC decoder using libfaad2
 
@@ -171,14 +183,16 @@ $Id$
 
  * gtk_main: Gtk+ wrapper for gtk_main
 
+ * h264: H264 decoder
+
+ * hd1000a: audio output module for the Roku HD1000 Set-Top-Box
+
  * headphone_channel_mixer:
 	 headphone channel mixer with virtual spatialization effect.
 
  * hotkeys: hotkeys control module
 
  * http: HTTP remote control webinterface
-
- * httpd: HTTP server
 
  * i420_rgb: planar YUV to packed RGB conversion functions.
 
@@ -190,8 +204,10 @@ $Id$
 
  * i420_yuy2: planar 4:2:0 YUV to packed YUV conversion functions.
 
+ * i420_yuy2_altivec: AltiVec accelerated version of i420_yuy2.
+ 
  * i420_yuy2_mmx: MMX accelerated version of i420_yuy2.
-
+ 
  * i422_yuy2: planar 4:2:2 YUV to packed YUV conversion functions.
 
  * i422_yuy2_mmx: MMX accelerated version of i422_yuy2.
@@ -230,6 +246,8 @@ $Id$
 
  * macosx: Video output, and interface module for Mac OS X.
 
+ * mash: OpenMash based decoder
+
  * memcpy3dn: 3D Now! accelerated version of memcpy.
 
  * memcpy: memory chunk copying module.
@@ -243,6 +261,8 @@ $Id$
  * mga: video output module for Matrox cards using the Linux mga kernel driver.
 
  * mkv: Matroska demuxer
+
+ * mod: MOD demuxer
 
  * motionblur: Motion blur filter
 
@@ -276,6 +296,8 @@ $Id$
 
  * ncurses: interface module using the ncurses library.
 
+ * nsv: NullSoft Video demuxer
+
  * ntservice: run VLC as a NT service
 
  * ogg: input module for OGG decapsulation.
@@ -285,6 +307,8 @@ $Id$
  * oss: audio output module using the OSS /dev/dsp interface.
  
  * packetizer_copy: Simple copy packetizer
+ 
+ * packetizer_h264: H264 video packetizer
 
  * packetizer_mpeg4audio: MPEG4 audio packetizer
  
@@ -294,13 +318,19 @@ $Id$
  
  * pda: interface for iPaq using the Gtk2+ widget set.
 
+ * playlist: playlist import module
+ 
  * postprocessing_c: Video Postprocessing module
 
  * postprocessing_mmx: Video Postprocessing module using MMX
  
  * postprocessing_mmxext: Video Postprocessing module using MMX_EXT 
 
+ * ps2: new generation MPEG PS demuxer
+
  * ps: input module for MPEG PS decapsulation.
+ 
+ * pva: PVA demuxer
 
  * pvr: input module to read from a PVR card
 
@@ -320,6 +350,8 @@ $Id$
 
  * rc: interface module using stdio.
 
+ * real: partial Real audio/video demuxer
+
  * s16tofixed32: Signed 16 bits to fixed 32 bits audio converter
 
  * s16tofloat32: Signed 16 bits to float 32 bits audio converter
@@ -332,9 +364,11 @@ $Id$
 
  * satellite: Satellite cards access module
 
- * scope: Scope visualization plugin (broken)
-
  * screensaver: screensaver disabling module
+
+ * sgimb: SGIMB referrer files parser
+
+ * skins2: Skinnable interface, new generation
 
  * skins: Skinnable interface
 
@@ -366,9 +400,13 @@ $Id$
 
  * subsdec: Another SPU decoder for text subtitles
 
+ * svcdsub: SVCD subtitles decoder
+
  * svgalib: SGVAlib output plugin
 
  * tarkin: a tarkin video decoder using libtarkin
+
+ * telnet: Telnet control interface for VideoLAN Media Manager
 
  * test1: Empty C module
 
@@ -390,9 +428,11 @@ $Id$
  * trivial_mixer: Trivial audio mixer plugin
 
  * trivial_resampler: Simple audio resampler
+ 
+ * ts2: new generation MPEG TS demuxer
 
  * ts: input module for MPEG TS decapsulation.
- 
+
  * ts_dvbpsi: same as ts using libdvbpsi
 
  * u8tofixed32: unsigned 8 bits to fixed 32 bits audio converter 
@@ -426,6 +466,8 @@ $Id$
  * wxwindows: interface module using the cross-platform wxWindows library.
 
  * x11: video output module using the X11 API.
+
+ * x264: H264 video decoder using X264
 
  * xosd: X On Screen Display interface
 

@@ -7,11 +7,13 @@ Core support:
  * Bookmarks feature for easier seeking/access inside medias.
  * Support for video output embedded in interfaces.
  * Improved HTTP daemon
+ * Saved playlist now remember VLC-specific options
 
 Codecs:
  * New Continuous Media Markup Language (CMML) codec.
    (http://www.annodex.net/overview.html)
  * New H.261 video decoder using openmash.
+ * H264 encoder, demuxer and packetizer
  * Packetizer interfaced between demux and codec when needed
    (allows using ffmpeg plugin to decode MPEG streams and better aac decoding).
 
@@ -26,8 +28,12 @@ Input:
 
 Demux:
  * Annodex (http://www.annodex.net) support
- * Subviewer and subviewer v2 subtitles support.
  * mmsh streaming fixes.
+
+Subtitles:
+ * Subviewer and subviewer v2 subtitles support.
+ * Ability to choose autodetected subtitles path
+ * subtitles delay can be changed in real time with hotkeys
 
 Stream output:
  * Improved session announcement system.
@@ -35,7 +41,9 @@ Stream output:
  * Added faster than realtime stream output (limited by CPU) for file output.
  * Improved MOV/MP4 muxer.
  * Improved MPEG TS muxer.
+ * Improved transrater
  * Meta info options used by the muxers.
+ * New configuration system
  * Better audio channels downmixing when transcoding.
 
 VideoLAN manager:
@@ -54,14 +62,19 @@ Interfaces:
  * wxWindows
     - New design and set of icons.
     - Ability to embed video output.
+ * MacOS
+    - Support for 'groups' and playlist item properties
+    - Better hotkeys handling
 
 Mac OS X port:
- * Support for 'groups' and playlist item properties.
  * OpenGL video output is now the default when available.
 
 Win32 port:
  * DirectShow input plugin should work with more devices.
  * Disable monitor power down when watching movies.
+
+Linux port:
+ * PowerPC fixes
 
 Misc:
  * Improvements to the GOOM visualisation plugin.
