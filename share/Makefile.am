@@ -5,6 +5,7 @@ EXTRA_DIST = $(DIST_rsrc) $(DIST_fonts)
 pkgdatadir = $(datadir)/vlc
 
 dist_pkgdata_DATA = \
+	font-eutopiabold36.rle \
 	$(DIST_familiar) \
 	$(DIST_icons16) \
 	$(DIST_icons32) \
