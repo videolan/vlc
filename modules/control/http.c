@@ -2,7 +2,7 @@
  * http.c :  http remote control plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.8 2003/05/23 13:02:53 hartman Exp $
+ * $Id: http.c,v 1.9 2003/05/23 23:53:53 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -433,65 +433,70 @@ static int httpd_page_interface_update( intf_thread_t *p_intf,
     i_size += 8192;
 
     p = *pp_data = malloc( i_size );
-
-    p += sprintf( p, "<html>\n" );
+    p += sprintf( p, "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" );
+    p += sprintf( p, "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n" );
     p += sprintf( p, "<head>\n" );
     p += sprintf( p, "<title>VLC Media Player</title>\n" );
     if( b_redirect )
     {
-        p += sprintf( p, "<meta http-equiv=\"refresh\" content=\"0;URL=/\"\n" );
+        p += sprintf( p, "<meta http-equiv=\"refresh\" content=\"0;URL=/\"/>\n" );
     }
+    p += sprintf( p, "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"/>\n" );
     /* p += sprintf( p, "<link rel=\"shortcut icon\" href=\"http://www.videolan.org/favicon.ico\">\n" ); */
     p += sprintf( p, "</head>\n" );
     p += sprintf( p, "<body>\n" );
-    p += sprintf( p, "<h2><center><a href=\"http://www.videolan.org\">"
-                     "VLC Media Player</a> (http interface)</center></h2>\n" );
+    p += sprintf( p, "<h2 style=\"align: center;\"><a href=\"http://www.videolan.org\">"
+                     "VLC Media Player</a> (http interface)</h2>\n" );
 
     /*
      * Display the controls
      */
-    p += sprintf( p, "<hr />\n" );
+    p += sprintf( p, "<hr/>\n" );
 
-    p += sprintf( p, "<td><form method=\"get\" action=\"\">"
-        "<input type=\"submit\" name=\"action\" value=\"stop\" />"
+    p += sprintf( p, "<form method=\"get\" action=\"/\">"
+        "<p><input type=\"submit\" name=\"action\" value=\"stop\" />"
         "<input type=\"submit\" name=\"action\" value=\"pause\" />"
         "<input type=\"submit\" name=\"action\" value=\"previous\" />"
-        "<input type=\"submit\" name=\"action\" value=\"next\" />"
-        "</form></td><br />\n" );
+        "<input type=\"submit\" name=\"action\" value=\"next\" /></p>"
+        "</form>\n" );
 
-    p += sprintf( p, "<td><form method=\"get\" action=\"\" "
+    p += sprintf( p, "<form method=\"get\" action=\"/\" "
                      "enctype=\"text/plain\" >"
-        "Media Resource Locator: "
+        "<p>Media Resource Locator:<br/>"
         "<input type=\"text\" name=\"mrl\" size=\"40\" />"
-        "<input type=\"submit\" name=\"action\" value=\"add\" />"
-        "</form></td>\n" );
+        "<input type=\"submit\" name=\"action\" value=\"add\" /></p>"
+        "</form>\n" );
 
-    p += sprintf( p, "<hr />\n" );
+    p += sprintf( p, "<hr/>\n" );
 
     /*
      * Display the playlist items
      */
-    for ( i = 0; i < p_playlist->i_size; i++ )
+    if ( p_playlist->i_size )
     {
-        if( i == p_playlist->i_index ) p += sprintf( p, "<b>" );
-
-        p += sprintf( p, "<a href=?action=play&item=%i>", i );
-        p += sprintf( p, "%i - %s", i,
-                      p_playlist->pp_items[i]->psz_name );
-        p += sprintf( p, "</a>" );
-
-        if( i == p_playlist->i_index ) p += sprintf( p, "</b>" );
-        p += sprintf( p, "<br />\n" );
+        p += sprintf( p, "<ol>\n" );
+        for ( i = 0; i < p_playlist->i_size; i++ )
+        {
+            if( i == p_playlist->i_index ) p += sprintf( p, "<b>" );
+            
+            p += sprintf( p, "<li><a href=\"?action=play&amp;item=%i\">", i );
+            p += sprintf( p, "%s", p_playlist->pp_items[i]->psz_name );
+            p += sprintf( p, "</a></li>" );
+            
+            if( i == p_playlist->i_index ) p += sprintf( p, "</b>" );
+            p += sprintf( p, "\n" );
+        }
+        p += sprintf( p, "</ol>\n" );
     }
-    if ( i == 0 )
+    else
     {
-        p += sprintf( p, "no entries\n" );
+        p += sprintf( p, "<p>no entries</p>\n" );
     }
 
     p += sprintf( p, "</body>\n" );
     p += sprintf( p, "</html>\n" );
 
-    *pi_data = strlen( *pp_data ) + 1;
+    *pi_data = strlen( *pp_data );
 
     vlc_mutex_unlock( &p_playlist->object_lock );
 
