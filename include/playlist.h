@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: playlist.h,v 1.6 2002/06/07 14:30:40 sam Exp $
+ * $Id: playlist.h,v 1.7 2002/06/07 19:54:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -57,7 +57,7 @@ struct playlist_s
 #define PLAYLIST_APPEND      0x0004
 #define PLAYLIST_GO          0x0008
 
-#define PLAYLIST_END             -1
+#define PLAYLIST_END           -666
 
 /* Playlist parsing mode */
 #define PLAYLIST_REPEAT_CURRENT   0             /* Keep playing current item */

@@ -2,7 +2,7 @@
  * gtk_playlist.h : Playlist functions for the Gtk plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_playlist.h,v 1.7 2002/06/07 14:30:41 sam Exp $
+ * $Id: gtk_playlist.h,v 1.8 2002/06/07 19:54:37 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -33,7 +33,6 @@ void GtkPlaylistAddUrl        ( GtkMenuItem *, gpointer );
 
 gint     GtkCompareItems      ( gconstpointer, gconstpointer );
 int      GtkHasValidExtension ( gchar * );
-GList *  GtkReadFiles         ( gchar * );
 
 gboolean GtkPlaylistShow      ( GtkWidget *, gpointer );
 gboolean GtkPlaylistPrev      ( GtkWidget *, gpointer );

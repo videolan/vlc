@@ -2554,7 +2554,7 @@ http://www.videolan.org/
 	    </signal>
 	    <columns>2</columns>
 	    <column_widths>287,70</column_widths>
-	    <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
+	    <selection_mode>GTK_SELECTION_EXTENDED</selection_mode>
 	    <show_titles>True</show_titles>
 	    <shadow_type>GTK_SHADOW_IN</shadow_type>
 
@@ -2652,7 +2652,7 @@ http://www.videolan.org/
 	    <name>playlist_add_url</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>GtkPlaylistAddUrl</handler>
+	      <handler>GtkPlaylistAddUrl_GLADE_SUX_intf_playlist</handler>
 	      <data>&quot;intf_playlist&quot;</data>
 	      <last_modification_time>Sat, 19 May 2001 16:24:27 GMT</last_modification_time>
 	    </signal>
@@ -2677,7 +2677,7 @@ http://www.videolan.org/
 	    <name>playlist_delete_all</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>GtkPlaylistDeleteAll</handler>
+	      <handler>GtkPlaylistDeleteAll_GLADE_SUX_intf_playlist</handler>
 	      <data>&quot;intf_playlist&quot;</data>
 	      <last_modification_time>Sat, 19 May 2001 03:08:11 GMT</last_modification_time>
 	    </signal>
@@ -2690,7 +2690,7 @@ http://www.videolan.org/
 	    <name>playlist_delete_item</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>GtkPlaylistDeleteSelected</handler>
+	      <handler>GtkPlaylistDeleteSelected_GLADE_SUX_intf_playlist</handler>
 	      <data>&quot;intf_playlist&quot;</data>
 	      <last_modification_time>Sat, 19 May 2001 03:08:05 GMT</last_modification_time>
 	    </signal>
@@ -2715,7 +2715,7 @@ http://www.videolan.org/
 	    <name>playlist_selection_crop</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>GtkPlaylistCrop</handler>
+	      <handler>GtkPlaylistCrop_GLADE_SUX_intf_playlist</handler>
 	      <data>&quot;intf_playlist&quot;</data>
 	      <last_modification_time>Sat, 19 May 2001 03:07:56 GMT</last_modification_time>
 	    </signal>
@@ -2728,7 +2728,7 @@ http://www.videolan.org/
 	    <name>playlist_selection_invert</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>GtkPlaylistInvert</handler>
+	      <handler>GtkPlaylistInvert_GLADE_SUX_intf_playlist</handler>
 	      <data>&quot;intf_playlist&quot;</data>
 	      <last_modification_time>Sat, 19 May 2001 03:07:51 GMT</last_modification_time>
 	    </signal>
@@ -2741,7 +2741,7 @@ http://www.videolan.org/
 	    <name>playlist_selection_select</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>GtkPlaylistSelect</handler>
+	      <handler>GtkPlaylistSelect_GLADE_SUX_intf_playlist</handler>
 	      <data>&quot;intf_playlist&quot;</data>
 	      <last_modification_time>Sat, 19 May 2001 03:07:45 GMT</last_modification_time>
 	    </signal>

@@ -1727,7 +1727,7 @@ static GnomeUIInfo playlist_add_menu_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("Url"),
     NULL,
-    (gpointer) GtkPlaylistAddUrl, NULL, NULL,
+    (gpointer) GtkPlaylistAddUrl, "intf_playlist", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
@@ -1739,14 +1739,14 @@ static GnomeUIInfo playlist_delete_menu_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("All"),
     NULL,
-    (gpointer) GtkPlaylistDeleteAll, NULL, NULL,
+    (gpointer) GtkPlaylistDeleteAll, "intf_playlist", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("Item"),
     NULL,
-    (gpointer) GtkPlaylistDeleteSelected, NULL, NULL,
+    (gpointer) GtkPlaylistDeleteSelected, "intf_playlist", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
@@ -1758,21 +1758,21 @@ static GnomeUIInfo playlist_selection_menu_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("Crop"),
     NULL,
-    (gpointer) GtkPlaylistCrop, NULL, NULL,
+    (gpointer) GtkPlaylistCrop, "intf_playlist", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("Invert"),
     NULL,
-    (gpointer) GtkPlaylistInvert, NULL, NULL,
+    (gpointer) GtkPlaylistInvert, "intf_playlist", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("Select"),
     NULL,
-    (gpointer) GtkPlaylistSelect, NULL, NULL,
+    (gpointer) GtkPlaylistSelect, "intf_playlist", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
@@ -1862,6 +1862,7 @@ create_intf_playlist (void)
   gtk_container_add (GTK_CONTAINER (playlist_frame), playlist_clist);
   gtk_clist_set_column_width (GTK_CLIST (playlist_clist), 0, 287);
   gtk_clist_set_column_width (GTK_CLIST (playlist_clist), 1, 70);
+  gtk_clist_set_selection_mode (GTK_CLIST (playlist_clist), GTK_SELECTION_EXTENDED);
   gtk_clist_column_titles_show (GTK_CLIST (playlist_clist));
 
   playlist_label_url = gtk_label_new (_("Url"));

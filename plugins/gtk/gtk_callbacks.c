@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.44 2002/06/07 14:30:40 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.45 2002/06/07 19:54:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -384,12 +384,20 @@ void GtkJumpCancel( GtkButton       *button,
  ****************************************************************************/
 gboolean GtkDiscEject ( GtkWidget *widget, gpointer user_data )
 {
-#if 0 /* PLAYLIST TARASS */
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
-
     char *psz_device = NULL;
     char *psz_parser;
-    char *psz_current = p_intf->p_vlc->p_playlist->current.psz_name;
+    char *psz_current;
+
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return FALSE;
+    }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+    psz_current = p_playlist->pp_items[ p_playlist->i_index ]->psz_name;
 
     /*
      * Get the active input
@@ -437,6 +445,9 @@ gboolean GtkDiscEject ( GtkWidget *widget, gpointer user_data )
         }
     }
 
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_object_release( p_playlist );
+
     if( psz_device == NULL )
     {
         return TRUE;
@@ -462,7 +473,7 @@ gboolean GtkDiscEject ( GtkWidget *widget, gpointer user_data )
     }
 
     free(psz_device);
-#endif
+
     return TRUE;
 }
 
