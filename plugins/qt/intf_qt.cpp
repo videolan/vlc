@@ -2,7 +2,7 @@
  * intf_qt.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_qt.cpp,v 1.15 2002/07/01 17:39:55 sam Exp $
+ * $Id: intf_qt.cpp,v 1.16 2002/07/11 18:41:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -88,10 +88,10 @@ public:
     ~IntfWindow();
 
 private slots:
-    void Manage( void );
+    void Manage ( void );
 
     void FileOpen  ( void );
-    void FileQuit  ( void ) { qApp->quit(); };
+    void FileQuit  ( void );
 
     void PlaybackPlay  ( void );
     void PlaybackPause ( void );
@@ -406,6 +406,14 @@ void IntfWindow::FileOpen( void )
 }
 
 /*****************************************************************************
+ * FileQuit: terminate vlc
+ *****************************************************************************/
+void IntfWindow::FileQuit( void )
+{
+    p_intf->p_vlc->b_die = VLC_TRUE;
+}
+
+/*****************************************************************************
  * About: display the "about" box
  *****************************************************************************
  * This function displays a simple "about" box with copyright information.
@@ -479,7 +487,7 @@ void IntfWindow::Manage( void )
         p_intf->b_menu_change = 0;
     }
 
-    if( p_intf->p_vlc->b_die )
+    if( p_intf->b_die )
     {
         qApp->quit();
     }
