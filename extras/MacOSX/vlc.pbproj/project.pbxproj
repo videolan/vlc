@@ -219,7 +219,7 @@
 	<key>CFBundleExecutable</key>
 	<string>vlc</string>
 	<key>CFBundleGetInfoString</key>
-	<string>VideoLan Client 0.2.92</string>
+	<string>VideoLan Client 0.2.92 (25.01.2002)</string>
 	<key>CFBundleIconFile</key>
 	<string>vlc.icns</string>
 	<key>CFBundleIdentifier</key>

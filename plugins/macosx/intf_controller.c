@@ -170,6 +170,7 @@
         ] ;
         [o_window setContentView:o_qdview] ;
         [o_window orderFront:self] ;
+        [o_qdview lockFocus] ;
         [o_vlc setQDPort:[o_qdview qdPort]] ;
     }
     
