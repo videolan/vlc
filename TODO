@@ -20,7 +20,7 @@ Description: RAR/ZIP/... access
 Status: Todo
 
 Task
-Difficulty: easy
+Difficulty: Easy
 Platform: Linux, Win32
 Urgency: Normal
 Description: Streaming wizard
@@ -290,15 +290,16 @@ Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: export paramaters of an input
- Export the info of a file/source to a standard xml file for use by other applications. Possibly combine with file "probe'ing".
+ Export the Media Info of a file/source to a standard xml file for use by other applications. Possibly combine with file "probe'ing".
  - AR
  - size
+ - bitrate
  - resolution
  - codecs, etc.
 Status: Todo
 
 Task
-Difficlty: Easy
+Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: SSL http
@@ -306,7 +307,7 @@ SSL encrypted HTTP communication. To support protected VoD.
 Status: Todo
 
 Task
-Difficlty: Hard
+Difficulty: Hard
 Urgency: Wishlist
 Platform: any
 Description: http cookies
@@ -314,7 +315,7 @@ For protected VoD  (http://a-select.surfnet.nl)
 Status: Todo
 
 Task
-Difficlty: Easy
+Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: mime-type VLC launching
@@ -323,7 +324,7 @@ Allows for Progressive download to TEMP folder from browsers. VLC would play the
 Status: Todo
 
 Task
-Difficlty: Hard
+Difficulty: Hard
 Urgency: Wishlist
 Platform: any
 Description: rendezvous announces
