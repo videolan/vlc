@@ -98,16 +98,30 @@ static void Close( vlc_object_t * p_this )
 static int Capability( sout_mux_t *p_mux, int i_query,
                        void *p_args, void *p_answer )
 {
-    return SOUT_MUX_CAP_ERR_UNIMPLEMENTED;
+    switch( i_query )
+    {
+        case SOUT_MUX_CAP_GET_ADD_STREAM_ANY_TIME:
+            *(vlc_bool_t*)p_answer = VLC_TRUE;
+            return SOUT_MUX_CAP_ERR_OK;
+        default:
+            return SOUT_MUX_CAP_ERR_UNIMPLEMENTED;
+    }
 }
 
 static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
+    if( p_mux->i_nb_inputs > 1 )
+    {
+        msg_Dbg( p_mux, "only 1 input allowed" );
+        return VLC_EGENERIC;
+    }
+
     msg_Dbg( p_mux, "adding input" );
     if( p_input->p_fmt->i_codec != VLC_FOURCC('M','J','P','G') )
     {
         return VLC_EGENERIC;
     }
+
     return VLC_SUCCESS;
 }
 
@@ -122,6 +136,7 @@ static int Mux( sout_mux_t *p_mux )
     block_fifo_t *p_fifo;
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     int i_count;
+
     if( p_sys->b_send_headers )
     {
         block_t *p_header = block_New( p_mux, sizeof(SEPARATOR) - 2);
@@ -130,6 +145,9 @@ static int Mux( sout_mux_t *p_mux )
         sout_AccessOutWrite( p_mux->p_access, p_header );
         p_sys->b_send_headers = VLC_FALSE;
     }
+
+    if( !p_mux->i_nb_inputs ) return VLC_SUCCESS;
+
     p_fifo = p_mux->pp_inputs[0]->p_fifo;
     i_count = p_fifo->i_depth;
     while( i_count > 0 )
