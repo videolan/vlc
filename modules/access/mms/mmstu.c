@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmstu.c,v 1.2 2003/05/08 19:06:45 titer Exp $
+ * $Id: mmstu.c,v 1.3 2003/05/09 02:39:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -741,6 +741,7 @@ static int MMSOpen( input_thread_t  *p_input,
     }
     /* *** now read header packet *** */
     /* XXX could be split over multiples packets */
+    msg_Dbg( p_input, "reading header" );
     for( ;; )
     {
         if( mms_HeaderMediaRead( p_input, MMS_PACKET_HEADER ) < 0 )
@@ -1025,6 +1026,7 @@ static int  NetFillBuffer( input_thread_t *p_input )
     ssize_t i_tcp, i_udp;
     ssize_t i_tcp_read, i_udp_read;
     int i_handle_max;
+    int i_try;
 
     /* Initialize file descriptor set */
     FD_ZERO( &fds );
@@ -1065,22 +1067,28 @@ static int  NetFillBuffer( input_thread_t *p_input )
     /* We'll wait 0.5 second if nothing happens */
     timeout.tv_sec = 0;
     timeout.tv_usec = 500000;
-
+    i_try = 0;
     /* Find if some data is available */
     while( (i_ret = select( i_handle_max + 1, &fds,
                             NULL, NULL, &timeout )) == 0
            || (i_ret < 0 && errno == EINTR) )
     {
+        i_try++;
         FD_ZERO( &fds );
         if( i_tcp > 0 ) FD_SET( p_sys->socket_tcp.i_handle, &fds );
         if( i_udp > 0 ) FD_SET( p_sys->socket_udp.i_handle, &fds );
         timeout.tv_sec = 0;
         timeout.tv_usec = 500000;
 
+        if( i_try > 2 && ( p_sys->i_buffer_tcp > 0 || p_sys->i_buffer_udp > 0 ) )
+        {
+            return 0;
+        }
         if( p_input->b_die || p_input->b_error )
         {
             return 0;
         }
+        msg_Dbg( p_input, "NetFillBuffer: trying again (select)" );
     }
 
     if( i_ret < 0 )
