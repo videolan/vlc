@@ -485,3 +485,8 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<alexis> cdemarco: you can try with "-I dummy"
+<cdemarco> You mean I should call my computer names!?
+
+  -- #videolan
+%
