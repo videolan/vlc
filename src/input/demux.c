@@ -2,7 +2,7 @@
  * demux.c
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: demux.c,v 1.8 2004/01/17 12:03:19 gbazin Exp $
+ * $Id: demux.c,v 1.9 2004/01/20 14:48:37 fenrir Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -202,6 +202,10 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
             p_demux->psz_demux  = strdup( psz );
         }
     }
+    else
+    {
+        p_demux->psz_path = strdup( psz_mrl );
+    }
     free( psz_dup );
 
 
@@ -217,6 +221,9 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
     {
         p_demux->psz_path = strdup( "" );
     }
+    msg_Dbg( p_obj, "demux2_New: '%s' -> access='%s' demux='%s' path='%s'",
+             psz_mrl,
+             p_demux->psz_access, p_demux->psz_demux, p_demux->psz_path );
 
     p_demux->s          = s;
     p_demux->out        = out;
