@@ -1394,9 +1394,14 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
     msg_Dbg( p_demux, "seek request to "I64Fd" (%f%%)", i_date, f_percent );
     if( i_date < 0 && f_percent < 0 )
     {
+        msg_Warn( p_demux, "cannot seek nowhere !" );
         return;
     }
-    if( f_percent > 1.0 ) f_percent = 1.0;
+    if( f_percent > 1.0 )
+    {
+        msg_Warn( p_demux, "cannot seek so far !" );
+        return;
+    }
 
     delete p_sys->ep;
     p_sys->ep = new EbmlParser( p_sys->es, p_sys->segment );
