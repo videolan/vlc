@@ -978,7 +978,7 @@ vlc_module_begin();
                 DEMUX_LONGTEXT, VLC_TRUE );
     add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TEXT,
               MINIMIZE_THREADS_LONGTEXT, VLC_TRUE );
-    add_bool( "plugins-cache", 0, NULL, PLUGINS_CACHE_TEXT,
+    add_bool( "plugins-cache", VLC_TRUE, NULL, PLUGINS_CACHE_TEXT,
               PLUGINS_CACHE_LONGTEXT, VLC_TRUE );
     add_directory( "plugin-path", NULL, NULL, PLUGIN_PATH_TEXT,
                    PLUGIN_PATH_LONGTEXT, VLC_TRUE );
