@@ -2,7 +2,7 @@
  * net.c:
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: net.c,v 1.2 2004/01/06 23:03:17 fenrir Exp $
+ * $Id: net.c,v 1.3 2004/01/07 14:59:03 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -320,7 +320,7 @@ int net_Printf( vlc_object_t *p_this, int fd, char *psz_fmt, ... )
 {
     va_list args;
     char    *psz;
-    int     i_size;
+    int     i_size, i_ret;
 
     va_start( args, psz_fmt );
     psz = vsprintf_m( psz_fmt, args );
@@ -328,7 +328,10 @@ int net_Printf( vlc_object_t *p_this, int fd, char *psz_fmt, ... )
 
     i_size = strlen( psz );
 
-    return __net_Write( p_this, fd, psz, i_size ) < i_size ? -1 : i_size;
+    i_ret = __net_Write( p_this, fd, psz, i_size ) < i_size ? -1 : i_size;
+    free( psz );
+
+    return i_ret;
 }
 
 
