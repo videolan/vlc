@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.237 2003/10/05 23:03:35 gbazin Exp $
+ * $Id: video_output.c,v 1.238 2003/10/08 10:07:22 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -62,6 +62,8 @@ static int FullscreenCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
 static int DeinterlaceCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
+static int FilterCallback( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * vout_Request: find a video output thread, create one, or destroy one.
@@ -399,12 +401,12 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
         return NULL;
     }
 
-    p_vout->p_text_renderer_module = module_Need( p_vout, "text renderer", 
-						  NULL );
+    p_vout->p_text_renderer_module = module_Need( p_vout, "text renderer",
+                                                  NULL );
     if( p_vout->p_text_renderer_module == NULL )
     {
-	msg_Warn( p_vout, "no suitable text renderer module" );
-	p_vout->pf_add_string = NULL;
+        msg_Warn( p_vout, "no suitable text renderer module" );
+        p_vout->pf_add_string = NULL;
     }
 
     /* Create a few object variables for interface interaction */
@@ -439,6 +441,17 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
         var_Set( p_vout, "deinterlace", val );
     }
     var_AddCallback( p_vout, "deinterlace", DeinterlaceCallback, NULL );
+
+
+    var_Create( p_vout, "filter", VLC_VAR_STRING );
+    text.psz_string = _("Filters");
+    var_Change( p_vout, "filter", VLC_VAR_SETTEXT, &text, NULL );
+    var_Change( p_vout, "filter", VLC_VAR_INHERITVALUE, &val, NULL );
+    if( var_Get( p_vout, "filter", &val ) == VLC_SUCCESS )
+    {
+        var_Set( p_vout, "filter", val );
+    }
+    var_AddCallback( p_vout, "filter", FilterCallback, NULL );
 
     /* Calculate delay created by internal caching */
     p_input_thread = (input_thread_t *)vlc_object_find( p_vout,
@@ -1363,3 +1376,45 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
     var_Set( p_vout, "intf-change", val );
     return VLC_SUCCESS;
 }
+
+static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    input_thread_t *p_input;
+    vlc_value_t val;
+    unsigned int i;
+
+    p_input = (input_thread_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT,
+                                                 FIND_PARENT );
+
+    if (!p_input)
+    {
+        msg_Err( p_vout, "Input not found" );
+        return( VLC_EGENERIC );
+    }
+    /* Restart the video stream */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    p_vout->b_filter_change = VLC_TRUE;
+
+#define ES p_input->stream.pp_es[i]
+
+    for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
+    {
+        if( ( ES->i_cat == VIDEO_ES ) && ES->p_decoder_fifo != NULL )
+        {
+            input_UnselectES( p_input, ES );
+            input_SelectES( p_input, ES );
+        }
+#undef ES
+    }
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    vlc_object_release( p_input );
+
+    val.b_bool = VLC_TRUE;
+    var_Set( p_vout, "intf-change", val );
+    return VLC_SUCCESS;
+}
+

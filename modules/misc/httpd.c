@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.27 2003/08/26 00:40:27 fenrir Exp $
+ * $Id: httpd.c,v 1.28 2003/10/08 10:07:22 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -114,7 +114,9 @@ static httpd_file_t     *RegisterFile   ( httpd_t *,
                                           httpd_file_callback_args_t *p_args );
 static void             UnregisterFile  ( httpd_t *, httpd_file_t * );
 
-//#define httpd_stream_t              httpd_file_t
+#if 0
+ #define httpd_stream_t              httpd_file_t
+#endif
 static httpd_stream_t   *RegisterStream ( httpd_t *,
                                          char *psz_file, char *psz_mime,
                                          char *psz_user, char *psz_password );
@@ -143,7 +145,9 @@ enum httpd_authenticate_e
     HTTPD_AUTHENTICATE_BASIC = 1
 };
 
-//typedef httpd_file_t httpd_stream_t;
+#if 0
+  typedef httpd_file_t httpd_stream_t;
+#endif
 
 struct httpd_file_t
 {
@@ -207,12 +211,12 @@ typedef struct httpd_connection_s
     int    i_state;
     int    i_method;       /* get/post */
 
-    char    *psz_file;      // file to be send
-    int     i_http_error;   // error to be send with the file
-    char    *psz_user;      // if Authorization in the request header
+    char    *psz_file;      /* file to be send */
+    int     i_http_error;   /* error to be send with the file */
+    char    *psz_user;      /* if Authorization in the request header */
     char    *psz_password;
 
-    uint8_t *p_request;     // whith get: ?<*>, with post: main data
+    uint8_t *p_request;     /* whith get: ?<*>, with post: main data */
     int      i_request_size;
 
     httpd_file_t    *p_file;
@@ -288,19 +292,36 @@ static int Open( vlc_object_t *p_this )
     p_httpt->b_error= 0;
 
     /* init httpt_t structure */
-    vlc_mutex_init( p_httpd, &p_httpt->host_lock );
+    if( vlc_mutex_init( p_httpd, &p_httpt->host_lock ) )
+    {
+        msg_Err( p_httpd, "Error in mutex creation");
+        return( VLC_EGENERIC );
+    }
     p_httpt->i_host_count = 0;
     p_httpt->host = NULL;
 
-    vlc_mutex_init( p_httpd, &p_httpt->file_lock );
+    if( vlc_mutex_init( p_httpd, &p_httpt->file_lock ) )
+    {
+        msg_Err( p_httpd, "Error in mutex creation");
+        return( VLC_EGENERIC );
+    }
     p_httpt->i_file_count = 0;
     p_httpt->file = NULL;
 
-    vlc_mutex_init( p_httpd, &p_httpt->connection_lock );
+    if( vlc_mutex_init( p_httpd, &p_httpt->connection_lock ) )
+    {
+        msg_Err( p_httpd, "Error in mutex creation");
+        return( VLC_EGENERIC );
+    }
     p_httpt->i_connection_count = 0;
     p_httpt->p_first_connection = NULL;
 
-    vlc_mutex_init( p_httpd, &p_httpt->ban_lock );
+    if( vlc_mutex_init( p_httpd, &p_httpt->ban_lock ) )
+    {
+        msg_Err( p_httpd, "Error in mutex creation");
+        return( VLC_EGENERIC );
+    }
+
     p_httpt->i_banned_ip_count = 0;
     p_httpt->p_first_banned_ip = NULL;
 
@@ -559,9 +580,24 @@ static httpd_host_t *_RegisterHost( httpd_sys_t *p_httpt, char *psz_host_addr, i
     {
         p_httpt->host = malloc( sizeof( httpd_host_t *) );
     }
+    if( !p_httpt->host )
+    {
+        msg_Err( p_httpt, "Out of memory" );
+        return NULL;
+    }
     p_host                = malloc( sizeof( httpd_host_t ) );
+    if( !p_host )
+    {
+        msg_Err( p_httpt, "Out of memory" );
+        return NULL;
+    }
     p_host->i_ref         = 1;
     p_host->psz_host_addr = strdup( psz_host_addr );
+    if( !p_host->psz_host_addr )
+    {
+        msg_Err( p_httpt, "Out of memory" );
+        return NULL;
+    }
     p_host->i_port        = i_port;
     p_host->sock          = sock;
     p_host->fd            = fd;
@@ -642,6 +678,11 @@ static void            _UnregisterHost( httpd_sys_t *p_httpt, httpd_host_t *p_ho
         p_httpt->i_host_count--;
         p_httpt->host = realloc( p_httpt->host,
                                  p_httpt->i_host_count * sizeof( httpd_host_t * ) );
+        if( !p_httpt->p_host )
+        {
+            msg_Err( p_httpt, "Out of memory" );
+            return NULL;
+        }
     }
 
     vlc_mutex_unlock( &p_httpt->host_lock );
@@ -663,7 +704,10 @@ static void __RegisterFile( httpd_sys_t *p_httpt, httpd_file_t *p_file )
     {
         p_httpt->file = malloc( sizeof( httpd_file_t *) );
     }
-
+    if( !p_httpt->file )
+    {
+        return;
+    }
     p_httpt->file[p_httpt->i_file_count++] = p_file;
 }
 
@@ -693,14 +737,29 @@ static httpd_file_t    *_RegisterFile( httpd_sys_t *p_httpt,
     }
 
     p_file              = malloc( sizeof( httpd_file_t ) );
+    if( !p_file )
+    {
+        msg_Err( p_httpt, "Out of memory" );
+        return NULL;
+    }
     p_file->i_ref       = 0;
     p_file->psz_file    = strdup( psz_file );
     p_file->psz_mime    = strdup( psz_mime );
+    if( !p_file->psz_file || !p_file->psz_mime )
+    {
+        msg_Err( p_httpt, "Out of memory" );
+        return NULL;
+    }
     if( psz_user && *psz_user )
     {
         p_file->i_authenticate_method = HTTPD_AUTHENTICATE_BASIC;
         p_file->psz_user              = strdup( psz_user );
         p_file->psz_password          = strdup( psz_password );
+        if( !p_file->psz_user || !p_file->psz_password )
+        {
+            msg_Err( p_httpt, "Out of memory" );
+            return NULL;
+        }
     }
     else
     {
@@ -763,14 +822,29 @@ static httpd_stream_t  *_RegisterStream( httpd_sys_t *p_httpt,
     }
 
     p_stream              = malloc( sizeof( httpd_stream_t ) );
+    if( !p_stream )
+    {
+        msg_Err( p_httpt, "Out of memory" );
+        return NULL;
+    }
     p_stream->i_ref       = 0;
     p_stream->psz_file    = strdup( psz_file );
     p_stream->psz_mime    = strdup( psz_mime );
+    if( !p_file->psz_file || !p_file->psz_mime )
+    {
+        msg_Err( p_httpt, "Out of memory" );
+        return NULL;
+    }
     if( psz_user && *psz_user )
     {
         p_stream->i_authenticate_method = HTTPD_AUTHENTICATE_BASIC;
         p_stream->psz_user              = strdup( psz_user );
         p_stream->psz_password          = strdup( psz_password );
+        if( !p_file->psz_user || !p_file->psz_password )
+        {
+            msg_Err( p_httpt, "Out of memory" );
+            return NULL;
+        }
     }
     else
     {
@@ -788,6 +862,11 @@ static httpd_stream_t  *_RegisterStream( httpd_sys_t *p_httpt,
     p_stream->i_buffer_pos      = 0;
     p_stream->i_buffer_last_pos = 0;
     p_stream->p_buffer        = malloc( p_stream->i_buffer_size );
+    if( !p_stream->p_buffer )
+    {
+        msg_Err( p_httpt, "Out of memory" );
+        return NULL;
+    }
 
     p_stream->i_header_size   = 0;
     p_stream->p_header        = NULL;
@@ -900,8 +979,9 @@ static int             _SendStream( httpd_sys_t *p_httpt, httpd_stream_t *p_stre
     {
         return( VLC_SUCCESS );
     }
-    //fprintf( stderr, "## i_data=%d pos=%lld\n", i_data, p_stream->i_buffer_pos );
-
+#if 0
+    fprintf( stderr, "## i_data=%d pos=%lld\n", i_data, p_stream->i_buffer_pos );
+#endif
     vlc_mutex_lock( &p_httpt->file_lock );
 
     /* save this pointer (to be used by new connection) */
@@ -915,6 +995,7 @@ static int             _SendStream( httpd_sys_t *p_httpt, httpd_stream_t *p_stre
 
         i_copy = __MIN( i_count, p_stream->i_buffer_size - i_pos );
 
+        /* Ok, we can't go past the end of our buffer */
         memcpy( &p_stream->p_buffer[i_pos],
                 p_data,
                 i_copy );
@@ -929,6 +1010,7 @@ static int             _SendStream( httpd_sys_t *p_httpt, httpd_stream_t *p_stre
 
     return( VLC_SUCCESS );
 }
+
 static int             SendStream( httpd_t *p_httpd, httpd_stream_t *p_stream, uint8_t *p_data, int i_data )
 {
     return( _SendStream( p_httpd->p_sys, p_stream, p_data, i_data ) );
@@ -949,6 +1031,11 @@ static int             HeaderStream( httpd_t *p_httpd, httpd_stream_t *p_stream,
     {
         p_stream->i_header_size = i_data;
         p_stream->p_header = malloc( i_data );
+        if( !p_stream->p_header )
+        {
+            msg_Err( p_httpt, "Out of memory" );
+            return( VLC_ENOMEM );
+        }
         memcpy( p_stream->p_header,
                 p_data,
                 i_data );
@@ -970,14 +1057,22 @@ static void httpd_info_add_ss( httpd_info_t *p_info, char *name, char *value )
             realloc( p_info->info,
                      sizeof( httpd_val_t ) * ( p_info->i_count + 1 ) );
     }
+    if( !p_info->info )
+    {
+        return;
+    }
     p_info->info[p_info->i_count].psz_name  = strdup( name );
+    if( ! p_info->info[p_info->i_count].psz_name )
+    {
+        return;
+    }
     p_info->info[p_info->i_count].psz_value = strdup( value ? value : "(null)");
     p_info->i_count++;
 }
 
 static void httpd_info_add_si( httpd_info_t *p_info, char *name, int i_value )
 {
-    char v[40];
+    char v[40]; /* Ok, int is not so long */
 
     sprintf( v, "%d", i_value );
     httpd_info_add_ss( p_info, name, v );
@@ -1101,7 +1196,10 @@ static int  httpd_page_400_get( httpd_file_callback_args_t *p_args,
     char *p;
 
     p = *pp_data = malloc( 1024 );
-
+    if( !p )
+    {
+        return VLC_ENOMEM ;
+    }
     p += sprintf( p, "<html>\n" );
     p += sprintf( p, "<head>\n" );
     p += sprintf( p, "<title>Error 400</title>\n" );
@@ -1125,6 +1223,10 @@ static int  httpd_page_401_get( httpd_file_callback_args_t *p_args,
     char *p;
 
     p = *pp_data = malloc( 1024 );
+    if( !p )
+    {
+        return VLC_ENOMEM ;
+    }
 
     p += sprintf( p, "<html>\n" );
     p += sprintf( p, "<head>\n" );
@@ -1148,6 +1250,10 @@ static int  httpd_page_404_get( httpd_file_callback_args_t *p_args,
     char *p;
 
     p = *pp_data = malloc( 1024 );
+    if( !p )
+    {
+        return VLC_ENOMEM ;
+    }
 
     p += sprintf( p, "<html>\n" );
     p += sprintf( p, "<head>\n" );
@@ -1276,6 +1382,11 @@ static void httpd_ConnnectionNew( httpd_sys_t *p_httpt, int fd, struct sockaddr_
 
     /* create a new connection and link it */
     p_con = malloc( sizeof( httpd_connection_t ) );
+    if( !p_con )
+    {
+        msg_Err( p_httpt, "Out of memory" );
+        return;
+    }
     p_con->i_state  = HTTPD_CONNECTION_RECEIVING_REQUEST;
     p_con->fd       = fd;
     p_con->i_last_activity_date = mdate();
@@ -1293,8 +1404,13 @@ static void httpd_ConnnectionNew( httpd_sys_t *p_httpt, int fd, struct sockaddr_
     p_con->i_buffer = 0;
     p_con->i_buffer_size = 8096;
     p_con->p_buffer = malloc( p_con->i_buffer_size );
+    if( !p_con->p_buffer )
+    {
+        msg_Err( p_httpt, "Out of memory");
+        return ;
+    }
 
-    p_con->i_stream_pos = 0; // updated by httpd_thread */
+    p_con->i_stream_pos = 0; /* updated by httpd_thread */
     p_con->p_next = NULL;
 
     if( p_httpt->p_first_connection )
@@ -1395,7 +1511,7 @@ static int httpd_RequestNextLine( char **pp_buffer, char *p_end )
     return VLC_EGENERIC;
 }
 
-//char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+/*char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";*/
 static void b64_decode( char *dest, char *src )
 {
     int  i_level;
@@ -1460,6 +1576,7 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
 
     int  i;
     int  b_xplaystream = VLC_FALSE;
+    /* Size is checked for all of these */
     char command[32];
     char url[1024];
     char version[32];
@@ -1475,8 +1592,9 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
     httpd_RequestGetWord( command, 32, &p, p_end );
     httpd_RequestGetWord( url, 1024, &p, p_end );
     httpd_RequestGetWord( version, 32, &p, p_end );
-    //msg_Dbg( p_httpt, "ask =%s= =%s= =%s=", command, url, version );
-
+#if 0
+    msg_Dbg( p_httpt, "ask =%s= =%s= =%s=", command, url, version );
+#endif
     p_con->p_request      = NULL;
     p_con->i_request_size = 0;
     if( !strcmp( command, "GET" ) )
@@ -1515,11 +1633,14 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
 
         if( httpd_RequestNextLine( &p, p_end ) )
         {
-            //msg_Dbg( p_httpt, "failled new line" );
+#if 0
+            msg_Dbg( p_httpt, "failled new line" );
+#endif
             break;;
         }
-        //msg_Dbg( p_httpt, "new line=%s", p );
-
+#if 0
+        msg_Dbg( p_httpt, "new line=%s", p );
+#endif
         httpd_RequestGetWord( header, 1024, &p, p_end );
         if( !strcmp( header, "\r\n" ) || !strcmp( header, "\n" ) )
         {
@@ -1537,9 +1658,13 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
                 char decoded[1024];
 
                 httpd_RequestGetWord( basic, 1024, &p, p_end );
-//                msg_Dbg( p_httpt, "Authorization: basic:%s", basic );
+#if 0
+                msg_Dbg( p_httpt, "Authorization: basic:%s", basic );
+#endif
                 b64_decode( decoded, basic );
-//                msg_Dbg( p_httpt, "Authorization: decoded:%s", decoded );
+#if 0
+                msg_Dbg( p_httpt, "Authorization: decoded:%s", decoded );
+#endif
                 if( strchr( decoded, ':' ) )
                 {
                     char *p = strchr( decoded, ':' );
@@ -1595,7 +1720,11 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
         {
             p_con->i_request_size = p_end - p_request;
             p_con->p_request = malloc( p_con->i_request_size + 1);
-
+            if( !p_con->p_request)
+            {
+                msg_Err( p_httpt, "Out of memory" );
+                return;
+            }
             memcpy( p_con->p_request,
                     p_request,
                     p_con->i_request_size );
@@ -1606,17 +1735,23 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
     p_con->i_http_error = 200;
 
 create_header:
-    //msg_Dbg( p_httpt, "ask %s %s %d", command, p_con->psz_file, p_con->i_http_error );
+#if 0
+    msg_Dbg( p_httpt, "ask %s %s %d", command, p_con->psz_file, p_con->i_http_error );
+#endif
     FREE( p_con->p_buffer );
     p_con->i_buffer = 0;
     p_con->i_buffer_size = 0;
 
-    //vlc_mutex_lock( &p_httpt->file_lock );
+#if 0
+    vlc_mutex_lock( &p_httpt->file_lock );
+#endif
 search_file:
     /* search file */
     p_con->p_file = NULL;
     for( i = 0; i < p_httpt->i_file_count; i++ )
     {
+        /* Our strdup call failed */
+        if( !p_con->psz_file ) return;
         if( !strcmp( p_httpt->file[i]->psz_file, p_con->psz_file ) )
         {
             if( p_httpt->file[i]->b_stream ||
@@ -1664,7 +1799,9 @@ search_file:
     }
 
     p_con->p_file->i_ref++;
-//    vlc_mutex_unlock( &p_httpt->file_lock );
+#if 0
+    vlc_mutex_unlock( &p_httpt->file_lock );
+#endif
 
     switch( p_con->i_http_error )
     {
@@ -1694,7 +1831,11 @@ search_file:
     }
 
     p = p_con->p_buffer = malloc( p_con->i_buffer_size );
-
+    if( !p)
+    {
+        msg_Err( p_httpt, "Out of memory" );
+        return;
+    }
     p += sprintf( p, "HTTP/1.0 %d %s\r\n", p_con->i_http_error, psz_status );
 
     /* Special mmsh case cludgy but ...*/
@@ -1752,7 +1893,9 @@ search_file:
     {
         p_con->i_method = HTTPD_CONNECTION_METHOD_HEAD;
     }
-    //msg_Dbg( p_httpt, "answer=\n%s", p_con->p_buffer );
+#if 0
+    msg_Dbg( p_httpt, "answer=\n%s", p_con->p_buffer );
+#endif
 }
 #define HTTPD_STREAM_PACKET 10000
 static void httpd_Thread( httpd_sys_t *p_httpt )
@@ -1961,7 +2104,9 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                 {
                     i_len = 0;
                 }
-//                msg_Warn( p_httpt, "on %d send %d bytes %s", p_con->i_buffer_size, i_len, p_con->p_buffer + p_con->i_buffer );
+#if 0
+                msg_Warn( p_httpt, "on %d send %d bytes %s", p_con->i_buffer_size, i_len, p_con->p_buffer + p_con->i_buffer );
+#endif
 
 #if defined( WIN32 ) || defined( UNDER_CE )
                 if( ( i_len < 0 && WSAGetLastError() != WSAEWOULDBLOCK ) || ( i_len == 0 ) )
@@ -1989,7 +2134,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
 
                             if( !p_con->p_file->b_stream || p_con->i_method == HTTPD_CONNECTION_METHOD_HEAD )
                             {
-                                p_con->i_state = HTTPD_CONNECTION_SENDING_FILE; // be sure to out from HTTPD_CONNECTION_SENDING_HEADER
+                                p_con->i_state = HTTPD_CONNECTION_SENDING_FILE; /* be sure to out from HTTPD_CONNECTION_SENDING_HEADER */
                                 if( p_con->i_method == HTTPD_CONNECTION_METHOD_GET )
                                 {
                                     p_con->p_file->pf_get( p_con->p_file->p_sys,

@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.24 2003/10/06 16:23:30 zorglub Exp $
+ * $Id: sap.c,v 1.25 2003/10/08 10:07:22 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -116,7 +116,7 @@ static void free_sd( sess_descr_t * );
 static int  ismult( char * );
 
 /* The struct that contains sdp informations */
-struct  sess_descr_t 
+struct  sess_descr_t
 {
     char *psz_version;
     char *psz_origin;
@@ -136,13 +136,13 @@ struct  sess_descr_t
 };
 
 /* All this informations are not useful yet.  */
-struct media_descr_t 
+struct media_descr_t
 {
     char *psz_medianame;
     char *psz_mediaconnection;
 };
 
-struct attr_descr_t 
+struct attr_descr_t
 {
     char *psz_field;
     char *psz_value;
@@ -212,11 +212,11 @@ static void Run( intf_thread_t *p_intf )
     char *psz_network = NULL;
     int fd            = - 1;
     int fdv6          = -1;
-    
+
     int no_sap_ipv4      = config_GetInt( p_intf, "no-sap-ipv4" );
     int sap_ipv6         = config_GetInt( p_intf, "sap-ipv6" );
     char *sap_ipv6_scope = config_GetPsz( p_intf, "sap-ipv6-scope" );
-    
+
     char buffer[MAX_SAP_BUFFER + 1];
 
     module_t            *p_network;
@@ -227,15 +227,15 @@ static void Run( intf_thread_t *p_intf )
         msg_Warn( p_intf, "Unable to parse module configuration" );
         return;
     }
-    
+
     /* Prepare IPv4 Networking */
     if ( no_sap_ipv4 == 0)
     {
         if( !(psz_addr = config_GetPsz( p_intf, "sap-addr" ) ) )
-        { 
+        {
             psz_addr = strdup( HELLO_GROUP );
-        } 
-            
+        }
+
         /* Prepare the network_socket_t structure */
         socket_desc.i_type            = NETWORK_UDP;
         socket_desc.psz_bind_addr     = psz_addr;
@@ -245,10 +245,10 @@ static void Run( intf_thread_t *p_intf )
         socket_desc.i_ttl             = 0;
         p_intf->p_private = (void*) &socket_desc;
 
-        psz_network = "ipv4"; 
+        psz_network = "ipv4";
 
        /* Create, Bind the socket, ... with the appropriate module  */
- 
+
         if( !( p_network = module_Need( p_intf, "network", psz_network ) ) )
         {
             msg_Warn( p_intf, "failed to open a connection (udp)" );
@@ -264,12 +264,17 @@ static void Run( intf_thread_t *p_intf )
     {
         /* Prepare the network_socket_t structure */
 
-        psz_addrv6=(char *)malloc(sizeof(char)*38); 
+        psz_addrv6=(char *)malloc(sizeof(char)*38);
+
+        if( !psz_addrv6)
+        {
+            msg_Warn( p_intf, "Out of memory !" );
+        }
         /* Max size of an IPv6 address */
-        
+
         sprintf(psz_addrv6,"[%s%c%s]",IPV6_ADDR_1,
                         sap_ipv6_scope[0],IPV6_ADDR_2);
-        
+
         socket_desc.i_type            = NETWORK_UDP;
         socket_desc.psz_bind_addr     = psz_addrv6;
         socket_desc.i_bind_port       = HELLO_PORT;
@@ -278,10 +283,10 @@ static void Run( intf_thread_t *p_intf )
         socket_desc.i_ttl             = 0;
         p_intf->p_private = (void*) &socket_desc;
 
-        psz_network = "ipv6"; 
+        psz_network = "ipv6";
 
        /* Create, Bind the socket, ... with the appropriate module  */
- 
+
         if( !( p_network = module_Need( p_intf, "network", psz_network ) ) )
         {
             msg_Warn( p_intf, "failed to open a connection (udp)" );
@@ -292,7 +297,7 @@ static void Run( intf_thread_t *p_intf )
         fdv6 = socket_desc.i_handle;
     }
 
-    
+
     /* read SAP packets */
     while( !p_intf->b_die )
     {
@@ -317,7 +322,20 @@ static void Run( intf_thread_t *p_intf )
     }
 
     /* Closing socket */
-    close( socket_desc.i_handle );
+    if( fd )
+    {
+        if( close( fd ) )
+        {
+            msg_Warn( p_intf, "Ohoh, unable to close the socket") ;
+        }
+    }
+    if( fdv6 )
+    {
+        if( close( fdv6 ) )
+        {
+            msg_Warn( p_intf, "Ohoh, unable to close the socket") ;
+        }
+    }
 }
 
 /********************************************************************
@@ -415,7 +433,7 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             if(!strcasecmp( p_sd->pp_attributes[i]->psz_field , "http-path"))
             {
                 psz_http_path = strdup(  p_sd->pp_attributes[i]->psz_value );
-                
+
             }
         }
 
@@ -606,7 +624,7 @@ static int parse_sap( char *p_packet )
         for(;p_packet[i_hlen] != 'v' && p_packet[i_hlen+1] != '=' ; i_hlen++);
         return i_hlen-1;
     }
-     
+
     return(i_hlen);
 }
 
@@ -649,8 +667,8 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
 {
     sess_descr_t *  sd;
     char *psz_eof;
-   
-    unsigned int i; 
+
+    unsigned int i;
     // According to RFC 2327, the first bytes should be exactly "v="
     if((p_packet[0] != 'v') || (p_packet[1] != '='))
     {
@@ -676,11 +694,11 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
     sd->psz_repeat = NULL;
     sd->psz_attribute = NULL;
     sd->psz_connection = NULL;
-    
-    
+
+
     sd->i_media      = 0;
     sd->i_attributes = 0;
-    
+
     while( *p_packet != '\0'  )
     {
 #define FIELD_COPY( p ) \
@@ -740,30 +758,41 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
                     {
                         sd->pp_attributes =
                             realloc( sd->pp_attributes,
-                                    sizeof( attr_descr_t ) * 
+                                    sizeof( attr_descr_t ) *
                                     ( sd->i_attributes +1 ) );
                     }
                     else
                     {
                         sd->pp_attributes = malloc( sizeof( void * ) );
                     }
+                    if( !sd->pp_attributes )
+                    {
+                        msg_Warn( p_intf, "Out of memory !" );
+                        return NULL;
+                    }
                     sd->pp_attributes[sd->i_attributes] =
                             malloc( sizeof( attr_descr_t ) );
+                    if( ! sd->pp_attributes[sd->i_attributes])
+                    {
+                        msg_Warn( p_intf, "Out of memory !" );
+                        return NULL;
+                    }
+
                     p_packet += 2;
                     psz_eof = strchr( p_packet, ':');
                     if(psz_eof)
                         *psz_eof = '\0';
                     sd->pp_attributes[sd->i_attributes]->psz_field =
                             strdup( p_packet );
-                    sd->pp_attributes[sd->i_attributes]->psz_value = 
+                    sd->pp_attributes[sd->i_attributes]->psz_value =
                             strdup( ++psz_eof );
-                    for( i=0 ; i< 
+                    for( i=0 ; i<
                       strlen(sd->pp_attributes[sd->i_attributes]->psz_value) ;
                              i++ )
                     {
                         if(sd->pp_attributes[sd->i_attributes]->psz_value[i]
                                         =='\n' )
-                          sd->pp_attributes[sd->i_attributes]->psz_value[i]                                            =0;                    
+                          sd->pp_attributes[sd->i_attributes]->psz_value[i]                                            =0;
                     }
                     sd->i_attributes++;
                     break;
@@ -779,13 +808,17 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
                     {
                         sd->pp_media = malloc( sizeof( void * ) );
                     }
-
-                    
+                    if( !sd->pp_media )
+                    {
+                        msg_Warn( p_intf, "Out of memory !" );
+                        return NULL;
+                    }
                     sd->pp_media[sd->i_media] =
                             malloc( sizeof( media_descr_t ) );
                     sd->pp_media[sd->i_media]->psz_medianame = NULL;
                     sd->pp_media[sd->i_media]->psz_mediaconnection = NULL;
-                    sd->pp_media[sd->i_media]->psz_medianame = strndup( &p_packet[2], i_field_len );
+                    sd->pp_media[sd->i_media]->psz_medianame =
+                                   strndup( &p_packet[2], i_field_len );
 
                     sd->i_media++;
                     break;
@@ -863,14 +896,14 @@ static int ismult( char *psz_uri )
     i_value = strtol( psz_uri, &psz_end, 0 );
 
     /* IPv6 */
-    if( psz_uri[0] == '[') 
+    if( psz_uri[0] == '[')
     {
-      if( strncasecmp( &psz_uri[1], "FF0" , 3) || 
+      if( strncasecmp( &psz_uri[1], "FF0" , 3) ||
           strncasecmp( &psz_uri[2], "FF0" , 3))
             return( VLC_TRUE );
         else
-            return( VLC_FALSE ); 
-    } 
+            return( VLC_FALSE );
+    }
 
     if( *psz_end != '.' ) { return( VLC_FALSE ); }
 
@@ -885,7 +918,7 @@ static int ismult( char *psz_uri )
  * Taken from udp.c
  ******************************************************************************/
 static ssize_t NetRead( intf_thread_t *p_intf,
-                        int i_handle, int i_handle_v6, 
+                        int i_handle, int i_handle_v6,
                         byte_t *p_buffer, size_t i_len)
 {
 #ifdef UNDER_CE
@@ -898,14 +931,14 @@ static ssize_t NetRead( intf_thread_t *p_intf,
     int             i_max_handle;
 
     ssize_t i_recv=-1;
-    
+
     /* Get the max handle for select */
     if( i_handle_v6 > i_handle )
         i_max_handle = i_handle_v6;
     else
         i_max_handle = i_handle;
 
-    
+
     /* Initialize file descriptor set */
     FD_ZERO( &fds );
     if(   i_handle > 0   ) FD_SET( i_handle, &fds );
@@ -926,7 +959,7 @@ static ssize_t NetRead( intf_thread_t *p_intf,
     }
     else if( i_ret > 0 )
    {
-      /* Get the data */     
+      /* Get the data */
       if(i_handle >0)
       {
          if(FD_ISSET( i_handle, &fds ))
@@ -941,7 +974,7 @@ static ssize_t NetRead( intf_thread_t *p_intf,
             i_recv = recv( i_handle_v6, p_buffer, i_len, 0 );
          }
       }
-      
+
        if( i_recv < 0 )
         {
            msg_Err( p_intf, "recv failed (%s)", strerror(errno) );

@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.62 2003/10/06 17:41:47 gbazin Exp $
+ * $Id: interface.cpp,v 1.63 2003/10/08 10:07:22 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -31,6 +31,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
+#include <vlc/vout.h>
 #include <vlc/intf.h>
 #include "stream_control.h"
 
@@ -498,9 +499,9 @@ void Interface::CreateOurExtraPanel()
     hue_slider = new wxSlider ( extra_frame, Hue_Event, 0, 0,
                                 360, wxDefaultPosition, wxDefaultSize );
 
-   hue_sizer->Add(hue_text,1, 0 ,0);
-   hue_sizer->Add(hue_slider,1, 0 ,0);
-   hue_sizer->Layout();
+    hue_sizer->Add(hue_text,1, 0 ,0);
+    hue_sizer->Add(hue_slider,1, 0 ,0);
+    hue_sizer->Layout();
 
     wxBoxSizer *contrast_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxStaticText *contrast_text = new wxStaticText( extra_frame, -1,
@@ -597,6 +598,21 @@ void Interface::CreateOurExtraPanel()
         brightness_slider->Disable();
         hue_slider->Disable();
     }
+
+    int i_value = config_GetInt( p_intf, "hue" );
+    if( i_value > 0 && i_value < 360 )
+        hue_slider->SetValue( i_value );
+
+    float f_value;
+    f_value = config_GetFloat( p_intf, "saturation" );
+    if( f_value > 0 && f_value < 3 )
+        saturation_slider->SetValue( (int)(100 * f_value) );
+    f_value = config_GetFloat( p_intf, "contrast" );
+    if( f_value > 0 && f_value < 2 )
+        contrast_slider->SetValue( (int)(100 * f_value) );
+    f_value = config_GetFloat( p_intf, "brightness" );
+    if( f_value > 0 && f_value < 2 )
+        brightness_slider->SetValue( (int)(100 * f_value) );
 
     extra_frame->Hide();
     free(psz_filters);
@@ -859,7 +875,17 @@ void Interface::OnEnableAdjust(wxCommandEvent& event)
             sprintf( psz_new, "%s:adjust", psz_filters);
         }
         config_PutPsz( p_intf, "filter", psz_new );
-
+        vlc_value_t val;
+        vout_thread_t *p_vout =
+           (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                       FIND_ANYWHERE );
+        if( p_vout != NULL )
+        {
+            val.psz_string = strdup( psz_new );
+            var_Set( p_vout, "filter", val);
+            vlc_object_release( p_vout );
+        }
+        if( val.psz_string ) free( val.psz_string );
         brightness_slider->Enable();
         saturation_slider->Enable();
         contrast_slider->Enable();
@@ -890,6 +916,17 @@ void Interface::OnEnableAdjust(wxCommandEvent& event)
                 }
             }
             config_PutPsz( p_intf, "filter", psz_filters);
+            vlc_value_t val;
+            val.psz_string = strdup( psz_filters );
+            vout_thread_t *p_vout =
+               (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                       FIND_ANYWHERE );
+            if( p_vout != NULL )
+            {
+                var_Set( p_vout, "filter", val);
+                vlc_object_release( p_vout );
+            }
+            if( val.psz_string ) free( val.psz_string );
         }
         brightness_slider->Disable();
         saturation_slider->Disable();
