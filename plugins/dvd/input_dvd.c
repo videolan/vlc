@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.128 2002/03/04 02:26:23 stef Exp $
+ * $Id: input_dvd.c,v 1.129 2002/03/04 02:50:18 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -288,7 +288,7 @@ static int DVDOpen( struct input_thread_s *p_input )
         psz_raw = NULL;
     }
 
-    if( !strtol( psz_parser, NULL, 10 ) )
+    if( *psz_parser && !strtol( psz_parser, NULL, 10 ) )
     {
         while( *psz_parser && *psz_parser != '@' )
         {
