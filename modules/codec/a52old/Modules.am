@@ -1,18 +1,18 @@
 SOURCES_a52old = \
-	modules/codec/a52old/a52old.c \
-	modules/codec/a52old/adec.h \
-	modules/codec/a52old/internal.h \
-	modules/codec/a52old/decoder.c \
-	modules/codec/a52old/decoder.h \
-	modules/codec/a52old/parse.c \
-	modules/codec/a52old/exponent.c \
-	modules/codec/a52old/exponent.h \
-	modules/codec/a52old/bit_allocate.c \
-	modules/codec/a52old/mantissa.c \
-	modules/codec/a52old/mantissa.h \
-	modules/codec/a52old/rematrix.c \
-	modules/codec/a52old/imdct.c \
-	modules/codec/a52old/imdct.h \
-	modules/codec/a52old/downmix.h \
+	a52old.c \
+	adec.h \
+	internal.h \
+	decoder.c \
+	decoder.h \
+	parse.c \
+	exponent.c \
+	exponent.h \
+	bit_allocate.c \
+	mantissa.c \
+	mantissa.h \
+	rematrix.c \
+	imdct.c \
+	imdct.h \
+	downmix.h \
 	$(NULL)
 

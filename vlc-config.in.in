@@ -1,0 +1,287 @@
+#!/bin/sh
+
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+exec_prefix_set=no
+
+release="@release@"
+debug="@debug@"
+gprof="@gprof@"
+cprof="@cprof@"
+optim="@optim@"
+
+plugins="@PLUGINS@"
+builtins="@BUILTINS@"
+
+cflags_tuning="@CFLAGS_TUNING@"
+cflags_optim="@CFLAGS_OPTIM@"
+cflags_optim_nodebug="@CFLAGS_OPTIM_NODEBUG@"
+cflags_nooptim="@CFLAGS_NOOPTIM@"
+
+#
+#  Do not touch below this place unless you really know what you are doing
+#
+usage()
+{
+        cat << BLAH
+Usage: vlc-config OPTIONS MODULES
+Options:
+        [--prefix[=DIR]]          set prefix
+        [--exec-prefix[=DIR]]     set exec prefix
+        [--version]               print version and exit
+        [--linkage]               print linkage mode (c, c++, objc)
+        [--target]                print targets and exit
+        [--libs]                  output linking flags
+        [--cflags]                output C compilation flags
+        [--cxxflags]              output C++ compilation flags
+        [--objcflags]             output Objective C compilation flags
+Modules:
+        vlc                       the main VLC object
+        plugin                    flags for plugin modules
+        builtin                   flags for built-in modules
+        pic                       flags for PIC code
+        MODULE                    any available module (dummy, gtk, avi, etc.)
+BLAH
+        exit $1
+}
+
+register_flags()
+{
+  case "$1" in
+    #@1@#
+    *)
+      ;;
+  esac
+}
+
+register_targets()
+{
+  case "$1" in
+    #@2@#
+    *)
+      ;;
+  esac
+}
+
+if test $# -eq 0; then
+        usage 1 1>&2
+fi
+
+#
+#  No need to include the default @*FLAGS@ values here because they are
+#  automatically added when using $(COMPILE), $(CXXCOMPILE) or $(OBJCCOMPILE)
+#
+if test "@includedir@" != /usr/include ; then
+  includes="-I@includedir@"
+fi
+cppflags="${includes}"
+libs="-L@libdir@"
+module=""
+linkage="c"
+
+#
+#  On Linux and Solaris, activate 64-bit off_t (by default under BSD)
+#
+cppflags="${cppflags} -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_LARGEFILE64_SOURCE -D_REENTRANT -D_THREAD_SAFE -D_GNU_SOURCE"
+
+#
+#  Gettext, data and plugin location
+#
+cppflags="${cppflags} -DLOCALEDIR=\"@datadir@/locale\""
+cppflags="${cppflags} -DDATA_PATH=\"${prefix}/share/vlc\""
+cppflags="${cppflags} -DPLUGIN_PATH=\"${prefix}/lib/vlc\""
+
+#
+#  Various additional defines
+#
+if [ "${debug}" = yes ]; then
+  cppflags="${cppflags} -DDEBUG"
+  cflags="${cflags} -g"
+  cxxflags="${cxxflags} -g"
+  objcflags="${objcflags} -g"
+  ldflags="${objcflags} -g"
+fi
+if [ "${cprof}" = yes ]; then
+  cppflags="${cppflags} -DCPROF"
+  cflags="${cflags} -finstrument-functions"
+  cxxflags="${cxxflags} -finstrument-functions"
+  objcflags="${objcflags} -finstrument-functions"
+fi
+if [ "${gprof}" = yes ]; then
+  cppflags="${cppflags} -DGPROF"
+  cflags="${cflags} -pg"
+  cxxflags="${cxxflags} -pg"
+  objcflags="${objcflags} -pg"
+  ldflags="${ldflags} -pg"
+fi
+if [ "${release}" = yes ]; then
+  cppflags="${cppflags} -DHAVE_RELEASE"
+fi
+if [ "${optim}" = yes ]; then
+  cppflags="${cppflags} ${cflags_optim} ${cflags_tuning}"
+  if [ "${debug}" != yes -a "${gprof}" != yes -a "${cprof}" != yes ]; then
+    cppflags="${cppflags} ${cflags_optim_nodebug}"
+  fi
+else
+  cppflags="${cppflags} ${cflags_nooptim}"
+fi
+
+#
+#  The main argument loop
+#
+while test $# -gt 0; do
+  case "$1" in
+  -*=*) optarg=`echo "$1" | sed 's/-_a-zA-Z0-9*=//'` ;;
+  *) optarg= ;;
+  esac
+
+  case "$1" in
+    --prefix=*)
+      prefix="${optarg}"
+      if test "${exec_prefix_set}" = no ; then
+        exec_prefix="${optarg}"
+      fi
+      ;;
+    --prefix)
+      echo_prefix=yes
+      ;;
+    --exec-prefix=*)
+      exec_prefix="${optarg}"
+      exec_prefix_set=yes
+      ;;
+    --exec-prefix)
+      echo_exec_prefix=yes
+      ;;
+    --version)
+      echo "@VERSION@"
+      exit 0
+      ;;
+    --linkage)
+      echo_linkage=yes
+      ;;
+    --target)
+      echo_target=yes
+      ;;
+    --cflags)
+      echo_cflags=yes
+      ;;
+    --cxxflags)
+      echo_cxxflags=yes
+      ;;
+    --objcflags)
+      echo_objcflags=yes
+      ;;
+    --libs)
+      echo_libs=yes
+      ;;
+    -*)
+      usage 1 1>&1
+      ;;
+    vlc)
+      cppflags="${cppflags} -D__VLC__"
+      ;;
+    plugin)
+      echo_plugin=yes
+      cppflags="${cppflags} -D__VLC__ -D__PLUGIN__"
+      ;;
+    pic)
+      echo_pic=yes
+      ;;
+    builtin)
+      echo_builtin=yes
+      cppflags="${cppflags} -D__VLC__ -D__BUILTIN__"
+      ;;
+    mozilla)
+      ;;
+    *)
+      module="$1"
+      ;;
+  esac
+
+  # Register per-module *FLAGS
+  register_flags "$1"
+
+  # Register module targets
+  register_targets "$1"
+
+  shift
+done
+
+#
+#  If a module was requested, use its name
+#
+if test "${module}" != ""; then
+  cppflags="${cppflags} -DMODULE_NAME=${module} -DMODULE_NAME_IS_${module}"
+fi
+
+#
+#  Output what we were asked
+#
+if test "${echo_linkage}" = yes; then
+  if test "${echo_plugin}"; then
+    for module in `echo "${plugins}"`; do
+      register_flags "${module}"
+    done
+  fi
+  if test "${echo_builtin}"; then
+    for module in `echo "${builtins}"`; do
+      register_flags "${module}"
+    done
+  fi
+  echo "${linkage}"
+  exit 0
+fi
+
+if test "${echo_target}" = yes; then
+  if test "${echo_plugin}"; then
+    for module in `echo "${plugins}"`; do
+      register_targets "${module}"
+    done
+    echo "${list}" | sed -e 's/[^ ][^ ]*/&_plugin/g'
+  fi
+  if test "${echo_builtin}"; then
+    for module in `echo "${builtins}"`; do
+      register_targets "${module}"
+    done
+    if test "${echo_pic}"; then
+      echo "${list}" | sed -e 's/[^ ][^ ]*/&_pic.a/g'
+    else
+      echo "${list}" | sed -e 's/[^ ][^ ]*/&.a/g'
+    fi
+  fi
+  exit 0
+fi
+
+if test "${echo_prefix}" = yes; then
+  echo "${prefix}"
+fi
+if test "${echo_exec_prefix}" = yes; then
+  echo "${exec_prefix}"
+fi
+if test "${echo_cppflags}" = yes; then
+  echo "${cppflags}"
+fi
+if test "${echo_cflags}" = yes; then
+  echo "${cppflags} ${cflags}"
+fi
+if test "${echo_cxxflags}" = yes; then
+  echo "${cppflags} ${cxxflags}"
+fi
+if test "${echo_objcflags}" = yes; then
+  echo "${cppflags} ${objcflags}"
+fi
+if test "${echo_libs}" = yes; then
+  if test "${echo_builtin}"; then
+    for module in `echo "${builtins}"`; do
+      register_targets "${module}"
+      register_flags "${module}"
+    done
+    if test "${echo_pic}"; then
+      libs="`echo "${list}" | sed -e 's/[^ ][^ ]*/&_pic.a/g'` ${libs}"
+    else
+      libs="`echo "${list}" | sed -e 's/[^ ][^ ]*/&.a/g'` ${libs}"
+    fi
+  fi
+  echo "${libs} ${ldflags}"
+fi
+

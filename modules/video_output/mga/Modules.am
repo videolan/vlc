@@ -1,2 +1,2 @@
-SOURCES_mga = modules/video_output/mga/mga.c
-SOURCES_xmga = modules/video_output/mga/xmga.c
+SOURCES_mga = mga.c
+SOURCES_xmga = xmga.c

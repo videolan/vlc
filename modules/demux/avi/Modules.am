@@ -1,6 +1,6 @@
 SOURCES_avi = \
-	modules/demux/avi/avi.c \
-	modules/demux/avi/avi.h \
-	modules/demux/avi/libavi.c \
-	modules/demux/avi/libavi.h \
+	avi.c \
+	avi.h \
+	libavi.c \
+	libavi.h \
 	$(NULL)

@@ -1,1 +1,1 @@
-SOURCES_lirc = modules/control/lirc/lirc.c
+SOURCES_lirc = lirc.c

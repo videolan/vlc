@@ -7,7 +7,7 @@ NULL =
 # SUBDIRS stores the directories where a "make" is required when building
 # something. DIST_SUBDIRS stores the directories where nothing is built but
 # which have makefiles with distribution information.
-SUBDIRS = po intl m4 share
+SUBDIRS = intl . share po m4
 DIST_SUBDIRS = $(SUBDIRS) modules src debian doc ipkg lib autotools
 
 EXTRA_DIST = \
@@ -20,24 +20,14 @@ EXTRA_DIST = \
 	install-win32 \
 	src/extras/COPYING \
 	toolbox \
+	vlc-config.in.in \
 	vlc.ebuild \
 	vlc.spec \
 	vlc.spec.redhat \
 	$(NULL)
 
-MOSTLYCLEANFILES =
 BUILT_SOURCES =
 SUFFIXES = 
-
-# List of programs, libraries and headers that need to be built and/or
-# distributed. Initialized to empty because we'll use += later.
-bin_PROGRAMS =
-
-lib_LIBRARIES = 
-libvlc_LIBRARIES =
-noinst_LIBRARIES =
-
-noinst_HEADERS =
 
 # Tell aclocal to use -I m4. Wonder if it really works.
 ACLOCAL_AMFLAGS = -I m4
@@ -46,103 +36,8 @@ ACLOCAL_AMFLAGS = -I m4
 # because old versions of automake don't support them in configure.ac.
 AUTOMAKE_OPTIONS = dist-bzip2 subdir-objects
 
-###############################################################################
-# Compilation flags for debug mode, profiling, and others
-###############################################################################
-
-# Standard flags used everywhere to build things in the distribution. Some
-# of them are empty but might be extended later in the Makefile. *_default
-# is the default flag list for all files in the distribution, for instance
-# the vlc code. *_pic is for PIC code, such as the Mozilla plugin. *_plugin
-# is for plugin code, *_builtin is for builtin code, and *_builtin_pic is
-# for PIC builtin code, for instance builtin modules in the mozilla plugin.
-
-CPPFLAGS_default = -I$(top_srcdir)/include
-CFLAGS_default = 
-CXXFLAGS_default = 
-OBJCFLAGS_default = 
-LDFLAGS_default = $(LDFLAGS_gprof)
-
-CPPFLAGS_pic = $(CPPFLAGS_default)
-CFLAGS_pic = $(CFLAGS_default) @CFLAGS_pics@
-CXXFLAGS_pic = $(CXXFLAGS_default) @CFLAGS_pics@
-OBJCFLAGS_pic = $(OBJCFLAGS_default) @CFLAGS_pics@
-LDFLAGS_pic = $(LDFLAGS_default)
-
-CPPFLAGS_plugin = $(CPPFLAGS_default) -D__VLC__ -D__PLUGIN__
-CFLAGS_plugin = $(CFLAGS_default) @CFLAGS_plugins@
-CXXFLAGS_plugin = $(CXXFLAGS_default) @CFLAGS_plugins@
-OBJCFLAGS_plugin = $(OBJCFLAGS_default) @CFLAGS_plugins@
-LDFLAGS_plugin = @LDFLAGS_plugins@
-
-CPPFLAGS_builtin = $(CPPFLAGS_default) -D__VLC__ -D__BUILTIN__
-CFLAGS_builtin = $(CFLAGS_default) @CFLAGS_builtins@
-CXXFLAGS_builtin = $(CXXFLAGS_default) @CFLAGS_builtins@
-OBJCFLAGS_builtin = $(OBJCFLAGS_default) @CFLAGS_builtins@
-LDFLAGS_builtin =
-L_builtin =
-
-CPPFLAGS_builtin_pic = $(CPPFLAGS_builtin) $(CPPFLAGS_pic)
-CFLAGS_builtin_pic = $(CFLAGS_builtin) $(CFLAGS_pic)
-CXXFLAGS_builtin_pic = $(CXXFLAGS_builtin) $(CXXFLAGS_pic)
-OBJCFLAGS_builtin_pic = $(OBJCFLAGS_builtin) $(OBJCFLAGS_pic)
-LDFLAGS_builtin_pic = $(LDFLAGS_builtin) $(LDFLAGS_pic)
-L_builtin_pic =
-
-# On Linux and Solaris, activate 64-bit off_t (by default under BSD)
-CPPFLAGS_default += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_LARGEFILE64_SOURCE
-CPPFLAGS_default += -D_REENTRANT -D_THREAD_SAFE
-CPPFLAGS_default += -D_GNU_SOURCE
-
-# Gettext support
-CPPFLAGS_default += -DLOCALEDIR=\"$(datadir)/locale\"
-
-# Data and plugin location
-CPPFLAGS_default += -DDATA_PATH=\"@prefix@/share/vlc\"
-CPPFLAGS_default += -DPLUGIN_PATH=\"@prefix@/lib/vlc\"
-
-# Conditional flags that get added to *FLAGS_default
-if RELEASE
-CPPFLAGS_release = -DHAVE_RELEASE
-endif
-if DEBUG
-CPPFLAGS_debug = -DDEBUG
-CFLAGS_debug = -g
-endif
-if GPROF
-CPPFLAGS_gprof = -DGPROF
-CFLAGS_gprof = -pg
-LDFLAGS_gprof = -pg
-endif
-if CPROF
-CPPFLAGS_cprof = -DCPROF
-CFLAGS_cprof = -finstrument-functions
-endif
-if OPTIM
-CFLAGS_optim = @CFLAGS_OPTIM@ @CFLAGS_TUNING@
-if DEBUG
-else
-if GPROF
-else
-if CPROF
-else
-CFLAGS_nodebug = @CFLAGS_OPTIM_NODEBUG@
-endif
-endif
-endif
-else
-# !OPTIM
-CFLAGS_optim = @CFLAGS_NOOPTIM@
-endif
-
-CPPFLAGS_default += $(CPPFLAGS_release) \
-		$(CPPFLAGS_debug) $(CPPFLAGS_gprof) $(CPPFLAGS_cprof)
-CFLAGS_default += $(CFLAGS_optim) $(CFLAGS_nodebug) \
-		$(CFLAGS_debug) $(CFLAGS_gprof) $(CFLAGS_cprof)
-CXXFLAGS_default += $(CFLAGS_optim) $(CFLAGS_nodebug) \
-		$(CFLAGS_debug) $(CFLAGS_gprof) $(CFLAGS_cprof)
-OBJCFLAGS_default += $(CFLAGS_optim) $(CFLAGS_nodebug) \
-		$(CFLAGS_debug) $(CFLAGS_gprof) $(CFLAGS_cprof)
+# Don't forget to build plugins
+all: plugins
 
 ###############################################################################
 # Headers
@@ -166,7 +61,7 @@ dist_pkginclude_HEADERS = \
 	include/vlc/intf.h \
 	$(NULL)
 
-noinst_HEADERS += $(HEADERS_include) $(HEADERS_include_built)
+noinst_HEADERS = $(HEADERS_include) $(HEADERS_include_built)
 
 HEADERS_include = \
 	include/aout_internal.h \
@@ -215,13 +110,13 @@ HEADERS_include_built = \
 	$(NULL)
 
 include/vlc_symbols.h: Makefile $(HEADERS_include)
-	cd $(srcdir) && ./toolbox --update-includes $(BUILTINS)
+	cd $(srcdir) && $(srcdir)/toolbox --update-includes
 
 src/misc/modules_plugin.h: Makefile src/misc/modules_plugin.h.in $(HEADERS_include)
-	cd $(srcdir) && ./toolbox --update-includes $(BUILTINS)
+	cd $(srcdir) && $(srcdir)/toolbox --update-includes
 
 src/misc/modules_builtin.h: Makefile src/misc/modules_builtin.h.in
-	cd $(srcdir) && ./toolbox --update-includes $(BUILTINS)
+	cd $(srcdir) && $(srcdir)/toolbox --update-includes
 
 # These dependencies are mandatory
 $(SOURCES): include/vlc_symbols.h
@@ -325,18 +220,18 @@ dist-hook:
 
 bin_SCRIPTS = vlc-config
 
-lib_LIBRARIES += lib/libvlc.a $(LIBRARIES_libvlc_pic)
+lib_LIBRARIES = lib/libvlc.a $(LIBRARIES_libvlc_pic)
 
 lib_libvlc_a_SOURCES = $(SOURCES_libvlc)
 dist_lib_libvlc_a_SOURCES = src/misc/modules_plugin.h
-lib_libvlc_a_CFLAGS = $(CPPFLAGS_default) -D__VLC__ $(CFLAGS_default) @CFLAGS_vlc@
-lib_libvlc_a_CXXFLAGS = $(CPPFLAGS_default) -D__VLC__ $(CXXFLAGS_default)
-lib_libvlc_a_OBJCFLAGS = $(CPPFLAGS_default) -D__VLC__ $(OBJCFLAGS_default)
+lib_libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
+lib_libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
+lib_libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
 
 lib_libvlc_pic_a_SOURCES = $(SOURCES_libvlc)
-lib_libvlc_pic_a_CFLAGS = $(CPPFLAGS_pic) -D__VLC__ $(CFLAGS_pic) @CFLAGS_vlc@
-lib_libvlc_pic_a_CXXFLAGS = $(CPPFLAGS_pic) -D__VLC__ $(CXXFLAGS_pic)
-lib_libvlc_pic_a_OBJCFLAGS = $(CPPFLAGS_pic) -D__VLC__ $(OBJCFLAGS_pic)
+lib_libvlc_pic_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc pic`
+lib_libvlc_pic_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc pic`
+lib_libvlc_pic_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc pic`
 
 if HAVE_BEOS
 OPT_SOURCES_libvlc_beos = $(SOURCES_libvlc_beos)
@@ -445,32 +340,25 @@ SOURCES_libvlc = \
 # Building vlc
 ###############################################################################
 
-bin_PROGRAMS += vlc
+bin_PROGRAMS = vlc
 
 vlc_SOURCES = src/vlc.c
 
-# @AUTOMAKE_SUCKS@ gets expanded to $(L_builtin) $(LDFLAGS_builtin)
-# but we don't write it directly, otherwise automake will go amok and eat all
-# the memory because of its 2^N crap algorithm. So we fool him. Nuahaha.
-vlc_LDADD = lib/libvlc.a $(LDFLAGS_vlc) \
-            $(DATA_win32_rc) $(LIB_intl) @AUTOMAKE_SUCKS@
-vlc_CFLAGS = $(CPPFLAGS_default) $(CFLAGS_default)
+vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin`
+vlc_LDADD = lib/libvlc.a $(DATA_win32_rc) $(LIB_intl)
+vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 
 # We use DEPENDENCIES_vlc instead of vlc_DEPENDENCIES because of an
 # old automake-1.5 bug (automake/279).
-DEPENDENCIES_vlc = lib/libvlc.a $(L_builtin) $(DATA_win32_rc) $(LIB_intl)
+DEPENDENCIES_vlc = lib/libvlc.a $(DATA_win32_rc) $(LIB_intl) builtins
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
 	@rm -f $(srcdir)/vlc$(EXEEXT)
-if HAVE_BEOS
-	$(CXXLINK) $(vlc_LDFLAGS) $(vlc_OBJECTS) $(vlc_LDADD) $(LIBS)
-else
-if HAVE_DARWIN
-	$(CXXLINK) $(vlc_LDFLAGS) $(vlc_OBJECTS) $(vlc_LDADD) $(LIBS)
-else
-	$(LINK) $(vlc_LDFLAGS) $(vlc_OBJECTS) $(vlc_LDADD) $(LIBS)
-endif
-endif
+	case `$(VLC_CONFIG) --linkage vlc builtin` in \
+	  c++) $(CXXLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ;; \
+	  objc) $(OBJCLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ;; \
+	  c|*) $(LINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ;; \
+	esac
 
 if HAVE_BEOS
 	xres -o $@ $(srcdir)/share/vlc_beos.rsrc
@@ -483,28 +371,34 @@ if HAVE_BEOS
 	done
 endif
 
-# Install the symlinks
+# Install the modules and the symlinks
 install-exec-local:
+	for i in dummy `$(srcdir)/vlc-config --target plugin` ; do if test "x$$i" != "xdummy" ; then \
+	  $(INSTALL) -m 755 "$$i$(LIBEXT)" "$(DESTDIR)$(libdir)/vlc/`echo $$i | cut -f2 -d/`/" ; \
+	fi ; done
+	for i in dummy `$(srcdir)/vlc-config --target builtin` `$(srcdir)/vlc-config --target builtin pic` ; do if test "x$$i" != "xdummy" ; then \
+	  $(INSTALL) -m 644 "$$i" "$(DESTDIR)$(libdir)/vlc/" ; \
+	fi ; done
 	for i in dummy $(ALIASES) ; do if test "x$$i" != "xdummy" ; then \
-		rm -f $(DESTDIR)$(bindir)/$$i && \
-		ln -s vlc $(DESTDIR)$(bindir)/$$i ; \
+	  rm -f "$(DESTDIR)$(bindir)/$$i" && \
+	  ln -s vlc "$(DESTDIR)$(bindir)/$$i" ; \
 	fi ; done
 
 if HAVE_DARWIN
 # Create the MacOS X app
 vlc_app_DATA = VLC.app
 vlc_appdir = $(bindir)
-VLC.app: vlc $(PLUGIN_FILES)
+VLC.app: vlc plugins
 	rm -Rf VLC.app
 	cd $(srcdir)/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'
 	cp -r $(srcdir)/extras/MacOSX/build/vlc.bundle $(srcdir)/VLC.app
 	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS
 	$(INSTALL) vlc $(srcdir)/VLC.app/Contents/MacOS/VLC
 	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/modules
-	for i in dummy $(PLUGIN_FILES) ; do if test "x$$i" != "xdummy" ; then \
-		$(INSTALL) $(srcdir)/$$i \
-			$(srcdir)/VLC.app/Contents/MacOS/modules/ ; \
-	fi ; done
+	for i in dummy `$(srcdir)/vlc-config --target plugin` ; do \
+	  if test "x$$i" != "xdummy" ; then $(INSTALL) $(srcdir)/$$i$(LIBEXT) \
+	    $(srcdir)/VLC.app/Contents/MacOS/modules/ ; \
+	  fi ; done
 	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/share
 	$(INSTALL) -m 644 $(srcdir)/share/*.psf $(srcdir)/share/*.rle \
 		$(srcdir)/VLC.app/Contents/MacOS/share
@@ -527,6 +421,18 @@ noinst_share_vlc_win32_rcdir = $(libdir)
 share/vlc_win32_rc.$(OBJEXT): share/vlc_win32_rc.rc
 	$(WINDRES) --include-dir $(srcdir)/share -i $< -o $@
 endif
+
+###############################################################################
+# Building modules
+###############################################################################
+plugins: FORCE
+	$(MAKE) `$(VLC_CONFIG) --target plugin` FORCE
+
+builtins: FORCE
+	$(MAKE) `$(VLC_CONFIG) --target builtin` FORCE
+
+builtins_pic: FORCE
+	$(MAKE) `$(VLC_CONFIG) --target builtin pic` FORCE
 
 ###############################################################################
 # Building architecture-specific binary packages
@@ -555,9 +461,10 @@ package-win32:
 		unix2dos $(srcdir)/tmp/$${file}.txt ; done
 
 	mkdir $(srcdir)/tmp/plugins
-	for i in dummy $(PLUGIN_FILES) ; do if test "x$$i" != "xdummy" ; then \
-		$(INSTALL) $(srcdir)/$$i $(srcdir)/tmp/plugins/ ; \
-	fi ; done
+	for i in dummy `$(srcdir)/vlc-config --target plugin` ; do \
+	  if test "x$$i" != "xdummy" ; then \
+	    $(INSTALL) $(srcdir)/$$i$(LIBEXT) $(srcdir)/tmp/plugins/ ; \
+	  fi ; done
 
 	for i in dummy $(srcdir)/tmp/plugins/*$(LIBEXT) ; \
 		do if test $$i != dummy ; then $(STRIP) $$i ; fi ; done
@@ -652,9 +559,9 @@ package-macosx:
 # Building the Mozilla plugin
 ###############################################################################
 
-noinst_LIBRARIES += $(noinst_LIBRARIES_mozilla)
+noinst_LIBRARIES = $(noinst_LIBRARIES_mozilla)
 
-MOSTLYCLEANFILES += $(LIBRARIES_mozilla)
+MOSTLYCLEANFILES = $(LIBRARIES_mozilla)
 
 EXTRA_DIST += $(SOURCES_mozilla) mozilla/vlcintf.idl
 
@@ -695,13 +602,11 @@ noinst_LIBRARIES_mozilla = mozilla/libplugin.a
 endif
 
 mozilla_libplugin_a_SOURCES = $(SOURCES_mozilla)
-mozilla_libplugin_a_CFLAGS = $(CPPFLAGS_pic) $(CFLAGS_pic) \
-                             $(CPPFLAGS_mozilla) $(CFLAGS_mozilla) \
+mozilla_libplugin_a_CFLAGS = `$(VLC_CONFIG) --cflags mozilla pic` \
                              $(CPPFLAGS_mozilla_EXTRA)
-mozilla_libplugin_a_CXXFLAGS = $(CPPFLAGS_pic) $(CXXFLAGS_pic) \
-                               $(CPPFLAGS_mozilla) $(CXXFLAGS_mozilla) \
+mozilla_libplugin_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla pic` \
                                $(CPPFLAGS_mozilla_EXTRA)
-mozilla_libplugin_a_DEPENDENCIES = lib/libvlc_pic.a $(L_builtin_pic) $(DATA_npvlc_rc)
+mozilla_libplugin_a_DEPENDENCIES = lib/libvlc_pic.a $(DATA_npvlc_rc) builtins_pic
 
 BUILT_SOURCES_mozilla = mozilla/vlcintf.h
 $(SOURCES_mozilla): mozilla/vlcintf.h
@@ -709,11 +614,10 @@ $(SOURCES_mozilla): mozilla/vlcintf.h
 mozilla_plugin_DATA = $(LIBRARIES_mozilla)
 mozilla_plugindir = $(libdir)/mozilla/plugins
 $(LIBRARIES_mozilla): $(mozilla_libplugin_a_OBJECTS) \
-                      $(mozilla_libplugin_a_DEPENDENCIES) \
-                      $(L_builtin_pic)
+                      $(mozilla_libplugin_a_DEPENDENCIES)
 	$(CXXLINK) $(mozilla_libplugin_a_OBJECTS) $(DATA_npvlc_rc) \
-		lib/libvlc_pic.a $(L_builtin_pic) -shared $(LDFLAGS) \
-		$(LDFLAGS_vlc) $(LDFLAGS_mozilla) $(LDFLAGS_builtin_pic)
+		lib/libvlc_pic.a -shared \
+		`$(VLC_CONFIG) --libs vlc mozilla builtin pic`
 
 mozilla_vlcintf_xpt_DATA = mozilla/vlcintf.xpt
 mozilla_vlcintf_xptdir = $(libdir)/mozilla/components
@@ -737,11 +641,6 @@ endif
 ###############################################################################
 # Modules
 ###############################################################################
-MOSTLYCLEANFILES += $(PLUGIN_FILES)
-PLUGIN_FILES =
-
-libvlcdir = $(libdir)/vlc
-
 include Modules.am
 
 ###############################################################################

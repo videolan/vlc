@@ -1,4 +1,4 @@
 SOURCES_qte = \
-	modules/video_output/qte/qte.cpp \
-	modules/video_output/qte/qte.h \
+	qte.cpp \
+	qte.h \
 	$(NULL)

@@ -4,7 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-06-22 18:09+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-06-26 15:42+0200\n"
 "PO-Revision-Date: 2003-04-06 12:32+0200\n"
 "Last-Translator: Haakon Meland Eriksen <haakon.eriksen@far.no>\n"
 "Language-Team: vlc <>\n"
@@ -12,7 +13,7 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: include/interface.h:72
+#: include/vlc_interface.h:72
 #, fuzzy
 msgid ""
 "\n"
@@ -125,7 +126,7 @@ msgid "Program"
 msgstr "Avslutt programmet"
 
 #: src/input/input_programs.c:98 modules/demux/asf/libasf.c:696
-#: modules/gui/beos/MediaControlView.cpp:1258
+#: modules/demux/mkv.cpp:2265 modules/gui/beos/MediaControlView.cpp:1258
 #: modules/gui/gtk/gnome_interface.c:1650 modules/gui/gtk/gtk_interface.c:1956
 #: modules/gui/gtk/menu.c:1402 modules/gui/gtk/menu.c:1423
 #: modules/gui/kde/interface.cpp:144 modules/gui/macosx/intf.m:373
@@ -1155,19 +1156,20 @@ msgstr "Grensesnitt"
 
 #: src/libvlc.h:458 modules/audio_output/coreaudio.c:227
 #: modules/audio_output/file.c:108 modules/demux/asf/asf.c:228
-#: modules/demux/ogg.c:555 modules/demux/ogg.c:825 modules/demux/ogg.c:998
-#: modules/gui/beos/InterfaceWindow.cpp:259
+#: modules/demux/mkv.cpp:2295 modules/demux/ogg.c:557 modules/demux/ogg.c:829
+#: modules/demux/ogg.c:1002 modules/gui/beos/InterfaceWindow.cpp:259
 #: modules/gui/gtk/gnome_interface.c:1092 modules/gui/gtk/gtk_interface.c:1219
 #: modules/gui/macosx/intf.m:378 modules/gui/macosx/output.m:155
 msgid "Audio"
 msgstr "Lyd"
 
-#: src/libvlc.h:477 modules/demux/asf/asf.c:302 modules/demux/avi/avi.c:1203
-#: modules/demux/ogg.c:625 modules/demux/ogg.c:665 modules/demux/ogg.c:730
-#: modules/demux/ogg.c:905 modules/gui/gtk/gnome_interface.c:1099
-#: modules/gui/gtk/gtk_interface.c:1296 modules/gui/macosx/intf.m:389
-#: modules/gui/macosx/macosx.m:68 modules/gui/macosx/output.m:144
-#: modules/misc/dummy/dummy.c:81 modules/video_output/directx/directx.c:112
+#: src/libvlc.h:477 modules/demux/asf/asf.c:302 modules/demux/avi/avi.c:1208
+#: modules/demux/mkv.cpp:2311 modules/demux/ogg.c:629 modules/demux/ogg.c:669
+#: modules/demux/ogg.c:734 modules/demux/ogg.c:909
+#: modules/gui/gtk/gnome_interface.c:1099 modules/gui/gtk/gtk_interface.c:1296
+#: modules/gui/macosx/intf.m:389 modules/gui/macosx/macosx.m:68
+#: modules/gui/macosx/output.m:144 modules/misc/dummy/dummy.c:81
+#: modules/video_output/directx/directx.c:112
 msgid "Video"
 msgstr "Video"
 
@@ -1415,41 +1417,6 @@ msgstr ""
 msgid "Microsoft Media Server (MMS) input"
 msgstr ""
 
-#: modules/access_output/dummy.c:56
-#, fuzzy
-msgid "Dummy stream ouput"
-msgstr "Standard output:"
-
-#: modules/access_output/file.c:66
-#, fuzzy
-msgid "File stream ouput"
-msgstr "Standard output:"
-
-#: modules/access_output/http.c:54
-#, fuzzy
-msgid "HTTP stream ouput"
-msgstr "Standard output:"
-
-#: modules/access_output/udp.c:74 modules/access/udp.c:72
-msgid "caching value in ms"
-msgstr ""
-
-#: modules/access_output/udp.c:76 modules/access/udp.c:74
-msgid ""
-"Allows you to modify the default caching value for udp streams. This value "
-"should be set in miliseconds units."
-msgstr ""
-
-#: modules/access_output/udp.c:80
-#, fuzzy
-msgid "UDP stream ouput"
-msgstr "Standard output:"
-
-#: modules/access_output/udp.c:81
-#, fuzzy
-msgid "udp stream output"
-msgstr "Standard output:"
-
 #: modules/access/pvr/pvr.c:74
 msgid "Hauppauge PVR cards input"
 msgstr ""
@@ -1499,6 +1466,16 @@ msgstr ""
 msgid "slp"
 msgstr ""
 
+#: modules/access/udp.c:72 modules/access_output/udp.c:74
+msgid "caching value in ms"
+msgstr ""
+
+#: modules/access/udp.c:74 modules/access_output/udp.c:76
+msgid ""
+"Allows you to modify the default caching value for udp streams. This value "
+"should be set in miliseconds units."
+msgstr ""
+
 #: modules/access/udp.c:78
 msgid "UDP/RTP input"
 msgstr ""
@@ -1530,6 +1507,40 @@ msgstr "Standard grensesnitt: "
 #: modules/access/vcd/vcd.c:79
 msgid "VCD input"
 msgstr ""
+
+#: modules/access/vlcs.c:131 modules/misc/sap.c:142
+msgid "SAP"
+msgstr ""
+
+#: modules/access/vlcs.c:134
+#, fuzzy
+msgid "SAP interface module"
+msgstr "Standard grensesnitt: "
+
+#: modules/access_output/dummy.c:56
+#, fuzzy
+msgid "Dummy stream ouput"
+msgstr "Standard output:"
+
+#: modules/access_output/file.c:66
+#, fuzzy
+msgid "File stream ouput"
+msgstr "Standard output:"
+
+#: modules/access_output/http.c:54
+#, fuzzy
+msgid "HTTP stream ouput"
+msgstr "Standard output:"
+
+#: modules/access_output/udp.c:80
+#, fuzzy
+msgid "UDP stream ouput"
+msgstr "Standard output:"
+
+#: modules/access_output/udp.c:81
+#, fuzzy
+msgid "udp stream output"
+msgstr "Standard output:"
 
 #: modules/audio_filter/channel_mixer/headphone.c:48
 #, fuzzy
@@ -1729,7 +1740,7 @@ msgstr ""
 msgid "2 Front 2 Rear"
 msgstr "2 Front 2 Bak"
 
-#: modules/audio_output/esd.c:64
+#: modules/audio_output/esd.c:66
 #, fuzzy
 msgid "EsounD audio output"
 msgstr "Lydeksport volum"
@@ -1976,12 +1987,12 @@ msgstr ""
 msgid "MPEG I/II layer 1/2 audio decoder"
 msgstr "Standard grensesnitt: "
 
-#: modules/codec/mpeg_video/idct/idctaltivec.c:45
-msgid "AltiVec IDCT"
-msgstr ""
-
 #: modules/codec/mpeg_video/idct/idct.c:41
 msgid "IDCT"
+msgstr ""
+
+#: modules/codec/mpeg_video/idct/idctaltivec.c:45
+msgid "AltiVec IDCT"
 msgstr ""
 
 #: modules/codec/mpeg_video/idct/idctclassic.c:41
@@ -1996,16 +2007,16 @@ msgstr ""
 msgid "MMX EXT IDCT"
 msgstr ""
 
+#: modules/codec/mpeg_video/motion/motion.c:42
+msgid "motion compensation"
+msgstr ""
+
 #: modules/codec/mpeg_video/motion/motion3dnow.c:44
 msgid "3D Now! motion compensation"
 msgstr ""
 
 #: modules/codec/mpeg_video/motion/motionaltivec.c:47
 msgid "AltiVec motion compensation"
-msgstr ""
-
-#: modules/codec/mpeg_video/motion/motion.c:42
-msgid "motion compensation"
 msgstr ""
 
 #: modules/codec/mpeg_video/motion/motionmmx.c:45
@@ -2248,17 +2259,17 @@ msgid "Layer"
 msgstr ""
 
 #: modules/demux/aac/demux.c:562 modules/demux/asf/asf.c:275
-#: modules/demux/avi/avi.c:1171 modules/demux/ogg.c:833
-#: modules/demux/ogg.c:1006 modules/gui/gtk/gnome_interface.c:148
-#: modules/gui/gtk/gnome_interface.c:931 modules/gui/gtk/gtk_interface.c:481
-#: modules/gui/gtk/gtk_interface.c:1282
+#: modules/demux/avi/avi.c:1176 modules/demux/mkv.cpp:2299
+#: modules/demux/ogg.c:561 modules/demux/ogg.c:837 modules/demux/ogg.c:1010
+#: modules/gui/gtk/gnome_interface.c:148 modules/gui/gtk/gnome_interface.c:931
+#: modules/gui/gtk/gtk_interface.c:481 modules/gui/gtk/gtk_interface.c:1282
 msgid "Channels"
 msgstr "Kanaler"
 
 #: modules/demux/aac/demux.c:564 modules/demux/asf/asf.c:277
-#: modules/demux/avi/avi.c:1173 modules/demux/mpeg/audio.c:632
-#: modules/demux/ogg.c:557 modules/demux/ogg.c:667 modules/demux/ogg.c:828
-#: modules/demux/ogg.c:1001
+#: modules/demux/avi/avi.c:1178 modules/demux/mkv.cpp:2303
+#: modules/demux/mpeg/audio.c:632 modules/demux/ogg.c:559
+#: modules/demux/ogg.c:671 modules/demux/ogg.c:832 modules/demux/ogg.c:1005
 msgid "Sample Rate"
 msgstr ""
 
@@ -2266,25 +2277,28 @@ msgstr ""
 msgid "ASF v1.0 demuxer (file only)"
 msgstr ""
 
-#: modules/demux/asf/asf.c:165
+#: modules/demux/asf/asf.c:165 modules/demux/mkv.cpp:2283
 #, fuzzy
 msgid "Number of streams"
 msgstr "Stopp strøm"
 
 #: modules/demux/asf/asf.c:228 modules/demux/asf/asf.c:302
-#: modules/demux/avi/avi.c:1167 modules/demux/avi/avi.c:1203
-#: modules/demux/avi/avi.c:1234 modules/demux/ogg.c:555
-#: modules/demux/ogg.c:625 modules/demux/ogg.c:665 modules/demux/ogg.c:730
-#: modules/demux/ogg.c:825 modules/demux/ogg.c:905 modules/demux/ogg.c:998
-#: modules/gui/familiar/interface.c:370 modules/gui/macosx/output.m:134
+#: modules/demux/avi/avi.c:1172 modules/demux/avi/avi.c:1208
+#: modules/demux/avi/avi.c:1239 modules/demux/mkv.cpp:2295
+#: modules/demux/mkv.cpp:2311 modules/demux/mkv.cpp:2327
+#: modules/demux/ogg.c:557 modules/demux/ogg.c:629 modules/demux/ogg.c:669
+#: modules/demux/ogg.c:734 modules/demux/ogg.c:829 modules/demux/ogg.c:909
+#: modules/demux/ogg.c:1002 modules/gui/familiar/interface.c:370
+#: modules/gui/macosx/output.m:134
 msgid "Type"
 msgstr ""
 
 #: modules/demux/asf/asf.c:260 modules/demux/asf/asf.c:318
-#: modules/demux/avi/avi.c:1169 modules/demux/avi/avi.c:1204
-#: modules/demux/ogg.c:556 modules/demux/ogg.c:626 modules/demux/ogg.c:666
-#: modules/demux/ogg.c:731 modules/demux/ogg.c:826 modules/demux/ogg.c:906
-#: modules/demux/ogg.c:999
+#: modules/demux/avi/avi.c:1174 modules/demux/avi/avi.c:1209
+#: modules/demux/mkv.cpp:2296 modules/demux/mkv.cpp:2312
+#: modules/demux/mkv.cpp:2328 modules/demux/ogg.c:558 modules/demux/ogg.c:630
+#: modules/demux/ogg.c:670 modules/demux/ogg.c:735 modules/demux/ogg.c:830
+#: modules/demux/ogg.c:910 modules/demux/ogg.c:1003
 msgid "Codec"
 msgstr ""
 
@@ -2292,7 +2306,8 @@ msgstr ""
 msgid "Avg. byterate"
 msgstr ""
 
-#: modules/demux/asf/asf.c:282 modules/demux/avi/avi.c:1175
+#: modules/demux/asf/asf.c:282 modules/demux/avi/avi.c:1180
+#: modules/demux/mkv.cpp:2307
 msgid "Bits Per Sample"
 msgstr ""
 
@@ -2300,7 +2315,8 @@ msgstr ""
 msgid "Size"
 msgstr ""
 
-#: modules/demux/asf/asf.c:335 modules/demux/avi/avi.c:1206
+#: modules/demux/asf/asf.c:335 modules/demux/avi/avi.c:1211
+#: modules/demux/mkv.cpp:2315
 msgid "Resolution"
 msgstr "Oppløsning"
 
@@ -2309,7 +2325,7 @@ msgstr "Oppløsning"
 msgid "Planes"
 msgstr "Spill"
 
-#: modules/demux/asf/asf.c:339 modules/demux/avi/avi.c:1212
+#: modules/demux/asf/asf.c:339 modules/demux/avi/avi.c:1217
 msgid "Bits Per Pixel"
 msgstr ""
 
@@ -2381,26 +2397,26 @@ msgstr ""
 msgid "AVI demuxer"
 msgstr ""
 
-#: modules/demux/avi/avi.c:1096
+#: modules/demux/avi/avi.c:1101
 msgid "Avi"
 msgstr ""
 
-#: modules/demux/avi/avi.c:1097
+#: modules/demux/avi/avi.c:1102
 #, fuzzy
 msgid "Number of Streams"
 msgstr "Pause strøm"
 
-#: modules/demux/avi/avi.c:1098
+#: modules/demux/avi/avi.c:1103
 #, fuzzy
 msgid "Flags"
 msgstr "Fort"
 
-#: modules/demux/avi/avi.c:1209 modules/demux/ogg.c:627
-#: modules/demux/ogg.c:733 modules/demux/ogg.c:908
+#: modules/demux/avi/avi.c:1214 modules/demux/ogg.c:631
+#: modules/demux/ogg.c:737 modules/demux/ogg.c:912
 msgid "Frame Rate"
 msgstr ""
 
-#: modules/demux/avi/avi.c:1234
+#: modules/demux/avi/avi.c:1239
 msgid "Unknown"
 msgstr "Ukjent"
 
@@ -2426,18 +2442,57 @@ msgstr ""
 msgid "playlist metademux"
 msgstr "Åpne spilleliste-vinduet"
 
-#: modules/demux/mkv.cpp:83
+#: modules/demux/mkv.cpp:91
 msgid "mkv-demuxer"
 msgstr ""
 
-#: modules/demux/mkv.cpp:85 modules/demux/mkv.cpp:86
-msgid "Create index if no cues found"
+#: modules/demux/mkv.cpp:93 modules/demux/mkv.cpp:94
+msgid "Seek based on percent not time"
 msgstr ""
 
-#: modules/demux/mkv.cpp:87
+#: modules/demux/mkv.cpp:96
 #, fuzzy
 msgid "mka/mkv stream demuxer"
 msgstr "Standard grensesnitt: "
+
+#: modules/demux/mkv.cpp:2260 modules/gui/gtk/gnome_interface.c:2436
+#: modules/gui/gtk/gtk_interface.c:2857 modules/gui/wxwindows/playlist.cpp:148
+msgid "Duration"
+msgstr "Varighet"
+
+#: modules/demux/mkv.cpp:2269
+msgid "Date UTC"
+msgstr ""
+
+#: modules/demux/mkv.cpp:2273
+#, fuzzy
+msgid "Segment Filename"
+msgstr "Fil"
+
+#: modules/demux/mkv.cpp:2277
+#, fuzzy
+msgid "Muxing Application"
+msgstr "Om dette programmet"
+
+#: modules/demux/mkv.cpp:2281
+#, fuzzy
+msgid "Writing Application"
+msgstr "Startposisjon"
+
+#: modules/demux/mkv.cpp:2319
+#, fuzzy
+msgid "Display Resolution"
+msgstr "Oppløsning"
+
+#: modules/demux/mkv.cpp:2323
+msgid "Frame Per Second"
+msgstr ""
+
+#: modules/demux/mkv.cpp:2327 modules/gui/gtk/gnome_interface.c:1963
+#: modules/gui/gtk/gtk_interface.c:2278
+#, fuzzy
+msgid "Subtitle"
+msgstr "_Teksting"
 
 #: modules/demux/mp4/mp4.c:59
 msgid "MP4 demuxer"
@@ -2511,41 +2566,41 @@ msgstr ""
 msgid "ISO 13818-1 MPEG Transport Stream input (libdvbpsi)"
 msgstr ""
 
-#: modules/demux/ogg.c:187
+#: modules/demux/ogg.c:188
 msgid "ogg stream demuxer"
 msgstr ""
 
-#: modules/demux/ogg.c:556
+#: modules/demux/ogg.c:558
 msgid "Vorbis"
 msgstr ""
 
-#: modules/demux/ogg.c:559 modules/demux/ogg.c:629 modules/demux/ogg.c:669
-#: modules/demux/ogg.c:830 modules/demux/ogg.c:1003
+#: modules/demux/ogg.c:563 modules/demux/ogg.c:633 modules/demux/ogg.c:673
+#: modules/demux/ogg.c:834 modules/demux/ogg.c:1007
 msgid "Bit Rate"
 msgstr ""
 
-#: modules/demux/ogg.c:626
+#: modules/demux/ogg.c:630
 msgid "Theora"
 msgstr ""
 
-#: modules/demux/ogg.c:666
+#: modules/demux/ogg.c:670
 #, fuzzy
 msgid "tarkin"
 msgstr "tegn"
 
-#: modules/demux/ogg.c:735 modules/demux/ogg.c:910
+#: modules/demux/ogg.c:739 modules/demux/ogg.c:914
 msgid "Bit Count"
 msgstr ""
 
-#: modules/demux/ogg.c:737 modules/demux/ogg.c:912
+#: modules/demux/ogg.c:741 modules/demux/ogg.c:916
 msgid "Width"
 msgstr ""
 
-#: modules/demux/ogg.c:739 modules/demux/ogg.c:914
+#: modules/demux/ogg.c:743 modules/demux/ogg.c:918
 msgid "Height"
 msgstr ""
 
-#: modules/demux/ogg.c:835 modules/demux/ogg.c:1008
+#: modules/demux/ogg.c:839 modules/demux/ogg.c:1012
 msgid "Bits per Sample"
 msgstr ""
 
@@ -2972,8 +3027,8 @@ msgstr "Fil"
 
 #: modules/gui/beos/InterfaceWindow.cpp:240
 #: modules/gui/beos/PlayListWindow.cpp:84
-#: modules/gui/gtk2/gnome2_interface.c:113
-#: modules/gui/gtk/gnome_interface.c:2179 modules/gui/macosx/open.m:332
+#: modules/gui/gtk/gnome_interface.c:2179
+#: modules/gui/gtk2/gnome2_interface.c:113 modules/gui/macosx/open.m:332
 #: modules/gui/macosx/open.m:630 modules/gui/macosx/open.m:677
 msgid "Open File"
 msgstr "Åpne fil"
@@ -3384,10 +3439,10 @@ msgid ""
 "from local or network sources."
 msgstr ""
 
-#: modules/gui/familiar/support.c:121 modules/gui/gtk2/gnome2_support.c:60
-#: modules/gui/gtk2/gnome2_support.c:85 modules/gui/gtk2/gtk2_support.c:90
-#: modules/gui/gtk2/gtk2_support.c:114 modules/gui/gtk/gnome_support.c:100
+#: modules/gui/familiar/support.c:121 modules/gui/gtk/gnome_support.c:100
 #: modules/gui/gtk/gnome_support.c:138 modules/gui/gtk/gtk_support.c:121
+#: modules/gui/gtk2/gnome2_support.c:60 modules/gui/gtk2/gnome2_support.c:85
+#: modules/gui/gtk2/gtk2_support.c:90 modules/gui/gtk2/gtk2_support.c:114
 #, c-format
 msgid "Couldn't find pixmap file: %s"
 msgstr ""
@@ -3395,69 +3450,6 @@ msgstr ""
 #: modules/gui/familiar/support.c:130 modules/gui/gtk/gtk_support.c:130
 #, c-format
 msgid "Error loading pixmap file: %s"
-msgstr ""
-
-#: modules/gui/gtk2/gnome2.c:54 modules/gui/gtk2/gtk2.c:55
-#, fuzzy
-msgid "Gtk2 interface"
-msgstr "Standard grensesnitt: "
-
-#: modules/gui/gtk2/gnome2_interface.c:31
-#, fuzzy
-msgid "_New"
-msgstr "_Vis"
-
-#: modules/gui/gtk2/gnome2_interface.c:87
-msgid "gnome2"
-msgstr ""
-
-#: modules/gui/gtk2/gnome2_interface.c:112
-msgid "button4"
-msgstr ""
-
-#: modules/gui/gtk2/gnome2_interface.c:122
-#: modules/gui/gtk2/gtk2_interface.c:183
-msgid "button3"
-msgstr ""
-
-#: modules/gui/gtk2/gnome2_interface.c:123 modules/gui/macosx/output.m:337
-#, fuzzy
-msgid "Save File"
-msgstr "Velg fil"
-
-#: modules/gui/gtk2/gtk2_interface.c:67
-msgid "window1"
-msgstr ""
-
-#: modules/gui/gtk2/gtk2_interface.c:77 modules/gui/gtk/gtk_interface.c:147
-#: modules/gui/gtk/gtk_interface.c:1373
-msgid "_File"
-msgstr "_Fil"
-
-#: modules/gui/gtk2/gtk2_interface.c:109
-#, fuzzy
-msgid "_Edit"
-msgstr "_Avslutt"
-
-#: modules/gui/gtk2/gtk2_interface.c:132 modules/gui/gtk/gtk_interface.c:268
-msgid "_View"
-msgstr "_Vis"
-
-#: modules/gui/gtk2/gtk2_interface.c:139 modules/gui/gtk/gtk_interface.c:569
-msgid "_Help"
-msgstr "_Hjelp"
-
-#: modules/gui/gtk2/gtk2_interface.c:146
-#, fuzzy
-msgid "_About"
-msgstr "Om"
-
-#: modules/gui/gtk2/gtk2_interface.c:163
-msgid "button1"
-msgstr ""
-
-#: modules/gui/gtk2/gtk2_interface.c:173
-msgid "button2"
 msgstr ""
 
 #: modules/gui/gtk/gnome.c:55 modules/gui/gtk/gtk.c:57
@@ -3946,11 +3938,6 @@ msgstr ""
 msgid "Satellite"
 msgstr "Åpne spilleliste-vinduet"
 
-#: modules/gui/gtk/gnome_interface.c:1963 modules/gui/gtk/gtk_interface.c:2278
-#, fuzzy
-msgid "Subtitle"
-msgstr "_Teksting"
-
 #: modules/gui/gtk/gnome_interface.c:2005 modules/gui/gtk/gtk_interface.c:2322
 #: modules/gui/macosx/open.m:175
 #, fuzzy
@@ -4012,11 +3999,6 @@ msgstr "Slett"
 #: modules/gui/gtk/gnome_interface.c:2359 modules/gui/gtk/gtk_interface.c:2782
 msgid "Selection"
 msgstr "Valg"
-
-#: modules/gui/gtk/gnome_interface.c:2436 modules/gui/gtk/gtk_interface.c:2857
-#: modules/gui/wxwindows/playlist.cpp:148
-msgid "Duration"
-msgstr "Varighet"
 
 #: modules/gui/gtk/gnome_interface.c:2588
 #, fuzzy
@@ -4095,6 +4077,11 @@ msgstr "Gtk+"
 msgid "Gtk+ interface"
 msgstr "Standard grensesnitt: "
 
+#: modules/gui/gtk/gtk_interface.c:147 modules/gui/gtk/gtk_interface.c:1373
+#: modules/gui/gtk2/gtk2_interface.c:77
+msgid "_File"
+msgstr "_Fil"
+
 #: modules/gui/gtk/gtk_interface.c:238
 msgid "_Close"
 msgstr ""
@@ -4111,6 +4098,10 @@ msgstr "_Avslutt"
 #: modules/gui/gtk/gtk_interface.c:261
 msgid "Exit the program"
 msgstr "Avslutt programmet"
+
+#: modules/gui/gtk/gtk_interface.c:268 modules/gui/gtk2/gtk2_interface.c:132
+msgid "_View"
+msgstr "_Vis"
 
 #: modules/gui/gtk/gtk_interface.c:294
 msgid "Hide the main interface window"
@@ -4131,6 +4122,10 @@ msgstr "_Preferanser..."
 #: modules/gui/gtk/gtk_interface.c:411
 msgid "Configure the application"
 msgstr "Konfigurer programmet"
+
+#: modules/gui/gtk/gtk_interface.c:569 modules/gui/gtk2/gtk2_interface.c:139
+msgid "_Help"
+msgstr "_Hjelp"
 
 #: modules/gui/gtk/gtk_interface.c:587 modules/gui/gtk/gtk_interface.c:1435
 msgid "_About..."
@@ -4241,6 +4236,56 @@ msgstr ""
 #, fuzzy
 msgid "Selected:"
 msgstr "Valgte"
+
+#: modules/gui/gtk2/gnome2.c:54 modules/gui/gtk2/gtk2.c:55
+#, fuzzy
+msgid "Gtk2 interface"
+msgstr "Standard grensesnitt: "
+
+#: modules/gui/gtk2/gnome2_interface.c:31
+#, fuzzy
+msgid "_New"
+msgstr "_Vis"
+
+#: modules/gui/gtk2/gnome2_interface.c:87
+msgid "gnome2"
+msgstr ""
+
+#: modules/gui/gtk2/gnome2_interface.c:112
+msgid "button4"
+msgstr ""
+
+#: modules/gui/gtk2/gnome2_interface.c:122
+#: modules/gui/gtk2/gtk2_interface.c:183
+msgid "button3"
+msgstr ""
+
+#: modules/gui/gtk2/gnome2_interface.c:123 modules/gui/macosx/output.m:337
+#, fuzzy
+msgid "Save File"
+msgstr "Velg fil"
+
+#: modules/gui/gtk2/gtk2_interface.c:67
+msgid "window1"
+msgstr ""
+
+#: modules/gui/gtk2/gtk2_interface.c:109
+#, fuzzy
+msgid "_Edit"
+msgstr "_Avslutt"
+
+#: modules/gui/gtk2/gtk2_interface.c:146
+#, fuzzy
+msgid "_About"
+msgstr "Om"
+
+#: modules/gui/gtk2/gtk2_interface.c:163
+msgid "button1"
+msgstr ""
+
+#: modules/gui/gtk2/gtk2_interface.c:173
+msgid "button2"
+msgstr ""
 
 #: modules/gui/kde/interface.cpp:88
 msgid "Languages"
@@ -4695,27 +4740,27 @@ msgstr "Standard grensesnitt: "
 msgid "Open a skin file"
 msgstr "Åpne en fil"
 
+#: modules/gui/skins/src/skin_main.cpp:349
 #: modules/gui/skins/src/skin_main.cpp:350
-#: modules/gui/skins/src/skin_main.cpp:351
 msgid "Last skin actually used"
 msgstr ""
 
+#: modules/gui/skins/src/skin_main.cpp:351
 #: modules/gui/skins/src/skin_main.cpp:352
-#: modules/gui/skins/src/skin_main.cpp:353
 msgid "Config of last used skin"
 msgstr ""
 
+#: modules/gui/skins/src/skin_main.cpp:353
 #: modules/gui/skins/src/skin_main.cpp:354
-#: modules/gui/skins/src/skin_main.cpp:355
 msgid "Show application in system tray"
 msgstr ""
 
+#: modules/gui/skins/src/skin_main.cpp:355
 #: modules/gui/skins/src/skin_main.cpp:356
-#: modules/gui/skins/src/skin_main.cpp:357
 msgid "Show application in taskbar"
 msgstr ""
 
-#: modules/gui/skins/src/skin_main.cpp:368
+#: modules/gui/skins/src/skin_main.cpp:367
 #, fuzzy
 msgid "Skinnable Interface"
 msgstr "Grensesnitt"
@@ -5240,10 +5285,6 @@ msgstr "Standard grensesnitt: "
 msgid "Using the logger interface plugin..."
 msgstr ""
 
-#: modules/misc/memcpy/memcpyaltivec.c:52
-msgid "AltiVec memcpy"
-msgstr ""
-
 #: modules/misc/memcpy/memcpy.c:81
 msgid "libc memcpy"
 msgstr ""
@@ -5258,6 +5299,10 @@ msgstr ""
 
 #: modules/misc/memcpy/memcpy.c:97
 msgid "MMX EXT memcpy"
+msgstr ""
+
+#: modules/misc/memcpy/memcpyaltivec.c:52
+msgid "AltiVec memcpy"
 msgstr ""
 
 #: modules/misc/network/ipv4.c:85
@@ -5283,11 +5328,7 @@ msgstr ""
 msgid "Qt Embedded GUI helper"
 msgstr "Standard grensesnitt: "
 
-#: modules/misc/sap.c:140
-msgid "SAP"
-msgstr ""
-
-#: modules/misc/sap.c:159
+#: modules/misc/sap.c:161
 #, fuzzy
 msgid "SAP interface"
 msgstr "_Gjem grensesnitt"
@@ -5329,7 +5370,7 @@ msgstr ""
 msgid "TS muxer (libdvbpsi)"
 msgstr ""
 
-#: modules/mux/ogg.c:54
+#: modules/mux/ogg.c:55
 msgid "Ogg/ogm muxer"
 msgstr ""
 
@@ -5357,6 +5398,11 @@ msgstr ""
 msgid "MPEG-I/II video packetizer"
 msgstr ""
 
+#: modules/packetizer/vorbis.c:89
+#, fuzzy
+msgid "Vorbis audio packetizer"
+msgstr "Standard grensesnitt: "
+
 #: modules/stream_out/display.c:50
 #, fuzzy
 msgid "Display stream"
@@ -5377,7 +5423,7 @@ msgstr "Spill strøm"
 msgid "ES stream"
 msgstr "Stopp strøm"
 
-#: modules/stream_out/standard.c:49
+#: modules/stream_out/standard.c:51
 #, fuzzy
 msgid "Standard stream"
 msgstr "Stopp strøm"
@@ -5886,10 +5932,6 @@ msgstr "xosd modulgrensesnitt"
 #~ msgstr "Video"
 
 #, fuzzy
-#~ msgid "SAP interface module"
-#~ msgstr "Standard grensesnitt: "
-
-#, fuzzy
 #~ msgid "mpga"
 #~ msgstr "mpeg"
 
@@ -5926,10 +5968,6 @@ msgstr "xosd modulgrensesnitt"
 #, fuzzy
 #~ msgid "Device &name:"
 #~ msgstr "Enhets navn:"
-
-#, fuzzy
-#~ msgid "Starting position"
-#~ msgstr "Startposisjon"
 
 #, fuzzy
 #~ msgid "&Title:"

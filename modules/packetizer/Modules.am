@@ -1,7 +1,7 @@
-SOURCES_packetizer_copy = modules/packetizer/copy.c
-SOURCES_packetizer_a52 = modules/packetizer/a52.c
-SOURCES_packetizer_mpegaudio = modules/packetizer/mpegaudio.c
-SOURCES_packetizer_mpegvideo = modules/packetizer/mpegvideo.c
-SOURCES_packetizer_mpeg4video = modules/packetizer/mpeg4video.c
-SOURCES_packetizer_mpeg4audio = modules/packetizer/mpeg4audio.c
-SOURCES_packetizer_vorbis = modules/packetizer/vorbis.c
+SOURCES_packetizer_copy = copy.c
+SOURCES_packetizer_a52 = a52.c
+SOURCES_packetizer_mpegaudio = mpegaudio.c
+SOURCES_packetizer_mpegvideo = mpegvideo.c
+SOURCES_packetizer_mpeg4video = mpeg4video.c
+SOURCES_packetizer_mpeg4audio = mpeg4audio.c
+SOURCES_packetizer_vorbis = vorbis.c

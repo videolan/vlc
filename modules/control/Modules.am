@@ -1,2 +1,2 @@
-SOURCES_gestures = modules/control/gestures.c
-SOURCES_http = modules/control/http.c
+SOURCES_gestures = gestures.c
+SOURCES_http = http.c

@@ -7,7 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.73.3\n"
-"POT-Creation-Date: 2003-06-22 18:09+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-06-26 15:42+0200\n"
 "PO-Revision-Date: 2002-04-18 23:38+0100\n"
 "Last-Translator: Felix Kühne <fk@aenneburghardt.de>\n"
 "Language-Team: \n"
@@ -15,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: include/interface.h:72
+#: include/vlc_interface.h:72
 #, fuzzy
 msgid ""
 "\n"
@@ -125,7 +126,7 @@ msgid "Program"
 msgstr "Programm"
 
 #: src/input/input_programs.c:98 modules/demux/asf/libasf.c:696
-#: modules/gui/beos/MediaControlView.cpp:1258
+#: modules/demux/mkv.cpp:2265 modules/gui/beos/MediaControlView.cpp:1258
 #: modules/gui/gtk/gnome_interface.c:1650 modules/gui/gtk/gtk_interface.c:1956
 #: modules/gui/gtk/menu.c:1402 modules/gui/gtk/menu.c:1423
 #: modules/gui/kde/interface.cpp:144 modules/gui/macosx/intf.m:373
@@ -1085,19 +1086,20 @@ msgstr "Oberfläche"
 
 #: src/libvlc.h:458 modules/audio_output/coreaudio.c:227
 #: modules/audio_output/file.c:108 modules/demux/asf/asf.c:228
-#: modules/demux/ogg.c:555 modules/demux/ogg.c:825 modules/demux/ogg.c:998
-#: modules/gui/beos/InterfaceWindow.cpp:259
+#: modules/demux/mkv.cpp:2295 modules/demux/ogg.c:557 modules/demux/ogg.c:829
+#: modules/demux/ogg.c:1002 modules/gui/beos/InterfaceWindow.cpp:259
 #: modules/gui/gtk/gnome_interface.c:1092 modules/gui/gtk/gtk_interface.c:1219
 #: modules/gui/macosx/intf.m:378 modules/gui/macosx/output.m:155
 msgid "Audio"
 msgstr "Ton"
 
-#: src/libvlc.h:477 modules/demux/asf/asf.c:302 modules/demux/avi/avi.c:1203
-#: modules/demux/ogg.c:625 modules/demux/ogg.c:665 modules/demux/ogg.c:730
-#: modules/demux/ogg.c:905 modules/gui/gtk/gnome_interface.c:1099
-#: modules/gui/gtk/gtk_interface.c:1296 modules/gui/macosx/intf.m:389
-#: modules/gui/macosx/macosx.m:68 modules/gui/macosx/output.m:144
-#: modules/misc/dummy/dummy.c:81 modules/video_output/directx/directx.c:112
+#: src/libvlc.h:477 modules/demux/asf/asf.c:302 modules/demux/avi/avi.c:1208
+#: modules/demux/mkv.cpp:2311 modules/demux/ogg.c:629 modules/demux/ogg.c:669
+#: modules/demux/ogg.c:734 modules/demux/ogg.c:909
+#: modules/gui/gtk/gnome_interface.c:1099 modules/gui/gtk/gtk_interface.c:1296
+#: modules/gui/macosx/intf.m:389 modules/gui/macosx/macosx.m:68
+#: modules/gui/macosx/output.m:144 modules/misc/dummy/dummy.c:81
+#: modules/video_output/directx/directx.c:112
 msgid "Video"
 msgstr "Bild"
 
@@ -1363,39 +1365,6 @@ msgstr ""
 msgid "Microsoft Media Server (MMS) input"
 msgstr "Microsoft Media Server (MMS) Input"
 
-#: modules/access_output/dummy.c:56
-msgid "Dummy stream ouput"
-msgstr "Dummy-Streamausgabe"
-
-#: modules/access_output/file.c:66
-msgid "File stream ouput"
-msgstr "Datei-Streamausgabe"
-
-#: modules/access_output/http.c:54
-msgid "HTTP stream ouput"
-msgstr "HTTP-Streamausgabe"
-
-#: modules/access_output/udp.c:74 modules/access/udp.c:72
-msgid "caching value in ms"
-msgstr "zwischenspeichern des Werts in ms"
-
-#: modules/access_output/udp.c:76 modules/access/udp.c:74
-msgid ""
-"Allows you to modify the default caching value for udp streams. This value "
-"should be set in miliseconds units."
-msgstr ""
-"Erlaubt Ihnen den Standard-Zwischenspeicher-Wert für UDP streams zu ändern. "
-"Dieser Wert sollte in Millisekunden sein."
-
-#: modules/access_output/udp.c:80
-msgid "UDP stream ouput"
-msgstr "UDP-Streamausgabe"
-
-#: modules/access_output/udp.c:81
-#, fuzzy
-msgid "udp stream output"
-msgstr "Stream-Ausgabe benutzen"
-
 #: modules/access/pvr/pvr.c:74
 msgid "Hauppauge PVR cards input"
 msgstr "Hauppauge PVR-Karten Input"
@@ -1444,6 +1413,18 @@ msgstr "SLP Input"
 msgid "slp"
 msgstr "slp"
 
+#: modules/access/udp.c:72 modules/access_output/udp.c:74
+msgid "caching value in ms"
+msgstr "zwischenspeichern des Werts in ms"
+
+#: modules/access/udp.c:74 modules/access_output/udp.c:76
+msgid ""
+"Allows you to modify the default caching value for udp streams. This value "
+"should be set in miliseconds units."
+msgstr ""
+"Erlaubt Ihnen den Standard-Zwischenspeicher-Wert für UDP streams zu ändern. "
+"Dieser Wert sollte in Millisekunden sein."
+
 #: modules/access/udp.c:78
 msgid "UDP/RTP input"
 msgstr "UDP/RTP Input"
@@ -1475,6 +1456,35 @@ msgstr "Video4Linux Demuxer"
 #: modules/access/vcd/vcd.c:79
 msgid "VCD input"
 msgstr "VCD Input"
+
+#: modules/access/vlcs.c:131 modules/misc/sap.c:142
+msgid "SAP"
+msgstr "SAP"
+
+#: modules/access/vlcs.c:134
+msgid "SAP interface module"
+msgstr "SAP Oberflächen Modul"
+
+#: modules/access_output/dummy.c:56
+msgid "Dummy stream ouput"
+msgstr "Dummy-Streamausgabe"
+
+#: modules/access_output/file.c:66
+msgid "File stream ouput"
+msgstr "Datei-Streamausgabe"
+
+#: modules/access_output/http.c:54
+msgid "HTTP stream ouput"
+msgstr "HTTP-Streamausgabe"
+
+#: modules/access_output/udp.c:80
+msgid "UDP stream ouput"
+msgstr "UDP-Streamausgabe"
+
+#: modules/access_output/udp.c:81
+#, fuzzy
+msgid "udp stream output"
+msgstr "Stream-Ausgabe benutzen"
 
 #: modules/audio_filter/channel_mixer/headphone.c:48
 msgid "Characteristic dimension"
@@ -1675,7 +1685,7 @@ msgstr "5.1"
 msgid "2 Front 2 Rear"
 msgstr "2 Vorder- und 2 Rückseiten"
 
-#: modules/audio_output/esd.c:64
+#: modules/audio_output/esd.c:66
 msgid "EsounD audio output"
 msgstr "EsounD Tonausgabe"
 
@@ -1927,13 +1937,13 @@ msgstr "MPEG audio layer I/II/III parser"
 msgid "MPEG I/II layer 1/2 audio decoder"
 msgstr "MPEG I/II layer 1/2 - Tondekoder"
 
-#: modules/codec/mpeg_video/idct/idctaltivec.c:45
-msgid "AltiVec IDCT"
-msgstr "AltiVec IDCT"
-
 #: modules/codec/mpeg_video/idct/idct.c:41
 msgid "IDCT"
 msgstr "IDCT"
+
+#: modules/codec/mpeg_video/idct/idctaltivec.c:45
+msgid "AltiVec IDCT"
+msgstr "AltiVec IDCT"
 
 #: modules/codec/mpeg_video/idct/idctclassic.c:41
 msgid "classic IDCT"
@@ -1947,6 +1957,10 @@ msgstr "MMX IDCT"
 msgid "MMX EXT IDCT"
 msgstr "MMX EXT IDCT"
 
+#: modules/codec/mpeg_video/motion/motion.c:42
+msgid "motion compensation"
+msgstr "Bewegungsausgleich"
+
 #: modules/codec/mpeg_video/motion/motion3dnow.c:44
 msgid "3D Now! motion compensation"
 msgstr "3D Now! Bewegungsausgleich"
@@ -1954,10 +1968,6 @@ msgstr "3D Now! Bewegungsausgleich"
 #: modules/codec/mpeg_video/motion/motionaltivec.c:47
 msgid "AltiVec motion compensation"
 msgstr "AltiVec Bewegungsausgleich"
-
-#: modules/codec/mpeg_video/motion/motion.c:42
-msgid "motion compensation"
-msgstr "Bewegungsausgleich"
 
 #: modules/codec/mpeg_video/motion/motionmmx.c:45
 msgid "MMX motion compensation"
@@ -2202,17 +2212,17 @@ msgid "Layer"
 msgstr "Layer"
 
 #: modules/demux/aac/demux.c:562 modules/demux/asf/asf.c:275
-#: modules/demux/avi/avi.c:1171 modules/demux/ogg.c:833
-#: modules/demux/ogg.c:1006 modules/gui/gtk/gnome_interface.c:148
-#: modules/gui/gtk/gnome_interface.c:931 modules/gui/gtk/gtk_interface.c:481
-#: modules/gui/gtk/gtk_interface.c:1282
+#: modules/demux/avi/avi.c:1176 modules/demux/mkv.cpp:2299
+#: modules/demux/ogg.c:561 modules/demux/ogg.c:837 modules/demux/ogg.c:1010
+#: modules/gui/gtk/gnome_interface.c:148 modules/gui/gtk/gnome_interface.c:931
+#: modules/gui/gtk/gtk_interface.c:481 modules/gui/gtk/gtk_interface.c:1282
 msgid "Channels"
 msgstr "Kanäle"
 
 #: modules/demux/aac/demux.c:564 modules/demux/asf/asf.c:277
-#: modules/demux/avi/avi.c:1173 modules/demux/mpeg/audio.c:632
-#: modules/demux/ogg.c:557 modules/demux/ogg.c:667 modules/demux/ogg.c:828
-#: modules/demux/ogg.c:1001
+#: modules/demux/avi/avi.c:1178 modules/demux/mkv.cpp:2303
+#: modules/demux/mpeg/audio.c:632 modules/demux/ogg.c:559
+#: modules/demux/ogg.c:671 modules/demux/ogg.c:832 modules/demux/ogg.c:1005
 msgid "Sample Rate"
 msgstr "Daten-/Symbolrate"
 
@@ -2220,24 +2230,27 @@ msgstr "Daten-/Symbolrate"
 msgid "ASF v1.0 demuxer (file only)"
 msgstr "ASF v1.0 Muxer (nur für Dateien)"
 
-#: modules/demux/asf/asf.c:165
+#: modules/demux/asf/asf.c:165 modules/demux/mkv.cpp:2283
 msgid "Number of streams"
 msgstr "Anzahl der Streams"
 
 #: modules/demux/asf/asf.c:228 modules/demux/asf/asf.c:302
-#: modules/demux/avi/avi.c:1167 modules/demux/avi/avi.c:1203
-#: modules/demux/avi/avi.c:1234 modules/demux/ogg.c:555
-#: modules/demux/ogg.c:625 modules/demux/ogg.c:665 modules/demux/ogg.c:730
-#: modules/demux/ogg.c:825 modules/demux/ogg.c:905 modules/demux/ogg.c:998
-#: modules/gui/familiar/interface.c:370 modules/gui/macosx/output.m:134
+#: modules/demux/avi/avi.c:1172 modules/demux/avi/avi.c:1208
+#: modules/demux/avi/avi.c:1239 modules/demux/mkv.cpp:2295
+#: modules/demux/mkv.cpp:2311 modules/demux/mkv.cpp:2327
+#: modules/demux/ogg.c:557 modules/demux/ogg.c:629 modules/demux/ogg.c:669
+#: modules/demux/ogg.c:734 modules/demux/ogg.c:829 modules/demux/ogg.c:909
+#: modules/demux/ogg.c:1002 modules/gui/familiar/interface.c:370
+#: modules/gui/macosx/output.m:134
 msgid "Type"
 msgstr "Typ"
 
 #: modules/demux/asf/asf.c:260 modules/demux/asf/asf.c:318
-#: modules/demux/avi/avi.c:1169 modules/demux/avi/avi.c:1204
-#: modules/demux/ogg.c:556 modules/demux/ogg.c:626 modules/demux/ogg.c:666
-#: modules/demux/ogg.c:731 modules/demux/ogg.c:826 modules/demux/ogg.c:906
-#: modules/demux/ogg.c:999
+#: modules/demux/avi/avi.c:1174 modules/demux/avi/avi.c:1209
+#: modules/demux/mkv.cpp:2296 modules/demux/mkv.cpp:2312
+#: modules/demux/mkv.cpp:2328 modules/demux/ogg.c:558 modules/demux/ogg.c:630
+#: modules/demux/ogg.c:670 modules/demux/ogg.c:735 modules/demux/ogg.c:830
+#: modules/demux/ogg.c:910 modules/demux/ogg.c:1003
 msgid "Codec"
 msgstr "Codec"
 
@@ -2245,7 +2258,8 @@ msgstr "Codec"
 msgid "Avg. byterate"
 msgstr "durchschnittliche Byte-Rate"
 
-#: modules/demux/asf/asf.c:282 modules/demux/avi/avi.c:1175
+#: modules/demux/asf/asf.c:282 modules/demux/avi/avi.c:1180
+#: modules/demux/mkv.cpp:2307
 msgid "Bits Per Sample"
 msgstr "Bits pro Sekunde"
 
@@ -2253,7 +2267,8 @@ msgstr "Bits pro Sekunde"
 msgid "Size"
 msgstr "Größe"
 
-#: modules/demux/asf/asf.c:335 modules/demux/avi/avi.c:1206
+#: modules/demux/asf/asf.c:335 modules/demux/avi/avi.c:1211
+#: modules/demux/mkv.cpp:2315
 msgid "Resolution"
 msgstr "Auflösung"
 
@@ -2261,7 +2276,7 @@ msgstr "Auflösung"
 msgid "Planes"
 msgstr "Ebenen"
 
-#: modules/demux/asf/asf.c:339 modules/demux/avi/avi.c:1212
+#: modules/demux/asf/asf.c:339 modules/demux/avi/avi.c:1217
 msgid "Bits Per Pixel"
 msgstr "Bits pro Pixel"
 
@@ -2326,24 +2341,24 @@ msgstr "Index-Erzeugung erzwingen"
 msgid "AVI demuxer"
 msgstr "AVI Muxer"
 
-#: modules/demux/avi/avi.c:1096
+#: modules/demux/avi/avi.c:1101
 msgid "Avi"
 msgstr "Avi"
 
-#: modules/demux/avi/avi.c:1097
+#: modules/demux/avi/avi.c:1102
 msgid "Number of Streams"
 msgstr "Anzahl der Streams"
 
-#: modules/demux/avi/avi.c:1098
+#: modules/demux/avi/avi.c:1103
 msgid "Flags"
 msgstr "Markierungen"
 
-#: modules/demux/avi/avi.c:1209 modules/demux/ogg.c:627
-#: modules/demux/ogg.c:733 modules/demux/ogg.c:908
+#: modules/demux/avi/avi.c:1214 modules/demux/ogg.c:631
+#: modules/demux/ogg.c:737 modules/demux/ogg.c:912
 msgid "Frame Rate"
 msgstr "Frame-Rate"
 
-#: modules/demux/avi/avi.c:1234
+#: modules/demux/avi/avi.c:1239
 msgid "Unknown"
 msgstr "Unbekannt"
 
@@ -2368,19 +2383,58 @@ msgstr "flac Bild/Ton-Trenner"
 msgid "playlist metademux"
 msgstr "Abspiellisten Meta-Bild/Ton-Trenner"
 
-#: modules/demux/mkv.cpp:83
+#: modules/demux/mkv.cpp:91
 #, fuzzy
 msgid "mkv-demuxer"
 msgstr "avi-Muxer"
 
-#: modules/demux/mkv.cpp:85 modules/demux/mkv.cpp:86
-msgid "Create index if no cues found"
+#: modules/demux/mkv.cpp:93 modules/demux/mkv.cpp:94
+msgid "Seek based on percent not time"
 msgstr ""
 
-#: modules/demux/mkv.cpp:87
+#: modules/demux/mkv.cpp:96
 #, fuzzy
 msgid "mka/mkv stream demuxer"
 msgstr "AAC Stream Bild/Ton-Trennung"
+
+#: modules/demux/mkv.cpp:2260 modules/gui/gtk/gnome_interface.c:2436
+#: modules/gui/gtk/gtk_interface.c:2857 modules/gui/wxwindows/playlist.cpp:148
+msgid "Duration"
+msgstr "Dauer"
+
+#: modules/demux/mkv.cpp:2269
+msgid "Date UTC"
+msgstr ""
+
+#: modules/demux/mkv.cpp:2273
+#, fuzzy
+msgid "Segment Filename"
+msgstr "Dateiname"
+
+#: modules/demux/mkv.cpp:2277
+#, fuzzy
+msgid "Muxing Application"
+msgstr "Über dieses Programm"
+
+#: modules/demux/mkv.cpp:2281
+#, fuzzy
+msgid "Writing Application"
+msgstr "Startposition"
+
+#: modules/demux/mkv.cpp:2319
+#, fuzzy
+msgid "Display Resolution"
+msgstr "Auflösung"
+
+#: modules/demux/mkv.cpp:2323
+#, fuzzy
+msgid "Frame Per Second"
+msgstr "Bilder pro Sekunde"
+
+#: modules/demux/mkv.cpp:2327 modules/gui/gtk/gnome_interface.c:1963
+#: modules/gui/gtk/gtk_interface.c:2278
+msgid "Subtitle"
+msgstr "Untertitel"
 
 #: modules/demux/mp4/mp4.c:59
 msgid "MP4 demuxer"
@@ -2457,40 +2511,40 @@ msgstr "ISO 13818-1 MPEG Transport Stream Eingabe"
 msgid "ISO 13818-1 MPEG Transport Stream input (libdvbpsi)"
 msgstr "ISO 13818-1 MPEG Transport Stream Eingabe (libdvbpsi)"
 
-#: modules/demux/ogg.c:187
+#: modules/demux/ogg.c:188
 msgid "ogg stream demuxer"
 msgstr "ogg-Stream Bild/Ton-Trennung"
 
-#: modules/demux/ogg.c:556
+#: modules/demux/ogg.c:558
 msgid "Vorbis"
 msgstr "Vorbis"
 
-#: modules/demux/ogg.c:559 modules/demux/ogg.c:629 modules/demux/ogg.c:669
-#: modules/demux/ogg.c:830 modules/demux/ogg.c:1003
+#: modules/demux/ogg.c:563 modules/demux/ogg.c:633 modules/demux/ogg.c:673
+#: modules/demux/ogg.c:834 modules/demux/ogg.c:1007
 msgid "Bit Rate"
 msgstr "Bit-Rate"
 
-#: modules/demux/ogg.c:626
+#: modules/demux/ogg.c:630
 msgid "Theora"
 msgstr "Theora"
 
-#: modules/demux/ogg.c:666
+#: modules/demux/ogg.c:670
 msgid "tarkin"
 msgstr "tarkin"
 
-#: modules/demux/ogg.c:735 modules/demux/ogg.c:910
+#: modules/demux/ogg.c:739 modules/demux/ogg.c:914
 msgid "Bit Count"
 msgstr "Bit-Menge"
 
-#: modules/demux/ogg.c:737 modules/demux/ogg.c:912
+#: modules/demux/ogg.c:741 modules/demux/ogg.c:916
 msgid "Width"
 msgstr "Breite"
 
-#: modules/demux/ogg.c:739 modules/demux/ogg.c:914
+#: modules/demux/ogg.c:743 modules/demux/ogg.c:918
 msgid "Height"
 msgstr "Höhe"
 
-#: modules/demux/ogg.c:835 modules/demux/ogg.c:1008
+#: modules/demux/ogg.c:839 modules/demux/ogg.c:1012
 msgid "Bits per Sample"
 msgstr "Bits pro Beispiel"
 
@@ -2897,8 +2951,8 @@ msgstr "Datei"
 
 #: modules/gui/beos/InterfaceWindow.cpp:240
 #: modules/gui/beos/PlayListWindow.cpp:84
-#: modules/gui/gtk2/gnome2_interface.c:113
-#: modules/gui/gtk/gnome_interface.c:2179 modules/gui/macosx/open.m:332
+#: modules/gui/gtk/gnome_interface.c:2179
+#: modules/gui/gtk2/gnome2_interface.c:113 modules/gui/macosx/open.m:332
 #: modules/gui/macosx/open.m:630 modules/gui/macosx/open.m:677
 msgid "Open File"
 msgstr "Datei öffnen"
@@ -3278,10 +3332,10 @@ msgstr ""
 "Der VideoLAN Client ist ein MPEG 1, MPEG 2, MP3 und DivX Player der sowohl "
 "lokale Dateien als auch Netzwerk-Quellen unterstützt."
 
-#: modules/gui/familiar/support.c:121 modules/gui/gtk2/gnome2_support.c:60
-#: modules/gui/gtk2/gnome2_support.c:85 modules/gui/gtk2/gtk2_support.c:90
-#: modules/gui/gtk2/gtk2_support.c:114 modules/gui/gtk/gnome_support.c:100
+#: modules/gui/familiar/support.c:121 modules/gui/gtk/gnome_support.c:100
 #: modules/gui/gtk/gnome_support.c:138 modules/gui/gtk/gtk_support.c:121
+#: modules/gui/gtk2/gnome2_support.c:60 modules/gui/gtk2/gnome2_support.c:85
+#: modules/gui/gtk2/gtk2_support.c:90 modules/gui/gtk2/gtk2_support.c:114
 #, c-format
 msgid "Couldn't find pixmap file: %s"
 msgstr "Konnte pixmap-Datei %s nicht finden"
@@ -3290,64 +3344,6 @@ msgstr "Konnte pixmap-Datei %s nicht finden"
 #, c-format
 msgid "Error loading pixmap file: %s"
 msgstr "Fehler beim Laden der pixmap Datei %s"
-
-#: modules/gui/gtk2/gnome2.c:54 modules/gui/gtk2/gtk2.c:55
-msgid "Gtk2 interface"
-msgstr "Gtk2 Oberfläche"
-
-#: modules/gui/gtk2/gnome2_interface.c:31
-msgid "_New"
-msgstr "_Neu"
-
-#: modules/gui/gtk2/gnome2_interface.c:87
-msgid "gnome2"
-msgstr "gnome2"
-
-#: modules/gui/gtk2/gnome2_interface.c:112
-msgid "button4"
-msgstr "button4"
-
-#: modules/gui/gtk2/gnome2_interface.c:122
-#: modules/gui/gtk2/gtk2_interface.c:183
-msgid "button3"
-msgstr "button3"
-
-#: modules/gui/gtk2/gnome2_interface.c:123 modules/gui/macosx/output.m:337
-msgid "Save File"
-msgstr "Datei sichern"
-
-#: modules/gui/gtk2/gtk2_interface.c:67
-msgid "window1"
-msgstr "Fenster 1"
-
-#: modules/gui/gtk2/gtk2_interface.c:77 modules/gui/gtk/gtk_interface.c:147
-#: modules/gui/gtk/gtk_interface.c:1373
-msgid "_File"
-msgstr "_Datei"
-
-#: modules/gui/gtk2/gtk2_interface.c:109
-msgid "_Edit"
-msgstr "_Bearbeiten"
-
-#: modules/gui/gtk2/gtk2_interface.c:132 modules/gui/gtk/gtk_interface.c:268
-msgid "_View"
-msgstr "_Ansicht"
-
-#: modules/gui/gtk2/gtk2_interface.c:139 modules/gui/gtk/gtk_interface.c:569
-msgid "_Help"
-msgstr "_Hilfe"
-
-#: modules/gui/gtk2/gtk2_interface.c:146
-msgid "_About"
-msgstr "_Über..."
-
-#: modules/gui/gtk2/gtk2_interface.c:163
-msgid "button1"
-msgstr "button1"
-
-#: modules/gui/gtk2/gtk2_interface.c:173
-msgid "button2"
-msgstr "button2"
 
 #: modules/gui/gtk/gnome.c:55 modules/gui/gtk/gtk.c:57
 msgid "Show tooltips"
@@ -3819,10 +3815,6 @@ msgstr "Horizontal"
 msgid "Satellite"
 msgstr "Satellit"
 
-#: modules/gui/gtk/gnome_interface.c:1963 modules/gui/gtk/gtk_interface.c:2278
-msgid "Subtitle"
-msgstr "Untertitel"
-
 #: modules/gui/gtk/gnome_interface.c:2005 modules/gui/gtk/gtk_interface.c:2322
 #: modules/gui/macosx/open.m:175
 msgid "delay"
@@ -3882,11 +3874,6 @@ msgstr "Löschen"
 #: modules/gui/gtk/gnome_interface.c:2359 modules/gui/gtk/gtk_interface.c:2782
 msgid "Selection"
 msgstr "Auswahl"
-
-#: modules/gui/gtk/gnome_interface.c:2436 modules/gui/gtk/gtk_interface.c:2857
-#: modules/gui/wxwindows/playlist.cpp:148
-msgid "Duration"
-msgstr "Dauer"
 
 #: modules/gui/gtk/gnome_interface.c:2588
 msgid "Jump to: "
@@ -3959,6 +3946,11 @@ msgstr "Gtk+"
 msgid "Gtk+ interface"
 msgstr "Gtk+ Oberfläche"
 
+#: modules/gui/gtk/gtk_interface.c:147 modules/gui/gtk/gtk_interface.c:1373
+#: modules/gui/gtk2/gtk2_interface.c:77
+msgid "_File"
+msgstr "_Datei"
+
 #: modules/gui/gtk/gtk_interface.c:238
 msgid "_Close"
 msgstr "_Schließen"
@@ -3974,6 +3966,10 @@ msgstr "B_eenden"
 #: modules/gui/gtk/gtk_interface.c:261
 msgid "Exit the program"
 msgstr "Programm beenden"
+
+#: modules/gui/gtk/gtk_interface.c:268 modules/gui/gtk2/gtk2_interface.c:132
+msgid "_View"
+msgstr "_Ansicht"
 
 #: modules/gui/gtk/gtk_interface.c:294
 msgid "Hide the main interface window"
@@ -3994,6 +3990,10 @@ msgstr "_Einstellungen..."
 #: modules/gui/gtk/gtk_interface.c:411
 msgid "Configure the application"
 msgstr "Programm einstellen"
+
+#: modules/gui/gtk/gtk_interface.c:569 modules/gui/gtk2/gtk2_interface.c:139
+msgid "_Help"
+msgstr "_Hilfe"
 
 #: modules/gui/gtk/gtk_interface.c:587 modules/gui/gtk/gtk_interface.c:1435
 msgid "_About..."
@@ -4098,6 +4098,51 @@ msgstr "Einstellen"
 #: modules/gui/gtk/preferences.c:394 modules/gui/kde/pluginsbox.cpp:51
 msgid "Selected:"
 msgstr "Ausgewählt:"
+
+#: modules/gui/gtk2/gnome2.c:54 modules/gui/gtk2/gtk2.c:55
+msgid "Gtk2 interface"
+msgstr "Gtk2 Oberfläche"
+
+#: modules/gui/gtk2/gnome2_interface.c:31
+msgid "_New"
+msgstr "_Neu"
+
+#: modules/gui/gtk2/gnome2_interface.c:87
+msgid "gnome2"
+msgstr "gnome2"
+
+#: modules/gui/gtk2/gnome2_interface.c:112
+msgid "button4"
+msgstr "button4"
+
+#: modules/gui/gtk2/gnome2_interface.c:122
+#: modules/gui/gtk2/gtk2_interface.c:183
+msgid "button3"
+msgstr "button3"
+
+#: modules/gui/gtk2/gnome2_interface.c:123 modules/gui/macosx/output.m:337
+msgid "Save File"
+msgstr "Datei sichern"
+
+#: modules/gui/gtk2/gtk2_interface.c:67
+msgid "window1"
+msgstr "Fenster 1"
+
+#: modules/gui/gtk2/gtk2_interface.c:109
+msgid "_Edit"
+msgstr "_Bearbeiten"
+
+#: modules/gui/gtk2/gtk2_interface.c:146
+msgid "_About"
+msgstr "_Über..."
+
+#: modules/gui/gtk2/gtk2_interface.c:163
+msgid "button1"
+msgstr "button1"
+
+#: modules/gui/gtk2/gtk2_interface.c:173
+msgid "button2"
+msgstr "button2"
 
 #: modules/gui/kde/interface.cpp:88
 msgid "Languages"
@@ -4525,27 +4570,27 @@ msgstr "QT Oberfläche"
 msgid "Open a skin file"
 msgstr "Eine Skin-Datei öffnen"
 
+#: modules/gui/skins/src/skin_main.cpp:349
 #: modules/gui/skins/src/skin_main.cpp:350
-#: modules/gui/skins/src/skin_main.cpp:351
 msgid "Last skin actually used"
 msgstr "Zuletzt benutzter Skin"
 
+#: modules/gui/skins/src/skin_main.cpp:351
 #: modules/gui/skins/src/skin_main.cpp:352
-#: modules/gui/skins/src/skin_main.cpp:353
 msgid "Config of last used skin"
 msgstr "Konfiguration des letzten Skins"
 
+#: modules/gui/skins/src/skin_main.cpp:353
 #: modules/gui/skins/src/skin_main.cpp:354
-#: modules/gui/skins/src/skin_main.cpp:355
 msgid "Show application in system tray"
 msgstr "Programm im System-Tray anzeigen"
 
+#: modules/gui/skins/src/skin_main.cpp:355
 #: modules/gui/skins/src/skin_main.cpp:356
-#: modules/gui/skins/src/skin_main.cpp:357
 msgid "Show application in taskbar"
 msgstr "Programm in der Taskleiste anzeigen"
 
-#: modules/gui/skins/src/skin_main.cpp:368
+#: modules/gui/skins/src/skin_main.cpp:367
 msgid "Skinnable Interface"
 msgstr "mit Skins anpassbare Oberfläche"
 
@@ -5025,10 +5070,6 @@ msgstr "Interface-Aktionen in Datei mitschreiben"
 msgid "Using the logger interface plugin..."
 msgstr "Das Benutzeroberflächen-Aufzeichnungs-PlugIn benutzen..."
 
-#: modules/misc/memcpy/memcpyaltivec.c:52
-msgid "AltiVec memcpy"
-msgstr "AltiVec memcpy"
-
 #: modules/misc/memcpy/memcpy.c:81
 msgid "libc memcpy"
 msgstr "libc memcpy"
@@ -5044,6 +5085,10 @@ msgstr "MMX memcpy"
 #: modules/misc/memcpy/memcpy.c:97
 msgid "MMX EXT memcpy"
 msgstr "MMX EXT memcpy"
+
+#: modules/misc/memcpy/memcpyaltivec.c:52
+msgid "AltiVec memcpy"
+msgstr "AltiVec memcpy"
 
 #: modules/misc/network/ipv4.c:85
 msgid "IPv4 network abstraction layer"
@@ -5069,11 +5114,7 @@ msgstr ""
 msgid "Qt Embedded GUI helper"
 msgstr "Integrierte QT Hilfe"
 
-#: modules/misc/sap.c:140
-msgid "SAP"
-msgstr "SAP"
-
-#: modules/misc/sap.c:159
+#: modules/misc/sap.c:161
 msgid "SAP interface"
 msgstr "SAP Benutzeroberfläche"
 
@@ -5113,7 +5154,7 @@ msgstr "TS Muxer"
 msgid "TS muxer (libdvbpsi)"
 msgstr "TS Muxer (libdvbpsi)"
 
-#: modules/mux/ogg.c:54
+#: modules/mux/ogg.c:55
 msgid "Ogg/ogm muxer"
 msgstr "Ogg/ogm Muxer"
 
@@ -5141,6 +5182,11 @@ msgstr "MPEG I/II - Ton-Packetizer"
 msgid "MPEG-I/II video packetizer"
 msgstr "MPEG I/II Video Packetizer"
 
+#: modules/packetizer/vorbis.c:89
+#, fuzzy
+msgid "Vorbis audio packetizer"
+msgstr "A/52 Ton-Packetizer"
+
 #: modules/stream_out/display.c:50
 msgid "Display stream"
 msgstr "Stream anzeigen"
@@ -5157,7 +5203,7 @@ msgstr "Stream duplizieren"
 msgid "ES stream"
 msgstr "ES Stream"
 
-#: modules/stream_out/standard.c:49
+#: modules/stream_out/standard.c:51
 msgid "Standard stream"
 msgstr "Standard Stream"
 
@@ -5720,9 +5766,6 @@ msgstr "xosd Oberfläche"
 #~ msgid "Video Track"
 #~ msgstr "Bildspur"
 
-#~ msgid "SAP interface module"
-#~ msgstr "SAP Oberflächen Modul"
-
 #~ msgid "mpga"
 #~ msgstr "mpga"
 
@@ -5780,9 +5823,6 @@ msgstr "xosd Oberfläche"
 
 #~ msgid "&Menus"
 #~ msgstr "&Menüs"
-
-#~ msgid "Starting position"
-#~ msgstr "Startposition"
 
 #~ msgid "&Title:"
 #~ msgstr "&Titel:"

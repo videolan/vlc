@@ -1,6 +1,6 @@
 SOURCES_encoder_ffmpeg = \
-	modules/encoder/ffmpeg/encoder.c \
-	modules/encoder/ffmpeg/video.c \
-	modules/encoder/ffmpeg/audio.c \
+	encoder.c \
+	video.c \
+	audio.c \
 	$(NULL)
 

@@ -1,2 +1,1 @@
-SOURCES_pvr = modules/access/pvr/pvr.c \
-	modules/access/pvr/videodev2.h
+SOURCES_pvr = pvr.c videodev2.h

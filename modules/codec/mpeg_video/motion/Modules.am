@@ -1,5 +1,5 @@
-SOURCES_motion = modules/codec/mpeg_video/motion/motion.c
-SOURCES_motionmmx = modules/codec/mpeg_video/motion/motionmmx.c
-SOURCES_motionmmxext = modules/codec/mpeg_video/motion/motionmmxext.c
-SOURCES_motion3dnow = modules/codec/mpeg_video/motion/motion3dnow.c
-SOURCES_motionaltivec = modules/codec/mpeg_video/motion/motionaltivec.c
+SOURCES_motion = motion.c
+SOURCES_motionmmx = motionmmx.c
+SOURCES_motionmmxext = motionmmxext.c
+SOURCES_motion3dnow = motion3dnow.c
+SOURCES_motionaltivec = motionaltivec.c

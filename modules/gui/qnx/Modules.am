@@ -1,4 +1,4 @@
 SOURCES_qnx = \
-	modules/gui/qnx/qnx.c \
-	modules/gui/qnx/aout.c \
-	modules/gui/qnx/vout.c
+	qnx.c \
+	aout.c \
+	vout.c

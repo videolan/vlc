@@ -1,6 +1,6 @@
 SOURCES_dvdread = \
-	modules/access/dvdread/dvdread.c \
-	modules/access/dvdread/input.c \
-	modules/access/dvdread/input.h \
+	dvdread.c \
+	input.c \
+	input.h \
 	$(NULL)
 

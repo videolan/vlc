@@ -1,1 +1,1 @@
-SOURCES_logger = modules/misc/logger/logger.c
+SOURCES_logger = logger.c

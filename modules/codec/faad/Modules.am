@@ -1,4 +1,4 @@
 SOURCES_faad = \
-	modules/codec/faad/decoder.c \
-	modules/codec/faad/decoder.h \
+	decoder.c \
+	decoder.h \
 	$(NULL)

@@ -1,7 +1,7 @@
 SOURCES_satellite = \
-	modules/access/satellite/satellite.c \
-	modules/access/satellite/access.c \
-	modules/access/satellite/dvb.c \
-	modules/access/satellite/dvb.h \
+	satellite.c \
+	access.c \
+	dvb.c \
+	dvb.h \
 	$(NULL)
 

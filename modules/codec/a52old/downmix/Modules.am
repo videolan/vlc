@@ -1,18 +1,18 @@
 SOURCES_downmix = \
-	modules/codec/a52old/downmix/downmix.c \
-	modules/codec/a52old/downmix/downmix_c.c \
-	modules/codec/a52old/downmix/downmix_common.h \
+	downmix.c \
+	downmix_c.c \
+	downmix_common.h \
 	$(NULL)
 
 SOURCES_downmixsse = \
-	modules/codec/a52old/downmix/downmix.c \
-	modules/codec/a52old/downmix/downmix_sse.c \
-	modules/codec/a52old/downmix/downmix_common.h \
+	downmix.c \
+	downmix_sse.c \
+	downmix_common.h \
 	$(NULL)
 
 SOURCES_downmix3dn = \
-	modules/codec/a52old/downmix/downmix.c \
-	modules/codec/a52old/downmix/downmix_3dn.c \
-	modules/codec/a52old/downmix/downmix_common.h \
+	downmix.c \
+	downmix_3dn.c \
+	downmix_common.h \
 	$(NULL)
 

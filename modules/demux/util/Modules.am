@@ -1,14 +1,14 @@
 SOURCES_id3 = \
-	modules/demux/util/id3.c \
+	id3.c \
 	$(NULL)
 
 SOURCES_id3tag = \
-	modules/demux/util/id3tag.c \
-	modules/demux/util/id3genres.h \
+	id3tag.c \
+	id3genres.h \
 	$(NULL)
 
 SOURCES_demuxsub = \
-	modules/demux/util/sub.c \
-	modules/demux/util/sub.h \
+	sub.c \
+	sub.h \
 	$(NULL)
 

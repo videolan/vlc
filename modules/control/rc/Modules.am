@@ -1,1 +1,1 @@
-SOURCES_rc = modules/control/rc/rc.c
+SOURCES_rc = rc.c

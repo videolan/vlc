@@ -1,1 +1,1 @@
-SOURCES_encoder_xvid = modules/encoder/xvid.c
+SOURCES_encoder_xvid = xvid.c

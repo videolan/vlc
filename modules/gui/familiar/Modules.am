@@ -1,16 +1,16 @@
 SOURCES_familiar = \
-	modules/gui/familiar/familiar.c \
-	modules/gui/familiar/familiar.h \
-	modules/gui/familiar/interface.c \
-	modules/gui/familiar/interface.h \
-	modules/gui/familiar/support.c \
-	modules/gui/familiar/support.h \
-	modules/gui/familiar/callbacks.c \
-	modules/gui/familiar/callbacks.h \
-        modules/gui/familiar/network.c \
-        modules/gui/familiar/network.h \
-        modules/gui/familiar/playlist.c \
-        modules/gui/familiar/playlist.h \
+	familiar.c \
+	familiar.h \
+	interface.c \
+	interface.h \
+	support.c \
+	support.h \
+	callbacks.c \
+	callbacks.h \
+        network.c \
+        network.h \
+        playlist.c \
+        playlist.h \
 	$(NULL)
 
-EXTRA_DIST += modules/gui/familiar/familiar.glade
+EXTRA_DIST += familiar.glade

@@ -1,1 +1,1 @@
-SOURCES_ncurses = modules/gui/ncurses/ncurses.c
+SOURCES_ncurses = ncurses.c

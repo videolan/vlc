@@ -1,8 +1,8 @@
-SOURCES_a52sys = modules/demux/a52sys.c
-SOURCES_flac = modules/demux/flac.c
-SOURCES_ogg = modules/demux/ogg.c
-SOURCES_m3u = modules/demux/m3u.c
-SOURCES_demuxdump = modules/demux/demuxdump.c
-SOURCES_rawdv = modules/demux/rawdv.c
-SOURCES_au = modules/demux/au.c
-SOURCES_mkv = modules/demux/mkv.cpp
+SOURCES_a52sys = a52sys.c
+SOURCES_flac = flac.c
+SOURCES_ogg = ogg.c
+SOURCES_m3u = m3u.c
+SOURCES_demuxdump = demuxdump.c
+SOURCES_rawdv = rawdv.c
+SOURCES_au = au.c
+SOURCES_mkv = mkv.cpp

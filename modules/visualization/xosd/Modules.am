@@ -1,1 +1,1 @@
-SOURCES_xosd = modules/visualization/xosd/xosd.c
+SOURCES_xosd = xosd.c

@@ -1,13 +1,13 @@
 SOURCES_qt = \
-	modules/gui/qt/qt.cpp \
-	modules/gui/qt/intf.cpp
+	qt.cpp \
+	intf.cpp
 
 nodist_SOURCES_qt = \
-	modules/gui/qt/intf.moc.cpp
+	intf.moc.cpp
 
 noinst_HEADERS += \
-	modules/gui/qt/intf.h
+	intf.h
 
-modules/gui/qt/intf.moc.cpp: modules/gui/qt/intf.h
+intf.moc.cpp: intf.h
 	$(MOC) $< -o $@
 

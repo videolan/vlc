@@ -1,12 +1,12 @@
-SOURCES_access_file = modules/access/file.c
-SOURCES_access_directory = modules/access/directory.c
-SOURCES_access_udp = modules/access/udp.c
-SOURCES_access_http = modules/access/http.c
-SOURCES_access_ftp = modules/access/ftp.c
-SOURCES_slp = modules/access/slp.c
+SOURCES_access_file = file.c
+SOURCES_access_directory = directory.c
+SOURCES_access_udp = udp.c
+SOURCES_access_http = http.c
+SOURCES_access_ftp = ftp.c
+SOURCES_slp = slp.c
 SOURCES_cdda = \
-        modules/access/cdda.c \
-        modules/access/vcd/cdrom.c \
-        modules/access/vcd/cdrom.h \
-        modules/access/vcd/cdrom_internals.h \
+        cdda.c \
+        vcd/cdrom.c \
+        vcd/cdrom.h \
+        vcd/cdrom_internals.h \
         $(NULL)

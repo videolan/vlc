@@ -1,6 +1,6 @@
 SOURCES_vout_directx = \
-	modules/video_output/directx/directx.c \
-	modules/video_output/directx/vout.h \
-	modules/video_output/directx/events.c \
+	directx.c \
+	vout.h \
+	events.c \
 	$(NULL)
 

@@ -1,4 +1,4 @@
-$Id: HACKING,v 1.7 2003/06/21 17:04:20 sam Exp $
+$Id: HACKING,v 1.8 2003/06/27 13:50:07 sam Exp $
 
 Hacking vlc
 ===========
@@ -35,16 +35,19 @@ The bootstrap sequence
 
 The bootstrap script does the following actions:
 
- - browse the modules/ directory for all available modules. A module "foo"
-   exists if there is a Modules.am file in the modules/ directory which
-   defines SOURCES_foo.
+ - parse configure.ac for all Makefiles in the modules/ directory that need
+   to be generated, and look for available modules in the corresponding
+   Modules.am file. A module "foo" exists if there is a Modules.am file in
+   the modules/ directory which defines SOURCES_foo.
 
  - create a top-level Modules.am file (which will be included by Makefile.am)
    which contains additional build rules for modules, and includes all the
    Modules.am files that were found in modules/
 
- - create an m4/vlc.m4 from configure.ac, generating the AC_SUBST and
-   AM_CONDITIONAL rules that will be needed by configure.ac.
+ - create an m4/private.m4 from configure.ac, generating m4 macros that will
+   be needed by configure.ac.
+
+ - create a Makefile.am file for each Modules.am file found in modules/ .
 
  - run autopoint (previously gettextize) to create an intl/ directory,
    needed when libgettext is not available.

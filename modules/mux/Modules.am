@@ -1,3 +1,3 @@
-SOURCES_mux_dummy = modules/mux/dummy.c
-SOURCES_mux_avi = modules/mux/avi.c
-SOURCES_mux_ogg = modules/mux/ogg.c
+SOURCES_mux_dummy = dummy.c
+SOURCES_mux_avi = avi.c
+SOURCES_mux_ogg = ogg.c

@@ -1,13 +1,13 @@
 SOURCES_mpeg_audio = \
-	modules/codec/mpeg_audio/decoder.c \
-	modules/codec/mpeg_audio/decoder.h \
-	modules/codec/mpeg_audio/layer1.c \
-	modules/codec/mpeg_audio/layer1.h \
-	modules/codec/mpeg_audio/layer2.c \
-	modules/codec/mpeg_audio/layer2.h \
-	modules/codec/mpeg_audio/math.c \
-	modules/codec/mpeg_audio/math.h \
-	modules/codec/mpeg_audio/generic.c \
-	modules/codec/mpeg_audio/generic.h \
+	decoder.c \
+	decoder.h \
+	layer1.c \
+	layer1.h \
+	layer2.c \
+	layer2.h \
+	math.c \
+	math.h \
+	generic.c \
+	generic.h \
 	$(NULL)
 

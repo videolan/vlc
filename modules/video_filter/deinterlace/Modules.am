@@ -1,1 +1,1 @@
-SOURCES_deinterlace = modules/video_filter/deinterlace/deinterlace.c
+SOURCES_deinterlace = deinterlace.c

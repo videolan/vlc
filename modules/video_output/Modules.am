@@ -1,8 +1,8 @@
-SOURCES_aa = modules/video_output/aa.c
-SOURCES_fb = modules/video_output/fb.c
-SOURCES_ggi = modules/video_output/ggi.c
-SOURCES_glide = modules/video_output/glide.c
-SOURCES_vout_sdl = modules/video_output/sdl.c
-SOURCES_svgalib = modules/video_output/svgalib.c
-SOURCES_wingdi = modules/video_output/wingdi.c
-SOURCES_vout_encoder = modules/video_output/encoder.c
+SOURCES_aa = aa.c
+SOURCES_fb = fb.c
+SOURCES_ggi = ggi.c
+SOURCES_glide = glide.c
+SOURCES_vout_sdl = sdl.c
+SOURCES_svgalib = svgalib.c
+SOURCES_wingdi = wingdi.c
+SOURCES_vout_encoder = encoder.c

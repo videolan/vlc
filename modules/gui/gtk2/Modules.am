@@ -2,26 +2,26 @@ COMMON_gtk2 = \
 	$(NULL)
 
 SOURCES_gtk2 = \
-	modules/gui/gtk2/gtk2.c \
-	modules/gui/gtk2/gtk2_callbacks.c \
-	modules/gui/gtk2/gtk2_callbacks.h \
-	modules/gui/gtk2/gtk2_interface.c \
-	modules/gui/gtk2/gtk2_interface.h \
-	modules/gui/gtk2/gtk2_support.c \
-	modules/gui/gtk2/gtk2_support.h \
+	gtk2.c \
+	gtk2_callbacks.c \
+	gtk2_callbacks.h \
+	gtk2_interface.c \
+	gtk2_interface.h \
+	gtk2_support.c \
+	gtk2_support.h \
 	$(COMMON_gtk2)
 
 SOURCES_gnome2 = \
-	modules/gui/gtk2/gnome2.c \
-	modules/gui/gtk2/gnome2_callbacks.c \
-	modules/gui/gtk2/gnome2_callbacks.h \
-	modules/gui/gtk2/gnome2_interface.c \
-	modules/gui/gtk2/gnome2_interface.h \
-	modules/gui/gtk2/gnome2_support.c \
-	modules/gui/gtk2/gnome2_support.h \
+	gnome2.c \
+	gnome2_callbacks.c \
+	gnome2_callbacks.h \
+	gnome2_interface.c \
+	gnome2_interface.h \
+	gnome2_support.c \
+	gnome2_support.h \
 	$(COMMON_gtk2)
 
 EXTRA_DIST += \
-	modules/gui/gtk2/gtk2.glade \
-	modules/gui/gtk2/gnome2.glade \
+	gtk2.glade \
+	gnome2.glade \
 	$(NULL)

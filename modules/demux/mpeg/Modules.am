@@ -1,30 +1,30 @@
 SOURCES_mpeg_system = \
-	modules/demux/mpeg/system.c \
-	modules/demux/mpeg/system.h \
+	system.c \
+	system.h \
 	$(NULL)
 
 SOURCES_es = \
-	modules/demux/mpeg/es.c \
+	es.c \
 	$(NULL)
 
 SOURCES_m4v = \
-	modules/demux/mpeg/m4v.c \
+	m4v.c \
 	$(NULL)
 
 
 SOURCES_ps = \
-	modules/demux/mpeg/ps.c \
+	ps.c \
 	$(NULL)
 
 SOURCES_ts = \
-	modules/demux/mpeg/ts.c \
+	ts.c \
 	$(NULL)
 
 SOURCES_ts_dvbpsi = \
-	modules/demux/mpeg/ts.c \
+	ts.c \
 	$(NULL)
 
 SOURCES_audio = \
-	modules/demux/mpeg/audio.c \
+	audio.c \
 	$(NULL)
 

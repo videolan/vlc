@@ -1,1 +1,1 @@
-SOURCES_aac = modules/demux/aac/demux.c
+SOURCES_aac = demux.c

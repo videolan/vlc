@@ -1,17 +1,17 @@
-SOURCES_mux_ps = modules/mux/mpeg/ps.c \
-                 modules/mux/mpeg/pes.c \
-                 modules/mux/mpeg/pes.h \
-                 modules/mux/mpeg/bits.h \
+SOURCES_mux_ps = ps.c \
+                 pes.c \
+                 pes.h \
+                 bits.h \
                  $(NULL)
-SOURCES_mux_ts = modules/mux/mpeg/ts.c \
-                 modules/mux/mpeg/pes.c \
-                 modules/mux/mpeg/pes.h \
-                 modules/mux/mpeg/bits.h \
+SOURCES_mux_ts = ts.c \
+                 pes.c \
+                 pes.h \
+                 bits.h \
                  $(NULL)
 
-SOURCES_mux_ts_dvbpsi = modules/mux/mpeg/ts.c \
-                        modules/mux/mpeg/pes.c \
-                        modules/mux/mpeg/pes.h \
-                        modules/mux/mpeg/bits.h \
+SOURCES_mux_ts_dvbpsi = ts.c \
+                        pes.c \
+                        pes.h \
+                        bits.h \
                         $(NULL)
 

@@ -1,67 +1,70 @@
 SOURCES_kde = \
-	modules/gui/kde/kde.cpp \
-	modules/gui/kde/interface.cpp \
-	modules/gui/kde/slider.cpp \
-	modules/gui/kde/disc.cpp \
-	modules/gui/kde/net.cpp \
-	modules/gui/kde/menu.cpp \
-	modules/gui/kde/preferences.cpp \
-	modules/gui/kde/pluginsbox.cpp \
-	modules/gui/kde/QConfigItem.cpp \
-	modules/gui/kde/messages.cpp \
-	modules/gui/kde/info.cpp \
-	modules/gui/kde/languagemenu.cpp
+	kde.cpp \
+	interface.cpp \
+	slider.cpp \
+	disc.cpp \
+	net.cpp \
+	menu.cpp \
+	preferences.cpp \
+	pluginsbox.cpp \
+	QConfigItem.cpp \
+	messages.cpp \
+	info.cpp \
+	languagemenu.cpp \
+	$(NULL)
 
 nodist_SOURCES_kde = \
-	modules/gui/kde/interface.moc.cpp \
-	modules/gui/kde/slider.moc.cpp \
-	modules/gui/kde/disc.moc.cpp \
-	modules/gui/kde/net.moc.cpp \
-	modules/gui/kde/menu.moc.cpp \
-	modules/gui/kde/preferences.moc.cpp \
-	modules/gui/kde/pluginsbox.moc.cpp \
-	modules/gui/kde/QConfigItem.moc.cpp \
-	modules/gui/kde/messages.moc.cpp \
-	modules/gui/kde/info.moc.cpp \
-	modules/gui/kde/languagemenu.moc.cpp
+	interface.moc.cpp \
+	slider.moc.cpp \
+	disc.moc.cpp \
+	net.moc.cpp \
+	menu.moc.cpp \
+	preferences.moc.cpp \
+	pluginsbox.moc.cpp \
+	QConfigItem.moc.cpp \
+	messages.moc.cpp \
+	info.moc.cpp \
+	languagemenu.moc.cpp \
+	$(NULL)
 
 noinst_HEADERS += \
-	modules/gui/kde/common.h \
-	modules/gui/kde/disc.h \
-	modules/gui/kde/QConfigItem.h \
-	modules/gui/kde/interface.h \
-	modules/gui/kde/menu.h \
-	modules/gui/kde/net.h \
-	modules/gui/kde/pluginsbox.h \
-	modules/gui/kde/preferences.h \
-	modules/gui/kde/slider.h \
-	modules/gui/kde/messages.h \
-	modules/gui/kde/info.h \
-	modules/gui/kde/languagemenu.h
+	common.h \
+	disc.h \
+	QConfigItem.h \
+	interface.h \
+	menu.h \
+	net.h \
+	pluginsbox.h \
+	preferences.h \
+	slider.h \
+	messages.h \
+	info.h \
+	languagemenu.h \
+	$(NULL)
 
-modules/gui/kde/interface.moc.cpp: modules/gui/kde/interface.h
+interface.moc.cpp: interface.h
 	$(MOC) $< -o $@
-modules/gui/kde/slider.moc.cpp: modules/gui/kde/slider.h
+slider.moc.cpp: slider.h
 	$(MOC) $< -o $@
-modules/gui/kde/disc.moc.cpp: modules/gui/kde/disc.h
+disc.moc.cpp: disc.h
 	$(MOC) $< -o $@
-modules/gui/kde/net.moc.cpp: modules/gui/kde/net.h
+net.moc.cpp: net.h
 	$(MOC) $< -o $@
-modules/gui/kde/menu.moc.cpp: modules/gui/kde/menu.h
+menu.moc.cpp: menu.h
 	$(MOC) $< -o $@
-modules/gui/kde/preferences.moc.cpp: modules/gui/kde/preferences.h
+preferences.moc.cpp: preferences.h
 	$(MOC) $< -o $@
-modules/gui/kde/pluginsbox.moc.cpp: modules/gui/kde/pluginsbox.h
+pluginsbox.moc.cpp: pluginsbox.h
 	$(MOC) $< -o $@
-modules/gui/kde/QConfigItem.moc.cpp: modules/gui/kde/QConfigItem.h
+QConfigItem.moc.cpp: QConfigItem.h
 	$(MOC) $< -o $@
-modules/gui/kde/messages.moc.cpp: modules/gui/kde/messages.h
+messages.moc.cpp: messages.h
 	$(MOC) $< -o $@
-modules/gui/kde/info.moc.cpp: modules/gui/kde/info.h
+info.moc.cpp: info.h
 	$(MOC) $< -o $@
-modules/gui/kde/languagemenu.moc.cpp: modules/gui/kde/languagemenu.h
+languagemenu.moc.cpp: languagemenu.h
 	$(MOC) $< -o $@
 
 kdedatadir = $(datadir)/vlc
 
-dist_kdedata_DATA = modules/gui/kde/ui.rc
+dist_kdedata_DATA = ui.rc

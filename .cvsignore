@@ -15,10 +15,11 @@ config.status
 confdefs.h
 conftest.cc
 autom4te.cache
-Makefile
 Makefile.in
+Makefile
 Modules.am
 build-stamp
+configure-stamp
 stamp-h*
 aclocal.m4
 vlc-debug.*

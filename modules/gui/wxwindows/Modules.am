@@ -1,27 +1,27 @@
 SOURCES_wxwindows = \
-	modules/gui/wxwindows/wxwindows.cpp \
-	modules/gui/wxwindows/wxwindows.h \
-	modules/gui/wxwindows/interface.cpp \
-	modules/gui/wxwindows/open.cpp \
-	modules/gui/wxwindows/streamout.cpp \
-	modules/gui/wxwindows/messages.cpp \
-	modules/gui/wxwindows/playlist.cpp \
-	modules/gui/wxwindows/menus.cpp \
-	modules/gui/wxwindows/preferences.cpp \
-	modules/gui/wxwindows/timer.cpp \
-	modules/gui/wxwindows/fileinfo.cpp \
-	modules/gui/wxwindows/subtitles.cpp \
+	wxwindows.cpp \
+	wxwindows.h \
+	interface.cpp \
+	open.cpp \
+	streamout.cpp \
+	messages.cpp \
+	playlist.cpp \
+	menus.cpp \
+	preferences.cpp \
+	timer.cpp \
+	fileinfo.cpp \
+	subtitles.cpp \
 	$(NULL)
 
 EXTRA_DIST += \
-	modules/gui/wxwindows/bitmaps/file.xpm \
-	modules/gui/wxwindows/bitmaps/disc.xpm \
-	modules/gui/wxwindows/bitmaps/net.xpm \
-	modules/gui/wxwindows/bitmaps/stop.xpm \
-	modules/gui/wxwindows/bitmaps/play.xpm \
-	modules/gui/wxwindows/bitmaps/pause.xpm \
-	modules/gui/wxwindows/bitmaps/playlist.xpm \
-	modules/gui/wxwindows/bitmaps/previous.xpm \
-	modules/gui/wxwindows/bitmaps/next.xpm \
-	modules/gui/wxwindows/bitmaps/slow.xpm \
-	modules/gui/wxwindows/bitmaps/fast.xpm
+	bitmaps/file.xpm \
+	bitmaps/disc.xpm \
+	bitmaps/net.xpm \
+	bitmaps/stop.xpm \
+	bitmaps/play.xpm \
+	bitmaps/pause.xpm \
+	bitmaps/playlist.xpm \
+	bitmaps/previous.xpm \
+	bitmaps/next.xpm \
+	bitmaps/slow.xpm \
+	bitmaps/fast.xpm

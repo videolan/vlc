@@ -1,8 +1,8 @@
-SOURCES_gtk_main = modules/misc/gtk_main.c
-SOURCES_gnome_main = modules/misc/gtk_main.c
-SOURCES_gtk2_main = modules/misc/gtk_main.c
-SOURCES_gnome2_main = modules/misc/gtk_main.c
-SOURCES_sap = modules/misc/sap.c
-SOURCES_screensaver = modules/misc/screensaver.c
-SOURCES_qte_main = modules/misc/qte_main.cpp
-SOURCES_httpd = modules/misc/httpd.c
+SOURCES_gtk_main = gtk_main.c
+SOURCES_gnome_main = gtk_main.c
+SOURCES_gtk2_main = gtk_main.c
+SOURCES_gnome2_main = gtk_main.c
+SOURCES_sap = sap.c
+SOURCES_screensaver = screensaver.c
+SOURCES_qte_main = qte_main.cpp
+SOURCES_httpd = httpd.c

@@ -1,10 +1,10 @@
 SOURCES_ffmpeg = \
-	modules/codec/ffmpeg/ffmpeg.c \
-	modules/codec/ffmpeg/ffmpeg.h \
-	modules/codec/ffmpeg/video.c \
-	modules/codec/ffmpeg/video.h \
-	modules/codec/ffmpeg/audio.c \
-	modules/codec/ffmpeg/audio.h \
-	modules/codec/ffmpeg/chroma.c \
+	ffmpeg.c \
+	ffmpeg.h \
+	video.c \
+	video.h \
+	audio.c \
+	audio.h \
+	chroma.c \
 	$(NULL)
 

@@ -8,8 +8,8 @@ EXTRA_DIST += $(BORLAND_win32)
 # We have private rules! We do whatever we want! Don't mess with us!
 SOURCES_win32 = PRIVATE
 
-modules/gui/win32/libwin32_plugin.dll: $(BORLAND_win32)
-	cd modules/gui/win32/ && \
+libwin32_plugin.dll: $(BORLAND_win32)
+	cd && \
 	rm -f win32.mak && \
 	$(BPR2MAK) win32.bpr -s | \
 		sed -e 's@^LIBPATH = .*@&;$$(RELEASELIBPATH)@' \
@@ -18,45 +18,45 @@ modules/gui/win32/libwin32_plugin.dll: $(BORLAND_win32)
 	$(BCMAKE) -f win32.mak -b
 
 BORLAND_win32 = \
-	modules/gui/win32/win32.bpr \
-	modules/gui/win32/win32.bpf \
+	win32.bpr \
+	win32.bpf \
 	\
-	modules/gui/win32/about.cpp \
-	modules/gui/win32/disc.cpp \
-	modules/gui/win32/dragdrop.cpp \
-	modules/gui/win32/mainframe.cpp \
-	modules/gui/win32/menu.cpp \
-	modules/gui/win32/messages.cpp \
-	modules/gui/win32/network.cpp \
-	modules/gui/win32/playlist.cpp \
-	modules/gui/win32/preferences.cpp \
-	modules/gui/win32/win32.cpp \
-	modules/gui/win32/misc.cpp \
-	modules/gui/win32/sout.cpp \
-	modules/gui/win32/subtitles.cpp \
+	about.cpp \
+	disc.cpp \
+	dragdrop.cpp \
+	mainframe.cpp \
+	menu.cpp \
+	messages.cpp \
+	network.cpp \
+	playlist.cpp \
+	preferences.cpp \
+	win32.cpp \
+	misc.cpp \
+	sout.cpp \
+	subtitles.cpp \
 	\
-	modules/gui/win32/about.dfm \
-	modules/gui/win32/disc.dfm \
-	modules/gui/win32/mainframe.dfm \
-	modules/gui/win32/messages.dfm \
-	modules/gui/win32/network.dfm \
-	modules/gui/win32/playlist.dfm \
-	modules/gui/win32/preferences.dfm \
-	modules/gui/win32/sout.dfm \
-	modules/gui/win32/subtitles.dfm \
+	about.dfm \
+	disc.dfm \
+	mainframe.dfm \
+	messages.dfm \
+	network.dfm \
+	playlist.dfm \
+	preferences.dfm \
+	sout.dfm \
+	subtitles.dfm \
 	\
-	modules/gui/win32/about.h \
-	modules/gui/win32/disc.h \
-	modules/gui/win32/dragdrop.h \
-	modules/gui/win32/mainframe.h \
-	modules/gui/win32/menu.h \
-	modules/gui/win32/messages.h \
-	modules/gui/win32/network.h \
-	modules/gui/win32/playlist.h \
-	modules/gui/win32/preferences.h \
-	modules/gui/win32/win32_common.h \
-	modules/gui/win32/misc.h \
-	modules/gui/win32/sout.h \
-	modules/gui/win32/subtitles.h \
+	about.h \
+	disc.h \
+	dragdrop.h \
+	mainframe.h \
+	menu.h \
+	messages.h \
+	network.h \
+	playlist.h \
+	preferences.h \
+	win32_common.h \
+	misc.h \
+	sout.h \
+	subtitles.h \
 	$(NULL)
 

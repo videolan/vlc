@@ -1,24 +1,24 @@
 COMMON_imdct = \
-	modules/codec/a52old/imdct/imdct.c \
-	modules/codec/a52old/imdct/imdct_common.c
+	imdct.c \
+	imdct_common.c
 
 SOURCES_imdct = \
-	modules/codec/a52old/imdct/imdct_c.c \
-	modules/codec/a52old/imdct/srfft_c.c \
+	imdct_c.c \
+	srfft_c.c \
 	$(COMMON_imdct)
 
 SOURCES_imdctsse = \
-	modules/codec/a52old/imdct/imdct_sse.c \
-	modules/codec/a52old/imdct/srfft_sse.c \
+	imdct_sse.c \
+	srfft_sse.c \
 	$(COMMON_imdct)
 
 SOURCES_imdct3dn = \
-	modules/codec/a52old/imdct/imdct_3dn.c \
-	modules/codec/a52old/imdct/srfft_3dn.c \
+	imdct_3dn.c \
+	srfft_3dn.c \
 	$(COMMON_imdct)
 
 noinst_HEADERS += \
-	modules/codec/a52old/imdct/imdct_common.h \
-	modules/codec/a52old/imdct/retables.h \
-	modules/codec/a52old/imdct/srfft.h
+	imdct_common.h \
+	retables.h \
+	srfft.h
 
