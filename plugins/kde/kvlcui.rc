@@ -1,0 +1,46 @@
+<!DOCTYPE kpartgui>
+<kpartgui name="kvlc" version="0.1">
+
+<ActionProperties>
+  <Action name="open_disk" icon="dvd_unmount"/>
+  <Action name="open_stream" icon="connect_no"/>
+  <Action name="play" icon="1rightarrow"/>
+  <Action name="pause"	icon = "player_pause"/>
+  <Action name="stop" icon="player_stop"/>
+  <Action name="backward" icon="player_start"/>
+  <Action name="forward" icon="player_end"/>
+  <Action name="fast" icon="2rightarrow"/>
+  <Action name="slow" icon="2leftarrow"/>
+</ActionProperties>
+
+<MenuBar>
+  <Menu name="file" noMerge="1"><text>&amp;File</text>
+    <Action name="file_open"/>
+    <Action name="file_open_recent"/>
+    <Action name="open_disk"/>
+    <Action name="open_stream"/>
+    <Separator lineSeparator="true"/>
+    <Action name="file_close"/>
+    <Separator lineSeparator="true"/>
+    <Action name="file_quit"/>
+  </Menu>
+</MenuBar>
+
+<ToolBar name="mainToolBar" noMerge="1">
+</ToolBar>
+
+<ToolBar name="main" iconText="icononly" iconSize="32">
+  <Action name="file_open"/>
+  <Action name="open_disk"/>
+  <Action name="open_stream"/>
+  <Separator lineSeparator="true"/>
+  <Action name="backward"/>
+  <Action name="play"/>
+  <Action name="pause"/>
+  <Action name="stop"/>
+  <Action name="forward"/>
+  <Action name="slow"/>
+  <Action name="fast"/>
+</ToolBar> 
+
+</kpartgui>
