@@ -40,6 +40,8 @@ class SkinParser: public XMLParser
         const BuilderData &getData() const { return m_data; }
 
     private:
+        // Static variable to avoid initializing catalogs twice
+        static bool m_initialized;
         /// Container for mapping data from the XML
         BuilderData m_data;
         /// Current IDs
