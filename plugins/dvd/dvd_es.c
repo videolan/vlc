@@ -1,7 +1,7 @@
 /* dvd_es.c: functions to find and select ES
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_es.c,v 1.3 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: dvd_es.c,v 1.4 2002/03/12 18:37:46 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -252,9 +252,7 @@ void DVDLaunchDecoders( input_thread_t * p_input )
             i_audio = 1;
         }
         
-        if( config_GetIntVariable( "spdif" ) ||
-            ( config_GetIntVariable( "input_audio" ) ==
-              REQUESTED_AC3 ) )
+        if( ( config_GetIntVariable( "input_audio" ) == REQUESTED_AC3 ) )
         {
             int     i_ac3 = i_audio;
             while( ( p_input->stream.pp_es[i_ac3]->i_type !=

@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: main.h,v 1.30 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: main.h,v 1.31 2002/03/12 18:37:46 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -47,7 +47,6 @@ typedef struct main_s
     /* Generic settings */
     boolean_t              b_audio;             /* is audio output allowed ? */
     boolean_t              b_video;             /* is video output allowed ? */
-    boolean_t              b_ac3;
     boolean_t              b_stereo;
     mtime_t                i_desync;   /* relative desync of the audio ouput */
 

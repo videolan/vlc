@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.82 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: audio_output.c,v 1.83 2002/03/12 18:37:46 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -86,7 +86,8 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, int i_rate )
 #if 0
     int             i_status;                               /* thread status */
 #endif
-    char *psz_name;
+    char *          psz_name;
+    int             i_format;
 
     /* Allocate descriptor */
     p_aout = (aout_thread_t *) malloc( sizeof(aout_thread_t) );
@@ -99,17 +100,16 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, int i_rate )
     p_aout->i_rate = config_GetIntVariable( "rate" );
     p_aout->i_channels = config_GetIntVariable( "mono" ) ? 1 : 2;
 
-    /* Maybe we should pass this setting in argument */
-    p_aout->i_format = AOUT_FORMAT_DEFAULT;
-
-    /* special setting for ac3 pass-through mode */
-    /* FIXME is it necessary ? (cf ac3_adec.c) */
-    if( config_GetIntVariable( "spdif" ) && p_main->b_ac3 )
+    i_format = config_GetIntVariable( "aout_format" );
+    if( ( !i_format ) || ( i_format > 8 ) )
     {
-        intf_WarnMsg( 4, "aout info: setting ac3 spdif" );
-        p_aout->i_format = AOUT_FMT_AC3;
+        p_aout->i_format = AOUT_FMT_S16_NE;
     }
-    
+    else
+    {
+        p_aout->i_format = 1 << ( i_format + 2 );
+    }
+
     if( p_aout->i_rate == 0 )
     {
         intf_ErrMsg( "aout error: null sample rate" );

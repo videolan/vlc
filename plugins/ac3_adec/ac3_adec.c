@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.22 2002/02/24 22:06:50 sam Exp $
+ * $Id: ac3_adec.c,v 1.23 2002/03/12 18:37:46 stef Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -84,6 +84,8 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( "software AC3 decoder" )
     ADD_CAPABILITY( DECODER, 50 )
+    ADD_SHORTCUT( "ac3_adec" )
+    ADD_SHORTCUT( "ac3" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

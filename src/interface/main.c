@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.162 2002/03/11 07:23:10 gbazin Exp $
+ * $Id: main.c,v 1.163 2002/03/12 18:37:46 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -130,10 +130,25 @@
 #define MONO_LONGTEXT "This will force a mono audio output"
 
 #define VOLUME_TEXT "audio output volume"
-#define VOLUME_LONGTEXT "You can set the default audio output volume here"
+#define VOLUME_LONGTEXT "You can set the default audio output volume here," \
+                        " in a range from 0 to 1024"
 
-#define RATE_TEXT "audio output frequency"
-#define RATE_LONGTEXT "You can force the audio output frequency here"
+#define FORMAT_TEXT "audio output format"
+#define FORMAT_LONGTEXT "You can force the audio output format here.\n" \
+                        "0 -> 16 bits signed native endian (default)\n" \
+                        "1 ->  8 bits unsigned\n"                       \
+                        "2 -> 16 bits signed little endian\n"           \
+                        "3 -> 16 bits signed big endian\n"              \
+                        "4 ->  8 bits signed\n"                         \
+                        "5 -> 16 bits unsigned little endian\n"         \
+                        "6 -> 16 bits unsigned big endian\n"            \
+                        "7 -> mpeg2 audio (unsupported)\n"              \
+                        "8 -> ac3 pass-through"
+                         
+#define RATE_TEXT "audio output frequency (Hz)"
+#define RATE_LONGTEXT "You can force the audio output frequency here.\n"    \
+                      "Common values are 48000, 44100, 32000, 22050,"       \
+                      " 16000, 11025, 8000"
 
 #define DESYNC_TEXT "Compensate desynchronization of audio (in ms)"
 #define DESYNC_LONGTEXT "This option allows you to delay the audio output." \
@@ -282,6 +297,8 @@ ADD_BOOL    ( "mono", NULL, MONO_TEXT, MONO_LONGTEXT )
 ADD_INTEGER ( "volume", VOLUME_DEFAULT, NULL, VOLUME_TEXT, VOLUME_LONGTEXT )
 ADD_INTEGER ( "rate", 44100, NULL, RATE_TEXT, RATE_LONGTEXT )
 ADD_INTEGER ( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT )
+ADD_INTEGER ( "aout_format", 0, NULL, FORMAT_TEXT,
+              FORMAT_LONGTEXT )
 
 /* Video options */
 ADD_CATEGORY_HINT( "Video", NULL )
@@ -306,7 +323,7 @@ ADD_INTEGER ( "channel_port", 6010, NULL, CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT )
 ADD_STRING  ( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT )
 
 ADD_INTEGER ( "input_audio", -1, NULL, INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT )
-ADD_INTEGER ( "input channel", -1, NULL, INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT )
+ADD_INTEGER ( "input_channel", -1, NULL, INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT )
 ADD_INTEGER ( "input_subtitle", -1, NULL, INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT )
 
 ADD_STRING  ( "dvd_device", "/dev/dvd", NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT )
@@ -943,7 +960,7 @@ static int GetConfigurationFromCmdLine( int *pi_argc, char *ppsz_argv[],
             if( !b_ignore_errors )
             {
                 intf_ErrMsg( "intf error: unknown option `%s'",
-                             ppsz_argv[optind] );
+                             ppsz_argv[optind-1] );
                 intf_Msg( "Try `%s --help' for more information.\n",
                           p_main->psz_arg0 );
 

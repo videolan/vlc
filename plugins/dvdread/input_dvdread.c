@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.32 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: input_dvdread.c,v 1.33 2002/03/12 18:37:46 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -1216,9 +1216,7 @@ static void DvdReadLauchDecoders( input_thread_t * p_input )
         }
         if( i_audio > 0/* && i_audio_nb > 0*/ )
         {
-            if( config_GetIntVariable( "spdif" ) ||
-                ( config_GetIntVariable( "input_audio" ) ==
-                  REQUESTED_AC3 ) )
+            if( config_GetIntVariable( "input_audio" ) == REQUESTED_AC3 )
             {
                 int     i_ac3 = i_audio;
                 while( ( p_input->stream.pp_es[i_ac3]->i_type !=

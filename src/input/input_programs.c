@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_programs.c,v 1.73 2002/03/05 17:46:33 stef Exp $
+ * $Id: input_programs.c,v 1.74 2002/03/12 18:37:46 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -543,9 +543,6 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     case LPCM_AUDIO_ES:
         if( p_main->b_audio )
         {
-            /* This kludge should be removed */
-            p_main->b_ac3 = ( p_es->i_type == AC3_AUDIO_ES );
-
             /* Release the lock, not to block the input thread during
              * the creation of the thread. */
             vlc_mutex_unlock( &p_input->stream.stream_lock );

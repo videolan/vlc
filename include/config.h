@@ -104,15 +104,6 @@
 /* Maximum number of audio output threads */
 #define AOUT_MAX_THREADS                10
 
-/* Default audio output format (AOUT_FMT_S16_NE = Native Endianess) */
-#define AOUT_FORMAT_DEFAULT             AOUT_FMT_S16_NE
-/* #define AOUT_FORMAT_DEFAULT          AOUT_FMT_S8 */
-/* #define AOUT_FORMAT_DEFAULT          AOUT_FMT_U8 */
-/* #define AOUT_FORMAT_DEFAULT          AOUT_FMT_S16_BE */
-/* #define AOUT_FORMAT_DEFAULT          AOUT_FMT_S16_LE */
-/* #define AOUT_FORMAT_DEFAULT          AOUT_FMT_U16_BE */
-/* #define AOUT_FORMAT_DEFAULT          AOUT_FMT_U16_LE */
-
 /* Volume */
 #define VOLUME_DEFAULT                  256
 #define VOLUME_STEP                     128

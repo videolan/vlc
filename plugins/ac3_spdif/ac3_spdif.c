@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.19 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: ac3_spdif.c,v 1.20 2002/03/12 18:37:46 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -69,13 +69,14 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_CATEGORY_HINT( "Misc Options", NULL )
-ADD_BOOL( "spdif", NULL, "enable AC3 pass-through mode", NULL )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( "SPDIF pass-through AC3 decoder" )
-    ADD_CAPABILITY( DECODER, 100 )
+    ADD_CAPABILITY( DECODER, 0 )
+    ADD_SHORTCUT( "ac3_spdif" )
+    ADD_SHORTCUT( "pass_through" )
+    ADD_SHORTCUT( "pass" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -93,8 +94,7 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int decoder_Probe( u8 *pi_type )
 {
-    return( ( config_GetIntVariable( "spdif" )
-               && *pi_type == AC3_AUDIO_ES ) ? 0 : -1 );
+    return( *pi_type == AC3_AUDIO_ES ) ? 0 : -1;
 }
 
 
@@ -249,7 +249,6 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
     {
         intf_ErrMsg( "spdif error: stream not valid");
 
-        aout_DestroyFifo( p_spdif->p_aout_fifo );
         return( -1 );
     }
 
@@ -265,6 +264,10 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
         //aout_DestroyFifo( p_spdif->p_aout_fifo );
         //return -1;
     }
+    
+    /* The audio output need to be ready for an ac3 stream */
+    p_spdif->i_previous_format = config_GetIntVariable( "aout_format" );
+    config_PutIntVariable( "aout_format", 8 );
     
     /* Creating the audio output fifo */
     p_spdif->p_aout_fifo = aout_CreateFifo( AOUT_FIFO_SPDIF, 1,
@@ -301,6 +304,9 @@ static void EndThread( ac3_spdif_thread_t * p_spdif )
         vlc_mutex_unlock( &(p_spdif->p_aout_fifo->data_lock ) );
         
     }
+
+    /* restore previous setting for output format */
+    config_PutIntVariable( "aout_format", p_spdif->i_previous_format );
 
     /* Destroy descriptor */
     free( p_spdif->p_ac3 );

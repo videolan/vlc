@@ -2,7 +2,7 @@
  * ac3_spdif.h: header for ac3 pass-through
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.h,v 1.1 2001/11/13 12:09:17 henri Exp $
+ * $Id: ac3_spdif.h,v 1.2 2002/03/12 18:37:46 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -63,6 +63,7 @@ typedef struct ac3_spdif_thread_s
     /*
      * Output properties
      */
+    int                 i_previous_format;
     aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
 
 } ac3_spdif_thread_t;
