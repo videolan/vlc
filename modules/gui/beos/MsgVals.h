@@ -2,7 +2,7 @@
  * MsgVals.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: MsgVals.h,v 1.6 2003/02/03 17:18:48 stippi Exp $
+ * $Id: MsgVals.h,v 1.7 2003/02/09 17:10:52 stippi Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -47,6 +47,7 @@ const uint32 SELECT_SUBTITLE    = 'subt';
 const uint32 PREV_TITLE         = 'prti';
 const uint32 NEXT_TITLE         = 'nxti';
 const uint32 TOGGLE_TITLE       = 'tgti';
+const uint32 NAVIGATE_MENU      = 'navm';
 const uint32 PREV_CHAPTER       = 'prch';
 const uint32 NEXT_CHAPTER       = 'nxch';
 const uint32 TOGGLE_CHAPTER     = 'tgch';

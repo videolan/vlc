@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.11 2003/02/01 12:01:11 stippi Exp $
+ * $Id: InterfaceWindow.h,v 1.12 2003/02/09 17:10:52 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -128,6 +128,7 @@ class InterfaceWindow : public BWindow
     PreferencesWindow*      fPreferencesWindow;
     MessagesWindow*         fMessagesWindow;
     BMenuBar*               fMenuBar;
+    BMenuItem*				fGotoMenuMI;
     BMenuItem*              fNextTitleMI;
     BMenuItem*              fPrevTitleMI;
     BMenuItem*              fNextChapterMI;

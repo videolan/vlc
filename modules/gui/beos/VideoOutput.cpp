@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.11 2003/02/01 12:01:11 stippi Exp $
+ * $Id: VideoOutput.cpp,v 1.12 2003/02/09 17:10:52 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -36,6 +36,7 @@
 #include <Application.h>
 #include <BitmapStream.h>
 #include <Bitmap.h>
+#include <Directory.h>
 #include <DirectWindow.h>
 #include <File.h>
 #include <InterfaceKit.h>
@@ -366,9 +367,11 @@ VideoWindow::MessageReceived( BMessage *p_message )
 						dst += dstBpr;
 						src += srcBpr;
 					}
-					_SaveScreenShot( temp,
-									 strdup( DEFAULT_SCREEN_SHOT_PATH ),
-									 DEFAULT_SCREEN_SHOT_FORMAT );
+					char* path = config_GetPsz( p_vout, "beos-screenshot-path" );
+					if ( !path )
+						path = strdup( DEFAULT_SCREEN_SHOT_PATH );
+					int32 format = config_GetInt( p_vout, "beos-screenshot-format" );
+					_SaveScreenShot( temp, path, format );
 				}
 				else
 				{
@@ -892,6 +895,21 @@ VideoWindow::_save_screen_shot( void* cookie )
 		// taken the next screen shot already!)
 		// make sure we have a unique name for the screen shot
 		BString path( info->path );
+		// create the folder if it doesn't exist
+		BString folder( info->path );
+		int32 pos = folder.FindLast("/");
+		if ( pos > 0 )
+		{
+			pos++; // leave the last '/' in the string
+			if ( pos == path.Length() )
+				path << "vlc screenshot";
+			else
+			{
+				int32 removeChars = folder.Length() - pos;	
+				folder.Remove( pos, removeChars );
+			}
+			create_directory( folder.String(), 0777 );
+		}
 		BEntry entry( path.String() );
 		int32 appendedNumber = 0;
 		if ( entry.Exists() && !entry.IsSymLink() )
@@ -900,7 +918,7 @@ VideoWindow::_save_screen_shot( void* cookie )
 			bool foundUniqueName = false;
 			appendedNumber = 1;
 			while ( !foundUniqueName ) {
-				BString newName( info->path );
+				BString newName( path.String() );
 				newName << " " << appendedNumber;
 				BEntry possiblyClobberedEntry( newName.String() );
 				if ( possiblyClobberedEntry.Exists()
@@ -920,8 +938,6 @@ VideoWindow::_save_screen_shot( void* cookie )
 		// make colorspace converted copy of bitmap
 		BBitmap* converted = new BBitmap( BRect( 0.0, 0.0, info->width, info->height ),
 										  B_RGB32 );
-//		if ( converted->IsValid() )
-//			memset( converted->Bits(), 0, converted->BitsLength() );
 		status_t status = convert_bitmap( info->bitmap, converted );
 		if ( status == B_OK )
 		{
@@ -1021,7 +1037,7 @@ VideoWindow::_save_screen_shot( void* cookie )
 	if ( info )
 	{
 		delete info->bitmap;
-		delete[] info->path;
+		free( info->path );
 	}
 	delete info;
 	return B_OK;

@@ -2,10 +2,11 @@
  * beos.cpp : BeOS plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: BeOS.cpp,v 1.5 2003/01/31 06:45:00 titer Exp $
+ * $Id: BeOS.cpp,v 1.6 2003/02/09 17:10:52 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,6 +65,14 @@ vlc_module_begin();
         add_integer( "beos-messages-xpos", 0, NULL, "", "" );
         add_integer( "beos-messages-ypos", 0, NULL, "", "" );
         add_bool( "beos-messages-show", 0, NULL, "", "" );
+        add_integer( "beos-settings-width", 0, NULL, "", "" );
+        add_integer( "beos-settings-height", 0, NULL, "", "" );
+        add_integer( "beos-settings-xpos", 0, NULL, "", "" );
+        add_integer( "beos-settings-ypos", 0, NULL, "", "" );
+        add_bool( "beos-settings-show", 0, NULL, "", "" );
+        add_integer( "beos-screenshot-format", 0, NULL, "", "" );
+        add_string( "beos-screenshot-path", 0, NULL, "", "" );
+        add_bool( "beos-use-dvd-menus", 0, NULL, "", "" );
     add_submodule();                                     
         set_capability( "video output", 100 );
         set_callbacks( E_(OpenVideo), E_(CloseVideo) );

@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.25 2003/02/09 11:51:36 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.26 2003/02/09 17:10:52 stippi Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -33,6 +33,7 @@
 #include <vlc/vout.h>
 extern "C"
 {
+  #include <input_ext-plugins.h>	// needed here when compiling without plugins
   #include <audio_output.h>
   #include <aout_internal.h>
 }
@@ -973,7 +974,7 @@ void VlcWrapper::FilterChange()
     vout_thread_t * p_vout;
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    /* Warn the vout we are about to change the filter chain */
+    // Warn the vout we are about to change the filter chain
     p_vout = (vout_thread_t*)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                               FIND_ANYWHERE );
     if( p_vout )
@@ -982,7 +983,7 @@ void VlcWrapper::FilterChange()
         vlc_object_release( p_vout );
     }
 
-    /* restart all video stream */
+    // restart all video stream
     for( unsigned int i = 0; i < p_input->stream.i_es_number; i++ )
     {
         if( ( p_input->stream.pp_es[i]->i_cat == VIDEO_ES ) &&
