@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: playlist.m,v 1.3 2003/01/05 03:21:50 jlj Exp $
+ * $Id: playlist.m,v 1.4 2003/01/20 03:45:06 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -98,7 +98,7 @@
     {
         o_values = [o_pasteboard propertyListForType: NSFilenamesPboardType];
 
-        [self appendArray: o_values atPos: i_row];
+        [self appendArray: o_values atPos: i_row enqueue:YES];
 
         return( YES );
     }
@@ -196,7 +196,7 @@
     [o_table_view selectAll: nil];
 }
 
-- (void)appendArray:(NSArray*)o_array atPos:(int)i_pos
+- (void)appendArray:(NSArray*)o_array atPos:(int)i_pos enqueue:(BOOL)b_enqueue
 {
     int i_items;
     NSString * o_value;
@@ -221,8 +221,10 @@
     {
         NSURL * o_url;
 
-        int i_mode = i_items == 0 ? PLAYLIST_INSERT | PLAYLIST_GO :
-                                                   PLAYLIST_INSERT;
+        int i_mode = PLAYLIST_INSERT;
+        
+        if (i_items == 0 && !b_enqueue)
+            i_mode |= PLAYLIST_GO;
 
         playlist_Add( p_playlist, [o_value fileSystemRepresentation],
             i_mode, i_pos == -1 ? PLAYLIST_END : i_pos + i_items );

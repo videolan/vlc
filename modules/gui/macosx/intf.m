@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.26 2003/01/16 13:49:44 hartman Exp $
+ * $Id: intf.m,v 1.27 2003/01/20 03:45:06 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -300,7 +300,7 @@ static void Run( intf_thread_t *p_intf )
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename
 {
     [o_playlist appendArray:
-        [NSArray arrayWithObject: o_filename] atPos: -1];
+        [NSArray arrayWithObject: o_filename] atPos: -1 enqueue: NO];
 
     return( TRUE );
 }

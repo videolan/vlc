@@ -127,12 +127,36 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>ogg</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>OGG file</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>dat</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>mpeg.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>DAT file</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>cue</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>CUE file</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>

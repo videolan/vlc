@@ -2,7 +2,7 @@
  * playlist.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: playlist.h,v 1.3 2003/01/16 13:49:44 hartman Exp $
+ * $Id: playlist.h,v 1.4 2003/01/20 03:45:06 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -55,7 +55,7 @@
 - (IBAction)deleteItems:(id)sender;
 - (IBAction)selectAll:(id)sender;
 
-- (void)appendArray:(NSArray*)o_array atPos:(int)i_pos;
+- (void)appendArray:(NSArray*)o_array atPos:(int)i_pos enqueue:(BOOL)b_enqueue;
 - (void)playlistUpdated;
 
 @end

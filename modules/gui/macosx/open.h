@@ -2,7 +2,7 @@
  * open.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.h,v 1.6 2003/01/06 02:45:09 massiot Exp $
+ * $Id: open.h,v 1.7 2003/01/20 03:45:06 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -42,10 +42,14 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 
     IBOutlet id o_btn_ok;
     IBOutlet id o_btn_cancel;
+    IBOutlet id o_ckbox_enqueue;
 
     IBOutlet id o_file_path;
     IBOutlet id o_file_btn_browse;
     IBOutlet id o_file_stream;
+    IBOutlet id o_file_sub_path;
+    IBOutlet id o_file_sub_btn_browse;
+    IBOutlet id o_file_sub_ckbox;
 
     IBOutlet id o_disc_type;
     IBOutlet id o_disc_device;
@@ -98,6 +102,8 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (void)openFilePathChanged:(NSNotification *)o_notification;
 - (IBAction)openFileBrowse:(id)sender;
 - (IBAction)openFileStreamChanged:(id)sender;
+- (IBAction)loadSubsChanged:(id)sender;
+- (IBAction)openSubBrowse:(id)sender;
 
 - (IBAction)openDisc:(id)sender;
 - (IBAction)openDiscTypeChanged:(id)sender;

@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.10 2003/01/18 04:57:08 hartman Exp $
+ * $Id: open.m,v 1.11 2003/01/20 03:45:06 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -168,6 +168,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     [o_panel setTitle: _NS("Open Source")];
     [o_mrl_lbl setTitle: _NS("Media Resource Locator (MRL)")];
+    [o_ckbox_enqueue setTitle: _NS("Only enqueue in playlist. Do not play.")];
 
     [o_btn_ok setTitle: _NS("OK")];
     [o_btn_cancel setTitle: _NS("Cancel")];
@@ -178,6 +179,9 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     [o_file_btn_browse setTitle: _NS("Browse...")];
     [o_file_stream setTitle: _NS("Treat as a pipe rather than as a file")];
+
+    [o_file_sub_btn_browse setTitle: _NS("Browse...")];
+    [o_file_sub_ckbox setTitle: _NS("Load subtitles")];
 
     [o_disc_device_lbl setStringValue: _NS("Device name")];
     [o_disc_title_lbl setStringValue: _NS("Title")];
@@ -285,24 +289,34 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     int i_result;
 
     [o_tabview selectTabViewItemAtIndex: i_type];
-
+    [o_ckbox_enqueue setState: NSOffState];
+    [o_file_sub_path setStringValue: @""];
+    [o_file_sub_ckbox setState: NSOffState];
+    [o_file_sub_path setEnabled: NO];
+    [o_file_sub_btn_browse setEnabled: NO];
+    
     i_result = [NSApp runModalForWindow: o_panel];
     [o_panel close];
 
     if( i_result )
     {
         NSString *o_sout = [o_sout_mrl stringValue];
-
+        intf_thread_t * p_intf = [NSApp getIntf];
+        
         if ( [o_sout_cbox state] )
         {
-            intf_thread_t * p_intf = [NSApp getIntf];
             config_PutPsz( p_intf, "sout", [o_sout lossyCString] );
         }
 
         NSString *o_source = [o_mrl stringValue];
-
+        BOOL b_enq = [o_ckbox_enqueue state] == NSOnState ? YES : NO;
+        NSString *subPath = [o_file_sub_path stringValue];
+        
         [o_playlist appendArray: 
-            [NSArray arrayWithObject: o_source] atPos: -1];
+            [NSArray arrayWithObject: o_source] atPos: -1 enqueue:b_enq];
+        
+        if (([o_file_sub_ckbox state] == NSOnState) && !([subPath isEqualTo: @""]))
+            config_PutPsz( p_intf, "sub-file", strdup( [subPath cString] ) );
     }
 
     [self soutModeChanged: nil];
@@ -387,6 +401,36 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 - (IBAction)openFileStreamChanged:(id)sender
 {
     [self openFilePathChanged: nil];
+}
+
+- (IBAction)loadSubsChanged:(id)sender
+{
+    if ([o_file_sub_ckbox state] == NSOnState)
+    {
+        [o_file_sub_path setEnabled:YES];
+        [o_file_sub_btn_browse setEnabled:YES];
+    }
+    else
+    {
+        [o_file_sub_path setEnabled:NO];
+        [o_file_sub_btn_browse setEnabled:NO];
+    }
+}
+
+- (IBAction)openSubBrowse:(id)sender
+{
+    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
+    
+    [o_open_panel setAllowsMultipleSelection: NO];
+    [o_open_panel setTitle: _NS("Open File")];
+    [o_open_panel setPrompt: _NS("Open")];
+
+    if( [o_open_panel runModalForDirectory: nil 
+            file: nil types: nil] == NSOKButton )
+    {
+        NSString *o_filename = [[o_open_panel filenames] objectAtIndex: 0];
+        [o_file_sub_path setStringValue: o_filename];
+    }
 }
 
 - (IBAction)openDiscTypeChanged:(id)sender
@@ -797,19 +841,8 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
 - (IBAction)openFile:(id)sender
 {
-    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
-
-    [o_open_panel setAllowsMultipleSelection: NO];
-    [o_open_panel setTitle: _NS("Open File")];
-    [o_open_panel setPrompt: _NS("Open")];
-
-    if( [o_open_panel runModalForDirectory: nil
-            file: nil types: nil] == NSOKButton )
-    {
-        intf_thread_t * p_intf = [NSApp getIntf];
-        config_PutPsz( p_intf, "sout", NULL );
-        [o_playlist appendArray: [o_open_panel filenames] atPos: -1];
-    }
+    [self openFilePathChanged: nil];
+    [self openTarget: 0];
 }
 
 - (IBAction)panelCancel:(id)sender

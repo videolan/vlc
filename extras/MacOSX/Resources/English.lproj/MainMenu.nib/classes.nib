@@ -121,6 +121,7 @@
         }, 
         {
             ACTIONS = {
+                loadSubsChanged = id; 
                 openDisc = id; 
                 openDiscMenusChanged = id; 
                 openDiscStepperChanged = id; 
@@ -132,6 +133,7 @@
                 openNet = id; 
                 openNetModeChanged = id; 
                 openNetStepperChanged = id; 
+                openSubBrowse = id; 
                 openVTSBrowse = id; 
                 panelCancel = id; 
                 panelOk = id; 
@@ -145,6 +147,7 @@
             OUTLETS = {
                 "o_btn_cancel" = id; 
                 "o_btn_ok" = id; 
+                "o_ckbox_enqueue" = id; 
                 "o_disc_chapter" = id; 
                 "o_disc_chapter_lbl" = id; 
                 "o_disc_chapter_stp" = id; 
@@ -160,6 +163,9 @@
                 "o_file_btn_browse" = id; 
                 "o_file_path" = id; 
                 "o_file_stream" = id; 
+                "o_file_sub_btn_browse" = id; 
+                "o_file_sub_ckbox" = id; 
+                "o_file_sub_path" = id; 
                 "o_mrl" = id; 
                 "o_mrl_lbl" = id; 
                 "o_net_cs_addr" = id; 
