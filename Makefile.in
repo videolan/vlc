@@ -96,7 +96,7 @@ LIB += -ldl -lsocket -lnsl -lpthread
 endif
 
 ifneq (,$(findstring darwin,$(SYS)))
-LIB += -ldl -dyn
+LIB += -ldl -framework Carbon
 endif
 
 ifeq ($(SYS),beos)
@@ -159,11 +159,19 @@ endif
 #
 # C compiler flags: plugin compilation
 #
-ifneq (,$(findstring darwin,$(SYS)))
-PCFLAGS += -bundle -undefined suppress
-else
 PCFLAGS += -fPIC
+
+#
+# C compiler flags: plugin linking
+#
+ifneq (,$(findstring darwin,$(SYS)))
+PLCFLAGS += -bundle -undefined suppress
+else
+ifeq ($(SYS),beos)
+PLCFLAGS += -nostart plugins/_APP_
+else
 PLCFLAGS += -shared
+endif
 endif
 
 #
@@ -178,6 +186,20 @@ DCFLAGS += -MM
 LCFLAGS += $(LIB)
 LCFLAGS += -Wall
 #LCFLAGS += -s
+
+ifeq ($(SYS),beos)
+LCFLAGS += -Xlinker -soname=_APP_
+else
+ifneq (,$(findstring qnx,$(SYS)))
+LCFLAGS += -Xlinker -export-dynamic
+else
+ifneq (,$(findstring darwin,$(SYS)))
+LCFLAGS += -dyn
+else
+LCFLAGS += --export-dynamic @DYNAMIC_FLAG@
+endif
+endif
+endif
 
 #
 # Debugging and profiling support (unless optimisations are active)
@@ -337,6 +359,12 @@ PLUGIN_GGI =	plugins/ggi/ggi.o \
 PLUGIN_GLIDE =	plugins/glide/glide.o \
 		plugins/glide/vout_glide.o
 
+PLUGIN_GNOME =	plugins/gnome/gnome.o \
+		plugins/gnome/intf_gnome.o \
+		plugins/gnome/gnome_callbacks.o \
+		plugins/gnome/gnome_interface.o \
+		plugins/gnome/gnome_support.o
+
 PLUGIN_GTK =	plugins/gtk/gtk.o \
 		plugins/gtk/intf_gtk.o \
 		plugins/gtk/gtk_callbacks.o \
@@ -344,32 +372,20 @@ PLUGIN_GTK =	plugins/gtk/gtk.o \
 		plugins/gtk/gtk_support.o \
 		plugins/gtk/gtk_playlist.o
 
-PLUGIN_GNOME =	plugins/gnome/gnome.o \
-		plugins/gnome/intf_gnome.o \
-		plugins/gnome/gnome_callbacks.o \
-		plugins/gnome/gnome_interface.o \
-		plugins/gnome/gnome_support.o
+PLUGIN_IDCT =		plugins/idct/idct.o
 
-PLUGIN_QT =	plugins/qt/qt.o \
-		plugins/qt/intf_qt.o
+PLUGIN_IDCTCLASSIC =	plugins/idct/idctclassic.o
+
+PLUGIN_IDCTMMX =	plugins/idct/idctmmx.o
+
+PLUGIN_IDCTMMXEXT =	plugins/idct/idctmmxext.o
+
+PLUGIN_IDCTALTIVEC =	plugins/idct/idctaltivec.o
+
+PLUGIN_IDCTCOMMON =	plugins/idct/idct_common.o
 
 PLUGIN_KDE =	plugins/kde/kde.o \
 		plugins/kde/intf_kde.o
-
-PLUGIN_IDCT =	plugins/idct/idct.o \
-		plugins/idct/idct_common.o
-
-PLUGIN_IDCTCLASSIC =	plugins/idct/idctclassic.o \
-			plugins/idct/idct_common.o
-
-PLUGIN_IDCTMMX =	plugins/idct/idctmmx.o \
-			plugins/idct/idct_common.o
-
-PLUGIN_IDCTMMXEXT =	plugins/idct/idctmmxext.o \
-			plugins/idct/idct_common.o
-
-PLUGIN_IDCTALTIVEC =	plugins/idct/idctaltivec.o
-#FIXME : we should have plugins/idct/idct_common.o here
 
 PLUGIN_MACOSX =	plugins/macosx/macosx.o \
 		plugins/macosx/intf_macosx.o \
@@ -378,17 +394,16 @@ PLUGIN_MACOSX =	plugins/macosx/macosx.o \
 PLUGIN_MGA =	plugins/mga/mga.o \
 		plugins/mga/vout_mga.o
 
-PLUGIN_MOTION =	plugins/motion/motion.o \
-		plugins/motion/vdec_motion_common.o \
-		plugins/motion/vdec_motion_inner.o
+PLUGIN_MOTION =		plugins/motion/motion.o \
+			plugins/motion/vdec_motion_inner.o
 
 PLUGIN_MOTIONMMX =	plugins/motion/motionmmx.o \
-			plugins/motion/vdec_motion_common.o \
 			plugins/motion/vdec_motion_inner_mmx.o
 
 PLUGIN_MOTIONMMXEXT =	plugins/motion/motionmmxext.o \
-			plugins/motion/vdec_motion_common.o \
 			plugins/motion/vdec_motion_inner_mmxext.o
+
+PLUGIN_MOTIONCOMMON =	plugins/motion/vdec_motion_common.o
 
 PLUGIN_NCURSES =	plugins/text/ncurses.o \
 			plugins/text/intf_ncurses.o
@@ -397,6 +412,9 @@ PLUGIN_NULL =	plugins/null/null.o
 
 PLUGIN_PS =	plugins/mpeg/ps.o \
 		plugins/mpeg/input_ps.o
+
+PLUGIN_QT =	plugins/qt/qt.o \
+		plugins/qt/intf_qt.o
 
 PLUGIN_SDL =	plugins/sdl/sdl.o \
 		plugins/sdl/vout_sdl.o \
@@ -429,11 +447,13 @@ STD_PLUGIN_OBJ = \
 		$(PLUGIN_IDCTCLASSIC) \
 		$(PLUGIN_IDCTMMX) \
 		$(PLUGIN_IDCTMMXEXT) \
+		$(PLUGIN_IDCTCOMMON) \
 		$(PLUGIN_MACOSX) \
 		$(PLUGIN_MGA) \
 		$(PLUGIN_MOTION) \
 		$(PLUGIN_MOTIONMMX) \
 		$(PLUGIN_MOTIONMMXEXT) \
+		$(PLUGIN_MOTIONCOMMON) \
 		$(PLUGIN_NCURSES) \
 		$(PLUGIN_NULL) \
 		$(PLUGIN_PS) \
@@ -441,14 +461,6 @@ STD_PLUGIN_OBJ = \
 		$(PLUGIN_TS) \
 		$(PLUGIN_YUV) \
 		$(PLUGIN_YUVMMX)
-
-# list duplicates
-STD_PLUGIN_COMMON =	plugins/idct/idct_common.o \
-			plugins/motion/vdec_motion_common.o
-
-# filter out duplicates from the plugin object lists
-STD_PLUGIN_OBJ :=	$(filter-out $(STD_PLUGIN_COMMON), \
-				 $(STD_PLUGIN_OBJ)) $(STD_PLUGIN_COMMON)
 
 NONSTD_PLUGIN_OBJ = \
 		$(PLUGIN_X11) \
@@ -642,170 +654,119 @@ $(PLUGIN_IDCTALTIVEC): %.o: %.c
 #
 
 vlc: $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
+	$(CC) $(CFLAGS) -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(LCFLAGS)
 ifeq ($(SYS),beos)
-	$(CC) $(CFLAGS) $(LCFLAGS) -Xlinker -soname=_APP_ -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
 	rm -f ./plugins/_APP_
 	ln -s ../vlc ./plugins/_APP_
-else
-ifeq ($(SYS),nto-qnx)
-	$(CC) $(CFLAGS) $(LCFLAGS) -Xlinker -export-dynamic -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
-else
-	$(CC) $(CFLAGS) $(LCFLAGS) --export-dynamic @DYNAMIC_FLAG@ -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
-endif
 endif
 
 #
 # Plugin targets
 #
 
+lib/alsa.so: $(PLUGIN_ALSA)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -lasound
+
 lib/beos.so: $(PLUGIN_BEOS)
-	$(CC) $(PCFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_ -lbe -lgame -lroot -ltracker
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -lbe -lgame -lroot -ltracker
 
 lib/esd.so: $(PLUGIN_ESD)
 ifneq (,$(findstring bsd,$(SYS)))
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -lesd
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -lesd
 else
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -laudiofile -lesd
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -laudiofile -lesd
 endif
-
-lib/macosx.so: $(PLUGIN_MACOSX)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/darwin.so: $(PLUGIN_DARWIN)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -framework CoreAudio
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -framework CoreAudio
 
 lib/dsp.so: $(PLUGIN_DSP)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-lib/qt.so: $(PLUGIN_QT)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -lqt -L${QTDIR}/lib
+lib/dummy.so: $(PLUGIN_DUMMY)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-lib/kde.so: $(PLUGIN_KDE)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -lkdeui -lkdecore -lqt -ldl
-
-lib/alsa.so: $(PLUGIN_ALSA)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -lasound
+lib/dvd.so: $(PLUGIN_DVD)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 lib/fb.so: $(PLUGIN_FB)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
-
-ifeq ($(SYS),nto-qnx)
-lib/x11.so: $(PLUGIN_X11)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -L/usr/X11R6/lib -lX11 -lXext -lsocket
-else
-lib/x11.so: $(PLUGIN_X11)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -L/usr/X11R6/lib -lX11 -lXext
-endif
-
-lib/mga.so: $(PLUGIN_MGA)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -L/usr/X11R6/lib -lX11 -lXext
-
-lib/gtk.so: $(PLUGIN_GTK)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ `gtk-config --libs gtk | sed 's,-rdynamic,,'`
-
-lib/gnome.so: $(PLUGIN_GNOME)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ `gnome-config --libs gnomeui | sed 's,-rdynamic,,'`
-
-lib/glide.so: $(PLUGIN_GLIDE)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ $(LIB_GLIDE)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 lib/ggi.so: $(PLUGIN_GGI)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ $(LIB_GGI)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GGI)
 
-lib/sdl.so: $(PLUGIN_SDL)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ $(LIB_SDL)
+lib/glide.so: $(PLUGIN_GLIDE)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GLIDE)
+
+lib/gnome.so: $(PLUGIN_GNOME)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) `gnome-config --libs gnomeui | sed 's,-rdynamic,,'`
+
+lib/gtk.so: $(PLUGIN_GTK)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) `gtk-config --libs gtk | sed 's,-rdynamic,,'`
+
+lib/idct.so: $(PLUGIN_IDCT) $(PLUGIN_IDCTCOMMON)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+
+lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC) $(PLUGIN_IDCTCOMMON)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+
+lib/idctmmx.so: $(PLUGIN_IDCTMMX) $(PLUGIN_IDCTCOMMON)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+
+lib/idctmmxext.so: $(PLUGIN_IDCTMMXEXT) $(PLUGIN_IDCTCOMMON)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+
+lib/idctaltivec.so: $(PLUGIN_IDCTALTIVEC) $(PLUGIN_IDCTCOMMON)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -framework VecLib
+
+lib/kde.so: $(PLUGIN_KDE)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -lkdeui -lkdecore -lqt -ldl
+
+lib/macosx.so: $(PLUGIN_MACOSX)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+
+lib/mga.so: $(PLUGIN_MGA)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -L/usr/X11R6/lib -lX11 -lXext
+
+lib/motion.so: $(PLUGIN_MOTION) $(PLUGIN_MOTIONCOMMON)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+
+lib/motionmmx.so: $(PLUGIN_MOTIONMMX) $(PLUGIN_MOTIONCOMMON)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+
+lib/motionmmxext.so: $(PLUGIN_MOTIONMMXEXT) $(PLUGIN_MOTIONCOMMON)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 lib/ncurses.so: $(PLUGIN_NCURSES)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -lncurses
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -lncurses
 
-ifeq ($(SYS),beos)
 lib/null.so: $(PLUGIN_NULL)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 lib/ps.so: $(PLUGIN_PS)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+
+lib/qt.so: $(PLUGIN_QT)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -lqt -L${QTDIR}/lib
+
+lib/sdl.so: $(PLUGIN_SDL)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_SDL)
 
 lib/ts.so: $(PLUGIN_TS)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-lib/dvd.so: $(PLUGIN_DVD)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
-
-lib/dummy.so: $(PLUGIN_DUMMY)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
-
-lib/yuv.so: $(PLUGIN_YUV)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
-
-lib/yuvmmx.so: $(PLUGIN_YUVMMX)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
-
-lib/motion.so: $(PLUGIN_MOTION)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
-
-lib/motionmmx.so: $(PLUGIN_MOTIONMMX)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
-
-lib/motionmmxext.so: $(PLUGIN_MOTIONMMXEXT)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
-
-lib/idct.so: $(PLUGIN_IDCT)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
-
-lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
-
-lib/idctmmx.so: $(PLUGIN_IDCTMMX)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
-
-lib/idctmmxext.so: $(PLUGIN_IDCTMMXEXT)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+lib/x11.so: $(PLUGIN_X11)
+ifeq ($(SYS),nto-qnx)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lsocket
 else
-lib/null.so: $(PLUGIN_NULL)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
-
-lib/ps.so: $(PLUGIN_PS)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
-
-lib/ts.so: $(PLUGIN_TS)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
-
-lib/dvd.so: $(PLUGIN_DVD)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
-
-lib/dummy.so: $(PLUGIN_DUMMY)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -L/usr/X11R6/lib -lX11 -lXext
+endif
 
 lib/yuv.so: $(PLUGIN_YUV)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 lib/yuvmmx.so: $(PLUGIN_YUVMMX)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
-
-lib/motion.so: $(PLUGIN_MOTION)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
-
-lib/motionmmx.so: $(PLUGIN_MOTIONMMX)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
-
-lib/motionmmxext.so: $(PLUGIN_MOTIONMMXEXT)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
-
-lib/idct.so: $(PLUGIN_IDCT)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
-
-lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
-
-lib/idctmmx.so: $(PLUGIN_IDCTMMX)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
-
-lib/idctmmxext.so: $(PLUGIN_IDCTMMXEXT)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
-
-lib/idctaltivec.so: $(PLUGIN_IDCTALTIVEC)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ plugins/idct/idct_common.o -framework VecLib
-endif
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 ################################################################################
 # Note on generic rules and dependancies

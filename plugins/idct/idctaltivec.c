@@ -2,7 +2,7 @@
  * idctaltivec.c : Altivec IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctaltivec.c,v 1.1 2001/03/20 20:09:37 massiot Exp $
+ * $Id: idctaltivec.c,v 1.2 2001/03/21 02:58:29 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME idctmmxext
+#define MODULE_NAME idctaltivec
 
 /*****************************************************************************
  * Preamble
