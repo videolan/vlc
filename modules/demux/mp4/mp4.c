@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: mp4.c,v 1.59 2004/02/07 13:26:24 fenrir Exp $
+ * $Id$
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,6 +29,7 @@
 #include <vlc/input.h>
 #include <vlc_playlist.h>
 #include "iso_lang.h"
+#include "vlc_meta.h"
 
 #include "libmp4.h"
 #include "mp4.h"
@@ -640,7 +641,54 @@ static int Control( input_thread_t *p_input, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_GET_META:
-            return VLC_EGENERIC;
+        {
+            vlc_meta_t **pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
+            vlc_meta_t *meta;
+            MP4_Box_t  *p_udta   = MP4_BoxGet( p_sys->p_root, "/moov/udta" );
+            MP4_Box_t  *p_0xa9xxx;
+            if( p_udta == NULL )
+            {
+                return VLC_EGENERIC;
+            }
+            *pp_meta = meta = vlc_meta_New();
+            for( p_0xa9xxx = p_udta->p_first; p_0xa9xxx != NULL; p_0xa9xxx = p_0xa9xxx->p_next )
+            {
+                switch( p_0xa9xxx->i_type )
+                {
+                    case FOURCC_0xa9nam:
+                        vlc_meta_Add( meta, VLC_META_TITLE, p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                        break;
+                    case FOURCC_0xa9aut:
+                        vlc_meta_Add( meta, VLC_META_AUTHOR, p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                        break;
+                    case FOURCC_0xa9ART:
+                        vlc_meta_Add( meta, VLC_META_ARTIST, p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                        break;
+                    case FOURCC_0xa9cpy:
+                        vlc_meta_Add( meta, VLC_META_COPYRIGHT, p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                        break;
+                    case FOURCC_0xa9day:
+                        vlc_meta_Add( meta, VLC_META_DATE, p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                        break;
+
+                    case FOURCC_0xa9swr:
+                    case FOURCC_0xa9inf:
+                    case FOURCC_0xa9dir:
+                    case FOURCC_0xa9cmt:
+                    case FOURCC_0xa9req:
+                    case FOURCC_0xa9fmt:
+                    case FOURCC_0xa9prd:
+                    case FOURCC_0xa9prf:
+                    case FOURCC_0xa9src:
+                        /* TODO one day, but they aren't really meaningfull */
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            return VLC_SUCCESS;
+        }
 
         default:
             msg_Err( p_input, "control query unimplemented !!!" );

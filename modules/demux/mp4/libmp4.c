@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: libmp4.c,v 1.45 2004/01/25 20:05:28 hartman Exp $
+ * $Id$
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1932,6 +1932,41 @@ static int MP4_ReadBox_drms( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_0xa9xxx( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+{
+    int16_t i_length, i_dummy;
+
+    MP4_READBOX_ENTER( MP4_Box_data_0xa9xxx_t );
+
+    p_box->data.p_0xa9xxx->psz_text = NULL;
+
+    MP4_GET2BYTES( i_length );
+    MP4_GET2BYTES( i_dummy );
+
+    if( i_length > 0 )
+    {
+        if( i_length > i_read ) i_length = i_read;
+
+        p_box->data.p_0xa9xxx->psz_text = malloc( i_length + 1 );
+
+        memcpy( p_box->data.p_0xa9xxx->psz_text,
+                p_peek, i_length );
+        p_box->data.p_0xa9xxx->psz_text[i_length] = '\0';
+
+#ifdef MP4_VERBOSE
+        msg_Dbg( p_stream->p_input,
+                 "read box: \"%4.4s\" text=`%s'",
+                 (char*)&p_box->i_type,
+                 p_box->data.p_0xa9xxx->psz_text );
+#endif
+    }
+
+    MP4_READBOX_EXIT( 1 );
+}
+static void MP4_FreeBox_0xa9xxx( MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_0xa9xxx->psz_text );
+}
 
 /**** ------------------------------------------------------------------- ****/
 /****                   "Higher level" Functions                          ****/
@@ -2046,6 +2081,7 @@ static struct
     { FOURCC_dvp,   MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_VP31,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_vp31,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_h264,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
 
     { FOURCC_jpeg,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
 
@@ -2076,6 +2112,22 @@ static struct
     { FOURCC_iviv,  MP4_ReadBox_drms,           MP4_FreeBox_Common },
     { FOURCC_name,  MP4_ReadBox_drms,           MP4_FreeBox_Common },
     { FOURCC_priv,  MP4_ReadBox_drms,           MP4_FreeBox_Common },
+
+    /* found in udta */
+    { FOURCC_0xa9nam,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9aut,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9cpy,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9swr,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9inf,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9ART,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9dir,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9cmt,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9req,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9day,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9fmt,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9prd,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9prf,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9src,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
 
     /* Last entry */
     { 0,            NULL,                   NULL }
