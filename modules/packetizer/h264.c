@@ -52,6 +52,7 @@ vlc_module_end();
  * Local prototypes
  ****************************************************************************/
 static block_t *Packetize( decoder_t *, block_t ** );
+static block_t *PacketizeAVC1( decoder_t *, block_t ** );
 
 struct decoder_sys_t
 {
@@ -69,6 +70,9 @@ struct decoder_sys_t
     unsigned int i_flags;
 
     vlc_bool_t   b_sps;
+
+    /* avcC data */
+    int i_avcC_length_size;
 };
 
 enum
@@ -101,6 +105,8 @@ enum nal_priority_e
 
 static block_t *ParseNALBlock( decoder_t *, block_t * );
 
+static block_t *nal_get_encoded( decoder_t *, uint8_t *p, int );
+
 /*****************************************************************************
  * Open: probe the packetizer and return score
  *****************************************************************************/
@@ -110,7 +116,8 @@ static int Open( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC( 'h', '2', '6', '4') &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC( 'H', '2', '6', '4') )
+        p_dec->fmt_in.i_codec != VLC_FOURCC( 'H', '2', '6', '4') &&
+        ( p_dec->fmt_in.i_codec != VLC_FOURCC( 'a', 'v', 'c', '1') || p_dec->fmt_in.i_extra < 7 ) )
     {
         return VLC_EGENERIC;
     }
@@ -139,29 +146,47 @@ static int Open( vlc_object_t *p_this )
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->fmt_out.i_codec = VLC_FOURCC( 'h', '2', '6', '4' );
 
-#if 0
-    if( p_dec->fmt_in.i_extra )
+    if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'a', 'v', 'c', '1' ) )
     {
-        /* We have a vol */
-        p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
-        p_dec->fmt_out.p_extra = malloc( p_dec->fmt_in.i_extra );
-        memcpy( p_dec->fmt_out.p_extra, p_dec->fmt_in.p_extra,
-                p_dec->fmt_in.i_extra );
+        uint8_t *p = &((uint8_t*)p_dec->fmt_in.p_extra)[4];
+        int i_sps, i_pps;
+        int i;
 
-        msg_Dbg( p_dec, "opening with vol size:%d", p_dec->fmt_in.i_extra );
-        m4v_VOLParse( &p_dec->fmt_out,
-                      p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
+        /* Parse avcC */
+        p_sys->i_avcC_length_size = 1 + ((*p++)&0x03);
+
+        /* Read SPS */
+        i_sps = (*p++)&0x1f;
+
+        for( i = 0; i < i_sps; i++ )
+        {
+            int i_length = GetWBE( p );
+            block_t *p_sps = nal_get_encoded( p_dec, p+2, i_length );
+
+            ParseNALBlock( p_dec, p_sps );
+            p += 2 + i_length;
+        }
+        /* Read PPS */
+        i_pps = *p++;
+        for( i = 0; i < i_pps; i++ )
+        {
+            int i_length = GetWBE( p );
+            block_t *p_pps = nal_get_encoded( p_dec, p+2, i_length );
+
+            ParseNALBlock( p_dec, p_pps );
+            p += 2 + i_length;
+        }
+        msg_Dbg( p_dec, "avcC length size=%d sps=%d pps=%d",
+                 p_sys->i_avcC_length_size, i_sps, i_pps );
+
+        /* Set callback */
+        p_dec->pf_packetize = PacketizeAVC1;
     }
     else
     {
-        /* No vol, we'll have to look for one later on */
-        p_dec->fmt_out.i_extra = 0;
-        p_dec->fmt_out.p_extra = 0;
+        /* Set callback */
+        p_dec->pf_packetize = Packetize;
     }
-#endif
-
-    /* Set callback */
-    p_dec->pf_packetize = Packetize;
 
     return VLC_SUCCESS;
 }
@@ -252,6 +277,115 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     }
 }
 
+/****************************************************************************
+ * PacketizeAVC1: the whole thing
+ ****************************************************************************/
+static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t       *p_block;
+    block_t       *p_ret = NULL;
+    uint8_t       *p;
+
+    if( !pp_block || !*pp_block ) return NULL;
+
+    p_block = *pp_block;
+    *pp_block = NULL;
+
+    for( p = p_block->p_buffer; p < &p_block->p_buffer[p_block->i_buffer]; )
+    {
+        block_t *p_pic;
+        int i_size = 0;
+        int i;
+
+        for( i = 0; i < p_sys->i_avcC_length_size; i++ )
+        {
+            i_size = (i_size << 8) | (*p++);
+        }
+
+        if( i_size > 0 )
+        {
+            block_t *p_part = nal_get_encoded( p_dec, p, i_size );
+
+            p_part->i_dts = p_block->i_dts;
+            p_part->i_pts = p_block->i_pts;
+            /* Parse the NAL */
+            if( ( p_pic = ParseNALBlock( p_dec, p_part ) ) )
+            {
+                block_ChainAppend( &p_ret, p_pic );
+            }
+        }
+        p += i_size;
+    }
+
+    return p_ret;
+}
+
+static block_t *nal_get_encoded( decoder_t *p_dec, uint8_t *p, int i_size )
+{
+    block_t *p_nal;
+    int     i_nal_size = 5;
+    uint8_t *src = &p[1];
+    uint8_t *end = &p[i_size];
+    uint8_t *dst;
+    int     i_count = 0;
+
+    /* 1: compute real size */
+    while( src < end )
+    {
+        if( i_count == 2 && *src <= 0x03 )
+        {
+            i_nal_size++;
+            i_count = 0;
+        }
+        if( *src == 0 )
+        {
+            i_count++;
+        }
+        else
+        {
+            i_count = 0;
+        }
+        i_nal_size++;
+        src++;
+    }
+
+    /* 2: encode it */
+    p_nal = block_New( p_dec, i_nal_size );
+    i_count = 0;
+    src = p;
+    dst = p_nal->p_buffer;
+
+    /* add start code */
+    *dst++ = 0x00;
+    *dst++ = 0x00;
+    *dst++ = 0x00;
+    *dst++ = 0x01;
+
+    /* nal type */
+    *dst++ = *src++;
+
+    while( src < end )
+    {
+        if( i_count == 2 && *src <= 0x03 )
+        {
+            *dst++ = 0x03;
+            i_count = 0;
+        }
+        if( *src == 0 )
+        {
+            i_count++;
+        }
+        else
+        {
+            i_count = 0;
+        }
+        *dst++ = *src++;
+    }
+
+    return p_nal;
+}
+
 static void nal_get_decoded( uint8_t **pp_ret, int *pi_ret, uint8_t *src, int i_src )
 {
     uint8_t *end = &src[i_src];
@@ -285,7 +419,7 @@ static inline int bs_read_ue( bs_t *s )
     }
     return( ( 1 << i) - 1 + bs_read( s, i ) );
 }
-static inline int bs_read_se( bs_t *s ) 
+static inline int bs_read_se( bs_t *s )
 {
     int val = bs_read_ue( s );
 
@@ -316,6 +450,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         else
         {
             block_ChainRelease( p_sys->p_frame );
+            msg_Warn( p_dec, "waiting SPS" );
         }
 
         /* reset context */
