@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.50 2003/09/20 01:36:57 hartman Exp $
+ * $Id: ffmpeg.c,v 1.51 2003/09/26 16:10:24 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -67,12 +67,13 @@
  * Local prototypes
  */
 int             E_(OpenChroma)  ( vlc_object_t * );
+void            E_(ffmpeg_InitLibavcodec) ( vlc_object_t *p_object );
+
 static int      OpenDecoder     ( vlc_object_t * );
 static int      RunDecoder      ( decoder_fifo_t * );
 
 static int      InitThread      ( generic_thread_t * );
 static void     EndThread       ( generic_thread_t * );
-
 
 static int      b_ffmpeginit = 0;
 
@@ -282,28 +283,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 static int InitThread( generic_thread_t *p_decoder )
 {
     int i_result;
-    vlc_value_t lockval;
 
-
-    var_Get( p_decoder->p_fifo->p_libvlc, "avcodec", &lockval );
-    vlc_mutex_lock( lockval.p_address );
-
-     /* *** init ffmpeg library (libavcodec) *** */
-    if( !b_ffmpeginit )
-    {
-
-        avcodec_init();
-        avcodec_register_all();
-        b_ffmpeginit = 1;
-
-        msg_Dbg( p_decoder->p_fifo, "libavcodec initialized (interface %d )",
-                                                           LIBAVCODEC_BUILD );
-    }
-    else
-    {
-        msg_Dbg( p_decoder->p_fifo, "libavcodec already initialized" );
-    }
-    vlc_mutex_unlock( lockval.p_address );
+    E_(ffmpeg_InitLibavcodec)(VLC_OBJECT(p_decoder->p_fifo));
 
     /* *** determine codec type *** */
     ffmpeg_GetFfmpegCodec( p_decoder->p_fifo->i_fourcc,
@@ -601,7 +582,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
 
 #if( ( LIBAVCODEC_BUILD >= 4663 ) && ( !defined( WORDS_BIGENDIAN ) ) )
         /* Quality of this decoder on ppc is not good */
-	case FOURCC_IV31:
+        case FOURCC_IV31:
         case FOURCC_iv31:
         case FOURCC_IV32:
         case FOURCC_iv32:
@@ -612,13 +593,13 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
 #endif
 
 #if LIBAVCODEC_BUILD >= 4668
-	/* Not yet finished 
+        /* Not yet finished 
         case FOURCC_vp31:
-	case FOURCC_VP31:
-	    i_cat    = VIDEO_ES;
-	    i_codec  = CODEC_ID_VP3;
-	    psz_name = "On2's VP3 Video";
-	    break;
+        case FOURCC_VP31:
+            i_cat    = VIDEO_ES;
+            i_codec  = CODEC_ID_VP3;
+            psz_name = "On2's VP3 Video";
+            break;
 
         case FOURCC_asv1:
         case FOURCC_ASV1:
@@ -644,4 +625,29 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
     }
 
     return( VLC_FALSE );
+}
+
+void E_ (ffmpeg_InitLibavcodec) ( vlc_object_t *p_object )
+{
+    vlc_value_t lockval;
+
+    var_Get( p_object->p_libvlc, "avcodec", &lockval );
+    vlc_mutex_lock( lockval.p_address );
+
+     /* *** init ffmpeg library (libavcodec) *** */
+    if( !b_ffmpeginit )
+    {
+        avcodec_init();
+        avcodec_register_all();
+        b_ffmpeginit = 1;
+
+        msg_Dbg( p_object, "libavcodec initialized (interface %d )",
+                 LIBAVCODEC_BUILD );
+    }
+    else
+    {
+        msg_Dbg( p_object, "libavcodec already initialized" );
+    }
+
+    vlc_mutex_unlock( lockval.p_address );
 }

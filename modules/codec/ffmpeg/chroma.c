@@ -2,7 +2,7 @@
  * chroma.c: chroma conversion using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: chroma.c,v 1.1 2003/04/27 15:25:11 gbazin Exp $
+ * $Id: chroma.c,v 1.2 2003/09/26 16:10:24 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -38,7 +38,8 @@
 
 #include "ffmpeg.h"
 
-void ChromaConversion( vout_thread_t *, picture_t *, picture_t * );
+void E_(ffmpeg_InitLibavcodec) ( vlc_object_t *p_object );
+static void ChromaConversion( vout_thread_t *, picture_t *, picture_t * );
 
 /*****************************************************************************
  * chroma_sys_t: chroma method descriptor
@@ -146,14 +147,17 @@ int E_(OpenChroma)( vlc_object_t *p_this )
     p_vout->chroma.p_sys->i_src_ffmpeg_chroma = i_ffmpeg_chroma[0];
     p_vout->chroma.p_sys->i_dst_ffmpeg_chroma = i_ffmpeg_chroma[1];
 
+    /* libavcodec needs to be initialized for some chroma conversions */
+    E_(ffmpeg_InitLibavcodec)(p_this);
+
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * ChromaConversion: actual chroma conversion function
  *****************************************************************************/
-void ChromaConversion( vout_thread_t *p_vout,
-                       picture_t *p_src, picture_t *p_dest )
+static void ChromaConversion( vout_thread_t *p_vout,
+                              picture_t *p_src, picture_t *p_dest )
 {
     AVPicture src_pic;
     AVPicture dest_pic;
