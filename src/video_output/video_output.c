@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.236 2003/09/19 15:33:58 fenrir Exp $
+ * $Id: video_output.c,v 1.237 2003/10/05 23:03:35 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -913,9 +913,14 @@ static void RunThread( vout_thread_t *p_vout)
         vlc_mutex_unlock( &p_vout->change_lock );
 
         /* Sleep a while or until a given date */
-        if( display_date != 0 && p_vout->psz_filter_chain == NULL )
+        if( display_date != 0 )
         {
-            mwait( display_date - VOUT_MWAIT_TOLERANCE );
+            /* If there are filters in the chain, better give them the picture
+             * in advance */
+            if( !p_vout->psz_filter_chain || !*p_vout->psz_filter_chain )
+            {
+                mwait( display_date - VOUT_MWAIT_TOLERANCE );
+            }
         }
         else
         {
