@@ -1915,7 +1915,6 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	  <widget>
 	    <class>GtkRadioButton</class>
 	    <name>network_http</name>
-	    <sensitive>False</sensitive>
 	    <can_focus>True</can_focus>
 	    <label>HTTP</label>
 	    <active>False</active>

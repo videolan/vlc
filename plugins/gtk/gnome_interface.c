@@ -1456,7 +1456,6 @@ create_intf_network (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (network_http);
   gtk_box_pack_start (GTK_BOX (vbox6), network_http, FALSE, FALSE, 0);
-  gtk_widget_set_sensitive (network_http, FALSE);
 
   frame4 = gtk_frame_new (_("Server"));
   gtk_widget_ref (frame4);
