@@ -36,7 +36,7 @@ Conflicts: vlc-gnome (<< 0.5.0)
 Replaces: vlc-gnome (<< 0.5.0)
 Provides: vlc-gui
 Description: GNOME frontend for VLC
- This plugin adds a Gnome interface to the VLC media player. To activate
+ This plugin adds a GNOME interface to the VLC media player. To activate
  it, use the `--intf gnome' flag or run the `gnome-vlc' program.
 
 Package: vlc-gnome
@@ -52,8 +52,8 @@ Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Conflicts: vlc-gnome (<= 0.2.63-2), vlc-gtk (<< 0.5.0)
 Replaces: vlc-gnome (<= 0.2.63-2), vlc-gtk (<< 0.5.0)
 Provides: vlc-gui
-Description: Gtk+ frontend for VLC
- This plugin adds a Gtk+ interface to the VLC media player. To activate
+Description: GTK+ frontend for VLC
+ This plugin adds a GTK+ interface to the VLC media player. To activate
  it, use the `--intf gtk' flag or run the `gvlc' program.
 
 Package: vlc-gtk

@@ -1,8 +1,12 @@
 vlc (0.5.3-2) unstable; urgency=low
 
   * Changed the libvlc0-dev section to libdevel.
+  * We now build the static objects twice: once the normal way before we
+    link them with VLC, and once with -fPIC so that they can be linked to
+    the Mozilla plugin.
+  * Updated extras/faad/config.{sub,guess}.
 
- -- Samuel Hocevar <sam@zoy.org>  Fri, 11 Apr 2003 21:14:07 +0200
+ -- Samuel Hocevar <sam@zoy.org>  Fri, 14 Apr 2003 15:14:07 +0200
 
 vlc (0.5.3-1) unstable; urgency=low
 

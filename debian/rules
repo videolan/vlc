@@ -87,7 +87,7 @@ build-stamp:
 		cd extras/ffmpeg \
 		&& ./configure \
 		&& cd libavcodec \
-		&& make; \
+		&& $(MAKE); \
 	fi
 
 	# Check that we have an faad tree in here (can be a symlink)
@@ -101,12 +101,36 @@ build-stamp:
 		&& touch `find . -name Makefile.in` \
 		&& ./configure --disable-shared \
 		&& cd libfaad \
-		&& make; \
+		&& $(MAKE); \
 	fi
 
-	# Configure VLC and build it
+	# Configure VLC
 	./configure --mandir=$${prefix}/share/man \
 		--infodir=$${prefix}/share/info $(CONFIG_FLAGS)
+
+	# Build only VLC, with the non-PIC libs
+	$(MAKE) vlc
+
+ifneq ($(DEB_BUILD_ARCH),i386)
+	# Hackety hackety hack
+	if test ! -d CVS; then \
+		cd extras/ffmpeg/libavcodec \
+		&& $(MAKE) clean \
+		&& rm -f Makefile.pic \
+		&& sed 's/^CFLAGS *=/&-fPIC -DPIC /' <Makefile >Makefile.pic \
+		&& $(MAKE) -f Makefile.pic \
+		&& rm -f Makefile.pic; \
+	fi
+
+	# HACKETY HACKETY HACK
+	if test ! -d CVS; then \
+		cd extras/faad/libfaad \
+		&& $(MAKE) clean \
+		&& $(MAKE) AM_CFLAGS=-fPIC; \
+	fi
+endif
+
+	# Build all the rest, with the PIC libs
 	$(MAKE)
 
 	touch build-stamp
@@ -118,10 +142,10 @@ clean:
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
 	test -d extras/ffmpeg
-	-if test ! -d CVS; then cd extras/ffmpeg && make distclean; fi
+	-if test ! -d CVS; then cd extras/ffmpeg && $(MAKE) distclean; fi
 	# Check that we have an faad tree in here (can be a symlink)
 	test -d extras/faad
-	-if test ! -d CVS; then cd extras/faad && make distclean; fi
+	-if test ! -d CVS; then cd extras/faad && $(MAKE) distclean; fi
 
 	# Remove spurious autotools stuff
 	rm -f config.log confdefs.h
