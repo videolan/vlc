@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input.c,v 1.4 2002/08/30 22:22:24 massiot Exp $
+ * $Id: input.c,v 1.5 2002/10/23 21:54:33 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -236,7 +236,6 @@ static int DvdReadRewind( input_thread_t * p_input )
 int E_(OpenDVD) ( vlc_object_t *p_this )
 {
     input_thread_t *        p_input = (input_thread_t *)p_this;
-    char *                  psz_orig;
     char *                  psz_parser;
     char *                  psz_source;
     char *                  psz_next;
@@ -249,8 +248,8 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     int                     i_angle = 1;
     int                     i;
 
-    psz_orig = psz_parser = psz_source = strdup( p_input->psz_name );
-    if( !psz_orig )
+    psz_parser = psz_source = strdup( p_input->psz_name );
+    if( !psz_source )
     {
         return( -1 );
     }
@@ -289,18 +288,20 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
 
     if( !*psz_source )
     {
+        free( psz_source );
         if( !p_input->psz_access )
         {
-            free( psz_orig );
             return -1;
         }
         psz_source = config_GetPsz( p_input, "dvd" );
+        if( !psz_source ) return -1;
     }
 
     if( stat( psz_source, &stat_info ) == -1 )
     {
         msg_Err( p_input, "cannot stat() source `%s' (%s)",
                           psz_source, strerror(errno));
+        free( psz_source );
         return( -1 );
     }
     if( !S_ISBLK(stat_info.st_mode) &&
@@ -308,6 +309,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
         !S_ISDIR(stat_info.st_mode) )
     {
         msg_Warn( p_input, "dvdread module discarded (not a valid source)" );
+        free( psz_source );
         return -1;
     }
     
@@ -318,9 +320,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     p_dvdread = DVDOpen( psz_source );
 
     /* free allocated strings */
-    if( psz_source != psz_orig )
-        free( psz_source );
-    free( psz_orig );
+    free( psz_source );
 
     if( ! p_dvdread )
     {

@@ -2,7 +2,7 @@
  * tools.c: tools for dvd plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: tools.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: tools.c,v 1.2 2002/10/23 21:54:33 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -97,12 +97,14 @@ char * dvdplay_ParseCL( input_thread_t * p_input,
             return NULL;
         }
         psz_source = config_GetPsz( p_input, "dvd" );
+        if( !psz_source ) return NULL;
     }
 
     if( stat( psz_source, &stat_info ) == -1 )
     {
         msg_Err( p_input, "cannot stat() source `%s' (%s)",
                      psz_source, strerror(errno));
+        free( psz_source );
         return NULL;
     }
     if( !S_ISBLK(stat_info.st_mode) &&
@@ -111,6 +113,7 @@ char * dvdplay_ParseCL( input_thread_t * p_input,
     {
         msg_Dbg( p_input, "plugin discarded"
                          " (not a valid source)" );
+        free( psz_source );
         return NULL;
     }
     

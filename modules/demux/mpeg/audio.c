@@ -2,7 +2,7 @@
  * audio.c : mpeg audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.8 2002/08/24 21:35:31 sigmunau Exp $
+ * $Id: audio.c,v 1.9 2002/10/23 21:54:33 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -513,6 +513,7 @@ static int Activate( vlc_object_t * p_this )
     /* check if it could be a ps stream */
     if( !b_forced && CheckPS(  p_input ))
     {
+        free( p_input->p_demux_data );
         return( -1 );
     }
 
@@ -532,6 +533,7 @@ static int Activate( vlc_object_t * p_this )
         else
         {
             msg_Warn( p_input, "MPEGAudio module discarded (no frame found)" );
+            free( p_input->p_demux_data );
             return( -1 );
         }
     }
@@ -545,11 +547,13 @@ static int Activate( vlc_object_t * p_this )
     if( input_InitStream( p_input, 0 ) == -1)
     {
         msg_Err( p_input, "cannot init stream" );
+        free( p_input->p_demux_data );
         return( -1 );
     }    
     if( input_AddProgram( p_input, 0, 0) == NULL )
     {
         msg_Err( p_input, "cannot add program" );
+        free( p_input->p_demux_data );
         return( -1 );
     }
     p_input->stream.pp_programs[0]->b_is_ok = 0;
@@ -564,6 +568,7 @@ static int Activate( vlc_object_t * p_this )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "out of memory" );
+        free( p_input->p_demux_data );
         return( -1 );
     }
     p_demux->p_es->i_stream_id = 1;

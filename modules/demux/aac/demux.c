@@ -2,7 +2,7 @@
  * demux.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demux.c,v 1.2 2002/08/24 21:35:31 sigmunau Exp $
+ * $Id: demux.c,v 1.3 2002/10/23 21:54:33 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -475,11 +475,13 @@ static int Activate( vlc_object_t * p_this )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( input_InitStream( p_input, 0 ) == -1)
     {
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot init stream" );
         return( -1 );
     }    
     if( input_AddProgram( p_input, 0, 0) == NULL )
     {
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot add program" );
         return( -1 );
     }
