@@ -289,6 +289,13 @@ void KInterface::slotManage()
     {
         p_intf->p_sys->p_input = (input_thread_t *)
                 vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+        if ( p_intf->p_sys->p_input )
+        {
+            languages->setEnabled( true );
+            subtitles->setEnabled( true );
+            info->setEnabled( true );
+        }
+            
     }
     else if( p_intf->p_sys->p_input->b_dead )
     {
