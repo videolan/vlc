@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.36 2001/11/11 01:32:03 stef Exp $
+ * $Id: input_ts.c,v 1.37 2001/11/23 18:47:51 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -133,9 +133,10 @@ static int TSProbe( probedata_t * p_data )
         return( 999 );
     }
 
-    if( ( strlen(psz_name) > 3 ) && !strncasecmp( psz_name, "ts:", 3 ) )
+    if( ( strlen(psz_name) >= 10 && !strncasecmp( psz_name, "udpstream:", 10 ) )
+            || ( strlen(psz_name) >= 4 && !strncasecmp( psz_name, "udp:", 4 ) ) )
     {
-        /* If the user specified "ts:" then it's probably a network stream */
+        /* If the user specified "udp:" then it's probably a network stream */
         return( 999 );
     }
 

@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.48 2001/11/21 22:33:03 jlj Exp $
+ * $Id: netutils.c,v 1.49 2001/11/23 18:47:51 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -109,10 +109,10 @@ static int GetAdapterInfo  ( int i_adapter, char *psz_string );
 #endif
 
 /*****************************************************************************
- * network_BuildLocalAddr : fill a sockaddr_in structure for local binding
+ * network_BuildAddr : fill a sockaddr_in structure
  *****************************************************************************/
-int network_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port,
-                            char * psz_broadcast )
+int network_BuildAddr( struct sockaddr_in * p_socket,
+                       char * psz_address, int i_port )
 {
 #if defined( SYS_BEOS )
     intf_ErrMsg( "error: networking is not yet supported under BeOS" );
@@ -123,7 +123,7 @@ int network_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port,
     memset( p_socket, 0, sizeof( struct sockaddr_in ) );
     p_socket->sin_family = AF_INET;                                /* family */
     p_socket->sin_port = htons( i_port );
-    if( psz_broadcast == NULL )
+    if( psz_address == NULL )
     {
         p_socket->sin_addr.s_addr = INADDR_ANY;
     }
@@ -134,15 +134,15 @@ int network_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port,
         /* Try to convert address directly from in_addr - this will work if
          * psz_broadcast is dotted decimal. */
 #ifdef HAVE_ARPA_INET_H
-        if( !inet_aton( psz_broadcast, &p_socket->sin_addr) )
+        if( !inet_aton( psz_address, &p_socket->sin_addr) )
 #else
-        if( (p_socket->sin_addr.s_addr = inet_addr( psz_broadcast )) == -1 )
+        if( (p_socket->sin_addr.s_addr = inet_addr( psz_address )) == -1 )
 #endif
         {
             /* We have a fqdn, try to find its address */
-            if ( (p_hostent = gethostbyname( psz_broadcast )) == NULL )
+            if ( (p_hostent = gethostbyname( psz_address )) == NULL )
             {
-                intf_ErrMsg( "BuildLocalAddr: unknown host %s", psz_broadcast );
+                intf_ErrMsg( "BuildLocalAddr: unknown host %s", psz_address );
                 return( -1 );
             }
 
@@ -150,48 +150,6 @@ int network_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port,
             memcpy( &p_socket->sin_addr, p_hostent->h_addr_list[0],
                      p_hostent->h_length );
         }
-    }
-    return( 0 );
-#endif
-}
-
-/*****************************************************************************
- * network_BuildRemoteAddr : fill a sockaddr_in structure for remote host
- *****************************************************************************/
-int network_BuildRemoteAddr( struct sockaddr_in * p_socket, char * psz_server )
-{
-#if defined( SYS_BEOS )
-    intf_ErrMsg( "error: networking is not yet supported under BeOS" );
-    return( 1 );
-
-#else
-    struct hostent            * p_hostent;
-
-    /* Reset structure */
-    memset( p_socket, 0, sizeof( struct sockaddr_in ) );
-    p_socket->sin_family = AF_INET;                                /* family */
-    p_socket->sin_port = htons( 0 );               /* This is for remote end */
-
-     /* Try to convert address directly from in_addr - this will work if
-      * psz_in_addr is dotted decimal. */
-
-#ifdef HAVE_ARPA_INET_H
-    if( !inet_aton( psz_server, &p_socket->sin_addr) )
-#else
-    if( (p_socket->sin_addr.s_addr = inet_addr( psz_server )) == -1 )
-#endif
-    {
-        /* We have a fqdn, try to find its address */
-        if ( (p_hostent = gethostbyname(psz_server)) == NULL )
-        {
-            intf_ErrMsg( "BuildRemoteAddr: unknown host %s",
-                         psz_server );
-            return( -1 );
-        }
-
-        /* Copy the first address of the host in the socket address */
-        memcpy( &p_socket->sin_addr, p_hostent->h_addr_list[0],
-                 p_hostent->h_length );
     }
     return( 0 );
 #endif

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.125 2001/11/14 00:01:36 jlj Exp $
+ * $Id: main.c,v 1.126 2001/11/23 18:47:51 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -213,9 +213,6 @@ static const struct option longopts[] =
     
     /* Input options */
     {   "input",            1,          0,      OPT_INPUT },
-    {   "server",           1,          0,      OPT_SERVER },
-    {   "port",             1,          0,      OPT_PORT },
-    {   "broadcast",        1,          0,      OPT_BROADCAST },
     {   "channels",         0,          0,      OPT_CHANNELS },
     {   "channelserver",    1,          0,      OPT_CHANNELSERVER },
 
@@ -792,16 +789,6 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_CHANNELSERVER:                           /* --channelserver */
             main_PutPszVariable( INPUT_CHANNEL_SERVER_VAR, optarg );
             break;
-        case OPT_SERVER:                                         /* --server */
-            main_PutPszVariable( INPUT_SERVER_VAR, optarg );
-            break;
-        case OPT_PORT:                                             /* --port */
-            main_PutPszVariable( INPUT_PORT_VAR, optarg );
-            break;
-        case OPT_BROADCAST:                                   /* --broadcast */
-            main_PutIntVariable( INPUT_BROADCAST_VAR, 1 );
-            main_PutPszVariable( INPUT_BCAST_ADDR_VAR, optarg );
-            break;
 
         /* Synchro options */
         case OPT_SYNCHRO:                                      
@@ -916,9 +903,6 @@ static void Usage( int i_fashion )
           "\n      --input                    \tinput method"
           "\n      --channels                 \tenable channels"
           "\n      --channelserver <host>     \tchannel server address"
-          "\n      --server <host>            \tvideo server address"
-          "\n      --port <port>              \tvideo server port"
-          "\n      --broadcast                \tlisten to a broadcast"
           "\n"
           "\n  -h, --help                     \tprint help and exit"
           "\n  -H, --longhelp                 \tprint long help and exit"
@@ -974,10 +958,7 @@ static void Usage( int i_fashion )
 
     /* Input parameters */
     intf_MsgImm( "\nInput parameters:"
-        "\n  " INPUT_SERVER_VAR "=<hostname>          \tvideo server"
-        "\n  " INPUT_PORT_VAR "=<port>            \tvideo server port"
         "\n  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface"
-        "\n  " INPUT_BCAST_ADDR_VAR "=<addr>          \tbroadcast mode"
         "\n  " INPUT_CHANNEL_SERVER_VAR "=<hostname>  \tchannel server"
         "\n  " INPUT_CHANNEL_PORT_VAR "=<port>        \tchannel server port" );
 

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.157 2001/11/21 16:47:46 massiot Exp $
+ * $Id: input.c,v 1.158 2001/11/23 18:47:51 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -419,8 +419,10 @@ static int InitThread( input_thread_t * p_input )
 
 #if !defined( SYS_BEOS ) && !defined( SYS_NTO )
     /* FIXME : this is waaaay too kludgy */
-    if( ( strlen( p_input->p_source ) > 3)
-          && !strncasecmp( p_input->p_source, "ts:", 3 ) )
+    if( ( strlen( p_input->p_source ) >= 10
+          && !strncasecmp( p_input->p_source, "udpstream:", 10 ) )
+          || ( strlen( p_input->p_source ) >= 4
+                && !strncasecmp( p_input->p_source, "udp:", 4 ) ) )
     {
         /* Network stream */
         NetworkOpen( p_input );
@@ -549,8 +551,10 @@ static void CloseThread( input_thread_t * p_input )
 
 #if !defined( SYS_BEOS ) && !defined( SYS_NTO )
     /* Close stream */
-    if( ( strlen( p_input->p_source ) > 3)
-          && !strncasecmp( p_input->p_source, "ts:", 3 ) )
+    if( ( strlen( p_input->p_source ) > 10
+          && !strncasecmp( p_input->p_source, "udpstream:", 10 ) )
+          || ( strlen( p_input->p_source ) > 4
+                && !strncasecmp( p_input->p_source, "udp:", 4 ) ) )
     {
         NetworkClose( p_input );
     }
@@ -726,77 +730,107 @@ static void FileClose( input_thread_t * p_input )
 static void NetworkOpen( input_thread_t * p_input )
 {
     char                *psz_server = NULL;
-    char                *psz_broadcast = NULL;
-    int                 i_port = 0;
+    char                *psz_bind = NULL;
+    int                 i_server_port = 0;
+    int                 i_bind_port = 0;
     int                 i_opt;
     int                 i_opt_size;
     struct sockaddr_in  sock;
 
-    /* Get the remote server */
+    /* Get the remote server. Syntax is :
+     * udp[stream]:[/][/][serveraddr[:serverport]][@[bindaddr]:[bindport]] */
     if( p_input->p_source != NULL )
     {
-        psz_server = p_input->p_source;
+        char * psz_parser = p_input->p_source;
+        char * psz_server_port = NULL;
+        char * psz_bind_port = NULL;
 
         /* Skip the protocol name */
-        while( *psz_server && *psz_server != ':' )
+        while( *psz_parser && *psz_parser != ':' )
         {
-            psz_server++;
+            psz_parser++;
         }
 
         /* Skip the "://" part */
-        while( *psz_server && (*psz_server == ':' || *psz_server == '/') )
+        while( *psz_parser && (*psz_parser == ':' || *psz_parser == '/') )
         {
-            psz_server++;
+            psz_parser++;
         }
 
-        /* Found a server name */
-        if( *psz_server )
+        if( *psz_parser && *psz_parser != '@' )
         {
-            char *psz_port = psz_server;
+            /* Found server */
+            psz_server = psz_parser;
 
-            /* Skip the hostname part */
-            while( *psz_port && *psz_port != ':' && *psz_port != '/' )
+            while( *psz_parser && *psz_parser != ':' && *psz_parser != '@' )
             {
-                psz_port++;
+                psz_parser++;
             }
 
-            /* Found a port name or a broadcast addres */
-            if( *psz_port )
+            if( *psz_parser == ':' )
             {
-                /* That's a port name */
-                if( *psz_port == ':' )
-                {
-                    *psz_port = '\0';
-                    psz_port++;
-                    i_port = atoi( psz_port );
-                }
+                /* Found server port */
+                *psz_parser = '\0'; /* Terminate server name */
+                psz_parser++;
+                psz_server_port = psz_parser;
 
-                /* Search for '/' just after the port in case
-                 * we also have a broadcast address */
-                psz_broadcast = psz_port;
-                while( *psz_broadcast && *psz_broadcast != '/' )
+                while( *psz_parser && *psz_parser != '@' )
                 {
-                    psz_broadcast++;
-                }
-
-                if( *psz_broadcast )
-                {
-                    *psz_broadcast = '\0';
-                    psz_broadcast++;
-                    while( *psz_broadcast && *psz_broadcast == '/' )
-                    {
-                        psz_broadcast++;
-                    }
-                }
-                else
-                {
-                    psz_broadcast = NULL;
+                    psz_parser++;
                 }
             }
         }
-        else
+
+        if( *psz_parser == '@' )
         {
-            psz_server = NULL;
+            /* Found bind address or bind port */
+            *psz_parser = '\0'; /* Terminate server port or name if necessary */
+            psz_parser++;
+
+            if( *psz_parser && *psz_parser != ':' )
+            {
+                /* Found bind address */
+                psz_bind = psz_parser;
+
+                while( *psz_parser && *psz_parser != ':' )
+                {
+                    psz_parser++;
+                }
+            }
+
+            if( *psz_parser == ':' )
+            {
+                /* Found bind port */
+                *psz_parser = '\0'; /* Terminate bind address if necessary */
+                psz_parser++;
+
+                psz_bind_port = psz_parser;
+            }
+        }
+
+        /* Convert ports format */
+        if( psz_server_port != NULL )
+        {
+            i_server_port = strtol( psz_server_port, &psz_parser, 10 );
+            if( *psz_parser )
+            {
+                intf_ErrMsg( "input error: cannot parse server port near %s",
+                             psz_parser );
+                p_input->b_error = 1;
+                return;
+            }
+        }
+
+        if( psz_bind_port != NULL )
+        {
+            i_bind_port = strtol( psz_bind_port, &psz_parser, 10 );
+            if( *psz_parser )
+            {
+                intf_ErrMsg( "input error: cannot parse bind port near %s",
+                             psz_parser );
+                p_input->b_error = 1;
+                return;
+            }
         }
     }
     else
@@ -805,36 +839,14 @@ static void NetworkOpen( input_thread_t * p_input )
         p_input->p_source = "ts: network input";
     }
 
-    /* Check that we got a valid server */
-    if( psz_server == NULL )
-    {
-        psz_server = main_GetPszVariable( INPUT_SERVER_VAR, 
-                                          INPUT_SERVER_DEFAULT );
-    }
-
     /* Check that we got a valid port */
-    if( i_port == 0 )
+    if( i_bind_port == 0 )
     {
-        i_port = main_GetIntVariable( INPUT_PORT_VAR, INPUT_PORT_DEFAULT );
+        i_bind_port = main_GetIntVariable( INPUT_PORT_VAR, INPUT_PORT_DEFAULT );
     }
 
-    if( psz_broadcast == NULL )
-    {
-        /* Are we broadcasting ? */
-        if( main_GetIntVariable( INPUT_BROADCAST_VAR,
-                                 INPUT_BROADCAST_DEFAULT ) )
-        {
-            psz_broadcast = main_GetPszVariable( INPUT_BCAST_ADDR_VAR,
-                                                 INPUT_BCAST_ADDR_DEFAULT );
-        }
-        else
-        {
-            psz_broadcast = NULL; 
-        }
-    }
-
-    intf_WarnMsg( 2, "input: server=%s port=%d broadcast=%s",
-                     psz_server, i_port, psz_broadcast );
+    intf_WarnMsg( 2, "input: server=%s:%d local=%s:%d",
+                     psz_server, i_server_port, psz_bind, i_bind_port );
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
      * protocol */
@@ -864,7 +876,7 @@ static void NetworkOpen( input_thread_t * p_input )
     if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_RCVBUF,
                     (void *) &i_opt, sizeof( i_opt ) ) == -1 )
     {
-        intf_WarnMsg( 1, "input error: can't configure socket (SO_RCVBUF: %s)", 
+        intf_WarnMsg( 1, "input warning: can't configure socket (SO_RCVBUF: %s)", 
                          strerror(errno));
     }
 
@@ -876,7 +888,7 @@ static void NetworkOpen( input_thread_t * p_input )
     if( getsockopt( p_input->i_handle, SOL_SOCKET, SO_RCVBUF,
                     (void*) &i_opt, &i_opt_size ) == -1 )
     {
-        intf_WarnMsg( 1, "input error: can't query socket (SO_RCVBUF: %s)", 
+        intf_WarnMsg( 1, "input warning: can't query socket (SO_RCVBUF: %s)", 
                          strerror(errno));
     }
     else if( i_opt < 0x80000 )
@@ -886,7 +898,7 @@ static void NetworkOpen( input_thread_t * p_input )
     }
 
     /* Build the local socket */
-    if ( network_BuildLocalAddr( &sock, i_port, psz_broadcast ) == -1 )
+    if ( network_BuildAddr( &sock, psz_bind, i_bind_port ) == -1 )
     {
         intf_ErrMsg( "input error: can't build local address" );
         close( p_input->i_handle );
@@ -904,14 +916,26 @@ static void NetworkOpen( input_thread_t * p_input )
         return;
     }
 
-    /* Join the multicast group if the socket is a multicast address */
+    /* Allow broadcast reception if we bound on INADDR_ANY */
+    if( psz_bind == NULL )
+    {
+        i_opt = 1;
+        if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_BROADCAST,
+                        (void*) &i_opt, sizeof( i_opt ) ) == -1 )
+        {
+            intf_WarnMsg( 1, "input warning: can't configure socket (SO_BROADCAST: %s)", 
+                             strerror(errno));
+        }
+    }
 
-#if defined( WIN32 )
+    /* Join the multicast group if the socket is a multicast address */
+#ifndef IN_MULTICAST
 #   define IN_MULTICAST(a)         IN_CLASSD(a)
 #endif
 
     /* TODO : make this compile under Win32 */
-#ifndef WIN32    
+    /* Enabled this so that windows people have a serious look at it :)) */
+//#ifndef WIN32    
     if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
     {
         struct ip_mreq imr;
@@ -923,24 +947,23 @@ static void NetworkOpen( input_thread_t * p_input )
         {
             intf_ErrMsg( "input error: failed to join IP multicast group (%s)",
                          strerror(errno) );
-            close( p_input->i_handle);
+            close( p_input->i_handle );
             p_input->b_error = 1;
             return;
         }
     }
     
-    /* Build socket for remote connection */
-    if ( network_BuildRemoteAddr( &sock, psz_server ) == -1 )
+    if( psz_server != NULL )
     {
-        intf_ErrMsg( "input error: can't build remote address" );
-        close( p_input->i_handle );
-        p_input->b_error = 1;
-        return;
-    }
+        /* Build socket for remote connection */
+        if ( network_BuildAddr( &sock, psz_server, i_server_port ) == -1 )
+        {
+            intf_ErrMsg( "input error: can't build remote address" );
+            close( p_input->i_handle );
+            p_input->b_error = 1;
+            return;
+        }
 
-    /* Only connect if the user has passed a valid host */
-    if( sock.sin_addr.s_addr != INADDR_ANY )
-    {
         /* Connect the socket */
         if( connect( p_input->i_handle, (struct sockaddr *) &sock,
                      sizeof( sock ) ) == (-1) )
@@ -952,7 +975,7 @@ static void NetworkOpen( input_thread_t * p_input )
             return;
         }
     }
-#endif
+//#endif
 
     p_input->stream.b_pace_control = 0;
     p_input->stream.b_seekable = 0;
@@ -1153,26 +1176,24 @@ static void HTTPOpen( input_thread_t * p_input )
         }
 
         /* Build socket for proxy connection */
-        if ( network_BuildRemoteAddr( &sock, psz_proxy ) == -1 )
+        if ( network_BuildAddr( &sock, psz_proxy, i_proxy_port ) == -1 )
         {
             intf_ErrMsg( "input error: can't build remote address" );
             close( p_input->i_handle );
             p_input->b_error = 1;
             return;
         }
-        sock.sin_port = htons( i_proxy_port );
     }
     else
     {
         /* No proxy, direct connection */
-        if ( network_BuildRemoteAddr( &sock, psz_server ) == -1 )
+        if ( network_BuildAddr( &sock, psz_server, i_port ) == -1 )
         {
             intf_ErrMsg( "input error: can't build remote address" );
             close( p_input->i_handle );
             p_input->b_error = 1;
             return;
         }
-        sock.sin_port = htons( i_port );
     }
 
     /* Connect the socket */
