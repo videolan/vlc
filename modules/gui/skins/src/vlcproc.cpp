@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.8 2003/04/16 21:50:19 karibu Exp $
+ * $Id: vlcproc.cpp,v 1.9 2003/04/17 16:32:14 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -585,15 +585,10 @@ void VlcProc::ChangeVolume( unsigned int msg, long param )
     }
     aout_VolumeGet( p_intf, &volume );
 
-/* FIXME: kludge */
-#ifdef WIN32
-    PostMessage( NULL, CTRL_SET_SLIDER,
+    OSAPI_PostMessage( NULL, CTRL_SET_SLIDER,
         (unsigned int)
             p_intf->p_sys->p_theme->EvtBank->Get( "volume_refresh" ),
         (int)( volume * SLIDER_RANGE / AOUT_VOLUME_MAX ) );
-#else
-  fprintf(stderr, "WARNING: FIXME in vlcproc.cpp !!!");
-#endif
 }
 //---------------------------------------------------------------------------
 
