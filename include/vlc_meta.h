@@ -86,13 +86,13 @@ static inline void vlc_meta_Delete( vlc_meta_t *m )
 
 static inline void vlc_meta_Add( vlc_meta_t *m, char *name, char *value )
 {
-    int i_meta = m->i_meta;
+    m->name  = (char**)realloc( m->name, sizeof(char*) * ( m->i_meta + 1 ) );
+    m->name[m->i_meta] = strdup( name );
 
-    name = strdup( name );
-    value = strdup( value );
+    m->value = (char**)realloc( m->value, sizeof(char*) * ( m->i_meta + 1 ) );
+    m->value[m->i_meta] = strdup( value );
 
-    TAB_APPEND( m->i_meta, m->name, name );
-    TAB_APPEND( i_meta,    m->value,value );
+    m->i_meta++;
 }
 
 static inline vlc_meta_t *vlc_meta_Duplicate( vlc_meta_t *src )
@@ -106,7 +106,9 @@ static inline vlc_meta_t *vlc_meta_Duplicate( vlc_meta_t *src )
     for( i = 0; i < src->i_track; i++ )
     {
         vlc_meta_t *tk = vlc_meta_Duplicate( src->track[i] );
-        TAB_APPEND( dst->i_track, dst->track, tk );
+
+        dst->track = (vlc_meta_t**)realloc( dst->track, sizeof( vlc_meta_t* ) * (dst->i_track+1) );
+        dst->track[dst->i_track++] = tk;
     }
     return dst;
 }
@@ -118,15 +120,15 @@ static inline void vlc_meta_Merge( vlc_meta_t *dst, vlc_meta_t *src )
     {
         /* Check if dst contains the entry */
         for( j = 0; j < dst->i_meta; j++ )
-	{
-	    if( !strcmp( src->name[i], dst->name[j] ) ) break;
-	}
-	if( j < dst->i_meta )
-	{
-	    if( dst->value[j] ) free( dst->value[j] );
-	    dst->value[j] = strdup( src->value[i] );
-	}
-	else vlc_meta_Add( dst, src->name[i], src->value[i] );
+        {
+            if( !strcmp( src->name[i], dst->name[j] ) ) break;
+        }
+        if( j < dst->i_meta )
+        {
+            if( dst->value[j] ) free( dst->value[j] );
+            dst->value[j] = strdup( src->value[i] );
+        }
+        else vlc_meta_Add( dst, src->name[i], src->value[i] );
     }
 }
 

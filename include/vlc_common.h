@@ -476,13 +476,13 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #define TAB_APPEND( count, tab, p )             \
     if( (count) > 0 )                           \
     {                                           \
-        (void *)(tab) = realloc( tab, sizeof( void ** ) * ( (count) + 1 ) ); \
+        (tab) = realloc( tab, sizeof( void ** ) * ( (count) + 1 ) ); \
     }                                           \
     else                                        \
     {                                           \
-        (void *)(tab) = malloc( sizeof( void ** ) );    \
+        (tab) = malloc( sizeof( void ** ) );    \
     }                                           \
-    ((void**)(tab))[count] = (void*)(p);        \
+    (tab)[count] = (p);        \
     (count)++
 
 #define TAB_FIND( count, tab, p, index )        \
@@ -491,7 +491,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
         (index) = -1;                           \
         for( _i_ = 0; _i_ < (count); _i_++ )    \
         {                                       \
-            if( ((void**)(tab))[_i_] == (void*)(p) )  \
+            if( (tab)[_i_] == (p) )  \
             {                                   \
                 (index) = _i_;                  \
                 break;                          \
