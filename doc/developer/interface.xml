@@ -220,48 +220,110 @@ messages (if the message queue is in use).
 
   <sect1> <title> How to write an interface plugin </title>
 
+  <sect2> <title> API for the Module </title>
     <para>
-Have a look at <filename>plugins/dummy/intf_dummy.c</filename> and
-<filename>plugins/gtk/intf_gtk.c</filename>. Basically, you have to
-write 5 functions :
+Have a look the files in directories
+<filename>modules/misc/control</filename>, 
+<filename> modules/misc/dummy</filename>, 
+<filename> modules/misc/access</filename>, 
+or <filename> modules/gui</filename>. However the GUI interfaces are
+not very easy to understand, since they are quite big. I suggest to
+start digging into a non-graphical interface modules first. For example
+<filename>modules/control/hotkeys.c</filename>.</para>
+
+  <para>An interface module is made of 3 entry functions and a module
+description:
 </para>
 
     <itemizedlist>
-      <listitem> <para> <function> intf_Probe </function> ( <parameter>
-      probedata_t * p_data </parameter> ) :
-      This is supposed to tell whether your plugin can work in this
-      environment or not. If it can, it returns a score between 1
-      and 999 indicating whether this plugin should be preferred
-      against others or not. <parameter> p_data </parameter> is
-      currently unused. </para> </listitem>
 
-      <listitem> <para> <function> intf_Open </function> ( <parameter>
-      intf_thread_t * p_intf </parameter> ) :
-      Initializes the interface (ie. opens a new window, etc.).
-      You can store your information in p_intf-&gt;p_sys.
-      </para> </listitem>
+      <listitem> <para> The module description is made of macros that
+   declares the capabilities of the module (interface, in this case)
+   with their priority, the module description as it will appear in
+   the preferences of GUI modules that implement them, some
+   configuration variables specific to the module, shortcuts,
+   sub-modules, etc. </para></listitem>
 
-      <listitem> <para> <function> intf_Close </function> ( <parameter>
-      intf_thread_t * p_intf </parameter> ) :
-      Closes the interface and frees all allocated structures
-      (including p_intf-&gt;p_sys).
-      </para> </listitem>
+     <listitem> <para> <function> Open </function> ( <parameter>
+	   vlc_object_t* p_object </parameter> ): This is called by
+	   VLC to initialize the module. </para></listitem>
 
-      <listitem> <para> <function> intf_Run </function> ( <parameter>
-      intf_thread_t * p_intf </parameter> ) :
-      Launches the main loop, which shouldn't return
-      until p_intf-&gt;b_die is set to 1. Pay attention not to take all
-      CPU time with an infinite loop (add <function> msleep</function>).
-      </para> </listitem>
-    </itemizedlist>
+     <listitem> <para> <function> Run </function> ( <parameter>
+	   vlc_object_t* p_object </parameter> ): really does the job
+	   of the interface module (waiting for user input and
+	   displaying info). It should check periodically that
+	   <constant>p_intf->b_die</constant> is
+	   not <constant>VLC_TRUE</constant>.
+     </para></listitem>
 
-    <para>
-Don't forget to define intf_sys_t to contain any variable you need
-(don't use static variables, they suck in a multi-threaded
-application :-). If additionnal
-capabilities (such as Open button, playlist, menus, etc.) are needed,
-look at the GTK+ plug-in in <filename> plugins/gtk</filename>.
+      <listitem> <para> <function> Close ( <parameter> vcl_object_t *
+   p_object </parameter> ) </function> function is called by VLC to
+   uninitialize the module (basically, this consists in destroying
+   whatever have been allocated
+   by <function>Open</function>) </para></listitem>
+
+     </itemizedlist>
+
+<para>The above functions take a <parameter>vlc_object_t*</parameter>
+as argument, but that may need to be cast into
+a <parameter>intf_thread_t*</parameter> depending on your needs. This
+structure is often needed as a parameter for exported VLC functions,
+such as <function>msg_Err()</function>, <function>msg_Warn()</function>,
+...</para>
+
+<para>
+Define <parameter>intf_sys_t</parameter> to contain any variable you
+need (don't use static variables, they suck in a multi-threaded
+application :-).</para>
+
+<para>If additional capabilities (such as Open button,
+playlist, menus, etc.) are needed, consult one of the GUI modules.
+One of the simpler GUI modules to consult might be 
+<filename>modules/gui/ncurses/ncurses.c</filename>. It is a quite
+simple complete interface module with playlist interaction, and
+progress bar, among other things.
+
     </para>
+</sect2>
+
+<sect2><title>Arranging for your Module to get Compiled</title>
+
+<para>If you create a new directory for your module, add
+a <filename>Modules.am</filename> file in it.  In this file, put
+something like : <constant>SOURCES_yourmodule = myfile1.c
+myfile2.c</constant></para>
+
+<para>Then, go to the main <filename>configure.ac</filename> file, and
+at the end, in the <constant>AC_CONFIG_FILES</constant> section, add a
+line similar to the others.</para>
+
+<para>If you don't create a directory for your plugin (just put it in
+an existing one), you only have to add the two SOURCES_... lines to
+the existing <filename>Modules.am</filename> file</para>
+
+<para>By doing this, your module is declared, but it will never automatically
+compile.</para>
+
+<para>You then have to restart from the beginning the build sequence, so:</para>
+<!---don't know if <xmp> or <example> works. Until then... -->
+<para><filename>./bootstrap</filename></para>
+<para><filename>./configure...</filename></para>
+<para><filename>make</filename></para>
+
+<para>To build the module, you have to do it manually, by going to its
+directory, and typing
+<constant>make libyourmodule_plugin.so</constant> (or .dll, ora
+  whatever the file type for a shared library is on your Operating
+  System.)</para>
+
+<para>To automatize the build of your module, you must ask this in the
+configure.ac file.</para>
+
+<para>If you want it to be always built, add it to
+the <constant>default modules</constant> section
+in <filename>configure.ac</filename>, in one
+<constant>AX_ADD_PLUGINS</constant> directive.</para>
+</sect2>
 
   </sect1>
 
