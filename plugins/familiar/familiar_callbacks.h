@@ -2,7 +2,7 @@
  * callbacks.h : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar_callbacks.h,v 1.7.2.1 2002/09/30 20:37:13 jpsaman Exp $
+ * $Id: familiar_callbacks.h,v 1.7.2.2 2002/09/30 22:01:43 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -85,3 +85,5 @@ gboolean
 on_familiar_delete_event               (GtkWidget       *widget,
                                         GdkEvent        *event,
                                         gpointer         user_data);
+
+

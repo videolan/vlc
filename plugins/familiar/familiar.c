@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.8.2.1 2002/09/30 20:37:13 jpsaman Exp $
+ * $Id: familiar.c,v 1.8.2.2 2002/09/30 22:01:43 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -48,6 +48,11 @@
 #include "familiar.h"
 
 /*****************************************************************************
+ * Local variables (mutex-protected).
+ *****************************************************************************/
+static void ** pp_global_data = NULL;
+
+/*****************************************************************************
  * g_atexit: kludge to avoid the Gtk+ thread to segfault at exit
  *****************************************************************************
  * gtk_init() makes several calls to g_atexit() which calls atexit() to
@@ -59,6 +64,18 @@ void g_atexit( GVoidFunc func )
 {
     intf_thread_t *p_intf = p_main->p_intf;
     int i_dummy;
+
+    if( pp_global_data == NULL )
+    {
+        atexit( func );
+        return;
+    }
+
+    p_intf = (intf_thread_t *)*pp_global_data;
+    if( p_intf == NULL )
+    {
+        return;
+    }
 
     for( i_dummy = 0;
          i_dummy < MAX_ATEXIT && p_intf->p_sys->pf_callback[i_dummy] != NULL;
