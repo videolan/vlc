@@ -16,10 +16,30 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * video_synchro_t : timers for the video synchro
+ * video_synchro_t and video_synchro_tab_s : timers for the video synchro
  *****************************************************************************/
+typedef struct video_synchro_tab_s
+{
+    double mean;
+    double deviation;
+    int count;
+    
+} video_synchro_tab_t;
+
 typedef struct video_synchro_s
 {
+    int modulo;
+
+    /* P images since the last I */
+    int current_p_count;
+    double p_count_predict;
+    /* B images since the last I */
+    int current_b_count;
+    double b_count_predict;
+
+    /* 1 for linear count, 2 for binary count, 3 for ternary count */
+    video_synchro_tab_t tab_p[6];
+    video_synchro_tab_t tab_b[6];
 
 } video_synchro_t;
 
