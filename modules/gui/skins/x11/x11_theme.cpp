@@ -2,7 +2,7 @@
  * x11_theme.cpp: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.cpp,v 1.9 2003/06/01 22:11:24 asmax Exp $
+ * $Id: x11_theme.cpp,v 1.10 2003/06/07 10:18:15 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -142,7 +142,7 @@ void X11Theme::AddWindow( string name, int x, int y, bool visible,
     } motifWmHints;
 
     Atom hints_atom = XInternAtom( display, "_MOTIF_WM_HINTS", False );
-    
+
     motifWmHints.flags = 2;    // MWM_HINTS_DECORATIONS;
     motifWmHints.decorations = 0;
     XLOCK;
@@ -152,15 +152,6 @@ void X11Theme::AddWindow( string name, int x, int y, bool visible,
 
     // Change the window title
     XStoreName( display, wnd, name.c_str() );
-
-    // Display the window
-    XMapRaised( display, wnd );
-
-    XEvent evt;
-    do 
-    {
-        XNextEvent( display, &evt );
-    } while( evt.type != MapNotify );
     XUNLOCK;
 
     WindowList.push_back( (SkinWindow *)new OSWindow( p_intf, wnd, x, y, 
