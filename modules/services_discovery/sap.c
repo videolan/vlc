@@ -836,6 +836,18 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
         return NULL;
     }
 
+    psz_value = GetAttribute( p_sap->p_sdp, "tool" );
+    if( psz_value != NULL )
+    {
+        vlc_input_item_AddInfo( &p_item->input, _("Session"),
+                                _("Tool"), psz_value );
+    }
+    if( strcmp( p_sdp->psz_username, "-" ) )
+    {
+        vlc_input_item_AddInfo( &p_item->input, _("Session"),
+                                _("User"), p_sdp->psz_username );
+    }
+
     psz_value = GetAttribute( p_sap->p_sdp, "x-plgroup" );
 
     if( psz_value == NULL )
@@ -1057,7 +1069,6 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         free( psz_proto );
         psz_proto = strdup( "udp" );
     }
-                    
 
     /* FIXME: HTTP support */
 
