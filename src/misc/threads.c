@@ -1,8 +1,8 @@
 /*****************************************************************************
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.42 2003/10/25 00:49:14 sam Exp $
+ * Copyright (C) 1999, 2000, 2001, 2002, 2003 VideoLAN
+ * $Id: threads.c,v 1.43 2003/11/07 19:30:28 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -552,8 +552,11 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_ret = pthread_create( &p_this->thread_id, NULL, func, p_data );
 
-#ifdef SYS_DARWIN
-    if ( i_priority )
+    if ( i_priority
+#ifndef SYS_DARWIN
+            && config_GetInt( p_this, "rt-priority" )
+#endif
+       )
     {
         int i_error, i_policy;
         struct sched_param param;
@@ -576,7 +579,10 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
             i_priority = 0;
         }
     }
-#endif
+    else
+    {
+        i_priority = 0;
+    }
 
 #elif defined( HAVE_CTHREADS_H )
     p_this->thread_id = cthread_fork( (cthread_fn_t)func, (any_t)p_data );

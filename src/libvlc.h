@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.101 2003/11/05 00:39:17 gbazin Exp $
+ * $Id: libvlc.h,v 1.102 2003/11/07 19:30:28 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -469,6 +469,14 @@ static char *ppsz_language_text[] =
 #define DEMUX_LONGTEXT N_( \
     "This is a legacy entry to let you configure demux modules")
 
+#define RT_PRIORITY_TEXT N_("Allow VLC to run with a real-time priority")
+#define RT_PRIORITY_LONGTEXT N_( \
+    "Running VLC in real-time priority will allow for much more precise " \
+    "scheduling and yield better, especially when streaming content. " \
+    "It can however lock up your whole machine, or make it very very " \
+    "slow. You should only activate this if you know what you're " \
+    "doing.")
+
 #define ONEINSTANCE_TEXT N_("Allow only one running instance of VLC")
 #define ONEINSTANCE_LONGTEXT N_( \
     "Allowing only one running instance of VLC can sometimes be useful, " \
@@ -746,6 +754,10 @@ vlc_module_begin();
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT, VLC_TRUE );
     add_module( "access", "access", NULL, NULL, ACCESS_TEXT, ACCESS_LONGTEXT, VLC_TRUE );
     add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT, VLC_TRUE );
+
+#if !defined(SYS_DARWIN) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
+    add_bool( "rt-priority", 0, NULL, RT_PRIORITY_TEXT, RT_PRIORITY_LONGTEXT, VLC_TRUE );
+#endif
 
 #if defined(WIN32)
     add_bool( "one-instance", 0, NULL, ONEINSTANCE_TEXT, ONEINSTANCE_LONGTEXT, VLC_TRUE );

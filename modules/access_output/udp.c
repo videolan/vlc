@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.14 2003/11/01 00:11:31 fenrir Exp $
+ * $Id: udp.c,v 1.15 2003/11/07 19:30:28 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -428,7 +428,7 @@ static void ThreadWrite( vlc_object_t *p_this )
                 i_date_last = i_date;
                 continue;
             }
-            else if( i_date - i_date_last < 0 )
+            else if( i_date - i_date_last < -100000 )
             {
                 msg_Dbg( p_thread, "mmh, paquets in the past -> drop" );
 
