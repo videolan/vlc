@@ -40,9 +40,7 @@
 #include "video_parser.h"
 #include "vpar_motion.h"
 
-/* mv_format */
-#define MV_FIELD 0
-#define MV_FRAME 1
+
 
 /*
  * Local prototypes
@@ -54,45 +52,44 @@
 static __inline__ int vpar_MotionCode( vpar_thread_t * p_vpar )
 {
     int i_code;
-   static mv_tab_t p_mv_tab0[8] = 
+    static lookup_t pl_mv_tab0[8] = 
         { {-1,0}, {3,3}, {2,2}, {2,2}, {1,1}, {1,1}, {1,1}, {1,1} };
     /* Table B-10, motion_code, codes 0000011 ... 000011x */
-    static mv_tab_t p_mv_tab1[8] =
+    static lookup_t pl_mv_tab1[8] =
         { {-1,0}, {-1,0}, {-1,0}, {7,6}, {6,6}, {5,6}, {4,5}, {4,5} };
     /* Table B-10, motion_code, codes 0000001100 ... 000001011x */
-    static mv_tab_t p_mv_tab2[12] = {
+    static lookup_t pl_mv_tab2[12] = {
         {16,9}, {15,9}, {14,9}, {13,9},
         {12,9}, {11,9}, {10,8}, {10,8},
         {9,8},  {9,8},  {8,8},  {8,8} };
     
-   if( GetBits(&p_vpar->bit_stream, 1) )
-   {
-       return 0;
-   }
+    if( GetBits(&p_vpar->bit_stream, 1) )
+    {
+        return 0;
+    }
+    if( (i_code = ShowBits(&p_vpar->bit_stream, 9)) >= 64 )
+    {
+        i_code >>= 6;
+        RemoveBits( &p_vpar->bit_stream, pl_mv_tab0[i_code].i_length );
+        return( GetBits(&p_vpar->bit_stream, 1) ? -pl_mv_tab0[i_code].i_value : pl_mv_tab0[i_code].i_value );
+    }
 
-   if( (i_code = ShowBits(&p_vpar->bit_stream, 9)) >= 64 )
-   {
-       i_code >>= 6;
-       RemoveBits( &p_vpar->bit_stream, p_mv_tab0[0].i_len );
-       return( GetBits(&p_vpar->bit_stream, 1) ? -p_mv_tab0[i_code].i_val : p_mv_tab0[i_code].i_val );
-   }
+    if( i_code >= 24 )
+    {
+        i_code >>= 3;
+        RemoveBits( &p_vpar->bit_stream, pl_mv_tab1[i_code].i_length );
+        return( GetBits(&p_vpar->bit_stream, 1) ? -pl_mv_tab1[i_code].i_value : pl_mv_tab1[i_code].i_value );
+    }
 
-   if( i_code >= 24 )
-   {
-       i_code >>= 3;
-       RemoveBits( &p_vpar->bit_stream, p_mv_tab1[0].i_len );
-       return( GetBits(&p_vpar->bit_stream, 1) ? -p_mv_tab1[i_code].i_val : p_mv_tab1[i_code].i_val );
-   }
+    if( (i_code -= 12) < 0 )
+    {
+        p_vpar->picture.b_error = 1;
+        intf_DbgMsg( "vpar debug: Invalid motion_vector code\n" );
+        return 0;
+    }
 
-   if( (i_code -= 12) < 0 )
-   {
-       p_vpar->picture.b_error = 1;
-       intf_DbgMsg( "vpar debug: Invalid motion_vector code\n" );
-       return 0;
-   }
-
-   RemoveBits( &p_vpar->bit_stream, p_mv_tab2[0].i_len );
-   return( GetBits(&p_vpar->bit_stream, 1) ? -p_mv_tab2[i_code].i_val : p_mv_tab2[i_code].i_val );            
+    RemoveBits( &p_vpar->bit_stream, pl_mv_tab2[i_code].i_length );
+    return( GetBits(&p_vpar->bit_stream, 1) ? -pl_mv_tab2[i_code].i_value : pl_mv_tab2[i_code].i_value );            
 }
 
 /****************************************************************************
@@ -129,7 +126,6 @@ static __inline__ void vpar_DecodeMotionVector( int * pi_prediction, int i_r_siz
 void vpar_MotionVector( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_r,
         int i_s, int i_full_pel )
 {
-        
     int i_motion_code, i_motion_residual;
     int i_r_size;
 
@@ -189,7 +185,7 @@ void vpar_MPEG2MotionVector( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_
 {
     if( p_vpar->mb.i_mv_count == 1 )
     {
-        if( p_vpar->mb.i_mv_format == MV_FIELD && !p_vpar->mb.b_dmv )
+        if( p_vpar->mb.i_mv_format == MOTION_FIELD && !p_vpar->mb.b_dmv )
         {
             p_mb->ppi_field_select[0][i_s] = p_mb->ppi_field_select[1][i_s]
                                             = GetBits( &p_vpar->bit_stream, 1 );

@@ -39,6 +39,7 @@
 #include "vpar_synchro.h"
 #include "video_parser.h"
 
+
 /*
  * Local prototypes
  */
@@ -646,8 +647,6 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
     /* Get macroblock_type. */
     p_vpar->mb.i_mb_type = (p_vpar->picture.pf_macroblock_type)( p_vpar );
     p_mb->i_mb_type = p_vpar->mb.i_mb_type;
-
-//fprintf( stderr, "MB type : %d\n", p_mb->i_mb_type );
     
     /* SCALABILITY : warning, we don't know if spatial_temporal_weight_code
      * has to be dropped, take care if you use scalable streams. */
@@ -741,39 +740,13 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
     yuv_data_t *    p_data2;
 
     /************* DEBUG *************/
-    static int i_count = 0;
     int i_inc;
-    boolean_t b_stop = 0;
-
-    i_inc = MacroblockAddressIncrement( p_vpar );
-   
-    *pi_mb_address += i_inc;
-
-    //*pi_mb_address += MacroblockAddressIncrement( p_vpar );
-    b_stop = i_inc > 1;
-//    fprintf( stderr, "inc : %d (%d)\n", *pi_mb_address, i_inc );
-if( 0  )//i_count > 8 )
-{
-    exit(0);
-}
+    static int i_count;
 i_count++;
 
-if( 0 )        
-    //i_count == 249)
-    // i_count != *pi_mb_address)
-    //b_stop )
-{
-    fprintf( stderr, "i_count = %d (%d)\n", i_count, i_inc );
-     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x ", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x\n", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x ", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x\n", GetBits( &p_vpar->bit_stream, 16 ) );
-     exit(0);
-}
+    i_inc = MacroblockAddressIncrement( p_vpar );
+    *pi_mb_address += i_inc;
+    //*pi_mb_address += MacroblockAddressIncrement( p_vpar );
 
     for( i_mb = i_mb_previous + 1; i_mb < *pi_mb_address; i_mb++ )
     {
@@ -782,7 +755,6 @@ if( 0 )
         static f_motion_t   pf_motion_skipped[4] = {NULL, vdec_MotionField,
                                 vdec_MotionField, vdec_MotionFrame};
 
-fprintf(stderr, "Skipped macroblock !\n");
         /* Reset DC predictors (7.2.1). */
         p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
             = p_vpar->slice.pi_dc_dct_pred[2]
@@ -840,13 +812,13 @@ fprintf(stderr, "Skipped macroblock !\n");
 
     if( p_vpar->mb.i_mb_type & MB_MOTION_FORWARD )
     {
-fprintf( stderr, "motion !\n" );
+//fprintf( stderr, "motion !\n" );
         (*p_vpar->sequence.pf_decode_mv)( p_vpar, p_mb, 0 );
     }
 
     if( p_vpar->mb.i_mb_type & MB_MOTION_BACKWARD )
     {
-fprintf( stderr, "motion2 !\n" );    
+//fprintf( stderr, "motion2 !\n" );    
         (*p_vpar->sequence.pf_decode_mv)( p_vpar, p_mb, 1 );
     }
 
@@ -854,10 +826,27 @@ fprintf( stderr, "motion2 !\n" );
     {
         RemoveBits( &p_vpar->bit_stream, 1 );
     }
+if( 0 )        
+    //i_count == 1231 &&
+    // i_count != *pi_mb_address)
+    //p_vpar->picture.i_coding_type == P_CODING_TYPE )
+{
+    fprintf( stderr, "i_count = %d (%d)\n", i_count, p_vpar->mb.i_mb_type );
+     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x ", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x\n", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x ", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x\n", GetBits( &p_vpar->bit_stream, 16 ) );
+     exit(0);
+}
 
     if( p_vpar->mb.i_mb_type & MB_PATTERN )
     {
-        (*p_vpar->sequence.pf_decode_pattern)( p_vpar );
+        p_vpar->mb.i_coded_block_pattern = (*p_vpar->sequence.pf_decode_pattern)( p_vpar );
+//fprintf( stderr, "pattern : %d\n", p_vpar->mb.i_coded_block_pattern );
     }
     else
     {
@@ -866,7 +855,6 @@ fprintf( stderr, "motion2 !\n" );
         p_vpar->mb.i_coded_block_pattern = pi_coded_block_pattern
                                     [p_vpar->mb.i_mb_type & MB_INTRA];
     }
-
     pf_addb = ppf_addb_intra[p_vpar->mb.i_mb_type & MB_INTRA];
 
     /*
@@ -1002,9 +990,45 @@ int vpar_PMBType( vpar_thread_t * p_vpar )
     /* Testing on 6 bits */
     int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
     
+#if 0   
+/* Table B-3, macroblock_type in P-pictures, codes 001..1xx */
+static lookup_t PMBtab0[8] = {
+  {-1,0},
+  {MB_MOTION_FORWARD,3},
+  {MB_PATTERN,2}, {MB_PATTERN,2},
+  {MB_MOTION_FORWARD|MB_PATTERN,1}, 
+  {MB_MOTION_FORWARD|MB_PATTERN,1},
+  {MB_MOTION_FORWARD|MB_PATTERN,1}, 
+  {MB_MOTION_FORWARD|MB_PATTERN,1}
+};
+
+/* Table B-3, macroblock_type in P-pictures, codes 000001..00011x */
+static lookup_t PMBtab1[8] = {
+  {-1,0},
+  {MB_QUANT|MB_INTRA,6},
+  {MB_QUANT|MB_PATTERN,5}, {MB_QUANT|MB_PATTERN,5},
+  {MB_QUANT|MB_MOTION_FORWARD|MB_PATTERN,5}, {MB_QUANT|MB_MOTION_FORWARD|MB_PATTERN,5},
+  {MB_INTRA,5}, {MB_INTRA,5}
+};
+
+
+  if(i_type >= 8)      
+  {
+    i_type >>= 3;
+    RemoveBits( &p_vpar->bit_stream,PMBtab0[i_type].i_length );
+    return PMBtab0[i_type].i_value;
+  }
+
+  if (i_type==0)
+  {
+      printf("Invalid P macroblock_type code\n");
+    return -1;
+  }
+    RemoveBits( &p_vpar->bit_stream,PMBtab1[i_type].i_length );
+ return PMBtab1[i_type].i_value;
+#endif
     /* Dump the good number of bits */
     RemoveBits( &p_vpar->bit_stream, p_vpar->ppl_mb_type[0][i_type].i_length );
-
     /* return the value from the lookup table for P type */
     return p_vpar->ppl_mb_type[0][i_type].i_value;
 }
@@ -1134,7 +1158,7 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
     
     /* Lookup Table for the chromatic component */
     static int pi_cc_index[12] = { 0, 0, 0, 0, 1, 2, 1, 2, 1, 2 };
-    
+
     i_cc = pi_cc_index[i_b];
 
     /* Determine whether it is luminance or not (chrominance) */
@@ -1165,6 +1189,12 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
                 i_level =   pl_DCT_tab_ac[(i_code>>12)-4].i_level;
                 i_length =  pl_DCT_tab_ac[(i_code>>12)-4].i_length;
              }
+        }
+        else if( i_code >= 1024 )
+        {
+            i_run =     pl_DCT_tab0[(i_code>>8)-4].i_run;
+            i_length =  pl_DCT_tab0[(i_code>>8)-4].i_length;
+            i_level =   pl_DCT_tab0[(i_code>>8)-4].i_level;            
         }
         else
         {
@@ -1203,16 +1233,21 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
         i_coef = i_parse;
         i_parse += i_run;
         i_nc ++;
- 
+
+if( i_parse >= 64 )
+{
+    break;
+}
+        
         i_pos = pi_scan[p_vpar->picture.b_alternate_scan][i_parse];
         i_level = ( i_level *
                     p_vpar->slice.i_quantizer_scale *
                     ppi_quant[i_type][i_pos] ) >> 5;
-        p_mb->ppi_blocks[i_b][i_parse] = b_sign ? -i_level : i_level;
+        p_mb->ppi_blocks[i_b][i_pos] = b_sign ? -i_level : i_level;
     }
-fprintf( stderr, "MPEG2 end (%d)\n", i_b );
+fprintf( stderr, "Non intra MPEG2 end (%d)\n", i_b );
 exit(0);
-
+//p_vpar->picture.b_error = 1;
 }
 
 /*****************************************************************************
@@ -1238,7 +1273,6 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
     
     /* Lookup Table for the chromatic component */
     static int pi_cc_index[12] = { 0, 0, 0, 0, 1, 2, 1, 2, 1, 2 };
-
     i_cc = pi_cc_index[i_b];
 
     /* Determine whether it is luminance or not (chrominance) */
@@ -1436,7 +1470,11 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
 //                  i_run, i_level, i_parse, ShowBits( &p_vpar->bit_stream, 16 ) );
 
 //fprintf( stderr, "- %4x\n",ShowBits( &p_vpar->bit_stream, 16 ) ); 
-    
+if( i_parse >= 64 )
+{
+    fprintf( stderr, "Beuhh dans l'intra decode (%d)\n", i_b );
+    break;
+}
         i_coef = i_parse;
         i_parse += i_run;
         i_nc ++;
@@ -1450,4 +1488,5 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
     
 fprintf( stderr, "MPEG2 end (%d)\n", i_b );
 exit(0);
+//p_vpar->b_error = 1;
 }

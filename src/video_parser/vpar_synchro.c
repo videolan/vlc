@@ -49,7 +49,9 @@
 boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                               int i_structure )
 {
-    return( i_coding_type == I_CODING_TYPE );
+    return( 1 );
+    return( i_coding_type == I_CODING_TYPE || i_coding_type == P_CODING_TYPE );
+    //return( i_coding_type == I_CODING_TYPE );
 }
 
 /*****************************************************************************
