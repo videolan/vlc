@@ -643,8 +643,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Read
  *****************************************************************************/
-static int Read( access_t * p_access, uint8_t * p_buffer,
-                     int i_len )
+static int Read( access_t * p_access, uint8_t * p_buffer, int i_len )
 {
     access_sys_t * p_sys = p_access->p_sys;
 
@@ -668,7 +667,7 @@ static int Read( access_t * p_access, uint8_t * p_buffer,
         timeout.tv_sec = 0;
         timeout.tv_usec = 500000;
 
-        if( p_access->b_die || p_access->b_error )
+        if( p_access->b_die )
             return 0;
     }
 
