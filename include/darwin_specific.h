@@ -2,7 +2,7 @@
  * darwin_specific.h: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.h,v 1.5 2002/07/05 11:18:56 sam Exp $
+ * $Id: darwin_specific.h,v 1.6 2003/01/18 13:24:44 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,4 +24,4 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-char  * system_GetProgramPath( void );
+VLC_EXPORT( char  *, system_GetProgramPath, ( void ) );

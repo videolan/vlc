@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.9 2002/12/02 21:13:25 jlj Exp $
+ * $Id: spudec.c,v 1.10 2003/01/18 13:24:44 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,10 +49,17 @@ static void EndThread     ( spudec_thread_t * );
     "When the subtitles are coded in text form then, you can choose " \
     "which font will be used to display them.")
 
+#define DEFAULT_FONT "font-eutopiabold36.rle"
+
 vlc_module_begin();
     add_category_hint( N_("subtitles"), NULL );
-    add_file( "spudec-font", "./share/font-eutopiabold36.rle", NULL,
+#ifndef SYS_DARWIN
+    add_file( "spudec-font", "./share/" DEFAULT_FONT, NULL,
               FONT_TEXT, FONT_LONGTEXT );
+#else
+    add_file( "spudec-font", NULL, NULL,
+              FONT_TEXT, FONT_LONGTEXT );
+#endif
     set_description( _("subtitles decoder module") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, NULL );
@@ -118,6 +125,15 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     {
         /* Here we are dealing with text subtitles */
 
+#ifdef SYS_DARWIN
+        if ( (psz_font = config_GetPsz( p_fifo, "spudec-font" )) == NULL )
+        {
+            char * psz_vlcpath = system_GetProgramPath();
+            psz_font = malloc( strlen(psz_vlcpath) + strlen("/share/")
+                                + strlen(DEFAULT_FONT) + 1 );
+            sprintf(psz_font, "%s/share/" DEFAULT_FONT, psz_vlcpath);
+        }
+#else
         if( (psz_font = config_GetPsz( p_fifo, "spudec-font" )) == NULL )
         {
             msg_Err( p_fifo, "no default font selected" );
@@ -125,6 +141,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
             p_spudec->p_fifo->b_error;
         }
         else
+#endif
         {
             p_font = E_(subtitler_LoadFont)( p_spudec->p_vout, psz_font );
             if ( p_font == NULL )
