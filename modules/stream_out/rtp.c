@@ -2,7 +2,7 @@
  * rtp.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: rtp.c,v 1.3 2003/11/01 04:17:43 fenrir Exp $
+ * $Id: rtp.c,v 1.4 2003/11/01 06:57:51 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -368,6 +368,8 @@ static void SDPGenerate( sout_stream_t *p_stream )
  *
  *****************************************************************************/
 
+static int rtp_packetize_l16  ( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
+static int rtp_packetize_l8   ( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
 static int rtp_packetize_mpa  ( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
 static int rtp_packetize_mpv  ( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
 static int rtp_packetize_ac3  ( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
@@ -442,6 +444,31 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
 
     switch( p_fmt->i_fourcc )
     {
+        case VLC_FOURCC( 's', '1', '6', 'b' ):
+            if( p_fmt->i_channels == 1 && p_fmt->i_sample_rate == 44100 )
+            {
+                id->i_payload_type = 11;
+            }
+            else if( p_fmt->i_channels == 2 && p_fmt->i_sample_rate == 44100 )
+            {
+                id->i_payload_type = 10;
+            }
+            else
+            {
+                id->i_payload_type = p_sys->i_payload_type++;
+            }
+            id->psz_rtpmap = malloc( strlen( "L16/*/*" ) + 20+1 );
+            sprintf( id->psz_rtpmap, "L16/%d/%d", p_fmt->i_sample_rate, p_fmt->i_channels );
+            id->i_clock_rate = p_fmt->i_sample_rate;
+            id->pf_packetize = rtp_packetize_l16;
+            break;
+        case VLC_FOURCC( 'u', '8', ' ', ' ' ):
+            id->i_payload_type = p_sys->i_payload_type++;
+            id->psz_rtpmap = malloc( strlen( "L8/*/*" ) + 20+1 );
+            sprintf( id->psz_rtpmap, "L8/%d/%d", p_fmt->i_sample_rate, p_fmt->i_channels );
+            id->i_clock_rate = p_fmt->i_sample_rate;
+            id->pf_packetize = rtp_packetize_l8;
+            break;
         case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
             id->i_payload_type = 14;
             id->i_clock_rate = 90000;
@@ -891,6 +918,69 @@ static int rtp_packetize_split( sout_stream_t *p_stream, sout_stream_id_t *id, s
     return VLC_SUCCESS;
 }
 
+static int rtp_packetize_l16( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *in )
+{
+    int     i_max   = id->i_mtu - 12; /* payload max in one packet */
+    int     i_count = ( in->i_size + i_max - 1 ) / i_max;
+
+    uint8_t *p_data = in->p_buffer;
+    int     i_data  = in->i_size;
+    int     i_packet = 0;
+
+    while( i_data > 0 )
+    {
+        int           i_payload = (__MIN( i_max, i_data )/4)*4;
+        sout_buffer_t *out = sout_BufferNew( p_stream->p_sout, 12 + i_payload );
+
+        /* rtp common header */
+        rtp_packetize_common( id, out, 0, (in->i_pts > 0 ? in->i_pts : in->i_dts) );
+        memcpy( &out->p_buffer[12], p_data, i_payload );
+
+        out->i_size   = 12 + i_payload;
+        out->i_dts    = in->i_dts + i_packet * in->i_length / i_count;
+        out->i_length = in->i_length / i_count;
+
+        sout_AccessOutWrite( id->p_access, out );
+
+        p_data += i_payload;
+        i_data -= i_payload;
+        i_packet++;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int rtp_packetize_l8( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *in )
+{
+    int     i_max   = id->i_mtu - 12; /* payload max in one packet */
+    int     i_count = ( in->i_size + i_max - 1 ) / i_max;
+
+    uint8_t *p_data = in->p_buffer;
+    int     i_data  = in->i_size;
+    int     i_packet = 0;
+
+    while( i_data > 0 )
+    {
+        int           i_payload = (__MIN( i_max, i_data )/2)*2;
+        sout_buffer_t *out = sout_BufferNew( p_stream->p_sout, 12 + i_payload );
+
+        /* rtp common header */
+        rtp_packetize_common( id, out, 0, (in->i_pts > 0 ? in->i_pts : in->i_dts) );
+        memcpy( &out->p_buffer[12], p_data, i_payload );
+
+        out->i_size   = 12 + i_payload;
+        out->i_dts    = in->i_dts + i_packet * in->i_length / i_count;
+        out->i_length = in->i_length / i_count;
+
+        sout_AccessOutWrite( id->p_access, out );
+
+        p_data += i_payload;
+        i_data -= i_payload;
+        i_packet++;
+    }
+
+    return VLC_SUCCESS;
+}
 static int rtp_packetize_mp4a( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *in )
 {
     int     i_max   = id->i_mtu - 16; /* payload max in one packet */
