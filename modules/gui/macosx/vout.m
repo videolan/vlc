@@ -2,7 +2,7 @@
 /* vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.52 2003/08/19 14:07:51 garf Exp $
+ * $Id: vout.m,v 1.53 2003/08/20 13:08:10 garf Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -693,7 +693,7 @@ static void QTScaleMatrix( vout_thread_t *p_vout )
         i_width = valw.i_int;
         i_height = valh.i_int;
 
-        SetRectRgn( p_vout->p_sys->mask , 0 , 0 , valr.i_int - vall.i_int , valb.i_int - valt.i_int );
+        SetRectRgn( p_vout->p_sys->mask , vall.i_int - valx.i_int , valt.i_int - valy.i_int , valr.i_int - valx.i_int , valb.i_int - valy.i_int );
         p_vout->p_sys->rect.top = 0;
         p_vout->p_sys->rect.left = 0;
         p_vout->p_sys->rect.bottom = valb.i_int - valt.i_int;
