@@ -2,7 +2,7 @@
  * mpeg_ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ps.c,v 1.4 2002/03/01 00:33:18 massiot Exp $
+ * $Id: mpeg_ps.c,v 1.5 2002/03/04 23:56:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -83,113 +83,6 @@ static void input_getfunctions( function_list_t * p_function_list )
 #undef input
 }
 
-/*
- * Data reading functions
- */
-
-/*****************************************************************************
- * PSRead: reads one PS packet
- *****************************************************************************/
-#define PEEK( SIZE )                                                        \
-    i_error = input_Peek( p_input, &p_peek, SIZE );                         \
-    if( i_error == -1 )                                                     \
-    {                                                                       \
-        return( -1 );                                                       \
-    }                                                                       \
-    else if( i_error < SIZE )                                               \
-    {                                                                       \
-        /* EOF */                                                           \
-        return( 0 );                                                        \
-    }
-
-static __inline__ ssize_t PSRead( input_thread_t * p_input,
-                                  data_packet_t ** pp_data )
-{
-    byte_t *            p_peek;
-    size_t              i_packet_size;
-    ssize_t             i_error, i_read;
-
-    /* Read what we believe to be a packet header. */
-    PEEK( 4 );
-
-    if( *p_peek || *(p_peek + 1) || *(p_peek + 2) != 1 )
-    {
-        if( *p_peek || *(p_peek + 1) || *(p_peek + 2) )
-        {
-            /* It is common for MPEG-1 streams to pad with zeros
-             * (although it is forbidden by the recommendation), so
-             * don't bother everybody in this case. */
-            intf_WarnMsg( 3, "input warning: garbage at input (0x%x%x%x%x)",
-                 *p_peek, *(p_peek + 1), *(p_peek + 2), *(p_peek + 3) );
-        }
-
-        /* This is not the startcode of a packet. Read the stream
-         * until we find one. */
-        while( *p_peek || *(p_peek + 1) || *(p_peek + 2) != 1 )
-        {
-            p_input->p_current_data++;
-            PEEK( 4 );
-        }
-        /* Packet found. */
-    }
-
-    /* 0x1B9 == SYSTEM_END_CODE, it is only 4 bytes long. */
-    if( p_peek[3] != 0xB9 )
-    {
-        /* The packet is at least 6 bytes long. */
-        PEEK( 6 );
-
-        if( p_peek[3] != 0xBA )
-        {
-            /* That's the case for all packets, except pack header. */
-            i_packet_size = (p_peek[4] << 8) | p_peek[5];
-        }
-        else
-        {
-            /* Pack header. */
-            if( (p_peek[4] & 0xC0) == 0x40 )
-            {
-                /* MPEG-2 */
-                i_packet_size = 8;
-            }
-            else if( (p_peek[4] & 0xF0) == 0x20 )
-            {
-                /* MPEG-1 */
-                i_packet_size = 6;
-            }
-            else
-            {
-                intf_ErrMsg( "Unable to determine stream type" );
-                return( -1 );
-            }
-        }
-    }
-    else
-    {
-        /* System End Code */
-        i_packet_size = -2;
-    }
-
-    /* Fetch a packet of the appropriate size. */
-    i_read = input_SplitBuffer( p_input, pp_data, i_packet_size + 6 );
-    if( i_read <= 0 )
-    {
-        return( i_read );
-    }
-
-    /* In MPEG-2 pack headers we still have to read stuffing bytes. */
-    if( ((*pp_data)->p_demux_start[3] == 0xBA) && (i_packet_size == 8) )
-    {
-        size_t i_stuffing = ((*pp_data)->p_demux_start[13] & 0x7);
-        /* Force refill of the input buffer - though we don't care
-         * about p_peek. Please note that this is unoptimized. */
-        PEEK( i_stuffing );
-        p_input->p_current_data += i_stuffing;
-    }
-
-    return( 1 );
-}
-
 /*****************************************************************************
  * PSInit: initializes PS structures
  *****************************************************************************/
@@ -266,7 +159,7 @@ static int PSInit( input_thread_t * p_input )
             ssize_t             i_result;
             data_packet_t *     p_data;
 
-            i_result = PSRead( p_input, &p_data );
+            i_result = input_ReadPS( p_input, &p_data );
 
             if( i_result == 0 )
             {
@@ -413,7 +306,7 @@ static int PSDemux( input_thread_t * p_input )
         data_packet_t *     p_data;
         ssize_t             i_result;
 
-        i_result = PSRead( p_input, &p_data );
+        i_result = input_ReadPS( p_input, &p_data );
 
         if( i_result <= 0 )
         {

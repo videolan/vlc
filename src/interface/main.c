@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.159 2002/03/04 22:18:25 gbazin Exp $
+ * $Id: main.c,v 1.160 2002/03/04 23:56:38 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -169,6 +169,8 @@ ADD_INTEGER ( INPUT_SUBTITLE_VAR, -1, NULL, "choose subtitles", NULL )
 
 ADD_STRING  ( INPUT_DVD_DEVICE_VAR, "/dev/dvd", NULL, "DVD device", NULL )
 ADD_STRING  ( INPUT_VCD_DEVICE_VAR, "/dev/cdrom", NULL, "VCD device", NULL )
+ADD_BOOL    ( INPUT_IPV6_VAR, NULL, "force IPv6", NULL )
+ADD_BOOL    ( INPUT_IPV4_VAR, NULL, "force IPv4", NULL )
 
 /* Decoder options */
 ADD_CATEGORY_HINT( "Decoders Options", NULL )

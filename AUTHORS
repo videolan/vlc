@@ -125,6 +125,10 @@ E: jeanphi@via.ecp.fr
 C: jeanphi
 D: Bug fixes
 
+N: Alexis Guillard
+E: alexis.guillard@bt.com
+D: IPv6
+
 N: Shane Harper
 E: shanegh@optusnet.com.au
 D: SDL plugin fixes and enhancements

@@ -125,6 +125,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		mpeg_adec/mpeg_adec \
 		mpeg_vdec/mpeg_vdec \
 		network/ipv4 \
+		network/ipv6 \
 		qnx/qnx \
 		qt/qt \
 		sdl/sdl \

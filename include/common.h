@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.83 2002/03/03 04:37:29 sam Exp $
+ * $Id: common.h,v 1.84 2002/03/04 23:56:37 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -552,8 +552,12 @@ typedef struct module_symbols_s
                                       struct pes_packet_s * );
     struct es_descriptor_s * ( * input_ParsePS ) ( struct input_thread_s *,
                                                    struct data_packet_s * );
+    ssize_t ( * input_ReadPS )      ( struct input_thread_s *,
+                                      struct data_packet_s ** );
     void ( * input_DemuxPS )        ( struct input_thread_s *,
                                       struct data_packet_s * );
+    ssize_t ( * input_ReadTS )      ( struct input_thread_s *,
+                                      struct data_packet_s ** );
     void ( * input_DemuxTS )        ( struct input_thread_s *,
                                       struct data_packet_s * );
     void ( * input_DemuxPSI )       ( struct input_thread_s *,

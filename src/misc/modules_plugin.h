@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.13 2002/03/01 00:33:18 massiot Exp $
+ * $Id: modules_plugin.h,v 1.14 2002/03/04 23:56:38 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -209,8 +209,10 @@ module_error( void )
     (p_symbols)->input_ParsePES = input_ParsePES; \
     (p_symbols)->input_GatherPES = input_GatherPES; \
     (p_symbols)->input_DecodePES = input_DecodePES; \
+    (p_symbols)->input_ReadPS = input_ReadPS; \
     (p_symbols)->input_ParsePS = input_ParsePS; \
     (p_symbols)->input_DemuxPS = input_DemuxPS; \
+    (p_symbols)->input_ReadTS = input_ReadTS; \
     (p_symbols)->input_DemuxTS = input_DemuxTS; \
     (p_symbols)->input_DemuxPSI = input_DemuxPSI; \
     (p_symbols)->input_ClockManageControl = input_ClockManageControl; \

@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.20 2002/03/02 03:53:54 xav Exp $
+ * $Id: input_ext-plugins.h,v 1.21 2002/03/04 23:56:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -193,6 +193,7 @@ static __inline__ void input_NullPacket( input_thread_t * p_input,
  * Constants
  *****************************************************************************/
 #define TS_PACKET_SIZE      188                       /* Size of a TS packet */
+#define TS_SYNC_CODE        0x47                /* First byte of a TS packet */
 #define PSI_SECTION_SIZE    4096            /* Maximum size of a PSI section */
 
 #define PAT_UNINITIALIZED    (1 << 6)
@@ -286,8 +287,10 @@ typedef struct stream_ps_data_s
 void input_ParsePES  ( struct input_thread_s *, struct es_descriptor_s * );
 void input_GatherPES ( struct input_thread_s *, struct data_packet_s *,
                        struct es_descriptor_s *, boolean_t, boolean_t );
+ssize_t input_ReadPS ( struct input_thread_s *, struct data_packet_s ** );
 es_descriptor_t * input_ParsePS( struct input_thread_s *,
                                  struct data_packet_s * );
+ssize_t input_ReadTS ( struct input_thread_s *, struct data_packet_s ** );
 void input_DemuxPS   ( struct input_thread_s *, struct data_packet_s * );
 void input_DemuxTS   ( struct input_thread_s *, struct data_packet_s * );
 void input_DemuxPSI  ( struct input_thread_s *, struct data_packet_s *,
@@ -295,8 +298,10 @@ void input_DemuxPSI  ( struct input_thread_s *, struct data_packet_s *,
 #else
 #   define input_ParsePES p_symbols->input_ParsePES
 #   define input_GatherPES p_symbols->input_GatherPES
+#   define input_ReadPS p_symbols->input_ReadPS
 #   define input_ParsePS p_symbols->input_ParsePS
 #   define input_DemuxPS p_symbols->input_DemuxPS
+#   define input_ReadTS p_symbols->input_ReadTS
 #   define input_DemuxTS p_symbols->input_DemuxTS
 #   define input_DemuxPSI p_symbols->input_DemuxPSI
 #endif

@@ -346,6 +346,9 @@
 #define INPUT_DVD_DEVICE_VAR            "dvd_device"
 /* VCD defaults */
 #define INPUT_VCD_DEVICE_VAR            "vcd_device"
+/* IPv6, IPv4 */
+#define INPUT_IPV6_VAR                  "6"
+#define INPUT_IPV4_VAR                  "4"
 
 /*
  * Decoders option names

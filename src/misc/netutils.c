@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.58 2002/02/27 04:49:55 sam Exp $
+ * $Id: netutils.c,v 1.59 2002/03/04 23:56:38 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -34,10 +34,6 @@
 #include <string.h>                                              /* memset() */
 
 #include <videolan/vlc.h>
-
-#ifdef STRNCASECMP_IN_STRINGS_H
-#   include <strings.h>
-#endif
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                      /* gethostname() */
@@ -81,6 +77,7 @@
 #include "netutils.h"
 
 #include "intf_playlist.h"
+#include "network.h"
 
 /*****************************************************************************
  * input_channel_t: channel library data
@@ -105,53 +102,6 @@ static int GetAdapterInfo  ( int i_adapter, char *psz_string );
 #endif
 
 /*****************************************************************************
- * network_BuildAddr : fill a sockaddr_in structure
- *****************************************************************************/
-int network_BuildAddr( struct sockaddr_in * p_socket,
-                       char * psz_address, int i_port )
-{
-#if 0
-    intf_ErrMsg( "error: networking is not yet supported under BeOS" );
-    return( 1 );
-
-#else
-    /* Reset struct */
-    memset( p_socket, 0, sizeof( struct sockaddr_in ) );
-    p_socket->sin_family = AF_INET;                                /* family */
-    p_socket->sin_port = htons( i_port );
-    if( psz_address == NULL )
-    {
-        p_socket->sin_addr.s_addr = INADDR_ANY;
-    }
-    else
-    {
-        struct hostent    * p_hostent;
-
-        /* Try to convert address directly from in_addr - this will work if
-         * psz_broadcast is dotted decimal. */
-#ifdef HAVE_ARPA_INET_H
-        if( !inet_aton( psz_address, &p_socket->sin_addr) )
-#else
-        if( (p_socket->sin_addr.s_addr = inet_addr( psz_address )) == -1 )
-#endif
-        {
-            /* We have a fqdn, try to find its address */
-            if ( (p_hostent = gethostbyname( psz_address )) == NULL )
-            {
-                intf_ErrMsg( "BuildLocalAddr: unknown host %s", psz_address );
-                return( -1 );
-            }
-
-            /* Copy the first address of the host in the socket address */
-            memcpy( &p_socket->sin_addr, p_hostent->h_addr_list[0],
-                     p_hostent->h_length );
-        }
-    }
-    return( 0 );
-#endif
-}
-
-/*****************************************************************************
  * network_ChannelCreate: initialize global channel method data
  *****************************************************************************
  * Initialize channel input method global data. This function should be called
@@ -160,7 +110,10 @@ int network_BuildAddr( struct sockaddr_in * p_socket,
  *****************************************************************************/
 int network_ChannelCreate( void )
 {
-#if defined( SYS_LINUX ) || defined( WIN32 )
+#if !defined( SYS_LINUX ) && !defined( WIN32 )
+    intf_ErrMsg( "channel warning: VLAN-based channels are not supported"
+                 " under this architecture" );
+#endif
 
     /* Allocate structure */
     p_main->p_channel = malloc( sizeof( input_channel_t ) );
@@ -176,12 +129,6 @@ int network_ChannelCreate( void )
 
     intf_WarnMsg( 2, "network: channels initialized" );
     return( 0 );
-
-#else
-    intf_ErrMsg( "network error : channels not supported on this platform" );
-    return( 1 );
-
-#endif
 }
 
 /*****************************************************************************
@@ -197,17 +144,16 @@ int network_ChannelCreate( void )
  *****************************************************************************/
 int network_ChannelJoin( int i_channel )
 {
-#if defined( SYS_LINUX ) || defined( WIN32 )
-
 #define VLCS_VERSION 13
 #define MESSAGE_LENGTH 256
 
+    struct module_s *   p_network;
+    char *              psz_network = NULL;
+    network_socket_t    socket_desc;
     char psz_mess[ MESSAGE_LENGTH ];
     char psz_mac[ 40 ];
-    int i_fd, i_dummy, i_port;
+    int i_fd, i_port;
     char *psz_vlcs;
-    struct sockaddr_in sa_server;
-    struct sockaddr_in sa_client;
     struct timeval delay;
     fd_set fds;
 
@@ -223,26 +169,18 @@ int network_ChannelJoin( int i_channel )
     {
         intf_WarnMsg( 2, "network: waiting before changing channel" );
         /* XXX Isn't this completely brain-damaged ??? -- Sam */
+        /* Yes it is. I don't think this is still justified with the new
+         * vlanserver --Meuuh */
         mwait( p_main->p_channel->last_change + INPUT_CHANNEL_CHANGE_DELAY );
     }
 
-    /* Initializing the socket */
-    i_fd = socket( AF_INET, SOCK_DGRAM, 0 );
-    if( i_fd < 0 )
+    if( config_GetIntVariable( INPUT_IPV4_VAR ) )
     {
-        intf_ErrMsg( "network error: unable to create vlcs socket (%s)",
-                     strerror( errno ) );
-        return -1;
+        psz_network = "ipv4";
     }
-
-    i_dummy = 1;
-    if( setsockopt( i_fd, SOL_SOCKET, SO_REUSEADDR,
-                    (void *) &i_dummy, sizeof( i_dummy ) ) == -1 )
+    if( config_GetIntVariable( INPUT_IPV6_VAR ) )
     {
-        intf_ErrMsg( "network error: can't SO_REUSEADDR vlcs socket (%s)",
-                     strerror(errno));
-        close( i_fd );
-        return -1;
+        psz_network = "ipv6";
     }
 
     /* Getting information about the channel server */
@@ -255,31 +193,27 @@ int network_ChannelJoin( int i_channel )
 
     i_port = config_GetIntVariable( INPUT_CHANNEL_PORT_VAR );
 
-    intf_WarnMsg( 5, "network: socket %i, vlcs '%s', port %d",
-                     i_fd, psz_vlcs, i_port );
+    intf_WarnMsg( 5, "channel: connecting to %s:%d",
+                     psz_vlcs, i_port );
 
-    memset( &sa_client, 0x00, sizeof(struct sockaddr_in) );
-    memset( &sa_server, 0x00, sizeof(struct sockaddr_in) );
-    sa_client.sin_family      = AF_INET;
-    sa_server.sin_family      = AF_INET;
-    sa_client.sin_port        = htons( 4312 );
-    sa_server.sin_port        = htons( i_port );
-    sa_client.sin_addr.s_addr = INADDR_ANY;
-#ifdef HAVE_ARPA_INET_H
-    inet_aton( psz_vlcs, &sa_server.sin_addr );
-#else
-    sa_server.sin_addr.s_addr = inet_addr( psz_vlcs );
-#endif
-    free( psz_vlcs );
+    /* Prepare the network_socket_t structure */
+    socket_desc.i_type = NETWORK_UDP;
+    socket_desc.psz_bind_addr = NULL;
+    socket_desc.i_bind_port = 4321;
+    socket_desc.psz_server_addr = psz_vlcs;
+    socket_desc.i_server_port = i_port;
 
-    /* Bind the socket */
-    if( bind( i_fd, (struct sockaddr*)(&sa_client), sizeof(sa_client) ) )
+    /* Find an appropriate network module */
+    p_network = module_Need( MODULE_CAPABILITY_NETWORK, psz_network,
+                             &socket_desc );
+    if( p_network == NULL )
     {
-        intf_ErrMsg( "network: unable to bind vlcs socket (%s)",
-                     strerror( errno ) );
-        close( i_fd );
-        return -1;
+        return( -1 );
     }
+    module_Unneed( p_network );
+
+    free( psz_vlcs ); /* Do we really need this ? -- Meuuh */
+    i_fd = socket_desc.i_handle;
 
     /* Look for the interface MAC address */
     if( GetMacAddress( i_fd, psz_mac ) )
@@ -297,8 +231,7 @@ int network_ChannelJoin( int i_channel )
                        psz_mac );
 
     /* Send the message */
-    sendto( i_fd, psz_mess, MESSAGE_LENGTH, 0,
-            (struct sockaddr *)(&sa_server), sizeof(struct sockaddr) );
+    send( i_fd, psz_mess, MESSAGE_LENGTH, 0 );
 
     intf_WarnMsg( 2, "network: attempting to join channel %d", i_channel );
 
@@ -327,10 +260,8 @@ int network_ChannelJoin( int i_channel )
             break;
     }
 
-    i_dummy = sizeof( struct sockaddr );
-    recvfrom( i_fd, psz_mess, MESSAGE_LENGTH, 0,
-              (struct sockaddr *)(&sa_client), &i_dummy);
-    psz_mess[ MESSAGE_LENGTH - 1 ] = 0;
+    recv( i_fd, psz_mess, MESSAGE_LENGTH, 0 );
+    psz_mess[ MESSAGE_LENGTH - 1 ] = '\0';
 
     if( !strncasecmp( psz_mess, "E: ", 3 ) )
     {
@@ -366,12 +297,6 @@ int network_ChannelJoin( int i_channel )
     close( i_fd );
 
     return 0;
-
-#else
-    intf_ErrMsg( "network error: channels not supported on this platform" );
-    return -1; 
-
-#endif
 }
 
 /* Following functions are local */
@@ -444,7 +369,8 @@ static int GetMacAddress( int i_fd, char *psz_mac )
     return( i_ret );
 
 #else
-    return( -1);
+    strcpy( psz_mac, "00:00:00:00:00:00" );
+    return( 0 );
 
 #endif
 }

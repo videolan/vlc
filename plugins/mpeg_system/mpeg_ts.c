@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ts.c,v 1.4 2002/03/01 00:33:18 massiot Exp $
+ * $Id: mpeg_ts.c,v 1.5 2002/03/04 23:56:37 massiot Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *
@@ -39,8 +39,6 @@
  * Constants
  *****************************************************************************/
 #define TS_READ_ONCE 200
-#define TS_PACKET_SIZE 188
-#define TS_SYNC_CODE 0x47
 
 /*****************************************************************************
  * Local prototypes
@@ -163,18 +161,6 @@ static void TSEnd( input_thread_t * p_input )
  * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
  * packets.
  *****************************************************************************/
-#define PEEK( SIZE )                                                        \
-    i_error = input_Peek( p_input, &p_peek, SIZE );                         \
-    if( i_error == -1 )                                                     \
-    {                                                                       \
-        return( -1 );                                                       \
-    }                                                                       \
-    else if( i_error < SIZE )                                               \
-    {                                                                       \
-        /* EOF */                                                           \
-        return( 0 );                                                        \
-    }
-
 static int TSDemux( input_thread_t * p_input )
 {
     int             i_read_once = (p_input->i_mtu ?
@@ -185,38 +171,13 @@ static int TSDemux( input_thread_t * p_input )
     for( i = 0; i < i_read_once; i++ )
     {
         data_packet_t *     p_data;
-        ssize_t             i_read, i_error;
-        byte_t *            p_peek;
+        ssize_t             i_result;
 
-        PEEK( 1 );
+        i_result = input_ReadTS( p_input, &p_data );
 
-        if( *p_peek != TS_SYNC_CODE )
+        if( i_result <= 0 )
         {
-            intf_WarnMsg( 3, "input warning: garbage at input (%x)", *p_peek );
-
-            if( p_input->i_mtu )
-            {
-                /* Try to resync on next packet. */
-                PEEK( TS_PACKET_SIZE );
-                p_input->p_current_data += TS_PACKET_SIZE;
-            }
-            else
-            {
-                /* Move forward until we find 0x47 (and hope it's the good
-                 * one... FIXME) */
-                while( *p_peek != TS_SYNC_CODE )
-                {
-                    p_input->p_current_data++;
-                    PEEK( 1 );
-                }
-            }
-        }
-
-        i_read = input_SplitBuffer( p_input, &p_data, TS_PACKET_SIZE );
-
-        if( i_read <= 0 )
-        {
-            return( i_read );
+            return( i_result );
         }
 
         input_DemuxTS( p_input, p_data );

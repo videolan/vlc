@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.1 2002/03/01 00:33:18 massiot Exp $
+ * $Id: http.c,v 1.2 2002/03/04 23:56:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -230,6 +230,14 @@ static int HTTPOpen( input_thread_t * p_input )
     }
 
     p_access_data->psz_network = NULL;
+    if( config_GetIntVariable( INPUT_IPV4_VAR ) )
+    {
+        p_access_data->psz_network = "ipv4";
+    }
+    if( config_GetIntVariable( INPUT_IPV6_VAR ) )
+    {
+        p_access_data->psz_network = "ipv6";
+    }
     if( p_input->psz_access != NULL )
     {
         /* Find out which shortcut was used */

@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.1 2002/03/01 00:33:18 massiot Exp $
+ * $Id: udp.c,v 1.2 2002/03/04 23:56:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -107,6 +107,15 @@ static int UDPOpen( input_thread_t * p_input )
     int                 i_bind_port = 0, i_server_port = 0;
     network_socket_t    socket_desc;
 
+    if( config_GetIntVariable( INPUT_IPV4_VAR ) )
+    {
+        psz_network = "ipv4";
+    }
+    if( config_GetIntVariable( INPUT_IPV6_VAR ) )
+    {
+        psz_network = "ipv6";
+    }
+
     if( p_input->psz_access != NULL )
     {
         /* Find out which shortcut was used */
@@ -130,6 +139,14 @@ static int UDPOpen( input_thread_t * p_input )
 
         while( *psz_parser && *psz_parser != ':' && *psz_parser != '@' )
         {
+            if( *psz_parser == '[' )
+            {
+                /* IPv6 address */
+                while( *psz_parser && *psz_parser != ']' )
+                {
+                    psz_parser++;
+                }
+            }
             psz_parser++;
         }
 
@@ -150,7 +167,8 @@ static int UDPOpen( input_thread_t * p_input )
     if( *psz_parser == '@' )
     {
         /* Found bind address or bind port */
-        *psz_parser = '\0'; /* Terminate server port or name if necessary */            psz_parser++;
+        *psz_parser = '\0'; /* Terminate server port or name if necessary */
+        psz_parser++;
 
         if( *psz_parser && *psz_parser != ':' )
         {
@@ -159,6 +177,14 @@ static int UDPOpen( input_thread_t * p_input )
 
             while( *psz_parser && *psz_parser != ':' )
             {
+                if( *psz_parser == '[' )
+                {
+                    /* IPv6 address */
+                    while( *psz_parser && *psz_parser != ']' )
+                    {
+                        psz_parser++;
+                    }
+                }
                 psz_parser++;
             }
         }
