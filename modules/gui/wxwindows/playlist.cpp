@@ -499,6 +499,13 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, playlist_item_t *p_item )
     wxTreeItemId item = treectrl->GetFirstChild( root, cookie );
     wxTreeItemId child;
 
+    p_wxcurrent = (PlaylistItem *)treectrl->GetItemData( root );
+
+    if( p_wxcurrent->p_item == p_item )
+    {
+        return root;
+    }
+
     if( !p_item )
     {
         wxTreeItemId dummy;
