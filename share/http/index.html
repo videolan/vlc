@@ -10,7 +10,7 @@
         <meta http-equiv="refresh" content="0;URL=/" />
     <vlc id="end" />
 
-    <vlc id="control" param1="stop,pause,previous,next,add,sout,play,delete,empty,seek" />
+    <vlc id="control" param1="stop,pause,previous,next,add,sout,play,delete,empty,seek,fullscreen,keep" />
     <vlc id="set" param1="sout" param2="string" />
  </head>
  <body>
@@ -25,7 +25,7 @@
         <td><input type="submit" name="control" value="pause" /></td>
         <td><input type="submit" name="control" value="previous" /></td>
         <td><input type="submit" name="control" value="next" /></td>
-        <td><input type="submit" name="control" value="empty" /></td>
+        <td><input type="submit" name="control" value="fullscreen" /></td>
         <td><a href="info.html">Informations</a></td>
         <td><a href="admin/">Administration</a></td>
        </tr>
@@ -59,6 +59,7 @@
   
     <div class="sectitle">VLC Playlist</div>
     <div class="section"> 
+
     <form method="get" action="">
      <table>
         <vlc id="foreach" param1="pl" param2="playlist" />
@@ -75,6 +76,7 @@
         <vlc id="end" />
      </table>
      <td><input type="submit" name="control" value="delete" /></td>
+     <td><input type="submit" name="control" value="keep" /></td>
     </form>
     </div>
     <hr/>

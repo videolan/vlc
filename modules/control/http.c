@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.27 2003/11/03 03:21:37 garf Exp $
+ * $Id: http.c,v 1.28 2003/11/04 15:52:52 garf Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -36,6 +36,8 @@
 #include <stdlib.h>
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+
+#include <vlc/vout.h> /* for fullscreen */
 
 #include "httpd.h"
 
@@ -1323,6 +1325,8 @@ enum macroType
         MVLC_DEL,
         MVLC_EMPTY,
         MVLC_SEEK,
+        MVLC_KEEP,
+        MVLC_FULLSCREEN,
 
         MVLC_CLOSE,
         MVLC_SHUTDOWN,
@@ -1355,6 +1359,8 @@ StrToMacroTypeTab [] =
         { "next",           MVLC_NEXT },
         { "previous",       MVLC_PREVIOUS },
         { "seek",           MVLC_SEEK },
+        { "keep",           MVLC_KEEP },
+        { "fullscreen",     MVLC_FULLSCREEN },
 
         /* playlist management */
         { "add",            MVLC_ADD },
@@ -1480,6 +1486,20 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                                       p_sys->p_playlist->i_index - 1 );
                     msg_Dbg( p_intf, "requested playlist next" );
                     break;
+                case MVLC_FULLSCREEN:
+                    if( p_sys->p_input )
+                    {
+                        vout_thread_t *p_vout;
+                        p_vout = vlc_object_find( p_sys->p_input,
+                                                  VLC_OBJECT_VOUT, FIND_CHILD );
+
+                        if( p_vout )
+                        {
+                            p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                            vlc_object_release( p_vout );
+                        }
+                    }
+                break;
                 case MVLC_SEEK:
                 {
                     vlc_value_t val;
@@ -1546,6 +1566,57 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                             p_items[i_index] = -1;
                         }
                     }
+
+                    if( p_items ) free( p_items );
+                    break;
+                }
+                case MVLC_KEEP:
+                {
+                    int i_item, *p_items = NULL, i_nb_items = 0;
+                    char item[512], *p_parser = p_request;
+                    int i,j,temp;
+
+                    /* Get the list of items to keep */
+                    while( (p_parser =
+                            uri_extract_value( p_parser, "item", item, 512 )) )
+                    {
+                        if( !*item ) continue;
+
+                        i_item = atoi( item );
+                        p_items = realloc( p_items, (i_nb_items + 3) *
+                                           sizeof(int) );
+                        p_items[i_nb_items + 1] = i_item;
+                        i_nb_items++;
+                    }
+
+                    /* sort item list */
+                    for( i=1 ; i < (i_nb_items + 1) ; i++)
+                    {
+                        for( j=(i+1) ; j < (i_nb_items + 1) ; j++)
+                        {
+                            if( p_items[j] > p_items[i] )
+                            {
+                                temp = p_items[j];
+                                p_items[j] = p_items[i];
+                                p_items[i] = temp;
+                            }
+                        }
+                    }
+
+                    p_items[0] = p_sys->p_playlist->i_size;
+                    p_items[ i_nb_items + 1 ] = -1;
+                    
+                    /* The items need to be deleted from in reversed order */
+                        for( i=0 ; i <= i_nb_items ; i++ )
+                        {
+                            for( j = (p_items[i] - 1) ; j > p_items[i + 1] ; j-- )
+                            {
+                                playlist_Delete( p_sys->p_playlist,
+                                                 j );
+                                msg_Dbg( p_intf, "requested playlist delete: %d",
+                                         j );
+                            }
+                        }
 
                     if( p_items ) free( p_items );
                     break;
