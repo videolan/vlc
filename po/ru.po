@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-04-01 00:36+0200\n"
+"POT-Creation-Date: 2003-04-02 00:02+0200\n"
 "PO-Revision-Date: 2001-02-19 19:58+03:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -801,7 +801,8 @@ msgstr ""
 
 #: src/libvlc.h:537 modules/gui/gtk/gnome_interface.c:2149
 #: modules/gui/gtk/gtk_interface.c:2468 modules/gui/gtk/gtk_interface.c:3150
-#: modules/gui/win32/strings.cpp:221
+#: modules/gui/win32/strings.cpp:221 modules/gui/wxwindows/open.cpp:177
+#: modules/gui/wxwindows/streamout.cpp:129
 msgid "Stream output"
 msgstr ""
 
@@ -815,7 +816,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:2525 modules/gui/gtk/gtk_interface.c:752
 #: modules/gui/gtk/gtk_interface.c:2813 modules/gui/macosx/intf.m:281
 #: modules/gui/macosx/intf.m:356 modules/gui/win32/strings.cpp:120
-#: modules/gui/win32/strings.cpp:180 modules/gui/wxwindows/interface.cpp:290
+#: modules/gui/win32/strings.cpp:180 modules/gui/wxwindows/interface.cpp:289
 msgid "Playlist"
 msgstr "Список для воспроизведения"
 
@@ -1212,9 +1213,8 @@ msgstr ""
 msgid "audio filter for bandlimited interpolation resampling"
 msgstr ""
 
-#: modules/audio_filter/resampler/coreaudio.c:63
-#: modules/audio_filter/resampler/ugly.c:46
-msgid "audio filter for ugly resampling"
+#: modules/audio_filter/resampler/coreaudio.c:64
+msgid "audio filter using CoreAudio for resampling"
 msgstr ""
 
 #: modules/audio_filter/resampler/linear.c:59
@@ -1223,6 +1223,10 @@ msgstr ""
 
 #: modules/audio_filter/resampler/trivial.c:46
 msgid "audio filter for trivial resampling"
+msgstr ""
+
+#: modules/audio_filter/resampler/ugly.c:46
+msgid "audio filter for ugly resampling"
 msgstr ""
 
 #: modules/audio_mixer/float32.c:45
@@ -1628,7 +1632,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1061 modules/gui/gtk/gtk_interface.c:714
 #: modules/gui/gtk/gtk_interface.c:1160 modules/gui/macosx/intf.m:869
 #: modules/gui/macosx/intf.m:870 modules/gui/macosx/intf.m:871
-#: modules/gui/win32/strings.cpp:102 modules/gui/wxwindows/interface.cpp:616
+#: modules/gui/win32/strings.cpp:102 modules/gui/wxwindows/interface.cpp:607
 msgid "Pause"
 msgstr "Пауза"
 
@@ -1639,8 +1643,8 @@ msgstr "Пауза"
 #: modules/gui/macosx/intf.m:369 modules/gui/macosx/intf.m:876
 #: modules/gui/macosx/intf.m:877 modules/gui/macosx/intf.m:878
 #: modules/gui/macosx/playlist.m:172 modules/gui/win32/strings.cpp:100
-#: modules/gui/win32/strings.cpp:204 modules/gui/wxwindows/interface.cpp:287
-#: modules/gui/wxwindows/interface.cpp:621
+#: modules/gui/win32/strings.cpp:204 modules/gui/wxwindows/interface.cpp:286
+#: modules/gui/wxwindows/interface.cpp:612
 msgid "Play"
 msgstr "Воспр."
 
@@ -1757,23 +1761,19 @@ msgstr "Следующий файл"
 msgid "Planes"
 msgstr "Воспр."
 
-#: modules/demux/asf/asf.c:326
-msgid "Bits per pixel"
+#: modules/demux/asf/asf.c:326 modules/demux/avi/avi.c:1049
+msgid "Bits Per Pixel"
 msgstr ""
 
-#: modules/demux/asf/asf.c:328
-msgid "Compression Rate"
-msgstr ""
-
-#: modules/demux/asf/asf.c:330
+#: modules/demux/asf/asf.c:329
 msgid "Image Size"
 msgstr ""
 
-#: modules/demux/asf/asf.c:332
+#: modules/demux/asf/asf.c:331
 msgid "X pixels per meter"
 msgstr ""
 
-#: modules/demux/asf/asf.c:334
+#: modules/demux/asf/asf.c:333
 msgid "Y pixels per meter"
 msgstr ""
 
@@ -1814,10 +1814,6 @@ msgstr "Быстро"
 #: modules/demux/avi/avi.c:1046 modules/demux/ogg.c:614
 #: modules/demux/ogg.c:720 modules/demux/ogg.c:895
 msgid "Frame Rate"
-msgstr ""
-
-#: modules/demux/avi/avi.c:1049
-msgid "Bits Per Pixel"
 msgstr ""
 
 #: modules/demux/avi/avi.c:1071
@@ -1941,11 +1937,6 @@ msgstr ""
 msgid "Height"
 msgstr ""
 
-#: modules/demux/ogg.c:813
-#, c-format
-msgid "%.4s"
-msgstr ""
-
 #: modules/demux/ogg.c:822 modules/demux/ogg.c:995
 msgid "Bits per Sample"
 msgstr ""
@@ -2003,8 +1994,8 @@ msgstr ""
 msgid "VLC media player"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:124 modules/gui/wxwindows/open.cpp:573
-#: modules/gui/wxwindows/preferences.cpp:842
+#: modules/gui/familiar/interface.c:124 modules/gui/wxwindows/open.cpp:574
+#: modules/gui/wxwindows/preferences.cpp:847
 #: modules/gui/skins/src/vlcproc.cpp:383
 #, fuzzy
 msgid "Open file"
@@ -2012,7 +2003,7 @@ msgstr "Открыть файл"
 
 #: modules/gui/familiar/interface.c:149 modules/gui/familiar/interface.c:150
 #: modules/gui/macosx/intf.m:288 modules/gui/macosx/prefs.m:191
-#: modules/gui/win32/strings.cpp:211 modules/gui/wxwindows/preferences.cpp:220
+#: modules/gui/win32/strings.cpp:211 modules/gui/wxwindows/preferences.cpp:222
 msgid "Preferences"
 msgstr ""
 
@@ -2040,7 +2031,7 @@ msgstr "Воспроизвести поток"
 #: modules/gui/gtk/gtk_interface.c:1168 modules/gui/macosx/intf.m:285
 #: modules/gui/macosx/intf.m:323 modules/gui/macosx/intf.m:370
 #: modules/gui/macosx/controls.m:653 modules/gui/win32/strings.cpp:104
-#: modules/gui/wxwindows/interface.cpp:285
+#: modules/gui/wxwindows/interface.cpp:284
 msgid "Stop"
 msgstr "Стоп"
 
@@ -2086,21 +2077,21 @@ msgstr ""
 #: modules/gui/macosx/open.m:154 modules/gui/macosx/open.m:189
 #: modules/gui/macosx/open.m:318 modules/gui/macosx/open.m:721
 #: modules/gui/macosx/open.m:757 modules/gui/win32/strings.cpp:93
-#: modules/gui/win32/strings.cpp:226 modules/gui/wxwindows/interface.cpp:274
-#: modules/gui/wxwindows/open.cpp:232 modules/gui/wxwindows/streamout.cpp:258
+#: modules/gui/win32/strings.cpp:226 modules/gui/wxwindows/interface.cpp:273
+#: modules/gui/wxwindows/open.cpp:233 modules/gui/wxwindows/streamout.cpp:259
 #, fuzzy
 msgid "File"
 msgstr "Следующий файл"
 
 #: modules/gui/familiar/interface.c:394
-msgid "UDP/RTP (Adress when Multicast)"
+msgid "UDP/RTP (Address when Multicast)"
 msgstr ""
 
 #: modules/gui/familiar/interface.c:412 modules/gui/gtk/gnome_interface.c:1805
 #: modules/gui/gtk/gnome_interface.c:1817 modules/gui/gtk/gtk_interface.c:2120
 #: modules/gui/gtk/gtk_interface.c:2132 modules/gui/macosx/open.m:172
-#: modules/gui/macosx/open.m:195 modules/gui/wxwindows/open.cpp:394
-#: modules/gui/wxwindows/open.cpp:416 modules/gui/wxwindows/streamout.cpp:294
+#: modules/gui/macosx/open.m:195 modules/gui/wxwindows/open.cpp:395
+#: modules/gui/wxwindows/open.cpp:417 modules/gui/wxwindows/streamout.cpp:295
 msgid "Address"
 msgstr ""
 
@@ -2111,13 +2102,13 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:2185 modules/gui/gtk/gtk_interface.c:2196
 #: modules/gui/gtk/gtk_interface.c:3341 modules/gui/macosx/open.m:171
 #: modules/gui/macosx/open.m:173 modules/gui/macosx/open.m:196
-#: modules/gui/wxwindows/open.cpp:379 modules/gui/wxwindows/open.cpp:402
-#: modules/gui/wxwindows/open.cpp:424 modules/gui/wxwindows/streamout.cpp:303
+#: modules/gui/wxwindows/open.cpp:380 modules/gui/wxwindows/open.cpp:403
+#: modules/gui/wxwindows/open.cpp:425 modules/gui/wxwindows/streamout.cpp:304
 msgid "Port"
 msgstr ""
 
 #: modules/gui/familiar/interface.c:478 modules/gui/macosx/open.m:190
-#: modules/gui/macosx/open.m:762 modules/gui/wxwindows/streamout.cpp:259
+#: modules/gui/macosx/open.m:762 modules/gui/wxwindows/streamout.cpp:260
 msgid "HTTP"
 msgstr ""
 
@@ -2132,7 +2123,7 @@ msgstr ""
 #: modules/gui/familiar/interface.c:516 modules/gui/gtk/gnome_interface.c:1937
 #: modules/gui/gtk/gnome_interface.c:2397 modules/gui/gtk/gtk_interface.c:2252
 #: modules/gui/gtk/gtk_interface.c:2856 modules/gui/macosx/open.m:156
-#: modules/gui/macosx/open.m:326 modules/gui/wxwindows/open.cpp:236
+#: modules/gui/macosx/open.m:326 modules/gui/wxwindows/open.cpp:237
 msgid "Network"
 msgstr ""
 
@@ -2252,7 +2243,7 @@ msgstr "Открыть файл..."
 #: modules/gui/gtk/gnome_interface.c:20 modules/gui/gtk/gnome_interface.c:509
 #: modules/gui/gtk/gnome_interface.c:1027 modules/gui/gtk/gtk_interface.c:178
 #: modules/gui/gtk/gtk_interface.c:624 modules/gui/gtk/gtk_interface.c:1440
-#: modules/gui/win32/strings.cpp:94 modules/gui/wxwindows/interface.cpp:194
+#: modules/gui/win32/strings.cpp:94 modules/gui/wxwindows/interface.cpp:193
 #, fuzzy
 msgid "Open a file"
 msgstr "Открыть файл"
@@ -2431,19 +2422,19 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:821 modules/gui/gtk/gtk_interface.c:2053
 #: modules/gui/gtk/gtk_interface.c:2842 modules/gui/macosx/open.m:155
 #: modules/gui/macosx/open.m:322 modules/gui/win32/strings.cpp:43
-#: modules/gui/win32/strings.cpp:95 modules/gui/wxwindows/interface.cpp:276
-#: modules/gui/wxwindows/open.cpp:234
+#: modules/gui/win32/strings.cpp:95 modules/gui/wxwindows/interface.cpp:275
+#: modules/gui/wxwindows/open.cpp:235
 msgid "Disc"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:532 modules/gui/gtk/gtk_interface.c:645
-#: modules/gui/win32/strings.cpp:97 modules/gui/wxwindows/interface.cpp:278
+#: modules/gui/win32/strings.cpp:97 modules/gui/wxwindows/interface.cpp:277
 #, fuzzy
 msgid "Net"
 msgstr "След."
 
 #: modules/gui/gtk/gnome_interface.c:544 modules/gui/gtk/gtk_interface.c:656
-#: modules/gui/wxwindows/interface.cpp:281
+#: modules/gui/wxwindows/interface.cpp:280
 msgid "Sat"
 msgstr ""
 
@@ -2508,7 +2499,7 @@ msgstr "Открыть список для воспроизведения"
 #: modules/gui/gtk/gtk_interface.c:849 modules/gui/gtk/gtk_interface.c:893
 #: modules/gui/gtk/gtk_interface.c:1214 modules/gui/win32/strings.cpp:112
 #: modules/gui/win32/strings.cpp:132 modules/gui/win32/strings.cpp:136
-#: modules/gui/wxwindows/interface.cpp:292
+#: modules/gui/wxwindows/interface.cpp:291
 msgid "Prev"
 msgstr "Пред."
 
@@ -2525,7 +2516,7 @@ msgstr "Предыдущий файл"
 #: modules/gui/macosx/intf.m:327 modules/gui/macosx/intf.m:371
 #: modules/gui/macosx/controls.m:661 modules/gui/win32/strings.cpp:114
 #: modules/gui/win32/strings.cpp:134 modules/gui/win32/strings.cpp:138
-#: modules/gui/wxwindows/interface.cpp:294
+#: modules/gui/wxwindows/interface.cpp:293
 msgid "Next"
 msgstr "След."
 
@@ -2614,9 +2605,7 @@ msgstr "Список для воспроизведения..."
 msgid ""
 "This is the VideoLAN Client, a DVD, MPEG and DivX player. It can play MPEG "
 "and MPEG2 files from a file or from a network source."
-msgstr ""
-"Это клиент VideoLAN, DVD, MPEG и DivX-проигрывателя. Вы можете воспроизвести "
-"MPEG и MPEG-2 файлы из файла или с источника в сети."
+msgstr "Это клиент VideoLAN, DVD, MPEG и DivX-проигрывателя. Вы можете воспроизвести MPEG и MPEG-2 файлы из файла или с источника в сети."
 
 #: modules/gui/gtk/gnome_interface.c:1507
 #, fuzzy
@@ -2624,18 +2613,18 @@ msgid "Open Stream"
 msgstr "Остановить поток"
 
 #: modules/gui/gtk/gnome_interface.c:1524 modules/gui/gtk/gtk_interface.c:1839
-#: modules/gui/macosx/open.m:148 modules/gui/wxwindows/open.cpp:155
+#: modules/gui/macosx/open.m:148 modules/gui/wxwindows/open.cpp:156
 msgid "Media Resource Locator (MRL)"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1546 modules/gui/gtk/gtk_interface.c:1861
-#: modules/gui/wxwindows/open.cpp:159
+#: modules/gui/wxwindows/open.cpp:160
 #, fuzzy
 msgid "Open Target:"
 msgstr "Остановить поток"
 
 #: modules/gui/gtk/gnome_interface.c:1566 modules/gui/gtk/gtk_interface.c:1881
-#: modules/gui/wxwindows/open.cpp:170
+#: modules/gui/wxwindows/open.cpp:171
 msgid ""
 "Alternatively, you can build an MRL using one of the following predefined "
 "targets:"
@@ -2646,46 +2635,46 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:2422 modules/gui/macosx/open.m:158
 #: modules/gui/macosx/open.m:164 modules/gui/macosx/open.m:194
 #: modules/gui/macosx/open.m:206 modules/gui/win32/strings.cpp:229
-#: modules/gui/win32/strings.cpp:248 modules/gui/wxwindows/open.cpp:203
-#: modules/gui/wxwindows/open.cpp:293
-#: modules/gui/wxwindows/preferences.cpp:656
-#: modules/gui/wxwindows/streamout.cpp:283
+#: modules/gui/win32/strings.cpp:248 modules/gui/wxwindows/open.cpp:204
+#: modules/gui/wxwindows/open.cpp:294
+#: modules/gui/wxwindows/preferences.cpp:661
+#: modules/gui/wxwindows/streamout.cpp:284
 msgid "Browse..."
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1634 modules/gui/gtk/gtk_interface.c:1949
-#: modules/gui/win32/strings.cpp:25 modules/gui/wxwindows/open.cpp:316
+#: modules/gui/win32/strings.cpp:25 modules/gui/wxwindows/open.cpp:317
 msgid "Disc type"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1653 modules/gui/gtk/gtk_interface.c:1968
 #: modules/gui/macosx/open.m:168 modules/gui/macosx/open.m:527
-#: modules/gui/wxwindows/open.cpp:311
+#: modules/gui/wxwindows/open.cpp:312
 msgid "DVD"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1661 modules/gui/gtk/gtk_interface.c:1976
 #: modules/gui/macosx/open.m:169 modules/gui/macosx/open.m:436
-#: modules/gui/macosx/open.m:519 modules/gui/wxwindows/open.cpp:313
+#: modules/gui/macosx/open.m:519 modules/gui/wxwindows/open.cpp:314
 msgid "VCD"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1669 modules/gui/gtk/gtk_interface.c:1984
-#: modules/gui/macosx/open.m:161
+#: modules/gui/macosx/open.m:161 modules/gui/wxwindows/open.cpp:323
 msgid "Device name"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1688 modules/gui/gtk/gtk_interface.c:1994
 #: modules/gui/gtk/menu.c:1007 modules/gui/gtk/menu.c:1375
 #: modules/gui/kde/interface.cpp:146 modules/gui/macosx/intf.m:333
-#: modules/gui/macosx/open.m:163 modules/gui/wxwindows/open.cpp:336
+#: modules/gui/macosx/open.m:163 modules/gui/wxwindows/open.cpp:337
 msgid "Chapter"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1698 modules/gui/gtk/gtk_interface.c:2004
 #: modules/gui/gtk/menu.c:1345 modules/gui/gtk/menu.c:1366
 #: modules/gui/kde/interface.cpp:144 modules/gui/macosx/intf.m:332
-#: modules/gui/macosx/open.m:162 modules/gui/wxwindows/open.cpp:330
+#: modules/gui/macosx/open.m:162 modules/gui/wxwindows/open.cpp:331
 msgid "Title"
 msgstr ""
 
@@ -2696,31 +2685,31 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1755 modules/gui/gtk/gtk_interface.c:2070
 #: modules/gui/macosx/open.m:176 modules/gui/macosx/open.m:586
 #: modules/gui/macosx/open.m:624 modules/gui/win32/strings.cpp:169
-#: modules/gui/wxwindows/open.cpp:357
+#: modules/gui/wxwindows/open.cpp:358
 msgid "UDP/RTP"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1765 modules/gui/gtk/gtk_interface.c:2080
 #: modules/gui/macosx/open.m:177 modules/gui/macosx/open.m:587
 #: modules/gui/macosx/open.m:636 modules/gui/win32/strings.cpp:170
-#: modules/gui/wxwindows/open.cpp:358
+#: modules/gui/wxwindows/open.cpp:359
 msgid "UDP/RTP Multicast"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1775 modules/gui/gtk/gtk_interface.c:2090
-#: modules/gui/win32/strings.cpp:171 modules/gui/wxwindows/open.cpp:359
+#: modules/gui/win32/strings.cpp:171 modules/gui/wxwindows/open.cpp:360
 msgid "Channel server"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1785 modules/gui/gtk/gtk_interface.c:2100
 #: modules/gui/macosx/open.m:178 modules/gui/macosx/open.m:588
 #: modules/gui/macosx/open.m:649 modules/gui/win32/strings.cpp:172
-#: modules/gui/wxwindows/open.cpp:360
+#: modules/gui/wxwindows/open.cpp:361
 msgid "HTTP/FTP/MMS"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1827 modules/gui/gtk/gtk_interface.c:2142
-#: modules/gui/macosx/open.m:174 modules/gui/wxwindows/open.cpp:438
+#: modules/gui/macosx/open.m:174 modules/gui/wxwindows/open.cpp:439
 msgid "URL"
 msgstr ""
 
@@ -2749,7 +2738,7 @@ msgid "Horizontal"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2063 modules/gui/gtk/gtk_interface.c:2378
-#: modules/gui/wxwindows/open.cpp:239
+#: modules/gui/wxwindows/open.cpp:240
 #, fuzzy
 msgid "Satellite"
 msgstr "Открыть окно списка для воспроизведения"
@@ -2770,7 +2759,8 @@ msgid "fps"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2156 modules/gui/gtk/gtk_interface.c:2476
-#: modules/gui/wxwindows/open.cpp:180
+#: modules/gui/macosx/open.m:185 modules/gui/macosx/open.m:205
+#: modules/gui/wxwindows/open.cpp:181
 msgid "Settings..."
 msgstr ""
 
@@ -2787,13 +2777,11 @@ msgstr "Модули"
 msgid ""
 "Sorry, the module manager isn't functional yet. Please retry in a later "
 "version."
-msgstr ""
-"Извините, диспетчер модулей пока не функционален. Пожалуйста, попробуйте в "
-"следующих версиях."
+msgstr "Извините, диспетчер модулей пока не функционален. Пожалуйста, попробуйте в следующих версиях."
 
 #: modules/gui/gtk/gnome_interface.c:2404
 #: modules/gui/gtk/gnome_interface.c:2545 modules/gui/gtk/gtk_interface.c:2863
-#: modules/gui/wxwindows/playlist.cpp:135
+#: modules/gui/wxwindows/playlist.cpp:136
 msgid "Url"
 msgstr ""
 
@@ -2831,7 +2819,7 @@ msgid "Selection"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2552 modules/gui/gtk/gtk_interface.c:2973
-#: modules/gui/win32/strings.cpp:182 modules/gui/wxwindows/playlist.cpp:136
+#: modules/gui/win32/strings.cpp:182 modules/gui/wxwindows/playlist.cpp:137
 msgid "Duration"
 msgstr ""
 
@@ -2869,13 +2857,13 @@ msgstr "Остановить поток"
 #: modules/gui/gtk/gnome_interface.c:2973 modules/gui/gtk/gtk_interface.c:3228
 #: modules/gui/macosx/open.m:191 modules/gui/macosx/open.m:722
 #: modules/gui/macosx/open.m:768 modules/gui/win32/strings.cpp:227
-#: modules/gui/wxwindows/streamout.cpp:260
+#: modules/gui/wxwindows/streamout.cpp:261
 msgid "UDP"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2983 modules/gui/gtk/gtk_interface.c:3238
 #: modules/gui/macosx/open.m:192 modules/gui/macosx/open.m:723
-#: modules/gui/win32/strings.cpp:228 modules/gui/wxwindows/streamout.cpp:261
+#: modules/gui/win32/strings.cpp:228 modules/gui/wxwindows/streamout.cpp:262
 msgid "RTP"
 msgstr ""
 
@@ -2902,7 +2890,7 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:3088 modules/gui/gtk/gtk_interface.c:3333
 #: modules/gui/macosx/open.m:201 modules/gui/macosx/open.m:691
-#: modules/gui/macosx/open.m:752 modules/gui/wxwindows/streamout.cpp:348
+#: modules/gui/macosx/open.m:752 modules/gui/wxwindows/streamout.cpp:349
 msgid "AVI"
 msgstr ""
 
@@ -3004,11 +2992,11 @@ msgstr ""
 #: modules/gui/win32/strings.cpp:26 modules/gui/win32/strings.cpp:154
 #: modules/gui/win32/strings.cpp:173 modules/gui/win32/strings.cpp:183
 #: modules/gui/win32/strings.cpp:214 modules/gui/win32/strings.cpp:233
-#: modules/gui/win32/strings.cpp:249 modules/gui/wxwindows/open.cpp:224
-#: modules/gui/wxwindows/fileinfo.cpp:85 modules/gui/wxwindows/messages.cpp:94
-#: modules/gui/wxwindows/playlist.cpp:141
-#: modules/gui/wxwindows/preferences.cpp:240
-#: modules/gui/wxwindows/streamout.cpp:165
+#: modules/gui/win32/strings.cpp:249 modules/gui/wxwindows/open.cpp:225
+#: modules/gui/wxwindows/fileinfo.cpp:91 modules/gui/wxwindows/messages.cpp:95
+#: modules/gui/wxwindows/playlist.cpp:142
+#: modules/gui/wxwindows/preferences.cpp:243
+#: modules/gui/wxwindows/streamout.cpp:166
 msgid "OK"
 msgstr ""
 
@@ -3050,9 +3038,9 @@ msgstr ""
 #: modules/gui/macosx/prefs.m:739 modules/gui/macosx/open.m:152
 #: modules/gui/win32/strings.cpp:27 modules/gui/win32/strings.cpp:174
 #: modules/gui/win32/strings.cpp:215 modules/gui/win32/strings.cpp:234
-#: modules/gui/win32/strings.cpp:250 modules/gui/wxwindows/open.cpp:226
-#: modules/gui/wxwindows/preferences.cpp:242
-#: modules/gui/wxwindows/streamout.cpp:167
+#: modules/gui/win32/strings.cpp:250 modules/gui/wxwindows/open.cpp:227
+#: modules/gui/wxwindows/preferences.cpp:245
+#: modules/gui/wxwindows/streamout.cpp:168
 msgid "Cancel"
 msgstr ""
 
@@ -3115,7 +3103,7 @@ msgstr ""
 
 #: modules/gui/gtk/preferences.c:596 modules/gui/gtk/preferences.c:613
 #: modules/gui/macosx/open.m:702 modules/gui/win32/strings.cpp:213
-#: modules/gui/wxwindows/preferences.cpp:243
+#: modules/gui/wxwindows/preferences.cpp:246
 msgid "Save"
 msgstr ""
 
@@ -3423,34 +3411,29 @@ msgstr ""
 msgid "Stream output:"
 msgstr "Остановить поток"
 
-#: modules/gui/macosx/open.m:185 modules/gui/macosx/open.m:205
-#, fuzzy
-msgid "Settings"
-msgstr "Следующий файл"
-
-#: modules/gui/macosx/open.m:186
+#: modules/gui/macosx/open.m:186 modules/gui/wxwindows/streamout.cpp:144
 msgid "Stream output MRL"
 msgstr ""
 
-#: modules/gui/macosx/open.m:188 modules/gui/wxwindows/streamout.cpp:252
+#: modules/gui/macosx/open.m:188 modules/gui/wxwindows/streamout.cpp:253
 msgid "Output Method"
 msgstr ""
 
-#: modules/gui/macosx/open.m:198 modules/gui/wxwindows/streamout.cpp:340
+#: modules/gui/macosx/open.m:198 modules/gui/wxwindows/streamout.cpp:341
 msgid "Encapsulation Method"
 msgstr ""
 
-#: modules/gui/macosx/open.m:199 modules/gui/wxwindows/streamout.cpp:346
+#: modules/gui/macosx/open.m:199 modules/gui/wxwindows/streamout.cpp:347
 msgid "MPEG TS"
 msgstr ""
 
 #: modules/gui/macosx/open.m:200 modules/gui/macosx/open.m:689
-#: modules/gui/macosx/open.m:754 modules/gui/wxwindows/streamout.cpp:347
+#: modules/gui/macosx/open.m:754 modules/gui/wxwindows/streamout.cpp:348
 msgid "MPEG PS"
 msgstr ""
 
 #: modules/gui/macosx/open.m:202 modules/gui/macosx/open.m:693
-#: modules/gui/macosx/open.m:753 modules/gui/wxwindows/streamout.cpp:349
+#: modules/gui/macosx/open.m:753 modules/gui/wxwindows/streamout.cpp:350
 msgid "Ogg"
 msgstr ""
 
@@ -3596,7 +3579,7 @@ msgstr "Следующий файл"
 msgid "0:00:00"
 msgstr ""
 
-#: modules/gui/win32/strings.cpp:47 modules/gui/wxwindows/interface.cpp:243
+#: modules/gui/win32/strings.cpp:47 modules/gui/wxwindows/interface.cpp:242
 #, fuzzy
 msgid "&File"
 msgstr "Следующий файл"
@@ -3616,7 +3599,7 @@ msgstr "Открыть файл..."
 msgid "&Network stream..."
 msgstr "Остановить поток"
 
-#: modules/gui/win32/strings.cpp:51 modules/gui/wxwindows/interface.cpp:244
+#: modules/gui/win32/strings.cpp:51 modules/gui/wxwindows/interface.cpp:243
 msgid "&View"
 msgstr ""
 
@@ -3625,7 +3608,7 @@ msgstr ""
 msgid "&Hide interface"
 msgstr "Открыть окно списка для воспроизведения"
 
-#: modules/gui/win32/strings.cpp:54 modules/gui/wxwindows/interface.cpp:226
+#: modules/gui/win32/strings.cpp:54 modules/gui/wxwindows/interface.cpp:225
 #, fuzzy
 msgid "&Playlist..."
 msgstr "Список для воспроизведения..."
@@ -3682,11 +3665,11 @@ msgstr "Следующий файл"
 msgid "&Language"
 msgstr ""
 
-#: modules/gui/win32/strings.cpp:72 modules/gui/wxwindows/interface.cpp:233
+#: modules/gui/win32/strings.cpp:72 modules/gui/wxwindows/interface.cpp:232
 msgid "&Subtitles"
 msgstr ""
 
-#: modules/gui/win32/strings.cpp:74 modules/gui/wxwindows/interface.cpp:246
+#: modules/gui/win32/strings.cpp:74 modules/gui/wxwindows/interface.cpp:245
 msgid "&Help"
 msgstr ""
 
@@ -3831,7 +3814,7 @@ msgstr ""
 msgid "URL:"
 msgstr ""
 
-#: modules/gui/win32/strings.cpp:181 modules/gui/wxwindows/streamout.cpp:279
+#: modules/gui/win32/strings.cpp:181 modules/gui/wxwindows/streamout.cpp:280
 #, fuzzy
 msgid "Filename"
 msgstr "Следующий файл"
@@ -3859,12 +3842,12 @@ msgstr "Остановить поток"
 msgid "&Url"
 msgstr ""
 
-#: modules/gui/win32/strings.cpp:189 modules/gui/wxwindows/playlist.cpp:112
+#: modules/gui/win32/strings.cpp:189 modules/gui/wxwindows/playlist.cpp:113
 msgid "&Delete"
 msgstr ""
 
 #: modules/gui/win32/strings.cpp:190 modules/gui/win32/strings.cpp:191
-#: modules/gui/wxwindows/playlist.cpp:118
+#: modules/gui/wxwindows/playlist.cpp:119
 #, fuzzy
 msgid "&Selection"
 msgstr "Следующий файл"
@@ -3939,212 +3922,192 @@ msgstr ""
 msgid "wxWindows interface module"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:195
+#: modules/gui/wxwindows/interface.cpp:194
 msgid "Open a DVD or (S)VCD"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:196
+#: modules/gui/wxwindows/interface.cpp:195
 #, fuzzy
 msgid "Open a network stream"
 msgstr "Остановить поток"
 
-#: modules/gui/wxwindows/interface.cpp:197
+#: modules/gui/wxwindows/interface.cpp:196
 #, fuzzy
 msgid "Open a satellite stream"
 msgstr "Открыть окно списка для воспроизведения"
 
-#: modules/gui/wxwindows/interface.cpp:198
+#: modules/gui/wxwindows/interface.cpp:197
 msgid "Eject the DVD/CD"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:199
+#: modules/gui/wxwindows/interface.cpp:198
 msgid "Exit this program"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:201
+#: modules/gui/wxwindows/interface.cpp:200
 #, fuzzy
 msgid "Open the playlist"
 msgstr "Открыть окно списка для воспроизведения"
 
-#: modules/gui/wxwindows/interface.cpp:202
+#: modules/gui/wxwindows/interface.cpp:201
 msgid "Show the program logs"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:203
+#: modules/gui/wxwindows/interface.cpp:202
 msgid "Show information about the file being played"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:205
+#: modules/gui/wxwindows/interface.cpp:204
 msgid "Change the current audio track"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:206
+#: modules/gui/wxwindows/interface.cpp:205
 msgid "Change the current subtitles stream"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:207
+#: modules/gui/wxwindows/interface.cpp:206
 msgid "Go to the preferences menu"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:209
+#: modules/gui/wxwindows/interface.cpp:208
 msgid "About this program"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:213
+#: modules/gui/wxwindows/interface.cpp:212
 #, fuzzy
 msgid "&Open File..."
 msgstr "Открыть файл..."
 
-#: modules/gui/wxwindows/interface.cpp:214
+#: modules/gui/wxwindows/interface.cpp:213
 #, fuzzy
 msgid "Open &Disc..."
 msgstr "Открыть файл..."
 
-#: modules/gui/wxwindows/interface.cpp:215
+#: modules/gui/wxwindows/interface.cpp:214
 #, fuzzy
 msgid "&Network Stream..."
 msgstr "Остановить поток"
 
-#: modules/gui/wxwindows/interface.cpp:217
+#: modules/gui/wxwindows/interface.cpp:216
 #, fuzzy
 msgid "&Satellite Stream..."
 msgstr "Остановить поток"
 
-#: modules/gui/wxwindows/interface.cpp:220
+#: modules/gui/wxwindows/interface.cpp:219
 #, fuzzy
 msgid "&Eject Disc"
 msgstr "Открыть файл"
 
-#: modules/gui/wxwindows/interface.cpp:222
+#: modules/gui/wxwindows/interface.cpp:221
 msgid "E&xit"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:227
+#: modules/gui/wxwindows/interface.cpp:226
 #, fuzzy
 msgid "&Logs..."
 msgstr "Открыть файл..."
 
-#: modules/gui/wxwindows/interface.cpp:228
+#: modules/gui/wxwindows/interface.cpp:227
 #, fuzzy
 msgid "&File info..."
 msgstr "Открыть файл..."
 
-#: modules/gui/wxwindows/interface.cpp:232
+#: modules/gui/wxwindows/interface.cpp:231
 msgid "&Audio"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:235
+#: modules/gui/wxwindows/interface.cpp:234
 msgid "&Preferences..."
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:239
+#: modules/gui/wxwindows/interface.cpp:238
 #, fuzzy
 msgid "&About..."
 msgstr "Модули..."
 
-#: modules/gui/wxwindows/interface.cpp:245
+#: modules/gui/wxwindows/interface.cpp:244
 #, fuzzy
 msgid "&Settings"
 msgstr "Следующий файл"
 
-#: modules/gui/wxwindows/interface.cpp:259
+#: modules/gui/wxwindows/interface.cpp:258
 #, fuzzy
 msgid "Stop current playlist item"
 msgstr "Открыть окно списка для воспроизведения"
 
-#: modules/gui/wxwindows/interface.cpp:260
+#: modules/gui/wxwindows/interface.cpp:259
 msgid "Play current playlist item"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:261
+#: modules/gui/wxwindows/interface.cpp:260
 msgid "Pause current playlist item"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:262
+#: modules/gui/wxwindows/interface.cpp:261
 #, fuzzy
 msgid "Open playlist"
 msgstr "Открыть список для воспроизведения"
 
-#: modules/gui/wxwindows/interface.cpp:263
+#: modules/gui/wxwindows/interface.cpp:262
 #, fuzzy
 msgid "Previous playlist item"
 msgstr "Предыдущий файл"
 
-#: modules/gui/wxwindows/interface.cpp:264
+#: modules/gui/wxwindows/interface.cpp:263
 #, fuzzy
 msgid "Next playlist item"
 msgstr "Открыть окно списка для воспроизведения"
 
-#: modules/gui/wxwindows/interface.cpp:386
+#: modules/gui/wxwindows/interface.cpp:385
 #, fuzzy
 msgid ""
 " (wxWindows interface)\n"
 "\n"
 msgstr "Открыть окно списка для воспроизведения"
 
-#: modules/gui/wxwindows/interface.cpp:387
+#: modules/gui/wxwindows/interface.cpp:386
 msgid ""
 "(C) 1996-2003 - the VideoLAN Team\n"
 "\n"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:388
+#: modules/gui/wxwindows/interface.cpp:387
 msgid ""
 "The VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/\n"
 "\n"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:390
+#: modules/gui/wxwindows/interface.cpp:389
 #, fuzzy
 msgid ""
 "This is the VideoLAN Client, a DVD, MPEG and DivX player.\n"
 "It can play MPEG and MPEG2 files from a file or from a network source."
-msgstr ""
-"Это клиент VideoLAN, DVD, MPEG и DivX-проигрывателя. Вы можете воспроизвести "
-"MPEG и MPEG-2 файлы из файла или с источника в сети."
+msgstr "Это клиент VideoLAN, DVD, MPEG и DivX-проигрывателя. Вы можете воспроизвести MPEG и MPEG-2 файлы из файла или с источника в сети."
 
-#: modules/gui/wxwindows/interface.cpp:394
-#, fuzzy
-msgid "About "
+#: modules/gui/wxwindows/interface.cpp:393
+#, fuzzy, c-format
+msgid "About %s"
 msgstr "Модули..."
 
-#: modules/gui/wxwindows/open.cpp:176 modules/gui/wxwindows/streamout.cpp:129
-#, fuzzy
-msgid "Stream Output"
-msgstr "Остановить поток"
-
-#: modules/gui/wxwindows/open.cpp:177
+#: modules/gui/wxwindows/open.cpp:178
 msgid "Use VLC has a stream server"
 msgstr ""
 
-#: modules/gui/wxwindows/open.cpp:196
+#: modules/gui/wxwindows/open.cpp:197
 #, fuzzy
 msgid "Capture input stream"
 msgstr "Приостановить поток"
 
-#: modules/gui/wxwindows/open.cpp:198
+#: modules/gui/wxwindows/open.cpp:199
 msgid "Capture the stream you are playing to a file"
 msgstr ""
 
-#: modules/gui/wxwindows/open.cpp:312
+#: modules/gui/wxwindows/open.cpp:313
 msgid "DVD (menus support)"
 msgstr ""
 
-#: modules/gui/wxwindows/open.cpp:322
-msgid "Device Name"
-msgstr ""
-
-#: modules/gui/wxwindows/open.cpp:381 modules/gui/wxwindows/open.cpp:404
-#: modules/gui/wxwindows/open.cpp:426 modules/gui/wxwindows/popup.cpp:261
-#: modules/gui/wxwindows/preferences.cpp:665
-#: modules/gui/wxwindows/preferences.cpp:680
-#: modules/gui/wxwindows/streamout.cpp:305
-#, c-format
-msgid "%d"
-msgstr ""
-
-#: modules/gui/wxwindows/open.cpp:703 modules/gui/wxwindows/streamout.cpp:534
+#: modules/gui/wxwindows/open.cpp:704 modules/gui/wxwindows/streamout.cpp:535
 #, fuzzy
 msgid "Save file"
 msgstr "Следующий файл"
@@ -4161,57 +4124,52 @@ msgstr ""
 msgid "Input menu"
 msgstr ""
 
-#: modules/gui/wxwindows/popup.cpp:127 modules/gui/wxwindows/playlist.cpp:107
+#: modules/gui/wxwindows/popup.cpp:127 modules/gui/wxwindows/playlist.cpp:108
 msgid "&Close"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:104
+#: modules/gui/wxwindows/playlist.cpp:105
 msgid "Add &Url..."
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:105
+#: modules/gui/wxwindows/playlist.cpp:106
 msgid "Add &Directory..."
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:111
+#: modules/gui/wxwindows/playlist.cpp:112
 msgid "&Invert"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:113
+#: modules/gui/wxwindows/playlist.cpp:114
 #, fuzzy
 msgid "&Select All"
 msgstr "Следующий файл"
 
-#: modules/gui/wxwindows/playlist.cpp:117
+#: modules/gui/wxwindows/playlist.cpp:118
 msgid "&Manage"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:192
+#: modules/gui/wxwindows/playlist.cpp:193
 msgid "no info"
 msgstr ""
 
-#: modules/gui/wxwindows/preferences.cpp:367
+#: modules/gui/wxwindows/preferences.cpp:370
 msgid "Plugins"
 msgstr ""
 
-#: modules/gui/wxwindows/preferences.cpp:597
+#: modules/gui/wxwindows/preferences.cpp:602
 msgid "Default"
 msgstr ""
 
-#: modules/gui/wxwindows/preferences.cpp:722
+#: modules/gui/wxwindows/preferences.cpp:727
 msgid "No configuration options available"
 msgstr ""
 
-#: modules/gui/wxwindows/preferences.cpp:743
+#: modules/gui/wxwindows/preferences.cpp:748
 msgid "Advanced..."
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:143
-#, fuzzy
-msgid "Stream Output MRL"
-msgstr "Остановить поток"
-
-#: modules/gui/wxwindows/streamout.cpp:147
+#: modules/gui/wxwindows/streamout.cpp:148
 #, fuzzy
 msgid "Destination Target:"
 msgstr "Остановить поток"
@@ -4876,6 +4834,18 @@ msgstr ""
 #, fuzzy
 msgid "xosd interface"
 msgstr "Открыть окно списка для воспроизведения"
+
+#, fuzzy
+#~ msgid "Settings"
+#~ msgstr "Следующий файл"
+
+#, fuzzy
+#~ msgid "Stream Output"
+#~ msgstr "Остановить поток"
+
+#, fuzzy
+#~ msgid "Stream Output MRL"
+#~ msgstr "Остановить поток"
 
 #, fuzzy
 #~ msgid "User"

@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.26 2003/03/26 03:13:30 hartman Exp $
+ * $Id: open.m,v 1.27 2003/04/01 22:29:41 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -182,7 +182,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     [o_sout_cbox setTitle: _NS("Stream output:")];
     [o_sout_btn_ok setTitle: _NS("OK")];
-    [o_sout_settings setTitle: _NS("Settings")];
+    [o_sout_settings setTitle: _NS("Settings...")];
     [o_sout_mrl_lbl setTitle: _NS("Stream output MRL")];
     
     [o_sout_access_lbl setTitle: _NS("Output Method")];
@@ -202,7 +202,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [[o_sout_mux cellAtRow:0 column:3] setTitle: _NS("Ogg")];
     
     [o_file_sub_ckbox setTitle: _NS("Load subtitles file:")];
-    [o_file_sub_btn_settings setTitle: _NS("Settings")];
+    [o_file_sub_btn_settings setTitle: _NS("Settings...")];
     [o_file_sub_btn_browse setTitle: _NS("Browse...")];
     [o_file_sub_override setTitle: _NS("Override")];
     [o_file_sub_delay_lbl setStringValue: _NS("delay")];

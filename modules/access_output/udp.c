@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.6 2003/03/11 19:02:30 fenrir Exp $
+ * $Id: udp.c,v 1.7 2003/04/01 22:29:41 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -142,6 +142,13 @@ static int Open( vlc_object_t *p_this )
     psz_dst_addr = psz_parser;
     i_dst_port = 0;
 
+    if ( *psz_parser == '[' )
+    {
+        while( *psz_parser && *psz_parser != ']' )
+        {
+            psz_parser++;
+        }
+    }
     while( *psz_parser && *psz_parser != ':' )
     {
         psz_parser++;
