@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: headers.c,v 1.3 2002/08/12 09:34:15 sam Exp $
+ * $Id: headers.c,v 1.4 2002/10/23 22:05:22 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -309,12 +309,9 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     };
 #undef RESERVED
 
-    int i_height_save, i_width_save, i_aspect;
+    int i_aspect;
 
     vout_thread_t *p_vout;
-
-    i_height_save = p_vpar->sequence.i_height;
-    i_width_save = p_vpar->sequence.i_width;
 
     p_vpar->sequence.i_width = GetBits( &p_vpar->bit_stream, 12 );
     p_vpar->sequence.i_height = GetBits( &p_vpar->bit_stream, 12 );
@@ -476,14 +473,6 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         p_vpar->sequence.b_chroma_v_subsampled = 0;
         break;
     }
-
-#if 0
-    if(    p_vpar->sequence.i_width != i_width_save
-        || p_vpar->sequence.i_height != i_height_save )
-    {
-         /* FIXME: Warn the video output */
-    }
-#endif
 
     /* Extension and User data */
     ExtensionAndUserData( p_vpar );
