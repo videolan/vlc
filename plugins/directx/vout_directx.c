@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.32 2002/04/29 21:22:35 gbazin Exp $
+ * $Id: vout_directx.c,v 1.33 2002/05/18 13:30:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -129,6 +129,8 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->b_caps_overlay_clipping = 0;
     SetRectEmpty( &p_vout->p_sys->rect_display );
     p_vout->p_sys->b_using_overlay = !config_GetIntVariable( "nooverlay" );
+    p_vout->p_sys->b_use_sysmem = config_GetIntVariable( "directx-use-sysmem");
+    p_vout->p_sys->b_hw_yuv = !config_GetIntVariable( "no-directx-hw-yuv" );
 
     p_vout->p_sys->b_cursor_hidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
@@ -229,6 +231,9 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
 #define MAX_DIRECTBUFFERS 1
+    /* Right now we use only 1 directbuffer because we don't want the
+     * video decoder to decode directly into direct buffers as they are
+     * created into video memory and video memory is _really_ slow */
 
     NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
 
@@ -236,6 +241,9 @@ static int vout_Init( vout_thread_t *p_vout )
     if( p_vout->p_sys->b_using_overlay )
         SetWindowText( p_vout->p_sys->hwnd,
                        "VLC DirectX (using hardware overlay)" );
+    else if( p_vout->p_sys->b_hw_yuv )
+        SetWindowText( p_vout->p_sys->hwnd,
+                       "VLC DirectX (using hardware YUV->RGB conversion)" );
 
     return( 0 );
 }
@@ -409,14 +417,14 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         /* We ask for the "NOTEARING" option */
         memset( &ddbltfx, 0, sizeof(DDBLTFX) );
         ddbltfx.dwSize = sizeof(DDBLTFX);
-        ddbltfx.dwDDFX = DDBLTFX_NOTEARING | DDBLT_ASYNC;
+        ddbltfx.dwDDFX = DDBLTFX_NOTEARING;
 
         /* Blit video surface to display */
         dxresult = IDirectDrawSurface3_Blt(p_vout->p_sys->p_display,
                                            &p_vout->p_sys->rect_dest_clipped,
                                            p_pic->p_sys->p_surface,
                                            &p_vout->p_sys->rect_src_clipped,
-                                           0, &ddbltfx );
+                                           DDBLT_ASYNC, &ddbltfx );
         if ( dxresult == DDERR_SURFACELOST )
         {
             /* Our surface can be lost so be sure
@@ -428,7 +436,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
                                            &p_vout->p_sys->rect_dest_clipped,
                                            p_pic->p_sys->p_surface,
                                            &p_vout->p_sys->rect_src_clipped,
-                                           0, &ddbltfx );
+                                           DDBLT_ASYNC, &ddbltfx );
         }
 
         if( dxresult != DD_OK )
@@ -462,6 +470,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
         if( dxresult != DD_OK )
             intf_WarnMsg( 8, "vout: couldn't flip overlay surface" );
+
 
         if( !DirectXGetSurfaceDesc( p_pic ) )
         {
@@ -748,16 +757,31 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
 
     if( !b_overlay )
     {
-        /* Now try to create a plain RGB surface. */
+        boolean_t b_rgb_surface = ( i_chroma == FOURCC_RGB2 ) ||
+            ( i_chroma == FOURCC_RV15 ) || ( i_chroma == FOURCC_RV16 ) ||
+            ( i_chroma == FOURCC_RV24 ) || ( i_chroma == FOURCC_RV32 );
+
         memset( &ddsd, 0, sizeof( DDSURFACEDESC ) );
         ddsd.dwSize = sizeof(DDSURFACEDESC);
+        ddsd.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
         ddsd.dwFlags = DDSD_HEIGHT |
                        DDSD_WIDTH |
                        DDSD_CAPS;
-        ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN |
-                              DDSCAPS_SYSTEMMEMORY;
+        ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
         ddsd.dwHeight = p_vout->render.i_height;
         ddsd.dwWidth = p_vout->render.i_width;
+
+        if( p_vout->p_sys->b_use_sysmem )
+            ddsd.ddsCaps.dwCaps |= DDSCAPS_SYSTEMMEMORY;
+        else
+            ddsd.ddsCaps.dwCaps |= DDSCAPS_VIDEOMEMORY;
+
+        if( !b_rgb_surface )
+        {
+            ddsd.dwFlags |= DDSD_PIXELFORMAT;
+            ddsd.ddpfPixelFormat.dwFlags = DDPF_FOURCC;
+            ddsd.ddpfPixelFormat.dwFourCC = i_chroma;
+        }
 
         dxresult = IDirectDraw2_CreateSurface( p_vout->p_sys->p_ddobject,
                                                &ddsd,
@@ -768,7 +792,7 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
             return 0;
         }
     }
-      
+
     /* Now that the surface is created, try to get a newer DirectX interface */
     dxresult = IDirectDrawSurface_QueryInterface( p_surface,
                                      &IID_IDirectDrawSurface3,
@@ -898,6 +922,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                           int i_num_pics )
 {
     int i;
+    boolean_t b_result_ok;
     LPDIRECTDRAWSURFACE3 p_surface;
 
     intf_WarnMsg( 3, "vout: NewPictureVec" );
@@ -919,13 +944,8 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
         case FOURCC_YVYU:
             p_vout->output.i_chroma = FOURCC_YVYU;
             break;
-        case FOURCC_YV12:
-            p_vout->output.i_chroma = FOURCC_YV12;
-            break;
-        case FOURCC_I420:
-        case FOURCC_IYUV:
         default:
-            p_vout->output.i_chroma = FOURCC_IYUV;
+            p_vout->output.i_chroma = FOURCC_YV12;
             break;
     }
 
@@ -937,8 +957,6 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
      * memcpy() to the overlay surface. */
     if( p_vout->p_sys->b_using_overlay )
     {
-        boolean_t b_result_ok;
-
         /* Triple buffering rocks! it doesn't have any processing overhead
          * (you don't have to wait for the vsync) and provides for a very nice
          * video quality (no tearing). */
@@ -947,16 +965,6 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                                             p_vout->output.i_chroma,
                                             p_vout->p_sys->b_using_overlay,
                                             2 /* number of backbuffers */ );
-        if( !b_result_ok )
-            /* Try another chroma */
-            if( p_vout->output.i_chroma == FOURCC_IYUV )
-            {
-                p_vout->output.i_chroma = FOURCC_YV12;
-                b_result_ok = DirectXCreateSurface( p_vout, &p_surface,
-                                                p_vout->output.i_chroma,
-                                                p_vout->p_sys->b_using_overlay,
-                                                2 /* number of backbuffers */);
-            }
 
         if( !b_result_ok )
             /* Try to reduce the number of backbuffers */
@@ -1023,67 +1031,80 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
         }
     }
 
-    /* As we can't have overlays, we'll try to create plain RBG surfaces in
-     * system memory. These surfaces will then be blitted onto the primary
-     * surface (display) so they can be displayed */
+    /* As we can't have an overlay, we'll try to create a plain offscreen
+     * surface. This surface will reside in video memory because there's a
+     * better chance then that we'll be able to use some kind of hardware
+     * acceleration like rescaling, blitting or YUV->RGB conversions.
+     * We then only need to blit this surface onto the main display when we
+     * want to display it */
     if( !p_vout->p_sys->b_using_overlay )
     {
-        DDPIXELFORMAT ddpfPixelFormat;
 
-        for( i = 0; i < i_num_pics; i++ )
+        if( p_vout->p_sys->b_hw_yuv )
+            b_result_ok = DirectXCreateSurface( p_vout, &p_surface,
+                                                p_vout->output.i_chroma,
+                                                p_vout->p_sys->b_using_overlay,
+                                                0 /* no back buffers */ );
+
+        if( !p_vout->p_sys->b_hw_yuv || !b_result_ok )
         {
-            if( DirectXCreateSurface( p_vout, &p_surface,
-                                      p_vout->output.i_chroma,
-                                      p_vout->p_sys->b_using_overlay,
-                                      0 /* no back buffers */ ) )
+            /* Our last choice is to use a plain RGB surface */
+            DDPIXELFORMAT ddpfPixelFormat;
+
+            ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+            IDirectDrawSurface3_GetPixelFormat( p_vout->p_sys->p_display,
+                                                &ddpfPixelFormat );
+
+            if( ddpfPixelFormat.dwFlags & DDPF_RGB )
             {
-                /* Allocate internal structure */
-                p_pic[i].p_sys = malloc( sizeof( picture_sys_t ) );
-                if( p_pic[i].p_sys == NULL )
+                switch( ddpfPixelFormat.dwRGBBitCount )
                 {
-                    DirectXCloseSurface( p_vout, p_surface );
-                    FreePictureVec( p_vout, p_pic, I_OUTPUTPICTURES );
-                    I_OUTPUTPICTURES = 0;
-                    return -1;
+                case 8: /* FIXME: set the palette */
+                    p_vout->output.i_chroma = FOURCC_RGB2; break;
+                case 15:
+                    p_vout->output.i_chroma = FOURCC_RV15; break;
+                case 16:
+                    p_vout->output.i_chroma = FOURCC_RV16; break;
+                case 24:
+                    p_vout->output.i_chroma = FOURCC_RV24; break;
+                case 32:
+                    p_vout->output.i_chroma = FOURCC_RV32; break;
+                default:
+                    intf_ErrMsg( "vout error: unknown screen depth" );
+                    return( 0 );
                 }
-                p_pic[i].p_sys->p_surface = p_surface;
-                p_pic[i].p_sys->p_front_surface = NULL;
-                I_OUTPUTPICTURES++;
-
+                p_vout->output.i_rmask = ddpfPixelFormat.dwRBitMask;
+                p_vout->output.i_gmask = ddpfPixelFormat.dwGBitMask;
+                p_vout->output.i_bmask = ddpfPixelFormat.dwBBitMask;
             }
-            else break;
+
+            p_vout->p_sys->b_hw_yuv = 0;
+
+            b_result_ok = DirectXCreateSurface( p_vout, &p_surface,
+                                                p_vout->output.i_chroma,
+                                                p_vout->p_sys->b_using_overlay,
+                                                0 /* no back buffers */ );
         }
 
-        if( I_OUTPUTPICTURES )
-            intf_WarnMsg( 3,"vout: DirectX RGB surface created successfully" );
-        else
-            intf_ErrMsg( "vout error: can't create RGB surface." );
-
-        /* We couldn't use an YUV overlay so we need to indicate to
-         * video_output which format we are falling back to */
-        ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
-        IDirectDrawSurface3_GetPixelFormat( p_vout->p_sys->p_display,
-                                            &ddpfPixelFormat );
-        switch( ddpfPixelFormat.dwRGBBitCount )
+        if( b_result_ok )
         {
-            case 8: /* FIXME: set the palette */
-                p_vout->output.i_chroma = FOURCC_RGB2; break;
-            case 15:
-                p_vout->output.i_chroma = FOURCC_RV15; break;
-            case 16:
-                p_vout->output.i_chroma = FOURCC_RV16; break;
-            case 24:
-                p_vout->output.i_chroma = FOURCC_RV24; break;
-            case 32:
-                p_vout->output.i_chroma = FOURCC_RV32; break;
-            default:
-                intf_ErrMsg( "vout error: unknown screen depth" );
-                return( 0 );
-        }
-        p_vout->output.i_rmask = ddpfPixelFormat.dwRBitMask;
-        p_vout->output.i_gmask = ddpfPixelFormat.dwGBitMask;
-        p_vout->output.i_bmask = ddpfPixelFormat.dwBBitMask;
+            /* Allocate internal structure */
+            p_pic[0].p_sys = malloc( sizeof( picture_sys_t ) );
+            if( p_pic[0].p_sys == NULL )
+            {
+                DirectXCloseSurface( p_vout, p_surface );
+                return -1;
+            }
+            p_pic[0].p_sys->p_surface = p_pic[0].p_sys->p_front_surface
+                = p_surface;
 
+            I_OUTPUTPICTURES = 1;
+
+            intf_WarnMsg( 3, "vout: DirectX plain surface created "
+                             "successfully" );
+        }
+        else
+            intf_ErrMsg( "vout error: DirectX can't create plain surface." );
     }
 
 
@@ -1132,13 +1153,7 @@ static void FreePictureVec( vout_thread_t *p_vout, picture_t *p_pic,
 
     for( i = 0; i < i_num_pics; i++ )
     {
-#if 0
-        if( p_pic->p_sys->p_front_surface && 
-            ( p_pic->p_sys->p_surface != p_pic->p_sys->p_front_surface ) )
-            DirectXCloseSurface( p_vout, p_pic[i].p_sys->p_front_surface );
-#endif
-
-        DirectXCloseSurface( p_vout, p_pic[i].p_sys->p_surface );
+        DirectXCloseSurface( p_vout, p_pic[i].p_sys->p_front_surface );
 
         for( i = 0; i < i_num_pics; i++ )
         {

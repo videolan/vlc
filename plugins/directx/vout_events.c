@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.15 2002/04/24 23:49:32 gbazin Exp $
+ * $Id: vout_events.c,v 1.16 2002/05/18 13:30:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -142,7 +142,7 @@ void DirectXEventThread( vout_thread_t *p_vout )
             case VK_ESCAPE:
             case VK_F12:
                 /* exit application */
-                p_main->p_intf->b_die = 1;
+                p_main->p_intf->b_die = p_vout->p_sys->b_event_thread_die = 1;
                 break;
             }
             TranslateMessage(&msg);
@@ -154,7 +154,7 @@ void DirectXEventThread( vout_thread_t *p_vout )
             case 'q':
             case 'Q':
                 /* exit application */
-                p_main->p_intf->b_die = 1;
+                p_main->p_intf->b_die = p_vout->p_sys->b_event_thread_die = 1;
                 break;
 
             case 'f':                            /* switch to fullscreen */
@@ -512,7 +512,9 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
             DirectXUpdateOverlay( p_vout );
 
         /* signal the size change */
-        p_vout->p_sys->i_changes |= VOUT_SIZE_CHANGE;
+        if( !p_vout->p_sys->b_using_overlay &&
+            !p_vout->p_sys->b_event_thread_die )
+            p_vout->p_sys->i_changes |= VOUT_SIZE_CHANGE;
 
         return 0;
         }
@@ -522,7 +524,8 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     case WM_CLOSE:
         intf_WarnMsg( 4, "vout: WinProc WM_CLOSE" );
         /* exit application */
-        p_main->p_intf->b_die = 1;
+        p_vout = (vout_thread_t *)GetWindowLong( hwnd, GWL_USERDATA );
+        p_main->p_intf->b_die = p_vout->p_sys->b_event_thread_die = 1;
         return 0;
         break;
 

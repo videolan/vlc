@@ -2,7 +2,7 @@
  * vout_directx.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.h,v 1.5 2002/04/23 22:07:05 gbazin Exp $
+ * $Id: vout_directx.h,v 1.6 2002/05/18 13:30:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -39,6 +39,8 @@ typedef struct vout_sys_s
     HWND                 hwnd;                  /* Handle of the main window */
 
     boolean_t    b_using_overlay;         /* Are we using an overlay surface */
+    boolean_t    b_use_sysmem;   /* Should we use system memory for surfaces */
+    boolean_t    b_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
 
     /* size of the display */
     RECT         rect_display;
@@ -73,7 +75,7 @@ typedef struct vout_sys_s
     vlc_cond_t   event_thread_wait;
 
     volatile int i_event_thread_status;         /* DirectXEventThread status */
-    boolean_t    b_event_thread_die;        /* flag to kill the event thread */
+    volatile boolean_t b_event_thread_die;  /* flag to kill the event thread */
 
 } vout_sys_t;
 

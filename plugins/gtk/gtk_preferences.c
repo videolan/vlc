@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.27 2002/05/04 16:17:08 gbazin Exp $
+ * $Id: gtk_preferences.c,v 1.28 2002/05/18 13:30:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -733,6 +733,7 @@ static void GtkIntChanged( GtkEditable *editable, gpointer user_data )
 
     p_config = malloc( sizeof(module_config_t) );
     p_config->i_type = MODULE_CONFIG_ITEM_INTEGER;
+    gtk_spin_button_update( GTK_SPIN_BUTTON(editable) );
     p_config->i_value = gtk_spin_button_get_value_as_int(
                             GTK_SPIN_BUTTON(editable) );
     p_config->psz_name = (char *)gtk_object_get_data( GTK_OBJECT(editable),
@@ -767,6 +768,7 @@ static void GtkFloatChanged( GtkEditable *editable, gpointer user_data )
 
     p_config = malloc( sizeof(module_config_t) );
     p_config->i_type = MODULE_CONFIG_ITEM_FLOAT;
+    gtk_spin_button_update( GTK_SPIN_BUTTON(editable) );
     p_config->f_value = gtk_spin_button_get_value_as_float(
                            GTK_SPIN_BUTTON(editable) );
     p_config->psz_name = (char *)gtk_object_get_data( GTK_OBJECT(editable),

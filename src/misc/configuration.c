@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.23 2002/05/15 01:29:07 sam Exp $
+ * $Id: configuration.c,v 1.24 2002/05/18 13:30:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -411,8 +411,8 @@ int config_LoadConfigFile( const char *psz_module_name )
     file = fopen( psz_filename, "rt" );
     if( !file )
     {
-        intf_WarnMsg( 1, "config: couldn't open config file %s for reading (%s)",
-                         psz_filename, strerror(errno) );
+        intf_WarnMsg( 1, "config: config file %s doesn't already exist",
+                         psz_filename );
         free( psz_filename );
         vlc_mutex_unlock( &p_main->config_lock );
         return -1;
@@ -450,7 +450,8 @@ int config_LoadConfigFile( const char *psz_module_name )
             if( line[0] == '[' ) break; /* end of section */
 
             /* ignore comments or empty lines */
-            if( (line[0] == '#') || (line[0] == (char)0) ) continue;
+            if( (line[0] == '#') || (line[0] == '\n') || (line[0] == (char)0) )
+                continue;
 
             /* get rid of line feed */
             if( line[strlen(line)-1] == '\n' )
@@ -599,8 +600,8 @@ int config_SaveConfigFile( const char *psz_module_name )
     file = fopen( psz_filename, "rt" );
     if( !file )
     {
-        intf_WarnMsg( 1, "config: couldn't open config file %s for reading (%s)",
-                         psz_filename, strerror(errno) );
+        intf_WarnMsg( 1, "config: config file %s doesn't already exist",
+                         psz_filename );
     }
     else
     {
@@ -702,10 +703,11 @@ int config_SaveConfigFile( const char *psz_module_name )
         intf_WarnMsg( 5, "config: saving config for module <%s>",
                          p_module->psz_name );
 
-        fprintf( file, "[%s]\n", p_module->psz_name );
-
+        fprintf( file, "[%s]", p_module->psz_name );
         if( p_module->psz_longname )
-            fprintf( file, "###\n###  %s\n###\n", p_module->psz_longname );
+            fprintf( file, " # %s\n\n", p_module->psz_longname );
+        else
+            fprintf( file, "\n\n" );
 
         for( p_item = p_module->p_config;
              p_item->i_type != MODULE_CONFIG_HINT_END;
@@ -1022,13 +1024,13 @@ char *config_GetHomeDir( void )
 #   define CSIDL_APPDATA 0x1A
 #   define SHGFP_TYPE_CURRENT 0
 
-    HINSTANCE shell32_dll;
+    HINSTANCE shfolder_dll;
     SHGETFOLDERPATH SHGetFolderPath ;
 
     /* load the shell32 dll to retreive SHGetFolderPath */
-    if( ( shell32_dll = LoadLibrary("shell32.dll") ) != NULL )
+    if( ( shfolder_dll = LoadLibrary("shfolder.dll") ) != NULL )
     {
-        SHGetFolderPath = (void *)GetProcAddress( shell32_dll,
+        SHGetFolderPath = (void *)GetProcAddress( shfolder_dll,
                                                   "SHGetFolderPathA" );
         if ( SHGetFolderPath != NULL )
         {
@@ -1045,12 +1047,12 @@ char *config_GetHomeDir( void )
                                          NULL, SHGFP_TYPE_CURRENT,
                                          p_homedir ) )
             {
-                FreeLibrary( shell32_dll );
+                FreeLibrary( shfolder_dll );
                 return p_homedir;
             }
             free( p_homedir );
         }
-        FreeLibrary( shell32_dll );
+        FreeLibrary( shfolder_dll );
     }
 #endif
 
