@@ -1,3 +1,5 @@
 SOURCES_visual = visual.c \
-		 effects.c \
-		 fft.c
+                 visual.h \
+                 effects.c \
+                 fft.c \
+                 fft.h
