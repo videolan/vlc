@@ -77,8 +77,8 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
             Remaining=p_libmad_stream->bufend-p_libmad_stream->next_frame;
             if( p_mad_adec->buffer != p_libmad_stream->next_frame )
             {
-                p_mad_adec->p_fifo->p_vlc->pf_memcpy( p_mad_adec->buffer,
-                                    p_libmad_stream->next_frame, Remaining );
+                memcpy( p_mad_adec->buffer,
+                        p_libmad_stream->next_frame, Remaining );
             }
             ReadStart=p_mad_adec->buffer+Remaining;
             ReadSize=(MAD_BUFFER_MDLEN)-Remaining;
@@ -106,14 +106,12 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
         {
             ReadSize = p_mad_adec->p_data->p_payload_end
                         - p_mad_adec->p_data->p_payload_start;
-            p_mad_adec->p_fifo->p_vlc->pf_memcpy( ReadStart,
-                                p_mad_adec->p_data->p_payload_start, ReadSize );
+            memcpy( ReadStart, p_mad_adec->p_data->p_payload_start, ReadSize );
             NextDataPacket( p_mad_adec->p_fifo, &p_mad_adec->p_data );
         }
         else
         {
-            p_mad_adec->p_fifo->p_vlc->pf_memcpy( ReadStart,
-                         p_mad_adec->p_data->p_payload_start, ReadSize );
+            memcpy( ReadStart, p_mad_adec->p_data->p_payload_start, ReadSize );
             p_mad_adec->p_data->p_payload_start += ReadSize;
         }
 
