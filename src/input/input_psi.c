@@ -174,12 +174,12 @@ void input_PsiRead( input_thread_t *p_input /* ??? */ )
   for( i_index = 0; i_index < p_input->p_stream->i_pgrm_number; i_index++ )
   {
     p_pgrm = p_input->p_stream->ap_programs[i_index];
-    intf_Msg("Printing info for program %d\n", p_pgrm->i_number );
+    intf_DbgMsg("Printing info for program %d\n", p_pgrm->i_number );
     intf_IntfMsg("Printing info for program %d\n", p_pgrm->i_number );
 
     for( i_index2 = 0; i_index2 < p_pgrm->i_es_number; i_index2++ )
     {
-      intf_Msg( " ->Pid %d: type %d, PCR: %d, PSI: %d\n", p_pgrm->ap_es[i_index2]->i_id,
+      intf_DbgMsg( " ->Pid %d: type %d, PCR: %d, PSI: %d\n", p_pgrm->ap_es[i_index2]->i_id,
                     p_pgrm->ap_es[i_index2]->i_type, p_pgrm->ap_es[i_index2]->b_pcr,
                     p_pgrm->ap_es[i_index2]->b_psi);
 
@@ -294,7 +294,7 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
       /* This can either mean that the PSI decoder has just started or that
          the stream has changed */
       if( p_descr->i_PAT_version== PSI_UNINITIALISED )
-        intf_Msg("Building Program Association table\n");
+        intf_DbgMsg("Building Program Association table\n");
       else
         intf_ErrMsg( "Stream Id has suddently changed ! Rebuilding PAT\n" );
 
@@ -306,7 +306,7 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
       /* Stream has not changed, test if the PMT is up to date */
       if( p_descr->i_PAT_version != i_version )
       {
-        intf_Msg("PAT has been updated, rebuilding it\n");
+        intf_DbgMsg("PAT has been updated, rebuilding it\n");
         /* Ask the PSI decoder to rebuild the table */
         b_is_invalid = 1;
       }
@@ -402,7 +402,7 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
                (Network information table) */
             if( i_pgrm_id != 0 )
             {
-              intf_Msg("Adding program %d to the Program Map Table\n", i_pgrm_id);
+              intf_DbgMsg("Adding program %d to the Program Map Table\n", i_pgrm_id);
               AddPgrmDescr(p_descr, i_pgrm_id);
             }
           }
@@ -485,7 +485,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
   i_version = (p_pms[5] >> 1) && 0x1F;
     if( p_pgrm->i_version != i_version )
     {
-        intf_Msg("Updating PMT for program %d\n", i_pgrm_number);
+        intf_DbgMsg("Updating PMT for program %d\n", i_pgrm_number);
 
         for( i_index = 0; i_index < p_pgrm->i_es_number; i_index++ )
         {
@@ -493,7 +493,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
              normally used by the interface to manage this */
           if( input_IsElemRecv(p_input, p_pgrm->ap_es[i_index]->i_id) )
           {
-            intf_Msg( "PID %d is no more valid: stopping its reception\n",
+            intf_DbgMsg( "PID %d is no more valid: stopping its reception\n",
                       p_pgrm->ap_es[i_index]->i_id );
             input_DelPgrmElem( p_input, p_pgrm->ap_es[i_index]->i_id );
           }
@@ -599,7 +599,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
           }
 
           /* We now know the info carried in this section */
-          intf_Msg("Description of program %d complete\n", p_pgrm->i_number);
+          intf_DbgMsg("Description of program %d complete\n", p_pgrm->i_number);
           p_pgrm->b_is_ok = 1;
           Set_known(p_descr->a_known_PMT_sections, i_current_section);
         
@@ -682,7 +682,7 @@ void DecodeSrvDescrSection( byte_t* p_sdt, input_thread_t *p_input )
      /* Section applyies to our TS, test if the SDT is up to date */
      if( p_stream->i_SDT_version != i_version )
      {
-       intf_Msg("SDT has been updated, NOT YET IMPLEMENTED\n");
+       intf_DbgMsg("SDT has been updated, NOT YET IMPLEMENTED\n");
 
        /* Ask the PSI decoder to rebuild the table */
         b_must_update = 1;
@@ -706,7 +706,7 @@ void DecodeSrvDescrSection( byte_t* p_sdt, input_thread_t *p_input )
          if( p_stream->ap_programs[i_index]->i_number == U16_AT(&p_sdt[i_offset]) )
          {
            /* Here we are */
-           intf_Msg("FOUND: %d\n", p_stream->ap_programs[i_index]->i_number);
+           intf_DbgMsg("FOUND: %d\n", p_stream->ap_programs[i_index]->i_number);
            break;
          }
        }
@@ -778,7 +778,7 @@ static void DecodePgrmDescriptor( byte_t* p_descriptor, pgrm_descriptor_t* p_pgr
 #endif
     default:
 //        intf_DbgMsg("Unhandled program descriptor received (type: %d)\n", i_type);
-//        intf_Msg("Unhandled ES descriptor received (type: %d)\n", i_type);
+//        intf_DbgMsg("Unhandled ES descriptor received (type: %d)\n", i_type);
     }
 }
 
@@ -824,7 +824,7 @@ static void DecodeESDescriptor( byte_t* p_descriptor, es_descriptor_t* p_es )
     }
     default:
 //        intf_DbgMsg("Unhandled ES descriptor received (type: %d)\n", i_type);
-//        intf_Msg("Unhandled ES descriptor received (type: %d)\n", i_type);
+//        intf_DbgMsg("Unhandled ES descriptor received (type: %d)\n", i_type);
     }
 }
 

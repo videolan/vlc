@@ -40,10 +40,14 @@ CCFLAGS += -D_REENTRANT
 CCFLAGS += -D_GNU_SOURCE
 
 # Optimizations : don't compile debug versions with them
-#CCFLAGS += -O2
-#CCFLAGS += -O8
-#CCFLAGS += -s -fargument-noalias-global -fexpensive-optimizations -ffast-math -funroll-loops -fomit-frame-pointer #-march=pentiumpro
-#(Uncomment -march=pentiumpro if it applies)
+CCFLAGS += -O3
+CCFLAGS += -ffast-math -funroll-loops -fno-function-cse -fargument-noalias-global
+#CCFLAGS += -fomit-frame-pointer -s
+#CCFLAGS += -malign-double
+#CCFLAGS += -march=pentiumpro
+#CCFLAGS += -march=pentium
+#CCFLAGS += -mcpu=604e -mmultiple -mhard-float -mstring
+#LCFLAGS += -s
 
 #
 # C compiler flags: dependancies
@@ -87,10 +91,10 @@ FFILTER = grep -v "intf_.*Msg.*\.\.\."
 #
 # Debugging settings: electric fence, debuging symbols and profiling support. 
 # Note that electric fence and accurate profiling are quite uncompatible.
-CCFLAGS += -g
-CCFLAGS += -pg
-LCFLAGS += -g
-LCFLAGS += -pg
+#CCFLAGS += -g
+#CCFLAGS += -pg
+#LCFLAGS += -g
+#LCFLAGS += -pg
 #LIB += -ldmalloc
 #LIB += -lefence
 
@@ -128,9 +132,19 @@ video_output_obj = 		video_output/video_output.o \
 audio_decoder_obj =		audio_decoder/audio_decoder.o \
 						audio_decoder/audio_math.o
 
-generic_decoder_obj =		generic_decoder/generic_decoder.o
+#generic_decoder_obj =		generic_decoder/generic_decoder.o
 
-video_decoder_obj =		video_decoder/video_decoder.o
+video_decoder_obj =		video_decoder_ref/video_decoder.o \
+						video_decoder_ref/display.o \
+						video_decoder_ref/getblk.o \
+						video_decoder_ref/gethdr.o \
+						video_decoder_ref/getpic.o \
+						video_decoder_ref/getvlc.o \
+						video_decoder_ref/idct.o \
+						video_decoder_ref/motion.o \
+						video_decoder_ref/mpeg2dec.o \
+						video_decoder_ref/recon.o \
+						video_decoder_ref/spatscal.o
 
 misc_obj =			misc/mtime.o \
 						misc/xutils.o \

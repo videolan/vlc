@@ -79,7 +79,7 @@
  */
 
 /* Size of the FIFO. FIFO_SIZE+1 must be a multiple of 2 */
-#define FIFO_SIZE                       511
+#define FIFO_SIZE                       1023
 
 /*******************************************************************************
  * Input thread configuration
@@ -115,7 +115,7 @@
  * INPUT_MAX_TS + 1 must be a power of 2, to optimize the %(INPUT_MAX_TS+1)
  * operation with a &INPUT_MAX_TS in the case of a fifo netlist.
  * It should be > number of fifos * FIFO_SIZE to avoid input deadlock. */
-#define INPUT_MAX_TS                    16383      /* INPUT_MAX_TS + 1 = 2^14 */
+#define INPUT_MAX_TS                    32767      /* INPUT_MAX_TS + 1 = 2^15 */
 
 /* Same thing with PES packets */
 #define INPUT_MAX_PES                   16383
@@ -137,7 +137,7 @@
 
 
 /* Default input method */
-#define INPUT_DEFAULT_METHOD            20 /* unicast (debug) */
+#define INPUT_DEFAULT_METHOD            INPUT_METHOD_TS_UCAST
 
 /* Default remote server */
 #define VIDEOLAN_DEFAULT_SERVER         "vod.via.ecp.fr"
