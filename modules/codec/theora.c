@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.16 2003/12/07 17:09:33 gbazin Exp $
+ * $Id: theora.c,v 1.17 2003/12/07 17:53:45 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -200,7 +200,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_dec->fmt_out.video.i_height = p_sys->ti.height;
 
         if( p_sys->ti.aspect_denominator )
-            p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR *
+            p_dec->fmt_out.video.i_aspect = ((int64_t)VOUT_ASPECT_FACTOR) *
                 p_sys->ti.aspect_numerator / p_sys->ti.aspect_denominator;
         else
             p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR *
@@ -463,8 +463,6 @@ static int OpenEncoder( vlc_object_t *p_this )
 #define frame_y_offset 0
 #define video_hzn 25
 #define video_hzd 1
-#define video_an 4
-#define video_ad 3
 #define video_q 5
 
     theora_info_init( &p_sys->ti );
@@ -477,9 +475,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->ti.offset_y = frame_y_offset;
     p_sys->ti.fps_numerator = video_hzn;
     p_sys->ti.fps_denominator = video_hzd;
-    p_sys->ti.aspect_numerator = video_an;
-    p_sys->ti.aspect_denominator = video_ad;
-    p_sys->ti.colorspace = not_specified;
+    p_sys->ti.aspect_numerator = p_enc->fmt_in.video.i_aspect;
+    p_sys->ti.aspect_denominator = VOUT_ASPECT_FACTOR;
     p_sys->ti.target_bitrate = p_enc->fmt_out.i_bitrate;
     p_sys->ti.quality = video_q;
 
