@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.23 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: vout_directx.c,v 1.24 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -134,7 +134,7 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->b_caps_overlay_clipping = 0;
     SetRectEmpty( &p_vout->p_sys->rect_display );
     p_vout->p_sys->b_using_overlay =
-        !config_GetIntVariable( VOUT_NOOVERLAY_VAR );
+        !config_GetIntVariable( "nooverlay" );
 
     p_vout->p_sys->b_cursor = 1;
 
@@ -157,8 +157,8 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
 #if 0
-    p_vout->p_sys->i_window_width = config_GetIntVariable( VOUT_WIDTH_VAR );
-    p_vout->p_sys->i_window_height = config_GetIntVariable( VOUT_HEIGHT_VAR );
+    p_vout->p_sys->i_window_width = config_GetIntVariable( "width" );
+    p_vout->p_sys->i_window_height = config_GetIntVariable( "height" );
 #endif
 
     /* Set locks and condition variables */

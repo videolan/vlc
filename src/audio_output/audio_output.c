@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.81 2002/03/04 22:18:25 gbazin Exp $
+ * $Id: audio_output.c,v 1.82 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -96,15 +96,15 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, int i_rate )
     }
 
     p_aout->i_latency = 0;
-    p_aout->i_rate = config_GetIntVariable( AOUT_RATE_VAR );
-    p_aout->i_channels = config_GetIntVariable( AOUT_MONO_VAR ) ? 1 : 2;
+    p_aout->i_rate = config_GetIntVariable( "rate" );
+    p_aout->i_channels = config_GetIntVariable( "mono" ) ? 1 : 2;
 
     /* Maybe we should pass this setting in argument */
     p_aout->i_format = AOUT_FORMAT_DEFAULT;
 
     /* special setting for ac3 pass-through mode */
     /* FIXME is it necessary ? (cf ac3_adec.c) */
-    if( config_GetIntVariable( AOUT_SPDIF_VAR ) && p_main->b_ac3 )
+    if( config_GetIntVariable( "spdif" ) && p_main->b_ac3 )
     {
         intf_WarnMsg( 4, "aout info: setting ac3 spdif" );
         p_aout->i_format = AOUT_FMT_AC3;
@@ -118,7 +118,7 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, int i_rate )
     }
 
     /* Choose the best module */
-    psz_name = config_GetPszVariable( AOUT_METHOD_VAR );
+    psz_name = config_GetPszVariable( "aout" );
     p_aout->p_module = module_Need( MODULE_CAPABILITY_AOUT, psz_name,
                                     (void *)p_aout );
     if( psz_name ) free( psz_name );
@@ -149,7 +149,7 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, int i_rate )
     }
 
     /* Initialize the volume level */
-    p_aout->i_volume = config_GetIntVariable( AOUT_VOLUME_VAR );
+    p_aout->i_volume = config_GetIntVariable( "volume" );
     p_aout->i_savedvolume = 0;
     
     /* FIXME: maybe it would be cleaner to change SpawnThread prototype

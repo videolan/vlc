@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.1 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: configuration.h,v 1.2 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -27,29 +27,34 @@
  * Macros used to build the configuration structure.
  *****************************************************************************/
 
-/* Mandatory last part of the structure */
-#define MODULE_CONFIG_ITEM_END              0x000   /* End of config */
+/* Configuration hint types */
+#define MODULE_CONFIG_HINT_END              0x0001  /* End of config */
+#define MODULE_CONFIG_HINT_CATEGORY         0x0002  /* Start of new category */
+#define MODULE_CONFIG_HINT_SUBCATEGORY      0x0003  /* Start of sub-category */
+#define MODULE_CONFIG_HINT_SUBCATEGORY_END  0x0004  /* End of sub-category */
 
-/* Configuration widgets */
-#define MODULE_CONFIG_ITEM_CATEGORY         0x0001  /* Start of new category */
-#define MODULE_CONFIG_ITEM_SUBCATEGORY      0x0002  /* Start of sub-category */
-#define MODULE_CONFIG_ITEM_SUBCATEGORY_END  0x0003  /* End of sub-category */
-#define MODULE_CONFIG_ITEM_STRING           0x0004  /* String option */
-#define MODULE_CONFIG_ITEM_FILE             0x0005  /* File option */
-#define MODULE_CONFIG_ITEM_PLUGIN           0x0006  /* Plugin option */
-#define MODULE_CONFIG_ITEM_INTEGER          0x0007  /* Integer option */
-#define MODULE_CONFIG_ITEM_BOOL             0x0008  /* Bool option */
-#define MODULE_CONFIG_ITEM_ALIAS            0x0009  /* Alias option */
+#define MODULE_CONFIG_HINT                  0x000F
+
+/* Configuration item types */
+#define MODULE_CONFIG_ITEM_STRING           0x0010  /* String option */
+#define MODULE_CONFIG_ITEM_FILE             0x0020  /* File option */
+#define MODULE_CONFIG_ITEM_PLUGIN           0x0030  /* Plugin option */
+#define MODULE_CONFIG_ITEM_INTEGER          0x0040  /* Integer option */
+#define MODULE_CONFIG_ITEM_BOOL             0x0050  /* Bool option */
+#define MODULE_CONFIG_ITEM_ALIAS            0x0060  /* Alias option */
+
+#define MODULE_CONFIG_ITEM                  0x00F0
 
 typedef struct module_config_s
 {
     int         i_type;                                /* Configuration type */
-    char *      psz_name;                                     /* Option name */
-    char *      psz_text;       /* Short comment on the configuration option */
-    char *      psz_longtext;    /* Long comment on the configuration option */
-    char *      psz_value;                                   /* Option value */
+    char        *psz_name;                                    /* Option name */
+    char        *psz_text;      /* Short comment on the configuration option */
+    char        *psz_longtext;   /* Long comment on the configuration option */
+    char        *psz_value;                                  /* Option value */
     int         i_value;                                     /* Option value */
-    void *      p_callback;      /* Function to call when commiting a change */
+    void        *p_callback;     /* Function to call when commiting a change */
+    vlc_mutex_t *p_lock;            /* lock to use when modifying the config */
     boolean_t   b_dirty;           /* Dirty flag to indicate a config change */
 
 } module_config_t;
@@ -65,8 +70,7 @@ void   config_PutIntVariable( const char *psz_name, int i_value );
 void   config_PutPszVariable( const char *psz_name, char *psz_value );
 
 module_config_t *config_FindConfig( const char *psz_name );
-module_config_t *config_Duplicate ( module_config_t *p_config_orig,
-                                    int i_config_options );
+module_config_t *config_Duplicate ( module_t *p_module );
 #else
 #   define config_GetIntVariable p_symbols->config_GetIntVariable
 #   define config_PutIntVariable p_symbols->config_PutIntVariable
@@ -92,25 +96,29 @@ module_config_t *config_Duplicate ( module_config_t *p_config_orig,
     static module_config_t p_config[] = {
 
 #define MODULE_CONFIG_STOP \
-    { MODULE_CONFIG_ITEM_END, NULL, NULL, NULL, NULL, 0, NULL, 0 } };
+    { MODULE_CONFIG_HINT_END, NULL, NULL, NULL, NULL, 0, NULL, 0 } };
 
 #define ADD_CATEGORY_HINT( text, longtext ) \
-    { MODULE_CONFIG_ITEM_CATEGORY, NULL, text, longtext, NULL, 0, NULL, 0 },
+    { MODULE_CONFIG_HINT_CATEGORY, NULL, text, longtext, NULL, 0, NULL, \
+      NULL, 0 },
 #define ADD_SUBCATEGORY_HINT( text, longtext ) \
-    { MODULE_CONFIG_ITEM_SUBCATEGORY, NULL, text, longtext, NULL, 0, NULL, 0 },
+    { MODULE_CONFIG_HINT_SUBCATEGORY, NULL, text, longtext, NULL, 0, NULL, \
+      NULL, 0 },
 #define END_SUBCATEGORY_HINT \
-    { MODULE_CONFIG_ITEM_SUBCATEGORY_END, NULL, NULL, NULL, NULL, 0, NULL, 0 },
+    { MODULE_CONFIG_HINT_SUBCATEGORY_END, NULL, NULL, NULL, NULL, 0, NULL, \
+      NULL, 0 },
 #define ADD_STRING( name, value, p_callback, text, longtext ) \
     { MODULE_CONFIG_ITEM_STRING, name, text, longtext, value, 0, \
-      p_callback, 0 },
+      p_callback, NULL, 0 },
 #define ADD_FILE( name, psz_value, p_callback, text, longtext ) \
     { MODULE_CONFIG_ITEM_FILE, name, text, longtext, psz_value, 0, \
-      p_callback, 0 },
+      p_callback, NULL, 0 },
 #define ADD_PLUGIN( name, i_capability, psz_value, p_callback, text, longtext)\
     { MODULE_CONFIG_ITEM_PLUGIN, name, text, longtext, psz_value, \
-      i_capability, p_callback, 0 },
+      i_capability, p_callback, NULL, 0 },
 #define ADD_INTEGER( name, i_value, p_callback, text, longtext ) \
     { MODULE_CONFIG_ITEM_INTEGER, name, text, longtext, NULL, i_value, \
-      p_callback, 0 },
+      p_callback, NULL, 0 },
 #define ADD_BOOL( name, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_BOOL, name, text, longtext, NULL, 0, p_callback, 0 },
+    { MODULE_CONFIG_ITEM_BOOL, name, text, longtext, NULL, 0, p_callback, \
+      NULL, 0 },

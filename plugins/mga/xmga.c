@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.6 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: xmga.c,v 1.7 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -267,9 +267,9 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    /* Open display, unsing the VOUT_DISPLAY_VAR config variable or the DISPLAY
+    /* Open display, unsing the "display" config variable or the DISPLAY
      * environment variable */
-    psz_display = config_GetPszVariable( VOUT_DISPLAY_VAR );
+    psz_display = config_GetPszVariable( "display" );
     p_vout->p_sys->p_display = XOpenDisplay( psz_display );
 
     if( p_vout->p_sys->p_display == NULL )                          /* error */

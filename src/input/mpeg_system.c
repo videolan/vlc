@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.83 2002/03/05 17:46:33 stef Exp $
+ * $Id: mpeg_system.c,v 1.84 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -812,11 +812,11 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
                         if( !p_input->stream.b_seekable )
-                        if( config_GetIntVariable( INPUT_CHANNEL_VAR )
+                        if( config_GetIntVariable( "input_channel" )
                                 == (p_es->i_id & 0x1F) ||
-                            ( config_GetIntVariable( INPUT_CHANNEL_VAR ) < 0
+                            ( config_GetIntVariable( "input_channel" ) < 0
                               && !(p_es->i_id & 0x1F) ) )
-                        switch( config_GetIntVariable( INPUT_AUDIO_VAR ) )
+                        switch( config_GetIntVariable( "input_audio" ) )
                         {
                         case -1:
                         case REQUESTED_MPEG:
@@ -832,11 +832,11 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
                         if( !p_input->stream.b_seekable )
-                        if( config_GetIntVariable( INPUT_CHANNEL_VAR )
+                        if( config_GetIntVariable( "input_channel" )
                                 == ((p_es->i_id & 0xF00) >> 8) ||
-                            ( config_GetIntVariable( INPUT_CHANNEL_VAR ) < 0
+                            ( config_GetIntVariable( "input_channel" ) < 0
                               && !((p_es->i_id & 0xF00) >> 8)) )
-                        switch( config_GetIntVariable( INPUT_AUDIO_VAR ) )
+                        switch( config_GetIntVariable( "input_audio" ) )
                         {
                         case -1:
                         case REQUESTED_AC3:
@@ -850,7 +850,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_type = DVD_SPU_ES;
                         p_es->i_cat = SPU_ES;
 #ifdef AUTO_SPAWN
-                        if( config_GetIntVariable( INPUT_SUBTITLE_VAR )
+                        if( config_GetIntVariable( "input_subtitle" )
                                 == ((p_es->i_id & 0x1F00) >> 8) )
                         {
                             if( !p_input->stream.b_seekable )
@@ -1638,7 +1638,7 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         if( p_main->b_audio )
         {
             /* Default is the first one */
-            i_required_audio_es = config_GetIntVariable( INPUT_CHANNEL_VAR );
+            i_required_audio_es = config_GetIntVariable( "input_channel" );
             if( i_required_audio_es < 0 )
             {
                 i_required_audio_es = 1;
@@ -1653,7 +1653,7 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         if( p_main->b_video )
         {
             /* for spu, default is none */
-            i_required_spu_es = config_GetIntVariable( INPUT_SUBTITLE_VAR );
+            i_required_spu_es = config_GetIntVariable( "input_subtitle" );
             if( i_required_spu_es < 0 )
             {
                 i_required_spu_es = 0;

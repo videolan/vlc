@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.6 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: deinterlace.c,v 1.7 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -125,10 +125,10 @@ static int vout_Create( vout_thread_t *p_vout )
 
     /* Look what method was requested */
     if( !(psz_method = psz_method_tmp
-          = config_GetPszVariable( VOUT_FILTER_VAR )) )
+          = config_GetPszVariable( "filter" )) )
     {
         intf_ErrMsg( "vout error: configuration variable %s empty",
-                     VOUT_FILTER_VAR );
+                     "filter" );
         return( 1 );
     }
 
@@ -188,8 +188,8 @@ static int vout_Init( vout_thread_t *p_vout )
     }
 
     /* Try to open the real video output, with half the height our images */
-    psz_filter = config_GetPszVariable( VOUT_FILTER_VAR );
-    config_PutPszVariable( VOUT_FILTER_VAR, NULL );
+    psz_filter = config_GetPszVariable( "filter" );
+    config_PutPszVariable( "filter", NULL );
 
     intf_WarnMsg( 1, "filter: spawning the real video output" );
 
@@ -227,7 +227,7 @@ static int vout_Init( vout_thread_t *p_vout )
         break;
     }
 
-    config_PutPszVariable( VOUT_FILTER_VAR, psz_filter );
+    config_PutPszVariable( "filter", psz_filter );
     if( psz_filter ) free( psz_filter );
 
     /* Everything failed */

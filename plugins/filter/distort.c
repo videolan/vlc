@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.8 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: distort.c,v 1.9 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -133,10 +133,10 @@ static int vout_Create( vout_thread_t *p_vout )
 
     /* Look what method was requested */
     if( !(psz_method = psz_method_tmp
-          = config_GetPszVariable( VOUT_FILTER_VAR )) )
+          = config_GetPszVariable( "filter" )) )
     {
         intf_ErrMsg( "vout error: configuration variable %s empty",
-                     VOUT_FILTER_VAR );
+                     "filter" );
         return( 1 );
     }
 
@@ -183,8 +183,8 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     /* Try to open the real video output */
-    psz_filter = config_GetPszVariable( VOUT_FILTER_VAR );
-    config_PutPszVariable( VOUT_FILTER_VAR, NULL );
+    psz_filter = config_GetPszVariable( "filter" );
+    config_PutPszVariable( "filter", NULL );
 
     intf_WarnMsg( 1, "filter: spawning the real video output" );
 
@@ -193,7 +193,7 @@ static int vout_Init( vout_thread_t *p_vout )
                            p_vout->render.i_width, p_vout->render.i_height,
                            p_vout->render.i_chroma, p_vout->render.i_aspect );
 
-    config_PutPszVariable( VOUT_FILTER_VAR, psz_filter );
+    config_PutPszVariable( "filter", psz_filter );
     if( psz_filter ) free( psz_filter );
 
     /* Everything failed */

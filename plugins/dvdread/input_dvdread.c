@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.31 2002/03/06 16:39:37 stef Exp $
+ * $Id: input_dvdread.c,v 1.32 2002/03/11 07:23:09 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -284,7 +284,7 @@ static int DvdReadOpen( struct input_thread_s *p_input )
             free( psz_orig );
             return -1;
         }
-        psz_source = config_GetPszVariable( INPUT_DVD_DEVICE_VAR );
+        psz_source = config_GetPszVariable( "dvd_device" );
     }
 
     if( stat( psz_source, &stat_info ) == -1 )
@@ -1208,16 +1208,16 @@ static void DvdReadLauchDecoders( input_thread_t * p_input )
     if( p_main->b_audio )
     {
         /* For audio: first one if none or a not existing one specified */
-        int i_audio = config_GetIntVariable( INPUT_CHANNEL_VAR );
+        int i_audio = config_GetIntVariable( "input_channel" );
         if( i_audio < 0 /*|| i_audio > i_audio_nb*/ )
         {
-            config_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
+            config_PutIntVariable( "input_channel", 1 );
             i_audio = 1;
         }
         if( i_audio > 0/* && i_audio_nb > 0*/ )
         {
-            if( config_GetIntVariable( AOUT_SPDIF_VAR ) ||
-                ( config_GetIntVariable( INPUT_AUDIO_VAR ) ==
+            if( config_GetIntVariable( "spdif" ) ||
+                ( config_GetIntVariable( "input_audio" ) ==
                   REQUESTED_AC3 ) )
             {
                 int     i_ac3 = i_audio;
@@ -1244,10 +1244,10 @@ static void DvdReadLauchDecoders( input_thread_t * p_input )
     if( p_main->b_video )
     {
         /* for spu, default is none */
-        int i_spu = config_GetIntVariable( INPUT_SUBTITLE_VAR );
+        int i_spu = config_GetIntVariable( "input_subtitle" );
         if( i_spu < 0 /*|| i_spu > i_spu_nb*/ )
         {
-            config_PutIntVariable( INPUT_SUBTITLE_VAR, 0 );
+            config_PutIntVariable( "input_subtitle", 0 );
             i_spu = 0;
         }
         if( i_spu > 0 /*&& i_spu_nb > 0*/ )

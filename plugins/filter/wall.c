@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.14 2002/02/27 03:47:56 sam Exp $
+ * $Id: wall.c,v 1.15 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -130,10 +130,10 @@ static int vout_Create( vout_thread_t *p_vout )
 
     /* Look what method was requested */
     if( !(psz_method = psz_method_tmp
-          = config_GetPszVariable( VOUT_FILTER_VAR )) )
+          = config_GetPszVariable( "filter" )) )
     {
         intf_ErrMsg( "vout error: configuration variable %s empty",
-                     VOUT_FILTER_VAR );
+                     "filter" );
         return( 1 );
     }
 
@@ -283,8 +283,8 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     /* Try to open the real video output */
-    psz_filter = config_GetPszVariable( VOUT_FILTER_VAR );
-    config_PutPszVariable( VOUT_FILTER_VAR, NULL );
+    psz_filter = config_GetPszVariable( "filter" );
+    config_PutPszVariable( "filter", NULL );
 
     intf_WarnMsg( 1, "filter: spawning the real video outputs" );
 
@@ -339,7 +339,7 @@ static int vout_Init( vout_thread_t *p_vout )
                 intf_ErrMsg( "vout error: failed to get %ix%i vout threads",
                              p_vout->p_sys->i_col, p_vout->p_sys->i_row );
                 RemoveAllVout( p_vout );
-                config_PutPszVariable( VOUT_FILTER_VAR, psz_filter );
+                config_PutPszVariable( "filter", psz_filter );
                 if( psz_filter ) free( psz_filter );
                 return 0;
             }
@@ -348,7 +348,7 @@ static int vout_Init( vout_thread_t *p_vout )
         }
     }
 
-    config_PutPszVariable( VOUT_FILTER_VAR, psz_filter );
+    config_PutPszVariable( "filter", psz_filter );
     if( psz_filter ) free( psz_filter );
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );

@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.15 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: ggi.c,v 1.16 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -396,7 +396,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     }
 
     /* Open display */
-    psz_display = config_GetPszVariable( VOUT_DISPLAY_VAR );
+    psz_display = config_GetPszVariable( "display" );
 
     p_vout->p_sys->p_display = ggiOpen( psz_display, NULL );
     if( psz_display ) free( psz_display );
@@ -410,8 +410,8 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     /* Find most appropriate mode */
     p_vout->p_sys->mode.frames =    2;                          /* 2 buffers */
-    p_vout->p_sys->mode.visible.x = config_GetIntVariable( VOUT_WIDTH_VAR );
-    p_vout->p_sys->mode.visible.y = config_GetIntVariable( VOUT_HEIGHT_VAR );
+    p_vout->p_sys->mode.visible.x = config_GetIntVariable( "width" );
+    p_vout->p_sys->mode.visible.y = config_GetIntVariable( "height" );
     p_vout->p_sys->mode.virt.x =    GGI_AUTO;
     p_vout->p_sys->mode.virt.y =    GGI_AUTO;
     p_vout->p_sys->mode.size.x =    GGI_AUTO;

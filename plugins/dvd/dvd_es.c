@@ -1,7 +1,7 @@
 /* dvd_es.c: functions to find and select ES
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_es.c,v 1.2 2002/03/08 22:58:12 stef Exp $
+ * $Id: dvd_es.c,v 1.3 2002/03/11 07:23:09 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -245,15 +245,15 @@ void DVDLaunchDecoders( input_thread_t * p_input )
     if( p_main->b_audio && p_dvd->i_audio_nb > 0 )
     {
         /* For audio: first one if none or a not existing one specified */
-        i_audio = config_GetIntVariable( INPUT_CHANNEL_VAR );
+        i_audio = config_GetIntVariable( "input_channel" );
         if( i_audio <= 0 || i_audio > p_dvd->i_audio_nb )
         {
-            config_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
+            config_PutIntVariable( "input_channel", 1 );
             i_audio = 1;
         }
         
-        if( config_GetIntVariable( AOUT_SPDIF_VAR ) ||
-            ( config_GetIntVariable( INPUT_AUDIO_VAR ) ==
+        if( config_GetIntVariable( "spdif" ) ||
+            ( config_GetIntVariable( "input_audio" ) ==
               REQUESTED_AC3 ) )
         {
             int     i_ac3 = i_audio;
@@ -280,10 +280,10 @@ void DVDLaunchDecoders( input_thread_t * p_input )
     if( p_main->b_video && p_dvd->i_spu_nb > 0 )
     {
         /* for spu, default is none */
-        i_spu = config_GetIntVariable( INPUT_SUBTITLE_VAR );
+        i_spu = config_GetIntVariable( "input_subtitle" );
         if( i_spu < 0 || i_spu > p_dvd->i_spu_nb )
         {
-            config_PutIntVariable( INPUT_SUBTITLE_VAR, 0 );
+            config_PutIntVariable( "input_subtitle", 0 );
             i_spu = 0;
         }
         if( i_spu > 0 )

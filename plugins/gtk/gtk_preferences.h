@@ -2,7 +2,7 @@
  * gtk_control.h: prototypes for control functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_preferences.h,v 1.2 2001/05/15 14:49:48 stef Exp $
+ * $Id: gtk_preferences.h,v 1.3 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -22,8 +22,4 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-gboolean GtkPreferencesShow   ( GtkWidget *, GdkEventButton *, gpointer );
-void     GtkPreferencesOk     ( GtkButton *, gpointer );
-void     GtkPreferencesApply  ( GtkButton *, gpointer );
-void     GtkPreferencesCancel ( GtkButton *, gpointer );
-void     GtkPreferencesActivate( GtkMenuItem *, gpointer );
+void GtkPreferencesActivate( GtkMenuItem *, gpointer );

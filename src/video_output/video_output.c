@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.164 2002/03/03 20:42:21 gbazin Exp $
+ * $Id: video_output.c,v 1.165 2002/03/11 07:23:10 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -106,9 +106,9 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     }
 
     /* Choose the best module */
-    if( !(psz_plugin = config_GetPszVariable( VOUT_FILTER_VAR )) )
+    if( !(psz_plugin = config_GetPszVariable( "filter" )) )
     {
-        psz_plugin = config_GetPszVariable( VOUT_METHOD_VAR );
+        psz_plugin = config_GetPszVariable( "vout" );
     }
 
     /* Initialize thread properties - thread id and locks will be initialized
@@ -154,7 +154,7 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     p_vout->c_fps_samples= 0;
 
     /* user requested fullscreen? */
-    if( config_GetIntVariable( VOUT_FULLSCREEN_VAR ) )
+    if( config_GetIntVariable( "fullscreen" ) )
         p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
 
     p_vout->p_module

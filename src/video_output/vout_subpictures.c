@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.9 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: vout_subpictures.c,v 1.10 2002/03/11 07:23:10 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -60,7 +60,7 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 
     /* If the user requested an SPU margin, we force the position after
      * having checked that it was a valid value. */
-    i_margin = config_GetIntVariable( VOUT_SPUMARGIN_VAR );
+    i_margin = config_GetIntVariable( "spumargin" );
 
     if( i_margin >= 0 )
     {

@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.2 2002/03/04 23:56:37 massiot Exp $
+ * $Id: udp.c,v 1.3 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -107,11 +107,11 @@ static int UDPOpen( input_thread_t * p_input )
     int                 i_bind_port = 0, i_server_port = 0;
     network_socket_t    socket_desc;
 
-    if( config_GetIntVariable( INPUT_IPV4_VAR ) )
+    if( config_GetIntVariable( "ipv4" ) )
     {
         psz_network = "ipv4";
     }
-    if( config_GetIntVariable( INPUT_IPV6_VAR ) )
+    if( config_GetIntVariable( "ipv6" ) )
     {
         psz_network = "ipv6";
     }

@@ -87,7 +87,7 @@ void
 GnomeMenubarPreferencesActivate        (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-    GtkPreferencesShow( GTK_WIDGET( menuitem ), NULL, "intf_window" );
+    GtkPreferencesActivate( menuitem, "intf_window" );
 }
 
 

@@ -142,14 +142,14 @@ static int vout_Create( vout_thread_t *p_vout )
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
     p_vout->b_fullscreen = 
-        config_GetIntVariable( VOUT_FULLSCREEN_VAR );
+        config_GetIntVariable( "fullscreen" );
     p_vout->p_sys->i_mode = 
-        config_GetIntVariable( VOUT_NOOVERLAY_VAR ) ?
+        config_GetIntVariable( "nooverlay" ) ?
         MODE_NORMAL_MEM : MODE_VIDEO_OVERLAY;
     p_vout->p_sys->dim.w =
-        config_GetIntVariable( VOUT_WIDTH_VAR );
+        config_GetIntVariable( "width" );
     p_vout->p_sys->dim.h =
-        config_GetIntVariable( VOUT_HEIGHT_VAR );
+        config_GetIntVariable( "height" );
 
     /* init display and create window */
     if( QNXInitDisplay( p_vout ) || QNXCreateWnd( p_vout ) )

@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.44 2002/03/01 00:33:18 massiot Exp $
+ * $Id: modules.h,v 1.45 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -87,7 +87,7 @@ static __inline__ char *GetCapabilityName( unsigned int i_capa )
  *****************************************************************************
  * This global variable is accessed by any function using modules.
  *****************************************************************************/
-typedef struct
+typedef struct module_bank_s
 {
     struct module_s *   first;                   /* First module in the bank */
     int                 i_count;              /* Number of allocated modules */
@@ -96,7 +96,11 @@ typedef struct
                                     it is to design thread-safe linked lists */
 } module_bank_t;
 
+#ifndef PLUGIN
 extern module_bank_t *p_module_bank;
+#else
+#   define p_module_bank (p_symbols->p_module_bank)
+#endif
 
 /*****************************************************************************
  * Module description structure
@@ -121,8 +125,15 @@ typedef struct module_s
     u32   i_cpu_capabilities;                   /* Required CPU capabilities */
 
     struct module_functions_s *p_functions;          /* Capability functions */
-    struct module_config_s  *p_config;     /* Module configuration structure */
-    int i_config_options;                 /* number of configuration options */
+
+    /*
+     * Variables set by the module to store its config options
+     */
+    struct module_config_s *p_config;      /* Module configuration structure */
+    struct module_config_s *p_config_orig;    /* original module config data */
+    vlc_mutex_t            config_lock;    /* lock used to modify the config */
+    int                    i_config_lines;  /* number of configuration lines */
+    int                    i_config_items;  /* number of configuration items */
 
     /*
      * Variables used internally by the module manager

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.84 2002/03/04 23:56:37 massiot Exp $
+ * $Id: common.h,v 1.85 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -463,6 +463,7 @@ typedef __int64 off_t;
 typedef struct module_symbols_s
 {
     struct main_s* p_main;
+    struct module_bank_s* p_module_bank;
     struct input_bank_s* p_input_bank;
     struct aout_bank_s*  p_aout_bank;
     struct vout_bank_s*  p_vout_bank;
@@ -472,8 +473,7 @@ typedef struct module_symbols_s
     void   ( * config_PutIntVariable ) ( const char *, int );
     void   ( * config_PutPszVariable ) ( const char *, char * );
     struct module_config_s * ( * config_FindConfig ) ( const char * );
-    struct module_config_s * ( * config_Duplicate ) ( struct module_config_s *,
-                                                      int );
+    struct module_config_s * ( * config_Duplicate ) ( struct module_s * );
 
     struct intf_subscription_s * ( * intf_MsgSub ) ( void );
     void ( * intf_MsgUnsub )   ( struct intf_subscription_s * );

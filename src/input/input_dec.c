@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.29 2002/03/01 00:33:18 massiot Exp $
+ * $Id: input_dec.c,v 1.30 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -50,11 +50,11 @@ vlc_thread_t input_RunDecoder( input_thread_t * p_input,
 
     if( p_es->i_type == MPEG1_AUDIO_ES || p_es->i_type == MPEG2_AUDIO_ES )
     {
-        psz_plugin = config_GetPszVariable( ADEC_MPEG_VAR );
+        psz_plugin = config_GetPszVariable( "mpeg_adec" );
     }
     if( p_es->i_type == AC3_AUDIO_ES )
     {
-        psz_plugin = config_GetPszVariable( ADEC_AC3_VAR );
+        psz_plugin = config_GetPszVariable( "ac3_adec" );
     }
 
     /* Get a suitable module */

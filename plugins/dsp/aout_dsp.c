@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_dsp.c,v 1.25 2002/02/27 18:19:21 sam Exp $
+ * $Id: aout_dsp.c,v 1.26 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -236,7 +236,11 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     if( p_aout->b_active )
     {
-        write( p_aout->p_sys->i_fd, buffer, i_size );
+        int i_tmp;
+        i_tmp = write( p_aout->p_sys->i_fd, buffer, i_size );
+	if( i_tmp < 0 )
+	    intf_ErrMsg("aout error: %s", strerror(ENOMEM) );
+
     }
 }
 

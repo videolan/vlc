@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.59 2002/03/04 23:56:38 massiot Exp $
+ * $Id: netutils.c,v 1.60 2002/03/11 07:23:10 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -157,7 +157,7 @@ int network_ChannelJoin( int i_channel )
     struct timeval delay;
     fd_set fds;
 
-    if( !config_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR ) )
+    if( !config_GetIntVariable( "network_channel" ) )
     {
         intf_ErrMsg( "network: channels disabled, to enable them, use the"
                      "--channels option" );
@@ -174,24 +174,23 @@ int network_ChannelJoin( int i_channel )
         mwait( p_main->p_channel->last_change + INPUT_CHANNEL_CHANGE_DELAY );
     }
 
-    if( config_GetIntVariable( INPUT_IPV4_VAR ) )
+    if( config_GetIntVariable( "ipv4" ) )
     {
         psz_network = "ipv4";
     }
-    if( config_GetIntVariable( INPUT_IPV6_VAR ) )
+    if( config_GetIntVariable( "ipv6" ) )
     {
         psz_network = "ipv6";
     }
 
     /* Getting information about the channel server */
-    if( !(psz_vlcs = config_GetPszVariable( INPUT_CHANNEL_SERVER_VAR )) )
+    if( !(psz_vlcs = config_GetPszVariable( "channel_server" )) )
     {
-        intf_ErrMsg( "network: configuration variable %s empty",
-                     INPUT_CHANNEL_SERVER_VAR );
+        intf_ErrMsg( "network: configuration variable channel_server empty" );
         return -1;
     }
 
-    i_port = config_GetIntVariable( INPUT_CHANNEL_PORT_VAR );
+    i_port = config_GetIntVariable( "channel_port" );
 
     intf_WarnMsg( 5, "channel: connecting to %s:%d",
                      psz_vlcs, i_port );
@@ -315,10 +314,9 @@ static int GetMacAddress( int i_fd, char *psz_mac )
      * Looking for information about the eth0 interface
      */
     interface.ifr_addr.sa_family = AF_INET;
-    if( !(psz_interface = config_GetPszVariable( INPUT_IFACE_VAR )) )
+    if( !(psz_interface = config_GetPszVariable( "iface" )) )
     {
-        intf_ErrMsg( "network error: configuration variable %s empty",
-                     INPUT_IFACE_VAR );
+        intf_ErrMsg( "network error: configuration variable iface empty" );
         return -1;
     }
     strcpy( interface.ifr_name, psz_interface );

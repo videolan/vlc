@@ -2,7 +2,7 @@
  * logger.c : file logging plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: logger.c,v 1.4 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: logger.c,v 1.5 2002/03/11 07:23:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -103,10 +103,9 @@ static int intf_Open( intf_thread_t *p_intf )
     }
 
     if( !(psz_filename = psz_filename_tmp
-          = config_GetPszVariable( INTF_METHOD_VAR )) )
+          = config_GetPszVariable( "intf" )) )
     {
-        intf_ErrMsg( "intf error: configuration variable %s empty",
-                     INTF_METHOD_VAR );
+        intf_ErrMsg( "intf error: configuration variable intf empty" );
         return -1;
     }
 

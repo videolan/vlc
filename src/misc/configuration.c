@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.2 2002/02/26 22:08:57 gbazin Exp $
+ * $Id: configuration.c,v 1.3 2002/03/11 07:23:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -26,9 +26,6 @@
 #include <string.h>                                              /* strdup() */
 
 #include <videolan/vlc.h>
-
-/* TODO: implement locking for config_PutPszVariable and config_GetPszVariable
- * because they are not thread safe */
 
 /*****************************************************************************
  * config_GetIntVariable: get the value of an int variable
@@ -96,7 +93,9 @@ char * config_GetPszVariable( const char *psz_name )
     }
 
     /* return a copy of the string */
+    vlc_mutex_lock( p_config->p_lock );
     if( p_config->psz_value ) psz_value = strdup( p_config->psz_value );
+    vlc_mutex_unlock( p_config->p_lock );
 
     return psz_value;
 }
@@ -111,7 +110,6 @@ char * config_GetPszVariable( const char *psz_name )
 void config_PutPszVariable( const char *psz_name, char *psz_value )
 {
     module_config_t *p_config;
-    char *psz_tmp;
 
     p_config = config_FindConfig( psz_name );
 
@@ -131,12 +129,15 @@ void config_PutPszVariable( const char *psz_name, char *psz_value )
         return;
     }
 
-    psz_tmp = p_config->psz_value;
+    vlc_mutex_lock( p_config->p_lock );
+
+    /* free old string */
+    if( p_config->psz_value ) free( p_config->psz_value );
+
     if( psz_value ) p_config->psz_value = strdup( psz_value );
     else p_config->psz_value = NULL;
 
-    /* free old string */
-    if( psz_tmp ) free( psz_tmp );
+    vlc_mutex_unlock( p_config->p_lock );
 
 }
 
@@ -187,14 +188,10 @@ module_config_t *config_FindConfig( const char *psz_name )
          p_module != NULL ;
          p_module = p_module->next )
     {
-        for( i = 0; i < (p_module->i_config_options -1); i++ )
+        for( i = 0; i < p_module->i_config_lines; i++ )
         {
-            if( (p_module->p_config[i].i_type ==
-                     MODULE_CONFIG_ITEM_CATEGORY)||
-                (p_module->p_config[i].i_type ==
-                     MODULE_CONFIG_ITEM_SUBCATEGORY)||
-                (p_module->p_config[i].i_type ==
-                     MODULE_CONFIG_ITEM_SUBCATEGORY_END) )
+            if( p_module->p_config[i].i_type & MODULE_CONFIG_HINT )
+                /* ignore hints */
                 continue;
             if( !strcmp( psz_name, p_module->p_config[i].psz_name ) )
                 return &p_module->p_config[i];
@@ -211,42 +208,46 @@ module_config_t *config_FindConfig( const char *psz_name )
  * this module might be unloaded from memory at any time (remember HideModule).
  * This is why we need to create an exact copy of the config data.
  *****************************************************************************/
-module_config_t *config_Duplicate( module_config_t *p_config_orig,
-                                   int i_config_options )
+module_config_t *config_Duplicate( module_t *p_module )
 {
     int i;
     module_config_t *p_config;
 
     /* allocate memory */
     p_config = (module_config_t *)malloc( sizeof(module_config_t)
-                                          * i_config_options );
+                                          * p_module->i_config_lines );
     if( p_config == NULL )
     {
         intf_ErrMsg( "config_Duplicate error: can't allocate p_config" );
         return( NULL );
     }
 
-    for( i = 0; i < i_config_options ; i++ )
+    for( i = 0; i < p_module->i_config_lines ; i++ )
     {
-        p_config[i].i_type = p_config_orig[i].i_type;
-        p_config[i].i_value = p_config_orig[i].i_value;
-        p_config[i].b_dirty = p_config_orig[i].b_dirty;
-        if( p_config_orig[i].psz_name )
-            p_config[i].psz_name = strdup( p_config_orig[i].psz_name );
+        p_config[i].i_type = p_module->p_config_orig[i].i_type;
+        p_config[i].i_value = p_module->p_config_orig[i].i_value;
+        p_config[i].b_dirty = p_module->p_config_orig[i].b_dirty;
+        p_config[i].p_lock = &p_module->config_lock;
+        if( p_module->p_config_orig[i].psz_name )
+            p_config[i].psz_name =
+                strdup( p_module->p_config_orig[i].psz_name );
         else p_config[i].psz_name = NULL;
-        if( p_config_orig[i].psz_text )
-            p_config[i].psz_text = strdup( p_config_orig[i].psz_text );
+        if( p_module->p_config_orig[i].psz_text )
+            p_config[i].psz_text =
+                strdup( p_module->p_config_orig[i].psz_text );
         else p_config[i].psz_text = NULL;
-        if( p_config_orig[i].psz_longtext )
-            p_config[i].psz_longtext = strdup( p_config_orig[i].psz_longtext );
+        if( p_module->p_config_orig[i].psz_longtext )
+            p_config[i].psz_longtext =
+                strdup( p_module->p_config_orig[i].psz_longtext );
         else p_config[i].psz_longtext = NULL;
-        if( p_config_orig[i].psz_value )
-            p_config[i].psz_value = strdup( p_config_orig[i].psz_value );
+        if( p_module->p_config_orig[i].psz_value )
+            p_config[i].psz_value =
+                strdup( p_module->p_config_orig[i].psz_value );
         else p_config[i].psz_value = NULL;
 
         /* the callback pointer is only valid when the module is loaded so this
          * value is set in ActivateModule() and reset in DeactivateModule() */
-        p_config_orig[i].p_callback = NULL;
+        p_config[i].p_callback = NULL;
     }
 
     return p_config;
