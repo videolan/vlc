@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.67 2004/01/17 11:41:21 gbazin Exp $
+ * $Id: transcode.c,v 1.68 2004/01/17 12:11:58 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -1108,6 +1108,7 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     /* Close the encoder.
      * We'll open it only when we have the first frame */
     module_Unneed( id->p_encoder, id->p_encoder->p_module );
+    id->p_encoder->p_module = NULL;
 
     id->b_enc_inited = VLC_FALSE;
 
@@ -1125,7 +1126,8 @@ static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream,
     }
 
     /* Close encoder */
-    module_Unneed( id->p_encoder, id->p_encoder->p_module );
+    if( id->p_encoder->p_module )
+        module_Unneed( id->p_encoder, id->p_encoder->p_module );
     vlc_object_destroy( id->p_encoder );
 
     /* Misc cleanup */
