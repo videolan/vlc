@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.14 2003/05/12 21:55:01 gbazin Exp $
+ * $Id: preferences.cpp,v 1.15 2003/05/13 11:44:53 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -541,8 +541,6 @@ void PrefsTreeCtrl::CleanChanges()
             if( item == GetSelection() )
             {
                 wxTreeEvent event;
-                event.SetItem(item);
-
                 OnSelectTreeItem( event );
             }
         }
@@ -577,8 +575,6 @@ void PrefsTreeCtrl::CleanChanges()
                 if( item2 == GetSelection() )
                 {
                     wxTreeEvent event;
-                    event.SetItem(item2);
-
                     OnSelectTreeItem( event );
                 }
             }
@@ -601,7 +597,8 @@ void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
         p_sizer->Remove( config_data->panel );
     }
 
-    config_data = (ConfigTreeData *)GetItemData( event.GetItem() );
+    /* Don't use event.GetItem() because we also send fake events */
+    config_data = (ConfigTreeData *)GetItemData( GetSelection() );
     if( config_data )
     {
         if( !config_data->panel )
@@ -688,7 +685,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
     /* Now put all the config options into a scrolled window */
     config_sizer = new wxBoxSizer( wxVERTICAL );
     config_window = new wxScrolledWindow( this, -1, wxDefaultPosition,
-                                          wxDefaultSize );
+        wxDefaultSize, wxSTATIC_BORDER | wxHSCROLL | wxVSCROLL );
     config_window->SetAutoLayout( TRUE );
     config_window->SetScrollRate( 5, 5 );
 
@@ -928,6 +925,7 @@ void PrefsPanel::OnAdvanced( wxCommandEvent& WXUNUSED(event) )
 
     config_sizer->Layout();
     config_window->FitInside();
+    config_window->Refresh();
 }
 
 /*****************************************************************************
