@@ -399,11 +399,9 @@ static void Usage( void )
 
     /* Options */
     intf_Msg("Options:\n" \
-             "  -h, --help                        \tprint usage\n" \
-             "  -v, --version                     \tprint program version\n" \
-             "  --noaudio                         \tdisable audio\n" \
+             "  -h, --help, -v, --version         \tprint usage or version\n" \
+             "  --noaudio, --novideo              \tdisable audio/video\n" \
              "  --stereo, --mono                  \tstereo/mono audio\n" \
-             "  --novideo                         \tdisable video\n" \
              "  --display <display>               \tdisplay string\n" \
              "  --width <w>, --height <h>         \tdisplay dimensions\n" \
              "  -g, --grayscale, --color          \tgrayscale/color video\n" \
@@ -414,6 +412,7 @@ static void Usage( void )
     /* Interface parameters */
     intf_Msg("Interface parameters:\n" \
 	     "  " INTF_INIT_SCRIPT_VAR "=<filename>             \tinitialization script\n" \
+             "  " INTF_CHANNELS_VAR "=<filename>            \tchannels list\n" \
 	     );
 
     /* Audio parameters */
@@ -440,17 +439,6 @@ static void Usage( void )
              "  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server\n" \
              "  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port\n" \
 	     );
-
-    /* Interfaces keys */
-    intf_Msg("Interface keys: most interfaces accept the following commands:\n" \
-             "  [space]                           \ttoggle interface\n"
-             "  [esc], q                          \tquit\n" \
-             "  0 - 9                             \tselect channel\n" \
-             "  +, -, m                           \tchange volume, mute\n" \
-             "  g, G, c                           \tchange gamma, toggle grayscale\n" \
-             "  i                                 \ttoggle info printing\n" \
-             "  s                                 \ttoggle picture scaling\n" \
-             );    
 }
 
 /*******************************************************************************

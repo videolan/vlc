@@ -808,7 +808,6 @@ static void RunThread( vout_thread_t *p_vout)
         }
         else if( p_vout->b_active )          /* idle or interface screen alone */
         {
-            //?? clear: SetBufferPicture( p_vout, NULL );
             if( p_vout->b_interface && 0 /* && ?? intf_change */ )
             {
                 /* Interface has changed, so a new rendering is required - force
@@ -1403,6 +1402,8 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
  * nothing has been rendered, or 1 if something has been changed on the screen.
  * Note that if you absolutely want something to be printed, you will have
  * to force it by setting the last idle date to 0.
+ * Unlike other rendering functions, this one calls the SetBufferPicture 
+ * function when needed.
  ******************************************************************************/
 static int RenderIdle( vout_thread_t *p_vout )
 {
@@ -1416,10 +1417,11 @@ static int RenderIdle( vout_thread_t *p_vout )
     if( (current_date - p_vout->last_display_date) > VOUT_IDLE_DELAY &&
         (current_date - p_vout->last_idle_date) > VOUT_IDLE_DELAY )
     {
+        SetBufferPicture( p_vout, NULL );            
         vout_TextSize( p_vout->p_large_font, WIDE_TEXT | OUTLINED_TEXT, psz_text,
                        &i_width, &i_height );
         if( !Align( p_vout, &i_x, &i_y, i_width, i_height, CENTER_RALIGN, CENTER_RALIGN ) )
-        {       
+        {  
             vout_Print( p_vout->p_large_font, 
                         p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
                         i_x * p_vout->i_bytes_per_pixel + i_y * p_vout->i_bytes_per_line,

@@ -39,11 +39,13 @@ struct intf_thread_s;
 struct intf_sys_s;
 struct intf_console_s;
 struct intf_msg_s;
+struct intf_channel_s;
 
 typedef struct intf_thread_s *          p_intf_thread_t;
 typedef struct intf_sys_s *             p_intf_sys_t;
 typedef struct intf_console_s *         p_intf_console_t;
 typedef struct intf_msg_s *             p_intf_msg_t;
+typedef struct intf_channel_s *         p_intf_channel_t;
 
 /* Input */
 struct input_thread_s;

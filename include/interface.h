@@ -34,6 +34,9 @@ typedef struct intf_thread_s
     p_intf_console_t    p_console;                                 /* console */
     p_intf_sys_t        p_sys;                            /* system interface */
 
+    /* Channels array - NULL if not used */
+    p_intf_channel_t    p_channel;                 /* description of channels */    
+
     /* Main threads - NULL if not active */
     p_vout_thread_t     p_vout;
     p_input_thread_t    p_input;        
@@ -46,6 +49,6 @@ intf_thread_t * intf_Create             ( void );
 void            intf_Run                ( intf_thread_t * p_intf );
 void            intf_Destroy            ( intf_thread_t * p_intf );
 
-int             intf_SelectInput        ( intf_thread_t * p_intf, int i_index );
+int             intf_SelectChannel      ( intf_thread_t * p_intf, int i_channel );
 int             intf_ProcessKey         ( intf_thread_t * p_intf, int i_key );
 

@@ -100,6 +100,10 @@
 #define INTF_INIT_SCRIPT_VAR	        "vlc_init"
 #define INTF_INIT_SCRIPT_DEFAULT        "vlc.init"
 
+/* Environment variable used to store channels file and default value */
+#define INTF_CHANNELS_VAR               "vlc_channels"
+#define INTF_CHANNELS_DEFAULT           "vlc.channels"
+
 /* Base delay in micro second for interface sleeps */
 #define INTF_IDLE_SLEEP                 100000
 

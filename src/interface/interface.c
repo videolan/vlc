@@ -32,6 +32,34 @@
 #include "intf_sys.h"
 
 /*******************************************************************************
+ * intf_channel_t: channel description
+ *******************************************************************************
+ * A 'channel' is a descriptor of an input method. It is used to switch easily
+ * from source to source without having to specify the whole input thread 
+ * configuration. The channels array, stored in the interface thread object, is
+ * loaded in intf_Create, and unloaded in intf_Destroy.
+ *******************************************************************************/
+typedef struct intf_channel_s
+{
+    /* Channel description */
+    int         i_channel;              /* channel number, -1 for end of array */
+    char *      psz_description;                /* channel description (owned) */
+    
+    /* Input configuration */
+    int         i_input_method;                     /* input method descriptor */
+    char *      psz_input_source;                     /* source string (owned) */
+    int         i_input_port;                                          /* port */
+    int         i_input_vlan;                                          /* vlan */
+} intf_channel_t;
+
+/*******************************************************************************
+ * Local prototypes
+ *******************************************************************************/
+static int      LoadChannels    ( intf_thread_t *p_intf, char *psz_filename );
+static void     UnloadChannels  ( intf_thread_t *p_intf );
+static int      ParseChannel    ( intf_channel_t *p_channel, char *psz_str );
+
+/*******************************************************************************
  * intf_Create: prepare interface before main loop
  *******************************************************************************
  * This function opens output devices and create specific interfaces. It send
@@ -53,6 +81,11 @@ intf_thread_t* intf_Create( void )
     p_intf->b_die =     0;    
     p_intf->p_vout =    NULL;
     p_intf->p_input =   NULL;   
+
+    /* Load channels - the pointer will be set to NULL on failure. The 
+     * return value is ignored since the program can work without 
+     * channels */
+    LoadChannels( p_intf, main_GetPszVariable( INTF_CHANNELS_VAR, INTF_CHANNELS_DEFAULT ));    
 
     /* Start interfaces */
     p_intf->p_console = intf_ConsoleCreate();
@@ -126,39 +159,55 @@ void intf_Destroy( intf_thread_t *p_intf )
     /* Destroy interfaces */
     intf_SysDestroy( p_intf );
     intf_ConsoleDestroy( p_intf->p_console );
+        
+    /* Unload channels */
+    UnloadChannels( p_intf );    
 
     /* Free structure */
     free( p_intf );
 }
 
 /*******************************************************************************
- * intf_SelectInput: change input stream
+ * intf_SelectChannel: change channel
  *******************************************************************************
  * Kill existing input, if any, and try to open a new one, using an input
  * configuration table.
  *******************************************************************************/
-int intf_SelectInput( intf_thread_t * p_intf, int i_index )
+int intf_SelectChannel( intf_thread_t * p_intf, int i_channel )
 {
-    intf_DbgMsg("\n");
-
-    /* If VLANs are not active, return with an error */
-    if( !p_main->b_vlans )
-    {
-        intf_ErrMsg("error: VLANs are not activated\n");
-        return( 1 );        
-    }    
+    intf_channel_t *    p_channel;                                  /* channel */
     
-    /* Kill existing input, if any */
-    if( p_intf->p_input != NULL )
-    {        
-        input_DestroyThread( p_intf->p_input, NULL );
+    /* Look for channel in array */
+    if( p_intf->p_channel != NULL )
+    {
+        for( p_channel = p_intf->p_channel; p_channel->i_channel != -1; p_channel++ )
+        {
+            if( p_channel->i_channel == i_channel )
+            {
+                /*
+                 * Change channel
+                 */
+
+                /* Kill existing input, if any */
+                if( p_intf->p_input != NULL )
+                {        
+                    input_DestroyThread( p_intf->p_input, NULL );
+                }
+                
+                intf_Msg("Channel %d: %s\n", i_channel, p_channel->psz_description );                
+
+                /* Open a new input */
+                p_intf->p_input = input_CreateThread( p_channel->i_input_method, p_channel->psz_input_source,
+                                                      p_channel->i_input_port, p_channel->i_input_vlan, 
+                                                      p_intf->p_vout, p_main->p_aout, NULL );        
+                return( p_intf->p_input == NULL );             
+            }            
+        }        
     }
 
-    /* Open a new input */
-    intf_Msg("Switching to channel %d\n", i_index );    
-    p_intf->p_input = input_CreateThread( INPUT_METHOD_TS_VLAN_BCAST, NULL, 0, i_index, 
-                                          p_intf->p_vout, p_main->p_aout, NULL );        
-    return( p_intf->p_input == NULL );    
+    /* Channel does not exist */
+    intf_Msg("Channel %d does not exist\n", i_channel );
+    return( 1 );    
 }
 
 /*******************************************************************************
@@ -186,10 +235,9 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
     case '7':
     case '8':
     case '9':                    
-        if( intf_SelectInput( p_intf, i_key - '0' ) )
-        {
-            intf_ErrMsg("error: can not open channel %d\n", i_key - '0');            
-        }        
+        /* Change channel - return code is ignored since SelectChannel displays
+         * its own error messages */
+        intf_SelectChannel( p_intf, i_key - '0' );        
         break;
     case '+':                                                      /* volume + */
         // ??
@@ -262,5 +310,235 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
     return( 0 );    
 }
 
+/* following functions are local */
+                    
+/*******************************************************************************
+ * LoadChannels: load channels description from a file
+ *******************************************************************************
+ * This structe describes all interface-specific data of the main (interface)
+ * thread.
+ * Each line of the file is a semicolon separated list of the following 
+ * fields :
+ *      integer         channel number
+ *      string          channel description
+ *      integer         input method (see input.h)
+ *      string          input source
+ *      integer         input port
+ *      integer         input vlan
+ * The last field must end with a semicolon.
+ * Comments and empty lines are not explicitely allowed, but lines with parsing
+ * errors are ignored without warning.
+ *******************************************************************************/
+static int LoadChannels( intf_thread_t *p_intf, char *psz_filename )
+{
+    FILE *              p_file;                                        /* file */
+    intf_channel_t *    p_channel;                          /* current channel */    
+    char                psz_line[INTF_MAX_CMD_SIZE];            /* line buffer */
+    int                 i_index;                     /* channel or field index */        
+
+    /* Set default value */
+    p_intf->p_channel = NULL;    
     
-                
+    /* Open file */
+    p_file = fopen( psz_filename, "r" );
+    if( p_file == NULL )
+    {
+        intf_ErrMsg("error: can't open %s (%s)\n", psz_filename, strerror(errno));
+        return( 1 );        
+    }
+
+    /* First pass: count number of lines */
+    for( i_index = 0; fgets( psz_line, INTF_MAX_CMD_SIZE, p_file ) != NULL; i_index++ )
+    {
+        ;        
+    }
+
+    if( i_index != 0 )
+    {        
+        /* Allocate array and rewind - some of the lines may be invalid, and the
+         * array will probably be larger than the actual number of channels, but
+         * it has no consequence. */
+        p_intf->p_channel = malloc( sizeof( intf_channel_t ) * i_index );
+        if( p_intf->p_channel == NULL )
+        {
+            intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+            fclose( p_file );
+            return( 1 );            
+        }        
+        p_channel = p_intf->p_channel;        
+        rewind( p_file );
+
+        /* Second pass: read channels descriptions */
+        while( fgets( psz_line, INTF_MAX_CMD_SIZE, p_file ) != NULL )
+        {
+            if( !ParseChannel( p_channel, psz_line ) )
+            {
+                intf_DbgMsg("channel [%d] %s : method %d (%s:%d vlan %d)\n",
+                            p_channel->i_channel, p_channel->psz_description,
+                            p_channel->i_input_method, p_channel->psz_input_source,
+                            p_channel->i_input_port, p_channel->i_input_vlan );                
+                p_channel++;                
+            }
+        }
+        
+        /* Add marker at the end of the array */
+        p_channel->i_channel = -1;
+    }
+
+    /* Close file */
+    fclose( p_file );    
+    return( 0 );
+}
+
+/******************************************************************************
+ * UnloadChannels: unload channels description
+ ******************************************************************************
+ * This function free all resources allocated by LoadChannels, if any.
+ ******************************************************************************/
+static void UnloadChannels( intf_thread_t *p_intf )
+{
+    int i_channel;                                           /* channel index */    
+    
+    if( p_intf->p_channel != NULL )
+    {
+        /* Free allocated strings */
+        for( i_channel = 0; 
+             p_intf->p_channel[ i_channel ].i_channel != -1; 
+             i_channel++ )
+        {
+            if( p_intf->p_channel[ i_channel ].psz_description != NULL )
+            {                
+                free( p_intf->p_channel[ i_channel ].psz_description );
+            }
+            if( p_intf->p_channel[ i_channel ].psz_input_source != NULL )
+            {                
+                free( p_intf->p_channel[ i_channel ].psz_input_source );            
+            }            
+        }        
+
+        /* Free array */
+        free( p_intf->p_channel );        
+        p_intf->p_channel = NULL;        
+    }    
+}
+
+
+/*******************************************************************************
+ * ParseChannel: parse a channel description line
+ *******************************************************************************
+ * See LoadChannels. This function return non 0 on parsing error.
+ *******************************************************************************/
+static int ParseChannel( intf_channel_t *p_channel, char *psz_str )
+{
+    char *      psz_index;                                /* current character */
+    char *      psz_end;                             /* end pointer for strtol */    
+    int         i_field;                          /* field number, -1 on error */
+    int         i_field_length;               /* field length, for text fields */
+
+    /* Set some default fields */
+    p_channel->i_channel =              0;
+    p_channel->psz_description =        NULL;
+    p_channel->i_input_method =         0;
+    p_channel->psz_input_source =       NULL;
+    p_channel->i_input_port =           0;
+    p_channel->i_input_vlan =           0;    
+
+    /* Parse string */
+    i_field = 0;
+    for( psz_index = psz_str; (i_field != -1) && (*psz_index != '\0'); psz_index++ )
+    {
+        if( *psz_index == ';' )
+        {
+            /* Mark end of field */
+            *psz_index = '\0';
+
+            /* Parse field */
+            switch( i_field++ )
+            {
+            case 0:                                          /* channel number */
+                p_channel->i_channel = strtol( psz_str, &psz_end, 0);
+                if( (*psz_str == '\0') || (*psz_end != '\0') )
+                {
+                    i_field = -1;
+                }
+                break;                
+            case 1:                                     /* channel description */
+                i_field_length = strlen( psz_str );                
+                if( i_field_length != 0 )
+                {
+                    p_channel->psz_description = malloc( i_field_length + 1 );
+                    if( p_channel->psz_description == NULL )
+                    {
+                        intf_ErrMsg("error: %s\n", strerror( ENOMEM ));                        
+                        i_field = -1;                        
+                    }
+                    else
+                    {                        
+                        strcpy( p_channel->psz_description, psz_str );                        
+                    }                        
+                }
+                break;                
+            case 2:                                            /* input method */
+                p_channel->i_input_method = strtol( psz_str, &psz_end, 0);
+                if( (*psz_str == '\0') || (*psz_end != '\0') )
+                {
+                    i_field = -1;
+                }
+                break;                
+            case 3:                                            /* input source */
+                i_field_length = strlen( psz_str );                
+                if( i_field_length != 0 )
+                {
+                    p_channel->psz_input_source = malloc( i_field_length + 1 );
+                    if( p_channel->psz_input_source == NULL )
+                    {
+                        intf_ErrMsg("error: %s\n", strerror( ENOMEM ));                        
+                        i_field = -1;                        
+                    }
+                    else
+                    {                        
+                        strcpy( p_channel->psz_input_source, psz_str );                        
+                    }                        
+                }
+                break;                
+            case 4:                                              /* input port */
+                p_channel->i_input_port = strtol( psz_str, &psz_end, 0);
+                if( (*psz_str == '\0') || (*psz_end != '\0') )
+                {
+                    i_field = -1;
+                }
+                break;                                
+            case 5:                                              /* input vlan */
+                p_channel->i_channel = strtol( psz_str, &psz_end, 0);
+                if( (*psz_str == '\0') || (*psz_end != '\0') )
+                {
+                    i_field = -1;
+                }
+                break;                
+                /* ... following fields are ignored */
+            }
+
+            /* Set new beginning of field */
+            psz_str = psz_index + 1;
+        }
+    }      
+
+    /* At least the first three fields must be parsed sucessfully for function
+     * success. Other parsing errors are returned using i_field = -1. */    
+    if( i_field < 3 )
+    {
+        /* Function fails. Free allocated strings */
+        if( p_channel->psz_description != NULL )
+        {
+            free( p_channel->psz_description );            
+        }
+        if( p_channel->psz_input_source != NULL )
+        {
+            free( p_channel->psz_input_source );            
+        }                
+        return( 1 );        
+    }
+
+    /* Return success */
+    return( 0 );    
+}
