@@ -1,5 +1,4 @@
-List of known vlc bugs
-$Id: BUGS,v 1.7 2002/03/17 21:59:52 sam Exp $
+List of known vlc bugs $Id: BUGS,v 1.8 2002/03/20 03:12:20 ipkiss Exp $
 
    Please try to keep this file up to date. Also, grep for FIXME in the
 source files for more and more bugs to fix.
@@ -19,11 +18,19 @@ Input:
 
   * HTTP input seems to lose packets during pre-parsing.
 
+  * TS input doesn't work under Windows 98 when the server address is
+  specified.
+
+  * Stopping and playing again a network stream often makes vlc crash
+  under Windows.
+
 
 Audio output:
 
   * Audio output stutters on some audio cards. For instance kwyxz's SB
   128 with an es1371 chip.
+
+  * WaveOut doesn't close correctly under Windows 98.
 
 
 Video output:
@@ -32,11 +39,11 @@ Video output:
 
   * The QNX video output plugin is broken because of vout4.
 
-  * The MGA video output plugin makes the picture stutter when MGA_NUM_FRAMES
-    is set to a value higher than 1.
+  * The MGA video output plugin makes the picture stutter when
+  MGA_NUM_FRAMES is set to a value higher than 1.
 
-  * The SPU decoder doesn't detect when the video output failed to launch
-    itself, and we segfault.
+  * The SPU decoder doesn't detect when the video output failed to
+  launch itself, and we segfault.
 
   * On-the-fly resizing doesn't work when using a chroma transformation.
 
