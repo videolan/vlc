@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.19 2002/11/13 11:09:56 gbazin Exp $
+ * $Id: playlist.c,v 1.20 2002/11/13 12:58:19 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -203,7 +203,7 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
         /* XXX: what if the item is still in use? */
         free( p_playlist->pp_items[i_pos] );
 
-        if( i_pos < p_playlist->i_index )
+        if( i_pos <= p_playlist->i_index )
         {
             p_playlist->i_index--;
         }
@@ -310,11 +310,9 @@ static void RunThread ( playlist_t *p_playlist )
                 {
                     playlist_Delete( p_playlist, p_playlist->i_index );
                 }
-                else
-                {
-                    /* Select the next playlist item */
-                    SkipItem( p_playlist, 1 );
-                }
+
+                /* Select the next playlist item */
+                SkipItem( p_playlist, 1 );
 
                 /* Destroy input */
                 input_DestroyThread( p_input );

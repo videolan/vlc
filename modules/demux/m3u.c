@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.2 2002/11/13 11:09:56 gbazin Exp $
+ * $Id: m3u.c,v 1.3 2002/11/13 12:58:19 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -51,7 +51,8 @@ struct demux_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Init  ( vlc_object_t * );
+static int  Activate  ( vlc_object_t * );
+static void Deactivate( vlc_object_t * );
 static int  Demux ( input_thread_t * );
 
 /*****************************************************************************
@@ -60,13 +61,15 @@ static int  Demux ( input_thread_t * );
 vlc_module_begin();
     set_description( "m3u/asx metademux" );
     set_capability( "demux", 10 );
-    set_callbacks( Init, NULL );
+    set_callbacks( Activate, Deactivate );
+    add_shortcut( "m3u" );
+    add_shortcut( "asx" );
 vlc_module_end();
 
 /*****************************************************************************
- * Init: initializes ES structures
+ * Activate: initializes m3u demux structures
  *****************************************************************************/
-static int Init( vlc_object_t * p_this )
+static int Activate( vlc_object_t * p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     char           *psz_ext;
@@ -85,11 +88,13 @@ static int Init( vlc_object_t * p_this )
 
     /* Check for m3u/asx file extension */
     psz_ext = strrchr ( p_input->psz_name, '.' );
-    if( !strcasecmp( psz_ext, ".m3u") )
+    if( !strcasecmp( psz_ext, ".m3u") ||
+        ( p_input->psz_demux && !strncmp(p_input->psz_demux, "m3u", 3) ) )
     {
         i_type = TYPE_M3U;
     }
-    else if( !strcasecmp( psz_ext, ".asx") )
+    else if( !strcasecmp( psz_ext, ".asx") ||
+             ( p_input->psz_demux && !strncmp(p_input->psz_demux, "asx", 3) ) )
     {
         i_type = TYPE_ASX;
     }
@@ -110,6 +115,22 @@ static int Init( vlc_object_t * p_this )
     return 0;
 }
 
+/*****************************************************************************
+ * Deactivate: frees unused data
+ *****************************************************************************/
+static void Deactivate( vlc_object_t *p_this )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    demux_sys_t *p_m3u = (demux_sys_t *)p_input->p_demux_data  ; 
+
+    free( p_m3u );
+}
+
+/*****************************************************************************
+ * Demux: reads and demuxes data packets
+ *****************************************************************************
+ * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
+ *****************************************************************************/
 static int Demux ( input_thread_t *p_input )
 {
     data_packet_t *p_data;
@@ -189,12 +210,13 @@ static int Demux ( input_thread_t *p_input )
             else
             {
                 /* We are dealing with ASX files.
-                 * We are looking for href html markups that begins with
-                 * "mms://" */
+                 * We are looking for "href" or "param" html markups that
+                 * begins with "mms://" */
                 char *psz_eol;
 
-                while( *psz_bol && strncasecmp( psz_bol, "href",
-                                                sizeof("href") - 1 )  )
+                while( *psz_bol &&
+                       strncasecmp( psz_bol, "href", sizeof("href") - 1 ) &&
+                       strncasecmp( psz_bol, "param", sizeof("param") - 1 ) )
                     psz_bol++;
 
                 if( !*psz_bol ) continue;
