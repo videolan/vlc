@@ -2,7 +2,7 @@
  * intf_qt.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_qt.cpp,v 1.14 2002/06/01 12:32:00 sam Exp $
+ * $Id: intf_qt.cpp,v 1.15 2002/07/01 17:39:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -129,6 +129,8 @@ struct intf_sys_s
 {
     QApplication *p_app;
     IntfWindow   *p_window;
+
+    input_thread_t *p_input;
 };
 
 /*****************************************************************************
@@ -167,7 +169,7 @@ static int intf_Open( intf_thread_t *p_intf )
     if( p_intf->p_sys == NULL )
     {
         msg_Err( p_intf, "out of memory" );
-        return( 1 );
+        return 1;
     }
 
     /* Create the C++ objects */
@@ -177,7 +179,9 @@ static int intf_Open( intf_thread_t *p_intf )
     /* Tell the world we are here */
     p_intf->p_sys->p_window->setCaption( VOUT_TITLE " (Qt interface)" );
 
-    return( 0 );
+    p_intf->p_sys->p_input = NULL;
+
+    return 0;
 }
 
 /*****************************************************************************
@@ -185,6 +189,11 @@ static int intf_Open( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Close( intf_thread_t *p_intf )
 {
+    if( p_intf->p_sys->p_input )
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+    }
+
     /* Get rid of the C++ objects */
     delete p_intf->p_sys->p_window;
     delete p_intf->p_sys->p_app;
@@ -353,15 +362,15 @@ IntfWindow::~IntfWindow( void )
  *****************************************************************************/
 void IntfWindow::DateDisplay( int i_range )
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intf->p_sys->p_input )
     {
         char psz_time[ OFFSETTOTIME_MAX_SIZE ];
 
-        vlc_mutex_lock( &p_intf->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
-        p_date->setText( input_OffsetToTime( p_intf->p_vlc->p_input_bank->pp_input[0], psz_time,
-               ( p_intf->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_size * i_range )
-                   / SLIDER_MAX ) );
-        vlc_mutex_unlock( &p_intf->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
+        p_date->setText( input_OffsetToTime( p_intf->p_sys->p_input, psz_time,
+           ( p_intf->p_sys->p_input->stream.p_selected_area->i_size * i_range )
+               / SLIDER_MAX ) );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
 }
 
@@ -373,6 +382,7 @@ void IntfWindow::DateDisplay( int i_range )
  *****************************************************************************/
 void IntfWindow::FileOpen( void )
 {
+    playlist_t *p_playlist;
     QString file = QFileDialog::getOpenFileName( QString::null,
                                                  QString::null, this );
 
@@ -382,8 +392,16 @@ void IntfWindow::FileOpen( void )
     }
     else
     {
-        intf_PlaylistAdd( p_intf->p_vlc->p_playlist,
-                          PLAYLIST_END, file.latin1() );
+        p_playlist = (playlist_t *)
+                vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        if( p_playlist == NULL )
+        {
+            return;
+        }
+
+        playlist_Add( p_playlist, file.latin1(),
+                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+        vlc_object_release( p_playlist );
     }
 }
 
@@ -413,14 +431,24 @@ void IntfWindow::About( void )
  *****************************************************************************/
 void IntfWindow::Manage( void )
 {
-    input_thread_t *p_input = vlc_object_find_input( p_intf );
+    /* Update the input */
+    if( p_intf->p_sys->p_input == NULL )
+    {
+        p_intf->p_sys->p_input = (input_thread_t *)
+                vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    }
+    else if( p_intf->p_sys->p_input->b_dead )
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+        p_intf->p_sys->p_input = NULL;
+    }
 
     /* Manage the slider */
-    if( p_input != NULL && p_input->stream.b_seekable )
+    if( p_intf->p_sys->p_input && p_intf->p_sys->p_input->stream.b_seekable )
     {
         int i_value = p_slider->value();
 
-#define p_area p_input->stream.p_selected_area
+#define p_area p_intf->p_sys->p_input->stream.p_selected_area
         /* If the user hasn't touched the slider since the last time,
          * then the input can safely change it */
         if( i_value == p_slider->oldvalue() )
@@ -436,17 +464,12 @@ void IntfWindow::Manage( void )
         {
             off_t i_seek = ( i_value * p_area->i_size ) / SLIDER_MAX;
 
-            input_Seek( p_input, i_seek, INPUT_SEEK_SET );
+            input_Seek( p_intf->p_sys->p_input, i_seek, INPUT_SEEK_SET );
 
             /* Update the old value */
             p_slider->setOldValue( i_value );
         }
 #undef p_area
-    }
-
-    if( p_input != NULL )
-    {
-        vlc_object_release( p_input );
     }
 
     /* If the "display popup" flag has changed, popup the context menu */
@@ -460,9 +483,6 @@ void IntfWindow::Manage( void )
     {
         qApp->quit();
     }
-
-    /* Manage core vlc functions through the callback */
-    p_intf->pf_manage( p_intf );
 }
 
 /*****************************************************************************
@@ -470,9 +490,9 @@ void IntfWindow::Manage( void )
  *****************************************************************************/
 void IntfWindow::PlaybackPlay( void )
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intf->p_sys->p_input != NULL )
     {
-        input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
     }
 }
 
@@ -481,9 +501,9 @@ void IntfWindow::PlaybackPlay( void )
  *****************************************************************************/
 void IntfWindow::PlaybackPause( void )
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intf->p_sys->p_input != NULL )
     {
-        input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PAUSE );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
     }
 }
 
@@ -492,9 +512,9 @@ void IntfWindow::PlaybackPause( void )
  *****************************************************************************/
 void IntfWindow::PlaybackSlow( void )
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intf->p_sys->p_input != NULL )
     {
-        input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_SLOWER );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
     }
 }
 
@@ -503,9 +523,9 @@ void IntfWindow::PlaybackSlow( void )
  *****************************************************************************/
 void IntfWindow::PlaybackFast( void )
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intf->p_sys->p_input != NULL )
     {
-        input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_FASTER );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_FASTER );
     }
 }
 
@@ -514,13 +534,16 @@ void IntfWindow::PlaybackFast( void )
  *****************************************************************************/
 void IntfWindow::PlaylistPrev( void )
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    playlist_t *p_playlist = (playlist_t *)
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+
+    if( p_playlist == NULL )
     {
-        /* FIXME: temporary hack */
-        intf_PlaylistPrev( p_intf->p_vlc->p_playlist );
-        intf_PlaylistPrev( p_intf->p_vlc->p_playlist );
-        p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
+        return;
     }
+
+    playlist_Prev( p_playlist );
+    vlc_object_release( p_playlist );
 }
 
 /*****************************************************************************
@@ -528,11 +551,16 @@ void IntfWindow::PlaylistPrev( void )
  *****************************************************************************/
 void IntfWindow::PlaylistNext( void )
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    playlist_t *p_playlist = (playlist_t *)
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+
+    if( p_playlist == NULL )
     {
-        /* FIXME: temporary hack */
-        p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
+        return;
     }
+
+    playlist_Next( p_playlist );
+    vlc_object_release( p_playlist );
 }
 
 /*****************************************************************************
