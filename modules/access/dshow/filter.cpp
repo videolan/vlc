@@ -355,7 +355,7 @@ AM_MEDIA_TYPE &CapturePin::CustomGetMediaType()
 /* IUnknown methods */
 STDMETHODIMP CapturePin::QueryInterface(REFIID riid, void **ppv)
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CapturePin::QueryInterface" );
 #endif
 
@@ -374,7 +374,7 @@ STDMETHODIMP CapturePin::QueryInterface(REFIID riid, void **ppv)
     }
     else
     {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
         msg_Dbg( p_input, "CapturePin::QueryInterface() failed for: "
                  "%04X-%02X-%02X-%02X%02X%02X%02X%02X%02X%02X%02X",
                  (int)riid.Data1, (int)riid.Data2, (int)riid.Data3,
@@ -635,7 +635,7 @@ STDMETHODIMP CapturePin::QueryAccept( const AM_MEDIA_TYPE *pmt )
 }
 STDMETHODIMP CapturePin::EnumMediaTypes( IEnumMediaTypes **ppEnum )
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CapturePin::EnumMediaTypes" );
 #endif
 
@@ -647,7 +647,7 @@ STDMETHODIMP CapturePin::EnumMediaTypes( IEnumMediaTypes **ppEnum )
 }
 STDMETHODIMP CapturePin::QueryInternalConnections( IPin* *apPin, ULONG *nPin )
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CapturePin::QueryInternalConnections" );
 #endif
     return E_NOTIMPL;
@@ -782,7 +782,7 @@ CaptureFilter::~CaptureFilter()
 /* IUnknown methods */
 STDMETHODIMP CaptureFilter::QueryInterface( REFIID riid, void **ppv )
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureFilter::QueryInterface" );
 #endif
 
@@ -812,7 +812,7 @@ STDMETHODIMP CaptureFilter::QueryInterface( REFIID riid, void **ppv )
     }
     else
     {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
         msg_Dbg( p_input, "CaptureFilter::QueryInterface() failed for: "
                  "%04X-%02X-%02X-%02X%02X%02X%02X%02X%02X%02X%02X",
                  (int)riid.Data1, (int)riid.Data2, (int)riid.Data3,
@@ -990,7 +990,7 @@ CaptureEnumPins::CaptureEnumPins( vlc_object_t *_p_input,
 
 CaptureEnumPins::~CaptureEnumPins()
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumPins::~CaptureEnumPins" );
 #endif
     p_filter->Release();
@@ -999,7 +999,7 @@ CaptureEnumPins::~CaptureEnumPins()
 /* IUnknown methods */
 STDMETHODIMP CaptureEnumPins::QueryInterface( REFIID riid, void **ppv )
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumPins::QueryInterface" );
 #endif
 
@@ -1039,7 +1039,7 @@ STDMETHODIMP_(ULONG) CaptureEnumPins::Release()
 STDMETHODIMP CaptureEnumPins::Next( ULONG cPins, IPin ** ppPins,
                                     ULONG * pcFetched )
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumPins::Next" );
 #endif
 
@@ -1060,7 +1060,7 @@ STDMETHODIMP CaptureEnumPins::Next( ULONG cPins, IPin ** ppPins,
 };
 STDMETHODIMP CaptureEnumPins::Skip( ULONG cPins )
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumPins::Skip" );
 #endif
 
@@ -1075,7 +1075,7 @@ STDMETHODIMP CaptureEnumPins::Skip( ULONG cPins )
 };
 STDMETHODIMP CaptureEnumPins::Reset()
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumPins::Reset" );
 #endif
 
@@ -1084,7 +1084,7 @@ STDMETHODIMP CaptureEnumPins::Reset()
 };
 STDMETHODIMP CaptureEnumPins::Clone( IEnumPins **ppEnum )
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumPins::Clone" );
 #endif
 
@@ -1119,7 +1119,7 @@ CaptureEnumMediaTypes::CaptureEnumMediaTypes( vlc_object_t *_p_input,
 
 CaptureEnumMediaTypes::~CaptureEnumMediaTypes()
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumMediaTypes::~CaptureEnumMediaTypes" );
 #endif
     FreeMediaType(cx_media_type);
@@ -1129,7 +1129,7 @@ CaptureEnumMediaTypes::~CaptureEnumMediaTypes()
 /* IUnknown methods */
 STDMETHODIMP CaptureEnumMediaTypes::QueryInterface( REFIID riid, void **ppv )
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumMediaTypes::QueryInterface" );
 #endif
 
@@ -1170,7 +1170,7 @@ STDMETHODIMP CaptureEnumMediaTypes::Next( ULONG cMediaTypes,
                                           AM_MEDIA_TYPE ** ppMediaTypes,
                                           ULONG * pcFetched )
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumMediaTypes::Next " );
 #endif
     ULONG copied = 0;
@@ -1224,7 +1224,7 @@ STDMETHODIMP CaptureEnumMediaTypes::Skip( ULONG cMediaTypes )
     {
         max = 1;
     }
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumMediaTypes::Skip" );
 #endif
 
@@ -1233,7 +1233,7 @@ STDMETHODIMP CaptureEnumMediaTypes::Skip( ULONG cMediaTypes )
 };
 STDMETHODIMP CaptureEnumMediaTypes::Reset()
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumMediaTypes::Reset" );
 #endif
 
@@ -1244,7 +1244,7 @@ STDMETHODIMP CaptureEnumMediaTypes::Reset()
 };
 STDMETHODIMP CaptureEnumMediaTypes::Clone( IEnumMediaTypes **ppEnum )
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumMediaTypes::Clone" );
 #endif
 
