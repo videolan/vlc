@@ -57,8 +57,6 @@ static int      BinaryLog         ( uint32_t );
 static void     MaskToShift       ( int *, int *, uint32_t );
 static void     InitWindowSize    ( vout_thread_t *, int *, int * );
 
-void vout_IntfInit( vout_thread_t * );
-
 /* Object variables callbacks */
 static int DeinterlaceCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );

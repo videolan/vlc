@@ -185,6 +185,7 @@ uint32_t CPUCapabilities( void )
         }
 #   endif
     }
+
     if( i_edx & 0x04000000 )
     {
 #   if defined(CAN_COMPILE_SSE) && !defined(SYS_BEOS)
