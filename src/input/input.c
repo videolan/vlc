@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.81 2001/02/16 06:37:09 sam Exp $
+ * $Id: input.c,v 1.82 2001/02/16 09:25:04 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -282,7 +282,8 @@ static int InitThread( input_thread_t * p_input )
 #endif
 
     p_input->p_input_module = module_Need( p_main->p_bank,
-                                           MODULE_CAPABILITY_INPUT, NULL );
+                                           MODULE_CAPABILITY_INPUT,
+                                           (probedata_t *)p_input );
 
     if( p_input->p_input_module == NULL )
     {
@@ -369,6 +370,7 @@ static void EndThread( input_thread_t * p_input )
 
     /* Release modules */
     module_Unneed( p_main->p_bank, p_input->p_input_module );
+
 }
 
 /*****************************************************************************
@@ -398,13 +400,38 @@ static void DestroyThread( input_thread_t * p_input )
 void input_FileOpen( input_thread_t * p_input )
 {
     struct stat         stat_info;
+    int                 i_stat;
 
-    if( stat( p_input->p_source, &stat_info ) == (-1) )
+    char *psz_name = p_input->p_source;
+
+    /* FIXME: this code ought to be in the plugin so that code can
+     * be shared with the *_Probe function */
+    if( ( i_stat = stat( psz_name, &stat_info ) ) == (-1) )
     {
-        intf_ErrMsg( "input error: cannot stat() file `%s' (%s)",
-                     p_input->p_source, strerror(errno));
-        p_input->b_error = 1;
-        return;
+        int i_size = strlen( psz_name );
+
+        if( ( i_size > 4 )
+            && !strncasecmp( psz_name, "dvd:", 4 ) )
+        {
+            /* get rid of the 'dvd:' stuff and try again */
+            psz_name += 4;
+            i_stat = stat( psz_name, &stat_info );
+	}
+	else if( ( i_size > 5 )
+                 && !strncasecmp( psz_name, "file:", 5 ) )
+        {
+            /* get rid of the 'file:' stuff and try again */
+            psz_name += 5;
+            i_stat = stat( psz_name, &stat_info );
+	}
+
+	if( i_stat == (-1) )
+        {
+            intf_ErrMsg( "input error: cannot stat() file `%s' (%s)",
+                         psz_name, strerror(errno));
+            p_input->b_error = 1;
+            return;
+        }
     }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -427,7 +454,7 @@ void input_FileOpen( input_thread_t * p_input )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         intf_ErrMsg( "input error: unknown file type for `%s'",
-                     p_input->p_source );
+                     psz_name );
         p_input->b_error = 1;
         return;
     }
@@ -435,8 +462,8 @@ void input_FileOpen( input_thread_t * p_input )
     p_input->stream.i_tell = 0;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    intf_Msg( "input: opening file %s", p_input->p_source );
-    if( (p_input->i_handle = open( p_input->p_source,
+    intf_Msg( "input: opening %s", p_input->p_source );
+    if( (p_input->i_handle = open( psz_name,
                                    /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
     {
         intf_ErrMsg( "input error: cannot open file (%s)", strerror(errno) );

@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.11 2001/02/14 15:58:29 henri Exp $
+ * $Id: input_dvd.c,v 1.12 2001/02/16 09:25:03 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -116,12 +116,32 @@ void input_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int DVDProbe( probedata_t *p_data )
 {
+    input_thread_t * p_input = (input_thread_t *)p_data;
+
+    char * psz_name = p_input->p_source;
+    int i_handle;
+    int i_score = 5;
+
     if( TestMethod( INPUT_METHOD_VAR, "dvd" ) )
     {
         return( 999 );
     }
 
-    return 5;
+    if( ( strlen(psz_name) > 4 ) && !strncasecmp( psz_name, "dvd:", 4 ) )
+    {
+        /* If the user specified "dvd:" then it's probably a DVD */
+        i_score = 100;
+        psz_name += 4;
+    }
+
+    i_handle = open( psz_name, 0 );
+    if( i_handle == -1 )
+    {
+        return( 0 );
+    }
+    close( i_handle );
+
+    return( i_score );
 }
 
 /*****************************************************************************

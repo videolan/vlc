@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.5 2001/02/12 07:52:40 sam Exp $
+ * $Id: input_ps.c,v 1.6 2001/02/16 09:25:03 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -29,6 +29,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include "config.h"
 #include "common.h"
@@ -99,12 +104,32 @@ void input_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int PSProbe( probedata_t *p_data )
 {
+    input_thread_t * p_input = (input_thread_t *)p_data;
+
+    char * psz_name = p_input->p_source;
+    int i_handle;
+    int i_score = 10;
+
     if( TestMethod( INPUT_METHOD_VAR, "ps" ) )
     {
         return( 999 );
     }
 
-    return 10;
+    if( ( strlen(psz_name) > 5 ) && !strncasecmp( psz_name, "file:", 5 ) )
+    {
+        /* If the user specified "file:" then it's probably a file */
+        i_score = 100;
+        psz_name += 5;
+    }
+
+    i_handle = open( psz_name, 0 );
+    if( i_handle == -1 )
+    {
+        return( 0 );
+    }
+    close( i_handle );
+
+    return( i_score );
 }
 
 /*****************************************************************************

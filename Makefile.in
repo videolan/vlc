@@ -493,29 +493,29 @@ snapshot:
 	mv /tmp/vlc-@VLC_VERSION@.tar.gz /tmp/vlc-@VLC_VERSION@.tar.bz2 ..
 
 	# removing CSS stuff
-	find /tmp/vlc-@VLC_VERSION@ -type f -name '*css*' | xargs rm -f
-	for x in Makefile.in src/input/input_dvd.c src/input/input_dvd.h ; do \
-	rm -f /tmp/vlc-@VLC_VERSION@/$$x ; \
-	perl -ne 'if (/^#e(lse|ndif)/) { $$i=0; } \
-			if (/^#if.*DVD/) { $$i=1; print "#if 0\n"; } \
-			elsif (!$$i || /^#/) { print $$_; }' \
-		< $$x | grep -vi css >| /tmp/vlc-@VLC_VERSION@/$$x ; \
-	done
-	rm -f /tmp/vlc-@VLC_VERSION@/debian/changelog
-	sed 's/\(^vlc ([^-]*\)-/\1nocss-/' < debian/changelog \
-		> /tmp/vlc-@VLC_VERSION@/debian/changelog
-
-	# build nocss archives
-	(cd /tmp ; mv vlc-@VLC_VERSION@ vlc-@VLC_VERSION@nocss ; \
-		tar cf vlc-@VLC_VERSION@nocss.tar vlc-@VLC_VERSION@nocss ; \
-		bzip2 -f -9 < vlc-@VLC_VERSION@nocss.tar \
-			> vlc-@VLC_VERSION@nocss.tar.bz2 ; \
-		gzip -f -9 vlc-@VLC_VERSION@nocss.tar )
-	mv /tmp/vlc-@VLC_VERSION@nocss.tar.gz \
-		/tmp/vlc-@VLC_VERSION@nocss.tar.bz2 ..
-
-	# clean up
-	rm -rf /tmp/vlc-@VLC_VERSION@nocss
+#	find /tmp/vlc-@VLC_VERSION@ -type f -name '*css*' | xargs rm -f
+#	for x in Makefile.in src/input/input_dvd.c src/input/input_dvd.h ; do \
+#	rm -f /tmp/vlc-@VLC_VERSION@/$$x ; \
+#	perl -ne 'if (/^#e(lse|ndif)/) { $$i=0; } \
+#			if (/^#if.*DVD/) { $$i=1; print "#if 0\n"; } \
+#			elsif (!$$i || /^#/) { print $$_; }' \
+#		< $$x | grep -vi css >| /tmp/vlc-@VLC_VERSION@/$$x ; \
+#	done
+#	rm -f /tmp/vlc-@VLC_VERSION@/debian/changelog
+#	sed 's/\(^vlc ([^-]*\)-/\1nocss-/' < debian/changelog \
+#		> /tmp/vlc-@VLC_VERSION@/debian/changelog
+#
+#	# build nocss archives
+#	(cd /tmp ; mv vlc-@VLC_VERSION@ vlc-@VLC_VERSION@nocss ; \
+#		tar cf vlc-@VLC_VERSION@nocss.tar vlc-@VLC_VERSION@nocss ; \
+#		bzip2 -f -9 < vlc-@VLC_VERSION@nocss.tar \
+#			> vlc-@VLC_VERSION@nocss.tar.bz2 ; \
+#		gzip -f -9 vlc-@VLC_VERSION@nocss.tar )
+#	mv /tmp/vlc-@VLC_VERSION@nocss.tar.gz \
+#		/tmp/vlc-@VLC_VERSION@nocss.tar.bz2 ..
+#
+#	# clean up
+	rm -rf /tmp/vlc-@VLC_VERSION@*
 
 plugins: $(PLUGINS:%=lib/%.so)
 

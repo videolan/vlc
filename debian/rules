@@ -12,19 +12,11 @@ build: build-stamp
 build-stamp:
 	dh_testdir
 
-	if [ $(DEB_BUILD_ARCH) = i386 ]; then \
 	./configure --prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
-		--enable-gnome --enable-fb --with-glide --with-ggi \
-		--with-sdl --enable-esd --enable-alsa --disable-ppro ; \
-	else \
-	./configure --prefix=/usr \
-		--mandir=\$${prefix}/share/man \
-		--infodir=\$${prefix}/share/info \
-		--enable-gnome --enable-fb --with-ggi \
-		--with-sdl --enable-esd --enable-alsa ; \
-	fi
+		--enable-gnome \
+		--with-sdl --enable-esd --enable-alsa --disable-ppro ;
 
 	$(MAKE)
 
@@ -48,7 +40,7 @@ install: build
 	$(MAKE) install prefix=`pwd`/debian/vlc/usr
 
 	# make symlinks for packages
-	for alias in ggi gnome glide esd sdl alsa ; do \
+	for alias in gnome esd sdl alsa ; do \
 		mkdir -p debian/vlc-$$alias/usr/share/doc/ ; \
 		ln -s vlc debian/vlc-$$alias/usr/share/doc/vlc-$$alias ; \
 		mkdir -p debian/vlc-$$alias/usr/lib/videolan/vlc/ ; \
@@ -63,8 +55,6 @@ install: build
 		debian/vlc-gnome/usr/share/videolan/
 	mkdir -p debian/vlc-gnome/usr/share/man/man1/
 	ln -s vlc.1.gz debian/vlc-gnome/usr/share/man/man1/gvlc.1.gz
-
-	ln -s vlc.1.gz debian/vlc/usr/share/man/man1/fbvlc.1.gz
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -83,10 +73,10 @@ binary-arch: build install
 #	dh_installpam
 #	dh_installinit
 	dh_installcron
-	dh_installmanpages -Nvlc-gnome -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa
+	dh_installmanpages -Nvlc-gnome -Nvlc-esd -Nvlc-sdl -Nvlc-alsa
 	dh_installinfo
 #	dh_undocumented
-	dh_installchangelogs -Nvlc-gnome -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa
+	dh_installchangelogs -Nvlc-gnome -Nvlc-esd -Nvlc-sdl -Nvlc-alsa
 	dh_link
 	dh_strip
 	dh_compress
@@ -94,7 +84,7 @@ binary-arch: build install
 #	dh_makeshlibs
 	dh_installdeb
 #	dh_perl
-	dh_shlibdeps -Nvlc-glide
+	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.2 2001/02/14 15:58:29 henri Exp $
+ * $Id: input_ts.c,v 1.3 2001/02/16 09:25:03 sam Exp $
  *
  * Authors: 
  *
@@ -31,6 +31,10 @@
 #include <errno.h>
 #include <sys/uio.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include "config.h"
 #include "common.h"
@@ -88,13 +92,31 @@ void input_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int TSProbe( probedata_t * p_data )
 {
+    input_thread_t * p_input = (input_thread_t *)p_data;
+
+    char * psz_name = p_input->p_source;
+    int i_handle;
+    int i_score = 1;
+
     if( TestMethod( INPUT_METHOD_VAR, "ts" ) )
     {
         return( 999 );
     }
 
-    /* verify that the first byte is 0x47 */
-    return 0;
+    if( ( strlen(psz_name) > 5 ) && !strncasecmp( psz_name, "file:", 5 ) )
+    {
+        /* If the user specified "file:" then it's probably a file */
+        psz_name += 5;
+    }
+
+    i_handle = open( psz_name, 0 );
+    if( i_handle == -1 )
+    {
+        return( 0 );
+    }
+    close( i_handle );
+
+    return( i_score );
 }
 
 /*****************************************************************************

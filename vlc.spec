@@ -1,16 +1,19 @@
 Name: vlc
-Version: 0.2.60
+Version: 0.2.61
 Release: 1
 Copyright: GPL
 Url: http://www.videolan.org/
 Group: X11/Applications/Graphics
-Source0: http://www.videolan.org/packages/0.2.60/vlc-0.2.60.tar.gz
+Source0: http://www.videolan.org/packages/0.2.61/vlc-0.2.61.tar.gz
 Packager: Samuel Hocevar <sam@zoy.org>
 
 Buildroot: /tmp/vlc-build
 Summary: VideoLAN Client.
 
 %changelog
+* Fri Feb 16 2001 Samuel Hocevar <sam@via.ecp.fr>
+New upstream release
+
 * Tue Aug  8 2000 Samuel Hocevar <sam@via.ecp.fr>
 Added framebuffer support
 
@@ -31,7 +34,7 @@ a free network-aware MPEG and DVD player
 %setup 
 
 %build
-./configure --prefix=/usr --enable-mmx --enable-gnome --enable-fb
+./configure --prefix=/usr --enable-mmx --with-sdl --enable-esd
 make
 %install
 mkdir -p $RPM_BUILD_ROOT/usr/lib

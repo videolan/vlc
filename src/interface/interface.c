@@ -160,7 +160,9 @@ static void intf_Manage( intf_thread_t *p_intf )
         if( p_main->p_playlist->i_index == -1 )
         {
             /*    FIXME: wait for user to add stuff to playlist ? */
+#if 0
             p_intf->b_die = 1;
+#endif
         }
         else
         {

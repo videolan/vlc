@@ -1,3 +1,9 @@
+vlc (0.2.61-1) unstable; urgency=low
+
+  * New release. The package build works again.
+
+ -- Samuel Hocevar <sam@zoy.org>  Fri, 16 Feb 2001 08:09:59 +0100
+
 vlc (0.2.60-1) unstable; urgency=low
 
   * New release. The package build is most presumably FUBAR.

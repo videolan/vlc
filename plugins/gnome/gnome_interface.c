@@ -83,8 +83,8 @@ create_intf_window (void)
   GtkWidget *toolbar_prev;
   GtkWidget *toolbar_next;
   GtkWidget *vbox2;
-  GtkWidget *label6;
   GtkWidget *entry1;
+  GtkWidget *label6;
   GtkWidget *hscale;
   GtkWidget *label13;
   GtkWidget *appbar;
@@ -299,7 +299,15 @@ create_intf_window (void)
   gtk_widget_show (vbox2);
   gnome_app_set_contents (GNOME_APP (intf_window), vbox2);
 
-  label6 = gtk_label_new (_("File name: this part of the interface doesn't work yet.mpeg"));
+  entry1 = gtk_entry_new ();
+  gtk_widget_ref (entry1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "entry1", entry1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (entry1);
+  gtk_box_pack_start (GTK_BOX (vbox2), entry1, FALSE, FALSE, 0);
+  gtk_entry_set_text (GTK_ENTRY (entry1), _("Tired of boring stub messages ? Write your own exciting message here !!"));
+
+  label6 = gtk_label_new (_("This part of the interface doesn't work yet. You can drag the slider below, though:"));
   gtk_widget_ref (label6);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "label6", label6,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -309,15 +317,7 @@ create_intf_window (void)
   gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
   gtk_misc_set_padding (GTK_MISC (label6), 5, 0);
 
-  entry1 = gtk_entry_new ();
-  gtk_widget_ref (entry1);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "entry1", entry1,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (entry1);
-  gtk_box_pack_start (GTK_BOX (vbox2), entry1, FALSE, FALSE, 0);
-  gtk_entry_set_text (GTK_ENTRY (entry1), _("Tired of boring stub messages ? Write your own exciting message here !!"));
-
-  hscale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 100, 1, 5, 1)));
+  hscale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (43.75, 0, 100, 1, 6.25, 0)));
   gtk_widget_ref (hscale);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "hscale", hscale,
                             (GtkDestroyNotify) gtk_widget_unref);
