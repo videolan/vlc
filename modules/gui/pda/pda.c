@@ -419,11 +419,9 @@ static int Manage( intf_thread_t *p_intf )
     {
         input_thread_t *p_input = p_intf->p_sys->p_input;
 
-        vlc_mutex_lock( &p_input->stream.stream_lock );
+        vlc_mutex_lock( &p_input->object_lock );
         if( !p_input->b_die )
         {
-            /* New input or stream map change */
-            if( p_input->stream.b_changed )
             {
                 playlist_t *p_playlist;
 
@@ -447,11 +445,12 @@ static int Manage( intf_thread_t *p_intf )
             }
 
             /* Manage the slider */
-#define p_area p_input->stream.p_selected_area
+#if 0
+#define p_area p_input->p_selected_area
             if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
             {
                 /* Manage the slider for CPU_CAPABILITY_FPU hardware */
-                if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
+                if( p_intf->p_sys->b_playing )
                 {
                     float newvalue = p_intf->p_sys->p_adj->value;
 
@@ -473,9 +472,9 @@ static int Manage( intf_thread_t *p_intf )
                         double f_pos = (double)newvalue / 100.0;
 
                         /* release the lock to be able to seek */
-                        vlc_mutex_unlock( &p_input->stream.stream_lock );
+                        vlc_mutex_unlock( &p_input->object_lock );
                         var_SetFloat( p_input, "position", f_pos );
-                        vlc_mutex_lock( &p_input->stream.stream_lock );
+                        vlc_mutex_lock( &p_input->object_lock );
 
                         /* Update the old value */
                         p_intf->p_sys->f_adj_oldvalue = newvalue;
@@ -485,7 +484,7 @@ static int Manage( intf_thread_t *p_intf )
             else
             {
                 /* Manage the slider without CPU_CAPABILITY_FPU hardware */
-                if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
+                if( p_intf->p_sys->b_playing )
                 {
                     off_t newvalue = p_intf->p_sys->p_adj->value;
 
@@ -507,9 +506,9 @@ static int Manage( intf_thread_t *p_intf )
                         double f_pos = (double)newvalue / 100.0;
 
                         /* release the lock to be able to seek */
-                        vlc_mutex_unlock( &p_input->stream.stream_lock );
+                        vlc_mutex_unlock( &p_input->object_lock );
                         var_SetFloat( p_input, "position", f_pos );
-                        vlc_mutex_lock( &p_input->stream.stream_lock );
+                        vlc_mutex_lock( &p_input->object_lock );
 
                         /* Update the old value */
                         p_intf->p_sys->i_adj_oldvalue = newvalue;
@@ -517,8 +516,9 @@ static int Manage( intf_thread_t *p_intf )
                 }
             }
 #undef p_area
+#endif
         }
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        vlc_mutex_unlock( &p_input->object_lock );
     }
     else if( p_intf->p_sys->b_playing && !p_intf->b_die )
     {
@@ -596,20 +596,13 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
     if( p_intf->p_sys->p_input )
     {
         /* initialize and show slider for seekable streams */
-        if( p_intf->p_sys->p_input->stream.b_seekable )
         {
             gtk_widget_show( GTK_WIDGET( p_slider ) );
         }
-        else
-        {
-            /* hide slider */
-            gtk_widget_hide( GTK_WIDGET( p_slider ) );
-        }
 
         /* control buttons for free pace streams */
-        b_control = p_intf->p_sys->p_input->stream.b_pace_control;
+        b_control = p_intf->p_sys->p_input->b_can_pace_control;
 
-        p_intf->p_sys->p_input->stream.b_changed = 0;
         msg_Dbg( p_intf, "stream has changed, refreshing interface" );
     }
 
