@@ -263,6 +263,10 @@ dist-hook:
 ###############################################################################
 
 bin_SCRIPTS = vlc-config
+CLEANFILES = $(bin_SCRIPTS)
+vlc-config: $(top_builddir)/config.status $(top_builddir)/vlc-config.in
+	cd $(top_builddir) && $(SHELL) ./config.status --file=$@
+	-cd $(top_builddir) && chmod 0755 $@
 
 lib_LIBRARIES = lib/libvlc.a $(LIBRARIES_libvlc_pic)
 

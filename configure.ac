@@ -4282,7 +4282,10 @@ AC_CONFIG_FILES([
   modules/visualization/galaktos/Makefile
 ])
 
-AC_CONFIG_FILES([vlc-config], [chmod 0755 vlc-config])
+# Cannot use AC_CONFIG_FILES([vlc-config]) as is automatically built,
+# not provided with the source
+${SHELL} ./config.status --file=vlc-config
+chmod 0755 vlc-config
 
 dnl Generate makefiles
 AC_OUTPUT
