@@ -1,5 +1,11 @@
 vlc (0.1.99i) unstable; urgency=low
 
+  * Fixed the framerate display
+
+ -- Samuel Hocevar <sam@zoy.org>  Tue, 24 Oct 2000 11:08:01 +0200
+
+vlc (0.1.99i) unstable; urgency=low
+
   * fixed the support for field pictures, which involved a few dozens
     bugs in the video parser and video decoder.
   * renamed an inconsistent variable in src/input/input_file.c.

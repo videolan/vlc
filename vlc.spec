@@ -5,7 +5,7 @@ Copyright: GPL
 Url: http://www.videolan.org/
 Group: X11/Applications/Graphics
 Source0: http://www.videolan.org/packages/0.1.99i/vlc-0.1.99i.tar.gz
-Packager: Samuel Hocevar <sam@via.ecp.fr>
+Packager: Samuel Hocevar <sam@zoy.org>
 
 Buildroot: /tmp/vlc-build
 Summary: VideoLAN Client.

@@ -1,7 +1,7 @@
 Source: vlc
 Section: graphics
 Priority: optional
-Maintainer: Samuel Hocevar <sam@via.ecp.fr>
+Maintainer: Samuel Hocevar <sam@zoy.org>
 Standards-Version: 3.0.1
 
 Package: vlc

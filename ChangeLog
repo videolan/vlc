@@ -1,9 +1,14 @@
-  * fixe a 100% cpu usage bug, in the dummy aout
-  * Added a 'f' shortcut to switch between Windowed and Fullscreened
+0.1.99j:
+
+  * Minor changes in the Debian files.
+  * Fixed fps display.
+  * Fixed MPEG1 video decoding.
+  * Fixed a 100% cpu usage bug, in the dummy aout.
+  * Added a 'f' shortcut to switch between Windowed and Fullscreen
     mode.
 
 Mon, 28 Aug 2000 02:34:18 +0200
-O.1.99i :
+0.1.99i :
 
   * fixed the support for field pictures, which involved a few dozens
     bugs in the video parser and video decoder.
