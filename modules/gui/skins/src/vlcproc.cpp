@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.15 2003/04/22 17:56:44 asmax Exp $
+ * $Id: vlcproc.cpp,v 1.16 2003/04/25 12:37:52 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -30,7 +30,10 @@
 #include <vlc/intf.h>
 #include <vlc/aout.h>
 #include <vlc/vout.h>
-#include <netutils.h>
+
+extern "C" {
+#include "netutils.h"
+}
 
 //--- SKIN ------------------------------------------------------------------
 #include "../os_api.h"
