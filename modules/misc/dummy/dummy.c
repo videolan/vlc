@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.10 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: dummy.c,v 1.11 2003/12/08 18:42:08 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -40,6 +40,11 @@
     "format instead of trying to improve performances by using the most " \
     "efficient one.")
 
+#define SAVE_TEXT N_("Save raw codec data")
+#define SAVE_LONGTEXT N_( \
+    "This option allows you to save the raw codec data if you have " \
+    "selected/forced the dummy decoder in the main options." )
+
 #ifdef WIN32
 #define QUIET_TEXT N_("Don't open a dos command box interface")
 #define QUIET_LONGTEXT N_( \
@@ -70,6 +75,7 @@ vlc_module_begin();
         set_description( _("dummy decoder function") );
         set_capability( "decoder", 0 );
         set_callbacks( E_(OpenDecoder), E_(CloseDecoder) );
+        add_bool( "dummy-save-es", 0, NULL, SAVE_TEXT, SAVE_LONGTEXT, VLC_FALSE );
     add_submodule();
         set_description( _("dummy encoder function") );
         set_capability( "encoder", 0 );

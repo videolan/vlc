@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: es_out.c,v 1.8 2003/12/07 17:17:04 gbazin Exp $
+ * $Id: es_out.c,v 1.9 2003/12/08 18:42:08 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -518,6 +518,10 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
         es->p_es->p_bitmapinfoheader = NULL;
     }
     input_DelES( p_sys->p_input, es->p_es );
+
+    if( p_sys->p_es_audio == es ) p_sys->p_es_audio = NULL;
+    if( p_sys->p_es_video == es ) p_sys->p_es_video = NULL;
+    if( p_sys->p_es_sub   == es ) p_sys->p_es_sub   = NULL;
 
     vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
 
