@@ -27,10 +27,6 @@
 
 #include "input_internal.h"
 
-#ifdef UNDER_CE
-#   define LOW_MEM
-#endif
-
 /* TODO:
  *  - tune the 2 methods
  *  - compute cost for seek
@@ -45,8 +41,8 @@
  *      More complex scheme using mutliple track to avoid seeking
  */
 
-/* How many track we have, currently only used for stream mode */
-#ifdef LOW_MEM
+/* How many tracks we have, currently only used for stream mode */
+#ifdef OPTIMIZE_MEMORY
 #   define STREAM_CACHE_TRACK 1
     /* Max size of our cache 128Ko per track */
 #   define STREAM_CACHE_SIZE  (STREAM_CACHE_TRACK*1024*128)
