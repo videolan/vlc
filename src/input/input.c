@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.164 2001/12/10 16:16:51 massiot Exp $
+ * $Id: input.c,v 1.165 2001/12/12 02:13:50 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -601,6 +601,12 @@ static void CloseThread( input_thread_t * p_input )
     if( ( ( strlen( p_input->p_source ) > 4 )
             && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
         || TestMethod( INPUT_METHOD_VAR, "dvd" ) )
+    {
+        f.pf_close( p_input );
+    }
+    else if( ( ( strlen( p_input->p_source ) > 8 )
+                 && !strncasecmp( p_input->p_source, "dvdread:", 8 ) )
+             || TestMethod( INPUT_METHOD_VAR, "dvdread" ) )
     {
         f.pf_close( p_input );
     }

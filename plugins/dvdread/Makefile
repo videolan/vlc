@@ -47,7 +47,7 @@ else
 endif
 
 libdvdcss:
-	cd ../../ && $(MAKE) libdvdcss
+	@cd ../../ && $(MAKE) libdvdcss
 
 libdvdread:
-	cd ../../ && $(MAKE) libdvdread
+	@cd ../../ && $(MAKE) libdvdread

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.135 2001/12/10 13:17:35 sam Exp $
+ * $Id: main.c,v 1.136 2001/12/12 02:13:50 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -56,6 +56,10 @@
 #   include <unistd.h>
 #elif defined( _MSC_VER ) && defined( _WIN32 )
 #   include <io.h>
+#endif
+
+#ifdef HAVE_LOCALE_H
+#    include <locale.h>
 #endif
 
 #include <errno.h>                                                 /* ENOMEM */
@@ -286,10 +290,12 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /* 
      * Support for getext
      */
+#ifdef HAVE_LOCALE_H
     if( ! setlocale(LC_MESSAGES, "") )
     {
         fprintf( stderr, "warning: unsupported locale.\n" );
     }
+#endif
 
     if( ! bindtextdomain(PACKAGE, LOCALEDIR) )
     {

@@ -52,7 +52,7 @@ $(BUILTIN_OBJ): DVDREAD_%.o: %.c
 all: ../../lib/$(BASE_A)
 
 libdvdcss:
-	cd ../../ && $(MAKE) libdvdcss
+	@cd ../../ && $(MAKE) libdvdcss
 
 #install:
 #	mkdir -p $(DESTDIR)$(includedir)/videolan
