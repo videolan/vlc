@@ -243,7 +243,7 @@ if test "${echo_target}" = yes; then
     for module in `echo "${plugins}"`; do
       register_targets "${module}"
     done
-    for target in `echo ${list}`; do printf "${target}_plugin "; done
+    for target in `echo ${list}`; do printf "modules/${target}_plugin "; done
     printf '\n'
   fi
   if test "${echo_builtin}"; then
@@ -251,9 +251,9 @@ if test "${echo_target}" = yes; then
       register_targets "${module}"
     done
     if test "${echo_pic}"; then
-      for target in `echo ${list}`; do printf "${target}_pic.a "; done
+      for target in `echo ${list}`; do printf "modules/${target}_pic.a "; done
     else
-      for target in `echo ${list}`; do printf "${target}.a "; done
+      for target in `echo ${list}`; do printf "modules/${target}.a "; done
     fi
     printf '\n'
   fi
@@ -285,9 +285,9 @@ if test "${echo_libs}" = yes; then
       register_flags "${module}"
     done
     if test "${echo_pic}"; then
-      for target in `echo ${list}`; do printf "${target}_pic.a "; done
+      for target in `echo ${list}`; do printf "modules/${target}_pic.a "; done
     else
-      for target in `echo ${list}`; do printf "${target}.a "; done
+      for target in `echo ${list}`; do printf "modules/${target}.a "; done
     fi
     printf '\n'
   fi
