@@ -2,7 +2,7 @@
  * x11_bitmap.cpp: X11 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_bitmap.cpp,v 1.4 2003/05/18 17:48:05 asmax Exp $
+ * $Id: x11_bitmap.cpp,v 1.5 2003/05/19 21:39:34 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -206,7 +206,6 @@ char *X11Bitmap::LoadFromFile( string fileName, int depth, int AColor,
     dataSize = U32( headers + 34 );
     nColors = U32( headers + 50 );
 
-    fprintf(stderr,"image %s %x\n", fileName.c_str(), AColor);
     switch( bpp )
     {
         case 24:

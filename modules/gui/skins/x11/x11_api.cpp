@@ -2,7 +2,7 @@
  * x11_api.cpp: Various x11-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_api.cpp,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_api.cpp,v 1.2 2003/05/19 21:39:34 asmax Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -28,12 +28,14 @@
 #include <X11/Xlib.h>
 
 //--- SKIN ------------------------------------------------------------------
+#include <vlc/intf.h>
+#include "../src/skin_common.h"
 #include "../src/window.h"
 #include "../os_window.h"
 #include "../os_api.h"
 #include "../src/event.h"       // for MAX_PARAM_SIZE
 
-#include <stdio.h>
+extern intf_thread_t *g_pIntf;  // ugly, but it's not my fault ;)
 
 //---------------------------------------------------------------------------
 // Event API
@@ -51,24 +53,21 @@ void OSAPI_SendMessage( SkinWindow *win, unsigned int message, unsigned int para
 void OSAPI_PostMessage( SkinWindow *win, unsigned int message, unsigned int param1,
                         long param2 )
 {
-
-/*    GdkEventClient *event = new GdkEventClient;
+    XEvent event;
     
-    event->type = GDK_CLIENT_EVENT;
+    event.type = ClientMessage;
+    event.xclient.display = g_pIntf->p_sys->display;
     if( win == NULL )
-        event->window = NULL;
+        event.xclient.window = NULL;
     else
-        event->window = (( Window )win)->GetHandle();
-    event->send_event = 0;
-    event->message_type = NULL;
-    event->data_format = 32;
-    event->data.l[0] = message;
-    event->data.l[1] = param1;
-    event->data.l[2] = param2;
-
-    gdk_event_put( (GdkEvent *)event );
-
-    delete event;*/
+        event.xclient.window = (( X11Window *)win)->GetHandle();
+    event.xclient.send_event = 0;
+    event.xclient.message_type = NULL;
+    event.xclient.format = 32;
+    event.xclient.data.l[0] = message;
+    event.xclient.data.l[1] = param1;
+    event.xclient.data.l[2] = param2;
+    XSendEvent( g_pIntf->p_sys->display, event.xclient.window, False, 0, &event );
 }
 //---------------------------------------------------------------------------
 
@@ -117,12 +116,21 @@ void OSAPI_GetScreenSize( int &w, int &h )
 //---------------------------------------------------------------------------
 void OSAPI_GetMousePos( int &x, int &y )
 {
-/*    gdk_window_get_pointer( gdk_get_default_root_window(), &x, &y, NULL );*/
+    Window rootReturn, childReturn;
+    int rootx, rooty;
+    int winx, winy;
+    unsigned int xmask;
+    
+    Window root = DefaultRootWindow( g_pIntf->p_sys->display );
+    XQueryPointer( g_pIntf->p_sys->display, root, &rootReturn, &childReturn, 
+                   &rootx, &rooty, &winx, &winy, &xmask );
+    x = rootx;
+    y = rooty;
 }
 //---------------------------------------------------------------------------
 string OSAPI_GetWindowTitle( SkinWindow *win )
 {
-/*    return ( (GTK2Window *)win )->GetName();*/
+    return ( (X11Window *)win )->GetName();
 }
 //---------------------------------------------------------------------------
 bool OSAPI_RmDir( string path )

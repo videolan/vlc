@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.4 2003/05/18 17:48:05 asmax Exp $
+ * $Id: x11_window.cpp,v 1.5 2003/05/19 21:39:34 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -148,6 +148,7 @@ void X11Window::OSShow( bool show )
     {
 /*        gdk_window_show( gWnd );
         gdk_window_move( gWnd, Left, Top );*/
+        XMoveWindow( display, Wnd, Left, Top );
     }
     else
     {
@@ -160,7 +161,7 @@ bool X11Window::ProcessOSEvent( Event *evt )
     unsigned int msg = evt->GetMessage();
     unsigned int p1  = evt->GetParam1();
     int          p2  = evt->GetParam2();
-    
+ 
     switch( msg )
     {
         case Expose:
@@ -168,69 +169,68 @@ bool X11Window::ProcessOSEvent( Event *evt )
             return true;
  
         case MotionNotify:
- /*           if( LButtonDown )
-                MouseMove( (int)( (GdkEventButton *)p2 )->x,
-                           (int)( (GdkEventButton *)p2 )->y, 1 );
+            if( LButtonDown )
+                MouseMove( (int)( (XMotionEvent *)p2 )->x,
+                           (int)( (XMotionEvent *)p2 )->y, 1 );
             else if( RButtonDown )
-                MouseMove( (int)( (GdkEventButton *)p2 )->x,
-                           (int)( (GdkEventButton *)p2 )->y, 2 );
+                MouseMove( (int)( (XMotionEvent *)p2 )->x,
+                           (int)( (XMotionEvent *)p2 )->y, 2 );
             else
-                MouseMove( (int)( (GdkEventButton *)p2 )->x,
-                           (int)( (GdkEventButton *)p2 )->y, 0 );
-            gdk_window_get_pointer( gWnd, 0, 0, 0 );*/
+                MouseMove( (int)( (XMotionEvent *)p2 )->x,
+                           (int)( (XMotionEvent *)p2 )->y, 0 );
             return true;
 
 
         case ButtonPress:
             // Raise all the windows
-/*            for( list<SkinWindow *>::const_iterator win = 
+            for( list<SkinWindow *>::const_iterator win = 
                     p_intf->p_sys->p_theme->WindowList.begin();
                     win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
             {
-                gdk_window_raise( ( (X11Window *)(*win) )->GetHandle() );
+                XRaiseWindow( display, ( (X11Window *)(*win) )->GetHandle() );
             }
           
-            switch( ( (GdkEventButton *)p2 )->button )
+            switch( ( (XButtonEvent *)p2 )->button )
             {
                 case 1:
                     // Left button
                     LButtonDown = true;
-                    MouseDown( (int)( (GdkEventButton *)p2 )->x,
-                               (int)( (GdkEventButton *)p2 )->y, 1 );
+                    MouseDown( (int)( (XButtonEvent *)p2 )->x,
+                               (int)( (XButtonEvent *)p2 )->y, 1 );
                     break;
 
                 case 3:
                     // Right button
                     RButtonDown = true;
-                    MouseDown( (int)( (GdkEventButton *)p2 )->x,
-                               (int)( (GdkEventButton *)p2 )->y, 2 );
+                    MouseDown( (int)( (XButtonEvent *)p2 )->x,
+                               (int)( (XButtonEvent *)p2 )->y, 2 );
                     break;
 
                 default:
                     break;
-            }*/
+            }
             return true;
 
         case ButtonRelease:
-/*            switch( ( (GdkEventButton *)p2 )->button )
+            switch( ( (XButtonEvent *)p2 )->button )
             {
                 case 1:
                     // Left button
                     LButtonDown = false;
-                    MouseUp( (int)( (GdkEventButton *)p2 )->x,
-                             (int)( (GdkEventButton *)p2 )->y, 1 );
+                    MouseUp( (int)( (XButtonEvent *)p2 )->x,
+                             (int)( (XButtonEvent *)p2 )->y, 1 );
                     break;
 
                 case 3:
                     // Right button
                     RButtonDown = false;
-                    MouseUp( (int)( (GdkEventButton *)p2 )->x,
-                             (int)( (GdkEventButton *)p2 )->y, 2 );
+                    MouseUp( (int)( (XButtonEvent *)p2 )->x,
+                             (int)( (XButtonEvent *)p2 )->y, 2 );
                     break;
 
                 default:
                     break;
-            }*/
+            }
             return true;
 
         case LeaveNotify:
@@ -332,8 +332,7 @@ void X11Window::WindowManualMove()
 //---------------------------------------------------------------------------
 void X11Window::WindowManualMoveInit()
 {
-/*    gdk_window_get_pointer( gdk_get_default_root_window(), &CursorX, &CursorY,
-                            NULL );*/
+    OSAPI_GetMousePos( CursorX, CursorY );
     WindowX = Left;
     WindowY = Top;
 }
@@ -343,7 +342,6 @@ void X11Window::Move( int left, int top )
     Left = left;
     Top  = top;
     XMoveWindow( display, Wnd, left, top );
-   
 }
 //---------------------------------------------------------------------------
 void X11Window::Size( int width, int height )

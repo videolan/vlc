@@ -2,7 +2,7 @@
  * x11_event.cpp: x11 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_event.cpp,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_event.cpp,v 1.2 2003/05/19 21:39:34 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -61,7 +61,7 @@ X11Event::X11Event( intf_thread_t *p_intf, Window wnd, unsigned int msg,
 X11Event::X11Event( intf_thread_t *p_intf, SkinWindow *win, unsigned int msg,
     unsigned int par1, long par2 ) : Event( p_intf, msg, par1, par2 )
 {
-//    gWnd = ( (X11Window *)win )->GetHandle();
+    Wnd = ( (X11Window *)win )->GetHandle();
 }
 //---------------------------------------------------------------------------
 X11Event::~X11Event()
@@ -70,15 +70,15 @@ X11Event::~X11Event()
 //---------------------------------------------------------------------------
 bool X11Event::SendEvent()
 {
-/*    if( Message != VLC_NOTHING )
+    if( Message != VLC_NOTHING )
     {
-        // Find window matching with gwnd
+        // Find window matching with Wnd
         list<SkinWindow *>::const_iterator win;
         for( win = p_intf->p_sys->p_theme->WindowList.begin();
              win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
         {
             // If it is the correct window
-            if( gWnd == ( (X11Window *)(*win) )->GetHandle() )
+            if( Wnd == ( (X11Window *)(*win) )->GetHandle() )
             {
                 OSAPI_PostMessage( *win, Message, Param1, Param2 );
                 PostSynchroMessage();
@@ -88,40 +88,40 @@ bool X11Event::SendEvent()
         OSAPI_PostMessage( NULL, Message, Param1, Param2 );
         return true;
     }
-*/
+
     return false;
 }
 //---------------------------------------------------------------------------
 bool X11Event::IsEqual( Event *evt )
 {
-/*    X11Event *GTKEvt = (X11Event *)evt;
-    return( GTKEvt->GetWindow() == gWnd   && GTKEvt->GetMessage() == Message &&
-            GTKEvt->GetParam1() == Param1 && GTKEvt->GetParam2()  == Param2 );*/
+    X11Event *XEvt = (X11Event *)evt;
+    return( XEvt->GetWindow() == Wnd   && XEvt->GetMessage() == Message &&
+            XEvt->GetParam1() == Param1 && XEvt->GetParam2()  == Param2 );
 }
 //---------------------------------------------------------------------------
 void X11Event::CreateOSEvent( string para1, string para2, string para3 )
 {
     // Find Parameters
-/*    switch( Message )
+    switch( Message )
     {
         case WINDOW_MOVE:
-            gWnd = GetWindowFromName( para1 );
+            Wnd = GetWindowFromName( para1 );
             break;
 
         case WINDOW_CLOSE:
-            gWnd = GetWindowFromName( para1 );
+            Wnd = GetWindowFromName( para1 );
             break;
 
         case WINDOW_OPEN:
-            gWnd = GetWindowFromName( para1 );
+            Wnd = GetWindowFromName( para1 );
             break;
 
-    }*/
+    }
 }
 //---------------------------------------------------------------------------
 Window X11Event::GetWindowFromName( string name )
 {
-/*    X11Window *win = (X11Window *)
+    X11Window *win = (X11Window *)
         p_intf->p_sys->p_theme->GetWindow( name );
 
     if( win == NULL )
@@ -131,7 +131,7 @@ Window X11Event::GetWindowFromName( string name )
     else
     {
         return win->GetHandle();
-    }*/
+    }
 }
 //---------------------------------------------------------------------------
 

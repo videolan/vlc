@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.5 2003/05/18 17:48:05 asmax Exp $
+ * $Id: x11_run.cpp,v 1.6 2003/05/19 21:39:34 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -52,6 +52,8 @@
 
 // include the icon graphic
 #include "share/vlc32x32.xpm"
+
+#include <unistd.h>
 
 
 //---------------------------------------------------------------------------
@@ -191,17 +193,6 @@ private:
 }*/
 //---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
-// REFRESH TIMER CALLBACK
-//---------------------------------------------------------------------------
-/*gboolean RefreshTimer( gpointer data )
-{
-    intf_thread_t *p_intf = (intf_thread_t *)data;
-    SkinManage( p_intf );
-    return true;
-}*/
-//---------------------------------------------------------------------------
-
 
 //---------------------------------------------------------------------------
 // Implementation of Instance class
@@ -257,12 +248,11 @@ void ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
     // Skin event
     if( event->type == ClientMessage )
     {
-/*        msg = ( (GdkEventClient *)event )->data.l[0];
+        msg = ( (XClientMessageEvent *)event )->data.l[0];
         evt = (Event *)new OSEvent( p_intf, 
-            ((GdkEventAny *)event)->window,
-            msg,
-            ( (GdkEventClient *)event )->data.l[1],
-            ( (GdkEventClient *)event )->data.l[2] );*/
+            ((XAnyEvent *)event)->window, msg,
+            ( (XClientMessageEvent *)event )->data.l[1],
+            ( (XClientMessageEvent *)event )->data.l[2] );
     }
     // System event
     else
@@ -357,18 +347,25 @@ void OSRun( intf_thread_t *p_intf )
 /*    wxTheApp = new Instance( p_intf, callbackobj );
     wxEntry( 1, p_args );*/
 
+
     Display *display = ((OSTheme *)p_intf->p_sys->p_theme)->GetDisplay();
     
     // Main event loop
+    int count = 0;
     while( 1 )
     {
-        XEvent *event;
-        XNextEvent( display, event );
-        
-        ProcessEvent( p_intf, proc, event );
-
-// kludge: add timer
-    //    SkinManage( p_intf );
+        XEvent event;
+        while( XPending( display ) > 0 )
+        {
+            XNextEvent( display, &event );
+            ProcessEvent( p_intf, proc, &event );
+        }
+        usleep( 1000 );
+        if( ++count == 100 )
+        {
+            count = 0;
+            SkinManage( p_intf );    // Call every 100 ms
+        }
     }
     
 }
