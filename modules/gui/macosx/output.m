@@ -2,7 +2,7 @@
  * output.m: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: output.m,v 1.3 2003/05/21 21:30:30 hartman Exp $
+ * $Id: output.m,v 1.4 2003/05/22 14:25:33 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -302,7 +302,6 @@
         [o_mrl_string appendString: @"}"];
     }
     [self setMRL:o_mrl_string];
-    NSLog( o_mrl_string );
 }
 
 - (void)TTLChanged:(NSNotification *)o_notification

@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.23 2003/05/20 18:53:03 hartman Exp $
+ * $Id: prefs.m,v 1.24 2003/05/22 14:25:34 hartman Exp $
  *
  * Authors:	Jon Lech Johansen <jon-vl@nanocrew.net>
  *		Derk-Jan Hartman <thedj at users.sf.net>
@@ -68,7 +68,6 @@
     [o_prefs_view setRulersVisible: YES];
     [o_prefs_view setDocumentView: o_empty_view];
     [o_tree selectRow:0 byExtendingSelection:NO];
-    //[self loadConfigTree];
 }
 
 - (void)initStrings
@@ -130,7 +129,7 @@
 
     int i_type = [o_vlc_config configType];
     NSString *o_name = [o_vlc_config configName];
-    char *psz_name = (char *)[o_name UTF8String];
+    char *psz_name = (char *)[o_name lossyCString];
 
     switch( i_type )
     {
@@ -141,7 +140,7 @@
             NSString *o_value;
 
             o_value = [o_vlc_config titleOfSelectedItem];
-            psz_value = (char *)[o_value UTF8String];
+            psz_value = (char *)[o_value lossyCString];
 
             config_PutPsz( p_intf, psz_name, psz_value );
         }
@@ -155,7 +154,7 @@
             NSString *o_value;
 
             o_value = [o_vlc_config stringValue];
-            psz_value = (char *)[o_value UTF8String];
+            psz_value = (char *)[o_value lossyCString];
 
             config_PutPsz( p_intf, psz_name, psz_value );
         }
@@ -206,7 +205,7 @@
     }
     
     /* Enumerate config options and add corresponding config boxes */
-    o_module_name = [NSString stringWithUTF8String: p_parser->psz_object_name];
+    o_module_name = [NSString stringWithCString: p_parser->psz_object_name];
     p_item = p_parser->p_config;
 
     i_pos = 0;
@@ -330,6 +329,7 @@
                 [o_modules setTarget: self];
                 [o_modules setAction: @selector(configChanged:)];
                 [o_modules sendActionOn:NSLeftMouseUpMask];
+                
                 if ( psz_duptip != NULL )
                 {
                     [o_modules setToolTip: [NSApp localizedString:
@@ -349,8 +349,8 @@
                         if( !strcmp( p_a_module->psz_capability,
                                     p_item->psz_type ) )
                         {
-                            NSString *o_object_name = [NSString
-                                stringWithCString: p_a_module->psz_object_name];
+                            NSString *o_object_name = [NSApp
+                                localizedString: p_a_module->psz_object_name];
                             [o_modules addItemWithTitle: o_object_name];
                         }
                     }
@@ -359,7 +359,7 @@
                 if( p_item->psz_value != NULL )
                 {
                     NSString *o_value =
-                        [NSString stringWithUTF8String: p_item->psz_value];
+                        [NSApp localizedString: p_item->psz_value];
     
                     [o_modules selectItemWithTitle: o_value];
                 }
@@ -385,7 +385,7 @@
                                     p_item->psz_value : "";
     
                     INPUT_FIELD_STRING( p_item->psz_name, p_item->psz_text, 200,
-                                        [NSString stringWithCString: psz_value],
+                                        [NSApp localizedString: psz_value],
                                         p_item->psz_longtext );
                 }
                 else
@@ -420,9 +420,9 @@
                     for( i=0; p_item->ppsz_list[i]; i++ )
                     {
                         [o_combo_box addItemWithObjectValue:
-                            [NSString stringWithCString: p_item->ppsz_list[i]]];
+                            [NSApp localizedString: p_item->ppsz_list[i]]];
                     }
-                    [o_combo_box setStringValue: [NSString stringWithCString: 
+                    [o_combo_box setStringValue: [NSApp localizedString: 
                         p_item->psz_value ? p_item->psz_value : ""]];
     
                     CONTROL_LABEL( p_item->psz_text );
@@ -595,7 +595,7 @@ static VLCTreeItem *o_root_item = nil;
                     switch( p_item->i_type )
                     {
                     case CONFIG_HINT_CATEGORY:
-                        o_child_name = [NSString stringWithUTF8String: p_item->psz_text];
+                        o_child_name = [NSApp localizedString: p_item->psz_text];
                         [o_children addObject:[[VLCTreeItem alloc] initWithName: o_child_name
                             ID: p_module->i_object_id parent:self]];
                         break;
@@ -637,7 +637,7 @@ static VLCTreeItem *o_root_item = nil;
         
                 /* Create the capability tree if it doesn't already exist */
                 NSString *o_capability;
-                o_capability = [NSString stringWithUTF8String: p_module->psz_capability];
+                o_capability = [NSApp localizedString: p_module->psz_capability];
                 if( !p_module->psz_capability || !*p_module->psz_capability )
                 {
                     /* Empty capability ? Let's look at the submodules */
@@ -647,7 +647,7 @@ static VLCTreeItem *o_root_item = nil;
                         p_submodule = (module_t*)p_module->pp_children[ j ];
                         if( p_submodule->psz_capability && *p_submodule->psz_capability )
                         {
-                            o_capability = [NSString stringWithUTF8String: p_submodule->psz_capability];
+                            o_capability = [NSApp localizedString: p_submodule->psz_capability];
                             BOOL b_found = FALSE;
                             for( j = 0; j < [o_children count]; j++ )
                             {
@@ -707,7 +707,7 @@ static VLCTreeItem *o_root_item = nil;
         
                 /* Check the capability */
                 NSString *o_capability;
-                o_capability = [NSString stringWithUTF8String: p_module->psz_capability];
+                o_capability = [NSApp localizedString: p_module->psz_capability];
                 if( !p_module->psz_capability || !*p_module->psz_capability )
                 {
                     /* Empty capability ? Let's look at the submodules */
@@ -717,11 +717,11 @@ static VLCTreeItem *o_root_item = nil;
                         p_submodule = (module_t*)p_module->pp_children[ j ];
                         if( p_submodule->psz_capability && *p_submodule->psz_capability )
                         {
-                            o_capability = [NSString stringWithUTF8String: p_submodule->psz_capability];
+                            o_capability = [NSApp localizedString: p_submodule->psz_capability];
                             if( [o_capability isEqualToString: [self getName]] )
                             {
                             [o_children addObject:[[VLCTreeItem alloc] initWithName:
-                                [NSString stringWithUTF8String: p_module->psz_object_name ]
+                                [NSApp localizedString: p_module->psz_object_name ]
                                 ID: p_module->i_object_id parent:self]];
                             }
                         }
@@ -730,7 +730,7 @@ static VLCTreeItem *o_root_item = nil;
                 else if( [o_capability isEqualToString: [self getName]] )
                 {
                     [o_children addObject:[[VLCTreeItem alloc] initWithName:
-                        [NSString stringWithUTF8String: p_module->psz_object_name ]
+                        [NSApp localizedString: p_module->psz_object_name ]
                         ID: p_module->i_object_id parent:self]];
                 }
             }
