@@ -2,7 +2,7 @@
  * avi.h : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: avi.h,v 1.19 2004/01/25 20:05:28 hartman Exp $
+ * $Id: avi.h,v 1.20 2004/01/31 14:49:52 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -86,5 +86,8 @@ struct demux_sys_t
     /* number of streams and information */
     unsigned int i_track;
     avi_track_t  **track;
+
+    /* meta */
+    vlc_meta_t  *meta;
 };
 

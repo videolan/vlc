@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: avi.c,v 1.85 2004/01/25 20:05:28 hartman Exp $
+ * $Id: avi.c,v 1.86 2004/01/31 14:49:52 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,8 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-#include "vlc_playlist.h"
+
+#include "vlc_meta.h"
 #include "codecs.h"
 
 #include "libavi.h"
@@ -50,7 +51,7 @@ static void Close  ( vlc_object_t * );
 vlc_module_begin();
     set_description( _("AVI demuxer") );
     set_capability( "demux", 212 );
-    
+
     add_bool( "avi-interleaved", 0, NULL,
               INTERLEAVE_TEXT, INTERLEAVE_LONGTEXT, VLC_TRUE );
     add_bool( "avi-index", 0, NULL,
@@ -157,6 +158,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->b_odml   = VLC_FALSE;
     p_sys->i_track  = 0;
     p_sys->track    = NULL;
+    p_sys->meta     = NULL;
 
     stream_Control( p_input->s, STREAM_CAN_FASTSEEK, &p_sys->b_seekable );
 
@@ -240,29 +242,15 @@ static int Open( vlc_object_t * p_this )
              p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
              p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
              p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
+    if( ( p_sys->meta = vlc_meta_New() ) )
     {
-        playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_input,
-                        VLC_OBJECT_PLAYLIST,  FIND_PARENT);
-        input_info_category_t *p_cat = input_InfoCategory( p_input, _("Avi") );
-
-        input_AddInfo( p_cat, _("Number of streams"), "%d", i_track );
-        input_AddInfo( p_cat, _("Flags"), "%s%s%s%s",
-                       p_avih->i_flags&AVIF_HASINDEX?" HAS_INDEX":"",
-                       p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
-                       p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
-                       p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
-        if( p_playlist )
-        {
-            playlist_AddInfo( p_playlist, -1 , _("Avi"),
-                          _("Number of streams"), "%d", i_track );
-            playlist_AddInfo( p_playlist, -1 , _("Avi"),
-                       _("Flags"), "%s%s%s%s",
-                       p_avih->i_flags&AVIF_HASINDEX?" HAS_INDEX":"",
-                       p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
-                       p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
-                       p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
-            vlc_object_release( p_playlist );
-        }
+        char buffer[200];
+        sprintf( buffer, "%s%s%s%s",
+                 p_avih->i_flags&AVIF_HASINDEX?" HAS_INDEX":"",
+                 p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
+                 p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
+                 p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
+        vlc_meta_Add( p_sys->meta, VLC_META_SETTING, buffer );
     }
 
     /* now read info on each stream and create ES */
@@ -451,6 +439,10 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
+    if( p_sys->meta )
+    {
+        vlc_meta_Delete( p_sys->meta );
+    }
     AVI_ChunkFreeRoot( p_input->s, &p_sys->ck_root );
     free( p_sys );
     return VLC_EGENERIC;
@@ -475,6 +467,7 @@ static void Close ( vlc_object_t * p_this )
     }
     FREE( p_sys->track );
     AVI_ChunkFreeRoot( p_input->s, &p_sys->ck_root );
+    vlc_meta_Delete( p_sys->meta );
 
     free( p_sys );
 }
@@ -1139,6 +1132,7 @@ static int    Control( input_thread_t *p_input, int i_query, va_list args )
     int i;
     double   f, *pf;
     int64_t i64, *pi64;
+    vlc_meta_t **pp_meta;
 
     switch( i_query )
     {
@@ -1193,6 +1187,10 @@ static int    Control( input_thread_t *p_input, int i_query, va_list args )
                     break;
                 }
             }
+            return VLC_SUCCESS;
+        case DEMUX_GET_META:
+            pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
+            *pp_meta = vlc_meta_Duplicate( p_sys->meta );
             return VLC_SUCCESS;
 
         default:
