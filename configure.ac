@@ -3972,7 +3972,6 @@ VLC_OUTPUT_VLC_CONFIG_IN
 
 AC_CONFIG_FILES([
   Makefile
-  autotools/Makefile
   debian/Makefile
   doc/Makefile
   intl/Makefile
