@@ -2,7 +2,7 @@
  * xosd.c : X On Screen Display interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: xosd.c,v 1.6 2003/01/28 16:52:36 sam Exp $
+ * $Id: xosd.c,v 1.7 2003/02/03 01:32:37 sam Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -108,7 +108,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Initialize library */
     p_intf->p_sys->p_osd =
-#ifdef HAVE_XOSD_VERSION_0
+#if defined(HAVE_XOSD_VERSION_0) || defined(HAVE_XOSD_VERSION_1)
         xosd_init( config_GetPsz( p_intf, "xosd-font" ),
                    "LawnGreen", 3, XOSD_top, 0, 1 );
 #else
