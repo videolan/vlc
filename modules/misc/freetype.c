@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.20 2003/08/27 12:24:52 sigmunau Exp $
+ * $Id: freetype.c,v 1.21 2003/09/10 21:54:27 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -76,10 +76,13 @@ static line_desc_t *NewLine( byte_t * );
 #define FONTSIZE_TEXT N_("Font size")
 #define FONTSIZE_LONGTEXT N_("The size of the fonts used by the osd module" )
 
+static char *ppsz_sizes[] = { "smaller", "small", "normal", "large", "larger", NULL};
+
 vlc_module_begin();
     add_category_hint( N_("Fonts"), NULL, VLC_FALSE );
     add_file( "freetype-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT, VLC_FALSE );
-    add_integer( "freetype-fontsize", 16, NULL, FONTSIZE_TEXT, FONTSIZE_LONGTEXT, VLC_FALSE );
+    add_integer( "freetype-fontsize", 16, NULL, FONTSIZE_TEXT, FONTSIZE_LONGTEXT, VLC_TRUE );
+    add_string_from_list( "freetype-rel-fontsize", "normal", ppsz_sizes, NULL, FONTSIZE_TEXT, FONTSIZE_LONGTEXT, VLC_FALSE );
     set_description( _("freetype2 font renderer") );
     set_capability( "text renderer", 100 );
     add_shortcut( "text" );
@@ -138,6 +141,8 @@ static int Create( vlc_object_t *p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     char *psz_fontfile;
     int i, i_error;
+    int i_font_factor = 0;
+    int i_fontsize = 0;
     double gamma_inv = 1.0f / gamma_value;
     vlc_value_t val;
 
@@ -157,6 +162,8 @@ static int Create( vlc_object_t *p_this )
     var_Create( p_vout, "freetype-font", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "freetype-fontsize",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "freetype-rel-fontsize",
+                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     /* Look what method was requested */
     var_Get( p_vout, "freetype-font", &val );
@@ -209,7 +216,7 @@ static int Create( vlc_object_t *p_this )
 
     i_error = FT_Select_Charmap( p_vout->p_text_renderer_data->p_face,
                                  ft_encoding_unicode );
-    if ( i_error )
+    if( i_error )
     {
         msg_Err( p_vout, "Font has no unicode translation table" );
         FT_Done_Face( p_vout->p_text_renderer_data->p_face );
@@ -220,13 +227,51 @@ static int Create( vlc_object_t *p_this )
 
     p_vout->p_text_renderer_data->i_use_kerning =
         FT_HAS_KERNING(p_vout->p_text_renderer_data->p_face);
-    var_Get( p_vout, "freetype-fontsize", &val );
+
+    var_Get( p_vout, "freetype-rel-fontsize", &val );
+    
+    if( val.psz_string )
+    {
+        if( strncmp( val.psz_string, "smaller", 7 ) == 0 )
+        {
+            i_font_factor = 20;
+        }
+        else if( strncmp( val.psz_string, "small", 5 ) == 0 )
+        {
+            i_font_factor = 18;
+        }
+        else if( strncmp( val.psz_string, "normal", 6 ) == 0 )
+        {
+            i_font_factor = 16;
+        }
+        else if( strncmp( val.psz_string, "large", 5 ) == 0 )
+        {
+            i_font_factor = 12;
+        }
+        else if( strncmp( val.psz_string, "larger", 6 ) == 0 )
+        {
+            i_font_factor = 6;
+        }
+        else
+        {
+            var_Get( p_vout, "freetype-fontsize", &val );
+            i_fontsize = val.i_int;
+        }
+        if( i_font_factor )
+            i_fontsize = (int) p_vout->i_window_height / i_font_factor;
+        free( val.psz_string );
+    }
+    else
+    {
+        var_Get( p_vout, "freetype-fontsize", &val );
+        i_fontsize = val.i_int;
+    }
 
     i_error = FT_Set_Pixel_Sizes( p_vout->p_text_renderer_data->p_face, 0,
-                                  val.i_int );
+                                  i_fontsize );
     if( i_error )
     {
-        msg_Err( p_vout, "couldn't set font size to %d", val.i_int );
+        msg_Err( p_vout, "couldn't set font size to %d", i_fontsize );
         free( p_vout->p_text_renderer_data );
         return VLC_EGENERIC;
     }
