@@ -1280,7 +1280,7 @@ wizStreamingExtraPage::wizStreamingExtraPage( wxWizard *parent,
     /* TTL */
     sizer->Add( new wxStaticText( this, -1, wxU(_("Time-To-Live (TTL)"))),
                     0, wxALL,  5 );
-    ttl_spin = new wxSpinCtrl( this, -1, "", wxDefaultPosition, wxDefaultSize,
+    ttl_spin = new wxSpinCtrl( this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize,
                     0, 1, 255, 1 );
     ttl_spin->SetToolTip(wxU(_(TTL) ) ) ;
     sizer->Add( ttl_spin, 0, wxALL , 5 );
