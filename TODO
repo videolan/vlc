@@ -114,6 +114,7 @@ Think playlist within playlist, directory structures, SAP section, TV channels l
 50% done.<br />
 Todo:<br />
 - Core support<br />
+   - *** Fix meta-information (author and duration)<br />
    - **  input options inheritance (down nodes)<br />
    - *** Improve random mode and fix loop<br />
    - *   "Name finder"<br />
@@ -121,12 +122,14 @@ Todo:<br />
    - *** Item moving/copying facilities<br />
    - *** Live directory representation<br /> 
 - Helper modules<br />
+   - **  Strip path in subdirectories<br />
    - **  ASX and B4S parsers (see below)<br />
    - *   Rewrite SLP announce discovery<br />
    - **  Adapt CDDAX<br />
    - **  Fix MP4, LIVE.COM<br />
 - *** Implement in MacOS X and Skins 2 interfaces<br />
 - wx implementation :<br />
+   - *** Investigate bug with wxImageList<br />
    - **  Support item move/copy<br />
    - *   Explorer view<br />
    - *** Fix search<br />
