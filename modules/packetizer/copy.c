@@ -51,7 +51,8 @@ struct decoder_sys_t
     block_t *p_block;
 };
 
-static block_t *Packetize ( decoder_t *, block_t ** );
+static block_t *Packetize   ( decoder_t *, block_t ** );
+static block_t *PacketizeSub( decoder_t *, block_t ** );
 
 /*****************************************************************************
  * Open: probe the packetizer and return score
@@ -72,7 +73,10 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_dec->pf_packetize = Packetize;
+    if( p_dec->fmt_in.i_cat == SPU_ES )
+        p_dec->pf_packetize = PacketizeSub;
+    else
+        p_dec->pf_packetize = Packetize;
 
     /* Create the output format */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
@@ -241,7 +245,7 @@ static void Close( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * PacketizeStd: packetize an unit (here copy a complete block )
+ * Packetize: packetize an unit (here copy a complete block )
  *****************************************************************************/
 static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
 {
@@ -267,12 +271,40 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( p_dec->fmt_in.i_cat != SPU_ES &&
-        p_ret != NULL && p_block->i_pts > p_ret->i_pts )
+    if( p_ret != NULL && p_block->i_pts > p_ret->i_pts )
     {
         p_ret->i_length = p_block->i_pts - p_ret->i_pts;
     }
     p_dec->p_sys->p_block = p_block;
 
     return p_ret;
+}
+
+/*****************************************************************************
+ * PacketizeSub: packetize an unit (here copy a complete block )
+ *****************************************************************************/
+static block_t *PacketizeSub( decoder_t *p_dec, block_t **pp_block )
+{
+    block_t *p_block;
+
+    if( pp_block == NULL || *pp_block == NULL )
+    {
+        return NULL;
+    }
+    p_block = *pp_block;
+    *pp_block = NULL;
+
+    if( p_block->i_dts <= 0 )
+    {
+        p_block->i_dts = p_block->i_pts;
+    }
+
+    if( p_block->i_dts <= 0 )
+    {
+        msg_Dbg( p_dec, "need dts > 0" );
+        block_Release( p_block );
+        return NULL;
+    }
+
+    return p_block;
 }
