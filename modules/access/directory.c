@@ -85,7 +85,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 
     add_submodule();
-        set_description( _("Directory EOF") );
+        set_description( "Directory EOF");
         set_capability( "demux2", 0 );
         add_shortcut( "directory" );
         set_callbacks( DemuxOpen, NULL );
