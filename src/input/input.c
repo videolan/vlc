@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.158 2001/11/23 18:47:51 massiot Exp $
+ * $Id: input.c,v 1.159 2001/11/25 05:04:38 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -445,6 +445,14 @@ static int InitThread( input_thread_t * p_input )
         f.pf_open( p_input );
         p_input->stream.i_method = INPUT_METHOD_DVD;
     }
+    else if( ( ( strlen( p_input->p_source ) > 8 )
+                 && !strncasecmp( p_input->p_source, "dvdread:", 8 ) )
+              || TestMethod( INPUT_METHOD_VAR, "dvdread" ) )
+    {
+        /* DVDRead - this is THE kludge */
+        f.pf_open( p_input );
+        p_input->stream.i_method = INPUT_METHOD_DVD;
+    }
     else if( ( strlen( p_input->p_source ) > 4 )
                && !strncasecmp( p_input->p_source, "vlc:", 4 ) )
     {
@@ -637,7 +645,14 @@ static void FileOpen( input_thread_t * p_input )
     {
         int i_size = strlen( psz_name );
 
-        if( ( i_size > 4 )
+        if( ( i_size > 8 )
+            && !strncasecmp( psz_name, "dvdread:", 8 ) )
+        {
+            /* get rid of the 'dvdread:' stuff and try again */
+            psz_name += 8;
+            i_stat = stat( psz_name, &stat_info );
+        }
+	else if( ( i_size > 4 )
             && !strncasecmp( psz_name, "dvd:", 4 ) )
         {
             /* get rid of the 'dvd:' stuff and try again */

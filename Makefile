@@ -23,6 +23,7 @@ PLUGINS_DIR :=	ac3_adec \
 		dsp \
 		dummy \
 		dvd \
+		dvdread \
 		esd \
 		fb \
 		ggi \
@@ -58,6 +59,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		dummy/dummy \
 		dummy/null \
 		dvd/dvd \
+		dvdread/dvdread \
 		esd/esd \
 		fb/fb \
 		ggi/ggi \
@@ -198,7 +200,7 @@ show:
 #
 # Cleaning rules
 #
-clean: libdvdcss-clean plugins-clean vlc-clean
+clean: libdvdcss-clean libdvdread-clean plugins-clean vlc-clean
 	rm -f src/*/*.o extras/*/*.o
 	rm -f lib/*.so* lib/*.a
 	rm -f plugins/*.so plugins/*.a
@@ -206,6 +208,9 @@ clean: libdvdcss-clean plugins-clean vlc-clean
 
 libdvdcss-clean:
 	-cd extras/libdvdcss && $(MAKE) clean
+
+libdvdread-clean:
+	-cd extras/libdvdread && $(MAKE) clean
 
 plugins-clean:
 	for dir in $(PLUGINS_DIR) ; do \
@@ -533,3 +538,10 @@ $(BUILTIN_OBJ): FORCE
 #
 libdvdcss: Makefile.opts
 	cd extras/libdvdcss && $(MAKE)
+
+#
+# libdvdread target
+#
+libdvdread: Makefile.opts
+	cd extras/libdvdread && $(MAKE)
+
