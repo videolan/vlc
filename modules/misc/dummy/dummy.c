@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.8 2003/06/17 16:09:16 gbazin Exp $
+ * $Id: dummy.c,v 1.9 2003/07/14 21:32:59 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -80,5 +80,9 @@ vlc_module_begin();
         set_callbacks( E_(OpenVideo), NULL );
         add_category_hint( N_("Video"), NULL, VLC_FALSE );
         add_string( "dummy-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, VLC_FALSE );
+    add_submodule();
+        set_description( _("dummy font renderer function") );
+        set_capability( "text renderer", 1 );
+        set_callbacks( E_(OpenRenderer), NULL );
 vlc_module_end();
 

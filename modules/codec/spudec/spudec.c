@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.19 2003/06/12 22:27:35 massiot Exp $
+ * $Id: spudec.c,v 1.20 2003/07/14 21:32:58 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,6 +52,9 @@ static vout_thread_t *FindVout( spudec_thread_t * );
 
 #define DEFAULT_FONT "font-eutopiabold21.rle"
 
+#define ENCODING_TEXT N_("subtitle text encoding")
+#define ENCODING_LONGTEXT N_("change the encoding used in text subtitles")
+
 vlc_module_begin();
     add_category_hint( N_("subtitles"), NULL, VLC_TRUE );
 #if defined(SYS_DARWIN) || defined(SYS_BEOS) \
@@ -61,6 +64,10 @@ vlc_module_begin();
 #else
     add_file( "spudec-font", "share/" DEFAULT_FONT, NULL,
               FONT_TEXT, FONT_LONGTEXT, VLC_TRUE );
+#endif
+#if defined(HAVE_ICONV)
+    add_string( "spudec-encoding", "ISO-8859-1", NULL, ENCODING_TEXT,
+		ENCODING_LONGTEXT, VLC_FALSE );
 #endif
     set_description( _("subtitles decoder") );
     set_capability( "decoder", 50 );
@@ -151,7 +158,13 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
             p_spudec->p_fifo->b_error = VLC_TRUE;
         }
 #endif
-
+#if defined(HAVE_ICONV)
+	p_spudec->iconv_handle = iconv_open( "UTF-8", config_GetPsz( p_spudec->p_fifo, "spudec-encoding" ) );
+	if( p_spudec->iconv_handle == (iconv_t)-1 )
+	{
+	    msg_Warn( p_spudec->p_fifo, "Unable to do requested conversion" );
+	}
+#endif
         while( (!p_spudec->p_fifo->b_die) && (!p_spudec->p_fifo->b_error) )
         {
             /* Find/Wait for a video output */
@@ -324,7 +337,12 @@ static void EndThread( spudec_thread_t *p_spudec )
             }
         }
     }
-
+#if defined(HAVE_ICONV)
+    if( p_spudec->iconv_handle != (iconv_t)-1 )
+    {
+	iconv_close( p_spudec->iconv_handle );
+    }
+#endif
     CloseBitstream( &p_spudec->bit_stream );
     free( p_spudec );
 }

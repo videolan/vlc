@@ -1,8 +1,9 @@
+
 /*****************************************************************************
  * spudec.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: spudec.h,v 1.5 2002/12/06 16:34:05 sam Exp $
+ * $Id: spudec.h,v 1.6 2003/07/14 21:32:58 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -20,6 +21,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#if defined(HAVE_ICONV)
+#include <iconv.h>
+#endif
+
 
 typedef struct spudec_thread_t spudec_thread_t;
 
@@ -83,6 +89,9 @@ struct spudec_thread_t
      */
     unsigned int        i_spu_size;            /* size of current SPU packet */
     unsigned int        i_rle_size;                  /* size of the RLE part */
+#if defined(HAVE_ICONV)
+    iconv_t             iconv_handle;     /* handle to iconv instance */
+#endif
 };
 
 /*****************************************************************************

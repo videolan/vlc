@@ -2,7 +2,7 @@
  * dummy.h : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002 VideoLAN
- * $Id: dummy.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: dummy.h,v 1.2 2003/07/14 21:32:59 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -37,3 +37,4 @@ int  E_(OpenAudio)    ( vlc_object_t * );
 
 int  E_(OpenVideo)    ( vlc_object_t * );
 
+int E_(OpenRenderer)  ( vlc_object_t * );

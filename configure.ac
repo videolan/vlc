@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.29 2003/07/14 16:10:20 gbazin Exp $
+dnl $Id: configure.ac,v 1.30 2003/07/14 21:32:58 sigmunau Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -2129,9 +2129,9 @@ then
 
   if test "${FREETYPE_CONFIG}" != "no"
   then
-    AX_ADD_PLUGINS([osdtext])
-    AX_ADD_CFLAGS([osdtext],[`${FREETYPE_CONFIG} --cflags`])
-    AX_ADD_LDFLAGS([osdtext],[`${FREETYPE_CONFIG} --libs`])
+    AX_ADD_PLUGINS([freetype])
+    AX_ADD_CFLAGS([freetype],[`${FREETYPE_CONFIG} --cflags`])
+    AX_ADD_LDFLAGS([freetype],[`${FREETYPE_CONFIG} --libs`])
     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_freetype}"
   elif test "${enable_freetype}" =  "yes"
   then

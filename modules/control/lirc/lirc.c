@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.6 2003/03/30 18:14:37 gbazin Exp $
+ * $Id: lirc.c,v 1.7 2003/07/14 21:32:59 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -370,25 +370,9 @@ static void Run( intf_thread_t *p_intf )
 
 static void Feedback( intf_thread_t *p_intf, char *psz_string )
 {
-        vlc_value_t val, lockval;
-    if ( p_intf->p_sys->p_vout
-         && var_Get( p_intf->p_sys->p_vout, "lock", &lockval ) == VLC_SUCCESS )
+    if ( p_intf->p_sys->p_vout )
     {
-        vlc_mutex_lock( lockval.p_address );
-        val.i_int = OSD_ALIGN_RIGHT|OSD_ALIGN_BOTTOM;
-        var_Set( p_intf->p_sys->p_vout, "flags", val ); 
-        val.i_int = 400000;
-        var_Set( p_intf->p_sys->p_vout, "duration", val ); 
-        val.i_int = 30;
-        var_Set( p_intf->p_sys->p_vout, "x-margin", val ); 
-        val.i_int = 20;
-        var_Set( p_intf->p_sys->p_vout, "y-margin", val );
-        val.psz_string = psz_string;
-        var_Set( p_intf->p_sys->p_vout, "string", val );
-        vlc_mutex_unlock( lockval.p_address );
-    }
-    else
-    {
-        msg_Dbg( p_intf, psz_string );
+	vout_ShowTextRelative( p_intf->p_sys->p_vout, psz_string, NULL, 
+				 OSD_ALIGN_TOP|OSD_ALIGN_RIGHT, 30,20,400000 );
     }
 }

@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.95 2003/06/09 00:33:34 massiot Exp $
+ * $Id: video_output.h,v 1.96 2003/07/14 21:32:58 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -50,76 +50,91 @@ typedef struct vout_chroma_t
 
 } vout_chroma_t;
 
-/*****************************************************************************
- * vout_thread_t: video output thread descriptor
- *****************************************************************************
+/**
+ * \brief video output thread descriptor
+ *
  * Any independant video output device, such as an X11 window or a GGI device,
  * is represented by a video output thread, and described using the following
  * structure.
- *****************************************************************************/
+ */
 struct vout_thread_t
 {
     VLC_COMMON_MEMBERS
 
-    /* Thread properties and lock */
-    vlc_mutex_t         picture_lock;                   /* picture heap lock */
-    vlc_mutex_t         subpicture_lock;             /* subpicture heap lock */
-    vlc_mutex_t         change_lock;                   /* thread change lock */
-    vout_sys_t *        p_sys;                       /* system output method */
-
-    /* Current display properties */
-    uint16_t            i_changes;             /* changes made to the thread */
-    float               f_gamma;                                    /* gamma */
-    vlc_bool_t          b_grayscale;           /* color or grayscale display */
-    vlc_bool_t          b_info;              /* print additional information */
-    vlc_bool_t          b_interface;                     /* render interface */
-    vlc_bool_t          b_scale;                    /* allow picture scaling */
-    vlc_bool_t          b_fullscreen;           /* toogle fullscreen display */
-    vlc_bool_t          b_override_aspect;         /* aspect ratio overriden */
-    mtime_t             render_time;             /* last picture render time */
-    unsigned int        i_window_width;                /* video window width */
-    unsigned int        i_window_height;              /* video window height */
-
-    /* Plugin used and shortcuts to access its capabilities */
+    /** \name Thread properties and locks */
+    /**@{*/
+    vlc_mutex_t         picture_lock;                 /**< picture heap lock */
+    vlc_mutex_t         subpicture_lock;           /**< subpicture heap lock */
+    vlc_mutex_t         change_lock;                 /**< thread change lock */
+    vout_sys_t *        p_sys;                     /**< system output method */
+    /**@}*/
+    
+    /** \name Current display properties */
+    /**@{*/
+    uint16_t            i_changes;           /**< changes made to the thread */
+    float               f_gamma;                                  /**< gamma */
+    vlc_bool_t          b_grayscale;         /**< color or grayscale display */
+    vlc_bool_t          b_info;            /**< print additional information */
+    vlc_bool_t          b_interface;                   /**< render interface */
+    vlc_bool_t          b_scale;                  /**< allow picture scaling */
+    vlc_bool_t          b_fullscreen;         /**< toogle fullscreen display */
+    vlc_bool_t          b_override_aspect;       /**< aspect ratio overriden */
+    mtime_t             render_time;           /**< last picture render time */
+    unsigned int        i_window_width;              /**< video window width */
+    unsigned int        i_window_height;            /**< video window height */
+    /**@}*/
+    
+    /** \name Plugin used and shortcuts to access its capabilities */
+    /**@{*/
     module_t *   p_module;
     int       ( *pf_init )       ( vout_thread_t * );
     void      ( *pf_end )        ( vout_thread_t * );
     int       ( *pf_manage )     ( vout_thread_t * );
     void      ( *pf_render )     ( vout_thread_t *, picture_t * );
     void      ( *pf_display )    ( vout_thread_t *, picture_t * );
+    /**@}*/
 
-    /* Statistics - these numbers are not supposed to be accurate, but are a
+    /** \name Statistics
+     * These numbers are not supposed to be accurate, but are a
      * good indication of the thread status */
-    count_t             c_fps_samples;                     /* picture counts */
-    mtime_t             p_fps_sample[VOUT_FPS_SAMPLES]; /* FPS samples dates */
+    /**@{*/
+    count_t       c_fps_samples;                         /**< picture counts */
+    mtime_t       p_fps_sample[VOUT_FPS_SAMPLES];     /**< FPS samples dates */
+    /**@}*/
 
-    /* Video heap and translation tables */
-    int                 i_heap_size;                            /* heap size */
-    picture_heap_t      render;                         /* rendered pictures */
-    picture_heap_t      output;                            /* direct buffers */
-    vlc_bool_t          b_direct;              /* rendered are like direct ? */
-    vout_chroma_t       chroma;                        /* translation tables */
+    /** \name Video heap and translation tables */
+    /**@{*/
+    int                 i_heap_size;                          /**< heap size */
+    picture_heap_t      render;                       /**< rendered pictures */
+    picture_heap_t      output;                          /**< direct buffers */
+    vlc_bool_t          b_direct;            /**< rendered are like direct ? */
+    vout_chroma_t       chroma;                      /**< translation tables */
+    /**@}*/
 
     /* Picture and subpicture heaps */
-    picture_t           p_picture[2*VOUT_MAX_PICTURES];          /* pictures */
-    subpicture_t        p_subpicture[VOUT_MAX_PICTURES];      /* subpictures */
-
-    /* Bitmap fonts */
-    vout_font_t *       p_default_font;                      /* default font */
-    vout_font_t *       p_large_font;                          /* large font */
+    picture_t           p_picture[2*VOUT_MAX_PICTURES];        /**< pictures */
+    subpicture_t        p_subpicture[VOUT_MAX_PICTURES];    /**< subpictures */
 
     /* Statistics */
-    count_t             c_loops;
-    count_t             c_pictures, c_late_pictures;
-    mtime_t             display_jitter;    /* average deviation from the PTS */
-    count_t             c_jitter_samples;  /* number of samples used for the *
-                                            * calculation of the jitter      */
-    /* delay created by internal caching */
+    count_t          c_loops;
+    count_t          c_pictures, c_late_pictures;
+    mtime_t          display_jitter;    /**< average deviation from the PTS */
+    count_t          c_jitter_samples;  /**< number of samples used
+                                           for the calculation of the
+                                           jitter  */
+    /** delay created by internal caching */
     int                 i_pts_delay;
 
     /* Filter chain */
     char *psz_filter_chain;
     vlc_bool_t b_filter_change;
+
+    /* text renderer data */
+    text_renderer_sys_t * p_text_renderer_data;        /**< private data for
+						           the text renderer */
+    module_t *            p_text_renderer_module;  /**< text renderer module */
+    int ( *pf_add_string ) ( vout_thread_t *, char *, text_style_t *, int,  
+			     int, int, mtime_t, mtime_t ); /**< callback used when a new string needs to be shown on the vout */
 };
 
 #define I_OUTPUTPICTURES p_vout->output.i_pictures

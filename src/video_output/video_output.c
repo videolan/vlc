@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.228 2003/06/28 21:18:58 fenrir Exp $
+ * $Id: video_output.c,v 1.229 2003/07/14 21:32:59 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -382,7 +382,13 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
         vlc_object_destroy( p_vout );
         return NULL;
     }
-
+    p_vout->p_text_renderer_module = module_Need( p_vout, "text renderer", 
+						  NULL );
+    if( p_vout->p_text_renderer_module == NULL )
+    {
+	msg_Warn( p_vout, "no suitable text renderer module" );
+	p_vout->pf_add_string = NULL;
+    }
     /* Create a few object variables for interface interaction */
     var_Create( p_vout, "fullscreen", VLC_VAR_BOOL );
     text.psz_string = _("Fullscreen");
@@ -1010,7 +1016,7 @@ static void EndThread( vout_thread_t *p_vout )
     {
         module_Unneed( p_vout, p_vout->chroma.p_module );
     }
-
+    
     /* Destroy all remaining pictures */
     for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES; i_index++ )
     {
@@ -1030,6 +1036,8 @@ static void EndThread( vout_thread_t *p_vout )
         }
     }
 
+    module_Unneed( p_vout, p_vout->p_text_renderer_module );
+    
     /* Destroy translation tables */
     p_vout->pf_end( p_vout );
 

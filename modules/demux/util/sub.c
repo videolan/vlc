@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.16 2003/06/26 18:14:56 sam Exp $
+ * $Id: sub.c,v 1.17 2003/07/14 21:32:59 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -21,8 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/* define USE_FREETYPE to use freetype for subtitles */
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -33,9 +31,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-#if defined(USE_FREETYPE)
-#include <osd.h>
-#endif
 #include "vlc_video.h"
 
 #include "sub.h"
@@ -447,9 +442,6 @@ static int  sub_open ( subtitle_demux_t *p_sub,
  *****************************************************************************/
 static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
 {
-#if defined(USE_FREETYPE)
-    vlc_object_t *p_vout = NULL;
-#endif
     if( p_sub->p_es->p_decoder_fifo && !p_sub->i_previously_selected )
     {
         p_sub->i_previously_selected = 1;
@@ -469,9 +461,6 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
         data_packet_t   *p_data;
 
         int i_len;
-#if defined(USE_FREETYPE)
-        p_vout = vlc_object_find( p_sub, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-#endif
 
         i_len = strlen( p_sub->subtitle[p_sub->i_subtitle].psz_text ) + 1;
 
@@ -514,35 +503,7 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
         {
             p_pes->i_dts = 0;
         }
-#if defined(USE_FREETYPE)
-        if( p_vout )
-        {
-            vlc_value_t val, lockval;
-            if( var_Get( p_vout, "lock", &lockval ) == VLC_SUCCESS )
-            {
-                int64_t i_tmp;
-                vlc_mutex_lock( lockval.p_address );
-                msg_Dbg( p_sub, "pts "I64Fd" dts " I64Fd, p_pes->i_pts,
-                         p_pes->i_dts );
-                i_tmp = p_pes->i_dts - p_pes->i_pts;
-                val.i_int = OSD_ALIGN_LEFT|OSD_ALIGN_BOTTOM;
-                var_Set( p_vout, "flags", val ); 
-                val.time.i_low = (int)(p_pes->i_pts+p_sub->p_input->i_pts_delay);
-                val.time.i_high = (int)( p_pes->i_pts >> 32 );
-                var_Set( p_vout, "start-date", val ); 
-                val.time.i_low = (int)(p_pes->i_dts + p_sub->p_input->i_pts_delay);
-                val.time.i_high = (int)( p_pes->i_dts >> 32 );
-                var_Set( p_vout, "stop-date", val ); 
-                val.i_int = 20;
-                var_Set( p_vout, "x-margin", val ); 
-                val.i_int = 20;
-                var_Set( p_vout, "y-margin", val );
-                val.psz_string = p_sub->subtitle[p_sub->i_subtitle].psz_text;
-                var_Set( p_vout, "string", val );
-                vlc_mutex_unlock( lockval.p_address );
-            }
-        }
-#endif
+
         p_pes->i_nb_data = 1;
         p_pes->p_first =
             p_pes->p_last = p_data;
@@ -563,12 +524,6 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
 
         p_sub->i_subtitle++;
     }
-#if defined(USE_FREETYPE)
-    if ( p_vout )
-    {
-        vlc_object_release( p_vout );
-    }
-#endif
     return( 0 );
 }
 

@@ -6,6 +6,5 @@ SOURCES_wall = wall.c
 SOURCES_clone = clone.c
 SOURCES_crop = crop.c
 SOURCES_motionblur = motionblur.c
-SOURCES_osdtext = osd_text.c
 SOURCES_logo = logo.c
 noinst_HEADERS += filter_common.h
