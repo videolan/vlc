@@ -572,7 +572,7 @@ AC_CHECK_HEADERS(signal.h time.h errno.h stdint.h stdbool.h getopt.h strings.h i
 AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h sys/ioctl.h sys/stat.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
 if test "${SYS}" != "mingw32"; then
-AC_CHECK_HEADERS(machine/param.h sys/shm.h)
+AC_CHECK_HEADERS(machine/param.h sys/shm.h altivec.h)
 AC_CHECK_HEADERS(linux/version.h)
 fi # end "${SYS}" != "mingw32"
 
@@ -991,6 +991,7 @@ if test "${ac_cv_altivec_inline}" != "no"; then
     AX_ADD_CFLAGS([idctaltivec],[${ac_cv_altivec_inline}])
     AX_ADD_CFLAGS([motionaltivec],[${ac_cv_altivec_inline}])
     AX_ADD_CFLAGS([memcpyaltivec],[${ac_cv_altivec_inline}])
+    AX_ADD_CFLAGS([i420_yuy2_altivec],[${ac_cv_altivec_inline}])
     AX_ADD_CFLAGS([vlc],[${ac_cv_altivec_inline}])
   fi
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
@@ -998,14 +999,23 @@ fi
 
 AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
     [ac_cv_c_altivec],
-    [CFLAGS="${CFLAGS_save} -faltivec"
-     # Darwin test
-     AC_TRY_COMPILE(,[vec_mtvscr((vector unsigned int)(0));],
-        ac_cv_c_altivec=-faltivec, [
-        # Linux/PPC test
-        CFLAGS="${CFLAGS_save} ${CFLAGS_idctaltivec} -fvec"
-        AC_TRY_COMPILE(,[vec_mtvscr((vector unsigned int)(0));],
-            [ac_cv_c_altivec="-fvec"], ac_cv_c_altivec=no)
+    [# Darwin test
+     CFLAGS="${CFLAGS_save} -faltivec"
+     AC_TRY_COMPILE([],
+       [vec_mtvscr((vector unsigned int)(0));],
+       [ac_cv_c_altivec="-faltivec"],
+       [# Linux/PPC test
+        CFLAGS="${CFLAGS_save} ${CFLAGS_idctaltivec} -maltivec -mabi=altivec"
+        AC_TRY_COMPILE([],
+          [vec_mtvscr((vector unsigned int)(0));],
+          [ac_cv_c_altivec="-maltivec -mabi=altivec"],
+          [# Linux/PPC test (old GCC versions)
+           CFLAGS="${CFLAGS_save} ${CFLAGS_idctaltivec} -fvec"
+           AC_TRY_COMPILE([#include <altivec.h>],
+             [vec_mtvscr((vector unsigned int)(0));],
+             [ac_cv_c_altivec="-fvec"],
+             [ac_cv_c_altivec=no])
+           ])
         ])
      CFLAGS="${CFLAGS_save}"])
 if test "${ac_cv_c_altivec}" != "no"; then
