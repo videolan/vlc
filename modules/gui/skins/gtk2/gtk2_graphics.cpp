@@ -2,7 +2,7 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.7 2003/04/15 01:19:11 ipkiss Exp $
+ * $Id: gtk2_graphics.cpp,v 1.8 2003/04/16 14:38:04 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -67,6 +67,9 @@ GTK2Graphics::GTK2Graphics( int w, int h, Window *from ) : Graphics( w, h )
         gdk_drawable_set_colormap( Image, gdk_colormap_get_system() );
         Gc = gdk_gc_new( Image );
     }
+    
+    // Set the background color to black
+    gdk_draw_rectangle( Image, Gc, TRUE, 0, 0, w, h );
 }
 //---------------------------------------------------------------------------
 GTK2Graphics::~GTK2Graphics()

@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.10 2003/04/15 22:16:05 asmax Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.11 2003/04/16 14:38:04 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -111,7 +111,7 @@ GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
     }
 
     Bmp = gdk_pixbuf_add_alpha( Bmp, TRUE, AColor & 0xff, (AColor>>8) & 0xff, 
-            AColor>>16 );
+            (AColor>>16) & 0xff );
     Width = gdk_pixbuf_get_width( Bmp );
     Height = gdk_pixbuf_get_height( Bmp );
 }
@@ -161,10 +161,10 @@ void GTK2Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
                               Graphics *dest )
 {
     GdkDrawable *destImg = ( (GTK2Graphics *)dest )->GetImage();
-   // GdkGC *destGC = ( (GTK2Graphics *)dest )->GetGC();
+    GdkGC *destGC = ( (GTK2Graphics *)dest )->GetGC();
 
-    gdk_pixbuf_render_to_drawable_alpha( Bmp, destImg, x, y, xRef, yRef, 
-            w, h, GDK_PIXBUF_ALPHA_BILEVEL, 128, GDK_RGB_DITHER_NORMAL, 0, 0);
+    gdk_pixbuf_render_to_drawable( Bmp, destImg, destGC, x, y, xRef, yRef, 
+            w, h, GDK_RGB_DITHER_NORMAL, 0, 0);
 }
 //---------------------------------------------------------------------------
 bool GTK2Bitmap::Hit( int x, int y)
@@ -172,6 +172,7 @@ bool GTK2Bitmap::Hit( int x, int y)
     if( x < 0 || x >= Width || y < 0 || y >= Height )
         return false;
 
+/* FIXME */
     guchar *pixels;
     int rowstride, offset;
     gboolean has_alpha;

@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.15 2003/04/15 20:33:58 karibu Exp $
+ * $Id: gtk2_window.cpp,v 1.16 2003/04/16 14:38:04 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -262,10 +262,37 @@ void GTK2Window::RefreshFromImage( int x, int y, int w, int h )
     // Release window device context
     ReleaseDC( hWnd, DC );
 
-*/
+*/ 
+    GdkDrawable *drawable = (( GTK2Graphics* )Image )->GetImage();
+    GdkImage *image = gdk_drawable_get_image( drawable, 0, 0, Width, Height );
+    
+    gdk_draw_drawable( gWnd, gc, drawable, x, y, x, y, w, h );
 
-    gdk_draw_drawable( gWnd, gc, (( GTK2Graphics* )Image )->GetImage(),
-            x, y, x, y, w, h );
+    // Mask for transparency
+    GdkRegion *region = gdk_region_new();
+    for( int line = 0; line < Height; line++ )
+    {
+        int start = 0;
+        while( gdk_image_get_pixel( image, start, line ) == 0 && start < Width-1)
+        {
+            start++;
+        } 
+        int end = Width - 1;
+        while( end >=0 && gdk_image_get_pixel( image, end, line ) == 0)
+        {
+            end--;
+        }
+        GdkRectangle rect;
+        rect.x = start;
+        rect.y = line;
+        rect.width = end - start + 1;
+        rect.height = 1;
+        GdkRegion *rectReg = gdk_region_rectangle( &rect );
+        gdk_region_union( region, rectReg );
+        gdk_region_destroy( rectReg );
+    }
+    gdk_window_shape_combine_region( gWnd, region, 0, 0 );
+    gdk_region_destroy( region );
 }
 //---------------------------------------------------------------------------
 void GTK2Window::WindowManualMove()

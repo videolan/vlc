@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.12 2003/04/15 20:33:58 karibu Exp $
+ * $Id: gtk2_theme.cpp,v 1.13 2003/04/16 14:38:04 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -259,6 +259,8 @@ void GTK2Theme::AddWindow( string name, int x, int y, bool visible,
         msg_Err( p_intf, "CreateWindow failed" );
         return;
     }
+
+    GdkColor black = {0, 0, 0, 0};
 
     gdk_window_show( gwnd );
 

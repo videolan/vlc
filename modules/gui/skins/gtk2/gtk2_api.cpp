@@ -2,7 +2,7 @@
  * gtk2_api.cpp: Various gtk2-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_api.cpp,v 1.8 2003/04/15 20:54:58 karibu Exp $
+ * $Id: gtk2_api.cpp,v 1.9 2003/04/16 14:38:04 asmax Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -67,7 +67,7 @@ void OSAPI_PostMessage( Window *win, unsigned int message, unsigned int param1,
 
     if( message == VLC_HIDE )
     {
-        fprintf( stderr, "======= message %i\n", message );
+        fprintf( stderr, "======= message %i %x\n", message, event );
     }
 
     gdk_event_put( (GdkEvent *)event );
