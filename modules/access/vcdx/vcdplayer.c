@@ -3,7 +3,7 @@
  *               using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 Rocky Bernstein <rocky@panix.com>
- * $Id: vcdplayer.c,v 1.7 2003/12/05 05:01:17 rocky Exp $
+ * $Id: vcdplayer.c,v 1.8 2003/12/11 05:31:37 rocky Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -359,11 +359,15 @@ vcdplayer_play_next( input_thread_t * p_input )
 {
   thread_vcd_data_t *p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
 
-  vcdinfo_obj_t     *obj  = p_vcd->vcd;
+  vcdinfo_obj_t     *obj;
   vcdinfo_itemid_t   itemid;
+
+  if (!p_vcd) return false;
 
   dbg_print( (INPUT_DBG_CALL|INPUT_DBG_PBC), 
 	     "current: %d" , p_vcd->play_item.num);
+
+  obj = p_vcd->vcd;
 
   itemid.type = p_vcd->play_item.type;
 
