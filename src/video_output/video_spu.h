@@ -2,7 +2,7 @@
  * video_spu.h : DVD subpicture units functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_spu.h,v 1.8 2001/03/21 13:42:35 sam Exp $
+ * $Id: video_spu.h,v 1.9 2001/05/08 20:38:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@via.ecp.fr>
@@ -25,6 +25,8 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void   vout_RenderSPU ( vout_buffer_t *p_buffer, subpicture_t *p_subpic,
-                        int i_bytes_per_pixel, int i_bytes_per_line );
+void   vout_RenderRGBSPU( picture_t *p_pic, const subpicture_t *p_spu,
+                          vout_buffer_t *p_buffer,
+                          int i_bytes_per_pixel, int i_bytes_per_line );
+void   vout_RenderYUVSPU( picture_t *p_pic, const subpicture_t *p_spu );
 

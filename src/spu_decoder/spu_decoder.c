@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.42 2001/05/07 04:42:42 sam Exp $
+ * $Id: spu_decoder.c,v 1.43 2001/05/08 20:38:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -504,17 +504,16 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
     /* Get rid of padding bytes */
     switch( p_spudec->i_spu_size - i_index )
     {
+        /* Zero or one padding byte, quite usual */
         case 1:
             RemoveBits( &p_spudec->bit_stream, 8 );
             i_index++;
         case 0:
-            /* Zero or one padding byte, quite usual */
             break;
 
+        /* More than one padding byte - this is very strange, but
+         * we can deal with it */
         default:
-
-            /* More than one padding byte - this is very strange, but
-             * we can deal with it */
             intf_WarnMsg( 2, "spudec warning: %i padding bytes, we usually "
                              "get 1 or none",
                           p_spudec->i_spu_size - i_index );
@@ -542,7 +541,6 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
 static int ParseRLE( u8 *p_src, subpicture_t * p_spu )
 {
     unsigned int i_code;
-    unsigned int i_id = 0;
 
     unsigned int i_width = p_spu->i_width;
     unsigned int i_height = p_spu->i_height;
@@ -551,6 +549,7 @@ static int ParseRLE( u8 *p_src, subpicture_t * p_spu )
     u16 *p_dest = (u16 *)p_spu->p_data;
 
     /* The subtitles are interlaced, we need two offsets */
+    unsigned int  i_id = 0;                   /* Start on the even SPU layer */
     unsigned int  pi_table[ 2 ];
     unsigned int *pi_offset;
 

@@ -2,7 +2,7 @@
  * video_fifo.c : video FIFO management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_fifo.c,v 1.31 2001/05/06 04:32:02 sam Exp $
+ * $Id: video_fifo.c,v 1.32 2001/05/08 20:38:25 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -80,3 +80,4 @@ void vpar_InitFIFO( vpar_thread_t * p_vpar )
     }
 #endif
 }
+

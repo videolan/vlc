@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.127 2001/05/08 00:43:57 sam Exp $
+ * $Id: video_output.c,v 1.128 2001/05/08 20:38:25 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -72,11 +72,9 @@ static void     SetBufferArea     ( vout_thread_t *p_vout, int i_x, int i_y,
 static void     SetBufferPicture  ( vout_thread_t *p_vout, picture_t *p_pic );
 static void     RenderPicture     ( vout_thread_t *p_vout, picture_t *p_pic );
 static void     RenderPictureInfo ( vout_thread_t *p_vout, picture_t *p_pic );
-static void     RenderSubPicture  ( vout_thread_t *p_vout,
+static void     RenderSubPicture  ( vout_thread_t *p_vout, picture_t *p_pic,
                                     subpicture_t *p_subpic );
-static void     RenderInterface   ( vout_thread_t *p_vout );
 static int      RenderIdle        ( vout_thread_t *p_vout );
-static int      RenderSplash      ( vout_thread_t *p_vout );
 static void     RenderInfo        ( vout_thread_t *p_vout );
 static int      Manage            ( vout_thread_t *p_vout );
 static int      Align             ( vout_thread_t *p_vout, int *pi_x,
@@ -1198,18 +1196,14 @@ static void RunThread( vout_thread_t *p_vout)
                     RenderPictureInfo( p_vout, p_pic );
                     RenderInfo( p_vout );
                 }
+            }
+            if( b_display ) /* XXX: quick HACK */
+            {
                 if( p_subpic )
                 {
-                    RenderSubPicture( p_vout, p_subpic );
+                    RenderSubPicture( p_vout, p_pic, p_subpic );
                 }
             }
-
-            /* Render interface and subpicture */
-            if( b_display && p_vout->b_interface && p_vout->b_need_render )
-            {
-                RenderInterface( p_vout );
-            }
-
         }
         else if( p_vout->b_active && p_vout->b_need_render
                   && p_vout->init_display_date == 0)
@@ -1229,10 +1223,6 @@ static void RunThread( vout_thread_t *p_vout)
             if( b_display )
             {
                 p_vout->last_idle_date = current_date;
-                if( p_vout->b_interface )
-                {
-                    RenderInterface( p_vout );
-                }
             }
 
         }
@@ -1248,17 +1238,7 @@ static void RunThread( vout_thread_t *p_vout)
          */
         if( p_vout->init_display_date > 0 && p_vout->b_need_render )
         {
-            if( p_vout->b_active &&
-                    mdate()-p_vout->init_display_date < 5000000)
-            {
-                /* there is something to display ! */
-                    b_display = 1;
-                    RenderSplash( p_vout );
-
-            } else {
-                /* no splash screen ! */
-                p_vout->init_display_date=0;
-            }
+            p_vout->init_display_date = 0;
         }
 
 
@@ -1896,42 +1876,6 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*****************************************************************************
- * RenderSplash: render splash picture
- *****************************************************************************
- * This function will print something on the screen. It will return 0 if
- * nothing has been rendered, or 1 if something has been changed on the screen.
- * Note that if you absolutely want something to be printed, you will have
- * to force it by setting the last idle date to 0.
- * Unlike other rendering functions, this one calls the SetBufferPicture
- * function when needed.
- *****************************************************************************/
-int RenderSplash( vout_thread_t *p_vout )
-{
-    int         i_x = 0, i_y = 0;                           /* text position */
-    int         i_width, i_height;                              /* text size */
-    char *psz_text =    "VideoLAN Client (" VERSION ")";  /* text to display */
-
-    memset( p_vout->p_buffer[ p_vout->i_buffer_index ].p_data,
-                  p_vout->i_bytes_per_line * p_vout->i_height, 12);
-
- //   SetBufferPicture( p_vout, NULL );
-    vout_TextSize( p_vout->p_large_font, WIDE_TEXT | OUTLINED_TEXT, psz_text,
-                   &i_width, &i_height );
-    if( !Align( p_vout, &i_x, &i_y, i_width, i_height, CENTER_RALIGN, CENTER_RALIGN ) )
-    {
-        vout_Print( p_vout->p_large_font,
-                    p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
-                    i_x * p_vout->i_bytes_per_pixel + (i_y - 16 ) * p_vout->i_bytes_per_line,
-                    p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
-                    p_vout->i_white_pixel, p_vout->i_gray_pixel, 0,
-                    WIDE_TEXT | OUTLINED_TEXT, psz_text, 100);
-        SetBufferArea( p_vout, i_x, i_y, i_width, i_height);
-    }
-    return( 1 );
-}
-
-
-/*****************************************************************************
  * RenderIdle: render idle picture
  *****************************************************************************
  * This function will print something on the screen. It will return 0 if
@@ -2037,7 +1981,8 @@ static void RenderInfo( vout_thread_t *p_vout )
  *****************************************************************************
  * This function renders a sub picture unit.
  *****************************************************************************/
-static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
+static void RenderSubPicture( vout_thread_t *p_vout, picture_t *p_pic,
+                              subpicture_t *p_subpic )
 {
     p_vout_font_t       p_font;                                 /* text font */
     int                 i_width, i_height;          /* subpicture dimensions */
@@ -2047,9 +1992,11 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
         switch( p_subpic->i_type )
         {
         case DVD_SUBPICTURE:                          /* DVD subpicture unit */
-            vout_RenderSPU( &p_vout->p_buffer[ p_vout->i_buffer_index ],
-                            p_subpic, p_vout->i_bytes_per_pixel,
-                            p_vout->i_bytes_per_line );
+            vout_RenderRGBSPU( p_pic, p_subpic,
+                               &p_vout->p_buffer[ p_vout->i_buffer_index ],
+                               p_vout->i_bytes_per_pixel,
+                               p_vout->i_bytes_per_line );
+            /* vout_RenderYUVSPU( p_pic, p_subpic ); */
             break;
 
         case TEXT_SUBPICTURE:                            /* single line text */
@@ -2092,55 +2039,6 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 
         p_subpic = p_subpic->p_next;
     }
-}
-
-/*****************************************************************************
- * RenderInterface: render the interface
- *****************************************************************************
- * This function renders the interface, if any.
- *****************************************************************************/
-static void RenderInterface( vout_thread_t *p_vout )
-{
-    int         i_height, i_text_height;            /* total and text height */
-    int         i_width_1, i_width_2;                          /* text width */
-    int         i_byte;                                        /* byte index */
-    const char *psz_text_1 = "[1-9] Channel   [i]nfo   [c]olor     [g/G]amma";
-    const char *psz_text_2 = "[+/-] Volume    [m]ute   [s]caling   [Q]uit";
-
-    /* Get text size */
-    vout_TextSize( p_vout->p_large_font, OUTLINED_TEXT, psz_text_1, &i_width_1, &i_height );
-    vout_TextSize( p_vout->p_large_font, OUTLINED_TEXT, psz_text_2, &i_width_2, &i_text_height );
-    i_height += i_text_height;
-
-    /* Render background */
-    for( i_byte = (p_vout->i_height - i_height) * p_vout->i_bytes_per_line;
-         i_byte < p_vout->i_height * p_vout->i_bytes_per_line;
-         i_byte++ )
-    {
-        /* XXX?? noooo ! */
-        p_vout->p_buffer[ p_vout->i_buffer_index ].p_data[ i_byte ] = p_vout->i_blue_pixel;
-    }
-
-    /* Render text, if not larger than screen */
-    if( i_width_1 < p_vout->i_width )
-    {
-        vout_Print( p_vout->p_large_font, p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
-                    (p_vout->i_height - i_height) * p_vout->i_bytes_per_line,
-                    p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
-                    p_vout->i_white_pixel, p_vout->i_black_pixel, 0,
-                    OUTLINED_TEXT, psz_text_1, 100 );
-    }
-    if( i_width_2 < p_vout->i_width )
-    {
-        vout_Print( p_vout->p_large_font, p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
-                    (p_vout->i_height - i_height + i_text_height) * p_vout->i_bytes_per_line,
-                    p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
-                    p_vout->i_white_pixel, p_vout->i_black_pixel, 0,
-                    OUTLINED_TEXT, psz_text_2, 100 );
-    }
-
-    /* Activate modified area */
-    SetBufferArea( p_vout, 0, p_vout->i_height - i_height, p_vout->i_width, i_height );
 }
 
 /*****************************************************************************

@@ -3,6 +3,8 @@
 #===================#
 
 HEAD
+  * Fixed an aspect ratio issue in the SPU decoder, and optimized the
+    SPU renderer.
   * Speed optimization in the handling of the unusual ephemer DVD subtitles.
   * Little optimization to bozo's UnalignedShowBits fix.
   * Race fix in the packet cache by Jon Lech Johansen <jon-vl@nanocrew.net>.
