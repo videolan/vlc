@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.23 2001/04/09 04:15:30 stef Exp $
+ * $Id: intf_beos.cpp,v 1.24 2001/04/12 11:10:16 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -134,8 +134,8 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
 
 	menu_bar->AddItem (am = new BMenu("Audio") );
 	menu_bar->ResizeToPreferred();
-	am->AddItem( new LanguageMenu("Language", 0, p_intf) );
-	am->AddItem( new LanguageMenu("Subtitles", 1, p_intf) );
+	am->AddItem( new LanguageMenu("Language", AUDIO_ES, p_intf) );
+	am->AddItem( new LanguageMenu("Subtitles", SPU_ES, p_intf) );
 	
 
     rect = Bounds();
