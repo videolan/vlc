@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.34 2003/11/12 08:10:21 zorglub Exp $
+ * $Id: sap.c,v 1.35 2003/11/12 20:01:01 gbazin Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -531,6 +531,7 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             }
             if(!strcasecmp( p_sd->pp_attributes[i]->psz_field , "plgroup"))
             {
+                int i_id;
                 p_playlist =
                 (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                         FIND_ANYWHERE );
@@ -539,8 +540,8 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
                     return;
                 }
 
-                int i_id=playlist_GroupToId( p_playlist,
-                                      p_sd->pp_attributes[i]->psz_value);
+                i_id = playlist_GroupToId( p_playlist,
+                                           p_sd->pp_attributes[i]->psz_value);
                 if( i_id != 0 )
                 {
                     p_item->i_group = i_id;
