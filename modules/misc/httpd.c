@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.3 2003/02/25 17:17:43 fenrir Exp $
+ * $Id: httpd.c,v 1.4 2003/02/27 15:07:48 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -25,8 +25,11 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
+
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -66,9 +69,9 @@
 #   define INADDR_NONE 0xFFFFFFFF
 #endif
 
-#define LISTEN_BACKLOG  100
-#define HTTPD_MAX_CONNECTION    1024
-
+#define LISTEN_BACKLOG          100
+#define HTTPD_MAX_CONNECTION    512
+#define HTTPD_CONNECTION_MAX_UNUSED 10000000
 
 #define FREE( p ) if( p ) { free( p); (p) = NULL; }
 
@@ -175,8 +178,9 @@ typedef struct httpd_connection_s
     struct httpd_connection_s *p_next;
     struct httpd_connection_s *p_prev;
 
-    struct sockaddr_in sock;
-    int    fd;
+    struct  sockaddr_in sock;
+    int     fd;
+    mtime_t i_last_activity_date;
 
     int    i_state;
 
@@ -957,6 +961,13 @@ static int  httpd_page_admin_fill( httpd_file_callback_args_t *p_args, uint8_t *
     p += sprintf( p, "<h1><center>VideoLAN Client Stream Output</center></h1>\n" );
     p += sprintf( p, "<h2><center>Admin page</center></h2>\n" );
 
+    /* general */
+    p += sprintf( p, "<h3>General state</h3>\n" );
+    p += sprintf( p, "<ul>\n" );
+    p += sprintf( p, "<li>Connection count: %d</li>\n", p_httpt->i_connection_count );
+    //p += sprintf( p, "<li>Total bandwith: %d</li>\n", -1 );
+    /*p += sprintf( p, "<li></li>\n" );*/
+    p += sprintf( p, "</ul>\n" );
     /* host list */
     vlc_mutex_lock( &p_httpt->host_lock );
     p += sprintf( p, "<h3>Host list</h3>\n" );
@@ -1053,6 +1064,8 @@ static void httpd_ConnnectionNew( httpd_sys_t *p_httpt, int fd, struct sockaddr_
     p_con = malloc( sizeof( httpd_connection_t ) );
     p_con->i_state  = HTTPD_CONNECTION_RECEIVING_REQUEST;
     p_con->fd       = fd;
+    p_con->i_last_activity_date = mdate();
+
     p_con->sock     = *p_sock;
     p_con->psz_file = NULL;
     p_con->i_http_error = 0;
@@ -1402,7 +1415,6 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
     httpd_file_t    *p_page_404;
 
     httpd_connection_t *p_con;
-    vlc_bool_t         b_wait;
 
     msg_Info( p_httpt, "httpd started" );
 
@@ -1424,12 +1436,84 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
 
     while( !p_httpt->b_die )
     {
+        struct timeval  timeout;
+        fd_set          fds_read;
+        fd_set          fds_write;
+        int             i_handle_max = 0;
+        int             i_ret;
         int i;
         if( p_httpt->i_host_count <= 0 )
         {
             msleep( 100 * 1000 );
             continue;
         }
+
+        /* we will create a socket set with host and connection */
+        FD_ZERO( &fds_read );
+        FD_ZERO( &fds_write );
+
+        vlc_mutex_lock( &p_httpt->host_lock );
+        vlc_mutex_lock( &p_httpt->connection_lock );
+        for( i = 0; i < p_httpt->i_host_count; i++ )
+        {
+            FD_SET( p_httpt->host[i]->fd, &fds_read );
+            i_handle_max = __MAX( i_handle_max, p_httpt->host[i]->fd );
+        }
+        for( p_con = p_httpt->p_first_connection; p_con != NULL; )
+        {
+            /* no more than 10s of inactivity */
+            if( p_con->i_last_activity_date + (mtime_t)HTTPD_CONNECTION_MAX_UNUSED < mdate() )
+            {
+                httpd_connection_t *p_next = p_con->p_next;
+
+                msg_Dbg( p_httpt,  "close unused connection" );
+                httpd_ConnnectionClose( p_httpt, p_con );
+                p_con = p_next;
+                continue;
+            }
+
+            if( p_con->i_state == HTTPD_CONNECTION_SENDING_STREAM && p_con->i_stream_pos + HTTPD_STREAM_PACKET >= p_con->p_file->i_buffer_pos )
+            {
+                p_con = p_con->p_next;
+                continue;
+            }
+
+            if( p_con->i_state == HTTPD_CONNECTION_RECEIVING_REQUEST )
+            {
+                FD_SET( p_con->fd, &fds_read );
+            }
+            else
+            {
+                FD_SET( p_con->fd, &fds_write );
+            }
+            i_handle_max = __MAX( i_handle_max, p_con->fd );
+
+            p_con = p_con->p_next;
+        }
+        vlc_mutex_unlock( &p_httpt->host_lock );
+        vlc_mutex_unlock( &p_httpt->connection_lock );
+
+        /* we will wait 0.5s */
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 500*1000;
+
+        i_ret = select( i_handle_max + 1, 
+                        &fds_read,
+                        &fds_write,
+                        NULL,
+                        &timeout );
+        if( i_ret == -1 && errno != EINTR )
+        {
+            msg_Warn( p_httpt, "cannot select sockets" );
+            msleep( 1000 );
+            continue;
+        }
+        if( i_ret <= 0 )
+        {
+//            msg_Dbg( p_httpt, "waiting..." );
+            continue;
+        }
+
         vlc_mutex_lock( &p_httpt->host_lock );
         /* accept/refuse new connection */
         for( i = 0; i < p_httpt->i_host_count; i++ )
@@ -1487,7 +1571,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                 else if( i_len > 0 )
                 {
                     uint8_t *ptr;
-
+                    p_con->i_last_activity_date = mdate();
                     p_con->i_buffer += i_len;
 
                     ptr = p_con->p_buffer + p_con->i_buffer;
@@ -1527,6 +1611,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                 }
                 else if( i_len > 0 )
                 {
+                    p_con->i_last_activity_date = mdate();
                     p_con->i_buffer += i_len;
 
                     if( p_con->i_buffer >= p_con->i_buffer_size )
@@ -1609,6 +1694,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                     }
                     else if( i_send > 0 )
                     {
+                        p_con->i_last_activity_date = mdate();
                         p_con->i_stream_pos += i_send;
                     }
                 }
@@ -1622,25 +1708,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
             }
         }   /* for over connection */
 
-#if 0
-        b_wait = VLC_TRUE;
-        /* update position for stream based file */
-        for( i = 0; i < p_httpt->i_file_count; i++ )
-        {
-            if( p_httpt->file[i]->b_stream )
-            {
-                p_httpt->file[i]->i_buffer += __MIN( p_httpt->file[i]->i_buffer_valid - p_httpt->file[i]->i_buffer,
-                                                     HTTPD_STREAM_PACKET );
-                if( p_httpt->file[i]->i_buffer < p_httpt->file[i]->i_buffer_valid )
-                {
-                    /* there is data */
-                    b_wait = VLC_FALSE;
-                }
-            }
-        }
-#endif
         vlc_mutex_unlock( &p_httpt->file_lock );
-        /*if( b_wait )*/ msleep( 10 );
     }
     msg_Info( p_httpt, "httpd stopped" );
 
