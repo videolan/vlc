@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.48 2003/10/30 12:01:01 gbazin Exp $
+ * $Id: transcode.c,v 1.49 2003/11/05 18:59:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -988,6 +988,16 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
 #if LIBAVCODEC_BUILD >= 4662
         id->p_encoder->i_frame_rate_base= id->ff_dec_c->frame_rate_base;
 #endif
+
+#if LIBAVCODEC_BUILD >= 4687
+        id->p_encoder->i_aspect = VOUT_ASPECT_FACTOR *
+            ( av_q2d(id->ff_dec_c->sample_aspect_ratio) *
+              id->ff_dec_c->width / id->ff_dec_c->height );
+#else
+        id->p_encoder->i_aspect = VOUT_ASPECT_FACTOR *
+            id->ff_dec_c->aspect_ratio;
+#endif
+
     }
     else
     {

@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.68 2003/11/05 17:57:29 gbazin Exp $
+ * $Id: configuration.c,v 1.69 2003/11/05 18:59:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -815,7 +815,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                     case CONFIG_ITEM_INTEGER:
                         if( !*psz_option_value )
                             break;                    /* ignore empty option */
-                        p_item->i_value = atoi( psz_option_value);
+                        p_item->i_value = strtol( psz_option_value, 0, 0 );
 #if 0
                         msg_Dbg( p_this, "option \"%s\", value %i",
                                  p_item->psz_name, p_item->i_value );
@@ -1387,7 +1387,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                 config_PutPsz( p_this, psz_name, optarg );
                 break;
             case CONFIG_ITEM_INTEGER:
-                config_PutInt( p_this, psz_name, atoi(optarg));
+                config_PutInt( p_this, psz_name, strtol(optarg, 0, 0));
                 break;
             case CONFIG_ITEM_FLOAT:
                 config_PutFloat( p_this, psz_name, (float)atof(optarg) );
@@ -1443,7 +1443,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                 else
                 {
                     config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name,
-                                           atoi(optarg) );
+                                           strtol(optarg, 0, 0) );
                 }
                 break;
             case CONFIG_ITEM_BOOL:
