@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.19 2003/05/08 10:45:50 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.20 2003/05/13 11:18:25 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -275,20 +275,16 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     rect.InsetBy( 10, 10 );
     rect.left = rect.right - 80;
     rect.top = rect.bottom - 25;
-    button = new BButton( rect, "", _("Close"), new BMessage( PREFS_CLOSE ),
-                          B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM );
-    button->MakeDefault( true );
-    fPrefsView->AddChild( button );
-    rect.OffsetBy( -90, 0 );
     button = new BButton( rect, "", _("Apply"), new BMessage( PREFS_APPLY ),
                           B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM );
+    button->MakeDefault( true );
     fPrefsView->AddChild( button );
     rect.OffsetBy( -90, 0 );
     button = new BButton( rect, "", _("Save"), new BMessage( PREFS_SAVE ),
                           B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM );
     fPrefsView->AddChild( button );
     rect.OffsetBy( -90, 0 );
-    button = new BButton( rect, "", _("Revert"), new BMessage( PREFS_REVERT ),
+    button = new BButton( rect, "", _("Defaults"), new BMessage( PREFS_DEFAULTS ),
                           B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM );
     fPrefsView->AddChild( button );
     
@@ -324,11 +320,8 @@ void PreferencesWindow::MessageReceived( BMessage * message )
             Update();
             break;
         
-        case PREFS_CLOSE:
-            PostMessage( B_QUIT_REQUESTED );
-            break;
-        
-        case PREFS_REVERT:
+        case PREFS_DEFAULTS:
+            config_ResetAll( p_intf );
             ApplyChanges( false );
             break;
         
