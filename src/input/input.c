@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.146 2001/10/30 10:48:14 massiot Exp $
+ * $Id: input.c,v 1.147 2001/10/30 10:57:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -91,6 +91,7 @@ static void DestroyThread   ( input_thread_t *p_input );
 static void EndThread       ( input_thread_t *p_input );
 
 static void FileOpen        ( input_thread_t *p_input );
+static void StdOpen         ( input_thread_t *p_input );
 static void FileClose       ( input_thread_t *p_input );
 #if !defined( SYS_BEOS ) && !defined( SYS_NTO )
 static void NetworkOpen     ( input_thread_t *p_input );
@@ -443,6 +444,11 @@ static int InitThread( input_thread_t * p_input )
         /* Dummy input - very kludgy */
         p_input->p_input_module->p_functions->input.functions.input.pf_open( p_input );
     }
+    else if( ( strlen( p_input->p_source ) == 1 ) && *p_input->p_source == '-' )
+    {
+        /* Stdin */
+        StdOpen( p_input );
+    }
     else
     {
         /* File input */
@@ -569,6 +575,25 @@ static void DestroyThread( input_thread_t * p_input )
 
     /* Update status */
     *pi_status = THREAD_OVER;
+}
+
+/*****************************************************************************
+ * StdOpen : open standard input
+ *****************************************************************************/
+static void StdOpen( input_thread_t * p_input )
+{
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    /* Suppose we can control the pace - this won't work in some cases ! */
+    p_input->stream.b_pace_control = 1;
+
+    p_input->stream.b_seekable = 0;
+    p_input->stream.p_selected_area->i_size = 0;
+    p_input->stream.p_selected_area->i_tell = 0;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    intf_WarnMsg( 2, "input: opening stdin" );
+    p_input->i_handle = 0;
 }
 
 /*****************************************************************************
