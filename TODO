@@ -36,6 +36,14 @@ Description: Embedded video outputs
 Status: Assigned to gibalou
 
 Task
+Difficulty: Hard
+Urgency: Normal
+Platform: any
+Description: Multichannel downmixing
+5:1 to Stereo proper downmixing
+Status: Todo
+
+Task
 Difficulty: Guru
 Platform: any
 Urgency: Normal
@@ -52,6 +60,14 @@ Description: Multi-acccess
 Status: Assigned to fenrir
 
 Task
+Difficulty: Hard
+Urgency: Normal
+Platform: any
+Description: make everything UTF-8 based
+ Convert everything that deals with strings to a UTF-8 based system. Not very difficult, but needs a lot of checking, testing and allows for easy breakage.
+Status: Todo
+
+Task
 Difficulty: Medium
 Urgency: Wishlist
 Platform: any
@@ -61,10 +77,20 @@ Status: Assigned to yoann
 
 Task
 Difficulty: Medium
+Urgency: Wishlist
+Platform: any
+Description: Full blown OSD system 
+ In the line of freevo etc.
+Status: Todo
+
+Task
+Difficulty: Medium
 Urgency: Normal
 Platform: any
 Description: Rewrite the SAP parser
  The SAP parser is very dirty at the moment, and needs a complete rewrite.
+ - caching support
+ - sdp file support? (because live.com doesn't handle udp announces)
 Status: Todo
 
 Task
@@ -73,22 +99,59 @@ Urgency: Normal
 Platform: any
 Description: Tree playlist
  A hierarchized playlist structure, eventually using a media library.
+Think playlist within playlist, directory structures, SAP section, TV channels list, iTunes library like stuff etc.
+Status: Todo
+
+Task
+Difficulty: Easy
+Urgency: Wishlist
+Platform: any
+Description: GSM decoder
+GSM decoder not based on standard reference sources.
+Status: Todo
+
+Task
+Difficulty: Easy
+Urgency: Wishlist
+Platform: any
+Description: MusePack  decoder
+Need I say more?
+Status: Todo
+
+Task
+Difficulty: Easy
+Urgency: Normal
+Platform: any
+Description: VobSub support
+Implement VobSub support (.sub and .idx files). Needs SPU scaling support.
+Status: Waiting
+
+Task
+Difficulty: Medium
+Urgency: Wishlist
+Platform: any
+Description: Closed Captions/Teletext support
+In order to conform to international regulations, VLC needs to be able to decode the closed captions in TV, DVD, DVB and HDTV video. V4L has a CC api, DVD and HDTV usually have them in a seperate stream.
+Perhaps look at Xawtv, dvbtext and other vbi, vtx systems.
 Status: Todo
 
 Task
 Difficulty: Hard
 Urgency: Normal
-Platform: OSX
+Platform: Mac OS X
 Description: New OS X preferences
- New preferences for Mac OS X
+ New preferences for Mac OS X. Current not suited for Mac Users and several
+Pref. elements are broken (hotkeys and int with string desc.).
 Status: Assigned to thedj
 
 Task
 Difficulty: Hard
-Urgency: Normal
+Urgency: Critical
 Platform: OSX
-Description: CoreAudio multichannel audio output
-Status: Assigned to thedj
+Description: CoreAudio multichannel audio output. Convert to 
+<a href="http://www.mat.ucsb.edu:8000/CoreAudio/108">AUHAL</a> based sytem.
+Still no info over S/PDIF output available.
+Status: Todo
 
 Task
 Difficulty: Hard
@@ -98,7 +161,169 @@ Description: Stream text subtitles
  Find a a way to stream text subtitles, in TS and in RTP.
   - Find an existing norm
   - Implement it
-Status: todo
+Status: Todo
+
+Task
+Difficulty: Hard
+Urgency: Normal
+Platform: any
+Description: RTSP server
+Full implementation of a RTSP server.
+Status: fenrir has some code
+
+Task
+Difficulty: Hard
+Urgency: Wishlist
+Platform: any
+Description: Picture filters
+picture per picture chained filter system that also works on output streams
+Status: Todo
+
+Task
+Difficulty: Guru
+Urgency: Wishlist
+Platform: any
+Description: Vout redesign
+- vout needs distinct splitting into vout_core, vout_window
+- needs 'assistence' vout windows (filters,goom etc)
+- 4:3, 16:9, freeform AR
+- cropping and padding
+Status: Todo
+
+Task
+Difficulty: Medium
+Urgency: Wishlist
+Platform: any
+Description: SPU redesign
+- multiple subpicture channels
+- centralized rendering and use of chroma filters
+- centralized scaling support
+(also look at ogt/cvd sub work)
+Status: Todo
+
+Task
+Difficulty: Guru
+Urgency: Wishlist
+Platform: Mac OS X
+Description: intf / vout dependency
+The application specific parts of the intf need to be brougth to the VLC application core. A valid NSApplication needs to be created on VLC opening, with the dock and menu hidden/disabled, only being generated on VLC intf loading.
+Status: Todo
+
+Task
+Difficulty: Guru
+Urgency: Wishlist
+Platform: Mac OS X
+Description: skins2
+Port VLC skins to Objective C++ and OSX. Also requires the intf to be a dialog handler. Is slighly dependant on intf/vout dependency todoitem
+Status: Todo
+
+Task
+Difficulty: Hard
+Urgency: Wishlist
+Platform: any
+Description: Equalizer
+Implement an equilizer for VLC.
+Status: Todo
+
+Task
+Difficulty: Hard
+Urgency: Wishlist
+Platform: any
+Description: informing user.
+Implement a system to
+ - Alert the user of critical errors (cannot play file)
+ - Ask the user a question (Are you sure? or Try to Fix index of avi? or Overwrite File?)
+ - Inform the user, without disturbing him. (Buffering stream)
+Status: Todo
+
+Task
+Difficulty: Guru
+Urgency: Normal
+Platform: Mac OS X
+Description: SVCD support
+libcdio needs to be ported to the Mac to support the cddax and vcdx modules for proper SVCD support
+Status: Todo
+
+Task
+Difficulty: Hard 
+Urgency: Wishlist
+Platform: Mac OS X
+Description: QuickTime capturing
+Allow capturing from QuickTime Firewire, USB and PCI devices.
+Possibly see: <a href="http://bugzilla.videolan.org/cgi-bin/bugzilla/show_bug.cgi?id=416">Bug 416</a>
+Status: Todo
+
+Task
+Difficulty: Medium
+Urgency: Normal
+Platform: Mac OS X
+Description: Finish Mac Mozilla plugin
+The Mac mozilla plugin needs some more work to be useable. Basic funtionality is working. However the video-output part needs some more work since it was crashing. See svn history for the old code. 
+Status: Halfway (stalled)
+
+Task
+Difficulty: Easy
+Urgency: Normal
+Platform: any
+Description: Controlling the mozilla plugin
+The mozilla plugin needs to be better controllable (via javascript). 
+- retrieve variable values.
+- open VLC media player
+- (look at fen-php?)
+Status: Todo
+
+Task
+Difficulty: Hard
+Urgency: Wishlist
+Platform: Windows
+Description: ActiveX control for VLC
+ We need an ActiveX version of VLC for IE intergration
+Status: Todo
+
+Task
+Difficulty: Easy
+Urgency: Wishlist
+Platform: any
+Description: export paramaters of an input
+ Export the info of a file/source to a standard xml file for use by other applications. Possibly combine with file "probe'ing".
+ - AR
+ - size
+ - resolution
+ - codecs, etc.
+Status: Todo
+
+Task
+Difficlty: Easy
+Urgency: Wishlist
+Platform: any
+Description: SSL http
+SSL encrypted HTTP communication. To support protected VoD.
+Status: Todo
+
+Task
+Difficlty: Hard
+Urgency: Wishlist
+Platform: any
+Description: http cookies
+For protected VoD  (http://a-select.surfnet.nl)
+Status: Todo
+
+Task
+Difficlty: Easy
+Urgency: Wishlist
+Platform: any
+Description: mime-type VLC launching
+Allow application/vlc mimetype to launch VLC instead of plugin for video file.
+Allows for Progressive download to TEMP folder from browsers. VLC would play the file in the TEMP.
+Status: Todo
+
+Task
+Difficlty: Hard
+Urgency: Wishlist
+Platform: any
+Description: rendezvous announces
+DMAP protocol announce for videos.
+Status: Todo
 
 # Do not remove me
 Task
