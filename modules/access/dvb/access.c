@@ -399,6 +399,7 @@ static int Open( vlc_object_t *p_this )
     if( input_InitStream( p_input, sizeof( stream_ts_data_t ) ) == -1 )
     {
         msg_Err( p_input, "could not initialize stream structure" );
+	E_(FrontendClose)( p_input );
         close( p_dvb->i_handle );
         free( p_dvb );
         return( -1 );
@@ -435,7 +436,7 @@ static void Close( vlc_object_t *p_this )
         E_(DMXUnsetFilter)( p_input, p_dvb->p_demux_handles[0].i_handle );
         p_dvb->p_demux_handles[0].i_type = 0;
     }
-
+    E_(DVRClose)( p_input );
     E_(FrontendClose)( p_input );
     free( p_dvb );
 }
