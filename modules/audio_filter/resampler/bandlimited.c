@@ -2,7 +2,7 @@
  * bandlimited.c : bandlimited interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: bandlimited.c,v 1.3 2003/03/04 22:08:33 gbazin Exp $
+ * $Id: bandlimited.c,v 1.4 2003/03/05 19:31:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -255,10 +255,10 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     d_scale_factor = SMALL_FILTER_SCALE * d_factor + 0.5;
 
     /* Apply the old rate until we have enough samples for the new one */
-    /* TODO: Check we have enough samples */
     i_in = p_filter->p_sys->i_old_wing;
     p_in += p_filter->p_sys->i_old_wing * i_nb_channels;
-    for( ; i_in < i_filter_wing; i_in++ )
+    for( ; i_in < i_filter_wing &&
+           (i_in + p_filter->p_sys->i_old_wing) < i_in_nb; i_in++ )
     {
         if( p_filter->p_sys->d_old_factor == 1 )
         {
@@ -299,6 +299,16 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     *(p_out+i) *= d_old_scale_factor;
                 }
 #endif
+
+                /* Sanity check */
+                if( p_out_buf->i_size/p_filter->input.i_bytes_per_frame
+                    <= (unsigned int)i_out+1 )
+                {
+                    p_out += i_nb_channels;
+                    i_out++;
+                    p_filter->p_sys->i_remainder += p_filter->input.i_rate;
+                    break;
+                }
             }
             else
             {
@@ -328,7 +338,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     /* Apply the new rate for the rest of the samples */
-    /* TODO: Check we have enough future samples for the new rate */
     if( i_in < i_in_nb - i_filter_wing )
     {
         p_filter->p_sys->i_old_rate   = p_filter->input.i_rate;
@@ -366,6 +375,15 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     *(p_out+i) *= d_old_scale_factor;
                 }
 #endif
+                /* Sanity check */
+                if( p_out_buf->i_size/p_filter->input.i_bytes_per_frame
+                    <= (unsigned int)i_out+1 )
+                {
+                    p_out += i_nb_channels;
+                    i_out++;
+                    p_filter->p_sys->i_remainder += p_filter->input.i_rate;
+                    break;
+                }
             }
             else
             {
