@@ -1,8 +1,8 @@
 /*****************************************************************************
  * caca.c: Color ASCII Art video output plugin using libcaca
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
- * $Id: caca.c,v 1.5 2004/01/04 04:50:24 sam Exp $
+ * Copyright (C) 2003, 2004 VideoLAN
+ * $Id: caca.c,v 1.6 2004/01/08 19:22:10 sam Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *
@@ -199,24 +199,21 @@ static int Manage( vout_thread_t *p_vout )
     int event;
     vlc_value_t val;
 
-    while(( event = caca_get_event() ))
+    while(( event = caca_get_event(CACA_EVENT_KEY_PRESS) ))
     {
-        if( event & CACA_EVENT_KEY_PRESS )
+        switch( event & 0x00ffffff )
         {
-            switch( event & 0xffff )
-            {
-            case 'q':
-                val.i_int = KEY_MODIFIER_CTRL | 'q';
-                break;
-            case ' ':
-                val.i_int = KEY_SPACE;
-                break;
-            default:
-                continue;
-            }
-
-            var_Set( p_vout->p_vlc, "key-pressed", val );
+        case 'q':
+            val.i_int = KEY_MODIFIER_CTRL | 'q';
+            break;
+        case ' ':
+            val.i_int = KEY_SPACE;
+            break;
+        default:
+            continue;
         }
+
+        var_Set( p_vout->p_vlc, "key-pressed", val );
     }
 
     return VLC_SUCCESS;
