@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.63 2003/08/19 21:20:00 zorglub Exp $
+dnl $Id: configure.ac,v 1.64 2003/08/21 16:59:35 hartman Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -2263,7 +2263,7 @@ AC_ARG_ENABLE(mga,
   [  --enable-mga            Linux kernel Matrox support (default disabled)],
   [ if test "${enable_mga}" = "yes"
     then
-      AX_ADD_PLUGINS([mga xmga])
+      AX_ADD_PLUGINS([mga])
     fi ])
 
 dnl
