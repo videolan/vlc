@@ -2,7 +2,7 @@
  * render.c : Philips OGT and CVD (VCD Subtitle) blending routines
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: render.c,v 1.17 2004/01/21 04:45:47 rocky Exp $
+ * $Id: render.c,v 1.18 2004/01/21 07:38:29 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -44,9 +44,9 @@
 #define MAX_ALPHA  ((1<<ALPHA_BITS) - 1) 
 #define ALPHA_SCALEDOWN (8-ALPHA_BITS)
 
-/* We use a somewhat artifical factor in scaling calculations so
-   that we can use integer arithmetic and still get somewhat precise
-   results. 
+/* We use a fixed-point arithmetic to scaling ratios so that we
+   can use integer arithmetic and still get fairly precise
+   results. ASCALE is a shift about or power of 2.
 */
 #define ASCALE 6
 
@@ -62,7 +62,7 @@ static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop );
 static void BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop );
-static void BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
+static void BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop );
 static void BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop );
@@ -101,8 +101,7 @@ void VCDSubBlend( vout_thread_t *p_vout, picture_t *p_pic,
 
         /* RV32 target, scaling */
         case VLC_FOURCC('R','V','2','4'):
-        case VLC_FOURCC('R','V','3','2'):
-            BlendRV32( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
+            BlendRV24( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
 	    break;
 
         /* NVidia overlay, no scaling */
@@ -117,7 +116,10 @@ void VCDSubBlend( vout_thread_t *p_vout, picture_t *p_pic,
         case VLC_FOURCC('R','G','B','2'):
             BlendRGB2( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
           
-          /*msg_Err( p_vout, "RGB2 not implemented yet" );*/
+	    break;
+
+        case VLC_FOURCC('R','V','3','2'):
+            msg_Err( p_vout, "RV32 not implemented yet" );
 	    break;
 
         default:
@@ -316,10 +318,6 @@ static void BlendI420( vout_thread_t *p_vout, picture_t *p_pic,
   spans the two pixels.
 */
 
-/* 
-   Should be same as p_pic->p_format.i_bits_per_pixel / 8. But since
-   we know it here, why try to compute it?
-*/
 #define BYTES_PER_PIXEL 4
 
 static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
@@ -563,15 +561,8 @@ yuv2rgb555(ogt_yuvt_t *p_yuv, uint8_t *p_rgb1, uint8_t *p_rgb2 )
          *p_rgb1, *p_rgb2);
 #endif
 
-#undef RED_PIXEL   
-#undef GREEN_PIXEL 
-#undef BLUE_PIXEL  
 }
 
-/* 
-   Should be same as p_pic->p_format.i_bits_per_pixel / 8. But since
-   we know it here, why try to compute it?
-*/
 #undef BYTES_PER_PIXEL
 #define BYTES_PER_PIXEL 2
 
@@ -803,15 +794,18 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
     }
 }
 
-/* 
-   Should be Same as p_pic->p_format.i_bits_per_pixel / 8. But since
-   we know it here, why try to compute it?
-*/
 #undef  BYTES_PER_PIXEL
-#define BYTES_PER_PIXEL 4
+#define BYTES_PER_PIXEL 3
 
+/* 
+  RV24 format: a pixel is represented by 3 bytes containing a red,
+  blue and green sample with blue stored at the lowest address, green
+  next then red. No padding bytes are added between pixels. Although
+  this may not be part of a spec, images should be stored with each
+  line padded to a u_int32 boundary. 
+*/
 static void 
-BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
+BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
             const subpicture_t *p_spu, vlc_bool_t b_crop )
 {
     /* Common variables */
@@ -823,11 +817,16 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
     int i_x, i_y;
     int i_y_src;
 
+    /* Make sure we start on a word (4-byte) boundary. */
+    uint32_t i_spu_x;
+
+
+
     /* RGB-specific */
-    int i_xscale, i_yscale, i_width, i_height, i_ytmp, i_ynext;
+    int32_t i_xscale, i_yscale, i_width, i_height, i_ytmp, i_ynext;
 
     /* Crop-specific */
-    int i_x_start, i_y_start, i_x_end, i_y_end;
+    int32_t i_x_start, i_y_start, i_x_end, i_y_end;
 
     struct subpicture_sys_t *p_sys = p_spu->p_sys;
 
@@ -846,10 +845,14 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
     i_height = p_spu->i_height * i_yscale;
 
     /* Set where we will start blending subtitle from using
-       the picture coordinates subtitle offsets
+       the picture coordinates subtitle offsets.
+
+       i_spu_x needs to be word (16-bit) aligned.
     */
-    p_pixel_base = p_pic->p->p_pixels 
-              + ( (p_spu->i_x * i_xscale) >> ASCALE ) * BYTES_PER_PIXEL
+    i_spu_x = (( ((p_spu->i_x * i_xscale) >> ASCALE) * BYTES_PER_PIXEL ) 
+               & 0xfffc );
+
+    p_pixel_base = p_pic->p->p_pixels + i_spu_x
               + ( (p_spu->i_y * i_yscale) >> ASCALE ) * p_pic->p->i_pitch;
 
     i_x_start = p_sys->i_x_start;
@@ -885,12 +888,6 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
           for( ; i_x < p_spu->i_width;  i_x++, p_source++ )
             {
 
-#if 0              
-              uint8_t *p=(uint8_t *) p_source;
-              printf("+++ %02x %02x %02x %02x\n", 
-                     p[0], p[1], p[2], p[3]);
-#endif
-    
               if( b_crop ) {
                 
                 /* FIXME: y cropping should be dealt with outside of this 
@@ -924,14 +921,33 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
 		
 		    /* This is the location that's going to get changed.
 		     */
-		    uint8_t *p_dest = p_pixel_base_y 
-                      + ((i_x * i_xscale ) >> ASCALE) * BYTES_PER_PIXEL;
+                    uint16_t i_dest_x = 
+                      ((i_x * i_xscale ) >> ASCALE)  * BYTES_PER_PIXEL;
+		    uint8_t *p_dest = p_pixel_base_y + i_dest_x;
                     uint8_t rgb[4];
 
                     yuv2rgb(p_source, rgb);
-                    *p_dest++ = rgb[2];
-                    *p_dest++ = rgb[1];
-                    *p_dest++ = rgb[0];
+                    switch (i_dest_x % 4) {
+                    case 3:
+                      p_dest++;
+                      *p_dest++ = rgb[BLUE_PIXEL];
+                      *p_dest++ = rgb[GREEN_PIXEL];
+                      *p_dest++ = rgb[RED_PIXEL];
+                      break;
+                    case 2:
+                      p_dest+=2;
+                      *p_dest++ = rgb[BLUE_PIXEL];
+                      *p_dest++ = rgb[GREEN_PIXEL];
+                      *p_dest++ = rgb[RED_PIXEL];
+                      break;
+                    case 1:
+                      p_dest--;
+                    case 0:
+                      *p_dest++ = rgb[BLUE_PIXEL];
+                      *p_dest++ = rgb[GREEN_PIXEL];
+                      *p_dest++ = rgb[RED_PIXEL];
+                      break;
+                    default:  /* Can't happen */;
 		    break;
 		  }
 
@@ -955,9 +971,10 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
 		    break;
 		  }
 #endif /*TRANSPARENCY_FINISHED*/
+                  }
                 }
             }
-        }
+        } 
         else
         {
             i_ynext = p_pic->p->i_pitch * i_y >> ASCALE;
@@ -1000,16 +1017,45 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
 
 		    /* This is the location that's going to get changed.
 		     */
-		    uint8_t *p_pixel_base_x = p_pixel_base
-                      + ((i_x * i_xscale ) >> ASCALE) * BYTES_PER_PIXEL;
+		    uint8_t i_dest_x = ((i_x * i_xscale ) >> ASCALE) 
+                      * BYTES_PER_PIXEL;
                     uint8_t rgb[4];
+
                     yuv2rgb(p_source, rgb); 
 
                     for(  ; i_ytmp < i_ynext ; i_ytmp += p_pic->p->i_pitch )
                     {
-		      /* This is the location that's going to get changed.  */
-		      uint8_t *p_dest = p_pixel_base_x + i_ytmp;
-                      memcpy(p_dest, rgb, 4);
+                      /* Completely opaque. Completely overwrite underlying
+                         pixel with subtitle pixel. */
+                      
+                      /* This is the location that's going to get changed.
+                       */
+                      uint8_t *p_dest = p_pixel_base + i_ytmp + i_dest_x;
+                      uint8_t rgb[4];
+                      
+                      switch (i_dest_x % 4) {
+                      case 3:
+                        p_dest++;
+                        *p_dest++ = rgb[BLUE_PIXEL];
+                        *p_dest++ = rgb[GREEN_PIXEL];
+                        *p_dest++ = rgb[RED_PIXEL];
+                        break;
+                      case 2:
+                        p_dest+=2;
+                        *p_dest++ = rgb[BLUE_PIXEL];
+                        *p_dest++ = rgb[GREEN_PIXEL];
+                        *p_dest++ = rgb[RED_PIXEL];
+                        break;
+                      case 1:
+                        p_dest--;
+                      case 0:
+                        *p_dest++ = rgb[BLUE_PIXEL];
+                        *p_dest++ = rgb[GREEN_PIXEL];
+                        *p_dest++ = rgb[RED_PIXEL];
+                        break;
+                      default:  /* Can't happen */;
+                        break;
+                      }
                     }
                     break;
 		  }
@@ -1040,10 +1086,6 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
     }
 }
 
-/* 
-   Should be same as p_pic->p_format.i_bits_per_pixel / 8. But since
-   we know it here, why try to compute it?
-*/
 #undef  BYTES_PER_PIXEL
 #define BYTES_PER_PIXEL 1
 
