@@ -445,25 +445,89 @@ if test "x${ac_cv_c_inline_limit}" != "xno"; then
     OBJCFLAGS_save="${OBJCFLAGS_save} -finline-limit-30000"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
 
-dnl Check for -W or -w flags
-AC_CACHE_CHECK([if \$CC accepts -Wall -Winline],
-    [ac_cv_c_Wall_Winline],
-    [CFLAGS="-Wall -Winline ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Wall_Winline=yes, ac_cv_c_Wall_Winline=no)])
-if test "x${ac_cv_c_Wall_Winline}" != "xno"; then
-    CFLAGS_save="-Wall -Winline ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="-Wall ${CXXFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="-Wall -Winline ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
-else
-    AC_CACHE_CHECK([if \$CC accepts -wall -winline],
-        [ac_cv_c_wall_winline],
-        [CFLAGS="-wall -winline ${CFLAGS_save}"
-         AC_TRY_COMPILE([],,ac_cv_c_wall_winline=yes, ac_cv_c_wall_winline=no)])
-    if test "x${ac_cv_c_wall_winline}" != "xno"; then
-        CFLAGS_save="-wall -winline ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-        CXXFLAGS_save="-wall -winline ${CXXFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
-        OBJCFLAGS_save="-wall -winline ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
-    fi
+# XXX: do this with an M4 macro?
+#dnl Check for various -W flags
+#for flag in "" all unreachable-code conversion sign-compare disabled-optimization
+#do
+#    AC_CACHE_CHECK([if \$CC accepts -W${flag}],
+#        [ac_cv_c_W${flag}],
+#        [CFLAGS="-W${flag} ${CFLAGS_save}"
+#         AC_TRY_COMPILE([],,ac_cv_c_W${flag}=yes, ac_cv_c_W${flag}=no)])
+#    if test "x${ac_cv_c_W${flag}}" != "xno"; then
+#        CFLAGS_save="-W${flag} ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
+#        CXXFLAGS_save="-W${flag} ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
+#        OBJCFLAGS_save="-W${flag} ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
+#    fi
+#done
+
+AC_CACHE_CHECK([if \$CC accepts -W],
+    [ac_cv_c_W],
+    [CFLAGS="-W ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_W=yes, ac_cv_c_W=no)])
+if test "x${ac_cv_c_W}" != "xno"; then
+    CFLAGS_save="-W ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
+    CXXFLAGS_save="-W ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
+    OBJCFLAGS_save="-W ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
+fi
+
+AC_CACHE_CHECK([if \$CC accepts -Wall],
+    [ac_cv_c_Wall],
+    [CFLAGS="-Wall ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_Wall=yes, ac_cv_c_Wall=no)])
+if test "x${ac_cv_c_Wall}" != "xno"; then
+    CFLAGS_save="-Wall ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
+    CXXFLAGS_save="-Wall ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
+    OBJCFLAGS_save="-Wall ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
+fi
+
+AC_CACHE_CHECK([if \$CC accepts -Wunreachable-code],
+    [ac_cv_c_Wunreachable_code],
+    [CFLAGS="-Wunreachable-code ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_Wunreachable_code=yes, ac_cv_c_Wunreachable_code=no)])
+if test "x${ac_cv_c_Wunreachable_code}" != "xno"; then
+    CFLAGS_save="-Wunreachable-code ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
+    CXXFLAGS_save="-Wunreachable-code ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
+    OBJCFLAGS_save="-Wunreachable-code ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
+fi
+
+AC_CACHE_CHECK([if \$CC accepts -Wconversion],
+    [ac_cv_c_Wconversion],
+    [CFLAGS="-Wconversion ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_Wconversion=yes, ac_cv_c_Wconversion=no)])
+if test "x${ac_cv_c_Wconversion}" != "xno"; then
+    CFLAGS_save="-Wconversion ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
+    CXXFLAGS_save="-Wconversion ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
+    OBJCFLAGS_save="-Wconversion ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
+fi
+
+AC_CACHE_CHECK([if \$CC accepts -Wsign-compare],
+    [ac_cv_c_Wsign_compare],
+    [CFLAGS="-Wsign-compare ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_Wsign_compare=yes, ac_cv_c_Wsign_compare=no)])
+if test "x${ac_cv_c_Wsign_compare}" != "xno"; then
+    CFLAGS_save="-Wsign-compare ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
+    CXXFLAGS_save="-Wsign-compare ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
+    OBJCFLAGS_save="-Wsign-compare ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
+fi
+
+AC_CACHE_CHECK([if \$CC accepts -Wdisabled-optimization],
+    [ac_cv_c_Wdisabled_optimization],
+    [CFLAGS="-Wdisabled-optimization ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_Wdisabled_optimization=yes, ac_cv_c_Wdisabled_optimization=no)])
+if test "x${ac_cv_c_Wdisabled_optimization}" != "xno"; then
+    CFLAGS_save="-Wdisabled-optimization ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
+    CXXFLAGS_save="-Wdisabled-optimization ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
+    OBJCFLAGS_save="-Wdisabled-optimization ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
+fi
+
+dnl Check for the -Winline flag
+AC_CACHE_CHECK([if \$CC accepts -W -Winline],
+    [ac_cv_c_Winline],
+    [CFLAGS="-Winline ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_Winline=yes, ac_cv_c_Winline=no)])
+if test "x${ac_cv_c_Winline}" != "xno"; then
+    CFLAGS_save="-Winline ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
+    OBJCFLAGS_save="-Winline ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
 
 dnl Check for -pipe

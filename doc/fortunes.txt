@@ -378,3 +378,18 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<JMunakra> nah you have zip with password protection
+<jlj> that's not classified as DRM
+<JMunakra> where does DRM start?
+<Meuuh> I don't know, but I know where it ends : at my doorstep
+
+  -- #videolan
+%
+<hal_3k> jlj: what did you do?
+<jlj> I was like watching a few of my DVDs using unauthorized software under
+      the evil GNU/Linux operating system, and then my computer was, like,
+      beep beep beep beep beep beep beep, and then, like, all my computers
+      were confiscated, and I was like, nnnn? ... It's kind of ... a bummer.
+
+  -- #videolan
+%
