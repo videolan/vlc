@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.24 2001/04/12 01:52:45 sam Exp $
+ * $Id: netutils.c,v 1.25 2001/04/17 20:43:41 marcari Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -220,122 +220,122 @@ int network_ChannelCreate( void )
  *****************************************************************************/
 int network_ChannelJoin( int i_channel_id )
 {
-    intf_ErrMsg("Changing to channel %d",i_channel_id);
-    return(0);
-/* Courtesy of Nitrox. He'll update it soon */
-#if 0
-/* I still prefer to put BeOS a bit apart */    
+/* I still prefer to put BeOS a bit apart */   
 #ifdef SYS_BEOS
-    intf_ErrMsg( "Channels are not yet supported uunder BeOS" );
+    intf_ErrMsg( "Channels are not yet supported under BeOS" );
     return( -1 );
 #else
 #ifdef SYS_LINUX    
-    int                 socket_cl;
-    int                 fromlen;
-    struct ifreq        interface;
+    int                 i_socket_cl;
+    int                 i_fromlen;
+    struct ifreq        s_interface;
     struct sockaddr_in  sa_server;
     struct sockaddr_in  sa_client;
-    unsigned int        version = 12;
-    char                mess[80];
-    char                mess_length = 80;
-    struct timeval     *date_cl;
-    struct timeval      time;
-    long unsigned int   date;
-    int                 nbanswer;
-    char                answer;
-    fd_set              rfds;
-    unsigned int 	rc;
-/* debug */ intf_ErrMsg("ChannelJoin : %d",i_channel_id);
+    unsigned int        i_version = 12;
+    char                psz_mess[80];
+    char                i_mess_length = 80;
+    struct timeval *    p_date_cl;
+    struct timeval      s_time;
+    long unsigned int   i_date;
+    int                 i_nbanswer;
+    char                i_answer;
+    fd_set              s_rfds;
+    unsigned int 	i_rc;
+    
+    /* debug */ 
+    intf_DbgMsg( "ChannelJoin : %d", i_channel_id );
     /* If last change is too recent, wait a while */
     if( mdate() - p_main->p_channel->last_change < INPUT_CHANNEL_CHANGE_DELAY )
     {
-        intf_Msg("Waiting before changing channel...\n");
+        intf_Msg( "Waiting before changing channel...\n" );
         mwait( p_main->p_channel->last_change + INPUT_CHANNEL_CHANGE_DELAY );
     }
     p_main->p_channel->last_change = mdate();
     p_main->p_channel->i_channel_id = i_channel_id;
 
-    intf_Msg("Joining channel %d\n", i_channel_id );
+    intf_Msg( "Joining channel %d\n", i_channel_id );
 
     /*      
      * Looking for information about the eth0 interface
      */
-    interface.ifr_addr.sa_family=AF_INET;
-    strcpy(interface.ifr_name,INPUT_IFACE_DEFAULT);
+    s_interface.ifr_addr.sa_family = AF_INET;
+    strcpy( s_interface.ifr_name, INPUT_IFACE_DEFAULT );
     
     
     /*
      * Initialysing the socket
      */
-    socket_cl=socket(AF_INET,SOCK_DGRAM,0);
+    i_socket_cl=socket( AF_INET, SOCK_DGRAM, 0 );
 
     
     /* 
      * Getting the server's information 
      */
-    bzero(&sa_server,sizeof(struct sockaddr_in));
-    sa_server.sin_family=AF_INET;
-    sa_server.sin_port=htons(INPUT_CHANNEL_PORT_DEFAULT);
-    inet_aton(INPUT_CHANNEL_SERVER_DEFAULT,&(sa_server.sin_addr));
-    
+    bzero( &sa_server, sizeof(struct sockaddr_in) );
+    sa_server.sin_family = AF_INET;
+    sa_server.sin_port   = htons( INPUT_CHANNEL_PORT_DEFAULT );
+    inet_aton( INPUT_CHANNEL_SERVER_DEFAULT, &(sa_server.sin_addr) );
+
     /*
      * Looking for the interface MAC address
      */
-    ioctl(socket_cl,SIOCGIFHWADDR,&interface);
+    ioctl( i_socket_cl, SIOCGIFHWADDR, &s_interface );
     intf_DbgMsg(
         "CHANNELSERVER: macaddr == %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x\n",
-        interface.ifr_hwaddr.sa_data[0] & 0xff,
-        interface.ifr_hwaddr.sa_data[1] & 0xff,
-        interface.ifr_hwaddr.sa_data[2] & 0xff,
-        interface.ifr_hwaddr.sa_data[3] & 0xff,
-        interface.ifr_hwaddr.sa_data[4] & 0xff,
-        interface.ifr_hwaddr.sa_data[5] & 0xff);
+        s_interface.ifr_hwaddr.sa_data[0] & 0xff,
+        s_interface.ifr_hwaddr.sa_data[1] & 0xff,
+        s_interface.ifr_hwaddr.sa_data[2] & 0xff,
+        s_interface.ifr_hwaddr.sa_data[3] & 0xff,
+        s_interface.ifr_hwaddr.sa_data[4] & 0xff,
+        s_interface.ifr_hwaddr.sa_data[5] & 0xff );
     
     /*
      * Getting date of the client
      */
-    date_cl=malloc(sizeof(struct timeval));
-    if(date_cl==NULL)
+    p_date_cl=malloc( sizeof(struct timeval) );
+    if( p_date_cl == NULL )
     {
-        intf_ErrMsg("CHANNELSERVER: unable to allocate memory\n");
+        intf_ErrMsg( "CHANNELSERVER: unable to allocate memory\n" );
     /*    return VS_R_MEMORY;*/
-        return -1;
+        return( -1);
     }
     
-    if (gettimeofday(date_cl,0)==-1)
-        return -1;
-    date=date_cl->tv_sec;
-    free(date_cl);
-    intf_DbgMsg("CHANNELSERVER: date %lu\n",date);
+    if ( gettimeofday( p_date_cl, 0 ) == -1 )
+    {
+        return( -1);
+    }
+    i_date = p_date_cl->tv_sec;
+    free( p_date_cl );
+    intf_DbgMsg( "CHANNELSERVER: date %lu\n", i_date );
 
 
     /* 
      * Build of the message
      */
-    sprintf(mess,"%d %u %lu %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x \n",
-          i_channel_id, version, date,
-        interface.ifr_hwaddr.sa_data[0] & 0xff, 
-        interface.ifr_hwaddr.sa_data[1] & 0xff,
-        interface.ifr_hwaddr.sa_data[2] & 0xff,
-        interface.ifr_hwaddr.sa_data[3] & 0xff,
-        interface.ifr_hwaddr.sa_data[4] & 0xff,
-        interface.ifr_hwaddr.sa_data[5] & 0xff);
+    sprintf( psz_mess, "%d %u %lu %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x \n",
+          i_channel_id, i_version, i_date,
+        s_interface.ifr_hwaddr.sa_data[0] & 0xff, 
+        s_interface.ifr_hwaddr.sa_data[1] & 0xff,
+        s_interface.ifr_hwaddr.sa_data[2] & 0xff,
+        s_interface.ifr_hwaddr.sa_data[3] & 0xff,
+        s_interface.ifr_hwaddr.sa_data[4] & 0xff,
+        s_interface.ifr_hwaddr.sa_data[5] & 0xff );
  
-    intf_DbgMsg("CHANNELSERVER: The message is %s\n",mess);
-
+    intf_DbgMsg( "CHANNELSERVER: The message is %s\n", psz_mess );
 
     /*
      * Open the socket 2
      */
-    bzero(&sa_client,sizeof(struct sockaddr_in));
-    sa_client.sin_family=AF_INET;
-    sa_client.sin_port=htons(4312);
-    sa_client.sin_addr.s_addr=INADDR_ANY;
-    fromlen=sizeof(struct sockaddr);
-    rc=bind(socket_cl,(struct sockaddr *)(&sa_client),sizeof(struct sockaddr));
-    if (rc)
+    bzero( &sa_client, sizeof(struct sockaddr_in) );
+    sa_client.sin_family = AF_INET;
+    sa_client.sin_port   = htons(4312);
+    sa_client.sin_addr.s_addr = INADDR_ANY;
+    i_fromlen = sizeof( struct sockaddr );
+    i_rc = bind( i_socket_cl, (struct sockaddr *)(&sa_client),\
+                 sizeof(struct sockaddr) );
+    if ( i_rc )
     {
-        intf_ErrMsg("CHANNELSERVER: Unable to bind socket:%u\n",rc); 
+        intf_ErrMsg( "CHANNELSERVER: Unable to bind socket:%u\n", i_rc ); 
     /* TODO put CS_R_BIND in types.h*/
     /*    return CS_R_SOCKET;*/
         return -1;
@@ -345,47 +345,56 @@ int network_ChannelJoin( int i_channel_id )
     /*
      * Send the message
      */
-    sendto(socket_cl,mess,mess_length,0,(struct sockaddr *)(&sa_server),\
-           sizeof(struct sockaddr));
+    sendto( i_socket_cl, psz_mess, i_mess_length, 0, \
+            (struct sockaddr *)(&sa_server),   \
+            sizeof(struct sockaddr) );
    
      /*
      * Waiting 5 sec for one answer from the server
      */
-    time.tv_sec=5;
-    time.tv_usec=0;
-    FD_ZERO(&rfds);
-    FD_SET(socket_cl,&rfds);
-    nbanswer=select(socket_cl+1,&rfds,NULL,NULL,&time);
-    if(nbanswer==0)
-        intf_DbgMsg("CHANNELSERVER: no answer\n");
-    else if(nbanswer==-1)
-        intf_DbgMsg("CHANNELSERVER: Unable to receive the answer\n");
+    s_time.tv_sec  = 5;
+    s_time.tv_usec = 0;
+    FD_ZERO( &s_rfds );
+    FD_SET( i_socket_cl, &s_rfds );
+    i_nbanswer = select( i_socket_cl+1, &s_rfds, NULL, NULL, &s_time );
+    if( i_nbanswer == 0 )
+    {
+        intf_DbgMsg( "CHANNELSERVER: no answer\n" );
+    }
+    else if( i_nbanswer == -1 )
+    {
+        intf_DbgMsg( "CHANNELSERVER: Unable to receive the answer\n ");
+    }
     else
     {
-        recvfrom(socket_cl,&answer,sizeof(char),0,\
-                 (struct sockaddr *)(&sa_client),&fromlen);
-        intf_DbgMsg("CHANNELSERVER: the answer : %hhd\n",answer);
-        if(answer==-1)
+        recvfrom( i_socket_cl, &i_answer, sizeof(char), 0,\
+                  (struct sockaddr *)(&sa_client), &i_fromlen);
+        intf_DbgMsg( "CHANNELSERVER: the answer : %hhd\n", i_answer );
+        if( i_answer == -1 )
+        {
             intf_DbgMsg(
-                    "CHANNELSERVER: The server failed to create the thread\n");
-        else if(answer==0)
+                  "CHANNELSERVER: The server failed to create the thread\n" );
+        }
+        else if( i_answer == 0 )
+        {
             intf_DbgMsg(
-                    "CHANNELSERVER: The server tries to change the channel\n");
+                  "CHANNELSERVER: The server tries to change the channel\n" );
+        }
         else
-            intf_DbgMsg("CHANNELSERVER: Unknown answer !\n");
+        {
+            intf_DbgMsg( "CHANNELSERVER: Unknown answer !\n" );
+        }
     }
     
     /*
      * Close the socket
      */
-    close(socket_cl);
+    close( i_socket_cl );
 
-    return 0;
+    return( 0 );
 #else /* SYS_LINUX */
     intf_ErrMsg( "Channel only work under linux yet" );
 #endif /* SYS_LINUX */    
-    
-}
+
 #endif /* SYS_BEOS */
-#endif /* if 0 */
 }
