@@ -2,7 +2,7 @@
  * i420_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.c,v 1.6 2002/04/23 13:47:30 sam Exp $
+ * $Id: i420_yuy2.c,v 1.7 2002/05/21 03:37:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -179,6 +179,11 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
+    const int i_source_margin = p_source->p->b_margin ?
+        p_source->p->i_pitch - p_source->p->i_visible_bytes : 0;
+    const int i_dest_margin = p_dest->p->b_margin ?
+        p_dest->p->i_pitch - p_dest->p->i_visible_bytes : 0;
+
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
         p_line1 = p_line2;
@@ -198,6 +203,11 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
             MMX_CALL( MMX_YUV420_YUYV );
 #endif
         }
+
+        p_y1 += i_source_margin;
+        p_y2 += i_source_margin;
+        p_line1 += i_dest_margin;
+        p_line2 += i_dest_margin;
     }
 }
 
@@ -213,6 +223,11 @@ static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
     u8 *p_v = p_source->V_PIXELS;
 
     int i_x, i_y;
+
+    const int i_source_margin = p_source->p->b_margin ?
+        p_source->p->i_pitch - p_source->p->i_visible_bytes : 0;
+    const int i_dest_margin = p_dest->p->b_margin ?
+        p_dest->p->i_pitch - p_dest->p->i_visible_bytes : 0;
 
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
@@ -233,6 +248,11 @@ static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
             MMX_CALL( MMX_YUV420_YVYU );
 #endif
         }
+
+        p_y1 += i_source_margin;
+        p_y2 += i_source_margin;
+        p_line1 += i_dest_margin;
+        p_line2 += i_dest_margin;
     }
 }
 
@@ -248,6 +268,11 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
     u8 *p_v = p_source->V_PIXELS;
 
     int i_x, i_y;
+
+    const int i_source_margin = p_source->p->b_margin ?
+        p_source->p->i_pitch - p_source->p->i_visible_bytes : 0;
+    const int i_dest_margin = p_dest->p->b_margin ?
+        p_dest->p->i_pitch - p_dest->p->i_visible_bytes : 0;
 
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
@@ -268,6 +293,11 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
             MMX_CALL( MMX_YUV420_UYVY );
 #endif
         }
+
+        p_y1 += i_source_margin;
+        p_y2 += i_source_margin;
+        p_line1 += i_dest_margin;
+        p_line2 += i_dest_margin;
     }
 }
 
@@ -297,6 +327,11 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
+    const int i_source_margin = p_source->p->b_margin ?
+        p_source->p->i_pitch - p_source->p->i_visible_bytes : 0;
+    const int i_dest_margin = p_dest->p->b_margin ?
+        p_dest->p->i_pitch - p_dest->p->i_visible_bytes : 0;
+
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
         p_line1 -= 3 * p_dest->p->i_pitch;
@@ -316,6 +351,11 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
             MMX_CALL( MMX_YUV420_UYVY );
 #endif
         }
+
+        p_y1 += i_source_margin;
+        p_y2 += i_source_margin;
+        p_line1 += i_dest_margin;
+        p_line2 += i_dest_margin;
     }
 }
 
@@ -333,6 +373,11 @@ static void I420_Y211( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
+    const int i_source_margin = p_source->p->b_margin ?
+        p_source->p->i_pitch - p_source->p->i_visible_bytes : 0;
+    const int i_dest_margin = p_dest->p->b_margin ?
+        p_dest->p->i_pitch - p_dest->p->i_visible_bytes : 0;
+
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
         p_line1 = p_line2;
@@ -346,6 +391,11 @@ static void I420_Y211( vout_thread_t *p_vout, picture_t *p_source,
             C_YUV420_Y211( );
             C_YUV420_Y211( );
         }
+
+        p_y1 += i_source_margin;
+        p_y2 += i_source_margin;
+        p_line1 += i_dest_margin;
+        p_line2 += i_dest_margin;
     }
 }
 #endif
