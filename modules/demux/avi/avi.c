@@ -434,6 +434,8 @@ static int Open( vlc_object_t * p_this )
                 fmt.video.i_width  = p_vids->p_bih->biWidth;
                 fmt.video.i_height = p_vids->p_bih->biHeight;
                 fmt.video.i_bits_per_pixel = p_vids->p_bih->biBitCount;
+	        fmt.video.i_frame_rate = tk->i_rate;
+	        fmt.video.i_frame_rate_base = tk->i_scale;
                 fmt.i_extra =
                     __MIN( p_vids->p_bih->biSize - sizeof( BITMAPINFOHEADER ),
                            p_vids->i_chunk_size - sizeof(BITMAPINFOHEADER) );

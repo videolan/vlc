@@ -1424,6 +1424,12 @@ static void EsOutAddInfo( es_out_t *out, es_out_id_t *es )
                            _("Display resolution"), "%dx%d",
                            fmt->video.i_visible_width,
                            fmt->video.i_visible_height);
+       if( fmt->video.i_frame_rate > 0 &&
+	   fmt->video.i_frame_rate_base > 0 )
+	   input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+			  _("Frame rate"), "%f",
+			  (float)fmt->video.i_frame_rate / 
+			  fmt->video.i_frame_rate_base );
         break;
 
     case SPU_ES:
