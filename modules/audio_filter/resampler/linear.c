@@ -2,7 +2,7 @@
  * ugly.c : linear interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: linear.c,v 1.2 2002/11/10 13:24:35 sigmunau Exp $
+ * $Id: linear.c,v 1.3 2002/11/11 19:16:21 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -45,7 +45,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("audio filter for linear interpolation resampling") );
-    set_capability( "audio filter", 10 );
+    set_capability( "audio filter", 0 );
     set_callbacks( Create, NULL );
 vlc_module_end();
 
