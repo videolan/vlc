@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.94 2003/09/19 23:03:27 hartman Exp $
+ * $Id: intf.m,v 1.95 2003/09/20 13:46:00 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -483,11 +483,38 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
         if( p_playlist != NULL )
         {
             var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
-            vlc_mutex_lock( &p_playlist->object_lock );
+#define p_input p_playlist->p_input
+        
+            if( p_input )
+            {
+                if( !p_input->b_die )
+                {
+                    vlc_value_t val;
+
+                    /* New input or stream map change */
+                    if( p_input->stream.b_changed )
+                    {
+                        msg_Dbg( p_intf, "stream has changed, refreshing interface" );
+                        p_intf->p_sys->b_playing = TRUE;
+                        p_intf->p_sys->b_current_title_update = 1;
+                        p_input->stream.b_changed = 0;
+                        p_intf->p_sys->b_intf_update = TRUE;
+                    }
+
+                    if( var_Get( (vlc_object_t *)p_input, "intf-change", &val )
+                        >= 0 && val.b_bool )
+                    {
+                        p_intf->p_sys->b_input_update = TRUE;
+                    }
+                }
+            }
+            else if( p_intf->p_sys->b_playing && !p_intf->b_die )
+            {
+                p_intf->p_sys->b_playing = FALSE;
+                p_intf->p_sys->b_intf_update = TRUE;
+            }
             
-            [self manage: p_playlist];
-            
-            vlc_mutex_unlock( &p_playlist->object_lock );
+#undef p_input
             vlc_object_release( p_playlist );
         }
 
@@ -498,61 +525,7 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     }
 
     [self terminate];
-
     [o_pool release];
-}
-
-- (void)manage:(playlist_t *)p_playlist
-{
-    intf_thread_t * p_intf = [NSApp getIntf];
-
-#define p_input p_playlist->p_input
-
-    if( p_input )
-    {
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-
-        if( !p_input->b_die )
-        {
-            /* New input or stream map change */
-            if( p_input->stream.b_changed )
-            {
-                p_intf->p_sys->b_playing = TRUE;
-                [self manageMode: p_playlist];
-            }
-
-            vlc_value_t val;
-
-            if( var_Get( (vlc_object_t *)p_input, "intf-change", &val )
-                >= 0 && val.b_bool )
-            {
-                p_intf->p_sys->b_input_update = TRUE;
-            }
-        }
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-    }
-    else if( p_intf->p_sys->b_playing && !p_intf->b_die )
-    {
-        p_intf->p_sys->b_playing = FALSE;
-        [self manageMode: p_playlist];
-    }
-
-#undef p_input
-}
-
-- (void)manageMode:(playlist_t *)p_playlist
-{
-    intf_thread_t * p_intf = [NSApp getIntf];
-
-    if( p_playlist->p_input != NULL )
-    {
-        p_intf->p_sys->b_current_title_update = 1;
-        p_playlist->p_input->stream.b_changed = 0;
-        
-        msg_Dbg( p_intf, "stream has changed, refreshing interface" );
-    }
-
-    p_intf->p_sys->b_intf_update = VLC_TRUE;
 }
 
 - (void)manageIntf:(NSTimer *)o_timer
@@ -614,6 +587,7 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
         vlc_bool_t b_control = VLC_FALSE;
         vlc_bool_t b_seekable = VLC_FALSE;
         vlc_bool_t b_chapters = VLC_FALSE;
+        vlc_value_t val;
 
         b_plmul = p_playlist->i_size > 1;
 
@@ -629,12 +603,12 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
             /* chapters & titles */
             b_chapters = p_input->stream.i_area_nb > 1; 
+ 
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
 
             /* play status */
-            p_intf->p_sys->b_play_status = 
-                p_input->stream.control.i_status != PAUSE_S;
-            
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            var_Get( p_input, "state", &val );
+            p_intf->p_sys->b_play_status = val.i_int != PAUSE_S;
         }
         else
         {
@@ -659,16 +633,16 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
         p_intf->p_sys->b_intf_update = VLC_FALSE;
     }
-    
-#define p_area p_input->stream.p_selected_area
 
     if( p_intf->p_sys->b_playing && p_input != NULL )
     {
-        vlc_bool_t b_field_update = TRUE;
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        
+        vlc_value_t time, val;
+        NSString * o_time;
+        mtime_t i_seconds;
+        var_Get( p_input, "state", &val );
+
         if( !p_input->b_die && ( p_intf->p_sys->b_play_status !=
-            ( p_input->stream.control.i_status != PAUSE_S ) ) ) 
+            ( val.i_int != PAUSE_S ) ) ) 
         {
             p_intf->p_sys->b_play_status =
                 !p_intf->p_sys->b_play_status;
@@ -678,56 +652,29 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
         if( p_input->stream.b_seekable )
         {
-            if( f_slider == f_slider_old )
+            vlc_value_t pos;
+            float f_updated;
+            
+            var_Get( p_input, "position", &pos );
+            f_updated = 10000. * pos.f_float;
+
+            if( f_slider != f_updated )
             {
-                float f_updated = ( 10000. * p_area->i_tell ) /
-                                           p_area->i_size;
-
-                if( f_slider != f_updated )
-                {
-                    [o_timeslider setFloatValue: f_updated];
-                }
-            }
-            else
-            {
-                off_t i_seek = ( f_slider * p_area->i_size ) / 10000;
-
-                /* release the lock to be able to seek */
-                vlc_mutex_unlock( &p_input->stream.stream_lock );
-                vlc_mutex_unlock( &p_playlist->object_lock );
-                playlist_Play( p_playlist );
-                input_Seek( p_input, i_seek, INPUT_SEEK_SET );
-                vlc_mutex_lock( &p_playlist->object_lock );
-                vlc_mutex_lock( &p_input->stream.stream_lock );
-
-                /* update the old value */
-                f_slider_old = f_slider; 
-
-                b_field_update = VLC_FALSE;
+                [o_timeslider setFloatValue: f_updated];
             }
         }
-
-        if( b_field_update )
-        {
-            NSString * o_time;
-            char psz_time[ OFFSETTOTIME_MAX_SIZE ];
-
-            input_OffsetToTime( p_input, psz_time, p_area->i_tell );
-
-            o_time = [NSString stringWithUTF8String: psz_time];
-            [o_timefield setStringValue: o_time];
-        }
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
+            
+        var_Get( p_input, "time", &time );
+        i_seconds = time.i_time / 1000000;
+        
+        o_time = [NSString stringWithFormat: @"%d:%02d:%02d",
+                        (int) (i_seconds / (60 * 60)),
+                        (int) (i_seconds / 60 % 60),
+                        (int) (i_seconds % 60)];
+        [o_timefield setStringValue: o_time];
 
         /* disable screen saver */
         UpdateSystemActivity( UsrActivity );
-    }
-
-#undef p_area
-
-    if( p_input != NULL )
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
 
 #undef p_input
@@ -928,15 +875,14 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
 - (IBAction)timesliderUpdate:(id)sender
 {
+    intf_thread_t * p_intf;
+    input_thread_t * p_input;
     float f_updated;
 
     switch( [[NSApp currentEvent] type] )
     {
         case NSLeftMouseUp:
         case NSLeftMouseDown:
-            f_slider = [sender floatValue];
-            return;
-
         case NSLeftMouseDragged:
             f_updated = [sender floatValue];
             break;
@@ -945,43 +891,42 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
             return;
     }
 
-    intf_thread_t * p_intf = [NSApp getIntf];
+    p_intf = [NSApp getIntf];
+    p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                            FIND_ANYWHERE );
 
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-
-    if( p_playlist == NULL )
+    if( p_input != NULL )
     {
-        return;
-    }
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-
-    if( p_playlist->p_input != NULL )
-    {
-        off_t i_tell;
+        vlc_value_t time;
+        mtime_t i_seconds;
         NSString * o_time;
-        char psz_time[ OFFSETTOTIME_MAX_SIZE ];
 
-#define p_area p_playlist->p_input->stream.p_selected_area
-        vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
-        i_tell = f_updated / 10000. * p_area->i_size;
-        input_OffsetToTime( p_playlist->p_input, psz_time, i_tell );
-        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-#undef p_area
-
-        o_time = [NSString stringWithUTF8String: psz_time];
-        [o_timefield setStringValue: o_time]; 
+        if( p_input->stream.b_seekable )
+        {
+                vlc_value_t pos;
+                pos.f_float = f_updated / 10000.;
+                if( f_slider != f_updated )
+                {
+                    var_Set( p_input, "position", pos );
+                    [o_timeslider setFloatValue: f_updated];
+                }
+        }
+            
+        var_Get( p_input, "time", &time );
+        i_seconds = time.i_time / 1000000;
+        
+        o_time = [NSString stringWithFormat: @"%d:%02d:%02d",
+                        (int) (i_seconds / (60 * 60)),
+                        (int) (i_seconds / 60 % 60),
+                        (int) (i_seconds % 60)];
+        [o_timefield setStringValue: o_time];
+        vlc_object_release( p_input );
     }
-
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    vlc_object_release( p_playlist );
 }
 
 - (void)terminate
 {
     NSEvent * o_event;
-    vout_thread_t * p_vout;
     playlist_t * p_playlist;
     intf_thread_t * p_intf = [NSApp getIntf];
 
@@ -995,18 +940,6 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
         vlc_object_detach( p_playlist );
         vlc_object_release( p_playlist );
         playlist_Destroy( p_playlist );
-    }
-
-    /*
-     * Free video outputs
-     */
-    msg_Dbg( p_intf, "removing all video outputs" );
-    while( (p_vout = vlc_object_find( p_intf->p_vlc, 
-                                      VLC_OBJECT_VOUT, FIND_CHILD )) )
-    {
-        vlc_object_detach( p_vout );
-        vlc_object_release( p_vout );
-        vout_Destroy( p_vout );
     }
 
     if( o_img_pause != nil )

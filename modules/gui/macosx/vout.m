@@ -3,7 +3,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.55 2003/08/25 14:51:47 garf Exp $
+ * $Id: vout.m,v 1.56 2003/09/20 13:46:00 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -427,20 +427,15 @@ static int vout_Manage( vout_thread_t *p_vout )
         else if ( !p_vout->p_sys->b_mouse_pointer_visible )
         {
             vlc_bool_t b_playing = NO;
-            playlist_t * p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
+            input_thread_t * p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT,
                                                                     FIND_ANYWHERE );
 
-            if ( p_playlist != nil )
+            if ( p_input != NULL )
             {
-                vlc_mutex_lock( &p_playlist->object_lock );
-                if( p_playlist->p_input != NULL )
-                {
-                    vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
-                    b_playing = p_playlist->p_input->stream.control.i_status != PAUSE_S;
-                    vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-                }
-                vlc_mutex_unlock( &p_playlist->object_lock );
-                vlc_object_release( p_playlist );
+                vlc_value_t state;
+                var_Get( p_input, "state", &state );
+                b_playing = state.i_int != PAUSE_S;
+                vlc_object_release( p_input );
             }
             if ( !b_playing )
             {
@@ -985,6 +980,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void)keyDown:(NSEvent *)o_event
 {
+    playlist_t * p_playlist;
     unichar key = 0;
     vlc_value_t val;
 
@@ -1011,7 +1007,13 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
             break;
 
         case ' ':
-            input_SetStatus( p_vout, INPUT_STATUS_PAUSE );
+            p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
+                                                    FIND_ANYWHERE );
+            if ( p_playlist != NULL )
+            {
+                playlist_Pause( p_playlist );
+                vlc_object_release( p_playlist);
+            }
             break;
 
         case (unichar)0xf700: /* arrow up */

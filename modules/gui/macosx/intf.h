@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.43 2003/09/19 23:03:27 hartman Exp $
+ * $Id: intf.h,v 1.44 2003/09/20 13:46:00 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -225,8 +225,6 @@ struct intf_sys_t
 - (void)terminate;
 
 - (void)manage;
-- (void)manage:(playlist_t *)p_playlist;
-- (void)manageMode:(playlist_t *)p_playlist;
 - (void)manageIntf:(NSTimer *)o_timer;
 - (void)setupMenus;
 

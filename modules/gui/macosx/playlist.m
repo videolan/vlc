@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.31 2003/09/19 23:03:27 hartman Exp $
+ * $Id: playlist.m,v 1.32 2003/09/20 13:46:00 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -32,6 +32,7 @@
 
 #include "intf.h"
 #include "playlist.h"
+#include "controls.h"
 
 int MacVersion102 = -1;
 
@@ -80,12 +81,7 @@ int MacVersion102 = -1;
     switch( key )
     {
         case ' ':
-            vlc_mutex_lock( &p_playlist->object_lock );
-            if( p_playlist->p_input != NULL )
-            {
-                input_SetStatus( p_playlist->p_input, INPUT_STATUS_PAUSE );
-            }
-            vlc_mutex_unlock( &p_playlist->object_lock );
+            [(VLCControls *)[[NSApp delegate] getControls] play: nil];
             break;
 
         case NSDeleteCharacter:
@@ -231,14 +227,11 @@ int MacVersion102 = -1;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
 
-    if( p_playlist == NULL )
+    if( p_playlist != NULL )
     {
-        return;
+        playlist_Goto( p_playlist, [o_table_view selectedRow] );
+        vlc_object_release( p_playlist );
     }
-
-    playlist_Goto( p_playlist, [o_table_view selectedRow] );
-
-    vlc_object_release( p_playlist );
 }
 
 - (IBAction)deleteItems:(id)sender
@@ -257,7 +250,7 @@ int MacVersion102 = -1;
     }
     
     o_to_delete = [NSMutableArray arrayWithArray:[[o_table_view selectedRowEnumerator] allObjects]];
-    c = [o_to_delete count];
+    c = (int)[o_to_delete count];
     
     for( i = 0; i < c; i++ ) {
         o_number = [o_to_delete lastObject];

@@ -2,7 +2,7 @@
  * info.m: MacOS X info panel
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: info.m,v 1.6 2003/05/25 17:27:13 massiot Exp $
+ * $Id: info.m,v 1.7 2003/09/20 13:46:00 hartman Exp $
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
@@ -84,28 +84,19 @@
     o_selectedPane = [[o_selector selectedItem] title];
 
     intf_thread_t * p_intf = [NSApp getIntf]; 
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
 
-    if( p_playlist == NULL )
+    if ( p_input == NULL )
     {
-        return;
-    }
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-
-    if ( p_playlist->p_input == NULL )
-    {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        vlc_object_release( p_playlist );
         return;
     }
 
     [o_strings removeAllObjects];
     [o_selector removeAllItems];
 
-    vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
-    input_info_category_t * p_category = p_playlist->p_input->stream.p_info;
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    input_info_category_t * p_category = p_input->stream.p_info;
 
     while( p_category )
     {
@@ -113,9 +104,8 @@
         p_category = p_category->p_next;
     }
 
-    vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    vlc_object_release( p_playlist );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    vlc_object_release( p_input );
 
     int i_select = [o_selector indexOfItemWithTitle:o_selectedPane];
     if ( i_select < 0 )
@@ -161,26 +151,19 @@
     BOOL bEnabled = TRUE;
 
     intf_thread_t * p_intf = [NSApp getIntf];
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
-
-    if( p_playlist != NULL )
-    {
-        vlc_mutex_lock( &p_playlist->object_lock );
-    }
 
     if( [[o_mi title] isEqualToString: _NS("Info")] )
     {
-        if( p_playlist == NULL || p_playlist->p_input == NULL )
+        if( p_input == NULL )
         {
             bEnabled = FALSE;
         }
-    }
-    
-    if( p_playlist != NULL )
-    {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        vlc_object_release( p_playlist );
+        else
+        {
+            vlc_object_release( p_input );
+        }
     }
 
     return( bEnabled );

@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.47 2003/07/29 21:14:10 gbazin Exp $
+ * $Id: controls.m,v 1.48 2003/09/20 13:46:00 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -74,58 +74,41 @@
 - (IBAction)stop:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
-
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-    if( p_playlist == NULL )
+    if( p_playlist != NULL )
     {
-        return;
+        playlist_Stop( p_playlist );
+        vlc_object_release( p_playlist );
     }
-
-    playlist_Stop( p_playlist );
-    vlc_object_release( p_playlist );
 }
 
 - (IBAction)faster:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
-
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
-    if( p_playlist == NULL )
+    if( p_input != NULL )
     {
-        return;
+        vlc_value_t val; val.b_bool = VLC_TRUE;
+
+        var_Set( p_input, "rate-faster", val );
+        vlc_object_release( p_input );
     }
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-    if( p_playlist->p_input != NULL )
-    {
-        input_SetStatus( p_playlist->p_input, INPUT_STATUS_FASTER );
-    } 
-    vlc_mutex_unlock( &p_playlist->object_lock );
-
-    vlc_object_release( p_playlist );
 }
 
 - (IBAction)slower:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
-
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
-    if( p_playlist == NULL )
+    if( p_input != NULL )
     {
-        return;
-    }
+        vlc_value_t val; val.b_bool = VLC_TRUE;
 
-    vlc_mutex_lock( &p_playlist->object_lock );
-    if( p_playlist->p_input != NULL )
-    {
-        input_SetStatus( p_playlist->p_input, INPUT_STATUS_SLOWER );
+        var_Set( p_input, "rate-slower", val );
+        vlc_object_release( p_input );
     }
-    vlc_mutex_unlock( &p_playlist->object_lock );
-
-    vlc_object_release( p_playlist );
 }
 
 - (IBAction)prev:(id)sender
@@ -244,33 +227,29 @@
 - (IBAction)forward:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
-    if( p_playlist == NULL || p_playlist->p_input == NULL )
+    if( p_input != NULL )
     {
-        if ( p_playlist != NULL ) vlc_object_release( p_playlist );
-        return;
+        vlc_value_t time;
+        time.f_float = 5;
+        var_Set( p_input, "time-offset", time );
+        vlc_object_release( p_input );
     }
-
-    playlist_Play( p_playlist );
-    input_Seek( p_playlist->p_input, 5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
-    vlc_object_release( p_playlist );
 }
 
 - (IBAction)backward:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
-    if( p_playlist == NULL || p_playlist->p_input == NULL )
+    if( p_input != NULL )
     {
-        if ( p_playlist != NULL ) vlc_object_release( p_playlist );
-        return;
+        vlc_value_t time;
+        time.f_float = -5;
+        var_Set( p_input, "time-offset", time );
+        vlc_object_release( p_input );
     }
-
-    playlist_Play( p_playlist );
-    input_Seek( p_playlist->p_input, -5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
-    vlc_object_release( p_playlist );
 }
 
 - (IBAction)volumeUp:(id)sender
