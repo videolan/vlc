@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.1 2001/12/09 17:01:37 sam Exp $
+ * $Id: vout_subpictures.c,v 1.2 2001/12/13 12:47:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -43,8 +43,10 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void vout_RenderRGBSPU( picture_t *p_pic, const subpicture_t *p_spu );
-static void vout_RenderYUVSPU( picture_t *p_pic, const subpicture_t *p_spu );
+static void vout_RenderRGBSPU( const vout_thread_t *p_vout, picture_t *p_pic,
+                               const subpicture_t *p_spu );
+static void vout_RenderYUVSPU( const vout_thread_t *p_vout, picture_t *p_pic,
+                               const subpicture_t *p_spu );
 
 /* FIXME: fake palette - the real one has to be sought in the .IFO */
 static int p_palette[4] = { 0x0000, 0x0000, 0xffff, 0x8888 };
@@ -67,7 +69,7 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     /* Check if status is valid */
     if( p_subpic->i_status != RESERVED_SUBPICTURE )
     {
-        intf_ErrMsg("error: subpicture %p has invalid status %d", p_subpic,
+        intf_ErrMsg("error: subpicture %p has invalid status #%d", p_subpic,
                     p_subpic->i_status );
     }
 #endif
@@ -219,7 +221,8 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
 #ifdef DEBUG
    /* Check if status is valid */
-   if( p_subpic->i_status != RESERVED_SUBPICTURE )
+   if( ( p_subpic->i_status != RESERVED_SUBPICTURE )
+          && ( p_subpic->i_status != READY_SUBPICTURE ) )
    {
        intf_ErrMsg("error: subpicture %p has invalid status %d",
                    p_subpic, p_subpic->i_status );
@@ -238,7 +241,8 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
  *****************************************************************************
  * This function renders a sub picture unit.
  *****************************************************************************/
-void vout_RenderSubPictures( picture_t *p_pic, subpicture_t *p_subpic )
+void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic,
+                             subpicture_t *p_subpic )
 {
 #if 0
     p_vout_font_t       p_font;                                 /* text font */
@@ -250,8 +254,8 @@ void vout_RenderSubPictures( picture_t *p_pic, subpicture_t *p_subpic )
         switch( p_subpic->i_type )
         {
         case DVD_SUBPICTURE:                          /* DVD subpicture unit */
-            vout_RenderRGBSPU( p_pic, p_subpic );
-            vout_RenderYUVSPU( p_pic, p_subpic );
+            vout_RenderRGBSPU( p_vout, p_pic, p_subpic );
+            vout_RenderYUVSPU( p_vout, p_pic, p_subpic );
             break;
 
 #if 0
@@ -415,7 +419,8 @@ subpicture_t *vout_SortSubPictures( vout_thread_t *p_vout,
  * RLE buffer again and again. Most sanity checks are done in spu_decoder.c
  * so that this routine can be as fast as possible.
  *****************************************************************************/
-static void vout_RenderRGBSPU( picture_t *p_pic, const subpicture_t *p_spu )
+static void vout_RenderRGBSPU( const vout_thread_t *p_vout, picture_t *p_pic,
+                               const subpicture_t *p_spu )
 {
 #if 0
     int  i_len, i_color;
@@ -522,7 +527,8 @@ static void vout_RenderRGBSPU( picture_t *p_pic, const subpicture_t *p_spu )
  * RLE buffer again and again. Most sanity checks are done in spu_decoder.c
  * so that this routine can be as fast as possible.
  *****************************************************************************/
-static void vout_RenderYUVSPU( picture_t *p_pic, const subpicture_t *p_spu )
+static void vout_RenderYUVSPU( const vout_thread_t *p_vout, picture_t *p_pic,
+                               const subpicture_t *p_spu )
 {
     int  i_len, i_color;
     u16 *p_source = (u16 *)p_spu->p_data;
@@ -530,10 +536,10 @@ static void vout_RenderYUVSPU( picture_t *p_pic, const subpicture_t *p_spu )
     int i_x, i_y;
 
     u8 *p_dest = p_pic->planes[ Y_PLANE ].p_data + p_spu->i_x + p_spu->i_width
-                        + p_pic->i_width * ( p_spu->i_y + p_spu->i_height );
+                   + p_vout->output.i_width * ( p_spu->i_y + p_spu->i_height );
 
     /* Draw until we reach the bottom of the subtitle */
-    i_y = p_spu->i_height * p_pic->i_width;
+    i_y = p_spu->i_height * p_vout->output.i_width;
 
     while( i_y )
     {
@@ -556,7 +562,7 @@ static void vout_RenderYUVSPU( picture_t *p_pic, const subpicture_t *p_spu )
             i_x -= *p_source++ >> 2;
         }
 
-        i_y -= p_pic->i_width;
+        i_y -= p_vout->output.i_width;
     }
 }
 

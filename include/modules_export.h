@@ -96,6 +96,7 @@
     (p_symbols)->vout_DatePicture = vout_DatePicture; \
     (p_symbols)->vout_LinkPicture = vout_LinkPicture; \
     (p_symbols)->vout_UnlinkPicture = vout_UnlinkPicture; \
+    (p_symbols)->vout_PlacePicture = vout_PlacePicture; \
     (p_symbols)->UnalignedGetBits = UnalignedGetBits; \
     (p_symbols)->UnalignedRemoveBits = UnalignedRemoveBits; \
     (p_symbols)->UnalignedShowBits = UnalignedShowBits; \
@@ -205,6 +206,7 @@
 #   define vout_DatePicture p_symbols->vout_DatePicture
 #   define vout_LinkPicture p_symbols->vout_LinkPicture
 #   define vout_UnlinkPicture p_symbols->vout_UnlinkPicture
+#   define vout_PlacePicture p_symbols->vout_PlacePicture
     
 #   define DecodeLanguage p_symbols->DecodeLanguage
 

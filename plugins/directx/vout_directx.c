@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.15 2001/12/07 18:33:07 sam Exp $
+ * $Id: vout_directx.c,v 1.16 2001/12/13 12:47:17 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1355,7 +1355,7 @@ static void DirectXKeepAspectRatio( vout_thread_t *p_vout, RECT *rect_window )
 
   if( !p_vout->p_rendered_pic ) return;
 
-  switch( p_vout->p_rendered_pic->i_aspect_ratio )
+  switch( p_vout->p_rendered_pic->i_aspect )
   {
       case AR_16_9_PICTURE:
       if( ((rect_window->right-rect_window->left)*9)

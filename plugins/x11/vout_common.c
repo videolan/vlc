@@ -2,7 +2,7 @@
  * vout_common.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_common.c,v 1.2 2001/12/10 10:58:54 massiot Exp $
+ * $Id: vout_common.c,v 1.3 2001/12/13 12:47:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -129,13 +129,13 @@ int _M( vout_Manage ) ( vout_thread_t *p_vout )
     {
         /* ConfigureNotify event: prepare  */
         if( (xevent.type == ConfigureNotify)
-          && ((xevent.xconfigure.width != p_vout->p_sys->i_window_width)
-             || (xevent.xconfigure.height != p_vout->p_sys->i_window_height)) )
+          && ((xevent.xconfigure.width != p_vout->p_sys->i_width)
+             || (xevent.xconfigure.height != p_vout->p_sys->i_height)) )
         {
             /* Update dimensions */
             b_resized = 1;
-            p_vout->p_sys->i_window_width = xevent.xconfigure.width;
-            p_vout->p_sys->i_window_height = xevent.xconfigure.height;
+            p_vout->p_sys->i_width = xevent.xconfigure.width;
+            p_vout->p_sys->i_height = xevent.xconfigure.height;
         }
         /* MapNotify event: change window status and disable screen saver */
         else if( xevent.type == MapNotify)
@@ -410,11 +410,9 @@ int _M( vout_Manage ) ( vout_thread_t *p_vout )
     {
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
-        p_vout->i_width = p_vout->p_sys->i_window_width;
-        p_vout->i_height = p_vout->p_sys->i_window_height;
-
         intf_WarnMsg( 3, "vout: video display resized (%dx%d)",
-                      p_vout->i_width, p_vout->i_height );
+                      p_vout->p_sys->i_width,
+                      p_vout->p_sys->i_height );
     }
 #endif
 
@@ -450,21 +448,21 @@ int _M( XCommonCreateWindow ) ( vout_thread_t *p_vout )
     /* If we're full screen, we're full screen! */
     if( p_vout->b_fullscreen ) 
     {
-        p_vout->p_sys->i_window_width =
+        p_vout->p_sys->i_width =
            DisplayWidth( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
-        p_vout->p_sys->i_window_height =
+        p_vout->p_sys->i_height =
            DisplayHeight( p_vout->p_sys->p_display, p_vout->p_sys->i_screen ); 
     }
     else
     {
         /* Set main window's size */
-        p_vout->p_sys->i_window_width = p_vout->i_width;
-        p_vout->p_sys->i_window_height = p_vout->i_height;
+        p_vout->p_sys->i_width = p_vout->render.i_width;
+        p_vout->p_sys->i_height = p_vout->render.i_height;
     }
 
     /* Prepare window manager hints and properties */
-    xsize_hints.base_width          = p_vout->p_sys->i_window_width;
-    xsize_hints.base_height         = p_vout->p_sys->i_window_height;
+    xsize_hints.base_width          = p_vout->p_sys->i_width;
+    xsize_hints.base_height         = p_vout->p_sys->i_height;
     xsize_hints.flags               = PSize;
     p_vout->p_sys->wm_protocols     = XInternAtom( p_vout->p_sys->p_display,
                                                    "WM_PROTOCOLS", True );
@@ -485,8 +483,8 @@ int _M( XCommonCreateWindow ) ( vout_thread_t *p_vout )
         XCreateWindow( p_vout->p_sys->p_display,
                        DefaultRootWindow( p_vout->p_sys->p_display ),
                        0, 0,
-                       p_vout->p_sys->i_window_width,
-                       p_vout->p_sys->i_window_height,
+                       p_vout->p_sys->i_width,
+                       p_vout->p_sys->i_height,
 #ifdef MODULE_NAME_IS_x11
                        /* XXX - what's this ? */
                        0,
@@ -567,8 +565,8 @@ int _M( XCommonCreateWindow ) ( vout_thread_t *p_vout )
                  && (xevent.xconfigure.window == p_vout->p_sys->window) )
         {
             b_configure_notify = 1;
-            p_vout->p_sys->i_window_width = xevent.xconfigure.width;
-            p_vout->p_sys->i_window_height = xevent.xconfigure.height;
+            p_vout->p_sys->i_width = xevent.xconfigure.width;
+            p_vout->p_sys->i_height = xevent.xconfigure.height;
         }
     } while( !( b_expose && b_configure_notify && b_map_notify ) );
 

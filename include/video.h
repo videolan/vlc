@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.33 2001/12/09 17:01:35 sam Exp $
+ * $Id: video.h,v 1.34 2001/12/13 12:47:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -60,20 +60,13 @@ typedef struct picture_s
 
     /* Type and flags - should NOT be modified except by the vout thread */
     int             i_status;                               /* picture flags */
+    int             i_type;                  /* is picture a direct buffer ? */
     int             i_matrix_coefficients;     /* in YUV type, encoding type */
 
     /* Picture management properties - these properties can be modified using
      * the video output thread API, but should never be written directly */
     int             i_refcount;                    /* link reference counter */
     mtime_t         date;                                    /* display date */
-
-    /* Picture static properties - those properties are fixed at initialization
-     * and should NOT be modified */
-    int             i_width;                                /* picture width */
-    int             i_height;                              /* picture height */
-    int             i_chroma;                              /* picture chroma */
-    int             i_aspect_ratio;                          /* aspect ratio */
-    boolean_t       b_directbuffer;               /* is it a direct buffer ? */
 
     /* These values can be calculated from i_chroma, i_width and i_height
      * but we leave them to prevent unnecessary calculation */
@@ -104,16 +97,31 @@ typedef struct picture_s
 
 } picture_t;
 
-/* Pictures chromas */
-#define EMPTY_PICTURE           0     /* picture slot is empty and available */
-#define YUV_420_PICTURE         100                     /* 4:2:0 YUV picture */
-#define YUV_422_PICTURE         101                     /* 4:2:2 YUV picture */
-#define YUV_444_PICTURE         102                     /* 4:4:4 YUV picture */
-#define RGB_8BPP_PICTURE        200                      /* RGB 8bpp picture */
-#define RGB_16BPP_PICTURE       201                     /* RGB 16bpp picture */
-#define RGB_32BPP_PICTURE       202                     /* RGB 32bpp picture */
+/*****************************************************************************
+ * picture_heap_t: video picture heap
+ *****************************************************************************/
+typedef struct picture_heap_s
+{
+    int             i_pictures;                         /* current heap size */
 
-/* Pictures status */
+    /* Picture static properties - those properties are fixed at initialization
+     * and should NOT be modified */
+    int             i_width;                                /* picture width */
+    int             i_height;                              /* picture height */
+    int             i_chroma;                              /* picture chroma */
+    int             i_aspect;                                /* aspect ratio */
+
+    /* Real pictures */
+    picture_t*      pp_picture[VOUT_MAX_PICTURES];               /* pictures */
+
+} picture_heap_t;
+
+/* Picture type */
+#define EMPTY_PICTURE           0                            /* empty buffer */
+#define MEMORY_PICTURE          100                 /* heap-allocated buffer */
+#define DIRECT_PICTURE          200                         /* direct buffer */
+
+/* Picture status */
 #define FREE_PICTURE            0                  /* free and not allocated */
 #define RESERVED_PICTURE        1                  /* allocated and reserved */
 #define RESERVED_DATED_PICTURE  2              /* waiting for DisplayPicture */
@@ -122,7 +130,16 @@ typedef struct picture_s
 #define DISPLAYED_PICTURE       5            /* been displayed but is linked */
 #define DESTROYED_PICTURE       6              /* allocated but no more used */
 
-/* Aspect ratios (ISO/IEC 13818-2 section 6.3.3, table 6-3) */
+/* Picture chroma */
+#define EMPTY_PICTURE           0     /* picture slot is empty and available */
+#define YUV_420_PICTURE         100                     /* 4:2:0 YUV picture */
+#define YUV_422_PICTURE         101                     /* 4:2:2 YUV picture */
+#define YUV_444_PICTURE         102                     /* 4:4:4 YUV picture */
+#define RGB_8BPP_PICTURE        200                      /* RGB 8bpp picture */
+#define RGB_16BPP_PICTURE       201                     /* RGB 16bpp picture */
+#define RGB_32BPP_PICTURE       202                     /* RGB 32bpp picture */
+
+/* Aspect ratio (ISO/IEC 13818-2 section 6.3.3, table 6-3) */
 #define AR_SQUARE_PICTURE       1                           /* square pixels */
 #define AR_3_4_PICTURE          2                        /* 3:4 picture (TV) */
 #define AR_16_9_PICTURE         3              /* 16:9 picture (wide screen) */

@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.37 2001/12/09 17:01:37 sam Exp $
+ * $Id: vout_xvideo.c,v 1.38 2001/12/13 12:47:17 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -95,9 +95,6 @@ static void     DestroyShmImage( Display *, XvImage *, XShmSegmentInfo * );
 
 static int  CheckForXVideo     ( Display * );
 static int  GetXVideoPort      ( Display * );
-static void XVideoOutputCoords ( const picture_t *, const boolean_t,
-                                 const int, const int,
-                                 int *, int *, int *, int * );
 
 /*static void XVideoSetAttribute       ( vout_thread_t *, char *, float );*/
 
@@ -137,7 +134,7 @@ static int vout_Probe( probedata_t *p_data )
         intf_WarnMsg( 3, "vout: Xvideo not supported" );
         return( 0 );
     }
-    
+
     if( !CheckForXVideo( p_display ) )
     {
         intf_WarnMsg( 3, "vout: Xvideo not supported" );
@@ -219,7 +216,7 @@ static int vout_Create( vout_thread_t *p_vout )
                                                   DefaultRootWindow(
                                                      p_vout->p_sys->p_display),
                                                   1, 1, 1 );
-    
+
     XParseColor( p_vout->p_sys->p_display,
                  XCreateColormap( p_vout->p_sys->p_display,
                                   DefaultRootWindow(
@@ -229,13 +226,13 @@ static int vout_Create( vout_thread_t *p_vout )
                                                 p_vout->p_sys->i_screen ),
                                   AllocNone ),
                  "black", &cursor_color );
-    
+
     p_vout->p_sys->blank_cursor = XCreatePixmapCursor(
                                       p_vout->p_sys->p_display,
                                       p_vout->p_sys->cursor_pixmap,
                                       p_vout->p_sys->cursor_pixmap,
                                       &cursor_color,
-                                      &cursor_color, 1, 1 );    
+                                      &cursor_color, 1, 1 );
 
     /* Spawn base window - this window will include the video output window,
      * but also command buttons, subtitles and other indicators */
@@ -266,33 +263,58 @@ static int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
+    int i_index;
     picture_t *p_pic;
-    int        i_index = 0;
+
+    I_OUTPUTPICTURES = 0;
+
+    /* Initialize the output structure */
+    switch( p_vout->render.i_chroma )
+    {
+        case YUV_420_PICTURE:
+            p_vout->output.i_chroma = p_vout->render.i_chroma;
+            p_vout->output.i_width  = p_vout->render.i_width;
+            p_vout->output.i_height = p_vout->render.i_height;
+            p_vout->output.i_aspect = p_vout->render.i_aspect;
+            break;
+
+        default:
+            return( 0 );
+    }
 
     /* Try to initialize up to XVIDEO_MAX_DIRECTBUFFERS direct buffers */
-    while( i_index < XVIDEO_MAX_DIRECTBUFFERS )
+    while( I_OUTPUTPICTURES < XVIDEO_MAX_DIRECTBUFFERS )
     {
-        p_pic = &p_vout->p_picture[ i_index ];
+        p_pic = NULL;
 
+        /* Find an empty picture slot */
+        for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
+        {
+            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
+            {
+                p_pic = p_vout->p_picture + i_index;
+                break;
+            }
+        }
+
+        /* Allocate the picture */
         if( XVideoNewPicture( p_vout, p_pic ) )
         {
             break;
         }
 
         p_pic->i_status        = DESTROYED_PICTURE;
-
-        p_pic->b_directbuffer  = 1;
+        p_pic->i_type          = DIRECT_PICTURE;
 
         p_pic->i_left_margin   =
         p_pic->i_right_margin  =
         p_pic->i_top_margin    =
         p_pic->i_bottom_margin = 0;
 
-        i_index++;
-    }
+        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
 
-    /* How many directbuffers did we create ? */
-    p_vout->i_directbuffers = i_index;
+        I_OUTPUTPICTURES++;
+    }
 
     return( 0 );
 }
@@ -308,13 +330,13 @@ static void vout_End( vout_thread_t *p_vout )
     int i_index;
 
     /* Free the direct buffers we allocated */
-    for( i_index = p_vout->i_directbuffers ; i_index ; )
+    for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
         i_index--;
         DestroyShmImage( p_vout->p_sys->p_display,
-                         p_vout->p_picture[ i_index ].p_sys->p_xvimage,
-                         &p_vout->p_picture[ i_index ].p_sys->shminfo );
-        free( p_vout->p_picture[ i_index ].p_sys );
+                         PP_OUTPUTPICTURE[ i_index ]->p_sys->p_xvimage,
+                         &PP_OUTPUTPICTURE[ i_index ]->p_sys->shminfo );
+        free( PP_OUTPUTPICTURE[ i_index ]->p_sys );
     }
 }
 
@@ -350,30 +372,23 @@ static void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    int i_dest_width, i_dest_height, i_dest_x, i_dest_y;
+    int i_width, i_height, i_x, i_y;
 
-    //printf("pic: %i %i, disp: %i %i\n", p_pic->i_width, p_pic->i_height, p_vout->p_sys->i_window_width, p_vout->p_sys->i_window_height);
-    //printf("pic aspect ratio: %i\n", p_pic->i_aspect_ratio);
-    XVideoOutputCoords( p_pic, p_vout->b_scale,
-                        p_vout->p_sys->i_window_width,
-                        p_vout->p_sys->i_window_height,
-                        &i_dest_x, &i_dest_y,
-                        &i_dest_width, &i_dest_height);
-    //printf("resized to %i %i, moved at %i %i\n", i_dest_width, i_dest_height, i_dest_x, i_dest_y);
+    vout_PlacePicture( p_vout, p_vout->p_sys->i_width, p_vout->p_sys->i_height,
+                       &i_x, &i_y, &i_width, &i_height );
 
     XvShmPutImage( p_vout->p_sys->p_display, p_vout->p_sys->i_xvport,
                    p_vout->p_sys->yuv_window, p_vout->p_sys->gc,
-                   p_pic->p_sys->p_xvimage,
-                   0 /*src_x*/, 0 /*src_y*/, p_pic->i_width, p_pic->i_height,
-                   0 /*dest_x*/, 0 /*dest_y*/, i_dest_width, i_dest_height,
+                   p_pic->p_sys->p_xvimage, 0 /*src_x*/, 0 /*src_y*/,
+                   p_vout->output.i_width, p_vout->output.i_height,
+                   0 /*dest_x*/, 0 /*dest_y*/, i_width, i_height,
                    True );
 
     XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
-                   i_dest_width, i_dest_height );
-#if 0
+                   i_width, i_height );
+
     XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
-                 i_dest_x, i_dest_y );
-#endif
+                 i_x, i_y );
 }
 
 /* following functions are local */
@@ -411,7 +426,10 @@ static int CheckForXVideo( Display *p_display )
  *****************************************************************************/
 static int XVideoNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    switch( p_vout->i_chroma )
+    int i_width  = p_vout->output.i_width;
+    int i_height = p_vout->output.i_height;
+
+    switch( p_vout->output.i_chroma )
     {
         case YUV_420_PICTURE:
             /* We know this chroma, allocate a buffer which will be used
@@ -428,31 +446,29 @@ static int XVideoNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
                 CreateShmImage( p_vout->p_sys->p_display,
                                 p_vout->p_sys->i_xvport,
                                 &p_pic->p_sys->shminfo,
-                                p_vout->i_width, p_vout->i_height );
+                                p_vout->output.i_width,
+                                p_vout->output.i_height );
             if( p_pic->p_sys->p_xvimage == NULL )
             {
                 free( p_pic->p_sys );
                 return -1;
             }
 
-            p_pic->i_chroma = p_vout->i_chroma; /* YUV_420_PICTURE */
-            p_pic->i_width  = p_vout->i_width;
-            p_pic->i_height = p_vout->i_height;
 
             /* Precalculate some values */
-            p_pic->i_size         = p_vout->i_width * p_vout->i_height;
-            p_pic->i_chroma_width = p_vout->i_width / 2;
-            p_pic->i_chroma_size  = p_vout->i_height * p_pic->i_chroma_width;
+            p_pic->i_size         = i_width * i_height;
+            p_pic->i_chroma_width = i_width / 2;
+            p_pic->i_chroma_size  = i_height * ( i_width / 2 );
 
-            /* FIXME: try to get the right i_bytes value from p_overlay */
-            p_pic->planes[ Y_PLANE ].p_data  = p_pic->p_sys->p_xvimage->data;
-            p_pic->planes[ Y_PLANE ].i_bytes = p_pic->i_size * sizeof(u8);
-            p_pic->planes[ U_PLANE ].p_data  = (u8*)p_pic->p_sys->p_xvimage->data
-                                                + p_pic->i_size * 5 / 4;
-            p_pic->planes[ U_PLANE ].i_bytes = p_pic->i_size * sizeof(u8) / 4;
-            p_pic->planes[ V_PLANE ].p_data  = (u8*)p_pic->p_sys->p_xvimage->data
-                                                + p_pic->i_size;
-            p_pic->planes[ V_PLANE ].i_bytes = p_pic->i_size * sizeof(u8) / 4;
+            /* FIXME: try to get the right i_bytes value from p_xvimage */
+            p_pic->planes[Y_PLANE].p_data  = p_pic->p_sys->p_xvimage->data;
+            p_pic->planes[Y_PLANE].i_bytes = p_pic->i_size * sizeof(u8);
+            p_pic->planes[U_PLANE].p_data  = (u8*)p_pic->p_sys->p_xvimage->data
+                                               + p_pic->i_size * 5 / 4;
+            p_pic->planes[U_PLANE].i_bytes = p_pic->i_size * sizeof(u8) / 4;
+            p_pic->planes[V_PLANE].p_data  = (u8*)p_pic->p_sys->p_xvimage->data
+                                               + p_pic->i_size;
+            p_pic->planes[V_PLANE].i_bytes = p_pic->i_size * sizeof(u8) / 4;
             p_pic->i_planes = 3;
 
             return 0;
@@ -461,7 +477,7 @@ static int XVideoNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             /* Unknown chroma, tell the guy to get lost */
             p_pic->i_planes = 0;
 
-            return 0;
+            return -1;
     }
 }
 
@@ -547,46 +563,6 @@ static void DestroyShmImage( Display *p_display, XvImage *p_xvimage,
         intf_ErrMsg( "vout error: cannot detach shared memory (%s)",
                      strerror(errno) );
     }
-}
-
-/* This based on some code in SetBufferPicture... At the moment it's only
- * used by the xvideo plugin, but others may want to use it. */
-static void XVideoOutputCoords( const picture_t *p_pic, const boolean_t scale,
-                                const int win_w, const int win_h,
-                                int *dx, int *dy, int *w, int *h )
-{
-    if( !scale )
-    {
-        *w = p_pic->i_width;
-        *h = p_pic->i_height;
-    }
-    else
-    {
-        *h = win_h;
-        switch( p_pic->i_aspect_ratio )
-        {
-            case AR_3_4_PICTURE:
-                *w = win_h * 4 / 3;
-                break;
-
-            case AR_16_9_PICTURE:
-                *w = win_h * 16 / 9;
-                break;
-
-            case AR_221_1_PICTURE:
-                *w = win_h * 221 / 100;
-                break;
-
-            case AR_SQUARE_PICTURE:
-            default:
-                *w = win_h * p_pic->i_width / p_pic->i_height;
-                break;
-        }
-    }
-
-    /* Set picture position */
-    *dx = (win_w - *w) / 2;
-    *dy = (win_h - *h) / 2;
 }
 
 /*****************************************************************************

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.146 2001/12/09 17:01:37 sam Exp $
+ * $Id: video_output.c,v 1.147 2001/12/13 12:47:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -94,7 +94,7 @@ void vout_EndBank ( void )
  *****************************************************************************/
 vout_thread_t * vout_CreateThread   ( int *pi_status,
                                       int i_width, int i_height,
-                                      int i_chroma, int i_aspect_ratio )
+                                      int i_chroma, int i_aspect )
 {
     vout_thread_t * p_vout;                             /* thread descriptor */
     int             i_status;                               /* thread status */
@@ -142,9 +142,7 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++)
     {
         p_vout->p_picture[i_index].i_status = FREE_PICTURE;
-        p_vout->p_picture[i_index].i_chroma = EMPTY_PICTURE;
-        p_vout->p_picture[i_index].i_aspect_ratio = i_aspect_ratio;
-        p_vout->p_picture[i_index].b_directbuffer = 0;
+        p_vout->p_picture[i_index].i_type   = EMPTY_PICTURE;
     }
 
     for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++)
@@ -153,23 +151,25 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
         p_vout->p_subpicture[i_index].i_type   = EMPTY_SUBPICTURE;
     }
 
-    p_vout->i_width         = i_width;
-    p_vout->i_height        = i_height;
-    p_vout->i_chroma        = i_chroma;
-    p_vout->i_aspect_ratio  = i_aspect_ratio;
-    p_vout->i_pictures = 0;
-    p_vout->i_directbuffers = 0;
+    /* Initialize the rendering heap */
+    p_vout->i_heap_size = 0;
+
+    I_RENDERPICTURES = 0;
+    p_vout->render.i_width    = i_width;
+    p_vout->render.i_height   = i_height;
+    p_vout->render.i_chroma   = i_chroma;
+    p_vout->render.i_aspect   = i_aspect;
 
     /* Initialize misc stuff */
-    p_vout->i_changes = 0;
-    p_vout->f_gamma = 0;
-    p_vout->b_grayscale = 0;
-    p_vout->b_info = 0;
-    p_vout->b_interface = 0;
-    p_vout->b_scale = 1;
+    p_vout->i_changes    = 0;
+    p_vout->f_gamma      = 0;
+    p_vout->b_grayscale  = 0;
+    p_vout->b_info       = 0;
+    p_vout->b_interface  = 0;
+    p_vout->b_scale      = 1;
     p_vout->b_fullscreen = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
                                                 VOUT_FULLSCREEN_DEFAULT );
-    p_vout->render_time = 10;
+    p_vout->render_time  = 10;
 
     /* Create thread and set locks */
     vlc_mutex_init( &p_vout->picture_lock );
@@ -242,6 +242,8 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
  *****************************************************************************/
 static int InitThread( vout_thread_t *p_vout )
 {
+    int i_index;
+
     /* Update status */
     *p_vout->pi_status = THREAD_START;
 
@@ -258,7 +260,7 @@ static int InitThread( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    if( !p_vout->i_directbuffers )
+    if( !I_OUTPUTPICTURES )
     {
         intf_ErrMsg( "vout error: plugin was unable to allocate at least "
                      "one direct buffer" );
@@ -266,12 +268,39 @@ static int InitThread( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    intf_WarnMsg( 1, "vout info: got %i direct buffer(s)",
-                  p_vout->i_directbuffers );
+    /* Check whether we managed to create direct buffers similar to
+     * the render buffers, ie same size, chroma and aspect ratio */
+    if( ( p_vout->output.i_width == p_vout->render.i_width )
+     && ( p_vout->output.i_height == p_vout->render.i_height )
+     && ( p_vout->output.i_chroma == p_vout->render.i_chroma )
+     && ( p_vout->output.i_aspect == p_vout->render.i_aspect ) )
+    {
+        p_vout->b_direct = 1;
+
+        /* Map the first render buffers to the first direct buffers, but
+         * leave the first direct buffer for memcpy operations */
+        i_index = 1;
+    }
+    else
+    {
+        p_vout->b_direct = 0;
+
+        /* Append render buffers after the direct buffers */
+        i_index = I_RENDERPICTURES;
+    }
+
+    for( ; i_index < VOUT_MAX_PICTURES; i_index++ )
+    {
+        PP_RENDERPICTURE[ I_RENDERPICTURES ]
+            = &p_vout->p_picture[ i_index ];
+        I_RENDERPICTURES++;
+    }
+
+    intf_WarnMsg( 1, "vout info: got %i direct buffer(s)", I_OUTPUTPICTURES );
 
     /* Mark thread as running and return */
-    p_vout->b_active =          1;
-    *p_vout->pi_status =        THREAD_READY;
+    p_vout->b_active = 1;
+    *p_vout->pi_status = THREAD_READY;
 
     intf_DbgMsg("thread ready");
     return( 0 );
@@ -323,17 +352,15 @@ static void RunThread( vout_thread_t *p_vout)
     while( (!p_vout->b_die) && (!p_vout->b_error) )
     {
         /* Initialize loop variables */
-        p_picture =      NULL;
-        p_directbuffer = NULL;
-        display_date =   0;
-        current_date =   mdate();
+        display_date = 0;
+        current_date = mdate();
 
 #ifdef STATS
         p_vout->c_loops++;
         if( !(p_vout->c_loops % VOUT_STATS_NB_LOOPS) )
         {
             intf_Msg( "vout stats: picture heap: %d/%d",
-                      p_vout->i_pictures, VOUT_MAX_PICTURES );
+                      I_RENDERPICTURES, p_vout->i_heap_size );
         }
 #endif
 
@@ -341,13 +368,17 @@ static void RunThread( vout_thread_t *p_vout)
          * Find the picture to display - this operation does not need lock,
          * since only READY_PICTUREs are handled
          */
-        for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )
+        p_picture = NULL;
+
+        for( i_index = 0;
+             i_index < I_RENDERPICTURES;
+             i_index++ )
         {
-            if( (p_vout->p_picture[i_index].i_status == READY_PICTURE) &&
-            ( (p_picture == NULL) ||
-              (p_vout->p_picture[i_index].date < display_date) ) )
+            if( (PP_RENDERPICTURE[i_index]->i_status == READY_PICTURE)
+                && ( (p_picture == NULL) ||
+                     (PP_RENDERPICTURE[i_index]->date < display_date) ) )
             {
-                p_picture = &p_vout->p_picture[i_index];
+                p_picture = PP_RENDERPICTURE[i_index];
                 display_date = p_picture->date;
             }
         }
@@ -373,7 +404,7 @@ static void RunThread( vout_thread_t *p_vout)
                 {
                     /* Destroy the picture without displaying it */
                     p_picture->i_status = DESTROYED_PICTURE;
-                    p_vout->i_pictures--;
+                    p_vout->i_heap_size--;
                 }
                 intf_WarnMsg( 1, "vout warning: late picture skipped (%p)",
                               p_picture );
@@ -450,7 +481,7 @@ static void RunThread( vout_thread_t *p_vout)
             else
             {
                 p_picture->i_status = DESTROYED_PICTURE;
-                p_vout->i_pictures--;
+                p_vout->i_heap_size--;
             }
             vlc_mutex_unlock( &p_vout->picture_lock );
         }
@@ -527,11 +558,9 @@ static void EndThread( vout_thread_t *p_vout )
 #endif
 
     /* Destroy all remaining pictures */
-    for( i_index = p_vout->i_directbuffers;
-         i_index < VOUT_MAX_PICTURES;
-         i_index++ )
+    for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )
     {
-        if( p_vout->p_picture[i_index].i_status != FREE_PICTURE )
+        if ( p_vout->p_picture[i_index].i_type == MEMORY_PICTURE )
         {
             free( p_vout->p_picture[i_index].planes[0].p_data );
         }

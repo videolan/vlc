@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppenned video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.64 2001/12/09 17:01:35 sam Exp $
+ * $Id: video_output.h,v 1.65 2001/12/13 12:47:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -69,27 +69,6 @@ typedef struct vout_chroma_s
 } vout_chroma_t;
 
 /*****************************************************************************
- * vout_buffer_t: rendering buffer
- *****************************************************************************
- * This structure stores information about a buffer. Buffers are not completely
- * cleared between displays, and modified areas need to be stored.
- *****************************************************************************/
-typedef struct vout_buffer_s
-{
-    /* Picture area */
-    int         i_pic_x, i_pic_y;                       /* picture position  */
-    int         i_pic_width, i_pic_height;                   /* picture size */
-
-    /* Other areas - only vertical extensions of areas are stored */
-    int         i_areas;                                  /* number of areas */
-    int         pi_area_begin[VOUT_MAX_AREAS];          /* beginning of area */
-    int         pi_area_end[VOUT_MAX_AREAS];                  /* end of area */
-
-    /* Picture data */
-    byte_t *    p_data;                                    /* memory address */
-} vout_buffer_t;
-
-/*****************************************************************************
  * vout_fifo_t
  *****************************************************************************/
 typedef struct vout_fifo_s
@@ -128,32 +107,15 @@ typedef struct vout_thread_s
     int *               pi_status;                  /* temporary status flag */
     p_vout_sys_t        p_sys;                       /* system output method */
                                                                    
-    /* Current input properties */
-    int                 i_width;                      /* current input width */
-    int                 i_height;                    /* current input height */
-    int                 i_chroma;                    /* current input chroma */
-    int                 i_aspect_ratio;        /* current input aspect ratio */
-
     /* Current display properties */
     u16                 i_changes;             /* changes made to the thread */
     float               f_gamma;                                    /* gamma */
-
-    /* Color masks and shifts in RGB mode - masks are set by system
-     * initialization, shifts are calculated. A pixel color value can be
-     * obtained using the formula ((value >> rshift) << lshift) */
-    u32                 i_red_mask;                              /* red mask */
-    u32                 i_green_mask;                          /* green mask */
-    u32                 i_blue_mask;                            /* blue mask */
-    int                 i_red_lshift, i_red_rshift;            /* red shifts */
-    int                 i_green_lshift, i_green_rshift;      /* green shifts */
-    int                 i_blue_lshift, i_blue_rshift;         /* blue shifts */
-
-    /* Useful pre-calculated pixel values - these are not supposed to be
-     * accurate values, but rather values looking nice, given their usage. */
-    u32                 i_white_pixel;                              /* white */
-    u32                 i_black_pixel;                              /* black */
-    u32                 i_gray_pixel;                                /* gray */
-    u32                 i_blue_pixel;                                /* blue */
+    boolean_t           b_grayscale;           /* color or grayscale display */
+    boolean_t           b_info;              /* print additional information */
+    boolean_t           b_interface;                     /* render interface */
+    boolean_t           b_scale;                    /* allow picture scaling */
+    boolean_t           b_fullscreen;           /* toogle fullscreen display */
+    mtime_t             render_time;             /* last picture render time */
 
     /* Plugin used and shortcuts to access its capabilities */
     struct module_s *   p_module;
@@ -167,26 +129,21 @@ typedef struct vout_thread_s
     void             ( *pf_setpalette ) ( struct vout_thread_s *,
                                           u16 *, u16 *, u16 * );
 
-    /* Pictures and rendering properties */
-    boolean_t           b_grayscale;           /* color or grayscale display */
-    boolean_t           b_info;              /* print additional information */
-    boolean_t           b_interface;                     /* render interface */
-    boolean_t           b_scale;                    /* allow picture scaling */
-    boolean_t           b_fullscreen;           /* toogle fullscreen display */
-    mtime_t             render_time;             /* last picture render time */
-
     /* Statistics - these numbers are not supposed to be accurate, but are a
      * good indication of the thread status */
     count_t             c_fps_samples;                     /* picture counts */
     mtime_t             p_fps_sample[VOUT_FPS_SAMPLES]; /* FPS samples dates */
 
     /* Video heap and translation tables */
+    int                 i_heap_size;                            /* heap size */
+    picture_heap_t      render;                         /* rendered pictures */
+    picture_heap_t      output;                            /* direct buffers */
+    boolean_t           b_direct;              /* rendered are like direct ? */
+    vout_chroma_t       chroma;                        /* translation tables */
+
+    /* Picture and subpicture heaps */
     picture_t           p_picture[VOUT_MAX_PICTURES];            /* pictures */
     subpicture_t        p_subpicture[VOUT_MAX_PICTURES];      /* subpictures */
-    int                 i_directbuffers;       /* number of pictures in VRAM */
-    int                 i_pictures;                     /* current heap size */
-
-    vout_chroma_t       chroma;                        /* translation tables */
 
     /* Bitmap fonts */
     p_vout_font_t       p_default_font;                      /* default font */
@@ -199,6 +156,11 @@ typedef struct vout_thread_s
     count_t             c_jitter_samples;  /* number of samples used for the *
                                             * calculation of the jitter      */
 } vout_thread_t;
+
+#define I_OUTPUTPICTURES p_vout->output.i_pictures
+#define PP_OUTPUTPICTURE p_vout->output.pp_picture
+#define I_RENDERPICTURES p_vout->render.i_pictures
+#define PP_RENDERPICTURE p_vout->render.pp_picture
 
 /* Flags for changes - these flags are set in the i_changes field when another
  * thread changed a variable */
@@ -219,17 +181,6 @@ typedef struct vout_thread_s
 #define MAX_JITTER_SAMPLES      20
 
 /*****************************************************************************
- * Macros
- *****************************************************************************/
-
-/* RGB2PIXEL: assemble RGB components to a pixel value, returns a u32 */
-#define RGB2PIXEL( p_vout, i_red, i_green, i_blue )                           \
-    (((((u32)i_red)   >> p_vout->i_red_rshift)   << p_vout->i_red_lshift)   | \
-     ((((u32)i_green) >> p_vout->i_green_rshift) << p_vout->i_green_lshift) | \
-     ((((u32)i_blue)  >> p_vout->i_blue_rshift)  << p_vout->i_blue_lshift))
-
-
-/*****************************************************************************
  * Prototypes
  *****************************************************************************/
 void            vout_InitBank       ( void );
@@ -242,7 +193,7 @@ vout_fifo_t *   vout_CreateFifo     ( void );
 void            vout_DestroyFifo    ( vout_fifo_t * );
 void            vout_FreeFifo       ( vout_fifo_t * );
 
-picture_t *     vout_CreatePicture  ( vout_thread_t *, int, int, int, int );
+picture_t *     vout_CreatePicture  ( vout_thread_t * );
 void            vout_DestroyPicture ( vout_thread_t *, picture_t * );
 void            vout_DisplayPicture ( vout_thread_t *, picture_t * );
 void            vout_DatePicture    ( vout_thread_t *, picture_t *, mtime_t );
@@ -250,10 +201,13 @@ void            vout_LinkPicture    ( vout_thread_t *, picture_t * );
 void            vout_UnlinkPicture  ( vout_thread_t *, picture_t * );
 picture_t *     vout_RenderPicture  ( vout_thread_t *, picture_t *,
                                                        subpicture_t * );
+void            vout_PlacePicture   ( vout_thread_t *, int, int,
+                                      int *, int *, int *, int * );
 
 subpicture_t *  vout_CreateSubPicture   ( vout_thread_t *, int, int );
 void            vout_DestroySubPicture  ( vout_thread_t *, subpicture_t * );
 void            vout_DisplaySubPicture  ( vout_thread_t *, subpicture_t * );
 subpicture_t *  vout_SortSubPictures    ( vout_thread_t *, mtime_t );
-void            vout_RenderSubPictures  ( picture_t *, subpicture_t * );
+void            vout_RenderSubPictures  ( vout_thread_t *, picture_t *,
+                                                           subpicture_t * );
 

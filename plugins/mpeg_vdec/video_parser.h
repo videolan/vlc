@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.1 2001/11/13 12:09:18 henri Exp $
+ * $Id: video_parser.h,v 1.2 2001/12/13 12:47:17 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -113,7 +113,7 @@ typedef struct sequence_s
     u32                 i_size;       /* total number of pel of the lum comp */
     u32                 i_mb_height, i_mb_width, i_mb_size;
                                             /* the same, in macroblock units */
-    unsigned int        i_aspect_ratio;        /* height/width display ratio */
+    unsigned int        i_aspect;              /* height/width display ratio */
     unsigned int        i_matrix_coefficients;/* coeffs of the YUV transform */
     int                 i_chroma_format, i_scalable_mode;
     int                 i_chroma_nb_blocks;

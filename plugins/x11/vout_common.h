@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_common.h,v 1.1 2001/12/09 17:01:37 sam Exp $
+ * $Id: vout_common.h,v 1.2 2001/12/13 12:47:17 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -63,8 +63,8 @@ typedef struct vout_sys_s
     Atom                wm_protocols;
     Atom                wm_delete_window;
 
-    int                 i_window_width;              /* width of main window */
-    int                 i_window_height;            /* height of main window */
+    int                 i_width;                     /* width of main window */
+    int                 i_height;                   /* height of main window */
 
     /* Screen saver properties */
     int                 i_ss_timeout;                             /* timeout */

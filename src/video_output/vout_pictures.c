@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.1 2001/12/09 17:01:37 sam Exp $
+ * $Id: vout_pictures.c,v 1.2 2001/12/13 12:47:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -43,7 +43,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void     NewPicture        ( picture_t *, int, int, int );
+static void     NewPicture        ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
  * vout_DisplayPicture: display a picture
@@ -121,14 +121,11 @@ void vout_DatePicture( vout_thread_t *p_vout,
  * already allocated zone of memory in the picture data fields. It needs locking
  * since several pictures can be created by several producers threads.
  *****************************************************************************/
-picture_t *vout_CreatePicture( vout_thread_t *p_vout,
-                               int i_width, int i_height,
-                               int i_chroma, int i_aspect_ratio )
+picture_t *vout_CreatePicture( vout_thread_t *p_vout )
 {
     int         i_picture;                                  /* picture index */
     picture_t * p_picture;
     picture_t * p_free_picture = NULL;                 /* first free picture */
-    picture_t * p_destroyed_picture = NULL;       /* first destroyed picture */
 
     /* Get lock */
     vlc_mutex_lock( &p_vout->picture_lock );
@@ -137,54 +134,33 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
      * Look for an empty place. XXX: we start at 1 because the first
      * directbuffer is reserved for memcpy()ed pictures.
      */
-    for( i_picture = 1; i_picture < VOUT_MAX_PICTURES; i_picture++ )
+    for( i_picture = 0; i_picture < I_RENDERPICTURES; i_picture++ )
     {
-        p_picture = p_vout->p_picture + i_picture;
+        p_picture = PP_RENDERPICTURE[ i_picture ];
 
-        if( p_picture->i_status == DESTROYED_PICTURE )
+        switch( p_picture->i_status )
         {
-            /* Picture is marked for destruction, but is still allocated.
-             * Note that if width and type are the same for two pictures,
-             * chroma_width should also be the same */
-            if( ( p_picture->i_chroma == i_chroma ) &&
-                ( p_picture->i_height == i_height ) &&
-                ( p_picture->i_width  == i_width ) )
-            {
-                /* Memory size do match : memory will not be reallocated,
-                 * and function can end immediately - this is the best
-                 * possible case, since no memory allocation needs to be
-                 * done */
+            case DESTROYED_PICTURE:
+                /* Memory will not be reallocated, and function can end
+                 * immediately - this is the best possible case, since no
+                 * memory allocation needs to be done */
                 p_picture->i_status = RESERVED_PICTURE;
-                p_vout->i_pictures++;
+                p_vout->i_heap_size++;
 
                 vlc_mutex_unlock( &p_vout->picture_lock );
-
                 return( p_picture );
-            }
-            else if( ( p_destroyed_picture == NULL )
-                     && !p_picture->b_directbuffer )
-            {
-                /* Memory size do not match, but picture index will be kept in
-                 * case no other place are left */
-                p_destroyed_picture = p_picture;
-            }
-        }
-        else if( ( p_free_picture == NULL )
-                 && ( p_picture->i_status == FREE_PICTURE ) )
-        {
-            /* Picture is empty and ready for allocation */
-            p_free_picture = p_picture;
-        }
-    }
 
-    /* If no free picture is available, use a destroyed picture */
-    if( ( p_free_picture == NULL ) && ( p_destroyed_picture != NULL ) )
-    {
-        /* No free picture or matching destroyed picture has been found, but
-         * a destroyed picture is still avalaible */
-        free( p_destroyed_picture->planes[0].p_data );
-        p_destroyed_picture->i_planes = 0;
-        p_free_picture = p_destroyed_picture;
+            case FREE_PICTURE:
+                if( p_free_picture == NULL )
+                {
+                    /* Picture is empty and ready for allocation */
+                    p_free_picture = p_picture;
+                }
+                break;
+
+            default:
+                break;
+        }
     }
 
     /*
@@ -192,26 +168,22 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
      */
     if( p_free_picture != NULL )
     {
-        NewPicture( p_free_picture, i_chroma, i_width, i_height );
+        NewPicture( p_vout, p_free_picture );
 
-        if( p_free_picture->i_planes != 0 )
+        if( p_free_picture->i_planes )
         {
             /* Copy picture information, set some default values */
-            p_free_picture->i_width               = i_width;
-            p_free_picture->i_height              = i_height;
-            p_free_picture->i_chroma              = i_chroma;
-            p_free_picture->i_aspect_ratio        = i_aspect_ratio;
-            p_free_picture->i_status              = RESERVED_PICTURE;
+            p_free_picture->i_status = RESERVED_PICTURE;
+            p_free_picture->i_type = MEMORY_PICTURE;
             p_free_picture->i_matrix_coefficients = 1;
-            p_free_picture->i_refcount            = 0;
-            p_vout->i_pictures++;
+            p_free_picture->i_refcount = 0;
+            p_vout->i_heap_size++;
         }
         else
         {
             /* Memory allocation failed : set picture as empty */
-            p_free_picture->i_chroma =  EMPTY_PICTURE;
-            p_free_picture->i_status =  FREE_PICTURE;
-            p_free_picture =            NULL;
+            p_free_picture->i_status = FREE_PICTURE;
+            p_free_picture = NULL;
 
             intf_ErrMsg( "vout error: picture allocation failed" );
         }
@@ -254,7 +226,7 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_picture )
 #endif
 
     p_picture->i_status = DESTROYED_PICTURE;
-    p_vout->i_pictures--;
+    p_vout->i_heap_size--;
 
     /* destroy the lock that had been initialized in CreatePicture */
     vlc_mutex_destroy( &(p_picture->lock_deccount) );
@@ -302,7 +274,7 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_picture )
         ( p_picture->i_status == DISPLAYED_PICTURE ) )
     {
         p_picture->i_status = DESTROYED_PICTURE;
-        p_vout->i_pictures--;
+        p_vout->i_heap_size--;
     }
 
 #ifdef TRACE_VOUT
@@ -331,7 +303,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_picture,
         return NULL;
     }
 
-    if( p_picture->b_directbuffer )
+    if( p_picture->i_type == DIRECT_PICTURE )
     {
         if( p_picture->i_refcount )
         {
@@ -346,14 +318,14 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_picture,
                 for( i_index = 0 ; i_index < p_picture->i_planes ; i_index++ )
                 {
                     p_main->fast_memcpy(
-                        p_vout->p_picture[0].planes[ i_index ].p_data,
+                        PP_OUTPUTPICTURE[0]->planes[ i_index ].p_data,
                         p_picture->planes[ i_index ].p_data,
                         p_picture->planes[ i_index ].i_bytes );
                 }
 
-                vout_RenderSubPictures( &p_vout->p_picture[0], p_subpic );
+                vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_subpic );
 
-                return &p_vout->p_picture[0];
+                return PP_OUTPUTPICTURE[0];
             }
 
             /* No subtitles, picture is in a directbuffer so
@@ -365,30 +337,28 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_picture,
         /* Picture is in a direct buffer but isn't used by the
          * decoder. We can safely render subtitles on it and
          * display it. */
-        vout_RenderSubPictures( p_picture, p_subpic );
+        vout_RenderSubPictures( p_vout, p_picture, p_subpic );
 
         return p_picture;
     }
 
     /* Not a direct buffer. We either need to copy it to a direct buffer,
      * or render it if the chroma isn't the same. */
-    if( ( p_picture->i_chroma == p_vout->p_picture[0].i_chroma ) &&
-        ( p_picture->i_height == p_vout->p_picture[0].i_height ) &&
-        ( p_picture->i_width  == p_vout->p_picture[0].i_width ) )
+    if( p_vout->b_direct )
     {
         /* Picture is not in a direct buffer, but is exactly the
          * same size as the direct buffers. A memcpy() is enough,
          * then render the subtitles. */
         for( i_index = 0; i_index < p_picture->i_planes; i_index++ )
         {
-            p_main->fast_memcpy( p_vout->p_picture[0].planes[ i_index ].p_data,
+            p_main->fast_memcpy( PP_OUTPUTPICTURE[0]->planes[ i_index ].p_data,
                                  p_picture->planes[ i_index ].p_data,
                                  p_picture->planes[ i_index ].i_bytes );
         }
 
-        vout_RenderSubPictures( &p_vout->p_picture[0], p_subpic );
+        vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_subpic );
 
-        return &p_vout->p_picture[0];
+        return PP_OUTPUTPICTURE[0];
     }
 
     /* Picture is not in a direct buffer, and needs to be converted to
@@ -400,9 +370,77 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_picture,
 
     /* XXX: render to direct buffer */
 
-    vout_RenderSubPictures( p_picture, p_subpic );
+    vout_RenderSubPictures( p_vout, p_picture, p_subpic );
 
     return &p_vout->p_picture[0];
+}
+
+/*****************************************************************************
+ * vout_PlacePicture: calculate image window coordinates
+ *****************************************************************************
+ * This function will be accessed by plugins. It calculates the relative
+ * position of the output window and the image window.
+ *****************************************************************************/
+void vout_PlacePicture( vout_thread_t *p_vout, int i_width, int i_height,
+                        int *pi_x, int *pi_y, int *pi_width, int *pi_height )
+{
+    int i_ratio;
+
+    if( p_vout->b_scale )
+    {
+        *pi_width = i_width;
+        *pi_height = i_height;
+    }
+    else
+    {
+        *pi_width = MIN( i_width, p_vout->render.i_width );
+        *pi_height = MIN( i_height, p_vout->render.i_height );
+    }
+
+    switch( p_vout->render.i_aspect )
+    {
+        case AR_3_4_PICTURE:
+            i_ratio = 900 * 4 / 3;
+            break;
+
+        case AR_16_9_PICTURE:
+            i_ratio = 900 * 16 / 9;
+            break;
+
+        case AR_221_1_PICTURE:
+            i_ratio = 900 * 221 / 100;
+            break;
+
+        case AR_SQUARE_PICTURE:
+        default:
+            i_ratio = 900 * p_vout->render.i_width
+                          / p_vout->render.i_height;
+            break;
+    }
+
+    if( 900 * *pi_width / *pi_height < i_ratio )
+    {
+        *pi_width = *pi_height * i_ratio / 900;
+    }
+    else
+    {
+        *pi_height = *pi_width * 900 / i_ratio;
+    }
+
+    if( *pi_width > i_width )
+    {
+        *pi_width = i_width;
+        *pi_height = 900 * *pi_width / i_ratio;
+    }
+
+    if( *pi_height > i_height )
+    {
+        *pi_height = i_height;
+        *pi_width = *pi_height * i_ratio / 900;
+    }
+
+    *pi_x = ( i_width - *pi_width ) / 2;
+    *pi_y = ( i_height - *pi_height ) / 2;
 }
 
 /* Following functions are local */
@@ -414,39 +452,40 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_picture,
  * used exactly like a video buffer. The video output thread then manages
  * how it gets displayed.
  *****************************************************************************/
-static void NewPicture( picture_t *p_picture, int i_chroma,
-                        int i_width, int i_height )
+static void NewPicture( vout_thread_t *p_vout, picture_t *p_picture )
 {
     int i_data_size = 0;
 
-    p_picture->i_size = i_width * i_height;
+    p_picture->i_size = p_vout->render.i_width
+                         * p_vout->render.i_height;
 
     /* Calculate coordinates */
-    switch( i_chroma )
+    switch( p_vout->render.i_chroma )
     {
         case YUV_420_PICTURE:        /* YUV 420: 1,1/4,1/4 samples per pixel */
             p_picture->i_chroma_size = p_picture->i_size / 4;
-            p_picture->i_chroma_width = i_width / 2;
+            p_picture->i_chroma_width = p_vout->render.i_width / 2;
             break;
 
         case YUV_422_PICTURE:        /* YUV 422: 1,1/2,1/2 samples per pixel */
             p_picture->i_chroma_size = p_picture->i_size / 2;
-            p_picture->i_chroma_width = i_width / 2;
+            p_picture->i_chroma_width = p_vout->render.i_width / 2;
             break;
 
         case YUV_444_PICTURE:            /* YUV 444: 1,1,1 samples per pixel */
             p_picture->i_chroma_size = p_picture->i_size;
-            p_picture->i_chroma_width = i_width;
+            p_picture->i_chroma_width = p_vout->render.i_width;
             break;
 
         default:
-            intf_ErrMsg("error: unknown chroma type %d", i_chroma );
+            intf_ErrMsg( "vout error: unknown chroma type %d",
+                         p_vout->render.i_chroma );
             p_picture->i_planes = 0;
             return;
     }
 
     /* Allocate memory */
-    switch( i_chroma )
+    switch( p_vout->render.i_chroma )
     {
         case YUV_420_PICTURE:        /* YUV 420: 1,1/4,1/4 samples per pixel */
         case YUV_422_PICTURE:        /* YUV 422: 1,1/2,1/2 samples per pixel */

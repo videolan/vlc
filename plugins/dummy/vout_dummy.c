@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.10 2001/12/09 17:01:36 sam Exp $
+ * $Id: vout_dummy.c,v 1.11 2001/12/13 12:47:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -72,6 +72,8 @@ static void vout_Destroy   ( struct vout_thread_s * );
 static int  vout_Manage    ( struct vout_thread_s * );
 static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
 
+static int  DummyNewPicture( struct vout_thread_s *, struct picture_s * );
+
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
@@ -124,91 +126,62 @@ static int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
+    int i_index;
     picture_t *p_pic;
-    int        i_index = 0;
-    int        i_luma_bytes, i_chroma_bytes;
+    
+    I_OUTPUTPICTURES = 0;
+
+    /* Initialize the output structure */
+    switch( p_vout->render.i_chroma )
+    {
+        case YUV_420_PICTURE:
+            p_vout->output.i_chroma = p_vout->render.i_chroma;
+            p_vout->output.i_width  = p_vout->render.i_width;
+            p_vout->output.i_height = p_vout->render.i_height;
+            p_vout->output.i_aspect = p_vout->render.i_aspect;
+            break;
+
+        default:
+            p_vout->output.i_chroma = RGB_16BPP_PICTURE;
+            p_vout->output.i_width  = p_vout->render.i_width;
+            p_vout->output.i_height = p_vout->render.i_height;
+            p_vout->output.i_aspect = p_vout->render.i_aspect;
+            break;
+    }
 
     /* Try to initialize DUMMY_MAX_DIRECTBUFFERS direct buffers */
-    while( i_index < DUMMY_MAX_DIRECTBUFFERS )
+    while( I_OUTPUTPICTURES < DUMMY_MAX_DIRECTBUFFERS )
     {
-        p_pic = &p_vout->p_picture[ i_index ];
+        p_pic = NULL;
 
-        switch( p_vout->i_chroma )
+        /* Find an empty picture slot */
+        for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
         {
-        /* We know this chroma, allocate a buffer which will be used
-         * directly by the decoder */
-        case YUV_420_PICTURE:
-
-            p_pic->i_chroma = YUV_420_PICTURE;
-            p_pic->i_width  = p_vout->i_width;
-            p_pic->i_height = p_vout->i_height;
-
-            /* Precalculate some values */
-            p_pic->i_size         = p_vout->i_width * p_vout->i_height;
-            p_pic->i_chroma_width = p_vout->i_width / 2;
-            p_pic->i_chroma_size  = p_vout->i_width * p_vout->i_height / 2;
-
-            /* Allocate the memory buffer */
-            i_luma_bytes = p_pic->i_size * sizeof(pixel_data_t);
-            i_chroma_bytes = p_pic->i_chroma_size * sizeof(pixel_data_t);
-
-            /* Y buffer */
-            p_pic->planes[ Y_PLANE ].p_data = malloc( i_luma_bytes + 2 * i_chroma_bytes );
-            p_pic->planes[ Y_PLANE ].i_bytes = i_luma_bytes;
-
-            /* U buffer */
-            p_pic->planes[ U_PLANE ].p_data = p_pic->planes[ Y_PLANE ].p_data + p_pic->i_height * p_pic->i_width;
-            p_pic->planes[ U_PLANE ].i_bytes = i_chroma_bytes;
-
-            /* V buffer */
-            p_pic->planes[ V_PLANE ].p_data = p_pic->planes[ U_PLANE ].p_data + p_pic->i_height * p_pic->i_chroma_width;
-            p_pic->planes[ V_PLANE ].i_bytes = i_chroma_bytes;
-
-            /* We allocated 3 planes */
-            p_pic->i_planes = 3;
-
-            break;
-
-        /* Unknown chroma, allocate an RGB buffer, the video output's job
-         * will be to do the chroma->RGB conversion */
-        default:
-
-            p_pic->i_chroma = RGB_16BPP_PICTURE;
-            p_pic->i_width  = DUMMY_WIDTH;
-            p_pic->i_height = DUMMY_HEIGHT;
-
-            /* Precalculate some values */
-            i_luma_bytes    = sizeof(u16) * DUMMY_WIDTH * DUMMY_HEIGHT;
-
-            /* Allocate the memory buffer */
-            p_pic->planes[ RGB_PLANE ].p_data = malloc( i_luma_bytes );
-            p_pic->planes[ RGB_PLANE ].i_bytes = i_luma_bytes;
-
-            /* We allocated 1 plane */
-            p_pic->i_planes = 1;
-
-            break;
+            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
+            {
+                p_pic = p_vout->p_picture + i_index;
+                break;
+            }
         }
 
-        if( p_pic->i_planes == 0 )
+        /* Allocate the picture */
+        if( DummyNewPicture( p_vout, p_pic ) )
         {
             break;
         }
 
         p_pic->i_status        = DESTROYED_PICTURE;
-
-        p_pic->b_directbuffer  = 1;
+        p_pic->i_type          = DIRECT_PICTURE;
 
         p_pic->i_left_margin   =
         p_pic->i_right_margin  =
         p_pic->i_top_margin    =
         p_pic->i_bottom_margin = 0;
 
-        i_index++;
-    }
+        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
 
-    /* How many directbuffers did we create ? */
-    p_vout->i_directbuffers = i_index;
+        I_OUTPUTPICTURES++;
+    }
 
     return( 0 );
 }
@@ -220,11 +193,11 @@ static void vout_End( vout_thread_t *p_vout )
 {
     int i_index;
 
-    /* Free the fake direct buffers we allocated */
-    for( i_index = p_vout->i_directbuffers ; i_index ; )
+    /* Free the fake output buffers we allocated */
+    for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
         i_index--;
-        free( p_vout->p_picture[ i_index ].planes[ 0 ].p_data );
+        free( PP_OUTPUTPICTURE[ i_index ]->planes[ 0 ].p_data );
     }
 }
 
@@ -258,5 +231,70 @@ static int vout_Manage( vout_thread_t *p_vout )
 static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     /* No need to do anything, the fake direct buffers stay as they are */
+}
+
+
+/*****************************************************************************
+ * DummyNewPicture: allocate a picture
+ *****************************************************************************
+ * Returns 0 on success, -1 otherwise
+ *****************************************************************************/
+static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    int i_luma_bytes, i_chroma_bytes;
+
+    int i_width  = p_vout->output.i_width;
+    int i_height = p_vout->output.i_height;
+
+    switch( p_vout->output.i_chroma )
+    {
+    /* We know this chroma, allocate a buffer which will be used
+     * directly by the decoder */
+    case YUV_420_PICTURE:
+
+        /* Precalculate some values */
+        p_pic->i_size         = i_width * i_height;
+        p_pic->i_chroma_width = i_width / 2;
+        p_pic->i_chroma_size  = i_width * i_height / 2;
+
+        /* Allocate the memory buffer */
+        i_luma_bytes = p_pic->i_size * sizeof(pixel_data_t);
+        i_chroma_bytes = p_pic->i_chroma_size * sizeof(pixel_data_t);
+
+        /* Y buffer */
+        p_pic->planes[ Y_PLANE ].p_data = malloc( i_luma_bytes + 2 * i_chroma_bytes );
+        p_pic->planes[ Y_PLANE ].i_bytes = i_luma_bytes;
+
+        /* U buffer */
+        p_pic->planes[ U_PLANE ].p_data = p_pic->planes[ Y_PLANE ].p_data + i_height * i_width;
+        p_pic->planes[ U_PLANE ].i_bytes = i_chroma_bytes;
+
+        /* V buffer */
+        p_pic->planes[ V_PLANE ].p_data = p_pic->planes[ U_PLANE ].p_data + i_height * p_pic->i_chroma_width;
+        p_pic->planes[ V_PLANE ].i_bytes = i_chroma_bytes;
+
+        /* We allocated 3 planes */
+        p_pic->i_planes = 3;
+
+        return( 0 );
+        break;
+
+    /* Unknown chroma, allocate an RGB buffer, the video output's job
+     * will be to do the chroma->RGB conversion */
+    default:
+
+        /* Precalculate some values */
+        i_luma_bytes = sizeof(u16) * i_width * i_height;
+
+        /* Allocate the memory buffer */
+        p_pic->planes[ RGB_PLANE ].p_data = malloc( i_luma_bytes );
+        p_pic->planes[ RGB_PLANE ].i_bytes = i_luma_bytes;
+
+        /* We allocated 1 plane */
+        p_pic->i_planes = 1;
+
+        return( 0 );
+        break;
+    }
 }
 

@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.5 2001/12/10 10:58:54 massiot Exp $
+ * $Id: vpar_headers.c,v 1.6 2001/12/13 12:47:17 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -310,7 +310,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
 
     p_vpar->sequence.i_width = GetBits( &p_vpar->bit_stream, 12 );
     p_vpar->sequence.i_height = GetBits( &p_vpar->bit_stream, 12 );
-    p_vpar->sequence.i_aspect_ratio = GetBits( &p_vpar->bit_stream, 4 );
+    p_vpar->sequence.i_aspect = GetBits( &p_vpar->bit_stream, 4 );
     p_vpar->sequence.i_frame_rate =
             i_frame_rate_table[ GetBits( &p_vpar->bit_stream, 4 ) ];
 
@@ -400,22 +400,22 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
             12015
         };
 
-        if( p_vpar->sequence.i_aspect_ratio > 1 )
+        if( p_vpar->sequence.i_aspect > 1 )
         {
                 i_xyratio = p_vpar->sequence.i_height *
-                        pi_mpeg1ratio[p_vpar->sequence.i_aspect_ratio] /
+                        pi_mpeg1ratio[p_vpar->sequence.i_aspect] /
                         p_vpar->sequence.i_width;
                 if( 7450 < i_xyratio && i_xyratio < 7550 )
                 {
-                        p_vpar->sequence.i_aspect_ratio = 2;
+                        p_vpar->sequence.i_aspect = 2;
                 }
                 else if( 5575 < i_xyratio && i_xyratio < 5675 )
                 {
-                        p_vpar->sequence.i_aspect_ratio = 3;
+                        p_vpar->sequence.i_aspect = 3;
                 }
                 else if( 4475 < i_xyratio && i_xyratio < 4575 )
                 {
-                        p_vpar->sequence.i_aspect_ratio = 4;
+                        p_vpar->sequence.i_aspect = 4;
                 }
         }
 
@@ -478,7 +478,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
             vout_CreateThread( NULL, p_vpar->sequence.i_width,
                                      p_vpar->sequence.i_height,
                                      99 + p_vpar->sequence.i_chroma_format,
-                                     p_vpar->sequence.i_aspect_ratio );
+                                     p_vpar->sequence.i_aspect );
 
         /* Everything failed */
         if( p_vpar->p_vout == NULL )
@@ -774,12 +774,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     if( !p_vpar->picture.i_current_structure )
     {
         /* This is a new frame. Get a structure from the video_output. */
-        while( ( P_picture = vout_CreatePicture( p_vpar->p_vout,
-                                        p_vpar->sequence.i_width,
-                                        p_vpar->sequence.i_height,
-                         /* XXX */ 99 + p_vpar->sequence.i_chroma_format,
-                                        p_vpar->sequence.i_aspect_ratio ) )
-             == NULL )
+        while( ( P_picture = vout_CreatePicture( p_vpar->p_vout ) ) == NULL )
         {
             intf_DbgMsg("vpar debug: vout_CreatePicture failed, delaying");
             if( p_vpar->p_fifo->b_die || p_vpar->p_fifo->b_error )
@@ -791,7 +786,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
         /* Initialize values. */
         vpar_SynchroDecode( p_vpar, p_vpar->picture.i_coding_type, i_structure );
-        P_picture->i_aspect_ratio = p_vpar->sequence.i_aspect_ratio;
         P_picture->i_matrix_coefficients = p_vpar->sequence.i_matrix_coefficients;
         p_vpar->picture.i_field_width = ( p_vpar->sequence.i_width
                     << ( 1 - p_vpar->picture.b_frame_structure ) );

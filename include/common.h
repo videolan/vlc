@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.57 2001/12/12 02:13:50 sam Exp $
+ * $Id: common.h,v 1.58 2001/12/13 12:47:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -544,8 +544,7 @@ typedef struct module_symbols_s
     struct vout_thread_s * (* vout_CreateThread) ( int *, int, int, int, int );
     struct subpicture_s * (* vout_CreateSubPicture) ( struct vout_thread_s *, 
                                                       int, int );
-    struct picture_s * ( * vout_CreatePicture ) ( struct vout_thread_s *, 
-                                                  int, int, int, int );
+    struct picture_s * ( * vout_CreatePicture ) ( struct vout_thread_s * ); 
 
     void  ( * vout_DestroySubPicture )  ( struct vout_thread_s *, 
                                           struct subpicture_s * );
@@ -561,6 +560,8 @@ typedef struct module_symbols_s
                                       struct picture_s * );
     void  ( * vout_DatePicture )    ( struct vout_thread_s *p_vout, 
                                       struct picture_s *p_pic, mtime_t );
+    void  ( * vout_PlacePicture )   ( struct vout_thread_s *, int, int,
+                                      int *, int *, int *, int * );
     
     u32  ( * UnalignedShowBits )    ( struct bit_stream_s *, unsigned int );
     void ( * UnalignedRemoveBits )  ( struct bit_stream_s * );

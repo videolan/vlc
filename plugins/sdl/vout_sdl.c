@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.68 2001/12/09 17:01:37 sam Exp $
+ * $Id: vout_sdl.c,v 1.69 2001/12/13 12:47:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -176,8 +176,8 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->b_cursor_autohidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
 
-    p_vout->p_sys->i_width = p_vout->i_width;
-    p_vout->p_sys->i_height = p_vout->i_height;
+    p_vout->p_sys->i_width = p_vout->render.i_width;
+    p_vout->p_sys->i_height = p_vout->render.i_height;
 
     if( SDLOpenDisplay( p_vout ) )
     {
@@ -196,33 +196,58 @@ static int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
+    int i_index;
     picture_t *p_pic;
-    int        i_index = 0;
+
+    I_OUTPUTPICTURES = 0;
+
+    /* Initialize the output structure */
+    switch( p_vout->render.i_chroma )
+    {
+        case YUV_420_PICTURE:
+            p_vout->output.i_chroma = p_vout->render.i_chroma;
+            p_vout->output.i_width  = p_vout->render.i_width;
+            p_vout->output.i_height = p_vout->render.i_height;
+            p_vout->output.i_aspect = p_vout->render.i_aspect;
+            break;
+
+        default:
+            return( 0 );
+    }
 
     /* Try to initialize SDL_MAX_DIRECTBUFFERS direct buffers */
-    while( i_index < SDL_MAX_DIRECTBUFFERS )
+    while( I_OUTPUTPICTURES < SDL_MAX_DIRECTBUFFERS )
     {
-        p_pic = &p_vout->p_picture[ i_index ];
+        p_pic = NULL;
 
+        /* Find an empty picture slot */
+        for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
+        {
+            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
+            {
+                p_pic = p_vout->p_picture + i_index;
+                break;
+            }
+        }
+
+        /* Allocate the picture */
         if( SDLNewPicture( p_vout, p_pic ) )
         {
             break;
         }
 
         p_pic->i_status        = DESTROYED_PICTURE;
-
-        p_pic->b_directbuffer  = 1;
+        p_pic->i_type          = DIRECT_PICTURE;
 
         p_pic->i_left_margin   =
         p_pic->i_right_margin  =
         p_pic->i_top_margin    =
         p_pic->i_bottom_margin = 0;
 
-        i_index++;
-    }
+        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
 
-    /* How many directbuffers did we create ? */
-    p_vout->i_directbuffers = i_index;
+        I_OUTPUTPICTURES++;
+    }
 
     return( 0 );
 }
@@ -236,13 +261,13 @@ static void vout_End( vout_thread_t *p_vout )
 {
     int i_index;
 
-    /* Free the direct buffers we allocated */
-    for( i_index = p_vout->i_directbuffers ; i_index ; )
+    /* Free the output buffers we allocated */
+    for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
         i_index--;
-        SDL_UnlockYUVOverlay( p_vout->p_picture[ i_index ].p_sys->p_overlay );
-        SDL_FreeYUVOverlay( p_vout->p_picture[ i_index ].p_sys->p_overlay );
-        free( p_vout->p_picture[ i_index ].p_sys );
+        SDL_UnlockYUVOverlay( PP_OUTPUTPICTURE[ i_index ]->p_sys->p_overlay );
+        SDL_FreeYUVOverlay( PP_OUTPUTPICTURE[ i_index ]->p_sys->p_overlay );
+        free( PP_OUTPUTPICTURE[ i_index ]->p_sys );
     }
 }
 
@@ -410,26 +435,21 @@ static int vout_Manage( vout_thread_t *p_vout )
  *****************************************************************************
  * This function sends the currently rendered image to the display.
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_picture )
+static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    int x, y, w, h;
     SDL_Rect disp;
 
-    /* We'll need to deal with aspect ratio later */
-    disp.w = p_vout->p_sys->i_width;
-    disp.h = p_vout->p_sys->i_height;
-    disp.x = 0;
-    disp.y = 0;
+    vout_PlacePicture( p_vout, p_vout->p_sys->i_width, p_vout->p_sys->i_height,
+                       &x, &y, &w, &h );
+    disp.x = x;
+    disp.y = y;
+    disp.w = w;
+    disp.h = h;
 
-    if( p_picture->b_directbuffer )
-    {
-        SDL_UnlockYUVOverlay( p_picture->p_sys->p_overlay);
-        SDL_DisplayYUVOverlay( p_picture->p_sys->p_overlay , &disp );
-        SDL_LockYUVOverlay( p_picture->p_sys->p_overlay);
-    }
-    else
-    {
-        intf_ErrMsg( "vout error: main thread passed a virtual buffer" );
-    }
+    SDL_UnlockYUVOverlay( p_pic->p_sys->p_overlay);
+    SDL_DisplayYUVOverlay( p_pic->p_sys->p_overlay , &disp );
+    SDL_LockYUVOverlay( p_pic->p_sys->p_overlay);
 }
 
 /* following functions are local */
@@ -495,7 +515,10 @@ static void SDLCloseDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    switch( p_vout->i_chroma )
+    int i_width  = p_vout->output.i_width;
+    int i_height = p_vout->output.i_height;
+
+    switch( p_vout->output.i_chroma )
     {
         case YUV_420_PICTURE:
             /* We know this chroma, allocate a buffer which will be used
@@ -508,7 +531,7 @@ static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             }
 
             p_pic->p_sys->p_overlay =
-                SDL_CreateYUVOverlay( p_vout->i_width, p_vout->i_height,
+                SDL_CreateYUVOverlay( i_width, i_height,
                                       SDL_YV12_OVERLAY,
                                       p_vout->p_sys->p_display );
 
@@ -520,14 +543,10 @@ static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
             SDL_LockYUVOverlay( p_pic->p_sys->p_overlay );
 
-            p_pic->i_chroma = p_vout->i_chroma; /* YUV_420_PICTURE */
-            p_pic->i_width  = p_vout->i_width;
-            p_pic->i_height = p_vout->i_height;
-
             /* Precalculate some values */
-            p_pic->i_size         = p_vout->i_width * p_vout->i_height;
-            p_pic->i_chroma_width = p_vout->i_width / 2;
-            p_pic->i_chroma_size  = p_vout->i_height * p_pic->i_chroma_width;
+            p_pic->i_size         = i_width * i_height;
+            p_pic->i_chroma_width = i_width / 2;
+            p_pic->i_chroma_size  = i_height * ( i_width / 2 );
 
             /* FIXME: try to get the right i_bytes value from p_overlay */
             p_pic->planes[ Y_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[0];
