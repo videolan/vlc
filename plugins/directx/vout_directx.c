@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.c,v 1.2 2001/06/03 12:47:21 sam Exp $
+ * $Id: vout_directx.c,v 1.3 2001/06/08 20:03:15 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -26,12 +26,20 @@
 
 /* This is a list of what needs to be fixed:
  *
+ * When the option: "Display full screen when dragging window" is enabled in
+ * Windows display properties, the overlay surface coordinates won't be updated
+ * (but it won't crash anymore ;-) I know where the problem is in the code, but * I just don't know yet of a nice way to fix it.
+ *
+ * When you move part of the video window outside the physical display, the
+ * overlay surface coordinates are not updated anymore. This comes from the
+ * directdraw UpdateOverlay function which doesn't like negative coordinates.
+ *
  * For now, this plugin only works when YUV overlay is supported (which it
  * should be nowadays on most of the video cards under Windows)...
  *
  * The overlay doesn't use double-buffering.
  *
- * Use Shane Harper's optimizations for YUV
+ * Port this plugin to Video Output IV
  */
 
 /*****************************************************************************
@@ -45,6 +53,7 @@
 #include <string.h>                                            /* strerror() */
 
 #include <windows.h>
+#include <windowsx.h>
 #include <directx.h>
 
 #include "config.h"
@@ -64,10 +73,6 @@
 #include "modules.h"
 #include "modules_export.h"
 
-#define OVERLAY_COLOR_KEY 1       /* color on top of which the overlay will be
-                                   * displayed. 1 should be almost black but
-                                   * not black (which is too common a color) */
-
 /*****************************************************************************
  * vout_sys_t: video output DirectX method descriptor
  *****************************************************************************
@@ -77,18 +82,20 @@
 typedef struct vout_sys_s
 {
 
-    LPDIRECTDRAW          p_ddobject;                   /* DirectDraw object */
-    LPDIRECTDRAWSURFACE   p_display;                       /* display device */
-    LPDIRECTDRAWSURFACE   p_overlay;                       /* overlay device */
-    LPDIRECTDRAWCLIPPER   p_clipper;                              /* clipper */
-    HWND                  hwnd;                        /* Handle of the main */
-                                                                   /* window */
+    LPDIRECTDRAW         p_ddobject;                    /* DirectDraw object */
+    LPDIRECTDRAWSURFACE  p_display;                        /* display device */
+    LPDIRECTDRAWSURFACE  p_overlay;                        /* overlay device */
+    LPDIRECTDRAWCLIPPER  p_clipper;                               /* clipper */
+    HBRUSH               hbrush;           /* window backgound brush (color) */
+    HWND                 hwnd;                  /* Handle of the main window */
 
     int         i_image_width;                  /* size of the decoded image */
     int         i_image_height;
     int         i_window_width;               /* size of the displayed image */
     int         i_window_height;
 
+    int         i_colorkey;          /* colorkey used to display the overlay */
+ 
     boolean_t   b_display_enabled;
     boolean_t   b_overlay;
     boolean_t   b_cursor;
@@ -118,7 +125,6 @@ static int  WinDXInitDDraw        ( vout_thread_t *p_vout );
 static int  WinDXCreateDisplay    ( vout_thread_t *p_vout );
 static int  WinDXCreateYUVOverlay ( vout_thread_t *p_vout );
 static int  WinDXUpdateOverlay    ( vout_thread_t *p_vout );
-static int  WinDXClipOverlay      ( vout_thread_t *p_vout );
 static void WinDXCloseDDraw       ( vout_thread_t *p_vout );
 static void WinDXCloseWindow      ( vout_thread_t *p_vout );
 static void WinDXCloseDisplay     ( vout_thread_t *p_vout );
@@ -171,11 +177,18 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
+    /* Initialisations */
+    p_vout->p_sys->p_ddobject = NULL;
+    p_vout->p_sys->p_display = NULL;
+    p_vout->p_sys->p_overlay = NULL;
+    p_vout->p_sys->p_clipper = NULL;
+    p_vout->p_sys->hbrush = INVALID_HANDLE_VALUE;
+    p_vout->p_sys->hwnd = INVALID_HANDLE_VALUE;
+
     p_vout->p_sys->b_cursor = 1; /* TODO should be done with a main_GetInt.. */
 
     p_vout->p_sys->b_cursor_autohidden = 0;
     p_vout->p_sys->b_display_enabled = 0;
-
     p_vout->p_sys->i_lastmoved = mdate();
 
     p_vout->b_fullscreen = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
@@ -251,6 +264,7 @@ static void vout_End( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Destroy( vout_thread_t *p_vout )
 {
+    intf_WarnMsg( 3, "vout: vout_Destroy" );
     WinDXCloseDisplay( p_vout );
     WinDXCloseDDraw( p_vout );
     WinDXCloseWindow( p_vout );
@@ -271,8 +285,9 @@ static void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Manage( vout_thread_t *p_vout )
 {
-    MSG msg;
+    MSG             msg;
     WINDOWPLACEMENT window_placement;
+    boolean_t       b_dispatch_msg = TRUE;
 
     while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
     {
@@ -280,6 +295,12 @@ static int vout_Manage( vout_thread_t *p_vout )
         {
             switch( msg.message )
             {
+
+                case WM_CLOSE:
+                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_CLOSE" );
+                    p_vout->b_die = 1;
+                    break;
+
                 case WM_QUIT:
                     intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_QUIT" );
                     p_main->p_intf->b_die = 1;
@@ -289,24 +310,65 @@ static int vout_Manage( vout_thread_t *p_vout )
                     intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_MOVE" );
                     if( !p_vout->b_need_render )
                     {
-                        WinDXUpdateOverlay( p_vout );
+                        p_vout->i_changes |= VOUT_SIZE_CHANGE;
                     }
                     /* don't create a never ending loop */
-                    return( 0 );
+                    b_dispatch_msg = FALSE;
+                    break;
+
+                case WM_APP:
+                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_APP" );
+                    if( !p_vout->b_need_render )
+                    {
+                        p_vout->i_changes |= VOUT_SIZE_CHANGE;
+                    }
+                    /* don't create a never ending loop */
+                    b_dispatch_msg = FALSE;
                     break;
 
                 case WM_PAINT:
                     intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_PAINT" );
-                    if( !p_vout->b_need_render )
+                    break;
+
+                case WM_ERASEBKGND:
+                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_ERASEBKGND" );
+                    break;
+
+                case WM_MOUSEMOVE:
+                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_MOUSEMOVE" );
+                    if( p_vout->p_sys->b_cursor )
                     {
-                        WinDXClipOverlay( p_vout );
+                    if( p_vout->p_sys->b_cursor_autohidden )
+                        {
+                            p_vout->p_sys->b_cursor_autohidden = 0;
+                            p_vout->p_sys->i_lastmoved = mdate();
+                            ShowCursor( TRUE );
+                        }
+                        else
+                        {
+                            p_vout->p_sys->i_lastmoved = mdate();
+                        }
+                    }               
+                    break;
+
+                case WM_KEYDOWN:
+                    /* the key events are first processed here. The next
+                     * message processed by this main message loop will be the
+                     * char translation of the key event */
+                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_KEYDOWN" );
+                    switch( msg.wParam )
+                    {
+                        case VK_ESCAPE:
+                        case VK_F12:
+                            p_main->p_intf->b_die = 1;
+                            break;
                     }
-                    /* don't create a never ending loop */
-                    return( 0 );
+                    TranslateMessage(&msg);
+                    b_dispatch_msg = FALSE;
                     break;
 
                 case WM_CHAR:
-                    intf_WarnMsg( 3, "vout: WinDX WinProc WM_CHAR" );
+                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_CHAR" );
                     switch( msg.wParam )
                     {
                         case 'q':
@@ -341,10 +403,19 @@ static int vout_Manage( vout_thread_t *p_vout )
                     }
 
                 default:
+                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM Default %i",
+                                  msg.message );
                 break;
             }
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+
+            /* don't create a never ending loop */
+            if( b_dispatch_msg )
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+            b_dispatch_msg = TRUE;
+
         }
         else
         {
@@ -353,6 +424,16 @@ static int vout_Manage( vout_thread_t *p_vout )
 
     }
 
+
+    /*
+     * Size Change 
+     */
+    if( p_vout->i_changes & VOUT_SIZE_CHANGE )
+    {
+        intf_WarnMsg( 3, "vout: WinDX vout_Manage Size Change" );
+        WinDXUpdateOverlay( p_vout );
+        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
+    }
 
     /*
      * Fullscreen change
@@ -385,6 +466,27 @@ static int vout_Manage( vout_thread_t *p_vout )
         /*WinDXUpdateOverlay( p_vout );*/
 
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
+    }
+
+    /*
+     * Pointer change
+     */
+    if( ! p_vout->p_sys->b_cursor_autohidden &&
+        ( mdate() - p_vout->p_sys->i_lastmoved > 2000000 ) )
+    {
+        /* Hide the mouse automatically */
+        p_vout->p_sys->b_cursor_autohidden = 1;
+        ShowCursor( FALSE );
+    }
+
+    if( p_vout->i_changes & VOUT_CURSOR_CHANGE )
+    {
+        p_vout->p_sys->b_cursor = ! p_vout->p_sys->b_cursor;
+
+        ShowCursor( p_vout->p_sys->b_cursor &&
+                     ! p_vout->p_sys->b_cursor_autohidden );
+
+        p_vout->i_changes &= ~VOUT_CURSOR_CHANGE;
     }
 
     return( 0 );
@@ -489,6 +591,7 @@ static void vout_Display( vout_thread_t *p_vout )
          * when the Pitch does not equal the width of the picture */
         for( i=0; i < ddsd.dwHeight/2; i++)
         {
+#ifdef NONAMELESSUNION
             /* copy Y, we copy two lines at once */
             memcpy(ddsd.lpSurface + i*2*ddsd.u1.lPitch,
                    p_vout->p_rendered_pic->p_y + i*2*i_image_width,
@@ -507,6 +610,27 @@ static void vout_Display( vout_thread_t *p_vout )
                       + i * ddsd.u1.lPitch/2,
                    p_vout->p_rendered_pic->p_u + i*i_image_width/2,
                    i_image_width/2);
+#else
+            /* copy Y, we copy two lines at once */
+            memcpy(ddsd.lpSurface + i*2*ddsd.lPitch,
+                   p_vout->p_rendered_pic->p_y + i*2*i_image_width,
+                   i_image_width);
+            memcpy(ddsd.lpSurface + (i*2+1)*ddsd.lPitch,
+                   p_vout->p_rendered_pic->p_y + (i*2+1)*i_image_width,
+                   i_image_width);
+            /* then V */
+            memcpy((ddsd.lpSurface + ddsd.dwHeight * ddsd.lPitch)
+                      + i * ddsd.lPitch/2,
+                   p_vout->p_rendered_pic->p_v + i*i_image_width/2,
+                   i_image_width/2);
+            /* and U */
+            memcpy((ddsd.lpSurface + ddsd.dwHeight * ddsd.lPitch)
+                      + (ddsd.dwHeight * ddsd.lPitch/4)
+                      + i * ddsd.lPitch/2,
+                   p_vout->p_rendered_pic->p_u + i*i_image_width/2,
+                   i_image_width/2);
+#endif /* NONAMELESSUNION */
+
         }
 
         /* Unlock the Surface */
@@ -538,42 +662,23 @@ long FAR PASCAL WinDXEventProc( HWND hwnd, UINT message,
     switch( message )
     {
 
-    case WM_ACTIVATEAPP:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_ACTIVEAPP" );
-
-        break;
-
-    case WM_SETCURSOR:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_SETCURSOR" );
-        /* turn the cursor off by setting it's value to NULL */
-        SetCursor(NULL);
+    case WM_ACTIVATE:
+        intf_WarnMsg( 3, "vout: WinDX WinProc WM_ACTIVED" );
         break;
 
     case WM_CREATE:
         intf_WarnMsg( 3, "vout: WinDX WinProc WM_CREATE" );
         break;
 
-    /* test your key states in this case */
-    case WM_KEYDOWN:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_KEYDOWN" );
-        switch( wParam )
-        {
-        case VK_ESCAPE:
-        case VK_F12:
-            PostMessage(hwnd,WM_CLOSE,0,0);
-            break;
-
-        }
+    /* the user wants to close the window */
+    case WM_CLOSE:
+        intf_WarnMsg( 3, "vout: WinDX WinProc WM_CLOSE" );
         break;
 
-    /* this case is touched when the application is shutting down */
+    /* the window has been closed so shut down everything now */
     case WM_DESTROY:
         intf_WarnMsg( 3, "vout: WinDX WinProc WM_DESTROY" );
         PostQuitMessage( 0 );
-        break;
-
-    case WM_QUIT:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_QUIT" );
         break;
 
     case WM_SYSCOMMAND:
@@ -587,11 +692,40 @@ long FAR PASCAL WinDXEventProc( HWND hwnd, UINT message,
         break;
 
     case WM_MOVE:
-    case WM_SIZE:
-    case WM_WINDOWPOSCHANGED:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_MOVE, WMSIZE" );
-        PostMessage(hwnd,WM_MOVE,0,0);
+        intf_WarnMsg( 3, "vout: WinDX WinProc WM_MOVE" );
+        break;
 
+    case WM_SIZE:
+        intf_WarnMsg( 3, "vout: WinDX WinProc WM_SIZE" );
+        break;
+
+    case WM_MOVING:
+        intf_WarnMsg( 3, "vout: WinDX WinProc WM_MOVING" );
+        break;
+
+    case WM_SIZING:
+        intf_WarnMsg( 3, "vout: WinDX WinProc WM_SIZING" );
+        break;
+
+    case WM_WINDOWPOSCHANGED:
+        intf_WarnMsg( 3, "vout: WinDX WinProc WM_WINDOWPOSCHANGED" );
+        PostMessage( NULL, WM_APP, 0, 0);
+        break;
+
+    case WM_WINDOWPOSCHANGING:
+        intf_WarnMsg( 3, "vout: WinDX WinProc WM_WINDOWPOSCHANGING" );
+        break;
+
+    case WM_PAINT:
+        intf_WarnMsg( 3, "vout: WinDX WinProc WM_PAINT" );
+        break;
+
+    case WM_ERASEBKGND:
+        intf_WarnMsg( 3, "vout: WinDX WinProc WM_ERASEBKGND" );
+        break;
+
+    default:
+        intf_WarnMsg( 3, "vout: WinDX WinProc WM Default %i", message );
         break;
     }
 
@@ -610,11 +744,38 @@ static int WinDXCreateWindow( vout_thread_t *p_vout )
     HINSTANCE hInstance;
     WNDCLASS  wc;                                 /* window class components */
     RECT      rect_window;
+    COLORREF  colorkey; 
+    HDC       hdc;
 
     intf_WarnMsg( 3, "vout: WinDX WinDXCreateWindow" );
 
     /* get this module's instance */
     hInstance = GetModuleHandle(NULL);
+
+    /* Create a BRUSH that will be used by Windows to paint the window
+     * background.
+     * This window background is important for us as it will be used by the
+     * graphics card to display the overlay.
+     * This is why we carefully choose the color for this background, the goal
+     * being to choose a color which isn't complete black but nearly. We
+     * obviously don't want to use black as a colorkey for the overlay because
+     * black is one of the most used color and thus would give us undesirable
+     * effects */
+    /* the first step is to find the colorkey we want to use. The difficulty
+     * comes from the potential dithering (depends on the display depth)
+     * because we need to know the real RGB value of the chosen colorkey */
+    hdc = GetDC( GetDesktopWindow() );
+    for( colorkey = 1; colorkey < 0xFF /*all shades of red*/; colorkey++ )
+    {
+        if( colorkey == GetNearestColor( hdc, colorkey ) )
+          break;
+    }
+    intf_WarnMsg( 3, "vout: WinDXCreateWindow background color:%i", colorkey );
+    ReleaseDC( p_vout->p_sys->hwnd, hdc );
+
+    /* create the actual brush */  
+    p_vout->p_sys->hbrush = CreateSolidBrush(colorkey);
+    p_vout->p_sys->i_colorkey = (int)colorkey;
 
     /* fill in the window class structure */
     wc.style         = 0;                               /* no special styles */
@@ -624,7 +785,7 @@ static int WinDXCreateWindow( vout_thread_t *p_vout )
     wc.hInstance     = hInstance;                                /* instance */
     wc.hIcon         = LoadIcon(NULL, IDI_WINLOGO);   /* load a default icon */
     wc.hCursor       = LoadCursor(NULL, IDC_ARROW); /* load a default cursor */
-    wc.hbrBackground = NULL;                            /* redraw our own bg */
+    wc.hbrBackground = p_vout->p_sys->hbrush;            /* background color */
     wc.lpszMenuName  = NULL;                                      /* no menu */
     wc.lpszClassName = "VLC DirectX";                 /* use a special class */
 
@@ -743,6 +904,7 @@ static int WinDXCreateDisplay( vout_thread_t *p_vout )
         return( 1 );
     }
 
+#if 0
     /* Now create a clipper for our window.
      * This clipper prevents us to modify by mistake anything on the screen
      * (primary surface) which doesn't belong to our window */
@@ -775,7 +937,7 @@ static int WinDXCreateDisplay( vout_thread_t *p_vout )
         p_vout->p_sys->p_display = NULL;
         return( 1 );
     }
-
+#endif
 
     /* Probe the capabilities of the hardware */
     /* This is just an indication of whever or not we'll support overlay,
@@ -806,6 +968,7 @@ static int WinDXCreateDisplay( vout_thread_t *p_vout )
                          bHasOverlay, bHasColorKey, bCanStretch );
     }
 
+    p_vout->p_sys->p_overlay = NULL;
     if( bHasOverlay && bHasColorKey && bCanStretch )
     {
         if( !WinDXCreateYUVOverlay( p_vout ) )
@@ -850,6 +1013,8 @@ static int WinDXCreateDisplay( vout_thread_t *p_vout )
         /* Set thread information */
         p_vout->i_width =           ddsd.dwWidth;
         p_vout->i_height =          ddsd.dwHeight;
+
+#ifdef NONAMELESSUNION
         p_vout->i_bytes_per_line =  ddsd.u1.lPitch;
 
         p_vout->i_screen_depth =    ddsd.ddpfPixelFormat.u1.dwRGBBitCount;
@@ -858,6 +1023,17 @@ static int WinDXCreateDisplay( vout_thread_t *p_vout )
         p_vout->i_red_mask =        ddsd.ddpfPixelFormat.u2.dwRBitMask;
         p_vout->i_green_mask =      ddsd.ddpfPixelFormat.u3.dwGBitMask;
         p_vout->i_blue_mask =       ddsd.ddpfPixelFormat.u4.dwBBitMask;
+#else
+        p_vout->i_bytes_per_line =  ddsd.lPitch;
+
+        p_vout->i_screen_depth =    ddsd.ddpfPixelFormat.dwRGBBitCount;
+        p_vout->i_bytes_per_pixel = ddsd.ddpfPixelFormat.dwRGBBitCount/8;
+
+        p_vout->i_red_mask =        ddsd.ddpfPixelFormat.dwRBitMask;
+        p_vout->i_green_mask =      ddsd.ddpfPixelFormat.dwGBitMask;
+        p_vout->i_blue_mask =       ddsd.ddpfPixelFormat.dwBBitMask;
+
+#endif /* NONAMELESSUNION */
 
         /* Unlock the Surface */
         dxresult = IDirectDrawSurface_Unlock(p_vout->p_sys->p_display,
@@ -896,7 +1072,11 @@ static int WinDXCreateDisplay( vout_thread_t *p_vout )
         /* Set thread information */
         p_vout->i_width =           ddsd.dwWidth;
         p_vout->i_height =          ddsd.dwHeight;
+#ifdef NONAMELESSUNION
         p_vout->i_bytes_per_line =  ddsd.u1.lPitch;
+#else
+        p_vout->i_bytes_per_line =  ddsd.lPitch;
+#endif /* NONAMELESSUNION */
 
         /* Unlock the Surface */
         dxresult = IDirectDrawSurface_Unlock(p_vout->p_sys->p_overlay,
@@ -926,15 +1106,19 @@ static int WinDXCreateYUVOverlay( vout_thread_t *p_vout )
      * A color key is used to determine whether or not the overlay will be
      * displayed, ie the overlay will be displayed in place of the primary
      * surface wherever the primary surface will have this color.
-     * This color will be painted by WinDXClipOverlay which in turn is called
-     * by a WM_PAINT event */
+     * The video window has been created with a background of this color so
+     * the overlay will be only displayed on top of this window */
 
     memset( &ddsd, 0, sizeof( DDSURFACEDESC ));
     ddsd.dwSize = sizeof(DDSURFACEDESC);
     ddsd.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
     ddsd.ddpfPixelFormat.dwFlags = DDPF_FOURCC;
     ddsd.ddpfPixelFormat.dwFourCC = mmioFOURCC('Y','V','1','2');
+#ifdef NONAMELESSUNION
     ddsd.ddpfPixelFormat.u1.dwYUVBitCount = 16;
+#else
+    ddsd.ddpfPixelFormat.dwYUVBitCount = 16;
+#endif
 
     ddsd.dwSize = sizeof(DDSURFACEDESC);
     ddsd.dwFlags = DDSD_CAPS |
@@ -951,6 +1135,7 @@ static int WinDXCreateYUVOverlay( vout_thread_t *p_vout )
     if( dxresult != DD_OK )
     {
         intf_ErrMsg( "vout error: can't create overlay surface." );
+        p_vout->p_sys->p_overlay = NULL;
     }
     else
     {
@@ -977,9 +1162,12 @@ static int WinDXCreateYUVOverlay( vout_thread_t *p_vout )
 static int WinDXUpdateOverlay( vout_thread_t *p_vout )
 {
     DDOVERLAYFX     ddofx;
-    RECT            rect_window, rect_client;
+    RECT            rect_window, rect_image;
+    POINT           point_window;
     DWORD           dwFlags;
     HRESULT         dxresult;
+    DWORD           dw_colorkey;
+    DDPIXELFORMAT   pixel_format;
 
     if( p_vout->p_sys->p_overlay == NULL || p_vout->b_need_render)
     {
@@ -995,13 +1183,23 @@ static int WinDXUpdateOverlay( vout_thread_t *p_vout )
 
     /* Now get the coordinates of the window. We don't actually want the
      * window coordinates but these of the usable surface inside the window.
-     * By specification rect_client.right = rect_client.top = 0 */
-    GetWindowRect(p_vout->p_sys->hwnd, &rect_window);
-    GetClientRect(p_vout->p_sys->hwnd, &rect_client);;
-    rect_window.left = ( (rect_window.right - rect_window.left) -
-                          rect_client.right ) / 2 + rect_window.left;
-    rect_window.right = rect_window.left + rect_client.right;
-    rect_window.top = rect_window.bottom - rect_client.bottom;
+     * By specification GetClientRect will always set rect_window.left and
+     * rect_window.top to 0 because the Client area is always relative to the
+     * container window */
+    GetClientRect(p_vout->p_sys->hwnd, &rect_window);
+
+    point_window.x = 0;
+    point_window.y = 0;
+    ClientToScreen(p_vout->p_sys->hwnd, &point_window);
+    rect_window.left = point_window.x;
+    rect_window.top = point_window.y;
+
+    point_window.x = rect_window.right;
+    point_window.y = rect_window.bottom;
+    ClientToScreen(p_vout->p_sys->hwnd, &point_window);
+    rect_window.right = point_window.x;
+    rect_window.bottom = point_window.y;
+
 
     /* We want to keep the aspect ratio of the video */
     if( p_vout->b_scale )
@@ -1092,81 +1290,45 @@ static int WinDXUpdateOverlay( vout_thread_t *p_vout )
     }
 
 
+    /* It seems we can't feed the UpdateOverlay directdraw function with
+     * negative values so we have to clip the computed rectangles */
+    /* FIXME */
+
+
+    /* compute the colorkey pixel value from the RGB value we've got */
+    memset( &pixel_format, 0, sizeof( DDPIXELFORMAT ));
+    pixel_format.dwSize = sizeof( DDPIXELFORMAT );
+    dxresult = IDirectDrawSurface_GetPixelFormat( p_vout->p_sys->p_display,
+                                                  &pixel_format );
+    if( dxresult != DD_OK )
+        intf_WarnMsg( 3, "vout: WinDX GetPixelFormat failed !!" );
+    dw_colorkey = (DWORD)p_vout->p_sys->i_colorkey;
+#ifdef NONAMELESSUNION
+    dw_colorkey = (DWORD)((( dw_colorkey * pixel_format.u2.dwRBitMask) / 255)
+                          & pixel_format.u2.dwRBitMask);
+#else
+    dw_colorkey = (DWORD)((( dw_colorkey * pixel_format.dwRBitMask) / 255)
+                          & pixel_format.dwRBitMask);
+#endif
+
     /* Position and show the overlay */
     memset(&ddofx, 0, sizeof(DDOVERLAYFX));
     ddofx.dwSize = sizeof(DDOVERLAYFX);
-    ddofx.dckDestColorkey.dwColorSpaceLowValue = OVERLAY_COLOR_KEY;
-    ddofx.dckDestColorkey.dwColorSpaceHighValue = OVERLAY_COLOR_KEY;
+    ddofx.dckDestColorkey.dwColorSpaceLowValue = dw_colorkey;
+    ddofx.dckDestColorkey.dwColorSpaceHighValue = dw_colorkey;
 
     dwFlags = DDOVER_KEYDESTOVERRIDE | DDOVER_SHOW;
 
     dxresult = IDirectDrawSurface_UpdateOverlay(p_vout->p_sys->p_overlay,
-                                                NULL,
+                                                NULL,    /*&rect_image,*/
                                                 p_vout->p_sys->p_display,
                                                 &rect_window,
                                                 dwFlags,
                                                 &ddofx);
     if(dxresult != DD_OK)
     {
-        intf_WarnMsg( 3, "vout: WinDX WM_MOVE can't move or resize overlay" );
+        intf_WarnMsg( 3, "vout: WinDX can't move or resize overlay" );
     }
-
-    return ( 0 );
-}
-
-/*****************************************************************************
- * WinDXClipOveraly: Clip overlay surface on video display.
- *****************************************************************************
- * The overlay is displayed on top of the primary surface (which is the
- * screen).
- * This overlay must be clipped whenever another window is supposed to cover
- * it.
- * For this, we use a color key which we paint on the parts of the window
- * which aren't covered by anything else. The video adapter will then only
- * display the overlay on the surfaces painted with this color key.
- * This function is called whenever a WM_PAINT event is generated
- * (in vout_Manage).
- *****************************************************************************/
-static int WinDXClipOverlay( vout_thread_t *p_vout )
-{
-    PAINTSTRUCT ps;
-    POINT       ptClient;
-    RECT        rectBlt;
-    DDBLTFX     ddbfx;
-
-    if( p_vout->p_sys->p_overlay == NULL || p_vout->b_need_render)
-    {
-        intf_WarnMsg( 3, "vout: WinDX no overlay !!" );
-        return( 0 );
-    }
-
-    BeginPaint(p_vout->p_sys->hwnd, &ps);
-
-    /* Fill the client area with colour key */
-    ptClient.x = ps.rcPaint.left;
-    ptClient.y = ps.rcPaint.top;
-    ClientToScreen(p_vout->p_sys->hwnd, &ptClient);
-    rectBlt.left = ptClient.x;
-    rectBlt.top = ptClient.y;
-
-    ptClient.x = ps.rcPaint.right;
-    ptClient.y = ps.rcPaint.bottom;
-    ClientToScreen(p_vout->p_sys->hwnd, &ptClient);
-    rectBlt.right = ptClient.x;
-    rectBlt.bottom = ptClient.y;
-
-    memset(&ddbfx, 0, sizeof(DDBLTFX));
-    ddbfx.dwSize = sizeof(DDBLTFX);
-    ddbfx.u5.dwFillColor = OVERLAY_COLOR_KEY;
-
-    IDirectDrawSurface_Blt(p_vout->p_sys->p_display,
-                           &rectBlt,
-                           NULL,
-                           &rectBlt,
-                           DDBLT_COLORFILL, // | DDBLT_WAIT,
-                           &ddbfx);
-
-    EndPaint(p_vout->p_sys->hwnd, &ps);
 
     return ( 0 );
 }
@@ -1180,6 +1342,7 @@ static void WinDXCloseWindow( vout_thread_t *p_vout )
 {
     HINSTANCE hInstance;
 
+    intf_WarnMsg( 3, "vout: WinDXCloseWindow" );
     if( p_vout->p_sys->hwnd != INVALID_HANDLE_VALUE )
     {
         DestroyWindow( p_vout->p_sys->hwnd);
@@ -1190,6 +1353,12 @@ static void WinDXCloseWindow( vout_thread_t *p_vout )
     UnregisterClass( "VLC DirectX",                            /* class name */
                      hInstance );          /* handle to application instance */
 
+    /* free window background brush */
+    if( p_vout->p_sys->hwnd != INVALID_HANDLE_VALUE )
+    {
+        DeleteObject( p_vout->p_sys->hbrush );
+        p_vout->p_sys->hbrush = INVALID_HANDLE_VALUE;
+    }
 }
 
 /*****************************************************************************
@@ -1199,6 +1368,7 @@ static void WinDXCloseWindow( vout_thread_t *p_vout )
  *****************************************************************************/
 static void WinDXCloseDDraw( vout_thread_t *p_vout )
 {
+    intf_WarnMsg(3, "vout: WinDXCloseDDraw" );
     if( p_vout->p_sys->p_ddobject != NULL )
     {
         IDirectDraw_Release(p_vout->p_sys->p_ddobject);
@@ -1214,20 +1384,24 @@ static void WinDXCloseDDraw( vout_thread_t *p_vout )
  *****************************************************************************/
 static void WinDXCloseDisplay( vout_thread_t *p_vout )
 {
+    intf_WarnMsg( 3, "vout: WinDXCloseDisplay" );
     if( p_vout->p_sys->p_display != NULL )
     {
         if( p_vout->p_sys->p_overlay != NULL )
         {
+            intf_WarnMsg( 3, "vout: WinDXCloseDisplay overlay" );
             IDirectDraw_Release( p_vout->p_sys->p_overlay );
             p_vout->p_sys->p_overlay = NULL;
         }
 
         if( p_vout->p_sys->p_clipper != NULL )
         {
+            intf_WarnMsg( 3, "vout: WinDXCloseDisplay clipper" );
             IDirectDraw_Release( p_vout->p_sys->p_clipper );
             p_vout->p_sys->p_clipper = NULL;
         }
 
+        intf_WarnMsg( 3, "vout: WinDXCloseDisplay display" );
         IDirectDraw_Release( p_vout->p_sys->p_display );
         p_vout->p_sys->p_display = NULL;
     }
@@ -1243,6 +1417,7 @@ static void WinDXCloseDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void WinDXCloseYUVOverlay( vout_thread_t *p_vout )
 {
+    intf_WarnMsg( 3, "vout: WinDXCloseYUVOverlay" );
     if( p_vout->p_sys->p_overlay != NULL )
     {
         IDirectDraw_Release( p_vout->p_sys->p_overlay );
@@ -1250,4 +1425,3 @@ static void WinDXCloseYUVOverlay( vout_thread_t *p_vout )
     }
     p_vout->p_sys->b_display_enabled = 0;
 }
-

@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dummy.c,v 1.1 2001/06/07 01:10:33 sam Exp $
+ * $Id: input_dummy.c,v 1.2 2001/06/08 20:03:16 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -150,8 +150,7 @@ static void DummyOpen( input_thread_t * p_input )
     {
         i_arg = atoi( psz_name + 6 );
 
-        intf_WarnMsg( 1, "input: playlist command `pause %i'", i_arg );
-        intf_FlushMsg();
+        intf_WarnMsgImm( 1, "input: playlist command `pause %i'", i_arg );
 
         msleep( i_arg * 1000000 );
         return;

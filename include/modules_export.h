@@ -38,10 +38,10 @@ typedef struct module_symbols_s
     int  ( * intf_ProcessKey ) ( struct intf_thread_s *, int );
     void ( * intf_AssignKey )  ( struct intf_thread_s *, int, int, int );
 
-    void ( * intf_Msg )     ( char *, ... );
-    void ( * intf_ErrMsg )  ( char *, ... );
-    void ( * intf_WarnMsg ) ( int, char *, ... );
-    void ( * intf_FlushMsg )( void );
+    void ( * intf_Msg )        ( char *, ... );
+    void ( * intf_ErrMsg )     ( char *, ... );
+    void ( * intf_WarnMsg )    ( int, char *, ... );
+    void ( * intf_WarnMsgImm ) ( int, char *, ... );
 
     int  ( * intf_PlaylistAdd )     ( struct playlist_s *, int, const char* );
     int  ( * intf_PlaylistDelete )  ( struct playlist_s *, int );
@@ -135,7 +135,7 @@ typedef struct module_symbols_s
     (p_symbols)->intf_Msg = intf_Msg; \
     (p_symbols)->intf_ErrMsg = intf_ErrMsg; \
     (p_symbols)->intf_WarnMsg = intf_WarnMsg; \
-    (p_symbols)->intf_FlushMsg = intf_FlushMsg; \
+    (p_symbols)->intf_WarnMsgImm = intf_WarnMsgImm; \
     (p_symbols)->intf_PlaylistAdd = intf_PlaylistAdd; \
     (p_symbols)->intf_PlaylistDelete = intf_PlaylistDelete; \
     (p_symbols)->intf_PlaylistNext = intf_PlaylistNext; \
@@ -203,7 +203,7 @@ extern module_symbols_t* p_symbols;
 #   define intf_Msg p_symbols->intf_Msg
 #   define intf_ErrMsg p_symbols->intf_ErrMsg
 #   define intf_WarnMsg p_symbols->intf_WarnMsg
-#   define intf_FlushMsg p_symbols->intf_FlushMsg
+#   define intf_WarnMsgImm p_symbols->intf_WarnMsgImm
 
 #   define intf_PlaylistAdd(a,b,c) p_symbols->intf_PlaylistAdd(a,b,c)
 #   define intf_PlaylistDelete(a,b) p_symbols->intf_PlaylistDelete(a,b)
