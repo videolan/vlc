@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.24 2003/04/22 16:28:24 fenrir Exp $
+ * $Id: mp4.c,v 1.25 2003/04/24 14:39:53 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -112,6 +112,8 @@ static int MP4Init( vlc_object_t * p_this )
     MP4_Box_t       *p_trak;
 
     unsigned int    i;
+    vlc_bool_t      b_audio;
+
     /* I need to seek */
     if( !p_input->stream.b_seekable )
     {
@@ -382,13 +384,22 @@ static int MP4Init( vlc_object_t * p_this )
 
     }
 
-    for( i = 0; i < p_demux->i_tracks; i++ )
+    for( i = 0, b_audio = VLC_FALSE; i < p_demux->i_tracks; i++ )
     {
+#define track p_demux->track[i]
         /* start decoder for this track if enable by default*/
-        if( p_demux->track[i].b_ok && p_demux->track[i].b_enable )
+        if( track.b_ok && track.b_enable &&
+            ( track.i_cat != AUDIO_ES || !b_audio ) )
         {
-            MP4_TrackSelect( p_input, &p_demux->track[i], 0 );
+            if( !MP4_TrackSelect( p_input, &track, 0 ) )
+            {
+                if(track.i_cat == AUDIO_ES )
+                {
+                    b_audio = VLC_TRUE;
+                }
+            }
         }
+#undef track
     }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -1362,7 +1373,7 @@ static int  TrackGotoChunkSample( input_thread_t   *p_input,
     p_track->i_chunk    = i_chunk;
     p_track->i_sample   = i_sample;
 
-    return( VLC_SUCCESS );
+    return( p_track->b_selected ? VLC_SUCCESS : VLC_EGENERIC );
 }
 
 /****************************************************************************
