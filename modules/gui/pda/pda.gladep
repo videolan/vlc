@@ -1,0 +1,10 @@
+<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
+<!DOCTYPE glade-project SYSTEM "http://glade.gnome.org/glade-project-2.0.dtd">
+
+<glade-project>
+  <name>Pda</name>
+  <program_name>pda</program_name>
+  <pixmaps_directory>../../../share</pixmaps_directory>
+  <output_main_file>FALSE</output_main_file>
+  <output_build_files>FALSE</output_build_files>
+</glade-project>

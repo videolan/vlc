@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.40 2003/07/22 20:49:10 hartman Exp $
+dnl $Id: configure.ac,v 1.41 2003/07/23 22:02:56 jpsaman Exp $
 
 AC_INIT(vlc,0.6.1-test1)
 
@@ -2527,6 +2527,21 @@ dnl   fi
 dnl fi
 
 dnl
+dnl  PDA Gtk+2 module
+dnl
+AC_ARG_ENABLE(pda,
+  [  --enable-pda           PDA interface needs Gtk2 suport (default disabled)])
+if test "x${enable_pda}" = "xyes"
+then
+  PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
+  AX_ADD_CFLAGS([gtk2],[${GTK2_CFLAGS}])
+  AX_ADD_LDFLAGS([gtk2],[${GTK2_LIBS}])
+  AX_ADD_CFLAGS([pda],[${GTK2_CFLAGS} ${CFLAGS_pda}])
+  AX_ADD_LDFLAGS([pda],[${GTK2_LDFLAGS} ${LDFLAGS_pda}])
+  AX_ADD_PLUGINS([pda])
+fi
+
+dnl
 dnl  Familiar module uses Gtk+ library
 dnl
 AC_ARG_ENABLE(familiar,
@@ -3064,16 +3079,16 @@ dnl
 if test "${NEED_GTK_MAIN}" != "no"
 then
     AX_ADD_PLUGINS([gtk_main])
-    AX_ADD_CFLAGS([gtk familiar],[-DNEED_GTK_MAIN])
-    AX_ADD_CFLAGS([gtk_main],[${CFLAGS_gtk} ${CFLAGS_familiar}])
-    AX_ADD_LDFLAGS([gtk_main],[${LDFLAGS_gtk} ${LDFLAGS_familiar}])
+    AX_ADD_CFLAGS([gtk familiar pda],[-DNEED_GTK_MAIN])
+    AX_ADD_CFLAGS([gtk_main],[${CFLAGS_gtk} ${CFLAGS_familiar} ${CFLAGS_pda}])
+    AX_ADD_LDFLAGS([gtk_main],[${LDFLAGS_gtk} ${LDFLAGS_familiar} ${LDFLAGS_pda}])
 fi
 
 if test "${NEED_GNOME_MAIN}" != "no"
 then
     AX_ADD_PLUGINS([gnome_main])
-    AX_ADD_CFLAGS([gnome_main],[${CFLAGS_gtk} ${CFLAGS_familiar} ${CFLAGS_gnome}])
-    AX_ADD_LDFLAGS([gnome_main],[${LDFLAGS_gtk} ${LDFLAGS_familiar} ${LDFLAGS_gnome}])
+    AX_ADD_CFLAGS([gnome_main],[${CFLAGS_gtk} ${CFLAGS_familiar} ${CFLAGS_pda} ${CFLAGS_gnome}])
+    AX_ADD_LDFLAGS([gnome_main],[${LDFLAGS_gtk} ${LDFLAGS_familiar} ${LDFLAGS_pda} ${LDFLAGS_gnome}])
 fi
 
 if test "${NEED_GTK2_MAIN}" != "no"
@@ -3272,6 +3287,7 @@ AC_OUTPUT([
   modules/gui/Makefile
   modules/gui/beos/Makefile
   modules/gui/familiar/Makefile
+  modules/gui/pda/Makefile
   modules/gui/gtk/Makefile
   modules/gui/gtk2/Makefile
   modules/gui/kde/Makefile

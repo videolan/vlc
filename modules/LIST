@@ -1,5 +1,5 @@
 List of vlc plugins
-$Id: LIST,v 1.6 2002/12/09 00:52:42 babal Exp $
+$Id: LIST,v 1.7 2003/07/23 22:02:56 jpsaman Exp $
 
  * a52_system: input module for A52 decapsulation.
 
@@ -128,6 +128,8 @@ $Id: LIST,v 1.6 2002/12/09 00:52:42 babal Exp $
  * null: a module with no capabilities.
 
  * ogg: input module for OGG decapsulation.
+
+ * pda-gtk2: interface for iPaq using the Gtk2+ widget set.
 
  * qt: interface module using the Qt widget set.
 
