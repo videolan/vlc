@@ -187,8 +187,11 @@ void intf_StopThread( intf_thread_t *p_intf )
  */
 void intf_Destroy( intf_thread_t *p_intf )
 {
-    /* Unlock module */
-    module_Unneed( p_intf, p_intf->p_module );
+    /* Unlock module if present (a switch may have failed) */
+    if( p_intf->p_module )
+    {
+        module_Unneed( p_intf, p_intf->p_module );
+    }
 
     vlc_mutex_destroy( &p_intf->change_lock );
 
@@ -238,6 +241,7 @@ static void Manager( intf_thread_t *p_intf )
 static void RunInterface( intf_thread_t *p_intf )
 {
     vlc_value_t val, text;
+    char *psz_intf;
 
     /* Variable used for interface switching */
     p_intf->psz_switch_intf = NULL;
@@ -276,31 +280,31 @@ static void RunInterface( intf_thread_t *p_intf )
 
     var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );
 
-    /* Give control to the interface */
-    p_intf->pf_run( p_intf );
-
-    /* Reset play on start status */
-    p_intf->b_play = VLC_FALSE;
-
-    /* Provide ability to switch the main interface on the fly */
-    while( p_intf->psz_switch_intf )
+    do
     {
-        char *psz_intf = p_intf->psz_switch_intf;
+        /* Give control to the interface */
+        p_intf->pf_run( p_intf );
+
+        /* Reset play on start status */
+        p_intf->b_play = VLC_FALSE;
+
+        if( !p_intf->psz_switch_intf )
+        {
+            break;
+        }
+
+        /* Provide ability to switch the main interface on the fly */
+        psz_intf = p_intf->psz_switch_intf;
         p_intf->psz_switch_intf = NULL;
         p_intf->b_die = VLC_FALSE;
 
-        /* Make sure the old interface is completely uninitialised */
+        /* Make sure the old interface is completely uninitialized */
         module_Unneed( p_intf, p_intf->p_module );
 
         p_intf->p_module = module_Need( p_intf, "interface", psz_intf, 0 );
         free( psz_intf );
-
-        if( p_intf->p_module )
-        {
-            p_intf->pf_run( p_intf );
-        }
-        else break;
     }
+    while( p_intf->p_module );
 }
 
 static int SwitchIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
