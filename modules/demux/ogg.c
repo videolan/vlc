@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.43 2003/11/17 22:53:05 gbazin Exp $
+ * $Id: ogg.c,v 1.44 2003/11/18 00:57:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -96,9 +96,10 @@ struct demux_sys_t
      * the sub-streams */
     mtime_t i_pcr;
     int     b_reinit;
+    int     i_prev_sync_state;
 
     /* stream state */
-    int     b_eos;
+    int     i_eos;
 };
 
 /* OggDS headers for the new header format (used in ogm files) */
@@ -366,6 +367,13 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
           {
 #ifdef HAVE_OGGPACKB
               oggpack_buffer opb;
+              char title[sizeof("Stream") + 10];
+              input_info_category_t *p_cat;
+
+              sprintf( title, "Stream %d", p_stream->i_serial_no );
+              p_cat = input_InfoCategory( p_input, title );
+              input_AddInfo( p_cat, _("Type"), _("Audio") );
+              input_AddInfo( p_cat, _("Codec"), _("Flac") );
 
               /* Parse the STREAMINFO metadata */
               oggpackB_readinit(&opb, p_oggpacket->packet, p_oggpacket->bytes);
@@ -377,16 +385,23 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
                       oggpackB_adv( &opb, 80 );
                       p_stream->f_rate = oggpackB_read( &opb, 20 );
                       p_stream->i_channels = oggpackB_read( &opb, 3 ) + 1;
+
+                      input_AddInfo( p_cat, _("Sample Rate"), "%d",
+                                     (int)p_stream->f_rate );
+                      input_AddInfo( p_cat, _("Channels"), "%d",
+                                     p_stream->i_channels );
+                      msg_Dbg( p_input, "Flac header, channels: %i, rate: %i",
+                               p_stream->i_channels, (int)p_stream->f_rate );
                   }
                   else
                   {
-                      msg_Dbg( p_input, "STREAMINFO metadata too short" );
+                      msg_Dbg( p_input, "FLAC STREAMINFO metadata too short" );
                   }
               }
               else
               {
                   /* This ain't a STREAMINFO metadata */
-                  msg_Dbg( p_input, "Invalid STREAMINFO metadata" );
+                  msg_Dbg( p_input, "Invalid FLAC STREAMINFO metadata" );
               }
 #endif
               p_stream->b_force_backup = 0;
@@ -631,8 +646,8 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                         p_cat = input_InfoCategory( p_input, title );
                         input_AddInfo( p_cat, _("Type"), _("Audio") );
                         input_AddInfo( p_cat, _("Codec"), _("Vorbis") );
-                        input_AddInfo( p_cat, _("Sample Rate"), "%f",
-                                       p_stream->f_rate );
+                        input_AddInfo( p_cat, _("Sample Rate"), "%d",
+                                       (int)p_stream->f_rate );
                         input_AddInfo( p_cat, _("Channels"), "%d",
                                        p_stream->i_channels );
                         input_AddInfo( p_cat, _("Bit Rate"), "%d",
@@ -670,8 +685,8 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                         p_cat = input_InfoCategory( p_input, title );
                         input_AddInfo( p_cat, _("Type"), _("Audio") );
                         input_AddInfo( p_cat, _("Codec"), _("Speex") );
-                        input_AddInfo( p_cat, _("Sample Rate"), "%f",
-                                       p_stream->f_rate );
+                        input_AddInfo( p_cat, _("Sample Rate"), "%d",
+                                       (int)p_stream->f_rate );
                         input_AddInfo( p_cat, _("Channels"), "%d",
                                        p_stream->i_channels );
                         input_AddInfo( p_cat, _("Bit Rate"), "%d",
@@ -695,6 +710,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
 
                     p_stream->i_cat = AUDIO_ES;
                     p_stream->i_fourcc = VLC_FOURCC( 'f','l','a','c' );
+                    p_stream->i_bitrate = 0;
                 }
                 /* Check for Theora header */
                 else if( oggpacket.bytes >= 7 &&
@@ -760,7 +776,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                         p_cat = input_InfoCategory( p_input, title );
                         input_AddInfo( p_cat, _("Type"), _("Video") );
                         input_AddInfo( p_cat, _("Codec"), _("Theora") );
-                        input_AddInfo( p_cat, _("Frame Rate"), "%f",
+                        input_AddInfo( p_cat, _("Frame Rate"), "%.2f",
                                        p_stream->f_rate );
                         input_AddInfo( p_cat, _("Bit Rate"), "%d",
                                        p_stream->i_bitrate );
@@ -799,8 +815,8 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                         p_cat = input_InfoCategory( p_input, title );
                         input_AddInfo( p_cat, _("Type"), _("Video") );
                         input_AddInfo( p_cat, _("Codec"), _("tarkin") );
-                        input_AddInfo( p_cat, _("Sample Rate"), "%f",
-                                       p_stream->f_rate );
+                        input_AddInfo( p_cat, _("Sample Rate"), "%d",
+                                       (int)p_stream->f_rate );
                         input_AddInfo( p_cat, _("Bit Rate"), "%d",
                                        p_stream->i_bitrate );
                     }
@@ -865,7 +881,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                             input_AddInfo( p_cat, _("Type"), _("Video") );
                             input_AddInfo( p_cat, _("Codec"), "%.4s",
                                            (char *)&p_stream->i_fourcc );
-                            input_AddInfo( p_cat, _("Frame Rate"), "%f",
+                            input_AddInfo( p_cat, _("Frame Rate"), "%.2f",
                                            p_stream->f_rate );
                             input_AddInfo( p_cat, _("Bit Count"), "%d",
                                            p_stream->p_bih->biBitCount );
@@ -1040,7 +1056,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                             input_AddInfo( p_cat, _("Type"), _("Video") );
                             input_AddInfo( p_cat, _("Codec"), "%.4s",
                                            (char *)&p_stream->i_fourcc );
-                            input_AddInfo( p_cat, _("Frame Rate"), "%f",
+                            input_AddInfo( p_cat, _("Frame Rate"), "%.2f",
                                            p_stream->f_rate );
                             input_AddInfo( p_cat, _("Bit Count"), "%d",
                                            p_stream->p_bih->biBitCount );
@@ -1257,7 +1273,9 @@ static int Activate( vlc_object_t * p_this )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     /* Begnning of stream, tell the demux to look for elementary streams. */
-    p_ogg->b_eos = VLC_TRUE;
+    p_ogg->i_eos = 0;
+
+    p_ogg->i_prev_sync_state = SYNCHRO_REINIT;
 
     return 0;
 
@@ -1459,10 +1477,16 @@ static int Demux( input_thread_t * p_input )
     ogg_packet  oggpacket;
     int         i_stream;
 
-    if( p_ogg->b_eos )
+    if( p_ogg->i_eos == p_ogg->i_streams )
     {
+        if( p_ogg->i_eos )
+        {
+            msg_Dbg( p_input, "end of a group of logical streams" );
+            Ogg_EndOfStream( p_input, p_ogg );
+        }
+
         if( Ogg_BeginningOfStream( p_input, p_ogg ) != VLC_SUCCESS ) return 0;
-        p_ogg->b_eos = VLC_FALSE;
+        p_ogg->i_eos = 0;
 
         msg_Dbg( p_input, "beginning of a group of logical streams" );
 
@@ -1533,8 +1557,12 @@ static int Demux( input_thread_t * p_input )
             p_stream->i_pcr = -1;
             p_stream->i_interpolated_pcr = -1;
         }
+        if( p_ogg->i_prev_sync_state != SYNCHRO_REINIT )
+            ogg_sync_reset( &p_ogg->oy );
     }
 
+    p_ogg->i_prev_sync_state =
+        p_input->stream.p_selected_program->i_synchro_state;
 
     /*
      * Demux an ogg page from the stream
@@ -1545,14 +1573,8 @@ static int Demux( input_thread_t * p_input )
     }
 
     /* Test for End of Stream */
-    if( ogg_page_eos( &oggpage ) )
-    {
-        msg_Dbg( p_input, "end of a group of logical streams" );
+    if( ogg_page_eos( &oggpage ) ) p_ogg->i_eos++;
 
-        Ogg_EndOfStream( p_input, p_ogg );
-        p_ogg->b_eos = VLC_TRUE;
-        return 1;
-    }
 
     for( i_stream = 0; i_stream < p_ogg->i_streams; i_stream++ )
     {
@@ -1590,6 +1612,11 @@ static int Demux( input_thread_t * p_input )
                     if( ogg_stream_packetout( &p_stream->os, &oggpacket ) > 0 )
                     {
                         Ogg_DecodePacket( p_input, p_stream, &oggpacket );
+                    }
+                    else
+                    {
+                        input_ClockManageRef( p_input,
+                            p_input->stream.p_selected_program, p_ogg->i_pcr );
                     }
                     continue;
                 }
