@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.23 2002/03/01 14:17:22 stef Exp $
+ * $Id: input_dvdread.c,v 1.24 2002/03/02 03:29:13 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -42,6 +42,7 @@
 
 #include <fcntl.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
