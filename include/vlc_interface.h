@@ -118,10 +118,13 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
  *****************************************************************************/
 #if defined( WIN32 ) && !defined( UNDER_CE )
 #    define CONSOLE_INTRO_MSG \
+         if( !getenv( "PWD" ) || !getenv( "PS1" ) ) /* detect cygwin shell */ \
+         { \
          AllocConsole(); \
          freopen( "CONOUT$", "w", stdout ); \
          freopen( "CONOUT$", "w", stderr ); \
          freopen( "CONIN$", "r", stdin ); \
+         } \
          msg_Info( p_intf, COPYRIGHT_MESSAGE ); \
          msg_Info( p_intf, _("\nWarning: if you can't access the GUI " \
                              "anymore, open a dos command box, go to the " \

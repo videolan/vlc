@@ -2168,11 +2168,15 @@ static void Version( void )
 static void ShowConsole( void )
 {
 #   ifndef UNDER_CE
+
+    if( getenv( "PWD" ) && getenv( "PS1" ) ) return; /* cygwin shell */
+
     AllocConsole();
     freopen( "CONOUT$", "w", stdout );
     freopen( "CONOUT$", "w", stderr );
     freopen( "CONIN$", "r", stdin );
 #   endif
+
     return;
 }
 #endif
