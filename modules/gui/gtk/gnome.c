@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.8 2003/01/26 22:57:21 gbazin Exp $
+ * $Id: gnome.c,v 1.9 2003/01/31 09:51:57 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -110,22 +110,27 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
 
     /* Initialize Gnome thread */
-    p_intf->p_sys->b_playing = 0;
-    p_intf->p_sys->b_deinterlace_update = 0;
+    p_intf->p_sys->b_playing = VLC_FALSE;
+    p_intf->p_sys->b_deinterlace_update = VLC_FALSE;
 
-    p_intf->p_sys->b_aout_update = 0;
-    p_intf->p_sys->b_vout_update = 0;
+    p_intf->p_sys->b_aout_update = VLC_FALSE;
+    p_intf->p_sys->b_vout_update = VLC_FALSE;
 
-    p_intf->p_sys->b_popup_changed = 0;
-    p_intf->p_sys->b_window_changed = 0;
-    p_intf->p_sys->b_playlist_changed = 0;
+    p_intf->p_sys->b_popup_changed = VLC_FALSE;
+    p_intf->p_sys->b_window_changed = VLC_FALSE;
+    p_intf->p_sys->b_playlist_changed = VLC_FALSE;
+    p_intf->p_sys->b_program_update = VLC_FALSE;
+    p_intf->p_sys->b_title_update = VLC_FALSE;
+    p_intf->p_sys->b_chapter_update = VLC_FALSE;
+    p_intf->p_sys->b_spu_update = VLC_FALSE;
+    p_intf->p_sys->b_audio_update = VLC_FALSE;
 
     p_intf->p_sys->p_input = NULL;
     p_intf->p_sys->i_playing = -1;
-    p_intf->p_sys->b_slider_free = 1;
+    p_intf->p_sys->b_slider_free = VLC_TRUE;
 
     p_intf->p_sys->i_part = 0;
-    p_intf->p_sys->b_mute = 0;
+    p_intf->p_sys->b_mute = VLC_FALSE;
 
     return VLC_SUCCESS;
 }
