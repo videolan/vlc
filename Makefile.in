@@ -24,7 +24,7 @@ VOUT += x11
 #VOUT += ggi
 #VOUT += glide
 # Not yet supported
-VOUT += gnome
+#VOUT += gnome
 #VOUT += beos
 #VOUT += dga
 # Fallback method that should always work
@@ -36,7 +36,7 @@ INTF += x11
 #INTF += ggi
 #INTF += glide
 # Not yet supported
-INTF += gnome
+#INTF += gnome
 #INTF += beos
 #INTF += dga
 # Fallback method that should always work
