@@ -2,7 +2,7 @@
  * mp4.h : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.h,v 1.2 2002/08/07 00:29:36 sam Exp $
+ * $Id: mp4.h,v 1.3 2002/09/17 11:57:38 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -84,7 +84,7 @@ typedef struct track_data_mp4_s
     int b_ok;           /* The track is usable */
     int i_track_ID;     /* this should be unique */
     int b_enable;       /* is the trak enable by default */
-
+    int b_selected;     /* is the trak being played */
     int i_cat;          /* Type of the track, VIDEO_ES, AUDIO_ES, UNKNOWN_ES  ... */
     char        i_language[3];
 
@@ -132,7 +132,7 @@ struct demux_sys_t
     
     u64         i_time;         /* time position of the presentation in movie timescale */
     u64         i_timescale;    /* movie time scale */
-    
+    u64         i_duration;     /* movie duration */
     int i_tracks;               /* number of track */  
     track_data_mp4_t *track; /* array of track */
     

@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.4 2002/08/13 11:59:36 sam Exp $
+ * $Id: libmp4.c,v 1.5 2002/09/17 11:57:38 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <stdarg.h>
 #include <string.h>                                              /* strdup() */
 #include <errno.h>
 #include <sys/types.h>
@@ -105,9 +106,7 @@
       return( 0 ); \
     } 
                 
-
 #define MP4_READBOX_EXIT( i_code ) \
-    if( !i_code ) \
     free( p_buff ); \
     if( i_read < 0 ) \
     { \
@@ -1429,14 +1428,22 @@ int MP4_ReadBox_stco_co64( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     p_box->data.p_co64->i_chunk_offset = 
         calloc( sizeof( u64 ), p_box->data.p_co64->i_entry_count );
 
-    for( i = 0; (i < p_box->data.p_co64->i_entry_count )&&( i_read >= 8 ); i++ )
+    for( i = 0; i < p_box->data.p_co64->i_entry_count; i++ )
     {
         if( p_box->i_type == FOURCC_stco )
         {
+            if( i_read < 4 )
+            {
+                break;
+            }
             MP4_GET4BYTES( p_box->data.p_co64->i_chunk_offset[i] );
         }
         else
         {
+            if( i_read < 8 )
+            {
+                break;
+            }
             MP4_GET8BYTES( p_box->data.p_co64->i_chunk_offset[i] );
         }
     }
@@ -1472,6 +1479,8 @@ int MP4_ReadBox_stss( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     {
 
         MP4_GET4BYTES( p_box->data.p_stss->i_sample_number[i] );
+        /* XXX in libmp4 sample begin at 0 */
+        p_box->data.p_stss->i_sample_number[i]--;
     }
     
     
@@ -2044,12 +2053,118 @@ int MP4_ReadBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father )
     }
     return( i_result );
 }
+#if 0
+/*****************************************************************************
+ * MP4_CountBox: given a box, count how many child have the requested type 
+ * FIXME : support GUUID 
+ *****************************************************************************/
+int MP4_CountBox( MP4_Box_t *p_box, u32 i_type )
+{
+    int i_count;
+    MP4_Box_t *p_child;
+    
+    if( !p_box )
+    {
+        return( 0 );
+    }
+
+    i_count = 0;
+    p_child = p_box->p_first;
+    while( p_child )
+    {
+        if( p_child->i_type == i_type )
+        {   
+            i_count++;
+        }
+        p_child = p_child->p_next;
+    }
+    
+    return( i_count );
+}
+#endif
+
+/*****************************************************************************
+ * MP4_FindBox:  find first box with i_type child of p_box
+ *      return NULL if not found
+ *****************************************************************************/
+
+MP4_Box_t *MP4_FindBox( MP4_Box_t *p_box, u32 i_type )
+{
+    MP4_Box_t *p_child;
+    
+    if( !p_box )
+    {
+        return( NULL );
+    }
+
+    p_child = p_box->p_first;
+    while( p_child )
+    {
+        if( p_child->i_type == i_type )
+        {   
+            return( p_child );
+        }
+        p_child = p_child->p_next;
+    }
+    
+    return( NULL );
+}
+
+
+#if 0
+/*****************************************************************************
+ * MP4_FindNextBox:  find next box with thesame type and at the same level 
+ *                  than p_box
+ *****************************************************************************/
+MP4_Box_t *MP4_FindNextBox( MP4_Box_t *p_box )
+{
+    MP4_Box_t *p_next;
+    
+    if( !p_box )
+    {
+        return( NULL );
+    }
+
+    p_next = p_box->p_next;
+    while( p_next )
+    {
+        if( p_next->i_type == p_box->i_type )
+        {
+            return( p_next );
+        }
+        p_next = p_next->p_next;
+    }
+    return( NULL );
+}
+/*****************************************************************************
+ * MP4_FindNbBox:  find the box i_number
+ *****************************************************************************/
+MP4_Box_t *MP4_FindNbBox( MP4_Box_t *p_box, u32 i_number )
+{
+    MP4_Box_t *p_child = p_box->p_first;
+    
+    if( !p_child )
+    {
+        return( NULL );
+    }
+
+    while( i_number )
+    {
+        if( !( p_child = p_child->p_next ) )
+        {
+            return( NULL );
+        }
+        i_number--;
+    }
+    return( p_child );
+}
+#endif
 
 /*****************************************************************************
  * MP4_FreeBox : free memory after read with MP4_ReadBox and all 
  * the children
  *****************************************************************************/
-void MP4_FreeBox( input_thread_t *p_input, MP4_Box_t *p_box )
+void MP4_BoxFree( input_thread_t *p_input, MP4_Box_t *p_box )
 {
     int i_index;
 
@@ -2064,7 +2179,7 @@ void MP4_FreeBox( input_thread_t *p_input, MP4_Box_t *p_box )
     while( p_child )
     {
         p_next = p_child->p_next;
-        MP4_FreeBox( p_input, p_child );
+        MP4_BoxFree( p_input, p_child );
         /* MP4_FreeBoxChildren have free all data expect p_child itself */
         free( p_child );
         p_child = p_next; 
@@ -2106,12 +2221,12 @@ void MP4_FreeBox( input_thread_t *p_input, MP4_Box_t *p_box )
 }
 
 /*****************************************************************************
- * MP4_ReadRoot : Parse the entire file, and create all boxes in memory
+ * MP4_BoxGetRoot : Parse the entire file, and create all boxes in memory
  *****************************************************************************
  *  The first box is a virtual box "root" and is the father for all first 
  *  level boxes for the file, a sort of virtual contener
  *****************************************************************************/
-int MP4_ReadBoxRoot( input_thread_t *p_input, MP4_Box_t *p_root )
+int MP4_BoxGetRoot( input_thread_t *p_input, MP4_Box_t *p_root )
 {
     
     MP4_Stream_t *p_stream;
@@ -2166,7 +2281,7 @@ int MP4_ReadBoxRoot( input_thread_t *p_input, MP4_Box_t *p_root )
 }
 
 
-static void __MP4_DumpBoxStructure( input_thread_t *p_input,
+static void __MP4_BoxDumpStructure( input_thread_t *p_input,
                                     MP4_Box_t *p_box, int i_level )
 {
     MP4_Box_t *p_child;
@@ -2200,120 +2315,271 @@ static void __MP4_DumpBoxStructure( input_thread_t *p_input,
     p_child = p_box->p_first;
     while( p_child )
     {
-        __MP4_DumpBoxStructure( p_input, p_child, i_level + 1 );
+        __MP4_BoxDumpStructure( p_input, p_child, i_level + 1 );
         p_child = p_child->p_next;
     }
     
 }
 
-void MP4_DumpBoxStructure( input_thread_t *p_input, MP4_Box_t *p_box )
+void MP4_BoxDumpStructure( input_thread_t *p_input, MP4_Box_t *p_box )
 {
-    __MP4_DumpBoxStructure( p_input, p_box, 0 );
+    __MP4_BoxDumpStructure( p_input, p_box, 0 );
 }
 
 
+
 /*****************************************************************************
- * MP4_CountBox: given a box, count how many child have the requested type 
- * FIXME : support GUUID 
+ *****************************************************************************
+ **
+ **  High level methods to acces an MP4 file
+ **
+ *****************************************************************************
  *****************************************************************************/
-int MP4_CountBox( MP4_Box_t *p_box, u32 i_type )
+static void __get_token( char **ppsz_path, char **ppsz_token, int *pi_number )
 {
-    int i_count;
-    MP4_Box_t *p_child;
+    int i_len ;
+    if( !*ppsz_path[0] )
+    {
+        *ppsz_token = NULL;
+        *pi_number = 0;
+        return;
+    }
+    i_len = 0;
+    while(  (*ppsz_path)[i_len] && 
+            (*ppsz_path)[i_len] != '/' && (*ppsz_path)[i_len] != '[' )
+    {
+        i_len++;
+    }
+    if( !i_len && **ppsz_path == '/' )
+    {
+        i_len = 1;
+    }
+    *ppsz_token = malloc( i_len + 1 );
+        
+    memcpy( *ppsz_token, *ppsz_path, i_len );
+
+    (*ppsz_token)[i_len] = '\0';
+
+    *ppsz_path += i_len;
+        
+    if( **ppsz_path == '[' )
+    {
+        (*ppsz_path)++;
+        *pi_number = strtol( *ppsz_path, NULL, 10 );
+        while( **ppsz_path && **ppsz_path != ']' )
+        {
+            (*ppsz_path)++;
+        }
+        if( **ppsz_path == ']' )
+        {
+            (*ppsz_path)++;
+        }
+    }
+    else
+    {
+        *pi_number = 0;
+    }
+    while( **ppsz_path == '/' )
+    {
+        (*ppsz_path)++;
+    }
+}
+
+static void __MP4_BoxGet( MP4_Box_t **pp_result,
+                          MP4_Box_t *p_box, char *psz_fmt, va_list args)
+{
+    char    *psz_path;
+#ifndef HAVE_VASPRINTF
+    int     i_size;
+#endif
+
     
     if( !p_box )
+    {
+        *pp_result = NULL;
+        return;
+    }
+
+#ifdef HAVE_VASPRINTF
+    vasprintf( &psz_path, psz_fmt, args );
+#else
+    i_size = strlen( psz_fmt ) + 1024;
+    psz_path = calloc( i_size, sizeof( char ) );
+    vsnprintf( psz_path, i_size, psz_fmt, args );
+    psz_path[i_size - 1] = 0;
+#endif
+
+    if( !psz_path || !psz_path[0] )
+    {
+        FREE( psz_path );
+        *pp_result = NULL;
+        return;
+    }
+
+//    fprintf( stderr, "path:'%s'\n", psz_path );
+    psz_fmt = psz_path; /* keep this pointer, as it need to be unallocated */
+    for( ; ; )
+    {
+        char *psz_token;
+        int i_number;
+
+        __get_token( &psz_path, &psz_token, &i_number );
+//        fprintf( stderr, "path:'%s', token:'%s' n:%d\n", 
+//                 psz_path,psz_token,i_number );
+        if( !psz_token )
+        {
+            FREE( psz_token );
+            free( psz_fmt );
+            *pp_result = p_box;
+            return;
+        }
+        else
+        if( !strcmp( psz_token, "/" ) )
+        {
+            /* Find root box */
+            while( p_box && p_box->i_type != VLC_FOURCC( 'r', 'o', 'o', 't' ) )
+            {
+                p_box = p_box->p_father;
+            }
+            if( !p_box )
+            {
+                free( psz_token );
+                free( psz_fmt );
+                *pp_result = NULL;
+                return;
+            }
+        }
+        else
+        if( !strcmp( psz_token, "." ) )
+        {
+            /* Do nothing */
+        }
+        else
+        if( !strcmp( psz_token, ".." ) )
+        {
+            p_box = p_box->p_father;
+            if( !p_box )
+            {
+                free( psz_token );
+                free( psz_fmt );
+                *pp_result = NULL;
+                return;
+            }
+        }
+        else
+        if( strlen( psz_token ) == 4 )
+        {
+            u32 i_fourcc;
+            i_fourcc = VLC_FOURCC( psz_token[0], psz_token[1],
+                                   psz_token[2], psz_token[3] );
+            p_box = p_box->p_first;
+            for( ; ; )
+            {
+                if( !p_box )
+                {
+                    free( psz_token );
+                    free( psz_fmt );
+                    *pp_result = NULL;
+                    return;
+                }
+                if( p_box->i_type == i_fourcc )
+                {
+                    if( !i_number )
+                    {
+                        break;
+                    }
+                    i_number--;
+                }
+                p_box = p_box->p_next;
+            }
+        }
+        else
+        if( strlen( psz_token ) == 0 )
+        {
+            p_box = p_box->p_first;
+            for( ; ; )
+            {
+                if( !p_box )
+                {
+                    free( psz_token );
+                    free( psz_fmt );
+                    *pp_result = NULL;
+                    return;
+                }
+                if( !i_number )
+                {
+                    break;
+                }
+                i_number--;
+                p_box = p_box->p_next;
+            }
+        }
+        else
+        {
+//            fprintf( stderr, "Argg malformed token \"%s\"",psz_token );
+            FREE( psz_token );
+            free( psz_fmt );
+            *pp_result = NULL;
+            return;
+        }
+        
+        free( psz_token );
+    }
+    
+}
+
+/*****************************************************************************
+ * MP4_BoxGet: find a box given a path relative to p_box
+ *****************************************************************************
+ * Path Format: . .. / as usual
+ *              [number] to specifie box number ex: trak[12]
+ *              
+ * ex: /moov/trak[12]
+ *     ../mdia
+ *****************************************************************************/
+MP4_Box_t *MP4_BoxGet( MP4_Box_t *p_box, char *psz_fmt, ... )
+{
+    va_list args;
+    MP4_Box_t *p_result;
+
+    va_start( args, psz_fmt ); 
+    __MP4_BoxGet( &p_result, p_box, psz_fmt, args );
+    va_end( args );
+
+    return( p_result );
+}
+
+/*****************************************************************************
+ * MP4_BoxCount: count box given a path relative to p_box
+ *****************************************************************************
+ * Path Format: . .. / as usual
+ *              [number] to specifie box number ex: trak[12]
+ *              
+ * ex: /moov/trak[12]
+ *     ../mdia
+ *****************************************************************************/
+int MP4_BoxCount( MP4_Box_t *p_box, char *psz_fmt, ... )
+{
+    va_list args;
+    int     i_count;
+    MP4_Box_t *p_result, *p_next;
+
+    va_start( args, psz_fmt ); 
+    __MP4_BoxGet( &p_result, p_box, psz_fmt, args );
+    va_end( args );
+    if( !p_result )
     {
         return( 0 );
     }
-
-    i_count = 0;
-    p_child = p_box->p_first;
-    while( p_child )
+    
+    i_count = 1;
+    for( p_next = p_result->p_next; p_next != NULL; p_next = p_next->p_next)
     {
-        if( p_child->i_type == i_type )
-        {   
+        if( p_next->i_type == p_result->i_type)
+        {
             i_count++;
         }
-        p_child = p_child->p_next;
     }
-    
     return( i_count );
-}
-
-
-/*****************************************************************************
- * MP4_FindBox:  find first box with i_type child of p_box
- *      return NULL if not found
- *****************************************************************************/
-
-MP4_Box_t *MP4_FindBox( MP4_Box_t *p_box, u32 i_type )
-{
-    MP4_Box_t *p_child;
-    
-    if( !p_box )
-    {
-        return( NULL );
-    }
-
-    p_child = p_box->p_first;
-    while( p_child )
-    {
-        if( p_child->i_type == i_type )
-        {   
-            return( p_child );
-        }
-        p_child = p_child->p_next;
-    }
-    
-    return( NULL );
-}
-
-
-/*****************************************************************************
- * MP4_FindNextBox:  find next box with thesame type and at the same level 
- *                  than p_box
- *****************************************************************************/
-MP4_Box_t *MP4_FindNextBox( MP4_Box_t *p_box )
-{
-    MP4_Box_t *p_next;
-    
-    if( !p_box )
-    {
-        return( NULL );
-    }
-
-    p_next = p_box->p_next;
-    while( p_next )
-    {
-        if( p_next->i_type == p_box->i_type )
-        {
-            return( p_next );
-        }
-        p_next = p_next->p_next;
-    }
-    return( NULL );
-}
-
-/*****************************************************************************
- * MP4_FindNbBox:  find the box i_number
- *****************************************************************************/
-MP4_Box_t *MP4_FindNbBox( MP4_Box_t *p_box, u32 i_number )
-{
-    MP4_Box_t *p_child = p_box->p_first;
-    
-    if( !p_child )
-    {
-        return( NULL );
-    }
-
-    while( i_number )
-    {
-        if( !( p_child = p_child->p_next ) )
-        {
-            return( NULL );
-        }
-        i_number--;
-    }
-    return( p_child );
 }
 

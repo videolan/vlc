@@ -2,7 +2,7 @@
  * libmp4.h : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.h,v 1.2 2002/08/08 22:28:22 sam Exp $
+ * $Id: libmp4.h,v 1.3 2002/09/17 11:57:38 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -647,7 +647,8 @@ typedef struct MP4_Box_s
     
     u64     i_size; /* always set so use it */
 
-    MP4_Box_data_t   data;   /* union of pointers on extended data depending on i_type (or i_usertype) */
+    MP4_Box_data_t   data;   /* union of pointers on extended data depending    
+                                on i_type (or i_usertype) */
 
     struct MP4_Box_s *p_father; /* pointer on the father Box */
 
@@ -659,7 +660,9 @@ typedef struct MP4_Box_s
 } MP4_Box_t;
 
 /*---------------------------------------------------------------------------*/
+/*                                                                           */
 /****----------------------- High level functions ------------------------****/
+/*                                                                           */
 /*---------------------------------------------------------------------------*/
 
 /*****************************************************************************
@@ -671,40 +674,76 @@ int   MP4_SeekAbsolute( input_thread_t *p_input, off_t i_pos);
 int   MP4_ReadData( input_thread_t *p_input, u8 *p_buff, int i_size );
 
 /*****************************************************************************
- * MP4_ReadRoot : Parse the entire file, and create all boxes in memory
+ * MP4_BoxGetRoot : Parse the entire file, and create all boxes in memory
  *****************************************************************************
  *  The first box is a virtual box "root" and is the father for all first 
  *  level boxes 
  *
  *  RETURN : 1 if succes and 0 if it failed
  *****************************************************************************/
-int MP4_ReadBoxRoot( input_thread_t *p_input, MP4_Box_t *p_root );
+int MP4_BoxGetRoot( input_thread_t *p_input, MP4_Box_t *p_root );
 
 /*****************************************************************************
  * MP4_FreeBox : free memory allocated after read with MP4_ReadBox
- *               this, means also children boxes
+ *               or MP4_BoxGetRoot, this means also children boxes
  * XXX : all children have to be allocated by a malloc !! and 
  *         p_box isn't freeing  
  *****************************************************************************/
-void MP4_FreeBox( input_thread_t *p_input, MP4_Box_t *p_box );
+void MP4_BoxFree( input_thread_t *p_input, MP4_Box_t *p_box );
 
 /*****************************************************************************
  * MP4_DumpBoxStructure: print the structure of the p_box
+ *****************************************************************************
+ * Usefull while debugging
  *****************************************************************************/
-void MP4_DumpBoxStructure( input_thread_t *p_input, MP4_Box_t *p_box );
+void MP4_BoxDumpStructure( input_thread_t *p_input, MP4_Box_t *p_box );
 
+
+/*****************************************************************************
+ * MP4_BoxGet: find a box given a path relative to p_box
+ *****************************************************************************
+ * Path Format: . .. / as usual
+ *              [number] to specifie box number ex: trak[12]
+ *              
+ * ex: /moov/trak[12]
+ *     ../mdia 
+ *****************************************************************************/
+MP4_Box_t *MP4_BoxGet( MP4_Box_t *p_box, char *psz_fmt, ... );
+    
+/*****************************************************************************
+ * MP4_BoxCount: find number of box given a path relative to p_box
+ *****************************************************************************
+ * Path Format: . .. / as usual
+ *              [number] to specifie box number ex: trak[12]
+ *              
+ * ex: /moov/trak
+ *     ../mdia 
+ *****************************************************************************/
+int MP4_BoxCount( MP4_Box_t *p_box, char *psz_fmt, ... );
+
+
+
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/****---------------------- Medium level functions -----------------------****/
+/*                                                                           */
+/*---------------------------------------------------------------------------*/
+
+#if 0
 /*****************************************************************************
  * MP4_CountBox: given a box, count how many child have the requested type 
  * FIXME : support GUUID 
  *****************************************************************************/
 int MP4_CountBox( MP4_Box_t *p_box, u32 i_type );
-    
+#endif
+
 /*****************************************************************************
  * MP4_FindBox:  find first box with i_type child of p_box
  *      return NULL if not found
  *****************************************************************************/
 MP4_Box_t *MP4_FindBox( MP4_Box_t *p_box, u32 i_type );
 
+#if 0
 /*****************************************************************************
  * MP4_FindNextBox:  find next box with thesame type and at the same level 
  *                  than p_box
@@ -715,12 +754,12 @@ MP4_Box_t *MP4_FindNextBox( MP4_Box_t *p_box );
  * MP4_FindNbBox:  find the box i_number 
  *****************************************************************************/
 MP4_Box_t *MP4_FindNbBox( MP4_Box_t *p_box, u32 i_number );
-   
+#endif
 
 /*---------------------------------------------------------------------------*/
 /****----------------------- Lower level functions -----------------------****/
 /****                                                                     ****/
-/****------Use them only when you known what they really do and need------****/  
+/****------Use them only when you known what they really do and need------****/
 /****                                                                     ****/
 /****---------------------------------------------------------------------****/
 /*---------------------------------------------------------------------------*/
