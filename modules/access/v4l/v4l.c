@@ -1292,23 +1292,31 @@ static uint8_t *GrabCapture( input_thread_t *p_input )
     int i_captured_frame = p_sys->i_frame_pos;
 
     p_sys->vid_mmap.frame = (p_sys->i_frame_pos + 1) % p_sys->vid_mbuf.frames;
-    for( ;; )
-    {
-        if( ioctl( p_sys->fd_video, VIDIOCMCAPTURE, &p_sys->vid_mmap ) >= 0 )
-        {
-            break;
-        }
 
+    while( ioctl( p_sys->fd_video, VIDIOCMCAPTURE, &p_sys->vid_mmap ) < 0 )
+    {
         if( errno != EAGAIN )
         {
-            msg_Err( p_input, "failed while grabbing new frame" );
-            return( NULL );
+            msg_Err( p_input, "failed capturing new frame" );
+            return NULL;
         }
-        msg_Dbg( p_input, "another try ?" );
+
+        if( p_input->b_die )
+        {
+            return NULL;
+        }
+
+        msg_Dbg( p_input, "grab failed, trying again" );
     }
 
-    while( ioctl(p_sys->fd_video, VIDIOCSYNC, &p_sys->i_frame_pos) < 0 &&
-           ( errno == EAGAIN || errno == EINTR ) );
+    while( ioctl(p_sys->fd_video, VIDIOCSYNC, &p_sys->i_frame_pos) < 0 )
+    {
+        if( errno != EAGAIN && errno != EINTR )    
+        {
+            msg_Err( p_input, "failed syncing new frame" );
+            return NULL;
+        }
+    }
 
     p_sys->i_frame_pos = p_sys->vid_mmap.frame;
     /* leave i_video_frame_size alone */
@@ -1326,12 +1334,27 @@ static uint8_t *GrabMJPEG( input_thread_t *p_input )
 
     /* re-queue the last frame we sync'd */
     if( p_sys->i_frame_pos != -1 )
-        while( ioctl( p_sys->fd_video, MJPIOC_QBUF_CAPT, &p_sys->i_frame_pos ) < 0 &&
-                ( errno == EAGAIN || errno == EINTR ) );
+    {
+        while( ioctl( p_sys->fd_video, MJPIOC_QBUF_CAPT,
+                                       &p_sys->i_frame_pos ) < 0 )
+        {
+            if( errno != EAGAIN && errno != EINTR )    
+            {
+                msg_Err( p_input, "failed capturing new frame" );
+                return NULL;
+            }
+        }
+    }
 
     /* sync on the next frame */
-    while( ioctl( p_sys->fd_video, MJPIOC_SYNC, &sync ) < 0 &&
-            ( errno == EAGAIN || errno == EINTR ) );
+    while( ioctl( p_sys->fd_video, MJPIOC_SYNC, &sync ) < 0 )
+    {
+        if( errno != EAGAIN && errno != EINTR )    
+        {
+            msg_Err( p_input, "failed syncing new frame" );
+            return NULL;
+        }
+    }
 
     p_sys->i_frame_pos = sync.frame;
     p_frame = p_sys->p_video_mmap + p_sys->mjpeg_buffers.size * sync.frame;
