@@ -10,8 +10,8 @@
 ################################################################################
 
 # Environment
-#CC = gcc
-#SHELL = /bin/sh
+#CC=gcc
+#SHELL=/bin/sh
 
 # Video output settings
 VIDEO=X11
@@ -26,11 +26,17 @@ ARCH=MMX
 #ARCH=PPC
 #ARCH=SPARC
 
+# Target operating system
+SYS=LINUX
+#SYS=BSD
+#SYS=BEOS
+
 # Decoder choice - ?? old decoder will be removed soon
 DECODER=old
 #DECODER=new
-# !!! don't forget to run this command after changing decoder type !!!
-# touch input/input.c input/input_ctrl.c include/vlc.h include/video_decoder.h
+
+# Debugging mode on or off
+DEBUG=1
 
 #----------------- do not change anything below this line ----------------------
 
@@ -38,21 +44,37 @@ DECODER=old
 # Configuration pre-processing
 ################################################################################
 
-# DEFINE will contain all the constants definitions decided in Makefile
-DEFINE = -DVIDEO_$(VIDEO)
+# Program version - may only be changed by the project leader
+PROGRAM_VERSION = 1.0-dev
+
+# PROGRAM_OPTIONS is an identification string of the compilation options
+PROGRAM_OPTIONS = $(VIDEO) $(ARCH) $(SYS)
+ifneq ($(DEBUG),)
+PROGRAM_OPTIONS += DEBUG
+endif
+
+# PROGRAM_BUILD is a complete identification of the build
+PROGRAM_BUILD = `date -R` $(USER)@`hostname`
+
+# DEFINE will contain some of the constants definitions decided in Makefile, 
+# including VIDEO_xx and ARCH_xx. It will be passed to C compiler.
+DEFINE += -DVIDEO_$(VIDEO) 
+DEFINE += -DARCH_$(ARCH)
+DEFINE += -DSYS_$(SYS)
+DEFINE += -DPROGRAM_VERSION="\"$(PROGRAM_VERSION)\""
+DEFINE += -DPROGRAM_OPTIONS="\"$(PROGRAM_OPTIONS)\""
+DEFINE += -DPROGRAM_BUILD="\"$(PROGRAM_BUILD)\""
+ifneq ($(DEBUG),)
+DEFINE += -DDEBUG
+endif
 
 # video is a lowercase version of VIDEO used for filenames
 video = $(shell echo $(VIDEO) | tr 'A-Z' 'a-z')
 
 ################################################################################
-# Tunning and other variables
+# Tunning and other variables - do not change anything except if you know
+# exactly what you are doing
 ################################################################################
-
-#
-# Transformation for video decompression (Fourier or cosine)
-#
-TRANSFORM=vdec_idct
-#TRANSFORM=vdec_idft
 
 #
 # C headers directories
@@ -78,9 +100,6 @@ ifeq ($(VIDEO),GGI)
 LIB += -lggi
 endif
 
-# System dependant libraries
-#??LIB += -lXxf86dga
-
 #
 # C compiler flags: compilation
 #
@@ -90,7 +109,6 @@ CCFLAGS += -D_REENTRANT
 CCFLAGS += -D_GNU_SOURCE
 
 # Optimizations : don't compile debug versions with them
-CCFLAGS += -g
 CCFLAGS += -O6
 CCFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
 CCFLAGS += -fomit-frame-pointer
@@ -143,21 +161,19 @@ endif
 #
 # Additionnal debugging flags
 #
-# Debugging settings: electric fence, debuging symbols and profiling support. 
-# Note that electric fence and accurate profiling are quite uncompatible.
-#CCFLAGS += -g
-#CCFLAGS += -pg
-#LCFLAGS += -g 
-#LCFLAGS += -pg
-#LIB += -ldmalloc
-#LIB += -lefence
+
+# Debugging support
+ifneq ($(DEBUG),)
+CFLAGS += -g
+#CFLAGS += -pg
+endif
 
 #################################################################################
 # Objects and files
 #################################################################################
 
 #
-# Objects
+# C Objects
 # 
 interface_obj =  		interface/main.o \
 						interface/interface.o \
@@ -224,23 +240,12 @@ video_parser_obj = 		video_parser/video_parser.o \
 
 video_decoder_obj =		video_decoder/video_decoder.o \
 						video_decoder/vdec_motion.o \
-                        video_decoder/$(TRANSFORM).o
+			                        video_decoder/vdec_idct.o
 endif
 
 misc_obj =			misc/mtime.o \
 						misc/rsc_files.o \
 						misc/netutils.o
-
-ifeq ($(ARCH),MMX)
-ifeq ($(DECODER),old)
-ASM_OBJ = 			video_decoder_ref/idctmmx.o \
-						video_output/video_yuv_mmx.o
-else
-ASM_OBJ = 			video_decoder/idctmmx.o \
-						video_output/video_yuv_mmx.o
-endif
-
-endif
 
 C_OBJ = $(interface_obj) \
 		$(input_obj) \
@@ -254,6 +259,19 @@ C_OBJ = $(interface_obj) \
 		$(video_decoder_obj) \
 		$(vlan_obj) \
 		$(misc_obj)
+
+#
+# Assembler Objects
+# 
+ifeq ($(ARCH),MMX)
+ifeq ($(DECODER),old)
+ASM_OBJ = 			video_decoder_ref/idctmmx.o \
+						video_output/video_yuv_mmx.o
+else
+ASM_OBJ = 			video_decoder/idctmmx.o \
+						video_output/video_yuv_mmx.o
+endif
+endif
 
 #
 # Other lists of files
@@ -281,13 +299,20 @@ distclean: clean
 	rm -f vlc gmon.out core
 	rm -rf dep
 
+show:
+	@echo "Command line for C objects:"
+	@echo $(CC) $(CCFLAGS) $(CFLAGS) -c -o "<dest.o>" "<src.c>"
+	@echo
+	@echo "Command line for assembler objects:"
+	@echo $(CC) $(CFLAGS) -c -o "<dest.o>" "<src.S>"
+
 FORCE:
 
 #
 # Real targets
 #
 vlc: $(C_OBJ) $(ASM_OBJ)
-	$(CC) $(LCFLAGS) $(CFLAGS) -o $@ $(C_OBJ) $(ASM_OBJ)
+	$(CC) $(LCFLAGS) $(CFLAGS) -o $@ $(C_OBJ) $(ASM_OBJ)	
 
 #
 # Generic rules (see below)
@@ -295,12 +320,16 @@ vlc: $(C_OBJ) $(ASM_OBJ)
 $(dependancies): %.d: FORCE
 	@$(MAKE) -s --no-print-directory -f Makefile.dep $@
 
+$(C_OBJ): %.o: Makefile Makefile.dep
 $(C_OBJ): %.o: dep/%.d
-
 $(C_OBJ): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	@echo "compiling $*.c"
+	@$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+
+$(ASM_OBJ): %.o: Makefile Makefile.dep
 $(ASM_OBJ): %.o: %.S
-	$(CC) $(CFLAGS) -c -o $@ $<
+	@echo "assembling $*.S"
+	@$(CC) $(CFLAGS) -c -o $@ $<
 
 ################################################################################
 # Note on generic rules and dependancies

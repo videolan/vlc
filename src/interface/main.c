@@ -56,6 +56,7 @@ static const struct option longopts[] =
 
     /* General/common options */
     {   "help",             0,          0,      'h' },          
+    {   "version",          0,          0,      'v' },        
 
     /* Audio options */
     {   "noaudio",          0,          0,      OPT_NOAUDIO },       
@@ -79,7 +80,7 @@ static const struct option longopts[] =
 };
 
 /* Short options */
-static const char *psz_shortopts = "hg";
+static const char *psz_shortopts = "hvg";
 
 /*******************************************************************************
  * Global variable program_data - this is the one and only, see main.h
@@ -92,6 +93,7 @@ main_t *p_main;
 static void SetDefaultConfiguration ( void );
 static int  GetConfiguration        ( int i_argc, char *ppsz_argv[], char *ppsz_env[] );
 static void Usage                   ( void );
+static void Version                 ( void );
 
 static void InitSignalHandler       ( void );
 static void SignalHandler           ( int i_signal );
@@ -318,15 +320,19 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             Usage();
             return( -1 );
             break;
+        case 'v':                                             /* -v, --version */
+            Version();
+            return( -1 );
+            break;            
 
         /* Audio options */
-        case OPT_NOAUDIO:                                        /* --noaudio */
+        case OPT_NOAUDIO:                                         /* --noaudio */
 	    p_main->b_audio = 0;
             break;
-        case OPT_STEREO:                                          /* --stereo */
+        case OPT_STEREO:                                           /* --stereo */
             main_PutIntVariable( AOUT_STEREO_VAR, 1 );
             break;
-        case OPT_MONO:                                              /* --mono */
+        case OPT_MONO:                                               /* --mono */
             main_PutIntVariable( AOUT_STEREO_VAR, 0 );
             break;
 
@@ -394,6 +400,7 @@ static void Usage( void )
     /* Options */
     intf_Msg("Options:\n" \
              "  -h, --help                        \tprint usage\n" \
+             "  -v, --version                     \tprint program version\n" \
              "  --noaudio                         \tdisable audio\n" \
              "  --stereo, --mono                  \tstereo/mono audio\n" \
              "  --novideo                         \tdisable video\n" \
@@ -443,6 +450,23 @@ static void Usage( void )
              "  [space]                           \ttoggle info printing\n" \
              );    
 }
+
+/*******************************************************************************
+ * Version: print complete program version
+ *******************************************************************************
+ * Print complete program version and build number.
+ *******************************************************************************/
+static void Version( void )
+{
+    intf_Msg(VERSION_MESSAGE "\n\n");
+    intf_Msg("This is free software; see the documentation or contact <videolan@via.ecp.fr>\n" \
+             "for use and copying conditions.\n" \
+             "\n" \
+             "This software is protected by the international copyright laws, and is\n" \
+             "provided without any warranty, including the implied warranties of\n" \
+             "merchantibility and fitness for a particular purpose.\n" \
+            );
+}    
 
 /*******************************************************************************
  * InitSignalHandler: system signal handler initialization

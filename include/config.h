@@ -23,29 +23,11 @@
  * Program information
  *******************************************************************************/
 
-/* Program options - this part will produce a copyright message with compilation
- * options informations, based on some definines set in the Makefile - do not
- * edit */
-#if defined(VIDEO_X11)
-#define VIDEO_OPTIONS                   "X11"
-#elif defined(VIDEO_FB)
-#define VIDEO_OPTIONS                   "Framebuffer"
-#elif defined(VIDEO_GGI)
-#define VIDEO_OPTIONS                   "GGI"
-#else
-#define VIDEO_OPTIONS                   ""
-#endif
-#if defined(HAVE_MMX)
-#define ARCH_OPTIONS                    "MMX"
-#else
-#define ARCH_OPTIONS                    ""
-#endif
-#define PROGRAM_OPTIONS                 VIDEO_OPTIONS " " ARCH_OPTIONS
-
 /* Program version and copyright message */
-#define PROGRAM_VERSION		        "1.0-dev"
-#define COPYRIGHT_MESSAGE	        "VideoLAN Client v" PROGRAM_VERSION " (" __DATE__ ") - " \
-                                        PROGRAM_OPTIONS " - (c)1999-2000 VideoLAN"
+#define COPYRIGHT_MESSAGE	        "VideoLAN Client v" PROGRAM_VERSION " - (c)1999-2000 VideoLAN"
+#define VERSION_MESSAGE                 "VideoLAN Client - (c)1999-2000 VideoLAN\n" \
+                                        "version " PROGRAM_VERSION " ( " PROGRAM_BUILD " )\n" \
+                                        "compilation options: " PROGRAM_OPTIONS
 
 /*******************************************************************************
  * General compilation options
@@ -71,22 +53,24 @@
 /*******************************************************************************
  * Debugging options - define or undefine symbols
  *******************************************************************************/
-
-/* General debugging support */
-//#define DEBUG
+#ifdef DEBUG
+/* General debugging support, which depends of the DEBUG define, is determined
+ * in the Makefile */
 
 /* Modules specific debugging - this will produce a lot of output, but can be
  * usefull to track a bug */
-/*#define DEBUG_INTF
+#define DEBUG_INTF
 #define DEBUG_INPUT
 #define DEBUG_AUDIO
-#define DEBUG_VIDEO*/
+#define DEBUG_VIDEO
 
 /* Debugging log file - if defined, a file can be used to store all messages. If
  * DEBUG_LOG_ONLY is defined, debug messages will only be printed to the log and
  * will not appear on the screen */
-//#define DEBUG_LOG                       "vlc-debug.log"
-//#define DEBUG_LOG_ONLY
+#define DEBUG_LOG                       "vlc-debug.log"
+#define DEBUG_LOG_ONLY
+
+#endif
 
 /*******************************************************************************
  * General configuration
@@ -341,7 +325,9 @@
 /* Define to enable messages queues - disabling messages queue can be usefull
  * when debugging, since it allows messages which would not otherwise be printed,
  * due to a crash, to be printed anyway */
+#ifndef DEBUG
 #define INTF_MSG_QUEUE
+#endif
 
 /* Format of the header for debug messages. The arguments following this header
  * are the file (char *), the function (char *) and the line (int) in which the
