@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.292 2004/03/03 20:39:53 gbazin Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -54,6 +54,8 @@ struct input_thread_sys_t
     /* subtitles */
     int              i_sub;
     subtitle_demux_t **sub;
+
+    int64_t          i_stop_time;
 };
 
 static  int RunThread       ( input_thread_t *p_input );
@@ -122,6 +124,10 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
 
     /* repeat variable */
     var_Create( p_input, "input-repeat", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+
+    /* start/stop time */
+    var_Create( p_input, "start-time", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    var_Create( p_input, "stop-time", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
     /* decoders */
     var_Create( p_input, "minimize-threads", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -521,6 +527,13 @@ static int RunThread( input_thread_t *p_input )
                 var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
             }
 
+            /* Check stop-time */
+            if( p_input->p_sys->i_stop_time > 0 && p_input->p_sys->i_stop_time < i_time )
+            {
+                msg_Warn( p_input, "EOF reached because of stop-time" );
+                p_input->b_eof = 1;
+            }
+
             /* update subs */
             for( i = 0; i < p_input->p_sys->i_sub; i++ )
             {
@@ -808,6 +821,8 @@ static int InitThread( input_thread_t * p_input )
     p_input->p_sys->i_sub = 0;
     p_input->p_sys->sub   = NULL;
 
+    p_input->p_sys->i_stop_time = 0;
+
     /* get meta informations */
     if( !demux_Control( p_input, DEMUX_GET_META, &meta ) )
     {
@@ -906,8 +921,43 @@ static int InitThread( input_thread_t * p_input )
             input_AddInfo( p_cat, _("Duration"),
                            msecstotimestr( psz_buffer, i_length / 1000 ) );
         }
-    }
 
+        /* Set start time */
+        var_Get( p_input, "start-time", &val );
+        if(  val.i_int > 0 )
+        {
+            double f_pos = (double)( (int64_t)val.i_int * I64C(1000000) ) / (double)i_length;
+
+            if( f_pos >= 1.0 )
+            {
+                msg_Warn( p_input, "invalid start-time, ignored (start-time >= media length)" );
+            }
+            else
+            {
+                p_input->stream.p_selected_area->i_seek =
+                    (int64_t)( f_pos * (double)p_input->stream.p_selected_area->i_size );
+
+                msg_Dbg( p_input, "start-time %ds (%2.2f)", val.i_int, f_pos );
+            }
+        }
+    }
+    /* Set stop-time and check validity */
+    var_Get( p_input, "stop-time", &val );
+    if( val.i_int > 0 )
+    {
+        vlc_value_t start;
+
+        var_Get( p_input, "start-time", &start );
+        if( start.i_int >= val.i_int )
+        {
+            msg_Warn( p_input, "invalid stop-time, ignored (stop-time < start-time)" );
+        }
+        else
+        {
+            p_input->p_sys->i_stop_time = (int64_t)val.i_int * I64C(1000000);
+            msg_Dbg( p_input, "stop-time %ds", val.i_int );
+        }
+    }
 
     /* get fps */
     if( demux_Control( p_input, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )

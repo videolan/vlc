@@ -324,6 +324,12 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
 #define INPUT_REPEAT_TEXT N_("Number of time the same input will be repeated")
 #define INPUT_REPEAT_LONGTEXT N_("Number of time the same input will be repeated")
 
+#define START_TIME_TEXT N_("Input start time (second)")
+#define START_TIME_LONGTEXT N_("Input start time (second)")
+
+#define STOP_TIME_TEXT N_("Input stop time (second)")
+#define STOP_TIME_LONGTEXT N_("Input stop time (second)")
+
 #define SUB_AUTO_TEXT N_("Autodetect subtitle files")
 #define SUB_AUTO_LONGTEXT \
     N_("Automatically detect a subtitle file, if no subtitle filename is " \
@@ -783,6 +789,10 @@ vlc_module_begin();
                  SUB_FILE_TEXT, SUB_FILE_LONGTEXT, VLC_TRUE );
     add_integer( "input-repeat", 0, NULL,
                  INPUT_REPEAT_TEXT, INPUT_REPEAT_LONGTEXT, VLC_TRUE );
+    add_integer( "start-time", 0, NULL,
+                 START_TIME_TEXT, START_TIME_LONGTEXT, VLC_TRUE );
+    add_integer( "stop-time", 0, NULL,
+                 STOP_TIME_TEXT, STOP_TIME_LONGTEXT, VLC_TRUE );
 
     add_file( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT, VLC_FALSE );
     add_file( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT, VLC_FALSE );
