@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.16 2003/06/05 21:22:28 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.17 2003/07/05 15:35:28 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -86,6 +86,9 @@ vlc_module_begin();
     add_shortcut( "wxwin" );
     add_shortcut( "wx" );
     set_program( "wxvlc" );
+#if !defined(WIN32)
+    linked_with_a_crap_library_which_uses_atexit();
+#endif
 vlc_module_end();
 
 /*****************************************************************************
