@@ -492,22 +492,26 @@ static int OpenEncoder( vlc_object_t *p_this )
     if( i_quality > 10 ) i_quality = 10;
     if( i_quality < 0 ) i_quality = 0;
 
-#define frame_x_offset 0
-#define frame_y_offset 0
-#define video_hzn 25
-#define video_hzd 1
-#define video_q 5
-
     theora_info_init( &p_sys->ti );
 
     p_sys->ti.width = p_enc->fmt_in.video.i_width;
     p_sys->ti.height = p_enc->fmt_in.video.i_height;
     p_sys->ti.frame_width = p_enc->fmt_in.video.i_width;
     p_sys->ti.frame_height = p_enc->fmt_in.video.i_height;
-    p_sys->ti.offset_x = frame_x_offset;
-    p_sys->ti.offset_y = frame_y_offset;
-    p_sys->ti.fps_numerator = video_hzn;
-    p_sys->ti.fps_denominator = video_hzd;
+    p_sys->ti.offset_x = 0 /*frame_x_offset*/;
+    p_sys->ti.offset_y = 0/*frame_y_offset*/;
+
+    if( !p_enc->fmt_in.video.i_frame_rate ||
+        !p_enc->fmt_in.video.i_frame_rate_base )
+    {
+        p_sys->ti.fps_numerator = 25;
+        p_sys->ti.fps_denominator = 1;
+    }
+    else
+    {
+        p_sys->ti.fps_numerator = p_enc->fmt_in.video.i_frame_rate;
+        p_sys->ti.fps_denominator = p_enc->fmt_in.video.i_frame_rate_base;
+    }
 
     if( p_enc->fmt_in.video.i_aspect )
     {
@@ -625,7 +629,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     /* Ogg packet to block */
     p_block = block_New( p_enc, oggpacket.bytes );
     memcpy( p_block->p_buffer, oggpacket.packet, oggpacket.bytes );
-    p_block->i_dts = p_block->i_pts = p_pict->date;;
+    p_block->i_dts = p_block->i_pts = p_pict->date;
 
     return p_block;
 }

@@ -328,6 +328,14 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     switch( p_input->p_fmt->i_cat )
     {
     case VIDEO_ES:
+        if( !p_input->p_fmt->video.i_frame_rate ||
+            !p_input->p_fmt->video.i_frame_rate_base )
+        {
+            msg_Warn( p_mux, "Missing frame rate, assuming 25fps" );
+            p_input->p_fmt->video.i_frame_rate = 25;
+            p_input->p_fmt->video.i_frame_rate_base = 1;
+        }
+
         switch( p_stream->i_fourcc )
         {
         case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
@@ -352,7 +360,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             SetDWLE( &p_stream->oggds_header.i_size,
                      sizeof( oggds_header_t ) - 1);
             SetQWLE( &p_stream->oggds_header.i_time_unit,
-                     I64C(10000000)/(int64_t)25 );  // FIXME (25fps)
+                     I64C(10000000) * p_input->p_fmt->video.i_frame_rate_base /
+                     (int64_t)p_input->p_fmt->video.i_frame_rate );
             SetQWLE( &p_stream->oggds_header.i_samples_per_unit, 1 );
             SetDWLE( &p_stream->oggds_header.i_default_len, 1 ); /* ??? */
             SetDWLE( &p_stream->oggds_header.i_buffer_size, 1024*1024 );
@@ -597,7 +606,8 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
             /* Get keyframe_granule_shift for theora granulepos calculation */
             if( p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
             {
-                int i_keyframe_frequency_force = 1 << (op.packet[36] >> 3);
+                int i_keyframe_frequency_force =
+                      1 << ((op.packet[40] << 6 >> 3) | (op.packet[41] >> 5));
 
                 /* granule_shift = i_log( frequency_force -1 ) */
                 p_stream->i_keyframe_granule_shift = 0;
@@ -909,9 +919,11 @@ static int Mux( sout_mux_t *p_mux )
         {
             if( p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
             {
-                /* FIXME, we assume only keyframes and 25fps */
-                op.granulepos = ( ( i_dts - p_sys->i_start_dts ) * I64C(25)
-                    / I64C(1000000) ) << p_stream->i_keyframe_granule_shift;
+                /* FIXME, we assume only keyframes */
+                op.granulepos = ( ( i_dts - p_sys->i_start_dts ) *
+                    p_input->p_fmt->video.i_frame_rate /
+                    p_input->p_fmt->video.i_frame_rate_base /
+                    I64C(1000000) ) << p_stream->i_keyframe_granule_shift;
             }
             else
                 op.granulepos = ( i_dts - p_sys->i_start_dts ) * I64C(10) /
