@@ -227,7 +227,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     libvlc_t *p_libvlc = p_filter->p_libvlc;
     vlc_value_t val;
-    int i_index;
+    int i_index, i_real_index, i_row, i_col;
 
     subpicture_region_t *p_region;
     subpicture_region_t *p_region_prev = NULL;
@@ -275,6 +275,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                             i_numpics/p_sys->i_rows + 1 );
     }
 
+    i_real_index = 0;
+
     for( i_index = 0 ; i_index < p_picture_vout->i_picture_num ; i_index ++ )
     {
 
@@ -293,6 +295,10 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             msg_Dbg( p_filter, "Picture Vout Element is empty");
             break;
         }
+        i_real_index ++;
+        i_row = ( i_real_index / p_sys->i_cols ) % p_sys->i_rows ;
+        i_col = i_real_index % p_sys->i_cols ;
+
 
 
         /* Convert the images */
@@ -310,8 +316,12 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
 
         fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
-        fmt_out.i_width = fmt_in.i_width *( p_sys->i_width / p_sys->i_cols ) / fmt_in.i_width;
-        fmt_out.i_height = fmt_in.i_height*( p_sys->i_height / p_sys->i_rows ) / fmt_in.i_height;
+        fmt_out.i_width = fmt_in.i_width *
+            ( ( p_sys->i_width - ( p_sys->i_cols - 1 ) * p_sys->i_vborder )
+              / p_sys->i_cols ) / fmt_in.i_width;
+        fmt_out.i_height = fmt_in.i_height *
+            ( ( p_sys->i_height - ( p_sys->i_rows - 1 ) * p_sys->i_hborder )
+              / p_sys->i_rows ) / fmt_in.i_height;
         if( p_sys->i_ar ) /* keep aspect ratio */
         {
             if( (float)fmt_out.i_width/(float)fmt_out.i_height
@@ -365,39 +375,27 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         if( p_sys->i_ar ) /* keep aspect ratio */
         {
             /* center the video in the dedicated rectangle */
-            p_region->i_x = p_sys->i_xoffset + ( i_index % p_sys->i_cols )
-                            * ( p_sys->i_width / p_sys->i_cols
-                                + p_sys->i_vborder )
-                        + ( fmt_in.i_width *( p_sys->i_width / p_sys->i_cols )
-                            / fmt_in.i_width - fmt_out.i_width ) / 2;
+            p_region->i_x = p_sys->i_xoffset
+                            + i_col * ( p_sys->i_width / p_sys->i_cols )
+                            + ( i_col * p_sys->i_vborder ) / p_sys->i_cols
+                        + ( fmt_in.i_width *
+            ( ( p_sys->i_width - ( p_sys->i_cols - 1 ) * p_sys->i_vborder )
+              / p_sys->i_cols ) / fmt_in.i_width - fmt_out.i_width ) / 2;
             p_region->i_y = p_sys->i_yoffset
-                        + ( ( i_index / p_sys->i_cols ) % p_sys->i_rows )
-                            * ( p_sys->i_height / p_sys->i_rows
-                                + p_sys->i_hborder )
-                        + ( fmt_in.i_height*( p_sys->i_height / p_sys->i_rows ) 
-                        / fmt_in.i_height - fmt_out.i_height ) / 2;
+                        + i_row * ( p_sys->i_height / p_sys->i_rows )
+                        + ( i_row * p_sys->i_hborder ) / p_sys->i_rows
+                        + ( fmt_in.i_height *
+            ( ( p_sys->i_height - ( p_sys->i_rows - 1 ) * p_sys->i_hborder )
+              / p_sys->i_rows ) / fmt_in.i_height - fmt_out.i_height ) / 2;
         } else {
             /* we don't have to center the video since it takes the
             whole rectangle area */
-            p_region->i_x = p_sys->i_xoffset + ( i_index % p_sys->i_cols )
-                            * ( p_sys->i_width / p_sys->i_cols
-                                + p_sys->i_vborder );
+            p_region->i_x = p_sys->i_xoffset
+                            + i_col * ( p_sys->i_width / p_sys->i_cols )
+                            + ( i_col * p_sys->i_vborder ) / p_sys->i_cols;
             p_region->i_y = p_sys->i_yoffset
-                        + ( ( i_index / p_sys->i_cols ) % p_sys->i_rows )
-                            * ( p_sys->i_height / p_sys->i_rows
-                                + p_sys->i_hborder );
-        }
-
-        if( 1 )
-        {
-            uint8_t *p_a = p_region->picture.A_PIXELS;
-            int i_pitch = p_region->picture.Y_PITCH;
-            int x,y;
-
-            for( x = 0, y=0; x+y < 20; x++, y++){
-                p_a[ x + i_pitch * y ] = 0xff;
-            }
-
+                        + i_row * ( p_sys->i_height / p_sys->i_rows )
+                        + ( i_row * p_sys->i_hborder ) / p_sys->i_rows;
         }
 
         if( p_region_prev == NULL ){
