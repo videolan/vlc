@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.10 2002/11/15 14:41:49 gbazin Exp $
+ * $Id: http.c,v 1.11 2002/11/23 04:40:53 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -25,22 +25,26 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <string.h>
-#include <errno.h>
-#include <fcntl.h>
-
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#ifdef HAVE_ERRNO_H
+#   include <errno.h>
+#endif
+#ifdef HAVE_FCNTL_H
+#   include <fcntl.h>
+#endif
+
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 )
+#elif defined( _MSC_VER ) && defined( _WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
 #endif
 
-#ifdef WIN32
+#if defined( UNDER_CE )
+#   include <winsock.h>
+#elif defined( WIN32 )
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #   ifndef IN_MULTICAST
@@ -142,7 +146,11 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     if( send( p_access_data->_socket.i_handle, psz_buffer,
                strlen( psz_buffer ), 0 ) == (-1) )
     {
+#ifdef HAVE_ERRNO_H
         msg_Err( p_input, "cannot send request (%s)", strerror(errno) );
+#else
+        msg_Err( p_input, "cannot send request" );
+#endif
         Close( VLC_OBJECT(p_input) );
         return VLC_EGENERIC;
     }
@@ -549,9 +557,7 @@ static void Close( vlc_object_t *p_this )
 
     msg_Info( p_input, "closing HTTP target `%s'", p_input->psz_source );
 
-#ifdef UNDER_CE
-    CloseHandle( (HANDLE)i_handle );
-#elif defined( WIN32 )
+#if defined( WIN32 ) || defined( UNDER_CE )
     closesocket( i_handle );
 #else
     close( i_handle );
@@ -575,9 +581,7 @@ static int SetProgram( input_thread_t * p_input,
 static void Seek( input_thread_t * p_input, off_t i_pos )
 {
     _input_socket_t *p_access_data = (_input_socket_t*)p_input->p_access_data;
-#ifdef UNDER_CE
-    CloseHandle( (HANDLE)p_access_data->_socket.i_handle );
-#elif defined( WIN32 )
+#if defined( WIN32 ) || defined( UNDER_CE )
     closesocket( p_access_data->_socket.i_handle );
 #else
     close( p_access_data->_socket.i_handle );
@@ -591,10 +595,6 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
  *****************************************************************************/
 static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 {
-#ifdef UNDER_CE
-    return -1;
-
-#else
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
     struct timeval  timeout;
     fd_set          fds;
@@ -612,10 +612,17 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
     i_ret = select( p_access_data->i_handle + 1, &fds,
                     NULL, NULL, &timeout );
 
+#ifdef HAVE_ERRNO_H
     if( i_ret == -1 && errno != EINTR )
     {
         msg_Err( p_input, "network select error (%s)", strerror(errno) );
     }
+#else
+    if( i_ret == -1 )
+    {
+        msg_Err( p_input, "network select error" );
+    }
+#endif
     else if( i_ret > 0 )
     {
         ssize_t i_recv = recv( p_access_data->i_handle, p_buffer, i_len, 0 );
@@ -629,13 +636,15 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 
         if( i_recv < 0 )
         {
+#ifdef HAVE_ERRNO_H
             msg_Err( p_input, "recv failed (%s)", strerror(errno) );
+#else
+            msg_Err( p_input, "recv failed" );
+#endif
         }
 
         return i_recv;
     }
 
     return 0;
-
-#endif
 }
