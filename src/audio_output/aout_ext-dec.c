@@ -2,7 +2,7 @@
  * aout_ext-dec.c : exported fifo management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_ext-dec.c,v 1.10 2002/01/14 12:15:10 asmax Exp $
+ * $Id: aout_ext-dec.c,v 1.11 2002/01/21 23:57:46 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -43,6 +43,9 @@ aout_fifo_t * aout_CreateFifo( int i_type, int i_channels, long l_rate,
 {
     aout_thread_t *p_aout;
     int i_fifo;
+
+    intf_WarnMsg( 3, "aout_CreateFifo: type == %d, channels == %d, rate == %d, units == %d, frame_size == %d, buffer == %x",
+                  i_type, i_channels, l_rate, l_units, l_frame_size, p_buffer );
 
     /* Spawn an audio output if there is none */
     vlc_mutex_lock( &p_aout_bank->lock );

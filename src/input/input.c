@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.172 2002/01/15 19:01:28 stef Exp $
+ * $Id: input.c,v 1.173 2002/01/21 23:57:46 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -465,7 +465,6 @@ static int InitThread( input_thread_t * p_input )
 #define f p_input->p_input_module->p_functions->input.functions.input
     p_input->pf_init          = f.pf_init;
     p_input->pf_end           = f.pf_end;
-    p_input->pf_init_bit_stream= f.pf_init_bit_stream;
     p_input->pf_read          = f.pf_read;
     p_input->pf_set_area      = f.pf_set_area;
     p_input->pf_set_program   = f.pf_set_program;

@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.14 2002/01/14 23:46:35 massiot Exp $
+ * $Id: mpeg_adec.c,v 1.15 2002/01/21 23:57:46 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -123,8 +123,8 @@ static int decoder_Run ( decoder_config_t * p_config )
     /*
      * Initialize bit stream 
      */
-    p_adec->p_config->pf_init_bit_stream( &p_adec->bit_stream,
-        p_adec->p_config->p_decoder_fifo, NULL, NULL );
+    InitBitstream( &p_adec->bit_stream, p_adec->p_config->p_decoder_fifo,
+                   NULL, NULL );
 
     /* We do not create the audio output fifo now, but
        it will be created when the first frame is received */

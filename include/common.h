@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.69 2002/01/14 23:46:35 massiot Exp $
+ * $Id: common.h,v 1.70 2002/01/21 23:57:46 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -510,6 +510,9 @@ typedef struct module_symbols_s
                                       void ( * ) ( struct bit_stream_s *,
                                                    boolean_t ),
                                       void * );
+    void ( * BitstreamNextDataPacket )( struct bit_stream_s * );
+    boolean_t ( * NextDataPacket )  ( struct decoder_fifo_s *,
+                                      struct data_packet_s ** );
     void ( * DecoderError )         ( struct decoder_fifo_s * p_fifo );
     int  ( * input_InitStream )     ( struct input_thread_s *, size_t );
     void ( * input_EndStream )      ( struct input_thread_s * );

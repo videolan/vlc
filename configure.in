@@ -61,9 +61,10 @@ AC_ARG_WITH(words,
     *)
       dnl  Try to guess endianness by matching patterns on a compiled
       dnl  binary, by looking for an ASCII or EBCDIC string
-      ac_cv_c_bigendian=unknown
-      AC_MSG_CHECKING(what the byte order looks to be)[
-        cat >conftest.c <<EOF
+      AC_CACHE_CHECK([whether the byte order is big-endian],
+        [ac_cv_c_bigendian],
+        [ac_cv_c_bigendian=unknown
+        [cat >conftest.c <<EOF
         short am[] = { 0x4249, 0x4765, 0x6e44, 0x6961, 0x6e53, 0x7953, 0 };
         short ai[] = { 0x694c, 0x5454, 0x656c, 0x6e45, 0x6944, 0x6e61, 0 };
         void _a(void) { char*s = (char*)am; s = (char *)ai; }
@@ -72,37 +73,34 @@ AC_ARG_WITH(words,
         void _e(void) { char*s = (char*)em; s = (char*)ei; }
         int main(void) { _a(); _e(); return 0; }
 EOF
-      ]
-      if test -f conftest.c
-      then 
-        if ${CC-cc} conftest.c -o conftest.o >config.log 2>&1 \
-            && test -f conftest.o
-        then
-          if test `grep -l BIGenDianSyS conftest.o`
+        ]
+        if test -f conftest.c
+        then 
+          if ${CC-cc} conftest.c -o conftest.o >config.log 2>&1 \
+              && test -f conftest.o
           then
-            AC_MSG_RESULT("big endian")
-            ac_cv_c_bigendian=yes
-          fi
-          if test `grep -l LiTTleEnDian conftest.o`
-          then
-            AC_MSG_RESULT("little endian")
-            ac_cv_c_bigendian=no
+            if test `grep -l BIGenDianSyS conftest.o`
+            then
+              ac_cv_c_bigendian=yes
+            fi
+            if test `grep -l LiTTleEnDian conftest.o`
+            then
+              ac_cv_c_bigendian=no
+            fi
           fi
         fi
-      fi
+      ])
       if test $ac_cv_c_bigendian = xunknown
       then
         AC_MSG_ERROR([Could not guess endianness, please use --with-words])
       fi
-      dnl  Now we know what to use for endianness, just put it in the header
-      if test $ac_cv_c_bigendian = yes
-      then
-        cat >> confdefs.h <<\EOF
-#define WORDS_BIGENDIAN 1
-EOF
-      fi
       ;;
   esac
+dnl  Now we know what to use for endianness, just put it in the header
+if test $ac_cv_c_bigendian = yes
+then
+  AC_DEFINE(WORDS_BIGENDIAN, 1, big endian system)
+fi
 
 dnl Check for system libs needed
 AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty)

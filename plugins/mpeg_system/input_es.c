@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.11 2001/12/30 07:09:55 sam Exp $
+ * $Id: input_es.c,v 1.12 2002/01/21 23:57:46 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -68,12 +68,7 @@ static void ESEnd           ( struct input_thread_s * );
 static void ESSeek          ( struct input_thread_s *, off_t );
 static int  ESSetProgram    ( struct input_thread_s *, pgrm_descriptor_t * );
 static void ESDemux         ( struct input_thread_s *, 
-                                struct data_packet_s * );
-static void ESNextDataPacket( struct bit_stream_s * );
-static void ESInitBitstream( struct bit_stream_s *, struct decoder_fifo_s *,
-                        void (* pf_bitstream_callback)( struct bit_stream_s *,
-                                                        boolean_t ),
-                        void * );
+                              struct data_packet_s * );
 
 /*****************************************************************************
  * Declare a buffer manager
@@ -101,7 +96,6 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_open             = NULL;
     input.pf_close            = NULL;
     input.pf_end              = ESEnd;
-    input.pf_init_bit_stream  = ESInitBitstream;
     input.pf_set_area         = NULL;
     input.pf_set_program      = ESSetProgram;
     input.pf_read             = ESRead;
@@ -256,6 +250,14 @@ static void ESDemux( input_thread_t * p_input, data_packet_t * p_data )
     p_pes->p_first = p_pes->p_last = p_data;
     p_pes->i_nb_data = 1;
 
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    if( p_fifo->i_depth >= MAX_PACKETS_IN_FIFO )
+    {
+        /* Wait for the decoder. */
+        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
+    }
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
     if( (p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT)
          | (input_ClockManageControl( p_input, 
                           p_input->stream.p_selected_program,
@@ -267,95 +269,5 @@ static void ESDemux( input_thread_t * p_input, data_packet_t * p_data )
     }
 
     input_DecodePES( p_fifo, p_pes );
-
-    vlc_mutex_lock( &p_fifo->data_lock );
-    if( p_fifo->i_depth >= MAX_PACKETS_IN_FIFO )
-    {
-        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-    }
-    vlc_mutex_unlock( &p_fifo->data_lock );
 }
 
-/*****************************************************************************
- * ESNextDataPacket: signals the input thread if there isn't enough packets
- * available
- *****************************************************************************/
-static void ESNextDataPacket( bit_stream_t * p_bit_stream )
-{
-    decoder_fifo_t *    p_fifo = p_bit_stream->p_decoder_fifo;
-    boolean_t           b_new_pes;
-
-    /* We are looking for the next data packet that contains real data,
-     * and not just a PES header */
-    do
-    {
-        /* We were reading the last data packet of this PES packet... It's
-         * time to jump to the next PES packet */
-        if( p_bit_stream->p_data->p_next == NULL )
-        {
-            pes_packet_t * p_next;
-
-            vlc_mutex_lock( &p_fifo->data_lock );
-
-            /* Free the previous PES packet. */
-            p_next = p_fifo->p_first->p_next;
-            p_fifo->p_first->p_next = NULL;
-            p_fifo->pf_delete_pes( p_fifo->p_packets_mgt,
-                                   p_fifo->p_first );
-            p_fifo->p_first = p_next;
-            p_fifo->i_depth--;
-
-            if( p_fifo->p_first == NULL )
-            {
-                /* No PES in the FIFO. p_last is no longer valid. */
-                p_fifo->pp_last = &p_fifo->p_first;
-
-                /* Signal the input thread we're waiting. */
-                vlc_cond_signal( &p_fifo->data_wait );
-
-                /* Wait for the input to tell us when we receive a packet. */
-                vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-            }
-
-            /* The next byte could be found in the next PES packet */
-            p_bit_stream->p_data = p_fifo->p_first->p_first;
-
-            vlc_mutex_unlock( &p_fifo->data_lock );
-
-            b_new_pes = 1;
-        }
-        else
-        {
-            /* Perhaps the next data packet of the current PES packet contains
-             * real data (ie its payload's size is greater than 0). */
-            p_bit_stream->p_data = p_bit_stream->p_data->p_next;
-
-            b_new_pes = 0;
-        }
-    } while ( p_bit_stream->p_data->p_payload_start
-               == p_bit_stream->p_data->p_payload_end );
-
-    /* We've found a data packet which contains interesting data... */
-    p_bit_stream->p_byte = p_bit_stream->p_data->p_payload_start;
-    p_bit_stream->p_end  = p_bit_stream->p_data->p_payload_end;
-
-    /* Call back the decoder. */
-    if( p_bit_stream->pf_bitstream_callback != NULL )
-    {
-        p_bit_stream->pf_bitstream_callback( p_bit_stream, b_new_pes );
-    }
-}
-
-/*****************************************************************************
- * ESInitBitstream: changes pf_next_data_packet
- *****************************************************************************/
-static void ESInitBitstream( bit_stream_t * p_bit_stream,
-                             decoder_fifo_t * p_decoder_fifo,
-                        void (* pf_bitstream_callback)( struct bit_stream_s *,
-                                                        boolean_t ),
-                            void * p_callback_arg )
-{
-    InitBitstream( p_bit_stream, p_decoder_fifo, pf_bitstream_callback,
-                   p_callback_arg );
-    p_bit_stream->pf_next_data_packet = ESNextDataPacket;
-}

@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.11 2002/01/14 23:46:35 massiot Exp $
+ * $Id: video_parser.c,v 1.12 2002/01/21 23:57:46 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -224,9 +224,8 @@ static int InitThread( vpar_thread_t *p_vpar )
 #undef f
 
     /* Initialize input bitstream */
-    p_vpar->p_config->pf_init_bit_stream( &p_vpar->bit_stream,
-        p_vpar->p_config->p_decoder_fifo, BitstreamCallback,
-        (void *)p_vpar );
+    InitBitstream( &p_vpar->bit_stream, p_vpar->p_config->p_decoder_fifo,
+                   BitstreamCallback, (void *)p_vpar );
 
     /* Initialize parsing data */
     p_vpar->sequence.p_forward = NULL;

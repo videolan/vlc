@@ -179,7 +179,7 @@ DEFINE_SYS := -DSYS_$(shell echo $(SYS) | sed -e 's/-.*//' | tr '[a-z].' '[A-Z]_
 DEFINE += $(DEFINE_SYS)
 
 # On Linux and Solaris, activate 64-bit off_t (by default under BSD)
-DEFINE += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 
+DEFINE += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_LARGEFILE64_SOURCE
 
 # Gettext support
 DEFINE += -DLOCALEDIR=\"$(datadir)/locale\"

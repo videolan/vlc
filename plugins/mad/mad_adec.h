@@ -34,8 +34,8 @@ typedef struct mad_adec_thread_s
      * Decoder properties
      */
     struct mad_decoder *libmad_decoder;
-    mad_timer_t 	libmad_timer;  
-    byte_t 		buffer[MAD_BUFFER_SIZE]; 
+    mad_timer_t         libmad_timer;  
+    byte_t              buffer[MAD_BUFFER_SIZE]; 
    
     /*
      * Thread properties
@@ -46,12 +46,11 @@ typedef struct mad_adec_thread_s
      * Input properties
      */
     decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
-    /* The bit stream structure handles the PES stream at the bit level */
-    bit_stream_t        bit_stream;
+    data_packet_t *     p_data;
     decoder_config_t *  p_config;
 
     /* Store i_pts for syncing audio frames */
-    mtime_t         	i_current_pts, i_next_pts;
+    mtime_t             i_current_pts, i_next_pts;
 
     /*
      * Output properties

@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.9 2002/01/14 23:46:35 massiot Exp $
+ * $Id: lpcm_adec.c,v 1.10 2002/01/21 23:57:46 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -146,10 +146,8 @@ static int InitThread (lpcmdec_thread_t * p_lpcmdec)
 {
 
     /* Init the BitStream */
-    p_lpcmdec->p_config->pf_init_bit_stream(
-            &p_lpcmdec->bit_stream,
-            p_lpcmdec->p_config->p_decoder_fifo,
-            NULL, NULL);
+    InitBitstream( &p_lpcmdec->bit_stream, p_lpcmdec->p_config->p_decoder_fifo,
+                   NULL, NULL);
 
     /* Creating the audio output fifo */
     p_lpcmdec->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_STEREO_FIFO, 2, 48000,

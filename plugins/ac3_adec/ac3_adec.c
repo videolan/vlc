@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.14 2002/01/14 23:46:35 massiot Exp $
+ * $Id: ac3_adec.c,v 1.15 2002/01/21 23:57:46 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -200,8 +200,7 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
     /*
      * Bit stream
      */
-    p_ac3thread->p_config->pf_init_bit_stream(
-            &p_ac3thread->ac3_decoder->bit_stream,
+    InitBitstream(&p_ac3thread->ac3_decoder->bit_stream,
             p_ac3thread->p_config->p_decoder_fifo,
             BitstreamCallback, (void *) p_ac3thread );
     

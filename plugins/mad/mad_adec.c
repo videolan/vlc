@@ -132,14 +132,14 @@ static int decoder_Run ( decoder_config_t * p_config )
     /* mad decoder thread's main loop */
     while ((!p_mad_adec->p_fifo->b_die) && (!p_mad_adec->p_fifo->b_error))
     {
-	intf_ErrMsg( "mad_adec: starting libmad decoder" );
-	if (mad_decoder_run(p_mad_adec->libmad_decoder, MAD_DECODER_MODE_SYNC)==-1)
-	{
-	  intf_ErrMsg( "mad_adec error: libmad decoder returns abnormally");
-          DecoderError( p_mad_adec->p_fifo );
-	  EndThread(p_mad_adec);
-      	  return( -1 );
-	}
+        intf_ErrMsg( "mad_adec: starting libmad decoder" );
+        if (mad_decoder_run(p_mad_adec->libmad_decoder, MAD_DECODER_MODE_SYNC)==-1)
+        {
+            intf_ErrMsg( "mad_adec error: libmad decoder returns abnormally");
+            DecoderError( p_mad_adec->p_fifo );
+            EndThread(p_mad_adec);
+            return( -1 );
+        }
     }
 
     /* If b_error is set, the mad decoder thread enters the error loop */
@@ -148,7 +148,7 @@ static int decoder_Run ( decoder_config_t * p_config )
         DecoderError( p_mad_adec->p_fifo );
     }
 
-    /* End of the ac3 decoder thread */
+    /* End of the mad decoder thread */
     EndThread (p_mad_adec);
 
     return( 0 );
@@ -159,42 +159,55 @@ static int decoder_Run ( decoder_config_t * p_config )
  *****************************************************************************/
 static int InitThread( mad_adec_thread_t * p_mad_adec )
 {
+    decoder_fifo_t * p_fifo = p_mad_adec->p_fifo;
+
     /*
      * Properties of audio for libmad
      */
-	
+        
     /* Initialize the libmad decoder structures */
     p_mad_adec->libmad_decoder = (struct mad_decoder*) malloc(sizeof(struct mad_decoder));
-
-    if (p_mad_adec->libmad_decoder == NULL) {
+    if (p_mad_adec->libmad_decoder == NULL)
+    {
         intf_ErrMsg ( "mad_adec error: not enough memory "
                       "for decoder_InitThread() to allocate p_mad_adec->libmad_decder" );
-    	return -1;
+        return -1;
     }
     p_mad_adec->i_current_pts = p_mad_adec->i_next_pts = 0;
 
-    /*
-     * Initialize bit stream
-     */
-    p_mad_adec->p_config->pf_init_bit_stream( &p_mad_adec->bit_stream,
-					      p_mad_adec->p_config->p_decoder_fifo,
-					      NULL,    /* pf_bitstream_callback */
-					      NULL );  /* void **/
-
     mad_decoder_init( p_mad_adec->libmad_decoder,
-    		      p_mad_adec, 	/* vlc's thread structure and p_fifo playbuffer */
-		      libmad_input,  	/* input_func */
-		      0,		/* header_func */
-		      0,		/* filter */
-		      libmad_output,	/* output_func */
-		      0, 	/* error */
-		      0);            	/* message */
+                          p_mad_adec,         /* vlc's thread structure and p_fifo playbuffer */
+                      libmad_input,          /* input_func */
+                      0,                /* header_func */
+                      0,                /* filter */
+                      libmad_output,         /* output_func */
+                      0,                  /* error */
+                      0);                    /* message */
 
     mad_decoder_options(p_mad_adec->libmad_decoder, MAD_OPTION_IGNORECRC);
     mad_timer_reset(&p_mad_adec->libmad_timer);
 
-    /* output fifo will be created when needed */
-    p_mad_adec->p_aout_fifo=NULL;
+    /*
+     * Initialize the output properties
+     */
+    p_mad_adec->p_aout_fifo = NULL;
+
+    /*
+     * Initialize the input properties
+     */
+    /* Get the first data packet. */
+    vlc_mutex_lock( &p_fifo->data_lock );
+    while ( p_fifo->p_first == NULL )
+    {
+        if ( p_fifo->b_die )
+        {
+            vlc_mutex_unlock( &p_fifo->data_lock );
+            return( -1 );
+        }
+        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
+    }
+    vlc_mutex_unlock( &p_fifo->data_lock );
+    p_mad_adec->p_data = p_fifo->p_first->p_first;
 
     intf_ErrMsg("mad_adec debug: mad decoder thread %p initialized", p_mad_adec);
 

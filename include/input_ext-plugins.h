@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-plugins.h,v 1.15 2001/12/30 07:09:54 sam Exp $
+ * $Id: input_ext-plugins.h,v 1.16 2002/01/21 23:57:46 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -32,19 +32,6 @@
 #define PADDING_PACKET_NUMBER 10 /* Number of padding packets top insert to
                                   * escape a decoder.                        */
 #define NO_SEEK             -1
-
-/*****************************************************************************
- * Prototypes from input_ext-dec.c
- *****************************************************************************/
-#ifndef PLUGIN
-void InitBitstream  ( struct bit_stream_s *, struct decoder_fifo_s *,
-                      void (* pf_bitstream_callback)( struct bit_stream_s *,
-                                                      boolean_t ),
-                      void * p_callback_arg );
-void NextDataPacket ( struct bit_stream_s * );
-#else
-#   define InitBitstream p_symbols->InitBitstream
-#endif
 
 /*****************************************************************************
  * Prototypes from input_programs.c

@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.51 2002/01/14 23:46:35 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.52 2002/01/21 23:57:46 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -158,9 +158,6 @@ typedef struct bit_stream_s
     /* The decoder fifo contains the data of the PES stream */
     decoder_fifo_t *        p_decoder_fifo;
 
-    /* Function to jump to the next data packet */
-    void                 (* pf_next_data_packet)( struct bit_stream_s * );
-
     /* Callback to the decoder used when changing data packets ; set
      * to NULL if your decoder doesn't need it. */
     void                 (* pf_bitstream_callback)( struct bit_stream_s *,
@@ -218,11 +215,20 @@ typedef struct bit_stream_s
  * Prototypes from input_ext-dec.c
  *****************************************************************************/
 #ifndef PLUGIN
+void InitBitstream  ( struct bit_stream_s *, struct decoder_fifo_s *,
+                      void (* pf_bitstream_callback)( struct bit_stream_s *,
+                                                      boolean_t ),
+                      void * p_callback_arg );
+boolean_t NextDataPacket( struct decoder_fifo_s *, struct data_packet_s ** );
+void BitstreamNextDataPacket( struct bit_stream_s * );
 u32  UnalignedShowBits( struct bit_stream_s *, unsigned int );
 void UnalignedRemoveBits( struct bit_stream_s * );
 u32  UnalignedGetBits( struct bit_stream_s *, unsigned int );
 void CurrentPTS( struct bit_stream_s *, mtime_t *, mtime_t * );
 #else
+#   define InitBitstream p_symbols->InitBitstream
+#   define NextDataPacket p_symbols->NextDataPacket
+#   define BitstreamNextDataPacket p_symbols->BitstreamNextDataPacket
 #   define UnalignedShowBits p_symbols->UnalignedShowBits
 #   define UnalignedRemoveBits p_symbols->UnalignedRemoveBits
 #   define UnalignedGetBits p_symbols->UnalignedGetBits
@@ -248,7 +254,7 @@ static __inline__ void AlignWord( bit_stream_t * p_bit_stream )
         }
         else
         {
-            p_bit_stream->pf_next_data_packet( p_bit_stream );
+            BitstreamNextDataPacket( p_bit_stream );
             p_bit_stream->fifo.buffer |= *(p_bit_stream->p_byte++)
                 << (8 * sizeof(WORD_TYPE) - 8
                      - p_bit_stream->fifo.i_available);
@@ -499,7 +505,7 @@ static __inline__ void GetChunk( bit_stream_t * p_bit_stream,
             p_bit_stream->p_byte = p_bit_stream->p_end;
             p_buffer += i_available;
             i_buf_len -= i_available;
-            p_bit_stream->pf_next_data_packet( p_bit_stream );
+            BitstreamNextDataPacket( p_bit_stream );
         }
         while( (i_available = p_bit_stream->p_end - p_bit_stream->p_byte)
                 <= i_buf_len && !p_bit_stream->p_decoder_fifo->b_die );
@@ -534,11 +540,6 @@ typedef struct decoder_config_s
 
     struct stream_ctrl_s *  p_stream_ctrl;
     struct decoder_fifo_s * p_decoder_fifo;
-    void                 (* pf_init_bit_stream)( struct bit_stream_s *,
-                                                 struct decoder_fifo_s *,
-                 void (* pf_bitstream_callback)( struct bit_stream_s *,
-                                                 boolean_t ),
-                                                 void * );
 } decoder_config_t;
 
 /*****************************************************************************

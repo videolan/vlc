@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.7 2002/01/04 14:01:34 sam Exp $
+ * $Id: spu_decoder.c,v 1.8 2002/01/21 23:57:46 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -195,9 +195,8 @@ static int InitThread( spudec_thread_t *p_spudec )
     /* Take the first video output FIXME: take the best one */
     p_spudec->p_vout = p_vout_bank->pp_vout[ 0 ];
     vlc_mutex_unlock( &p_vout_bank->lock );
-    p_spudec->p_config->pf_init_bit_stream(
-            &p_spudec->bit_stream,
-            p_spudec->p_config->p_decoder_fifo, NULL, NULL );
+    InitBitstream( &p_spudec->bit_stream,
+                   p_spudec->p_config->p_decoder_fifo, NULL, NULL );
 
     /* Mark thread as running and return */
     return( 0 );

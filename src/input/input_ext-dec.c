@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.28 2002/01/14 23:46:35 massiot Exp $
+ * $Id: input_ext-dec.c,v 1.29 2002/01/21 23:57:46 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -43,7 +43,6 @@ void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo,
                     void * p_callback_arg )
 {
     p_bit_stream->p_decoder_fifo = p_fifo;
-    p_bit_stream->pf_next_data_packet = NextDataPacket;
     p_bit_stream->pf_bitstream_callback = pf_bitstream_callback;
     p_bit_stream->p_callback_arg = p_callback_arg;
 
@@ -110,12 +109,13 @@ void DecoderError( decoder_fifo_t * p_fifo )
 }
 
 /*****************************************************************************
- * NextDataPacket: go to the next data packet
+ * NextDataPacket: go to the data packet after *pp_data, return 1 if we
+ * changed PES
  *****************************************************************************/
-void NextDataPacket( bit_stream_t * p_bit_stream )
+static __inline__ boolean_t _NextDataPacket( decoder_fifo_t * p_fifo,
+                                             data_packet_t ** pp_data )
 {
-    decoder_fifo_t *    p_fifo = p_bit_stream->p_decoder_fifo;
-    boolean_t           b_new_pes;
+    boolean_t b_new_pes;
 
     /* We are looking for the next data packet that contains real data,
      * and not just a PES header */
@@ -123,7 +123,7 @@ void NextDataPacket( bit_stream_t * p_bit_stream )
     {
         /* We were reading the last data packet of this PES packet... It's
          * time to jump to the next PES packet */
-        if( p_bit_stream->p_data->p_next == NULL )
+        if( (*pp_data)->p_next == NULL )
         {
             pes_packet_t * p_next;
 
@@ -142,12 +142,17 @@ void NextDataPacket( bit_stream_t * p_bit_stream )
                 /* No PES in the FIFO. p_last is no longer valid. */
                 p_fifo->pp_last = &p_fifo->p_first;
 
+                /* Signal the input thread we're waiting. This is only
+                 * needed in case of slave clock (ES plug-in)  but it won't
+                 * harm. */
+                vlc_cond_signal( &p_fifo->data_wait );
+
                 /* Wait for the input to tell us when we receive a packet. */
                 vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
             }
 
-            /* The next byte could be found in the next PES packet */
-            p_bit_stream->p_data = p_fifo->p_first->p_first;
+            /* The next packet could be found in the next PES packet */
+            *pp_data = p_fifo->p_first->p_first;
 
             vlc_mutex_unlock( &p_fifo->data_lock );
 
@@ -157,12 +162,30 @@ void NextDataPacket( bit_stream_t * p_bit_stream )
         {
             /* Perhaps the next data packet of the current PES packet contains
              * real data (ie its payload's size is greater than 0). */
-            p_bit_stream->p_data = p_bit_stream->p_data->p_next;
+            *pp_data = (*pp_data)->p_next;
 
             b_new_pes = 0;
         }
-    } while ( p_bit_stream->p_data->p_payload_start
-               == p_bit_stream->p_data->p_payload_end );
+    } while ( (*pp_data)->p_payload_start == (*pp_data)->p_payload_end );
+
+    return( b_new_pes );
+}
+
+boolean_t NextDataPacket( decoder_fifo_t * p_fifo, data_packet_t ** pp_data )
+{
+    return( _NextDataPacket( p_fifo, pp_data ) );
+}
+
+/*****************************************************************************
+ * BitstreamNextDataPacket: go to the next data packet, and update bitstream
+ * context
+ *****************************************************************************/
+static __inline__ void _BitstreamNextDataPacket( bit_stream_t * p_bit_stream )
+{
+    decoder_fifo_t *    p_fifo = p_bit_stream->p_decoder_fifo;
+    boolean_t           b_new_pes;
+
+    b_new_pes = _NextDataPacket( p_fifo, &p_bit_stream->p_data );
 
     /* We've found a data packet which contains interesting data... */
     p_bit_stream->p_byte = p_bit_stream->p_data->p_payload_start;
@@ -189,6 +212,11 @@ void NextDataPacket( bit_stream_t * p_bit_stream )
     }
 }
 
+void BitstreamNextDataPacket( bit_stream_t * p_bit_stream )
+{
+    _BitstreamNextDataPacket( p_bit_stream );
+}
+
 /*****************************************************************************
  * UnalignedShowBits : places i_bits bits into the bit buffer, even when
  * not aligned on a word boundary
@@ -207,7 +235,7 @@ u32 UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
         }
         else
         {
-            p_bit_stream->pf_next_data_packet( p_bit_stream );
+            _BitstreamNextDataPacket( p_bit_stream );
 
             if( (ptrdiff_t)p_bit_stream->p_byte & (sizeof(WORD_TYPE) - 1) )
             {
@@ -232,7 +260,7 @@ u32 UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
                         if( p_bit_stream->p_byte >= p_bit_stream->p_end )
                         {
                             j = i;
-                            p_bit_stream->pf_next_data_packet( p_bit_stream );
+                            _BitstreamNextDataPacket( p_bit_stream );
                         }
                         ((byte_t *)&p_bit_stream->i_showbits_buffer)[i] =
                             * p_bit_stream->p_byte;
@@ -289,7 +317,7 @@ u32 UnalignedGetBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
         }
         else
         {
-            p_bit_stream->pf_next_data_packet( p_bit_stream );
+            _BitstreamNextDataPacket( p_bit_stream );
             i_result |= *(p_bit_stream->p_byte++) << (i_bits - 8);
             i_bits -= 8;
         }
@@ -309,7 +337,7 @@ u32 UnalignedGetBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
         }
         else
         {
-            p_bit_stream->pf_next_data_packet( p_bit_stream );
+            _BitstreamNextDataPacket( p_bit_stream );
             i_result |= *p_bit_stream->p_byte >> i_tmp;
             p_bit_stream->fifo.buffer = *(p_bit_stream->p_byte++)
                  << ( sizeof(WORD_TYPE) * 8 - i_tmp );
@@ -351,7 +379,7 @@ void UnalignedRemoveBits( bit_stream_t * p_bit_stream )
         }
         else
         {
-            p_bit_stream->pf_next_data_packet( p_bit_stream );
+            _BitstreamNextDataPacket( p_bit_stream );
             p_bit_stream->p_byte++;
             p_bit_stream->fifo.i_available += 8;
         }
@@ -369,7 +397,7 @@ void UnalignedRemoveBits( bit_stream_t * p_bit_stream )
         }
         else
         {
-            p_bit_stream->pf_next_data_packet( p_bit_stream );
+            _BitstreamNextDataPacket( p_bit_stream );
             p_bit_stream->fifo.buffer = *(p_bit_stream->p_byte++)
                  << ( sizeof(WORD_TYPE) * 8 - 8
                          - p_bit_stream->fifo.i_available );
