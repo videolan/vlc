@@ -115,20 +115,40 @@ Todo:<br />
    - *   "Name finder"<br />
    - *   "Protocol rollover" node<br />
    - *** Item moving/copying facilities<br />
-   - *** Live directory representation<br /> 
+   - *   Ability to save playlist on quit<br />
+   - ?   Represent navigation structure as "fake items" ?  <br />
+   -     Custom playlist format<br />
 - Helper modules<br />
    - **  ASX and B4S parsers (see below)<br />
    - *   Rewrite SLP announce discovery<br />
+   - *   Live directory representation<br /> 
 - *** Implement in MacOS X and Skins 2 interfaces<br />
 - wx implementation :<br />
-   - *** Investigate bug with wxImageList<br />
+   - *** Investigate Win32 crash<br />
    - **  Support item move/copy<br />
    - *   Explorer view<br />
-   - *** Fix search<br />
-   - **  Clever update using i_serial<br />
+   - *   Cleverer update using i_serial<br />
    - *   Playlist preferences panel<br />
    - **  Improve iteminfo dialog<br />
 Status: Assigned to zorglub
+
+Task
+Difficulty: Easy
+Urgency: Normal
+Platform: any
+Description: Improve bookmarks
+ - Put them in the input_item structure to have them persistent
+ - Add an input option to play the whole file but starting at a given bookmark
+Status: Todo
+
+Task
+Difficulty: Easy
+Urgency: Normal
+Platform: Win32, Linux
+Description: DVD controls panel
+  A small panel that would popup (below the slider, for example) when playing
+  a DVD with controls such as "up, down, right, left, next chapter, prev chapter, back to menu, ..."
+Status: Todo
 
 Task
 Difficulty: Easy
