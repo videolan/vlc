@@ -840,7 +840,8 @@ private:
     void OnNewGroup( wxCommandEvent& event );
 
     /* Popup  */
-    wxMenu *popup_menu;
+    wxMenu *item_popup;
+    wxMenu *node_popup;
     wxTreeItemId i_popup_item;
     playlist_item_t *p_popup_item;
     playlist_item_t *p_popup_parent;

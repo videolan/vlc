@@ -255,13 +255,19 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     SetMenuBar( menubar );
 
     /* Create the popup menu */
-    popup_menu = new wxMenu;
-    popup_menu->Append( PopupPlay_Event, wxU(_("Play")) );
-    popup_menu->Append( PopupPlayThis_Event, wxU(_("Play this branch")) );
-    popup_menu->Append( PopupPreparse_Event, wxU(_("Preparse")) );
-    popup_menu->Append( PopupSort_Event, wxU(_("Sort this branch")) );
-    popup_menu->Append( PopupDel_Event, wxU(_("Delete")) );
-    popup_menu->Append( PopupInfo_Event, wxU(_("Info")) );
+    node_popup = new wxMenu;
+    node_popup->Append( PopupPlay_Event, wxU(_("Play")) );
+    node_popup->Append( PopupPlayThis_Event, wxU(_("Play this branch")) );
+    node_popup->Append( PopupPreparse_Event, wxU(_("Preparse")) );
+    node_popup->Append( PopupSort_Event, wxU(_("Sort this branch")) );
+    node_popup->Append( PopupDel_Event, wxU(_("Delete")) );
+    node_popup->Append( PopupInfo_Event, wxU(_("Info")) );
+
+    item_popup = new wxMenu;
+    item_popup->Append( PopupPlay_Event, wxU(_("Play")) );
+    item_popup->Append( PopupPreparse_Event, wxU(_("Preparse")) );
+    item_popup->Append( PopupDel_Event, wxU(_("Delete")) );
+    item_popup->Append( PopupInfo_Event, wxU(_("Info")) );
 
     /* Create a panel to put everything in */
     wxPanel *playlist_panel = new wxPanel( this, -1 );
@@ -1346,8 +1352,13 @@ void Playlist::OnPopup( wxContextMenuEvent& event )
         p_popup_item = p_wxitem->p_item;
         p_popup_parent = p_wxparent->p_item;
         treectrl->SelectItem( i_popup_item );
-        Playlist::PopupMenu( popup_menu,
-                             ScreenToClient( wxGetMousePosition() ) );
+        if( p_popup_item->i_children == -1 )
+            Playlist::PopupMenu( item_popup,
+                                 ScreenToClient( wxGetMousePosition() ) );
+        else
+            Playlist::PopupMenu( node_popup,
+                                 ScreenToClient( wxGetMousePosition() ) );
+            
     }
 }
 
