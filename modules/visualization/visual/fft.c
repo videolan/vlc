@@ -1,7 +1,7 @@
 /*****************************************************************************
  * fft.c: Iterative implementation of a FFT
  *****************************************************************************
- * $Id: fft.c,v 1.1 2003/08/29 16:56:43 zorglub Exp $
+ * $Id: fft.c,v 1.2 2003/10/24 17:43:51 sam Exp $
  *
  * Mainly taken from XMMS's code
  * 
@@ -62,7 +62,7 @@ static float costable[FFT_BUFFER_SIZE / 2];
  * On error, returns NULL.
  * The pointer should be freed when it is finished with, by fft_close().
  */
-fft_state *fft_init(void) 
+fft_state *visual_fft_init(void) 
 {
     fft_state *p_state;
     unsigned int i;
@@ -92,7 +92,7 @@ fft_state *fft_init(void)
  *
  * The input array is assumed to have FFT_BUFFER_SIZE elements,
  * and the output array is assumed to have (FFT_BUFFER_SIZE / 2 + 1) elements.
- * state is a (non-NULL) pointer returned by fft_init.
+ * state is a (non-NULL) pointer returned by visual_fft_init.
  */
 void fft_perform(const sound_sample *input, float *output, fft_state *state) {
     /* Convert data from sound format to be ready for FFT */

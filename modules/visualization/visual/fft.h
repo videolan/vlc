@@ -1,7 +1,7 @@
 /*****************************************************************************
  * fft.h: Headers for iterative implementation of a FFT
  *****************************************************************************
- * $Id: fft.h,v 1.1 2003/08/29 16:56:43 zorglub Exp $
+ * $Id: fft.h,v 1.2 2003/10/24 17:43:51 sam Exp $
  *
  * Mainly taken from XMMS's code
  * 
@@ -40,7 +40,7 @@ struct _struct_fft_state {
 
 /* FFT prototypes */
 typedef struct _struct_fft_state fft_state;
-fft_state *fft_init (void);
+fft_state *visual_fft_init (void);
 void fft_perform (const sound_sample *input, float *output, fft_state *state);
 void fft_close (fft_state *state);
 

@@ -2,7 +2,7 @@
  * effects.c : Effects for the visualization system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: effects.c,v 1.8 2003/10/06 16:23:30 zorglub Exp $
+ * $Id: effects.c,v 1.9 2003/10/24 17:43:51 sam Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -80,18 +80,18 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 
     int i , j , y , k;
     int i_line;
-    s16 p_dest[FFT_BUFFER_SIZE];          /* Adapted FFT result */
-    s16 p_buffer1[FFT_BUFFER_SIZE];       /* Buffer on which we perform
+    int16_t p_dest[FFT_BUFFER_SIZE];      /* Adapted FFT result */
+    int16_t p_buffer1[FFT_BUFFER_SIZE];   /* Buffer on which we perform
                                              the FFT (first channel) */
 
     float *p_buffl =                     /* Original buffer */
             (float*)p_buffer->p_buffer;
 
-    s16  *p_buffs;                        /* s16 converted buffer */
-    s16  *p_s16_buff = NULL;                    /* s16 converted buffer */
+    int16_t  *p_buffs;                    /* int16_t converted buffer */
+    int16_t  *p_s16_buff = NULL;                /* int16_t converted buffer */
 
-    p_s16_buff = (s16*)malloc(
-              p_buffer->i_nb_samples * p_effect->i_nb_chans * sizeof(s16));
+    p_s16_buff = (int16_t*)malloc(
+              p_buffer->i_nb_samples * p_effect->i_nb_chans * sizeof(int16_t));
 
     if( !p_s16_buff )
     {
@@ -142,20 +142,20 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
         msg_Err(p_aout,"Out of memory");
         return -1;
     }
-    /* Convert the buffer to s16  */
+    /* Convert the buffer to int16_t  */
     /* Pasted from float32tos16.c */
     for (i = p_buffer->i_nb_samples * p_effect->i_nb_chans; i--; )
     {
         float f_in = *p_buffl + 384.0;
-        s32 i_in;
-        i_in = *(s32 *)&f_in;
+        int32_t i_in;
+        i_in = *(int32_t *)&f_in;
         if(i_in >  0x43c07fff ) * p_buffs = 32767;
         else if ( i_in < 0x43bf8000 ) *p_buffs = -32768;
         else *p_buffs = i_in - 0x43c00000;
 
         p_buffl++ ; p_buffs++ ;
     }
-    p_state  = fft_init();
+    p_state  = visual_fft_init();
     if( !p_state)
     {
         msg_Err(p_aout,"Unable to initialize FFT transform");
@@ -330,7 +330,7 @@ int scope_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 {
     int i_index;
     float *p_sample ;
-    u8 *ppp_area[2][3];
+    uint8_t *ppp_area[2][3];
 
 
         for( i_index = 0 ; i_index < 2 ; i_index++ )
@@ -348,7 +348,7 @@ int scope_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
              i_index < p_effect->i_width;
              i_index++ )
         {
-            u8 i_value;
+            uint8_t i_value;
 
             /* Left channel */
             i_value =  (*p_sample++ +1) * 127;
