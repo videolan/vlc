@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.86 2004/03/03 12:01:57 titer Exp $
+ * $Id: vout.m,v 1.87 2004/03/04 22:52:43 bigben Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -574,6 +574,10 @@ static int CoDestroyWindow( vout_thread_t *p_vout )
  *****************************************************************************/
 static int CoToggleFullscreen( vout_thread_t *p_vout )
 {
+
+    vlc_value_t val;
+    intf_thread_t * p_intf;
+
     if( p_vout->p_sys->i_opengl )
     {
         p_vout->b_fullscreen = !p_vout->b_fullscreen;
@@ -585,6 +589,16 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
         {
             [p_vout->p_sys->o_glview exitFullScreen];
         }
+        /*This makes this function dependant of the presence of a macosx 
+        interface. We do not check if this interface exists, since it has 
+        already been done before.*/
+
+        p_intf = [NSApp getIntf];
+
+        val.b_bool = VLC_TRUE;
+        var_Create(p_intf,"intf-change",VLC_VAR_BOOL);
+        var_Set(p_intf, "intf-change",val);
+
         return 0;
     }
     
@@ -1560,6 +1574,9 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void) exitFullScreen
 {
+     vlc_value_t val;
+    intf_thread_t * p_intf;
+
     /* Free current OpenGL context */
     [NSOpenGLContext clearCurrentContext];
     [fullScreenContext clearDrawable];
