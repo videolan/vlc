@@ -32,5 +32,7 @@ EXTRA_DIST = \
 	skins/skins-howto.txt \
 	skins/events-howto.txt \
 	skins/curve_maker \
+	strings.txt \
+	translations.txt \
 	win32/Cross-Compile-Howto.txt \
 	$(NULL)

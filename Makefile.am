@@ -467,6 +467,8 @@ VLC.app: vlc
 	    output.m \
 	    playlist.h \
 	    playlist.m \
+	    prefs_widgets.h \
+	    prefs_widgets.m \
 	    prefs.h \
 	    prefs.m \
 	    vout.h \
@@ -685,6 +687,34 @@ package-macosx:
 
 # Clean up
 	rm -Rf $(top_builddir)/tmp
+
+package-translations:
+	@if test -e "$(srcdir)/vlc-translations-${VERSION}"; then \
+	  echo "Error: please remove $(srcdir)/vlc-translations-${VERSION}, it is in the way"; \
+	  false; \
+	else \
+	  echo "OK."; mkdir -p "$(srcdir)/vlc-translations-${VERSION}"; \
+	fi
+# Copy translations
+	for i in $(ALL_LINGUAS); do \
+	  cp "$(srcdir)/po/$${i}.po" \
+	    "$(srcdir)/vlc-translations-${VERSION}/$${i}.po" \
+	    || true ; \
+	done
+	cp "$(srcdir)/doc/translations.txt" \
+	  "$(srcdir)/vlc-translations-${VERSION}/README.txt"
+
+	echo "#!/bin/sh" >>"$(srcdir)/vlc-translations-$(VERSION)/convert.po.sh"
+	echo "" >>"$(srcdir)/vlc-translations-$(VERSION)/convert.po.sh"
+	echo 'if test $$# != 1; then' >>"$(srcdir)/vlc-translations-$(VERSION)/convert.po.sh"
+	echo "	echo \"Usage: convert-po.sh <.po file>\"" >>"$(srcdir)/vlc-translations-$(VERSION)/convert.po.sh"
+	echo "	exit 1" >>"$(srcdir)/vlc-translations-$(VERSION)/convert.po.sh"
+	echo "fi" >>"$(srcdir)/vlc-translations-$(VERSION)/convert.po.sh"
+	echo "" >>"$(srcdir)/vlc-translations-$(VERSION)/convert.po.sh"
+	echo 'msgfmt --statistics -o vlc.mo $$1' >>"$(srcdir)/vlc-translations-$(VERSION)/convert.po.sh"
+
+	$(AMTAR) chof - $(srcdir)/vlc-translations-$(VERSION) \
+	  | GZIP=$(GZIP_ENV) gzip -c >$(srcdir)/vlc-translations-$(VERSION).tar.gz
 
 ###############################################################################
 # Stamp rules
