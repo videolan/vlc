@@ -1,10 +1,11 @@
 /*****************************************************************************
- * portaudio.c : portaudio audio output plugin
+ * portaudio.c : portaudio (v19) audio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
  * $Id$
  *
  * Authors: Frederic Ruget <frederic.ruget@free.fr>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,21 +35,31 @@
 #include "aout_internal.h"
 
 #define FRAME_SIZE 1024              /* The size is in samples, not in bytes */
-#define FRAMES_NUM 8
 
 /*****************************************************************************
  * aout_sys_t: portaudio audio output method descriptor
  *****************************************************************************/
+typedef struct pa_thread_t
+{
+    VLC_COMMON_MEMBERS
+    aout_instance_t * p_aout;
+
+} pa_thread_t;
+
 struct aout_sys_t
 {
     aout_instance_t *p_aout;
-    PortAudioStream *p_stream;
-    int i_numDevices;
-    int i_nbChannels;
-    PaSampleFormat sampleFormat;
-    int i_sampleSize;
-    PaDeviceID i_deviceId;
-    PaDeviceInfo deviceInfo;
+    PaStream *p_stream;
+
+    PaDeviceIndex i_devices;
+    int i_sample_size;
+    PaDeviceIndex i_device_id;
+    const PaDeviceInfo *deviceInfo;
+
+    vlc_mutex_t lock;
+    vlc_cond_t wait;
+
+    pa_thread_t *pa_thread;
 };
 
 /*****************************************************************************
@@ -57,7 +68,10 @@ struct aout_sys_t
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
 static void Play        ( aout_instance_t * );
-static int i_once = 0;
+static void PORTAUDIOThread( pa_thread_t * );
+
+static int PAOpenDevice( aout_instance_t * );
+static int PAOpenStream( aout_instance_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -69,36 +83,46 @@ vlc_module_begin();
     set_description( N_("PORTAUDIO audio output") );
     add_integer( "portaudio-device", 0, NULL,
                  DEVICE_TEXT, DEVICE_LONGTEXT, VLC_FALSE );
-    set_capability( "audio output", 40 );
+    set_capability( "audio output", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
 
 /* This routine will be called by the PortAudio engine when audio is needed.
-** It may called at interrupt level on some machines so don't do anything
-** that could mess up the system like calling malloc() or free().
-*/
-static int paCallback( void *inputBuffer, void *outputBuffer,
-                       unsigned long framesPerBuffer,
-                       PaTimestamp outTime, void *p_cookie )
+ * It may called at interrupt level on some machines so don't do anything
+ * that could mess up the system like calling malloc() or free().
+ */
+static int paCallback( const void *inputBuffer, void *outputBuffer,
+                            unsigned long framesPerBuffer,
+                            const PaStreamCallbackTimeInfo *paDate,
+                            PaStreamCallbackFlags statusFlags,
+                            void *p_cookie )
 {
-    struct aout_sys_t* p_sys = (struct aout_sys_t*) p_cookie;
-    aout_instance_t * p_aout = p_sys->p_aout;
-    aout_buffer_t *   p_buffer;
+    struct aout_sys_t *p_sys = (struct aout_sys_t*) p_cookie;
+    aout_instance_t   *p_aout = p_sys->p_aout;
+    aout_buffer_t     *p_buffer;
+    mtime_t out_date;
 
-    vlc_mutex_lock( &p_aout->output_fifo_lock );
-    p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
-    vlc_mutex_unlock( &p_aout->output_fifo_lock );
+    out_date = mdate() + (mtime_t) ( 1000000 *
+        ( paDate->outputBufferDacTime - paDate->currentTime ) );
+    p_buffer = aout_OutputNextBuffer( p_aout, out_date, VLC_TRUE );
 
     if ( p_buffer != NULL )
     {
         p_aout->p_vlc->pf_memcpy( outputBuffer, p_buffer->p_buffer,
-                                  framesPerBuffer * p_sys->i_sampleSize );
+                                  framesPerBuffer * p_sys->i_sample_size );
+        /* aout_BufferFree may be dangereous here, but then so is
+         * aout_OutputNextBuffer (calls aout_BufferFree internally).
+         * one solution would be to link the no longer useful buffers
+         * in a second fifo (in aout_OutputNextBuffer too) and to
+         * wait until we are in Play to do the actual free.
+         */
         aout_BufferFree( p_buffer );
     }
     else
+        /* Audio output buffer shortage -> stop the fill process and wait */
     {
-      p_aout->p_vlc->pf_memset( outputBuffer, 0,
-                                framesPerBuffer * p_sys->i_sampleSize );
+        p_aout->p_vlc->pf_memset( outputBuffer, 0,
+                                  framesPerBuffer * p_sys->i_sample_size );
     }
     return 0;
 }
@@ -106,234 +130,67 @@ static int paCallback( void *inputBuffer, void *outputBuffer,
 /*****************************************************************************
  * Open: open the audio device
  *****************************************************************************/
-static int Open ( vlc_object_t * p_this )
+static int Open( vlc_object_t * p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
-    PortAudioStream *p_stream;
     vlc_value_t val;
-    PaError i_err;
-    int i_nb_channels;
-    const PaDeviceInfo *p_pdi;
-    int i, j;
+    int i_err;
 
     msg_Dbg( p_aout, "Entering Open()");
 
     /* Allocate p_sys structure */
-    p_sys = (struct aout_sys_t*) malloc( sizeof( aout_sys_t ) );
+    p_sys = (aout_sys_t *)malloc( sizeof(aout_sys_t) );
     if( p_sys == NULL )
     {
         msg_Err( p_aout, "out of memory" );
         return VLC_ENOMEM;
     }
     p_sys->p_aout = p_aout;
+    p_sys->p_stream = 0;
     p_aout->output.p_sys = p_sys;
-
-    /* Output device id */
-    var_Create( p_this, "portaudio-device",
-                VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Get( p_this, "portaudio-device", &val );
-    p_sys->i_deviceId = val.i_int;
-
-    if (! i_once)
-    {
-        i_once = 1;
-        i_err = Pa_Initialize();
-        if ( i_err != paNoError )
-        {
-            msg_Err( p_aout, "Pa_Initialize returned %d : %s", i_err, Pa_GetErrorText( i_err ));
-            return VLC_EGENERIC;
-        }
-    }
-    p_sys->i_numDevices = Pa_CountDevices();
-    if( p_sys->i_numDevices < 0 )
-    {
-        i_err = p_sys->i_numDevices;
-        msg_Err( p_aout, "Pa_CountDevices returned %d : %s", i_err, Pa_GetErrorText( i_err ));
-        (void) Pa_Terminate();
-        return VLC_EGENERIC;
-    }
-    msg_Info( p_aout, "Number of devices = %d", p_sys->i_numDevices );
-    if ( p_sys->i_deviceId >= p_sys->i_numDevices )
-    {
-        msg_Err( p_aout, "Device %d does not exist", p_sys->i_deviceId );
-        (void) Pa_Terminate();
-        return VLC_EGENERIC;
-    }
-    for( i = 0; i < p_sys->i_numDevices; i++ )
-    {
-        p_pdi = Pa_GetDeviceInfo( i );
-        if ( i == p_sys->i_deviceId )
-        {
-            p_sys->deviceInfo = *p_pdi;
-        }
-        msg_Info( p_aout, "---------------------------------------------- #%d", i );
-        msg_Info( p_aout, "Name         = %s", p_pdi->name );
-        msg_Info( p_aout, "Max Inputs   = %d, Max Outputs = %d",
-                 p_pdi->maxInputChannels, p_pdi->maxOutputChannels );
-        if( p_pdi->numSampleRates == -1 )
-        {
-            msg_Info( p_aout, "Sample Rate Range = %f to %f", p_pdi->sampleRates[0], p_pdi->sampleRates[1] );
-        }
-        else
-        {
-            msg_Info( p_aout, "Sample Rates =");
-            for( j = 0; j < p_pdi->numSampleRates; j++ )
-            {
-                msg_Info( p_aout, " %8.2f,", p_pdi->sampleRates[j] );
-            }
-        }
-        msg_Info( p_aout, "Native Sample Formats = ");
-        if( p_pdi->nativeSampleFormats & paInt8 )        msg_Info( p_aout, "paInt8");
-        if( p_pdi->nativeSampleFormats & paUInt8 )       msg_Info( p_aout, "paUInt8");
-        if( p_pdi->nativeSampleFormats & paInt16 )       msg_Info( p_aout, "paInt16");
-        if( p_pdi->nativeSampleFormats & paInt32 )       msg_Info( p_aout, "paInt32");
-        if( p_pdi->nativeSampleFormats & paFloat32 )     msg_Info( p_aout, "paFloat32");
-        if( p_pdi->nativeSampleFormats & paInt24 )       msg_Info( p_aout, "paInt24");
-        if( p_pdi->nativeSampleFormats & paPackedInt24 ) msg_Info( p_aout, "paPackedInt24");
-    }
-
-    msg_Info( p_aout, "----------------------------------------------");
-
-
-    /*
-portaudio warning: Number of devices = 3
-portaudio warning: ---------------------------------------------- #0 DefaultInput DefaultOutput
-portaudio warning: Name         = PORTAUDIO DirectX Full Duplex Driver
-portaudio warning: Max Inputs   = 2, Max Outputs = 2
-portaudio warning: Sample Rates =
-portaudio warning:  11025.00,
-portaudio warning:  22050.00,
-portaudio warning:  32000.00,
-portaudio warning:  44100.00,
-portaudio warning:  48000.00,
-portaudio warning:  88200.00,
-portaudio warning:  96000.00,
-portaudio warning: Native Sample Formats = 
-portaudio warning: paInt16
-portaudio warning: ---------------------------------------------- #1
-portaudio warning: Name         = PORTAUDIO Multimedia Driver
-portaudio warning: Max Inputs   = 2, Max Outputs = 2
-portaudio warning: Sample Rates =
-portaudio warning:  11025.00,
-portaudio warning:  22050.00,
-portaudio warning:  32000.00,
-portaudio warning:  44100.00,
-portaudio warning:  48000.00,
-portaudio warning:  88200.00,
-portaudio warning:  96000.00,
-portaudio warning: Native Sample Formats = 
-portaudio warning: paInt16
-portaudio warning: ---------------------------------------------- #2
-portaudio warning: Name         = E-MU PORTAUDIO
-portaudio warning: Max Inputs   = 0, Max Outputs = 4
-portaudio warning: Sample Rates =
-portaudio warning:  44100.00,
-portaudio warning:  48000.00,
-portaudio warning:  96000.00,
-portaudio warning: Native Sample Formats = 
-portaudio warning: paInt16
-portaudio warning: ----------------------------------------------
-     */
-
     p_aout->output.pf_play = Play;
-    aout_VolumeSoftInit( p_aout );
 
-    /* select audio format */
-    if( p_sys->deviceInfo.nativeSampleFormats & paFloat32 )
+    /* Retrieve output device id from config */
+    var_Create( p_aout, "portaudio-device", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT);
+    var_Get( p_aout, "portaudio-device", &val );
+    p_sys->i_device_id = val.i_int;
+
+    if( PAOpenDevice( p_aout ) != VLC_SUCCESS )
     {
-        p_sys->sampleFormat = paFloat32;
-        p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
-        p_sys->i_sampleSize = 4;
-    }
-    else if( p_sys->deviceInfo.nativeSampleFormats & paInt16 )
-    {
-        p_sys->sampleFormat = paInt16;
-        p_aout->output.output.i_format = AOUT_FMT_S16_NE;
-        p_sys->i_sampleSize = 2;
-    }
-    else
-    {
-        msg_Err( p_aout, "Audio format not supported" );
-        (void) Pa_Terminate();
+        msg_Err( p_aout, "cannot open portaudio device" );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
-    i_nb_channels = aout_FormatNbChannels( &p_aout->output.output );
-    msg_Info( p_aout, "nb_channels = %d", i_nb_channels );
-    if ( i_nb_channels > p_sys->deviceInfo.maxOutputChannels )
+    /* Close device for now. We'll re-open it later on */
+    if( ( i_err = Pa_Terminate() ) != paNoError )
     {
-        if ( p_sys->deviceInfo.maxOutputChannels < 1 )
-        {
-            msg_Err( p_aout, "No channel available" );
-            (void) Pa_Terminate();
-            return VLC_EGENERIC;
-        }
-        else if ( p_sys->deviceInfo.maxOutputChannels < 2 )
-        {
-            p_sys->i_nbChannels = 1;
-            p_aout->output.output.i_physical_channels
-            = AOUT_CHAN_CENTER;
-        }
-        else if ( p_sys->deviceInfo.maxOutputChannels < 4 )
-        {
-            p_sys->i_nbChannels = 2;
-            p_aout->output.output.i_physical_channels
-            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-        }
-        else if ( p_sys->deviceInfo.maxOutputChannels < 6 )
-        {
-            p_sys->i_nbChannels = 4;
-            p_aout->output.output.i_physical_channels
-            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-               | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-        }
-        else
-        {
-            p_sys->i_nbChannels = 6;
-            p_aout->output.output.i_physical_channels
-            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-               | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
-               | AOUT_CHAN_LFE;
-        }
+        msg_Err( p_aout, "Pa_Terminate returned %d", i_err );
     }
-    p_sys->i_sampleSize *= p_sys->i_nbChannels;
 
-    /* Open portaudio stream */
-    p_aout->output.i_nb_samples = FRAME_SIZE;
-    msg_Info( p_aout, "rate = %d", p_aout->output.output.i_rate );
-    msg_Info( p_aout, "samples = %d", p_aout->output.i_nb_samples );
-    
-    i_err = Pa_OpenStream(
-              &p_stream,
-              paNoDevice, 0, 0, 0,  /* no input device */
-              p_sys->i_deviceId,    /* output device */
-              p_sys->i_nbChannels,
-              p_sys->sampleFormat,
-              NULL,
-              (double) p_aout->output.output.i_rate,
-              (unsigned long) p_aout->output.i_nb_samples,  /* FRAMES_PER_BUFFER */
-              FRAMES_NUM, /* number of buffers, if zero then use default minimum */
-              paClipOff,  /* we won't output out of range samples so don't bother clipping them */
-              paCallback, p_sys );
-    if( i_err != paNoError )
+    /* Now we need to setup our DirectSound play notification structure */
+    p_sys->pa_thread = vlc_object_create( p_aout, sizeof(pa_thread_t) );
+    p_sys->pa_thread->p_aout = p_aout;
+
+    vlc_mutex_init( p_aout, &p_sys->lock );
+    vlc_cond_init( p_aout, &p_sys->wait );
+
+    /* Create PORTAUDIOThread */
+    if( vlc_thread_create( p_sys->pa_thread, "aout", PORTAUDIOThread,
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_TRUE ) )
     {
-        msg_Err( p_aout, "Pa_OpenStream returns %d : %s", i_err,
-                 Pa_GetErrorText( i_err ) );
-        (void) Pa_Terminate();
+        msg_Err( p_aout, "cannot create PORTAUDIO thread" );
         return VLC_EGENERIC;
     }
 
-    p_sys->p_stream = p_stream;
-    i_err = Pa_StartStream( p_stream );
-    if( i_err != paNoError )
+    if( p_sys->pa_thread->b_error )
     {
-        (void) Pa_CloseStream( p_stream);
-        (void) Pa_Terminate();
+        msg_Err( p_aout, "PORTAUDIO thread failed" );
+        Close( p_this );
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_aout, "Leaving Open()" );
     return VLC_SUCCESS;
 }
 
@@ -343,28 +200,21 @@ portaudio warning: ----------------------------------------------
 static void Close ( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
-    PortAudioStream *p_stream = p_sys->p_stream;
-    PaError i_err;
+    aout_sys_t *p_sys = p_aout->output.p_sys;
 
-    msg_Dbg( p_aout, "Entering Close()");
+    msg_Dbg( p_aout, "closing portaudio");
 
-    i_err = Pa_AbortStream( p_stream );
-    if ( i_err != paNoError )
-    {
-        msg_Err( p_aout, "Pa_AbortStream: %d (%s)", i_err, Pa_GetErrorText( i_err ) );
-    }
-    i_err = Pa_CloseStream( p_stream );
-    if ( i_err != paNoError )
-    {
-        msg_Err( p_aout, "Pa_CloseStream: %d (%s)", i_err, Pa_GetErrorText( i_err ) );
-    }
-    i_err = Pa_Terminate();
-    if ( i_err != paNoError )
-    {
-        msg_Err( p_aout, "Pa_Terminate: %d (%s)", i_err, Pa_GetErrorText( i_err ) );
-    }
-    msg_Dbg( p_aout, "Leaving Close()");
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->pa_thread->b_die = VLC_TRUE;
+    vlc_cond_signal( &p_sys->wait );
+    vlc_mutex_unlock( &p_sys->lock );
+
+    vlc_thread_join( p_sys->pa_thread );
+    vlc_cond_destroy( &p_sys->wait );
+    vlc_mutex_destroy( &p_sys->lock );
+
+    msg_Dbg( p_aout, "portaudio closed");
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -372,4 +222,268 @@ static void Close ( vlc_object_t *p_this )
  *****************************************************************************/
 static void Play( aout_instance_t * p_aout )
 {
+}
+
+/*****************************************************************************
+ * PORTAUDIOThread: all interactions with libportaudio.a are handled
+ * in this single thread.  Otherwise libportaudio.a is _not_ happy :-(
+ *****************************************************************************/
+static void PORTAUDIOThread( pa_thread_t *pa_thread )
+{
+    aout_instance_t *p_aout = pa_thread->p_aout;
+    aout_sys_t *p_sys = p_aout->output.p_sys;
+    int i_err;
+
+    if( PAOpenDevice( p_aout ) != VLC_SUCCESS )
+    {
+        msg_Err( p_aout, "cannot open portaudio device" );
+        pa_thread->b_error = VLC_TRUE;
+        vlc_thread_ready( pa_thread );
+        return;
+    }
+
+    if( PAOpenStream( p_aout ) != VLC_SUCCESS )
+    {
+        msg_Err( p_aout, "cannot open portaudio device" );
+        pa_thread->b_error = VLC_TRUE;
+        vlc_thread_ready( pa_thread );
+        goto end;
+    }
+
+    /* Tell the main thread that we are ready */
+    vlc_thread_ready( pa_thread );
+
+    vlc_mutex_lock( &p_sys->lock );
+    if( !pa_thread->b_die ) vlc_cond_wait( &p_sys->wait, &p_sys->lock );
+    vlc_mutex_unlock( &p_sys->lock );
+
+    i_err = Pa_StopStream( p_sys->p_stream );
+    if( i_err != paNoError )
+    {
+        msg_Err( p_aout, "Pa_StopStream: %d (%s)", i_err,
+                 Pa_GetErrorText( i_err ) );
+    }
+    i_err = Pa_CloseStream( p_sys->p_stream );
+    if( i_err != paNoError )
+    {
+        msg_Err( p_aout, "Pa_CloseStream: %d (%s)", i_err,
+                 Pa_GetErrorText( i_err ) );
+    }
+
+ end:
+    i_err = Pa_Terminate();
+    if( i_err != paNoError )
+    {
+        msg_Err( p_aout, "Pa_Terminate: %d (%s)", i_err,
+                 Pa_GetErrorText( i_err ) );
+    }
+}
+
+static int PAOpenDevice( aout_instance_t *p_aout )
+{
+    aout_sys_t *p_sys = p_aout->output.p_sys;
+    const PaDeviceInfo *p_pdi;
+    PaError i_err;
+    vlc_value_t val, text;
+    int i;
+
+    /* Initialize portaudio */
+    i_err = Pa_Initialize();
+    if( i_err != paNoError )
+    {
+        msg_Err( p_aout, "Pa_Initialize returned %d : %s",
+                 i_err, Pa_GetErrorText( i_err ) );
+
+        return VLC_EGENERIC;
+    }
+
+    p_sys->i_devices = Pa_GetDeviceCount();
+    if( p_sys->i_devices < 0 )
+    {
+        i_err = p_sys->i_devices;
+        msg_Err( p_aout, "Pa_GetDeviceCount returned %d : %s", i_err,
+                 Pa_GetErrorText( i_err ) );
+
+        goto error;
+    }
+
+    /* Display all devices info */
+    msg_Dbg( p_aout, "number of devices = %d", p_sys->i_devices );
+    for( i = 0; i < p_sys->i_devices; i++ )
+    {
+        p_pdi = Pa_GetDeviceInfo( i );
+        msg_Dbg( p_aout, "------------------------------------- #%d", i );
+        msg_Dbg( p_aout, "Name         = %s", p_pdi->name );
+        msg_Dbg( p_aout, "Max Inputs   = %d, Max Outputs = %d",
+                  p_pdi->maxInputChannels, p_pdi->maxOutputChannels );
+    }
+    msg_Dbg( p_aout, "-------------------------------------" );
+
+    msg_Dbg( p_aout, "requested device is #%d", p_sys->i_device_id );
+    if( p_sys->i_device_id >= p_sys->i_devices )
+    {
+        msg_Err( p_aout, "device %d does not exist", p_sys->i_device_id );
+        goto error;
+    }
+    p_sys->deviceInfo = Pa_GetDeviceInfo( p_sys->i_device_id );
+
+    if( p_sys->deviceInfo->maxOutputChannels < 1 )
+    {
+        msg_Err( p_aout, "no channel available" );
+        goto error;
+    }
+
+    if( var_Type( p_aout, "audio-device" ) == 0 )
+    {
+        var_Create( p_aout, "audio-device", VLC_VAR_INTEGER|VLC_VAR_HASCHOICE);
+        text.psz_string = _("Audio Device");
+        var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
+
+        if( p_sys->deviceInfo->maxOutputChannels >= 1 )
+        {
+            val.i_int = AOUT_VAR_MONO;
+            text.psz_string = N_("Mono");
+            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE,
+                        &val, &text );
+            msg_Dbg( p_aout, "device supports 1 channel" );
+        }
+        if( p_sys->deviceInfo->maxOutputChannels >= 2 )
+        {
+            val.i_int = AOUT_VAR_STEREO;
+            text.psz_string = N_("Stereo");
+            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE,
+                        &val, &text );
+            var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT,
+                        &val, NULL );
+            msg_Dbg( p_aout, "device supports 2 channels" );
+        }
+        if( p_sys->deviceInfo->maxOutputChannels >= 4 )
+        {
+            val.i_int = AOUT_VAR_2F2R;
+            text.psz_string = N_("2 Front 2 Rear");
+            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE,
+                        &val, &text );
+            msg_Dbg( p_aout, "device supports 4 channels" );
+        }
+        if( p_sys->deviceInfo->maxOutputChannels >= 5 )
+        {
+            val.i_int = AOUT_VAR_3F2R;
+            text.psz_string = N_("3 Front 2 Rear");
+            var_Change( p_aout, "audio-device",
+                        VLC_VAR_ADDCHOICE, &val, &text );
+            msg_Dbg( p_aout, "device supports 5 channels" );
+        }
+        if( p_sys->deviceInfo->maxOutputChannels >= 6 )
+        {
+            val.i_int = AOUT_VAR_5_1;
+            text.psz_string = N_("5.1");
+            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE,
+                        &val, &text );
+            msg_Dbg( p_aout, "device supports 5.1 channels" );
+        }
+
+        var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
+
+        val.b_bool = VLC_TRUE;
+        var_Set( p_aout, "intf-change", val );
+    }
+
+    /* Audio format is paFloat32 (always supported by portaudio v19) */
+    p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
+
+    return VLC_SUCCESS;
+
+ error:
+    if( ( i_err = Pa_Terminate() ) != paNoError )
+    {
+        msg_Err( p_aout, "Pa_Terminate returned %d", i_err );
+    }
+    return VLC_EGENERIC;
+}
+
+static int PAOpenStream( aout_instance_t *p_aout )
+{
+    aout_sys_t *p_sys = p_aout->output.p_sys;
+    const PaHostErrorInfo* paLastHostErrorInfo = Pa_GetLastHostErrorInfo();
+    PaStreamParameters paStreamParameters;
+    vlc_value_t val;
+    int i_channels, i_err;
+
+    if( var_Get( p_aout, "audio-device", &val ) < 0 )
+    {
+        return VLC_EGENERIC;
+    }
+
+    if( val.i_int == AOUT_VAR_5_1 )
+    {
+        p_aout->output.output.i_physical_channels
+            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+              | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+              | AOUT_CHAN_LFE;
+    }
+    else if( val.i_int == AOUT_VAR_3F2R )
+    {
+        p_aout->output.output.i_physical_channels
+            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+            | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+    }
+    else if( val.i_int == AOUT_VAR_2F2R )
+    {
+        p_aout->output.output.i_physical_channels
+            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+            | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+    }
+    else if( val.i_int == AOUT_VAR_MONO )
+    {
+        p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
+    }
+    else
+    {
+        p_aout->output.output.i_physical_channels
+            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+    }
+
+    i_channels = aout_FormatNbChannels( &p_aout->output.output );
+    msg_Dbg( p_aout, "nb_channels requested = %d", i_channels );
+
+    /* Calculate the frame size in bytes */
+    p_sys->i_sample_size = 4 * i_channels;
+    p_aout->output.i_nb_samples = FRAME_SIZE;
+    aout_FormatPrepare( &p_aout->output.output );
+    aout_VolumeSoftInit( p_aout );
+
+    paStreamParameters.device = p_sys->i_device_id;
+    paStreamParameters.channelCount = i_channels;
+    paStreamParameters.sampleFormat = paFloat32;
+    paStreamParameters.suggestedLatency =
+        p_sys->deviceInfo->defaultLowOutputLatency;
+    paStreamParameters.hostApiSpecificStreamInfo = NULL;
+
+    i_err = Pa_OpenStream( &p_sys->p_stream, NULL /* no input */,
+                &paStreamParameters, (double)p_aout->output.output.i_rate,
+                FRAME_SIZE, paClipOff, paCallback, p_sys );
+    if( i_err != paNoError )
+    {
+        msg_Err( p_aout, "Pa_OpenStream returns %d : %s", i_err,
+                 Pa_GetErrorText( i_err ) );
+        if( i_err == paUnanticipatedHostError )
+        {
+            msg_Err( p_aout, "type %d code %ld : %s",
+                     paLastHostErrorInfo->hostApiType,
+                     paLastHostErrorInfo->errorCode,
+                     paLastHostErrorInfo->errorText );
+        }
+        p_sys->p_stream = 0;
+        return VLC_EGENERIC;
+    }
+
+    i_err = Pa_StartStream( p_sys->p_stream );
+    if( i_err != paNoError )
+    {
+        msg_Err( p_aout, "Pa_StartStream() failed" );
+        Pa_CloseStream( p_sys->p_stream );
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
 }
