@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.109 2001/05/25 13:20:10 sam Exp $
+ * $Id: input.c,v 1.110 2001/05/28 03:17:01 xav Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -38,6 +38,13 @@
 #   include <strings.h>
 #endif
 #include <errno.h>
+
+/* WinSock Includes */
+
+#ifdef WIN32
+#include <winsock2.h>
+#endif
+
 
 /* Network functions */
 
@@ -551,7 +558,7 @@ void input_FileClose( input_thread_t * p_input )
 }
 
 
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO ) && !defined( WIN32 )
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
 /*****************************************************************************
  * input_NetworkOpen : open a network socket 
  *****************************************************************************/
@@ -562,6 +569,19 @@ void input_NetworkOpen( input_thread_t * p_input )
     int                 i_port = 0;
     int                 i_opt;
     struct sockaddr_in  sock;
+
+	/* WinSock Library Init. */
+
+	#ifdef WIN32
+		WSADATA				Data;
+		int Result = WSAStartup( MAKEWORD( 1,1 ),&Data );
+		
+		if( Result != 0 )
+		{
+		intf_ErrMsg( "Can't initiate WinSocks : error %i", Result) ;
+		return ;
+		}
+	#endif
     
     /* Get the remote server */
     if( p_input->p_source != NULL )
@@ -740,5 +760,10 @@ void input_NetworkOpen( input_thread_t * p_input )
 void input_NetworkClose( input_thread_t * p_input )
 {
     close( p_input->i_handle );
+
+	#ifdef WIN32 
+		WSACleanup();
+	#endif
+
 }
 #endif
