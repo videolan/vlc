@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.30 2001/09/26 12:32:25 massiot Exp $
+ * $Id: vout_beos.cpp,v 1.31 2001/10/21 06:06:20 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -140,13 +140,12 @@ int32 Draw(void *data)
  *****************************************************************************/
 
 VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_output )
-        : BWindow(frame, name, B_TITLED_WINDOW, NULL)
+        : BWindow(frame, name, B_TITLED_WINDOW, B_OUTLINE_RESIZE)
 {
 
 	/* set the VideoWindow variables */
     teardownwindow = false;
     is_zoomed = false;
-	fUsingOverlay = false;
 	p_video_output->b_YCbr = false;
 	
 	/* create the view to do the display */
@@ -169,7 +168,6 @@ VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_o
     fRowBytes = bitmap[0]->BytesPerRow();
 	i_screen_depth = 8 * i_bytes_per_pixel;
 
-    fDirty = false;
     Show();
 }
 
@@ -191,6 +189,27 @@ VideoWindow::~VideoWindow()
  *****************************************************************************/
 void VideoWindow::FrameResized( float width, float height )
 {
+	if (is_zoomed)
+	{
+	    return;
+	}
+	float width_scale;
+	float height_scale;
+	float orig_width = bitmap[0]->Bounds().Width();
+	float orig_height = bitmap[0]->Bounds().Height();
+
+	width_scale = width / orig_width;
+	height_scale = height / orig_height;
+	
+    /* if the width is proportionally smaller */
+    if (width_scale <= height_scale)
+    {
+        ResizeTo(width, orig_height * width_scale);
+    }
+    else /* if the height is proportionally smaller */
+    {
+        ResizeTo(orig_width * height_scale, height);
+    }
 }
 
 /*****************************************************************************
@@ -349,12 +368,7 @@ int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
     
-    /* Set video window's size */
-	p_vout->b_scale = true;
-	                                            
-    intf_Msg("Initial Width: %d Height: %d", 
-    		p_vout->i_width,
-    		p_vout->i_height);
+	p_vout->b_scale = false;
 
     /* Open and initialize device */
     if( BeosOpenDisplay( p_vout ) )
@@ -447,12 +461,12 @@ void vout_Display( vout_thread_t *p_vout )
     
    	p_win->i_buffer_index = p_vout->i_buffer_index;
 	p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
-
-   	p_win->fDrawThreadID = spawn_thread(Draw, "drawing_thread",
+	if (!p_win->teardownwindow)
+	{
+   	   p_win->fDrawThreadID = spawn_thread(Draw, "drawing_thread",
               B_DISPLAY_PRIORITY, (void*) p_win);
-    wait_for_thread(p_win->fDrawThreadID, &status);
-
-	
+       wait_for_thread(p_win->fDrawThreadID, &status);
+    }
 }
 
 /* following functions are local */

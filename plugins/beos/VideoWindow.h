@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.6 2001/09/12 01:30:07 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.7 2001/10/21 06:06:20 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -51,30 +51,25 @@ public:
     virtual void	Zoom(BPoint origin, float width, float height);
 
     // this is the hook controling direct screen connection
-    int32                   i_bytes_per_pixel;
-    int32                   i_screen_depth;
-    int32					i_width;
-    int32					i_height;
-    struct vout_thread_s   *p_vout;
-     
+    int32           i_bytes_per_pixel;
+    int32           i_screen_depth;
+    int32           i_width;
+    int32           i_height;
     int32           fRowBytes;
-
-    uint32          fNumClipRects;
-
     int				i_buffer_index;
-    bool            fDirty;
-    thread_id       fDrawThreadID;
+
     BBitmap			*bitmap[2];
-    BBitmap			*drawthis;
     VLCView			*view;
+    thread_id       fDrawThreadID;
+
     bool			teardownwindow;
     bool			is_zoomed;
-    bool			fUsingOverlay;
-    BScreen			*screen;
+
+    struct vout_thread_s   *p_vout;
 
 private:
-	display_mode old_mode;
-	BRect rect;
+//	display_mode old_mode;
+	BRect           rect;
 
 };
 
