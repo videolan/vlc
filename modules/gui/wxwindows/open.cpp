@@ -392,8 +392,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     wxStaticText *mrl_label = new wxStaticText( panel, -1,
                                                 wxU(_("Open:")) );
     mrl_combo = new wxComboBox( panel, MRL_Event, wxT(""),
-                                wxPoint(20,25), wxSize(120, -1),
-                                0, NULL );
+                                wxPoint(20,25), wxSize(120, -1) );
     mrl_combo->SetToolTip( wxU(_("You can use this field directly by typing "
         "the full MRL you want to open.\n""Alternatively, the field will be "
         "filled automatically when you use the controls below.")) );
@@ -592,7 +591,7 @@ wxPanel *OpenDialog::FilePanel( wxWindow* parent )
     wxBoxSizer *file_sizer = new wxBoxSizer( wxHORIZONTAL );
 
     file_combo = new wxComboBox( panel, FileName_Event, wxT(""),
-                                 wxPoint(20,25), wxSize(200, -1), 0, NULL );
+                                 wxPoint(20,25), wxSize(200, -1) );
     wxButton *browse_button = new wxButton( panel, FileBrowse_Event,
                                             wxU(_("Browse...")) );
     file_sizer->Add( file_combo, 1, wxALL, 5 );
@@ -858,11 +857,11 @@ void OpenDialog::UpdateMRL( int i_access_method )
         case 3: /* CD-DA */
             mrltemp = 
 #ifdef HAVE_CDDAX
-	      wxT("cddax://") 
+              wxT("cddax://") 
 #else
-	      wxT("cdda://") 
+              wxT("cdda://") 
 #endif
-	      + disc_device->GetValue();
+              + disc_device->GetValue();
             if( i_disc_title > 0 )
                 mrltemp += wxString::Format( wxT("@%d"), i_disc_title );
 

@@ -171,7 +171,7 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     wxStaticText *mrl_label = new wxStaticText( panel, -1,
                                                 wxU(_("Destination Target:")));
     mrl_combo = new wxComboBox( panel, MRL_Event, wxT(""),
-                                wxPoint(20,25), wxSize(120, -1), 0, NULL );
+                                wxPoint(20,25), wxSize(120, -1) );
     mrl_combo->SetToolTip( wxU(_("You can use this field directly by typing "
         "the full MRL you want to open.\n""Alternatively, the field will be "
         "filled automatically when you use the controls below")) );
@@ -457,7 +457,7 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
     subpanel_sizer = new wxFlexGridSizer( 3, 2, 20 );
     label = new wxStaticText( access_subpanels[1], -1, wxU(_("Filename")) );
     file_combo = new wxComboBox( access_subpanels[1], FileName_Event, wxT(""),
-                                 wxPoint(20,25), wxSize(200, -1), 0, NULL );
+                                 wxPoint(20,25), wxSize(200, -1) );
     wxButton *browse_button = new wxButton( access_subpanels[1],
                                   FileBrowse_Event, wxU(_("Browse...")) );
     subpanel_sizer->Add( label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
