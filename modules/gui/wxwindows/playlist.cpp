@@ -49,8 +49,8 @@
 #include <wx/imaglist.h>
 
 #define HELP_SHUFFLE N_( "Shuffle" )
-#define HELP_LOOP N_( "Loop" )
-#define HELP_REPEAT N_( "Repeat" )
+#define HELP_LOOP N_( "Repeat All" )
+#define HELP_REPEAT N_( "Repeat One" )
 
 /* Callback prototype */
 static int PlaylistChanged( vlc_object_t *, const char *,
