@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.9 2003/04/14 20:17:33 asmax Exp $
+ * $Id: gtk2_theme.cpp,v 1.10 2003/04/15 01:19:11 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -49,83 +49,6 @@
 //---------------------------------------------------------------------------
 void SkinManage( intf_thread_t *p_intf );
 
-/*
-
-//---------------------------------------------------------------------------
-// GTK2 interface
-//---------------------------------------------------------------------------
-LRESULT CALLBACK GTK2Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
-{
-    // Get pointer to thread info
-    intf_thread_t *p_intf = (intf_thread_t *)GetWindowLongPtr( hwnd,
-        GWLP_USERDATA );
-
-    // If doesn't exist, treat windows message normally
-    if( p_intf == NULL )
-        return DefWindowProc( hwnd, uMsg, wParam, lParam );
-
-    // Create event to dispatch in windows
-    Event *evt = (Event *)new OSEvent( p_intf, hwnd, uMsg, wParam, lParam );
-
-
-    // Find window matching with hwnd
-    list<Window *>::const_iterator win;
-    for( win = p_intf->p_sys->p_theme->WindowList.begin();
-         win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
-    {
-        // If it is the correct window
-        if( hwnd == ( (GTK2Window *)(*win) )->GetHandle() )
-        {
-            // Send event and check if processed
-            if( (*win)->ProcessEvent( evt ) )
-            {
-                delete (OSEvent *)evt;
-                return 0;
-            }
-            else
-            {
-                break;
-            }
-        }
-    }
-    delete (OSEvent *)evt;
-
-
-    // If Window is parent window
-    if( hwnd == ( (GTK2Theme *)p_intf->p_sys->p_theme )->GetParentWindow() )
-    {
-        if( uMsg == WM_SYSCOMMAND )
-        {
-            if( (Event *)wParam != NULL )
-                ( (Event *)wParam )->SendEvent();
-            return 0;
-        }
-        else if( uMsg == WM_RBUTTONDOWN && wParam == 42 &&
-                 lParam == WM_RBUTTONDOWN )
-        {
-            int x, y;
-            OSAPI_GetMousePos( x, y );
-            TrackPopupMenu(
-                ( (GTK2Theme *)p_intf->p_sys->p_theme )->GetSysMenu(),
-                0, x, y, 0, hwnd, NULL );
-        }
-    }
-
-
-    // If closing parent window
-    if( uMsg == WM_CLOSE )
-    {
-        OSAPI_PostMessage( NULL, VLC_HIDE, VLC_QUIT, 0 );
-        return 0;
-    }
-
-    // If hwnd does not match any window or message not processed
-    return DefWindowProc( hwnd, uMsg, wParam, lParam );
-}
-//---------------------------------------------------------------------------
-
-
-*/
 
 //---------------------------------------------------------------------------
 // THEME

@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.8 2003/04/14 20:17:33 asmax Exp $
+ * $Id: gtk2_window.cpp,v 1.9 2003/04/15 01:19:11 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -32,6 +32,7 @@
 
 //--- GTK2 ------------------------------------------------------------------
 #include <gdk/gdk.h>
+#include <glib.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "os_api.h"
@@ -45,7 +46,6 @@
 #include "os_graphics.h"
 #include "skin_common.h"
 #include "theme.h"
-
 
 
 //---------------------------------------------------------------------------
@@ -71,6 +71,9 @@ GTK2Window::GTK2Window( intf_thread_t *p_intf, GdkWindow *gwnd, int x, int y,
     // Set handles
     gWnd           = gwnd;
     gc = gdk_gc_new( gwnd );
+
+    LButtonDown = false;
+    RButtonDown = false;
 /*
     // Set position parameters
     CursorPos    = new POINT;
@@ -155,46 +158,80 @@ void GTK2Window::OSShow( bool show )
 //---------------------------------------------------------------------------
 bool GTK2Window::ProcessOSEvent( Event *evt )
 {
-/*    unsigned int msg = evt->GetMessage();
+    unsigned int msg = evt->GetMessage();
     unsigned int p1  = evt->GetParam1();
     int          p2  = evt->GetParam2();
 
+    fprintf( stderr, "salut %li\n", evt->GetMessage() );
+
     switch( msg )
     {
-        case WM_PAINT:
-            HDC DC;
-            PAINTSTRUCT Infos;
-            DC = BeginPaint( hWnd , &Infos );
-            EndPaint( hWnd , &Infos );
+        case GDK_EXPOSE:
             RefreshFromImage( 0, 0, Width, Height );
             return true;
 
-        case WM_MOUSEMOVE:
-            TRACKMOUSEEVENT TrackEvent;
-            TrackEvent.cbSize      = sizeof( TRACKMOUSEEVENT );
-            TrackEvent.dwFlags     = TME_LEAVE;
-            TrackEvent.hwndTrack   = hWnd;
-            TrackEvent.dwHoverTime = 1;
-            TrackMouseEvent( &TrackEvent );
-            if( p1 == MK_LBUTTON )
-                MouseMove( LOWORD( p2 ), HIWORD( p2 ), 1 );
-            else if( p1 == MK_RBUTTON )
-                MouseMove( LOWORD( p2 ), HIWORD( p2 ), 2 );
+
+        case GDK_MOTION_NOTIFY:
+//            TRACKMOUSEEVENT TrackEvent;
+//            TrackEvent.cbSize      = sizeof( TRACKMOUSEEVENT );
+//            TrackEvent.dwFlags     = TME_LEAVE;
+//            TrackEvent.hwndTrack   = hWnd;
+//            TrackEvent.dwHoverTime = 1;
+//            TrackMouseEvent( &TrackEvent );
+            if( LButtonDown )
+                MouseMove( ((GdkEventButton *)p2)->x_root, ((GdkEventButton *)p2)->y_root,
+                           1 );
+            else if( RButtonDown )
+                MouseMove( ((GdkEventButton *)p2)->x_root, ((GdkEventButton *)p2)->y_root,
+                           2 );
             else
-                MouseMove( LOWORD( p2 ), HIWORD( p2 ), 0 );
+                MouseMove( ((GdkEventButton *)p2)->x_root, ((GdkEventButton *)p2)->y_root,
+                           0 );
 
             return true;
 
-        case WM_LBUTTONDOWN:
-            SetCapture( hWnd );
-            MouseDown( LOWORD( p2 ), HIWORD( p2 ), 1 );
+
+        case GDK_BUTTON_PRESS:
+            switch( ((GdkEventButton *)p2)->button )
+            {
+                case 1:
+                    // Left button
+                    LButtonDown = true;
+                    MouseDown( ((GdkEventButton *)p2)->x_root,
+                               ((GdkEventButton *)p2)->y_root, 1 );
+                    break;
+                case 3:
+                    // Right button
+                    RButtonDown = true;
+                    MouseDown( ((GdkEventButton *)p2)->x_root,
+                               ((GdkEventButton *)p2)->y_root, 2 );
+                    break;
+                default:
+                    break;
+            }
             return true;
 
-        case WM_LBUTTONUP:
-            ReleaseCapture();
-            MouseUp( LOWORD( p2 ), HIWORD( p2 ), 1 );
+        case GDK_BUTTON_RELEASE:
+            switch( ((GdkEventButton *)p2)->button )
+            {
+                case 1:
+                    // Left button
+                    LButtonDown = false;
+                    MouseUp( ((GdkEventButton *)p2)->x_root,
+                             ((GdkEventButton *)p2)->y_root, 1 );
+                    break;
+                case 3:
+                    // Right button
+                    RButtonDown = false;
+                    MouseUp( ((GdkEventButton *)p2)->x_root,
+                             ((GdkEventButton *)p2)->y_root, 2 );
+                    break;
+                default:
+                    break;
+            }
             return true;
 
+/*
         case WM_RBUTTONDOWN:
             MouseDown( LOWORD( p2 ), HIWORD( p2 ), 2 );
             return true;
@@ -210,10 +247,10 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
         case WM_MOUSELEAVE:
             OSAPI_PostMessage( this, WINDOW_LEAVE, 0, 0 );
             return true;
-
+*/
         default:
             return false;
-    }*/
+    }
 }
 //---------------------------------------------------------------------------
 void GTK2Window::SetTransparency( int Value )
@@ -235,9 +272,9 @@ void GTK2Window::RefreshFromImage( int x, int y, int w, int h )
 
     // Release window device context
     ReleaseDC( hWnd, DC );
-    
+
 */
-    
+
  fprintf(stderr, "window %d %d %d %d\n", x, y, w, h);
     gdk_draw_drawable( gWnd, gc, (( GTK2Graphics* )Image )->GetImage(),
             x, y, x, y, w, h );
@@ -245,25 +282,23 @@ void GTK2Window::RefreshFromImage( int x, int y, int w, int h )
 //---------------------------------------------------------------------------
 void GTK2Window::WindowManualMove()
 {
-/*    // Get mouse cursor position
-    LPPOINT NewPos = new POINT;
-    GetCursorPos( NewPos );
+    // Get mouse cursor position
+    int x, y;
+    gdk_display_get_pointer( gdk_display_get_default(), NULL, &x, &y, NULL );
 
     // Move window and chek for magnetism
     p_intf->p_sys->p_theme->MoveSkinMagnet( this,
-        WindowPos->x + NewPos->x - CursorPos->x,
-        WindowPos->y + NewPos->y - CursorPos->y );
+        WindowX + x - CursorX, WindowY + y - CursorY );
 
-    // Free memory
-    delete[] NewPos;
-*/
+    fprintf( stderr, "---------\n" );
 }
 //---------------------------------------------------------------------------
 void GTK2Window::WindowManualMoveInit()
 {
-/*    GetCursorPos( CursorPos );
-    WindowPos->x = Left;
-    WindowPos->y = Top;*/
+    gdk_display_get_pointer( gdk_display_get_default(), NULL, &CursorX,
+                             &CursorY, NULL );
+    WindowX = Left;
+    WindowY = Top;
 }
 //---------------------------------------------------------------------------
 void GTK2Window::Move( int left, int top )

@@ -2,7 +2,7 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.6 2003/04/14 20:07:49 asmax Exp $
+ * $Id: gtk2_graphics.cpp,v 1.7 2003/04/15 01:19:11 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -79,7 +79,6 @@ void GTK2Graphics::CopyFrom( int dx, int dy, int dw, int dh, Graphics *Src,
 {
 /*    BitBlt( Image, dx, dy, dw, dh, ( (GTK2Graphics *)Src )->GetImageHandle(),
         sx, sy, Flag );*/
-        fprintf(stderr, "%d %d %d %d %d %d\n", sx, sy, dx, dy, dw, dh);
     gdk_draw_drawable( Image, Gc, (( GTK2Graphics* )Src )->GetImage(),
             sx, sy, dx, dy, dw, dh );
 }

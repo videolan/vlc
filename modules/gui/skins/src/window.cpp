@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.8 2003/04/14 20:07:49 asmax Exp $
+ * $Id: window.cpp,v 1.9 2003/04/15 01:19:11 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -321,6 +321,8 @@ void Window::MouseDown( int x, int y, int button )
 void Window::MouseMove( int x, int y, int button  )
 {
     int i;
+
+    fprintf( stderr, "pouet %i\n", button );
 
     // Move window if selected !
     if( WindowMoving )

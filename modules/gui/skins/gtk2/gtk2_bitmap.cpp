@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.7 2003/04/14 20:07:49 asmax Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.8 2003/04/15 01:19:11 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -98,7 +98,7 @@ GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
 
     // Delete objects
     DeleteObject( HBitmap );*/
-    
+
     // Load the bitmap image
     Bmp = gdk_pixbuf_new_from_file( FileName.c_str(), NULL );
     if( Bmp == NULL )

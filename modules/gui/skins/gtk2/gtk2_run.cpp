@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.4 2003/04/13 19:09:59 asmax Exp $
+ * $Id: gtk2_run.cpp,v 1.5 2003/04/15 01:19:11 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -63,6 +63,81 @@ int  SkinManage( intf_thread_t *p_intf );
 }*/
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+// GTK2 interface
+//---------------------------------------------------------------------------
+void GTK2Proc( GdkEvent *event, gpointer data )
+{
+    GdkWindow *gwnd = ((GdkEventAny *)event)->window;
+
+    // Get pointer to thread info
+    intf_thread_t *p_intf = (intf_thread_t *)data;
+
+    // If doesn't exist, treat windows message normally
+//    if( p_intf == NULL )
+//        return DefWindowProc( hwnd, uMsg, wParam, lParam );
+
+    // Create event to dispatch in windows
+    Event *evt = (Event *)new OSEvent( p_intf, ((GdkEventAny *)event)->window,
+                                       event->type, 0, (long)event );
+
+    // Find window matching with gwnd
+    list<Window *>::const_iterator win;
+    for( win = p_intf->p_sys->p_theme->WindowList.begin();
+         win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
+    {
+        // If it is the correct window
+        if( gwnd == ( (GTK2Window *)(*win) )->GetHandle() )
+        {
+            // Send event and check if processed
+            if( (*win)->ProcessEvent( evt ) )
+            {
+                delete (OSEvent *)evt;
+                return;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    delete (OSEvent *)evt;
+
+#if 0
+    // If Window is parent window
+    if( hwnd == ( (GTK2Theme *)p_intf->p_sys->p_theme )->GetParentWindow() )
+    {
+        if( uMsg == WM_SYSCOMMAND )
+        {
+            if( (Event *)wParam != NULL )
+                ( (Event *)wParam )->SendEvent();
+            return 0;
+        }
+        else if( uMsg == WM_RBUTTONDOWN && wParam == 42 &&
+                 lParam == WM_RBUTTONDOWN )
+        {
+            int x, y;
+            OSAPI_GetMousePos( x, y );
+            TrackPopupMenu(
+                ( (GTK2Theme *)p_intf->p_sys->p_theme )->GetSysMenu(),
+                0, x, y, 0, hwnd, NULL );
+        }
+    }
+
+
+    // If closing parent window
+    if( uMsg == WM_CLOSE )
+    {
+        OSAPI_PostMessage( NULL, VLC_HIDE, VLC_QUIT, 0 );
+        return 0;
+    }
+
+    // If hwnd does not match any window or message not processed
+    return DefWindowProc( hwnd, uMsg, wParam, lParam );
+#endif
+}
+//---------------------------------------------------------------------------
+
 
 
 //---------------------------------------------------------------------------
@@ -70,114 +145,11 @@ int  SkinManage( intf_thread_t *p_intf );
 //---------------------------------------------------------------------------
 void OSRun( intf_thread_t *p_intf )
 {
-#if 0
-    VlcProc *Proc = new VlcProc( p_intf );
-    MSG msg;
-    list<Window *>::const_iterator win;
-    Event *ProcessEvent;
-    int KeyModifier = 0;
+    gdk_event_handler_set( GTK2Proc, (gpointer)p_intf, NULL );
 
-    // Create refresh timer
-    SetTimer( ((OSTheme *)p_intf->p_sys->p_theme)->GetParentWindow(), 42, 200,
-              (TIMERPROC)RefreshTimer );
-
-    // Compute windows message list
-    while( GetMessage( &msg, NULL, 0, 0 ) )
-    {
-
-        // Translate keys
-        TranslateMessage( &msg );
-
-        // Create event
-        ProcessEvent = (Event *)new OSEvent( p_intf, msg.hwnd, msg.message,
-                                             msg.wParam, msg.lParam );
-
-        /*****************************
-        * Process keyboard shortcuts *
-        *****************************/
-        if( msg.message == WM_KEYUP )
-        {
-            msg_Err( p_intf, "Key : %i (%i)", msg.wParam, KeyModifier );
-            // If key is CTRL
-            if( msg.wParam == 17 )
-                KeyModifier = 0;
-            else if( KeyModifier == 0 )
-            {
-                p_intf->p_sys->p_theme->EvtBank->TestShortcut(
-                    msg.wParam, 0 );
-            }
-        }
-        else if( msg.message == WM_KEYDOWN )
-        {
-            // If key is control
-            if( msg.wParam == 17 )
-                KeyModifier = 2;
-            else if( KeyModifier > 0 )
-                p_intf->p_sys->p_theme->EvtBank->TestShortcut(
-                    msg.wParam, KeyModifier );
-        }
-        else if( msg.message == WM_SYSKEYDOWN )
-        {
-            // If key is ALT
-            if( msg.wParam == 18 )
-                KeyModifier = 1;
-        }
-        else if( msg.message == WM_SYSKEYUP )
-        {
-            // If key is a system key
-            KeyModifier = 0;
-        }
-
-        /************************
-        * Process timer message *
-        ************************/
-        else if( msg.message == WM_TIMER )
-        {
-            DispatchMessage( &msg );
-        }
-
-        /***********************
-        * VLC specific message *
-        ***********************/
-        else if( IsVLCEvent( msg.message ) )
-        {
-            if( !Proc->EventProc( ProcessEvent ) )
-                break;      // Exit VLC !
-        }
-
-        /**********************
-        * Broadcsated message *
-        **********************/
-        else if( msg.hwnd == NULL )
-        {
-            for( win = p_intf->p_sys->p_theme->WindowList.begin();
-                win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
-            {
-                (*win)->ProcessEvent( ProcessEvent );
-            }
-        }
-
-        /***********************
-        * Process window event *
-        ***********************/
-        else
-        {
-            DispatchMessage( &msg );
-        }
-
-        // Delete event
-        ProcessEvent->DestructParameters();
-        delete (OSEvent *)ProcessEvent;
-
-        // Check if vlc is closing
-        Proc->IsClosing();
-    }
-    #endif
-    
     // Main event loop
     GMainLoop *loop = g_main_loop_new( NULL, TRUE );
     g_main_loop_run( loop );
-
 }
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg )
@@ -185,6 +157,5 @@ bool IsVLCEvent( unsigned int msg )
     return( msg > VLC_MESSAGE && msg < VLC_WINDOW );
 }
 //---------------------------------------------------------------------------
-
 
 #endif
