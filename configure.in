@@ -1,6 +1,7 @@
 dnl Autoconf settings for vlc
 AC_INIT(configure.in)
-AM_CONFIG_HEADER(config.h)
+
+AC_PREREQ(2.50)
 AC_CANONICAL_SYSTEM
 
 CONFIGURE_LINE="$0 $*"
@@ -8,6 +9,9 @@ CONFIGURE_LINE="$0 $*"
 PACKAGE="vlc"
 VERSION="0.5.0-cvs"
 CODENAME="Natalya"
+
+AM_INIT_AUTOMAKE(${PACKAGE}, ${VERSION})
+AM_CONFIG_HEADER(config.h)
 
 dnl
 dnl  Save *FLAGS
@@ -19,9 +23,10 @@ save_LDFLAGS="${LDFLAGS}"
 dnl
 dnl Check for tools
 dnl
-AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_PROG_CPP
+AC_PROG_MAKE_SET
+AC_PROG_INSTALL
 
 dnl Find the right ranlib, even when cross-compiling
 AC_CHECK_TOOL(RANLIB, ranlib, :)
@@ -51,6 +56,7 @@ ALL_LINGUAS="de en_GB fr ja no ru nl pl se"
 
 AC_DEFINE_UNQUOTED(VLC_PACKAGE, "${PACKAGE}", [Package name])
 AC_DEFINE_UNQUOTED(VLC_VERSION, "${VERSION}", [Package version])
+AM_GNU_GETTEXT_VERSION(0.10.40)
 AM_GNU_GETTEXT
 
 dnl AM_PROG_LIBTOOL
@@ -2167,8 +2173,17 @@ AC_SUBST(xvideo_LDFLAGS)
 AC_SUBST(xosd_LDFLAGS)
 AC_SUBST(id3tag_LDFLAGS)
         
-AC_OUTPUT([Makefile Makefile.config Makefile.opts po/Makefile.in vlc-config m4/Makefile intl/Makefile])
-chmod a+x vlc-config
+AC_OUTPUT([
+  Makefile
+  Makefile.config
+  Makefile.opts
+  m4/Makefile
+  intl/Makefile
+  po/Makefile.in
+  vlc-config
+],[
+  chmod a+x vlc-config
+])
 
 echo "
 vlc configuration

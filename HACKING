@@ -1,12 +1,12 @@
-$Id: HACKING,v 1.2 2002/08/26 09:38:19 sam Exp $
+$Id: HACKING,v 1.3 2002/08/26 20:49:49 sam Exp $
 
 Hacking vlc
 ===========
 
 You will need the following tools if you plan to use the CVS version of vlc:
 
- - autoconf version 2.13 or later
- - automake version 1.4 or later
+ - autoconf version 2.50 or later
+ - automake version 1.6 or later
  - gettext version 0.10.4 or later
 
 After retrieving the CVS tree, you need to run the bootstrap script to
