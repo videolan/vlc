@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.9 2003/01/09 18:06:06 sam Exp $
+ * $Id: xcommon.c,v 1.10 2003/01/15 13:48:14 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -686,13 +686,13 @@ static int ManageVideo( vout_thread_t *p_vout )
                 ToggleCursor( p_vout );
             }
         }
-        /* Reparent move -- XXX: why are we getting this ? */
-        else if( xevent.type == ReparentNotify )
+        else if( xevent.type == ReparentNotify /* XXX: why do we get this? */
+                  || xevent.type == MapNotify
+                  || xevent.type == UnmapNotify )
         {
-            ;
+            /* Ignore these events */
         }
-        /* Other event */
-        else
+        else /* Other events */
         {
             msg_Warn( p_vout, "unhandled event %d received", xevent.type );
         }
