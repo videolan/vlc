@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.5 2002/11/23 14:28:51 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.6 2002/11/23 16:17:12 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -29,18 +29,19 @@
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-
-/* Let vlc take care of the i18n stuff */
-#undef _
+#include <vlc/vlc.h>
 
 #ifdef WIN32                                                 /* mingw32 hack */
 #undef Yield
 #undef CreateDialog
 #endif
 
-#include <vlc/vlc.h>
+/* Let vlc take care of the i18n stuff */
+#define WXINTL_NO_GETTEXT_MACRO
+
+#include <wx/wxprec.h>
+#include <wx/wx.h>
+
 #include <vlc/intf.h>
 
 #include "wxwindows.h"
@@ -77,6 +78,8 @@ vlc_module_begin();
     set_description( (char *) _("wxWindows interface module") );
     set_capability( "interface", 50 );
     set_callbacks( Open, Close );
+    add_shortcut( "wxwindows" );
+    add_shortcut( "wxwin" );
     set_program( "wxvlc" );
 vlc_module_end();
 
@@ -138,7 +141,9 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
+#if !defined( WIN32 )
     static char  *p_args[] = { "" };
+#endif
 
     /* Hack to pass the p_intf pointer to the new wxWindow Instance object */
     wxTheApp = new Instance( p_intf );

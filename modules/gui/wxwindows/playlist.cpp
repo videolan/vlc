@@ -29,19 +29,20 @@
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-#include <wx/listctrl.h>
-
-/* Let vlc take care of the i18n stuff */
-#undef _
+#include <vlc/vlc.h>
 
 #ifdef WIN32                                                 /* mingw32 hack */
 #undef Yield
 #undef CreateDialog
 #endif
 
-#include <vlc/vlc.h>
+/* Let vlc take care of the i18n stuff */
+#define WXINTL_NO_GETTEXT_MACRO
+
+#include <wx/wxprec.h>
+#include <wx/wx.h>
+#include <wx/listctrl.h>
+
 #include <vlc/intf.h>
 
 #include "wxwindows.h"

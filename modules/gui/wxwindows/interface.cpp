@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.7 2002/11/23 14:28:51 gbazin Exp $
+ * $Id: interface.cpp,v 1.8 2002/11/23 16:17:12 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -29,18 +29,19 @@
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-
-/* Let vlc take care of the i18n stuff */
-#undef _
+#include <vlc/vlc.h>
 
 #ifdef WIN32                                                 /* mingw32 hack */
 #undef Yield
 #undef CreateDialog
 #endif
 
-#include <vlc/vlc.h>
+/* Let vlc take care of the i18n stuff */
+#define WXINTL_NO_GETTEXT_MACRO
+
+#include <wx/wxprec.h>
+#include <wx/wx.h>
+
 #include <vlc/intf.h>
 
 #include "wxwindows.h"
@@ -58,6 +59,8 @@
 #include "bitmaps/previous.xpm"
 #include "bitmaps/next.xpm"
 #include "bitmaps/playlist.xpm"
+#define TOOLBAR_BMP_WIDTH 24
+#define TOOLBAR_BMP_HEIGHT 24
 
 /* include the icon graphic */
 #include "share/vlc32x32.xpm"
@@ -251,6 +254,8 @@ void Interface::CreateOurToolBar()
 
     wxToolBar *toolbar = CreateToolBar(
         wxTB_HORIZONTAL | wxTB_TEXT | wxTB_FLAT | wxTB_DOCKABLE );
+
+    toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
     toolbar->AddTool( OpenFile_Event, _("File"), *p_bmp_file, HELP_FILE );
     toolbar->AddTool( OpenFile_Event, _("Disc"), *p_bmp_disc, HELP_DISC );
