@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.8 2001/03/21 13:42:34 sam Exp $
+ * $Id: gtk_playlist.c,v 1.9 2001/04/08 13:09:32 octplane Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *      
@@ -56,19 +56,11 @@
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"
 #include "gtk_support.h"
+#include "gtk_playlist.h"
 #include "intf_gtk.h"
 
-#include "main.h"
 
-/* Playlist specific functions */
-void rebuildCList(GtkCList * clist, playlist_t * playlist_p);
-gint compareItems(gconstpointer a, gconstpointer b);
-int hasValidExtension(gchar * filename);
-GList * intf_readFiles(gchar * fsname );
-int intf_AppendList( playlist_t * p_playlist, int i_pos, GList * list );
-void GtkPlayListManage( gpointer p_data );
-void on_generic_drop_data_received( intf_thread_t * p_intf,
-                GtkSelectionData *data, guint info, int position);
+#include "main.h"
 
 void
 on_menubar_playlist_activate           (GtkMenuItem     *menuitem,
@@ -110,7 +102,7 @@ on_toolbar_playlist_clicked            (GtkButton       *button,
 
     if( !GTK_IS_WIDGET( p_intf->p_sys->p_playlist ) )
     {
-        /* this shoud never happen */
+        /* this should never happen */
         intf_ErrMsgImm("intf_playlist is not a widget !");
 
         p_intf->p_sys->p_playlist = create_intf_playlist();
@@ -273,7 +265,7 @@ on_delete_clicked                      (GtkMenuItem       *item,
         g_list_foreach( selection,
                         deleteGListItem, 
                         p_intf );
-        
+        /* rebuild the CList */
         rebuildCList( clist, playlist_p );
     }
     

@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.12 2001/03/21 13:42:34 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.13 2001/04/08 13:09:32 octplane Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -51,17 +51,10 @@
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"
 #include "gtk_support.h"
+#include "gtk_playlist.h"
 #include "intf_gtk.h"
 
 #include "main.h"
-
-/****************************************************************************
- * External function
- */
-void on_generic_drop_data_received( intf_thread_t * p_intf,
-                        GtkSelectionData *data, guint info, int position);
-
-
 
 /*****************************************************************************
  * Callbacks
@@ -132,7 +125,7 @@ on_toolbar_open_clicked                (GtkButton       *button,
     {
         p_intf->p_sys->p_fileopen = create_intf_fileopen();
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_fileopen ),
-                             "p_intf", p_intf );
+                             "p_intf", p_intf  );
     }
 
     gtk_widget_show( p_intf->p_sys->p_fileopen );
@@ -252,14 +245,30 @@ void
 on_fileopen_ok_clicked                 (GtkButton       *button,
                                         gpointer         user_data)
 {
-    GtkWidget *filesel;
+    GtkCList *playlist_clist;
     gchar *filename;
 
-    filesel = gtk_widget_get_toplevel (GTK_WIDGET (button));
+    GtkWidget *filesel = gtk_widget_get_toplevel ( GTK_WIDGET (button) );
+    
+    /* retrieve the interface */
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(filesel), "intf_fileopen" );
+    
+    /* hide the widget */
     gtk_widget_hide (filesel);
     filename = gtk_file_selection_get_filename (GTK_FILE_SELECTION (filesel));
-
-    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, (char*)filename );
+    
+    /* catch the GTK CList */
+    playlist_clist = GTK_CLIST( 
+            lookup_widget(p_intf->p_sys->p_playlist,"playlist_clist"));
+    
+    intf_PlaylistAdd( p_main->p_playlist, 
+            PLAYLIST_END, 
+            (char*)filename );
+    
+    /* update the display */
+    rebuildCList( playlist_clist , 
+            p_main->p_playlist );
+   
 }
 
 
