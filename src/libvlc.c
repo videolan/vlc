@@ -99,6 +99,7 @@ static void Version       ( void );
 
 #ifdef WIN32
 static void ShowConsole   ( void );
+static void PauseConsole  ( void );
 #endif
 static int  ConsoleWidth  ( void );
 
@@ -526,8 +527,8 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         ShowConsole();
         /* Pause the console because it's destroyed when we exit */
         fprintf( stderr, "The command line options couldn't be loaded, check "
-                 "that they are valid.\nPress the RETURN key to continue..." );
-        getchar();
+                 "that they are valid.\n" );
+        PauseConsole();
 #endif
         vlc_object_detach( p_help_module );
         config_Free( p_help_module );
@@ -2073,8 +2074,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
     vlc_list_release( p_list );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-    fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
-    getchar();
+    PauseConsole();
 #endif
 }
 
@@ -2128,8 +2128,7 @@ static void ListModules( vlc_t *p_this )
     vlc_list_release( p_list );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-    fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
-    getchar();
+    PauseConsole();
 #endif
 }
 
@@ -2152,8 +2151,7 @@ static void Version( void )
         "Written by the VideoLAN team; see the AUTHORS file.\n") );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-    fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
-    getchar();
+    PauseConsole();
 #endif
 }
 
@@ -2173,9 +2171,26 @@ static void ShowConsole( void )
     freopen( "CONOUT$", "w", stdout );
     freopen( "CONOUT$", "w", stderr );
     freopen( "CONIN$", "r", stdin );
-#   endif
 
-    return;
+#   endif
+}
+#endif
+
+/*****************************************************************************
+ * PauseConsole: On Win32, wait for a key press before closing the console
+ *****************************************************************************
+ * This function is useful only on Win32.
+ *****************************************************************************/
+#ifdef WIN32 /*  */
+static void PauseConsole( void )
+{
+#   ifndef UNDER_CE
+
+    if( getenv( "PWD" ) && getenv( "PS1" ) ) return; /* cygwin shell */
+    fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
+    getchar();
+
+#   endif
 }
 #endif
 
