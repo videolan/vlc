@@ -91,8 +91,8 @@ typedef struct video_synchro_s
     int         i_coding_type;
 } video_synchro_t;
 
-#define SYNC_TOLERATE   10000 /* 10 ms */
-#define SYNC_DELAY      500000
+#define SYNC_TOLERATE   ((int)(0.010*CLOCK_FREQ))	/* 10 ms */
+#define SYNC_DELAY      ((int)(0.500*CLOCK_FREQ))      	/* 500 ms */
 #endif
 
 #ifdef POLUX_SYNCHRO

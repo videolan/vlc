@@ -76,13 +76,16 @@
  * General configuration
  *****************************************************************************/
 
+#define CLOCK_FREQ 1000000
+
+
 /* Automagically spawn input, audio and video threads ? */
 // ?? used ?
 #define AUTO_SPAWN
 
 /* When creating or destroying threads in blocking mode, delay to poll thread
  * status */
-#define THREAD_SLEEP                    10000
+#define THREAD_SLEEP                    ((int)(0.010*CLOCK_FREQ))
 
 /*
  * Decoders FIFO configuration
@@ -105,7 +108,7 @@
 #define INTF_CHANNELS_DEFAULT           "vlc.channels"
 
 /* Base delay in micro second for interface sleeps */
-#define INTF_IDLE_SLEEP                 100000
+#define INTF_IDLE_SLEEP                 ((int)(0.100*CLOCK_FREQ))
 
 /* Step for changing gamma, and minimum and maximum values */
 #define INTF_GAMMA_STEP                 .1
@@ -123,7 +126,7 @@
  *****************************************************************************/
 
 /* ?? */
-#define INPUT_IDLE_SLEEP                100000
+#define INPUT_IDLE_SLEEP                ((int)(0.100*CLOCK_FREQ))
 
 /*
  * General limitations
@@ -196,11 +199,11 @@
 
 /* Delay between vlan changes - this is required to avoid flooding the VLAN
  * server */
-#define INPUT_VLAN_CHANGE_DELAY         5000000
+#define INPUT_VLAN_CHANGE_DELAY         (5*CLOCK_FREQ)
 
 /* Duration between the time we receive the TS packet, and the time we will
  * mark it to be presented */
-#define INPUT_PTS_DELAY                 2000000
+#define INPUT_PTS_DELAY                 (2*CLOCK_FREQ)
 
 /*****************************************************************************
  * Audio configuration
@@ -274,17 +277,17 @@
 
 /* Time during which the thread will sleep if it has nothing to
  * display (in micro-seconds) */
-#define VOUT_IDLE_SLEEP                 20000
+#define VOUT_IDLE_SLEEP                 ((int)(0.020*CLOCK_FREQ))
 
 /* Maximum lap of time allowed between the beginning of rendering and
  * display. If, compared to the current date, the next image is too
  * late, the thread will perform an idle loop. This time should be
  * at least VOUT_IDLE_SLEEP plus the time required to render a few
  * images, to avoid trashing of decoded images */
-#define VOUT_DISPLAY_DELAY              500000
+#define VOUT_DISPLAY_DELAY              ((int)(0.500*CLOCK_FREQ))
 
 /* Delay (in microseconds) before an idle screen is displayed */
-#define VOUT_IDLE_DELAY                 5000000
+#define VOUT_IDLE_DELAY                 (5*CLOCK_FREQ)
 
 /* Number of pictures required to computes the FPS rate */
 #define VOUT_FPS_SAMPLES                20
@@ -301,13 +304,13 @@
  * Video parser configuration
  *****************************************************************************/
 
-#define VPAR_IDLE_SLEEP                 10000
+#define VPAR_IDLE_SLEEP                 ((int)(0.010*CLOCK_FREQ))
 
 /* Time to sleep when waiting for a buffer (from vout or the video fifo).
  * It should be approximately the time needed to perform a complete picture
  * loop. Since it only happens when the video heap is full, it does not need
  * to be too low, even if it blocks the decoder. */
-#define VPAR_OUTMEM_SLEEP               50000
+#define VPAR_OUTMEM_SLEEP               ((int)(0.050*CLOCK_FREQ))
 
 /* Optimization level, from 0 to 2 - 1 is generally a good compromise. Remember
  * that raising this level dramatically lengthens the compilation time. */
@@ -329,7 +332,7 @@
 
 //#define VDEC_SMP
 
-#define VDEC_IDLE_SLEEP                 100000
+#define VDEC_IDLE_SLEEP                 ((int)(0.100*CLOCK_FREQ))
 
 /* Number of video_decoder threads to launch on startup of the video_parser.
  * It should always be less than half the number of macroblocks of a
@@ -343,7 +346,7 @@
  * Generic decoder configuration
  *****************************************************************************/
 
-#define GDEC_IDLE_SLEEP                 100000
+#define GDEC_IDLE_SLEEP                 ((int)(0.100*CLOCK_FREQ))
 
 /*****************************************************************************
  * Messages and console interfaces configuration
