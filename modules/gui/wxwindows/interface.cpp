@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.2 2002/11/18 15:19:26 gbazin Exp $
+ * $Id: interface.cpp,v 1.3 2002/11/18 16:39:36 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -258,26 +258,24 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
 
 void Interface::OnOpenFile( wxCommandEvent& WXUNUSED(event) )
 {
-    wxFileDialog dialog
-                 (
-                    this,
-                    _T("Open file dialog"),
-                    _T(""),
-                    _T(""),
-                    _T("*.*")
-                 );
+    wxFileDialog dialog( this, _("Open file"), _(""), _(""),
+                         _("*.*") );
 
-    if (dialog.ShowModal() == wxID_OK)
+    if( dialog.ShowModal() == wxID_OK )
     {
-        wxString info;
-        info.Printf(_T("Full file name: %s\n")
-                    _T("Path: %s\n")
-                    _T("Name: %s"),
-                    dialog.GetPath().c_str(),
-                    dialog.GetDirectory().c_str(),
-                    dialog.GetFilename().c_str());
-        wxMessageDialog dialog2(this, info, _T("Selected file"));
-        dialog2.ShowModal();
+        /* Update the playlist */
+        playlist_t *p_playlist =
+            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
+        if( p_playlist == NULL )
+        {
+            return;
+        }
+
+        playlist_Add( p_playlist, (char *)dialog.GetPath().c_str(),
+                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+
+        vlc_object_release( p_playlist );
     }
 }
 
