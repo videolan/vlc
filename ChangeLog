@@ -9,6 +9,9 @@ HEAD
 0.4.2
 Sun,  7 Jul 2002 22:15:33 +0200
 
+  * ./plugins/beos/VideoWindow.h: changed default bitmap to 16bit to fix
+    green distortion problem.
+  * ./plugins/network/ipv6.c: enabled IPv6 multicast support.
   * ./plugins/dvd/dvd_es.c: error in selecting SPU stream.
   * ./plugins/spudec/spu_decoder.c: endianness fix for subtitles colour.
   * ./plugins/spudec/spu_decoder.c: little hack for preventing blank alpha
