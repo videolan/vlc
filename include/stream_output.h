@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.20 2004/01/25 18:17:08 zorglub Exp $
+ * $Id: stream_output.h,v 1.21 2004/02/22 16:08:47 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -282,8 +282,7 @@ VLC_EXPORT( sout_buffer_t *, sout_FifoGet,        ( sout_fifo_t * ) );
 VLC_EXPORT( sout_buffer_t *, sout_FifoShow,       ( sout_fifo_t * ) );
 
 
-#define sout_InputNew( a, b ) __sout_InputNew( VLC_OBJECT(a), b )
-VLC_EXPORT( sout_packetizer_input_t *, __sout_InputNew,       ( vlc_object_t *, es_format_t * ) );
+VLC_EXPORT( sout_packetizer_input_t *, sout_InputNew,( sout_instance_t *, es_format_t * ) );
 VLC_EXPORT( int,            sout_InputDelete,      ( sout_packetizer_input_t * ) );
 VLC_EXPORT( int,            sout_InputSendBuffer,  ( sout_packetizer_input_t *, sout_buffer_t* ) );
 

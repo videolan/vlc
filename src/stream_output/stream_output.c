@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: stream_output.c,v 1.39 2004/01/27 14:05:33 gbazin Exp $
+ * $Id: stream_output.c,v 1.40 2004/02/22 16:08:47 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -174,19 +174,10 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
 /*****************************************************************************
  * Packetizer/Input
  *****************************************************************************/
-sout_packetizer_input_t *__sout_InputNew( vlc_object_t  *p_this,
-                                          es_format_t *p_fmt )
+sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
+                                        es_format_t *p_fmt )
 {
-    sout_instance_t         *p_sout = NULL;
     sout_packetizer_input_t *p_input;
-
-    /* search an stream output */
-    if( !( p_sout = vlc_object_find( p_this, VLC_OBJECT_SOUT, FIND_ANYWHERE ) ) )
-    {
-        /* can't happen ... */
-        msg_Err( p_this, "cannot find any stream ouput" );
-        return NULL;
-    }
 
     msg_Dbg( p_sout, "adding a new input" );
 
@@ -203,16 +194,13 @@ sout_packetizer_input_t *__sout_InputNew( vlc_object_t  *p_this,
 
     /* *** add it to the stream chain */
     vlc_mutex_lock( &p_sout->lock );
-    p_input->id = p_sout->p_stream->pf_add( p_sout->p_stream,
-                                            p_fmt );
+    p_input->id = p_sout->p_stream->pf_add( p_sout->p_stream, p_fmt );
     vlc_mutex_unlock( &p_sout->lock );
-
-    vlc_object_release( p_sout );
 
     if( p_input->id == NULL )
     {
         free( p_input );
-        return( NULL );
+        return NULL;
     }
 
     return( p_input );

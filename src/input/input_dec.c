@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_dec.c,v 1.89 2004/01/30 17:49:21 fenrir Exp $
+ * $Id: input_dec.c,v 1.90 2004/02/22 16:08:47 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -66,7 +66,8 @@ struct decoder_owner_sys_t
 
     vout_thread_t   *p_vout;
 
-    sout_packetizer_input_t *p_sout;
+    sout_instance_t         *p_sout;
+    sout_packetizer_input_t *p_sout_input;
 
     /* Current format in use by the output */
     video_format_t video;
@@ -482,7 +483,8 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
     p_dec->p_owner->p_aout = NULL;
     p_dec->p_owner->p_aout_input = NULL;
     p_dec->p_owner->p_vout = NULL;
-    p_dec->p_owner->p_sout = NULL;
+    p_dec->p_owner->p_sout = p_input->stream.p_sout;
+    p_dec->p_owner->p_sout_input = NULL;
     p_dec->p_owner->p_es_descriptor = p_es;
     /* decoder fifo */
     if( ( p_dec->p_owner->p_fifo = block_FifoNew( p_dec ) ) == NULL )
@@ -573,7 +575,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 
         while( (p_sout_block = p_dec->pf_packetize( p_dec, &p_block )) )
         {
-            if( !p_dec->p_owner->p_sout )
+            if( !p_dec->p_owner->p_sout_input )
             {
                 es_format_Copy( &p_dec->p_owner->sout, &p_dec->fmt_out );
                 if( p_dec->p_owner->p_es_descriptor->p_pgrm )
@@ -587,10 +589,10 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                     p_dec->p_owner->sout.psz_language = strdup( p_dec->fmt_in.psz_language );
                 }
 
-                p_dec->p_owner->p_sout =
-                    sout_InputNew( p_dec, &p_dec->p_owner->sout );
+                p_dec->p_owner->p_sout_input =
+                    sout_InputNew( p_dec->p_owner->p_sout, &p_dec->p_owner->sout );
 
-                if( p_dec->p_owner->p_sout == NULL )
+                if( p_dec->p_owner->p_sout_input == NULL )
                 {
                     msg_Err( p_dec, "cannot create packetizer output" );
                     p_dec->b_error = VLC_TRUE;
@@ -611,7 +613,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 sout_buffer_t *p_sout_buffer;
 
                 p_sout_buffer =
-                    sout_BufferNew( p_dec->p_owner->p_sout->p_sout,
+                    sout_BufferNew( p_dec->p_owner->p_sout_input->p_sout,
                                     p_sout_block->i_buffer );
                 if( p_sout_buffer == NULL )
                 {
@@ -628,7 +630,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 
                 block_Release( p_sout_block );
 
-                sout_InputSendBuffer( p_dec->p_owner->p_sout, p_sout_buffer );
+                sout_InputSendBuffer( p_dec->p_owner->p_sout_input, p_sout_buffer );
 
                 p_sout_block = p_next;
             }
@@ -710,9 +712,9 @@ static void DeleteDecoder( decoder_t * p_dec )
         vout_Request( p_dec, p_dec->p_owner->p_vout, 0, 0, 0, 0 );
     }
 
-    if( p_dec->p_owner->p_sout )
+    if( p_dec->p_owner->p_sout_input )
     {
-        sout_InputDelete( p_dec->p_owner->p_sout );
+        sout_InputDelete( p_dec->p_owner->p_sout_input );
         if( p_dec->p_owner->sout.i_extra ) free(p_dec->p_owner->sout.p_extra);
     }
 
