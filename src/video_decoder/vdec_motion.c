@@ -2,6 +2,7 @@
  * vdec_motion.c : motion compensation routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: vdec_motion.c,v 1.32 2000/12/21 17:19:52 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>

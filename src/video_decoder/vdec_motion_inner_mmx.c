@@ -3,6 +3,7 @@
  *                           MMX
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: vdec_motion_inner_mmx.c,v 1.5 2000/12/21 17:19:52 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>, largerly inspired by the
  *          work done by the livid project <http://www.linuxvideo.org/>

@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.56 2000/12/21 14:18:15 massiot Exp $
+ * $Id: video_parser.c,v 1.57 2000/12/21 17:19:54 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -21,8 +21,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-/* FIXME: passer en terminate/destroy avec les signaux supplémentaires ?? */
 
 /*****************************************************************************
  * Preamble
@@ -47,7 +45,6 @@
 #include "plugins.h"
 
 #include "intf_msg.h"
-#include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
 
 #include "stream_control.h"
 #include "input_ext-dec.h"
@@ -55,15 +52,15 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "vdec_idct.h"
-#include "video_decoder.h"
-#include "vdec_motion.h"
+#include "../video_decoder/vdec_idct.h"
+#include "../video_decoder/video_decoder.h"
+#include "../video_decoder/vdec_motion.h"
 
-#include "vpar_blocks.h"
-#include "vpar_headers.h"
-#include "vpar_synchro.h"
-#include "video_parser.h"
-#include "video_fifo.h"
+#include "../video_decoder/vpar_blocks.h"
+#include "../video_decoder/vpar_headers.h"
+#include "../video_decoder/vpar_synchro.h"
+#include "../video_decoder/video_parser.h"
+#include "../video_decoder/video_fifo.h"
 
 /*
  * Local prototypes

@@ -2,6 +2,7 @@
  * vdec_motion.h : types for the motion compensation algorithm
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: vdec_motion.h,v 1.1 2000/12/21 17:19:52 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>

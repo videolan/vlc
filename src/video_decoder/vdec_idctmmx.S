@@ -2,6 +2,7 @@
  * vdec_idctmmx.S : MMX IDCT implementation
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: vdec_idctmmx.S,v 1.5 2000/12/21 17:19:52 massiot Exp $
  *
  * Authors:
  *

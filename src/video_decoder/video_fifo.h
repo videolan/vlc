@@ -2,6 +2,7 @@
  * video_fifo.h : FIFO for the pool of video_decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: video_fifo.h,v 1.1 2000/12/21 17:19:52 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -126,8 +127,7 @@ static __inline__ void vpar_DecodeMacroblock( video_fifo_t * p_fifo,
 
     vlc_mutex_unlock( &p_fifo->lock );
 #else
-    p_fifo->p_vpar->p_vout->vdec_DecodeMacroblock(
-            p_fifo->p_vpar->pp_vdec[0], p_mb );
+    vdec_DecodeMacroblockC( p_fifo->p_vpar->pp_vdec[0], p_mb );
 #endif
 }
 

@@ -2,6 +2,7 @@
  * vdec_idct.c : IDCT functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: vdec_idct.c,v 1.22 2000/12/21 17:19:52 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *

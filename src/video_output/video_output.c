@@ -51,9 +51,6 @@
 #include "intf_msg.h"
 #include "main.h"
 
-#include "vdec_idct.h"
-#include "video_decoder.h"
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -166,7 +163,6 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
 
     p_vout->b_grayscale           = main_GetIntVariable( VOUT_GRAYSCALE_VAR,
                                                        VOUT_GRAYSCALE_DEFAULT );
-    p_vout->vdec_DecodeMacroblock = vdec_DecodeMacroblockC;
     p_vout->b_info                = 0;
     p_vout->b_interface           = 0;
     p_vout->b_scale               = 1;
@@ -2047,15 +2043,6 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->i_changes & (VOUT_GAMMA_CHANGE | VOUT_GRAYSCALE_CHANGE |
                              VOUT_YUV_CHANGE) )
     {
-        /* Change vdec_DecodeMacroblock when switching between BW and C */
-        if( !p_vout->b_grayscale ) 
-        {
-            p_vout->vdec_DecodeMacroblock = vdec_DecodeMacroblockC;
-        }
-        else if( p_vout->b_grayscale)
-        {
-            p_vout->vdec_DecodeMacroblock = vdec_DecodeMacroblockBW;
-        }  
         if( vout_ResetYUV( p_vout ) )
         {
             intf_ErrMsg("error: can't rebuild convertion tables\n");

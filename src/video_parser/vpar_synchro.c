@@ -2,6 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: vpar_synchro.c,v 1.62 2000/12/21 17:19:54 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -96,10 +97,6 @@
  *****************************************************************************/
 #include "defs.h"
 
-#include <stdlib.h>                                                /* free() */
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                            /* "input.h" */
-
 #include "config.h"
 #include "common.h"
 #include "threads.h"
@@ -114,14 +111,14 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "vdec_idct.h"
-#include "video_decoder.h"
-#include "vdec_motion.h"
+#include "../video_decoder/vdec_idct.h"
+#include "../video_decoder/video_decoder.h"
+#include "../video_decoder/vdec_motion.h"
 
-#include "vpar_blocks.h"
-#include "vpar_headers.h"
-#include "vpar_synchro.h"
-#include "video_parser.h"
+#include "../video_decoder/vpar_blocks.h"
+#include "../video_decoder/vpar_headers.h"
+#include "../video_decoder/vpar_synchro.h"
+#include "../video_decoder/video_parser.h"
 
 #include "main.h"
 

@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.32 2000/12/21 13:25:50 massiot Exp $
+ * $Id: video_parser.h,v 1.1 2000/12/21 17:19:52 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
