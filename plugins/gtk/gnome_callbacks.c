@@ -223,7 +223,7 @@ void
 GnomePopupPreferencesActivate          (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-    GtkPreferencesActivate( menuitem, "intf_window" );
+    GtkPreferencesActivate( menuitem, "intf_popup" );
 }
 
 

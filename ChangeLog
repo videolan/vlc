@@ -4,7 +4,8 @@
 
 HEAD
 
-  * Nothing yet.
+  * ./plugins/gtk/gnome_callbacks.c: fixed a crash when activating preferences 
+    from the popup menu.
 
 0.4.1
 Mon,  3 Jun 2002 23:43:35 +0200
