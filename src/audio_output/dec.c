@@ -2,7 +2,7 @@
  * dec.c : audio output API towards decoders
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dec.c,v 1.10 2003/05/22 16:01:02 gbazin Exp $
+ * $Id: dec.c,v 1.11 2003/07/31 23:14:32 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -124,8 +124,6 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
         vlc_mutex_unlock( &p_aout->mixer_lock );
         return NULL;
     }
-
-    aout_MixerNew( p_aout );
 
     aout_InputNew( p_aout, p_input );
 
