@@ -542,7 +542,7 @@ static int QTCreateSequence( vout_thread_t *p_vout )
     p_descr->frameCount = 1;
     p_descr->clutID = -1;
     p_descr->dataSize = 0;
-    p_descr->depth = 12;
+    p_descr->depth = 24;
 
     HUnlock( (Handle)p_vout->p_sys->h_img_descr );
 
