@@ -197,6 +197,7 @@ __published:	// IDE-managed Components
     void __fastcall OpenFileActionExecute( TObject *Sender );
     void __fastcall OpenDiscActionExecute( TObject *Sender );
     void __fastcall NetworkStreamActionExecute( TObject *Sender );
+    void __fastcall StreamOutputActionExecute( TObject *Sender );
     void __fastcall ExitActionExecute( TObject *Sender );
     void __fastcall PlaylistActionExecute( TObject *Sender );
     void __fastcall MessagesActionExecute( TObject *Sender );
@@ -219,7 +220,6 @@ __published:	// IDE-managed Components
     void __fastcall NextTitleActionExecute( TObject *Sender );
     void __fastcall PrevChapterActionExecute( TObject *Sender );
     void __fastcall NextChapterActionExecute( TObject *Sender );
-    void __fastcall StreamOutputActionExecute( TObject *Sender );
 private:	// User declarations
     intf_thread_t *p_intf;
     /* drag and drop handling */

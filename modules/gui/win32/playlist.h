@@ -91,9 +91,9 @@ __published:	// IDE-managed Components
     void __fastcall DeleteSelectionActionExecute( TObject *Sender );
     void __fastcall DeleteAllActionExecute( TObject *Sender );
     void __fastcall PlayStreamActionExecute( TObject *Sender );
-   void __fastcall MenuFileCloseClick(TObject *Sender);
-    void __fastcall MenuFileOpenClick(TObject *Sender);
-    void __fastcall MenuFileSaveClick(TObject *Sender);
+    void __fastcall MenuFileCloseClick( TObject *Sender );
+    void __fastcall MenuFileOpenClick( TObject *Sender );
+    void __fastcall MenuFileSaveClick( TObject *Sender );
 private:	// User declarations
     char * __fastcall rindex( char *s, char c );
     intf_thread_t *p_intf;

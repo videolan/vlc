@@ -189,23 +189,27 @@ void __fastcall TPlaylistDlg::ListViewPlaylistCustomDrawItem(
  ****************************************************************************/
 void __fastcall TPlaylistDlg::MenuAddFileClick( TObject *Sender )
 {
-    p_intf->p_sys->b_play_when_adding = false;
+    p_intf->p_sys->b_play_when_adding =
+        (vlc_bool_t)config_GetInt( p_intf, "enqueue" );
     p_intf->p_sys->p_window->OpenFileActionExecute( Sender );
-    p_intf->p_sys->b_play_when_adding = true;
+    p_intf->p_sys->b_play_when_adding = VLC_TRUE;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::MenuAddDiscClick( TObject *Sender )
 {
-    p_intf->p_sys->b_play_when_adding = false;
+    p_intf->p_sys->b_play_when_adding =
+        (vlc_bool_t)config_GetInt( p_intf, "enqueue" );
     p_intf->p_sys->p_window->OpenDiscActionExecute( Sender );
-    p_intf->p_sys->b_play_when_adding = true;
+    p_intf->p_sys->b_play_when_adding = VLC_TRUE;
+        (vlc_bool_t)config_GetInt( p_intf, "enqueue" );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::MenuAddNetClick( TObject *Sender )
 {
-    p_intf->p_sys->b_play_when_adding = false;
+    p_intf->p_sys->b_play_when_adding =
+        (vlc_bool_t)config_GetInt( p_intf, "enqueue" );
     p_intf->p_sys->p_window->NetworkStreamActionExecute( Sender );
-    p_intf->p_sys->b_play_when_adding = true;
+    p_intf->p_sys->b_play_when_adding = VLC_TRUE;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::MenuAddUrlClick( TObject *Sender )
@@ -416,29 +420,26 @@ void __fastcall TPlaylistDlg::Next()
     playlist_Next( p_playlist );
 }
 //---------------------------------------------------------------------------
-
-
-void __fastcall TPlaylistDlg::MenuFileCloseClick(TObject *Sender)
+void __fastcall TPlaylistDlg::MenuFileCloseClick( TObject *Sender )
 {
     Hide();
 }
 //---------------------------------------------------------------------------
-
-void __fastcall TPlaylistDlg::MenuFileOpenClick(TObject *Sender)
+void __fastcall TPlaylistDlg::MenuFileOpenClick( TObject *Sender )
 {
-    if ( PlaylistOpenDlg->Execute() )
+    if( PlaylistOpenDlg->Execute() )
     {
-//        playlist_LoadFile ( p_playlist , PlaylistOpenDlg->FileName.c_str() );
+//        playlist_LoadFile( p_playlist , PlaylistOpenDlg->FileName.c_str() );
         UpdateGrid();
     }
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TPlaylistDlg::MenuFileSaveClick(TObject *Sender)
+void __fastcall TPlaylistDlg::MenuFileSaveClick( TObject *Sender )
 {
-    if ( PlaylistSaveDlg->Execute() )
+    if( PlaylistSaveDlg->Execute() )
     {
-//        playlist_SaveFile ( p_playlist , PlaylistSaveDlg->FileName.c_str() );
+//        playlist_SaveFile( p_playlist , PlaylistSaveDlg->FileName.c_str() );
     }
 }
 //---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  * win32.cpp : Win32 interface plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: win32.cpp,v 1.8 2003/01/13 17:11:14 ipkiss Exp $
+ * $Id: win32.cpp,v 1.9 2003/01/21 21:20:54 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -76,8 +76,17 @@ static int Open ( vlc_object_t *p_this )
 
     p_intf->p_sys->p_input = NULL;
     p_intf->p_sys->i_playing = -1;
-    p_intf->p_sys->b_play_when_adding = true;
+    p_intf->p_sys->b_play_when_adding = VLC_TRUE;
+
     p_intf->p_sys->b_slider_free = 1;
+
+    p_intf->p_sys->b_aout_update = VLC_FALSE;
+    p_intf->p_sys->b_vout_update = VLC_FALSE;
+    p_intf->p_sys->b_program_update = VLC_FALSE;
+    p_intf->p_sys->b_title_update = VLC_FALSE;
+    p_intf->p_sys->b_chapter_update = VLC_FALSE;
+    p_intf->p_sys->b_audio_update = VLC_FALSE;
+    p_intf->p_sys->b_spu_update = VLC_FALSE;
 
     return( 0 );
 }
@@ -152,7 +161,7 @@ int Win32Manage( intf_thread_t *p_intf )
     if( p_intf->p_sys->p_input == NULL )
     {
         p_intf->p_sys->p_input = (input_thread_t *)
-                    vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+            vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     }
     else if( p_intf->p_sys->p_input->b_dead )
     {

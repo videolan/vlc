@@ -178,6 +178,13 @@ void __fastcall TMainFrameDlg::NetworkStreamActionExecute( TObject *Sender )
     p_network->Show();
 }
 //---------------------------------------------------------------------------
+void __fastcall TMainFrameDlg::StreamOutputActionExecute( TObject *Sender )
+{
+    TSoutDlg *p_sout = new TSoutDlg( this, p_intf );
+    p_sout->ShowModal();
+    delete p_sout;
+}
+//---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::ExitActionExecute( TObject *Sender )
 {
     Close();
@@ -380,8 +387,16 @@ void __fastcall TMainFrameDlg::OnDrop( TMessage &Msg )
         DragQueryFile( (HDROP)Msg.WParam, i, FileName, name_length );
 
         /* add the new file to the playlist */
-        p_intf->p_sys->p_playwin->Add( FileName, PLAYLIST_APPEND | PLAYLIST_GO,
-                                       PLAYLIST_END );
+        if( config_GetInt( p_intf, "enqueue" ) )
+        {
+            p_intf->p_sys->p_playwin->Add( FileName,
+                PLAYLIST_APPEND, PLAYLIST_END );
+        }
+        else
+        {
+            p_intf->p_sys->p_playwin->Add( FileName,
+                PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+        }
 
         delete[] FileName;
     }
@@ -696,13 +711,6 @@ void __fastcall TMainFrameDlg::CreatePreferences( AnsiString Name )
 
     /* display the dialog */
     Preferences->Show();
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::StreamOutputActionExecute( TObject *Sender )
-{
-    TSoutDlg *p_sout = new TSoutDlg( this, p_intf );
-    p_sout->ShowModal();
-    delete p_sout;
 }
 //---------------------------------------------------------------------------
 
