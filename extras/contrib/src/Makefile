@@ -55,13 +55,13 @@ all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
-	.png .gpgerror .gcrypt .gnutls .daap .cddb .cdio .vcdimager
+	.png .gpgerror .gcrypt .gnutls .daap .cddb .cdio .vcdimager .aclocal
 endif
 ifeq ($(SYS),BEOS)
 all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
-	.dvdread .dvdnav .dvbpsi
+	.dvdread .dvdnav .dvbpsi .aclocal
 endif
 
 FORCE:
@@ -1079,6 +1079,15 @@ CLEAN_PKG += libopendaap
 DISCLEAN_PKG += libopendaap-$(DAAP_VERSION).tar.bz2
 
 # ***************************************************************************
+# Copy aclocal files
+# This is neceserry for --missing aclocal to succeed after a
+# configure.ac/Makefile.am change in the vlc root dir
+# **************************************************************************
+
+.aclocal:
+	cp -R $(PREFIX)/share/aclocal/* $(PREFIX)/../../m4/
+
+
 # ***************************************************************************
 # Some cleansing
 # ***************************************************************************
