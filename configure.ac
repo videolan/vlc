@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.162 2004/01/26 19:51:33 titer Exp $
+dnl $Id: configure.ac,v 1.163 2004/01/27 01:57:29 rocky Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -377,7 +377,7 @@ AC_CHECK_LIB(m,cos,[
   AX_ADD_LDFLAGS([adjust distort a52tofloat32],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  AX_ADD_LDFLAGS([ffmpeg stream_out_transcode stream_out_transrate i420_rgb faad svdsub svcdsub freetype visual],[-lm])
+  AX_ADD_LDFLAGS([ffmpeg stream_out_transcode stream_out_transrate i420_rgb faad vlc],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   AX_ADD_LDFLAGS([headphone_channel_mixer],[-lm])
