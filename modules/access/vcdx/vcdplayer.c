@@ -43,6 +43,10 @@
 #include <cdio/util.h>
 #include <libvcd/info.h>
 
+#ifdef WIN32
+#define sleep(A) Sleep((A)*1000
+#endif
+
 /*!
   Return true if playback control (PBC) is on
 */
