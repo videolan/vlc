@@ -5,7 +5,6 @@ ABOUT-NLS
 core
 core.*
 gmon.out
-configure.ac
 configure
 config.h
 config.h.*
