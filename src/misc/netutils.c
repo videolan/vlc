@@ -2,11 +2,12 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.29 2001/05/07 04:42:42 sam Exp $
+ * $Id: netutils.c,v 1.30 2001/05/18 09:49:16 xav Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
  *          Henri Fallon <henri@videolan.org>
+ *          Xavier Marchesini <xav@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +49,14 @@
 #include <sys/ioctl.h>                                            /* ioctl() */
 #endif
 
+#ifdef WIN32                            /* tools to get the MAC adress from  */
+#include <windows.h>                    /* the interface under Windows	     */
+#include <stdio.h>
+#include <iostream>
+#include <strstream>
+#include <string>
+#endif
+
 #ifdef HAVE_NET_IF_H
 #include <net/if.h>                            /* interface (arch-dependent) */
 #endif
@@ -67,7 +76,6 @@
 #include "netutils.h"
 
 
-
 /*****************************************************************************
  * input_channel_t: channel library data
  *****************************************************************************
@@ -82,6 +90,128 @@ typedef struct input_channel_s
     mtime_t     last_change;                             /* last change date */
 } input_channel_t;
 
+
+#ifdef WIN32
+
+/*****************************************************************************
+ * GetAdapterInfo : gets some informations about the interface using NETBIOS *
+ *****************************************************************************/ 
+
+
+  using namespace std ;
+
+  bool GetAdapterInfo ( int nAdapterNum, string & sMAC )
+  {
+      /* Reset the LAN adapter so that we can begin querying it */
+      
+    NCB Ncb ;
+    memset ( &Ncb, 0, sizeof ( Ncb ) ) ;
+    Ncb.ncb_command = NCBRESET ;
+    Ncb.ncb_lana_num = nAdapterNum ;
+    
+    if ( Netbios ( &Ncb ) != NRC_GOODRET ) 
+    {
+        char acTemp [ 80 ] ;
+        ostrstream outs ( acTemp, sizeof ( acTemp ) ) ;
+	
+        /* FIXME This should use vlc's standard handling error functions */ 
+	  
+        outs << "error " << Ncb.ncb_retcode << " on reset" << ends ;
+        sMAC = acTemp ;
+        return false ;
+    }
+      
+    /* Prepare to get the adapter status block */
+      
+    memset ( &Ncb, 0, sizeof ( Ncb ) ) ;     /* Initialization */
+    Ncb.ncb_command = NCBASTAT ;
+    Ncb.ncb_lana_num = nAdapterNum ;
+    
+    strcpy ( ( char * ) Ncb.ncb_callname, "*" ) ;
+    
+    struct ASTAT {
+        ADAPTER_STATUS adapt ;
+        NAME_BUFFER NameBuff[30] ;
+    } Adapter ;
+      
+    memset ( &Adapter, 0, sizeof ( Adapter ) ) ;
+    Ncb.ncb_buffer = ( unsigned char * ) &Adapter ;
+    Ncb.ncb_length = sizeof ( Adapter ) ;
+      
+      /* Get the adapter's info and, if this works, return it in standard,
+      colon-delimited form. */
+      
+    if ( Netbios( &Ncb ) == 0 ) 
+    {
+        char acMAC [ 18 ] ;
+        sprintf ( acMAC, "%02X:%02X:%02X:%02X:%02X:%02X",
+                int ( Adapter.adapt.adapter_address[0] ),
+                int ( Adapter.adapt.adapter_address[1] ),
+                int ( Adapter.adapt.adapter_address[2] ),
+                int ( Adapter.adapt.adapter_address[3] ),
+                int ( Adapter.adapt.adapter_address[4] ),
+                int ( Adapter.adapt.adapter_address[5] ) );
+        sMAC = acMAC;
+        return true;
+    }
+    else 
+    {
+        char acTemp[80] ;
+        ostrstream outs ( acTemp, sizeof ( acTemp ) ) ;
+        /* FIXME Same thing as up there */
+	  
+        outs << "error " << Ncb.ncb_retcode << " on ASTAT" << ends;
+ 
+        sMAC = acTemp;
+        return false;
+    }
+}
+
+/*****************************************************************************
+ * GetMacAddress : Extracts the MAC Address from the informations collected in
+ * GetAdapterInfo
+ ****************************************************************************/
+
+string GetMacAddress()
+{
+    /* Get adapter list - support for more than one adapter */
+    
+    LANA_ENUM AdapterList ;
+    NCB Ncb ;
+   
+    memset ( &Ncb, 0, sizeof ( NCB ) ) ;
+    Ncb.ncb_command = NCBENUM ;
+    Ncb.ncb_buffer = ( unsigned char * ) &AdapterList ;
+    Ncb.ncb_length = sizeof ( AdapterList ) ;
+    Netbios ( &Ncb ) ;
+    
+    /* Get all of the local ethernet addresses */
+      
+    string sMAC;
+    
+    for ( int i = 0; i < AdapterList.length ; ++i ) 
+    {
+        if ( GetAdapterInfo ( AdapterList.lana [ i ] , sMAC ) ) 
+        {
+            cout << "Adapter " << int ( AdapterList. lana [ i ] ) <<
+                    "'s MAC is " << sMAC << endl ;
+        }
+        else 
+        {
+
+	    /* FIXME those bloody error messages */
+		  
+            cerr << "Failed to get MAC address! Do you" << endl;
+            cerr << "have the NetBIOS protocol installed?" << endl;
+	      
+            break;
+        }
+    }
+
+    return sMac;
+}
+
+#endif
 
 /*****************************************************************************
  * network_BuildLocalAddr : fill a sockaddr_in structure for local binding
