@@ -28,6 +28,7 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <string.h>
+
 #include <vlc/vlc.h>
 #include <errno.h>
 
@@ -45,13 +46,19 @@
 #   include <unistd.h>
 #endif
 
-#if defined( UNDER_CE )
-#   include <winsock.h>
-#   define close(fd) CloseHandle((HANDLE)fd)
-#elif defined( WIN32 )
+#if defined(WIN32) || defined(UNDER_CE)
+#   if defined(UNDER_CE) && defined(sockaddr_storage)
+#       undef sockaddr_storage
+#   endif
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #   define close closesocket
+#   if defined(UNDER_CE)
+#       undef IP_MULTICAST_TTL
+#       define IP_MULTICAST_TTL 3
+#       undef IP_ADD_MEMBERSHIP
+#       define IP_ADD_MEMBERSHIP 5
+#   endif
 #else
 #   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>
@@ -256,7 +263,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 
     /* Build the local socket */
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
+#if defined( WIN32 ) || defined( UNDER_CE )
     /* Under Win32 and for multicasting, we bind to INADDR_ANY,
      * so let's call BuildAddr with "" instead of psz_bind_addr */
     if( BuildAddr( &sock, IN_MULTICAST( ntohl( inet_addr(psz_bind_addr) ) ) ?
@@ -282,7 +289,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         return( -1 );
     }
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
+#if defined( WIN32 ) || defined( UNDER_CE )
     /* Restore the sock struct so we can spare a few #ifdef WIN32 later on */
     if( IN_MULTICAST( ntohl( inet_addr(psz_bind_addr) ) ) )
     {
@@ -313,7 +320,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     }
 #endif
 
-#if !defined( UNDER_CE ) && !defined( SYS_BEOS )
+#if !defined( SYS_BEOS )
     /* Join the multicast group if the socket is a multicast address */
     if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
     {
@@ -418,7 +425,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
             return( -1 );
         }
 
-#if !defined( UNDER_CE ) && !defined( SYS_BEOS )
+#if !defined( SYS_BEOS )
         if( IN_MULTICAST( ntohl(inet_addr(psz_server_addr) ) ) )
         {
             /* set the time-to-live */
