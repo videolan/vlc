@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.cpp,v 1.7 2002/12/11 21:50:03 jpsaman Exp $
+ * $Id: qte.cpp,v 1.8 2002/12/24 19:25:54 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -123,9 +123,9 @@ extern "C"
 {
 
 vlc_module_begin();
-    add_category_hint( N_("QT Embedded"), NULL );
-    add_string( "qte-display", "portrait", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT);
-    add_bool( "qte-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT);
+//    add_category_hint( N_("QT Embedded"), NULL );
+//    add_string( "qte-display", "landscape", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT);
+//    add_bool( "qte-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT);
 //    add_integer( "qte-drawable", -1, NULL, NULL, NULL); //DRAWABLE_TEXT, DRAWABLE_LONGTEXT );
     set_description( _("QT Embedded module") );
     set_capability( "video output", 30 );
@@ -178,8 +178,23 @@ static void Close ( vlc_object_t *p_this )
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
     msg_Err( p_vout, "Close" );
-    DestroyQtWindow(p_vout);
-    free(p_vout->p_sys);
+    if( p_vout->p_sys->p_event )
+    {
+        vlc_object_detach( p_vout->p_sys->p_event );
+
+        /* Kill RunQtThread */
+        p_vout->p_sys->p_event->b_die = VLC_TRUE;
+        DestroyQtWindow(p_vout);
+
+        vlc_thread_join( p_vout->p_sys->p_event );
+        vlc_object_destroy( p_vout->p_sys->p_event );
+    }
+
+    if( p_vout->p_sys )
+    {
+        free( p_vout->p_sys );
+        p_vout->p_sys = NULL;
+    }
 }
 
 /*****************************************************************************
@@ -192,7 +207,6 @@ static int Init( vout_thread_t *p_vout )
 {
     int         i_index;
     picture_t*  p_pic;
-    char 		*psz_display;
     int         dd = QPixmap::defaultDepth();
 
     I_OUTPUTPICTURES = 0;
@@ -202,24 +216,11 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_gmask  = 0x07e0;
     p_vout->output.i_bmask  = 0x001f;
 
-    psz_display = config_GetPsz(p_vout, "qte-display");
-    if( strncmp(psz_display, "portrait", 8)==0 )
-    {
-         /* All we have is an RGB image with square pixels */
-         p_vout->output.i_width  = p_vout->p_sys->i_width;
-         p_vout->output.i_height = p_vout->p_sys->i_height;
-         p_vout->output.i_aspect = p_vout->output.i_width
-                                    * VOUT_ASPECT_FACTOR
-                                    / p_vout->output.i_height;
-    }
-    else
-    {
-         /* We may need to convert the chroma, but at least we keep the
-          * aspect ratio */
-         p_vout->output.i_width  = p_vout->render.i_width;
-         p_vout->output.i_height = p_vout->render.i_height;
-         p_vout->output.i_aspect = p_vout->render.i_aspect;
-    }
+    /* We may need to convert the chroma, but at least we keep the
+     * aspect ratio */
+    p_vout->output.i_width  = p_vout->p_sys->i_width;
+    p_vout->output.i_height = p_vout->p_sys->i_height;
+    p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     /* Try to initialize MAX_DIRECTBUFFERS direct buffers */
     while( I_OUTPUTPICTURES < QTE_MAX_DIRECTBUFFERS )
@@ -274,6 +275,9 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     vout_PlacePicture( p_vout, p_vout->p_sys->i_width, p_vout->p_sys->i_height,
                        &x, &y, &w, &h );
 
+    msg_Err(p_vout, "+qte::Display( p_vout, i_width=%d, i_height=%d, x=%u, y=%u, w=%u, h=%u",
+					p_vout->p_sys->i_width, p_vout->p_sys->i_height, x, y, w, h );
+
     if(p_vout->p_sys->pcVoutWidget)
     {
 // shameless borrowed from opie mediaplayer....
@@ -321,6 +325,8 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
         memcpy(p.frameBuffer(), (p_pic->p_sys->pQImage->jumpTable())[0], h * p.lineStep());
 #endif
     }
+    msg_Err(p_vout, "-qte::Display" );
+
 }
 
 /*****************************************************************************
