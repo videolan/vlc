@@ -2,7 +2,7 @@
  * interpreter.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: interpreter.cpp,v 1.3 2004/01/11 17:12:17 asmax Exp $
+ * $Id: interpreter.cpp,v 1.4 2004/01/18 19:54:46 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -30,13 +30,10 @@
 #include "../commands/cmd_quit.hpp"
 #include "../commands/cmd_input.hpp"
 #include "../commands/cmd_fullscreen.hpp"
+#include "../commands/cmd_show_window.hpp"
 #include "../src/theme.hpp"
 #include "../src/var_manager.hpp"
 #include "../src/vlcproc.hpp"
-#include "../vars/playlist.hpp"
-#include "../vars/vlcvars.hpp"
-#include "../vars/time.hpp"
-#include "../vars/volume.hpp"
 
 
 Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
@@ -63,6 +60,8 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_CMD( "playlist.previous()", CmdPlaylistPrevious )
     REGISTER_CMD( "playlist.sort()", CmdPlaylistSort )
     REGISTER_CMD( "vlc.fullscreen()", CmdFullscreen )
+    REGISTER_CMD( "vlc.play()", CmdPlay )
+    REGISTER_CMD( "vlc.pause()", CmdPause )
     REGISTER_CMD( "vlc.quit()", CmdQuit )
     REGISTER_CMD( "vlc.faster()", CmdFaster )
     REGISTER_CMD( "vlc.slower()", CmdSlower )
@@ -115,6 +114,34 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
                                           rightPos - (windowId.size() + 11) );
         pCommand = new CmdLayout( getIntf(), windowId, layoutId );
     }
+    else if( rAction.find( ".show()" ) != string::npos )
+    {
+        int leftPos = rAction.find( ".show()" );
+        string windowId = rAction.substr( 0, leftPos );
+        GenericWindow *pWin = pTheme->getWindowById( windowId );
+        if( pWin )
+        {
+            pCommand = new CmdShowWindow( getIntf(), *pWin );
+        }
+        else
+        {
+            msg_Err( getIntf(), "Unknown window (%s)", windowId.c_str() );
+        }
+    }
+    else if( rAction.find( ".hide()" ) != string::npos )
+    {
+        int leftPos = rAction.find( ".hide()" );
+        string windowId = rAction.substr( 0, leftPos );
+        GenericWindow *pWin = pTheme->getWindowById( windowId );
+        if( pWin )
+        {
+            pCommand = new CmdHideWindow( getIntf(), *pWin );
+        }
+        else
+        {
+            msg_Err( getIntf(), "Unknown window (%s)", windowId.c_str() );
+        }
+    }
 
     if( pCommand )
     {
@@ -136,11 +163,51 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
     {
         return pVar;
     }
+    else if( rName.find( " and " ) != string::npos )
+    {
+        int leftPos = rName.find( " and " );
+        string name1 = rName.substr( 0, leftPos );
+        int rightPos = leftPos + 5;   // 5 is the size of " and "
+        string name2 = rName.substr( rightPos, rName.size() - rightPos );
+        // Retrive the two boolean variables
+        VarBool *pVar1 = getVarBool( name1, pTheme );
+        VarBool *pVar2 = getVarBool( name2, pTheme );
+        // Create a composite boolean variable
+        if( pVar1 && pVar2 )
+        {
+            VarBool *pNewVar = new VarBoolAndBool( getIntf(), *pVar1, *pVar2 );
+            // Register this variable in the manager
+            pVarManager->registerVar( VariablePtr( pNewVar ), rName );
+            return pNewVar;
+        }
+        else
+        {
+            return NULL;
+        }
+    }
+    else if( rName.find( "not " ) != string::npos )
+    {
+        int rightPos = rName.find( "not " ) + 4;
+        string name = rName.substr( rightPos, rName.size() - rightPos );
+        // Retrive the boolean variable
+        VarBool *pVar = getVarBool( name, pTheme );
+        // Create a composite boolean variable
+        if( pVar )
+        {
+            VarBool *pNewVar = new VarNotBool( getIntf(), *pVar );
+            // Register this variable in the manager
+            pVarManager->registerVar( VariablePtr( pNewVar ), rName );
+            return pNewVar;
+        }
+        else
+        {
+            return NULL;
+        }
+    }
     else if( rName.find( ".isVisible" ) != string::npos )
     {
         int leftPos = rName.find( ".isVisible" );
         string windowId = rName.substr( 0, leftPos );
-        // XXX Need to check the IDs (isalpha())?
         GenericWindow *pWin = pTheme->getWindowById( windowId );
         if( pWin )
         {
@@ -148,7 +215,7 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
         }
         else
         {
-            msg_Warn( getIntf(), "Unknown window (%s)", windowId.c_str() );
+            msg_Err( getIntf(), "Unknown window (%s)", windowId.c_str() );
             return NULL;
         }
     }

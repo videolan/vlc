@@ -2,7 +2,7 @@
  * var_bool.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_bool.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id: var_bool.hpp,v 1.3 2004/01/18 19:54:46 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -29,25 +29,81 @@
 #include "observer.hpp"
 
 
-/// Percentage variable
+/// Interface for read-only boolean variable
 class VarBool: public Variable, public Subject<VarBool>
 {
     public:
-        VarBool( intf_thread_t *pIntf );
-        virtual ~VarBool() {}
-
         /// Get the variable type
         virtual const string &getType() const { return m_type; }
 
-        /// Set the internal value
-        virtual void set( bool value );
-        virtual bool get() const { return m_value; }
+        /// Get the boolean value
+        virtual bool get() const = 0;
+
+    protected:
+        VarBool( intf_thread_t *pIntf ): Variable( pIntf ) {}
+        virtual ~VarBool() {}
 
     private:
         /// Variable type
         static const string m_type;
+};
+
+
+/// Boolean variable implementation (read/write)
+class VarBoolImpl: public VarBool
+{
+    public:
+        VarBoolImpl( intf_thread_t *pIntf );
+        virtual ~VarBoolImpl() {}
+
+        // Get the boolean value
+        virtual bool get() const { return m_value; }
+
+        /// Set the internal value
+        virtual void set( bool value );
+
+    private:
         /// Boolean value
         bool m_value;
 };
+
+
+/// Conjunction of two boolean variables (AND)
+class VarBoolAndBool: public VarBool, public Observer<VarBool>
+{
+    public:
+        VarBoolAndBool( intf_thread_t *pIntf, VarBool &rVar1, VarBool &rVar2 );
+        virtual ~VarBoolAndBool();
+
+        // Get the boolean value
+        virtual bool get() const { return m_rVar1.get() && m_rVar2.get(); }
+
+        // Called when one of the observed variables is changed
+        void onUpdate( Subject<VarBool> &rVariable );
+
+    private:
+        /// Boolean variables
+        VarBool &m_rVar1, &m_rVar2;
+};
+
+
+/// Negation of a boolean variable (NOT)
+class VarNotBool: public VarBool, public Observer<VarBool>
+{
+    public:
+        VarNotBool( intf_thread_t *pIntf, VarBool &rVar );
+        virtual ~VarNotBool();
+
+        // Get the boolean value
+        virtual bool get() const { return !m_rVar.get(); }
+
+        // Called when the observed variable is changed
+        void onUpdate( Subject<VarBool> &rVariable );
+
+    private:
+        /// Boolean variable
+        VarBool &m_rVar;
+};
+
 
 #endif

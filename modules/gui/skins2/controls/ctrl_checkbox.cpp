@@ -2,7 +2,7 @@
  * ctrl_checkbox.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_checkbox.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_checkbox.cpp,v 1.2 2004/01/18 19:54:46 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -184,7 +184,6 @@ void CtrlCheckbox::transDownOverUpOver( SkinObject *pCtrl )
     pThis->releaseMouse();
 
     // Invert the state variable
-    pThis->m_rVariable.set( !pThis->m_rVariable.get() );
     pThis->m_pImgCurrent = pThis->m_pImgUp;
     pThis->notifyLayout();
 

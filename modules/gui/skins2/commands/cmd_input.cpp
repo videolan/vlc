@@ -2,7 +2,7 @@
  * cmd_input.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cmd_input.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: cmd_input.cpp,v 1.2 2004/01/18 19:54:45 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -23,6 +23,30 @@
  *****************************************************************************/
 
 #include "cmd_input.hpp"
+
+
+void CmdPlay::execute()
+{
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    if( pPlaylist == NULL )
+    {
+        return;
+    }
+
+    playlist_Play( pPlaylist );
+}
+
+
+void CmdPause::execute()
+{
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    if( pPlaylist == NULL )
+    {
+        return;
+    }
+
+    playlist_Pause( pPlaylist );
+}
 
 
 void CmdStop::execute()

@@ -2,7 +2,7 @@
  * cmd_input.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cmd_input.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: cmd_input.hpp,v 1.2 2004/01/18 19:54:45 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -28,6 +28,8 @@
 #include "cmd_generic.hpp"
 
 /// Commands to control the input
+DEFINE_COMMAND( Play, "play" )
+DEFINE_COMMAND( Pause, "pause" )
 DEFINE_COMMAND( Stop, "stop" )
 DEFINE_COMMAND( Slower, "slower" )
 DEFINE_COMMAND( Faster, "faster" )

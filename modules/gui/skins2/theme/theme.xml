@@ -92,15 +92,15 @@
       <Text font="default_font" width="70" x="287" y="79" text="$T"/>
       <Button x="42" y="42" up="preferences" down="preferences_onclick" over="preferences" action="dialogs.prefs()" tooltiptext="Preferences"/>
       <Button x="17" y="64" up="stop" down="stop_onclick" over="stop" action="vlc.stop()" tooltiptext="Stop"/>
-      <CheckBox x="42" y="87" up1="playlist_button" down1="playlist_button_onclick" up2="playlist_button2" down2="playlist_button_onclick2" state="playlist_window.isVisible" tooltiptext1="Show Playlist" tooltiptext2="Hide Playlist"/>
-      <CheckBox x="83" y="44" up1="play" up2="pause" down1="play_onclick" down2="pause_onclick" state="vlc.isPlaying" tooltiptext1="Play" tooltiptext2="Pause"/>
+      <CheckBox x="42" y="87" up1="playlist_button" down1="playlist_button_onclick" up2="playlist_button2" down2="playlist_button_onclick2" state="playlist_window.isVisible" action1="playlist_window.show()" action2="playlist_window.hide()" tooltiptext1="Show Playlist" tooltiptext2="Hide Playlist"/>
+      <CheckBox x="83" y="44" up1="play" up2="pause" down1="play_onclick" down2="pause_onclick" state="vlc.isPlaying" action1="vlc.play()" action2="vlc.pause()" tooltiptext1="Play" tooltiptext2="Pause"/>
       <Button x="159" y="37" up="rev" down="rev_click" over="rev" action="vlc.slower()" tooltiptext="Slower"/>
       <Button x="159" y="89" up="fast" down="fast_click" over="fast" action="vlc.faster()" tooltiptext="Faster"/>
       <Button x="196" y="46" up="previous" down="previous_onclick" over="previous" action="playlist.previous()" tooltiptext="Previous Item"/>
       <Button x="196" y="79" up="next" down="next_onclick" over="next" action="playlist.next()" tooltiptext="Next Item"/>
       <Button x="8" y="5" up="close" down="close_onclick" over="close_mouseover" action="vlc.quit()" tooltiptext="Quit VLC" help="quit"/>
       <Image x="29" y="5" image="reduce_disabled"/>
-      <Slider id="time_slider" x="24" y="130" up="slider" down="slider_onclick" points="(0,0),(366,0)" value="time" visible="vlc.isSeekablePlaying" tooltiptext="Time: $T"/>
+      <Slider id="time_slider" x="24" y="130" up="slider" down="slider_onclick" points="(0,0),(366,0)" value="time" visible="vlc.isSeekable and not vlc.isStopped" tooltiptext="Time: $T"/>
       <Slider id="volume_slider" x="391" y="53" up="slider_volume" down="slider_volume_onclick" points="(0,47),(0,0)" value="volume" tooltiptext="Volume: $V%"/>
     </Group>
    </Layout>

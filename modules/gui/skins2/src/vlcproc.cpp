@@ -2,7 +2,7 @@
  * vlcproc.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.3 2004/01/11 17:12:17 asmax Exp $
+ * $Id: vlcproc.cpp,v 1.4 2004/01/18 19:54:46 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -31,6 +31,7 @@
 #include "../commands/async_queue.hpp"
 #include "../commands/cmd_notify_playlist.hpp"
 #include "../commands/cmd_quit.hpp"
+#include "../utils/var_bool.hpp"
 
 
 VlcProc *VlcProc::instance( intf_thread_t *pIntf )
@@ -63,19 +64,20 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf )
 
     // Create and register VLC variables
     VarManager *pVarManager = VarManager::instance( getIntf() );
-#define REGISTER_VAR( name, var, type ) \
-    name = VariablePtr( new var( getIntf() ) ); \
-    pVarManager->registerVar( name, type );
+#define REGISTER_VAR( var, type, name ) \
+    var = VariablePtr( new type( getIntf() ) ); \
+    pVarManager->registerVar( var, name );
 
     REGISTER_VAR( m_cPlaylist, Playlist, "playlist" )
     pVarManager->registerVar( getPlaylistVar().getPositionVarPtr(),
                               "playlist.slider" );
     REGISTER_VAR( m_cVarTime, Time, "time" )
     REGISTER_VAR( m_cVarVolume, Volume, "volume" )
-    REGISTER_VAR( m_cVarMute, VlcIsMute, "vlc.isMute" )
-    REGISTER_VAR( m_cVarPlaying, VlcIsPlaying, "vlc.isPlaying" )
-    REGISTER_VAR( m_cVarSeekablePlaying, VlcIsSeekablePlaying,
-                  "vlc.isSeekablePlaying" )
+    REGISTER_VAR( m_cVarMute, VarBoolImpl, "vlc.isMute" ) // XXX broken
+    REGISTER_VAR( m_cVarPlaying, VarBoolImpl, "vlc.isPlaying" )
+    REGISTER_VAR( m_cVarStopped, VarBoolImpl, "vlc.isStopped" )
+    REGISTER_VAR( m_cVarPaused, VarBoolImpl, "vlc.isPaused" )
+    REGISTER_VAR( m_cVarSeekable, VarBoolImpl, "vlc.isSeekable" )
 
     // Called when the playlist changes
     var_AddCallback( pIntf->p_sys-> p_playlist, "intf-change",
@@ -115,8 +117,10 @@ void VlcProc::manage()
     // Get the VLC variables
     Time *pTime = (Time*)m_cVarTime.get();
     Volume *pVolume = (Volume*)m_cVarVolume.get();
-    VlcIsPlaying *pVarPlaying = (VlcIsPlaying*)m_cVarPlaying.get();
-    VarBool *pVarSeekablePlaying = (VarBool*)m_cVarSeekablePlaying.get();
+    VarBoolImpl *pVarPlaying = (VarBoolImpl*)m_cVarPlaying.get();
+    VarBoolImpl *pVarStopped = (VarBoolImpl*)m_cVarStopped.get();
+    VarBoolImpl *pVarPaused = (VarBoolImpl*)m_cVarPaused.get();
+    VarBoolImpl *pVarSeekable = (VarBoolImpl*)m_cVarSeekable.get();
 
     // Refresh sound volume
     audio_volume_t volume;
@@ -158,20 +162,17 @@ void VlcProc::manage()
         // Get the status of the playlist
         playlist_status_t status = getIntf()->p_sys->p_playlist->i_status;
 
-        pVarPlaying->set( status == PLAYLIST_RUNNING, false );
-        if( pInput->stream.b_seekable )
-        {
-            pVarSeekablePlaying->set( status != PLAYLIST_STOPPED );
-        }
-        else
-        {
-            pVarSeekablePlaying->set( false );
-        }
+        pVarPlaying->set( status == PLAYLIST_RUNNING );
+        pVarStopped->set( status == PLAYLIST_STOPPED );
+        pVarPaused->set( status == PLAYLIST_PAUSED );
+        pVarSeekable->set( pInput->stream.b_seekable );
     }
     else
     {
-        pVarPlaying->set( false, false );
-        pVarSeekablePlaying->set( false );
+        pVarPlaying->set( false );
+        pVarPaused->set( false );
+        pVarStopped->set( true );
+        pVarSeekable->set( false );
         pTime->set( 0, false );
     }
 }

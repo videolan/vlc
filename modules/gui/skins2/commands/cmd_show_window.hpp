@@ -2,7 +2,7 @@
  * cmd_show_window.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cmd_show_window.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: cmd_show_window.hpp,v 1.2 2004/01/18 19:54:45 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -26,33 +26,47 @@
 #define CMD_SHOW_WINDOW_HPP
 
 #include "cmd_generic.hpp"
-#include "../utils/var_bool.hpp"
+#include "../src/generic_window.hpp"
 
 
-template<bool newValue> class CmdShowHideWindow;
-
-typedef CmdShowHideWindow<true> CmdShowWindow;
-typedef CmdShowHideWindow<false> CmdHideWindow;
-
-
-/// "Show/Hide window" command
-template<bool newValue>
-class CmdShowHideWindow: public CmdGeneric
+/// Command to show a window
+class CmdShowWindow: public CmdGeneric
 {
     public:
-        CmdShowHideWindow( intf_thread_t *pIntf, VarBool &rVariable ):
-            CmdGeneric( pIntf ), m_rVariable( rVariable ) {}
-        virtual ~CmdShowHideWindow() {}
+        CmdShowWindow( intf_thread_t *pIntf, GenericWindow &rWin ):
+            CmdGeneric( pIntf ), m_rWin( rWin ) {}
+        virtual ~CmdShowWindow() {}
 
         /// This method does the real job of the command
-        virtual void execute() { m_rVariable.set( newValue ); }
+        virtual void execute() { m_rWin.show(); }
 
         /// Return the type of the command
-        virtual string getType() const { return "show/hide window"; }
+        virtual string getType() const { return "show window"; }
 
     private:
-        /// Reference to the observed variable
-        VarBool &m_rVariable;
+        /// Reference to the window
+        GenericWindow &m_rWin;
 };
+
+
+/// Command to hide a window
+class CmdHideWindow: public CmdGeneric
+{
+    public:
+        CmdHideWindow( intf_thread_t *pIntf, GenericWindow &rWin ):
+            CmdGeneric( pIntf ), m_rWin( rWin ) {}
+        virtual ~CmdHideWindow() {}
+
+        /// This method does the real job of the command
+        virtual void execute() { m_rWin.hide(); }
+
+        /// Return the type of the command
+        virtual string getType() const { return "hide window"; }
+
+    private:
+        /// Reference to the window
+        GenericWindow &m_rWin;
+};
+
 
 #endif

@@ -144,8 +144,6 @@ SOURCES_skins2 = \
 	vars/time.hpp \
 	vars/volume.cpp \
 	vars/volume.hpp \
-	vars/vlcvars.cpp \
-	vars/vlcvars.hpp \
 \
 	win32/win32_dragdrop.cpp \
 	win32/win32_dragdrop.hpp \

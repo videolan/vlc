@@ -2,7 +2,7 @@
  * var_bool.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_bool.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id: var_bool.cpp,v 1.3 2004/01/18 19:54:46 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -28,12 +28,13 @@
 const string VarBool::m_type = "bool";
 
 
-VarBool::VarBool( intf_thread_t *pIntf ): Variable( pIntf ), m_value( false )
+VarBoolImpl::VarBoolImpl( intf_thread_t *pIntf ):
+    VarBool( pIntf ), m_value( false )
 {
 }
 
 
-void VarBool::set( bool value )
+void VarBoolImpl::set( bool value )
 {
     if( value != m_value )
     {
@@ -42,4 +43,46 @@ void VarBool::set( bool value )
         notify();
     }
 }
+
+
+VarBoolAndBool::VarBoolAndBool( intf_thread_t *pIntf,  VarBool &rVar1,
+                                VarBool &rVar2 ):
+    VarBool( pIntf ), m_rVar1( rVar1 ), m_rVar2( rVar2 )
+{
+    m_rVar1.addObserver( this );
+    m_rVar2.addObserver( this );
+}
+
+
+VarBoolAndBool::~VarBoolAndBool()
+{
+    m_rVar1.delObserver( this );
+    m_rVar2.delObserver( this );
+}
+
+
+void VarBoolAndBool::onUpdate( Subject<VarBool> &rVariable )
+{
+    notify();
+}
+
+
+VarNotBool::VarNotBool( intf_thread_t *pIntf, VarBool &rVar ):
+    VarBool( pIntf ), m_rVar( rVar )
+{
+    m_rVar.addObserver( this );
+}
+
+
+VarNotBool::~VarNotBool()
+{
+    m_rVar.delObserver( this );
+}
+
+
+void VarNotBool::onUpdate( Subject<VarBool> &rVariable )
+{
+    notify();
+}
+
 

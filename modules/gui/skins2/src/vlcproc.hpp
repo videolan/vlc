@@ -2,7 +2,7 @@
  * vlcproc.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.hpp,v 1.3 2004/01/11 17:12:17 asmax Exp $
+ * $Id: vlcproc.hpp,v 1.4 2004/01/18 19:54:46 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -28,9 +28,9 @@
 #include "../vars/playlist.hpp"
 #include "../vars/time.hpp"
 #include "../vars/volume.hpp"
-#include "../vars/vlcvars.hpp"
 
 class OSTimer;
+class VarBool;
 
 
 /// Singleton object handling VLC internal state and playlist
@@ -59,9 +59,14 @@ class VlcProc: public SkinObject
         /// Getter for the playing variable
         VarBool &getIsPlayingVar() { return *((VarBool*)(m_cVarPlaying.get())); }
 
-        /// Getter for the seekable/playing variable
-        VarBool &getIsSeekablePlayingVar()
-            { return *((VarBool*)(m_cVarSeekablePlaying.get())); }
+        /// Getter for the stopped variable
+        VarBool &getIsStoppedVar() { return *((VarBool*)(m_cVarStopped.get())); }
+
+        /// Getter for the paused variable
+        VarBool &getIsPausedVar() { return *((VarBool*)(m_cVarPaused.get())); }
+
+        /// Getter for the seekable variable
+        VarBool &getIsSeekableVar() { return *((VarBool*)(m_cVarSeekable.get())); }
 
     protected:
         // Protected because it is a singleton
@@ -81,7 +86,9 @@ class VlcProc: public SkinObject
         VariablePtr m_cVarMute;
         /// Variables related to the input
         VariablePtr m_cVarPlaying;
-        VariablePtr m_cVarSeekablePlaying;
+        VariablePtr m_cVarStopped;
+        VariablePtr m_cVarPaused;
+        VariablePtr m_cVarSeekable;
 
         /// Poll VLC internals to update the status (volume, current time in
         /// the stream, current filename, play/pause/stop status, ...)

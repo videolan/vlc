@@ -2,7 +2,7 @@
  * generic_window.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic_window.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: generic_window.hpp,v 1.2 2004/01/18 19:54:46 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -146,7 +146,7 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
         /// Tooltip
         Tooltip *m_pTooltip;
         /// Variable for the visibility of the window
-        VarBool m_varVisible;
+        VarBoolImpl m_varVisible;
 
         /// Method called when the observed variable is modified
         virtual void onUpdate( Subject<VarBool> &rVariable );
