@@ -226,5 +226,20 @@ Once configured, to build VLC, just run `make'.
 ( If you are using our gcc-3.3.1 cross-compiler you'll need to use:
   PATH=/usr/local/mingw/bin:$PATH make )
 
+Once the compilation is done, you can either run VLC directly from the source
+tree or you can build self-contained VLC packages with the following
+'make' rules:
+
+  make package-win32-base
+   will create a subdirectory named vlc-x.x.x with all the binaries
+   'stripped' (ie. without any debugging symbols).
+
+  make package-win32-zip
+   Same as above but will package the directory in a zip file.
+
+  make package-win32
+   Same as above but will also create an auto-installer package. You will need
+   to have NSIS installed in its default location for this to work.
+
 Well done, now you're ready to use VLC!
 =======================================
