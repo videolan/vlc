@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.206 2002/07/21 18:57:02 sigmunau Exp $
+ * $Id: input.c,v 1.207 2002/07/24 23:11:55 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -56,7 +56,6 @@
 static  int RunThread       ( input_thread_t *p_input );
 static  int InitThread      ( input_thread_t *p_input );
 static void ErrorThread     ( input_thread_t *p_input );
-static void CloseThread     ( input_thread_t *p_input );
 static void EndThread       ( input_thread_t *p_input );
 
 /*****************************************************************************
@@ -572,30 +571,22 @@ static void EndThread( input_thread_t * p_input )
     
     input_DumpStream( p_input );
 
-    /* Tell we're dead */
-    p_input->b_dead = 1;
-
     /* Free all ES and destroy all decoder threads */
     input_EndStream( p_input );
 
     /* Free demultiplexer's data */
     p_input->pf_end( p_input );
     module_Unneed( p_input->p_demux_module );
-    
-    /* Close the access plug-in */
-    CloseThread( p_input );
-}
 
-/*****************************************************************************
- * CloseThread: close the target
- *****************************************************************************/
-static void CloseThread( input_thread_t * p_input )
-{
+    /* Close the access plug-in */
     p_input->pf_close( p_input );
     module_Unneed( p_input->p_access_module );
 
     input_AccessEnd( p_input );
 
     free( p_input->psz_source );
+
+    /* Tell we're dead */
+    p_input->b_dead = 1;
 }
 

@@ -102,6 +102,9 @@ case "x${target_os}" in
     x11_LDFLAGS="${x11_LDFLAGS} -lsocket"
     xvideo_LDFLAGS="${xvideo_LDFLAGS} -lsocket"
     ;;
+  xsolaris*)
+    SYS=solaris
+    ;;
   xbeos)
     SYS=beos
     save_CFLAGS="${save_CFLAGS} -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual"; CFLAGS="${save_CFLAGS}"
@@ -871,11 +874,18 @@ dnl  ipv6 plugin - not for QNX yet
 dnl
 if test "x${SYS}" != "xnto" && test "x${SYS}" != "xmingw32"
 then
-  AC_CHECK_FUNC(inet_pton,[PLUGINS="${PLUGINS} ipv6"],[
+  have_ipv6=0
+  AC_CHECK_FUNC(inet_pton,[have_ipv6=1],[
     AC_CHECK_LIB(resolv,inet_pton,
-      [PLUGINS="${PLUGINS} ipv6"
+      [have_ipv6=1
        ipv6_LDFLAGS="${ipv6_LDFLAGS} -lresolv"])
   ])
+  AC_MSG_CHECKING(for sockaddr_in6 in netinet/in.h)
+  AC_EGREP_HEADER(sockaddr_in6,netinet/in.h,
+    [AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no); have_ipv6=0])
+  if test x$have_ipv6 = x1; then
+    PLUGINS="${PLUGINS} ipv6"
+  fi
 fi
 if test "x${SYS}" = "xmingw32"
 then

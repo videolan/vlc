@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.16 2002/07/21 23:40:24 sam Exp $
+ * $Id: input_ext-plugins.c,v 1.17 2002/07/24 23:11:55 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -548,7 +548,6 @@ ssize_t input_FillBuffer( input_thread_t * p_input )
                               p_input->i_bufsize );
     if( i_ret < 0 ) i_ret = 0;
 
-    /* We take back the lock before fiddling with buffers */
     p_input->p_data_buffer = p_buf;
     p_input->p_current_data = (byte_t *)p_buf + sizeof(data_buffer_t);
     p_input->p_last_data = p_input->p_current_data + i_remains + i_ret;
@@ -601,6 +600,11 @@ ssize_t input_SplitBuffer( input_thread_t * p_input,
         {
             i_size = i_ret;
         }
+    }
+
+    if ( !i_size )
+    {
+        return 0;
     }
 
     *pp_data = input_ShareBuffer( p_input->p_method_data,
