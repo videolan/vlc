@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_dummy.c,v 1.16 2002/03/01 00:33:18 massiot Exp $
+ * $Id: input_dummy.c,v 1.17 2002/03/02 03:51:23 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -97,6 +97,7 @@ void _M( demux_getfunctions )( function_list_t * p_function_list )
 static int DummyOpen( input_thread_t * p_input )
 {
     p_input->stream.i_method = INPUT_METHOD_NONE;
+
     /* Force dummy demux plug-in */
     p_input->psz_demux = "vlc";
     return( 0 );
@@ -190,6 +191,7 @@ static int DummyDemux( struct input_thread_s *p_input )
     switch( p_method->i_command )
     {
         case COMMAND_QUIT:
+            p_main->p_intf->b_die = 1;
             p_input->b_die = 1;
             break;
 

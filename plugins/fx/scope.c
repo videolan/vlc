@@ -2,7 +2,7 @@
  * scope.c : Scope effect module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: scope.c,v 1.3 2002/03/01 16:07:00 sam Exp $
+ * $Id: scope.c,v 1.4 2002/03/02 03:51:23 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -234,9 +234,13 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
         /* We only support 2 channels for now */
         for( i_index = 0 ; i_index < 2 ; i_index++ )
         {
-           ppp_area[i_index][0] = p_outpic->p[0].p_pixels + i_index * p_outpic->p[0].i_lines / p_aout->i_channels * p_outpic->p[0].i_pitch;
-           ppp_area[i_index][1] = p_outpic->p[1].p_pixels + i_index * p_outpic->p[1].i_lines / p_aout->i_channels * p_outpic->p[1].i_pitch;
-           ppp_area[i_index][2] = p_outpic->p[2].p_pixels + i_index * p_outpic->p[2].i_lines / p_aout->i_channels * p_outpic->p[2].i_pitch;
+            int j;
+            for( j = 0 ; j < 3 ; j++ )
+            {
+                ppp_area[i_index][j] =
+                    p_outpic->p[j].p_pixels + i_index * p_outpic->p[j].i_lines
+                                / p_aout->i_channels * p_outpic->p[j].i_pitch;
+            }
         }
 
         for( i_index = 0, p_sample = (u16*)p_buffer;
@@ -274,7 +278,7 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
 
         /* Display the picture - FIXME: find a better date :-) */
         vout_DatePicture( p_aout->p_sys->p_vout, p_outpic,
-                          p_aout->date + i_image * 10000 );
+                          p_aout->date + i_image * 20000 );
         vout_DisplayPicture( p_aout->p_sys->p_vout, p_outpic );
 
         p_buffer += SCOPE_WIDTH * 4;

@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.18 2002/03/01 00:33:17 massiot Exp $
+ * $Id: input_ext-plugins.h,v 1.19 2002/03/02 03:51:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -151,7 +151,7 @@ static __inline__ void input_NullPacket( input_thread_t * p_input,
     if( (p_pad_data = input_NewPacket( p_input->p_method_data,
                     PADDING_PACKET_SIZE )) == NULL )
     {
-        intf_ErrMsg("Out of memory");
+        intf_ErrMsg("input error: no new packet");
         p_input->b_error = 1;
         return;
     }
@@ -171,7 +171,7 @@ static __inline__ void input_NullPacket( input_thread_t * p_input,
     {
         if( (p_pes = input_NewPES( p_input->p_method_data )) == NULL )
         {
-            intf_ErrMsg("Out of memory");
+            intf_ErrMsg("input error: no PES packet");
             p_input->b_error = 1;
             return;
         }

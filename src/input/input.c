@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.182 2002/03/02 03:15:22 stef Exp $
+ * $Id: input.c,v 1.183 2002/03/02 03:51:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Alexis Guillard <alexis.guillard@bt.com>
@@ -145,6 +145,9 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->pf_set_area    = NULL;
     p_input->pf_set_program = NULL;
     
+    p_input->i_bufsize = 0;
+    p_input->i_mtu = 0;
+
     /* Initialize statistics */
     p_input->c_loops                    = 0;
     p_input->stream.c_packets_read      = 0;
@@ -528,7 +531,7 @@ static int InitThread( input_thread_t * p_input )
         p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
     }
 
-    if( p_input->p_current_data == NULL )
+    if( p_input->p_current_data == NULL && p_input->pf_read != NULL )
     {
         while( !input_FillBuffer( p_input ) )
         {
