@@ -278,8 +278,9 @@
  * - long, in order to perform the buffer calculations as few as possible */
 #define AOUT_BUFFER_DURATION            100000
 
-/* Environment variable for MPEG audio decoder */
+/* Environment variable for audio decoders */
 #define ADEC_MPEG_VAR                   "vlc_mpeg_adec"
+#define ADEC_AC3_VAR                   "vlc_ac3_adec"
 
 /*****************************************************************************
  * Video configuration

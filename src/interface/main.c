@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.146 2002/01/21 00:52:07 sam Exp $
+ * $Id: main.c,v 1.147 2002/02/05 21:46:41 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -132,12 +132,13 @@
 #define OPT_STATS               194
 
 #define OPT_MPEG_ADEC           200
+#define OPT_AC3_ADEC            201
 
-#define OPT_NOMMX               201
-#define OPT_NO3DNOW             202
-#define OPT_NOMMXEXT            203
-#define OPT_NOSSE               204
-#define OPT_NOALTIVEC           205
+#define OPT_NOMMX               210
+#define OPT_NO3DNOW             211
+#define OPT_NOMMXEXT            212
+#define OPT_NOSSE               213
+#define OPT_NOALTIVEC           214
 
 /* Usage fashion */
 #define USAGE                     0
@@ -210,6 +211,7 @@ static const struct option longopts[] =
 
     /* Decoder options */
     {   "mpeg_adec",        1,          0,      OPT_MPEG_ADEC },
+    {   "ac3_adec",         1,          0,      OPT_AC3_ADEC },
 
     /* CPU options */
     {   "nommx",            0,          0,      OPT_NOMMX },
@@ -861,6 +863,10 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             main_PutPszVariable( ADEC_MPEG_VAR, optarg );
             break;
 
+        case OPT_AC3_ADEC:
+            main_PutPszVariable( ADEC_AC3_VAR, optarg );
+            break;
+
         /* CPU options */
         case OPT_NOMMX:
             p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_MMX;
@@ -995,7 +1001,8 @@ static void Usage( int i_fashion )
           "\n      --channels                 \tenable channels"
           "\n      --channelserver <host>     \tchannel server address"
           "\n"
-          "\n      --mpeg_adec <builtin|mad>  \tchoose audio decoder"
+          "\n      --mpeg_adec <builtin|mad>  \tchoose MPEG audio decoder"
+          "\n      --ac3_adec <builtin|liba52>  \tchoose AC3 audio decoder"
           "\n"
           "\n      --nommx                    \tdisable CPU's MMX support"
           "\n      --no3dnow                  \tdisable CPU's 3D Now! support"
@@ -1075,7 +1082,8 @@ static void Usage( int i_fashion )
 
     /* Decoder parameters */
     intf_MsgImm( "\nDecoder parameters:"
-        "\n  " ADEC_MPEG_VAR "=<builtin|mad>          \taudio decoder" );
+        "\n  " ADEC_MPEG_VAR "=<builtin|mad>          \tMPEG audio decoder"
+        "\n  " ADEC_AC3_VAR "=<builtin|liba52>        \tAC3 audio decoder" );
 }
 
 /*****************************************************************************
