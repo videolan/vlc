@@ -2,7 +2,7 @@
  * idct.c : IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct.c,v 1.3 2001/01/16 02:16:38 sam Exp $
+ * $Id: idct.c,v 1.4 2001/01/16 05:04:25 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -34,6 +34,7 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -142,6 +143,11 @@ static void idct_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int idct_Probe( probedata_t *p_data )
 {
+    if( TestMethod( IDCT_METHOD_VAR, "idct" ) )
+    {
+        return( 999 );
+    }
+
     /* This plugin always works */
     return( 50 );
 }

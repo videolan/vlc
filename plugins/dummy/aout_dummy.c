@@ -29,7 +29,7 @@
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
+#include "tests.h"
 
 #include "audio_output.h"                                   /* aout_thread_t */
 
@@ -78,6 +78,11 @@ void aout_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int aout_Probe( probedata_t *p_data )
 {
+    if( TestMethod( AOUT_METHOD_VAR, "dummy" ) )
+    {
+        return( 999 );
+    }
+
     /* The dummy plugin always works but give it the lower possible score */
     return( 1 );
 }

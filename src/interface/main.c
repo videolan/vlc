@@ -79,7 +79,8 @@
 #define OPT_WIDTH               163
 #define OPT_HEIGHT              164
 #define OPT_COLOR               165
-#define OPT_YUV                 166
+#define OPT_IDCT                166
+#define OPT_YUV                 167
 
 #define OPT_VLANS               170
 #define OPT_SERVER              171
@@ -121,6 +122,7 @@ static const struct option longopts[] =
     {   "height",           1,          0,      OPT_HEIGHT },
     {   "grayscale",        0,          0,      'g' },
     {   "color",            0,          0,      OPT_COLOR },
+    {   "idct",             1,          0,      OPT_IDCT },
     {   "yuv",              1,          0,      OPT_YUV },
 
     /* DVD options */
@@ -556,6 +558,9 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_COLOR:                                           /* --color */
             main_PutIntVariable( VOUT_GRAYSCALE_VAR, 0 );
             break;
+	case OPT_IDCT:                                             /* --idct */
+            main_PutPszVariable( IDCT_METHOD_VAR, optarg );
+            break;
         case OPT_YUV:                                               /* --yuv */
             main_PutPszVariable( YUV_METHOD_VAR, optarg );
             break;
@@ -645,16 +650,20 @@ static void Usage( int i_fashion )
     /* Options */
     intf_Msg( "\nOptions:"
               "\n      --noaudio                  \tdisable audio"
-              "\n      --aout <plugin>            \taudio output method"
+              "\n      --aout <module>            \taudio output method"
               "\n      --stereo, --mono           \tstereo/mono audio"
               "\n"
               "\n      --novideo                  \tdisable video"
-              "\n      --vout <plugin>            \tvideo output method"
+              "\n      --vout <module>            \tvideo output method"
               "\n      --display <display>        \tdisplay string"
               "\n      --width <w>, --height <h>  \tdisplay dimensions"
               "\n  -g, --grayscale                \tgrayscale output"
               "\n      --color                    \tcolor output"
+              "\n      --idct <module>            \tIDCT method"
+              "\n      --yuv <module>             \tYUV method"
+              "\n      --synchro <type>           \tforce synchro algorithm"
               "\n"
+              "\n      --dvd                      \tDVD mode"
               "\n  -a, --dvdaudio <type>          \tchoose DVD audio type"
               "\n  -c, --dvdchannel <channel>     \tchoose DVD audio channel"
               "\n  -s, --dvdsubtitle <channel>    \tchoose DVD subtitle channel"
@@ -663,9 +672,6 @@ static void Usage( int i_fashion )
               "\n      --server <host>            \tvideo server address"
               "\n      --port <port>              \tvideo server port"
               "\n      --broadcast                \tlisten to a broadcast"
-              "\n      --dvd                      \tread dvd"
-              "\n"
-              "\n      --synchro <type>           \tforce synchro algorithm"
               "\n"
               "\n      --warning <level>          \tdisplay warning messages"
               "\n"
@@ -696,10 +702,14 @@ static void Usage( int i_fashion )
               "\n  " VOUT_WIDTH_VAR "=<width>               \tdisplay width"
               "\n  " VOUT_HEIGHT_VAR "=<height>             \tdislay height"
               "\n  " VOUT_FB_DEV_VAR "=<filename>           \tframebuffer device path"
-              "\n  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output" );
+              "\n  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output"
+              "\n  " IDCT_METHOD_VAR "=<method name>        \tIDCT method"
+              "\n  " YUV_METHOD_VAR "=<method name>         \tYUV method"
+              "\n  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm" );
 
     /* DVD parameters */
     intf_Msg( "\nDVD parameters:"
+              "\n  " INPUT_DVD_DEVICE_VAR "=<device>           \tDVD device"
               "\n  " INPUT_DVD_AUDIO_VAR "={ac3|lpcm|mpeg|off} \taudio type"
               "\n  " INPUT_DVD_CHANNEL_VAR "=[0-15]            \taudio channel"
               "\n  " INPUT_DVD_SUBTITLE_VAR "=[0-31]           \tsubtitle channel" );
@@ -712,12 +722,8 @@ static void Usage( int i_fashion )
               "\n  " INPUT_BROADCAST_VAR "={1|0}            \tbroadcast mode"
               "\n  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server"
               "\n  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port"
-              "\n  " INPUT_DVD_DEVICE_VAR "=<device>        \tDVD device"
  );
 
-    /* Synchro parameters */
-    intf_Msg( "\nSynchro parameters:"
-              "\n  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm");
 }
 
 /*****************************************************************************

@@ -41,6 +41,7 @@
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
 
 #include "audio_output.h"                                   /* aout_thread_t */
 
@@ -127,9 +128,7 @@ static int aout_Probe( probedata_t *p_data )
         return ( 0 );
     }
 
-    /* Otherwise, we may think it'll work */ 
-
-    /* Close */
+    /* Close it */
     i_close_return = snd_pcm_close ( local_sys.p_alsa_handle );
     
     if( i_close_return )
@@ -137,8 +136,14 @@ static int aout_Probe( probedata_t *p_data )
         intf_ErrMsg( "Error closing alsa device in aout_probe; exit=%i",
                      i_close_return );
         intf_ErrMsg( "This means : %s",snd_strerror( i_close_return ) );
+        return( 0 );
     }
     
+    if( TestMethod( AOUT_METHOD_VAR, "alsa" ) )
+    {
+        return( 999 );
+    }
+
     /* And return score */
     return( 100 );
 }    

@@ -36,7 +36,6 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
 
 #include "video.h"
 #include "video_output.h"

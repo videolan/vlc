@@ -38,6 +38,7 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
 #include "modules.h"
 
 #include "video.h"
@@ -75,6 +76,11 @@ void yuv_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int yuv_Probe( probedata_t *p_data )
 {
+    if( TestMethod( YUV_METHOD_VAR, "yuv" ) )
+    {
+        return( 999 );
+    }
+
     /* This module always works */
     return( 100 );
 }

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.70 2001/01/16 04:41:20 stef Exp $
+ * $Id: input.c,v 1.71 2001/01/16 05:04:25 sam Exp $
  *
  * Authors: 
  *
@@ -363,7 +363,7 @@ static void FileOpen( input_thread_t * p_input )
 
     if( stat( p_config->p_source, &stat_info ) == (-1) )
     {
-        intf_ErrMsg( "input error: cannot stat() file %s (%s)",
+        intf_ErrMsg( "input error: cannot stat() file `%s' (%s)",
                      p_config->p_source, strerror(errno));
         p_input->b_error = 1;
         return;
@@ -388,7 +388,7 @@ static void FileOpen( input_thread_t * p_input )
     else
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
-        intf_ErrMsg( "input error: unknown file type for %s",
+        intf_ErrMsg( "input error: unknown file type for `%s'",
                      p_config->p_source );
         p_input->b_error = 1;
         return;
@@ -401,7 +401,7 @@ static void FileOpen( input_thread_t * p_input )
     if( (p_input->i_handle = open( p_config->p_source,
                                    /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
     {
-        intf_ErrMsg( "input error: cannot open file %s", strerror(errno) );
+        intf_ErrMsg( "input error: cannot open file (%s)", strerror(errno) );
         p_input->b_error = 1;
         return;
     }
@@ -418,7 +418,7 @@ static void DvdOpen( input_thread_t * p_input )
     if( (p_input->i_handle = open( p_input->p_config->p_source,
                                    O_RDONLY|O_LARGEFILE )) == (-1) )
     {
-        intf_ErrMsg( "input error: cannot open device %s", strerror(errno) );
+        intf_ErrMsg( "input error: cannot open device (%s)", strerror(errno) );
         p_input->b_error = 1;
         return;
     }

@@ -77,7 +77,14 @@ static int yuv_Probe( probedata_t *p_data )
     /* Test for MMX support in the CPU */
     if( TestCPU() & CPU_CAPABILITY_MMX )
     {
-        return( 100 );
+        if( TestMethod( YUV_METHOD_VAR, "yuvmmx" ) )
+        {
+            return( 999 );
+        }
+        else
+        {
+            return( 100 );
+        }
     }
     else
     {

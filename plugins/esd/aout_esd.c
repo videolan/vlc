@@ -44,7 +44,7 @@
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
+#include "tests.h"
 
 #include "audio_output.h"                                   /* aout_thread_t */
 
@@ -98,6 +98,11 @@ void aout_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int aout_Probe( probedata_t *p_data )
 {
+    if( TestMethod( AOUT_METHOD_VAR, "esd" ) )
+    {
+        return( 999 );
+    }
+
     /* We don't have to test anything -- if we managed to open this plugin,
      * it means we have the appropriate libs. */
     return( 50 );

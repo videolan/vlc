@@ -19,7 +19,7 @@
 vlc, fbvlc, gvlc \- The VideoLAN Client
 .SH SYNOPSIS
 .B vlc
-.RI [ OPTIONS ] 
+.RI [ OPTIONS ]
 .RI [ PARAMETERS ]
 .RI [ FILE ]...
 .SH DESCRIPTION
@@ -35,8 +35,8 @@ A summary of options is included below.
 .B \-\-noaudio
 Disable audio output.
 .TP
-.B \-\-aout <plugin>
-Specify an audio output plugin: "dsp", "esd", for instance.
+.B \-\-aout <module>
+Specify an audio output module: "dsp", "esd", for instance.
 .TP
 .B \-\-stereo, \-\-mono
 Choose stereo or mono audio output
@@ -44,11 +44,14 @@ Choose stereo or mono audio output
 .B \-\-novideo
 Disable video output.
 .TP
-.B \-\-vout <plugin>
-Specify a video output plugin: "gnome", "fb", "glide", for instance.
+.B \-\-vout <module>
+Specify a video output module: "gnome", "fb", "glide", for instance.
 .TP
-.B \-\-yuv <plugin>
-Specify a YUV plugin: "mmx", "nommx", for instance.
+.B \-\-idct <module>
+Specify a module for IDCT: "idct", "idctmmx", for instance.
+.TP
+.B \-\-yuv <module>
+Specify a YUV module: "yuv", "yuvmmx", for instance.
 .TP
 .B \-\-display <display>
 Specify the display name.
@@ -61,6 +64,24 @@ Grayscale output.
 .TP
 .B \-\-color
 Color output.
+.TP
+.B \-\-synchro <type>
+Choose a fixed synchro value instead of the internal auto-adaptative
+heuristics based on CPU usage.
+
+`I' displays only I images, `IP' displays I and P images, `IP+'
+displays I and P images and every second B image, and `IPB' forces
+displaying of all images.
+
+Note that the vlc is certainly going to crash if you ask it to
+display more images than your CPU can cope with.
+.TP
+.B \-\-dvd
+Activate DVD mode, by directly accessing the DVD drive (no need to mount
+it). By default,
+.B vlc
+opens /dev/dvd, but this behaviour may be overridden by the vlc_dvd_device
+environment variable (see below).
 .TP
 .B \-a, \-\-dvdaudio [ ac3 | lpcm | mpeg | off ]
 Choose the audio channel type. Most DVDs have AC3 audio channels, but
@@ -81,17 +102,6 @@ Disable VLANs support.
 .B \-\-server <host>, \-\-port <port>
 Choose the video server address and port.
 .TP
-.B \-\-synchro <type>
-Choose a fixed synchro value instead of the internal auto-adaptative
-heuristics based on CPU usage.
-
-`I' displays only I images, `IP' displays I and P images, `IP+'
-displays I and P images and every second B image, and `IPB' forces
-displaying of all images.
-
-Note that the vlc is certainly going to crash if you ask it to
-display more images than your CPU can cope with.
-.TP
 .B \-h, \-\-help
 Print help and exit.
 .TP
@@ -107,6 +117,7 @@ also accepts a lot of parameters to customize its behaviour.
 .B Interface parameters:
  vlc_init=<filename>      initialization script
  vlc_channels=<filename>  channels list
+ warning_level=<level>    warning level
 .TP
 .B Audio parameters:
  vlc_aout=<method name>   audio method
@@ -115,14 +126,18 @@ also accepts a lot of parameters to customize its behaviour.
  vlc_audio_rate=<rate>    output rate
 .TP
 .B Video parameters:
- vlc_vout=<method name>   display method
- vlc_display=<display>    display used
- vlc_width=<width>        display width
- vlc_height=<height>      dislay height
- vlc_fb_dev=<filename>    framebuffer device path
- vlc_grayscale={1|0}      grayscale or color output
+ vlc_vout=<method name>        display method
+ vlc_display=<display>         display used
+ vlc_width=<width>             display width
+ vlc_height=<height>           dislay height
+ vlc_fb_dev=<filename>         framebuffer device
+ vlc_grayscale={1|0}           grayscale or color
+ vlc_idct=<method name>        IDCT method
+ vlc_yuv=<method name>         YUV method
+ vlc_synchro={I|I+|IP|IP+|IPB} synchro algorithm
 .TP
 .B DVD parameters:
+ vlc_dvd_device=<device>           DVD device
  vlc_dvd_audio={ac3|lpcm|mpeg|off} audio type
  vlc_dvd_channel=[0-15]            audio channel
  vlc_dvd_subtitle=[0-31]           subtitle channel
@@ -130,12 +145,10 @@ also accepts a lot of parameters to customize its behaviour.
 .B Input parameters:
  vlc_server=<hostname>    video server
  vlc_server_port=<port>   video server port
+ vlc_broadcast={1|0}      broadcast mode
  vlc_iface=<interface>    network interface
  vlc_vlan_server=<host>   vlan server
  vlc_vlan_port=<port>     vlan server port
-.TP
-.B Synchro parameters:
- vlc_synchro=<type>       synchro algorithm
 
 .SH SEE ALSO
 .BR vls (1), vlms (1)
