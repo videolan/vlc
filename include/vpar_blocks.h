@@ -60,8 +60,6 @@ typedef struct
 {
     int                     i_mb_type, i_motion_type, i_mv_count, i_mv_format;
     boolean_t               b_dmv;
-    /* AddressIncrement information */
-    int                     i_addr_inc;
 
     /* Macroblock Type */
     int                     i_coded_block_pattern;

@@ -820,23 +820,25 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
 static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
 {
     /* Index in the lookup table mb_addr_inc */
-    int    i_index = ShowBits( &p_vpar->bit_stream, 11 );
+    int     i_index = ShowBits( &p_vpar->bit_stream, 11 );
     
-    p_vpar->mb.i_addr_inc = 0;
+    int     i_addr_inc = 0;
     
     /* Test the presence of the escape character */
     while( i_index == 8 )
     {
         DumpBits( &p_vpar->bit_stream, 11 );
-        p_vpar->mb.i_addr_inc += 33;
+        i_addr_inc += 33;
         i_index = ShowBits( &p_vpar->bit_stream, 11 );
     }
     
     /* Affect the value from the lookup table */
-    p_vpar->mb.i_addr_inc += p_vpar->pl_mb_addr_inc[i_index].i_value;
+    i_addr_inc += p_vpar->pl_mb_addr_inc[i_index].i_value;
     
     /* Dump the good number of bits */
     DumpBits( &p_vpar->bit_stream, p_vpar->pl_mb_addr_inc[i_index].i_length );
+
+    return i_addr_inc;
 }
 
 /*****************************************************************************
@@ -1067,17 +1069,11 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
     int         i_code;
     int         i_nc;
     int         i_coef;
-    int         i_type;
-    int         i_select;
-    int         i_offset;
     int         i_run;
     int         i_level;
     boolean_t   b_intra;
     boolean_t   b_sign;
-    /* Lookup table for the offset in the tables for ac coef decoding */
-    static lookup_t pl_offset_table[8] = { { 12, 4 }, { 8, 4 }, { 6, 8 },
-                                           { 4, 16 }, { 3, 16 }, { 2, 16 },
-                                           { 1, 16 }, { 0, 16 } };
+    
     /* There is no special decodding for DC coefficient in non intra blocs
      * except that we won't use exactly the same table B.14 note 3 & 4 */
     /* Decoding of the coefficients */
@@ -1088,8 +1084,10 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
     i_nc = 0;
 #endif
 
+    i_coef = 0;
+
     b_intra = p_vpar->picture.b_intra_vlc_format;
-    for( i_dummy = 1; i_dummy < 64; i_dummy++ )
+    for( i_dummy = 0; i_dummy < 64; i_dummy++ )
     {
         i_code = ShowBits( &p_vpar->bit_stream, 16 );
         i_run = (*p_vpar->pppl_dct_coef[b_intra][i_code]).i_run;
@@ -1155,10 +1153,6 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
     /* Lookup Table for the chromatic component */
     static int pi_cc_index[12] = { 0, 0, 0, 0, 1, 2, 1, 2, 1, 2 };
     
-    /* Lookup table for the offset in the tables for ac coef decoding */
-    static lookup_t pl_offset_table[8] = { { 12, 4 }, { 8, 4 }, { 6, 8 },
-                                           { 4, 16 }, { 3, 16 }, { 2, 16 },
-                                           { 1, 16 }, { 0, 16 } };
     i_cc = pi_cc_index[i_b];
     
     /* Determine whether it is luminance or not (chrominance) */
