@@ -427,14 +427,10 @@ void DialogsProvider::OnOpenDirectory( wxCommandEvent& event )
         playlist_item_t *p_item;
         wxString path = p_dir_dialog->GetPath();
 
-        int i_id = playlist_Add( p_playlist, (const char *)path.mb_str(),
-                                             (const char *)path.mb_str(),
-                                             PLAYLIST_APPEND, PLAYLIST_END );
-        p_item = playlist_LockItemGetById( p_playlist, i_id );
-        if( p_item )
-        {
-            input_CreateThread( p_intf, &p_item->input );
-        }
+        playlist_Add( p_playlist, (const char *)path.mb_str(),
+                      (const char *)path.mb_str(),
+                      PLAYLIST_APPEND | (event.GetInt() ? PLAYLIST_GO : 0),
+                      PLAYLIST_END );
     }
 
     vlc_object_release( p_playlist );
