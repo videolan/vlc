@@ -2,7 +2,7 @@
  * menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: menu.c,v 1.4 2003/01/20 20:07:07 fenrir Exp $
+ * $Id: menu.c,v 1.5 2003/01/22 00:32:32 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -372,20 +372,23 @@ static void GtkDeinterlaceUpdate( intf_thread_t *p_intf, char *psz_mode )
         free( psz_filter );
 
     /* now restart all video stream */
-    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-#define ES p_intf->p_sys->p_input->stream.pp_es[i]
-    /* create a set of language buttons and append them to the container */
-    for( i = 0 ; i < p_intf->p_sys->p_input->stream.i_es_number ; i++ )
+    if( p_intf->p_sys->p_input )
     {
-        if( ( ES->i_cat == VIDEO_ES ) &&
-                ES->p_decoder_fifo != NULL )
+        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
+#define ES p_intf->p_sys->p_input->stream.pp_es[i]
+        /* create a set of language buttons and append them to the container */
+        for( i = 0 ; i < p_intf->p_sys->p_input->stream.i_es_number ; i++ )
         {
-            input_UnselectES( p_intf->p_sys->p_input, ES );
-            input_SelectES( p_intf->p_sys->p_input, ES );
-        }
+            if( ( ES->i_cat == VIDEO_ES ) &&
+                    ES->p_decoder_fifo != NULL )
+            {
+                input_UnselectES( p_intf->p_sys->p_input, ES );
+                input_SelectES( p_intf->p_sys->p_input, ES );
+            }
 #undef ES
+        }
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
-    vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 }
 
 static void GtkMenubarDeinterlaceToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
