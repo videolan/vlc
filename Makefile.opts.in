@@ -217,10 +217,7 @@ LIB += @LIB@
 #
 # C compiler flags: mainstream compilation
 #
-DEFINE += @DEFINE@
 CFLAGS += $(DEFINE) $(INCLUDE)
-CFLAGS += -Wall -Winline
-CFLAGS += -pipe
 CFLAGS += -D_REENTRANT
 CFLAGS += -D_GNU_SOURCE
 
@@ -247,12 +244,11 @@ endif
 
 # Optimizations : don't compile debug versions with them
 ifeq ($(OPTIMS),1)
-CFLAGS += -O3
-CFLAGS += -ffast-math -funroll-loops
+CFLAGS += @CFLAGS_OPTIM@
 ifneq ($(DEBUG),1)
 ifneq ($(GPROF),1)
 ifneq ($(CPROF),1)
-CFLAGS += -fomit-frame-pointer
+CFLAGS += @CFLAGS_OPTIM_NODEBUG@
 endif
 endif
 endif
@@ -285,7 +281,7 @@ endif
 # C compiler flags: dependancies
 #
 DCFLAGS += $(INCLUDE)
-DCFLAGS += -MM
+DCFLAGS += -M
 
 #
 # C compiler flags: linking

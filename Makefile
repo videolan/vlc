@@ -169,24 +169,6 @@ VLC_OBJ := $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ)
 H_OBJ :=	src/misc/modules_builtin.h
 
 #
-# Included headers which don't get noticed by Makefile.dep
-#
-H_DEP :=	videolan/vlc.h \
-		defs.h \
-		config.h \
-		int_types.h \
-		modules_inner.h \
-		common.h \
-		beos_specific.h \
-		darwin_specific.h \
-		win32_specific.h \
-		intf_msg.h \
-		threads.h \
-		mtime.h \
-		modules.h \
-		main.h
-
-#
 # Other lists of files
 #
 C_DEP := $(C_OBJ:%.o=.dep/%.d)
@@ -556,13 +538,13 @@ $(CPP_DEP): %.dpp: FORCE
 	@$(MAKE) -s --no-print-directory -f Makefile.dep $@
 
 $(C_OBJ): %.o: Makefile.opts Makefile.dep Makefile
-$(C_OBJ): %.o: $(H_OBJ) $(H_DEP:%=include/%)
+$(C_OBJ): %.o: $(H_OBJ)
 $(C_OBJ): %.o: .dep/%.d
 $(C_OBJ): %.o: %.c
 	$(CC) $(CFLAGS) $(CFLAGS_VLC) -c -o $@ $<
 
 $(CPP_OBJ): %.o: Makefile.opts Makefile.dep Makefile
-$(CPP_OBJ): %.o: $(H_OBJ) $(H_DEP:%=include/%)
+$(CPP_OBJ): %.o: $(H_OBJ)
 $(CPP_OBJ): %.o: .dep/%.dpp
 $(CPP_OBJ): %.o: %.cpp
 	$(CC) $(CFLAGS) $(CFLAGS_VLC) -c -o $@ $<

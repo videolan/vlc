@@ -206,6 +206,84 @@ if test x"$ac_cv_c_inline_limit" != x"no"; then
     save_CFLAGS="${save_CFLAGS} -finline-limit-30000"
 fi
 
+dnl Check for -W or -w flags
+AC_CACHE_CHECK([if \$CC accepts -Wall -Winline],
+    [ac_cv_c_Wall_Winline],
+    [CFLAGS="${save_CFLAGS} -Wall -Winline"
+     AC_TRY_COMPILE([],,ac_cv_c_Wall_Winline=yes, ac_cv_c_Wall_Winline=no)])
+if test x"$ac_cv_c_Wall_Winline" != x"no"; then
+    save_CFLAGS="${save_CFLAGS} -Wall -Winline"
+else
+    AC_CACHE_CHECK([if \$CC accepts -wall -winline],
+        [ac_cv_c_wall_winline],
+        [CFLAGS="${save_CFLAGS} -wall -winline"
+         AC_TRY_COMPILE([],,ac_cv_c_wall_winline=yes, ac_cv_c_wall_winline=no)])
+    if test x"$ac_cv_c_wall_winline" != x"no"; then
+        save_CFLAGS="${save_CFLAGS} -wall -winline"
+    fi
+fi
+
+dnl Check for -pipe
+AC_CACHE_CHECK([if \$CC accepts -pipe],
+    [ac_cv_c_pipe],
+    [CFLAGS="${save_CFLAGS} -pipe"
+     AC_TRY_COMPILE([],,ac_cv_c_pipe=yes, ac_cv_c_pipe=no)])
+if test x"$ac_cv_c_pipe" != x"no"; then
+    save_CFLAGS="${save_CFLAGS} -pipe"
+fi
+
+dnl Check for various optimization flags
+AC_CACHE_CHECK([if \$CC accepts -O3],
+    [ac_cv_c_o3],
+    [CFLAGS="${save_CFLAGS} -O3"
+     AC_TRY_COMPILE([],,ac_cv_c_o3=yes, ac_cv_c_o3=no)])
+if test x"$ac_cv_c_o3" != x"no"; then
+    CFLAGS_OPTIM="${CFLAGS_OPTIM} -O3"
+else
+    AC_CACHE_CHECK([if \$CC accepts -O2],
+        [ac_cv_c_o2],
+        [CFLAGS="${save_CFLAGS} -O2"
+         AC_TRY_COMPILE([],,ac_cv_c_o2=yes, ac_cv_c_o2=no)])
+    if test x"$ac_cv_c_o2" != x"no"; then
+        CFLAGS_OPTIM="${CFLAGS_OPTIM} -O2"
+    else
+        AC_CACHE_CHECK([if \$CC accepts -O],
+            [ac_cv_c_o],
+            [CFLAGS="${save_CFLAGS} -O"
+             AC_TRY_COMPILE([],,ac_cv_c_o=yes, ac_cv_c_o=no)])
+        if test x"$ac_cv_c_o" != x"no"; then
+            CFLAGS_OPTIM="${CFLAGS_OPTIM} -O"
+        fi
+    fi
+fi
+
+dnl Check for -ffast-math
+AC_CACHE_CHECK([if \$CC accepts -ffast-math],
+    [ac_cv_c_fast_math],
+    [CFLAGS="${save_CFLAGS} -ffast-math"
+     AC_TRY_COMPILE([],,ac_cv_c_fast_math=yes, ac_cv_c_fast_math=no)])
+if test x"$ac_cv_c_fast_math" != x"no"; then
+    CFLAGS_OPTIM="${CFLAGS_OPTIM} -ffast-math"
+fi
+
+dnl Check for -funroll-loops
+AC_CACHE_CHECK([if \$CC accepts -funroll-loops],
+    [ac_cv_c_unroll_loops],
+    [CFLAGS="${save_CFLAGS} -funroll-loops"
+     AC_TRY_COMPILE([],,ac_cv_c_unroll_loops=yes, ac_cv_c_unroll_loops=no)])
+if test x"$ac_cv_c_unroll_loops" != x"no"; then
+    CFLAGS_OPTIM="${CFLAGS_OPTIM} -funroll-loops"
+fi
+
+dnl Check for -fomit-frame-pointer
+AC_CACHE_CHECK([if \$CC accepts -fomit-frame-pointer],
+    [ac_cv_c_omit_frame_pointer],
+    [CFLAGS="${save_CFLAGS} -fomit-frame-pointer"
+     AC_TRY_COMPILE([],,ac_cv_c_omit_frame_pointer=yes, ac_cv_c_omit_frame_pointer=no)])
+if test x"$ac_cv_c_omit_frame_pointer" != x"no"; then
+    CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fomit-frame-pointer"
+fi
+
 dnl Check for Darwin plugin linking flags
 AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error],
     [ac_cv_ld_darwin],
@@ -1062,11 +1140,11 @@ dnl
 dnl  Windows MFC interface module
 dnl
 AC_ARG_ENABLE(win32,
-  [  --enable-win32          Windows DirectX support (default disabled)])
-if test "x$enableval" = "xyes"
-then
-  PLUGINS="${PLUGINS} win32"
-fi
+  [  --enable-win32          Windows DirectX support (default disabled)],
+  [ if test "x$enableval" != "xno"
+    then
+      PLUGINS="${PLUGINS} win32"
+    fi ])
 
 dnl
 dnl  Glide module
@@ -1321,7 +1399,6 @@ AC_SUBST(ARCH)
 AC_SUBST(PLUGINS)
 AC_SUBST(BUILTINS)
 AC_SUBST(ALIASES)
-AC_SUBST(DEFINE)
 AC_SUBST(INCLUDE)
 AC_SUBST(DEBUG)
 AC_SUBST(ASM)
@@ -1392,6 +1469,8 @@ AC_SUBST(CFLAGS_LIBDVDCSS)
 AC_SUBST(CFLAGS_MACOSX)
 AC_SUBST(CFLAGS_MAD)
 AC_SUBST(CFLAGS_MOTIONALTIVEC)
+AC_SUBST(CFLAGS_OPTIM)
+AC_SUBST(CFLAGS_OPTIM_NODEBUG)
 AC_SUBST(CFLAGS_QT)
 AC_SUBST(CFLAGS_SDL)
 AC_SUBST(CFLAGS_WIN32)
