@@ -3,12 +3,11 @@
 %define rel		0.1
 
 %define	libmajor	0
-%define libname		lib%name%libmajor
 
 %define cvs     	1
 %if %{cvs}
 %define	cvsrel		1
-%define cvsdate 	20030116
+%define cvsdate 	20030120
 %define release		0.%{cvsdate}.%{cvsrel}mdk
 %define cvs_name 	%{name}-snapshot-%cvsdate
 %else
@@ -43,13 +42,25 @@
 %define with_arts 1
 %define with_alsa 1
 
-%define redhat80 0
-%if %redhat80
+%define with_slp 1
+
+%define	buildfor_rh80	0
+%define	buildfor_mdk82	0
+%define	buildfor_mdk90	0
+
+# new macros
+%if %buildfor_mdk82 || %buildfor_mdk90 || %buildfor_rh80
+%define libname		lib%name%libmajor
+%else
+%define libname		%mklibname %name %libmajor
+%endif
+
+%if %buildfor_rh80
 %define release %rel
 # some mdk macros that do not exist in rh
 %define configure2_5x CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr
 %define make %__make
-%define makeinstall_std make DESTDIR="$RPM_BUILD_ROOT" install
+%define makeinstall_std %__make DESTDIR="$RPM_BUILD_ROOT" install
 # adjust define for Redhat.
 %endif
 
@@ -79,6 +90,8 @@
 %{?_without_arts:	%{expand: %%define with_arts 0}}
 %{?_without_alsa:	%{expand: %%define with_alsa 0}}
 
+%{?_without_slp:	%{expand: %%define with_slp 0}}
+
 # with
 %{?_with_mozilla:    	%{expand: %%define with_mozilla 1}}
 %{?_with_gtk:		%{expand: %%define with_gtk 1}}
@@ -105,6 +118,7 @@
 %{?_with_arts:       	%{expand: %%define with_arts 1}}
 %{?_with_alsa:       	%{expand: %%define with_alsa 1}}
 
+%{?_with_slp:		%{expand: %%define with_slp 1}}
 
 Summary:	VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 Name:		%{name}
@@ -179,7 +193,7 @@ Buildrequires:	libdv2-devel
 %endif
 
 %if %with_a52
-#Buildrequires:	liba52dec-devel
+Buildrequires:	liba52dec-devel
 %endif
 
 %if %with_ffmpeg
@@ -195,6 +209,11 @@ Buildrequires:	libesound0-devel
 %if %with_arts
 Buildrequires:	libarts-devel
 %endif
+
+%if %with_slp
+Buildrequires:	libopenslp-devel
+%endif
+
 
 %description
 VideoLAN is an OpenSource streaming solution for every OS developed by
@@ -471,6 +490,17 @@ This plugin adds support for the Advanced Linux Sound Architecture to
 vlc, the VideoLAN Client. To activate it, use the `--aout alsa' flag or
 select the `alsa' aout plugin from the preferences menu.
 
+%package plugin-slp
+Summary: Service Location Protocol acces plugin for the VideoLAN client
+Group: Video
+Requires: %{name} = %{version}
+%description plugin-slp
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+
+This plugin adds support for the Service Location Protocol to
+vlc, the VideoLAN Client.
+
+
 %prep
 %if %{cvs}
 %setup -q -n %{cvs_name}
@@ -579,6 +609,7 @@ export QTDIR=%{_libdir}/qt3
 %make
 
 %install
+rm -f %buildroot
 %makeinstall_std
 %find_lang %name
 install -d %buildroot/%_mandir/man1
@@ -645,7 +676,7 @@ rm -f %pngdir/*
 %post
 %update_menus
 %postun
-%update_menus
+%clean_menus
 
 %clean
 rm -fr %buildroot
@@ -848,7 +879,7 @@ rm -fr %buildroot
 %post -n gvlc
 %update_menus
 %postun -n gvlc
-%update_menus
+%clean_menus
 %endif
 
 %if %with_gnome
@@ -865,7 +896,7 @@ rm -fr %buildroot
 %post   -n gnome-vlc
 %update_menus
 %postun -n gnome-vlc
-%update_menus
+%clean_menus
 %endif
 
 %if %with_qt
@@ -881,7 +912,7 @@ rm -fr %buildroot
 %post   -n qvlc
 %update_menus
 %postun -n qvlc
-%update_menus
+%clean_menus
 %endif
 
 %if %with_kde
@@ -896,7 +927,7 @@ rm -fr %buildroot
 %post   -n kvlc
 %update_menus
 %postun -n kvlc
-%update_menus
+%clean_menus
 %endif
 
 %if %with_ncurses
@@ -1012,6 +1043,13 @@ rm -fr %buildroot
 %defattr(-,root,root)
 %doc README
 %_libdir/vlc/audio_output/libalsa_plugin.so
+%endif
+
+%if %with_slp
+%files plugin-slp
+%defattr(-,root,root)
+%doc README
+%_libdir/vlc/access/libslp_plugin.so
 %endif
 
 %changelog
