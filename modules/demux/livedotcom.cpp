@@ -158,8 +158,6 @@ static int  AccessOpen( vlc_object_t *p_this )
         p_sys->i_sdp = strlen( p_sys->p_sdp );
         p_sys->i_pos = 0;
 
-        //fprintf( stderr, "sdp=%s\n", p_sys->p_sdp );
-
         delete env;
         delete scheduler;
 
@@ -456,12 +454,15 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         }
         else
         {
-            int fd = sub->rtpSource()->RTPgs()->socketNum();
+            if( sub->rtpSource() )
+            {
+                int fd = sub->rtpSource()->RTPgs()->socketNum();
+                /* Increase the buffer size */
+                increaseReceiveBufferTo( *p_sys->env, fd, i_buffer );
+            }
 
             msg_Dbg( p_demux, "RTP subsession '%s/%s'", sub->mediumName(), sub->codecName() );
 
-            /* Increase the buffer size */
-            increaseReceiveBufferTo( *p_sys->env, fd, i_buffer );
             /* Issue the SETUP */
             if( p_sys->rtsp )
             {
@@ -612,12 +613,12 @@ static int  DemuxOpen ( vlc_object_t *p_this )
             else if( !strcmp( sub->codecName(), "MP2T" ) )
             {
                 tk->b_muxed = VLC_TRUE;
-                tk->p_out_muxed = stream_DemuxNew( p_demux, "ts2", p_demux->out );
+                tk->p_out_muxed = stream_DemuxNew( p_demux, "ts", p_demux->out );
             }
             else if( !strcmp( sub->codecName(), "MP2P" ) || !strcmp( sub->codecName(), "MP1S" ) )
             {
                 tk->b_muxed = VLC_TRUE;
-                tk->p_out_muxed = stream_DemuxNew( p_demux, "ps2", p_demux->out );
+                tk->p_out_muxed = stream_DemuxNew( p_demux, "ps", p_demux->out );
             }
         }
 
