@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.28 2003/10/08 10:07:22 zorglub Exp $
+ * $Id: httpd.c,v 1.29 2003/10/08 11:24:59 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -678,10 +678,10 @@ static void            _UnregisterHost( httpd_sys_t *p_httpt, httpd_host_t *p_ho
         p_httpt->i_host_count--;
         p_httpt->host = realloc( p_httpt->host,
                                  p_httpt->i_host_count * sizeof( httpd_host_t * ) );
-        if( !p_httpt->p_host )
+        if( !p_httpt->host )
         {
             msg_Err( p_httpt, "Out of memory" );
-            return NULL;
+            return;
         }
     }
 
@@ -830,7 +830,7 @@ static httpd_stream_t  *_RegisterStream( httpd_sys_t *p_httpt,
     p_stream->i_ref       = 0;
     p_stream->psz_file    = strdup( psz_file );
     p_stream->psz_mime    = strdup( psz_mime );
-    if( !p_file->psz_file || !p_file->psz_mime )
+    if( !p_stream->psz_file || !p_stream->psz_mime )
     {
         msg_Err( p_httpt, "Out of memory" );
         return NULL;
@@ -840,7 +840,7 @@ static httpd_stream_t  *_RegisterStream( httpd_sys_t *p_httpt,
         p_stream->i_authenticate_method = HTTPD_AUTHENTICATE_BASIC;
         p_stream->psz_user              = strdup( psz_user );
         p_stream->psz_password          = strdup( psz_password );
-        if( !p_file->psz_user || !p_file->psz_password )
+        if( !p_stream->psz_user || !p_stream->psz_password )
         {
             msg_Err( p_httpt, "Out of memory" );
             return NULL;
