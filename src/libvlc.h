@@ -232,16 +232,6 @@ static char *ppsz_align_descriptions[] =
 #define VIDEO_ON_TOP_LONGTEXT N_("Always place the video window on top of " \
     "other windows." )
 
-#define SPUMARGIN_TEXT N_("Force SPU position")
-#define SPUMARGIN_LONGTEXT N_( \
-    "You can use this option to place the subtitles under the movie, " \
-    "instead of over the movie. Try several positions.")
-
-#define OSD_TEXT N_("On Screen Display")
-#define OSD_LONGTEXT N_( \
-    "VLC can display messages on the video. This is called OSD (On Screen " \
-    "Display). You can disable this feature here.")
-
 #define FILTER_TEXT N_("Video filter module")
 #define FILTER_LONGTEXT N_( \
     "This will allow you to add a post-processing filter to enhance the " \
@@ -299,12 +289,12 @@ static char *ppsz_align_descriptions[] =
 #define INPUT_CHAN_TEXT N_("Choose audio channel")
 #define INPUT_CHAN_LONGTEXT N_( \
     "Give the stream number of the audio channel you want to use in a DVD " \
-    "(from 1 to n).")
+    "(from 0 to n).")
 
-#define INPUT_SUBT_TEXT N_("Choose subtitle track")
-#define INPUT_SUBT_LONGTEXT N_( \
+#define INPUT_SUB_TEXT N_("Choose subtitle track")
+#define INPUT_SUB_LONGTEXT N_( \
     "Give the stream number of the subtitle channel you want to use " \
-    "(from 1 to n).")
+    "(from 0 to n).")
 
 #define INPUT_REPEAT_TEXT N_("Number of time the same input will be repeated")
 #define INPUT_REPEAT_LONGTEXT N_("Number of time the same input will be repeated")
@@ -322,6 +312,28 @@ static char *ppsz_align_descriptions[] =
 #define BOOKMARKS_LONGTEXT N_("You can specify a list of bookmarks for a stream in " \
     "the form \"{name=bookmark-name,time=optional-time-offset," \
     "bytes=optional-byte-offset},{etc...}\"")
+
+#define SUB_CAT_LONGTEXT N_( \
+    "These options allow you to modify the behavior of the subpictures " \
+    "subsystem. You can for example enable subpictures filters (logo, ...). " \
+    "Enable these filters here and configure them in the " \
+    "\"subpictures filters\" modules section. You can also set many " \
+    "miscellaneous subpictures options." )
+
+#define SPUMARGIN_TEXT N_("Force SPU position")
+#define SPUMARGIN_LONGTEXT N_( \
+    "You can use this option to place the subtitles under the movie, " \
+    "instead of over the movie. Try several positions.")
+
+#define OSD_TEXT N_("On Screen Display")
+#define OSD_LONGTEXT N_( \
+    "VLC can display messages on the video. This is called OSD (On Screen " \
+    "Display). You can disable this feature here.")
+
+#define SUB_FILTER_TEXT N_("Subpictures filter module")
+#define SUB_FILTER_LONGTEXT N_( \
+    "This will allow you to add a subpictures filter for instance to overlay "\
+    "a logo.")
 
 #define SUB_AUTO_TEXT N_("Autodetect subtitle files")
 #define SUB_AUTO_LONGTEXT \
@@ -795,17 +807,19 @@ vlc_module_begin();
     add_integer_with_range( "saved-volume", AOUT_VOLUME_DEFAULT,
                             AOUT_VOLUME_MIN, AOUT_VOLUME_MAX, NULL,
                             VOLUME_SAVE_TEXT, VOLUME_SAVE_LONGTEXT, VLC_TRUE );
-    add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT, AOUT_RATE_LONGTEXT, VLC_TRUE );
+    add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT,
+                 AOUT_RATE_LONGTEXT, VLC_TRUE );
 #if !defined( SYS_DARWIN )
-    add_bool( "hq-resampling", 1, NULL, AOUT_RESAMP_TEXT, AOUT_RESAMP_LONGTEXT, VLC_TRUE );
+    add_bool( "hq-resampling", 1, NULL, AOUT_RESAMP_TEXT,
+              AOUT_RESAMP_LONGTEXT, VLC_TRUE );
 #endif
     add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
-    add_integer( "audio-desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT, VLC_TRUE );
-    add_string("audio-filter",0,NULL,AUDIO_FILTER_TEXT,
-                    AUDIO_FILTER_LONGTEXT,VLC_FALSE);
+    add_integer( "audio-desync", 0, NULL, DESYNC_TEXT,
+                 DESYNC_LONGTEXT, VLC_TRUE );
+    add_string( "audio-filter", 0, NULL,AUDIO_FILTER_TEXT,
+                AUDIO_FILTER_LONGTEXT, VLC_FALSE );
     add_module( "audio-channel-mixer", "audio filter", NULL, NULL,
-                    AUDIO_CHANNEL_MIXER, AUDIO_CHANNEL_MIXER_LONGTEXT,
-                    VLC_FALSE );
+                AUDIO_CHANNEL_MIXER, AUDIO_CHANNEL_MIXER_LONGTEXT, VLC_FALSE );
 
     /* Video options */
     add_category_hint( N_("Video"), VOUT_CAT_LONGTEXT , VLC_FALSE );
@@ -822,17 +836,17 @@ vlc_module_begin();
     add_integer( "align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_align_values, ppsz_align_descriptions, 0 );
     add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, VLC_TRUE );
-    add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT, VLC_TRUE );
+    add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT,
+              GRAYSCALE_LONGTEXT, VLC_TRUE );
     add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT,
-                        FULLSCREEN_LONGTEXT, VLC_FALSE );
+              FULLSCREEN_LONGTEXT, VLC_FALSE );
+        change_short('F');
 #ifndef SYS_DARWIN
     add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, VLC_TRUE );
 #endif
 
-    add_bool( "video-on-top", 0, NULL, VIDEO_ON_TOP_TEXT, VIDEO_ON_TOP_LONGTEXT, VLC_FALSE );
-    add_integer( "spumargin", -1, NULL, SPUMARGIN_TEXT,
-                        SPUMARGIN_LONGTEXT, VLC_TRUE );
-    add_bool( "osd", 1, NULL, OSD_TEXT, OSD_LONGTEXT, VLC_FALSE );
+    add_bool( "video-on-top", 0, NULL, VIDEO_ON_TOP_TEXT,
+              VIDEO_ON_TOP_LONGTEXT, VLC_FALSE );
     add_module( "filter", "video filter", NULL, NULL,
                 FILTER_TEXT, FILTER_LONGTEXT, VLC_FALSE );
     add_string( "aspect-ratio", "", NULL,
@@ -841,23 +855,9 @@ vlc_module_begin();
     add_string( "pixel-ratio", "1", NULL, PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT );
 #endif
 
-    /* Input options */
-    add_category_hint( N_("Input"), INPUT_CAT_LONGTEXT , VLC_FALSE );
-    add_integer( "cr-average", 40, NULL, CR_AVERAGE_TEXT,
-                 CR_AVERAGE_LONGTEXT, VLC_FALSE );
-    add_integer( "server-port", 1234, NULL,
-                 SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT, VLC_FALSE );
-    add_integer( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT, VLC_TRUE );
-    add_string( "iface-addr", "", NULL, IFACE_ADDR_TEXT, IFACE_ADDR_LONGTEXT, VLC_TRUE );
-
-    add_integer( "program", 0, NULL,
-                 INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT, VLC_TRUE );
-    add_integer( "audio-type", -1, NULL,
-                 INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT, VLC_TRUE );
-    add_integer( "audio-channel", -1, NULL,
-                 INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT, VLC_FALSE );
-    add_integer( "spu-channel", -1, NULL,
-                 INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT, VLC_FALSE );
+    /* Subpictures options */
+    add_category_hint( N_("Subpictures"), SUB_CAT_LONGTEXT , VLC_FALSE );
+    add_bool( "osd", 1, NULL, OSD_TEXT, OSD_LONGTEXT, VLC_FALSE );
     add_bool( "sub-autodetect-file", VLC_TRUE, NULL,
                  SUB_AUTO_TEXT, SUB_AUTO_LONGTEXT, VLC_FALSE );
     add_integer( "sub-autodetect-fuzzy", 3, NULL,
@@ -869,8 +869,31 @@ vlc_module_begin();
 #endif
     add_string( "sub-autodetect-path", SUB_PATH, NULL,
                  SUB_PATH_TEXT, SUB_PATH_LONGTEXT, VLC_TRUE );
-    add_file( "sub-file", NULL, NULL,
-                 SUB_FILE_TEXT, SUB_FILE_LONGTEXT, VLC_TRUE );
+    add_file( "sub-file", NULL, NULL, SUB_FILE_TEXT,
+              SUB_FILE_LONGTEXT, VLC_TRUE );
+    add_integer( "spumargin", -1, NULL, SPUMARGIN_TEXT,
+                 SPUMARGIN_LONGTEXT, VLC_TRUE );
+    add_module( "sub-filter", "subpicture filter", NULL, NULL,
+                SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, VLC_TRUE );
+
+    /* Input options */
+    add_category_hint( N_("Input"), INPUT_CAT_LONGTEXT , VLC_FALSE );
+    add_integer( "cr-average", 40, NULL, CR_AVERAGE_TEXT,
+                 CR_AVERAGE_LONGTEXT, VLC_FALSE );
+    add_integer( "server-port", 1234, NULL,
+                 SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT, VLC_FALSE );
+    add_integer( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT, VLC_TRUE );
+    add_string( "iface-addr", "", NULL, IFACE_ADDR_TEXT,
+                IFACE_ADDR_LONGTEXT, VLC_TRUE );
+
+    add_integer( "program", 0, NULL,
+                 INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT, VLC_TRUE );
+    add_integer( "audio-type", -1, NULL,
+                 INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT, VLC_TRUE );
+    add_integer( "audio-channel", -1, NULL,
+                 INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT, VLC_FALSE );
+    add_integer( "spu-channel", -1, NULL,
+                 INPUT_SUB_TEXT, INPUT_SUB_LONGTEXT, VLC_FALSE );
     add_integer( "input-repeat", 0, NULL,
                  INPUT_REPEAT_TEXT, INPUT_REPEAT_LONGTEXT, VLC_TRUE );
     add_integer( "start-time", 0, NULL,
@@ -914,8 +937,10 @@ vlc_module_begin();
 
     /* Decoder options */
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , VLC_TRUE );
-    add_module( "codec", "decoder", NULL, NULL, CODEC_TEXT, CODEC_LONGTEXT, VLC_TRUE );
-    add_module( "encoder", "encoder", NULL, NULL, ENCODER_TEXT, ENCODER_LONGTEXT, VLC_TRUE );
+    add_module( "codec", "decoder", NULL, NULL, CODEC_TEXT,
+                CODEC_LONGTEXT, VLC_TRUE );
+    add_module( "encoder", "encoder", NULL, NULL, ENCODER_TEXT,
+                ENCODER_LONGTEXT, VLC_TRUE );
 
 
     /* Stream output options */

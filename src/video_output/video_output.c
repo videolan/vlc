@@ -287,11 +287,13 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
 
     /* Initialize subpicture unit */
-    p_vout->p_spu = spu_Init( p_vout );
+    p_vout->p_spu = spu_Create( p_vout );
     spu_Attach( p_vout->p_spu, p_parent, VLC_TRUE );
 
     /* Attach the new object now so we can use var inheritance below */
     vlc_object_attach( p_vout, p_parent );
+
+    spu_Init( p_vout->p_spu );
 
     /* Take care of some "interface/control" related initialisations */
     vout_IntfInit( p_vout );

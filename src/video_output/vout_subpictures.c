@@ -46,17 +46,19 @@ static void UpdateSPU   ( spu_t *, vlc_object_t * );
 static int  CropCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
 
+static subpicture_t *sub_new_buffer( filter_t * );
+static void sub_del_buffer( filter_t *, subpicture_t * );
 static subpicture_t *spu_new_buffer( filter_t * );
 static void spu_del_buffer( filter_t *, subpicture_t * );
 static picture_t *spu_new_video_buffer( filter_t * );
 static void spu_del_video_buffer( filter_t *, picture_t * );
 
 /**
- * Initialise the subpicture unit
+ * Creates the subpicture unit
  *
  * \param p_this the parent object which creates the subpicture unit
  */
-spu_t *__spu_Init( vlc_object_t *p_this )
+spu_t *__spu_Create( vlc_object_t *p_this )
 {
     int i_index;
     spu_t *p_spu = vlc_object_create( p_this, VLC_OBJECT_SPU );
@@ -70,6 +72,7 @@ spu_t *__spu_Init( vlc_object_t *p_this )
     p_spu->p_blend = NULL;
     p_spu->p_text = NULL;
     p_spu->p_scale = NULL;
+    p_spu->i_filter = 0;
 
     /* Register the default subpicture channel */
     p_spu->i_channel = 1;
@@ -78,10 +81,50 @@ spu_t *__spu_Init( vlc_object_t *p_this )
 
     vlc_object_attach( p_spu, p_this );
 
-    /* If the user requested an SPU margin, we force the position. */
-    p_spu->i_margin = config_GetInt( p_spu, "spumargin" );
-
     return p_spu;
+}
+
+/**
+ * Initialise the subpicture unit
+ *
+ * \param p_spu the subpicture unit object
+ */
+int spu_Init( spu_t *p_spu )
+{
+    char *psz_filter, *psz_filter_orig;
+    vlc_value_t val;
+
+    /* If the user requested an SPU margin, we force the position. */
+    var_Create( p_spu, "spumargin", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_spu, "spumargin", &val );
+    p_spu->i_margin = val.i_int;
+
+    var_Create( p_spu, "sub-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Get( p_spu, "sub-filter", &val );
+    psz_filter = psz_filter_orig = val.psz_string;
+    if( psz_filter && *psz_filter )
+    {
+        p_spu->pp_filter[p_spu->i_filter] =
+            vlc_object_create( p_spu, VLC_OBJECT_FILTER );
+        vlc_object_attach( p_spu->pp_filter[p_spu->i_filter], p_spu );
+        p_spu->pp_filter[p_spu->i_filter]->pf_sub_buffer_new = sub_new_buffer;
+        p_spu->pp_filter[p_spu->i_filter]->pf_sub_buffer_del = sub_del_buffer;
+        p_spu->pp_filter[p_spu->i_filter]->p_owner =
+            (filter_owner_sys_t *)p_spu;
+        p_spu->pp_filter[p_spu->i_filter]->p_module =
+            module_Need( p_spu->pp_filter[p_spu->i_filter],
+                         "subpicture filter", psz_filter, 0 );
+        if( p_spu->pp_filter[p_spu->i_filter]->p_module ) p_spu->i_filter++;
+        else
+        {
+            msg_Dbg( p_spu, "no subpicture filter found" );
+            vlc_object_detach( p_spu->pp_filter[p_spu->i_filter] );
+            vlc_object_destroy( p_spu->pp_filter[p_spu->i_filter] );
+        }
+    }
+    if( psz_filter_orig ) free( psz_filter_orig );
+
+    return VLC_EGENERIC;
 }
 
 /**
@@ -129,6 +172,14 @@ void spu_Destroy( spu_t *p_spu )
 
         vlc_object_detach( p_spu->p_scale );
         vlc_object_destroy( p_spu->p_scale );
+    }
+
+    while( p_spu->i_filter-- )
+    {
+        module_Unneed( p_spu->pp_filter[p_spu->i_filter],
+                       p_spu->pp_filter[p_spu->i_filter]->p_module );
+        vlc_object_detach( p_spu->pp_filter[p_spu->i_filter] );
+        vlc_object_destroy( p_spu->pp_filter[p_spu->i_filter] );
     }
 
     vlc_mutex_destroy( &p_spu->subpicture_lock );
@@ -401,8 +452,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_spu->p_text->fmt_out.video.i_visible_height =
                     p_fmt->i_height;
 
-            p_spu->p_text->pf_spu_buffer_new = spu_new_buffer;
-            p_spu->p_text->pf_spu_buffer_del = spu_del_buffer;
+            p_spu->p_text->pf_sub_buffer_new = spu_new_buffer;
+            p_spu->p_text->pf_sub_buffer_del = spu_del_buffer;
 
             p_spu->p_text->p_module =
                 module_Need( p_spu->p_text, "text renderer", 0, 0 );
@@ -473,7 +524,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                             *p_region = *p_subpic_tmp->p_region;
                             p_region->p_next = tmp_region.p_next;
                             *p_subpic_tmp->p_region = tmp_region;
-                            p_spu->p_text->pf_spu_buffer_del( p_spu->p_text,
+                            p_spu->p_text->pf_sub_buffer_del( p_spu->p_text,
                                                               p_subpic_tmp );
                         }
                     }
@@ -669,6 +720,18 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date )
     subpicture_t *p_subpic     = NULL;
     subpicture_t *p_ephemer    = NULL;
     mtime_t       ephemer_date = 0;
+
+    /* Run subpicture filters */
+    for( i_index = 0; i_index < p_spu->i_filter; i_index++ )
+    {
+        subpicture_t *p_subpic_filter;
+        p_subpic_filter = p_spu->pp_filter[i_index]->
+            pf_sub_filter( p_spu->pp_filter[i_index], display_date );
+        if( p_subpic_filter )
+        {
+            spu_DisplaySubpicture( p_spu, p_subpic_filter );
+        }
+    }
 
     /* We get an easily parsable chained list of subpictures which
      * ends with NULL since p_subpic was initialized to NULL. */
@@ -905,6 +968,18 @@ static int CropCallback( vlc_object_t *p_object, char const *psz_var,
 /*****************************************************************************
  * Buffers allocation callbacks for the filters
  *****************************************************************************/
+static subpicture_t *sub_new_buffer( filter_t *p_filter )
+{
+    spu_t *p_spu = (spu_t *)p_filter->p_owner;
+    return spu_CreateSubpicture( p_spu );
+}
+
+static void sub_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
+{
+    spu_t *p_spu = (spu_t *)p_filter->p_owner;
+    spu_DestroySubpicture( p_spu, p_subpic );
+}
+
 static subpicture_t *spu_new_buffer( filter_t *p_filter )
 {
     subpicture_t *p_subpic = (subpicture_t *)malloc(sizeof(subpicture_t));

@@ -57,8 +57,7 @@ struct filter_t
                                                 picture_t *, picture_t *,
                                                 int, int );
 
-    subpicture_t *      ( *pf_subpicture_filter ) ( filter_t * );
-
+    subpicture_t *      ( *pf_sub_filter ) ( filter_t *, mtime_t );
     subpicture_t *      ( *pf_render_string ) ( filter_t *, block_t * );
 
     /*
@@ -75,8 +74,8 @@ struct filter_t
     void            ( * pf_picture_unlink)  ( filter_t *, picture_t * );
 
     /* SPU output callbacks */
-    subpicture_t *  ( * pf_spu_buffer_new) ( filter_t * );
-    void            ( * pf_spu_buffer_del) ( filter_t *, subpicture_t * );
+    subpicture_t *  ( * pf_sub_buffer_new) ( filter_t * );
+    void            ( * pf_sub_buffer_del) ( filter_t *, subpicture_t * );
 
     /* Private structure for the owner of the decoder */
     filter_owner_sys_t *p_owner;

@@ -419,7 +419,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
     line.yMax = 0;
 
     /* Create and initialize a subpicture */
-    p_subpic = p_filter->pf_spu_buffer_new( p_filter );
+    p_subpic = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_subpic ) goto error;
 
     p_subpic->i_start = p_block->i_pts;
@@ -601,7 +601,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
 
  error:
     FreeString( p_string );
-    if( p_subpic ) p_filter->pf_spu_buffer_del( p_filter, p_subpic );
+    if( p_subpic ) p_filter->pf_sub_buffer_del( p_filter, p_subpic );
     block_Release( p_block );
     return NULL;
 }

@@ -52,6 +52,10 @@ struct spu_t
     uint8_t pi_alpha[4];                           /**< forced alpha palette */
 
     int ( *pf_control ) ( spu_t *, int, va_list );
+
+    /* Supciture filters */
+    filter_t *pp_filter[10];
+    int      i_filter;
 };
 
 static inline int spu_vaControl( spu_t *p_spu, int i_query, va_list args )
@@ -83,8 +87,9 @@ enum spu_query_e
  * \addtogroup subpicture
  * @{
  */
-#define spu_Init(a) __spu_Init(VLC_OBJECT(a))
-VLC_EXPORT( spu_t *, __spu_Init, ( vlc_object_t * ) );
+#define spu_Create(a) __spu_Create(VLC_OBJECT(a))
+VLC_EXPORT( spu_t *, __spu_Create, ( vlc_object_t * ) );
+VLC_EXPORT( int, spu_Init, ( spu_t * ) );
 VLC_EXPORT( void, spu_Destroy, ( spu_t * ) );
 void spu_Attach( spu_t *, vlc_object_t *, vlc_bool_t );
 
