@@ -68,12 +68,15 @@ struct playlist_item_t
 
 
     int        i_nb_played;       /**< How many times was this item played ? */
+
+    /* LEGACY FIELDS */
     vlc_bool_t b_autodeletion;    /**< Indicates whther this item is to
                                    * be deleted after playback. True mean
                                    * that this item is to be deleted
                                    * after playback, false otherwise */
     vlc_bool_t b_enabled;         /**< Indicates whether this item is to be
                                    * played or skipped */
+    /* END LEGACY FIELDS */
 };
 
 #define PLAYLIST_SAVE_FLAG      0x1     /**< Must it be saved */
@@ -219,7 +222,7 @@ struct playlist_add_t
 /* Creation/Deletion */
 #define playlist_Create(a) __playlist_Create(VLC_OBJECT(a))
 playlist_t * __playlist_Create   ( vlc_object_t * );
-void           playlist_Destroy  ( playlist_t * );
+int            playlist_Destroy  ( playlist_t * );
 
 /* Playlist control */
 #define playlist_Play(p) playlist_Control(p,PLAYLIST_PLAY )
@@ -238,7 +241,7 @@ VLC_EXPORT( int,  playlist_Clear, ( playlist_t * ) );
 /* Services discovery */
 
 VLC_EXPORT( int, playlist_ServicesDiscoveryAdd, (playlist_t *, const char *));
-VLC_EXPORT( void, playlist_ServicesDiscoveryRemove, (playlist_t *, const char *));
+VLC_EXPORT( int, playlist_ServicesDiscoveryRemove, (playlist_t *, const char *));
 VLC_EXPORT( int, playlist_AddSDModules, (playlist_t *, char *));
 VLC_EXPORT( vlc_bool_t, playlist_IsServicesDiscoveryLoaded, ( playlist_t *,const char *));
 
@@ -247,9 +250,9 @@ VLC_EXPORT( vlc_bool_t, playlist_IsServicesDiscoveryLoaded, ( playlist_t *,const
 #define playlist_AddItem(p,pi,i1,i2) playlist_ItemAdd(p,pi,i1,i2)
 #define playlist_ItemNew( a , b, c ) __playlist_ItemNew(VLC_OBJECT(a) , b , c )
 VLC_EXPORT( playlist_item_t* , __playlist_ItemNew, ( vlc_object_t *,const char *,const char * ) );
-VLC_EXPORT( void, playlist_ItemDelete, ( playlist_item_t * ) );
-VLC_EXPORT( void, playlist_ItemAddParent, ( playlist_item_t *, int,playlist_item_t *) );
-VLC_EXPORT( void, playlist_CopyParents, ( playlist_item_t *,playlist_item_t *) );
+VLC_EXPORT( int, playlist_ItemDelete, ( playlist_item_t * ) );
+VLC_EXPORT( int, playlist_ItemAddParent, ( playlist_item_t *, int,playlist_item_t *) );
+VLC_EXPORT( int, playlist_CopyParents, ( playlist_item_t *,playlist_item_t *) );
 /* Item informations accessors */
 VLC_EXPORT( int, playlist_ItemSetName, (playlist_item_t *,  char * ) );
 VLC_EXPORT( int, playlist_ItemSetDuration, (playlist_item_t *, mtime_t ) );
@@ -257,10 +260,10 @@ VLC_EXPORT( int, playlist_ItemSetDuration, (playlist_item_t *, mtime_t ) );
 
 /* View management functions */
 VLC_EXPORT( int, playlist_ViewInsert, (playlist_t *, int, char * ) );
-VLC_EXPORT( void, playlist_ViewDelete, (playlist_t *,playlist_view_t* ) );
+VLC_EXPORT( int, playlist_ViewDelete, (playlist_t *,playlist_view_t* ) );
 VLC_EXPORT( playlist_view_t *, playlist_ViewFind, (playlist_t *, int ) );
 VLC_EXPORT( int, playlist_ViewUpdate, (playlist_t *, int ) );
-VLC_EXPORT( void, playlist_ViewDump, (playlist_t *, playlist_view_t * ) );
+VLC_EXPORT( int, playlist_ViewDump, (playlist_t *, playlist_view_t * ) );
 VLC_EXPORT( int, playlist_ViewEmpty, (playlist_t *, int, vlc_bool_t ) );
 
 /* Node management */
@@ -298,7 +301,8 @@ VLC_EXPORT(int, playlist_NodeAddItem, ( playlist_t *, playlist_item_t *,int,play
 VLC_EXPORT( int,  playlist_Delete, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_Disable, ( playlist_t *, playlist_item_t * ) );
 VLC_EXPORT( int,  playlist_Enable, ( playlist_t *, playlist_item_t * ) );
-VLC_EXPORT( void, playlist_ItemToNode, (playlist_t *,playlist_item_t *) );
+VLC_EXPORT( int, playlist_ItemToNode, (playlist_t *,playlist_item_t *) );
+VLC_EXPORT( int, playlist_Replace, (playlist_t *,playlist_item_t *, input_item_t*) );
 
 
 /* Item search functions */

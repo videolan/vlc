@@ -90,7 +90,6 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
 int playlist_NodeSort( playlist_t * p_playlist , playlist_item_t *p_node,
                        int i_mode, int i_type )
 {
-    int i_id;
     vlc_value_t val;
     val.b_bool = VLC_TRUE;
 

@@ -85,7 +85,7 @@ playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
  * \param p_item the item to delete
  * \return nothing
  */
-void playlist_ItemDelete( playlist_item_t *p_item )
+int playlist_ItemDelete( playlist_item_t *p_item )
 {
     vlc_mutex_lock( &p_item->input.lock );
 
@@ -132,6 +132,8 @@ void playlist_ItemDelete( playlist_item_t *p_item )
     vlc_mutex_destroy( &p_item->input.lock );
 
     free( p_item );
+
+    return VLC_SUCCESS;
 }
 
 /**
@@ -161,8 +163,8 @@ int playlist_ItemAddOption( playlist_item_t *p_item, const char *psz_option )
  * \param p_parent the parent to add
  * \return nothing
  */
-void playlist_ItemAddParent( playlist_item_t *p_item, int i_view,
-                         playlist_item_t *p_parent )
+int playlist_ItemAddParent( playlist_item_t *p_item, int i_view,
+                            playlist_item_t *p_parent )
 {
    vlc_bool_t b_found = VLC_FALSE;
    int i;
@@ -188,12 +190,13 @@ void playlist_ItemAddParent( playlist_item_t *p_item, int i_view,
                     p_item->i_parents, p_item->i_parents,
                     p_ip );
    }
+   return VLC_SUCCESS;
 }
 
 /**
  * Copy all parents from parent to child
  */
-void playlist_CopyParents( playlist_item_t *p_parent,
+int playlist_CopyParents( playlist_item_t *p_parent,
                            playlist_item_t *p_child )
 {
     int i=0;
@@ -203,6 +206,7 @@ void playlist_CopyParents( playlist_item_t *p_parent,
                                 p_parent->pp_parents[i]->i_view,
                                 p_parent );
     }
+    return VLC_SUCCESS;
 }
 
 
@@ -260,6 +264,8 @@ int playlist_ItemSetDuration( playlist_item_t *p_item, mtime_t i_duration )
     return VLC_EGENERIC;
 }
 
+/*
+ * Guess the type of the item using the beginning of the mrl */
 static void GuessType( input_item_t *p_item)
 {
     int i;

@@ -433,7 +433,7 @@ playlist_item_t * playlist_ItemGetById( playlist_t * p_playlist , int i_id )
  * \return the item, or NULL on failure
  */
 playlist_item_t * playlist_ItemGetByInput( playlist_t * p_playlist ,
-                                        input_item_t *p_item )
+                                           input_item_t *p_item )
 {
     int i;
     for( i =  0 ; i < p_playlist->i_size ; i++ )
@@ -455,11 +455,13 @@ playlist_item_t * playlist_ItemGetByInput( playlist_t * p_playlist ,
 /**
  * Transform an item to a node
  *
+ * This function must be entered without the playlist lock
+ *
  * \param p_playlist the playlist object
  * \param p_item the item to transform
  * \return nothing
  */
-void playlist_ItemToNode( playlist_t *p_playlist,playlist_item_t *p_item )
+int playlist_ItemToNode( playlist_t *p_playlist,playlist_item_t *p_item )
 {
     int i = 0;
     if( p_item->i_children == -1 )
@@ -479,12 +481,71 @@ void playlist_ItemToNode( playlist_t *p_playlist,playlist_item_t *p_item )
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 
-    /* Handle the parents
-     * Nothing to do ! */
+    return VLC_SUCCESS;
 }
 
 /**
- * delete an item from a playlist.
+ * Replaces an item with another one
+ * This function must be entered without the playlist lock
+ *
+ * \see playlist_Replace
+ */
+int playlist_LockAndReplace( playlist_t *p_playlist,
+                             playlist_item_t *p_olditem,
+                             input_item_t *p_new )
+{
+    int i_ret;
+    vlc_mutex_lock( &p_playlist->object_lock );
+    i_ret = playlist_Replace( p_playlist, p_olditem, p_new );
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    return i_ret;
+}
+
+/**
+ * Replaces an item with another one
+ * This function must be entered with the playlist lock:
+ *
+ * \param p_playlist the playlist
+ * \param p_olditem the item to replace
+ * \param p_new the new input_item
+ * \return VLC_SUCCESS or an error
+ */
+int playlist_Replace( playlist_t *p_playlist, playlist_item_t *p_olditem,
+                       input_item_t *p_new )
+{
+    int i;
+    int j;
+
+    if( p_olditem->i_children != -1 )
+    {
+        msg_Err( p_playlist, "playlist_Replace can only be used on leafs");
+        return VLC_EGENERIC;
+    }
+
+    p_olditem->i_nb_played = 0;
+    memcpy( &p_olditem->input, p_new, sizeof( input_item_t ) );
+
+    p_olditem->i_nb_played = 0;
+
+    for( i = 0 ; i< p_olditem->i_parents ; i++ )
+    {
+        playlist_item_t *p_parent = p_olditem->pp_parents[i]->p_parent;
+
+        for( j = 0 ; j< p_parent->i_children ; i++ )
+        {
+            if( p_parent->pp_children[j] == p_olditem )
+            {
+                p_parent->i_serial++;
+            }
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+/**
+ * Deletes an item from a playlist.
+ *
+ * This function must be entered without the playlist lock
  *
  * \param p_playlist the playlist to remove from.
  * \param i_id the identifier of the item to delete
@@ -605,6 +666,8 @@ int playlist_Enable( playlist_t * p_playlist, playlist_item_t *p_item )
 /**
  * Move an item in a playlist
  *
+ * This function must be entered without the playlist lock
+ *
  * Move the item in the playlist with position i_pos before the current item
  * at position i_newpos.
  * \param p_playlist the playlist to move items in
@@ -670,6 +733,55 @@ int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos )
 
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-change", val );
+
+    return VLC_SUCCESS;
+}
+
+/**
+ * Moves an item
+ *
+ * \param p_playlist the playlist
+ * \param p_item the item to move
+ * \param p_node the new parent of the item
+ * \param i_newpos the new position under this new parent
+ * \param i_view the view in which the move must be done or ALL_VIEWS
+ * \return VLC_SUCCESS or an error
+ */
+int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
+                       playlist_item_t *p_node, int i_newpos, int i_view )
+{
+    int i;
+    playlist_item_t *p_detach = NULL;
+#if 0
+    if( i_view == ALL_VIEWS )
+    {
+        for( i = 0 ; i < p_playlist->i_views; i++ )
+        {
+            playlist_TreeMove( p_playlist, p_item, p_node, i_newpos,
+                               p_playlist->pp_views[i] );
+        }
+    }
+#endif
+
+    /* Find the parent */
+    for( i = 0 ; i< p_item->i_parents; i++ )
+    {
+        if( p_item->pp_parents[i]->i_view == i_view )
+        {
+            p_detach = p_item->pp_parents[i]->p_parent;
+            break;
+        }
+    }
+    if( p_detach == NULL )
+    {
+        msg_Err( p_playlist, "item not found in view %i", i_view );
+        return VLC_EGENERIC;
+    }
+
+    /* Detach from the parent */
+//    playlist_NodeDetach( p_detach, p_item );
+
+    /* Attach to new parent */
 
     return VLC_SUCCESS;
 }

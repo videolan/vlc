@@ -80,7 +80,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,
     return VLC_SUCCESS;
 }
 
-void playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
+int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
                                        const char *psz_module )
 {
     int i;
@@ -99,18 +99,22 @@ void playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
 
     if( p_sd )
     {
+        vlc_mutex_unlock( &p_playlist->object_lock );
         p_sd->b_die = VLC_TRUE;
         vlc_thread_join( p_sd );
         module_Unneed( p_sd, p_sd->p_module );
+        vlc_mutex_lock( &p_playlist->object_lock );
         vlc_object_destroy( p_sd );
     }
     else
     {
         msg_Warn( p_playlist, "module %s is not loaded", psz_module );
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        return VLC_EGENERIC;
     }
 
     vlc_mutex_unlock( &p_playlist->object_lock );
-    return;
+    return VLC_SUCCESS;
 }
 
 vlc_bool_t playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,

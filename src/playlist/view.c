@@ -116,10 +116,10 @@ int playlist_ViewInsert( playlist_t *p_playlist, int i_id, char *psz_name )
  * \param p_view the view to delete
  * \return nothing
  */
-void playlist_ViewDelete( playlist_t *p_playlist,playlist_view_t *p_view )
+int playlist_ViewDelete( playlist_t *p_playlist,playlist_view_t *p_view )
 {
-    //playlist_Delete( p_view->p_root );
     REMOVE_ELEM( p_playlist->pp_views, p_playlist->i_views, 0 );
+    return VLC_SUCCESS;
 }
 
 
@@ -130,10 +130,11 @@ void playlist_ViewDelete( playlist_t *p_playlist,playlist_view_t *p_view )
  * \param p_view the view to dump
  * \return nothing
  */
-void playlist_ViewDump( playlist_t *p_playlist, playlist_view_t *p_view )
+int playlist_ViewDump( playlist_t *p_playlist, playlist_view_t *p_view )
 {
     msg_Dbg( p_playlist, "dumping view %i",p_view->i_id );
     playlist_NodeDump( p_playlist,p_view->p_root, 1 );
+    return VLC_SUCCESS;
 }
 
 /**

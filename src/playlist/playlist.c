@@ -44,7 +44,7 @@
  *****************************************************************************/
 static void RunThread ( playlist_t * );
 static playlist_item_t * NextItem  ( playlist_t * );
-static void PlayItem  ( playlist_t *, playlist_item_t * );
+static int PlayItem  ( playlist_t *, playlist_item_t * );
 
 static int ItemChange( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
@@ -61,7 +61,6 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args );
  */
 playlist_t * __playlist_Create ( vlc_object_t *p_parent )
 {
-    int i_index;
     playlist_t *p_playlist;
     playlist_view_t *p_view;
     vlc_value_t     val;
@@ -157,8 +156,9 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
  *
  * Delete all items in the playlist and free the playlist structure.
  * \param p_playlist the playlist structure to destroy
+ * \return VLC_SUCCESS or an error
  */
-void playlist_Destroy( playlist_t * p_playlist )
+int playlist_Destroy( playlist_t * p_playlist )
 {
     int i;
     p_playlist->b_die = 1;
@@ -194,6 +194,8 @@ void playlist_Destroy( playlist_t * p_playlist )
     }
 
     vlc_object_destroy( p_playlist );
+
+    return VLC_SUCCESS;
 }
 
 
@@ -903,10 +905,9 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
 /*****************************************************************************
  * PlayItem: start the input thread for an item
  ****************************************************************************/
-static void PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
+static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 {
     vlc_value_t val;
-    int i;
 
     msg_Dbg( p_playlist, "creating new input thread" );
 
@@ -931,6 +932,8 @@ static void PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     vlc_mutex_unlock( &p_playlist->object_lock);
     var_Set( p_playlist, "playlist-current", val);
     vlc_mutex_lock( &p_playlist->object_lock);
+
+    return VLC_SUCCESS;
 
 }
 
