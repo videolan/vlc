@@ -35,7 +35,6 @@
 #include <cdio/cdio.h>
 #include <cdio/logging.h>
 #include <cdio/cd_types.h>
-#include <cdio/cdda.h>
 
 #include <stdio.h>
 
