@@ -234,12 +234,16 @@ static vlc_bool_t CheckMimeHeader( demux_t *p_demux, int *p_header_size )
         free( psz_line );
         psz_line = GetLine( p_demux, &i_pos );
     }
+
     if( NULL == psz_line )
     {
         msg_Err( p_demux, "no EOL" );
         *p_header_size = -3;
         return VLC_FALSE;
     }
+
+    free( psz_line );
+
     *p_header_size = i_pos;
     return b_jpeg;
 }
