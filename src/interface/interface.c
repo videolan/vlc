@@ -179,6 +179,9 @@ void intf_Run( intf_thread_t *p_intf )
     char * psz_server = main_GetPszVariable( INPUT_SERVER_VAR, NULL );
     input_config_t *    p_input_config;
 
+    /* Flush messages before spawning input */
+    intf_FlushMsg();
+
     /* If a server was specified */
     if( psz_server )
     {

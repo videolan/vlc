@@ -2,7 +2,7 @@
  * video_fifo.h : FIFO for the pool of video_decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_fifo.h,v 1.2 2000/12/22 13:04:45 sam Exp $
+ * $Id: video_fifo.h,v 1.3 2000/12/23 03:10:59 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -59,7 +59,7 @@ static __inline__ macroblock_t * vpar_GetMacroblock( video_fifo_t * p_fifo )
     while( VIDEO_FIFO_ISEMPTY( *p_fifo ) )
     {
         vlc_cond_wait( &p_fifo->wait, &p_fifo->lock );
-        if( p_fifo->p_vpar->b_die )
+        if( p_fifo->p_vpar->p_fifo->b_die )
         {
             vlc_mutex_unlock( &p_fifo->lock );
             return( NULL );
@@ -93,7 +93,7 @@ static __inline__ macroblock_t * vpar_NewMacroblock( video_fifo_t * p_fifo )
         /* No more structures available. This should not happen ! */
         intf_DbgMsg("vpar debug: macroblock list is empty, delaying");
         vlc_mutex_unlock( &P_buffer.lock );
-        if( p_fifo->p_vpar->b_die )
+        if( p_fifo->p_vpar->p_fifo->b_die )
         {
             return( NULL );
         }

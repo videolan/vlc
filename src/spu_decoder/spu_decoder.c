@@ -55,11 +55,6 @@ static void     RunThread           ( spudec_thread_t *p_spudec );
 static void     ErrorThread         ( spudec_thread_t *p_spudec );
 static void     EndThread           ( spudec_thread_t *p_spudec );
 
-#define GetWord( i ) \
-    i  = GetByte( &p_spudec->bit_stream ) << 8; \
-    i += GetByte( &p_spudec->bit_stream ); \
-    i_index += 2;
-
 /*****************************************************************************
  * spudec_CreateThread: create a spu decoder thread
  *****************************************************************************/
@@ -145,12 +140,9 @@ static void RunThread( spudec_thread_t *p_spudec )
     {
         int i_packet_size;
         int i_rle_size;
-        int i_index;
-        int i_pes_size;
-        int i_pes_count;
-        boolean_t       b_finished;
-        unsigned char * p_spu_data;
-        subpicture_t  * p_spu = NULL;
+        int i_index, i_next;
+        boolean_t b_valid;
+        subpicture_t * p_spu = NULL;
 
         while( !DECODER_FIFO_ISEMPTY(*p_spudec->p_fifo) )
         {
@@ -164,20 +156,18 @@ static void RunThread( spudec_thread_t *p_spudec )
             while( i_packet_size == 0xff );
 
             if( p_spudec->p_fifo->b_die )
-                break;
+            {
+                goto bad_packet;
+            }
 
             /* the total size - should equal the sum of the
              * PES packet size that form the SPU packet */
-            i_packet_size = ( i_packet_size << 8 )
-                            + GetByte( &p_spudec->bit_stream );
-            i_index = 2;
-
-            /* get the useful PES size (real size - 10) */
-            i_pes_size = DECODER_FIFO_START(*p_spudec->p_fifo)->i_pes_size - 9;
-            i_pes_count = 1;
+            i_packet_size = i_packet_size << 8
+                             | GetByte( &p_spudec->bit_stream );
 
             /* the RLE stuff size */
-            GetWord( i_rle_size );
+            i_rle_size = GetByte( &p_spudec->bit_stream ) << 8
+                          | GetByte( &p_spudec->bit_stream );
 
             /* if the values we got aren't too strange, decode the data */
             if( i_rle_size < i_packet_size )
@@ -185,39 +175,41 @@ static void RunThread( spudec_thread_t *p_spudec )
                 /* allocate the subpicture.
                  * FIXME: we should check if the allocation failed */
                 p_spu = vout_CreateSubPicture( p_spudec->p_vout,
-                                           DVD_SUBPICTURE, i_rle_size );
-                p_spu_data = p_spu->p_data;
-
+                                               DVD_SUBPICTURE, i_rle_size );
                 /* get display time */
                 p_spu->begin_date = p_spu->end_date
                                 = DECODER_FIFO_START(*p_spudec->p_fifo)->i_pts;
 
-                /* getting the RLE part */
-                while( i_index++ < i_rle_size )
+                /* get RLE data, skip 4 bytes for the first two read offsets */
+                GetChunk( &p_spudec->bit_stream, p_spu->p_data,
+                          i_rle_size - 4 );
+
+                if( p_spudec->p_fifo->b_die )
                 {
-                    /* skip the leading byte of a PES */
-                    /* FIXME: this part definitely looks strange */
-                    if ( !((i_index + 3) % i_pes_size) )
-                    {
-                        i_pes_count++;
-                    }
-                    *p_spu_data++ = GetByte( &p_spudec->bit_stream );
+                    goto bad_packet;
                 }
 
+                /* continue parsing after the RLE part */
+                i_index = i_rle_size;
+
+                /* assume packet is valid */
+                b_valid = 1;
+
                 /* getting the control part */
-                b_finished = 0;
                 do
                 {
                     unsigned char i_cmd;
-                    unsigned int i_word;
-                    unsigned int i_date;
+                    unsigned int i_word, i_date;
 
-                    /* the date */
-                    GetWord( i_date );
+                    /* Get the sequence date */
+                    i_date = GetByte( &p_spudec->bit_stream ) << 8
+                              | GetByte( &p_spudec->bit_stream );
 
-                    /* next offset, no next offset if == i_index-5 */
-                    GetWord( i_word );
-                    b_finished = ( i_index - 5 >= i_word );
+                    /* Next offset */
+                    i_next = GetByte( &p_spudec->bit_stream ) << 8
+                              | GetByte( &p_spudec->bit_stream );
+
+                    i_index += 4;
 
                     do
                     {
@@ -243,11 +235,15 @@ static void RunThread( spudec_thread_t *p_spudec )
                                 break;
                             case SPU_CMD_SET_PALETTE:
                                 /* 03xxxx (palette) */
-                                GetWord( i_word );
+                                i_word = GetByte( &p_spudec->bit_stream ) << 8
+                                          | GetByte( &p_spudec->bit_stream );
+                                i_index += 2;
                                 break;
                             case SPU_CMD_SET_ALPHACHANNEL:
                                 /* 04xxxx (alpha channel) */
-                                GetWord( i_word );
+                                i_word = GetByte( &p_spudec->bit_stream ) << 8
+                                          | GetByte( &p_spudec->bit_stream );
+                                i_index += 2;
                                 break;
                             case SPU_CMD_SET_COORDINATES:
                                 /* 05xxxyyyxxxyyy (coordinates) */
@@ -257,9 +253,9 @@ static void RunThread( spudec_thread_t *p_spudec )
 
                                 i_word = GetBits( &p_spudec->bit_stream, 4 );
                                 p_spu->i_width = p_spu->i_x - ( (i_word << 8)
-                                    | GetByte( &p_spudec->bit_stream ) ) + 1;
+                                    | GetBits( &p_spudec->bit_stream, 8 ) ) + 1;
 
-                                i_word = GetByte( &p_spudec->bit_stream );
+                                i_word = GetBits( &p_spudec->bit_stream, 8 );
                                 p_spu->i_y = (i_word << 4)
                                     | GetBits( &p_spudec->bit_stream, 4 );
 
@@ -271,10 +267,13 @@ static void RunThread( spudec_thread_t *p_spudec )
                                 break;
                             case SPU_CMD_SET_OFFSETS:
                                 /* 06xxxxyyyy (byte offsets) */
-                                GetWord( i_word );
-                                p_spu->type.spu.i_offset[0] = i_word - 4;
-                                GetWord( i_word );
-                                p_spu->type.spu.i_offset[1] = i_word - 4;
+                                p_spu->type.spu.i_offset[0] =
+                                    ( GetByte( &p_spudec->bit_stream ) << 8
+                                      | GetByte( &p_spudec->bit_stream ) ) - 4;
+                                p_spu->type.spu.i_offset[1] =
+                                    ( GetByte( &p_spudec->bit_stream ) << 8
+                                      | GetByte( &p_spudec->bit_stream ) ) - 4;
+                                i_index += 4;
                                 break;
                             case SPU_CMD_END:
                                 /* ff (end) */
@@ -283,16 +282,24 @@ static void RunThread( spudec_thread_t *p_spudec )
                                 /* ?? (unknown command) */
                                 intf_ErrMsg( "spudec: unknown command 0x%.2x",
                                              i_cmd );
+                                b_valid = 0;
                                 break;
                         }
                     }
-                    while( i_cmd != SPU_CMD_END );
+                    while( b_valid && ( i_cmd != SPU_CMD_END ) );
                 }
-                while( !b_finished );
+                while( b_valid && ( i_index == i_next ) );
 
-                /* SPU is finished - we can tell the video output
-                 * to display it */
-                vout_DisplaySubPicture( p_spudec->p_vout, p_spu );
+                if( b_valid )
+                {
+                    /* SPU is finished - we can tell the video output
+                     * to display it */
+                    vout_DisplaySubPicture( p_spudec->p_vout, p_spu );
+                }
+                else
+                {
+                    vout_DestroySubPicture( p_spudec->p_vout, p_spu );
+                }
             }
             else 
             {
@@ -304,7 +311,7 @@ static void RunThread( spudec_thread_t *p_spudec )
                 DECODER_FIFO_INCSTART( *p_spudec->p_fifo );
                 vlc_mutex_unlock( &p_spudec->p_fifo->data_lock );
             }
-
+bad_packet:
         }
     }
 

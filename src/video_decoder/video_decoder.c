@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.c,v 1.42 2000/12/22 13:04:45 sam Exp $
+ * $Id: video_decoder.c,v 1.43 2000/12/23 03:10:59 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -31,6 +31,7 @@
 #include <unistd.h>                                              /* getpid() */
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                          /* for input.h */
+#include <errno.h>                                                  /* errno */
 
 #include "config.h"
 #include "common.h"
