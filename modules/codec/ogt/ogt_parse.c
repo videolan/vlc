@@ -2,7 +2,7 @@
  * Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ogt_parse.c,v 1.3 2003/12/29 04:47:44 rocky Exp $
+ * $Id: ogt_parse.c,v 1.4 2003/12/30 04:43:52 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -214,11 +214,11 @@ E_(ParsePacket)( decoder_t *p_dec)
 
 }
 
-/* Advance pointer to image pointer, update internal i_remaining counter
+/* Advance pointer to image pointer, update internal i_2bit_field counter
    and check that we haven't goine too far  in the image data. */
 #define advance_color_pointer_byte					\
   p++;									\
-  i_remaining=4;							\
+  i_2bit_field=4;							\
   if (p >= maxp) {							\
     msg_Warn( p_dec,							\
 	      "broken subtitle - tried to access beyond end "		\
@@ -227,19 +227,22 @@ E_(ParsePacket)( decoder_t *p_dec)
   }									\
 
 #define advance_color_pointer						\
-  i_remaining--;							\
-  if ( i_remaining == 0 ) {						\
+  i_2bit_field--;							\
+  if ( i_2bit_field == 0 ) {						\
     advance_color_pointer_byte;						\
   }									
 
+#define OGT_FIELD_BITS (2)
+#define OGT_FIELD_MASK  ((1<<OGT_FIELD_BITS) - 1) 
+
 /* Get the next field - either a palette index or a RLE count for
-   color 0.  To do this we use byte image pointer p, and i_remaining
+   color 0.  To do this we use byte image pointer p, and i_2bit_field
    which indicates where we are in the byte.
 */
 static inline ogt_color_t 
-ExtractField(uint8_t *p, unsigned int i_remaining) 
+ExtractField(uint8_t *p, unsigned int i_2bit_field) 
 {
-  return ( ( *p >> 2*(i_remaining-1) ) & 0x3 );
+  return ( ( *p >> (OGT_FIELD_BITS*(i_2bit_field-1)) ) & OGT_FIELD_MASK );
 }
 
 /*****************************************************************************
@@ -280,8 +283,8 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 
     uint8_t *p_dest = (uint8_t *)p_spu->p_sys->p_data;
 
-    uint8_t i_remaining;           /* number of 2-bit pixels remaining 
-				      in byte of *p */
+    uint8_t i_2bit_field;           /* The 2-bit field to sue in byte of *p.
+				       Has value 0..4. */
     uint8_t i_pending_zero = 0;    /* number of pixels to fill with 
 				      color zero 0..3 */
     ogt_color_t i_color;           /* current pixel color: 0..3 */
@@ -295,7 +298,7 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
       printf("\n");
 
     for ( i_field=0; i_field < 2; i_field++ ) {
-      i_remaining = 4;
+      i_2bit_field = 4;
       for ( i_row=i_field; i_row < i_height; i_row += 2 ) {
 	for ( i_column=0; i_column<i_width; i_column++ ) {
 
@@ -305,10 +308,10 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 	    i_pending_zero--;
 	    i_color = 0;
 	  } else {
-	    i_color = ExtractField( p, i_remaining);
+	    i_color = ExtractField( p, i_2bit_field );
 	    advance_color_pointer;
 	    if ( i_color == 0 ) {
-	      i_pending_zero = ExtractField( p, i_remaining );
+	      i_pending_zero = ExtractField( p, i_2bit_field );
 	      advance_color_pointer;
 	      /* Fall through with i_color == 0 to output the first cell */
 	    }
@@ -325,7 +328,7 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 	if (p_sys && p_sys->i_debug & DECODE_DBG_IMAGE)	
 	  printf("\n");
 
-	if ( i_remaining != 4 ) {
+	if ( i_2bit_field != 4 ) {
 	  /* Lines are padded to complete bytes, ignore padding */
 	  advance_color_pointer_byte;
 	}
@@ -347,19 +350,7 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
       printf("\n-------------------------------------\n");
     }
 
-    /* Remove color palette by expanding pixel entries to contain the
-       palette values. We work from the free space at the end to the
-       beginning so we can expand inline.
-    */
-    {
-      int n = (i_height * i_width) - 1;
-      uint8_t    *p_from = p_dest;
-      ogt_yuvt_t *p_to   = (ogt_yuvt_t *) p_dest;
-      
-      for ( ; n >= 0 ; n-- ) {
-	p_to[n] = p_sys->pi_palette[p_from[n]];
-      }
-    }
+    VCDInlinePalette( p_dest, p_sys, i_height, i_width );
 
     /* The video is automatically scaled. However subtitle bitmaps
        assume a 1:1 aspect ratio. So we need to scale to compensate for

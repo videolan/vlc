@@ -2,7 +2,7 @@
  * Header for Common SVCD and VCD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: common.h,v 1.1 2003/12/28 04:51:52 rocky Exp $
+ * $Id: common.h,v 1.2 2003/12/30 04:43:52 rocky Exp $
  *
  * Author: Rocky Bernstein
  *
@@ -35,5 +35,9 @@ int            VCDSubCropCallback( vlc_object_t *p_object, char const *psz_var,
 				   vlc_value_t oldval, vlc_value_t newval, 
 				   void *p_data );
 void           VCDSubUpdateSPU( subpicture_t *p_spu, vlc_object_t *p_object );
+void           VCDInlinePalette ( /*inout*/ uint8_t *p_dest, 
+				  decoder_sys_t *p_sys, unsigned int i_height, 
+				  unsigned int i_width );
+
 
 

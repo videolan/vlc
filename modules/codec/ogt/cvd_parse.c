@@ -2,7 +2,7 @@
  * parse.c: Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cvd_parse.c,v 1.3 2003/12/29 04:47:44 rocky Exp $
+ * $Id: cvd_parse.c,v 1.4 2003/12/30 04:43:52 rocky Exp $
  *
  * Authors: Rocky Bernstein 
  *   based on code from: 
@@ -46,41 +46,36 @@ typedef uint8_t ogt_color_t;
 static int  ParseImage         ( decoder_t *, subpicture_t * );
 
 /*
- * We do not have information on the subtitle format used on CVD's
- * except the submux sample code and a couple of samples of dubious
- * origin. Thus, this is the result of reading some code whose
- * correctness is not known and some experimentation.
- * 
- * CVD subtitles present several differences compared to SVCD OGT
- * subtitles.  Firstly, the image comes first and the metadata is at
- * the end.  So that the metadata can be found easily, the subtitle
- * begins with two two-byte (everything is big-endian again) that
- * describe, the total size of the subtitle data and the offset to the
- * metadata (size of the image data plus the four bytes at the
- * beginning.
- *
- * Image data comes interlaced and uses RLE.  Coding is based in
- * four-bit nibbles that are further subdivided in a two-bit repeat
- * count and a two-bit color number so that up to three pixels can be
- * describe with a total of four bits.  The function of a 0 repeat
- * count is unknown.  It might be used for RLE extension.  There is a
- * special case, though.  When the full nibble is zero, the rest of
- * the line is filled with the color value in the next nibble.  It is
- * unknown what happens if the color value is greater than three.  The
- * rest seems to use a 4-entries palette.  It is not impossible that
- * the fill-line complete case above is not as described and the zero
- * repeat count means fill line.  The sample code never produces this,
- * so it may be untested.
- *
- * The metadata section does not follow a fixed pattern, every
- * metadata item consists of a tag byte followed by parameters. In all
- * cases known, the block (including the tag byte) is exactly four
- * bytes in length.  Read the code for the rest.
- */
-
-/* FIXME: do we really need p_buffer and p? 
-   Can't all of thes _offset's and _lengths's get removed? 
+  We do not have information on the subtitle format used on CVD's
+  except the submux sample code and a couple of samples of dubious
+  origin. Thus, this is the result of reading some code whose
+  correctness is not known and some experimentation.
+  
+  CVD subtitles are different in severl ways from SVCD OGT subtitles.
+  First, the image comes first and the metadata is at the end.  So
+  that the metadata can be found easily, the subtitle packet starts
+  with two bytes (everything is big-endian again) that give the total
+  size of the subtitle data and the offset to the metadata - i.e. size
+  of the image data plus the four bytes at the beginning.
+ 
+  Image data comes interlaced is run-length encoded.  Each field is a
+  four-bit nibble. Each nibble contains a two-bit repeat count and a
+  two-bit color number so that up to three pixels can be described in
+  four bits.  The function of a 0 repeat count is unknown; it might be
+  used for RLE extension.  However when the full nibble is zero, the
+  rest of the line is filled with the color value in the next nibble.
+  It is unknown what happens if the color value is greater than three.
+  The rest seems to use a 4-entries palette.  It is not impossible
+  that the fill-line complete case above is not as described and the
+  zero repeat count means fill line.  The sample code never produces
+  this, so it may be untested.
+ 
+  The metadata section does not follow a fixed pattern, every
+  metadata item consists of a tag byte followed by parameters. In all
+  cases known, the block (including the tag byte) is exactly four
+  bytes in length.  Read the code for the rest.
 */
+
 void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
 {
   decoder_sys_t *p_sys = p_dec->p_sys;
@@ -156,7 +151,7 @@ E_(ParsePacket)( decoder_t *p_dec)
     p_spu->i_height   = p_sys->i_height;
 
     p_spu->i_start    = p_sys->i_pts;
-    p_spu->i_stop     = p_sys->i_pts + (p_sys->i_duration * 10);
+    p_spu->i_stop     = p_sys->i_pts + (p_sys->i_duration * 5);
     
     p_spu->p_sys->b_crop  = VLC_FALSE;
     p_spu->p_sys->i_debug = p_sys->i_debug;
@@ -183,7 +178,7 @@ E_(ParsePacket)( decoder_t *p_dec)
 
 #define advance_color_byte_pointer					\
   p++;									\
-  i_remaining = 2;							\
+  i_nibble_field = 2;							\
   /*									\
    * This is wrong, it may exceed maxp if it is the last, check		\
    * should be moved to use location or the algorithm changed to	\
@@ -197,14 +192,17 @@ E_(ParsePacket)( decoder_t *p_dec)
     return VLC_EGENERIC;						\
   }									
 
-/* Get the next field - either a palette index or a RLE count for
-   color 0.  To do this we use byte image pointer p, and i_remaining
-   which indicates where we are in the byte.
+#define CVD_FIELD_BITS (4)
+#define CVD_FIELD_MASK  ((1<<CVD_FIELD_BITS) - 1) 
+
+/* Get the next field - a 2-bit palette index and a run count.  To do
+   this we use byte image pointer p, and i_nibble_field which
+   indicates where we are in the byte.
 */
 static inline uint8_t
-ExtractField(uint8_t *p, unsigned int i_remaining) 
+ExtractField(uint8_t *p, uint8_t i_nibble_field) 
 {
-  return ( ( *p >> 4*(i_remaining-1) ) & 0xf );
+  return ( ( *p >> (CVD_FIELD_BITS*(i_nibble_field-1)) ) & CVD_FIELD_MASK );
 }
 
 /*****************************************************************************
@@ -236,9 +234,8 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    unsigned int i_field;  /* The subtitles are interlaced, are we on an
+    uint8_t i_field;       /* The subtitles are interlaced, are we on an
 			      even or odd scanline?  */
-
     unsigned int i_row;    /* scanline row number */
     unsigned int i_column; /* scanline column number */
 
@@ -247,8 +244,8 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 
     uint8_t *p_dest = (uint8_t *)p_spu->p_sys->p_data;
 
-    uint8_t i_remaining;       /* number of 2-bit pixels remaining 
-				  in byte of *p */
+    uint8_t i_nibble_field;    /* The 2-bit pixels remaining in byte of *p.
+				  Has value 0..2. */
     vlc_bool_t b_filling;      /* Filling i_color to the of the line. */
     uint8_t i_pending = 0;     /* number of pixels to fill with 
 				  color zero 0..3 */
@@ -256,7 +253,7 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
     uint8_t *p = p_sys->subtitle_data  + p_sys->comp_image_offset;
     uint8_t *maxp = p + p_sys->comp_image_length;
 
-    dbg_print( (DECODE_DBG_CALL) , "width x height: %dx%d ",
+    dbg_print( (DECODE_DBG_CALL) , "width x height: %dx%d",
 	       i_width, i_height);
 
     if (p_sys && p_sys->i_debug & DECODE_DBG_IMAGE)	
@@ -265,10 +262,10 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
     i_pending = 0;
 
     for ( i_field=0; i_field < 2; i_field++ ) {
-      i_remaining = 2;  /* 4-bit pieces available in *p */
-      b_filling   = VLC_FALSE;
+      i_nibble_field = 2;  /* 4-bit pieces available in *p */
 
       for ( i_row=i_field; i_row < i_height; i_row += 2 ) {
+	b_filling   = VLC_FALSE;
 	for ( i_column=0; i_column<i_width; i_column++ ) {
 	  if ( i_pending ) {
 	    /* We are in the middle of a RLE expansion, just decrement and 
@@ -278,16 +275,16 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 	    /* We are just filling to the end of line with one color, just
 	       reuse current color value */
 	  } else {
-	    uint8_t i_val = ExtractField(p, i_remaining--);
-	    if ( i_remaining == 0 ) {
+	    uint8_t i_val = ExtractField(p, i_nibble_field--);
+	    if ( i_nibble_field == 0 ) {
 	      advance_color_byte_pointer;
 	    }
 	    if ( i_val == 0 ) {
 	      /* fill the rest of the line with next color */
-	      i_color = ExtractField( p, i_remaining-- );
-	      if ( i_remaining == 0 ) {
+	      i_color = ExtractField( p, i_nibble_field-- );
+	      if ( i_nibble_field == 0 ) {
 		p++;
-		i_remaining=2;
+		i_nibble_field=2;
 		/*
 		  This is wrong, it may exceed maxp if it is the
 		  last, check should be moved to use location or the
@@ -320,7 +317,7 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 	  
 	}
 	
-	if ( i_remaining != 0 && i_remaining !=2 ) {
+	if ( i_nibble_field == 1 ) {
 	  advance_color_byte_pointer;
 	}
 
@@ -328,6 +325,21 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 	  printf("\n");
       }
     }
+
+    /* Dump out image not interlaced... */
+    if (p_sys && p_sys->i_debug & DECODE_DBG_IMAGE) {
+      uint8_t *p = p_dest;
+      printf("-------------------------------------\n++");
+      for ( i_row=0; i_row < i_height; i_row ++ ) {
+	for ( i_column=0; i_column<i_width; i_column++ ) {
+	  printf("%1d", *p++ & 0x03);
+	}
+	printf("\n++");
+      }
+      printf("\n-------------------------------------\n");
+    }
+
+    VCDInlinePalette( p_dest, p_sys, i_height, i_width );
 
     /* The video is automatically scaled. However subtitle bitmaps
        assume a 1:1 aspect ratio. So we need to scale to compensate for

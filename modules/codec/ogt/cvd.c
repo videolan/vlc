@@ -2,7 +2,7 @@
  * cvd.c : CVD Subtitle decoder thread
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cvd.c,v 1.3 2003/12/29 04:47:44 rocky Exp $
+ * $Id: cvd.c,v 1.4 2003/12/30 04:43:52 rocky Exp $
  *
  * Authors: Rocky Bernstein
  *   based on code from:
@@ -305,7 +305,7 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 	    p_sys->i_width  = lastx - p_sys->i_x_start + 1;
 	    p_sys->i_height = lasty - p_sys->i_y_start + 1;
 	    dbg_print( DECODE_DBG_PACKET, 
-		       "end position: (%d,%d): %.2x %.2x %.2x, w x h: %d x %d",
+		       "end position: (%d,%d): %.2x %.2x %.2x, w x h: %dx%d",
 		       lastx, lasty, p[1], p[2], p[3], 
 		       p_sys->i_width, p_sys->i_height );
 	    break;
@@ -357,9 +357,12 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 	  p_sys->pi_palette[3].s.t = p[2] >> 4;
 
 	  dbg_print( DECODE_DBG_PACKET,
-		     "transparancy for primary palette (y,u,v): "
-		     "0x%0x 0x%0x 0x%0x",
-		     p[1], p[2], p[3]);
+		     "transparancy for primary palette 0..3: "
+		     "0x%0x 0x%0x 0x%0x 0x%0x",
+		     p_sys->pi_palette[0].s.t,
+		     p_sys->pi_palette[1].s.t,
+		     p_sys->pi_palette[2].s.t,
+		     p_sys->pi_palette[3].s.t );
 
 	  break;
 
@@ -371,9 +374,12 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 	  p_sys->pi_palette_highlight[3].s.t = p[1] >> 4;
 
 	  dbg_print( DECODE_DBG_PACKET,
-		     "transparancy for highlight palette (y,u,v): "
-		     "0x%0x 0x%0x 0x%0x",
-		     p[1], p[2], p[3]);
+		     "transparancy for primary palette 0..3: "
+		     "0x%0x 0x%0x 0x%0x 0x%0x",
+		     p_sys->pi_palette_highlight[0].s.t,
+		     p_sys->pi_palette_highlight[1].s.t,
+		     p_sys->pi_palette_highlight[2].s.t,
+		     p_sys->pi_palette_highlight[3].s.t );
 
 	  break;
 	  

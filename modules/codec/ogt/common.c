@@ -2,7 +2,7 @@
  * Common SVCD and VCD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: common.c,v 1.1 2003/12/28 04:51:52 rocky Exp $
+ * $Id: common.c,v 1.2 2003/12/30 04:43:52 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -158,6 +158,25 @@ vout_thread_t *VCDSubFindVout( decoder_t *p_dec )
     while( 1 );
 
     return p_vout;
+}
+
+
+
+/* Remove color palette by expanding pixel entries to contain the
+   palette values. We work from the free space at the end to the
+   beginning so we can expand inline.
+    */
+void
+VCDInlinePalette ( /*inout*/ uint8_t *p_dest, decoder_sys_t *p_sys,
+		   unsigned int i_height, unsigned int i_width ) 
+{
+  int n = (i_height * i_width) - 1;
+  uint8_t    *p_from = p_dest;
+  ogt_yuvt_t *p_to   = (ogt_yuvt_t *) p_dest;
+  
+  for ( ; n >= 0 ; n-- ) {
+    p_to[n] = p_sys->pi_palette[p_from[n]];
+  }
 }
 
 
