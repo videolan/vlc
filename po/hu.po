@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLAN\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-30 23:31+0200\n"
+"POT-Creation-Date: 2004-10-02 17:36+0200\n"
 "PO-Revision-Date: 2003-10-26 02:54+0100\n"
 "Last-Translator: DirektX <DirektX @ freemail.hu>\n"
 "Language-Team: DirektX <DirektX @ freemail.hu>\n"
@@ -205,7 +205,7 @@ msgstr ""
 msgid "No help is available for these modules"
 msgstr ""
 
-#: include/vlc_interface.h:126
+#: include/vlc_interface.h:129
 msgid ""
 "\n"
 "Warning: if you can't access the GUI anymore, open a dos command box, go to "
@@ -215,7 +215,7 @@ msgstr ""
 "Warning: if you can't access the GUI anymore, open a dos command box, go to "
 "the directory where you installed VLC and run \"vlc -I wxwin\"\n"
 
-#: include/vlc_interface.h:159
+#: include/vlc_interface.h:162
 msgid ""
 "VLC is an open-source and cross-platform multimedia player for various audio "
 "and video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, Ogg, ...) as well as "
@@ -293,7 +293,7 @@ msgstr "&Beállítások"
 msgid "URL"
 msgstr ""
 
-#: include/vlc_meta.h:38 src/input/es_out.c:1088 src/libvlc.h:73
+#: include/vlc_meta.h:38 src/input/es_out.c:1087 src/libvlc.h:73
 #: modules/gui/beos/InterfaceWindow.cpp:259
 msgid "Language"
 msgstr "Nyelv"
@@ -533,73 +533,76 @@ msgstr ""
 msgid "Track %i"
 msgstr ""
 
-#: src/input/es_out.c:1080 src/input/es_out.c:1083
+#: src/input/es_out.c:1082
 #, c-format
 msgid "Stream %d"
 msgstr ""
 
-#: src/input/es_out.c:1085
+#: src/input/es_out.c:1084 modules/gui/wxwindows/wizard.cpp:806
+#: modules/gui/wxwindows/wizard.cpp:842
 msgid "Codec"
 msgstr ""
 
-#: src/input/es_out.c:1096 src/input/es_out.c:1118 src/input/es_out.c:1135
+#: src/input/es_out.c:1095 src/input/es_out.c:1117 src/input/es_out.c:1134
 #: modules/gui/macosx/output.m:153
 msgid "Type"
 msgstr ""
 
-#: src/input/es_out.c:1096 src/libvlc.h:799
+#: src/input/es_out.c:1095 src/libvlc.h:799
 #: modules/gui/beos/InterfaceWindow.cpp:263
 #: modules/gui/gtk/gnome_interface.c:1092 modules/gui/gtk/gtk_interface.c:1219
 #: modules/gui/macosx/intf.m:439 modules/gui/macosx/output.m:170
 #: modules/gui/wxwindows/extrapanel.cpp:178
+#: modules/gui/wxwindows/wizard.cpp:832
 msgid "Audio"
 msgstr "Hang"
 
-#: src/input/es_out.c:1099 modules/gui/gtk/gnome_interface.c:148
+#: src/input/es_out.c:1098 modules/gui/gtk/gnome_interface.c:148
 #: modules/gui/gtk/gnome_interface.c:931 modules/gui/gtk/gtk_interface.c:481
 #: modules/gui/gtk/gtk_interface.c:1282 modules/gui/macosx/output.m:176
 #: modules/gui/wxwindows/streamout.cpp:760
 msgid "Channels"
 msgstr ""
 
-#: src/input/es_out.c:1103
+#: src/input/es_out.c:1102
 msgid "Sample rate"
 msgstr ""
 
-#: src/input/es_out.c:1104
+#: src/input/es_out.c:1103
 #, c-format
 msgid "%d Hz"
 msgstr ""
 
-#: src/input/es_out.c:1108
+#: src/input/es_out.c:1107
 msgid "Bits per sample"
 msgstr ""
 
-#: src/input/es_out.c:1112 modules/access/pvr/pvr.c:73
+#: src/input/es_out.c:1111 modules/access/pvr/pvr.c:73
 msgid "Bitrate"
 msgstr ""
 
-#: src/input/es_out.c:1113
+#: src/input/es_out.c:1112
 #, c-format
 msgid "%d kb/s"
 msgstr ""
 
-#: src/input/es_out.c:1118 src/libvlc.h:825
+#: src/input/es_out.c:1117 src/libvlc.h:825
 #: modules/gui/gtk/gnome_interface.c:1099 modules/gui/gtk/gtk_interface.c:1296
 #: modules/gui/macosx/intf.m:452 modules/gui/macosx/output.m:160
-#: modules/gui/wxwindows/extrapanel.cpp:176 modules/misc/dummy/dummy.c:91
+#: modules/gui/wxwindows/extrapanel.cpp:176
+#: modules/gui/wxwindows/wizard.cpp:797 modules/misc/dummy/dummy.c:91
 msgid "Video"
 msgstr "Kép"
 
-#: src/input/es_out.c:1122
+#: src/input/es_out.c:1121
 msgid "Resolution"
 msgstr ""
 
-#: src/input/es_out.c:1128
+#: src/input/es_out.c:1127
 msgid "Display resolution"
 msgstr ""
 
-#: src/input/es_out.c:1135 modules/gui/gtk/gnome_interface.c:1972
+#: src/input/es_out.c:1134 modules/gui/gtk/gnome_interface.c:1972
 #: modules/gui/gtk/gtk_interface.c:2287
 msgid "Subtitle"
 msgstr ""
@@ -2096,7 +2099,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1127 modules/gui/macosx/controls.m:556
 #: modules/gui/macosx/intf.m:382 modules/gui/macosx/intf.m:421
 #: modules/gui/macosx/intf.m:490 modules/gui/pda/pda_interface.c:274
-#: modules/gui/pda/pda_interface.c:275 modules/gui/wxwindows/interface.cpp:431
+#: modules/gui/pda/pda_interface.c:275 modules/gui/wxwindows/interface.cpp:435
 #: modules/gui/wxwindows/menus.cpp:273 modules/visualization/xosd.c:230
 #: modules/visualization/xosd.c:231
 #, c-format
@@ -2466,7 +2469,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:2709 modules/gui/macosx/intf.m:475
 #: modules/gui/macosx/playlist.m:170 modules/gui/macosx/playlist.m:185
 #: modules/gui/pda/pda_interface.c:1265
-#: modules/gui/wxwindows/interface.cpp:434
+#: modules/gui/wxwindows/interface.cpp:438
 #: modules/gui/wxwindows/playlist.cpp:183
 msgid "Playlist"
 msgstr "Lejátszási lista"
@@ -3293,8 +3296,9 @@ msgid "Year"
 msgstr "Törlés"
 
 #: modules/access/cdda/access.c:731
+#, fuzzy
 msgid "Track Artist"
-msgstr ""
+msgstr "Elõzõ cím"
 
 #: modules/access/cdda/access.c:733
 #, fuzzy
@@ -3404,8 +3408,9 @@ msgid "If set, lookup CD-DA track information using the CDDB protocol"
 msgstr ""
 
 #: modules/access/cdda/cdda.c:142
+#, fuzzy
 msgid "CDDB server"
-msgstr ""
+msgstr "Kiszolgáló kapu"
 
 #: modules/access/cdda/cdda.c:143
 msgid "Contact this CDDB server look up CD-DA information"
@@ -3441,8 +3446,9 @@ msgid "If set, the CDDB server gets information via the CDDB HTTP protocol"
 msgstr ""
 
 #: modules/access/cdda/cdda.c:168
+#, fuzzy
 msgid "CDDB server timeout"
-msgstr ""
+msgstr "Kiszolgáló kapu"
 
 #: modules/access/cdda/cdda.c:169
 msgid "Time (in seconds) to wait for a response from the CDDB server"
@@ -3478,8 +3484,9 @@ msgid "expand"
 msgstr ""
 
 #: modules/access/directory.c:78
+#, fuzzy
 msgid "Standard filesystem directory input"
-msgstr ""
+msgstr "Kimeneti adatfolyam"
 
 #: modules/access/directory.c:88
 msgid "Directory EOF"
@@ -3494,9 +3501,9 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:67 modules/access/dshow/dshow.cpp:69
 #: modules/gui/gtk/menu.c:700
-#, c-format
+#, fuzzy, c-format
 msgid "None"
-msgstr ""
+msgstr "Nem"
 
 #: modules/access/dshow/dshow.cpp:73
 msgid ""
@@ -3541,8 +3548,9 @@ msgid ""
 msgstr ""
 
 #: modules/access/dshow/dshow.cpp:90 modules/access/v4l/v4l.c:84
+#, fuzzy
 msgid "Video input chroma format"
-msgstr ""
+msgstr "VIdeó kódoló"
 
 #: modules/access/dshow/dshow.cpp:92
 msgid ""
@@ -3576,8 +3584,9 @@ msgstr "Lemez kidobása"
 
 #: modules/access/dshow/dshow.cpp:117 modules/access/dshow/dshow.cpp:122
 #: modules/gui/gtk/preferences.c:373
+#, fuzzy
 msgid "Configure"
-msgstr ""
+msgstr "Tovább"
 
 #: modules/access/dvb/access.c:52
 msgid ""
@@ -3649,8 +3658,9 @@ msgid "Antenna lnb_slof (kHz)"
 msgstr ""
 
 #: modules/access/dvb/access.c:86
+#, fuzzy
 msgid "Budget mode"
-msgstr ""
+msgstr "Fájlnév"
 
 #: modules/access/dvb/access.c:87
 msgid "This allows you to stream an entire transponder with a budget card."
@@ -3831,8 +3841,9 @@ msgid ""
 msgstr ""
 
 #: modules/access/file.c:80
+#, fuzzy
 msgid "Standard filesystem file input"
-msgstr ""
+msgstr "Kimeneti adatfolyam"
 
 #: modules/access/ftp.c:42
 msgid ""
@@ -3867,8 +3878,9 @@ msgid "Allows you to modify the account that will be used for the connection."
 msgstr ""
 
 #: modules/access/ftp.c:55
+#, fuzzy
 msgid "FTP input"
-msgstr ""
+msgstr "Hang menü"
 
 #: modules/access/http.c:42
 msgid "HTTP proxy"
@@ -3888,8 +3900,9 @@ msgid ""
 msgstr ""
 
 #: modules/access/http.c:53
+#, fuzzy
 msgid "HTTP user name"
-msgstr ""
+msgstr "Lejátszás indítása"
 
 #: modules/access/http.c:54
 msgid ""
@@ -3902,8 +3915,9 @@ msgid "HTTP password"
 msgstr ""
 
 #: modules/access/http.c:61
+#, fuzzy
 msgid "HTTP user agent"
-msgstr ""
+msgstr "Lejátszás indítása"
 
 #: modules/access/http.c:62
 msgid ""
@@ -3921,8 +3935,9 @@ msgid ""
 msgstr ""
 
 #: modules/access/http.c:70
+#, fuzzy
 msgid "HTTP input"
-msgstr ""
+msgstr "Hang menü"
 
 #: modules/access/mms/mms.c:48
 msgid ""
@@ -3931,8 +3946,9 @@ msgid ""
 msgstr ""
 
 #: modules/access/mms/mms.c:51
+#, fuzzy
 msgid "Force selection of all streams"
-msgstr ""
+msgstr "Hálózati adatfolyam megadása"
 
 #: modules/access/mms/mms.c:53
 #, fuzzy
@@ -3950,8 +3966,9 @@ msgstr ""
 #: modules/access/pvr/pvr.c:46 modules/gui/gtk/gnome_interface.c:155
 #: modules/gui/gtk/gnome_interface.c:938 modules/gui/gtk/gtk_interface.c:488
 #: modules/gui/gtk/gtk_interface.c:1289
+#, fuzzy
 msgid "Device"
-msgstr ""
+msgstr "DVD meghajtó"
 
 #: modules/access/pvr/pvr.c:47
 #, fuzzy
@@ -4101,8 +4118,9 @@ msgid "Demux number"
 msgstr "Demux modul"
 
 #: modules/access/satellite/satellite.c:44
+#, fuzzy
 msgid "Tuner number"
-msgstr ""
+msgstr "Demux modul"
 
 #: modules/access/satellite/satellite.c:47
 msgid "Satellite default transponder frequency (kHz)"
@@ -4168,8 +4186,9 @@ msgid ""
 msgstr ""
 
 #: modules/access/slp.c:65
+#, fuzzy
 msgid "SLP scopes list"
-msgstr ""
+msgstr "Kodek lista megadása"
 
 #: modules/access/slp.c:67
 msgid ""
@@ -4188,8 +4207,9 @@ msgid ""
 msgstr ""
 
 #: modules/access/slp.c:75
+#, fuzzy
 msgid "SLP LDAP filter"
-msgstr ""
+msgstr "Fájlmentés"
 
 #: modules/access/slp.c:77
 msgid ""
@@ -4208,8 +4228,9 @@ msgid ""
 msgstr ""
 
 #: modules/access/slp.c:86
+#, fuzzy
 msgid "SLP input"
-msgstr ""
+msgstr "Hang menü"
 
 #: modules/access/tcp.c:39
 msgid ""
@@ -4218,8 +4239,9 @@ msgid ""
 msgstr ""
 
 #: modules/access/tcp.c:46
+#, fuzzy
 msgid "TCP input"
-msgstr ""
+msgstr "Hang menü"
 
 #: modules/access/udp.c:43 modules/access_output/udp.c:65
 msgid ""
@@ -4269,12 +4291,14 @@ msgid "Video4Linux"
 msgstr "Kép menü"
 
 #: modules/access/v4l/v4l.c:91
+#, fuzzy
 msgid "Video4Linux input"
-msgstr ""
+msgstr "Kép menü"
 
 #: modules/access/vcd/vcd.c:46
+#, fuzzy
 msgid "VCD input"
-msgstr ""
+msgstr "Hang menü"
 
 #: modules/access/vcd/vcd.c:50
 msgid "[vcd:][device][@[title][,[chapter]]]"
@@ -4328,7 +4352,7 @@ msgid "Volume Set"
 msgstr ""
 
 #: modules/access/vcdx/access.c:1060 modules/gui/macosx/intf.m:386
-#: modules/gui/wxwindows/interface.cpp:1125
+#: modules/gui/wxwindows/interface.cpp:1129
 msgid "Volume"
 msgstr ""
 
@@ -4634,8 +4658,9 @@ msgstr ""
 
 #: modules/audio_filter/converter/mpgatofixed32.c:65
 #: modules/audio_filter/converter/mpgatofixed32.c:70
+#, fuzzy
 msgid "MPEG audio decoder"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/audio_filter/converter/s16tofixed32.c:46
 msgid "audio filter for s16->fixed32 conversion"
@@ -4709,16 +4734,19 @@ msgstr ""
 
 #: modules/audio_filter/equalizer_presets.h:39
 #: modules/demux/util/id3genres.h:31
+#, fuzzy
 msgid "Dance"
-msgstr ""
+msgstr "Mégse"
 
 #: modules/audio_filter/equalizer_presets.h:39
+#, fuzzy
 msgid "Full bass"
-msgstr ""
+msgstr "Teljesképernyõ"
 
 #: modules/audio_filter/equalizer_presets.h:40
+#, fuzzy
 msgid "Full bass and treble"
-msgstr ""
+msgstr "Teljesképernyõ"
 
 #: modules/audio_filter/equalizer_presets.h:40
 #, fuzzy
@@ -4837,16 +4865,18 @@ msgid "Dummy S/PDIF audio mixer"
 msgstr "hang kódoló"
 
 #: modules/audio_mixer/trivial.c:45
+#, fuzzy
 msgid "Trivial audio mixer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/audio_output/alsa.c:84
 msgid "default"
 msgstr ""
 
 #: modules/audio_output/alsa.c:99
+#, fuzzy
 msgid "ALSA audio output"
-msgstr ""
+msgstr "Teljesképernyõs kép"
 
 #: modules/audio_output/alsa.c:101
 #, fuzzy
@@ -4884,8 +4914,9 @@ msgid "A/52 over S/PDIF"
 msgstr "A/52 S/PDIF-n keresztül"
 
 #: modules/audio_output/arts.c:66
+#, fuzzy
 msgid "aRts audio output"
-msgstr ""
+msgstr "Teljesképernyõs kép"
 
 #: modules/audio_output/coreaudio.c:218
 msgid ""
@@ -4895,12 +4926,14 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/coreaudio.c:223
+#, fuzzy
 msgid "CoreAudio output"
-msgstr ""
+msgstr "Hang kimenet modul"
 
 #: modules/audio_output/directx.c:209
+#, fuzzy
 msgid "DirectX audio output"
-msgstr ""
+msgstr "Teljesképernyõs kép"
 
 #: modules/audio_output/directx.c:415
 #, fuzzy
@@ -4908,8 +4941,9 @@ msgid "3 Front 2 Rear"
 msgstr "2 elsõ, 2 hátsó"
 
 #: modules/audio_output/esd.c:66
+#, fuzzy
 msgid "EsounD audio output"
-msgstr ""
+msgstr "Teljesképernyõs kép"
 
 #: modules/audio_output/file.c:80
 msgid "Output format"
@@ -4940,8 +4974,9 @@ msgid "Instead of writing a raw file, you can add a WAV header to the file"
 msgstr ""
 
 #: modules/audio_output/file.c:106
+#, fuzzy
 msgid "Output file"
-msgstr ""
+msgstr "Fájl megnyitása"
 
 #: modules/audio_output/file.c:107
 msgid "File to which the audio samples will be written to"
@@ -4969,8 +5004,9 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/oss.c:108
+#, fuzzy
 msgid "Linux OSS audio output"
-msgstr ""
+msgstr "Teljesképernyõs kép"
 
 #: modules/audio_output/oss.c:111
 #, fuzzy
@@ -5001,12 +5037,14 @@ msgid "A/52 parser"
 msgstr ""
 
 #: modules/codec/a52.c:95
+#, fuzzy
 msgid "A/52 audio packetizer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/codec/adpcm.c:41
+#, fuzzy
 msgid "ADPCM audio decoder"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/codec/araw.c:41
 #, fuzzy
@@ -5019,8 +5057,9 @@ msgid "Raw audio encoder"
 msgstr "hang kódoló"
 
 #: modules/codec/cinepak.c:38
+#, fuzzy
 msgid "Cinepak video decoder"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/codec/cmml/cmml.c:70
 msgid "CMML annotations decoder"
@@ -5039,12 +5078,14 @@ msgid "DTS parser"
 msgstr ""
 
 #: modules/codec/dts.c:96
+#, fuzzy
 msgid "DTS audio packetizer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/codec/dv.c:48
+#, fuzzy
 msgid "DV video decoder"
-msgstr ""
+msgstr "VIdeó kódoló"
 
 #: modules/codec/dvbsub.c:51
 #, fuzzy
@@ -5087,12 +5128,14 @@ msgid "ffmpeg chroma conversion"
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:121
+#, fuzzy
 msgid "ffmpeg audio/video encoder"
-msgstr ""
+msgstr "Elõzõ fájl"
 
 #: modules/codec/ffmpeg/ffmpeg.c:165
+#, fuzzy
 msgid "ffmpeg demuxer"
-msgstr ""
+msgstr "Elõzõ fájl"
 
 #: modules/codec/ffmpeg/ffmpeg.c:173
 #, fuzzy
@@ -5105,8 +5148,9 @@ msgid "ffmpeg deinterlace video filter"
 msgstr "Elõzõ fájl"
 
 #: modules/codec/ffmpeg/ffmpeg.h:86
+#, fuzzy
 msgid "Direct rendering"
-msgstr ""
+msgstr "VIdeó kódoló"
 
 #: modules/codec/ffmpeg/ffmpeg.h:88
 msgid "Error resilience"
@@ -5237,8 +5281,9 @@ msgid "Allows you to enable the pre motion estimation."
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:193
+#, fuzzy
 msgid "Enable strict rate control"
-msgstr ""
+msgstr "Felirat kódolása"
 
 #: modules/codec/ffmpeg/ffmpeg.h:194
 msgid "Allows you to enable the strict rate control algorithm."
@@ -5250,8 +5295,9 @@ msgid "Rate control buffer size"
 msgstr "A hálózati csatoló MTU-ja"
 
 #: modules/codec/ffmpeg/ffmpeg.h:198
+#, fuzzy
 msgid "Allows you to specify the rate control buffer size."
-msgstr ""
+msgstr "A hálózati csatoló MTU-ja"
 
 #: modules/codec/ffmpeg/ffmpeg.h:201
 #, fuzzy
@@ -5259,8 +5305,9 @@ msgid "Rate control buffer aggressiveness"
 msgstr "A hálózati csatoló MTU-ja"
 
 #: modules/codec/ffmpeg/ffmpeg.h:202
+#, fuzzy
 msgid "Allows you to specify the rate control buffer aggressiveness."
-msgstr ""
+msgstr "A hálózati csatoló MTU-ja"
 
 #: modules/codec/ffmpeg/ffmpeg.h:205
 msgid "I quantization factor"
@@ -5363,8 +5410,9 @@ msgid "Post processing"
 msgstr ""
 
 #: modules/codec/ffmpeg/postprocess.c:92
+#, fuzzy
 msgid "1 (Lowest)"
-msgstr ""
+msgstr "DVD menük használata"
 
 #: modules/codec/ffmpeg/postprocess.c:102
 msgid "6 (Highest)"
@@ -5388,8 +5436,9 @@ msgid "Flac audio decoder"
 msgstr "hang kódoló"
 
 #: modules/codec/flac.c:150
+#, fuzzy
 msgid "Flac audio packetizer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/codec/flac.c:155
 #, fuzzy
@@ -5411,16 +5460,18 @@ msgid "Linear PCM audio packetizer"
 msgstr "Feliratok"
 
 #: modules/codec/mash.cpp:65
+#, fuzzy
 msgid "Video decoder using openmash"
-msgstr ""
+msgstr "VIdeó kódoló"
 
 #: modules/codec/mpeg_audio.c:106
 msgid "MPEG audio layer I/II/III parser"
 msgstr ""
 
 #: modules/codec/mpeg_audio.c:115
+#, fuzzy
 msgid "MPEG audio layer I/II/III packetizer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/codec/ogt/cvd.c:46
 #, fuzzy
@@ -5475,8 +5526,9 @@ msgid ""
 msgstr ""
 
 #: modules/codec/ogt/subtitle.h:68
+#, fuzzy
 msgid "Factor to increase subtitle display interval"
-msgstr ""
+msgstr "Következõ lejátszási listatétel"
 
 #: modules/codec/ogt/subtitle.h:70
 msgid ""
@@ -5517,36 +5569,43 @@ msgid "QuickTime library decoder"
 msgstr ""
 
 #: modules/codec/rawvideo.c:68
+#, fuzzy
 msgid "Pseudo raw video decoder"
-msgstr ""
+msgstr "Videó eszköz"
 
 #: modules/codec/rawvideo.c:73
+#, fuzzy
 msgid "Pseudo raw video packetizer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/codec/speex.c:102
+#, fuzzy
 msgid "Speex audio decoder"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/codec/speex.c:107
+#, fuzzy
 msgid "Speex audio packetizer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/codec/speex.c:112
+#, fuzzy
 msgid "Speex audio encoder"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/codec/speex.c:547 modules/codec/speex.c:564
+#, fuzzy
 msgid "Speex comment"
-msgstr ""
+msgstr "Általános"
 
 #: modules/codec/speex.c:547
 msgid "Mode"
 msgstr ""
 
 #: modules/codec/spudec/spudec.c:41
+#, fuzzy
 msgid "DVD subtitles decoder"
-msgstr ""
+msgstr "Felirat kódolása"
 
 #: modules/codec/spudec/spudec.c:46
 #, fuzzy
@@ -5554,20 +5613,24 @@ msgid "DVD subtitles packetizer"
 msgstr "Feliratok"
 
 #: modules/codec/subsdec.c:86
+#, fuzzy
 msgid "Subtitles text encoding"
-msgstr ""
+msgstr "Felirat kódolása"
 
 #: modules/codec/subsdec.c:87
+#, fuzzy
 msgid "Set the encoding used in text subtitles"
-msgstr ""
+msgstr "Következõ lejátszási listatétel"
 
 #: modules/codec/subsdec.c:88 modules/gui/macosx/open.m:233
+#, fuzzy
 msgid "Subtitles justification"
-msgstr ""
+msgstr "Felirat beállításai"
 
 #: modules/codec/subsdec.c:89
+#, fuzzy
 msgid "Set the justification of subtitles"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/codec/subsdec.c:92
 #, fuzzy
@@ -5590,16 +5653,19 @@ msgid ""
 msgstr ""
 
 #: modules/codec/theora.c:91
+#, fuzzy
 msgid "Theora video decoder"
-msgstr ""
+msgstr "VIdeó kódoló"
 
 #: modules/codec/theora.c:97
+#, fuzzy
 msgid "Theora video packetizer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/codec/theora.c:103
+#, fuzzy
 msgid "Theora video encoder"
-msgstr ""
+msgstr "VIdeó kódoló"
 
 #: modules/codec/theora.c:468
 msgid "Theora comment"
@@ -5663,16 +5729,19 @@ msgid "Allows you to force a constant bitrate encoding (CBR)."
 msgstr ""
 
 #: modules/codec/vorbis.c:145
+#, fuzzy
 msgid "Vorbis audio decoder"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/codec/vorbis.c:154
+#, fuzzy
 msgid "Vorbis audio packetizer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/codec/vorbis.c:161
+#, fuzzy
 msgid "Vorbis audio encoder"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/codec/vorbis.c:577
 msgid "Vorbis comment"
@@ -5697,8 +5766,9 @@ msgid "h264 video encoder using x264 library"
 msgstr ""
 
 #: modules/codec/xvid.c:45
+#, fuzzy
 msgid "Xvid video decoder"
-msgstr ""
+msgstr "VIdeó kódoló"
 
 #: modules/control/corba/corba.c:685
 #, fuzzy
@@ -5727,8 +5797,9 @@ msgid "You can set the trigger button for mouse gestures here."
 msgstr ""
 
 #: modules/control/gestures.c:87
+#, fuzzy
 msgid "Middle"
-msgstr ""
+msgstr "Fájl"
 
 #: modules/control/gestures.c:94
 #, fuzzy
@@ -5810,20 +5881,23 @@ msgid "N/A"
 msgstr ""
 
 #: modules/control/http.c:75 modules/misc/rtsp.c:46
+#, fuzzy
 msgid "Host address"
-msgstr ""
+msgstr "Cím"
 
 #: modules/control/http.c:77
 msgid "You can set the address and port the http interface will bind to."
 msgstr ""
 
 #: modules/control/http.c:78 modules/control/http.c:79
+#, fuzzy
 msgid "Source directory"
-msgstr ""
+msgstr "Hang választás"
 
 #: modules/control/http.c:82
+#, fuzzy
 msgid "HTTP remote control interface"
-msgstr ""
+msgstr "A hálózati csatoló MTU-ja"
 
 #: modules/control/joystick.c:135
 msgid "Motion threshold"
@@ -5883,8 +5957,9 @@ msgid "Joystick control interface"
 msgstr "Kezelõfelület"
 
 #: modules/control/lirc.c:65
+#, fuzzy
 msgid "Infrared remote control interface"
-msgstr ""
+msgstr "A hálózati csatoló MTU-ja"
 
 #: modules/control/lirc.c:201 modules/control/lirc.c:208
 #, c-format
@@ -5902,13 +5977,13 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1119 modules/gui/macosx/intf.m:1102
 #: modules/gui/macosx/intf.m:1103 modules/gui/macosx/intf.m:1104
 #: modules/gui/pda/pda_interface.c:250 modules/gui/pda/pda_interface.c:251
-#: modules/gui/wxwindows/interface.cpp:433
-#: modules/gui/wxwindows/interface.cpp:1045
+#: modules/gui/wxwindows/interface.cpp:437
+#: modules/gui/wxwindows/interface.cpp:1049
 #: modules/gui/wxwindows/menus.cpp:281 modules/visualization/xosd.c:236
 #: modules/visualization/xosd.c:237
-#, c-format
+#, fuzzy, c-format
 msgid "Pause"
-msgstr ""
+msgstr "Beillesztés"
 
 #: modules/control/lirc.c:325 modules/gui/gtk/gnome_interface.c:590
 #: modules/gui/gtk/gnome_interface.c:1013 modules/gui/gtk/gtk_interface.c:698
@@ -5916,12 +5991,13 @@ msgstr ""
 #: modules/gui/macosx/intf.m:489 modules/gui/macosx/intf.m:1110
 #: modules/gui/macosx/intf.m:1111 modules/gui/macosx/intf.m:1112
 #: modules/gui/macosx/playlist.m:172 modules/gui/pda/pda_interface.c:262
-#: modules/gui/pda/pda_interface.c:263 modules/gui/wxwindows/interface.cpp:432
-#: modules/gui/wxwindows/interface.cpp:1051
+#: modules/gui/pda/pda_interface.c:263 modules/gui/wxwindows/interface.cpp:436
+#: modules/gui/wxwindows/interface.cpp:1055
 #: modules/gui/wxwindows/menus.cpp:279 modules/gui/wxwindows/menus.cpp:293
 #: modules/gui/wxwindows/playlist.cpp:254
+#, fuzzy
 msgid "Play"
-msgstr ""
+msgstr "Lejátszási lista"
 
 #: modules/control/netsync.c:80
 msgid "Act as master for network synchronisation"
@@ -5948,16 +6024,18 @@ msgid "Network synchronisation"
 msgstr ""
 
 #: modules/control/ntservice.c:39
+#, fuzzy
 msgid "Install Windows Service"
-msgstr ""
+msgstr "Kezelõfelület"
 
 #: modules/control/ntservice.c:41
 msgid "If enabled the interface will install the Service and exit."
 msgstr ""
 
 #: modules/control/ntservice.c:42
+#, fuzzy
 msgid "Uninstall Windows Service"
-msgstr ""
+msgstr "Kezelõfelület"
 
 #: modules/control/ntservice.c:44
 msgid "If enabled the interface will uninstall the Service and exit."
@@ -5984,16 +6062,16 @@ msgstr ""
 msgid "Windows Service interface"
 msgstr "Kezelõfelület"
 
-#: modules/control/rc.c:120
+#: modules/control/rc.c:120 modules/control/rtci.c:127
 msgid "Show stream position"
 msgstr ""
 
-#: modules/control/rc.c:121
+#: modules/control/rc.c:121 modules/control/rtci.c:128
 msgid ""
 "Show the current position in seconds within the stream from time to time."
 msgstr ""
 
-#: modules/control/rc.c:124
+#: modules/control/rc.c:124 modules/control/rtci.c:131
 msgid "Fake TTY"
 msgstr ""
 
@@ -6001,33 +6079,34 @@ msgstr ""
 msgid "Force the rc module to use stdin as if it was a TTY."
 msgstr ""
 
-#: modules/control/rc.c:127
+#: modules/control/rc.c:127 modules/control/rtci.c:134
 msgid "UNIX socket command input"
 msgstr ""
 
-#: modules/control/rc.c:128
+#: modules/control/rc.c:128 modules/control/rtci.c:135
 msgid "Accept commands over a Unix socket rather than stdin."
 msgstr ""
 
-#: modules/control/rc.c:131
+#: modules/control/rc.c:131 modules/control/rtci.c:138
 msgid "TCP command input"
 msgstr ""
 
-#: modules/control/rc.c:132
+#: modules/control/rc.c:132 modules/control/rtci.c:139
 msgid ""
 "Accept commands over a socket rather than stdin. You can set the address and "
 "port the interface will bind to."
 msgstr ""
 
-#: modules/control/rc.c:134
+#: modules/control/rc.c:134 modules/control/rtci.c:141
 msgid "Extended help"
 msgstr ""
 
-#: modules/control/rc.c:135
+#: modules/control/rc.c:135 modules/control/rtci.c:142
 msgid "List additional commands."
 msgstr ""
 
-#: modules/control/rc.c:139 modules/misc/dummy/dummy.c:49
+#: modules/control/rc.c:139 modules/control/rtci.c:146
+#: modules/misc/dummy/dummy.c:49
 msgid "Do not open a DOS command box interface"
 msgstr ""
 
@@ -6049,226 +6128,251 @@ msgid "Remote control interface initialized, `h' for help\n"
 msgstr "A hálózati csatoló MTU-ja"
 
 #: modules/control/rc.c:471 modules/control/rc.c:486
+#: modules/control/rtci.c:476 modules/control/rtci.c:491
 #, c-format
 msgid "%s: returned %i (%s)\n"
 msgstr ""
 
-#: modules/control/rc.c:520
+#: modules/control/rc.c:520 modules/control/rtci.c:525
 #, c-format
 msgid "+----[ end of stream info ]\n"
 msgstr ""
 
-#: modules/control/rc.c:525
+#: modules/control/rc.c:525 modules/control/rtci.c:530
 #, fuzzy, c-format
 msgid "no input\n"
 msgstr "Hang menü"
 
-#: modules/control/rc.c:602
+#: modules/control/rc.c:602 modules/control/rtci.c:607
 #, c-format
 msgid "+----[ Remote control commands ]\n"
 msgstr ""
 
-#: modules/control/rc.c:604
+#: modules/control/rc.c:604 modules/control/rtci.c:609
 #, c-format
 msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist\n"
 msgstr ""
 
-#: modules/control/rc.c:605
+#: modules/control/rc.c:605 modules/control/rtci.c:610
 #, c-format
 msgid "| playlist . . .  show items currently in playlist\n"
 msgstr ""
 
-#: modules/control/rc.c:606
+#: modules/control/rc.c:606 modules/control/rtci.c:611
 #, c-format
 msgid "| play . . . . . . . . . . . . . . . . play stream\n"
 msgstr ""
 
-#: modules/control/rc.c:607
+#: modules/control/rc.c:607 modules/control/rtci.c:612
 #, c-format
 msgid "| stop . . . . . . . . . . . . . . . . stop stream\n"
 msgstr ""
 
-#: modules/control/rc.c:608
+#: modules/control/rc.c:608 modules/control/rtci.c:613
 #, c-format
 msgid "| next . . . . . . . . . . . .  next playlist item\n"
 msgstr ""
 
-#: modules/control/rc.c:609
+#: modules/control/rc.c:609 modules/control/rtci.c:614
 #, c-format
 msgid "| prev . . . . . . . . . .  previous playlist item\n"
 msgstr ""
 
-#: modules/control/rc.c:610
+#: modules/control/rc.c:610 modules/control/rtci.c:615
 #, c-format
 msgid "| title [X]  . . . . set/get title in current item\n"
 msgstr ""
 
-#: modules/control/rc.c:611
+#: modules/control/rc.c:611 modules/control/rtci.c:616
 #, c-format
 msgid "| title_n  . . . . . .  next title in current item\n"
 msgstr ""
 
-#: modules/control/rc.c:612
+#: modules/control/rc.c:612 modules/control/rtci.c:617
 #, c-format
 msgid "| title_p  . . . .  previous title in current item\n"
 msgstr ""
 
-#: modules/control/rc.c:613
+#: modules/control/rc.c:613 modules/control/rtci.c:618
 #, c-format
 msgid "| chapter [X]  . . set/get chapter in current item\n"
 msgstr ""
 
-#: modules/control/rc.c:614
+#: modules/control/rc.c:614 modules/control/rtci.c:619
 #, c-format
 msgid "| chapter_n  . . . .  next chapter in current item\n"
 msgstr ""
 
-#: modules/control/rc.c:615
+#: modules/control/rc.c:615 modules/control/rtci.c:620
 #, c-format
 msgid "| chapter_p  . .  previous chapter in current item\n"
 msgstr ""
 
-#: modules/control/rc.c:617
+#: modules/control/rc.c:617 modules/control/rtci.c:622
 #, c-format
 msgid "| seek X . seek in seconds, for instance `seek 12'\n"
 msgstr ""
 
-#: modules/control/rc.c:618
+#: modules/control/rc.c:618 modules/control/rtci.c:623
 #, c-format
 msgid "| pause  . . . . . . . . . . . . . .  toggle pause\n"
 msgstr ""
 
-#: modules/control/rc.c:619
+#: modules/control/rc.c:619 modules/control/rtci.c:624
 #, c-format
 msgid "| f  . . . . . . . . . . . . . . toggle fullscreen\n"
 msgstr ""
 
-#: modules/control/rc.c:620
+#: modules/control/rc.c:620 modules/control/rtci.c:625
 #, c-format
 msgid "| info . . .  information about the current stream\n"
 msgstr ""
 
-#: modules/control/rc.c:622
+#: modules/control/rc.c:622 modules/control/rtci.c:627
 #, c-format
 msgid "| volume [X] . . . . . . . .  set/get audio volume\n"
 msgstr ""
 
-#: modules/control/rc.c:623
+#: modules/control/rc.c:623 modules/control/rtci.c:628
 #, c-format
 msgid "| volup [X]  . . . . .  raise audio volume X steps\n"
 msgstr ""
 
-#: modules/control/rc.c:624
+#: modules/control/rc.c:624 modules/control/rtci.c:629
 #, c-format
 msgid "| voldown [X]  . . . .  lower audio volume X steps\n"
 msgstr ""
 
-#: modules/control/rc.c:625
+#: modules/control/rc.c:625 modules/control/rtci.c:630
 #, c-format
 msgid "| adev [X] . . . . . . . . .  set/get audio device\n"
 msgstr ""
 
-#: modules/control/rc.c:626
+#: modules/control/rc.c:626 modules/control/rtci.c:631
 #, c-format
 msgid "| achan [X]. . . . . . . .  set/get audio channels\n"
 msgstr ""
 
-#: modules/control/rc.c:630
+#: modules/control/rc.c:630 modules/control/rtci.c:635
 #, c-format
 msgid "| marq-marquee STRING  . . overlay STRING in video\n"
 msgstr ""
 
-#: modules/control/rc.c:631
+#: modules/control/rc.c:631 modules/control/rtci.c:636
 #, c-format
 msgid "| marq-x X . . . . . .offset of marquee, from left\n"
 msgstr ""
 
-#: modules/control/rc.c:632
+#: modules/control/rc.c:632 modules/control/rtci.c:637
 #, c-format
 msgid "| marq-y Y . . . . . . offset of marquee, from top\n"
 msgstr ""
 
-#: modules/control/rc.c:633
+#: modules/control/rc.c:633 modules/control/rtci.c:638
 #, c-format
 msgid "| marq-timeout T. . . . .timeout of marquee, in ms\n"
 msgstr ""
 
-#: modules/control/rc.c:636
+#: modules/control/rc.c:636 modules/control/rtci.c:641
 #, c-format
 msgid "| help . . . . . . . . . . . . . this help message\n"
 msgstr ""
 
-#: modules/control/rc.c:637
+#: modules/control/rc.c:637 modules/control/rtci.c:642
 #, c-format
 msgid "| logout . . . . . .exit (if in socket connection)\n"
 msgstr ""
 
-#: modules/control/rc.c:638
+#: modules/control/rc.c:638 modules/control/rtci.c:643
 #, c-format
 msgid "| quit . . . . . . . . . . . . . . . . .  quit vlc\n"
 msgstr ""
 
-#: modules/control/rc.c:640
+#: modules/control/rc.c:640 modules/control/rtci.c:645
 #, c-format
 msgid "+----[ end of help ]\n"
 msgstr ""
 
-#: modules/control/rc.c:648
+#: modules/control/rc.c:648 modules/control/rtci.c:653
 #, c-format
 msgid "unknown command `%s', type `help' for help\n"
 msgstr ""
 
-#: modules/control/rc.c:725
+#: modules/control/rc.c:725 modules/control/rtci.c:730
 #, c-format
 msgid "Currently playing chapter %d/%d\n"
 msgstr ""
 
-#: modules/control/rc.c:765
+#: modules/control/rc.c:765 modules/control/rtci.c:770
 #, c-format
 msgid "Currently playing title %d/%d\n"
 msgstr ""
 
-#: modules/control/rc.c:822
+#: modules/control/rc.c:822 modules/control/rtci.c:827
 #, c-format
 msgid "trying to add %s to playlist\n"
 msgstr ""
 
-#: modules/control/rc.c:837
-#, c-format
+#: modules/control/rc.c:837 modules/control/rtci.c:842
+#, fuzzy, c-format
 msgid "| no entries\n"
-msgstr ""
+msgstr "Üres"
 
 #: modules/control/rc.c:846 modules/control/rc.c:911
+#: modules/control/rtci.c:851 modules/control/rtci.c:916
 #, c-format
 msgid "unknown command!\n"
 msgstr ""
 
-#: modules/control/rc.c:957
+#: modules/control/rc.c:957 modules/control/rtci.c:962
 #, c-format
 msgid "Volume must be in the range %d-%d\n"
 msgstr ""
 
 #: modules/control/rc.c:973 modules/control/rc.c:1005
+#: modules/control/rtci.c:978 modules/control/rtci.c:1010
 #, c-format
 msgid "Volume is %d\n"
 msgstr ""
 
-#: modules/control/rc.c:1067
+#: modules/control/rc.c:1067 modules/control/rtci.c:1072
 #, c-format
 msgid "+----[ end of %s ]\n"
 msgstr ""
 
-#: modules/control/telnet.c:79
-msgid "Telnet Interface port"
+#: modules/control/rtci.c:132
+msgid "Force the rtci module to use stdin as if it was a TTY."
 msgstr ""
+
+#: modules/control/rtci.c:148
+msgid ""
+"By default the rtci interface plugin will start a DOS command box. Enabling "
+"the quiet mode will not launch this command box."
+msgstr ""
+
+#: modules/control/rtci.c:153
+#, fuzzy
+msgid "Real time control interface"
+msgstr "A hálózati csatoló MTU-ja"
+
+#: modules/control/rtci.c:278
+#, fuzzy, c-format
+msgid "Real time control interface initialized, `h' for help\n"
+msgstr "A hálózati csatoló MTU-ja"
+
+#: modules/control/telnet.c:79
+#, fuzzy
+msgid "Telnet Interface port"
+msgstr "Kezelõfelület"
 
 #: modules/control/telnet.c:80
 msgid "Default to 4212"
 msgstr ""
 
 #: modules/control/telnet.c:81
+#, fuzzy
 msgid "Telnet Interface password"
-msgstr ""
+msgstr "Hálózati csatoló címe"
 
 #: modules/control/telnet.c:82
 msgid "Default to admin"
@@ -6279,42 +6383,49 @@ msgstr ""
 msgid "Telnet remote control interface"
 msgstr "A hálózati csatoló MTU-ja"
 
-#: modules/control/telnet.c:139
+#: modules/control/telnet.c:137
 msgid "Using the VLM interface plugin..."
 msgstr ""
 
-#: modules/control/telnet.c:150
+#: modules/control/telnet.c:148
 #, c-format
 msgid "Telnet interface started on port: %d"
 msgstr ""
 
 #: modules/demux/a52.c:42
+#, fuzzy
 msgid "Raw A/52 demuxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/demux/aac.c:39
+#, fuzzy
 msgid "AAC demuxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/demux/aiff.c:43
+#, fuzzy
 msgid "AIFF demuxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/demux/asf/asf.c:44
+#, fuzzy
 msgid "ASF v1.0 demuxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/demux/au.c:44
+#, fuzzy
 msgid "AU demuxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/demux/avi/avi.c:40 modules/demux/avi/avi.c:41
+#, fuzzy
 msgid "Force interleaved method"
-msgstr ""
+msgstr "Felirat kódolása"
 
 #: modules/demux/avi/avi.c:43
+#, fuzzy
 msgid "Force index creation"
-msgstr ""
+msgstr "nincs adat"
 
 #: modules/demux/avi/avi.c:45
 msgid ""
@@ -6322,8 +6433,9 @@ msgid ""
 msgstr ""
 
 #: modules/demux/avi/avi.c:51
+#, fuzzy
 msgid "AVI demuxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/demux/demuxdump.c:37
 #, fuzzy
@@ -6335,8 +6447,9 @@ msgid "Specify a file name to which the raw stream will be dumped."
 msgstr ""
 
 #: modules/demux/demuxdump.c:40
+#, fuzzy
 msgid "Append"
-msgstr ""
+msgstr "Fájl megnyitása"
 
 #: modules/demux/demuxdump.c:42
 msgid ""
@@ -6345,12 +6458,14 @@ msgid ""
 msgstr ""
 
 #: modules/demux/demuxdump.c:49
+#, fuzzy
 msgid "Filedump demuxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/demux/dts.c:38
+#, fuzzy
 msgid "Raw DTS demuxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/demux/flac.c:38
 #, fuzzy
@@ -6405,8 +6520,9 @@ msgid "Seek based on percent not time"
 msgstr ""
 
 #: modules/demux/mkv.cpp:2538
+#, fuzzy
 msgid "Segment filename"
-msgstr ""
+msgstr "Fájlnév"
 
 #: modules/demux/mkv.cpp:2542
 msgid "Muxing application"
@@ -6482,12 +6598,14 @@ msgid "Surround delay in ms (usually 5-40ms)"
 msgstr ""
 
 #: modules/demux/mp4/mp4.c:44
+#, fuzzy
 msgid "MP4 stream demuxer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/demux/mpeg/h264.c:40
+#, fuzzy
 msgid "H264 video demuxer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/demux/mpeg/m4a.c:40
 #, fuzzy
@@ -6495,24 +6613,28 @@ msgid "MPEG-4 audio demuxer"
 msgstr "Feliratok"
 
 #: modules/demux/mpeg/m4v.c:40
+#, fuzzy
 msgid "MPEG-4 video demuxer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/demux/mpeg/mpga.c:41
+#, fuzzy
 msgid "MPEG-I/II audio demuxer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/demux/mpeg/mpgv.c:40
+#, fuzzy
 msgid "MPEG-I/II video demuxer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/demux/nsv.c:45
 msgid "NullSoft demuxer"
 msgstr ""
 
 #: modules/demux/ogg.c:43
+#, fuzzy
 msgid "Ogg stream demuxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/demux/playlist/playlist.c:38
 #, fuzzy
@@ -6530,12 +6652,14 @@ msgid "PLS playlist import"
 msgstr "Lejátszási lista"
 
 #: modules/demux/ps.c:47 modules/demux/ps.c:53
+#, fuzzy
 msgid "PS demuxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/demux/pva.c:43
+#, fuzzy
 msgid "PVA demuxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/demux/rawdv.c:39
 #, fuzzy
@@ -6543,16 +6667,18 @@ msgid "raw DV demuxer"
 msgstr "hang kódoló"
 
 #: modules/demux/real.c:39
+#, fuzzy
 msgid "Real demuxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/demux/sgimb.c:70
 msgid "Kasenna MediaBase metademux"
 msgstr ""
 
 #: modules/demux/subtitle.c:64
+#, fuzzy
 msgid "Text subtitles demux"
-msgstr ""
+msgstr "Felirat kódolása"
 
 #: modules/demux/subtitle.c:67 modules/gui/wxwindows/subtitles.cpp:174
 msgid "Frames per second"
@@ -6617,12 +6743,14 @@ msgid "Classic rock"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:30
+#, fuzzy
 msgid "Country"
-msgstr ""
+msgstr "Vezérlõk"
 
 #: modules/demux/util/id3genres.h:32
+#, fuzzy
 msgid "Disco"
-msgstr ""
+msgstr "Lemez"
 
 #: modules/demux/util/id3genres.h:33
 msgid "Funk"
@@ -6641,8 +6769,9 @@ msgid "Jazz"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:37
+#, fuzzy
 msgid "Metal"
-msgstr ""
+msgstr "Függõleges"
 
 #: modules/demux/util/id3genres.h:38
 msgid "New Age"
@@ -6677,8 +6806,9 @@ msgid "Death metal"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:51
+#, fuzzy
 msgid "Pranks"
-msgstr ""
+msgstr "Vissza"
 
 #: modules/demux/util/id3genres.h:52
 msgid "Soundtrack"
@@ -6697,8 +6827,9 @@ msgid "Trip-Hop"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:56
+#, fuzzy
 msgid "Vocal"
-msgstr ""
+msgstr "Függõleges"
 
 #: modules/demux/util/id3genres.h:57
 msgid "Jazz+Funk"
@@ -6709,8 +6840,9 @@ msgid "Fusion"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:59
+#, fuzzy
 msgid "Trance"
-msgstr ""
+msgstr "Vissza"
 
 #: modules/demux/util/id3genres.h:61
 msgid "Instrumental"
@@ -6721,12 +6853,14 @@ msgid "Acid"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:63
+#, fuzzy
 msgid "House"
-msgstr ""
+msgstr "Bezár"
 
 #: modules/demux/util/id3genres.h:64
+#, fuzzy
 msgid "Game"
-msgstr ""
+msgstr "Fejezet"
 
 #: modules/demux/util/id3genres.h:65
 msgid "Sound clip"
@@ -6737,8 +6871,9 @@ msgid "Gospel"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:67
+#, fuzzy
 msgid "Noise"
-msgstr ""
+msgstr "Bezár"
 
 #: modules/demux/util/id3genres.h:68
 msgid "Alternative rock"
@@ -6749,16 +6884,18 @@ msgid "Bass"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:70
+#, fuzzy
 msgid "Soul"
-msgstr ""
+msgstr "Általános"
 
 #: modules/demux/util/id3genres.h:71
 msgid "Punk"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:72
+#, fuzzy
 msgid "Space"
-msgstr ""
+msgstr "Mentés"
 
 #: modules/demux/util/id3genres.h:73
 msgid "Meditative"
@@ -6789,8 +6926,9 @@ msgid "Techno-Industrial"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:80
+#, fuzzy
 msgid "Electronic"
-msgstr ""
+msgstr "&Kijelölés"
 
 #: modules/demux/util/id3genres.h:81
 msgid "Pop-Folk"
@@ -6801,16 +6939,18 @@ msgid "Eurodance"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:83
+#, fuzzy
 msgid "Dream"
-msgstr ""
+msgstr "Kimeneti adatfolyam"
 
 #: modules/demux/util/id3genres.h:84
 msgid "Southern rock"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:85
+#, fuzzy
 msgid "Comedy"
-msgstr ""
+msgstr "Általános"
 
 #: modules/demux/util/id3genres.h:86
 msgid "Cult"
@@ -6837,8 +6977,9 @@ msgid "Jungle"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:92
+#, fuzzy
 msgid "Native American"
-msgstr ""
+msgstr "Függõleges"
 
 #: modules/demux/util/id3genres.h:93
 msgid "Cabaret"
@@ -6853,16 +6994,18 @@ msgid "Psychedelic"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:96
+#, fuzzy
 msgid "Rave"
-msgstr ""
+msgstr "Mentés"
 
 #: modules/demux/util/id3genres.h:97
 msgid "Showtunes"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:98
+#, fuzzy
 msgid "Trailer"
-msgstr ""
+msgstr "Elõzõ cím"
 
 #: modules/demux/util/id3genres.h:99
 msgid "Lo-Fi"
@@ -6881,8 +7024,9 @@ msgid "Acid jazz"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:103
+#, fuzzy
 msgid "Polka"
-msgstr ""
+msgstr "Lejátszási lista"
 
 #: modules/demux/util/id3genres.h:104
 msgid "Retro"
@@ -6910,8 +7054,9 @@ msgid "Vobsub subtitles demux"
 msgstr "Felirat kódolása"
 
 #: modules/demux/wav.c:42
+#, fuzzy
 msgid "WAV demuxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/gui/beos/BeOS.cpp:52
 #, fuzzy
@@ -6927,8 +7072,9 @@ msgid "Screenshot Format"
 msgstr ""
 
 #: modules/gui/beos/BeOS.cpp:58
+#, fuzzy
 msgid "BeOS standard API interface"
-msgstr ""
+msgstr "Kezelõfelület"
 
 #: modules/gui/beos/InterfaceWindow.cpp:158
 msgid "Open files from all sub-folders as well?"
@@ -6950,10 +7096,11 @@ msgstr "Mégse"
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/open.m:414
 #: modules/gui/macosx/open.m:608 modules/gui/macosx/open.m:713
-#: modules/gui/macosx/open.m:759 modules/gui/wxwindows/interface.cpp:430
+#: modules/gui/macosx/open.m:759 modules/gui/wxwindows/interface.cpp:434
 #: modules/gui/wxwindows/menus.cpp:300
+#, fuzzy
 msgid "Open"
-msgstr ""
+msgstr "Fájl megnyitása"
 
 #: modules/gui/beos/InterfaceWindow.cpp:208
 #: modules/gui/beos/InterfaceWindow.cpp:309 modules/gui/macosx/prefs.m:78
@@ -6991,6 +7138,7 @@ msgstr "Fájl"
 #: modules/gui/gtk/gnome_interface.c:2191 modules/gui/macosx/open.m:413
 #: modules/gui/macosx/open.m:712 modules/gui/macosx/open.m:758
 #: modules/gui/wxwindows/dialogs.cpp:344 modules/gui/wxwindows/open.cpp:1097
+#: modules/gui/wxwindows/wizard.cpp:1253
 msgid "Open File"
 msgstr "Fájl megnyitása"
 
@@ -7010,8 +7158,9 @@ msgid "About"
 msgstr "Névjegy"
 
 #: modules/gui/beos/InterfaceWindow.cpp:260 modules/gui/kde/interface.cpp:93
+#, fuzzy
 msgid "Subtitles"
-msgstr ""
+msgstr "Felirat megnyitása"
 
 #: modules/gui/beos/InterfaceWindow.cpp:268
 msgid "Prev Title"
@@ -7079,17 +7228,20 @@ msgstr "Bezár"
 
 #: modules/gui/beos/PlayListWindow.cpp:101 modules/gui/macosx/intf.m:412
 #: modules/gui/wxwindows/bookmarks.cpp:225
+#, fuzzy
 msgid "Edit"
-msgstr ""
+msgstr "&Kilépés"
 
 #: modules/gui/beos/PlayListWindow.cpp:103 modules/gui/macosx/intf.m:417
 #: modules/gui/macosx/playlist.m:174
+#, fuzzy
 msgid "Select All"
-msgstr ""
+msgstr "&Mindent"
 
 #: modules/gui/beos/PlayListWindow.cpp:106
+#, fuzzy
 msgid "Select None"
-msgstr ""
+msgstr "&Kijelölés"
 
 #: modules/gui/beos/PlayListWindow.cpp:111
 msgid "Sort Reverse"
@@ -7104,8 +7256,9 @@ msgid "Sort by Path"
 msgstr ""
 
 #: modules/gui/beos/PlayListWindow.cpp:122
+#, fuzzy
 msgid "Randomize"
-msgstr ""
+msgstr "Lejátszási lista menté&se"
 
 #: modules/gui/beos/PlayListWindow.cpp:127
 #: modules/gui/wxwindows/bookmarks.cpp:221
@@ -7113,24 +7266,28 @@ msgid "Remove"
 msgstr ""
 
 #: modules/gui/beos/PlayListWindow.cpp:130
+#, fuzzy
 msgid "Remove All"
-msgstr ""
+msgstr "Összes alaphelyzetbe"
 
 #: modules/gui/beos/PlayListWindow.cpp:135
+#, fuzzy
 msgid "View"
-msgstr ""
+msgstr "&Nézet"
 
 #: modules/gui/beos/PlayListWindow.cpp:141
+#, fuzzy
 msgid "Path"
-msgstr ""
+msgstr "Beillesztés"
 
 #: modules/gui/beos/PlayListWindow.cpp:147 modules/gui/gtk/preferences.c:327
 #: modules/gui/kde/pluginsbox.cpp:45 modules/gui/macosx/playlist.m:180
 #: modules/gui/wxwindows/bookmarks.cpp:159
 #: modules/gui/wxwindows/iteminfo.cpp:156
-#: modules/gui/wxwindows/playlist.cpp:319
+#: modules/gui/wxwindows/playlist.cpp:319 modules/gui/wxwindows/wizard.cpp:575
+#, fuzzy
 msgid "Name"
-msgstr ""
+msgstr "Fejezet"
 
 #: modules/gui/beos/PreferencesWindow.cpp:46
 #: modules/gui/beos/PreferencesWindow.cpp:48
@@ -7158,8 +7315,9 @@ msgid "Defaults"
 msgstr ""
 
 #: modules/gui/beos/VideoOutput.cpp:1189
+#, fuzzy
 msgid "Show Interface"
-msgstr ""
+msgstr "Kezelõfelület"
 
 #: modules/gui/beos/VideoOutput.cpp:1193
 msgid "50%"
@@ -7174,16 +7332,18 @@ msgid "200%"
 msgstr ""
 
 #: modules/gui/beos/VideoOutput.cpp:1209
+#, fuzzy
 msgid "Vertical Sync"
-msgstr ""
+msgstr "Függõleges"
 
 #: modules/gui/beos/VideoOutput.cpp:1213
 msgid "Correct Aspect Ratio"
 msgstr ""
 
 #: modules/gui/beos/VideoOutput.cpp:1242
+#, fuzzy
 msgid "Stay On Top"
-msgstr ""
+msgstr "Mindig felül"
 
 #: modules/gui/beos/VideoOutput.cpp:1248
 msgid "Take Screen Shot"
@@ -7220,19 +7380,24 @@ msgid "Interface default search path"
 msgstr ""
 
 #: modules/gui/gtk/gnome.c:68 modules/gui/gtk/gtk.c:67
+#, fuzzy
 msgid ""
 "This option allows you to set the default path that the interface will open "
 "when looking for a file."
 msgstr ""
+"A kezelõfelület nyelvét adhatjuk meg. \"auto\" esetén a VLC felismeri a "
+"rendszer nyelvét."
 
 #: modules/gui/gtk/gnome.c:77
+#, fuzzy
 msgid "GNOME interface"
-msgstr ""
+msgstr "Kezelõfelület"
 
 #: modules/gui/gtk/gnome_interface.c:19 modules/gui/gtk/gnome_interface.c:985
 #: modules/gui/gtk/gtk_interface.c:165 modules/gui/gtk/gtk_interface.c:1391
+#, fuzzy
 msgid "_Open File..."
-msgstr ""
+msgstr "Fájl megnyitása..."
 
 #: modules/gui/gtk/gnome_interface.c:20 modules/gui/gtk/gnome_interface.c:504
 #: modules/gui/gtk/gnome_interface.c:986 modules/gui/gtk/gtk_interface.c:173
@@ -7242,8 +7407,9 @@ msgstr "Fájl megnyitása"
 
 #: modules/gui/gtk/gnome_interface.c:26 modules/gui/gtk/gnome_interface.c:992
 #: modules/gui/gtk/gtk_interface.c:180 modules/gui/gtk/gtk_interface.c:1403
+#, fuzzy
 msgid "Open _Disc..."
-msgstr ""
+msgstr "Lemez megnyitása..."
 
 #: modules/gui/gtk/gnome_interface.c:27 modules/gui/gtk/gnome_interface.c:993
 #: modules/gui/gtk/gtk_interface.c:188 modules/gui/gtk/gtk_interface.c:1411
@@ -7263,8 +7429,9 @@ msgid "Select a network stream"
 msgstr "Hálózati adatfolyam megadása"
 
 #: modules/gui/gtk/gnome_interface.c:41 modules/gui/gtk/gtk_interface.c:218
+#, fuzzy
 msgid "_Eject Disc"
-msgstr ""
+msgstr "Lemez &kidobása"
 
 #: modules/gui/gtk/gnome_interface.c:42 modules/gui/gtk/gnome_interface.c:579
 #: modules/gui/gtk/gtk_interface.c:226
@@ -7272,40 +7439,49 @@ msgid "Eject disc"
 msgstr "Lemez kidobása"
 
 #: modules/gui/gtk/gnome_interface.c:56 modules/gui/gtk/gtk_interface.c:286
+#, fuzzy
 msgid "_Hide interface"
-msgstr ""
+msgstr "Kezelõfelület"
 
 #: modules/gui/gtk/gnome_interface.c:64 modules/gui/gtk/gtk_interface.c:306
+#, fuzzy
 msgid "Progr_am"
-msgstr ""
+msgstr "Progam"
 
 #: modules/gui/gtk/gnome_interface.c:65 modules/gui/gtk/gtk_interface.c:315
+#, fuzzy
 msgid "Choose the program"
-msgstr ""
+msgstr "Program választás (SID)"
 
 #: modules/gui/gtk/gnome_interface.c:71 modules/gui/gtk/gtk_interface.c:319
+#, fuzzy
 msgid "_Title"
-msgstr ""
+msgstr "Cím"
 
 #: modules/gui/gtk/gnome_interface.c:72
+#, fuzzy
 msgid "Choose title"
-msgstr ""
+msgstr "Felirat választás"
 
 #: modules/gui/gtk/gnome_interface.c:78 modules/gui/gtk/gtk_interface.c:332
+#, fuzzy
 msgid "_Chapter"
-msgstr ""
+msgstr "Fejezet"
 
 #: modules/gui/gtk/gnome_interface.c:79
+#, fuzzy
 msgid "Choose chapter"
-msgstr ""
+msgstr "Felirat választás"
 
 #: modules/gui/gtk/gnome_interface.c:86 modules/gui/gtk/gtk_interface.c:352
+#, fuzzy
 msgid "_Playlist..."
-msgstr ""
+msgstr "Lejátszási lista"
 
 #: modules/gui/gtk/gnome_interface.c:87 modules/gui/gtk/gtk_interface.c:360
+#, fuzzy
 msgid "Open the playlist window"
-msgstr ""
+msgstr "Lejátszási lista megnyitása"
 
 #: modules/gui/gtk/gnome_interface.c:93 modules/gui/gtk/gtk_interface.c:364
 msgid "_Modules..."
@@ -7317,8 +7493,9 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:100 modules/gui/gtk/gtk_interface.c:375
 #: modules/gui/kde/interface.cpp:133
+#, fuzzy
 msgid "Messages..."
-msgstr ""
+msgstr "Üzenetek"
 
 #: modules/gui/gtk/gnome_interface.c:101 modules/gui/gtk/gtk_interface.c:381
 msgid "Open the messages window"
@@ -7326,13 +7503,15 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:118 modules/gui/gtk/gnome_interface.c:901
 #: modules/gui/gtk/gtk_interface.c:433 modules/gui/gtk/gtk_interface.c:1235
+#, fuzzy
 msgid "_Language"
-msgstr ""
+msgstr "Nyelv"
 
 #: modules/gui/gtk/gnome_interface.c:119 modules/gui/gtk/gnome_interface.c:902
 #: modules/gui/gtk/gtk_interface.c:442
+#, fuzzy
 msgid "Select audio channel"
-msgstr ""
+msgstr "Csatorna választás"
 
 #: modules/gui/gtk/gnome_interface.c:126 modules/gui/gtk/gtk_interface.c:452
 #: modules/gui/gtk/gtk_interface.c:1253 modules/gui/macosx/intf.m:440
@@ -7346,32 +7525,38 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:167 modules/gui/gtk/gnome_interface.c:950
 #: modules/gui/gtk/gtk_interface.c:515 modules/gui/gtk/gtk_interface.c:1312
+#, fuzzy
 msgid "_Subtitles"
-msgstr ""
+msgstr "Felirat megnyitása"
 
 #: modules/gui/gtk/gnome_interface.c:168 modules/gui/gtk/gnome_interface.c:951
 #: modules/gui/gtk/gtk_interface.c:524
+#, fuzzy
 msgid "Select subtitles channel"
-msgstr ""
+msgstr "Felirat kódolása"
 
 #: modules/gui/gtk/gnome_interface.c:175 modules/gui/gtk/gnome_interface.c:958
 #: modules/gui/gtk/gtk_interface.c:536 modules/gui/gtk/gtk_interface.c:1332
+#, fuzzy
 msgid "_Fullscreen"
-msgstr ""
+msgstr "Teljesképernyõ"
 
 #: modules/gui/gtk/gnome_interface.c:190 modules/gui/gtk/gnome_interface.c:973
 #: modules/gui/gtk/gtk_interface.c:560 modules/gui/gtk/gtk_interface.c:1356
 #: modules/gui/macosx/voutgl.m:148 modules/gui/macosx/voutqt.m:214
+#, fuzzy
 msgid "Screen"
-msgstr ""
+msgstr "Teljesképernyõ"
 
 #: modules/gui/gtk/gnome_interface.c:211 modules/gui/gtk/gtk_interface.c:415
+#, fuzzy
 msgid "_Audio"
-msgstr ""
+msgstr "Hang"
 
 #: modules/gui/gtk/gnome_interface.c:218 modules/gui/gtk/gtk_interface.c:497
+#, fuzzy
 msgid "_Video"
-msgstr ""
+msgstr "Kép"
 
 #: modules/gui/gtk/gnome_interface.c:274 modules/gui/gtk/gtk_interface.c:121
 #: modules/gui/gtk/gtk_interface.c:1595 modules/gui/macosx/intf.m:376
@@ -7390,8 +7575,9 @@ msgid "Net"
 msgstr "Hálózta"
 
 #: modules/gui/gtk/gnome_interface.c:539 modules/gui/gtk/gtk_interface.c:651
+#, fuzzy
 msgid "Sat"
-msgstr ""
+msgstr "Hossz"
 
 #: modules/gui/gtk/gnome_interface.c:540
 #, fuzzy
@@ -7435,7 +7621,7 @@ msgid "Slow"
 msgstr "Lassítás"
 
 #: modules/gui/gtk/gnome_interface.c:618
-#: modules/gui/wxwindows/interface.cpp:437
+#: modules/gui/wxwindows/interface.cpp:441
 msgid "Play slower"
 msgstr "Lejátszás lassítása"
 
@@ -7446,7 +7632,7 @@ msgid "Fast"
 msgstr "Gyorsítás"
 
 #: modules/gui/gtk/gnome_interface.c:631
-#: modules/gui/wxwindows/interface.cpp:438
+#: modules/gui/wxwindows/interface.cpp:442
 msgid "Play faster"
 msgstr "Lejátszás gyorsítása"
 
@@ -7503,36 +7689,42 @@ msgstr "Teljes képernyõs mód"
 
 #: modules/gui/gtk/gnome_interface.c:999 modules/gui/gtk/gtk_interface.c:195
 #: modules/gui/gtk/gtk_interface.c:1415
+#, fuzzy
 msgid "_Network Stream..."
-msgstr ""
+msgstr "&Hálózati adatfolyam megnyitás"
 
 #: modules/gui/gtk/gnome_interface.c:1070 modules/gui/gtk/gtk_interface.c:1182
+#, fuzzy
 msgid "_Jump..."
-msgstr ""
+msgstr "Ugrás"
 
 #: modules/gui/gtk/gnome_interface.c:1071
 msgid "Got directly so specified point"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1079
+#, fuzzy
 msgid "Switch program"
-msgstr ""
+msgstr "Kilépés a programból"
 
 #: modules/gui/gtk/gnome_interface.c:1085 modules/gui/gtk/gtk_interface.c:1209
+#, fuzzy
 msgid "_Navigation"
-msgstr ""
+msgstr "&Navigáció"
 
 #: modules/gui/gtk/gnome_interface.c:1086
 msgid "Navigate through titles and chapters"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1108 modules/gui/gtk/gtk_interface.c:1446
+#, fuzzy
 msgid "Toggle _Interface"
-msgstr ""
+msgstr "Kezelõfelület"
 
 #: modules/gui/gtk/gnome_interface.c:1115 modules/gui/gtk/gtk_interface.c:1455
+#, fuzzy
 msgid "Playlist..."
-msgstr ""
+msgstr "Lejátszási lista"
 
 #: modules/gui/gtk/gnome_interface.c:1361 modules/gui/gtk/gtk_interface.c:1603
 #: modules/gui/kde/kde.cpp:110 modules/gui/pda/pda_interface.c:1350
@@ -7551,8 +7743,9 @@ msgstr ""
 "fájlok lejátszására is fájlból, vagy hálózatról."
 
 #: modules/gui/gtk/gnome_interface.c:1460
+#, fuzzy
 msgid "Open Stream"
-msgstr ""
+msgstr "Lejátszás leállítása"
 
 #: modules/gui/gtk/gnome_interface.c:1499 modules/gui/gtk/gtk_interface.c:1814
 msgid "Open Target:"
@@ -7598,8 +7791,9 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1622 modules/gui/gtk/gtk_interface.c:1937
 #: modules/gui/macosx/open.m:158 modules/gui/macosx/open.m:470
 #: modules/gui/macosx/open.m:561 modules/gui/wxwindows/open.cpp:635
+#, fuzzy
 msgid "Audio CD"
-msgstr ""
+msgstr "Hang"
 
 #: modules/gui/gtk/gnome_interface.c:1630 modules/gui/gtk/gtk_interface.c:1945
 #: modules/gui/macosx/open.m:149 modules/gui/wxwindows/open.cpp:645
@@ -7625,8 +7819,9 @@ msgstr ""
 #: modules/gui/macosx/output.m:147 modules/gui/wxwindows/open.cpp:711
 #: modules/gui/wxwindows/open.cpp:738 modules/gui/wxwindows/streamout.cpp:484
 #: modules/stream_out/rtp.c:67
+#, fuzzy
 msgid "Port"
-msgstr ""
+msgstr "Beillesztés"
 
 #: modules/gui/gtk/gnome_interface.c:1756 modules/gui/gtk/gtk_interface.c:2071
 #: modules/gui/macosx/open.m:161 modules/gui/macosx/output.m:146
@@ -7647,8 +7842,9 @@ msgid "Symbol Rate"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1876 modules/gui/gtk/gtk_interface.c:2191
+#, fuzzy
 msgid "Polarization"
-msgstr ""
+msgstr "Hossz"
 
 #: modules/gui/gtk/gnome_interface.c:1896 modules/gui/gtk/gtk_interface.c:2211
 msgid "FEC"
@@ -7663,8 +7859,9 @@ msgid "Horizontal"
 msgstr "Vízszintes"
 
 #: modules/gui/gtk/gnome_interface.c:1965 modules/gui/gtk/gtk_interface.c:2280
+#, fuzzy
 msgid "Satellite"
-msgstr ""
+msgstr "Lejátszási lista mentése"
 
 #: modules/gui/gtk/gnome_interface.c:2014 modules/gui/gtk/gtk_interface.c:2331
 #: modules/gui/macosx/open.m:225
@@ -7698,41 +7895,49 @@ msgid "All"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2319
+#, fuzzy
 msgid "Item"
-msgstr ""
+msgstr "nincs adat"
 
 #: modules/gui/gtk/gnome_interface.c:2331
+#, fuzzy
 msgid "Crop"
-msgstr ""
+msgstr "Másolás"
 
 #: modules/gui/gtk/gnome_interface.c:2338
+#, fuzzy
 msgid "Invert"
-msgstr ""
+msgstr "Meg&fordít"
 
 #: modules/gui/gtk/gnome_interface.c:2345 modules/gui/gtk/preferences.c:384
 #: modules/gui/kde/pluginsbox.cpp:48 modules/gui/macosx/prefs.m:243
 #: modules/gui/macosx/prefs_widgets.m:626
+#, fuzzy
 msgid "Select"
-msgstr ""
+msgstr "&Kijelölés"
 
 #: modules/gui/gtk/gnome_interface.c:2357 modules/gui/gtk/gtk_interface.c:2724
 #: modules/gui/wxwindows/bookmarks.cpp:219
+#, fuzzy
 msgid "Add"
-msgstr ""
+msgstr "Cím"
 
 #: modules/gui/gtk/gnome_interface.c:2364 modules/gui/gtk/gtk_interface.c:2766
 #: modules/gui/macosx/playlist.m:173 modules/gui/pda/pda_interface.c:1255
 #: modules/gui/wxwindows/playlist.cpp:255
+#, fuzzy
 msgid "Delete"
-msgstr ""
+msgstr "&Törlés"
 
 #: modules/gui/gtk/gnome_interface.c:2371 modules/gui/gtk/gtk_interface.c:2794
+#, fuzzy
 msgid "Selection"
-msgstr ""
+msgstr "&Kijelölés"
 
 #: modules/gui/gtk/gnome_interface.c:2600
+#, fuzzy
 msgid "Jump to: "
-msgstr ""
+msgstr "Ugrás"
 
 #: modules/gui/gtk/gnome_interface.c:2808
 #, fuzzy
@@ -7740,8 +7945,9 @@ msgid "stream output (MRL)"
 msgstr "Kimeneti adatfolyam"
 
 #: modules/gui/gtk/gnome_interface.c:2823 modules/gui/gtk/gtk_interface.c:3078
+#, fuzzy
 msgid "Destination Target: "
-msgstr ""
+msgstr "Hossz"
 
 #: modules/gui/gtk/gnome_interface.c:2869
 #: modules/gui/wxwindows/streamout.cpp:428
@@ -7754,13 +7960,15 @@ msgid "RTP"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2889 modules/gui/gtk/gtk_interface.c:3144
+#, fuzzy
 msgid "Path:"
-msgstr ""
+msgstr "Beillesztés"
 
 #: modules/gui/gtk/gnome_interface.c:2899 modules/gui/gtk/gtk_interface.c:3169
 #: modules/gui/pda/pda_interface.c:432
+#, fuzzy
 msgid "Address:"
-msgstr ""
+msgstr "Cím"
 
 #: modules/gui/gtk/gnome_interface.c:2968 modules/gui/gtk/gtk_interface.c:3213
 #: modules/gui/pda/pda_interface.c:1052
@@ -7773,7 +7981,7 @@ msgid "PS"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2984 modules/gui/gtk/gtk_interface.c:3229
-#: modules/gui/pda/pda_interface.c:1054
+#: modules/gui/pda/pda_interface.c:1054 modules/gui/wxwindows/streamdata.h:145
 msgid "AVI"
 msgstr ""
 
@@ -7790,68 +7998,82 @@ msgid "Couldn't create pixmap from file: %s"
 msgstr ""
 
 #: modules/gui/gtk/gtk.c:76
+#, fuzzy
 msgid "Gtk+ interface"
-msgstr ""
+msgstr "Kezelõfelület"
 
 #: modules/gui/gtk/gtk_interface.c:147 modules/gui/gtk/gtk_interface.c:1373
+#, fuzzy
 msgid "_File"
-msgstr ""
+msgstr "Fájl"
 
 #: modules/gui/gtk/gtk_interface.c:238
+#, fuzzy
 msgid "_Close"
-msgstr ""
+msgstr "Bezár"
 
 #: modules/gui/gtk/gtk_interface.c:246
+#, fuzzy
 msgid "Close the window"
-msgstr ""
+msgstr "Ablak bezárása"
 
 #: modules/gui/gtk/gtk_interface.c:253 modules/gui/gtk/gtk_interface.c:1483
+#, fuzzy
 msgid "E_xit"
-msgstr ""
+msgstr "&Kilépés"
 
 #: modules/gui/gtk/gtk_interface.c:261
+#, fuzzy
 msgid "Exit the program"
-msgstr ""
+msgstr "Kilépés a programból"
 
 #: modules/gui/gtk/gtk_interface.c:268
+#, fuzzy
 msgid "_View"
-msgstr ""
+msgstr "&Nézet"
 
 #: modules/gui/gtk/gtk_interface.c:294
 msgid "Hide the main interface window"
 msgstr ""
 
 #: modules/gui/gtk/gtk_interface.c:328
+#, fuzzy
 msgid "Navigate through the stream"
-msgstr ""
+msgstr "&Navigáció"
 
 #: modules/gui/gtk/gtk_interface.c:385
+#, fuzzy
 msgid "_Settings"
-msgstr ""
+msgstr "&Beállítások"
 
 #: modules/gui/gtk/gtk_interface.c:403 modules/gui/gtk/gtk_interface.c:1464
+#, fuzzy
 msgid "_Preferences..."
-msgstr ""
+msgstr "&Beállítások"
 
 #: modules/gui/gtk/gtk_interface.c:411
 msgid "Configure the application"
 msgstr ""
 
 #: modules/gui/gtk/gtk_interface.c:569
+#, fuzzy
 msgid "_Help"
-msgstr ""
+msgstr "Súgó"
 
 #: modules/gui/gtk/gtk_interface.c:587 modules/gui/gtk/gtk_interface.c:1435
+#, fuzzy
 msgid "_About..."
-msgstr ""
+msgstr "&Névjegy"
 
 #: modules/gui/gtk/gtk_interface.c:595
+#, fuzzy
 msgid "About this application"
-msgstr ""
+msgstr "Névjegy"
 
 #: modules/gui/gtk/gtk_interface.c:652
+#, fuzzy
 msgid "Open a Satellite Card"
-msgstr ""
+msgstr "Mûholdas"
 
 #: modules/gui/gtk/gtk_interface.c:665
 msgid "Go Backward"
@@ -7891,20 +8113,23 @@ msgid "Next File"
 msgstr "Következõ fájl"
 
 #: modules/gui/gtk/gtk_interface.c:1110
+#, fuzzy
 msgid "_Play"
-msgstr ""
+msgstr "Lejátszási lista"
 
 #: modules/gui/gtk/gtk_interface.c:1612
+#, fuzzy
 msgid "Authors"
-msgstr ""
+msgstr "Hang"
 
 #: modules/gui/gtk/gtk_interface.c:1626
 msgid "the VideoLAN team <videolan@videolan.org>"
 msgstr "a VideoLAN csapat <videolan@videolan.org>"
 
 #: modules/gui/gtk/gtk_interface.c:1778
+#, fuzzy
 msgid "Open Target"
-msgstr ""
+msgstr "Cél"
 
 #: modules/gui/gtk/gtk_interface.c:2031 modules/gui/macosx/open.m:165
 #: modules/gui/macosx/open.m:628 modules/gui/macosx/open.m:666
@@ -7919,28 +8144,33 @@ msgid "HTTP/FTP/MMS"
 msgstr ""
 
 #: modules/gui/gtk/gtk_interface.c:2293
+#, fuzzy
 msgid "Use a subtitles file"
-msgstr ""
+msgstr "Feliratok fájl"
 
 #: modules/gui/gtk/gtk_interface.c:2315
+#, fuzzy
 msgid "Select a subtitles file"
-msgstr ""
+msgstr "Feliratfájl megnyitása"
 
 #: modules/gui/gtk/gtk_interface.c:2345
 msgid "Set the delay (in seconds)"
 msgstr ""
 
 #: modules/gui/gtk/gtk_interface.c:2361
+#, fuzzy
 msgid "Set the number of Frames Per Second"
-msgstr ""
+msgstr "Másodpercenkénti képkockaszám"
 
 #: modules/gui/gtk/gtk_interface.c:2376
+#, fuzzy
 msgid "Use stream output"
-msgstr ""
+msgstr "Kimeneti adatfolyam"
 
 #: modules/gui/gtk/gtk_interface.c:2384
+#, fuzzy
 msgid "Stream output configuration "
-msgstr ""
+msgstr "Kép kimeneti modul"
 
 #: modules/gui/gtk/gtk_interface.c:2530
 msgid "Select File"
@@ -7967,24 +8197,29 @@ msgid "h:"
 msgstr ""
 
 #: modules/gui/gtk/gtk_interface.c:2787
+#, fuzzy
 msgid "Selected"
-msgstr ""
+msgstr "Fájl megadása"
 
 #: modules/gui/gtk/gtk_interface.c:2810
+#, fuzzy
 msgid "_Crop"
-msgstr ""
+msgstr "Másolás"
 
 #: modules/gui/gtk/gtk_interface.c:2821
+#, fuzzy
 msgid "_Invert"
-msgstr ""
+msgstr "Meg&fordít"
 
 #: modules/gui/gtk/gtk_interface.c:2832
+#, fuzzy
 msgid "_Select"
-msgstr ""
+msgstr "&Kijelölés"
 
 #: modules/gui/gtk/gtk_interface.c:3063
+#, fuzzy
 msgid "Stream output (MRL)"
-msgstr ""
+msgstr "Kimeneti adatfolyam"
 
 #: modules/gui/gtk/gtk_support.c:130
 #, c-format
@@ -7992,22 +8227,23 @@ msgid "Error loading pixmap file: %s"
 msgstr ""
 
 #: modules/gui/gtk/menu.c:867
-#, c-format
+#, fuzzy, c-format
 msgid "Title %d (%d)"
-msgstr ""
+msgstr "Cím %i"
 
 #: modules/gui/gtk/menu.c:934
-#, c-format
+#, fuzzy, c-format
 msgid "Chapter %d"
-msgstr ""
+msgstr "Fejezet %i"
 
 #: modules/gui/gtk/open.c:276
 msgid "PBC LID"
 msgstr ""
 
 #: modules/gui/gtk/preferences.c:396 modules/gui/kde/pluginsbox.cpp:51
+#, fuzzy
 msgid "Selected:"
-msgstr ""
+msgstr "Fájl megadása"
 
 #: modules/gui/kde/disc.cpp:31
 #, fuzzy
@@ -8034,8 +8270,9 @@ msgid "Device name "
 msgstr "Eszköz neve"
 
 #: modules/gui/kde/interface.cpp:88
+#, fuzzy
 msgid "Languages"
-msgstr ""
+msgstr "Nyelv"
 
 #: modules/gui/kde/interface.cpp:89
 #, fuzzy
@@ -8083,24 +8320,28 @@ msgid "Fas&t"
 msgstr "Gyorsítás"
 
 #: modules/gui/kde/interface.cpp:137
+#, fuzzy
 msgid "Stream info..."
-msgstr ""
+msgstr "Kimeneti adatfolyam"
 
 #: modules/gui/kde/interface.cpp:148
 msgid "Opens an existing document"
 msgstr ""
 
 #: modules/gui/kde/interface.cpp:149
+#, fuzzy
 msgid "Opens a recently used file"
-msgstr ""
+msgstr "Fájl megnyitása"
 
 #: modules/gui/kde/interface.cpp:150
+#, fuzzy
 msgid "Quits the application"
-msgstr ""
+msgstr "Következõ lejátszási listatétel"
 
 #: modules/gui/kde/interface.cpp:151
+#, fuzzy
 msgid "Enables/disables the toolbar"
-msgstr ""
+msgstr "Tiltás"
 
 #: modules/gui/kde/interface.cpp:152
 msgid "Enables/disables the status bar"
@@ -8167,16 +8408,18 @@ msgid "Off"
 msgstr ""
 
 #: modules/gui/kde/kde.cpp:54
+#, fuzzy
 msgid "KDE interface"
-msgstr ""
+msgstr "Kezelõfelület"
 
 #: modules/gui/kde/kde.cpp:55
 msgid "path to ui.rc file"
 msgstr ""
 
 #: modules/gui/kde/messages.cpp:52
+#, fuzzy
 msgid "Messages:"
-msgstr ""
+msgstr "Üzenetek"
 
 #: modules/gui/kde/net.cpp:31
 msgid "Protocol"
@@ -8188,8 +8431,9 @@ msgid "Address "
 msgstr "Cím"
 
 #: modules/gui/kde/net.cpp:45
+#, fuzzy
 msgid "Port "
-msgstr ""
+msgstr "Beillesztés"
 
 #: modules/gui/kde/preferences.cpp:56
 #, fuzzy
@@ -8227,14 +8471,16 @@ msgstr "Összes alaphelyzetbe"
 
 #: modules/gui/macosx/controls.m:162 modules/gui/macosx/controls.m:194
 #: modules/gui/macosx/playlist.m:567
+#, fuzzy
 msgid "Repeat Off"
-msgstr ""
+msgstr "Összes alaphelyzetbe"
 
 #: modules/gui/macosx/controls.m:190 modules/gui/macosx/controls.m:582
 #: modules/gui/macosx/intf.m:427 modules/gui/macosx/playlist.m:187
 #: modules/gui/macosx/playlist.m:548
+#, fuzzy
 msgid "Repeat One"
-msgstr ""
+msgstr "Összes alaphelyzetbe"
 
 #: modules/gui/macosx/controls.m:279 modules/gui/macosx/controls.m:614
 #: modules/gui/macosx/intf.m:453
@@ -8263,12 +8509,14 @@ msgid "Fit to Screen"
 msgstr ""
 
 #: modules/gui/macosx/controls.m:596 modules/gui/macosx/intf.m:429
+#, fuzzy
 msgid "Step Forward"
-msgstr ""
+msgstr "Elõre"
 
 #: modules/gui/macosx/controls.m:597 modules/gui/macosx/intf.m:430
+#, fuzzy
 msgid "Step Backward"
-msgstr ""
+msgstr "Visszalépés"
 
 #: modules/gui/macosx/equalizer.m:141 modules/gui/wxwindows/extrapanel.cpp:465
 msgid "2 Pass"
@@ -8282,6 +8530,7 @@ msgstr ""
 
 #: modules/gui/macosx/equalizer.m:144 modules/gui/wxwindows/extrapanel.cpp:212
 #: modules/gui/wxwindows/extrapanel.cpp:459
+#: modules/gui/wxwindows/wizard.cpp:617
 #, fuzzy
 msgid "Enable"
 msgstr "Tiltás"
@@ -8298,8 +8547,9 @@ msgid "Preamp"
 msgstr "Kimeneti adatfolyam"
 
 #: modules/gui/macosx/intf.m:375
+#, fuzzy
 msgid "VLC - Controller"
-msgstr ""
+msgstr "Vezérlõk"
 
 #: modules/gui/macosx/intf.m:380 modules/gui/pda/pda_interface.c:238
 #: modules/gui/pda/pda_interface.c:239
@@ -8316,8 +8566,9 @@ msgid "Open CrashLog"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:395
+#, fuzzy
 msgid "Preferences..."
-msgstr ""
+msgstr "&Beállítások"
 
 #: modules/gui/macosx/intf.m:398
 msgid "Services"
@@ -8328,8 +8579,9 @@ msgid "Hide VLC"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:400
+#, fuzzy
 msgid "Hide Others"
-msgstr ""
+msgstr "Videó eszköz"
 
 #: modules/gui/macosx/intf.m:401
 msgid "Show All"
@@ -8340,8 +8592,9 @@ msgid "Quit VLC"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:404
+#, fuzzy
 msgid "1:File"
-msgstr ""
+msgstr "Fájl"
 
 #: modules/gui/macosx/intf.m:406
 #, fuzzy
@@ -8399,14 +8652,16 @@ msgid "Close Window"
 msgstr "Ablak bezárása"
 
 #: modules/gui/macosx/intf.m:473
+#, fuzzy
 msgid "Controller"
-msgstr ""
+msgstr "Vezérlõk"
 
 #: modules/gui/macosx/intf.m:476 modules/gui/macosx/intf.m:503
 #: modules/gui/macosx/playlistinfo.m:329
 #: modules/gui/wxwindows/playlist.cpp:257
+#, fuzzy
 msgid "Info"
-msgstr ""
+msgstr "nincs adat"
 
 #: modules/gui/macosx/intf.m:479
 msgid "Bring All to Front"
@@ -8436,7 +8691,7 @@ msgstr "VideoLAN weblapja"
 msgid "License"
 msgstr "Engedélyek"
 
-#: modules/gui/macosx/intf.m:496
+#: modules/gui/macosx/intf.m:496 modules/gui/wxwindows/wizard.cpp:86
 msgid "Error"
 msgstr "Hiba"
 
@@ -8518,8 +8773,9 @@ msgid "Mac OS X interface, sound and video"
 msgstr ""
 
 #: modules/gui/macosx/open.m:136
+#, fuzzy
 msgid "Open Source"
-msgstr ""
+msgstr "Lejátszás leállítása"
 
 #: modules/gui/macosx/open.m:137 modules/gui/wxwindows/open.cpp:389
 msgid "Media Resource Locator (MRL)"
@@ -8534,58 +8790,67 @@ msgid "VIDEO_TS folder"
 msgstr ""
 
 #: modules/gui/macosx/open.m:221
+#, fuzzy
 msgid "Load subtitles file:"
-msgstr ""
+msgstr "Feliratfájl megnyitása"
 
 #: modules/gui/macosx/open.m:224
+#, fuzzy
 msgid "Override"
-msgstr ""
+msgstr "Kép"
 
 #: modules/gui/macosx/open.m:229 modules/gui/wxwindows/subtitles.cpp:105
 msgid "Subtitles encoding"
 msgstr "Felirat kódolása"
 
 #: modules/gui/macosx/open.m:231 modules/misc/freetype.c:85
+#, fuzzy
 msgid "Font size"
-msgstr ""
+msgstr "Fájlnév"
 
 #: modules/gui/macosx/open.m:504 modules/gui/macosx/open.m:556
 #: modules/gui/macosx/open.m:564 modules/gui/macosx/open.m:572
-#, objc-format
+#, fuzzy, objc-format
 msgid "No %@s found"
-msgstr ""
+msgstr "Hang menü"
 
 #: modules/gui/macosx/open.m:607
 msgid "Open VIDEO_TS Directory"
 msgstr ""
 
 #: modules/gui/macosx/output.m:136
+#, fuzzy
 msgid "Advanced output:"
-msgstr ""
+msgstr "További lehetõségek"
 
 #: modules/gui/macosx/output.m:140
+#, fuzzy
 msgid "Output Options"
-msgstr ""
+msgstr "További lehetõségek"
 
 #: modules/gui/macosx/output.m:141 modules/gui/wxwindows/streamout.cpp:424
+#, fuzzy
 msgid "Play locally"
-msgstr ""
+msgstr "Lejátszás lassítása"
 
 #: modules/gui/macosx/output.m:144 modules/gui/wxwindows/streamout.cpp:463
+#, fuzzy
 msgid "Dump raw input"
-msgstr ""
+msgstr "Kimeneti adatfolyam"
 
 #: modules/gui/macosx/output.m:155 modules/gui/wxwindows/streamout.cpp:581
 msgid "Encapsulation Method"
 msgstr ""
 
 #: modules/gui/macosx/output.m:159
+#, fuzzy
 msgid "Transcode options"
-msgstr ""
+msgstr "Lejátszás megállítása"
 
 #: modules/gui/macosx/output.m:163 modules/gui/macosx/output.m:173
 #: modules/gui/wxwindows/streamout.cpp:684
 #: modules/gui/wxwindows/streamout.cpp:754
+#: modules/gui/wxwindows/wizard.cpp:816 modules/gui/wxwindows/wizard.cpp:852
 msgid "Bitrate (kb/s)"
 msgstr ""
 
@@ -8595,8 +8860,9 @@ msgid "Scale"
 msgstr "Mentés"
 
 #: modules/gui/macosx/output.m:180
+#, fuzzy
 msgid "Stream Announcing"
-msgstr ""
+msgstr "Kimeneti adatfolyam"
 
 #: modules/gui/macosx/output.m:181 modules/gui/wxwindows/streamout.cpp:540
 msgid "SAP announce"
@@ -8628,8 +8894,9 @@ msgid "SDP URL"
 msgstr ""
 
 #: modules/gui/macosx/output.m:511
+#, fuzzy
 msgid "Save File"
-msgstr ""
+msgstr "Fájlmentés"
 
 #: modules/gui/macosx/playlist.m:171
 #, fuzzy
@@ -8655,8 +8922,9 @@ msgid "Properties"
 msgstr "A program naplóinak megtekintése"
 
 #: modules/gui/macosx/playlist.m:184 modules/gui/wxwindows/playlist.cpp:294
+#, fuzzy
 msgid "Search"
-msgstr ""
+msgstr "Törlés"
 
 #: modules/gui/macosx/playlist.m:186
 msgid "Standard Play"
@@ -8678,6 +8946,7 @@ msgid "%i items in playlist"
 msgstr "Tételek hozzávétele"
 
 #: modules/gui/macosx/playlistinfo.m:61 modules/gui/wxwindows/iteminfo.cpp:145
+#: modules/gui/wxwindows/wizard.cpp:576
 msgid "URI"
 msgstr ""
 
@@ -8692,8 +8961,9 @@ msgstr ""
 
 #: modules/gui/macosx/playlistinfo.m:68 modules/gui/pda/pda.c:242
 #: modules/gui/wxwindows/iteminfo.cpp:215
+#, fuzzy
 msgid "Group"
-msgstr ""
+msgstr "nincs adat"
 
 #: modules/gui/macosx/prefs.m:81 modules/gui/wxwindows/preferences.cpp:200
 msgid "Reset All"
@@ -8706,8 +8976,9 @@ msgstr "További"
 #: modules/gui/macosx/prefs.m:179 modules/gui/macosx/prefs.m:760
 #: modules/gui/macosx/prefs_widgets.m:200
 #: modules/gui/macosx/prefs_widgets.m:274
+#, fuzzy
 msgid "Command"
-msgstr ""
+msgstr "Általános"
 
 #: modules/gui/macosx/prefs.m:182 modules/gui/macosx/prefs.m:764
 #: modules/gui/macosx/prefs_widgets.m:204
@@ -8719,8 +8990,9 @@ msgstr "Vezérlõk"
 #: modules/gui/macosx/prefs.m:185 modules/gui/macosx/prefs.m:768
 #: modules/gui/macosx/prefs_widgets.m:208
 #: modules/gui/macosx/prefs_widgets.m:284
+#, fuzzy
 msgid "Option/Alt"
-msgstr ""
+msgstr "További lehetõségek"
 
 #: modules/gui/macosx/prefs.m:188 modules/gui/macosx/prefs.m:772
 #: modules/gui/macosx/prefs_widgets.m:212
@@ -8730,8 +9002,9 @@ msgid "Shift"
 msgstr ""
 
 #: modules/gui/macosx/prefs.m:214 modules/gui/wxwindows/preferences.cpp:275
+#, fuzzy
 msgid "Reset Preferences"
-msgstr ""
+msgstr "Beállítások"
 
 #: modules/gui/macosx/prefs.m:214
 msgid "Continue"
@@ -8744,8 +9017,9 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/prefs.m:242
+#, fuzzy
 msgid "Select file or directory"
-msgstr ""
+msgstr "Hálózati adatfolyam megadása"
 
 #: modules/gui/macosx/prefs_widgets.m:625
 #, fuzzy
@@ -8763,8 +9037,9 @@ msgid ""
 msgstr ""
 
 #: modules/gui/ncurses.c:92
+#, fuzzy
 msgid "ncurses interface"
-msgstr ""
+msgstr "Kezelõfelület"
 
 #: modules/gui/pda/pda.c:58
 msgid "Autoplay selected file"
@@ -8784,8 +9059,9 @@ msgid "Filename"
 msgstr "Fájlnév"
 
 #: modules/gui/pda/pda.c:224
+#, fuzzy
 msgid "Permissions"
-msgstr ""
+msgstr "Függõleges"
 
 #: modules/gui/pda/pda.c:230
 msgid "Size"
@@ -8822,8 +9098,9 @@ msgid "MRL:"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:423
+#, fuzzy
 msgid "Port:"
-msgstr ""
+msgstr "Beillesztés"
 
 #: modules/gui/pda/pda_interface.c:471
 msgid "unicast"
@@ -8876,8 +9153,9 @@ msgid "Protocol:"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:522 modules/gui/pda/pda_interface.c:848
+#, fuzzy
 msgid "Transcode:"
-msgstr ""
+msgstr "Lejátszás megállítása"
 
 #: modules/gui/pda/pda_interface.c:531 modules/gui/pda/pda_interface.c:833
 #: modules/gui/pda/pda_interface.c:857 modules/gui/pda/pda_interface.c:1099
@@ -8902,8 +9180,9 @@ msgid "Channel:"
 msgstr "Mégse"
 
 #: modules/gui/pda/pda_interface.c:602
+#, fuzzy
 msgid "Norm:"
-msgstr ""
+msgstr "Nem"
 
 #: modules/gui/pda/pda_interface.c:611
 msgid "Size:"
@@ -8914,8 +9193,9 @@ msgid "Frequency:"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:629
+#, fuzzy
 msgid "Samplerate:"
-msgstr ""
+msgstr "Fejezet"
 
 #: modules/gui/pda/pda_interface.c:638
 msgid "Quality:"
@@ -8926,8 +9206,9 @@ msgid "Tuner:"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:656
+#, fuzzy
 msgid "Sound:"
-msgstr ""
+msgstr "Dolby Surround"
 
 #: modules/gui/pda/pda_interface.c:665
 msgid "MJPEG:"
@@ -8947,12 +9228,14 @@ msgid "ntsc"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:742
+#, fuzzy
 msgid "secam"
-msgstr ""
+msgstr "Lejátszás indítása"
 
 #: modules/gui/pda/pda_interface.c:743
+#, fuzzy
 msgid "auto"
-msgstr ""
+msgstr "Hang"
 
 #: modules/gui/pda/pda_interface.c:760
 msgid "240x192"
@@ -9048,12 +9331,14 @@ msgid "Video Bitrate:"
 msgstr "Képsáv"
 
 #: modules/gui/pda/pda_interface.c:943
+#, fuzzy
 msgid "Bitrate Tolerance:"
-msgstr ""
+msgstr "Képsáv"
 
 #: modules/gui/pda/pda_interface.c:952
+#, fuzzy
 msgid "Keyframe Interval:"
-msgstr ""
+msgstr "Általános"
 
 #: modules/gui/pda/pda_interface.c:961
 #, fuzzy
@@ -9066,8 +9351,9 @@ msgid "Deinterlace:"
 msgstr "Kezelõfelület"
 
 #: modules/gui/pda/pda_interface.c:979
+#, fuzzy
 msgid "Access:"
-msgstr ""
+msgstr "Hozzáférési modul"
 
 #: modules/gui/pda/pda_interface.c:988
 msgid "Muxer:"
@@ -9101,7 +9387,7 @@ msgstr ""
 msgid "MPEG1"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1055
+#: modules/gui/pda/pda_interface.c:1055 modules/gui/wxwindows/streamdata.h:142
 msgid "OGG"
 msgstr ""
 
@@ -9109,21 +9395,23 @@ msgstr ""
 msgid "MP4"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1057
+#: modules/gui/pda/pda_interface.c:1057 modules/gui/wxwindows/streamdata.h:147
 msgid "MOV"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1058
+#: modules/gui/pda/pda_interface.c:1058 modules/gui/wxwindows/streamdata.h:144
 msgid "ASF"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:1074 modules/gui/pda/pda_interface.c:1132
+#, fuzzy
 msgid "kbits/s"
-msgstr ""
+msgstr "Felirat választás"
 
 #: modules/gui/pda/pda_interface.c:1085
+#, fuzzy
 msgid "alaw"
-msgstr ""
+msgstr "késleltetés"
 
 #: modules/gui/pda/pda_interface.c:1086
 msgid "ulaw"
@@ -9146,8 +9434,9 @@ msgid "vorb"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:1122
+#, fuzzy
 msgid "bits/s"
-msgstr ""
+msgstr "Felirat választás"
 
 #: modules/gui/pda/pda_interface.c:1135
 #, fuzzy
@@ -9155,21 +9444,24 @@ msgid "Audio Bitrate :"
 msgstr "Hangsáv"
 
 #: modules/gui/pda/pda_interface.c:1158
+#, fuzzy
 msgid "SAP Announce:"
-msgstr ""
+msgstr "Mégse"
 
 #: modules/gui/pda/pda_interface.c:1181
+#, fuzzy
 msgid "SLP Announce:"
-msgstr ""
+msgstr "Mégse"
 
 #: modules/gui/pda/pda_interface.c:1190
 #, fuzzy
 msgid "Announce Channel:"
 msgstr "Mégse"
 
-#: modules/gui/pda/pda_interface.c:1222
+#: modules/gui/pda/pda_interface.c:1222 modules/gui/wxwindows/wizard.cpp:124
+#, fuzzy
 msgid "Transcode"
-msgstr ""
+msgstr "Lejátszás megállítása"
 
 #: modules/gui/pda/pda_interface.c:1250
 msgid "Update"
@@ -9192,8 +9484,9 @@ msgid " Cancel "
 msgstr " Mégse"
 
 #: modules/gui/pda/pda_interface.c:1306
+#, fuzzy
 msgid "Preference"
-msgstr ""
+msgstr "Beállítások"
 
 #: modules/gui/pda/pda_interface.c:1334
 msgid ""
@@ -9208,16 +9501,19 @@ msgid "Authors: the VideoLAN Team, http://www.videolan.org/team/"
 msgstr "Szerzõk: a VideoLAN csapat, http://www.videolan.org/team/"
 
 #: modules/gui/qnx/qnx.c:44
+#, fuzzy
 msgid "QNX RTOS video and audio output"
-msgstr ""
+msgstr "Teljesképernyõs kép"
 
 #: modules/gui/qt/qt.cpp:47
+#, fuzzy
 msgid "Qt interface"
-msgstr ""
+msgstr "Kezelõfelület"
 
 #: modules/gui/skins2/src/dialogs.cpp:225
+#, fuzzy
 msgid "Open a skin file"
-msgstr ""
+msgstr "Fájl megnyitása"
 
 #: modules/gui/skins2/src/dialogs.cpp:226
 msgid "Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"
@@ -9241,8 +9537,9 @@ msgid "Last skin used"
 msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:333
+#, fuzzy
 msgid "Select the path to the last skin used."
-msgstr ""
+msgstr "Következõ lejátszási listatétel"
 
 #: modules/gui/skins2/src/skin_main.cpp:334
 msgid "Config of last used skin"
@@ -9291,8 +9588,9 @@ msgid "Bytes"
 msgstr ""
 
 #: modules/gui/wxwindows/bookmarks.cpp:199
+#, fuzzy
 msgid "Bookmarks"
-msgstr ""
+msgstr "Lejátszási lista"
 
 #: modules/gui/wxwindows/bookmarks.cpp:227
 msgid "Extract"
@@ -9410,8 +9708,9 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwindows/extrapanel.cpp:395
+#, fuzzy
 msgid "Volume normalization"
-msgstr ""
+msgstr "nincs adat"
 
 #: modules/gui/wxwindows/extrapanel.cpp:396
 msgid ""
@@ -9440,6 +9739,7 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwindows/extrapanel.cpp:921
+#: modules/gui/wxwindows/wizard.cpp:504
 #, fuzzy
 msgid "More information"
 msgstr "nincs adat"
@@ -9473,8 +9773,9 @@ msgid "Open &Network Stream...\tCtrl-N"
 msgstr "&Hálózati adatfolyam megnyitás"
 
 #: modules/gui/wxwindows/interface.cpp:328
+#, fuzzy
 msgid "Open &Capture Device...\tCtrl-C"
-msgstr ""
+msgstr "&Meghajtó megnyitás"
 
 #: modules/gui/wxwindows/interface.cpp:331
 #, fuzzy
@@ -9527,37 +9828,38 @@ msgstr "&Navigáció"
 msgid "&Help"
 msgstr "&Súgó"
 
-#: modules/gui/wxwindows/interface.cpp:435
+#: modules/gui/wxwindows/interface.cpp:439
 msgid "Previous playlist item"
 msgstr "Elõzõ lejátszási listatétel"
 
-#: modules/gui/wxwindows/interface.cpp:436
+#: modules/gui/wxwindows/interface.cpp:440
 msgid "Next playlist item"
 msgstr "Következõ lejátszási listatétel"
 
-#: modules/gui/wxwindows/interface.cpp:611
+#: modules/gui/wxwindows/interface.cpp:615
 msgid "&Extended GUI"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:615
+#: modules/gui/wxwindows/interface.cpp:619
 msgid "&Undock Ext. GUI"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:618
+#: modules/gui/wxwindows/interface.cpp:622
 msgid "&Bookmarks..."
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:619 modules/gui/wxwindows/menus.cpp:142
+#: modules/gui/wxwindows/interface.cpp:623 modules/gui/wxwindows/menus.cpp:142
 msgid "&Preferences..."
 msgstr "&Beállítások"
 
-#: modules/gui/wxwindows/interface.cpp:672
+#: modules/gui/wxwindows/interface.cpp:676
+#, fuzzy
 msgid ""
 " (wxWindows interface)\n"
 "\n"
-msgstr ""
+msgstr "Kezelõfelület"
 
-#: modules/gui/wxwindows/interface.cpp:673
+#: modules/gui/wxwindows/interface.cpp:677
 #, fuzzy
 msgid ""
 "(c) 1996-2004 - the VideoLAN Team\n"
@@ -9566,7 +9868,7 @@ msgstr ""
 "(C) 1996-2003 - a VideoLAN csapat\n"
 "\n"
 
-#: modules/gui/wxwindows/interface.cpp:675
+#: modules/gui/wxwindows/interface.cpp:679
 msgid ""
 "The VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/\n"
@@ -9576,7 +9878,7 @@ msgstr ""
 "http://www.videolan.org/\n"
 "\n"
 
-#: modules/gui/wxwindows/interface.cpp:678
+#: modules/gui/wxwindows/interface.cpp:682
 #, c-format
 msgid "About %s"
 msgstr "Névjegy %s"
@@ -9598,8 +9900,9 @@ msgstr "nincs adat"
 
 #: modules/gui/wxwindows/iteminfo.cpp:230
 #: modules/gui/wxwindows/playlist.cpp:1305
+#, fuzzy
 msgid "New Group"
-msgstr ""
+msgstr "&Törlés"
 
 #: modules/gui/wxwindows/menus.cpp:129
 #, fuzzy
@@ -9662,8 +9965,9 @@ msgid "Options:"
 msgstr "További lehetõségek"
 
 #: modules/gui/wxwindows/open.cpp:358 modules/gui/wxwindows/open.cpp:366
+#, fuzzy
 msgid "Open..."
-msgstr ""
+msgstr "Fájl megnyitása..."
 
 #: modules/gui/wxwindows/open.cpp:393
 #, fuzzy
@@ -9747,8 +10051,9 @@ msgid "&Close"
 msgstr "&Bezárás"
 
 #: modules/gui/wxwindows/playlist.cpp:216
+#, fuzzy
 msgid "Sort by &title"
-msgstr ""
+msgstr "Felcserélt sztereó"
 
 #: modules/gui/wxwindows/playlist.cpp:217
 #, fuzzy
@@ -9756,8 +10061,9 @@ msgid "&Reverse sort by title"
 msgstr "Felcserélt sztereó"
 
 #: modules/gui/wxwindows/playlist.cpp:219
+#, fuzzy
 msgid "Sort by &author"
-msgstr ""
+msgstr "Felcserélt sztereó"
 
 #: modules/gui/wxwindows/playlist.cpp:220
 #, fuzzy
@@ -9765,8 +10071,9 @@ msgid "Reverse sort by author"
 msgstr "Felcserélt sztereó"
 
 #: modules/gui/wxwindows/playlist.cpp:222
+#, fuzzy
 msgid "Sort by &group"
-msgstr ""
+msgstr "Felcserélt sztereó"
 
 #: modules/gui/wxwindows/playlist.cpp:223
 #, fuzzy
@@ -9779,8 +10086,9 @@ msgid "&Shuffle Playlist"
 msgstr "Lejátszási lista mentése"
 
 #: modules/gui/wxwindows/playlist.cpp:229
+#, fuzzy
 msgid "&Enable"
-msgstr ""
+msgstr "Tiltás"
 
 #: modules/gui/wxwindows/playlist.cpp:230
 #, fuzzy
@@ -9838,8 +10146,9 @@ msgid "Down"
 msgstr ""
 
 #: modules/gui/wxwindows/playlist.cpp:602
+#, fuzzy
 msgid "M3U file"
-msgstr ""
+msgstr "Fájlmentés"
 
 #: modules/gui/wxwindows/playlist.cpp:603
 #, fuzzy
@@ -9883,13 +10192,172 @@ msgstr "Hang választás"
 msgid "Choose file"
 msgstr "Felirat választás"
 
-#: modules/gui/wxwindows/streamout.cpp:165
-msgid "Stream output MRL"
+#: modules/gui/wxwindows/streamdata.h:47
+#, fuzzy
+msgid "MPEG-1 Video codec"
+msgstr "VIdeó kódoló"
+
+#: modules/gui/wxwindows/streamdata.h:49
+#, fuzzy
+msgid "MPEG-2 Video codec"
+msgstr "VIdeó kódoló"
+
+#: modules/gui/wxwindows/streamdata.h:51
+#, fuzzy
+msgid "MPEG-4 Video codec"
+msgstr "VIdeó kódoló"
+
+#: modules/gui/wxwindows/streamdata.h:53
+msgid "DivX first version"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:169
-msgid "Destination Target:"
+#: modules/gui/wxwindows/streamdata.h:55
+msgid "DivX second version"
 msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:57
+msgid "DivX third version"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:59
+msgid "H263 is a video codec optimized for videoconference (low rates)"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:61
+msgid "I263 is an Intel conferencing codec"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:63
+msgid "WMV (Windows Media Video) 1"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:65
+msgid "WMV (Windows Media Video) 2"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:67
+msgid "MJPEG consists of a series of JPEG pictures"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:69
+msgid "Theora is a free general-purpose codec"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:71 modules/gui/wxwindows/streamdata.h:92
+msgid "Dummy codec (do not transcode)"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:78
+msgid "The standard MPEG audio (1/2) format"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:80
+#, fuzzy
+msgid "MPEG Audio Layer 3"
+msgstr "Feliratok"
+
+#: modules/gui/wxwindows/streamdata.h:82
+msgid "Audio format for MPEG4"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:84
+#, fuzzy
+msgid "DVD audio format"
+msgstr "nincs adat"
+
+#: modules/gui/wxwindows/streamdata.h:86
+#, fuzzy
+msgid "Vorbis is a free audio codec"
+msgstr "hang kódoló"
+
+#: modules/gui/wxwindows/streamdata.h:88
+msgid "FLAC is a lossless audio codec"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:90
+msgid "A free audio codec dedicated to compression of voice"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:107
+msgid "UDP Unicast"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:107
+msgid "Use this to stream to a single computer"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:108
+msgid "Enter the address of the computer to stream to"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:110
+msgid "UDP Multicast"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:111
+msgid ""
+"Use this to stream to a dynamic group of computers on a multicast-enabled "
+"network. This is the most efficient method to stream to several computers, "
+"but it does not work over Internet."
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:114
+msgid ""
+"Enter the multicast address to stream to in this field. This must be an IP "
+"address between 224.0.0.0 an 239.255.255.255 For a private use, enter an "
+"address beginning with 239.255."
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:118
+#: modules/gui/wxwindows/streamout.cpp:426
+msgid "HTTP"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:119
+msgid ""
+"Use this to stream to several computers. This method is less efficient, as "
+"the server needs to send several times the stream."
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:122
+msgid ""
+"Enter the local addresses you want to listen to. Do not enter anything if "
+"you want to listen to all adresses or if you don't understand. This is "
+"generally the best thing to do. Other computers can then access the stream "
+"at http://yourip:8080 by default"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:139
+#, fuzzy
+msgid "MPEG Program Stream"
+msgstr "Lejátszás indítása"
+
+#: modules/gui/wxwindows/streamdata.h:140
+#, fuzzy
+msgid "MPEG Transport Stream"
+msgstr "Lejátszás megállítása"
+
+#: modules/gui/wxwindows/streamdata.h:141
+msgid "MPEG 1 Format"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:143
+msgid "RAW"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:146
+msgid "MPEG4"
+msgstr ""
+
+#: modules/gui/wxwindows/streamout.cpp:165
+#, fuzzy
+msgid "Stream output MRL"
+msgstr "Kimeneti adatfolyam"
+
+#: modules/gui/wxwindows/streamout.cpp:169
+#, fuzzy
+msgid "Destination Target:"
+msgstr "Hossz"
 
 #: modules/gui/wxwindows/streamout.cpp:172
 msgid ""
@@ -9899,12 +10367,9 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwindows/streamout.cpp:417
+#, fuzzy
 msgid "Output methods"
-msgstr ""
-
-#: modules/gui/wxwindows/streamout.cpp:426
-msgid "HTTP"
-msgstr ""
+msgstr "Kép kimeneti modul"
 
 #: modules/gui/wxwindows/streamout.cpp:427
 msgid "MMSH"
@@ -9921,8 +10386,9 @@ msgid "Channel name"
 msgstr "Csatornanév"
 
 #: modules/gui/wxwindows/streamout.cpp:624
+#, fuzzy
 msgid "Transcoding options"
-msgstr ""
+msgstr "További lehetõségek"
 
 #: modules/gui/wxwindows/streamout.cpp:676
 msgid "Video codec"
@@ -9952,30 +10418,262 @@ msgstr ""
 msgid "Open file"
 msgstr "Fájl megnyitása"
 
-#: modules/gui/wxwindows/wxwindows.cpp:83
+#: modules/gui/wxwindows/wizard.cpp:87 modules/gui/wxwindows/wizard.cpp:90
+#: modules/gui/wxwindows/wizard.cpp:1370
+msgid "Streaming/Transcoding Wizard"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:91
+msgid "This wizard helps you to stream, transcode or save a stream"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:93
+#, fuzzy
+msgid "Stream to network"
+msgstr "Kimeneti adatfolyam"
+
+#: modules/gui/wxwindows/wizard.cpp:94 modules/gui/wxwindows/wizard.cpp:99
+msgid "Use this to stream on a network"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:95
+#, fuzzy
+msgid "Transcode/Save to file"
+msgstr "Lejátszás megállítása"
+
+#: modules/gui/wxwindows/wizard.cpp:96
+msgid "Use this to re-encode a stream and save it to a file"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:97
+msgid ""
+"This wizard only gives access to a small subset of VLC's streaming and "
+"transcoding capabilities. Use the Open and Stream Output dialogs to get all "
+"of them"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:101
+msgid ""
+"Use this to save a stream to a file. You have the possibility to reencode "
+"the stream. You can save whatever VLC can read.\n"
+"Please notice that VLC is not very suited for file to file transcoding. You "
+"should use its transcoding features to save network streams, for example"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:106
+#, fuzzy
+msgid "Choose input"
+msgstr "Felirat választás"
+
+#: modules/gui/wxwindows/wizard.cpp:107
+msgid "Choose here your input stream"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:109
+#, fuzzy
+msgid "Select a stream"
+msgstr "Hálózati adatfolyam megadása"
+
+#: modules/gui/wxwindows/wizard.cpp:110
+#, fuzzy
+msgid "Existing playlist item"
+msgstr "Következõ lejátszási listatétel"
+
+#: modules/gui/wxwindows/wizard.cpp:112
+msgid "You must choose a stream"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:113
+msgid "Uh Oh! Unable to find playlist !"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:115
+msgid ""
+"Use this to read only a part of the stream. You must be able to control the "
+"incoming stream (for example, a file or a disc, but not an UDP network "
+"stream.\n"
+"Enter the starting and ending times (in seconds)"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:121
+#, fuzzy
+msgid "Choose"
+msgstr "Tallóz..."
+
+#: modules/gui/wxwindows/wizard.cpp:125
+msgid ""
+"If you want to change the compression format of the audio or video tracks, "
+"fill in this page. (If you only want to change the container format, proceed "
+"to next page)."
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:127
+msgid "If your stream has video and you want to transcode it, enable this"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:129
+msgid "Select your video codec. Click one to get more information"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:132
+msgid "If your stream has audio and you want to transcode it, enable this"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:134
+msgid "Select your audio codec. Click one to get more information"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:138
+#, fuzzy
+msgid "Streaming"
+msgstr "Kimeneti adatfolyam"
+
+#: modules/gui/wxwindows/wizard.cpp:139
+msgid "In this page, you will select how your input stream will be sent."
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:142
+msgid "This does not appear to be a valid multicast address"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:144
+#, fuzzy
+msgid "You need to enter an address"
+msgstr "Hálózati csatoló címe"
+
+#: modules/gui/wxwindows/wizard.cpp:147
+msgid "Encapsulation format"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:148
+msgid ""
+"In this page, you will select how the stream will be encapsulated. Depending "
+"on the choices you made, all formats won't be available."
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:154
+#, fuzzy
+msgid "Additional transcode options"
+msgstr "További lehetõségek"
+
+#: modules/gui/wxwindows/wizard.cpp:155
+msgid ""
+"In this page, you will define a few additionnal parameters for your "
+"transcoding"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:158
+msgid "You must choose a file to save to"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:161
+#, fuzzy
+msgid "Additional streaming options"
+msgstr "Felirat beállításai"
+
+#: modules/gui/wxwindows/wizard.cpp:162
+msgid ""
+"In this page, you will define a few additionnal parameters for your stream"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:165
+msgid ""
+"Define the TTL (Time-To-Live) of the stream. This parameter is the maximum "
+"number of routers your stream can go through. If you don't know what it "
+"means, or if you want to stream on your local network only, leave this "
+"setting to 1."
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:170
+msgid ""
+"When streaming using UDP, you can announce your streams using the SAP/SDP "
+"announcing protocol. This way, the clients won't have to type in the "
+"multicast address, it will appear in their playlist if they enable the SAP "
+"extra interface.\n"
+"If you want to give a name to your stream, enter it here, else, a default "
+"name will be used"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:475 modules/gui/wxwindows/wizard.cpp:482
+#, fuzzy
+msgid "More Info"
+msgstr "nincs adat"
+
+#: modules/gui/wxwindows/wizard.cpp:555
+#, fuzzy
+msgid "Choose..."
+msgstr "Tallóz..."
+
+#: modules/gui/wxwindows/wizard.cpp:611
+msgid "Partial Extract"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:622
+msgid "From"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:627
+msgid "To"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:803
+#, fuzzy
+msgid "Transcode video"
+msgstr "Lejátszás megállítása"
+
+#: modules/gui/wxwindows/wizard.cpp:838
+#, fuzzy
+msgid "Transcode audio"
+msgstr "Lejátszás megállítása"
+
+#: modules/gui/wxwindows/wizard.cpp:1005
+#, fuzzy
+msgid "Streaming method"
+msgstr "Kimeneti adatfolyam"
+
+#: modules/gui/wxwindows/wizard.cpp:1019 modules/stream_out/rtp.c:41
+#, fuzzy
+msgid "Destination"
+msgstr "Hossz"
+
+#: modules/gui/wxwindows/wizard.cpp:1234
+#, fuzzy
+msgid "Select the file to save to"
+msgstr "Hálózati adatfolyam megadása"
+
+#: modules/gui/wxwindows/wizard.cpp:1302
+msgid "Time-To-Live (TTL)"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:1310
+msgid "SAP Announce"
+msgstr ""
+
+#: modules/gui/wxwindows/wxwindows.cpp:86
 #, fuzzy
 msgid "Embed video in interface"
 msgstr "Kezelõfelület"
 
-#: modules/gui/wxwindows/wxwindows.cpp:84
+#: modules/gui/wxwindows/wxwindows.cpp:87
 msgid ""
 "Embed the video inside the interface instead of having it in a separate "
 "window."
 msgstr ""
 
-#: modules/gui/wxwindows/wxwindows.cpp:86
+#: modules/gui/wxwindows/wxwindows.cpp:89
 msgid "Show bookmarks dialog"
 msgstr ""
 
-#: modules/gui/wxwindows/wxwindows.cpp:87
+#: modules/gui/wxwindows/wxwindows.cpp:90
 msgid "Show bookmarks dialog when the interface starts."
 msgstr ""
 
-#: modules/gui/wxwindows/wxwindows.cpp:96
+#: modules/gui/wxwindows/wxwindows.cpp:99
+#, fuzzy
 msgid "wxWindows interface module"
-msgstr ""
+msgstr "Kezelõfelület"
 
-#: modules/gui/wxwindows/wxwindows.cpp:110
+#: modules/gui/wxwindows/wxwindows.cpp:113
 msgid "wxWindows dialogs provider"
 msgstr ""
 
@@ -10027,12 +10725,14 @@ msgid "Dummy encoder function"
 msgstr ""
 
 #: modules/misc/dummy/dummy.c:84
+#, fuzzy
 msgid "Dummy audio output function"
-msgstr ""
+msgstr "Kimeneti adatfolyam"
 
 #: modules/misc/dummy/dummy.c:88
+#, fuzzy
 msgid "Dummy video output function"
-msgstr ""
+msgstr "Kimeneti adatfolyam"
 
 #: modules/misc/dummy/dummy.c:94
 msgid "Dummy font renderer function"
@@ -10062,12 +10762,14 @@ msgid "The size of the fonts used by the osd module"
 msgstr ""
 
 #: modules/misc/freetype.c:89
+#, fuzzy
 msgid "Smaller"
-msgstr ""
+msgstr "Mentés"
 
 #: modules/misc/freetype.c:89
+#, fuzzy
 msgid "Small"
-msgstr ""
+msgstr "Általános"
 
 #: modules/misc/freetype.c:90
 #, fuzzy
@@ -10075,8 +10777,9 @@ msgid "Large"
 msgstr "Nyelv"
 
 #: modules/misc/freetype.c:90
+#, fuzzy
 msgid "Larger"
-msgstr ""
+msgstr "Nyelv"
 
 #: modules/misc/freetype.c:93
 msgid "freetype2 font renderer"
@@ -10092,8 +10795,9 @@ msgid "Text"
 msgstr "Következõ"
 
 #: modules/misc/logger.c:93
+#, fuzzy
 msgid "Log format"
-msgstr ""
+msgstr "nincs adat"
 
 #: modules/misc/logger.c:94
 msgid ""
@@ -10238,8 +10942,9 @@ msgid ""
 msgstr ""
 
 #: modules/misc/sap.c:111
+#, fuzzy
 msgid "SAP interface"
-msgstr ""
+msgstr "Kezelõfelület"
 
 #: modules/misc/screensaver.c:44
 msgid "X Screensaver disabler"
@@ -10260,8 +10965,9 @@ msgid "C module that does nothing"
 msgstr ""
 
 #: modules/misc/testsuite/test4.c:63
+#, fuzzy
 msgid "Miscellaneous stress tests"
-msgstr ""
+msgstr "Egyéb beállítások"
 
 #: modules/mux/asf.c:48
 msgid "Allows you to define the title that will be put in ASF comments."
@@ -10290,8 +10996,9 @@ msgid "Allows you to define the \"rating\" that will be put in ASF comments."
 msgstr ""
 
 #: modules/mux/asf.c:64
+#, fuzzy
 msgid "ASF muxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/mux/asf.c:509
 #, fuzzy
@@ -10299,12 +11006,14 @@ msgid "Unknown Video"
 msgstr "Ismeretlen"
 
 #: modules/mux/avi.c:44
+#, fuzzy
 msgid "AVI muxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/mux/dummy.c:41
+#, fuzzy
 msgid "Dummy/Raw muxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/mux/mp4.c:45
 msgid "Create \"Fast start\" files"
@@ -10318,8 +11027,9 @@ msgid ""
 msgstr ""
 
 #: modules/mux/mp4.c:56
+#, fuzzy
 msgid "MP4/MOV muxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/mux/mpeg/ps.c:43 modules/mux/mpeg/ts.c:103
 msgid "DTS delay (ms)"
@@ -10333,8 +11043,9 @@ msgid ""
 msgstr ""
 
 #: modules/mux/mpeg/ps.c:55
+#, fuzzy
 msgid "PS muxer"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/mux/mpeg/ts.c:77
 #, fuzzy
@@ -10376,8 +11087,9 @@ msgid ""
 msgstr ""
 
 #: modules/mux/mpeg/ts.c:90
+#, fuzzy
 msgid "Use keyframes"
-msgstr ""
+msgstr "Lejátszás indítása"
 
 #: modules/mux/mpeg/ts.c:91
 msgid ""
@@ -10411,8 +11123,9 @@ msgid "Crypt audio"
 msgstr "Hang választás"
 
 #: modules/mux/mpeg/ts.c:110
+#, fuzzy
 msgid "Crypt audio using CSA"
-msgstr ""
+msgstr "Hang választás"
 
 #: modules/mux/mpeg/ts.c:112
 msgid "CSA Key"
@@ -10442,8 +11155,9 @@ msgid "WAV muxer"
 msgstr "hang kódoló"
 
 #: modules/packetizer/copy.c:41
+#, fuzzy
 msgid "Copy packetizer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/packetizer/h264.c:45
 #, fuzzy
@@ -10461,8 +11175,9 @@ msgid "MPEG4 video packetizer"
 msgstr "Feliratok"
 
 #: modules/packetizer/mpegvideo.c:58
+#, fuzzy
 msgid "MPEG-I/II video packetizer"
-msgstr ""
+msgstr "Feliratok"
 
 #: modules/stream_out/description.c:48
 #, fuzzy
@@ -10470,8 +11185,9 @@ msgid "Description stream output"
 msgstr "Lejátszás megállítása"
 
 #: modules/stream_out/display.c:38
+#, fuzzy
 msgid "Enable/disable audio rendering."
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/stream_out/display.c:40
 msgid "Enable/disable video rendering."
@@ -10497,8 +11213,9 @@ msgid "Duplicate stream output"
 msgstr "Kimeneti adatfolyam"
 
 #: modules/stream_out/es.c:37 modules/stream_out/standard.c:43
+#, fuzzy
 msgid "Output access method"
-msgstr ""
+msgstr "Hang kimenet modul"
 
 #: modules/stream_out/es.c:39 modules/stream_out/standard.c:45
 msgid ""
@@ -10528,8 +11245,9 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/es.c:50 modules/stream_out/standard.c:47
+#, fuzzy
 msgid "Output muxer"
-msgstr ""
+msgstr "Kép kimeneti modul"
 
 #: modules/stream_out/es.c:52 modules/stream_out/rtp.c:52
 msgid "Allows you to specify the muxer used for the streaming output."
@@ -10554,8 +11272,9 @@ msgid "Allows you to specify the muxer used for the video streaming output."
 msgstr ""
 
 #: modules/stream_out/es.c:60 modules/stream_out/standard.c:51
+#, fuzzy
 msgid "Output URL"
-msgstr ""
+msgstr "Kép kimeneti modul"
 
 #: modules/stream_out/es.c:62 modules/stream_out/rtp.c:43
 #: modules/stream_out/standard.c:53
@@ -10591,11 +11310,6 @@ msgstr "Kimeneti adatfolyam"
 #, fuzzy
 msgid "Gathering stream output"
 msgstr "Lejátszás megállítása"
-
-#: modules/stream_out/rtp.c:41
-#, fuzzy
-msgid "Destination"
-msgstr "Hossz"
 
 #: modules/stream_out/rtp.c:44
 msgid "SDP"
@@ -10730,8 +11444,9 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/transcode.c:46
+#, fuzzy
 msgid "Destination video codec"
-msgstr ""
+msgstr "hang kódoló"
 
 #: modules/stream_out/transcode.c:48
 msgid ""
@@ -10913,8 +11628,9 @@ msgid "Allows you to specify the number of threads used for the transcoding."
 msgstr ""
 
 #: modules/stream_out/transcode.c:122
+#, fuzzy
 msgid "Synchronise on audio track"
-msgstr ""
+msgstr "Hangsáv"
 
 #: modules/stream_out/transcode.c:124
 msgid ""
@@ -10928,8 +11644,9 @@ msgid "Transcode stream output"
 msgstr "Lejátszás megállítása"
 
 #: modules/stream_out/transrate/transrate.c:56
+#, fuzzy
 msgid "MPEG2 video transrating stream output"
-msgstr ""
+msgstr "Lejátszás megállítása"
 
 #: modules/video_chroma/i420_rgb.c:67
 msgid "I420,IYUV,YV12 to RGB2,RV15,RV16,RV24,RV32 conversions"
@@ -10941,8 +11658,9 @@ msgstr ""
 
 #: modules/video_chroma/i420_ymga.c:48 modules/video_chroma/i420_yuy2.c:75
 #: modules/video_chroma/i422_yuy2.c:63
+#, fuzzy
 msgid "Conversions from "
-msgstr ""
+msgstr "Eszköz neve"
 
 #: modules/video_chroma/i420_ymga.c:48 modules/video_chroma/i420_ymga.c:51
 #: modules/video_chroma/i420_yuy2.c:75 modules/video_chroma/i420_yuy2.c:78
@@ -11005,7 +11723,7 @@ msgstr ""
 msgid "Image properties filter"
 msgstr "A program naplóinak megtekintése"
 
-#: modules/video_filter/blend.c:65
+#: modules/video_filter/blend.c:66
 #, fuzzy
 msgid "Video pictures blending"
 msgstr "Kép kimeneti modul"
@@ -11028,8 +11746,9 @@ msgid "Select the specific video output modules that you want to activate."
 msgstr ""
 
 #: modules/video_filter/clone.c:63
+#, fuzzy
 msgid "Clone video filter"
-msgstr ""
+msgstr "Elõzõ fájl"
 
 #: modules/video_filter/crop.c:54
 msgid "Crop geometry (pixels)"
@@ -11042,8 +11761,9 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/crop.c:57
+#, fuzzy
 msgid "Automatic cropping"
-msgstr ""
+msgstr "Függõleges"
 
 #: modules/video_filter/crop.c:58
 msgid "Activate automatic black border cropping."
@@ -11055,20 +11775,23 @@ msgid "Crop video filter"
 msgstr "Elõzõ fájl"
 
 #: modules/video_filter/deinterlace.c:91
+#, fuzzy
 msgid "Deinterlace mode"
-msgstr ""
+msgstr "Kezelõfelület"
 
 #: modules/video_filter/deinterlace.c:92
 msgid "You can choose the default deinterlace mode"
 msgstr ""
 
 #: modules/video_filter/deinterlace.c:99
+#, fuzzy
 msgid "Deinterlacing video filter"
-msgstr ""
+msgstr "Elõzõ fájl"
 
 #: modules/video_filter/distort.c:59
+#, fuzzy
 msgid "Distort mode"
-msgstr ""
+msgstr "Sztereó"
 
 #: modules/video_filter/distort.c:60
 msgid "Distort mode, one of \"wave\" and \"ripple\""
@@ -11080,16 +11803,19 @@ msgid "Wave"
 msgstr "Mentés"
 
 #: modules/video_filter/distort.c:63
+#, fuzzy
 msgid "Ripple"
-msgstr ""
+msgstr "Idõ"
 
 #: modules/video_filter/distort.c:66
+#, fuzzy
 msgid "Distort video filter"
-msgstr ""
+msgstr "Elõzõ fájl"
 
 #: modules/video_filter/invert.c:52
+#, fuzzy
 msgid "Invert video filter"
-msgstr ""
+msgstr "Elõzõ fájl"
 
 #: modules/video_filter/logo.c:61
 #, fuzzy
@@ -11189,8 +11915,9 @@ msgid "The degree of blurring from 1 to 127."
 msgstr ""
 
 #: modules/video_filter/motionblur.c:58
+#, fuzzy
 msgid "Motion blur filter"
-msgstr ""
+msgstr "Fájlnév"
 
 #: modules/video_filter/scale.c:53 modules/video_filter/swscale/filter.c:74
 #, fuzzy
@@ -11207,8 +11934,9 @@ msgid "You can choose the default scaling mode."
 msgstr ""
 
 #: modules/video_filter/swscale/filter.c:68
+#, fuzzy
 msgid "Fast bilinear"
-msgstr ""
+msgstr "Törlés"
 
 #: modules/video_filter/swscale/filter.c:68
 #, fuzzy
@@ -11297,8 +12025,9 @@ msgid "Flip vertically"
 msgstr "Függõleges"
 
 #: modules/video_filter/transform.c:66
+#, fuzzy
 msgid "Video transformation filter"
-msgstr ""
+msgstr "Kép menü"
 
 #: modules/video_filter/wall.c:53
 msgid "Number of columns"
@@ -11327,12 +12056,14 @@ msgid "Comma separated list of active windows, defaults to all"
 msgstr ""
 
 #: modules/video_filter/wall.c:66
+#, fuzzy
 msgid "wall video filter"
-msgstr ""
+msgstr "Fájlnév"
 
 #: modules/video_output/aa.c:55
+#, fuzzy
 msgid "ASCII-art video output"
-msgstr ""
+msgstr "Teljesképernyõs kép"
 
 #: modules/video_output/caca.c:54
 msgid "color ASCII art video output"
@@ -11393,8 +12124,9 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/directx/directx.c:156
+#, fuzzy
 msgid "DirectX video output"
-msgstr ""
+msgstr "Teljesképernyõs kép"
 
 #: modules/video_output/directx/directx.c:288
 msgid "Wallpaper"
@@ -11420,8 +12152,9 @@ msgstr ""
 
 #: modules/video_output/ggi.c:56 modules/video_output/x11/glx.c:101
 #: modules/video_output/x11/x11.c:52 modules/video_output/x11/xvideo.c:58
+#, fuzzy
 msgid "X11 display name"
-msgstr ""
+msgstr "késleltetés"
 
 #: modules/video_output/ggi.c:58
 msgid ""
@@ -11430,8 +12163,9 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/glide.c:64
+#, fuzzy
 msgid "3dfx Glide video output"
-msgstr ""
+msgstr "Teljesképernyõs kép"
 
 #: modules/video_output/hd1000v.cpp:57
 #, fuzzy
@@ -11467,24 +12201,27 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/qte/qte.cpp:115
+#, fuzzy
 msgid "QT Embedded video output"
-msgstr ""
+msgstr "Teljesképernyõs kép"
 
 #: modules/video_output/sdl.c:104
 msgid "Simple DirectMedia Layer video output"
 msgstr ""
 
 #: modules/video_output/snapshot.c:46
+#, fuzzy
 msgid "snapshot width"
-msgstr ""
+msgstr "Hozzáférési modul"
 
 #: modules/video_output/snapshot.c:47
 msgid "Set the width of the snapshot image."
 msgstr ""
 
 #: modules/video_output/snapshot.c:49
+#, fuzzy
 msgid "snapshot height"
-msgstr ""
+msgstr "Hozzáférési modul"
 
 #: modules/video_output/snapshot.c:50
 msgid "Set the height of the snapshot image."
@@ -11512,16 +12249,19 @@ msgid "snapshot module"
 msgstr "Hozzáférési modul"
 
 #: modules/video_output/svgalib.c:53
+#, fuzzy
 msgid "SVGAlib video output"
-msgstr ""
+msgstr "Teljesképernyõs kép"
 
 #: modules/video_output/wingdi.c:82
+#, fuzzy
 msgid "Windows GDI video output"
-msgstr ""
+msgstr "Teljesképernyõs kép"
 
 #: modules/video_output/x11/glx.c:87 modules/video_output/x11/xvideo.c:44
+#, fuzzy
 msgid "XVideo adaptor number"
-msgstr ""
+msgstr "Kép kimeneti modul"
 
 #: modules/video_output/x11/glx.c:89 modules/video_output/x11/xvideo.c:46
 msgid ""
@@ -11531,8 +12271,9 @@ msgstr ""
 
 #: modules/video_output/x11/glx.c:92 modules/video_output/x11/x11.c:43
 #: modules/video_output/x11/xvideo.c:49
+#, fuzzy
 msgid "Alternate fullscreen method"
-msgstr ""
+msgstr "Teljes képernyõs mód"
 
 #: modules/video_output/x11/glx.c:94 modules/video_output/x11/x11.c:45
 #: modules/video_output/x11/xvideo.c:51
@@ -11577,12 +12318,14 @@ msgid "Use shared memory to communicate between VLC and the X server."
 msgstr ""
 
 #: modules/video_output/x11/x11.c:61
+#, fuzzy
 msgid "choose the screen to be used for fullscreen mode."
-msgstr ""
+msgstr "Teljes képernyõs mód"
 
 #: modules/video_output/x11/x11.c:75
+#, fuzzy
 msgid "X11 video output"
-msgstr ""
+msgstr "Teljesképernyõs kép"
 
 #: modules/video_output/x11/xvideo.c:63
 msgid "XVimage chroma format"
@@ -11595,8 +12338,9 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/x11/xvideo.c:89
+#, fuzzy
 msgid "XVideo extension video output"
-msgstr ""
+msgstr "Teljesképernyõs kép"
 
 #: modules/visualization/galaktos/plugin.c:48
 msgid "GaLaktos visualization plugin"
@@ -11673,8 +12417,9 @@ msgid "This is a coefficient that modifies the height of the bands."
 msgstr ""
 
 #: modules/visualization/visual/visual.c:63
+#, fuzzy
 msgid "Enable peaks"
-msgstr ""
+msgstr "Tiltás"
 
 #: modules/visualization/visual/visual.c:65
 msgid "Defines whether to draw peaks."
@@ -11689,20 +12434,23 @@ msgid "Defines the number of stars to draw with random effect."
 msgstr ""
 
 #: modules/visualization/visual/visual.c:75
+#, fuzzy
 msgid "visualizer filter"
-msgstr ""
+msgstr "Kép menü"
 
 #: modules/visualization/xosd.c:63
+#, fuzzy
 msgid "Flip vertical position"
-msgstr ""
+msgstr "Függõleges"
 
 #: modules/visualization/xosd.c:64
 msgid "Display xosd output on the bottom of the screen instead of the top"
 msgstr ""
 
 #: modules/visualization/xosd.c:67
+#, fuzzy
 msgid "Vertical offset"
-msgstr ""
+msgstr "Függõleges"
 
 #: modules/visualization/xosd.c:68
 msgid "Vertical offset in pixels of the displayed text"
@@ -11725,24 +12473,12 @@ msgstr ""
 msgid "XOSD interface"
 msgstr "Kezelõfelület"
 
-#, fuzzy
-#~ msgid "Real time control interface"
-#~ msgstr "A hálózati csatoló MTU-ja"
-
-#, fuzzy
-#~ msgid "Real time control interface initialized, `h' for help\n"
-#~ msgstr "A hálózati csatoló MTU-ja"
-
 #~ msgid "Delay subtitles (in 1/10s)"
 #~ msgstr "Felirat késleltetése (tizedmásodpercben)"
 
 #, fuzzy
 #~ msgid "CDDB error: %s"
 #~ msgstr "Hiba"
-
-#, fuzzy
-#~ msgid "Options"
-#~ msgstr "További lehetõségek"
 
 #~ msgid "Audio menu"
 #~ msgstr "Hang menü"
@@ -11773,24 +12509,8 @@ msgstr "Kezelõfelület"
 #~ msgstr "<ismeretlen>"
 
 #, fuzzy
-#~ msgid "video rendering mode"
-#~ msgstr "VIdeó kódoló"
-
-#, fuzzy
 #~ msgid "OpenGL effect"
 #~ msgstr "Korábbi megnyitása"
-
-#, fuzzy
-#~ msgid "Skinnable interface"
-#~ msgstr "Kezelõfelület"
-
-#, fuzzy
-#~ msgid "Audio Options"
-#~ msgstr "További lehetõségek"
-
-#, fuzzy
-#~ msgid "DVD (test)"
-#~ msgstr "DVD menük használata"
 
 #, fuzzy
 #~ msgid "Item info"
@@ -11807,10 +12527,6 @@ msgstr "Kezelõfelület"
 #, fuzzy
 #~ msgid "Step 3: Start streaming."
 #~ msgstr "Hálózati adatfolyam megadása"
-
-#, fuzzy
-#~ msgid "Choose..."
-#~ msgstr "Tallóz..."
 
 #~ msgid "DVD (menus support)"
 #~ msgstr "DVD (menütámogatás)"
@@ -11831,38 +12547,6 @@ msgstr "Kezelõfelület"
 #~ "MPEG2 fájlok lejátszására is fájlból, vagy hálózatról."
 
 #, fuzzy
-#~ msgid "Transcode/Save"
-#~ msgstr "Lejátszás megállítása"
-
-#, fuzzy
-#~ msgid "Choose input"
-#~ msgstr "Felirat választás"
-
-#, fuzzy
-#~ msgid "Select a stream"
-#~ msgstr "Hálózati adatfolyam megadása"
-
-#, fuzzy
-#~ msgid "Existing playlist item"
-#~ msgstr "Következõ lejátszási listatétel"
-
-#, fuzzy
-#~ msgid "Streaming"
-#~ msgstr "Kimeneti adatfolyam"
-
-#, fuzzy
-#~ msgid "Additional transcode options"
-#~ msgstr "További lehetõségek"
-
-#, fuzzy
-#~ msgid "Additional streaming options"
-#~ msgstr "Felirat beállításai"
-
-#, fuzzy
-#~ msgid "Transcode video"
-#~ msgstr "Lejátszás megállítása"
-
-#, fuzzy
 #~ msgid "Toggle enabled"
 #~ msgstr "Általános"
 
@@ -11874,31 +12558,14 @@ msgstr "Kezelõfelület"
 #~ msgid "Codec info"
 #~ msgstr "nincs adat"
 
-#~ msgid "No"
-#~ msgstr "Nem"
-
 #~ msgid "Yes"
 #~ msgstr "Igen"
-
-#, fuzzy
-#~ msgid "Open a skin file."
-#~ msgstr "Fájl megnyitása"
-
-#, fuzzy
-#~ msgid "Advanced open"
-#~ msgstr "További lehetõségek"
 
 #~ msgid "Open a network stream"
 #~ msgstr "Hálózati adatfolyam megnyitása"
 
 #~ msgid "Eject the DVD/CD"
 #~ msgstr "DCD/CD kidobása"
-
-#~ msgid "Exit this program"
-#~ msgstr "Kilépés a programból"
-
-#~ msgid "Open the playlist"
-#~ msgstr "Lejátszási lista megnyitása"
 
 #~ msgid "Show the program logs"
 #~ msgstr "A program naplóinak megtekintése"
@@ -11909,14 +12576,8 @@ msgstr "Kezelõfelület"
 #~ msgid "Go to the preferences menu"
 #~ msgstr "A beállítások menü megnyitása"
 
-#~ msgid "About this program"
-#~ msgstr "Névjegy"
-
 #~ msgid "Open &Satellite Stream..."
 #~ msgstr "Mûholdas"
-
-#~ msgid "E&xit"
-#~ msgstr "&Kilépés"
 
 #, fuzzy
 #~ msgid "Video device type"
@@ -11945,10 +12606,6 @@ msgstr "Kezelõfelület"
 #~ msgid "Native playlist exporter"
 #~ msgstr "Következõ lejátszási listatétel"
 
-#, fuzzy
-#~ msgid "display"
-#~ msgstr "késleltetés"
-
 #~ msgid "(c) 1996-2003 the VideoLAN team"
 #~ msgstr "(c) 1996-2003 a VideoLAN csapat"
 
@@ -11971,9 +12628,6 @@ msgstr "Kezelõfelület"
 #~ msgid "Quick &Open ..."
 #~ msgstr "&Egyszerû megnyitás"
 
-#~ msgid "&About..."
-#~ msgstr "&Névjegy"
-
 #~ msgid "Stop current playlist item"
 #~ msgstr "Jelenleg lejátszott tétel leállítása"
 
@@ -11990,14 +12644,6 @@ msgstr "Kezelõfelület"
 #~ "Load an additional subtitles file. Currently only works with AVI files."
 #~ msgstr ""
 #~ "További feliratfájl beolvasása. Jelenleg csak AVI fájlok esetén mûködik."
-
-#, fuzzy
-#~ msgid "&Randomize Playlist"
-#~ msgstr "Lejátszási lista menté&se"
-
-#, fuzzy
-#~ msgid "Open subtitles file"
-#~ msgstr "Feliratfájl megnyitása"
 
 #, fuzzy
 #~ msgid "(C) 1996-2003 the VideoLAN team"
@@ -12057,9 +12703,6 @@ msgstr "Kezelõfelület"
 
 #~ msgid "Encoders"
 #~ msgstr "Kódolók"
-
-#~ msgid "&Eject Disc"
-#~ msgstr "Lemez &kidobása"
 
 #~ msgid ""
 #~ "This is the VideoLAN Client, a DVD, MPEG and DivX player.\n"

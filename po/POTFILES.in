@@ -324,6 +324,7 @@ modules/control/lirc.c
 modules/control/netsync.c
 modules/control/ntservice.c
 modules/control/rc.c
+modules/control/rtci.c
 modules/control/telnet.c
 modules/demux/a52.c
 modules/demux/aac.c
@@ -698,6 +699,7 @@ modules/gui/wxwindows/streamout.cpp
 modules/gui/wxwindows/subtitles.cpp
 modules/gui/wxwindows/timer.cpp
 modules/gui/wxwindows/video.cpp
+modules/gui/wxwindows/wizard.cpp
 modules/gui/wxwindows/wxwindows.cpp
 modules/gui/wxwindows/wxwindows.h
 modules/misc/dummy/aout.c

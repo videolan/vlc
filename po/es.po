@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-30 23:31+0200\n"
+"POT-Creation-Date: 2004-10-02 17:36+0200\n"
 "PO-Revision-Date: 2002-04-22 09:56+0200\n"
 "Last-Translator: Antonio Javier Varela <tonxabar@hotmail.com>\n"
 "Language-Team: \n"
@@ -221,7 +221,7 @@ msgstr "Sin ayuda disponible"
 msgid "No help is available for these modules"
 msgstr "No se dispone de ayuda para estos módulos"
 
-#: include/vlc_interface.h:126
+#: include/vlc_interface.h:129
 msgid ""
 "\n"
 "Warning: if you can't access the GUI anymore, open a dos command box, go to "
@@ -232,7 +232,7 @@ msgstr ""
 "ventana de comandos dos, ve al directorio donde instalaste VLC y ejecuta "
 "\"vlc -I wxwin\"\n"
 
-#: include/vlc_interface.h:159
+#: include/vlc_interface.h:162
 msgid ""
 "VLC is an open-source and cross-platform multimedia player for various audio "
 "and video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, Ogg, ...) as well as "
@@ -317,7 +317,7 @@ msgstr "Opción"
 msgid "URL"
 msgstr ""
 
-#: include/vlc_meta.h:38 src/input/es_out.c:1088 src/libvlc.h:73
+#: include/vlc_meta.h:38 src/input/es_out.c:1087 src/libvlc.h:73
 #: modules/gui/beos/InterfaceWindow.cpp:259
 msgid "Language"
 msgstr "Lenguaje"
@@ -559,73 +559,76 @@ msgstr "Favorito %i"
 msgid "Track %i"
 msgstr "Pista %i"
 
-#: src/input/es_out.c:1080 src/input/es_out.c:1083
+#: src/input/es_out.c:1082
 #, c-format
 msgid "Stream %d"
 msgstr "Volcado %d"
 
-#: src/input/es_out.c:1085
+#: src/input/es_out.c:1084 modules/gui/wxwindows/wizard.cpp:806
+#: modules/gui/wxwindows/wizard.cpp:842
 msgid "Codec"
 msgstr "Códec"
 
-#: src/input/es_out.c:1096 src/input/es_out.c:1118 src/input/es_out.c:1135
+#: src/input/es_out.c:1095 src/input/es_out.c:1117 src/input/es_out.c:1134
 #: modules/gui/macosx/output.m:153
 msgid "Type"
 msgstr "Tipo"
 
-#: src/input/es_out.c:1096 src/libvlc.h:799
+#: src/input/es_out.c:1095 src/libvlc.h:799
 #: modules/gui/beos/InterfaceWindow.cpp:263
 #: modules/gui/gtk/gnome_interface.c:1092 modules/gui/gtk/gtk_interface.c:1219
 #: modules/gui/macosx/intf.m:439 modules/gui/macosx/output.m:170
 #: modules/gui/wxwindows/extrapanel.cpp:178
+#: modules/gui/wxwindows/wizard.cpp:832
 msgid "Audio"
 msgstr "Audio"
 
-#: src/input/es_out.c:1099 modules/gui/gtk/gnome_interface.c:148
+#: src/input/es_out.c:1098 modules/gui/gtk/gnome_interface.c:148
 #: modules/gui/gtk/gnome_interface.c:931 modules/gui/gtk/gtk_interface.c:481
 #: modules/gui/gtk/gtk_interface.c:1282 modules/gui/macosx/output.m:176
 #: modules/gui/wxwindows/streamout.cpp:760
 msgid "Channels"
 msgstr "Canales"
 
-#: src/input/es_out.c:1103
+#: src/input/es_out.c:1102
 msgid "Sample rate"
 msgstr "Tasa de Muestra"
 
-#: src/input/es_out.c:1104
+#: src/input/es_out.c:1103
 #, c-format
 msgid "%d Hz"
 msgstr ""
 
-#: src/input/es_out.c:1108
+#: src/input/es_out.c:1107
 msgid "Bits per sample"
 msgstr "Bits por muestra"
 
-#: src/input/es_out.c:1112 modules/access/pvr/pvr.c:73
+#: src/input/es_out.c:1111 modules/access/pvr/pvr.c:73
 msgid "Bitrate"
 msgstr "Tasa de Bits"
 
-#: src/input/es_out.c:1113
+#: src/input/es_out.c:1112
 #, c-format
 msgid "%d kb/s"
 msgstr ""
 
-#: src/input/es_out.c:1118 src/libvlc.h:825
+#: src/input/es_out.c:1117 src/libvlc.h:825
 #: modules/gui/gtk/gnome_interface.c:1099 modules/gui/gtk/gtk_interface.c:1296
 #: modules/gui/macosx/intf.m:452 modules/gui/macosx/output.m:160
-#: modules/gui/wxwindows/extrapanel.cpp:176 modules/misc/dummy/dummy.c:91
+#: modules/gui/wxwindows/extrapanel.cpp:176
+#: modules/gui/wxwindows/wizard.cpp:797 modules/misc/dummy/dummy.c:91
 msgid "Video"
 msgstr "Vídeo"
 
-#: src/input/es_out.c:1122
+#: src/input/es_out.c:1121
 msgid "Resolution"
 msgstr "Resolución"
 
-#: src/input/es_out.c:1128
+#: src/input/es_out.c:1127
 msgid "Display resolution"
 msgstr "Resolución de pantalla"
 
-#: src/input/es_out.c:1135 modules/gui/gtk/gnome_interface.c:1972
+#: src/input/es_out.c:1134 modules/gui/gtk/gnome_interface.c:1972
 #: modules/gui/gtk/gtk_interface.c:2287
 msgid "Subtitle"
 msgstr "Subtítulo"
@@ -2255,7 +2258,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1127 modules/gui/macosx/controls.m:556
 #: modules/gui/macosx/intf.m:382 modules/gui/macosx/intf.m:421
 #: modules/gui/macosx/intf.m:490 modules/gui/pda/pda_interface.c:274
-#: modules/gui/pda/pda_interface.c:275 modules/gui/wxwindows/interface.cpp:431
+#: modules/gui/pda/pda_interface.c:275 modules/gui/wxwindows/interface.cpp:435
 #: modules/gui/wxwindows/menus.cpp:273 modules/visualization/xosd.c:230
 #: modules/visualization/xosd.c:231
 #, c-format
@@ -2614,7 +2617,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:2709 modules/gui/macosx/intf.m:475
 #: modules/gui/macosx/playlist.m:170 modules/gui/macosx/playlist.m:185
 #: modules/gui/pda/pda_interface.c:1265
-#: modules/gui/wxwindows/interface.cpp:434
+#: modules/gui/wxwindows/interface.cpp:438
 #: modules/gui/wxwindows/playlist.cpp:183
 msgid "Playlist"
 msgstr "Lista de reproducción"
@@ -3815,8 +3818,9 @@ msgid "Antenna lnb_slof (kHz)"
 msgstr "Antena lnb_slof (kHz)"
 
 #: modules/access/dvb/access.c:86
+#, fuzzy
 msgid "Budget mode"
-msgstr ""
+msgstr "modo de desenfoque"
 
 #: modules/access/dvb/access.c:87
 #, fuzzy
@@ -4252,8 +4256,9 @@ msgid "Peak bitrate in VBR mode"
 msgstr ""
 
 #: modules/access/pvr/pvr.c:77
+#, fuzzy
 msgid "Bitrate mode (vbr or cbr)"
-msgstr ""
+msgstr "Opciones de tasa de bits"
 
 #: modules/access/pvr/pvr.c:78
 #, fuzzy
@@ -4547,8 +4552,9 @@ msgid "Preparer"
 msgstr "Preparador"
 
 #: modules/access/vcdx/access.c:1057
+#, fuzzy
 msgid "Vol #"
-msgstr ""
+msgstr "Vol máx #"
 
 #: modules/access/vcdx/access.c:1058
 msgid "Vol max #"
@@ -4559,7 +4565,7 @@ msgid "Volume Set"
 msgstr "Conjunto de Volumen"
 
 #: modules/access/vcdx/access.c:1060 modules/gui/macosx/intf.m:386
-#: modules/gui/wxwindows/interface.cpp:1125
+#: modules/gui/wxwindows/interface.cpp:1129
 msgid "Volume"
 msgstr "Volumen"
 
@@ -4936,8 +4942,9 @@ msgid "audio filter for u8->float32 conversion"
 msgstr "filtro de audio para conversión u8->float32"
 
 #: modules/audio_filter/equalizer.c:52
+#, fuzzy
 msgid "Equalizer preset"
-msgstr ""
+msgstr "visualizador"
 
 #: modules/audio_filter/equalizer.c:55
 msgid "Bands gain"
@@ -4987,16 +4994,19 @@ msgstr "Cubo"
 
 #: modules/audio_filter/equalizer_presets.h:39
 #: modules/demux/util/id3genres.h:31
+#, fuzzy
 msgid "Dance"
-msgstr ""
+msgstr "Cancelar"
 
 #: modules/audio_filter/equalizer_presets.h:39
+#, fuzzy
 msgid "Full bass"
-msgstr ""
+msgstr "Pantalla completa"
 
 #: modules/audio_filter/equalizer_presets.h:40
+#, fuzzy
 msgid "Full bass and treble"
-msgstr ""
+msgstr "Pantalla completa"
 
 #: modules/audio_filter/equalizer_presets.h:40
 #, fuzzy
@@ -5025,8 +5035,9 @@ msgstr "Puerto"
 
 #: modules/audio_filter/equalizer_presets.h:41
 #: modules/demux/util/id3genres.h:41
+#, fuzzy
 msgid "Pop"
-msgstr ""
+msgstr "Arriba"
 
 #: modules/audio_filter/equalizer_presets.h:41
 #: modules/demux/util/id3genres.h:44
@@ -5040,8 +5051,9 @@ msgstr ""
 
 #: modules/audio_filter/equalizer_presets.h:42
 #: modules/demux/util/id3genres.h:49
+#, fuzzy
 msgid "Ska"
-msgstr ""
+msgstr "Satélite"
 
 #: modules/audio_filter/equalizer_presets.h:42
 #, fuzzy
@@ -5088,8 +5100,9 @@ msgid ""
 msgstr ""
 
 #: modules/audio_filter/normvol.c:81
+#, fuzzy
 msgid "Volume normalizer"
-msgstr ""
+msgstr "Visualizaciones"
 
 #: modules/audio_filter/resampler/bandlimited.c:82
 msgid "audio filter for band-limited interpolation resampling"
@@ -5146,8 +5159,9 @@ msgstr "Aparato de Audio"
 #: modules/audio_output/alsa.c:172 modules/audio_output/directx.c:460
 #: modules/audio_output/oss.c:222 modules/audio_output/sdl.c:182
 #: modules/audio_output/sdl.c:201 modules/audio_output/waveout.c:406
+#, fuzzy
 msgid "Mono"
-msgstr ""
+msgstr "Mongol"
 
 #: modules/audio_output/alsa.c:185 modules/audio_output/directx.c:433
 #: modules/audio_output/oss.c:178 modules/audio_output/waveout.c:378
@@ -5350,12 +5364,14 @@ msgid "rd"
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:74
+#, fuzzy
 msgid "bits"
-msgstr ""
+msgstr "Subtítulos"
 
 #: modules/codec/ffmpeg/ffmpeg.c:74
+#, fuzzy
 msgid "simple"
-msgstr ""
+msgstr "Rizo"
 
 #: modules/codec/ffmpeg/ffmpeg.c:83
 #, fuzzy
@@ -5678,10 +5694,11 @@ msgid "Strict standard compliance"
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:250
+#, fuzzy
 msgid ""
 "Allows you to force a strict standard compliance when encoding (accepted "
 "values: -1, 0, 1)."
-msgstr ""
+msgstr "Te permite escalar el vídeo antes de la codificación."
 
 #: modules/codec/ffmpeg/postprocess.c:84 modules/gui/macosx/intf.m:467
 #: modules/gui/macosx/intf.m:468
@@ -5853,9 +5870,9 @@ msgstr ""
 "desvíaría la posición especificada del subtítulo."
 
 #: modules/codec/ogt/write_png.c:59 modules/codec/ogt/write_png.c:71
-#, c-format
+#, fuzzy, c-format
 msgid "Error: %s\n"
-msgstr ""
+msgstr "Puerto del servidor CDDB"
 
 #: modules/codec/quicktime.c:59
 msgid "QuickTime library decoder"
@@ -6036,8 +6053,9 @@ msgid "all"
 msgstr "todo"
 
 #: modules/codec/x264.c:46
+#, fuzzy
 msgid "normal"
-msgstr ""
+msgstr "Somalí"
 
 #: modules/codec/x264.c:46
 msgid "fast"
@@ -6243,8 +6261,8 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1119 modules/gui/macosx/intf.m:1102
 #: modules/gui/macosx/intf.m:1103 modules/gui/macosx/intf.m:1104
 #: modules/gui/pda/pda_interface.c:250 modules/gui/pda/pda_interface.c:251
-#: modules/gui/wxwindows/interface.cpp:433
-#: modules/gui/wxwindows/interface.cpp:1045
+#: modules/gui/wxwindows/interface.cpp:437
+#: modules/gui/wxwindows/interface.cpp:1049
 #: modules/gui/wxwindows/menus.cpp:281 modules/visualization/xosd.c:236
 #: modules/visualization/xosd.c:237
 #, c-format
@@ -6257,16 +6275,18 @@ msgstr "Pausa"
 #: modules/gui/macosx/intf.m:489 modules/gui/macosx/intf.m:1110
 #: modules/gui/macosx/intf.m:1111 modules/gui/macosx/intf.m:1112
 #: modules/gui/macosx/playlist.m:172 modules/gui/pda/pda_interface.c:262
-#: modules/gui/pda/pda_interface.c:263 modules/gui/wxwindows/interface.cpp:432
-#: modules/gui/wxwindows/interface.cpp:1051
+#: modules/gui/pda/pda_interface.c:263 modules/gui/wxwindows/interface.cpp:436
+#: modules/gui/wxwindows/interface.cpp:1055
 #: modules/gui/wxwindows/menus.cpp:279 modules/gui/wxwindows/menus.cpp:293
 #: modules/gui/wxwindows/playlist.cpp:254
 msgid "Play"
 msgstr "Reproducir"
 
 #: modules/control/netsync.c:80
+#, fuzzy
 msgid "Act as master for network synchronisation"
 msgstr ""
+"Te permite inidicar el número de hilos usados para la transcodificación."
 
 #: modules/control/netsync.c:81
 #, fuzzy
@@ -6331,17 +6351,17 @@ msgstr ""
 msgid "Windows Service interface"
 msgstr "Interfaz de Servicio de Windows"
 
-#: modules/control/rc.c:120
+#: modules/control/rc.c:120 modules/control/rtci.c:127
 msgid "Show stream position"
 msgstr "Muestra posición de volcado"
 
-#: modules/control/rc.c:121
+#: modules/control/rc.c:121 modules/control/rtci.c:128
 msgid ""
 "Show the current position in seconds within the stream from time to time."
 msgstr ""
 "Muestra la posición actual en segundos dentro del volcado de vez en cuando."
 
-#: modules/control/rc.c:124
+#: modules/control/rc.c:124 modules/control/rtci.c:131
 msgid "Fake TTY"
 msgstr "Falso TTY"
 
@@ -6349,37 +6369,39 @@ msgstr "Falso TTY"
 msgid "Force the rc module to use stdin as if it was a TTY."
 msgstr "Forzar la entrada rc a usar stdin como si fuera TTY."
 
-#: modules/control/rc.c:127
+#: modules/control/rc.c:127 modules/control/rtci.c:134
+#, fuzzy
 msgid "UNIX socket command input"
-msgstr ""
+msgstr "Entrada TCP"
 
-#: modules/control/rc.c:128
+#: modules/control/rc.c:128 modules/control/rtci.c:135
 msgid "Accept commands over a Unix socket rather than stdin."
 msgstr ""
 
-#: modules/control/rc.c:131
+#: modules/control/rc.c:131 modules/control/rtci.c:138
 #, fuzzy
 msgid "TCP command input"
 msgstr "Entrada TCP"
 
-#: modules/control/rc.c:132
+#: modules/control/rc.c:132 modules/control/rtci.c:139
 #, fuzzy
 msgid ""
 "Accept commands over a socket rather than stdin. You can set the address and "
 "port the interface will bind to."
 msgstr "Puedes poner la dirección y puerto al que se unirá la interfaz http."
 
-#: modules/control/rc.c:134
+#: modules/control/rc.c:134 modules/control/rtci.c:141
 #, fuzzy
 msgid "Extended help"
 msgstr "GUI &Extendida"
 
-#: modules/control/rc.c:135
+#: modules/control/rc.c:135 modules/control/rtci.c:142
 #, fuzzy
 msgid "List additional commands."
 msgstr "Usar procesadores adicionales"
 
-#: modules/control/rc.c:139 modules/misc/dummy/dummy.c:49
+#: modules/control/rc.c:139 modules/control/rtci.c:146
+#: modules/misc/dummy/dummy.c:49
 msgid "Do not open a DOS command box interface"
 msgstr "No abrir un interfaz de línea de comandos DOS"
 
@@ -6405,214 +6427,243 @@ msgid "Remote control interface initialized, `h' for help\n"
 msgstr "Interfaz inicializada de control remoto, `h' para ayuda\n"
 
 #: modules/control/rc.c:471 modules/control/rc.c:486
+#: modules/control/rtci.c:476 modules/control/rtci.c:491
 #, c-format
 msgid "%s: returned %i (%s)\n"
 msgstr "%s: devolvió %i (%s)\n"
 
-#: modules/control/rc.c:520
+#: modules/control/rc.c:520 modules/control/rtci.c:525
 #, c-format
 msgid "+----[ end of stream info ]\n"
 msgstr "+----[ fin de info de volcado ]\n"
 
-#: modules/control/rc.c:525
+#: modules/control/rc.c:525 modules/control/rtci.c:530
 #, c-format
 msgid "no input\n"
 msgstr "sin entrada\n"
 
-#: modules/control/rc.c:602
+#: modules/control/rc.c:602 modules/control/rtci.c:607
 #, c-format
 msgid "+----[ Remote control commands ]\n"
 msgstr "+----[ Comandos de control remoto ]\n"
 
-#: modules/control/rc.c:604
+#: modules/control/rc.c:604 modules/control/rtci.c:609
 #, c-format
 msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist\n"
 msgstr "| add XYZ . . . . . . .  añade XYZ a lista de repr.\n"
 
-#: modules/control/rc.c:605
+#: modules/control/rc.c:605 modules/control/rtci.c:610
 #, c-format
 msgid "| playlist . . .  show items currently in playlist\n"
 msgstr "| playlist  . . mostrar objetos actualmente en ella\n"
 
-#: modules/control/rc.c:606
+#: modules/control/rc.c:606 modules/control/rtci.c:611
 #, c-format
 msgid "| play . . . . . . . . . . . . . . . . play stream\n"
 msgstr "| play  . . . . . . . . . . . .  reproducir volcado\n"
 
-#: modules/control/rc.c:607
+#: modules/control/rc.c:607 modules/control/rtci.c:612
 #, c-format
 msgid "| stop . . . . . . . . . . . . . . . . stop stream\n"
 msgstr "| stop  . . . . . . . . . . . . . . . parar volcado\n"
 
-#: modules/control/rc.c:608
+#: modules/control/rc.c:608 modules/control/rtci.c:613
 #, c-format
 msgid "| next . . . . . . . . . . . .  next playlist item\n"
 msgstr "| next  . . . .  siguiente objeto de lista de repr.\n"
 
-#: modules/control/rc.c:609
+#: modules/control/rc.c:609 modules/control/rtci.c:614
 #, c-format
 msgid "| prev . . . . . . . . . .  previous playlist item\n"
 msgstr "| prev  . . . . . . objeto previo de lista de repr.\n"
 
-#: modules/control/rc.c:610
+#: modules/control/rc.c:610 modules/control/rtci.c:615
 #, fuzzy, c-format
 msgid "| title [X]  . . . . set/get title in current item\n"
 msgstr "| title [X] . . . pon/obtén titulo en objeto actual\n"
 
-#: modules/control/rc.c:611
+#: modules/control/rc.c:611 modules/control/rtci.c:616
 #, c-format
 msgid "| title_n  . . . . . .  next title in current item\n"
 msgstr "| title_n . . . . título siguiente en objeto actual\n"
 
-#: modules/control/rc.c:612
+#: modules/control/rc.c:612 modules/control/rtci.c:617
 #, c-format
 msgid "| title_p  . . . .  previous title in current item\n"
 msgstr "| title_p . . . . .  título previo en objeto actual\n"
 
-#: modules/control/rc.c:613
+#: modules/control/rc.c:613 modules/control/rtci.c:618
 #, fuzzy, c-format
 msgid "| chapter [X]  . . set/get chapter in current item\n"
 msgstr "| chapter [X] . pon/obtén capítulo en objeto actual\n"
 
-#: modules/control/rc.c:614
+#: modules/control/rc.c:614 modules/control/rtci.c:619
 #, c-format
 msgid "| chapter_n  . . . .  next chapter in current item\n"
 msgstr "| chapter_n . .  capítulo siguente en objeto actual\n"
 
-#: modules/control/rc.c:615
+#: modules/control/rc.c:615 modules/control/rtci.c:620
 #, c-format
 msgid "| chapter_p  . .  previous chapter in current item\n"
 msgstr "| chapter_p . . .  capítulo previo en objeto actual\n"
 
-#: modules/control/rc.c:617
+#: modules/control/rc.c:617 modules/control/rtci.c:622
 #, c-format
 msgid "| seek X . seek in seconds, for instance `seek 12'\n"
 msgstr "| seek X  . . . buscar en segundos, p.ej. `seek 12'\n"
 
-#: modules/control/rc.c:618
+#: modules/control/rc.c:618 modules/control/rtci.c:623
 #, c-format
 msgid "| pause  . . . . . . . . . . . . . .  toggle pause\n"
 msgstr "| pause . . . . . . . . . . . .  intercambiar pausa\n"
 
-#: modules/control/rc.c:619
+#: modules/control/rc.c:619 modules/control/rtci.c:624
 #, c-format
 msgid "| f  . . . . . . . . . . . . . . toggle fullscreen\n"
 msgstr "| f . . . . . . . .  intercambiar pantalla completa\n"
 
-#: modules/control/rc.c:620
+#: modules/control/rc.c:620 modules/control/rtci.c:625
 #, c-format
 msgid "| info . . .  information about the current stream\n"
 msgstr "| info  . . . . información sobre el volcado actual\n"
 
-#: modules/control/rc.c:622
+#: modules/control/rc.c:622 modules/control/rtci.c:627
 #, c-format
 msgid "| volume [X] . . . . . . . .  set/get audio volume\n"
 msgstr "| volume [X]. . . . . .  pon/obtén volumen de audio\n"
 
-#: modules/control/rc.c:623
+#: modules/control/rc.c:623 modules/control/rtci.c:628
 #, c-format
 msgid "| volup [X]  . . . . .  raise audio volume X steps\n"
 msgstr "| volup [X] . . . . subir volumen de audio X puntos\n"
 
-#: modules/control/rc.c:624
+#: modules/control/rc.c:624 modules/control/rtci.c:629
 #, c-format
 msgid "| voldown [X]  . . . .  lower audio volume X steps\n"
 msgstr "| voldown [X] . . . bajar volumen de audio X puntos\n"
 
-#: modules/control/rc.c:625
+#: modules/control/rc.c:625 modules/control/rtci.c:630
 #, c-format
 msgid "| adev [X] . . . . . . . . .  set/get audio device\n"
 msgstr "| adev [X]. . . . . . . . pon/obtén aparato de audio\n"
 
-#: modules/control/rc.c:626
+#: modules/control/rc.c:626 modules/control/rtci.c:631
 #, c-format
 msgid "| achan [X]. . . . . . . .  set/get audio channels\n"
 msgstr "| achan [X] . . . . . .  pon/obtén canales de audio\n"
 
-#: modules/control/rc.c:630
+#: modules/control/rc.c:630 modules/control/rtci.c:635
 #, c-format
 msgid "| marq-marquee STRING  . . overlay STRING in video\n"
 msgstr ""
 
-#: modules/control/rc.c:631
+#: modules/control/rc.c:631 modules/control/rtci.c:636
 #, c-format
 msgid "| marq-x X . . . . . .offset of marquee, from left\n"
 msgstr ""
 
-#: modules/control/rc.c:632
+#: modules/control/rc.c:632 modules/control/rtci.c:637
 #, c-format
 msgid "| marq-y Y . . . . . . offset of marquee, from top\n"
 msgstr ""
 
-#: modules/control/rc.c:633
+#: modules/control/rc.c:633 modules/control/rtci.c:638
 #, c-format
 msgid "| marq-timeout T. . . . .timeout of marquee, in ms\n"
 msgstr ""
 
-#: modules/control/rc.c:636
+#: modules/control/rc.c:636 modules/control/rtci.c:641
 #, c-format
 msgid "| help . . . . . . . . . . . . . this help message\n"
 msgstr "| help  . . . . . . . . . . . este mensaje de ayuda\n"
 
-#: modules/control/rc.c:637
+#: modules/control/rc.c:637 modules/control/rtci.c:642
 #, c-format
 msgid "| logout . . . . . .exit (if in socket connection)\n"
 msgstr ""
 
-#: modules/control/rc.c:638
+#: modules/control/rc.c:638 modules/control/rtci.c:643
 #, c-format
 msgid "| quit . . . . . . . . . . . . . . . . .  quit vlc\n"
 msgstr "| quit  . . . . . . . . . . . . . . . .  quitar vlc\n"
 
-#: modules/control/rc.c:640
+#: modules/control/rc.c:640 modules/control/rtci.c:645
 #, c-format
 msgid "+----[ end of help ]\n"
 msgstr "+----[ fin de ayuda ]\n"
 
-#: modules/control/rc.c:648
+#: modules/control/rc.c:648 modules/control/rtci.c:653
 #, c-format
 msgid "unknown command `%s', type `help' for help\n"
 msgstr "comando desconocido `%s', escribe `help' para ayuda\n"
 
-#: modules/control/rc.c:725
+#: modules/control/rc.c:725 modules/control/rtci.c:730
 #, c-format
 msgid "Currently playing chapter %d/%d\n"
 msgstr "Reproduciendo ahora capítulo %d/%d\n"
 
-#: modules/control/rc.c:765
+#: modules/control/rc.c:765 modules/control/rtci.c:770
 #, c-format
 msgid "Currently playing title %d/%d\n"
 msgstr "Reproduciendo ahora título %d/%d\n"
 
-#: modules/control/rc.c:822
+#: modules/control/rc.c:822 modules/control/rtci.c:827
 #, c-format
 msgid "trying to add %s to playlist\n"
 msgstr "intentando añadir %s a lista de repr.\n"
 
-#: modules/control/rc.c:837
+#: modules/control/rc.c:837 modules/control/rtci.c:842
 #, c-format
 msgid "| no entries\n"
 msgstr "| sin entradas\n"
 
 #: modules/control/rc.c:846 modules/control/rc.c:911
+#: modules/control/rtci.c:851 modules/control/rtci.c:916
 #, c-format
 msgid "unknown command!\n"
 msgstr "¡comando desconocido!\n"
 
-#: modules/control/rc.c:957
+#: modules/control/rc.c:957 modules/control/rtci.c:962
 #, c-format
 msgid "Volume must be in the range %d-%d\n"
 msgstr "Volumen deber estar en el rango %d-%d\n"
 
 #: modules/control/rc.c:973 modules/control/rc.c:1005
+#: modules/control/rtci.c:978 modules/control/rtci.c:1010
 #, c-format
 msgid "Volume is %d\n"
 msgstr "Volumen es %d\n"
 
-#: modules/control/rc.c:1067
+#: modules/control/rc.c:1067 modules/control/rtci.c:1072
 #, c-format
 msgid "+----[ end of %s ]\n"
 msgstr "+----[ fin de %s ]\n"
+
+#: modules/control/rtci.c:132
+#, fuzzy
+msgid "Force the rtci module to use stdin as if it was a TTY."
+msgstr "Forzar la entrada rc a usar stdin como si fuera TTY."
+
+#: modules/control/rtci.c:148
+#, fuzzy
+msgid ""
+"By default the rtci interface plugin will start a DOS command box. Enabling "
+"the quiet mode will not launch this command box."
+msgstr ""
+"Por defecto el plugin de interfaz dummy iniciará una línea de comandos DOS. "
+"Habilitando el modo silencioso no saldrá esta línea de comandos pero puede "
+"ser bastante molesto cuando quieres dentener VLC y no se abre ninguna "
+"ventana de vídeo."
+
+#: modules/control/rtci.c:153
+#, fuzzy
+msgid "Real time control interface"
+msgstr "Interfaz de control remoto"
+
+#: modules/control/rtci.c:278
+#, fuzzy, c-format
+msgid "Real time control interface initialized, `h' for help\n"
+msgstr "Interfaz inicializada de control remoto, `h' para ayuda\n"
 
 #: modules/control/telnet.c:79
 msgid "Telnet Interface port"
@@ -6634,11 +6685,11 @@ msgstr "Por defecto a admin"
 msgid "Telnet remote control interface"
 msgstr "Interfaz de control remoto telnet"
 
-#: modules/control/telnet.c:139
+#: modules/control/telnet.c:137
 msgid "Using the VLM interface plugin..."
 msgstr "Usando el plugin de interfaz VLM..."
 
-#: modules/control/telnet.c:150
+#: modules/control/telnet.c:148
 #, c-format
 msgid "Telnet interface started on port: %d"
 msgstr "Interfaz telnet iniciado en puerto: %d"
@@ -6691,8 +6742,9 @@ msgid "Specify a file name to which the raw stream will be dumped."
 msgstr "Especifica un nombre de archivo al que el flujo raw se volcará."
 
 #: modules/demux/demuxdump.c:40
+#, fuzzy
 msgid "Append"
-msgstr ""
+msgstr "Abrir"
 
 #: modules/demux/demuxdump.c:42
 msgid ""
@@ -6742,10 +6794,12 @@ msgid "Frames per Second"
 msgstr "Fotogramas por segundo"
 
 #: modules/demux/mjpeg.c:44
+#, fuzzy
 msgid ""
 "Allows you to set the desired frame rate when playing from files, use 0 for "
 "live."
 msgstr ""
+"Te permite indicar la hora de emisión en vivo para el volcado de salida."
 
 #: modules/demux/mjpeg.c:48
 #, fuzzy
@@ -6961,24 +7015,28 @@ msgid "Simple id3 tag skipper"
 msgstr "Anulador de etiqueta id3 simple"
 
 #: modules/demux/util/id3genres.h:28
+#, fuzzy
 msgid "Blues"
-msgstr ""
+msgstr "Birmano"
 
 #: modules/demux/util/id3genres.h:29
 msgid "Classic rock"
 msgstr "Rock clásico"
 
 #: modules/demux/util/id3genres.h:30
+#, fuzzy
 msgid "Country"
-msgstr ""
+msgstr "Contraste"
 
 #: modules/demux/util/id3genres.h:32
+#, fuzzy
 msgid "Disco"
-msgstr ""
+msgstr "Disco"
 
 #: modules/demux/util/id3genres.h:33
+#, fuzzy
 msgid "Funk"
-msgstr ""
+msgstr "Fusión"
 
 #: modules/demux/util/id3genres.h:34
 msgid "Grunge"
@@ -6993,12 +7051,14 @@ msgid "Jazz"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:37
+#, fuzzy
 msgid "Metal"
-msgstr ""
+msgstr "Promedio"
 
 #: modules/demux/util/id3genres.h:38
+#, fuzzy
 msgid "New Age"
-msgstr ""
+msgstr "Nueva ola"
 
 #: modules/demux/util/id3genres.h:39
 msgid "Oldies"
@@ -7017,20 +7077,23 @@ msgid "Rap"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:47
+#, fuzzy
 msgid "Industrial"
-msgstr ""
+msgstr "Tecno Industrial"
 
 #: modules/demux/util/id3genres.h:48
 msgid "Alternative"
 msgstr "Alternativa"
 
 #: modules/demux/util/id3genres.h:50
+#, fuzzy
 msgid "Death metal"
-msgstr ""
+msgstr "Metadata de fecha"
 
 #: modules/demux/util/id3genres.h:51
+#, fuzzy
 msgid "Pranks"
-msgstr ""
+msgstr "Planos"
 
 #: modules/demux/util/id3genres.h:52
 msgid "Soundtrack"
@@ -7061,20 +7124,23 @@ msgid "Fusion"
 msgstr "Fusión"
 
 #: modules/demux/util/id3genres.h:59
+#, fuzzy
 msgid "Trance"
-msgstr ""
+msgstr "Transcodificar"
 
 #: modules/demux/util/id3genres.h:61
+#, fuzzy
 msgid "Instrumental"
-msgstr ""
+msgstr "Pop instrumental"
 
 #: modules/demux/util/id3genres.h:62
 msgid "Acid"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:63
+#, fuzzy
 msgid "House"
-msgstr ""
+msgstr "Color"
 
 #: modules/demux/util/id3genres.h:64
 msgid "Game"
@@ -7089,28 +7155,32 @@ msgid "Gospel"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:67
+#, fuzzy
 msgid "Noise"
-msgstr ""
+msgstr "Ninguno"
 
 #: modules/demux/util/id3genres.h:68
 msgid "Alternative rock"
 msgstr "Rock alternativo"
 
 #: modules/demux/util/id3genres.h:69
+#, fuzzy
 msgid "Bass"
-msgstr ""
+msgstr "Pausa"
 
 #: modules/demux/util/id3genres.h:70
+#, fuzzy
 msgid "Soul"
-msgstr ""
+msgstr "Sonido:"
 
 #: modules/demux/util/id3genres.h:71
 msgid "Punk"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:72
+#, fuzzy
 msgid "Space"
-msgstr ""
+msgstr "Salvar"
 
 #: modules/demux/util/id3genres.h:73
 msgid "Meditative"
@@ -7153,8 +7223,9 @@ msgid "Eurodance"
 msgstr "Dance Europeo"
 
 #: modules/demux/util/id3genres.h:83
+#, fuzzy
 msgid "Dream"
-msgstr ""
+msgstr "Volcado"
 
 #: modules/demux/util/id3genres.h:84
 msgid "Southern rock"
@@ -7185,8 +7256,9 @@ msgid "Pop/funk"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:91
+#, fuzzy
 msgid "Jungle"
-msgstr ""
+msgstr "Ángulo"
 
 #: modules/demux/util/id3genres.h:92
 msgid "Native American"
@@ -7205,24 +7277,27 @@ msgid "Psychedelic"
 msgstr "Psicodélica"
 
 #: modules/demux/util/id3genres.h:96
+#, fuzzy
 msgid "Rave"
-msgstr ""
+msgstr "Salvar"
 
 #: modules/demux/util/id3genres.h:97
 msgid "Showtunes"
 msgstr "Melodías de TV"
 
 #: modules/demux/util/id3genres.h:98
+#, fuzzy
 msgid "Trailer"
-msgstr ""
+msgstr "Título de Pista"
 
 #: modules/demux/util/id3genres.h:99
 msgid "Lo-Fi"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:100
+#, fuzzy
 msgid "Tribal"
-msgstr ""
+msgstr "Tibetano"
 
 #: modules/demux/util/id3genres.h:101
 msgid "Acid punk"
@@ -7233,16 +7308,19 @@ msgid "Acid jazz"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:103
+#, fuzzy
 msgid "Polka"
-msgstr ""
+msgstr "Reproducir"
 
 #: modules/demux/util/id3genres.h:104
+#, fuzzy
 msgid "Retro"
-msgstr ""
+msgstr "Proporción"
 
 #: modules/demux/util/id3genres.h:105
+#, fuzzy
 msgid "Musical"
-msgstr ""
+msgstr "Clásica"
 
 #: modules/demux/util/id3genres.h:106
 msgid "Rock & roll"
@@ -7301,7 +7379,7 @@ msgstr "Cancelar"
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/open.m:414
 #: modules/gui/macosx/open.m:608 modules/gui/macosx/open.m:713
-#: modules/gui/macosx/open.m:759 modules/gui/wxwindows/interface.cpp:430
+#: modules/gui/macosx/open.m:759 modules/gui/wxwindows/interface.cpp:434
 #: modules/gui/wxwindows/menus.cpp:300
 msgid "Open"
 msgstr "Abrir"
@@ -7342,6 +7420,7 @@ msgstr "Archivo"
 #: modules/gui/gtk/gnome_interface.c:2191 modules/gui/macosx/open.m:413
 #: modules/gui/macosx/open.m:712 modules/gui/macosx/open.m:758
 #: modules/gui/wxwindows/dialogs.cpp:344 modules/gui/wxwindows/open.cpp:1097
+#: modules/gui/wxwindows/wizard.cpp:1253
 msgid "Open File"
 msgstr "Abrir Archivo"
 
@@ -7476,7 +7555,7 @@ msgstr "Ruta"
 #: modules/gui/kde/pluginsbox.cpp:45 modules/gui/macosx/playlist.m:180
 #: modules/gui/wxwindows/bookmarks.cpp:159
 #: modules/gui/wxwindows/iteminfo.cpp:156
-#: modules/gui/wxwindows/playlist.cpp:319
+#: modules/gui/wxwindows/playlist.cpp:319 modules/gui/wxwindows/wizard.cpp:575
 msgid "Name"
 msgstr "Nombre"
 
@@ -7716,8 +7795,9 @@ msgid "Screen"
 msgstr "Pantalla"
 
 #: modules/gui/gtk/gnome_interface.c:211 modules/gui/gtk/gtk_interface.c:415
+#, fuzzy
 msgid "_Audio"
-msgstr ""
+msgstr "Audio"
 
 #: modules/gui/gtk/gnome_interface.c:218 modules/gui/gtk/gtk_interface.c:497
 msgid "_Video"
@@ -7779,7 +7859,7 @@ msgid "Slow"
 msgstr "Lento"
 
 #: modules/gui/gtk/gnome_interface.c:618
-#: modules/gui/wxwindows/interface.cpp:437
+#: modules/gui/wxwindows/interface.cpp:441
 msgid "Play slower"
 msgstr "Reproducir más lento"
 
@@ -7790,7 +7870,7 @@ msgid "Fast"
 msgstr "Rápido"
 
 #: modules/gui/gtk/gnome_interface.c:631
-#: modules/gui/wxwindows/interface.cpp:438
+#: modules/gui/wxwindows/interface.cpp:442
 msgid "Play faster"
 msgstr "Reproducir más rápido"
 
@@ -7805,8 +7885,9 @@ msgstr "Abrir lista de reproducción"
 #: modules/gui/gtk/gtk_interface.c:844 modules/gui/gtk/gtk_interface.c:888
 #: modules/gui/gtk/gtk_interface.c:1173 modules/gui/kde/interface.cpp:129
 #: modules/gui/kde/interface.cpp:162
+#, fuzzy
 msgid "Prev"
-msgstr ""
+msgstr "Previo"
 
 #: modules/gui/gtk/gnome_interface.c:656
 msgid "Previous file"
@@ -7997,12 +8078,14 @@ msgid "FEC"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1915 modules/gui/gtk/gtk_interface.c:2230
+#, fuzzy
 msgid "Vertical"
-msgstr ""
+msgstr "Sincronía Vertical"
 
 #: modules/gui/gtk/gnome_interface.c:1923 modules/gui/gtk/gtk_interface.c:2238
+#, fuzzy
 msgid "Horizontal"
-msgstr ""
+msgstr "Voltear horizontalmente"
 
 #: modules/gui/gtk/gnome_interface.c:1965 modules/gui/gtk/gtk_interface.c:2280
 msgid "Satellite"
@@ -8115,7 +8198,7 @@ msgid "PS"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2984 modules/gui/gtk/gtk_interface.c:3229
-#: modules/gui/pda/pda_interface.c:1054
+#: modules/gui/pda/pda_interface.c:1054 modules/gui/wxwindows/streamdata.h:145
 msgid "AVI"
 msgstr ""
 
@@ -8250,8 +8333,9 @@ msgstr "Abrir Objetivo"
 #: modules/gui/gtk/gtk_interface.c:2031 modules/gui/macosx/open.m:165
 #: modules/gui/macosx/open.m:628 modules/gui/macosx/open.m:666
 #: modules/gui/wxwindows/open.cpp:689
+#, fuzzy
 msgid "UDP/RTP"
-msgstr ""
+msgstr "Entrada UDP/RTP"
 
 #: modules/gui/gtk/gtk_interface.c:2051 modules/gui/macosx/open.m:167
 #: modules/gui/macosx/open.m:630 modules/gui/macosx/open.m:691
@@ -8521,8 +8605,9 @@ msgid "&Save"
 msgstr "&Salvar"
 
 #: modules/gui/kde/preferences.cpp:96
+#, fuzzy
 msgid "Plugins"
-msgstr ""
+msgstr "Polaco"
 
 #: modules/gui/macosx/about.m:73 modules/gui/macosx/intf.m:394
 #: modules/gui/wxwindows/interface.cpp:350
@@ -8599,6 +8684,7 @@ msgstr ""
 
 #: modules/gui/macosx/equalizer.m:144 modules/gui/wxwindows/extrapanel.cpp:212
 #: modules/gui/wxwindows/extrapanel.cpp:459
+#: modules/gui/wxwindows/wizard.cpp:617
 msgid "Enable"
 msgstr "Habilitar"
 
@@ -8718,8 +8804,9 @@ msgstr "Controlador"
 #: modules/gui/macosx/intf.m:476 modules/gui/macosx/intf.m:503
 #: modules/gui/macosx/playlistinfo.m:329
 #: modules/gui/wxwindows/playlist.cpp:257
+#, fuzzy
 msgid "Info"
-msgstr ""
+msgstr "InfoArchivo"
 
 #: modules/gui/macosx/intf.m:479
 msgid "Bring All to Front"
@@ -8749,7 +8836,7 @@ msgstr "Página Web de VideoLAN"
 msgid "License"
 msgstr "Licencia"
 
-#: modules/gui/macosx/intf.m:496
+#: modules/gui/macosx/intf.m:496 modules/gui/wxwindows/wizard.cpp:86
 msgid "Error"
 msgstr ""
 
@@ -8910,6 +8997,7 @@ msgstr "Opciones de transcodificación"
 #: modules/gui/macosx/output.m:163 modules/gui/macosx/output.m:173
 #: modules/gui/wxwindows/streamout.cpp:684
 #: modules/gui/wxwindows/streamout.cpp:754
+#: modules/gui/wxwindows/wizard.cpp:816 modules/gui/wxwindows/wizard.cpp:852
 msgid "Bitrate (kb/s)"
 msgstr "Tasa de bits (kb/s)"
 
@@ -8997,6 +9085,7 @@ msgid "%i items in playlist"
 msgstr "%i objetos en lista de reproducción"
 
 #: modules/gui/macosx/playlistinfo.m:61 modules/gui/wxwindows/iteminfo.cpp:145
+#: modules/gui/wxwindows/wizard.cpp:576
 msgid "URI"
 msgstr ""
 
@@ -9030,8 +9119,9 @@ msgstr "Comando"
 #: modules/gui/macosx/prefs.m:182 modules/gui/macosx/prefs.m:764
 #: modules/gui/macosx/prefs_widgets.m:204
 #: modules/gui/macosx/prefs_widgets.m:279
+#, fuzzy
 msgid "Control"
-msgstr ""
+msgstr "Controles"
 
 #: modules/gui/macosx/prefs.m:185 modules/gui/macosx/prefs.m:768
 #: modules/gui/macosx/prefs_widgets.m:208
@@ -9176,16 +9266,18 @@ msgid "rtp4"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:502
+#, fuzzy
 msgid "ftp"
-msgstr ""
+msgstr "ftp://"
 
 #: modules/gui/pda/pda_interface.c:503
 msgid "http"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:504
+#, fuzzy
 msgid "sout"
-msgstr ""
+msgstr "Acerca de"
 
 #: modules/gui/pda/pda_interface.c:505
 msgid "mms"
@@ -9210,8 +9302,9 @@ msgid "Video:"
 msgstr "Vídeo:"
 
 #: modules/gui/pda/pda_interface.c:584
+#, fuzzy
 msgid "Audio:"
-msgstr ""
+msgstr "Audio"
 
 #: modules/gui/pda/pda_interface.c:593
 msgid "Channel:"
@@ -9254,20 +9347,24 @@ msgid "Decimation:"
 msgstr "Diezmado:"
 
 #: modules/gui/pda/pda_interface.c:740
+#, fuzzy
 msgid "pal"
-msgstr ""
+msgstr "todo"
 
 #: modules/gui/pda/pda_interface.c:741
+#, fuzzy
 msgid "ntsc"
-msgstr ""
+msgstr "Fuentes"
 
 #: modules/gui/pda/pda_interface.c:742
+#, fuzzy
 msgid "secam"
-msgstr ""
+msgstr "Cámara web"
 
 #: modules/gui/pda/pda_interface.c:743
+#, fuzzy
 msgid "auto"
-msgstr ""
+msgstr "Automático"
 
 #: modules/gui/pda/pda_interface.c:760
 msgid "240x192"
@@ -9306,8 +9403,9 @@ msgid "Hz/s"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:814
+#, fuzzy
 msgid "mono"
-msgstr ""
+msgstr "Samoano"
 
 #: modules/gui/pda/pda_interface.c:815
 msgid "stereo"
@@ -9378,8 +9476,9 @@ msgid "Access:"
 msgstr "Acceso:"
 
 #: modules/gui/pda/pda_interface.c:988
+#, fuzzy
 msgid "Muxer:"
-msgstr ""
+msgstr "Sintonizador:"
 
 #: modules/gui/pda/pda_interface.c:997
 msgid "URL:"
@@ -9409,7 +9508,7 @@ msgstr ""
 msgid "MPEG1"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1055
+#: modules/gui/pda/pda_interface.c:1055 modules/gui/wxwindows/streamdata.h:142
 msgid "OGG"
 msgstr ""
 
@@ -9417,11 +9516,11 @@ msgstr ""
 msgid "MP4"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1057
+#: modules/gui/pda/pda_interface.c:1057 modules/gui/wxwindows/streamdata.h:147
 msgid "MOV"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1058
+#: modules/gui/pda/pda_interface.c:1058 modules/gui/wxwindows/streamdata.h:144
 msgid "ASF"
 msgstr ""
 
@@ -9430,8 +9529,9 @@ msgid "kbits/s"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:1085
+#, fuzzy
 msgid "alaw"
-msgstr ""
+msgstr "Malayo"
 
 #: modules/gui/pda/pda_interface.c:1086
 msgid "ulaw"
@@ -9450,8 +9550,9 @@ msgid "a52"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:1090
+#, fuzzy
 msgid "vorb"
-msgstr ""
+msgstr "Reverberación"
 
 #: modules/gui/pda/pda_interface.c:1122
 msgid "bits/s"
@@ -9473,7 +9574,7 @@ msgstr "Anuncio SLP:"
 msgid "Announce Channel:"
 msgstr "Canal de Anuncio:"
 
-#: modules/gui/pda/pda_interface.c:1222
+#: modules/gui/pda/pda_interface.c:1222 modules/gui/wxwindows/wizard.cpp:124
 msgid "Transcode"
 msgstr "Transcodificar"
 
@@ -9686,8 +9787,9 @@ msgid "Saturation"
 msgstr "Saturación"
 
 #: modules/gui/wxwindows/extrapanel.cpp:240
+#, fuzzy
 msgid "Gamma"
-msgstr ""
+msgstr "Juego"
 
 #: modules/gui/wxwindows/extrapanel.cpp:266
 msgid "Video Options"
@@ -9750,6 +9852,7 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwindows/extrapanel.cpp:921
+#: modules/gui/wxwindows/wizard.cpp:504
 #, fuzzy
 msgid "More information"
 msgstr "Informaciones de objeto"
@@ -9817,8 +9920,9 @@ msgid "&Settings"
 msgstr "Opcione&s"
 
 #: modules/gui/wxwindows/interface.cpp:357
+#, fuzzy
 msgid "&Audio"
-msgstr ""
+msgstr "Audio"
 
 #: modules/gui/wxwindows/interface.cpp:358
 msgid "&Video"
@@ -9832,31 +9936,31 @@ msgstr "&Navegación"
 msgid "&Help"
 msgstr "Ayuda: &H"
 
-#: modules/gui/wxwindows/interface.cpp:435
+#: modules/gui/wxwindows/interface.cpp:439
 msgid "Previous playlist item"
 msgstr "Objeto previo de lista de reproducción"
 
-#: modules/gui/wxwindows/interface.cpp:436
+#: modules/gui/wxwindows/interface.cpp:440
 msgid "Next playlist item"
 msgstr "Objeto siguiente de lista de reproducción"
 
-#: modules/gui/wxwindows/interface.cpp:611
+#: modules/gui/wxwindows/interface.cpp:615
 msgid "&Extended GUI"
 msgstr "GUI &Extendida"
 
-#: modules/gui/wxwindows/interface.cpp:615
+#: modules/gui/wxwindows/interface.cpp:619
 msgid "&Undock Ext. GUI"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:618
+#: modules/gui/wxwindows/interface.cpp:622
 msgid "&Bookmarks..."
 msgstr "Favoritos...: &B"
 
-#: modules/gui/wxwindows/interface.cpp:619 modules/gui/wxwindows/menus.cpp:142
+#: modules/gui/wxwindows/interface.cpp:623 modules/gui/wxwindows/menus.cpp:142
 msgid "&Preferences..."
 msgstr "&Preferencias..."
 
-#: modules/gui/wxwindows/interface.cpp:672
+#: modules/gui/wxwindows/interface.cpp:676
 msgid ""
 " (wxWindows interface)\n"
 "\n"
@@ -9864,7 +9968,7 @@ msgstr ""
 " (interfaz wxWindows)\n"
 "\n"
 
-#: modules/gui/wxwindows/interface.cpp:673
+#: modules/gui/wxwindows/interface.cpp:677
 msgid ""
 "(c) 1996-2004 - the VideoLAN Team\n"
 "\n"
@@ -9872,7 +9976,7 @@ msgstr ""
 "(c) 1996-2004 - el Equipo de VideoLAN\n"
 "\n"
 
-#: modules/gui/wxwindows/interface.cpp:675
+#: modules/gui/wxwindows/interface.cpp:679
 msgid ""
 "The VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/\n"
@@ -9882,7 +9986,7 @@ msgstr ""
 "http://www.videolan.org/\n"
 "\n"
 
-#: modules/gui/wxwindows/interface.cpp:678
+#: modules/gui/wxwindows/interface.cpp:682
 #, c-format
 msgid "About %s"
 msgstr "Acerca de %s"
@@ -10155,12 +10259,14 @@ msgid "General settings"
 msgstr "Opciones generales"
 
 #: modules/gui/wxwindows/preferences_widgets.cpp:181
+#, fuzzy
 msgid "Alt"
-msgstr ""
+msgstr "Todo"
 
 #: modules/gui/wxwindows/preferences_widgets.cpp:183
+#, fuzzy
 msgid "Ctrl"
-msgstr ""
+msgstr "Controles"
 
 #: modules/gui/wxwindows/preferences_widgets.cpp:477
 msgid "Choose directory"
@@ -10169,6 +10275,167 @@ msgstr "Elige directorio"
 #: modules/gui/wxwindows/preferences_widgets.cpp:486
 msgid "Choose file"
 msgstr "Elige archivo"
+
+#: modules/gui/wxwindows/streamdata.h:47
+#, fuzzy
+msgid "MPEG-1 Video codec"
+msgstr "Códec de vídeo"
+
+#: modules/gui/wxwindows/streamdata.h:49
+#, fuzzy
+msgid "MPEG-2 Video codec"
+msgstr "Códec de vídeo"
+
+#: modules/gui/wxwindows/streamdata.h:51
+#, fuzzy
+msgid "MPEG-4 Video codec"
+msgstr "Códec de vídeo"
+
+#: modules/gui/wxwindows/streamdata.h:53
+msgid "DivX first version"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:55
+#, fuzzy
+msgid "DivX second version"
+msgstr "Conversiones MMX desde "
+
+#: modules/gui/wxwindows/streamdata.h:57
+msgid "DivX third version"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:59
+msgid "H263 is a video codec optimized for videoconference (low rates)"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:61
+msgid "I263 is an Intel conferencing codec"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:63
+msgid "WMV (Windows Media Video) 1"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:65
+msgid "WMV (Windows Media Video) 2"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:67
+msgid "MJPEG consists of a series of JPEG pictures"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:69
+msgid "Theora is a free general-purpose codec"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:71 modules/gui/wxwindows/streamdata.h:92
+msgid "Dummy codec (do not transcode)"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:78
+msgid "The standard MPEG audio (1/2) format"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:80
+#, fuzzy
+msgid "MPEG Audio Layer 3"
+msgstr "Decodificador de audio MPEG"
+
+#: modules/gui/wxwindows/streamdata.h:82
+msgid "Audio format for MPEG4"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:84
+#, fuzzy
+msgid "DVD audio format"
+msgstr "Formato VCD"
+
+#: modules/gui/wxwindows/streamdata.h:86
+#, fuzzy
+msgid "Vorbis is a free audio codec"
+msgstr "Decodificador de audio Vorbis"
+
+#: modules/gui/wxwindows/streamdata.h:88
+msgid "FLAC is a lossless audio codec"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:90
+msgid "A free audio codec dedicated to compression of voice"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:107
+#, fuzzy
+msgid "UDP Unicast"
+msgstr "uniemisión"
+
+#: modules/gui/wxwindows/streamdata.h:107
+msgid "Use this to stream to a single computer"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:108
+msgid "Enter the address of the computer to stream to"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:110
+#, fuzzy
+msgid "UDP Multicast"
+msgstr "UDP/RTP Multiemisión"
+
+#: modules/gui/wxwindows/streamdata.h:111
+msgid ""
+"Use this to stream to a dynamic group of computers on a multicast-enabled "
+"network. This is the most efficient method to stream to several computers, "
+"but it does not work over Internet."
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:114
+msgid ""
+"Enter the multicast address to stream to in this field. This must be an IP "
+"address between 224.0.0.0 an 239.255.255.255 For a private use, enter an "
+"address beginning with 239.255."
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:118
+#: modules/gui/wxwindows/streamout.cpp:426
+msgid "HTTP"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:119
+msgid ""
+"Use this to stream to several computers. This method is less efficient, as "
+"the server needs to send several times the stream."
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:122
+msgid ""
+"Enter the local addresses you want to listen to. Do not enter anything if "
+"you want to listen to all adresses or if you don't understand. This is "
+"generally the best thing to do. Other computers can then access the stream "
+"at http://yourip:8080 by default"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:139
+#, fuzzy
+msgid "MPEG Program Stream"
+msgstr "entrada de Volcado de Programa MPEG ISO 13818-1"
+
+#: modules/gui/wxwindows/streamdata.h:140
+#, fuzzy
+msgid "MPEG Transport Stream"
+msgstr "Transvalorar volcado"
+
+#: modules/gui/wxwindows/streamdata.h:141
+#, fuzzy
+msgid "MPEG 1 Format"
+msgstr "Formato VCD"
+
+#: modules/gui/wxwindows/streamdata.h:143
+msgid "RAW"
+msgstr ""
+
+#: modules/gui/wxwindows/streamdata.h:146
+msgid "MPEG4"
+msgstr ""
 
 #: modules/gui/wxwindows/streamout.cpp:165
 msgid "Stream output MRL"
@@ -10192,10 +10459,6 @@ msgstr ""
 #: modules/gui/wxwindows/streamout.cpp:417
 msgid "Output methods"
 msgstr "Métodos de salida"
-
-#: modules/gui/wxwindows/streamout.cpp:426
-msgid "HTTP"
-msgstr ""
 
 #: modules/gui/wxwindows/streamout.cpp:427
 msgid "MMSH"
@@ -10241,29 +10504,263 @@ msgstr "Anular fotogramas por seg. Sólo funciona con subtítulos de MicroDVD."
 msgid "Open file"
 msgstr "Abrir archivo"
 
-#: modules/gui/wxwindows/wxwindows.cpp:83
+#: modules/gui/wxwindows/wizard.cpp:87 modules/gui/wxwindows/wizard.cpp:90
+#: modules/gui/wxwindows/wizard.cpp:1370
+msgid "Streaming/Transcoding Wizard"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:91
+#, fuzzy
+msgid "This wizard helps you to stream, transcode or save a stream"
+msgstr "Esto te permite reproducir el volcado mientras lo vuelcas."
+
+#: modules/gui/wxwindows/wizard.cpp:93
+#, fuzzy
+msgid "Stream to network"
+msgstr "Volcado de salida"
+
+#: modules/gui/wxwindows/wizard.cpp:94 modules/gui/wxwindows/wizard.cpp:99
+msgid "Use this to stream on a network"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:95
+#, fuzzy
+msgid "Transcode/Save to file"
+msgstr "Opciones de transcodificación"
+
+#: modules/gui/wxwindows/wizard.cpp:96
+msgid "Use this to re-encode a stream and save it to a file"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:97
+msgid ""
+"This wizard only gives access to a small subset of VLC's streaming and "
+"transcoding capabilities. Use the Open and Stream Output dialogs to get all "
+"of them"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:101
+msgid ""
+"Use this to save a stream to a file. You have the possibility to reencode "
+"the stream. You can save whatever VLC can read.\n"
+"Please notice that VLC is not very suited for file to file transcoding. You "
+"should use its transcoding features to save network streams, for example"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:106
+#, fuzzy
+msgid "Choose input"
+msgstr "Elige título"
+
+#: modules/gui/wxwindows/wizard.cpp:107
+msgid "Choose here your input stream"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:109
+#, fuzzy
+msgid "Select a stream"
+msgstr "Elige un volcado de red"
+
+#: modules/gui/wxwindows/wizard.cpp:110
+#, fuzzy
+msgid "Existing playlist item"
+msgstr "Objeto siguiente de lista de reproducción"
+
+#: modules/gui/wxwindows/wizard.cpp:112
+#, fuzzy
+msgid "You must choose a stream"
+msgstr "Elige un volcado de salida"
+
+#: modules/gui/wxwindows/wizard.cpp:113
+msgid "Uh Oh! Unable to find playlist !"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:115
+msgid ""
+"Use this to read only a part of the stream. You must be able to control the "
+"incoming stream (for example, a file or a disc, but not an UDP network "
+"stream.\n"
+"Enter the starting and ending times (in seconds)"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:121
+#, fuzzy
+msgid "Choose"
+msgstr "Elige..."
+
+#: modules/gui/wxwindows/wizard.cpp:125
+msgid ""
+"If you want to change the compression format of the audio or video tracks, "
+"fill in this page. (If you only want to change the container format, proceed "
+"to next page)."
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:127
+msgid "If your stream has video and you want to transcode it, enable this"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:129
+msgid "Select your video codec. Click one to get more information"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:132
+msgid "If your stream has audio and you want to transcode it, enable this"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:134
+msgid "Select your audio codec. Click one to get more information"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:138
+#, fuzzy
+msgid "Streaming"
+msgstr "Volcado"
+
+#: modules/gui/wxwindows/wizard.cpp:139
+msgid "In this page, you will select how your input stream will be sent."
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:142
+msgid "This does not appear to be a valid multicast address"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:144
+#, fuzzy
+msgid "You need to enter an address"
+msgstr "Dirección de interfaz de red"
+
+#: modules/gui/wxwindows/wizard.cpp:147
+#, fuzzy
+msgid "Encapsulation format"
+msgstr "Método de Encapsulamiento"
+
+#: modules/gui/wxwindows/wizard.cpp:148
+msgid ""
+"In this page, you will select how the stream will be encapsulated. Depending "
+"on the choices you made, all formats won't be available."
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:154
+#, fuzzy
+msgid "Additional transcode options"
+msgstr "Opciones de transcodificación"
+
+#: modules/gui/wxwindows/wizard.cpp:155
+msgid ""
+"In this page, you will define a few additionnal parameters for your "
+"transcoding"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:158
+msgid "You must choose a file to save to"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:161
+#, fuzzy
+msgid "Additional streaming options"
+msgstr "Obtener salida de volcado"
+
+#: modules/gui/wxwindows/wizard.cpp:162
+msgid ""
+"In this page, you will define a few additionnal parameters for your stream"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:165
+msgid ""
+"Define the TTL (Time-To-Live) of the stream. This parameter is the maximum "
+"number of routers your stream can go through. If you don't know what it "
+"means, or if you want to stream on your local network only, leave this "
+"setting to 1."
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:170
+msgid ""
+"When streaming using UDP, you can announce your streams using the SAP/SDP "
+"announcing protocol. This way, the clients won't have to type in the "
+"multicast address, it will appear in their playlist if they enable the SAP "
+"extra interface.\n"
+"If you want to give a name to your stream, enter it here, else, a default "
+"name will be used"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:475 modules/gui/wxwindows/wizard.cpp:482
+#, fuzzy
+msgid "More Info"
+msgstr "sin info"
+
+#: modules/gui/wxwindows/wizard.cpp:555
+msgid "Choose..."
+msgstr "Elige..."
+
+#: modules/gui/wxwindows/wizard.cpp:611
+msgid "Partial Extract"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:622
+msgid "From"
+msgstr ""
+
+#: modules/gui/wxwindows/wizard.cpp:627
+#, fuzzy
+msgid "To"
+msgstr "Arriba"
+
+#: modules/gui/wxwindows/wizard.cpp:803
+#, fuzzy
+msgid "Transcode video"
+msgstr "Opciones de transcodificación"
+
+#: modules/gui/wxwindows/wizard.cpp:838
+#, fuzzy
+msgid "Transcode audio"
+msgstr "Opciones de transcodificación"
+
+#: modules/gui/wxwindows/wizard.cpp:1005
+#, fuzzy
+msgid "Streaming method"
+msgstr "Paso 2: Define método de volcado."
+
+#: modules/gui/wxwindows/wizard.cpp:1019 modules/stream_out/rtp.c:41
+msgid "Destination"
+msgstr "Destino"
+
+#: modules/gui/wxwindows/wizard.cpp:1234
+#, fuzzy
+msgid "Select the file to save to"
+msgstr "Elige tecla a usar para reproducir."
+
+#: modules/gui/wxwindows/wizard.cpp:1302
+#, fuzzy
+msgid "Time-To-Live (TTL)"
+msgstr "Hora para Emisión En Directo (TTL): "
+
+#: modules/gui/wxwindows/wizard.cpp:1310
+msgid "SAP Announce"
+msgstr "Anuncio SAP"
+
+#: modules/gui/wxwindows/wxwindows.cpp:86
 msgid "Embed video in interface"
 msgstr "Integrar vídeo en interfaz"
 
-#: modules/gui/wxwindows/wxwindows.cpp:84
+#: modules/gui/wxwindows/wxwindows.cpp:87
 msgid ""
 "Embed the video inside the interface instead of having it in a separate "
 "window."
 msgstr "Integra el vídeo en la interfaz en vez de tenerlo en ventana aparte."
 
-#: modules/gui/wxwindows/wxwindows.cpp:86
+#: modules/gui/wxwindows/wxwindows.cpp:89
 msgid "Show bookmarks dialog"
 msgstr "Muestra diálogo favoritos"
 
-#: modules/gui/wxwindows/wxwindows.cpp:87
+#: modules/gui/wxwindows/wxwindows.cpp:90
 msgid "Show bookmarks dialog when the interface starts."
 msgstr "Muestra diálogo favoritos al iniciar la interfaz."
 
-#: modules/gui/wxwindows/wxwindows.cpp:96
+#: modules/gui/wxwindows/wxwindows.cpp:99
 msgid "wxWindows interface module"
 msgstr "Módulo de interfaz wxWindows"
 
-#: modules/gui/wxwindows/wxwindows.cpp:110
+#: modules/gui/wxwindows/wxwindows.cpp:113
 msgid "wxWindows dialogs provider"
 msgstr "proveedor de diálogos wxWindows"
 
@@ -10444,8 +10941,9 @@ msgstr ""
 "valor debería ponerse en unidades de milisegundos."
 
 #: modules/misc/network/ipv4.c:95
+#, fuzzy
 msgid "IPv4 network abstraction layer"
-msgstr ""
+msgstr "Capa de abstracción de red IPv6"
 
 #: modules/misc/network/ipv6.c:86
 msgid "IPv6 network abstraction layer"
@@ -10917,10 +11415,6 @@ msgstr "Salida de volcado elemental"
 msgid "Gathering stream output"
 msgstr "Obtener salida de volcado"
 
-#: modules/stream_out/rtp.c:41
-msgid "Destination"
-msgstr "Destino"
-
 #: modules/stream_out/rtp.c:44
 msgid "SDP"
 msgstr ""
@@ -10937,8 +11431,9 @@ msgstr ""
 "RTSP, y sap:// para anunciar el SDP vía SAP"
 
 #: modules/stream_out/rtp.c:50
+#, fuzzy
 msgid "Muxer"
-msgstr ""
+msgstr "Mudo"
 
 #: modules/stream_out/rtp.c:54 modules/stream_out/standard.c:55
 msgid "Session name"
@@ -11253,8 +11748,9 @@ msgstr ""
 "Te permite inidicar el número de hilos usados para la transcodificación."
 
 #: modules/stream_out/transcode.c:122
+#, fuzzy
 msgid "Synchronise on audio track"
-msgstr ""
+msgstr "Pista de Audio"
 
 #: modules/stream_out/transcode.c:124
 msgid ""
@@ -11343,7 +11839,7 @@ msgstr "Pon la gamma de imagen, entre 0.01 y 10. Por defecto a 1"
 msgid "Image properties filter"
 msgstr "Filtro de propiedades de imagen"
 
-#: modules/video_filter/blend.c:65
+#: modules/video_filter/blend.c:66
 #, fuzzy
 msgid "Video pictures blending"
 msgstr "Opciones de filtros de vídeo"
@@ -11844,8 +12340,9 @@ msgid "Simple DirectMedia Layer video output"
 msgstr "Salida de vídeo Simple DirectMedia Layer"
 
 #: modules/video_output/snapshot.c:46
+#, fuzzy
 msgid "snapshot width"
-msgstr ""
+msgstr "Módulos de acceso"
 
 #: modules/video_output/snapshot.c:47
 #, fuzzy
@@ -11853,8 +12350,9 @@ msgid "Set the width of the snapshot image."
 msgstr "Elige ruta a última piel usada."
 
 #: modules/video_output/snapshot.c:49
+#, fuzzy
 msgid "snapshot height"
-msgstr ""
+msgstr "Módulos de acceso"
 
 #: modules/video_output/snapshot.c:50
 #, fuzzy
@@ -11871,8 +12369,9 @@ msgid "Set the desired chroma for the snapshot image (a 4 character string)."
 msgstr "Elige ruta a última piel usada."
 
 #: modules/video_output/snapshot.c:55
+#, fuzzy
 msgid "cache size (number of images)"
-msgstr ""
+msgstr "Pon el número de Fotogramas Por Segundo"
 
 #: modules/video_output/snapshot.c:56
 #, fuzzy
@@ -12113,37 +12612,11 @@ msgstr "Fuente usada para mostrar texto en la salida xosd"
 msgid "XOSD interface"
 msgstr "interfaz XOSD"
 
-#, fuzzy
-#~ msgid "Force the rtci module to use stdin as if it was a TTY."
-#~ msgstr "Forzar la entrada rc a usar stdin como si fuera TTY."
-
-#, fuzzy
-#~ msgid ""
-#~ "By default the rtci interface plugin will start a DOS command box. "
-#~ "Enabling the quiet mode will not launch this command box."
-#~ msgstr ""
-#~ "Por defecto el plugin de interfaz dummy iniciará una línea de comandos "
-#~ "DOS. Habilitando el modo silencioso no saldrá esta línea de comandos pero "
-#~ "puede ser bastante molesto cuando quieres dentener VLC y no se abre "
-#~ "ninguna ventana de vídeo."
-
-#, fuzzy
-#~ msgid "Real time control interface"
-#~ msgstr "Interfaz de control remoto"
-
-#, fuzzy
-#~ msgid "Real time control interface initialized, `h' for help\n"
-#~ msgstr "Interfaz inicializada de control remoto, `h' para ayuda\n"
-
 #~ msgid "Delay subtitles (in 1/10s)"
 #~ msgstr "Retrasar subtítulos (en 1/10s)"
 
 #~ msgid "The above message had unknown cdio log level"
 #~ msgstr "El anterior mensaje tuvo nivel de registro cdio desconocido"
-
-#, fuzzy
-#~ msgid "CDDB error: %s"
-#~ msgstr "Puerto del servidor CDDB"
 
 #, fuzzy
 #~ msgid "unimplemented query in control"
@@ -12201,9 +12674,6 @@ msgstr "interfaz XOSD"
 
 #~ msgid "Root"
 #~ msgstr "Raíz"
-
-#~ msgid "Angle"
-#~ msgstr "Ángulo"
 
 #~ msgid "Resume"
 #~ msgstr "Continuar"
@@ -12278,9 +12748,6 @@ msgstr "interfaz XOSD"
 
 #~ msgid "RTSP/RTP describe"
 #~ msgstr "Describir RTSP/RTP"
-
-#~ msgid "ISO 13818-1 MPEG Program Stream input"
-#~ msgstr "entrada de Volcado de Programa MPEG ISO 13818-1"
 
 #~ msgid "Generic ISO 13818-1 MPEG demultiplexing"
 #~ msgstr "MPEG ISO 13818-1 genérico demultiplexador"
@@ -12361,14 +12828,8 @@ msgstr "interfaz XOSD"
 #~ msgid "Step 1: Select what to stream."
 #~ msgstr "Paso 1: Elige qué volcar."
 
-#~ msgid "Step 2: Define streaming method."
-#~ msgstr "Paso 2: Define método de volcado."
-
 #~ msgid "Step 3: Start streaming."
 #~ msgstr "Paso 3: Inicia el volcado."
-
-#~ msgid "Choose..."
-#~ msgstr "Elige..."
 
 #~ msgid "Start!"
 #~ msgstr "¡Iniciar!"
@@ -12508,9 +12969,6 @@ msgstr "interfaz XOSD"
 #~ msgstr ""
 #~ "Usa OpenGL en vez de QuickTime para renderizar el vídeo en pantalla."
 
-#~ msgid "ftp://"
-#~ msgstr "ftp://"
-
 #~ msgid "Open a skin file."
 #~ msgstr "Abrir un archivo de piel."
 
@@ -12567,9 +13025,6 @@ msgstr "interfaz XOSD"
 
 #~ msgid "Video for Linux"
 #~ msgstr "Vídeo para Linux"
-
-#~ msgid "Webcam"
-#~ msgstr "Cámara web"
 
 #~ msgid "TV card"
 #~ msgstr "Tarjeta TV"
@@ -12756,9 +13211,6 @@ msgstr "interfaz XOSD"
 #~ msgid "Image adjust"
 #~ msgstr "Ajuste de imagen"
 
-#~ msgid "Ratio"
-#~ msgstr "Proporción"
-
 #~ msgid "Simple &Open ..."
 #~ msgstr "Abrir Simple...: &O"
 
@@ -12783,9 +13235,6 @@ msgstr "interfaz XOSD"
 #~ msgid "Open subtitles file"
 #~ msgstr "Abrir archivo de subtítulos"
 
-#~ msgid "Fonts"
-#~ msgstr "Fuentes"
-
 #~ msgid "log filename"
 #~ msgstr "nombrearchivo registro"
 
@@ -12800,9 +13249,6 @@ msgstr "interfaz XOSD"
 
 #~ msgid "Gather stream"
 #~ msgstr "Acumular volcado"
-
-#~ msgid "Transrate stream"
-#~ msgstr "Transvalorar volcado"
 
 #~ msgid "Set image hue"
 #~ msgstr "Pon color de imagen"
@@ -12914,9 +13360,6 @@ msgstr "interfaz XOSD"
 #~ msgid "button2"
 #~ msgstr "botón2"
 
-#~ msgid "SAP Announce"
-#~ msgstr "Anuncio SAP"
-
 #~ msgid "SLP Announce"
 #~ msgstr "Anuncio SLP"
 
@@ -13001,9 +13444,6 @@ msgstr "interfaz XOSD"
 #~ "El Cliente de VideoLAN es un reproductor de MPEG, MPEG 2, MP3, DivX, que "
 #~ "acepta la entrada desde fuentes locales o en red."
 
-#~ msgid "FileInfo"
-#~ msgstr "InfoArchivo"
-
 #~ msgid "&File info..."
 #~ msgstr "In&fo de Archivo..."
 
@@ -13068,9 +13508,6 @@ msgstr "interfaz XOSD"
 
 #~ msgid "Avg. byterate"
 #~ msgstr "Tasa promedio de bytes"
-
-#~ msgid "Planes"
-#~ msgstr "Planos"
 
 #~ msgid "Bits Per Pixel"
 #~ msgstr "Bits Por Píxel"

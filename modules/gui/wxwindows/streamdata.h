@@ -44,52 +44,52 @@ struct codec {
 
 static struct codec vcodecs_array[] =
 {
-    { "MPEG-1 Video" , "mp1v" , "MPEG-1 Video codec",
+    { "MPEG-1 Video" , "mp1v" , N_("MPEG-1 Video codec"),
        {MUX_PS, MUX_TS, MUX_MPEG, MUX_OGG, MUX_AVI, MUX_RAW, -1,-1,-1 } },
-    { "MPEG-2 Video" , "mp2v" , "MPEG-2 Video codec",
+    { "MPEG-2 Video" , "mp2v" , N_("MPEG-2 Video codec"),
        {MUX_PS, MUX_TS, MUX_MPEG, MUX_OGG, MUX_AVI, MUX_RAW, -1,-1,-1 } },
-    { "MPEG-4 Video" , "mp4v" , "MPEG-4 Video codec",
+    { "MPEG-4 Video" , "mp4v" , N_("MPEG-4 Video codec"),
        {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_MP4,MUX_OGG,MUX_AVI,MUX_RAW, -1} },
-    { "DIVX 1" ,"DIV1","Divx first version" ,
+    { "DIVX 1" ,"DIV1",N_("DivX first version") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , MUX_AVI , -1,-1,-1,-1 } },
-    { "DIVX 2" ,"DIV2","Divx second version" ,
+    { "DIVX 2" ,"DIV2",N_("DivX second version") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , MUX_AVI , -1,-1,-1,-1 } },
-    { "DIVX 3" ,"DIV3","Divx third version" ,
+    { "DIVX 3" ,"DIV3",N_("DivX third version") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , MUX_AVI , -1,-1,-1,-1 } },
-    { "H 263" , "H263" , "H263 is ..." ,
+    { "H 263" , "H263" , N_("H263 is a video codec optimized for videoconference (low rates)") ,
        { MUX_TS, MUX_AVI, -1,-1,-1,-1,-1,-1,-1 } },
-    { "I 263", "I263", "I263 is ..." ,
+    { "I 263", "I263", N_("I263 is an Intel conferencing codec") ,
        { MUX_TS, MUX_AVI, -1,-1,-1,-1,-1,-1,-1 } },
-    { "WMV 1" , "WMV1", "First version of WMV" ,
+    { "WMV 1" , "WMV1", N_("WMV (Windows Media Video) 1") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , MUX_AVI , -1,-1,-1,-1 } },
-    { "WMV 2" , "WMV2", "2 version of WMV" ,
+    { "WMV 2" , "WMV2", N_("WMV (Windows Media Video) 2") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , MUX_AVI , -1,-1,-1,-1 } },
-    { "MJPEG" , "MJPG", "MJPEG consists of a series of JPEG pictures" ,
+    { "MJPEG" , "MJPG", N_("MJPEG consists of a series of JPEG pictures") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , MUX_AVI , -1,-1,-1,-1 } },
-    { "Theora" , "theo", "Experimental free codec",
+    { "Theora" , "theo", N_("Theora is a free general-purpose codec"),
        {MUX_TS, -1,-1,-1,-1,-1,-1,-1,-1} },
-    { "Dummy", "dummy", "Dummy codec (do not transcode)" ,
+    { "Dummy", "dummy", N_("Dummy codec (do not transcode)") ,
       {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_MP4,MUX_OGG,MUX_AVI,MUX_RAW,MUX_MOV}},
     { NULL,NULL,NULL , {-1,-1,-1,-1,-1,-1,-1,-1,-1}} /* Do not remove me */
 };
 
 static struct codec acodecs_array[] =
 {
-    { "MPEG Audio" , "mpga" , "The standard MPEG audio (1/2) format" ,
+    { "MPEG Audio" , "mpga" , N_("The standard MPEG audio (1/2) format") ,
        {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_OGG,MUX_AVI,MUX_RAW, -1,-1} },
-    { "MP3" , "mp3" , "MPEG Audio Layer 3" ,
+    { "MP3" , "mp3" , N_("MPEG Audio Layer 3") ,
        {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_OGG,MUX_AVI,MUX_RAW, -1,-1} },
-    { "MPEG 4 Audio" , "mp4a" , "Audio format for MPEG4" ,
+    { "MPEG 4 Audio" , "mp4a" , N_("Audio format for MPEG4") ,
        {MUX_TS, MUX_MP4, -1,-1,-1,-1,-1,-1,-1 } },
-    { "A/52" , "a52" , "DVD audio format" ,
+    { "A/52" , "a52" , N_("DVD audio format") ,
        {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_OGG,MUX_AVI,MUX_RAW, -1,-1} },
-    { "Vorbis" , "vorb" , "This is a free audio codec" ,
+    { "Vorbis" , "vorb" , N_("Vorbis is a free audio codec") ,
        {MUX_OGG, -1,-1,-1,-1,-1,-1,-1,-1} },
-    { "FLAC" , "flac" , "This is an audio codec" ,
+    { "FLAC" , "flac" , N_("FLAC is a lossless audio codec") ,
        {MUX_OGG , MUX_RAW, -1,-1,-1,-1,-1,-1,-1} },
-    { "Speex" , "spx" , "An audio codec dedicated to compression of voice" ,
+    { "Speex" , "spx" , N_("A free audio codec dedicated to compression of voice") ,
        {MUX_OGG, -1,-1,-1,-1,-1,-1,-1,-1} },
-    { "Dummy", "dummy", "Dummy codec (do not transcode)" ,
+    { "Dummy", "dummy", N_("Dummy codec (do not transcode)") ,
      {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_MP4,MUX_OGG,MUX_AVI,MUX_RAW,MUX_MOV}},
     { NULL,NULL,NULL , {-1,-1,-1,-1,-1,-1,-1,-1,-1}} /* Do not remove me */
 };
@@ -104,25 +104,25 @@ struct method {
 
 static struct method methods_array[] =
 {
-    {"udp:","UDP Unicast", "Use this to stream to a single computer",
-     "Enter the address of the computer to stream to",
+    {"udp:",N_("UDP Unicast"), N_("Use this to stream to a single computer"),
+     N_("Enter the address of the computer to stream to"),
      { MUX_TS, -1,-1,-1,-1,-1,-1,-1,-1 } },
-    {"udp:","UDP Multicast",
-     "Use this to stream to a dynamic group of computers on a "
+    {"udp:",N_("UDP Multicast"),
+     N_("Use this to stream to a dynamic group of computers on a "
      "multicast-enabled network. This is the most efficient method "
-     "to stream to several computers, but it does not work over Internet.",
-     "Enter the multicast address to stream to in this field. "
+     "to stream to several computers, but it does not work over Internet."),
+     N_("Enter the multicast address to stream to in this field. "
      "This must be an IP address between 224.0.0.0 an 239.255.255.255 "
-     "For a private use, enter an address beginning with 239.255.",
+     "For a private use, enter an address beginning with 239.255."),
      { MUX_TS, -1,-1,-1,-1,-1,-1,-1,-1 } },
-    {"http://","HTTP",
-            "Use this to stream to several computers. This method is "
+    {"http://",N_("HTTP"),
+     N_("Use this to stream to several computers. This method is "
      "less efficient, as the server needs to send several times the "
-     "stream.",
-     "Enter the local addresses you want to listen to. Do not enter "
+     "stream."),
+     N_("Enter the local addresses you want to listen to. Do not enter "
      "anything if you want to listen to all adresses or if you don't "
      "understand. This is generally the best thing to do. Other computers "
-     "can then access the stream at http://yourip:8080 by default",
+     "can then access the stream at http://yourip:8080 by default"),
      { MUX_TS, MUX_PS, MUX_MPEG, MUX_OGG, MUX_RAW, MUX_ASF, -1,-1,-1} },
     { NULL, NULL,NULL,NULL , {-1,-1,-1,-1,-1,-1,-1,-1,-1}} /* Do not remove me */
 };
@@ -136,15 +136,15 @@ struct encap {
 
 static struct encap encaps_array[] =
 {
-    { MUX_PS, "ps","MPEG PS", "MPEG Program Stream" },
-    { MUX_TS, "ts","MPEG TS", "MPEG Transport Stream" },
-    { MUX_MPEG, "ps", "MPEG 1", "MPEG 1 Format" },
-    { MUX_OGG, "ogg", "OGG", "OGG" },
-    { MUX_RAW, "raw", "RAW", "RAW" },
-    { MUX_ASF, "asf","ASF", "ASF" },
-    { MUX_AVI, "avi","AVI", "AVI" },
-    { MUX_MP4, "mp4","MP4", "MPEG4" },
-    { MUX_MOV, "mov","MOV", "MOV" },
+    { MUX_PS, "ps","MPEG PS", N_("MPEG Program Stream") },
+    { MUX_TS, "ts","MPEG TS", N_("MPEG Transport Stream") },
+    { MUX_MPEG, "ps", "MPEG 1", N_("MPEG 1 Format") },
+    { MUX_OGG, "ogg", "OGG", N_("OGG") },
+    { MUX_RAW, "raw", "RAW", N_("RAW") },
+    { MUX_ASF, "asf","ASF", N_("ASF") },
+    { MUX_AVI, "avi","AVI", N_("AVI") },
+    { MUX_MP4, "mp4","MP4", N_("MPEG4") },
+    { MUX_MOV, "mov","MOV", N_("MOV") },
     { -1 , NULL,NULL , NULL } /* Do not remove me */
 };
 
