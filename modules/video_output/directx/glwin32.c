@@ -63,6 +63,9 @@ vlc_module_begin();
     set_capability( "opengl provider", 100 );
     add_shortcut( "glwin32" );
     set_callbacks( OpenVideo, CloseVideo );
+
+    /* FIXME: Hack to avoid unregistering our window class */
+    linked_with_a_crap_library_which_uses_atexit( );
 vlc_module_end();
 
 #if 0 /* FIXME */
