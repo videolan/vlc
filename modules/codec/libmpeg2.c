@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.2 2003/02/25 21:09:34 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.3 2003/03/20 21:45:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -119,7 +119,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     p_dec->p_vout     = NULL;
     p_dec->p_mpeg2dec = NULL;
     p_dec->p_info     = NULL;
-    p_dec->i_pts      = 0;
+    p_dec->i_pts      = mdate() + DEFAULT_PTS_DELAY;
     p_dec->i_current_pts  = 0;
     p_dec->i_previous_pts = 0;
 
@@ -175,9 +175,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
         case STATE_SEQUENCE:
             /* Initialize video output */
-            i_aspect = p_dec->p_info->sequence->width *
-                p_dec->p_info->sequence->pixel_width /
-                p_dec->p_info->sequence->height * VOUT_ASPECT_FACTOR /
+            i_aspect = ((uint64_t)p_dec->p_info->sequence->width) *
+                p_dec->p_info->sequence->pixel_width * VOUT_ASPECT_FACTOR /
+                p_dec->p_info->sequence->height /
                 p_dec->p_info->sequence->pixel_height;
 
             i_chroma = VLC_FOURCC('Y','V','1','2');
@@ -189,8 +189,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             break;
 
         case STATE_PICTURE:
-          {
-            uint8_t * buf[3];
+        {
+            uint8_t *buf[3];
 
             /* Get a new picture */
             while( !(p_pic = vout_CreatePicture( p_dec->p_vout, 0, 0, 0 ) ) )
@@ -207,35 +207,33 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             buf[1] = p_pic->p[1].p_pixels;
             buf[2] = p_pic->p[2].p_pixels;
             mpeg2_set_buf( p_dec->p_mpeg2dec, buf, p_pic );
-          }
-          break;
+
+            /* Store the date for the picture */
+            if( p_dec->p_info->current_picture->flags & PIC_FLAG_PTS )
+            {
+                p_pic->date = ( p_dec->p_info->current_picture->pts ==
+                                (uint32_t)p_dec->i_current_pts ) ?
+                              p_dec->i_current_pts : p_dec->i_previous_pts;
+            }
+        }
+        break;
 
         case STATE_END:
-#if 0
-            msg_Err( p_dec->p_fifo, "STATE_END" );
-#endif
         case STATE_SLICE:
-#if 0
-            msg_Err( p_dec->p_fifo, "STATE_SLICE: %i",
-                     p_dec->p_info->display_fbuf ?
-                     p_dec->p_info->display_fbuf->id : -1 );
-#endif
             if( p_dec->p_info->display_fbuf
                 && p_dec->p_info->display_fbuf->id )
             {
                 p_pic = (picture_t *)p_dec->p_info->display_fbuf->id;
 
+                /* Date the new picture */
                 if( p_dec->p_info->display_picture->flags & PIC_FLAG_PTS )
                 {
-                    p_dec->i_pts = ( p_dec->p_info->display_picture->pts ==
-                                     (uint32_t)p_dec->i_current_pts ) ?
-                        p_dec->i_current_pts : p_dec->i_previous_pts;
+                    p_dec->i_pts = p_pic->date;
                 }
                 else
                 {
                     p_dec->i_pts += (p_dec->p_info->sequence->frame_period/27);
                 }
-
                 vout_DatePicture( p_dec->p_vout, p_pic, p_dec->i_pts );
 
                 vout_DisplayPicture( p_dec->p_vout, p_pic );
