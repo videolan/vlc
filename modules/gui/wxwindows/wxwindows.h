@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.36 2003/06/12 21:28:39 gbazin Exp $
+ * $Id: wxwindows.h,v 1.37 2003/07/04 12:20:32 adn Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -305,6 +305,7 @@ public:
 private:
     void UpdateMRL();
     wxPanel *AccessPanel( wxWindow* parent );
+    wxPanel *MiscPanel( wxWindow* parent );
     wxPanel *EncapsulationPanel( wxWindow* parent );
     wxPanel *TranscodingPanel( wxWindow* parent );
     void    ParseMRL();
@@ -314,6 +315,7 @@ private:
     void OnCancel( wxCommandEvent& event );
     void OnMRLChange( wxCommandEvent& event );
     void OnAccessTypeChange( wxCommandEvent& event );
+    void OnSAPTypeChange( wxCommandEvent& event );
 
     /* Event handlers for the file access output */
     void OnFileChange( wxCommandEvent& event );
@@ -322,6 +324,9 @@ private:
     /* Event handlers for the net access output */
     void OnNetChange( wxCommandEvent& event );
 
+    /* Event specific to the sap address */
+    void OnSAPAddrChange( wxCommandEvent& event );
+    
     /* Event handlers for the encapsulation panel */
     void OnEncapsulationChange( wxCommandEvent& event );
 
@@ -346,6 +351,14 @@ private:
     wxSpinCtrl *net_ports[5];
     wxTextCtrl *net_addrs[5];
 
+    /* Controls for the SAP announces */
+     wxPanel *misc_subpanels[1];
+     wxCheckBox *misc_checkboxes[1];
+     
+     int i_sap_type;
+     
+     wxTextCtrl *misc_addrs[1];
+                            
     /* Controls for the encapsulation */
     wxRadioButton *encapsulation_radios[5];
     int i_encapsulation_type;
