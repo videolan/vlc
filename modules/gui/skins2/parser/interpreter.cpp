@@ -63,6 +63,10 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
         CmdGenericPtr( new CmdPlaylistRandom( getIntf(), true ) );
     m_commandMap["playlist.setRandom(false)"] =
         CmdGenericPtr( new CmdPlaylistRandom( getIntf(), false ) );
+    m_commandMap["playlist.setLoop(true)"] =
+        CmdGenericPtr( new CmdPlaylistLoop( getIntf(), true ) );
+    m_commandMap["playlist.setLoop(false)"] =
+        CmdGenericPtr( new CmdPlaylistLoop( getIntf(), false ) );
     REGISTER_CMD( "vlc.fullscreen()", CmdFullscreen )
     REGISTER_CMD( "vlc.play()", CmdPlay )
     REGISTER_CMD( "vlc.pause()", CmdPause )

@@ -48,9 +48,6 @@ class VlcProc: public SkinObject
         /// Getter for the playlist variable
         Playlist &getPlaylistVar() { return *((Playlist*)m_cPlaylist.get()); }
 
-        /// Getter for the random variable
-        VarBool &getIsRandomVar() { return *((VarBool*)m_cVarRandom.get()); }
-
         /// Getter for the time variable
         Time &getTimeVar() { return *((Time*)(m_cVarTime.get())); }
 
@@ -86,6 +83,7 @@ class VlcProc: public SkinObject
         /// Playlist variable
         VariablePtr m_cPlaylist;
         VariablePtr m_cVarRandom;
+        VariablePtr m_cVarLoop;
         /// Variable for current position of the stream
         VariablePtr m_cVarTime;
         /// Variable for audio volume

@@ -78,5 +78,25 @@ class CmdPlaylistRandom: public CmdGeneric
         bool m_value;
 };
 
+/// Command to set the loop state
+class CmdPlaylistLoop: public CmdGeneric
+{
+    public:
+        CmdPlaylistLoop( intf_thread_t *pIntf, bool value ):
+            CmdGeneric( pIntf ), m_value( value ) {}
+        virtual ~CmdPlaylistLoop() {}
+
+        /// This method does the real job of the command
+        virtual void execute();
+
+        /// Return the type of the command
+        virtual string getType() const { return "playlist loop"; }
+
+    private:
+        /// Loop state
+        bool m_value;
+};
+
+
 
 #endif
