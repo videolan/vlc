@@ -1,3 +1,9 @@
+vlc (0.2.92-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Christophe Massiot <massiot@via.ecp.fr>  Fri,  7 Dec 2001 20:18:56 +0100
+
 vlc (0.2.91-2) unstable; urgency=low
 
   * Added versioned build-dep to libasound2-dev (Closes: #121057).
