@@ -202,7 +202,8 @@ static int CreateVout( vlc_object_t *p_this )
     var_Create( p_sys->p_vout, "mouse-y", VLC_VAR_INTEGER );
     var_Create( p_sys->p_vout, "mouse-moved", VLC_VAR_BOOL );
     var_Create( p_sys->p_vout, "mouse-clicked", VLC_VAR_INTEGER );
-    var_Create( p_sys->p_vout, "video-on-top", VLC_VAR_BOOL );
+    var_Create( p_sys->p_vout, "video-on-top",
+                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     var_AddCallback( p_sys->p_vout, "mouse-x", SendEvents, p_vout );
     var_AddCallback( p_sys->p_vout, "mouse-y", SendEvents, p_vout );
