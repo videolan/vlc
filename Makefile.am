@@ -68,29 +68,25 @@ HEADERS_include = \
 	include/aout_internal.h \
 	include/audio_output.h \
 	include/beos_specific.h \
-	include/configuration.h \
-	include/darwin_specific.h \
 	include/charset.h \
 	include/codecs.h \
-	include/vlc_es_out.h \
-	include/vlc_input.h \
-	include/vlc_access.h \
-	include/vlc_stream.h \
-	include/vlc_demux.h \
+	include/configuration.h \
+	include/darwin_specific.h \
 	include/intf_eject.h \
 	include/iso_lang.h \
-	include/vlc_httpd.h \
 	include/main.h \
 	include/mmx.h \
 	include/modules.h \
 	include/modules_inner.h \
 	include/mtime.h \
 	include/network.h \
+	include/osd.h \
 	include/os_specific.h \
 	include/snapshot.h \
 	include/stream_output.h \
 	include/variables.h \
 	include/video_output.h \
+	include/vlc_access.h \
 	include/vlc_bits.h \
 	include/vlc_block.h \
 	include/vlc_block_helper.h \
@@ -98,22 +94,27 @@ HEADERS_include = \
 	include/vlc_common.h \
 	include/vlc_config.h \
 	include/vlc_cpu.h \
+	include/vlc_demux.h \
 	include/vlc_error.h \
 	include/vlc_es.h \
+	include/vlc_es_out.h \
 	include/vlc_help.h \
+	include/vlc_httpd.h \
+	include/vlc_input.h \
 	include/vlc_interface.h \
 	include/vlc_keys.h \
 	include/vlc_messages.h \
 	include/vlc_meta.h \
-	include/vlc_vlm.h \
 	include/vlc_objects.h \
+	include/vlc_opengl.h \
 	include/vlc_playlist.h \
-	include/vlc_threads.h \
+	include/vlc_stream.h \
 	include/vlc_threads_funcs.h \
+	include/vlc_threads.h \
 	include/vlc_video.h \
+	include/vlc_vlm.h \
 	include/vout_synchro.h \
 	include/win32_specific.h \
-	include/osd.h \
 	$(NULL)
 
 HEADERS_include_built = \
