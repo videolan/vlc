@@ -190,7 +190,7 @@
 #define INPUT_BROADCAST_DEFAULT         0
 
 /*
- * Vlan method
+ * Channel method
  */
 
 /* Default network interface and environment variable */
@@ -198,14 +198,14 @@
 #define INPUT_IFACE_DEFAULT             "eth0"
 
 /* Default server and port */
-#define INPUT_VLAN_SERVER_VAR           "vlc_vlan_server"
-#define INPUT_VLAN_SERVER_DEFAULT       "138.195.139.95"
-#define INPUT_VLAN_PORT_VAR             "vlc_vlan_port"
-#define INPUT_VLAN_PORT_DEFAULT         6010
+#define INPUT_CHANNEL_SERVER_VAR           "vlc_channel_server"
+#define INPUT_CHANNEL_SERVER_DEFAULT       "138.195.139.95"
+#define INPUT_CHANNEL_PORT_VAR             "vlc_channel_port"
+#define INPUT_CHANNEL_PORT_DEFAULT         6010
 
-/* Delay between vlan changes - this is required to avoid flooding the VLAN
- * server */
-#define INPUT_VLAN_CHANGE_DELAY         (mtime_t)(5*CLOCK_FREQ)
+/* Delay between channel changes - this is required to avoid flooding the 
+ * channel server */
+#define INPUT_CHANNEL_CHANGE_DELAY         (mtime_t)(5*CLOCK_FREQ)
 
 /* Duration between the time we receive the data packet, and the time we will
  * mark it to be presented */

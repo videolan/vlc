@@ -19,7 +19,7 @@
  * More informations about parameters stand in `list of commands' section.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_ctrl.c,v 1.35 2001/04/06 09:15:47 sam Exp $
+ * $Id: intf_ctrl.c,v 1.36 2001/04/11 02:01:24 henri Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -80,7 +80,7 @@ static int SpawnInput           ( int i_argc, intf_arg_t *p_argv );
 #ifdef DEBUG
 static int Test                 ( int i_argc, intf_arg_t *p_argv );
 #endif
-static int Vlan                 ( int i_argc, intf_arg_t *p_argv );
+static int Channel                 ( int i_argc, intf_arg_t *p_argv );
 static int Psi                  ( int i_argc, intf_arg_t *p_argv );
 
 /*
@@ -170,11 +170,12 @@ const intf_command_t control_command[] =
     /* help: */     "Spawn a decoder thread for <pid>. The stream will be" \
     " received by <input>." },
   { "spawn-input", SpawnInput,                                /* spawn-input */
-    /* format: */   "method=i? filename=s? hostname=s? ip=s? port=i? vlan=i?",
+    /* format: */   "method=i? filename=s? hostname=s? ip=s? port=i?"\
+    " channel=i?",
     /* summary: */  "spawn an input thread",
     /* summary: */  "spawn-input [method=<method>]\n" \
     "[filename=<file>|hostname=<hostname>|ip=<ip>]\n" \
-    "[port=<port>] [vlan=<vlan>]",
+    "[port=<port>] [channel=<channel>]",
     /* help: */     "Spawn an input thread. Method is 10, 20, 21, 22, 32, "\
     "hostname is the fully-qualified domain name, ip is a dotted-decimal address." },
 #ifdef DEBUG
@@ -186,16 +187,17 @@ const intf_command_t control_command[] =
     "developpers as an easy way to test part of their code. If you don't know "\
     "what it should do, just try !" },
 #endif
-  { "vlan", Vlan,
+  { "channel", Channel,
     /* format: */   "intf=s? s i? ",
-    /* summary: */  "vlan operations",
-    /* usage: */    "vlan synchro\n" \
-    "vlan [intf=<interface>] request\n" \
-    "vlan [intf=<interface>] join <vlan>\n" \
-    "vlan [intf=<interface>] leave",
-    /* help: */     "Perform various operations on vlans. 'synchro' resynchronize " \
-    "with the server. 'request' ask which is the current vlan (for the default "\
-    "interface or for a given one). 'join' and 'leave' try to change vlan." },
+    /* summary: */  "channel changing operations",
+    /* usage: */    "channel synchro\n" \
+    "channel [intf=<interface>] request\n" \
+    "channel [intf=<interface>] join <channel>\n" \
+    "channel [intf=<interface>] leave",
+    /* help: */     "Perform various operations on channels. 'synchro'"\
+    "resynchronize with the server. 'request' ask which is the current"\
+    "channel (for the default interface or for a given one)."\
+    "'join' and 'leave' try to change channel." },
   { "psi", Psi,
     /* format: */   "i ",
     /* summary: */  "Dump PSI tables",
@@ -529,18 +531,18 @@ static int Test( int i_argc, intf_arg_t *p_argv )
 #endif
 
 /*****************************************************************************
- * Vlan: vlan operations
+ * Channels: channel operations
  *****************************************************************************
- * This function performs various vlan operations.
+ * This function performs various channel operations.
  *****************************************************************************/
-static int Vlan( int i_argc, intf_arg_t *p_argv  )
+static int Channel( int i_argc, intf_arg_t *p_argv  )
 {
     int i_command;                                /* command argument number */
 
-    /* Do not try anything if vlans are deactivated */
-    if( !p_main->b_vlans )
+    /* Do not try anything if channel changing is desactivated */
+    if( !p_main->b_channels )
     {
-        intf_IntfMsg("vlans are deactivated");
+        intf_IntfMsg("channel changing is desactivated");
         return( INTF_OTHER_ERROR );
     }
 
@@ -564,7 +566,7 @@ static int Vlan( int i_argc, intf_arg_t *p_argv  )
     /* Command is unknown */
     else
     {
-        intf_IntfMsg("vlan error: unknown command %s", p_argv[i_command].psz_str );
+        intf_IntfMsg("channel error: unknown command %s", p_argv[i_command].psz_str );
         return( INTF_USAGE_ERROR );
     }
 

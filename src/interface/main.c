@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.82 2001/04/06 09:15:47 sam Exp $
+ * $Id: main.c,v 1.83 2001/04/11 02:01:24 henri Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -76,6 +76,8 @@
 #include "beos_specific.h"
 #endif
 
+#include "netutils.h"                                 /* network_ChannelJoin */
+
 #include "main.h"
 
 /*****************************************************************************
@@ -97,7 +99,7 @@
 #define OPT_FULLSCREEN          165
 #define OPT_OVERLAY             166
 
-#define OPT_VLANS               170
+#define OPT_CHANNELS            170
 #define OPT_SERVER              171
 #define OPT_PORT                172
 #define OPT_BROADCAST           173
@@ -159,7 +161,7 @@ static const struct option longopts[] =
     
     /* Input options */
     {   "input",            1,          0,      OPT_INPUT },
-    {   "vlans",            0,          0,      OPT_VLANS },
+    {   "channels",         0,          0,      OPT_CHANNELS },
     {   "server",           1,          0,      OPT_SERVER },
     {   "port",             1,          0,      OPT_PORT },
     {   "broadcast",        0,          0,      OPT_BROADCAST },
@@ -293,16 +295,13 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Initialize shared resources and libraries
      */
-    /* FIXME: no VLANs */
-#if 0
-    if( p_main->b_vlans && input_VlanCreate() )
+    if( p_main->b_channels && network_ChannelCreate() )
     {
-        /* On error during vlans initialization, switch off vlans */
-        intf_Msg( "Virtual LANs initialization failed : "
-                  "vlans management is deactivated" );
-        p_main->b_vlans = 0;
+        /* On error during Channels initialization, switch off channels */
+        intf_Msg( "Channels initialization failed : "
+                  "Channel management is deactivated" );
+        p_main->b_channels = 0;
     }
-#endif
 
     /*
      * Run interface
@@ -379,15 +378,12 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
 
     /*
-     * Free shared resources and libraries
+     * Go back into channel 0 which is the network
      */
-    /* FIXME */
-#if 0
-    if( p_main->b_vlans )
+    if( p_main->b_channels )
     {
-        input_VlanDestroy();
+        network_ChannelJoin( COMMON_CHANNEL );
     }
-#endif
 
     /*
      * Free module bank
@@ -518,9 +514,9 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->ppsz_argv = ppsz_argv;
     p_main->ppsz_env  = ppsz_env;
 
-    p_main->b_audio  = 1;
-    p_main->b_video  = 1;
-    p_main->b_vlans  = 0;
+    p_main->b_audio     = 1;
+    p_main->b_video     = 1;
+    p_main->b_channels  = 0;
 
     p_main->i_warning_level = 4;
 
@@ -651,8 +647,8 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_INPUT:                                           /* --input */
             main_PutPszVariable( INPUT_METHOD_VAR, optarg );
             break;
-        case OPT_VLANS:                                           /* --vlans */
-            p_main->b_vlans = 1;
+        case OPT_CHANNELS:                                     /* --channels */
+            p_main->b_channels = 1;
             break;
         case OPT_SERVER:                                         /* --server */
             main_PutPszVariable( INPUT_SERVER_VAR, optarg );
@@ -754,7 +750,7 @@ static void Usage( int i_fashion )
           "\n  -s, --dvdsubtitle <channel>    \tchoose DVD subtitle channel"
           "\n"
           "\n      --input                    \tinput method"
-          "\n      --vlans                    \tenable vlans"
+          "\n      --channels                    \tenable channels"
           "\n      --server <host>            \tvideo server address"
           "\n      --port <port>              \tvideo server port"
           "\n      --broadcast                \tlisten to a broadcast"
@@ -809,8 +805,8 @@ static void Usage( int i_fashion )
         "\n  " INPUT_PORT_VAR "=<port>            \tvideo server port"
         "\n  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface"
         "\n  " INPUT_BROADCAST_VAR "={1|0}            \tbroadcast mode"
-        "\n  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server"
-        "\n  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port" );
+        "\n  " INPUT_CHANNEL_SERVER_VAR "=<hostname>     \tchannel server"
+        "\n  " INPUT_CHANNEL_PORT_VAR "=<port>         \tchannel server port" );
 
 }
 

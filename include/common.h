@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.29 2001/03/16 22:37:06 massiot Exp $
+ * $Id: common.h,v 1.30 2001/04/11 02:01:24 henri Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -103,11 +103,11 @@ typedef struct intf_channel_s *         p_intf_channel_t;
 
 /* Input */
 struct input_thread_s;
-struct input_vlan_s;
+struct input_channel_s;
 struct input_cfg_s;
 
 typedef struct input_thread_s *         p_input_thread_t;
-typedef struct input_vlan_s *           p_input_vlan_t;
+typedef struct input_channel_s *        p_input_channel_t;
 typedef struct input_cfg_s *            p_input_cfg_t;
 
 /* Audio */

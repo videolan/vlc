@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_sdl.c,v 1.46 2001/04/06 09:15:47 sam Exp $
+ * $Id: vout_sdl.c,v 1.47 2001/04/11 02:01:24 henri Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -52,6 +52,7 @@
 /* FIXME: get rid of this */
 #include "keystrokes.h"
 #include "main.h"
+#include "netutils.h"
 
 /*****************************************************************************
  * FIXME: this file is ...                                                   *
@@ -274,7 +275,7 @@ static void vout_Destroy( vout_thread_t *p_vout )
 static int vout_Manage( vout_thread_t *p_vout )
 {
     SDL_Event event;                                            /* SDL event */
-    Uint8     i_key;
+    char *    p_key;
 
     /* Process events */
     while( SDL_PollEvent(&event) )
@@ -326,9 +327,8 @@ static int vout_Manage( vout_thread_t *p_vout )
             break;
 
         case SDL_KEYDOWN:                             /* if a key is pressed */
-            i_key = event.key.keysym.sym;
 
-            switch( i_key )
+            switch( event.key.keysym.sym )
             {
             case SDLK_f:                             /* switch to fullscreen */
                 p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
@@ -357,11 +357,51 @@ static int vout_Manage( vout_thread_t *p_vout )
                 p_vout->b_interface = ! p_vout->b_interface;
                 p_vout->i_changes |= VOUT_INTF_CHANGE;
                 break;
+            
+            case SDLK_F10:
+                network_ChannelJoin( 0 );
+                break;
+            case SDLK_F1:
+                network_ChannelJoin( 1 );
+                break;
+            case SDLK_F2:
+                network_ChannelJoin( 2 );
+                break;
+            case SDLK_F3:
+                network_ChannelJoin( 3 );
+                break;
+            case SDLK_F4:
+                network_ChannelJoin( 4 );
+                break;
+            case SDLK_F5:
+                network_ChannelJoin( 5 );
+                break;
+            case SDLK_F6:
+                network_ChannelJoin( 6 );
+                break;
+            case SDLK_F7:
+                network_ChannelJoin( 7 );
+                break;
+            case SDLK_F8:
+                network_ChannelJoin( 8 );
+                break;
+            case SDLK_F9:
+                network_ChannelJoin( 9 );
+                break;
 
+            case SDLK_MENU:
+                p_main->p_intf->b_menu_change = 1;
+                break;
+                
             default:
-                if( intf_ProcessKey( p_main->p_intf, (char )i_key ) )
+                p_key = SDL_GetKeyName( event.key.keysym.sym ) ;
+                if( intf_ProcessKey( p_main->p_intf, 
+                                     (char )event.key.keysym.sym ) )
                 {
-                   intf_DbgMsg( "unhandled key '%c' (%i)", (char)i_key, i_key );                }
+                   intf_DbgMsg( "unhandled key '%c' (%i)", 
+                                (char)event.key.keysym.sym, 
+                                event.key.keysym.sym );                
+                }
                 break;
             }
             break;

@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: interface.c,v 1.71 2001/03/21 13:42:34 sam Exp $
+ * $Id: interface.c,v 1.72 2001/04/11 02:01:24 henri Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -322,16 +322,18 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
     keyparm k_reply;
     
     k_reply = intf_GetKey( p_intf, g_key); 
-    
     switch( k_reply.key )
     {
-    case INTF_KEY_QUIT:                                                  /* quit order */
+    case INTF_KEY_QUIT:                                        /* quit order */
         p_intf->b_die = 1;
         break;
     case INTF_KEY_SET_CHANNEL:
         /* Change channel - return code is ignored since SelectChannel displays
          * its own error messages */
-        intf_SelectChannel( p_intf, k_reply.param );
+/*        intf_SelectChannel( p_intf, k_reply.param ); */
+/*        network_ChannelJoin() */
+/* FIXME : keyboard event is for the time being half handled by the interface
+ * half handled directly by the plugins. We should decide what to do. */        
         break;
     case INTF_KEY_INC_VOLUME:                                    /* volume + */
         if( (p_main->p_aout != NULL) && (p_main->p_aout->vol < VOLUME_MAX) )
@@ -380,4 +382,3 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
 
     return( 0 );
 }
-

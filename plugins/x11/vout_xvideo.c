@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.4 2001/04/08 16:57:47 sam Exp $
+ * $Id: vout_xvideo.c,v 1.5 2001/04/11 02:01:24 henri Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -63,6 +63,8 @@
 #include "interface.h"
 #include "intf_msg.h"
 
+#include "netutils.h"                                 /* network_ChannelJoin */
+
 #include "main.h"
 
 /*****************************************************************************
@@ -105,7 +107,10 @@ typedef struct vout_sys_s
     int                 i_ss_interval;           /* interval between changes */
     int                 i_ss_blanking;                      /* blanking mode */
     int                 i_ss_exposure;                      /* exposure mode */
-
+    
+    /* Auto-hide cursor */
+    mtime_t     i_lastmoved;
+    
     /* Mouse pointer properties */
     boolean_t           b_mouse;         /* is the mouse pointer displayed ? */
 
@@ -331,6 +336,7 @@ static int vout_Manage( vout_thread_t *p_vout )
     XEvent      xevent;                                         /* X11 event */
     boolean_t   b_resized;                        /* window has been resized */
     char        i_key;                                    /* ISO Latin-1 key */
+    KeySym      x_key_symbol;
 
     /* Handle X11 events: ConfigureNotify events are parsed to know if the
      * output window's size changed, MapNotify and UnmapNotify to know if the
@@ -339,7 +345,8 @@ static int vout_Manage( vout_thread_t *p_vout )
     b_resized = 0;
     while( XCheckWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
                               StructureNotifyMask | KeyPressMask |
-                              ButtonPressMask | ButtonReleaseMask, &xevent )
+                              ButtonPressMask | ButtonReleaseMask | 
+                              PointerMotionMask, &xevent )
            == True )
     {
         /* ConfigureNotify event: prepare  */
@@ -375,16 +382,73 @@ static int vout_Manage( vout_thread_t *p_vout )
         /* Keyboard event */
         else if( xevent.type == KeyPress )
         {
-            if( XLookupString( &xevent.xkey, &i_key, 1, NULL, NULL ) )
+            /* We may have keys like F1 trough F12, ESC ... */
+            x_key_symbol = XKeycodeToKeysym( p_vout->p_sys->p_display,
+                                             xevent.xkey.keycode, 0 );
+            switch( x_key_symbol )
             {
-                /* FIXME: handle stuff here */
-                switch( i_key )
-                {
-                case 'q':
-                    /* FIXME: need locking ! */
-                    p_main->p_intf->b_die = 1;
-                    break;
-                }
+                 case XK_Escape:
+                     p_main->p_intf->b_die = 1;
+                     break;
+                 case XK_Menu:
+                     p_main->p_intf->b_menu_change = 1;
+                     break;
+                 default:
+                     /* "Normal Keys"
+                      * The reason why I use this instead of XK_0 is that 
+                      * with XLookupString, we don't have to care about
+                      * keymaps. */
+
+                    if( XLookupString( &xevent.xkey, &i_key, 1, NULL, NULL ) )
+                    {
+                        /* FIXME: handle stuff here */
+                        switch( i_key )
+                        {
+                        case 'q':
+                        case 'Q':
+                            p_main->p_intf->b_die = 1;
+                            break;
+                        case '0':
+                            network_ChannelJoin( 0 );
+                            break;
+                        case '1':
+                            network_ChannelJoin( 1 );
+                            break;
+                        case '2':
+                            network_ChannelJoin( 2 );
+                            break;
+                        case '3':
+                            network_ChannelJoin( 3 );
+                            break;
+                        case '4':
+                            network_ChannelJoin( 4 );
+                            break;
+                        case '5':
+                            network_ChannelJoin( 5 );
+                            break;
+                        case '6':
+                            network_ChannelJoin( 6 );
+                            break;
+                        case '7':
+                            network_ChannelJoin( 7 );
+                            break;
+                        case '8':
+                            network_ChannelJoin( 8 );
+                            break;
+                        case '9':
+                            network_ChannelJoin( 9 );
+                            break;
+                        default:
+                            if( intf_ProcessKey( p_main->p_intf, 
+                                                 (char )i_key ) )
+                            {
+                               intf_DbgMsg( "unhandled key '%c' (%i)", 
+                                            (char)i_key, i_key );
+                            }
+                            break;
+                        }
+                    }
+                break;
             }
         }
         /* Mouse click */
@@ -395,10 +459,6 @@ static int vout_Manage( vout_thread_t *p_vout )
                 case Button1:
                     /* in this part we will eventually manage
                      * clicks for DVD navigation for instance */
-                    break;
-
-                case Button2:
-                    XVideoTogglePointer( p_vout );
                     break;
             }
         }
@@ -413,6 +473,16 @@ static int vout_Manage( vout_thread_t *p_vout )
                     break;
             }
         }
+        /* Mouse move */
+        else if( xevent.type == MotionNotify )
+        {
+            p_vout->p_sys->i_lastmoved = mdate();
+            if( ! p_vout->p_sys->b_mouse )
+            {
+                XVideoTogglePointer( p_vout ); 
+            }
+        }
+        
 #ifdef DEBUG
         /* Other event */
         else
@@ -482,6 +552,16 @@ static int vout_Manage( vout_thread_t *p_vout )
                   p_vout->i_width, p_vout->i_height );
     }
 
+    /* Autohide Cursour */
+    if( mdate() - p_vout->p_sys->i_lastmoved > 2000000 )
+    {
+        /* Hide the mouse automatically */
+        if( p_vout->p_sys->b_mouse )
+        {
+            XVideoTogglePointer( p_vout ); 
+        }
+    }
+    
     return 0;
 }
 
@@ -684,7 +764,8 @@ static int XVideoCreateWindow( vout_thread_t *p_vout )
 
     XSelectInput( p_vout->p_sys->p_display, p_vout->p_sys->window,
                   StructureNotifyMask | KeyPressMask |
-                  ButtonPressMask | ButtonReleaseMask );
+                  ButtonPressMask | ButtonReleaseMask | 
+                  PointerMotionMask );
 
     /* At this stage, the window is open, displayed, and ready to
      * receive data */
