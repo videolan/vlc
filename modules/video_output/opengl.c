@@ -66,11 +66,18 @@ static inline int GetAlignedSize( int );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define EFFECT_TEXT N_("Select effect")
+#define EFFECT_LONGTEXT N_( \
+    "Allows you to select different visual effects.")
+
 vlc_module_begin();
     set_description( _("OpenGL video output") );
     set_capability( "video output", 20 );
     add_shortcut( "opengl" );
     set_callbacks( CreateVout, DestroyVout );
+
+    add_integer( "opengl-effect", 0, NULL, EFFECT_TEXT,
+                 EFFECT_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************
@@ -89,7 +96,7 @@ struct vout_sys_t
     int         i_tex_height;
     GLuint      texture;
 
-    int         i_effect; //XXX
+    int         i_effect;
 };
 
 /*****************************************************************************
@@ -99,6 +106,7 @@ static int CreateVout( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_sys_t *p_sys;
+    vlc_value_t val;
 
     /* Allocate structure */
     p_vout->p_sys = p_sys = malloc( sizeof( vout_sys_t ) );
@@ -108,8 +116,9 @@ static int CreateVout( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    //XXX set to 0 to disable the cube effect
-    p_sys->i_effect = 1;
+    var_Create( p_vout, "opengl-effect", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_vout, "opengl-effect", &val );
+    p_sys->i_effect = val.i_int;
 
     /* A texture must have a size aligned on a power of 2 */
     p_sys->i_tex_width  = GetAlignedSize( p_vout->render.i_width );
@@ -134,6 +143,8 @@ static int CreateVout( vlc_object_t *p_this )
     p_sys->p_vout->render.i_width = p_vout->render.i_width;
     p_sys->p_vout->render.i_height = p_vout->render.i_height;
     p_sys->p_vout->render.i_aspect = p_vout->render.i_aspect;
+    p_sys->p_vout->b_scale = p_vout->b_scale;
+    p_sys->p_vout->i_alignment = p_vout->i_alignment;
 
     p_sys->p_vout->p_module =
         module_Need( p_sys->p_vout, "opengl provider", NULL, 0 );
@@ -221,15 +232,25 @@ static int Init( vout_thread_t *p_vout )
     I_OUTPUTPICTURES = 1;
 
     /* Set the texture parameters */
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1.0 );
+
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
-    if( p_sys->i_effect )
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+
+    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_CULL_FACE);
+    glClear( GL_COLOR_BUFFER_BIT );
+
+    if( p_sys->i_effect == 1 )
     {
         glEnable( GL_CULL_FACE);
-        /* glDisable( GL_DEPTH_TEST );
-        glEnable( GL_BLEND );
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE );*/
 
         /* Set the perpective */
         glMatrixMode( GL_PROJECTION );
@@ -281,6 +302,7 @@ static void DestroyVout( vlc_object_t *p_this )
 static int Manage( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
+
     return p_sys->p_vout->pf_manage( p_sys->p_vout );
 }
 
@@ -293,13 +315,11 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     float f_width = (float)p_vout->output.i_width / p_sys->i_tex_width;
     float f_height = (float)p_vout->output.i_height / p_sys->i_tex_height;
 
-    glClear( GL_COLOR_BUFFER_BIT );
-
     glTexImage2D( GL_TEXTURE_2D, 0, 3,
                   p_sys->i_tex_width, p_sys->i_tex_height , 0,
                   VLCGL_RGB_FORMAT, VLCGL_RGB_TYPE, p_sys->p_buffer );
 
-    if( !p_sys->i_effect )
+    if( p_sys->i_effect != 1 )
     {
         glEnable( GL_TEXTURE_2D );
         glBegin( GL_POLYGON );

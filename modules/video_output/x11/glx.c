@@ -306,6 +306,13 @@ int InitGLX13( vout_thread_t *p_vout )
 static void SwapBuffers( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
+    int i_width, i_height, i_x, i_y;
+
+    vout_PlacePicture( p_vout, p_vout->p_sys->p_win->i_width,
+                       p_vout->p_sys->p_win->i_height,
+                       &i_x, &i_y, &i_width, &i_height );
+
+    glViewport( 0, 0, (GLint)i_width, (GLint)i_height );
 
     if( p_sys->b_glx13 )
     {
