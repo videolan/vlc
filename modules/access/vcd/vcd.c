@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.18 2003/03/30 18:14:36 gbazin Exp $
+ * $Id: vcd.c,v 1.19 2003/05/04 22:42:15 gbazin Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -409,12 +409,12 @@ static int VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         /* Update the navigation variables without triggering a callback */
         val.i_int = p_area->i_id;
-        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val );
-        var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL );
+        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
+        var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL, NULL );
         for( i = 1; i <= p_area->i_part_nb; i++ )
         {
             val.i_int = i;
-            var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val );
+            var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val, NULL );
         }
     }
 
@@ -438,7 +438,7 @@ static int VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
     /* Update the navigation variables without triggering a callback */
     val.i_int = p_area->i_part;
-    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
 
     return 0;
 }

@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.5 2003/03/30 18:14:38 gbazin Exp $
+ * $Id: dummy.c,v 1.6 2003/05/04 22:42:17 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -53,6 +53,7 @@ vlc_module_begin();
     set_description( _("dummy functions") );
     add_shortcut( "vlc" );
     add_submodule();
+        set_description( _("dummy interface function") );
         set_capability( "interface", 0 );
         set_callbacks( E_(OpenIntf), NULL );
 #ifdef WIN32
@@ -60,18 +61,23 @@ vlc_module_begin();
         add_bool( "dummy-quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_FALSE );
 #endif
     add_submodule();
+        set_description( _("dummy access function") );
         set_capability( "access", 0 );
         set_callbacks( E_(OpenAccess), NULL );
     add_submodule();
+        set_description( _("dummy demux function") );
         set_capability( "demux", 0 );
         set_callbacks( E_(OpenDemux), E_(CloseDemux) );
     add_submodule();
+        set_description( _("dummy decoder function") );
         set_capability( "decoder", 0 );
         set_callbacks( E_(OpenDecoder), NULL );
     add_submodule();
+        set_description( _("dummy audio output function") );
         set_capability( "audio output", 1 );
         set_callbacks( E_(OpenAudio), NULL );
     add_submodule();
+        set_description( _("dummy video output function") );
         set_capability( "video output", 1 );
         set_callbacks( E_(OpenVideo), NULL );
         add_category_hint( N_("Video"), NULL, VLC_FALSE );

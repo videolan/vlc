@@ -2,7 +2,7 @@
  * coreaudio.c: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: coreaudio.c,v 1.2 2003/05/04 15:02:42 massiot Exp $
+ * $Id: coreaudio.c,v 1.3 2003/05/04 22:42:15 gbazin Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -1119,14 +1119,7 @@ static int InitDevice( aout_instance_t * p_aout )
         return( VLC_ENOVAR );
     }
 
-    if( !sscanf( val.psz_string, "%d:", &i_option ) ||
-        p_sys->i_options <= i_option )
-    {
-        i_option = 0;
-    }
-
-    free( (void *)val.psz_string );
-
+    i_option = val.i_int;
     p_option = &p_sys->p_options[i_option];
     p_dev = &p_sys->p_devices[p_option->i_dev];
 
@@ -1450,7 +1443,7 @@ static void InitDeviceVar( aout_instance_t * p_aout, int i_option,
                            vlc_bool_t b_change )
 { 
     UInt32 i;
-    vlc_value_t val;
+    vlc_value_t val, text;
 
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
@@ -1466,13 +1459,15 @@ static void InitDeviceVar( aout_instance_t * p_aout, int i_option,
         }
     }
 
-    var_Create( p_aout, "audio-device", VLC_VAR_STRING | 
-                                        VLC_VAR_HASCHOICE );
+    var_Create( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    text.psz_string = _("Audio device");
+    var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
 
     for( i = 0; i < p_sys->i_options; i++ )
     {
-        val.psz_string = p_sys->p_options[i].sz_option;
-        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+        text.psz_string = p_sys->p_options[i].sz_option;
+        val.i_int = i;
+        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
 
         if( !b_change && i == (UInt32)i_option )
         {
@@ -1487,7 +1482,7 @@ static void InitDeviceVar( aout_instance_t * p_aout, int i_option,
 
     if( b_change )
     {
-        val.psz_string = p_sys->p_options[i_option].sz_option;
+        val.i_int = i_option;
         var_Set( p_aout, "audio-device", val );
     }
 

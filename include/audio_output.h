@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.79 2003/02/11 11:16:04 massiot Exp $
+ * $Id: audio_output.h,v 1.80 2003/05/04 22:42:14 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -122,6 +122,20 @@ typedef int32_t vlc_fixed_t;
 
 #define AOUT_CHAN_PHYSMASK          0xFFFF
 
+/* Values used for the audio-device and audio-channels object variables */
+#define AOUT_VAR_MONO               1
+#define AOUT_VAR_STEREO             2
+#define AOUT_VAR_2F2R               3
+#define AOUT_VAR_5_1                4
+#define AOUT_VAR_6_1                5
+#define AOUT_VAR_7_1                6
+#define AOUT_VAR_SPDIF              7
+
+#define AOUT_VAR_CHAN_STEREO        1
+#define AOUT_VAR_CHAN_RSTEREO       2
+#define AOUT_VAR_CHAN_LEFT          3
+#define AOUT_VAR_CHAN_RIGHT         4
+#define AOUT_VAR_CHAN_DOLBYS        5
 
 /*****************************************************************************
  * aout_buffer_t : audio output buffer

@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.48 2003/03/11 23:56:54 gbazin Exp $
+ * $Id: input_ext-intf.c,v 1.49 2003/05/04 22:42:17 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -384,7 +384,7 @@ int input_ChangeProgram( input_thread_t * p_input, uint16_t i_program_number )
 
     /* Update the navigation variables without triggering a callback */
     val.i_int = i_program_number;
-    var_Change( p_input, "program", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "program", VLC_VAR_SETVALUE, &val, NULL );
 
     return 0;
 }

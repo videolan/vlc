@@ -2,7 +2,7 @@
  * test4.c : Miscellaneous stress tests module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: test4.c,v 1.6 2002/12/14 19:34:06 gbazin Exp $
+ * $Id: test4.c,v 1.7 2003/05/04 22:42:17 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -87,12 +87,12 @@ static int Foo( vlc_object_t *p_this, char const *psz_cmd,
     var_Create( p_this, "honk", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
 
     val.psz_string = "foo";
-    var_Change( p_this, "honk", VLC_VAR_ADDCHOICE, &val );
+    var_Change( p_this, "honk", VLC_VAR_ADDCHOICE, &val, NULL );
     val.psz_string = "bar";
-    var_Change( p_this, "honk", VLC_VAR_ADDCHOICE, &val );
+    var_Change( p_this, "honk", VLC_VAR_ADDCHOICE, &val, NULL );
     val.psz_string = "baz";
-    var_Change( p_this, "honk", VLC_VAR_ADDCHOICE, &val );
-    var_Change( p_this, "honk", VLC_VAR_SETDEFAULT, &val );
+    var_Change( p_this, "honk", VLC_VAR_ADDCHOICE, &val, NULL );
+    var_Change( p_this, "honk", VLC_VAR_SETDEFAULT, &val, NULL );
 
     var_Get( p_this, "honk", &val ); printf( "value: %s\n", val.psz_string );
 
@@ -107,16 +107,16 @@ static int Foo( vlc_object_t *p_this, char const *psz_cmd,
     var_Get( p_this, "honk", &val ); printf( "value: %s\n", val.psz_string );
 
     val.psz_string = "baz";
-    var_Change( p_this, "honk", VLC_VAR_DELCHOICE, &val );
+    var_Change( p_this, "honk", VLC_VAR_DELCHOICE, &val, NULL );
 
     var_Get( p_this, "honk", &val ); printf( "value: %s\n", val.psz_string );
 
-    var_Change( p_this, "honk", VLC_VAR_GETLIST, &val );
+    var_Change( p_this, "honk", VLC_VAR_GETLIST, &val, NULL );
     for( i = 0 ; i < val.p_list->i_count ; i++ )
     {
         printf( "value %i: %s\n", i, val.p_list->p_values[i].psz_string );
     }
-    var_Change( p_this, "honk", VLC_VAR_FREELIST, &val );
+    var_Change( p_this, "honk", VLC_VAR_FREELIST, &val, NULL );
 
     var_Destroy( p_this, "honk" );
 

@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.18 2003/04/21 16:55:53 anil Exp $
+ * $Id: wxwindows.h,v 1.19 2003/05/04 22:42:16 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -154,6 +154,9 @@ private:
     void OnPrevStream( wxCommandEvent& event );
     void OnNextStream( wxCommandEvent& event );
 
+    void OnMenuOpen( wxMenuEvent& event );
+    void OnMenuClose( wxMenuEvent& event );
+
     DECLARE_EVENT_TABLE();
 
     Timer *timer;
@@ -162,6 +165,12 @@ private:
     wxFrame *p_prefs_dialog;
 
     int i_old_playing_status;
+
+    /* For auto-generated menus */
+    wxMenu *p_audio_menu;
+    vlc_bool_t b_audio_menu;
+    wxMenu *p_video_menu;
+    vlc_bool_t b_video_menu;
 };
 
 /* Open Dialog */
@@ -432,38 +441,18 @@ private:
 };
 #endif
 
-/* Popup contextual menu */
-class PopupMenu: public wxMenu
+/* Menus */
+void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface );
+wxMenu *AudioMenu( intf_thread_t *_p_intf, Interface *_p_main_interface );
+wxMenu *VideoMenu( intf_thread_t *_p_intf, Interface *_p_main_interface );
+
+class MenuEvtHandler : public wxEvtHandler
 {
 public:
-    /* Constructor */
-    PopupMenu( intf_thread_t *p_intf, Interface *p_main_interface );
-    virtual ~PopupMenu();
+    MenuEvtHandler( intf_thread_t *p_intf, Interface *p_main_interface );
+    virtual ~MenuEvtHandler();
 
-private:
-    /* Event handlers (these functions should _not_ be virtual) */
-    void OnClose( wxCommandEvent& event );
-    void OnEntrySelected( wxCommandEvent& event );
-
-    wxMenu *PopupMenu::CreateDummyMenu();
-    void   PopupMenu::CreateMenuEntry( char *, vlc_object_t * );
-    wxMenu *PopupMenu::CreateSubMenu( char *, vlc_object_t * );
-
-    DECLARE_EVENT_TABLE();
-
-    intf_thread_t *p_intf;
-    Interface *p_main_interface;
-
-    int  i_item_id;
-};
-
-class PopupEvtHandler : public wxEvtHandler
-{
-public:
-    PopupEvtHandler( intf_thread_t *p_intf, Interface *p_main_interface );
-    virtual ~PopupEvtHandler();
-
-    void PopupEvtHandler::OnMenuEvent( wxCommandEvent& event );
+    void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event );
 
 private:
 
@@ -473,29 +462,27 @@ private:
     Interface *p_main_interface;
 };
 
-class wxMenuItemExt: public wxMenuItem
+class Menu: public wxMenu
 {
 public:
     /* Constructor */
-    wxMenuItemExt( wxMenu* parentMenu, int id,
-                   const wxString& text,
-                   const wxString& helpString,
-                   wxItemKind kind,
-                   char *_psz_var, int _i_object_id, vlc_value_t _val ):
-        wxMenuItem( parentMenu, id, text, helpString, kind )
-    {
-        /* Initializations */
-        psz_var = _psz_var;
-        i_object_id = _i_object_id;
-        val = _val;
-    };
-
-    virtual ~wxMenuItemExt() { if( psz_var ) free( psz_var ); };
-
-    char *psz_var;
-    int  i_object_id;
-    vlc_value_t val;
+    Menu( intf_thread_t *p_intf, Interface *p_main_interface, int i_count,
+          char **ppsz_names, int *pi_objects );
+    virtual ~Menu();
 
 private:
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnClose( wxCommandEvent& event );
+    void OnEntrySelected( wxCommandEvent& event );
 
+    wxMenu *Menu::CreateDummyMenu();
+    void   Menu::CreateMenuItem( wxMenu *, char *, vlc_object_t * );
+    wxMenu *Menu::CreateChoicesMenu( char *, vlc_object_t * );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+    Interface *p_main_interface;
+
+    int  i_item_id;
 };

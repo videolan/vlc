@@ -437,7 +437,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
 
     /* Update the navigation variables without triggering a callback */
     val.i_int = p_new_prg->i_number;
-    var_Change( p_input, "program", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "program", VLC_VAR_SETVALUE, &val, NULL );
 
     return 0;
 }

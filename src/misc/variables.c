@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.21 2003/03/11 23:56:54 gbazin Exp $
+ * $Id: variables.c,v 1.22 2003/05/04 22:42:18 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -54,9 +54,64 @@ static int CmpAddress( vlc_value_t v, vlc_value_t w ) { return v.p_address == w.
 static void DupDummy( vlc_value_t *p_val ) { (void)p_val; /* unused */ }
 static void DupString( vlc_value_t *p_val ) { p_val->psz_string = strdup( p_val->psz_string ); }
 
+static void DupList( vlc_value_t *p_val )
+{
+    int i;
+    vlc_list_t *p_list = malloc( sizeof(vlc_list_t) );
+
+    if( p_val->p_list->i_count )
+    {
+        p_list->i_count = p_val->p_list->i_count;
+        p_list->p_values = malloc( p_list->i_count * sizeof(vlc_value_t) );
+        p_list->pi_types = malloc( p_list->i_count * sizeof(int) );
+    }
+
+    for( i = 0; i < p_list->i_count; i++ )
+    {
+        p_list->p_values[i] = p_val->p_list->p_values[i];
+        switch( p_val->p_list->pi_types[i] & VLC_VAR_TYPE )
+        {
+        case VLC_VAR_STRING:
+            
+            DupString( &p_list->p_values[i] );
+            break;
+        default:
+            break;
+        }
+    }
+
+    p_val->p_list = p_list;
+}
+
 static void FreeDummy( vlc_value_t *p_val ) { (void)p_val; /* unused */ }
 static void FreeString( vlc_value_t *p_val ) { free( p_val->psz_string ); }
 static void FreeMutex( vlc_value_t *p_val ) { vlc_mutex_destroy( (vlc_mutex_t*)p_val->p_address ); free( p_val->p_address ); }
+
+static void FreeList( vlc_value_t *p_val )
+{
+    int i;
+    for( i = 0; i < p_val->p_list->i_count; i++ )
+    {
+        switch( p_val->p_list->pi_types[i] & VLC_VAR_TYPE )
+        {
+        case VLC_VAR_STRING:
+            FreeString( &p_val->p_list->p_values[i] );
+            break;
+        case VLC_VAR_MUTEX:
+            FreeMutex( &p_val->p_list->p_values[i] );
+            break;
+        default:
+            break;
+        }
+    }
+
+    if( p_val->p_list->i_count )
+    {
+        free( p_val->p_list->p_values );
+        free( p_val->p_list->pi_types );
+    }
+    free( p_val->p_list );
+}
 
 /*****************************************************************************
  * Local prototypes
@@ -81,6 +136,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 {
     int i_new;
     variable_t *p_var;
+    static vlc_list_t dummy_null_list = {0, NULL, NULL};
 
     vlc_mutex_lock( &p_this->var_lock );
 
@@ -122,6 +178,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 
     p_var->i_hash = HashString( psz_name );
     p_var->psz_name = strdup( psz_name );
+    p_var->psz_text = NULL;
 
     p_var->i_type = i_type;
     memset( &p_var->val, 0, sizeof(vlc_value_t) );
@@ -134,6 +191,8 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     p_var->i_default = -1;
     p_var->choices.i_count = 0;
     p_var->choices.p_values = NULL;
+    p_var->choices_text.i_count = 0;
+    p_var->choices_text.p_values = NULL;
 
     p_var->b_incallback = VLC_FALSE;
     p_var->i_entries = 0;
@@ -178,6 +237,12 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             p_var->pf_free = FreeMutex;
             p_var->val.p_address = malloc( sizeof(vlc_mutex_t) );
             vlc_mutex_init( p_this, (vlc_mutex_t*)p_var->val.p_address );
+            break;
+        case VLC_VAR_LIST:
+            p_var->pf_cmp = CmpAddress;
+            p_var->pf_dup = DupList;
+            p_var->pf_free = FreeList;
+            p_var->val.p_list = &dummy_null_list;
             break;
     }
 
@@ -238,6 +303,7 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
     }
 
     free( p_var->psz_name );
+    if( p_var->psz_text ) free( p_var->psz_text );
 
     memmove( p_this->p_vars + i_var,
              p_this->p_vars + i_var + 1,
@@ -262,7 +328,7 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
  *
  *****************************************************************************/
 int __var_Change( vlc_object_t *p_this, const char *psz_name,
-                  int i_action, vlc_value_t *p_val )
+                  int i_action, vlc_value_t *p_val, vlc_value_t *p_val2 )
 {
     int i_var, i;
     variable_t *p_var;
@@ -332,7 +398,12 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
 
             INSERT_ELEM( p_var->choices.p_values, p_var->choices.i_count,
                          i, *p_val );
+            INSERT_ELEM( p_var->choices_text.p_values,
+                         p_var->choices_text.i_count, i, (vlc_value_t)0 );
             p_var->pf_dup( &p_var->choices.p_values[i] );
+            p_var->choices_text.p_values[i].psz_string =
+                ( p_val2 && p_val2->psz_string ) ?
+                strdup( p_val2->psz_string ) : NULL;
 
             CheckValue( p_var, &p_var->val );
             break;
@@ -363,9 +434,16 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             }
 
             p_var->pf_free( &p_var->choices.p_values[i] );
+            if( p_var->choices_text.p_values[i].psz_string )
+                free( p_var->choices_text.p_values[i].psz_string );
             REMOVE_ELEM( p_var->choices.p_values, p_var->choices.i_count, i );
+            REMOVE_ELEM( p_var->choices_text.p_values,
+                         p_var->choices_text.i_count, i );
 
             CheckValue( p_var, &p_var->val );
+            break;
+        case VLC_VAR_CHOICESCOUNT:
+            p_val->i_int = p_var->choices.i_count;
             break;
         case VLC_VAR_CLEARCHOICES:
             for( i = 0 ; i < p_var->choices.i_count ; i++ )
@@ -410,26 +488,54 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             /* Free data if needed */
             p_var->pf_free( &oldval );
             break;
+        case VLC_VAR_GETCHOICES:
         case VLC_VAR_GETLIST:
             p_val->p_list = malloc( sizeof(vlc_list_t) );
+            if( p_val2 ) p_val2->p_list = malloc( sizeof(vlc_list_t) );
             if( p_var->choices.i_count )
+            {
                 p_val->p_list->p_values = malloc( p_var->choices.i_count
                                                   * sizeof(vlc_value_t) );
+                p_val->p_list->pi_types = malloc( p_var->choices.i_count
+                                                  * sizeof(int) );
+                if( p_val2 )
+                {
+                    p_val2->p_list->p_values =
+                        malloc( p_var->choices.i_count * sizeof(vlc_value_t) );
+                    p_val2->p_list->pi_types =
+                        malloc( p_var->choices.i_count * sizeof(int) );
+                }
+            }
             p_val->p_list->i_count = p_var->choices.i_count;
+            if( p_val2 ) p_val2->p_list->i_count = p_var->choices.i_count;
             for( i = 0 ; i < p_var->choices.i_count ; i++ )
             {
                 p_val->p_list->p_values[i] = p_var->choices.p_values[i];
+                p_val->p_list->pi_types[i] = p_var->i_type;
                 p_var->pf_dup( &p_val->p_list->p_values[i] );
+                if( p_val2 )
+                {
+                    p_val2->p_list->p_values[i].psz_string =
+                        p_var->choices_text.p_values[i].psz_string ?
+                    strdup(p_var->choices_text.p_values[i].psz_string) : NULL;
+                    p_val2->p_list->pi_types[i] = VLC_VAR_STRING;
+                }
             }
             break;
         case VLC_VAR_FREELIST:
-            for( i = p_val->p_list->i_count ; i-- ; )
+            FreeList( p_val );
+            break;
+        case VLC_VAR_SETTEXT:
+            if( p_var->psz_text ) free( p_var->psz_text );
+            if( p_val && p_val->psz_string )
+                p_var->psz_text = strdup( p_val->psz_string );
+            break;
+        case VLC_VAR_GETTEXT:
+            p_val->psz_string = NULL;
+            if( p_var->psz_text )
             {
-                p_var->pf_free( &p_val->p_list->p_values[i] );
+                p_val->psz_string = strdup( p_var->psz_text );
             }
-            if( p_val->p_list->i_count )
-                free( p_val->p_list->p_values );
-            free( p_val->p_list );
             break;
 
         default:

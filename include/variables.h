@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.12 2003/03/11 23:56:53 gbazin Exp $
+ * $Id: variables.h,v 1.13 2003/05/04 22:42:14 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -37,6 +37,9 @@ struct variable_t
     uint32_t     i_hash;
     int          i_type;
 
+    /* The variable display name, mainly for use by the interfaces */
+    char *       psz_text;
+
     /* A pointer to a comparison function, a duplication function, and
      * a deallocation function */
     int      ( * pf_cmp ) ( vlc_value_t, vlc_value_t );
@@ -52,6 +55,7 @@ struct variable_t
     /* If the variable is to be chosen in a list */
     int          i_default;
     vlc_list_t   choices;
+    vlc_list_t   choices_text;
 
     /* Set to TRUE if the variable is in a callback */
     vlc_bool_t   b_incallback;
@@ -80,6 +84,7 @@ struct variable_t
 #define VLC_VAR_TIME      0x0060
 #define VLC_VAR_ADDRESS   0x0070
 #define VLC_VAR_MUTEX     0x0080
+#define VLC_VAR_LIST      0x0090
 
 /* Additive flags */
 #define VLC_VAR_HASCHOICE 0x0100
@@ -100,12 +105,18 @@ struct variable_t
 
 #define VLC_VAR_SETVALUE      0x0013
 
+#define VLC_VAR_SETTEXT       0x0014
+#define VLC_VAR_GETTEXT       0x0015
+
 #define VLC_VAR_ADDCHOICE     0x0020
 #define VLC_VAR_DELCHOICE     0x0021
 #define VLC_VAR_CLEARCHOICES  0x0022
 #define VLC_VAR_SETDEFAULT    0x0023
-#define VLC_VAR_GETLIST       0x0024
-#define VLC_VAR_FREELIST      0x0025
+#define VLC_VAR_GETCHOICES    0x0024
+#define VLC_VAR_FREECHOICES   0x0025
+#define VLC_VAR_GETLIST       0x0026
+#define VLC_VAR_FREELIST      0x0027
+#define VLC_VAR_CHOICESCOUNT  0x0028
 
 /*****************************************************************************
  * Prototypes
@@ -113,7 +124,7 @@ struct variable_t
 VLC_EXPORT( int, __var_Create, ( vlc_object_t *, const char *, int ) );
 VLC_EXPORT( int, __var_Destroy, ( vlc_object_t *, const char * ) );
 
-VLC_EXPORT( int, __var_Change, ( vlc_object_t *, const char *, int, vlc_value_t * ) );
+VLC_EXPORT( int, __var_Change, ( vlc_object_t *, const char *, int, vlc_value_t *, vlc_value_t * ) );
 
 VLC_EXPORT( int, __var_Type, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( int, __var_Set, ( vlc_object_t *, const char *, vlc_value_t ) );
@@ -122,7 +133,7 @@ VLC_EXPORT( int, __var_Get, ( vlc_object_t *, const char *, vlc_value_t * ) );
 #define var_Create(a,b,c) __var_Create( VLC_OBJECT(a), b, c )
 #define var_Destroy(a,b) __var_Destroy( VLC_OBJECT(a), b )
 
-#define var_Change(a,b,c,d) __var_Change( VLC_OBJECT(a), b, c, d )
+#define var_Change(a,b,c,d,e) __var_Change( VLC_OBJECT(a), b, c, d, e )
 
 #define var_Type(a,b) __var_Type( VLC_OBJECT(a), b )
 #define var_Set(a,b,c) __var_Set( VLC_OBJECT(a), b, c )

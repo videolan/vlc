@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.71 2003/05/01 01:11:17 hartman Exp $
+ * $Id: intf.m,v 1.72 2003/05/04 22:42:16 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -1186,6 +1186,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
             var_Set( (vlc_object_t *)p_aout, "intf-change", val );
 
+#error fixme! look at rc.c line 823
             [self setupVarMenu: o_mi_channels target: (vlc_object_t *)p_aout
                 var: "audio-channels" selector: @selector(toggleVar:)];
 
@@ -1327,7 +1328,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     psz_value = val.psz_string;
 
     if ( var_Change( p_object, psz_variable,
-                     VLC_VAR_GETLIST, &val ) < 0 )
+                     VLC_VAR_GETLIST, &val, NULL ) < 0 )
     {
         free( psz_value );
         return;
@@ -1355,7 +1356,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     }
 
     var_Change( p_object, psz_variable, VLC_VAR_FREELIST,
-                &val );
+                &val, NULL );
 
     free( psz_value );
 }

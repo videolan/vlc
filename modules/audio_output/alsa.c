@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.25 2003/03/30 18:14:36 gbazin Exp $
+ * $Id: alsa.c,v 1.26 2003/05/04 22:42:15 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -104,9 +104,11 @@ static void Probe( aout_instance_t * p_aout,
                    int i_snd_pcm_format )
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
-    vlc_value_t val;
+    vlc_value_t val, text;
 
-    var_Create ( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
+    var_Create ( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    text.psz_string = _("Audio device");
+    var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Now test linear PCM capabilities */
     if ( !snd_pcm_open( &p_sys->p_snd_pcm, psz_device,
@@ -153,25 +155,29 @@ static void Probe( aout_instance_t * p_aout,
                 switch ( i_channels )
                 {
                 case 1:
-                    val.psz_string = N_("Mono");
+                    val.i_int = AOUT_VAR_MONO;
+                    text.psz_string = N_("Mono");
                     var_Change( p_aout, "audio-device",
-                                VLC_VAR_ADDCHOICE, &val );
+                                VLC_VAR_ADDCHOICE, &val, &text );
                     break;
                 case 2:
-                    val.psz_string = N_("Stereo");
+                    val.i_int = AOUT_VAR_STEREO;
+                    text.psz_string = N_("Stereo");
                     var_Change( p_aout, "audio-device",
-                                VLC_VAR_ADDCHOICE, &val );
+                                VLC_VAR_ADDCHOICE, &val, &text );
                     break;
 /*
                 case 4:
-                    val.psz_string = N_("2 Front 2 Rear");
+                    val.i_int = AOUT_VAR_2F2R;
+                    text.psz_string = N_("2 Front 2 Rear");
                     var_Change( p_aout, "audio-device",
-                                VLC_VAR_ADDCHOICE, &val );
+                                VLC_VAR_ADDCHOICE, &val, &text );
                     break;
                 case 6:
-                    val.psz_string = N_("5.1");
+                    val.i_int = AOUT_VAR_5_1;
+                    text.psz_string = N_("5.1");
                     var_Change( p_aout, "audio-device",
-                                VLC_VAR_ADDCHOICE, &val );
+                                VLC_VAR_ADDCHOICE, &val, &text );
                     break;
 */
                 }
@@ -191,11 +197,14 @@ static void Probe( aout_instance_t * p_aout,
         if ( !snd_pcm_open( &p_sys->p_snd_pcm, psz_iec_device,
                                 SND_PCM_STREAM_PLAYBACK, 0 ) )
         {
-            val.psz_string = N_("A/52 over S/PDIF");
-            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
-            snd_pcm_close( p_sys->p_snd_pcm );
+            val.i_int = AOUT_VAR_SPDIF;
+            text.psz_string = N_("A/52 over S/PDIF");
+            var_Change( p_aout, "audio-device",
+                        VLC_VAR_ADDCHOICE, &val, &text );
             if( config_GetInt( p_aout, "spdif" ) )
                 var_Set( p_aout, "audio-device", val );
+
+            snd_pcm_close( p_sys->p_snd_pcm );
         }
     }
 
@@ -305,11 +314,11 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if ( !strcmp( val.psz_string, N_("A/52 over S/PDIF") ) )
+    if ( val.i_int, AOUT_VAR_SPDIF )
     {
         p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
     }
-    else if ( !strcmp( val.psz_string, N_("5.1") ) )
+    else if ( val.i_int == AOUT_VAR_5_1 )
     {
         p_aout->output.output.i_format = i_vlc_pcm_format;
         p_aout->output.output.i_physical_channels
@@ -317,20 +326,20 @@ static int Open( vlc_object_t *p_this )
                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
                | AOUT_CHAN_LFE;
     }
-    else if ( !strcmp( val.psz_string, N_("2 Front 2 Rear") ) )
+    else if ( val.i_int == AOUT_VAR_2F2R )
     {
         p_aout->output.output.i_format = i_vlc_pcm_format;
         p_aout->output.output.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
     }
-    else if ( !strcmp( val.psz_string, N_("Stereo") ) )
+    else if ( val.i_int == AOUT_VAR_STEREO )
     {
         p_aout->output.output.i_format = i_vlc_pcm_format;
         p_aout->output.output.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     }
-    else if ( !strcmp( val.psz_string, N_("Mono") ) )
+    else if ( val.i_int == AOUT_VAR_MONO )
     {
         p_aout->output.output.i_format = i_vlc_pcm_format;
         p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
@@ -339,13 +348,10 @@ static int Open( vlc_object_t *p_this )
     else
     {
         /* This should not happen ! */
-        msg_Err( p_aout, "internal: can't find audio-device (%s)",
-                 val.psz_string );
+        msg_Err( p_aout, "internal: can't find audio-device (%i)", val.i_int );
         free( p_sys );
-        free( val.psz_string );
         return VLC_EGENERIC;
     }
-    free( val.psz_string );
 
 #ifdef DEBUG
     snd_output_stdio_attach( &p_sys->p_snd_stderr, stderr, 0 );

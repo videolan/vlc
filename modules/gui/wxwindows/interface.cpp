@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.21 2003/04/17 14:18:47 anil Exp $
+ * $Id: interface.cpp,v 1.22 2003/05/04 22:42:16 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -69,6 +69,25 @@
 /*****************************************************************************
  * Local class declarations.
  *****************************************************************************/
+class wxMenuExt: public wxMenu
+{
+public:
+    /* Constructor */
+    wxMenuExt( wxMenu* parentMenu, int id, const wxString& text,
+                   const wxString& helpString, wxItemKind kind,
+                   char *_psz_var, int _i_object_id, vlc_value_t _val,
+                   int _i_val_type );
+
+    virtual ~wxMenuExt() {};
+
+    char *psz_var;
+    int  i_val_type;
+    int  i_object_id;
+    vlc_value_t val;
+
+private:
+
+};
 
 /*****************************************************************************
  * Event Table.
@@ -113,6 +132,10 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(Logs_Event, Interface::OnLogs)
     EVT_MENU(FileInfo_Event, Interface::OnFileInfo)
     EVT_MENU(Prefs_Event, Interface::OnPreferences)
+
+    EVT_MENU_OPEN(Interface::OnMenuOpen)
+    EVT_MENU_CLOSE(Interface::OnMenuClose)
+
 
     /* Toolbar events */
     EVT_MENU(OpenFile_Event, Interface::OnOpenFile)
@@ -228,10 +251,17 @@ void Interface::CreateOurMenuBar()
 
     /* Create the "Settings" menu */
     wxMenu *settings_menu = new wxMenu;
-    settings_menu->Append( Audio_Event, _("&Audio"), HELP_AUDIO );
     settings_menu->Append( Subtitles_Event, _("&Subtitles"), HELP_SUBS );
     settings_menu->AppendSeparator();
     settings_menu->Append( Prefs_Event, _("&Preferences..."), HELP_PREFS );
+
+    /* Create the "Audio" menu */
+    p_audio_menu = new wxMenu;
+    b_audio_menu = 1;
+
+    /* Create the "Video" menu */
+    p_video_menu = new wxMenu;
+    b_video_menu = 1;
 
     /* Create the "Help" menu */
     wxMenu *help_menu = new wxMenu;
@@ -242,10 +272,15 @@ void Interface::CreateOurMenuBar()
     menubar->Append( file_menu, _("&File") );
     menubar->Append( view_menu, _("&View") );
     menubar->Append( settings_menu, _("&Settings") );
+    menubar->Append( p_audio_menu, _("&Audio") );
+    menubar->Append( p_video_menu, _("&Video") );
     menubar->Append( help_menu, _("&Help") );
 
     /* Attach the menu bar to the frame */
     SetMenuBar( menubar );
+
+    /* Intercept all menu events in our custom event handler */
+    PushEventHandler( new MenuEvtHandler( p_intf, this ) );
 
 #if !defined(__WXX11__)
     /* Associate drop targets with the menubar */
@@ -371,6 +406,40 @@ void Interface::Open( int i_access_method )
 /*****************************************************************************
  * Event Handlers.
  *****************************************************************************/
+void Interface::OnMenuOpen(wxMenuEvent& event)
+{
+    if( event.GetEventObject() == p_audio_menu )
+    {
+        if( b_audio_menu )
+        {
+            p_audio_menu = AudioMenu( p_intf, this );
+            wxMenu *menu =
+                GetMenuBar()->Replace( 3, p_audio_menu, _("&Audio") );
+            if( menu ) delete menu;
+
+            b_audio_menu = 0;
+        }
+        else b_audio_menu = 1;
+    }
+    else if( event.GetEventObject() == p_video_menu )
+    {
+        if( b_video_menu )
+        {
+            p_video_menu = VideoMenu( p_intf, this );
+            wxMenu *menu =
+                GetMenuBar()->Replace( 4, p_video_menu, _("&Video") );
+            if( menu ) delete menu;
+
+            b_video_menu = 0;
+        }
+        else b_video_menu = 1;
+    }
+}
+
+void Interface::OnMenuClose(wxMenuEvent& event)
+{
+}
+
 void Interface::OnExit( wxCommandEvent& WXUNUSED(event) )
 {
     /* TRUE is to force the frame to close. */
@@ -531,17 +600,17 @@ void Interface::OnSliderUpdate( wxScrollEvent& event )
 
 #ifdef WIN32
     if( event.GetEventType() == wxEVT_SCROLL_THUMBRELEASE
-	|| event.GetEventType() == wxEVT_SCROLL_ENDSCROLL )
+        || event.GetEventType() == wxEVT_SCROLL_ENDSCROLL )
     {
 #endif
-	if( p_intf->p_sys->i_slider_pos != event.GetPosition()
-	    && p_intf->p_sys->p_input )
-	{
+        if( p_intf->p_sys->i_slider_pos != event.GetPosition()
+            && p_intf->p_sys->p_input )
+        {
             p_intf->p_sys->i_slider_pos = event.GetPosition();
-	    input_Seek( p_intf->p_sys->p_input, p_intf->p_sys->i_slider_pos *
-			100 / SLIDER_MAX_POS,
-			INPUT_SEEK_PERCENT | INPUT_SEEK_SET );
-	}
+            input_Seek( p_intf->p_sys->p_input, p_intf->p_sys->i_slider_pos *
+                        100 / SLIDER_MAX_POS,
+                        INPUT_SEEK_PERCENT | INPUT_SEEK_SET );
+        }
 
 #ifdef WIN32
         p_intf->p_sys->b_slider_free = VLC_TRUE;
@@ -550,19 +619,19 @@ void Interface::OnSliderUpdate( wxScrollEvent& event )
     {
         p_intf->p_sys->b_slider_free = VLC_FALSE;
 
-	if( p_intf->p_sys->p_input )
-	{
-  	    /* Update stream date */
+        if( p_intf->p_sys->p_input )
+        {
+            /* Update stream date */
 #define p_area p_intf->p_sys->p_input->stream.p_selected_area
-	    char psz_time[ OFFSETTOTIME_MAX_SIZE ];
+            char psz_time[ OFFSETTOTIME_MAX_SIZE ];
 
-	    slider_box->SetLabel(
-	        input_OffsetToTime( p_intf->p_sys->p_input,
-				    psz_time,
-				    p_area->i_size * event.GetPosition()
-				    / SLIDER_MAX_POS ) );
+            slider_box->SetLabel(
+                input_OffsetToTime( p_intf->p_sys->p_input,
+                                    psz_time,
+                                    p_area->i_size * event.GetPosition()
+                                    / SLIDER_MAX_POS ) );
 #undef p_area
-	}
+        }
     }
 #endif
 

@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.30 2003/03/30 18:14:37 gbazin Exp $
+ * $Id: rc.c,v 1.31 2003/05/04 22:42:15 gbazin Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -794,7 +794,7 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
 {
     aout_instance_t * p_aout;
     const char * psz_variable;
-    const char * psz_name;
+    vlc_value_t val_name;
     int i_error;
 
     p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT, FIND_ANYWHERE );
@@ -803,55 +803,58 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
     if ( !strcmp( psz_cmd, "adev" ) )
     {
         psz_variable = "audio-device";
-        psz_name = "audio devices";
     }
     else
     {
         psz_variable = "audio-channels";
-        psz_name = "audio channels";
     }
+
+    /* Get the descriptive name of the variable */
+    var_Change( (vlc_object_t *)p_aout, psz_variable, VLC_VAR_GETTEXT,
+                 &val_name, NULL );
+    if( !val_name.psz_string ) val_name.psz_string = strdup(psz_variable);
 
     if ( !*newval.psz_string )
     {
         /* Retrieve all registered ***. */
-        vlc_value_t val;
-        int i;
-        char * psz_value;
+        vlc_value_t val, text;
+        int i, i_value;
 
         if ( var_Get( (vlc_object_t *)p_aout, psz_variable, &val ) < 0 )
         {
             vlc_object_release( (vlc_object_t *)p_aout );
             return VLC_EGENERIC;
         }
-        psz_value = val.psz_string;
+        i_value = val.i_int;
 
         if ( var_Change( (vlc_object_t *)p_aout, psz_variable,
-                         VLC_VAR_GETLIST, &val ) < 0 )
+                         VLC_VAR_GETLIST, &val, &text ) < 0 )
         {
-            free( psz_value );
             vlc_object_release( (vlc_object_t *)p_aout );
             return VLC_EGENERIC;
         }
 
-        printf( "+----[ %s ]\n", psz_name );
+        printf( "+----[ %s ]\n", val_name.psz_string );
         for ( i = 0; i < val.p_list->i_count; i++ )
         {
-            if ( !strcmp( psz_value, val.p_list->p_values[i].psz_string ) )
-                printf( "| %s *\n", val.p_list->p_values[i].psz_string );
+            if ( i_value == val.p_list->p_values[i].i_int )
+                printf( "| %i - %s *\n", val.p_list->p_values[i].i_int,
+			text.p_list->p_values[i].psz_string );
             else
-                printf( "| %s\n", val.p_list->p_values[i].psz_string );
+                printf( "| %i - %s\n", val.p_list->p_values[i].i_int,
+			text.p_list->p_values[i].psz_string );
         }
         var_Change( (vlc_object_t *)p_aout, psz_variable, VLC_VAR_FREELIST,
-                    &val );
-        printf( "+----[ end of %s ]\n", psz_name );
+                    &val, NULL );
+        printf( "+----[ end of %s ]\n", val_name.psz_string );
 
-        free( psz_value );
+        if( val_name.psz_string ) free( val_name.psz_string );
         i_error = VLC_SUCCESS;
     }
     else
     {
         vlc_value_t val;
-        val.psz_string = newval.psz_string;
+        val.i_int = atoi( newval.psz_string );
 
         i_error = var_Set( (vlc_object_t *)p_aout, psz_variable, val );
     }

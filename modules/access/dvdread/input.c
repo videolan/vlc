@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: input.c,v 1.19 2003/03/24 17:15:29 gbazin Exp $
+ * $Id: input.c,v 1.20 2003/05/04 22:42:14 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -475,7 +475,7 @@ static int DvdReadSetProgram( input_thread_t * p_input,
 
         /* Update the navigation variables without triggering a callback */
         val.i_int = p_program->i_number;
-        var_Change( p_input, "program", VLC_VAR_SETVALUE, &val );
+        var_Change( p_input, "program", VLC_VAR_SETVALUE, &val, NULL );
     }
 
     return VLC_SUCCESS;
@@ -798,12 +798,12 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         /* Update the navigation variables without triggering a callback */
         val.i_int = p_area->i_id;
-        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val );
-        var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL );
+        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
+        var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL, NULL );
         for( i = 1; i <= p_area->i_part_nb; i++ )
         {
             val.i_int = i;
-            var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val );
+            var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val, NULL );
         }
 
     } /* i_title >= 0 */
@@ -852,7 +852,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
 
     /* Update the navigation variables without triggering a callback */
     val.i_int = p_area->i_part;
-    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
 
     return VLC_SUCCESS;
 }

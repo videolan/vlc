@@ -8,7 +8,7 @@
  *  -udf.* to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: access.c,v 1.12 2003/03/24 17:15:29 gbazin Exp $
+ * $Id: access.c,v 1.13 2003/05/04 22:42:14 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -325,7 +325,7 @@ static int DVDSetProgram( input_thread_t    * p_input,
 
         /* Update the navigation variables without triggering a callback */
         val.i_int = p_program->i_number;
-        var_Change( p_input, "program", VLC_VAR_SETVALUE, &val );
+        var_Change( p_input, "program", VLC_VAR_SETVALUE, &val, NULL );
     }
 
     return 0;
@@ -500,12 +500,12 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         /* Update the navigation variables without triggering a callback */
         val.i_int = p_area->i_id;
-        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val );
-        var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL );
+        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
+        var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL, NULL );
 	for( i = 1; i <= p_area->i_part_nb; i++ )
 	{
 	    val.i_int = i;
-	    var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val );
+	    var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val, NULL );
 	}
 
     } /* i_title >= 0 */
@@ -525,7 +525,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
     /* Update the navigation variables without triggering a callback */
     val.i_int = p_area->i_part;
-    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
 
     return 0;
 }

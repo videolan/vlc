@@ -2,7 +2,7 @@
  * menu.cpp: functions to handle menu items
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: menu.cpp,v 1.14 2003/02/12 02:11:58 ipkiss Exp $
+ * $Id: menu.cpp,v 1.15 2003/05/04 22:42:16 gbazin Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -51,6 +51,7 @@ void __fastcall TMenusGen::AoutVarClick( TObject *Sender )
         return;
     }
 
+#error fixme! look at rc.c line 823
     if( Item->Parent == MenuADevice || Item->Parent == PopupADevice )
     {
         VarChange( p_aout, "audio-device", MenuADevice, PopupADevice, Item );
@@ -414,6 +415,7 @@ void __fastcall TMenusGen::SetupMenus()
 
             var_Set( (vlc_object_t *)p_aout, "intf-change", val );
 
+#error fixme! look at rc.c line 823
             SetupVarMenu( (vlc_object_t *)p_aout, "audio-channels",
                           MenuChannel, AoutVarClick );
             SetupVarMenu( (vlc_object_t *)p_aout, "audio-channels",
@@ -632,7 +634,7 @@ void __fastcall TMenusGen::SetupVarMenu( vlc_object_t *p_object,
     }
     psz_value = val.psz_string;
 
-    if( var_Change( p_object, psz_variable, VLC_VAR_GETLIST, &val ) < 0 )
+    if( var_Change( p_object, psz_variable, VLC_VAR_GETLIST, &val, NULL ) < 0 )
     {
         free( psz_value );
         return;
@@ -657,7 +659,7 @@ void __fastcall TMenusGen::SetupVarMenu( vlc_object_t *p_object,
     Root->Enabled = ( val.p_list->i_count > 0 );
 
     /* clean up everything */
-    var_Change( p_object, psz_variable, VLC_VAR_FREELIST, &val );
+    var_Change( p_object, psz_variable, VLC_VAR_FREELIST, &val, NULL );
 //    free( psz_value );
 }
 

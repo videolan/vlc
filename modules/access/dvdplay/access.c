@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.16 2003/04/05 12:32:19 gbazin Exp $
+ * $Id: access.c,v 1.17 2003/05/04 22:42:14 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -251,7 +251,7 @@ static int dvdplay_SetProgram( input_thread_t *     p_input,
 
         /* Update the navigation variables without triggering a callback */
         val.i_int = p_program->i_number;
-        var_Change( p_input, "program", VLC_VAR_SETVALUE, &val );
+        var_Change( p_input, "program", VLC_VAR_SETVALUE, &val, NULL );
     }
 
     return 0;
@@ -320,7 +320,7 @@ static int dvdplay_SetArea( input_thread_t * p_input, input_area_t * p_area )
 
     /* Update the navigation variables without triggering a callback */
     val.i_int = p_area->i_part;
-    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
 
     return 0;
 }
@@ -430,7 +430,7 @@ static void pf_vmg_callback( void* p_args, dvdplay_event_t event )
 
         /* Update the navigation variables without triggering a callback */
         val.i_int = p_input->stream.p_selected_area->i_part;
-        var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
+        var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
         break;
     case NEW_CELL:
         p_dvd->b_end_of_cell = 0;
@@ -536,17 +536,17 @@ static int dvdNewArea( input_thread_t * p_input, input_area_t * p_area )
 
     /* Update the navigation variables without triggering a callback */
     val.i_int = p_area->i_id;
-    var_Change( p_input, "title", VLC_VAR_SETVALUE, &val );
-    var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL );
+    var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
+    var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL, NULL );
     for( i = 1; (unsigned int)i <= p_area->i_part_nb; i++ )
     {
         val.i_int = i;
-        var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val );
+        var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val, NULL );
     }
 
     /* Update the navigation variables without triggering a callback */
     val.i_int = p_area->i_part;
-    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
 
     return 0;
 }

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.104 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: input_programs.c,v 1.105 2003/05/04 22:42:17 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -205,7 +205,7 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
                  p_pgrm );
 
     val.i_int = i_pgrm_id;
-    var_Change( p_input, "program", VLC_VAR_ADDCHOICE, &val );
+    var_Change( p_input, "program", VLC_VAR_ADDCHOICE, &val, NULL );
 
     return p_pgrm;
 }
@@ -236,7 +236,7 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
     }
 
     val.i_int = i_pgrm_index;
-    var_Change( p_input, "program", VLC_VAR_DELCHOICE, &val );
+    var_Change( p_input, "program", VLC_VAR_DELCHOICE, &val, NULL );
 
     /* Free the structures that describe the es that belongs to that program */
     while( p_pgrm->i_es_number )
@@ -299,7 +299,7 @@ input_area_t * input_AddArea( input_thread_t * p_input,
 
     /* Take care of the navigation variables */
     val.i_int = i_area_id;
-    var_Change( p_input, "title", VLC_VAR_ADDCHOICE, &val );
+    var_Change( p_input, "title", VLC_VAR_ADDCHOICE, &val, NULL );
 
     val.psz_string = malloc( sizeof("title ") + 5 );
     if( val.psz_string )
@@ -313,12 +313,13 @@ input_area_t * input_AddArea( input_thread_t * p_input,
 	var_AddCallback( p_input, val.psz_string, NavigationCallback,
 			 (void *)(int)i_area_id );
 
-	var_Change( p_input, "navigation", VLC_VAR_ADDCHOICE, &val );
+	var_Change( p_input, "navigation", VLC_VAR_ADDCHOICE, &val, NULL );
 
 	for( i = 1; i <= i_part_nb; i++ )
 	{
 	    val2.i_int = i;
-	    var_Change( p_input, val.psz_string, VLC_VAR_ADDCHOICE, &val2 );
+	    var_Change( p_input, val.psz_string,
+                        VLC_VAR_ADDCHOICE, &val2, NULL );
 	}
     }
 
@@ -423,7 +424,7 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
 
     /* Update the navigation variables without triggering a callback */
     val.i_int = p_new_prg->i_number;
-    var_Change( p_input, "program", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "program", VLC_VAR_SETVALUE, &val, NULL );
 
     return( 0 );
 }
@@ -458,7 +459,7 @@ void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
     if( val.psz_string )
     {
         sprintf( val.psz_string, "title %i", p_area->i_id );
-	var_Change( p_input, "navigation", VLC_VAR_DELCHOICE, &val );
+	var_Change( p_input, "navigation", VLC_VAR_DELCHOICE, &val, NULL );
 	var_Destroy( p_input, val.psz_string );
     }
 

@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.45 2003/05/01 01:11:17 hartman Exp $
+ * $Id: vout.m,v 1.46 2003/05/04 22:42:16 gbazin Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -201,7 +201,8 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
                       (int)s_rect.size.width, (int)s_rect.size.height ); 
 
             val.psz_string = psz_temp;
-            var_Change( p_vout, "video-device", VLC_VAR_ADDCHOICE, &val );
+            var_Change( p_vout, "video-device",
+                        VLC_VAR_ADDCHOICE, &val, NULL );
 
             if( ( i - 1 ) == i_option )
             {

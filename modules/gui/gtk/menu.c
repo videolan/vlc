@@ -2,7 +2,7 @@
  * menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: menu.c,v 1.8 2003/02/05 22:11:52 sam Exp $
+ * $Id: menu.c,v 1.9 2003/05/04 22:42:15 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -293,15 +293,16 @@ void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 }
 
 
-static void GtkPopupObjectToggle( GtkCheckMenuItem * menuitem, gpointer user_data,
-                                  int i_object_type, char *psz_variable )
+static void GtkPopupObjectToggle( GtkCheckMenuItem * menuitem,
+    gpointer user_data, int i_object_type, char *psz_variable )
 {
     intf_thread_t   *p_intf = GtkGetIntf( menuitem );
     GtkLabel        *p_label;
 
     p_label = GTK_LABEL( ( GTK_BIN( menuitem )->child ) );
 
-    if( menuitem->active && !p_intf->p_sys->b_aout_update && !p_intf->p_sys->b_vout_update )
+    if( menuitem->active && !p_intf->p_sys->b_aout_update &&
+        !p_intf->p_sys->b_vout_update )
     {
         vlc_object_t * p_obj;
 
@@ -311,7 +312,14 @@ static void GtkPopupObjectToggle( GtkCheckMenuItem * menuitem, gpointer user_dat
         {
             vlc_value_t val;
 
-            gtk_label_get( p_label, &val.psz_string );
+            if( user_data )
+            {
+                val = (vlc_value_t)user_data;
+            }
+            else
+            {
+                gtk_label_get( p_label, &val.psz_string );
+            }
 
             if( var_Set( p_obj, psz_variable, val ) < 0 )
             {
@@ -1067,14 +1075,13 @@ static gint GtkSetupVarMenu( intf_thread_t * p_intf,
                              char * psz_variable,
                              void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
 {
-    vlc_value_t         val;
-    char              * psz_value;
+    vlc_value_t         val, text, val_list, text_list;
     GtkWidget *         p_menu;
     GSList *            p_group = NULL;
     GtkWidget *         p_item;
     GtkWidget *         p_item_active = NULL;
 
-    int                 i_item;
+    int                 i_item, i_type;
 
      /* temporary hack to avoid blank menu when an open menu is removed */
     if( GTK_MENU_ITEM(p_root)->submenu != NULL )
@@ -1085,16 +1092,29 @@ static gint GtkSetupVarMenu( intf_thread_t * p_intf,
     gtk_menu_item_remove_submenu( GTK_MENU_ITEM( p_root ) );
     gtk_widget_set_sensitive( p_root, FALSE );
 
+    /* Check the type of the object variable */
+    i_type = var_Type( p_object, psz_variable );
+
+    /* Make sure we want to display the variable */
+    if( i_type & VLC_VAR_HASCHOICE )
+    {
+        var_Change( p_object, psz_variable, VLC_VAR_CHOICESCOUNT, &val, NULL );
+        if( val.i_int == 0 ) return FALSE;
+    }
+
+    /* Get the descriptive name of the variable */
+    var_Change( p_object, psz_variable, VLC_VAR_GETTEXT, &text, NULL );
+
     /* get the current value */
     if( var_Get( p_object, psz_variable, &val ) < 0 )
     {
         return FALSE;
     }
-    psz_value = val.psz_string;
 
-    if( var_Change( p_object, psz_variable, VLC_VAR_GETLIST, &val ) < 0 )
+    if( var_Change( p_object, psz_variable, VLC_VAR_GETLIST,
+                    &val_list, &text_list ) < 0 )
     {
-        free( psz_value );
+        if( i_type == VLC_VAR_STRING ) free( val.psz_string );
         return FALSE;
     }
 
@@ -1102,41 +1122,74 @@ static gint GtkSetupVarMenu( intf_thread_t * p_intf,
     p_menu = gtk_menu_new();
     gtk_object_set_data( GTK_OBJECT( p_menu ), "p_intf", p_intf );
 
-    for( i_item = 0; i_item < val.p_list->i_count; i_item++ )
+    for( i_item = 0; i_item < val_list.p_list->i_count; i_item++ )
     {
-        p_item = gtk_radio_menu_item_new_with_label( p_group,
-                                                     val.p_list->p_values[i_item].psz_string );
-        p_group = gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item ) );
-
-        if( !strcmp( psz_value, val.p_list->p_values[i_item].psz_string ) )
+        switch( i_type & VLC_VAR_TYPE )
         {
-            p_item_active = p_item;
+        case VLC_VAR_STRING:
+            p_item = gtk_radio_menu_item_new_with_label( p_group,
+                     text_list.p_list->p_values[i_item].psz_string ?
+                     text_list.p_list->p_values[i_item].psz_string :
+                     val_list.p_list->p_values[i_item].psz_string );
+
+            /* signal hanling for off */
+            gtk_signal_connect( GTK_OBJECT( p_item ), "toggled",
+                GTK_SIGNAL_FUNC ( pf_toggle ),
+                /* FIXME memory leak */
+                strdup(val_list.p_list->p_values[i_item].psz_string) );
+
+            if( !strcmp( val.psz_string,
+                         val_list.p_list->p_values[i_item].psz_string ) )
+            {
+                p_item_active = p_item;
+            }
+            break;
+        case VLC_VAR_INTEGER:
+            p_item = gtk_radio_menu_item_new_with_label( p_group,
+                     text_list.p_list->p_values[i_item].psz_string ?
+                     text_list.p_list->p_values[i_item].psz_string :
+                     NULL /* FIXME */ );
+
+            /* signal hanling for off */
+            gtk_signal_connect( GTK_OBJECT( p_item ), "toggled",
+                GTK_SIGNAL_FUNC ( pf_toggle ),
+                (gpointer)val_list.p_list->p_values[i_item].i_int );
+
+            if( val.i_int == val_list.p_list->p_values[i_item].i_int )
+            {
+                p_item_active = p_item;
+            }
+            break;
+        default:
+            /* FIXME */
+	    return FALSE;
         }
+
+        p_group = gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item ) );
 
         gtk_widget_show( p_item );
 
-        /* signal hanling for off */
-        gtk_signal_connect( GTK_OBJECT( p_item ), "toggled",
-                        GTK_SIGNAL_FUNC ( pf_toggle ), NULL );
-
         gtk_menu_append( GTK_MENU( p_menu ), p_item );
-
     }
+
     /* link the new menu to the menubar item */
     gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_root ), p_menu );
 
     if( p_item_active )
     {
-        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (p_item_active), TRUE);
+        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(p_item_active),
+                                        TRUE );
     }
 
-    if( val.p_list->i_count > 0 )
+    if( val_list.p_list->i_count > 0 )
     {
         gtk_widget_set_sensitive( p_root, TRUE );
     }
 
     /* clean up everything */
-    var_Change( p_object, psz_variable, VLC_VAR_FREELIST, &val );
+    if( i_type == VLC_VAR_STRING ) free( val.psz_string );
+    var_Change( p_object, psz_variable, VLC_VAR_FREELIST,
+                &val_list, &text_list );
 
     return TRUE;
 }

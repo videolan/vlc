@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.23 2003/04/08 21:26:22 gbazin Exp $
+ * $Id: waveout.c,v 1.24 2003/05/04 22:42:15 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -198,10 +198,9 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Open the device */
-    if( !strcmp( val.psz_string, N_("A/52 over S/PDIF") ) )
+    if( val.i_int == AOUT_VAR_SPDIF )
     {
         p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
-        free( val.psz_string );
 
         if( OpenWaveOut( p_aout, VLC_FOURCC('s','p','d','i'),
                          p_aout->output.output.i_physical_channels,
@@ -225,20 +224,20 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-        if( !strcmp( val.psz_string, N_("5.1") ) )
+        if( val.i_int == AOUT_VAR_5_1 )
         {
             p_aout->output.output.i_physical_channels
                 = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
                    | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
                    | AOUT_CHAN_LFE;
         }
-        else if( !strcmp( val.psz_string, N_("2 Front 2 Rear") ) )
+        else if( val.i_int == AOUT_VAR_2F2R )
         {
             p_aout->output.output.i_physical_channels
                 = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                    | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
         }
-        else if( !strcmp( val.psz_string, "Mono" ) )
+        else if( val.i_int == AOUT_VAR_MONO )
         {
             p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
         }
@@ -247,7 +246,6 @@ static int Open( vlc_object_t *p_this )
             p_aout->output.output.i_physical_channels
                 = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
         }
-        free( val.psz_string );
 
         if( OpenWaveOutPCM( p_aout, &p_aout->output.output.i_format,
                             p_aout->output.output.i_physical_channels,
@@ -303,11 +301,13 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Probe( aout_instance_t * p_aout )
 {
-    vlc_value_t val;
+    vlc_value_t val, text;
     int i_format;
     unsigned int i_physical_channels;
 
-    var_Create( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
+    var_Create( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    text.psz_string = _("Audio device");
+    var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Test for 5.1 support */
     i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
@@ -320,8 +320,10 @@ static void Probe( aout_instance_t * p_aout )
                             p_aout->output.output.i_rate, VLC_TRUE )
             == VLC_SUCCESS )
         {
-            val.psz_string = N_("5.1");
-            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+            val.i_int = AOUT_VAR_5_1;
+            text.psz_string = N_("5.1");
+            var_Change( p_aout, "audio-device",
+                        VLC_VAR_ADDCHOICE, &val, &text );
             msg_Dbg( p_aout, "device supports 5.1 channels" );
         }
     }
@@ -337,8 +339,10 @@ static void Probe( aout_instance_t * p_aout )
                             p_aout->output.output.i_rate, VLC_TRUE )
             == VLC_SUCCESS )
         {
-            val.psz_string = N_("2 Front 2 Rear");
-            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+            val.i_int = AOUT_VAR_2F2R;
+            text.psz_string = N_("2 Front 2 Rear");
+            var_Change( p_aout, "audio-device",
+                        VLC_VAR_ADDCHOICE, &val, &text );
             msg_Dbg( p_aout, "device supports 4 channels" );
         }
     }
@@ -350,9 +354,9 @@ static void Probe( aout_instance_t * p_aout )
                         p_aout->output.output.i_rate, VLC_TRUE )
         == VLC_SUCCESS )
     {
-        val.psz_string = N_("Stereo");
-        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
-        var_Set( p_aout, "audio-device", val );
+        val.i_int = AOUT_VAR_STEREO;
+        text.psz_string = N_("Stereo");
+        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
         msg_Dbg( p_aout, "device supports 2 channels" );
     }
 
@@ -363,8 +367,9 @@ static void Probe( aout_instance_t * p_aout )
                         p_aout->output.output.i_rate, VLC_TRUE )
         == VLC_SUCCESS )
     {
-        val.psz_string = N_("Mono");
-        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );        
+        val.i_int = AOUT_VAR_MONO;
+        text.psz_string = N_("Mono");
+        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
         msg_Dbg( p_aout, "device supports 1 channel" );
     }
 
@@ -378,8 +383,10 @@ static void Probe( aout_instance_t * p_aout )
             == VLC_SUCCESS )
         {
             msg_Dbg( p_aout, "device supports A/52 over S/PDIF" );
-            val.psz_string = N_("A/52 over S/PDIF");
-            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+            val.i_int = AOUT_VAR_SPDIF;
+            text.psz_string = N_("A/52 over S/PDIF");
+            var_Change( p_aout, "audio-device",
+                        VLC_VAR_ADDCHOICE, &val, &text );
             if( config_GetInt( p_aout, "spdif" ) )
                 var_Set( p_aout, "audio-device", val );
         }
