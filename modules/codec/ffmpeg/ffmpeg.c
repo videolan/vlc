@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.75 2004/01/09 00:02:55 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.76 2004/01/09 02:28:30 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -437,10 +437,12 @@ static struct
     /* Flash (H263) variant */
     { VLC_FOURCC('F','L','V','1'), CODEC_ID_FLV1,
       VIDEO_ES, "Flash Video" },
+
 #if LIBAVCODEC_BUILD > 4680
     { VLC_FOURCC('F','L','I','C'), CODEC_ID_FLIC,
       VIDEO_ES, "Flic Video" },
 #endif
+
     /* MJPEG */
     { VLC_FOURCC( 'M', 'J', 'P', 'G' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Motion JPEG Video" },
@@ -460,8 +462,10 @@ static struct
     { VLC_FOURCC( 'm', 'j', 'p', 'b' ), CODEC_ID_MJPEGB, /* for mov file */
       VIDEO_ES, "Motion JPEG B Video" },
 
+#if LIBAVCODEC_BUILD > 4680
     { VLC_FOURCC( 'S', 'P', '5', 'X' ), CODEC_ID_SP5X,
       VIDEO_ES, "Sunplus Motion JPEG Video" },
+#endif
 
     /* DV */
     { VLC_FOURCC('d','v','s','l'), CODEC_ID_DVVIDEO,
