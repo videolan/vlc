@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.180 2004/02/10 20:30:09 jpsaman Exp $
+dnl $Id: configure.ac,v 1.181 2004/02/11 08:50:04 zorglub Exp $
 
 AC_INIT(vlc,0.7.1-test1)
 
@@ -883,7 +883,7 @@ AX_ADD_PLUGINS([trivial_mixer spdif_mixer float32_mixer])
 AX_ADD_PLUGINS([aout_file])
 #AX_ADD_PLUGINS([scope])
 AX_ADD_PLUGINS([i420_rgb i420_yuy2 i422_yuy2 i420_ymga])
-AX_ADD_PLUGINS([id3 m3u])
+AX_ADD_PLUGINS([id3 m3u playlist export])
 AX_ADD_PLUGINS([rawvideo])
 AX_ADD_PLUGINS([wav araw demuxdump demuxsub adpcm a52sys dtssys au])
 AX_ADD_PLUGINS([access_file access_udp access_tcp access_http ipv4 access_mms])
