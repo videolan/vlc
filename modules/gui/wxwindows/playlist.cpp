@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.17 2003/09/08 12:02:16 zorglub Exp $
+ * $Id: playlist.cpp,v 1.18 2003/09/08 12:48:53 zorglub Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -179,7 +179,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 			wxTE_PROCESS_ENTER);    
 
     /* Create the search button */
-    wxButton *search_button = 
+    search_button = 
 	new wxButton( playlist_panel, Search_Event, wxU(_("Search")) );
 
  
@@ -463,7 +463,7 @@ void Playlist::OnRSort( wxCommandEvent& WXUNUSED(event) )
 
 void Playlist::OnSearchTextChange( wxCommandEvent& WXUNUSED(event) )
 {
- /* Does nothing */
+   search_button->SetDefault(); 
 }
 
 void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
@@ -490,7 +490,7 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
 	wxListItem listitem;
  	listitem.SetId( i_current );
 	listview->GetItem( listitem );
-	if( listitem.m_text.Contains( search_string ) )
+	if( listitem.m_text.Lower().Contains( search_string.Lower() ) )
 	{
 	   i_item = i_current;
 	   break;
