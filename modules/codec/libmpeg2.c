@@ -298,16 +298,17 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 {
                     p_sys->i_aspect =
                         ((uint64_t)p_sys->p_info->sequence->display_width) *
-                        p_sys->p_info->sequence->pixel_width * VOUT_ASPECT_FACTOR /
+                        p_sys->p_info->sequence->pixel_width *
+                        VOUT_ASPECT_FACTOR /
                         p_sys->p_info->sequence->display_height /
                         p_sys->p_info->sequence->pixel_height;
                 }
                 else
                 {
-                    /* Handle invalid aspect as square */
-                    p_sys->i_aspect = VOUT_ASPECT_FACTOR *
-                                      p_sys->p_info->sequence->width /
-                                      p_sys->p_info->sequence->height;
+                    /* Invalid aspect, assume 4:3.
+                     * This shouldn't happen and if it does it is a bug
+                     * in libmpeg2 (likely triggered by an invalid stream) */
+                    p_sys->i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;
                 }
             }
 
