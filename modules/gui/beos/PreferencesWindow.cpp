@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.25 2003/05/27 13:22:45 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.26 2003/12/21 21:30:43 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -27,6 +27,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include <vlc_keys.h>
 
 #include "PreferencesWindow.h"
 
@@ -35,7 +36,8 @@
     - fix window resizing */
 
 /* We use this function to order the items of the BOutlineView */
-int compare_func( const BListItem * _first, const BListItem * _second )
+static int compare_func( const BListItem * _first,
+                         const BListItem * _second )
 {
     StringItemWithView * first = (StringItemWithView*) _first;
     StringItemWithView * second = (StringItemWithView*) _second;
@@ -77,15 +79,17 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     fOutline = new BOutlineListView( rect, "preferences tree",
                                      B_SINGLE_SELECTION_LIST,
                                      B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM );
-    BScrollView * scrollview = new BScrollView( "scrollview", fOutline,
-                                                B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
-                                                0, false, true );
+    BScrollView * scrollview =
+        new BScrollView( "scrollview", fOutline,
+                         B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
+                         0, false, true );
     fPrefsView->AddChild( scrollview );
 
     /* We need to be informed if the user selects an item */
     fOutline->SetSelectionMessage( new BMessage( PREFS_ITEM_SELECTED ) );
 
-    /* Create a dummy view so we can correctly place the real config views later */
+    /* Create a dummy view so we can correctly place the real config
+       views later */
     rect.bottom -= 40;
     rect.left = rect.right + 15 + B_V_SCROLL_BAR_WIDTH;
     rect.right = Bounds().right - 15;
@@ -144,13 +148,21 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
         /* If the module has no config option, ignore it */
         p_item = p_module->p_config;
         if( !p_item )
+        {
             continue;
-        do {
+        }
+        do
+        {
             if( p_item->i_type & CONFIG_ITEM )
+            {
                 break;
+            }
         } while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+
         if( p_item->i_type == CONFIG_HINT_END )
+        {
             continue;
+        }
 
         /* Create the capability tree if it doesn't already exist */
         char * psz_capability;
@@ -162,7 +174,8 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
             for( int j = 0; j < p_module->i_children; j++ )
             {
                 p_submodule = (module_t*)p_module->pp_children[ j ];
-                if( p_submodule->psz_capability && *p_submodule->psz_capability )
+                if( p_submodule->psz_capability &&
+                        *p_submodule->psz_capability )
                 {
                     psz_capability = p_submodule->psz_capability;
                     break;
@@ -172,10 +185,11 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
 
         StringItemWithView * capabilityItem;
         capabilityItem = NULL;
-        for( int j = 0; j < fOutline->CountItemsUnder( modulesItem, true ); j++ )
+        for( int j = 0;
+             j < fOutline->CountItemsUnder( modulesItem, true ); j++ )
         {
             if( !strcmp( ((StringItemWithView*)
-                             fOutline->ItemUnderAt( modulesItem, true, j ))->Text(),
+                fOutline->ItemUnderAt( modulesItem, true, j ))->Text(),
                          psz_capability ) )
             {
                 capabilityItem = (StringItemWithView*)
@@ -225,7 +239,8 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
                           B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM );
     fPrefsView->AddChild( button );
     rect.OffsetBy( -90, 0 );
-    button = new BButton( rect, "", _("Defaults"), new BMessage( PREFS_DEFAULTS ),
+    button = new BButton( rect, "", _("Defaults"),
+                          new BMessage( PREFS_DEFAULTS ),
                           B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM );
     fPrefsView->AddChild( button );
 
@@ -246,7 +261,9 @@ PreferencesWindow::~PreferencesWindow()
 bool PreferencesWindow::QuitRequested()
 {
     if( !IsHidden() )
+    {
         Hide();
+    }
 	return false;
 }
 
@@ -312,14 +329,14 @@ void PreferencesWindow::Update()
     fCurrent->fConfigBox->ResizeTo( fDummyView->Bounds().Width(),
                                     fDummyView->Bounds().Height() );
     fDummyView->AddChild( fCurrent->fConfigBox );
-    
+
     /* Force redrawing of its children */
     BRect rect = fCurrent->fConfigBox->Bounds();
     rect.InsetBy( 10,10 );
     rect.top += 10;
     fCurrent->fConfigScroll->ResizeTo( rect.Width(), rect.Height() );
     fCurrent->fConfigScroll->Draw( fCurrent->fConfigScroll->Bounds() );
-    
+
     UpdateScrollBar();
 }
 
@@ -331,9 +348,11 @@ void PreferencesWindow::UpdateScrollBar()
 {
     /* We have to fix the scrollbar manually because it doesn't handle
        correctly simple BViews */
-       
+
     if( !fCurrent )
+    {
         return;
+    }
 
     /* Get the available BRect for display */
     BRect display = fCurrent->fConfigScroll->Bounds();
@@ -359,122 +378,25 @@ void PreferencesWindow::UpdateScrollBar()
 void PreferencesWindow::ApplyChanges( bool doIt )
 {
     StringItemWithView * item;
-    BView * view;
-    BView * child;
-    const char * name;
-    BString string;
+    BView              * view;
+    ConfigWidget       * child;
+    BString              string;
+
     for( int i = 0; i < fOutline->CountItems(); i++ )
     {
         item = (StringItemWithView*) fOutline->ItemAt( i );
         view = item->fConfigView;
 
         if( !view )
+        {
             /* This is a category */
             continue;
+        }
 
         for( int j = 0; j < view->CountChildren(); j++ )
         {
-            child = view->ChildAt( j );
-            name = child->Name();
-            if( !strcmp( name, "ConfigTextControl" ) )
-            {
-                ConfigTextControl * textControl;
-                textControl = (ConfigTextControl*) child;
-                switch( textControl->fConfigType )
-                {
-                    case CONFIG_ITEM_STRING:
-                        if( doIt )
-                            config_PutPsz( p_intf, textControl->fConfigName, textControl->Text() );
-                        else
-                            textControl->SetText( config_GetPsz( p_intf, textControl->fConfigName ) );
-                        break;
-                    case CONFIG_ITEM_INTEGER:
-                        if( doIt )
-                            config_PutInt( p_intf, textControl->fConfigName, atoi( textControl->Text() ) );
-                        else
-                        {
-                            string = "";
-                            string << config_GetInt( p_intf, textControl->fConfigName );
-                            textControl->SetText( string.String() );
-                        }
-                        break;
-                    case CONFIG_ITEM_FLOAT:
-                        if( doIt )
-                            config_PutFloat( p_intf, textControl->fConfigName,
-                                             strtod( textControl->Text(), NULL ) );
-                        else
-                        {
-                            string = "";
-                            string << config_GetFloat( p_intf, textControl->fConfigName );
-                            textControl->SetText( string.String() );
-                        }
-                        break;
-                }
-            }
-            else if( !strcmp( name, "ConfigCheckBox" ) )
-            {
-                ConfigCheckBox * checkBox;
-                checkBox = (ConfigCheckBox*) child;
-                if( doIt )
-                    config_PutInt( p_intf, checkBox->fConfigName, checkBox->Value() );
-                else
-                    checkBox->SetValue( config_GetInt( p_intf, checkBox->fConfigName ) );
-            }
-            else if( !strcmp( name, "ConfigMenuField" ) )
-            {
-                ConfigMenuField * menuField;
-                menuField = (ConfigMenuField*) child;
-                BMenu * menu;
-                BMenuItem * menuItem;
-                menu = menuField->Menu();
-                if( doIt )
-                {
-                    menuItem = menu->FindMarked();
-                    if( menuItem )
-                        config_PutPsz( p_intf, menuField->fConfigName, menuItem->Label() );
-                }
-                else
-                {
-                    char * value;
-                    value = config_GetPsz( p_intf, menuField->fConfigName );
-                    if( !value ) value = "";
-                    for( int k = 0; k < menu->CountItems(); k++ )
-                    {
-                        menuItem = menu->ItemAt( k );
-                        if( !strcmp( value, menuItem->Label() ) )
-                        {
-                            menuItem->SetMarked( true );
-                            break;
-                        }
-                    }
-                }
-            }
-            else if( !strcmp( name, "ConfigSlider" ) )
-            {
-                ConfigSlider * slider;
-                slider = (ConfigSlider*) child;
-                
-                switch( slider->fConfigType )
-                {
-                    case CONFIG_ITEM_INTEGER:
-                        if( doIt )
-                            config_PutInt( p_intf, slider->fConfigName,
-                                           slider->Value() );
-                        else
-                            slider->SetValue( config_GetInt( p_intf,
-                                                  slider->fConfigName ) );
-                        break;
-                        
-                    case CONFIG_ITEM_FLOAT:
-                        if( doIt )
-                            config_PutFloat( p_intf, slider->fConfigName,
-                                             (float)slider->Value() / 100.0 );
-                        else
-                            slider->SetValue( config_GetFloat( p_intf,
-                                                  slider->fConfigName ) * 100.0 );
-                        break;
-                }
-            }
+            child = (ConfigWidget*) view->ChildAt( j );
+            child->Apply( p_intf, doIt );
         }
     }
 }
@@ -509,7 +431,7 @@ void PreferencesWindow::BuildConfigView( StringItemWithView * stringItem,
     BRect rect = fDummyView->Bounds();
     stringItem->fConfigBox = new BBox( rect, "config box", B_FOLLOW_ALL );
     stringItem->fConfigBox->SetLabel( stringItem->fText );
-    
+
     /* Build the BView */
     rect = stringItem->fConfigBox->Bounds();
     rect.InsetBy( 10,10 );
@@ -517,28 +439,26 @@ void PreferencesWindow::BuildConfigView( StringItemWithView * stringItem,
     rect.right -= B_V_SCROLL_BAR_WIDTH + 5;
     stringItem->fConfigView = new BView( rect, "config view",
                                          B_FOLLOW_NONE, B_WILL_DRAW );
-    stringItem->fConfigView->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
+    stringItem->fConfigView->SetViewColor(
+            ui_color( B_PANEL_BACKGROUND_COLOR ) );
 
     /* Add all the settings options */
     rect = stringItem->fConfigView->Bounds();
     rect.InsetBy( 10, 10 );
+
     ConfigTextControl * textControl;
-    ConfigCheckBox * checkBox;
-    ConfigMenuField * menuField;
-    ConfigSlider * slider;
-    BPopUpMenu * popUp;
+    ConfigCheckBox    * checkBox;
+    ConfigMenuField   * menuField;
+    ConfigSlider      * slider;
+    ConfigKey         * keyConfig;
 
     for( ; (*pp_item)->i_type != CONFIG_HINT_END; (*pp_item)++ )
     {
-        if( stop_after_category && (*pp_item)->i_type == CONFIG_HINT_CATEGORY )
+        if( stop_after_category &&
+            (*pp_item)->i_type == CONFIG_HINT_CATEGORY )
+        {
             break;
-            
-        /* Discard a few options */
-        if( (*pp_item)->psz_name &&
-            ( !strcmp( (*pp_item)->psz_name, "volume" ) ||
-              !strcmp( (*pp_item)->psz_name, "saved-volume" ) ||
-              !strcmp( (*pp_item)->psz_name, "advanced" ) ) )
-            continue;
+        }
 
         switch( (*pp_item)->i_type )
         {
@@ -548,91 +468,356 @@ void PreferencesWindow::BuildConfigView( StringItemWithView * stringItem,
             case CONFIG_ITEM_DIRECTORY:
                 if( (*pp_item)->ppsz_list && (*pp_item)->ppsz_list[0] )
                 {
-                    rect.bottom = rect.top + 20;
-                    popUp = new BPopUpMenu( "" );
-                    menuField = new ConfigMenuField( rect, (*pp_item)->psz_text,
-                                                     popUp, (*pp_item)->psz_name );
-                    BMenuItem * menuItem;
-                    for( int i = 0; (*pp_item)->ppsz_list[i]; i++ )
-                    {
-                        menuItem = new BMenuItem( (*pp_item)->ppsz_list[i], new BMessage() );
-                        popUp->AddItem( menuItem );
-                    }
+                    menuField = new ConfigMenuField( rect,
+                            (*pp_item)->i_type, (*pp_item)->psz_text,
+                            (*pp_item)->psz_name, (*pp_item)->ppsz_list );
                     stringItem->fConfigView->AddChild( menuField );
-                    rect.top = rect.bottom + 10;
+                    rect.top += menuField->Bounds().Height();
                 }
                 else
                 {
-                    rect.bottom = rect.top + 20;
-                    textControl = new ConfigTextControl( rect, (*pp_item)->psz_text,
-                                                         CONFIG_ITEM_STRING, (*pp_item)->psz_name );
+                    textControl = new ConfigTextControl( rect,
+                            (*pp_item)->i_type, (*pp_item)->psz_text,
+                            (*pp_item)->psz_name );
                     stringItem->fConfigView->AddChild( textControl );
-                    rect.top = rect.bottom + 10;
+                    rect.top += textControl->Bounds().Height();
                 }
                 break;
 
             case CONFIG_ITEM_INTEGER:
-
                 if( (*pp_item)->i_min == (*pp_item)->i_max )
                 {
-                    rect.bottom = rect.top + 20;
-                    textControl = new ConfigTextControl( rect, (*pp_item)->psz_text,
-                                                         CONFIG_ITEM_INTEGER,
-                                                         (*pp_item)->psz_name );
+                    textControl = new ConfigTextControl( rect,
+                            CONFIG_ITEM_INTEGER, (*pp_item)->psz_text,
+                            (*pp_item)->psz_name );
                     stringItem->fConfigView->AddChild( textControl );
-                    rect.top = rect.bottom + 10;
+                    rect.top += textControl->Bounds().Height();
                 }
                 else
                 {
-                    rect.bottom = rect.top + 30;
-                    slider = new ConfigSlider( rect, (*pp_item)->psz_text,
-                                               CONFIG_ITEM_INTEGER, (*pp_item)->i_min,
-                                               (*pp_item)->i_max, (*pp_item)->psz_name );
+                    slider = new ConfigSlider( rect, CONFIG_ITEM_INTEGER,
+                            (*pp_item)->psz_text, (*pp_item)->psz_name,
+                            (*pp_item)->i_min, (*pp_item)->i_max );
                     stringItem->fConfigView->AddChild( slider );
-                    rect.top = rect.bottom + 10;
+                    rect.top += slider->Bounds().Height();
                 }
                 break;
 
             case CONFIG_ITEM_FLOAT:
                 if( (*pp_item)->f_min == (*pp_item)->f_max )
                 {
-                    rect.bottom = rect.top + 20;
-                    textControl = new ConfigTextControl( rect, (*pp_item)->psz_text,
-                                                         CONFIG_ITEM_FLOAT, (*pp_item)->psz_name );
+                    textControl = new ConfigTextControl( rect,
+                            CONFIG_ITEM_FLOAT, (*pp_item)->psz_text,
+                            (*pp_item)->psz_name );
                     stringItem->fConfigView->AddChild( textControl );
-                    rect.top = rect.bottom + 10;
+                    rect.top += textControl->Bounds().Height();
                 }
                 else
                 {
-                    rect.bottom = rect.top + 30;
-                    slider = new ConfigSlider( rect, (*pp_item)->psz_text,
-                                               CONFIG_ITEM_FLOAT, 100 * (*pp_item)->f_min,
-                                               100 * (*pp_item)->f_max, (*pp_item)->psz_name );
+                    slider = new ConfigSlider( rect, CONFIG_ITEM_FLOAT,
+                            (*pp_item)->psz_text, (*pp_item)->psz_name,
+                            100 * (*pp_item)->f_min, 100 * (*pp_item)->f_max );
                     stringItem->fConfigView->AddChild( slider );
-                    rect.top = rect.bottom + 10;
+                    rect.top += slider->Bounds().Height();
                 }
                 break;
 
             case CONFIG_ITEM_BOOL:
-                rect.bottom = rect.top + 20;
-                checkBox = new ConfigCheckBox( rect, (*pp_item)->psz_text,
-                                               (*pp_item)->psz_name );
+                checkBox = new ConfigCheckBox( rect,
+                        CONFIG_ITEM_BOOL, (*pp_item)->psz_text,
+                        (*pp_item)->psz_name );
                 stringItem->fConfigView->AddChild( checkBox );
-                rect.top = rect.bottom + 10;
+                rect.top += checkBox->Bounds().Height();
                 break;
+
+            case CONFIG_ITEM_KEY:
+                keyConfig = new ConfigKey( rect, CONFIG_ITEM_KEY,
+                        (*pp_item)->psz_text, (*pp_item)->psz_name );
+                stringItem->fConfigView->AddChild( keyConfig );
+                rect.top += keyConfig->Bounds().Height();
         }
     }
 
     /* Put the BView into a BScrollView */
-    
     stringItem->fConfigScroll =
         new BScrollView( "config scroll", stringItem->fConfigView,
                          B_FOLLOW_ALL, 0, false, true, B_FANCY_BORDER );
-    stringItem->fConfigScroll->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
+    stringItem->fConfigScroll->SetViewColor(
+            ui_color( B_PANEL_BACKGROUND_COLOR ) );
     stringItem->fConfigBox->AddChild( stringItem->fConfigScroll );
 
     /* Adjust the configView size */
     stringItem->fConfigView->ResizeTo(
         stringItem->fConfigView->Bounds().Width(), rect.top );
+}
+
+ConfigWidget::ConfigWidget( BRect rect, int type, char * configName )
+    : BView( rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW )
+{
+    fConfigType = type;
+    fConfigName = strdup( configName );
+    SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
+}
+
+ConfigTextControl::ConfigTextControl( BRect rect, int type, char * label,
+                                      char * configName )
+    : ConfigWidget( BRect( rect.left, rect.top,
+                           rect.right, rect.top + 25 ),
+                    type, configName )
+{
+    fTextControl = new BTextControl( Bounds(), NULL, label, NULL,
+                                     new BMessage() );
+    AddChild( fTextControl );
+}
+
+void ConfigTextControl::Apply( intf_thread_t * p_intf, bool doIt )
+{
+    char string[1024];
+
+    switch( fConfigType )
+    {
+        case CONFIG_ITEM_STRING:
+        case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_MODULE:
+        case CONFIG_ITEM_DIRECTORY:
+            if( doIt )
+            {
+                config_PutPsz( p_intf, fConfigName, fTextControl->Text() );
+            }
+            else
+            {
+                fTextControl->SetText( config_GetPsz( p_intf, fConfigName ) );
+            }
+            break;
+        case CONFIG_ITEM_INTEGER:
+            if( doIt )
+            {
+                config_PutInt( p_intf, fConfigName,
+                               atoi( fTextControl->Text() ) );
+            }
+            else
+            {
+                memset( string, 0, 1024 );
+                snprintf( string, 1023, "%d",
+                          config_GetInt( p_intf, fConfigName ) );
+                fTextControl->SetText( string );
+            }
+            break;
+        case CONFIG_ITEM_FLOAT:
+            if( doIt )
+            {
+                config_PutFloat( p_intf, fConfigName,
+                                 strtod( fTextControl->Text(), NULL ) );
+            }
+            else
+            {
+                memset( string, 0, 1024 );
+                snprintf( string, 1023, "%f",
+                          config_GetFloat( p_intf, fConfigName ) );
+                fTextControl->SetText( string );
+            }
+            break;
+    }
+}
+
+ConfigCheckBox::ConfigCheckBox( BRect rect, int type, char * label,
+                                char * configName )
+    : ConfigWidget( BRect( rect.left, rect.top,
+                           rect.right, rect.top + 25 ),
+                    type, configName )
+{
+    fCheckBox = new BCheckBox( Bounds(), NULL, label, new BMessage() );
+    AddChild( fCheckBox );
+}
+
+void ConfigCheckBox::Apply( intf_thread_t * p_intf, bool doIt )
+{
+    if( doIt )
+    {
+        config_PutInt( p_intf, fConfigName, fCheckBox->Value() );
+    }
+    else
+    {
+        fCheckBox->SetValue( config_GetInt( p_intf, fConfigName ) );
+    }
+}
+
+ConfigMenuField::ConfigMenuField( BRect rect, int type, char * label,
+                                  char * configName, char ** list )
+    : ConfigWidget( BRect( rect.left, rect.top,
+                           rect.right, rect.top + 25 ),
+                    type, configName )
+{
+    BMenuItem * menuItem;
+
+    fPopUpMenu = new BPopUpMenu( "" );
+    fMenuField = new BMenuField( Bounds(), NULL, label, fPopUpMenu );
+
+    for( int i = 0; list[i]; i++ )
+    {
+        menuItem = new BMenuItem( list[i], new BMessage() );
+        fPopUpMenu->AddItem( menuItem );
+    }
+
+    AddChild( fMenuField );
+}
+
+void ConfigMenuField::Apply( intf_thread_t * p_intf, bool doIt )
+{
+    BMenuItem * menuItem;
+
+    if( doIt )
+    {
+        menuItem = fPopUpMenu->FindMarked();
+        if( menuItem )
+        {
+            config_PutPsz( p_intf, fConfigName, menuItem->Label() );
+        }
+    }
+    else
+    {
+        char * value = config_GetPsz( p_intf, fConfigName );
+        if( !value )
+        {
+            value = "";
+        }
+
+        for( int i = 0; i < fPopUpMenu->CountItems(); i++ )
+        {
+            menuItem = fPopUpMenu->ItemAt( i );
+            if( !strcmp( value, menuItem->Label() ) )
+            {
+                menuItem->SetMarked( true );
+                break;
+            }
+        }
+    }
+}
+
+ConfigSlider::ConfigSlider( BRect rect, int type, char * label,
+                            char * configName, int min, int max )
+    : ConfigWidget( BRect( rect.left, rect.top,
+                           rect.right, rect.top + 40 ),
+                    type, configName )
+{
+    fSlider = new BSlider( Bounds(), NULL, label, new BMessage(),
+                           min, max );
+    AddChild( fSlider );
+}
+
+void ConfigSlider::Apply( intf_thread_t * p_intf, bool doIt )
+{
+    switch( fConfigType )
+    {
+        case CONFIG_ITEM_INTEGER:
+            if( doIt )
+            {
+                config_PutInt( p_intf, fConfigName, fSlider->Value() );
+            }
+            else
+            {
+                fSlider->SetValue( config_GetInt( p_intf, fConfigName ) );
+            }
+            break;
+
+        case CONFIG_ITEM_FLOAT:
+            if( doIt )
+            {
+                config_PutFloat( p_intf, fConfigName,
+                                 (float) fSlider->Value() / 100.0 );
+            }
+            else
+            {
+                fSlider->SetValue( 100 *
+                        config_GetFloat( p_intf, fConfigName ) );
+            }
+            break;
+    }
+}
+
+ConfigKey::ConfigKey( BRect rect, int type, char * label,
+                            char * configName )
+    : ConfigWidget( BRect( rect.left, rect.top,
+                           rect.right, rect.top + 25 ),
+                    type, configName )
+{
+    BRect r = Bounds();
+    BMenuItem * menuItem;
+
+    r.left = r.right - 60;
+    fPopUpMenu = new BPopUpMenu( "" );
+    fMenuField = new BMenuField( r, NULL, NULL, fPopUpMenu );
+    for( unsigned i = 0;
+         i < sizeof( vlc_keys ) / sizeof( key_descriptor_t ); i++ )
+    {
+        menuItem = new BMenuItem( vlc_keys[i].psz_key_string, NULL );
+        fPopUpMenu->AddItem( menuItem );
+    }
+
+    r.right = r.left - 10; r.left = r.left - 60;
+    fShiftCheck = new BCheckBox( r, NULL, "Shift", new BMessage );
+
+    r.right = r.left - 10; r.left = r.left - 60;
+    fCtrlCheck = new BCheckBox( r, NULL, "Ctrl", new BMessage );
+
+    r.right = r.left - 10; r.left = r.left - 60;
+    fAltCheck = new BCheckBox( r, NULL, "Alt", new BMessage );
+
+    /* Can someone tell me how we're supposed to get GUI items aligned ? */
+    r.right = r.left - 10; r.left = 0;
+    r.bottom -= 10;
+    fStringView = new BStringView( r, NULL, label );
+
+    AddChild( fStringView );
+    AddChild( fAltCheck );
+    AddChild( fCtrlCheck );
+    AddChild( fShiftCheck );
+    AddChild( fMenuField );
+}
+
+void ConfigKey::Apply( intf_thread_t * p_intf, bool doIt )
+{
+    BMenuItem * menuItem;
+
+    if( doIt )
+    {
+        menuItem = fPopUpMenu->FindMarked();
+        if( menuItem )
+        {
+            int value = vlc_keys[fPopUpMenu->IndexOf( menuItem )].i_key_code;
+            if( fAltCheck->Value() )
+            {
+                value |= KEY_MODIFIER_ALT;
+            }
+            if( fCtrlCheck->Value() )
+            {
+                value |= KEY_MODIFIER_CTRL;
+            }
+            if( fShiftCheck->Value() )
+            {
+                value |= KEY_MODIFIER_SHIFT;
+            }
+            config_PutInt( p_intf, fConfigName, value );
+        }
+    }
+    else
+    {
+        int value = config_GetInt( p_intf, fConfigName );
+        fAltCheck->SetValue( value & KEY_MODIFIER_ALT );
+        fCtrlCheck->SetValue( value & KEY_MODIFIER_CTRL );
+        fShiftCheck->SetValue( value & KEY_MODIFIER_SHIFT );
+
+        for( unsigned i = 0;
+             i < sizeof( vlc_keys ) / sizeof( key_descriptor_t ); i++ )
+        {
+            if( (unsigned) vlc_keys[i].i_key_code ==
+                    ( value & ~KEY_MODIFIER ) )
+            {
+                menuItem = fPopUpMenu->ItemAt( i );
+                menuItem->SetMarked( true );
+                break;
+            }
+        }
+    }
 }
 

@@ -2,7 +2,7 @@
  * PreferencesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.h,v 1.17 2003/05/25 17:21:36 titer Exp $
+ * $Id: PreferencesWindow.h,v 1.18 2003/12/21 21:30:43 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -52,64 +52,76 @@ class StringItemWithView : public BStringItem
     char *                  fText;
 };
 
-class ConfigTextControl : public BTextControl
-{
-  public:
-                            ConfigTextControl( BRect rect, char * label,
-                                               int type, char * configName )
-                                : BTextControl( rect, "ConfigTextControl", label,
-                                                "", new BMessage() )
-                            {
-                                fConfigType = type;
-                                fConfigName = strdup( configName );
-                            }
-
-    int                     fConfigType;
-    char *                  fConfigName;
-};
-
-class ConfigCheckBox : public BCheckBox
+class ConfigWidget : public BView
 {
     public:
-                            ConfigCheckBox( BRect rect, char * label,
-                                            char * configName )
-                               : BCheckBox( rect, "ConfigCheckBox", label,
-                                            new BMessage() )
-                            {
-                                fConfigName = strdup( configName );
-                            }
+        ConfigWidget( BRect rect, int type, char * configName );
+        virtual void Apply( intf_thread_t * p_intf, bool doIt ) = 0;
 
-    char *                  fConfigName;
+    protected:
+        int          fConfigType;
+        char       * fConfigName;
 };
 
-class ConfigMenuField : public BMenuField
+class ConfigTextControl : public ConfigWidget
 {
     public:
-                            ConfigMenuField( BRect rect, char * label,
-                                             BPopUpMenu * popUp, char * configName )
-                               : BMenuField( rect, "ConfigMenuField", label,
-                                             popUp, new BMessage() )
-                            {
-                                fConfigName = strdup( configName );
-                            }
+        ConfigTextControl( BRect rect, int type, char * label,
+                           char * configName );
+        void Apply( intf_thread_t * p_intf, bool doIt );
 
-    char *                  fConfigName;
+    private:
+        BTextControl * fTextControl;
 };
 
-class ConfigSlider : public BSlider
+class ConfigCheckBox : public ConfigWidget
 {
     public:
-                            ConfigSlider( BRect rect, char * label, int type,
-                                          int min, int max, char * configName )
-                               : BSlider( rect, "ConfigSlider", label,
-                                          new BMessage(), min, max )
-                            {
-                                fConfigType = type;
-                                fConfigName = strdup( configName );
-                            }
-                            
-    int                     fConfigType;
-    char * fConfigName;
+        ConfigCheckBox( BRect rect, int type, char * label,
+                        char * configName );
+        void Apply( intf_thread_t * p_intf, bool doIt );
+
+    private:
+        BCheckBox * fCheckBox;
+};
+
+class ConfigMenuField : public ConfigWidget
+{
+    public:
+        ConfigMenuField( BRect rect, int type, char * label,
+                         char * configName, char ** list );
+        void Apply( intf_thread_t * p_intf, bool doIt );
+
+    private:
+        BPopUpMenu * fPopUpMenu;
+        BMenuField * fMenuField;
+};
+
+class ConfigSlider : public ConfigWidget
+{
+    public:
+        ConfigSlider( BRect rect, int type, char * label,
+                      char * configName, int min, int max );
+        void Apply( intf_thread_t * p_intf, bool doIt );
+
+    private:
+        BSlider * fSlider;
+};
+
+class ConfigKey : public ConfigWidget
+{
+    public:
+        ConfigKey( BRect rect, int type, char * label,
+                   char * configName );
+        void Apply( intf_thread_t * p_intf, bool doIt );
+
+    private:
+        BStringView * fStringView;
+        BCheckBox   * fAltCheck;
+        BCheckBox   * fCtrlCheck;
+        BCheckBox   * fShiftCheck;
+        BPopUpMenu  * fPopUpMenu;
+        BMenuField  * fMenuField;
 };
 
 class PreferencesWindow : public BWindow
