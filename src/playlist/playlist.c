@@ -840,6 +840,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
                     p_playlist->i_index += i_skip;
                     p_new = p_playlist->pp_items[p_playlist->i_index];
                 }
+                p_playlist->request.i_skip = 0;
             }
         }
         else
