@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.198 2002/11/19 20:45:08 gbazin Exp $
+ * $Id: video_output.c,v 1.199 2002/11/20 01:49:15 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -142,7 +142,7 @@ vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
     p_vout->render.i_gmask    = 0;
     p_vout->render.i_bmask    = 0;
 
-    p_vout->render.i_last_used_pic = 0;
+    p_vout->render.i_last_used_pic = -1;
     p_vout->render.b_allow_modify_pics = 1;
 
     /* Zero the output heap */
@@ -267,6 +267,15 @@ static int InitThread( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
 
+    if( I_OUTPUTPICTURES > VOUT_MAX_PICTURES )
+    {
+        msg_Err( p_vout, "plugin allocated too many direct buffers, "
+                         "our internal buffers must have overflown." );
+        p_vout->pf_end( p_vout );
+        vlc_mutex_unlock( &p_vout->change_lock );
+        return VLC_EGENERIC;
+    }
+
     msg_Dbg( p_vout, "got %i direct buffer(s)", I_OUTPUTPICTURES );
 
     i_pgcd = ReduceHeight( p_vout->render.i_aspect );
@@ -341,26 +350,20 @@ static int InitThread( vout_thread_t *p_vout )
             return VLC_EGENERIC;
         }
 
-        if( I_OUTPUTPICTURES < 2 * VOUT_MAX_PICTURES )
-        {
-            msg_Dbg( p_vout, "indirect render, mapping "
-                     "render pictures %i-%i to system pictures %i-%i",
-                     I_OUTPUTPICTURES - 1, 2 * VOUT_MAX_PICTURES - 2,
-                     I_OUTPUTPICTURES, 2 * VOUT_MAX_PICTURES - 1 );
-        }
-        else
-        {
-            /* FIXME: if this happens, we don't have any render pictures left */
-            msg_Dbg( p_vout, "indirect render, no system pictures needed,"
-                     " we have %i directbuffers", I_OUTPUTPICTURES );
-            msg_Err( p_vout, "this is a bug!" );
-        }
+        msg_Dbg( p_vout, "indirect render, mapping "
+                 "render pictures 0-%i to system pictures %i-%i",
+                 VOUT_MAX_PICTURES - 1, I_OUTPUTPICTURES,
+                 I_OUTPUTPICTURES + VOUT_MAX_PICTURES - 1 );
 
         /* Append render buffers after the direct buffers */
         for( i = I_OUTPUTPICTURES; i < 2 * VOUT_MAX_PICTURES; i++ )
         {
             PP_RENDERPICTURE[ I_RENDERPICTURES ] = &p_vout->p_picture[ i ];
             I_RENDERPICTURES++;
+
+            /* Check if we have enough render pictures */
+            if( I_RENDERPICTURES == VOUT_MAX_PICTURES )
+                break;
         }
     }
 
