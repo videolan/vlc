@@ -2,7 +2,7 @@
  * filter.h : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filter.h,v 1.4 2003/12/02 23:03:31 gbazin Exp $
+ * $Id: filter.h,v 1.5 2004/01/26 18:24:17 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -128,6 +128,7 @@ class CaptureFilter : public IBaseFilter
     CapturePin     *p_pin;
     IFilterGraph   *p_graph;
     AM_MEDIA_TYPE  media_type;
+    FILTER_STATE   state;
 
     long i_ref;
 

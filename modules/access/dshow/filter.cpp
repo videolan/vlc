@@ -2,7 +2,7 @@
  * filter.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filter.cpp,v 1.10 2003/12/15 00:47:18 gbazin Exp $
+ * $Id: filter.cpp,v 1.11 2004/01/26 18:24:17 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -396,21 +396,21 @@ STDMETHODIMP CapturePin::EndOfStream( void )
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CapturePin::EndOfStream" );
 #endif
-    return E_NOTIMPL;
+    return S_OK;
 }
 STDMETHODIMP CapturePin::BeginFlush( void )
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CapturePin::BeginFlush" );
 #endif
-    return E_NOTIMPL;
+    return S_OK;
 }
 STDMETHODIMP CapturePin::EndFlush( void )
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CapturePin::EndFlush" );
 #endif
-    return E_NOTIMPL;
+    return S_OK;
 }
 STDMETHODIMP CapturePin::NewSegment( REFERENCE_TIME tStart,
                                      REFERENCE_TIME tStop,
@@ -419,7 +419,7 @@ STDMETHODIMP CapturePin::NewSegment( REFERENCE_TIME tStart,
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CapturePin::NewSegment" );
 #endif
-    return E_NOTIMPL;
+    return S_OK;
 }
 
 /* IMemInputPin methods */
@@ -510,7 +510,7 @@ STDMETHODIMP CapturePin::ReceiveCanBlock( void )
 
 CaptureFilter::CaptureFilter( input_thread_t * _p_input, AM_MEDIA_TYPE mt )
   : p_input( _p_input ), p_pin( new CapturePin( _p_input, this, mt ) ),
-    media_type( mt ), i_ref( 1 )
+    media_type( mt ), state( State_Stopped ), i_ref( 1 )
 {
 }
 
@@ -591,9 +591,11 @@ STDMETHODIMP CaptureFilter::GetClassID(CLSID *pClsID)
 STDMETHODIMP CaptureFilter::GetState(DWORD dwMSecs, FILTER_STATE *State)
 {
 #ifdef DEBUG_DSHOW
-    msg_Dbg( p_input, "CaptureFilter::GetState" );
+    msg_Dbg( p_input, "CaptureFilter::GetState %i", state );
 #endif
-    return E_NOTIMPL;
+
+    *State = state;
+    return S_OK;
 };
 STDMETHODIMP CaptureFilter::SetSyncSource(IReferenceClock *pClock)
 {
@@ -601,7 +603,7 @@ STDMETHODIMP CaptureFilter::SetSyncSource(IReferenceClock *pClock)
     msg_Dbg( p_input, "CaptureFilter::SetSyncSource" );
 #endif
 
-    return NOERROR;
+    return S_OK;
 };
 STDMETHODIMP CaptureFilter::GetSyncSource(IReferenceClock **pClock)
 {
@@ -617,6 +619,8 @@ STDMETHODIMP CaptureFilter::Stop()
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::Stop" );
 #endif
+
+    state = State_Stopped;
     return S_OK;
 };
 STDMETHODIMP CaptureFilter::Pause()
@@ -624,6 +628,8 @@ STDMETHODIMP CaptureFilter::Pause()
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::Pause" );
 #endif
+
+    state = State_Paused;
     return S_OK;
 };
 STDMETHODIMP CaptureFilter::Run(REFERENCE_TIME tStart)
@@ -631,6 +637,8 @@ STDMETHODIMP CaptureFilter::Run(REFERENCE_TIME tStart)
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::Run" );
 #endif
+
+    state = State_Running;
     return S_OK;
 };
 
