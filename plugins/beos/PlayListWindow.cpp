@@ -2,7 +2,7 @@
  * PlayListWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.cpp,v 1.7 2002/06/01 12:31:58 sam Exp $
+ * $Id: PlayListWindow.cpp,v 1.8 2002/08/01 12:36:26 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -27,6 +27,7 @@
 /* System headers */
 #include <InterfaceKit.h>
 #include <StorageKit.h>
+#include <SupportKit.h>
 #include <string.h>
 
 /* VLC headers */
@@ -34,6 +35,7 @@
 #include <vlc/intf.h>
 
 /* BeOS interface headers */
+#include "intf_vlc_wrapper.h"
 #include "InterfaceWindow.h"
 #include "MsgVals.h"
 #include "PlayListWindow.h"
@@ -85,7 +87,7 @@ PlayListWindow::PlayListWindow( BRect frame, const char *name,
                                     B_MULTIPLE_SELECTION_LIST);
     for (int i=0; i < p_playlist->i_size; i++)
     {
-        p_listview->AddItem(new BStringItem(p_playlist->p_item[i].psz_name)); 
+        p_listview->AddItem(new BStringItem(p_playlist->pp_items[i]->psz_name)); 
     }
     p_view->AddChild(new BScrollView("scroll_playlist", p_listview,
              B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true)); 
@@ -118,27 +120,34 @@ void PlayListWindow::MessageReceived( BMessage * p_message )
         break;
 
     case OPEN_DVD:
-        const char *psz_device;
-        char psz_source[ B_FILE_NAME_LENGTH + 4 ];
-        if( p_message->FindString("device", &psz_device) != B_ERROR )
         {
-            snprintf( psz_source, B_FILE_NAME_LENGTH + 4,
-                      "dvd:%s", psz_device );
-            psz_source[ strlen(psz_source) ] = '\0';
-            intf_PlaylistAdd( p_playlist, PLAYLIST_END, (char*)psz_source );
-            p_listview->AddItem(new BStringItem((char*)psz_source));
+            const char *psz_device;
+            BString type("dvd");
+            if( p_message->FindString("device", &psz_device) != B_ERROR )
+            {
+                BString device(psz_device);
+//                p_vlc_wrapper->openDisc(type, device, 0,0);
+                p_listview->AddItem(new BStringItem(psz_device));
+            }
         }
-    case B_REFS_RECEIVED:
+        break;
+   case B_REFS_RECEIVED:
     case B_SIMPLE_DATA:
         {
             entry_ref ref;
-            if( p_message->FindRef( "refs", &ref ) == B_OK )
+            BList* files = new BList();
+
+            int i = 0;
+            while( p_message->FindRef( "refs", i, &ref ) == B_OK )
             {
                 BPath path( &ref );
-                intf_PlaylistAdd( p_playlist,
-                                  PLAYLIST_END, (char*)path.Path() );
+
+                files->AddItem(new BString((char*)path.Path()) );
                 p_listview->AddItem(new BStringItem((char*)path.Path()));
+                i++;
             }
+//            p_vlc_wrapper->openFiles(files);
+            delete files;
         }
         break;
     default:
