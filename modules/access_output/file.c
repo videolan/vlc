@@ -2,7 +2,7 @@
  * file.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.5 2003/04/29 15:40:31 fenrir Exp $
+ * $Id: file.c,v 1.6 2003/06/11 21:41:56 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -40,6 +40,10 @@
 #   include <unistd.h>
 #elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
+#   ifndef S_IRGRP
+#   define S_IRGRP 0
+#   define S_IROTH 0
+#   endif
 #endif
 
 /*****************************************************************************
@@ -63,7 +67,7 @@ vlc_module_end();
 
 struct sout_access_out_sys_t
 {
-    FILE *p_file;
+    int i_handle;
 
 };
 
@@ -87,10 +91,12 @@ static int Open( vlc_object_t *p_this )
     }
     if( !strcmp( p_access->psz_name, "-" ) )
     {
-        p_access->p_sys->p_file = stdout;
+        p_access->p_sys->i_handle = STDOUT_FILENO;
         msg_Dbg( p_access, "using stdout" );
     }
-    else if( !( p_access->p_sys->p_file = fopen( p_access->psz_name, "wb" ) ) )
+    else if( ( p_access->p_sys->i_handle =
+               open( p_access->psz_name, O_WRONLY|O_CREAT|O_TRUNC,
+                     S_IREAD | S_IRGRP | S_IROTH ) ) == -1 )
     {
         msg_Err( p_access, "cannot open `%s'", p_access->psz_name );
         free( p_access->p_sys );
@@ -113,9 +119,9 @@ static void Close( vlc_object_t * p_this )
 
     if( strcmp( p_access->psz_name, "-" ) )
     {
-        if( p_access->p_sys->p_file )
+        if( p_access->p_sys->i_handle )
         {
-            fclose( p_access->p_sys->p_file );
+            close( p_access->p_sys->i_handle );
         }
     }
     free( p_access->p_sys );
@@ -134,8 +140,8 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
     {
         sout_buffer_t *p_next;
 
-        i_write += fwrite( p_buffer->p_buffer, 1, p_buffer->i_size,
-                           p_access->p_sys->p_file );
+        i_write += write( p_access->p_sys->i_handle, p_buffer->p_buffer,
+                          p_buffer->i_size );
         p_next = p_buffer->p_next;
         sout_BufferDelete( p_access->p_sout, p_buffer );
         p_buffer = p_next;
@@ -150,11 +156,15 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
  *****************************************************************************/
 static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
-
     msg_Dbg( p_access, "Seek: pos:"I64Fd, (int64_t)i_pos );
+
     if( strcmp( p_access->psz_name, "-" ) )
     {
-        return( fseek( p_access->p_sys->p_file, i_pos, SEEK_SET ) );
+#if defined( WIN32 ) && !defined( UNDER_CE )
+        return( _lseeki64( p_access->p_sys->i_handle, i_pos, SEEK_SET ) );
+#else
+        return( lseek( p_access->p_sys->i_handle, i_pos, SEEK_SET ) );
+#endif
     }
     else
     {
@@ -162,6 +172,3 @@ static int Seek( sout_access_out_t *p_access, off_t i_pos )
         return VLC_EGENERIC;
     }
 }
-
-
-
