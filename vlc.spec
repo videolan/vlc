@@ -42,6 +42,8 @@ Buildrequires: XFree86-devel, desktop-file-utils, libpostproc >= 1.0
 %{!?_without_mozilla:BuildRequires: mozplugger >= 1.3.2}
 %{!?_without_speex:BuildRequires: speex-devel >= 1.0.3}
 %{!?_without_aa:BuildRequires: aalib >= 1.4}
+%{!?_without_mkv:BuildRequires: matroska}
+%{!?_without_fribidi:BuildRequires: fribidi-devel}
 
 Obsoletes: videolan-client
 
@@ -73,6 +75,8 @@ Requires: XFree86, desktop-file-utils
 %{!?_without_mozilla:Requires: mozilla >= %{mozver}}
 %{!?_without_speex:Requires: speex >= 1.0.3}
 %{!?_without_wxwindows:Requires: wxGTK >= 2.4.2}
+%{!?_without_mkv:Requires: matroska}
+%{!?_without_fribidi:Requires: fribidi}
 
 %description
 VideoLAN Client (VLC) is a highly portable multimedia player for various
@@ -82,7 +86,7 @@ well as DVDs, VCDs, and various streaming protocols.
 Available rpmbuild rebuild options :
 --without dvd dvdread dvdplay dvbpsi dv v4l avi asf aac ogg rawdv mad ffmpeg xvid
           mp4 a52 vorbis mpeg2dec flac aa esd arts alsa gtk gnome xosd lsp lirc
-          pth id3tag dv qt kde ncurses faad wxwindows
+          pth id3tag dv qt kde ncurses faad wxwindows mkv fribidi
 
 Options that would need not yet existing add-on packages :
 --with tremor tarkin theora ggi glide svgalib mga
@@ -156,7 +160,8 @@ ln /usr/share/idl/mozilla-%{mozver} /usr/share/idl/mozilla -sf
 	%{!?_without_esd:--enable-esd} \
 	%{!?_without_arts:--enable-arts} \
 	%{?_with_alsa:--enable-alsa} \
-	--disable-waveout \
+	%{!?_without_fribidi:--enable-fribidi} \
+        --disable-waveout \
 	%{!?_without_gtk:--enable-gtk} \
 	--disable-familiar \
 	%{!?_without_gnome:--enable-gnome} \
@@ -176,7 +181,9 @@ ln /usr/share/idl/mozilla-%{mozver} /usr/share/idl/mozilla -sf
 	%{!?_without_mozilla:--enable-mozilla} \
         %{?_without_speex:--disable-speex} \
 	--disable-testsuite \
-	--enable-plugins
+	--enable-plugins \
+        %{?_without_mkv:--disable-mkv} \
+        %{!?_without_fribidi:--enable-fribidi}
 make %{?_smp_mflags}
 
 %install
@@ -241,6 +248,10 @@ mv %{_libdir}/mozilla-%{mozver}/plugins/mozplugger.so %{_libdir}/mozilla/plugins
 %{_libdir}/libvlc.a
 
 %changelog
+* Tue Dec 2 2003 Jason Luka
+- Added fribidi support
+- Added fribidi and mkv options to configure
+
 * Sat Nov 29 2003 Jason Luka
 - Fixed Matroska/EBML problem
 - Updated script for mozilla plugin installation
