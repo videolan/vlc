@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.29 2003/03/06 11:43:07 hartman Exp $
+ * $Id: controls.m,v 1.30 2003/04/06 23:21:13 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -388,7 +388,7 @@
 {
     intf_thread_t * p_intf = [NSApp getIntf];
     BOOL bEnable = [sender state] == NSOffState;
-    
+
     if( bEnable )
     {
         config_PutPsz( p_intf, "filter", "deinterlace" );

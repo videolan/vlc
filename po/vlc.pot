@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2003-04-02 00:02+0200\n"
+"POT-Creation-Date: 2003-04-06 23:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,44 +19,44 @@ msgstr ""
 msgid "C"
 msgstr ""
 
-#: src/libvlc.c:298 src/libvlc.c:1333
+#: src/libvlc.c:298 src/libvlc.c:1335
 #, c-format
 msgid ""
 "Usage: %s [options] [items]...\n"
 "\n"
 msgstr ""
 
-#: src/libvlc.c:1165 src/misc/configuration.c:919
+#: src/libvlc.c:1167 src/misc/configuration.c:919
 msgid "string"
 msgstr ""
 
-#: src/libvlc.c:1182 src/misc/configuration.c:904
+#: src/libvlc.c:1184 src/misc/configuration.c:904
 msgid "integer"
 msgstr ""
 
-#: src/libvlc.c:1185 src/misc/configuration.c:911
+#: src/libvlc.c:1187 src/misc/configuration.c:911
 msgid "float"
 msgstr ""
 
-#: src/libvlc.c:1191
+#: src/libvlc.c:1193
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc.c:1192
+#: src/libvlc.c:1194
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc.c:1308 src/libvlc.c:1363 src/libvlc.c:1387
+#: src/libvlc.c:1310 src/libvlc.c:1365 src/libvlc.c:1389
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
 msgstr ""
 
-#: src/libvlc.c:1336
+#: src/libvlc.c:1338
 msgid "[module]              [description]\n"
 msgstr ""
 
-#: src/libvlc.c:1381
+#: src/libvlc.c:1383
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -773,7 +773,7 @@ msgstr ""
 msgid "Interface"
 msgstr ""
 
-#: src/libvlc.h:459 modules/audio_output/coreaudio.c:224
+#: src/libvlc.h:461 modules/audio_output/coreaudio.c:224
 #: modules/audio_output/file.c:108 modules/demux/asf/asf.c:218
 #: modules/demux/ogg.c:553 modules/demux/ogg.c:812 modules/demux/ogg.c:985
 #: modules/gui/gtk/gnome_interface.c:1133 modules/gui/gtk/gtk_interface.c:1260
@@ -781,7 +781,7 @@ msgstr ""
 msgid "Audio"
 msgstr ""
 
-#: src/libvlc.h:475 modules/demux/asf/asf.c:288 modules/demux/avi/avi.c:1040
+#: src/libvlc.h:477 modules/demux/asf/asf.c:288 modules/demux/avi/avi.c:1040
 #: modules/demux/ogg.c:612 modules/demux/ogg.c:652 modules/demux/ogg.c:717
 #: modules/demux/ogg.c:892 modules/gui/gtk/gnome_interface.c:1140
 #: modules/gui/gtk/gtk_interface.c:1337 modules/gui/macosx/intf.m:344
@@ -789,30 +789,30 @@ msgstr ""
 msgid "Video"
 msgstr ""
 
-#: src/libvlc.h:495 modules/access/satellite/satellite.c:66
+#: src/libvlc.h:497 modules/access/satellite/satellite.c:66
 msgid "Input"
 msgstr ""
 
-#: src/libvlc.h:529
+#: src/libvlc.h:531
 msgid "Decoders"
 msgstr ""
 
-#: src/libvlc.h:532
+#: src/libvlc.h:534
 msgid "Encoders"
 msgstr ""
 
-#: src/libvlc.h:537 modules/gui/gtk/gnome_interface.c:2149
+#: src/libvlc.h:539 modules/gui/gtk/gnome_interface.c:2149
 #: modules/gui/gtk/gtk_interface.c:2468 modules/gui/gtk/gtk_interface.c:3150
 #: modules/gui/win32/strings.cpp:221 modules/gui/wxwindows/open.cpp:177
 #: modules/gui/wxwindows/streamout.cpp:129
 msgid "Stream output"
 msgstr ""
 
-#: src/libvlc.h:550
+#: src/libvlc.h:552
 msgid "CPU"
 msgstr ""
 
-#: src/libvlc.h:562 modules/gui/familiar/interface.c:610
+#: src/libvlc.h:564 modules/gui/familiar/interface.c:610
 #: modules/gui/gtk/gnome_interface.c:648
 #: modules/gui/gtk/gnome_interface.c:2500
 #: modules/gui/gtk/gnome_interface.c:2525 modules/gui/gtk/gtk_interface.c:752
@@ -822,7 +822,7 @@ msgstr ""
 msgid "Playlist"
 msgstr ""
 
-#: src/libvlc.h:569 modules/audio_filter/converter/a52tofloat32.c:85
+#: src/libvlc.h:571 modules/audio_filter/converter/a52tofloat32.c:85
 #: modules/audio_filter/converter/mpgatofixed32.c:60
 #: modules/codec/a52old/a52old.c:59 modules/codec/mpeg_video/parser.c:84
 #: modules/demux/mpeg/ts.c:118 modules/gui/familiar/familiar.c:70
@@ -833,27 +833,27 @@ msgstr ""
 msgid "Miscellaneous"
 msgstr ""
 
-#: src/libvlc.h:582
+#: src/libvlc.h:584
 msgid "main program"
 msgstr ""
 
-#: src/libvlc.h:588
+#: src/libvlc.h:590
 msgid "print help"
 msgstr ""
 
-#: src/libvlc.h:590
+#: src/libvlc.h:592
 msgid "print detailed help"
 msgstr ""
 
-#: src/libvlc.h:593
+#: src/libvlc.h:595
 msgid "print a list of available modules"
 msgstr ""
 
-#: src/libvlc.h:595
+#: src/libvlc.h:597
 msgid "print help on module"
 msgstr ""
 
-#: src/libvlc.h:598
+#: src/libvlc.h:600
 msgid "print version information"
 msgstr ""
 
@@ -2946,7 +2946,7 @@ msgstr ""
 #: modules/gui/win32/strings.cpp:173 modules/gui/win32/strings.cpp:183
 #: modules/gui/win32/strings.cpp:214 modules/gui/win32/strings.cpp:233
 #: modules/gui/win32/strings.cpp:249 modules/gui/wxwindows/open.cpp:225
-#: modules/gui/wxwindows/fileinfo.cpp:91 modules/gui/wxwindows/messages.cpp:95
+#: modules/gui/wxwindows/fileinfo.cpp:91 modules/gui/wxwindows/messages.cpp:98
 #: modules/gui/wxwindows/playlist.cpp:142
 #: modules/gui/wxwindows/preferences.cpp:243
 #: modules/gui/wxwindows/streamout.cpp:166
@@ -3965,7 +3965,7 @@ msgid "About %s"
 msgstr ""
 
 #: modules/gui/wxwindows/open.cpp:178
-msgid "Use VLC has a stream server"
+msgid "Use VLC as a stream server"
 msgstr ""
 
 #: modules/gui/wxwindows/open.cpp:197
@@ -3998,6 +3998,10 @@ msgstr ""
 
 #: modules/gui/wxwindows/popup.cpp:127 modules/gui/wxwindows/playlist.cpp:108
 msgid "&Close"
+msgstr ""
+
+#: modules/gui/wxwindows/messages.cpp:103
+msgid "Verbose"
 msgstr ""
 
 #: modules/gui/wxwindows/playlist.cpp:105
@@ -4044,42 +4048,42 @@ msgstr ""
 msgid "Destination Target:"
 msgstr ""
 
-#: modules/gui/skins/src/skin_main.cpp:162
+#: modules/gui/skins/src/skin_main.cpp:170
 msgid "Open skin"
 msgstr ""
 
-#: modules/gui/skins/src/skin_main.cpp:163
-#: modules/gui/skins/src/skin_main.cpp:164
+#: modules/gui/skins/src/skin_main.cpp:171
+#: modules/gui/skins/src/skin_main.cpp:172
 #: modules/gui/skins/src/vlcproc.cpp:318 modules/gui/skins/src/vlcproc.cpp:319
 msgid "Skin files"
 msgstr ""
 
-#: modules/gui/skins/src/skin_main.cpp:165
+#: modules/gui/skins/src/skin_main.cpp:173
 #: modules/gui/skins/src/vlcproc.cpp:320 modules/gui/skins/src/vlcproc.cpp:390
 msgid "All files"
 msgstr ""
 
-#: modules/gui/skins/src/skin_main.cpp:208
-#: modules/gui/skins/src/skin_main.cpp:209
+#: modules/gui/skins/src/skin_main.cpp:216
+#: modules/gui/skins/src/skin_main.cpp:217
 msgid "Last skin actually used"
 msgstr ""
 
-#: modules/gui/skins/src/skin_main.cpp:210
-#: modules/gui/skins/src/skin_main.cpp:211
+#: modules/gui/skins/src/skin_main.cpp:218
+#: modules/gui/skins/src/skin_main.cpp:219
 msgid "Config of last used skin"
 msgstr ""
 
-#: modules/gui/skins/src/skin_main.cpp:212
-#: modules/gui/skins/src/skin_main.cpp:213
+#: modules/gui/skins/src/skin_main.cpp:220
+#: modules/gui/skins/src/skin_main.cpp:221
 msgid "Show application in system tray"
 msgstr ""
 
-#: modules/gui/skins/src/skin_main.cpp:214
-#: modules/gui/skins/src/skin_main.cpp:215
+#: modules/gui/skins/src/skin_main.cpp:222
+#: modules/gui/skins/src/skin_main.cpp:223
 msgid "Show application in taskbar"
 msgstr ""
 
-#: modules/gui/skins/src/skin_main.cpp:226
+#: modules/gui/skins/src/skin_main.cpp:234
 msgid "Skinnable Interface"
 msgstr ""
 

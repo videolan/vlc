@@ -138,6 +138,7 @@
                 "o_msgs_panel" = id; 
                 "o_mu_audio" = id; 
                 "o_mu_controls" = id; 
+                "o_mu_deinterlace" = id; 
                 "o_mu_edit" = id; 
                 "o_mu_file" = id; 
                 "o_mu_help" = id; 

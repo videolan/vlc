@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.19 2003/03/20 10:06:16 sam Exp $
+##  $Id: toolbox,v 1.20 2003/04/06 23:21:13 massiot Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -89,7 +89,7 @@ if test "${action}" = "changelog"
 then
   cvs2cl --help >/dev/null 2>&1 || exit 1
   rm -f ChangeLog
-  cvs2cl --hide-filenames --no-wrap -w --stdout | \
+  cvs2cl --utc --hide-filenames --no-wrap -w --stdout | \
     sed -e 's/^[^0-9]/ /' -e 's/^  *$//' | \
     uniq > ChangeLog
   exit 0
