@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.16 2003/08/14 12:38:03 garf Exp $
+ * $Id: vlcshell.cpp,v 1.17 2003/08/14 13:32:12 garf Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -400,8 +400,8 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
 
 NPError NPP_SetWindow( NPP instance, NPWindow* window )
 {
-#ifdef XP_MACOSX
     vlc_value_t value;
+#ifdef XP_MACOSX
     vlc_value_t valuex;
     vlc_value_t valuey;
     vlc_value_t valuew;
