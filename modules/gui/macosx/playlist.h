@@ -2,7 +2,7 @@
  * playlist.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: playlist.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: playlist.h,v 1.2 2003/01/05 03:21:50 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -36,12 +36,22 @@
  *****************************************************************************/
 @interface VLCPlaylist : NSObject
 {
-    IBOutlet id o_panel; 
-    IBOutlet id o_btn_close;
     IBOutlet id o_table_view;
+
+    IBOutlet id o_ctx_menu;
+
+    IBOutlet id o_mi_play;
+    IBOutlet id o_mi_delete;
+    IBOutlet id o_mi_selectall;
 }
 
+- (NSMenu *)menuForEvent:(NSEvent *)o_event;
+
+- (IBAction)playItem:(id)sender;
+- (IBAction)deleteItems:(id)sender;
+- (IBAction)selectAll:(id)sender;
+
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_pos;
+- (void)playlistUpdated;
 
 @end
-

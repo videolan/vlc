@@ -171,9 +171,16 @@
             SUPERCLASS = NSObject; 
         }, 
         {
+            ACTIONS = {deleteItems = id; playItem = id; selectAll = id; }; 
             CLASS = VLCPlaylist; 
             LANGUAGE = ObjC; 
-            OUTLETS = {"o_btn_close" = id; "o_panel" = id; "o_table_view" = id; }; 
+            OUTLETS = {
+                "o_ctx_menu" = id; 
+                "o_mi_delete" = id; 
+                "o_mi_play" = id; 
+                "o_mi_selectall" = id; 
+                "o_table_view" = id; 
+            }; 
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = VLCPlaylistView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }

@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: playlist.m,v 1.2 2002/09/23 23:05:58 massiot Exp $
+ * $Id: playlist.m,v 1.3 2003/01/05 03:21:50 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -43,9 +43,7 @@
 
 - (NSMenu *)menuForEvent:(NSEvent *)o_event
 {
-    /* TODO */
-
-    return( nil );
+    return( [[self delegate] menuForEvent: o_event] );
 }
 
 @end
@@ -61,13 +59,14 @@
     [o_table_view setDelegate: self];
     [o_table_view setDataSource: self];
 
-    [o_table_view setDoubleAction: @selector(doubleClick:)];
+    [o_table_view setDoubleAction: @selector(playItem:)];
 
     [o_table_view registerForDraggedTypes: 
         [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
 
-    [o_panel setTitle: _NS("Playlist")];
-    [o_btn_close setTitle: _NS("Close")];
+    [o_mi_play setTitle: _NS("Play")];
+    [o_mi_delete setTitle: _NS("Delete")];
+    [o_mi_selectall setTitle: _NS("Select All")];
 }
 
 - (BOOL)tableView:(NSTableView *)o_tv 
@@ -101,11 +100,6 @@
 
         [self appendArray: o_values atPos: i_row];
 
-        if( i_row != -1 )
-        {
-            [o_table_view reloadData];
-        }
-        
         return( YES );
     }
 
@@ -115,25 +109,44 @@
 - (void)tableView:(NSTableView *)o_tv willDisplayCell:(id)o_cell
                   forTableColumn:(NSTableColumn *)o_tc row:(int)i_row
 {
+    NSColor * o_color;
+
     [o_cell setDrawsBackground: YES];
 
     if( i_row % 2 )
     {
-        [o_cell setBackgroundColor: 
-            [NSColor colorWithDeviceRed: 0.937255 
-                                  green: 0.968627
-                                   blue: 1.0
-                                  alpha: 1.0]];
+        o_color = [[NSColor alternateSelectedControlColor]
+                            highlightWithLevel: 0.90];
     }
     else
     {
-        [o_cell setBackgroundColor: [NSColor whiteColor]];
+        o_color = [o_tv backgroundColor]; 
     }
+
+    [o_cell setBackgroundColor: o_color];
 }
 
-- (IBAction)doubleClick:(id)sender
+- (NSMenu *)menuForEvent:(NSEvent *)o_event
 {
-    NSTableView * o_tv = sender;
+    NSPoint pt;
+    vlc_bool_t b_rows;
+    vlc_bool_t b_item_sel;
+
+    pt = [o_table_view convertPoint: [o_event locationInWindow] 
+                                                 fromView: nil];
+    b_item_sel = ( [o_table_view rowAtPoint: pt] != -1 &&
+                   [o_table_view selectedRow] != -1 );
+    b_rows = [o_table_view numberOfRows] != 0;
+
+    [o_mi_play setEnabled: b_item_sel];
+    [o_mi_delete setEnabled: b_item_sel];
+    [o_mi_selectall setEnabled: b_rows];
+
+    return( o_ctx_menu );
+}
+
+- (IBAction)playItem:(id)sender
+{
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
@@ -143,9 +156,44 @@
         return;
     }
 
-    playlist_Goto( p_playlist, [o_tv clickedRow] );
+    playlist_Goto( p_playlist, [o_table_view selectedRow] );
 
     vlc_object_release( p_playlist );
+}
+
+- (IBAction)deleteItems:(id)sender
+{
+    int i_row;
+
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    while( ( i_row = [o_table_view selectedRow] ) != -1 )
+    {
+        if( p_playlist->i_index == i_row && p_playlist->i_status )
+        {
+            playlist_Stop( p_playlist );
+        }
+
+        playlist_Delete( p_playlist, i_row ); 
+
+        [o_table_view deselectRow: i_row];
+    }
+
+    vlc_object_release( p_playlist );
+
+    [self playlistUpdated];
+}
+
+- (IBAction)selectAll:(id)sender
+{
+    [o_table_view selectAll: nil];
 }
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_pos
@@ -196,6 +244,13 @@
     }
 
     vlc_object_release( p_playlist );
+
+    [self playlistUpdated];
+}
+
+- (void)playlistUpdated
+{
+    [o_table_view reloadData];
 }
 
 @end
