@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: fileinfo.cpp,v 1.6 2003/04/01 16:11:43 gbazin Exp $
+ * $Id: fileinfo.cpp,v 1.7 2003/04/06 13:18:26 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -114,7 +114,6 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     wxTreeItemId root = tree->AddRoot( p_input->psz_name );
-    tree->Expand( root );
     input_info_category_t *p_cat = p_input->stream.p_info;
     
     while ( p_cat ) {
@@ -126,6 +125,7 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
             p_info = p_info->p_next;
         }
         p_cat = p_cat->p_next;
+        tree->Expand( cat );
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
