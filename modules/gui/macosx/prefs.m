@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.31 2003/06/06 00:38:41 hartman Exp $
+ * $Id: prefs.m,v 1.32 2003/06/21 22:30:21 hartman Exp $
  *
  * Authors:	Jon Lech Johansen <jon-vl@nanocrew.net>
  *		Derk-Jan Hartman <thedj at users.sf.net>
@@ -44,6 +44,7 @@
     if( self != nil )
     {
         o_empty_view = [[NSView alloc] init];
+        o_save_prefs = [[NSMutableDictionary alloc] init];
     }
 
     return( self );
@@ -52,6 +53,7 @@
 - (void)dealloc
 {
     [o_empty_view release];
+    [o_save_prefs release];
     [super dealloc];
 }
 
@@ -65,7 +67,7 @@
     [o_prefs_view setBorderType: NSGrooveBorder];
     [o_prefs_view setHasVerticalScroller: YES];
     [o_prefs_view setDrawsBackground: NO];
-    [o_prefs_view setRulersVisible: YES];
+    [o_prefs_view setRulersVisible: NO];
     [o_prefs_view setDocumentView: o_empty_view];
     [o_tree selectRow:0 byExtendingSelection:NO];
 }
@@ -81,12 +83,79 @@
 
 - (void)showPrefs
 {
+    [o_save_prefs release];
+    o_save_prefs = [[NSMutableDictionary alloc] init];
+    [self showViewForID: [[o_tree itemAtRow:[o_tree selectedRow]] getObjectID]
+        andName: [[o_tree itemAtRow:[o_tree selectedRow]] getName]];
     [o_prefs_window center];
     [o_prefs_window makeKeyAndOrderFront:self];
 }
 
 - (IBAction)savePrefs: (id)sender
 {
+    id o_vlc_config;
+    NSEnumerator *o_enum;
+
+    o_enum = [o_save_prefs objectEnumerator];
+    while( ( o_vlc_config = [o_enum nextObject] ) )
+    {
+        int i_type = [o_vlc_config configType];
+        NSString *o_name = [o_vlc_config configName];
+        char *psz_name = (char *)[o_name UTF8String];
+
+        switch( i_type )
+        {
+    
+        case CONFIG_ITEM_MODULE:
+            {
+                char *psz_value;
+                module_t *p_a_module;
+                int i_id = [[o_vlc_config selectedItem] tag];
+                
+                p_a_module = (module_t *)vlc_object_get( p_intf, i_id );
+                if( p_a_module == NULL || p_a_module->i_object_type != VLC_OBJECT_MODULE )
+                {
+                    i_id = -1;
+                }
+                
+                psz_value = ( i_id == -1 ) ? "" :  p_a_module->psz_object_name ;
+                config_PutPsz( p_intf, psz_name, strdup(psz_value) );
+            }
+            break;
+    
+        case CONFIG_ITEM_STRING:
+        case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_DIRECTORY:
+            {
+                char *psz_value;
+                NSString *o_value;
+    
+                o_value = [o_vlc_config stringValue];
+                psz_value = (char *)[o_value UTF8String];
+    
+                config_PutPsz( p_intf, psz_name, psz_value );
+            }
+            break;
+    
+        case CONFIG_ITEM_INTEGER:
+        case CONFIG_ITEM_BOOL:
+            {
+                int i_value = [o_vlc_config intValue];
+    
+                config_PutInt( p_intf, psz_name, i_value );
+            }
+            break;
+    
+        case CONFIG_ITEM_FLOAT:
+            {
+                float f_value = [o_vlc_config floatValue];
+    
+                config_PutFloat( p_intf, psz_name, f_value );
+            }
+            break;
+    
+        }
+    }
     config_SaveConfigFile( p_intf, NULL );
     [o_prefs_window orderOut:self];
 }
@@ -122,6 +191,37 @@
         andName: [[o_tree itemAtRow:[o_tree selectedRow]] getName]];
 }
 
+- (IBAction)openFileDialog: (id)sender
+{
+    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
+    
+    [o_open_panel setTitle: _NS("Select file or directory")];
+    [o_open_panel setPrompt: _NS("Select")];
+    [o_open_panel setAllowsMultipleSelection: NO];
+    [o_open_panel setCanChooseFiles: YES];
+    [o_open_panel setCanChooseDirectories: YES];
+    [o_open_panel beginSheetForDirectory:nil
+        file:nil
+        types:nil
+        modalForWindow:[sender window]
+        modalDelegate: self
+        didEndSelector: @selector(pathChosenInPanel: 
+                        withReturn:
+                        contextInfo:)
+        contextInfo: sender];
+}
+
+- (void)pathChosenInPanel:(NSOpenPanel *)o_sheet withReturn:(int)i_return_code contextInfo:(void  *)o_context_info
+{
+    if( i_return_code == NSOKButton )
+    {
+        NSString *o_path = [[o_sheet filenames] objectAtIndex: 0];
+        VLCTextField *o_field = (VLCTextField *)[(VLCButton *)o_context_info tag]; /* FIXME */
+        [o_field setStringValue: o_path];
+        [self configChanged: o_field];
+    }
+}
+
 - (void)loadConfigTree
 {
     
@@ -142,62 +242,8 @@
     id o_vlc_config = [o_unknown isKindOfClass: [NSNotification class]] ?
                       [o_unknown object] : o_unknown;
 
-    int i_type = [o_vlc_config configType];
     NSString *o_name = [o_vlc_config configName];
-    char *psz_name = (char *)[o_name UTF8String];
-
-    switch( i_type )
-    {
-
-    case CONFIG_ITEM_MODULE:
-        {
-            char *psz_value;
-            module_t *p_a_module;
-            int i_id = [[o_vlc_config selectedItem] tag];
-            
-            p_a_module = (module_t *)vlc_object_get( p_intf, i_id );
-            if( p_a_module == NULL || p_a_module->i_object_type != VLC_OBJECT_MODULE )
-            {
-                i_id = -1;
-            }
-            
-            psz_value = ( i_id == -1 ) ? "" :  p_a_module->psz_object_name ;
-            config_PutPsz( p_intf, psz_name, strdup(psz_value) );
-        }
-        break;
-
-    case CONFIG_ITEM_STRING:
-    case CONFIG_ITEM_FILE:
-    case CONFIG_ITEM_DIRECTORY:
-        {
-            char *psz_value;
-            NSString *o_value;
-
-            o_value = [o_vlc_config stringValue];
-            psz_value = (char *)[o_value UTF8String];
-
-            config_PutPsz( p_intf, psz_name, psz_value );
-        }
-        break;
-
-    case CONFIG_ITEM_INTEGER:
-    case CONFIG_ITEM_BOOL:
-        {
-            int i_value = [o_vlc_config intValue];
-
-            config_PutInt( p_intf, psz_name, i_value );
-        }
-        break;
-
-    case CONFIG_ITEM_FLOAT:
-        {
-            float f_value = [o_vlc_config floatValue];
-
-            config_PutFloat( p_intf, psz_name, f_value );
-        }
-        break;
-
-    }
+    [o_save_prefs setObject: o_vlc_config forKey: o_name];
 }
 
 - (void)showViewForID: (int)i_id andName: (NSString *)o_item_name
@@ -302,6 +348,7 @@
     /* Init View */
     s_vrc = [[o_prefs_view contentView] bounds]; s_vrc.size.height -= 4;
     o_view = [[VLCFlippedView alloc] initWithFrame: s_vrc];
+    [o_view setAutoresizingMask: NSViewWidthSizable];
     s_rc.origin.x = X_ORIGIN;
     s_rc.origin.y = Y_ORIGIN;
     BOOL b_right_cat = FALSE;
@@ -338,7 +385,7 @@
                 if ( p_item->psz_longtext != NULL )
                     psz_duptip = strdup( p_item->psz_longtext );
 
-                s_rc.size.height = 30;
+                s_rc.size.height = 25;
                 s_rc.size.width = 200;
                 s_rc.origin.y += 10;
                 
@@ -391,11 +438,67 @@
             }
             break;
 
-            case CONFIG_ITEM_STRING:
             case CONFIG_ITEM_FILE:
             case CONFIG_ITEM_DIRECTORY:
             {
-    
+                char *psz_duptip = NULL;
+                char *psz_value = p_item->psz_value ?
+                                    p_item->psz_value : "";
+
+                if ( p_item->psz_longtext != NULL )
+                    psz_duptip = strdup( p_item->psz_longtext );
+
+                s_rc.origin.y += 10;
+                s_rc.size.width = - 10;
+                s_rc.size.height = 25;
+                CHECK_VIEW_HEIGHT;
+                CONTROL_LABEL( p_item->psz_text );
+                s_rc.origin.x = X_ORIGIN;
+                s_rc.origin.y += s_rc.size.height;
+                CHECK_VIEW_HEIGHT;
+
+                VLCButton *button = [[VLCButton alloc] initWithFrame: s_rc];
+                CONTROL_CONFIG( button, o_module_name, CONFIG_ITEM_STRING , p_item->psz_name );
+                [button setButtonType: NSMomentaryPushInButton];
+                [button setBezelStyle: NSRoundedBezelStyle];
+                [button setTitle: _NS("Browse...")];
+                [button sizeToFit];
+                [button setAutoresizingMask:NSViewMinXMargin];
+                [button setFrameOrigin: NSMakePoint( s_vrc.size.width - ( 10 + [button frame].size.width), s_rc.origin.y)];
+
+                [button setTarget: self];
+                [button setAction: @selector(openFileDialog:)];
+
+                s_rc.size.height = 25;
+                s_rc.size.width = s_vrc.size.width - ( 35 + [button frame].size.width);
+                
+                o_text_field = [[VLCTextField alloc] initWithFrame: s_rc];
+                CONTROL_CONFIG( o_text_field, o_module_name, CONFIG_ITEM_STRING , p_item->psz_name );
+
+                [o_text_field setStringValue: [NSApp localizedString: psz_value]];
+                if ( psz_duptip != NULL )
+                {
+                    [o_text_field setToolTip: [NSApp wrapString: [NSApp localizedString:
+                                            psz_duptip] toWidth: PREFS_WRAP ]];
+                    free(psz_duptip);
+                }
+                
+                [[NSNotificationCenter defaultCenter] addObserver: self
+                    selector: @selector(configChanged:)
+                    name: NSControlTextDidChangeNotification
+                    object: o_text_field];
+                [o_text_field setAutoresizingMask:NSViewWidthSizable];
+                [button setTag: (int) o_text_field ]; /* FIXME */
+                
+                [o_view addSubview: [o_text_field autorelease]];
+                [o_view addSubview: [button autorelease]];
+                s_rc.origin.y += s_rc.size.height;
+                s_rc.origin.x = X_ORIGIN;
+            }
+            break;
+            
+            case CONFIG_ITEM_STRING:            
+            {
                 if( !p_item->ppsz_list )
                 {
                     char *psz_value = p_item->psz_value ?
