@@ -1548,9 +1548,10 @@ static void CacheLoad( vlc_object_t *p_this )
     FILE *file;
     int i, j, i_size, i_read;
     char p_cachestring[sizeof(PLUGINSCACHE_DIR COPYRIGHT_MESSAGE)];
+    char p_cachelang[6], p_lang[6];
     int i_cache;
     module_cache_t **pp_cache = 0;
-    int32_t i_file_size;
+    int32_t i_file_size, i_marker;
 
     psz_homedir = p_this->p_vlc->psz_homedir;
     if( !psz_homedir )
@@ -1561,7 +1562,7 @@ static void CacheLoad( vlc_object_t *p_this )
 
     i_size = asprintf( &psz_filename, "%s/%s/%s/%s", psz_homedir, CONFIG_DIR,
                        PLUGINSCACHE_DIR, CacheName() );
-    if( !i_size )
+    if( i_size <= 0 )
     {
         msg_Err( p_this, "out of memory" );
         return;
@@ -1619,6 +1620,29 @@ static void CacheLoad( vlc_object_t *p_this )
         memcmp( p_cachestring, PLUGINSCACHE_DIR COPYRIGHT_MESSAGE, i_size ) )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
+        fclose( file );
+        return;
+    }
+
+    /* Check the language hasn't changed */
+    sprintf( p_lang, "%5.5s", _("C") ); i_size = 5;
+    i_read = fread( p_cachelang, sizeof(char), i_size, file );
+    if( i_read != i_size || memcmp( p_cachelang, p_lang, i_size ) )
+    {
+        msg_Warn( p_this, "This doesn't look like a valid plugins cache "
+                  "(language changed)" );
+        msg_Warn( p_this, "lang: %s, %s", p_cachelang, p_lang );
+        fclose( file );
+        return;
+    }
+
+    /* Check header marker */
+    i_read = fread( &i_marker, sizeof(char), sizeof(i_marker), file );
+    if( i_read != sizeof(i_marker) ||
+        i_marker != ftell( file ) - (int)sizeof(i_marker) )
+    {
+        msg_Warn( p_this, "This doesn't look like a valid plugins cache "
+                  "(corrupted header)" );
         fclose( file );
         return;
     }
@@ -1890,6 +1914,13 @@ static void CacheSave( vlc_object_t *p_this )
 
     /* Contains version number */
     fprintf( file, "%s", PLUGINSCACHE_DIR COPYRIGHT_MESSAGE );
+
+    /* Language */
+    fprintf( file, "%5.5s", _("C") );
+
+    /* Header marker */
+    i_file_size = ftell( file );
+    fwrite( &i_file_size, sizeof(char), sizeof(i_file_size), file );
 
     i_cache = p_this->p_libvlc->p_module_bank->i_cache;
     pp_cache = p_this->p_libvlc->p_module_bank->pp_cache;
