@@ -795,29 +795,58 @@ AC_ARG_ENABLE(mad,
   [  --enable-mad            libmad module (default disabled)])
 if test x$enable_mad = xyes
 then
-  PLUGINS="${PLUGINS} mad"
-  mad_LDFLAGS="${mad_LDFLAGS} -lmad"
   AC_ARG_WITH(mad,
-    [    --with-mad=PATH       path to libmad],
-    [ if test "x$with_mad" != "xno" -a "x$with_mad" != "x"
-      then
-        mad_CFLAGS="${mad_CFLAGS} -I$with_mad/include"
-        mad_LDFLAGS="${mad_LDFLAGS} -L$with_mad/lib"
-      fi ])
-  save_CFLAGS=$CFLAGS
-  save_LDFLAGS=$LDFLAGS
-  CFLAGS="$CFLAGS $mad_CFLAGS"
-  LDFLAGS="$LDFLAGS $mad_LDFLAGS"
-  AC_CHECK_HEADERS(mad.h, ,
-  [ echo "Cannot find development headers for libmad..."
-    exit 1
-  ])
-  AC_CHECK_LIB(mad, mad_bit_init, ,
-  [ echo "Cannot find libmad library..."
-    exit 1
-  ])
-  CFLAGS=$save_CFLAGS
-  LDFLAGS=$save_LDFLAGS
+    [    --with-mad=PATH       path to libmad],[],[])
+  if test "x$with_mad" != "xno" -a "x$with_mad" != "x"
+  then
+    mad_CFLAGS="${mad_CFLAGS} -I$with_mad/include"
+    mad_LDFLAGS="${mad_LDFLAGS} -L$with_mad/lib"
+  fi
+
+  AC_ARG_WITH(mad-tree,
+    [    --with-mad-tree=PATH  mad tree for static linking],[],[])
+  if test "x$with_mad_tree" != "xno" -a "x$with_mad_tree" != "x"
+  then
+    real_mad_tree="`cd ${with_mad_tree} 2>/dev/null && pwd`"
+    if test "x$real_mad_tree" = x
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([${with_mad_tree} directory doesn't exist])
+    fi
+    dnl  Use a custom libmad
+    AC_MSG_CHECKING(for mad.h in ${real_mad_tree}/libmad)
+    if test -f ${real_mad_tree}/libmad/mad.h
+    then
+      AC_MSG_RESULT(yes)
+      mad_CFLAGS="${mad_CFLAGS} -I${real_mad_tree}/libmad"
+      mad_LDFLAGS="${mad_LDFLAGS} -L${real_mad_tree}/libmad/.libs"
+      save_LDFLAGS=$LDFLAGS
+      LDFLAGS=$mad_LDFLAGS
+      AC_CHECK_LIB(mad, mad_bit_init, [
+        BUILTINS="${BUILTINS} mad"
+        mad_LDFLAGS="${mad_LDFLAGS} -lmad"
+        ],[ AC_MSG_ERROR([the specified tree hasn't been compiled ])
+      ],[])
+      LDFLAGS=$save_LDFLAGS
+    else
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([the specified tree doesn't have mad.h])
+    fi
+  else
+    save_CFLAGS=$CFLAGS
+    save_LDFLAGS=$LDFLAGS
+    CFLAGS="$CFLAGS $mad_CFLAGS"
+    LDFLAGS="$LDFLAGS $mad_LDFLAGS"
+    AC_CHECK_HEADERS(mad.h, ,
+      [ AC_MSG_ERROR([Cannot find development headers for libmad...]) ])
+    AC_CHECK_LIB(mad, mad_bit_init,
+      PLUGINS="${PLUGINS} mad"
+      mad_LDFLAGS="${mad_LDFLAGS} -lmad",
+      [ AC_MSG_ERROR([Cannot find libmad library...]) ])
+    CFLAGS=$save_CFLAGS
+    LDFLAGS=$save_LDFLAGS
+  fi
 fi
 
 dnl

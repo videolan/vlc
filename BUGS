@@ -1,4 +1,4 @@
-List of known vlc bugs $Id: BUGS,v 1.10 2002/05/04 03:36:19 lool Exp $
+List of known vlc bugs $Id: BUGS,v 1.11 2002/05/14 20:39:23 gbazin Exp $
 
    Please try to keep this file up to date. Also, grep for FIXME in the
 source files for more and more bugs to fix.
@@ -24,6 +24,16 @@ Input:
   * Stopping and playing again a network stream often makes vlc crash
   under Windows.
 
+  * segfault after "INPUT_MAX_ALLOCATION reached" error message. This seems
+  to be happening when an output plugin isn't "eating" the data buffers
+  allocated by a decoder. This happens for instance when the audio output
+  plugin fails but the audio decoder goes on as if nothing happened.
+
+Decoders:
+
+  * Under Win32, the a52 plugin will segfault when switching to different audio
+  channels.
+
 
 Audio output:
 
@@ -35,16 +45,20 @@ Video output:
 
   * We don't render subtitles on RGB surfaces.
 
-  * The QNX video output plugin is broken because of vout4.
-
   * The MGA video output plugin makes the picture stutter when
   MGA_NUM_FRAMES is set to a value higher than 1.
 
   * The SPU decoder doesn't detect when the video output failed to
   launch itself, and we segfault.
 
-  * On-the-fly resizing doesn't work when using a chroma transformation.
+  * On-the-fly resizing when using a chroma transformation doesn't work for
+  all plugins. Currently it is only implemented for x11 and SDL.
 
+  * The DirectX video output can't create overlays on some (even recent)
+  graphic cards.
+
+  * The alternate_fullscreen method of the x11 and xvideo plugins will
+  sometimes not switch to fullscreen.
 
 Chroma transformations:
 
