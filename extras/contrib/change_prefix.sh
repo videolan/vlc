@@ -3,7 +3,7 @@
 # change_prefix.sh : allow to transfer a contrib dir
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: change_prefix.sh,v 1.2 2003/11/23 13:23:20 massiot Exp $
+# $Id: change_prefix.sh,v 1.3 2003/11/23 14:00:25 massiot Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -53,7 +53,7 @@ for file in $files; do
                           $file
       fi
     done
-  else
+  elif test ".`file $file | grep text\|shell`" != "." ; then
     sed -e "s,$prefix,$new_prefix,g" < $file > $file.tmp
     mv -f $file.tmp $file
   fi
