@@ -1161,8 +1161,8 @@ static void AStreamPrebufferStream( stream_t *s )
         }
 
         /* */
-        i_read = __MIN( p_sys->stream.i_read_size,
-                        STREAM_CACHE_TRACK_SIZE - tk->i_end );
+        i_read = STREAM_CACHE_TRACK_SIZE - tk->i_end;
+        i_read = __MIN( p_sys->stream.i_read_size, i_read );
         i_read = p_access->pf_read( p_access, &tk->p_buffer[tk->i_end],
                                     i_read );
         if( i_read <  0 )

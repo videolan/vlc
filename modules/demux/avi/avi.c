@@ -840,7 +840,8 @@ static int Demux_Seekable( demux_t *p_demux )
                 }
                 else
                 {
-                    i_toread = __MAX( AVI_PTSToByte( tk, 20 * 1000 ), 100 );
+                    i_toread = AVI_PTSToByte( tk, 20 * 1000 );
+                    i_toread = __MAX( i_toread, 100 );
                 }
             }
             i_size = __MIN( tk->p_index[tk->i_idxposc].i_length -
