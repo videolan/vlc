@@ -2,7 +2,7 @@
  * win32_graphics.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_graphics.cpp,v 1.3 2004/01/27 21:12:42 gbazin Exp $
+ * $Id: win32_graphics.cpp,v 1.4 2004/01/28 15:51:16 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -184,8 +184,8 @@ void Win32Graphics::drawBitmap( const GenericBitmap &rBitmap,
                                int, int, BLENDFUNCTION );
     AlphaBlend = ((Win32Factory*)OSFactory::instance( getIntf() ))->AlphaBlend;
     if( AlphaBlend &&
-        AlphaBlend( m_hDC, xDest, yDest, width, height, hDC, 0, 0,
-                    width, height, bf ) )
+        !AlphaBlend( m_hDC, xDest, yDest, width, height, hDC, 0, 0,
+                     width, height, bf ) )
     {
         msg_Err( getIntf(), "AlphaBlend() failed" );
     }
