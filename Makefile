@@ -32,8 +32,8 @@ SYS=LINUX
 #SYS=BEOS
 
 # Decoder choice - ?? old decoder will be removed soon
-DECODER=old
-#DECODER=new
+#DECODER=old
+DECODER=new
 
 # Debugging mode on or off
 DEBUG=1

@@ -245,13 +245,18 @@ static int InitThread( vpar_thread_t *p_vpar )
     /*
      * Initialize the synchro properties
      */
+    p_vpar->synchro.i_last_i_pts = 0;
+    p_vpar->synchro.theorical_fps = 30;
+    p_vpar->synchro.actual_fps = 25;
     /* the fifo */
     p_vpar->synchro.i_fifo_start = 0;
     p_vpar->synchro.i_fifo_stop = 0;
     /* the counter */
     p_vpar->synchro.modulo = 0;
-    /* mean decoding time - at least 100 ms */
-    p_vpar->synchro.decode_time = 500000;
+    /* mean decoding time - at least 200 ms for a slow machine */
+    p_vpar->synchro.i_mean_decode_time = 200000;
+    /* suppose we have no delay */
+    p_vpar->synchro.i_delay = 0;
     /* assume there were about 3 P and 6 B images between I's */
     p_vpar->synchro.current_p_count = 1;
     p_vpar->synchro.p_count_predict = 3;

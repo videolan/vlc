@@ -29,7 +29,8 @@ typedef struct video_synchro_fifo_s
 {
     /* type of image to be decoded, and decoding date */
     int i_image_type;
-    mtime_t decode_date;
+    mtime_t i_decode_date;
+    mtime_t i_pts;
     
 } video_synchro_fifo_t;
 
@@ -40,11 +41,14 @@ typedef struct video_synchro_s
     unsigned int i_fifo_start;
     unsigned int i_fifo_stop;
 
-    /* 0: I
-     * 1: P
-     * 2: B
-     */
-    mtime_t decode_time;
+    /* mean decoding time */
+    mtime_t i_mean_decode_time;
+    /* tells whether we accumulated delay */
+    mtime_t i_delay;
+    /* dates */
+    mtime_t i_last_pts;
+    mtime_t i_last_i_pts;
+    unsigned int i_images_since_pts;
     
     /* il manquait un compteur */
     unsigned int modulo;
@@ -59,6 +63,9 @@ typedef struct video_synchro_s
     /* 1 for linear count, 2 for binary count, 3 for ternary count */
     video_synchro_tab_t tab_p[6];
     video_synchro_tab_t tab_b[6];
+
+    double theorical_fps;
+    double actual_fps;
 
 } video_synchro_t;
 
