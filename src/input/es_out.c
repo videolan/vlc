@@ -995,8 +995,9 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
         {
             /* This ain't pretty but is need by some demuxers (eg. Ogg )
              * to update the p_extra data */
+            es_format_t *p_fmt;
             es = (es_out_id_t*) va_arg( args, es_out_id_t * );
-            es_format_t *p_fmt = (es_format_t*) va_arg( args, es_format_t * );
+            p_fmt = (es_format_t*) va_arg( args, es_format_t * );
             if( es == NULL ) return VLC_EGENERIC;
 
             if( p_fmt->i_extra )
