@@ -158,7 +158,11 @@ void X11Loop::handleX11Event()
         {
             // When the "parent" window is mapped, show all the visible
             // windows, as it is not automatic, unfortunately
-            getIntf()->p_sys->p_theme->getWindowManager().synchVisibility();
+            Theme *pTheme = getIntf()->p_sys->p_theme;
+            if( pTheme )
+            {
+                pTheme->getWindowManager().synchVisibility();
+            }
         }
         return;
     }
