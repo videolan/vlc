@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.28 2001/03/04 13:54:26 stef Exp $
+ * $Id: input_dvd.c,v 1.29 2001/03/05 00:40:06 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -511,6 +511,12 @@ static int DVDSetArea( input_thread_t * p_input,
             p_dvd->ifo.vts.pgci_ti.p_srp[p_dvd->i_vts_title-1].pgc.i_cell_nb;
         DVDFindSector( p_dvd );
 
+        /* temporary hack to fix size in some dvds */
+        if( p_dvd->i_cell >= p_dvd->ifo.vts.c_adt.i_cell_nb )
+        {
+            p_dvd->i_cell = p_dvd->ifo.vts.c_adt.i_cell_nb - 1;
+        }
+
         p_dvd->i_size = DVD_LB_SIZE *
           (off_t)( p_dvd->ifo.vts.c_adt.p_cell_inf[p_dvd->i_cell].i_esector );
 
@@ -566,17 +572,22 @@ static int DVDSetArea( input_thread_t * p_input,
         {
 
 #if 0
-    fprintf( stderr, "Audio %d: %x %x %x %x %x %x %x\n", i,
-            p_dvd->ifo.vts.mat.p_audio_atrt[i].i_num_channels,
-            p_dvd->ifo.vts.mat.p_audio_atrt[i].i_coding_mode,
-            p_dvd->ifo.vts.mat.p_audio_atrt[i].i_multichannel_extension,
-            p_dvd->ifo.vts.mat.p_audio_atrt[i].i_type,
-            p_dvd->ifo.vts.mat.p_audio_atrt[i].i_appl_mode,
-            p_dvd->ifo.vts.mat.p_audio_atrt[i].i_foo,
-            p_dvd->ifo.vts.mat.p_audio_atrt[i].i_bar );
+    fprintf( stderr, "Audio %d: %x %x %x %x %x %x %x %x %x %x %x %x\n", i,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_num_channels,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_coding_mode,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_multichannel_extension,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_type,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_appl_mode,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_foo,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_bar,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_appl_mode,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_quantization,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_sample_freq,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_lang_code,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_caption );
 #endif
 
-            switch( p_dvd->ifo.vts.mat.p_audio_atrt[i].i_coding_mode )
+            switch( p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_coding_mode )
             {
             case 0x00:              /* AC3 */
                 i_id = ( ( i_ac3 + i ) << 8 ) | 0xbd;
@@ -609,17 +620,17 @@ static int DVDSetArea( input_thread_t * p_input,
                 break;
             case 0x04:              /* LPCM */
                 i_id = 0;
-                intf_ErrMsg( "dvd error: LPCM audio not handled yet" );
+                intf_ErrMsg( "dvd warning: LPCM audio not handled yet" );
                 break;
             case 0x06:              /* DTS */
                 i_id = 0;
                 i_ac3--;
-                intf_ErrMsg( "dvd error: DTS audio not handled yet" );
+                intf_ErrMsg( "dvd warning: DTS audio not handled yet" );
                 break;
             default:
                 i_id = 0;
-                intf_ErrMsg( "dvd error: unknown audio type %.2x",
-                         p_dvd->ifo.vts.mat.p_audio_atrt[i].i_coding_mode );
+                intf_ErrMsg( "dvd warning: unknown audio type %.2x",
+                         p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_coding_mode );
             }
         
         }
