@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "POT-Creation-Date: 2003-07-24 00:53+0200\n"
-"PO-Revision-Date: 2003-06-14 15:00+0100\n"
+"PO-Revision-Date: 2003-07-24 15:00+0100\n"
 "Last-Translator: Vella Bruno\n"
 "Language-Team: Italian <it@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -445,19 +445,18 @@ msgstr ""
 "se noti una distanza tra video e audio."
 
 #: src/libvlc.h:130
-#, fuzzy
 msgid "Choose prefered audio output channels mode"
-msgstr "Scegli lista encoder audio favoriti"
+msgstr "Scegli modalita' canali uscita audio preferita"
 
 #: src/libvlc.h:132
-#, fuzzy
 msgid ""
 "This option allows you to set the audio output channels mode that will be "
 "used by default when possible (ie. if your hardware supports it as well as "
 "the audio stream being played)"
 msgstr ""
-"Questa opzione ti permette di utilizzare l'uscita audio S/PDIF se il tuo "
-"hardware la supporta mentre viene riprodotta la sorgente audio."
+"Questa opzione ti permette di impostare la modalita' canali uscita audio che "
+"verra' utilizzata come predefinita quando possibile (se il tuo hardware la "
+"supporta mentre la sorgente audio viene riprodotta)"
 
 #: src/libvlc.h:136
 msgid "Use the S/PDIF audio output when available"
@@ -1459,9 +1458,8 @@ msgid "UDP stream ouput"
 msgstr "uscita sorgente UDP"
 
 #: modules/access_output/udp.c:81
-#, fuzzy
 msgid "udp stream output"
-msgstr "Usa uscita sorgente"
+msgstr "uscita sorgente udp"
 
 #: modules/audio_filter/channel_mixer/headphone.c:48
 msgid "Characteristic dimension"
@@ -1986,24 +1984,20 @@ msgid "Pseudo Raw Video decoder"
 msgstr "decodifica video Pseudo Raw"
 
 #: modules/codec/spudec/spudec.c:49
-#, fuzzy
 msgid "DVD subtitles decoder"
-msgstr "decodifica sottotitoli"
+msgstr "decodificatore sottotitoli DVD"
 
 #: modules/codec/subsdec/subsdec.c:68
-#, fuzzy
 msgid "subtitle text encoding"
-msgstr "decodifica sottotitoli"
+msgstr "codifica testo sottotitoli"
 
 #: modules/codec/subsdec/subsdec.c:69
-#, fuzzy
 msgid "change the encoding used in text subtitles"
-msgstr "Cambia la sorgente sottotitoli corrente"
+msgstr "cambia la codifica usata nel testo sottotitoli"
 
 #: modules/codec/subsdec/subsdec.c:72
-#, fuzzy
 msgid "file subtitles decoder"
-msgstr "decodifica sottotitoli"
+msgstr "decodificatore file sottotitoli"
 
 #: modules/codec/subsdec/subsdec.c:75 modules/gui/beos/InterfaceWindow.cpp:256
 #: modules/gui/kde/interface.cpp:93
@@ -2031,18 +2025,16 @@ msgid "Xvid video decoder"
 msgstr "decodifica video Xvid"
 
 #: modules/control/corba/corba.c:614
-#, fuzzy
 msgid "Corba control"
-msgstr "Controlli"
+msgstr "controllo Corba"
 
 #: modules/control/corba/corba.c:615
-#, fuzzy
 msgid "corba control module"
-msgstr "modulo decodifica Theora"
+msgstr "modulo controllo corba"
 
 #: modules/control/gestures.c:77 modules/control/joystick.c:132
 msgid "Motion threshold"
-msgstr ""
+msgstr "Soglia movimento"
 
 #: modules/control/gestures.c:79
 msgid "the amount of movement required for a mouse gesture to be recorded"
@@ -2065,22 +2057,20 @@ msgid "mouse gestures control interface"
 msgstr "interfaccia controllo gestioni mouse"
 
 #: modules/control/http.c:131
-#, fuzzy
 msgid "Host address"
-msgstr "Indirizzo"
+msgstr "Indirizzo host"
 
 #: modules/control/http.c:133
 msgid "You can set the address and port on which the http interface will bind"
 msgstr ""
 
 #: modules/control/http.c:134 modules/control/http.c:135
-#, fuzzy
 msgid "Source directory"
-msgstr "Rapporto aspetto sorgente"
+msgstr "Cartella sorgente"
 
 #: modules/control/http.c:138
 msgid "HTTP remote control interface"
-msgstr "Interfaccia controllo remoto HTTP"
+msgstr "interfaccia controllo remoto HTTP"
 
 #: modules/control/http.c:139
 msgid "HTTP remote control"
@@ -2133,9 +2123,8 @@ msgid "Joystick"
 msgstr ""
 
 #: modules/control/joystick.c:168
-#, fuzzy
 msgid "joystick control interface"
-msgstr "interfaccia controllo remoto"
+msgstr "interfaccia controllo joystick"
 
 #: modules/control/lirc/lirc.c:64
 msgid "infrared remote control interface"
@@ -2356,18 +2345,17 @@ msgid "Flags"
 msgstr ""
 
 #: modules/demux/avi/avi.c:1170
-#, fuzzy, c-format
+#, c-format
 msgid "Stream %d"
-msgstr "Sorgente"
+msgstr "Sorgente %d"
 
 #: modules/demux/avi/avi.c:1176 modules/demux/avi/avi.c:1220
 msgid "FOURCC"
 msgstr ""
 
 #: modules/demux/avi/avi.c:1187
-#, fuzzy
 msgid "Audio Bitrate"
-msgstr "Traccia audio"
+msgstr "Bitrate Audio"
 
 #: modules/demux/avi/avi.c:1225 modules/demux/ogg.c:631
 #: modules/demux/ogg.c:737 modules/demux/ogg.c:912
@@ -2420,19 +2408,16 @@ msgid "Date UTC"
 msgstr ""
 
 #: modules/demux/mkv.cpp:2402
-#, fuzzy
 msgid "Segment Filename"
-msgstr "Nome file"
+msgstr "Nome file segmento"
 
 #: modules/demux/mkv.cpp:2406
-#, fuzzy
 msgid "Muxing Application"
-msgstr "Info su questa applicazione"
+msgstr "Applicazione Muxing"
 
 #: modules/demux/mkv.cpp:2410
-#, fuzzy
 msgid "Writing Application"
-msgstr "Posizione iniziale"
+msgstr "Applicazione Scrittura"
 
 #: modules/demux/mkv.cpp:2423 modules/gui/beos/PlayListWindow.cpp:144
 #: modules/gui/familiar/interface.c:362 modules/gui/gtk/preferences.c:325
@@ -2441,34 +2426,28 @@ msgid "Name"
 msgstr "Nome"
 
 #: modules/demux/mkv.cpp:2427
-#, fuzzy
 msgid "Codec Name"
-msgstr "Nome codifica"
+msgstr "Nome Codifica"
 
 #: modules/demux/mkv.cpp:2431
-#, fuzzy
 msgid "Codec Setting"
-msgstr "Impostazioni"
+msgstr "Impostazioni Codifica"
 
 #: modules/demux/mkv.cpp:2435
-#, fuzzy
 msgid "Codec Info"
-msgstr "Nome codifica"
+msgstr "Info Codifica"
 
 #: modules/demux/mkv.cpp:2439
-#, fuzzy
 msgid "Codec Download"
-msgstr "Nome codifica"
+msgstr "Scarica Codifica"
 
 #: modules/demux/mkv.cpp:2469
-#, fuzzy
 msgid "Display Resolution"
-msgstr "Risoluzione"
+msgstr "Risoluzione Video"
 
 #: modules/demux/mkv.cpp:2473
-#, fuzzy
 msgid "Frame Per Second"
-msgstr "Fotogrammi al secondo"
+msgstr "Fotogrammi Al Secondo"
 
 #: modules/demux/mkv.cpp:2477 modules/gui/gtk/gnome_interface.c:1963
 #: modules/gui/gtk/gtk_interface.c:2278
@@ -3263,7 +3242,6 @@ msgid "MRL :"
 msgstr "MRL :"
 
 #: modules/gui/familiar/interface.c:394
-#, fuzzy
 msgid "UDP/RTP (Address when Multicast)"
 msgstr "UDP/RTP (Indirizzo quando Multicast)"
 
@@ -4454,7 +4432,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:62
 msgid "MacOS X interface, sound and video"
-msgstr "Interfaccia MacOS X, suono e video"
+msgstr "interfaccia MacOS X, suono e video"
 
 #: modules/gui/macosx/open.m:134
 msgid "Open Source"
@@ -4531,9 +4509,8 @@ msgstr "MPEG PS"
 
 #: modules/gui/macosx/output.m:152 modules/gui/macosx/output.m:307
 #: modules/gui/macosx/output.m:360
-#, fuzzy
 msgid "MPEG1"
-msgstr "MPEG TS"
+msgstr "MPEG1"
 
 #: modules/gui/macosx/output.m:154 modules/gui/macosx/output.m:304
 #: modules/gui/macosx/output.m:364
@@ -4542,7 +4519,7 @@ msgstr "Ogg"
 
 #: modules/gui/macosx/output.m:157
 msgid "Transcode options"
-msgstr "Opzioni Trascodifica"
+msgstr "Opzioni Transcodifica"
 
 #: modules/gui/macosx/output.m:161 modules/gui/macosx/output.m:167
 #: modules/gui/wxwindows/streamout.cpp:609
@@ -4551,13 +4528,12 @@ msgid "Bitrate (kb/s)"
 msgstr ""
 
 #: modules/gui/macosx/output.m:174 modules/gui/wxwindows/streamout.cpp:483
-#, fuzzy
 msgid "Miscellaneous Options"
-msgstr "Varie"
+msgstr "Opzioni Varie"
 
 #: modules/gui/macosx/output.m:175
 msgid "Announce streams via SAP Channel:"
-msgstr ""
+msgstr "Annuncia sorgenti via Canale SAP:"
 
 #: modules/gui/macosx/output.m:306 modules/gui/macosx/output.m:366
 msgid "mp4"
@@ -4596,14 +4572,12 @@ msgid "ncurses interface"
 msgstr "interfaccia ncurses"
 
 #: modules/gui/pda/interface.c:396
-#, fuzzy
 msgid "UDP/RTP (Adress when Multicast)"
 msgstr "UDP/RTP (Indirizzo quando Multicast)"
 
 #: modules/gui/pda/pda.c:72
-#, fuzzy
 msgid "PDA Linux Gtk2+ interface"
-msgstr "interfaccia Gtk+"
+msgstr "interfaccia PDA Linux Gtk2+"
 
 #: modules/gui/qnx/qnx.c:44
 msgid "QNX RTOS video and audio output"
@@ -4686,28 +4660,24 @@ msgid "About this program"
 msgstr "Informazioni su questo programma"
 
 #: modules/gui/wxwindows/interface.cpp:272 modules/gui/wxwindows/menus.cpp:108
-#, fuzzy
 msgid "Simple &Open ..."
-msgstr "Apri File..."
+msgstr "Apri Semplice..."
 
 #: modules/gui/wxwindows/interface.cpp:274 modules/gui/wxwindows/menus.cpp:109
-#, fuzzy
 msgid "Open &File..."
-msgstr "Apri File..."
+msgstr "Apri &File..."
 
 #: modules/gui/wxwindows/interface.cpp:276 modules/gui/wxwindows/menus.cpp:110
 msgid "Open &Disc..."
 msgstr "Apri &Disco..."
 
 #: modules/gui/wxwindows/interface.cpp:278 modules/gui/wxwindows/menus.cpp:111
-#, fuzzy
 msgid "Open &Network Stream..."
-msgstr "Sorgente di Rete..."
+msgstr "Apri Sorgente Rete..."
 
 #: modules/gui/wxwindows/interface.cpp:281
-#, fuzzy
 msgid "Open &Satellite Stream..."
-msgstr "Sorgente &Satellite..."
+msgstr "Apri Sorgente &Satellite..."
 
 #: modules/gui/wxwindows/interface.cpp:286
 msgid "&Eject Disc"
@@ -4860,9 +4830,8 @@ msgid "Empty"
 msgstr "Vuoto"
 
 #: modules/gui/wxwindows/messages.cpp:116
-#, fuzzy
 msgid "Save As..."
-msgstr "Registra Playlist..."
+msgstr "Registra col Nome..."
 
 #: modules/gui/wxwindows/messages.cpp:121
 msgid "Verbose"
@@ -4912,9 +4881,8 @@ msgid "Save file"
 msgstr "Registra file"
 
 #: modules/gui/wxwindows/playlist.cpp:116
-#, fuzzy
 msgid "&Simple Add..."
-msgstr "&File..."
+msgstr "&Aggiungi Semplice..."
 
 #: modules/gui/wxwindows/playlist.cpp:117
 msgid "&Add MRL..."
@@ -5004,13 +4972,12 @@ msgid "SAP Announce"
 msgstr ""
 
 #: modules/gui/wxwindows/streamout.cpp:497
-#, fuzzy
 msgid "Channel Name "
-msgstr "Canale server"
+msgstr "Nome Canale "
 
 #: modules/gui/wxwindows/streamout.cpp:569
 msgid "Transcoding options"
-msgstr "Opzioni trascodifica"
+msgstr "Opzioni transcodifica"
 
 #: modules/gui/wxwindows/streamout.cpp:602
 msgid "Video codec"
@@ -5045,9 +5012,8 @@ msgid "wxWindows interface module"
 msgstr "modulo interfaccia wxWindows"
 
 #: modules/gui/wxwindows/wxwindows.cpp:100
-#, fuzzy
 msgid "wxWindows dialogs provider"
-msgstr "modulo interfaccia wxWindows"
+msgstr ""
 
 #: modules/misc/dummy/dummy.c:37
 msgid "Dummy image chroma format"
@@ -5095,9 +5061,8 @@ msgid "dummy video output function"
 msgstr "funzione uscita video dummy"
 
 #: modules/misc/dummy/dummy.c:84
-#, fuzzy
 msgid "dummy font renderer function"
-msgstr "funzione interfaccia dummy"
+msgstr "funzione generatore font dummy"
 
 #: modules/misc/dummy/interface.c:52
 msgid "Using the dummy interface plugin..."
@@ -5120,9 +5085,8 @@ msgid "The size of the fonts used by the osd module"
 msgstr ""
 
 #: modules/misc/freetype.c:71
-#, fuzzy
 msgid "Fonts"
-msgstr "Carattere"
+msgstr "Caratteri"
 
 #: modules/misc/freetype.c:74
 msgid "freetype2 font renderer"
@@ -5304,9 +5268,8 @@ msgid "MPEG-I/II video packetizer"
 msgstr ""
 
 #: modules/packetizer/vorbis.c:89
-#, fuzzy
 msgid "Vorbis audio packetizer"
-msgstr "decodifica audio Vorbis"
+msgstr "packetizer audio Vorbis"
 
 #: modules/stream_out/display.c:50
 msgid "Display stream"
@@ -5330,7 +5293,7 @@ msgstr "Sorgente standard"
 
 #: modules/stream_out/transcode.c:71
 msgid "Transcode stream"
-msgstr "Sorgente trascodifica"
+msgstr "Sorgente transcodifica"
 
 #: modules/video_chroma/i420_rgb.c:67
 msgid "I420,IYUV,YV12 to RGB2,RV15,RV16,RV24,RV32 conversions"
@@ -5362,15 +5325,15 @@ msgstr "Imposta contrasto immagine"
 
 #: modules/video_filter/adjust.c:61
 msgid "Set the image contrast, between 0 and 2. Defaults to 1"
-msgstr ""
+msgstr "Imposta il contrasto immagine, tra 0 e 2. Predefinito a 1"
 
 #: modules/video_filter/adjust.c:62
 msgid "Set image hue"
-msgstr ""
+msgstr "Imposta tinta immagine"
 
 #: modules/video_filter/adjust.c:63
 msgid "Set the image hue, between 0 and 360. Defaults to 0"
-msgstr ""
+msgstr "Imposta la tinta immagine, tra 0 e 360. Predefinita a 0"
 
 #: modules/video_filter/adjust.c:64
 msgid "Set image saturation"
@@ -5378,7 +5341,7 @@ msgstr "Imposta saturazione immagine"
 
 #: modules/video_filter/adjust.c:65
 msgid "Set the image saturation, between 0 and 3. Defaults to 1"
-msgstr ""
+msgstr "Imposta la saturazione immagine, tra 0 e 3. Predefinita a 1"
 
 #: modules/video_filter/adjust.c:66
 msgid "Set image brightness"
@@ -5475,9 +5438,8 @@ msgid "invert video filter"
 msgstr "filtro video inverti"
 
 #: modules/video_filter/logo.c:58
-#, fuzzy
 msgid "Logo File"
-msgstr "Archivio"
+msgstr "Archivio Logo"
 
 #: modules/video_filter/logo.c:59
 msgid "It must be a PNG in RGBA 8bits (for now)"
@@ -5508,9 +5470,8 @@ msgid "logo"
 msgstr ""
 
 #: modules/video_filter/logo.c:73
-#, fuzzy
 msgid "logo video filter"
-msgstr "filtro clonatura video"
+msgstr "filtro video logo"
 
 #: modules/video_filter/motionblur.c:54
 msgid "Blur factor"
@@ -6252,7 +6213,7 @@ msgstr "interfaccia xosd"
 #~ msgstr "specifica una finestra esistente"
 
 #~ msgid "number of channels of audio output"
-#~ msgstr "numero di canali di uscita audio"
+#~ msgstr "numero di canali uscita audio"
 
 #~ msgid "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team"
 #~ msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - il Team VideoLAN"
