@@ -53,6 +53,37 @@
         }, 
         {
             ACTIONS = {
+                bandSliderUpdated = id; 
+                changePreset = id; 
+                enable = id; 
+                preampSliderUpdated = id; 
+                toggleWindow = id; 
+                twopass = id; 
+            }; 
+            CLASS = VLCEqualizer; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "o_btn_2pass" = id; 
+                "o_btn_enable" = id; 
+                "o_btn_equalizer" = id; 
+                "o_popup_presets" = id; 
+                "o_slider_band1" = id; 
+                "o_slider_band10" = id; 
+                "o_slider_band2" = id; 
+                "o_slider_band3" = id; 
+                "o_slider_band4" = id; 
+                "o_slider_band5" = id; 
+                "o_slider_band6" = id; 
+                "o_slider_band7" = id; 
+                "o_slider_band8" = id; 
+                "o_slider_band9" = id; 
+                "o_slider_preamp" = id; 
+                "o_window" = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
                 createOutlineGroup = id; 
                 deleteOutlineGroup = id; 
                 handleGroup = id; 

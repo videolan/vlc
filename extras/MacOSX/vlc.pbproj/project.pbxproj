@@ -7,15 +7,12 @@
 	objects = {
 		014CEA410018CDE011CA2923 = {
 			explicitFileType = wrapper.cfbundle;
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			path = VLC.bundle;
 			refType = 3;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		014CEA420018CDE011CA2923 = {
-			buildRules = (
-			);
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -29,8 +26,6 @@
 			name = Development;
 		};
 		014CEA430018CDE011CA2923 = {
-			buildRules = (
-			);
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -87,8 +82,7 @@
 			sourceTree = "<group>";
 		};
 		089C1672FE841209C02AAC07 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = Foundation.framework;
 			path = /System/Library/Frameworks/Foundation.framework;
@@ -717,6 +711,10 @@
 				8E9390CD0565D6D300C7661C,
 				8E49720206417F6800370C9F,
 				8E49720306417F6800370C9F,
+				2A16E04106C4F08700C87B09,
+				2A16E04206C4F08700C87B09,
+				2A16E08006C5074F00C87B09,
+				2A16E08106C5074F00C87B09,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -758,8 +756,7 @@
 			sourceTree = "<group>";
 		};
 		089C167FFE841241C02AAC07 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = AppKit.framework;
 			path = /System/Library/Frameworks/AppKit.framework;
@@ -792,6 +789,8 @@
 				8E55FB800459B0FD00FB3317,
 				8ED6C28703E2EB1C0059A3A7,
 				8ED6C28803E2EB1C0059A3A7,
+				2A16E03F06C4F08700C87B09,
+				2A16E04006C4F08700C87B09,
 			);
 			isa = PBXGroup;
 			name = Classes;
@@ -818,8 +817,7 @@
 			sourceTree = "<group>";
 		};
 		1058C7ADFEA557BF11CA2CBB = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = Cocoa.framework;
 			path = /System/Library/Frameworks/Cocoa.framework;
@@ -866,6 +864,74 @@
 //192
 //193
 //194
+//2A0
+//2A1
+//2A2
+//2A3
+//2A4
+		2A16E03F06C4F08700C87B09 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = equalizer.h;
+			path = "/Users/djc/src/videolan/vlc-trunk/modules/gui/macosx/equalizer.h";
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		2A16E04006C4F08700C87B09 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = equalizer.m;
+			path = "/Users/djc/src/videolan/vlc-trunk/modules/gui/macosx/equalizer.m";
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		2A16E04106C4F08700C87B09 = {
+			fileRef = 2A16E03F06C4F08700C87B09;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		2A16E04206C4F08700C87B09 = {
+			fileRef = 2A16E04006C4F08700C87B09;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		2A16E07E06C5074F00C87B09 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.png;
+			name = equalizerdrawer_active.png;
+			path = Resources/equalizerdrawer_active.png;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		2A16E07F06C5074F00C87B09 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.png;
+			name = equalizerdrawer_blue.png;
+			path = Resources/equalizerdrawer_blue.png;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		2A16E08006C5074F00C87B09 = {
+			fileRef = 2A16E07E06C5074F00C87B09;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		2A16E08106C5074F00C87B09 = {
+			fileRef = 2A16E07F06C5074F00C87B09;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+//2A0
+//2A1
+//2A2
+//2A3
+//2A4
 //8E0
 //8E1
 //8E2
@@ -1710,6 +1776,8 @@
 		};
 		8ECA7E520563CD9500DFC000 = {
 			children = (
+				2A16E07E06C5074F00C87B09,
+				2A16E07F06C5074F00C87B09,
 				8E93909A0565D6D300C7661C,
 				8E93909B0565D6D300C7661C,
 				8E93909C0565D6D300C7661C,

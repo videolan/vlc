@@ -193,6 +193,8 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/display.png \
 	extras/MacOSX/Resources/display_slider.png \
 	extras/MacOSX/Resources/display_track.png \
+	extras/MacOSX/Resources/equalizerdrawer_active.png \
+	extras/MacOSX/Resources/equalizerdrawer_blue.png \
 	extras/MacOSX/Resources/fullscreen_active.png \
 	extras/MacOSX/Resources/fullscreen_blue.png \
 	extras/MacOSX/Resources/next_active.png \
@@ -478,6 +480,8 @@ VLC.app: vlc
 	    applescript.m \
 	    controls.h \
 	    controls.m \
+	    equalizer.h \
+	    equalizer.m \
 	    intf.h \
 	    intf.m \
 	    macosx.m \

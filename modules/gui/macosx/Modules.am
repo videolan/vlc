@@ -5,6 +5,8 @@ SOURCES_macosx = \
 	applescript.m \
 	controls.h \
 	controls.m \
+	equalizer.m \
+	equalizer.h \
 	intf.m \
 	intf.h \
 	macosx.m \
