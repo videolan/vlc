@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.7 2003/07/20 23:05:24 sigmunau Exp $
+ * $Id: freetype.c,v 1.8 2003/07/20 23:46:46 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -136,6 +136,16 @@ static int Create( vlc_object_t *p_this )
 
     /* Look what method was requested */
     psz_fontfile = config_GetPsz( p_vout, "freetype-font" );
+#ifdef WIN32
+    if( !psz_fontfile || !*psz_fontfile )
+    {
+        if( psz_fontfile ) free( psz_fontfile );
+        psz_fontfile = (char *)malloc( MAX_PATH + 1 );
+        GetWindowsDirectory( psz_fontfile, MAX_PATH + 1 );
+        strcat( psz_fontfile, "\\fonts\\arial.ttf" );
+    }
+#endif
+
     i_error = FT_Init_FreeType( &p_vout->p_text_renderer_data->p_library );
     if( i_error )
     {
@@ -143,23 +153,28 @@ static int Create( vlc_object_t *p_this )
         free( p_vout->p_text_renderer_data );
         return VLC_EGENERIC;
     }
+
     i_error = FT_New_Face( p_vout->p_text_renderer_data->p_library,
-                           psz_fontfile, 0,
+                           psz_fontfile ? psz_fontfile : "", 0,
                            &p_vout->p_text_renderer_data->p_face );
     if( i_error == FT_Err_Unknown_File_Format )
     {
         msg_Err( p_vout, "file %s have unknown format", psz_fontfile );
         FT_Done_FreeType( p_vout->p_text_renderer_data->p_library );
         free( p_vout->p_text_renderer_data );
+        if( psz_fontfile ) free( psz_fontfile );
         return VLC_EGENERIC;
     }
     else if( i_error )
     {
-        msg_Err( p_vout, "failed to load font file" );
+        msg_Err( p_vout, "failed to load font file %s", psz_fontfile );
         FT_Done_FreeType( p_vout->p_text_renderer_data->p_library );
         free( p_vout->p_text_renderer_data );
+        if( psz_fontfile ) free( psz_fontfile );
         return VLC_EGENERIC;
     }
+    if( psz_fontfile ) free( psz_fontfile );
+
     i_error = FT_Select_Charmap( p_vout->p_text_renderer_data->p_face,
                                  ft_encoding_unicode );
     if ( i_error )
