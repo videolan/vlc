@@ -1,0 +1,37 @@
+#!/usr/bin/make -f
+# debian/rules for the VideoLAN Client - uses debhelper.
+# based on Joey Hess's one.
+# Kludged for ipkg
+
+# Compilation options
+export CC=arm-linux-gcc
+export LD=arm-linux-ld
+export STRIP=arm-linux-strip
+export CONFIG_FLAGS="--enable-release --prefix=/usr --disable-gtk --enable-fb --enable-sdl --disable-xvideo --disable-plugins --with-tuning=strongarm1100 --x-includes=/skiff/local/arm-linux/include --x-libraries=/skiff/local/arm-linux/lib/X11 --with-sdl-config-path=/skiff/local/bin"
+export LIBDVDCSS_FLAGS="--with-dvdcss=local-static"
+export VIDDIR="usr/share/videolan"
+export PIXDIR="usr/share/pixmaps"
+export DESTDIR=/tmp/vlc
+
+build: build-stamp
+build-stamp:
+	./configure --mandir=$${prefix}/share/man \
+		--infodir=$${prefix}/share/info \
+		$(shell echo $(CONFIG_FLAGS)) $(shell echo $(LIBDVDCSS_FLAGS))
+
+	$(MAKE)
+
+	touch build-stamp
+
+clean:
+	rm -f build-stamp
+
+	-$(MAKE) distclean
+
+install: build
+	mkdir -p $(DESTDIR)/usr/bin
+	$(STRIP) vlc
+	cp vlc $(DESTDIR)/usr/bin
+
+.PHONY: build clean install
+

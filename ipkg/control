@@ -1,0 +1,8 @@
+Package: vlc
+Section: graphics
+Priority: optional
+Version: 0.2.90-fam0
+Architecture: arm
+Maintainer: Christophe Massiot <massiot@via.ecp.fr>
+Depends: libc6, task-x
+Description: streaming-capable MPEG decoder
