@@ -25,11 +25,14 @@
 
 #if defined(HAVE_PTHREAD_H)            /* pthreads (Linux & BSD for example) */
 #include <pthread.h>
+
 #elif defined(HAVE_CTHREADS_H)                                    /* GNUMach */
 #include <cthreads.h>
+
 #elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)   /* BeOS */
 #include <kernel/OS.h>
 #include <kernel/scheduler.h>
+
 #else
 #error no threads available on your system !
 #endif
@@ -200,11 +203,11 @@ static __inline__ void vlc_thread_join( vlc_thread_t thread )
 static __inline__ void lazy_init_mutex(vlc_mutex_t* p_mutex)
 {
     int32 v = atomic_or( &p_mutex->init, 1 );
-    if( 2000 == v ) // we're the first, so do the init
+    if( 2000 == v ) /* we're the first, so do the init */
     {
         vlc_mutex_init( p_mutex );
     }
-    else // we're not the first, so wait until the init is finished
+    else /* we're not the first, so wait until the init is finished */
     {
         while( p_mutex->init != 9999 ) snooze( 10000 );
     }
@@ -292,11 +295,11 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
 static __inline__ void lazy_init_cond( vlc_cond_t* p_condvar )
 {
     int32 v = atomic_or( &p_condvar->init, 1 );
-    if( 2000 == v ) // we're the first, so do the init
+    if( 2000 == v ) /* we're the first, so do the init */
     {
         vlc_cond_init( p_condvar );
     }
-    else // we're not the first, so wait until the init is finished
+    else /* we're not the first, so wait until the init is finished */
     {
         while( p_condvar->init != 9999 ) snooze( 10000 );
     }

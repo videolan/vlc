@@ -55,11 +55,20 @@
 /* Define if you have the usleep function.  */
 #undef HAVE_USLEEP
 
+/* Define if you have the <arpa/inet.h> header file.  */
+#undef HAVE_ARPA_INET_H
+
 /* Define if you have the <cthreads.h> header file.  */
 #undef HAVE_CTHREADS_H
 
+/* Define if you have the <dlfcn.h> header file.  */
+#undef HAVE_DLFCN_H
+
 /* Define if you have the <fcntl.h> header file.  */
 #undef HAVE_FCNTL_H
+
+/* Define if you have the <image.h> header file.  */
+#undef HAVE_IMAGE_H
 
 /* Define if you have the <kernel/OS.h> header file.  */
 #undef HAVE_KERNEL_OS_H
@@ -70,11 +79,20 @@
 /* Define if you have the <machine/soundcard.h> header file.  */
 #undef HAVE_MACHINE_SOUNDCARD_H
 
+/* Define if you have the <net/if.h> header file.  */
+#undef HAVE_NET_IF_H
+
+/* Define if you have the <netinet/in.h> header file.  */
+#undef HAVE_NETINET_IN_H
+
 /* Define if you have the <pthread.h> header file.  */
 #undef HAVE_PTHREAD_H
 
 /* Define if you have the <sys/ioctl.h> header file.  */
 #undef HAVE_SYS_IOCTL_H
+
+/* Define if you have the <sys/socket.h> header file.  */
+#undef HAVE_SYS_SOCKET_H
 
 /* Define if you have the <sys/soundcard.h> header file.  */
 #undef HAVE_SYS_SOUNDCARD_H

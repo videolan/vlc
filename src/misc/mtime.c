@@ -36,7 +36,7 @@
 #include <unistd.h>                                              /* select() */
 #include <sys/time.h>
 
-#ifdef SYS_BEOS
+#ifdef HAVE_KERNEL_OS_H
 #include <kernel/OS.h>
 #endif
 
@@ -70,8 +70,9 @@ char *mstrtime( char *psz_buffer, mtime_t date )
  *****************************************************************************/
 mtime_t mdate( void )
 {
-#ifdef SYS_BEOS
+#ifdef HAVE_KERNEL_OS_H
     return( real_time_clock_usecs() );
+    
 #else
     struct timeval tv_date;
 
@@ -80,6 +81,7 @@ mtime_t mdate( void )
      * here, since tv is a local variable. */
     gettimeofday( &tv_date, NULL );
     return( (mtime_t) tv_date.tv_sec * 1000000 + (mtime_t) tv_date.tv_usec );
+    
 #endif
 }
 
@@ -92,7 +94,8 @@ mtime_t mdate( void )
  *****************************************************************************/
 void mwait( mtime_t date )
 {
-#ifdef SYS_BEOS
+#ifdef HAVE_KERNEL_OS_H
+	
     mtime_t delay;
     
     delay = date - real_time_clock_usecs();
@@ -101,7 +104,7 @@ void mwait( mtime_t date )
         return;
     }
     snooze( delay );
-#else /* SYS_BEOS */
+#else
 
     struct timeval tv_date, tv_delay;
     mtime_t        delay;          /* delay in msec, signed to detect errors */
@@ -115,17 +118,18 @@ void mwait( mtime_t date )
     {
         return;
     }
-#ifndef usleep
+
+#ifdef HAVE_USLEEP
+    usleep( delay );
+#else
     tv_delay.tv_sec = delay / 1000000;
     tv_delay.tv_usec = delay % 1000000;
 
     /* see msleep() about select() errors */
     select( 0, NULL, NULL, NULL, &tv_delay );
-#else
-    usleep( delay );
 #endif
 
-#endif /* SYS_BEOS */
+#endif /* HAVE_KERNEL_OS_H */
 }
 
 /*****************************************************************************
@@ -135,11 +139,13 @@ void mwait( mtime_t date )
  *****************************************************************************/
 void msleep( mtime_t delay )
 {
-#ifdef SYS_BEOS
+#ifdef HAVE_KERNEL_OS_H
     snooze( delay );
-#else /* SYS_BEOS */
+#else
 
-#ifndef usleep
+#ifdef HAVE_USLEEP
+    usleep( delay );
+#else
     struct timeval tv_delay;
 
     tv_delay.tv_sec = delay / 1000000;
@@ -149,9 +155,7 @@ void msleep( mtime_t delay )
      * (i.e. when a signal is sent to the thread, or when memory is full), and
      * can be ingnored. */
     select( 0, NULL, NULL, NULL, &tv_delay );
-#else
-    usleep( delay );
 #endif
 
-#endif /* SYS_BEOS */
+#endif /* HAVE_KERNEL_OS_H */
 }

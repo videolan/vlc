@@ -578,7 +578,9 @@ static void SignalHandler( int i_signal )
 static int TestMMX( void )
 {
 /* FIXME: under beos, gcc does not support the foolowing inline assembly */ 
-#ifndef SYS_BEOS
+#ifdef SYS_BEOS
+    return( 1 );
+#else
 
     int i_reg, i_dummy = 0;
 
@@ -642,8 +644,6 @@ static int TestMMX( void )
 
     return( 1 );
 
-#else /* SYS_BEOS */
-    return( 1 );
-#endif /* SYS_BEOS */
+#endif
 }
 #endif

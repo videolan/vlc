@@ -46,6 +46,8 @@ AC_SUBST(LIBOBJS)
 
 AC_CHECK_HEADERS(fcntl.h sys/ioctl.h sys/time.h unistd.h)
 AC_CHECK_HEADERS(sys/soundcard.h machine/soundcard.h)
+AC_CHECK_HEADERS(dlfcn.h image.h)
+AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
 
 dnl Check for threads library
 AC_CHECK_HEADERS(cthreads.h pthread.h kernel/sheduler.h kernel/OS.h)
@@ -55,5 +57,5 @@ AC_C_CONST
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
 
-AC_OUTPUT([Makefile])
+AC_OUTPUT([Makefile include/config.h])
 

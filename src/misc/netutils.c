@@ -31,17 +31,13 @@
 #include <errno.h>                                                /* errno() */
 #include <string.h>                                      /* bzero(), bcopy() */
 
-#ifdef SYS_BSD
-#include <netinet/in.h>                                    /* struct in_addr */
-#include <sys/socket.h>                                   /* struct sockaddr */
-#endif
-
-#if defined(SYS_LINUX) || defined(SYS_BSD) || defined(SYS_GNU)
+#include <netinet/in.h>                               /* BSD: struct in_addr */
+#include <sys/socket.h>                              /* BSD: struct sockaddr */
+#ifdef (HAVE_ARPA_INET_H)
 #include <arpa/inet.h>                           /* inet_ntoa(), inet_aton() */
 #endif
 
-
-#ifdef SYS_LINUX
+#if defined (HAVE_SYS_IOCTL_H) && defined(HAVE_NET_IF_H)
 #include <sys/ioctl.h>                                            /* ioctl() */
 #include <net/if.h>                            /* interface (arch-dependent) */
 #endif
@@ -78,10 +74,10 @@ int BuildInetAddr( struct sockaddr_in *p_sa_in, char *psz_in_addr, int i_port )
     }
     /* Try to convert address directly from in_addr - this will work if
      * psz_in_addr is dotted decimal. */
-#ifdef SYS_BEOS
-    else if( (p_sa_in->sin_addr.s_addr = inet_addr( psz_in_addr )) == -1 )
-#else
+#ifdef HAVE_ARPA_INET_H
     else if( !inet_aton( psz_in_addr, &p_sa_in->sin_addr) )
+#else
+    else if( (p_sa_in->sin_addr.s_addr = inet_addr( psz_in_addr )) == -1 )
 #endif
     {
         /* The convertion failed: the address is an host name, which needs
@@ -135,7 +131,7 @@ int ServerPort( char *psz_addr )
 int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
 {
     int i_rc = 0;
-#ifdef SYS_LINUX
+#if defined (HAVE_SYS_IOCTL_H) && defined(HAVE_NET_IF_H)
     struct ifreq ifr_config;
 
     ASSERT(p_ifdescr);
@@ -216,7 +212,7 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
                     psz_name, strerror(errno));
         return -1;
     }
-#endif /* SYS_LINUX */
+#endif
 
     return i_rc;
 }
@@ -231,17 +227,17 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
  *****************************************************************************/
 int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
 {
-#ifdef SYS_LINUX
+#if defined (HAVE_SYS_IOCTL_H) && defined(HAVE_NET_IF_H)
     struct ifreq* a_ifr_ifconf = NULL;
     struct ifreq* p_ifr_current_if;
     struct ifconf ifc_netconf;
 
     int i_if_number;
     int i_remaining;
-#endif /* SYS_LINUX */
+#endif
     int i_rc = 0;
 
-#ifdef SYS_LINUX
+#if defined (HAVE_SYS_IOCTL_H) && defined(HAVE_NET_IF_H)
     ASSERT(p_net_descr);
 
     /* Start by assuming we have few than 3 interfaces (i_if_number will
@@ -316,7 +312,7 @@ int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
 
     /* Don't need the a_ifr_ifconf anymore */
     free( a_ifr_ifconf );
-#endif /* SYS_LINUX */
+#endif
 
     return i_rc;
 }

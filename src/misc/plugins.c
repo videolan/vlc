@@ -25,12 +25,14 @@
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                              /* sprintf() */
 
-#if defined(SYS_LINUX) || defined(SYS_BSD) || defined(SYS_GNU)
+#if defined(HAVE_DLFCN_H)                                /* Linux, BSD, Hurd */
 #include <dlfcn.h>                           /* dlopen(), dlsym(), dlclose() */
-#endif
 
-#ifdef SYS_BEOS
+#elif defined(HAVE_IMAGE_H)                                          /* BeOS */
 #include <image.h>
+
+#else
+#error no dynamic plugins available on your system !
 #endif
 
 #include "plugins.h"
@@ -53,19 +55,25 @@ int RequestPlugin ( plugin_id_t * p_plugin, char * psz_mask, char * psz_name )
     {
         psz_plugin = malloc( strlen(psz_plugin_path[i_count]) + i_length + 6 );
         sprintf( psz_plugin, "%s/%s_%s.so", psz_plugin_path[i_count], psz_mask, psz_name );
-#ifdef SYS_BEOS
-        *p_plugin = load_addon_image( psz_plugin );
-#else  /* SYS_BEOS */
+
+#if defined(HAVE_DLFCN_H)
         *p_plugin = dlopen( psz_plugin, RTLD_NOW | RTLD_GLOBAL );
-#endif /* SYS_BEOS */
+
+#elif defined(HAVE_IMAGE_H)
+        *p_plugin = load_addon_image( psz_plugin );
+
+#endif
+
         free( psz_plugin );
 
-#ifdef SYS_BEOS
+#if defined(HAVE_DLFCN_H)
+	if( *p_plugin != NULL )
+            return( 0 );
+
+#elif defined(HAVE_IMAGE_H)
         if( *p_plugin >= 0 )
             return( 0 );
-#else
-        if( *p_plugin != NULL )
-            return( 0 );
+
 #endif
     }
 
@@ -74,24 +82,28 @@ int RequestPlugin ( plugin_id_t * p_plugin, char * psz_mask, char * psz_name )
 
 void TrashPlugin ( plugin_id_t plugin )
 {
-#ifdef SYS_BEOS
-    unload_add_on( plugin );
-#else
+#if defined(HAVE_DLFCN_H)
     dlclose( plugin );
+
+#elif defined(HAVE_IMAGE_H)
+    unload_add_on( plugin );
+
 #endif
 }
 
 void * GetPluginFunction ( plugin_id_t plugin, char *psz_name )
 {
-#ifdef SYS_BEOS
+#if defined(HAVE_DLFCN_H)
+    return( dlsym(plugin, psz_name) );
+
+#elif defined(HAVE_IMAGE_H)
     void * p_func;
     
     if( get_image_symbol( plugin, psz_name, B_SYMBOL_TYPE_TEXT, &p_func ) )
         return( NULL );
     else
         return( p_func );    
-#else
-    return( dlsym(plugin, psz_name) );
+
 #endif
 }
 
