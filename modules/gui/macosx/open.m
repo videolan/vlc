@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.34 2003/05/20 18:53:03 hartman Exp $
+ * $Id: open.m,v 1.35 2003/05/25 17:27:13 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -238,7 +238,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         
         if (([o_file_sub_ckbox state] == NSOnState) && !([subPath isEqualTo: @""]))
         {
-            config_PutPsz( p_intf, "sub-file", strdup( [subPath cString] ) );
+            config_PutPsz( p_intf, "sub-file", strdup( [subPath UTF8String] ) );
             if ( [o_file_sub_override state] )
             {
                 config_PutInt( p_intf, "sub-delay", (int)( [o_file_sub_delay intValue] * 10 ) );

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.87 2003/05/21 15:40:03 hartman Exp $
+ * $Id: libvlc.c,v 1.88 2003/05/25 17:27:13 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -345,6 +345,12 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
 
         textdomain( PACKAGE );
+
+#if defined( SYS_BEOS ) || defined ( SYS_DARWIN )
+        /* BeOS only support UTF8 strings */
+        /* Mac OS X prefers UTF8 */
+        bind_textdomain_codeset( PACKAGE, "UTF-8" );
+#endif
 
         module_EndBank( p_vlc );
         module_InitBank( &libvlc );
@@ -1061,8 +1067,9 @@ static void SetLanguage ( char const *psz_lang )
     /* Set the default domain */
     textdomain( PACKAGE );
 
-#ifdef SYS_BEOS
+#if defined( SYS_BEOS ) || defined ( SYS_DARWIN )
     /* BeOS only support UTF8 strings */
+    /* Mac OS X prefers UTF8 */
     bind_textdomain_codeset( PACKAGE, "UTF-8" );
 #endif
 

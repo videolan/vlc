@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.85 2003/05/20 18:53:03 hartman Exp $
+ * $Id: intf.m,v 1.86 2003/05/25 17:27:13 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -113,34 +113,13 @@ static void Run( intf_thread_t *p_intf )
 - (id)init
 {
     /* default encoding: ISO-8859-1 */
-    i_encoding = NSISOLatin1StringEncoding;
+    i_encoding = NSUTF8StringEncoding;
 
     return( [super init] );
 }
 
 - (void)initIntlSupport
 {
-    char *psz_lang = getenv( "LANG" );
-
-    if( psz_lang == NULL )
-    {
-        return;
-    }
-
-    if( strncmp( psz_lang, "pl", 2 ) == 0 )
-    {
-        i_encoding = NSISOLatin2StringEncoding;
-    }
-    else if( strncmp( psz_lang, "ja", 2 ) == 0 ) 
-    {
-        i_encoding = NSJapaneseEUCStringEncoding;
-    }
-    else if( strncmp( psz_lang, "ru", 2 ) == 0 )
-    {
-#define CFSENC2NSSENC(e) CFStringConvertEncodingToNSStringEncoding(e)
-        i_encoding = CFSENC2NSSENC( kCFStringEncodingKOI8_R ); 
-#undef CFSENC2NSSENC
-    }
 }
 
 - (NSString *)localizedString:(char *)psz
@@ -149,10 +128,11 @@ static void Run( intf_thread_t *p_intf )
 
     if( psz != NULL )
     {
-        UInt32 uiLength = (UInt32)strlen( psz );
-        NSData * o_data = [NSData dataWithBytes: psz length: uiLength];
-        o_str = [[[NSString alloc] initWithData: o_data
-                                       encoding: i_encoding] autorelease];
+        o_str = [[[NSString alloc] initWithUTF8String: psz] autorelease];
+    }
+    if ( o_str == NULL )
+    {
+        msg_Err( p_intf, "could not translate: %s", psz );
     }
 
     return( o_str );
@@ -764,7 +744,7 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
             input_OffsetToTime( p_input, psz_time, p_area->i_tell );
 
-            o_time = [NSString stringWithCString: psz_time];
+            o_time = [NSString stringWithUTF8String: psz_time];
             [o_timefield setStringValue: o_time];
         }
 
@@ -1183,7 +1163,7 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
 #undef p_area
 
-        o_time = [NSString stringWithCString: psz_time];
+        o_time = [NSString stringWithUTF8String: psz_time];
         [o_timefield setStringValue: o_time]; 
     }
 

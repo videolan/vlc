@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.26 2003/05/24 20:54:27 gbazin Exp $
+ * $Id: prefs.m,v 1.27 2003/05/25 17:27:13 massiot Exp $
  *
  * Authors:	Jon Lech Johansen <jon-vl@nanocrew.net>
  *		Derk-Jan Hartman <thedj at users.sf.net>
@@ -129,7 +129,7 @@
 
     int i_type = [o_vlc_config configType];
     NSString *o_name = [o_vlc_config configName];
-    char *psz_name = (char *)[o_name lossyCString];
+    char *psz_name = (char *)[o_name UTF8String];
 
     switch( i_type )
     {
@@ -141,7 +141,7 @@
 
             o_value = [o_vlc_config titleOfSelectedItem];
             psz_value = [o_value isEqualToString: _NS("Auto") ] ? "" :
-                (char *)[o_value lossyCString];
+                (char *)[o_value UTF8String];
             config_PutPsz( p_intf, psz_name, psz_value );
         }
         break;
@@ -154,7 +154,7 @@
             NSString *o_value;
 
             o_value = [o_vlc_config stringValue];
-            psz_value = (char *)[o_value lossyCString];
+            psz_value = (char *)[o_value UTF8String];
 
             config_PutPsz( p_intf, psz_name, psz_value );
         }
@@ -205,7 +205,7 @@
     }
     
     /* Enumerate config options and add corresponding config boxes */
-    o_module_name = [NSString stringWithCString: p_parser->psz_object_name];
+    o_module_name = [NSString stringWithUTF8String: p_parser->psz_object_name];
     p_item = p_parser->p_config;
 
     i_pos = 0;
@@ -771,7 +771,7 @@ static VLCTreeItem *o_root_item = nil;
     char *psz_module_name;
     int i_index;
 
-    psz_module_name = (char *)[o_module_name lossyCString];
+    psz_module_name = (char *)[o_module_name UTF8String];
 
     /* look for module */
     p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );

@@ -2,7 +2,7 @@
  * info.m: MacOS X info panel
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: info.m,v 1.5 2003/03/18 02:28:53 hartman Exp $
+ * $Id: info.m,v 1.6 2003/05/25 17:27:13 massiot Exp $
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
@@ -133,7 +133,7 @@
     input_info_t * p_info;
 
     /* Add a category */
-    o_title = [NSString stringWithCString: p_category->psz_name];
+    o_title = [NSString stringWithUTF8String: p_category->psz_name];
     [o_selector addItemWithTitle: o_title];
 
     /* Create empty content string */

@@ -2,7 +2,7 @@
  * prefs.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.h,v 1.6 2003/05/20 15:23:25 hartman Exp $
+ * $Id: prefs.h,v 1.7 2003/05/25 17:27:13 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -160,6 +160,6 @@ INTF_CONTROL_CONFIG(TextField);
     { \
         [obj setModuleName: mname]; \
         [obj setConfigType: ctype]; \
-        [obj setConfigName: [NSString stringWithCString: cname]]; \
+        [obj setConfigName: [NSString stringWithUTF8String: cname]]; \
     }
 

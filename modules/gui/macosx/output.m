@@ -2,7 +2,7 @@
  * output.m: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: output.m,v 1.5 2003/05/22 14:40:07 hartman Exp $
+ * $Id: output.m,v 1.6 2003/05/25 17:27:13 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -179,7 +179,7 @@
 - (IBAction)outputCloseSheet:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
-    config_PutPsz( p_intf, "sout", [o_mrl lossyCString] );
+    config_PutPsz( p_intf, "sout", [o_mrl UTF8String] );
     
     [o_output_sheet orderOut:sender];
     [NSApp endSheet: o_output_sheet];

@@ -183,8 +183,7 @@ if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
 else
   AC_CHECK_FUNCS(textdomain,,[
     AC_CHECK_LIB(intl,textdomain,
-      LDFLAGS_vlc="${LDFLAGS_vlc} ${LIBINTL}"
-      LDFLAGS_plugins="${LDFLAGS_plugins} ${LIBINTL}",,
+      LDFLAGS_vlc="${LDFLAGS_vlc} ${LIBINTL}",,
       ${LIBINTL}
     )
   ])

@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.38 2003/05/11 18:41:27 hartman Exp $
+ * $Id: controls.m,v 1.39 2003/05/25 17:27:13 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -369,7 +369,7 @@
     {
         config_PutPsz( p_intf, "filter", "deinterlace" );
 	config_PutPsz( p_intf, "deinterlace-mode",
-                    [[sender title] lossyCString] );
+                    [[sender title] UTF8String] );
     }
     else
     {
@@ -536,7 +536,7 @@
 
         if( psz_filter != NULL )
         {
-            if( strcmp( psz_filter, [[o_mi title] lossyCString] ) == 0 )
+            if( strcmp( psz_filter, [[o_mi title] UTF8String] ) == 0 )
             {
                 [o_mi setState: NSOnState];
             }

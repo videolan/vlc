@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.64 2003/05/20 16:20:33 zorglub Exp $
+ * $Id: vlc_common.h,v 1.65 2003/05/25 17:27:13 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -678,19 +678,18 @@ VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
      (defined(MODULE_NAME_IS_gnome)||defined(MODULE_NAME_IS_gnome_main)||\
       defined(MODULE_NAME_IS_gnome2)||defined(MODULE_NAME_IS_gnome2_main))
     /* Declare nothing: gnome.h will do it for us */
-#elif defined( ENABLE_NLS ) && defined( HAVE_INCLUDED_GETTEXT )
+#elif defined( ENABLE_NLS )
+#if defined( HAVE_INCLUDED_GETTEXT )
 #   include "libintl.h"
+#else
+#   include <libintl.h>
+#endif
 #   undef _
 #if defined( __BORLANDC__ )
 #define _(String) vlc_dgettext (PACKAGE_TARNAME, String)
 #else
 #   define _(String) vlc_dgettext (PACKAGE, String)
 #endif
-#   define N_(String) ((char*)(String))
-#elif defined( ENABLE_NLS ) && defined( HAVE_GETTEXT )
-#   include <libintl.h>
-#   undef _
-#   define _(String) dgettext (PACKAGE, String)
 #   define N_(String) ((char*)(String))
 #else
 #   define _(String) ((char*)(String))
