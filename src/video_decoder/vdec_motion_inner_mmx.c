@@ -331,11 +331,10 @@ void MotionComponent_X_y_copy_##width##_##height(yuv_data_t * p_src,        \
 #define __MotionComponent_x_Y_copy(width,height)                            \
 void MotionComponent_x_Y_copy_##width##_##height(yuv_data_t * p_src,        \
                                                  yuv_data_t * p_dest,       \
-                                                 int i_stride,              \
-                                                 int i_step)                \
+                                                 int i_stride)              \
 {                                                                           \
     int i_y;                                                                \
-    yuv_data_t * p_next_src = p_src + i_step;                               \
+    yuv_data_t * p_next_src = p_src + i_stride;                             \
                                                                             \
     MMXZeroReg();                                                           \
                                                                             \
@@ -357,11 +356,10 @@ void MotionComponent_x_Y_copy_##width##_##height(yuv_data_t * p_src,        \
 #define __MotionComponent_X_Y_copy(width,height)                            \
 void MotionComponent_X_Y_copy_##width##_##height(yuv_data_t * p_src,        \
                                                  yuv_data_t * p_dest,       \
-                                                 int i_stride,              \
-                                                 int i_step)                \
+                                                 int i_stride)              \
 {                                                                           \
     int i_y;                                                                \
-    yuv_data_t * p_next_src = p_src + i_step;                               \
+    yuv_data_t * p_next_src = p_src + i_stride;                             \
                                                                             \
     MMXZeroReg();                                                           \
                                                                             \
@@ -430,8 +428,7 @@ void MotionComponent_X_y_avg_##width##_##height(yuv_data_t * p_src,         \
 #define __MotionComponent_x_Y_avg(width,height)                             \
 void MotionComponent_x_Y_avg_##width##_##height(yuv_data_t * p_src,         \
                                                 yuv_data_t * p_dest,        \
-                                                int i_stride,               \
-                                                int i_step)                 \
+                                                int i_stride)               \
 {                                                                           \
     int i_x, i_y;                                                           \
     unsigned int i_dummy;                                                   \
@@ -442,7 +439,7 @@ void MotionComponent_x_Y_avg_##width##_##height(yuv_data_t * p_src,         \
         {                                                                   \
             i_dummy =                                                       \
                 p_dest[i_x] + ((unsigned int)(p_src[i_x]                    \
-                                              + p_src[i_x + i_step]         \
+                                              + p_src[i_x + i_stride]       \
                                               + 1) >> 1);                   \
             p_dest[i_x] = (i_dummy + 1) >> 1;                               \
         }                                                                   \
@@ -454,11 +451,10 @@ void MotionComponent_x_Y_avg_##width##_##height(yuv_data_t * p_src,         \
 #define __MotionComponent_X_Y_avg(width,height)                             \
 void MotionComponent_X_Y_avg_##width##_##height(yuv_data_t * p_src,         \
                                                 yuv_data_t * p_dest,        \
-                                                int i_stride,               \
-                                                int i_step)                 \
+                                                int i_stride)               \
 {                                                                           \
     int i_y;                                                                \
-    yuv_data_t * p_next_src = p_src + i_step;                               \
+    yuv_data_t * p_next_src = p_src + i_stride;                             \
                                                                             \
     MMXZeroReg();                                                           \
                                                                             \
