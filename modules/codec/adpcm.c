@@ -2,7 +2,7 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.13 2003/09/02 20:19:25 gbazin Exp $
+ * $Id: adpcm.c,v 1.14 2003/11/04 14:51:51 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -26,74 +26,66 @@
  *
  * Documentation: http://www.pcisys.net/~melanson/codecs/adpcm.txt
  *****************************************************************************/
+#include <stdlib.h>                                      /* malloc(), free() */
+
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/decoder.h>
 #include <vlc/input.h>
 
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
 #include "codecs.h"
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  Open    ( vlc_object_t * );
+
+vlc_module_begin();
+    set_description( _("ADPCM audio decoder") );
+    set_capability( "decoder", 50 );
+    set_callbacks( Open, NULL );
+vlc_module_end();
+
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-
-#define ADPCM_IMA_QT    1
-#define ADPCM_IMA_WAV   2
-#define ADPCM_MS        3
-#define ADPCM_DK3       4
-#define ADPCM_DK4       5
-
-typedef struct adec_thread_s
+enum adpcm_codec_e
 {
-    int i_codec;
+    ADPCM_IMA_QT,
+    ADPCM_IMA_WAV,
+    ADPCM_MS,
+    ADPCM_DK3,
+    ADPCM_DK4
+};
 
-    WAVEFORMATEX    *p_wf;
+struct decoder_sys_t
+{
+    WAVEFORMATEX       *p_wf;
+    enum adpcm_codec_e codec;
 
     int                 i_block;
-    uint8_t             *p_block;
     int                 i_samplesperblock;
 
-    uint8_t             *p_buffer;      /* buffer for gather pes */  \
-    int                 i_buffer;       /* bytes present in p_buffer */
-
-    /* Input properties */
-    decoder_fifo_t *p_fifo;
-
-    /* Output properties */
+    /* audio output */
     aout_instance_t *   p_aout;       /* opaque */
     aout_input_t *      p_aout_input; /* opaque */
     audio_sample_format_t output_format;
 
     audio_date_t        date;
-    mtime_t             pts;
+};
 
-} adec_thread_t;
-
-static int  OpenDecoder    ( vlc_object_t * );
-
-static int  RunDecoder     ( decoder_fifo_t * );
-static int  InitThread     ( adec_thread_t * );
-static void DecodeThread   ( adec_thread_t * );
-static void EndThread      ( adec_thread_t * );
+static int Init  ( decoder_t * );
+static int Decode( decoder_t *, block_t * );
+static int End   ( decoder_t * );
 
 
-static void DecodeAdpcmMs       ( adec_thread_t *, aout_buffer_t * );
-static void DecodeAdpcmImaWav   ( adec_thread_t *, aout_buffer_t * );
-static void DecodeAdpcmImaQT    ( adec_thread_t *, aout_buffer_t * );
-static void DecodeAdpcmDk4      ( adec_thread_t *, aout_buffer_t * );
-static void DecodeAdpcmDk3      ( adec_thread_t *, aout_buffer_t * );
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-
-vlc_module_begin();
-    set_description( _("ADPCM audio decoder") );
-    set_capability( "decoder", 50 );
-    set_callbacks( OpenDecoder, NULL );
-vlc_module_end();
-
+static void DecodeAdpcmMs       ( decoder_sys_t *, int16_t *, uint8_t * );
+static void DecodeAdpcmImaWav   ( decoder_sys_t *, int16_t *, uint8_t * );
+static void DecodeAdpcmImaQT    ( decoder_sys_t *, int16_t *, uint8_t * );
+static void DecodeAdpcmDk4      ( decoder_sys_t *, int16_t *, uint8_t * );
+static void DecodeAdpcmDk3      ( decoder_sys_t *, int16_t *, uint8_t * );
 
 static int pi_channels_maps[6] =
 {
@@ -149,7 +141,7 @@ static int i_adaptation_coeff2[7] =
  * Tries to launch a decoder and return score so that the interface is able
  * to choose.
  *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this )
+static int Open( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
@@ -161,7 +153,11 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_FOURCC('m','s',0x00,0x61): /* Duck DK4 ADPCM */
         case VLC_FOURCC('m','s',0x00,0x62): /* Duck DK3 ADPCM */
 
-            p_dec->pf_run = RunDecoder;
+            p_dec->pf_init   = Init;
+            p_dec->pf_decode = Decode;
+            p_dec->pf_end    = End;
+
+            p_dec->p_sys     = malloc( sizeof( decoder_sys_t ) );
             return VLC_SUCCESS;
 
         default:
@@ -170,319 +166,187 @@ static int OpenDecoder( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * RunDecoder: this function is called just after the thread is created
+ * Init:
  *****************************************************************************/
-static int RunDecoder( decoder_fifo_t *p_fifo )
+static int Init  ( decoder_t *p_dec )
 {
-    adec_thread_t *p_adec;
-    int b_error;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( !( p_adec = malloc( sizeof( adec_thread_t ) ) ) )
+    WAVEFORMATEX *p_wf;
+    if( ( p_wf = (WAVEFORMATEX*)p_dec->p_fifo->p_waveformatex ) == NULL )
     {
-        msg_Err( p_fifo, "out of memory" );
-        DecoderError( p_fifo );
-        return( -1 );
-    }
-    memset( p_adec, 0, sizeof( adec_thread_t ) );
-
-    p_adec->p_fifo = p_fifo;
-
-    if( InitThread( p_adec ) != 0 )
-    {
-        DecoderError( p_fifo );
-        return( -1 );
+        msg_Err( p_dec, "unknown raw format" );
+        return VLC_EGENERIC;
     }
 
-    while( ( !p_adec->p_fifo->b_die )&&( !p_adec->p_fifo->b_error ) )
+    if( p_wf->nChannels < 1 || p_wf->nChannels > 2 )
     {
-        DecodeThread( p_adec );
+        msg_Err( p_dec, "bad channels count(1-2)" );
+        return VLC_EGENERIC;
+    }
+    if( p_wf->nSamplesPerSec <= 0 )
+    {
+        msg_Err( p_dec, "bad samplerate" );
+        return VLC_EGENERIC;
     }
 
-
-    if( ( b_error = p_adec->p_fifo->b_error ) )
-    {
-        DecoderError( p_adec->p_fifo );
-    }
-
-    EndThread( p_adec );
-    if( b_error )
-    {
-        return( -1 );
-    }
-
-    return( 0 );
-}
-
-
-#define FREE( p ) if( p ) free( p ); p = NULL
-
-/*****************************************************************************
- * InitThread: initialize data before entering main loop
- *****************************************************************************/
-
-static int InitThread( adec_thread_t * p_adec )
-{
-    if( ( p_adec->p_wf = (WAVEFORMATEX*)p_adec->p_fifo->p_waveformatex ) == NULL )
-    {
-        msg_Err( p_adec->p_fifo, "missing format" );
-        return( -1 );
-    }
-    /* fourcc to codec */
-    switch( p_adec->p_fifo->i_fourcc )
+    p_sys->p_wf = p_wf;
+    switch( p_dec->p_fifo->i_fourcc )
     {
         case VLC_FOURCC('i','m','a', '4'): /* IMA ADPCM */
-            p_adec->i_codec = ADPCM_IMA_QT;
+            p_sys->codec = ADPCM_IMA_QT;
             break;
         case VLC_FOURCC('m','s',0x00,0x11): /* IMA ADPCM */
-            p_adec->i_codec = ADPCM_IMA_WAV;
+            p_sys->codec = ADPCM_IMA_WAV;
             break;
         case VLC_FOURCC('m','s',0x00,0x02): /* MS ADPCM */
-            p_adec->i_codec = ADPCM_MS;
+            p_sys->codec = ADPCM_MS;
             break;
         case VLC_FOURCC('m','s',0x00,0x61): /* Duck DK4 ADPCM */
-            p_adec->i_codec = ADPCM_DK4;
+            p_sys->codec = ADPCM_DK4;
             break;
         case VLC_FOURCC('m','s',0x00,0x62): /* Duck DK3 ADPCM */
-            p_adec->i_codec = ADPCM_DK3;
+            p_sys->codec = ADPCM_DK3;
             break;
     }
 
-    if( p_adec->p_wf->nChannels < 1 ||
-            p_adec->p_wf->nChannels > 2 )
+    if( ( p_sys->i_block = p_wf->nBlockAlign ) <= 0 )
     {
-        msg_Err( p_adec->p_fifo, "bad channels count(1-2)" );
-        return( -1 );
+        p_sys->i_block = p_sys->codec==ADPCM_IMA_QT ? 34*p_wf->nChannels:1024;
+        msg_Warn( p_dec, "block size undefined, -> using %d", p_sys->i_block );
     }
-    if( !( p_adec->i_block = p_adec->p_wf->nBlockAlign ) )
-    {
-        if( p_adec->i_codec == ADPCM_IMA_QT )
-        {
-            p_adec->i_block = 34 * p_adec->p_wf->nChannels;
-        }
-        else
-        {
-            p_adec->i_block = 1024; // XXX FIXME
-        }
-        msg_Warn( p_adec->p_fifo,
-                 "block size undefined, using %d default",
-                 p_adec->i_block );
-    }
-    p_adec->p_block = NULL;
 
     /* calculate samples per block */
-    switch( p_adec->i_codec )
+    switch( p_sys->codec )
     {
         case ADPCM_IMA_QT:
-            p_adec->i_samplesperblock = 64;
+            p_sys->i_samplesperblock = 64;
             break;
         case ADPCM_IMA_WAV:
-            p_adec->i_samplesperblock =
-                 2 * ( p_adec->i_block - 4 * p_adec->p_wf->nChannels )/
-                 p_adec->p_wf->nChannels;
+            p_sys->i_samplesperblock =
+                 2 * ( p_sys->i_block - 4 * p_wf->nChannels )/ p_wf->nChannels;
                  break;
         case ADPCM_MS:
-            p_adec->i_samplesperblock =
-                2 * ( p_adec->i_block - 7 * p_adec->p_wf->nChannels ) /
-                p_adec->p_wf->nChannels + 2;
+            p_sys->i_samplesperblock =
+                2 * (p_sys->i_block - 7 * p_wf->nChannels)/p_wf->nChannels + 2;
             break;
         case ADPCM_DK4:
-            p_adec->i_samplesperblock =
-               2 * ( p_adec->i_block - 4 * p_adec->p_wf->nChannels ) /
-               p_adec->p_wf->nChannels + 1;
+            p_sys->i_samplesperblock =
+               2 * (p_sys->i_block - 4 * p_wf->nChannels)/p_wf->nChannels + 1;
             break;
         case ADPCM_DK3:
-            p_adec->p_wf->nChannels = 2;
-            p_adec->i_samplesperblock = ( 4 * ( p_adec->i_block - 16 ) + 2 )/ 3;
+            p_wf->nChannels = 2;
+            p_sys->i_samplesperblock = ( 4 * ( p_sys->i_block - 16 ) + 2 )/ 3;
             break;
-        default:
-            msg_Err( p_adec->p_fifo, "unknown adpcm variant" );
-            return( -1 );
     }
-
-    msg_Dbg( p_adec->p_fifo,
+    msg_Dbg( p_dec,
              "format: samplerate:%dHz channels:%d bits/sample:%d blockalign:%d samplesperblock %d",
-             p_adec->p_wf->nSamplesPerSec,
-             p_adec->p_wf->nChannels,
-             p_adec->p_wf->wBitsPerSample,
-             p_adec->p_wf->nBlockAlign,
-             p_adec->i_samplesperblock );
+             p_wf->nSamplesPerSec, p_wf->nChannels,
+             p_wf->wBitsPerSample, p_wf->nBlockAlign,
+             p_sys->i_samplesperblock );
 
-    //p_adec->output_format.i_format = VLC_FOURCC('s','1','6','l');
-    /* FIXME good way ? */
-    p_adec->output_format.i_format = AOUT_FMT_S16_NE;
-    p_adec->output_format.i_rate = p_adec->p_wf->nSamplesPerSec;
+    p_sys->output_format.i_format = AOUT_FMT_S16_NE;
+    p_sys->output_format.i_rate = p_wf->nSamplesPerSec;
+    p_sys->output_format.i_physical_channels =
+    p_sys->output_format.i_original_channels =
+            pi_channels_maps[p_wf->nChannels];
 
-
-    p_adec->output_format.i_physical_channels =
-        p_adec->output_format.i_original_channels =
-            pi_channels_maps[p_adec->p_wf->nChannels];
-    p_adec->p_aout = NULL;
-    p_adec->p_aout_input = NULL;
-
-    /* **** Create a new audio output **** */
-    aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
-    p_adec->p_aout_input = aout_DecNew( p_adec->p_fifo,
-                                        &p_adec->p_aout,
-                                        &p_adec->output_format );
-    if( !p_adec->p_aout_input )
+    p_sys->p_aout = NULL;
+    p_sys->p_aout_input = aout_DecNew( p_dec,
+                                       &p_sys->p_aout, &p_sys->output_format);
+    if( p_sys->p_aout_input == NULL )
     {
-        msg_Err( p_adec->p_fifo, "cannot create aout" );
-        return( -1 );
+        msg_Err( p_dec, "cannot create aout" );
+        return VLC_EGENERIC;
     }
 
-    /* Init the BitStream */
-//    InitBitstream( &p_adec->bit_stream, p_adec->p_fifo,
-//                   NULL, NULL );
+    aout_DateInit( &p_sys->date, p_sys->output_format.i_rate );
+    aout_DateSet( &p_sys->date, 0 );
 
-    return( 0 );
-}
-
-
-static void GetPESData( uint8_t *p_buf, int i_max, pes_packet_t *p_pes )
-{
-    int i_copy;
-    int i_count;
-
-    data_packet_t   *p_data;
-
-    i_count = 0;
-    p_data = p_pes->p_first;
-    while( p_data != NULL && i_count < i_max )
-    {
-
-        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start,
-                        i_max - i_count );
-
-        if( i_copy > 0 )
-        {
-            memcpy( p_buf,
-                    p_data->p_payload_start,
-                    i_copy );
-        }
-
-        p_data = p_data->p_next;
-        i_count += i_copy;
-        p_buf   += i_copy;
-    }
-
-    if( i_count < i_max )
-    {
-        memset( p_buf, 0, i_max - i_count );
-    }
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * DecodeThread: decodes a frame
+ * Decode:
  *****************************************************************************/
-static void DecodeThread( adec_thread_t *p_adec )
+static int Decode( decoder_t *p_dec, block_t *p_block )
 {
-    aout_buffer_t   *p_aout_buffer;
-    pes_packet_t    *p_pes;
+    decoder_sys_t *p_sys  = p_dec->p_sys;
+    mtime_t        i_pts  = p_block->i_pts;
+    uint8_t       *p_data = p_block->p_buffer;
+    int            i_data = p_block->i_buffer;
 
-    int             i_frame_size;
-
-    /* **** Get a new frames from streams **** */
-    do
+    while( i_data >= p_sys->i_block )
     {
-        input_ExtractPES( p_adec->p_fifo, &p_pes );
-        if( !p_pes )
+        aout_buffer_t *out;
+
+        if( i_pts != 0 && i_pts != aout_DateGet( &p_sys->date ) )
         {
-            p_adec->p_fifo->b_error = 1;
-            return;
+            aout_DateSet( &p_sys->date, i_pts );
         }
-        if( p_pes->i_pts != 0 )
+        else if( !aout_DateGet( &p_sys->date ) )
         {
-            p_adec->pts = p_pes->i_pts;
+            return VLC_SUCCESS;
         }
-        i_frame_size = p_pes->i_pes_size;
+        i_pts = 0;
 
-        if( i_frame_size > 0 )
+        out = aout_DecNewBuffer( p_sys->p_aout,
+                                 p_sys->p_aout_input,
+                                 p_sys->i_samplesperblock );
+        if( out == NULL )
         {
-            if( p_adec->i_buffer < i_frame_size + 16 )
-            {
-                FREE( p_adec->p_buffer );
-                p_adec->p_buffer = malloc( i_frame_size + 16 );
-                p_adec->i_buffer = i_frame_size + 16;
-            }
-
-            GetPESData( p_adec->p_buffer, p_adec->i_buffer, p_pes );
+            msg_Err( p_dec, "cannot get aout buffer" );
+            return VLC_EGENERIC;
         }
-        input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
+        out->start_date = aout_DateGet( &p_sys->date );
+        out->end_date   = aout_DateIncrement( &p_sys->date,
+                                              p_sys->i_samplesperblock );
 
-    } while( i_frame_size <= 0 );
-
-    for( p_adec->p_block = p_adec->p_buffer;
-         i_frame_size >= p_adec->i_block;
-         p_adec->p_block += p_adec->i_block, i_frame_size -= p_adec->i_block  )
-    {
-        /* get output buffer */
-        if( p_adec->pts != 0 && p_adec->pts != aout_DateGet( &p_adec->date ) )
-        {
-            aout_DateSet( &p_adec->date, p_adec->pts );
-        }
-        else if( !aout_DateGet( &p_adec->date ) )
-        {
-            return;
-        }
-        p_adec->pts = 0;
-
-        p_aout_buffer = aout_DecNewBuffer( p_adec->p_aout,
-                                           p_adec->p_aout_input,
-                                           p_adec->i_samplesperblock );
-        if( !p_aout_buffer )
-        {
-            msg_Err( p_adec->p_fifo, "cannot get aout buffer" );
-            p_adec->p_fifo->b_error = 1;
-            return;
-        }
-
-        p_aout_buffer->start_date = aout_DateGet( &p_adec->date );
-        p_aout_buffer->end_date = aout_DateIncrement( &p_adec->date,
-                                                      p_adec->i_samplesperblock );
-
-        /* decode */
-
-        switch( p_adec->i_codec )
+        switch( p_sys->codec )
         {
             case ADPCM_IMA_QT:
-                DecodeAdpcmImaQT( p_adec, p_aout_buffer );
+                DecodeAdpcmImaQT( p_sys, (int16_t*)out->p_buffer, p_data );
                 break;
             case ADPCM_IMA_WAV:
-                DecodeAdpcmImaWav( p_adec, p_aout_buffer );
+                DecodeAdpcmImaWav( p_sys, (int16_t*)out->p_buffer, p_data );
                 break;
             case ADPCM_MS:
-                DecodeAdpcmMs( p_adec, p_aout_buffer );
+                DecodeAdpcmMs( p_sys, (int16_t*)out->p_buffer, p_data );
                 break;
             case ADPCM_DK4:
-                DecodeAdpcmDk4( p_adec, p_aout_buffer );
+                DecodeAdpcmDk4( p_sys, (int16_t*)out->p_buffer, p_data );
+                break;
             case ADPCM_DK3:
-                DecodeAdpcmDk3( p_adec, p_aout_buffer );
+                DecodeAdpcmDk3( p_sys, (int16_t*)out->p_buffer, p_data );
+                break;
             default:
                 break;
         }
+        aout_DecPlay( p_sys->p_aout, p_sys->p_aout_input, out );
 
-
-        /* **** Now we can output these samples **** */
-        aout_DecPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
+        p_data += p_sys->i_block;
+        i_data -= p_sys->i_block;
     }
-}
 
+    return VLC_SUCCESS;
+}
 
 /*****************************************************************************
- * EndThread : faad decoder thread destruction
+ * End:
  *****************************************************************************/
-static void EndThread (adec_thread_t *p_adec)
+static int End   ( decoder_t *p_dec )
 {
-    if( p_adec->p_aout_input )
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sys->p_aout_input )
     {
-        aout_DecDelete( p_adec->p_aout, p_adec->p_aout_input );
+        aout_DecDelete( p_sys->p_aout, p_sys->p_aout_input );
     }
+    free( p_sys );
 
-    msg_Dbg( p_adec->p_fifo, "adpcm audio decoder closed" );
-
-    FREE( p_adec->p_buffer );
-    free( p_adec );
+    return VLC_SUCCESS;
 }
+
 #define CLAMP( v, min, max ) \
     if( (v) < (min) ) (v) = (min); \
     if( (v) > (max) ) (v) = (max)
@@ -534,18 +398,14 @@ static int AdpcmMsExpandNibble(adpcm_ms_channel_t *p_channel,
     return( i_predictor );
 }
 
-static void DecodeAdpcmMs( adec_thread_t *p_adec,
-                           aout_buffer_t *p_aout_buffer)
+static void DecodeAdpcmMs( decoder_sys_t *p_sys, int16_t *p_sample, uint8_t *p_buffer )
 {
-    uint8_t            *p_buffer;
     adpcm_ms_channel_t channel[2];
     int i_nibbles;
-    uint16_t           *p_sample;
     int b_stereo;
     int i_block_predictor;
 
-    p_buffer = p_adec->p_block;
-    b_stereo = p_adec->p_wf->nChannels == 2 ? 1 : 0;
+    b_stereo = p_sys->p_wf->nChannels == 2 ? 1 : 0;
 
     GetByte( i_block_predictor );
     CLAMP( i_block_predictor, 0, 6 );
@@ -577,33 +437,26 @@ static void DecodeAdpcmMs( adec_thread_t *p_adec,
         GetWord( channel[1].i_sample2 );
     }
 
-    p_sample = (int16_t*)p_aout_buffer->p_buffer;
-
     if( b_stereo )
     {
-        *p_sample = channel[0].i_sample2; p_sample++;
-        *p_sample = channel[1].i_sample2; p_sample++;
-        *p_sample = channel[0].i_sample1; p_sample++;
-        *p_sample = channel[1].i_sample1; p_sample++;
+        *p_sample++ = channel[0].i_sample2;
+        *p_sample++ = channel[1].i_sample2;
+        *p_sample++ = channel[0].i_sample1;
+        *p_sample++ = channel[1].i_sample1;
     }
     else
     {
-        *p_sample = channel[0].i_sample2; p_sample++;
-        *p_sample = channel[0].i_sample1; p_sample++;
+        *p_sample++ = channel[0].i_sample2;
+        *p_sample++ = channel[0].i_sample1;
     }
 
-    for( i_nibbles =  2 *( p_adec->i_block - 7 * p_adec->p_wf->nChannels );
+    for( i_nibbles =  2 *( p_sys->i_block - 7 * p_sys->p_wf->nChannels );
          i_nibbles > 0; i_nibbles -= 2,p_buffer++ )
     {
-        *p_sample = AdpcmMsExpandNibble( &channel[0], (*p_buffer) >> 4);
-        p_sample++;
-
-        *p_sample = AdpcmMsExpandNibble( &channel[b_stereo ? 1 : 0],
-                                         (*p_buffer)&0x0f);
-        p_sample++;
+        *p_sample++ = AdpcmMsExpandNibble( &channel[0], (*p_buffer) >> 4);
+        *p_sample++ = AdpcmMsExpandNibble( &channel[b_stereo ? 1 : 0],
+                                           (*p_buffer)&0x0f);
     }
-
-
 }
 
 /*
@@ -639,17 +492,13 @@ static int AdpcmImaWavExpandNibble(adpcm_ima_wav_channel_t *p_channel,
     return( p_channel->i_predictor );
 }
 
-static void DecodeAdpcmImaWav( adec_thread_t *p_adec,
-                               aout_buffer_t *p_aout_buffer)
+static void DecodeAdpcmImaWav( decoder_sys_t *p_sys, int16_t *p_sample, uint8_t *p_buffer )
 {
-    uint8_t                 *p_buffer;
     adpcm_ima_wav_channel_t channel[2];
     int                     i_nibbles;
-    uint16_t                *p_sample;
     int                     b_stereo;
 
-    p_buffer = p_adec->p_block;
-    b_stereo = p_adec->p_wf->nChannels == 2 ? 1 : 0;
+    b_stereo = p_sys->p_wf->nChannels == 2 ? 1 : 0;
 
     GetWord( channel[0].i_predictor );
     GetByte( channel[0].i_step_index );
@@ -664,10 +513,9 @@ static void DecodeAdpcmImaWav( adec_thread_t *p_adec,
         p_buffer++;
     }
 
-    p_sample = (int16_t*)p_aout_buffer->p_buffer;
     if( b_stereo )
     {
-        for( i_nibbles = 2 * (p_adec->i_block - 8);
+        for( i_nibbles = 2 * (p_sys->i_block - 8);
              i_nibbles > 0;
              i_nibbles -= 16 )
         {
@@ -698,14 +546,12 @@ static void DecodeAdpcmImaWav( adec_thread_t *p_adec,
     }
     else
     {
-        for( i_nibbles = 2 * (p_adec->i_block - 4);
+        for( i_nibbles = 2 * (p_sys->i_block - 4);
              i_nibbles > 0;
              i_nibbles -= 2, p_buffer++ )
         {
-            *p_sample =AdpcmImaWavExpandNibble( &channel[0], (*p_buffer)&0x0f );
-            p_sample++;
-            *p_sample =AdpcmImaWavExpandNibble( &channel[0], (*p_buffer) >> 4 );
-            p_sample++;
+            *p_sample++ =AdpcmImaWavExpandNibble( &channel[0], (*p_buffer)&0x0f );
+            *p_sample++ =AdpcmImaWavExpandNibble( &channel[0], (*p_buffer) >> 4 );
         }
     }
 }
@@ -713,22 +559,17 @@ static void DecodeAdpcmImaWav( adec_thread_t *p_adec,
 /*
  * Ima4 in QT file
  */
-static void DecodeAdpcmImaQT( adec_thread_t *p_adec,
-                              aout_buffer_t *p_aout_buffer )
+static void DecodeAdpcmImaQT( decoder_sys_t *p_sys, int16_t *p_sample, uint8_t *p_buffer )
 {
-    uint8_t                 *p_buffer;
     adpcm_ima_wav_channel_t channel[2];
     int                     i_nibbles;
-    uint16_t                *p_sample;
     int                     i_ch;
     int                     i_step;
 
-    p_buffer = p_adec->p_block;
-    i_step   = p_adec->p_wf->nChannels;
+    i_step   = p_sys->p_wf->nChannels;
 
-    for( i_ch = 0; i_ch < p_adec->p_wf->nChannels; i_ch++ )
+    for( i_ch = 0; i_ch < p_sys->p_wf->nChannels; i_ch++ )
     {
-        p_sample = ((int16_t*)p_aout_buffer->p_buffer) + i_ch;
         /* load preambule */
         channel[i_ch].i_predictor  = (int16_t)((( ( p_buffer[0] << 1 )|(  p_buffer[1] >> 7 ) ))<<7);
         channel[i_ch].i_step_index = p_buffer[1]&0x7f;
@@ -746,6 +587,9 @@ static void DecodeAdpcmImaQT( adec_thread_t *p_adec,
 
             p_buffer++;
         }
+
+        /* Next channel */
+        p_sample += 1 - 64 * i_step;
     }
 }
 
@@ -753,17 +597,13 @@ static void DecodeAdpcmImaQT( adec_thread_t *p_adec,
  * Dk4
  */
 
-static void DecodeAdpcmDk4( adec_thread_t *p_adec,
-                               aout_buffer_t *p_aout_buffer)
+static void DecodeAdpcmDk4( decoder_sys_t *p_sys, int16_t *p_sample, uint8_t *p_buffer )
 {
-    uint8_t                 *p_buffer;
     adpcm_ima_wav_channel_t channel[2];
     int                     i_nibbles;
-    uint16_t                *p_sample;
     int                     b_stereo;
 
-    p_buffer = p_adec->p_block;
-    b_stereo = p_adec->p_wf->nChannels == 2 ? 1 : 0;
+    b_stereo = p_sys->p_wf->nChannels == 2 ? 1 : 0;
 
     GetWord( channel[0].i_predictor );
     GetByte( channel[0].i_step_index );
@@ -778,8 +618,6 @@ static void DecodeAdpcmDk4( adec_thread_t *p_adec,
         p_buffer++;
     }
 
-    p_sample = (int16_t*)p_aout_buffer->p_buffer;
-
     /* first output predictor */
     *p_sample++ = channel[0].i_predictor;
     if( b_stereo )
@@ -788,7 +626,7 @@ static void DecodeAdpcmDk4( adec_thread_t *p_adec,
     }
 
     for( i_nibbles = 0;
-         i_nibbles < p_adec->i_block - 4 * (b_stereo ? 2:1 );
+         i_nibbles < p_sys->i_block - 4 * (b_stereo ? 2:1 );
          i_nibbles++ )
     {
         *p_sample++ = AdpcmImaWavExpandNibble( &channel[0],
@@ -803,29 +641,22 @@ static void DecodeAdpcmDk4( adec_thread_t *p_adec,
 /*
  * Dk3
  */
-
-static void DecodeAdpcmDk3( adec_thread_t *p_adec,
-                               aout_buffer_t *p_aout_buffer)
+static void DecodeAdpcmDk3( decoder_sys_t *p_sys, int16_t *p_sample, uint8_t *p_buffer )
 {
-    uint8_t                 *p_buffer, *p_end;
+    uint8_t                 *p_end = &p_buffer[p_sys->i_block];
     adpcm_ima_wav_channel_t sum;
     adpcm_ima_wav_channel_t diff;
-    uint16_t                *p_sample;
     int                     i_diff_value;
 
-    p_buffer = p_adec->p_block;
-    p_end    = p_buffer + p_adec->i_block;
-
     p_buffer += 10;
+
     GetWord( sum.i_predictor );
     GetWord( diff.i_predictor );
     GetByte( sum.i_step_index );
     GetByte( diff.i_step_index );
 
-    p_sample = (int16_t*)p_aout_buffer->p_buffer;
     i_diff_value = diff.i_predictor;
     /* we process 6 nibbles at once */
-    //for( i_group = 0; i_group < ( p_adec->i_block -16 ) / 3; i_group++ )
     while( p_buffer + 1 <= p_end )
     {
         /* first 3 nibbles */
@@ -869,7 +700,6 @@ static void DecodeAdpcmDk3( adec_thread_t *p_adec,
             *p_sample++ = sum.i_predictor + i_diff_value;
             *p_sample++ = sum.i_predictor - i_diff_value;
         }
-
     }
-
 }
+
