@@ -2,7 +2,7 @@
  * http.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: http.c,v 1.10 2004/01/25 17:20:18 kuehne Exp $
+ * $Id: http.c,v 1.11 2004/02/03 20:12:53 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -356,7 +356,7 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
  *****************************************************************************/
 static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
-    msg_Err( p_access, "HTTP sout access cannot seek" );
-    return( VLC_EGENERIC );
+    msg_Warn( p_access, "HTTP sout access cannot seek" );
+    return VLC_EGENERIC;
 }
 
