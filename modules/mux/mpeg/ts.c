@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.5 2003/01/11 14:09:22 ipkiss Exp $
+ * $Id: ts.c,v 1.6 2003/01/11 17:23:13 ipkiss Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -54,12 +54,14 @@
 #       include <dvbpsi/pat.h>
 #       include <dvbpsi/pmt.h>
 #       include <dvbpsi/dr.h>
+#       include <dvbpsi/psi.h>
 #   else
 #       include "dvbpsi.h"
 #       include "descriptor.h"
 #       include "tables/pat.h"
 #       include "tables/pmt.h"
 #       include "descriptors/dr.h"
+#       include "psi.h"
 #   endif
 #endif
 
@@ -769,7 +771,7 @@ static sout_buffer_t *WritePSISection( sout_instance_t *p_sout,
     {
         int             i_size;
 
-        i_size =  p_section->p_payload_end - p_section->p_data +
+        i_size =  (uint32_t)( p_section->p_payload_end - p_section->p_data )+
                   ( p_section->b_syntax_indicator ? 4 : 0 );
 
         p_psi = sout_BufferNew( p_sout, i_size + 1 );
