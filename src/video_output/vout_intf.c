@@ -62,6 +62,9 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
     vlc_value_t val;
     int i;
 
+    /* Small kludge */
+    if( !var_Type( p_vout, "aspect-ratio" ) ) vout_IntfInit( p_vout );
+
     /* Get requested coordinates */
     var_Get( p_vout, "video-x", &val );
     *pi_x_hint = val.i_int ;
