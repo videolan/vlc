@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.6 2002/10/04 18:07:21 sam Exp $
+ * $Id: vcd.c,v 1.7 2002/10/15 19:56:59 gbazin Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -36,22 +36,27 @@
 #   include <unistd.h>
 #endif
 
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <string.h>
-#include <errno.h>
-
-#if defined( WIN32 )
-#   include <io.h>                                                 /* read() */
-#endif
 
 #include "vcd.h"
-#include "cdrom.h"
 
 /* how many blocks VCDRead will read in each loop */
 #define VCD_BLOCKS_ONCE 20
 #define VCD_DATA_ONCE   (VCD_BLOCKS_ONCE * VCD_DATA_SIZE)
+
+/*****************************************************************************
+ * thread_vcd_data_t: VCD information
+ *****************************************************************************/
+typedef struct thread_vcd_data_s
+{
+    vcddev_t    *vcddev;                            /* vcd device descriptor */
+    int         nb_tracks;                          /* Nb of tracks (titles) */
+    int         i_track;                                    /* Current track */
+    int         i_sector;                                  /* Current Sector */
+    int *       p_sectors;                                  /* Track sectors */
+    vlc_bool_t  b_end_of_track;           /* If the end of track was reached */
+
+} thread_vcd_data_t;
 
 /*****************************************************************************
  * Local prototypes
@@ -87,7 +92,6 @@ static int VCDOpen( vlc_object_t *p_this )
     char *                  psz_parser;
     char *                  psz_source;
     char *                  psz_next;
-    struct stat             stat_info;
     thread_vcd_data_t *     p_vcd;
     int                     i;
     input_area_t *          p_area;
@@ -98,6 +102,12 @@ static int VCDOpen( vlc_object_t *p_this )
     p_input->pf_seek = VCDSeek;
     p_input->pf_set_area = VCDSetArea;
     p_input->pf_set_program = VCDSetProgram;
+
+#ifdef WIN32
+    /* On Win32 we want the VCD access plugin to be explicitly requested,
+     * we end up with lots of problems otherwise */
+    if( !p_input->psz_access || !*p_input->psz_access ) return( -1 );
+#endif
 
     /* parse the options passed in command line : */
     psz_orig = psz_parser = psz_source = strdup( p_input->psz_name );
@@ -137,29 +147,15 @@ static int VCDOpen( vlc_object_t *p_this )
             return -1;
         }
         psz_source = config_GetPsz( p_input, "vcd" );
+        if( !psz_source ) return -1;
     }
 
-    /* test the type of file given */
-    
-    if( stat( psz_source, &stat_info ) == -1 )
-    {
-        msg_Err( p_input, "cannot stat() source `%s' (%s)",
-                          psz_source, strerror(errno));
-        return( -1 );
-    }
-    
-    if( !S_ISBLK(stat_info.st_mode) && !S_ISCHR(stat_info.st_mode))
-    {
-        msg_Warn( p_input, "vcd module discarded (not a valid drive)" );
-        return -1;
-    }
-    
-    
     p_vcd = malloc( sizeof(thread_vcd_data_t) );
 
     if( p_vcd == NULL )
     {
         msg_Err( p_input, "out of memory" );
+        free( psz_source );
         return -1;
     }
     
@@ -177,39 +173,26 @@ static int VCDOpen( vlc_object_t *p_this )
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    p_vcd->i_handle = open( psz_source, O_RDONLY | O_NONBLOCK );
-
-    if( p_vcd->i_handle == -1 )
+    if( !(p_vcd->vcddev = ioctl_Open( p_this, psz_source )) )
     {
         msg_Err( p_input, "could not open %s", psz_source );
-        free (p_vcd);
+        free( psz_source );
+        free( p_vcd );
         return -1;
     }
 
     /* We read the Table Of Content information */
-    p_vcd->nb_tracks = ioctl_GetTrackCount( VLC_OBJECT( p_input),
-                                            p_vcd->i_handle, psz_source );
+    p_vcd->nb_tracks = ioctl_GetTracksMap( VLC_OBJECT(p_input),
+                                           p_vcd->vcddev, &p_vcd->p_sectors );
+    free( psz_source );
     if( p_vcd->nb_tracks < 0 )
-    {
         msg_Err( p_input, "unable to count tracks" );
-        close( p_vcd->i_handle );
-        free( p_vcd );
-        return -1;
-    }
     else if( p_vcd->nb_tracks <= 1 )
-    {
         msg_Err( p_input, "no movie tracks found" );
-        close( p_vcd->i_handle );
-        free( p_vcd );
-        return -1;
-    }
-
-    p_vcd->p_sectors = ioctl_GetSectors( VLC_OBJECT( p_input),
-                                         p_vcd->i_handle, psz_source );
-    if( p_vcd->p_sectors == NULL )
+    if( p_vcd->nb_tracks <= 1)
     {
-        input_BuffersEnd( p_input, p_input->p_method_data );
-        close( p_vcd->i_handle );
+        //input_BuffersEnd( p_input, p_input->p_method_data ); /* ??? */
+        ioctl_Close( p_this, p_vcd->vcddev );
         free( p_vcd );
         return -1;
     }
@@ -263,7 +246,7 @@ static void VCDClose( vlc_object_t *p_this )
     input_thread_t *   p_input = (input_thread_t *)p_this;
     thread_vcd_data_t *p_vcd = (thread_vcd_data_t *)p_input->p_access_data;
 
-    close( p_vcd->i_handle );
+    ioctl_Close( p_this, p_vcd->vcddev );
     free( p_vcd );
 }
 
@@ -292,7 +275,7 @@ static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
 
     for ( i_index = 0 ; i_index < i_blocks ; i_index++ ) 
     {
-        if ( ioctl_ReadSector( VLC_OBJECT(p_input), p_vcd->i_handle,
+        if ( ioctl_ReadSector( VLC_OBJECT(p_input), p_vcd->vcddev,
                     p_vcd->i_sector, p_buffer + i_index * VCD_DATA_SIZE ) < 0 )
         {
             msg_Err( p_input, "could not read sector %d", p_vcd->i_sector );
@@ -321,7 +304,7 @@ static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
     
     if ( i_len % VCD_DATA_SIZE ) /* this should not happen */
     { 
-        if ( ioctl_ReadSector( VLC_OBJECT(p_input), p_vcd->i_handle,
+        if ( ioctl_ReadSector( VLC_OBJECT(p_input), p_vcd->vcddev,
                                p_vcd->i_sector, p_last_sector ) < 0 )
         {
             msg_Err( p_input, "could not read sector %d", p_vcd->i_sector );

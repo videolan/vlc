@@ -2,9 +2,10 @@
  * cdrom.h: cdrom tools header
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.h,v 1.2 2002/08/08 22:28:22 sam Exp $
+ * $Id: cdrom.h,v 1.3 2002/10/15 19:56:59 gbazin Exp $
  *
- * Author: Johan Bilien <jobi@via.ecp.fr>
+ * Authors: Johan Bilien <jobi@via.ecp.fr>
+ *          Gildas Bazin <gbazin@netcourrier.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,17 +22,191 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/* where the data start on a VCD sector */
-#define VCD_DATA_START 24
-/* size of the availablr data on a VCD sector */
-#define VCD_DATA_SIZE 2324
-/* size of a VCD sector, header and tail included */
-#define VCD_SECTOR_SIZE 2352
+/*****************************************************************************
+ * The vcddev structure
+ *****************************************************************************/
+typedef struct vcddev_s
+{
+    char   *psz_dev;                                      /* vcd device name */
 
-/******************************************************************************
-* Prototypes                                                                  *
-******************************************************************************/
-int   ioctl_GetTrackCount ( vlc_object_t *, int, const char *psz_dev );
-int * ioctl_GetSectors    ( vlc_object_t *, int, const char *psz_dev );
-int   ioctl_ReadSector    ( vlc_object_t *, int, int, byte_t * );
+    /* Section used in vcd image mode */
+    int    i_vcdimage_handle;                   /* vcd image file descriptor */
+    int    i_tracks;                          /* number of tracks of the vcd */
+    int    *p_sectors;                           /* tracks layout on the vcd */
 
+    /* Section used in vcd device mode */
+
+#ifdef WIN32
+    HANDLE h_device_handle;                         /* vcd device descriptor */
+    long  hASPI;
+    short i_sid;
+    long  (*lpSendCommand)( void* );
+
+#else
+    int    i_device_handle;                         /* vcd device descriptor */
+#endif
+
+} vcddev_t;
+
+
+/*****************************************************************************
+ * Misc. Macros
+ *****************************************************************************/
+/* LBA = msf.frame + 75 * ( msf.second + 60 * msf.minute ) */
+#define MSF_TO_LBA(min, sec, frame) ((int)frame + 75 * (sec + 60 * min))
+/* LBA = msf.frame + 75 * ( msf.second - 2 + 60 * msf.minute ) */
+#define MSF_TO_LBA2(min, sec, frame) ((int)frame + 75 * (sec -2 + 60 * min))
+
+#ifndef O_BINARY
+#   define O_BINARY 0
+#endif
+
+#define VCDDEV_T 1
+
+/*****************************************************************************
+ * Platform specifics
+ *****************************************************************************/
+#if defined( SYS_DARWIN )
+#define darwin_freeTOC( p ) free( (void*)p )
+#define CD_MIN_TRACK_NO 01
+#define CD_MAX_TRACK_NO 99
+#endif
+
+#if defined( WIN32 )
+
+/* Win32 DeviceIoControl specifics */
+#ifndef MAXIMUM_NUMBER_TRACKS
+#    define MAXIMUM_NUMBER_TRACKS 100
+#endif
+typedef struct _TRACK_DATA {
+    UCHAR Reserved;
+    UCHAR Control : 4;
+    UCHAR Adr : 4;
+    UCHAR TrackNumber;
+    UCHAR Reserved1;
+    UCHAR Address[4];
+} TRACK_DATA, *PTRACK_DATA;
+typedef struct _CDROM_TOC {
+    UCHAR Length[2];
+    UCHAR FirstTrack;
+    UCHAR LastTrack;
+    TRACK_DATA TrackData[MAXIMUM_NUMBER_TRACKS];
+} CDROM_TOC, *PCDROM_TOC;
+typedef enum _TRACK_MODE_TYPE {
+    YellowMode2,
+    XAForm2,
+    CDDA
+} TRACK_MODE_TYPE, *PTRACK_MODE_TYPE;
+typedef struct __RAW_READ_INFO {
+    LARGE_INTEGER DiskOffset;
+    ULONG SectorCount;
+    TRACK_MODE_TYPE TrackMode;
+} RAW_READ_INFO, *PRAW_READ_INFO;
+
+#ifndef IOCTL_CDROM_BASE
+#    define IOCTL_CDROM_BASE FILE_DEVICE_CD_ROM
+#endif
+#ifndef IOCTL_CDROM_READ_TOC
+#    define IOCTL_CDROM_READ_TOC CTL_CODE(IOCTL_CDROM_BASE, 0x0000, \
+                                          METHOD_BUFFERED, FILE_READ_ACCESS)
+#endif
+#ifndef IOCTL_CDROM_RAW_READ
+#define IOCTL_CDROM_RAW_READ CTL_CODE(IOCTL_CDROM_BASE, 0x000F, \
+                                      METHOD_OUT_DIRECT, FILE_READ_ACCESS)
+#endif
+
+/* Win32 aspi specific */
+#define WIN_NT               ( GetVersion() < 0x80000000 )
+#define ASPI_HAID           0
+#define ASPI_TARGET         0
+#define DTYPE_CDROM         0x05
+
+#define SENSE_LEN           0x0E
+#define SC_GET_DEV_TYPE     0x01
+#define SC_EXEC_SCSI_CMD    0x02
+#define SC_GET_DISK_INFO    0x06
+#define SS_COMP             0x01
+#define SS_PENDING          0x00
+#define SS_NO_ADAPTERS      0xE8
+#define SRB_DIR_IN          0x08
+#define SRB_DIR_OUT         0x10
+#define SRB_EVENT_NOTIFY    0x40
+
+#define READ_CD 0xbe
+#define SECTOR_TYPE_MODE2 0x14
+#define READ_CD_USERDATA_MODE2 0x10
+
+#define READ_TOC 0x43
+#define READ_TOC_FORMAT_TOC 0x0
+
+#pragma pack(1)
+
+struct SRB_GetDiskInfo
+{
+    unsigned char   SRB_Cmd;
+    unsigned char   SRB_Status;
+    unsigned char   SRB_HaId;
+    unsigned char   SRB_Flags;
+    unsigned long   SRB_Hdr_Rsvd;
+    unsigned char   SRB_Target;
+    unsigned char   SRB_Lun;
+    unsigned char   SRB_DriveFlags;
+    unsigned char   SRB_Int13HDriveInfo;
+    unsigned char   SRB_Heads;
+    unsigned char   SRB_Sectors;
+    unsigned char   SRB_Rsvd1[22];
+};
+
+struct SRB_GDEVBlock
+{
+    unsigned char SRB_Cmd;
+    unsigned char SRB_Status;
+    unsigned char SRB_HaId;
+    unsigned char SRB_Flags;
+    unsigned long SRB_Hdr_Rsvd;
+    unsigned char SRB_Target;
+    unsigned char SRB_Lun;
+    unsigned char SRB_DeviceType;
+    unsigned char SRB_Rsvd1;
+};
+
+struct SRB_ExecSCSICmd
+{
+    unsigned char   SRB_Cmd;
+    unsigned char   SRB_Status;
+    unsigned char   SRB_HaId;
+    unsigned char   SRB_Flags;
+    unsigned long   SRB_Hdr_Rsvd;
+    unsigned char   SRB_Target;
+    unsigned char   SRB_Lun;
+    unsigned short  SRB_Rsvd1;
+    unsigned long   SRB_BufLen;
+    unsigned char   *SRB_BufPointer;
+    unsigned char   SRB_SenseLen;
+    unsigned char   SRB_CDBLen;
+    unsigned char   SRB_HaStat;
+    unsigned char   SRB_TargStat;
+    unsigned long   *SRB_PostProc;
+    unsigned char   SRB_Rsvd2[20];
+    unsigned char   CDBByte[16];
+    unsigned char   SenseArea[SENSE_LEN+2];
+};
+
+#pragma pack()
+#endif /* WIN32 */
+
+
+/*****************************************************************************
+ * Local Prototypes
+ *****************************************************************************/
+static int    OpenVCDImage( vlc_object_t *, const char *, vcddev_t * );
+static void   CloseVCDImage( vlc_object_t *, vcddev_t * );
+
+#if defined( SYS_DARWIN )
+static CDTOC *darwin_getTOC( vlc_object_t *, const char * );
+static int    darwin_getNumberOfDescriptors( CDTOC * );
+static int    darwin_getNumberOfTracks( CDTOC *, int );
+
+#elif defined( WIN32 )
+static int    win32_vcd_open( vlc_object_t *, const char *, vcddev_t * );
+#endif

@@ -305,7 +305,7 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
 
 dnl Check for headers
 AC_CHECK_HEADERS(stdint.h getopt.h strings.h inttypes.h sys/int_types.h)
-AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h)
+AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h sys/ioctl.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
 AC_CHECK_HEADERS(machine/param.h sys/shm.h)
@@ -965,7 +965,7 @@ dnl
 dnl  VCD module
 dnl
 AC_ARG_ENABLE(vcd,
-  [  --enable-vcd            VCD support for Linux, FreeBSD and MacOS X (default enabled)])
+  [  --enable-vcd            VCD support for Linux, FreeBSD, MacOS X and Win32 (default enabled)])
 
 if test "x${enable_vcd}" != "xno"
 then
@@ -978,7 +978,7 @@ then
     AC_DEFINE(HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H, 1, For FreeBSD VCD support)
   ])
 
-  if test "x${SYS}" = "xbsdi"
+  if test "x${SYS}" = "xbsdi" -o "x${SYS}" = "xmingw32"
   then
     PLUGINS="${PLUGINS} vcd"
   fi

@@ -2,7 +2,7 @@
  * vcd.h: thread structure of the VCD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vcd.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: vcd.h,v 1.2 2002/10/15 19:56:59 gbazin Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -21,17 +21,24 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/* where the data start on a VCD sector */
+#define VCD_DATA_START 24
+/* size of the availablr data on a VCD sector */
+#define VCD_DATA_SIZE 2324
+/* size of a VCD sector, header and tail included */
+#define VCD_SECTOR_SIZE 2352
+/* size of a CD sector */
+#define CD_SECTOR_SIZE 2048
+
+#ifndef VCDDEV_T
+typedef struct vcddev_s vcddev_t;
+#endif
+
 /*****************************************************************************
- * thread_vcd_data_t: VCD information
+ * Prototypes
  *****************************************************************************/
-typedef struct thread_vcd_data_s
-{
-    int         i_handle;                                 /* File descriptor */
-    int         nb_tracks;                          /* Nb of tracks (titles) */
-    int         i_track;                                    /* Current track */
-    int         i_sector;                                  /* Current Sector */
-    int *       p_sectors;                                  /* Track sectors */
-    vlc_bool_t  b_end_of_track;           /* If the end of track was reached */
-
-} thread_vcd_data_t;
-
+vcddev_t *ioctl_Open         ( vlc_object_t *, const char * );
+void      ioctl_Close        ( vlc_object_t *, vcddev_t * );
+int       ioctl_GetTracksMap ( vlc_object_t *, const vcddev_t *, int ** );
+int       ioctl_ReadSector   ( vlc_object_t *, const vcddev_t *,
+			       int, byte_t * );
