@@ -546,6 +546,8 @@ static int ExecuteCommand( vlm_t *vlm, char *command , vlm_message_t **p_message
                 {
                     vlm_ScheduleDelete( vlm, vlm->schedule[i], NULL );
                 }
+                i_return = 0;
+                goto end_seq;
             }
             else
             {
@@ -1244,6 +1246,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media, vlm_schedule_t *
         vlm_message_t *message;
         vlm_message_t *message_schedule;
         vlm_message_t *message_child;
+        char buffer[100];
 
         message = vlm_MessageNew( "show" , NULL );
         message_schedule = vlm_MessageAdd( message , vlm_MessageNew( schedule->psz_name , NULL ) );
@@ -1261,6 +1264,22 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media, vlm_schedule_t *
 
         if( schedule->i_date != 0 )
         {
+            struct tm date;
+            time_t i_time = (time_t) ( schedule->i_date / 1000000 );
+            char *psz_date = malloc( strlen( "//-::" ) + 14 );
+
+#ifdef HAVE_LOCALTIME_R
+            localtime_r( &i_time, &date);
+#else
+            struct tm *p_date = localtime( &i_time );
+            date = *p_date;
+#endif
+
+            sprintf( psz_date, "%d/%d/%d-%d:%d:%d",
+                          date.tm_year + 1900, date.tm_mon + 1, date.tm_mday,
+                          date.tm_hour, date.tm_min, date.tm_sec );
+
+/*
             time_t i_time = schedule->i_date / (int64_t)1000000;
 
 #ifdef HAVE_CTIME_R
@@ -1269,7 +1288,9 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media, vlm_schedule_t *
 #else
             char *psz_date = ctime( &i_time );
 #endif
+*/
             vlm_MessageAdd( message_schedule , vlm_MessageNew( "date" , psz_date ) );
+            free( psz_date );
         }
         else
         {
@@ -1278,7 +1299,6 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media, vlm_schedule_t *
 
         if( schedule->i_period != 0 )
         {
-            char buffer[100];
             time_t i_time = (time_t) ( schedule->i_period / 1000000 );
             struct tm date;
 
@@ -1295,21 +1315,18 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media, vlm_schedule_t *
             i_time = i_time / 12;
             date.tm_year = (int)i_time;
 
-            sprintf( buffer, "%d years %d months %d days %d hours %d minutes %d seconds", date.tm_year ,
-                                                                                          date.tm_mon,
-                                                                                          date.tm_mday,
-                                                                                          date.tm_hour,
-                                                                                          date.tm_min,
-                                                                                          date.tm_sec);
+            sprintf( buffer, "%d/%d/%d-%d:%d:%d", date.tm_year, date.tm_mon,
+                     date.tm_mday, date.tm_hour, date.tm_min, date.tm_sec);
 
             vlm_MessageAdd( message_schedule , vlm_MessageNew( "period" , buffer ) );
-
-            if( schedule->i_repeat >= 0 )
-            {
-                sprintf( buffer, "%d" , schedule->i_repeat );
-                vlm_MessageAdd( message_schedule , vlm_MessageNew( "repeat" , buffer ) );
-            }
         }
+        else
+        {
+            vlm_MessageAdd( message_schedule , vlm_MessageNew( "period" , "0" ) );
+        }
+
+        sprintf( buffer, "%d" , schedule->i_repeat );
+        vlm_MessageAdd( message_schedule , vlm_MessageNew( "repeat" , buffer ) );
 
         message_child = vlm_MessageAdd( message_schedule , vlm_MessageNew( "commands" , NULL ) );
 
@@ -1464,30 +1481,7 @@ static vlm_message_t *vlm_Help( vlm_t *vlm, char *psz_filter )
 
     if( psz_filter == NULL )
     {
-        char *help = malloc( strlen( "Commands Syntax:" ) +
-                     strlen( "\n new (name) vod|broadcast|schedule [properties]" ) +
-                     strlen( "\n setup (name) (properties)" ) +
-                     strlen( "\n show [(name)|media|schedule]" ) +
-                     strlen( "\n del (name)|all|media|schedule" ) +
-                     strlen( "\n control (name) (command)" ) +
-                     strlen( "\n save (config_file)" ) +
-                     strlen( "\n load (config_file)" ) +
-                     strlen( "\nMedia Proprieties Syntax:" ) +
-                     strlen( "\n input (input_name)" ) +
-                     strlen( "\n output (output_name)" ) +
-                     strlen( "\n option (option_name)[=value]" ) +
-                     strlen( "\n enabled|disabled" ) +
-                     strlen( "\n loop|unloop (broadcast only)" ) +
-                     strlen( "\nSchedule Proprieties Syntax:" ) +
-                     strlen( "\n enabled|disabled" ) +
-                     strlen( "\n append (command_until_rest_of_the_line)" ) +
-                     strlen( "\n date (year)/(month)/(day)-(hour):(minutes):(seconds)|now" ) +
-                     strlen( "\n period (years_aka_12_months)/(months_aka_30_days)/(days)-(hours):(minutes):(seconds)" ) +
-                     strlen( "\n repeat (number_of_repetitions)" ) +
-                     strlen( "\nControl Commands Syntax:" ) +
-                     strlen( "\n play\n pause\n stop\n seek (percentage)\n" ) + 1 );
-
-        sprintf( help,
+        char *help= strdup(
                  "Commands Syntax:"
                  "\n new (name) vod|broadcast|schedule [properties]"
                  "\n setup (name) (properties)"
@@ -1794,7 +1788,7 @@ static vlm_schedule_t *vlm_ScheduleNew( vlm_t *vlm , char *psz_name )
     sched->command = NULL;
     sched->i_date = 0;
     sched->i_period = 0;
-    sched->i_repeat = 0;
+    sched->i_repeat = -1;
 
     TAB_APPEND( vlm->i_schedule , vlm->schedule , sched );
 
@@ -2085,25 +2079,25 @@ static int Manage( vlc_object_t* p_object )
         {
             mtime_t i_real_date = vlm->schedule[i]->i_date;
 
-            if( vlm->schedule[i]->i_date == 0 ) // now !
-            {
-                vlm->schedule[i]->i_date = (i_time / 1000000) * 1000000 ;
-                i_real_date = i_time;
-            }
-            else if( vlm->schedule[i]->i_period != 0 )
-            {
-                int j = 0;
-                while( vlm->schedule[i]->i_date + j * vlm->schedule[i]->i_period <= i_lastcheck &&
-                       ( vlm->schedule[i]->i_repeat > j || vlm->schedule[i]->i_repeat == -1 ) )
-                {
-                    j++;
-                }
-
-                i_real_date = vlm->schedule[i]->i_date + j * vlm->schedule[i]->i_period;
-            }
-
             if( vlm->schedule[i]->b_enabled == VLC_TRUE )
             {
+                if( vlm->schedule[i]->i_date == 0 ) // now !
+                {
+                    vlm->schedule[i]->i_date = (i_time / 1000000) * 1000000 ;
+                    i_real_date = i_time;
+                }
+                else if( vlm->schedule[i]->i_period != 0 )
+                {
+                    int j = 0;
+                    while( vlm->schedule[i]->i_date + j * vlm->schedule[i]->i_period <= i_lastcheck &&
+                           ( vlm->schedule[i]->i_repeat > j || vlm->schedule[i]->i_repeat == -1 ) )
+                    {
+                        j++;
+                    }
+
+                    i_real_date = vlm->schedule[i]->i_date + j * vlm->schedule[i]->i_period;
+                }
+
                 if( i_real_date <= i_time && i_real_date > i_lastcheck )
                 {
                     for( j = 0 ; j < vlm->schedule[i]->i_command ; j++ )

@@ -1959,7 +1959,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         /* no args */
                         "enabled", "disabled", "loop", "unloop",
                         /* args required */
-                        "input", "output", "option", "append", "date", "period", "repeat",
+                        "input", "output", "option", "date", "period", "repeat", "append",
                     };
                     vlm_message_t *vlm_answer;
                     char name[512];

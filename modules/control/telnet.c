@@ -534,10 +534,10 @@ static char* MessageToString( vlm_message_t* message , int i_level )
     else
     {
         psz_message = strdup( "" );
-        psz_message = realloc( psz_message , strlen( psz_message ) + strlen( message->psz_name ) + i_level + 1 );
+        psz_message = realloc( psz_message , strlen( psz_message ) + strlen( message->psz_name ) + i_level * 4 + 1 );
         for( i = 0 ; i < i_level ; i++ )
         {
-            strcat( psz_message , " " );
+            strcat( psz_message , "    " );
         }
         strcat( psz_message , message->psz_name );
         if( message->psz_value )

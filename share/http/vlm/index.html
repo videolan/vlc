@@ -20,8 +20,8 @@
 
     <form method="get" action="" />
     <input type="test" name="file" size="40"/>
-    <input type="submit" name="control" value="vlm_load" />
-    <input type="submit" name="control" value="vlm_save" />
+    <button name="control" value="vlm_load">Load</button>
+    <button name="control" value="vlm_save">Save</button>
     </form>
     </div>
 
@@ -37,55 +37,135 @@
     <input type="test" name="name" size="40"/>
     <input type="submit" name="type" value="schedule"/>
     </form>
-
     </div>
-
-
 
     <div class="sectitle">VLM - Media</div>
     <div class="section">
-
     <table border="1">
-        <tr class="ligne2"> <td>Media</td><td>State</td><td>Control</td></tr>
-    <vlc id="foreach" param1="el" param2="vlm" />
-    <vlc id="if" param1="el.type value 'broadcast' strcmp 0 = " />
+     <tr class="ligne2">
+      <td>Media</td>
+      <td>State</td>
+      <td>Control</td>
+     </tr>
+<vlc id="foreach" param1="el" param2="vlm" />
+<vlc id="if" param1="el.type value 'broadcast' strcmp 0 = " />
+     <tr>
+      <td>
+       <table>
         <tr>
-            <td><table><tr>
-                <td width="30%"><form method="get" action="" />
-                    <input type="submit" name="control" value="vlm_del" />
-                    <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
-                    </form></td>
-                <td><a href="/vlm/edit.html?name=<vlc id="value" param1="el.name" />&type=broadcast"><vlc id="value" param1="el.name" /></a></td></table>
-            </td>
-            <td><vlc id="value" param1="el.state" /> </td>
-            <td>
-            <form method="get" action="" />
-            <input type="submit" name="control" value="vlm_play" />
-            <input type="submit" name="control" value="vlm_pause" />
-            <input type="submit" name="control" value="vlm_stop" />
-            <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
-            </form>
-            </td>
+         <td width="30%">
+          <form method="get" action="" />
+           <button name="control" value="vlm_del">del</button>
+           <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
+          </form>
+         </td>
+         <td><a href="/vlm/edit.html?name=<vlc id="value" param1="el.name" />&type=broadcast"><vlc id="value" param1="el.name" /></a></td>
         </tr>
-    <vlc id="end" />
-    <vlc id="end" />
+       </table>
+      </td>
+      <td>
+<vlc id="if" param1="el.enabled value 'yes' strcmp 0 = " />
+       <table>
+        <tr>
+         <td>
+          <vlc id="value" param1="el.state" />
+         </td>
+         <td align="right">
+          <form method="get" action="" />
+           <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
+           <input type="hidden" name="disabled" value="" />
+           <button name="control" value="vlm_setup">disable</button>
+          </form>
+         </td>
+        </tr>
+       </table>
+<vlc id="else" />
+       <table>
+        <tr>
+         <td>disabled</td>
+         <td align="right">
+          <form method="get" action="" />
+           <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
+           <input type="hidden" name="enabled" value="" />
+           <button name="control" value="vlm_setup">enable</button>
+          </form>
+         </td>
+        </tr>
+       </table>
+<vlc id="end" />
+      </td>
+      <td>
+<vlc id="if" param1="el.enabled value 'yes' strcmp 0 = " />
+       <form method="get" action="" />
+        <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
+         <button name="control" value="vlm_stop">stop</button>
+         <button name="control" value="vlm_play">play</button>
+         <button name="control" value="vlm_pause">pause</button>
+        </form>
+<vlc id="end" />
+      </td>
+     </tr>
+<vlc id="end" />
+<vlc id="end" />
     </table>
-
-
     </div>
+
     <div class="sectitle">VLM - Schedule</div>
     <div class="section">
     <table border="1">
-        <tr class="ligne2"> <td>Schedule</td></tr>
-    <vlc id="foreach" param1="el" param2="vlm" />
-    <vlc id="if" param1="el.type value 'schedule' strcmp 0 =" />
+     <tr class="ligne2">
+      <td>Schedule</td>
+      <td>State</td>
+     </tr>
+<vlc id="foreach" param1="el" param2="vlm" />
+<vlc id="if" param1="el.type value 'schedule' strcmp 0 = " />
+     <tr>
+      <td>
+       <table>
         <tr>
-            <td><a href="/vlm/edit.html?name=<vlc id="value" param1="el.name" />&type=schedule"><vlc id="value" param1="el.name" /></a> </td>
+         <td width="30%">
+          <form method="get" action="" />
+           <button name="control" value="vlm_del">del</button>
+           <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
+          </form>
+         </td>
+         <td><a href="/vlm/edit.html?name=<vlc id="value" param1="el.name" />&type=schedule"><vlc id="value" param1="el.name" /></a></td>
         </tr>
-    <vlc id="end" />
-    <vlc id="end" />
+       </table>
+      </td>
+      <td>
+<vlc id="if" param1="el.enabled value 'yes' strcmp 0 = " />
+       <table>
+        <tr>
+         <td>enabled</td>
+         <td align="right">
+          <form method="get" action="" />
+           <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
+           <input type="hidden" name="disabled" value="" />
+           <button name="control" value="vlm_setup">disable</button>
+          </form>
+         </td>
+        </tr>
+       </table>
+<vlc id="else" />
+       <table>
+        <tr>
+         <td>disabled</td>
+         <td align="right">
+          <form method="get" action="" />
+           <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
+           <input type="hidden" name="enabled" value="" />
+           <button name="control" value="vlm_setup">enable</button>
+          </form>
+         </td>
+        </tr>
+       </table>
+<vlc id="end" />
+      </td>
+     </tr>
+<vlc id="end" />
+<vlc id="end" />
     </table>
-
     </div>
 
     <hr/>

@@ -19,22 +19,36 @@
         <form method="get" action="/vlm/" />
         <table>
         <tr><td>Name : <vlc id="value" param1="'name' url_extract"/> </td> </tr>
-        <tr><td>Type: Broadcast </td></tr>
+        <tr><td>Type: Schedule </td></tr>
         <tr><td>Input: <input type="text" name="input" size="40" value=""/></td></tr>
         <tr><td>Output: <input type="text" name="output" size="40" value=""/></td></tr>
         <tr><td>Option: <input type="text" name="option" size="40" value=""/></td></tr>
         </table>
-        <input type="hidden" name="enabled" value=""/>
+        <input type="hidden" name="disabled" value=""/>
         <input type="hidden" name="type" value="broadcast"/>
         <input type="hidden" name="name" value="<vlc id="value" param1="'name' url_extract"/>" />
         <input type="submit" name="control" value="vlm_new"/>
         </form>
     <vlc id="else" />
-        <p> TODO schedule </p>
+    <vlc id="if" param1="'type' url_extract 'schedule' strcmp 0 =" />
+        <form method="get" action="/vlm/" />
+        <table>
+        <tr><td>Name : <vlc id="value" param1="'name' url_extract"/> </td> </tr>
+        <tr><td>Type: Schedule </td></tr>
+        <tr><td>Command: <input type="text" name="append" size="40" value=""/></td></tr>
+        <tr><td>Date: <input type="text" name="date" size="40" value=""/></td></tr>
+        <tr><td>Period: <input type="text" name="period" size="40" value=""/></td></tr>
+        <tr><td>Repeat: <input type="text" name="repeat" size="40" value=""/></td></tr>
+        </table>
+        <input type="hidden" name="disabled" value=""/>
+        <input type="hidden" name="type" value="schedule"/>
+        <input type="hidden" name="name" value="<vlc id="value" param1="'name' url_extract"/>" />
+        <input type="submit" name="control" value="vlm_new"/>
+        </form>
     <vlc id="end" />
-    
-    </div>
+    <vlc id="end" />
 
+    </div>
     <hr/>
     <p> <vlc id="value" param1="copyright" /> </p>
 </body>
