@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.8 2002/08/25 20:44:40 jpsaman Exp $
+ * $Id: familiar.c,v 1.9 2002/09/15 19:32:02 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -132,6 +132,10 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_notebook = GTK_NOTEBOOK( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "notebook" ) );
 //    gtk_widget_hide( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+
+    p_intf->p_sys->p_progess = GTK_PROGRESS_BAR( gtk_object_get_data(
+        GTK_OBJECT( p_intf->p_sys->p_window ), "progress" ) );
+    gtk_widget_hide( GTK_WIDGET(p_intf->p_sys->p_progess) );
 
     p_intf->p_sys->p_clist = GTK_CLIST( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "clistmedia" ) );
