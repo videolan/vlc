@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.10 2002/11/20 14:09:57 gbazin Exp $
+ * $Id: ogg.c,v 1.11 2002/11/21 09:39:39 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -65,7 +65,7 @@ typedef struct logical_stream_s
     /* program clock reference (in units of 90kHz) derived from the previous
      * granulepos */
     mtime_t          i_pcr;
-    mtime_t          i_last_received_pcr;
+    mtime_t          i_interpolated_pcr;
 
     /* info from logical streams */
     double f_rate;
@@ -91,15 +91,13 @@ struct demux_sys_t
     logical_stream_t *p_stream_audio;
     logical_stream_t *p_stream_spu;
 
-    /* stream we use as a time reference for demux reading speed */
-    logical_stream_t *p_stream_timeref;
-
     /* program clock reference (in units of 90kHz) derived from the pcr of
-     * one of the sub-streams (p_stream_timeref) */
+     * the sub-streams */
     mtime_t i_pcr;
 
     mtime_t i_length;
     int     b_seekable;
+    int     b_reinit;
 };
 
 /* OggDS headers for the new header format (used in ogm files) */
@@ -176,9 +174,9 @@ static void Ogg_StreamStop   ( input_thread_t *, demux_sys_t *, int );
 /* Bitstream manipulation */
 static int  Ogg_Check        ( input_thread_t *p_input );
 static int  Ogg_ReadPage     ( input_thread_t *, demux_sys_t *, ogg_page * );
+static void Ogg_UpdatePCR    ( logical_stream_t *, ogg_packet * );
 static void Ogg_DecodePacket ( input_thread_t *p_input,
-                               logical_stream_t *p_stream,
-                               ogg_packet *p_oggpacket );
+                               logical_stream_t *p_stream, ogg_packet * );
 static int  Ogg_FindLogicalStreams( input_thread_t *p_input,
                                     demux_sys_t *p_ogg );
 
@@ -304,6 +302,53 @@ static int Ogg_ReadPage( input_thread_t *p_input, demux_sys_t *p_ogg,
 }
 
 /****************************************************************************
+ * Ogg_UpdatePCR: update the PCR (90kHz program clock reference) for the
+ *                current stream.
+ ****************************************************************************/
+static void Ogg_UpdatePCR( logical_stream_t *p_stream,
+                           ogg_packet *p_oggpacket )
+{
+
+    /* Convert the next granulepos into a pcr */
+    if( p_oggpacket->granulepos >= 0 )
+    {
+        if( p_stream->i_fourcc != VLC_FOURCC( 't','h','e','o' ) )
+        {
+            p_stream->i_pcr = p_oggpacket->granulepos * 90000
+                              / p_stream->f_rate;
+        }
+        else
+        {
+            ogg_int64_t iframe = p_oggpacket->granulepos >>
+              p_stream->i_theora_keyframe_granule_shift;
+            ogg_int64_t pframe = p_oggpacket->granulepos -
+              ( iframe << p_stream->i_theora_keyframe_granule_shift );
+
+            p_stream->i_pcr = ( iframe + pframe ) * 90000
+                              / p_stream->f_rate;
+        }
+
+        p_stream->i_interpolated_pcr = p_stream->i_pcr;
+    }
+    else
+    {
+        /* FIXME: ffmpeg doesn't like null pts */
+        if( p_stream->i_cat == VIDEO_ES )
+            /* 1 frame per packet */
+            p_stream->i_pcr += (90000 / p_stream->f_rate);
+        else
+            p_stream->i_pcr = -1;
+
+        /* no granulepos available, try to interpolate the pcr */
+        if( p_stream->i_bitrate )
+            p_stream->i_interpolated_pcr += ( p_oggpacket->bytes * 90000
+                                              / p_stream->i_bitrate / 8 );
+        else
+            p_stream->i_interpolated_pcr = -1;
+    }
+}
+
+/****************************************************************************
  * Ogg_DecodePacket: Decode an Ogg packet.
  ****************************************************************************/
 static void Ogg_DecodePacket( input_thread_t *p_input,
@@ -312,7 +357,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
 {
     pes_packet_t  *p_pes;
     data_packet_t *p_data;
-    demux_sys_t *p_ogg = p_input->p_demux_data;
+    //demux_sys_t *p_ogg = p_input->p_demux_data;
     int i_header_len = 0;
 
     if( p_stream->b_force_backup )
@@ -350,46 +395,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     {
         /* This stream isn't currently selected so we don't need to decode it,
          * but we do need to store its pcr as it might be selected later on. */
-
-        /* Convert the next granulepos into a pcr */
-        if( p_oggpacket->granulepos >= 0 )
-        {
-            if( p_stream->i_fourcc != VLC_FOURCC( 't','h','e','o' ) )
-            {
-                p_stream->i_pcr = p_oggpacket->granulepos * 90000
-                                  / p_stream->f_rate;
-            }
-            else
-            {
-                ogg_int64_t iframe = p_oggpacket->granulepos >>
-                    p_stream->i_theora_keyframe_granule_shift;
-                ogg_int64_t pframe = p_oggpacket->granulepos -
-                    ( iframe << p_stream->i_theora_keyframe_granule_shift );
-
-                p_stream->i_pcr = ( iframe + pframe ) * 90000
-                                  / p_stream->f_rate;
-            }
-
-            p_stream->i_last_received_pcr = p_stream->i_pcr;
-        }
-        else
-        {
-            /* no granulepos available, try to interpolate */
-            if( p_stream->i_bitrate )
-                p_stream->i_pcr += ( p_oggpacket->bytes * 90000
-                                     / p_stream->i_bitrate / 8 );
-            else
-                p_stream->i_pcr = -1;
-        }
-
-        /* Update the main pcr */
-        if( p_stream == p_ogg->p_stream_timeref )
-        {
-            if( p_ogg->p_stream_timeref->i_pcr >= 0 )
-            {
-                p_ogg->i_pcr = p_ogg->p_stream_timeref->i_pcr;
-            }
-        }
+        Ogg_UpdatePCR( p_stream, p_oggpacket );
 
         return;
     }
@@ -422,50 +428,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     }
 
     /* Convert the next granulepos into a pcr */
-    if( p_oggpacket->granulepos >= 0 )
-    {
-        if( p_stream->i_fourcc != VLC_FOURCC( 't','h','e','o' ) )
-        {
-            p_stream->i_pcr = p_oggpacket->granulepos * 90000
-                              / p_stream->f_rate;
-        }
-        else
-        {
-            ogg_int64_t iframe = p_oggpacket->granulepos >>
-                p_stream->i_theora_keyframe_granule_shift;
-            ogg_int64_t pframe = p_oggpacket->granulepos -
-                ( iframe << p_stream->i_theora_keyframe_granule_shift );
-
-            p_stream->i_pcr = ( iframe + pframe ) * 90000 / p_stream->f_rate;
-        }
-
-        p_stream->i_last_received_pcr = p_stream->i_pcr;
-    }
-    else
-    {
-        /* FIXME: ffmpeg doesn't like null pts */
-        if( p_stream->i_cat == VIDEO_ES )
-            /* 1 frame per packet */
-            p_stream->i_pcr += (90000 / p_stream->f_rate);
-        else
-            p_stream->i_pcr = -1;
-    }
-
-    /* Update the main pcr */
-    if( p_stream == p_ogg->p_stream_timeref )
-    {
-        if( p_ogg->p_stream_timeref->i_pcr >= 0 )
-        {
-            p_ogg->i_pcr = p_ogg->p_stream_timeref->i_pcr;
-        }
-        else
-        {
-            /* no granulepos available, try to interpolate */
-            if( p_stream->i_bitrate )
-                p_ogg->i_pcr += ( p_oggpacket->bytes * 90000
-                                     / p_stream->i_bitrate / 8 );
-        }
-    }
+    Ogg_UpdatePCR( p_stream, p_oggpacket );
 
     p_pes->i_nb_data = 1;
     p_pes->i_dts = p_oggpacket->granulepos;
@@ -541,10 +504,6 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                 /* Setup the logical stream */
                 p_stream->i_serial_no = ogg_page_serialno( &oggpage );
                 ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
-
-                /* The first stream we find is our timeref (might be changed
-                 * later on) */
-                p_ogg->p_stream_timeref = p_stream;
 
                 /* Extract the initial header from the first page and verify
                  * the codec type of tis Ogg bitstream */
@@ -863,7 +822,6 @@ static int Activate( vlc_object_t * p_this )
     p_input->p_demux_data = p_ogg;
 
     p_ogg->i_pcr  = 0;
-    p_ogg->p_stream_timeref = NULL;
     p_ogg->b_seekable = ( ( p_input->stream.b_seekable )
                         &&( p_input->stream.i_method == INPUT_METHOD_FILE ) );
 
@@ -946,7 +904,6 @@ static int Activate( vlc_object_t * p_this )
                         p_ogg->pp_stream[i_audio]->p_es->i_cat != AUDIO_ES )
                     {
                         p_ogg->p_stream_audio = p_stream;
-                        p_ogg->p_stream_timeref = p_stream;
                         Ogg_StreamStart( p_input, p_ogg, i_stream );
                     }
                 }
@@ -1097,7 +1054,6 @@ static int Demux( input_thread_t * p_input )
                   &&( p_stream->p_es->p_decoder_fifo ) )
             {
                 p_ogg->p_stream_audio = p_stream;
-                p_ogg->p_stream_timeref = p_stream;
                 break;
             }
         }
@@ -1115,16 +1071,17 @@ static int Demux( input_thread_t * p_input )
         {
             /* we'll trash all the data until we find the next pcr */
             p_stream->b_reinit = 1;
-            p_ogg->i_pcr = 0;
+            p_stream->i_pcr = -1;
+            p_stream->i_interpolated_pcr = -1;
         }
+        p_ogg->b_reinit = 1;
     }
 
 
     /*
      * Demux ogg pages from the stream
      */
-    for( i = 0; (i < PAGES_READ_ONCE) || p_ogg->p_stream_timeref->b_reinit;
-         i++ )
+    for( i = 0; i < PAGES_READ_ONCE || p_ogg->b_reinit;  i++ )
     {
         if( Ogg_ReadPage( p_input, p_ogg, &oggpage ) != VLC_SUCCESS )
         {
@@ -1149,19 +1106,23 @@ static int Demux( input_thread_t * p_input )
                     if( oggpacket.granulepos >= 0 )
                     {
                         p_stream->b_reinit = 0;
-                        p_stream->i_pcr = oggpacket.granulepos
-                            * 90000 / p_stream->f_rate;
 
-                        if( !p_ogg->i_pcr ||
-                            (p_stream == p_ogg->p_stream_timeref) )
-                        {
-                            /* Call the pace control to reinitialize
-                             * the system clock */
-                            p_ogg->i_pcr = p_stream->i_pcr;
-                            input_ClockManageRef( p_input,
-                               p_input->stream.p_selected_program,
-                               p_ogg->i_pcr );
-                        }
+                        /* Convert the next granulepos into a pcr */
+                        Ogg_UpdatePCR( p_stream, &oggpacket );
+
+                        /* Call the pace control to reinitialize
+                         * the system clock */
+                         input_ClockManageRef( p_input,
+                             p_input->stream.p_selected_program,
+                             p_stream->i_pcr );
+
+                         if( (!p_ogg->p_stream_video ||
+                              !p_ogg->p_stream_video->b_reinit) &&
+                             (!p_ogg->p_stream_audio ||
+                              !p_ogg->p_stream_audio->b_reinit) )
+                         {
+                             p_ogg->b_reinit = 0;
+                         }
                     }
                     continue;
                 }
@@ -1170,13 +1131,24 @@ static int Demux( input_thread_t * p_input )
 
             }
         }
-#undef p_stream
     }
 
+    p_ogg->i_pcr = INT_MAX;
+    for( i_stream = 0 ; i_stream < p_ogg->i_streams; i_stream++ )
+    {
+        if( p_stream->i_cat == SPU_ES )
+            continue;
+
+        if( p_stream->i_interpolated_pcr >= 0 &&
+            p_stream->i_interpolated_pcr < p_ogg->i_pcr )
+            p_ogg->i_pcr = p_stream->i_interpolated_pcr;
+    }
+#undef p_stream
+
+
     /* Call the pace control */
-    if( !b_eos ) input_ClockManageRef( p_input,
-                                       p_input->stream.p_selected_program,
-                                       p_ogg->i_pcr );
+    input_ClockManageRef( p_input, p_input->stream.p_selected_program,
+                          p_ogg->i_pcr );
 
     /* Did we reach the end of stream ? */
     return( b_eos ? 0 : 1 );
