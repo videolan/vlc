@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,8 @@
 #include <vlc/sout.h>
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
+#include "vlc_filter.h"
+#include "osd.h"
 
 /* ffmpeg header */
 #ifdef HAVE_FFMPEG_AVCODEC_H
@@ -107,6 +109,15 @@
     "Allows you to specify the number of audio channels used for the " \
     "streaming output." )
 
+#define SENC_TEXT N_("Subtitles encoder")
+#define SENC_LONGTEXT N_( \
+    "Allows you to specify the subtitles encoder to use and its associated " \
+    "options." )
+#define SCODEC_TEXT N_("Destination subtitles codec")
+#define SCODEC_LONGTEXT N_( \
+    "Allows you to specify the destination subtitles codec used for the " \
+    "streaming output." )
+
 #define THREADS_TEXT N_("Number of threads")
 #define THREADS_LONGTEXT N_( \
     "Allows you to specify the number of threads used for the transcoding." )
@@ -157,6 +168,13 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "samplerate", 0, NULL, ARATE_TEXT,
                  ARATE_LONGTEXT, VLC_TRUE );
 
+    add_string( SOUT_CFG_PREFIX "senc", NULL, NULL, SENC_TEXT,
+                SENC_LONGTEXT, VLC_FALSE );
+    add_string( SOUT_CFG_PREFIX "scodec", NULL, NULL, SCODEC_TEXT,
+                SCODEC_LONGTEXT, VLC_FALSE );
+    add_bool( SOUT_CFG_PREFIX "soverlay", 0, NULL, SCODEC_TEXT,
+               SCODEC_LONGTEXT, VLC_FALSE );
+
     add_integer( SOUT_CFG_PREFIX "threads", 0, NULL, THREADS_TEXT,
                  THREADS_LONGTEXT, VLC_TRUE );
 vlc_module_end();
@@ -164,7 +182,8 @@ vlc_module_end();
 static const char *ppsz_sout_options[] = {
     "venc", "vcodec", "vb", "croptop", "cropbottom", "cropleft", "cropright",
     "scale", "width", "height", "deinterlace", "threads",
-    "aenc", "acodec", "ab", "samplerate", "channels", NULL
+    "aenc", "acodec", "ab", "samplerate", "channels",
+    "senc", "scodec", "soverlay", NULL
 };
 
 /*****************************************************************************
@@ -184,6 +203,13 @@ static int  transcode_video_ffmpeg_process( sout_stream_t *, sout_stream_id_t *,
 
 static int  transcode_video_ffmpeg_getframebuf( struct AVCodecContext *, AVFrame *);
 
+static int  transcode_spu_new    ( sout_stream_t *, sout_stream_id_t * );
+static void transcode_spu_close  ( sout_stream_t *, sout_stream_id_t * );
+static int  transcode_spu_process( sout_stream_t *, sout_stream_id_t *,
+                                   block_t *, block_t ** );
+static subpicture_t *transcode_spu_get( sout_stream_t *, sout_stream_id_t *,
+                                        mtime_t );
+
 static int  EncoderThread( struct sout_stream_sys_t * p_sys );
 
 static int pi_channels_maps[6] =
@@ -198,6 +224,7 @@ static int pi_channels_maps[6] =
 };
 
 #define PICTURE_RING_SIZE 64
+#define SUBPICTURE_RING_SIZE 20
 
 struct sout_stream_sys_t
 {
@@ -211,6 +238,7 @@ struct sout_stream_sys_t
     picture_t *     pp_pics[PICTURE_RING_SIZE];
     int             i_first_pic, i_last_pic;
 
+    /* Audio */
     vlc_fourcc_t    i_acodec;   /* codec audio (0 if not transcode) */
     char            *psz_aenc;
     sout_cfg_t      *p_audio_cfg;
@@ -218,7 +246,8 @@ struct sout_stream_sys_t
     int             i_channels;
     int             i_abitrate;
 
-    vlc_fourcc_t    i_vcodec;   /*    "   video  " "   "      " */
+    /* Video */
+    vlc_fourcc_t    i_vcodec;   /* codec video (0 if not transcode) */
     char            *psz_venc;
     sout_cfg_t      *p_video_cfg;
     int             i_vbitrate;
@@ -238,6 +267,16 @@ struct sout_stream_sys_t
     vlc_bool_t      b_input_has_b_frames;
 
     mtime_t         i_output_pts;
+
+    /* SPU */
+    vlc_fourcc_t    i_scodec;   /* codec spu (0 if not transcode) */
+    char            *psz_senc;
+    vlc_bool_t      b_soverlay;
+    sout_cfg_t      *p_spu_cfg;
+    subpicture_t    *pp_subpics[SUBPICTURE_RING_SIZE];
+
+    /* Filters */
+    filter_t        *p_filter_blend;
 };
 
 /*****************************************************************************
@@ -248,6 +287,7 @@ static int Open( vlc_object_t *p_this )
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
     vlc_value_t       val;
+    int               i;
 
     p_sys = vlc_object_create( p_this, sizeof( sout_stream_sys_t ) );
 
@@ -363,6 +403,43 @@ static int Open( vlc_object_t *p_this )
                  p_sys->f_scale, p_sys->i_vbitrate / 1000 );
     }
 
+    /* Subpictures transcoding parameters */
+    var_Get( p_stream, SOUT_CFG_PREFIX "senc", &val );
+    p_sys->psz_senc = NULL;
+    p_sys->p_spu_cfg = NULL;
+    if( val.psz_string && *val.psz_string )
+    {
+        char *psz_next;
+        psz_next = sout_CfgCreate( &p_sys->psz_senc, &p_sys->p_spu_cfg,
+                                   val.psz_string );
+        if( psz_next ) free( psz_next );
+    }
+    if( val.psz_string ) free( val.psz_string );
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "scodec", &val );
+    p_sys->i_scodec = 0;
+    if( val.psz_string && *val.psz_string )
+    {
+        char fcc[4] = "    ";
+        memcpy( fcc, val.psz_string, __MIN( strlen( val.psz_string ), 4 ) );
+        p_sys->i_scodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
+    }
+    if( val.psz_string ) free( val.psz_string );
+
+    if( p_sys->i_scodec )
+    {
+        msg_Dbg( p_stream, "codec spu=%4.4s", (char *)&p_sys->i_acodec );
+    }
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "soverlay", &val );
+    p_sys->b_soverlay = val.b_bool;
+    p_sys->p_filter_blend = 0;
+
+    for( i = 0; i < SUBPICTURE_RING_SIZE; i++ )
+    {
+        p_sys->pp_subpics[i] = 0;
+    }
+
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
@@ -412,6 +489,30 @@ static void Close( vlc_object_t * p_this )
     }
     if( p_sys->psz_venc ) free( p_sys->psz_venc );
 
+    while( p_sys->p_spu_cfg != NULL )
+    {
+        sout_cfg_t *p_next = p_sys->p_spu_cfg->p_next;
+
+        if( p_sys->p_spu_cfg->psz_name )
+            free( p_sys->p_spu_cfg->psz_name );
+        if( p_sys->p_spu_cfg->psz_value )
+            free( p_sys->p_spu_cfg->psz_value );
+        free( p_sys->p_spu_cfg );
+
+        p_sys->p_spu_cfg = p_next;
+    }
+    if( p_sys->psz_senc ) free( p_sys->psz_senc );
+
+    if( p_sys->p_filter_blend )
+    {
+        if( p_sys->p_filter_blend->p_module )
+            module_Unneed( p_sys->p_filter_blend,
+                           p_sys->p_filter_blend->p_module );
+
+        vlc_object_detach( p_sys->p_filter_blend );
+        vlc_object_destroy( p_sys->p_filter_blend );
+    }
+
     vlc_object_destroy( p_sys );
 }
 
@@ -424,6 +525,9 @@ struct sout_stream_id_t
 
     /* id of the out stream */
     void *id;
+
+    /* Decoder */
+    decoder_t       *p_decoder;
 
     /* Encoder */
     encoder_t       *p_encoder;
@@ -444,19 +548,21 @@ struct sout_stream_id_t
     AVFrame         *p_ff_pic_tmp0; /* to do deinterlace */
     AVFrame         *p_ff_pic_tmp1; /* to do pix conversion */
     AVFrame         *p_ff_pic_tmp2; /* to do resample */
+    AVFrame         *p_ff_pic_tmp3; /* to do subpicture overlay */
 
     ImgReSampleContext *p_vresample;
 };
 
 
-static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
-    sout_stream_sys_t   *p_sys = p_stream->p_sys;
-    sout_stream_id_t    *id;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_id_t *id;
 
     id = malloc( sizeof( sout_stream_id_t ) );
     id->i_dts = 0;
     id->id = NULL;
+    id->p_decoder = NULL;
     id->p_encoder = NULL;
 
     if( p_fmt->i_cat == AUDIO_ES && (p_sys->i_acodec || p_sys->psz_aenc) )
@@ -536,6 +642,60 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 #endif
         id->b_transcode = VLC_TRUE;
     }
+    else if( p_fmt->i_cat == SPU_ES && (p_sys->i_scodec || p_sys->psz_senc) )
+    {
+        msg_Dbg( p_stream, "creating subtitles transcoding from fcc=`%4.4s' "
+                 "to fcc=`%4.4s'", (char*)&p_fmt->i_codec,
+                 (char*)&p_sys->i_scodec );
+
+        /* src format */
+        memcpy( &id->f_src, p_fmt, sizeof( es_format_t ) );
+
+        /* create dst format */
+        es_format_Init( &id->f_dst, SPU_ES, p_sys->i_scodec );
+        id->f_dst.i_id    = id->f_src.i_id;
+        id->f_dst.i_group = id->f_src.i_group;
+        if( id->f_src.psz_language )
+            id->f_dst.psz_language = strdup( id->f_src.psz_language );
+        id->f_dst.i_extra  = 0;
+        id->f_dst.p_extra  = NULL;
+
+        /* build decoder -> filter -> encoder */
+        if( transcode_spu_new( p_stream, id ) )
+        {
+            msg_Err( p_stream, "cannot create subtitles chain" );
+            free( id );
+            return NULL;
+        }
+
+        /* open output stream */
+        id->id = p_sys->p_out->pf_add( p_sys->p_out, &id->f_dst );
+        id->b_transcode = VLC_TRUE;
+
+        if( id->id == NULL )
+        {
+            free( id );
+            return NULL;
+        }
+    }
+    else if( p_fmt->i_cat == SPU_ES && p_sys->b_soverlay )
+    {
+        msg_Dbg( p_stream, "subtitles (fcc=`%4.4s') overlaying",
+                 (char*)&p_fmt->i_codec );
+
+        id->b_transcode = VLC_TRUE;
+
+        /* src format */
+        memcpy( &id->f_src, p_fmt, sizeof( es_format_t ) );
+
+        /* build decoder -> filter -> encoder */
+        if( transcode_spu_new( p_stream, id ) )
+        {
+            msg_Err( p_stream, "cannot create subtitles chain" );
+            free( id );
+            return NULL;
+        }
+    }
     else
     {
         msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')",
@@ -553,7 +713,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     return id;
 }
 
-static int     Del      ( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
 
@@ -566,6 +726,10 @@ static int     Del      ( sout_stream_t *p_stream, sout_stream_id_t *id )
         else if( id->f_src.i_cat == VIDEO_ES )
         {
             transcode_video_ffmpeg_close( p_stream, id );
+        }
+        else if( id->f_src.i_cat == SPU_ES )
+        {
+            transcode_spu_close( p_stream, id );
         }
     }
 
@@ -597,6 +761,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         {
             transcode_audio_ffmpeg_process( p_stream, id, p_buffer,
                                             &p_buffer_out );
+            block_Release( p_buffer );
         }
         else if( id->f_src.i_cat == VIDEO_ES )
         {
@@ -606,8 +771,20 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
                 block_Release( p_buffer );
                 return VLC_EGENERIC;
             }
+            block_Release( p_buffer );
         }
-        block_Release( p_buffer );
+        else if( id->f_src.i_cat == SPU_ES )
+        {
+            if( transcode_spu_process( p_stream, id, p_buffer,
+                &p_buffer_out ) != VLC_SUCCESS )
+            {
+                return VLC_EGENERIC;
+            }
+        }
+        else
+        {
+            block_Release( p_buffer );
+        }
 
         if( p_buffer_out )
         {
@@ -669,6 +846,9 @@ static struct
 #if LIBAVCODEC_BUILD >= 4666
     { VLC_FOURCC( 'S', 'V', 'Q', '3' ), CODEC_ID_SVQ3 },
     { VLC_FOURCC( 'h', '2', '6', '4' ), CODEC_ID_H264 },
+#endif
+#if LIBAVCODEC_BUILD >= 4719
+    { VLC_FOURCC( 'S', 'N', 'O', 'W' ), CODEC_ID_SNOW },
 #endif
 
     /* raw video code, only used for 'encoding' */
@@ -839,8 +1019,6 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
     id->p_encoder->fmt_out.i_bitrate = id->f_dst.i_bitrate;
 
     id->p_encoder->p_cfg = p_stream->p_sys->p_audio_cfg;
-    if( p_stream->p_sys->psz_aenc &&
-        *p_stream->p_sys->psz_aenc ) id->p_encoder->b_force = VLC_TRUE;
 
     /* Attach object to parent so object variables inheritance works */
     vlc_object_attach( id->p_encoder, p_stream );
@@ -1293,11 +1471,10 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     id->p_ff_pic_tmp0    = NULL;
     id->p_ff_pic_tmp1    = NULL;
     id->p_ff_pic_tmp2    = NULL;
+    id->p_ff_pic_tmp3    = NULL;
     id->p_vresample      = NULL;
 
     id->p_encoder->p_cfg = p_sys->p_video_cfg;
-    if( p_stream->p_sys->psz_venc &&
-        *p_stream->p_sys->psz_venc ) id->p_encoder->b_force = VLC_TRUE;
 
     /* Attach object to parent so object variables inheritance works */
     vlc_object_attach( id->p_encoder, p_stream );
@@ -1380,15 +1557,20 @@ static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream,
         free( id->p_ff_pic_tmp0->data[0] );
         free( id->p_ff_pic_tmp0 );
     }
-    if( id->p_ff_pic_tmp1)
+    if( id->p_ff_pic_tmp1 )
     {
         free( id->p_ff_pic_tmp1->data[0] );
         free( id->p_ff_pic_tmp1 );
     }
-    if( id->p_ff_pic_tmp2)
+    if( id->p_ff_pic_tmp2 )
     {
         free( id->p_ff_pic_tmp2->data[0] );
         free( id->p_ff_pic_tmp2 );
+    }
+    if( id->p_ff_pic_tmp3 )
+    {
+        free( id->p_ff_pic_tmp3->data[0] );
+        free( id->p_ff_pic_tmp3 );
     }
     if( id->p_vresample )
     {
@@ -1417,6 +1599,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         block_t *p_block;
         picture_t * p_pic;
         int i_plane;
+        subpicture_t *p_subpic = 0;
 
         /* decode frame */
         frame = id->p_ff_pic;
@@ -1680,6 +1863,44 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                           id->f_dst.video.i_width * VOUT_ASPECT_FACTOR /
                           id->f_dst.video.i_height );
 
+        /* Check if we have a subpicture to overlay */
+        if( p_sys->p_filter_blend )
+        {
+            p_subpic = transcode_spu_get( p_stream, id, p_sys->i_output_pts );
+
+            if( p_subpic && frame != id->p_ff_pic_tmp0 &&
+                frame != id->p_ff_pic_tmp1 && frame != id->p_ff_pic_tmp2 )
+            {
+                if( id->p_ff_pic_tmp3 == NULL )
+                {
+                    uint8_t *buf = malloc( frame->linesize[0] *
+                                           p_pic->p[0].i_lines * 3 );
+                    id->p_ff_pic_tmp3 = avcodec_alloc_frame();
+                    *id->p_ff_pic_tmp3 = *frame;
+                    id->p_ff_pic_tmp3->data[0] = buf;
+                    id->p_ff_pic_tmp3->data[1] = id->p_ff_pic_tmp3->data[0] +
+                        frame->linesize[0] * p_pic->p[0].i_lines;
+                    id->p_ff_pic_tmp3->data[2] = id->p_ff_pic_tmp3->data[1] +
+                        frame->linesize[1] * p_pic->p[1].i_lines;
+                }
+
+                for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+                {
+                    p_stream->p_vlc->pf_memcpy(
+                        id->p_ff_pic_tmp3->data[i_plane],
+                        frame->data[i_plane],
+                        p_pic->p[i_plane].i_lines * frame->linesize[i_plane] );
+                }
+
+                id->p_ff_pic_tmp3->repeat_pict = frame->repeat_pict;
+#if LIBAVCODEC_BUILD >= 4685
+                id->p_ff_pic_tmp3->interlaced_frame = frame->interlaced_frame;
+                id->p_ff_pic_tmp3->top_field_first = frame->top_field_first;
+#endif
+                frame = id->p_ff_pic_tmp3;
+            }
+        }
+
         for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
             p_pic->p[i_plane].i_pitch = frame->linesize[i_plane];
@@ -1712,6 +1933,71 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         {
             p_sys->i_output_pts += I64C(1000000) * (2 + frame->repeat_pict) *
               id->ff_dec_c->frame_rate_base / (2 * id->ff_dec_c->frame_rate);
+        }
+
+        /* Overlay subpicture */
+        if( p_subpic )
+        {
+            int i_width, i_height;
+
+            p_sys->p_filter_blend->fmt_out = id->p_encoder->fmt_in;
+            p_sys->p_filter_blend->fmt_out.video.i_visible_width =
+                p_sys->p_filter_blend->fmt_out.video.i_width;
+            p_sys->p_filter_blend->fmt_out.video.i_visible_height =
+                p_sys->p_filter_blend->fmt_out.video.i_height;
+            p_sys->p_filter_blend->fmt_out.video.i_chroma =
+                VLC_FOURCC('I','4','2','0');
+
+            i_width = id->p_encoder->fmt_in.video.i_width;
+            i_height = id->p_encoder->fmt_in.video.i_height;
+
+            while( p_subpic != NULL )
+            {
+                subpicture_region_t *p_region = p_subpic->p_region;
+
+                while( p_region && p_sys->p_filter_blend &&
+                       p_sys->p_filter_blend->pf_video_blend )
+                {
+                    int i_x_offset = p_region->i_x + p_subpic->i_x;
+                    int i_y_offset = p_region->i_y + p_subpic->i_y;
+
+                    if( p_subpic->i_flags & OSD_ALIGN_BOTTOM )
+                    {
+                        i_y_offset = i_height - p_region->fmt.i_height -
+                            p_subpic->i_y;
+                    }
+                    else if ( !(p_subpic->i_flags & OSD_ALIGN_TOP) )
+                    {
+                        i_y_offset = i_height / 2 - p_region->fmt.i_height / 2;
+                    }
+
+                    if( p_subpic->i_flags & OSD_ALIGN_RIGHT )
+                    {
+                        i_x_offset = i_width - p_region->fmt.i_width -
+                            p_subpic->i_x;
+                    }
+                    else if ( !(p_subpic->i_flags & OSD_ALIGN_LEFT) )
+                    {
+                        i_x_offset = i_width / 2 - p_region->fmt.i_width / 2;
+                    }
+
+                    if( p_subpic->b_absolute )
+                    {
+                        i_x_offset = p_region->i_x + p_subpic->i_x;
+                        i_y_offset = p_region->i_y + p_subpic->i_y;
+                    }
+
+                    p_sys->p_filter_blend->fmt_in.video = p_region->fmt;
+
+                    p_sys->p_filter_blend->pf_video_blend(
+                         p_sys->p_filter_blend, p_pic, p_pic,
+                         &p_region->picture, i_x_offset, i_y_offset );
+
+                    p_region = p_region->p_next;
+                }
+
+                p_subpic = p_subpic->p_next;
+            }
         }
 
         if ( p_sys->i_threads >= 1 )
@@ -1835,4 +2121,230 @@ static int transcode_video_ffmpeg_getframebuf(struct AVCodecContext *p_context,
     }
 
     return avcodec_default_get_buffer( p_context, p_frame );
+}
+
+/*
+ * SPU
+ */
+static subpicture_t *spu_new_buffer( decoder_t * );
+static void spu_del_buffer( decoder_t *, subpicture_t * );
+
+static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    /* Open decoder */
+    id->p_decoder = vlc_object_create( p_stream, VLC_OBJECT_DECODER );
+
+    /* Initialization of decoder format structures */
+    id->p_decoder->fmt_in = id->f_src;
+    id->p_decoder->pf_spu_buffer_new = spu_new_buffer;
+    id->p_decoder->pf_spu_buffer_del = spu_del_buffer;
+    //id->p_decoder->p_cfg = p_sys->p_spu_cfg;
+
+    /* Attach object to parent so object variables inheritance works */
+    vlc_object_attach( id->p_decoder, p_stream );
+
+    id->p_decoder->p_module =
+        module_Need( id->p_decoder, "decoder", "$codec", VLC_TRUE );
+
+    if( !id->p_decoder->p_module )
+    {
+        vlc_object_detach( id->p_decoder );
+        vlc_object_destroy( id->p_decoder );
+        msg_Err( p_stream, "cannot find decoder" );
+        return VLC_EGENERIC;
+    }
+
+    if( !p_sys->b_soverlay )
+    {
+        /* Open encoder */
+        id->p_encoder = vlc_object_create( p_stream, VLC_OBJECT_ENCODER );
+
+        /* Initialization of encoder format structures */
+        es_format_Init( &id->p_encoder->fmt_in,
+                        id->f_src.i_cat, id->f_src.i_codec );
+
+        id->p_encoder->fmt_out = id->p_encoder->fmt_in;
+        id->p_encoder->fmt_out.i_codec = id->f_dst.i_codec;
+        id->p_encoder->fmt_out.i_bitrate = id->f_dst.i_bitrate;
+
+        id->p_encoder->p_cfg = p_sys->p_spu_cfg;
+
+        /* Attach object to parent so object variables inheritance works */
+        vlc_object_attach( id->p_encoder, p_stream );
+
+        id->p_encoder->p_module =
+            module_Need( id->p_encoder, "encoder", p_sys->psz_senc, VLC_TRUE );
+
+        if( !id->p_encoder->p_module )
+        {
+            module_Unneed( id->p_decoder, id->p_decoder->p_module );
+            vlc_object_detach( id->p_decoder );
+            vlc_object_destroy( id->p_decoder );
+
+            vlc_object_detach( id->p_encoder );
+            vlc_object_destroy( id->p_encoder );
+            msg_Err( p_stream, "cannot find encoder" );
+            return VLC_EGENERIC;
+        }
+    }
+    else
+    {
+        p_sys->p_filter_blend =
+            vlc_object_create( p_stream, sizeof(filter_t) );
+        vlc_object_attach( p_sys->p_filter_blend, p_stream );
+        p_sys->p_filter_blend->fmt_out.video.i_chroma =
+            VLC_FOURCC('I','4','2','0');
+        p_sys->p_filter_blend->fmt_in.video.i_chroma =
+            VLC_FOURCC('Y','U','V','A');
+        p_sys->p_filter_blend->p_module =
+            module_Need( p_sys->p_filter_blend, "video blending", 0, 0 );
+    }
+
+    return VLC_SUCCESS;
+}
+
+static void transcode_spu_close( sout_stream_t *p_stream, sout_stream_id_t *id)
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    int i;
+
+    /* Close decoder */
+    if( id->p_decoder->p_module )
+        module_Unneed( id->p_decoder, id->p_decoder->p_module );
+    vlc_object_detach( id->p_decoder );
+    vlc_object_destroy( id->p_decoder );
+
+    /* Close encoder */
+    if( id->p_encoder )
+    {
+        if( id->p_encoder->p_module )
+            module_Unneed( id->p_encoder, id->p_encoder->p_module );
+        vlc_object_detach( id->p_encoder );
+        vlc_object_destroy( id->p_encoder );
+    }
+
+    /* Free subpictures */
+    for( i = 0; i < SUBPICTURE_RING_SIZE; i++ )
+    {
+        if( !p_sys->pp_subpics[i] ) continue;
+
+        spu_del_buffer( id->p_decoder, p_sys->pp_subpics[i] );
+        p_sys->pp_subpics[i] = NULL;
+    }
+}
+
+static int transcode_spu_process( sout_stream_t *p_stream,
+                                  sout_stream_id_t *id,
+                                  block_t *in, block_t **out )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    subpicture_t *p_subpic;
+
+    p_subpic = id->p_decoder->pf_decode_sub( id->p_decoder, &in );
+    if( p_subpic && p_sys->b_soverlay )
+    {
+        int i;
+
+        /* Find a free slot in our supictures ring buffer */
+        for( i = 0; i < SUBPICTURE_RING_SIZE; i++ )
+        {
+            if( !p_sys->pp_subpics[i] )
+            {
+                p_sys->pp_subpics[i] = p_subpic;
+                break;
+            }
+        }
+        if( i == SUBPICTURE_RING_SIZE )
+        {
+            spu_del_buffer( id->p_decoder, p_subpic );
+        }
+    }
+
+    if( !p_sys->b_soverlay && p_subpic )
+    {
+        block_t *p_block;
+        p_block = id->p_encoder->pf_encode_sub( id->p_encoder, p_subpic );
+        if( p_block ) block_ChainAppend( out, p_block );
+        return VLC_SUCCESS;
+    }
+
+    return VLC_EGENERIC;
+}
+
+static subpicture_t *transcode_spu_get( sout_stream_t *p_stream,
+                                        sout_stream_id_t *id,
+                                        mtime_t display_date )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    subpicture_t *p_subpic = 0;
+    subpicture_t *p_ephemer = 0;
+    subpicture_t **pp_subpic = &p_subpic;
+    int i;
+
+    /* Find current subpictures and remove old ones */
+    for( i = 0; i < SUBPICTURE_RING_SIZE; i++ )
+    {
+        if( !p_sys->pp_subpics[i] ) continue;
+
+        if( !p_sys->pp_subpics[i]->b_ephemer &&
+            p_sys->pp_subpics[i]->i_stop < display_date )
+        {
+            spu_del_buffer( id->p_decoder, p_sys->pp_subpics[i] );
+            p_sys->pp_subpics[i] = NULL;
+            continue;
+        }
+
+        if( p_sys->pp_subpics[i]->i_start > display_date ) continue;
+
+        if( p_sys->pp_subpics[i]->b_ephemer && !p_ephemer )
+        {
+            p_ephemer = p_sys->pp_subpics[i];
+        }
+        else if( p_sys->pp_subpics[i]->b_ephemer )
+        {
+            if( p_ephemer->i_start < p_sys->pp_subpics[i]->i_start )
+            {
+                subpicture_t tmp;
+                tmp = *p_ephemer;
+                *p_ephemer = *p_sys->pp_subpics[i];
+                *p_sys->pp_subpics[i] = tmp;
+            }
+
+            spu_del_buffer( id->p_decoder, p_sys->pp_subpics[i] );
+            p_sys->pp_subpics[i] = NULL;
+            continue;
+        }
+
+        /* Add subpicture to the list */
+        *pp_subpic = p_sys->pp_subpics[i];
+        pp_subpic = &p_sys->pp_subpics[i]->p_next;
+    }
+
+    return p_subpic;
+}
+
+static subpicture_t *spu_new_buffer( decoder_t *p_dec )
+{
+    subpicture_t *p_subpic = (subpicture_t *)malloc(sizeof(subpicture_t));
+    memset( p_subpic, 0, sizeof(subpicture_t) );
+    p_subpic->b_absolute = VLC_TRUE;
+
+    p_subpic->pf_create_region = __spu_CreateRegion;
+    p_subpic->pf_destroy_region = __spu_DestroyRegion;
+
+    return p_subpic;
+}
+
+static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_subpic )
+{
+    while( p_subpic->p_region )
+    {
+        subpicture_region_t *p_region = p_subpic->p_region;
+        p_subpic->p_region = p_region->p_next;
+        p_subpic->pf_destroy_region( VLC_OBJECT(p_dec), p_region );
+    }
+
+    free( p_subpic );
 }

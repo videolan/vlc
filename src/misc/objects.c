@@ -212,6 +212,7 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
     p_new->b_error = VLC_FALSE;
     p_new->b_dead = VLC_FALSE;
     p_new->b_attached = VLC_FALSE;
+    p_new->b_force = VLC_FALSE;
 
     p_new->i_vars = 0;
     p_new->p_vars = (variable_t *)malloc( 16 * sizeof( variable_t ) );

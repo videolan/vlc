@@ -328,6 +328,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     {
         module_t *p_module;
         int i_score;
+        vlc_bool_t b_force;
         module_list_t *p_next;
     };
 
@@ -501,6 +502,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         /* Store this new module */
         p_list[ i_index ].p_module = p_module;
         p_list[ i_index ].i_score = p_module->i_score + i_shortcut_bonus;
+        p_list[ i_index ].b_force = !!i_shortcut_bonus;
 
         /* Add it to the modules-to-probe list */
         if( i_index == 0 )
@@ -571,6 +573,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         }
 #endif
 
+        p_this->b_force = p_tmp->b_force;
         if( p_tmp->p_module->pf_activate
              && p_tmp->p_module->pf_activate( p_this ) == VLC_SUCCESS )
         {
@@ -600,6 +603,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     }
 
     free( p_list );
+    p_this->b_force = VLC_FALSE;
 
     if( p_module != NULL )
     {

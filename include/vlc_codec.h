@@ -101,11 +101,11 @@ struct encoder_t
     /* Module properties */
     module_t *          p_module;
     encoder_sys_t *     p_sys;
-    vlc_bool_t          b_force;
 
     block_t *           ( * pf_header )( encoder_t * );
     block_t *           ( * pf_encode_video )( encoder_t *, picture_t * );
     block_t *           ( * pf_encode_audio )( encoder_t *, aout_buffer_t * );
+    block_t *           ( * pf_encode_sub )( encoder_t *, subpicture_t * );
 
     /* Properties of the input data fed to the encoder */
     es_format_t         fmt_in;

@@ -414,6 +414,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
     volatile vlc_bool_t b_die;                   /**< set by the outside */ \
     volatile vlc_bool_t b_dead;                   /**< set by the object */ \
     volatile vlc_bool_t b_attached;               /**< set by the object */ \
+    vlc_bool_t b_force;      /**< set by the outside (eg. module_Need()) */ \
                                                                             \
     /* Object variables */                                                  \
     vlc_mutex_t     var_lock;                                               \
