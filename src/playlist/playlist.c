@@ -870,7 +870,22 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
                                     p_view->p_root,
                                     p_playlist->request.p_node,
                                     p_new );
-                    if( p_new == NULL ) break;
+                    if( p_new == NULL )
+                    {
+                        if( b_loop )
+                        {
+                            p_new = playlist_FindNextFromParent( p_playlist,
+                                      p_playlist->request.i_view,
+                                      p_view->p_root,
+                                      p_playlist->request.p_node,
+                                      NULL );
+                            if( p_new == NULL ) break;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
                 }
             }
             else if( i_skip < 0 )
@@ -909,7 +924,13 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
             else
             {
                 msg_Dbg( p_playlist,"finished" );
-                p_new = NULL;
+                if( b_loop && p_playlist->i_size > 0)
+                {
+                    p_playlist->i_index = 0;
+                    p_new = p_playlist->pp_items[0];
+                }
+                else
+                    p_new = NULL;
             }
         }
         /* We are playing with a view */
@@ -923,6 +944,14 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
                             p_view->p_root,
                             p_playlist->status.p_node,
                             p_playlist->status.p_item );
+            if( p_new == NULL && b_loop )
+            {
+                p_new = playlist_FindNextFromParent( p_playlist,
+                                   p_playlist->status.i_view,
+                                   p_view->p_root,
+                                   p_playlist->status.p_node,
+                                   NULL );
+            }
         }
     }
 
@@ -938,8 +967,10 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
     msg_Dbg(p_playlist,"next item found in "I64Fi " us", mdate()-start );
 #endif
 
-    if( p_new == NULL ) { msg_Info( p_playlist, "Nothing to play" ); }
-
+    if( p_new == NULL )
+    {
+        msg_Info( p_playlist, "Nothing to play" );
+    }
     return p_new;
 }
 

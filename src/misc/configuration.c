@@ -212,6 +212,7 @@ char * __config_GetPsz( vlc_object_t *p_this, const char *psz_name )
         return NULL;
     }
 
+
     /* return a copy of the string */
     vlc_mutex_lock( p_config->p_lock );
     if( p_config->psz_value ) psz_value = strdup( p_config->psz_value );
@@ -235,6 +236,7 @@ void __config_PutPsz( vlc_object_t *p_this,
 
     p_config = config_FindConfig( p_this, psz_name );
 
+
     /* sanity checks */
     if( !p_config )
     {
@@ -245,6 +247,7 @@ void __config_PutPsz( vlc_object_t *p_this,
         (p_config->i_type!=CONFIG_ITEM_FILE) &&
         (p_config->i_type!=CONFIG_ITEM_DIRECTORY) &&
         (p_config->i_type!=CONFIG_ITEM_MODULE_LIST) &&
+        (p_config->i_type!=CONFIG_ITEM_MODULE_CAT) &&
         (p_config->i_type!=CONFIG_ITEM_MODULE_LIST_CAT) &&
         (p_config->i_type!=CONFIG_ITEM_MODULE) )
     {
@@ -1444,6 +1447,9 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
             case CONFIG_ITEM_FILE:
             case CONFIG_ITEM_DIRECTORY:
             case CONFIG_ITEM_MODULE:
+            case CONFIG_ITEM_MODULE_LIST:
+            case CONFIG_ITEM_MODULE_LIST_CAT:
+            case CONFIG_ITEM_MODULE_CAT:
                 config_PutPsz( p_this, psz_name, optarg );
                 break;
             case CONFIG_ITEM_INTEGER:
@@ -1472,6 +1478,9 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
             case CONFIG_ITEM_FILE:
             case CONFIG_ITEM_DIRECTORY:
             case CONFIG_ITEM_MODULE:
+            case CONFIG_ITEM_MODULE_CAT:
+            case CONFIG_ITEM_MODULE_LIST:
+            case CONFIG_ITEM_MODULE_LIST_CAT:
                 config_PutPsz( p_this, pp_shortopts[i_cmd]->psz_name, optarg );
                 break;
             case CONFIG_ITEM_INTEGER:
