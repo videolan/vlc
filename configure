@@ -6098,7 +6098,7 @@ rm -f conftest*
 
   if test "x${SYS}" = "xdarwin"
   then
-    PLUGINS="${PLUGINS} vcd"
+    # No need to add vcd to PLUGINS, Darwin is already based on FreeBSD
     vcd_LDFLAGS="${vcd_LDFLAGS} -framework IOKit -framework CoreFoundation" 
   fi
 fi

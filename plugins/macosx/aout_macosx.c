@@ -2,7 +2,7 @@
  * aout_macosx.c : CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.c,v 1.18 2002/04/25 23:07:23 massiot Exp $
+ * $Id: aout_macosx.c,v 1.19 2002/05/01 22:32:27 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -147,7 +147,6 @@ static int aout_Open( aout_thread_t *p_aout )
         intf_ErrMsg( "aout error: failed to get device buffer size: %d", err );
         return( -1 );
     }
-    p_aout->i_latency = p_aout->p_sys->ui_buffer_size;
 
     /* get a description of the data format used by the device */
     ui_param_size = sizeof( p_aout->p_sys->s_dst_stream_format ); 
@@ -348,6 +347,11 @@ static OSStatus CAIOCallback( AudioDeviceID inDevice,
 
         p_sys->b_buffer_data = 0;
     }
+    else
+    {
+        memset(outOutputData->mBuffers[ 0 ].mData, 0, p_sys->ui_buffer_size);
+        intf_WarnMsg(1, "aout warning: audio output is starving, expect glitches");
+    }
 
     vlc_mutex_unlock( &p_sys->mutex_lock );
 
@@ -425,6 +429,7 @@ static int CABeginFormat( aout_thread_t *p_aout )
                                   kAudioDevicePropertyBufferSize, 
                                   ui_param_size,
                                   &p_aout->p_sys->ui_buffer_size );
+    p_aout->i_latency = p_aout->p_sys->ui_buffer_size;
 
     if( err != noErr )
     {
