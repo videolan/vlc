@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.21 2003/07/31 23:44:49 fenrir Exp $
+ * $Id: sap.c,v 1.22 2003/09/11 15:34:16 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -88,6 +88,7 @@
 
 typedef struct media_descr_t media_descr_t;
 typedef struct sess_descr_t sess_descr_t;
+typedef struct attr_descr_t attr_descr_t;
 
 static int  Activate     ( vlc_object_t * );
 static void Run          ( intf_thread_t *p_intf );
@@ -115,7 +116,8 @@ static void free_sd( sess_descr_t * );
 static int  ismult( char * );
 
 /* The struct that contains sdp informations */
-struct  sess_descr_t {
+struct  sess_descr_t 
+{
     char *psz_version;
     char *psz_origin;
     char *psz_sessionname;
@@ -128,13 +130,22 @@ struct  sess_descr_t {
     char *psz_attribute;
     char *psz_connection;
     int  i_media;
+    int  i_attributes;
     media_descr_t ** pp_media;
+    attr_descr_t ** pp_attributes;
 };
 
 /* All this informations are not useful yet.  */
-struct media_descr_t {
+struct media_descr_t 
+{
     char *psz_medianame;
     char *psz_mediaconnection;
+};
+
+struct attr_descr_t 
+{
+    char *psz_field;
+    char *psz_value;
 };
 
 /*****************************************************************************
@@ -331,7 +342,9 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
     char *psz_port;
     char *psz_uri_default;
     int i_multicast;
-    int i_count;
+    int i_count , i;
+    vlc_bool_t b_http = VLC_FALSE;
+    char *psz_http_path = NULL;
     playlist_t *p_playlist;
 
     psz_uri_default = NULL;
@@ -386,31 +399,67 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             return 0;
         }
 
-
-        /* Filling p_item->psz_uri */
-        i_multicast = ismult( psz_uri );
-
-        p_item->psz_uri = malloc( strlen( psz_proto ) + strlen( psz_uri ) +
-                        strlen( psz_port ) + 5 +i_multicast );
-        if( p_item->psz_uri == NULL )
+        for( i = 0 ; i< p_sd->i_attributes ; i++ )
         {
-            msg_Err( p_intf, "Not enough memory");
-            free( p_item );
-            return 0;
+            if(!strcasecmp( p_sd->pp_attributes[i]->psz_field , "type") &&
+                strstr( p_sd->pp_attributes[i]->psz_value, "http") )
+            {
+                b_http = VLC_TRUE;
+            }
+            if(!strcasecmp( p_sd->pp_attributes[i]->psz_field , "http-path"))
+            {
+                psz_http_path = strdup(  p_sd->pp_attributes[i]->psz_value );
+                
+            }
         }
-
-        if( i_multicast == 1)
+        
+        
+        /* Filling p_item->psz_uri */
+        if( b_http == VLC_FALSE )
         {
-            sprintf( p_item->psz_uri, "%s://@%s:%s", psz_proto,
+            i_multicast = ismult( psz_uri );
+
+            p_item->psz_uri = malloc( strlen( psz_proto ) + strlen( psz_uri ) +
+                        strlen( psz_port ) + 5 +i_multicast );
+    
+            if( p_item->psz_uri == NULL )
+            {
+                msg_Err( p_intf, "Not enough memory");
+                free( p_item );
+                return 0;
+            }
+
+            if( i_multicast == 1)
+            {
+                sprintf( p_item->psz_uri, "%s://@%s:%s", psz_proto,
+                                 psz_uri, psz_port );
+            }
+            else
+            {
+                sprintf( p_item->psz_uri, "%s://%s:%s", psz_proto,
                             psz_uri, psz_port );
+            }
         }
         else
         {
-            sprintf( p_item->psz_uri, "%s://%s:%s", psz_proto,
-                            psz_uri, psz_port );
+            if( psz_http_path == NULL ) 
+                psz_http_path = strdup("/");
+            
+            p_item->psz_uri = malloc( strlen( psz_proto ) + strlen( psz_uri ) +
+                        strlen( psz_port ) + 3 + strlen(psz_http_path) );
+    
+            if( p_item->psz_uri == NULL )
+            {
+                msg_Err( p_intf, "Not enough memory");
+                free( p_item );
+                return 0;
+            }
+            
+            sprintf( p_item->psz_uri, "%s://%s:%s%s", psz_proto,
+                            psz_uri, psz_port,psz_http_path );
+            
         }
-
-        /* Enqueueing p_item in the playlist */
+            /* Enqueueing p_item in the playlist */
 
         if( p_item )
         {
@@ -421,10 +470,10 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             PLAYLIST_CHECK_INSERT, PLAYLIST_END);
             vlc_object_release( p_playlist );
         }
-
-
+  
+        if( psz_http_path ) 
+            free(psz_http_path);
     }
-
 
     return 1;
 
@@ -582,7 +631,9 @@ static int packet_handle( intf_thread_t * p_intf, char *p_packet, int i_len )
 static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
 {
     sess_descr_t *  sd;
-
+    char *psz_eof;
+   
+    unsigned int i; 
     // According to RFC 2327, the first bytes should be exactly "v="
     if((p_packet[0] != 'v') || (p_packet[1] != '='))
     {
@@ -597,6 +648,7 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
     }
 
     sd->pp_media = NULL;
+    sd->pp_attributes = NULL;
     sd->psz_origin = NULL;
     sd->psz_sessionname = NULL;
     sd->psz_information = NULL;
@@ -607,9 +659,11 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
     sd->psz_repeat = NULL;
     sd->psz_attribute = NULL;
     sd->psz_connection = NULL;
-
-    sd->i_media = 0;
-
+    
+    
+    sd->i_media      = 0;
+    sd->i_attributes = 0;
+    
     while( *p_packet != '\0'  )
     {
 #define FIELD_COPY( p ) \
@@ -665,7 +719,36 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
                     FIELD_COPY( sd->psz_repeat );
                     break;
                 case( 'a' ):
-                    FIELD_COPY( sd->psz_attribute );
+                    if( sd->pp_attributes )
+                    {
+                        sd->pp_attributes =
+                            realloc( sd->pp_attributes,
+                                    sizeof( attr_descr_t ) * 
+                                    ( sd->i_attributes +1 ) );
+                    }
+                    else
+                    {
+                        sd->pp_attributes = malloc( sizeof( void * ) );
+                    }
+                    sd->pp_attributes[sd->i_attributes] =
+                            malloc( sizeof( attr_descr_t ) );
+                    p_packet += 2;
+                    psz_eof = strchr( p_packet, ':');
+                    if(psz_eof)
+                        *psz_eof = '\0';
+                    sd->pp_attributes[sd->i_attributes]->psz_field =
+                            strdup( p_packet );
+                    sd->pp_attributes[sd->i_attributes]->psz_value = 
+                            strdup( ++psz_eof );
+                    for( i=0 ; i< 
+                      strlen(sd->pp_attributes[sd->i_attributes]->psz_value) ;
+                             i++ )
+                    {
+                        if(sd->pp_attributes[sd->i_attributes]->psz_value[i]
+                                        =='\n' )
+                          sd->pp_attributes[sd->i_attributes]->psz_value[i]                                            =0;                    
+                    }
+                    sd->i_attributes++;
                     break;
 
                 case( 'm' ):
@@ -680,6 +763,7 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
                         sd->pp_media = malloc( sizeof( void * ) );
                     }
 
+                    
                     sd->pp_media[sd->i_media] =
                             malloc( sizeof( media_descr_t ) );
                     sd->pp_media[sd->i_media]->psz_medianame = NULL;
@@ -733,6 +817,12 @@ static void free_sd( sess_descr_t * p_sd )
             FREE( p_sd->pp_media[i]->psz_medianame );
             FREE( p_sd->pp_media[i]->psz_mediaconnection );
         }
+        for( i = 0; i < p_sd->i_attributes ; i++ )
+        {
+            FREE( p_sd->pp_attributes[i]->psz_field );
+            FREE( p_sd->pp_attributes[i]->psz_value );
+        }
+        FREE( p_sd->pp_attributes );
         FREE( p_sd->pp_media );
 
         free( p_sd );
