@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.287 2004/02/06 23:43:32 gbazin Exp $
+ * $Id: input.c,v 1.288 2004/02/08 17:21:50 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -536,6 +536,7 @@ static int InitThread( input_thread_t * p_input )
     int64_t i_microsecondperframe;
 
     subtitle_demux_t *p_sub_toselect = NULL;
+    char             *psz_sub_file = NULL;
 
     /* Skip the plug-in names */
     while( *psz_parser && *psz_parser != ':' )
@@ -893,7 +894,7 @@ static int InitThread( input_thread_t * p_input )
             TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
         }
     }
-    if( val.psz_string ) free( val.psz_string );
+    psz_sub_file = val.psz_string;
 
     var_Get( p_input, "sub-autodetect-file", &val );
     if( val.b_bool )
@@ -904,15 +905,19 @@ static int InitThread( input_thread_t * p_input )
         char **tmp2 = tmp;
         for( i = 0; *tmp2 != NULL; i++ )
         {
-            if( ( p_sub = subtitle_New( p_input, *tmp2,
-                                        i_microsecondperframe ) ) )
+            if( psz_sub_file == NULL || strcmp( psz_sub_file, *tmp2 ) )
             {
-                TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
+                if( ( p_sub = subtitle_New( p_input, *tmp2,
+                                            i_microsecondperframe ) ) )
+                {
+                    TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
+                }
             }
             free( *tmp2++ );
         }
         free( tmp );
     }
+    if( psz_sub_file ) free( psz_sub_file );
 
     es_out_Control( p_input->p_es_out, ES_OUT_SET_ACTIVE, VLC_TRUE );
     val.b_bool =  VLC_FALSE;
