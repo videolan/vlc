@@ -715,23 +715,21 @@ static int Init( input_thread_t * p_input )
     psz = var_GetString( p_input, "input-slave" );
     if( *psz )
     {
-        char *psz_delim = strchr( psz, '#' );
-
-        for( ;; )
+        char *psz_delim;
+        input_source_t *slave;
+        while( psz && *psz )
         {
-            input_source_t *slave;
-
-            if( psz_delim )
+            while( *psz == ' ' || *psz == '#' )
+            {
+                psz++;
+            }
+            if( ( psz_delim = strchr( psz, '#' ) ) )
             {
                 *psz_delim++ = '\0';
             }
-
-            if( *psz == '\0' )
+            if( *psz == 0 )
             {
-                if( psz_delim )
-                    continue;
-                else
-                    break;
+                break;
             }
 
             msg_Dbg( p_input, "adding slave '%s'", psz );
@@ -740,11 +738,10 @@ static int Init( input_thread_t * p_input )
             {
                 TAB_APPEND( p_input->i_slave, p_input->slave, slave );
             }
-            if( !psz_delim )
-                break;
+            psz = psz_delim;
         }
+        free( psz );
     }
-    free( psz );
 
     /* Set up es_out */
     es_out_Control( p_input->p_es_out, ES_OUT_SET_ACTIVE, VLC_TRUE );
