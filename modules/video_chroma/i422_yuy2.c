@@ -2,7 +2,7 @@
  * i422_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i422_yuy2.c,v 1.5 2004/01/25 17:20:18 kuehne Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -162,12 +162,7 @@ static void I422_YUY2( vout_thread_t *p_vout, picture_t *p_source,
             __asm__( ".align 8" MMX_YUV422_YUYV
                      : : "r" (p_line), "r" (p_y), "r" (p_u), "r" (p_v) ); 
 
-            p_line += 8; p_y += 4; p_u += 2; p_v += 2;
-
-            __asm__( ".align 8" MMX_YUV422_YUYV
-                     : : "r" (p_line), "r" (p_y), "r" (p_u), "r" (p_v) ); 
-
-            p_line += 8; p_y += 4; p_u += 2; p_v += 2;
+            p_line += 16; p_y += 8; p_u += 4; p_v += 4;
 #endif
         }
     }
@@ -199,12 +194,7 @@ static void I422_YVYU( vout_thread_t *p_vout, picture_t *p_source,
             __asm__( ".align 8" MMX_YUV422_YVYU
                      : : "r" (p_line), "r" (p_y), "r" (p_u), "r" (p_v) ); 
 
-            p_line += 8; p_y += 4; p_u += 2; p_v += 2;
-
-            __asm__( ".align 8" MMX_YUV422_YVYU
-                     : : "r" (p_line), "r" (p_y), "r" (p_u), "r" (p_v) ); 
-
-            p_line += 8; p_y += 4; p_u += 2; p_v += 2;
+            p_line += 16; p_y += 8; p_u += 4; p_v += 4;
 #endif
         }
     }
@@ -236,12 +226,7 @@ static void I422_UYVY( vout_thread_t *p_vout, picture_t *p_source,
             __asm__( ".align 8" MMX_YUV422_UYVY
                      : : "r" (p_line), "r" (p_y), "r" (p_u), "r" (p_v) ); 
 
-            p_line += 8; p_y += 4; p_u += 2; p_v += 2;
-
-            __asm__( ".align 8" MMX_YUV422_UYVY
-                     : : "r" (p_line), "r" (p_y), "r" (p_u), "r" (p_v) ); 
-
-            p_line += 8; p_y += 4; p_u += 2; p_v += 2;
+            p_line += 16; p_y += 8; p_u += 4; p_v += 4;
 #endif
         }
     }
@@ -285,12 +270,7 @@ static void I422_cyuv( vout_thread_t *p_vout, picture_t *p_source,
             __asm__( ".align 8" MMX_YUV422_UYVY
                      : : "r" (p_line), "r" (p_y), "r" (p_u), "r" (p_v) ); 
 
-            p_line += 8; p_y += 4; p_u += 2; p_v += 2;
-
-            __asm__( ".align 8" MMX_YUV422_UYVY
-                     : : "r" (p_line), "r" (p_y), "r" (p_u), "r" (p_v) ); 
-
-            p_line += 8; p_y += 4; p_u += 2; p_v += 2;
+            p_line += 16; p_y += 8; p_u += 4; p_v += 4;
 #endif
         }
     }
