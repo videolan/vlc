@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.16 2002/08/24 11:46:44 sam Exp $
+ * $Id: oss.c,v 1.17 2002/08/24 21:11:21 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -65,7 +65,7 @@ struct aout_sys_t
     volatile vlc_bool_t   b_initialized;
 };
 
-#define FRAME_SIZE 2048
+#define FRAME_SIZE 1024
 #define FRAME_COUNT 8
 #define A52_FRAME_NB 1536
 
@@ -323,11 +323,20 @@ static int OSSThread( aout_instance_t * p_aout )
                                 / p_aout->output.output.i_rate
                                 * p_aout->output.output.i_frame_length;
 
+            while( buffered > 50000 )
+            {
+                msleep( buffered / 2 - 10000 );
+                buffered = (mtime_t)GetBufInfo( p_aout ) * 1000000
+                            / p_aout->output.output.i_bytes_per_frame
+                            / p_aout->output.output.i_rate
+                            * p_aout->output.output.i_frame_length;
+            }
+
             /* Next buffer will be played at mdate()+buffered, and we tell
              * the audio output that it can wait for a new packet for
-             * buffered/2 microseconds. */
+             * 20000 microseconds. */
             p_buffer = aout_OutputNextBuffer( p_aout, mdate() + buffered,
-                                              buffered / 2, VLC_FALSE );
+                                              20000, VLC_FALSE );
         }
         else
         {
