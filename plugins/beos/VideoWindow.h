@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.11 2002/03/17 05:48:18 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.12 2002/03/20 10:33:42 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -22,6 +22,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+#define BITMAP  0
+#define DIRECT  1
+#define OVERLAY 2
+#define OPENGL  3
+
 class VLCView : public BView
 {
 public:
@@ -41,24 +46,30 @@ public:
                  struct vout_thread_s *p_video_output); 
     ~VideoWindow();
     
-    void drawBuffer(int bufferIndex);
+    void	        Zoom(BPoint origin, float width, float height);
+    void            FrameResized(float width, float height);
+    void            FrameMoved(BPoint origin);
+    void            ScreenChanged(BRect frame, color_space mode);
+    void            drawBuffer(int bufferIndex);
     
     // this is the hook controling direct screen connection
     int32           i_width;     // incomming bitmap size 
     int32           i_height;
     BRect           winSize;     // current window size
     float           width_scale, height_scale;
-    bool            is_zoomed, resized;
+    float           out_top, out_left, out_height, out_width;
+    bool            is_zoomed, resized, vsync;
     BBitmap	        *bitmap[2];
     VLCView	        *view;
     BWindow         *voutWindow;
     int             i_buffer;
     bool			teardownwindow;
+    thread_id       fDrawThreadID;
 
 private:
     // display_mode old_mode;
-    thread_id              fDrawThreadID;
     struct vout_thread_s   *p_vout;
+    int             mode;
 
 };
 
@@ -69,7 +80,10 @@ public:
     ~bitmapWindow();
     // standard window member
     virtual void    FrameResized(float width, float height);
+    virtual void    FrameMoved(BPoint origin);
     virtual void	Zoom(BPoint origin, float width, float height);
+    virtual void    ScreenChanged(BRect frame, color_space mode);
+    void            drawBuffer(int bufferIndex);
 private:
 	VideoWindow     *owner;
 };
@@ -84,8 +98,11 @@ public:
 
     // standard window member
     virtual void    FrameResized(float width, float height);
+    virtual void    FrameMoved(BPoint origin);    
     virtual void	Zoom(BPoint origin, float width, float height);
     virtual void    DirectConnected(direct_buffer_info *info);
+    virtual void    ScreenChanged(BRect frame, color_space mode);
+    void            drawBuffer(int bufferIndex);
 private:
     VideoWindow     *owner;
 };
