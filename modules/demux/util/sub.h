@@ -2,7 +2,7 @@
  * sub.h
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: sub.h,v 1.19 2004/01/27 13:10:29 fenrir Exp $
+ * $Id: sub.h,v 1.20 2004/03/03 20:39:52 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -91,7 +91,7 @@ static inline subtitle_demux_t *subtitle_New( input_thread_t *p_input,
     p_sub = vlc_object_create( p_input, sizeof( subtitle_demux_t ) );
     p_sub->psz_object_name = "subtitle demux";
     vlc_object_attach( p_sub, p_input );
-    p_sub->p_module = module_Need( p_sub, "subtitle demux", "" );
+    p_sub->p_module = module_Need( p_sub, "subtitle demux", NULL, 0 );
 
     if( p_sub->p_module &&
         p_sub->pf_open( p_sub, p_input, psz_name, i_microsecperframe ) >=0 )

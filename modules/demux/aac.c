@@ -2,7 +2,7 @@
  * aac.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: aac.c,v 1.10 2004/03/03 11:40:19 fenrir Exp $
+ * $Id: aac.c,v 1.11 2004/03/03 20:39:51 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -126,7 +126,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* skip possible id3 header */
-    if( ( p_id3 = module_Need( p_demux, "id3", NULL ) ) )
+    if( ( p_id3 = module_Need( p_demux, "id3", NULL, 0 ) ) )
     {
         module_Unneed( p_demux, p_id3 );
     }

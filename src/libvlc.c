@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: libvlc.c,v 1.117 2004/02/22 15:41:27 massiot Exp $
+ * $Id: libvlc.c,v 1.118 2004/03/03 20:39:52 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -559,7 +559,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /*
      * Choose the best memcpy module
      */
-    p_vlc->p_memcpy_module = module_Need( p_vlc, "memcpy", "$memcpy" );
+    p_vlc->p_memcpy_module = module_Need( p_vlc, "memcpy", "$memcpy", 0 );
 
     if( p_vlc->pf_memcpy == NULL )
     {

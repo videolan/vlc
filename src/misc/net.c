@@ -2,7 +2,7 @@
  * net.c:
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: net.c,v 1.9 2004/01/25 17:16:06 zorglub Exp $
+ * $Id: net.c,v 1.10 2004/03/03 20:39:53 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -72,7 +72,6 @@ int __net_OpenTCP( vlc_object_t *p_this, char *psz_host, int i_port )
     network_socket_t sock;
     module_t         *p_network;
 
-
     /* Check if we have force ipv4 or ipv6 */
     var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_this, "ipv4", &val );
@@ -99,9 +98,10 @@ int __net_OpenTCP( vlc_object_t *p_this, char *psz_host, int i_port )
     msg_Dbg( p_this, "net: connecting to '%s:%d'", psz_host, i_port );
     private = p_this->p_private;
     p_this->p_private = (void*)&sock;
-    if( ( p_network = module_Need( p_this, "network", psz_network ) ) == NULL )
+    if( !( p_network = module_Need( p_this, "network", psz_network, 0 ) ) )
     {
-        msg_Dbg( p_this, "net: connection to '%s:%d' failed", psz_host, i_port );
+        msg_Dbg( p_this, "net: connection to '%s:%d' failed",
+                 psz_host, i_port );
         return -1;
     }
     module_Unneed( p_this, p_network );
@@ -155,7 +155,7 @@ int __net_OpenUDP( vlc_object_t *p_this, char *psz_bind, int i_bind,
              psz_server, i_server, psz_bind, i_bind );
     private = p_this->p_private;
     p_this->p_private = (void*)&sock;
-    if( ( p_network = module_Need( p_this, "network", psz_network ) ) == NULL )
+    if( !( p_network = module_Need( p_this, "network", psz_network, 0 ) ) )
     {
         msg_Dbg( p_this, "net: connection to '%s:%d@%s:%d' failed",
                  psz_server, i_server, psz_bind, i_bind );

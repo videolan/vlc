@@ -2,7 +2,7 @@
  * demuxstream.c: Read an MPEG stream from the satellite and stream it
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: demuxstream.c,v 1.2 2004/01/25 20:05:28 hartman Exp $
+ * $Id: demuxstream.c,v 1.3 2004/03/03 20:39:51 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -217,8 +217,7 @@ static int Activate( vlc_object_t * p_this )
     socket_desc.i_bind_port     = 0;
     socket_desc.i_ttl           = 0;
     p_input->p_private = (void*)&socket_desc;
-    if( !( p_network = module_Need( p_input,
-                                    "network", "" ) ) )
+    if( !( p_network = module_Need( p_input, "network", NULL, 0 ) ) )
     {
         msg_Err( p_input, "failed to open a connection (udp)" );
         return( VLC_EGENERIC );
@@ -269,7 +268,7 @@ static int Activate( vlc_object_t * p_this )
     p_demux->i_handle = socket_desc.i_handle;
 
     p_input->p_private = (void*)&p_demux->mpeg;
-    p_demux->p_module = module_Need( p_input, "mpeg-system", NULL );
+    p_demux->p_module = module_Need( p_input, "mpeg-system", NULL, 0 );
     if( p_demux->p_module == NULL )
     {
         free( p_input->p_demux_data );

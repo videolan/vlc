@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: output.c,v 1.43 2004/01/26 21:37:58 hartman Exp $
+ * $Id: output.c,v 1.44 2004/03/03 20:39:52 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -41,7 +41,6 @@ int aout_OutputNew( aout_instance_t * p_aout,
                     audio_sample_format_t * p_format )
 {
     /* Retrieve user defaults. */
-    char * psz_name = config_GetPsz( p_aout, "aout" );
     int i_rate = config_GetInt( p_aout, "aout-rate" );
     vlc_value_t val, text;
     /* kludge to avoid a fpu error when rate is 0... */
@@ -55,8 +54,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     vlc_mutex_lock( &p_aout->output_fifo_lock );
 
     /* Find the best output plug-in. */
-    p_aout->output.p_module = module_Need( p_aout, "audio output", psz_name );
-    if ( psz_name != NULL ) free( psz_name );
+    p_aout->output.p_module = module_Need( p_aout, "audio output", "$aout", 0);
     if ( p_aout->output.p_module == NULL )
     {
         msg_Err( p_aout, "no suitable aout module" );

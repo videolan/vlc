@@ -2,7 +2,7 @@
  * demux.c
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: demux.c,v 1.12 2004/03/03 12:01:38 fenrir Exp $
+ * $Id: demux.c,v 1.13 2004/03/03 20:39:53 gbazin Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -238,7 +238,8 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
     /* Before module_Need (for var_Create...) */
     vlc_object_attach( p_demux, p_obj );
 
-    p_demux->p_module = module_Need( p_demux, "demux2", p_demux->psz_demux );
+    p_demux->p_module =
+        module_Need( p_demux, "demux2", p_demux->psz_demux, VLC_TRUE );
     if( p_demux->p_module == NULL )
     {
         vlc_object_detach( p_demux );

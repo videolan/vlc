@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.53 2004/02/23 21:00:37 sigmunau Exp $
+ * $Id: sap.c,v 1.54 2004/03/03 20:39:52 gbazin Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -263,7 +263,7 @@ static int Open( vlc_object_t *p_this )
         sock.i_ttl             = 0;
         p_intf->p_private = (void*) &sock;
 
-        p_network = module_Need( p_intf, "network", "ipv4" );
+        p_network = module_Need( p_intf, "network", "ipv4", VLC_TRUE );
         if( p_network )
         {
             p_sys->fd[0] = sock.i_handle;
@@ -299,7 +299,7 @@ static int Open( vlc_object_t *p_this )
         sock.i_ttl             = 0;
         p_intf->p_private = (void*) &sock;
 
-        p_network = module_Need( p_intf, "network", "ipv6" );
+        p_network = module_Need( p_intf, "network", "ipv6", VLC_TRUE );
         if( p_network )
         {
             p_sys->fd[1] = sock.i_handle;

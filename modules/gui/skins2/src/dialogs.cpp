@@ -2,7 +2,7 @@
  * dialogs.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.2 2004/01/25 17:20:19 kuehne Exp $
+ * $Id: dialogs.cpp,v 1.3 2004/03/03 20:39:52 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -132,7 +132,7 @@ bool Dialogs::init()
         return false;
     }
 
-    m_pModule = module_Need( m_pProvider, "dialogs provider", NULL );
+    m_pModule = module_Need( m_pProvider, "dialogs provider", NULL, 0 );
     if( m_pModule == NULL )
     {
         msg_Err( getIntf(), "No suitable dialogs provider found" );

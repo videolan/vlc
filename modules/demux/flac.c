@@ -2,7 +2,7 @@
  * flac.c : FLAC demux module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: flac.c,v 1.12 2004/03/03 11:40:19 fenrir Exp $
+ * $Id: flac.c,v 1.13 2004/03/03 20:39:51 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -136,7 +136,7 @@ static int Open( vlc_object_t * p_this )
             STREAMINFO_SIZE + 4 );
 
     p_sys->p_packetizer->p_module =
-        module_Need( p_sys->p_packetizer, "packetizer", NULL );
+        module_Need( p_sys->p_packetizer, "packetizer", NULL, 0 );
     if( !p_sys->p_packetizer->p_module )
     {
         if( p_sys->p_packetizer->fmt_in.p_extra )

@@ -1,7 +1,7 @@
 /* demux.c: DVD demux functions.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: demux.c,v 1.3 2003/09/07 22:49:05 fenrir Exp $
+ * $Id: demux.c,v 1.4 2004/03/03 20:39:51 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -85,7 +85,7 @@ int E_(DVDInit) ( vlc_object_t *p_this )
     }
 
     p_input->p_private = (void*)&p_demux->mpeg;
-    p_demux->p_module = module_Need( p_input, "mpeg-system", NULL );
+    p_demux->p_module = module_Need( p_input, "mpeg-system", NULL, 0 );
     if( p_demux->p_module == NULL )
     {
         free( p_input->p_demux_data );

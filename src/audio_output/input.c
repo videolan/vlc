@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: input.c,v 1.43 2004/01/06 12:02:05 zorglub Exp $
+ * $Id: input.c,v 1.44 2004/03/03 20:39:52 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -177,7 +177,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                     sizeof(audio_sample_format_t) );
 
             p_filter->p_module =
-                module_Need( p_filter,"audio filter", psz_parser );
+                module_Need( p_filter,"audio filter", psz_parser, VLC_TRUE );
 
             if( p_filter->p_module== NULL )
             {
@@ -527,7 +527,7 @@ static aout_filter_t * allocateUserChannelMixer( aout_instance_t * p_aout,
     memcpy( &p_channel_mixer->output, p_output_format,
                     sizeof(audio_sample_format_t) );
     p_channel_mixer->p_module =
-                    module_Need( p_channel_mixer,"audio filter", psz_name );
+        module_Need( p_channel_mixer,"audio filter", psz_name, VLC_TRUE );
     if( p_channel_mixer->p_module== NULL )
     {
         msg_Err( p_aout, "cannot add user channel mixer %s", psz_name );

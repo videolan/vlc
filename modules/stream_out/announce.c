@@ -220,7 +220,7 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout,
 
         /* Call the network module */
         p_sout->p_private = (void*) &socket_desc;
-        if( !( p_network = module_Need( p_sout, "network", "ipv4" ) ) )
+        if( !( p_network = module_Need(p_sout, "network", "ipv4", VLC_TRUE) ) )
         {
              msg_Warn( p_sout, "failed to open a connection (udp)" );
              return NULL;
@@ -260,7 +260,7 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout,
 
         /* Call the network module */
         p_sout->p_private = (void *) &socket_desc;
-        if( !( p_network = module_Need( p_sout, "network", "ipv6" ) ) )
+        if( !( p_network = module_Need(p_sout, "network", "ipv6", VLC_TRUE) ) )
         {
             msg_Warn( p_sout, "failed to open a connection (udp)" );
             return NULL;

@@ -2,7 +2,7 @@
  * loadsave.c : Playlist loading / saving functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: loadsave.c,v 1.10 2004/01/29 17:51:08 zorglub Exp $
+ * $Id: loadsave.c,v 1.11 2004/03/03 20:39:53 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -113,7 +113,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     vlc_mutex_lock( &p_playlist->object_lock );
 
     /* And call the module ! All work is done now */
-    p_module = module_Need( p_playlist, "playlist export",  psz_type);
+    p_module = module_Need( p_playlist, "playlist export", psz_type, VLC_TRUE);
     if( !p_module )
     {
         msg_Warn( p_playlist, "failed to export playlist" );

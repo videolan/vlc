@@ -2,7 +2,7 @@
  * coreaudio.c resampler based on CoreAudio's AudioConverter
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: coreaudio.c,v 1.4 2003/05/11 01:00:26 massiot Exp $
+ * $Id: coreaudio.c,v 1.5 2004/03/03 20:39:51 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -168,7 +168,7 @@ static int Create( vlc_object_t *p_this )
             sizeof(audio_sample_format_t) );
     p_sys->p_secondary_resampler->p_module
         = module_Need( p_sys->p_secondary_resampler, "audio filter",
-                       "ugly_resampler" );
+                       "ugly_resampler", VLC_TRUE );
     if ( p_sys->p_secondary_resampler->p_module == NULL )
     {
         vlc_object_detach( p_sys->p_secondary_resampler );

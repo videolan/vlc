@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2003 VideoLAN
- * $Id: qte.cpp,v 1.21 2004/01/26 16:45:02 zorglub Exp $
+ * $Id: qte.cpp,v 1.22 2004/03/03 20:39:52 gbazin Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -150,7 +150,8 @@ static int Open( vlc_object_t *p_this )
     p_vout->pf_display = Display;
 
 #ifdef NEED_QTE_MAIN
-    p_vout->p_sys->p_qte_main = module_Need( p_this, "gui-helper", "qte" );
+    p_vout->p_sys->p_qte_main =
+        module_Need( p_this, "gui-helper", "qte", VLC_TRUE );
     if( p_vout->p_sys->p_qte_main == NULL )
     {
         free( p_vout->p_sys );

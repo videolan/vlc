@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.291 2004/03/03 11:59:41 fenrir Exp $
+ * $Id: input.c,v 1.292 2004/03/03 20:39:53 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -673,7 +673,7 @@ static int InitThread( input_thread_t * p_input )
 
     /* Find and open appropriate access module */
     p_input->p_access = module_Need( p_input, "access",
-                                     p_input->psz_access );
+                                     p_input->psz_access, VLC_TRUE );
 
 #ifndef WIN32      /* Remove this gross hack from the win32 build as colons
                     * are forbidden in filenames on Win32. */
@@ -688,7 +688,7 @@ static int InitThread( input_thread_t * p_input )
         p_input->psz_dupsource = NULL;
 
         p_input->p_access = module_Need( p_input, "access",
-                                         p_input->psz_access );
+                                         p_input->psz_access, VLC_TRUE );
     }
 #endif
 
@@ -778,7 +778,9 @@ static int InitThread( input_thread_t * p_input )
     p_input->p_demux =
         module_Need( p_input, "demux",
                      (p_input->psz_demux && *p_input->psz_demux) ?
-                     p_input->psz_demux : "$demux" );
+                     p_input->psz_demux : "$demux",
+                     (p_input->psz_demux && *p_input->psz_demux) ?
+                     VLC_TRUE : VLC_FALSE );
 
     if( p_input->p_demux == NULL )
     {

@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: interface.c,v 1.113 2004/02/08 11:23:17 gbazin Exp $
+ * $Id: interface.c,v 1.114 2004/03/03 20:39:53 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -98,7 +98,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
     }
 
     /* Choose the best module */
-    p_intf->p_module = module_Need( p_intf, "interface", psz_module );
+    p_intf->p_module = module_Need( p_intf, "interface", psz_module, 0 );
 
     if( p_intf->p_module == NULL )
     {
@@ -296,7 +296,7 @@ static void RunInterface( intf_thread_t *p_intf )
         /* Make sure the old interface is completely uninitialised */
         module_Unneed( p_intf, p_intf->p_module );
 
-        p_intf->p_module = module_Need( p_intf, "interface", psz_intf );
+        p_intf->p_module = module_Need( p_intf, "interface", psz_intf, 0 );
         free( psz_intf );
 
         if( p_intf->p_module )

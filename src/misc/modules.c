@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: modules.c,v 1.145 2004/03/03 15:47:08 sigmunau Exp $
+ * $Id: modules.c,v 1.146 2004/03/03 20:39:53 gbazin Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -262,7 +262,7 @@ void __module_LoadPlugins( vlc_object_t * p_this )
  * This function returns the module that best fits the asked capabilities.
  *****************************************************************************/
 module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
-                          const char *psz_name )
+                          const char *psz_name, vlc_bool_t b_strict )
 {
     typedef struct module_list_t module_list_t;
 
@@ -299,7 +299,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     /* Count how many different shortcuts were asked for */
     if( psz_name && *psz_name )
     {
-        char *psz_parser;
+        char *psz_parser, *psz_last_shortcut;
 
         /* If the user wants none, give him none. */
         if( !strcmp( psz_name, "none" ) )
@@ -309,7 +309,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         }
 
         i_shortcuts++;
-        psz_shortcuts = strdup( psz_name );
+        psz_shortcuts = psz_last_shortcut = strdup( psz_name );
 
         for( psz_parser = psz_shortcuts; *psz_parser; psz_parser++ )
         {
@@ -317,7 +317,15 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
             {
                  *psz_parser = '\0';
                  i_shortcuts++;
+                 psz_last_shortcut = psz_parser + 1;
             }
+        }
+
+        /* Check if the user wants to override the "strict" mode */
+        if( psz_last_shortcut )
+        {
+            if( !strcmp(psz_last_shortcut, "none") ) b_strict = VLC_TRUE;
+            else if( !strcmp(psz_last_shortcut, "any") ) b_strict = VLC_FALSE;
         }
     }
 
@@ -377,10 +385,10 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
 
             while( i_short )
             {
-                /* If the last given shortcut is "none" and we couldn't
+                /* If we are in "strict" mode and we couldn't
                  * find the module in the list of provided shortcuts,
                  * then kick the bastard out of here!!! */
-                if( (i_short == 1) && !strcmp(psz_name, "none") )
+                if( i_short == 1 && b_strict )
                 {
                     b_trash = VLC_TRUE;
                     break;

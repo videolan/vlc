@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: filters.c,v 1.19 2004/01/06 12:02:05 zorglub Exp $
+ * $Id: filters.c,v 1.20 2004/03/03 20:39:52 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -52,7 +52,7 @@ static aout_filter_t * FindFilter( aout_instance_t * p_aout,
     memcpy( &p_filter->input, p_input_format, sizeof(audio_sample_format_t) );
     memcpy( &p_filter->output, p_output_format,
             sizeof(audio_sample_format_t) );
-    p_filter->p_module = module_Need( p_filter, "audio filter", NULL );
+    p_filter->p_module = module_Need( p_filter, "audio filter", NULL, 0 );
     if ( p_filter->p_module == NULL )
     {
         vlc_object_detach( p_filter );

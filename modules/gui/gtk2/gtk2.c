@@ -2,7 +2,7 @@
  * gtk2.c : Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2.c,v 1.2 2003/03/30 18:14:37 gbazin Exp $
+ * $Id: gtk2.c,v 1.3 2004/03/03 20:39:52 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -84,7 +84,8 @@ static int Open( vlc_object_t *p_this )
     }
 
 #ifdef NEED_GTK2_MAIN
-    p_intf->p_sys->p_gui_helper = module_Need( p_this, "gui-helper", "gtk2" );
+    p_intf->p_sys->p_gui_helper =
+        module_Need( p_this, "gui-helper", "gtk2", VLC_TRUE );
     if( p_intf->p_sys->p_gui_helper == NULL )
     {
         free( p_intf->p_sys );

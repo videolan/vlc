@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: stream_output.c,v 1.40 2004/02/22 16:08:47 fenrir Exp $
+ * $Id: stream_output.c,v 1.41 2004/03/03 20:39:53 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -41,9 +41,6 @@ static void sout_cfg_free( sout_cfg_t * );
 
 #define sout_stream_url_to_chain( p, s ) _sout_stream_url_to_chain( VLC_OBJECT(p), s )
 static char *_sout_stream_url_to_chain( vlc_object_t *, char * );
-
-#define module_NeedStrict(a,b,c) __module_NeedStrict(VLC_OBJECT(a),b,c)
-static module_t *__module_NeedStrict( vlc_object_t *, const char *, const char * );
 
 /*
  * Generic MRL parser
@@ -282,7 +279,7 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
     p_access->pf_write   = NULL;
 
     p_access->p_module   =
-        module_NeedStrict( p_access, "sout access", p_access->psz_access );
+        module_Need( p_access, "sout access", p_access->psz_access, VLC_TRUE );
 
     if( !p_access->p_module )
     {
@@ -373,7 +370,7 @@ sout_mux_t * sout_MuxNew         ( sout_instance_t *p_sout,
     p_mux->p_sys        = NULL;
 
     p_mux->p_module     =
-        module_NeedStrict( p_mux, "sout mux", p_mux->psz_mux );
+        module_Need( p_mux, "sout mux", p_mux->psz_mux, VLC_TRUE );
 
     if( p_mux->p_module == NULL )
     {
@@ -1213,7 +1210,7 @@ sout_stream_t *sout_stream_new( sout_instance_t *p_sout,
     msg_Dbg( p_sout, "stream=`%s'", p_stream->psz_name );
 
     p_stream->p_module =
-        module_NeedStrict( p_stream, "sout stream", p_stream->psz_name );
+        module_Need( p_stream, "sout stream", p_stream->psz_name, VLC_TRUE );
 
     if( !p_stream->p_module )
     {
@@ -1263,28 +1260,3 @@ static char *_sout_stream_url_to_chain( vlc_object_t *p_this, char *psz_url )
     mrl_Clean( &mrl );
     return( psz_chain );
 }
-
-/*****************************************************************************/
-static module_t *__module_NeedStrict( vlc_object_t *p_obj, const char *psz_capacity, const char *psz_name )
-{
-    module_t *p_module;
-
-    if( !psz_name || !*psz_name )
-    {
-        p_module = module_Need( p_obj, psz_capacity, psz_name );
-    }
-    else
-    {
-        char *psz_name_strict = malloc( strlen( psz_name ) + 6 );
-        strcpy( psz_name_strict, psz_name );
-        strcat( psz_name_strict, ",none" );
-
-        p_module = module_Need( p_obj, psz_capacity, psz_name_strict );
-
-        free( psz_name_strict );
-    }
-
-    return p_module;
-}
-
-

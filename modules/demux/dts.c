@@ -2,7 +2,7 @@
  * dts.c : raw DTS stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dts.c,v 1.11 2004/03/03 11:40:19 fenrir Exp $
+ * $Id: dts.c,v 1.12 2004/03/03 20:39:51 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -173,7 +173,7 @@ static int Open( vlc_object_t * p_this )
                     VLC_FOURCC( 'd', 't', 's', ' ' ) );
 
     p_sys->p_packetizer->p_module =
-        module_Need( p_sys->p_packetizer, "packetizer", NULL );
+        module_Need( p_sys->p_packetizer, "packetizer", NULL, 0 );
     if( !p_sys->p_packetizer->p_module )
     {
         msg_Err( p_demux, "cannot find DTS packetizer" );

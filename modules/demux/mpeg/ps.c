@@ -2,7 +2,7 @@
  * ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004, 2004 VideoLAN
- * $Id: ps.c,v 1.17 2004/01/25 20:05:28 hartman Exp $
+ * $Id: ps.c,v 1.18 2004/03/03 20:39:52 gbazin Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -123,7 +123,7 @@ static int Activate( vlc_object_t * p_this )
     }
 
     p_input->p_private = (void*)&p_demux->mpeg;
-    p_demux->p_module = module_Need( p_input, "mpeg-system", NULL );
+    p_demux->p_module = module_Need( p_input, "mpeg-system", NULL, 0 );
     if( p_demux->p_module == NULL )
     {
         free( p_input->p_demux_data );

@@ -2,7 +2,7 @@
  * transcode.c: transcoding stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: transcode.c,v 1.81 2004/03/03 11:29:26 massiot Exp $
+ * $Id: transcode.c,v 1.82 2004/03/03 20:39:52 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -786,7 +786,7 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
     id->p_encoder->fmt_out.i_bitrate = id->f_dst.i_bitrate;
 
     id->p_encoder->p_module =
-        module_Need( id->p_encoder, "encoder", NULL );
+        module_Need( id->p_encoder, "encoder", NULL, 0 );
     if( !id->p_encoder->p_module )
     {
         vlc_object_destroy( id->p_encoder );
@@ -1178,7 +1178,7 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     id->p_vresample      = NULL;
 
     id->p_encoder->p_module =
-        module_Need( id->p_encoder, "encoder", NULL );
+        module_Need( id->p_encoder, "encoder", NULL, 0 );
 
     if( !id->p_encoder->p_module )
     {
@@ -1375,7 +1375,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             id->p_encoder->fmt_out.p_extra = NULL;
 
             id->p_encoder->p_module =
-                module_Need( id->p_encoder, "encoder", NULL );
+                module_Need( id->p_encoder, "encoder", NULL, 0 );
             if( !id->p_encoder->p_module )
             {
                 vlc_object_destroy( id->p_encoder );

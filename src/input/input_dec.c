@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_dec.c,v 1.93 2004/03/03 11:12:08 massiot Exp $
+ * $Id: input_dec.c,v 1.94 2004/03/03 20:39:53 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -106,7 +106,7 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
             return NULL;
         }
 
-        p_dec->p_module = module_Need( p_dec, "packetizer", "$packetizer" );
+        p_dec->p_module = module_Need( p_dec, "packetizer", "$packetizer", 0 );
     }
     else
     {
@@ -119,7 +119,7 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
         }
 
         /* default Get a suitable decoder module */
-        p_dec->p_module = module_Need( p_dec, "decoder", "$codec" );
+        p_dec->p_module = module_Need( p_dec, "decoder", "$codec", 0 );
     }
 
     if( !p_dec->p_module )

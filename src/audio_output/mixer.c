@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: mixer.c,v 1.29 2004/01/06 12:02:05 zorglub Exp $
+ * $Id: mixer.c,v 1.30 2004/03/03 20:39:52 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -43,7 +43,7 @@
  *****************************************************************************/
 int aout_MixerNew( aout_instance_t * p_aout )
 {
-    p_aout->mixer.p_module = module_Need( p_aout, "audio mixer", NULL );
+    p_aout->mixer.p_module = module_Need( p_aout, "audio mixer", NULL, 0 );
     if ( p_aout->mixer.p_module == NULL )
     {
         msg_Err( p_aout, "no suitable aout mixer" );

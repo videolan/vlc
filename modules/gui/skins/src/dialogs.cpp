@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.17 2003/12/11 02:26:03 asmax Exp $
+ * $Id: dialogs.cpp,v 1.18 2004/03/03 20:39:52 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -63,7 +63,7 @@ Dialogs::Dialogs( intf_thread_t *_p_intf )
         return;
     }
 
-    p_module = module_Need( p_provider, "dialogs provider", NULL );
+    p_module = module_Need( p_provider, "dialogs provider", NULL, 0 );
     if( p_module == NULL )
     {
         msg_Err( p_intf, "no suitable dialogs provider found" );

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: video_output.c,v 1.245 2004/01/25 17:16:06 zorglub Exp $
+ * $Id: video_output.c,v 1.246 2004/03/03 20:39:53 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -403,10 +403,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
 
     /* Create the vout thread */
     p_vout->p_module = module_Need( p_vout,
-                           ( p_vout->psz_filter_chain &&
-                               *p_vout->psz_filter_chain ) ?
-                           "video filter" : "video output",
-                           psz_plugin );
+        ( p_vout->psz_filter_chain && *p_vout->psz_filter_chain ) ?
+        "video filter" : "video output", psz_plugin, 0 );
 
     if( psz_plugin ) free( psz_plugin );
     if( p_vout->p_module == NULL )
@@ -416,8 +414,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
         return NULL;
     }
 
-    p_vout->p_text_renderer_module = module_Need( p_vout, "text renderer",
-                                                  NULL );
+    p_vout->p_text_renderer_module =
+        module_Need( p_vout, "text renderer", NULL, 0 );
     if( p_vout->p_text_renderer_module == NULL )
     {
         msg_Warn( p_vout, "no suitable text renderer module" );
@@ -669,7 +667,7 @@ static int InitThread( vout_thread_t *p_vout )
         p_vout->b_direct = 0;
 
         /* Choose the best module */
-        p_vout->chroma.p_module = module_Need( p_vout, "chroma", NULL );
+        p_vout->chroma.p_module = module_Need( p_vout, "chroma", NULL, 0 );
 
         if( p_vout->chroma.p_module == NULL )
         {

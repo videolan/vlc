@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.65 2003/10/04 12:25:00 sam Exp $
+ * $Id: modules.h,v 1.66 2004/03/03 20:39:51 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -126,8 +126,8 @@ void  __module_EndBank         ( vlc_object_t * );
 #define module_ResetBank(a)    __module_ResetBank(VLC_OBJECT(a))
 void  __module_ResetBank       ( vlc_object_t * );
 
-#define module_Need(a,b,c) __module_Need(VLC_OBJECT(a),b,c)
-VLC_EXPORT( module_t *, __module_Need, ( vlc_object_t *, const char *, const char * ) );
+#define module_Need(a,b,c,d) __module_Need(VLC_OBJECT(a),b,c,d)
+VLC_EXPORT( module_t *, __module_Need, ( vlc_object_t *, const char *, const char *, vlc_bool_t ) );
 #define module_Unneed(a,b) __module_Unneed(VLC_OBJECT(a),b)
 VLC_EXPORT( void, __module_Unneed, ( vlc_object_t *, module_t * ) );
 

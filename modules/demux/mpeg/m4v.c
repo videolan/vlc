@@ -2,7 +2,7 @@
  * m4v.c : MPEG-4 Video demuxer
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: m4v.c,v 1.11 2003/12/22 02:24:52 sam Exp $
+ * $Id: m4v.c,v 1.12 2004/03/03 20:39:52 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -122,10 +122,11 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_packetizer->pf_decode_video = NULL;
     p_sys->p_packetizer->pf_decode_sub = NULL;
     p_sys->p_packetizer->pf_packetize = NULL;
-    es_format_Init( &p_sys->p_packetizer->fmt_in,  VIDEO_ES,   VLC_FOURCC( 'm', 'p', '4', 'v' ) );
+    es_format_Init( &p_sys->p_packetizer->fmt_in, VIDEO_ES,
+                    VLC_FOURCC( 'm', 'p', '4', 'v' ) );
     es_format_Init( &p_sys->p_packetizer->fmt_out, UNKNOWN_ES, 0 );
     p_sys->p_packetizer->p_module =
-        module_Need( p_sys->p_packetizer, "packetizer", NULL );
+        module_Need( p_sys->p_packetizer, "packetizer", NULL, 0 );
 
     if( p_sys->p_packetizer->p_module == NULL)
     {

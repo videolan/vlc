@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.22 2004/03/03 10:51:55 massiot Exp $
+ * $Id: udp.c,v 1.23 2004/03/03 20:39:51 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -203,7 +203,7 @@ static int Open( vlc_object_t *p_this )
         socket_desc.i_ttl = atoi( psz_val );
     }
     p_sys->p_thread->p_private = (void*)&socket_desc;
-    if( !( p_network = module_Need( p_sys->p_thread, "network", "" ) ) )
+    if( !( p_network = module_Need( p_sys->p_thread, "network", NULL, 0 ) ) )
     {
         msg_Err( p_access, "failed to open a connection (udp)" );
         return VLC_EGENERIC;
