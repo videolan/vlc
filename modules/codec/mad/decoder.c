@@ -48,14 +48,8 @@ static void EndThread      ( mad_adec_thread_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define DOWNSCALE_TEXT N_("mad audio downscale routine (fast,mpg321)")
-#define DOWNSCALE_LONGTEXT N_( \
-    "Specify the mad audio downscale routine you want to use. By default " \
-    "the mad plugin will use the fastest routine.")
-
 vlc_module_begin();
     add_category_hint( N_("Libmad"), NULL );
-    add_string( "downscale", "fast", NULL, DOWNSCALE_TEXT, DOWNSCALE_LONGTEXT );
     set_description( _("libmad MPEG 1/2/3 audio decoder") );
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, NULL );
@@ -143,38 +137,15 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 static int InitThread( mad_adec_thread_t * p_dec )
 {
     decoder_fifo_t * p_fifo = p_dec->p_fifo;
-    char *psz_downscale = NULL;
 
     /* Initialize the thread properties */
     p_dec->p_aout = NULL;
     p_dec->p_aout_input = NULL;
     p_dec->output_format.i_format = AOUT_FMT_FIXED32;
-    p_dec->output_format.i_channels = 2; /* FIXME ! */
 
     /*
      * Properties of audio for libmad
      */
-
-    /* Look what scaling method was requested by the user */
-    psz_downscale = config_GetPsz( p_fifo, "downscale" );
-
-    if ( strncmp(psz_downscale,"fast",4)==0 )
-    {
-        p_dec->audio_scaling = FAST_SCALING;
-        msg_Dbg( p_fifo, "downscale fast selected" );
-    }
-    else if ( strncmp(psz_downscale,"mpg321",7)==0 )
-    {
-        p_dec->audio_scaling = MPG321_SCALING;
-        msg_Dbg( p_fifo, "downscale mpg321 selected" );
-    }
-    else
-    {
-        p_dec->audio_scaling = FAST_SCALING;
-        msg_Dbg( p_fifo, "downscale default fast selected" );
-    }
-
-    if (psz_downscale) free(psz_downscale);
 
     /* Initialize the libmad decoder structures */
     p_dec->i_current_pts = p_dec->i_next_pts = 0;
@@ -193,9 +164,6 @@ static int InitThread( mad_adec_thread_t * p_dec )
     /*
      * Initialize the input properties
      */
-
-    /* Init the Bitstream */
-    InitBitstream( &p_dec->bit_stream, p_dec->p_fifo, NULL, NULL );
 
     /* Get the first data packet. */
     vlc_mutex_lock( &p_fifo->data_lock );

@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.12 2002/09/16 20:46:38 massiot Exp $
+ * $Id: mixer.c,v 1.13 2002/09/19 21:56:40 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -86,8 +86,8 @@ static int MixBuffer( aout_instance_t * p_aout )
         /* The output is _very_ late. This can only happen if the user
          * pauses the stream (or if the decoder is buggy, which cannot
          * happen :). */
-        msg_Warn( p_aout, "Output PTS is out of range (%lld), clearing out",
-                  start_date );
+        msg_Warn( p_aout, "output PTS is out of range (%lld), clearing out",
+                  mdate() - start_date );
         aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
         aout_DateSet( &exact_start_date, 0 );
         start_date = 0;

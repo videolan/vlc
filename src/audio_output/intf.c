@@ -2,7 +2,7 @@
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.2 2002/09/18 21:21:24 massiot Exp $
+ * $Id: intf.c,v 1.3 2002/09/19 21:56:40 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -41,21 +41,18 @@
  *
  * Here is a schematic of the i_volume range :
  * 
- * |------------------+------------------------------------+--------------|
- * 0             pi_low_soft                          pi_high_soft       1024
+ * |------------------------------+---------------------------------------|
+ * 0                           pi_soft                                   1024
  *
- * Between pi_low_soft and pi_high_soft, the volume is done in hardware
- * by the output module. Outside, the output module will change
- * p_aout->mixer.i_multiplier (done in software). This scaling may result
- * in cropping errors and should be avoided as much as possible.
+ * Between 0 and pi_soft, the volume is done in hardware by the output
+ * module. Above, the output module will change p_aout->mixer.i_multiplier
+ * (done in software). This scaling may result * in cropping errors and
+ * should be avoided as much as possible.
  *
- * It is legal to have *pi_low_soft == *pi_high_soft, and do everything in
- * software. In that case, it is recommended to use *pi_low_soft == 256,
- * along with the utility functions provided in this file.
- *
- * It is also legal to have *pi_low_soft == 0 and *pi_high_soft == 1024, and
- * completely avoid software scaling. However, some streams (esp. A/52)
- * are encoded with a very low volume and users may complain.
+ * It is legal to have *pi_soft == 0, and do everything in software.
+ * It is also legal to have *pi_soft == 1024, and completely avoid
+ * software scaling. However, some streams (esp. A/52) are encoded with
+ * a very low volume and users may complain.
  */
 
 /*****************************************************************************
@@ -77,7 +74,7 @@ int aout_VolumeGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
 
     i_result = p_aout->output.pf_volume_get( p_aout, pi_volume );
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    vlc_mutex_unlock( &p_aout->mixer_lock );
     return i_result;
 }
 
@@ -100,15 +97,14 @@ int aout_VolumeSet( aout_instance_t * p_aout, audio_volume_t i_volume )
 
     i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    vlc_mutex_unlock( &p_aout->mixer_lock );
     return i_result;
 }
 
 /*****************************************************************************
  * aout_VolumeInfos : get the boundaries pi_low_soft and pi_high_soft
  *****************************************************************************/
-int aout_VolumeInfos( aout_instance_t * p_aout, audio_volume_t * pi_low_soft,
-                      audio_volume_t * pi_high_soft )
+int aout_VolumeInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )
 {
     int i_result;
 
@@ -122,10 +118,9 @@ int aout_VolumeInfos( aout_instance_t * p_aout, audio_volume_t * pi_low_soft,
         return -1;
     }
 
-    i_result = p_aout->output.pf_volume_infos( p_aout, pi_low_soft,
-                                               pi_high_soft );
+    i_result = p_aout->output.pf_volume_infos( p_aout, pi_soft );
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    vlc_mutex_unlock( &p_aout->mixer_lock );
     return i_result;
 }
 
@@ -162,7 +157,7 @@ int aout_VolumeUp( aout_instance_t * p_aout, int i_nb_steps,
 
     i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    vlc_mutex_unlock( &p_aout->mixer_lock );
 
     if ( pi_volume != NULL ) *pi_volume = i_volume;
     return i_result;
@@ -203,7 +198,7 @@ int aout_VolumeDown( aout_instance_t * p_aout, int i_nb_steps,
 
     i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    vlc_mutex_unlock( &p_aout->mixer_lock );
 
     if ( pi_volume != NULL ) *pi_volume = i_volume;
     return i_result;
@@ -219,33 +214,28 @@ void aout_VolumeSoftInit( aout_instance_t * p_aout )
 {
     int i_volume;
 
-    i_volume = config_GetInt( p_aout, "volume" );
-    if ( i_volume == -1 )
-    {
-        p_aout->output.i_volume = AOUT_VOLUME_DEFAULT;
-    }
-    else
-    {
-        p_aout->output.i_volume = i_volume;
-    }
-
     p_aout->output.pf_volume_infos = aout_VolumeSoftInfos;
     p_aout->output.pf_volume_get = aout_VolumeSoftGet;
     p_aout->output.pf_volume_set = aout_VolumeSoftSet;
+
+    i_volume = config_GetInt( p_aout, "volume" );
+    if ( i_volume == -1 )
+    {
+        i_volume = AOUT_VOLUME_DEFAULT;
+    }
+
+    aout_VolumeSoftSet( p_aout, i_volume );
 }
 
 /* Placeholder for pf_volume_infos(). */
-int aout_VolumeSoftInfos( aout_instance_t * p_aout,
-                          audio_volume_t * pi_low_soft,
-                          audio_volume_t * pi_high_soft )
+int aout_VolumeSoftInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )
 {
-    *pi_low_soft = *pi_high_soft = AOUT_VOLUME_DEFAULT;
+    *pi_soft = 0;
     return 0;
 }
 
 /* Placeholder for pf_volume_get(). */
-int aout_VolumeSoftGet( aout_instance_t * p_aout,
-                        audio_volume_t * pi_volume )
+int aout_VolumeSoftGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
 {
     *pi_volume = p_aout->output.i_volume;
     return 0;
@@ -253,10 +243,10 @@ int aout_VolumeSoftGet( aout_instance_t * p_aout,
 
 
 /* Placeholder for pf_volume_set(). */
-int aout_VolumeSoftSet( aout_instance_t * p_aout,
-                        audio_volume_t i_volume )
+int aout_VolumeSoftSet( aout_instance_t * p_aout, audio_volume_t i_volume )
 {
-    aout_MixerMultiplierSet( p_aout, (float)(i_volume / AOUT_VOLUME_DEFAULT) );
+    aout_MixerMultiplierSet( p_aout, (float)i_volume / AOUT_VOLUME_DEFAULT );
+    p_aout->output.i_volume = i_volume;
     return 0;
 }
 
@@ -274,9 +264,7 @@ void aout_VolumeNoneInit( aout_instance_t * p_aout )
 }
 
 /* Placeholder for pf_volume_infos(). */
-int aout_VolumeNoneInfos( aout_instance_t * p_aout,
-                          audio_volume_t * pi_low_soft,
-                          audio_volume_t * pi_high_soft )
+int aout_VolumeNoneInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )
 {
     return -1;
 }

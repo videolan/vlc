@@ -40,7 +40,7 @@ struct module_symbols_t
     int (* aout_FormatNbChannels_inner) ( audio_sample_format_t * p_format ) ;
     int (* aout_VolumeDown_inner) ( aout_instance_t *, int, audio_volume_t * ) ;
     int (* aout_VolumeGet_inner) ( aout_instance_t *, audio_volume_t * ) ;
-    int (* aout_VolumeInfos_inner) ( aout_instance_t *, audio_volume_t *, audio_volume_t * ) ;
+    int (* aout_VolumeInfos_inner) ( aout_instance_t *, audio_volume_t * ) ;
     int (* aout_VolumeSet_inner) ( aout_instance_t *, audio_volume_t ) ;
     int (* aout_VolumeUp_inner) ( aout_instance_t *, int, audio_volume_t * ) ;
     int (* input_AccessInit_inner) ( input_thread_t * ) ;

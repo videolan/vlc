@@ -91,6 +91,7 @@ enum mad_flow libmad_input( void *p_data, struct mad_stream *p_stream )
             /* Store timestamp for this frame */
             p_dec->i_current_pts = p_dec->p_fifo->p_first->i_pts;
         }
+        p_dec->p_fifo->p_first->i_pts = 0;
 
         /* Fill-in the buffer. If an error occurs print a message and leave
          * the decoding loop. If the end of stream is reached we also leave
@@ -144,13 +145,14 @@ enum mad_flow libmad_output( void *p_data, struct mad_header const *p_header,
     aout_buffer_t *     p_buffer;
     mad_fixed_t const * p_left = p_pcm->samples[0];
     mad_fixed_t const * p_right = p_pcm->samples[1];
-    register int        i_samples = p_pcm->length;
+    int                 i_samples = p_pcm->length;
     mad_fixed_t *       p_samples;
 
     /* Creating the audio output fifo. Assume the samplerate and nr of channels
      * from the first decoded frame is right for the entire audio track. */
     if( (p_dec->p_aout_input != NULL) &&
-        (p_dec->output_format.i_rate != p_pcm->samplerate) )
+        (p_dec->output_format.i_rate != p_pcm->samplerate
+           || p_dec->output_format.i_channels != p_pcm->channels) )
     {
         /* Parameters changed - this should not happen. */
         aout_InputDelete( p_dec->p_aout, p_dec->p_aout_input );
@@ -161,7 +163,7 @@ enum mad_flow libmad_output( void *p_data, struct mad_header const *p_header,
     if( p_dec->p_aout_input == NULL )
     {
         p_dec->output_format.i_rate = p_pcm->samplerate;
-        /* p_dec->output_format.i_channels = p_pcm->channels; */
+        p_dec->output_format.i_channels = p_pcm->channels;
         aout_DateInit( &p_dec->end_date, p_pcm->samplerate );
         p_dec->p_aout_input = aout_InputNew( p_dec->p_fifo,
                                              &p_dec->p_aout,
@@ -221,12 +223,8 @@ enum mad_flow libmad_output( void *p_data, struct mad_header const *p_header,
         }
         break;
     case 1:
-        while( i_samples-- )
-        {
-            *p_samples++ = *p_left;
-            *p_samples++ = *p_left++;
-        }
-        break;
+        p_dec->p_fifo->p_vlc->pf_memcpy( p_samples, p_left,
+                                         i_samples * sizeof(mad_fixed_t) );
     default:
         msg_Err( p_dec->p_fifo, "cannot interleave %i channels",
                                 p_pcm->channels );

@@ -38,9 +38,6 @@ typedef struct mad_adec_thread_s
      */
     vlc_thread_t        thread_id;                /* id for thread functions */
 
-    /* The bit stream structure handles the PES stream at the bit level */
-    bit_stream_t        bit_stream;
-
     /*
      * Input properties
      */
@@ -57,9 +54,6 @@ typedef struct mad_adec_thread_s
     aout_input_t *      p_aout_input; /* opaque */
     audio_sample_format_t output_format;
     audio_date_t        end_date;
-
-    enum mad_scaling	audio_scaling;
-
 } mad_adec_thread_t;
 
 /*****************************************************************************

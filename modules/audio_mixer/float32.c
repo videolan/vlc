@@ -2,7 +2,7 @@
  * float32.c : precise float32 audio mixer implementation
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32.c,v 1.2 2002/09/16 20:46:37 massiot Exp $
+ * $Id: float32.c,v 1.3 2002/09/19 21:56:39 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -110,6 +110,7 @@ static void MeanWords( float * p_out, const float * p_in, size_t i_nb_words,
 static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 {
     int i_nb_inputs = p_aout->i_nb_inputs;
+    float f_multiplier = p_aout->mixer.f_multiplier;
     int i_input;
 
     for ( i_input = 0; i_input < i_nb_inputs; i_input++ )
@@ -136,12 +137,12 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
                     if ( !i_input )
                     {
                         ScaleWords( p_out, p_in, i_available_words,
-                                    i_nb_inputs, p_aout->mixer.f_multiplier );
+                                    i_nb_inputs, f_multiplier );
                     }
                     else
                     {
                         MeanWords( p_out, p_in, i_available_words,
-                                   i_nb_inputs, p_aout->mixer.f_multiplier );
+                                   i_nb_inputs, f_multiplier );
                     }
                 }
 
@@ -165,12 +166,12 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
                     if ( !i_input )
                     {
                         ScaleWords( p_out, p_in, i_nb_words, i_nb_inputs,
-                                    p_aout->mixer.f_multiplier );
+                                    f_multiplier );
                     }
                     else
                     {
                         MeanWords( p_out, p_in, i_nb_words, i_nb_inputs,
-                                   p_aout->mixer.f_multiplier );
+                                   f_multiplier );
                     }
                 }
                 p_input->p_first_byte_to_mix = (void *)(p_in

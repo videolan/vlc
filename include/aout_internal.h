@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.18 2002/09/18 21:21:23 massiot Exp $
+ * $Id: aout_internal.h,v 1.19 2002/09/19 21:56:39 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -166,7 +166,7 @@ typedef struct aout_output_t
     void                 (* pf_play)( aout_instance_t * );
     int                  (* pf_volume_get )( aout_instance_t *, audio_volume_t * );
     int                  (* pf_volume_set )( aout_instance_t *, audio_volume_t );
-    int                  (* pf_volume_infos )( aout_instance_t *, audio_volume_t *, audio_volume_t * );
+    int                  (* pf_volume_infos )( aout_instance_t *, audio_volume_t * );
     int                     i_nb_samples;
 
     /* Current volume for the output - it's just a placeholder, the plug-in
@@ -259,9 +259,9 @@ void aout_FifoDestroy( aout_instance_t * p_aout, aout_fifo_t * p_fifo );
 VLC_EXPORT( void, aout_VolumeSoftInit, ( aout_instance_t * ) );
 int aout_VolumeSoftGet( aout_instance_t *, audio_volume_t * );
 int aout_VolumeSoftSet( aout_instance_t *, audio_volume_t );
-int aout_VolumeSoftInfos( aout_instance_t *, audio_volume_t *, audio_volume_t * );
+int aout_VolumeSoftInfos( aout_instance_t *, audio_volume_t * );
 VLC_EXPORT( void, aout_VolumeNoneInit, ( aout_instance_t * ) );
 int aout_VolumeNoneGet( aout_instance_t *, audio_volume_t * );
 int aout_VolumeNoneSet( aout_instance_t *, audio_volume_t );
-int aout_VolumeNoneInfos( aout_instance_t *, audio_volume_t *, audio_volume_t * );
+int aout_VolumeNoneInfos( aout_instance_t *, audio_volume_t * );
 

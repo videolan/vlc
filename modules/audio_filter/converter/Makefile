@@ -7,3 +7,4 @@ a52tofloat32_SOURCES = a52tofloat32.c
 fixed32tos16_SOURCES = fixed32tos16.c
 fixed32tofloat32_SOURCES = fixed32tofloat32.c
 s16tofloat32_SOURCES = s16tofloat32.c
+s16tofloat32swab_SOURCES = s16tofloat32swab.C
