@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.35 2003/06/11 10:42:34 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.36 2003/06/20 19:50:29 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -269,12 +269,18 @@ void VlcProc::InterfaceRefresh( bool All )
         else
             EnabledEvent( "next", true );
 
-
-        // Update file name text
+        // Update file name
         if( PlayList->i_index != Sys->i_index )
         {
+            string long_name = PlayList->pp_items[PlayList->i_index]->psz_name;
+            int pos = long_name.rfind( DIRECTORY_SEPARATOR, long_name.size() );
+
+            // Complete file name
             Thema->EvtBank->Get( "file_name" )->PostTextMessage(
                 PlayList->pp_items[PlayList->i_index]->psz_name );
+            // File name without path
+            Thema->EvtBank->Get( "title" )->PostTextMessage(
+                PlayList->pp_items[PlayList->i_index]->psz_name + pos + 1 );
         }
 
         // Update playlists

@@ -75,7 +75,6 @@ OK, let's go for an enumeration of the different tags and theor attributes :
        border of the screen and a window is less than this value, the window
        will stick to the border. 0 means no magnetism.
        Default is "9".
-     - log: not yet supported.
 
  - ThemeInfo: You can enter here some information about you (but this
    information is currently unused by VLC...)
@@ -90,37 +89,37 @@ OK, let's go for an enumeration of the different tags and theor attributes :
    bitmap file you have.
    Attributes:
      - id: this is the name of the bitmap that will be used with controls
-       ( 2 bitmaps shouldn't have the same name).
+       (2 bitmaps shouldn't have the same name).
      - alphacolor: this is the transparency color of the bitmap. It must be
        indicated with the following format: "#RRGGBB" (where RR stands for the
        hexadecimal value of the red component, GG for the green one, and BB for
        the blue one).
      - file: this attribute is used to indicate the path and name of the bitmap
        file used. This path can be absolute (but you should avoid it as often as
-       possible), else it will be relative to the path of the xml file.
+       possible), or relative to the path of the xml file.
 
  - Event: An action that will be associated to a control later.
    Attributes :
      - id: this is the name of the event that will be used with controls.
        (2 events shouldn't have the same name).
-     - event: see event.howto.
+     - event: see events-howto.txt
      - key: this is the shortcut key associated with the event. This means that
        the event will be executed when hitting the correspounding key. It must
-       be indicated with following format : "MOD+L" where MOD is "CTRL" or "ALT"
-       if control or alt keys or associated the key and "L" is the letter and
-       must be in uppercase format ("MOD+" is optionnal).
+       be indicated with the following format : "MOD+L" where "MOD" is the
+       modifier key ("CTRL" or "ALT") and "L" is the letter in uppercase
+       ("MOD+" is optionnal).
        Default is "none".
 
  - Font: Declares a font to be used in a TextControl or PlaylistControl.
    Attributes :
-      - id: this is the name of the event that will be used with controls
+      - id: this is the name of the font that will be used with controls.
         Default is "default". (2 fonts shouldn't have the same name).
       - font: this is the name of the font
         Default is "arial".
-      - size: this is the size of the police in point
+      - size: this is the size of the font in points (pt).
         Default is "12".
       - color: this is the color of the font with the following format,
-        "#RRGGBB" (see bitmap).
+        "#RRGGBB" (see Bitmap).
         Default is "#000000" (black).
       - weight: this is the weight of the font. It must be between 0 and 1000
         Default is "400" (normal weight). Fewer is thinner...
@@ -131,7 +130,7 @@ OK, let's go for an enumeration of the different tags and theor attributes :
 
  - Window: A window that will appear on screen.
       - id: this is the name of the window (it will be only used for events
-        but it is important : 2 windows shouldn't have the same name).
+        but it is important: 2 windows shouldn't have the same name).
       - visible: sets if the window should appear or not at the launch of VLC.
         Default is "true".
       - x: sets the left position of the window.
@@ -142,7 +141,7 @@ OK, let's go for an enumeration of the different tags and theor attributes :
         transition.
         Default is "500".
       - alpha: sets the transparency of the window. It must be between 1 and
-        255. 1 is nearly total transaprency and should be avoid. 255 is total
+        255. 1 is nearly total transaprency and should be avoided. 255 is total
         opacity.
         Default is "255". You should use high values.
       - movealpha: sets the transparency of the window when the window is
@@ -176,8 +175,8 @@ OK, let's go for an enumeration of the different tags and theor attributes :
      - y: ...
        Default is "0".
      - priority: priority of anchor (see the previous description).
-       No default, must de defined !!!
-     - range: Range of action in pixel of the anchor.
+       No default, must de defined!
+     - range: Range of action of the anchor in pixels.
        Default is "10".
 
  - ImageControl, ButtonControl, CheckBoxControl, TextControl, SliderControl,
@@ -190,29 +189,29 @@ OK, let's go for an enumeration of the different tags and theor attributes :
    possibility to associate many events to a control at once, separing them
    with semicolons.
 
- - ImageControl: Creates a simple image. Usefull for backgrounds.
+ - ImageControl: Creates a simple image. Useful for backgrounds.
      - image: this attribute must be set to an identifiant of a Bitmap tag.
      - onclick: the 'event' attribute can be used to associate an event to the
        image (the event is triggered by a click on the image).
        Typical use: an Event made with 'WINDOW_MOVE(window)' (where 'window' is
-       the name of a Window) can be associated to an ImageControl of this
+       the id of a Window) can be associated to an ImageControl of this
        Window. Hence the Window can be moved via the image...
 
  - ButtonControl: Creates a button.
-     - up: identifiants of a bitmap. Used for drawing the up state of the
+     - up: identifiant of a Bitmap. Used for drawing the up state of the
        button.
-     - down: identifiants of a bitmap. Used for drawinf the down state of the
+     - down: identifiant of a Bitmap. Used for drawing the down state of the
        button.
-     - disabled : identifiants of a bitmap. Used for drawing the disabled state
+     - disabled : identifiant of a Bitmap. Used for drawing the disabled state
        of the button.
      - onclick: event executed when clicking on the button.
        Default is "none".
-     - onmouseover: event executed when the mouse cursor enter the button.
+     - onmouseover: event executed when the mouse cursor enters the button.
        Default is "none".
      - onmouseout: event executed when the mouse cursor leaves the button.
        Default is "none".
      - tooltiptext : used to display a tooltip.
-       Default is "none". (no tooltip).
+       Default is "none" (no tooltip).
 
  - CheckBoxControl: Creates a checkbox, i.e. a button with 2 states
    (checked/unchecked). So you need 6 images for a full-featured checkbox: each
@@ -220,31 +219,31 @@ OK, let's go for an enumeration of the different tags and theor attributes :
    and an image for the disabled control. If you supply only the basic images,
    the other ones will be identical.
    Attributes:
-     - img1: identifiants of a bitmap. Used for drawing control in state 1.
+     - img1: identifiant of a Bitmap. Used for drawing control in state 1.
      - clickimg1: identifiants of a bitmap. Used for drawing control when
        clicking on it in state 1.
        Default is the value of 'img1' attribute.
-     - img2: identifiants of a bitmap. Used for drawing control in state 2.
-     - clickimg2: identifiants of a bitmap. Used for drawing control when
+     - img2: identifiant of a Bitmap. Used for drawing control in state 2.
+     - clickimg2: identifiant of a Bitmap. Used for drawing control when
        clicking on it in state 2.
        Default is the value of 'img2' attribute.
-     - disabled1: identifiants of a bitmap. Used for drawing control in state 1
+     - disabled1: identifiant of a Bitmap. Used for drawing control in state 1
        when disabling.
        Default is the value of 'img1' attribute.
-     - disabled2: identifiants of a bitmap. Used for drawing control in state 1
+     - disabled2: identifiant of a Bitmap. Used for drawing control in state 1
        when disabling.
        Default is the value of 'img2' attribute.
      - onclick1: event executed when clicking on the control in state 1.
        Default is "none".
      - onclick2: event executed when clicking on the control in state 2.
        Default is "none".
-     - onmouseover1: event executed when the mouse cursor enter the button in
+     - onmouseover1: event executed when the mouse cursor enters the button in
        state 1.
        Default is "none".
      - onmouseout1: event executed when the mouse cursor leaves the button in
        state 1.
        Default is "none".
-     - onmouseover2: event executed when the mouse cursor enter the button in
+     - onmouseover2: event executed when the mouse cursor enters the button in
        state 2.
        Default is "none".
      - onmouseout2: event executed when the mouse cursor leaves the button in
@@ -265,12 +264,13 @@ OK, let's go for an enumeration of the different tags and theor attributes :
        Default is "20".
      - display: this value is a bit special, it allows to have a text
        auto-updated by VLC. Possible values are 'time', 'left_time',
-       'total_time', 'file_name' (for the current file name) and 'help'
-       (for a help about the controls that defined their 'help' attribute).
-       You can specify several type by separating them with semicolons. TO
+       'total_time', 'file_name' (for the current file name with its path),
+       'title' (for the file name without the path) and 'help' (for a help
+       about the controls that defined their 'help' attribute).
+       You can specify several types by separating them with semicolons. To
        switch between then, just double click on the text.
-       Usefull to switch betxeen 'time' and 'left_time'.
-     - width: Width of the text in pixel. If set to "0", the width is
+       Useful to switch between 'time' and 'left_time'.
+     - width: Width of the text in pixels. If set to "0", the width is
        automatically calculated to fit with the current text.
        Default is "0".
 
@@ -282,12 +282,12 @@ OK, let's go for an enumeration of the different tags and theor attributes :
      - type: two 'types' of sliders are predefined: 'time' for a slider
        allowing to seek in the stream, and 'volume' for a volume slider.
        Default is "time".
-     - up: identifiants of a bitmap.
-     - down: identifiants of a bitmap.
+     - up: identifiant of a Bitmap.
+     - down: identifiant of a Bitmap.
      - abs: see SliderControl description and bezier curve description.
-     - ord: see SliderControl description and bezier curve description..
-     - tooltiptext: see button.
-       Default is "none". Disable tooltip.
+     - ord: see SliderControl description and bezier curve description.
+     - tooltiptext: used to display a tooltip.
+       Default is "none" (no tooltip).
 
  - PlaylistControl: Creates a playlist. This tag must contain a SliderControl
    tag (to allow scrolling in the playlist). If the playlist contains entries
@@ -295,10 +295,10 @@ OK, let's go for an enumeration of the different tags and theor attributes :
    the full name of the entry. The other attributes are rather easy to
    understand...
    Attributes:
-     - width: width in pixel of the list. This is the whole width for file
-       name, number of file in the playlist and info text.
+     - width: width of the list in pixels. This is the whole width for file
+       name, number of files in the playlist and info text.
        Default is "200".
-     - infowidth: width in pixel of the info text.
+     - infowidth: width of the info text in pixels.
        Default is "50".
      - font: the font to use, which must be one of the Font identifiants.
      - playfont: the font to use for current playing file, which must be one of
@@ -317,7 +317,7 @@ Compression
 Once your skin is finished, instead of keeping many bitmap files and the XML
 file, you can compress them in a .tar.gz archive (Winzip and UmtimateZip can do
 it perfectly, for example). Before doing so, don't forget to rename your XML
-file into "theme.xml", or VLC won't be able to read it...  Then rename your
+file into "theme.xml", or VLC won't be able to read it... Then rename your
 compressed file with the .vlt extension and... that's all! VLC can load
 directly skins with the .vlt extension.
 
@@ -329,7 +329,7 @@ Tools and advice
  - To generate easily Bezier curves, you can use the curve-maker. Basically,
    you add and remove points at will, and you can move them to see how the
    curve evolves. When you have reached the perfect curve, you just have to
-   copy-paste the list ob abscissas and ordinates in the 'abs' and 'ord'
+   copy-paste the list of abscissas and ordinates into the 'abs' and 'ord'
    attributes of your SliderControl or PlaylistControl. The curve-maker also
    allows to load a bitmap, this could be useful if you want to follow a
    specific pattern of a slider, for example.
