@@ -79,9 +79,9 @@ typedef struct
     uint64_t i_pos;
     int      i_size;
 
-    mtime_t  i_pts;
-    mtime_t  i_dts;
+    mtime_t  i_pts_dts;
     mtime_t  i_length;
+    unsigned int i_flags;
 
 } mp4_entry_t;
 
@@ -605,9 +605,9 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     unsigned int i_chunk, i_stsc_last_val, i_stsc_entries, i, i_index;
-    bo_t *stbl, *stsd, *stts, *stco, *stsc, *stsz;
+    bo_t *stbl, *stsd, *stts, *stco, *stsc, *stsz, *stss;
     uint32_t i_timescale;
-    int64_t  i_residue;
+    int64_t i_dts, i_dts_q;
 
     stbl = box_new( "stbl" );
     stsd = box_full_new( "stsd", 0, 0 );
@@ -706,33 +706,36 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     else
         i_timescale = 1001;
 
-    for( i = 0, i_index = 0, i_residue = 0; i < p_stream->i_entry_count; i_index++)
+    /* first, create quantified length */
+    for( i = 0, i_dts = 0, i_dts_q = 0; i < p_stream->i_entry_count; i++ )
     {
-        int64_t i_delta;
-        int     i_first;
-        int64_t i_tmp;
+        int64_t i_dts_deq = i_dts_q * I64C(1000000) / (int64_t)i_timescale;
+        int64_t i_delta = p_stream->entry[i].i_length + i_dts - i_dts_deq;
 
-        i_first = i;
-        i_delta = p_stream->entry[i].i_length;
+        i_dts += p_stream->entry[i].i_length;
+
+        p_stream->entry[i].i_length = i_delta * (int64_t)i_timescale / I64C(1000000);;
+
+        i_dts_q += p_stream->entry[i].i_length;
+    }
+    /* then write encoded table */
+    for( i = 0, i_index = 0; i < p_stream->i_entry_count; i_index++)
+    {
+        int     i_first = i;
+        int64_t i_delta = p_stream->entry[i].i_length;
 
         while( i < p_stream->i_entry_count )
         {
-            if( i + 1 < p_stream->i_entry_count &&
-                p_stream->entry[i + 1].i_length != i_delta )
+            i++;
+            if( i >= p_stream->i_entry_count ||
+                p_stream->entry[i].i_length != i_delta )
             {
-                i++;
                 break;
             }
-
-            i++;
         }
 
-        i_tmp = i_delta * (int64_t)i_timescale + i_residue;
-
-        bo_add_32be( stts, i - i_first );           // sample-count
-        bo_add_32be( stts, i_tmp / I64C(1000000) ); // sample-delta
-
-        i_residue = i_tmp % I64C(1000000);
+        bo_add_32be( stts, i - i_first ); // sample-count
+        bo_add_32be( stts, i_delta );     // sample-delta
     }
     bo_fix_32be( stts, 12, i_index );
 
@@ -752,6 +755,28 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     /* append stsz to stbl */
     box_fix( stsz );
     box_gather( stbl, stsz );
+
+    /* create stss table */
+    stss = NULL;
+    for( i = 0, i_index = 0; i < p_stream->i_entry_count; i++ )
+    {
+        if( p_stream->entry[i].i_flags & (BLOCK_FLAG_TYPE_I<<SOUT_BUFFER_FLAGS_BLOCK_SHIFT) )
+        {
+            if( stss == NULL )
+            {
+                stss = box_full_new( "stss", 0, 0 );
+                bo_add_32be( stss, 0 ); /* fixed later */
+            }
+            bo_add_32be( stss, 1 + i );
+            i_index++;
+        }
+    }
+    if( stss )
+    {
+        bo_fix_32be( stss, 12, i_index );
+        box_fix( stss );
+        box_gather( stbl, stss );
+    }
 
     box_fix( stbl );
 
@@ -1326,11 +1351,11 @@ static int Mux( sout_mux_t *p_mux )
         }
 
         /* add index entry */
-        p_stream->entry[p_stream->i_entry_count].i_pos   = p_sys->i_pos;
-        p_stream->entry[p_stream->i_entry_count].i_size  = p_data->i_size;
-        p_stream->entry[p_stream->i_entry_count].i_pts   = p_data->i_pts;
-        p_stream->entry[p_stream->i_entry_count].i_dts   = p_data->i_dts;
-        p_stream->entry[p_stream->i_entry_count].i_length= p_data->i_length;
+        p_stream->entry[p_stream->i_entry_count].i_pos    = p_sys->i_pos;
+        p_stream->entry[p_stream->i_entry_count].i_size   = p_data->i_size;
+        p_stream->entry[p_stream->i_entry_count].i_pts_dts= __MAX( p_data->i_pts - p_data->i_dts, 0 );
+        p_stream->entry[p_stream->i_entry_count].i_length = p_data->i_length;
+        p_stream->entry[p_stream->i_entry_count].i_flags  = p_data->i_flags;
 
         if( p_stream->i_entry_count == 0 )
         {
