@@ -178,7 +178,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             break;
 
         default:
-            msg_Err( p_filter, "cannot interleave %i channels",
+            msg_Err( p_aout, "cannot interleave %i channels",
                      p_pcm->channels );
         }
     }
@@ -210,7 +210,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             break;
 
         default:
-            msg_Err( p_filter, "cannot interleave %i channels",
+            msg_Err( p_aout, "cannot interleave %i channels",
                      p_pcm->channels );
         }
     }
