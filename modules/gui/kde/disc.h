@@ -9,6 +9,7 @@
 #ifndef KDE_DISC_H
 #define KDE_DISC_H
 
+#include "common.h"
 #include <kdialogbase.h>
 #include <qstring.h>
 

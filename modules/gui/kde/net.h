@@ -9,6 +9,7 @@
 #ifndef _KDE_NET_H_
 #define _KDE_NET_H_
 
+#include "common.h"
 #include <qwidget.h>
 #include <kdialogbase.h>
 
