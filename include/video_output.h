@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.91 2003/01/28 12:30:44 gbazin Exp $
+ * $Id: video_output.h,v 1.92 2003/01/28 22:03:21 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -75,6 +75,7 @@ struct vout_thread_t
     vlc_bool_t          b_interface;                     /* render interface */
     vlc_bool_t          b_scale;                    /* allow picture scaling */
     vlc_bool_t          b_fullscreen;           /* toogle fullscreen display */
+    vlc_bool_t          b_override_aspect;         /* aspect ratio overriden */
     mtime_t             render_time;             /* last picture render time */
     unsigned int        i_window_width;                /* video window width */
     unsigned int        i_window_height;              /* video window height */

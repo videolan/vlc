@@ -8,7 +8,7 @@
  *  -udf.* to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: access.c,v 1.8 2002/12/31 01:54:35 massiot Exp $
+ * $Id: access.c,v 1.9 2003/01/28 22:03:21 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -124,7 +124,7 @@ int E_(DVDOpen) ( vlc_object_t *p_this )
 
     /* override environment variable DVDCSS_METHOD with config option
      * (FIXME: this creates a small memory leak) */
-    psz_dvdcss_env = config_GetPsz( p_input, "dvd-css-method" );
+    psz_dvdcss_env = config_GetPsz( p_input, "dvdcss-method" );
     if( psz_dvdcss_env && *psz_dvdcss_env )
     {
         char *psz_env;

@@ -2,7 +2,7 @@
  * kde.cpp : KDE plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: kde.cpp,v 1.6 2003/01/28 21:08:29 sam Exp $
+ * $Id: kde.cpp,v 1.7 2003/01/28 22:03:21 sam Exp $
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -88,7 +88,7 @@ static void close(vlc_object_t *p_this)
     {
         vlc_object_release( p_intf->p_sys->p_input );
     }
-    
+
     delete p_intf->p_sys->p_app;
     delete p_intf->p_sys->p_about;
     msg_Unsubscribe(p_intf, p_intf->p_sys->p_msg);

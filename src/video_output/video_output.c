@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.209 2003/01/28 13:07:45 gbazin Exp $
+ * $Id: video_output.c,v 1.210 2003/01/28 22:03:21 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -140,7 +140,8 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
         if( ( p_vout->render.i_width != i_width ) ||
             ( p_vout->render.i_height != i_height ) ||
             ( p_vout->render.i_chroma != i_chroma ) ||
-            ( p_vout->render.i_aspect != i_aspect ) ||
+            ( p_vout->render.i_aspect != i_aspect
+                    && !p_vout->b_override_aspect ) ||
             p_vout->b_filter_change )
         {
             /* We are not interested in this format, close this vout */
@@ -195,6 +196,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     val.b_bool = VLC_TRUE;
     var_Set( p_vout, "intf-change", val );
 
+    p_vout->b_override_aspect = VLC_FALSE;
+
     /* If the parent is not a VOUT object, that means we are at the start of
      * the video output pipe */
     if( p_parent->i_object_type != VLC_OBJECT_VOUT )
@@ -230,6 +233,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
                          i_new_aspect / i_pgcd, VOUT_ASPECT_FACTOR / i_pgcd );
 
                 i_aspect = i_new_aspect;
+
+                p_vout->b_override_aspect = VLC_TRUE;
             }
         }
 
@@ -316,7 +321,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     p_vout->b_scale      = 1;
     p_vout->b_fullscreen = 0;
     p_vout->render_time  = 10;
-    p_vout->c_fps_samples= 0;
+    p_vout->c_fps_samples = 0;
     p_vout->b_filter_change = 0;
 
     /* Mouse coordinates */

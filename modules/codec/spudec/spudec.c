@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.12 2003/01/20 02:45:25 titer Exp $
+ * $Id: spudec.c,v 1.13 2003/01/28 22:03:21 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -36,7 +36,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  OpenDecoder   ( vlc_object_t * );      
+static int  OpenDecoder   ( vlc_object_t * );
 static int  RunDecoder    ( decoder_fifo_t * );
 static int  InitThread    ( spudec_thread_t * );
 static void EndThread     ( spudec_thread_t * );
@@ -44,7 +44,7 @@ static void EndThread     ( spudec_thread_t * );
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-#define FONT_TEXT N_("Font used by the text subtitler")
+#define FONT_TEXT N_("font used by the text subtitler")
 #define FONT_LONGTEXT N_(\
     "When the subtitles are coded in text form then, you can choose " \
     "which font will be used to display them.")
@@ -68,7 +68,7 @@ vlc_module_end();
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
  *****************************************************************************
- * Tries to launch a decoder and return score so that the interface is able 
+ * Tries to launch a decoder and return score so that the interface is able
  * to chose.
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
@@ -105,7 +105,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
         DecoderError( p_fifo );
         return( -1 );
     }
-    
+
     /*
      * Initialize the thread properties
      */
@@ -239,12 +239,12 @@ static int InitThread( spudec_thread_t *p_spudec )
  *****************************************************************************/
 static void EndThread( spudec_thread_t *p_spudec )
 {
-    if( p_spudec->p_vout != NULL 
+    if( p_spudec->p_vout != NULL
          && p_spudec->p_vout->p_subpicture != NULL )
     {
         subpicture_t *  p_subpic;
         int             i_subpic;
-    
+
         for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
         {
             p_subpic = &p_spudec->p_vout->p_subpicture[i_subpic];
@@ -259,7 +259,7 @@ static void EndThread( spudec_thread_t *p_spudec )
 
         vlc_object_release( p_spudec->p_vout );
     }
-    
+
     CloseBitstream( &p_spudec->bit_stream );
     free( p_spudec );
 }

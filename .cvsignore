@@ -34,7 +34,4 @@ vlc-log.*
 vlc-config
 vlc
 vlc.app
-gvlc
-qvlc
-kvlc
-gnome-vlc
+vlc.exe
