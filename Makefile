@@ -36,6 +36,7 @@ PLUGINS_DIR :=	a52 \
 		esd \
 		fb \
 		ffmpeg \
+		mp4 \
 		filter \
 		fx \
 		ggi \
@@ -99,6 +100,7 @@ PLUGINS_TARGETS := a52/a52 \
 		esd/esd \
 		fb/fb \
 		ffmpeg/ffmpeg \
+		mp4/mp4 \
 		filter/filter_clone \
 		filter/filter_crop \
 		filter/filter_deinterlace \

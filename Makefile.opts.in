@@ -101,6 +101,7 @@ dvdread_LDFLAGS = @dvdread_LDFLAGS@
 esd_LDFLAGS = @esd_LDFLAGS@
 filter_distort_LDFLAGS = @filter_distort_LDFLAGS@
 ffmpeg_LDFLAGS = @ffmpeg_LDFLAGS@
+mp4_LDFLAGS = @mp4_LDFLAGS@
 ggi_LDFLAGS = @ggi_LDFLAGS@
 glide_LDFLAGS = @glide_LDFLAGS@
 gnome_LDFLAGS = @gnome_LDFLAGS@
