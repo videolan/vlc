@@ -2233,7 +2233,7 @@ then
         LDFLAGS_familiar="${LDFLAGS_familiar} ${LDFLAGS_gpe}"
       fi
     else
-	NEED_GTK_MAIN=yes
+	  NEED_GTK_MAIN=yes
     fi # end gpe support
   fi # end gtk+ support
 fi
@@ -2624,6 +2624,7 @@ if test "x${NEED_GTK_MAIN}" != "xno"
 then
     PLUGINS="${PLUGINS} gtk_main"
     CFLAGS_gtk="${CFLAGS_gtk} -DNEED_GTK_MAIN"
+	CFLAGS_familiar="${CFLAGS_familiar} -DNEED_GTK_MAIN"
     CFLAGS_gtk_main="${CFLAGS_gtk_main} ${CFLAGS_gtk} ${CFLAGS_familiar}"
     LDFLAGS_gtk_main="${LDFLAGS_gtk_main} ${LDFLAGS_gtk} ${LDFLAGS_familiar}"
 fi
