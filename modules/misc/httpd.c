@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.18 2003/07/01 08:55:57 adn Exp $
+ * $Id: httpd.c,v 1.19 2003/07/01 09:00:50 adn Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1968,8 +1968,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
             msleep( 1000 );
             continue;
         }
-        /*FIXME : < 0 is necessary for medialive plugin (it was <=0 before), but why ?*/       
-        if( i_ret < 0 )
+        if( i_ret <= 0 )
         {
 //            msg_Dbg( p_httpt, "waiting..." );
             continue;
