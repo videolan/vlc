@@ -106,9 +106,6 @@
 /* Define if you have the munmap function.  */
 #undef HAVE_MUNMAP
 
-/* Define if you have the nanosleep function.  */
-#undef HAVE_NANOSLEEP
-
 /* Define if you have the posix_memalign function.  */
 #undef HAVE_POSIX_MEMALIGN
 
@@ -349,6 +346,9 @@
 
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #undef HAVE_GETTEXT
+
+/* Define if nanosleep is available. */
+#undef HAVE_NANOSLEEP
 
 /* long getopt support */
 #undef HAVE_GETOPT_LONG
