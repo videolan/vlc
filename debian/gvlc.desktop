@@ -1,8 +1,8 @@
 [Desktop Entry]
-Name=Gtk+ VideoLAN Client
-Name[fr]=Client VideoLAN pour Gtk+
-Comment=Gtk+ DVD and MPEG player
-Comment[fr]=Lecteur de DVD et MPEG pour Gtk+
+Name=VLC for Gtk+
+Name[fr]=VLC pour Gtk+
+Comment=Gtk+ multimedia player
+Comment[fr]=Lecteur multimédia pour Gtk+
 Exec=gvlc
 Icon=gvlc.png
 Terminal=0

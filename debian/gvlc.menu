@@ -1,3 +1,3 @@
 ?package(gvlc):command="/usr/bin/gvlc" hotkey="V" needs="X11" \
-               section="Apps/Viewers" title="Gtk+ VideoLAN Client" \
+               section="Apps/Viewers" title="VLC media player for Gtk+" \
                icon="/usr/share/vlc/gvlc.xpm" hints="Video"
