@@ -1,5 +1,5 @@
 List of vlc plugins
-$Id: MODULES,v 1.4 2002/06/02 23:43:38 bozo Exp $
+$Id: MODULES,v 1.5 2002/07/22 13:48:13 jpsaman Exp $
 
  * a52_system: input module for A52 decapsulation.
 
@@ -42,6 +42,8 @@ $Id: MODULES,v 1.4 2002/06/02 23:43:38 bozo Exp $
  * dvdread: input module for accessing DVDs, uses libdvdread.
 
  * esd: audio output module using the Esound sound daemon.
+
+ * familiar: interface for iPaq using the Gtk+ widget set.
 
  * fb: video output module for the Linux framebuffer.
 

@@ -35,6 +35,7 @@ PLUGINS_DIR :=	a52 \
 		dvd \
 		dvdread \
 		esd \
+      familiar \
 		fb \
 		ffmpeg \
 		mp4 \
@@ -101,6 +102,7 @@ PLUGINS_TARGETS := a52/a52 \
 		dvd/dvd \
 		dvdread/dvdread \
 		esd/esd \
+      familiar/familiar \
 		fb/fb \
 		ffmpeg/ffmpeg \
 		mp4/mp4 \

@@ -1,4 +1,4 @@
-# $Id: STATUS,v 1.1 2002/07/12 21:57:25 massiot Exp $
+# $Id: STATUS,v 1.2 2002/07/22 13:48:13 jpsaman Exp $
 #
 #                              VLC STATUS
 #
@@ -56,3 +56,6 @@ Christophe Massiot <massiot@via.ecp.fr> :
       rewind, better time handling)
       ETA : end of 2002
 
+Jean-Paul Saman <jpsaman@wxs.nl> :
+    - Familiar Linux interface for iPaq
+      ETA : late summer
