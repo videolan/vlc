@@ -54,8 +54,6 @@
 #include "video_parser.h"
 #include "video_fifo.h"
 
-static int i_count = 0;
-
 /*
  * Welcome to vpar_blocks.c ! Here's where the heavy processor-critical parsing
  * task is done. This file is divided in several parts :
@@ -1705,7 +1703,7 @@ if( p_vpar->picture.b_error )                                           \
             /* Calculate block coordinates. */                          \
             p_mb->p_data[i_b] = p_data1                                 \
                                 + pi_y[p_vpar->mb.b_dct_type][i_b]      \
-                                * p_vpar->sequence.i_width              \
+                                * p_vpar->picture.i_l_stride            \
                                 + pi_x[i_b];                            \
                                                                         \
             PARSEERROR                                                  \
@@ -1738,7 +1736,7 @@ if( p_vpar->picture.b_error )                                           \
             /* Calculate block coordinates. */                          \
             p_mb->p_data[i_b] = pp_data[i_b & 1]                        \
                                  + pi_y[p_vpar->mb.b_dct_type][i_b]     \
-                                   * p_vpar->sequence.i_chroma_width    \
+                                   * p_vpar->picture.i_c_stride         \
                                  + pi_x[i_b];                           \
                                                                         \
             PARSEERROR                                                  \
@@ -1790,8 +1788,6 @@ static __inline__ void ParseMacroblock(
     macroblock_t *  p_mb;
     yuv_data_t *    p_data1;
     yuv_data_t *    p_data2;
-
-i_count++;
 
     i_inc = MacroblockAddressIncrement( p_vpar );
     *pi_mb_address += i_inc;
@@ -2217,16 +2213,15 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
         else
         {
             /* Try to find an optimized function. */
-            if( ppf_parse_mb[p_vpar->picture.i_structure]
+            if( ppf_parse_mb[i_structure]
                             [p_vpar->picture.i_coding_type] == NULL )
             {
                 intf_ErrMsg( "vpar error: bad ppf_parse_mb function pointer (struct:%d, coding type:%d)\n",
-                         p_vpar->picture.i_structure, p_vpar->picture.i_coding_type );
+                         i_structure, i_coding_type );
             }
             else
             {
-                ppf_parse_mb[p_vpar->picture.i_structure]
-                            [p_vpar->picture.i_coding_type]
+                ppf_parse_mb[i_structure][i_coding_type]
                        ( p_vpar, pi_mb_address, i_mb_address_save,
                          i_mb_base, b_mpeg2, i_coding_type,
                          i_chroma_format, i_structure,
@@ -2256,7 +2251,8 @@ void vpar_PictureData( vpar_thread_t * p_vpar, int i_mb_base )
     while( ((p_vpar->picture.i_coding_type != I_CODING_TYPE
                     && p_vpar->picture.i_coding_type != D_CODING_TYPE)
              || !p_vpar->picture.b_error)
-           && i_mb_address+i_mb_base < p_vpar->sequence.i_mb_size
+           && i_mb_address < (p_vpar->sequence.i_mb_size
+                    >> (p_vpar->picture.i_structure != FRAME_STRUCTURE))
            && !p_vpar->b_die )
     {
         if( ((i_dummy = ShowBits( &p_vpar->bit_stream, 32 ))

@@ -639,7 +639,17 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 #endif
         /* Update context. */
         if( i_structure != FRAME_STRUCTURE )
-            p_vpar->picture.i_current_structure = i_structure;
+        {
+            if( (p_vpar->picture.i_current_structure | i_structure)
+                    == FRAME_STRUCTURE )
+            {
+                p_vpar->picture.i_current_structure = 0;
+            }
+            else
+            {
+                p_vpar->picture.i_current_structure = i_structure;
+            }
+        }
         p_vpar->picture.p_picture = NULL;
 
         return;

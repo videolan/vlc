@@ -1,3 +1,8 @@
+O.1.99i :
+
+  * fixed the support for the field pictures, which involved a few dozens
+    bugs in the video parser and video decoder
+
 Tue, 22 Aug 2000 01:31:58 +0200
 0.1.99h :
 

@@ -11,3 +11,5 @@ config.cache
 config.status
 Makefile
 build-stamp
+gvlc
+fbvlc

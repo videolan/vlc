@@ -175,12 +175,12 @@ static __inline__ void Motion420(
 
     i_source_offset = (p_mb->i_l_x + (i_mv_x >> 1))
                        + (p_mb->i_motion_l_y + i_offset
-                         + (i_mv_y >> 1)
                          + b_source_field)
-                         * p_mb->p_picture->i_width;
+                       * p_mb->p_picture->i_width
+                       + (i_mv_y >> 1) * p_mb->i_l_stride;
     if( i_source_offset >= p_source->i_width * p_source->i_height )
     {
-        intf_ErrMsg( "vdec error: bad motion vector\n" );
+        intf_ErrMsg( "vdec error: bad motion vector (lum)\n" );
         return;
     }
 
@@ -201,13 +201,13 @@ static __inline__ void Motion420(
                      b_average );
 
     i_source_offset = (p_mb->i_c_x + ((i_mv_x/2) >> 1))
-                        + ((p_mb->i_motion_c_y + (i_offset >> 1)
-                           + ((i_mv_y/2) >> 1))
+                        + (p_mb->i_motion_c_y + (i_offset >> 1)
                            + b_source_field)
-                          * p_mb->p_picture->i_chroma_width;
+                          * p_mb->p_picture->i_chroma_width
+                        + ((i_mv_y/2) >> 1) * p_mb->i_c_stride;
     if( i_source_offset >= (p_source->i_width * p_source->i_height) / 4 )
     {
-        intf_ErrMsg( "vdec error: bad motion vector\n" );
+        intf_ErrMsg( "vdec error: bad motion vector (chroma)\n" );
         return;
     }
 
@@ -264,9 +264,9 @@ static __inline__ void Motion422(
                      p_source->p_y
                        + (p_mb->i_l_x + (i_mv_x >> 1))
                        + (p_mb->i_motion_l_y + i_offset
-                          + (i_mv_y >> 1)
                           + b_source_field)
-                         * p_mb->p_picture->i_width,
+		       * p_mb->p_picture->i_width
+                       + (i_mv_y >> 1) * p_mb->i_l_stride,
                      /* destination */
                      p_mb->p_picture->p_y
                        + (p_mb->i_l_x)
@@ -281,10 +281,10 @@ static __inline__ void Motion422(
                      b_average );
 
     i_source_offset = (p_mb->i_c_x + ((i_mv_x/2) >> 1))
-                        + ((p_mb->i_motion_c_y + (i_offset)
-                           + ((i_mv_y) >> 1))
+                        + (p_mb->i_motion_c_y + i_offset
                            + b_source_field)
-                          * p_mb->p_picture->i_chroma_width;
+                        * p_mb->p_picture->i_chroma_width
+                        + (i_mv_y) >> 1) * p_mb->i_c_stride;
     i_dest_offset = (p_mb->i_c_x)
                       + (p_mb->i_motion_c_y + b_dest_field)
                         * p_mb->p_picture->i_chroma_width;
@@ -335,9 +335,9 @@ static __inline__ void Motion444(
 
     i_source_offset = (p_mb->i_l_x + (i_mv_x >> 1))
                         + (p_mb->i_motion_l_y + i_offset
-                           + (i_mv_y >> 1)
                            + b_source_field)
-                          * p_mb->p_picture->i_width;
+                        * p_mb->p_picture->i_width
+                        + (i_mv_y >> 1) * p_mb->i_l_stride;
     i_dest_offset = (p_mb->i_l_x)
                       + (p_mb->i_motion_l_y + b_dest_field)
                         * p_mb->p_picture->i_width;
@@ -374,6 +374,7 @@ static __inline__ void Motion444(
  * vdec_MotionFieldField : motion compensation for field motion type (field)
  *****************************************************************************/
 #define FIELDFIELD( MOTION )                                            \
+{                                                                       \
     picture_t *     p_pred;                                             \
                                                                         \
     if( p_mb->i_mb_type & MB_MOTION_FORWARD )                           \
@@ -398,6 +399,7 @@ static __inline__ void Motion444(
                     p_mb->pppi_motion_vectors[0][1][0],                 \
                     p_mb->pppi_motion_vectors[0][1][1],                 \
                     p_mb->i_l_stride, p_mb->i_c_stride, 16, 0, 1 );     \
+        }                                                               \
     }                                                                   \
                                                                         \
     else /* MB_MOTION_BACKWARD */                                       \
@@ -508,7 +510,7 @@ void vdec_MotionField16x8444( macroblock_t * p_mb )
 }
 
 /*****************************************************************************
- * vdec_MotionFieldDMVXXX?? : motion compensation for dmv motion type (field)
+ * vdec_MotionFieldDMVXXX : motion compensation for dmv motion type (field)
  *****************************************************************************/
 #define FIELDDMV( MOTION )                                              \
 {                                                                       \
