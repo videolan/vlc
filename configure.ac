@@ -438,7 +438,7 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
   AC_MSG_RESULT(no)])
 
 dnl Check for headers
-AC_CHECK_HEADERS(signal.h time.h errno.h stdint.h getopt.h strings.h inttypes.h sys/int_types.h)
+AC_CHECK_HEADERS(signal.h time.h errno.h stdint.h getopt.h strings.h inttypes.h sys/int_types.h wchar.h)
 AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h sys/ioctl.h sys/stat.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)

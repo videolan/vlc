@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.15 2003/06/26 16:46:19 fenrir Exp $
+ * $Id: mkv.cpp,v 1.16 2003/06/28 12:07:00 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -40,7 +40,9 @@
 #include <cassert>
 #include <typeinfo>
 
-#include <wchar.h>
+#ifdef HAVE_WCHAR_H
+#   include <wchar.h>
+#endif
 
 /* libebml and matroska */
 #include "ebml/EbmlHead.h"
