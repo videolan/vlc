@@ -315,6 +315,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     float f_width = (float)p_vout->output.i_width / p_sys->i_tex_width;
     float f_height = (float)p_vout->output.i_height / p_sys->i_tex_height;
 
+    glClear( GL_COLOR_BUFFER_BIT );
+
     glTexImage2D( GL_TEXTURE_2D, 0, 3,
                   p_sys->i_tex_width, p_sys->i_tex_height , 0,
                   VLCGL_RGB_FORMAT, VLCGL_RGB_TYPE, p_sys->p_buffer );
