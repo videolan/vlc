@@ -28,7 +28,6 @@
 
 using namespace std;
 
-#define COMDLLPATH   "axvlc.dll"
 #define THREADING_MODEL "Both"
 #define COMPANY_STR "VideoLAN"
 #define PROGRAM_STR "VLCPlugin"
@@ -147,6 +146,7 @@ STDAPI DllUnregisterServer(VOID)
         SHDeleteKey(hClsIDKey, psz_CLSID);
         RegCloseKey(hClsIDKey);
     }
+    CoTaskMemFree((void *)psz_CLSID);
 
     return S_OK;
 };
@@ -154,6 +154,11 @@ STDAPI DllUnregisterServer(VOID)
 STDAPI DllRegisterServer(VOID)
 {
     DllUnregisterServer();
+
+    char DllPath[MAX_PATH];
+    DWORD DllPathLen= GetModuleFileName(h_instance, DllPath, sizeof(DllPath)) ;
+	if( 0 == DllPathLen )
+        return E_FAIL;
 
     LPCTSTR psz_CLSID = TStrFromGUID(CLSID_VLCPlugin);
 
@@ -181,7 +186,7 @@ STDAPI DllRegisterServer(VOID)
         // InprocServer32 key value
         hSubKey = keyCreate(hClassKey, TEXT("InprocServer32"));
         RegSetValueEx(hSubKey, NULL, 0, REG_SZ,
-                (const BYTE*)COMDLLPATH, sizeof(COMDLLPATH));
+                (const BYTE*)DllPath, DllPathLen);
         RegSetValueEx(hSubKey, TEXT("ThreadingModel"), 0, REG_SZ,
                 (const BYTE*)THREADING_MODEL, sizeof(THREADING_MODEL));
         RegCloseKey(hSubKey);
@@ -291,8 +296,22 @@ STDAPI DllRegisterServer(VOID)
 
     // register type lib into the registry
     ITypeLib *typeLib;
-    if( SUCCEEDED(LoadTypeLibEx(OLESTR("")COMDLLPATH, REGKIND_REGISTER, &typeLib)) )
+#ifndef OLE2ANSI
+    size_t typeLibPathLen = MultiByteToWideChar(CP_ACP, 0, DllPath, DllPathLen, NULL, 0);
+    if( typeLibPathLen > 0 )
+    {
+        LPOLESTR typeLibPath = (LPOLESTR)CoTaskMemAlloc(typeLibPathLen*sizeof(wchar_t));
+        MultiByteToWideChar(CP_ACP, 0, DllPath, DllPathLen, typeLibPath, typeLibPathLen);
+        if( SUCCEEDED(LoadTypeLibEx(typeLibPath, REGKIND_REGISTER, &typeLib)) )
+            typeLib->Release();
+        CoTaskMemFree((void *)typeLibPath);
+    }
+#else
+    if( SUCCEEDED(LoadTypeLibEx((LPOLESTR)DllPath, REGKIND_REGISTER, &typeLib)) )
         typeLib->Release();
+#endif
+
+    CoTaskMemFree((void *)psz_CLSID);
 
     return S_OK;
 };
@@ -302,7 +321,7 @@ STDAPI DllRegisterServer(VOID)
 /*
 ** easier to debug an application than a DLL on cygwin GDB :)
 */
-#include <stream.h>
+#include <iostream>
 
 STDAPI_(int) WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 {

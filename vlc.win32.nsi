@@ -202,9 +202,9 @@ SectionEnd
 
 Section /o "ActiveX plugin" SEC04
   SectionIn 2 3
-  SetOutPath $SYSDIR
+  SetOutPath "$INSTDIR"
   File activex\axvlc.dll
-  RegDLL $SYSDIR\axvlc.dll
+  RegDLL "$INSTDIR\axvlc.dll"
 SectionEnd
 
 SubSection "File type associations" SEC05
@@ -335,8 +335,8 @@ Section Uninstall
   !insertmacro UnRegisterExtensionSection ".wma"
   !insertmacro UnRegisterExtensionSection ".wmv"
 
-  UnRegDLL $SYSDIR\axvlc.dll
-  Delete /REBOOTOK $SYSDIR\axvlc.dll
+  UnRegDLL "$INSTDIR\axvlc.dll"
+  Delete /REBOOTOK "$INSTDIR\axvlc.dll"
 
   RMDir "$SMPROGRAMS\VideoLAN"
   RMDir /r $SMPROGRAMS\VideoLAN
