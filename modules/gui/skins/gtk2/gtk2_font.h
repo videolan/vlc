@@ -2,7 +2,7 @@
  * gtk2_font.h: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_font.h,v 1.4 2003/04/17 13:46:55 karibu Exp $
+ * $Id: gtk2_font.h,v 1.5 2003/04/17 15:43:29 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -41,8 +41,10 @@ class Graphics;
 class GTK2Font : Font
 {
     private:
-        PangoContext *Context;
-        PangoLayout *Layout;
+        PangoContext  *Context;
+        PangoLayout   *Layout;
+        PangoFontDescription *FontDesc;
+
         // Assign font to Device Context
         virtual void AssignFont( Graphics *dest );
 

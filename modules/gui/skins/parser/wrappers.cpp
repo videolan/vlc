@@ -2,7 +2,7 @@
  * wrappers.cpp: Wrappers around C++ objects
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: wrappers.cpp,v 1.7 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: wrappers.cpp,v 1.8 2003/04/17 15:43:30 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -38,6 +38,7 @@ extern intf_thread_t *g_pIntf;
 #include "../src/banks.h"
 #include "../controls/controls.h"
 #include "../src/font.h"
+#include "../os_font.h"
 #include "../src/window.h"
 #include "../src/theme.h"
 #include "../src/skin_common.h"
@@ -385,12 +386,12 @@ static void ConvertCoords( char *coord, double *p_coord )
 static int ConvertAlign( char *align )
 {
     if( strcmp( align, "left" ) == 0 )
-        return DT_LEFT;
+        return VLC_FONT_ALIGN_LEFT;
     else if( strcmp( align, "right" ) == 0 )
-        return DT_RIGHT;
+        return VLC_FONT_ALIGN_RIGHT;
     else if( strcmp( align, "center" ) == 0 )
-        return DT_CENTER;
+        return VLC_FONT_ALIGN_CENTER;
     else
-        return DT_LEFT;
+        return VLC_FONT_ALIGN_LEFT;
 }
 //---------------------------------------------------------------------------
