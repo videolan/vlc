@@ -2,7 +2,7 @@
  * avi.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: avi.c,v 1.3 2003/01/13 04:46:49 fenrir Exp $
+ * $Id: avi.c,v 1.4 2003/01/19 08:28:02 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -666,7 +666,14 @@ static int avi_HeaderAdd_strf( sout_instance_t *p_sout,
             bo_AddDWordLE( p_bo, p_stream->p_bih->biHeight );
             bo_AddWordLE( p_bo, p_stream->p_bih->biPlanes );
             bo_AddWordLE( p_bo, p_stream->p_bih->biBitCount );
-            bo_AddDWordBE( p_bo, p_stream->p_bih->biCompression );
+            if( VLC_FOURCC( 0, 0, 0, 1 ) == 0x00000001 )
+            {
+                bo_AddDWordBE( p_bo, p_stream->p_bih->biCompression );
+            }
+            else
+            {
+                bo_AddDWordLE( p_bo, p_stream->p_bih->biCompression );
+            }
             bo_AddDWordLE( p_bo, p_stream->p_bih->biSizeImage );
             bo_AddDWordLE( p_bo, p_stream->p_bih->biXPelsPerMeter );
             bo_AddDWordLE( p_bo, p_stream->p_bih->biYPelsPerMeter );
