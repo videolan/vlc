@@ -2183,17 +2183,49 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 msg_Dbg( p_demux, "  * es pid=%d type=%d dr->i_tag=0x%x",
                          p_es->i_pid, p_es->i_type, p_dr->i_tag );
 
-                if( p_dr->i_tag == 0x6a )
+                if( p_dr->i_tag == 0x05 )
                 {
+                    /* Registration Descriptor */
+                    if( p_dr->i_length != 4 )
+                    {
+                        msg_Warn( p_demux, "invalid Registration Descriptor" );
+                    }
+                    else
+                    {
+                        if( !memcmp( p_dr->p_data, "AC-3", 4 ) )
+                        {
+                            /* ATSC with stream_type 0x81 (but this descriptor
+                             * is then not mandatory */
+                            pid->es->fmt.i_cat = AUDIO_ES;
+                            pid->es->fmt.i_codec = VLC_FOURCC('a','5','2',' ');
+                        }
+                        else if( !memcmp( p_dr->p_data, "DTS1", 4 ) ||
+                                 !memcmp( p_dr->p_data, "DTS2", 4 ) ||
+                                 !memcmp( p_dr->p_data, "DTS3", 4 ) )
+                        {
+                           /*registration descriptor(ETSI TS 101 154 Annex F)*/
+                            pid->es->fmt.i_cat = AUDIO_ES;
+                            pid->es->fmt.i_codec = VLC_FOURCC('d','t','s',' ');
+                        }
+                        else if( !memcmp( p_dr->p_data, "BSSD", 4 ) )
+                        {
+                            pid->es->fmt.i_cat = AUDIO_ES;
+                            pid->es->fmt.i_codec = VLC_FOURCC('l','p','c','m');
+                        }
+                        else
+                        {
+                            msg_Warn( p_demux,
+                                      "unknown Registration Descriptor (%4.4s)",
+                                      p_dr->p_data );
+                        }
+                    }
+
+                }
+                else if( p_dr->i_tag == 0x6a )
+                {
+                    /* DVB with stream_type 0x06 */
                     pid->es->fmt.i_cat = AUDIO_ES;
                     pid->es->fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
-                }
-                else if( p_dr->i_tag == 0x05 )
-                {
-
-                    /* DTS registration descriptor (ETSI TS 101 154 Annex F) */
-                    pid->es->fmt.i_cat = AUDIO_ES;
-                    pid->es->fmt.i_codec = VLC_FOURCC( 'd', 't', 's', ' ' );
                 }
                 else if( p_dr->i_tag == 0x73 )
                 {
