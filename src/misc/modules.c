@@ -403,7 +403,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     /* Parse the module list for capabilities and probe each of them */
     for( i_which_module = 0; i_which_module < p_all->i_count; i_which_module++ )
     {
-        int i_shortcut_bonus = 0, i_submodule;
+        int i_shortcut_bonus = 0;
 
         p_module = (module_t *)p_all->p_values[i_which_module].p_object;
 
