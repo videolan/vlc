@@ -1392,11 +1392,21 @@ wxMenu *Playlist::SDMenu()
         module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
         if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
+            i_number++;
+    }
+    if( i_number ) pp_sds = (char **)malloc( i_number * sizeof(void *) );
+
+    i_number = 0;
+    for( int i_index = 0; i_index < p_list->i_count; i_index++ )
+    {
+        module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+
+        if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
         {
             p_sd_menu->AppendCheckItem( FirstSD_Event + i_number ,
-                       wxU( p_parser->psz_longname ? p_parser->psz_longname :
-                            ( p_parser->psz_shortname ?
-                            p_parser->psz_shortname :p_parser->psz_object_name)) );
+                wxU( p_parser->psz_longname ? p_parser->psz_longname :
+                     (p_parser->psz_shortname ?
+                      p_parser->psz_shortname : p_parser->psz_object_name) ) );
 
             if( playlist_IsServicesDiscoveryLoaded( p_playlist,
                                     p_parser->psz_object_name ) )
@@ -1404,8 +1414,7 @@ wxMenu *Playlist::SDMenu()
                 p_sd_menu->Check( FirstSD_Event + i_number, TRUE );
             }
 
-            INSERT_ELEM( (void**)pp_sds, i_number, i_number,
-                         (void*)p_parser->psz_object_name );
+            pp_sds[i_number++] = p_parser->psz_object_name;
         }
     }
     vlc_list_release( p_list );
