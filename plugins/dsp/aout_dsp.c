@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_dsp.c,v 1.27.2.1 2002/10/28 22:48:45 jobi Exp $
+ * $Id: aout_dsp.c,v 1.27.2.2 2002/10/28 23:49:05 jobi Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -120,7 +120,7 @@ static int aout_Open( aout_thread_t *p_aout )
 
     /* Open the sound device */
     if( (p_aout->p_sys->i_fd = open( p_aout->p_sys->psz_device,
-                    O_WRONLY | O_NONBLOCK )) < 0 )
+                    O_WRONLY | O_NDELAY )) < 0 )
     {
         intf_ErrMsg( "aout error: can't open audio device (%s)",
                      p_aout->p_sys->psz_device );
@@ -128,6 +128,8 @@ static int aout_Open( aout_thread_t *p_aout )
         free( p_aout->p_sys );
         return( -1 );
     }
+    fcntl( p_aout->p_sys->i_fd, F_SETFL,
+            fcntl(p_aout->p_sys->i_fd, F_GETFL)&~FNDELAY );
 
     return( 0 );
 }
