@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: vcd.c,v 1.15 2004/01/25 17:31:22 gbazin Exp $
+ * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *
@@ -104,7 +104,7 @@ vlc_module_begin();
               N_("Use playback control?"),
               N_("If VCD is authored with playback control, use it. "
                  "Otherwise we play by tracks."),
-              VLC_TRUE );
+              VLC_FALSE );
 
     add_string( MODULE_STRING "-author-format",
                 "%v - %F disc %c of %C",
