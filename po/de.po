@@ -191,7 +191,7 @@ msgstr "Dies wird die Mono-Tonausgabe erzwingen."
 
 #: src/libvlc.h:87
 msgid "audio output volume"
-msgstr "Audio Ausgabelautstärke"
+msgstr "Ton Ausgabelautstärke"
 
 #: src/libvlc.h:89
 msgid ""
@@ -243,7 +243,7 @@ msgstr ""
 
 #: src/libvlc.h:111
 msgid "characteristic dimension"
-msgstr "Characteristische Größe"
+msgstr "Charakteristische Größe"
 
 #: src/libvlc.h:113
 msgid ""
@@ -267,15 +267,15 @@ msgstr ""
 
 #: src/libvlc.h:122
 msgid "enable video"
-msgstr "Video aktivieren"
+msgstr "Bildausgabe aktivieren"
 
 #: src/libvlc.h:124
 msgid ""
 "You can completely disable the video output. In this case the video decoding "
 "stage won't be done, which will save some processing power."
 msgstr ""
-"Dies wird die Bildausgabe komplett deaktivieren. Die Videodekodierung wird "
-"ebenfalls deaktiviert, dadurch kann Prozessorzeit gespart werden."
+"Sie können die Bildausgabe komplett ausschalten. Die Bilddekodierung wird "
+"ebenfalls deaktiviert, wodurch die Prozessorbelastung geringer wird."
 
 #: src/libvlc.h:127
 msgid "display identifier"
@@ -357,7 +357,7 @@ msgstr ""
 
 #: src/libvlc.h:161
 msgid "force SPU position"
-msgstr "SPU Position festlegen"
+msgstr "Untertitel-Position festlegen"
 
 #: src/libvlc.h:163
 msgid ""
@@ -622,9 +622,8 @@ msgid "Empty if no stream output."
 msgstr "Leer, falls kein Stream-Ausgabeort verfügbar."
 
 #: src/libvlc.h:287
-#, fuzzy
 msgid "enable video stream output"
-msgstr "Graustufen Bildausgabe"
+msgstr "Stream-Bildausgabe aktivieren"
 
 #: src/libvlc.h:289 src/libvlc.h:298
 msgid ""
@@ -643,9 +642,8 @@ msgid "This allows you to force video encoding"
 msgstr "Dies erlaubt Ihnen, die Video-Dekodierung zu erzwingen."
 
 #: src/libvlc.h:296
-#, fuzzy
 msgid "enable audio stream output"
-msgstr "Ton aktivieren"
+msgstr "Tonausgabe aktivieren"
 
 #: src/libvlc.h:301
 msgid "audio encoding codec"
@@ -657,7 +655,7 @@ msgstr "Dies erlaubt Ihnen, die Ton-Enkodierung zu erzwingen."
 
 #: src/libvlc.h:305
 msgid "choose preferred packetizer list"
-msgstr "Liste der bevorzugten Paket-Erzeuger"
+msgstr "Liste der bevorzugten Packetizer"
 
 #: src/libvlc.h:307
 msgid ""
@@ -667,17 +665,15 @@ msgstr ""
 "Paket-Erzeuger wählt."
 
 #: src/libvlc.h:310
-#, fuzzy
 msgid "mux module"
-msgstr "Hilfe Modul"
+msgstr "mux Modul"
 
 #: src/libvlc.h:312
 msgid "This is a legacy entry to let you configure mux modules"
 msgstr ""
-"Dies ist ein Eintrag mit dem Sie die 'mux'-Module konfigurieren können."
+"Dies ist ein Eintrag mit dem Sie die mux-Module konfigurieren können."
 
 #: src/libvlc.h:314
-#, fuzzy
 msgid "access output module"
 msgstr "Video Ausgabe Modul"
 
@@ -689,58 +685,58 @@ msgstr ""
 
 #: src/libvlc.h:319
 msgid "enable CPU MMX support"
-msgstr "'MMX' Unterstützung aktivieren"
+msgstr "MMX Unterstützung aktivieren"
 
 #: src/libvlc.h:321
 msgid ""
 "If your processor supports the MMX instructions set, VLC can take advantage "
 "of them."
 msgstr ""
-"Falls Ihr Prozessor 'MMX' Befehle unterstützt, kann VLC diese benutzen."
+"Falls Ihr Prozessor MMX Befehle unterstützt, kann VLC diese benutzen."
 
 #: src/libvlc.h:324
 msgid "enable CPU 3D Now! support"
-msgstr "'3D Now!' Unterstützung aktivieren"
+msgstr "3D Now! Unterstützung aktivieren"
 
 #: src/libvlc.h:326
 msgid ""
 "If your processor supports the 3D Now! instructions set, VLC can take "
 "advantage of them."
 msgstr ""
-"Falls Ihr Prozessor '3D Now!' Befehle unterstützt, kann VLC diese benutzen."
+"Falls Ihr Prozessor 3D Now! Befehle unterstützt, kann VLC diese benutzen."
 
 #: src/libvlc.h:329
 msgid "enable CPU MMX EXT support"
-msgstr "'MMX EXT' Unterstützung aktivieren."
+msgstr "MMX EXT Unterstützung aktivieren."
 
 #: src/libvlc.h:331
 msgid ""
 "If your processor supports the MMX EXT instructions set, VLC can take "
 "advantage of them."
 msgstr ""
-"Falls Ihr Prozessor 'MMX EXT' Befehle unterstützt, kann VLC diese benutzen."
+"Falls Ihr Prozessor MMX EXT Befehle unterstützt, kann VLC diese benutzen."
 
 #: src/libvlc.h:334
 msgid "enable CPU SSE support"
-msgstr "'SSE' Unterstüzung aktivieren"
+msgstr "SSE Unterstüzung aktivieren"
 
 #: src/libvlc.h:336
 msgid ""
 "If your processor supports the SSE instructions set, VLC can take advantage "
 "of them."
 msgstr ""
-"Falls Ihr Prozessor 'SSE' Befehle unterstützt, kann VLC diese benutzen."
+"Falls Ihr Prozessor SSE Befehle unterstützt, kann VLC diese benutzen."
 
 #: src/libvlc.h:339
 msgid "enable CPU AltiVec support"
-msgstr "'AltiVec' Unterstützung aktiveren"
+msgstr "AltiVec Unterstützung aktiveren"
 
 #: src/libvlc.h:341
 msgid ""
 "If your processor supports the AltiVec instructions set, VLC can take "
 "advantage of them."
 msgstr ""
-"Falls Ihr Prozessor 'AltiVec' Befehle unterstützt, kann VLC diese benutzen."
+"Falls Ihr Prozessor AltiVec Befehle unterstützt, kann VLC diese benutzen."
 
 #: src/libvlc.h:344
 msgid "play files randomly forever"
@@ -760,7 +756,7 @@ msgstr "Abspielliste beim Starten aufrufen"
 
 #: src/libvlc.h:351
 msgid "If you want VLC to start playing on startup, then enable this option."
-msgstr "Wenn VLC beim Start anfangen soll abzuspielen, aktivieren Sie dies."
+msgstr "Wenn VLC beim Start anfangen soll, die Liste abzuspielen, aktivieren Sie dies."
 
 #: src/libvlc.h:353
 msgid "enqueue items in playlist"
@@ -808,17 +804,16 @@ msgstr ""
 "Dies ist ein Eintrag, mit dem Sie das Zugriffsmodul konfigurieren können."
 
 #: src/libvlc.h:372
-#, fuzzy
 msgid "demux module"
-msgstr "Hilfe Modul"
+msgstr "demux Modul"
 
 #: src/libvlc.h:374
 msgid "This is a legacy entry to let you configure demux modules"
-msgstr "Dies ist ein Eintrag, mit Sie die 'demux' Module konfigurieren können."
+msgstr "Dies ist ein Eintrag, mit Sie die demux Module konfigurieren können."
 
 #: src/libvlc.h:376
 msgid "fast mutex on NT/2K/XP (developers only)"
-msgstr "schnelles 'mutex' auf NT/2K/XP (nur für Entwickler)"
+msgstr "schnelles mutex auf NT/2K/XP (nur für Entwickler)"
 
 #: src/libvlc.h:378
 msgid ""
@@ -826,7 +821,7 @@ msgid ""
 "to correctely implement condition variables. You can also use the faster "
 "Win9x implementation but you might experience problems with it."
 msgstr ""
-"Unter Windows NT/2K/XP benutzen wir eine langsame 'mutex' Implementation, "
+"Unter Windows NT/2K/XP benutzen wir eine langsame mutex Implementation, "
 "welche uns aber die Umgebungsvariablen korrekt einbauen lassen. Sie können "
 "auch die schnellere Win9x Variante benutzen, aber Sie werden vielleicht "
 "Probleme haben."
@@ -892,12 +887,12 @@ msgstr "Ton"
 #: modules/gui/gtk/gtk_interface.c:1337 modules/gui/macosx/intf.m:310
 #: modules/misc/dummy/dummy.c:64 modules/video_output/directx/directx.c:107
 msgid "Video"
-msgstr "Video"
+msgstr "Bild"
 
 #. Input options
 #: src/libvlc.h:469 modules/access/satellite/satellite.c:66
 msgid "Input"
-msgstr "Eingabe"
+msgstr "Input"
 
 #. Decoder options
 #: src/libvlc.h:502
@@ -1020,7 +1015,7 @@ msgstr ""
 "Schlüsseln zur Umwandlungszeit haben. Wenn Sie eine haben, wird die "
 "Entschlösselung des Disk-Schlüssels mit dieser Methode schneller sein. Diese "
 "wurde von libcss benutzt.\n"
-"Die standardmäßige Methode ist 'Schlüssel'"
+"Die standardmäßige Methode ist Schlüssel"
 
 #: modules/access/dvd/dvd.c:86
 msgid "[dvd:][device][@raw_device][@[title][,[chapter][,angle]]]"
@@ -1333,12 +1328,12 @@ msgstr ""
 
 #: modules/audio_output/file.c:86
 msgid "add wave header"
-msgstr "'wave header' hinzufügen"
+msgstr "wave header hinzufügen"
 
 #: modules/audio_output/file.c:87
 msgid "instead of writing a raw file, you can add a wav header to the file"
 msgstr ""
-"Anstatt in eine 'raw' Datei zu schreiben, können Sie einen 'Header' der "
+"Anstatt in eine raw Datei zu schreiben, können Sie einen Header der "
 "Datei hinzufügen"
 
 #: modules/audio_output/file.c:104
@@ -1358,7 +1353,7 @@ msgstr "Datei-Tonausgabe-Modul"
 #. ****************************************************************************
 #: modules/audio_output/oss.c:88
 msgid "try to work around buggy OSS drivers"
-msgstr "Versuch, die fehlerhaften 'OSS' Treiber zu umgehen."
+msgstr "Versuch, die fehlerhaften OSS Treiber zu umgehen."
 
 #: modules/audio_output/oss.c:90
 msgid ""
@@ -1366,13 +1361,13 @@ msgid ""
 "completely filled (the sound gets heavily hashed). If you have one of these "
 "drivers, then you need to enable this option."
 msgstr ""
-"Einige fehlerhafte 'OSS' Treiber mögen es nicht wenn ihre internen Puffer "
+"Einige fehlerhafte OSS Treiber mögen es nicht wenn ihre internen Puffer "
 "komplett gefüllt sind (der Ton fängt an zu knacken). Wenn Sie einen dieser "
 "Treiber haben, aktivieren Sie diese Option."
 
 #: modules/audio_output/oss.c:94
 msgid "try to use S/PDIF output"
-msgstr "Versuch, die 'S/PDIF' - Ausgabe zu benutzen"
+msgstr "Versuch, die S/PDIF - Ausgabe zu benutzen"
 
 #: modules/audio_output/oss.c:101
 msgid "OSS"
@@ -1463,12 +1458,12 @@ msgstr "Bewegungsausgleichs-Modul"
 #: modules/codec/ffmpeg/postprocessing/postprocessing.c:53
 #, fuzzy
 msgid "MMX Post Processing module"
-msgstr "'MMX'-Bewegungsausgleichs-Modul"
+msgstr "MMX-Bewegungsausgleichs-Modul"
 
 #: modules/codec/ffmpeg/postprocessing/postprocessing.c:58
 #, fuzzy
 msgid "MMXEXT Post Processing module"
-msgstr "'MMXEXT'-Bewegungsausgleichs-Modul"
+msgstr "MMXEXT-Bewegungsausgleichs-Modul"
 
 #: modules/codec/lpcm.c:98
 msgid "linear PCM audio parser"
@@ -1484,11 +1479,11 @@ msgstr "MPEG audio layer I/II/III parser"
 #: modules/codec/mpeg_video/idct/idct.c:41
 #: modules/codec/mpeg_video/parser.c:59
 msgid "IDCT module"
-msgstr "'DCT Modul"
+msgstr "DCT Modul"
 
 #: modules/codec/mpeg_video/idct/idctaltivec.c:45
 msgid "AltiVec IDCT module"
-msgstr "'AltiVec' IDCT Modul"
+msgstr "AltiVec IDCT Modul"
 
 #: modules/codec/mpeg_video/idct/idctclassic.c:41
 msgid "classic IDCT module"
@@ -1496,11 +1491,11 @@ msgstr "klassisches IDCT Modul"
 
 #: modules/codec/mpeg_video/idct/idctmmx.c:47
 msgid "MMX IDCT module"
-msgstr "'MMX' IDCT Modul"
+msgstr "MMX IDCT Modul"
 
 #: modules/codec/mpeg_video/idct/idctmmxext.c:47
 msgid "MMX EXT IDCT module"
-msgstr "'MMX EXT' IDCT Modul"
+msgstr "MMX EXT IDCT Modul"
 
 #: modules/codec/mpeg_video/motion/motion.c:42
 #: modules/codec/mpeg_video/parser.c:65
@@ -1509,19 +1504,19 @@ msgstr "Bewegungsausgleichs-Modul"
 
 #: modules/codec/mpeg_video/motion/motion3dnow.c:44
 msgid "3D Now! motion compensation module"
-msgstr "'3D Now!' Bewegungsausgleichs-Modul"
+msgstr "3D Now! Bewegungsausgleichs-Modul"
 
 #: modules/codec/mpeg_video/motion/motionaltivec.c:47
 msgid "AltiVec motion compensation module"
-msgstr "'AltiVec' Bewegungsausgleichs-Modul"
+msgstr "AltiVec Bewegungsausgleichs-Modul"
 
 #: modules/codec/mpeg_video/motion/motionmmx.c:45
 msgid "MMX motion compensation module"
-msgstr "'MMX' Motion Compensation Modul"
+msgstr "MMX Motion Compensation Modul"
 
 #: modules/codec/mpeg_video/motion/motionmmxext.c:44
 msgid "MMX EXT motion compensation module"
-msgstr "'MMX EXT' Bewegungsausgleichs-Modul"
+msgstr "MMX EXT Bewegungsausgleichs-Modul"
 
 #: modules/codec/mpeg_video/parser.c:61
 msgid ""
@@ -1615,11 +1610,11 @@ msgstr "Zeigt die aktuelle Position im Stream von Zeit zu Zeit in Sekunden an."
 
 #: modules/control/rc/rc.c:84
 msgid "fake TTY"
-msgstr "'TTY' vortäuschen"
+msgstr "TTY vortäuschen"
 
 #: modules/control/rc/rc.c:85
 msgid "Force the rc plugin to use stdin as if it was a TTY."
-msgstr "Das rc PlugIn zwingen 'stdin' ,wie es in 'TTY' war, zu benutzen."
+msgstr "Das rc PlugIn zwingen stdin, wie es in TTY war, zu benutzen."
 
 #: modules/control/rc/rc.c:88
 msgid "Remote control"
@@ -1731,7 +1726,7 @@ msgstr "Datei öffnen"
 #: modules/gui/macosx/intf.m:256 modules/gui/macosx/intf.m:268
 #: modules/gui/macosx/prefs.m:191 modules/gui/win32/strings.cpp:210
 msgid "Preferences"
-msgstr "Einstellungen"
+msgstr "Einstellungen..."
 
 #: modules/gui/familiar/interface.c:118
 msgid "Rewind"
@@ -1878,12 +1873,12 @@ msgstr ""
 #: modules/gui/gtk/gnome_support.c:138 modules/gui/gtk/gtk_support.c:121
 #, c-format
 msgid "Couldn't find pixmap file: %s"
-msgstr "Konnte 'pixmap'-Datei %s nicht finden"
+msgstr "Konnte pixmap-Datei %s nicht finden"
 
 #: modules/gui/familiar/support.c:130 modules/gui/gtk/gtk_support.c:130
 #, c-format
 msgid "Error loading pixmap file: %s"
-msgstr "Fehler beim Laden der 'pixmap' Datei %s"
+msgstr "Fehler beim Laden der pixmap Datei %s"
 
 #. ****************************************************************************
 #. * Module descriptor
@@ -2603,7 +2598,7 @@ msgstr "AVI"
 #: modules/gui/gtk/gnome_support.c:116
 #, c-format
 msgid "Couldn't create pixmap from file: %s"
-msgstr "Konnte 'pixmap' von Datei %s nicht erzeugen"
+msgstr "Konnte pixmap von Datei %s nicht erzeugen"
 
 #: modules/gui/gtk/gtk.c:71
 msgid "Gtk+"
@@ -2815,7 +2810,7 @@ msgstr "Nachrichten:"
 
 #: modules/gui/macosx/intf.m:245
 msgid "VLC - Controller"
-msgstr "VLC - Einstellungen"
+msgstr "VLC - Steuerung"
 
 #: modules/gui/macosx/intf.m:250 modules/gui/macosx/intf.m:294
 #: modules/gui/macosx/controls.m:644
@@ -2944,7 +2939,7 @@ msgstr "Fenster schließen"
 
 #: modules/gui/macosx/intf.m:318
 msgid "Controller"
-msgstr "Kontrollen"
+msgstr "Steuerungsfenster"
 
 #: modules/gui/macosx/intf.m:322
 msgid "Bring All to Front"
@@ -3332,7 +3327,7 @@ msgstr "&Stumm"
 
 #: modules/gui/win32/strings.cpp:145
 msgid "Toggle mute"
-msgstr "'Stumm' ein/ausschalten"
+msgstr "Stumm ein/ausschalten"
 
 #: modules/gui/win32/strings.cpp:146
 msgid "Always on top..."
@@ -3396,7 +3391,7 @@ msgstr "Auswahl &invertieren"
 
 #: modules/gui/win32/strings.cpp:192
 msgid "&Crop selection"
-msgstr "Auswahl '&croppen'"
+msgstr "Auswahl &croppen"
 
 #: modules/gui/win32/strings.cpp:193
 msgid "&Delete selection"
@@ -3412,7 +3407,7 @@ msgstr "Auswahl invertieren"
 
 #: modules/gui/win32/strings.cpp:198
 msgid "Crop selection"
-msgstr "Auswahl 'croppen'"
+msgstr "Auswahl croppen"
 
 #: modules/gui/win32/strings.cpp:200
 msgid "Delete selection"
@@ -3514,31 +3509,31 @@ msgstr "Das Benutzeroberflächen-Aufzeichnungs-PlugIn benutzen..."
 
 #: modules/misc/memcpy/memcpy.c:81
 msgid "libc memcpy module"
-msgstr "'libc' Speicherkopier Modul"
+msgstr "libc Speicherkopier Modul"
 
 #: modules/misc/memcpy/memcpy.c:85
 msgid "3D Now! memcpy module"
-msgstr "'3D Now!' Speicherkopier Modul"
+msgstr "3D Now! Speicherkopier Modul"
 
 #: modules/misc/memcpy/memcpy.c:92
 msgid "MMX memcpy module"
-msgstr "'MMX' Speicherkopier Modul"
+msgstr "MMX Speicherkopier Modul"
 
 #: modules/misc/memcpy/memcpy.c:97
 msgid "MMX EXT memcpy module"
-msgstr "'MMX EXT' Speicherkopier Modul"
+msgstr "MMX EXT Speicherkopier Modul"
 
 #: modules/misc/memcpy/memcpyaltivec.c:52
 msgid "AltiVec memcpy module"
-msgstr "'AltiVec' Speicherkopier Modul"
+msgstr "AltiVec Speicherkopier Modul"
 
 #: modules/misc/network/ipv4.c:86
 msgid "IPv4 network abstraction layer"
-msgstr "'IPv4' Netzwerk Abstraktionsschicht"
+msgstr "IPv4 Netzwerk Abstraktionsschicht"
 
 #: modules/misc/network/ipv6.c:79
 msgid "IPv6 network abstraction layer"
-msgstr "'IPv6' Netzwerk Abstraktionsschict"
+msgstr "IPv6 Netzwerk Abstraktionsschict"
 
 #: modules/misc/testsuite/test1.c:33
 msgid "C module that does nothing"
@@ -3570,7 +3565,7 @@ msgstr "nach "
 #: modules/video_chroma/i420_ymga.c:51 modules/video_chroma/i420_yuy2.c:70
 #: modules/video_chroma/i422_yuy2.c:64
 msgid "MMX conversions from "
-msgstr "'MMX'-Umwandlungen von "
+msgstr "MMX-Umwandlungen von "
 
 #. ****************************************************************************
 #. * Module descriptor
@@ -3671,8 +3666,8 @@ msgstr "Umwandlungstyp"
 #: modules/video_filter/transform.c:58
 msgid "One of '90', '180', '270', 'hflip' and 'vflip'"
 msgstr ""
-"Einer von '90', '180', '270', 'hflip' (horizontal umkehren) oder "
-"'vflip' (vertikal umkehren)"
+"Einer von 90, 180, 270, hflip (horizontal umkehren) oder "
+"vflip (vertikal umkehren)"
 
 #: modules/video_filter/transform.c:66
 msgid "image transformation module"
@@ -3740,7 +3735,7 @@ msgid ""
 "doesn't have any effect when using overlays."
 msgstr ""
 "Versuchen, die YUV in RGB Öbersetzungen mit der Hardware zu beschleunigen. "
-"Dies funktioniert nicht, wenn Sie das 'overlaying', d.h. die direkte DirectX-"
+"Dies funktioniert nicht, wenn Sie das overlaying, d.h. die direkte DirectX-"
 "Ausgabe, benutzen."
 
 #: modules/video_output/directx/directx.c:99
@@ -3756,7 +3751,7 @@ msgid ""
 msgstr ""
 "Bild-Puffer im System erzeugen, anstatt das VRAM zu benutzen. Dies ist "
 "normalerweise nicht empfohlen, da das VRAM schneller ist. Dies funktioniert "
-"nicht, wenn Sie das 'overlaying', d.h. die direkte DirectX-Ausgabe, benutzen."
+"nicht, wenn Sie das overlaying, d.h. die direkte DirectX-Ausgabe, benutzen."
 
 #: modules/video_output/directx/directx.c:111
 msgid "DirectX video module"
@@ -3789,7 +3784,7 @@ msgstr ""
 
 #: modules/video_output/glide.c:64
 msgid "3dfx Glide module"
-msgstr "'3dfx Glide' - Modul"
+msgstr "3dfx Glide - Modul"
 
 #: modules/video_output/mga/mga.c:59
 msgid "Matrox Graphic Array video module"
@@ -3943,7 +3938,7 @@ msgstr "vertikale Position vertauschen"
 
 #: modules/visualization/xosd/xosd.c:62
 msgid "Display xosd output on the bottom of the screen instead of the top"
-msgstr "Die 'xosd'-Ausgabe auf dem Bildschirm unten statt oben anzeigen"
+msgstr "Die xosd-Ausgabe auf dem Bildschirm unten statt oben anzeigen"
 
 #: modules/visualization/xosd/xosd.c:65
 msgid "vertical offset"
@@ -3967,7 +3962,7 @@ msgstr "Schrift"
 
 #: modules/visualization/xosd/xosd.c:72
 msgid "Font used to display text in the xosd output"
-msgstr "Schrift, die zur Anzeige des Textes in der 'xosd' Ausgabe benutzt wird"
+msgstr "Schrift, die zur Anzeige des Textes in der xosd Ausgabe benutzt wird"
 
 #: modules/visualization/xosd/xosd.c:76
 msgid "XOSD module"
@@ -3975,9 +3970,8 @@ msgstr "XOSD Modul"
 
 #: modules/visualization/xosd/xosd.c:83
 msgid "xosd interface module"
-msgstr "'xosd' Benutzeroberflächen Modul"
+msgstr "xosd Benutzeroberflächen Modul"
 
-#, fuzzy
 #~ msgid "the VideoLAN Team <videolan@videolan.org>"
 #~ msgstr "Das VideoLAN Team <videolan@videolan.org>"
 
