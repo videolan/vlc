@@ -2,11 +2,12 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.8 2001/04/17 18:22:51 massiot Exp $
+ * $Id: vout_xvideo.c,v 1.9 2001/04/21 22:49:24 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
+ *          David Kennedy <dkennedy@tinytoad.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -123,7 +124,22 @@ typedef struct vout_sys_s
     /* Mouse pointer properties */
     boolean_t           b_mouse;         /* is the mouse pointer displayed ? */
 
+    /* Displaying fullscreen */
+    boolean_t           b_fullscreen;
+
 } vout_sys_t;
+
+/* Fullscreen needs to be able to hide the wm decorations */
+#define MWM_HINTS_DECORATIONS   (1L << 1)
+#define PROP_MWM_HINTS_ELEMENTS 5
+typedef struct mwmhints_s
+{
+    u32 flags;
+    u32 functions;
+    u32 decorations;
+    s32 input_mode;
+    u32 status;
+} mwmhints_t;
 
 /*****************************************************************************
  * Local prototypes
@@ -219,6 +235,9 @@ static int vout_Create( vout_thread_t *p_vout )
     }
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
 
+    p_vout->p_sys->b_fullscreen
+        = main_GetIntVariable( VOUT_FULLSCREEN_VAR, VOUT_FULLSCREEN_DEFAULT );
+    
     if( !XVideoCheckForXv( p_vout->p_sys->p_display ) )
     {
         intf_ErrMsg( "vout error: no XVideo extension" );
@@ -317,9 +336,12 @@ static void vout_Destroy( vout_thread_t *p_vout )
 static int vout_Manage( vout_thread_t *p_vout )
 {
     XEvent      xevent;                                         /* X11 event */
+    boolean_t   b_gofullscreen;                    /* user wants full-screen */
     char        i_key;                                    /* ISO Latin-1 key */
     KeySym      x_key_symbol;
 
+    b_gofullscreen = 0;
+    
     /* Handle X11 events: ConfigureNotify events are parsed to know if the
      * output window's size changed, MapNotify and UnmapNotify to know if the
      * window is mapped (and if the display is useful), and ClientMessages
@@ -384,6 +406,10 @@ static int vout_Manage( vout_thread_t *p_vout )
                         case 'q':
                         case 'Q':
                             p_main->p_intf->b_die = 1;
+                            break;
+                        case 'f':
+                        case 'F':
+                            b_gofullscreen = 1;
                             break;
                         case '0':
                             network_ChannelJoin( 0 );
@@ -487,6 +513,35 @@ static int vout_Manage( vout_thread_t *p_vout )
         }
     }
 
+    if ( b_gofullscreen )
+    {
+        char *psz_display;
+        /* Open display, unsing 'vlc_display' or DISPLAY environment variable */
+        psz_display = XDisplayName( main_GetPszVariable( VOUT_DISPLAY_VAR, NULL ) );
+
+        intf_DbgMsg( "vout: changing full-screen status" );
+
+        p_vout->p_sys->b_fullscreen = !p_vout->p_sys->b_fullscreen;
+
+        /* Get rid of the old window */
+        XUnmapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
+        XFreeGC( p_vout->p_sys->p_display, p_vout->p_sys->gc );
+
+        /* And create a new one */
+        if( XVideoCreateWindow( p_vout ) )
+        {
+            intf_ErrMsg( "vout error: cannot create X11 window" );
+            XCloseDisplay( p_vout->p_sys->p_display );
+
+            free( p_vout->p_sys );
+            return( 1 );
+        }
+     
+        /* We've changed the size, update it */
+        p_vout->i_changes |= VOUT_SIZE_CHANGE;
+    }
+
+    
     if( (p_vout->i_changes & VOUT_GRAYSCALE_CHANGE))
     {
         /* FIXME: clear flags ?? */
@@ -673,15 +728,32 @@ static int XVideoCreateWindow( vout_thread_t *p_vout )
     XSetWindowAttributes    xwindow_attributes;
     XGCValues               xgcvalues;
     XEvent                  xevent;
+    Atom                    prop;
+    mwmhints_t              mwmhints;
+    
     boolean_t               b_expose;
     boolean_t               b_configure_notify;
     boolean_t               b_map_notify;
 
-    /* Set main window's size */
-    p_vout->p_sys->i_window_width =  main_GetIntVariable( VOUT_WIDTH_VAR,
-                                                   VOUT_WIDTH_DEFAULT );
-    p_vout->p_sys->i_window_height = main_GetIntVariable( VOUT_HEIGHT_VAR,
-                                                   VOUT_HEIGHT_DEFAULT );
+
+    /* If we're full screen, we're full screen! */
+    if( p_vout->p_sys->b_fullscreen )
+    {
+        p_vout->p_sys->i_window_width = DisplayWidth( p_vout->p_sys->p_display,
+                                                      p_vout->p_sys->i_screen );
+        p_vout->p_sys->i_window_height =  DisplayHeight( p_vout->p_sys->p_display,
+                                                         p_vout->p_sys->i_screen );
+        p_vout->i_width =  p_vout->p_sys->i_window_width;
+        p_vout->i_height = p_vout->p_sys->i_window_height;
+    }
+    else
+    {
+        /* Set main window's size */
+        p_vout->p_sys->i_window_width =  main_GetIntVariable( VOUT_WIDTH_VAR,
+                                                       VOUT_WIDTH_DEFAULT );
+        p_vout->p_sys->i_window_height = main_GetIntVariable( VOUT_HEIGHT_VAR,
+                                                       VOUT_HEIGHT_DEFAULT );
+    }
 
     /* Prepare window manager hints and properties */
     xsize_hints.base_width          = p_vout->p_sys->i_window_width;
@@ -711,6 +783,21 @@ static int XVideoCreateWindow( vout_thread_t *p_vout )
                            CWBackingStore | CWBackPixel | CWEventMask,
                            &xwindow_attributes );
 
+    if ( p_vout->p_sys->b_fullscreen )
+    {
+        prop = XInternAtom(p_vout->p_sys->p_display, "_MOTIF_WM_HINTS", False);
+        mwmhints.flags = MWM_HINTS_DECORATIONS;
+        mwmhints.decorations = 0;
+        XChangeProperty( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                         prop, prop, 32, PropModeReplace,
+                         (unsigned char *)&mwmhints, PROP_MWM_HINTS_ELEMENTS );
+
+        XSetTransientForHint( p_vout->p_sys->p_display,
+                              p_vout->p_sys->window, None );
+        XRaiseWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
+    }
+
+    
     /* Set window manager hints and properties: size hints, command,
      * window's name, and accepted protocols */
     XSetWMNormalHints( p_vout->p_sys->p_display, p_vout->p_sys->window,
@@ -771,6 +858,13 @@ static int XVideoCreateWindow( vout_thread_t *p_vout )
                   StructureNotifyMask | KeyPressMask |
                   ButtonPressMask | ButtonReleaseMask | 
                   PointerMotionMask );
+
+    if( p_vout->p_sys->b_fullscreen )
+    {
+        XSetInputFocus( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                        RevertToNone, CurrentTime );
+        XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->window, 0, 0 );
+    }
 
     /* At this stage, the window is open, displayed, and ready to
      * receive data */

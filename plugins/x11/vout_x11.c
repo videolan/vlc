@@ -2,10 +2,11 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.19 2001/04/21 00:31:07 sam Exp $
+ * $Id: vout_x11.c,v 1.20 2001/04/21 22:49:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
+ *          David Kennedy <dkennedy@tinytoad.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

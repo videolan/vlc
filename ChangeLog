@@ -4,7 +4,8 @@
 
 HEAD
 
-  * X11 fullscreen mode.
+  * XVideo fullscreen mode by David Kennedy <dkennedy@tinytoad.com>.
+  * X11 fullscreen mode by David Kennedy <dkennedy@tinytoad.com>.
   * Fixed build process when no plugins or no builtins were chosen.
   * Makefile changes to get around MacOS X's brain-damaged gcc.
   * FreeBSD configure and Makefile patches, courtesy of Espen
