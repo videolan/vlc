@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.12 2003/05/03 14:22:47 fenrir Exp $
+ * $Id: transcode.c,v 1.13 2003/05/03 14:33:35 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -667,8 +667,8 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
     }
     else
     {
-        int16_t *sout = (int16_t*)&id->p_buffer[id->i_buffer_pos];
-        int     i_used;
+        int16_t *sout  = (int16_t*)&id->p_buffer[id->i_buffer_pos];
+        int     i_used = 0;
 
         if( id->f_src.i_fourcc == VLC_FOURCC( 's', '8', ' ', ' ' ) )
         {
@@ -965,6 +965,7 @@ static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream, sout_stream_
 static int transcode_video_ffmpeg_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                                            sout_buffer_t *in, sout_buffer_t **out )
 {
+    sout_stream_sys_t   *p_sys = p_stream->p_sys;
     int     i_used;
     int     i_out;
     int     b_gotpicture;
@@ -1018,11 +1019,13 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
                detecting size */
             if( id->ff_enc_c->width <= 0 )
             {
-                id->ff_enc_c->width  = id->f_dst.i_width  = id->ff_dec_c->width;
+                id->ff_enc_c->width    =
+                    id->f_dst.i_width  = id->ff_dec_c->width - p_sys->i_crop_left - p_sys->i_crop_right;
             }
             if( id->ff_enc_c->height <= 0 )
             {
-                id->ff_enc_c->height = id->f_dst.i_height = id->ff_dec_c->height;
+                id->ff_enc_c->height   =
+                    id->f_dst.i_height = id->ff_dec_c->height - p_sys->i_crop_top - p_sys->i_crop_bottom;
             }
 
             if( avcodec_open( id->ff_enc_c, id->ff_enc ) )
@@ -1093,8 +1096,10 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
         }
 
         /* convert size and crop */
-        if( ( id->ff_dec_c->width  != id->ff_enc_c->width ) ||
-            ( id->ff_dec_c->height != id->ff_enc_c->height ) )
+        if( id->ff_dec_c->width  != id->ff_enc_c->width ||
+            id->ff_dec_c->height != id->ff_enc_c->height ||
+            p_sys->i_crop_top > 0 || p_sys->i_crop_bottom > 0 ||
+            p_sys->i_crop_left > 0 || p_sys->i_crop_right )
         {
             if( id->p_ff_pic_tmp2 == NULL )
             {
