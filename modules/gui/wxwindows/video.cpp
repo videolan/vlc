@@ -292,8 +292,8 @@ int VideoWindow::ControlWindow( void *p_window, int i_query, va_list args )
             double f_arg = va_arg( args, double );
 
             /* Update dimensions */
-            wxSizeEvent event( wxSize(p_vout->i_window_width * f_arg,
-                                      p_vout->i_window_height * f_arg),
+            wxSizeEvent event( wxSize((int)(p_vout->i_window_width * f_arg),
+                                      (int)(p_vout->i_window_height * f_arg)),
                                UpdateSize_Event );
             AddPendingEvent( event );
 

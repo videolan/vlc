@@ -145,10 +145,10 @@ BookmarkEditDialog::BookmarkEditDialog( intf_thread_t *_p_intf,
                                                p_seekpoint->psz_name : "" ),
                                 wxDefaultPosition, wxSize( 100, 20) );
     time_text = new wxTextCtrl( this, -1, wxString::Format(wxT("%d"),
-                                p_seekpoint->i_time_offset/1000000 ),
+                                (int)(p_seekpoint->i_time_offset / 1000000) ),
                                 wxDefaultPosition, wxSize( 100, 20) );
     bytes_text = new wxTextCtrl( this, -1, wxString::Format(wxT("%d"),
-                                p_seekpoint->i_byte_offset ),
+                                (int)p_seekpoint->i_byte_offset ),
                                 wxDefaultPosition, wxSize( 100, 20) );
 
     sizer->Add( new wxStaticText( this, -1, wxU(_("Name") ) ), 0, wxLEFT, 5 );
@@ -311,10 +311,11 @@ void BookmarksDialog::Update()
     for( int i = 0; i < i_bookmarks; i++ )
     {
         list_ctrl->InsertItem( i, wxL2U( pp_bookmarks[i]->psz_name ) );
+        /* FIXME: see if we can use the 64 bits integer format string */
         list_ctrl->SetItem( i, 1, wxString::Format(wxT("%d"),
-                            pp_bookmarks[i]->i_byte_offset ) );
+                            (int)(pp_bookmarks[i]->i_byte_offset) ) );
         list_ctrl->SetItem( i, 2, wxString::Format(wxT("%d"),
-                            pp_bookmarks[i]->i_time_offset/1000000 ) );
+                            (int)(pp_bookmarks[i]->i_time_offset / 1000000) ) );
     }
 
     vlc_object_release( p_input );
