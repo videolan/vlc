@@ -369,7 +369,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     if( ( p_sys->fd = net_OpenTCP( p_access, p_sys->url.psz_host,
                                             p_sys->url.i_port ) ) < 0 )
     {
-        msg_Err( p_access, "cannot connect to%s:%d", p_sys->url.psz_host, p_sys->url.i_port );
+        msg_Err( p_access, "cannot connect to %s:%d", p_sys->url.psz_host, p_sys->url.i_port );
         goto error;
     }
 
