@@ -198,7 +198,7 @@ static inline int ps_pkt_parse_system( block_t *p_pkt,
         if( p[0] >= 0xBC || p[0] == 0xB8 || p[0] == 0xB9 ) p += 2;
         p++;
 
-        if( p[0] >= 0xc0 )
+        if( i_id >= 0xc0 )
         {
             int i_tk = PS_ID_TO_TK( i_id );
 
