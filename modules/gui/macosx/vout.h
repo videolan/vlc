@@ -30,6 +30,7 @@
 @interface VLCWindow : NSWindow
 {
     vout_thread_t * p_vout;
+    vout_thread_t * p_real_vout;
 
     Ptr             p_fullscreen_state;
     mtime_t         i_time_mouse_last_moved;

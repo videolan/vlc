@@ -50,6 +50,19 @@
     [self setReleasedWhenClosed: YES];
 
     p_vout = _p_vout;
+
+    /* p_real_vout: the vout we have to use to check for video-on-top
+       and a few other things. If we are the QuickTime output, it's us.
+       It we are the OpenGL provider, it is our parent. */
+    if( p_vout->i_object_type == VLC_OBJECT_OPENGL )
+    {
+        p_real_vout = (vout_thread_t *) p_vout->p_parent;
+    }
+    else
+    {
+        p_real_vout = p_vout;
+    }
+
     p_fullscreen_state = NULL;
     i_time_mouse_last_moved = mdate();
 
@@ -126,7 +139,7 @@
 
         [self setAlphaValue: var_GetFloat( p_vout, "macosx-opaqueness" )];
 
-        if( var_GetBool( p_vout, "video-on-top" ) )
+        if( var_GetBool( p_real_vout, "video-on-top" ) )
         {
             [self setLevel: NSStatusWindowLevel];
         }
@@ -261,8 +274,8 @@
 - (void)toggleFullscreen
 {
     vlc_value_t val;
-    val.b_bool = !p_vout->b_fullscreen;
-    var_Set( p_vout, "fullscreen", val );
+    val.b_bool = !p_real_vout->b_fullscreen;
+    var_Set( p_real_vout, "fullscreen", val );
 }
 
 - (BOOL)isFullscreen

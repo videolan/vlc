@@ -78,14 +78,12 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     int i_timeout;
     vlc_value_t val;
 
-
 /* OpenGL interface disabled until
- * - the video on top var is properly working
- * - the escape key is working in fullscreen
  * - the green line is gone
  * - other problems?????
  */
-return( 1 );
+    return( 1 );
+
     if( !CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay ) )
     {
         msg_Warn( p_vout, "no hardware acceleration" );
