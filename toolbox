@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.21 2003/04/09 16:05:58 sam Exp $
+##  $Id: toolbox,v 1.22 2003/04/14 23:07:38 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -359,11 +359,11 @@ then
   echo '#ifdef __PLUGIN__' >> ${file}.in
   cat ${LIBVLC_HEADERS} | grep '^ *VLC_EXPORT.*;' | sed -e 's/VLC_EXPORT( *\([^,]*\), *\([^,]*\), *\(.*\));.*/#   define \2 p_symbols->\2_inner/' >> ${file}.in
   echo '#endif /* __PLUGIN__ */' >> ${file}.in
-  if ! diff -q ${file} ${file}.in
+  if diff -q ${file} ${file}.in
   then
-    mv -f ${file}.in ${file}
-  else
     rm -f ${file}.in
+  else
+    mv -f ${file}.in ${file}
   fi
 
   file=src/misc/modules_plugin.h
@@ -373,11 +373,11 @@ then
   echo '#define STORE_SYMBOLS( p_symbols ) \' >> ${file}.tmp
   cat ${LIBVLC_HEADERS} | grep '^ *VLC_EXPORT.*;' | sed -e 's/VLC_EXPORT( *\([^,]*\), *\([^,]*\), *\(.*\));.*/    (p_symbols)->\2_inner = \2; \\/' >> ${file}.tmp
   echo '' >> ${file}.tmp
-  if ! diff -q ${file} ${file}.tmp
+  if diff -q ${file} ${file}.tmp
   then
-    mv -f ${file}.tmp ${file}
-  else
     rm -f ${file}.tmp
+  else
+    mv -f ${file}.tmp ${file}
   fi
 
   file=src/misc/modules_builtin.h
@@ -403,11 +403,11 @@ then
   fi
   echo "    } while( 0 );" >> ${file}.tmp
   echo "" >> ${file}.tmp
-  if ! diff -q ${file} ${file}.tmp
+  if diff -q ${file} ${file}.tmp
   then
-    mv -f ${file}.tmp ${file}
-  else
     rm -f ${file}.tmp
+  else
+    mv -f ${file}.tmp ${file}
   fi
 
   exit 0
