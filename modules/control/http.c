@@ -1155,9 +1155,31 @@ static mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm )
             set = mvar_New( name, "set" );
             mvar_AppendNewVar( set, "name", el->psz_name );
 
+            fprintf( stderr, "#### name=%s\n", el->psz_name );
+
             for( k = 0; k < desc->i_child; k++ )
             {
-                mvar_AppendNewVar( set, desc->child[k]->psz_name, desc->child[k]->psz_value );
+                vlm_message_t *ch = desc->child[k];
+                if( ch->i_child > 0 )
+                {
+                    int c;
+                    mvar_t *n = mvar_New( ch->psz_name, "set" );
+
+                    fprintf( stderr, "        child=%s [%d]\n", ch->psz_name, ch->i_child );
+                    for( c = 0; c < ch->i_child; c++ )
+                    {
+                        mvar_t *in = mvar_New( ch->psz_name, ch->child[c]->psz_name );
+                        mvar_AppendVar( n, in );
+
+                        fprintf( stderr, "            sub=%s\n", ch->child[c]->psz_name );
+                    }
+                    mvar_AppendVar( set, n );
+                }
+                else
+                {
+                    fprintf( stderr, "        child=%s->%s\n", ch->psz_name, ch->psz_value );
+                    mvar_AppendNewVar( set, ch->psz_name, ch->psz_value );
+                }
             }
             vlm_MessageDelete( inf );
 
@@ -1927,8 +1949,10 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 {
                     static const char *vlm_properties[11] =
                     {
-                        "input", "output", "option", "enabled", "disabled",
-                        "loop", "unloop", "append", "date", "period", "repeat",
+                        /* no args */
+                        "enabled", "disabled", "loop", "unloop",
+                        /* args required */
+                        "input", "output", "option", "append", "date", "period", "repeat",
                     };
                     vlm_message_t *vlm_answer;
                     char name[512];
@@ -1955,11 +1979,11 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     {
                         char val[512];
                         uri_extract_value( p_request, vlm_properties[i], val, 512 );
-                        if( strlen( val ) > 0 )
+                        if( strlen( val ) > 0 && i >= 4 )
                         {
                             p += sprintf( p, " %s %s", vlm_properties[i], val );
                         }
-                        else if( uri_test_param( p_request, vlm_properties[i] ) )
+                        else if( uri_test_param( p_request, vlm_properties[i] ) && i < 4 )
                         {
                             p += sprintf( p, " %s", vlm_properties[i] );
                         }
