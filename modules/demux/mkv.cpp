@@ -315,6 +315,29 @@ typedef struct
     vlc_bool_t b_key;
 } mkv_index_t;
 
+class chapter_item_t
+{
+public:
+	int64_t                     i_start_time, i_end_time;
+	int64_t                     i_absolute_start_time; /* the time in the stream when an edition is ordered */
+	std::vector<chapter_item_t> sub_chapters;
+	int						    i_current_sub_chapter;
+	int                         i_seekpoint_num;
+};
+
+class chapter_edition_t 
+{
+public:
+	chapter_edition_t()
+	:i_uid(-1)
+	,b_ordered(false)
+	{}
+	
+	std::vector<chapter_item_t> chapters;
+	int64_t                     i_uid;
+	bool                        b_ordered;
+};
+
 class demux_sys_t
 {
 public:
@@ -344,6 +367,7 @@ public:
         ,psz_date_utc(NULL)
         ,meta(NULL)
         ,title(NULL)
+	    ,i_current_edition(0)
     {}
 
     vlc_stream_io_callback  *in;
@@ -390,10 +414,10 @@ public:
     input_title_t           *title;
 
     std::vector<KaxSegmentFamily> families;
-    std::vector<KaxSegment*> family_members;
-
-    int64_t                  edition_uid;
-    bool                     edition_ordered;
+    std::vector<KaxSegment*>      family_members;
+	
+	std::vector<chapter_edition_t> editions;
+	int                            i_current_edition;
 };
 
 #define MKVD_TIMECODESCALE 1000000
@@ -1145,6 +1169,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 Seek( p_demux, (int64_t)p_sys->title->seekpoint[i_skp]->i_time_offset, -1);
                 p_demux->info.i_seekpoint |= INPUT_UPDATE_SEEKPOINT;
                 p_demux->info.i_seekpoint = i_skp;
+/*				p_sys->i_current_chapter = i_skp;*/
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -1392,6 +1417,19 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
 #undef tk
 }
 
+static void UpdateCurrentChapter()
+{
+	/* update current chapter/seekpoint */
+#ifdef TODO
+	i_chapter
+	if (p_sys->title->seekpoint[i_skp]->i_time_offset)
+	{
+		p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+		p_demux->info.i_seekpoint = i_chapter;
+	}
+#endif
+}
+
 static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -1565,6 +1603,7 @@ static int Demux( demux_t *p_demux)
     demux_sys_t *p_sys = p_demux->p_sys;
     mtime_t        i_start_pts;
     int            i_block_count = 0;
+	int            i_chapter;
 
     KaxBlock *block;
     int64_t i_block_duration;
@@ -1575,6 +1614,15 @@ static int Demux( demux_t *p_demux)
 
     for( ;; )
     {
+		if ( p_sys->editions[p_sys->i_current_edition].b_ordered )
+		{
+			/* 1st, we need to know in which chapter we are */
+			
+			/* check if we need to silently seek to a new location in the stream */
+			/* count the last duration time found for each track in a table (-1 not found, -2 silent) */
+			/* only seek after each duration >= end timecode of the current chapter */
+		}
+		
         if( BlockGet( p_demux, &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
             msg_Warn( p_demux, "cannot get block EOF?" );
@@ -1591,6 +1639,8 @@ static int Demux( demux_t *p_demux)
 
         BlockDecode( p_demux, block, p_sys->i_pts, i_block_duration );
 
+		UpdateCurrentChapter();
+		
         delete block;
         i_block_count++;
 
@@ -2653,7 +2703,7 @@ static void ParseInfo( demux_t *p_demux, EbmlElement *info )
 /*****************************************************************************
  * ParseChapterAtom
  *****************************************************************************/
-static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca )
+static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca, chapter_item_t & chapters )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     unsigned int i;
@@ -2741,7 +2791,9 @@ static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca )
         }
         else if( MKV_IS_ID( l, KaxChapterAtom ) )
         {
-            ParseChapterAtom( p_demux, i_level+1, static_cast<EbmlMaster *>(l) );
+			chapter_item_t new_sub_chapter;
+            ParseChapterAtom( p_demux, i_level+1, static_cast<EbmlMaster *>(l), new_sub_chapter );
+			chapters.sub_chapters.push_back( new_sub_chapter );
         }
     }
 
@@ -2768,7 +2820,7 @@ static void ParseChapters( demux_t *p_demux, EbmlElement *chapters )
     EbmlMaster  *m;
     unsigned int i;
     int i_upper_level = 0;
-
+	int i_default_edition = 0;
 
     /* Master elements */
     m = static_cast<EbmlMaster *>(chapters);
@@ -2780,37 +2832,53 @@ static void ParseChapters( demux_t *p_demux, EbmlElement *chapters )
 
         if( MKV_IS_ID( l, KaxEditionEntry ) )
         {
+			chapter_edition_t edition;
+			
             EbmlMaster *E = static_cast<EbmlMaster *>(l );
             unsigned int j;
             msg_Dbg( p_demux, "|   |   + EditionEntry" );
-            p_sys->edition_ordered = false;
             for( j = 0; j < E->ListSize(); j++ )
             {
                 EbmlElement *l = (*E)[j];
 
                 if( MKV_IS_ID( l, KaxChapterAtom ) )
                 {
-                    ParseChapterAtom( p_demux, 0, static_cast<EbmlMaster *>(l) );
+					chapter_item_t new_sub_chapter;
+                    ParseChapterAtom( p_demux, 0, static_cast<EbmlMaster *>(l), new_sub_chapter );
+					edition.chapters.push_back( new_sub_chapter );
                 }
                 else if( MKV_IS_ID( l, KaxEditionUID ) )
                 {
-                    p_sys->edition_uid = uint64(*static_cast<KaxEditionUID *>(l));
+                    edition.i_uid = uint64(*static_cast<KaxEditionUID *>(l));
                 }
                 else if( MKV_IS_ID( l, KaxEditionFlagOrdered ) )
                 {
-                    p_sys->edition_ordered = uint8(*static_cast<KaxEditionFlagOrdered *>(l)) != 0;
+                    edition.b_ordered = uint8(*static_cast<KaxEditionFlagOrdered *>(l)) != 0;
+                }
+                else if( MKV_IS_ID( l, KaxEditionFlagDefault ) )
+                {
+					if (uint8(*static_cast<KaxEditionFlagDefault *>(l)) != 0)
+						p_sys->i_current_edition = p_sys->editions.size();
                 }
                 else
                 {
                     msg_Dbg( p_demux, "|   |   |   + Unknown (%s)", typeid(*l).name() );
                 }
             }
+			p_sys->editions.push_back( edition );
         }
         else
         {
             msg_Dbg( p_demux, "|   |   + Unknown (%s)", typeid(*l).name() );
         }
     }
+
+	p_sys->i_current_edition = i_default_edition;
+	
+	if ( p_sys->editions[i_default_edition].b_ordered )
+	{
+		/* update the duration of the segment according to the sum of all sub chapters */
+	}
 }
 
 /*****************************************************************************
