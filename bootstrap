@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.31 2002/11/20 16:43:32 sam Exp $
+##  $Id: bootstrap,v 1.32 2002/11/20 19:07:26 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -116,36 +116,36 @@ EOF
 # Begin Source File${M}
 SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
 # ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\"plugins\\" /D DATA_PATH=\\"share\\"${M}
-!IF "\$(CFG)" == "vlc - Win32 (WCE MIPS) Release"${M}
-# PROP Intermediate_Dir "MIPSRel\\${subdir}"${M}
+!IF "\$(CFG)" == "libvlc - Win32 (WCE MIPS) Release"${M}
 # PROP Output_Dir "MIPSRel\\${subdir}"${M}
-!ELSEIF "\$(CFG)" == "vlc - Win32 (WCE MIPS) Debug"${M}
-# PROP Intermediate_Dir "MIPSDbg\\${subdir}"${M}
+# PROP Intermediate_Dir "MIPSRel\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE MIPS) Debug"${M}
 # PROP Output_Dir "MIPSDbg\\${subdir}"${M}
-!ELSEIF "\$(CFG)" == "vlc - Win32 (WCE SH4) Release"${M}
-# PROP Intermediate_Dir "SH4Rel\\${subdir}"${M}
+# PROP Intermediate_Dir "MIPSDbg\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE SH4) Release"${M}
 # PROP Output_Dir "SH4Rel\\${subdir}"${M}
-!ELSEIF "\$(CFG)" == "vlc - Win32 (WCE SH4) Debug"${M}
-# PROP Intermediate_Dir "SH4Dbg\\${subdir}"${M}
+# PROP Intermediate_Dir "SH4Rel\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE SH4) Debug"${M}
 # PROP Output_Dir "SH4Dbg\\${subdir}"${M}
-!ELSEIF "\$(CFG)" == "vlc - Win32 (WCE SH3) Release"${M}
-# PROP Intermediate_Dir "SH3Rel\\${subdir}"${M}
+# PROP Intermediate_Dir "SH4Dbg\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE SH3) Release"${M}
 # PROP Output_Dir "SH3Rel\\${subdir}"${M}
-!ELSEIF "\$(CFG)" == "vlc - Win32 (WCE SH3) Debug"${M}
-# PROP Intermediate_Dir "SH3Dbg\\${subdir}"${M}
+# PROP Intermediate_Dir "SH3Rel\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE SH3) Debug"${M}
 # PROP Output_Dir "SH3Dbg\\${subdir}"${M}
-!ELSEIF "\$(CFG)" == "vlc - Win32 (WCE ARM) Release"${M}
-# PROP Intermediate_Dir "ARMRel\\${subdir}"${M}
+# PROP Intermediate_Dir "SH3Dbg\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE ARM) Release"${M}
 # PROP Output_Dir "ARMRel\\${subdir}"${M}
-!ELSEIF "\$(CFG)" == "vlc - Win32 (WCE ARM) Debug"${M}
-# PROP Intermediate_Dir "ARMDbg\\${subdir}"${M}
+# PROP Intermediate_Dir "ARMRel\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE ARM) Debug"${M}
 # PROP Output_Dir "ARMDbg\\${subdir}"${M}
-!ELSEIF "\$(CFG)" == "vlc - Win32 (WCE x86em) Release"${M}
-# PROP Intermediate_Dir "X86EMRel\\${subdir}"${M}
+# PROP Intermediate_Dir "ARMDbg\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE x86em) Release"${M}
 # PROP Output_Dir "X86EMRel\\${subdir}"${M}
-!ELSEIF "\$(CFG)" == "vlc - Win32 (WCE x86em) Debug"${M}
-# PROP Intermediate_Dir "X86EMDbg\\${subdir}"${M}
+# PROP Intermediate_Dir "X86EMRel\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE x86em) Debug"${M}
 # PROP Output_Dir "X86EMDbg\\${subdir}"${M}
+# PROP Intermediate_Dir "X86EMDbg\\${subdir}"${M}
 !ENDIF${M}
 # End Source File${M}
 EOF
@@ -154,12 +154,12 @@ EOF
 # Begin Source File${M}
 SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
 # ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\"plugins\\" /D DATA_PATH=\\"share\\"${M}
-!IF "\$(CFG)" == "vlc - Win32 Release"${M}
-# PROP Intermediate_Dir "Release\\${subdir}"${M}
+!IF "\$(CFG)" == "libvlc - Win32 Release"${M}
 # PROP Output_Dir "Release\\${subdir}"${M}
-!ELSEIF "\$(CFG)" == "vlc - Win32 Debug"${M}
-# PROP Intermediate_Dir "Debug\\${subdir}"${M}
+# PROP Intermediate_Dir "Release\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 Debug"${M}
 # PROP Output_Dir "Debug\\${subdir}"${M}
+# PROP Intermediate_Dir "Debug\\${subdir}"${M}
 !ENDIF${M}
 # End Source File${M}
 EOF

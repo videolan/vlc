@@ -1,5 +1,6 @@
 Debug
 Release
-vlc.ncb
-vlc.opt
-vlc.plg
+*.dsp
+*.ncb
+*.opt
+*.plg

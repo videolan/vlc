@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.23 2002/11/13 15:28:24 sam Exp $
+ * $Id: messages.c,v 1.24 2002/11/20 19:07:27 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -463,7 +463,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     CE_WRITE( ppsz_type[i_type] );
     CE_WRITE( ": " );
     CE_WRITE( p_item->psz_msg );
-    CE_WRITE( "\n" );
+    CE_WRITE( "\r\n" );
     FlushFileBuffers( p_this->p_libvlc->msg_bank.logfile );
 
 #else

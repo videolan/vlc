@@ -348,6 +348,75 @@ Package=<5>
 Package=<4>
 {{{
     Begin Project Dependency
+    Project_Dep_Name plugin_a52tospdif
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_access_file
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_dummy
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_es
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_fixed32tofloat32
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_fixed32tos16
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_i420_rgb
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_i420_yuy2
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_i422_yuy2
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_idct
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_idctclassic
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_linear_resampler
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_memcpy
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_motion
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_mpeg_audio
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_mpeg_system
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_mpeg_video
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_ps
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_trivial_channel_mixer
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_trivial_mixer
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_trivial_resampler
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_ts
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name plugin_waveout
+    End Project Dependency
+    Begin Project Dependency
     Project_Dep_Name libvlc
     End Project Dependency
 }}}

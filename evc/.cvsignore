@@ -7,3 +7,8 @@ SH3Rel
 SH4Dbg
 SH4Rel
 X86EMDbg
+X86EMRel
+*.vcp
+*.vcl
+*.vcb
+*.vco
