@@ -166,17 +166,4 @@ void vpar_InitPMBType( struct vpar_thread_s * p_vpar );
 void vpar_InitBMBType( struct vpar_thread_s * p_vpar );
 void vpar_InitCodedPattern( struct vpar_thread_s * p_vpar );
 void vpar_InitDCTTables( struct vpar_thread_s * p_vpar );
-void vpar_PictureDataGENERIC( struct vpar_thread_s * p_vpar, int i_mb_base );
-#if (VPAR_OPTIM_LEVEL > 0)
-void vpar_PictureData2I420F0( struct vpar_thread_s * p_vpar, int i_mb_base );
-void vpar_PictureData2P420F0( struct vpar_thread_s * p_vpar, int i_mb_base );
-void vpar_PictureData2B420F0( struct vpar_thread_s * p_vpar, int i_mb_base );
-#endif
-#if (VPAR_OPTIM_LEVEL > 1)
-void vpar_PictureData2I420TZ( struct vpar_thread_s * p_vpar, int i_mb_base );
-void vpar_PictureData2P420TZ( struct vpar_thread_s * p_vpar, int i_mb_base );
-void vpar_PictureData2B420TZ( struct vpar_thread_s * p_vpar, int i_mb_base );
-void vpar_PictureData2I420BZ( struct vpar_thread_s * p_vpar, int i_mb_base );
-void vpar_PictureData2P420BZ( struct vpar_thread_s * p_vpar, int i_mb_base );
-void vpar_PictureData2B420BZ( struct vpar_thread_s * p_vpar, int i_mb_base );
-#endif
+void vpar_PictureData( struct vpar_thread_s * p_vpar, int i_mb_base );

@@ -291,14 +291,14 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->synchro.i_delay            = 200000;
     p_vpar->synchro.i_theorical_delay  = 40000; /* 25 fps */
     /* assume we can display all Is and 2 Ps */
-    p_vpar->synchro.b_all_I = 1;
+    p_vpar->synchro.b_all_I = 1 << 10;
     p_vpar->synchro.b_all_P = 0;
-    p_vpar->synchro.displayable_p = 2;
+    p_vpar->synchro.displayable_p = 2 << 10;
     p_vpar->synchro.b_all_B = 0;
     p_vpar->synchro.displayable_b = 0;
     /* assume there were about 3 P and 6 B images between I's */
-    p_vpar->synchro.i_P_seen = p_vpar->synchro.i_P_kept = 1;
-    p_vpar->synchro.i_B_seen = p_vpar->synchro.i_B_kept = 1;
+    p_vpar->synchro.i_P_seen = p_vpar->synchro.i_P_kept = 1 << 10;
+    p_vpar->synchro.i_B_seen = p_vpar->synchro.i_B_kept = 1 << 10;
 #endif
 
 #ifdef MEUUH_SYNCHRO

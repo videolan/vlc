@@ -67,9 +67,9 @@ typedef struct video_synchro_s
     /* can we display pictures ? */
     boolean_t     b_all_I;
     boolean_t     b_all_P;
-    double        displayable_p;
+    int           displayable_p;
     boolean_t     b_all_B;
-    double        displayable_b;
+    int           displayable_b;
 
 } video_synchro_t;
 
@@ -100,7 +100,7 @@ typedef struct video_synchro_s
     /* Date Section */
 
     /* Dates needed to compute the date of the current frame
-     * We also use the stream frame rate (sequence.r_frame_rate) */
+     * We also use the stream frame rate (sequence.i_frame_rate) */
     mtime_t     i_current_frame_date;
     mtime_t     i_backward_frame_date;
 

@@ -158,14 +158,23 @@ int intf_ExecScript( char *psz_filename )
     FILE *  p_file;                                                  /* file */
     char    psz_line[INTF_MAX_CMD_SIZE];                             /* line */
     char *  psz_index;                                    /* index in string */
+    char *  psz_vlcrc;                                 /* full path to vlcrc */
     int     i_err;                                        /* error indicator */
 
     /* Open file */
     i_err = 0;
-    p_file = fopen( psz_filename, "r" );
+
+    if( !( psz_index = getenv("HOME") ) )
+    {
+        psz_index = "/";
+    }
+    psz_vlcrc = malloc( strlen( psz_index ) + 1 + strlen( psz_filename ) + 1 );
+    sprintf( psz_vlcrc, "%s/%s", psz_index, psz_filename );
+    
+    p_file = fopen( psz_vlcrc, "r" );
     if( p_file == NULL )
     {
-        intf_DbgMsg("intf warning: %s: %s\n", psz_filename, strerror(errno));
+        intf_DbgMsg("intf warning: %s: %s\n", psz_vlcrc, strerror(errno));
         return( -1 );
     }
 
@@ -194,7 +203,7 @@ int intf_ExecScript( char *psz_filename )
     }
     if( !feof( p_file ) )
     {
-        intf_ErrMsg("error: %s: %s\n", psz_filename, strerror(errno));
+        intf_ErrMsg("error: %s: %s\n", psz_vlcrc, strerror(errno));
         return( -1 );
     }
 

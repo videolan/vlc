@@ -53,7 +53,6 @@ int i_pic_height, int i_pic_line_width, int i_matrix_coefficients
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-void SetGammaTable        ( int *pi_table, double f_gamma );
 void SetYUV               ( vout_thread_t *p_vout );
 void SetOffset            ( int i_width, int i_height, int i_pic_width,
                             int i_pic_height, boolean_t *pb_h_scaling,

@@ -1691,7 +1691,7 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
      */
     if( p_vout->c_fps_samples > VOUT_FPS_SAMPLES )
     {
-        sprintf( psz_buffer, "%.2f fps", (double) VOUT_FPS_SAMPLES * 1000000 /
+        sprintf( psz_buffer, "%.2f fps/10", VOUT_FPS_SAMPLES * 1000000 * 10 /
                  ( p_vout->p_fps_sample[ (p_vout->c_fps_samples - 1) % VOUT_FPS_SAMPLES ] -
                    p_vout->p_fps_sample[ p_vout->c_fps_samples % VOUT_FPS_SAMPLES ] ) );
         Print( p_vout, 0, 0, RIGHT_RALIGN, TOP_RALIGN, psz_buffer );
@@ -1939,7 +1939,7 @@ static void Synchronize( vout_thread_t *p_vout, s64 i_delay )
     /* XXX?? gore following */
     static int i_panic_count = 0;
     static int i_last_synchro_inc = 0;
-    static float r_synchro_level = VOUT_SYNCHRO_LEVEL_START;
+    static int i_synchro_level = VOUT_SYNCHRO_LEVEL_START;
     static int i_truc = 10;
 
     if( i_delay < 0 )
@@ -1965,7 +1965,7 @@ static void Synchronize( vout_thread_t *p_vout, s64 i_delay )
         }
     }
 
-    if( i_truc > VOUT_SYNCHRO_LEVEL_MAX*2*2*2*2*2 ||
+    if( i_truc > VOUT_SYNCHRO_LEVEL_MAX >> 5 ||
         i_synchro_inc*i_last_synchro_inc < 0 )
     {
         i_truc = 32;
@@ -1985,17 +1985,17 @@ static void Synchronize( vout_thread_t *p_vout, s64 i_delay )
     }
     else if( i_delay > 100000 )
     {
-        r_synchro_level += 1;
+        i_synchro_level += 1 << 10;
         if( i_delay > 130000 )
-            r_synchro_level += 1;
+            i_synchro_level += 1 << 10;
     }
 
-    r_synchro_level += (float)i_synchro_inc / i_truc;
-    p_vout->i_synchro_level = (int)(r_synchro_level+0.5);
+    i_synchro_level += ( i_synchro_inc << 10 ) / i_truc;
+    p_vout->i_synchro_level = ( i_synchro_level + (1 << 9) );
 
-    if( r_synchro_level > VOUT_SYNCHRO_LEVEL_MAX )
+    if( i_synchro_level > VOUT_SYNCHRO_LEVEL_MAX )
     {
-        r_synchro_level = VOUT_SYNCHRO_LEVEL_MAX;
+        i_synchro_level = VOUT_SYNCHRO_LEVEL_MAX;
     }
 
     //fprintf( stderr, "synchro level : %d, heap : %d (%d, %d) (%d, %f) - %Ld\n", p_vout->i_synchro_level,

@@ -156,69 +156,75 @@ endif
 #
 # C Objects
 # 
-interface_obj =  		interface/main.o \
-						interface/interface.o \
-						interface/intf_msg.o \
-						interface/intf_cmd.o \
-						interface/intf_ctrl.o \
-						interface/intf_console.o
+interface_obj =  	interface/main.o \
+				interface/interface.o \
+				interface/intf_msg.o \
+				interface/intf_cmd.o \
+				interface/intf_ctrl.o \
+				interface/intf_console.o
 
-input_obj =         		input/input_vlan.o \
-						input/input_file.o \
-						input/input_netlist.o \
-						input/input_network.o \
-						input/input_ctrl.o \
-						input/input_pcr.o \
-						input/input_psi.o \
-						input/input.o
+input_obj =		input/input_vlan.o \
+				input/input_file.o \
+				input/input_netlist.o \
+				input/input_network.o \
+				input/input_ctrl.o \
+				input/input_pcr.o \
+				input/input_psi.o \
+				input/input.o
 
-audio_output_obj = 		audio_output/audio_output.o
+audio_output_obj = 	audio_output/audio_output.o
 
-video_output_obj = 		video_output/video_output.o \
-						video_output/video_text.o \
-						video_output/video_spu.o \
-						video_output/video_yuv.o
+video_output_obj = 	video_output/video_output.o \
+				video_output/video_text.o \
+				video_output/video_spu.o \
+				video_output/video_yuv.o
 
-ac3_decoder_obj =		ac3_decoder/ac3_decoder_thread.o \
-						ac3_decoder/ac3_decoder.o \
-						ac3_decoder/ac3_parse.o \
-						ac3_decoder/ac3_exponent.o \
-						ac3_decoder/ac3_bit_allocate.o \
-						ac3_decoder/ac3_mantissa.o \
-						ac3_decoder/ac3_rematrix.o \
-						ac3_decoder/ac3_imdct.o \
-						ac3_decoder/ac3_downmix.o
+ac3_decoder_obj =	ac3_decoder/ac3_decoder_thread.o \
+				ac3_decoder/ac3_decoder.o \
+				ac3_decoder/ac3_parse.o \
+				ac3_decoder/ac3_exponent.o \
+				ac3_decoder/ac3_bit_allocate.o \
+				ac3_decoder/ac3_mantissa.o \
+				ac3_decoder/ac3_rematrix.o \
+				ac3_decoder/ac3_imdct.o \
+				ac3_decoder/ac3_downmix.o
 						
-lpcm_decoder_obj =		lpcm_decoder/lpcm_decoder_thread.o \
-						lpcm_decoder/lpcm_decoder.o
+lpcm_decoder_obj =	lpcm_decoder/lpcm_decoder_thread.o \
+				lpcm_decoder/lpcm_decoder.o
 
-audio_decoder_obj =		audio_decoder/audio_decoder_thread.o \
-						audio_decoder/audio_decoder.o \
-						audio_decoder/audio_math.o
+audio_decoder_obj =	audio_decoder/audio_decoder_thread.o \
+				audio_decoder/audio_decoder.o \
+				audio_decoder/audio_math.o
 
-spu_decoder_obj =		spu_decoder/spu_decoder.o
+spu_decoder_obj =	spu_decoder/spu_decoder.o
 
 #??generic_decoder_obj =		generic_decoder/generic_decoder.o
 # remeber to add it to OBJ 
 
-video_parser_obj = 		video_parser/video_parser.o \
-						video_parser/vpar_headers.o \
-						video_parser/vpar_blocks.o \
-						video_parser/vpar_synchro.o \
-						video_parser/video_fifo.o
+video_parser_obj = 	video_parser/video_parser.o \
+				video_parser/vpar_headers.o \
+				video_parser/vpar_blocks.o \
+				video_parser/vpar_synchro.o \
+				video_parser/video_fifo.o
 
-video_decoder_obj =		video_decoder/video_decoder.o \
-						video_decoder/vdec_motion.o \
-						video_decoder/vdec_motion_inner.o \
-			                        video_decoder/vdec_idct.o
+ifneq (,$(findstring mmx,$(ARCH)))
+	vdec_motion_inner = video_decoder/vdec_motion_inner_mmx.o
+else
+	vdec_motion_inner = video_decoder/vdec_motion_inner.o
+endif
 
-misc_obj =			misc/mtime.o \
-						misc/tests.o \
-						misc/rsc_files.o \
-						misc/netutils.o \
-						misc/playlist.o \
-						misc/plugins.o \
-						misc/decoder_fifo.o
+video_decoder_obj =	video_decoder/video_decoder.o \
+				video_decoder/vdec_motion.o \
+				video_decoder/vdec_idct.o \
+				$(vdec_motion_inner)
+
+misc_obj =		misc/mtime.o \
+				misc/tests.o \
+				misc/rsc_files.o \
+				misc/netutils.o \
+				misc/playlist.o \
+				misc/plugins.o \
+				misc/decoder_fifo.o
 
 
 C_OBJ = $(interface_obj) \

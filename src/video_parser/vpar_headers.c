@@ -53,11 +53,6 @@
 #include "video_fifo.h"
 
 /*
- * Function pointer
- */
-typedef void    (*f_picture_data_t)( vpar_thread_t*, int );
-
-/*
  * Local prototypes
  */
 static __inline__ void NextStartCode( vpar_thread_t * p_vpar );
@@ -334,17 +329,17 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
 static void SequenceHeader( vpar_thread_t * p_vpar )
 {
 #define RESERVED    -1
-    static float r_frame_rate_table[16] =
+    static int i_frame_rate_table[16] =
     {
-        0.0,
-        ((23.0*1000.0)/1001.0),
-        24.0,
-        25.0,
-        ((30.0*1000.0)/1001.0),
-        30.0,
-        50.0,
-        ((60.0*1000.0)/1001.0),
-        60.0,
+        0,
+        23 * 1000,
+        24 * 1001,
+        25 * 1001,
+        30 * 1000,
+        30 * 1001,
+        50 * 1001,
+        60 * 1000,
+        60 * 1001,
         RESERVED, RESERVED, RESERVED, RESERVED, RESERVED, RESERVED, RESERVED
     };
 #undef RESERVED
@@ -357,8 +352,8 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     p_vpar->sequence.i_width = GetBits( &p_vpar->bit_stream, 12 );
     p_vpar->sequence.i_height = GetBits( &p_vpar->bit_stream, 12 );
     p_vpar->sequence.i_aspect_ratio = GetBits( &p_vpar->bit_stream, 4 );
-    p_vpar->sequence.r_frame_rate =
-            r_frame_rate_table[ GetBits( &p_vpar->bit_stream, 4 ) ];
+    p_vpar->sequence.i_frame_rate =
+            i_frame_rate_table[ GetBits( &p_vpar->bit_stream, 4 ) ];
 
     /* We don't need bit_rate_value, marker_bit, vbv_buffer_size,
      * constrained_parameters_flag */
@@ -418,7 +413,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         /* frame_rate_extension_n */
         i_dummy = GetBits( &p_vpar->bit_stream, 2 );
         /* frame_rate_extension_d */
-        p_vpar->sequence.r_frame_rate *= (i_dummy + 1)
+        p_vpar->sequence.i_frame_rate *= (i_dummy + 1)
                                   / (GetBits( &p_vpar->bit_stream, 5 ) + 1);
     }
     else
@@ -496,44 +491,6 @@ static void GroupHeader( vpar_thread_t * p_vpar )
  *****************************************************************************/
 static void PictureHeader( vpar_thread_t * p_vpar )
 {
-    /* Table of optimized PictureData functions. */
-    static f_picture_data_t ppf_picture_data[4][4] =
-    {
-        {
-            NULL, NULL, NULL, NULL
-        },
-        {
-            /* TOP_FIELD */
-#if (VPAR_OPTIM_LEVEL > 1)
-            NULL, vpar_PictureData2I420TZ, vpar_PictureData2P420TZ,
-            vpar_PictureData2B420TZ
-#else
-            NULL, vpar_PictureDataGENERIC, vpar_PictureDataGENERIC,
-            vpar_PictureDataGENERIC
-#endif
-        },
-        {
-            /* BOTTOM_FIELD */
-#if (VPAR_OPTIM_LEVEL > 1)
-            NULL, vpar_PictureData2I420BZ, vpar_PictureData2P420BZ,
-            vpar_PictureData2B420BZ
-#else
-            NULL, vpar_PictureDataGENERIC, vpar_PictureDataGENERIC,
-            vpar_PictureDataGENERIC
-#endif
-        },
-        {
-            /* FRAME_PICTURE */
-#if (VPAR_OPTIM_LEVEL > 0)
-            NULL, vpar_PictureData2I420F0, vpar_PictureData2P420F0,
-            vpar_PictureData2B420F0
-#else
-            NULL, vpar_PictureDataGENERIC, vpar_PictureDataGENERIC,
-            vpar_PictureDataGENERIC
-#endif
-        }
-    };
-
     int                 i_structure;
     int                 i_mb_base;
     boolean_t           b_parsable;
@@ -764,28 +721,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     /* Extension and User data. */
     ExtensionAndUserData( p_vpar );
 
-    /* Picture data (ISO/IEC 13818-2 6.2.3.7). */
-    if( p_vpar->sequence.i_chroma_format != CHROMA_420
-        || !p_vpar->sequence.b_mpeg2 || p_vpar->sequence.i_height > 2800
-        || p_vpar->sequence.i_scalable_mode == SC_DP )
-    {
-        /* Weird stream. Use the slower generic function. */
-        vpar_PictureDataGENERIC( p_vpar, i_mb_base );
-    }
-    else
-    {
-        /* Try to find an optimized function. */
-        if( ppf_picture_data[p_vpar->picture.i_structure][p_vpar->picture.i_coding_type] == NULL )
-        {
-            intf_ErrMsg( "vpar error: bad ppf_picture_data function pointer (struct:%d, coding type:%d)\n",
-                     p_vpar->picture.i_structure, p_vpar->picture.i_coding_type );
-        }
-        else
-        {
-            ppf_picture_data[p_vpar->picture.i_structure]
-                            [p_vpar->picture.i_coding_type]( p_vpar, i_mb_base );
-        }
-    }
+    vpar_PictureData( p_vpar, i_mb_base );
 
     if( p_vpar->b_die || p_vpar->b_error )
     {

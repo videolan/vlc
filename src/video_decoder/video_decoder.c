@@ -322,8 +322,8 @@ static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
 
-            "emms"
-             :"+r" (p_data): "r" (p_block),"r" (i_incr+8));
+            //"emms"
+            :"+r" (p_data): "r" (p_block),"r" (i_incr+8));
 }
 #endif
 
@@ -389,7 +389,7 @@ static  __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
             "movq        112(%1),%%mm0\n\t"
             "packuswb   120(%1),%%mm0\n\t"
             "movq        %%mm0,(%0)\n\t"
-            "emms"
+            //"emms"
             :"+r" (p_data): "r" (p_block),"r" (i_incr+8));
 }
 #endif

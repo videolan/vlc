@@ -2,8 +2,7 @@
   Régis Duchesne <regis@via.ecp.fr>
   Michel Lespinasse <walken@wrs.com>
 
-  Olivier Baxa <oli@via.ecp.fr>
-  Eric Estievenart <eric@via.ecp.fr>
+  Olivier Pomel <pomel@via.ecp.fr>
 
   Jean-Philippe Grimaldi <jeanphi@via.ecp.fr>
   Andres Krapf <dae@via.ecp.fr>
@@ -14,11 +13,9 @@
   Jean-Marc Dressler <polux@via.ecp.fr>
   Gaël Hendryckx <jimmy@via.ecp.fr>
   Samuel Hocevar <sam@via.ecp.fr>
+  Brieuc Jeunhomme <bbp@via.ecp.fr>
   Michel Kaempf <maxx@via.ecp.fr>
 
   Stéphane Borel <stef@via.ecp.fr>
   Renaud Dartus <reno@via.ecp.fr>
-  Henri Fallon <henri@via.ecp.fr>
 
-  Contributors include Aaron Holtzman for his ac3dec decoder, and the
-  LiViD team for a few lines of code we borrowed here and there.

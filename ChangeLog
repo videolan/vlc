@@ -5,6 +5,10 @@
   * "gvlc", "fbvlc", "ggivlc" aliases now work
   * fixed functions that weren't properly inlined
   * removed bloat from the MMX YUV plugin
+  * vlc.init becomes ~/.vlcrc
+  * removed float operations in the video decoder, and all emms asm functions
+  * borrowed linuxvideo's MMX motion compensation
+  * fixed an undefined symbol in the MMX YUV plugin
 
 Thu Jul 20 15:14:06 CEST 2000
 0.1.99e :

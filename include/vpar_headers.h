@@ -58,7 +58,7 @@ typedef struct sequence_s
                                             /* the same, in macroblock units */
     unsigned int        i_aspect_ratio;        /* height/width display ratio */
     unsigned int        i_matrix_coefficients;/* coeffs of the YUV transform */
-    float               r_frame_rate;       /* theoritical frame rate in fps */
+    int                 i_frame_rate;  /* theoritical frame rate in fps*1001 */
     boolean_t           b_mpeg2;                                    /* guess */
     boolean_t           b_progressive;              /* progressive (ie.
                                                      * non-interlaced) frame */

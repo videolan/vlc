@@ -127,8 +127,8 @@
  *****************************************************************************/
 
 /* Environment variable used to store startup script name and default value */
-#define INTF_INIT_SCRIPT_VAR            "vlc_init"
-#define INTF_INIT_SCRIPT_DEFAULT        "vlc.init"
+#define INTF_INIT_SCRIPT_VAR            "vlcrc"
+#define INTF_INIT_SCRIPT_DEFAULT        ".vlcrc"
 
 /* Environment variable used to store channels file and default value */
 #define INTF_CHANNELS_VAR               "vlc_channels"
@@ -434,6 +434,7 @@
  * Synchro configuration
  *****************************************************************************/
 
-#define VOUT_SYNCHRO_LEVEL_START        5
-#define VOUT_SYNCHRO_LEVEL_MAX          15
+#define VOUT_SYNCHRO_LEVEL_START        5 << 10
+#define VOUT_SYNCHRO_LEVEL_MAX          15 << 10
 #define VOUT_SYNCHRO_HEAP_IDEAL_SIZE    5
+

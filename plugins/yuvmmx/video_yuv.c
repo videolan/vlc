@@ -131,11 +131,7 @@ int yuv_MMXReset( vout_thread_t *p_vout )
 + *****************************************************************************/
 void SetYUV( vout_thread_t *p_vout )
 {
-    int         pi_gamma[256];                                /* gamma table */
     int         i_index;                                  /* index in tables */
-
-    /* Build gamma table */
-    SetGammaTable( pi_gamma, p_vout->f_gamma );
 
     /*
      * Set pointers and build YUV tables

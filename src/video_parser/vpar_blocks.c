@@ -618,7 +618,7 @@ void vpar_InitDCTTables( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * DecodeMPEG1NonIntra : decode MPEG-1 non-intra blocks
  *****************************************************************************/
-static void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
+static __inline__ void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
                                             macroblock_t * p_mb, int i_b,
                                             int i_chroma_format )
 {
@@ -729,7 +729,7 @@ static void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * DecodeMPEG1Intra : decode MPEG-1 intra blocks
  *****************************************************************************/
-static void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
+static __inline__ void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
                                          macroblock_t * p_mb, int i_b ,
                                          int i_chroma_format )
 {
@@ -876,7 +876,7 @@ static void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * DecodeMPEG2NonIntra : decode MPEG-2 non-intra blocks
  *****************************************************************************/
-static void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
+static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
                                             macroblock_t * p_mb, int i_b,
                                             int i_chroma_format )
 {
@@ -985,7 +985,7 @@ static void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * DecodeMPEG2Intra : decode MPEG-2 intra blocks
  *****************************************************************************/
-static void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
+static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
                                          macroblock_t * p_mb, int i_b,
                                          int i_chroma_format )
 {
@@ -1135,7 +1135,7 @@ static void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
 /****************************************************************************
  * MotionCode : Parse the next motion code
  ****************************************************************************/
-static int MotionCode( vpar_thread_t * p_vpar )
+static __inline__ int MotionCode( vpar_thread_t * p_vpar )
 {
     int i_code;
     static lookup_t pl_mv_tab0[8] =
@@ -1184,7 +1184,7 @@ static int MotionCode( vpar_thread_t * p_vpar )
 /****************************************************************************
  * DecodeMotionVector : Decode a motion_vector
  ****************************************************************************/
-static void DecodeMotionVector( int * pi_prediction, int i_r_size,
+static __inline__ void DecodeMotionVector( int * pi_prediction, int i_r_size,
         int i_motion_code, int i_motion_residual, int i_full_pel )
 {
     int i_limit, i_vector;
@@ -1211,7 +1211,7 @@ static void DecodeMotionVector( int * pi_prediction, int i_r_size,
 /****************************************************************************
  * MotionVector : Parse the next motion_vector field
  ****************************************************************************/
-static void MotionVector( vpar_thread_t * p_vpar,
+static __inline__ void MotionVector( vpar_thread_t * p_vpar,
                                      macroblock_t * p_mb, int i_r,
                                      int i_s, int i_full_pel, int i_structure )
 {
@@ -1321,7 +1321,7 @@ static void MotionVector( vpar_thread_t * p_vpar,
  * DecodeMVMPEG1 : Parse the next MPEG-1 motion vectors
  *****************************************************************************/
 static void DecodeMVMPEG1( vpar_thread_t * p_vpar,
-                            macroblock_t * p_mb, int i_s, int i_structure )
+                           macroblock_t * p_mb, int i_s, int i_structure )
 {
     MotionVector( p_vpar, p_mb, 0, i_s,
                   p_vpar->picture.pb_full_pel_vector[i_s], i_structure );
@@ -1331,7 +1331,7 @@ static void DecodeMVMPEG1( vpar_thread_t * p_vpar,
  * DecodeMVMPEG2 : Parse the next MPEG-2 motion_vectors field
  *****************************************************************************/
 static void DecodeMVMPEG2( vpar_thread_t * p_vpar,
-                            macroblock_t * p_mb, int i_s, int i_structure )
+                           macroblock_t * p_mb, int i_s, int i_structure )
 {
     if( p_vpar->mb.i_mv_count == 1 )
     {
@@ -1389,7 +1389,7 @@ static int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * IMBType : macroblock_type in I pictures
  *****************************************************************************/
-static int IMBType( vpar_thread_t * p_vpar )
+static __inline__ int IMBType( vpar_thread_t * p_vpar )
 {
     /* Take two bits for testing */
     int                 i_type = ShowBits( &p_vpar->bit_stream, 2 );
@@ -1407,7 +1407,7 @@ static int IMBType( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * PMBType : macroblock_type in P pictures
  *****************************************************************************/
-static int PMBType( vpar_thread_t * p_vpar )
+static __inline__ int PMBType( vpar_thread_t * p_vpar )
 {
     /* Testing on 6 bits */
     int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
@@ -1421,7 +1421,7 @@ static int PMBType( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * BMBType : macroblock_type in B pictures
  *****************************************************************************/
-static int BMBType( vpar_thread_t * p_vpar )
+static __inline__ int BMBType( vpar_thread_t * p_vpar )
 {
      /* Testing on 6 bits */
     int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
@@ -1436,7 +1436,7 @@ static int BMBType( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * DMBType : macroblock_type in D pictures
  *****************************************************************************/
-static int DMBType( vpar_thread_t * p_vpar )
+static __inline__ int DMBType( vpar_thread_t * p_vpar )
 {
     return GetBits( &p_vpar->bit_stream, 1 );
 }
@@ -1444,7 +1444,7 @@ static int DMBType( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * CodedPattern420 : coded_block_pattern with 4:2:0 chroma
  *****************************************************************************/
-static int CodedPattern420( vpar_thread_t * p_vpar )
+static __inline__ int CodedPattern420( vpar_thread_t * p_vpar )
 {
     /* Take the max 9 bits length vlc code for testing */
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
@@ -1459,7 +1459,7 @@ static int CodedPattern420( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * CodedPattern422 : coded_block_pattern with 4:2:2 chroma
  *****************************************************************************/
-static int CodedPattern422( vpar_thread_t * p_vpar )
+static __inline__ int CodedPattern422( vpar_thread_t * p_vpar )
 {
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
 
@@ -1473,7 +1473,7 @@ static int CodedPattern422( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * CodedPattern444 : coded_block_pattern with 4:4:4 chroma
  *****************************************************************************/
-static int CodedPattern444( vpar_thread_t * p_vpar )
+static __inline__ int CodedPattern444( vpar_thread_t * p_vpar )
 {
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
 
@@ -1486,7 +1486,7 @@ static int CodedPattern444( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * InitMacroblock : Initialize macroblock values
  *****************************************************************************/
-static void InitMacroblock( vpar_thread_t * p_vpar,
+static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
                                        macroblock_t * p_mb, int i_coding_type,
                                        int i_chroma_format,
                                        int i_structure,
@@ -1521,7 +1521,7 @@ static void InitMacroblock( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * UpdateContext : Update the p_vpar contextual values
  *****************************************************************************/
-static void UpdateContext( vpar_thread_t * p_vpar, int i_structure )
+static __inline__ void UpdateContext( vpar_thread_t * p_vpar, int i_structure )
 {
     /* Update macroblock real position. */
     p_vpar->mb.i_l_x += 16;
@@ -1539,7 +1539,7 @@ static void UpdateContext( vpar_thread_t * p_vpar, int i_structure )
 /*****************************************************************************
  * SkippedMacroblock : Generate a skipped macroblock with NULL motion vector
  *****************************************************************************/
-static void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
+static __inline__ void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
                                           int i_mb_base, int i_coding_type,
                                           int i_chroma_format,
                                           int i_structure,
@@ -1599,7 +1599,7 @@ static void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
 /*****************************************************************************
  * MacroblockModes : Get the macroblock_modes structure
  *****************************************************************************/
-static void MacroblockModes( vpar_thread_t * p_vpar,
+static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
                                         macroblock_t * p_mb,
                                         int i_chroma_format,
                                         int i_coding_type,
@@ -1683,7 +1683,6 @@ if( p_vpar->picture.b_error )                                           \
     return;                                                             \
 }
 
-
 #define PARSEBLOCKS( MPEG1FUNC, MPEG2FUNC )                             \
 {                                                                       \
     i_mask = 1 << (3 + (1 << i_chroma_format));                         \
@@ -1746,7 +1745,7 @@ if( p_vpar->picture.b_error )                                           \
     }                                                                   \
 }
 
-static void ParseMacroblock(
+static __inline__ void ParseMacroblock(
                            vpar_thread_t * p_vpar,
                            int * pi_mb_address,     /* previous address to be
                                                      * used for mb_addr_incr */
@@ -1978,9 +1977,136 @@ i_count++;
  */
 
 /*****************************************************************************
+ * ParseMacroblockVWXYZ : Parse the next macroblock ; specific functions
+ *****************************************************************************
+ * V = MPEG2 ?
+ * W = coding type ?
+ * X = chroma format ?
+ * Y = structure ?
+ * Z = second field ?
+ *****************************************************************************/
+void ParseMacroblockGENERIC( vpar_thread_t * p_vpar, int * pi_mb_address,
+                             int i_mb_previous, int i_mb_base,
+                             boolean_t b_mpeg2, int i_coding_type,
+                             int i_chroma_format, int i_structure,
+                             boolean_t b_second_field )
+{
+/*    ParseMacroblock( p_vpar, pi_mb_address, i_mb_previous, i_mb_base,
+                     b_mpeg2, i_coding_type, i_chroma_format,
+                     i_structure, b_second_field );*/
+}
+
+#if (VPAR_OPTIM_LEVEL > 0)
+/* Optimizations for frame pictures */
+void ParseMacroblock2I420F0( vpar_thread_t * p_vpar, int * pi_mb_address,                                    int i_mb_previous, int i_mb_base,
+                             boolean_t b_mpeg2, int i_coding_type,
+                             int i_chroma_format, int i_structure,
+                             boolean_t b_second_field )
+{
+    ParseMacroblock( p_vpar, pi_mb_address, i_mb_previous, i_mb_base,
+                     1, I_CODING_TYPE, CHROMA_420,
+                     FRAME_STRUCTURE, 0 );
+}
+
+void ParseMacroblock2P420F0( vpar_thread_t * p_vpar, int * pi_mb_address,                                    int i_mb_previous, int i_mb_base,
+                             boolean_t b_mpeg2, int i_coding_type,
+                             int i_chroma_format, int i_structure,
+                             boolean_t b_second_field )
+{
+    ParseMacroblock( p_vpar, pi_mb_address, i_mb_previous, i_mb_base,
+                     1, P_CODING_TYPE, CHROMA_420,
+                     FRAME_STRUCTURE, 0 );
+}
+
+void ParseMacroblock2B420F0( vpar_thread_t * p_vpar, int * pi_mb_address,                                    int i_mb_previous, int i_mb_base,
+                             boolean_t b_mpeg2, int i_coding_type,
+                             int i_chroma_format, int i_structure,
+                             boolean_t b_second_field )
+{
+    ParseMacroblock( p_vpar, pi_mb_address, i_mb_previous, i_mb_base,
+                     1, B_CODING_TYPE, CHROMA_420,
+                     FRAME_STRUCTURE, 0 );
+}
+#endif
+
+#if (VPAR_OPTIM_LEVEL > 1)
+/* Optimizations for field pictures */
+void ParseMacroblock2I420TZ( vpar_thread_t * p_vpar, int * pi_mb_address,                                    int i_mb_previous, int i_mb_base,
+                             boolean_t b_mpeg2, int i_coding_type,
+                             int i_chroma_format, int i_structure,
+                             boolean_t b_second_field )
+{
+    ParseMacroblock( p_vpar, pi_mb_address, i_mb_previous, i_mb_base,
+                     1, I_CODING_TYPE, CHROMA_420,
+                     TOP_FIELD, (p_vpar->picture.i_structure !=
+                                 p_vpar->picture.i_current_structure) );
+}
+
+void ParseMacroblock2P420TZ( vpar_thread_t * p_vpar, int * pi_mb_address,                                    int i_mb_previous, int i_mb_base,
+                             boolean_t b_mpeg2, int i_coding_type,
+                             int i_chroma_format, int i_structure,
+                             boolean_t b_second_field )
+{
+    ParseMacroblock( p_vpar, pi_mb_address, i_mb_previous, i_mb_base,
+                     1, P_CODING_TYPE, CHROMA_420,
+                     TOP_FIELD, (p_vpar->picture.i_structure !=
+                                 p_vpar->picture.i_current_structure) );
+}
+
+void ParseMacroblock2B420TZ( vpar_thread_t * p_vpar, int * pi_mb_address,                                    int i_mb_previous, int i_mb_base,
+                             boolean_t b_mpeg2, int i_coding_type,
+                             int i_chroma_format, int i_structure,
+                             boolean_t b_second_field )
+{
+    ParseMacroblock( p_vpar, pi_mb_address, i_mb_previous, i_mb_base,
+                     1, B_CODING_TYPE, CHROMA_420,
+                     TOP_FIELD, (p_vpar->picture.i_structure !=
+                                 p_vpar->picture.i_current_structure) );
+}
+
+void ParseMacroblock2I420BZ( vpar_thread_t * p_vpar, int * pi_mb_address,                                    int i_mb_previous, int i_mb_base,
+                             boolean_t b_mpeg2, int i_coding_type,
+                             int i_chroma_format, int i_structure,
+                             boolean_t b_second_field )
+{
+    ParseMacroblock( p_vpar, pi_mb_address, i_mb_previous, i_mb_base,
+                     1, I_CODING_TYPE, CHROMA_420,
+                     BOTTOM_FIELD, (p_vpar->picture.i_structure !=
+                                    p_vpar->picture.i_current_structure) );
+}
+
+void ParseMacroblock2P420BZ( vpar_thread_t * p_vpar, int * pi_mb_address,                                    int i_mb_previous, int i_mb_base,
+                             boolean_t b_mpeg2, int i_coding_type,
+                             int i_chroma_format, int i_structure,
+                             boolean_t b_second_field )
+{
+    ParseMacroblock( p_vpar, pi_mb_address, i_mb_previous, i_mb_base,
+                     1, P_CODING_TYPE, CHROMA_420,
+                     BOTTOM_FIELD, (p_vpar->picture.i_structure !=
+                                    p_vpar->picture.i_current_structure) );
+}
+
+void ParseMacroblock2B420BZ( vpar_thread_t * p_vpar, int * pi_mb_address,                                    int i_mb_previous, int i_mb_base,
+                             boolean_t b_mpeg2, int i_coding_type,
+                             int i_chroma_format, int i_structure,
+                             boolean_t b_second_field )
+{
+    ParseMacroblock( p_vpar, pi_mb_address, i_mb_previous, i_mb_base,
+                     1, B_CODING_TYPE, CHROMA_420,
+                     BOTTOM_FIELD, (p_vpar->picture.i_structure !=
+                                    p_vpar->picture.i_current_structure) );
+}
+#endif
+
+/*****************************************************************************
  * SliceHeader : Parse the next slice structure
  *****************************************************************************/
-static void SliceHeader( vpar_thread_t * p_vpar,
+typedef void    (*f_parse_mb_t)( vpar_thread_t * p_vpar, int * pi_mb_address,                                    int i_mb_previous, int i_mb_base,
+                                 boolean_t b_mpeg2, int i_coding_type,
+                                 int i_chroma_format, int i_structure,
+                                 boolean_t b_second_field );
+
+static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
                                     int * pi_mb_address, int i_mb_base,
                                     u32 i_vert_code, boolean_t b_high,
                                     boolean_t b_dp_scalable,
@@ -1988,6 +2114,43 @@ static void SliceHeader( vpar_thread_t * p_vpar,
                                     int i_chroma_format, int i_structure,
                                     boolean_t b_second_field )
 {
+    static f_parse_mb_t ppf_parse_mb[4][4] =
+    {
+        {
+            NULL, NULL, NULL, NULL
+        },
+        {
+            /* TOP_FIELD */
+#if (VPAR_OPTIM_LEVEL > 1)
+            NULL, ParseMacroblock2I420TZ, ParseMacroblock2P420TZ,
+            ParseMacroblock2B420TZ
+#else
+            NULL, ParseMacroblockGENERIC, ParseMacroblockGENERIC,
+            ParseMacroblockGENERIC
+#endif
+        },
+        {
+            /* BOTTOM_FIELD */
+#if (VPAR_OPTIM_LEVEL > 1)
+            NULL, ParseMacroblock2I420BZ, ParseMacroblock2P420BZ,
+            ParseMacroblock2B420BZ
+#else
+            NULL, ParseMacroblockGENERIC, ParseMacroblockGENERIC,
+            ParseMacroblockGENERIC
+#endif
+        },
+        {
+            /* FRAME_PICTURE */
+#if (VPAR_OPTIM_LEVEL > 0)
+            NULL, ParseMacroblock2I420F0, ParseMacroblock2P420F0,
+            ParseMacroblock2B420F0
+#else
+            NULL, ParseMacroblockGENERIC, ParseMacroblockGENERIC,
+            ParseMacroblockGENERIC
+#endif
+        }
+    };
+
     int                     i_mb_address_save = *pi_mb_address;
 
     p_vpar->picture.b_error = 0;
@@ -2039,10 +2202,37 @@ static void SliceHeader( vpar_thread_t * p_vpar,
             p_vpar->picture.b_error = 1;
             return;
         }
-        ParseMacroblock( p_vpar, pi_mb_address, i_mb_address_save,
+
+        if( p_vpar->sequence.i_chroma_format != CHROMA_420
+            || !p_vpar->sequence.b_mpeg2 || p_vpar->sequence.i_height > 2800
+            || p_vpar->sequence.i_scalable_mode == SC_DP )
+        {
+            /* Weird stream. Use the slower generic function. */
+            ParseMacroblockGENERIC( p_vpar, pi_mb_address, i_mb_address_save,
                          i_mb_base, b_mpeg2, i_coding_type,
                          i_chroma_format, i_structure,
                          b_second_field );
+        }
+        else
+        {
+            /* Try to find an optimized function. */
+            if( ppf_parse_mb[p_vpar->picture.i_structure]
+                            [p_vpar->picture.i_coding_type] == NULL )
+            {
+                intf_ErrMsg( "vpar error: bad ppf_parse_mb function pointer (struct:%d, coding type:%d)\n",
+                         p_vpar->picture.i_structure, p_vpar->picture.i_coding_type );
+            }
+            else
+            {
+                ppf_parse_mb[p_vpar->picture.i_structure]
+                            [p_vpar->picture.i_coding_type]
+                       ( p_vpar, pi_mb_address, i_mb_address_save,
+                         i_mb_base, b_mpeg2, i_coding_type,
+                         i_chroma_format, i_structure,
+                         b_second_field );
+            }
+        }
+
         i_mb_address_save = *pi_mb_address;
         if( p_vpar->picture.b_error )
         {
@@ -2056,17 +2246,14 @@ static void SliceHeader( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * PictureData : Parse off all macroblocks (ISO/IEC 13818-2 6.2.3.7)
  *****************************************************************************/
-static void PictureData( vpar_thread_t * p_vpar, int i_mb_base,
-                                    boolean_t b_high, boolean_t b_dp_scalable,
-                                    boolean_t b_mpeg2, int i_coding_type,
-                                    int i_chroma_format, int i_structure,
-                                    boolean_t b_second_field )
+void vpar_PictureData( vpar_thread_t * p_vpar, int i_mb_base )
 {
     int         i_mb_address = 0;
     u32         i_dummy;
 
     NextStartCode( p_vpar );
-    while( ((i_coding_type != I_CODING_TYPE && i_coding_type != D_CODING_TYPE)
+    while( ((p_vpar->picture.i_coding_type != I_CODING_TYPE
+                    && p_vpar->picture.i_coding_type != D_CODING_TYPE)
              || !p_vpar->picture.b_error)
            && i_mb_address+i_mb_base < p_vpar->sequence.i_mb_size
            && !p_vpar->b_die )
@@ -2083,17 +2270,23 @@ static void PictureData( vpar_thread_t * p_vpar, int i_mb_base,
 
         /* Decode slice data. */
         SliceHeader( p_vpar, &i_mb_address, i_mb_base, i_dummy & 255,
-                     b_high, b_dp_scalable, b_mpeg2, i_coding_type,
-                     i_chroma_format, i_structure, b_second_field );
+                     (p_vpar->sequence.i_height > 2800),
+                     (p_vpar->sequence.i_scalable_mode == SC_DP),
+                     p_vpar->sequence.b_mpeg2, p_vpar->picture.i_coding_type,
+                     p_vpar->sequence.i_chroma_format,
+                     p_vpar->picture.i_structure,
+                     (p_vpar->picture.i_structure !=
+                        p_vpar->picture.i_current_structure) );
     }
 
     /* Try to recover from error. If we missed less than half the
      * number of macroblocks of the picture, mark the missed ones
      * as skipped. */
-    if( (i_coding_type == P_CODING_TYPE || i_coding_type == B_CODING_TYPE)
+    if( (p_vpar->picture.i_coding_type == P_CODING_TYPE
+                || p_vpar->picture.i_coding_type == B_CODING_TYPE)
         && p_vpar->picture.b_error &&
         ( (i_mb_address-i_mb_base) > (p_vpar->sequence.i_mb_size >> 1)
-           || (i_structure != FRAME_STRUCTURE
+           || (p_vpar->picture.i_structure != FRAME_STRUCTURE
                && (i_mb_address-i_mb_base) > (p_vpar->sequence.i_mb_size >> 2) ) ) )
     {
         int         i_mb;
@@ -2101,97 +2294,16 @@ static void PictureData( vpar_thread_t * p_vpar, int i_mb_base,
         p_vpar->picture.b_error = 0;
         for( i_mb = i_mb_address + 1;
              i_mb < (p_vpar->sequence.i_mb_size
-                     << (i_structure != FRAME_STRUCTURE));
+                     << (p_vpar->picture.i_structure != FRAME_STRUCTURE));
              i_mb++ )
         {
-            SkippedMacroblock( p_vpar, i_mb, i_mb_base, i_coding_type,
-                               i_chroma_format, i_structure, b_second_field );
+            SkippedMacroblock( p_vpar, i_mb, i_mb_base,
+                               p_vpar->picture.i_coding_type,
+                               p_vpar->sequence.i_chroma_format,
+                               p_vpar->picture.i_structure,
+                               (p_vpar->picture.i_structure !=
+                                p_vpar->picture.i_current_structure) );
         }
     }
 }
 
-/*****************************************************************************
- * vpar_PictureDataVWXYZ : Parse the next macroblock ; specific functions
- *****************************************************************************
- * V = MPEG2 ?
- * W = coding type ?
- * X = chroma format ?
- * Y = structure ?
- * Z = second field ?
- *****************************************************************************/
-void vpar_PictureDataGENERIC( vpar_thread_t * p_vpar, int i_mb_base )
-{
-    PictureData( p_vpar, i_mb_base, (p_vpar->sequence.i_height > 2800),
-                 (p_vpar->sequence.i_scalable_mode == SC_DP),
-                 p_vpar->sequence.b_mpeg2, p_vpar->picture.i_coding_type,
-                 p_vpar->sequence.i_chroma_format,
-                 p_vpar->picture.i_structure,
-                 (p_vpar->picture.i_structure !=
-                    p_vpar->picture.i_current_structure) );
-}
-
-#if (VPAR_OPTIM_LEVEL > 0)
-/* Optimizations for frame pictures */
-void vpar_PictureData2I420F0( vpar_thread_t * p_vpar, int i_mb_base )
-{
-    PictureData( p_vpar, 0, 0, 0, 1, I_CODING_TYPE, CHROMA_420,
-                 FRAME_STRUCTURE, 0 );
-}
-
-void vpar_PictureData2P420F0( vpar_thread_t * p_vpar, int i_mb_base )
-{
-    PictureData( p_vpar, 0, 0, 0, 1, P_CODING_TYPE, CHROMA_420,
-                 FRAME_STRUCTURE, 0 );
-}
-
-void vpar_PictureData2B420F0( vpar_thread_t * p_vpar, int i_mb_base )
-{
-    PictureData( p_vpar, 0, 0, 0, 1, B_CODING_TYPE, CHROMA_420,
-                 FRAME_STRUCTURE, 0 );
-}
-#endif
-
-#if (VPAR_OPTIM_LEVEL > 1)
-/* Optimizations for field pictures */
-void vpar_PictureData2I420TZ( vpar_thread_t * p_vpar, int i_mb_base )
-{
-    PictureData( p_vpar, i_mb_base, 0, 0, 1, I_CODING_TYPE, CHROMA_420,
-                 TOP_FIELD, (p_vpar->picture.i_structure !=
-                                p_vpar->picture.i_current_structure) );
-}
-
-void vpar_PictureData2P420TZ( vpar_thread_t * p_vpar, int i_mb_base )
-{
-    PictureData( p_vpar, i_mb_base, 0, 0, 1, P_CODING_TYPE, CHROMA_420,
-                 TOP_FIELD, (p_vpar->picture.i_structure !=
-                                p_vpar->picture.i_current_structure) );
-}
-
-void vpar_PictureData2B420TZ( vpar_thread_t * p_vpar, int i_mb_base )
-{
-    PictureData( p_vpar, i_mb_base, 0, 0, 1, B_CODING_TYPE, CHROMA_420,
-                 TOP_FIELD, (p_vpar->picture.i_structure !=
-                                p_vpar->picture.i_current_structure) );
-}
-
-void vpar_PictureData2I420BZ( vpar_thread_t * p_vpar, int i_mb_base )
-{
-    PictureData( p_vpar, i_mb_base, 0, 0, 1, I_CODING_TYPE, CHROMA_420,
-                 BOTTOM_FIELD, (p_vpar->picture.i_structure !=
-                                p_vpar->picture.i_current_structure) );
-}
-
-void vpar_PictureData2P420BZ( vpar_thread_t * p_vpar, int i_mb_base )
-{
-    PictureData( p_vpar, i_mb_base, 0, 0, 1, P_CODING_TYPE, CHROMA_420,
-                 BOTTOM_FIELD, (p_vpar->picture.i_structure !=
-                                p_vpar->picture.i_current_structure) );
-}
-
-void vpar_PictureData2B420BZ( vpar_thread_t * p_vpar, int i_mb_base )
-{
-    PictureData( p_vpar, i_mb_base, 0, 0, 1, B_CODING_TYPE, CHROMA_420,
-                 BOTTOM_FIELD, (p_vpar->picture.i_structure !=
-                                p_vpar->picture.i_current_structure) );
-}
-#endif
