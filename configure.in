@@ -854,9 +854,9 @@ then
     LDFLAGS="$LDFLAGS $mad_LDFLAGS"
     AC_CHECK_HEADERS(mad.h, ,
       [ AC_MSG_ERROR([Cannot find development headers for libmad...]) ])
-    AC_CHECK_LIB(mad, mad_bit_init,
+    AC_CHECK_LIB(mad, mad_bit_init, [
       PLUGINS="${PLUGINS} mad"
-      mad_LDFLAGS="${mad_LDFLAGS} -lmad",
+      mad_LDFLAGS="${mad_LDFLAGS} -lmad" ],
       [ AC_MSG_ERROR([Cannot find libmad library...]) ])
     CFLAGS=$save_CFLAGS
     LDFLAGS=$save_LDFLAGS
@@ -874,7 +874,6 @@ then
     [    --with-ffmpeg=PATH    path to ffmpeg installation],[],[])
   if test "x$with_ffmpeg" != "xno" -a "x$with_ffmpeg" != "x"
   then
-    BUILTINS="${BUILTINS} ffmpeg"
     ffmpeg_CFLAGS="${ffmpeg_CFLAGS} -I$with_ffmpeg/include/libffmpeg"
     ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -L$with_ffmpeg/lib"
   fi
@@ -908,9 +907,9 @@ then
     save_LDFLAGS=$LDFLAGS
     CFLAGS="$CFLAGS $ffmpeg_CFLAGS"
     LDFLAGS="$LDFLAGS $ffmpeg_LDFLAGS"
-    AC_CHECK_LIB(avcodec, avcodec_init,
-      BUITLINS="${BUILTINS} ffmpeg"
-      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lavcodec",
+    AC_CHECK_LIB(avcodec, avcodec_init, [
+      BUILTINS="${BUILTINS} ffmpeg"
+      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lavcodec" ],
       [ AC_MSG_ERROR([Cannot find libavcodec library...]) ])
     CFLAGS=$save_CFLAGS
     LDFLAGS=$save_LDFLAGS
