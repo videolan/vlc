@@ -879,9 +879,17 @@ vcdimager: vcdimager-$(VCDIMAGER_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/vcdimager.patch
 
+ifeq ($(SYS),DARWIN)
+.vcdimager: vcdimager
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static LDFLAGS="$(LDFLAGS) -framework CoreFoundation -framework IOKit" && make && make install)
+	touch $@
+endif
+
+ifeq ($(SYS),BEOS)
 .vcdimager: vcdimager
 	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
 	touch $@
+endif
 
 CLEAN_FILE += .vcdimager
 CLEAN_PKG += vcdimager
