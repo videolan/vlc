@@ -495,7 +495,7 @@ PLUGINS="${PLUGINS} rc logger access_file memcpy"
 PLUGINS="${PLUGINS} es audio mpeg_system ps ts"
 PLUGINS="${PLUGINS} idct idctclassic motion mpeg_video spudec mpeg_audio"
 #PLUGINS="${PLUGINS} a52old imdct downmix"
-PLUGINS="${PLUGINS} lpcm"
+PLUGINS="${PLUGINS} lpcm a52"
 PLUGINS="${PLUGINS} deinterlace invert wall transform distort clone crop motionblur"
 PLUGINS="${PLUGINS} float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif fixed32tofloat32 fixed32tos16 s16tofloat32 s16tofloat32swab"
 PLUGINS="${PLUGINS} trivial_resampler ugly_resampler"
@@ -1231,13 +1231,13 @@ then
     if test -f ${real_a52_tree}/include/a52.h
     then
       AC_MSG_RESULT(yes)
-      CPPFLAGS_a52="${CPPFLAGS_a52} -I${real_a52_tree}"
-      LDFLAGS_a52="${LDFLAGS_a52} -L${real_a52_tree}/liba52/.libs"
-      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_a52}"
+      CPPFLAGS_a52tofloat32="${CPPFLAGS_a52tofloat32} -I${real_a52_tree}"
+      LDFLAGS_a52tofloat32="${LDFLAGS_a52tofloat32} -L${real_a52_tree}/liba52/.libs"
+      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_a52tofloat32}"
       AC_CHECK_LIB(a52, a52_free, [
-        BUILTINS="${BUILTINS} a52"
-        LDFLAGS_a52="${LDFLAGS_a52} -la52 -lm"
-        CPPFLAGS_a52="${CPPFLAGS_a52} -DUSE_A52DEC_TREE"
+        BUILTINS="${BUILTINS} a52tofloat32"
+        LDFLAGS_a52tofloat32="${LDFLAGS_a52tofloat32} -la52 -lm"
+        CPPFLAGS_a52tofloat32="${CPPFLAGS_a52tofloat32} -DUSE_A52DEC_TREE"
         ],[
         if test -f ${real_a52_tree}/liba52/.libs/liba52.a
         then
@@ -1264,9 +1264,9 @@ then
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_test}"
     AC_CHECK_HEADERS(a52dec/a52.h, [
       AC_CHECK_LIB(a52, a52_free, [
-        PLUGINS="${PLUGINS} a52"
-        LDFLAGS_a52="${LDFLAGS_a52} ${LDFLAGS_test} -la52 -lm"
-        CPPFLAGS_a52="${CPPFLAGS_a52} ${CPPFLAGS_test}"
+        PLUGINS="${PLUGINS} a52tofloat32"
+        LDFLAGS_a52tofloat32="${LDFLAGS_a52tofloat32} ${LDFLAGS_test} -la52 -lm"
+        CPPFLAGS_a52tofloat32="${CPPFLAGS_a52tofloat32} ${CPPFLAGS_test}"
       ],[
         if test "x${enable_dvbpsi}" != "x"
         then
