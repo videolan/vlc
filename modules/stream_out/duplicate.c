@@ -2,7 +2,7 @@
  * duplicate.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: duplicate.c,v 1.9 2004/01/18 02:20:28 fenrir Exp $
+ * $Id: duplicate.c,v 1.10 2004/01/18 03:43:03 fenrir Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -367,28 +367,25 @@ static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select, int i_es_numbe
         if( !strncmp( psz, "no-audio", strlen( "no-audio" ) ) ||
             !strncmp( psz, "noaudio", strlen( "noaudio" ) ) )
         {
-            if( fmt->i_cat == AUDIO_ES )
+            if( i_cat != 1 )
             {
-                i_cat = 0;
-                break;
+                i_cat = fmt->i_cat != AUDIO_ES ? 1 : 0;
             }
         }
         else if( !strncmp( psz, "no-video", strlen( "no-video" ) ) ||
                  !strncmp( psz, "novideo", strlen( "novideo" ) ) )
         {
-            if( fmt->i_cat == VIDEO_ES )
+            if( i_cat != 1 )
             {
-                i_cat = 0;
-                break;
+                i_cat = fmt->i_cat != VIDEO_ES ? 1 : 0;
             }
         }
         else if( !strncmp( psz, "no-spu", strlen( "no-spu" ) ) ||
                  !strncmp( psz, "nospu", strlen( "nospu" ) ) )
         {
-            if( fmt->i_cat == SPU_ES )
+            if( i_cat != 1 )
             {
-                i_cat = 0;
-                break;
+                i_cat = fmt->i_cat != SPU_ES ? 1 : 0;
             }
         }
         else if( !strncmp( psz, "audio", strlen( "audio" ) ) )
@@ -419,10 +416,9 @@ static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select, int i_es_numbe
 
             if( !strcmp( psz, "no-es" ) || !strcmp( psz, "es" ) )
             {
-                if( !NumInRange( psz_arg, i_es_number ) )
+                if( i_es != 1 )
                 {
-                    i_es = 0;
-                    break;
+                    i_es = !NumInRange( psz_arg, i_es_number ) ? 1 : 0;
                 }
             }
             else if( !strcmp( psz, "es" ) )
@@ -435,13 +431,12 @@ static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select, int i_es_numbe
             else if( !strcmp( psz, "no-prgm" ) || !strcmp( psz, "noprgm" ) ||
                       !strcmp( psz, "no-program" ) || !strcmp( psz, "noprogram" ) )
             {
-                if( fmt->i_group >= 0 && !NumInRange( psz_arg, fmt->i_group ) )
+                if( fmt->i_group >= 0 && i_prgm != 1 )
                 {
-                    i_prgm = 0;
-                    break;
+                    i_prgm = !NumInRange( psz_arg, fmt->i_group ) ? 1 : 0;
                 }
             }
-            else if( !strcmp( psz, "program" ) || !strcmp( psz, "program" ) )
+            else if( !strcmp( psz, "prgm" ) || !strcmp( psz, "program" ) )
             {
                 if( fmt->i_group >= 0 && i_prgm != 1 )
                 {
