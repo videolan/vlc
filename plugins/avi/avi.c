@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.6 2002/04/27 16:13:23 fenrir Exp $
+ * $Id: avi.c,v 1.7 2002/04/27 22:54:00 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -671,7 +671,7 @@ static int AVIInit( input_thread_t *p_input )
 #define p_info  p_avi_demux->pp_info[i]
         if( p_info->p_index == NULL )
         {
-            intf_WarnMsg( 1, "input init: add index entry for stream %d", i ); 
+            intf_WarnMsg( 3, "input init: add index entry for stream %d", i ); 
             RIFF_GoToChunk( p_input, p_avi_demux->p_movi );
             if( RIFF_DescendChunk(p_input) != 0 ) { continue; }
             p_chunk = NULL;
@@ -784,8 +784,6 @@ static int AVIInit( input_thread_t *p_input )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( p_es_video != NULL ) 
     {
-        intf_WarnMsg( 1,"input init: selecting video stream %d",
-                        p_es_video->i_id  );
         input_SelectES( p_input, p_es_video );
         /*  it seems that it's useless to select es because there are selected 
          *  by the interface but i'm not sure of that */
@@ -798,8 +796,6 @@ static int AVIInit( input_thread_t *p_input )
     }
     if( p_es_audio != NULL ) 
     {
-        intf_WarnMsg( 1,"input init: selecting audio stream %d",
-                        p_es_audio->i_id  );
         input_SelectES( p_input, p_es_audio );
     }
     else
@@ -902,7 +898,7 @@ static int __AVI_NextIndexEntry( input_thread_t *p_input,
         u16 i_type;
         if( (p_chunk = RIFF_ReadChunk( p_input )) == NULL )
         {
-            if( i > 0)
+            if( b_inc )
             {
                 return( 0 );
             }
@@ -917,12 +913,11 @@ static int __AVI_NextIndexEntry( input_thread_t *p_input,
         index.i_offset = p_chunk->i_pos;
         index.i_length = p_chunk->i_size;
         RIFF_DeleteChunk( p_input, p_chunk );
-
 #define p_info_i    p_avi_demux->pp_info[i_number]
        if( (__AVI_ParseStreamHeader( index.i_id, &i_number, &i_type ) == 0)
              &&( i_number < p_avi_demux->i_streams )
              && (p_info_i->p_index[p_info_i->i_idxnb - 1].i_offset + 
-                     p_info_i->p_index[p_info_i->i_idxnb - 1].i_length <= 
+                     p_info_i->p_index[p_info_i->i_idxnb - 1].i_length + 8<= 
                         index.i_offset ) )
         {
             /* do we need to check i_type ? */
@@ -936,7 +931,7 @@ static int __AVI_NextIndexEntry( input_thread_t *p_input,
 #undef  p_info_i
         if( RIFF_NextChunk( p_input, p_avi_demux->p_movi ) != 0 )
         {
-            if( i > 0)
+            if( b_inc )
             {
                 return( 0 );
             }
@@ -947,7 +942,6 @@ static int __AVI_NextIndexEntry( input_thread_t *p_input,
         }
     } 
     return( 0 );
-    intf_WarnMsg( 1, "input demux: added index entry(%d)",i );
 }
 
 static int __AVI_ReAlign( input_thread_t *p_input, 
@@ -983,7 +977,7 @@ static int __AVI_ReAlign( input_thread_t *p_input,
         __AVI_SeekToChunk will correct */
     if( (p_info->p_index[p_info->i_idxpos].i_offset <= i_pos)
             && ( i_pos < p_info->p_index[p_info->i_idxpos].i_offset + 
-                    p_info->p_index[p_info->i_idxpos].i_length ) )
+                    p_info->p_index[p_info->i_idxpos].i_length + 8) )
     {
         return( 0 );
     }
@@ -991,16 +985,19 @@ static int __AVI_ReAlign( input_thread_t *p_input,
     if( i_pos >= p_info->p_index[p_info->i_idxpos].i_offset )
     {
         /* search for a chunk after i_idxpos */
-        while( (p_info->p_index[p_info->i_idxpos].i_offset < i_pos)
-                &&( p_info->i_idxpos < p_info->i_idxnb - 1 ) )
+        while( (p_info->p_index[p_info->i_idxpos].i_offset < i_pos) )
+/*                &&( p_info->i_idxpos < p_info->i_idxnb - 1 ) ) */
         {
+/*
             if( __AVI_NextIndexEntry( p_input, p_info ) != 0 )
             {
                 return( -1 );
             }
+*/
+            p_info->i_idxpos++; /* we know that index is valid (first test )*/
         }
-        while( ((p_info->p_index[p_info->i_idxpos].i_flags&AVIIF_KEYFRAME) == 0)
-                &&( p_info->i_idxpos < p_info->i_idxnb - 1 ) )
+        while(((p_info->p_index[p_info->i_idxpos].i_flags&AVIIF_KEYFRAME) == 0))
+/*                &&( p_info->i_idxpos < p_info->i_idxnb - 1 ) ) */
         {
             if( __AVI_NextIndexEntry( p_input, p_info ) != 0 )
             {
@@ -1012,7 +1009,7 @@ static int __AVI_ReAlign( input_thread_t *p_input,
     {
         /* search for a chunk before i_idxpos */
         while( (p_info->p_index[p_info->i_idxpos].i_offset + 
-                    p_info->p_index[p_info->i_idxpos].i_length >= i_pos)
+                    p_info->p_index[p_info->i_idxpos].i_length + 8>= i_pos)
                         &&( p_info->i_idxpos > 0 ) )
         {
             p_info->i_idxpos--; /* backward, index is always valid */
@@ -1042,7 +1039,10 @@ static void __AVI_SynchroReInit( input_thread_t *p_input,
         p_info_slave->i_idxpos = 0; 
         while( __AVI_GetPTS( p_info_slave) < __AVI_GetPTS( p_info_master) )
         {
-            __AVI_NextIndexEntry( p_input, p_info_slave );
+            if( __AVI_NextIndexEntry( p_input, p_info_slave ) != 0 )
+            {
+                return;
+            }
         }
         if( (__AVI_GetPTS( p_info_slave) > __AVI_GetPTS( p_info_master))
             &&(p_info_slave->i_idxpos>0) )
@@ -1056,16 +1056,6 @@ static void __AVI_SynchroReInit( input_thread_t *p_input,
 /** -1 in case of error, 0 of EOF, 1 otherwise **/
 static int AVIDemux( input_thread_t *p_input )
 {
-    /* on cherche un block
-       plusieurs cas :
-        * encapsuler dans un chunk "rec "
-        * juste une succesion de 00dc 01wb ...
-        * pire tout audio puis tout video ou vice versa
-     */
-/* TODO :   * create dynamically index for invalid or incomplete index
-            * verify that we are reading in p_movi 
-            * XXX be sure to send audio before video to avoid click
- */
     riffchunk_t *p_chunk;
     int i;
     pes_packet_t *p_pes;
@@ -1074,10 +1064,10 @@ static int AVIDemux( input_thread_t *p_input )
     AVIStreamInfo_t *p_info_video;
     AVIStreamInfo_t *p_info_audio;
     AVIStreamInfo_t *p_info;
-    /* XXX arrive pas a avoir acces a cette fct° */
-/*    input_ClockManageRef( p_input,
+/*     try to use this to read data packet at the good time
+ *     input_ClockManageRef( p_input,
                             p_input->stream.p_selected_program,
-                            (mtime_t)0 );  ??? what suppose to do */
+                            (mtime_t)pcr );  ??? what suppose to do */
     p_avi_demux = (demux_data_avi_file_t*)p_input->p_demux_data;
 
     /* search video and audio stream selected */
@@ -1118,7 +1108,7 @@ static int AVIDemux( input_thread_t *p_input )
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     { 
        /*realign on video stream*/
-       if( __AVI_ReAlign( p_input, p_info_video ) != 0 )
+        if( __AVI_ReAlign( p_input, p_info_video ) != 0 )
         {
             return( 0 ); /* assume EOF */
         }
@@ -1128,16 +1118,17 @@ static int AVIDemux( input_thread_t *p_input )
      /* update i_date if previously unselected ES (ex: 2 channels audio ) */
     if( (p_info_audio != NULL)&&(p_info_audio->b_unselected ))
     {
-        /* we have to go to the good pts */
+        p_info_audio->b_unselected = 0 ;
+       /* we have to go to the good pts */
         /* we will reach p_info_ok pts */
         while( __AVI_GetPTS( p_info_audio) < __AVI_GetPTS( p_info_video) )
         {
             if( __AVI_NextIndexEntry( p_input, p_info_audio ) != 0 )
             {
+                p_info_audio = NULL; /* to force selection of video */
                 break;
             }
         }
-       p_info_audio->b_unselected = 0 ;
     }
 
     /* what stream we should read in first */
@@ -1173,7 +1164,10 @@ static int AVIDemux( input_thread_t *p_input )
                     (p_info->p_index[p_info->i_idxpos].i_id&0xFFFF0000) )
     {
         intf_WarnMsg( 2, "input demux: bad index entry" );
-        __AVI_NextIndexEntry( p_input, p_info );
+        if( __AVI_NextIndexEntry( p_input, p_info ) != 0 )
+        {
+            return( 0 );
+        }
         return( 1 );
     }
 /*    
