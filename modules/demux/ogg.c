@@ -479,7 +479,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     block_t *p_block;
     vlc_bool_t b_selected;
     int i_header_len = 0;
-    mtime_t i_pts = 0;
+    mtime_t i_pts = -1, i_interpolated_pts;
 
     /* Sanity check */
     if( !p_oggpacket->bytes )
@@ -508,7 +508,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     if( p_stream->b_force_backup )
     {
         uint8_t *p_extra;
-	vlc_bool_t b_store_size = VLC_TRUE;
+        vlc_bool_t b_store_size = VLC_TRUE;
 
         p_stream->i_packets_backup++;
         switch( p_stream->fmt.i_codec )
@@ -522,7 +522,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         case VLC_FOURCC( 'f','l','a','c' ):
           if( p_stream->i_packets_backup == 2 )
           {
-	      Ogg_ReadFlacHeader( p_demux, p_stream, p_oggpacket );
+              Ogg_ReadFlacHeader( p_demux, p_stream, p_oggpacket );
               p_stream->b_force_backup = 0;
           }
           b_store_size = VLC_FALSE;
@@ -552,8 +552,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             p_stream->fmt.i_extra = p_stream->i_headers;
             p_stream->fmt.p_extra =
                 realloc( p_stream->fmt.p_extra, p_stream->i_headers );
-	    memcpy( p_stream->fmt.p_extra, p_stream->p_headers,
-		    p_stream->i_headers );
+            memcpy( p_stream->fmt.p_extra, p_stream->p_headers,
+                    p_stream->i_headers );
             es_out_Control( p_demux->out, ES_OUT_SET_FMT,
                             p_stream->p_es, &p_stream->fmt );
         }
@@ -588,6 +588,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     }
 
     /* Convert the granulepos into the next pcr */
+    i_interpolated_pts = p_stream->i_interpolated_pcr;
     Ogg_UpdatePCR( p_stream, p_oggpacket );
 
     if( p_stream->i_pcr >= 0 )
@@ -623,6 +624,11 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     }
 
     if( !( p_block = block_New( p_demux, p_oggpacket->bytes ) ) ) return;
+
+    /* Normalize PTS */
+    if( i_pts == 0 ) i_pts = 1;
+    else if( i_pts == -1 && i_interpolated_pts == 0 ) i_pts = 1;
+    else if( i_pts == -1 ) i_pts = 0;
 
     if( p_stream->fmt.i_cat == AUDIO_ES )
         p_block->i_dts = p_block->i_pts = i_pts;
@@ -1250,18 +1256,18 @@ static void Ogg_ReadFlacHeader( demux_t *p_demux, logical_stream_t *p_stream,
     if( bs_read( &s, 7 ) == 0 )
     {
         if( bs_read( &s, 24 ) >= 34 /*size STREAMINFO*/ )
-	{
-	    bs_skip( &s, 80 );
-	    p_stream->f_rate = p_stream->fmt.audio.i_rate = bs_read( &s, 20 );
-	    p_stream->fmt.audio.i_channels = bs_read( &s, 3 ) + 1;
+        {
+            bs_skip( &s, 80 );
+            p_stream->f_rate = p_stream->fmt.audio.i_rate = bs_read( &s, 20 );
+            p_stream->fmt.audio.i_channels = bs_read( &s, 3 ) + 1;
 
-	    msg_Dbg( p_demux, "FLAC header, channels: %i, rate: %i",
-		     p_stream->fmt.audio.i_channels, (int)p_stream->f_rate );
-	}
-	else msg_Dbg( p_demux, "FLAC STREAMINFO metadata too short" );
+            msg_Dbg( p_demux, "FLAC header, channels: %i, rate: %i",
+                     p_stream->fmt.audio.i_channels, (int)p_stream->f_rate );
+        }
+        else msg_Dbg( p_demux, "FLAC STREAMINFO metadata too short" );
 
-	/* Fake this as the last metadata block */
-	*((uint8_t*)p_oggpacket->packet) |= 0x80;
+        /* Fake this as the last metadata block */
+        *((uint8_t*)p_oggpacket->packet) |= 0x80;
     }
     else
     {
