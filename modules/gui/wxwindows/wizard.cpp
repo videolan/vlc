@@ -115,7 +115,7 @@ END_EVENT_TABLE()
 #define PARTIAL _("Use this to read only a part of the stream. " \
                   "You must be able to control the incoming stream " \
                   "(for example, a file or a disc, but not an UDP " \
-                  "network stream.\n" \
+                  "network stream.)\n" \
                   "Enter the starting and ending times (in seconds)")
 
 #define INPUT_BUTTON _("Choose")
