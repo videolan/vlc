@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.39 2003/09/18 17:54:02 zorglub Exp $
+ * $Id: objects.c,v 1.40 2003/09/19 15:33:58 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -426,8 +426,21 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
     /* Otherwise, recursively look for the object */
     if( (i_mode & 0x000f) == FIND_ANYWHERE )
     {
-        p_found = FindObject( VLC_OBJECT(p_this->p_vlc), i_type,
-                              (i_mode & ~0x000f) | FIND_CHILD );
+        vlc_object_t *p_root = p_this;
+
+        /* Find the root */
+        while( p_root->p_parent != NULL &&
+               p_root != VLC_OBJECT( p_this->p_vlc ) )
+        {
+            p_root = p_root->p_parent;
+        }
+
+        p_found = FindObject( p_root, i_type, (i_mode & ~0x000f)|FIND_CHILD );
+        if( p_found == NULL && p_root != VLC_OBJECT( p_this->p_vlc ) )
+        {
+            p_found = FindObject( VLC_OBJECT( p_this->p_vlc ),
+                                  i_type, (i_mode & ~0x000f)|FIND_CHILD );
+        }
     }
     else
     {

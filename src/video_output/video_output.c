@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.235 2003/09/14 13:54:43 sigmunau Exp $
+ * $Id: video_output.c,v 1.236 2003/09/19 15:33:58 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -81,7 +81,7 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
             vlc_object_t *p_playlist;
 
             p_playlist = vlc_object_find( p_this,
-                                          VLC_OBJECT_PLAYLIST, FIND_PARENT );
+                                          VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
             if( p_playlist )
             {
