@@ -2,7 +2,7 @@
  * dts.c: parse DTS audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dts.c,v 1.13 2004/02/02 23:49:46 gbazin Exp $
+ * $Id: dts.c,v 1.14 2004/02/03 23:32:45 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -30,7 +30,7 @@
 
 #include "vlc_block_helper.h"
 
-#define DTS_HEADER_SIZE 12
+#define DTS_HEADER_SIZE 14
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
@@ -402,8 +402,7 @@ static block_t *GetSoutBuffer( decoder_t *p_dec )
  *****************************************************************************/
 static const unsigned int ppi_dts_samplerate[] =
 {
-    0, 8000, 16000, 32000, 64000, 128000,
-    11025, 22050, 44010, 88020, 176400,
+    0, 8000, 16000, 32000, 0, 0, 11025, 22050, 44100, 0, 0,
     12000, 24000, 48000, 96000, 192000
 };
 
@@ -414,7 +413,7 @@ static const unsigned int ppi_dts_bitrate[] =
     448000, 512000, 576000, 640000, 768000,
     896000, 1024000, 1152000, 1280000, 1344000,
     1408000, 1411200, 1472000, 1536000, 1920000,
-    2048000, 3072000, 3840000, 4096000, 0, 0
+    2048000, 3072000, 3840000, 1/*open*/, 2/*variable*/, 3/*lossless*/
 };
 
 static int SyncInfo16be( const uint8_t *p_buf,
@@ -424,6 +423,7 @@ static int SyncInfo16be( const uint8_t *p_buf,
                          unsigned int *pi_frame_length )
 {
     unsigned int i_frame_size;
+    unsigned int i_lfe;
 
     *pi_frame_length = (p_buf[4] & 0x01) << 6 | (p_buf[5] >> 2);
     i_frame_size = (p_buf[5] & 0x03) << 12 | (p_buf[6] << 4) |
@@ -432,6 +432,9 @@ static int SyncInfo16be( const uint8_t *p_buf,
     *pi_audio_mode = (p_buf[7] & 0x0f) << 2 | (p_buf[8] >> 6);
     *pi_sample_rate = (p_buf[8] >> 2) & 0x0f;
     *pi_bit_rate = (p_buf[8] & 0x03) << 3 | ((p_buf[9] >> 5) & 0x07);
+
+    i_lfe = (p_buf[10] >> 1) & 0x03;
+    if( i_lfe ) *pi_audio_mode |= 0x10000;
 
     return i_frame_size + 1;
 }
@@ -539,8 +542,8 @@ static int SyncInfo( const uint8_t *p_buf,
         p_buf[2] == 0x00 && p_buf[3] == 0xe8 &&
         (p_buf[4] & 0xf0) == 0xf0 && p_buf[5] == 0x07 )
     {
-        uint8_t conv_buf[12];
-        Buf14To16( conv_buf, p_buf, 12, 1 );
+        uint8_t conv_buf[DTS_HEADER_SIZE];
+        Buf14To16( conv_buf, p_buf, DTS_HEADER_SIZE, 1 );
         i_frame_size = SyncInfo16be( conv_buf, &i_audio_mode, pi_sample_rate,
                                      pi_bit_rate, pi_frame_length );
         i_frame_size = i_frame_size * 8 / 14 * 2;
@@ -550,8 +553,8 @@ static int SyncInfo( const uint8_t *p_buf,
              p_buf[2] == 0xe8 && p_buf[3] == 0x00 &&
              p_buf[4] == 0x07 && (p_buf[5] & 0xf0) == 0xf0 )
     {
-        uint8_t conv_buf[12];
-        Buf14To16( conv_buf, p_buf, 12, 0 );
+        uint8_t conv_buf[DTS_HEADER_SIZE];
+        Buf14To16( conv_buf, p_buf, DTS_HEADER_SIZE, 0 );
         i_frame_size = SyncInfo16be( conv_buf, &i_audio_mode, pi_sample_rate,
                                      pi_bit_rate, pi_frame_length );
         i_frame_size = i_frame_size * 8 / 14 * 2;
@@ -567,14 +570,14 @@ static int SyncInfo( const uint8_t *p_buf,
     else if( p_buf[0] == 0xfe && p_buf[1] == 0x7f &&
              p_buf[2] == 0x01 && p_buf[3] == 0x80 )
     {
-        uint8_t conv_buf[12];
-        BufLeToBe( conv_buf, p_buf, 12 );
+        uint8_t conv_buf[DTS_HEADER_SIZE];
+        BufLeToBe( conv_buf, p_buf, DTS_HEADER_SIZE );
         i_frame_size = SyncInfo16be( p_buf, &i_audio_mode, pi_sample_rate,
                                      pi_bit_rate, pi_frame_length );
     }
     else return 0;
 
-    switch( i_audio_mode )
+    switch( i_audio_mode & 0xFFFF )
     {
         case 0x0:
             /* Mono */
@@ -599,16 +602,16 @@ static int SyncInfo( const uint8_t *p_buf,
                                 AOUT_CHAN_CENTER;
             break;
         case 0x6:
-            /* 2F/LFE */
+            /* 2F/1R */
             *pi_channels = 3;
             *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-                                AOUT_CHAN_LFE;
+                                AOUT_CHAN_REARCENTER;
             break;
         case 0x7:
-            /* 3F/LFE */
+            /* 3F/1R */
             *pi_channels = 4;
             *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-                                AOUT_CHAN_CENTER | AOUT_CHAN_LFE;
+                                AOUT_CHAN_CENTER | AOUT_CHAN_REARCENTER;
             break;
         case 0x8:
             /* 2F2R */
@@ -660,21 +663,27 @@ static int SyncInfo( const uint8_t *p_buf,
             break;
     }
 
+    if( i_audio_mode & 0x10000 )
+    {
+        (*pi_channels)++;
+        *pi_channels_conf |= AOUT_CHAN_LFE;
+    }
+
     if( *pi_sample_rate >= sizeof( ppi_dts_samplerate ) /
                            sizeof( ppi_dts_samplerate[0] ) )
     {
         return 0;
     }
-
     *pi_sample_rate = ppi_dts_samplerate[ *pi_sample_rate ];
+    if( !*pi_sample_rate ) return 0;
 
     if( *pi_bit_rate >= sizeof( ppi_dts_bitrate ) /
                         sizeof( ppi_dts_bitrate[0] ) )
     {
         return 0;
     }
-
     *pi_bit_rate = ppi_dts_bitrate[ *pi_bit_rate ];
+    if( !*pi_bit_rate ) return 0;
 
     *pi_frame_length = (*pi_frame_length + 1) * 32;
 
