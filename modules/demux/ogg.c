@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.17 2002/12/20 15:18:56 sigmunau Exp $
+ * $Id: ogg.c,v 1.18 2003/01/07 21:49:01 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -1128,8 +1128,8 @@ static int Activate( vlc_object_t * p_this )
         p_stream->p_es->i_stream_id = p_stream->p_es->i_id = i_stream;
         p_stream->p_es->i_fourcc = p_stream->i_fourcc;
         p_stream->p_es->i_cat = p_stream->i_cat;
-        p_stream->p_es->p_demux_data = p_stream->p_bih ?
-            (void *)p_stream->p_bih : (void *)p_stream->p_wf;
+        p_stream->p_es->p_waveformatex      = (void*)p_stream->p_wf;
+        p_stream->p_es->p_bitmapinfoheader  = (void*)p_stream->p_bih;
 #undef p_stream
     }
 

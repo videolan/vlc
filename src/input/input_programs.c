@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.99 2002/12/06 16:34:08 sam Exp $
+ * $Id: input_programs.c,v 1.100 2003/01/07 21:49:01 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -461,6 +461,8 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     {
         p_es->p_demux_data = NULL;
     }
+    p_es->p_waveformatex     = NULL;
+    p_es->p_bitmapinfoheader = NULL;
 
     /* Add this ES to the program definition if one is given */
     if( p_pgrm )
@@ -530,6 +532,14 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
     if( p_es->p_demux_data != NULL )
     {
         free( p_es->p_demux_data );
+    }
+    if( p_es->p_waveformatex )
+    {
+        free( p_es->p_waveformatex );
+    }
+    if( p_es->p_bitmapinfoheader )
+    {
+        free( p_es->p_bitmapinfoheader );
     }
 
     /* Find the ES in the ES table */

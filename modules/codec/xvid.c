@@ -2,7 +2,7 @@
  * xvid.c: a decoder for libxvidcore, the Xvid video codec
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: xvid.c,v 1.3 2002/11/28 17:34:59 sam Exp $
+ * $Id: xvid.c,v 1.4 2003/01/07 21:49:01 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -100,12 +100,18 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
         DecoderError( p_fifo );
         return VLC_EGENERIC;
     }
+    if( ( p_format = (BITMAPINFOHEADER *)p_fifo->p_bitmapinfoheader ) == NULL )
+    {
+        i_width  = 1;
+        i_height = 1;   // avoid segfault anyway it's wrong
+    }
+    else
+    {
+        /* Guess picture properties from the BIH */
+        i_width = p_format->biWidth;
+        i_height = p_format->biHeight;
+    }
 
-    p_format = (BITMAPINFOHEADER *)p_fifo->p_demux_data;
-
-    /* Guess picture properties from the BIH */
-    i_width = p_format->biWidth;
-    i_height = p_format->biHeight;
     i_chroma = VLC_FOURCC('Y','V','1','2');
     i_aspect = VOUT_ASPECT_FACTOR * i_width / i_height;
 

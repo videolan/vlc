@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.13 2003/01/05 21:03:58 sigmunau Exp $
+ * $Id: asf.c,v 1.14 2003/01/07 21:49:01 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -254,7 +254,7 @@ static int Activate( vlc_object_t * p_this )
                 i_size = p_sp->i_type_specific_data_length;
 
                 p_wf = malloc( i_size );
-                p_stream->p_es->p_demux_data = (void*)p_wf;
+                p_stream->p_es->p_waveformatex = (void*)p_wf;
                 p_data = p_sp->p_type_specific_data;
 
                 p_wf->wFormatTag        = GetWLE( p_data );
@@ -271,7 +271,7 @@ static int Activate( vlc_object_t * p_this )
                                               i_size - sizeof( WAVEFORMATEX ));
                 if( i_size > sizeof( WAVEFORMATEX ) )
                 {
-                    memcpy( (uint8_t*)p_stream->p_es->p_demux_data + sizeof( WAVEFORMATEX ),
+                    memcpy( (uint8_t*)p_wf + sizeof( WAVEFORMATEX ),
                             p_data + sizeof( WAVEFORMATEX ),
                             i_size - sizeof( WAVEFORMATEX ) );
                 }
@@ -309,7 +309,7 @@ static int Activate( vlc_object_t * p_this )
                 i_size = p_sp->i_type_specific_data_length - 11;
 
                 p_bih = malloc( i_size );
-                p_stream->p_es->p_demux_data = (void*)p_bih;
+                p_stream->p_es->p_bitmapinfoheader = (void*)p_bih;
                 p_data = p_sp->p_type_specific_data + 11;
 
                 p_bih->biSize       = GetDWLE( p_data );
@@ -334,7 +334,7 @@ static int Activate( vlc_object_t * p_this )
 
                 if( i_size > sizeof( BITMAPINFOHEADER ) )
                 {
-                    memcpy( (uint8_t*)p_stream->p_es->p_demux_data + sizeof( BITMAPINFOHEADER ),
+                    memcpy( (uint8_t*)p_bih + sizeof( BITMAPINFOHEADER ),
                             p_data + sizeof( BITMAPINFOHEADER ),
                             i_size - sizeof( BITMAPINFOHEADER ) );
                 }

@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.10 2003/01/02 20:48:28 gbazin Exp $
+ * $Id: araw.c,v 1.11 2003/01/07 21:49:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -193,13 +193,12 @@ static void GetWaveFormatEx( waveformatex_t *p_wh,
 
 static int InitThread( adec_thread_t * p_adec )
 {
-
-    if( !p_adec->p_fifo->p_demux_data )
+    if( ( p_adec->p_wf = (WAVEFORMATEX*)p_adec->p_fifo->p_waveformatex ) == NULL )
     {
         msg_Err( p_adec->p_fifo, "unknown raw format" );
         return( -1 );
     }
-    p_adec->p_wf = (WAVEFORMATEX*)p_adec->p_fifo->p_demux_data;
+
     /* fixing some values */
     if( p_adec->p_wf->wFormatTag  == WAVE_FORMAT_PCM && 
         !p_adec->p_wf->nBlockAlign )

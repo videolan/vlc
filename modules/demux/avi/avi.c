@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.19 2002/12/27 15:40:52 sam Exp $
+ * $Id: avi.c,v 1.20 2003/01/07 21:49:01 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -974,9 +974,6 @@ static int AVIInit( vlc_object_t * p_this )
                     input_AddInfo( p_cat, "Bits Per Sample", "%d",
                                    p_avi_strf_auds->p_wf->wBitsPerSample );
                 }
-                                   
-                                   
-                    
                 break;
 
             case( AVIFOURCC_vids ):
@@ -1043,18 +1040,20 @@ static int AVIInit( vlc_object_t * p_this )
         p_info->p_es =
             p_es = input_AddES( p_input,
                                 p_input->stream.p_selected_program, 1+i,
-                                i_init_size );
+                                0 );
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         p_es->i_stream_id =i; /* XXX: i don't use it */
         p_es->i_fourcc = p_info->i_fourcc;
         p_es->i_cat = p_info->i_cat;
-
-        /* We copy strf for decoder in p_es->p_demux_data */
-        if( p_init_data )
+        if( p_es->i_cat == AUDIO_ES )
         {
-            memcpy( p_es->p_demux_data,
-                    p_init_data,
-                    i_init_size );
+            p_es->p_waveformatex = malloc( i_init_size );
+            memcpy( p_es->p_waveformatex, p_init_data, i_init_size );
+        }
+        else if( p_es->i_cat == VIDEO_ES )
+        {
+            p_es->p_bitmapinfoheader = malloc( i_init_size );
+            memcpy( p_es->p_bitmapinfoheader, p_init_data, i_init_size );
         }
 #undef p_info
     }

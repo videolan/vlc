@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.16 2003/01/02 20:48:28 gbazin Exp $
+ * $Id: decoder.c,v 1.17 2003/01/07 21:49:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -198,13 +198,14 @@ static void GetPESData( u8 *p_buf, int i_max, pes_packet_t *p_pes )
  *****************************************************************************/
 static int InitThread( adec_thread_t * p_adec )
 {
+    WAVEFORMATEX    *p_wf;
     int i_status;
-    unsigned long i_rate;
-    unsigned char i_nb_channels;
-            
+    unsigned long   i_rate;
+    unsigned char   i_nb_channels;
+
     faacDecConfiguration *p_faad_config;
 
-    if( !p_adec->p_fifo->p_demux_data )
+    if( ( p_wf = (WAVEFORMATEX*)p_adec->p_fifo->p_waveformatex ) == NULL )
     {
         msg_Warn( p_adec->p_fifo,
                   "cannot load stream informations" );
@@ -212,7 +213,7 @@ static int InitThread( adec_thread_t * p_adec )
     else
     {
         faac_GetWaveFormatEx( &p_adec->format,
-                              (u8*)p_adec->p_fifo->p_demux_data );
+                              (uint8_t*)p_wf );
     }
 
     p_adec->p_buffer = NULL;
@@ -226,7 +227,7 @@ static int InitThread( adec_thread_t * p_adec )
         FREE( p_adec->format.p_data );
         return( -1 );
     }
-    
+
     if( p_adec->format.p_data == NULL )
     {
         int i_frame_size;

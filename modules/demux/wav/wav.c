@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.8 2002/12/18 14:17:10 sam Exp $
+ * $Id: wav.c,v 1.9 2003/01/07 21:49:01 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -490,16 +490,15 @@ static int WAVInit( vlc_object_t * p_this )
 
         p_demux->p_es = input_AddES( p_input,
                                      p_input->stream.p_selected_program, 1,
-                                     p_demux->i_wf );
+                                     0 );
         p_demux->p_es->i_stream_id = 1;
         p_demux->p_es->i_fourcc = p_demux->i_fourcc;
         p_demux->p_es->i_cat = AUDIO_ES;
-        memcpy( p_demux->p_es->p_demux_data,
-                p_demux->p_wf,
-                p_demux->i_wf );
-        
+        p_demux->p_es->p_waveformatex = malloc( p_demux->i_wf );
+        memcpy( p_demux->p_es->p_waveformatex, p_demux->p_wf, p_demux->i_wf );
+
         input_SelectES( p_input, p_demux->p_es );
-        
+
         p_input->stream.p_selected_program->b_is_ok = 1;
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
@@ -513,9 +512,9 @@ static int WAVInit( vlc_object_t * p_this )
         p_input->psz_demux = p_demux->psz_demux;
 
         p_demux->p_demux = module_Need( p_input, "demux", NULL );
-        
+
         p_input->psz_demux = psz_sav;
-        
+
         if( !p_demux->p_demux )
         {
             msg_Err( p_input, 

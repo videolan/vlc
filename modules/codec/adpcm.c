@@ -2,7 +2,7 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.4 2003/01/02 20:48:28 gbazin Exp $
+ * $Id: adpcm.c,v 1.5 2003/01/07 21:49:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -223,7 +223,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
 static int InitThread( adec_thread_t * p_adec )
 {
-    if( !( p_adec->p_wf = (WAVEFORMATEX*)p_adec->p_fifo->p_demux_data ) )
+    if( ( p_adec->p_wf = (WAVEFORMATEX*)p_adec->p_fifo->p_waveformatex ) == NULL )
     {
         msg_Err( p_adec->p_fifo, "missing format" );
         return( -1 );

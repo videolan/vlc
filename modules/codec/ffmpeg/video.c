@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.14 2002/12/18 16:31:25 fenrir Exp $
+ * $Id: video.c,v 1.15 2003/01/07 21:49:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -280,10 +280,8 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
     p_vdec->p_ff_pic = &p_vdec->ff_pic;
 #endif
 
-    if( p_vdec->p_fifo->p_demux_data )
+    if( ( p_vdec->p_format = (BITMAPINFOHEADER *)p_vdec->p_fifo->p_bitmapinfoheader) != NULL )
     {
-        p_vdec->p_format = (BITMAPINFOHEADER *)p_vdec->p_fifo->p_demux_data;
-
         /* ***** Fill p_context with init values ***** */
         p_vdec->p_context->width  = p_vdec->p_format->biWidth;
         p_vdec->p_context->height = p_vdec->p_format->biHeight;

@@ -2,7 +2,7 @@
  * rawdv.c : raw dv input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rawdv.c,v 1.1 2002/12/17 21:15:43 gbazin Exp $
+ * $Id: rawdv.c,v 1.2 2003/01/07 21:49:01 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -267,7 +267,7 @@ static int Activate( vlc_object_t * p_this )
     p_rawdv->p_video_es->i_stream_id = 0;
     p_rawdv->p_video_es->i_fourcc = VLC_FOURCC( 'd','v','s','d' );
     p_rawdv->p_video_es->i_cat = VIDEO_ES;
-    p_rawdv->p_video_es->p_demux_data = (void *)p_rawdv->p_bih;
+    p_rawdv->p_video_es->p_bitmapinfoheader = (void *)p_rawdv->p_bih;
     input_SelectES( p_input, p_rawdv->p_video_es );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 

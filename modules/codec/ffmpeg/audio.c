@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.10 2003/01/02 20:48:28 gbazin Exp $
+ * $Id: audio.c,v 1.11 2003/01/07 21:49:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -116,10 +116,12 @@ static void ffmpeg_GetWaveFormatEx( waveformatex_t *p_wh,
  *****************************************************************************/
 int E_( InitThread_Audio )( adec_thread_t *p_adec )
 {
-    if( p_adec->p_fifo->p_demux_data )
+    WAVEFORMATEX *p_wf;
+
+    if( ( p_wf = p_adec->p_fifo->p_waveformatex ) != NULL )
     {
-        ffmpeg_GetWaveFormatEx( &p_adec->format, 
-                                (u8*)p_adec->p_fifo->p_demux_data );
+        ffmpeg_GetWaveFormatEx( &p_adec->format,
+                                (uint8_t*)p_wf );
     }
     else
     {
