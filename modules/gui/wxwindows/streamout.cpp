@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.30 2003/08/28 15:59:04 gbazin Exp $
+ * $Id: streamout.cpp,v 1.31 2003/08/30 11:59:44 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -477,25 +477,22 @@ wxPanel *SoutDialog::MiscPanel( wxWindow* parent )
     wxPanel *panel = new wxPanel( parent, -1, wxDefaultPosition,
                                   wxSize(200, 200) );
 
-    // wxFlexGridSizer *sizer = new wxFlexGridSizer( 2, 4, 20 );
     wxStaticBox *panel_box = new wxStaticBox( panel, -1,
                                    wxU(_("Miscellaneous Options")) );
     wxStaticBoxSizer *panel_sizer = new wxStaticBoxSizer( panel_box,
                                                           wxVERTICAL );
 
     /* Announce Row */
-    wxStaticText *label;
-    wxFlexGridSizer *subpanel_sizer;
-
     misc_subpanels[ANN_MISC_SOUT] = new wxPanel( panel, -1 );
-    subpanel_sizer = new wxFlexGridSizer( 2, 2, 20 );
+    wxFlexGridSizer *subpanel_sizer = new wxFlexGridSizer( 4, 4, 20 );
 
     sap_checkbox = new wxCheckBox( misc_subpanels[ANN_MISC_SOUT],SAPMisc_Event,
                                    wxU(_("SAP Announce")) );
     slp_checkbox = new wxCheckBox( misc_subpanels[ANN_MISC_SOUT],SLPMisc_Event,
                                    wxU(_("SLP Announce")) );
-    label = new wxStaticText( misc_subpanels[ANN_MISC_SOUT], -1,
-                              wxU(_("Channel Name ")) );
+
+    wxStaticText *label = new wxStaticText( misc_subpanels[ANN_MISC_SOUT], -1,
+                                            wxU(_("Channel Name")) );
     announce_addr = new wxTextCtrl( misc_subpanels[ANN_MISC_SOUT],
                                     AnnounceAddr_Event,
                                     wxT(""), wxDefaultPosition,

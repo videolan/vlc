@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.22 2003/08/29 18:58:49 fenrir Exp $
+ * $Id: v4l.c,v 1.23 2003/08/30 11:59:44 gbazin Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -743,7 +743,7 @@ static int AccessOpen( vlc_object_t *p_this )
         /* Find out video format used by device */
         if( ioctl( p_sys->fd, VIDIOCGPICT, &p_sys->vid_picture ) == 0 )
         {
-            int i_chroma;
+            int i_chroma = VLC_FOURCC( ' ', ' ', ' ', ' ' );
             struct video_picture vid_picture = p_sys->vid_picture;
 
             /* Try to set the format to something easy to encode */
