@@ -2,7 +2,7 @@
  * mmsh.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmsh.c,v 1.7 2004/01/21 16:56:16 fenrir Exp $
+ * $Id: mmsh.c,v 1.8 2004/01/26 16:30:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -322,7 +322,7 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
     i_packet = ( i_pos - p_sys->i_header ) / p_sys->asfh.i_min_data_packet_size;
     i_offset = ( i_pos - p_sys->i_header ) % p_sys->asfh.i_min_data_packet_size;
 
-    msg_Err( p_input, "seeking to "I64Fd, i_pos );
+    msg_Dbg( p_input, "seeking to "I64Fd, i_pos );
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
