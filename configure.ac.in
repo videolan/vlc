@@ -32,6 +32,7 @@ AC_PROG_CPP
 AC_PROG_CXX
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
+AC_PROG_EGREP
 
 dnl AC_PROG_OBJC doesn't seem to exist, this is the KDE workaround
 AC_MSG_CHECKING(for an Objective-C compiler)
@@ -368,15 +369,26 @@ dnl Check for cthreads under GNU/Hurd for instance
 AC_CHECK_LIB(threads,cthread_fork,THREAD_LIB="-lthreads")
 
 dnl Check for misc headers
+AC_MSG_CHECKING(for pthread_cond_t in pthread.h)
 AC_EGREP_HEADER(pthread_cond_t,pthread.h,[
+  AC_MSG_RESULT(yes)
   AC_DEFINE(PTHREAD_COND_T_IN_PTHREAD_H, 1,
-            Define if <pthread.h> defines pthread_cond_t.)])
+            Define if <pthread.h> defines pthread_cond_t.)],[
+  AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING(for pthread_once in pthread.h)
 AC_EGREP_HEADER(pthread_once,pthread.h,[
+  AC_MSG_RESULT(yes)
   AC_DEFINE(PTHREAD_ONCE_IN_PTHREAD_H, 1,
-            Define if <pthread.h> defines pthread_once.)])
+            Define if <pthread.h> defines pthread_once.)],[
+  AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING(for strncasecmp in strings.h)
 AC_EGREP_HEADER(strncasecmp,strings.h,[
+  AC_MSG_RESULT(yes)
   AC_DEFINE(STRNCASECMP_IN_STRINGS_H, 1,
-            Define if <strings.h> defines strncasecmp.)])
+            Define if <strings.h> defines strncasecmp.)],[
+  AC_MSG_RESULT(no)])
 
 dnl Check for headers
 AC_CHECK_HEADERS(signal.h time.h errno.h stdint.h getopt.h strings.h inttypes.h sys/int_types.h)
@@ -394,15 +406,23 @@ AC_CHECK_HEADERS(dirent.h,,[need_dirent=:])
 AM_CONDITIONAL(BUILD_DIRENT, ${need_dirent})
 
 dnl Mac OS X and other OSes don't have declaration for nanosleep
+AC_MSG_CHECKING(for nanosleep in time.h)
 AC_EGREP_HEADER(nanosleep,time.h,[
+  AC_MSG_RESULT(yes)
   AC_DEFINE(HAVE_DECL_NANOSLEEP, 1,
             Define if <time.h> defines nanosleep.)
+],[
+  AC_MSG_RESULT(no)
 ])
 
 dnl Make sure we have timespecs
+AC_MSG_CHECKING(for timespec in sys/time.h)
 AC_EGREP_HEADER(timespec,sys/time.h,[
+  AC_MSG_RESULT(yes)
   AC_DEFINE(HAVE_STRUCT_TIMESPEC, 1,
             Define if <sys/time.h> defines struct timespec.)
+],[
+  AC_MSG_RESULT(no)
 ])
 
 dnl Check for threads library
@@ -425,9 +445,13 @@ if test "x${SYS}" != "xmingw32"
 then
   CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
   AC_CHECK_HEADERS(X11/extensions/dpms.h, [
+    AC_MSG_CHECKING(for DPMSInfo in X11/extensions/dpms.h)
     AC_EGREP_HEADER(DPMSInfo,X11/extensions/dpms.h,[
+      AC_MSG_RESULT(yes)
       AC_DEFINE(DPMSINFO_IN_DPMS_H, 1,
                 Define if <X11/extensions/dpms.h> defines DPMSInfo.)
+    ],[
+      AC_MSG_RESULT(no)
     ])
   ],,[
     #include <X11/Xlib.h>
@@ -1196,18 +1220,30 @@ AC_ARG_ENABLE(vcd,
 
 if test "x${enable_vcd}" != "xno"
 then
+  AC_MSG_CHECKING(for cdrom_msf0 in linux/cdrom.h)
   AC_EGREP_HEADER(cdrom_msf0,linux/cdrom.h,[
+    AC_MSG_RESULT(yes)
     PLUGINS="${PLUGINS} vcd"
+  ],[
+    AC_MSG_RESULT(no)
   ])
 
+  AC_MSG_CHECKING(for scsireq in sys/scsiio.h)
   AC_EGREP_HEADER(scsireq,sys/scsiio.h,[
+    AC_MSG_RESULT(yes)
     PLUGINS="${PLUGINS} vcd"
     AC_DEFINE(HAVE_SCSIREQ_IN_SYS_SCSIIO_H, 1, For NetBSD VCD support)
+  ],[
+    AC_MSG_RESULT(no)
   ])
 
+  AC_MSG_CHECKING(for ioc_toc_header in sys/cdio.h)
   AC_EGREP_HEADER(ioc_toc_header ,sys/cdio.h,[
+    AC_MSG_RESULT(yes)
     PLUGINS="${PLUGINS} vcd"
     AC_DEFINE(HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H, 1, For FreeBSD VCD support)
+  ],[
+    AC_MSG_RESULT(no)
   ])
 
   if test "x${SYS}" = "xbsdi" -o "x${SYS}" = "xmingw32"
@@ -2543,11 +2579,16 @@ AC_ARG_ENABLE(pth,
   [  --enable-pth            GNU Pth support (default disabled)],
   [ if test "x${enable_pth}" = "xyes"; then
     AC_CHECK_LIB(pth,pth_init)
+    AC_MSG_CHECKING(for pth_init in pth.h)
     AC_EGREP_HEADER(pth_init,pth.h,[
+      AC_MSG_RESULT(yes)
       AC_DEFINE(PTH_INIT_IN_PTH_H, 1,
                 Define if <pth.h> defines pth_init)
-    THREAD_LIB="-lpth"
-    fi])
+      THREAD_LIB="-lpth"
+    ],[
+      AC_MSG_RESULT(no)
+    ])
+    fi
 ])
 
 dnl
@@ -2557,11 +2598,16 @@ AC_ARG_ENABLE(st,
   [  --enable-st             State Threads (default disabled)],
   [ if test "x${enable_st}" = "xyes"; then
     AC_CHECK_LIB(st,st_init)
+    AC_MSG_CHECKING(for st_init in st.h)
     AC_EGREP_HEADER(st_init,st.h,[
+      AC_MSG_RESULT(yes)
       AC_DEFINE(ST_INIT_IN_ST_H, 1,
                 Define if <st.h> defines st_init)
-    THREAD_LIB="-lst"
-    fi])
+      THREAD_LIB="-lst"
+    ],[
+      AC_MSG_RESULT(yes)
+    ])
+    fi
 ])
 
 if test "x${SYS}" != "xmingw32"; then
