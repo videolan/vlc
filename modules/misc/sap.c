@@ -100,6 +100,10 @@
 #define SAP_TIMEOUT_LONGTEXT N_( \
        "Sets the time before SAP items get deleted if no new announce " \
        "is received.")
+#define SAP_PARSE_TEXT N_("Try to parse the SAP")
+#define SAP_PARSE_LONGTEXT N_( \
+       "When SAP can it will try to parse the SAP. Normal behaviour is" \
+       "to have livedotcom parse the announce." )
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
@@ -117,6 +121,8 @@ vlc_module_begin();
                 SAP_SCOPE_TEXT, SAP_SCOPE_LONGTEXT, VLC_TRUE);
     add_integer( "sap-timeout", 1800, NULL,
                  SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, VLC_TRUE);
+    add_bool( "sap-parse", 0 , NULL,
+               SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, VLC_TRUE);
 
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
@@ -645,14 +651,14 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
     char *psz_uri, *psz_proto, *psz_item_uri;
     char *psz_port;
     char *psz_uri_default;
-    int i_count , i , i_pos , i_id = 0;
+    int i_count, i, i_id = 0;
     vlc_bool_t b_http = VLC_FALSE;
     char *psz_http_path = NULL;
     playlist_t *p_playlist = NULL;
     playlist_item_t *p_item;
 
     psz_uri_default = NULL;
-    if( p_sd->i_media > 1 )
+    if( p_sd->i_media > 1 || !config_GetInt( p_intf, "sap-parse" ) )
     {
         asprintf( &psz_uri, "sdp://%s", p_sd->psz_sdp );
         /* Check if we have already added the item */
