@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: aout.m,v 1.28 2003/03/15 22:10:58 jlj Exp $
+ * $Id: aout.m,v 1.29 2003/03/16 20:06:34 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -82,16 +82,16 @@ aout_classes[] =
 
     {
         kAudioFormatLinearPCM, 
-        1, 
+        2, 
         AudioDeviceClassPCM, 
-        "Mono PCM"
+        "Stereo PCM"
     },
 
     {
         kAudioFormatLinearPCM, 
-        2, 
+        1, 
         AudioDeviceClassPCM, 
-        "Stereo PCM"
+        "Mono PCM"
     },
 
     {
