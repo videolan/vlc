@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filters.c,v 1.5 2002/08/19 21:31:11 massiot Exp $
+ * $Id: filters.c,v 1.6 2002/08/19 21:54:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -76,13 +76,13 @@ static int SplitConversion( aout_instance_t * p_aout,
                              const audio_sample_format_t * p_input_format,
                              const audio_sample_format_t * p_output_format,
                              audio_sample_format_t * p_middle_format,
-                             boolean_t b_format_first,
-                             boolean_t b_rate_first )
+                             vlc_bool_t b_format_first,
+                             vlc_bool_t b_rate_first )
 {
-    boolean_t b_format =
+    vlc_bool_t b_format =
              (p_input_format->i_format != p_output_format->i_format);
-    boolean_t b_rate = (p_input_format->i_rate != p_output_format->i_rate);
-    boolean_t b_channels =
+    vlc_bool_t b_rate = (p_input_format->i_rate != p_output_format->i_rate);
+    vlc_bool_t b_channels =
              (p_input_format->i_channels != p_output_format->i_channels);
     int i_nb_conversions = b_format + b_rate + b_channels;
 
@@ -160,7 +160,7 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
                                 const audio_sample_format_t * p_output_format )
 {
     audio_sample_format_t temp_format;
-    boolean_t b_format_first, b_rate_first;
+    vlc_bool_t b_format_first, b_rate_first;
 
     if ( AOUT_FMTS_IDENTICAL( p_input_format, p_output_format ) )
     {

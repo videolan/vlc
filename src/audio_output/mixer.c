@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.6 2002/08/19 21:31:11 massiot Exp $
+ * $Id: mixer.c,v 1.7 2002/08/19 21:54:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -92,7 +92,7 @@ void aout_MixerRun( aout_instance_t * p_aout )
         aout_fifo_t * p_fifo = &p_input->fifo;
         aout_buffer_t * p_buffer;
         mtime_t prev_date;
-        boolean_t b_drop_buffers;
+        vlc_bool_t b_drop_buffers;
 
         vlc_mutex_lock( &p_fifo->lock );
 

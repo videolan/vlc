@@ -2,7 +2,7 @@
  * aout.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.3 2002/08/19 11:51:03 tcastley Exp $
+ * $Id: AudioOutput.cpp,v 1.4 2002/08/19 21:54:37 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -63,7 +63,7 @@ struct aout_sys_t
  *****************************************************************************/
 static int     SetFormat   ( aout_instance_t * );
 //static int     GetBufInfo  ( aout_instance_t *, int );
-static void    Play        ( aout_instance_t *, aout_buffer_t * );
+static void    Play        ( aout_instance_t * );
 
 /*****************************************************************************
  * OpenAudio: opens a BPushGameSound
@@ -138,9 +138,9 @@ static int SetFormat( aout_instance_t *p_aout )
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the dsp
  *****************************************************************************/
-static void Play( aout_instance_t *p_aout,
-                  aout_buffer_t *p_buffer )
+static void Play( aout_instance_t *p_aout )
 {
+    aout_buffer_t * p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
     int i_newbuf_pos;
 
     if( (i_newbuf_pos = p_aout->output.p_sys->i_buffer_pos + p_buffer->i_size)
