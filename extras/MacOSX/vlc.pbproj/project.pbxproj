@@ -143,6 +143,26 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>spx</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Speex Audio File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>sdp</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Session Description Protocol File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>wav</string>
 			</array>
 			<key>CFBundleTypeName</key>
@@ -450,9 +470,20 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>m2p</string>
+				<string>ps</string>
 			</array>
 			<key>CFBundleTypeName</key>
 			<string>MPEG-2 Program Stream</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>ts</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>MPEG-2 Transport Stream</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -535,6 +566,7 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>m4a</string>
+				<string>m4p</string>
 			</array>
 			<key>CFBundleTypeName</key>
 			<string>MPEG-4 Audio File</string>
@@ -745,8 +777,6 @@
 				8ED6C27B03E2EB1C0059A3A7,
 				8ED6C27C03E2EB1C0059A3A7,
 				8ED6C27D03E2EB1C0059A3A7,
-				8EF1600B03FC62560059A3A7,
-				8EF1600C03FC62560059A3A7,
 				8ED6C27E03E2EB1C0059A3A7,
 				8ED6C27F03E2EB1C0059A3A7,
 				8ED6C28003E2EB1C0059A3A7,
@@ -1922,24 +1952,6 @@
 			isa = PBXBuildFile;
 			settings = {
 			};
-		};
-		8EF1600B03FC62560059A3A7 = {
-			fileEncoding = 4;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = info.h;
-			path = ../../modules/gui/macosx/info.h;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		8EF1600C03FC62560059A3A7 = {
-			fileEncoding = 4;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.objc;
-			name = info.m;
-			path = ../../modules/gui/macosx/info.m;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
 		};
 //8E0
 //8E1

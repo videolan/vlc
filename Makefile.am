@@ -462,8 +462,6 @@ VLC.app: vlc
 	    applescript.m \
 	    controls.h \
 	    controls.m \
-	    info.h \
-	    info.m \
 	    intf.h \
 	    intf.m \
 	    macosx.m \
