@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.13 2003/12/05 02:33:49 rocky Exp $
+ * $Id: access.c,v 1.14 2003/12/11 12:56:25 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -836,7 +836,7 @@ E_(Open)( vlc_object_t *p_this )
         free( psz_orig );
         return -1;
       }
-      psz_source = config_GetPsz( p_input, MODULE_STRING "-device" );
+      psz_source = config_GetPsz( p_input, "cd-audio" );
       
       if( !psz_source || 0==strlen(psz_source) ) {
         /* Scan for a CD-ROM drive with a CD-DA in it. */

@@ -3,8 +3,8 @@
  *         using libcdio, libvcd and libvcdinfo. vlc-specific things tend
  *         to go here.
  *****************************************************************************
- * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.9 2003/12/05 05:01:17 rocky Exp $
+ * Copyright (C) 2000, 2003 VideoLAN
+ * $Id: access.c,v 1.10 2003/12/11 12:56:25 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -197,8 +197,10 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
             *p_buf = 0x01;
             dbg_print(INPUT_DBG_STILL, "Handled still event");
 
+#if 1
 	    p_vcd->p_intf->p_sys->b_still = 1;
 	    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+#endif
 
 	    vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -207,9 +209,10 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 
 	    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-            dbg_print(INPUT_DBG_STILL, "Clock manage");
 	    input_ClockManageControl( p_input, p_pgrm, 0 );
-            dbg_print(INPUT_DBG_STILL, "Clock manage done");
+
+	    p_vcd->p_intf->p_sys->b_still = 1;
+	    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
 
             return i_read + M2F2_SECTOR_SIZE;
           }
@@ -825,7 +828,7 @@ VCDParse( input_thread_t * p_input, /*out*/ vcdinfo_itemid_t * p_itemid )
       /* No source specified, so figure it out. */
       if( !p_input->psz_access ) return NULL;
       
-      psz_source = config_GetPsz( p_input, MODULE_STRING "-device" );
+      psz_source = config_GetPsz( p_input, "vcd" );
 
       if( !psz_source || 0==strlen(psz_source) ) {
         /* Scan for a CD-ROM drive with a VCD in it. */

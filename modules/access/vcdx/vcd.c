@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: vcd.c,v 1.10 2003/11/30 13:53:45 rocky Exp $
+ * $Id: vcd.c,v 1.11 2003/12/11 12:56:25 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
@@ -82,13 +82,6 @@ vlc_module_begin();
     add_integer ( MODULE_STRING "-debug", 0, E_(DebugCallback), 
 		  N_("set debug mask for additional debugging."),
                   DEBUG_LONGTEXT, VLC_TRUE );
-
-    add_string( MODULE_STRING "-device", "", NULL, 
-		N_("VCD device name"),
-		N_("Specify the name of the Video Compact Disc device that "
-                   "will be used by default. If you don't specify anything, "
-		   "we'll scan for a suitable VCD device."),
-		VLC_FALSE );
 
     add_bool( MODULE_STRING "-PBC", 0, NULL,
 	      N_("Use playback control?"),
