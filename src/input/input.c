@@ -126,7 +126,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->bookmark = NULL;
     p_input->p_es_out = NULL;
     p_input->p_sout  = NULL;
-    p_input->b_out_pace_control = VLC_TRUE;
+    p_input->b_out_pace_control = VLC_FALSE;
     p_input->i_pts_delay = 0;
 
 
@@ -1191,7 +1191,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             }
             if( i_rate != INPUT_RATE_DEFAULT &&
                 ( !p_input->b_can_pace_control ||
-                  !p_input->b_out_pace_control ) )
+                  ( p_input->p_sout && !p_input->b_out_pace_control ) ) )
             {
                 msg_Dbg( p_input, "cannot change rate" );
                 i_rate = INPUT_RATE_DEFAULT;
