@@ -2,7 +2,7 @@
  * parse.c: SPU parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: parse.c,v 1.2 2002/10/17 08:24:12 sam Exp $
+ * $Id: parse.c,v 1.3 2002/10/31 09:40:26 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -103,12 +103,14 @@ void E_(ParsePacket)( spudec_thread_t *p_spudec )
     subpicture_t * p_spu;
     u8           * p_src;
     unsigned int   i_offset;
+    mtime_t        i_pts;
 
     msg_Dbg( p_spudec->p_fifo, "trying to gather a 0x%.2x long subtitle",
                                p_spudec->i_spu_size );
 
     /* We cannot display a subpicture with no date */
-    if( p_spudec->p_fifo->p_first->i_pts == 0 )
+    NextPTS( &p_spudec->bit_stream, &i_pts, NULL );
+    if( i_pts == 0 )
     {
         msg_Warn( p_spudec->p_fifo, "subtitle without a date" );
         return;
@@ -139,7 +141,7 @@ void E_(ParsePacket)( spudec_thread_t *p_spudec )
     p_spu->p_sys->pi_alpha[3] = 0x0f;
 
     /* Get display time now. If we do it later, we may miss the PTS. */
-    p_spu->p_sys->i_pts = p_spudec->p_fifo->p_first->i_pts;
+    p_spu->p_sys->i_pts = i_pts;
 
     /* Allocate the temporary buffer we will parse */
     p_src = malloc( p_spudec->i_rle_size );

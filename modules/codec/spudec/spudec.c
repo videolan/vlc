@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.5 2002/10/27 16:58:13 gbazin Exp $
+ * $Id: spudec.c,v 1.6 2002/10/31 09:40:26 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -151,6 +151,10 @@ static int InitThread( spudec_thread_t *p_spudec )
     {
         if( p_spudec->p_fifo->b_die || p_spudec->p_fifo->b_error )
         {
+            /* Call InitBitstream anyway so p_spudec is in a known state
+             * before calling CloseBitstream */
+            InitBitstream( &p_spudec->bit_stream, p_spudec->p_fifo,
+                           NULL, NULL );
             return -1;
         }
 
