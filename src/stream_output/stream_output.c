@@ -39,7 +39,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void sout_cfg_free( sout_cfg_t * );
+static void sout_CfgDestroy( sout_cfg_t * );
 
 #define sout_stream_url_to_chain( p, s ) _sout_stream_url_to_chain( VLC_OBJECT(p), s )
 static char *_sout_stream_url_to_chain( vlc_object_t *, char * );
@@ -138,7 +138,7 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
     /* attach it for inherit */
     vlc_object_attach( p_sout, p_parent );
 
-    p_sout->p_stream = sout_stream_new( p_sout, p_sout->psz_chain );
+    p_sout->p_stream = sout_StreamNew( p_sout, p_sout->psz_chain );
 
     if( p_sout->p_stream == NULL )
     {
@@ -163,7 +163,7 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
     vlc_object_detach( p_sout );
 
     /* remove the stream out chain */
-    sout_stream_delete( p_sout->p_stream );
+    sout_StreamDelete( p_sout->p_stream );
 
     /* *** free all string *** */
     FREE( p_sout->psz_sout );
@@ -282,7 +282,7 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
         return NULL;
     }
 
-    psz_next = sout_cfg_parser( &p_access->psz_access, &p_access->p_cfg,
+    psz_next = sout_CfgCreate( &p_access->psz_access, &p_access->p_cfg,
                                 psz_access );
     if( psz_next )
     {
@@ -323,7 +323,7 @@ void sout_AccessOutDelete( sout_access_out_t *p_access )
     }
     free( p_access->psz_access );
 
-    sout_cfg_free( p_access->p_cfg );
+    sout_CfgDestroy( p_access->p_cfg );
 
     free( p_access->psz_name );
 
@@ -373,13 +373,13 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
     }
 
     p_mux->p_sout       = p_sout;
-    psz_next = sout_cfg_parser( &p_mux->psz_mux, &p_mux->p_cfg, psz_mux );
+    psz_next = sout_CfgCreate( &p_mux->psz_mux, &p_mux->p_cfg, psz_mux );
     if( psz_next )
     {
         free( psz_next );
     }
     p_mux->p_access     = p_access;
-    p_mux->pf_capacity  = NULL;
+    p_mux->pf_control   = NULL;
     p_mux->pf_addstream = NULL;
     p_mux->pf_delstream = NULL;
     p_mux->pf_mux       = NULL;
@@ -404,12 +404,10 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
     }
 
     /* *** probe mux capacity *** */
-    if( p_mux->pf_capacity )
+    if( p_mux->pf_control )
     {
         int b_answer;
-        if( p_mux->pf_capacity( p_mux,
-                                SOUT_MUX_CAP_GET_ADD_STREAM_ANY_TIME, NULL,
-                                (void*)&b_answer ) != SOUT_MUX_CAP_ERR_OK )
+        if( sout_MuxControl( p_mux, MUX_CAN_ADD_STREAM_WHILE_MUXING, &b_answer ) )
         {
             b_answer = VLC_FALSE;
         }
@@ -419,9 +417,7 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
             p_mux->b_add_stream_any_time = VLC_TRUE;
             p_mux->b_waiting_stream = VLC_FALSE;
 
-            if( p_mux->pf_capacity( p_mux,
-                                    SOUT_MUX_CAP_GET_ADD_STREAM_WAIT, NULL,
-                                    (void*)&b_answer ) != SOUT_MUX_CAP_ERR_OK )
+            if( sout_MuxControl( p_mux, MUX_GET_ADD_STREAM_WAIT, &b_answer ) )
             {
                 b_answer = VLC_FALSE;
             }
@@ -460,7 +456,7 @@ void sout_MuxDelete( sout_mux_t *p_mux )
     }
     free( p_mux->psz_mux );
 
-    sout_cfg_free( p_mux->p_cfg );
+    sout_CfgDestroy( p_mux->p_cfg );
 
     vlc_object_destroy( p_mux );
 }
@@ -748,7 +744,7 @@ static char *_get_chain_end( char *str )
     }
 }
 
-char *sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
+char *sout_CfgCreate( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
 {
     sout_cfg_t *p_cfg = NULL;
     char       *p = psz_chain;
@@ -880,7 +876,7 @@ char *sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
     return NULL;
 }
 
-static void sout_cfg_free( sout_cfg_t *p_cfg )
+static void sout_CfgDestroy( sout_cfg_t *p_cfg )
 {
     while( p_cfg != NULL )
     {
@@ -896,7 +892,7 @@ static void sout_cfg_free( sout_cfg_t *p_cfg )
     }
 }
 
-void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix,
+void __sout_CfgParse( vlc_object_t *p_this, char *psz_prefix,
                       const char **ppsz_options, sout_cfg_t *cfg )
 {
     char *psz_name;
@@ -999,7 +995,7 @@ void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix,
 /*
  * XXX name and p_cfg are used (-> do NOT free them)
  */
-sout_stream_t *sout_stream_new( sout_instance_t *p_sout, char *psz_chain )
+sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_chain )
 {
     sout_stream_t *p_stream;
 
@@ -1021,7 +1017,7 @@ sout_stream_t *sout_stream_new( sout_instance_t *p_sout, char *psz_chain )
     p_stream->p_sys    = NULL;
 
     p_stream->psz_next =
-        sout_cfg_parser( &p_stream->psz_name, &p_stream->p_cfg, psz_chain);
+        sout_CfgCreate( &p_stream->psz_name, &p_stream->p_cfg, psz_chain);
 
     msg_Dbg( p_sout, "stream=`%s'", p_stream->psz_name );
 
@@ -1032,14 +1028,14 @@ sout_stream_t *sout_stream_new( sout_instance_t *p_sout, char *psz_chain )
 
     if( !p_stream->p_module )
     {
-        sout_stream_delete( p_stream );
+        sout_StreamDelete( p_stream );
         return NULL;
     }
 
     return p_stream;
 }
 
-void sout_stream_delete( sout_stream_t *p_stream )
+void sout_StreamDelete( sout_stream_t *p_stream )
 {
     msg_Dbg( p_stream, "destroying chain... (name=%s)", p_stream->psz_name );
 
@@ -1049,7 +1045,7 @@ void sout_stream_delete( sout_stream_t *p_stream )
     FREE( p_stream->psz_name );
     FREE( p_stream->psz_next );
 
-    sout_cfg_free( p_stream->p_cfg );
+    sout_CfgDestroy( p_stream->p_cfg );
 
     msg_Dbg( p_stream, "destroying chain done" );
     vlc_object_destroy( p_stream );
