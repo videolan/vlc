@@ -684,7 +684,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     else if( [[o_tc identifier] isEqualToString:@"3"] )
     {
         char psz_duration[MSTRTIME_MAX_SIZE];
-        mtime_t dur = p_playlist->pp_items[i_row]->i_duration;
+        mtime_t dur = p_playlist->pp_items[i_row]->input.i_duration;
         if( dur != -1 )
         {
             secstotimestr( psz_duration, dur/1000000 );

@@ -36,6 +36,6 @@
 - (void)updateInfo;
 - (IBAction)toggleInfoPanel:(id)sender;
 - (IBAction)showCategory:(id)sender;
-- (void)createInfoView:(input_info_category_t *)p_category;
+- (void)createInfoView:(info_category_t *)p_category;
 
 @end

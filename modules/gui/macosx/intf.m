@@ -739,7 +739,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
         vlc_mutex_lock( &p_playlist->object_lock );
         [o_scrollfield setStringValue: [NSString stringWithUTF8String: 
-            p_playlist->pp_items[p_playlist->i_index]->psz_name]]; 
+            p_playlist->pp_items[p_playlist->i_index]->input.psz_name]]; 
         vlc_mutex_unlock( &p_playlist->object_lock );
 
         if( p_vout != NULL )

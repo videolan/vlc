@@ -75,6 +75,7 @@
 - (void)updateInfo
 {
     NSString *o_selectedPane;
+    int i, i_select;
     
     if( ![o_window isVisible] )
     {
@@ -94,20 +95,17 @@
 
     [o_strings removeAllObjects];
     [o_selector removeAllItems];
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    input_info_category_t * p_category = p_input->stream.p_info;
-
-    while( p_category )
+    
+    vlc_mutex_lock( &p_input->p_item->lock );
+    for( i = 0; i < p_input->p_item->i_categories; i++ )
     {
-        [self createInfoView: p_category];
-        p_category = p_category->p_next;
+        info_category_t *p_cat = p_input->p_item->pp_categories[i];
+
+        [self createInfoView: p_cat];
     }
+    vlc_mutex_unlock( &p_input->p_item->lock );
 
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-    if( p_input ) vlc_object_release( p_input );
-
-    int i_select = [o_selector indexOfItemWithTitle:o_selectedPane];
+    i_select = [o_selector indexOfItemWithTitle:o_selectedPane];
     if ( i_select < 0 )
     {
         i_select = 0;
@@ -116,27 +114,26 @@
     [self showCategory: o_selector];
 }
 
-- (void)createInfoView:(input_info_category_t *)p_category
+- (void)createInfoView:(info_category_t *)p_cat
 {
     NSString * o_title;
     NSMutableString * o_content;
-    input_info_t * p_info;
+    info_t * p_info;
+    int i;
 
     /* Add a category */
-    o_title = [NSString stringWithUTF8String: p_category->psz_name];
+    o_title = [NSString stringWithUTF8String: p_cat->psz_name];
     [o_selector addItemWithTitle: o_title];
 
     /* Create empty content string */
     o_content = [NSMutableString string];
 
     /* Add the fields */
-    p_info = p_category->p_info;
-
-    while( p_info )
+    for( i= 0; i < p_cat->i_infos; i++ )
     {
+        p_info = p_cat->pp_infos[i];
         [o_content appendFormat: @"%@: %@\n\n", [NSApp localizedString: p_info->psz_name],
-                                                [NSApp localizedString: p_info->psz_value]]; 
-        p_info = p_info->p_next;
+                                                [NSApp localizedString: p_info->psz_value]];
     }
 
     [o_strings setObject: o_content forKey: o_title];
