@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.13 2003/03/11 06:58:06 fenrir Exp $
+ * $Id: araw.c,v 1.14 2003/03/11 17:40:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -433,7 +433,7 @@ static void DecodeThread( adec_thread_t *p_adec )
     aout_buffer_t   *p_aout_buffer;
     int             i_samples; // per channels
     int             i_size;
-    uint8_t         *p_data;
+    uint8_t         *p_data, *p;
     pes_packet_t    *p_pes;
 
     /* **** get samples count **** */
@@ -449,13 +449,12 @@ static void DecodeThread( adec_thread_t *p_adec )
     {
         i_size -= i_size % p_adec->p_wf->nBlockAlign;
     }
-    i_size = __MAX( i_size, p_adec->p_wf->nBlockAlign );
-
-    if( !i_size || !p_pes )
+    if( i_size <= 0 || i_size < p_adec->p_wf->nBlockAlign )
     {
-        msg_Err( p_adec->p_fifo, "infinite loop..." );
+        input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
         return;
     }
+
     i_samples = i_size /
                 ( ( p_adec->p_wf->wBitsPerSample + 7 ) / 8 ) /
                 p_adec->p_wf->nChannels;
@@ -475,7 +474,7 @@ static void DecodeThread( adec_thread_t *p_adec )
     }
 
     /* gather data */
-    p_data = alloca( i_size );
+    p = p_data = malloc( i_size );
     GetPESData( p_data, i_size, p_pes );
 
     while( i_samples > 0 )
@@ -490,6 +489,8 @@ static void DecodeThread( adec_thread_t *p_adec )
         {
             msg_Err( p_adec->p_fifo, "cannot get aout buffer" );
             p_adec->p_fifo->b_error = 1;
+
+            free( p_data );
             return;
         }
 
@@ -505,16 +506,16 @@ static void DecodeThread( adec_thread_t *p_adec )
 
             for( i = 0; i < p_aout_buffer->i_nb_bytes; i++ )
             {
-                *s++ = p_adec->p_logtos16[*p_data++];
+                *s++ = p_adec->p_logtos16[*p++];
             }
         }
         else
         {
             memcpy( p_aout_buffer->p_buffer,
-                    p_data,
+                    p,
                     p_aout_buffer->i_nb_bytes );
 
-            p_data += p_aout_buffer->i_nb_bytes;
+            p += p_aout_buffer->i_nb_bytes;
         }
 
         aout_DecPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
@@ -522,6 +523,7 @@ static void DecodeThread( adec_thread_t *p_adec )
         i_samples -= i_copy;
     }
 
+    free( p_data );
     input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
 }
 
