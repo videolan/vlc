@@ -4,6 +4,7 @@ SOURCES_id3 = \
 
 SOURCES_id3tag = \
 	modules/demux/util/id3tag.c \
+	modules/demux/util/id3genres.h \
 	$(NULL)
 
 SOURCES_demuxsub = \
