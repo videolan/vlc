@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.5 2002/08/25 09:40:00 sam Exp $
+ * $Id: waveout.c,v 1.6 2002/08/30 23:27:06 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -43,8 +43,6 @@
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );             
 static void Close        ( vlc_object_t * );                   
-
-static int  SetFormat    ( aout_instance_t * );  
 static void Play         ( aout_instance_t * );
 
 /* local functions */
@@ -102,7 +100,6 @@ static int Open( vlc_object_t *p_this )
         return 1;
     }
 
-    p_aout->output.pf_setformat = SetFormat;
     p_aout->output.pf_play = Play;
 
     /* calculate the frame size in bytes */
@@ -119,56 +116,16 @@ static int Open( vlc_object_t *p_this )
 
     /* We need to open the device with default values to be sure it is
      * available */
-    return OpenWaveOut( p_aout, WAVE_FORMAT_PCM, 2, 44100 );
-}
-
-/*****************************************************************************
- * SetFormat: reset the audio device and sets its format
- *****************************************************************************
- * This functions set a new audio format.
- * For this we need to close the current device and create another
- * one with the desired format.
- *****************************************************************************/
-static int SetFormat( aout_instance_t *p_aout )
-{
-    msg_Dbg( p_aout, "SetFormat" );
+    if ( OpenWaveOut( p_aout, WAVE_FORMAT_PCM, 2, 44100 ) )
+    {
+        msg_Err( p_aout, "cannot open waveout" );
+        return 1;
+    }
 
     waveOutReset( p_aout->output.p_sys->h_waveout );
 
     p_aout->output.output.i_format = AOUT_FMT_S16_NE;
     p_aout->output.i_nb_samples = FRAME_SIZE;
-
-    /* Check if the format has changed */
-    if( (p_aout->output.p_sys->waveformat.nChannels !=
-             p_aout->output.output.i_channels) ||
-        (p_aout->output.p_sys->waveformat.nSamplesPerSec !=
-             p_aout->output.output.i_rate) )
-    {
-        if( waveOutClose( p_aout->output.p_sys->h_waveout ) !=
-                MMSYSERR_NOERROR )
-        {
-            msg_Err( p_aout, "waveOutClose failed" );
-        }
-
-        /* calculate the frame size in bytes */
-        p_aout->output.p_sys->i_buffer_size = FRAME_SIZE * sizeof(s16)
-                                            * p_aout->output.output.i_channels;
-
-        /* take care of silence buffer */
-        free( p_aout->output.p_sys->p_silence_buffer );
-        p_aout->output.p_sys->p_silence_buffer =
-            calloc( p_aout->output.p_sys->i_buffer_size, 1 );
-        if( p_aout->output.p_sys->p_silence_buffer == NULL )
-        {
-            msg_Err( p_aout, "out of memory" );
-            return 1;
-        }
-
-        if( OpenWaveOut( p_aout, WAVE_FORMAT_PCM,
-                         p_aout->output.output.i_channels,
-                         p_aout->output.output.i_rate ) )
-            return 1;
-    }
 
     /* We need to kick off the playback in order to have the callback properly
      * working */

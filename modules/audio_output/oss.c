@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.20 2002/08/29 23:53:22 massiot Exp $
+ * $Id: oss.c,v 1.21 2002/08/30 23:27:06 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -62,7 +62,6 @@
 struct aout_sys_t
 {
     int                   i_fd;
-    volatile vlc_bool_t   b_initialized;
 };
 
 #define FRAME_SIZE 1024
@@ -75,7 +74,6 @@ struct aout_sys_t
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
-static int  SetFormat    ( aout_instance_t * );
 static void Play         ( aout_instance_t * );
 static int  OSSThread    ( aout_instance_t * );
 
@@ -102,6 +100,10 @@ static int Open( vlc_object_t *p_this )
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
     char * psz_device;
+    int i_format;
+    int i_rate;
+    int i_fragments;
+    vlc_bool_t b_stereo;
 
     /* Allocate structure */
     p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
@@ -129,41 +131,7 @@ static int Open( vlc_object_t *p_this )
     }
     free( psz_device );
 
-    /* Create OSS thread and wait for its readiness. */
-    p_sys->b_initialized = VLC_FALSE;
-    if( vlc_thread_create( p_aout, "aout", OSSThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
-    {
-        msg_Err( p_aout, "cannot create OSS thread (%s)", strerror(errno) );
-        close( p_sys->i_fd );
-        free( psz_device );
-        free( p_sys );
-        return VLC_ETHREAD;
-    }
-
-    p_aout->output.pf_setformat = SetFormat;
     p_aout->output.pf_play = Play;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * SetFormat: reset the dsp and set its format
- *****************************************************************************
- * This functions resets the DSP device, tries to initialize the output
- * format with the value contained in the dsp structure, and if this value
- * could not be set, the default value returned by ioctl is set. It then
- * does the same for the stereo mode, and for the output rate.
- *****************************************************************************/
-static int SetFormat( aout_instance_t *p_aout )
-{
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
-    int i_format;
-    int i_rate;
-    int i_fragments;
-    vlc_bool_t b_stereo;
-
-    p_sys->b_initialized = VLC_FALSE;
 
     /* Reset the DSP device */
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
@@ -246,13 +214,22 @@ static int SetFormat( aout_instance_t *p_aout )
         }
     }
 
-    p_sys->b_initialized = VLC_TRUE;
+    /* Create OSS thread and wait for its readiness. */
+    if( vlc_thread_create( p_aout, "aout", OSSThread,
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
+    {
+        msg_Err( p_aout, "cannot create OSS thread (%s)", strerror(errno) );
+        close( p_sys->i_fd );
+        free( psz_device );
+        free( p_sys );
+        return VLC_ETHREAD;
+    }
 
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * Play: queue a buffer for playing by OSSThread
+ * Play: nothing to do
  *****************************************************************************/
 static void Play( aout_instance_t *p_aout )
 {
@@ -318,12 +295,6 @@ static int OSSThread( aout_instance_t * p_aout )
         aout_buffer_t * p_buffer;
         int i_tmp, i_size;
         byte_t * p_bytes;
-
-        if( !p_sys->b_initialized )
-        {
-            msleep( THREAD_SLEEP );
-            continue;
-        }
 
         if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )
         {

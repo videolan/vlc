@@ -2,7 +2,7 @@
  * aout.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.6 2002/08/29 23:53:22 massiot Exp $
+ * $Id: AudioOutput.cpp,v 1.7 2002/08/30 23:27:06 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -54,9 +54,7 @@ struct aout_sys_t
     void             * p_buffer;
     int 	         i_buffer_size;
     uint             i_buffer_pos;
-    volatile vlc_bool_t   b_initialized;
     mtime_t          clock_diff;
-
 };
 
 #define FRAME_SIZE 2048
@@ -64,19 +62,15 @@ struct aout_sys_t
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-int  Open         ( vlc_object_t * );
-void Close        ( vlc_object_t * );
-
 static int  SetFormat    ( aout_instance_t * );
 static void Play         ( aout_instance_t * );
-static int  BeOSThread    ( aout_instance_t * );
+static int  BeOSThread   ( aout_instance_t * );
 
 /*****************************************************************************
  * OpenAudio: opens a BPushGameSound
  *****************************************************************************/
 int E_(OpenAudio) ( vlc_object_t * p_this )
 {       
-
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
 
@@ -113,10 +107,8 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
         free( p_sys->p_format );
         free( p_sys );
         return -1;
-
     }
     
-    p_aout->output.pf_setformat = SetFormat;
     p_aout->output.pf_play = Play;
 
     return 0;
@@ -157,15 +149,11 @@ static int SetFormat( aout_instance_t *p_aout )
 
     p_aout->output.p_sys->p_format->buffer_size = 4*8192;
 
-    p_aout->output.p_sys->b_initialized = VLC_TRUE;
-
     return( 0 );
 }
 
 /*****************************************************************************
- * Play: plays a sound samples buffer
- *****************************************************************************
- * This function writes a buffer of i_length bytes in the dsp
+ * Play: nothing to do
  *****************************************************************************/
 static void Play( aout_instance_t *p_aout )
 {
@@ -222,11 +210,6 @@ static int BeOSThread( aout_instance_t * p_aout )
         int i_tmp, i_size;
         byte_t * p_bytes;
 
-        if( !p_sys->b_initialized )
-        {
-            msleep( THREAD_SLEEP );
-            continue;
-        }
         mtime_t next_date = 0;
         /* Get the presentation date of the next write() operation. It
          * is equal to the current date + duration of buffered samples.

@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.9 2002/08/29 23:53:22 massiot Exp $
+ * $Id: alsa.c,v 1.10 2002/08/30 23:27:06 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -52,8 +52,6 @@ struct aout_sys_t
     snd_pcm_sframes_t   i_buffer_size;
     int                 i_period_time;
 
-    volatile vlc_bool_t b_initialized;
-
     volatile vlc_bool_t b_can_sleek;
 
 #ifdef DEBUG
@@ -77,10 +75,7 @@ struct aout_sys_t
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
-
-static int  SetFormat    ( aout_instance_t * );
 static void Play         ( aout_instance_t * );
-
 static int  ALSAThread   ( aout_instance_t * );
 static void ALSAFill     ( aout_instance_t * );
 
@@ -105,44 +100,6 @@ static int Open( vlc_object_t *p_this )
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
 
-    /* Allocate structures */
-    p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
-    if( p_sys == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
-        return -1;
-    }
-
-    /* Create ALSA thread and wait for its readiness. */
-    p_sys->b_initialized = VLC_FALSE;
-    if( vlc_thread_create( p_aout, "aout", ALSAThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
-    {
-        msg_Err( p_aout, "cannot create ALSA thread (%s)", strerror(errno) );
-        free( p_sys );
-        return -1;
-    }
-
-    p_aout->output.pf_setformat = SetFormat;
-    p_aout->output.pf_play = Play;
-
-#ifdef DEBUG
-    snd_output_stdio_attach( &p_sys->p_snd_stderr, stderr, 0 );
-#endif
-
-    return 0;
-}
-
-/*****************************************************************************
- * SetFormat : sets the alsa output format
- *****************************************************************************
- * This function prepares the device, sets the rate, format, the mode
- * ( "play as soon as you have data" ), and buffer information.
- *****************************************************************************/
-static int SetFormat( aout_instance_t * p_aout )
-{
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
-
     int i_snd_rc;
 
     char * psz_device;
@@ -154,6 +111,20 @@ static int SetFormat( aout_instance_t * p_aout )
 
     snd_pcm_hw_params_t *p_hw;
     snd_pcm_sw_params_t *p_sw;
+
+    /* Allocate structures */
+    p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
+    if( p_sys == NULL )
+    {
+        msg_Err( p_aout, "out of memory" );
+        return -1;
+    }
+
+    p_aout->output.pf_play = Play;
+
+#ifdef DEBUG
+    snd_output_stdio_attach( &p_sys->p_snd_stderr, stderr, 0 );
+#endif
 
     /* Read in ALSA device preferences from configuration */
     psz_userdev = config_GetPsz( p_aout, "alsa-device" );
@@ -334,13 +305,20 @@ static int SetFormat( aout_instance_t * p_aout )
     snd_output_printf( p_sys->p_snd_stderr, "\n" );
 #endif
 
-    p_sys->b_initialized = VLC_TRUE;
+    /* Create ALSA thread and wait for its readiness. */
+    if( vlc_thread_create( p_aout, "aout", ALSAThread,
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
+    {
+        msg_Err( p_aout, "cannot create ALSA thread (%s)", strerror(errno) );
+        free( p_sys );
+        return -1;
+    }
 
     return 0;
 }
 
 /*****************************************************************************
- * Play: queue a buffer for playing by ALSAThread
+ * Play: nothing to do
  *****************************************************************************/
 static void Play( aout_instance_t *p_aout )
 {
@@ -382,9 +360,6 @@ static void Close( vlc_object_t *p_this )
 static int ALSAThread( aout_instance_t * p_aout )
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
-
-    while ( !p_aout->b_die && !p_sys->b_initialized )
-        msleep( THREAD_SLEEP );
 
     while ( !p_aout->b_die )
     {

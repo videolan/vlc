@@ -2,7 +2,7 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.8 2002/08/30 22:22:24 massiot Exp $
+ * $Id: sdl.c,v 1.9 2002/08/30 23:27:06 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -57,10 +57,7 @@ struct aout_sys_t
  *****************************************************************************/
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
-
-static int  SetFormat   ( aout_instance_t * );
 static void Play        ( aout_instance_t * );
-
 static void SDLCallback ( void *, Uint8 *, int );
 
 /*****************************************************************************
@@ -78,6 +75,7 @@ vlc_module_end();
 static int Open ( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    SDL_AudioSpec desired;
 
     Uint32 i_flags = SDL_INIT_AUDIO;
 
@@ -106,16 +104,7 @@ static int Open ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * SetFormat: reset the audio device and sets its format
- *****************************************************************************/
-static int SetFormat( aout_instance_t *p_aout )
-{
     /* TODO: finish and clean this */
-    SDL_AudioSpec desired;
 
     desired.freq       = p_aout->output.output.i_rate;
     desired.format     = AUDIO_S16SYS;

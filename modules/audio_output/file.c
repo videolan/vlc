@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.9 2002/08/30 22:22:24 massiot Exp $
+ * $Id: file.c,v 1.10 2002/08/30 23:27:06 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -41,7 +41,6 @@
  *****************************************************************************/
 static int     Open        ( vlc_object_t * );
 static void    Close       ( vlc_object_t * );
-static int     SetFormat   ( aout_instance_t * );
 static void    Play        ( aout_instance_t * );
 
 /*****************************************************************************
@@ -82,36 +81,17 @@ static int Open( vlc_object_t * p_this )
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     FILE * p_file;
     char * psz_name = config_GetPsz( p_this, "path" );
+    char * psz_format = config_GetPsz( p_aout, "format" );
+    char ** ppsz_compare = format_list;
+    int i = 0;
+
 
     p_file = fopen( psz_name, "wb" );
     p_aout->output.p_sys = (void *)p_file;
     free( psz_name );
     if ( p_file == NULL ) return -1;
 
-    p_aout->output.pf_setformat = SetFormat;
     p_aout->output.pf_play = Play;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Close: close our file
- *****************************************************************************/
-static void Close( vlc_object_t * p_this )
-{
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
-
-    fclose( (FILE *)p_aout->output.p_sys );
-}
-
-/*****************************************************************************
- * SetFormat: pretend to set the dsp output format
- *****************************************************************************/
-static int SetFormat( aout_instance_t * p_aout )
-{
-    char * psz_format = config_GetPsz( p_aout, "format" );
-    char ** ppsz_compare = format_list;
-    int i = 0;
 
     while ( *ppsz_compare != NULL )
     {
@@ -141,6 +121,16 @@ static int SetFormat( aout_instance_t * p_aout )
         p_aout->output.i_nb_samples = FRAME_SIZE;
     }
     return 0;
+}
+
+/*****************************************************************************
+ * Close: close our file
+ *****************************************************************************/
+static void Close( vlc_object_t * p_this )
+{
+    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+
+    fclose( (FILE *)p_aout->output.p_sys );
 }
 
 /*****************************************************************************

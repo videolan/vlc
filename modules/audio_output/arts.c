@@ -2,6 +2,7 @@
  * arts.c : aRts module
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
+ * $Id: arts.c,v 1.10 2002/08/30 23:27:06 massiot Exp $
  *
  * Authors: Emmanuel Blindauer <manu@agat.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -46,7 +47,6 @@
 struct aout_sys_t
 {
     arts_stream_t stream;
-    vlc_bool_t    b_initialized;
 
     mtime_t       latency;
     int           i_size;
@@ -57,8 +57,6 @@ struct aout_sys_t
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
-
-static int  SetFormat    ( aout_instance_t * );
 static void Play         ( aout_instance_t * );
 static int  aRtsThread   ( aout_instance_t * );
 
@@ -87,6 +85,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_aout, "out of memory" );
         return -1;
     }
+    p_aout->output.p_sys = p_sys;
 
     i_err = arts_init();
     
@@ -97,34 +96,9 @@ static int Open( vlc_object_t *p_this )
         return -1;
     }
 
-    p_aout->output.p_sys = p_sys;
-
-    /* Create aRts thread and wait for its readiness. */
-    p_sys->b_initialized = VLC_FALSE;
-    if( vlc_thread_create( p_aout, "aout", aRtsThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
-    {
-        msg_Err( p_aout, "cannot create aRts thread (%s)", strerror(errno) );
-        free( p_sys );
-        return -1;
-    }
-
-    p_aout->output.pf_setformat = SetFormat;
     p_aout->output.pf_play = Play;
 
     p_sys->stream = NULL;
-
-    return 0;
-}
-
-/*****************************************************************************
- * SetFormat: set the output format
- *****************************************************************************/
-static int SetFormat( aout_instance_t *p_aout )
-{
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
-
-    p_sys->b_initialized = VLC_FALSE;
 
     if( p_sys->stream )
     {
@@ -152,13 +126,20 @@ static int SetFormat( aout_instance_t *p_aout )
     p_aout->output.output.i_format = AOUT_FMT_S16_NE;
     p_aout->output.i_nb_samples = p_sys->i_size;
 
-    p_sys->b_initialized = VLC_TRUE;
+    /* Create aRts thread and wait for its readiness. */
+    if( vlc_thread_create( p_aout, "aout", aRtsThread,
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
+    {
+        msg_Err( p_aout, "cannot create aRts thread (%s)", strerror(errno) );
+        free( p_sys );
+        return -1;
+    }
 
     return 0;
 }
 
 /*****************************************************************************
- * Play: queue a buffer for playing by aRtsThread
+ * Play: nothing to do
  *****************************************************************************/
 static void Play( aout_instance_t *p_aout )
 {
@@ -197,12 +178,6 @@ static int aRtsThread( aout_instance_t * p_aout )
         aout_buffer_t * p_buffer;
         int i_tmp, i_size;
         byte_t * p_bytes;
-
-        if( !p_sys->b_initialized )
-        {
-            msleep( THREAD_SLEEP );
-            continue;
-        }
 
         /* Get the presentation date of the next write() operation. It
          * is equal to the current date + latency */

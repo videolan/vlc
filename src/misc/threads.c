@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.14 2002/08/30 12:23:23 sam Exp $
+ * $Id: threads.c,v 1.15 2002/08/30 23:27:06 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -320,7 +320,7 @@ int __vlc_mutex_destroy( char * psz_file, int i_line, vlc_mutex_t *p_mutex )
     i_result = pthread_mutex_destroy( &p_mutex->mutex );
     if ( i_result )
     {
-        i_thread = pthread_self();
+        i_thread = (int)pthread_self();
         psz_error = strerror(i_result);
     }
 
@@ -454,7 +454,7 @@ int __vlc_cond_destroy( char * psz_file, int i_line, vlc_cond_t *p_condvar )
     i_result = pthread_cond_destroy( &p_condvar->cond );
     if ( i_result )
     {
-        i_thread = pthread_self();
+        i_thread = (int)pthread_self();
         psz_error = strerror(i_result);
     }
 

@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.11 2002/08/29 23:53:22 massiot Exp $
+ * $Id: esd.c,v 1.12 2002/08/30 23:27:06 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,7 +46,6 @@ struct aout_sys_t
 {
     esd_format_t esd_format;
     int          i_fd;
-    vlc_bool_t   b_initialized;
 
     mtime_t      latency;
 };
@@ -56,8 +55,6 @@ struct aout_sys_t
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
-
-static int  SetFormat    ( aout_instance_t * );
 static void Play         ( aout_instance_t * );
 static int  ESDThread    ( aout_instance_t * );
 
@@ -89,30 +86,7 @@ static int Open( vlc_object_t *p_this )
 
     p_aout->output.p_sys = p_sys;
 
-    /* Create ESD thread and wait for its readiness. */
-    p_sys->b_initialized = VLC_FALSE;
-    if( vlc_thread_create( p_aout, "aout", ESDThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
-    {
-        msg_Err( p_aout, "cannot create ESD thread (%s)", strerror(errno) );
-        free( p_sys );
-        return -1;
-    }
-
-    p_aout->output.pf_setformat = SetFormat;
     p_aout->output.pf_play = Play;
-
-    return( 0 );
-}
-
-/*****************************************************************************
- * SetFormat: set the output format
- *****************************************************************************/
-static int SetFormat( aout_instance_t *p_aout )
-{
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
-
-    p_sys->b_initialized = VLC_FALSE;
 
     /* Initialize some variables */
     p_sys->esd_format = ESD_BITS16 | ESD_STREAM | ESD_PLAY;
@@ -155,13 +129,20 @@ static int SetFormat( aout_instance_t *p_aout )
       / p_aout->output.output.i_bytes_per_frame
       / p_aout->output.output.i_rate;
 
-    p_sys->b_initialized = VLC_TRUE;
+    /* Create ESD thread and wait for its readiness. */
+    if( vlc_thread_create( p_aout, "aout", ESDThread,
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
+    {
+        msg_Err( p_aout, "cannot create ESD thread (%s)", strerror(errno) );
+        free( p_sys );
+        return -1;
+    }
 
     return 0;
 }
 
 /*****************************************************************************
- * Play: queue a buffer for playing by ESDThread
+ * Play: nothing to do
  *****************************************************************************/
 static void Play( aout_instance_t *p_aout )
 {
@@ -194,12 +175,6 @@ static int ESDThread( aout_instance_t * p_aout )
         aout_buffer_t * p_buffer;
         int i_tmp, i_size;
         byte_t * p_bytes;
-
-        if( !p_sys->b_initialized )
-        {
-            msleep( THREAD_SLEEP );
-            continue;
-        }
 
         /* Get the presentation date of the next write() operation. It
          * is equal to the current date + buffered samples + esd latency */

@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.m,v 1.7 2002/08/25 09:40:00 sam Exp $
+ * $Id: aout.m,v 1.8 2002/08/30 23:27:06 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -57,7 +57,6 @@ struct aout_sys_t
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int      SetFormat       ( aout_instance_t *p_aout );
 static void     Play            ( aout_instance_t *p_aout );
 
 static OSStatus IOCallback      ( AudioDeviceID inDevice,
@@ -99,22 +98,10 @@ int E_(OpenAudio)( vlc_object_t * p_this )
         return( -1 );
     }
 
-    p_aout->output.pf_setformat = SetFormat;
     p_aout->output.pf_play = Play;
 
-    return 0;
-}
-
-/*****************************************************************************
- * SetFormat: find the closest available format from p_format
- *****************************************************************************/
-static int SetFormat( aout_instance_t * p_aout )
-{
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
-    OSErr err;
-
     /* Get a description of the data format used by the device */
-    UInt32 i_param_size = sizeof( p_sys->stream_format ); 
+    i_param_size = sizeof( p_sys->stream_format ); 
     err = AudioDeviceGetProperty( p_sys->device, 0, false, 
                                   kAudioDevicePropertyStreamFormat, 
                                   &i_param_size,
@@ -208,7 +195,7 @@ void E_(CloseAudio)( aout_instance_t * p_aout )
 }
 
 /*****************************************************************************
- * Play: queue a buffer for playing by IOCallback
+ * Play: nothing to do
  *****************************************************************************/
 static void Play( aout_instance_t * p_aout )
 {

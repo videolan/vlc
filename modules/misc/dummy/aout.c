@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.c,v 1.7 2002/08/30 22:22:24 massiot Exp $
+ * $Id: aout.c,v 1.8 2002/08/30 23:27:06 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -38,7 +38,6 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int     SetFormat   ( aout_instance_t * );
 static void    Play        ( aout_instance_t * );
 
 /*****************************************************************************
@@ -48,17 +47,8 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
 
-    p_aout->output.pf_setformat = SetFormat;
     p_aout->output.pf_play = Play;
 
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * SetFormat: pretend to set the dsp output format
- *****************************************************************************/
-static int SetFormat( aout_instance_t * p_aout )
-{
     if ( p_aout->output.output.i_format == AOUT_FMT_SPDIF )
     {
         p_aout->output.i_nb_samples = A52_FRAME_NB;

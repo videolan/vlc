@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.13 2002/08/30 22:22:24 massiot Exp $
+ * $Id: output.c,v 1.14 2002/08/30 23:27:06 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -40,20 +40,11 @@
 int aout_OutputNew( aout_instance_t * p_aout,
                     audio_sample_format_t * p_format )
 {
+    /* Retrieve user defaults. */
     char * psz_name = config_GetPsz( p_aout, "aout" );
     int i_rate = config_GetInt( p_aout, "aout-rate" );
     int i_channels = config_GetInt( p_aout, "aout-channels" );
 
-    p_aout->output.p_module = module_Need( p_aout, "audio output",
-                                           psz_name );
-    if ( psz_name != NULL ) free( psz_name );
-    if ( p_aout->output.p_module == NULL )
-    {
-        msg_Err( p_aout, "no suitable aout module" );
-        return -1;
-    }
-
-    /* Retrieve user defaults. */
     memcpy( &p_aout->output.output, p_format, sizeof(audio_sample_format_t) );
     if ( i_rate != -1 ) p_aout->output.output.i_rate = i_rate;
     if ( i_channels != -1 ) p_aout->output.output.i_channels = i_channels;
@@ -68,14 +59,17 @@ int aout_OutputNew( aout_instance_t * p_aout,
                      = (p_aout->p_vlc->i_cpu & CPU_CAPABILITY_FPU) ?
                         AOUT_FMT_FLOAT32 : AOUT_FMT_FIXED32;
     }
+    aout_FormatPrepare( &p_aout->output.output );
 
     vlc_mutex_lock( &p_aout->output_fifo_lock );
 
-    /* Find the best output format. */
-    if ( p_aout->output.pf_setformat( p_aout ) != 0 )
+    /* Find the best output plug-in. */
+    p_aout->output.p_module = module_Need( p_aout, "audio output",
+                                           psz_name );
+    if ( psz_name != NULL ) free( psz_name );
+    if ( p_aout->output.p_module == NULL )
     {
-        msg_Err( p_aout, "couldn't set an output format" );
-        module_Unneed( p_aout, p_aout->output.p_module );
+        msg_Err( p_aout, "no suitable aout module" );
         vlc_mutex_unlock( &p_aout->output_fifo_lock );
         return -1;
     }

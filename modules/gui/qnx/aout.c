@@ -47,7 +47,6 @@ struct aout_sys_t
     int          i_device;
 
     byte_t *     p_silent_buffer;
-    vlc_bool_t   b_initialized;
 };
 
 #define DEFAULT_FRAME_SIZE 2048
@@ -58,7 +57,6 @@ struct aout_sys_t
 int            E_(OpenAudio)    ( vlc_object_t *p_this );
 void           E_(CloseAudio)   ( vlc_object_t *p_this );
 static int     GetBufInfo       ( aout_instance_t * );
-static int     SetFormat        ( aout_instance_t * );
 static void    Play             ( aout_instance_t * );
 static int     QNXaoutThread    ( aout_instance_t * );
 
@@ -71,6 +69,10 @@ int E_(OpenAudio)( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     int i_ret;
+    int i_bytes_per_sample;
+    snd_pcm_channel_info_t pi;
+    snd_pcm_channel_params_t pp;
+    aout_instance_t *p_aout = (aout_instance_t *)p_this;
 
     /* allocate structure */
     p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
@@ -102,40 +104,8 @@ int E_(OpenAudio)( vlc_object_t *p_this )
         return -1;
     }
 
-    /* Create audio thread and wait for its readiness. */
-    p_aout->output.p_sys->b_initialized = VLC_FALSE;
-    if( vlc_thread_create( p_aout, "aout", QNXaoutThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
-    {
-        msg_Err( p_aout, "cannot create QNX audio thread (%s)", strerror(errno) );
-        E_(CloseAudio)( p_this );
-        free( p_aout->output.p_sys );
-        return -1;
-    }
-
     p_aout->output.p_sys->p_silent_buffer = malloc( DEFAULT_FRAME_SIZE * 4 );
-
-    p_aout->output.pf_setformat = SetFormat;
     p_aout->output.pf_play = Play;
-
-    return( 0 );
-}
-
-/*****************************************************************************
- * SetFormat : set the audio output format
- *****************************************************************************
- * This function prepares the device, sets the rate, format, the mode
- * ("play as soon as you have data"), and buffer information.
- *****************************************************************************/
-static int SetFormat( aout_instance_t *p_this )
-{
-    int i_ret;
-    int i_bytes_per_sample;
-    snd_pcm_channel_info_t pi;
-    snd_pcm_channel_params_t pp;
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
-
-    p_aout->output.p_sys->b_initialized = VLC_FALSE;
 
     memset( &pi, 0, sizeof(pi) );
     memset( &pp, 0, sizeof(pp) );
@@ -198,7 +168,15 @@ static int SetFormat( aout_instance_t *p_this )
         return -1;
     }
 
-    p_aout->output.p_sys->b_initialized = VLC_TRUE;
+    /* Create audio thread and wait for its readiness. */
+    if( vlc_thread_create( p_aout, "aout", QNXaoutThread,
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
+    {
+        msg_Err( p_aout, "cannot create QNX audio thread (%s)", strerror(errno) );
+        E_(CloseAudio)( p_this );
+        free( p_aout->output.p_sys );
+        return -1;
+    }
 
     return( 0 );
 }
@@ -286,12 +264,6 @@ static int QNXaoutThread( aout_instance_t * p_aout )
         aout_buffer_t * p_buffer;
         int i_tmp, i_size;
         byte_t * p_bytes;
-
-        if( !p_sys->b_initialized )
-        {
-            msleep( THREAD_SLEEP );
-            continue;
-        }
 
         if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )
         {

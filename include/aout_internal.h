@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.13 2002/08/30 22:22:24 massiot Exp $
+ * $Id: aout_internal.h,v 1.14 2002/08/30 23:27:05 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -158,7 +158,6 @@ typedef struct aout_output_t
 
     struct module_t *       p_module;
     struct aout_sys_t *     p_sys;
-    int                  (* pf_setformat)( aout_instance_t * );
     void                 (* pf_play)( aout_instance_t * );
     int                     i_nb_samples;
 } aout_output_t;

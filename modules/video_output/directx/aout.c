@@ -2,7 +2,7 @@
  * aout.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout.c,v 1.8 2002/08/29 23:53:22 massiot Exp $
+ * $Id: aout.c,v 1.9 2002/08/30 23:27:06 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -89,14 +89,8 @@ struct aout_sys_t
 };
 
 /*****************************************************************************
- * Prototypes.
- *****************************************************************************/
-void E_(CloseAudio) ( vlc_object_t *p_this );
-
-/*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  SetFormat ( aout_instance_t * );
 static void Play      ( aout_instance_t * );
 
 /* local functions */
@@ -134,7 +128,6 @@ int E_(OpenAudio) ( vlc_object_t *p_this )
     p_aout->output.p_sys->p_notif = NULL;
     vlc_mutex_init( p_aout, &p_aout->output.p_sys->buffer_lock );
 
-    p_aout->output.pf_setformat = SetFormat;
     p_aout->output.pf_play = Play;
 
     /* Initialise DirectSound */
@@ -159,7 +152,6 @@ int E_(OpenAudio) ( vlc_object_t *p_this )
         goto error;
     }
 
-
     /* Now we need to setup DirectSound play notification */
     p_aout->output.p_sys->p_notif =
         vlc_object_create( p_aout, sizeof(notification_thread_t) );
@@ -171,37 +163,6 @@ int E_(OpenAudio) ( vlc_object_t *p_this )
     p_aout->output.p_sys->p_notif->p_events[1].hEventNotify =
         CreateEvent( NULL, FALSE, FALSE, NULL );
 
-    /* then launch the notification thread */
-    msg_Dbg( p_aout, "creating DirectSoundThread" );
-    if( vlc_thread_create( p_aout->output.p_sys->p_notif,
-                           "DirectSound Notification Thread",
-                           DirectSoundThread, VLC_THREAD_PRIORITY_OUTPUT, 1 ) )
-    {
-        msg_Err( p_aout, "cannot create DirectSoundThread" );
-        goto error;
-    }
-
-    vlc_object_attach( p_aout->output.p_sys->p_notif, p_aout );
-
-    return 0;
-
- error:
-    E_(CloseAudio)( VLC_OBJECT(p_aout) );
-    return 1;
-}
-
-/*****************************************************************************
- * SetFormat: reset the audio device and sets its format
- *****************************************************************************
- * This functions set a new audio format.
- * For this we need to close the current secondary buffer and create another
- * one with the desired format.
- *****************************************************************************/
-static int SetFormat( aout_instance_t *p_aout )
-{
-    HRESULT dsresult;
-
-    msg_Dbg( p_aout, "SetFormat" );
     vlc_mutex_lock( &p_aout->output.p_sys->buffer_lock );
 
     /* first release the current secondary buffer */
@@ -239,14 +200,27 @@ static int SetFormat( aout_instance_t *p_aout )
         msg_Warn( p_aout, "cannot play buffer" );
     }
 
+    /* then launch the notification thread */
+    msg_Dbg( p_aout, "creating DirectSoundThread" );
+    if( vlc_thread_create( p_aout->output.p_sys->p_notif,
+                           "DirectSound Notification Thread",
+                           DirectSoundThread, VLC_THREAD_PRIORITY_OUTPUT, 1 ) )
+    {
+        msg_Err( p_aout, "cannot create DirectSoundThread" );
+        goto error;
+    }
+
+    vlc_object_attach( p_aout->output.p_sys->p_notif, p_aout );
+
     return 0;
+
+ error:
+    E_(CloseAudio)( VLC_OBJECT(p_aout) );
+    return 1;
 }
 
 /*****************************************************************************
- * Play: play a sound buffer
- *****************************************************************************
- * This doesn't actually play the buffer. This just stores the buffer so it
- * can be played by the callback thread.
+ * Play: nothing to do
  *****************************************************************************/
 static void Play( aout_instance_t *p_aout )
 {
