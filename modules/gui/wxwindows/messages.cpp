@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: messages.cpp,v 1.2 2003/04/01 16:11:43 gbazin Exp $
+ * $Id: messages.cpp,v 1.3 2003/04/06 16:30:43 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -54,12 +54,14 @@
 /* IDs for the controls and the menu commands */
 enum
 {
-    Close_Event
+    Close_Event,
+    Verbose_Event
 };
 
 BEGIN_EVENT_TABLE(Messages, wxFrame)
     /* Button events */
     EVT_BUTTON(wxID_OK, Messages::OnClose)
+    EVT_CHECKBOX(Verbose_Event, Messages::OnVerbose)
 
     /* Special events : we don't want to destroy the window when the user
      * clicks on (X) */
@@ -76,6 +78,7 @@ Messages::Messages( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     /* Initializations */
     p_intf = _p_intf;
     p_main_interface = _p_main_interface;
+    b_verbose = VLC_FALSE;
     SetIcon( *p_intf->p_sys->p_icon );
 
     /* Create a panel to put everything in */
@@ -92,17 +95,23 @@ Messages::Messages( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     dbg_attr = new wxTextAttr( *wxBLACK );
 
     /* Create the OK button */
-    ok_button = new wxButton( messages_panel, wxID_OK, _("OK") );
+    wxButton *ok_button = new wxButton( messages_panel, wxID_OK, _("OK") );
     ok_button->SetDefault();
 
+    /* Create the Verbose checkbox */
+    wxCheckBox *verbose_checkbox =
+        new wxCheckBox( messages_panel, Verbose_Event, _("Verbose") );
+
     /* Place everything in sizers */
-    wxBoxSizer *ok_button_sizer = new wxBoxSizer( wxHORIZONTAL );
-    ok_button_sizer->Add( ok_button, 0, wxALL, 5 );
-    ok_button_sizer->Layout();
+    wxBoxSizer *buttons_sizer = new wxBoxSizer( wxHORIZONTAL );
+    buttons_sizer->Add( ok_button, 0, wxEXPAND |wxALIGN_LEFT| wxALL, 5 );
+    buttons_sizer->Add( new wxPanel( this, -1 ), 1, wxALL, 5 );
+    buttons_sizer->Add( verbose_checkbox, 0, wxEXPAND |wxALIGN_RIGHT | wxALL, 5 );
+    buttons_sizer->Layout();
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     panel_sizer->Add( textctrl, 1, wxEXPAND | wxALL, 5 );
-    panel_sizer->Add( ok_button_sizer, 0, wxALIGN_CENTRE );
+    panel_sizer->Add( buttons_sizer, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Layout();
     messages_panel->SetSizerAndFit( panel_sizer );
     main_sizer->Add( messages_panel, 1, wxGROW, 0 );
@@ -129,6 +138,12 @@ void Messages::UpdateLog()
              i_start != i_stop;
              i_start = (i_start+1) % VLC_MSG_QSIZE )
         {
+
+            if( !b_verbose &&
+                VLC_MSG_ERR != p_sub->p_msg[i_start].i_type &&
+                VLC_MSG_INFO != p_sub->p_msg[i_start].i_type )
+                continue;
+
             /* Append all messages to log window */
             textctrl->SetDefaultStyle( *dbg_attr );
             (*textctrl) << p_sub->p_msg[i_start].psz_module;
@@ -171,3 +186,7 @@ void Messages::OnClose( wxCommandEvent& WXUNUSED(event) )
     Hide();
 }
 
+void Messages::OnVerbose( wxCommandEvent& event )
+{
+    b_verbose = event.IsChecked();
+}

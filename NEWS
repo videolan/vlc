@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.34 2003/04/06 15:43:02 massiot Exp $
+$Id: NEWS,v 1.35 2003/04/06 16:30:43 gbazin Exp $
 
 Changes between 0.5.2 and 0.5.3:
 ---------------------------------
@@ -7,6 +7,9 @@ Core Support:
  * fixed DTS S/PDIF output on little-endian machines
  * support for skins at the interface level
  * new OSD module using Freetype2
+ * video outputs are now destroyed when the associated input ends
+ * the video output takes into account the caching delay introduced at the
+   input level before dropping out of date frames.
 
 Input access:
  * fixed HTTP redirects
@@ -26,6 +29,12 @@ Codecs:
  * support for SAMI subtitles (untested and incomplete)
  * better SSA4 subtitles recognition
  * new codec for raw I420 video
+ * improvements to the libmpeg2 based MPEG video decoder
+
+Interfaces:
+ * improvements to wxWindows based interface
+   (although it still misses some important features)
+ * skeleton for a Gnome2/GTK2 plug-in
 
 Stream output:
  * new HTTP output support
@@ -37,7 +46,6 @@ Miscellaneous:
 
 UNIX ports:
  * the SDL vout plug-in will now work on big-endian machines
- * skeleton for a GTK2 plug-in
 
 Mac OS X port:
  * reorderable playlist
@@ -53,6 +61,7 @@ Mac OS X port:
 
 Win32 port:
  * new skinnable interface
+ * the directx video output doesn't crash anymore on ctrl+alt+del events.
 
 iPAQ familiar Linux port:
  * support for FLAC audio format
