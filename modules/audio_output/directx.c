@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.26 2004/01/25 17:58:29 murray Exp $
+ * $Id: directx.c,v 1.27 2004/02/26 17:02:17 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -721,6 +721,13 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
     waveformat.Format.nAvgBytesPerSec =
         waveformat.Format.nSamplesPerSec * waveformat.Format.nBlockAlign;
 
+    /* Then fill in the direct sound descriptor */
+    memset(&dsbdesc, 0, sizeof(DSBUFFERDESC));
+    dsbdesc.dwSize = sizeof(DSBUFFERDESC);
+    dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2/* Better position accuracy */
+                    | DSBCAPS_CTRLPOSITIONNOTIFY     /* We need notification */
+                    | DSBCAPS_GLOBALFOCUS;      /* Allows background playing */
+
     /* Only use the new WAVE_FORMAT_EXTENSIBLE format for multichannel audio */
     if( i_nb_channels <= 2 )
     {
@@ -731,16 +738,11 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
         waveformat.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
         waveformat.Format.cbSize =
             sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX);
+
+        /* Needed for 5.1 on emu101k */
+        dsbdesc.dwFlags |= DSBCAPS_LOCHARDWARE;
     }
 
-
-    /* Then fill in the direct sound descriptor */
-    memset(&dsbdesc, 0, sizeof(DSBUFFERDESC));
-    dsbdesc.dwSize = sizeof(DSBUFFERDESC);
-    dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2/* Better position accuracy */
-                    | DSBCAPS_CTRLPOSITIONNOTIFY     /* We need notification */
-                    | DSBCAPS_GLOBALFOCUS       /* Allows background playing */
-                    | DSBCAPS_LOCHARDWARE;      /* Needed for 5.1 on emu101k */
     dsbdesc.dwBufferBytes = FRAMES_NUM * i_bytes_per_frame;   /* buffer size */
     dsbdesc.lpwfxFormat = (WAVEFORMATEX *)&waveformat;
 
@@ -748,15 +750,23 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
                    p_aout->output.p_sys->p_dsobject, &dsbdesc,
                    &p_aout->output.p_sys->p_dsbuffer, NULL) )
     {
-        /* Try without DSBCAPS_LOCHARDWARE */
-        dsbdesc.dwFlags &= ~DSBCAPS_LOCHARDWARE;
-        if FAILED( IDirectSound_CreateSoundBuffer(
+        if( dsbdesc.dwFlags & DSBCAPS_LOCHARDWARE )
+        {
+            /* Try without DSBCAPS_LOCHARDWARE */
+            dsbdesc.dwFlags &= ~DSBCAPS_LOCHARDWARE;
+            if FAILED( IDirectSound_CreateSoundBuffer(
                    p_aout->output.p_sys->p_dsobject, &dsbdesc,
                    &p_aout->output.p_sys->p_dsbuffer, NULL) )
+            {
+                return VLC_EGENERIC;
+            }
+            if( !b_probe )
+                msg_Dbg( p_aout, "couldn't use hardware sound buffer" );
+        }
+        else
         {
             return VLC_EGENERIC;
         }
-        if( !b_probe ) msg_Dbg( p_aout, "couldn't use hardware sound buffer" );
     }
 
     /* Stop here if we were just probing */
