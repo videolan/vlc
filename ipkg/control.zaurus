@@ -1,0 +1,17 @@
+Package: zaurus-vlc
+Section: graphics
+Priority: optional
+Version: 0.5.1
+Release: test1
+Conflicts: gpe-apps, gpe-vlc, vlc, libsdl
+Architecture: arm
+Maintainer: Jean-Paul Saman <jpsaman@wxs.nl>
+Depends: libc6, opie-oipkg, opie-base, opie-multikey, opie-handwriting, opie-volumeapplet, opie-embeddedkonsole, opie-handwriting, opie-irdaapplet, opie-launcher-settings, opie-networksetup, opie-libsdl, ffmpeg
+Copyright: GPL
+Description: VideoLAN Client is a free network-aware MPEG and DVD player.
+ VideoLAN is a free MPEG1/2 software solution licensed under GPL. The original 
+ source can be found on: 
+ http://www.videolan.org/pub/videolan/vlc/
+ The VideoLAN Client allows to play MPEG1, MPEG2 Transport Streams and 
+ Program Streams, MP3, DivX and lots of other codecs  from the network or 
+ from a file, as well as direct DVD playback. 

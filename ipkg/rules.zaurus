@@ -1,0 +1,86 @@
+#!/usr/bin/make -f
+# debian/rules for the VideoLAN Client - uses debhelper.
+# based on Joey Hess's one.
+# Kludged for ipkg
+
+# export PATH="$PATH:/usr/local/arm/2.95.3/bin"
+# Compilation options
+export CC=arm-linux-gcc
+export LD=arm-linux-ld
+export AR=arm-linux-ar
+export RANLIB=arm-linux-ranlib
+export STRIP=arm-linux-strip
+export CONFIG_FLAGS="--enable-release --prefix=/usr \
+	--disable-plugins \
+	--disable-gtk \
+	--disable-gnome \
+	--disable-qt \
+	--disable-kde \
+	--enable-qte \
+	--disable-x11 \
+	--enable-fb \
+	--enable-sdl \
+	--disable-alsa \
+	--disable-xvideo \
+	--disable-dvd \
+	--disable-dvdread \
+	--disable-vcd \
+	--disable-maxosx \
+	--enable-mad \
+	--enable-ffmpeg \
+	--disable-familiar \
+	--with-tuning=strongarm1100 \
+	--with-mad-tree=/home/jpsaman/iPaq/src/mad-0.14.2b \
+	--with-sdl-config-path=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/bin \
+	--with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop \
+	--with-qte=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop \
+	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg"
+
+export VIDDIR="usr/share/vlc"
+export PIXDIR="usr/share/pixmaps"
+#export DESTDIR=/tmp/vlc
+export DESTDIR=/usr/local/arm/2.95.3/arm-linux
+export PKGDIR=/home/jpsaman/iPaq/packages/zaurus-vlc-0.5.1
+export QTDIR=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop
+
+build: build-stamp
+config:
+	./configure --mandir=$${prefix}/share/man \
+		--infodir=$${prefix}/share/info \
+		--host=arm-linux \
+		--target=arm-linux \
+		$(shell echo $(CONFIG_FLAGS))
+
+build-stamp:
+# This is ugly -- I know
+#	patch -p0 < ipkg/patch
+
+	$(MAKE)
+
+clean:
+	-$(MAKE) distclean
+
+install: build
+	rm -fr ${PKGDIR}/
+	mkdir -p ${PKGDIR}/CONTROL
+	mkdir -p $(PKGDIR)/usr/bin
+	mkdir -p ${PKGDIR}/usr/share/vlc
+	mkdir -p ${PKGDIR}/usr/lib/menu
+	mkdir -p ${PKGDIR}/usr/lib/vlc
+	mkdir -p ${PKGDIR}/opt/QtPalmtop/sharp/bin
+	mkdir -p ${PKGDIR}/opt/QtPalmtop/sharp/apps/Applications
+	$(STRIP) vlc
+	cp ipkg/control.zaurus $(PKGDIR)/CONTROL/control
+	cp ipkg/postinst.zaurus ${PKGDIR}/CONTROL/postinst
+	cp ipkg/postrm.zaurus ${PKGDIR}/CONTROL/postrm
+	cp share/vlc48x48.png  ${PKGDIR}/usr/share/vlc
+	cp vlc $(PKGDIR)/usr/bin
+	cp ipkg/vlc.zaurus ${PKGDIR}/opt/QtPalmtop/sharp/bin/opie-vlc
+	cp ipkg/vlc.desktop ${PKGDIR}/opt/QtPalmtop/sharp/apps/Applications
+
+install-plugins: install
+	find ./modules/ -name *.so -print -depth | xargs cp $1 ${PKGDIR}/usr/lib/vlc
+	$(STRIP) ${PKGDIR}/usr/lib/vlc
+
+.PHONY: build clean install install-plugins
+
