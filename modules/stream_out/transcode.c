@@ -2,7 +2,7 @@
  * transcode.c: transcoding stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: transcode.c,v 1.72 2004/01/25 14:34:25 gbazin Exp $
+ * $Id: transcode.c,v 1.73 2004/01/30 17:51:02 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -376,6 +376,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         es_format_Init( &id->f_dst, AUDIO_ES, p_sys->i_acodec );
         id->f_dst.i_id    = id->f_src.i_id;
         id->f_dst.i_group = id->f_src.i_group;
+        if( id->f_src.psz_language ) id->f_dst.psz_language = strdup( id->f_src.psz_language );
         id->f_dst.audio.i_rate = p_sys->i_sample_rate  > 0 ? p_sys->i_sample_rate : id->f_src.audio.i_rate;
         id->f_dst.audio.i_channels    = p_sys->i_channels > 0 ? p_sys->i_channels : id->f_src.audio.i_channels;
         id->f_dst.i_bitrate     = p_sys->i_abitrate > 0 ? p_sys->i_abitrate : 64000;
@@ -414,6 +415,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         es_format_Init( &id->f_dst, VIDEO_ES, p_sys->i_vcodec );
         id->f_dst.i_id    = id->f_src.i_id;
         id->f_dst.i_group = id->f_src.i_group;
+        if( id->f_src.psz_language ) id->f_dst.psz_language = strdup( id->f_src.psz_language );
         id->f_dst.video.i_width = p_sys->i_width;
         id->f_dst.video.i_height= p_sys->i_height;
         id->f_dst.i_bitrate     = p_sys->i_vbitrate > 0 ? p_sys->i_vbitrate : 800*1000;
