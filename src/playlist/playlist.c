@@ -29,9 +29,6 @@
 #include <vlc/sout.h>
 #include <vlc/input.h>
 
-#include "stream_control.h"
-#include "input_ext-intf.h"
-
 #include "vlc_playlist.h"
 
 #define PLAYLIST_FILE_HEADER_0_5  "# vlc playlist file version 0.5"
@@ -386,7 +383,7 @@ static void RunThread ( playlist_t *p_playlist )
                 }
                 continue;
             }
-            else if( p_playlist->p_input->stream.control.i_status != INIT_S )
+            else if( p_playlist->p_input->i_state != INIT_S )
             {
                 vlc_mutex_unlock( &p_playlist->object_lock );
                 i_vout_destroyed_date =

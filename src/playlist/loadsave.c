@@ -27,13 +27,11 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/sout.h>
+#include <vlc/input.h>
 
 #ifdef HAVE_ERRNO_H
 #   include <errno.h>
 #endif
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
 
 #include "vlc_playlist.h"
 
