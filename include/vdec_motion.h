@@ -32,10 +32,12 @@ void vdec_MotionField   ( struct macroblock_s* );
 void vdec_MotionFrame   ( struct macroblock_s* );
 
 /* Motion compensation for non skipped macroblocks */
-void vdec_FieldRecon    ( struct macroblock_s* );
-void vdec_16x8Recon     ( struct macroblock_s* );
-void vdec_FrameRecon    ( struct macroblock_s* );
-void vdec_DMVRecon      ( struct macroblock_s* );
+void vdec_FieldDMVRecon    ( struct macroblock_s* );
+void vdec_FieldFieldRecon    ( struct macroblock_s* );
+void vdec_Field16x8Recon     ( struct macroblock_s* );
+void vdec_FrameFrameRecon    ( struct macroblock_s* );
+void vdec_FrameFieldRecon    ( struct macroblock_s* );
+void vdec_FrameDMVRecon      ( struct macroblock_s* );
 
 /* Motion compensation functions for the 3 chroma formats */
 void vdec_Motion420();

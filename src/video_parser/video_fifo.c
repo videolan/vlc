@@ -136,6 +136,8 @@ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
     /* Unlink picture buffer */
     vlc_mutex_lock( &p_mb->p_picture->lock_deccount );
     p_mb->p_picture->i_deccount--;
+
+    /* Test if it was the last block of the picture */
     if( p_mb->p_picture->i_deccount == 0 )
     {
         /* Mark the picture to be displayed */

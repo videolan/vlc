@@ -25,6 +25,10 @@ VIDEO=FB
 ARCH=MMX
 #ARCH=PPC
 
+# Decoder choice - ?? old decoder will be removed soon
+DECODER=old
+#DECODER=new
+
 #----------------- do not change anything below this line ----------------------
 
 ################################################################################
@@ -174,6 +178,7 @@ audio_decoder_obj =		audio_decoder/audio_decoder.o \
 #??generic_decoder_obj =		generic_decoder/generic_decoder.o
 # remeber to add it to OBJ 
 
+ifeq ($(DECODER),old)
 video_decoder_obj =		video_decoder_ref/video_decoder.o \
 						video_decoder_ref/display.o \
 						video_decoder_ref/getblk.o \
@@ -184,19 +189,19 @@ video_decoder_obj =		video_decoder_ref/video_decoder.o \
 						video_decoder_ref/motion.o \
 						video_decoder_ref/mpeg2dec.o \
 						video_decoder_ref/recon.o \
-						video_decoder_ref/spatscal.o 
-#						video_decoder_ref/$(TRANSFORM).o
+						video_decoder_ref/spatscal.o
+else
+video_parser_obj = 		video_parser/video_parser.o \
+						video_parser/vpar_headers.o \
+						video_parser/vpar_blocks.o \
+						video_parser/vpar_motion.o \
+						video_parser/vpar_synchro.o \
+						video_parser/video_fifo.o
 
-#video_parser_obj = 		video_parser/video_parser.o \
-#						video_parser/vpar_headers.o \
-#						video_parser/vpar_blocks.o \
-#						video_parser/vpar_motion.o \
-#						video_parser/vpar_synchro.o \
-#						video_parser/video_fifo.o
-
-#video_decoder_obj =		video_decoder/video_decoder.o \
-#						video_decoder/vdec_idct.o \
-#						video_decoder/vdec_motion.o
+video_decoder_obj =		video_decoder/video_decoder.o \
+						video_decoder/vdec_motion.o \
+                        video_decoder/$(TRANSFORM).o
+endif
 
 misc_obj =			misc/mtime.o \
 						misc/rsc_files.o \

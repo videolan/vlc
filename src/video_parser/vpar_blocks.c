@@ -533,8 +533,6 @@ void InitDCTTables( vpar_thread_t * p_vpar )
     memcpy( p_vpar->ppl_dct_coef[8], pl_DCT_tab6, sizeof( pl_DCT_tab6 ) );
     memcpy( p_vpar->ppl_dct_coef[9], pl_DCT_tab0a, sizeof( pl_DCT_tab0a ) );
     memcpy( p_vpar->ppl_dct_coef[10], pl_DCT_tab1a, sizeof( pl_DCT_tab1a ) );
-
-
 }
 
 /*
@@ -683,8 +681,8 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
      
             /* Calculate block coordinates. */
             p_mb->p_data[i_b] = p_data1
-                                 + pi_y[p_vpar->mb.b_dct_type][i_b]
-                                   * p_vpar->sequence.i_chroma_width;
+                                + pi_y[p_vpar->mb.b_dct_type][i_b]
+                                * p_vpar->sequence.i_chroma_width;
         }
         else
         {
@@ -759,12 +757,14 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
     
     p_mb->p_picture = p_vpar->picture.p_picture;
     p_mb->i_structure = p_vpar->picture.i_structure;
+    p_mb->i_current_structure = p_vpar->picture.i_current_structure;
     p_mb->i_l_x = p_vpar->mb.i_l_x;
     p_mb->i_l_y = p_vpar->mb.i_l_y;
     p_mb->i_c_x = p_vpar->mb.i_c_x;
     p_mb->i_c_y = p_vpar->mb.i_c_y;
     p_mb->i_chroma_nb_blocks = p_vpar->sequence.i_chroma_nb_blocks;
     p_mb->pf_chroma_motion = pf_chroma_motion[p_vpar->sequence.i_chroma_format];
+    p_mb->b_P_coding_type = ( p_vpar->picture.i_coding_type == P_CODING_TYPE );
 
     p_mb->p_forward = p_vpar->sequence.p_forward;
     p_mb->p_backward = p_vpar->sequence.p_backward;
@@ -813,20 +813,20 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
                                         macroblock_t * p_mb )
 {
     static f_motion_t   pf_motion[2][4] =
-        { {NULL, vdec_FieldRecon, vdec_16x8Recon, vdec_DMVRecon},
-          {NULL, vdec_FieldRecon, vdec_FrameRecon, vdec_DMVRecon} };
+        { {NULL, vdec_FieldFieldRecon, vdec_Field16x8Recon, vdec_FieldDMVRecon},
+          {NULL, vdec_FrameFieldRecon, vdec_FrameFrameRecon, vdec_FrameDMVRecon} };
     static int          ppi_mv_count[2][4] = { {0, 1, 2, 1}, {0, 2, 1, 1} };
     static int          ppi_mv_format[2][4] = { {0, 1, 1, 1}, {0, 1, 2, 1} };
 
     /* Get macroblock_type. */
     p_vpar->mb.i_mb_type = (p_vpar->picture.pf_macroblock_type)( p_vpar );
-
+    p_mb->i_mb_type = p_vpar->mb.i_mb_type;
+    
     /* SCALABILITY : warning, we don't know if spatial_temporal_weight_code
      * has to be dropped, take care if you use scalable streams. */
     /* DumpBits( &p_vpar->bit_stream, 2 ); */
     
-    if( (p_vpar->picture.i_coding_type == P_CODING_TYPE) &&
-        !(p_vpar->mb.i_mb_type & (MB_MOTION_FORWARD|MB_INTRA)) )
+    if( p_mb->b_P_coding_type && !(p_vpar->mb.i_mb_type & (MB_MOTION_FORWARD|MB_INTRA)) )
     {
         /* Special No-MC macroblock in P pictures (7.6.3.5). */
         memset( p_vpar->slice.pppi_pmv, 0, 8*sizeof(int) );
@@ -1078,7 +1078,7 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
             default:
                 i_level = ( * ( p_vpar->ppl_dct_coef[i_select]
                               + ( i_offset * sizeof(dct_lookup_t) ) ) ).i_level;
-                b_sign = Getbits( &p_vpar->bit_stream, 1 );
+                b_sign = GetBits( &p_vpar->bit_stream, 1 );
                 p_mb->ppi_blocks[i_b][i_dummy] = b_sign ? -i_level : i_level;
                 i_coef = i_dummy;
                 i_dummy += i_run;
@@ -1195,7 +1195,7 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
             default:
                 i_level = ( * ( p_vpar->ppl_dct_coef[i_select]
                               + ( i_offset * sizeof(dct_lookup_t) ) ) ).i_level;
-                b_sign = Getbits( &p_vpar->bit_stream, 1 );
+                b_sign = GetBits( &p_vpar->bit_stream, 1 );
                 p_mb->ppi_blocks[i_b][i_dummy] = b_sign ? -i_level : i_level;
                 i_coef = i_dummy;
                 i_dummy += i_run;

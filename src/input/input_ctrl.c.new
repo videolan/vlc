@@ -9,6 +9,10 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
+
+#include "vlc.h"
+
+#if 0
 #include <errno.h>
 #include <sys/uio.h>                                                 /* iovec */
 #include <stdlib.h>                               /* atoi(), malloc(), free() */
@@ -40,7 +44,7 @@
 #include "video.h"
 #include "video_output.h"
 #include "video_decoder.h"
-
+#endif
 
 /******************************************************************************
  * input_AddPgrmElem: Start the extraction and the decoding of a program element

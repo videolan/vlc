@@ -43,41 +43,149 @@
  * Local prototypes
  */
 
+typedef struct motion_arg_s
+{
+    picture_t *     p_source;
+    boolean_t       b_source_field;
+    boolean_t       b_dest_field;
+    int             i_height;
+    int             i_x_step;
+    int             i_mv_x, i_mv_y;
+    boolean_t       b_average;
+} motion_arg_t;
+
+/*
 typedef void         (*f_motion_c_t)( coeff_t *, pel_lookup_table_t *,
                                       int, coeff_t *, int, int,
                                       int, int, int, int, int );
+*/
+
+/*****************************************************************************
+ * vdec_MotionComponent : last stage of motion compensation
+ *****************************************************************************/
+static __inline__ vdec_MotionComponent()
+{
+
+}
 
 /*****************************************************************************
  * vdec_DummyRecon : motion compensation for an intra macroblock
  *****************************************************************************/
 void vdec_DummyRecon( macroblock_t * p_mb )
 {
+    /* Nothing to do :) */
 }
 
 /*****************************************************************************
- * vdec_ForwardRecon : motion compensation for a forward predicted macroblock
+ * vdec_FieldFieldRecon : motion compensation for field motion type (field)
  *****************************************************************************/
-void vdec_ForwardRecon( macroblock_t * p_mb )
+void vdec_FieldFieldRecon( macroblock_t * p_mb )
+{
+#if 0
+    motion_arg_t motion_arg;
+
+    motion_arg
+    
+    if( p_mb->i_mb_type & MB_MOTION_FORWARD )
+    {
+        int i_current_field;
+        picture_t * p_pred_frame;
+        
+        i_current_field = ( p_mb->i_structure == BOTTOM_FIELD );
+        if( p_mb->b_P_coding_type && (p_mb->i_current_structure == FRAME_STRUCTURE)
+            && (i_current_field != p_mb->ppi_field_select[0][0]) )
+        {
+            p_pred_frame = p_mb->p_forward;
+        }
+        else
+        {
+            p_pred_frame = p_mb->p_backward;
+        }
+        p_mb->pf_chroma_motion( p_mb, p_pred_frame, 0 /* average */ );
+    }
+#endif
+}
+
+/*****************************************************************************
+ * vdec_Field16x8Recon : motion compensation for 16x8 motion type (field)
+ *****************************************************************************/
+void vdec_Field16x8Recon( macroblock_t * p_mb )
 {
 
 }
 
 /*****************************************************************************
- * vdec_BackwardRecon : motion compensation for a backward predicted macroblock
+ * vdec_FieldDMVRecon : motion compensation for dmv motion type (field)
  *****************************************************************************/
-void vdec_BackwardRecon( macroblock_t * p_mb )
+void vdec_FieldDMVRecon( macroblock_t * p_mb )
+{
+    /* This is necessarily a MOTION_FORWARD only macroblock */
+    
+}
+
+/*****************************************************************************
+ * vdec_FrameFrameRecon : motion compensation for frame motion type (frame)
+ *****************************************************************************/
+void vdec_FrameFrameRecon( macroblock_t * p_mb )
 {
 
 }
 
 /*****************************************************************************
- * vdec_BidirectionalRecon : motion compensation for a bidirectionally
- *                           predicted macroblock
+ * vdec_FrameFieldRecon : motion compensation for field motion type (frame)
  *****************************************************************************/
-void vdec_BidirectionalRecon( macroblock_t * p_mb )
+void vdec_FrameFieldRecon( macroblock_t * p_mb )
 {
 
 }
+
+/*****************************************************************************
+ * vdec_FrameDMVRecon : motion compensation for dmv motion type (frame)
+ *****************************************************************************/
+void vdec_FrameDMVRecon( macroblock_t * p_mb )
+{
+    /* This is necessarily a MOTION_FORWARD only macroblock */
+    
+}
+
+/*****************************************************************************
+ * vdec_MotionField : motion compensation for skipped macroblocks (field)
+ *****************************************************************************/
+void vdec_MotionField( macroblock_t * p_mb )
+{
+
+}
+
+/*****************************************************************************
+ * vdec_MotionFrame : motion compensation for skipped macroblocks (frame)
+ *****************************************************************************/
+void vdec_MotionFrame( macroblock_t * p_mb )
+{
+
+}
+
+/*****************************************************************************
+ * vdec_Motion420 : motion compensation for a 4:2:0 macroblock
+ *****************************************************************************/
+void vdec_Motion420( macroblock_t * p_mb )
+{
+}
+
+/*****************************************************************************
+ * vdec_Motion422 : motion compensation for a 4:2:2 macroblock
+ *****************************************************************************/
+void vdec_Motion422( macroblock_t * p_mb )
+{
+}
+
+/*****************************************************************************
+ * vdec_Motion444 : motion compensation for a 4:4:4 macroblock
+ *****************************************************************************/
+void vdec_Motion444( macroblock_t * p_mb )
+{
+}
+
+#if 0
 
 /*****************************************************************************
  * vdec_MotionMacroblock420 : motion compensation for a 4:2:0 macroblock
@@ -85,12 +193,13 @@ void vdec_BidirectionalRecon( macroblock_t * p_mb )
 void vdec_MotionMacroblock420( macroblock_t * p_mb )
 {
     /* Luminance */
+    /*
     MotionBlock( p_undec_p->p_forward->p_u, p_undec_p->p_forward->p_lookup_lum,
                  p_undec_p->p_picture->i_width, p_u, i_mb_x, i_mb_y,
                  p_undec_p->p_picture->i_width,
                  p_undec_p->ppp_motion_vectors[0][0][0],
                  p_undec_p->ppp_motion_vectors[0][0][1] );
-
+    */
 }
 
 /*****************************************************************************
@@ -153,3 +262,5 @@ void ComponentNN( coeff_t * p_src, pel_lookup_table_t * p_lookup,
         i_src_loc += i_stride_line;
     }
 }
+
+#endif

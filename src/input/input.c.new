@@ -8,19 +8,22 @@
 
 /*******************************************************************************
  * Preamble
- ******************************************************************************/
+ *******************************************************************************/
+#include "vlc.h"
+
+/*
 #include <errno.h>
-#include <sys/uio.h>                                                 /* iovec */
+#include <sys/uio.h>                                               
 #include <string.h>
 
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
 #include <sys/soundcard.h>
 
-#include <stdlib.h>                               /* atoi(), malloc(), free() */
+#include <stdlib.h>                            
 #include <stdio.h>
-#include <sys/ioctl.h>                                             /* ioctl() */
-#include <net/if.h>                                                  /* ifreq */
+#include <sys/ioctl.h>                                            
+#include <net/if.h>                                                
 #include <netinet/in.h>
 
 #include "common.h"
@@ -44,6 +47,7 @@
 #include "video.h"
 #include "video_output.h"
 #include "video_decoder.h"
+*/
 
 /******************************************************************************
  * Local prototypes
@@ -192,7 +196,7 @@ input_thread_t *input_CreateThread( input_cfg_t *p_cfg )
 #ifdef NO_THREAD
     input_Thread( p_input );
 #else
-    if( vlc_thread_create(&p_input->thread_id, "input", (vlc_thread_func)input_Thread, 
+    if( vlc_thread_create(&p_input->thread_id, "input", (vlc_thread_func_t)input_Thread, 
                        (void *) p_input) )
     {
         intf_ErrMsg("input error: can't spawn input thread (%s)\n", 
@@ -304,7 +308,7 @@ static void input_Thread( input_thread_t *p_input )
     EndThread( p_input );
 
     intf_DbgMsg("input debug: thread %p destroyed\n", p_input);
-    vlc_thread_exit( 0 );
+    vlc_thread_exit();
 }
 
 
@@ -337,7 +341,7 @@ static void EndThread( input_thread_t * p_input )
             {
                 case MPEG1_VIDEO_ES:
                 case MPEG2_VIDEO_ES:
-                    vpar_DestroyThread( (vpar_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) /*, NULL */ );
+                    vdec_DestroyThread( (vdec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) /*, NULL */ );
                     break;
 
                 case MPEG1_AUDIO_ES:
@@ -915,27 +919,38 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                     pcr_descriptor_t * p_pcr;
 
                     p_pcr = p_input->p_pcr;
-                    vlc_mutex_lock( &p_pcr->lock );
-                    if( p_pcr->delta_clock == 0 )
+                    
+                    p_pes->i_pts = 
+                        ( ((mtime_t)(p_pes->p_pes_header[9] & 0x0E) << 29) |
+                          (((mtime_t)U16_AT(p_pes->p_pes_header + 10) << 14) - (1 << 14)) |
+                          ((mtime_t)U16_AT(p_pes->p_pes_header + 12) >> 1) ) * 300;
+                    p_pes->i_pts /= 27;
+                    
+                    if( p_pcr->i_synchro_state )
                     {
-                        p_pes->b_has_pts = 0;
+                        switch( p_pcr->i_synchro_state )
+                        {
+                            case SYNCHRO_NOT_STARTED:
+                                p_pes->b_has_pts = 0;
+                                break;
+
+                            case SYNCHRO_START:
+                                p_pes->i_pts += p_pcr->delta_pcr;
+                                p_pcr->delta_absolute = mdate() - p_pes->i_pts + 500000;
+                                p_pes->i_pts += p_pcr->delta_absolute;
+                                p_pcr->i_synchro_state = 0;
+                                break;
+
+                            case SYNCHRO_REINIT: /* We skip a PES */
+                                p_pes->b_has_pts = 0;
+                                p_pcr->i_synchro_state = SYNCHRO_START;
+                                break;
+                        }
                     }
                     else
                     {
-                        p_pes->i_pts = ( ((mtime_t)(p_pes->p_pes_header[9] & 0x0E) << 29) |
-                                         (((mtime_t)U16_AT(p_pes->p_pes_header + 10) << 14) - (1 << 14)) |
-                                         ((mtime_t)U16_AT(p_pes->p_pes_header + 12) >> 1) );
-                        p_pes->i_pts *= 300;
-                        p_pes->i_pts /= 27;
-                        p_pes->i_pts += p_pcr->delta_clock;
-                        if( p_pcr->c_pts == 0 )
-                        {
-                            p_pcr->delta_decode = mdate() - p_pes->i_pts + 500000;
-                        }
-                        p_pes->i_pts += p_pcr->delta_decode;
-                        p_pcr->c_pts += 1;
+                        p_pes->i_pts += p_pcr->delta_pcr + p_pcr->delta_absolute;
                     }
-                    vlc_mutex_unlock( &p_pcr->lock );
                 }
                 break;
             }

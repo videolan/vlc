@@ -179,7 +179,7 @@ void vpar_MotionVector( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_r,
  *****************************************************************************/
 void vpar_MPEG1MotionVector( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_s )
 {
-    p_vpar_MotionVector( p_vpar, p_mb, 0, i_s, p_vpar->picture.pb_full_pel_vector[i_s] );
+    vpar_MotionVector( p_vpar, p_mb, 0, i_s, p_vpar->picture.pb_full_pel_vector[i_s] );
 }
 
 /*****************************************************************************

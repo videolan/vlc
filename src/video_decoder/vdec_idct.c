@@ -6,6 +6,7 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -28,12 +29,16 @@
 #include "decoder_fifo.h"
 #include "video.h"
 #include "video_output.h"
-#include "video_parser.h"
-
-#include "video_fifo.h"
-#include "video_decoder.h"
 
 #include "vdec_idct.h"
+#include "video_decoder.h"
+#include "vdec_motion.h"
+
+#include "vpar_blocks.h"
+#include "vpar_headers.h"
+#include "video_fifo.h"
+#include "vpar_synchro.h"
+#include "video_parser.h"
 
 /*
  * Local prototypes
@@ -58,12 +63,14 @@ void vdec_DummyIDCT( vdec_thread_t * p_vdec, elem_t * p_block,
 void vdec_InitIDCT (vdec_thread_t * p_vdec) 
 {	  
     int i;
-    elem_t p_pre[][64]=vdec_thread_t->p_pre_idct;
-    for (i=0; i<64; i++) 
+    
+    elem_t * p_pre = p_vdec->p_pre_idct;
+    memset( p_pre, 0, 64*64*sizeof(elem_t) );
+    
+    for( i=0 ; i < 64 ; i++ ) 
     {
-        memset ((char *) p_pre[i], 0, 64*sizeof(elem_t));
-        p_pre[i][i]= 1 << SPARSE_SCALE_FACTOR;
-        vdec_IDCT (p_vdec, p_pre[i], 0);
+        p_pre[i*64+i] = 1 << SPARSE_SCALE_FACTOR;
+        vdec_IDCT( p_vdec, &p_pre[i*64], 0) ;
     }
 }
 
@@ -81,9 +88,9 @@ void vdec_SparseIDCT (vdec_thread_t * p_vdec, elem_t * p_block,
 
     if ( i_sparse_pos == 0 ) 
     {
-	dp=(int *)p_block;
-	val= *p_block >> 6;
-    /* Compute int to assign.  This speeds things up a bit */
+	    dp=(int *)p_block;
+	    val= *p_block >> 6;
+        /* Compute int to assign.  This speeds things up a bit */
         v = ((val & 0xffff) | (val << 16));
         dp[0] = v;     dp[1] = v;     dp[2] = v;     dp[3] = v;
         dp[4] = v;     dp[5] = v;     dp[6] = v;     dp[7] = v;
@@ -96,10 +103,10 @@ void vdec_SparseIDCT (vdec_thread_t * p_vdec, elem_t * p_block,
         return;
     }
     /* Some other coefficient. */
-    p_dest=(short int *)p_block;
-    p_source=(short int *)p_vdec->p_pre_idct[i_sparse_pos];
-    coef=p_dest[i_sparse_pos];
-    for (rr=0; rr<4; rr++)
+    p_dest = (s16*)p_block;
+    p_source = (s16*)&p_vdec->p_pre_idct[i_sparse_pos];
+    coeff = (int)p_dest[i_sparse_pos];
+    for( rr=0 ; rr < 4 ; rr++ )
     {
         p_dest[0] = (p_source[0] * coeff) >> SPARSE_SCALE_FACTOR;
         p_dest[1] = (p_source[1] * coeff) >> SPARSE_SCALE_FACTOR;
@@ -129,30 +136,31 @@ void vdec_SparseIDCT (vdec_thread_t * p_vdec, elem_t * p_block,
  *****************************************************************************/
 void vdec_IDCT( vdec_thread_t * p_vdec, elem_t * p_block, int i_idontcare )
 {
-    INT32 tmp0, tmp1, tmp2, tmp3;
-    INT32 tmp10, tmp11, tmp12, tmp13;
-    INT32 z1, z2, z3, z4, z5;
-    INT32 d0, d1, d2, d3, d4, d5, d6, d7;
+    s32 tmp0, tmp1, tmp2, tmp3;
+    s32 tmp10, tmp11, tmp12, tmp13;
+    s32 z1, z2, z3, z4, z5;
+    s32 d0, d1, d2, d3, d4, d5, d6, d7;
     elem_t * dataptr;
     int rowctr;
+    
     SHIFT_TEMPS
    
-  /* Pass 1: process rows. */
-  /* Note results are scaled up by sqrt(8) compared to a true IDCT; */
-  /* furthermore, we scale the results by 2**PASS1_BITS. */
+    /* Pass 1: process rows. */
+    /* Note results are scaled up by sqrt(8) compared to a true IDCT; */
+    /* furthermore, we scale the results by 2**PASS1_BITS. */
 
     dataptr = p_block;
 
     for (rowctr = DCTSIZE-1; rowctr >= 0; rowctr--) 
     {
-    /* Due to quantization, we will usually find that many of the input
-     * coefficients are zero, especially the AC terms.  We can exploit this
-     * by short-circuiting the IDCT calculation for any row in which all
-     * the AC terms are zero.  In that case each output is equal to the
-     * DC coefficient (with scale factor as needed).
-     * With typical images and quantization tables, half or more of the
-     * row DCT calculations can be simplified this way.
-     */
+        /* Due to quantization, we will usually find that many of the input
+         * coefficients are zero, especially the AC terms.  We can exploit this
+         * by short-circuiting the IDCT calculation for any row in which all
+         * the AC terms are zero.  In that case each output is equal to the
+         * DC coefficient (with scale factor as needed).
+         * With typical images and quantization tables, half or more of the
+         * row DCT calculations can be simplified this way.
+         */
 
         register int * idataptr = (int*)dataptr;
         d0 = dataptr[0];
@@ -732,7 +740,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, elem_t * p_block, int i_idontcare )
   /* Note that we must descale the results by a factor of 8 == 2**3, */
   /* and also undo the PASS1_BITS scaling. */
 
-    dataptr = data;
+    dataptr = p_block;
     for (rowctr = DCTSIZE-1; rowctr >= 0; rowctr--) 
     {
     /* Columns of zeroes can be exploited in the same way as we did with rows.
@@ -1301,4 +1309,5 @@ void vdec_IDCT( vdec_thread_t * p_vdec, elem_t * p_block, int i_idontcare )
                        CONST_BITS+PASS1_BITS+3);
     
     dataptr++;			/* advance pointer to next column */
+    }
 }

@@ -20,12 +20,15 @@
  *****************************************************************************/
 typedef struct macroblock_s
 {
-    picture_t *             p_picture;
+    int                     i_mb_type;                    /* macroblock type */
     int                     i_structure;
+    int                     i_current_structure;
+    boolean_t               b_P_coding_type;        /* Is it P_CODING_TYPE ? */
+    picture_t *             p_picture;
     int                     i_l_x, i_l_y;    /* position of macroblock (lum) */
     int                     i_c_x, i_c_y; /* position of macroblock (chroma) */
     int                     i_chroma_nb_blocks;  /* nb of bks for a chr comp */
-    int                     i_l_stride;           /* number of data_t to ignore
+    int                     i_l_stride;       /* number of yuv_data_t to ignore
 					                               * when changing lines     */
     int                     i_c_stride;                  /* idem, for chroma */
     
@@ -42,11 +45,11 @@ typedef struct macroblock_s
     int                     ppi_field_select[2][2];
     int                     pppi_motion_vectors[2][2][2];
     int                     pi_dm_vector[2];
-   
+  
     /* AddBlock information */
     f_addb_t                pf_addb[12];      /* pointer to the Add function */
-    data_t                  p_data[12];              /* pointer to the position
-					              * in the final picture */
+    yuv_data_t *            p_data[12];              /* pointer to the position
+					                                  * in the final picture */
     int                     i_addb_l_stride, i_addb_c_stride;
 } macroblock_t;
 
@@ -122,8 +125,8 @@ typedef struct dct_lookup_s
 /*****************************************************************************
  * Constants
  *****************************************************************************/
-extern int *    pi_default_intra_quant;
-extern int *    pi_default_nonintra_quant;
+extern int      pi_default_intra_quant[];
+extern int      pi_default_nonintra_quant[];
 extern u8       pi_scan[2][64];
 
 /*****************************************************************************

@@ -8,10 +8,8 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
-#include "vlc.h"
+//#include "vlc.h"
 
-/*#include <errno.h>
-#include <pthread.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -27,15 +25,13 @@
 #include "vlc_thread.h"
 
 #include "intf_msg.h"
-#include "debug.h"                    
+#include "debug.h"                    /* ?? temporaire, requis par netlist.h */
 
 #include "input.h"
 #include "input_netlist.h"
 #include "decoder_fifo.h"
 #include "video.h"
 #include "video_output.h"
-#include "video_decoder.h"*/
-
 
 #include "vdec_idct.h"
 #include "video_decoder.h"
@@ -91,7 +87,7 @@ vdec_thread_t * vdec_CreateThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
 
     /* Spawn the video decoder thread */
     if ( vlc_thread_create(&p_vdec->thread_id, "video decoder",
-         (vlc_thread_func)RunThread, (void *)p_vdec) )
+         (vlc_thread_func_t)RunThread, (void *)p_vdec) )
     {
         intf_ErrMsg("vdec error: can't spawn video decoder thread\n");
         free( p_vdec );
@@ -276,7 +272,7 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
          * Adding prediction and coefficient data (ISO/IEC 13818-2 section 7.6.8)
          */
         (p_mb->pf_addb[i_b])( p_mb->ppi_blocks[i_b],
-                               p_mb->p_data[i_b], p_mb->i_l_stride );
+                              p_mb->p_data[i_b], p_mb->i_l_stride );
     }
 
     /* chrominance */
@@ -291,8 +287,8 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
         /*
          * Adding prediction and coefficient data (ISO/IEC 13818-2 section 7.6.8)
          */
-        (p_mb->pf_addb[i_b])( p_mb->ppi_blocks[i_b],
-                               p_mb->p_data[i_b], p_mb->i_c_stride );
+        (p_mb->pf_addb[i_b])( (elem_t*)p_mb->ppi_blocks[i_b],
+                              p_mb->p_data[i_b], p_mb->i_c_stride );
     }
 
     /*
@@ -305,8 +301,7 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
 /*******************************************************************************
  * vdec_AddBlock : add a block
  *******************************************************************************/
-void vdec_AddBlock( vdec_thread_t * p_vdec, elem_t * p_block, data_t * p_data,
-                    int i_incr )
+void vdec_AddBlock( elem_t * p_block, yuv_data_t * p_data, int i_incr )
 {
     int i_x, i_y;
     
@@ -328,16 +323,15 @@ void vdec_AddBlock( vdec_thread_t * p_vdec, elem_t * p_block, data_t * p_data,
 /*******************************************************************************
  * vdec_CopyBlock : copy a block
  *******************************************************************************/
-void vdec_CopyBlock( vdec_thread_t * p_vdec, elem_t * p_block, data_t * p_data,
-                     int i_incr )
+void vdec_CopyBlock( elem_t * p_block, yuv_data_t * p_data, int i_incr )
 {
     int i_x, i_y;
     
     for( i_y = 0; i_y < 8; i_y++ )
     {
 #ifndef VDEC_DFT
-        /* elem_t and data_t are the same */
-        memcopy( p_data, p_block, 8*sizeof(data_t) );
+        /* elem_t and yuv_data_t are the same */
+        memcpy( p_data, p_block, 8*sizeof(yuv_data_t) );
         p_data += i_incr+8;
         p_block += 8;
 #else
@@ -355,7 +349,6 @@ void vdec_CopyBlock( vdec_thread_t * p_vdec, elem_t * p_block, data_t * p_data,
 /*******************************************************************************
  * vdec_DummyBlock : dummy function that does nothing
  *******************************************************************************/
-void vdec_DummyBlock( vdec_thread_t * p_vdec, elem_t * p_block, data_t * p_data,
-                      int i_incr )
+void vdec_DummyBlock( elem_t * p_block, yuv_data_t * p_data, int i_incr )
 {
 }

@@ -34,16 +34,16 @@ struct vdec_thread_s;
  * shift" instructions that shift in copies of the sign bit.  But some
  * C compilers implement >> with an unsigned shift.  For these machines you
  * must define RIGHT_SHIFT_IS_UNSIGNED.
- * RIGHT_SHIFT provides a proper signed right shift of an INT32 quantity.
+ * RIGHT_SHIFT provides a proper signed right shift of an s32 quantity.
  * It is only applied with constant shift counts.  SHIFT_TEMPS must be
  * included in the variables of any routine using RIGHT_SHIFT.
  */
 
 #ifdef RIGHT_SHIFT_IS_UNSIGNED
-#define SHIFT_TEMPS INT32 shift_temp;
+#define SHIFT_TEMPS s32 shift_temp;
 #define RIGHT_SHIFT(x,shft)  \
     ((shift_temp = (x)) < 0 ? \
-     (shift_temp >> (shft)) | ((~((INT32) 0)) << (32-(shft))) : \
+     (shift_temp >> (shft)) | ((~((s32) 0)) << (32-(shft))) : \
      (shift_temp >> (shft)))
 #else
 #define SHIFT_TEMPS
@@ -79,20 +79,22 @@ struct vdec_thread_s;
  * they are represented to better-than-integral precision.  These outputs
  * require BITS_IN_JSAMPLE + PASS1_BITS + 3 bits; this fits in a 16-bit word
  * with the recommended scaling.  (To scale up 12-bit sample data further, an
- * intermediate INT32 array would be needed.)
+ * intermediate s32 array would be needed.)
  *
  * To avoid overflow of the 32-bit intermediate results in pass 2, we must
  * have BITS_IN_JSAMPLE + CONST_BITS + PASS1_BITS <= 26.  Error analysis
  * shows that the values given below are the most effective.
  */
 
+#define CONST_BITS 13       /* Jimmy chose this constant :) */
+ 
 #ifdef EIGHT_BIT_SAMPLES
 #define PASS1_BITS  2
 #else
 #define PASS1_BITS  1		/* lose a little precision to avoid overflow */
 #endif
 
-#define ONE	((INT32) 1)
+#define ONE	((s32) 1)
 
 #define CONST_SCALE (ONE << CONST_BITS)
 
@@ -102,19 +104,19 @@ struct vdec_thread_s;
  * the correct integer constant values and insert them by hand.
  */
 
-#define FIX(x)	((INT32) ((x) * CONST_SCALE + 0.5))
+#define FIX(x)	((s32) ((x) * CONST_SCALE + 0.5))
 
 /* When adding two opposite-signed fixes, the 0.5 cancels */
-#define FIX2(x)	((INT32) ((x) * CONST_SCALE))
+#define FIX2(x)	((s32) ((x) * CONST_SCALE))
 
-/* Descale and correctly round an INT32 value that's scaled by N bits.
+/* Descale and correctly round an s32 value that's scaled by N bits.
  * We assume RIGHT_SHIFT rounds towards minus infinity, so adding
  * the fudge factor is correct for either sign of X.
  */
 
 #define DESCALE(x,n)  RIGHT_SHIFT((x) + (ONE << ((n)-1)), n)
 
-/* Multiply an INT32 variable by an INT32 constant to yield an INT32 result.
+/* Multiply an s32 variable by an s32 constant to yield an s32 result.
  * For 8-bit samples with the recommended scaling, all the variable
  * and constant values involved are no more than 16 bits wide, so a
  * 16x16->32 bit multiply can be used instead of a full 32x32 multiply;
@@ -130,7 +132,7 @@ struct vdec_thread_s;
 #define MULTIPLY(var,const)  (((INT16) (var)) * ((INT16) (const)))
 #endif
 #ifdef SHORTxLCONST_32		/* known to work with Microsoft C 6.0 */
-#define MULTIPLY(var,const)  (((INT16) (var)) * ((INT32) (const)))
+#define MULTIPLY(var,const)  (((INT16) (var)) * ((s32) (const)))
 #endif
 #endif
 
