@@ -1273,7 +1273,7 @@ void wizTranscodeExtraPage::OnWizardPageChanging( wxWizardEvent& event )
     }
     if( event.GetDirection() )
     {
-       p_parent->SetTranscodeOut( (char *)file_text->GetValue().c_str());
+       p_parent->SetTranscodeOut( (char *)file_text->GetValue().mb_str());
     }
 }
 
