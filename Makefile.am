@@ -475,7 +475,7 @@ vlc.app: vlc $(PLUGIN_FILES)
 	$(INSTALL) -d vlc.app/Contents/MacOS/locale
 	for i in $(CATALOGS); do \
 		mkdir -p vlc.app/Contents/MacOS/locale/$${i%.gmo}/LC_MESSAGES ; \
-		cp po/$$i vlc.app/Contents/MacOS/locale/$${i%.gmo}/LC_MESSAGES/vlc.mo ; \
+		cp po/$$i vlc.app/Contents/MacOS/locale/$${i%.gmo}/LC_MESSAGES/vlc.mo || true ; \
 	done
 	echo -n "APPLVLC#" >| vlc.app/Contents/PkgInfo
 endif
