@@ -7,3 +7,4 @@ SOURCES_aout_file = file.c
 SOURCES_oss = oss.c
 SOURCES_aout_sdl = sdl.c
 SOURCES_waveout = waveout.c
+SOURCES_hd1000a = hd1000a.cpp

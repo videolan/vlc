@@ -1390,7 +1390,7 @@ dnl  libdvdnav plugin
 dnl
 AC_ARG_ENABLE(dvdnav,
   [  --enable-dvdnav         dvdnav input module (default enabled)])
-if test "${enable_caca}" != "no"
+if test "${enable_dvdnav}" != "no"
 then
   DVDNAV_PATH="${PATH}"
   AC_ARG_WITH(dvdnav-config-path,
@@ -1778,12 +1778,12 @@ then
       AC_MSG_ERROR([${with_mad_tree} directory doesn't exist])
     fi
     dnl  Use a custom libmad
-    AC_MSG_CHECKING(for mad.h in ${real_mad_tree}/libmad)
-    if test -f ${real_mad_tree}/libmad/mad.h
+    AC_MSG_CHECKING(for mad.h in ${real_mad_tree})
+    if test -f ${real_mad_tree}/mad.h
     then
       AC_MSG_RESULT(yes)
-      AX_ADD_CPPFLAGS([mpgatofixed32],[-I${real_mad_tree}/libmad])
-      AX_ADD_LDFLAGS([mpgatofixed32],[-L${real_mad_tree}/libmad/.libs])
+      AX_ADD_CPPFLAGS([mpgatofixed32],[-I${real_mad_tree}])
+      AX_ADD_LDFLAGS([mpgatofixed32],[-L${real_mad_tree}/.libs])
       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_mpgatofixed32}"
       AC_CHECK_LIB(mad, mad_bit_init, [
         AX_ADD_BUILTINS([mpgatofixed32])
@@ -1930,7 +1930,7 @@ then
       dnl  Use a custom faad
       AC_MSG_RESULT(${real_faad_tree}/libfaad/.libs/libfaad.a)
       AX_ADD_BUILTINS([faad])
-      AX_ADD_LDFLAGS([faad],[-L${real_faad_tree}/libfaad/.libs -lfaad])
+      AX_ADD_LDFLAGS([faad],[-L${real_faad_tree}/libfaad/.libs/libfaad.a])
       AX_ADD_CPPFLAGS([faad],[-I${real_faad_tree}/include])
     else
       dnl  The given libfaad wasn't built
@@ -2851,6 +2851,21 @@ then
         AX_ADD_LDFLAGS([coreaudio_resampler],[-framework AudioToolbox])
       ],[ AC_MSG_RESULT(no) ])
     ], [ AC_MSG_ERROR([cannot find CoreAudio headers]) ])
+fi
+
+dnl
+dnl  Roku HD1000 audio
+dnl
+AC_ARG_ENABLE(hd1000a,
+  [  --enable-hd1000a        HD1000 audio module (default enabled on HD1000)])
+if test "${enable_hd1000a}" != "no" &&
+  (test "${SYS}" != "mingw32" || test "${enable_hd1000a}" = "yes")
+then
+  AC_LANG_PUSH([C++])
+  AC_CHECK_HEADERS(deschutes/libraries/hdmachinex225/PCMAudioPlayer.h, [
+    AX_ADD_PLUGINS([hd1000a])
+    AC_CHECK_LIB(HDMachineX225,main,AX_ADD_LDFLAGS([hd1000a],[-lHDMachineX225]))  ])
+  AC_LANG_POP([C++])
 fi
 
 dnl
