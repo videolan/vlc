@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.cpp,v 1.2 2002/09/15 20:54:12 jpsaman Exp $
+ * $Id: qte.cpp,v 1.3 2002/09/23 21:44:23 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -109,7 +109,7 @@ static void FreePicture    ( vout_thread_t *, picture_t * );
 
 static void ToggleFullScreen      ( vout_thread_t * );
 
-static void *RunQtThread( void *pVoid );
+static void RunQtThread( event_thread_t *p_event );
 
 /*****************************************************************************
 * Exported prototypes
@@ -465,17 +465,17 @@ static int CreateQtWindow( vout_thread_t *p_vout )
     //msg_Err(p_vout, "vout_qt: +init qt window");
 
     /* for displaying the vout in a qt window we need the QtApplication */
-    vlc_thread_t    thread_id;
+//    vlc_thread_t    thread_id;
     //msg_Err( "vout_qt: +init qt window, creating qpe application");
 
     p_vout->p_sys->pcVoutWidget = NULL;
 
     /* create thread to exec the qpe application */
-//    if ( vlc_thread_create( &thread_id, "video output", RunQtThread,
-//                            VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE) )
-    if ( vlc_thread_create( &thread_id, "vout qte",
-                            (vlc_thread_func_t)RunQtThread,
-                            (void *)p_vout) )
+    if ( vlc_thread_create( p_vout->p_sys->p_event, "QT Embedded video output", RunQtThread,
+                            VLC_THREAD_PRIORITY_OUTPUT, VLC_TRUE) )
+//    if ( vlc_thread_create( &thread_id, "vout qte",
+//                            (vlc_thread_func_t)RunQtThread,
+//                            (void *)p_vout) )
     {
         msg_Err( p_vout, "input error: can't spawn video output thread");
         return( -1 );
@@ -523,52 +523,57 @@ static void DestroyQtWindow( vout_thread_t *p_vout )
 /*****************************************************************************
  * main loop of qtapplication
  *****************************************************************************/
-static void *RunQtThread( void *pVoid)
+static void RunQtThread(event_thread_t *p_event)
 {
     int     argc    = 0;
-
-    vout_thread_t* p_vout = (vout_thread_t*) pVoid;
 
     if(qApp == NULL)
     {
         QApplication* pApp = new QApplication(argc, NULL);
         if(pApp)
         {
-            p_vout->p_sys->pcQApplication = pApp;
-            p_vout->p_sys->bOwnsQApp = TRUE;
+            p_event->p_vout->p_sys->pcQApplication = pApp;
+            p_event->p_vout->p_sys->bOwnsQApp = TRUE;
         }
     }
     else
     {
-        p_vout->p_sys->pcQApplication = qApp;
+        p_event->p_vout->p_sys->pcQApplication = qApp;
     }
 
-    if (p_vout->p_sys->pcQApplication)
+    if (p_event->p_vout->p_sys->pcQApplication)
     {
         QWidget vo(0, "qte");
         vo.showFullScreen();
         vo.show();
-        p_vout->p_sys->pcVoutWidget = &vo;
+        p_event->p_vout->p_sys->pcVoutWidget = &vo;
 
-        p_vout->p_sys->bRunning = TRUE;
+        p_event->p_vout->p_sys->bRunning = TRUE;
 
-        if(p_vout->p_sys->bOwnsQApp)
+        if(p_event->p_vout->p_sys->bOwnsQApp)
         {
             // run the main loop of qtapplication until someone says: 'quit'
-            p_vout->p_sys->pcQApplication->exec();
+            p_event->p_vout->p_sys->pcQApplication->exec();
         }
         else
         {
-            while(p_vout->p_sys->bRunning) msleep(100);
+            while(!p_event->b_die && p_event->p_vout->p_sys->bRunning)
+			{
+        	   /* Check if we are asked to exit */
+               if( p_event->b_die )
+                   break;
+
+				msleep(100);
+			}
         }
     }
 
-    p_vout->p_sys->pcVoutWidget = NULL;
+    p_event->p_vout->p_sys->pcVoutWidget = NULL;
 
-    if(p_vout->p_sys->bOwnsQApp)
+    if(p_event->p_vout->p_sys->bOwnsQApp)
     {
-        delete p_vout->p_sys->pcQApplication;
-        p_vout->p_sys->pcQApplication = NULL;
+        delete p_event->p_vout->p_sys->pcQApplication;
+        p_event->p_vout->p_sys->pcQApplication = NULL;
     }
 }
 

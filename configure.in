@@ -1401,7 +1401,7 @@ then
   CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
   AC_CHECK_HEADERS(qt.h, [
     qte_CFLAGS="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
-    qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -lqpe -lqte"
+    qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -lqte"
     if test "x${with_qte}" = "x"
     then
       PLUGINS="${PLUGINS} video_output/qte/qte"

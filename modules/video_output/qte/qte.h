@@ -2,7 +2,7 @@
  * qte.h : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.h,v 1.2 2002/09/15 20:54:12 jpsaman Exp $
+ * $Id: qte.h,v 1.3 2002/09/23 21:44:23 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -26,6 +26,17 @@
  * Preamble
  *****************************************************************************/
 
+/*****************************************************************************
+ * event_thread_t: QT Embedded event thread
+ *****************************************************************************/
+typedef struct event_thread_t
+{
+    VLC_COMMON_MEMBERS
+
+    vout_thread_t * p_vout;
+
+} event_thread_t;
+
 
 /*****************************************************************************
  * vout_sys_t: video output method descriptor
@@ -44,6 +55,8 @@ struct vout_sys_t
 
     QApplication*       pcQApplication;
     QWidget*            pcVoutWidget;
+
+    event_thread_t *    p_event;
 };
 
 
