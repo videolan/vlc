@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.205 2002/12/18 14:17:11 sam Exp $
+ * $Id: video_output.c,v 1.206 2003/01/12 15:38:35 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -281,6 +281,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     var_Create( p_vout, "mouse-y", VLC_VAR_INTEGER );
     var_Create( p_vout, "mouse-moved", VLC_VAR_BOOL );
     var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
+    var_Create( p_vout, "key-pressed", VLC_VAR_STRING );
 
     /* user requested fullscreen? */
     if( config_GetInt( p_vout, "fullscreen" ) )

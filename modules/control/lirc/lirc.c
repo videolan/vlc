@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.2 2003/01/12 01:26:36 sigmunau Exp $
+ * $Id: lirc.c,v 1.3 2003/01/12 15:38:35 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -147,6 +147,7 @@ static void Run( intf_thread_t *p_intf )
             vlc_object_release( p_intf->p_sys->p_input );
             p_intf->p_sys->p_input = NULL;
         }
+        p_input = p_intf->p_sys->p_input;
 
         /* We poll the lircsocket */
         if( lirc_nextcode(&code) != 0 )
@@ -181,6 +182,95 @@ static void Run( intf_thread_t *p_intf )
                 }
                 continue;
             }
+            if( !strcmp( c, "ACTIVATE" ) )
+            {
+                vout_thread_t *p_vout;
+                p_vout = vlc_object_find( p_intf->p_sys->p_input,
+                                          VLC_OBJECT_VOUT, FIND_CHILD );
+                if( p_vout )
+                {
+                    vlc_value_t val;
+                    val.psz_string = "ENTER";
+                    if (var_Set( p_vout, "key-pressed", val ) != VLC_SUCCESS)
+                    {
+                        msg_Warn( p_intf, "key-press failed" );
+                    }
+                    vlc_object_release( p_vout );
+                }
+                continue;
+            }
+
+            if( !strcmp( c, "LEFT" ) )
+            {
+                vout_thread_t *p_vout;
+                p_vout = vlc_object_find( p_intf->p_sys->p_input,
+                                          VLC_OBJECT_VOUT, FIND_CHILD );
+                if( p_vout )
+                {
+                    vlc_value_t val;
+                    val.psz_string = "LEFT";
+                    if (var_Set( p_vout, "key-pressed", val ) != VLC_SUCCESS)
+                    {
+                        msg_Warn( p_intf, "key-press failed" );
+                    }
+                    vlc_object_release( p_vout );
+                }
+                continue;
+            }
+
+            if( !strcmp( c, "RIGHT" ) )
+            {
+                vout_thread_t *p_vout;
+                p_vout = vlc_object_find( p_intf->p_sys->p_input,
+                                          VLC_OBJECT_VOUT, FIND_CHILD );
+                if( p_vout )
+                {
+                    vlc_value_t val;
+                    val.psz_string = "RIGHT";
+                    if (var_Set( p_vout, "key-pressed", val ) != VLC_SUCCESS)
+                    {
+                        msg_Warn( p_intf, "key-press failed" );
+                    }
+                    vlc_object_release( p_vout );
+                }
+                continue;
+            }
+
+            if( !strcmp( c, "UP" ) )
+            {
+                vout_thread_t *p_vout;
+                p_vout = vlc_object_find( p_intf->p_sys->p_input,
+                                          VLC_OBJECT_VOUT, FIND_CHILD );
+                if( p_vout )
+                {
+                    vlc_value_t val;
+                    val.psz_string = "UP";
+                    if (var_Set( p_vout, "key-pressed", val ) != VLC_SUCCESS)
+                    {
+                        msg_Warn( p_intf, "key-press failed" );
+                    }
+                    vlc_object_release( p_vout );
+                }
+                continue;
+            }
+
+            if( !strcmp( c, "DOWN" ) )
+            {
+                vout_thread_t *p_vout;
+                p_vout = vlc_object_find( p_intf->p_sys->p_input,
+                                          VLC_OBJECT_VOUT, FIND_CHILD );
+                if( p_vout )
+                {
+                    vlc_value_t val;
+                    val.psz_string = "DOWN";
+                    if (var_Set( p_vout, "key-pressed", val ) != VLC_SUCCESS)
+                    {
+                        msg_Warn( p_intf, "key-press failed" );
+                    }
+                    vlc_object_release( p_vout );
+                }
+                continue;
+            }
 
             if( !strcmp( c, "PLAY" ) )
             {
@@ -199,10 +289,10 @@ static void Run( intf_thread_t *p_intf )
             }
             if( !strcmp( c, "PLAYPAUSE" ) )
             {
-                if( p_intf->p_sys->p_input &&
-                    p_intf->p_sys->p_input->stream.control.i_status != PAUSE_S )
+                if( p_input &&
+                    p_input->stream.control.i_status != PAUSE_S )
                 {
-                    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
+                    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
                 }
                 else
                 {
@@ -220,10 +310,8 @@ static void Run( intf_thread_t *p_intf )
                     }
                 }                    
             }                
-            else if( p_intf->p_sys->p_input )
+            else if( p_input )
             {
-                p_input = p_intf->p_sys->p_input;
-
                 if( !strcmp( c, "PAUSE" ) )
                 {
                     input_SetStatus( p_input, INPUT_STATUS_PAUSE );

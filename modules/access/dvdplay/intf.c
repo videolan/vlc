@@ -2,7 +2,7 @@
  * intf.c: interface for DVD video manager
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.4 2002/11/08 10:26:52 gbazin Exp $
+ * $Id: intf.c,v 1.5 2003/01/12 15:38:35 sigmunau Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -50,7 +50,7 @@ struct intf_sys_t
     mtime_t             m_still_time;
 
     dvdplay_ctrl_t      control;
-    vlc_bool_t          b_click, b_move;
+    vlc_bool_t          b_click, b_move, b_key_pressed;
 };
 
 /*****************************************************************************
@@ -58,6 +58,8 @@ struct intf_sys_t
  *****************************************************************************/
 static int  InitThread     ( intf_thread_t *p_intf );
 static int  MouseEvent     ( vlc_object_t *, char const *,
+                             vlc_value_t, vlc_value_t, void * );
+static int  KeyEvent       ( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
 
 /* Exported functions */
@@ -209,6 +211,59 @@ static void RunIntf( intf_thread_t *p_intf )
             }
         }
 
+        /*
+         * keyboard event
+         */
+        if( p_vout && p_intf->p_sys->b_key_pressed )
+        {
+            vlc_value_t val;
+            int i_activate;
+
+            p_intf->p_sys->b_key_pressed = VLC_FALSE;
+            
+            var_Get( p_vout, "key-pressed", &val );
+            if ( val.psz_string )
+            {
+                if( !strcmp( val.psz_string, "LEFT" ) )
+                {
+                    p_intf->p_sys->control.type = DVDCtrlLeftButtonSelect;
+                }
+                else if( !strcmp( val.psz_string, "RIGHT" ) )
+                {
+                    p_intf->p_sys->control.type = DVDCtrlRightButtonSelect;
+                }
+                else if( !strcmp( val.psz_string, "UP" ) )
+                {
+                    p_intf->p_sys->control.type = DVDCtrlUpperButtonSelect;
+                }
+                else if( !strcmp( val.psz_string, "DOWN" ) )
+                {
+                    p_intf->p_sys->control.type = DVDCtrlLowerButtonSelect;
+                }
+                else if( !strcmp( val.psz_string, "ENTER" ) )
+                {
+                    p_intf->p_sys->control.type = DVDCtrlButtonActivate;
+                }
+                /* we can safely interact with libdvdplay
+                 * with the stream lock */
+                vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
+                
+                i_activate = dvdplay_button( p_intf->p_sys->p_dvd->vmg,
+                                             &p_intf->p_sys->control );
+                
+                vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+                
+                if( i_activate && p_intf->p_sys->b_still )
+                {
+                    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+                    p_intf->p_sys->b_still = 0;
+                    p_intf->p_sys->b_inf_still = 0;
+                    p_intf->p_sys->m_still_time = 0;
+                }
+            }
+        }
+                
+
         vlc_mutex_unlock( &p_intf->change_lock );
 
         /* 
@@ -218,6 +273,7 @@ static void RunIntf( intf_thread_t *p_intf )
         {
             var_DelCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
             var_DelCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
+            var_DelCallback( p_vout, "key-pressed", KeyEvent, p_intf );
             vlc_object_release( p_vout );
             p_vout = NULL;
         }
@@ -230,6 +286,7 @@ static void RunIntf( intf_thread_t *p_intf )
             {
                 var_AddCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
                 var_AddCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
+                var_AddCallback( p_vout, "key-pressed", KeyEvent, p_intf );
             }
         }
 
@@ -241,6 +298,7 @@ static void RunIntf( intf_thread_t *p_intf )
     {
         var_DelCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
         var_DelCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
+        var_DelCallback( p_vout, "key-pressed", KeyEvent, p_intf );
         vlc_object_release( p_vout );
     }
 
@@ -270,6 +328,7 @@ static int InitThread( intf_thread_t * p_intf )
 
         p_intf->p_sys->b_move = VLC_FALSE;
         p_intf->p_sys->b_click = VLC_FALSE;
+        p_intf->p_sys->b_key_pressed = VLC_FALSE;
 
         vlc_mutex_unlock( &p_intf->change_lock );
 
@@ -300,6 +359,22 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
         p_intf->p_sys->b_move = VLC_TRUE;
     }
 
+    vlc_mutex_unlock( &p_intf->change_lock );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * KeyEvent: callback for keyboard events
+ *****************************************************************************/
+static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)p_data;
+    vlc_mutex_lock( &p_intf->change_lock );
+
+    p_intf->p_sys->b_key_pressed = VLC_TRUE;
+    
     vlc_mutex_unlock( &p_intf->change_lock );
 
     return VLC_SUCCESS;
