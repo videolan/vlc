@@ -50,6 +50,8 @@
  *****************************************************************************/
 typedef struct vout_sys_s
 {
+    int i_width;
+    int i_height;
     SDL_Surface *   p_display;                             /* display device */
     SDL_Overlay *   p_overlay;                             /* overlay device */
     boolean_t   b_fullscreen;
@@ -110,7 +112,10 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
         p_vout->p_sys->b_fullscreen = 0;
     }
 
-    p_vout->p_sys->b_reopen_display = 1;
+    p_vout->p_sys->i_width = VOUT_WIDTH_DEFAULT;
+    p_vout->p_sys->i_height = VOUT_HEIGHT_DEFAULT;
+
+    p_vout->p_sys->b_reopen_display = 0;
 
     if( SDLOpenDisplay(p_vout) )
     {
@@ -281,91 +286,104 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
 static int SDLOpenDisplay( vout_thread_t *p_vout )
 {
     SDL_Rect    clipping_rect;
-    
+    Uint32      flags;
+    int bpp;
     /* Open display 
      * TODO: Check that we can request for a DOUBLEBUF HWSURFACE display
      */
+
+    /* init flags and cursor */
+    flags = SDL_ANYFORMAT;
+
     if( p_vout->p_sys->b_fullscreen )
+        flags |= SDL_FULLSCREEN;
+    else
+        flags |= SDL_RESIZABLE;
+
+    if( p_vout->b_need_render )
+        flags |= SDL_HWSURFACE | SDL_DOUBLEBUF;
+    else
+        flags |= SDL_SWSURFACE; /* save video memory */
+
+    bpp = SDL_VideoModeOK(p_vout->p_sys->i_width,
+                          p_vout->p_sys->i_height,
+                          p_vout->i_screen_depth, flags);
+
+    if(bpp == 0)
     {
-        p_vout->p_sys->p_display = SDL_SetVideoMode(p_vout->i_width, 
-            p_vout->i_height, 
-            0, 
-            SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN );
-        SDL_ShowCursor( 0 );
-    } else {
-        p_vout->p_sys->p_display = SDL_SetVideoMode(p_vout->i_width, 
-            p_vout->i_height, 
-            0, 
-            SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_RESIZABLE );
-        SDL_ShowCursor( 1 );
+        intf_ErrMsg( "error: can't open DISPLAY default display" );
+        return( 1 );
     }
-	
+
+    p_vout->p_sys->p_display = SDL_SetVideoMode(p_vout->p_sys->i_width,
+                                                p_vout->p_sys->i_height,
+                                                bpp, flags);
+
     if( p_vout->p_sys->p_display == NULL )
     {
         intf_ErrMsg( "error: can't open DISPLAY default display" );
         return( 1 );
     }
-    intf_DbgMsg( "sdl display size : %dx%d - pitch : %d",
-                 p_vout->p_sys->p_display->w,
-                 p_vout->p_sys->p_display->h,
-                 p_vout->p_sys->p_display->pitch);
+
+    if( p_vout->p_sys->b_fullscreen )
+        SDL_ShowCursor( 0 );
+    else
+        SDL_ShowCursor( 1 );
 
     SDL_WM_SetCaption( VOUT_TITLE , VOUT_TITLE );
     SDL_EventState(SDL_KEYUP , SDL_IGNORE);	/* ignore keys up */
 
+    if( p_vout->b_need_render )
+    {
+        p_vout->p_sys->p_buffer[ 0 ] = p_vout->p_sys->p_display->pixels;
+        SDL_Flip(p_vout->p_sys->p_display);
+        p_vout->p_sys->p_buffer[ 1 ] = p_vout->p_sys->p_display->pixels;
+        SDL_Flip(p_vout->p_sys->p_display);
+
+        /* Set clipping for text */
+        clipping_rect.x = 0;
+        clipping_rect.y = 0;
+        clipping_rect.w = p_vout->p_sys->p_display->w;
+        clipping_rect.h = p_vout->p_sys->p_display->h;
+        SDL_SetClipRect(p_vout->p_sys->p_display, &clipping_rect);
+
+        /* Set thread information */
+        p_vout->i_width =           p_vout->p_sys->p_display->w;
+        p_vout->i_height =          p_vout->p_sys->p_display->h;
+        p_vout->i_bytes_per_line =  p_vout->p_sys->p_display->pitch;
+
+        p_vout->i_screen_depth =
+            p_vout->p_sys->p_display->format->BitsPerPixel;
+        p_vout->i_bytes_per_pixel =
+            p_vout->p_sys->p_display->format->BytesPerPixel;
+
+        p_vout->i_red_mask =        p_vout->p_sys->p_display->format->Rmask;
+        p_vout->i_green_mask =      p_vout->p_sys->p_display->format->Gmask;
+        p_vout->i_blue_mask =       p_vout->p_sys->p_display->format->Bmask;
+
+        /* FIXME: palette in 8bpp ?? */
+        /* Set and initialize buffers */
+        vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer[ 0 ],
+                                 p_vout->p_sys->p_buffer[ 1 ] );
+    }
+    else
+    {
+        p_vout->p_sys->p_buffer[ 0 ] = p_vout->p_sys->p_display->pixels;
+        p_vout->p_sys->p_buffer[ 1 ] = p_vout->p_sys->p_display->pixels;
+
+        /* Set thread information */
+        p_vout->i_width =           p_vout->p_sys->p_display->w;
+        p_vout->i_height =          p_vout->p_sys->p_display->h;
+        p_vout->i_bytes_per_line =  p_vout->p_sys->p_display->pitch;
+
+        vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer[ 0 ],
+                                 p_vout->p_sys->p_buffer[ 1 ] );
+    }
+
+    p_vout->i_changes |= VOUT_YUV_CHANGE;
+
     /* Check buffers properties */	
     p_vout->p_sys->b_must_acquire = 1;		/* always acquire */
-    p_vout->p_sys->p_buffer[ 0 ] =
-         p_vout->p_sys->p_display->pixels;
-
-    SDL_Flip(p_vout->p_sys->p_display);
-    p_vout->p_sys->p_buffer[ 1 ] =
-         p_vout->p_sys->p_display->pixels;
-    SDL_Flip(p_vout->p_sys->p_display);
-
-    /* Set graphic context colors */
-
-/*
-    col_fg.r = col_fg.g = col_fg.b = -1;
-    col_bg.r = col_bg.g = col_bg.b = 0;
-    if( ggiSetGCForeground(p_vout->p_sys->p_display,
-                           ggiMapColor(p_vout->p_sys->p_display,&col_fg)) ||
-        ggiSetGCBackground(p_vout->p_sys->p_display,
-                           ggiMapColor(p_vout->p_sys->p_display,&col_bg)) )
-    {
-        intf_ErrMsg("error: can't set colors");
-        ggiClose( p_vout->p_sys->p_display );
-        ggiExit();
-        return( 1 );
-    }
-*/
-		
-    /* Set clipping for text */
-    clipping_rect.x = 0;
-    clipping_rect.y = 0;
-    clipping_rect.w = p_vout->p_sys->p_display->w;
-    clipping_rect.h = p_vout->p_sys->p_display->h;
-    SDL_SetClipRect(p_vout->p_sys->p_display, &clipping_rect);
-
-
-	
-    /* Set thread information */
-    p_vout->i_width =           p_vout->p_sys->p_display->w;
-    p_vout->i_height =          p_vout->p_sys->p_display->h;
-
-    p_vout->i_bytes_per_line = p_vout->p_sys->p_display->format->BytesPerPixel *
-                               p_vout->p_sys->p_display->w ;
-		
-    p_vout->i_screen_depth =    p_vout->p_sys->p_display->format->BitsPerPixel;
-    p_vout->i_bytes_per_pixel = p_vout->p_sys->p_display->format->BytesPerPixel;
-    p_vout->i_red_mask =        p_vout->p_sys->p_display->format->Rmask;
-    p_vout->i_green_mask =      p_vout->p_sys->p_display->format->Gmask;
-    p_vout->i_blue_mask =       p_vout->p_sys->p_display->format->Bmask;
-
-    /* FIXME: palette in 8bpp ?? */
-    /* Set and initialize buffers */
-    vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer[ 0 ],
-                             p_vout->p_sys->p_buffer[ 1 ] );
 
     return( 0 );
 }
@@ -386,6 +404,7 @@ static void SDLCloseDisplay( vout_thread_t *p_vout )
             SDL_FreeYUVOverlay(p_vout->p_sys->p_overlay);
             p_vout->p_sys->p_overlay = NULL;
         }
+        SDL_UnlockSurface(p_vout->p_sys->p_display);
         SDL_FreeSurface( p_vout->p_sys->p_display );
         p_vout->p_sys->p_display = NULL;
     }

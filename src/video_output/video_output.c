@@ -1064,17 +1064,18 @@ static void RunThread( vout_thread_t *p_vout)
             b_display = p_vout->b_active;
             p_vout->last_display_date = display_date;
             p_vout->p_rendered_pic = p_pic;
-            
 
 
+
+
+            /* Set picture dimensions and clear buffer */
+            SetBufferPicture( p_vout, p_pic );
 
             /* FIXME: if b_need_render == 0 we need to do something with
              * the subpictures one day. */
+
             if( p_vout->b_need_render && b_display )
             {
-                /* Set picture dimensions and clear buffer */
-                SetBufferPicture( p_vout, p_pic );
-
                 /* Render picture and information */
                 RenderPicture( p_vout, p_pic );
                 if( p_vout->b_info )

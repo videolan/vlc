@@ -63,6 +63,8 @@ typedef struct intf_sys_s
 
 typedef struct vout_sys_s
 {
+    int i_width;
+    int i_height;
     SDL_Surface *   p_display;                             /* display device */
     SDL_Overlay *   p_overlay;
     boolean_t   b_fullscreen;
@@ -192,18 +194,19 @@ void intf_SDL_Resize( intf_thread_t * p_intf, int width, int height )
 {
     intf_Msg( "Video display resized (%dx%d)", width, height ); 
     vlc_mutex_lock( &p_intf->p_vout->change_lock );
-    p_intf->p_vout->i_width = width/* & 0xffffffe*/;
-    p_intf->p_vout->i_height = height;
+    p_intf->p_vout->p_sys->i_width = width;
+    p_intf->p_vout->p_sys->i_height = height;
     p_intf->p_vout->p_sys->b_reopen_display = 1;
-    p_intf->p_vout->i_changes |= VOUT_YUV_CHANGE;
     vlc_mutex_unlock( &p_intf->p_vout->change_lock );
 }
 
 void intf_SDL_YUVSwitch(intf_thread_t * p_intf)
 {
     vlc_mutex_lock( &p_intf->p_vout->change_lock );
+    p_intf->p_vout->p_sys->b_must_acquire = 0;
     p_intf->p_vout->b_need_render = 1 - p_intf->p_vout->b_need_render;
     intf_DbgMsg( "need render now : '%d'",p_intf->p_vout->b_need_render); 
+    p_intf->p_vout->p_sys->b_reopen_display = 1;
     vlc_mutex_unlock( &p_intf->p_vout->change_lock );
 }
 void intf_SDL_Fullscreen(intf_thread_t * p_intf)
