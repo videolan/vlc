@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.12 2003/07/10 00:47:42 hartman Exp $
+# $Id: vlc.ebuild,v 1.13 2003/07/18 20:00:02 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -25,7 +25,7 @@
 # Thanks to the Gentoo Team for supporting us.
 ###############################################################################
 
-IUSE="arts qt ncurses dvd gtk nls 3dfx matrox svga fbcon esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l xvid lirc wxwindows imlib matroska dvb pvr"
+IUSE="arts qt ncurses dvd gtk nls 3dfx matrox svga fbcon esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l xvid lirc wxwindows imlib matroska dvb pvr mozilla mad"
 
 # Change these to correspond with the
 # unpacked dirnames of the CVS snapshots.
@@ -48,34 +48,35 @@ LICENSE="GPL-2"
 KEYWORDS="~x86 ~ppc ~sparc ~alpha ~mips ~hppa"
 
 DEPEND="X? ( virtual/x11 )
-	nls? ( sys-devel/gettext )
-	qt? ( x11-libs/qt )
+	aalib? ( >=media-libs/aalib-1.4_rc4-r2 )
+	alsa? ( >=media-libs/alsa-lib-0.9_rc2 )
+	dvb? ( media-libs/libdvb
+		media-tv/linuxtv-dvb )
 	dvd? ( >=media-libs/libdvdread-0.9.3
 		>=media-libs/libdvdcss-1.2.6
 		>=media-libs/libdvdplay-1.0.1 )
-	sdl? ( >=media-libs/libsdl-1.2.5 )
 	esd? ( >=media-sound/esound-0.2.22 )
 	ggi? ( >=media-libs/libggi-2.0_beta3 )
-	gtk? ( =x11-libs/gtk+-1.2* )
-	kde? ( kde-base/kdelibs )
-	arts? ( kde-base/kdelibs )
 	gnome? ( >=gnome-base/gnome-libs-1.4.1.2-r1 )
+	gtk? ( =x11-libs/gtk+-1.2* )
+	imlib? ( >=media-libs/imlib2-1.0.6 )
+	kde? ( kde-base/kdelibs )
+	lirc? ( app-misc/lirc )
+	mad? ( media-libs/libmad
+		media-libs/libid3tag )
+	matroska? ( media-libs/libmatroska )
+	mozilla? ( >=net-www/mozilla-1.4 )
 	ncurses? ( sys-libs/ncurses )
-	oggvorbis? ( >=media-libs/libvorbis-1.0 
-	             >=media-libs/libogg-1.0 )
-	alsa? ( >=media-libs/alsa-lib-0.9_rc2 )
-	aalib? ( >=media-libs/aalib-1.4_rc4-r2 )
-	xvid? ( >=media-libs/xvid-0.9.1 )
+	nls? ( sys-devel/gettext )
+	oggvorbis? ( >=media-libs/libvorbis-1.0
+		>=media-libs/libogg-1.0 )
+	qt? ( x11-libs/qt )
+	sdl? ( >=media-libs/libsdl-1.2.5 )
 	slp? ( >=net-libs/openslp-1.0.10 )
 	truetype? ( >=media-libs/freetype-2.1.4 )
-	lirc? ( app-misc/lirc )
-	imlib? ( >=media-libs/imlib2-1.0.6 )
-	wxwindows? ( >=x11-libs/wxGTK-2.4.0 )
-	matroska? ( media-libs/libmatroska )
-	dvb? ( media-libs/libdvb 
-		media-tv/linuxtv-dvb )
+	wxwindows? ( >=x11-libs/wxGTK-2.4.1 )
+	>=media-sound/lame-3.93.1
         >=media-libs/libdvbpsi-0.1.2
-	>=media-sound/mad-0.14.2b
 	>=media-libs/faad2-1.1
 	>=media-libs/a52dec-0.7.4
 	>=media-libs/flac-1.1.0"
@@ -142,7 +143,7 @@ src_compile(){
 	use mmx || myconf="--disable-mmx"
 
 	./configure ${myconf} \
-		--disable-mp3lame \
+		--enable-mp3lame \
 		--disable-vorbis || die "./configure of ffmpeg failed"
 	
 	cd libavcodec
@@ -209,6 +210,8 @@ src_compile(){
 
 	use slp || myconf="${myconf} --disable-slp"
 
+	use mad && myconf="${myconf} --enable-mad"
+
 	use truetype && myconf="${myconf} --enable-freetype"
 
 	# xvid is a local USE var, see /usr/portage/profiles/use.local.desc for more details
@@ -244,11 +247,10 @@ src_compile(){
 	touch config.h.in
 	touch `find . -name Makefile.in`
 
-	myconf="${myconf} --enable-ffmpeg --with-ffmpeg-tree=${SFFMPEG} \
+	myconf="${myconf} --enable-ffmpeg --with-ffmpeg-tree=${SFFMPEG} --with-ffmpeg-mp3lame \
 		--enable-libmpeg2 --with-libmpeg2-tree=${SLIBMPEG2} \
 		--enable-dvbpsi \
 		--enable-release \
-		--enable-mad \
 		--enable-faad \
 		--enable-flac \
 		--enable-a52"
