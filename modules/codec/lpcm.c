@@ -2,10 +2,11 @@
  * lpcm.c: lpcm decoder module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm.c,v 1.7 2002/11/14 22:38:47 massiot Exp $
+ * $Id: lpcm.c,v 1.8 2002/12/28 02:02:18 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +38,8 @@
 #   include <unistd.h>                                           /* getpid() */
 #endif
 
-#define LPCM_FRAME_NB 502
+/* DVD PES size (2048) - 40 bytes (headers) */
+#define LPCM_FRAME_LENGTH 2008
 
 /*****************************************************************************
  * dec_thread_t : lpcm decoder thread descriptor
@@ -65,14 +67,28 @@ typedef struct dec_thread_t
     audio_date_t            end_date;
 } dec_thread_t;
 
+/*
+ * LPCM header :
+ * - PES header
+ * - private stream ID (16 bits) == 0xA0 -> not in the bitstream
+ * - frame number (8 bits)
+ * - unknown (16 bits) == 0x0003 ?
+ * - unknown (4 bits)
+ * - current frame (4 bits)
+ * - unknown (2 bits)
+ * - frequency (2 bits) 0 == 48 kHz, 1 == 32 kHz, 2 == ?, 3 == ?
+ * - unknown (1 bit)
+ * - number of channels - 1 (3 bits) 1 == 2 channels
+ * - start code (8 bits) == 0x80
+ */
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  OpenDecoder    ( vlc_object_t * );
 static int  RunDecoder     ( decoder_fifo_t * );
 
-       void DecodeFrame    ( dec_thread_t * );
-// static int  InitThread     ( dec_thread_t * );
+static void DecodeFrame    ( dec_thread_t * );
 static void EndThread      ( dec_thread_t * );
 
 /*****************************************************************************
@@ -130,29 +146,11 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
         return -1;
     }
    
-    /* FIXME : I suppose the number of channel and sampling rate 
-     * are somewhere in the headers */
     p_dec->output_format.i_format = VLC_FOURCC('s','1','6','b');
-    p_dec->output_format.i_physical_channels
-           = p_dec->output_format.i_original_channels
-           = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-    p_dec->output_format.i_rate = 48000;
-    
-    aout_DateInit( &p_dec->end_date, 48000 );
     p_dec->p_aout = NULL;
-    p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
-                                       &p_dec->p_aout,
-                                       &p_dec->output_format );
+    p_dec->p_aout_input = NULL;
 
-    if ( p_dec->p_aout_input == NULL )
-    {
-        msg_Err( p_dec->p_fifo, "failed to create aout fifo" );
-        p_dec->p_fifo->b_error = 1;
-        EndThread( p_dec );
-        return( -1 );
-    }
-
-    /* lpcm decoder thread's main loop */
+    /* LPCM decoder thread's main loop */
     while ( (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error) )
     {
         DecodeFrame(p_dec);
@@ -173,50 +171,136 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
 /*****************************************************************************
  * DecodeFrame: decodes a frame.
  *****************************************************************************/
-void DecodeFrame( dec_thread_t * p_dec )
+static void DecodeFrame( dec_thread_t * p_dec )
 {
-    aout_buffer_t *    p_aout_buffer;
-    mtime_t     i_pts;
+    aout_buffer_t *    p_buffer;
+    mtime_t            i_pts;
+    uint8_t            i_header;
+    unsigned int       i_rate, i_original_channels;
+
+    /* Look for sync word - should be 0xXX80 */
+    RealignBits( &p_dec->bit_stream );
+    while ( (ShowBits( &p_dec->bit_stream, 16 ) & 0xc8ff) != 0x0080 && 
+             (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error) )
+    {
+        RemoveBits( &p_dec->bit_stream, 8 );
+    }
+    if ( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error ) return;
 
     NextPTS( &p_dec->bit_stream, &i_pts, NULL );
-    
     if( i_pts != 0 && i_pts != aout_DateGet( &p_dec->end_date ) )
     {
         aout_DateSet( &p_dec->end_date, i_pts );
     }
     
-    p_aout_buffer = aout_DecNewBuffer( p_dec->p_aout,
-                                       p_dec->p_aout_input,
-                                       LPCM_FRAME_NB );
+    /* Get LPCM header. */
+    i_header = GetBits( &p_dec->bit_stream, 16 ) >> 8;
+
+    switch ( i_header >> 4 )
+    {
+    case 0:
+        i_rate = 48000;
+        break;
+    case 1:
+        i_rate = 32000;
+        break;
+    default:
+        msg_Err( p_dec->p_fifo, "unsupported LPCM rate (0x%x)", i_header );
+        p_dec->p_fifo->b_error = 1;
+        return;
+    }
+
+    switch ( i_header & 0x7 )
+    {
+    case 0:
+        i_original_channels = AOUT_CHAN_CENTER;
+        break;
+    case 1:
+        i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+        break;
+    case 3:
+        i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                               | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+        break;
+    case 5:
+        i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                               | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+                               | AOUT_CHAN_CENTER | AOUT_CHAN_LFE;
+        break;
+    case 2:
+    case 4:
+    case 6:
+    case 7:
+    default:
+        msg_Err( p_dec->p_fifo, "unsupported LPCM channels (0x%x)",
+                 i_header );
+        p_dec->p_fifo->b_error = 1;
+        return;
+    }
+
+    if( (p_dec->p_aout_input != NULL) &&
+        ( (p_dec->output_format.i_rate != i_rate)
+            || (p_dec->output_format.i_original_channels
+                  != i_original_channels) ) )
+    {
+        /* Parameters changed - this should not happen. */
+        aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
+        p_dec->p_aout_input = NULL;
+    }
+
+    /* Creating the audio input if not created yet. */
+    if( p_dec->p_aout_input == NULL )
+    {
+        p_dec->output_format.i_rate = i_rate;
+        p_dec->output_format.i_original_channels = i_original_channels;
+        p_dec->output_format.i_physical_channels
+                   = i_original_channels & AOUT_CHAN_PHYSMASK;
+        aout_DateInit( &p_dec->end_date, i_rate );
+        p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
+                                           &p_dec->p_aout,
+                                           &p_dec->output_format );
+
+        if ( p_dec->p_aout_input == NULL )
+        {
+            p_dec->p_fifo->b_error = 1;
+            return;
+        }
+    }
+
+    if ( !aout_DateGet( &p_dec->end_date ) )
+    {
+        byte_t p_junk[LPCM_FRAME_LENGTH];
+
+        /* We've just started the stream, wait for the first PTS. */
+        GetChunk( &p_dec->bit_stream, p_junk, LPCM_FRAME_LENGTH );
+        return;
+    }
+
+    p_buffer = aout_DecNewBuffer( p_dec->p_aout, p_dec->p_aout_input,
+            LPCM_FRAME_LENGTH / p_dec->output_format.i_bytes_per_frame );
     
-    if( !p_aout_buffer )
+    if( p_buffer == NULL )
     {
         msg_Err( p_dec->p_fifo, "cannot get aout buffer" );
         p_dec->p_fifo->b_error = 1;
         return;
     }
-    
-    p_aout_buffer->start_date = aout_DateGet( &p_dec->end_date );
-    p_aout_buffer->end_date = aout_DateIncrement( &p_dec->end_date,
-                                                   LPCM_FRAME_NB );
+    p_buffer->start_date = aout_DateGet( &p_dec->end_date );
+    p_buffer->end_date = aout_DateIncrement( &p_dec->end_date,
+            LPCM_FRAME_LENGTH / p_dec->output_format.i_bytes_per_frame );
 
-    /* Look for sync word - should be 0x0180 */
-    RealignBits( &p_dec->bit_stream );
-    while ( (GetBits( &p_dec->bit_stream, 16 ) ) != 0x0180 && 
-             (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error));
-
-    GetChunk( &p_dec->bit_stream, p_aout_buffer->p_buffer, 
-              LPCM_FRAME_NB * 4);
-
+    /* Get the whole frame. */
+    GetChunk( &p_dec->bit_stream, p_buffer->p_buffer, 
+              LPCM_FRAME_LENGTH);
     if( p_dec->p_fifo->b_die )
     {
         aout_DecDeleteBuffer( p_dec->p_aout, p_dec->p_aout_input,
-                              p_aout_buffer );
+                              p_buffer );
         return;
     }
 
-    aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, 
-                  p_aout_buffer );
+    /* Send the buffer to the aout core. */
+    aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, p_buffer );
 }
 
 /*****************************************************************************

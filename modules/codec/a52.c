@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.19 2002/12/06 16:34:05 sam Exp $
+ * $Id: a52.c,v 1.20 2002/12/28 02:02:18 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -137,7 +137,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         return -1;
     }
 
-    /* decoder thread's main loop */
+    /* Decoder thread's main loop */
     while ( !p_dec->p_fifo->b_die && !p_dec->p_fifo->b_error )
     {
         int i_bit_rate;
@@ -149,10 +149,11 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         /* Look for sync word - should be 0x0b77 */
         RealignBits( &p_dec->bit_stream );
         while ( (ShowBits( &p_dec->bit_stream, 16 ) ) != 0x0b77 &&
-                (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error))
+                (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error) )
         {
             RemoveBits( &p_dec->bit_stream, 8 );
         }
+        if ( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error ) break;
 
         /* Set the Presentation Time Stamp */
         NextPTS( &p_dec->bit_stream, &pts, NULL );
@@ -163,7 +164,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
         /* Get A/52 frame header */
         GetChunk( &p_dec->bit_stream, p_header, 7 );
-        if( p_dec->p_fifo->b_die ) break;
+        if ( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error ) break;
 
         /* Check if frame is valid and get frame info */
         i_frame_size = SyncInfo( p_header, &i_original_channels, &i_rate,
@@ -218,7 +219,11 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
         p_buffer = aout_DecNewBuffer( p_dec->p_aout, p_dec->p_aout_input,
                                       A52_FRAME_NB );
-        if ( p_buffer == NULL ) return -1;
+        if ( p_buffer == NULL )
+        {
+            p_dec->p_fifo->b_error = 1;
+            break;
+        }
         p_buffer->start_date = aout_DateGet( &end_date );
         p_buffer->end_date = aout_DateIncrement( &end_date,
                                                  A52_FRAME_NB );
@@ -234,17 +239,15 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             break;
         }
 
-        /* Send the buffer to the mixer. */
+        /* Send the buffer to the aout core. */
         aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, p_buffer );
     }
 
-    /* If b_error is set, the spdif thread enters the error loop */
     if( p_dec->p_fifo->b_error )
     {
         DecoderError( p_dec->p_fifo );
     }
 
-    /* End of the spdif decoder thread */
     EndThread( p_dec );
 
     return 0;
