@@ -110,7 +110,8 @@ dnl Check for the need to include the mingwex lib for mingw32
 if test x$SYS = xmingw32
 then
     AC_CHECK_LIB(mingwex,opendir,
-        AC_CHECK_LIB(kernel32,opendir,,vlc_LDFLAGS="${vlc_LDFLAGS} -lmingwex")
+        AC_CHECK_LIB(mingw32,opendir,vlc_LDFLAGS="${vlc_LDFLAGS}",
+            vlc_LDFLAGS="${vlc_LDFLAGS} -lmingwex")
     )
 fi
 
