@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.6 2002/04/23 14:16:20 sam Exp $
+ * $Id: ipv6.c,v 1.7 2002/05/20 19:49:18 gbazin Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -27,11 +27,11 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <sys/types.h>
-#include <sys/socket.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
+
 #include <videolan/vlc.h>
 
 #ifdef HAVE_UNISTD_H
@@ -57,6 +57,10 @@
 /* Default MTU used for UDP socket. FIXME: we should issue some ioctl()
  * call to get that value from the interface driver. */
 #define DEFAULT_MTU 1500
+
+#if defined(WIN32)
+static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
+#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -100,9 +104,37 @@ static void getfunctions( function_list_t * p_function_list )
 static int BuildAddr( struct sockaddr_in6 * p_socket,
                       char * psz_address, int i_port )
 {
+#if defined(WIN32)
+    /* Try to get getaddrinfo() and freeaddrinfo() from wship6.dll */
+    typedef int (CALLBACK * GETADDRINFO) ( const char *nodename,
+                                            const char *servname,
+                                            const struct addrinfo *hints,
+                                            struct addrinfo **res );
+    typedef void (CALLBACK * FREEADDRINFO) ( struct addrinfo FAR *ai );
+
+    struct addrinfo hints, *res;
+    GETADDRINFO _getaddrinfo = NULL;
+    FREEADDRINFO _freeaddrinfo = NULL;
+
+    HINSTANCE wship6_dll = LoadLibrary("wship6.dll");
+    if( wship6_dll )
+    {
+        _getaddrinfo = (GETADDRINFO) GetProcAddress( wship6_dll,
+                                                      "getaddrinfo" );
+        _freeaddrinfo = (FREEADDRINFO) GetProcAddress( wship6_dll,
+                                                       "freeaddrinfo" );
+    }
+    if( !_getaddrinfo || !_freeaddrinfo )
+    {
+        intf_ErrMsg( "ipv6 error: no IPv6 stack installed" );
+        FreeLibrary( wship6_dll );
+        return( -1 );
+    }
+#endif
+
     /* Reset struct */
     memset( p_socket, 0, sizeof( struct sockaddr_in6 ) );
-    p_socket->sin6_family = AF_INET6;                               /* family */
+    p_socket->sin6_family = AF_INET6;                              /* family */
     p_socket->sin6_port = htons( i_port );
     if( !*psz_address )
     {
@@ -113,7 +145,26 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
     {
         psz_address++;
         psz_address[strlen(psz_address) - 1] = '\0' ;
+
+#if !defined( WIN32 )
         inet_pton(AF_INET6, psz_address, &p_socket->sin6_addr.s6_addr); 
+
+#else
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = AF_INET6;
+        hints.ai_flags = AI_NUMERICHOST;
+
+        if( _getaddrinfo( psz_address, NULL, &hints, &res ) )
+        {
+            FreeLibrary( wship6_dll );
+            return( -1 );
+        }
+        memcpy( &p_socket->sin6_addr,
+                &((struct sockaddr_in6 *)res->ai_addr)->sin6_addr,
+                sizeof(struct in6_addr) );
+        _freeaddrinfo( res );
+
+#endif
     }
     else
     {
@@ -130,11 +181,27 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
         /* Copy the first address of the host in the socket address */
         memcpy( &p_socket->sin6_addr, p_hostent->h_addr_list[0],
                  p_hostent->h_length );
+
+#elif defined(WIN32)
+        if( _getaddrinfo( psz_address, NULL, &hints, &res ) )
+        {
+            FreeLibrary( wship6_dll );
+            return( -1 );
+        }
+        memcpy( &p_socket->sin6_addr,
+                &((struct sockaddr_in6 *)res->ai_addr)->sin6_addr,
+                sizeof(struct in6_addr) );
+        _freeaddrinfo( res );
+
 #else
         intf_ErrMsg( "ipv6 error: IPv6 address %s is invalid", psz_address );
         return( -1 );
 #endif
     }
+
+#if defined(WIN32)
+    FreeLibrary( wship6_dll );
+#endif
 
     return( 0 );
 }
@@ -337,5 +404,3 @@ static int NetworkOpen( network_socket_t * p_socket )
         return OpenTCP( p_socket );
     }
 }
-
-

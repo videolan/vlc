@@ -107,6 +107,7 @@ imdct_LDFLAGS = @imdct_LDFLAGS@
 imdct3dn_LDFLAGS = @imdct3dn_LDFLAGS@
 imdctsse_LDFLAGS = @imdctsse_LDFLAGS@
 ipv4_LDFLAGS = @ipv4_LDFLAGS@
+ipv6_LDFLAGS = @ipv6_LDFLAGS@
 kde_LDFLAGS = @kde_LDFLAGS@
 lirc_LDFLAGS = @lirc_LDFLAGS@
 macosx_LDFLAGS = @macosx_LDFLAGS@
