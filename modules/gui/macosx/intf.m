@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.103 2003/11/22 06:26:16 titer Exp $
+ * $Id: intf.m,v 1.104 2003/12/11 16:00:09 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -374,7 +374,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
 - (void)awakeFromNib
 {
-    unsigned int i_key;
+    unsigned int i_key = 0;
     intf_thread_t * p_intf = [NSApp getIntf];
 
     [self initStrings];
@@ -415,6 +415,9 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     i_key = config_GetInt( p_intf, "key-vol-down" );
     [o_mi_vol_down setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
     [o_mi_vol_down setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-vol-mute" );
+    [o_mi_mute setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_mute setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
     i_key = config_GetInt( p_intf, "key-fullscreen" );
     [o_mi_fullscreen setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
     [o_mi_fullscreen setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];

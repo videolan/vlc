@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.49 2003/11/15 22:42:16 hartman Exp $
+ * $Id: intf.h,v 1.50 2003/12/11 16:00:09 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -93,7 +93,7 @@ struct intf_sys_t
     id o_prefs;                 /* VLCPrefs       */
 
     IBOutlet id o_window;       /* main window    */
-    IBOutlet id o_infofield;    /* info field     */
+    IBOutlet id o_scrollfield;  /* info field     */
     IBOutlet id o_timefield;    /* time field     */
     IBOutlet id o_timeslider;   /* time slider    */
     float f_slider;             /* slider value   */

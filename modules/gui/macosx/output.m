@@ -2,7 +2,7 @@
  * output.m: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: output.m,v 1.16 2003/11/06 18:35:19 hartman Exp $
+ * $Id: output.m,v 1.17 2003/12/11 16:00:09 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -119,7 +119,7 @@
         @"128", @"192", @"256", @"512", nil];
     NSArray *o_v_bitrates = [NSArray arrayWithObjects: @"16", @"32", @"64", @"96",
         @"128", @"192", @"256", @"384", @"512", @"768", @"1024", @"2048", @"3072", nil];
-    NSArray *o_a_codecs = [NSArray arrayWithObjects: @"mpga", @"mp3 ", @"a52 ", @"vorb", nil];
+    NSArray *o_a_codecs = [NSArray arrayWithObjects: @"mpga", @"mp3 ", @"a52 ", @"vorb", @"flac", @"spx ", nil];
     NSArray *o_v_codecs = [NSArray arrayWithObjects: @"mp1v", @"mp2v", @"mp4v", @"DIV1",
         @"DIV2", @"DIV3", @"H263", @"I263", @"WMV1", @"WMV2", @"MJPG", @"theo", nil];
     
