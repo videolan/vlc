@@ -2,7 +2,7 @@
  * gtk2_dialog.cpp: GTK2 implementation of some dialog boxes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_dialog.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_dialog.cpp,v 1.2 2003/04/12 22:50:42 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -46,7 +46,7 @@ extern intf_thread_t *g_pIntf;
 #include "event.h"
 #include "os_api.h"
 
-/*
+
 //---------------------------------------------------------------------------
 // Open file dialog box
 //---------------------------------------------------------------------------
@@ -61,7 +61,7 @@ GTK2OpenFileDialog::~GTK2OpenFileDialog()
 //---------------------------------------------------------------------------
 void GTK2OpenFileDialog::AddFilter( string name, string type )
 {
-    unsigned int i;
+/*    unsigned int i;
 
     for( i = 0; i < name.length(); i++ )
         Filter[FilterLength++] = name[i];
@@ -81,13 +81,13 @@ void GTK2OpenFileDialog::AddFilter( string name, string type )
     Filter[FilterLength++] = '\0';
 
     // Ending null character if this filter is the last
-    Filter[FilterLength] = '\0';
+    Filter[FilterLength] = '\0';*/
 }
 //---------------------------------------------------------------------------
 bool GTK2OpenFileDialog::Open()
 {
     // Initailize dialog box
-    OPENFILENAME OpenFile;
+/*    OPENFILENAME OpenFile;
     memset( &OpenFile, 0, sizeof( OpenFile ) );
     OpenFile.lStructSize  = sizeof( OPENFILENAME );
     OpenFile.hwndOwner = NULL;
@@ -180,7 +180,7 @@ bool GTK2OpenFileDialog::Open()
     // Free memory
     delete[] OpenFile.lpstrFile;
 
-    return true;
+    return true;*/
 }
 //---------------------------------------------------------------------------
 
@@ -190,7 +190,7 @@ bool GTK2OpenFileDialog::Open()
 //---------------------------------------------------------------------------
 // CALLBACKs
 //---------------------------------------------------------------------------
-LRESULT CALLBACK LogWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam,
+/*LRESULT CALLBACK LogWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam,
                                 LPARAM lParam )
 {
     intf_thread_t *p_intf = (intf_thread_t *)GetWindowLongPtr( hwnd,
@@ -246,7 +246,7 @@ DWORD CALLBACK LogWindowStream( DWORD_PTR dwCookie, LPBYTE pbBuff,
     }
     delete (string *)dwCookie;
     return 0;
-}
+}*/
 //---------------------------------------------------------------------------
 
 
@@ -256,7 +256,7 @@ DWORD CALLBACK LogWindowStream( DWORD_PTR dwCookie, LPBYTE pbBuff,
 //---------------------------------------------------------------------------
 GTK2LogWindow::GTK2LogWindow( intf_thread_t *_p_intf ) : LogWindow( _p_intf )
 {
-    hWindow   = NULL;
+/*    hWindow   = NULL;
     hRichCtrl = NULL;
 
     // Define window class
@@ -299,30 +299,30 @@ GTK2LogWindow::GTK2LogWindow( intf_thread_t *_p_intf ) : LogWindow( _p_intf )
     ChangeColor( RGB( 128, 128, 128 ) );
     RtfHeader = "{\\rtf1 ";
 
-    Clear();
+    Clear();*/
 }
 //---------------------------------------------------------------------------
 GTK2LogWindow::~GTK2LogWindow()
 {
-    DestroyWindow( hRichCtrl );
-    DestroyWindow( hWindow );
+/*    DestroyWindow( hRichCtrl );
+    DestroyWindow( hWindow );*/
 }
 //---------------------------------------------------------------------------
 void GTK2LogWindow::Clear()
 {
-    EDITSTREAM *Stream;
+/*    EDITSTREAM *Stream;
     Stream = new EDITSTREAM;
     string *buffer = new string( RtfHeader );
     Stream->dwCookie = (DWORD)buffer;
     Stream->dwError  = 0;
     Stream->pfnCallback = (EDITSTREAMCALLBACK)LogWindowStream;
-    SendMessage( hRichCtrl, EM_STREAMIN, SF_RTF, (LPARAM)Stream );
+    SendMessage( hRichCtrl, EM_STREAMIN, SF_RTF, (LPARAM)Stream );*/
 }
 //---------------------------------------------------------------------------
 void GTK2LogWindow::AddLine( string line )
 {
     // Initialize stream
-        EDITSTREAM *Stream;
+/*        EDITSTREAM *Stream;
         string *buffer      = new string( RtfHeader + line + "\\par }" );
         Stream              = new EDITSTREAM;
         Stream->dwCookie    = (DWORD)buffer;
@@ -331,30 +331,30 @@ void GTK2LogWindow::AddLine( string line )
 
     SendMessage( hRichCtrl, EM_STREAMIN, SF_RTF|SFF_SELECTION, (LPARAM)Stream );
 
-    SendMessage( hRichCtrl, WM_VSCROLL, SB_BOTTOM, 0 );
+    SendMessage( hRichCtrl, WM_VSCROLL, SB_BOTTOM, 0 );*/
 }
 //---------------------------------------------------------------------------
 void GTK2LogWindow::ChangeColor( int color, bool bold )
 {
-    CHARFORMAT format;
+/*    CHARFORMAT format;
     memset(&format, 0, sizeof(CHARFORMAT));
     format.cbSize      = sizeof(CHARFORMAT);
     format.dwMask      = bold ? CFM_COLOR|CFM_BOLD : CFM_COLOR;
     format.dwEffects   = bold ? CFE_BOLD           : 0;
     format.crTextColor = color;
-    SendMessage( hRichCtrl, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM)&format );
+    SendMessage( hRichCtrl, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM)&format );*/
 }
 //---------------------------------------------------------------------------
 void GTK2LogWindow::Show()
 {
-    ShowWindow( hWindow, SW_SHOW );
-    Visible = true;
+/*    ShowWindow( hWindow, SW_SHOW );
+    Visible = true;*/
 }
 //---------------------------------------------------------------------------
 void GTK2LogWindow::Hide()
 {
-    ShowWindow( hWindow, SW_HIDE );
-    Visible = false;
+/*    ShowWindow( hWindow, SW_HIDE );
+    Visible = false;*/
 }
 //---------------------------------------------------------------------------
-*/
+

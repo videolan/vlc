@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_run.cpp,v 1.2 2003/04/12 22:50:42 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -42,8 +42,6 @@
 #include "vlcproc.h"
 
 
-#if 0
-
 //---------------------------------------------------------------------------
 // Specific method
 //---------------------------------------------------------------------------
@@ -55,12 +53,12 @@ int  SkinManage( intf_thread_t *p_intf );
 //---------------------------------------------------------------------------
 // REFRESH TIMER CALLBACK
 //---------------------------------------------------------------------------
-void CALLBACK RefreshTimer( HWND hwnd, UINT uMsg, UINT idEvent, DWORD dwTime )
+/*void CALLBACK RefreshTimer( HWND hwnd, UINT uMsg, UINT idEvent, DWORD dwTime )
 {
     intf_thread_t *p_intf = (intf_thread_t *)GetWindowLongPtr( hwnd,
         GWLP_USERDATA );
     SkinManage( p_intf );
-}
+}*/
 //---------------------------------------------------------------------------
 
 
@@ -70,6 +68,7 @@ void CALLBACK RefreshTimer( HWND hwnd, UINT uMsg, UINT idEvent, DWORD dwTime )
 //---------------------------------------------------------------------------
 void OSRun( intf_thread_t *p_intf )
 {
+#if 0
     VlcProc *Proc = new VlcProc( p_intf );
     MSG msg;
     list<Window *>::const_iterator win;
@@ -171,6 +170,7 @@ void OSRun( intf_thread_t *p_intf )
         // Check if vlc is closing
         Proc->IsClosing();
     }
+    #endif
 }
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg )
@@ -180,4 +180,3 @@ bool IsVLCEvent( unsigned int msg )
 //---------------------------------------------------------------------------
 
 
-#endif

@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_window.cpp,v 1.2 2003/04/12 22:50:42 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -46,29 +46,29 @@
 #include "theme.h"
 
 
-/*
+
 //---------------------------------------------------------------------------
 // Fading API
 //---------------------------------------------------------------------------
-#define LWA_COLORKEY  0x00000001
+/*#define LWA_COLORKEY  0x00000001
 #define LWA_ALPHA     0x00000002
 typedef BOOL (WINAPI *SLWA)(HWND, COLORREF, BYTE, DWORD);
 HMODULE hModule = LoadLibrary( "user32.dll" );
 SLWA SetLayeredWindowAttributes =
     (SLWA)GetProcAddress( hModule, "SetLayeredWindowAttributes" );
-
+*/
 
 //---------------------------------------------------------------------------
 // Skinable Window
 //---------------------------------------------------------------------------
-GTK2Window::GTK2Window( intf_thread_t *p_intf, HWND hwnd, int x, int y,
+GTK2Window::GTK2Window( intf_thread_t *p_intf, GdkWindow *gwnd, int x, int y,
     bool visible, int transition, int normalalpha, int movealpha,
     bool dragdrop )
     : Window( p_intf, x, y, visible, transition, normalalpha, movealpha,
               dragdrop )
 {
     // Set handles
-    hWnd           = hwnd;
+/*    hWnd           = hwnd;
 
     // Set position parameters
     CursorPos    = new POINT;
@@ -102,12 +102,12 @@ GTK2Window::GTK2Window( intf_thread_t *p_intf, HWND hwnd, int x, int y,
         // register the listview as a drop target
         RegisterDragDrop( hWnd, DropTarget );
     }
-
+*/
 }
 //---------------------------------------------------------------------------
 GTK2Window::~GTK2Window()
 {
-    delete CursorPos;
+/*    delete CursorPos;
     delete WindowPos;
 
     if( hWnd != NULL )
@@ -126,24 +126,24 @@ GTK2Window::~GTK2Window()
         // Uninitialize the OLE library
         OleUninitialize();
     }
-
+*/
 }
 //---------------------------------------------------------------------------
 void GTK2Window::OSShow( bool show )
 {
-    if( show )
+/*    if( show )
     {
         ShowWindow( hWnd, SW_SHOW );
     }
     else
     {
         ShowWindow( hWnd, SW_HIDE );
-    }
+    }*/
 }
 //---------------------------------------------------------------------------
 bool GTK2Window::ProcessOSEvent( Event *evt )
 {
-    unsigned int msg = evt->GetMessage();
+/*    unsigned int msg = evt->GetMessage();
     unsigned int p1  = evt->GetParam1();
     int          p2  = evt->GetParam2();
 
@@ -201,21 +201,21 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
 
         default:
             return false;
-    }
+    }*/
 }
 //---------------------------------------------------------------------------
 void GTK2Window::SetTransparency( int Value )
 {
-    if( Value > -1 )
+/*    if( Value > -1 )
         Alpha = Value;
     SetLayeredWindowAttributes( hWnd, 0, Alpha, LWA_ALPHA | LWA_COLORKEY );
-    UpdateWindow( hWnd );
+    UpdateWindow( hWnd );*/
 }
 //---------------------------------------------------------------------------
 void GTK2Window::RefreshFromImage( int x, int y, int w, int h )
 {
     // Initialize painting
-    HDC DC = GetWindowDC( hWnd );
+/*    HDC DC = GetWindowDC( hWnd );
 
     // Draw image on window
     BitBlt( DC, x, y, w, h, ( (GTK2Graphics *)Image )->GetImageHandle(),
@@ -223,12 +223,12 @@ void GTK2Window::RefreshFromImage( int x, int y, int w, int h )
 
     // Release window device context
     ReleaseDC( hWnd, DC );
-
+*/
 }
 //---------------------------------------------------------------------------
 void GTK2Window::WindowManualMove()
 {
-    // Get mouse cursor position
+/*    // Get mouse cursor position
     LPPOINT NewPos = new POINT;
     GetCursorPos( NewPos );
 
@@ -239,36 +239,36 @@ void GTK2Window::WindowManualMove()
 
     // Free memory
     delete[] NewPos;
-
+*/
 }
 //---------------------------------------------------------------------------
 void GTK2Window::WindowManualMoveInit()
 {
-    GetCursorPos( CursorPos );
+/*    GetCursorPos( CursorPos );
     WindowPos->x = Left;
-    WindowPos->y = Top;
+    WindowPos->y = Top;*/
 }
 //---------------------------------------------------------------------------
 void GTK2Window::Move( int left, int top )
 {
-    Left = left;
+/*    Left = left;
     Top  = top;
     //SetWindowPos( hWnd, HWND_TOP, Left, Top, Width, Height,
     //              SWP_NOSIZE|SWP_NOREDRAW|SWP_NOZORDER );
-    MoveWindow( hWnd, Left, Top, Width, Height, false );
+    MoveWindow( hWnd, Left, Top, Width, Height, false );*/
 }
 //---------------------------------------------------------------------------
 void GTK2Window::Size( int width, int height )
 {
-    Width  = width;
+/*    Width  = width;
     Height = height;
     SetWindowPos( hWnd, HWND_TOP, Left, Top, Width, Height,
-                  SWP_NOMOVE|SWP_NOREDRAW|SWP_NOZORDER );
+                  SWP_NOMOVE|SWP_NOREDRAW|SWP_NOZORDER );*/
 }
 //---------------------------------------------------------------------------
 void GTK2Window::ChangeToolTipText( string text )
 {
-    if( text == "none" )
+/*    if( text == "none" )
     {
         if( ToolTipText != "none" )
         {
@@ -288,7 +288,7 @@ void GTK2Window::ChangeToolTipText( string text )
                              (LPARAM)(LPTOOLINFO)&ToolTipInfo );
         }
     }
-
+*/
 }
 //---------------------------------------------------------------------------
-*/
+

@@ -2,7 +2,7 @@
  * gtk2_font.cpp: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_font.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_font.cpp,v 1.2 2003/04/12 22:50:42 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -36,7 +36,7 @@
 #include "gtk2_font.h"
 
 
-/*
+
 //---------------------------------------------------------------------------
 // Font object
 //---------------------------------------------------------------------------
@@ -50,7 +50,7 @@ GTK2Font::~GTK2Font()
 {
 }
 //---------------------------------------------------------------------------
-void GTK2Font::AssignGTK2Font( HDC DC )
+/*void GTK2Font::AssignGTK2Font( HDC DC )
 {
     // Create font
     HGDIOBJ fontObj = CreateFont(
@@ -75,17 +75,17 @@ void GTK2Font::AssignGTK2Font( HDC DC )
 
     // Free memory
     DeleteObject( fontObj );
-}
+}*/
 //---------------------------------------------------------------------------
 void GTK2Font::AssignFont( Graphics *dest )
-{
+{/*
     HDC DC = ( (GTK2Graphics *)dest )->GetImageHandle();
-    AssignGTK2Font( DC );
+    AssignGTK2Font( DC );*/
 }
 //---------------------------------------------------------------------------
 void GTK2Font::GetSize( string text, int &w, int &h )
 {
-    // Get device context of screen
+/*    // Get device context of screen
     HDC DeskDC = GetWindowDC( GetDesktopWindow() );
 
     // Get size
@@ -98,13 +98,13 @@ void GTK2Font::GetSize( string text, int &w, int &h )
     h = rect->bottom - rect->top;
 
     // Release screen device context
-    ReleaseDC( GetDesktopWindow(), DeskDC );
+    ReleaseDC( GetDesktopWindow(), DeskDC );*/
 }
 //---------------------------------------------------------------------------
 void GTK2Font::GenericPrint( Graphics *dest, string text, int x, int y,
                                  int w, int h, int align, int color )
 {
-    HDC DC = ( (GTK2Graphics *)dest )->GetImageHandle();
+/*    HDC DC = ( (GTK2Graphics *)dest )->GetImageHandle();
     // Set boundaries
     LPRECT r = new RECT;
     r->left   = x;
@@ -128,21 +128,20 @@ void GTK2Font::GenericPrint( Graphics *dest, string text, int x, int y,
     SetTextColor( DC, 0 );
 
     // Free memory
-    delete r;
+    delete r;*/
 }
 
 //---------------------------------------------------------------------------
 void GTK2Font::Print( Graphics *dest, string text, int x, int y, int w,
                        int h, int align )
 {
-    GenericPrint( dest, text, x, y, w, h, align, Color );
+/*    GenericPrint( dest, text, x, y, w, h, align, Color );*/
 }
 //---------------------------------------------------------------------------
 void GTK2Font::PrintColor( Graphics *dest, string text, int x, int y, int w,
                             int h, int align, int color )
 {
-    GenericPrint( dest, text, x, y, w, h, align, color );
+/*    GenericPrint( dest, text, x, y, w, h, align, color );*/
 }
 //---------------------------------------------------------------------------
 
-*/

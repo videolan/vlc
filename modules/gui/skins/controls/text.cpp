@@ -2,7 +2,7 @@
  * text.cpp: Text control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: text.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: text.cpp,v 1.2 2003/04/12 22:50:42 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -48,10 +48,10 @@
 // Scrolling : one for each OS
 //---------------------------------------------------------------------------
 
+    #if defined( WIN32 )
     //-----------------------------------------------------------------------
     // Win32 methods
     //-----------------------------------------------------------------------
-    #if defined( WIN32 )
     void CALLBACK ScrollingTextTimer( HWND hwnd, UINT uMsg, UINT_PTR idEvent,
         DWORD dwTime )
     {
@@ -73,6 +73,24 @@
     {
         KillTimer( ( (Win32Window *)ParentWindow )->GetHandle(),
                    (UINT_PTR)this );
+    }
+    //-----------------------------------------------------------------------
+
+    #else
+    //-----------------------------------------------------------------------
+    // Gtk2 methods
+    //-----------------------------------------------------------------------
+    void ControlText::StartScrolling()
+    {
+/* FIXME: kluge */
+ /*       SetTimer( ( (Win32Window *)ParentWindow )->GetHandle(), (UINT_PTR)this,
+                  100, (TIMERPROC)ScrollingTextTimer );*/
+    }
+    //-----------------------------------------------------------------------
+    void ControlText::StopScrolling()
+    {
+/*        KillTimer( ( (Win32Window *)ParentWindow )->GetHandle(),
+                   (UINT_PTR)this );*/
     }
     //-----------------------------------------------------------------------
 

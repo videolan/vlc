@@ -2,7 +2,7 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_graphics.cpp,v 1.2 2003/04/12 22:50:42 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -33,13 +33,12 @@
 #include "gtk2_graphics.h"
 
 
-/*
 //---------------------------------------------------------------------------
 // GTK2 GRAPHICS
 //---------------------------------------------------------------------------
 GTK2Graphics::GTK2Graphics( int w, int h, Window *from ) : Graphics( w, h )
 {
-    HBITMAP HImage ;
+/*    HBITMAP HImage ;
     Image          = CreateCompatibleDC( NULL );
     if( from != NULL )
     {
@@ -52,32 +51,32 @@ GTK2Graphics::GTK2Graphics( int w, int h, Window *from ) : Graphics( w, h )
         HImage = CreateCompatibleBitmap( Image, w, h );
     }
     SelectObject( Image, HImage );
-    DeleteObject( HImage );
+    DeleteObject( HImage );*/
 }
 //---------------------------------------------------------------------------
 GTK2Graphics::~GTK2Graphics()
 {
-    DeleteDC( Image );
+/*    DeleteDC( Image );*/
 }
 //---------------------------------------------------------------------------
 void GTK2Graphics::CopyFrom( int dx, int dy, int dw, int dh, Graphics *Src,
                               int sx, int sy, int Flag )
 {
-    BitBlt( Image, dx, dy, dw, dh, ( (GTK2Graphics *)Src )->GetImageHandle(),
-        sx, sy, Flag );
+/*    BitBlt( Image, dx, dy, dw, dh, ( (GTK2Graphics *)Src )->GetImageHandle(),
+        sx, sy, Flag );*/
 }
-*/
+
 //---------------------------------------------------------------------------
 /*void GTK2Graphics::CopyTo( Graphics *Dest, int dx, int dy, int dw, int dh,
                             int sx, int sy, int Flag )
 {
     BitBlt( ( (GTK2Graphics *)Dest )->GetImageHandle(), dx, dy, dw, dh, Image,
         sx, sy, Flag );
-}*//*
+}*/
 //---------------------------------------------------------------------------
 void GTK2Graphics::DrawRect( int x, int y, int w, int h, int color )
 {
-    LPRECT r = new RECT;
+/*    LPRECT r = new RECT;
     HBRUSH  Brush = CreateSolidBrush( color );
     r->left   = x;
     r->top    = y;
@@ -85,12 +84,12 @@ void GTK2Graphics::DrawRect( int x, int y, int w, int h, int color )
     r->bottom = y + h;
     FillRect( Image, r, Brush );
     DeleteObject( Brush );
-    delete r;
+    delete r;*/
 }
 //---------------------------------------------------------------------------
 void GTK2Graphics::SetClipRegion( Region *rgn )
 {
-    SelectClipRgn( Image, ( (GTK2Region *)rgn )->GetHandle() );
+/*    SelectClipRgn( Image, ( (GTK2Region *)rgn )->GetHandle() );*/
 }
 //---------------------------------------------------------------------------
 
@@ -102,48 +101,48 @@ void GTK2Graphics::SetClipRegion( Region *rgn )
 //---------------------------------------------------------------------------
 GTK2Region::GTK2Region()
 {
-    Rgn = CreateRectRgn( 0, 0, 0, 0 );
+/*    Rgn = CreateRectRgn( 0, 0, 0, 0 );*/
 }
 //---------------------------------------------------------------------------
 GTK2Region::GTK2Region( int x, int y, int w, int h )
 {
-    Rgn = CreateRectRgn( x, y, x + w, y + h );
+/*    Rgn = CreateRectRgn( x, y, x + w, y + h );*/
 }
 //---------------------------------------------------------------------------
 GTK2Region::~GTK2Region()
 {
-    DeleteObject( Rgn );
+/*    DeleteObject( Rgn );*/
 }
 //---------------------------------------------------------------------------
 void GTK2Region::AddPoint( int x, int y )
 {
-    AddRectangle( x, y, x + 1, y + 1 );
+/*    AddRectangle( x, y, x + 1, y + 1 );*/
 }
 //---------------------------------------------------------------------------
 void GTK2Region::AddRectangle( int x, int y, int w, int h )
 {
-    HRGN Buffer;
+/*    HRGN Buffer;
     Buffer = CreateRectRgn( x, y, x + w, y + h );
     CombineRgn( Rgn, Buffer, Rgn, 0x2 );
-    DeleteObject( Buffer );
+    DeleteObject( Buffer );*/
 }
 //---------------------------------------------------------------------------
 void GTK2Region::AddElipse( int x, int y, int w, int h )
 {
-    HRGN Buffer;
+/*    HRGN Buffer;
     Buffer = CreateEllipticRgn( x, y, x + w, y + h );
     CombineRgn( Rgn, Buffer, Rgn, 0x2 );
-    DeleteObject( Buffer );
+    DeleteObject( Buffer );*/
 }
 //---------------------------------------------------------------------------
 void GTK2Region::Move( int x, int y )
 {
-    OffsetRgn( Rgn, x, y );
+/*    OffsetRgn( Rgn, x, y );*/
 }
 //---------------------------------------------------------------------------
 bool GTK2Region::Hit( int x, int y )
 {
-    return PtInRegion( Rgn, x, y );
+/*    return PtInRegion( Rgn, x, y );*/
 }
 //---------------------------------------------------------------------------
-*/
+

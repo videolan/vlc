@@ -2,7 +2,7 @@
  * gtk2_event.cpp: GTK2 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_event.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_event.cpp,v 1.2 2003/04/12 22:50:42 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -39,26 +39,25 @@
 #include "skin_common.h"
 
 
-/*
 //---------------------------------------------------------------------------
 //   VLC Event
 //---------------------------------------------------------------------------
 GTK2Event::GTK2Event( intf_thread_t *p_intf, string Desc, string shortcut )
     : Event( p_intf, Desc, shortcut )
 {
-    hWnd = NULL;
+/*    hWnd = NULL;*/
 }
 //---------------------------------------------------------------------------
-GTK2Event::GTK2Event( intf_thread_t *p_intf, HWND hwnd, unsigned int msg,
+GTK2Event::GTK2Event( intf_thread_t *p_intf, GdkWindow *gwnd, unsigned int msg,
     unsigned int par1, long par2 ) : Event( p_intf, msg, par1, par2 )
 {
-    hWnd = hwnd;
+/*    hWnd = hwnd;*/
 }
 //---------------------------------------------------------------------------
 GTK2Event::GTK2Event( intf_thread_t *p_intf, Window *win, unsigned int msg,
     unsigned int par1, long par2 ) : Event( p_intf, msg, par1, par2 )
 {
-    hWnd = ( (GTK2Window *)win )->GetHandle();
+/*    hWnd = ( (GTK2Window *)win )->GetHandle();*/
 }
 //---------------------------------------------------------------------------
 GTK2Event::~GTK2Event()
@@ -67,7 +66,7 @@ GTK2Event::~GTK2Event()
 //---------------------------------------------------------------------------
 bool GTK2Event::SendEvent()
 {
-    if( Message != VLC_NOTHING )
+/*    if( Message != VLC_NOTHING )
     {
         PostMessage( hWnd, Message, Param1, Param2 );
         PostSynchroMessage();
@@ -75,19 +74,19 @@ bool GTK2Event::SendEvent()
     }
 
     return true;
-
+*/
 }
 //---------------------------------------------------------------------------
 bool GTK2Event::IsEqual( Event *evt )
 {
-    GTK2Event *WinEvt = (GTK2Event *)evt;
+/*    GTK2Event *WinEvt = (GTK2Event *)evt;
     return( WinEvt->GetWindow() == hWnd   && WinEvt->GetMessage() == Message &&
-            WinEvt->GetParam1() == Param1 && WinEvt->GetParam2()  == Param2 );
+            WinEvt->GetParam1() == Param1 && WinEvt->GetParam2()  == Param2 );*/
 }
 //---------------------------------------------------------------------------
 void GTK2Event::CreateOSEvent( string para1, string para2, string para3 )
 {
-
+/*
     // Find Parameters
     switch( Message )
     {
@@ -104,17 +103,17 @@ void GTK2Event::CreateOSEvent( string para1, string para2, string para3 )
             break;
 
     }
-
+*/
 }
 //---------------------------------------------------------------------------
-HWND GTK2Event::GetWindowFromName( string name )
+GdkWindow *GTK2Event::GetWindowFromName( string name )
 {
-    GTK2Window *win = (GTK2Window *)
+/*    GTK2Window *win = (GTK2Window *)
         p_intf->p_sys->p_theme->GetWindow( name );
     if( win == NULL )
         return NULL;
     else
-        return win->GetHandle();
+        return win->GetHandle();*/
 }
 //---------------------------------------------------------------------------
-*/
+
