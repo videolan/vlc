@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 * marque les points prioritaires
 + les points à ne pas oublier avant la fin de l'année
-- les trucs qu'il faudra faire, mais qui ne sont pas urgent
+- les trucs qu'il faudra faire, mais qui ne sont pas urgents
 ? les idées à discuter
 -----------------------------------------------------------------------------
 
@@ -26,13 +26,14 @@ Main
 
 Audio output
 ============
-    - detection automatique du materiel
-    ? penser à une nouvelle manière de remplir le buffer de sortie, tout en 
-        conservant l'algorithme de rééchantillonage...
+    * moyenne mobile des fréquences des décodeurs ;
+    - détection automatique du materiel ;
+    - 8/16 Bits, Signed/Unsigned, Mono/Stereo (sauf 16 Bits Signed Stereo) ;
 
 Audio decoder
 =============
-    * tout tout tout
+    * AC3 ;
+    - MPEG2 Layer I, II, III (sauf Layer II Stereo) ;
 
 Video output
 ============
@@ -109,5 +110,3 @@ Documentation
 =============
     - documentation des interfaces de programmation dès qu'elles sont
         au point. En LaTeX ? (pour latex2html).
-
-
