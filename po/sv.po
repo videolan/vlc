@@ -1551,12 +1551,12 @@ msgstr ""
 #: modules/gui/macosx/open.m:846 modules/gui/macosx/controls.m:573
 #, fuzzy
 msgid "Open"
-msgstr "…ppna fil"
+msgstr "Öppna fil"
 
 #: modules/gui/familiar/interface.c:91
 #, fuzzy
 msgid "Open file"
-msgstr "…ppna fil"
+msgstr "Öppna fil"
 
 #.
 #. * from modules/gui/win32/preferences.dfm:
@@ -1655,7 +1655,7 @@ msgstr ""
 #: modules/gui/familiar/interface.c:289
 #, fuzzy
 msgid "User"
-msgstr "Spola framŒt"
+msgstr "Spola framåt"
 
 #: modules/gui/familiar/interface.c:297
 msgid "Group"
@@ -1761,7 +1761,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:19 modules/gui/gtk/gnome_interface.c:1026
 #: modules/gui/gtk/gtk_interface.c:170 modules/gui/gtk/gtk_interface.c:1432
 msgid "_Open File..."
-msgstr "_…ppna fil..."
+msgstr "_Öppna fil..."
 
 #: modules/gui/gtk/gnome_interface.c:20 modules/gui/gtk/gnome_interface.c:509
 #: modules/gui/gtk/gnome_interface.c:1027 modules/gui/gtk/gtk_interface.c:178
@@ -1769,24 +1769,24 @@ msgstr "_…ppna fil..."
 #: modules/gui/win32/strings.cpp:94
 #, fuzzy
 msgid "Open a file"
-msgstr "…ppna fil"
+msgstr "Öppna fil"
 
 #: modules/gui/gtk/gnome_interface.c:26 modules/gui/gtk/gnome_interface.c:1033
 #: modules/gui/gtk/gtk_interface.c:185 modules/gui/gtk/gtk_interface.c:1444
 msgid "Open _Disc..."
-msgstr "_…ppna skiva..."
+msgstr "_Öppna skiva..."
 
 #: modules/gui/gtk/gnome_interface.c:27 modules/gui/gtk/gnome_interface.c:521
 #: modules/gui/gtk/gnome_interface.c:1034 modules/gui/gtk/gtk_interface.c:193
 #: modules/gui/gtk/gtk_interface.c:635 modules/gui/gtk/gtk_interface.c:1452
 #: modules/gui/win32/strings.cpp:96
 msgid "Open a DVD or VCD"
-msgstr "…ppna skiva"
+msgstr "Öppna skiva"
 
 #: modules/gui/gtk/gnome_interface.c:33 modules/gui/gtk/gnome_interface.c:1040
 #: modules/gui/gtk/gtk_interface.c:200 modules/gui/gtk/gtk_interface.c:1456
 msgid "_Network Stream..."
-msgstr "_…ppna nŠtverk..."
+msgstr "_Öppna nätverk..."
 
 #: modules/gui/gtk/gnome_interface.c:34 modules/gui/gtk/gnome_interface.c:533
 #: modules/gui/gtk/gnome_interface.c:1041 modules/gui/gtk/gtk_interface.c:208
@@ -1794,7 +1794,7 @@ msgstr "_…ppna nŠtverk..."
 #: modules/gui/win32/strings.cpp:98
 #, fuzzy
 msgid "Select a network stream"
-msgstr "_…ppna nŠtverk..."
+msgstr "_Öppna nätverk..."
 
 #: modules/gui/gtk/gnome_interface.c:41 modules/gui/gtk/gtk_interface.c:223
 msgid "_Eject Disc"
@@ -1865,7 +1865,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:438 modules/gui/gtk/gtk_interface.c:1276
 #, fuzzy
 msgid "_Language"
-msgstr "SprŒk"
+msgstr "Språk"
 
 #: modules/gui/gtk/gnome_interface.c:119 modules/gui/gtk/gnome_interface.c:943
 #: modules/gui/gtk/gtk_interface.c:447 modules/gui/win32/strings.cpp:60
@@ -1889,7 +1889,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:471 modules/gui/gtk/gtk_interface.c:1308
 #: modules/gui/macosx/intf.m:333 modules/gui/macosx/controls.m:737
 msgid "Mute"
-msgstr "StŠng av ljudet"
+msgstr "Stäng av ljudet"
 
 #: modules/gui/gtk/gnome_interface.c:148 modules/gui/gtk/gnome_interface.c:972
 #: modules/gui/gtk/gtk_interface.c:486 modules/gui/gtk/gtk_interface.c:1323
@@ -1917,7 +1917,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:175 modules/gui/gtk/gnome_interface.c:999
 #: modules/gui/gtk/gtk_interface.c:541 modules/gui/gtk/gtk_interface.c:1373
 msgid "_Fullscreen"
-msgstr "_HelskŠrm"
+msgstr "_Helskärm"
 
 #: modules/gui/gtk/gnome_interface.c:183
 #: modules/gui/gtk/gnome_interface.c:1007 modules/gui/gtk/gtk_interface.c:558
@@ -1931,11 +1931,11 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1397 modules/gui/macosx/intf.m:342
 #: modules/gui/macosx/vout.m:194 modules/gui/win32/strings.cpp:83
 msgid "Screen"
-msgstr "HelskŠrm"
+msgstr "Helskärm"
 
 #: modules/gui/gtk/gnome_interface.c:211 modules/gui/gtk/gtk_interface.c:420
 msgid "_Audio"
-msgstr "_NŠsta objekt"
+msgstr "_Nästa objekt"
 
 #: modules/gui/gtk/gnome_interface.c:218 modules/gui/gtk/gtk_interface.c:502
 msgid "_Video"
@@ -1967,7 +1967,7 @@ msgstr "Skiva"
 #: modules/gui/gtk/gnome_interface.c:532 modules/gui/gtk/gtk_interface.c:645
 #: modules/gui/win32/strings.cpp:97
 msgid "Net"
-msgstr "NŠtverk"
+msgstr "Nätverk"
 
 #: modules/gui/gtk/gnome_interface.c:544 modules/gui/gtk/gtk_interface.c:656
 msgid "Sat"
@@ -1981,11 +1981,11 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1075 modules/gui/gtk/gtk_interface.c:669
 #: modules/gui/gtk/gtk_interface.c:1175 modules/gui/win32/strings.cpp:99
 msgid "Back"
-msgstr "FšregŒende objekt"
+msgstr "Föregående objekt"
 
 #: modules/gui/gtk/gnome_interface.c:559 modules/gui/gtk/gtk_interface.c:670
 msgid "Go Backward"
-msgstr "FšregŒende objekt"
+msgstr "Föregående objekt"
 
 #: modules/gui/gtk/gnome_interface.c:572 modules/gui/gtk/gtk_interface.c:682
 msgid "Stop Stream"
@@ -2018,11 +2018,11 @@ msgstr "Slow Motion"
 #: modules/gui/gtk/gnome_interface.c:1089 modules/gui/gtk/gtk_interface.c:740
 #: modules/gui/gtk/gtk_interface.c:1191 modules/gui/win32/strings.cpp:110
 msgid "Fast"
-msgstr "Spola framŒt"
+msgstr "Spola framåt"
 
 #: modules/gui/gtk/gnome_interface.c:636 modules/gui/gtk/gtk_interface.c:741
 msgid "Play Faster"
-msgstr "Spola framŒt"
+msgstr "Spola framåt"
 
 #: modules/gui/gtk/gnome_interface.c:649 modules/gui/gtk/gtk_interface.c:753
 msgid "Open Playlist"
@@ -2034,13 +2034,13 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1214 modules/gui/win32/strings.cpp:112
 #: modules/gui/win32/strings.cpp:132 modules/gui/win32/strings.cpp:136
 msgid "Prev"
-msgstr "FšregŒende objekt"
+msgstr "Föregående objekt"
 
 #: modules/gui/gtk/gnome_interface.c:661 modules/gui/gtk/gtk_interface.c:764
 #: modules/gui/win32/strings.cpp:113
 #, fuzzy
 msgid "Previous file"
-msgstr "FšregŒende fil"
+msgstr "Föregående fil"
 
 #: modules/gui/gtk/gnome_interface.c:672
 #: modules/gui/gtk/gnome_interface.c:1097 modules/gui/gtk/gtk_interface.c:774
@@ -2050,11 +2050,11 @@ msgstr "FšregŒende fil"
 #: modules/gui/macosx/controls.m:696 modules/gui/win32/strings.cpp:114
 #: modules/gui/win32/strings.cpp:134 modules/gui/win32/strings.cpp:138
 msgid "Next"
-msgstr "NŠsta objekt"
+msgstr "Nästa objekt"
 
 #: modules/gui/gtk/gnome_interface.c:673 modules/gui/gtk/gtk_interface.c:775
 msgid "Next File"
-msgstr "NŠsta file"
+msgstr "Nästa file"
 
 #: modules/gui/gtk/gnome_interface.c:737 modules/gui/gtk/gtk_interface.c:835
 #: modules/gui/win32/strings.cpp:44
@@ -2259,7 +2259,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:2856 modules/gui/macosx/open.m:174
 #: modules/gui/macosx/open.m:334
 msgid "Network"
-msgstr "NŠtverk"
+msgstr "Nätverk"
 
 #: modules/gui/gtk/gnome_interface.c:1954 modules/gui/gtk/gtk_interface.c:2269
 msgid "Symbol Rate"
@@ -2310,7 +2310,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:2295 modules/gui/macosx/open.m:386
 #: modules/gui/macosx/open.m:422 modules/gui/macosx/open.m:845
 msgid "Open File"
-msgstr "…ppna fil"
+msgstr "Öppna fil"
 
 #: modules/gui/gtk/gnome_interface.c:2332
 msgid "Modules"
@@ -2630,7 +2630,7 @@ msgstr ""
 #: modules/gui/kde/interface.cpp:89
 #, fuzzy
 msgid "Languages"
-msgstr "SprŒk"
+msgstr "Språk"
 
 #: modules/gui/kde/interface.cpp:94 modules/gui/macosx/intf.m:328
 #: modules/gui/win32/strings.cpp:87
@@ -2666,7 +2666,7 @@ msgstr "Kontroller"
 #: modules/gui/macosx/intf.m:364 modules/gui/macosx/controls.m:695
 #, fuzzy
 msgid "Previous"
-msgstr "FšregŒende fil"
+msgstr "Föregående fil"
 
 #: modules/gui/macosx/intf.m:277 modules/gui/macosx/intf.m:320
 #: modules/gui/macosx/controls.m:675
@@ -2677,7 +2677,7 @@ msgstr "Slow Motion"
 #: modules/gui/macosx/controls.m:674
 #, fuzzy
 msgid "Faster"
-msgstr "Spola framŒt"
+msgstr "Spola framåt"
 
 #: modules/gui/macosx/intf.m:283
 msgid "Volume"
@@ -2703,11 +2703,11 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:296
 msgid "Hide VLC"
-msgstr "Gšm VLC"
+msgstr "Göm VLC"
 
 #: modules/gui/macosx/intf.m:297
 msgid "Hide Others"
-msgstr "Gšm andra"
+msgstr "Göm andra"
 
 #: modules/gui/macosx/intf.m:298
 msgid "Show All"
@@ -2721,27 +2721,27 @@ msgstr "Avsluta VLC"
 #: modules/gui/macosx/intf.m:302
 #, fuzzy
 msgid "Open..."
-msgstr "…ppna fil"
+msgstr "Öppna fil"
 
 #: modules/gui/macosx/intf.m:303 modules/gui/win32/strings.cpp:90
 #, fuzzy
 msgid "Open File..."
-msgstr "_…ppna fil..."
+msgstr "_Öppna fil..."
 
 #: modules/gui/macosx/intf.m:304 modules/gui/win32/strings.cpp:91
 #, fuzzy
 msgid "Open Disc..."
-msgstr "_…ppna skiva..."
+msgstr "_Öppna skiva..."
 
 #: modules/gui/macosx/intf.m:305
 #, fuzzy
 msgid "Open Network..."
-msgstr "…ppna nŠtverk"
+msgstr "Öppna nätverk"
 
 #: modules/gui/macosx/intf.m:306
 #, fuzzy
 msgid "Open Recent"
-msgstr "…ppna nŠtverk"
+msgstr "Öppna nätverk"
 
 #. Recent Items Menu
 #: modules/gui/macosx/intf.m:307 modules/gui/macosx/intf.m:1469
@@ -2784,7 +2784,7 @@ msgstr "Repetera"
 #: modules/gui/macosx/intf.m:327 modules/gui/win32/strings.cpp:86
 #, fuzzy
 msgid "Language"
-msgstr "SprŒk"
+msgstr "Språk"
 
 #: modules/gui/macosx/intf.m:338 modules/gui/macosx/controls.m:755
 msgid "Half Size"
@@ -2800,11 +2800,11 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:341 modules/gui/macosx/controls.m:754
 msgid "Fullscreen"
-msgstr "HelskŠrm"
+msgstr "Helskärm"
 
 #: modules/gui/macosx/intf.m:345
 msgid "Window"
-msgstr "Fšnster"
+msgstr "Fönster"
 
 #: modules/gui/macosx/intf.m:346
 #, fuzzy
@@ -2814,7 +2814,7 @@ msgstr "Minimera"
 #: modules/gui/macosx/intf.m:347
 #, fuzzy
 msgid "Close Window"
-msgstr "Fšnster"
+msgstr "Fönster"
 
 #: modules/gui/macosx/intf.m:348
 #, fuzzy
@@ -2823,7 +2823,7 @@ msgstr "Kontroller"
 
 #: modules/gui/macosx/intf.m:352
 msgid "Bring All to Front"
-msgstr "LŠgg alla šverst"
+msgstr "Lägg alla överst"
 
 #: modules/gui/macosx/intf.m:354
 msgid "Help"
@@ -2874,7 +2874,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:1227
 #, c-format
 msgid "Language 0x%x"
-msgstr "SprŒk 0x%x"
+msgstr "Språk 0x%x"
 
 #: modules/gui/macosx/intf.m:1432
 msgid "No CrashLog found"
@@ -2889,7 +2889,7 @@ msgstr ""
 #: modules/gui/macosx/open.m:165
 #, fuzzy
 msgid "Open Source"
-msgstr "…ppna nŠtverk"
+msgstr "Öppna nätverk"
 
 #: modules/gui/macosx/open.m:167
 msgid "Only enqueue in playlist. Do not play."
@@ -2928,7 +2928,7 @@ msgstr ""
 #: modules/gui/macosx/open.m:757
 #, fuzzy
 msgid "Save File"
-msgstr "NŠsta file"
+msgstr "Nästa file"
 
 #: modules/gui/macosx/controls.m:572
 #, fuzzy
@@ -2938,7 +2938,7 @@ msgstr "Markera allt"
 #: modules/gui/macosx/vout.m:956
 #, c-format
 msgid "Screen %d"
-msgstr "HelskŠrm %d"
+msgstr "Helskärm %d"
 
 #: modules/gui/ncurses/ncurses.c:66
 msgid "ncurses interface module"
@@ -2979,7 +2979,7 @@ msgstr ""
 #: modules/gui/win32/strings.cpp:19
 #, fuzzy
 msgid "Open Disc"
-msgstr "…ppna skiva"
+msgstr "Öppna skiva"
 
 #: modules/gui/win32/strings.cpp:20
 msgid "Device &name:"
@@ -3040,17 +3040,17 @@ msgstr "Arkiv"
 #: modules/gui/win32/strings.cpp:48
 #, fuzzy
 msgid "Open &file..."
-msgstr "_…ppna fil..."
+msgstr "_Öppna fil..."
 
 #: modules/gui/win32/strings.cpp:49
 #, fuzzy
 msgid "Open &disc..."
-msgstr "_…ppna skiva..."
+msgstr "_Öppna skiva..."
 
 #: modules/gui/win32/strings.cpp:50
 #, fuzzy
 msgid "&Network stream..."
-msgstr "_…ppna nŠtverk..."
+msgstr "_Öppna nätverk..."
 
 #: modules/gui/win32/strings.cpp:51
 msgid "&View"
@@ -3059,7 +3059,7 @@ msgstr ""
 #: modules/gui/win32/strings.cpp:52
 #, fuzzy
 msgid "&Hide interface"
-msgstr "Gšm andra"
+msgstr "Göm andra"
 
 #: modules/gui/win32/strings.cpp:54
 msgid "&Playlist..."
@@ -3068,12 +3068,12 @@ msgstr ""
 #: modules/gui/win32/strings.cpp:55
 #, fuzzy
 msgid "&Add interface"
-msgstr "Gšm andra"
+msgstr "Göm andra"
 
 #: modules/gui/win32/strings.cpp:56
 #, fuzzy
 msgid "Spawn a new interface"
-msgstr "Gšm andra"
+msgstr "Göm andra"
 
 #: modules/gui/win32/strings.cpp:57
 #, fuzzy
@@ -3092,7 +3092,7 @@ msgstr "Kanal:"
 #: modules/gui/win32/strings.cpp:61
 #, fuzzy
 msgid "Sc&reen"
-msgstr "HelskŠrm"
+msgstr "Helskärm"
 
 #: modules/gui/win32/strings.cpp:62
 msgid "&Program"
@@ -3120,7 +3120,7 @@ msgstr "Markera allt"
 #: modules/gui/win32/strings.cpp:70
 #, fuzzy
 msgid "&Language"
-msgstr "SprŒk"
+msgstr "Språk"
 
 #: modules/gui/win32/strings.cpp:72
 #, fuzzy
@@ -3163,7 +3163,7 @@ msgstr "Paus"
 #: modules/gui/win32/strings.cpp:92
 #, fuzzy
 msgid "Network Stream..."
-msgstr "_…ppna nŠtverk..."
+msgstr "_Öppna nätverk..."
 
 #: modules/gui/win32/strings.cpp:109
 #, fuzzy
@@ -3173,12 +3173,12 @@ msgstr "Slow Motion"
 #: modules/gui/win32/strings.cpp:111
 #, fuzzy
 msgid "Play faster"
-msgstr "Spola framŒt"
+msgstr "Spola framåt"
 
 #: modules/gui/win32/strings.cpp:115
 #, fuzzy
 msgid "Next file"
-msgstr "NŠsta file"
+msgstr "Nästa file"
 
 #: modules/gui/win32/strings.cpp:116
 msgid "&Stream output..."
@@ -3205,7 +3205,7 @@ msgstr "_Avsluta"
 #: modules/gui/win32/strings.cpp:124
 #, fuzzy
 msgid "&Fullscreen"
-msgstr "HelskŠrm"
+msgstr "Helskärm"
 
 #: modules/gui/win32/strings.cpp:126
 msgid "Preferences..."
@@ -3240,7 +3240,7 @@ msgstr ""
 #: modules/gui/win32/strings.cpp:144
 #, fuzzy
 msgid "&Mute"
-msgstr "StŠng av ljudet"
+msgstr "Stäng av ljudet"
 
 #: modules/gui/win32/strings.cpp:145
 msgid "Toggle mute"
@@ -3264,12 +3264,12 @@ msgstr ""
 #: modules/gui/win32/strings.cpp:161
 #, fuzzy
 msgid "Open network"
-msgstr "…ppna nŠtverk"
+msgstr "Öppna nätverk"
 
 #: modules/gui/win32/strings.cpp:162
 #, fuzzy
 msgid "Network mode"
-msgstr "NŠtverk"
+msgstr "Nätverk"
 
 #: modules/gui/win32/strings.cpp:163 modules/gui/win32/strings.cpp:164
 #: modules/gui/win32/strings.cpp:165 modules/gui/win32/strings.cpp:223
@@ -3288,17 +3288,17 @@ msgstr ""
 #: modules/gui/win32/strings.cpp:185
 #, fuzzy
 msgid "&File..."
-msgstr "_…ppna fil..."
+msgstr "_Öppna fil..."
 
 #: modules/gui/win32/strings.cpp:186
 #, fuzzy
 msgid "&Disc..."
-msgstr "_…ppna skiva..."
+msgstr "_Öppna skiva..."
 
 #: modules/gui/win32/strings.cpp:187
 #, fuzzy
 msgid "&Network..."
-msgstr "NŠtverk"
+msgstr "Nätverk"
 
 #: modules/gui/win32/strings.cpp:188
 msgid "&Url"
@@ -3860,7 +3860,7 @@ msgid "xosd interface module"
 msgstr ""
 
 #~ msgid "A_udio"
-#~ msgstr "_SprŒk"
+#~ msgstr "_Språk"
 
 #, fuzzy
 #~ msgid "file://"
@@ -3868,32 +3868,32 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Play/Pause"
-#~ msgstr "Spola framŒt"
+#~ msgstr "Spola framåt"
 
 #~ msgid "Open a File"
-#~ msgstr "…ppna fil"
+#~ msgstr "Öppna fil"
 
 #, fuzzy
 #~ msgid "Open file..."
-#~ msgstr "_…ppna fil..."
+#~ msgstr "_Öppna fil..."
 
 #, fuzzy
 #~ msgid "Open disc..."
-#~ msgstr "_…ppna skiva..."
+#~ msgstr "_Öppna skiva..."
 
 #, fuzzy
 #~ msgid "Network stream..."
-#~ msgstr "_…ppna nŠtverk..."
+#~ msgstr "_Öppna nätverk..."
 
 #~ msgid "Previous File"
-#~ msgstr "FšregŒende fil"
+#~ msgstr "Föregående fil"
 
 #, fuzzy
 #~ msgid "Toggle fullscreen"
-#~ msgstr "HelskŠrm"
+#~ msgstr "Helskärm"
 
 #~ msgid "Jump to previous title"
-#~ msgstr "FšregŒende fil"
+#~ msgstr "Föregående fil"
 
 #, fuzzy
 #~ msgid "Channel Server"
