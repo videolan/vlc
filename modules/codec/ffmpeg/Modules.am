@@ -3,6 +3,7 @@ SOURCES_ffmpeg = \
 	ffmpeg.h \
 	video.c \
 	audio.c \
+	video_filter.c \
 	chroma.c \
 	encoder.c \
 	postprocess.c \
@@ -14,6 +15,7 @@ SOURCES_ffmpegaltivec = \
 	ffmpeg.h \
 	video.c \
 	audio.c \
+	video_filter.c \
 	chroma.c \
 	encoder.c \
 	postprocess.c \

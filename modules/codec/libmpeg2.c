@@ -430,7 +430,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_sys->p_info->current_picture->nb_fields, i_pts, i_dts,
                 p_sys->i_current_rate );
 
-            if ( !(p_sys->b_slice_i
+            if( !p_dec->b_pace_control &&
+                !(p_sys->b_slice_i
                    && ((p_sys->p_info->current_picture->flags
                          & PIC_MASK_CODING_TYPE) == P_CODING_TYPE))
                    && !vout_SynchroChoose( p_sys->p_synchro,

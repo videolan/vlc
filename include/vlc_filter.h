@@ -45,18 +45,18 @@ struct filter_t
     module_t *          p_module;
     filter_sys_t *     p_sys;
 
+    /* Input format */
+    es_format_t         fmt_in;
+
+    /* Output format of filter */
+    es_format_t         fmt_out;
+
     void                ( * pf_video_blend )  ( filter_t *, picture_t *,
                                                 picture_t *, picture_t *,
                                                 int, int );
     picture_t *         ( * pf_video_filter ) ( filter_t *, picture_t * );
 
     subpicture_t *      ( *pf_render_string ) ( filter_t *, block_t * );
-
-    /* Input format */
-    es_format_t         fmt_in;
-
-    /* Output format of filter */
-    es_format_t         fmt_out;
 
     /*
      * Buffers allocation

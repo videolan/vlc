@@ -38,6 +38,7 @@ void E_(InitLibavcodec)( vlc_object_t * );
 int E_(GetFfmpegCodec) ( vlc_fourcc_t, int *, int *, char ** );
 int E_(GetVlcFourcc)   ( int, int *, vlc_fourcc_t *, char ** );
 int E_(GetFfmpegChroma)( vlc_fourcc_t );
+vlc_fourcc_t E_(GetVlcChroma)( int );
 
 /* Video decoder module */
 int  E_( InitVideoDec )( decoder_t *, AVCodecContext *, AVCodec *,
@@ -66,6 +67,10 @@ void E_(CloseAudioEncoder)( vlc_object_t * );
 /* Demux module */
 int  E_(OpenDemux) ( vlc_object_t * );
 void E_(CloseDemux)( vlc_object_t * );
+
+/* Video filter module */
+int  E_(OpenFilter)( vlc_object_t * );
+void E_(CloseFilter)( vlc_object_t * );
 
 /* Postprocessing module */
 void *E_(OpenPostproc)( decoder_t *, vlc_bool_t * );

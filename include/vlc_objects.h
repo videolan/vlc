@@ -53,6 +53,7 @@
 #define VLC_OBJECT_ACCESS     (-19)
 #define VLC_OBJECT_STREAM     (-20)
 #define VLC_OBJECT_OPENGL     (-21)
+#define VLC_OBJECT_FILTER     (-22)
 
 #define VLC_OBJECT_GENERIC  (-666)
 

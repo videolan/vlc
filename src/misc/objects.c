@@ -47,6 +47,7 @@
 #include "vlc_playlist.h"
 #include "vlc_interface.h"
 #include "vlc_codec.h"
+#include "vlc_filter.h"
 
 #include "vlc_httpd.h"
 #include "vlc_vlm.h"
@@ -149,6 +150,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             i_size = sizeof(encoder_t);
             psz_type = "encoder";
             break;
+        case VLC_OBJECT_FILTER:
+            i_size = sizeof(filter_t);
+            psz_type = "filter";
+            break;
         case VLC_OBJECT_VOUT:
             i_size = sizeof(vout_thread_t);
             psz_type = "video output";
@@ -194,12 +199,7 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
     else
     {
         p_new = malloc( i_size );
-
-        if( !p_new )
-        {
-            return NULL;
-        }
-
+        if( !p_new ) return NULL;
         memset( p_new, 0, i_size );
     }
 

@@ -4,7 +4,7 @@
  * Copyright (C) 1999-2001 VideoLAN
  * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,67 +72,8 @@ int E_(OpenChroma)( vlc_object_t *p_this )
     i_vlc_chroma[1] = p_vout->output.i_chroma;
     for( i = 0; i < 2; i++ )
     {
-        switch( i_vlc_chroma[i] )
-        {
-
-        /* Planar YUV formats */
-        case VLC_FOURCC('I','4','4','4'):
-            i_ffmpeg_chroma[i] = PIX_FMT_YUV444P;
-            break;
-
-        case VLC_FOURCC('I','4','2','2'):
-            i_ffmpeg_chroma[i] = PIX_FMT_YUV422P;
-            break;
-
-        case VLC_FOURCC('Y','V','1','2'):
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('I','Y','U','V'):
-            i_ffmpeg_chroma[i] = PIX_FMT_YUV420P;
-            break;
-
-        case VLC_FOURCC('I','4','1','1'):
-            i_ffmpeg_chroma[i] = PIX_FMT_YUV411P;
-            break;
-
-        case VLC_FOURCC('I','4','1','0'):
-        case VLC_FOURCC('Y','V','U','9'):
-            i_ffmpeg_chroma[i] = PIX_FMT_YUV410P;
-            break;
-
-        /* Packed YUV formats */
-
-        case VLC_FOURCC('Y','U','Y','2'):
-        case VLC_FOURCC('U','Y','V','Y'):
-            i_ffmpeg_chroma[i] = PIX_FMT_YUV422;
-            break;
-
-        /* Packed RGB formats */
-
-        case VLC_FOURCC('R','V','3','2'):
-            i_ffmpeg_chroma[i] = PIX_FMT_RGBA32;
-            break;
-
-        case VLC_FOURCC('R','V','2','4'):
-            i_ffmpeg_chroma[i] = PIX_FMT_RGB24;
-            //i_ffmpeg_chroma[i] = PIX_FMT_BGR24;
-            break;
-
-        case VLC_FOURCC('R','V','1','6'):
-            i_ffmpeg_chroma[i] = PIX_FMT_RGB565;
-            break;
-
-        case VLC_FOURCC('R','V','1','5'):
-            i_ffmpeg_chroma[i] = PIX_FMT_RGB555;
-            break;
-
-        case VLC_FOURCC('R','G','B','2'):
-            i_ffmpeg_chroma[i] = PIX_FMT_GRAY8;
-            break;
-
-        default:
-            return VLC_EGENERIC;
-            break;
-        }
+        i_ffmpeg_chroma[i] = E_(GetFfmpegChroma)( i_vlc_chroma[i] );
+        if( i_ffmpeg_chroma[i] < 0 ) return VLC_EGENERIC;
     }
 
     p_vout->chroma.pf_convert = ChromaConversion;

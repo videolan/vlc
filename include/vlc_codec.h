@@ -46,19 +46,22 @@ struct decoder_t
     module_t *          p_module;
     decoder_sys_t *     p_sys;
 
-    picture_t *         ( * pf_decode_video )( decoder_t *, block_t ** );
-    aout_buffer_t *     ( * pf_decode_audio )( decoder_t *, block_t ** );
-    subpicture_t *      ( * pf_decode_sub)   ( decoder_t *, block_t ** );
-    block_t *           ( * pf_packetize )   ( decoder_t *, block_t ** );
-
-    /* Some decoders only accept packetized data (ie. not truncated) */
-    vlc_bool_t          b_need_packetized;
-
     /* Input format ie from demuxer (XXX: a lot of field could be invalid) */
     es_format_t         fmt_in;
 
     /* Output format of decoder/packetizer */
     es_format_t         fmt_out;
+
+    /* Some decoders only accept packetized data (ie. not truncated) */
+    vlc_bool_t          b_need_packetized;
+
+    /* Tell the decoder if it is allowed to drop frames */
+    vlc_bool_t          b_pace_control;
+
+    picture_t *         ( * pf_decode_video )( decoder_t *, block_t ** );
+    aout_buffer_t *     ( * pf_decode_audio )( decoder_t *, block_t ** );
+    subpicture_t *      ( * pf_decode_sub)   ( decoder_t *, block_t ** );
+    block_t *           ( * pf_packetize )   ( decoder_t *, block_t ** );
 
     /*
      * Buffers allocation
@@ -102,16 +105,15 @@ struct encoder_t
     module_t *          p_module;
     encoder_sys_t *     p_sys;
 
-    block_t *           ( * pf_header )( encoder_t * );
-    block_t *           ( * pf_encode_video )( encoder_t *, picture_t * );
-    block_t *           ( * pf_encode_audio )( encoder_t *, aout_buffer_t * );
-    block_t *           ( * pf_encode_sub )( encoder_t *, subpicture_t * );
-
     /* Properties of the input data fed to the encoder */
     es_format_t         fmt_in;
 
     /* Properties of the output of the encoder */
     es_format_t         fmt_out;
+
+    block_t *           ( * pf_encode_video )( encoder_t *, picture_t * );
+    block_t *           ( * pf_encode_audio )( encoder_t *, aout_buffer_t * );
+    block_t *           ( * pf_encode_sub )( encoder_t *, subpicture_t * );
 
     /* Common encoder options */
     int i_threads;               /* Number of threads to use during encoding */

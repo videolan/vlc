@@ -428,7 +428,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( p_sys->i_late_frames > 0 &&
+    if( !p_dec->b_pace_control && p_sys->i_late_frames > 0 &&
         mdate() - p_sys->i_late_frames_start > I64C(5000000) )
     {
         if( p_sys->i_pts )
@@ -453,7 +453,8 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
 
     /* TODO implement it in a better way */
     /* A good idea could be to decode all I pictures and see for the other */
-    if( p_sys->b_hurry_up && p_sys->i_late_frames > 4 )
+    if( !p_dec->b_pace_control &&
+        p_sys->b_hurry_up && p_sys->i_late_frames > 4 )
     {
         b_drawpicture = 0;
         if( p_sys->i_late_frames < 8 )
@@ -622,6 +623,13 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
                 p_sys->b_first_frame = VLC_FALSE;
                 p_pic->b_force = VLC_TRUE;
             }
+
+            p_pic->i_nb_fields = p_sys->p_ff_pic->repeat_pict;
+#if LIBAVCODEC_BUILD >= 4685
+            p_pic->b_progressive = !p_sys->p_ff_pic->interlaced_frame;
+            p_pic->b_top_field_first = p_sys->p_ff_pic->top_field_first;
+#endif
+
             return p_pic;
         }
         else

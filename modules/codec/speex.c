@@ -92,7 +92,6 @@ static void ParseSpeexComments( decoder_t *, ogg_packet * );
 
 static int OpenEncoder   ( vlc_object_t * );
 static void CloseEncoder ( vlc_object_t * );
-static block_t *Headers  ( encoder_t * );
 static block_t *Encode   ( encoder_t *, aout_buffer_t * );
 
 /*****************************************************************************
@@ -517,8 +516,6 @@ struct encoder_sys_t
     /*
      * Input properties
      */
-    int i_headers;
-
     char *p_buffer;
     char p_buffer_out[MAX_FRAME_BYTES];
 
@@ -551,7 +548,10 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
     const SpeexMode *p_speex_mode = &speex_nb_mode;
-    int i_quality;
+    int i_quality, i;
+    char *pp_header[2];
+    int pi_header[2];
+    uint8_t *p_extra;
 
     if( p_enc->fmt_out.i_codec != VLC_FOURCC('s','p','x',' ') &&
         !p_enc->b_force )
@@ -566,7 +566,6 @@ static int OpenEncoder( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     p_enc->p_sys = p_sys;
-    p_enc->pf_header = Headers;
     p_enc->pf_encode_audio = Encode;
     p_enc->fmt_in.i_codec = AOUT_FMT_S16_NE;
     p_enc->fmt_out.i_codec = VLC_FOURCC('s','p','x',' ');
@@ -590,7 +589,6 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     p_sys->i_frames_in_packet = 0;
     p_sys->i_samples_delay = 0;
-    p_sys->i_headers = 0;
     p_sys->i_pts = 0;
 
     speex_encoder_ctl( p_sys->p_state, SPEEX_GET_FRAME_SIZE,
@@ -600,47 +598,27 @@ static int OpenEncoder( vlc_object_t *p_this )
         sizeof(int16_t) * p_enc->fmt_in.audio.i_channels;
     p_sys->p_buffer = malloc( p_sys->i_frame_size );
 
+    /* Create and store headers */
+    pp_header[0] = speex_header_to_packet( &p_sys->header, &pi_header[0] );
+    pp_header[1] = "ENCODER=VLC media player";
+    pi_header[1] = sizeof("ENCODER=VLC media player");
+
+    p_enc->fmt_out.i_extra = 1 + 3 * 2 + pi_header[0] + pi_header[1];
+    p_extra = p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
+    *(p_extra++) = 2; /* number of headers */
+    for( i = 0; i < 2; i++ )
+    {
+        *(p_extra++) = pi_header[i] >> 8;
+        *(p_extra++) = pi_header[i] & 0xFF;
+        memcpy( p_extra, pp_header[i], pi_header[i] );
+        p_extra += pi_header[i];
+    }
+
     msg_Dbg( p_enc, "encoding: frame size:%d, channels:%d, samplerate:%d",
              p_sys->i_frame_size, p_enc->fmt_in.audio.i_channels,
              p_enc->fmt_in.audio.i_rate );
 
     return VLC_SUCCESS;
-}
-
-/****************************************************************************
- * Headers: spits out the headers
- ****************************************************************************
- * This function spits out ogg packets.
- ****************************************************************************/
-static block_t *Headers( encoder_t *p_enc )
-{
-    encoder_sys_t *p_sys = p_enc->p_sys;
-    block_t *p_block, *p_chain = NULL;
-
-    /* Create speex headers */
-    if( !p_sys->i_headers )
-    {
-        char *p_buffer;
-        int i_buffer;
-
-        /* Main header */
-        p_buffer = speex_header_to_packet( &p_sys->header, &i_buffer );
-        p_block = block_New( p_enc, i_buffer );
-        memcpy( p_block->p_buffer, p_buffer, i_buffer );
-        p_block->i_dts = p_block->i_pts = p_block->i_length = 0;
-        block_ChainAppend( &p_chain, p_block );
-
-        /* Comment */
-        p_block = block_New( p_enc, sizeof("ENCODER=VLC media player") );
-        memcpy( p_block->p_buffer, "ENCODER=VLC media player",
-                p_block->i_buffer );
-        p_block->i_dts = p_block->i_pts = p_block->i_length = 0;
-        block_ChainAppend( &p_chain, p_block );
-
-        p_sys->i_headers = 2;
-    }
-
-    return p_chain;
 }
 
 /****************************************************************************

@@ -117,7 +117,6 @@ static void Interleave   ( float *, const float **, int, int );
 #ifndef MODULE_NAME_IS_tremor
 static int OpenEncoder   ( vlc_object_t * );
 static void CloseEncoder ( vlc_object_t * );
-static block_t *Headers  ( encoder_t * );
 static block_t *Encode   ( encoder_t *, aout_buffer_t * );
 #endif
 
@@ -549,15 +548,10 @@ static void CloseDecoder( vlc_object_t *p_this )
 #if defined(HAVE_VORBIS_VORBISENC_H) && !defined(MODULE_NAME_IS_tremor)
 
 /*****************************************************************************
- * encoder_sys_t : theora encoder descriptor
+ * encoder_sys_t : vorbis encoder descriptor
  *****************************************************************************/
 struct encoder_sys_t
 {
-    /*
-     * Input properties
-     */
-    int i_headers;
-
     /*
      * Vorbis properties
      */
@@ -586,8 +580,10 @@ static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
-    int i_quality, i_min_bitrate, i_max_bitrate;
+    int i_quality, i_min_bitrate, i_max_bitrate, i;
+    ogg_packet header[3];
     vlc_value_t val;
+    uint8_t *p_extra;
 
     if( p_enc->fmt_out.i_codec != VLC_FOURCC('v','o','r','b') &&
         !p_enc->b_force )
@@ -603,7 +599,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     }
     p_enc->p_sys = p_sys;
 
-    p_enc->pf_header = Headers;
     p_enc->pf_encode_audio = Encode;
     p_enc->fmt_in.i_codec = VLC_FOURCC('f','l','3','2');
     p_enc->fmt_out.i_codec = VLC_FOURCC('v','o','r','b');
@@ -671,54 +666,35 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     vorbis_encode_setup_init( &p_sys->vi );
 
-    /* add a comment */
+    /* Add a comment */
     vorbis_comment_init( &p_sys->vc);
     vorbis_comment_add_tag( &p_sys->vc, "ENCODER", "VLC media player");
 
-    /* set up the analysis state and auxiliary encoding storage */
+    /* Set up the analysis state and auxiliary encoding storage */
     vorbis_analysis_init( &p_sys->vd, &p_sys->vi );
     vorbis_block_init( &p_sys->vd, &p_sys->vb );
+
+    /* Create and store headers */
+    vorbis_analysis_headerout( &p_sys->vd, &p_sys->vc,
+                               &header[0], &header[1], &header[2]);
+    p_enc->fmt_out.i_extra = 1 + 3 * 2 + header[0].bytes +
+       header[1].bytes + header[2].bytes;
+    p_extra = p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
+    *(p_extra++) = 3; /* number of headers */
+    for( i = 0; i < 3; i++ )
+    {
+        *(p_extra++) = header[i].bytes >> 8;
+        *(p_extra++) = header[i].bytes & 0xFF;
+        memcpy( p_extra, header[i].packet, header[i].bytes );
+        p_extra += header[i].bytes;
+    }
 
     p_sys->i_channels = p_enc->fmt_in.audio.i_channels;
     p_sys->i_last_block_size = 0;
     p_sys->i_samples_delay = 0;
-    p_sys->i_headers = 0;
     p_sys->i_pts = 0;
 
     return VLC_SUCCESS;
-}
-
-/****************************************************************************
- * Encode: the whole thing
- ****************************************************************************
- * This function spits out ogg packets.
- ****************************************************************************/
-static block_t *Headers( encoder_t *p_enc )
-{
-    encoder_sys_t *p_sys = p_enc->p_sys;
-    block_t *p_block, *p_chain = NULL;
-
-    /* Create theora headers */
-    if( !p_sys->i_headers )
-    {
-        ogg_packet header[3];
-        int i;
-
-        vorbis_analysis_headerout( &p_sys->vd, &p_sys->vc,
-                                   &header[0], &header[1], &header[2]);
-        for( i = 0; i < 3; i++ )
-        {
-            p_block = block_New( p_enc, header[i].bytes );
-            memcpy( p_block->p_buffer, header[i].packet, header[i].bytes );
-
-            p_block->i_dts = p_block->i_pts = p_block->i_length = 0;
-
-            block_ChainAppend( &p_chain, p_block );
-        }
-        p_sys->i_headers = 3;
-    }
-
-    return p_chain;
 }
 
 /****************************************************************************
@@ -791,7 +767,7 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
 }
 
 /*****************************************************************************
- * CloseEncoder: theora encoder destruction
+ * CloseEncoder: vorbis encoder destruction
  *****************************************************************************/
 static void CloseEncoder( vlc_object_t *p_this )
 {

@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -160,8 +160,14 @@ vlc_module_begin();
     /* demux submodule */
     add_submodule();
     set_description( _("ffmpeg demuxer" ) );
-    set_capability( "demux2", 1 );
+    set_capability( "demux2", 2 );
     set_callbacks( E_(OpenDemux), E_(CloseDemux) );
+
+    /* video filter submodule */
+    add_submodule();
+    set_capability( "video filter2", 50 );
+    set_callbacks( E_(OpenFilter), E_(CloseFilter) );
+    set_description( _("ffmpeg video filter") );
 
     var_Create( p_module->p_libvlc, "avcodec", VLC_VAR_MUTEX );
 vlc_module_end();
@@ -283,33 +289,6 @@ static void CloseDecoder( vlc_object_t *p_this )
 /*****************************************************************************
  * local Functions
  *****************************************************************************/
-int E_(GetFfmpegChroma)( vlc_fourcc_t i_chroma )
-{
-    switch( i_chroma )
-    {
-    case VLC_FOURCC( 'I', '4', '2', '0' ):
-        return PIX_FMT_YUV420P;
-    case VLC_FOURCC( 'I', '4', '2', '2' ):
-        return PIX_FMT_YUV422P;
-    case VLC_FOURCC( 'I', '4', '4', '4' ):
-        return PIX_FMT_YUV444P;
-    case VLC_FOURCC( 'R', 'V', '1', '5' ):
-        return PIX_FMT_RGB555;
-    case VLC_FOURCC( 'R', 'V', '1', '6' ):
-        return PIX_FMT_RGB565;
-    case VLC_FOURCC( 'R', 'V', '2', '4' ):
-        return PIX_FMT_RGB24;
-    case VLC_FOURCC( 'R', 'V', '3', '2' ):
-        return PIX_FMT_RGBA32;
-    case VLC_FOURCC( 'G', 'R', 'E', 'Y' ):
-        return PIX_FMT_GRAY8;
-    case VLC_FOURCC( 'Y', 'U', 'Y', '2' ):
-        return PIX_FMT_YUV422;
-    default:
-        return -1;
-    }
-}
-
 void E_(InitLibavcodec)( vlc_object_t *p_object )
 {
     static int b_ffmpeginit = 0;
@@ -336,7 +315,67 @@ void E_(InitLibavcodec)( vlc_object_t *p_object )
     vlc_mutex_unlock( lockval.p_address );
 }
 
+/*****************************************************************************
+ * Chroma fourcc -> ffmpeg_id mapping
+ *****************************************************************************/
+static struct
+{
+    vlc_fourcc_t  i_chroma;
+    int  i_chroma_id;
 
+} chroma_table[] =
+{
+    /* Planar YUV formats */
+    { VLC_FOURCC('I','4','4','4'), PIX_FMT_YUV444P },
+    { VLC_FOURCC('I','4','2','2'), PIX_FMT_YUV422P },
+    { VLC_FOURCC('I','4','2','0'), PIX_FMT_YUV420P },
+    { VLC_FOURCC('Y','V','1','2'), PIX_FMT_YUV420P },
+    { VLC_FOURCC('I','Y','U','V'), PIX_FMT_YUV420P },
+    { VLC_FOURCC('I','4','1','1'), PIX_FMT_YUV411P },
+    { VLC_FOURCC('I','4','1','0'), PIX_FMT_YUV410P },
+    { VLC_FOURCC('Y','V','U','9'), PIX_FMT_YUV410P },
+
+    /* Packed YUV formats */
+    { VLC_FOURCC('Y','U','Y','2'), PIX_FMT_YUV422 },
+    { VLC_FOURCC('U','Y','V','Y'), PIX_FMT_YUV422 },
+
+    /* Packed RGB formats */
+    { VLC_FOURCC('R','V','1','5'), PIX_FMT_RGB555 },
+    { VLC_FOURCC('R','V','1','6'), PIX_FMT_RGB565 },
+    { VLC_FOURCC('R','V','2','4'), PIX_FMT_RGB24 },
+    { VLC_FOURCC('R','V','3','2'), PIX_FMT_RGBA32 },
+    { VLC_FOURCC('G','R','E','Y'), PIX_FMT_GRAY8 },
+
+    {0}
+};
+
+int E_(GetFfmpegChroma)( vlc_fourcc_t i_chroma )
+{
+    int i;
+
+    for( i = 0; chroma_table[i].i_chroma != 0; i++ )
+    {
+        if( chroma_table[i].i_chroma == i_chroma )
+            return chroma_table[i].i_chroma_id;
+    }
+    return -1;
+}
+
+vlc_fourcc_t E_(GetVlcChroma)( int i_ffmpeg_chroma )
+{
+    int i;
+
+    for( i = 0; chroma_table[i].i_chroma != 0; i++ )
+    {
+        if( chroma_table[i].i_chroma_id == i_ffmpeg_chroma )
+            return chroma_table[i].i_chroma;
+    }
+    return 0;
+}
+
+/*****************************************************************************
+ * Codec fourcc -> ffmpeg_id mapping
+ *****************************************************************************/
 static struct
 {
     vlc_fourcc_t  i_fourcc;

@@ -76,7 +76,6 @@ static void theora_CopyPicture( decoder_t *, picture_t *, yuv_buffer * );
 
 static int  OpenEncoder( vlc_object_t *p_this );
 static void CloseEncoder( vlc_object_t *p_this );
-static block_t *Headers( encoder_t *p_enc );
 static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
 
 /*****************************************************************************
@@ -460,8 +459,10 @@ static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
+    ogg_packet header[3];
+    uint8_t *p_extra;
     vlc_value_t val;
-    int i_quality;
+    int i_quality, i;
 
     if( p_enc->fmt_out.i_codec != VLC_FOURCC('t','h','e','o') &&
         !p_enc->b_force )
@@ -486,7 +487,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     }
     p_enc->p_sys = p_sys;
 
-    p_enc->pf_header = Headers;
     p_enc->pf_encode_video = Encode;
     p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
     p_enc->fmt_out.i_codec = VLC_FOURCC('t','h','e','o');
@@ -548,54 +548,23 @@ static int OpenEncoder( vlc_object_t *p_this )
     theora_info_clear( &p_sys->ti );
     theora_comment_init( &p_sys->tc );
 
-    p_sys->b_headers = VLC_FALSE;
-
-    return VLC_SUCCESS;
-}
-
-/****************************************************************************
- * Encode: the whole thing
- ****************************************************************************
- * This function spits out ogg packets.
- ****************************************************************************/
-static block_t *Headers( encoder_t *p_enc )
-{
-    encoder_sys_t *p_sys = p_enc->p_sys;
-    block_t *p_chain = NULL;
-
-    /* Create theora headers */
-    if( !p_sys->b_headers )
+    /* Create and store headers */
+    theora_encode_header( &p_sys->td, &header[0] );
+    theora_encode_comment( &p_sys->tc, &header[1] );
+    theora_encode_tables( &p_sys->td, &header[2] );
+    p_enc->fmt_out.i_extra = 1 + 3 * 2 + header[0].bytes +
+       header[1].bytes + header[2].bytes;
+    p_extra = p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
+    *(p_extra++) = 3; /* number of headers */
+    for( i = 0; i < 3; i++ )
     {
-        ogg_packet oggpackets;
-        int i;
-        block_t *p_block;
-
-        /* Ogg packet to block */
-        for( i = 0; i < 3; i++ )
-        {
-            switch( i )
-            {
-            case 0:
-                theora_encode_header( &p_sys->td, &oggpackets );
-                break;
-            case 1:
-                theora_encode_comment( &p_sys->tc, &oggpackets );
-                break;
-            case 2:
-                theora_encode_tables( &p_sys->td, &oggpackets );
-                break;
-            }
-
-            p_block = block_New( p_enc, oggpackets.bytes );
-            memcpy( p_block->p_buffer, oggpackets.packet, oggpackets.bytes );
-            p_block->i_dts = p_block->i_pts = p_block->i_length = 0;
-            block_ChainAppend( &p_chain, p_block );
-        }
-
-        p_sys->b_headers = VLC_TRUE;
+        *(p_extra++) = header[i].bytes >> 8;
+        *(p_extra++) = header[i].bytes & 0xFF;
+        memcpy( p_extra, header[i].packet, header[i].bytes );
+        p_extra += header[i].bytes;
     }
 
-    return p_chain;
+    return VLC_SUCCESS;
 }
 
 /****************************************************************************
