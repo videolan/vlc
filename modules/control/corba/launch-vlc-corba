@@ -1,7 +1,0 @@
-#! /bin/sh
-# Helper prog
-VLCPATH=/usr/local/src/vlc
-cd $VLCPATH
-${VLCPATH}/vlc --intf corba &
-exit 0
-
