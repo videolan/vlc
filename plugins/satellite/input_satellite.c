@@ -51,11 +51,6 @@
 
 #include "satellite_tools.h"
 
-#define DISEQC 0                            /* Wether you should use Diseqc*/
-#define LNB_LOF_1 9750000
-#define LNB_LOF_2 10600000
-#define LNB_SLOF 11700000
-
 #define SATELLITE_READ_ONCE 3
 
 /*****************************************************************************
@@ -115,7 +110,11 @@ static int SatelliteOpen( input_thread_t * p_input )
     int                 i_srate = 0;
     boolean_t           b_pol = 0;
     int                 i_fec = 1;
-    float               f_fec;
+    float               f_fec = 1./2;
+    boolean_t           b_diseqc;
+    int                 i_lnb_lof1;
+    int                 i_lnb_lof2;
+    int                 i_lnb_slof;
 
     /* parse the options passed in command line : */
 
@@ -224,13 +223,20 @@ static int SatelliteOpen( input_thread_t * p_input )
     }
 
 
+    /* Get antenna configuration options */
+    b_diseqc = config_GetIntVariable( "sat_diseqc" );
+    i_lnb_lof1 = config_GetIntVariable( "sat_lnb_lof1" );
+    i_lnb_lof2 = config_GetIntVariable( "sat_lnb_lof2" );
+    i_lnb_slof = config_GetIntVariable( "sat_lnb_slof" );
+
     /* Initialize the Satellite Card */
 
     intf_WarnMsg( 2, "Initializing Sat Card with Freq: %d, Pol: %d, "\
                         "FEC: %03f, Srate: %d",
                         i_freq, b_pol, f_fec, i_srate );
 
-    if ( ioctl_SECControl( i_freq * 1000, b_pol, LNB_SLOF, DISEQC ) < 0 )
+    if ( ioctl_SECControl( i_freq * 1000, b_pol, i_lnb_slof * 1000, 
+                b_diseqc ) < 0 )
     {
         intf_ErrMsg("input: satellite: An error occured when controling SEC");
         close( p_satellite->i_handle );
@@ -240,7 +246,7 @@ static int SatelliteOpen( input_thread_t * p_input )
 
     intf_WarnMsg( 3, "Initializing Frontend device" );
     switch (ioctl_SetQPSKFrontend ( i_freq * 1000, i_srate* 1000, f_fec,
-                         LNB_LOF_1, LNB_LOF_2, LNB_SLOF))
+                i_lnb_lof1 * 1000, i_lnb_lof2 * 1000, i_lnb_slof * 1000))
     {
         case -2:
             intf_ErrMsg( "input: satellite: Frontend returned"\
@@ -296,7 +302,7 @@ static int SatelliteOpen( input_thread_t * p_input )
     {
         intf_ErrMsg( "input: satellite: Not enough memory to allow stream\
                         structure" );
-        close( p_satellite );
+        close( p_satellite->i_handle );
         free( p_satellite );
         return( -1 );
     }

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.177 2002/04/08 14:53:05 jobi Exp $
+ * $Id: main.c,v 1.178 2002/04/15 14:06:19 jobi Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -235,8 +235,23 @@
 #define SAT_POL_TEXT "Satellite transponder polarization"
 #define SAT_POL_LONGTEXT NULL
 
+#define SAT_FEC_TEXT "Satellite transponder FEC"
+#define SAT_FEC_LONGTEXT NULL
+
 #define SAT_SRATE_TEXT "Satellite transponder symbol rate"
 #define SAT_SRATE_LONGTEXT NULL
+
+#define SAT_DISEQC_TEXT "Use diseqc with antenna"
+#define SAT_DISEQC_LONGTEXT NULL
+
+#define SAT_LNB_LOF1_TEXT "Antenna lnb_lof1 (kHz)"
+#define SAT_LNB_LOF1_LONGTEXT NULL
+
+#define SAT_LNB_LOF2_TEXT "Antenna lnb_lof2 (kHz)"
+#define SAT_LNB_LOF2_LONGTEXT NULL
+
+#define SAT_LNB_SLOF_TEXT "Antenna lnb_slof (kHz)"
+#define SAT_LNB_SLOF_LONGTEXT NULL
 
 #define IPV6_TEXT "force IPv6"
 #define IPV6_LONGTEXT NULL
@@ -350,10 +365,18 @@ ADD_INTEGER ( "input_subtitle", -1, NULL, INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT )
 ADD_STRING  ( "dvd_device", "/dev/dvd", NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT )
 ADD_STRING  ( "vcd_device", "/dev/cdrom", NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT )
 #ifdef HAVE_SATELLITE
-ADD_INTEGER ( "sat_frequency", 12553, NULL, SAT_FREQ_TEXT, SAT_FREQ_LONGTEXT )
+ADD_INTEGER ( "sat_frequency", 11954, NULL, SAT_FREQ_TEXT, SAT_FREQ_LONGTEXT )
 ADD_INTEGER ( "sat_polarization", 0, NULL, SAT_POL_TEXT, SAT_POL_LONGTEXT )
+ADD_INTEGER ( "sat_fec", 3, NULL, SAT_FEC_TEXT, SAT_FEC_LONGTEXT )
 ADD_INTEGER ( "sat_symbol_rate", 27500, NULL, SAT_SRATE_TEXT,
             SAT_SRATE_LONGTEXT )
+ADD_BOOL    ( "sat_diseqc", 0, SAT_DISEQC_TEXT, SAT_DISEQC_LONGTEXT )
+ADD_INTEGER ( "sat_lnb_lof1", 10000, NULL, SAT_LNB_LOF1_TEXT, 
+            SAT_LNB_LOF1_LONGTEXT )
+ADD_INTEGER ( "sat_lnb_lof2", 10000, NULL, SAT_LNB_LOF2_TEXT, 
+            SAT_LNB_LOF2_LONGTEXT )
+ADD_INTEGER ( "sat_lnb_slof", 11700, NULL, SAT_LNB_SLOF_TEXT, 
+            SAT_LNB_SLOF_LONGTEXT )
 #endif
 
 ADD_BOOL    ( "ipv6", NULL, IPV6_TEXT, IPV6_LONGTEXT )
