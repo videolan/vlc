@@ -125,8 +125,9 @@
 
 /* Volume */
 #define VOLUME_DEFAULT                  256
-#define VOLUME_STEP                     128
+#define VOLUME_STEP                     32
 #define VOLUME_MAX                      1024
+#define VOLUME_MIN                      0
 
 /* Number of audio output frames contained in an audio output fifo.
  * (AOUT_FIFO_SIZE + 1) must be a power of 2, in order to optimise the

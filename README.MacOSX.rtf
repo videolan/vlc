@@ -1,7 +1,7 @@
 {\rtf1\mac\ansicpg10000\cocoartf100
 {\fonttbl\f0\fswiss\fcharset77 Helvetica;\f1\fswiss\fcharset77 Helvetica-Bold;\f2\fmodern\fcharset77 Courier;
 }
-{\colortbl;\red255\green255\blue255;}
+{\colortbl;\red255\green255\blue255;\red255\green3\blue0;}
 \margl1440\margr1440\vieww11240\viewh10380\viewkind0
 \hyphauto1\hyphfactor90
 \pard\tx1440\tx2880\tx4320\tx5760\tx7200\qc
@@ -14,6 +14,19 @@ Mac OS X-specific information
 \
 \pard\tx1440\tx2880\tx4320\tx5760\tx7200\qj
 \cf0 Welcome to the VideoLAN Client ! VLC is a multi-purpose mutimedia tool : it can play DVDs and VCDs, or read a stream from the network. It also supports DivX/MPEG-4 files and is unaffected by the dreaded .avi bug which can cause choppy sound when playing DivX in Quicktime. VLC has originally been developed for GNU/Linux systems, but has been ported to numerous operating systems, including Mac OS X and Win32. The Mac OS X port is a bit young and immature, as you will notice, and there are many caveats. We are working hard to improve it, and if you think you can help us in any way, please drop us a line.\
+\
+
+\fs48 \cf2 IMPORTANT NOTE
+\fs24 \cf0 \
+\
+
+\f1\b VLC is NOT compatible with QuickTime 6 Preview. At this point, we suspect a bug in QuickTime 6 Preview. Known workaround are :\
+- switch the screen depth to thousands of colors ;\
+- downgrade to QuickTime 5 (see http://docs.info.apple.com/article.html?artnum=120084)\
+\
+Please do NOT report any problem with QuickTime 6 Preview. Use it at your own risks. Any report involving QuickTime 6 Preview will be deleted.
+\f0\b0 \
+\
 \
 You may find the following frequentely asked questions useful :\
 \
@@ -48,7 +61,7 @@ If VLC is slow on your G4 system, try and quit or hide all running applications.
 
 \f1\b \ul 5. I only get a black picture !\
 
-\f0\b0 \ulnone We haven't found the reason why some people get this problem. However, users have indicated a workaround : switch your screen depth to thousands of colors instead of millions. If you think you have information to help us find the bug, please drop us a mail. Downgrading QuickTime to 5.0 may help, too.\
+\f0\b0 \ulnone Are you sure you do not have QuickTime 6 Preview installed ?.\
 \
 \
 
@@ -63,7 +76,13 @@ Just double-click on the movie.\
 Simply drag VLC from the place where you have installed it, to the Trash.\
 \
 \
+
+\f1\b \ul 8. Where can I find an older version for Mac OS 9 ?\
+
+\f0\b0 \ulnone There is no version for Mac OS 9. VLC is originally a UNIX application and has never been ported to Mac OS 9. Considering the amount of differences between Mac OS 9 and modern systems, it would require a tremendous work to port VLC. We do not plan to do it. So please don't ask.\
+\
+\
 Thanks for reading this file. For additional information, subscribe to the vlc mailing list on \ul http://www.videolan.org/.\ulnone \
 -- \
 Christophe Massiot <massiot@via.ecp.fr>, for the VideoLAN team.\
-$Id: README.MacOSX.rtf,v 1.4 2002/06/02 23:03:22 massiot Exp $}
+$Id: README.MacOSX.rtf,v 1.5 2002/06/18 23:18:40 massiot Exp $}

@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.m,v 1.14 2002/06/08 18:52:34 sam Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.15 2002/06/18 23:18:40 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -630,7 +630,6 @@ static Intf_VLCWrapper *o_intf = nil;
 
 - (void)openNetHTTP:(NSString*)o_addr
 {
-    NSString *o_source;
     int i_end = p_main->p_playlist->i_size;
     intf_thread_t * p_intf = p_main->p_intf;
 
@@ -995,6 +994,9 @@ static Intf_VLCWrapper *o_intf = nil;
         {
             [o_subtitle removeItemAtIndex:0];
         }
+
+        [o_language_item setEnabled: 1];
+        [o_subtitle_item setEnabled: 1];
 
         /* Create language & subtitles menus */
         for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
