@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.19 2003/07/23 01:13:48 gbazin Exp $
+ * $Id: sap.c,v 1.20 2003/07/23 01:28:54 gbazin Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -348,6 +348,8 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
         p_item->i_status = 0;
         p_item->b_autodeletion = VLC_FALSE;
         p_item->psz_uri = NULL;
+        p_item->ppsz_options = NULL;
+        p_item->i_options = 0;
 
         psz_uri = NULL;
 
@@ -413,7 +415,7 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             p_playlist = vlc_object_find( p_intf,
             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
-            playlist_AddItem ( p_playlist, p_item, 0, 0,
+            playlist_AddItem ( p_playlist, p_item,
             PLAYLIST_CHECK_INSERT, PLAYLIST_END);
             vlc_object_release( p_playlist );
         }
