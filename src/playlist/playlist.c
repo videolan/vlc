@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.57 2003/10/06 16:23:30 zorglub Exp $
+ * $Id: playlist.c,v 1.58 2003/10/09 18:05:32 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -447,8 +447,8 @@ int playlist_Enable( playlist_t * p_playlist, int i_pos )
 int playlist_DisableGroup( playlist_t * p_playlist, int i_group)
 {
     vlc_value_t     val;
-    vlc_mutex_lock( &p_playlist->object_lock );
     int i;
+    vlc_mutex_lock( &p_playlist->object_lock );
 
     msg_Dbg(p_playlist,"Disabling group %i",i_group);
     for( i = 0 ; i< p_playlist->i_size; i++ )
@@ -482,8 +482,8 @@ int playlist_DisableGroup( playlist_t * p_playlist, int i_group)
 int playlist_EnableGroup( playlist_t * p_playlist, int i_group)
 {
     vlc_value_t     val;
-    vlc_mutex_lock( &p_playlist->object_lock );
     int i;
+    vlc_mutex_lock( &p_playlist->object_lock );
 
     for( i = 0 ; i< p_playlist->i_size; i++ )
     {
