@@ -1,8 +1,8 @@
 /*****************************************************************************
- * win32_specific.c: Win32 specific features 
+ * win32_specific.c: Win32 specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.19 2002/11/10 18:04:24 sam Exp $
+ * $Id: win32_specific.c,v 1.20 2003/01/19 03:16:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the

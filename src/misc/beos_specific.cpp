@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.28 2003/01/12 02:08:39 titer Exp $
+ * $Id: beos_specific.cpp,v 1.29 2003/01/19 03:16:24 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -60,7 +60,6 @@ private:
 /*****************************************************************************
  * Static vars
  *****************************************************************************/
-static char *         psz_program_path;
 
 //const uint32 INTERFACE_CREATED = 'ifcr';  /* message sent from interface */
 #include "../../modules/gui/beos/MsgVals.h"
@@ -105,15 +104,7 @@ void system_End( vlc_t *p_this )
     vlc_thread_join( p_this->p_libvlc->p_appthread );
     vlc_object_destroy( p_this->p_libvlc->p_appthread );
 
-    free( psz_program_path );
-}
-
-/*****************************************************************************
- * system_GetProgramPath: get the full path to the program.
- *****************************************************************************/
-char * system_GetProgramPath( void )
-{
-    return( psz_program_path );
+    free( p_this->p_libvlc->psz_vlcpath );
 }
 
 /* following functions are local */
@@ -178,7 +169,7 @@ void VlcApplication::ReadyToRun( )
     BEntry entry( &info.ref ); 
     entry.GetPath( &path ); 
     path.GetParent( &path );
-    psz_program_path = strdup( path.Path() );
+    p_this->p_libvlc->psz_vlcpath = strdup( path.Path() );
 
     /* Tell the main thread we are finished initializing the BApplication */
     vlc_thread_ready( p_this );

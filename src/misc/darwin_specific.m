@@ -2,7 +2,7 @@
  * darwin_specific.m: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.m,v 1.6 2003/01/16 14:40:04 massiot Exp $
+ * $Id: darwin_specific.m,v 1.7 2003/01/19 03:16:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -27,11 +27,6 @@
 #include <vlc/vlc.h>
 
 #include <Cocoa/Cocoa.h>
-
-/*****************************************************************************
- * Static vars
- *****************************************************************************/
-static char * psz_program_path;
 
 /*****************************************************************************
  * system_Init: fill in program path & retrieve language
@@ -100,7 +95,7 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
     char *p_char, *p_oldchar = &i_dummy;
 
     /* Get the full program path and name */
-    p_char = psz_program_path = strdup( ppsz_argv[ 0 ] );
+    p_char = p_this->p_libvlc->psz_vlcpath = strdup( ppsz_argv[ 0 ] );
 
     /* Remove trailing program name */
     for( ; *p_char ; )
@@ -157,14 +152,6 @@ void system_Configure( vlc_t *p_this )
  *****************************************************************************/
 void system_End( vlc_t *p_this )
 {
-    free( psz_program_path );
-}
-
-/*****************************************************************************
- * system_GetProgramPath: get the full path to the program.
- *****************************************************************************/
-char * system_GetProgramPath( void )
-{
-    return( psz_program_path );
+    free( p_this->p_libvlc->psz_vlcpath );
 }
 

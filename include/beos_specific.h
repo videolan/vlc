@@ -2,7 +2,7 @@
  * beos_specific.h: BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: beos_specific.h,v 1.7 2002/04/02 23:43:57 gbazin Exp $
+ * $Id: beos_specific.h,v 1.8 2003/01/19 03:16:24 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -28,8 +28,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-char  * system_GetProgramPath( void );
 
 #ifdef __cplusplus
 }

@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.10 2003/01/18 13:24:44 massiot Exp $
+ * $Id: spudec.c,v 1.11 2003/01/19 03:16:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -128,7 +128,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
 #ifdef SYS_DARWIN
         if ( (psz_font = config_GetPsz( p_fifo, "spudec-font" )) == NULL )
         {
-            char * psz_vlcpath = system_GetProgramPath();
+            char * psz_vlcpath = p_fifo->p_libvlc->psz_vlcpath;
             psz_font = malloc( strlen(psz_vlcpath) + strlen("/share/")
                                 + strlen(DEFAULT_FONT) + 1 );
             sprintf(psz_font, "%s/share/" DEFAULT_FONT, psz_vlcpath);

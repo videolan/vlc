@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.109 2003/01/02 23:50:55 massiot Exp $
+ * $Id: modules.c,v 1.110 2003/01/19 03:16:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -552,8 +552,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     char **         ppsz_path = path;
     char *          psz_fullpath;
 #if defined( SYS_BEOS ) || defined( SYS_DARWIN )
-    char *          psz_vlcpath = system_GetProgramPath();
-    int             i_vlclen = strlen( psz_vlcpath );
+    int             i_vlclen = strlen( p_this->p_libvlc->psz_vlcpath );
     vlc_bool_t      b_notinroot;
 #endif
 
@@ -584,7 +583,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
             {
                 continue;
             }
-            sprintf( psz_fullpath, "%s/%s", psz_vlcpath, *ppsz_path );
+            sprintf( psz_fullpath, "%s/%s",
+                     p_this->p_libvlc->psz_vlcpath, *ppsz_path );
         }
         else
 #endif

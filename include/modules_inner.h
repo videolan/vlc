@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.36 2003/01/06 00:37:29 garf Exp $
+ * $Id: modules_inner.h,v 1.37 2003/01/19 03:16:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -113,16 +113,18 @@
             p_submodule->pp_shortcuts[ i_shortcut ] = NULL;                   \
         }                                                                     \
         {                                                                     \
-	    static module_config_t tmp = { CONFIG_HINT_END, NULL, NULL, '\0', \
-                                           NULL, NULL, NULL, 0, 0.0, 0, 0, 0.0, 0.0, NULL,NULL, NULL, VLC_FALSE };                                            \
+            static module_config_t tmp = { CONFIG_HINT_END, NULL, NULL, '\0', \
+                                           NULL, NULL, NULL, 0, 0.0, 0, 0,    \
+                                           0.0, 0.0, NULL,NULL, NULL,         \
+                                           VLC_FALSE };                       \
             p_config[ i_config ] = tmp;                                       \
         }                                                                     \
         config_Duplicate( p_module, p_config );                               \
         if( p_module->p_config == NULL )                                      \
         {                                                                     \
-            return -1;                                                        \
+            return VLC_EGENERIC;                                              \
         }                                                                     \
-        return 0 && i_shortcut;                                               \
+        return VLC_SUCCESS && i_shortcut;                                     \
     }                                                                         \
     struct _u_n_u_s_e_d_ /* the ; gets added */
 
@@ -147,7 +149,7 @@
     p_submodule->i_cpu = p_module->i_cpu;                                     \
     p_submodule->pf_activate = NULL;                                          \
     p_submodule->pf_deactivate = NULL
-    
+
 #define add_requirement( cap )                                                \
     p_module->i_cpu |= CPU_CAPABILITY_##cap
 

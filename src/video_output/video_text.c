@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.41 2002/12/06 10:10:40 sam Exp $
+ * $Id: video_text.c,v 1.42 2003/01/19 03:16:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -222,7 +222,7 @@ vout_font_t *vout_LoadFont( vout_thread_t *p_vout, const char *psz_name )
     char **             ppsz_path = path;
     char *              psz_file;
 #if defined( SYS_BEOS ) || defined( SYS_DARWIN )
-    char *              psz_vlcpath = system_GetProgramPath();
+    char *              psz_vlcpath = p_this->p_libvlc->psz_vlcpath;
     int                 i_vlclen = strlen( psz_vlcpath );
 #endif
     int                 i_char, i_line;        /* character and line indexes */
