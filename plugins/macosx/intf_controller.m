@@ -2,7 +2,7 @@
  * intf_controller.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.m,v 1.9 2002/06/08 19:32:19 sam Exp $
+ * $Id: intf_controller.m,v 1.10 2002/06/19 22:47:14 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -188,6 +188,22 @@
     else
     {
         [item setState:NSOffState];
+    }
+}
+
+- (IBAction)deinterlace:(id)sender
+{
+    NSMenuItem * item = (NSMenuItem *)sender;
+
+    if ( [item state] == NSOnState )
+    {
+        config_PutPszVariable( "filter", NULL );
+        [item setState:NSOffState];
+    }
+    else
+    {
+        config_PutPszVariable( "filter", "deinterlace:blend" );
+        [item setState:NSOnState];
     }
 }
 

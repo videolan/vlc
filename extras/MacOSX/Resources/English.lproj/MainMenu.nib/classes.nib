@@ -3,6 +3,7 @@
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
             ACTIONS = {
+                deinterlace = id; 
                 eject = id; 
                 faster = id; 
                 fullscreen = id; 
