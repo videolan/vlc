@@ -181,6 +181,11 @@ static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
     {
         if( p_vpar->sequence.p_forward != NULL )
             vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
+        if( p_vpar->sequence.p_backward != NULL )
+        {
+            vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
+                              vpar_SynchroDate( p_vpar ) );
+        }
         p_vpar->sequence.p_forward = p_vpar->sequence.p_backward;
         p_vpar->sequence.p_backward = p_newref;
         if( p_newref != NULL )
@@ -678,9 +683,12 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
         /* Initialize values. */
         vpar_SynchroDecode( p_vpar, p_vpar->picture.i_coding_type, i_structure );
-	/* kludge to be removed once vpar_SynchroEnd is called properly */
-        P_picture->date = mdate() + 700000;
-
+        if( p_vpar->picture.i_coding_type == B_CODING_TYPE )
+        {
+            /* Put date immediately. */
+            vout_DatePicture( p_vpar->p_vout, P_picture,
+                              vpar_SynchroDate( p_vpar ) );
+        }
         P_picture->i_aspect_ratio = p_vpar->sequence.i_aspect_ratio;
         P_picture->i_matrix_coefficients = p_vpar->sequence.i_matrix_coefficients;
         p_vpar->picture.i_l_stride = ( p_vpar->sequence.i_width

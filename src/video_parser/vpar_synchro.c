@@ -177,9 +177,14 @@ void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
 /*****************************************************************************
  * vpar_SynchroEnd : Called when the image is totally decoded
  *****************************************************************************/
-mtime_t vpar_SynchroEnd( vpar_thread_t * p_vpar )
+void vpar_SynchroEnd( vpar_thread_t * p_vpar )
 {
     
+//    return mdate() + 700000;
+}
+
+mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
+{
     return mdate() + 700000;
 }
 
