@@ -583,7 +583,7 @@ PLUGINS="${PLUGINS} trivial_mixer spdif_mixer"
 PLUGINS="${PLUGINS} aout_file"
 #PLUGINS="${PLUGINS} scope"
 PLUGINS="${PLUGINS} i420_rgb i420_yuy2 i422_yuy2 i420_ymga"
-PLUGINS="${PLUGINS} id3"
+PLUGINS="${PLUGINS} id3 m3u"
 PLUGINS="${PLUGINS} wav araw"
 
 dnl
