@@ -108,6 +108,18 @@ typedef struct
     uint64_t i_stco_pos;
     vlc_bool_t b_stco64;
 
+    /* for h264 */
+    struct
+    {
+        int     i_profile;
+        int     i_level;
+
+        int     i_sps;
+        uint8_t *sps;
+        int     i_pps;
+        uint8_t *pps;
+    } avc;
+
 } mp4_stream_t;
 
 struct sout_mux_sys_t
@@ -159,6 +171,8 @@ static void box_send( sout_mux_t *p_mux,  bo_t *box );
 static block_t *bo_to_sout( sout_instance_t *p_sout,  bo_t *box );
 
 static bo_t *GetMoovBox( sout_mux_t *p_mux );
+
+static void ConvertAVC1( sout_mux_t *, mp4_stream_t *, block_t * );
 
 /*****************************************************************************
  * Open:
@@ -335,6 +349,8 @@ static void Close( vlc_object_t * p_this )
         mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
 
         es_format_Clean( &p_stream->fmt );
+        if( p_stream->avc.i_sps ) free( p_stream->avc.sps );
+        if( p_stream->avc.i_pps ) free( p_stream->avc.pps );
         free( p_stream->entry );
         free( p_stream );
     }
@@ -399,6 +415,12 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         calloc( p_stream->i_entry_max, sizeof( mp4_entry_t ) );
     p_stream->i_dts_start   = 0;
     p_stream->i_duration    = 0;
+    p_stream->avc.i_profile = 77;
+    p_stream->avc.i_level   = 51;
+    p_stream->avc.i_sps     = 0;
+    p_stream->avc.sps       = NULL;
+    p_stream->avc.i_pps     = 0;
+    p_stream->avc.pps       = NULL;
 
     p_input->p_sys          = p_stream;
 
@@ -475,6 +497,10 @@ static int Mux( sout_mux_t *p_mux )
         p_stream = (mp4_stream_t*)p_input->p_sys;
 
         p_data  = block_FifoGet( p_input->p_fifo );
+        if( p_stream->fmt.i_codec == VLC_FOURCC( 'h', '2', '6', '4' ) )
+        {
+            ConvertAVC1( p_mux, p_stream, p_data );
+        }
         if( p_input->p_fifo->i_depth > 0 )
         {
             block_t *p_next = block_FifoShow( p_input->p_fifo );
@@ -543,6 +569,75 @@ static int Mux( sout_mux_t *p_mux )
 /*****************************************************************************
  *
  *****************************************************************************/
+static void ConvertAVC1( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_block )
+{
+    uint8_t *src = p_block->p_buffer;
+    int     i_src = p_block->i_buffer;
+    uint8_t *end = &p_block->p_buffer[i_src];
+
+    uint8_t *dst = p_block->p_buffer;
+
+    while( src < end )
+    {
+        uint8_t *fix = dst;
+        int i_type;
+        int i_size;
+
+        if( src[0] != 0 || src[1] != 0 || src[2] != 0 || src[3] != 1 )
+            break;
+
+        /* skip start code and room for size */
+        src += 4;
+        dst += 4;
+
+        /* nal type */
+        i_type = (*dst++ = *src++)&0x1f;
+
+        /* nal content */
+        while( src < end )
+        {
+            if( src < end - 4 && src[0] == 0x00 && src[1] == 0x00  && src[2] == 0x00 &&  src[3] == 0x01 )
+            {
+                break;
+            }
+
+            if( src < end - 3 && src[0] == 0x00 && src[1] == 0x00  && src[2] == 0x03 )
+            {
+                *dst++ = 0x00;
+                *dst++ = 0x00;
+
+                src += 3;
+                continue;
+            }
+            *dst++ = *src++;
+        }
+        i_size = dst - &fix[4];
+        fix[0] = (i_size >> 24)&0xff;
+        fix[1] = (i_size >> 16)&0xff;
+        fix[2] = (i_size >>  8)&0xff;
+        fix[3] = (i_size      )&0xff;
+
+        if( i_type == 7 && tk->avc.i_sps <= 0 )        /* SPS */
+        {
+            tk->avc.i_sps = i_size;
+            tk->avc.sps = malloc( i_size );
+            memcpy( tk->avc.sps, &fix[4], i_size );
+
+            tk->avc.i_profile = tk->avc.sps[1];
+            tk->avc.i_level   = tk->avc.sps[3];
+        }
+        else if( i_type == 8 && tk->avc.i_pps <= 0)   /* PPS */
+        {
+            tk->avc.i_pps = i_size;
+            tk->avc.pps = malloc( i_size );
+            memcpy( tk->avc.pps, &fix[4], i_size );
+        }
+    }
+
+    p_block->i_buffer = dst - p_block->p_buffer;
+}
+
+
 static int GetDescrLength( int i_size )
 {
     if( i_size < 0x00000080 )
@@ -668,6 +763,36 @@ static bo_t *GetWaveTag( mp4_stream_t *p_stream )
     box_fix( wave );
 
     return wave;
+}
+
+static bo_t *GetAvcCTag( mp4_stream_t *p_stream )
+{
+    bo_t *avcC;
+
+    /* FIXME use better value */
+    avcC = box_new( "avcC" );
+    bo_add_8( avcC, 1 );      /* configuration version */
+    bo_add_8( avcC, p_stream->avc.i_profile );
+    bo_add_8( avcC, p_stream->avc.i_profile );     /* profile compatible ??? */
+    bo_add_8( avcC, p_stream->avc.i_level );       /* level, 5.1 */
+    bo_add_8( avcC, 0xff );   /* 0b11111100 | lengthsize = 0x11 */
+
+    bo_add_8( avcC, 0xe0 | (p_stream->avc.i_sps > 0 ? 1 : 0) );   /* 0b11100000 | sps_count */
+    if( p_stream->avc.i_sps > 0 )
+    {
+        bo_add_16be( avcC, p_stream->avc.i_sps );
+        bo_add_mem( avcC, p_stream->avc.i_sps, p_stream->avc.sps );
+    }
+
+    bo_add_8( avcC, (p_stream->avc.i_pps > 0 ? 1 : 0) );   /* pps_count */
+    if( p_stream->avc.i_pps > 0 )
+    {
+        bo_add_16be( avcC, p_stream->avc.i_pps );
+        bo_add_mem( avcC, p_stream->avc.i_pps, p_stream->avc.pps );
+    }
+    box_fix( avcC );
+
+    return avcC;
 }
 
 /* TODO: No idea about these values */
@@ -907,6 +1032,10 @@ static bo_t *GetVideBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
         memcpy( fcc, "SVQ3", 4 );
         break;
 
+    case VLC_FOURCC('h','2','6','4'):
+        memcpy( fcc, "avc1", 4 );
+        break;
+
     default:
         memcpy( fcc, (char*)&p_stream->fmt.i_codec, 4 );
         break;
@@ -964,6 +1093,10 @@ static bo_t *GetVideBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
             box_fix( esds );
             box_gather( vide, esds );
         }
+        break;
+
+    case VLC_FOURCC('h','2','6','4'):
+        box_gather( vide, GetAvcCTag( p_stream ) );
         break;
 
     default:
