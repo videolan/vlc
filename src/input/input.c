@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.161 2001/11/28 15:08:06 massiot Exp $
+ * $Id: input.c,v 1.162 2001/12/07 16:47:47 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -265,6 +265,29 @@ static void RunThread( input_thread_t *p_input )
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
 
+        if( p_input->stream.p_new_program )
+        {
+            if( p_input->pf_set_program != NULL )
+            {
+
+                p_input->pf_set_program( p_input, 
+                        p_input->stream.p_new_program );
+
+                for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
+                {
+                    pgrm_descriptor_t * p_pgrm
+                                            = p_input->stream.pp_programs[i];
+                    /* Escape all decoders for the stream discontinuity they
+                     * will encounter. */
+                    input_EscapeDiscontinuity( p_input, p_pgrm );
+
+                    /* Reinitialize synchro. */
+                    p_pgrm->i_synchro_state = SYNCHRO_REINIT;
+                }
+            }
+            p_input->stream.p_new_program = NULL;
+        }
+        
         if( p_input->stream.p_new_area )
         {
             if( p_input->stream.b_seekable && p_input->pf_set_area != NULL )
@@ -410,6 +433,7 @@ static int InitThread( input_thread_t * p_input )
     p_input->pf_init_bit_stream= f.pf_init_bit_stream;
     p_input->pf_read          = f.pf_read;
     p_input->pf_set_area      = f.pf_set_area;
+    p_input->pf_set_program   = f.pf_set_program;
     p_input->pf_demux         = f.pf_demux;
     p_input->pf_new_packet    = f.pf_new_packet;
     p_input->pf_new_pes       = f.pf_new_pes;
@@ -653,7 +677,7 @@ static void FileOpen( input_thread_t * p_input )
             psz_name += 8;
             i_stat = stat( psz_name, &stat_info );
         }
-	else if( ( i_size > 4 )
+        else if( ( i_size > 4 )
             && !strncasecmp( psz_name, "dvd:", 4 ) )
         {
             /* get rid of the 'dvd:' stuff and try again */

@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.29 2001/11/28 15:08:06 massiot Exp $
+ * $Id: input_ext-intf.c,v 1.30 2001/12/07 16:47:47 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -327,6 +327,21 @@ int input_ChangeArea( input_thread_t * p_input, input_area_t * p_area )
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     p_input->stream.p_new_area = p_area;
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    return 0;
+}
+
+/****************************************************************************
+ * input_ChangeProgram: interface request an area change
+ ****************************************************************************/
+int input_ChangeProgram( input_thread_t * p_input, 
+            pgrm_descriptor_t * p_program )
+{
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    p_input->stream.p_new_program = p_program;
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 

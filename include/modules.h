@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.33 2001/12/03 16:18:37 sam Exp $
+ * $Id: modules.h,v 1.34 2001/12/07 16:47:47 jobi Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -128,6 +128,8 @@ typedef struct function_list_s
             void ( * pf_delete_packet )  ( void *, struct data_packet_s * );
             void ( * pf_delete_pes )     ( void *, struct pes_packet_s * );
 
+            int  ( * pf_set_program ) ( struct input_thread_s *,
+                                     struct pgrm_descriptor_s * );
 
             int  ( * pf_set_area ) ( struct input_thread_s *,
                                      struct input_area_s * );

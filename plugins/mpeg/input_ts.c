@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ts.c,v 1.40 2001/12/03 17:34:08 stef Exp $
+ * $Id: input_ts.c,v 1.41 2001/12/07 16:47:47 jobi Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -106,6 +106,7 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_end              = TSEnd;
     input.pf_init_bit_stream  = InitBitstream;
     input.pf_set_area         = NULL;
+    input.pf_set_area         = input_SetProgram;
     input.pf_read             = TSRead;
     input.pf_demux            = input_DemuxTS;
     input.pf_new_packet       = input_NetlistNewPacket;

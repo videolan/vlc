@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.14 2001/11/28 15:08:05 massiot Exp $
+ * $Id: input_es.c,v 1.15 2001/12/07 16:47:47 jobi Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -79,10 +79,12 @@
 static int  ESProbe     ( probedata_t * );
 static int  ESRead      ( struct input_thread_s *,
                           data_packet_t * p_packets[INPUT_READ_ONCE] );
-static void ESInit      ( struct input_thread_s * );
-static void ESEnd       ( struct input_thread_s * );
-static void ESSeek      ( struct input_thread_s *, off_t );
-static void ESDemux     ( struct input_thread_s *, struct data_packet_s * );
+static void ESInit          ( struct input_thread_s * );
+static void ESEnd           ( struct input_thread_s * );
+static void ESSeek          ( struct input_thread_s *, off_t );
+static int  ESSetProgram    ( struct input_thread_s *, pgrm_descriptor_t * );
+static void ESDemux         ( struct input_thread_s *, 
+                                struct data_packet_s * );
 static void ESNextDataPacket( struct bit_stream_s * );
 static void ESInitBitstream( struct bit_stream_s *, struct decoder_fifo_s *,
                         void (* pf_bitstream_callback)( struct bit_stream_s *,
@@ -104,6 +106,7 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_end              = ESEnd;
     input.pf_init_bit_stream  = ESInitBitstream;
     input.pf_set_area         = NULL;
+    input.pf_set_program      = ESSetProgram;
     input.pf_read             = ESRead;
     input.pf_demux            = ESDemux;
     input.pf_new_packet       = input_NetlistNewPacket;
@@ -217,6 +220,15 @@ static void ESSeek( input_thread_t * p_input, off_t i_position )
     lseek( p_input->i_handle, i_position, SEEK_SET );
 
     p_input->stream.p_selected_area->i_tell = i_position;
+}
+
+
+/*****************************************************************************
+ * ESSetProgram: Does nothing
+ *****************************************************************************/
+static int ESSetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
+{
+    return( 0 );
 }
 
 /*****************************************************************************

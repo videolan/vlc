@@ -89,19 +89,20 @@
  * Local prototypes
  *****************************************************************************/
 /* called from outside */
-static int  VCDProbe     ( probedata_t *p_data );
-static void VCDInit      ( struct input_thread_s * );
-static int  VCDRead      ( struct input_thread_s *, data_packet_t ** );
-static int  VCDSetArea   ( struct input_thread_s *, struct input_area_s * ); 
-static void VCDOpen      ( struct input_thread_s *);
-static void VCDClose     ( struct input_thread_s *);
-static void VCDEnd       ( struct input_thread_s *);
-static void VCDSeek      ( struct input_thread_s *, off_t );
-static int  VCDRewind    ( struct input_thread_s * );
+static int  VCDProbe        ( probedata_t *p_data );
+static void VCDInit         ( struct input_thread_s * );
+static int  VCDRead         ( struct input_thread_s *, data_packet_t ** );
+static int  VCDSetArea      ( struct input_thread_s *, struct input_area_s * ); 
+static int  VCDSetProgram   ( struct input_thread_s *, pgrm_descriptor_t * ); 
+static void VCDOpen         ( struct input_thread_s *);
+static void VCDClose         ( struct input_thread_s *);
+static void VCDEnd          ( struct input_thread_s *);
+static void VCDSeek         ( struct input_thread_s *, off_t );
+static int  VCDRewind       ( struct input_thread_s * );
 static struct data_packet_s * NewPacket( void *, size_t );
 static pes_packet_t *         NewPES   ( void * );
-static void DeletePacket ( void *, data_packet_t * );
-static void DeletePES    ( void *, pes_packet_t *);
+static void DeletePacket     ( void *, data_packet_t * );
+static void DeletePES       ( void *, pes_packet_t *);
 
 
 
@@ -112,21 +113,22 @@ static void DeletePES    ( void *, pes_packet_t *);
 void _M( input_getfunctions )( function_list_t * p_function_list )
 {
 #define input p_function_list->functions.input
-    p_function_list->pf_probe = VCDProbe ;
-    input.pf_init             = VCDInit ;
-    input.pf_open             = VCDOpen ;
-    input.pf_close            = VCDClose ;
-    input.pf_end              = VCDEnd ;
+    p_function_list->pf_probe = VCDProbe;
+    input.pf_init             = VCDInit;
+    input.pf_open             = VCDOpen;
+    input.pf_close            = VCDClose;
+    input.pf_end              = VCDEnd;
     input.pf_init_bit_stream  = InitBitstream;
-    input.pf_read             = VCDRead ;
-    input.pf_set_area         = VCDSetArea ;
+    input.pf_read             = VCDRead;
+    input.pf_set_area         = VCDSetArea;
+    input.pf_set_program      = VCDSetProgram;
     input.pf_demux            = input_DemuxPS;
     input.pf_new_packet       = NewPacket;
     input.pf_new_pes          = NewPES;
     input.pf_delete_packet    = DeletePacket;
     input.pf_delete_pes       = DeletePES;
-    input.pf_rewind           = VCDRewind ;
-    input.pf_seek             = VCDSeek ;
+    input.pf_rewind           = VCDRewind;
+    input.pf_seek             = VCDSeek;
 #undef input
 }
 
@@ -408,6 +410,16 @@ static void VCDEnd( input_thread_t * p_input )
     free( p_vcd );
 
 }
+
+/*****************************************************************************
+ * VCDSetProgram: Does nothing since a VCD is mono_program
+ *****************************************************************************/
+static int VCDSetProgram( input_thread_t * p_input, 
+            pgrm_descriptor_t * p_program)
+{
+    return 0;
+}
+
 
 /*****************************************************************************
  * VCDSetArea: initialize input data for title x, chapter y.

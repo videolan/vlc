@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_programs.c,v 1.67 2001/12/05 03:31:04 jobi Exp $
+ * $Id: input_programs.c,v 1.68 2001/12/07 16:47:47 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -301,6 +301,29 @@ input_area_t * input_AddArea( input_thread_t * p_input )
 
     return p_input->stream.pp_areas[i_area_index];
 }
+
+/*****************************************************************************
+ * input_SetProgram: changes the current program
+ *****************************************************************************/
+int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
+{
+    int i_es_index;
+#define old_prg p_input->stream.p_selected_program
+    for ( i_es_index = 0 ; i_es_index < old_prg->i_es_number ; i_es_index ++ )
+    {
+        input_UnselectES( p_input , old_prg->pp_es[i_es_index] );
+    }
+#undef old_prg
+    for (i_es_index = 0 ; i_es_index < p_new_prg->i_es_number ; i_es_index ++ )
+    {
+        input_SelectES( p_input , p_new_prg->pp_es[i_es_index] );
+    }
+
+    p_input->stream.p_selected_program = p_new_prg;
+
+    return( 0 );
+}
+
 
 /*****************************************************************************
  * input_DelArea: destroy a area descriptor

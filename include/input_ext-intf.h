@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.50 2001/12/05 03:31:04 jobi Exp $
+ * $Id: input_ext-intf.h,v 1.51 2001/12/07 16:47:47 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -275,6 +275,8 @@ typedef struct input_thread_s
     void                 (* pf_delete_pes)( void *, struct pes_packet_s * );
 
     /* Stream control capabilities */
+    int                  (* pf_set_program)( struct input_thread_s *,
+                                             struct pgrm_descriptor_s * );
     int                  (* pf_set_area)( struct input_thread_s *,
                                           struct input_area_s * );
     int                  (* pf_rewind)( struct input_thread_s * );

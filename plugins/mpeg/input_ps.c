@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ps.c,v 1.42 2001/12/05 03:31:04 jobi Exp $
+ * $Id: input_ps.c,v 1.43 2001/12/07 16:47:47 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -87,16 +87,17 @@ static __inline__ off_t fseeko( FILE *p_file, off_t i_offset, int i_pos )
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  PSProbe     ( probedata_t * );
-static int  PSRead      ( struct input_thread_s *,
-                          data_packet_t * p_packets[INPUT_READ_ONCE] );
-static void PSInit      ( struct input_thread_s * );
-static void PSEnd       ( struct input_thread_s * );
-static void PSSeek      ( struct input_thread_s *, off_t );
+static int  PSProbe         ( probedata_t * );
+static int  PSRead          ( struct input_thread_s *,
+                             data_packet_t * p_packets[INPUT_READ_ONCE] );
+static void PSInit          ( struct input_thread_s * );
+static void PSEnd           ( struct input_thread_s * );
+static int  PSSetProgram    ( struct input_thread_s * , pgrm_descriptor_t * );
+static void PSSeek          ( struct input_thread_s *, off_t );
 static struct pes_packet_s *  NewPES    ( void * );
 static struct data_packet_s * NewPacket ( void *, size_t );
-static void DeletePacket( void *, struct data_packet_s * );
-static void DeletePES   ( void *, struct pes_packet_s * );
+static void DeletePacket    ( void *, struct data_packet_s * );
+static void DeletePES       ( void *, struct pes_packet_s * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -112,6 +113,7 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_end              = PSEnd;
     input.pf_init_bit_stream  = InitBitstream;
     input.pf_set_area         = NULL;
+    input.pf_set_program      = PSSetProgram;
     input.pf_read             = PSRead;
     input.pf_demux            = input_DemuxPS;
     input.pf_new_packet       = NewPacket;
@@ -236,9 +238,9 @@ static void PSInit( input_thread_t * p_input )
     input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
     
     p_input->stream.p_selected_program = 
-		 p_input->stream.pp_programs[0] ;
+            p_input->stream.pp_programs[0] ;
     p_input->stream.p_new_program = 
-		 p_input->stream.pp_programs[0] ;
+            p_input->stream.pp_programs[0] ;
     
     if( p_input->stream.b_seekable )
     {
@@ -577,6 +579,14 @@ static int PSRead( input_thread_t * p_input,
 }
 
 /*****************************************************************************
+ * PSSetProgram: Does nothing since a PS Stream is mono-program
+ *****************************************************************************/
+static int PSSetProgram( input_thread_t * p_input, 
+            pgrm_descriptor_t * p_program)
+{
+    return( 0 );
+}
+/*****************************************************************************
  * PSSeek: changes the stream position indicator
  *****************************************************************************/
 static void PSSeek( input_thread_t * p_input, off_t i_position )
@@ -776,7 +786,7 @@ static pes_packet_t * NewPES( void * p_packet_cache )
     }
 #endif
 
-    vlc_mutex_lock( &p_cache->lock );	
+    vlc_mutex_lock( &p_cache->lock );
 
     /* Checks whether the PES cache is empty */
     if( p_cache->pes.l_index == 0 )
@@ -786,7 +796,7 @@ static pes_packet_t * NewPES( void * p_packet_cache )
         if( p_pes == NULL )
         {
             intf_DbgMsg( "Out of memory" );
-            vlc_mutex_unlock( &p_cache->lock );	
+            vlc_mutex_unlock( &p_cache->lock );
             return NULL;
         }
 #ifdef TRACE_INPUT

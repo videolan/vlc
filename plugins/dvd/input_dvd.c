@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.103 2001/12/05 03:31:04 jobi Exp $
+ * $Id: input_dvd.c,v 1.104 2001/12/07 16:47:47 jobi Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -105,15 +105,16 @@
  * Local prototypes
  *****************************************************************************/
 /* called from outside */
-static int  DVDProbe    ( probedata_t *p_data );
-static void DVDInit     ( struct input_thread_s * );
-static void DVDEnd      ( struct input_thread_s * );
-static void DVDOpen     ( struct input_thread_s * );
-static void DVDClose    ( struct input_thread_s * );
-static int  DVDSetArea  ( struct input_thread_s *, struct input_area_s * );
-static int  DVDRead     ( struct input_thread_s *, data_packet_t ** );
-static void DVDSeek     ( struct input_thread_s *, off_t );
-static int  DVDRewind   ( struct input_thread_s * );
+static int  DVDProbe        ( probedata_t *p_data );
+static void DVDInit         ( struct input_thread_s * );
+static void DVDEnd          ( struct input_thread_s * );
+static void DVDOpen         ( struct input_thread_s * );
+static void DVDClose        ( struct input_thread_s * );
+static int  DVDSetArea      ( struct input_thread_s *, struct input_area_s * );
+static int  DVDSetProgram   ( struct input_thread_s *, pgrm_descriptor_t * );
+static int  DVDRead         ( struct input_thread_s *, data_packet_t ** );
+static void DVDSeek         ( struct input_thread_s *, off_t );
+static int  DVDRewind       ( struct input_thread_s * );
 
 /* called only inside */
 static int  DVDChooseAngle( thread_dvd_data_t * );
@@ -136,6 +137,7 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_init_bit_stream  = InitBitstream;
     input.pf_read             = DVDRead;
     input.pf_set_area         = DVDSetArea;
+    input.pf_set_program      = DVDSetProgram;
     input.pf_demux            = input_DemuxPS;
     input.pf_new_packet       = input_NetlistNewPacket;
     input.pf_new_pes          = input_NetlistNewPES;
@@ -390,6 +392,15 @@ static void DVDEnd( input_thread_t * p_input )
 }
 
 /*****************************************************************************
+ * DVDSetProgram: Does nothing, a DVD is mono-program
+ *****************************************************************************/
+static int DVDSetProgram( input_thread_t * p_input, 
+            pgrm_descriptor_t * p_program ) 
+{
+    return 0;
+}
+
+/*****************************************************************************
  * DVDSetArea: initialize input data for title x, chapter y.
  * It should be called for each user navigation request.
  *****************************************************************************
@@ -504,7 +515,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
          * decrypted disc key are fast enough to check the key at each seek */
 
         if( dvdcss_seek( p_dvd->dvdhandle, p_dvd->i_start,
-				DVDCSS_SEEK_KEY ) < 0 )
+                            DVDCSS_SEEK_KEY ) < 0 )
         {
             intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
             return -1;

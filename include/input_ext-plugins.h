@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: input_ext-plugins.h,v 1.6 2001/11/25 22:52:21 gbazin Exp $
+ * $Id: input_ext-plugins.h,v 1.7 2001/12/07 16:47:47 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -58,6 +58,7 @@ struct pgrm_descriptor_s * input_FindProgram( struct input_thread_s *, u16 );
 struct pgrm_descriptor_s * input_AddProgram ( struct input_thread_s *,
                                               u16, size_t );
 void input_DelProgram( struct input_thread_s *, struct pgrm_descriptor_s * );
+int input_SetProgram( struct input_thread_s *, struct pgrm_descriptor_s * );
 struct input_area_s * input_AddArea( struct input_thread_s * );
 void input_DelArea   ( struct input_thread_s *, struct input_area_s * );
 struct es_descriptor_s * input_FindES( struct input_thread_s *, u16 );
