@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.9 2003/03/29 17:10:31 gbazin Exp $
+ * $Id: open.cpp,v 1.10 2003/03/30 16:26:42 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -235,8 +235,10 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, Interface *_p_main_interface,
                        i_access_method == DISC_ACCESS );
     notebook->AddPage( NetPanel( notebook ), _("Network"),
                        i_access_method == NET_ACCESS );
+#ifndef WIN32
     notebook->AddPage( SatPanel( notebook ), _("Satellite"),
                        i_access_method == SAT_ACCESS );
+#endif
 
     /* Update Disc panel */
     wxCommandEvent dummy_event;

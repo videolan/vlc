@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.52 2003/03/30 14:24:20 gbazin Exp $
+ * $Id: libvlc.h,v 1.53 2003/03/30 16:26:42 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -105,7 +105,7 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 #define AOUT_RATE_TEXT N_("audio output frequency (Hz)")
 #define AOUT_RATE_LONGTEXT N_( \
     "You can force the audio output frequency here. Common values are " \
-    "48000, 44100, 32000, 22050, 16000, 11025, 8000.")
+    "-1 (default), 48000, 44100, 32000, 22050, 16000, 11025, 8000.")
 
 #define DESYNC_TEXT N_("compensate desynchronization of audio (in ms)")
 #define DESYNC_LONGTEXT N_( \

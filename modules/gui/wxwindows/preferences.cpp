@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.7 2003/03/30 15:05:32 gbazin Exp $
+ * $Id: preferences.cpp,v 1.8 2003/03/30 16:26:42 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -613,8 +613,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
             combo->SetToolTip( p_item->psz_longtext );
             config_data->control.combobox = combo;
-            panel_sizer->Add( label, 0, wxALL, 5 );
-            panel_sizer->Add( combo, 1, wxALL, 5 );
+            panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+            panel_sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
             break;
 
         case CONFIG_ITEM_STRING:
@@ -648,13 +648,13 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                 combo->SetToolTip( p_item->psz_longtext );
                 config_data->control.combobox = combo;
                 config_data->b_config_list = VLC_TRUE;
-                panel_sizer->Add( combo, 1, wxALL, 5 );
+                panel_sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
             }
 
             if( p_item->i_type == CONFIG_ITEM_FILE )
             {
                 button = new wxButton( panel, -1, _("Browse...") );
-                panel_sizer->Add( button, 0, wxALL, 5 );
+                panel_sizer->Add( button, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
                 button->SetClientData((void *)config_data);
             }
             break;
@@ -668,8 +668,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                                    0, 16000, p_item->i_value);
             spin->SetToolTip( p_item->psz_longtext );
             config_data->control.spinctrl = spin;
-            panel_sizer->Add( label, 0, wxALL, 5 );
-            panel_sizer->Add( spin, 0, wxALL, 5 );
+            panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+            panel_sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
 
             spin->SetClientData((void *)config_data);
             break;
@@ -683,8 +683,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                                    0, 16000, p_item->i_value);
             spin->SetToolTip( p_item->psz_longtext );
             config_data->control.spinctrl = spin;
-            panel_sizer->Add( label, 0, wxALL, 5 );
-            panel_sizer->Add( spin, 0, wxALL, 5 );
+            panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+            panel_sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
             break;
 
         case CONFIG_ITEM_BOOL:
