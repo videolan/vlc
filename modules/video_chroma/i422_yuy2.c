@@ -2,7 +2,7 @@
  * i422_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i422_yuy2.c,v 1.3 2003/08/29 18:58:05 fenrir Exp $
+ * $Id: i422_yuy2.c,v 1.4 2003/11/06 17:08:12 nitrox Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -51,6 +51,8 @@ static void I422_IUYV           ( vout_thread_t *, picture_t *, picture_t * );
 static void I422_cyuv           ( vout_thread_t *, picture_t *, picture_t * );
 #if defined (MODULE_NAME_IS_i422_yuy2)
 static void I422_Y211           ( vout_thread_t *, picture_t *, picture_t * );
+static void I422_Y211           ( vout_thread_t *, picture_t *, picture_t * );
+static void I422_YV12           ( vout_thread_t *, picture_t *, picture_t * );
 #endif
 
 /*****************************************************************************
@@ -113,6 +115,10 @@ static int Activate( vlc_object_t *p_this )
 #if defined (MODULE_NAME_IS_i422_yuy2)
                 case VLC_FOURCC('Y','2','1','1'):
                     p_vout->chroma.pf_convert = I422_Y211;
+                    break;
+
+                case VLC_FOURCC('Y','V','1','2'):
+                    p_vout->chroma.pf_convert = I422_YV12;
                     break;
 #endif
 
@@ -315,3 +321,35 @@ static void I422_Y211( vout_thread_t *p_vout, picture_t *p_source,
 }
 #endif
 
+
+/*****************************************************************************
+ * I422_YV12: planar YUV 4:2:2 to planar YV12
+ *****************************************************************************/
+#if defined (MODULE_NAME_IS_i422_yuy2)
+static void I422_YV12( vout_thread_t *p_vout, picture_t *p_source,
+                                              picture_t *p_dest )
+{
+    uint16_t i_dpy = p_dest->p[Y_PLANE].i_pitch;
+    uint16_t i_spy = p_source->p[Y_PLANE].i_pitch;
+    uint16_t i_dpuv = p_dest->p[U_PLANE].i_pitch;
+    uint16_t i_spuv = p_source->p[U_PLANE].i_pitch;
+    uint16_t i_width = p_vout->render.i_width;
+    uint16_t i_y = p_vout->render.i_height;
+    uint8_t *p_dy = p_dest->Y_PIXELS + (i_y-1)*i_dpy;
+    uint8_t *p_y = p_source->Y_PIXELS + (i_y-1)*i_spy;
+    uint8_t *p_du = p_dest->U_PIXELS + (i_y/2-1)*i_dpuv;
+    uint8_t *p_u = p_source->U_PIXELS + (i_y-1)*i_spuv;
+    uint8_t *p_dv = p_dest->V_PIXELS + (i_y/2-1)*i_dpuv;
+    uint8_t *p_v = p_source->V_PIXELS + (i_y-1)*i_spuv;
+    i_y /= 2;
+
+    for ( ; i_y--; )
+    {
+        memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
+        memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
+        memcpy(p_du, p_u, i_width/2); p_du -= i_dpuv; p_u -= 2*i_spuv;
+        memcpy(p_dv, p_v, i_width/2); p_dv -= i_dpuv; p_v -= 2*i_spuv;
+    }
+
+}
+#endif
