@@ -385,6 +385,9 @@ static void Run( intf_thread_t *p_intf )
     intf_sys_t *p_sys  = p_intf->p_sys;
     uint8_t     buffer[MAX_SAP_BUFFER + 1];
     uint8_t    *p_end;
+    
+    /* Dirty hack to slow down the startup of the sap interface*/ 
+    msleep(500000);    
 
     /* read SAP packets */
     while( !p_intf->b_die )
