@@ -7,6 +7,10 @@
 #define UNDER_CE _WIN32_WCE
 #endif
 
+#if !defined(_WIN32_WCE)
+#define _WIN32_WCE UNDER_CE
+#endif
+
 #if defined(_WIN32_WCE)
     #define _WIN32_IE 0x0500
     #include <commctrl.h>
@@ -242,16 +246,26 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
+#ifdef __MINGW32__
+IDI_ICON1               ICON    DISCARDABLE     "bitmaps/vlc16x16.ico"
+#else
 IDI_ICON1               ICON    DISCARDABLE     "bitmaps\\vlc16x16.ico"
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
+#ifdef __MINGW32__
+IDB_BITMAP1             BITMAP  DISCARDABLE     "bitmaps/toolbar1.bmp"
+IDB_BITMAP2             BITMAP  DISCARDABLE     "bitmaps/toolbar2.bmp"
+IDB_BITMAP3             BITMAP  DISCARDABLE     "bitmaps/toolbar3.bmp"
+#else
 IDB_BITMAP1             BITMAP  DISCARDABLE     "bitmaps\\toolbar1.bmp"
 IDB_BITMAP2             BITMAP  DISCARDABLE     "bitmaps\\toolbar2.bmp"
 IDB_BITMAP3             BITMAP  DISCARDABLE     "bitmaps\\toolbar3.bmp"
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //

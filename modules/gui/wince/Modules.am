@@ -1,3 +1,7 @@
+SUFFIXES = .rc
+.rc.o:
+	$(WINDRES) -DUNDER_CE -D__MINGW32__ -I. -I$(srcdir) -i $< -o $@
+
 SOURCES_wince = \
 	wince.cpp \
 	wince.h \
@@ -14,7 +18,7 @@ SOURCES_wince = \
 	subtitles.cpp \
 	timer.cpp \
 	video.cpp \
-	wince.rc \
+	wince_rc.rc \
 	$(NULL)
 
 EXTRA_DIST += \
