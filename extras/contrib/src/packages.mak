@@ -2,7 +2,7 @@
 # src/packages.mak : Archives locations
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN   
-# $Id: packages.mak,v 1.10 2004/01/19 01:11:47 hartman Exp $
+# $Id: packages.mak,v 1.11 2004/01/21 19:21:23 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -80,12 +80,15 @@ LIBDVDREAD_VERSION=0.9.4
 LIBDVDREAD_URL=http://www.dtek.chalmers.se/groups/dvd/dist/libdvdread-$(LIBDVDREAD_VERSION).tar.gz
 LIBDVDPLAY_VERSION=1.0.1
 LIBDVDPLAY_URL=http://download.videolan.org/pub/libdvdplay/$(LIBDVDPLAY_VERSION)/libdvdplay-$(LIBDVDPLAY_VERSION).tar.gz
+LIBDVDNAV_VERSION=0.1.9
+LIBDVDNAV_URL=http://ftp.snt.utwente.nl/pub/linux/gentoo/distfiles/libdvdnav-$(LIBDVDNAV_VERSION).tar.gz
 LIBDVBPSI_VERSION=0.1.4
 LIBDVBPSI_URL=http://download.videolan.org/pub/libdvbpsi/$(LIBDVBPSI_VERSION)/libdvbpsi3-$(LIBDVBPSI_VERSION).tar.gz
-LIVEDOTCOM_VERSION=2003.11.06
+LIVEDOTCOM_VERSION=2004.01.21
 LIVEDOTCOM_URL=http://download.videolan.org/pub/testing/contrib/live.$(LIVEDOTCOM_VERSION).tar.gz
 GOOMDJ_URL=http://sidekick.student.utwente.nl/videolan/goom-dj.tar.gz
 LIBCACA_VERSION=0.8
 LIBCACA_URL=http://sam.zoy.org/projects/libcaca/libcaca-$(LIBCACA_VERSION).tar.gz
-
+LIBMODPLUG_VERSION=0.7
+LIBMODPLUG_URL=$(SF)/modplug-xmms/libmodplug-$(LIBMODPLUG_VERSION).tar.gz
 
