@@ -2,7 +2,7 @@
  * x11_api.cpp: Various x11-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_api.cpp,v 1.6 2003/06/04 17:44:57 gbazin Exp $
+ * $Id: x11_api.cpp,v 1.7 2003/06/04 18:47:57 asmax Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -37,6 +37,7 @@
 #include "../os_api.h"
 #include "../src/event.h"       // for MAX_PARAM_SIZE
 
+#include <unistd.h>                                       // unkink and rmdir
 #include <sys/types.h>
 #include <sys/stat.h>                                               // stat()
 #include <sys/time.h>                                       // gettimeofday()
