@@ -2,7 +2,7 @@
  * cdda.c : CD digital audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: cdda.c,v 1.7 2003/11/24 00:39:01 fenrir Exp $
+ * $Id: cdda.c,v 1.8 2003/11/24 12:44:24 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -25,64 +25,22 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-#include <sys/types.h>
-
-#include "codecs.h"
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
-
-#include <string.h>
 
 #include "vcd/cdrom.h"
-
-/* how many blocks VCDRead will read in each loop */
-#define CDDA_BLOCKS_ONCE 20
-#define CDDA_DATA_ONCE   (CDDA_BLOCKS_ONCE * CDDA_DATA_SIZE)
-
-/*****************************************************************************
- * cdda_data_t: CD audio information
- *****************************************************************************/
-typedef struct cdda_data_s
-{
-    vcddev_t    *vcddev;                            /* vcd device descriptor */
-    int         i_nb_tracks;                        /* Nb of tracks (titles) */
-    int         i_track;                                    /* Current track */
-    int         i_sector;                                  /* Current Sector */
-    int *       p_sectors;                                  /* Track sectors */
-    vlc_bool_t  b_end_of_track;           /* If the end of track was reached */
-
-} cdda_data_t;
-
-struct demux_sys_t
-{
-    es_descriptor_t *p_es;
-    mtime_t         i_pts;
-};
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  CDDAOpen         ( vlc_object_t * );
-static void CDDAClose        ( vlc_object_t * );
-static int  CDDARead         ( input_thread_t *, byte_t *, size_t );
-static void CDDASeek         ( input_thread_t *, off_t );
-static int  CDDASetArea      ( input_thread_t *, input_area_t * );
-static int  CDDASetProgram   ( input_thread_t *, pgrm_descriptor_t * );
-
-static int  CDDAOpenDemux    ( vlc_object_t * );
-static void CDDACloseDemux   ( vlc_object_t * );
-static int  CDDADemux        ( input_thread_t * p_input );
 
 /*****************************************************************************
  * Module descriptior
  *****************************************************************************/
+static int  AccessOpen ( vlc_object_t * );
+static void AccessClose( vlc_object_t * );
+
+static int  DemuxOpen  ( vlc_object_t * );
+static void DemuxClose ( vlc_object_t * );
+
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for cdda streams. This " \
@@ -92,26 +50,51 @@ vlc_module_begin();
     set_description( _("CD Audio input") );
     set_capability( "access", 70 );
     add_integer( "cdda-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    set_callbacks( CDDAOpen, CDDAClose );
+    set_callbacks( AccessOpen, AccessClose );
     add_shortcut( "cdda" );
 
     add_submodule();
         set_description( _("CD Audio demux") );
         set_capability( "demux", 0 );
-        set_callbacks( CDDAOpenDemux, CDDACloseDemux );
+        set_callbacks( DemuxOpen, DemuxClose );
         add_shortcut( "cdda" );
 vlc_module_end();
 
+
+/* how many blocks VCDRead will read in each loop */
+#define CDDA_BLOCKS_ONCE 20
+#define CDDA_DATA_ONCE   (CDDA_BLOCKS_ONCE * CDDA_DATA_SIZE)
+
 /*****************************************************************************
- * CDDAOpen: open cdda
+ * Access: local prototypes
  *****************************************************************************/
-static int CDDAOpen( vlc_object_t *p_this )
+struct access_sys_t
+{
+    vcddev_t    *vcddev;                            /* vcd device descriptor */
+    int         i_nb_tracks;                        /* Nb of tracks (titles) */
+    int         i_track;                                    /* Current track */
+    int         i_sector;                                  /* Current Sector */
+    int *       p_sectors;                                  /* Track sectors */
+    vlc_bool_t  b_end_of_track;           /* If the end of track was reached */
+
+};
+
+static int  Read      ( input_thread_t *, byte_t *, size_t );
+static void Seek      ( input_thread_t *, off_t );
+static int  SetArea   ( input_thread_t *, input_area_t * );
+static int  SetProgram( input_thread_t *, pgrm_descriptor_t * );
+
+/*****************************************************************************
+ * AccessOpen: open cdda
+ *****************************************************************************/
+static int AccessOpen( vlc_object_t *p_this )
 {
     input_thread_t *        p_input = (input_thread_t *)p_this;
+    access_sys_t *          p_sys;
+
     char *                  psz_orig;
     char *                  psz_parser;
     char *                  psz_source;
-    cdda_data_t *           p_cdda;
     int                     i;
     input_area_t *          p_area;
     int                     i_title = 1;
@@ -145,7 +128,7 @@ static int CDDAOpen( vlc_object_t *p_this )
         if( !p_input->psz_access )
         {
             free( psz_orig );
-            return -1;
+            return VLC_EGENERIC;
         }
         psz_source = config_GetPsz( p_input, "vcd" );
         if( !psz_source ) return -1;
@@ -156,40 +139,45 @@ static int CDDAOpen( vlc_object_t *p_this )
     {
         msg_Warn( p_input, "could not open %s", psz_source );
         free( psz_source );
-        return -1;
+        return VLC_EGENERIC;
     }
     free( psz_source );
 
-    p_cdda = malloc( sizeof(cdda_data_t) );
-    if( p_cdda == NULL )
+    p_input->p_access_data = p_sys = malloc( sizeof(access_sys_t) );
+    if( p_sys == NULL )
     {
         msg_Err( p_input, "out of memory" );
         free( psz_source );
-        return -1;
+        return VLC_EGENERIC;
     }
 
-    p_cdda->vcddev = vcddev;
-    p_input->p_access_data = (void *)p_cdda;
+    p_sys->vcddev = vcddev;
 
     p_input->i_mtu = CDDA_DATA_ONCE;
 
     /* We read the Table Of Content information */
-    p_cdda->i_nb_tracks = ioctl_GetTracksMap( VLC_OBJECT(p_input),
-                              p_cdda->vcddev, &p_cdda->p_sectors );
-    if( p_cdda->i_nb_tracks < 0 )
-        msg_Err( p_input, "unable to count tracks" );
-    else if( p_cdda->i_nb_tracks <= 0 )
-        msg_Err( p_input, "no audio tracks found" );
-
-    if( p_cdda->i_nb_tracks <= 1)
+    p_sys->i_nb_tracks = ioctl_GetTracksMap( VLC_OBJECT(p_input),
+                                             p_sys->vcddev, &p_sys->p_sectors );
+    if( p_sys->i_nb_tracks < 0 )
     {
-        ioctl_Close( p_this, p_cdda->vcddev );
-        free( p_cdda );
-        return -1;
+        msg_Err( p_input, "unable to count tracks" );
+    }
+    else if( p_sys->i_nb_tracks <= 0 )
+    {
+        msg_Err( p_input, "no audio tracks found" );
     }
 
-    if( i_title >= p_cdda->i_nb_tracks || i_title < 1 )
+    if( p_sys->i_nb_tracks <= 1)
+    {
+        ioctl_Close( p_this, p_sys->vcddev );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
+    if( i_title >= p_sys->i_nb_tracks || i_title < 1 )
+    {
         i_title = 1;
+    }
 
     /* Set stream and area data */
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -205,22 +193,22 @@ static int CDDAOpen( vlc_object_t *p_this )
     p_input->stream.i_mux_rate = 44100 * 4 / 50;
 
 #define area p_input->stream.pp_areas
-    for( i = 1 ; i <= p_cdda->i_nb_tracks ; i++ )
+    for( i = 1 ; i <= p_sys->i_nb_tracks ; i++ )
     {
         input_AddArea( p_input, i, 1 );
 
         /* Absolute start offset and size */
         area[i]->i_start =
-            (off_t)p_cdda->p_sectors[i-1] * (off_t)CDDA_DATA_SIZE;
+            (off_t)p_sys->p_sectors[i-1] * (off_t)CDDA_DATA_SIZE;
         area[i]->i_size =
-            (off_t)(p_cdda->p_sectors[i] - p_cdda->p_sectors[i-1])
+            (off_t)(p_sys->p_sectors[i] - p_sys->p_sectors[i-1])
             * (off_t)CDDA_DATA_SIZE;
     }
 #undef area
 
     p_area = p_input->stream.pp_areas[i_title];
 
-    CDDASetArea( p_input, p_area );
+    SetArea( p_input, p_area );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -229,67 +217,62 @@ static int CDDAOpen( vlc_object_t *p_this )
         p_input->psz_demux = "cdda";
     }
 
-    p_input->pf_read = CDDARead;
-    p_input->pf_seek = CDDASeek;
-    p_input->pf_set_area = CDDASetArea;
-    p_input->pf_set_program = CDDASetProgram;
+    p_input->pf_read = Read;
+    p_input->pf_seek = Seek;
+    p_input->pf_set_area = SetArea;
+    p_input->pf_set_program = SetProgram;
 
     /* Update default_pts to a suitable value for cdda access */
     p_input->i_pts_delay = config_GetInt( p_input, "cdda-caching" ) * 1000;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * CDDAClose: closes cdda
+ * AccessClose: closes cdda
  *****************************************************************************/
-static void CDDAClose( vlc_object_t *p_this )
+static void AccessClose( vlc_object_t *p_this )
 {
-    input_thread_t *   p_input = (input_thread_t *)p_this;
-    cdda_data_t *p_cdda = (cdda_data_t *)p_input->p_access_data;
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    access_sys_t   *p_sys = p_input->p_access_data;
 
-    ioctl_Close( p_this, p_cdda->vcddev );
-    free( p_cdda );
+    ioctl_Close( p_this, p_sys->vcddev );
+    free( p_sys );
 }
 
 /*****************************************************************************
- * CDDARead: reads from the CDDA into PES packets.
+ * Read: reads from the CDDA into PES packets.
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
  * bytes.
  *****************************************************************************/
-static int CDDARead( input_thread_t * p_input, byte_t * p_buffer,
+static int Read( input_thread_t * p_input, byte_t * p_buffer,
                      size_t i_len )
 {
-    cdda_data_t *           p_cdda;
-    int                     i_blocks;
-    int                     i_index;
-    int                     i_read;
+    access_sys_t *p_sys = p_input->p_access_data;
+    int          i_blocks = i_len / CDDA_DATA_SIZE;;
+    int          i_read = 0;
+    int          i_index;
 
-    p_cdda = (cdda_data_t *)p_input->p_access_data;
 
-    i_read = 0;
-
-    /* Compute the number of blocks we have to read */
-
-    i_blocks = i_len / CDDA_DATA_SIZE;
-
-    if ( ioctl_ReadSectors( VLC_OBJECT(p_input), p_cdda->vcddev,
-             p_cdda->i_sector, p_buffer, i_blocks, CDDA_TYPE ) < 0 )
+    if( ioctl_ReadSectors( VLC_OBJECT(p_input), p_sys->vcddev, p_sys->i_sector,
+                           p_buffer, i_blocks, CDDA_TYPE ) < 0 )
     {
-        msg_Err( p_input, "could not read sector %d", p_cdda->i_sector );
+        msg_Err( p_input, "could not read sector %d", p_sys->i_sector );
         return -1;
     }
 
-    for ( i_index = 0; i_index < i_blocks; i_index++ )
+    for( i_index = 0; i_index < i_blocks; i_index++ )
     {
-        p_cdda->i_sector ++;
-        if ( p_cdda->i_sector == p_cdda->p_sectors[p_cdda->i_track + 1] )
+        p_sys->i_sector ++;
+        if( p_sys->i_sector == p_sys->p_sectors[p_sys->i_track + 1] )
         {
             input_area_t *p_area;
 
-            if ( p_cdda->i_track >= p_cdda->i_nb_tracks - 1 )
+            if ( p_sys->i_track >= p_sys->i_nb_tracks - 1 )
+            {
                 return 0; /* EOF */
+            }
 
             vlc_mutex_lock( &p_input->stream.stream_lock );
             p_area = p_input->stream.pp_areas[
@@ -298,7 +281,7 @@ static int CDDARead( input_thread_t * p_input, byte_t * p_buffer,
             msg_Dbg( p_input, "new title" );
 
             p_area->i_part = 1;
-            CDDASetArea( p_input, p_area );
+            SetArea( p_input, p_area );
             vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
         i_read += CDDA_DATA_SIZE;
@@ -314,23 +297,23 @@ static int CDDARead( input_thread_t * p_input, byte_t * p_buffer,
 
 
 /*****************************************************************************
- * CDDASetProgram: Does nothing since a CDDA is mono_program
+ * SetProgram: Does nothing since a CDDA is mono_program
  *****************************************************************************/
-static int CDDASetProgram( input_thread_t * p_input,
+static int SetProgram( input_thread_t * p_input,
                            pgrm_descriptor_t * p_program)
 {
-    return 0;
+    return VLC_EGENERIC;
 }
 
 
 /*****************************************************************************
- * CDDASetArea: initialize input data for title x.
+ * SetArea: initialize input data for title x.
  * It should be called for each user navigation request.
  ****************************************************************************/
-static int CDDASetArea( input_thread_t * p_input, input_area_t * p_area )
+static int SetArea( input_thread_t * p_input, input_area_t * p_area )
 {
-    cdda_data_t *p_cdda = (cdda_data_t*)p_input->p_access_data;
-    vlc_value_t val;
+    access_sys_t *p_sys = p_input->p_access_data;
+    vlc_value_t  val;
 
     /* we can't use the interface slider until initilization is complete */
     p_input->stream.b_seekable = 0;
@@ -341,18 +324,18 @@ static int CDDASetArea( input_thread_t * p_input, input_area_t * p_area )
         p_input->stream.p_selected_area = p_area;
 
         /* Change the current track */
-        p_cdda->i_track = p_area->i_id - 1;
-        p_cdda->i_sector = p_cdda->p_sectors[p_cdda->i_track];
+        p_sys->i_track = p_area->i_id - 1;
+        p_sys->i_sector = p_sys->p_sectors[p_sys->i_track];
 
         /* Update the navigation variables without triggering a callback */
         val.i_int = p_area->i_id;
         var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
     }
 
-    p_cdda->i_sector = p_cdda->p_sectors[p_cdda->i_track];
+    p_sys->i_sector = p_sys->p_sectors[p_sys->i_track];
 
     p_input->stream.p_selected_area->i_tell =
-        (off_t)p_cdda->i_sector * (off_t)CDDA_DATA_SIZE
+        (off_t)p_sys->i_sector * (off_t)CDDA_DATA_SIZE
          - p_input->stream.p_selected_area->i_start;
 
     /* warn interface that something has changed */
@@ -364,144 +347,119 @@ static int CDDASetArea( input_thread_t * p_input, input_area_t * p_area )
 
 
 /****************************************************************************
- * CDDASeek
+ * Seek
  ****************************************************************************/
-static void CDDASeek( input_thread_t * p_input, off_t i_off )
+static void Seek( input_thread_t * p_input, off_t i_off )
 {
-    cdda_data_t * p_cdda;
+    access_sys_t * p_sys = p_input->p_access_data;
 
-    p_cdda = (cdda_data_t *) p_input->p_access_data;
-
-    p_cdda->i_sector = p_cdda->p_sectors[p_cdda->i_track]
+    p_sys->i_sector = p_sys->p_sectors[p_sys->i_track]
                        + i_off / (off_t)CDDA_DATA_SIZE;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.p_selected_area->i_tell =
-        (off_t)p_cdda->i_sector * (off_t)CDDA_DATA_SIZE
+        (off_t)p_sys->i_sector * (off_t)CDDA_DATA_SIZE
          - p_input->stream.p_selected_area->i_start;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
 
+
+
+
+/*****************************************************************************
+ * Demux: local prototypes
+ *****************************************************************************/
+struct demux_sys_t
+{
+    es_out_id_t *p_es;
+    mtime_t     i_pts;
+};
+
+static int  Demux     ( input_thread_t * p_input );
+
 /****************************************************************************
- * Demux Part
+ * DemuxOpen:
  ****************************************************************************/
-static int  CDDAOpenDemux    ( vlc_object_t * p_this)
+static int  DemuxOpen    ( vlc_object_t * p_this)
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_demux;
-    WAVEFORMATEX   *p_wf;
+    demux_sys_t    *p_sys;
+
+    es_format_t    fmt;
 
     if( p_input->stream.i_method != INPUT_METHOD_CDDA )
     {
         return VLC_EGENERIC;
     }
 
-    p_demux = malloc( sizeof( es_descriptor_t ) );
-    p_demux->i_pts = 0;
-    p_demux->p_es = NULL;
-
-    p_input->pf_demux  = CDDADemux;
-    p_input->pf_demux_control = demux_vaControlDefault;
+    p_input->pf_demux  = Demux;
     p_input->pf_rewind = NULL;
-    p_input->p_demux_data = p_demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
+    p_input->p_demux_data = p_sys = malloc( sizeof( es_descriptor_t ) );
+    p_sys->i_pts = 0;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( input_AddProgram( p_input, 0, 0) == NULL )
-    {
-        msg_Err( p_input, "cannot add program" );
-        free( p_input->p_demux_data );
-        return( -1 );
-    }
-    p_input->stream.pp_programs[0]->b_is_ok = 0;
-    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-
-    /* create our ES */ 
-    p_demux->p_es = input_AddES( p_input, 
-                                 p_input->stream.p_selected_program,
-                                 1 /* id */, AUDIO_ES, NULL, 0 );
-    if( !p_demux->p_es )
+    if( input_InitStream( p_input, 0 ) == -1)
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "out of memory" );
-        free( p_input->p_demux_data );
-        return( -1 );
+        msg_Err( p_input, "cannot init stream" );
+        free( p_sys );
+        return VLC_EGENERIC;
     }
-    p_demux->p_es->i_stream_id = 1;
-    p_demux->p_es->i_fourcc = VLC_FOURCC('a','r','a','w');
-
-    p_demux->p_es->p_waveformatex = p_wf = malloc( sizeof( WAVEFORMATEX ) );
-    p_wf->wFormatTag = WAVE_FORMAT_PCM;
-    p_wf->nChannels = 2;
-    p_wf->nSamplesPerSec = 44100;
-    p_wf->nAvgBytesPerSec = 2 * 44100 * 2;
-    p_wf->nBlockAlign = 4;
-    p_wf->wBitsPerSample = 16;
-    p_wf->cbSize = 0;
-
-    input_SelectES( p_input, p_demux->p_es );
-
-    p_input->stream.p_selected_program->b_is_ok = 1;
+    p_input->stream.i_mux_rate = 4 * 44100 / 50;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'a', 'r', 'a', 'w' ) );
+    fmt.audio.i_channels = 2;
+    fmt.audio.i_rate = 44100;
+    fmt.audio.i_bitspersample = 16;
+    fmt.audio.i_blockalign = 4;
+    fmt.i_bitrate = 4 * 44100 * 8;
+
+    p_sys->p_es =  es_out_Add( p_input->p_es_out, &fmt );
 
     return VLC_SUCCESS;
 }
 
-static void CDDACloseDemux( vlc_object_t * p_this)
+/****************************************************************************
+ * DemuxClose:
+ ****************************************************************************/
+static void DemuxClose( vlc_object_t * p_this)
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
-    demux_sys_t    *p_demux = (demux_sys_t*)p_input->p_demux_data;
+    demux_sys_t    *p_sys = (demux_sys_t*)p_input->p_demux_data;
 
-    free( p_demux );
-    p_input->p_demux_data = NULL;
+    free( p_sys );
     return;
 }
 
-static int  CDDADemux( input_thread_t * p_input )
+/****************************************************************************
+ * Demux:
+ ****************************************************************************/
+static int  Demux( input_thread_t * p_input )
 {
-    demux_sys_t    *p_demux = (demux_sys_t*)p_input->p_demux_data;
-    ssize_t         i_read;
-    data_packet_t * p_data;
-    pes_packet_t *  p_pes;
+    demux_sys_t    *p_sys = (demux_sys_t*)p_input->p_demux_data;
+    block_t        *p_block;
+
 
     input_ClockManageRef( p_input,
                           p_input->stream.p_selected_program,
-                          p_demux->i_pts );
+                          p_sys->i_pts );
 
-    if( ( i_read = input_SplitBuffer( p_input, &p_data, CDDA_DATA_SIZE ) )
-        <= 0 )
+    if( ( p_block = stream_Block( p_input->s, CDDA_DATA_SIZE ) ) == NULL )
     {
-        return 0; // EOF
+        /* eof */
+        return 0;
     }
+    p_block->i_dts =
+    p_block->i_pts = input_ClockGetTS( p_input,
+                                       p_input->stream.p_selected_program,
+                                       p_sys->i_pts );
+    p_block->i_length = (mtime_t)90000 * (mtime_t)p_block->i_buffer/44100/4;
 
-    p_pes = input_NewPES( p_input->p_method_data );
+    p_sys->i_pts += p_block->i_length;
 
-    if( p_pes == NULL )
-    {
-        msg_Err( p_input, "out of memory" );
-        input_DeletePacket( p_input->p_method_data, p_data );
-        return -1;
-    }
+    es_out_Send( p_input->p_es_out, p_sys->p_es, p_block );
 
-    p_pes->i_rate = p_input->stream.control.i_rate;
-    p_pes->p_first = p_pes->p_last = p_data;
-    p_pes->i_nb_data = 1;
-    p_pes->i_pes_size = i_read;
-
-    p_pes->i_dts =
-        p_pes->i_pts = input_ClockGetTS( p_input,
-                                         p_input->stream.p_selected_program,
-                                         p_demux->i_pts );
-
-    if( p_demux->p_es->p_dec )
-    {
-        input_DecodePES( p_demux->p_es->p_dec, p_pes );
-    }
-    else
-    {
-        input_DeletePES( p_input->p_method_data, p_pes );
-    }
-
-    p_demux->i_pts += ((mtime_t)90000) * i_read
-                      / (mtime_t)44100 / 4 /* stereo 16 bits */;
     return 1;
 }
