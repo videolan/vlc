@@ -1,8 +1,8 @@
 /*****************************************************************************
- * intf_controller.h : MacOS X plugin for vlc
+ * intf_controller.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $$
+ * $Id: intf_controller.h,v 1.3 2002/02/18 01:34:44 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *
@@ -21,54 +21,56 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
-#import "intf_vlc_wrapper.h"
-#import "intf_qdview.h"
+#include "intf_vlc_wrapper.h"
 
-@interface Intf_PlaylistDS : NSObject {
-    Intf_VlcWrapper* o_vlc ;
-    NSMutableArray* o_playlist ;
+@interface Intf_PlaylistDS : NSObject
+{
+    Intf_VlcWrapper      *o_vlc;
+    NSMutableArray       *o_playlist;
 
-    IBOutlet NSTableView *o_table ;
+    IBOutlet NSTableView *o_table;
 }
 
-- (void ) awakeFromNib ;
-- (void) readPlaylist ;
+- (void)awakeFromNib;
+- (void)readPlaylist;
 
-- (int) numberOfRowsInTableView:(NSTableView*)o_table ;
-- (id) tableView:(NSTableView*)o_table objectValueForTableColumn:(NSTableColumn*)o_column row:(int)i_row ;
-- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex ;
+- (int)numberOfRowsInTableView:(NSTableView *)o_table;
+- (id)tableView:(NSTableView *)o_table objectValueForTableColumn:(NSTableColumn *)o_column row:(int)i_row;
+- (void)tableView:(NSTableView *)o_table setObjectValue:o_value forTableColumn:(NSTableColumn *)o_column row:(int)i_index;
+
 @end
 
-@interface Intf_Controller : NSObject <VlcWrapper_Delegate> {
-    Intf_VlcWrapper* o_vlc ;
+@interface Intf_Controller : NSObject
+{
+    Intf_VlcWrapper *o_vlc;
 
-    NSWindow *o_window ;
-    bool b_window_is_fullscreen ;
-    
-    IBOutlet NSButton *o_play ;
-    IBOutlet NSButton *o_pause ;
-    IBOutlet NSButton *o_stop ;
-    IBOutlet NSButton *o_stepr ;
-    IBOutlet NSButton *o_stepf ;
-    IBOutlet NSSlider *o_timeslider ;
-    IBOutlet NSTextField *o_currenttime ;
-    IBOutlet NSMenuItem *o_menu_fullscreen ;
-    
-    IBOutlet Intf_PlaylistDS *o_playlistds ;
+    IBOutlet NSWindow       *o_window;
+    IBOutlet NSButton       *o_play;
+    IBOutlet NSButton       *o_pause;
+    IBOutlet NSButton       *o_stop;
+    IBOutlet NSButton       *o_stepr;
+    IBOutlet NSButton       *o_stepf;
+    IBOutlet NSSlider       *o_timeslider;
+    IBOutlet NSTextField    *o_currenttime;
+    IBOutlet NSMenuItem     *o_menu_fs;
+
+    IBOutlet Intf_PlaylistDS *o_playlistds;
 }
 
-//Initialization & Event-Management
-- (void) awakeFromNib ;
-- (void) manage:(NSTimer *)timer ;
-- (void)applicationDidBecomeActive:(NSNotification*)aNotification ;
-- (void)applicationDidResignActive:(NSNotification*)aNotification ;
+/* Initialization & Event-Management */
+- (void)awakeFromNib;
+- (void)applicationDidFinishLaunching:(NSNotification *)o_notification;
+- (void)manage;
+- (void)terminate;
 
-//Functions atteched to user interface 
-- (IBAction) openFile:(id)sender ;
-- (IBAction) pause:(id)sender ;
-- (IBAction) play:(id)sender ;
-- (IBAction) timeslider_update:(id)slider ;
-- (IBAction) speedslider_update:(id)slider ;
-- (IBAction) fullscreen_toggle:(id)sender ;
+/* Functions atteched to user interface */
+- (IBAction)openFile:(id)sender;
+- (IBAction)pause:(id)sender;
+- (IBAction)play:(id)sender;
+- (IBAction)stop:(id)sender;
+- (IBAction)timeslider_update:(id)slider;
+- (IBAction)speedslider_update:(id)slider;
+- (IBAction)fullscreen_toggle:(id)sender;
+- (IBAction)quit:(id)sender;
+
 @end

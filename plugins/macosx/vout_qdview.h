@@ -1,10 +1,11 @@
 /*****************************************************************************
- * intf_main.h: MacOS X interface plugin
+ * vout_qdview.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
+ * $Id: vout_qdview.h,v 1.1 2002/02/18 01:34:44 jlj Exp $
  *
- * Authors: Colin Delacroix <colin@zoy.org>
- *	        Florian G. Pflug <fgp@phlo.org>
+ * Authors: Florian G. Pflug <fgp@phlo.org>
+ *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,16 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/* OS specific */
-#import <Cocoa/Cocoa.h>
-
-/*****************************************************************************
- * intf_sys_t: description and status of the interface
- *****************************************************************************/
-typedef struct intf_sys_s
+@interface VLCView : NSQuickDrawView
 {
-    osx_com_t osx_communication ;
+    struct vout_thread_s *p_vout;
+}
 
-    NSAutoreleasePool *o_pool ;
-} intf_sys_t;
+- (id)initWithVout:(struct vout_thread_s *)_p_vout;
 
+@end

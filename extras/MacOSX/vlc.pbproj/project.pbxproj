@@ -67,14 +67,16 @@
 				F512122B0170635601A80A1F,
 				F512122C0170635601A80A1F,
 				F512122D0170635601A80A1F,
-				F512122F0170635601A80A1F,
 				F51212300170635601A80A1F,
 				F51212310170635601A80A1F,
 				F51212320170635601A80A1F,
 				F510A6CC01738ED001A80A1F,
 				F510A6CD01738ED001A80A1F,
-				F53A3B49018DECF201A80A1F,
-				F53A3B4A018DECF201A80A1F,
+				F6799746020DCC2A01A80112,
+				F6799747020DCC2A01A80112,
+				F6799748020DCC2A01A80112,
+				F6799749020DCC2A01A80112,
+				F679974A020DCC2A01A80112,
 			);
 			isa = PBXGroup;
 			name = Files;
@@ -111,12 +113,6 @@
 			isa = PBXFileReference;
 			name = intf_controller.h;
 			path = plugins/macosx/intf_controller.h;
-			refType = 4;
-		};
-		F512122F0170635601A80A1F = {
-			isa = PBXFileReference;
-			name = intf_main.c;
-			path = plugins/macosx/intf_main.c;
 			refType = 4;
 		};
 		F51212300170635601A80A1F = {
@@ -330,16 +326,44 @@
 			settings = {
 			};
 		};
-		F53A3B49018DECF201A80A1F = {
+//F50
+//F51
+//F52
+//F53
+//F54
+//F60
+//F61
+//F62
+//F63
+//F64
+		F6799746020DCC2A01A80112 = {
 			isa = PBXFileReference;
-			name = intf_qdview.h;
-			path = plugins/macosx/intf_qdview.h;
+			name = intf_macosx.c;
+			path = plugins/macosx/intf_macosx.c;
 			refType = 4;
 		};
-		F53A3B4A018DECF201A80A1F = {
+		F6799747020DCC2A01A80112 = {
 			isa = PBXFileReference;
-			name = intf_qdview.c;
-			path = plugins/macosx/intf_qdview.c;
+			name = vout_qdview.c;
+			path = plugins/macosx/vout_qdview.c;
+			refType = 4;
+		};
+		F6799748020DCC2A01A80112 = {
+			isa = PBXFileReference;
+			name = vout_qdview.h;
+			path = plugins/macosx/vout_qdview.h;
+			refType = 4;
+		};
+		F6799749020DCC2A01A80112 = {
+			isa = PBXFileReference;
+			name = vout_window.c;
+			path = plugins/macosx/vout_window.c;
+			refType = 4;
+		};
+		F679974A020DCC2A01A80112 = {
+			isa = PBXFileReference;
+			name = vout_window.h;
+			path = plugins/macosx/vout_window.h;
 			refType = 4;
 		};
 	};

@@ -1,12 +1,13 @@
 /*****************************************************************************
- * macosx.c : MacOS X plugin for vlc
+ * macosx.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: macosx.c,v 1.12 2002/01/21 00:52:07 sam Exp $
+ * $Id: macosx.c,v 1.13 2002/02/18 01:34:44 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
- *	    Florian G. Pflug <fgp@phlo.org>
+ *          Florian G. Pflug <fgp@phlo.org>
+ *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

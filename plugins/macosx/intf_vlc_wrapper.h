@@ -1,10 +1,11 @@
 /*****************************************************************************
- * intf_vlc_wrapper.h : MacOS X plugin for vlc
+ * intf_vlc_wrapper.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $$
+ * $Id: intf_vlc_wrapper.h,v 1.3 2002/02/18 01:34:44 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
+ *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,52 +22,51 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+typedef enum intf_speed_e
+{
+    SPEED_SLOW = 0,
+    SPEED_NORMAL,
+    SPEED_FAST
+} intf_speed_t;
 
-typedef enum intf_speed_e {SPEED_SLOW=0, SPEED_NORMAL, SPEED_FAST} intf_speed_t ;
-@protocol VlcWrapper_Delegate
-    - (void) requestQDPortFullscreen:(bool)b_fullscreen ;
-    - (void) releaseQDPort ;
-    - (void) resizeQDPortFullscreen:(bool)b_fullscreen ;
-@end
+/* Intf_VlcWrapper is a singleton class
+    (only one instance at any time) */
 
-
-// Intf_VlcWrapper is a singleton class (there is only one instance at any time)
-@interface Intf_VlcWrapper : NSObject {    
-    id<VlcWrapper_Delegate> o_delegate ;
-    intf_speed_t e_speed ;
-    
-    unsigned int i_width, i_height ;
+@interface Intf_VlcWrapper : NSObject
+{    
+    id o_delegate;
+    intf_speed_t e_speed;
 }
 
-// Initialization,.... 
-+ (Intf_VlcWrapper*) instance ;
-- (Intf_VlcWrapper*) initWithDelegate:(id)o_delegate ;
+/* Initialization */
++ (Intf_VlcWrapper *)instance;
+- (Intf_VlcWrapper *)initWithDelegate:(id)o_delegate;
 
-- (bool) manage ;
+- (bool)manage;
+- (void)quit;
 
-//Function for the GUI. 
-- (void) setQDPort:(CGrafPtr)p_qdport ;
-- (void) sizeChangeQDPort ;
-- (NSSize) videoSize ;
+/* Vout requests */
+- (void)handlePortMessage:(NSPortMessage *)o_msg;
+- (NSPort *)sendPort;
 
-// Playback control
-- (void) setSpeed:(intf_speed_t)e_speed ;
-- (NSString*) getTimeAsString ;
-- (float) getTimeAsFloat ;
-- (void) setTimeAsFloat:(float)i_offset ;
+/* Playback control */
+- (void)setSpeed:(intf_speed_t)e_speed;
+- (NSString *)getTimeAsString;
+- (float)getTimeAsFloat;
+- (void)setTimeAsFloat:(float)i_offset;
 
-// Playlist control
-- (NSArray*) playlistAsArray ;
-- (int) playlistLength ;
-- (NSString*) playlistItem:(int) i_pos ;
-- (bool) playlistPlayCurrent ;
-- (void) playlistPause ;
-- (void) playlistStop ;
-- (void) playlistPlayNext ;
-- (void) playlistPlayPrev ;
-- (void) playlistPlayItem:(int)i_item ;
-- (void) playlistAdd:(NSString*)o_filename ;
-- (void) clearPlaylist ;
+/* Playlist control */
+- (NSArray *)playlistAsArray;
+- (int)playlistLength;
+- (NSString *)playlistItem:(int)i_pos;
+- (bool)playlistPlayCurrent;
+- (void)playlistPause;
+- (void)playlistStop;
+- (void)playlistPlayNext;
+- (void)playlistPlayPrev;
+- (void)playlistPlayItem:(int)i_item;
+- (void)playlistAdd:(NSString *)o_filename;
+- (void)clearPlaylist;
+- (bool)playlistPlaying;
+
 @end
-

@@ -458,6 +458,25 @@ package-beos:
 	# Clean up
 	rm -Rf tmp
 
+package-macosx:
+	# Check that tmp isn't in the way
+	@if test -e tmp; then \
+		echo "Error: please remove ./tmp, it is in the way"; false; \
+	else \
+		echo "OK."; mkdir tmp; \
+	fi
+
+	# Copy relevant files 
+	cp -R vlc.app tmp/
+	cp AUTHORS COPYING ChangeLog ChangeLog.libdvdcss \
+		README README.libdvdcss FAQ TODO tmp/
+
+	# Create disk image 
+	./macosx-dmg 0 "vlc-${VLC_QUICKVERSION}" tmp/* 
+
+	# Clean up
+	rm -Rf tmp
+
 libdvdcss-snapshot: snapshot-common
 	# Remove vlc sources and icons, doc, debian directory...
 	rm -Rf tmp/vlc/src tmp/vlc/share tmp/vlc/plugins tmp/vlc/doc

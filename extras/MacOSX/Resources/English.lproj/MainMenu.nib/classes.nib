@@ -7,7 +7,9 @@
                 openFile = id; 
                 pause = id; 
                 play = id; 
+                quit = id; 
                 speedslider_update = id; 
+                stop = id; 
                 timeslider_update = id; 
             }; 
             CLASS = Intf_Controller; 
@@ -22,6 +24,7 @@
                 o_stepr = id; 
                 o_stop = id; 
                 o_timeslider = id; 
+                o_window = id; 
             }; 
             SUPERCLASS = NSObject; 
         }, 
@@ -31,7 +34,6 @@
             OUTLETS = {o_table = id; }; 
             SUPERCLASS = NSObject; 
         }, 
-        {CLASS = VlcQuickDrawView; LANGUAGE = ObjC; SUPERCLASS = NSQuickDrawView; }
     ); 
     IBVersion = 1; 
 }

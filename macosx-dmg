@@ -1,0 +1,53 @@
+#!/bin/sh
+#
+# Posted to the projectbuilder-users list by Mike Ferris
+# Modified for vlc by Jon Lech Johansen
+#
+
+set -e
+
+# Requires at least three args
+if [ $# -lt 3 ] ; then
+    echo "usage: $0 size name file ..." 1>&2
+    exit 1
+fi
+
+# Grab size and name
+imgSize=$1
+shift
+imgName=$1
+shift
+
+if [ $((${imgSize} < 5)) != 0 ] ; then
+    imgSize=5;
+fi
+
+# Create the image and format it
+rm -f "${imgName}.dmg"
+echo; echo "Creating ${imgSize} MB disk image named ${imgName}"
+hdiutil create "${imgName}.dmg" -megabytes "${imgSize}" -layout NONE -quiet
+dev=`hdid -nomount "${imgName}.dmg" | grep '/dev/disk[0-9]*' | cut -d " " -f 1`
+/sbin/newfs_hfs -w -v "${imgName}" -b 4096 "${dev}" > /dev/null
+hdiutil eject "${dev}" -quiet
+
+# Mount the image and copy stuff
+dev=`hdid "${imgName}.dmg" | grep '/dev/disk[0-9]*' | cut -d " " -f 1`
+
+echo "Copying contents to ${imgName}:"
+while [ $# -gt 0 ] ; do
+    echo "  ${1}"
+    /Developer/Tools/CpMac -r "${1}" "/Volumes/${imgName}"
+    shift
+done
+
+hdiutil eject "${dev}" -quiet
+
+# Compress the image
+echo "Compressing ${imgName} disk image"
+mv "${imgName}.dmg" "${imgName}.orig.dmg"
+hdiutil convert "${imgName}.orig.dmg" -format UDZO -o "${imgName}" -quiet
+rm "${imgName}.orig.dmg"
+
+# Done
+echo; echo "Disk image creation completed:"
+ls -la "${imgName}.dmg"; echo

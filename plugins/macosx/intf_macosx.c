@@ -1,10 +1,12 @@
 /*****************************************************************************
- * intf_main.c: MacOS X interface plugin
+ * intf_macosx.c: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
+ * $Id: intf_macosx.c,v 1.11 2002/02/18 01:34:44 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *	        Florian G. Pflug <fgp@phlo.org>
+ *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,10 +32,9 @@
 
 #include <videolan/vlc.h>
 
-#include "macosx.h"
-
 #include "interface.h"
-#include "intf_main.h"
+
+#include "macosx.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -62,12 +63,13 @@ static int intf_Open( intf_thread_t *p_intf )
     if( p_intf->p_sys == NULL )
     {
         return( 1 );
-    };
+    }
 
-    p_intf->p_sys->o_pool =[[NSAutoreleasePool alloc] init];
+    p_intf->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
+    p_intf->p_sys->o_port = [[NSPort port] retain];
 
-    [NSApplication sharedApplication];
-    [NSBundle loadNibNamed:@"MainMenu" owner:NSApp];
+    [[NSApplication sharedApplication] autorelease];
+    [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
 
     return( 0 );
 }
@@ -77,9 +79,12 @@ static int intf_Open( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Close( intf_thread_t *p_intf )
 {
-    /* Destroy structure */
-    [NSApp terminate:NSApp] ;
-    [p_intf->p_sys->o_pool release] ;
+    /* write cached user defaults to disk */
+    [[NSUserDefaults standardUserDefaults] synchronize];
+
+    [p_intf->p_sys->o_port release];
+    [p_intf->p_sys->o_pool release];
+
     free( p_intf->p_sys );
 }
 
@@ -88,5 +93,5 @@ static void intf_Close( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Run( intf_thread_t *p_intf )
 {
-    [NSApp run] ;
+    [NSApp run];
 }

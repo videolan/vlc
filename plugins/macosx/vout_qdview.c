@@ -1,12 +1,10 @@
 /*****************************************************************************
- * macosx.h: MacOS X plugin for vlc
+ * vout_qdview.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: macosx.h,v 1.5 2002/02/18 01:34:44 jlj Exp $
+ * $Id: vout_qdview.c,v 1.1 2002/02/18 01:34:44 jlj Exp $
  *
- * Authors: Colin Delacroix <colin@zoy.org>
- *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
- *          Florian G. Pflug <fgp@phlo.org>
+ * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,55 +22,39 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
-#import <QuickTime/QuickTime.h>
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
+#include <errno.h>                                                 /* ENOMEM */
+#include <stdlib.h>                                                /* free() */
+#include <string.h>                                            /* strerror() */
 
-#include "vout_window.h"
-#include "vout_qdview.h"
+#include <videolan/vlc.h>
+
+#include "video.h"
+#include "video_output.h"
+
+#include "macosx.h"
 
 /*****************************************************************************
- * intf_sys_t: description and status of the interface
+ * VLCView implementation 
  *****************************************************************************/
-typedef struct intf_sys_s
+@implementation VLCView
+
+- (id)initWithVout:(struct vout_thread_s *)_p_vout
 {
-    NSPort *o_port;
-    NSAutoreleasePool *o_pool;
-} intf_sys_t;
+    if( [super init] == nil )
+        return nil;
 
-/*****************************************************************************
- * vout_sys_t: MacOS X video output method descriptor
- *****************************************************************************/
-typedef struct vout_sys_s
+    p_vout = _p_vout;
+
+    return self;
+}
+
+- (void)drawRect:(NSRect)rect
 {
-    VLCWindow *o_window;
+    [super drawRect: rect];
+    p_vout->i_changes |= VOUT_SIZE_CHANGE;
+}
 
-    NSRect s_rect;
-    int b_pos_saved;
-
-    boolean_t b_mouse_moved;
-    boolean_t b_mouse_pointer_visible;
-    mtime_t i_time_mouse_last_moved;
-
-    CodecType i_codec;
-    CGrafPtr p_qdport;
-    ImageSequence i_seq;
-    MatrixRecordPtr p_matrix;
-    DecompressorComponent img_dc;
-    ImageDescriptionHandle h_img_descr;
-} vout_sys_t;
-
-/*****************************************************************************
- * vout_req_t: MacOS X video output request 
- *****************************************************************************/
-#define VOUT_REQ_CREATE_WINDOW  0x00000001
-#define VOUT_REQ_DESTROY_WINDOW 0x00000002
-
-typedef struct vout_req_s
-{
-    int i_type;
-    int i_result;
-
-    NSConditionLock *o_lock;
-
-    struct vout_thread_s *p_vout;
-} vout_req_t;
+@end
