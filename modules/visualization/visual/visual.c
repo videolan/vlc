@@ -2,7 +2,7 @@
  * visual.c : Visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.c,v 1.4 2003/09/03 10:00:23 zorglub Exp $
+ * $Id: visual.c,v 1.5 2003/09/09 23:35:28 hartman Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -42,7 +42,8 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  *****************************************************************************/
 #define ELIST_TEXT N_( "Effects list" )
 #define ELIST_LONGTEXT N_( \
-      "A list of visual effect, separated by commas." )
+      "A list of visual effect, separated by commas.\n
+      "Current effects include: dummy, random, scope, spectrum" )
 
 #define WIDTH_TEXT N_( "Video width" )
 #define HEIGHT_LONGTEXT N_( \
