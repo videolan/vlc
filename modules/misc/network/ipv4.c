@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.20 2003/07/31 23:44:49 fenrir Exp $
+ * $Id: ipv4.c,v 1.21 2004/01/15 13:47:01 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -183,11 +183,10 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
      * packet loss caused by scheduling problems */
     i_opt = 0x80000;
 #if defined( SYS_BEOS )
-    if( setsockopt( i_handle, SOL_SOCKET, SO_NONBLOCK,
+    if( setsockopt( i_handle, SOL_SOCKET, SO_NONBLOCK, (void *) &i_opt, sizeof( i_opt ) ) == -1 )
 #else
-    if( setsockopt( i_handle, SOL_SOCKET, SO_RCVBUF,
+    if( setsockopt( i_handle, SOL_SOCKET, SO_RCVBUF, (void *) &i_opt, sizeof( i_opt ) ) == -1 )
 #endif
-                    (void *) &i_opt, sizeof( i_opt ) ) == -1 )
     {
 #ifdef HAVE_ERRNO_H
         msg_Dbg( p_this, "cannot configure socket (SO_RCVBUF: %s)",
@@ -203,11 +202,10 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     i_opt = 0;
     i_opt_size = sizeof( i_opt );
 #if defined( SYS_BEOS )
-    if( getsockopt( i_handle, SOL_SOCKET, SO_NONBLOCK,
+    if( getsockopt( i_handle, SOL_SOCKET, SO_NONBLOCK, (void*) &i_opt, &i_opt_size ) == -1 )
 #else
-    if( getsockopt( i_handle, SOL_SOCKET, SO_RCVBUF,
+    if( getsockopt( i_handle, SOL_SOCKET, SO_RCVBUF, (void*) &i_opt, &i_opt_size ) == -1 )
 #endif
-                    (void*) &i_opt, &i_opt_size ) == -1 )
     {
 #ifdef HAVE_ERRNO_H
         msg_Warn( p_this, "cannot query socket (SO_RCVBUF: %s)",
@@ -269,11 +267,10 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     {
         i_opt = 1;
 #if defined( SYS_BEOS )
-        if( setsockopt( i_handle, SOL_SOCKET, SO_NONBLOCK,
+        if( setsockopt( i_handle, SOL_SOCKET, SO_NONBLOCK, (void*) &i_opt, sizeof( i_opt ) ) == -1 )
 #else
-        if( setsockopt( i_handle, SOL_SOCKET, SO_BROADCAST,
+        if( setsockopt( i_handle, SOL_SOCKET, SO_BROADCAST, (void*) &i_opt, sizeof( i_opt ) ) == -1 )
 #endif
-                        (void*) &i_opt, sizeof( i_opt ) ) == -1 )
         {
 #ifdef HAVE_ERRNO_H
             msg_Warn( p_this, "cannot configure socket (SO_BROADCAST: %s)",
@@ -404,34 +401,102 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
 #else
         msg_Warn( p_this, "cannot create socket" );
 #endif
-        return( -1 );
+        goto error;
     }
 
     /* Build remote address */
     if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )
     {
         msg_Dbg( p_this, "could not build local address" );
-        close( i_handle );
-        return( -1 );
+        goto error;
     }
 
+    /* We need errno to use non blocking connect */
+#ifdef HAVE_ERRNO_H
+    /* set to non-blocking */
+#if defined( WIN32 ) || defined( UNDER_CE )
+    {
+        unsigned long i_dummy = 1;
+        if( ioctlsocket( fd, FIONBIO, &i_dummy ) != 0 )
+        {
+            msg_Err( p_httpt, "cannot set socket to non-blocking mode" );
+        }
+    }
+#else
+    {
+        int i_flags;
+        if( ( i_flags = fcntl( i_handle, F_GETFL, 0 ) ) < 0 ||
+            fcntl( i_handle, F_SETFL, i_flags | O_NONBLOCK ) < 0 )
+        {
+            msg_Err( p_this, "cannot set socket to non-blocking mode" );
+        }
+    }
+#endif
+#endif
+
     /* Connect the socket */
-    if( connect( i_handle, (struct sockaddr *) &sock,
-                 sizeof( sock ) ) == (-1) )
+    if( connect( i_handle, (struct sockaddr *) &sock, sizeof( sock ) ) == -1 )
     {
 #ifdef HAVE_ERRNO_H
-        msg_Warn( p_this, "cannot connect socket (%s)", strerror(errno) );
+        if( errno == EINPROGRESS )
+        {
+            int i_ret;
+            int i_opt;
+            int i_opt_size = sizeof( i_opt );
+            struct timeval  timeout;
+            fd_set          fds;
+
+            msg_Dbg( p_this, "connection in progress" );
+            do
+            {
+                if( p_this->b_die )
+                {
+                    msg_Dbg( p_this, "connection aborted" );
+                    goto error;
+                }
+
+                /* Initialize file descriptor set */
+                FD_ZERO( &fds );
+                FD_SET( i_handle, &fds );
+
+                /* We'll wait 0.1 second if nothing happens */
+                timeout.tv_sec = 0;
+                timeout.tv_usec = 100000;
+            } while( ( i_ret = select( i_handle + 1, NULL, &fds, NULL, &timeout )) == 0 ||
+                     ( i_ret < 0 && errno == EINTR ) );
+            if( i_ret < 0 )
+            {
+                msg_Warn( p_this, "cannot connect socket (select failed)" );
+                goto error;
+            }
+            if( getsockopt( i_handle, SOL_SOCKET, SO_ERROR, (void*)&i_opt, &i_opt_size ) == -1 ||
+                i_opt != 0 )
+            {
+                msg_Warn( p_this, "cannot connect socket (SO_ERROR)" );
+                goto error;
+            }
+        }
+        else
+        {
+            msg_Warn( p_this, "cannot connect socket (%s)", strerror(errno) );
+            goto error;
+        }
 #else
         msg_Warn( p_this, "cannot connect socket" );
+        goto error;
 #endif
-        close( i_handle );
-        return( -1 );
     }
 
     p_socket->i_handle = i_handle;
     p_socket->i_mtu = 0; /* There is no MTU notion in TCP */
+    return VLC_SUCCESS;
 
-    return( 0 );
+error:
+    if( i_handle > 0 )
+    {
+        close( i_handle );
+    }
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
