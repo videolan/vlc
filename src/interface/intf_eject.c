@@ -2,7 +2,7 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.13 2002/06/01 12:32:01 sam Exp $
+ * $Id: intf_eject.c,v 1.14 2002/06/01 16:45:35 sam Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
@@ -167,11 +167,9 @@ int intf_Eject( vlc_object_t *p_this, const char *psz_device )
     /* Win2K ejection code */
     if ( GetVersion() < 0x80000000 )
     {
-        intf_WarnMsg (3, "intf: win2k ejecting procedure launched") ;
-        
         wsprintf(psz_drive_id, psz_volume_format, psz_device) ;
          
-        intf_WarnMsg(3, "intf: Ejecting drive %s", psz_drive_id) ;
+        msg_Dbg( p_this, "ejecting drive %s", psz_drive_id );
         
         /* Create the file handle */ 
         h_drive = CreateFile(  psz_drive_id, 
@@ -184,7 +182,8 @@ int intf_Eject( vlc_object_t *p_this, const char *psz_device )
 
         if (h_drive == INVALID_HANDLE_VALUE )
         {
-            intf_ErrMsg ("intf error: (Win32) couldn't create handle for device %s", psz_device) ;
+            msg_Err( p_this, "could not create handle for device %s",
+                             psz_device );
         }
 
         i_ret = DeviceIoControl ( h_drive, 
@@ -214,7 +213,7 @@ int intf_Eject( vlc_object_t *p_this, const char *psz_device )
                                  &dw_result, 0) ;
 
         CloseHandle (h_drive) ;
-	return (i_ret) ;
+        return (i_ret) ;
     }
 #else   /* WIN32 */
     

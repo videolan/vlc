@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.2 2002/06/01 14:31:32 sam Exp $
+ * $Id: threads.c,v 1.3 2002/06/01 16:45:35 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -155,7 +155,6 @@ int vlc_threads_end( void )
 #endif
 }
 
-static int mutexes = 0;
 /*****************************************************************************
  * vlc_mutex_init: initialize a mutex
  *****************************************************************************/
@@ -402,12 +401,15 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
     i_ret = 0;
     
 #elif defined( WIN32 )
-    unsigned threadID;
-    /* When using the MSVCRT C library you have to use the _beginthreadex
-     * function instead of CreateThread, otherwise you'll end up with memory
-     * leaks and the signal functions not working */
-    p_this->thread_id = (HANDLE)_beginthreadex( NULL, 0, (PTHREAD_START) func, 
-                                                (void *)p_this, 0, &threadID );
+    {
+        unsigned threadID;
+        /* When using the MSVCRT C library you have to use the _beginthreadex
+         * function instead of CreateThread, otherwise you'll end up with memory
+         * leaks and the signal functions not working */
+        p_this->thread_id =
+                (HANDLE)_beginthreadex( NULL, 0, (PTHREAD_START) func, 
+                                        (void *)p_this, 0, &threadID );
+    }
     
     i_ret = ( p_this->thread_id ? 0 : 1 );
 

@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.9 2002/06/01 14:31:32 sam Exp $
+ * $Id: win32_specific.c,v 1.10 2002/06/01 16:45:35 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -66,7 +66,7 @@ void system_Configure( vlc_object_t *p_this )
 /*****************************************************************************
  * system_End: terminate winsock.
  *****************************************************************************/
-void system_End( vlc_object_t * )
+void system_End( vlc_object_t *p_this )
 {
     WSACleanup();
 }

@@ -2,7 +2,7 @@
  * i420_yuy2.h : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.h,v 1.9 2002/06/01 13:52:24 sam Exp $
+ * $Id: i420_yuy2.h,v 1.10 2002/06/01 16:45:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -22,11 +22,6 @@
  *****************************************************************************/
 
 #ifdef MODULE_NAME_IS_chroma_i420_yuy2_mmx
-
-#define UNUSED_LONGLONG(foo) \
-    unsigned long long foo __asm__ (#foo) __attribute__((unused))
-UNUSED_LONGLONG(woo_00ffw) = 0x00ff00ff00ff00ff;
-UNUSED_LONGLONG(woo_80w)   = 0x0000000080808080;
 
 #define MMX_CALL(MMX_INSTRUCTIONS)                                          \
     do {                                                                    \
@@ -100,17 +95,17 @@ movq       (%2), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
 movq       (%3), %%mm1  # Load 8 Y            Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 movd       (%4), %%mm2  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
 movd       (%5), %%mm3  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
-pand  woo_00ffw, %%mm0  # get Y even          00 Y6 00 Y4 00 Y2 00 Y0     \n\
+pand    i_00ffw, %%mm0  # get Y even          00 Y6 00 Y4 00 Y2 00 Y0     \n\
 packuswb  %%mm0, %%mm0  # pack Y              y6 y4 y2 y0 y6 y4 y2 y0     \n\
-pand  woo_00ffw, %%mm2  # get U even          00 u6 00 u4 00 u2 00 u0     \n\
+pand    i_00ffw, %%mm2  # get U even          00 u6 00 u4 00 u2 00 u0     \n\
 packuswb  %%mm2, %%mm2  # pack U              00 00 u2 u0 00 00 u2 u0     \n\
-pand  woo_00ffw, %%mm3  # get V even          00 v6 00 v4 00 v2 00 v0     \n\
+pand    i_00ffw, %%mm3  # get V even          00 v6 00 v4 00 v2 00 v0     \n\
 packuswb  %%mm3, %%mm3  # pack V              00 00 v2 v0 00 00 v2 v0     \n\
 punpcklbw %%mm3, %%mm2  #                     00 00 00 00 v2 u2 v0 u0     \n\
-psubsw  woo_80w, %%mm2  # U,V -= 128                                      \n\
+psubsw    i_80w, %%mm2  # U,V -= 128                                      \n\
 punpcklbw %%mm2, %%mm0  #                     v2 y6 u2 y4 v0 y2 u0 y0     \n\
 movq      %%mm0, (%0)   # Store YUYV                                      \n\
-pand  woo_00ffw, %%mm1  # get Y even          00 Y6 00 Y4 00 Y2 00 Y0     \n\
+pand    i_00ffw, %%mm1  # get Y even          00 Y6 00 Y4 00 Y2 00 Y0     \n\
 packuswb  %%mm1, %%mm1  # pack Y              Y6 Y4 Y2 Y0 Y6 Y4 Y2 Y0     \n\
 punpcklbw %%mm2, %%mm1  #                     v2 Y6 u2 Y4 v0 Y2 u0 Y0     \n\
 movq      %%mm1, (%1)   # Store YUYV                                      \n\

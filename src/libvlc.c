@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.2 2002/06/01 14:31:32 sam Exp $
+ * $Id: libvlc.c,v 1.3 2002/06/01 16:45:34 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -103,9 +103,11 @@ static void ListModules   ( vlc_object_t * );
 static void Version       ( void );
 static void Build         ( void );
 
+#ifndef WIN32
 static void InitSignalHandler   ( void );
 static void SimpleSignalHandler ( int i_signal );
 static void FatalSignalHandler  ( int i_signal );
+#endif
 
 #ifdef WIN32
 static void ShowConsole   ( void );
@@ -144,7 +146,9 @@ vlc_t * vlc_create( void )
     vlc_mutex_init( p_vlc->p_this, &p_vlc->structure_lock );
 
     /* Set signal handling policy for all threads */
+#ifndef WIN32
     InitSignalHandler( );
+#endif
 
     /* Store our newly allocated structure in the global list */
     vlc_mutex_lock( p_vlc->p_global_lock );
@@ -1082,6 +1086,7 @@ static void ShowConsole( void )
 }
 #endif
 
+#ifndef WIN32
 /*****************************************************************************
  * InitSignalHandler: system signal handler initialization
  *****************************************************************************
@@ -1091,7 +1096,6 @@ static void ShowConsole( void )
  *****************************************************************************/
 static void InitSignalHandler( void )
 {
-#ifndef WIN32
     /* Termination signals */
     signal( SIGINT,  FatalSignalHandler );
     signal( SIGHUP,  FatalSignalHandler );
@@ -1100,7 +1104,6 @@ static void InitSignalHandler( void )
     /* Other signals */
     signal( SIGALRM, SimpleSignalHandler );
     signal( SIGPIPE, SimpleSignalHandler );
-#endif
 }
 
 /*****************************************************************************
@@ -1156,11 +1159,9 @@ static void FatalSignalHandler( int i_signal )
     else if( mdate() > abort_time + 1000000 )
     {
         /* If user asks again 1 second later, die badly */
-#ifndef WIN32
         signal( SIGINT,  SIG_IGN );
         signal( SIGHUP,  SIG_IGN );
         signal( SIGQUIT, SIG_IGN );
-#endif
 
         for( i_index = 0 ; i_index < i_vlc ; i_index++ )
         {
@@ -1173,4 +1174,5 @@ static void FatalSignalHandler( int i_signal )
 
     vlc_mutex_unlock( &global_lock );
 }
+#endif
 

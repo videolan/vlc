@@ -2,7 +2,7 @@
  * i420_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.c,v 1.8 2002/06/01 12:31:58 sam Exp $
+ * $Id: i420_yuy2.c,v 1.9 2002/06/01 16:45:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -58,6 +58,11 @@ static void I420_cyuv           ( vout_thread_t *, picture_t *, picture_t * );
 static void I420_Y211           ( vout_thread_t *, picture_t *, picture_t * );
 #endif
 
+#ifdef MODULE_NAME_IS_chroma_i420_yuy2_mmx
+static unsigned long long i_00ffw;
+static unsigned long long i_80w;
+#endif
+
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
@@ -72,6 +77,9 @@ MODULE_INIT_START
     SET_DESCRIPTION( _("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) )
     ADD_CAPABILITY( CHROMA, 100 )
     ADD_REQUIREMENT( MMX )
+    /* Initialize MMX-specific constants */
+    i_00ffw = 0x00ff00ff00ff00ff;
+    i_80w   = 0x0000000080808080;
 #endif
 MODULE_INIT_STOP
 

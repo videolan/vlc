@@ -2,7 +2,7 @@
  * aout_directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_directx.c,v 1.22 2002/06/01 12:31:58 sam Exp $
+ * $Id: aout_directx.c,v 1.23 2002/06/01 16:45:34 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -45,6 +45,18 @@
 DEFINE_GUID(IID_IDirectSoundNotify, 0xb0210783, 0x89cd, 0x11d0, 0xaf, 0x8, 0x0, 0xa0, 0xc9, 0x25, 0xcd, 0x16);
 
 /*****************************************************************************
+ * notification_thread_t: DirectX event thread
+ *****************************************************************************/
+typedef struct notification_thread_s
+{
+    VLC_COMMON_MEMBERS
+
+    aout_thread_t * p_aout;
+    DSBPOSITIONNOTIFY p_events[2];               /* play notification events */
+
+} notification_thread_t;
+
+/*****************************************************************************
  * aout_sys_t: directx audio output method descriptor
  *****************************************************************************
  * This structure is part of the audio output thread descriptor.
@@ -75,28 +87,23 @@ struct aout_sys_s
 
     vlc_mutex_t buffer_lock;                            /* audio buffer lock */
 
-    vlc_thread_t notification_thread_id;             /* DirectSoundThread id */
-
-    DSBPOSITIONNOTIFY notification_events[2];    /* play notification events */
-
-    vlc_bool_t b_notification_thread_die;         /* flag to kill the thread */
+    notification_thread_t * p_notif;                 /* DirectSoundThread id */
 };
 
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int     aout_Open        ( aout_thread_t *p_aout );
-static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
-static void    aout_Play        ( aout_thread_t *p_aout,
-                                  byte_t *buffer, int i_size );
-static void    aout_Close       ( aout_thread_t *p_aout );
+static int     aout_Open        ( aout_thread_t * );
+static int     aout_SetFormat   ( aout_thread_t * );
+static int     aout_GetBufInfo  ( aout_thread_t *, int );
+static void    aout_Play        ( aout_thread_t *, byte_t *, int );
+static void    aout_Close       ( aout_thread_t * );
 
 /* local functions */
-static int  DirectxCreateSecondaryBuffer ( aout_thread_t *p_aout );
-static void DirectxDestroySecondaryBuffer( aout_thread_t *p_aout );
-static int  DirectxInitDSound            ( aout_thread_t *p_aout );
-static void DirectSoundThread            ( aout_thread_t *p_aout );
+static int  DirectxCreateSecondaryBuffer ( aout_thread_t * );
+static void DirectxDestroySecondaryBuffer( aout_thread_t * );
+static int  DirectxInitDSound            ( aout_thread_t * );
+static void DirectSoundThread            ( notification_thread_t * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -137,10 +144,9 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys->p_dsbuffer_primary = NULL;
     p_aout->p_sys->p_dsbuffer = NULL;
     p_aout->p_sys->p_dsnotify = NULL;
-    p_aout->p_sys->b_notification_thread_die = 0;
     p_aout->p_sys->l_data_written_from_beginning = 0;
     p_aout->p_sys->l_data_played_from_beginning = 0;
-    vlc_mutex_init( &p_aout->p_sys->buffer_lock );
+    vlc_mutex_init( p_aout, &p_aout->p_sys->buffer_lock );
 
 
     /* Initialise DirectSound */
@@ -172,20 +178,24 @@ static int aout_Open( aout_thread_t *p_aout )
     /* Now we need to setup DirectSound play notification */
 
     /* first we need to create the notification events */
-    p_aout->p_sys->notification_events[0].hEventNotify =
+    p_aout->p_sys->p_notif->p_events[0].hEventNotify =
         CreateEvent( NULL, FALSE, FALSE, NULL );
-    p_aout->p_sys->notification_events[1].hEventNotify =
+    p_aout->p_sys->p_notif->p_events[1].hEventNotify =
         CreateEvent( NULL, FALSE, FALSE, NULL );
 
     /* then launch the notification thread */
     msg_Dbg( p_aout, "creating DirectSoundThread" );
-    if( vlc_thread_create( p_aout, &p_aout->p_sys->notification_thread_id,
-                           "DirectSound Notification Thread",
-                           (void *) DirectSoundThread, (void *) p_aout) )
+    p_aout->p_sys->p_notif =
+                vlc_object_create( p_aout, sizeof(notification_thread_t) );
+    p_aout->p_sys->p_notif->p_aout = p_aout;
+    if( vlc_thread_create( p_aout->p_sys->p_notif,
+                    "DirectSound Notification Thread", DirectSoundThread, 1 ) )
     {
         msg_Err( p_aout, "cannot create DirectSoundThread" );
         /* Let's go on anyway */
     }
+
+    vlc_object_attach( p_aout->p_sys->p_notif, p_aout );
 
     return( 0 );
 }
@@ -424,11 +434,14 @@ static void aout_Close( aout_thread_t *p_aout )
 
     msg_Dbg( p_aout, "aout_Close" );
 
-    /* kill the position notification thread */
-    p_aout->p_sys->b_notification_thread_die = 1;
-    SetEvent( p_aout->p_sys->notification_events[0].hEventNotify );
-    vlc_thread_join( p_aout, p_aout->p_sys->notification_thread_id );
-    vlc_mutex_destroy( &p_aout->p_sys->buffer_lock );
+    /* kill the position notification thread, if any */
+    vlc_object_unlink_all( p_aout->p_sys->p_notif );
+    if( p_aout->p_sys->p_notif->b_thread )
+    {
+        p_aout->p_sys->p_notif->b_die = 1;
+        vlc_thread_join( p_aout->p_sys->p_notif );
+    }
+    vlc_object_destroy( p_aout->p_sys->p_notif );
 
     /* release the secondary buffer */
     DirectxDestroySecondaryBuffer( p_aout );
@@ -578,8 +591,8 @@ static int DirectxCreateSecondaryBuffer( aout_thread_t *p_aout )
 
     /* Now the secondary buffer is created, we need to setup its position
      * notification */
-    p_aout->p_sys->notification_events[0].dwOffset = 0;    /* notif position */
-    p_aout->p_sys->notification_events[1].dwOffset = dsbcaps.dwBufferBytes / 2;
+    p_aout->p_sys->p_notif->p_events[0].dwOffset = 0;    /* notif position */
+    p_aout->p_sys->p_notif->p_events[1].dwOffset = dsbcaps.dwBufferBytes / 2;
 
     /* Get the IDirectSoundNotify interface */
     if FAILED( IDirectSoundBuffer_QueryInterface( p_aout->p_sys->p_dsbuffer,
@@ -595,7 +608,7 @@ static int DirectxCreateSecondaryBuffer( aout_thread_t *p_aout )
     if FAILED( IDirectSoundNotify_SetNotificationPositions(
                                         p_aout->p_sys->p_dsnotify,
                                         2,
-                                        p_aout->p_sys->notification_events ) )
+                                        p_aout->p_sys->p_notif->p_events ) )
     {
         msg_Warn( p_aout, "cannot set position Notification" );
         /* Go on anyway */
@@ -638,7 +651,7 @@ static void DirectxDestroySecondaryBuffer( aout_thread_t *p_aout )
  * Using event notification implies blocking the thread until the event is
  * signaled so we really need to run this in a separate thread.
  *****************************************************************************/
-static void DirectSoundThread( aout_thread_t *p_aout )
+static void DirectSoundThread( notification_thread_t *p_notif )
 {
     HANDLE  notification_events[2];
     VOID    *p_write_position, *p_start_buffer;
@@ -646,26 +659,32 @@ static void DirectSoundThread( aout_thread_t *p_aout )
     HRESULT dsresult;
     long    l_buffer_size, l_play_position, l_data_in_buffer;
 
-    notification_events[0]=p_aout->p_sys->notification_events[0].hEventNotify;
-    notification_events[1]=p_aout->p_sys->notification_events[1].hEventNotify;
+    aout_thread_t *p_aout = p_notif->p_aout;
+
+#define P_EVENTS p_aout->p_sys->p_notif->p_events
+    notification_events[0] = P_EVENTS[0].hEventNotify;
+    notification_events[1] = P_EVENTS[1].hEventNotify;
+
+    /* Tell the main thread that we are ready */
+    vlc_thread_ready( p_notif );
 
     /* this thread must be high-priority */
     if( !SetThreadPriority( GetCurrentThread(),
                             THREAD_PRIORITY_ABOVE_NORMAL ) )
     {
-        msg_Warn( p_aout, "DirectSoundThread could not renice itself" );
+        msg_Warn( p_notif, "DirectSoundThread could not renice itself" );
     }
 
-    msg_Dbg( p_aout, "DirectSoundThread ready" );
+    msg_Dbg( p_notif, "DirectSoundThread ready" );
 
-    while( !p_aout->p_sys->b_notification_thread_die )
+    while( !p_notif->b_die )
     {
         /* wait for the position notification */
         l_play_position = WaitForMultipleObjects( 2, notification_events,
                                                   0, INFINITE ); 
         vlc_mutex_lock( &p_aout->p_sys->buffer_lock );
 
-        if( p_aout->p_sys->b_notification_thread_die )
+        if( p_notif->b_die )
         {
             break;
         }
@@ -680,15 +699,15 @@ static void DirectSoundThread( aout_thread_t *p_aout )
         /* detect wrap-around */
         if( l_data_in_buffer < (-l_buffer_size/2) )
         {
-            msg_Dbg( p_aout, "DirectSoundThread wrap around: %li",
-                             l_data_in_buffer );
+            msg_Dbg( p_notif, "DirectSoundThread wrap around: %li",
+                              l_data_in_buffer );
             l_data_in_buffer += l_buffer_size;
         }
 
         /* detect underflow */
         if( l_data_in_buffer <= 0 )
         {
-            msg_Warn( p_aout,
+            msg_Warn( p_notif,
                       "DirectSoundThread underflow: %li", l_data_in_buffer );
             p_aout->p_sys->b_buffer_underflown = 1;
             p_aout->p_sys->l_write_position =
@@ -723,7 +742,7 @@ static void DirectSoundThread( aout_thread_t *p_aout )
         }
         if( dsresult != DS_OK )
         {
-            msg_Warn( p_aout, "aout_Play cannot lock buffer" );
+            msg_Warn( p_notif, "aout_Play cannot lock buffer" );
             vlc_mutex_unlock( &p_aout->p_sys->buffer_lock );
             return;
         }
@@ -747,6 +766,6 @@ static void DirectSoundThread( aout_thread_t *p_aout )
     CloseHandle( notification_events[0] );
     CloseHandle( notification_events[1] );
 
-    msg_Dbg( p_aout, "DirectSoundThread exiting" );
+    msg_Dbg( p_notif, "DirectSoundThread exiting" );
 
 }

@@ -4,6 +4,17 @@
 
 HEAD
 
+  * ./plugins/dummy/intf_dummy.c, ./plugins/chroma/i420_yuy2.c,
+    src/interface/intf_eject.c, src/misc/threads.c: win32 compilation fix.
+  * ./plugins/directx/aout_directx.c, plugins/directx/vout_directx.c,
+    ./plugins/directx/vout_events.c: the DirectX notification and event threads
+    now use the vlc_thread_create / vlc_thread_ready scheme. Untested.
+  * ./configure.in: added a check for inttypes.h and sys/int_types.h.
+  * ./configure.in: fixed the HTTP plugin compilation under BeOS.
+  * ./plugins/network/ipv6.c: reactivated IPv6 module.
+  * ./src/misc/beos_specific.cpp: BeOS fixes, removed a static variable.
+  * ./include/main.h: replaced p_sys with explicit variables because it's
+    really much simpler this way.
   * ./src/misc/beos_specific.cpp: the BeOS BApplication thread now uses the
     vlc_thread_create / vlc_thread_ready scheme to signal readiness.
   * ./src/misc/objects.c: prevent the creation of a too small vlc_object_t.

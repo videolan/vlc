@@ -21,9 +21,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA    02111, USA.
  *****************************************************************************/
 
+#include <vlc/vlc.h>
+
 #include <sys/ioctl.h>
 #include <stdio.h>
-#include <inttypes.h>
+#ifdef HAVE_INTTYPES_H
+#   include <inttypes.h>                                       /* int16_t .. */
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>

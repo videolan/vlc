@@ -133,6 +133,10 @@ AC_CHECK_FUNC(connect,,[
     ipv4_LDFLAGS="${ipv4_LDFLAGS} -lsocket"
     vlc_LDFLAGS="${vlc_LDFLAGS} -lsocket"
 )])
+AC_CHECK_FUNC(send,,[
+  AC_CHECK_LIB(socket,send,
+    http_LDFLAGS="${http_LDFLAGS} -lsocket"
+)])
 AC_CHECK_FUNC(gethostbyname,,[
   AC_CHECK_LIB(nsl,gethostbyname,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lnsl")
 ])
@@ -205,7 +209,7 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
             Define if <strings.h> defines strncasecmp.)])
 
 dnl Check for headers
-AC_CHECK_HEADERS(stdint.h getopt.h strings.h)
+AC_CHECK_HEADERS(stdint.h getopt.h strings.h inttypes.h sys/int_types.h)
 AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)

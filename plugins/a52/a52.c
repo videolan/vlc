@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.16 2002/06/01 12:31:58 sam Exp $
+ * $Id: a52.c,v 1.17 2002/06/01 16:45:34 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -26,18 +26,20 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
-#include <inttypes.h>                                          /* int16_t .. */
-
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/decoder.h>
 
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>                                              /* strdup() */
+#ifdef HAVE_INTTYPES_H
+#   include <inttypes.h>                                       /* int16_t .. */
+#endif
+
 #ifdef USE_A52DEC_TREE                                 /* liba52 header file */
-#include "include/a52.h"
+#   include "include/a52.h"
 #else
-#include "a52dec/a52.h"
+#   include "a52dec/a52.h"
 #endif
 
 #include "a52.h"

@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.19 2002/06/01 12:31:58 sam Exp $
+ * $Id: vout_events.c,v 1.20 2002/06/01 16:45:34 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -61,7 +61,7 @@ static long FAR PASCAL DirectXEventProc ( HWND hwnd, UINT message,
  * The main goal of this thread is to isolate the Win32 PeekMessage function
  * because this one can block for a long time.
  *****************************************************************************/
-void DirectXEventThread( vout_thread_t *p_vout )
+void DirectXEventThread( event_thread_t *p_event )
 {
     MSG msg;
     POINT old_mouse_pos;
@@ -71,27 +71,22 @@ void DirectXEventThread( vout_thread_t *p_vout )
     /* Create a window for the video */
     /* Creating a window under Windows also initializes the thread's event
      * message qeue */
-    vlc_mutex_lock( &p_vout->p_sys->event_thread_lock );
-    if( DirectXCreateWindow( p_vout ) )
+    if( DirectXCreateWindow( p_event->p_vout ) )
     {
-        msg_Err( p_vout, "out of memory" );
-        p_vout->p_sys->i_event_thread_status = THREAD_FATAL;
-        p_vout->p_sys->b_event_thread_die = 1;
+        msg_Err( p_event, "out of memory" );
+        p_event->b_dead = 1;
     }
-    else p_vout->p_sys->i_event_thread_status = THREAD_READY;
 
     /* signal the creation of the window */
-    vlc_cond_signal( &p_vout->p_sys->event_thread_wait );
-    vlc_mutex_unlock( &p_vout->p_sys->event_thread_lock );
+    vlc_thread_ready( p_event );
 
     /* Main loop */
     /* GetMessage will sleep if there's no message in the queue */
-    while( !p_vout->p_sys->b_event_thread_die
-           && GetMessage( &msg, p_vout->p_sys->hwnd, 0, 0 ) )
+    while( !p_event->b_die
+           && GetMessage( &msg, p_event->p_vout->p_sys->hwnd, 0, 0 ) )
     {
-
         /* Check if we are asked to exit */
-        if( p_vout->b_die || p_vout->p_sys->b_event_thread_die )
+        if( p_event->b_die )
             break;
 
         switch( msg.message )
@@ -103,11 +98,11 @@ void DirectXEventThread( vout_thread_t *p_vout )
                 (abs(GET_Y_LPARAM(msg.lParam) - old_mouse_pos.y)) > 2 ) )
             {
                 GetCursorPos( &old_mouse_pos );
-                p_vout->p_sys->i_lastmoved = mdate();
+                p_event->p_vout->p_sys->i_lastmoved = mdate();
 
-                if( p_vout->p_sys->b_cursor_hidden )
+                if( p_event->p_vout->p_sys->b_cursor_hidden )
                 {
-                    p_vout->p_sys->b_cursor_hidden = 0;
+                    p_event->p_vout->p_sys->b_cursor_hidden = 0;
                     ShowCursor( TRUE );
                 }
             }
@@ -119,27 +114,36 @@ void DirectXEventThread( vout_thread_t *p_vout )
             break;
 
         case WM_RBUTTONUP:
-            p_vout->p_vlc->p_intf->b_menu_change = 1;
+            {
+                intf_thread_t *p_intf;
+                p_intf = vlc_object_find( p_event->p_vlc, VLC_OBJECT_INTF,
+                                                          FIND_CHILD );
+                if( p_intf )
+                {
+                    p_intf->b_menu_change = 1;
+                    vlc_object_release( p_intf );
+                }
+            }
             break;
 
         case WM_LBUTTONDOWN:
             break;
 
         case WM_LBUTTONDBLCLK:
-            p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
+            p_event->p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
             break;
 
         case WM_KEYDOWN:
             /* the key events are first processed here. The next
              * message processed by this main message loop will be the
              * char translation of the key event */
-            msg_Dbg( p_vout, "WM_KEYDOWN" );
+            msg_Dbg( p_event, "WM_KEYDOWN" );
             switch( msg.wParam )
             {
             case VK_ESCAPE:
             case VK_F12:
                 /* exit application */
-                p_vout->p_vlc->b_die = 1;
+                p_event->p_vlc->b_die = 1;
                 break;
             }
             TranslateMessage(&msg);
@@ -151,47 +155,47 @@ void DirectXEventThread( vout_thread_t *p_vout )
             case 'q':
             case 'Q':
                 /* exit application */
-                p_vout->p_vlc->b_die = 1;
+                p_event->p_vlc->b_die = 1;
                 break;
 
             case 'f':                            /* switch to fullscreen */
             case 'F':
-                p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                p_event->p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
                 break;
 
             case 'c':                                /* toggle grayscale */
             case 'C':
-                p_vout->b_grayscale = ! p_vout->b_grayscale;
-                p_vout->p_sys->i_changes |= VOUT_GRAYSCALE_CHANGE;
+                p_event->p_vout->b_grayscale = ! p_event->p_vout->b_grayscale;
+                p_event->p_vout->p_sys->i_changes |= VOUT_GRAYSCALE_CHANGE;
                 break;
 
             case 'i':                                     /* toggle info */
             case 'I':
-                p_vout->b_info = ! p_vout->b_info;
-                p_vout->p_sys->i_changes |= VOUT_INFO_CHANGE;
+                p_event->p_vout->b_info = ! p_event->p_vout->b_info;
+                p_event->p_vout->p_sys->i_changes |= VOUT_INFO_CHANGE;
                 break;
 
             case 's':                                  /* toggle scaling */
             case 'S':
-                p_vout->b_scale = ! p_vout->b_scale;
-                p_vout->p_sys->i_changes |= VOUT_SCALE_CHANGE;
+                p_event->p_vout->b_scale = ! p_event->p_vout->b_scale;
+                p_event->p_vout->p_sys->i_changes |= VOUT_SCALE_CHANGE;
                 break;
 
             case ' ':                                /* toggle interface */
-                p_vout->b_interface = ! p_vout->b_interface;
-                p_vout->p_sys->i_changes |= VOUT_INTF_CHANGE;
+                p_event->p_vout->b_interface = ! p_event->p_vout->b_interface;
+                p_event->p_vout->p_sys->i_changes |= VOUT_INTF_CHANGE;
                 break;
 
-            case '0': network_ChannelJoin( p_vout->p_this, 0 ); break;
-            case '1': network_ChannelJoin( p_vout->p_this, 1 ); break;
-            case '2': network_ChannelJoin( p_vout->p_this, 2 ); break;
-            case '3': network_ChannelJoin( p_vout->p_this, 3 ); break;
-            case '4': network_ChannelJoin( p_vout->p_this, 4 ); break;
-            case '5': network_ChannelJoin( p_vout->p_this, 5 ); break;
-            case '6': network_ChannelJoin( p_vout->p_this, 6 ); break;
-            case '7': network_ChannelJoin( p_vout->p_this, 7 ); break;
-            case '8': network_ChannelJoin( p_vout->p_this, 8 ); break;
-            case '9': network_ChannelJoin( p_vout->p_this, 9 ); break;
+            case '0': network_ChannelJoin( p_event->p_this, 0 ); break;
+            case '1': network_ChannelJoin( p_event->p_this, 1 ); break;
+            case '2': network_ChannelJoin( p_event->p_this, 2 ); break;
+            case '3': network_ChannelJoin( p_event->p_this, 3 ); break;
+            case '4': network_ChannelJoin( p_event->p_this, 4 ); break;
+            case '5': network_ChannelJoin( p_event->p_this, 5 ); break;
+            case '6': network_ChannelJoin( p_event->p_this, 6 ); break;
+            case '7': network_ChannelJoin( p_event->p_this, 7 ); break;
+            case '8': network_ChannelJoin( p_event->p_this, 8 ); break;
+            case '9': network_ChannelJoin( p_event->p_this, 9 ); break;
 
             default:
                 break;
@@ -210,16 +214,16 @@ void DirectXEventThread( vout_thread_t *p_vout )
 
     if( msg.message == WM_QUIT )
     {
-        msg_Warn( p_vout, "WM_QUIT... should not happen!!" );
-        p_vout->p_sys->hwnd = NULL; /* Window already destroyed */
+        msg_Warn( p_event, "WM_QUIT... should not happen!!" );
+        p_event->p_vout->p_sys->hwnd = NULL; /* Window already destroyed */
     }
 
-    msg_Dbg( p_vout, "DirectXEventThread Terminating" );
+    msg_Dbg( p_event, "DirectXEventThread Terminating" );
 
     /* clear the changes formerly signaled */
-    p_vout->p_sys->i_changes = 0;
+    p_event->p_vout->p_sys->i_changes = 0;
 
-    DirectXCloseWindow( p_vout );
+    DirectXCloseWindow( p_event->p_vout );
 }
 
 
@@ -376,17 +380,11 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
 {
     msg_Dbg( p_vout, "DirectXCloseWindow" );
 
-    vlc_mutex_lock( &p_vout->p_sys->event_thread_lock );
-
     if( p_vout->p_sys->hwnd != NULL )
     {
         DestroyWindow( p_vout->p_sys->hwnd );
         p_vout->p_sys->hwnd = NULL;
     }
-
-    p_vout->p_sys->i_event_thread_status = THREAD_OVER;
-
-    vlc_mutex_unlock( &p_vout->p_sys->event_thread_lock );
 
     /* We don't unregister the Window Class because it could lead to race
      * conditions and it will be done anyway by the system when the app will

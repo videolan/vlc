@@ -2,7 +2,7 @@
  * vout_directx.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.h,v 1.7 2002/06/01 12:31:58 sam Exp $
+ * $Id: vout_directx.h,v 1.8 2002/06/01 16:45:34 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -22,6 +22,17 @@
  *****************************************************************************/
 
 /*****************************************************************************
+ * event_thread_t: DirectX event thread
+ *****************************************************************************/
+typedef struct event_thread_s
+{
+    VLC_COMMON_MEMBERS
+
+    vout_thread_t * p_vout;
+
+} event_thread_t;
+
+/*****************************************************************************
  * vout_sys_t: video output DirectX method descriptor
  *****************************************************************************
  * This structure is part of the video output thread descriptor.
@@ -29,7 +40,6 @@
  *****************************************************************************/
 struct vout_sys_s
 {
-
     LPDIRECTDRAW2        p_ddobject;                    /* DirectDraw object */
     LPDIRECTDRAWSURFACE3 p_display;                        /* Display device */
     LPDIRECTDRAWSURFACE3 p_current_surface;   /* surface currently displayed */
@@ -70,9 +80,7 @@ struct vout_sys_s
     volatile vlc_bool_t b_cursor_hidden;
     volatile mtime_t    i_lastmoved;
 
-    vlc_thread_t event_thread_id;                            /* event thread */
-    vlc_mutex_t  event_thread_lock;             /* lock for the event thread */
-    vlc_cond_t   event_thread_wait;
+    event_thread_t *    p_event;
 
     volatile int i_event_thread_status;         /* DirectXEventThread status */
     volatile vlc_bool_t b_event_thread_die; /* flag to kill the event thread */
@@ -98,7 +106,7 @@ struct picture_sys_s
 /*****************************************************************************
  * Prototypes from vout_events.c
  *****************************************************************************/
-void DirectXEventThread ( vout_thread_t *p_vout );
+void DirectXEventThread ( event_thread_t *p_event );
 void DirectXUpdateOverlay( vout_thread_t *p_vout );
 
 /*****************************************************************************

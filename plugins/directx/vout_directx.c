@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.37 2002/06/01 12:31:58 sam Exp $
+ * $Id: vout_directx.c,v 1.38 2002/06/01 16:45:34 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -122,7 +122,6 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->hbrush = NULL;
     p_vout->p_sys->hwnd = NULL;
     p_vout->p_sys->i_changes = 0;
-    p_vout->p_sys->b_event_thread_die = 0;
     p_vout->p_sys->b_caps_overlay_clipping = 0;
     SetRectEmpty( &p_vout->p_sys->rect_display );
     p_vout->p_sys->b_using_overlay = config_GetInt( p_vout, "overlay" );
@@ -136,11 +135,6 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->i_window_width = p_vout->i_window_width;
     p_vout->p_sys->i_window_height = p_vout->i_window_height;
 
-    /* Set locks and condition variables */
-    vlc_mutex_init( p_vout, &p_vout->p_sys->event_thread_lock );
-    vlc_cond_init( &p_vout->p_sys->event_thread_wait );
-    p_vout->p_sys->i_event_thread_status = THREAD_CREATE;
-
     /* Create the DirectXEventThread, this thread is created by us to isolate
      * the Win32 PeekMessage function calls. We want to do this because
      * Windows can stay blocked inside this call for a long time, and when
@@ -149,32 +143,30 @@ static int vout_Create( vout_thread_t *p_vout )
      * window (because PeekMessage has to be called from the same thread which
      * created the window). */
     msg_Dbg( p_vout, "creating DirectXEventThread" );
-    if( vlc_thread_create( p_vout, &p_vout->p_sys->event_thread_id,
-                           "DirectX Events Thread",
-                           (void *) DirectXEventThread, (void *) p_vout) )
+    p_vout->p_sys->p_event = vlc_object_create( p_vout, sizeof(event_thread_t) );
+    p_vout->p_sys->p_event->p_vout = p_vout;
+    if( vlc_thread_create( p_vout->p_sys->p_event,
+                           "DirectX Events Thread", DirectXEventThread, 1 ) )
     {
         msg_Err( p_vout, "cannot create DirectXEventThread" );
+        vlc_object_destroy( p_vout->p_sys->p_event );
         free( p_vout->p_sys );
         return( 1 );
     }
 
-    /* We need to wait for the actual creation of the thread and window */
-    vlc_mutex_lock( &p_vout->p_sys->event_thread_lock );
-    if( p_vout->p_sys->i_event_thread_status == THREAD_CREATE )
-    {
-        vlc_cond_wait ( &p_vout->p_sys->event_thread_wait,
-                        &p_vout->p_sys->event_thread_lock );
-    }
-    vlc_mutex_unlock( &p_vout->p_sys->event_thread_lock );
-    if( p_vout->p_sys->i_event_thread_status != THREAD_READY )
+    if( p_vout->p_sys->p_event->b_error )
     {
         msg_Err( p_vout, "DirectXEventThread failed" );
+        p_vout->p_sys->p_event->b_die = 1;
+        vlc_thread_join( p_vout->p_sys->p_event );
+        vlc_object_destroy( p_vout->p_sys->p_event );
         free( p_vout->p_sys );
         return( 1 );
     }
 
-    msg_Dbg( p_vout, "DirectXEventThread running" );
+    vlc_object_attach( p_vout->p_sys->p_event, p_vout );
 
+    msg_Dbg( p_vout, "DirectXEventThread running" );
 
     /* Initialise DirectDraw */
     if( DirectXInitDDraw( p_vout ) )
@@ -253,17 +245,20 @@ static void vout_Destroy( vout_thread_t *p_vout )
     DirectXCloseDisplay( p_vout );
     DirectXCloseDDraw( p_vout );
 
+    vlc_object_unlink_all( p_vout->p_sys->p_event );
+
     /* Kill DirectXEventThread */
-    vlc_mutex_lock( &p_vout->p_sys->event_thread_lock );
-    p_vout->p_sys->b_event_thread_die = 1;
+    p_vout->p_sys->p_event->b_die = 1;
 
     /* we need to be sure DirectXEventThread won't stay stuck in GetMessage,
      * so we send a fake message */
     if( p_vout->p_sys->hwnd )
+    {
         PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0);
+    }
 
-    vlc_mutex_unlock( &p_vout->p_sys->event_thread_lock );
-    vlc_thread_join( p_vout->p_sys->event_thread_id );
+    vlc_thread_join( p_vout->p_sys->p_event );
+    vlc_object_destroy( p_vout->p_sys->p_event );
 
     if( p_vout->p_sys != NULL )
     {
@@ -363,7 +358,7 @@ static int vout_Manage( vout_thread_t *p_vout )
     }
 
     /* Check if the event thread is still running */
-    if( p_vout->p_sys->b_event_thread_die )
+    if( p_vout->p_sys->p_event->b_die )
         return 1; /* exit */
 
     return( 0 );
@@ -739,7 +734,7 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
 
     if( !b_overlay )
     {
-        boolean_t b_rgb_surface = ( i_chroma == FOURCC_RGB2 ) ||
+        vlc_bool_t b_rgb_surface = ( i_chroma == FOURCC_RGB2 ) ||
             ( i_chroma == FOURCC_RV15 ) || ( i_chroma == FOURCC_RV16 ) ||
             ( i_chroma == FOURCC_RV24 ) || ( i_chroma == FOURCC_RV32 );
 
@@ -904,7 +899,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                           int i_num_pics )
 {
     int i;
-    boolean_t b_result_ok;
+    vlc_bool_t b_result_ok;
     LPDIRECTDRAWSURFACE3 p_surface;
 
     msg_Dbg( p_vout, "NewPictureVec" );
@@ -1081,11 +1076,10 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
 
             I_OUTPUTPICTURES = 1;
 
-            intf_WarnMsg( 3, "vout: DirectX plain surface created "
-                             "successfully" );
+            msg_Dbg( p_vout, "DirectX plain surface created successfully" );
         }
         else
-            intf_ErrMsg( "vout error: DirectX can't create plain surface." );
+            msg_Err( p_vout, "DirectX could not create plain surface" );
     }
 
 

@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.28 2002/06/01 12:32:01 sam Exp $
+ * $Id: modules_plugin.h,v 1.29 2002/06/01 16:45:35 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc-cvs\n"
-"POT-Creation-Date: 2002-05-31 11:45+0200\n"
+"POT-Creation-Date: 2002-06-01 18:43+0200\n"
 "PO-Revision-Date: 2002-28-02 23.35+0100\n"
 "Last-Translator: Sigmund Augdal <sigmunau@idi.ntnu.no>.\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -13,13 +13,13 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/libvlc.c:270
+#: src/libvlc.c:277
 #, c-format
 msgid "Usage: %s [options] [parameters] [file]...\n"
 msgstr ""
 
 #. Print module name
-#: src/libvlc.c:828
+#: src/libvlc.c:868
 #, c-format
 msgid ""
 "%s module options:\n"
@@ -27,27 +27,27 @@ msgid ""
 msgstr ""
 
 #. We could also have "=<" here
-#: src/libvlc.c:848 src/misc/configuration.c:794
+#: src/libvlc.c:888 src/misc/configuration.c:798
 msgid "string"
 msgstr ""
 
-#: src/libvlc.c:851 src/misc/configuration.c:779
+#: src/libvlc.c:891 src/misc/configuration.c:783
 msgid "integer"
 msgstr ""
 
-#: src/libvlc.c:854 src/misc/configuration.c:786
+#: src/libvlc.c:894 src/misc/configuration.c:790
 msgid "float"
 msgstr ""
 
-#: src/libvlc.c:860
-msgid " (default: enabled)"
+#: src/libvlc.c:900
+msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc.c:861
-msgid " (default: disabled)"
+#: src/libvlc.c:901
+msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc.c:915
+#: src/libvlc.c:955
 msgid ""
 "\n"
 "Playlist items:\n"
@@ -63,25 +63,25 @@ msgid ""
 "  vlc:quit                       quit VLC\n"
 msgstr ""
 
-#: src/libvlc.c:936 src/libvlc.c:985 src/libvlc.c:1009 src/libvlc.c:1028
+#: src/libvlc.c:976 src/libvlc.c:1025 src/libvlc.c:1049 src/libvlc.c:1068
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
 msgstr ""
 
 #. Usage
-#: src/libvlc.c:959
+#: src/libvlc.c:999
 #, c-format
 msgid ""
 "Usage: %s [options] [parameters] [file]...\n"
 "\n"
 msgstr ""
 
-#: src/libvlc.c:962
+#: src/libvlc.c:1002
 msgid "[module]              [description]\n"
 msgstr ""
 
-#: src/libvlc.c:1003
+#: src/libvlc.c:1043
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -93,7 +93,7 @@ msgstr ""
 #. * libvlc.h: main libvlc header
 #. *****************************************************************************
 #. * Copyright (C) 1998-2002 VideoLAN
-#. * $Id: no.po,v 1.9 2002/06/01 12:32:01 sam Exp $
+#. * $Id: no.po,v 1.10 2002/06/01 16:45:34 sam Exp $
 #. *
 #. * Authors: Vincent Seguin <seguin@via.ecp.fr>
 #. *          Samuel Hocevar <sam@zoy.org>
@@ -654,12 +654,12 @@ msgid "Playlist"
 msgstr "Spilleliste"
 
 #. Misc options
-#: plugins/a52/a52.c:81 plugins/ac3_adec/ac3_adec.c:72 plugins/dsp/dsp.c:81
+#: plugins/a52/a52.c:83 plugins/ac3_adec/ac3_adec.c:72 plugins/dsp/dsp.c:81
 #: plugins/dummy/dummy.c:51 plugins/fb/fb.c:70 plugins/filter/deinterlace.c:50
 #: plugins/filter/distort.c:50 plugins/filter/transform.c:51
 #: plugins/filter/wall.c:45 plugins/ggi/ggi.c:64 plugins/gtk/gnome.c:73
 #: plugins/gtk/gtk.c:71 plugins/mad/mad_adec.c:66 plugins/mga/xmga.c:106
-#: plugins/mpeg_vdec/video_parser.c:95 plugins/text/logger.c:86
+#: plugins/mpeg_vdec/video_parser.c:96 plugins/text/logger.c:86
 #: plugins/win32/win32.cpp:48 plugins/x11/x11.c:55 plugins/x11/xvideo.c:65
 #: src/libvlc.h:366
 msgid "Miscellaneous"
@@ -695,18 +695,18 @@ msgstr ""
 msgid "print build information"
 msgstr ""
 
-#: src/misc/configuration.c:779
+#: src/misc/configuration.c:783
 msgid "boolean"
 msgstr ""
 
 #. ****************************************************************************
 #. * Build configuration structure.
 #. ****************************************************************************
-#: plugins/a52/a52.c:72
+#: plugins/a52/a52.c:74
 msgid "A/52 dynamic range compression"
 msgstr ""
 
-#: plugins/a52/a52.c:74
+#: plugins/a52/a52.c:76
 msgid ""
 "Dynamic range compression makes the loud sounds softer, and the soft sounds "
 "louder, so you can more easily listen to the stream in a noisy environment "
@@ -714,7 +714,7 @@ msgid ""
 "playback will be more adapted to a movie theater or a listening room."
 msgstr ""
 
-#: plugins/a52/a52.c:86
+#: plugins/a52/a52.c:88
 msgid "a52 ATSC A/52 aka AC-3 audio decoder module"
 msgstr ""
 
@@ -770,19 +770,19 @@ msgstr ""
 msgid "MMX I420,IYUV,YV12 to RV15,RV16,RV24,RV32 conversions"
 msgstr ""
 
-#: plugins/chroma/i420_ymga.c:55 plugins/chroma/i420_yuy2.c:69
+#: plugins/chroma/i420_ymga.c:55 plugins/chroma/i420_yuy2.c:74
 #: plugins/chroma/i422_yuy2.c:68
 msgid "conversions from "
 msgstr ""
 
 #: plugins/chroma/i420_ymga.c:55 plugins/chroma/i420_ymga.c:58
-#: plugins/chroma/i420_yuy2.c:69 plugins/chroma/i420_yuy2.c:72
+#: plugins/chroma/i420_yuy2.c:74 plugins/chroma/i420_yuy2.c:77
 #: plugins/chroma/i422_yuy2.c:68 plugins/chroma/i422_yuy2.c:71
 #, fuzzy
 msgid " to "
 msgstr "Hopp til: "
 
-#: plugins/chroma/i420_ymga.c:58 plugins/chroma/i420_yuy2.c:72
+#: plugins/chroma/i420_ymga.c:58 plugins/chroma/i420_yuy2.c:77
 #: plugins/chroma/i422_yuy2.c:71
 msgid "MMX conversions from "
 msgstr ""
@@ -1756,11 +1756,11 @@ msgstr "Kapittel"
 #. ****************************************************************************
 #. * Build configuration tree.
 #. ****************************************************************************
-#: plugins/idct/idct.c:47 plugins/mpeg_vdec/video_parser.c:70
+#: plugins/idct/idct.c:47 plugins/mpeg_vdec/video_parser.c:71
 msgid "IDCT module"
 msgstr ""
 
-#: plugins/idct/idctaltivec.c:49
+#: plugins/idct/idctaltivec.c:51
 msgid "AltiVec IDCT module"
 msgstr ""
 
@@ -1870,7 +1870,7 @@ msgstr ""
 msgid "X11 MGA module"
 msgstr ""
 
-#: plugins/motion/motion.c:45 plugins/mpeg_vdec/video_parser.c:76
+#: plugins/motion/motion.c:45 plugins/mpeg_vdec/video_parser.c:77
 msgid "motion compensation module"
 msgstr ""
 
@@ -1878,7 +1878,7 @@ msgstr ""
 msgid "3D Now! motion compensation module"
 msgstr ""
 
-#: plugins/motion/motionaltivec.c:48
+#: plugins/motion/motionaltivec.c:50
 msgid "AltiVec motion compensation module"
 msgstr ""
 
@@ -1910,34 +1910,34 @@ msgstr ""
 msgid "ISO 13818-1 MPEG Transport Stream input (libdvbpsi)"
 msgstr ""
 
-#: plugins/mpeg_vdec/video_parser.c:72
+#: plugins/mpeg_vdec/video_parser.c:73
 msgid ""
 "This option allows you to select the IDCT module used by this video decoder. "
 "The default behavior is to automatically select the best module available."
 msgstr ""
 
-#: plugins/mpeg_vdec/video_parser.c:78
+#: plugins/mpeg_vdec/video_parser.c:79
 msgid ""
 "This option allows you to select the motion compensation module used by this "
 "video decoder. The default behavior is to automatically select the best "
 "module available."
 msgstr ""
 
-#: plugins/mpeg_vdec/video_parser.c:82
+#: plugins/mpeg_vdec/video_parser.c:83
 msgid "use additional processors"
 msgstr ""
 
-#: plugins/mpeg_vdec/video_parser.c:84
+#: plugins/mpeg_vdec/video_parser.c:85
 msgid ""
 "This video decoder can benefit from a multiprocessor computer. If you have "
 "one, you can specify the number of processors here."
 msgstr ""
 
-#: plugins/mpeg_vdec/video_parser.c:87
+#: plugins/mpeg_vdec/video_parser.c:88
 msgid "force synchro algorithm {I|I+|IP|IP+|IPB}"
 msgstr ""
 
-#: plugins/mpeg_vdec/video_parser.c:89
+#: plugins/mpeg_vdec/video_parser.c:90
 msgid ""
 "This allows you to force the synchro algorithm, by directly selecting the "
 "types of picture you want to decode. Please bear in mind that if you select "
@@ -1945,7 +1945,7 @@ msgid ""
 "anything."
 msgstr ""
 
-#: plugins/mpeg_vdec/video_parser.c:106
+#: plugins/mpeg_vdec/video_parser.c:107
 msgid "MPEG I/II video decoder module"
 msgstr ""
 

@@ -2,7 +2,7 @@
  * idctaltivec.c : AltiVec IDCT module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: idctaltivec.c,v 1.25 2002/06/01 12:31:59 sam Exp $
+ * $Id: idctaltivec.c,v 1.26 2002/06/01 16:45:34 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -26,11 +26,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>
-#include <string.h>
-#include <inttypes.h>
-
 #include <vlc/vlc.h>
+
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>
+#ifdef HAVE_INTTYPES_H
+#   include <inttypes.h>                                       /* int16_t .. */
+#endif
 
 #include "idct.h"
 
