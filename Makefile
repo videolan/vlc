@@ -500,12 +500,12 @@ endif
 $(C_OBJ): %.o: Makefile.opts Makefile.dep Makefile
 $(C_OBJ): %.o: .dep/%.d
 $(C_OBJ): %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(CFLAGS_VLC) -c -o $@ $<
 
 $(CPP_OBJ): %.o: Makefile.opts Makefile.dep Makefile
 $(CPP_OBJ): %.o: .dep/%.dpp
 $(CPP_OBJ): %.o: %.cpp
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(CFLAGS_VLC) -c -o $@ $<
 
 $(RESOURCE_OBJ): %.o: Makefile.dep Makefile
 ifneq (,(findstring mingw32,$(SYS)))

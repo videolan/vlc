@@ -361,6 +361,7 @@ if test x"$ac_cv_altivec_inline" != x"no"; then
   AC_DEFINE(CAN_COMPILE_ALTIVEC, 1, Define if \$CC groks ALTIVEC inline assembly.)
   if test x"$ac_cv_altivec_inline" != x"yes"; then
     CFLAGS_ALTIVEC="$CFLAGS_ALTIVEC $ac_cv_altivec_inline"
+    CFLAGS_VLC="$CFLAGS_VLC $ac_cv_altivec_inline"
   fi
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
@@ -382,6 +383,7 @@ AC_CACHE_CHECK([if \$CC groks Altivec C extensions],
 if test x"$ac_cv_c_altivec" != x"no"; then
   AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, Define if your compiler groks C altivec extensions.)
   CFLAGS_ALTIVEC="$CFLAGS_ALTIVEC $ac_cv_c_altivec"
+  CFLAGS_VLC="$CFLAGS_VLC $ac_cv_c_altivec"
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
 
