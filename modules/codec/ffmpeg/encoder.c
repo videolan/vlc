@@ -558,7 +558,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     }
     else
     {
-        frame.pts = 0;
+        frame.pts = AV_NOPTS_VALUE;
     }
 
     if ( frame.pts != AV_NOPTS_VALUE && frame.pts != 0 )

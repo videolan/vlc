@@ -1797,7 +1797,9 @@ static int transcode_video_ffmpeg_getframebuf(struct AVCodecContext *p_context,
         if( !p_context->has_b_frames || !p_sys->b_input_has_b_frames ||
             !p_frame->reference || !p_sys->i_output_pts )
         {
-            p_frame->pts = p_sys->i_input_dts;
+            p_frame->pts = p_sys->i_input_dts +
+                /* Hack: ffmpeg encoding doesn't like frames with identical pts */
+                (p_sys->i_output_pts ? 0 : 50000);
         }
         else p_frame->pts = AV_NOPTS_VALUE;
     }
