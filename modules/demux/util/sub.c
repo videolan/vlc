@@ -1,10 +1,11 @@
 /*****************************************************************************
- * sub.c
+ * sub.c: subtitle demux for external subtitle files
  *****************************************************************************
- * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.43 2004/01/26 20:26:54 gbazin Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: sub.c,v 1.44 2004/01/26 22:32:51 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Derk-Jan Hartman <hartman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,8 +46,7 @@ static int  Open ( vlc_object_t *p_this );
 static int  sub_open ( subtitle_demux_t *p_sub,
                        input_thread_t  *p_input,
                        char  *psz_name,
-                       mtime_t i_microsecperframe,
-                       int i_track_id );
+                       mtime_t i_microsecperframe );
 static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate );
 static int  sub_seek ( subtitle_demux_t *p_sub, mtime_t i_date );
 static void sub_close( subtitle_demux_t *p_sub );
@@ -256,8 +256,7 @@ static char * local_stristr( char *psz_big, char *psz_little)
  * sub_open: Open a subtitle file and add subtitle ES
  *****************************************************************************/
 static int sub_open( subtitle_demux_t *p_sub, input_thread_t  *p_input,
-                     char *psz_name, mtime_t i_microsecperframe,
-                     int i_track_id )
+                     char *psz_name, mtime_t i_microsecperframe )
 {
     text_t  txt;
     vlc_value_t val;
