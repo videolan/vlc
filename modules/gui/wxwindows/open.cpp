@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.cpp,v 1.54 2003/12/15 13:10:05 zorglub Exp $
+ * $Id: open.cpp,v 1.55 2003/12/15 20:20:55 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -783,7 +783,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
 
         case 2:
             /* http access */
-            if( net_addrs[2]->GetLineText(0).Find("http://") )
+            if( net_addrs[2]->GetLineText(0).Find(wxT("http://")) )
             {
                 mrltemp = wxT("http") + demux + wxT("://");
             }
