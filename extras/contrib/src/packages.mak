@@ -2,7 +2,7 @@
 # src/packages.mak : Archive locations
 # ***************************************************************************
 # Copyright (C) 2003, 2004 VideoLAN
-# $Id: packages.mak,v 1.17 2004/03/02 19:21:03 hartman Exp $
+# $Id: packages.mak,v 1.18 2004/03/02 22:55:34 massiot Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
@@ -45,9 +45,9 @@ A52DEC_URL=http://liba52.sourceforge.net/files/a52dec-$(A52DEC_VERSION).tar.gz
 MPEG2DEC_VERSION=0.4.1-cvs
 MPEG2DEC_CVSROOT=:pserver:anonymous@cvs.libmpeg2.sourceforge.net:/cvsroot/libmpeg2
 MPEG2DEC_SNAPSHOT=http://libmpeg2.sourceforge.net/files/mpeg2dec-snapshot.tar.gz
-LIBID3TAG_VERSION=0.15.0b
+LIBID3TAG_VERSION=0.15.1b
 LIBID3TAG_URL=ftp://ftp.mars.org/pub/mpeg/libid3tag-$(LIBID3TAG_VERSION).tar.gz
-LIBMAD_VERSION=0.15.0b
+LIBMAD_VERSION=0.15.1b
 LIBMAD_URL=ftp://ftp.mars.org/pub/mpeg/libmad-$(LIBMAD_VERSION).tar.gz
 OGG_VERSION=1.1
 OGG_URL=http://www.vorbis.com/files/1.0.1/unix/libogg-$(OGG_VERSION).tar.gz

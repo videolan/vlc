@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003, 2004 VideoLAN
-# $Id: Makefile,v 1.18 2004/03/02 19:21:03 hartman Exp $
+# $Id: Makefile,v 1.19 2004/03/02 22:55:34 massiot Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
@@ -43,7 +43,7 @@ export LDFLAGS = -L$(PREFIX)/lib
 all: .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .lame .ebml .matroska .ffmpeg .openslp \
-	.dvdcss .dvdread .dvdplay .dvdnav .dvbpsi .live .goom .caca .dts .mod
+	.dvdcss .dvdread .dvdplay .dvbpsi .live .goom .caca .dts .mod
 FORCE:
 
 # ***************************************************************************
@@ -311,7 +311,8 @@ libmad: libmad-$(LIBMAD_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .mad: libmad
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="-O3" && make && make install)
+	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .mad
@@ -533,7 +534,7 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 #	patch -p 0 < Patches/ffmpeg.patch
 
 .ffmpeg: ffmpeg
-	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS)" --extra-ldflags="$(LDFLAGS)" --enable-mp3lame --enable-pp --disable-vhook --disable-vorbis --disable-faad --disable-a52 --enable-mp3lame --disable-zlib && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
+	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS)" --extra-ldflags="$(LDFLAGS)" --enable-mp3lame --enable-pp --disable-vhook --disable-vorbis --disable-faad --disable-a52 --enable-mp3lame --disable-zlib --enable-a52 && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
 	touch $@
 
 CLEAN_FILE += .ffmpeg
