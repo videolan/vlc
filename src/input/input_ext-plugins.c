@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.36 2003/08/03 20:25:04 gbazin Exp $
+ * $Id: input_ext-plugins.c,v 1.37 2003/08/13 13:54:02 jpsaman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -593,7 +593,7 @@ ssize_t input_SplitBuffer( input_thread_t * p_input,
         }
     }
 
-    if ( !i_size )
+    if ( i_size < 0)
     {
         return 0;
     }
