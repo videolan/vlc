@@ -860,10 +860,18 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     vlc_object_t *p_pl;
     vlc_value_t     val;
+    vlc_object_t *p_inp;
 
     p_pl = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
                                            FIND_ANYWHERE );
     if( !p_pl )
+    {
+        return VLC_ENOOBJ;
+    }
+    
+    p_inp = vlc_object_find( p_this, VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( !p_inp )
     {
         return VLC_ENOOBJ;
     }
@@ -874,12 +882,12 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0 )
         {
             val.psz_string = newval.psz_string;
-            var_Set( p_pl, "marq-marquee", val );
+            var_Set( p_inp, "marq-marquee", val );
         }
         else 
         {
                 val.psz_string = "";
-                var_Set( p_pl, "marq-marquee", val);
+                var_Set( p_inp, "marq-marquee", val);
         }
     }
     else if( !strcmp( psz_cmd, "marq-x" ) )
@@ -887,7 +895,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_pl, "marq-x", val );
+            var_Set( p_inp, "marq-x", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-y" ) )
@@ -895,7 +903,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_pl, "marq-y", val );
+            var_Set( p_inp, "marq-y", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-timeout" ) )
@@ -903,7 +911,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_pl, "marq-timeout", val );
+            var_Set( p_inp, "marq-timeout", val );
         }
     }
  
@@ -916,6 +924,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
 
     vlc_object_release( p_pl );
+    vlc_object_release( p_inp );
     return VLC_SUCCESS;
 }
 

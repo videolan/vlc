@@ -94,7 +94,7 @@ static int CreateFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
-    vlc_object_t *p_pl;
+    vlc_object_t *p_input;
 
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
@@ -105,24 +105,24 @@ static int CreateFilter( vlc_object_t *p_this )
     }
 
     /* hook to the playlist */
-    p_pl = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( !p_pl )
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
     {
         return VLC_ENOOBJ;
     }
 /* p_access->p_libvlc p_demux->p_libvlc */
 
-    p_sys->i_xoff = var_CreateGetInteger( p_pl , "marq-x" );
-    p_sys->i_yoff = var_CreateGetInteger( p_pl , "marq-y" );
-    p_sys->i_timeout = var_CreateGetInteger( p_pl , "marq-timeout" );
-    p_sys->psz_marquee =  var_CreateGetString( p_pl, "marq-marquee" );
+    p_sys->i_xoff = var_CreateGetInteger( p_input , "marq-x" );
+    p_sys->i_yoff = var_CreateGetInteger( p_input , "marq-y" );
+    p_sys->i_timeout = var_CreateGetInteger( p_input , "marq-timeout" );
+    p_sys->psz_marquee =  var_CreateGetString( p_input, "marq-marquee" );
 
-    var_AddCallback( p_pl, "marq-x", MarqueeCallback, p_sys );
-    var_AddCallback( p_pl, "marq-y", MarqueeCallback, p_sys );
-    var_AddCallback( p_pl, "marq-marquee", MarqueeCallback, p_sys );
-    var_AddCallback( p_pl, "marq-timeout", MarqueeCallback, p_sys );
+    var_AddCallback( p_input, "marq-x", MarqueeCallback, p_sys );
+    var_AddCallback( p_input, "marq-y", MarqueeCallback, p_sys );
+    var_AddCallback( p_input, "marq-marquee", MarqueeCallback, p_sys );
+    var_AddCallback( p_input, "marq-timeout", MarqueeCallback, p_sys );
 
-    vlc_object_release( p_pl );
+    vlc_object_release( p_input );
 
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
@@ -138,22 +138,22 @@ static void DestroyFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
-    vlc_object_t *p_pl;
+    vlc_object_t *p_input;
 
     if( p_sys->psz_marquee ) free( p_sys->psz_marquee );
     free( p_sys );
 
     /* Delete the marquee variables from playlist */
-    p_pl = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( !p_pl )
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
     {
         return;
     }
-    var_Destroy( p_pl , "marq-marquee" );
-    var_Destroy( p_pl , "marq-x" );
-    var_Destroy( p_pl , "marq-y" );
-    var_Destroy( p_pl , "marq-timeout" );
-    vlc_object_release( p_pl );
+    var_Destroy( p_input , "marq-marquee" );
+    var_Destroy( p_input , "marq-x" );
+    var_Destroy( p_input , "marq-y" );
+    var_Destroy( p_input , "marq-timeout" );
+    vlc_object_release( p_input );
 }
 
 /****************************************************************************
