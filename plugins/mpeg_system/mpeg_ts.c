@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ts.c,v 1.9 2002/04/25 02:10:33 jobi Exp $
+ * $Id: mpeg_ts.c,v 1.10 2002/04/26 20:18:26 jobi Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -642,7 +642,7 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
             {
                 p_pgrm_to_select = input_FindProgram( p_input, i_id );
 
-                if( p_pgrm_to_select || p_pgrm_to_select == p_es->p_pgrm )
+                if( p_pgrm_to_select && p_pgrm_to_select == p_es->p_pgrm )
                     p_input->pf_set_program( p_input, p_pgrm_to_select );
             }
             else
@@ -801,7 +801,7 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
 
     p_pgrm_demux = (pgrm_ts_data_t *)p_pgrm->p_demux_data;
     p_pgrm_demux->i_pcr_pid = p_new_pmt->i_pcr_pid;
-    
+
     if( !p_new_pmt->b_current_next || 
             p_pgrm_demux->i_pmt_version == PMT_UNINITIALIZED )
     {
