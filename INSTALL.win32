@@ -1,4 +1,4 @@
-$Id: INSTALL.win32,v 1.20 2003/10/26 13:07:50 gbazin Exp $
+$Id: INSTALL.win32,v 1.21 2003/11/13 14:23:30 lool Exp $
 
 INSTALL file for the Windows9x/Me/NT4/2k/XP version of the VLC media player
 
@@ -63,7 +63,7 @@ be extracted in /usr/local/cross-tools).
 - compiling natively on Windoze with cygwin:
 You will need to download and run the setup.exe app from cygwin's web site
 (www.cygwin.com). You will also need to make sure you install at least the
-gcc-mingw, mingw-runtime and w32api packages.
+gcc-g++, gcc-mingw, mingw-runtime and win32-api packages.
 
 - compiling natively on Windoze with MSYS+MINGW:
 You will need to download and install the latest MSYS, MSYS-DTK and MINGW.
