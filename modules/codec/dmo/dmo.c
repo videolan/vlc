@@ -1105,10 +1105,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     i_err = p_dmo->vt->SetOutputType( p_dmo, 0, &dmo_type, 0 );
 
     p_vih = (VIDEOINFOHEADER *)dmo_type.pbFormat;
-    p_enc->fmt_out.video.i_width = p_enc->fmt_in.video.i_width;
-    p_enc->fmt_out.video.i_height = p_enc->fmt_in.video.i_height;
-    p_enc->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR *
-      p_enc->fmt_out.video.i_width / p_enc->fmt_out.video.i_height;
+    p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
 
     DMOFreeMediaType( &dmo_type );
     if( i_err )
@@ -1136,7 +1133,8 @@ static int EncoderSetAudioType( encoder_t *p_enc, IMediaObject *p_dmo )
     fourcc_to_wf_tag( p_enc->fmt_out.i_codec, &i_tag );
     if( i_tag == 0 ) return VLC_EGENERIC;
 
-    p_enc->fmt_in.audio.i_bitspersample = 16; // Forced
+    p_enc->fmt_in.i_codec = AOUT_FMT_S16_NE;
+    p_enc->fmt_in.audio.i_bitspersample = 16;
 
     /* We first need to choose an output type from the predefined
      * list of choices (we cycle through the list to select the best match) */
