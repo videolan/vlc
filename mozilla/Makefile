@@ -28,6 +28,8 @@ install:
 
 uninstall:
 	rm -f $(DESTDIR)$(libdir)/mozilla/plugins/$(PLUGIN_OBJ)
+	-rmdir $(DESTDIR)$(libdir)/mozilla/plugins
+	-rmdir $(DESTDIR)$(libdir)/mozilla
 
 FORCE:
 

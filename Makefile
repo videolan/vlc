@@ -182,6 +182,7 @@ endif
 	rm -f $(DESTDIR)$(datadir)/vlc/*.psf
 	rm -f $(DESTDIR)$(datadir)/vlc/*.png
 	rm -f $(DESTDIR)$(datadir)/vlc/*.xpm
+	-rmdir $(DESTDIR)$(datadir)/vlc
 
 plugins-install:
 	mkdir -p $(DESTDIR)$(libdir)/vlc
@@ -191,6 +192,7 @@ endif
 
 plugins-uninstall:
 	rm -f $(DESTDIR)$(libdir)/vlc/*.so
+	-rmdir $(DESTDIR)$(libdir)/vlc
 
 builtins-install:
 	mkdir -p $(DESTDIR)$(libdir)/vlc
@@ -200,6 +202,7 @@ endif
 
 builtins-uninstall:
 	rm -f $(DESTDIR)$(libdir)/vlc/*.a
+	-rmdir $(DESTDIR)$(libdir)/vlc
 
 libvlc-install:
 	mkdir -p $(DESTDIR)$(bindir)

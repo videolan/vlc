@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.79 2002/08/05 11:48:56 sam Exp $
+ * $Id: modules.c,v 1.80 2002/08/06 00:26:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -36,6 +36,11 @@
 #include <vlc/vlc.h>
 
 #include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
 
 #if defined(HAVE_DLFCN_H)                                /* Linux, BSD, Hurd */
 #   include <dlfcn.h>                        /* dlopen(), dlsym(), dlclose() */
@@ -282,7 +287,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     module_t *p_module;
 
     int   i_shortcuts = 0;
-    char *psz_shortcuts = NULL, psz_var = NULL;
+    char *psz_shortcuts = NULL, *psz_var = NULL;
 
     msg_Dbg( p_this, "looking for %s module", psz_capability );
 
@@ -642,46 +647,53 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir )
 {
 #define PLUGIN_EXT ".so"
-    DIR *           dir;
-    int             i_dirlen = strlen( psz_dir );
-    char *          psz_file;
+    int    i_dirlen;
+    DIR *  dir;
+    char * psz_file;
+
     struct dirent * file;
 
-    if( (dir = opendir( psz_dir )) )
+    dir = opendir( psz_dir );
+
+    if( !dir )
     {
-        /* Parse the directory and try to load all files it contains. */
-        while( (file = readdir( dir )) )
+        return;
+    }
+
+    i_dirlen = strlen( psz_dir );
+
+    /* Parse the directory and try to load all files it contains. */
+    while( (file = readdir( dir )) )
+    {
+        struct stat statbuf;
+        int i_len = strlen( file->d_name );
+
+        /* Skip ".", ".." and anything starting with "." */
+        if( !*file->d_name || *file->d_name == '.' )
         {
-            int i_len = strlen( file->d_name );
-
-            /* Skip ".", ".." and anything starting with "." */
-            if( !*file->d_name || *file->d_name == '.' )
-            {
-                continue;
-            }
-
-            if( file->d_type == DT_DIR )
-            {
-                psz_file = malloc( i_dirlen + 1 /* / */ + i_len + 1 /* \0 */ );
-                sprintf( psz_file, "%s/%s", psz_dir, file->d_name );
-                AllocatePluginDir( p_this, psz_file );
-                free( psz_file );
-            }
-            else if( i_len > strlen( PLUGIN_EXT )
-                      /* We only load files ending with ".so" */
-                      && !strncmp( file->d_name + i_len - strlen( PLUGIN_EXT ),
-                                   PLUGIN_EXT, strlen( PLUGIN_EXT ) ) )
-            {
-                psz_file = malloc( i_dirlen + 1 /* / */ + i_len + 1 /* \0 */ );
-                sprintf( psz_file, "%s/%s", psz_dir, file->d_name );
-                AllocatePluginFile( p_this, psz_file );
-                free( psz_file );
-            }
+            continue;
         }
 
-        /* Close the directory if successfully opened */
-        closedir( dir );
+        psz_file = malloc( i_dirlen + 1 /* / */ + i_len + 1 /* \0 */ );
+        sprintf( psz_file, "%s/%s", psz_dir, file->d_name );
+
+        if( !stat( psz_file, &statbuf ) && statbuf.st_mode & S_IFDIR )
+        {
+            AllocatePluginDir( p_this, psz_file );
+        }
+        else if( i_len > strlen( PLUGIN_EXT )
+                  /* We only load files ending with ".so" */
+                  && !strncmp( file->d_name + i_len - strlen( PLUGIN_EXT ),
+                               PLUGIN_EXT, strlen( PLUGIN_EXT ) ) )
+        {
+            AllocatePluginFile( p_this, psz_file );
+        }
+
+        free( psz_file );
     }
+
+    /* Close the directory */
+    closedir( dir );
 }
 
 /*****************************************************************************

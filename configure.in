@@ -837,6 +837,18 @@ then
 fi
 
 dnl
+dnl  Video4Linux plugin
+dnl
+AC_ARG_ENABLE(v4l,
+  [  --enable-v4l            Video4Linux input support (default disabled)])
+if test "x${enable_v4l}" = "xyes"
+then
+  AC_CHECK_HEADERS(libv4l/v4l.h, [
+    PLUGINS="${PLUGINS} access/v4l/v4l"
+   ],[])
+fi
+
+dnl
 dnl  VCD module
 dnl
 AC_ARG_ENABLE(vcd,
@@ -1049,12 +1061,6 @@ then
               mp4_LDFLAGS="${mp4_LDFLAGS} -lz" ], 
             [ AC_MSG_ERROR([cannot find zlib library...]) ]),
         [  AC_MSG_ERROR([cannot find zlib header...]) ])
-fi
-
-dnl special case for BeOS
-if test "x${SYS}" = "xbeos"
-then
-    PLUGINS="${PLUGINS} gui/beos/beos"
 fi
 
 dnl
@@ -1446,6 +1452,12 @@ dnl  Interface plugins
 dnl
 
 AC_ARG_WITH(,[Interface plugins:])
+
+dnl special case for BeOS
+if test "x${SYS}" = "xbeos"
+then
+    PLUGINS="${PLUGINS} gui/beos/beos"
+fi
 
 dnl
 dnl  Gtk+ module
