@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: deinterlace.c,v 1.20 2004/01/25 20:05:28 hartman Exp $
+ * $Id: deinterlace.c,v 1.21 2004/02/01 16:53:11 sigmunau Exp $
  *
  * Author: Sam Hocevar <sam@zoy.org>
  *
@@ -57,6 +57,9 @@ static void RenderLinear ( vout_thread_t *, picture_t *, picture_t *, int );
 
 static void MergeGeneric ( void *, const void *, const void *, size_t );
 static void MergeAltivec ( void *, const void *, const void *, size_t );
+static void MergeMMX     ( void *, const void *, const void *, size_t );
+static void MergeSSE2    ( void *, const void *, const void *, size_t );
+static void EndMMX       ( void );
 
 static int  SendEvents   ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
@@ -111,6 +114,7 @@ struct vout_sys_t
     vlc_mutex_t filter_lock;
 
     void (*pf_merge) ( void *, const void *, const void *, size_t );
+    void (*pf_end_merge) ( void );
 };
 
 /*****************************************************************************
@@ -145,10 +149,22 @@ static int Create( vlc_object_t *p_this )
     if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_ALTIVEC )
     {
         p_vout->p_sys->pf_merge = MergeAltivec;
+        p_vout->p_sys->pf_end_merge = NULL;
+    }
+    if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_MMX )
+    {
+        p_vout->p_sys->pf_merge = MergeMMX;
+        p_vout->p_sys->pf_end_merge = EndMMX;
+    }
+    if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_SSE2 )
+    {
+        p_vout->p_sys->pf_merge = MergeSSE2;
+        p_vout->p_sys->pf_end_merge = EndMMX;
     }
     else
     {
         p_vout->p_sys->pf_merge = MergeGeneric;
+        p_vout->p_sys->pf_end_merge = NULL;
     }
 
     /* Look what method was requested */
@@ -631,6 +647,7 @@ static void RenderBob( vout_thread_t *p_vout,
 }
 
 #define Merge p_vout->p_sys->pf_merge
+#define EndMerge if(p_vout->p_sys->pf_end_merge) p_vout->p_sys->pf_end_merge
 
 /*****************************************************************************
  * RenderLinear: BOB with linear interpolation
@@ -687,6 +704,7 @@ static void RenderLinear( vout_thread_t *p_vout,
                                       p_pic->p[i_plane].i_pitch );
         }
     }
+    EndMerge();
 }
 
 static void RenderMean( vout_thread_t *p_vout,
@@ -715,6 +733,7 @@ static void RenderMean( vout_thread_t *p_vout,
             p_in += 2 * p_pic->p[i_plane].i_pitch;
         }
     }
+    EndMerge();
 }
 
 static void RenderBlend( vout_thread_t *p_vout,
@@ -787,6 +806,7 @@ static void RenderBlend( vout_thread_t *p_vout,
                 break;
         }
     }
+    EndMerge();
 }
 
 #undef Merge
@@ -817,6 +837,65 @@ static void MergeGeneric( void *_p_dest, const void *_p_s1,
     {
         *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
     }
+}
+
+static void MergeMMX( void *_p_dest, const void *_p_s1, const void *_p_s2,
+                      size_t i_bytes )
+{
+    uint8_t* p_dest = (uint8_t*)_p_dest;
+    const uint8_t *p_s1 = (const uint8_t *)_p_s1;
+    const uint8_t *p_s2 = (const uint8_t *)_p_s2;
+    uint8_t* p_end = p_dest + i_bytes - 8;
+    while( p_dest < p_end )
+    {
+        __asm__  __volatile__( "movq %2,%%mm1;"
+                               "pavgb %1, %%mm1;"
+                               "movq %%mm1, %0" :"=m" (*p_dest):
+                                                 "m" (*p_s1),
+                                                 "m" (*p_s2) );
+        p_dest += 8;
+        p_s1 += 8;
+        p_s2 += 8;
+    }
+
+    p_end += 8;
+
+    while( p_dest < p_end )
+    {
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
+    }
+}
+
+static void MergeSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
+                       size_t i_bytes )
+{
+    uint8_t* p_dest = (uint8_t*)_p_dest;
+    const uint8_t *p_s1 = (const uint8_t *)_p_s1;
+    const uint8_t *p_s2 = (const uint8_t *)_p_s2;
+    uint8_t* p_end = p_dest + i_bytes - 16;
+    while( p_dest < p_end )
+    {
+        __asm__  __volatile__( "movdqu %2,%%xmm1;"
+                               "pavgb %1, %%xmm1;"
+                               "movdqu %%xmm1, %0" :"=m" (*p_dest):
+                                                 "m" (*p_s1),
+                                                 "m" (*p_s2) );
+        p_dest += 16;
+        p_s1 += 16;
+        p_s2 += 16;
+    }
+
+    p_end += 16;
+
+    while( p_dest < p_end )
+    {
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
+    }
+}
+
+static void EndMMX( void )
+{
+    __asm__ __volatile__( "emms" :: );
 }
 
 static void MergeAltivec( void *_p_dest, const void *_p_s1,
