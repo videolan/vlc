@@ -190,8 +190,10 @@ static int vout_Manage( vout_thread_t *p_vout )
           create_QTSequenceBestCodec( p_vout ) ;
       }
       else if ( p_vout->p_sys->osx_communication.i_changes & OSX_INTF_VOUT_SIZE_CHANGE ) {
-          fillout_ScalingMatrix( p_vout ) ;
-          SetDSequenceMatrix( p_vout->p_sys->i_seq, p_vout->p_sys->p_matrix ) ;
+          if ( p_vout->p_sys->c_codec != 'NONE' ) {
+              fillout_ScalingMatrix( p_vout ) ;
+              SetDSequenceMatrix( p_vout->p_sys->i_seq, p_vout->p_sys->p_matrix ) ;
+          }
       }
 
       p_vout->p_sys->osx_communication.i_changes &= ~( 
@@ -237,6 +239,8 @@ void vout_Display( vout_thread_t *p_vout )
  		nil
             ) ;            
             break ;
+       default:
+           intf_WarnMsg( 1, "vout_macosx: vout_Display called, but no codec available" ) ;
     }
 }
 
