@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.21 2003/07/16 17:17:05 gbazin Exp $
+ * $Id: spudec.c,v 1.22 2003/07/16 17:19:06 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -121,7 +121,9 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
      */
     p_spudec->p_vout = NULL;
     p_spudec->p_fifo = p_fifo;
+#if defined(HAVE_ICONV)
     p_spudec->iconv_handle = (iconv_t)-1;
+#endif
 
     /*
      * Initialize thread and free configuration
