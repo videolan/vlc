@@ -2,7 +2,7 @@
  * flac.c : FLAC demux module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: flac.c,v 1.6 2003/11/21 01:45:48 gbazin Exp $
+ * $Id: flac.c,v 1.7 2003/11/21 12:18:54 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -131,13 +131,13 @@ static int Open( vlc_object_t * p_this )
     es_format_Init( &p_sys->p_packetizer->fmt_in, AUDIO_ES,
                     VLC_FOURCC( 'f', 'l', 'a', 'c' ) );
 
-    /* Store STREAMINFO for the decoder an packetizer */
+    /* Store STREAMINFO for the decoder and packetizer */
     p_sys->p_packetizer->fmt_in.i_extra = fmt.i_extra = STREAMINFO_SIZE;
     p_sys->p_packetizer->fmt_in.p_extra = malloc( STREAMINFO_SIZE );
     stream_Read( p_input->s, p_sys->p_packetizer->fmt_in.p_extra,
                  STREAMINFO_SIZE );
 
-    /* Fake this a the last metadata block */
+    /* Fake this as the last metadata block */
     ((uint8_t*)p_sys->p_packetizer->fmt_in.p_extra)[0] |= 0x80;
     fmt.p_extra = malloc( STREAMINFO_SIZE );
     memcpy( fmt.p_extra, p_sys->p_packetizer->fmt_in.p_extra, STREAMINFO_SIZE);
@@ -179,7 +179,7 @@ static void Close( vlc_object_t * p_this )
     demux_sys_t    *p_sys = p_input->p_demux_data;
 
     /* Unneed module */
-    module_Unneed( p_input, p_sys->p_packetizer->p_module );
+    module_Unneed( p_sys->p_packetizer, p_sys->p_packetizer->p_module );
 
     if( p_sys->p_packetizer->fmt_in.p_extra )
         free( p_sys->p_packetizer->fmt_in.p_extra );

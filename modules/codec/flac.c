@@ -2,7 +2,7 @@
  * flac.c: flac decoder/packetizer module making use of libflac
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: flac.c,v 1.1 2003/11/21 01:45:48 gbazin Exp $
+ * $Id: flac.c,v 1.2 2003/11/21 12:18:54 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -404,7 +404,17 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         {
             decoder_state_error( p_dec,
                 FLAC__stream_decoder_get_state( p_sys->p_flac ) );
+            FLAC__stream_decoder_flush( p_dec->p_sys->p_flac );
         }
+
+        /* If the decoder is in the "aborted" state,
+         * FLAC__stream_decoder_process_single() won't return an error. */
+        if( FLAC__stream_decoder_get_state(p_dec->p_sys->p_flac)
+            == FLAC__STREAM_DECODER_ABORTED )
+        {
+            FLAC__stream_decoder_flush( p_dec->p_sys->p_flac );
+        }
+
         block_Release( p_sys->p_block );
     }
 
@@ -434,7 +444,6 @@ DecoderReadCallback( const FLAC__StreamDecoder *decoder, FLAC__byte buffer[],
     decoder_t *p_dec = (decoder_t *)client_data;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    msg_Err( p_dec, "buffer: %i", p_sys->p_block->i_buffer );
     if( p_sys->p_block && p_sys->p_block->i_buffer )
     {
         *bytes = __MIN(*bytes, (unsigned)p_sys->p_block->i_buffer);
@@ -570,6 +579,8 @@ static void DecoderErrorCallback( const FLAC__StreamDecoder *decoder,
     default:
         msg_Err( p_dec, "got decoder error: %d", status );
     }
+
+    FLAC__stream_decoder_flush( p_dec->p_sys->p_flac );
     return;
 }
 
@@ -633,7 +644,6 @@ static void decoder_state_error( decoder_t *p_dec,
     case FLAC__STREAM_DECODER_UNPARSEABLE_STREAM:
         msg_Err( p_dec, "The decoder encountered reserved fields in use "
                  "in the stream." );
-        FLAC__stream_decoder_flush( p_dec->p_sys->p_flac );
         break;
     case FLAC__STREAM_DECODER_MEMORY_ALLOCATION_ERROR:
         msg_Err( p_dec, "An error occurred allocating memory." );
