@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.70 2002/07/20 18:01:41 sam Exp $
+ * $Id: input_ext-intf.h,v 1.71 2002/07/21 19:26:13 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -160,7 +160,31 @@ struct input_area_t
 };
 
 /*****************************************************************************
- * stream_descriptor_t
+ * input_info_t
+ *****************************************************************************
+ * Composes a linked list of name/value pairs intended to inform the
+ * user about the current stream
+ *****************************************************************************/
+struct input_info_t {
+  char *         psz_name;
+  char *         psz_value;
+  input_info_t * p_next;
+};
+
+/*****************************************************************************
+ * input_info_category_t
+ *****************************************************************************
+ * Composes a linked list of categories in which to place info about
+ * the stream.
+ *****************************************************************************/
+struct input_info_category_t {
+  char *                  psz_name;
+  input_info_t *          p_info;
+  input_info_category_t * p_next;
+};
+
+/*****************************************************************************
+* stream_descriptor_t
  *****************************************************************************
  * Describes a stream and list its associated programs. Build upon
  * the information carried in program association sections (for instance)
@@ -217,6 +241,9 @@ struct stream_descriptor_t
     /* Stream control */
     stream_ctrl_t           control;
 
+    /* Input info */
+    input_info_category_t * p_info;
+    
     /* Statistics */
     count_t                 c_packets_read;                  /* packets read */
     count_t                 c_packets_trashed;            /* trashed packets */

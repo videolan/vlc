@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.10 2002/07/20 18:01:42 sam Exp $
+ * $Id: vlc_common.h,v 1.11 2002/07/21 19:26:13 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -187,6 +187,8 @@ VLC_DECLARE_STRUCT(pes_packet_t)
 VLC_DECLARE_STRUCT(bit_stream_t)
 VLC_DECLARE_STRUCT(network_socket_t)
 VLC_DECLARE_STRUCT(iso639_lang_t)
+VLC_DECLARE_STRUCT(input_info_t)
+VLC_DECLARE_STRUCT(input_info_category_t)
 
 /*****************************************************************************
  * Plug-in stuff

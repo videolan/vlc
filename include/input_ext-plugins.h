@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.31 2002/07/20 18:01:41 sam Exp $
+ * $Id: input_ext-plugins.h,v 1.32 2002/07/21 19:26:13 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -70,6 +70,12 @@ VLC_EXPORT( int,  input_ClockManageControl, ( input_thread_t *, pgrm_descriptor_
 VLC_EXPORT( void, input_ClockManageRef, ( input_thread_t *, pgrm_descriptor_t *, mtime_t ) );
 VLC_EXPORT( mtime_t, input_ClockGetTS, ( input_thread_t *, pgrm_descriptor_t *, mtime_t ) );
 
+/*****************************************************************************
+ * Prototypes from input_info.c
+ *****************************************************************************/
+VLC_EXPORT( input_info_category_t *, input_InfoCategory, ( input_thread_t *, char * ) );
+VLC_EXPORT( int, input_AddInfo, ( input_info_category_t *, char *, char *, ... ) );
+int input_DelInfo( input_thread_t * p_input ); /* no need to export this */
 /*****************************************************************************
  * Prototypes from input_ext-plugins.h (buffers management)
  *****************************************************************************/

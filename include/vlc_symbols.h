@@ -19,6 +19,7 @@ struct module_symbols_t
     es_descriptor_t * (* input_ParsePS_inner) ( input_thread_t *, data_packet_t * ) ;
     float (* __config_GetFloat_inner) (vlc_object_t *, const char *) ;
     input_area_t * (* input_AddArea_inner) ( input_thread_t * ) ;
+    input_info_category_t * (* input_InfoCategory_inner) ( input_thread_t *, char * ) ;
     int (* __config_GetInt_inner) (vlc_object_t *, const char *) ;
     int (* __config_LoadCmdLine_inner) ( vlc_object_t *, int *, char *[], vlc_bool_t ) ;
     int (* __config_LoadConfigFile_inner) ( vlc_object_t *, const char * ) ;
@@ -34,6 +35,7 @@ struct module_symbols_t
     int (* __vlc_threads_end_inner) ( vlc_object_t * ) ;
     int (* __vlc_threads_init_inner) ( vlc_object_t * ) ;
     int (* input_AccessInit_inner) ( input_thread_t * ) ;
+    int (* input_AddInfo_inner) ( input_info_category_t *, char *, char *, ... ) ;
     int (* input_ChangeArea_inner) ( input_thread_t *, input_area_t * ) ;
     int (* input_ChangeES_inner) ( input_thread_t *, es_descriptor_t *, u8 ) ;
     int (* input_ChangeProgram_inner) ( input_thread_t *, u16 ) ;
@@ -207,6 +209,7 @@ struct module_symbols_t
 #   define input_AccessReinit p_symbols->input_AccessReinit_inner
 #   define input_AddArea p_symbols->input_AddArea_inner
 #   define input_AddES p_symbols->input_AddES_inner
+#   define input_AddInfo p_symbols->input_AddInfo_inner
 #   define input_AddProgram p_symbols->input_AddProgram_inner
 #   define input_BuffersEnd p_symbols->input_BuffersEnd_inner
 #   define input_ChangeArea p_symbols->input_ChangeArea_inner
@@ -234,6 +237,7 @@ struct module_symbols_t
 #   define input_FindES p_symbols->input_FindES_inner
 #   define input_FindProgram p_symbols->input_FindProgram_inner
 #   define input_GatherPES p_symbols->input_GatherPES_inner
+#   define input_InfoCategory p_symbols->input_InfoCategory_inner
 #   define input_InitStream p_symbols->input_InitStream_inner
 #   define input_NewBuffer p_symbols->input_NewBuffer_inner
 #   define input_NewPES p_symbols->input_NewPES_inner
