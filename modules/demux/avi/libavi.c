@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.18 2003/04/27 11:55:03 fenrir Exp $
+ * $Id: libavi.c,v 1.19 2003/04/27 13:55:51 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -182,7 +182,7 @@ int AVI_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
     return i_read;
 }
 
-int  AVI_SkipBytes( input_thread_t *p_input, int i_count )
+int  AVI_SkipBytes( input_thread_t *p_input, int64_t i_count )
 {
     /* broken with new use of i_tell */
 #if 0
@@ -804,6 +804,7 @@ static struct
     { AVIFOURCC_ITCH, "technician" },
     { AVIFOURCC_ISMP, "time code" },
     { AVIFOURCC_IDIT, "digitalization time" },
+    { AVIFOURCC_strn, "stream name" },
     { 0,              "???" }
 };
 static int AVI_ChunkRead_strz( input_thread_t *p_input,
@@ -903,6 +904,7 @@ static struct
     { AVIFOURCC_ITCH, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
     { AVIFOURCC_ISMP, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
     { AVIFOURCC_IDIT, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
+    { AVIFOURCC_strn, AVI_ChunkRead_strz, AVI_ChunkFree_strz },
     { 0,           NULL,               NULL }
 };
 

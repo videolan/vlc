@@ -2,7 +2,7 @@
  * libavi.h : LibAVI library 
  ******************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.h,v 1.9 2003/04/27 11:55:03 fenrir Exp $
+ * $Id: libavi.h,v 1.10 2003/04/27 13:55:51 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -59,6 +59,7 @@
 #define AVIFOURCC_strh         VLC_FOURCC('s','t','r','h')
 #define AVIFOURCC_strf         VLC_FOURCC('s','t','r','f')
 #define AVIFOURCC_strd         VLC_FOURCC('s','t','r','d')
+#define AVIFOURCC_strn         VLC_FOURCC('s','t','r','n')
 #define AVIFOURCC_indx         VLC_FOURCC('i','n','d','x')
 
 #define AVIFOURCC_rec          VLC_FOURCC('r','e','c',' ')
@@ -351,7 +352,7 @@ int     AVI_TestFile( input_thread_t *p_input );
 off_t   AVI_TellAbsolute( input_thread_t *p_input );
 int     AVI_SeekAbsolute( input_thread_t *p_input, off_t i_pos);
 int     AVI_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size );
-int     AVI_SkipBytes( input_thread_t *p_input, int i_count );
+int     AVI_SkipBytes( input_thread_t *p_input, int64_t i_count );
 
 int     _AVI_ChunkRead( input_thread_t *p_input,
                         avi_chunk_t *p_chk,

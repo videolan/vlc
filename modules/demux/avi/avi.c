@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.43 2003/04/27 11:55:03 fenrir Exp $
+ * $Id: avi.c,v 1.44 2003/04/27 13:55:51 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -478,7 +478,7 @@ static void AVI_IndexAddEntry( demux_sys_t *p_avi,
     }
 }
 
-static void AVI_IndexLoad_idx1( input_thread_t *p_input )
+static int AVI_IndexLoad_idx1( input_thread_t *p_input )
 {
     demux_sys_t *p_avi = p_input->p_demux_data;
 
@@ -499,7 +499,7 @@ static void AVI_IndexLoad_idx1( input_thread_t *p_input )
     if( !p_idx1 )
     {
         msg_Warn( p_input, "cannot find idx1 chunk, no index defined" );
-        return;
+        return VLC_EGENERIC;
     }
 
     /* *** calculate offset *** */
@@ -532,6 +532,7 @@ static void AVI_IndexLoad_idx1( input_thread_t *p_input )
             AVI_IndexAddEntry( p_avi, i_stream, &index );
         }
     }
+    return VLC_SUCCESS;
 }
 
 static void __Parse_indx( input_thread_t    *p_input,
@@ -610,11 +611,14 @@ static void AVI_IndexLoad_indx( input_thread_t *p_input )
             avi_chunk_indx_t    ck_sub;
             for( i = 0; i < p_indx->i_entriesinuse; i++ )
             {
-                AVI_SeekAbsolute( p_input, p_indx->idx.super[i].i_offset );
-
-                if( !AVI_ChunkRead( p_input, &ck_sub, NULL, p_avi->b_seekable ) )
+                if( AVI_SeekAbsolute( p_input, p_indx->idx.super[i].i_offset ) )
                 {
-                    __Parse_indx( p_input, i_stream, &ck_sub );
+                    break;
+                }
+
+                if( AVI_ChunkRead( p_input, &ck_sub, NULL, p_avi->b_seekable ) )
+                {
+                    break;
                 }
             }
         }
@@ -643,7 +647,11 @@ static void AVI_IndexLoad( input_thread_t *p_input )
     }
     else
     {
-        AVI_IndexLoad_idx1( p_input );
+        if( AVI_IndexLoad_idx1( p_input ) )
+        {
+            /* try indx if idx1 failed as some "normal" file have indx too */
+            AVI_IndexLoad_indx( p_input );
+        }
     }
 
 
@@ -2161,19 +2169,11 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
                 if( avi_pk.i_stream >= p_avi->i_streams ||
                     ( avi_pk.i_cat != AUDIO_ES && avi_pk.i_cat != VIDEO_ES ) )
                 {
-                    switch( avi_pk.i_fourcc )
+                    if( AVI_PacketNext( p_input ) )
                     {
-                        case AVIFOURCC_LIST:
-                            AVI_SkipBytes( p_input, 12 );
-                            break;
-                        default:
-                            if( AVI_PacketNext( p_input ) )
-                            {
-                                msg_Warn( p_input,
-                                          "cannot skip packet, track disabled" );
-                                return( AVI_StreamStopFinishedStreams( p_input, p_avi ) ? 0 : 1 );
-                            }
-                            break;
+                        msg_Warn( p_input,
+                                  "cannot skip packet, track disabled" );
+                        return( AVI_StreamStopFinishedStreams( p_input, p_avi ) ? 0 : 1 );
                     }
                     continue;
                 }
