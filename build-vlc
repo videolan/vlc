@@ -56,6 +56,7 @@ TREMOR tremor
 TARKIN tarkin
 THEORA theora
 SOUT sout
+SLP slp
 DEBUG debug
 "
 PATHS="

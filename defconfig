@@ -8,11 +8,11 @@ CONFIG_LINUX=y
 #
 # Graphical User Interfaces
 #
+CONFIG_GTK=y
 CONFIG_GNOME=y
-# CONFIG_GNOME2 is not set
-# CONFIG_GTK is not set
 # CONFIG_GTK2 is not set
-# CONFIG_SKINS is not set
+# CONFIG_GNOME2 is not set
+CONFIG_SKINS=y
 # CONFIG_FAMILIAR is not set
 # CONFIG_WXWINDOWS is not set
 # CONFIG_QT is not set
@@ -37,11 +37,11 @@ CONFIG_DVDPSI=y
 #
 # Video outputs
 #
-CONFIG_X11=y
+# CONFIG_X11 is not set
 CONFIG_XVIDEO=y
 # CONFIG_FB is not set
 # CONFIG_SDL is not set
-CONFIG_FREETYPE=y
+# CONFIG_FREETYPE is not set
 # CONFIG_QTE is not set
 # CONFIG_MGA is not set
 # CONFIG_SVGALIB is not set
@@ -53,7 +53,7 @@ CONFIG_FREETYPE=y
 # Audio outputs
 #
 CONFIG_OSS=y
-# CONFIG_ESD is not set
+CONFIG_ESD=y
 # CONFIG_ARTS is not set
 # CONFIG_ALSA is not set
 
@@ -79,6 +79,11 @@ CONFIG_VORBIS=y
 # Streaming
 #
 CONFIG_SOUT=y
+
+#
+# Miscellaneous options
+#
+CONFIG_SLP=y
 
 #
 # Compilation options
