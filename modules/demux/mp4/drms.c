@@ -2,7 +2,7 @@
  * drms.c: DRMS
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: drms.c,v 1.10 2004/01/22 01:20:39 jlj Exp $
+ * $Id: drms.c,v 1.11 2004/01/23 20:58:52 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Sam Hocevar <sam@zoy.org>
@@ -130,7 +130,7 @@ static void EndMD5        ( struct md5_s * );
 static void Digest        ( struct md5_s *, uint32_t * );
 
 static void InitShuffle   ( struct shuffle_s *, uint32_t * );
-static void DoShuffle     ( struct shuffle_s *, uint8_t *, uint32_t );
+static void DoShuffle     ( struct shuffle_s *, uint32_t * );
 
 static int GetSystemKey   ( uint32_t *, vlc_bool_t );
 static int WriteUserKey   ( void *, uint32_t * );
@@ -643,7 +643,7 @@ static void Digest( struct md5_s *p_md5, uint32_t *p_input )
  *****************************************************************************/
 static void InitShuffle( struct shuffle_s *p_shuffle, uint32_t *p_sys_key )
 {
-    char p_secret1[] = "*!vT";
+    char p_secret1[] = "Tv!*";
     static char const p_secret2[] = "v8rhvsaAvOKMFfUH%798=[;."
                                     "f8677680a634ba87fnOIf)(*";
     unsigned int i;
@@ -652,17 +652,16 @@ static void InitShuffle( struct shuffle_s *p_shuffle, uint32_t *p_sys_key )
     for( i = 0; i < 20; i++ )
     {
         struct md5_s md5;
-        /* Convert the secret to big endian */
-        uint32_t i_big_secret = U32_AT(p_secret1);
         int32_t i_hash;
 
         InitMD5( &md5 );
         AddMD5( &md5, (uint8_t *)p_sys_key, 16 );
-        AddMD5( &md5, (uint8_t *)&i_big_secret, 4 );
+        AddMD5( &md5, (uint8_t *)p_secret1, 4 );
         EndMD5( &md5 );
 
-        p_secret1[ 0 ]++;
+        p_secret1[ 3 ]++;
 
+        REVERSE( md5.p_digest, 1 );
         i_hash = ((int32_t)U32_AT(md5.p_digest)) % 1024;
 
         p_shuffle->p_commands[ i ] = i_hash < 0 ? i_hash * -1 : i_hash;
@@ -673,17 +672,17 @@ static void InitShuffle( struct shuffle_s *p_shuffle, uint32_t *p_sys_key )
     {
         p_shuffle->p_bordel[ 4 * i ] = U32_AT(p_sys_key + i);
         memcpy( p_shuffle->p_bordel + 4 * i + 1, p_secret2 + 12 * i, 12 );
+        REVERSE( p_shuffle->p_bordel + 4 * i + 1, 3 );
     }
 }
 
 /*****************************************************************************
- * DoShuffle: shuffle i_len bytes of a buffer
+ * DoShuffle: shuffle 16 byte buffer
  *****************************************************************************
  * This is so ugly and uses so many MD5 checksums that it is most certainly
  * one-way, though why it needs to be so complicated is beyond me.
  *****************************************************************************/
-static void DoShuffle( struct shuffle_s *p_shuffle,
-                       uint8_t *p_buffer, uint32_t i_len )
+static void DoShuffle( struct shuffle_s *p_shuffle, uint32_t *p_buffer )
 {
     struct md5_s md5;
     uint32_t p_big_bordel[ 16 ];
@@ -733,16 +732,10 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
     AddMD5( &md5, (uint8_t *)p_big_bordel, 64 );
     EndMD5( &md5 );
 
-    /* There are only 16 bytes in an MD5 hash */
-    if( i_len > 16 )
-    {
-        i_len = 16;
-    }
-
     /* XOR our buffer with the computed checksum */
-    for( i = 0; i < i_len; i++ )
+    for( i = 0; i < 4; i++ )
     {
-        p_buffer[ i ] ^= ((uint8_t *)&md5.p_digest)[ i ];
+        p_buffer[ i ] ^= md5.p_digest[ i ];
     }
 }
 
@@ -916,10 +909,11 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
 
     /* Decrypt and shuffle our data at the same time */
     InitAES( &aes, p_sys_key );
+    REVERSE( p_sys_key, 4 );
     InitShuffle( &shuffle, p_sys_key );
 
-    /* FIXME: check for endianness */
     memcpy( p_sci_key, p_secret, 16 );
+    REVERSE( p_sci_key, 4 );
 
     while( i_blocks-- )
     {
@@ -933,7 +927,7 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
         memcpy( p_sci_key, p_buffer, 16 );
 
         /* Shuffle the decrypted data using a custom routine */
-        DoShuffle( &shuffle, (uint8_t *)p_tmp, 16 );
+        DoShuffle( &shuffle, p_tmp );
 
         /* Copy this block back to p_buffer */
         memcpy( p_buffer, p_tmp, 16 );
@@ -947,6 +941,7 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
      *          the DoShuffle() part made it completely meaningless. */
 
     y = 0;
+    REVERSE( p_sci_data + 5, 1 );
     i = U32_AT( p_sci_data + 5 );
     i_sci_size -= 22 * sizeof(uint32_t);
     p_sci1 = p_sci_data + 22;
@@ -963,6 +958,7 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
             }
 
             p_sci0 = p_sci1;
+            REVERSE( p_sci1 + 17, 1 );
             y = U32_AT( p_sci1 + 17 );
             p_sci1 += 18;
         }
@@ -974,10 +970,13 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
             continue;
         }
 
+        REVERSE( p_sci0, 1 );
+        REVERSE( p_sci1, 1 );
         if( U32_AT( p_sci0 ) == p_drms->i_user &&
             ( ( U32_AT( p_sci1 ) == p_drms->i_key ) ||
               ( !p_drms->i_key ) || ( p_sci1 == (p_sci0 + 18) ) ) )
         {
+            REVERSE( p_sci1 + 1, 4 );
             memcpy( p_user_key, p_sci1 + 1, 16 );
             WriteUserKey( p_drms, p_user_key );
             i_ret = 0;
@@ -1028,7 +1027,8 @@ static int GetSCIData( char *psz_ipod, uint32_t **pp_sci,
                                          NULL, 0, p_tmp ) ) )
         {
             strncat( p_tmp, p_filename, min( strlen( p_filename ),
-                      (sizeof(p_tmp) - 1) - strlen( p_tmp ) ) );
+                     (sizeof(p_tmp)/sizeof(p_tmp[0]) - 1) -
+                     strlen( p_tmp ) ) );
             psz_path = p_tmp;
         }
 
@@ -1040,10 +1040,17 @@ static int GetSCIData( char *psz_ipod, uint32_t **pp_sci,
     }
     else
     {
-        char *p_filename = "/iPod_Control/iTunes/iSCInfo";
-        snprintf( p_tmp, sizeof(p_tmp) - 1, "%s%s",
-                  psz_ipod, p_filename );
-        psz_path = p_tmp;
+#define ISCINFO "iSCInfo"
+        if( strstr( psz_ipod, ISCINFO ) == NULL )
+        {
+            snprintf( p_tmp, sizeof(p_tmp)/sizeof(p_tmp[0]) - 1,
+                      "%s/iPod_Control/iTunes/" ISCINFO, psz_ipod );
+            psz_path = p_tmp;
+        }
+        else
+        {
+            psz_path = psz_ipod;
+        }
     }
 
     if( psz_path == NULL )
@@ -1176,6 +1183,13 @@ static int HashSystemInfo( uint32_t *p_system_hash )
 static int GetiPodID( long long *p_ipod_id )
 {
     int i_ret = -1;
+
+    char *psz_ipod_id = getenv( "IPODID" );
+    if( psz_ipod_id != NULL )
+    {
+        *p_ipod_id = strtoll( psz_ipod_id, NULL, 16 );
+        return 0;
+    }
 
 #ifdef HAVE_SYSFS_LIBSYSFS_H
     struct sysfs_bus *bus = NULL;
