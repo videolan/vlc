@@ -485,14 +485,14 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
     smooth_slider->SetToolTip( wxU( SMOOTH_TIP ) );
     top_sizer->Add( smooth_slider, 0, wxALL, 2 );
     i_smooth = 0;
- 
+
     /* Create flex grid */
     wxFlexGridSizer *eq_gridsizer =
         new wxFlexGridSizer( 2, 12, 0, 0);
     eq_gridsizer->AddGrowableRow( 0 );
     eq_gridsizer->AddGrowableCol( 1 );
 
-    preamp_slider = new wxSlider( panel, Preamp_Event, 200, 0, 400,
+    preamp_slider = new wxSlider( panel, Preamp_Event, 80, 0, 400,
                     wxDefaultPosition, wxSize( -1 , 90 ) , wxSL_VERTICAL );
     eq_gridsizer->Add( preamp_slider, 1, wxEXPAND|wxALL, 2 );
 
@@ -507,7 +507,7 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
         eq_gridsizer->Add( band_sliders[i], 1, wxEXPAND|wxALL, 2 );
     }
 
-    preamp_text = new wxStaticText( panel, -1, wxT( "Preamp\n0.0dB" ) );
+    preamp_text = new wxStaticText( panel, -1, wxT( "Preamp\n12.0dB" ) );
     wxFont font= preamp_text->GetFont();
     font.SetPointSize(7);
     preamp_text->SetFont( font );
@@ -595,6 +595,7 @@ void ExtraPanel::OnEnableEqualizer( wxCommandEvent &event )
                                  VLC_OBJECT_AOUT, FIND_ANYWHERE);
     ChangeFiltersString( p_intf,p_aout, "equalizer",
                          event.IsChecked() ? VLC_TRUE : VLC_FALSE );
+
     if( p_aout != NULL )
         vlc_object_release( p_aout );
 }
@@ -619,10 +620,14 @@ void ExtraPanel::OnEqRestore( wxCommandEvent &event )
     }
     else
     {
-        var_SetFloat( p_aout, "equalizer-preamp", 0.0 );
+        var_SetFloat( p_aout, "equalizer-preamp", 12.0 );
+        config_PutFloat( p_intf, "equalizer-preamp", 12.0 );
         var_SetString( p_aout, "equalizer-bands",
                                 "0 0 0 0 0 0 0 0 0 0");
+        config_PutPsz( p_intf, "equalizer-bands",
+                                "0 0 0 0 0 0 0 0 0 0");
         var_SetString( p_aout , "equalizer-preset" , "flat" );
+        config_PutPsz( p_intf, "equalizer-preset","flat" );
         vlc_object_release( p_aout );
     }
 }
@@ -641,6 +646,7 @@ void ExtraPanel::OnEq2Pass( wxCommandEvent &event )
     else
     {
         var_SetBool( p_aout, "equalizer-2pass", b_2p );
+        config_PutInt( p_intf, "equalizer-2pass", b_2p );
         if( eq_chkbox->IsChecked() )
         {
             for( int i = 0; i < p_aout->i_nb_inputs; i++ )
@@ -677,6 +683,7 @@ void ExtraPanel::OnPreamp( wxScrollEvent &event )
     else
     {
         var_SetFloat( p_aout, "equalizer-preamp", f );
+        config_PutFloat( p_intf, "equalizer-preamp", f );
         b_my_update = VLC_TRUE;
         vlc_object_release( p_aout );
     }
@@ -688,6 +695,7 @@ void ExtraPanel::OnChangeEqualizer( wxScrollEvent &event )
                                  VLC_OBJECT_AOUT, FIND_ANYWHERE);
     char psz_values[102];
     memset( psz_values, 0, 102 );
+
 
     /* Smoothing */
     int i_diff = event.GetPosition() - i_values[  event.GetId() - Band0_Event ];
@@ -727,6 +735,7 @@ void ExtraPanel::OnChangeEqualizer( wxScrollEvent &event )
     else
     {
         var_SetString( p_aout, "equalizer-bands", psz_values );
+        config_PutPsz( p_intf, "equalizer-bands", psz_values );
         b_my_update = VLC_TRUE;
         vlc_object_release( p_aout );
     }
