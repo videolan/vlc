@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.6 2002/02/20 05:56:18 sam Exp $
+ * $Id: lirc.c,v 1.7 2002/02/21 21:55:40 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -26,6 +26,8 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
+
+#include <fcntl.h>
 
 #include <videolan/vlc.h>
 
@@ -95,20 +97,26 @@ static void intf_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int intf_Open( intf_thread_t *p_intf )
 {
+    int i_fd;
+
     /* Allocate instance and initialize some members */
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
     {
         intf_ErrMsg("no mem?");
         return 1;
-    };
+    }
 
-    if( lirc_init("vlc", 1) == -1 )
+    i_fd = lirc_init( "vlc", 1 );
+    if( i_fd == -1 )
     {
         intf_ErrMsg( "intf error: lirc_init failed" );
         free( p_intf->p_sys );
         return 1;
     }
+
+    /* We want polling */
+    fcntl( i_fd, F_SETFL, fcntl( i_fd, F_GETFL ) | O_NONBLOCK );
 
     if( lirc_readconfig( NULL, &p_intf->p_sys->config, NULL ) != 0 )
     {
@@ -140,11 +148,18 @@ static void intf_Run( intf_thread_t *p_intf )
     char *code;
     char *c;
 
-    /* Manage core vlc functions through the callback */
-    p_intf->pf_manage( p_intf );
-
-    while( !p_intf->b_die && lirc_nextcode(&code) == 0 )
+    while( !p_intf->b_die )
     {
+        /* Manage core vlc functions through the callback */
+        p_intf->pf_manage( p_intf );
+        msleep( INTF_IDLE_SLEEP );
+
+        /* We poll the lircsocket */
+        if( lirc_nextcode(&code) != 0 )
+        {
+            break;
+        }
+
         if( code == NULL )
         {
             continue;
@@ -265,9 +280,6 @@ static void intf_Run( intf_thread_t *p_intf )
         }
 
         free( code );
-
-        /* Manage core vlc functions through the callback */
-        p_intf->pf_manage( p_intf );
     }
 }
 
