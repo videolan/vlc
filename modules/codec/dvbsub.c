@@ -503,7 +503,8 @@ static void decode_clut( decoder_t *p_dec, bs_t *s )
         p_sys->p_cluts = p_clut;
     }
 
-    /* TODO: initialize to default clut */
+    /* Initialize to default clut */
+    *p_clut = p_sys->default_clut;
 
     /* We don't have this version of the CLUT: Parse it */
     p_clut->i_version = i_version;
@@ -599,9 +600,10 @@ static void decode_page_composition( decoder_t *p_dec, bs_t *s )
     }
     else if( !p_sys->p_page && i_state != DVBSUB_PCS_STATE_ACQUISITION )
     {
-#ifdef DEBUG_DVBSUB
         /* Not a full PCS, we need to wait for one */
         msg_Dbg( p_dec, "didn't receive an acquisition page yet" );
+
+#if 0 /* Try to start decoding even without an acquisition page */
         bs_skip( s,  8 * (i_segment_length - 2) );
         return;
 #endif
@@ -728,10 +730,11 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
         }
 
         p_region->p_pixbuf = malloc( i_height * i_width );
+        p_region->i_depth = 0;
         b_fill = VLC_TRUE;
     }
-    if( p_region->i_depth != i_depth ||
-        p_region->i_level_comp != i_level_comp || p_region->i_clut != i_clut )
+    if( p_region->i_depth && (p_region->i_depth != i_depth ||
+        p_region->i_level_comp != i_level_comp || p_region->i_clut != i_clut) )
     {
         msg_Dbg( p_dec, "region parameters changed (not allowed)" );
     }
@@ -1215,7 +1218,7 @@ static subpicture_t *render( decoder_t *p_dec )
 
         if( !p_region )
         {
-            msg_Err( p_dec, "no region founddddd!!!" );
+            msg_Dbg( p_dec, "region %i not found", p_regiondef->i_id );
             continue;
         }
 
@@ -1226,8 +1229,8 @@ static subpicture_t *render( decoder_t *p_dec )
         }
         if( !p_clut )
         {
-            msg_Warn( p_dec, "clut %i not found", p_region->i_clut );
-            p_clut = &p_sys->default_clut;
+            msg_Dbg( p_dec, "clut %i not found", p_region->i_clut );
+            continue;
         }
 
         /* Create new SPU region */
