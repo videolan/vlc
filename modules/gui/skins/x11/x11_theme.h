@@ -2,7 +2,7 @@
  * x11_theme.h: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.h,v 1.3 2003/06/01 22:11:24 asmax Exp $
+ * $Id: x11_theme.h,v 1.4 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -72,7 +72,8 @@ class X11Theme : public Theme
 
         // !!!
         virtual void AddWindow( string name, int x, int y, bool visible,
-            int fadetime, int alpha, int movealpha, bool dragdrop );
+            int fadetime, int alpha, int movealpha, bool dragdrop,
+            bool playondrop );
         virtual void ChangeClientWindowName( string name );
 
         // Taskbar && system tray

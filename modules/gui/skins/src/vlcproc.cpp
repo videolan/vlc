@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.50 2003/10/20 22:27:05 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.51 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -139,7 +139,7 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_DROP:
-            DropFile( evt->GetParam1() );
+            DropFile( evt->GetParam1(), evt->GetParam2() );
             return true;
 
         case VLC_PLAY:
@@ -431,21 +431,23 @@ void VlcProc::LoadSkin()
 }
 //---------------------------------------------------------------------------
 
-void VlcProc::DropFile( unsigned int param )
+void VlcProc::DropFile( unsigned int param1, long param2 )
 {
     // Get pointer to file
-    char *FileName = (char *)param;
+    char *FileName = (char *)param1;
 
     // Add the new file to the playlist
     if( p_intf->p_sys->p_playlist != NULL )
     {
-        if( config_GetInt( p_intf, "enqueue" ) )
+        if( param2 == 0 )
         {
+            // Enqueue the item
             playlist_Add( p_intf->p_sys->p_playlist, FileName, 0, 0,
                           PLAYLIST_APPEND, PLAYLIST_END );
         }
         else
         {
+            // Enqueue and play the item
             playlist_Add( p_intf->p_sys->p_playlist, FileName, 0, 0,
                           PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
         }
@@ -458,7 +460,6 @@ void VlcProc::DropFile( unsigned int param )
 
     // Refresh interface
     InterfaceRefresh();
-
 }
 //---------------------------------------------------------------------------
 

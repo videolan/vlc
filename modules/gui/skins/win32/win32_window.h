@@ -2,7 +2,7 @@
  * win32_window.h: Win32 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.h,v 1.4 2003/10/17 18:17:28 ipkiss Exp $
+ * $Id: win32_window.h,v 1.5 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -55,7 +55,7 @@ class Win32Window : public SkinWindow
         // Cosntructors
         Win32Window( intf_thread_t *_p_intf, HWND hwnd, int x, int y,
             bool visible, int transition, int normalalpha, int movealpha,
-            bool dragdrop );
+            bool dragdrop, bool playondrop );
 
         // Destructors
         virtual ~Win32Window();

@@ -2,7 +2,7 @@
  * theme.h: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.h,v 1.5 2003/06/22 12:46:49 asmax Exp $
+ * $Id: theme.h,v 1.6 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -69,7 +69,8 @@ class Theme
         void ShowTheme();
 
         virtual void AddWindow( string name, int x, int y, bool visible,
-            int fadetime, int alpha, int movealpha, bool dragdrop ) = 0;
+            int fadetime, int alpha, int movealpha, bool dragdrop,
+            bool playondrop ) = 0;
         virtual void ChangeClientWindowName( string name ) = 0;
 
         SkinWindow * GetWindow( string name );

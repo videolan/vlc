@@ -2,7 +2,7 @@
  * wrappers.h: Wrappers around C++ objects
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: wrappers.h,v 1.4 2003/04/20 20:28:39 ipkiss Exp $
+ * $Id: wrappers.h,v 1.5 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -54,7 +54,7 @@ extern "C" {
 //---------------------------------------------------------------------------
     void StartWindow( char *name, char *x, char *y, char *visible,
                       char *fadetime, char *alpha, char *movealpha,
-                      char *dragdrop );
+                      char *dragdrop, char *playondrop );
     void EndWindow();
 
 //---------------------------------------------------------------------------

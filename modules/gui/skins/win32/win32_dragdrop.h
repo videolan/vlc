@@ -2,7 +2,7 @@
  * win32_dragdrop.h: Win32 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_dragdrop.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: win32_dragdrop.h,v 1.3 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -36,7 +36,7 @@
 class Win32DropObject : public IDropTarget
 {
     public:
-       Win32DropObject();
+       Win32DropObject( bool playondrop );
        virtual ~Win32DropObject();
 
     protected:
@@ -55,6 +55,7 @@ class Win32DropObject : public IDropTarget
 
     private:
         unsigned long References;
+        bool PlayOnDrop;
 
         // Helper function
         void HandleDrop( HDROP HDrop );

@@ -2,7 +2,7 @@
  * x11_dragdrop.cpp: X11 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_dragdrop.cpp,v 1.6 2003/06/22 15:07:13 asmax Exp $
+ * $Id: x11_dragdrop.cpp,v 1.7 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -43,10 +43,12 @@
 
 
 //---------------------------------------------------------------------------
-X11DropObject::X11DropObject( intf_thread_t *_p_intf, Window win)
+X11DropObject::X11DropObject( intf_thread_t *_p_intf, Window win,
+                              bool playondrop )
 {
     p_intf = _p_intf;
     Win = win;
+    PlayOnDrop = playondrop;
     display = p_intf->p_sys->display;
 }
 //---------------------------------------------------------------------------
@@ -111,23 +113,23 @@ void X11DropObject::DndEnter( ldata_t data )
 }
 //---------------------------------------------------------------------------
 void X11DropObject::DndPosition( ldata_t data )
-{   
+{
     Window src = data[0];
     Time time = data[2];
-    
+
     XLOCK;
     Atom selectionAtom = XInternAtom( display, "XdndSelection", 0 );
     Atom targetAtom = XInternAtom( display, "text/plain", 0 );
     Atom propAtom = XInternAtom( display, "VLC_SELECTION", 0 );
-   
+
     Atom actionAtom = XInternAtom( display, "XdndActionCopy", 0 );
     Atom typeAtom = XInternAtom( display, "XdndFinished", 0 );
 
     // Convert the selection into the given target
     // NEEDED or it doesn't work !!!
-    XConvertSelection( display, selectionAtom, targetAtom, propAtom, src, 
+    XConvertSelection( display, selectionAtom, targetAtom, propAtom, src,
                        time );
- 
+
     actionAtom = XInternAtom( display, "XdndActionCopy", 0 );
     typeAtom = XInternAtom( display, "XdndStatus", 0 );
 
@@ -151,7 +153,7 @@ void X11DropObject::DndPosition( ldata_t data )
     event.xclient.data.l[2] = 0;
     event.xclient.data.l[3] = (w << 16) | h;
     event.xclient.data.l[4] = actionAtom;
- 
+
     // Tell the source whether we accept the drop
     XSendEvent( display, src, False, 0, &event );
     XUNLOCK;
@@ -170,21 +172,21 @@ void X11DropObject::DndDrop( ldata_t data )
     Atom selectionAtom = XInternAtom( display, "XdndSelection", 0 );
     Atom targetAtom = XInternAtom( display, "text/plain", 0 );
     Atom propAtom = XInternAtom( display, "VLC_SELECTION", 0 );
-   
+
     Atom actionAtom = XInternAtom( display, "XdndActionCopy", 0 );
     Atom typeAtom = XInternAtom( display, "XdndFinished", 0 );
 
     // Convert the selection into the given target
-    XConvertSelection( display, selectionAtom, targetAtom, propAtom, src, 
+    XConvertSelection( display, selectionAtom, targetAtom, propAtom, src,
                        time );
 
-    // Read the selection 
+    // Read the selection
     Atom type;
     int format;
     unsigned long nitems, nbytes;
     char *buffer;
-    XGetWindowProperty( display, src, propAtom, 0, 1024, False, 
-                        AnyPropertyType, &type, &format, &nitems, &nbytes, 
+    XGetWindowProperty( display, src, propAtom, 0, 1024, False,
+                        AnyPropertyType, &type, &format, &nitems, &nbytes,
                         (unsigned char**)&buffer );
     string selection = "";
     if( buffer != NULL )
@@ -193,12 +195,12 @@ void X11DropObject::DndDrop( ldata_t data )
     }
     XFree( buffer );
     XUNLOCK;
- 
+
     if( selection != "" )
     {
         // TODO: multiple files handling
         string::size_type end = selection.find( "\n", 0 );
-        selection = selection.substr( 0, end -1 );     
+        selection = selection.substr( 0, end -1 );
         end = selection.find( "\r", 0 );
         selection = selection.substr( 0, end -1 );
 
@@ -208,12 +210,19 @@ void X11DropObject::DndDrop( ldata_t data )
         {
             selection.erase( pos + 1, 2 );
         }
-    
+
         char *name = new char[selection.size()+1];
         strncpy( name, selection.c_str(), selection.size()+1 );
-        OSAPI_PostMessage( NULL, VLC_DROP, (unsigned int)name, 0 );
+        if( PlayOnDrop )
+        {
+            OSAPI_PostMessage( NULL, VLC_DROP, (unsigned int)name, 1 );
+        }
+        else
+        {
+            OSAPI_PostMessage( NULL, VLC_DROP, (unsigned int)name, 0 );
+        }
     }
-    
+
     // Tell the source we accepted the drop
     XEvent event;
     event.type = ClientMessage;

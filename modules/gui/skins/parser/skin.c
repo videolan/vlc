@@ -1,6 +1,6 @@
 /* XML application for skin.dtd (Id: skin.dtd,v 1.4 2003/04/20 20:28:39 ipkiss Exp).
  * Includes actions from skin.act.
- * Generated 2003/05/01 15:30:24.
+ * Generated 2003/10/22 19:09:40.
  *
  * This program was generated with the FleXML XML processor generator,
  * (Id: flexml.pl,v 1.24 1999/12/13 16:18:30 krisrose Exp).
@@ -78,7 +78,7 @@ void STag_Window(void)
 
         
             StartWindow( A_Window_id, A_Window_x, A_Window_y, A_Window_visible, A_Window_fadetime, A_Window_alpha,
-                         A_Window_movealpha, A_Window_dragdrop );
+                         A_Window_movealpha, A_Window_dragdrop, A_Window_playondrop );
         
     
 } /* STag_Window */

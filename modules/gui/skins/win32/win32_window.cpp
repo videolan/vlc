@@ -2,7 +2,7 @@
  * win32_window.cpp: Win32 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.cpp,v 1.13 2003/10/17 18:17:28 ipkiss Exp $
+ * $Id: win32_window.cpp,v 1.14 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -66,16 +66,16 @@
 //---------------------------------------------------------------------------
 Win32Window::Win32Window( intf_thread_t *p_intf, HWND hwnd, int x, int y,
     bool visible, int transition, int normalalpha, int movealpha,
-    bool dragdrop )
+    bool dragdrop, bool playondrop )
     : SkinWindow( p_intf, x, y, visible, transition, normalalpha, movealpha,
               dragdrop )
 {
     // Set handles
-    hWnd           = hwnd;
+    hWnd      = hwnd;
 
     // Set position parameters
-    CursorPos    = new POINT;
-    WindowPos    = new POINT;
+    CursorPos = new POINT;
+    WindowPos = new POINT;
 
     // Create Tool Tip Window
     ToolTipWindow = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL,
@@ -91,7 +91,7 @@ Win32Window::Win32Window( intf_thread_t *p_intf, HWND hwnd, int x, int y,
     ToolTipInfo.uId = (unsigned int)hWnd;
     ToolTipInfo.lpszText = NULL;
     ToolTipInfo.rect.left = ToolTipInfo.rect.top = 0;
-        ToolTipInfo.rect.right = ToolTipInfo.rect.bottom = 0;
+    ToolTipInfo.rect.right = ToolTipInfo.rect.bottom = 0;
 
     SendMessage( ToolTipWindow, TTM_ADDTOOL, 0,
                     (LPARAM)(LPTOOLINFO) &ToolTipInfo );
@@ -101,11 +101,10 @@ Win32Window::Win32Window( intf_thread_t *p_intf, HWND hwnd, int x, int y,
     {
         // Initialize the OLE library
         OleInitialize( NULL );
-        DropTarget = (LPDROPTARGET) new Win32DropObject();
+        DropTarget = (LPDROPTARGET) new Win32DropObject( playondrop );
         // register the listview as a drop target
         RegisterDragDrop( hWnd, DropTarget );
     }
-
 }
 //---------------------------------------------------------------------------
 Win32Window::~Win32Window()
@@ -129,7 +128,6 @@ Win32Window::~Win32Window()
         // Uninitialize the OLE library
         OleUninitialize();
     }
-
 }
 //---------------------------------------------------------------------------
 bool Win32Window::ProcessOSEvent( Event *evt )
@@ -265,7 +263,6 @@ void Win32Window::RefreshFromImage( int x, int y, int w, int h )
 
     // Release window device context
     ReleaseDC( hWnd, DC );
-
 }
 //---------------------------------------------------------------------------
 void Win32Window::WindowManualMove()
@@ -281,7 +278,6 @@ void Win32Window::WindowManualMove()
 
     // Free memory
     delete[] NewPos;
-
 }
 //---------------------------------------------------------------------------
 void Win32Window::WindowManualMoveInit()
@@ -330,7 +326,6 @@ void Win32Window::ChangeToolTipText( string text )
                              (LPARAM)(LPTOOLINFO)&ToolTipInfo );
         }
     }
-
 }
 //---------------------------------------------------------------------------
 

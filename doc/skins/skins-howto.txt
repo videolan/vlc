@@ -150,6 +150,9 @@ OK, let's go for an enumeration of the different tags and theor attributes :
       - dragdrop: sets if drag and drop of media files is allowed in this
         window.
         Default is "true".
+      - playondrop: sets if a drop file is played directly (true) or only
+        enqueud (false). This has no effect if dragdrop is set to "false".
+        Default is "true".
 
  - ControlGroup: Adds an offset to the elements it contains. A ControlGroup is
    only supposed to ease the job of the skin designer, who can adjust the

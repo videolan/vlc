@@ -1,5 +1,5 @@
 /* XML processor/application API for skin.dtd (Id: skin.dtd,v 1.4 2003/04/20 20:28:39 ipkiss Exp).
- * Generated 2003/05/01 15:30:24.
+ * Generated 2003/10/22 19:09:40.
  *
  * This program was generated with the FleXML XML processor generator,
  * (Id: flexml.pl,v 1.24 1999/12/13 16:18:30 krisrose Exp).
@@ -238,6 +238,8 @@ typedef char* AT_ThemeInfo_webpage;
 #define AU_ThemeInfo_webpage NULL
 typedef char* AT_ButtonControl_onmouseout;
 #define AU_ButtonControl_onmouseout NULL
+typedef char* AT_Window_playondrop;
+#define AU_Window_playondrop NULL
 typedef char* AT_CheckBoxControl_tooltiptext1;
 #define AU_CheckBoxControl_tooltiptext1 NULL
 typedef char* AT_CheckBoxControl_tooltiptext2;
@@ -380,6 +382,7 @@ extern AT_Event_event A_Event_event;
 extern AT_RectangleControl_h A_RectangleControl_h;
 extern AT_ThemeInfo_webpage A_ThemeInfo_webpage;
 extern AT_ButtonControl_onmouseout A_ButtonControl_onmouseout;
+extern AT_Window_playondrop A_Window_playondrop;
 extern AT_CheckBoxControl_tooltiptext1 A_CheckBoxControl_tooltiptext1;
 extern AT_CheckBoxControl_tooltiptext2 A_CheckBoxControl_tooltiptext2;
 extern AT_ImageControl_id A_ImageControl_id;

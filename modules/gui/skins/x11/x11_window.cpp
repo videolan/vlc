@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.29 2003/10/19 22:25:10 gbazin Exp $
+ * $Id: x11_window.cpp,v 1.30 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -60,9 +60,9 @@ static void DrawToolTipText( tooltip_t *tooltip );
 //---------------------------------------------------------------------------
 X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     bool visible, int transition, int normalalpha, int movealpha,
-    bool dragdrop, string name )
+    bool dragdrop, bool playondrop, string name )
     : SkinWindow( p_intf, x, y, visible, transition, normalalpha, movealpha,
-              dragdrop )
+              dragdrop  )
 {
     // Set handles
     Wnd         = wnd;
@@ -86,12 +86,12 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     if( DragDrop )
     {
         // register the listview as a drop target
-        DropObject = new X11DropObject( p_intf, Wnd );
+        DropObject = new X11DropObject( p_intf, Wnd, playondrop );
 
         Atom xdndAtom = XInternAtom( display, "XdndAware", False );
         char xdndVersion = 4;
         XLOCK;
-        XChangeProperty( display, wnd, xdndAtom, XA_ATOM, 32, 
+        XChangeProperty( display, wnd, xdndAtom, XA_ATOM, 32,
                          PropModeReplace, (unsigned char *)&xdndVersion, 1);
         XUNLOCK;
     }
@@ -154,7 +154,6 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     ClickedTime = 0;
     // TODO: can be retrieved somewhere ?
     DblClickDelay = 400;
-   
 }
 //---------------------------------------------------------------------------
 X11Window::~X11Window()

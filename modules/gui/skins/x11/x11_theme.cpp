@@ -2,7 +2,7 @@
  * x11_theme.cpp: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.cpp,v 1.15 2003/06/22 12:46:49 asmax Exp $
+ * $Id: x11_theme.cpp,v 1.16 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -90,7 +90,7 @@ void X11Theme::ChangeClientWindowName( string name )
 }
 //---------------------------------------------------------------------------
 void X11Theme::AddWindow( string name, int x, int y, bool visible,
-    int fadetime, int alpha, int movealpha, bool dragdrop )
+    int fadetime, int alpha, int movealpha, bool dragdrop, bool playondrop )
 {
     // Create the window
     Window root = DefaultRootWindow( display );
@@ -118,16 +118,16 @@ void X11Theme::AddWindow( string name, int x, int y, bool visible,
     motifWmHints.flags = 2;    // MWM_HINTS_DECORATIONS;
     motifWmHints.decorations = 0;
     XLOCK;
-    XChangeProperty( display, wnd, hints_atom, hints_atom, 32, 
-                     PropModeReplace, (unsigned char *)&motifWmHints, 
+    XChangeProperty( display, wnd, hints_atom, hints_atom, 32,
+                     PropModeReplace, (unsigned char *)&motifWmHints,
                      sizeof( motifWmHints ) / sizeof( long ) );
 
     // Change the window title
     XStoreName( display, wnd, name.c_str() );
     XUNLOCK;
 
-    WindowList.push_back( (SkinWindow *)new OSWindow( p_intf, wnd, x, y, 
-        visible, fadetime, alpha, movealpha, dragdrop, name ) ) ;
+    WindowList.push_back( (SkinWindow *)new OSWindow( p_intf, wnd, x, y,
+        visible, fadetime, alpha, movealpha, dragdrop, playondrop, name ) ) ;
 }
 //---------------------------------------------------------------------------
 void X11Theme::ChangeTray()

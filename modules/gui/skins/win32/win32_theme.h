@@ -2,7 +2,7 @@
  * win32_theme.h: Win32 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_theme.h,v 1.4 2003/04/21 21:51:16 asmax Exp $
+ * $Id: win32_theme.h,v 1.5 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -68,7 +68,8 @@ class Win32Theme : public Theme
 
         // !!!
         virtual void AddWindow( string name, int x, int y, bool visible,
-            int fadetime, int alpha, int movealpha, bool dragdrop );
+            int fadetime, int alpha, int movealpha, bool dragdrop,
+            bool playondrop );
         virtual void ChangeClientWindowName( string name );
 
         // Taskbar && system tray

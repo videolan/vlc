@@ -2,7 +2,7 @@
  * win32_theme.cpp: Win32 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_theme.cpp,v 1.9 2003/06/22 12:46:49 asmax Exp $
+ * $Id: win32_theme.cpp,v 1.10 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -280,7 +280,7 @@ void Win32Theme::ChangeClientWindowName( string name )
 }
 //---------------------------------------------------------------------------
 void Win32Theme::AddWindow( string name, int x, int y, bool visible,
-    int fadetime, int alpha, int movealpha, bool dragdrop )
+    int fadetime, int alpha, int movealpha, bool dragdrop, bool playondrop )
 {
     HWND hwnd;
 
@@ -302,7 +302,7 @@ void Win32Theme::AddWindow( string name, int x, int y, bool visible,
     SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)p_intf );
 
     WindowList.push_back( (SkinWindow *)new OSWindow( p_intf, hwnd, x, y,
-        visible, fadetime, alpha, movealpha, dragdrop ) ) ;
+        visible, fadetime, alpha, movealpha, dragdrop, playondrop ) ) ;
 }
 //---------------------------------------------------------------------------
 void Win32Theme::ChangeTray()

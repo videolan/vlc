@@ -2,7 +2,7 @@
  * win32_dragdrop.cpp: Win32 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_dragdrop.cpp,v 1.4 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: win32_dragdrop.cpp,v 1.5 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -35,9 +35,10 @@
 
 
 //---------------------------------------------------------------------------
-Win32DropObject::Win32DropObject() : IDropTarget()
+Win32DropObject::Win32DropObject( bool playondrop ) : IDropTarget()
 {
     References = 1;
+    PlayOnDrop = playondrop;
 }
 //---------------------------------------------------------------------------
 Win32DropObject::~Win32DropObject()
@@ -57,13 +58,21 @@ void Win32DropObject::HandleDrop( HDROP HDrop )
         char *FileName = new char[NameLength];
         DragQueryFile( (HDROP)HDrop, i, FileName, NameLength );
 
-        // The pointer must not be deleted here because it will be deleted
-        // in the VLC specific messages processing function
-        PostMessage( NULL, VLC_DROP, (WPARAM)FileName, 0 );
+        if( PlayOnDrop )
+        {
+            // The pointer must not be deleted here because it will be deleted
+            // in the VLC specific messages processing function
+            PostMessage( NULL, VLC_DROP, (WPARAM)FileName, 1 );
+        }
+        else
+        {
+            // The pointer must not be deleted here because it will be deleted
+            // in the VLC specific messages processing function
+            PostMessage( NULL, VLC_DROP, (WPARAM)FileName, 0 );
+        }
     }
 
     DragFinish( (HDROP)HDrop );
-
 }
 //---------------------------------------------------------------------------
 STDMETHODIMP Win32DropObject::QueryInterface( REFIID iid, void FAR* FAR* ppv )

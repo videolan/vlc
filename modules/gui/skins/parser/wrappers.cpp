@@ -2,7 +2,7 @@
  * wrappers.cpp: Wrappers around C++ objects
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: wrappers.cpp,v 1.12 2003/06/22 12:46:49 asmax Exp $
+ * $Id: wrappers.cpp,v 1.13 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -83,11 +83,12 @@ void AddThemeInfo( char *name, char *author, char *email, char *webpage )
 }
 //---------------------------------------------------------------------------
 void StartWindow( char *name, char *x, char *y, char *visible, char *fadetime,
-    char *alpha, char *movealpha, char *dragdrop )
+    char *alpha, char *movealpha, char *dragdrop, char *playondrop )
 {
     g_pIntf->p_sys->p_theme->AddWindow( name, atoi( x ), atoi( y ),
         ConvertBoolean( visible ), atoi( fadetime ), atoi( alpha ),
-        atoi( movealpha ), ConvertBoolean( dragdrop ) );
+        atoi( movealpha ), ConvertBoolean( dragdrop ),
+        ConvertBoolean( playondrop ) );
 }
 //---------------------------------------------------------------------------
 void EndWindow()

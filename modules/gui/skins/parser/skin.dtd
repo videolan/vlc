@@ -3,7 +3,7 @@
  * skin.dtd: DTD for the VLC skins
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin.dtd,v 1.4 2003/04/20 20:28:39 ipkiss Exp $
+ * $Id: skin.dtd,v 1.5 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -71,6 +71,7 @@
         alpha       CDATA   "255"
         movealpha   CDATA   "255"
         dragdrop    CDATA   "true"
+        playondrop  CDATA   "true"
     >
 
 <!ELEMENT ControlGroup (ControlGroup|ImageControl|ButtonControl|PlayListControl|

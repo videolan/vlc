@@ -2,7 +2,7 @@
  * window.h: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.h,v 1.6 2003/10/17 18:17:28 ipkiss Exp $
+ * $Id: window.h,v 1.7 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -87,7 +87,7 @@ class SkinWindow
 
         // Constructors
         SkinWindow( intf_thread_t *_p_intf, int x, int y, bool visible,
-                int transition, int normalalpha, int movealpha, bool dragdrop );
+            int transition, int normalalpha, int movealpha, bool dragdrop );
 
         // Destructors
         virtual ~SkinWindow();

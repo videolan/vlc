@@ -2,7 +2,7 @@
  * x11_window.h: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.h,v 1.7 2003/10/19 20:32:21 asmax Exp $
+ * $Id: x11_window.h,v 1.8 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -86,7 +86,7 @@ class X11Window : public SkinWindow
         // Cosntructors
         X11Window( intf_thread_t *_p_intf, Window wnd, int x, int y,
             bool visible, int transition, int normalalpha, int movealpha,
-            bool dragdrop, string name );
+            bool dragdrop, bool playondrop, string name );
 
         // Destructors
         virtual ~X11Window();

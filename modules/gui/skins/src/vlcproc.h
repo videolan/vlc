@@ -2,7 +2,7 @@
  * vlcproc.h: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.h,v 1.10 2003/07/20 20:42:23 ipkiss Exp $
+ * $Id: vlcproc.h,v 1.11 2003/10/22 19:12:56 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -41,7 +41,7 @@ class VlcProc
 
         // Vlc methods
         void LoadSkin();
-        void DropFile( unsigned int param );
+        void DropFile( unsigned int param1, long param2 );
         void PauseStream();
         void PlayStream();
         void StopStream();
