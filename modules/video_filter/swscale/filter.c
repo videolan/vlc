@@ -144,18 +144,18 @@ static int OpenFilter( vlc_object_t *p_this )
 
     switch( i_sws_mode )
     {
-    case 0:  p_sys->i_sws_flags |= SWS_FAST_BILINEAR; break;
-    case 1:  p_sys->i_sws_flags |= SWS_BILINEAR; break;
-    case 2:  p_sys->i_sws_flags |= SWS_BICUBIC; break;
-    case 3:  p_sys->i_sws_flags |= SWS_X; break;
-    case 4:  p_sys->i_sws_flags |= SWS_POINT; break;
-    case 5:  p_sys->i_sws_flags |= SWS_AREA; break;
-    case 6:  p_sys->i_sws_flags |= SWS_BICUBLIN; break;
-    case 7:  p_sys->i_sws_flags |= SWS_GAUSS; break;
-    case 8:  p_sys->i_sws_flags |= SWS_SINC; break;
-    case 9:  p_sys->i_sws_flags |= SWS_LANCZOS; break;
-    case 10: p_sys->i_sws_flags |= SWS_SPLINE; break;
-    default: p_sys->i_sws_flags |= SWS_FAST_BILINEAR; i_sws_mode = 0; break;
+    case 0:  p_sys->i_sws_flags = SWS_FAST_BILINEAR; break;
+    case 1:  p_sys->i_sws_flags = SWS_BILINEAR; break;
+    case 2:  p_sys->i_sws_flags = SWS_BICUBIC; break;
+    case 3:  p_sys->i_sws_flags = SWS_X; break;
+    case 4:  p_sys->i_sws_flags = SWS_POINT; break;
+    case 5:  p_sys->i_sws_flags = SWS_AREA; break;
+    case 6:  p_sys->i_sws_flags = SWS_BICUBLIN; break;
+    case 7:  p_sys->i_sws_flags = SWS_GAUSS; break;
+    case 8:  p_sys->i_sws_flags = SWS_SINC; break;
+    case 9:  p_sys->i_sws_flags = SWS_LANCZOS; break;
+    case 10: p_sys->i_sws_flags = SWS_SPLINE; break;
+    default: p_sys->i_sws_flags = SWS_FAST_BILINEAR; i_sws_mode = 0; break;
     }
 
     p_sys->p_src_filter = 0; p_sys->p_dst_filter = 0;
@@ -315,6 +315,9 @@ static struct
     { VLC_FOURCC('I','4','4','4'), IMGFMT_444P },
     { VLC_FOURCC('I','4','2','2'), IMGFMT_422P },
     { VLC_FOURCC('I','4','1','1'), IMGFMT_411P },
+#if 0
+    { VLC_FOURCC('Y','U','V','P'), IMGFMT_Y800 },
+#endif
 
     /* Packed YUV formats */
     { VLC_FOURCC('U','Y','V','Y'), IMGFMT_UYVY },
