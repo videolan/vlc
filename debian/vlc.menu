@@ -1,0 +1,3 @@
+?package(vlc):command="/usr/bin/vlc" hotkey="V" needs="X11" \
+               section="Apps/Graphics" title="VideoLAN Client" \
+               icon="/usr/share/videolan/vlc/vlc.png"

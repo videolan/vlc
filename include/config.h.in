@@ -292,8 +292,8 @@
 #define VOUT_GAMMA                      0.
 
 /* Default fonts */
-#define VOUT_DEFAULT_FONT               "lib/default8x9.psf"
-#define VOUT_LARGE_FONT                 "lib/default8x16.psf"
+#define VOUT_DEFAULT_FONT               "default8x9.psf"
+#define VOUT_LARGE_FONT                 "default8x16.psf"
 
 /*
  * Time settings

@@ -1,0 +1,74 @@
+#!/usr/bin/make -f
+# debian/rules for the VideoLAN Client - uses debhelper.
+# based on Joey Hess's one.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This is the debhelper compatability version to use.
+export DH_COMPAT=1
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+
+	./configure --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
+	$(MAKE)
+
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+
+	-$(MAKE) distclean
+
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	$(MAKE) install prefix=`pwd`/debian/tmp/usr
+
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+#	dh_testversion
+	dh_testdir
+	dh_testroot
+#	dh_installdebconf	
+	dh_installdocs
+	dh_installexamples
+	dh_installmenu
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installinit
+	dh_installcron
+	dh_installmanpages
+	dh_installinfo
+#	dh_undocumented
+	dh_installchangelogs 
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	# You may want to make some executables suid here.
+	dh_suidregister
+#	dh_makeshlibs
+	dh_installdeb
+#	dh_perl
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

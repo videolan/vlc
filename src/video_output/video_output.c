@@ -204,7 +204,11 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
 
     /* Load fonts - fonts must be initialized after the system method since
      * they may be dependant on screen depth and other thread properties */
-    p_vout->p_default_font      = vout_LoadFont( VOUT_DEFAULT_FONT );
+    p_vout->p_default_font      = vout_LoadFont( DATA_PATH "/" VOUT_DEFAULT_FONT );
+    if( p_vout->p_default_font == NULL )
+    {
+        p_vout->p_default_font  = vout_LoadFont( "share/" VOUT_DEFAULT_FONT );
+    }
     if( p_vout->p_default_font == NULL )
     {
         p_vout->p_sys_destroy( p_vout );
@@ -212,7 +216,11 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
         free( p_vout );
         return( NULL );
     }
-    p_vout->p_large_font        = vout_LoadFont( VOUT_LARGE_FONT );
+    p_vout->p_large_font        = vout_LoadFont( DATA_PATH "/" VOUT_LARGE_FONT );
+    if( p_vout->p_large_font == NULL )
+    {
+        p_vout->p_large_font    = vout_LoadFont( "share/" VOUT_LARGE_FONT );
+    }
     if( p_vout->p_large_font == NULL )
     {
         vout_UnloadFont( p_vout->p_default_font );

@@ -68,6 +68,9 @@ DEBUG=0
 
 #----------------- do not change anything below this line ----------------------
 
+prefix=@prefix@
+INSTALL=@INSTALL@
+
 ################################################################################
 # Configuration pre-processing
 ################################################################################
@@ -89,7 +92,8 @@ PROGRAM_BUILD = `date` $(USER)
 # including ARCH_xx and SYS_xx. It will be passed to C compiler.
 DEFINE += -DARCH_$(shell echo $(ARCH) | cut -f1 -d' ')
 DEFINE += -DSYS_$(SYS)
-DEFINE += -DPLUGIN_PATH="\"$(PREFIX)/lib/videolan/vlc\""
+DEFINE += -DPLUGIN_PATH="\"$(prefix)/lib/videolan/vlc\""
+DEFINE += -DDATA_PATH="\"$(prefix)/share/videolan/vlc\""
 #DEFINE += -DPROGRAM_OPTIONS="\"$(shell echo $(PROGRAM_OPTIONS) | tr 'A-Z' 'a-z')\""
 #DEFINE += -DPROGRAM_BUILD="\"$(PROGRAM_BUILD)\""
 ifeq ($(DEBUG),1)
@@ -338,9 +342,11 @@ distclean: clean
 	rm -rf .dep
 
 install:
-	$(INSTALL) vlc $(PREFIX)/bin
-	mkdir -p $(PREFIX)/lib/videolan/vlc
-	$(INSTALL) $(PLUGIN_OBJ) $(PREFIX)/lib/videolan/vlc
+	$(INSTALL) vlc $(prefix)/bin
+	mkdir -p $(prefix)/lib/videolan/vlc
+	$(INSTALL) $(PLUGIN_OBJ) $(prefix)/lib/videolan/vlc
+	$(INSTALL) share/*.psf $(prefix)/share/videolan/vlc
+	$(INSTALL) share/*.png $(prefix)/share/videolan/vlc
 
 show:
 	@echo "Command line for C objects:"

@@ -1,0 +1,9 @@
+vlc (0.1.99-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Samuel Hocevar <sam@via.ecp.fr>  Mon, 13 Mar 2000 02:21:45 +0100
+
+Local variables:
+mode: debian-changelog
+End:

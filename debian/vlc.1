@@ -1,0 +1,108 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH VLC 1 "March 13, 2000"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+vlc \- The VideoLAN Client
+.SH SYNOPSIS
+.B vlc
+.RI [ options ] 
+.RI [ parameters ]
+.SH DESCRIPTION
+This manual page documents briefly the
+.B vlc
+, a free MPEG2 player.
+.SH OPTIONS
+These programs follow the usual GNU command line syntax, with long
+options starting with two dashes (`-').
+A summary of options is included below.
+.TP
+.B \-\-noaudio
+Disable audio output.
+.TP
+.B \-\-aout <plugin>
+Specify an audio output plugin.
+.TP
+.B \-\-stereo, \-\-mono
+Choose stereo or mono audio output
+.TP
+.B \-\-novideo
+Disable video output.
+.TP
+.B \-\-vout <plugin>
+Specify a video output plugin.
+.TP
+.B \-\-display <display>
+Specify the display name.
+.TP
+.B \-\-width <w>, -\-\height <h>
+Choose the display coordinates.
+.TP
+.B \-g, \-\-grayscale
+Grayscale output.
+.TP
+.B \-\-color
+Color output.
+.TP
+.B \-\-novlans
+Disable VLANs support.
+.TP
+.B \-\-server <host>, \-\-port <port>
+Choose the video server address and port.
+.TP
+.B \-h, \-\-help
+Print help and exit.
+.TP
+.B \-H, \-\-longhelp
+Print long help and exit.
+.TP
+.B \-v, \-\-version
+Output version information and exit.
+.SH PARAMETERS
+.B vlc
+also accepts a lot of parameters to customize its behaviour.
+.TP
+.B Interface parameters:
+ vlc_init=<filename>      initialization script
+ vlc_channels=<filename>  channels list
+.TP
+.B Audio parameters:
+ vlc_aout=<method name>   audio method
+ vlc_dsp=<filename>       dsp device path
+ vlc_stereo={1|0}         stereo or mono output
+ vlc_audio_rate=<rate>    output rate
+.TP
+.B Video parameters:
+ vlc_vout=<method name>   display method
+ vlc_display=<display>    display used
+ vlc_width=<width>        display width
+ vlc_height=<height>      dislay height
+ vlc_fb_dev=<filename>    framebuffer device path
+ vlc_grayscale={1|0}      grayscale or color output
+.TP
+.B Input parameters:
+ vlc_server=<hostname>    video server
+ vlc_server_port=<port>   video server port
+ vlc_iface=<interface>    network interface
+ vlc_vlan_server=<host>   vlan server
+ vlc_vlan_port=<port>     vlan server port
+
+.SH SEE ALSO
+.BR vls (1),
+.br
+.SH AUTHOR
+This manual page was written by the VideoLAN Team <videolan@via.ecp.fr>,
+for the Debian GNU/Linux system (but may be used by others).

@@ -1,0 +1,14 @@
+Source: vlc
+Section: graphics
+Priority: optional
+Maintainer: Samuel Hocevar <sam@via.ecp.fr>
+Standards-Version: 3.0.1
+
+Package: vlc
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: VideoLAN Client - a free network-aware MPEG and DVD player
+ VideoLAN is a free MPEG2 software solution.
+ .
+ The VideoLAN Client allows to play MPEG2 Transport Streams from the
+ network or from a file, as well as direct DVD playback.
