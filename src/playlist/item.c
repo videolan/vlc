@@ -2,7 +2,7 @@
  * item.c : Playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: item.c,v 1.2 2003/11/22 12:35:17 sigmunau Exp $
+ * $Id: item.c,v 1.3 2003/11/23 16:24:20 garf Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -254,6 +254,12 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
 {
     vlc_value_t     val;
     vlc_mutex_lock( &p_playlist->object_lock );
+
+    /* if i_pos is the current played item, playlist should stop playing it */
+    if( ( p_playlist->i_status == PLAYLIST_RUNNING) && (p_playlist->i_index == i_pos) )
+    {
+        playlist_Command( p_playlist, PLAYLIST_STOP, 0 );
+    }
 
     if( i_pos >= 0 && i_pos < p_playlist->i_size )
     {

@@ -6,10 +6,6 @@
     <title>VLC Media Player</title>
     <link href="/style.css" title="Default" rel="stylesheet" />
 
-    <vlc id="if" param1="url_param"/>
-        <meta http-equiv="refresh" content="0;URL=/" />
-    <vlc id="end" />
-
     <vlc id="control" param1="stop,pause,previous,next,add,sout,play,delete,empty,seek,fullscreen,keep,volume,sort" />
     <vlc id="set" param1="sout" param2="string" />
  </head>
@@ -33,11 +29,6 @@
          <input type="submit" name="control" value="fullscreen" />
         </td>
        </form>
-       <form>
-        <td align="right" nowrap="1">
-         Current Volume: <vlc id="value" param1="volume" /> <input type="text" name="value" size="5"><input type="hidden" name="control" value="volume"><input type="submit" name="Set" value="Set">
-        </td>
-       </form>
       </tr>
       <tr>
        <td colspan="2">
@@ -58,6 +49,13 @@
          </tr>
         </table>
        </td>
+      </tr>
+      <tr>
+       <form>
+        <td>
+         Current Volume: <vlc id="value" param1="volume" /> <input type="text" name="value" size="5"><input type="hidden" name="control" value="volume"><input type="submit" name="Set" value="Set">
+        </td>
+       </form>
       </tr>
      </table>
     </div>

@@ -323,6 +323,7 @@ variable will be displayed (instead of it name).
             - index   : the index value (to be used for example for the 
                         "delete" control command.
             - name
+            - group   : the group number
 
         - "informations"  : Create informations for  the current playing
           stream.

@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.37 2003/11/20 08:44:30 garf Exp $
+ * $Id: http.c,v 1.38 2003/11/23 16:24:20 garf Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1768,9 +1768,8 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                 }
                 case MVLC_DEL:
                 {
-                    int i_item, *p_items = NULL, i_nb_items = 0, i_current = -1;
+                    int i_item, *p_items = NULL, i_nb_items = 0;
                     char item[512], *p_parser = p_request;
-                    vlc_value_t val;
 
                     /* Get the list of items to delete */
                     while( (p_parser =
@@ -1783,16 +1782,6 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                                            sizeof(int) );
                         p_items[i_nb_items] = i_item;
                         i_nb_items++;
-                    }
-
-                    /* we should not remove an item while it is played by VLC */
-                    var_Get( p_sys->p_input, "state", &val );
-                    if( val.i_int == PLAYING_S )
-                    {
-                        i_current = p_sys->p_playlist->i_index;
-                    } else
-                    {
-                        i_current = -1;
                     }
 
                     /* The items need to be deleted from in reversed order */
@@ -1808,13 +1797,10 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                                     i_index = j;
                             }
 
-                            if( p_items[i_index] != i_current )
-                            {
-                                playlist_Delete( p_sys->p_playlist,
-                                                 p_items[i_index] );
-                                msg_Dbg( p_intf, "requested playlist delete: %d",
-                                         p_items[i_index] );
-                            }
+                            playlist_Delete( p_sys->p_playlist,
+                                             p_items[i_index] );
+                            msg_Dbg( p_intf, "requested playlist delete: %d",
+                                     p_items[i_index] );
                             p_items[i_index] = -1;
                         }
                     }
