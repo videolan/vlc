@@ -1,11 +1,23 @@
+; Version number and signature of INF file.
+;
 [version]
   signature="$CHICAGO$"
   AdvancedINF=2.0
+
 [Add.Code]
+  vlc-0.8.2-svn-win32.exe
   axvlc.dll=axvlc.dll
+
 [axvlc.dll]
-  file-win32-x86=thiscab
-  clsid={E23FE9C6-778E-49d4-B537-38FCDE4887D8}
   FileVersion=0,8,2,0
-  DestDir=10
-  RegisterServer=yes
+  clsid={E23FE9C6-778E-49d4-B537-38FCDE4887D8}
+  RegisterServer=no
+  hook=nsiinstaller
+
+[vlc-0.8.2-svn-win32.exe]
+  FileVersion=0,8,2,0
+  file-win32-x86=thiscab
+
+[nsiinstaller]
+  run=%EXTRACT_DIR%\vlc-0.8.2-svn-win32.exe
+
