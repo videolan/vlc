@@ -4,9 +4,7 @@ EXTRA_DIST = \
 	README.Debian \
 	changelog \
 	control \
-	control.woody \
 	rules \
-	rules.woody \
 	vlc.copyright \
 	vlc.desktop \
 	vlc.dirs \
@@ -39,6 +37,7 @@ EXTRA_DIST = \
 	vlc-plugin-sdl.dirs \
 	vlc-plugin-svgalib.dirs \
 	vlc-plugin-xosd.dirs \
+	woody-buildpackage \
 	wxvlc.dirs \
 	wxvlc.menu \
 	$(NULL)
