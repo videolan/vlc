@@ -41,8 +41,7 @@
 #   define MENU_HEIGHT 0
 #endif
 
-#undef MODULE_NAME_IS_gapi
-#ifdef MODULE_NAME_IS_gapi
+#ifdef MODULE_NAME_IS_wingapi
     typedef struct GXDisplayProperties {
         DWORD cxWidth;
         DWORD cyHeight;
@@ -73,7 +72,7 @@
 #       define kfDirect444      0x200
 #       define kfDirectInverted 0x400
 #   endif
-#endif /* MODULE_NAME_IS_gapi */
+#endif /* MODULE_NAME_IS_wingapi */
 
 #define MAX_DIRECTBUFFERS 10
 
@@ -105,7 +104,7 @@ static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static int  Manage    ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
-#ifdef MODULE_NAME_IS_gapi
+#ifdef MODULE_NAME_IS_wingapi
 static void DisplayGAPI( vout_thread_t *, picture_t * );
 #else
 static void DisplayGDI( vout_thread_t *, picture_t * );
@@ -166,7 +165,7 @@ struct vout_sys_t
     HWND hTaskBar;
     vlc_bool_t   b_video_display;
 
-#ifdef MODULE_NAME_IS_gapi
+#ifdef MODULE_NAME_IS_wingapi
     HINSTANCE  gapi_dll;                    /* handle of the opened gapi dll */
 
     /* GAPI functions */
@@ -194,7 +193,7 @@ struct vout_sys_t
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-#ifdef MODULE_NAME_IS_gapi
+#ifdef MODULE_NAME_IS_wingapi
     set_description( _("Windows GAPI video output") );
     set_capability( "video output", 20 );
 #else
@@ -215,7 +214,7 @@ static int OpenVideo ( vlc_object_t *p_this )
     p_vout->p_sys = (vout_sys_t *)malloc( sizeof(vout_sys_t) );
     if( !p_vout->p_sys ) return VLC_ENOMEM;
 
-#ifdef MODULE_NAME_IS_gapi
+#ifdef MODULE_NAME_IS_wingapi
     /* Load GAPI */
     p_vout->p_sys->gapi_dll = LoadLibrary( _T("GX.DLL") );
     if( p_vout->p_sys->gapi_dll == NULL )
@@ -280,7 +279,7 @@ static int OpenVideo ( vlc_object_t *p_this )
     p_vout->pf_end = End;
     p_vout->pf_manage = Manage;
     p_vout->pf_render = Render;
-#ifdef MODULE_NAME_IS_gapi
+#ifdef MODULE_NAME_IS_wingapi
     p_vout->pf_display = DisplayGAPI;
 #else
     p_vout->pf_display = DisplayGDI;
@@ -297,7 +296,7 @@ static void CloseVideo ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
-#ifdef MODULE_NAME_IS_gapi
+#ifdef MODULE_NAME_IS_wingapi
     GXCloseDisplay();
     FreeLibrary( p_vout->p_sys->gapi_dll );
 #endif
@@ -367,7 +366,7 @@ static int Init( vout_thread_t *p_vout )
         break;
     }
 
-#ifdef MODULE_NAME_IS_gapi
+#ifdef MODULE_NAME_IS_wingapi
     p_vout->output.i_width  = p_vout->p_sys->render_width;
     p_vout->output.i_height = p_vout->p_sys->render_height;
 #else
@@ -570,7 +569,7 @@ static int Manage( vout_thread_t *p_vout )
             //PostMessage( p_vout->p_sys->hwnd, WM_VLC_SHOW_MOUSE, 0, 0 );
         }
 
-#ifdef MODULE_NAME_IS_gapi
+#ifdef MODULE_NAME_IS_wingapi
         GXCloseDisplay();
 #endif
 
@@ -578,7 +577,7 @@ static int Manage( vout_thread_t *p_vout )
         ShowWindow( p_vout->p_sys->hwnd, SW_SHOW );
         UpdateWindow( p_vout->p_sys->hwnd );
 
-#ifdef MODULE_NAME_IS_gapi
+#ifdef MODULE_NAME_IS_wingapi
         GXOpenDisplay( p_vout->p_sys->hvideownd, GX_FULLSCREEN );
 #endif
 
@@ -609,7 +608,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 #define rect_dest p_vout->p_sys->rect_dest
 #define rect_dest_clipped p_vout->p_sys->rect_dest_clipped
 
-#ifndef MODULE_NAME_IS_gapi
+#ifndef MODULE_NAME_IS_wingapi
 static void DisplayGDI( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
@@ -895,7 +894,7 @@ static void EventThread ( vlc_object_t *p_event )
             }
             break;
 
-#ifdef MODULE_NAME_IS_gapi
+#ifdef MODULE_NAME_IS_wingapi
         case WM_KILLFOCUS:
             GXSuspend();
             break;
@@ -1133,7 +1132,7 @@ static void InitBuffers( vout_thread_t *p_vout )
     window_dc = GetDC( p_vout->p_sys->hvideownd );
 
     /* Get screen properties */
-#ifdef MODULE_NAME_IS_gapi
+#ifdef MODULE_NAME_IS_wingapi
     {
     GXDisplayProperties gx_displayprop = GXGetDisplayProperties();
     p_vout->p_sys->i_depth = gx_displayprop.cBPP;
@@ -1144,7 +1143,7 @@ static void InitBuffers( vout_thread_t *p_vout )
 #endif
     msg_Dbg( p_vout, "GDI depth is %i", p_vout->p_sys->i_depth );
 
-#ifdef MODULE_NAME_IS_gapi
+#ifdef MODULE_NAME_IS_wingapi
     if( p_vout->b_fullscreen )
     {
         /* We need to restore Maximized sized window */

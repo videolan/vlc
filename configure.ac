@@ -3184,7 +3184,7 @@ if test "${enable_wingdi}" != "no"; then
     VLC_ADD_LDFLAGS([wingdi],[-lgdi32])
   fi
   if test "${SYS}" = "mingwce"; then
-    VLC_ADD_PLUGINS([wingdi])
+    VLC_ADD_PLUGINS([wingdi wingapi])
   fi
 fi
 
