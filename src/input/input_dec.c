@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.76 2003/11/24 00:39:02 fenrir Exp $
+ * $Id: input_dec.c,v 1.77 2003/11/24 02:35:50 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -407,17 +407,25 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
         p_dec->fmt_in.video.i_width = p_bih->biWidth;
         p_dec->fmt_in.video.i_height = p_bih->biHeight;
     }
+
     /* FIXME
      *  - 1: beurk
-     *  - 2: I'm not sure there isn't any endian problem here ... */
-    if( p_es->i_cat == SPU_ES &&
-        ( p_es->i_fourcc == VLC_FOURCC( 's', 'p', 'u', ' ' ) ||
-          p_es->i_fourcc == VLC_FOURCC( 's', 'p', 'u', 'b' ) ) &&
-        p_es->p_demux_data &&
-        *((uint32_t*)p_es->p_demux_data) == 0xBeef )
+     *  - 2: I'm not sure there isn't any endian problem here (spu)... */
+    if( p_es->i_cat == SPU_ES && p_es->p_demux_data )
     {
-        memcpy( p_dec->fmt_in.subs.spu.palette,
-                p_es->p_demux_data, 17 * 4 );
+        if( ( p_es->i_fourcc == VLC_FOURCC( 's', 'p', 'u', ' ' ) ||
+              p_es->i_fourcc == VLC_FOURCC( 's', 'p', 'u', 'b' ) ) &&
+            *((uint32_t*)p_es->p_demux_data) == 0xBeef )
+        {
+            memcpy( p_dec->fmt_in.subs.spu.palette,
+                    p_es->p_demux_data, 17 * 4 );
+        }
+        else if( p_es->i_fourcc == VLC_FOURCC( 'd', 'v', 'b', 's' ) )
+        {
+            dvb_spuinfo_t *p_dvbs = (dvb_spuinfo_t*)p_es->p_demux_data;
+
+            p_dec->fmt_in.subs.dvb.i_id = p_dvbs->i_id;
+        }
     }
 
     p_dec->fmt_in.i_cat = p_es->i_cat;
@@ -464,8 +472,6 @@ static int DecoderThread( decoder_t * p_dec )
     /* The decoder's main loop */
     while( !p_dec->b_die && !p_dec->b_error )
     {
-        int i_size;
-
         if( ( p_block = block_FifoGet( p_dec->p_owner->p_fifo ) ) == NULL )
         {
             p_dec->b_error = 1;
