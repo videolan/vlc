@@ -720,7 +720,7 @@ test "$host_alias" != "$target_alias" &&
 HAVE_VLC=0
 if test -r src/interface/main.c; then
   HAVE_VLC=1
-  VLC_VERSION="0.2.92-dev"
+  VLC_VERSION="0.2.92-pre1"
   
   VLC_CODENAME=Ourumov
   
@@ -729,7 +729,7 @@ fi
 HAVE_LIBDVDCSS=0
 if test -r extras/libdvdcss/libdvdcss.c; then
   HAVE_LIBDVDCSS=1
-  LIBDVDCSS_VERSION="1.0.1-dev"
+  LIBDVDCSS_VERSION="1.0.1-pre1"
   
   if test -r extras/libdvdcss/csskeys.h; then
     cat >> confdefs.h <<\EOF
