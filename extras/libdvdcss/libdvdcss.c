@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.27 2002/01/14 22:06:57 stef Exp $
+ * $Id: libdvdcss.c,v 1.28 2002/01/15 05:22:21 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -79,7 +79,8 @@ static int _dvdcss_raw_open     ( dvdcss_handle, char *psz_target );
  *****************************************************************************/
 extern dvdcss_handle dvdcss_open ( char *psz_target )
 {
-    int i_ret;
+    struct stat fileinfo;
+    int         i_ret;
 
     char *psz_method = getenv( "DVDCSS_METHOD" );
     char *psz_verbose = getenv( "DVDCSS_VERBOSE" );
@@ -157,18 +158,35 @@ extern dvdcss_handle dvdcss_open ( char *psz_target )
         return NULL;
     }
 
-    i_ret = CSSTest( dvdcss );
-    if( i_ret < 0 )
+    if( stat( psz_target, &fileinfo ) < 0 )
     {
-        _dvdcss_error( dvdcss, "CSS test failed" );
-        /* Disable the CSS ioctls and hope that it works? */
-        dvdcss->b_ioctls = 0;
-        dvdcss->b_encrypted = 1;
+        _dvdcss_error( dvdcss, "dvdcss: can't stat target" );
+    }
+    
+    if( S_ISBLK( fileinfo.st_mode ) || 
+        S_ISCHR( fileinfo.st_mode ) )
+    {        
+        i_ret = CSSTest( dvdcss );
+        if( i_ret < 0 )
+        {
+            _dvdcss_error( dvdcss, "CSS test failed" );
+            /* Disable the CSS ioctls and hope that it works? */
+            dvdcss->b_ioctls = 0;
+            dvdcss->b_encrypted = 1;
+        }
+        else
+        {
+            dvdcss->b_ioctls = 1;
+            dvdcss->b_encrypted = i_ret;
+        }
     }
     else
     {
-        dvdcss->b_ioctls = 1;
-        dvdcss->b_encrypted = i_ret;
+        _dvdcss_debug( dvdcss, "dvdcss: file mode, using title method" );
+        dvdcss->i_method = DVDCSS_METHOD_TITLE;
+        dvdcss->b_ioctls = 0;
+        dvdcss->b_encrypted = 1;
+        memset( &dvdcss->css.disc, 0, sizeof(dvdcss->css.disc) );
     }
 
     /* If disc is CSS protected and the ioctls work, authenticate the drive */
@@ -182,9 +200,9 @@ extern dvdcss_handle dvdcss_open ( char *psz_target )
             free( dvdcss );
             return NULL;
         }
+        
+        memset( dvdcss->css.p_unenc_key, 0, KEY_SIZE );
     }
-
-    memset( dvdcss->css.p_unenc_key, 0, KEY_SIZE );
 
 #ifndef WIN32
     if( psz_raw_device != NULL )
@@ -211,7 +229,8 @@ extern int dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks, int i_flags )
 {
     /* title cracking method is too slow to be used at each seek */
     if( ( ( i_flags & DVDCSS_SEEK_MPEG )
-             && ( dvdcss->i_method != DVDCSS_METHOD_TITLE ) ) )
+             && ( dvdcss->i_method != DVDCSS_METHOD_TITLE ) )
+             && dvdcss->b_encrypted )
     {
         int     i_ret;
 
