@@ -2,7 +2,7 @@
  * vcd.h: thread structure of the VCD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vcd.h,v 1.2 2002/10/15 19:56:59 gbazin Exp $
+ * $Id: vcd.h,v 1.3 2002/11/06 15:41:29 jobi Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -29,10 +29,55 @@
 #define VCD_SECTOR_SIZE 2352
 /* size of a CD sector */
 #define CD_SECTOR_SIZE 2048
+/* sector containing the entry points */
+#define VCD_ENTRIES_SECTOR 151
+
+/*****************************************************************************
+ * Misc. Macros
+ *****************************************************************************/
+/* LBA = msf.frame + 75 * ( msf.second + 60 * msf.minute ) */
+#define MSF_TO_LBA(min, sec, frame) ((int)frame + 75 * (sec + 60 * min))
+/* LBA = msf.frame + 75 * ( msf.second - 2 + 60 * msf.minute ) */
+#define MSF_TO_LBA2(min, sec, frame) ((int)frame + 75 * (sec -2 + 60 * min))
+/* Converts BCD to Binary data */
+#define BCD_TO_BIN(i) \
+    ((uint8_t)(0xf & (uint8_t)i)+((uint8_t)10*((uint8_t)i >> 4)))
 
 #ifndef VCDDEV_T
 typedef struct vcddev_s vcddev_t;
 #endif
+
+/*****************************************************************************
+ * structure to store minute/second/frame locations
+ *****************************************************************************/
+typedef struct msf_s
+{
+    uint8_t minute;
+    uint8_t second;
+    uint8_t frame;
+} msf_t;
+
+
+/*****************************************************************************
+ * entries_sect structure: the sector containing entry points
+ *****************************************************************************/
+typedef struct entries_sect_s
+{
+    uint8_t psz_id[8];                              /* "ENTRYVCD" */
+    uint8_t i_version;                              /* 0x02 VCD2.0
+                                                       0x01 SVCD  */
+    uint8_t i_sys_prof_tag;                         /* 0x01 if VCD1.1
+                                                       0x00 else */
+    uint16_t i_entries_nb;                          /* entries number <= 500 */
+
+    struct
+    {
+        uint8_t i_track;                            /* track number */
+        msf_t   msf;                                /* msf location
+                                                       (in BCD format) */
+    } entry[500];
+    uint8_t zeros[36];                              /* should be 0x00 */
+} entries_sect_t;
 
 /*****************************************************************************
  * Prototypes
@@ -41,4 +86,4 @@ vcddev_t *ioctl_Open         ( vlc_object_t *, const char * );
 void      ioctl_Close        ( vlc_object_t *, vcddev_t * );
 int       ioctl_GetTracksMap ( vlc_object_t *, const vcddev_t *, int ** );
 int       ioctl_ReadSector   ( vlc_object_t *, const vcddev_t *,
-			       int, byte_t * );
+                               int, byte_t * );
