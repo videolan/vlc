@@ -1,4 +1,31 @@
-$Id: NEWS,v 1.54 2003/06/23 11:41:25 zorglub Exp $
+$Id: NEWS,v 1.55 2003/07/11 23:36:01 gbazin Exp $
+
+Changes between 0.6.0 and 0.6.1:
+---------------------------------
+
+Stream output:
+ * Added vorbis audio support in Ogg streaming.
+ * Added vorbis audio transcoding support.
+ * Added mp3 audio transcoding support (when ffmpeg is compiled with mp3lame).
+
+Win32 port:
+ * Fixed DVD support which was partly broken due to a bug in libdvdcss
+ * Fixed 5.1 audio support for the sblive/audigy soundcards.
+
+UNIX ports:
+ * Fixed/improved alsa support and enabled multi-channel audio output.
+
+Interfaces:
+ * Small updates/fixes to the wxWindows interface.
+ * Improved HTTP remote control interface.
+
+Input demux:
+ * Improved support for the Matroska container format.
+
+Miscellaneous:
+ * Improved build system.
+ * New video filter plugin to overlay logos.
+ * Added support for Winamp 3 B4S files.
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------

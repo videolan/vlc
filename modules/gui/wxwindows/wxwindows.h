@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.40 2003/07/10 11:15:18 adn Exp $
+ * $Id: wxwindows.h,v 1.41 2003/07/11 23:36:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -369,6 +369,7 @@ private:
     wxCheckBox *audio_transc_checkbox;
     wxComboBox *video_bitrate_combo;
     wxComboBox *audio_bitrate_combo;
+    wxComboBox *audio_channels_combo;
 };
 
 /* Subtitles File Dialog */
