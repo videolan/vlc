@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.9 2003/05/15 15:59:35 gbazin Exp $
+ * $Id: menus.cpp,v 1.10 2003/05/15 21:31:53 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -245,8 +245,8 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
 wxMenu *NavigMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
 {
     vlc_object_t *p_object;
-    char *ppsz_varnames[6];
-    int pi_objects[6];
+    char *ppsz_varnames[10];
+    int pi_objects[10];
     int i = 0;
 
     /* Initializations */
@@ -262,9 +262,19 @@ wxMenu *NavigMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "navigation";
         pi_objects[i++] = p_object->i_object_id;
-        vlc_object_release( p_object );
         ppsz_varnames[i] = "program";
         pi_objects[i++] = p_object->i_object_id;
+
+        ppsz_varnames[i] = "prev-title";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "next-title";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "prev-chapter";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "next-chapter";
+        pi_objects[i++] = p_object->i_object_id;
+
+        vlc_object_release( p_object );
     }
 
     /* Build menu */

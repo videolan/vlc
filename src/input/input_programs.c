@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.110 2003/05/11 18:43:19 gbazin Exp $
+ * $Id: input_programs.c,v 1.111 2003/05/15 21:31:53 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -93,15 +93,31 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
     var_Create( p_input, "program", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Program");
     var_Change( p_input, "program", VLC_VAR_SETTEXT, &text, NULL );
+
     var_Create( p_input, "title", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Title");
     var_Change( p_input, "title", VLC_VAR_SETTEXT, &text, NULL );
+    var_Create( p_input, "next-title", VLC_VAR_VOID );
+    text.psz_string = _("Next title");
+    var_Change( p_input, "next-title", VLC_VAR_SETTEXT, &text, NULL );
+    var_Create( p_input, "prev-title", VLC_VAR_VOID );
+    text.psz_string = _("Previous title");
+    var_Change( p_input, "prev-title", VLC_VAR_SETTEXT, &text, NULL );
+
     var_Create( p_input, "chapter", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Chapter");
     var_Change( p_input, "chapter", VLC_VAR_SETTEXT, &text, NULL );
+    var_Create( p_input, "next-chapter", VLC_VAR_VOID );
+    text.psz_string = _("Next Chapter");
+    var_Change( p_input, "next-chapter", VLC_VAR_SETTEXT, &text, NULL );
+    var_Create( p_input, "prev-chapter", VLC_VAR_VOID );
+    text.psz_string = _("Previous Chapter");
+    var_Change( p_input, "prev-chapter", VLC_VAR_SETTEXT, &text, NULL );
+
     var_Create( p_input, "navigation", VLC_VAR_VARIABLE | VLC_VAR_HASCHOICE );
     text.psz_string = _("Navigation");
     var_Change( p_input, "navigation", VLC_VAR_SETTEXT, &text, NULL );
+
     var_Create( p_input, "video-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Video track");
     var_Change( p_input, "video-es", VLC_VAR_SETTEXT, &text, NULL );
@@ -109,12 +125,16 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
     text.psz_string = _("Audio track");
     var_Change( p_input, "audio-es", VLC_VAR_SETTEXT, &text, NULL );
     var_Create( p_input, "spu-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-    text.psz_string = _("Subtitle track");
+    text.psz_string = _("Subtitles track");
     var_Change( p_input, "spu-es", VLC_VAR_SETTEXT, &text, NULL );
 
     var_AddCallback( p_input, "program", ProgramCallback, NULL );
     var_AddCallback( p_input, "title", TitleCallback, NULL );
+    var_AddCallback( p_input, "next-title", TitleCallback, NULL );
+    var_AddCallback( p_input, "prev-title", TitleCallback, NULL );
     var_AddCallback( p_input, "chapter", ChapterCallback, NULL );
+    var_AddCallback( p_input, "next-chapter", ChapterCallback, NULL );
+    var_AddCallback( p_input, "prev-chapter", ChapterCallback, NULL );
     var_AddCallback( p_input, "video-es", ESCallback, NULL );
     var_AddCallback( p_input, "audio-es", ESCallback, NULL );
     var_AddCallback( p_input, "spu-es", ESCallback, NULL );
@@ -932,16 +952,38 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     input_area_t *p_area;
-    vlc_value_t val;
+    vlc_value_t val, val_list;
+    int i, i_step = 0;
 
-    if( oldval.i_int == newval.i_int )
-       return VLC_SUCCESS;
+    if( !strcmp( psz_cmd, "next-title" ) ) i_step++;
+    else if( !strcmp( psz_cmd, "prev-title" ) ) i_step--;
 
-    /* Sanity check should have already be done by var_Set(). */
+    if( !i_step && oldval.i_int == newval.i_int ) return VLC_SUCCESS;
+
+    /* Sanity check should have already been done by var_Set(). */
     vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    if( i_step )
+    {
+        var_Get( p_this, "title", &newval );
+        var_Change( p_this, "title", VLC_VAR_GETCHOICES, &val_list, NULL );
+	for( i = 0; i < val_list.p_list->i_count; i++ )
+	{
+	    if( val_list.p_list->p_values[i].i_int == newval.i_int &&
+		i + i_step >= 0 && i + i_step < val_list.p_list->i_count )
+	    {
+	        newval.i_int = val_list.p_list->p_values[i + i_step].i_int;
+		break;
+	    }
+	}
+        var_Change( p_this, "title", VLC_VAR_FREELIST, &val_list, NULL );
+    }
+
     p_area = p_input->stream.pp_areas[newval.i_int];
     p_area->i_part = 1;
+
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
     input_ChangeArea( p_input, p_area );
     input_SetStatus( p_input, INPUT_STATUS_PLAY );
 
@@ -956,13 +998,33 @@ static int ChapterCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     input_area_t *p_area;
-    vlc_value_t val;
+    vlc_value_t val, val_list;
+    int i, i_step = 0;
 
-    if( oldval.i_int == newval.i_int )
-       return VLC_SUCCESS;
+    if( !strcmp( psz_cmd, "next-chapter" ) ) i_step++;
+    else if( !strcmp( psz_cmd, "prev-chapter" ) ) i_step--;
 
-    /* Sanity check will have already be done by var_Set(). */
+    if( !i_step && oldval.i_int == newval.i_int ) return VLC_SUCCESS;
+
+    /* Sanity check should have already been done by var_Set(). */
     vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    if( i_step )
+    {
+        var_Get( p_this, "chapter", &newval );
+        var_Change( p_this, "chapter", VLC_VAR_GETCHOICES, &val_list, NULL );
+	for( i = 0; i < val_list.p_list->i_count; i++ )
+	{
+	    if( val_list.p_list->p_values[i].i_int == newval.i_int &&
+		i + i_step >= 0 && i + i_step < val_list.p_list->i_count )
+	    {
+	        newval.i_int = val_list.p_list->p_values[i + i_step].i_int;
+		break;
+	    }
+	}
+        var_Change( p_this, "chapter", VLC_VAR_FREELIST, &val_list, NULL );
+    }
+
     p_area = p_input->stream.p_selected_area;
     p_input->stream.p_selected_area->i_part = newval.i_int;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
