@@ -70,6 +70,8 @@ struct access_t
     char        *psz_access;
     /* Access path/url/filename/.... */
     char        *psz_path;
+    /* Access source for access_filter (NULL for regular access) */
+    access_t    *p_source;
 
     /* Access can fill this entry to force a demuxer
      * XXX: fill it once you know for sure you will succed
@@ -107,6 +109,7 @@ struct access_t
 
 #define access2_New( a, b, c, d, e ) __access2_New(VLC_OBJECT(a), b, c, d, e )
 VLC_EXPORT( access_t *, __access2_New,  ( vlc_object_t *p_obj, char *psz_access, char *psz_demux, char *psz_path, vlc_bool_t b_quick ) );
+VLC_EXPORT( access_t *, access2_FilterNew, ( access_t *p_source, char *psz_access_filter ) );
 VLC_EXPORT( void,      access2_Delete, ( access_t * ) );
 
 static inline int access2_vaControl( access_t *p_access, int i_query, va_list args )

@@ -28,11 +28,12 @@
 #include "input_internal.h"
 
 /*****************************************************************************
- * access2_New:
+ * access2_InternalNew:
  *****************************************************************************/
-access_t *__access2_New( vlc_object_t *p_obj,
-                         char *psz_access, char *psz_demux, char *psz_path,
-                         vlc_bool_t b_quick )
+static access_t *access2_InternalNew( vlc_object_t *p_obj,
+                                      char *psz_access, char *psz_demux, char *psz_path,
+                                      access_t *p_source,
+                                      vlc_bool_t b_quick )
 {
     access_t *p_access = vlc_object_create( p_obj, VLC_OBJECT_ACCESS );
 
@@ -43,13 +44,21 @@ access_t *__access2_New( vlc_object_t *p_obj,
     }
 
     /* Parse URL */
-    p_access->psz_access = b_quick ? strdup( "file" ) : strdup( psz_access );
-    p_access->psz_path   = strdup( psz_path );
-    p_access->psz_demux  = strdup( "" );
-
-    if( !b_quick )
+    p_access->p_source = p_source;
+    if( p_source )
+    {
+        msg_Dbg( p_obj, "creating access filter '%s'", psz_access );
+        p_access->psz_access = strdup( p_source->psz_access );
+        p_access->psz_path   = strdup( p_source->psz_path );
+    }
+    else if( !b_quick )
+    {
         msg_Dbg( p_obj, "creating access '%s' path='%s'",
-                 p_access->psz_access, p_access->psz_path );
+                 psz_access, psz_path );
+        p_access->psz_access = b_quick ? strdup( "file" ) : strdup( psz_access );
+        p_access->psz_path   = strdup( psz_path );
+    }
+    p_access->psz_demux  = strdup( "" );
 
     p_access->pf_read    = NULL;
     p_access->pf_block   = NULL;
@@ -67,9 +76,17 @@ access_t *__access2_New( vlc_object_t *p_obj,
     /* Before module_Need (for var_Create...) */
     vlc_object_attach( p_access, p_obj );
 
-    p_access->p_module =
-        module_Need( p_access, "access2", p_access->psz_access,
-                     b_quick ? VLC_TRUE : VLC_FALSE );
+    if( p_source )
+    {
+        p_access->p_module =
+            module_Need( p_access, "access_filter", psz_access, VLC_FALSE );
+    }
+    else
+    {
+        p_access->p_module =
+            module_Need( p_access, "access2",p_access->psz_access,
+                         b_quick ? VLC_TRUE : VLC_FALSE );
+    }
 
     if( p_access->p_module == NULL )
     {
@@ -85,7 +102,27 @@ access_t *__access2_New( vlc_object_t *p_obj,
 }
 
 /*****************************************************************************
- * demux2_Delete:
+ * access2_New:
+ *****************************************************************************/
+access_t *__access2_New( vlc_object_t *p_obj,
+                         char *psz_access, char *psz_demux, char *psz_path,
+                         vlc_bool_t b_quick )
+{
+    return access2_InternalNew( p_obj, psz_access, psz_demux, psz_path, NULL, b_quick );
+}
+
+/*****************************************************************************
+ * access2_FilterNew:
+ *****************************************************************************/
+access_t *access2_FilterNew( access_t *p_source, char *psz_access_filter )
+{
+    return access2_InternalNew( VLC_OBJECT(p_source),
+                                psz_access_filter, NULL, NULL,
+                                p_source, VLC_FALSE );
+}
+
+/*****************************************************************************
+ * access2_Delete:
  *****************************************************************************/
 void access2_Delete( access_t *p_access )
 {
@@ -96,5 +133,11 @@ void access2_Delete( access_t *p_access )
     free( p_access->psz_path );
     free( p_access->psz_demux );
 
+    if( p_access->p_source )
+    {
+        access2_Delete( p_access->p_source );
+    }
+
     vlc_object_destroy( p_access );
 }
+

@@ -1456,7 +1456,7 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
             p_ts->p_buffer[7] = ( 0 )&0xff;
             p_ts->p_buffer[8] = ( 0 )&0xff;
             p_ts->p_buffer[9] = ( 0 )&0xff;
-            p_ts->p_buffer[10]= ( 0 )&0x80;
+            p_ts->p_buffer[10]= ( ( 0 )&0x80 ) | 0x7e;
             p_ts->p_buffer[11]= 0;
 
             for( i = 12; i < 12 + i_stuffing; i++ )

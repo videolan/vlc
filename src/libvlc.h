@@ -663,6 +663,10 @@ static char *ppsz_clock_descriptions[] =
 #define ACCESS_LONGTEXT N_( \
     "This is a legacy entry to let you configure access modules.")
 
+#define ACCESS_FILTER_TEXT N_("Access filter module")
+#define ACCESS_FILTER_LONGTEXT N_( \
+    "This is a legacy entry to let you configure access filter modules.")
+
 #define DEMUX_TEXT N_("Demux module")
 #define DEMUX_LONGTEXT N_( \
     "This is a legacy entry to let you configure demux modules.")
@@ -1012,6 +1016,12 @@ vlc_module_begin();
     add_category_hint( N_("Input"), INPUT_CAT_LONGTEXT , VLC_FALSE );
     add_module( "access", "access2", NULL, NULL, ACCESS_TEXT,
                 ACCESS_LONGTEXT, VLC_TRUE );
+
+    set_subcategory( SUBCAT_INPUT_ACCESS_FILTER );
+    add_module_list_cat( "access-filter", SUBCAT_INPUT_ACCESS_FILTER, NULL, NULL,
+                ACCESS_FILTER_TEXT, ACCESS_FILTER_LONGTEXT, VLC_FALSE );
+
+
     set_subcategory( SUBCAT_INPUT_DEMUX );
     add_module( "demux", "demux2", NULL, NULL, DEMUX_TEXT,
                 DEMUX_LONGTEXT, VLC_TRUE );

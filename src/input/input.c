@@ -1912,6 +1912,7 @@ static int InputSourceInit( input_thread_t *p_input,
     char *psz_access;
     char *psz_demux;
     char *psz_path;
+    char *psz;
     vlc_value_t val;
 
     /* Split uri */
@@ -2020,6 +2021,23 @@ static int InputSourceInit( input_thread_t *p_input,
             msg_Err( p_input, "no suitable access module for `%s'", psz_mrl );
             goto error;
         }
+
+        /* */
+        psz = var_GetString( p_input, "access-filter" );
+        if( *psz )
+        {
+            access_t *p_access = in->p_access;
+
+            /* TODO support chained access-filter */
+            in->p_access = access2_FilterNew( in->p_access, psz );
+            if( in->p_access == NULL )
+            {
+                in->p_access = p_access;
+                msg_Warn( p_input, "failed to insert access filter %s",
+                          psz );
+            }
+        }
+        free( psz );
 
         /* Get infos from access */
         if( !b_quick )
