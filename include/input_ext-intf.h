@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.92 2003/07/27 14:10:02 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.93 2003/08/02 15:22:07 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -319,6 +319,7 @@ struct input_thread_t
     int           (* pf_rewind ) ( input_thread_t * );
                                            /* NULL if we don't support going *
                                             * backwards (it's gonna be fun)  */
+    int           (* pf_demux_control ) ( input_thread_t *, int, va_list );
     demux_sys_t *    p_demux_data;                      /* data of the demux */
 
     /* Buffer manager */

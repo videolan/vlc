@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.235 2003/07/23 22:01:25 gbazin Exp $
+ * $Id: input.c,v 1.236 2003/08/02 15:22:07 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -103,7 +103,10 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->psz_source = strdup( p_item->psz_uri );
 
     /* Demux */
-    p_input->p_demux = NULL;
+    p_input->p_demux   = NULL;
+    p_input->pf_demux  = NULL;
+    p_input->pf_rewind = NULL;
+    p_input->pf_demux_control = NULL;
 
     /* Access */
     p_input->p_access = NULL;
