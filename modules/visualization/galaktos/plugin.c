@@ -213,6 +213,7 @@ static void Thread( vlc_object_t *p_this )
     p_thread->p_opengl->render.i_width = p_thread->i_width;
     p_thread->p_opengl->render.i_height = p_thread->i_width;
     p_thread->p_opengl->render.i_aspect = VOUT_ASPECT_FACTOR;
+    p_thread->p_opengl->b_scale = VLC_TRUE;
 
     p_thread->p_module =
         module_Need( p_thread->p_opengl, "opengl provider", NULL, 0 );
@@ -257,6 +258,11 @@ static void Thread( vlc_object_t *p_this )
     //     printf("Limiter %d\n",(mdate()/1000-timestart));
         timestart=mdate()/1000;
     }
+
+    /* Free the openGL provider */
+    module_Unneed( p_sys->p_thread->p_opengl, p_sys->p_thread->p_module );
+    vlc_object_detach( p_sys->p_thread->p_opengl );
+    vlc_object_destroy( p_sys->p_thread->p_opengl );
 }
 
 /*****************************************************************************
@@ -274,14 +280,8 @@ static void Close( vlc_object_t *p_this )
 
     vlc_thread_join( p_sys->p_thread );
 
-    /* Free the openGL provider */
-    module_Unneed( p_sys->p_thread->p_opengl, p_sys->p_thread->p_module );
-    vlc_object_detach( p_sys->p_thread->p_opengl );
-    vlc_object_destroy( p_sys->p_thread->p_opengl );
-
     /* Free data */
     vlc_object_detach( p_sys->p_thread );
-
     vlc_object_destroy( p_sys->p_thread );
 
     free( p_sys );
