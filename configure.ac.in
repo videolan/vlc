@@ -2443,7 +2443,16 @@ AC_ARG_ENABLE(qt,
   [if test "x${enable_qt}" = "xyes"; then
      PLUGINS="${PLUGINS} qt"
      ALIASES="${ALIASES} qvlc"
-     LDFLAGS_qt="${LDFLAGS_qt} -lqt -L${QTDIR}/lib"
+     LDFLAGS_qt="${LDFLAGS_qt} -L${QTDIR}/lib"
+     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_qt}"
+     AC_CHECK_LIB(qt-mt,main,[
+       LDFLAGS_qt="${LDFLAGS_qt} -lqt-mt"
+     ],[
+       AC_CHECK_LIB(qt,main,[
+         LDFLAGS_qt="${LDFLAGS_qt} -lqt"
+       ])
+     ])
+     LDFLAGS="${LDFLAGS_save}"
      CPPFLAGS_qt="${CPPFLAGS_qt} -I/usr/include/qt3 -I/usr/include/qt -I${QTDIR}/include"
      if test -x ${QTDIR}/bin/moc
      then
