@@ -1490,9 +1490,9 @@ static int transcode_video_process( sout_stream_t *p_stream,
         {
             if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
             {
+                p_pic->pf_release( p_pic );
                 transcode_video_close( p_stream, id );
                 id->b_transcode = VLC_FALSE;
-                p_pic->pf_release( p_pic );
                 return VLC_EGENERIC;
             }
 
@@ -1569,9 +1569,9 @@ static int transcode_video_process( sout_stream_t *p_stream,
                     vlc_object_detach( id->pp_filter[id->i_filter] );
                     vlc_object_destroy( id->pp_filter[id->i_filter] );
 
+                    p_pic->pf_release( p_pic );
                     transcode_video_close( p_stream, id );
                     id->b_transcode = VLC_FALSE;
-                    p_pic->pf_release( p_pic );
                     return VLC_EGENERIC;
                 }
             }

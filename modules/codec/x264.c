@@ -286,6 +286,7 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.analyse.inter =
             X264_ANALYSE_I4x4 | X264_ANALYSE_PSUB16x16 | X264_ANALYSE_PSUB8x8;
     }
+    if( val.psz_string ) free( val.psz_string );
 
     if( p_enc->fmt_in.video.i_aspect > 0 )
     {

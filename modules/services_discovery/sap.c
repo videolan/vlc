@@ -365,10 +365,8 @@ static int OpenDemux( vlc_object_t *p_this )
     uint8_t *p_peek;
     int i_max_sdp = 1024;
     int i_sdp = 0;
-    char *psz_sdp = (char *)malloc( i_max_sdp );
+    char *psz_sdp = NULL;
     sdp_t *p_sdp = NULL;
-
-    if( !psz_sdp ) return VLC_EGENERIC;
 
     /* Probe for SDP */
     if( p_demux->s )
@@ -382,6 +380,9 @@ static int OpenDemux( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
     }
+
+    psz_sdp = (char *)malloc( i_max_sdp );
+    if( !psz_sdp ) return VLC_EGENERIC;
 
     /* Gather the complete sdp file */
     for( ;; )
@@ -424,7 +425,8 @@ static int OpenDemux( vlc_object_t *p_this )
     {
         p_sdp->psz_uri = NULL;
     }
-    if( p_sdp->i_media_type != 33 && p_sdp->i_media_type != 32 && p_sdp->i_media_type != 14 )
+    if( p_sdp->i_media_type != 33 && p_sdp->i_media_type != 32 &&
+        p_sdp->i_media_type != 14 )
         goto error;
 
     if( p_sdp->psz_uri == NULL ) goto error;
