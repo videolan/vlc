@@ -123,6 +123,8 @@ struct sout_stream_sys_t
 
     char        *psz_session_name;
 
+    /* */
+    vlc_bool_t b_export_sdp_file;
     /* sap */
     vlc_bool_t b_export_sap;
     session_descriptor_t *p_session;
@@ -204,6 +206,7 @@ struct sout_stream_id_t
 static int AccessOutGrabberWrite( sout_access_out_t *, block_t * );
 
 static int SapSetup( sout_stream_t *p_stream );
+static int FileSetup( sout_stream_t *p_stream );
 static int HttpSetup( sout_stream_t *p_stream, vlc_url_t * );
 static int RtspSetup( sout_stream_t *p_stream, vlc_url_t * );
 
@@ -284,6 +287,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_sdp = NULL;
 
     p_sys->b_export_sap = VLC_FALSE;
+    p_sys->b_export_sdp_file = VLC_FALSE;
     p_sys->p_session = NULL;
 
     p_sys->p_httpd_host = NULL;
@@ -422,7 +426,7 @@ static int Open( vlc_object_t *p_this )
                 msg_Err( p_stream, "cannot export sdp as http" );
             }
         }
-        if( url.psz_protocol && !strcasecmp( url.psz_protocol, "rtsp" ) )
+        else if( url.psz_protocol && !strcasecmp( url.psz_protocol, "rtsp" ) )
         {
             /* FIXME test if destination is multicast or no destination at all FIXME */
             if( RtspSetup( p_stream, &url ) )
@@ -434,6 +438,10 @@ static int Open( vlc_object_t *p_this )
         {
             p_sys->b_export_sap = VLC_TRUE;
             SapSetup( p_stream );
+        }
+        else if( url.psz_protocol && !strcasecmp( url.psz_protocol, "file" ) )
+        {
+            p_sys->b_export_sdp_file = VLC_TRUE;
         }
         else
         {
@@ -831,11 +839,9 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         fprintf( stderr, "sdp=%s", p_sys->psz_sdp );
 
-        /* Update the SAP announce */
-        if( p_sys->b_export_sap )
-        {
-            SapSetup( p_stream );
-        }
+        /* Update SDP (sap/file) */
+        if( p_sys->b_export_sap ) SapSetup( p_stream );
+        if( p_sys->b_export_sdp_file ) FileSetup( p_stream );
     }
 
     return id;
@@ -874,11 +880,9 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     vlc_mutex_destroy( &id->lock_rtsp );
     if( id->rtsp_access ) free( id->rtsp_access );
 
-    /* Update the SAP announce */
-    if( p_sys->b_export_sap )
-    {
-        SapSetup( p_stream );
-    }
+    /* Update SDP (sap/file) */
+    if( p_sys->b_export_sap ) SapSetup( p_stream );
+    if( p_sys->b_export_sdp_file ) FileSetup( p_stream );
 
     free( id );
     return VLC_SUCCESS;
@@ -1023,6 +1027,50 @@ static int SapSetup( sout_stream_t *p_stream )
     }
 
     free( p_method );
+    return VLC_SUCCESS;
+}
+
+/****************************************************************************
+* File:
+****************************************************************************/
+static int FileSetup( sout_stream_t *p_stream )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    vlc_value_t      val;
+    char            *psz;
+    FILE            *f;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "sdp", &val );
+    if( strncasecmp( val.psz_string, "file:", 5 ) )
+    {
+        msg_Err( p_stream, "FileSetup called with invalid sdp option" );
+        free( val.psz_string );
+        return VLC_EGENERIC;
+    }
+    psz = &val.psz_string[5];
+
+    if( psz[0] == '/' && psz[1] == '/' )
+        psz += 2;
+
+    if( *psz == '\0' )
+    {
+        msg_Err( p_stream, "FileSetup called with empty sdp option" );
+        free( val.psz_string );
+        return VLC_EGENERIC;
+    }
+
+    if( ( f = fopen( psz, "wt" ) ) == NULL )
+    {
+        msg_Err( p_stream, "cannot open file '%s' (%s)",
+                 psz, strerror(errno) );
+        free( val.psz_string );
+        return VLC_EGENERIC;
+    }
+    free( val.psz_string );
+
+    fprintf( f, "%s", p_sys->psz_sdp );
+    fclose( f );
+
     return VLC_SUCCESS;
 }
 
