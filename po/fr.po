@@ -1582,7 +1582,7 @@ msgstr "Ouvrir un fichier"
 #: modules/gui/familiar/interface.c:106 modules/gui/familiar/interface.c:107
 #: modules/gui/macosx/intf.m:191 modules/gui/macosx/prefs.m:196
 msgid "Preferences"
-msgstr "_Préférences"
+msgstr "Préférences"
 
 #: modules/gui/familiar/interface.c:121
 msgid "Rewind"

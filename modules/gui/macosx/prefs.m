@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: prefs.m,v 1.3 2002/12/25 02:23:36 massiot Exp $
+ * $Id: prefs.m,v 1.4 2002/12/29 01:16:28 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -242,13 +242,13 @@
         [o_text_field setEditable: NO]; \
         [o_text_field setSelectable: NO]; \
         [o_text_field setStringValue: \
-                [NSString stringWithCString: label]]; \
+            [NSApp localizedString: label]]; \
         [o_view addSubview: [o_text_field autorelease]]; \
     }
 
 #define INPUT_FIELD( ctype, cname, label, w, msg, param ) \
     { \
-        s_rc.size.height = 23; \
+        s_rc.size.height = 25; \
         s_rc.size.width = w; \
         s_rc.origin.y += 10; \
         CHECK_VIEW_HEIGHT; \
@@ -285,7 +285,7 @@
             NSString *o_label;
             NSToolbarItem *o_tbi;
 
-            o_label = [NSString stringWithCString: p_item->psz_text];
+            o_label = [NSApp localizedString: p_item->psz_text];
             o_tbi = [[NSToolbarItem alloc] initWithItemIdentifier: o_label]; 
             [o_tbi setImage: [NSImage imageNamed: @"NSApplicationIcon"]];
             [o_tbi setLabel: o_label];
@@ -325,7 +325,7 @@
 
 #define MODULE_BUTTON( button, title, sel ) \
     { \
-        s_brc.size.height = 25; \
+        s_brc.size.height = 32; \
         s_brc.origin.x += s_brc.size.width + 10; \
         s_brc.size.width = s_crc.size.width - s_brc.origin.x - 10; \
         button = [[NSButton alloc] initWithFrame: s_brc]; \
@@ -338,21 +338,21 @@
         [o_cview addSubview: [button autorelease]]; \
     }
 
-            s_rc.size.height = 100;
+            s_rc.size.height = 107;
             s_rc.size.width = s_vrc.size.width - X_ORIGIN * 2 - 20;
             s_rc.origin.y += i_module_tag == 3 ? Y_ORIGIN : 20;
 
             CHECK_VIEW_HEIGHT;
 
             o_box = [[NSBox alloc] initWithFrame: s_rc];
-            [o_box setTitle: [NSString stringWithCString: p_item->psz_text]];
+            [o_box setTitle: [NSApp localizedString: p_item->psz_text]];
             [o_view addSubview: [o_box autorelease]];
             s_rc.origin.y += s_rc.size.height + 10;
             o_cview = [[VLCFlippedView alloc] initWithFrame: s_rc];
             [o_box setContentView: [o_cview autorelease]];
             s_crc = [o_cview bounds];
 
-            s_brc = NSMakeRect( 5, 10, 200, 23 ); 
+            s_brc = NSMakeRect( 5, 10, 200, 30 ); 
             o_modules = [[NSPopUpButton alloc] initWithFrame: s_brc];
             [o_modules setTag: i_module_tag++];
             [o_modules setTarget: self];
@@ -363,7 +363,7 @@
                            configureModule: );
 
             s_brc = NSMakeRect( 8, s_brc.origin.y + s_brc.size.height + 10, 
-                                194, 23 ); 
+                                194, 25 ); 
             o_text_field = [[VLCTextField alloc] initWithFrame: s_brc];
             [o_text_field setTag: i_module_tag++];
             [o_text_field setAlignment: NSLeftTextAlignment];
@@ -433,7 +433,7 @@
                 int i;
                 VLCComboBox *o_combo_box;
 
-                s_rc.size.height = 25;
+                s_rc.size.height = 27;
                 s_rc.size.width = 150;
                 s_rc.origin.y += 10;
 
@@ -485,7 +485,7 @@
         {
             VLCButton *o_btn_bool;
 
-            s_rc.size.height = 20;
+            s_rc.size.height = 27;
             s_rc.size.width = s_vrc.size.width - X_ORIGIN * 2 - 20;
             s_rc.origin.y += 10;
 
@@ -495,7 +495,7 @@
             [o_btn_bool setButtonType: NSSwitchButton];
             [o_btn_bool setIntValue: p_item->i_value];
             [o_btn_bool setTitle: 
-                [NSString stringWithCString: p_item->psz_text]]; 
+                  [NSApp localizedString: p_item->psz_text]];
             [o_btn_bool setTarget: self];
             [o_btn_bool setAction: @selector(configChanged:)];
             CONTROL_CONFIG( o_btn_bool, o_module_name, 

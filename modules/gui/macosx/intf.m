@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.12 2002/12/25 02:23:36 massiot Exp $
+ * $Id: intf.m,v 1.13 2002/12/29 01:16:28 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -528,6 +528,15 @@ static void Run( intf_thread_t *p_intf )
         [o_mi_subtitle setEnabled: FALSE];
         [o_mi_channels setEnabled: FALSE];
         [o_mi_screen setEnabled: FALSE];
+    }
+
+    if ( (p_intf->p_sys->b_loop = config_GetInt( p_intf, "loop" )) )
+    {
+        [o_mi_loop setState: NSOnState];
+    }
+    else
+    {
+        [o_mi_loop setState: NSOffState];
     }
 }
 

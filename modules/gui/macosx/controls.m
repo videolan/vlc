@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.3 2002/12/25 02:23:36 massiot Exp $
+ * $Id: controls.m,v 1.4 2002/12/29 01:16:28 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -195,13 +195,12 @@
     if( p_intf->p_sys->b_loop )
     {
         [o_mi setState: NSOffState];
-        playlist_Delete( p_playlist, p_playlist->i_size - 1 );
+        config_PutInt( p_playlist, "loop", 0 );
     }
     else
     {
         [o_mi setState: NSOnState];
-        playlist_Add( p_playlist, "vlc:loop",
-                      PLAYLIST_APPEND, PLAYLIST_END );
+        config_PutInt( p_playlist, "loop", 1 );
     }
 
     p_intf->p_sys->b_loop = !p_intf->p_sys->b_loop;
