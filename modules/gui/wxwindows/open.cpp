@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.22 2003/05/15 15:59:35 gbazin Exp $
+ * $Id: open.cpp,v 1.23 2003/05/17 22:48:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -357,9 +357,11 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
 
     static const wxString disc_type_array[] =
     {
-        wxU(_("DVD")),
         wxU(_("DVD (menus support)")),
-        wxU(_("VCD"))
+        wxU(_("DVD")),
+        wxU(_("VCD")),
+        wxU(_("CD Audio"))
+
     };
 
     disc_type = new wxRadioBox( panel, DiscType_Event, wxU(_("Disc type")),
@@ -510,8 +512,9 @@ void OpenDialog::UpdateMRL( int i_access_method )
         mrl = wxT("file") + demux + wxT("://") + file_combo->GetValue();
         break;
     case DISC_ACCESS:
-        mrl = ( disc_type->GetSelection() == 0 ? wxT("dvdold") :
-                disc_type->GetSelection() == 1 ? wxT("dvd") : wxT("vcd") )
+        mrl = ( disc_type->GetSelection() == 0 ? wxT("dvdsimple") :
+                disc_type->GetSelection() == 1 ? wxT("dvd") :
+                disc_type->GetSelection() == 2 ? wxT("vcd") : wxT("cdda") )
                   + demux + wxT("://")
                   + disc_device->GetLineText(0)
                   + wxString::Format( wxT("@%d:%d"),

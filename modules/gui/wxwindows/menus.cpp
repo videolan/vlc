@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.10 2003/05/15 21:31:53 gbazin Exp $
+ * $Id: menus.cpp,v 1.11 2003/05/17 22:48:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -366,6 +366,8 @@ void Menu::CreateMenuItem( wxMenu *menu, char *psz_var,
     {
         var_Change( p_object, psz_var, VLC_VAR_CHOICESCOUNT, &val, NULL );
         if( val.i_int == 0 ) return;
+        if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE && val.i_int == 1 )
+            return;
     }
 
     /* Get the descriptive name of the variable */
@@ -425,6 +427,8 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object )
     {
         var_Change( p_object, psz_var, VLC_VAR_CHOICESCOUNT, &val, NULL );
         if( val.i_int == 0 ) return NULL;
+        if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE && val.i_int == 1 )
+            return NULL;
     }
     else
     {

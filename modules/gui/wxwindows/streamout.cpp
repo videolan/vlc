@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.11 2003/05/15 15:59:35 gbazin Exp $
+ * $Id: streamout.cpp,v 1.12 2003/05/17 22:48:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -482,7 +482,6 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
                                                           wxVERTICAL );
 
     /* Create video transcoding checkox */
-#   define VCODECS_NUM 8
     static const wxString vcodecs_array[] =
     {
         wxT("mpgv"),
@@ -494,7 +493,6 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
         wxT("I263"),
         wxT("WMV1"),
     };
-#   define VBITRATES_NUM 9
     static const wxString vbitrates_array[] =
     {
         wxT("3000"),
@@ -513,14 +511,14 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
         new wxCheckBox( panel, VideoTranscEnable_Event, wxU(_("Video codec")));
     video_codec_combo =
         new wxComboBox( panel, VideoTranscCodec_Event, wxT("mp4v"),
-                        wxPoint(20,25), wxDefaultSize,
-                        VCODECS_NUM, vcodecs_array, wxCB_READONLY );
+                        wxPoint(20,25), wxDefaultSize, WXSIZEOF(vcodecs_array),
+                        vcodecs_array, wxCB_READONLY );
     wxStaticText *bitrate_label =
         new wxStaticText( panel, -1, wxU(_("Bitrate (kb/s)")));
     video_bitrate_combo =
         new wxComboBox( panel, VideoTranscBitrate_Event, wxT("1000"),
                         wxPoint(20,25), wxDefaultSize,
-                        VBITRATES_NUM, vbitrates_array );
+                        WXSIZEOF(vbitrates_array), vbitrates_array );
     video_sizer->Add( video_transc_checkbox, 0,
                       wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     video_sizer->Add( video_codec_combo, 1,
@@ -531,13 +529,11 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
                       wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
 
     /* Create audio transcoding checkox */
-#   define ACODECS_NUM 2
     static const wxString acodecs_array[] =
     {
         wxT("mpga"),
         wxT("a52")
     };
-#   define ABITRATES_NUM 5
     static const wxString abitrates_array[] =
     {
         wxT("512"),
@@ -552,14 +548,14 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
         new wxCheckBox( panel, AudioTranscEnable_Event, wxU(_("Audio codec")));
     audio_codec_combo =
         new wxComboBox( panel, AudioTranscCodec_Event, wxT("mpga"),
-                        wxPoint(20,25), wxDefaultSize,
-                        ACODECS_NUM, acodecs_array, wxCB_READONLY );
+                        wxPoint(20,25), wxDefaultSize, WXSIZEOF(acodecs_array),
+                        acodecs_array, wxCB_READONLY );
     bitrate_label =
         new wxStaticText( panel, -1, wxU(_("Bitrate (kb/s)")));
     audio_bitrate_combo =
         new wxComboBox( panel, AudioTranscBitrate_Event, wxT("192"),
                         wxPoint(20,25), wxDefaultSize,
-                        ABITRATES_NUM, abitrates_array );
+                        WXSIZEOF(abitrates_array), abitrates_array );
     audio_sizer->Add( audio_transc_checkbox, 0,
                       wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     audio_sizer->Add( audio_codec_combo, 1,
