@@ -668,6 +668,13 @@ if test "${x_libraries}" = "NONE"; then
   x_libraries="/usr/X11R6/lib"
 fi
 
+dnl Check for hal
+PKG_CHECK_MODULES(HAL, hal >= 0.2.97,
+  [AC_DEFINE(HAVE_HAL, [], [Define if you have the HAL library])
+   VLC_ADD_LDFLAGS([vlc],[$HAL_LIBS])
+   VLC_ADD_CFLAGS([vlc],[$HAL_CFLAGS])],
+  [AC_MSG_WARN(HAL library not found)])
+
 dnl Build the gtk_main plugins?
 NEED_GTK_MAIN=no
 NEED_GNOME_MAIN=no

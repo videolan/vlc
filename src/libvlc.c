@@ -62,6 +62,10 @@
 #   include <locale.h>
 #endif
 
+#ifdef HAVE_HAL
+#   include <hal/libhal.h>
+#endif
+
 #include "vlc_cpu.h"                                        /* CPU detection */
 #include "os_specific.h"
 
@@ -102,6 +106,8 @@ static int  ConsoleWidth  ( void );
 
 static int  VerboseCallback( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
+
+static void InitDeviceValues( vlc_t * );
 
 /*****************************************************************************
  * vlc_current_object: return the current object.
@@ -487,6 +493,11 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EEXIT;
     }
+
+    /*
+     * Init device values
+     */
+    InitDeviceValues( p_vlc );
 
     /*
      * Override default configuration with config file settings
@@ -2205,4 +2216,52 @@ static int VerboseCallback( vlc_object_t *p_this, const char *psz_variable,
         p_vlc->p_libvlc->i_verbose = __MIN( new_val.i_int, 2 );
     }
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * InitDeviceValues: initialize device values
+ *****************************************************************************
+ * This function inits the dvd, vcd and cd-audio values
+ *****************************************************************************/
+static void InitDeviceValues( vlc_t *p_vlc )
+{
+#ifdef HAVE_HAL
+    LibHalContext * ctx;
+    int i, i_devices;
+    char **devices;
+    char *block_dev;
+    dbus_bool_t b_dvd;
+
+    if( ( ctx = hal_initialize( NULL, FALSE ) ) )
+    {
+        if( ( devices = hal_get_all_devices( ctx, &i_devices ) ) )
+        {
+            for( i = 0; i < i_devices; i++ )
+            {
+                if( !hal_device_property_exists( ctx, devices[ i ],
+                                                "storage.cdrom.dvd" ) )
+                {
+                    continue;
+                }
+
+                b_dvd = hal_device_get_property_bool( ctx, devices[ i ],
+                                                      "storage.cdrom.dvd" );
+                block_dev = hal_device_get_property_string( ctx, devices[ i ],
+                                                            "block.device" );
+
+                if( b_dvd )
+                {
+                    config_PutPsz( p_vlc, "dvd", block_dev );
+                }
+
+                config_PutPsz( p_vlc, "vcd", block_dev );
+                config_PutPsz( p_vlc, "cd-audio", block_dev );
+
+                hal_free_string( block_dev );
+            }
+        }
+
+        hal_shutdown( ctx );
+    }
+#endif
 }
