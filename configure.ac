@@ -978,7 +978,7 @@ VLC_ADD_PLUGINS([dummy logger memcpy])
 VLC_ADD_PLUGINS([mpgv mpga m4v m4a h264 ps pva avi asf aac mp4 rawdv nsv real aiff mjpeg demuxdump flac])
 VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec dvbsub mpeg_audio lpcm a52 dts cinepak flacdec])
 VLC_ADD_PLUGINS([deinterlace invert adjust transform distort clone crop motionblur])
-VLC_ADD_PLUGINS([fixed32tofloat32 fixed32tos16 s16tofixed32 u8tofixed32])
+VLC_ADD_PLUGINS([fixed32tos16 s16tofixed32 u8tofixed32])
 VLC_ADD_PLUGINS([trivial_resampler ugly_resampler])
 VLC_ADD_PLUGINS([trivial_channel_mixer trivial_mixer])
 VLC_ADD_PLUGINS([id3 playlist export sgimb m3u xtag])
@@ -994,7 +994,7 @@ if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGINS([aout_file linear_resampler bandlimited_resampler])
   VLC_ADD_PLUGINS([float32_mixer spdif_mixer simple_channel_mixer])
   VLC_ADD_PLUGINS([headphone_channel_mixer normvol equalizer])
-  VLC_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif s16tofloat32 s16tofloat32swab s8tofloat32 u8tofloat32 audio_format])
+  VLC_ADD_PLUGINS([fixed32tofloat32 float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif s16tofloat32 s16tofloat32swab s8tofloat32 u8tofloat32 audio_format])
 fi
 
 dnl
@@ -2214,7 +2214,7 @@ then
       dnl  Use a custom toolame
       AC_MSG_RESULT(${real_toolame_tree}/libtoolame/libtoolame.a)
       VLC_ADD_BUILTINS([toolame])
-      VLC_ADD_LDFLAGS([toolame],[${real_faad_tree}/libtoolame/libtoolame.a])
+      VLC_ADD_LDFLAGS([toolame],[${real_toolame_tree}/libtoolame/libtoolame.a])
       VLC_ADD_CPPFLAGS([toolame],[-I${real_toolame_tree}/libtoolame])
     else
       dnl  The given libtoolame wasn't built
