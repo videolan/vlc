@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.80 2003/08/18 13:16:43 zorglub Exp $
+ * $Id: libvlc.h,v 1.81 2003/08/19 11:26:59 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -31,8 +31,8 @@ static char *ppsz_sout_vcodec[] = { "", "mpgv", "mp4v", "DIV1", "DIV2",
                                  "DIV3", "h263", "i263", "WMV1", "WMV2",
                                  "MJPG", NULL };
 
-static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
-                                 "ja", "nl", "no", "pl", "ru", "sv", NULL };
+static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
+ i                               "nl", "no", "pl", "pt_BR", "ru", "sv", NULL };
 
 /*****************************************************************************
  * Configuration options for the main program. Each module will also separatly
