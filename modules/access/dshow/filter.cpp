@@ -193,7 +193,10 @@ HRESULT WINAPI CopyMediaType( AM_MEDIA_TYPE *pmtTarget,
                               const AM_MEDIA_TYPE *pmtSource )
 {
     *pmtTarget = *pmtSource;
-    if( pmtSource->cbFormat != 0 )
+
+    if( !pmtSource || !pmtTarget ) return S_FALSE;
+
+    if( pmtSource->cbFormat && pmtSource->pbFormat )
     {
         pmtTarget->pbFormat = (PBYTE)CoTaskMemAlloc( pmtSource->cbFormat );
         if( pmtTarget->pbFormat == NULL )

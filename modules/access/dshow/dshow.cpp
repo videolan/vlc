@@ -45,7 +45,8 @@ static int OpenDevice( access_t *, string, vlc_bool_t );
 static IBaseFilter *FindCaptureDevice( vlc_object_t *, string *,
                                        list<string> *, vlc_bool_t );
 static size_t EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
-                                     int, int, int, int, int, int, AM_MEDIA_TYPE *mt, size_t mt_max);
+                              int, int, int, int, int, int,
+                              AM_MEDIA_TYPE *mt, size_t );
 static bool ConnectFilters( access_t *, IBaseFilter *, CaptureFilter * );
 
 static int FindDevicesCallback( vlc_object_t *, char const *,
@@ -172,7 +173,6 @@ typedef struct dshow_stream_t
     CaptureFilter   *p_capture_filter;
     AM_MEDIA_TYPE   mt;
     int             i_fourcc;
-    vlc_bool_t      b_invert;
 
     union
     {
@@ -190,12 +190,14 @@ typedef struct dshow_stream_t
  ****************************************************************************/
 #define MAX_CROSSBAR_DEPTH 10
 
-typedef struct CrossbarRouteRec {
+typedef struct CrossbarRouteRec
+{
     IAMCrossbar *pXbar;
     LONG        VideoInputIndex;
     LONG        VideoOutputIndex;
     LONG        AudioInputIndex;
     LONG        AudioOutputIndex;
+
 } CrossbarRoute;
 
 struct access_sys_t
@@ -1049,7 +1051,6 @@ static int OpenDevice( access_t *p_access, string devicename,
         msg_Dbg( p_access, "filters connected successfully !" );
 
         dshow_stream_t dshow_stream;
-        dshow_stream.b_invert = VLC_FALSE;
         dshow_stream.b_pts = VLC_FALSE;
         dshow_stream.mt =
             p_capture_filter->CustomGetPin()->CustomGetMediaType();
@@ -1078,18 +1079,10 @@ static int OpenDevice( access_t *p_access, string devicename,
 
                 int i_height = dshow_stream.header.video.bmiHeader.biHeight;
 
-                /* Check if the image is inverted (bottom to top) */
-                if( dshow_stream.i_fourcc == VLC_FOURCC('R','G','B','1') ||
-                    dshow_stream.i_fourcc == VLC_FOURCC('R','G','B','4') ||
-                    dshow_stream.i_fourcc == VLC_FOURCC('R','G','B','8') ||
-                    dshow_stream.i_fourcc == VLC_FOURCC('R','V','1','5') ||
-                    dshow_stream.i_fourcc == VLC_FOURCC('R','V','1','6') ||
-                    dshow_stream.i_fourcc == VLC_FOURCC('R','V','2','4') ||
-                    dshow_stream.i_fourcc == VLC_FOURCC('R','V','3','2') ||
-                    dshow_stream.i_fourcc == VLC_FOURCC('R','G','B','A') )
+                if( !dshow_stream.header.video.bmiHeader.biCompression )
                 {
-                    if( i_height > 0 ) dshow_stream.b_invert = VLC_TRUE;
-                    else i_height = - i_height;
+                    /* RGB DIB are coded from bottom to top */
+                    i_height = - i_height;
                 }
 
                 /* Check if we are dealing with a DV stream */
@@ -1601,40 +1594,8 @@ static int AccessRead( access_t *p_access, uint8_t *p_buffer, int i_len )
         p_buffer += 16 /* header size */;
 
         /* Then copy stream data if any */
-        if( !p_stream->b_invert )
-        {
-            p_access->p_vlc->pf_memcpy( p_buffer, p_data, i_data_size );
-            p_buffer += i_data_size;
-        }
-        else
-        {
-            int i_width = p_stream->header.video.bmiHeader.biWidth;
-            int i_height = p_stream->header.video.bmiHeader.biHeight;
-            if( i_height < 0 ) i_height = - i_height;
-
-            switch( p_stream->i_fourcc )
-            {
-            case VLC_FOURCC( 'R', 'V', '1', '5' ):
-            case VLC_FOURCC( 'R', 'V', '1', '6' ):
-                i_width *= 2;
-                break;
-            case VLC_FOURCC( 'R', 'V', '2', '4' ):
-                i_width *= 3;
-                break;
-            case VLC_FOURCC( 'R', 'V', '3', '2' ):
-            case VLC_FOURCC( 'R', 'G', 'B', 'A' ):
-                i_width *= 4;
-                break;
-            }
-
-            for( int i = i_height - 1; i >= 0; i-- )
-            {
-                p_access->p_vlc->pf_memcpy( p_buffer,
-                     &p_data[i * i_width], i_width );
-
-                p_buffer += i_width;
-            }
-        }
+        p_access->p_vlc->pf_memcpy( p_buffer, p_data, i_data_size );
+        p_buffer += i_data_size;
 
         sample.p_sample->Release();
 
