@@ -163,3 +163,6 @@
 /* DVD support for linux */
 #undef LINUX_DVD
 
+/* Define if you want DVD CSS decryption. */
+#undef HAVE_CSS
+

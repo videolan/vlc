@@ -62,7 +62,11 @@ void _M( input_getfunctions )( function_list_t * p_function_list );
 MODULE_INIT
 {
     p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "DVD input module";
+#ifdef HAVE_CSS
+    p_module->psz_longname = "full DVD input module with CSS decryption";
+#else
+    p_module->psz_longname = "DVD input module, CSS decryption disabled";
+#endif
     p_module->psz_version = VERSION;
 
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
