@@ -902,27 +902,23 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
         char psz_port[6];
         struct addrinfo hints;
 
-#if 0
         memset( &hints, 0, sizeof( hints ) );
-        /* Check if we have force ipv4 or ipv6 */
+
+#if 0
+        /* Check if ipv4 or ipv6 were forced */
         var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
         var_Get( p_this, "ipv4", &val );
-        if( val.b_bool )
-            hints.ai_family = PF_INET;
+        if( val.b_bool ) hints.ai_family = PF_INET;
 #else
         /* 
          * For now, keep IPv4 by default. That said, it should be safe to use
          * IPv6 by default *on the server side*, as, apart from NetBSD, most
          * systems accept IPv4 clients on IPv6 listening sockets.
-         *
-         *
          */
         hints.ai_family = PF_INET;
-
         var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
         var_Get( p_this, "ipv6", &val );
-        if( val.b_bool )
-            hints.ai_family = 0; // try IPv6, then IPv4
+        if( val.b_bool ) hints.ai_family = 0; // try IPv6, then IPv4
 #endif
 
         hints.ai_socktype = SOCK_STREAM;
@@ -940,6 +936,7 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
             return NULL;
         }
     }
+
 #else
     struct sockaddr_in sock;
     struct httpd_addrinfo info;
@@ -997,7 +994,7 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
         /* verify if it already exist */
         for( i = 0; i < httpd->i_host; i++ )
         {
-            if (GetAddrPort (&httpd->host[i]->sock) != i_port)
+            if( GetAddrPort (&httpd->host[i]->sock) != i_port )
                 continue;
 
 #ifdef AF_INET6
@@ -1101,8 +1098,7 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
         if( listen( fd, LISTEN_BACKLOG ) < 0 )
         {
             msg_Err( p_this, "cannot listen socket" );
-            close( fd );
-            fd = -1;
+            goto socket_error;
         }
 
         continue;
