@@ -55,6 +55,10 @@ static int Control    ( vout_thread_t *, int, va_list );
 static int  CreateFilter ( vlc_object_t * );
 static void DestroyFilter( vlc_object_t * );
 
+static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -539,6 +543,9 @@ struct filter_sys_t
     vlc_bool_t b_absolute;
 
     mtime_t i_last_date;
+    /*  On the fly control variable: */
+    vlc_bool_t b_need_update;
+
 };
 
 static subpicture_t *Filter( filter_t *, mtime_t );
@@ -551,7 +558,8 @@ static int CreateFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
     vlc_value_t val;
-
+    vlc_object_t *p_input;
+    
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_sys == NULL )
@@ -559,16 +567,20 @@ static int CreateFilter( vlc_object_t *p_this )
         msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
     }
-
-    var_Create( p_this, "logo-position", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "logo-position", &val );
-    p_sys->pos = val.i_int;
-    var_Create( p_this, "logo-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "logo-x", &val );
-    p_sys->posx = val.i_int;
-    var_Create( p_this, "logo-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "logo-y", &val );
-    p_sys->posy = val.i_int;
+    /* Hook used for callback variables */
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
+    {
+        return VLC_ENOOBJ;
+    }
+    
+    p_sys->posx = var_CreateGetInteger( p_input , "logo-x" );
+    p_sys->posy = var_CreateGetInteger( p_input , "logo-y" );
+    p_sys->pos = var_CreateGetInteger( p_input , "logo-position" );
+    var_AddCallback( p_input, "logo-x", LogoCallback, p_sys );
+    var_AddCallback( p_input, "logo-y", LogoCallback, p_sys );
+    var_AddCallback( p_input, "logo-position", LogoCallback, p_sys );
+    vlc_object_release( p_input );
 
     p_sys->b_absolute = VLC_TRUE;
     if( p_sys->posx < 0 || p_sys->posy < 0 )
@@ -590,6 +602,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
+    p_sys->b_need_update = VLC_TRUE;
 
     return VLC_SUCCESS;
 }
@@ -601,12 +614,25 @@ static void DestroyFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
+    vlc_object_t *p_input;
 
     if( p_sys->p_pic && p_sys->p_pic->p_data_orig )
         free( p_sys->p_pic->p_data_orig );
     if( p_sys->p_pic ) free( p_sys->p_pic );
 
     free( p_sys );
+    
+    /* Delete the marquee variables from playlist */
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
+    {
+        return;
+    }
+    var_Destroy( p_input , "logo-x" );
+    var_Destroy( p_input , "logo-y" );
+    var_Destroy( p_input , "logo-position" );
+    vlc_object_release( p_input );
+
 }
 
 /****************************************************************************
@@ -622,6 +648,10 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     video_format_t fmt;
 
     if( p_sys->i_last_date && p_sys->i_last_date + 5000000 > date ) return 0;
+    if( p_sys->b_need_update == VLC_FALSE )
+    {
+        return NULL;
+    }
 
     /* Allocate the subpicture internal data. */
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
@@ -655,6 +685,36 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->i_start = p_sys->i_last_date = date;
     p_spu->i_stop = 0;
     p_spu->b_ephemer = VLC_TRUE;
+    p_sys->b_need_update = VLC_FALSE;
 
     return p_spu;
+}
+/**********************************************************************
+ * Callback to update params on the fly
+ **********************************************************************/
+static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data )
+{
+    filter_sys_t *p_sys = (filter_sys_t *) p_data;
+
+ /*   if( !strncmp( psz_var, "marq-marquee", 7 ) )
+    {
+        if( p_sys->psz_marquee ) free( p_sys->psz_marquee );
+        p_sys->psz_marquee = strdup( newval.psz_string );
+    }
+    else */ if ( !strncmp( psz_var, "logo-x", 6 ) )
+    {
+        p_sys->posx = newval.i_int;
+    }
+    else if ( !strncmp( psz_var, "logo-y", 6 ) )
+    {
+        p_sys->posy = newval.i_int;
+    }
+    else if ( !strncmp( psz_var, "logo-position", 12 ) )
+    {
+        p_sys->pos = newval.i_int;
+    }
+    p_sys->b_need_update = VLC_TRUE;
+    return VLC_SUCCESS;
 }
