@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.58 2003/08/22 22:52:48 fenrir Exp $
+ * $Id: avi.c,v 1.59 2003/08/23 11:46:06 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -504,7 +504,6 @@ static int Open( vlc_object_t * p_this )
 #undef p_stream
     }
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
     if( p_avi->i_length )
     {
         p_input->stream.i_mux_rate =
@@ -514,7 +513,6 @@ static int Open( vlc_object_t * p_this )
         msg_Dbg( p_input, "interleaved=%s",
                  p_avi->b_interleaved ? "yes" : "no" );
     }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     b_stream_audio = VLC_FALSE;
     b_stream_video = VLC_FALSE;
