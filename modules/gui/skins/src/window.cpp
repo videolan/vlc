@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.18 2003/04/20 15:00:19 karibu Exp $
+ * $Id: window.cpp,v 1.19 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -45,7 +45,7 @@
 //---------------------------------------------------------------------------
 // Skinable Window
 //---------------------------------------------------------------------------
-Window::Window( intf_thread_t *_p_intf, int x, int y, bool visible,
+SkinWindow::SkinWindow( intf_thread_t *_p_intf, int x, int y, bool visible,
     int transition, int normalalpha, int movealpha, bool dragdrop )
 {
     p_intf = _p_intf;
@@ -84,14 +84,14 @@ Window::Window( intf_thread_t *_p_intf, int x, int y, bool visible,
     ToolTipText = "none";
 }
 //---------------------------------------------------------------------------
-Window::~Window()
+SkinWindow::~SkinWindow()
 {
     // Destroy the controls
     for( unsigned int i = 0; i < ControlList.size(); i++ )
         delete ControlList[i];
 }
 //---------------------------------------------------------------------------
-void Window::Open()
+void SkinWindow::Open()
 {
     if( !Hidden )
         return;
@@ -110,7 +110,7 @@ void Window::Open()
     }
 }
 //---------------------------------------------------------------------------
-void Window::Close()
+void SkinWindow::Close()
 {
     Changing = true;
 
@@ -120,14 +120,14 @@ void Window::Close()
         OSAPI_PostMessage( this, WINDOW_FADE, WINDOW_HIDE, 1242 );
 }
 //---------------------------------------------------------------------------
-void Window::Show()
+void SkinWindow::Show()
 {
     Changing = false;
     Hidden   = false;
     OSShow( true );
 }
 //---------------------------------------------------------------------------
-void Window::Hide()
+void SkinWindow::Hide()
 {
     if( Hidden )
         return;
@@ -138,7 +138,7 @@ void Window::Hide()
     OSAPI_PostMessage( NULL, VLC_TEST_ALL_CLOSED, 0, 0 );
 }
 //---------------------------------------------------------------------------
-void Window::Fade( int To, int Time, unsigned int evt )
+void SkinWindow::Fade( int To, int Time, unsigned int evt )
 {
     StartAlpha = Alpha;
     EndAlpha   = To;
@@ -149,7 +149,7 @@ void Window::Fade( int To, int Time, unsigned int evt )
     OSAPI_PostMessage( this, WINDOW_FADE, evt, Lock );
 }
 //---------------------------------------------------------------------------
-bool Window::ProcessEvent( Event *evt )
+bool SkinWindow::ProcessEvent( Event *evt )
 {
     unsigned int i;
     unsigned int msg = evt->GetMessage();
@@ -243,7 +243,7 @@ bool Window::ProcessEvent( Event *evt )
     }
 }
 //---------------------------------------------------------------------------
-bool Window::ChangeAlpha( int time )
+bool SkinWindow::ChangeAlpha( int time )
 {
     if( time >= EndTime )
     {
@@ -267,7 +267,7 @@ bool Window::ChangeAlpha( int time )
     return true;
 }
 //---------------------------------------------------------------------------
-void Window::RefreshImage( int x, int y, int w, int h )
+void SkinWindow::RefreshImage( int x, int y, int w, int h )
 {
     unsigned int i;
 
@@ -285,7 +285,7 @@ void Window::RefreshImage( int x, int y, int w, int h )
     delete Buffer;
 }
 //---------------------------------------------------------------------------
-void Window::Refresh( int x, int y, int w, int h )
+void SkinWindow::Refresh( int x, int y, int w, int h )
 {
     if( Image == NULL )
         return;
@@ -301,12 +301,12 @@ void Window::Refresh( int x, int y, int w, int h )
 
 }
 //---------------------------------------------------------------------------
-void Window::RefreshAll()
+void SkinWindow::RefreshAll()
 {
     Refresh( 0, 0, Width, Height );
 }
 //---------------------------------------------------------------------------
-void Window::MouseDown( int x, int y, int button )
+void SkinWindow::MouseDown( int x, int y, int button )
 {
     // Checking event in controls
     for( int i = ControlList.size() - 1; i >= 0 ; i-- )
@@ -319,7 +319,7 @@ void Window::MouseDown( int x, int y, int button )
 
 }
 //---------------------------------------------------------------------------
-void Window::MouseMove( int x, int y, int button  )
+void SkinWindow::MouseMove( int x, int y, int button  )
 {
     int i;
 
@@ -366,7 +366,7 @@ void Window::MouseMove( int x, int y, int button  )
         ChangeToolTipText( "none" );
 }
 //---------------------------------------------------------------------------
-void Window::MouseUp( int x, int y, int button )
+void SkinWindow::MouseUp( int x, int y, int button )
 {
     int i;
 
@@ -392,7 +392,7 @@ void Window::MouseUp( int x, int y, int button )
     }
 }
 //---------------------------------------------------------------------------
-void Window::MouseDblClick( int x, int y, int button )
+void SkinWindow::MouseDblClick( int x, int y, int button )
 {
     int i;
 
@@ -404,7 +404,7 @@ void Window::MouseDblClick( int x, int y, int button )
     }
 }
 //---------------------------------------------------------------------------
-void Window::MouseScroll( int x, int y, int direction )
+void SkinWindow::MouseScroll( int x, int y, int direction )
 {
     // Checking event in controls
     for( int i = ControlList.size() - 1; i >= 0 ; i-- )
@@ -416,7 +416,7 @@ void Window::MouseScroll( int x, int y, int direction )
     }
 }
 //---------------------------------------------------------------------------
-void Window::Init()
+void SkinWindow::Init()
 {
     // Get size of window
     ReSize();
@@ -428,7 +428,7 @@ void Window::Init()
     Move( Left, Top );
 }
 //---------------------------------------------------------------------------
-void Window::ReSize()
+void SkinWindow::ReSize()
 {
     // Initialization
     unsigned int i;
@@ -480,13 +480,13 @@ void Window::ReSize()
 
 }
 //---------------------------------------------------------------------------
-void Window::GetSize( int &w, int &h )
+void SkinWindow::GetSize( int &w, int &h )
 {
     w = Width;
     h = Height;
 }
 //---------------------------------------------------------------------------
-void Window::GetPos( int &x, int &y )
+void SkinWindow::GetPos( int &x, int &y )
 {
     x = Left;
     y = Top;

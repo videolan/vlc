@@ -2,7 +2,7 @@
  * generic.cpp: Generic control, parent of the others
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic.cpp,v 1.3 2003/04/20 13:14:14 asmax Exp $
+ * $Id: generic.cpp,v 1.4 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -45,7 +45,7 @@
 // Generic Control
 //---------------------------------------------------------------------------
 GenericControl::GenericControl( string id, bool visible, string help,
-                                Window *Parent )
+                                SkinWindow *Parent )
 {
     ID      = id;
     Visible = visible;

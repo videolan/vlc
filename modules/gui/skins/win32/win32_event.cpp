@@ -2,7 +2,7 @@
  * win32_event.cpp: Win32 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_event.cpp,v 1.4 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: win32_event.cpp,v 1.5 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -57,7 +57,7 @@ Win32Event::Win32Event( intf_thread_t *p_intf, HWND hwnd, unsigned int msg,
     hWnd = hwnd;
 }
 //---------------------------------------------------------------------------
-Win32Event::Win32Event( intf_thread_t *p_intf, Window *win, unsigned int msg,
+Win32Event::Win32Event( intf_thread_t *p_intf, SkinWindow *win, unsigned int msg,
     unsigned int par1, long par2 ) : Event( p_intf, msg, par1, par2 )
 {
     hWnd = ( (Win32Window *)win )->GetHandle();

@@ -2,7 +2,7 @@
  * win32_event.h: Win32 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_event.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: win32_event.h,v 1.3 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -34,7 +34,7 @@ using namespace std;
 
 //---------------------------------------------------------------------------
 struct intf_thread_t;
-class Window;
+class SkinWindow;
 
 //---------------------------------------------------------------------------
 class Win32Event : Event
@@ -47,7 +47,7 @@ class Win32Event : Event
         Win32Event( intf_thread_t *p_intf, string Desc, string shortcut );
         Win32Event( intf_thread_t *p_intf, HWND hwnd, unsigned int msg,
                     unsigned int par1, long par2 );
-        Win32Event( intf_thread_t *p_intf, Window *win, unsigned int msg,
+        Win32Event( intf_thread_t *p_intf, SkinWindow *win, unsigned int msg,
                     unsigned int par1, long par2 );
 
         // Destructor

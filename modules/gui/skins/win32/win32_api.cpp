@@ -2,7 +2,7 @@
  * win32_api.cpp: Various win32-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_api.cpp,v 1.3 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: win32_api.cpp,v 1.4 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -39,7 +39,7 @@
 //---------------------------------------------------------------------------
 // Event API
 //---------------------------------------------------------------------------
-void OSAPI_SendMessage( Window *win, unsigned int message, unsigned int param1,
+void OSAPI_SendMessage( SkinWindow *win, unsigned int message, unsigned int param1,
                         long param2 )
 {
     if( win == NULL )
@@ -49,7 +49,7 @@ void OSAPI_SendMessage( Window *win, unsigned int message, unsigned int param1,
                      param2 );
 }
 //---------------------------------------------------------------------------
-void OSAPI_PostMessage( Window *win, unsigned int message, unsigned int param1,
+void OSAPI_PostMessage( SkinWindow *win, unsigned int message, unsigned int param1,
                         long param2 )
 {
     if( win == NULL )
@@ -110,7 +110,7 @@ void OSAPI_GetMousePos( int &x, int &y )
     delete MousePos;
 }
 //---------------------------------------------------------------------------
-string OSAPI_GetWindowTitle( Window *win )
+string OSAPI_GetWindowTitle( SkinWindow *win )
 {
     char *buffer = new char[MAX_PARAM_SIZE];
     GetWindowText( ((Win32Window *)win)->GetHandle(), buffer, MAX_PARAM_SIZE );

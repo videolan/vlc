@@ -2,7 +2,7 @@
  * slider.cpp: Slider control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: slider.cpp,v 1.6 2003/04/20 15:00:19 karibu Exp $
+ * $Id: slider.cpp,v 1.7 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -52,7 +52,7 @@
 //---------------------------------------------------------------------------
 ControlSlider::ControlSlider( string id, bool visible, string type,
     string cursorUp, string cursorDown, double *ptx, double *pty, int nb,
-    string tooltiptext, string help, Window *Parent )
+    string tooltiptext, string help, SkinWindow *Parent )
     : GenericControl( id, visible, help, Parent )
 {
     Type             = type;

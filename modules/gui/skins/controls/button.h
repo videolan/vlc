@@ -2,7 +2,7 @@
  * button.h: Button control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: button.h,v 1.2 2003/03/19 02:09:56 videolan Exp $
+ * $Id: button.h,v 1.3 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -34,7 +34,7 @@ using namespace std;
 //---------------------------------------------------------------------------
 class Action;
 class Graphics;
-class Window;
+class SkinWindow;
 
 //---------------------------------------------------------------------------
 class ControlButton : public GenericControl
@@ -69,7 +69,7 @@ class ControlButton : public GenericControl
                        string Up, string Down, string Disabled,
                        string onclick, string onmousevoer, string onmouseout,
                        string tooltiptext, string help,
-                       Window *Parent );
+                       SkinWindow *Parent );
 
         // Destructor
         virtual ~ControlButton();

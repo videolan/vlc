@@ -2,7 +2,7 @@
  * rectangle.h: Rectangle control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: rectangle.h,v 1.2 2003/03/18 04:08:45 ipkiss Exp $
+ * $Id: rectangle.h,v 1.3 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -34,7 +34,7 @@ using namespace std;
 //---------------------------------------------------------------------------
 class Action;
 class Graphics;
-class Window;
+class SkinWindow;
 
 //---------------------------------------------------------------------------
 class ControlRectangle : public GenericControl
@@ -53,7 +53,7 @@ class ControlRectangle : public GenericControl
     public:
         // Constructor
         ControlRectangle( string id, bool visible, int x, int y, int w, int h,
-            int color, string event, string help, Window *Parent);
+            int color, string event, string help, SkinWindow *Parent);
 
         // Destructor
         virtual ~ControlRectangle();

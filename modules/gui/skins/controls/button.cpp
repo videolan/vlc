@@ -2,7 +2,7 @@
  * button.cpp: Button control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: button.cpp,v 1.10 2003/04/17 13:08:02 karibu Exp $
+ * $Id: button.cpp,v 1.11 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -47,7 +47,7 @@ ControlButton::ControlButton(
     string Up, string Down, string Disabled,
     string onclick, string onmouseover, string onmouseout,
     string tooltiptext, string help,
-    Window *Parent ) : GenericControl( id, visible, help, Parent )
+    SkinWindow *Parent ) : GenericControl( id, visible, help, Parent )
 {
     // General
     Left            = x;

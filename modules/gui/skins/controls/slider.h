@@ -2,7 +2,7 @@
  * slider.h: Slider control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: slider.h,v 1.3 2003/04/20 15:00:19 karibu Exp $
+ * $Id: slider.h,v 1.4 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -34,7 +34,7 @@ using namespace std;
 //---------------------------------------------------------------------------
 class Event;
 class Graphics;
-class Window;
+class SkinWindow;
 class Bezier;
 class Region;
 
@@ -77,7 +77,7 @@ class ControlSlider : public GenericControl
         // Constructor
         ControlSlider( string id, bool visible, string type, string cursorUp,
             string cursorDown, double *ptx, double *pty, int nb,
-            string tooltiptext, string help, Window *Parent );
+            string tooltiptext, string help, SkinWindow *Parent );
 
         // Destructor
         virtual ~ControlSlider();

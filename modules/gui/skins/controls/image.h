@@ -2,7 +2,7 @@
  * image.h: Image control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: image.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: image.h,v 1.2 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -34,7 +34,7 @@ using namespace std;
 //---------------------------------------------------------------------------
 class Action;
 class Graphics;
-class Window;
+class SkinWindow;
 
 //---------------------------------------------------------------------------
 class ControlImage : public GenericControl
@@ -53,7 +53,7 @@ class ControlImage : public GenericControl
     public:
         // Constructor
         ControlImage( string id, bool visible, int x, int y, string img,
-            string event, string help, Window *Parent);
+            string event, string help, SkinWindow *Parent);
 
         // Destructor
         virtual ~ControlImage();

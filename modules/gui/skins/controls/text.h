@@ -2,7 +2,7 @@
  * text.h: Text control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: text.h,v 1.2 2003/04/17 13:08:02 karibu Exp $
+ * $Id: text.h,v 1.3 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -35,7 +35,7 @@ using namespace std;
 class Event;
 class BitmapBank;
 class Graphics;
-class Window;
+class SkinWindow;
 class Region;
 class Font;
 
@@ -78,7 +78,7 @@ class ControlText : public GenericControl
         // Constructor
         ControlText( string id, bool visible, int x, int y, string text,
             string font, int align, int width, string display,
-            bool scroll, int scrollspace, string help,  Window *Parent );
+            bool scroll, int scrollspace, string help,  SkinWindow *Parent );
 
         // initialization
         virtual void Init();

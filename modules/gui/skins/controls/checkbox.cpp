@@ -2,7 +2,7 @@
  * checkbox.cpp: Checkbox control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: checkbox.cpp,v 1.4 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: checkbox.cpp,v 1.5 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -53,7 +53,7 @@ ControlCheckBox::ControlCheckBox(
     string onclick1, string onclick2, string onmouseover1,
     string onmouseout1, string onmouseover2, string onmouseout2,
     string tooltiptext1, string tooltiptext2, string help,
-    Window *Parent ) : GenericControl( id, visible, help, Parent )
+    SkinWindow *Parent ) : GenericControl( id, visible, help, Parent )
 {
     Left             = x;
     Top              = y;

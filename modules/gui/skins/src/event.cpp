@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.12 2003/04/21 00:54:26 ipkiss Exp $
+ * $Id: event.cpp,v 1.13 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -356,7 +356,7 @@ void Event::CreateEvent()
 //---------------------------------------------------------------------------
 GenericControl * Event::FindControl( string id )
 {
-    list<Window *>::const_iterator win;
+    list<SkinWindow *>::const_iterator win;
     unsigned int i;
 
     for( win = p_intf->p_sys->p_theme->WindowList.begin();

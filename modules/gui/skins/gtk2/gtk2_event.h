@@ -2,7 +2,7 @@
  * gtk2_event.h: GTK2 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_event.h,v 1.1 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_event.h,v 1.2 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -35,7 +35,7 @@ using namespace std;
 
 //---------------------------------------------------------------------------
 struct intf_thread_t;
-class Window;
+class SkinWindow;
 
 //---------------------------------------------------------------------------
 class GTK2Event : Event
@@ -48,7 +48,7 @@ class GTK2Event : Event
         GTK2Event( intf_thread_t *p_intf, string Desc, string shortcut );
         GTK2Event( intf_thread_t *p_intf, GdkWindow *gwnd, unsigned int msg,
                     unsigned int par1, long par2 );
-        GTK2Event( intf_thread_t *p_intf, Window *win, unsigned int msg,
+        GTK2Event( intf_thread_t *p_intf, SkinWindow *win, unsigned int msg,
                     unsigned int par1, long par2 );
 
         // Destructor

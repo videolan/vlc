@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.19 2003/04/21 14:26:59 asmax Exp $
+ * $Id: gtk2_run.cpp,v 1.20 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -99,7 +99,7 @@ void GTK2Proc( GdkEvent *event, gpointer data )
     // Variables
     unsigned int msg;
     Event *evt;
-    list<Window *>::const_iterator win;
+    list<SkinWindow *>::const_iterator win;
     GdkWindow *gwnd = ((GdkEventAny *)event)->window;
 
     // Create event to dispatch in windows

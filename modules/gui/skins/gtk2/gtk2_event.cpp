@@ -2,7 +2,7 @@
  * gtk2_event.cpp: GTK2 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_event.cpp,v 1.10 2003/04/17 17:45:38 asmax Exp $
+ * $Id: gtk2_event.cpp,v 1.11 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -58,7 +58,7 @@ GTK2Event::GTK2Event( intf_thread_t *p_intf, GdkWindow *gwnd, unsigned int msg,
     gWnd = gwnd;
 }
 //---------------------------------------------------------------------------
-GTK2Event::GTK2Event( intf_thread_t *p_intf, Window *win, unsigned int msg,
+GTK2Event::GTK2Event( intf_thread_t *p_intf, SkinWindow *win, unsigned int msg,
     unsigned int par1, long par2 ) : Event( p_intf, msg, par1, par2 )
 {
     gWnd = ( (GTK2Window *)win )->GetHandle();
@@ -73,7 +73,7 @@ bool GTK2Event::SendEvent()
     if( Message != VLC_NOTHING )
     {
         // Find window matching with gwnd
-        list<Window *>::const_iterator win;
+        list<SkinWindow *>::const_iterator win;
         for( win = p_intf->p_sys->p_theme->WindowList.begin();
              win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
         {

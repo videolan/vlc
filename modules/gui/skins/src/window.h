@@ -2,7 +2,7 @@
  * window.h: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.h,v 1.2 2003/04/20 13:14:14 asmax Exp $
+ * $Id: window.h,v 1.3 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -46,7 +46,7 @@ class Event;
 #define MOUSE_SCROLL_DOWN 1
 
 //---------------------------------------------------------------------------
-class Window
+class SkinWindow
 {
     protected:
         // Interface thread
@@ -86,11 +86,11 @@ class Window
         vector<GenericControl *> ControlList;
 
         // Constructors
-        Window( intf_thread_t *_p_intf, int x, int y, bool visible,
+        SkinWindow( intf_thread_t *_p_intf, int x, int y, bool visible,
                 int transition, int normalalpha, int movealpha, bool dragdrop );
 
         // Destructors
-        virtual ~Window();
+        virtual ~SkinWindow();
 
         // Event processing
         bool ProcessEvent( Event *evt );
@@ -101,7 +101,7 @@ class Window
         void MouseDown(     int x, int y, int button );
         void MouseMove(     int x, int y, int button );
         void MouseDblClick( int x, int y, int button );
-        void Window::MouseScroll( int x, int y, int direction );
+        void SkinWindow::MouseScroll( int x, int y, int direction );
 
         // Window graphic aspect
         bool OnStartThemeVisible;

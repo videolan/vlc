@@ -2,7 +2,7 @@
  * win32_window.h: Win32 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: win32_window.h,v 1.3 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -36,7 +36,7 @@ class Graphics;
 class Event;
 
 //---------------------------------------------------------------------------
-class Win32Window : public Window
+class Win32Window : public SkinWindow
 {
     private:
         // General parameters

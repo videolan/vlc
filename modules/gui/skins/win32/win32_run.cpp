@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.8 2003/04/21 02:50:49 asmax Exp $
+ * $Id: win32_run.cpp,v 1.9 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -162,7 +162,7 @@ void OSRun( intf_thread_t *p_intf )
 {
     VlcProc *Proc = new VlcProc( p_intf );
     MSG msg;
-    list<Window *>::const_iterator win;
+    list<SkinWindow *>::const_iterator win;
     Event *ProcessEvent;
     int KeyModifier = 0;
 

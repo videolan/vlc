@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.13 2003/04/21 02:12:06 ipkiss Exp $
+ * $Id: vlcproc.cpp,v 1.14 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -71,7 +71,7 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_HIDE:
-            for( list<Window *>::const_iterator win =
+            for( list<SkinWindow *>::const_iterator win =
                     p_intf->p_sys->p_theme->WindowList.begin();
                  win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
             {
@@ -82,7 +82,7 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_SHOW:
-            for( list<Window *>::const_iterator win =
+            for( list<SkinWindow *>::const_iterator win =
                     p_intf->p_sys->p_theme->WindowList.begin();
                  win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
             {
@@ -182,7 +182,7 @@ bool VlcProc::EventProcEnd()
     if( p_intf->p_sys->b_all_win_closed )
         return true;
 
-    list<Window *>::const_iterator win;
+    list<SkinWindow *>::const_iterator win;
 
     // If a window has been closed, test if all are closed !
     for( win = p_intf->p_sys->p_theme->WindowList.begin();

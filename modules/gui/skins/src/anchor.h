@@ -2,7 +2,7 @@
  * anchor.h: Anchor class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: anchor.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: anchor.h,v 1.2 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -33,7 +33,7 @@ using namespace std;
 
 //---------------------------------------------------------------------------
 struct intf_thread_t;
-class Window;
+class SkinWindow;
 //---------------------------------------------------------------------------
 class Anchor
 {
@@ -49,7 +49,7 @@ class Anchor
         int Priority;
 
         // Parent window
-        Window *Parent;
+        SkinWindow *Parent;
 
         // Interface thread
         intf_thread_t *p_intf;
@@ -57,7 +57,7 @@ class Anchor
     public:
         // Constructor
         Anchor( intf_thread_t *_p_intf, int x, int y, int len, int priority,
-                Window *parent );
+                SkinWindow *parent );
 
         // Hang to anchor if in neighbourhood
         bool Hang( Anchor *anc, int mx, int my );
@@ -73,7 +73,7 @@ class Anchor
 
         // Getters
         int GetPriority()       { return Priority; }
-        Window *GetParent()     { return Parent; }
+        SkinWindow *GetParent()     { return Parent; }
 };
 //---------------------------------------------------------------------------
 

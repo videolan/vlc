@@ -2,7 +2,7 @@
  * playlist.h: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.h,v 1.2 2003/04/20 13:14:14 asmax Exp $
+ * $Id: playlist.h,v 1.3 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -34,7 +34,7 @@ using namespace std;
 //---------------------------------------------------------------------------
 class Event;
 class Graphics;
-class Window;
+class SkinWindow;
 class Font;
 class Bezier;
 class Region;
@@ -101,7 +101,7 @@ class ControlPlayList : public GenericControl
         ControlPlayList( string id, bool visible, int width, int infowidth,
                          string font, string playfont, int selcolor,
                          double *ptx, double *pty, int nb, bool longfilename,
-                         string help, Window *Parent );
+                         string help, SkinWindow *Parent );
 
         // Destructor
         virtual ~ControlPlayList();

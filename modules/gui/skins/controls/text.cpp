@@ -2,7 +2,7 @@
  * text.cpp: Text control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: text.cpp,v 1.6 2003/04/17 19:56:31 karibu Exp $
+ * $Id: text.cpp,v 1.7 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -122,7 +122,7 @@
 //---------------------------------------------------------------------------
 ControlText::ControlText( string id, bool visible, int x, int y, string text,
     string font, int align, int width, string display, bool scroll,
-    int scrollspace, string help, Window *Parent )
+    int scrollspace, string help, SkinWindow *Parent )
     : GenericControl( id, visible, help, Parent )
 {
     InitLeft         = x;

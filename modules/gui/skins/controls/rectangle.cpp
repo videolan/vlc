@@ -2,7 +2,7 @@
  * rectangle.cpp: Rectanglee control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: rectangle.cpp,v 1.3 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: rectangle.cpp,v 1.4 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -45,7 +45,7 @@
 // Control Rectangle
 //---------------------------------------------------------------------------
 ControlRectangle::ControlRectangle( string id, bool visible, int x, int y,
-    int w, int h, int color, string event, string help, Window *Parent )
+    int w, int h, int color, string event, string help, SkinWindow *Parent )
     : GenericControl( id, visible, help, Parent )
 {
     Left                = x;

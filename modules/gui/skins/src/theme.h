@@ -2,7 +2,7 @@
  * theme.h: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.h,v 1.2 2003/04/20 20:28:39 ipkiss Exp $
+ * $Id: theme.h,v 1.3 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -34,7 +34,7 @@ using namespace std;
 
 //---------------------------------------------------------------------------
 struct intf_thread_t;
-class Window;
+class SkinWindow;
 class EventBank;
 class BitmapBank;
 class FontBank;
@@ -72,7 +72,7 @@ class Theme
             int fadetime, int alpha, int movealpha, bool dragdrop ) = 0;
         virtual void ChangeClientWindowName( string name ) = 0;
 
-        Window * GetWindow( string name );
+        SkinWindow * GetWindow( string name );
 
         // Banks
         BitmapBank *BmpBank;
@@ -81,12 +81,12 @@ class Theme
         OffSetBank *OffBank;
 
         // List of the windows of the skin
-        list<Window *> WindowList;
+        list<SkinWindow *> WindowList;
 
         // Magetism
-        void HangToAnchors( Window *wnd, int &x, int &y, bool init = false );
-        bool MoveSkinMagnet( Window *wnd, int left, int top );
-        void MoveSkin( Window *wnd, int left, int top );
+        void HangToAnchors( SkinWindow *wnd, int &x, int &y, bool init = false );
+        bool MoveSkinMagnet( SkinWindow *wnd, int left, int top );
+        void MoveSkin( SkinWindow *wnd, int left, int top );
         void CheckAnchors();
 
         bool ConstructPlaylist;

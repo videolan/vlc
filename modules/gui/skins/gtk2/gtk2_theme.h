@@ -2,7 +2,7 @@
  * gtk2_theme.h: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.h,v 1.3 2003/04/20 20:28:39 ipkiss Exp $
+ * $Id: gtk2_theme.h,v 1.4 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -35,7 +35,7 @@ using namespace std;
 
 //---------------------------------------------------------------------------
 struct intf_thread_t;
-class Window;
+class SkinWindow;
 class EventBank;
 class BitmapBank;
 class FontBank;

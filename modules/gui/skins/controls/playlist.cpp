@@ -2,7 +2,7 @@
  * playlist.cpp: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.7 2003/04/21 14:26:59 asmax Exp $
+ * $Id: playlist.cpp,v 1.8 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -54,7 +54,7 @@
 //---------------------------------------------------------------------------
 ControlPlayList::ControlPlayList( string id, bool visible, int width,
     int infowidth, string font, string playfont, int selcolor, double *ptx,
-    double *pty, int nb, bool longfilename, string help, Window *Parent )
+    double *pty, int nb, bool longfilename, string help, SkinWindow *Parent )
     : GenericControl( id, visible, help, Parent )
 {
     Left          = 0;

@@ -2,7 +2,7 @@
  * gtk2_api.cpp: Various gtk2-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_api.cpp,v 1.12 2003/04/21 00:18:37 asmax Exp $
+ * $Id: gtk2_api.cpp,v 1.13 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -39,7 +39,7 @@
 //---------------------------------------------------------------------------
 // Event API
 //---------------------------------------------------------------------------
-void OSAPI_SendMessage( Window *win, unsigned int message, unsigned int param1,
+void OSAPI_SendMessage( SkinWindow *win, unsigned int message, unsigned int param1,
                         long param2 )
 {
 /*    if( win == NULL )
@@ -49,7 +49,7 @@ void OSAPI_SendMessage( Window *win, unsigned int message, unsigned int param1,
                      param2 );*/
 }
 //---------------------------------------------------------------------------
-void OSAPI_PostMessage( Window *win, unsigned int message, unsigned int param1,
+void OSAPI_PostMessage( SkinWindow *win, unsigned int message, unsigned int param1,
                         long param2 )
 {
     GdkEventClient *event = new GdkEventClient;
@@ -120,7 +120,7 @@ void OSAPI_GetMousePos( int &x, int &y )
     gdk_window_get_pointer( gdk_get_default_root_window(), &x, &y, NULL );
 }
 //---------------------------------------------------------------------------
-string OSAPI_GetWindowTitle( Window *win )
+string OSAPI_GetWindowTitle( SkinWindow *win )
 {
     return ( (GTK2Window *)win )->GetName();
 }

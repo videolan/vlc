@@ -2,7 +2,7 @@
  * theme.cpp: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.10 2003/04/21 02:12:06 ipkiss Exp $
+ * $Id: theme.cpp,v 1.11 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -62,7 +62,7 @@ Theme::Theme( intf_thread_t *_p_intf )
 Theme::~Theme()
 {
     // Delete the windows
-    list<Window *>::const_iterator win;
+    list<SkinWindow *>::const_iterator win;
     for( win = WindowList.begin(); win != WindowList.end(); win++ )
     {
         delete (OSWindow *)(*win);
@@ -82,7 +82,7 @@ void Theme::ShowTheme()
     if( ShowInTaskbar != (bool)config_GetInt( p_intf, "show_in_taskbar" ) )
         ChangeTaskbar();
 
-    list<Window *>::const_iterator win;
+    list<SkinWindow *>::const_iterator win;
     Event *evt1;
     Event *evt2;
 
@@ -128,7 +128,7 @@ void Theme::LoadConfig()
         return;
 
     // Initialization
-    list<Window *>::const_iterator win;
+    list<SkinWindow *>::const_iterator win;
     int i = 0;
     int x, y, v, scan;
 
@@ -154,7 +154,7 @@ void Theme::SaveConfig()
 {
     // Initialize char where config is stored
     char *save  = new char[400];
-    list<Window *>::const_iterator win;
+    list<SkinWindow *>::const_iterator win;
     int i = 0;
     int x, y;
 
@@ -198,7 +198,7 @@ void Theme::InitTheme()
 //---------------------------------------------------------------------------
 void Theme::InitWindows()
 {
-    for( list<Window *>::const_iterator win = WindowList.begin();
+    for( list<SkinWindow *>::const_iterator win = WindowList.begin();
          win != WindowList.end(); win++ )
     {
         (*win)->Init();
@@ -207,7 +207,7 @@ void Theme::InitWindows()
 //---------------------------------------------------------------------------
 void Theme::InitControls()
 {
-    for( list<Window *>::const_iterator win = WindowList.begin();
+    for( list<SkinWindow *>::const_iterator win = WindowList.begin();
          win != WindowList.end(); win++ )
     {
         for( unsigned int i = 0; i < (*win)->ControlList.size(); i++ )
@@ -217,9 +217,9 @@ void Theme::InitControls()
     }
 }
 //---------------------------------------------------------------------------
-Window * Theme::GetWindow( string name )
+SkinWindow * Theme::GetWindow( string name )
 {
-    for( list<Window *>::const_iterator win = WindowList.begin();
+    for( list<SkinWindow *>::const_iterator win = WindowList.begin();
          win != WindowList.end(); win++ )
     {
         if( name == OSAPI_GetWindowTitle( *win ) )
@@ -230,10 +230,10 @@ Window * Theme::GetWindow( string name )
     return NULL;
 }
 //---------------------------------------------------------------------------
-void Theme::MoveSkin( Window *wnd, int left, int top )
+void Theme::MoveSkin( SkinWindow *wnd, int left, int top )
 {
     int x, y, oldx, oldy;
-    Window *win;
+    SkinWindow *win;
     list<Anchor *>::const_iterator anc;
     list<Anchor *>::const_iterator hang;
     wnd->GetPos( oldx, oldy );
@@ -258,7 +258,7 @@ void Theme::MoveSkin( Window *wnd, int left, int top )
     }
 }
 //---------------------------------------------------------------------------
-bool Theme::MoveSkinMagnet( Window *wnd, int left, int top )
+bool Theme::MoveSkinMagnet( SkinWindow *wnd, int left, int top )
 {
 
     // If magnetism not activate
@@ -291,7 +291,7 @@ bool Theme::MoveSkinMagnet( Window *wnd, int left, int top )
     HangToAnchors( wnd, NewLeft, NewTop );
 
     // All windows can be moved
-    list<Window *>::const_iterator win;
+    list<SkinWindow *>::const_iterator win;
     for( win = WindowList.begin(); win != WindowList.end(); win++ )
         (*win)->Moved = false;
 
@@ -301,11 +301,11 @@ bool Theme::MoveSkinMagnet( Window *wnd, int left, int top )
     return true;
 }
 //---------------------------------------------------------------------------
-void Theme::HangToAnchors( Window *wnd, int &x, int &y, bool init )
+void Theme::HangToAnchors( SkinWindow *wnd, int &x, int &y, bool init )
 {
     // Magnetism initialization
     int win_x, win_y, win_anchor_x, win_anchor_y, wnd_anchor_x, wnd_anchor_y;
-    list<Window *>::const_iterator win;
+    list<SkinWindow *>::const_iterator win;
     list<Anchor *>::const_iterator win_anchor, wnd_anchor;
 
     // Parse list of windows
@@ -385,7 +385,7 @@ void Theme::HangToAnchors( Window *wnd, int &x, int &y, bool init )
 //---------------------------------------------------------------------------
 void Theme::CheckAnchors()
 {
-    list<Window *>::const_iterator win;
+    list<SkinWindow *>::const_iterator win;
     int x, y;
 
     for( win = WindowList.begin(); win != WindowList.end(); win++ )

@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.26 2003/04/21 18:39:38 asmax Exp $
+ * $Id: gtk2_window.cpp,v 1.27 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -54,7 +54,7 @@
 GTK2Window::GTK2Window( intf_thread_t *p_intf, GdkWindow *gwnd, int x, int y,
     bool visible, int transition, int normalalpha, int movealpha,
     bool dragdrop, string name )
-    : Window( p_intf, x, y, visible, transition, normalalpha, movealpha,
+    : SkinWindow( p_intf, x, y, visible, transition, normalalpha, movealpha,
               dragdrop )
 {
     // Set handles
@@ -179,7 +179,7 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
 
         case GDK_BUTTON_PRESS:
             // Raise all the windows
-            for( list<Window *>::const_iterator win = 
+            for( list<SkinWindow *>::const_iterator win = 
                     p_intf->p_sys->p_theme->WindowList.begin();
                     win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
             {

@@ -2,7 +2,7 @@
  * wrappers.cpp: Wrappers around C++ objects
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: wrappers.cpp,v 1.9 2003/04/20 20:28:39 ipkiss Exp $
+ * $Id: wrappers.cpp,v 1.10 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -117,7 +117,7 @@ void EndControlGroup()
 void AddAnchor( char *x, char *y, char *len, char *priority )
 {
     int XOff, YOff;
-    Window *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
+    SkinWindow *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
 
     g_pIntf->p_sys->p_theme->OffBank->GetOffSet( XOff, YOff );
     
@@ -137,7 +137,7 @@ void AddImage( char *id, char *visible, char *x, char *y, char *image,
     char *event, char *help )
 {
     int XOff, YOff;
-    Window *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
+    SkinWindow *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
 
     g_pIntf->p_sys->p_theme->OffBank->GetOffSet( XOff, YOff );
 
@@ -150,7 +150,7 @@ void AddRectangle( char *id, char *visible, char *x, char *y, char *w, char *h,
     char *color, char *event, char *help )
 {
     int XOff, YOff;
-    Window *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
+    SkinWindow *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
 
     g_pIntf->p_sys->p_theme->OffBank->GetOffSet( XOff, YOff );
 
@@ -168,7 +168,7 @@ void AddButton(
     char *tooltiptext, char *help )
 {
     int XOff, YOff;
-    Window *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
+    SkinWindow *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
 
     g_pIntf->p_sys->p_theme->OffBank->GetOffSet( XOff, YOff );
 
@@ -193,7 +193,7 @@ void AddCheckBox(
     char *tooltiptext1, char *tooltiptext2, char *help )
 {
     int XOff, YOff;
-    Window *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
+    SkinWindow *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
 
     g_pIntf->p_sys->p_theme->OffBank->GetOffSet( XOff, YOff );
 
@@ -231,7 +231,7 @@ void AddSlider( char *id, char *visible, char *x, char *y, char *type, char *up,
     ConvertCoords( abs, p_abs );
     ConvertCoords( ord, p_ord );
 
-    Window *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
+    SkinWindow *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
 
     // Move control
     g_pIntf->p_sys->p_theme->OffBank->GetOffSet( XOff, YOff );
@@ -286,7 +286,7 @@ void AddPlayList( char *id, char *visible, char *x, char *y, char *width,
     ConvertCoords( abs, p_abs );
     ConvertCoords( ord, p_ord );
 
-    Window *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
+    SkinWindow *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
 
     // Move control
     g_pIntf->p_sys->p_theme->OffBank->GetOffSet( XOff, YOff );
@@ -319,7 +319,7 @@ void AddText( char *id, char *visible, char *x, char *y, char *text, char *font,
     char *help )
 {
     int XOff, YOff;
-    Window *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
+    SkinWindow *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
 
     g_pIntf->p_sys->p_theme->OffBank->GetOffSet( XOff, YOff );
 

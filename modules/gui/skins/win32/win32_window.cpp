@@ -2,7 +2,7 @@
  * win32_window.cpp: Win32 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.cpp,v 1.9 2003/04/20 16:45:44 karibu Exp $
+ * $Id: win32_window.cpp,v 1.10 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -66,7 +66,7 @@ SLWA SetLayeredWindowAttributes =
 Win32Window::Win32Window( intf_thread_t *p_intf, HWND hwnd, int x, int y,
     bool visible, int transition, int normalalpha, int movealpha,
     bool dragdrop )
-    : Window( p_intf, x, y, visible, transition, normalalpha, movealpha,
+    : SkinWindow( p_intf, x, y, visible, transition, normalalpha, movealpha,
               dragdrop )
 {
     // Set handles

@@ -2,7 +2,7 @@
  * generic.h: Generic control, parent of the others
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic.h,v 1.2 2003/04/20 13:14:14 asmax Exp $
+ * $Id: generic.h,v 1.3 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -33,7 +33,7 @@ using namespace std;
 
 //---------------------------------------------------------------------------
 struct intf_thread_t;
-class Window;
+class SkinWindow;
 class Bitmap;
 class Graphics;
 class Region;
@@ -45,7 +45,7 @@ class Event;
 class GenericControl               // This is the generic control class
 {
     protected:
-        Window * ParentWindow;
+        SkinWindow * ParentWindow;
         bool     Visible;
         string   ID;
         string   Help;
@@ -54,7 +54,7 @@ class GenericControl               // This is the generic control class
     private:
     public:
         // Constructor
-        GenericControl( string id, bool visible, string help, Window *Parent );
+        GenericControl( string id, bool visible, string help, SkinWindow *Parent );
 
         // Destructor
         virtual ~GenericControl();

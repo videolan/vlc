@@ -2,7 +2,7 @@
  * checkbox.h: Checkbox control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: checkbox.h,v 1.2 2003/03/19 17:14:50 karibu Exp $
+ * $Id: checkbox.h,v 1.3 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -34,7 +34,7 @@ using namespace std;
 //---------------------------------------------------------------------------
 class Action;
 class Graphics;
-class Window;
+class SkinWindow;
 
 //---------------------------------------------------------------------------
 class ControlCheckBox : public GenericControl
@@ -85,7 +85,7 @@ class ControlCheckBox : public GenericControl
             string onclick1, string onclick2, string onmouseover1,
             string onmouseout1, string onmouseover2, string onmouseout2,
             string tooltiptext1, string tooltiptext2, string help,
-            Window *Parent );
+            SkinWindow *Parent );
 
         // Destructor
         virtual ~ControlCheckBox();

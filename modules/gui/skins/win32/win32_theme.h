@@ -2,7 +2,7 @@
  * win32_theme.h: Win32 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_theme.h,v 1.3 2003/04/20 20:28:39 ipkiss Exp $
+ * $Id: win32_theme.h,v 1.4 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -37,7 +37,7 @@ using namespace std;
 
 //---------------------------------------------------------------------------
 struct intf_thread_t;
-class Window;
+class SkinWindow;
 class EventBank;
 class BitmapBank;
 class FontBank;

@@ -2,7 +2,7 @@
  * win32_graphics.cpp: Win32 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_graphics.cpp,v 1.4 2003/04/19 02:34:47 karibu Exp $
+ * $Id: win32_graphics.cpp,v 1.5 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -39,7 +39,7 @@
 //---------------------------------------------------------------------------
 // WIN32 GRAPHICS
 //---------------------------------------------------------------------------
-Win32Graphics::Win32Graphics( int w, int h, Window *from ) : Graphics( w, h )
+Win32Graphics::Win32Graphics( int w, int h, SkinWindow *from ) : Graphics( w, h )
 {
     HBITMAP HImage ;
     Image          = CreateCompatibleDC( NULL );

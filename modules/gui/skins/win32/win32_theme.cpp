@@ -2,7 +2,7 @@
  * win32_theme.cpp: Win32 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_theme.cpp,v 1.5 2003/04/21 02:12:06 ipkiss Exp $
+ * $Id: win32_theme.cpp,v 1.6 2003/04/21 21:51:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -71,7 +71,7 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
 
     // Find window matching with hwnd
-    list<Window *>::const_iterator win;
+    list<SkinWindow *>::const_iterator win;
     for( win = p_intf->p_sys->p_theme->WindowList.begin();
          win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
     {
@@ -293,7 +293,7 @@ void Win32Theme::AddWindow( string name, int x, int y, bool visible,
 
     SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)p_intf );
 
-    WindowList.push_back( (Window *)new OSWindow( p_intf, hwnd, x, y, visible,
+    WindowList.push_back( (SkinWindow *)new OSWindow( p_intf, hwnd, x, y, visible,
         fadetime, alpha, movealpha, dragdrop ) ) ;
 }
 //---------------------------------------------------------------------------
