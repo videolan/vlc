@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.6 2003/06/23 00:30:41 fenrir Exp $
+ * $Id: mkv.cpp,v 1.7 2003/06/24 00:33:39 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -152,6 +152,9 @@ uint32_t vlc_stream_io_callback::read( void *p_buffer, size_t i_size )
 void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
 {
     int64_t i_pos;
+    int64_t i_last;
+
+    i_last = getFilePointer();
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     switch( mode )
@@ -163,10 +166,12 @@ void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
             i_pos = p_input->stream.p_selected_area->i_size - i_offset;
             break;
         default:
-            i_pos= p_input->stream.p_selected_area->i_tell + i_offset;
+            i_pos= i_last + i_offset;
             break;
     }
-    if( i_pos < 0 || i_pos > p_input->stream.p_selected_area->i_size )
+
+    if( i_pos < 0 ||
+        ( i_pos > p_input->stream.p_selected_area->i_size && p_input->stream.p_selected_area->i_size != 0 ) )
     {
         msg_Err( p_input, "seeking to wrong place (i_pos=%lld)", i_pos );
         vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -174,8 +179,54 @@ void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    input_AccessReinit( p_input );
-    p_input->pf_seek( p_input, i_pos );
+    if( i_pos == i_last )
+    {
+        return;
+    }
+
+    msg_Dbg( p_input, "####################seek new=%lld old=%lld", i_pos, getFilePointer() );
+
+    if( p_input->stream.b_seekable &&
+        ( /*p_input->stream.i_method == INPUT_METHOD_FILE ||*/ i_pos < i_last || i_pos - i_last > p_input->i_bufsize / 4 ) )
+    {
+        input_AccessReinit( p_input );
+        p_input->pf_seek( p_input, i_pos );
+    }
+    else if( i_pos > i_last )
+    {
+        data_packet_t   *p_data;
+        int             i_skip = i_pos - i_last;
+
+        if( i_skip > 1024 )
+        {
+            msg_Warn( p_input, "will skip %d bytes, slow", i_skip );
+        }
+
+        while (i_skip > 0 )
+        {
+            int i_read;
+
+            i_read = input_SplitBuffer( p_input, &p_data,
+                                        __MIN( 4096, i_skip ) );
+            if( i_read < 0 )
+            {
+                msg_Err( p_input, "seek failed" );
+                return;
+            }
+            i_skip -= i_read;
+
+            input_DeletePacket( p_input->p_method_data, p_data );
+            if( i_read == 0 && i_skip > 0 )
+            {
+                msg_Err( p_input, "seek failed" );
+                return;
+            }
+        }
+    }
+    else
+    {
+        msg_Err( p_input, "cannot seek or emulate seek to %lld from %lld", i_pos, i_last );
+    }
 }
 
 size_t vlc_stream_io_callback::write( const void *p_buffer, size_t i_size )
@@ -207,6 +258,9 @@ class EbmlParser
     public:
         EbmlParser( EbmlStream *es, EbmlElement *el_start );
         ~EbmlParser( void );
+
+        int  SetNext( const EbmlCallbacks & ClassInfos );
+
         void Up( void );
         void Down( void );
         EbmlElement *Get( void );
@@ -440,12 +494,34 @@ struct demux_sys_t
 
     mtime_t                 i_pts;
 
+    vlc_bool_t              b_cues;
     int                     i_index;
     int                     i_index_max;
     mkv_index_t             *index;
 };
 
 #define MKVD_TIMECODESCALE 1000000
+
+static void IndexAppendCluster( input_thread_t *p_input, KaxCluster *cluster )
+{
+    demux_sys_t    *p_sys   = p_input->p_demux_data;
+
+#define idx p_sys->index[p_sys->i_index]
+    idx.i_track       = -1;
+    idx.i_block_number= -1;
+    idx.i_position    = cluster->GetElementPosition();
+    idx.i_time        = -1;
+    idx.b_key         = VLC_TRUE;
+
+    p_sys->i_index++;
+    if( p_sys->i_index >= p_sys->i_index_max )
+    {
+        p_sys->i_index_max += 1024;
+        p_sys->index = (mkv_index_t*)realloc( p_sys->index, sizeof( mkv_index_t ) * p_sys->i_index_max );
+    }
+#undef idx
+}
+
 
 /*****************************************************************************
  * Activate: initializes matroska demux structures
@@ -486,12 +562,6 @@ static int Activate( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    if( p_input->stream.i_method != INPUT_METHOD_FILE || !p_input->stream.b_seekable )
-    {
-        msg_Err( p_input, "can only read matroska over seekable file yet" );
-        return VLC_EGENERIC;
-    }
-
     p_input->p_demux_data = p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
     memset( p_sys, 0, sizeof( demux_sys_t ) );
 
@@ -505,6 +575,7 @@ static int Activate( vlc_object_t * p_this )
     p_sys->i_cues_position = -1;
     p_sys->i_chapters_position = -1;
 
+    p_sys->b_cues       = VLC_FALSE;
     p_sys->i_index      = 0;
     p_sys->i_index_max  = 1024;
     p_sys->index        = (mkv_index_t*)malloc( sizeof( mkv_index_t ) * p_sys->i_index_max );
@@ -900,9 +971,10 @@ static int Activate( vlc_object_t * p_this )
         else if( EbmlId( *el1 ) == KaxCluster::ClassInfos.GlobalId )
         {
             msg_Dbg( p_input, "|   + Cluster" );
-            p_sys->cluster = (KaxCluster*)el1;
-            p_sys->ep->Down();
 
+            p_sys->cluster = (KaxCluster*)el1;
+
+            p_sys->ep->Down();
             /* stop parsing the stream */
             break;
         }
@@ -969,7 +1041,7 @@ static int Activate( vlc_object_t * p_this )
 #endif
 
     /* *** Load the cue if found *** */
-    if( p_sys->i_cues_position >= 0 )
+    if( p_sys->i_cues_position >= 0 && p_input->stream.b_seekable )
     {
         int64_t i_sav_position = p_sys->in->getFilePointer();
         EbmlParser *ep;
@@ -979,99 +1051,109 @@ static int Activate( vlc_object_t * p_this )
         p_sys->in->setFilePointer( p_sys->i_cues_position, seek_beginning );
         cues = p_sys->es->FindNextID( KaxCues::ClassInfos, 0xFFFFFFFFL);
 
-        ep = new EbmlParser( p_sys->es, cues );
-        while( ( el = ep->Get() ) != NULL )
+        if( cues == NULL )
         {
-            if( EbmlId( *el ) == KaxCuePoint::ClassInfos.GlobalId )
+            msg_Err( p_input, "cannot load cues (broken seekhead or file)" );
+        }
+        else
+        {
+            ep = new EbmlParser( p_sys->es, cues );
+            while( ( el = ep->Get() ) != NULL )
             {
+                if( EbmlId( *el ) == KaxCuePoint::ClassInfos.GlobalId )
+                {
 #define idx p_sys->index[p_sys->i_index]
 
-                idx.i_track       = -1;
-                idx.i_block_number= -1;
-                idx.i_position    = -1;
-                idx.i_time        = -1;
-                idx.b_key         = VLC_TRUE;
+                    idx.i_track       = -1;
+                    idx.i_block_number= -1;
+                    idx.i_position    = -1;
+                    idx.i_time        = -1;
+                    idx.b_key         = VLC_TRUE;
 
-                ep->Down();
-                while( ( el = ep->Get() ) != NULL )
-                {
-                    if( EbmlId( *el ) == KaxCueTime::ClassInfos.GlobalId )
+                    ep->Down();
+                    while( ( el = ep->Get() ) != NULL )
                     {
-                        KaxCueTime &ctime = *(KaxCueTime*)el;
-
-                        ctime.ReadData( p_sys->es->I_O() );
-
-                        idx.i_time = uint64( ctime ) * (mtime_t)1000000000 / p_sys->i_timescale;
-                    }
-                    else if( EbmlId( *el ) == KaxCueTrackPositions::ClassInfos.GlobalId )
-                    {
-                        ep->Down();
-                        while( ( el = ep->Get() ) != NULL )
+                        if( EbmlId( *el ) == KaxCueTime::ClassInfos.GlobalId )
                         {
-                            if( EbmlId( *el ) == KaxCueTrack::ClassInfos.GlobalId )
-                            {
-                                KaxCueTrack &ctrack = *(KaxCueTrack*)el;
+                            KaxCueTime &ctime = *(KaxCueTime*)el;
 
-                                ctrack.ReadData( p_sys->es->I_O() );
-                                idx.i_track = uint16( ctrack );
-                            }
-                            else if( EbmlId( *el ) == KaxCueClusterPosition::ClassInfos.GlobalId )
-                            {
-                                KaxCueClusterPosition &ccpos = *(KaxCueClusterPosition*)el;
+                            ctime.ReadData( p_sys->es->I_O() );
 
-                                ccpos.ReadData( p_sys->es->I_O() );
-                                idx.i_position = p_sys->segment->GetGlobalPosition( uint64( ccpos ) );
-                            }
-                            else if( EbmlId( *el ) == KaxCueBlockNumber::ClassInfos.GlobalId )
-                            {
-                                KaxCueBlockNumber &cbnum = *(KaxCueBlockNumber*)el;
-
-                                cbnum.ReadData( p_sys->es->I_O() );
-                                idx.i_block_number = uint32( cbnum );
-                            }
-                            else
-                            {
-                                msg_Dbg( p_input, "         * Unknow (%s)", typeid(*el).name() );
-                            }
+                            idx.i_time = uint64( ctime ) * (mtime_t)1000000000 / p_sys->i_timescale;
                         }
-                        ep->Up();
+                        else if( EbmlId( *el ) == KaxCueTrackPositions::ClassInfos.GlobalId )
+                        {
+                            ep->Down();
+                            while( ( el = ep->Get() ) != NULL )
+                            {
+                                if( EbmlId( *el ) == KaxCueTrack::ClassInfos.GlobalId )
+                                {
+                                    KaxCueTrack &ctrack = *(KaxCueTrack*)el;
+
+                                    ctrack.ReadData( p_sys->es->I_O() );
+                                    idx.i_track = uint16( ctrack );
+                                }
+                                else if( EbmlId( *el ) == KaxCueClusterPosition::ClassInfos.GlobalId )
+                                {
+                                    KaxCueClusterPosition &ccpos = *(KaxCueClusterPosition*)el;
+
+                                    ccpos.ReadData( p_sys->es->I_O() );
+                                    idx.i_position = p_sys->segment->GetGlobalPosition( uint64( ccpos ) );
+                                }
+                                else if( EbmlId( *el ) == KaxCueBlockNumber::ClassInfos.GlobalId )
+                                {
+                                    KaxCueBlockNumber &cbnum = *(KaxCueBlockNumber*)el;
+
+                                    cbnum.ReadData( p_sys->es->I_O() );
+                                    idx.i_block_number = uint32( cbnum );
+                                }
+                                else
+                                {
+                                    msg_Dbg( p_input, "         * Unknow (%s)", typeid(*el).name() );
+                                }
+                            }
+                            ep->Up();
+                        }
+                        else
+                        {
+                            msg_Dbg( p_input, "     * Unknow (%s)", typeid(*el).name() );
+                        }
                     }
-                    else
+                    ep->Up();
+
+                    msg_Dbg( p_input, " * added time=%lld pos=%lld track=%d bnum=%d",
+                             idx.i_time, idx.i_position, idx.i_track, idx.i_block_number );
+
+                    p_sys->i_index++;
+                    if( p_sys->i_index >= p_sys->i_index_max )
                     {
-                        msg_Dbg( p_input, "     * Unknow (%s)", typeid(*el).name() );
+                        p_sys->i_index_max += 1024;
+                        p_sys->index = (mkv_index_t*)realloc( p_sys->index, sizeof( mkv_index_t ) * p_sys->i_index_max );
                     }
-                }
-                ep->Up();
-
-                msg_Dbg( p_input, " * added time=%lld pos=%lld track=%d bnum=%d",
-                         idx.i_time, idx.i_position, idx.i_track, idx.i_block_number );
-
-                p_sys->i_index++;
-                if( p_sys->i_index >= p_sys->i_index_max )
-                {
-                    p_sys->i_index_max += 1024;
-                    p_sys->index = (mkv_index_t*)realloc( p_sys->index, sizeof( mkv_index_t ) * p_sys->i_index_max );
-                }
 #undef idx
+                }
+                else
+                {
+                    msg_Dbg( p_input, " * Unknow (%s)", typeid(*el).name() );
+                }
             }
-            else
-            {
-                msg_Dbg( p_input, " * Unknow (%s)", typeid(*el).name() );
-            }
+            delete ep;
+            delete cues;
+
+            p_sys->b_cues = VLC_TRUE;
         }
-        delete ep;
-        delete cues;
 
         msg_Dbg( p_input, "loading cues done." );
         p_sys->in->setFilePointer( i_sav_position, seek_beginning );
     }
 
-    if( p_sys->i_index <= 0 )
+    if( !p_sys->b_cues || p_sys->i_index <= 0 )
     {
-        /* FIXME FIXME FIXME */
-        msg_Warn( p_input, "no cues found -> unseekable stream for now FIXME" );
-        p_input->stream.b_seekable = VLC_FALSE;
-        /* FIXME FIXME FIXME */
+        msg_Warn( p_input, "no cues/empty cues found -> seek won't be precise" );
+
+        IndexAppendCluster( p_input, p_sys->cluster );
+
+        p_sys->b_cues = VLC_FALSE;
     }
 
     /* Create one program */
@@ -1468,6 +1550,14 @@ static int BlockGet( input_thread_t *p_input, KaxBlock **pp_block, int64_t *pi_r
 
         if( el == NULL && *pp_block != NULL )
         {
+            /* update the index */
+#define idx p_sys->index[p_sys->i_index - 1]
+            if( p_sys->i_index > 0 && idx.i_time == -1 )
+            {
+                idx.i_time        = (*pp_block)->GlobalTimecode() * (mtime_t) 1000 / p_sys->i_timescale;
+                idx.b_key         = *pi_ref1 == -1 ? VLC_TRUE : VLC_FALSE;
+            }
+#undef idx
             return VLC_SUCCESS;
         }
 
@@ -1488,6 +1578,14 @@ static int BlockGet( input_thread_t *p_input, KaxBlock **pp_block, int64_t *pi_r
             if( EbmlId( *el ) == KaxCluster::ClassInfos.GlobalId )
             {
                 p_sys->cluster = (KaxCluster*)el;
+
+                /* add it to the index */
+                if( p_sys->i_index == 0 ||
+                    ( p_sys->i_index > 0 && p_sys->index[p_sys->i_index - 1].i_position < p_sys->cluster->GetElementPosition() ) )
+                {
+                    IndexAppendCluster( p_input, p_sys->cluster );
+                }
+
                 p_sys->ep->Down();
             }
             else if( EbmlId( *el ) == KaxCues::ClassInfos.GlobalId )
@@ -1722,28 +1820,81 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
     int         i_track;
 
     msg_Dbg( p_input, "seek request to %lld (%d%%)", i_date, i_percent );
-
-    for( i_index = 0; i_index < p_sys->i_index; i_index++ )
+    if( i_date < 0 && i_percent < 0 )
     {
-        if( p_sys->index[i_index].i_time >= i_date )
-        {
-            break;
-        }
+        return;
     }
-
-    if( i_index > 0 )
-    {
-        i_index--;
-    }
-
-    msg_Dbg( p_input, "seek got %lld (%d%%)",
-             p_sys->index[i_index].i_time, (int)(100 * p_sys->index[i_index].i_position /p_input->stream.p_selected_area->i_size ) );
 
     delete p_sys->ep;
-
-    p_sys->in->setFilePointer( p_sys->index[i_index].i_position, seek_beginning );
-
     p_sys->ep = new EbmlParser( p_sys->es, p_sys->segment );
+    p_sys->cluster = NULL;
+
+    /* seek without index or without date */
+    if( !p_sys->b_cues || i_date < 0 )
+    {
+        int64_t i_pos = i_percent * p_input->stream.p_selected_area->i_size / 100;
+
+        msg_Warn( p_input, "imprecise way of seeking" );
+        for( i_index = 0; i_index < p_sys->i_index; i_index++ )
+        {
+            if( p_sys->index[i_index].i_position >= i_pos)
+            {
+                break;
+            }
+        }
+        if( i_index == p_sys->i_index )
+        {
+            i_index--;
+        }
+
+        p_sys->in->setFilePointer( p_sys->index[i_index].i_position, seek_beginning );
+
+        if( p_sys->index[i_index].i_position < i_pos )
+        {
+            EbmlElement *el;
+
+            msg_Warn( p_input, "searching for cluster, could take some time" );
+
+            /* search a cluster */
+            while( ( el = p_sys->ep->Get() ) != NULL )
+            {
+                if( EbmlId( *el ) == KaxCluster::ClassInfos.GlobalId )
+                {
+                    KaxCluster *cluster = (KaxCluster*)el;
+
+                    /* add it to the index */
+                    IndexAppendCluster( p_input, cluster );
+
+                    if( cluster->GetElementPosition() >= i_pos )
+                    {
+                        p_sys->cluster = cluster;
+                        p_sys->ep->Down();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        for( i_index = 0; i_index < p_sys->i_index; i_index++ )
+        {
+            if( p_sys->index[i_index].i_time >= i_date )
+            {
+                break;
+            }
+        }
+
+        if( i_index > 0 )
+        {
+            i_index--;
+        }
+
+        msg_Dbg( p_input, "seek got %lld (%d%%)",
+                 p_sys->index[i_index].i_time, (int)(100 * p_sys->index[i_index].i_position /p_input->stream.p_selected_area->i_size ) );
+
+        p_sys->in->setFilePointer( p_sys->index[i_index].i_position, seek_beginning );
+    }
 
     /* now parse until key frame */
 #define tk  p_sys->track[i_track]
@@ -1756,7 +1907,6 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
             i_track_skipping++;
         }
     }
-
 
     while( i_track_skipping > 0 )
     {
@@ -1804,6 +1954,8 @@ static int Demux( input_thread_t * p_input )
 {
     demux_sys_t    *p_sys   = p_input->p_demux_data;
     mtime_t        i_start_pts;
+    int            i_block_count = 0;
+
     KaxBlock *block;
     int64_t i_block_duration;
     int64_t i_block_ref1;
@@ -1812,21 +1964,28 @@ static int Demux( input_thread_t * p_input )
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
         mtime_t i_duration = (mtime_t)( p_sys->f_duration / 1000 );
-        mtime_t i_date;
-        int i_percent;
+        mtime_t i_date = -1;
+        int i_percent  = -1;
 
-        i_date = (mtime_t)1000000 *
-                 (mtime_t)i_duration*
-                 (mtime_t)p_sys->in->getFilePointer() /
-                 (mtime_t)p_input->stream.p_selected_area->i_size;
+        if( i_duration > 0 )
+        {
+            i_date = (mtime_t)1000000 *
+                     (mtime_t)i_duration*
+                     (mtime_t)p_sys->in->getFilePointer() /
+                     (mtime_t)p_input->stream.p_selected_area->i_size;
+        }
+        if( p_input->stream.p_selected_area->i_size > 0 )
+        {
+            i_percent = 100 * p_sys->in->getFilePointer() /
+                            p_input->stream.p_selected_area->i_size;
+        }
 
-        i_percent = 100 * p_sys->in->getFilePointer() /
-                        p_input->stream.p_selected_area->i_size;
-
+        msg_Dbg( p_input, "call Seek" );
         Seek( p_input, i_date, i_percent);
+        msg_Dbg( p_input, "Seek end" );
     }
 
-    i_start_pts = p_sys->i_pts;
+    i_start_pts = -1;
 
     for( ;; )
     {
@@ -1857,12 +2016,13 @@ static int Demux( input_thread_t * p_input )
         BlockDecode( p_input, block, i_pts, i_block_duration );
 
         delete block;
+        i_block_count++;
 
         if( i_start_pts == -1 )
         {
             i_start_pts = p_sys->i_pts;
         }
-        else if( p_sys->i_pts > i_start_pts + (mtime_t)100000)
+        else if( p_sys->i_pts > i_start_pts + (mtime_t)100000 || i_block_count > 5 )
         {
             return 1;
         }
