@@ -2636,6 +2636,22 @@ from http://www.freetype.org/, or configure with --disable-freetype. Have a nice
 fi
 
 dnl
+dnl  SVG module
+dnl
+AC_ARG_ENABLE(svg,
+  [  --enable-svg       SVG support (default disabled)])
+if test "${enable_svg}" == "yes"
+then
+  PKG_CHECK_MODULES(SVG, 
+	librsvg-2.0 >= 2.5.0,
+	[
+ 	  AX_ADD_LDFLAGS([svg],[$SVG_LIBS])
+      	  AX_ADD_CFLAGS([svg],[$SVG_CFLAGS])
+          AX_ADD_PLUGINS([svg]) ],
+        [AC_MSG_WARN(SVG library not found)])
+fi
+
+dnl
 dnl  Qt Embedded module
 dnl  (disabled by default)
 dnl
