@@ -466,6 +466,10 @@ VLC.app: vlc
 	    then $(INSTALL) "$$i$(LIBEXT)" \
 			   "$(top_builddir)/VLC.app/Contents/MacOS/modules" ; \
 	  fi ; done
+	if test -d $(top_builddir)/extras/contrib/vlc-lib; then \
+	  cp -R $(top_builddir)/extras/contrib/vlc-lib \
+	    $(top_builddir)/VLC.app/Contents/MacOS/lib ; \
+	fi
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share/http
 	$(INSTALL) -m 644 $(srcdir)/share/http/*.html \
@@ -658,7 +662,7 @@ package-macosx:
 	cd "$(srcdir)" && cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS $(top_builddir)/tmp/
 
 # Create disk image 
-	$(srcdir)/extras/MacOSX/macosx-dmg 18 "vlc-${VERSION}" $(top_builddir)/tmp/* 
+	$(srcdir)/extras/MacOSX/macosx-dmg 25 "vlc-${VERSION}" $(top_builddir)/tmp/* 
 
 # Clean up
 	rm -Rf $(top_builddir)/tmp

@@ -1,0 +1,24 @@
+diff -ru libtheora.old/Makefile.am libtheora/Makefile.am
+--- libtheora.old/Makefile.am	Thu Sep 26 04:50:51 2002
++++ libtheora/Makefile.am	Wed Nov 12 00:06:14 2003
+@@ -2,7 +2,7 @@
+ 
+ AUTOMAKE_OPTIONS = foreign dist-zip
+ 
+-SUBDIRS = lib include examples debian
++SUBDIRS = lib include
+ 
+ EXTRA_DIST = COPYING autogen.sh 
+ 
+diff -ru libtheora.old/Makefile.in libtheora/Makefile.in
+--- libtheora.old/Makefile.in	Mon Jun  9 23:26:11 2003
++++ libtheora/Makefile.in	Wed Nov 12 00:06:37 2003
+@@ -86,7 +86,7 @@
+ 
+ AUTOMAKE_OPTIONS = foreign dist-zip
+ 
+-SUBDIRS = lib include examples debian
++SUBDIRS = lib include
+ 
+ EXTRA_DIST = COPYING autogen.sh 
+ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4

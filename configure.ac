@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.112 2003/11/10 17:47:42 gbazin Exp $
+dnl $Id: configure.ac,v 1.113 2003/11/15 01:21:48 massiot Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -53,12 +53,37 @@ AC_CHECK_TOOL(STRIP, strip, :)
 AC_CHECK_TOOL(AR, ar, :)
 AC_CHECK_TOOL(LD, ld, :)
 
+dnl Sam, if you think I didn't see that... --Meuuh
 dnl AM_PROG_LIBTOOL
 AC_PROG_INSTALL
 
 dnl Check for compiler properties
 AC_C_CONST
 AC_C_INLINE
+
+dnl
+dnl  Check for the contrib directory
+dnl
+topdir="`pwd`"
+if test -d ${topdir}/extras/contrib/lib; then
+  export PATH=${topdir}/extras/contrib/bin:$PATH
+  export LD_LIBRARY_PATH=${topdir}/extras/contrib/lib:$LD_LIBRARY_PATH
+  export DYLD_LIBRARY_PATH=${topdir}/extras/contrib/lib:$DYLD_LIBRARY_PATH
+  CPPFLAGS="${CPPFLAGS} -I${topdir}/extras/contrib/include"
+  CPPFLAGS_save="${CPPFLAGS_save} -I${topdir}/extras/contrib/include"
+  CFLAGS="${CFLAGS} -I${topdir}/extras/contrib/include"
+  CFLAGS_save="${CFLAGS_save} -I${topdir}/extras/contrib/include"
+  CXXFLAGS="${CXXFLAGS} -I${topdir}/extras/contrib/include"
+  CXXFLAGS_save="${CXXFLAGS_save} -I${topdir}/extras/contrib/include"
+  OBJCFLAGS="${OBJCFLAGS} -I${topdir}/extras/contrib/include"
+  OBJCFLAGS_save="${OBJCFLAGS_save} -I${topdir}/extras/contrib/include"
+  if test -d ${topdir}/extras/contrib/vlc-lib; then
+    LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/vlc-lib"
+    LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/vlc-lib"
+  fi
+  LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/lib"
+  LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/lib"
+fi
 
 dnl
 dnl  Set default values

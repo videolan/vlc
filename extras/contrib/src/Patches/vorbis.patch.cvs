@@ -1,0 +1,124 @@
+diff -Naur vorbis.old/Makefile vorbis/Makefile
+--- vorbis.old/Makefile	Sun Nov  2 15:05:33 2003
++++ vorbis/Makefile	Sun Nov  2 16:50:28 2003
+@@ -104,7 +104,7 @@
+ 
+ AUTOMAKE_OPTIONS = foreign dist-zip
+ 
+-SUBDIRS = lib include doc examples win32 debian vq
++SUBDIRS = lib include doc
+ 
+ m4datadir = $(datadir)/aclocal
+ m4data_DATA = vorbis.m4
+diff -Naur vorbis.old/Makefile.am vorbis/Makefile.am
+--- vorbis.old/Makefile.am	Thu Sep 11 22:42:26 2003
++++ vorbis/Makefile.am	Sun Nov  2 16:50:56 2003
+@@ -2,7 +2,8 @@
+ 
+ AUTOMAKE_OPTIONS = foreign dist-zip
+ 
+-SUBDIRS = lib include doc examples win32 debian vq
++#SUBDIRS = lib include doc examples win32 debian vq
++SUBDIRS = lib include doc
+ 
+ m4datadir = $(datadir)/aclocal
+ m4data_DATA = vorbis.m4
+diff -Naur vorbis.old/Makefile.in vorbis/Makefile.in
+--- vorbis.old/Makefile.in	Sun Nov  2 02:33:58 2003
++++ vorbis/Makefile.in	Sun Nov  2 16:51:07 2003
+@@ -104,7 +104,8 @@
+ 
+ AUTOMAKE_OPTIONS = foreign dist-zip
+ 
+-SUBDIRS = lib include doc examples win32 debian vq
++#SUBDIRS = lib include doc examples win32 debian vq
++SUBDIRS = lib include doc
+ 
+ m4datadir = $(datadir)/aclocal
+ m4data_DATA = vorbis.m4
+diff -Naur vorbis.old/lib/Makefile vorbis/lib/Makefile
+--- vorbis.old/lib/Makefile	Sun Nov  2 15:05:33 2003
++++ vorbis/lib/Makefile	Sun Nov  2 16:48:57 2003
+@@ -123,12 +123,12 @@
+ libvorbis_la_LDFLAGS = -no-undefined -version-info 3:0:3
+ 
+ libvorbisfile_la_SOURCES = vorbisfile.c
+-libvorbisfile_la_LDFLAGS = -no-undefined -version-info 4:0:1
+-libvorbisfile_la_LIBADD = libvorbis.la
++libvorbisfile_la_LDFLAGS = -version-info 4:0:1
++libvorbisfile_la_LIBADD = -lvorbis
+ 
+ libvorbisenc_la_SOURCES = vorbisenc.c 
+-libvorbisenc_la_LDFLAGS = -no-undefined -version-info 2:0:0
+-libvorbisenc_la_LIBADD = libvorbis.la
++libvorbisenc_la_LDFLAGS = -version-info 2:0:0
++libvorbisenc_la_LIBADD = -lvorbis
+ 
+ EXTRA_PROGRAMS = barkmel tone psytune
+ CLEANFILES = $(EXTRA_PROGRAMS)
+@@ -151,10 +151,10 @@
+ 	floor1.lo floor0.lo res0.lo mapping0.lo registry.lo codebook.lo \
+ 	sharedbook.lo lookup.lo bitrate.lo
+ libvorbis_la_OBJECTS = $(am_libvorbis_la_OBJECTS)
+-libvorbisenc_la_DEPENDENCIES = libvorbis.la
++libvorbisenc_la_DEPENDENCIES =
+ am_libvorbisenc_la_OBJECTS = vorbisenc.lo
+ libvorbisenc_la_OBJECTS = $(am_libvorbisenc_la_OBJECTS)
+-libvorbisfile_la_DEPENDENCIES = libvorbis.la
++libvorbisfile_la_DEPENDENCIES =
+ am_libvorbisfile_la_OBJECTS = vorbisfile.lo
+ libvorbisfile_la_OBJECTS = $(am_libvorbisfile_la_OBJECTS)
+ EXTRA_PROGRAMS = barkmel$(EXEEXT) tone$(EXEEXT) psytune$(EXEEXT)
+diff -Naur vorbis.old/lib/Makefile.am vorbis/lib/Makefile.am
+--- vorbis.old/lib/Makefile.am	Sat Jan 18 22:02:20 2003
++++ vorbis/lib/Makefile.am	Sun Nov  2 16:38:53 2003
+@@ -20,12 +20,12 @@
+ libvorbis_la_LDFLAGS = -no-undefined -version-info @V_LIB_CURRENT@:@V_LIB_REVISION@:@V_LIB_AGE@
+ 
+ libvorbisfile_la_SOURCES = vorbisfile.c
+-libvorbisfile_la_LDFLAGS = -no-undefined -version-info @VF_LIB_CURRENT@:@VF_LIB_REVISION@:@VF_LIB_AGE@
+-libvorbisfile_la_LIBADD = libvorbis.la
++libvorbisfile_la_LDFLAGS = -version-info @VF_LIB_CURRENT@:@VF_LIB_REVISION@:@VF_LIB_AGE@
++libvorbisfile_la_LIBADD = -lvorbis
+ 
+ libvorbisenc_la_SOURCES = vorbisenc.c 
+-libvorbisenc_la_LDFLAGS = -no-undefined -version-info @VE_LIB_CURRENT@:@VE_LIB_REVISION@:@VE_LIB_AGE@
+-libvorbisenc_la_LIBADD = libvorbis.la
++libvorbisenc_la_LDFLAGS = -version-info @VE_LIB_CURRENT@:@VE_LIB_REVISION@:@VE_LIB_AGE@
++libvorbisenc_la_LIBADD = -lvorbis
+ 
+ EXTRA_PROGRAMS = barkmel tone psytune
+ CLEANFILES = $(EXTRA_PROGRAMS)
+diff -Naur vorbis.old/lib/Makefile.in vorbis/lib/Makefile.in
+--- vorbis.old/lib/Makefile.in	Sun Nov  2 02:34:00 2003
++++ vorbis/lib/Makefile.in	Sun Nov  2 16:51:10 2003
+@@ -123,12 +123,12 @@
+ libvorbis_la_LDFLAGS = -no-undefined -version-info @V_LIB_CURRENT@:@V_LIB_REVISION@:@V_LIB_AGE@
+ 
+ libvorbisfile_la_SOURCES = vorbisfile.c
+-libvorbisfile_la_LDFLAGS = -no-undefined -version-info @VF_LIB_CURRENT@:@VF_LIB_REVISION@:@VF_LIB_AGE@
+-libvorbisfile_la_LIBADD = libvorbis.la
++libvorbisfile_la_LDFLAGS = -version-info @VF_LIB_CURRENT@:@VF_LIB_REVISION@:@VF_LIB_AGE@
++libvorbisfile_la_LIBADD = -lvorbis
+ 
+ libvorbisenc_la_SOURCES = vorbisenc.c 
+-libvorbisenc_la_LDFLAGS = -no-undefined -version-info @VE_LIB_CURRENT@:@VE_LIB_REVISION@:@VE_LIB_AGE@
+-libvorbisenc_la_LIBADD = libvorbis.la
++libvorbisenc_la_LDFLAGS = -version-info @VE_LIB_CURRENT@:@VE_LIB_REVISION@:@VE_LIB_AGE@
++libvorbisenc_la_LIBADD = -lvorbis
+ 
+ EXTRA_PROGRAMS = barkmel tone psytune
+ CLEANFILES = $(EXTRA_PROGRAMS)
+@@ -151,10 +151,10 @@
+ 	floor1.lo floor0.lo res0.lo mapping0.lo registry.lo codebook.lo \
+ 	sharedbook.lo lookup.lo bitrate.lo
+ libvorbis_la_OBJECTS = $(am_libvorbis_la_OBJECTS)
+-libvorbisenc_la_DEPENDENCIES = libvorbis.la
++libvorbisenc_la_DEPENDENCIES =
+ am_libvorbisenc_la_OBJECTS = vorbisenc.lo
+ libvorbisenc_la_OBJECTS = $(am_libvorbisenc_la_OBJECTS)
+-libvorbisfile_la_DEPENDENCIES = libvorbis.la
++libvorbisfile_la_DEPENDENCIES =
+ am_libvorbisfile_la_OBJECTS = vorbisfile.lo
+ libvorbisfile_la_OBJECTS = $(am_libvorbisfile_la_OBJECTS)
+ EXTRA_PROGRAMS = barkmel$(EXEEXT) tone$(EXEEXT) psytune$(EXEEXT)
