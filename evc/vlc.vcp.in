@@ -6,9 +6,9 @@
 # TARGTYPE "Win32 (WCE SH3) Application" 0x8101
 # TARGTYPE "Win32 (WCE SH4) Application" 0x8601
 # TARGTYPE "Win32 (WCE MIPS) Application" 0x8201
-# TARGTYPE "Win32 (WCE x86) Static Library" 0x8304
-# TARGTYPE "Win32 (WCE x86em) Static Library" 0x7f04
-# TARGTYPE "Win32 (WCE emulator) Static Library" 0xa604
+# TARGTYPE "Win32 (WCE x86) Application" 0x8301
+# TARGTYPE "Win32 (WCE x86em) Application" 0x7f01
+# TARGTYPE "Win32 (WCE emulator) Application" 0xa601
 
 CFG=vlc - Win32 (WCE MIPS) Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
@@ -33,10 +33,10 @@ CFG=vlc - Win32 (WCE MIPS) Debug
 !MESSAGE "vlc - Win32 (WCE ARM) Debug" (based on "Win32 (WCE ARM) Application")
 !MESSAGE "vlc - Win32 (WCE x86em) Release" (based on "Win32 (WCE x86em) Application")
 !MESSAGE "vlc - Win32 (WCE x86em) Debug" (based on "Win32 (WCE x86em) Application")
-!MESSAGE "vlc - Win32 (WCE emulator) Release" (based on "Win32 (WCE emulator) Static Library")
-!MESSAGE "vlc - Win32 (WCE emulator) Debug" (based on "Win32 (WCE emulator) Static Library")
-!MESSAGE "vlc - Win32 (WCE x86) Release" (based on "Win32 (WCE x86) Static Library")
-!MESSAGE "vlc - Win32 (WCE x86) Debug" (based on "Win32 (WCE x86) Static Library")
+!MESSAGE "vlc - Win32 (WCE emulator) Release" (based on "Win32 (WCE emulator) Application")
+!MESSAGE "vlc - Win32 (WCE emulator) Debug" (based on "Win32 (WCE emulator) Application")
+!MESSAGE "vlc - Win32 (WCE x86) Release" (based on "Win32 (WCE x86) Application")
+!MESSAGE "vlc - Win32 (WCE x86) Debug" (based on "Win32 (WCE x86) Application")
 !MESSAGE 
 
 # Begin Project
@@ -393,13 +393,14 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /GX- /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "_i386_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /D "NDEBUG" /YX /Gs8192 /GF /O2 /c
-# ADD CPP /nologo /W3 /GX- /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "_i386_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /D "NDEBUG" /YX /Gs8192 /GF /O2 /c
-LIB32=link.exe -lib
-# ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo
+# ADD CPP /nologo /W3 /GX- /I "." /I "..\include" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "_i386_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /D "NDEBUG" /YX /Gs8192 /GF /O2 /c
+MTL=midl.exe
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
+LINK32=link.exe
+# ADD LINK32 Ws2.lib commctrl.lib coredll.lib $(CEx86Corelibc) /entry:"WinMainCRTStartup" /nodefaultlib:"OLDNAMES.lib" /nodefaultlib:$(CENoDefaultLib) /subsystem:$(CESubsystem)
+# SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 (WCE emulator) Debug"
 
@@ -419,13 +420,14 @@ BSC32=bscmake.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /GX- /Zi /Od /D "DEBUG" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "_i386_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /YX /Gs8192 /GF /c
-# ADD CPP /nologo /W3 /GX- /Zi /Od /D "DEBUG" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "_i386_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /YX /Gs8192 /GF /c
-LIB32=link.exe -lib
-# ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo
+# ADD CPP /nologo /W3 /GX- /Zi /Od /I "." /I "..\include" /D "DEBUG" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "_i386_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /YX /Gs8192 /GF /c
+MTL=midl.exe
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
+LINK32=link.exe
+# ADD LINK32 Ws2.lib commctrl.lib coredll.lib $(CEx86Corelibc) /entry:"WinMainCRTStartup" /nodefaultlib:"OLDNAMES.lib" /nodefaultlib:$(CENoDefaultLib) /subsystem:$(CESubsystem)
+# SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 (WCE x86) Release"
 
@@ -445,13 +447,14 @@ BSC32=bscmake.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /GX- /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "_i386_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /D "NDEBUG" /YX /Gs8192 /GF /O2 /c
-# ADD CPP /nologo /W3 /GX- /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "_i386_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /D "NDEBUG" /YX /Gs8192 /GF /O2 /c
-LIB32=link.exe -lib
-# ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo
+# ADD CPP /nologo /W3 /GX- /I "." /I "..\include" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "_i386_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /D "NDEBUG" /YX /Gs8192 /GF /O2 /c
+MTL=midl.exe
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
+LINK32=link.exe
+# ADD LINK32 Ws2.lib commctrl.lib coredll.lib $(CEx86Corelibc) /entry:"WinMainCRTStartup" /nodefaultlib:"OLDNAMES.lib" /nodefaultlib:$(CENoDefaultLib) /subsystem:$(CESubsystem)
+# SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 (WCE x86) Debug"
 
@@ -471,13 +474,14 @@ BSC32=bscmake.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /GX- /Zi /Od /D "DEBUG" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "_i386_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /YX /Gs8192 /GF /c
-# ADD CPP /nologo /W3 /GX- /Zi /Od /D "DEBUG" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "_i386_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /YX /Gs8192 /GF /c
-LIB32=link.exe -lib
-# ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo
+# ADD CPP /nologo /W3 /GX- /Zi /Od /I "." /I "..\include" /D "DEBUG" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "_i386_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /YX /Gs8192 /GF /c
+MTL=midl.exe
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
+LINK32=link.exe
+# ADD LINK32 Ws2.lib commctrl.lib coredll.lib $(CEx86Corelibc) /entry:"WinMainCRTStartup" /nodefaultlib:"OLDNAMES.lib" /nodefaultlib:$(CENoDefaultLib) /subsystem:$(CESubsystem)
+# SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
 
