@@ -355,6 +355,7 @@ static int PAOpenDevice( aout_instance_t *p_aout )
                         &val, &text );
             var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT,
                         &val, NULL );
+            var_Set( p_aout, "audio-device", val );
             msg_Dbg( p_aout, "device supports 2 channels" );
         }
         if( p_sys->deviceInfo->maxOutputChannels >= 4 )
