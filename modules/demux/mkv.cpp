@@ -407,7 +407,7 @@ static int Open( vlc_object_t * p_this )
 
                     p_sys->psz_writing_application = UTF8ToStr( UTFstring( wapp ) );
 
-                    msg_Dbg( p_input, "|   |   + Wrinting Application=%s",
+                    msg_Dbg( p_input, "|   |   + Writing Application=%s",
                              p_sys->psz_writing_application );
                 }
                 else if( EbmlId( *el2 ) == KaxSegmentFilename::ClassInfos.GlobalId )
