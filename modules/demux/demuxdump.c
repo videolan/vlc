@@ -37,6 +37,10 @@
 #define FILE_TEXT N_("Filename of dump")
 #define FILE_LONGTEXT N_( \
     "Specify a file name to which the raw stream will be dumped." )
+#define APPEND_TEXT N_("Append")
+#define APPEND_LONGTEXT N_( \
+    "If the file exists and this option is selected, the existing file " \
+    "will not be overwritten." )
 
 static int  Open( vlc_object_t * );
 static void Close ( vlc_object_t * );
@@ -46,6 +50,8 @@ vlc_module_begin();
     set_capability( "demux2", 0 );
     add_file( "demuxdump-file", "stream-demux.dump", NULL, FILE_TEXT,
               FILE_LONGTEXT, VLC_FALSE );
+    add_bool( "demuxdump-append", 0, NULL, APPEND_TEXT, APPEND_LONGTEXT,
+              VLC_FALSE );
     set_callbacks( Open, Close );
     add_shortcut( "dump" );
 vlc_module_end();
@@ -79,10 +85,21 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
+    char        *psz_mode;
+    vlc_value_t val;
+    vlc_bool_t  b_append;
 
     /* Accept only if forced */
     if( strcasecmp( p_demux->psz_demux, "dump" ) )
         return VLC_EGENERIC;
+
+    var_Create( p_demux, "demuxdump-append", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "demuxdump-append", &val );
+    b_append = val.b_bool;
+    if ( b_append )
+        psz_mode = "ab";
+    else
+        psz_mode = "wb";
 
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
@@ -101,14 +118,15 @@ static int Open( vlc_object_t * p_this )
         msg_Info( p_demux, "dumping raw stream to standard output" );
         p_sys->p_file = stdout;
     }
-    else if( ( p_sys->p_file = fopen( p_sys->psz_file, "wb" ) ) == NULL )
+    else if( ( p_sys->p_file = fopen( p_sys->psz_file, psz_mode ) ) == NULL )
     {
-        msg_Err( p_demux,"cannot create `%s' for writing", p_sys->psz_file );
+        msg_Err( p_demux, "cannot create `%s' for writing", p_sys->psz_file );
 
         free( p_sys );
         return VLC_EGENERIC;
     }
-    msg_Info( p_demux, "dumping raw stream to file `%s'", p_sys->psz_file );
+    msg_Info( p_demux, "%s raw stream to file `%s'",
+              b_append ? "appending" : "dumping", p_sys->psz_file );
 
     return VLC_SUCCESS;
 }
@@ -157,7 +175,9 @@ static int Demux( demux_t *p_demux )
         msg_Err( p_demux, "failed to write data" );
         return -1;
     }
+#if 0
     msg_Dbg( p_demux, "dumped %d bytes", i_data );
+#endif
 
     p_sys->i_write += i_data;
 
