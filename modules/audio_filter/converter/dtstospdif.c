@@ -2,7 +2,7 @@
  * dtstospdif.c : encapsulates DTS frames into S/PDIF packets
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dtstospdif.c,v 1.7 2004/02/08 00:15:04 gbazin Exp $
+ * $Id: dtstospdif.c,v 1.8 2004/02/15 21:52:59 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -175,12 +175,13 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             swab( p_in, p_out + 8, i_length );
 #else
             uint16_t i;
-            byte_t * p_tmp;
+            byte_t * p_tmp, tmp;
             p_tmp = p_out + 8;
             for( i = i_length / 2 ; i-- ; )
             {
+                tmp = p_in[0]; /* in-place filter */
                 p_tmp[0] = p_in[1];
-                p_tmp[1] = p_in[0];
+                p_tmp[1] = tmp;
                 p_tmp += 2; p_in += 2;
             }
 #endif
