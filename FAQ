@@ -1,16 +1,16 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.13 2002/11/20 08:58:20 sam Exp $
+$Id: FAQ,v 1.14 2003/01/08 12:13:24 lool Exp $
 
 1. Using VLC
 
-1.1 How do I read a DVD ?
+1.1 How do I read a DVD?
 -----------------------
 Just launch vlc and use the "open disc" command from the graphical
 interface. In case of trouble, you may want to use the command line
 interface :
     vlc dvd:/dev/dvd
 
-1.2 How do I read an encrypted DVD ?
+1.2 How do I read an encrypted DVD?
 ----------------------------------
 It's exactly the same as for a normal DVD. You will need write access to
 /dev/dvd, because of the key negociation process.
@@ -20,24 +20,24 @@ to install libdvdcss. It can be downloaded from the VideoLAN website. It
 used to be distributed in the same package as VLC, but now you must install
 them seperately.
 
-1.3 How do I switch to full screen display ?
+1.3 How do I switch to full screen display?
 ------------------------------------------
 Press 'f' to toggle fullscreen mode. Note that not all video output
 devices support full screen.
 
-1.4 How do I hide the mouse cursor ?
+1.4 How do I hide the mouse cursor?
 ----------------------------------
 It should disappear after a few seconds if you stop moving the mouse.
 
 1.5 How do I use vlc if I don't want to install Gnome and all this
-#@!£% *$@&§% !@# bloat ?
+#@!£% *$@&§% !@# bloat?
 ---------------------------------------------------------------------------
 You can run :
     vlc --intf dummy myfile.mpg
 Most commands are available from the command line, see vlc --help for
 more information.
 
-1.6 VLC eats my buffer cache, how to I use raw device ?
+1.6 VLC eats my buffer cache, how to I use raw device?
 -----------------------------------------------------
 If you don't know what is a raw device, don't even read this answer :-).
 There is an experimental support for raw devices in libdvdcss. It needs
@@ -46,7 +46,7 @@ use the "raw" utility). Then pass the raw device as second argument, for
 instance :
     vlc dvd:/dev/dvd@/dev/raw0
 
-1.7 How do I use VLC as a client for VLS/VLMS streaming ?
+1.7 How do I use VLC as a client for VLS/VLMS streaming?
 -------------------------------------------------------
 First you must set up a VLS or VLMS stream. Please refer to the
 documentation of these programs. Then start VLC :
@@ -55,9 +55,9 @@ You shouldn't need any option. If you're paranoid and want to control
 everything, here is the exact syntax :
     vlc udp:[<server>[:<server port>]][@[<bind address>][:<bind port>]]
 
-1.8 How do I uninstall / reinstall VLC ?
+1.8 How do I uninstall / reinstall VLC?
 --------------------------------------
-Why would you want to ?  ;)
+Why would you want to?  ;)
 
 If you're using a source distribution of VLC, for example a tarball or
 the CVS, then you have probably used "make install" to install the
@@ -69,17 +69,17 @@ a "make uninstall" in the newer tree should still work.
 For binary packages, remove old packages first and install the new ones
 (normally this should be handled automagically by your sytem).
 
-1.9 Debian: what should I put in my sources.list for videolan ?
+1.9 Debian: what should I put in my sources.list for videolan?
 -------------------------------------------------------------
 deb     http://www.videolan.org/pub/videolan/debian $(ARCH)/
 deb-src http://www.videolan.org/pub/videolan/debian sources/
 
-1.10 How can I save my VLC configuration ?
+1.10 How can I save my VLC configuration?
 ----------------------------------------
 Currently, the only way to save the configuration options in VLC is through
 the preferences menu in one of the graphical user interface plugins.
 
-1.11 Where does VLC store it's config file ?
+1.11 Where does VLC store it's config file?
 ------------------------------------------
 Currently, a config file is created on a per user basis (there is no global
 configuration file). If you modify the available options in VLC and save the
@@ -105,11 +105,11 @@ installed (often gtk-dev or gtk-devel) and recompile.
 Wait a few seconds. Key cracking can take much time on some discs. If it
 still doesn't work, you can have a more verbose output using "vlc -vvvvv".
 Here are a few things to check for :
-* Did you install the libdvdcss package ?
-* Do you have write access to your DVD device ? For instance :
+* Did you install the libdvdcss package?
+* Do you have write access to your DVD device? For instance :
 chmod 666 /dev/hdc
-* Does your kernel log contain line about your DVD device ?
-* Do you have a link from /dev/dvd to your real DVD device ? For instance
+* Does your kernel log contain line about your DVD device?
+* Do you have a link from /dev/dvd to your real DVD device? For instance
 ln -s hdc /dev/dvd
 
 2.3 [REMOVED]
@@ -171,7 +171,7 @@ terminal or in the Messages window).
 ----------------------------------
 Check that as user you have write access to your DVD drive / device.
 
-2.13 I'm stuck with option xxx, how do I reset options ?
+2.13 I'm stuck with option xxx, how do I reset options?
 ------------------------------------------------------
 Under unices, remove your ~/.videolan/vlcrc; for Windows, remove vlcrc
 in the videolan subfolder of your "Application Data" directory.
@@ -201,7 +201,7 @@ streams if you launch VLC (0.4.5 or later) with --vls-backwards-compat.
 
 3.1 MacOS X port
 
-3.1.1 Does VLC support the ATI DVD hardware acceleration cards ?
+3.1.1 Does VLC support the ATI DVD hardware acceleration cards?
 --------------------------------------------------------------
 Currently it doesn't. We'd be glad to support them, but we lack technical
 information on them.
@@ -213,23 +213,53 @@ information on them.
 
 3.2.2 When moving the focus to another window, VLC network input stops
 working properly !
----------------------------------------------------------------------------
+----------------------------------------------------------------------
 This is a known problem with Win 95-class systems. Upgrade to an NT-class
 system.
 
 3.3 Planned ports
 
-3.3.1 Do you have plans for a MacOS 9 / OS/2 / &{#!@}~ port ?
---------------------------------------------------------
+3.3.1 Do you have plans for a MacOS 9 / OS/2 / &{#!@}~ port?
+-----------------------------------------------------------
 No, nobody reported to be actually working on a MacOS 9 port.  If you
 feel like you could write it, we would of course welcome it.  Currently,
 the developers are more interested in supporting the latest Operating
 Systems and completing the functionalities.
 
-3.3.2 Does VLC have dxr2 / dxr3 cards support ?
+3.3.2 Does VLC have dxr2 / dxr3 cards support?
 ---------------------------------------------
 This support is currently being developed.
 
-3.3.3 Does VLC support RTP ?
+3.3.3 Does VLC support RTP?
 --------------------------
 Yes. Just use vlc rtp:@<mcast addr>:<local port>.
+
+4. Legal concerns
+
+4.1 May I use the VideoLAN logo?
+-------------------------------
+You may use the VideoLAN logo using the following copyright:
+
+  Copyright (c) 1996-2002 VideoLAN. This logo or a modified version
+  may be used or modified by anyone to refer to the VideoLAN project
+  or any product developed by the VideoLAN team, but does not indicate
+  endorsement by the project.
+
+4.2 May I reditribute VLC?
+-------------------------
+You may distribute an original or modified version of VideoLAN as long
+as you conform to the terms of its license. It is the GNU General Public
+License Version 2 (referred herein as GPL), and it is in the file named
+COPYING in our products.
+The simpliest way to conform to the GPL is to accompany the product you
+want to distribute with its sources. For example, if you plan to
+distribute the binary version in its 0.4.6 version you should include:
+
+   http://www.videolan.org/pub/videolan/vlc/0.4.6/vlc-0.4.6.tar.gz
+
+You don't need to bother explaining where the sources are, but the
+sources have to share the same media as the products.
+
+They are other ways to conform to the GPL, but this should be the
+simplest because it does not rely on a contract.
+
