@@ -253,7 +253,7 @@ endif
 #
 # Linker flags: plugins and builtins linking
 #
-builtins_LDFLAGS += $(patsubst %,$$%_LDFLAGS,$(shell echo $(BUILTINS) | sed -e 's@\([^ ]*/\)*@@g'))
+builtins_LDFLAGS += $(shell echo $(BUILTINS) | sed -e 's@[^ ]*/\([^ ]*\)@$$\1_LDFLAGS@g')
 
 #
 # Debugging and profiling support

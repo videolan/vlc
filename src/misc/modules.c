@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.78 2002/08/04 20:04:11 sam Exp $
+ * $Id: modules.c,v 1.79 2002/08/05 11:48:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -277,20 +277,20 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     module_list_t *p_list, *p_first, *p_tmp;
 
     int i_index = 0;
-    vlc_bool_t b_intf = VLC_FALSE, b_var = VLC_FALSE;
+    vlc_bool_t b_intf = VLC_FALSE;
 
     module_t *p_module;
 
     int   i_shortcuts = 0;
-    char *psz_shortcuts = NULL;
+    char *psz_shortcuts = NULL, psz_var = NULL;
 
     msg_Dbg( p_this, "looking for %s module", psz_capability );
 
     /* Deal with variables */
     if( psz_name && psz_name[0] == '$' )
     {
-        psz_name = config_GetPsz( p_this, psz_name + 1 );
-        b_var = ( psz_name != NULL );
+        psz_var = config_GetPsz( p_this, psz_name + 1 );
+        psz_name = psz_var;
     }
 
     /* Count how many different shortcuts were asked for */
@@ -301,7 +301,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         /* If the user wants none, give him none. */
         if( !strcmp( psz_name, "none" ) )
         {
-            if( b_var ) free( psz_name );
+            if( psz_var ) free( psz_var );
             return NULL;
         }
 
@@ -533,9 +533,9 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         free( psz_shortcuts );
     }
 
-    if( b_var )
+    if( psz_var )
     {
-        free( psz_name );
+        free( psz_var );
     }
 
     /* Don't forget that the module is still locked */
