@@ -36,7 +36,13 @@
 #define MODE_TEXT 0
 #define MODE_HTML 1
 
-#define LOG_FILE "vlc-log.txt"
+#ifdef SYS_DARWIN
+#define LOG_DIR "Library/Logs/"
+#endif
+
+#define LOG_FILE_TEXT "vlc-log.txt"
+#define LOG_FILE_HTML "vlc-log.html"
+
 #define LOG_STRING( msg, file ) fwrite( msg, strlen( msg ), 1, file );
 
 #define TEXT_HEADER "-- logger module started --\n"
@@ -82,7 +88,7 @@ static void HtmlPrint         ( const msg_item_t *, FILE * );
  * Module descriptor
  *****************************************************************************/
 static char *mode_list[] = { "text", "html" };
-static char *mode_list_text[] = { N_("Text"), N_("Html") };
+static char *mode_list_text[] = { N_("Text"), N_("HTML") };
 
 #define LOGMODE_TEXT N_("Log format")
 #define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are \"text\" (default) and \"html\".")
@@ -146,17 +152,43 @@ static int Open( vlc_object_t *p_this )
     psz_file = config_GetPsz( p_intf, "logfile" );
     if( !psz_file )
     {
-        switch( p_intf->p_sys->i_mode )
+#ifdef SYS_DARWIN
+	char *psz_homedir = p_this->p_vlc->psz_homedir; 
+
+        if( !psz_homedir )
+        {
+            msg_Err( p_this, "psz_homedir is null" );
+            return -1;
+        }
+        psz_file = (char *)malloc( sizeof("/" LOG_DIR "/" LOG_FILE_HTML) +
+                                       strlen(psz_homedir) );
+        if( psz_file )
+        {
+            switch( p_intf->p_sys->i_mode )
+            {
+            case MODE_HTML:
+                sprintf( psz_file, "%s/" LOG_DIR "/" LOG_FILE_HTML,
+                     psz_homedir );
+                break;
+            case MODE_TEXT:
+            default:
+                sprintf( psz_file, "%s/" LOG_DIR "/" LOG_FILE_TEXT,
+                     psz_homedir );
+                break;
+            }
+        }
+#else
+	switch( p_intf->p_sys->i_mode )
         {
         case MODE_HTML:
-            psz_file = strdup( "vlc-log.html" );
+            psz_file = strdup( LOG_FILE_HTML );
             break;
         case MODE_TEXT:
         default:
-            psz_file = strdup( "vlc-log.txt" );
+            psz_file = strdup( LOG_FILE_TEXT );
             break;
         }
-
+#endif
         msg_Warn( p_intf, "no log filename provided, using `%s'", psz_file );
     }
 

@@ -103,6 +103,7 @@
                 "o_info_window" = id; 
                 "o_messages" = id; 
                 "o_mi_about" = id; 
+                "o_mi_add_intf" = id; 
                 "o_mi_audiotrack" = id; 
                 "o_mi_bring_atf" = id; 
                 "o_mi_bwd" = id; 
@@ -146,7 +147,6 @@
                 "o_mi_paste" = id; 
                 "o_mi_play" = id; 
                 "o_mi_playlist" = id; 
-                "o_mi_position" = id; 
                 "o_mi_prefs" = id; 
                 "o_mi_previous" = id; 
                 "o_mi_program" = id; 
@@ -169,6 +169,7 @@
                 "o_mi_website" = id; 
                 "o_msgs_btn_crashlog" = id; 
                 "o_msgs_panel" = id; 
+                "o_mu_add_intf" = id; 
                 "o_mu_audio" = id; 
                 "o_mu_audiotrack" = id; 
                 "o_mu_channels" = id; 

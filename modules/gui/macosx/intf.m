@@ -470,6 +470,8 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     /* main menu */
     [o_mi_about setTitle: _NS("About VLC media player")];
     [o_mi_prefs setTitle: _NS("Preferences...")];
+    [o_mi_add_intf setTitle: _NS("Add Interface")];
+    [o_mu_add_intf setTitle: _NS("Add Interface")];
     [o_mi_hide setTitle: _NS("Hide VLC")];
     [o_mi_hide_others setTitle: _NS("Hide Others")];
     [o_mi_show_all setTitle: _NS("Show All")];
@@ -601,6 +603,9 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
     [NSThread detachNewThreadSelector: @selector(manage)
         toTarget: self withObject: nil];
+        
+    [o_controls setupVarMenuItem: o_mi_add_intf target: (vlc_object_t *)p_intf
+        var: "intf-add" selector: @selector(toggleVar:)];
 
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
 }

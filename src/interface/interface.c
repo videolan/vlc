@@ -75,7 +75,6 @@ static int AddIntfCallback( vlc_object_t *, char const *,
 intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
 {
     intf_thread_t * p_intf;
-    char *psz_intf;
 
     /* Allocate structure */
     p_intf = vlc_object_create( p_this, VLC_OBJECT_INTF );
@@ -257,18 +256,20 @@ static void RunInterface( intf_thread_t *p_intf )
     /* Variable used for interface spawning */
     var_Create( p_intf, "intf-add", VLC_VAR_STRING |
                 VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
-    text.psz_string = _("Add interface");
+    text.psz_string = _("Add Interface");
     var_Change( p_intf, "intf-add", VLC_VAR_SETTEXT, &text, NULL );
 
     val.psz_string = "rc"; text.psz_string = "Console";
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "telnet"; text.psz_string = "Telnet Interface";
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "http"; text.psz_string = "Web Interface";
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "logger"; text.psz_string = "Debug logging";
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "http"; text.psz_string = "HTTP remote control";
+    val.psz_string = "sap"; text.psz_string = "SAP Playlist";
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "sap"; text.psz_string = "SAP interface";
-    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "gestures"; text.psz_string = "Mouse gestures control";
+    val.psz_string = "gestures"; text.psz_string = "Mouse Gestures";
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
 
     var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );
