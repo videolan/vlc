@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.6.2.2 2002/10/11 23:44:01 massiot Exp $
+$Id: FAQ,v 1.6.2.3 2002/11/13 09:45:50 sam Exp $
 
 1. Using VLC
 
@@ -71,8 +71,8 @@ For binary packages, remove old packages first and install the new ones
 
 1.9 Debian: what should I put in my sources.list for videolan ?
 -------------------------------------------------------------
-deb     ftp://ftp.videolan.org/pub/videolan/debian $(ARCH)/
-deb-src ftp://ftp.videolan.org/pub/videolan/debian sources/
+deb     http://www.videolan.org/pub/videolan/debian $(ARCH)/
+deb-src http://www.videolan.org/pub/videolan/debian sources/
 
 1.10 How can I save my VLC configuration ?
 ----------------------------------------
