@@ -20,6 +20,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-int adec_layer1_mono( audiodec_t * p_adec, s16 * buffer );
-int adec_layer1_stereo (audiodec_t * p_adec, s16 * buffer);
+int adec_layer1_mono( adec_thread_t * p_adec, s16 * buffer );
+int adec_layer1_stereo (adec_thread_t * p_adec, s16 * buffer);
 

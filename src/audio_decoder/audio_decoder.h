@@ -2,7 +2,7 @@
  * audio_decoder.h : audio decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_decoder.h,v 1.4 2001/01/05 14:45:47 sam Exp $
+ * $Id: audio_decoder.h,v 1.5 2001/01/11 17:44:48 sam Exp $
  *
  * Authors:
  * Michel Kaempf <maxx@via.ecp.fr>
@@ -36,24 +36,33 @@ typedef struct adec_thread_s
      * Input properties
      */
     decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
-    data_packet_t *     p_data;
+    /* The bit stream structure handles the PES stream at the bit level */
+    bit_stream_t        bit_stream;
+    int                 i_read_bits;
     adec_config_t *     p_config;
-
 
     /*
      * Decoder properties
      */
-    audiodec_t          audio_decoder;
+    u32                 header;
+    int                 frame_size;
+    adec_bank_t         bank_0;
+    adec_bank_t         bank_1;
 
     /*
      * Output properties
      */
-    aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
-    aout_thread_t *     p_aout;           /* needed to create the audio fifo */
+    struct aout_fifo_s *    p_aout_fifo;   /* stores the decompressed frames */
+    struct aout_thread_s *  p_aout;       /* needed to create the audio fifo */
 
 } adec_thread_t;
 
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-vlc_thread_t adec_CreateThread       ( adec_config_t * p_config );
+vlc_thread_t adec_CreateThread   ( adec_config_t * p_config );
+int          adec_Init           ( adec_thread_t * p_adec );
+int          adec_SyncFrame      ( adec_thread_t * p_adec,
+                                   adec_sync_info_t * p_sync_info );
+int          adec_DecodeFrame    ( adec_thread_t * p_adec, s16 * buffer );
+

@@ -39,10 +39,8 @@ typedef struct spudec_thread_s
     vdec_config_t *     p_config;
 
     /*
-     * Decoder properties
+     * Output properties
      */
-    unsigned int        total_bits_read;
-    /* ... */
     vout_thread_t *     p_vout;          /* needed to create the spu objects */
 
 } spudec_thread_t;

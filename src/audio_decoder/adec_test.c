@@ -37,6 +37,7 @@
 
 #include "int_types.h"
 #include "adec_generic.h"
+#include "audio_decoder.h"
 
 #define ADEC_FRAME_SIZE (2*1152)
 

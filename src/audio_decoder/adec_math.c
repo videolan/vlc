@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 #include "int_types.h"
-#include "adec_generic.h"                                     /* adec_bank_t */
+#include "adec_generic.h"
 
 /*****************************************************************************
  * DCT32: Fast 32 points Discrete Cosine Transform

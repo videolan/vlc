@@ -27,11 +27,18 @@
  *
  */
 
-#include "int_types.h"
+#include "defs.h"
+
+#include "config.h"
+#include "common.h"
+#include "threads.h"
+#include "mtime.h"
+#include "stream_control.h"
+#include "input_ext-dec.h"
 
 #include "adec_generic.h"
+#include "audio_decoder.h"
 #include "adec_math.h"                                     /* DCT32(), PCM() */
-#include "adec_bit_stream.h"
 
 #define NULL ((void *)0)
 
@@ -88,79 +95,90 @@ static u8 adec_layer1_allocation_table[15] =
 
 static int adec_bound_table[4] = { 4, 8, 12, 16 };
 
-int adec_layer1_mono( audiodec_t * p_adec, s16 * buffer )
+int adec_layer1_mono( adec_thread_t * p_adec, s16 * buffer )
 {
     u8 allocation[32];
     float slope[32];
     float offset[32];
     float sample[32];
 
-    int sb;
+    int i_sb;
     int s;
+    int i_read_bits = 0;
 
-    /* parse allocation */
+    /*
+     * Parse the allocation tables
+     */
 
-    for (sb = 0; sb < 32; sb += 2)
+    for (i_sb = 0; i_sb < 32; i_sb += 2)
     {
         u8 tmp;
-        tmp = GetByte ( &p_adec->bit_stream );
+
+        /* i_read_bits will be updated at the end of the loop */
+        tmp = GetBits ( &p_adec->bit_stream, 8 );
 
         if ( (tmp >> 4) > 14 )
         {
             return 1;
         }
 
-        allocation[sb] = adec_layer1_allocation_table [tmp >> 4];
+        allocation[i_sb] = adec_layer1_allocation_table [tmp >> 4];
 
         if ((tmp & 15) > 14)
         {
             return 1;
         }
 
-        allocation[sb+1] = adec_layer1_allocation_table [tmp & 15];
+        allocation[i_sb+1] = adec_layer1_allocation_table [tmp & 15];
     }
 
-    /* parse scalefactors */
+    i_read_bits += 8 * 16; /* we did 16 iterations */
 
-    for ( sb = 0; sb < 32; sb++ )
+    /*
+     * Parse scalefactors
+     */
+
+    for ( i_sb = 0; i_sb < 32; i_sb++ )
     {
-        if ( allocation[sb] )
+        if ( allocation[i_sb] )
         {
             int index;
             float scalefactor;
 
-            NeedBits ( &p_adec->bit_stream, 6 );
-            index = p_adec->bit_stream.buffer >> (32 - 6);
-            DumpBits ( &p_adec->bit_stream, 6 );
+            index = GetBits( &p_adec->bit_stream, 6);
+
+            /* We also add the bits we'll take later in the sample parsing */
+            i_read_bits += 6 + 12 * allocation[i_sb];
 
             scalefactor = adec_scalefactor_table[index];
 
-            slope[sb] = adec_slope_table[allocation[sb]-2] * scalefactor;
-            offset[sb] = adec_offset_table[allocation[sb]-2] * scalefactor;
+            slope[i_sb] = adec_slope_table[allocation[i_sb]-2] * scalefactor;
+            offset[i_sb] = adec_offset_table[allocation[i_sb]-2] * scalefactor;
         }
     }
 
-    /* parse samples */
+    /* 
+     * Parse samples
+     */
 
-    for (s = 0; s < 12; s++)
+    for ( s = 0 ; s < 12; s++)
     {
         s16 * XXX_buf;
 
-        for (sb = 0; sb < 32; sb++)
+        for (i_sb = 0; i_sb < 32; i_sb++)
         {
-            if (!allocation[sb])
+            if (!allocation[i_sb])
             {
-                sample[sb] = 0;
+                sample[i_sb] = 0;
             }
             else
             {
                 int code;
 
-                NeedBits (&p_adec->bit_stream, allocation[sb]);
-                code = p_adec->bit_stream.buffer >> (32 - allocation[sb]);
-                DumpBits (&p_adec->bit_stream, allocation[sb]);
+                /* The bits were already counted in the scalefactors parsing */
+                code = GetBits( &p_adec->bit_stream, allocation[i_sb] );
 
-                sample[sb] = slope[sb] * code + offset[sb];
+                sample[i_sb] = slope[i_sb] * code + offset[i_sb];
             }
         }
 
@@ -170,10 +188,12 @@ int adec_layer1_mono( audiodec_t * p_adec, s16 * buffer )
         buffer += 32;
     }
 
+    p_adec->i_read_bits += i_read_bits;
+
     return 0;
 }
 
-int adec_layer1_stereo (audiodec_t * p_adec, s16 * buffer)
+int adec_layer1_stereo( adec_thread_t * p_adec, s16 * buffer )
 {
     u8 allocation_0[32], allocation_1[32];
     float slope_0[32], slope_1[32];
@@ -181,85 +201,97 @@ int adec_layer1_stereo (audiodec_t * p_adec, s16 * buffer)
     float sample_0[32], sample_1[32];
 
     int bound;
-    int sb;
+    int i_sb;
     int s;
+    int i_read_bits = 0;
 
-    /* calculate bound */
+    /*
+     * Calculate bound
+     */
 
     bound = 32;
     if ( (p_adec->header & 0xc0) == 0x40)
-    {   /* intensity stereo */
+    {
+        /* intensity stereo */
         int index;
         index = (p_adec->header >> 4) & 3;
         bound = adec_bound_table[index];
     }
 
-    /* parse allocation */
+    /*
+     * Parse allocation
+     */
 
-    for (sb = 0; sb < bound; sb++)
+    for (i_sb = 0; i_sb < bound; i_sb++)
     {
         u8 tmp;
-        tmp = GetByte (&p_adec->bit_stream);
+        tmp = GetBits( &p_adec->bit_stream, 8 );
         if ((tmp >> 4) > 14)
         {
             return 1;
         }
-        allocation_0[sb] = adec_layer1_allocation_table [tmp >> 4];
+        allocation_0[i_sb] = adec_layer1_allocation_table [tmp >> 4];
         if ((tmp & 15) > 14)
         {
             return 1;
         }
-        allocation_1[sb] = adec_layer1_allocation_table [tmp & 15];
+        allocation_1[i_sb] = adec_layer1_allocation_table [tmp & 15];
     }
 
-    for (; sb < 32; sb += 2)
+    for (; i_sb < 32; i_sb += 2)
     {
         u8 tmp;
-        tmp = GetByte (&p_adec->bit_stream);
+        tmp = GetBits( &p_adec->bit_stream, 8 );
+
         if ((tmp >> 4) > 14)
         {
             return 1;
         }
-        allocation_0[sb] = allocation_1[sb] = adec_layer1_allocation_table [tmp >> 4];
+        allocation_0[i_sb] = allocation_1[i_sb]
+            = adec_layer1_allocation_table [tmp >> 4];
+
         if ((tmp & 15) > 14)
         {
             return 1;
         }
-        allocation_0[sb+1] = allocation_1[sb+1] = adec_layer1_allocation_table [tmp & 15];
+        allocation_0[i_sb+1] = allocation_1[i_sb+1]
+            = adec_layer1_allocation_table [tmp & 15];
     }
 
-    /* parse scalefactors */
+    i_read_bits += 4 * ( 32 + bound ); /* we read 8*bound and 4*(32-bound) */
 
-    for ( sb = 0; sb < 32; sb++ )
+    /*
+     * Parse scalefactors
+     */
+
+    for ( i_sb = 0; i_sb < 32; i_sb++ )
     {
-        if ( allocation_0[sb] )
+        if ( allocation_0[i_sb] )
         {
             int index;
             float scalefactor;
 
-            NeedBits (&p_adec->bit_stream, 6);
-            index = p_adec->bit_stream.buffer >> (32 - 6);
-            DumpBits (&p_adec->bit_stream, 6);
+            index = GetBits( &p_adec->bit_stream, 6 );
+            i_read_bits += 6;
 
             scalefactor = adec_scalefactor_table[index];
 
-            slope_0[sb] = adec_slope_table[allocation_0[sb]-2] * scalefactor;
-            offset_0[sb] = adec_offset_table[allocation_0[sb]-2] * scalefactor;
+            slope_0[i_sb] = adec_slope_table[allocation_0[i_sb]-2] * scalefactor;
+            offset_0[i_sb] = adec_offset_table[allocation_0[i_sb]-2] * scalefactor;
         }
 
-        if (allocation_1[sb])
+        if (allocation_1[i_sb])
         {
             int index;
             float scalefactor;
 
-            NeedBits (&p_adec->bit_stream, 6);
-            index = p_adec->bit_stream.buffer >> (32 - 6);
-            DumpBits (&p_adec->bit_stream, 6);
+            index = GetBits( &p_adec->bit_stream, 6 );
+            i_read_bits += 6;
 
             scalefactor = adec_scalefactor_table[index];
 
-            slope_1[sb] = adec_slope_table[allocation_1[sb]-2] * scalefactor;
-            offset_1[sb] = adec_offset_table[allocation_1[sb]-2] * scalefactor;
+            slope_1[i_sb] = adec_slope_table[allocation_1[i_sb]-2] * scalefactor;
+            offset_1[i_sb] = adec_offset_table[allocation_1[i_sb]-2] * scalefactor;
         }
     }
 
@@ -269,56 +301,53 @@ int adec_layer1_stereo (audiodec_t * p_adec, s16 * buffer)
     {
         s16 * XXX_buf;
 
-        for (sb = 0; sb < bound; sb++)
+        for (i_sb = 0; i_sb < bound; i_sb++)
         {
-            if (!allocation_0[sb])
+            if (!allocation_0[i_sb])
             {
-                sample_0[sb] = 0;
+                sample_0[i_sb] = 0;
             }
             else
             {
                 int code;
 
-                NeedBits (&p_adec->bit_stream, allocation_0[sb]);
-                code = p_adec->bit_stream.buffer >> (32 - allocation_0[sb]);
-                DumpBits (&p_adec->bit_stream, allocation_0[sb]);
+                code = GetBits( &p_adec->bit_stream, allocation_0[i_sb] );
+                i_read_bits += allocation_0[i_sb];
 
-                sample_0[sb] = slope_0[sb] * code + offset_0[sb];
+                sample_0[i_sb] = slope_0[i_sb] * code + offset_0[i_sb];
             }
 
-            if ( !allocation_1[sb] )
+            if ( !allocation_1[i_sb] )
             {
-                sample_1[sb] = 0;
+                sample_1[i_sb] = 0;
             }
             else
             {
                 int code;
 
-                NeedBits (&p_adec->bit_stream, allocation_1[sb]);
-                code = p_adec->bit_stream.buffer >> (32 - allocation_1[sb]);
-                DumpBits (&p_adec->bit_stream, allocation_1[sb]);
+                code = GetBits( &p_adec->bit_stream, allocation_1[i_sb] );
+                i_read_bits += allocation_1[i_sb];
 
-                sample_1[sb] = slope_1[sb] * code + offset_1[sb];
+                sample_1[i_sb] = slope_1[i_sb] * code + offset_1[i_sb];
             }
         }
 
-        for (; sb < 32; sb++)
+        for (; i_sb < 32; i_sb++)
         {
-            if (!allocation_0[sb])
+            if (!allocation_0[i_sb])
             {
-                sample_0[sb] = 0;
-                sample_1[sb] = 0;
+                sample_0[i_sb] = 0;
+                sample_1[i_sb] = 0;
             }
             else
             {
                 int code;
 
-                NeedBits (&p_adec->bit_stream, allocation_0[sb]);
-                code = p_adec->bit_stream.buffer >> (32 - allocation_0[sb]);
-                DumpBits (&p_adec->bit_stream, allocation_0[sb]);
+                code = GetBits( &p_adec->bit_stream, allocation_0[i_sb] );
+                i_read_bits += allocation_0[i_sb];
 
-                sample_0[sb] = slope_0[sb] * code + offset_0[sb];
-                sample_1[sb] = slope_1[sb] * code + offset_1[sb];
+                sample_0[i_sb] = slope_0[i_sb] * code + offset_0[i_sb];
+                sample_1[i_sb] = slope_1[i_sb] * code + offset_1[i_sb];
             }
         }
 
@@ -330,6 +359,8 @@ int adec_layer1_stereo (audiodec_t * p_adec, s16 * buffer)
         PCM (&p_adec->bank_1, &XXX_buf, 2);
         buffer += 64;
     }
+
+    p_adec->i_read_bits += i_read_bits;
 
     return 0;
 }

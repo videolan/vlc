@@ -63,17 +63,18 @@ vlc_thread_t spudec_CreateThread( vdec_config_t * p_config )
     intf_DbgMsg("spudec debug: creating spu decoder thread");
 
     /* Allocate the memory needed to store the thread's structure */
-    if ( (p_spudec = (spudec_thread_t *)malloc( sizeof(spudec_thread_t) )) == NULL )
+    p_spudec = (spudec_thread_t *)malloc( sizeof(spudec_thread_t) );
+
+    if ( p_spudec == NULL )
     {
-        intf_ErrMsg("spudec error: not enough memory for spudec_CreateThread() to create the new thread");
+        intf_ErrMsg( "spudec error: not enough memory "
+                     "for spudec_CreateThread() to create the new thread" );
         return( 0 );
     }
 
     /*
      * Initialize the thread properties
      */
-    p_spudec->p_fifo->b_die = 0;
-    p_spudec->p_fifo->b_error = 0;
     p_spudec->p_config = p_config;
     p_spudec->p_fifo = p_config->decoder_config.p_decoder_fifo;
 
@@ -106,7 +107,8 @@ static int InitThread( spudec_thread_t *p_spudec )
 {
     intf_DbgMsg("spudec debug: initializing spu decoder thread %p", p_spudec);
 
-    p_spudec->p_config->decoder_config.pf_init_bit_stream( &p_spudec->bit_stream,
+    p_spudec->p_config->decoder_config.pf_init_bit_stream(
+            &p_spudec->bit_stream,
             p_spudec->p_config->decoder_config.p_decoder_fifo );
 
     /* Mark thread as running and return */

@@ -49,7 +49,7 @@
  * order to avoid rounding problems and heavy computations, as the function
  * that handles this structure only uses additions.
  *****************************************************************************/
-typedef struct
+typedef struct aout_increment_s
 {
     /* The remainder is used to keep track of the fractional part of the
      * index. */
@@ -73,7 +73,7 @@ typedef struct
 /*****************************************************************************
  * aout_fifo_t
  *****************************************************************************/
-typedef struct
+typedef struct aout_fifo_s
 {
     /* See the fifo types below */
     int                 i_type;
