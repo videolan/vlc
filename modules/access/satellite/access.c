@@ -298,7 +298,7 @@ int E_(Open) ( vlc_object_t *p_this )
 
         if ( ioctl_SECControl( i_tuner, i_freq, b_pol, i_lnb_slof, b_diseqc ) < 0 )
         {
-            msg_Err( p_input, "an error occured when controling SEC" );
+            msg_Err( p_input, "an error occurred when controling SEC" );
             close( p_satellite->i_handle );
             free( p_satellite );
             return -1;

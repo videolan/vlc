@@ -740,7 +740,7 @@ static void RunThread( vout_thread_t *p_vout)
     }
 
     /*
-     * Main loop - it is not executed if an error occured during
+     * Main loop - it is not executed if an error occurred during
      * initialization
      */
     while( (!p_vout->b_die) && (!p_vout->b_error) )
@@ -981,7 +981,7 @@ static void RunThread( vout_thread_t *p_vout)
          */
         if( p_vout->pf_manage && p_vout->pf_manage( p_vout ) )
         {
-            /* A fatal error occured, and the thread must terminate
+            /* A fatal error occurred, and the thread must terminate
              * immediately, without displaying anything - setting b_error to 1
              * causes the immediate end of the main while() loop. */
             p_vout->b_error = 1;
@@ -1062,9 +1062,9 @@ static void RunThread( vout_thread_t *p_vout)
 /*****************************************************************************
  * ErrorThread: RunThread() error loop
  *****************************************************************************
- * This function is called when an error occured during thread main's loop. The
- * thread can still receive feed, but must be ready to terminate as soon as
- * possible.
+ * This function is called when an error occurred during thread main's loop.
+ * The thread can still receive feed, but must be ready to terminate as soon
+ * as possible.
  *****************************************************************************/
 static void ErrorThread( vout_thread_t *p_vout )
 {

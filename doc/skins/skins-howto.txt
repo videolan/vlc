@@ -262,7 +262,7 @@ OK, let's go for an enumeration of the different tags and theor attributes :
      - scroll: if set to 'true', the text will scroll if it does not fit into
        the 'scrollspace'.
        Default is "true".
-     - scrollspace: size in pixel between two occurences of the text when
+     - scrollspace: size in pixel between two occurrences of the text when
        scrolling.
        Default is "20".
      - display: this value is a bit special, it allows to have a text

@@ -20,7 +20,7 @@ libmad_input	: called when input data is needed
 libmad_output	: called whenever a frame has been decoded
 libmad_header	: called upon decoding of only a frame header
 libmad_messages : libmad messages
-libmad_error	: called whenever an error occured during the decoding process
+libmad_error	: called whenever an error occurred during the decoding process
 
 Design: (ASCII art)
 =======

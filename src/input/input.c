@@ -876,7 +876,7 @@ error:
 /*****************************************************************************
  * Error: RunThread() error loop
  *****************************************************************************
- * This function is called when an error occured during thread main's loop.
+ * This function is called when an error occurred during thread main's loop.
  *****************************************************************************/
 static void Error( input_thread_t *p_input )
 {

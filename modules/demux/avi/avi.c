@@ -1648,7 +1648,7 @@ static int AVI_GetKeyFlag( vlc_fourcc_t i_fourcc, uint8_t *p_byte )
              */
             return p_byte[0] & 0xC0 ? 0 : AVIIF_KEYFRAME;
         case FOURCC_mp4v:
-            /* we should find first occurence of 0x000001b6 (32bits)
+            /* we should find first occurrence of 0x000001b6 (32bits)
              *  startcode:      0x000001b6   32bits
              *  piture type     0(I),1(P)     2bits
              */

@@ -266,7 +266,7 @@ static void Destroy( vlc_object_t *p_this )
  * Manage: handle GGI events
  *****************************************************************************
  * This function should be called regularly by video output thread. It returns
- * a non null value if an error occured.
+ * a non null value if an error occurred.
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {

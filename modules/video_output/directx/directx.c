@@ -464,7 +464,7 @@ static void CloseVideo( vlc_object_t *p_this )
  * Manage: handle Sys events
  *****************************************************************************
  * This function should be called regularly by the video output thread.
- * It returns a non null value if an error occured.
+ * It returns a non null value if an error occurred.
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {

@@ -1005,7 +1005,7 @@ void __sout_CfgParse( vlc_object_t *p_this, char *psz_prefix,
             if( *val2.psz_string )
             {
                 free( val2.psz_string );
-                msg_Dbg( p_this, "ignoring option %s (not first occurence)", psz_name );
+                msg_Dbg( p_this, "ignoring option %s (not first occurrence)", psz_name );
                 goto next;
             }
             free( val2.psz_string );
