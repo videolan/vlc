@@ -132,9 +132,9 @@ int vlc_strncasecmp( const char *s1, const char *s2, size_t n )
  * Case sensitive. Return NULL if not found, return big if little == null
  *****************************************************************************/
 #if !defined( HAVE_STRCASESTR ) && !defined( HAVE_STRISTR )
-static char * vlc_strncasestr( const char *psz_big, const char *psz_little )
+char * vlc_strcasestr( const char *psz_big, const char *psz_little )
 {
-    char *p_pox = psz_big;
+    char *p_pos = psz_big;
 
     if( !psz_big || !psz_little || !*psz_little ) return psz_big;
  
