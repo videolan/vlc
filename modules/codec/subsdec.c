@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.2 2003/10/02 13:31:00 hartman Exp $
+ * $Id: subsdec.c,v 1.3 2003/10/11 14:08:58 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -39,7 +39,6 @@
 
 #include "charset.h"
 
-#undef HAVE_ICONV
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
  *****************************************************************************/
@@ -273,7 +272,8 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
     if( p_sys->iconv_handle != (iconv_t)-1 )
     {
         char *psz_new_subtitle;
-        char *psz_convert_buffer_out, *psz_convert_buffer_in;
+        char *psz_convert_buffer_out;
+        const char *psz_convert_buffer_in;
         size_t ret, inbytes_left, outbytes_left;
 
         psz_new_subtitle = malloc( 6 * strlen( psz_subtitle ) );
