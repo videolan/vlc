@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.10 2002/10/28 22:31:49 gbazin Exp $
+ * $Id: waveout.c,v 1.11 2002/11/15 16:27:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -114,11 +114,17 @@ static int Open( vlc_object_t *p_this )
     aout_VolumeSoftInit( p_aout );
 
     i_nb_channels = aout_FormatNbChannels( &p_aout->output.output );
-    if ( i_nb_channels > 2 )
+    if ( i_nb_channels >= 2 )
     {
-        /* Waveout doesn't support more than two channels. */
         i_nb_channels = 2;
-        p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
+        p_aout->output.output.i_physical_channels =
+            AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+    }
+    else
+    {
+        i_nb_channels = 1;
+        p_aout->output.output.i_physical_channels =
+            AOUT_CHAN_CENTER;
     }
 
     /* We need to open the device with default values to be sure it is

@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.7 2002/11/01 15:43:55 gbazin Exp $
+ * $Id: directx.c,v 1.8 2002/11/15 16:27:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -379,10 +379,17 @@ static int DirectxCreateSecondaryBuffer( aout_instance_t *p_aout )
     int                  i_nb_channels, i;
 
     i_nb_channels = aout_FormatNbChannels( &p_aout->output.output );
-    if ( i_nb_channels > 2 )
+    if ( i_nb_channels >= 2 )
     {
         i_nb_channels = 2;
-        p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
+        p_aout->output.output.i_physical_channels =
+            AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+    }
+    else
+    {
+        i_nb_channels = 1;
+        p_aout->output.output.i_physical_channels =
+            AOUT_CHAN_CENTER;
     }
 
     /* First set the buffer format */
