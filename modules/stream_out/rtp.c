@@ -1361,6 +1361,7 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
                         answer->psz_status = strdup( "Unknown session id" );
                         answer->i_body = 0;
                         answer->p_body = NULL;
+                        free( ip );
                         break;
                     }
                 }
@@ -1371,6 +1372,8 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
                 else
                     sprintf( psz_access, "udp{raw}" );
                 sprintf( psz_url, "%s:%d", ip, i_port );
+                free( ip );
+                
                 if( ( p_access = sout_AccessOutNew( p_stream->p_sout, psz_access, psz_url ) ) == NULL )
                 {
                     msg_Err( p_stream, "cannot create the access out for %s://%s",
