@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.40 2002/12/23 13:49:11 massiot Exp $
+ * $Id: oss.c,v 1.41 2002/12/23 13:58:46 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -127,7 +127,7 @@ static void Probe( aout_instance_t * p_aout )
         if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) >= 0
              && i_format == AFMT_AC3 )
         {
-            val.psz_string = N_("S/PDIF");
+            val.psz_string = N_("A/52 over S/PDIF");
             var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
         }
     }
