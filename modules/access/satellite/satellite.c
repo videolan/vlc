@@ -38,6 +38,12 @@ void E_(Close)   ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 
+#define DEMUX_TEXT N_("Demux number")
+#define DEMUX_LONGTEXT ""
+
+#define TUNER_TEXT N_("Tuner number")
+#define TUNER_LONGTEXT ""
+
 #define FREQ_TEXT N_("Satellite default transponder frequency (KHz)")
 #define FREQ_LONGTEXT ""
 
@@ -64,7 +70,11 @@ void E_(Close)   ( vlc_object_t * );
 
 vlc_module_begin();
     add_category_hint( N_("Input"), NULL, VLC_FALSE );
-        add_integer( "frequency", 11954000, NULL, FREQ_TEXT, FREQ_LONGTEXT,
+        add_integer( "dvb-dmx", 0, NULL, DEMUX_TEXT, DEMUX_LONGTEXT,
+                     VLC_FALSE );
+        add_integer( "dvb-tuner", 0, NULL, TUNER_TEXT, TUNER_LONGTEXT,
+                     VLC_FALSE );
+        add_integer( "frequency", 0, NULL, FREQ_TEXT, FREQ_LONGTEXT,
                      VLC_FALSE );
         add_integer( "polarization", 0, NULL, POL_TEXT, POL_LONGTEXT,
                      VLC_FALSE );

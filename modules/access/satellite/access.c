@@ -1,9 +1,10 @@
 /*****************************************************************************
  * access.c: Satellite card input
  *****************************************************************************
- * Copyright (C) 1998-2002 VideoLAN
+ * Copyright (C) 1998-2003 VideoLAN
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +48,8 @@
 
 #include "dvb.h"
 
-#define SATELLITE_READ_ONCE 3
+#define SATELLITE_READ_ONCE 80
+#define DMX_BUFFER_SIZE (1024 * 1024)
 
 /*****************************************************************************
  * Local prototypes
@@ -77,6 +79,10 @@ int E_(Open) ( vlc_object_t *p_this )
     int                 i_lnb_lof1;
     int                 i_lnb_lof2;
     int                 i_lnb_slof;
+    int                 i_demux;
+    char                psz_dvr[255];
+    i_demux = config_GetInt( p_input, "dvb-dmx" );
+    snprintf(psz_dvr, sizeof(psz_dvr), DVR "%d", i_demux);
 
     /* parse the options passed in command line : */
 
@@ -115,14 +121,14 @@ int E_(Open) ( vlc_object_t *p_this )
     {
         msg_Warn( p_input, "invalid frequency, using default one" );
         i_freq = config_GetInt( p_input, "frequency" );
-        if( i_freq > (12999*1000) || i_freq < (10000*1000) )
+        if( i_freq && (i_freq > (12999*1000) || i_freq < (10000*1000)) )
         {
             msg_Err( p_input, "invalid default frequency" );
             return -1;
         }
     }
 
-    if( i_srate > (30000*1000) || i_srate < (1000*1000) )
+    if( i_freq && (i_srate > (30000*1000) || i_srate < (1000*1000)) )
     {
         msg_Warn( p_input, "invalid symbol rate, using default one" );
         i_srate = config_GetInt( p_input, "symbol-rate" );
@@ -133,7 +139,7 @@ int E_(Open) ( vlc_object_t *p_this )
         }
     }
 
-    if( b_pol && b_pol != 1 )
+    if( i_freq && b_pol && b_pol != 1 )
     {
         msg_Warn( p_input, "invalid polarization, using default one" );
         b_pol = config_GetInt( p_input, "polarization" );
@@ -144,7 +150,7 @@ int E_(Open) ( vlc_object_t *p_this )
         }
     }
 
-    if( i_fec > 7 || i_fec < 1 )
+    if( i_freq && (i_fec > 7 || i_fec < 1) )
     {
         msg_Warn( p_input, "invalid FEC, using default one" );
         i_fec = config_GetInt( p_input, "fec" );
@@ -155,32 +161,35 @@ int E_(Open) ( vlc_object_t *p_this )
         }
     }
 
-    switch( i_fec )
+    if ( i_freq )
     {
-        case 1:
-            f_fec = 1./2;
-            break;
-        case 2:
-            f_fec = 2./3;
-            break;
-        case 3:
-            f_fec = 3./4;
-            break;
-        case 4:
-            f_fec = 4./5;
-            break;
-        case 5:
-            f_fec = 5./6;
-            break;
-        case 6:
-            f_fec = 6./7;
-            break;
-        case 7:
-            f_fec = 7./8;
-            break;
-        default:
-            /* cannot happen */
-            break;
+        switch( i_fec )
+        {
+            case 1:
+                f_fec = 1./2;
+                break;
+            case 2:
+                f_fec = 2./3;
+                break;
+            case 3:
+                f_fec = 3./4;
+                break;
+            case 4:
+                f_fec = 4./5;
+                break;
+            case 5:
+                f_fec = 5./6;
+                break;
+            case 6:
+                f_fec = 6./7;
+                break;
+            case 7:
+                f_fec = 7./8;
+                break;
+            default:
+                /* cannot happen */
+                break;
+        }
     }
 
 
@@ -196,15 +205,20 @@ int E_(Open) ( vlc_object_t *p_this )
     p_input->p_access_data = (void *)p_satellite;
 
     /* Open the DVR device */
-    msg_Dbg( p_input, "opening DVR device `%s'", DVR );
+    msg_Dbg( p_input, "opening DVR device `%s'", psz_dvr );
 
-    if( (p_satellite->i_handle = open( DVR,
+    if( (p_satellite->i_handle = open( psz_dvr,
                                    /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
     {
-        msg_Warn( p_input, "cannot open `%s' (%s)", DVR, strerror(errno) );
+        msg_Warn( p_input, "cannot open `%s' (%s)", psz_dvr, strerror(errno) );
         free( p_satellite );
         return -1;
     }
+
+    /* FIXME : this is from the Dreambox port. I have no idea whether it
+     * hurts or helps other DVB interfaces, so I just leave it here.
+     * Feel free to remove it if it breaks. --Meuuh */
+    ioctl_SetBufferSize( p_satellite->i_handle, DMX_BUFFER_SIZE );
 
     /* Get antenna configuration options */
     b_diseqc = config_GetInt( p_input, "diseqc" );
@@ -214,58 +228,63 @@ int E_(Open) ( vlc_object_t *p_this )
 
     /* Initialize the Satellite Card */
 
-    msg_Dbg( p_input, "initializing Sat Card with Freq: %d, Pol: %d, "
-                      "FEC: %03f, Srate: %d", i_freq, b_pol, f_fec, i_srate );
-
-    if ( ioctl_SECControl( i_freq, b_pol, i_lnb_slof, b_diseqc ) < 0 )
+    if ( i_freq )
     {
-        msg_Err( p_input, "an error occured when controling SEC" );
-        close( p_satellite->i_handle );
-        free( p_satellite );
-        return -1;
-    }
+        int i_tuner = config_GetInt( p_input, "dvb-tuner" );
 
-    msg_Dbg( p_input, "initializing frontend device" );
-    switch (ioctl_SetQPSKFrontend ( i_freq, i_srate, f_fec,
-                i_lnb_lof1, i_lnb_lof2, i_lnb_slof))
-    {
-        case -2:
-            msg_Err( p_input, "frontend returned an unexpected event" );
+        msg_Dbg( p_input, "initializing Sat Card with Freq: %d, Pol: %d, "
+                          "FEC: %03f, Srate: %d", i_freq, b_pol, f_fec, i_srate );
+
+        if ( ioctl_SECControl( i_tuner, i_freq, b_pol, i_lnb_slof, b_diseqc ) < 0 )
+        {
+            msg_Err( p_input, "an error occured when controling SEC" );
             close( p_satellite->i_handle );
             free( p_satellite );
             return -1;
-            break;
-        case -3:
-            msg_Err( p_input, "frontend returned no event" );
-            close( p_satellite->i_handle );
-            free( p_satellite );
-            return -1;
-            break;
-        case -4:
-            msg_Err( p_input, "frontend: timeout when polling for event" );
-            close( p_satellite->i_handle );
-            free( p_satellite );
-            return -1;
-            break;
-        case -5:
-            msg_Err( p_input, "an error occured when polling frontend device" );
-            close( p_satellite->i_handle );
-            free( p_satellite );
-            return -1;
-            break;
-        case -1:
-            msg_Err( p_input, "frontend returned a failure event" );
-            close( p_satellite->i_handle );
-            free( p_satellite );
-            return -1;
-            break;
-        default:
-            break;
-    }
+        }
+
+        msg_Dbg( p_input, "initializing frontend device" );
+        switch (ioctl_SetQPSKFrontend ( i_tuner, i_freq, i_srate, f_fec,
+                    i_lnb_lof1, i_lnb_lof2, i_lnb_slof))
+        {
+            case -2:
+                msg_Err( p_input, "frontend returned an unexpected event" );
+                close( p_satellite->i_handle );
+                free( p_satellite );
+                return -1;
+                break;
+            case -3:
+                msg_Err( p_input, "frontend returned no event" );
+                close( p_satellite->i_handle );
+                free( p_satellite );
+                return -1;
+                break;
+            case -4:
+                msg_Err( p_input, "frontend: timeout when polling for event" );
+                close( p_satellite->i_handle );
+                free( p_satellite );
+                return -1;
+                break;
+            case -5:
+                msg_Err( p_input, "an error occured when polling frontend device" );
+                close( p_satellite->i_handle );
+                free( p_satellite );
+                return -1;
+                break;
+            case -1:
+                msg_Err( p_input, "frontend returned a failure event" );
+                close( p_satellite->i_handle );
+                free( p_satellite );
+                return -1;
+                break;
+            default:
+                break;
+        }
+    } /* i_freq */
 
     msg_Dbg( p_input, "setting filter on PAT" );
 
-    if ( ioctl_SetDMXFilter( 0, &i_fd, 3 ) < 0 )
+    if ( ioctl_SetDMXFilter( i_demux, 0, &i_fd, 3 ) < 0 )
     {
         msg_Err( p_input, "an error occured when setting filter on PAT" );
         close( p_satellite->i_handle );
@@ -332,19 +351,30 @@ static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
 {
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
     ssize_t i_ret;
- 
+    int i_program = config_GetInt( p_input, "program" );
+    int i_demux = config_GetInt( p_input, "dvb-dmx" );
+
     unsigned int i;
 
     /* if not set, set filters to the PMTs */
+    /* This is kludgy and consumes way too much CPU power - the access
+     * module should have a callback from the demux when a new program
+     * is encountered. --Meuuh */
     for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
     {
-        if ( p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd == 0 )
+        /* Only set a filter on the selected program : some boards
+         * (read: Dreambox) only have 8 filters, so you don't want to
+         * spend them on unwanted PMTs. --Meuuh */
+        if ( (!i_program || p_input->stream.pp_programs[i]->i_number == i_program) && p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd == 0 )
         {
-            msg_Dbg( p_input, "setting filter on pmt pid %d",
+            msg_Dbg( p_input, "setting filter on PMT pid %d",
                      p_input->stream.pp_programs[i]->pp_es[0]->i_id );
-            ioctl_SetDMXFilter( p_input->stream.pp_programs[i]->pp_es[0]->i_id,
+            if (ioctl_SetDMXFilter( i_demux, p_input->stream.pp_programs[i]->pp_es[0]->i_id,
                        &p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd,
-                       3 );
+                       3 ) < 0)
+            {
+                msg_Err(p_input, "ioctl_SetDMXFilter failed");
+            }
         }
     }
 
@@ -380,6 +410,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
 {
     unsigned int i_es_index;
     vlc_value_t val;
+    int i_demux = config_GetInt( p_input, "dvb-dmx" );
 
     if ( p_input->stream.p_selected_program )
     {
@@ -402,7 +433,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
         }
     }
 
-    for (i_es_index = 1 ; i_es_index < p_new_prg->i_es_number ; i_es_index ++ )
+    for ( i_es_index = 1 ; i_es_index < p_new_prg->i_es_number ; i_es_index ++ )
     {
 #define p_es p_new_prg->pp_es[i_es_index]
         switch( p_es->i_cat )
@@ -410,22 +441,57 @@ int SatelliteSetProgram( input_thread_t    * p_input,
             case MPEG1_VIDEO_ES:
             case MPEG2_VIDEO_ES:
             case MPEG2_MOTO_VIDEO_ES:
-                if ( input_SelectES( p_input , p_es ) == 0 )
+                msg_Dbg(p_input, "setting filter on video ES 0x%x",
+                        p_es->i_id);
+                /* First set the filter. This may seem a little odd, but
+                 * it allows you to stream the video with demuxstream
+                 * without having a decoder or a stream output behind.
+                 * The result is you'll sometimes filter a PID which you
+                 * don't really want, but in the most common cases it
+                 * should be OK. --Meuuh */
+                if (ioctl_SetDMXFilter( i_demux, p_es->i_id, &p_es->i_demux_fd, 1) < 0)
                 {
-                    ioctl_SetDMXFilter( p_es->i_id, &p_es->i_demux_fd, 1);
+                    msg_Dbg(p_input, "ioctl_SetDMXFilter failed");
+                }
+                else
+                {
+                    input_SelectES( p_input , p_es );
                 }
                 break;
+
             case MPEG1_AUDIO_ES:
             case MPEG2_AUDIO_ES:
-                if ( input_SelectES( p_input , p_es ) == 0 )
+                msg_Dbg(p_input, "setting filter on audio ES 0x%x",
+                        p_es->i_id);
+                if (ioctl_SetDMXFilter( i_demux, p_es->i_id, &p_es->i_demux_fd, 3) < 0)
                 {
-                    ioctl_SetDMXFilter( p_es->i_id, &p_es->i_demux_fd, 2);
+                    msg_Dbg(p_input, "ioctl_SetDMXFilter failed");
+                }
+                else
+                {
                     input_SelectES( p_input , p_es );
                 }
                 break;
             default:
-                ioctl_SetDMXFilter( p_es->i_id, &p_es->i_demux_fd, 3);
-                input_SelectES( p_input , p_es );
+                /* Do not select private streams. This is to avoid the
+                 * limit of 8 filters on the Dreambox and possibly on
+                 * other boards. We should probably change that to
+                 * have the DVB subtitles, but filtering all private
+                 * streams including DVB tables and padding seems
+                 * nonsense to me. --Meuuh */
+#if 0
+                msg_Dbg(p_input, "setting filter on misc (0x%x) ES 0x%x",
+                        p_es->i_cat,
+                        p_es->i_id);
+                if (ioctl_SetDMXFilter( i_demux, p_es->i_id, &p_es->i_demux_fd, 3) < 0)
+                {
+                    msg_Dbg(p_input, "ioctl_SetDMXFilter failed");
+                }
+                else
+                {
+                    input_SelectES( p_input , p_es );
+                }
+#endif
                 break;
 #undef p_es
         }

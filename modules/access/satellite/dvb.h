@@ -33,7 +33,8 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-int ioctl_SECControl( int , int , int , int );
-int ioctl_SetQPSKFrontend ( int , int , int , int , int , int );
-int ioctl_SetDMXFilter( int , int *, int );
+int ioctl_SECControl( int, int , int , int , int );
+int ioctl_SetQPSKFrontend ( int, int , int , int , int , int , int );
+int ioctl_SetDMXFilter( int, int , int *, int );
 int ioctl_UnsetDMXFilter( int );
+int ioctl_SetBufferSize( int, size_t );

@@ -50,13 +50,16 @@
  *****************************************************************************/
 
 
-int ioctl_SECControl( int freq, int pol, int lnb_slof, int diseqc)
+int ioctl_SECControl( int sec_nb, int freq, int pol, int lnb_slof, int diseqc )
 {
     struct secCommand scmd;
     struct secCmdSequence scmds;
     int sec;
+    char psz_sec[255];
 
-    if((sec = open(SEC,O_RDWR)) < 0)
+    snprintf(psz_sec, sizeof(psz_sec), SEC "%d", sec_nb);
+
+    if((sec = open(psz_sec, O_RDWR)) < 0)
     {
         return -1;
     }
@@ -100,15 +103,18 @@ static int check_qpsk( int );
  * ioctl_SetQPSKFrontend : controls the FE device
  *****************************************************************************/
 
-int ioctl_SetQPSKFrontend (int freq, int srate, int fec,\
+int ioctl_SetQPSKFrontend (int fe_nb, int freq, int srate, int fec,\
                         int lnb_lof1, int lnb_lof2, int lnb_slof)
 {
     FrontendParameters fep;
     int front;
     int rc;
+    char psz_fe[255];
+
+    snprintf(psz_fe, sizeof(psz_fe), FRONTEND "%d", fe_nb);
 
     /* Open the frontend device */
-    if((front = open(FRONTEND,O_RDWR)) < 0)
+    if((front = open(psz_fe, O_RDWR)) < 0)
     {
         return -1;
     }
@@ -187,12 +193,15 @@ static int check_qpsk(int front)
  * ioctl_SetDMXAudioFilter : controls the demux to add a filter
  *****************************************************************************/
 
-int ioctl_SetDMXFilter( int i_pid, int * pi_fd , int i_type ) 
+int ioctl_SetDMXFilter( int dmx_nb, int i_pid, int * pi_fd , int i_type ) 
 {
     struct dmxPesFilterParams s_filter_params;
-    
+    char psz_dmx[255];
+
+    snprintf(psz_dmx, sizeof(psz_dmx), DMX "%d", dmx_nb);
+
     /* We first open the device */
-    if ((*pi_fd = open(DMX, O_RDWR|O_NONBLOCK))  < 0)
+    if ((*pi_fd = open(psz_dmx, O_RDWR|O_NONBLOCK))  < 0)
     {
         return -1;
     }
@@ -203,6 +212,12 @@ int ioctl_SetDMXFilter( int i_pid, int * pi_fd , int i_type )
     s_filter_params.output  =   DMX_OUT_TS_TAP;
     switch ( i_type )
     {
+        /* AFAIK you shouldn't use DMX_PES_VIDEO and DMX_PES_AUDIO
+         * unless you want to use a hardware decoder. In all cases
+         * I know DMX_PES_OTHER is quite enough for what we want to
+         * do. In case you have problems, you can still try to
+         * reenable them here : --Meuuh */
+#if 0
         case 1:
             s_filter_params.pesType =   DMX_PES_VIDEO;
             break;
@@ -210,6 +225,8 @@ int ioctl_SetDMXFilter( int i_pid, int * pi_fd , int i_type )
             s_filter_params.pesType =   DMX_PES_AUDIO;
             break;
         case 3:
+#endif
+        default:
             s_filter_params.pesType =   DMX_PES_OTHER;
             break;
     }
@@ -232,4 +249,13 @@ int ioctl_UnsetDMXFilter(int demux)
     ioctl(demux, DMX_STOP);
     close(demux);
     return 0;
+}
+
+
+/*****************************************************************************
+ * ioctl_SetBufferSize :
+ *****************************************************************************/
+int ioctl_SetBufferSize(int handle, size_t size)
+{
+    return ioctl(handle, DMX_SET_BUFFER_SIZE, size);
 }
