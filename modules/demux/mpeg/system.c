@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: system.c,v 1.30 2004/01/25 20:05:28 hartman Exp $
+ * $Id: system.c,v 1.31 2004/02/20 17:16:50 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1240,6 +1240,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
     vlc_bool_t          b_psi = 0;                        /* Is this a PSI ? */
     vlc_bool_t          b_dvbsub = 0;            /* Is this a dvb subtitle ? */
     vlc_bool_t          b_pcr = 0;                   /* Does it have a PCR ? */
+    vlc_bool_t          b_scrambled;
     es_descriptor_t *   p_es = NULL;
     es_ts_data_t *      p_es_demux = NULL;
     pgrm_ts_data_t *    p_pgrm_demux = NULL;
@@ -1250,6 +1251,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
     /* Extract flags values from TS common header. */
     i_pid = ((p[1] & 0x1F) << 8) | p[2];
     b_unit_start = (p[1] & 0x40);
+    b_scrambled = (p[3] & 0xc0);
     b_adaptation = (p[3] & 0x20);
     b_payload = (p[3] & 0x10);
 
@@ -1301,6 +1303,11 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
     }
     else if( p_es->p_dec == NULL && !b_psi && !b_dvbsub )
     {
+        b_trash = 1;
+    }
+    else if( b_scrambled )
+    {
+        msg_Warn( p_input, "scrambled packet for PID %d counter %x", i_pid, p[3] & 0x0f );
         b_trash = 1;
     }
 
