@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.67 2001/12/07 18:33:08 sam Exp $
+ * $Id: vout_sdl.c,v 1.67.2.1 2001/12/18 00:51:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -139,6 +139,11 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
+    if( SDL_WasInit( SDL_INIT_VIDEO ) != 0 )
+    {
+        return( 0 );
+    }
+
     if( TestMethod( VOUT_METHOD_VAR, "sdl" ) )
     {
         return( 999 );
@@ -200,6 +205,7 @@ static int vout_Create( vout_thread_t *p_vout )
     if( SDLOpenDisplay(p_vout) )
     {
         intf_ErrMsg( "vout error: can't set up SDL (%s)", SDL_GetError() );
+        SDL_QuitSubSystem( SDL_INIT_VIDEO );
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -274,8 +280,7 @@ static int vout_Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_End( vout_thread_t *p_vout )
 {
-    SDLCloseDisplay( p_vout );
-    SDL_QuitSubSystem( SDL_INIT_VIDEO );
+    ;
 }
 
 /*****************************************************************************
@@ -285,6 +290,10 @@ static void vout_End( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Destroy( vout_thread_t *p_vout )
 {
+    SDLCloseDisplay( p_vout );
+
+    SDL_QuitSubSystem( SDL_INIT_VIDEO );
+
     free( p_vout->p_sys );
 }
 
