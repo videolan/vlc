@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.18 2003/07/21 01:38:37 hartman Exp $
+# $Id: vlc.ebuild,v 1.19 2003/08/24 08:12:01 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -25,11 +25,18 @@
 # Thanks to the Gentoo Team for supporting us.
 ###############################################################################
 
-IUSE="arts ncurses dvd gtk nls 3dfx svga fbcon esd X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l lirc wxwindows imlib matroska dvb pvr mozilla mad debug xvid"
+# Missing support for...
+#	tarkin - package not in portage yet - experimental
+#	theora - package not in portage yet - experimental
+#	tremor - package not in portage yet - experimental
+
+IUSE="arts ncurses dvd gtk nls 3dfx svga fbcon esd X alsa ggi
+      oggvorbis gnome xv oss sdl aalib slp truetype v4l xvid lirc 
+	  wxwindows imlib matroska dvb mozilla debug faad xosd altivec"
 
 # Change these to correspond with the
 # unpacked dirnames of the CVS snapshots.
-PFFMPEG=ffmpeg-20030622
+PFFMPEG=ffmpeg-20030813
 PLIBMPEG2=mpeg2dec-20030612
 
 S=${WORKDIR}/${P}
@@ -39,7 +46,7 @@ SLIBMPEG2=${WORKDIR}/${PLIBMPEG2}
 DESCRIPTION="VLC media player - Video player and streamer"
 SRC_URI="http://www.videolan.org/pub/${PN}/${PV}/${P}.tar.bz2
 		 http://www.videolan.org/pub/${PN}/${PV}/contrib/mpeg2dec-20030612.tar.bz2
-		 http://www.videolan.org/pub/${PN}/${PV}/contrib/ffmpeg-20030622.tar.bz2"
+		 http://www.videolan.org/pub/${PN}/${PV}/contrib/ffmpeg-20030813.tar.bz2"
 
 HOMEPAGE="http://www.videolan.org/vlc"
 
@@ -53,9 +60,10 @@ DEPEND="X? ( virtual/x11 )
 	dvb? ( media-libs/libdvb
 		media-tv/linuxtv-dvb )
 	dvd? ( >=media-libs/libdvdread-0.9.3
-		>=media-libs/libdvdcss-1.2.6
+		>=media-libs/libdvdcss-1.2.8
 		>=media-libs/libdvdplay-1.0.1 )
 	esd? ( >=media-sound/esound-0.2.22 )
+	faad? ( >=media-libs/faad2-1.1 )
 	ggi? ( >=media-libs/libggi-2.0_beta3 )
 	gnome? ( >=gnome-base/gnome-libs-1.4.1.2-r1 )
 	gtk? ( =x11-libs/gtk+-1.2* )
@@ -63,7 +71,7 @@ DEPEND="X? ( virtual/x11 )
 	lirc? ( app-misc/lirc )
 	mad? ( media-libs/libmad
 		media-libs/libid3tag )
-	matroska? ( media-libs/libmatroska )
+	matroska? ( >=media-libs/libmatroska-0.4.4 )
 	mozilla? ( >=net-www/mozilla-1.4 )
 	ncurses? ( sys-libs/ncurses )
 	nls? ( sys-devel/gettext )
@@ -73,58 +81,32 @@ DEPEND="X? ( virtual/x11 )
 	slp? ( >=net-libs/openslp-1.0.10 )
 	truetype? ( >=media-libs/freetype-2.1.4 )
 	wxwindows? ( >=x11-libs/wxGTK-2.4.1 )
+	xosd? ( >=x11-libs/xosd-2.0 )
 	xvid? ( >=media-libs/xvid-0.9.1 )
+	3dfx? ( media-libs/glide-v3 )
 	>=media-sound/lame-3.93.1
-	>=media-libs/libdvbpsi-0.1.2
-	>=media-libs/faad2-1.1
+	>=media-libs/libdvbpsi-0.1.3
 	>=media-libs/a52dec-0.7.4
 	>=media-libs/flac-1.1.0"
 
-# Missing support for
-#	tarkin
-#	theora
-#	tremor
-
-# get kde and arts paths
-if [ -n "`use kde`" -o -n "`use arts`" ]; then
-    inherit kde-functions
-    set-kdedir 3
-    # $KDEDIR is now set to arts/kdelibs location
-fi
+inherit gcc
 
 src_unpack() {
 	
 	unpack ${A}
 	cd ${S}
 
-	# if qt3 is installed, patch vlc to work with it instead of qt2
-	( use qt || use kde ) && ( \
-	if [ ${QTDIR} = "/usr/qt/3" ]
-	then
-		cp configure configure.orig
-		sed -e "s:-lkfile::" configure.orig > configure
-
-		cd ${S}/modules/gui/kde
-		cp interface.h interface.h.orig
-		sed -e "s:\(#include <kmainwindow.h>\):\1\n#include <kstatusbar.h>:" \
-			interface.h.orig > interface.h
-
-		cp preferences.cpp preferences.cpp.orig
-		sed -e 's:\("vlc preferences", true, false, \)\("Save\):\1(KGuiItem)\2:' \
-			preferences.cpp.orig > preferences.cpp
-	fi
-	)
-
 	# Change the location of the glide headers
 	cd ${S}
-	cp configure configure.orig
-	sed -e "s:/usr/include/glide:/usr/include/glide3:" configure.orig > configure
+	sed -i -e "s:/usr/include/glide:/usr/include/glide3:" configure
+	sed -i -e "s:glide2x:glide3:" configure
+	cd ${S}/modules/video_output
+	epatch ${FILESDIR}/glide.patch
+	cd ${S}
 	
 	# patch libmpeg2
 	cd ${SLIBMPEG2}
-	cp configure configure.orig
-	sed -e 's:OPT_CFLAGS=\"$CFLAGS -mcpu=.*\":OPT_CFLAGS=\"$CFLAGS\":g' \
-		configure.orig > configure
+	sed -i -e 's:OPT_CFLAGS=\"$CFLAGS -mcpu=.*\":OPT_CFLAGS=\"$CFLAGS\":g' configure
 
 }
 
@@ -138,38 +120,45 @@ src_compile(){
 
 	# configure and building of ffmpeg
 	cd ${SFFMPEG}
-	myconf=""
+	local myconf
 	use mmx || myconf="--disable-mmx"
 
 	./configure ${myconf} \
 		--enable-mp3lame \
 		--disable-vorbis || die "./configure of ffmpeg failed"
 	
-	cd libavcodec
-	make || die "make of ffmpeg failed"
 	cd libpostproc
 	make || die "make of libpostproc failed"
+	cd libavcodec
+	make || die "make of libavcodec failed"
 
 	# Configure and build VLC
 	cd ${S}
-	myconf=""
+	
+	# Avoid timestamp skews with autotools
+	touch configure.ac
+	touch aclocal.m4
+	touch configure
+	touch config.h.in
+	touch `find . -name Makefile.in`
+	
+	local myconf
+	myconf="--disable-mga --enable-flac --with-gnu-ld"
 
-	use X || myconf="${myconf} --disable-x11"
+    #--enable-pth				GNU Pth support (default disabled)
+	#--enable-st				State Threads (default disabled)
+	#--enable-gprof				gprof profiling (default disabled)
+	#--enable-cprof				cprof profiling (default disabled)
+	#--enable-mostly-builtin	most modules will be built-in (default enabled)
+	#--disable-optimizations	disable compiler optimizations (default disabled)
+	#--enable-testsuite			build test modules (default disabled)
+	#--disable-plugins			make all plugins built-in (default disabled)
 
-	use xv || myconf="${myconf} --disable-xvideo"
-
-	use ggi && myconf="${myconf} --enable-ggi"
-
-	use 3dfx && myconf="${myconf} --enable-glide"
-
-	use svga && myconf="${myconf} --enable-svgalib"
-
-	use sdl || myconf="${myconf} --disable-sdl"
-
-	use fbcon || myconf="${myconf} --disable-fb"
-
-	use aalib && myconf="${myconf} --enable-aa"
-
+	use nls || myconf="${myconf} --disable-nls"
+	
+	use debug && myconf="${myconf} --enable-debug" \
+		|| myconf="${myconf} --enable-release"
+	
 	use dvd \
 		&& myconf="${myconf} --enable-dvdread" \
 		|| myconf="${myconf} \
@@ -178,7 +167,37 @@ src_compile(){
 			--disable-dvdplay \
 			--disable-vcd"
 
-	use alsa && myconf="${myconf} --enable-alsa"
+	use v4l && myconf="${myconf} --enable-v4l"
+
+	use dvb && myconf="${myconf} --enable-satellite --enable-pvr --enable-dvb"
+
+	use oggvorbis || myconf="${myconf} --disable-vorbis --disable-ogg"
+
+	use matroska || myconf="${myconf} --disable-mkv"
+
+	use mad || myconf="${myconf} --disable-mad"
+
+	use faad && myconf="${myconf} --enable-faad"
+
+	use xvid && myconf="${myconf} --enable-xvid"
+
+	use X || myconf="${myconf} --disable-x11"
+
+	use xv || myconf="${myconf} --disable-xvideo"
+
+	use sdl || myconf="${myconf} --disable-sdl"
+
+	use truetype || myconf="${myconf} --disable-freetype"
+
+	use fbcon || myconf="${myconf} --disable-fb"
+
+	use svga && myconf="${myconf} --enable-svgalib"
+
+	use ggi && myconf="${myconf} --enable-ggi"
+
+	use 3dfx && myconf="${myconf} --enable-glide"
+
+	use aalib && myconf="${myconf} --enable-aa"
 
 	use oss || myconf="${myconf} --disable-oss"
 
@@ -186,54 +205,30 @@ src_compile(){
 
 	use arts && myconf="${myconf} --enable-arts"
 
-	use nls || myconf="${myconf} --disable-nls"
+	use alsa && myconf="${myconf} --enable-alsa"
 
-	# the current gtk2 and gnome2 are prelimenary frameworks
-	use gtk \
-		&& myconf="${myconf} --disable-gtk2" \
-		|| myconf="${myconf} --disable-gtk --disable-gtk2"
+	(use imlib && use wxwindows) && myconf="${myconf} --enable-skins"
 
-	use gnome && myconf="${myconf} --enable-gnome --disable-gnome2"
+	use gtk || myconf="${myconf} --disable-gtk"
+
+	use gnome && myconf="${myconf} --enable-gnome"
 
 	use ncurses && myconf="${myconf} --enable-ncurses"
 
-	use oggvorbis || myconf="${myconf} --disable-vorbis --disable-ogg"
-
-	use lirc && myconf="${myconf} --enable-lirc"
+	use xosd && myconf="${myconf} --enable-xosd"
 
 	use slp || myconf="${myconf} --disable-slp"
 
-	use mad || myconf="${myconf} --disable-mad"
+	use lirc && myconf="${myconf} --enable-lirc"
 
-	# xvid is a local USE var, see /usr/portage/profiles/use.local.desc for more details
-	use xvid && myconf="${myconf} --enable-xvid"
+	use joystick && myconf="${myconf} --enable-joystick"
 
-	use truetype || myconf="${myconf} --disable-freetype"
-
-	# v4l is a local USE var, see /usr/portage/profiles/use.local.desc for more details
-	use v4l && myconf="${myconf} --enable-v4l"
-
-	# If we use wxwindows and imlib, then we can also use skins
-	(use imlib && use wxwindows) && myconf="${myconf} --enable-skins"
-
-	# matroska is a local USE var. 
-	# http://forums.gentoo.org/viewtopic.php?t=63722&highlight=matroska
-	use matroska && myconf="${myconf} --enable-mkv"
-
-	use dvb && myconf="${myconf} --enable-satellite"
-
-	# pvr is a local USE var, see /usr/portage/profiles/use.local.desc for more details
-	use pvr && myconf="${myconf} --enable-pvr"
-
-	if [ "`use mozilla`" ]; then
-	  myconf="${myconf} --enable-mozilla \
+	use mozilla && \
+		myconf="${myconf} --enable-mozilla \
 	    MOZILLA_CONFIG=/usr/lib/mozilla/mozilla-config \
 	    XPIDL=/usr/bin/xpidl"
-	fi
 
-	use debug \
-		&& myconf="${myconf} --enable-debug" \
-		|| myconf="${myconf} --enable-release"
+	use altivec || myconf="${myconf} --disable-altivec"
 
 	# vlc uses its own ultraoptimizaed CXXFLAGS
 	# and forcing custom ones generally fails building
@@ -242,30 +237,23 @@ src_compile(){
 	export WANT_AUTOCONF_2_5=1
 	export WANT_AUTOMAKE_1_6=1
 
-	# Avoid timestamp skews with autotools
-	touch configure.ac
-	touch aclocal.m4
-	touch configure
-	touch config.h.in
-	touch `find . -name Makefile.in`
-
 	myconf="${myconf} --enable-ffmpeg --with-ffmpeg-tree=${SFFMPEG} \
 		--with-ffmpeg-mp3lame \
 		--enable-libmpeg2 --with-libmpeg2-tree=${SLIBMPEG2} \
-		--enable-dvbpsi \
-		--enable-faad \
 		--enable-flac \
-		--enable-a52 \
 		--disable-kde \
 		--disable-qt"
 
-	ewarn ${myconf}
 	econf ${myconf} || die "configure of VLC failed"
+
+	if [ `gcc-major-version` -eq 2 ]; then
+		sed -i s:"-fomit-frame-pointer":: vlc-config
+	fi
 
 	# parallel make doesn't work with our complicated makefile
 	# this is also the reason as why you shouldn't run autoconf
 	# or automake yourself. (or bootstrap for that matter)
-	MAKEOPTS="${MAKEOPTS} -j1
+	MAKEOPTS="${MAKEOPTS} -j1"
 	emake || die "make of VLC failed"
 }
 
