@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.80 2003/04/22 16:36:16 titer Exp $
+ * $Id: libvlc.c,v 1.81 2003/04/24 17:44:53 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -341,6 +341,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         module_EndBank( p_vlc );
         module_InitBank( &libvlc );
         module_LoadMain( &libvlc );
+        config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE );
     }
 #endif
 
