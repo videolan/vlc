@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.4 2003/03/30 18:14:36 gbazin Exp $
+ * $Id: theora.c,v 1.5 2003/06/11 15:53:50 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -50,6 +50,7 @@ typedef struct dec_thread_t
      * Theora properties
      */
     theora_info      ti;                        /* theora bitstream settings */
+    theora_comment   tc;                            /* theora comment header */
     theora_state     td;                   /* theora bitstream user comments */
 
     /*
@@ -126,23 +127,51 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     p_dec->p_pes  = NULL;
     p_dec->p_vout = NULL;
 
+    /* Init supporting Theora structures needed in header parsing */
+    theora_comment_init( &p_dec->tc );
+    theora_info_init( &p_dec->ti );
+
     /* Take care of the initial Theora header */
     if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
         goto error;
 
     oggpacket.b_o_s = 1; /* yes this actually is a b_o_s packet :) */
-    if( theora_decode_header( &p_dec->ti, &oggpacket ) < 0 )
+    if( theora_decode_header( &p_dec->ti, &p_dec->tc, &oggpacket ) < 0 )
     {
         msg_Err( p_dec->p_fifo, "This bitstream does not contain Theora "
-                 "video data");
+                 "video data" );
         goto error;
     }
 
-    /* Initialize decoder */
+    /* The next two packets in order are the comment and codebook headers.
+       We need to watch out that these packets are not missing as a
+       missing or corrupted header is fatal. */
+    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
+        goto error;
+
+    if( theora_decode_header( &p_dec->ti, &p_dec->tc, &oggpacket ) < 0 )
+    {
+        msg_Err( p_dec->p_fifo, "2nd Theora header is corrupted" );
+        goto error;
+    }
+
+    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
+        goto error;
+
+    if( theora_decode_header( &p_dec->ti, &p_dec->tc, &oggpacket ) < 0 )
+    {
+        msg_Err( p_dec->p_fifo, "3rd Theora header is corrupted" );
+        goto error;
+    }
+
+    /* We have all the headers, initialize decoder */
     theora_decode_init( &p_dec->td, &p_dec->ti );
-    msg_Dbg( p_dec->p_fifo, "%dx%d %.02f fps video",
+    msg_Dbg( p_dec->p_fifo, "%dx%d %.02f fps video, frame content is %dx%d "
+             "with offset (%d,%d)",
              p_dec->ti.width, p_dec->ti.height,
-             (double)p_dec->ti.fps_numerator/p_dec->ti.fps_denominator);
+             (double)p_dec->ti.fps_numerator/p_dec->ti.fps_denominator,
+             p_dec->ti.frame_width, p_dec->ti.frame_height,
+             p_dec->ti.offset_x, p_dec->ti.offset_y );
 
     /* Initialize video output */
     if( p_dec->ti.aspect_denominator )
@@ -266,6 +295,9 @@ static void CloseDecoder( dec_thread_t * p_dec )
             input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_dec->p_pes );
 
         vout_Request( p_dec->p_fifo, p_dec->p_vout, 0, 0, 0, 0 );
+
+        theora_info_clear( &p_dec->ti );
+        theora_comment_clear( &p_dec->tc );
 
         free( p_dec );
     }

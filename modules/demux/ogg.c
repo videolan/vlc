@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.25 2003/05/05 22:23:34 gbazin Exp $
+ * $Id: ogg.c,v 1.26 2003/06/11 15:53:50 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -381,6 +381,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         switch( p_stream->i_fourcc )
         {
         case VLC_FOURCC( 'v','o','r','b' ):
+        case VLC_FOURCC( 't','h','e','o' ):
           if( p_stream->i_packets_backup == 3 ) p_stream->b_force_backup = 0;
           break;
 
@@ -575,6 +576,11 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                     p_stream->i_cat = VIDEO_ES;
                     p_stream->i_fourcc = VLC_FOURCC( 't','h','e','o' );
 
+                    /* Signal that we want to keep a backup of the vorbis
+                     * stream headers. They will be used when switching between
+                     * audio streams. */
+                    p_stream->b_force_backup = 1;
+
                     /* Cheat and get additionnal info ;) */
                     oggpackB_readinit(&opb, oggpacket.packet, oggpacket.bytes);
                     oggpackB_adv( &opb, 56 );
@@ -583,13 +589,19 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                     oggpackB_read( &opb, 8 ); /* subminor version num */
                     oggpackB_read( &opb, 16 ) /*<< 4*/; /* width */
                     oggpackB_read( &opb, 16 ) /*<< 4*/; /* height */
+                    oggpackB_read( &opb, 24 ); /* frame width */
+                    oggpackB_read( &opb, 24 ); /* frame height */
+                    oggpackB_read( &opb, 8 ); /* x offset */
+                    oggpackB_read( &opb, 8 ); /* y offset */
+
                     i_fps_numerator = oggpackB_read( &opb, 32 );
                     i_fps_denominator = oggpackB_read( &opb, 32 );
                     oggpackB_read( &opb, 24 ); /* aspect_numerator */
                     oggpackB_read( &opb, 24 ); /* aspect_denominator */
                     i_keyframe_frequency_force = 1 << oggpackB_read( &opb, 5 );
+                    oggpackB_read( &opb, 8 ); /* colorspace */
                     p_stream->i_bitrate = oggpackB_read( &opb, 24 );
-                    oggpackB_read(&opb,6); /* quality */
+                    oggpackB_read( &opb, 6 ); /* quality */
 
                     /* granule_shift = i_log( frequency_force -1 ) */
                     p_stream->i_theora_keyframe_granule_shift = 0;
