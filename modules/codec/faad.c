@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: faad.c,v 1.9 2004/01/25 18:20:12 bigben Exp $
+ * $Id: faad.c,v 1.10 2004/02/19 15:13:49 jpsaman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -115,7 +115,11 @@ static int Open( vlc_object_t *p_this )
     /* Misc init */
     aout_DateSet( &p_sys->date, 0 );
     p_dec->fmt_out.i_cat = AUDIO_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+
+    if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
+        p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+    else
+        p_dec->fmt_out.i_codec = VLC_FOURCC('f','i','1','6');
     p_dec->pf_decode_audio = DecodeBlock;
 
     p_dec->fmt_out.audio.i_physical_channels =
@@ -147,7 +151,10 @@ static int Open( vlc_object_t *p_this )
 
     /* Set the faad config */
     cfg = faacDecGetCurrentConfiguration( p_sys->hfaad );
-    cfg->outputFormat = FAAD_FMT_FLOAT;
+    if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
+        cfg->outputFormat = FAAD_FMT_FLOAT;
+    else
+        cfg->outputFormat = FAAD_FMT_32BIT;
     faacDecSetConfiguration( p_sys->hfaad, cfg );
 
     /* buffer */
