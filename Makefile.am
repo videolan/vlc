@@ -720,7 +720,7 @@ package-macosx:
 	cd "$(srcdir)" && cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS $(top_builddir)/tmp/
 
 # Create disk image 
-	$(srcdir)/extras/MacOSX/macosx-dmg 25 "vlc-${VERSION}" $(top_builddir)/tmp/* 
+	$(srcdir)/extras/MacOSX/macosx-dmg "vlc-${VERSION}" $(top_builddir)/tmp
 
 # Clean up
 	rm -Rf $(top_builddir)/tmp

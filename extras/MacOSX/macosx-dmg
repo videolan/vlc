@@ -7,16 +7,19 @@
 set -e
 
 # Requires at least three args
-if [ $# -lt 3 ] ; then
-    echo "usage: $0 size name file ..." 1>&2
+if [ $# -lt 2 ] ; then
+    echo "usage: $0 imgName dirName ..." 1>&2
     exit 1
 fi
 
 # Grab size and name
-imgSize=$1
-shift
 imgName=$1
 shift
+dirName=$1
+shift
+
+imgSize=`du -sk ${dirName} | cut -f1`
+imgSize=$((${imgSize} / 1024 + 2))
 
 if [ $((${imgSize} < 5)) != 0 ] ; then
     imgSize=5;
@@ -28,18 +31,19 @@ echo; echo "Creating ${imgSize} MB disk image named ${imgName}"
 hdiutil create "${imgName}.dmg" -megabytes "${imgSize}" -layout NONE -quiet
 dev=`hdid -nomount "${imgName}.dmg" | grep '/dev/disk[0-9]*' | cut -d " " -f 1`
 /sbin/newfs_hfs -w -v "${imgName}" -b 4096 "${dev}" > /dev/null
-hdiutil eject "${dev}" -quiet
 
 # Mount the image and copy stuff
-dev=`hdid "${imgName}.dmg" | grep '/dev/disk[0-9]*' | cut -d " " -f 1`
+mkdir ./mountpoint
+mount -t hfs ${dev} ./mountpoint
 
 echo "Copying contents to ${imgName}:"
-while [ $# -gt 0 ] ; do
-    echo "  ${1}"
-    /Developer/Tools/CpMac -r "${1}" "/Volumes/${imgName}"
-    shift
+for i in ${dirName}/* ; do
+    echo "  ${i}"
+    /Developer/Tools/CpMac -r "${i}" ./mountpoint
 done
 
+umount ./mountpoint
+rmdir ./mountpoint
 hdiutil eject "${dev}" -quiet
 
 # Compress the image
