@@ -113,18 +113,6 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>vob</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>generic.icns</string>
-			<key>CFBundleTypeName</key>
-			<string>VOB File (DVD Video)</string>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
 			<string>Folder</string>
 			<key>CFBundleTypeOSTypes</key>
@@ -139,32 +127,10 @@
 			<array>
 				<string>asx</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>asx.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>ASX File</string>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>wma</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>generic.icns</string>
-			<key>CFBundleTypeName</key>
-			<string>WMA File</string>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>ogm</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>generic.icns</string>
-			<key>CFBundleTypeName</key>
-			<string>OGM FIle</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -174,21 +140,9 @@
 				<string>asf</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>generic.icns</string>
+			<string>asf.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>ASF File</string>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>wmv</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>generic.icns</string>
-			<key>CFBundleTypeName</key>
-			<string>WMV File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -199,21 +153,9 @@
 				<string>srt</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>generic.icns</string>
+			<string>sub.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>Subtitle File</string>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>mp3</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>generic.icns</string>
-			<key>CFBundleTypeName</key>
-			<string>MP3</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -223,7 +165,7 @@
 				<string>dv</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>generic.icns</string>
+			<string>dv.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>DV file</string>
 			<key>CFBundleTypeRole</key>
@@ -247,7 +189,7 @@
 				<string>pls</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>generic.icns</string>
+			<string>pls.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>Shoutcast playlist</string>
 			<key>CFBundleTypeRole</key>
@@ -259,7 +201,7 @@
 				<string>m3u</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>generic.icns</string>
+			<string>m3u.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>Playlist file</string>
 			<key>CFBundleTypeRole</key>
@@ -268,12 +210,12 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>ogg</string>
+				<string>vob</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>generic.icns</string>
+			<string>vob.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>OGG file</string>
+			<string>VOB File (DVD Video)</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -283,7 +225,7 @@
 				<string>dat</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>mpeg.icns</string>
+			<string>dat.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>DAT file</string>
 			<key>CFBundleTypeRole</key>
@@ -295,7 +237,7 @@
 				<string>cue</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>generic.icns</string>
+			<string>cue.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>CUE file</string>
 			<key>CFBundleTypeRole</key>
@@ -304,14 +246,69 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>mpg</string>
-				<string>mpeg</string>
-				<string>ts</string>
+				<string>iso</string>
+				<string>bin</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Iso file</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>mp3</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>mpeg.icns</string>
+			<string>mp3.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>MPEG File</string>
+			<string>MP3</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>a52</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>a52.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Raw a52</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>aac</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Raw aac</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>wma</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>wma.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>WMA File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>ogg</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>ogg.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>OGG file</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -321,9 +318,48 @@
 				<string>avi</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
+			<string>avi.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Avi file</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>ogm</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>ogm.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>OGM FIle</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>divx</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
 			<string>divx.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>DivX file</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>mpg</string>
+				<string>mpeg</string>
+				<string>ts</string>
+				<string>ps</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>mpeg.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>MPEG File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -360,6 +396,18 @@
 			<string>mpeg4.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>MPEG-4 File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>wmv</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>wmv.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>WMV File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -468,6 +516,28 @@
 				8EDAC3440440F72D0059A3A7,
 				8EE1AFA40444660F0059A3A7,
 				8E9CC7B2046EFD700059A3A7,
+				8E445F9D04728A700059A3A7,
+				8E445F9E04728A700059A3A7,
+				8E445F9F04728A700059A3A7,
+				8E445FA004728A700059A3A7,
+				8E445FA104728A700059A3A7,
+				8E445FA204728A700059A3A7,
+				8E445FA304728A700059A3A7,
+				8E445FA404728A700059A3A7,
+				8E445FA504728A700059A3A7,
+				8E445FA604728A700059A3A7,
+				8E445FA704728A700059A3A7,
+				8E445FA804728A700059A3A7,
+				8E445FA904728A700059A3A7,
+				8E445FAA04728A700059A3A7,
+				8E445FAB04728A700059A3A7,
+				8E445FAC04728A700059A3A7,
+				8E445FAD04728A700059A3A7,
+				8E445FAE04728A700059A3A7,
+				8E445FAF04728A700059A3A7,
+				8E445FB004728A700059A3A7,
+				8E445FB104728A700059A3A7,
+				8E445FB204728A700059A3A7,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -490,13 +560,7 @@
 		089C167CFE841241C02AAC07 = {
 			children = (
 				F74F13EA02C2A79C01EE194C,
-				F74F13DF02C2A53401EE194C,
-				F6E4F90A02D2648B01A80112,
-				F6E4F90B02D2648B01A80112,
-				F6E4F90C02D2648B01A80112,
-				F6E4F90D02D2648B01A80112,
-				F6E4F90E02D2648B01A80112,
-				F6E4F90F02D2648B01A80112,
+				8E445F86047289E50059A3A7,
 				A064F9E003CB9EE000B21232,
 				A064F9E103CB9EE000B21232,
 				A064F9E203CB9EE000B21232,
@@ -520,6 +584,7 @@
 			);
 			isa = PBXGroup;
 			name = Resources;
+			path = "";
 			refType = 4;
 		};
 		089C167FFE841241C02AAC07 = {
@@ -626,6 +691,307 @@
 //8E2
 //8E3
 //8E4
+		8E445F86047289E50059A3A7 = {
+			children = (
+				F74F13DF02C2A53401EE194C,
+				F6E4F90A02D2648B01A80112,
+				F6E4F90B02D2648B01A80112,
+				F6E4F90C02D2648B01A80112,
+				F6E4F90D02D2648B01A80112,
+				F6E4F90E02D2648B01A80112,
+				F6E4F90F02D2648B01A80112,
+				8E445F8704728A700059A3A7,
+				8E445F8804728A700059A3A7,
+				8E445F8904728A700059A3A7,
+				8E445F8A04728A700059A3A7,
+				8E445F8B04728A700059A3A7,
+				8E445F8C04728A700059A3A7,
+				8E445F8D04728A700059A3A7,
+				8E445F8E04728A700059A3A7,
+				8E445F8F04728A700059A3A7,
+				8E445F9004728A700059A3A7,
+				8E445F9104728A700059A3A7,
+				8E445F9204728A700059A3A7,
+				8E445F9304728A700059A3A7,
+				8E445F9404728A700059A3A7,
+				8E445F9504728A700059A3A7,
+				8E445F9604728A700059A3A7,
+				8E445F9704728A700059A3A7,
+				8E445F9804728A700059A3A7,
+				8E445F9904728A700059A3A7,
+				8E445F9A04728A700059A3A7,
+				8E445F9B04728A700059A3A7,
+				8E445F9C04728A700059A3A7,
+			);
+			isa = PBXGroup;
+			name = fileicons;
+			path = "";
+			refType = 4;
+		};
+		8E445F8704728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = a52.icns;
+			path = Resources/a52.icns;
+			refType = 2;
+		};
+		8E445F8804728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = aac.icns;
+			path = Resources/aac.icns;
+			refType = 2;
+		};
+		8E445F8904728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = asf.icns;
+			path = Resources/asf.icns;
+			refType = 2;
+		};
+		8E445F8A04728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = asx.icns;
+			path = Resources/asx.icns;
+			refType = 2;
+		};
+		8E445F8B04728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = avi.icns;
+			path = Resources/avi.icns;
+			refType = 2;
+		};
+		8E445F8C04728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = bin.icns;
+			path = Resources/bin.icns;
+			refType = 2;
+		};
+		8E445F8D04728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = cue.icns;
+			path = Resources/cue.icns;
+			refType = 2;
+		};
+		8E445F8E04728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = dat.icns;
+			path = Resources/dat.icns;
+			refType = 2;
+		};
+		8E445F8F04728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = dv.icns;
+			path = Resources/dv.icns;
+			refType = 2;
+		};
+		8E445F9004728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = m3u.icns;
+			path = Resources/m3u.icns;
+			refType = 2;
+		};
+		8E445F9104728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = mov.icns;
+			path = Resources/mov.icns;
+			refType = 2;
+		};
+		8E445F9204728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = mp3.icns;
+			path = Resources/mp3.icns;
+			refType = 2;
+		};
+		8E445F9304728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = mp4.icns;
+			path = Resources/mp4.icns;
+			refType = 2;
+		};
+		8E445F9404728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = mpg.icns;
+			path = Resources/mpg.icns;
+			refType = 2;
+		};
+		8E445F9504728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = ogg.icns;
+			path = Resources/ogg.icns;
+			refType = 2;
+		};
+		8E445F9604728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = ogm.icns;
+			path = Resources/ogm.icns;
+			refType = 2;
+		};
+		8E445F9704728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = pls.icns;
+			path = Resources/pls.icns;
+			refType = 2;
+		};
+		8E445F9804728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = srt.icns;
+			path = Resources/srt.icns;
+			refType = 2;
+		};
+		8E445F9904728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = sub.icns;
+			path = Resources/sub.icns;
+			refType = 2;
+		};
+		8E445F9A04728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = vob.icns;
+			path = Resources/vob.icns;
+			refType = 2;
+		};
+		8E445F9B04728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = wma.icns;
+			path = Resources/wma.icns;
+			refType = 2;
+		};
+		8E445F9C04728A700059A3A7 = {
+			isa = PBXFileReference;
+			name = wmv.icns;
+			path = Resources/wmv.icns;
+			refType = 2;
+		};
+		8E445F9D04728A700059A3A7 = {
+			fileRef = 8E445F8704728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445F9E04728A700059A3A7 = {
+			fileRef = 8E445F8804728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445F9F04728A700059A3A7 = {
+			fileRef = 8E445F8904728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FA004728A700059A3A7 = {
+			fileRef = 8E445F8A04728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FA104728A700059A3A7 = {
+			fileRef = 8E445F8B04728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FA204728A700059A3A7 = {
+			fileRef = 8E445F8C04728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FA304728A700059A3A7 = {
+			fileRef = 8E445F8D04728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FA404728A700059A3A7 = {
+			fileRef = 8E445F8E04728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FA504728A700059A3A7 = {
+			fileRef = 8E445F8F04728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FA604728A700059A3A7 = {
+			fileRef = 8E445F9004728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FA704728A700059A3A7 = {
+			fileRef = 8E445F9104728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FA804728A700059A3A7 = {
+			fileRef = 8E445F9204728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FA904728A700059A3A7 = {
+			fileRef = 8E445F9304728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FAA04728A700059A3A7 = {
+			fileRef = 8E445F9404728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FAB04728A700059A3A7 = {
+			fileRef = 8E445F9504728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FAC04728A700059A3A7 = {
+			fileRef = 8E445F9604728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FAD04728A700059A3A7 = {
+			fileRef = 8E445F9704728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FAE04728A700059A3A7 = {
+			fileRef = 8E445F9804728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FAF04728A700059A3A7 = {
+			fileRef = 8E445F9904728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FB004728A700059A3A7 = {
+			fileRef = 8E445F9A04728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FB104728A700059A3A7 = {
+			fileRef = 8E445F9B04728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E445FB204728A700059A3A7 = {
+			fileRef = 8E445F9C04728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		8E55FB7F0459B0FD00FB3317 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
