@@ -696,7 +696,7 @@ int playlist_LockClear( playlist_t *p_playlist )
 {
     int i_ret;
     vlc_mutex_lock( &p_playlist->object_lock );
-    playlist_Clear( p_playlist );
+    i_ret = playlist_Clear( p_playlist );
     vlc_mutex_unlock( &p_playlist->object_lock );
     return i_ret;
 }

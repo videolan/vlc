@@ -138,8 +138,8 @@ int playlist_ViewDump( playlist_t *p_playlist, playlist_view_t *p_view )
 #ifdef PLAYLIST_DEBUG
     msg_Dbg( p_playlist, "dumping view %i",p_view->i_id );
     playlist_NodeDump( p_playlist,p_view->p_root, 1 );
-    return VLC_SUCCESS;
 #endif
+    return VLC_SUCCESS;
 }
 
 /**
