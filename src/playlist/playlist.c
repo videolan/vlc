@@ -861,7 +861,11 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
             p_view = playlist_ViewFind( p_playlist,p_playlist->request.i_view );
             p_playlist->status.p_node = p_playlist->request.p_node;
             p_playlist->status.i_view = p_playlist->request.i_view;
-            if( i_skip > 0 )
+            if( !p_view )
+            {
+                msg_Err( p_playlist, "p_view is NULL and should not! (FIXME)" );
+            }
+            else if( i_skip > 0 )
             {
                 for( i = i_skip; i > 0 ; i-- )
                 {
@@ -939,18 +943,25 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
             playlist_view_t *p_view =
                     playlist_ViewFind( p_playlist,
                                    p_playlist->status.i_view );
-            p_new = playlist_FindNextFromParent( p_playlist,
+            if( !p_view )
+            {
+                msg_Err( p_playlist, "p_view is NULL and should not! (FIXME)" );
+            }
+            else
+            {
+                p_new = playlist_FindNextFromParent( p_playlist,
                             p_playlist->status.i_view,
                             p_view->p_root,
                             p_playlist->status.p_node,
                             p_playlist->status.p_item );
-            if( p_new == NULL && b_loop )
-            {
-                p_new = playlist_FindNextFromParent( p_playlist,
+                if( p_new == NULL && b_loop )
+                {
+                    p_new = playlist_FindNextFromParent( p_playlist,
                                    p_playlist->status.i_view,
                                    p_view->p_root,
                                    p_playlist->status.p_node,
                                    NULL );
+                }
             }
         }
     }
