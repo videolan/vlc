@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.18 2003/12/22 14:32:55 sam Exp $
+ * $Id: access.c,v 1.19 2003/12/28 20:50:20 asmax Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -599,6 +599,7 @@ CDDAFormatStr(const input_thread_t *p_input, cdda_data_t *p_cdda,
       add_format_num_info(p_cdda->i_nb_tracks, "%d");
       break;
 
+#ifdef HAVE_LIBCDDB
     case 's':
       if (p_cdda->i_cddb_enabled) {
         char psz_buffer[MSTRTIME_MAX_SIZE];
@@ -608,6 +609,7 @@ CDDAFormatStr(const input_thread_t *p_input, cdda_data_t *p_cdda,
         add_format_str_info(secstotimestr( psz_buffer, i_duration ) );
       } else goto not_special;
       break;
+#endif
 
     case 'T':
       add_format_num_info(i_track, "%02d");
@@ -684,9 +686,11 @@ CDDAFixupPlayList( input_thread_t *p_input, cdda_data_t *p_cdda,
 #ifdef HAVE_LIBCDDB
   p_cdda->i_cddb_enabled =
     config_GetInt( p_input, MODULE_STRING "-cddb-enabled" );
+  if( play_single_track && !p_cdda->i_cddb_enabled ) return 0;
+#else
+  if( play_single_track ) return 0;
 #endif
 
-  if (play_single_track && !p_cdda->i_cddb_enabled) return 0;
 
   psz_mrl = malloc( psz_mrl_max );
 
@@ -773,12 +777,14 @@ E_(CDDBEnabledCB)   ( vlc_object_t *p_this, const char *psz_name,
 
   p_cdda = (cdda_data_t *)p_cdda_input->p_access_data;
 
+#ifdef HAVE_LIBCDDB
   if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
     msg_Dbg( p_cdda_input, "Old CDDB Enabled (x%0x) %d, new (x%0x) %d",
              p_cdda->i_cddb_enabled, p_cdda->i_cddb_enabled,
              val.i_int, val.i_int);
   }
   p_cdda->i_cddb_enabled = val.i_int;
+#endif
   return VLC_SUCCESS;
 }
 
