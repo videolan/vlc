@@ -259,7 +259,7 @@ gettext-$(GETTEXT_VERSION).tar.gz:
 
 gettext: gettext-$(GETTEXT_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/gettext.patch
+#	patch -p 0 < Patches/gettext.patch
 
 .intl: gettext .iconv
 	( cd $< && ./configure --prefix=$(PREFIX) )
