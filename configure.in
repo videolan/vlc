@@ -1226,11 +1226,11 @@ dnl  (disabled by default)
 dnl
 AC_ARG_ENABLE(qte,
   [  --enable-qte            QT Embedded support (default disabled)])
-if test "x${enable_qte}" != "xno"
+if test "x${enable_qte}" = "xyes"
 then
   AC_ARG_WITH(qte,
   [    --with-qte=PATH       Qt Embedded headers and libraries])
-  if test "x${with_qte}" = "x"
+  if test "x${with_qte}" = "xyes" -a "x${with_qte}" != "x"
   then
     test_LDFLAGS="-L${QTDIR}/lib"
     test_CFLAGS="-I${QTDIR}/include"
@@ -1240,16 +1240,12 @@ then
   fi
 
   CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
-  AC_CHECK_HEADERS(qt.h, [
+  AC_CHECK_HEADERS(qte.h, [
     qte_CFLAGS="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
     qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -lqpe -lqte"
-    if test "x${with_qte}" = "x"
-    then
-      PLUGINS="${PLUGINS} qte"
-    else
-      BUILTINS="${BUILTINS} qte"
-    fi
-  ])
+    PLUGINS="${PLUGINS} qte"
+  ],
+  [ AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."]) ] )
   CPPFLAGS="${save_CPPFLAGS}"
 fi
 
@@ -1650,15 +1646,28 @@ AC_ARG_ENABLE(opie,
        test_LDFLAGS="-L${with_qte}/lib"
        test_CFLAGS="-I${with_qte}/include"
      fi
-
-     PLUGINS="${PLUGINS} opie"
-     opie_LDFLAGS="${opie_LDFLAGS} ${test_LDFLAGS} -lqpe -lqte"
-     opie_CFLAGS="${opie_CFLAGS} ${test_CFLAGS}-DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
-     if test -x ${QTDIR}/bin/moc
+     ac_cv_qte_headers=yes
+     CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
+     AC_CHECK_HEADERS(qte.h, [
+       test_CFLAGS="${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
+       test_LDFLAGS="${test_LDFLAGS} -lqpe -lqte"
+       ],
+       [ ac_cv_qte_headers=no
+         AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."]) 
+       ] 
+     )
+     CPPFLAGS="${save_CPPFLAGS}"
+     if test x${ac_cv_qte_headers} = "xyes" 
      then
-       MOC=${QTDIR}/bin/moc
-     else
-       MOC=moc
+       PLUGINS="${PLUGINS} opie"
+       opie_LDFLAGS="${opie_LDFLAGS} ${test_LDFLAGS}"
+       opie_CFLAGS="${opie_CFLAGS} ${test_CFLAGS}"
+       if test -x ${QTDIR}/bin/moc
+       then
+         MOC=${QTDIR}/bin/moc
+       else
+         MOC=moc
+       fi
      fi
    fi])
 
