@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.129 2003/12/07 20:47:19 hartman Exp $
+dnl $Id: configure.ac,v 1.130 2003/12/11 05:28:21 rocky Exp $
 
 AC_INIT(vlc,0.7.0-test1)
 
@@ -869,7 +869,7 @@ dnl  default modules
 dnl
 AX_ADD_PLUGINS([dummy rc logger gestures memcpy hotkeys])
 AX_ADD_PLUGINS([mpgv mpga m4v mpeg_system ps ts avi asf aac mp4 rawdv])
-AX_ADD_PLUGINS([spudec dvbsub mpeg_audio lpcm a52 dts cinepak])
+AX_ADD_PLUGINS([ogt spudec dvbsub mpeg_audio lpcm a52 dts cinepak])
 AX_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 AX_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32])
 AX_ADD_PLUGINS([trivial_resampler ugly_resampler linear_resampler bandlimited_resampler])
@@ -1492,10 +1492,12 @@ if test "${enable_cddax}" != "no"
 then
   PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.65,
    [enable_cddax="no"
+    AC_DEFINE(HAVE_CDDAX, [], [Define for the CD-DA plugin using libcdio])
     AX_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS])
     AX_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
     AX_ADD_PLUGINS([cddax])], 
-   [AC_MSG_WARN(libcdio library not found)])
+   [AC_MSG_WARN(libcdio library not found)
+   HAVE_CDDAX=no])
 
   if test x$enable_cddb != no; then
     PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.4, [
@@ -1519,10 +1521,13 @@ then
   then
     PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.20-cdio,
      [enable_vcd="no"
+      AC_DEFINE(HAVE_VCDX, [], 
+      [Define for the VCD plugin using libcdio/libvcdinfo])
       AX_ADD_LDFLAGS([vcdx],[$VCDINFO_LIBS])
       AX_ADD_CFLAGS([vcdx],[$VCDINFO_CFLAGS])
       AX_ADD_PLUGINS([vcdx])], 
-     [AC_MSG_WARN(vcdinfo library not found)])
+     [AC_MSG_WARN(vcdinfo library not found)
+     HAVE_VCDX=no])
   fi
 fi
 
@@ -3530,6 +3535,7 @@ AC_CONFIG_FILES([
   modules/codec/ffmpeg/Makefile
   modules/codec/ffmpeg/postprocessing/Makefile
   modules/codec/spudec/Makefile
+  modules/codec/ogt/Makefile
   modules/control/Makefile
   modules/control/corba/Makefile
   modules/control/lirc/Makefile
