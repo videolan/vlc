@@ -310,7 +310,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Place everything in sizers */
     wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
-    button_sizer->Add( iteminfo_button, 0, wxALIGN_CENTER|wxLEFT , 5);
+    button_sizer->Add( iteminfo_button, 0, wxALIGN_CENTER|wxLEFT, 5);
     button_sizer->Layout();
 
     wxBoxSizer *updown_sizer = new wxBoxSizer( wxHORIZONTAL );
@@ -341,7 +341,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxBoxSizer *bottom_sizer = new wxBoxSizer( wxHORIZONTAL );
     bottom_sizer->Add( updown_sizer, 0,
                        wxEXPAND |wxRIGHT | wxLEFT | wxALIGN_LEFT, 4 );
-    bottom_sizer->Add( button_sizer , 0,
+    bottom_sizer->Add( button_sizer, 0,
                        wxEXPAND|wxLEFT | wxRIGHT | wxALIGN_RIGHT, 4 );
     bottom_sizer->Layout();
 
@@ -350,7 +350,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     panel_sizer->Add( top_sizer, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( listview, 1, wxEXPAND | wxALL, 5 );
-    panel_sizer->Add( bottom_sizer, 0 , wxEXPAND | wxALL, 5);
+    panel_sizer->Add( bottom_sizer, 0, wxEXPAND | wxALL, 5);
     panel_sizer->Layout();
 
     playlist_panel->SetSizerAndFit( panel_sizer );
@@ -433,7 +433,7 @@ void Playlist::UpdateItem( int i )
 
     listview->SetItem( i, 0, wxL2U(p_item->input.psz_name) );
     listview->SetItem( i, 1, wxU( playlist_ItemGetInfo( p_item,
-                                       _("General") , _("Author") ) ) );
+                                       _("General"), _("Author") ) ) );
     char *psz_group = playlist_FindGroup(p_playlist,
                                          p_item->i_group);
     listview->SetItem( i, 3,
@@ -449,8 +449,10 @@ void Playlist::UpdateItem( int i )
 
     char psz_duration[MSTRTIME_MAX_SIZE];
     mtime_t dur = p_item->input.i_duration;
-    if( dur != -1 ) secstotimestr( psz_duration, dur/1000000 );
-    else memcpy( psz_duration , "-:--:--", sizeof("-:--:--") );
+    if( dur != -1 )
+        secstotimestr( psz_duration, dur/1000000 );
+    else
+        memcpy( psz_duration, "-:--:--", sizeof("-:--:--") );
     listview->SetItem( i, 2, wxU(psz_duration) );
 
     /* Change the colour for the currenty played stream */
@@ -695,7 +697,6 @@ void Playlist::OnUp( wxCommandEvent& event )
         listview->Focus( i_item - 1 );
     }
     vlc_object_release( p_playlist );
-    return;
 }
 
 void Playlist::OnDown( wxCommandEvent& event )
@@ -713,11 +714,10 @@ void Playlist::OnDown( wxCommandEvent& event )
                                          wxLIST_STATE_SELECTED );
     if( i_item >= 0 && i_item < p_playlist->i_size - 1 )
     {
-        playlist_Move( p_playlist , i_item, i_item + 2 );
+        playlist_Move( p_playlist, i_item, i_item + 2 );
         listview->Focus( i_item + 1 );
     }
     vlc_object_release( p_playlist );
-    return;
 }
 
 /********************************************************************
@@ -735,32 +735,30 @@ void Playlist::OnSort( wxCommandEvent& event )
     switch( event.GetId() )
     {
         case SortTitle_Event:
-           playlist_SortTitle( p_playlist , ORDER_NORMAL );
+           playlist_SortTitle( p_playlist, ORDER_NORMAL );
            break;
         case RSortTitle_Event:
-           playlist_SortTitle( p_playlist , ORDER_REVERSE );
+           playlist_SortTitle( p_playlist, ORDER_REVERSE );
            break;
         case SortAuthor_Event:
-           playlist_SortAuthor(p_playlist , ORDER_NORMAL );
+           playlist_SortAuthor(p_playlist, ORDER_NORMAL );
            break;
         case RSortAuthor_Event:
-           playlist_SortAuthor( p_playlist , ORDER_REVERSE );
+           playlist_SortAuthor( p_playlist, ORDER_REVERSE );
            break;
         case SortGroup_Event:
-           playlist_SortGroup( p_playlist , ORDER_NORMAL );
+           playlist_SortGroup( p_playlist, ORDER_NORMAL );
            break;
         case RSortGroup_Event:
-           playlist_SortGroup( p_playlist , ORDER_REVERSE );
+           playlist_SortGroup( p_playlist, ORDER_REVERSE );
            break;
         case Randomize_Event:
-           playlist_Sort( p_playlist , SORT_RANDOM, ORDER_NORMAL );
+           playlist_Sort( p_playlist, SORT_RANDOM, ORDER_NORMAL );
            break;
     }
     vlc_object_release( p_playlist );
 
     Rebuild();
-
-    return;
 }
 
 void Playlist::OnColSelect( wxListEvent& event )
@@ -828,8 +826,6 @@ void Playlist::OnColSelect( wxListEvent& event )
     vlc_object_release( p_playlist );
 
     Rebuild();
-
-    return;
 }
 
 /**********************************************************************
@@ -910,7 +906,10 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
         }
     }
 
-    if( i_item < 0 || i_item >= listview->GetItemCount() ) return;
+    if( i_item < 0 || i_item >= listview->GetItemCount() )
+    {
+        return;
+    }
 
     for( long item = 0; item < listview->GetItemCount(); item++ )
     {
@@ -922,7 +921,6 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
     listitem.m_state = wxLIST_STATE_SELECTED;
     listview->Select( i_item, TRUE );
     listview->Focus( i_item );
-
 }
 
 /**********************************************************************
@@ -1016,11 +1014,11 @@ void Playlist::OnRandom( wxCommandEvent& event )
     {
         return;
     }
-    var_Set( p_playlist , "random", val);
+    var_Set( p_playlist, "random", val);
     vlc_object_release( p_playlist );
 }
 
-void Playlist::OnLoop ( wxCommandEvent& event )
+void Playlist::OnLoop( wxCommandEvent& event )
 {
     vlc_value_t val;
     val.b_bool = event.IsChecked();
@@ -1031,11 +1029,11 @@ void Playlist::OnLoop ( wxCommandEvent& event )
     {
         return;
     }
-    var_Set( p_playlist , "loop", val);
+    var_Set( p_playlist, "loop", val);
     vlc_object_release( p_playlist );
 }
 
-void Playlist::OnRepeat ( wxCommandEvent& event )
+void Playlist::OnRepeat( wxCommandEvent& event )
 {
     vlc_value_t val;
     val.b_bool = event.IsChecked();
@@ -1046,7 +1044,7 @@ void Playlist::OnRepeat ( wxCommandEvent& event )
     {
         return;
     }
-    var_Set( p_playlist , "repeat", val);
+    var_Set( p_playlist, "repeat", val);
     vlc_object_release( p_playlist );
 }
 
@@ -1080,6 +1078,11 @@ void Playlist::OnKeyDown( wxListEvent& event )
 
 void Playlist::ShowInfos( int i_item )
 {
+    if( i_item == -1 )
+    {
+        return;
+    }
+
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                        FIND_ANYWHERE );
@@ -1087,12 +1090,7 @@ void Playlist::ShowInfos( int i_item )
     {
         return;
     }
-   
-    if( i_item == -1 )
-    {
-        return;
-    }
- 
+
     if( iteminfo_dialog == NULL )
     {
         vlc_mutex_lock( &p_playlist->object_lock);
@@ -1101,9 +1099,8 @@ void Playlist::ShowInfos( int i_item )
 
         if( p_item )
         {
-            iteminfo_dialog = new ItemInfoDialog(
-                              p_intf, p_item , this );
-            if( iteminfo_dialog->ShowModal()  == wxID_OK )
+            iteminfo_dialog = new ItemInfoDialog( p_intf, p_item, this );
+            if( iteminfo_dialog->ShowModal() == wxID_OK )
                 UpdateItem( i_item );
             delete iteminfo_dialog;
             iteminfo_dialog = NULL;
@@ -1115,7 +1112,7 @@ void Playlist::ShowInfos( int i_item )
 void Playlist::OnInfos( wxCommandEvent& WXUNUSED(event) )
 {
     /* We use the first selected item, so find it */
-    long i_item = listview->GetNextItem( -1 , wxLIST_NEXT_ALL,
+    long i_item = listview->GetNextItem( -1, wxLIST_NEXT_ALL,
                                          wxLIST_STATE_SELECTED );
     ShowInfos( i_item );
 }
@@ -1139,12 +1136,12 @@ void Playlist::OnEnDis( wxCommandEvent& event )
        {
            case EnableGroup_Event:
                /*XXX*/
-               playlist_EnableGroup( p_playlist ,
-                                  p_playlist->pp_items[i_item]->i_group );
+               playlist_EnableGroup( p_playlist,
+                                     p_playlist->pp_items[i_item]->i_group );
                break;
            case DisableGroup_Event:
-               playlist_DisableGroup( p_playlist ,
-                                  p_playlist->pp_items[i_item]->i_group );
+               playlist_DisableGroup( p_playlist,
+                                      p_playlist->pp_items[i_item]->i_group );
                break;
        }
        Rebuild();
@@ -1159,7 +1156,7 @@ void Playlist::OnEnDis( wxCommandEvent& event )
 void Playlist::OnPopup( wxListEvent& event )
 {
     i_popup_item = event.GetIndex();
-    Playlist::PopupMenu( popup_menu , ScreenToClient( wxGetMousePosition() ) );
+    Playlist::PopupMenu( popup_menu, ScreenToClient( wxGetMousePosition() ) );
 }
 
 void Playlist::OnPopupPlay( wxMenuEvent& event )
@@ -1286,11 +1283,11 @@ NewGroup::NewGroup( intf_thread_t *_p_intf, wxWindow *_p_parent ):
     panel->SetAutoLayout( TRUE );
 
     wxStaticText *group_label =
-            new wxStaticText( panel , -1,
+            new wxStaticText( panel, -1,
                 wxU(_("Enter a name for the new group:")));
 
-    groupname = new wxTextCtrl(panel, -1, wxU(""),wxDefaultPosition,
-                               wxSize(100,27),wxTE_PROCESS_ENTER);
+    groupname = new wxTextCtrl(panel, -1, wxU(""), wxDefaultPosition,
+                               wxSize(100, 27), wxTE_PROCESS_ENTER);
 
     wxButton *ok_button = new wxButton(panel, wxID_OK, wxU(_("OK")) );
     ok_button->SetDefault();
