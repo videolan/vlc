@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.130 2004/01/25 13:50:33 zorglub Exp $
+ * $Id: libvlc.h,v 1.131 2004/01/29 14:39:08 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -466,6 +466,11 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
     "If your processor supports the SSE instructions set, VLC can take " \
     "advantage of them.")
 
+#define SSE2_TEXT N_("Enable CPU SSE2 support")
+#define SSE2_LONGTEXT N_( \
+    "If your processor supports the SSE2 instructions set, VLC can take " \
+    "advantage of them.")
+
 #define ALTIVEC_TEXT N_("Enable CPU AltiVec support")
 #define ALTIVEC_LONGTEXT N_( \
     "If your processor supports the AltiVec instructions set, VLC can take " \
@@ -814,6 +819,7 @@ vlc_module_begin();
     add_bool( "3dn", 1, NULL, THREE_DN_TEXT, THREE_DN_LONGTEXT, VLC_TRUE );
     add_bool( "mmxext", 1, NULL, MMXEXT_TEXT, MMXEXT_LONGTEXT, VLC_TRUE );
     add_bool( "sse", 1, NULL, SSE_TEXT, SSE_LONGTEXT, VLC_TRUE );
+    add_bool( "sse2", 1, NULL, SSE2_TEXT, SSE2_LONGTEXT, VLC_TRUE );
 #endif
 #if defined( __powerpc__ ) || defined( SYS_DARWIN )
     add_bool( "altivec", 1, NULL, ALTIVEC_TEXT, ALTIVEC_LONGTEXT, VLC_TRUE );

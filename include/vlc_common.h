@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.106 2004/01/26 20:48:09 fenrir Exp $
+ * $Id: vlc_common.h,v 1.107 2004/01/29 14:39:08 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -794,6 +794,7 @@ VLC_EXPORT( char *, vlc_wraptext, ( const char *, int, vlc_bool_t ) );
 #define CPU_CAPABILITY_3DNOW   (1<<4)
 #define CPU_CAPABILITY_MMXEXT  (1<<5)
 #define CPU_CAPABILITY_SSE     (1<<6)
+#define CPU_CAPABILITY_SSE2    (1<<7)
 #define CPU_CAPABILITY_ALTIVEC (1<<16)
 #define CPU_CAPABILITY_FPU     (1<<31)
 

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: libvlc.c,v 1.113 2004/01/25 17:16:05 zorglub Exp $
+ * $Id: libvlc.c,v 1.114 2004/01/29 14:39:08 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -529,6 +529,8 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         libvlc.i_cpu &= ~CPU_CAPABILITY_MMXEXT;
     if( !config_GetInt( p_vlc, "sse" ) )
         libvlc.i_cpu &= ~CPU_CAPABILITY_SSE;
+    if( !config_GetInt( p_vlc, "sse2" ) )
+        libvlc.i_cpu &= ~CPU_CAPABILITY_SSE2;
 #endif
 #if defined( __powerpc__ ) || defined( SYS_DARWIN )
     if( !config_GetInt( p_vlc, "altivec" ) )
@@ -551,6 +553,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     PRINT_CAPABILITY( CPU_CAPABILITY_3DNOW, "3DNow!" );
     PRINT_CAPABILITY( CPU_CAPABILITY_MMXEXT, "MMXEXT" );
     PRINT_CAPABILITY( CPU_CAPABILITY_SSE, "SSE" );
+    PRINT_CAPABILITY( CPU_CAPABILITY_SSE2, "SSE2" );
     PRINT_CAPABILITY( CPU_CAPABILITY_ALTIVEC, "AltiVec" );
     PRINT_CAPABILITY( CPU_CAPABILITY_FPU, "FPU" );
     msg_Dbg( p_vlc, "CPU has capabilities %s", p_capabilities );
