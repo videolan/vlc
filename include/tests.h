@@ -27,6 +27,7 @@
 #define CPU_CAPABILITY_MMX     1<<3
 #define CPU_CAPABILITY_3DNOW   1<<4
 #define CPU_CAPABILITY_MMXEXT  1<<5
+#define CPU_CAPABILITY_ALTIVEC 1<<16
 
 /*****************************************************************************
  * TestVersion: tests if the given string equals the current version
