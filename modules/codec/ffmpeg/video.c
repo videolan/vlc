@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.45 2003/11/16 22:23:47 gbazin Exp $
+ * $Id: video.c,v 1.46 2003/11/17 02:52:39 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -392,7 +392,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         return VLC_SUCCESS;
     }
 
-    if( !p_sys->p_context->width || !p_sys->p_context->height )
+    if( p_sys->p_context->width <= 0 || p_sys->p_context->height <= 0 )
     {
         p_sys->p_context->hurry_up = 5;
     }
@@ -403,7 +403,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
 
     /* Don't forget that ffmpeg requires a little more bytes
      * that the real frame size */
-    if( p_block->i_buffer )
+    if( p_block->i_buffer > 0 )
     {
         p_sys->i_buffer = p_block->i_buffer;
         if( p_sys->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE >
@@ -424,7 +424,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         p_block->i_buffer = 0;
     }
 
-    while( p_sys->i_buffer )
+    while( p_sys->i_buffer > 0 )
     {
         int i_used, b_gotpicture;
         picture_t *p_pic;
@@ -438,6 +438,10 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
                       p_sys->i_buffer );
             block_Release( p_block );
             return NULL;
+        }
+        else if( i_used > p_sys->i_buffer )
+        {
+            i_used = p_sys->i_buffer;
         }
 
         /* Consumed bytes */

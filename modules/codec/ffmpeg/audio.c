@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: audio.c,v 1.22 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: audio.c,v 1.23 2003/11/17 02:52:39 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -160,7 +160,7 @@ aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( !p_block->i_buffer )
+    if( p_block->i_buffer <= 0 )
     {
         block_Release( p_block );
         return NULL;
@@ -178,6 +178,10 @@ aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
 
         block_Release( p_block );
         return NULL;
+    }
+    else if( i_used > p_block->i_buffer )
+    {
+        i_used = p_block->i_buffer;
     }
 
     p_block->i_buffer -= i_used;
