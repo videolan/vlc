@@ -35,6 +35,9 @@
 #include <GL/gl.h>
 
 /* RV16 */
+#ifndef GL_UNSIGNED_SHORT_5_6_5
+#define GL_UNSIGNED_SHORT_5_6_5 0x8363
+#endif
 //#define VLCGL_RGB_FORMAT GL_RGB
 //#define VLCGL_RGB_TYPE GL_UNSIGNED_SHORT_5_6_5
 
@@ -56,6 +59,7 @@ static void End          ( vout_thread_t * );
 static int  Manage       ( vout_thread_t * );
 static void Render       ( vout_thread_t *, picture_t * );
 static void DisplayVideo ( vout_thread_t *, picture_t * );
+static int  Control      ( vout_thread_t *, int, va_list );
 
 static inline int GetAlignedSize( int );
 
@@ -130,7 +134,6 @@ static int CreateVout( vlc_object_t *p_this )
     p_sys->p_vout->render.i_width = p_vout->render.i_width;
     p_sys->p_vout->render.i_height = p_vout->render.i_height;
     p_sys->p_vout->render.i_aspect = p_vout->render.i_aspect;
-    p_sys->p_vout->i_window_height = p_vout->i_window_height;
 
     p_sys->p_vout->p_module =
         module_Need( p_sys->p_vout, "opengl provider", NULL, 0 );
@@ -147,6 +150,7 @@ static int CreateVout( vlc_object_t *p_this )
     p_vout->pf_manage = Manage;
     p_vout->pf_render = Render;
     p_vout->pf_display = DisplayVideo;
+    p_vout->pf_control = Control;
 
     return VLC_SUCCESS;
 }
@@ -371,4 +375,17 @@ int GetAlignedSize( int i_size )
         i_result *= 2;
     }
     return i_result;
+}
+
+/*****************************************************************************
+ * Control: control facility for the vout
+ *****************************************************************************/
+static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    vout_sys_t *p_sys = p_vout->p_sys;
+
+    if( p_sys->p_vout->pf_control )
+        return p_sys->p_vout->pf_control( p_sys->p_vout, i_query, args );
+    else
+        return vout_vaControlDefault( p_vout, i_query, args );
 }
