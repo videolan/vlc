@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.12 2001/03/19 13:26:59 sam Exp $
+ * $Id: input_ts.c,v 1.13 2001/03/19 22:16:31 henri Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -34,6 +34,7 @@
 #include <errno.h>
 
 #include <sys/types.h>
+#include <sys/time.h>
 #ifdef SYS_NTO
 #include <sys/select.h>
 #endif
