@@ -29,58 +29,6 @@
 
 #include "vlc_es.h"
 
-/*
- * i_allocated_size: size of allocated buffer
- * p_allocated_buffer: where data has been allocated
- *
- * i_buffer_size: sizeof buffer from p_buffer
- * p_buffer: where data begins
- * i_size: size of valid data
- *
- */
-#define SOUT_BUFFER_FLAGS_HEADER    0x0001
-
-/*
- * Flags for muxer/access private usage.
- */
-#define SOUT_BUFFER_FLAGS_PRIVATE_MASK  0xffff0000
-#define SOUT_BUFFER_FLAGS_PRIVATE_SHIFT 16
-
-/*
- * Flags originating from block_t (FIXME: this is temporary).
- */
-#define SOUT_BUFFER_FLAGS_BLOCK_MASK    0x0000ff00
-#define SOUT_BUFFER_FLAGS_BLOCK_SHIFT   8
-
-struct sout_buffer_t
-{
-    size_t                  i_allocated_size;
-    byte_t                  *p_allocated_buffer;
-
-    size_t                  i_buffer_size;
-    byte_t                  *p_buffer;
-
-    size_t                  i_size;
-    mtime_t                 i_length;
-
-    mtime_t                 i_dts;
-    mtime_t                 i_pts;
-
-    uint32_t                i_flags;
-    int                     i_bitrate;
-
-    struct sout_buffer_t    *p_next;
-};
-
-struct sout_fifo_t
-{
-    vlc_mutex_t         lock;                         /* fifo data lock */
-    vlc_cond_t          wait;         /* fifo data conditional variable */
-
-    int                 i_depth;
-    sout_buffer_t       *p_first;
-    sout_buffer_t       **pp_last;
-};
 
 typedef struct sout_stream_id_t  sout_stream_id_t;
 
@@ -90,7 +38,7 @@ struct sout_input_t
     sout_instance_t *p_sout;
 
     es_format_t     *p_fmt;
-    sout_fifo_t     *p_fifo;
+    block_fifo_t    *p_fifo;
 
     void            *p_sys;
 };
@@ -98,7 +46,6 @@ struct sout_input_t
 /* for packetizer */
 struct sout_packetizer_input_t
 {
-
     sout_instance_t     *p_sout;
 
     es_format_t         *p_fmt;
@@ -125,12 +72,9 @@ struct sout_access_out_t
 
     char                    *psz_name;
     sout_access_out_sys_t   *p_sys;
-    int                     (* pf_seek  )( sout_access_out_t *,
-                                           off_t );
-    int                     (* pf_read  )( sout_access_out_t *,
-                                           sout_buffer_t * );
-    int                     (* pf_write )( sout_access_out_t *,
-                                           sout_buffer_t * );
+    int                     (*pf_seek)( sout_access_out_t *, off_t );
+    int                     (*pf_read)( sout_access_out_t *, block_t * );
+    int                     (*pf_write)( sout_access_out_t *, block_t * );
 };
 
 /*
@@ -154,37 +98,27 @@ typedef struct sout_mux_sys_t sout_mux_sys_t;
 struct  sout_mux_t
 {
     VLC_COMMON_MEMBERS
-    module_t                *p_module;
+    module_t            *p_module;
 
-    sout_instance_t         *p_sout;
+    sout_instance_t     *p_sout;
 
-    char                    *psz_mux;
-    sout_cfg_t              *p_cfg;
+    char                *psz_mux;
+    sout_cfg_t          *p_cfg;
 
-    sout_access_out_t       *p_access;
+    sout_access_out_t   *p_access;
 
-    int                     i_preheader;
-    int                     (* pf_capacity)  ( sout_mux_t *,
-                                               int, void *, void *);
-    int                     (* pf_addstream )( sout_mux_t *,
-                                               sout_input_t * );
-    int                     (* pf_delstream )( sout_mux_t *,
-                                               sout_input_t * );
-    int                     (* pf_mux )      ( sout_mux_t * );
-
+    int                 (*pf_capacity)( sout_mux_t *, int, void *, void *);
+    int                 (*pf_addstream)( sout_mux_t *, sout_input_t * );
+    int                 (*pf_delstream)( sout_mux_t *, sout_input_t * );
+    int                 (*pf_mux)      ( sout_mux_t * );
 
     /* here are all inputs accepted by muxer */
-    int                     i_nb_inputs;
-    sout_input_t            **pp_inputs;
+    int                 i_nb_inputs;
+    sout_input_t        **pp_inputs;
 
 
     /* mux private */
-    sout_mux_sys_t          *p_sys;
-
-#if 0
-    /* creater private */
-    void                    *p_sys_owner;
-#endif
+    sout_mux_sys_t      *p_sys;
 
     /* XXX private to stream_output.c */
     /* if muxer doesn't support adding stream at any time then we first wait
@@ -210,22 +144,21 @@ struct sout_stream_t
 {
     VLC_COMMON_MEMBERS
 
-    module_t                *p_module;
-    sout_instance_t         *p_sout;
+    module_t          *p_module;
+    sout_instance_t   *p_sout;
 
-    char                    *psz_name;
-    sout_cfg_t              *p_cfg;
-    char                    *psz_next;
+    char              *psz_name;
+    sout_cfg_t        *p_cfg;
+    char              *psz_next;
 
     /* add, remove a stream */
-    sout_stream_id_t *      (*pf_add) ( sout_stream_t *, es_format_t * );
-    int                     (*pf_del) ( sout_stream_t *, sout_stream_id_t * );
-
+    sout_stream_id_t *(*pf_add)( sout_stream_t *, es_format_t * );
+    int               (*pf_del)( sout_stream_t *, sout_stream_id_t * );
     /* manage a packet */
-    int                     (*pf_send)( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
+    int               (*pf_send)( sout_stream_t *, sout_stream_id_t *, block_t* );
 
     /* private */
-    sout_stream_sys_t       *p_sys;
+    sout_stream_sys_t *p_sys;
 };
 
 typedef struct sout_instance_sys_t sout_instance_sys_t;
@@ -239,10 +172,6 @@ struct sout_instance_t
     /* meta data (Read only) XXX it won't be set before the first packet received */
     vlc_meta_t          *p_meta;
 
-    /* muxer data */
-    int                 i_preheader;    /* max over all muxer */
-
-    int                 i_padding;      /* needed by some decoders */
     int                 i_out_pace_nocontrol;   /* count of output that can't control the space */
 
     vlc_mutex_t         lock;
@@ -280,40 +209,24 @@ static inline char *sout_cfg_find_value( sout_cfg_t *p_cfg, char *psz_name )
  * Prototypes
  *****************************************************************************/
 #define sout_NewInstance(a,b) __sout_NewInstance(VLC_OBJECT(a),b)
-VLC_EXPORT( sout_instance_t *, __sout_NewInstance,  ( vlc_object_t *, char * ) );
-VLC_EXPORT( void,              sout_DeleteInstance, ( sout_instance_t * ) );
-
-VLC_EXPORT( sout_fifo_t *,   sout_FifoCreate,     ( sout_instance_t * ) );
-VLC_EXPORT( void,            sout_FifoDestroy,    ( sout_instance_t *, sout_fifo_t * ) );
-VLC_EXPORT( void,            sout_FifoFree,       ( sout_instance_t *,sout_fifo_t * ) );
-
-VLC_EXPORT( void,            sout_FifoPut,        ( sout_fifo_t *, sout_buffer_t* ) );
-VLC_EXPORT( sout_buffer_t *, sout_FifoGet,        ( sout_fifo_t * ) );
-VLC_EXPORT( sout_buffer_t *, sout_FifoShow,       ( sout_fifo_t * ) );
-
+VLC_EXPORT( sout_instance_t *,  __sout_NewInstance,  ( vlc_object_t *, char * ) );
+VLC_EXPORT( void,               sout_DeleteInstance, ( sout_instance_t * ) );
 
 VLC_EXPORT( sout_packetizer_input_t *, sout_InputNew,( sout_instance_t *, es_format_t * ) );
-VLC_EXPORT( int,            sout_InputDelete,      ( sout_packetizer_input_t * ) );
-VLC_EXPORT( int,            sout_InputSendBuffer,  ( sout_packetizer_input_t *, sout_buffer_t* ) );
+VLC_EXPORT( int,                sout_InputDelete,      ( sout_packetizer_input_t * ) );
+VLC_EXPORT( int,                sout_InputSendBuffer,  ( sout_packetizer_input_t *, block_t* ) );
 
-VLC_EXPORT( sout_buffer_t*, sout_BufferNew,    ( sout_instance_t *, size_t ) );
-VLC_EXPORT( int,            sout_BufferRealloc,( sout_instance_t *, sout_buffer_t*, size_t ) );
-VLC_EXPORT( int,            sout_BufferReallocFromPreHeader,( sout_instance_t *, sout_buffer_t*, size_t ) );
-VLC_EXPORT( int,            sout_BufferDelete, ( sout_instance_t *, sout_buffer_t* ) );
-VLC_EXPORT( sout_buffer_t*, sout_BufferDuplicate,(sout_instance_t *, sout_buffer_t * ) );
-VLC_EXPORT( void,           sout_BufferChain,  ( sout_buffer_t **, sout_buffer_t * ) );
-
-VLC_EXPORT( sout_access_out_t *, sout_AccessOutNew, ( sout_instance_t *, char *psz_access, char *psz_name ) );
-VLC_EXPORT( void,                sout_AccessOutDelete, ( sout_access_out_t * ) );
-VLC_EXPORT( int,                 sout_AccessOutSeek,   ( sout_access_out_t *, off_t ) );
-VLC_EXPORT( int,                 sout_AccessOutRead,   ( sout_access_out_t *, sout_buffer_t * ) );
-VLC_EXPORT( int,                 sout_AccessOutWrite,  ( sout_access_out_t *, sout_buffer_t * ) );
+VLC_EXPORT( sout_access_out_t *,sout_AccessOutNew, ( sout_instance_t *, char *psz_access, char *psz_name ) );
+VLC_EXPORT( void,               sout_AccessOutDelete, ( sout_access_out_t * ) );
+VLC_EXPORT( int,                sout_AccessOutSeek,   ( sout_access_out_t *, off_t ) );
+VLC_EXPORT( int,                sout_AccessOutRead,   ( sout_access_out_t *, block_t * ) );
+VLC_EXPORT( int,                sout_AccessOutWrite,  ( sout_access_out_t *, block_t * ) );
 
 VLC_EXPORT( sout_mux_t *,       sout_MuxNew,          ( sout_instance_t*, char *, sout_access_out_t * ) );
 VLC_EXPORT( sout_input_t *,     sout_MuxAddStream,    ( sout_mux_t *, es_format_t * ) );
 VLC_EXPORT( void,               sout_MuxDeleteStream, ( sout_mux_t *, sout_input_t * ) );
 VLC_EXPORT( void,               sout_MuxDelete,       ( sout_mux_t * ) );
-VLC_EXPORT( void,               sout_MuxSendBuffer, ( sout_mux_t *, sout_input_t  *, sout_buffer_t * ) );
+VLC_EXPORT( void,               sout_MuxSendBuffer, ( sout_mux_t *, sout_input_t  *, block_t * ) );
 
 VLC_EXPORT( char *,             sout_cfg_parser, ( char **, sout_cfg_t **, char * ) );
 VLC_EXPORT( sout_stream_t *,    sout_stream_new, ( sout_instance_t *, char *psz_chain ) );

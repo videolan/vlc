@@ -266,10 +266,8 @@ typedef struct text_style_t text_style_t;
 
 /* Stream output */
 typedef struct sout_instance_t sout_instance_t;
-typedef struct sout_fifo_t sout_fifo_t;
 typedef struct sout_input_t sout_input_t;
 typedef struct sout_packetizer_input_t sout_packetizer_input_t;
-typedef struct sout_buffer_t sout_buffer_t;
 typedef struct sout_access_out_t sout_access_out_t;
 typedef struct sout_mux_t sout_mux_t;
 typedef struct sout_stream_t    sout_stream_t;

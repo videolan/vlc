@@ -2,7 +2,7 @@
  * vlc_block.h: Data blocks management functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_block.h,v 1.6 2004/02/25 17:48:52 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -39,6 +39,11 @@ typedef struct block_sys_t block_sys_t;
 #define BLOCK_FLAG_TYPE_B        0x0008
 /* BLOCK_FLAG_TYPE_PB: for inter frame when you don't know the real type */
 #define BLOCK_FLAG_TYPE_PB       0x0010
+/* BLOCK_FLAG_HEADER: warm that this block is a header one */
+#define BLOCK_FLAG_HEADER        0x0020
+
+#define BLOCK_FLAG_PRIVATE_MASK  0xffff0000
+#define BLOCK_FLAG_PRIVATE_SHIFT 16
 
 struct block_t
 {
