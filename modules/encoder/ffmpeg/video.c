@@ -2,7 +2,7 @@
  * video.c : video encoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: video.c,v 1.1 2003/01/22 10:41:57 fenrir Exp $
+ * $Id: video.c,v 1.2 2003/04/20 11:57:13 gbazin Exp $
  *
  * Authors: Laurent Aimar
  *
@@ -34,7 +34,12 @@
 #include "codecs.h"
 #include "encoder.h"
 
-#include <avcodec.h>
+/* ffmpeg header */
+#ifdef HAVE_FFMPEG_AVCODEC_H
+#   include <ffmpeg/avcodec.h>
+#else
+#   include <avcodec.h>
+#endif
 
 int  E_( OpenEncoderVideo ) ( vlc_object_t * );
 void E_( CloseEncoderVideo )( vlc_object_t * );

@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.15 2003/04/17 10:58:30 fenrir Exp $
+ * $Id: audio.c,v 1.16 2003/04/20 11:57:13 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -45,7 +45,12 @@
 #include "codecs.h"
 #include "aout_internal.h"
 
-#include "avcodec.h"                                            /* ffmpeg */
+/* ffmpeg header */
+#ifdef HAVE_FFMPEG_AVCODEC_H
+#   include <ffmpeg/avcodec.h>
+#else
+#   include <avcodec.h>
+#endif
 
 //#include "postprocessing/postprocessing.h"
 #include "ffmpeg.h"

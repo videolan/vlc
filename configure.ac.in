@@ -1507,41 +1507,59 @@ AC_ARG_ENABLE(ffmpeg,
 if test "x${enable_ffmpeg}" = "xyes"
 then
   AC_ARG_WITH(ffmpeg,
-    [    --with-ffmpeg=PATH    path to ffmpeg installation],[],[])
-  if test "x${with_ffmpeg}" != "xno" -a "x${with_ffmpeg}" != "x"
-  then
+    [    --with-ffmpeg=PATH    path to ffmpeg installation])
+  AC_ARG_WITH(ffmpeg-tree,
+    [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
+
+  dnl
+  dnl test for --with-ffmpeg
+  dnl
+  if test "x${with_ffmpeg}" != "xno" -a "x${with_ffmpeg}" != "x"; then
     CPPFLAGS_ffmpeg="${CPPFLAGS_ffmpeg} -I${with_ffmpeg}/include/ffmpeg"
     LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -L${with_ffmpeg}/lib"
 
     CPPFLAGS_stream_out_transcode="${CPPFLAGS_stream_out_transcode} -I${with_ffmpeg}/include/ffmpeg"
     LDFLAGS_stream_out_transcode="${LDFLAGS_stream_out_transcode} -L${with_ffmpeg}/lib"
-
   fi
 
-  dnl Add postprocessing modules
-  PLUGINS="${PLUGINS} postprocessing_c"
-  if test "x${ac_cv_mmx_inline}" != "xno"; then
-    PLUGINS="${PLUGINS} postprocessing_mmx"
+  dnl
+  dnl test for !(--with-ffmpeg) && !(--with-ffmpeg-tree)
+  dnl
+  if test "x${with_ffmpeg_tree}" == "xno" -o "x${with_ffmpeg_tree}" == "x";then
+    if test "x${with_ffmpeg}" == "xno" -o "x${with_ffmpeg}" == "x"; then
+      AC_CHECK_HEADERS(ffmpeg/avcodec.h postproc/postprocess.h)
+    fi
   fi
 
-  if test "x${ac_cv_mmxext_inline}" != "xno"; then
-    PLUGINS="${PLUGINS} postprocessing_mmxext"
+  dnl
+  dnl test for !(--with-ffmpeg-tree)
+  dnl
+  if test "x${with_ffmpeg}" == "xno" -o "x${with_ffmpeg}" == "x"; then
+    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
+    AC_CHECK_LIB(avcodec, avcodec_init, [
+      BUILTINS="${BUILTINS} ffmpeg stream_out_transcode"
+      LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -lavcodec"
+      dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
+      dnl       linker would miserably barf on multiple definitions.
+      LDFLAGS_stream_out_transcode="${LDFLAGS_stream_out_transcode}" ],
+      [ AC_MSG_ERROR([Cannot find libavcodec library...]) ])
+    LDFLAGS="${LDFLAGS_save}"
+    CPPFLAGS="${CPPFLAGS_save}"
   fi
 
-  AC_ARG_WITH(ffmpeg-tree,
-  [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
-  if test "x${with_ffmpeg_tree}" != "x"
-  then
+  dnl
+  dnl test for --with-ffmpeg-tree
+  dnl
+  if test "x${with_ffmpeg_tree}" != "xno" -a "x${with_ffmpeg_tree}" != "x";then
     AC_MSG_CHECKING(for libavcodec.a in ${with_ffmpeg_tree})
     real_ffmpeg_tree="`cd ${with_ffmpeg_tree} 2>/dev/null && pwd`"
-    if test "x${real_ffmpeg_tree}" = x
-    then
+    if test "x${real_ffmpeg_tree}" = x; then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot cd to ${with_ffmpeg_tree}])
     fi
-    if test -f "${real_ffmpeg_tree}/libavcodec/libavcodec.a"
-    then
+    if test -f "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
       dnl  Use a custom libffmpeg
       AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
       BUILTINS="${BUILTINS} ffmpeg stream_out_transcode"
@@ -1552,24 +1570,21 @@ then
       dnl       linker would miserably barf on multiple definitions.
       LDFLAGS_stream_out_transcode="${LDFLAGS_stream_out_transcode} -L${real_ffmpeg_tree}/libavcodec"
       CPPFLAGS_stream_out_transcode="${CPPFLAGS_stream_out_transcode} -I${real_ffmpeg_tree}/libavcodec"
-
     else
       dnl  The given libavcodec wasn't built
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot find ${real_ffmpeg_tree}/libavcodec/libavcodec.a, make sure you compiled libavcodec in ${with_ffmpeg_tree}])
     fi
-  else
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
-    AC_CHECK_LIB(avcodec, avcodec_init, [
-      BUILTINS="${BUILTINS} ffmpeg stream_out_transcode"
-      LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -lavcodec" 
-      dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
-      dnl       linker would miserably barf on multiple definitions.
-      LDFLAGS_stream_out_transcode="${LDFLAGS_stream_out_transcode}" ],
-      [ AC_MSG_ERROR([Cannot find libavcodec library...]) ])
-    LDFLAGS="${LDFLAGS_save}"
-    CPPFLAGS="${CPPFLAGS_save}"
+  fi
+
+  dnl Add postprocessing modules
+  PLUGINS="${PLUGINS} postprocessing_c"
+  if test "x${ac_cv_mmx_inline}" != "xno"; then
+    PLUGINS="${PLUGINS} postprocessing_mmx"
+  fi
+
+  if test "x${ac_cv_mmxext_inline}" != "xno"; then
+    PLUGINS="${PLUGINS} postprocessing_mmxext"
   fi
 fi
 

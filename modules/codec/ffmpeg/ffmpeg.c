@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.30 2003/04/17 10:58:30 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.31 2003/04/20 11:57:13 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -38,7 +38,12 @@
 #   include <sys/times.h>
 #endif
 
-#include "avcodec.h" /* ffmpeg */
+/* ffmpeg header */
+#ifdef HAVE_FFMPEG_AVCODEC_H
+#   include <ffmpeg/avcodec.h>
+#else
+#   include <avcodec.h>
+#endif
 
 #if LIBAVCODEC_BUILD < 4655
 #   error You must have a libavcodec >= 4655 (get CVS)
@@ -48,7 +53,11 @@
 #include "ffmpeg.h"
 
 #ifdef LIBAVCODEC_PP
-#   include "libpostproc/postprocess.h"
+#   ifndef HAVE_POSTPROC_POSTPROCESS_H
+#       include <postproc/postprocess.h>
+#   else
+#       include <libpostproc/postprocess.h>
+#   endif
 #else
 #   include "postprocessing/postprocessing.h"
 #endif

@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.3 2003/04/16 16:33:35 fenrir Exp $
+ * $Id: transcode.c,v 1.4 2003/04/20 11:57:13 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -31,7 +31,12 @@
 #include <vlc/input.h>
 #include <vlc/sout.h>
 
-#include <avcodec.h>
+/* ffmpeg header */
+#ifdef HAVE_FFMPEG_AVCODEC_H
+#   include <ffmpeg/avcodec.h>
+#else
+#   include <avcodec.h>
+#endif
 
 /*****************************************************************************
  * Exported prototypes
