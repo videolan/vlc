@@ -2,11 +2,11 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: v4l.c,v 1.41 2004/02/12 17:52:48 fenrir Exp $
+ * $Id$
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
- *         Gildas Bazin <gbazin@netcourrier.com>
+ *         Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1289,8 +1289,9 @@ static int GrabAudio( input_thread_t * p_input,
 static uint8_t *GrabCapture( input_thread_t *p_input )
 {
     access_sys_t *p_sys = p_input->p_access_data;
-    p_sys->vid_mmap.frame = ( p_sys->i_frame_pos + 1 ) %
-                            p_sys->vid_mbuf.frames;
+    int i_captured_frame = p_sys->i_frame_pos;
+
+    p_sys->vid_mmap.frame = (p_sys->i_frame_pos + 1) % p_sys->vid_mbuf.frames;
     for( ;; )
     {
         if( ioctl( p_sys->fd_video, VIDIOCMCAPTURE, &p_sys->vid_mmap ) >= 0 )
@@ -1306,14 +1307,12 @@ static uint8_t *GrabCapture( input_thread_t *p_input )
         msg_Dbg( p_input, "another try ?" );
     }
 
-    //msg_Warn( p_input, "grab a new frame" );
-
     while( ioctl(p_sys->fd_video, VIDIOCSYNC, &p_sys->i_frame_pos) < 0 &&
            ( errno == EAGAIN || errno == EINTR ) );
 
     p_sys->i_frame_pos = p_sys->vid_mmap.frame;
     /* leave i_video_frame_size alone */
-    return p_sys->p_video_mmap + p_sys->vid_mbuf.offsets[p_sys->i_frame_pos];
+    return p_sys->p_video_mmap + p_sys->vid_mbuf.offsets[i_captured_frame];
 }
 
 static uint8_t *GrabMJPEG( input_thread_t *p_input )
