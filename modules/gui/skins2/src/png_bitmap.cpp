@@ -2,7 +2,7 @@
  * png_bitmap.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: png_bitmap.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -118,10 +118,6 @@ PngBitmap::PngBitmap( intf_thread_t *pIntf, string fileName,
             if( aColor == (r<<16 | g<<8 | b) )
             {
                 *(pData++) = 0;
-            }
-            else
-            {
-                *(pData++) = 0xff;
             }
         }
     }
