@@ -176,8 +176,9 @@ int  E_( MMSHOpen )  ( input_thread_t *p_input )
          * asx FIXME */
         if( !strcasecmp( psz, "Pragma" ) )
         {
-            if( !strncasecmp( p, "features", 8 ) )
+            if( strstr( p, "features" ) )
             {
+                /* FIXME, it is a bit badly done here ..... */
                 if( strstr( p, "broadcast" ) )
                 {
                     msg_Dbg( p_input, "stream type = broadcast" );
@@ -433,7 +434,7 @@ static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
             p_sys->i_packet_used += i_copy;
             p_sys->i_pos += i_copy;
         }
-        else if( p_sys->i_pos + i_data > p_sys->i_header &&
+        else if( p_sys->i_packet_length > 0 &&
                  (int)p_sys->i_packet_used < p_sys->asfh.i_min_data_packet_size )
         {
             i_copy = __MIN( p_sys->asfh.i_min_data_packet_size - p_sys->i_packet_used,
