@@ -921,6 +921,8 @@ then
   PLUGINS="${PLUGINS} packetizer_mpegaudio packetizer_mpegvideo packetizer_a52"
   PLUGINS="${PLUGINS} packetizer_mpeg4video packetizer_mpeg4audio"
   PLUGINS="${PLUGINS} packetizer_copy"
+
+  PLUGINS="${PLUGINS} vout_encoder"
 fi
 
 
