@@ -194,7 +194,10 @@ static int AccessOpen( vlc_object_t *p_this )
     p_input->stream.b_pace_control = VLC_TRUE;
     p_input->stream.b_seekable = VLC_TRUE;
     p_input->stream.p_selected_area->i_tell = 0;
-    p_input->stream.p_selected_area->i_size = 0;
+
+    /* Bogus for demux1 compatibility */
+    p_input->stream.p_selected_area->i_size = 10000;
+
     p_input->stream.i_method = INPUT_METHOD_DVD;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
     p_input->i_mtu = 0;
@@ -374,6 +377,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     {
         msg_Warn( p_demux, "cannot set title/chapter" );
     }
+
     if( !p_sys->b_simple )
     {
         /* Get p_input and create variable */
@@ -493,6 +497,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
                     return VLC_SUCCESS;
                 }
             }
+
             return VLC_EGENERIC;
         }
 
@@ -631,7 +636,8 @@ static int DemuxDemux( demux_t *p_demux )
         {
             int32_t i_title = 0;
             int32_t i_part  = 0;
-            if( dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part ) == DVDNAV_STATUS_OK )
+            if( dvdnav_current_title_info( p_sys->dvdnav, &i_title,
+                                           &i_part ) == DVDNAV_STATUS_OK )
             {
                 if( i_title == 0 )
                 {
@@ -659,7 +665,9 @@ static int DemuxDemux( demux_t *p_demux )
     }
     case DVDNAV_NAV_PACKET:
     {
+#ifdef DVDNAV_DEBUG
         msg_Dbg( p_demux, "DVDNAV_NAV_PACKET" );
+#endif
         /* A lot of thing to do here :
          *  - handle packet
          *  - fetch pts (for time display)
@@ -844,6 +852,7 @@ static int DemuxBlock( demux_t *p_demux, uint8_t *pkt, int i_pkt )
         case 0x1b9:
         case 0x1bb:
         case 0x1bc:
+#ifdef DVDNAV_DEBUG
             if( p[3] == 0xbc )
             {
                 msg_Warn( p_demux, "received a PSM packet" );
@@ -852,6 +861,7 @@ static int DemuxBlock( demux_t *p_demux, uint8_t *pkt, int i_pkt )
             {
                 msg_Warn( p_demux, "received a SYSTEM packet" );
             }
+#endif
             block_Release( p_pkt );
             break;
 
