@@ -63,13 +63,13 @@ static char *psz_norm_list_text[] = { N_("Automatic"), N_("SECAM"),
 #define FREQUENCY_LONGTEXT N_( "Frequency to capture (in kHz), if applicable" )
 #define FRAMERATE_TEXT N_( "Framerate" )
 #define FRAMERATE_LONGTEXT N_( "Framerate to capture, if applicable (-1 for " \
-                               "auto" )
+                               "auto)" )
 #define KEYINT_TEXT N_( "Key interval" )
-#define KEYINT_LONGTEXT N_( "Interval between keyframes, in FIXME (-1 for " \
-                                " auto" )
+#define KEYINT_LONGTEXT N_( "Interval between keyframes (-1 for " \
+                                " auto)" )
 #define BFRAMES_TEXT N_( "B Frames" )
 #define BFRAMES_LONGTEXT N_("If this option is set, B-Frames will be used." \
-                            "Use this option to set the number of B-Frames")
+                            "Use this option to set the number of B-Frames.")
 #define BITRATE_TEXT N_( "Bitrate" )
 #define BITRATE_LONGTEXT N_( "Bitrate to use (-1 for default)" )
 #define BITRATE_PEAK_TEXT N_( "Bitrate peak" )
@@ -77,7 +77,7 @@ static char *psz_norm_list_text[] = { N_("Automatic"), N_("SECAM"),
 #define BITRATE_MODE_TEXT N_( "Bitrate mode (vbr or cbr)" )
 #define BITRATE_MODE_LONGTEXT N_( "Bitrate mode to use" )
 #define BITMASK_TEXT N_( "Audio bitmask" )
-#define BITMASK_LONGTEXT N_("FIXME FIXME FIXME FIXME" )
+#define BITMASK_LONGTEXT N_("This option allows setting of bitmask that will get used by the audio part of the card." )
 #define CHAN_TEXT N_( "Channel" )
 #define CHAN_LONGTEXT N_( "Channel of the card to use (Usually, 0 = tuner, " \
                           "1 = composite, 2 = svideo )" )

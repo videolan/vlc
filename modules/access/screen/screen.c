@@ -43,7 +43,7 @@
     "Allows you to set the desired frame rate for the capture." )
 
 #ifdef WIN32
-#define FRAGS_TEXT N_("Capture fragement size")
+#define FRAGS_TEXT N_("Capture fragment size")
 #define FRAGS_LONGTEXT N_( \
     "Allows you optimize the capture by fragmenting the screen in chunks " \
     "of predefined height (16 might be a good value, and 0 means disabled)." )

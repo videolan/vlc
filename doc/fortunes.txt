@@ -528,3 +528,11 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+
+< zorglub> vlc file1.mpg :start-time=300 :stop-time=420 --sout 
+                    file/ps:file2.mpg
+< boggle> sgagers: use zorglubs command, it will copy the needed 
+                   timeslice to file2.mpeg
+< sgagers> boggle: zorglubs is an utility of ffmpeg?
+
+%

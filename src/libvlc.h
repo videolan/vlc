@@ -545,8 +545,8 @@ static char *ppsz_align_descriptions[] =
 
 #define PAS_TEXT N_("Play and stop")
 #define PAS_LONGTEXT N_( \
-    "Stop the playlist after each played playlistitem." \
-    "Does advance the playlistindex.")
+    "Stop the playlist after each played playlist item. " \
+    "Does advance the playlist index.")
 
 #define MISC_CAT_LONGTEXT N_( \
     "These options allow you to select default modules. Leave these " \

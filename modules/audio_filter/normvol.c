@@ -73,7 +73,7 @@ struct aout_filter_sys_t {
 
 #define LEVEL_TEXT N_("Max level" )
 #define LEVEL_LONGTEXT N_("If the average power over the last N buffers " \
-               "is higher than this value, the volume will be normalized." \
+               "is higher than this value, the volume will be normalized. " \
                "This value is a positive floating point number. A value " \
                "between 0.5 and 10 seems sensible." )
 
