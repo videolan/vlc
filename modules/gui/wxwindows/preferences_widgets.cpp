@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.18 2003/12/22 15:42:44 gbazin Exp $
+ * $Id: preferences_widgets.cpp,v 1.19 2003/12/30 18:29:26 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -523,6 +523,10 @@ void FileConfigControl::OnBrowse( wxCommandEvent& event )
                              wxOPEN | wxSAVE
 #endif
                            );
+        if( dialog.ShowModal() == wxID_OK )
+        {
+            textctrl->SetValue( dialog.GetPath() );
+        }
     }
 }
 
