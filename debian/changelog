@@ -1,3 +1,19 @@
+vlc (0.6.0+cvs-20030702-1) unstable; urgency=low
+
+  * New CVS snapshot.
+    + Includes previous Debian fixes.
+    + Build should be a bit faster now.
+  * extras/faad:
+    + aclocal-1.6 && autoconf && automake-1.6 -a -c -f && libtoolize -c -f
+  * extras/faad/common/id3lib:
+    + mkdir doc examples
+    + aclocal-1.4 && autoconf && automake-1.4 -a -c && libtoolize -c -f
+  * extras/mpeg2dec:
+    + aclocal-1.7 && autoconf && automake-1.7 -a -c && libtoolize -c -f
+    + Fixes build on parisc (Closes: #199693).
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sun, 29 Jun 2003 21:12:10 +0200
+
 vlc (0.6.0+cvs-20030627-2) unstable; urgency=low
 
   * extras/ffmpeg:
