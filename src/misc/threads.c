@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.39 2003/03/04 23:36:57 massiot Exp $
+ * $Id: threads.c,v 1.40 2003/03/10 00:04:14 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -614,18 +614,26 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 #ifdef SYS_DARWIN
     if ( i_priority )
     {
-        int i_error;
+        int i_error, i_policy;
         struct sched_param param;
         memset( &param, 0, sizeof(struct sched_param) );
-        param.sched_priority = config_GetInt( p_this, "rt-priority" );
-        if ( (i_error = pthread_setschedparam( p_this->thread_id,
-                                               SCHED_RR, &param )) )
+        if ( i_priority < 0 )
         {
-            msg_Warn( p_this, "couldn't go to real-time priority (%s:%d): %s",
+            param.sched_priority = (-1) * i_priority;
+            i_policy = SCHED_OTHER;
+        }
+        else
+        {
+            param.sched_priority = i_priority;
+            i_policy = SCHED_RR;
+        }
+        if ( (i_error = pthread_setschedparam( p_this->thread_id,
+                                               i_policy, &param )) )
+        {
+            msg_Warn( p_this, "couldn't set thread priority (%s:%d): %s",
                       psz_file, i_line, strerror(i_error) );
             i_priority = 0;
         }
-
     }
 #endif
 
@@ -702,14 +710,23 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, char * psz_file,
 #ifdef SYS_DARWIN
     if ( i_priority )
     {
-        int i_error;
+        int i_error, i_policy;
         struct sched_param param;
         memset( &param, 0, sizeof(struct sched_param) );
-        param.sched_priority = config_GetInt( p_this, "rt-priority" );
-        if ( (i_error = pthread_setschedparam( pthread_self(),
-                                               SCHED_RR, &param )) )
+        if ( i_priority < 0 )
         {
-            msg_Warn( p_this, "couldn't go to real-time priority (%s:%d): %s",
+            param.sched_priority = (-1) * i_priority;
+            i_policy = SCHED_OTHER;
+        }
+        else
+        {
+            param.sched_priority = i_priority;
+            i_policy = SCHED_RR;
+        }
+        if ( (i_error = pthread_setschedparam( pthread_self(),
+                                               i_policy, &param )) )
+        {
+            msg_Warn( p_this, "couldn't set thread priority (%s:%d): %s",     
                       psz_file, i_line, strerror(i_error) );
             i_priority = 0;
         }

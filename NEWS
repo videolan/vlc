@@ -1,52 +1,69 @@
-$Id: NEWS,v 1.31 2003/03/09 19:44:16 gbazin Exp $
+$Id: NEWS,v 1.32 2003/03/10 00:04:14 massiot Exp $
 
 Changes between 0.5.1a and 0.5.2:
---------------------------------
+---------------------------------
 
 Core support:
- * advanced config options are now hidden by default.
- * new --spdif option to use the S/PDIF audio output by default.
- * fixed a 'clicking' sound when switching between streams.
- * new bandlimited resampler that should improve audio quality on primarily Mac OS X.
- * fixed a problem with audio over http that caused some web radios to not work.
+ * advanced config options are now hidden by default
+ * new --spdif option to use the S/PDIF audio output by default
+ * fixed a 'clicking' sound when switching between streams
+ * new bandlimited resampler that should improve audio quality on primarily
+   Mac OS X
+ * fixed a problem with audio over http that caused some web radios to not work
+ * DTS S/PDIF support
 
 Codecs:
- * support for DV audio through the ffmpeg library.
- * new but basic MPEG video decoder based on libmpeg2.
- * fixed a major bug in LPCM code ( fixes a problem with iDVD disks )
+ * support for DV audio through the ffmpeg library
+ * support for FLAC audio through libflac
+ * new but basic MPEG video decoder based on libmpeg2
+ * fixed a major bug in LPCM code (fixes a problem with iDVD disks)
+
+Stream output:
+ * support for streaming DivX 1/2/3, wmv1/2, h/i263 over MPEG-2 TS
+ * new --ttl option for Time To Live
 
 DVD support:
- * fixed quite a few problems with the dvd menu support.
+ * fixed quite a few problems with the dvd menu support
 
 UNIX ports:
- * fixed the GNU-pth support.
+ * fixed the GNU-pth support
 
 Win32 port:
- * multi-channel audio and S/PDIF support for both the DirectX and Waveout plugins.
- * localization support via gettext is now fully working.
- * rc interface is now fully useable.
- * fixed the MSVC project files generation.
+ * multi-channel audio and S/PDIF support for both the DirectX and Waveout
+   plugins
+ * localization support via gettext is now fully working
+ * rc interface is now fully useable
+ * fixed the MSVC project files generation
 
 Mac OS X port:
- * several fixes for multi channel audio devices. AC3 over SPDIF with M-Audio Sonica Theater still does not work. this is most likely a driver bug and has been reported to M-Audio. ( Sonica, Revolution, Delta, Griffin iMate and MOTU firewire devices should work).
- * new info panel.
- * very prelimenary support for VLC control via applescript.
+ * several fixes for multi channel audio devices. AC3 over SPDIF with
+   M-Audio Sonica Theater still does not work. this is most likely a driver
+   bug and has been reported to M-Audio. (Sonica, Revolution, Delta, Griffin
+   iMate and MOTU firewire devices should work)
+ * VLC now uses the default audio device
+ * new info panel
+ * very preliminary support for VLC control via applescript
+ * support for mouse gestures
+ * new priority scheme allowing to avoid lock-ups on low-end machines
 
 Linupy port:
- * there is a whole new port for the linupy distribution used by o.a. the YOPY PDA. It is still experimental, please test it.
+ * there is a whole new port for the linupy distribution used by o.a. the
+   YOPY PDA. It is still experimental, please test it
 
 Miscellaneous:
- * improved ID3 tag detection.
- * changed several errors into warnings. the frequently reported "this is not a PS stream, continuing" is one of these.
- * mouse gestures work on windows and osx, but there still isn't any useful gestures
+ * improved ID3 tag detection
+ * changed several errors into warnings ; the frequently reported "this is
+   not a PS stream, continuing" is one of these
+ * mouse gestures work on windows and osx, but there still isn't any useful
+   gestures
  * some support for .pls playlists used by shoutcast
 
 Changes between 0.5.1 and 0.5.1a:
---------------------------------
+---------------------------------
 
 Mac OS X port:
  * fixed a problem that caused VLC to select the wrong language when
-   English was set as the preferred language.
+   English was set as the preferred language
 
 
 Changes between 0.5.0 and 0.5.1:
