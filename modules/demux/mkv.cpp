@@ -1579,6 +1579,8 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
     {
         p_sys->psz_current_chapter = psz_chapter;
         p_sys->i_chapter_time = i_time_offset = psz_chapter->i_user_start_time - psz_chapter->i_start_time;
+        p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+        p_demux->info.i_seekpoint = psz_chapter->i_seekpoint_num - 1;
     }
 
     for( ; i_index < p_sys->i_index; i_index++ )
