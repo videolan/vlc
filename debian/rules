@@ -8,16 +8,32 @@
 # This is the debhelper compatability version to use.
 export DH_COMPAT=3
 
+#
 # Compilation options
-export FFMPEG_VERSION=cvs
-export FAAD_VERSION=cvs
-export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-familiar --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde --enable-ffmpeg --with-ffmpeg-tree=ffmpeg-$(FFMPEG_VERSION) --enable-mp4 --enable-dvb --enable-dv --enable-faad --with-faad-tree=faad-$(FAAD_VERSION)"
-# Remove --without-dvdcss here in non-totalitarian countries
-export DVDCSS_FLAGS="--enable-dvd --without-dvdcss"
+#
 
-export VIDDIR="usr/share/vlc"
-export PIXDIR="usr/share/pixmaps"
-export GNOMEDIR="usr/share/gnome/apps/Multimedia"
+FFMPEG_VERSION = cvs
+FAAD_VERSION = cvs
+
+CONFIG_FLAGS = --enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-familiar --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde --enable-mp4 --enable-dvb --enable-dv --enable-svgalib
+CONFIG_FLAGS += --enable-ffmpeg --with-ffmpeg-tree=ffmpeg-$(FFMPEG_VERSION)
+CONFIG_FLAGS += --enable-faad --with-faad-tree=faad-$(FAAD_VERSION)
+ifeq ($(DEB_BUILD_ARCH),i386)
+CONFIG_FLAGS += --enable-glide
+else
+ARCH_EXCLUDE = -Nvlc-plugin-glide
+endif
+
+# Remove --without-dvdcss here in non-totalitarian countries
+CONFIG_FLAGS += --enable-dvd --without-dvdcss
+
+VIDDIR = usr/share/vlc
+PIXDIR = usr/share/pixmaps
+GNOMEDIR = usr/share/gnome/apps/Multimedia
+
+#
+# Build rules
+#
 
 build: build-stamp
 build-stamp:
@@ -27,16 +43,8 @@ build-stamp:
 	test -d ffmpeg-$(FFMPEG_VERSION)
 	(cd ffmpeg-$(FFMPEG_VERSION) ; ./configure ; make)
 
-	case $(DEB_BUILD_ARCH) in \
-	i386) \
-		ARCH_FLAGS="--enable-glide" ;; \
-	*) \
-		ARCH_FLAGS="" ;; \
-	esac ;\
 	./configure --mandir=$${prefix}/share/man \
-		--infodir=$${prefix}/share/info \
-		$(shell echo $(CONFIG_FLAGS)) $$ARCH_FLAGS \
-		$(shell echo $(DVDCSS_FLAGS))
+		--infodir=$${prefix}/share/info $(CONFIG_FLAGS)
 
 	$(MAKE)
 
@@ -166,6 +174,11 @@ endif
 	mv debian/vlc/$(VIDDIR)/kvlc32x32.xpm debian/kvlc/$(VIDDIR)/kvlc.xpm
 	mv debian/vlc/$(VIDDIR)/kvlc48x48.png debian/kvlc/$(PIXDIR)/kvlc.png
 
+	# Package: vlc-plugin-svgalib
+	ln -s vlc debian/vlc-plugin-svgalib/usr/share/doc/vlc-plugin-svgalib
+	mv debian/vlc/usr/lib/vlc/video_output/svgalib.so \
+		debian/vlc-plugin-svgalib/usr/lib/vlc/video_output
+
 	# Clean up
 	rm -f debian/vlc/$(VIDDIR)/*.png
 
@@ -181,7 +194,7 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 #	dh_installdebconf	
-	dh_installdocs
+	dh_installdocs -p vlc
 #	dh_installexamples
 	dh_installmenu
 	dh_installman doc/vlc.1 -p vlc
@@ -194,17 +207,10 @@ binary-arch: build install
 	dh_makeshlibs
 	dh_installdeb
 #	dh_perl
-
-	case $(DEB_BUILD_ARCH) in \
-	i386) \
-		ARCH_EXCLUDE="" ;; \
-	*) \
-		ARCH_EXCLUDE="-Nvlc-plugin-glide" ;; \
-	esac ;\
-	dh_shlibdeps $$ARCH_EXCLUDE ;\
-	dh_gencontrol $$ARCH_EXCLUDE ;\
-	dh_md5sums $$ARCH_EXCLUDE ;\
-	dh_builddeb $$ARCH_EXCLUDE
+	dh_shlibdeps $(ARCH_EXCLUDE)
+	dh_gencontrol $(ARCH_EXCLUDE)
+	dh_md5sums $(ARCH_EXCLUDE)
+	dh_builddeb $(ARCH_EXCLUDE)
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install

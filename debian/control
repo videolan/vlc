@@ -2,7 +2,7 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Samuel Hocevar <sam@zoy.org>
-Build-Depends: debhelper (>=2.2.0), xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt-dev, libasound2-dev (>=0.9.0beta10a), libarts-dev, libmad0-dev, liblircclient-dev, a52dec-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, kdelibs-dev, dvb-dev, libdv-dev, libxosd-dev (>=1.0.2-1)
+Build-Depends: debhelper (>=2.2.0), xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt-dev, libasound2-dev (>=0.9.0beta10a), libarts-dev, libmad0-dev, liblircclient-dev, a52dec-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, kdelibs-dev, dvb-dev, libdv-dev, libxosd-dev (>=1.0.2-1), svgalibg1-dev (>=1.4.0)
 Standards-Version: 3.5.6
 
 Package: vlc
@@ -18,7 +18,7 @@ Description: a free MPEG, DVD and DivX player
 
 Package: libvlc0-dev
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Description: development files for the VideoLAN Client
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
@@ -37,6 +37,12 @@ Description: GNOME frontend for vlc
  This plugin adds a Gnome interface to vlc, the VideoLAN Client. To
  activate it, use the `--intf gnome' flag or run the `gnome-vlc' program.
 
+Package: vlc-gnome
+Architecture: any
+Depends: gnome-vlc
+Description: Legacy package that you should remove.
+ This package is now called gnome-vlc.
+
 Package: gvlc
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
@@ -48,6 +54,12 @@ Description: Gtk+ frontend for vlc
  .
  This plugin adds a Gtk+ interface to vlc, the VideoLAN Client. To
  activate it, use the `--intf gtk' flag or run the `gvlc' program.
+
+Package: vlc-gtk
+Architecture: any
+Depends: gvlc
+Description: Legacy package that you should remove.
+ This package is now called gvlc.
 
 Package: vlc-plugin-esd
 Architecture: any
@@ -61,6 +73,12 @@ Description: Esound audio output plugin for vlc
  VideoLAN Client. To activate it, use the `--aout esd' flag or select
  the `esd' aout plugin from the preferences menu.
 
+Package: vlc-esd
+Architecture: any
+Depends: vlc-plugin-esd
+Description: Legacy package that you should remove.
+ This package is now called vlc-plugin-esd.
+
 Package: vlc-plugin-alsa
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
@@ -72,6 +90,12 @@ Description: ALSA audio output plugin for vlc
  This plugin adds support for the Advanced Linux Sound Architecture to
  vlc, the VideoLAN Client. To activate it, use the `--aout alsa' flag or
  select the `alsa' aout plugin from the preferences menu.
+
+Package: vlc-alsa
+Architecture: any
+Depends: vlc-plugin-alsa
+Description: Legacy package that you should remove.
+ This package is now called vlc-plugin-alsa.
 
 Package: vlc-plugin-sdl
 Architecture: any
@@ -86,6 +110,12 @@ Description: SDL video and audio output plugin for vlc
  `--aout sdl' flags or select the `sdl' vout or aout plugin from the
  preferences menu.
 
+Package: vlc-sdl
+Architecture: any
+Depends: vlc-plugin-sdl
+Description: Legacy package that you should remove.
+ This package is now called vlc-plugin-sdl.
+
 Package: vlc-plugin-ggi
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
@@ -97,6 +127,12 @@ Description: GGI video output plugin for vlc
  This is a GGI plugin for vlc, the VideoLAN Client.  To activate it, use
  the `--vout ggi' flag or select the `ggi' vout plugin from the preferences
  menu.
+
+Package: vlc-ggi
+Architecture: any
+Depends: vlc-plugin-ggi
+Description: Legacy package that you should remove.
+ This package is now called vlc-plugin-ggi.
 
 Package: vlc-plugin-glide
 Architecture: i386
@@ -110,6 +146,12 @@ Description: Glide video output plugin for vlc
  it, use the `--vout glide' flag or select the `glide' vout plugin from
  the preferences menu.
 
+Package: vlc-glide
+Architecture: any
+Depends: vlc-plugin-glide
+Description: Legacy package that you should remove.
+ This package is now called vlc-plugin-glide.
+
 Package: qvlc
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
@@ -121,6 +163,12 @@ Description: Qt frontend for vlc
  .
  This plugin adds a Qt interface to vlc, the VideoLAN Client. To
  activate it, use the `--intf qt' flag or run the `qvlc' program.
+
+Package: vlc-qt
+Architecture: any
+Depends: qvlc
+Description: Legacy package that you should remove.
+ This package is now called qvlc.
 
 Package: vlc-plugin-mad
 Architecture: any
@@ -135,6 +183,12 @@ Description: MAD audio codec plugin for vlc
  this plugin, use the `--mpeg_adec mad' flag or select the `mad' MPEG
  decoder from the preferences menu.
 
+Package: vlc-mad
+Architecture: any
+Depends: vlc-plugin-mad
+Description: Legacy package that you should remove.
+ This package is now called vlc-plugin-mad.
+
 Package: vlc-plugin-arts
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
@@ -147,6 +201,12 @@ Description: aRts audio output plugin for vlc
  VideoLAN Client. To activate it, use the `--aout arts' flag or
  select the `arts' aout plugin from the preferences menu.
 
+Package: vlc-arts
+Architecture: any
+Depends: vlc-plugin-arts
+Description: Legacy package that you should remove.
+ This package is now called vlc-plugin-arts.
+
 Package: vlc-plugin-lirc
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
@@ -157,6 +217,12 @@ Description: lirc (infrared remote control) interface plugin for vlc
  .
  This plugin is an infrared lirc interface for vlc, the
  VideoLAN Client. To activate it, use the `--intf lirc' flag.
+
+Package: vlc-lirc
+Architecture: any
+Depends: vlc-plugin-lirc
+Description: Legacy package that you should remove.
+ This package is now called vlc-plugin-lirc.
 
 Package: vlc-plugin-aa
 Architecture: any
@@ -169,6 +235,12 @@ Description: ASCII art video output plugin for vlc
  This is an ASCII art video output plugin for vlc, the VideoLAN
  Client. To activate it, use the `--vout aa' flag or select the `aa'
  vout plugin from the preferences menu.
+
+Package: vlc-aa
+Architecture: any
+Depends: vlc-plugin-aa
+Description: Legacy package that you should remove.
+ This package is now called vlc-plugin-aa.
 
 Package: vlc-plugin-xosd
 Architecture: any
@@ -204,3 +276,15 @@ Description: KDE frontend for vlc
  .
  This plugin adds a KDE interface to vlc, the VideoLAN Client. To
  activate it, use the `--intf kde' flag or run the `kvlc' program.
+
+Package: vlc-plugin-svgalib
+Architecture: any
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Description: SVGAlib video output plugin for vlc
+ VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+ .
+ This plugin adds support for SVGAlib to vlc, the VideoLAN Client. To
+ activate it, use the `--vout svgalib' flag or select the `svgalib' video
+ output plugin from the preferences menu. Note that you will need root
+ permissions to use SVGAlib.
+
