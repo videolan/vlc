@@ -38,16 +38,16 @@ void _M( demux_getfunctions )( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 
-#define FREQ_TEXT N_("satellite transponder frequency")
+#define FREQ_TEXT N_("satellite default transponder frequency")
 #define FREQ_LONGTEXT ""
 
-#define POL_TEXT N_("satellite transponder polarization")
+#define POL_TEXT N_("satellite default transponder polarization")
 #define POL_LONGTEXT ""
 
-#define FEC_TEXT N_("satellite transponder FEC")
+#define FEC_TEXT N_("satellite default transponder FEC")
 #define FEC_LONGTEXT ""
 
-#define SRATE_TEXT N_("satellite transponder symbol rate")
+#define SRATE_TEXT N_("satellite default transponder symbol rate")
 #define SRATE_LONGTEXT ""
 
 #define DISEQC_TEXT N_("use diseqc with antenna")

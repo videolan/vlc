@@ -2,11 +2,11 @@
 <linuxdoc><article>
 <titlepag>
  <title>VLC HOWTO</title>
- <author>by the Videolan Team<tt><htmlurl url="mailto:videolan@videolan.org" name="videolan@videolan.org"></tt></author>
+ <author>Originally written by Henri Fallon, maintained by Johan Bilien<tt><htmlurl url="mailto:jobi@videolan.org" name="<jobi@videolan.org>"></tt></author>
  <date>v0.0.9, 16 april 2002</date>
 
  <abstract>
-  This document describes how to use the vlc (VideoLAN client) to read DVDs and mpeg files and DVDs.
+  This document describes how to use the vlc (VideoLAN client) to read DVDs and mpeg files, locally or from a network.
  </abstract>
 </titlepag>
 
@@ -32,14 +32,59 @@
  </sect1>
  
  <sect1>
-  <heading>What is the vlc</heading>
+  <heading>What is the VideoLAN project ?</heading>
   <p>
-   Vlc stands for VideoLAN client. It is the name of the program which is
-   capable of decoding MPEG streams, and displaying them onto your screen,
-   so you can watch you favourite movies, confortably sit in your armchair
-   :-).
+    VideoLAN is a complete software solution for video streaming, developed
+    by students at the <htmlurl url="http://www.ecp.fr" name="Ecole Centrale
+    Paris"> and contributors from all over the world, under the General
+    Public License (GPL). It has been designed for streaming MPEG 1 and MPEG
+    2 videos on local area networks (LAN), but it can be extended to
+    metropolitan or wide area networks (MAN, WAN), 
+    thanks to the multicast technology.
+    The VideoLAN solution includes a server, which can stream video from
+    various sources (file, DVD, satellite, camera, ...), a client, which can
+    receive, decode and display MPEG 1 and MPEG 2 streams and, if necessary,
+    a channel server which tells automatically to the client the parameters
+    needed to receive the stream.
+
+    <verb>
+
+        DVD --->-                 Unicast/Broadcast/Multicast
+                  \                           ---
+        File --->--     --------            /     \            --------
+                   |->-| Server |=====>====|  LAN  |---->-----| Client |
+     Satellite ->--    | (VLS)  |           \     /           | (VLC)  |
+                  /     --------              ---              --------
+       MPEG2 -->-                              ^
+      encoder                                  |
+                                               v
+                                        ----------------
+                                       | Channel Server |
+                                       |    (VLCS)      |
+                                        ----------------
+    </verb>
+    More details about the project can be found on the
+    <htmlurl url="http://www.videolan.org" name="VideoLAN Web site">.
+
   </p>
  </sect1>
+ <sect1>
+  <heading>The documentation of the project</heading>
+  <p>
+    There are four main documents :
+<itemize>
+<item>the <htmlurl
+url="http://www.videolan.org/doc/videolan-quickstart/videolan-quickstart.html"
+name="VideoLAN Quickstart">,
+<item>the <htmlurl url="http://www.videolan.org/network/doc/videolan-howto.html"
+name="VideoLAN HOWTO">,
+<item>the <htmlurl url="http://www.videolan.org/vls/doc/vls-guide.html"
+name="VideoLAN Server user guide">,
+<item>this VideoLAN Client Howto.
+</itemize>
+
+The up-to-date version of these documents can be found on the <htmlurl
+url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
 
  <sect1>
   <heading>Translated versions of this document</heading>
@@ -54,6 +99,57 @@
    name="http://www.videolan.org/doc/index.html">.
   </p>
  </sect1>
+
+ <sect1>
+  <heading>Requirements</heading>
+  <sect2>
+   <heading>Operating system</heading>
+   <p>
+    VLC works under the following systems :
+   </p>
+   <p>
+   <itemize>
+    <item> Linux (all distributions, including iPAQ Familiar Linux)
+    <item> Windows (all 32bit versions)
+    <item> Mas OS X
+    <item> FreeBSD, NetBSD, OpenBSD, BSD/OS
+    <item> BeOS
+    <item> QNX RTOS
+    <item> Solaris
+   </itemize>
+   </p>
+   <p>
+    Please note that the Linux, Windows and MacOS X are generally the most
+    uptodate versions.
+  </p>
+   </sect2>
+   <sect2>
+   <heading>Software requirements</heading>
+   <p>
+    Depending on the outputs and inputs you are using, you may need 
+    additionnal libraries. Please see <ref id="modules" name="description">.
+   </p>
+   <p>
+    For playing encrypted DVDs, you will need libdvdcss, which you can found
+    on this page :
+    <htmlurl name="http://www.videolan.org/libdvdcss/download.html"
+    url="http://www.videolan.org/libdvdcss/download.html">.
+   </p>
+  </sect2>
+  <sect2>
+   <heading>Hardware requirements</heading>
+   <p>
+    The hardware power needed depends a lot of the type of stream. 
+    For reading a DVD, a CPU working at around 450 MHz is required.
+   </p>
+   <p>
+    VLC can benefits from hardware acceleration from modern video cards
+    for YUV transformation and window rescaling. it also uses MMX, MMX EXT,
+    SSE, 3Dnow! optimizations if available.
+   </p>
+  </sect2>
+ </sect1>
+ 
 
  <sect1> 
   <heading>Disclaimer</heading> 
@@ -98,7 +194,7 @@
    <heading>Which package to chose ?</heading>
    <p>
     There are different packages because vlc has "plugins" which provide 
-    features but also enlarge the executable and require external libs. 
+    features but also enlarge the executable and require external libraries. 
    </p>
    <p>
     SDL is a lib which allows you to have an accelerated video output.
@@ -124,7 +220,7 @@
    </p>
    <p>
     Depending on the package you have downloaded, you may have dependency
-    problems. You have to solve them, by installing the required libs.
+    problems. You have to solve them, by installing the required libraries.
    </p>
   </sect2>
    
@@ -137,7 +233,7 @@
     </verb>
    </p>
    <p>
-    You may have to install external libs to meet dependencies, depending on
+    You may have to install external libraries to meet dependencies, depending on
     the package you downloaded (gnome, gtk, esd, ...).
    </p>
   </sect2>
@@ -147,7 +243,7 @@
    <p>
     Double-click on the archive. It should open your favorite archive extracter.
     You can then execute the vlc from there, or extract the archive to a 
-    diretory and run it from there.
+    directory and run it from there.
    </p>
   </sect2>
   
@@ -160,8 +256,9 @@
   <sect2>
    <heading>Windows users</heading>
    <p>
-    Decompress the archive with your favourite extracter in a directory of your
-    choice.
+    Launch the installer by double-clicking on it, and follow the installation
+    instructions. Please note that in most cases you will need administrator
+    rights to install it under Windows NT, 2000 and XP
    </p>
   </sect2>
  </sect1>
@@ -174,6 +271,10 @@
    packages for your distribution here : <htmlurl 
    name="http://www.videolan.org/libdvdcss/download.html" 
    url="http://www.videolan.org/libdvdcss/download.html">
+  </p>
+  <p>
+   For Windows users, libdvdcss is statically linked in the 
+   Windows binary, so you don't have to install it.
   </p>
  </sect1>
  
@@ -209,7 +310,7 @@
    <sect2>
     <heading>Windows users</heading>
     <p>
-     The path to your DVD drive usually is D: or E:. You may have a look
+     The path to your DVD drive usually is D:\ or E:\. You may have a look
      in "My Computer" and look to which letter your DVD drive is assigned.
     </p>
    </sect2>
@@ -252,7 +353,7 @@
       start.
      </p>
      <p>
-      If nothing appears and you are sure that a program is broadcasted in
+      If nothing appears and you are sure that a program is streamed in
       this channel, you may try once again, because a problem of communication
       with the channel server could have occured (in you launched vlc from
       a terminal, you should see "Network error: no answer from vlcs").
@@ -328,7 +429,7 @@
   </p>
   <p>
    In every tab, you may click on "Save" to store your settings in your
-   ~/.videolan/vlrrc file.
+   ~/.videolan/vlcrc file.
   </p>
   <sect2>
    <heading>Interface tab</heading>
@@ -436,6 +537,8 @@
     <verb> vlc udpstream:</verb> should be sufficient. If the stream
     is multicasted, you must specify the multicast address, for example 
     <verb> vlc udpstream:@239.255.255.42  </verb>
+   <p>
+    To receive a http stream, start vlc with <tt>vlc &lt;your URL&gt;</tt>.
 
    
    </p>
@@ -697,7 +800,7 @@
     make
     </verb>
    It should compile without any error. If there are, please check you 
-   have the required libs 
+   have the required libraries 
    installed on your system, as the configure script can't check them all.
   </p>
   <p>
@@ -731,7 +834,7 @@
    <p>
     This is the basic x11 video output. It only requires a 
     working X11 server. You will need xlibs headers to compile it
-    (xlibs-dev packet on Debian systems).
+    (xlibs-dev package on Debian systems).
    </p>
   </sect2>
   
@@ -938,6 +1041,13 @@
    </p>
   </sect2>
   <sect2>
+   <heading>http</heading>
+   <p>default: enabled</p>
+   <p>
+    This is the http input. You can use it for Video On Demand.
+   </p>
+  </sect2>
+  <sect2>
    <heading>satellite</heading>
    <p>default: disabled</p>
    <p>
@@ -1136,8 +1246,8 @@
   <heading>Get more help</heading>
   <p>
    First of all, it something seems to go wrong, read and try to 
-   understand the error messages. If you are a confirmed user, you 
-   may try the "-vvv" option which makes the vlc very verbose.
+   understand the error messages. You can have detailed messages by
+   choosing messages in the view menu, in GTK, Gnome and Win32 interfaces.
   </p>
   <p>
    There is a FAQ page on our website :

@@ -90,7 +90,7 @@ static int SatelliteOpen( input_thread_t * p_input )
     int                 i_freq = 0;
     int                 i_srate = 0;
     boolean_t           b_pol = 0;
-    int                 i_fec = 1;
+    int                 i_fec = 0;
     float               f_fec = 1./2;
     boolean_t           b_diseqc;
     int                 i_lnb_lof1;
@@ -127,29 +127,50 @@ static int SatelliteOpen( input_thread_t * p_input )
 
     if( i_freq > 12999 || i_freq < 10000 )
     {
-        intf_WarnMsg( 1, "input: satellite: invalid frequency, using"\
+        intf_WarnMsg( 1, "input: satellite: invalid frequency, using "\
                 "default one" );
-        i_srate = config_GetIntVariable( "frequency" );
+        i_freq = config_GetIntVariable( "frequency" );
+        if( i_freq > 12999 || i_freq < 10000 )
+        {
+            intf_ErrMsg( "input: satellite: invalid default frequency" );
+            return -1;
+        }
     }
 
     if( i_srate > 30000 || i_srate < 1000 )
     {
-        intf_WarnMsg( 1, "input: satellite: invalid symbol rate, using"\
+        intf_WarnMsg( 1, "input: satellite: invalid symbol rate, using "\
                 "default one" );
         i_srate = config_GetIntVariable( "symbol-rate" );
+        if( i_srate > 30000 || i_srate < 1000 )
+        {
+            intf_ErrMsg( "input: satellite: invalid default symbol rate" );
+            return -1;
+        }
     }
 
-    if( !b_pol && b_pol != 1 )
+    if( b_pol && b_pol != 1 )
     {
-        intf_WarnMsg( 1, "input: satellite: invalid polarization, using"\
+        intf_WarnMsg( 1, "input: satellite: invalid polarization, using "\
                 "default one" );
         b_pol = config_GetIntVariable( "polarization" );
+        fprintf(stderr, "%d\n", b_pol);
+        if( b_pol && b_pol != 1 )
+        {
+            intf_ErrMsg( "input: satellite: invalid default polarization" );
+            return -1;
+        }
     }
 
     if( i_fec > 7 || i_fec < 1 )
     {
-        intf_WarnMsg( 1, "input: satellite: invalid FEC, using default one" );
+        intf_WarnMsg( 1, "input: satellite: invalid FEC, using default one " );
         i_fec = config_GetIntVariable( "fec" );
+        if( i_fec > 7 || i_fec < 1 )
+        {
+            intf_ErrMsg( "input: satellite: invalid default FEC" );
+            return -1;
+        }
     }
 
     switch( i_fec )
