@@ -2,7 +2,7 @@
  * gtk_open.h: prototypes for open functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: open.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: open.h,v 1.2 2003/12/12 03:01:13 rocky Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -29,6 +29,7 @@ void     GtkFileOpenOk          ( GtkButton *, gpointer );
 gboolean GtkDiscOpenShow        ( GtkWidget *, gpointer );
 void     GtkDiscOpenDvd         ( GtkToggleButton *, gpointer );
 void     GtkDiscOpenVcd         ( GtkToggleButton *, gpointer );
+void     GtkDiscOpenCDDA        ( GtkToggleButton *, gpointer );
 void     GtkDiscOpenOk          ( GtkButton *, gpointer );
 void     GtkDiscOpenCancel      ( GtkButton *, gpointer );
 

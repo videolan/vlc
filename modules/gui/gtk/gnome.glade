@@ -101,7 +101,7 @@
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
 	      <name>menubar_disc</name>
-	      <tooltip>Open a DVD or VCD</tooltip>
+	      <tooltip>Open Disc Media</tooltip>
 	      <signal>
 		<name>activate</name>
 		<handler>GtkDiscOpenShow</handler>
@@ -511,7 +511,7 @@
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
 	  <name>toolbar_disc</name>
-	  <tooltip>Open a DVD or VCD</tooltip>
+	  <tooltip>Open Disc Media</tooltip>
 	  <signal>
 	    <name>clicked</name>
 	    <handler>GtkDiscOpenShow</handler>
@@ -1851,6 +1851,26 @@ http://www.videolan.org/
 		<fill>False</fill>
 	      </child>
 	    </widget>
+
+	    <widget>
+	      <class>GtkRadioButton</class>
+	      <name>disc_cdda</name>
+	      <can_focus>True</can_focus>
+	      <signal>
+		<name>toggled</name>
+		<handler>GtkDiscOpenCDDA</handler>
+		<last_modification_time>Fri, 12 Dec 2003 01:00:17 GMT</last_modification_time>
+	      </signal>
+	      <label>Audio CD</label>
+	      <active>False</active>
+	      <draw_indicator>True</draw_indicator>
+	      <group>disc</group>
+	      <child>
+		<padding>0</padding>
+		<expand>False</expand>
+		<fill>False</fill>
+	      </child>
+	    </widget>
 	  </widget>
 
 	  <widget>
@@ -2004,7 +2024,7 @@ http://www.videolan.org/
 	    <snap>False</snap>
 	    <wrap>False</wrap>
 	    <value>1</value>
-	    <lower>1</lower>
+	    <lower>0</lower>
 	    <upper>65536</upper>
 	    <step>1</step>
 	    <page>10</page>

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
- * $Id: open.c,v 1.15 2003/07/23 01:13:47 gbazin Exp $
+ * Copyright (C) 2000, 2001, 2003 VideoLAN
+ * $Id: open.c,v 1.16 2003/12/12 03:01:13 rocky Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -141,19 +141,26 @@ void GtkDiscOpenDvd( GtkToggleButton * togglebutton, gpointer user_data )
     intf_thread_t * p_intf = GtkGetIntf( togglebutton );
     char *psz_device;
 
-    if( togglebutton->active
-         && (psz_device = config_GetPsz( p_intf, "dvd" )) )
+    if( togglebutton->active ) 
     {
-        gtk_widget_set_sensitive( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "disc_dvd_use_menu" ) ) , TRUE);
+	if ( (psz_device = config_GetPsz( p_intf, "dvd" )) )
+        {
+	   gtk_widget_set_sensitive( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "disc_dvd_use_menu" ) ) , TRUE);
 
-        gtk_entry_set_text(
+	   gtk_entry_set_text(
             GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton),
                                       "disc_name" ) ), psz_device );
-        free( psz_device );
+	   free( psz_device );
+	}
+	else
+	{
+	  gtk_widget_set_sensitive( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "disc_dvd_use_menu" ) ), FALSE );
+	}
+	GtkDiscOpenChanged( (GtkWidget *) togglebutton, user_data );
     }
     else
     {
-        gtk_widget_set_sensitive( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "disc_dvd_use_menu" ) ), FALSE );
+	gtk_widget_set_sensitive( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "disc_dvd_use_menu" ) ), FALSE );
     }
 }
 
@@ -162,18 +169,40 @@ void GtkDiscOpenVcd( GtkToggleButton * togglebutton, gpointer user_data )
     intf_thread_t * p_intf = GtkGetIntf( togglebutton );
     char *psz_device;
 
-    if( togglebutton->active
-         && (psz_device = config_GetPsz( p_intf, "vcd" )) )
-    {
-        gtk_entry_set_text(
+    if( togglebutton->active ) 
+      {
+	if ( (psz_device = config_GetPsz( p_intf, "vcd" )) )
+	 {
+	   gtk_entry_set_text(
             GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton),
                                       "disc_name" ) ), psz_device );
-        free( psz_device );
-    }
+	   free( psz_device );
+	 }
+	GtkDiscOpenChanged( (GtkWidget *) togglebutton, user_data );
+      }
+}
+
+void GtkDiscOpenCDDA( GtkToggleButton * togglebutton, gpointer user_data )
+{
+    intf_thread_t * p_intf = GtkGetIntf( togglebutton );
+    char *psz_device;
+
+    if( togglebutton->active ) 
+      {
+	if ( (psz_device = config_GetPsz( p_intf, "cd-audio" )) )
+        {
+          gtk_entry_set_text(
+            GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton),
+                                      "disc_name" ) ), psz_device );
+          free( psz_device );
+	}
+	GtkDiscOpenChanged( (GtkWidget *) togglebutton, user_data );
+      }
 }
 
 static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
 {
+    intf_thread_t * p_intf = GtkGetIntf( button );
     GString * p_target = g_string_new( "" );
     GtkWidget * p_open;
     vlc_bool_t b_menus = VLC_FALSE;
@@ -192,28 +221,81 @@ static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
         }
         else
         {
-            g_string_append( p_target, "dvdold://" );
+            g_string_append( p_target, "dvdsimple://" );
         }
+	
+	g_string_append( p_target,
+			 gtk_entry_get_text( GTK_ENTRY( lookup_widget(
+                                     GTK_WIDGET(button), "disc_name" ) ) ) );
+
+	if( !b_menus )
+	  {
+	    g_string_sprintfa( p_target, "@%i:%i",
+			       gtk_spin_button_get_value_as_int(
+                                GTK_SPIN_BUTTON( lookup_widget(
+                                    GTK_WIDGET(button), "disc_title" ) ) ),
+                               gtk_spin_button_get_value_as_int(
+                                GTK_SPIN_BUTTON( lookup_widget(
+                                    GTK_WIDGET(button), "disc_chapter" ) ) ) );
+	  }
     }
     else if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
                                                "disc_vcd" ) )->active )
     {
-        g_string_append( p_target, "vcd://" );
-    }
+#ifdef HAVE_VCDX
+        int i = gtk_spin_button_get_value_as_int(
+                           GTK_SPIN_BUTTON( lookup_widget(
+	                   GTK_WIDGET(button), "disc_title" ) ) );
+	
+        g_string_append( p_target, "vcdx://" );
+	g_string_append( p_target,
+			 gtk_entry_get_text( GTK_ENTRY( lookup_widget(
+                         GTK_WIDGET(button), "disc_name" ) ) ) );
 
-    g_string_append( p_target,
+	if ( i ) 
+	  g_string_sprintfa( p_target, "@%c%d",
+			     config_GetInt( p_intf, "vcdx-PBC"  )
+			     ? 'P' : 'E', i );
+	
+    }
+#else
+        g_string_append( p_target, "vcd://" );
+	g_string_sprintfa( p_target, "@%d",
+			   gtk_spin_button_get_value_as_int(
+                           GTK_SPIN_BUTTON( lookup_widget(
+			   GTK_WIDGET(button), "disc_title" ) ) ) );
+#endif
+
+    else if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
+                                               "disc_cdda" ) )->active )
+    {
+#ifdef HAVE_CDDAX
+        int i = gtk_spin_button_get_value_as_int(
+                           GTK_SPIN_BUTTON( lookup_widget(
+	                   GTK_WIDGET(button), "disc_title" ) ) );
+
+        g_string_append( p_target, "cddax://" );
+	g_string_append( p_target,
                      gtk_entry_get_text( GTK_ENTRY( lookup_widget(
                                      GTK_WIDGET(button), "disc_name" ) ) ) );
 
-    if( !b_menus )
-    {
-        g_string_sprintfa( p_target, "@%i,%i",
+	if ( i ) 
+	  g_string_sprintfa( p_target, "@T%i",
+                             gtk_spin_button_get_value_as_int(
+                             GTK_SPIN_BUTTON( lookup_widget(
+			     GTK_WIDGET(button), "disc_title" ) ) ) );
+
+#else
+        g_string_append( p_target, "cdda://" );
+	g_string_append( p_target,
+                     gtk_entry_get_text( GTK_ENTRY( lookup_widget(
+                                     GTK_WIDGET(button), "disc_name" ) ) ) );
+
+        g_string_sprintfa( p_target, "@%i:%i",
                            gtk_spin_button_get_value_as_int(
-                                GTK_SPIN_BUTTON( lookup_widget(
-                                    GTK_WIDGET(button), "disc_title" ) ) ),
-                           gtk_spin_button_get_value_as_int(
-                                GTK_SPIN_BUTTON( lookup_widget(
-                                    GTK_WIDGET(button), "disc_chapter" ) ) ) );
+                           GTK_SPIN_BUTTON( lookup_widget(
+			   GTK_WIDGET(button), "disc_title" ) ) ) );
+#endif
     }
 
     gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),

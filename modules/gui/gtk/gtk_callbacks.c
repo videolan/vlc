@@ -1,8 +1,8 @@
 /*****************************************************************************
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.14 2003/05/05 16:09:39 gbazin Exp $
+ * Copyright (C) 2000, 2001, 2003 VideoLAN
+ * $Id: gtk_callbacks.c,v 1.15 2003/12/12 03:01:12 rocky Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -45,6 +45,18 @@
 #include "gtk_support.h"
 
 #include "common.h"
+
+#ifdef HAVE_CDDAX
+#define CDDA_MRL "cddax://"
+#else 
+#define CDDA_MRL "cdda://"
+#endif
+
+#ifdef HAVE_VCDX
+#define VCD_MRL "vcdx://"
+#else
+#define VCD_MRL "vcdx://"
+#endif
 
 /*****************************************************************************
  * Useful function to retrieve p_intf
@@ -447,31 +459,45 @@ gboolean GtkDiscEject ( GtkWidget *widget, gpointer user_data )
 
     if( psz_current != NULL )
     {
-        if( !strncmp(psz_current, "dvd:", 4) )
+        if( !strncmp(psz_current, "dvd://", 4) )
         {
-            switch( psz_current[4] )
+	    switch( psz_current[strlen("dvd://")] )
             {
             case '\0':
             case '@':
                 psz_device = config_GetPsz( p_intf, "dvd" );
                 break;
             default:
-                /* Omit the first 4 characters */
-                psz_device = strdup( psz_current + 4 );
+                /* Omit the first MRL-selector characters */
+	        psz_device = strdup( psz_current + strlen("dvd://" ) );
                 break;
             }
         }
-        else if( !strncmp(psz_current, "vcd:", 4) )
+        else if( !strncmp(psz_current, "vcd:", strlen("vcd:")) )
         {
-            switch( psz_current[4] )
+	    switch( psz_current[strlen("vcd:")] )
             {
             case '\0':
             case '@':
-                psz_device = config_GetPsz( p_intf, "vcd" );
+                psz_device = config_GetPsz( p_intf, VCD_MRL );
                 break;
             default:
-                /* Omit the first 4 characters */
-                psz_device = strdup( psz_current + 4 );
+                /* Omit the beginning MRL-selector characters */
+	        psz_device = strdup( psz_current + strlen(VCD_MRL) );
+                break;
+            }
+        }
+	else if( !strncmp(psz_current, CDDA_MRL, strlen(CDDA_MRL) ) )
+        {
+	    switch( psz_current[strlen(CDDA_MRL)] )
+            {
+            case '\0':
+            case '@':
+                psz_device = config_GetPsz( p_intf, "cd-audio" );
+                break;
+            default:
+                /* Omit the beginning MRL-selector characters */
+	        psz_device = strdup( psz_current + strlen(CDDA_MRL) );
                 break;
             }
         }
