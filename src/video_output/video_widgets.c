@@ -1,7 +1,7 @@
 /*****************************************************************************
  * video_widgets.c : widgets manipulation functions
  *****************************************************************************
- * Copyright (C) 1999-2004 VideoLAN
+ * Copyright (C) 2004 VideoLAN
  * $Id:$
  *
  * Author: Yoann Peronneau <yoann@videolan.org>
@@ -145,10 +145,8 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
 
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
-        uint8_t *p_in;
+        uint8_t *p_in = p_pic->p[ i_plane ].p_pixels;
         int i_pic_pitch = p_pic->p[ i_plane ].i_pitch;
-
-        p_in = p_pic->p[ i_plane ].p_pixels;
 
         if ( i_plane == 0 )
         {
@@ -211,7 +209,7 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 {
     subpicture_sys_t *p_widget = p_subpic->p_sys;
     int x, y, pen_x, pen_y;
-    uint8_t *p_in;
+    uint8_t *p_in = p_pic->p[0].p_pixels;
     int i_pic_pitch = p_pic->p[0].i_pitch;
 
     pen_x = p_widget->i_x;
@@ -253,7 +251,7 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
 {
     subpicture_sys_t *p_widget = p_subpic->p_sys;
     int x, y, pen_x, pen_y;
-    uint8_t *p_in;
+    uint8_t *p_in = p_pic->p[0].p_pixels;
     int i_pic_pitch = p_pic->p[0].i_pitch;
 
     pen_x = p_widget->i_x;
