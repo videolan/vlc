@@ -64,7 +64,7 @@ static void Close( vlc_object_t * );
     "value should be set in millisecond units." )
 
 #define KASENNA_TEXT N_( "Kasenna RTSP dialect")
-#define KASENNA_LONGTEXT N_( "Kasenna server speak an old and unstandard dialect of RTSP " \
+#define KASENNA_LONGTEXT N_( "Kasenna server speaks an old and unstandard dialect of RTSP. " \
     "When you set this parameter, VLC will try this dialect for communication. In " \
     "this mode you cannot talk to normal RTSP servers." )
 
@@ -243,12 +243,12 @@ static int  Open ( vlc_object_t *p_this )
         sprintf( psz_url, "rtsp://%s", p_demux->psz_path );
 
         /* Add kasenna option */
-        if( var_CreateGetBool( p_demux, "rtsp-kasenna" )) msg_Dbg(p_demux, "add kasenna option");
         psz_options = p_sys->rtsp->sendOptionsCmd( psz_url );
         if( psz_options )
             delete [] psz_options;
 
-        p_sdp = (uint8_t*)p_sys->rtsp->describeURL( psz_url );
+        p_sdp = (uint8_t*)p_sys->rtsp->describeURL( psz_url,
+                              NULL, var_CreateGetBool( p_demux, "rtsp-kasenna" ) );
         if( p_sdp == NULL )
         {
             msg_Err( p_demux, "describeURL failed (%s)", p_sys->env->getResultMsg() );
@@ -479,10 +479,6 @@ static int  Open ( vlc_object_t *p_this )
             {
                 tk->fmt.i_codec = VLC_FOURCC( 'M', 'J', 'P', 'G' );
             }
-            else if( !strcmp( sub->codecName(), "X-SV3V-ES" ) )
-            {
-                tk->fmt.i_codec = VLC_FOURCC( 'S', 'V', 'Q', '3' );
-            }
             else if( !strcmp( sub->codecName(), "MP4V-ES" ) )
             {
                 unsigned int i_extra;
@@ -498,7 +494,9 @@ static int  Open ( vlc_object_t *p_this )
                     delete[] p_extra;
                 }
             }
-            else if( !strcmp( sub->codecName(), "X-QT" ) || !strcmp( sub->codecName(), "X-QUICKTIME" ) )
+            else if( !strcmp( sub->codecName(), "X-QT" ) || !strcmp( sub->codecName(), "X-QUICKTIME" ) ||
+                     !strcmp( sub->codecName(), "X-QDM" ) || !strcmp( sub->codecName(), "X-SV3V-ES" )  ||
+                     !strcmp( sub->codecName(), "X-SORENSONVIDEO" ) )
             {
                 tk->b_quicktime = VLC_TRUE;
             }
