@@ -80,11 +80,26 @@ build-stamp:
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
 	test -d extras/ffmpeg
-	if test ! -d CVS; then cd extras/ffmpeg && ./configure && cd libavcodec && make; fi
+	if test ! -d CVS; then \
+		cd extras/ffmpeg \
+		&& ./configure \
+		&& cd libavcodec \
+		&& make; \
+	fi
 
 	# Check that we have an faad tree in here (can be a symlink)
 	test -d extras/faad
-	if test ! -d CVS; then cd extras/faad && ./configure --disable-shared && cd libfaad && make; fi
+	if test ! -d CVS; then \
+		cd extras/faad \
+		&& touch configure.in \
+		&& touch aclocal.m4 \
+		&& touch configure \
+		&& touch config.h.in \
+		&& touch `find . -name Makefile.in` \
+		&& ./configure --disable-shared \
+		&& cd libfaad \
+		&& make; \
+	fi
 
 	# Configure VLC and build it
 	./configure --mandir=$${prefix}/share/man \
