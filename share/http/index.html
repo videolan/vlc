@@ -14,143 +14,161 @@
     <vlc id="set" param1="sout" param2="string" />
  </head>
  <body>
-    <h2>
-     <a href="http://www.videolan.org/">VLC media player <vlc id="value" param1="version" /></a> (http interface)</h2>
-    <div class="sectitle">Control VLC</div>
-    <div class="section">
-     <table class="add">
-      <tr>
-       <td nowrap="nowrap">Current state: <vlc id="value" param1="stream_state" /></td>
-       <td align="right"><a href="info.html">Information</a> <a href="admin/">Administration</a></td>
-      </tr>
-      <tr>
-        <td nowrap="nowrap">
-          <form method="get" action="">
+    <div class="left">
+      <div class="sectitle">Playback control</div>
+      <div class="section-controls">
+        <form method="get" action="">
+          <p>
             <input type="submit" name="control" value="stop" />
             <input type="submit" name="control" value="pause" />
-            <input type="submit" name="control" value="previous" />
-            <input type="submit" name="control" value="next" />
-            <input type="submit" name="control" value="fullscreen" />
+            <br />
+              <input type="submit" name="control" value="previous" />
+              <input type="submit" name="control" value="next" />
+	  </p>
+            <input type="submit" name="seek_value" value="-1min"/><input type="hidden" name="control" value="seek"/>
+            <input type="submit" name="seek_value" value="+1min"/><input type="hidden" name="control" value="seek"/>
+	    <br />
+              <input type="text" name="seek_value" size="14"/><input type="hidden" name="control" value="seek"/>
           </form>
-        </td>
-      </tr>
-      <tr>
-       <td colspan="2">
-        <table>
-         <tr>
-           <td>
-             <form method="get" action="">
-               <input type="submit" name="seek_value" value="-1min"/><input type="hidden" name="control" value="seek"/>
-             </form>
-           </td>
-           <td>
-             <form method="get" action="">
-               <input type="text" name="seek_value" size="14"/><input type="hidden" name="control" value="seek"/>
-             </form>
-           </td>
-           <td>
-             <form method="get" action="">
-               <input type="submit" name="seek_value" value="+1min"/><input type="hidden" name="control" value="seek"/>
-             </form>
-           </td>
-           <td>
-            ( Seek Textbox: for example "+12min 42sec", "01:13:43", "-12%" etc... )
-           </td>
-         </tr>
-        </table>
-       </td>
-      </tr>
-      <tr>
-        <td>
-          <form method="get" action="">
-          Current volume level: <vlc id="value" param1="volume" /> <input type="text" name="value" size="5"/><button name="control" value="volume">Set</button>
-          </form>
-        </td>
-      </tr>
-     </table>
-    </div>
-    <div class="sectitle">Add</div>
-    <div class="section">
-     <form method="get" action="" enctype="text/plain" >
-      <table class="add">
-       <tr>
-        <td>Add a MRL (Media Resource Locator) to the playlist</td>
-        <td><input type="text" name="mrl" size="40" /><input type="submit" name="control" value="add" /></td>
-       </tr>
-       <tr>
-        <td>Stream Output:</td>
-        <td><input type="text" name="sout" size="40" value="<vlc id="get" param1="sout" param2="string" />" /><input type="submit" name="control" value="sout" /></td>
-       </tr>
-      </table>
-     </form>
-    </div>
+        <br />
+          <span class="small">( Seek Textbox: for example "+12min 42sec", "01:13:43", "-12%" etc... )</span>
+      </div> <!-- End section -->
 
-    <div class="sectitle">Move Item</div>
-    <div class="section">
-     <form method="get" action="">
-      Move the item number <input type="text" name="psz_pos" size="5" /> to <input type="text" name="psz_newpos" size="5" /> <input type="submit" name="control" value="move" />
-     </form>
-    </div>
+      <div class="sectitle">Misc controls</div>
+      <div class="section-controls">
+        <form method="get" action="">
+	  Vol: <input type="text" name="value" size="5"/>
+               <input type="submit" value="Set" /><br /> (0 -&gt;1024)<br />
+           <br />
+          <input type="submit" name="control" value="fullscreen" />
+        </form>
+      </div>
 
-    <div class="sectitle">VLC Playlist</div>
-     <div class="section">
-      <form method="get" action="">
-      <table>
-        <tr>
-          <td>
-            <input type="submit" name="control" value="sort" /> by
-            <select name="type">
-              <option value="title">title</option>
-              <option value="group">group</option>
-              <option value="author">author</option>
-              <option value="shuffle">shuffle</option>
-            </select> with
-            <select name="order">
-              <option value="0">normal order</option>
-              <option value="1">reverse order</option>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <table>
-              <vlc id="rpn" param1="0"/>
-              <vlc id="foreach" param1="pl" param2="playlist" />
-              <tr class="<vlc id="if" param1="pl.index 2 % 0 =" />ligne1<vlc id="else" />ligne2<vlc id="end" />">
+      <div class="sectitle">Status</div>
+      <div class="section">
+        State: <vlc id="value" param1="stream_state" /><br />
+        Length: <span id="length"><vlc id="value" param1="stream_length" /> s
+	      </span><br />
+        Time: <span id="time"><vlc id="value" param1="stream_time" /> s</span><br />
+        Volume: <span id="volume"><vlc id="value" param1="volume" /></span>
+        <br /><a href="info.html">Information</a>  
+      </div>
+    
+      <div><a href="/admin/">Administration Page</a></div>
+
+    </div> <!-- End left -->
+
+    <div class ="right">
+      <h2><a href="http://www.videolan.org/">VLC media player
+          <vlc id="value" param1="version" /></a> (http interface)
+      </h2>
+
+      <div class="sectitle">Add</div>
+      <div class="section">
+        <form method="get" action="" enctype="text/plain" >
+          <table class="add">
+            <tr>
+              <td>Add a MRL (Media Resource Locator) to the playlist</td>
+              <td><input type="text" name="mrl" size="40" /><input type="submit" name="control" value="add" /></td>
+            </tr>
+            <tr>
+              <td>Stream Output:</td>
+              <td><input type="text" name="sout" size="40" value="<vlc id="get" param1="sout" param2="string" />" /><input type="submit" name="control" value="sout" /></td>
+            </tr>
+          </table>
+        </form>
+      </div>
+
+      <div class="section">
+        <form method="get" action="">
+          <table>
+            <tr>
+              <td>
+                <table><tr>
                 <td>
-                  <input type="checkbox" name="item" value="<vlc id="value" param1="pl.index" />"/>
-                  <vlc id="if" param1="pl.current" />
-                  <b>
-                  <vlc id="end" />
-                  <a href="?control=play&amp;item=<vlc id="value" param1="pl.index" />">
-                  <vlc id="value" param1="pl.index" /> - <vlc id="value" param1="pl.uri" /><vlc id="if" param1="pl.uri value pl.name value strcmp"/>  (<vlc id="value" param1="pl.name" />)<vlc id="end"/></a>
-                  <vlc id="if" param1="pl.current" />
-                  </b>
-                  <vlc id="end" />
+                  <input type="submit" name="control" value="sort" /> by
+                  <select name="type">
+                    <option value="title">title</option>
+                    <option value="group">group</option>
+                    <option value="author">author</option>
+                    <option value="shuffle">shuffle</option>
+                  </select> with
+                  <select name="order">
+                    <option value="0">normal order</option>
+                    <option value="1">reverse order</option>
+                  </select>
                 </td>
-              </tr>
-              <vlc id="rpn" param1="1 +"/>
-              <vlc id="end" />
-              <vlc id="if" param1="0 ="/>
-               <tr class="ligne1">
                 <td>
-                 empty playlist
+                  <form method="get" action="">
+                     Move the item number
+		    <input type="text" name="psz_pos" size="5" /> to 
+		    <input type="text" name="psz_newpos" size="5" /> 
+		    <input type="submit" name="control" value="move" />
+                  </form>
                 </td>
-               </tr>
-              <vlc id="end"/>
-            </table>
-          </td>
-        </tr>
-        <tr>  
-          <td>
-            <input type="submit" name="control" value="delete" />
-            <input type="submit" name="control" value="keep" />
-          </td>
-        </tr>
-      </table>
-      </form>
+                </tr></table>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <table>
+                  <vlc id="rpn" param1="0"/>
+                  <vlc id="foreach" param1="pl" param2="playlist" />
+                  <tr class="<vlc id="if" param1="pl.index 2 % 0 =" />ligne1<vlc id="else" />ligne2<vlc id="end" />">
+                    <td>
+                      <input type="checkbox" name="item" value="<vlc id="value" param1="pl.index" />"/>
+                      <vlc id="if" param1="pl.current" />
+                        <strong>
+                      <vlc id="end" />
+                      <a href="?control=play&amp;item=<vlc id="value" param1="pl.index" />">
+                      <vlc id="value" param1="pl.index" /> - <vlc id="value" param1="pl.uri" /><vlc id="if" param1="pl.uri value pl.name value strcmp"/>  (<vlc id="value" param1="pl.name" />)<vlc id="end"/></a>
+                      <vlc id="if" param1="pl.current" />
+                        </strong>
+                      <vlc id="end" />
+                    </td>
+                  </tr>
+                  <vlc id="rpn" param1="1 +"/>
+                  <vlc id="end" />
+                  <vlc id="if" param1="0 ="/>
+                  <tr class="ligne1">
+                    <td>empty playlist</td>
+                  </tr>
+                  <vlc id="end"/>
+                </table>
+              </td>
+            </tr>
+            <tr>  
+              <td>
+                <input type="submit" name="control" value="delete" />
+                <input type="submit" name="control" value="keep" />
+              </td>
+            </tr>
+          </table>
+        </form>
+      </div>
     </div>
     <hr/>
-    <p> <vlc id="value" param1="copyright" /> </p>
+    <p style="text-align:center;font-size:1.2em;"> <vlc id="value" param1="copyright" /> </p>
+
+    <script language="javascript" type="text/javascript">
+      got_time = <vlc id="value" param1="stream_time" />;
+      hours = Math.floor(got_time/ 3600);
+      minutes = Math.floor((got_time/60) % 60);
+      seconds = got_time % 60;
+      if ( hours < 10 ) hours = "0" + hours;
+      if ( minutes < 10 ) minutes = "0" + minutes;
+      if ( seconds < 10 ) seconds = "0" + seconds;
+      document.getElementById('time').innerHTML = hours+":"+minutes+":"+seconds;
+      got_length = <vlc id="value" param1="stream_length" />;
+      hours = Math.floor(got_length/ 3600);
+      minutes = Math.floor((got_length/60) % 60);
+      seconds = got_length % 60;
+      if ( hours < 10 ) hours = "0" + hours;
+      if ( minutes < 10 ) minutes = "0" + minutes;
+      if ( seconds < 10 ) seconds = "0" + seconds;
+      document.getElementById('length').innerHTML = hours+":"+minutes+":"+seconds;
+      got_volume = <vlc id="value" param1="volume" />;
+      document.getElementById( 'volume').innerHTML = Math.floor(got_volume * 100/1024) + " %";
+    </script>
 </body>
 </html>
