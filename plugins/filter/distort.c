@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.12 2002/05/27 19:35:41 sam Exp $
+ * $Id: distort.c,v 1.13 2002/05/28 22:49:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -50,7 +50,7 @@ static void vout_getfunctions( function_list_t * p_function_list );
  *****************************************************************************/
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING  ( "distort_mode", "wave", NULL, N_("distort mode"),
+ADD_STRING  ( "distort-mode", "wave", NULL, N_("distort mode"),
               N_("one of \"wave\" and \"ripple\"") )
 MODULE_CONFIG_STOP
 
@@ -161,11 +161,11 @@ static int vout_Create( vout_thread_t *p_vout )
         /* No method given in commandline. Look what method was
          requested in configuration system */
         if( !(psz_method = psz_method_tmp
-              = config_GetPszVariable( "distort_mode" )) )
+              = config_GetPszVariable( "distort-mode" )) )
         {
             intf_ErrMsg( "vout error: configuration variable %s empty "
                          "using wave",
-                         "distort_mode" );
+                         "distort-mode" );
             p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
         }
         else {

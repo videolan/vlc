@@ -2,7 +2,7 @@
  * transform.c : transform image plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: transform.c,v 1.11 2002/05/27 19:35:41 sam Exp $
+ * $Id: transform.c,v 1.12 2002/05/28 22:49:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -51,7 +51,7 @@ static void vout_getfunctions( function_list_t * p_function_list );
  *****************************************************************************/
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING("transform_type", "90", NULL, N_("Transform type"),
+ADD_STRING("transform-type", "90", NULL, N_("Transform type"),
            N_("One of '90', '180', '270', 'hflip' and 'vflip'"))
 MODULE_CONFIG_STOP
 
@@ -117,7 +117,7 @@ static void vout_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Create( vout_thread_t *p_vout )
 {
-    char *psz_method, *psz_method_tmp;
+    char *psz_method;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -128,11 +128,12 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     /* Look what method was requested */
-    if( !(psz_method = psz_method_tmp
-          = config_GetPszVariable( "transform_type" )) )
+    psz_method = config_GetPszVariable( "transform-type" );
+
+    if( psz_method == NULL )
     {
         intf_ErrMsg( "vout error: configuration variable %s empty",
-                     "transform_type" );
+                     "transform-type" );
         intf_ErrMsg( "filter error: no valid transform mode provided, "
                      "using '90'" );
         p_vout->p_sys->i_mode = TRANSFORM_MODE_90;
@@ -172,10 +173,10 @@ static int vout_Create( vout_thread_t *p_vout )
             p_vout->p_sys->i_mode = TRANSFORM_MODE_90;
             p_vout->p_sys->b_rotation = 1;
         }
+
+        free( psz_method );
     }
     
-    free( psz_method_tmp );
-
     return( 0 );
 }
 

@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.18 2002/05/27 19:35:41 sam Exp $
+ * $Id: wall.c,v 1.19 2002/05/28 22:49:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,13 +45,13 @@ static void vout_getfunctions( function_list_t * p_function_list );
  *****************************************************************************/
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_INTEGER ( "wall_cols", 3, NULL, N_("Number of columns"),
+ADD_INTEGER ( "wall-cols", 3, NULL, N_("Number of columns"),
               N_("Select the number of horizontal videowindows in which "
                  "to split the video") )
-ADD_INTEGER ( "wall_rows", 3, NULL, N_("Number of rows"),
+ADD_INTEGER ( "wall-rows", 3, NULL, N_("Number of rows"),
               N_("Select the number of vertical videowindows in which "
                  "to split the video") )
-ADD_STRING ( "wall_active", NULL, NULL, N_("Active windows"),
+ADD_STRING ( "wall-active", NULL, NULL, N_("Active windows"),
              N_("comma separated list of active windows, defaults to all") )
 MODULE_CONFIG_STOP
 
@@ -138,8 +138,8 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     /* Look what method was requested */
-    p_vout->p_sys->i_col = config_GetIntVariable( "wall_cols" );
-    p_vout->p_sys->i_row = config_GetIntVariable( "wall_rows" );
+    p_vout->p_sys->i_col = config_GetIntVariable( "wall-cols" );
+    p_vout->p_sys->i_row = config_GetIntVariable( "wall-rows" );
 
     p_vout->p_sys->i_col = __MAX( 1, __MIN( 15, p_vout->p_sys->i_col ) );
     p_vout->p_sys->i_row = __MAX( 1, __MIN( 15, p_vout->p_sys->i_row ) );
@@ -158,7 +158,7 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    psz_method_tmp = psz_method = config_GetPszVariable( "wall_active" );
+    psz_method_tmp = psz_method = config_GetPszVariable( "wall-active" );
 
     /* If no trailing vout are specified, take them all */
     if( psz_method == NULL )

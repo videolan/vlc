@@ -2,7 +2,7 @@
  * clone.c : Clone video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: clone.c,v 1.3 2002/05/27 19:35:41 sam Exp $
+ * $Id: clone.c,v 1.4 2002/05/28 22:49:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,7 +45,7 @@ static void vout_getfunctions( function_list_t * p_function_list );
  *****************************************************************************/
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_INTEGER ( "clone_count", 2, NULL, N_("Number of clones"),
+ADD_INTEGER ( "clone-count", 2, NULL, N_("Number of clones"),
               N_("Select the number of videowindows in which to clone the video") )
 MODULE_CONFIG_STOP
 
@@ -122,7 +122,7 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     /* Look what method was requested */
-    p_vout->p_sys->i_clones = config_GetIntVariable( "clone_count" );
+    p_vout->p_sys->i_clones = config_GetIntVariable( "clone-count" );
 
     p_vout->p_sys->i_clones = __MAX( 1, __MIN( 99, p_vout->p_sys->i_clones ) );
 

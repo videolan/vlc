@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.11 2002/05/27 19:35:41 sam Exp $
+ * $Id: deinterlace.c,v 1.12 2002/05/28 22:49:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -50,7 +50,7 @@ static void *memblend( void *, const void *, const void *, size_t );
  *****************************************************************************/
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING  ( "deinterlace_mode", "bob", NULL, N_("Deinterlace mode"),
+ADD_STRING  ( "deinterlace-mode", "bob", NULL, N_("Deinterlace mode"),
               N_("one of 'bob' and 'blend'") )
 MODULE_CONFIG_STOP
 
@@ -127,26 +127,32 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     /* Look what method was requested */
-    if( !(psz_method = config_GetPszVariable( "filter" )) )
+    psz_method = config_GetPszVariable( "deinterlace-mode" );
+
+    if( psz_method == NULL )
     {
         intf_ErrMsg( "vout error: configuration variable %s empty",
-                     "filter" );
-        return( 1 );
-    }
-
-    if( !strcmp( psz_method, "bob" ) )
-    {
-        p_vout->p_sys->i_mode = DEINTERLACE_MODE_BOB;
-    }
-    else if( !strcmp( psz_method, "blend" ) )
-    {
-        p_vout->p_sys->i_mode = DEINTERLACE_MODE_BLEND;
-    }
-    else
-    {
+                     "deinterlace-mode" );
         intf_ErrMsg( "filter error: no valid deinterlace mode provided, "
                      "using deinterlace:bob" );
         p_vout->p_sys->i_mode = DEINTERLACE_MODE_BOB;
+    }
+    else
+    {
+        if( !strcmp( psz_method, "bob" ) )
+        {
+            p_vout->p_sys->i_mode = DEINTERLACE_MODE_BOB;
+        }
+        else if( !strcmp( psz_method, "blend" ) )
+        {
+            p_vout->p_sys->i_mode = DEINTERLACE_MODE_BLEND;
+        }
+        else
+        {
+            intf_ErrMsg( "filter error: no valid deinterlace mode provided, "
+                         "using deinterlace:bob" );
+            p_vout->p_sys->i_mode = DEINTERLACE_MODE_BOB;
+        }
     }
 
     free( psz_method );
