@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: cdda.c,v 1.7 2003/12/01 03:37:23 rocky Exp $
+ * $Id: cdda.c,v 1.8 2003/12/02 03:33:22 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -41,9 +41,13 @@ void E_(CloseIntf)    ( vlc_object_t * );
 int  E_(DemuxOpen)    ( vlc_object_t * p_this);
 void E_(DemuxClose)   ( vlc_object_t * p_this);
 
-int  E_(DebugCallback)       ( vlc_object_t *p_this, const char *psz_name,
-			       vlc_value_t oldval, vlc_value_t val, 
-			       void *p_data );
+int  E_(DebugCB)      ( vlc_object_t *p_this, const char *psz_name,
+			vlc_value_t oldval, vlc_value_t val, 
+			void *p_data );
+
+int  E_(CDDBEnabledCB)( vlc_object_t *p_this, const char *psz_name,
+			vlc_value_t oldval, vlc_value_t val, 
+			void *p_data );
 
 /*****************************************************************************
  * Module descriptor
@@ -73,30 +77,33 @@ int  E_(DebugCallback)       ( vlc_object_t *p_this, const char *psz_name,
     "Allows you to modify the default caching value for cdda streams. This " \
     "value should be set in millisecond units." )
 
-#define TITLE_FMT_LONGTEXT N_( \
+#define CDDB_TITLE_FMT_LONGTEXT N_( \
 "Format used in the GUI Playlist Title. Similar to the Unix date \n" \
 "Format specifiers that start with a percent sign. Specifiers are: \n" \
-"   %a : The artist **\n" \
-"   %A : The album information **\n" \
-"   %C : Category **\n" \
+"   %a : The artist\n" \
+"   %A : The album information\n" \
+"   %C : Category\n" \
 "   %I : CDDB disk ID\n" \
-"   %G : Genre **\n" \
+"   %G : Genre\n" \
 "   %M : The current MRL\n" \
 "   %m : The CD-DA Media Catalog Number (MCN)\n" \
 "   %n : The number of tracks on the CD\n" \
-"   %p : The artist/performer/composer in the track **\n" \
+"   %p : The artist/performer/composer in the track\n" \
 "   %T : The track number\n" \
 "   %s : Number of seconds in this track \n" \
-"   %t : The title **\n" \
-"   %Y : The year 19xx or 20xx **\n" \
-"   %% : a % \n" \
-"\n\n ** Only available if CDDB is enabled")
+"   %t : The title\n" \
+"   %Y : The year 19xx or 20xx\n" \
+"   %% : a % \n")
 
-#ifdef HAVE_LIBCDDB
-#define DEFAULT_TITLE_FORMAT "Track %T. %t - %p",
-#else 
-#define DEFAULT_TITLE_FORMAT "%T %M",
-#endif
+#define TITLE_FMT_LONGTEXT N_( \
+"Format used in the GUI Playlist Title. Similar to the Unix date \n" \
+"Format specifiers that start with a percent sign. Specifiers are: \n" \
+"   %M : The current MRL\n" \
+"   %m : The CD-DA Media Catalog Number (MCN)\n" \
+"   %n : The number of tracks on the CD\n" \
+"   %T : The track number\n" \
+"   %s : Number of seconds in this track \n" \
+"   %% : a % \n")
 
 /*****************************************************************************
  * Module descriptor
@@ -113,7 +120,7 @@ vlc_module_begin();
     /* Configuration options */
     add_category_hint( N_("CDX"), NULL, VLC_TRUE );
 
-    add_integer ( MODULE_STRING "-debug", 0, E_(DebugCallback), 
+    add_integer ( MODULE_STRING "-debug", 0, E_(DebugCB), 
 		  N_("set debug mask for additional debugging."),
                   DEBUG_LONGTEXT, VLC_TRUE );
 
@@ -126,12 +133,18 @@ vlc_module_begin();
 		N_("CD-ROM device name"),
                 DEV_LONGTEXT, VLC_FALSE );
 
-    add_string( MODULE_STRING "-title-format", DEFAULT_TITLE_FORMAT, NULL, 
-		N_("Format to use in playlist 'title' field"),
+    add_string( MODULE_STRING "-title-format", 
+		"%T %M", NULL, 
+		N_("Format to use in playlist 'title' field when no CDDB"),
                 TITLE_FMT_LONGTEXT, VLC_TRUE );
 
 #ifdef HAVE_LIBCDDB
-    add_bool( MODULE_STRING "-cddb-enabled", 1, NULL,
+    add_string( MODULE_STRING "-cddb-title-format", 
+		"Track %T. %t - %p", NULL, 
+		N_("Format to use in playlist 'title' field when using CDDB"),
+                CDDB_TITLE_FMT_LONGTEXT, VLC_TRUE );
+
+    add_bool( MODULE_STRING "-cddb-enabled", 1, E_(CDDBEnabledCB),
 	      N_("Do CDDB lookups?"),
 	      N_("If set, lookup CD-DA track information using the CDDB "
 		 "protocol"),

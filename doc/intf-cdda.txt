@@ -165,34 +165,49 @@ Configuration settings in vlc are generally put in ~/.vlc/vlcrc. A
 description of the ones specific to CDDAX are listed below.
 
 - -
-cddax-title-format
+cddax-cddb-title-format
 
-This gives a format used in the playlist title string.
+This gives a format used in the playlist title string when CDDB is consulted.
 Similar to the Unix date command, there are format specifiers
 that start with a percent sign for which various information is filled
 in dynamically.  The control specifiers are given as below
 
-   %a : The album artist **
-   %A : The album information **
-   %C : Category **
-   %I : CDDB disk ID **
-   %G : Genre **
+   %a : The album artist
+   %A : The album information
+   %C : Category
+   %I : CDDB disk ID
+   %G : Genre
    %M : The current MRL
    %m : The CD-DA Media Catalog Number (MCN)
    %n : The number of tracks on the CD
-   %p : The artist/performer/composer in the track **
-   %T : The track number **
+   %p : The artist/performer/composer in the track
+   %T : The track number
    %s : Number of seconds in this track
-   %t : The name **
-   %Y : The year 19xx or 20xx **
+   %t : The name
+   %Y : The year 19xx or 20xx
    %% : a %
 
-** Only available if CDDB is enabled
-
-The default if CDDB is enabled is 
+The default is
   Track %T. %t - %p 
-Or 
-  %T %M otherwise
+
+- -
+cddax-title-format
+
+This gives a format used in the playlist title string when CDDB is
+*NOT* consulted.  Similar to the Unix date command, there are format
+specifiers that start with a percent sign for which various
+information is filled in dynamically.  The control specifiers are
+given as below
+
+   %M : The current MRL
+   %m : The CD-DA Media Catalog Number (MCN)
+   %n : The number of tracks on the CD
+   %T : The track number
+   %s : Number of seconds in this track
+   %% : a %
+
+The default is 
+  %T %M 
 
 - -
 cddax-cddb-email
@@ -372,4 +387,4 @@ analyze the contents of a CD.
 The tool cd-read from libcdio can be used to show the sectors of 
 the CD or CD image or extract sectors. 
 
-$Id: intf-cdda.txt,v 1.2 2003/12/01 04:05:29 rocky Exp $
+$Id: intf-cdda.txt,v 1.3 2003/12/02 03:33:22 rocky Exp $
