@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.27 2002/12/06 10:10:40 sam Exp $
+ * $Id: threads.c,v 1.28 2002/12/08 00:41:06 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -612,7 +612,8 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
         param.sched_priority = i_priority;
         if ( pthread_setschedparam( p_this->thread_id, SCHED_RR, &param ) )
         {
-            msg_Warn( p_this, "couldn't go to real-time priority" );
+            msg_Warn( p_this, "couldn't go to real-time priority (%s:%d)",
+                      psz_file, i_line );
             i_priority = 0;
         }
     }
@@ -668,6 +669,32 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
     }
 
     return i_ret;
+}
+
+/*****************************************************************************
+ * vlc_thread_set_priority: set the priority of the current thread when we
+ * couldn't set it in vlc_thread_create (for instance for the main thread)
+ *****************************************************************************/
+int __vlc_thread_set_priority( vlc_object_t *p_this, char * psz_file,
+                               int i_line, int i_priority )
+{
+#if defined( WIN32 ) || defined( UNDER_CE )
+    /* FIXME: implement it under Win32 ! */
+
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    if ( i_priority )
+    {
+        struct sched_param param;
+        memset( &param, 0, sizeof(struct sched_param) );
+        param.sched_priority = i_priority;
+        if ( pthread_setschedparam( pthread_self(), SCHED_RR, &param ) )
+        {
+            msg_Warn( p_this, "couldn't go to real-time priority (%s:%d)",
+                      psz_file, i_line );
+            i_priority = 0;
+        }
+    }
+#endif
 }
 
 /*****************************************************************************

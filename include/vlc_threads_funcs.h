@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads_funcs.h,v 1.9 2002/11/11 14:39:11 sam Exp $
+ * $Id: vlc_threads_funcs.h,v 1.10 2002/12/08 00:41:06 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -35,8 +35,10 @@ VLC_EXPORT( int,  __vlc_mutex_destroy, ( char *, int, vlc_mutex_t * ) );
 VLC_EXPORT( int,  __vlc_cond_init,     ( vlc_object_t *, vlc_cond_t * ) );
 VLC_EXPORT( int,  __vlc_cond_destroy,  ( char *, int, vlc_cond_t * ) );
 VLC_EXPORT( int,  __vlc_thread_create, ( vlc_object_t *, char *, int, char *, void * ( * ) ( void * ), int, vlc_bool_t ) );
+VLC_EXPORT( int,  __vlc_thread_set_priority, ( vlc_object_t *, char *, int, int ) );
 VLC_EXPORT( void, __vlc_thread_ready,  ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, char *, int ) );
+
 
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
@@ -683,6 +685,12 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
  *****************************************************************************/
 #define vlc_thread_create( P_THIS, PSZ_NAME, FUNC, PRIORITY, WAIT )         \
     __vlc_thread_create( VLC_OBJECT(P_THIS), __FILE__, __LINE__, PSZ_NAME, (void * ( * ) ( void * ))FUNC, PRIORITY, WAIT )
+
+/*****************************************************************************
+ * vlc_thread_set_priority: set the priority of the calling thread
+ *****************************************************************************/
+#define vlc_thread_set_priority( P_THIS, PRIORITY )                         \
+    __vlc_thread_set_priority( VLC_OBJECT(P_THIS), __FILE__, __LINE__, PRIORITY )
 
 /*****************************************************************************
  * vlc_thread_ready: tell the parent thread we were successfully spawned
