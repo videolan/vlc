@@ -2,7 +2,7 @@
  * ugly.c : linear interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: linear.c,v 1.1 2002/11/07 21:09:59 sigmunau Exp $
+ * $Id: linear.c,v 1.2 2002/11/10 13:24:35 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -55,7 +55,6 @@ vlc_module_end();
 static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
-    msg_Dbg( p_this, " trying the linear resampler");
     if ( p_filter->input.i_rate == p_filter->output.i_rate
           || p_filter->input.i_format != p_filter->output.i_format
           || p_filter->input.i_channels != p_filter->output.i_channels
@@ -85,12 +84,13 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     / p_filter->input.i_rate;
     int i_frame_bytes = i_nb_channels * sizeof(s32);
     int i_in, i_chan, i_out = 0;
-    double f_step = (float)i_in_nb/i_out_nb;
+    double f_step = (float)p_filter->input.i_rate / p_filter->output.i_rate;
     float f_pos = 1;
+    
     for( i_in = 0 ; i_in < i_in_nb - 1; i_in++ )
     {
         f_pos--;
-        while( f_pos < 1 )
+        while( f_pos <= 1 )
         {
             for( i_chan = i_nb_channels ; i_chan ; )
             {
@@ -104,16 +104,11 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         }
         p_in += i_nb_channels;
     }
-    if ( f_step < 1 ) {
-        for( i_chan = i_nb_channels ; i_chan ; )
-        {
-            i_chan--;
-            p_out[i_chan] = p_in[i_chan];
-            i_out++;
-        }
-    }
-    if ( i_out != i_out_nb * i_nb_channels ) {
-        msg_Warn( p_aout, "mismatch in sample nubers: %d requested, %d generated", i_out_nb* i_nb_channels, i_out);
+    
+    if ( i_out != i_out_nb * i_nb_channels )
+    {
+        msg_Warn( p_aout, "mismatch in sample numbers: %d requested, "
+                  "%d generated", i_out_nb* i_nb_channels, i_out);
     }
                                               
     p_out_buf->i_nb_samples = i_out_nb;

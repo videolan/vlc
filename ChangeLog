@@ -1,6 +1,8 @@
 0.5.0
 Not released yet
 
+  * ./modules/audio_filter/resampler/linear.c: new audio resampler based on
+    linear interpolation
   * ./modules/gui/macosx/prefs.m: new configuration interface
   * ./src/misc/netutils.c: GetMacAddress Darwin support
   * ./src/libvlc.h: default to en0 instead of eth0 under Darwin
