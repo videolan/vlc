@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.52 2003/06/26 18:14:56 sam Exp $
+ * $Id: avi.c,v 1.53 2003/07/20 12:34:36 sigmunau Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1165,20 +1165,29 @@ static int AVIInit( vlc_object_t * p_this )
                         p_avi_strf_auds->p_wf->nSamplesPerSec,
                         p_avi_strf_auds->p_wf->wBitsPerSample );
                 {
-                    char hepp[sizeof("Stream") + 10];
+                    char psz_cat[ sizeof("Stream") + 10 ];
                     input_info_category_t *p_cat;
-                    sprintf(hepp, "Stream %d", i);
-                    p_cat = input_InfoCategory( p_input, hepp);
+                    sprintf( psz_cat, _("Stream %d"), i );
+                    p_cat = input_InfoCategory( p_input, psz_cat );
                     input_AddInfo( p_cat, _("Type"), "Audio(0x%x)",
                                    p_avi_strf_auds->p_wf->wFormatTag );
                     input_AddInfo( p_cat, _("Codec"), "%4.4s",
                                    (const char*)&(p_info->i_codec) );
+                    input_AddInfo( p_cat, _("FOURCC"), "0x%x",
+                                   p_info->i_codec );
                     input_AddInfo( p_cat, _("Channels"), "%d",
                                    p_avi_strf_auds->p_wf->nChannels );
                     input_AddInfo( p_cat, _("Sample Rate"), "%d",
                                    p_avi_strf_auds->p_wf->nSamplesPerSec );
-                    input_AddInfo( p_cat, _("Bits Per Sample"), "%d",
-                                   p_avi_strf_auds->p_wf->wBitsPerSample );
+                    if( p_avi_strf_auds->p_wf->wBitsPerSample > 0
+                        && p_info->i_scale != 0 )
+                    {
+                        input_AddInfo( p_cat, _("Bits Per Sample"), "%d",
+                                       p_avi_strf_auds->p_wf->wBitsPerSample );
+                        input_AddInfo( p_cat, _("Audio Bitrate"), "%d",
+                                       p_info->i_samplesize * p_info->i_rate
+                                       / p_info->i_scale );
+                    }
                 }
                 break;
 
@@ -1201,13 +1210,15 @@ static int AVIInit( vlc_object_t * p_this )
                          (float)p_info->i_rate /
                              (float)p_info->i_scale );
                 {
-                    char hepp[sizeof("Stream") + 10];
+                    char psz_cat[ sizeof("Stream") + 10 ];
                     input_info_category_t *p_cat;
-                    sprintf(hepp, "Stream %d", i);
-                    p_cat = input_InfoCategory( p_input, hepp);
+                    sprintf( psz_cat, "Stream %d", i );
+                    p_cat = input_InfoCategory( p_input, psz_cat );
                     input_AddInfo( p_cat, _("Type"), _("Video") );
                     input_AddInfo( p_cat, _("Codec"), "%4.4s",
                                    (const char*)&(p_info->i_codec) );
+                    input_AddInfo( p_cat, _("FOURCC"), "0x%x",
+                                   p_info->i_codec );
                     input_AddInfo( p_cat, _("Resolution"), "%dx%d",
                                    p_avi_strf_vids->p_bih->biWidth,
                                    p_avi_strf_vids->p_bih->biHeight );
