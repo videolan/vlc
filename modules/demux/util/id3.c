@@ -2,7 +2,7 @@
  * id3.c: simple id3 tag skipper
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3.c,v 1.5 2003/10/25 00:49:14 sam Exp $
+ * $Id: id3.c,v 1.6 2003/11/02 22:15:14 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -29,6 +29,8 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+
+#include "ninput.h"
 
 #include <sys/types.h>
 
@@ -64,16 +66,17 @@ static int SkipID3Tag( vlc_object_t *p_this )
     p_input = (input_thread_t *)p_this;
 
     msg_Dbg( p_input, "Checking for ID3 tag" );
+
     /* get 10 byte id3 header */
-    if( input_Peek( p_input, &p_peek, 10 ) < 10 )
+    if( stream_Peek( p_input->s, &p_peek, 10 ) < 10 )
     {
         msg_Err( p_input, "cannot peek()" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
-    if ( !( (p_peek[0] == 0x49) && (p_peek[1] == 0x44) && (p_peek[2] == 0x33)))
+    if( p_peek[0] != 'I' || p_peek[1] != 'D' || p_peek[2] != '3' )
     {
-        return( VLC_SUCCESS );
+        return VLC_SUCCESS;
     }
 
     version = p_peek[3];  /* These may become usfull later, */
@@ -89,15 +92,11 @@ static int SkipID3Tag( vlc_object_t *p_this )
     }
     i_size += 10;
 
-    /* peek the entire tag */
-    if ( input_Peek( p_input, &p_peek, i_size ) < i_size )
-    {
-        msg_Err( p_input, "cannot peek()" );
-        return( VLC_EGENERIC );
-    }
+    /* Skip the entire tag */
+    stream_Read( p_input->s, NULL, i_size );
 
     msg_Dbg( p_input, "ID3v2.%d revision %d tag found, skiping %d bytes",
              version, revision, i_size );
-    p_input->p_current_data += i_size; /* seek passed end of ID3 tag */
-    return ( VLC_SUCCESS );
+
+    return VLC_SUCCESS;
 }

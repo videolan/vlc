@@ -2,7 +2,7 @@
  * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3tag.c,v 1.14 2003/10/29 17:32:54 zorglub Exp $
+ * $Id: id3tag.c,v 1.15 2003/11/02 22:15:14 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -30,6 +30,8 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/input.h>
+
+#include "ninput.h"
 
 #include <sys/types.h>
 
@@ -178,17 +180,17 @@ static int ParseID3Tags( vlc_object_t *p_this )
     if ( p_input->stream.b_seekable &&
          p_input->stream.i_method != INPUT_METHOD_NETWORK )
     {
-        stream_position_t pos;
+        int64_t i_pos;
 
         /*look for a id3v1 tag at the end of the file*/
-        input_Tell( p_input, &pos );
-        if ( pos.i_size >128 )
+        i_pos = stream_Tell( p_input->s );
+        if ( i_pos >128 )
         {
             input_AccessReinit( p_input );
-            p_input->pf_seek( p_input, pos.i_size - 128 );
+            p_input->pf_seek( p_input, i_pos - 128 );
 
             /* get 10 byte id3 header */
-            if( input_Peek( p_input, &p_peek, 10 ) < 10 )
+            if( stream_Peek( p_input->s, &p_peek, 10 ) < 10 )
             {
                 msg_Err( p_input, "cannot peek()" );
                 return( VLC_EGENERIC );
@@ -197,7 +199,7 @@ static int ParseID3Tags( vlc_object_t *p_this )
             if ( i_size2 == 128 )
             {
                 /* peek the entire tag */
-                if ( input_Peek( p_input, &p_peek, i_size2 ) < i_size2 )
+                if ( stream_Peek( p_input->s, &p_peek, i_size2 ) < i_size2 )
                 {
                     msg_Err( p_input, "cannot peek()" );
                     return( VLC_EGENERIC );
@@ -207,18 +209,18 @@ static int ParseID3Tags( vlc_object_t *p_this )
 
             /* look for id3v2.4 tag at end of file */
             /* get 10 byte id3 footer */
-            if( input_Peek( p_input, &p_peek, 128 ) < 128 )
+            if( stream_Peek( p_input->s, &p_peek, 128 ) < 128 )
             {
                 msg_Err( p_input, "cannot peek()" );
                 return( VLC_EGENERIC );
             }
             i_size2 = id3_tag_query( p_peek + 118, 10 );
-            if ( i_size2 < 0  && pos.i_size > -i_size2 )
+            if ( i_size2 < 0  && i_pos > -i_size2 )
             {                                        /* id3v2.4 footer found */
                 input_AccessReinit( p_input );
-                p_input->pf_seek( p_input, pos.i_size + i_size2 );
+                p_input->pf_seek( p_input, i_pos + i_size2 );
                 /* peek the entire tag */
-                if ( input_Peek( p_input, &p_peek, i_size2 ) < i_size2 )
+                if ( stream_Peek( p_input->s, &p_peek, i_size2 ) < i_size2 )
                 {
                     msg_Err( p_input, "cannot peek()" );
                     return( VLC_EGENERIC );
@@ -230,7 +232,7 @@ static int ParseID3Tags( vlc_object_t *p_this )
         p_input->pf_seek( p_input, 0 );
     }
     /* get 10 byte id3 header */
-    if( input_Peek( p_input, &p_peek, 10 ) < 10 )
+    if( stream_Peek( p_input->s, &p_peek, 10 ) < 10 )
     {
         msg_Err( p_input, "cannot peek()" );
         return( VLC_EGENERIC );
@@ -242,15 +244,18 @@ static int ParseID3Tags( vlc_object_t *p_this )
         return( VLC_SUCCESS );
     }
 
-    /* peek the entire tag */
-    if ( input_Peek( p_input, &p_peek, i_size ) < i_size )
+    /* Read the entire tag */
+    p_peek = malloc( i_size );
+    if( !p_peek || stream_Read( p_input->s, p_peek, i_size ) < i_size )
     {
-        msg_Err( p_input, "cannot peek()" );
+        msg_Err( p_input, "cannot read id3 tag" );
+        if( p_peek ) free( p_peek );
         return( VLC_EGENERIC );
     }
 
     ParseID3Tag( p_input, p_peek, i_size );
     msg_Dbg( p_input, "ID3 tag found, skiping %d bytes", i_size );
-    p_input->p_current_data += i_size; /* seek passed end of ID3 tag */
+
+    free( p_peek );
     return( VLC_SUCCESS );
 }
