@@ -3577,7 +3577,7 @@ msgstr "Mixage audio trivial"
 
 #: modules/audio_output/alsa.c:84
 msgid "default"
-msgstr "Prédéfini"
+msgstr "prédéfini"
 
 #: modules/audio_output/alsa.c:99
 msgid "ALSA audio output"
@@ -3936,7 +3936,7 @@ msgstr "Empaqueteur MPEG audio layer I/II/III"
 
 #: modules/codec/ogt/cvd.c:46
 msgid "CVD subtitle decoder"
-msgstr "Décodeur de sous-titres CVS"
+msgstr "Décodeur de sous-titres CVD"
 
 #: modules/codec/ogt/cvd.c:68
 msgid "Chaoji VCD subtitle packetizer"
@@ -3991,16 +3991,10 @@ msgid ""
 msgstr ""
 "Utilisez ceci pour forcer le ratio d'aspect des sous-titres. Si vous "
 "mettez une chaîne nulle, la bonne valeur sera déterminée automatiquement. "
-"Généralement, cette option est la meilleure. Pour les sous-titres OGT et "
-"CVD, ceci annule l'effet d'une éventuelle mise à l'échelle vidéo. "
-"Utiliser une valeur de 1 fera qu'aucune correction ne sera appliquée; les "
-"sous-titres seront affichés avec le même ration d'aspect que la couche "
-"vidéo (ce qui n'est pas correct pour les sous-titres OGT ou CVD). Vous "
-"pouvez également forcer un autre ratio en donnant une paire d'entiers "
-"x:y où y devrait être entre x et deux fois x. Par exemple, 4:3 ou 16:9. "
-"Par ailleur, vous pouvez donner une valeur flottante exprimant l'aspect "
-"des pixels. Par exemple, 1.25 ou 1.3333 qui signifient la même chose "
-"que 4:3 et 16:9 respectivement."
+"Pour les sous-titres OGT et CVD, ceci annule l'effet d'une éventuelle mise "
+"à l'échelle vidéo. Vous pouvez également forcer un autre ratio en donnant "
+"une paire d'entiers x:y (par exemple, 4:3 ou 16:9) ou bien une valeur "
+"décimale équivalente (par exemple, 1.25 ou 1.3333)."
 
 #: modules/codec/ogt/subtitle.h:68
 msgid "Factor to increase subtitle display interval"
@@ -4028,8 +4022,7 @@ msgid ""
 msgstr ""
 "Si vous désirez ajuster la position de démarrage horizontale, réglez cette "
 "valeur. Les valeurs négatives décalent vers la gauche et les positives vers "
-"la droite. 0 correspond à une déviation nulle par rapport à la position "
-"spécifiée par le sous-titre."
+"la droite."
 
 #: modules/codec/ogt/subtitle.h:84
 msgid "Add this to starting vertical position of subtitle."
@@ -4043,8 +4036,7 @@ msgid ""
 msgstr ""
 "Si vous désirez ajuster la position de démarrage verticale, réglez cette "
 "valeur. Les valeurs négatives décalent vers le haut et les positives vers "
-"le bas. 0 correspond à une déviation nulle par rapport à la position "
-"spécifiée par le sous-titre."
+"le bas."
 
 #: modules/codec/ogt/write_png.c:59 modules/codec/ogt/write_png.c:71
 msgid "Error: %s\n"
@@ -4305,7 +4297,7 @@ msgid ""
 ">32767)."
 msgstr ""
 "La quantité de mouvement requise pour enregistrer un mouvement de joystick "
-"( 0-32767 )"
+"( 0-32767 )."
 
 #: modules/control/joystick.c:143
 msgid "Joystick device"
@@ -4313,7 +4305,7 @@ msgstr "Périphérique du Joystick"
 
 #: modules/control/joystick.c:145
 msgid "The joystick device (usually /dev/js0 or /dev/input/js0)."
-msgstr "Le périphérique du Joystick (souvent /dev/js0 ou /dev/input/js0)"
+msgstr "Le périphérique du Joystick (souvent /dev/js0 ou /dev/input/js0)."
 
 #: modules/control/joystick.c:147
 msgid "Repeat time (ms)"
@@ -4323,7 +4315,7 @@ msgstr "Temps de répétition"
 msgid ""
 "Delay waited before the action is repeated if it is still triggered, in "
 "milliseconds."
-msgstr "Le temps en millisecondes à attendre avant que l'action soit répétée"
+msgstr "Le temps en millisecondes à attendre avant que l'action soit répétée."
 
 #: modules/control/joystick.c:152
 msgid "Wait time (ms)"
@@ -4331,7 +4323,7 @@ msgstr "Temps d'attente"
 
 #: modules/control/joystick.c:154
 msgid "The time waited before the repeat starts, in milliseconds."
-msgstr "Le temps avant que la répétition commence, en millisecondes"
+msgstr "Le temps avant que la répétition commence, en millisecondes."
 
 #: modules/control/joystick.c:156
 msgid "Max seek interval (seconds)"
@@ -4339,7 +4331,7 @@ msgstr "Intervalle de déplacement maximal"
 
 #: modules/control/joystick.c:158
 msgid "The maximum number of seconds that will be seeked at a time."
-msgstr "Le nombre maximal de secondes du déplacement"
+msgstr "Le nombre maximal de secondes du déplacement."
 
 #: modules/control/joystick.c:160
 msgid "Action mapping"
@@ -4383,7 +4375,7 @@ msgstr "Installer le service NT/2K/XP"
 
 #: modules/control/ntservice.c:41
 msgid "If enabled the interface will install the service and exit."
-msgstr "Si ceci est activé, l'interface installera le service et quittera"
+msgstr "Si ceci est activé, l'interface installera le service et quittera."
 
 #: modules/control/ntservice.c:42
 msgid "Uninstall NT/2K/XP service"
@@ -4391,7 +4383,7 @@ msgstr "Désinstaller le service NT/2K/XP"
 
 #: modules/control/ntservice.c:44
 msgid "If enabled the interface will uninstall the service and exit."
-msgstr "Si ceci est activé, l'interface désinstallera le service et quittera"
+msgstr "Si ceci est activé, l'interface désinstallera le service et quittera."
 
 #: modules/control/ntservice.c:45
 msgid "Display name of the service"
@@ -4399,7 +4391,7 @@ msgstr "Afficher le nom du service"
 
 #: modules/control/ntservice.c:47
 msgid "This allows you to change the display name of the service."
-msgstr "Ceci vous permet de changer le nom du service"
+msgstr "Ceci vous permet de changer le nom du service."
 
 #: modules/control/ntservice.c:50
 msgid ""
@@ -7757,7 +7749,7 @@ msgstr "Tri inverse par groupe"
 
 #: modules/gui/wxwindows/playlist.cpp:207
 msgid "&Shuffle Playlist"
-msgstr "Rendrea aléatoire"
+msgstr "Rendre aléatoire"
 
 #: modules/gui/wxwindows/playlist.cpp:211
 msgid "&Enable"
