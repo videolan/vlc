@@ -6,5 +6,5 @@ SOURCES_wall = modules/video_filter/wall.c
 SOURCES_clone = modules/video_filter/clone.c
 SOURCES_crop = modules/video_filter/crop.c
 SOURCES_motionblur = modules/video_filter/motionblur.c
-
+SOURCES_osdtext = modules/video_filter/osd_text.c
 noinst_HEADERS += modules/video_filter/filter_common.h

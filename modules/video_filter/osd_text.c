@@ -2,7 +2,7 @@
  * osd_text.c : Filter to put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: osd_text.c,v 1.1 2003/03/23 16:38:40 sigmunau Exp $
+ * $Id: osd_text.c,v 1.2 2003/04/08 07:22:10 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -30,6 +30,7 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <osd.h>
+#include <math.h>
 
 #include "filter_common.h"
 
@@ -114,6 +115,7 @@ struct vout_sys_t
     mtime_t        i_end_date;
     vlc_mutex_t   *lock;
     vlc_bool_t     i_use_kerning;
+    uint8_t        pi_gamma[256];
 };
 /* more prototypes */
 static void ComputeBoundingBox( string_info_t * );
@@ -124,11 +126,14 @@ static void FreeString( string_info_t * );
  *****************************************************************************
  * This function allocates and initializes a Clone vout method.
  *****************************************************************************/
+#define gamma_value 2.0
 static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     char *psz_fontfile;
-    int i_error;
+    int i, i_error;
+    vlc_value_t val;
+    double gamma_inv = 1.0f / gamma_value;
     
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -137,33 +142,7 @@ static int Create( vlc_object_t *p_this )
         msg_Err( p_vout, "out of memory" );
         return VLC_ENOMEM;
     }
-    p_vout->p_sys->p_strings = malloc( sizeof( string_info_t ) );
-    if( p_vout->p_sys->p_strings == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
-        return VLC_ENOMEM;
-    }
     p_vout->p_sys->p_strings = NULL;
-#if 0
-    p_vout->p_sys->p_strings->i_x_margin = 20;
-    p_vout->p_sys->p_strings->i_y_margin = 100;
-    p_vout->p_sys->p_strings->i_start_date = 0;
-    p_vout->p_sys->p_strings->i_end_date = 0xFFFFFFFFFFFFFFFll;
-    p_vout->p_sys->p_strings->psz_text = "VideoLAN";
-    p_vout->p_sys->p_strings->p_next = NULL;
-    p_vout->p_sys->p_strings->p_next = malloc(sizeof(string_info_t));
-    if( p_vout->p_sys->p_strings->p_next == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
-        return VLC_ENOMEM;
-    }
-    p_vout->p_sys->p_strings->p_next->i_x_margin = 50;
-    p_vout->p_sys->p_strings->p_next->i_y_margin = 300;
-    p_vout->p_sys->p_strings->p_next->i_start_date = 0;
-    p_vout->p_sys->p_strings->p_next->i_end_date = 0xFFFFFFFFFFFFFFFll;
-    p_vout->p_sys->p_strings->p_next->psz_text = "freetype is cool!";
-    p_vout->p_sys->p_strings->p_next->p_next = NULL;
-#endif
     p_vout->p_sys->i_x_margin = 50;
     p_vout->p_sys->i_y_margin = 50;
     p_vout->p_sys->i_flags = 0;
@@ -178,6 +157,12 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
     vlc_mutex_init( p_vout, p_vout->p_sys->lock);
+
+    for (i = 0; i < 256; i++) {
+        p_vout->p_sys->pi_gamma[i] =
+            (uint8_t)( pow( (double)i / 255.0f, gamma_inv) * 255.0f );
+        msg_Dbg( p_vout, "%d", p_vout->p_sys->pi_gamma[i]);
+    }
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
     p_vout->pf_manage = NULL;
@@ -212,7 +197,8 @@ static int Create( vlc_object_t *p_this )
     i_error = FT_Set_Pixel_Sizes( p_vout->p_sys->p_face, 0, config_GetInt( p_vout, "osd-fontsize" ) );    
     if( i_error )
     {
-        msg_Err( p_vout, "couldn't set font size to 64" );
+        msg_Err( p_vout, "couldn't set font size to %d",
+                 config_GetInt( p_vout, "osd-fontsize" ) );
         free( p_vout->p_sys );
         return VLC_EGENERIC;
     }
@@ -231,6 +217,11 @@ static int Create( vlc_object_t *p_this )
     var_AddCallback( p_vout, "end-date", SetMargin, NULL );
     var_Create( p_vout, "string", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_vout, "string", AddText, NULL );
+
+    val.psz_string = "Videolan";
+//    var_Set( p_vout, "string", val );
+//    p_vout->p_sys->p_strings->i_end_date = 0xFFFFFFFFFFFFFFF;
+
     return VLC_SUCCESS;
 }
 
@@ -261,6 +252,7 @@ static int Init( vout_thread_t *p_vout )
         msg_Err( p_vout, "failed to start vout" );
         return VLC_EGENERIC;
     }
+
     ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
@@ -348,6 +340,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
         msleep( VOUT_OUTMEM_SLEEP );
     }
+    vout_DatePicture( p_vout->p_sys->p_vout,
+                      p_outpic, p_pic->date );
     if( p_vout->i_changes )
     {
         p_vout->p_sys->p_vout->i_changes = p_vout->i_changes;
@@ -365,8 +359,6 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         FreeString( p_string );
     }
 
-    vout_DatePicture( p_vout->p_sys->p_vout,
-                      p_outpic, p_pic->date );
 
     vlc_mutex_lock( p_vout->p_sys->lock );
 
@@ -399,7 +391,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         }
 /*        pen_x = 20;
           pen_y = 100;*/
-        if ( i_plane == 0 ) {
+        if ( i_plane == 0 )
+        {
             for( p_string = p_vout->p_sys->p_strings; p_string != NULL;
                  p_string = p_string->p_next )
             {
@@ -438,12 +431,14 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                                                       0 );
                         if ( i_error ) continue;
                         p_image = (FT_BitmapGlyph)p_glyph;
-#define alpha p_image->bitmap.buffer[x+ y*p_image->bitmap.width]
+#define alpha p_vout->p_sys->pi_gamma[p_image->bitmap.buffer[x+ y*p_image->bitmap.width]]
 #define pixel p_out[(p_string->p_glyph_pos[i].y + pen_y + y - p_image->top)*i_out_pitch+x+pen_x+p_string->p_glyph_pos[i].x+p_image->left]
                         for(y = 0; y < p_image->bitmap.rows; y++ )
                         {
                             for( x = 0; x < p_image->bitmap.width; x++ )
                             {
+//                                pixel = alpha;
+//                                pixel = (pixel^alpha)^pixel;
                                 pixel = ((pixel*(255-alpha))>>8) + (255*alpha>>8);
                             }
                         }
@@ -601,7 +596,7 @@ static int  AddText ( vlc_object_t *p_this, char const *psz_command,
 
 static void ComputeBoundingBox( string_info_t *p_string )
 {
-    unsigned int i;
+    unsigned int i, i2;
     int pen_y = 0;
     FT_Vector result;
     FT_Vector line;
@@ -615,8 +610,16 @@ static void ComputeBoundingBox( string_info_t *p_string )
     {
         if ( p_string->psz_text[i] == '\n' )
         {
+            i2 = i - 1;
+            while ( i2 >= 0 && p_string->psz_text[i2] )
+            {
+                p_string->p_glyph_pos[i2].y += line.y;
+                i2--;
+            }
             result.x = __MAX( result.x, line.x );
             result.y += line.y;
+            line.y = 0;
+            line.x = 0;
             pen_y = result.y;
             continue;
         }
@@ -629,6 +632,12 @@ static void ComputeBoundingBox( string_info_t *p_string )
     }
     result.x = __MAX( result.x, line.x );
     result.y += line.y;
+    i2 = i - 1;
+    while ( i2 >= 0 && p_string->psz_text[i2] )
+    {
+        p_string->p_glyph_pos[i2].y += line.y;
+        i2--;
+    }
     p_string->i_height = result.y;
     p_string->i_width = result.x;
     return;    
@@ -649,3 +658,4 @@ static void FreeString( string_info_t *p_string )
     free( p_string->pp_glyphs );
     free( p_string );
 }
+
