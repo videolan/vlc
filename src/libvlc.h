@@ -976,7 +976,7 @@ vlc_module_begin();
     add_module_list_cat( "sub-filter", SUBCAT_VIDEO_SUBPIC, NULL, NULL,
                 SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, VLC_TRUE );
 
-    set_subcategory( SUBCAT_VIDEO_TEXT );
+//    set_subcategory( SUBCAT_VIDEO_TEXT );
 
     /* Input options */
     set_category( CAT_INPUT );

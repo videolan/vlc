@@ -83,7 +83,7 @@ struct filter_sys_t
 #define TIMEOUT_LONGTEXT N_("Defines the time the marquee must remain " \
                             "displayed, in milliseconds. Default value is " \
                             "0 (remain forever).")
-#define OPACITY_TEXT N_("Opacity, 0..255")
+#define OPACITY_TEXT N_("Opacity")
 #define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of " \
     "overlay text. 0 = transparent, 255 = totally opaque. " )
 #define SIZE_TEXT N_("Font size, pixels")
@@ -116,11 +116,13 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
     add_string( "marq-marquee", "Marquee", NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
+
+    set_section( N_("Position"), NULL );
     add_integer( "marq-x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
     add_integer( "marq-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
-    add_integer( "marq-timeout", 0, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
-                 VLC_FALSE );
     add_integer( "marq-position", 5, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
+
+    set_section( N_("Font"), NULL );
     /* 5 sets the default to top [1] left [4] */
     change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
     add_integer_with_range( "marq-opacity", 255, 0, 255, NULL,
@@ -128,6 +130,10 @@ vlc_module_begin();
     add_integer( "marq-color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
     add_integer( "marq-size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT, VLC_FALSE );
+
+    set_section( N_("Misc"), NULL );
+    add_integer( "marq-timeout", 0, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
+                 VLC_FALSE );
 
     set_description( _("Marquee display sub filter") );
     add_shortcut( "marq" );

@@ -110,10 +110,10 @@ static char *ppsz_color_descriptions[] = {
   N_("Lime"), N_("Purple"), N_("Navy"), N_("Blue"), N_("Aqua") };
 
 vlc_module_begin();
-    set_shortname( _("Freetype"));
+    set_shortname( _("Text renderer"));
     set_description( _("Freetype2 font renderer") );
     set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_TEXT );
+    set_subcategory( SUBCAT_VIDEO_SUBPIC );
 
     add_file( "freetype-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT,
               VLC_FALSE );
