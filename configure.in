@@ -256,6 +256,14 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
     LINUX_DVD_STRUCT=1
   ])
   dnl
+  dnl Solaris: sys/scsi/generic/commands.h sys/scsi/impl/uscsi.h
+  dnl
+  AC_CHECK_HEADER(/usr/include/sys/scsi/scsi_types.h,[
+    AC_CHECK_HEADER(sys/scsi/impl/uscsi.h,[
+      AC_DEFINE(SOLARIS_USCSI, 1, Have userspace SCSI headers.)
+    ])
+  ])
+  dnl
   dnl Final tests to check what was detected
   dnl
   if test x$LINUX_DVD_STRUCT = x1; then

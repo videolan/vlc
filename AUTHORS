@@ -106,6 +106,10 @@ E: jimmy@via.ecp.fr
 C: jimmy
 D: IDCT and YUV transformations
 
+N: H}kan Hjort
+E: d95hjort@dtek.chalmers.se
+D: Solaris port of the DVD ioctls
+
 N: Samuel Hocevar
 E: sam@zoy.org
 C: sam

@@ -2,7 +2,7 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.7 2001/08/07 02:48:24 sam Exp $
+ * $Id: ioctl.c,v 1.8 2001/08/08 02:48:44 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -55,6 +55,12 @@
 #   include <malloc.h>
 #   include <scsi.h>
 #endif
+#ifdef SOLARIS_USCSI
+#   include <unistd.h>
+#   include <stropts.h>
+#   include </usr/include/sys/scsi/scsi_types.h>
+#   include <sys/scsi/impl/uscsi.h>
+#endif
 
 #include "config.h"
 #include "common.h"
@@ -70,6 +76,13 @@
  *****************************************************************************/
 #if defined( SYS_BEOS )
 static void BeInitRDC ( raw_device_command *, int );
+#endif
+
+/*****************************************************************************
+ * Local prototypes, Solaris specific
+ *****************************************************************************/
+#if defined( SOLARIS_USCSI )
+static void SolarisInitUSCSI( struct uscsi_cmd *p_sc, int i_type );
 #endif
 
 /*****************************************************************************
@@ -116,6 +129,21 @@ int ioctl_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
     i_ret = ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
     *pi_copyright = p_buffer[ 4 ];
+
+#elif defined( SOLARIS_USCSI )
+    INIT_USCSI( GPCMD_READ_DVD_STRUCTURE, 8 );
+    
+    rs_cdb.cdb_opaque[ 6 ] = i_layer;
+    rs_cdb.cdb_opaque[ 7 ] = DVD_STRUCT_COPYRIGHT;
+
+    i_ret = ioctl(i_fd, USCSICMD, &sc);
+
+    if( i_ret < 0 || sc.uscsi_status ) {
+        i_ret = -1;
+    }
+    
+    *pi_copyright = p_buffer[ 4 ];
+    // s->copyright.rmi = p_buffer[ 5 ];
 
 #elif defined( SYS_DARWIN )
     *pi_copyright = 1;
@@ -240,6 +268,22 @@ int ioctl_ReadKey( int i_fd, int *pi_agid, u8 *p_key )
 
     memcpy( p_key, p_buffer + 4, 2048 );
 
+#elif defined( SOLARIS_USCSI )
+    INIT_USCSI( GPCMD_READ_DVD_STRUCTURE, 2048 + 4 );
+    
+    rs_cdb.cdb_opaque[ 7 ] = DVD_STRUCT_DISCKEY;
+    rs_cdb.cdb_opaque[ 10 ] = *pi_agid << 6;
+    
+    i_ret = ioctl( i_fd, USCSICMD, &sc );
+    
+    if( i_ret < 0 || sc.uscsi_status )
+    {
+        i_ret = -1;
+        return i_ret;
+    }
+
+    memcpy( p_key, p_buffer + 4, 2048 );
+
 #elif defined( SYS_DARWIN )
     i_ret = 0;
 
@@ -330,6 +374,20 @@ int ioctl_ReportAgid( int i_fd, int *pi_agid )
 
     *pi_agid = p_buffer[ 7 ] >> 6;
 
+#elif defined( SOLARIS_USCSI )
+    INIT_USCSI( GPCMD_REPORT_KEY, 8 );
+    
+    rs_cdb.cdb_opaque[ 10 ] = DVD_REPORT_AGID | (*pi_agid << 6);
+    
+    i_ret = ioctl( i_fd, USCSICMD, &sc );
+    
+    if( i_ret < 0 || sc.uscsi_status )
+    {
+        i_ret = -1;
+    }
+
+    *pi_agid = p_buffer[ 7 ] >> 6;
+    
 #elif defined( SYS_DARWIN )
     INIT_DVDIOCTL( 8 );
 
@@ -407,6 +465,20 @@ int ioctl_ReportChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
 
     memcpy( p_challenge, p_buffer + 4, 12 );
 
+#elif defined( SOLARIS_USCSI )
+    INIT_USCSI( GPCMD_REPORT_KEY, 16 );
+    
+    rs_cdb.cdb_opaque[ 10 ] = DVD_REPORT_CHALLENGE | (*pi_agid << 6);
+    
+    i_ret = ioctl( i_fd, USCSICMD, &sc );
+    
+    if( i_ret < 0 || sc.uscsi_status )
+    {
+        i_ret = -1;
+    }
+
+    memcpy( p_challenge, p_buffer + 4, 12 );
+    
 #elif defined( SYS_DARWIN )
     INIT_DVDIOCTL( 16 );
 
@@ -499,6 +571,20 @@ int ioctl_ReportASF( int i_fd, int *pi_agid, int *pi_asf )
 
     *pi_asf = p_buffer[ 7 ] & 1;
 
+#elif defined( SOLARIS_USCSI )
+    INIT_USCSI( GPCMD_REPORT_KEY, 8 );
+    
+    rs_cdb.cdb_opaque[ 10 ] = DVD_REPORT_ASF | (*pi_agid << 6);
+    
+    i_ret = ioctl( i_fd, USCSICMD, &sc );
+    
+    if( i_ret < 0 || sc.uscsi_status )
+    {
+        i_ret = -1;
+    }
+
+    *pi_asf = p_buffer[ 7 ] & 1;
+    
 #elif defined( SYS_DARWIN )
     INIT_DVDIOCTL( 8 );
 
@@ -591,6 +677,20 @@ int ioctl_ReportKey1( int i_fd, int *pi_agid, u8 *p_key )
 
     memcpy( p_key, p_buffer + 4, 8 );
 
+#elif defined( SOLARIS_USCSI )
+    INIT_USCSI( GPCMD_REPORT_KEY, 12 );
+    
+    rs_cdb.cdb_opaque[ 10 ] = DVD_REPORT_KEY1 | (*pi_agid << 6);
+    
+    i_ret = ioctl( i_fd, USCSICMD, &sc );
+    
+    if( i_ret < 0 || sc.uscsi_status )
+    {
+        i_ret = -1;
+    }
+
+    memcpy( p_key, p_buffer + 4, 8 );;
+    
 #elif defined( SYS_DARWIN )
     INIT_DVDIOCTL( 12 );
 
@@ -673,6 +773,18 @@ int ioctl_InvalidateAgid( int i_fd, int *pi_agid )
 
     i_ret = ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
+#elif defined( SOLARIS_USCSI )
+    INIT_USCSI( GPCMD_REPORT_KEY, 0 );
+    
+    rs_cdb.cdb_opaque[ 10 ] = DVD_INVALIDATE_AGID | (*pi_agid << 6);
+    
+    i_ret = ioctl( i_fd, USCSICMD, &sc );
+    
+    if( i_ret < 0 || sc.uscsi_status )
+    {
+        i_ret = -1;
+    }
+
 #elif defined( SYS_DARWIN )
     INIT_DVDIOCTL( 0 );
 
@@ -749,6 +861,21 @@ int ioctl_SendChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
 
     return ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
+#elif defined( SOLARIS_USCSI )
+    INIT_USCSI( GPCMD_SEND_KEY, 16 );
+    
+    rs_cdb.cdb_opaque[ 10 ] = DVD_SEND_CHALLENGE | (*pi_agid << 6);
+    
+    p_buffer[ 1 ] = 0xe;
+    memcpy( p_buffer + 4, p_challenge, 12 );
+    
+    if( ioctl( i_fd, USCSICMD, &sc ) < 0 || sc.uscsi_status )
+    {
+        return -1;
+    }
+
+    return 0;
+    
 #elif defined( SYS_DARWIN )
     INIT_DVDIOCTL( 16 );
 
@@ -833,6 +960,21 @@ int ioctl_SendKey2( int i_fd, int *pi_agid, u8 *p_key )
 
     return ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
+#elif defined( SOLARIS_USCSI )
+    INIT_USCSI( GPCMD_SEND_KEY, 12 );
+    
+    rs_cdb.cdb_opaque[ 10 ] = DVD_SEND_KEY2 | (*pi_agid << 6);
+    
+    p_buffer[ 1 ] = 0xa;
+    memcpy( p_buffer + 4, p_key, 8 );
+    
+    if( ioctl( i_fd, USCSICMD, &sc ) < 0 || sc.uscsi_status )
+    {
+        return -1;
+    }
+
+    return 0;
+    
 #elif defined( WIN32 )
     if( WIN2K ) /* NT/Win2000/Whistler */
     {
@@ -917,6 +1059,43 @@ static void BeInitRDC( raw_device_command *p_rdc, int i_type )
     p_rdc->sense_data_length = 0;
 
     p_rdc->timeout           = 1000000;
+}
+#endif
+
+#if defined( SOLARIS_USCSI )
+/*****************************************************************************
+ * SolarisInitUSCSI: initialize a USCSICMD structure for the Solaris kernel
+ *****************************************************************************
+ * This function initializes a Solaris userspace scsi command structure for 
+ * future use, either a read command or a write command.
+ *****************************************************************************/
+static void SolarisInitUSCSI( struct uscsi_cmd *p_sc, int i_type )
+{   
+    union scsi_cdb *rs_cdb;
+    memset( p_sc->uscsi_cdb, 0, sizeof( union scsi_cdb ) );
+    memset( p_sc->uscsi_bufaddr, 0, p_sc->uscsi_buflen );
+    
+    switch( i_type )
+    {
+        case GPCMD_SEND_KEY:
+	    p_sc->uscsi_flags = USCSI_ISOLATE | USCSI_WRITE;
+            break;
+
+        case GPCMD_READ_DVD_STRUCTURE:
+        case GPCMD_REPORT_KEY:
+	    p_sc->uscsi_flags = USCSI_ISOLATE | USCSI_READ;
+            break;
+    }
+    
+    rs_cdb = (union scsi_cdb *)p_sc->uscsi_cdb;
+    
+    rs_cdb->scc_cmd = i_type;
+
+    rs_cdb->cdb_opaque[ 8 ] = (p_sc->uscsi_buflen >> 8) & 0xff;
+    rs_cdb->cdb_opaque[ 9 ] =  p_sc->uscsi_buflen       & 0xff;
+    p_sc->uscsi_cdblen = 12;
+
+    USCSI_TIMEOUT( p_sc, 15 );
 }
 #endif
 

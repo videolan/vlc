@@ -2,7 +2,7 @@
  * ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.h,v 1.5 2001/07/07 21:10:58 gbazin Exp $
+ * $Id: ioctl.h,v 1.6 2001/08/08 02:48:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,6 +46,23 @@ int ioctl_SendKey2          ( int, int *, u8 * );
 #endif
 
 /*****************************************************************************
+ * Common macro, Solaris specific
+ *****************************************************************************/
+#if defined( SOLARIS_USCSI )
+#define USCSI_TIMEOUT( SC, TO ) ( (SC)->uscsi_timeout = (TO) )
+#define USCSI_RESID( SC )       ( (SC)->uscsi_resid )
+#define INIT_USCSI( TYPE, SIZE ) \
+    struct uscsi_cmd sc; \
+    union scsi_cdb rs_cdb; \
+    u8 p_buffer[ (SIZE) ]; \
+    memset( &sc, 0, sizeof( struct uscsi_cmd ) ); \
+    sc.uscsi_cdb = (caddr_t)&rs_cdb; \
+    sc.uscsi_bufaddr = p_buffer; \
+    sc.uscsi_buflen = (SIZE); \
+    SolarisInitUSCSI( &sc, (TYPE) );
+#endif
+
+/*****************************************************************************
  * Common macro, Darwin specific
  *****************************************************************************/
 #if defined( SYS_DARWIN )
@@ -75,15 +92,18 @@ int ioctl_SendKey2          ( int, int *, u8 * );
  * Various DVD I/O tables
  *****************************************************************************/
 
-#if defined( SYS_BEOS ) || defined( WIN32 )
+#if defined( SYS_BEOS ) || defined( WIN32 ) || defined ( SOLARIS_USCSI )
     /* The generic packet command opcodes for CD/DVD Logical Units,
      * From Table 57 of the SFF8090 Ver. 3 (Mt. Fuji) draft standard. */
 #   define GPCMD_READ_DVD_STRUCTURE 0xad
 #   define GPCMD_REPORT_KEY         0xa4
 #   define GPCMD_SEND_KEY           0xa3
     /* DVD struct types */
+#   define DVD_STRUCT_PHYSICAL      0x00
 #   define DVD_STRUCT_COPYRIGHT     0x01
 #   define DVD_STRUCT_DISCKEY       0x02
+#   define DVD_STRUCT_BCA           0x03
+#   define DVD_STRUCT_MANUFACT      0x04
     /* Key formats */
 #   define DVD_REPORT_AGID          0x00
 #   define DVD_REPORT_CHALLENGE     0x01
