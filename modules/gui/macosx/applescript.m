@@ -53,11 +53,9 @@
         {
             NSURL * o_url;
     
-            int i_mode = PLAYLIST_INSERT;
-            
             playlist_Add( p_playlist, [o_urlString fileSystemRepresentation],
-                          [[o_urlString fileSystemRepresentation] lastPathComponent],
-                          i_mode, PLAYLIST_END );
+                          [[[NSFileManager defaultManager] displayNameAtPath: o_urlString] UTF8String],
+                          PLAYLIST_INSERT, PLAYLIST_END );
 
             o_url = [NSURL fileURLWithPath: o_urlString];
             if( o_url != nil )
