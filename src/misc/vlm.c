@@ -194,7 +194,7 @@ int vlm_Save( vlm_t *p_vlm, char *psz_file )
 
     if( !p_vlm || !psz_file ) return 1;
 
-    file = fopen( psz_file, "w" );
+    file = fopen( psz_file, "wt" );
     if( file == NULL ) return 1;
 
     psz_save = Save( p_vlm );
