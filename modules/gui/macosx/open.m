@@ -2,7 +2,7 @@
  * open.m: MacOS X module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.42 2004/01/25 17:01:57 murray Exp $
+ * $Id: open.m,v 1.43 2004/01/27 22:19:04 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -464,7 +464,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     o_videots = [o_disc_videots_folder stringValue];
     b_menus = [o_disc_dvd_menus state];
 
-    if ( [o_type isEqualToString: @"VCD"] )
+    if ( [o_type isEqualToString: _NS("VCD")] )
     {
         if ( [o_device isEqualToString:
                 [NSString stringWithFormat: _NS("No %@s found"), o_type]] )
@@ -480,7 +480,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         o_mrl_string = [NSString stringWithFormat: @"cdda://%@",
                         o_device]; 
     }
-    else if ( [o_type isEqualToString: @"DVD"] )
+    else if ( [o_type isEqualToString: _NS("DVD")] )
     {
         if ( [o_device isEqualToString:
                 [NSString stringWithFormat: _NS("No %@s found"), o_type]] )
@@ -539,9 +539,9 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     o_mode = [[o_net_mode selectedCell] title];
 
-    if( [o_mode isEqualToString: @"UDP/RTP"] ) b_udp = TRUE;   
-    else if( [o_mode isEqualToString: @"UDP/RTP Multicast"] ) b_udpm = TRUE;
-    else if( [o_mode isEqualToString: @"HTTP/FTP/MMS"] ) b_http = TRUE;
+    if( [o_mode isEqualToString: _NS("UDP/RTP")] ) b_udp = TRUE;   
+    else if( [o_mode isEqualToString: _NS("UDP/RTP Multicast")] ) b_udpm = TRUE;
+    else if( [o_mode isEqualToString: _NS("HTTP/FTP/MMS")] ) b_http = TRUE;
 
     [o_net_udp_port setEnabled: b_udp];
     [o_net_udp_port_stp setEnabled: b_udp];
@@ -577,7 +577,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     o_mode = [[o_net_mode selectedCell] title];
 
-    if( [o_mode isEqualToString: @"UDP/RTP"] )
+    if( [o_mode isEqualToString: _NS("UDP/RTP")] )
     {
         int i_port = [o_net_udp_port intValue];
 
@@ -589,7 +589,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
                 [o_mrl_string stringByAppendingFormat: @"@:%i", i_port]; 
         } 
     }
-    else if( [o_mode isEqualToString: @"UDP/RTP Multicast"] ) 
+    else if( [o_mode isEqualToString: _NS("UDP/RTP Multicast")] ) 
     {
         NSString *o_addr = [o_net_udpm_addr stringValue];
         int i_port = [o_net_udpm_port intValue];
@@ -602,7 +602,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
                 [o_mrl_string stringByAppendingFormat: @":%i", i_port]; 
         } 
     }
-    else if( [o_mode isEqualToString: @"HTTP/FTP/MMS"] )
+    else if( [o_mode isEqualToString: _NS("HTTP/FTP/MMS")] )
     {
         NSString *o_url = [o_net_http_url stringValue];
 
