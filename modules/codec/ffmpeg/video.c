@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.67 2004/02/25 17:48:52 fenrir Exp $
+ * $Id: video.c,v 1.68 2004/03/01 22:35:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -293,6 +293,29 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
             memcpy( &p[0],  "SVQ3", 4 );
             memset( &p[4], 0, 8 );
             memcpy( &p[12], p_dec->fmt_in.p_extra, i_size );
+
+            /* Now remove all atoms before the SMI one */
+            if( p_sys->p_context->extradata_size > 0x5a && strncmp( &p[0x56], "SMI ", 4 ) )
+            {
+                uint8_t *psz = &p[0x52];
+
+                while( psz < &p[p_sys->p_context->extradata_size - 8] )
+                {
+                    int i_size = GetDWBE( psz );
+                    if( i_size <= 1 )
+                    {
+                        /* FIXME handle 1 as long size */
+                        break;
+                    }
+                    if( !strncmp( &psz[4], "SMI ", 4 ) )
+                    {
+                        memmove( &p[0x52], psz, &p[p_sys->p_context->extradata_size] - psz );
+                        break;
+                    }
+
+                    psz += i_size;
+                }
+            }
         }
         else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'R', 'V', '1', '0' ) ||
                  p_dec->fmt_in.i_codec == VLC_FOURCC( 'R', 'V', '1', '3' ) ||
