@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 # debian/rules for the VideoLAN Client - uses debhelper.
-# $Id: rules,v 1.109 2004/01/04 04:53:07 sam Exp $
+# $Id: rules,v 1.110 2004/01/20 17:45:19 sam Exp $
 # based on Joey Hess's one.
 
 # Uncomment this to turn on verbose mode.
@@ -77,17 +77,17 @@ configure-stamp:
 	dh_testdir
 
 	# Touch stuff
-	touch configure.ac \
-	&& touch aclocal.m4 \
-	&& touch configure \
-	&& touch config.h.in \
-	&& touch `find . -name Makefile.in`
+	touch configure.ac
+	touch aclocal.m4
+	touch configure
+	touch config.h.in
+	touch `find . -name Makefile.in`
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
 	test -d extras/ffmpeg
 	if test ! -d CVS; then \
 	  cd extras/ffmpeg \
-	  && ./configure --enable-pp \
+	  && CC=$(CC) ./configure --enable-pp --disable-debug \
 	  && cd libavcodec \
 	  && $(MAKE); \
 	fi

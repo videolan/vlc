@@ -1,3 +1,14 @@
+vlc (0.7.0-2) unstable; urgency=low
+
+  * debian/rules:
+    + Look for faad in extras/faad2, not extras/faad.
+  * modules/demux/mkv.cpp:
+    + Updated mkv module for the latest Matroska version (Closes: #227923).
+  * modules/video_output/caca.c:
+    + Updated caca module for the latest libcaca version.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Tue, 20 Jan 2004 18:30:58 +0100
+
 vlc (0.7.0-1) unstable; urgency=low
 
   * New upstream release.
