@@ -419,3 +419,13 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<sam> p_input->stream.pp_areas ça commence à 0 ou à 1 ?
+<sam> aaaah /* We start from 1 here since the default area 0 is reserved for
+      video_ts.vob */
+<Meuuh> si c pas du code de porc ça mon bon monsieur
+<sam> mais alors l'area 0 elle sert à rien ou quoi ? :)
+<jobi> ben pour le vcd à rien du tout, si je me souviens bien
+<fenrir_> à ben voila ma piste qui disparaissait pour les cda...
+
+  -- #videolan, du code de pro
+%
