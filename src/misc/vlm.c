@@ -1049,7 +1049,7 @@ static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_name, cha
     {
         int i;
 
-        if( media->b_enabled == VLC_TRUE )
+        if( media->b_enabled == VLC_TRUE && media->i_input > 0 )
         {
             if( psz_args != NULL && sscanf( psz_args, "%d", &i ) == 1 && i < media->i_input )
             {
@@ -1106,7 +1106,7 @@ static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_name, cha
     {
         int i;
 
-        if( media->p_input );
+        if( media->p_input )
         {
             input_StopThread( media->p_input );
             input_DestroyThread( media->p_input );
