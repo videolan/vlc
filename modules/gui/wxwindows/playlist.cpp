@@ -242,7 +242,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     popup_menu = new wxMenu;
     popup_menu->Append( PopupPlay_Event, wxU(_("Play")) );
     popup_menu->Append( PopupDel_Event, wxU(_("Delete")) );
-    popup_menu->Append( PopupEna_Event, wxU(_("Toggle enabled")) );
+    popup_menu->Append( PopupEna_Event, wxU(_("Enable/Disable")) );
     popup_menu->Append( PopupInfo_Event, wxU(_("Info")) );
 
     /* Create a panel to put everything in */
