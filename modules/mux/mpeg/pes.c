@@ -95,7 +95,8 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
                 int i_pts_dts;
 
                 if( i_pts > 0 && i_dts > 0 &&
-                    ( i_pts != i_dts || p_fmt->i_cat == VIDEO_ES ) )
+                    ( i_pts != i_dts || ( p_fmt->i_cat == VIDEO_ES &&
+                      p_fmt->i_codec != VLC_FOURCC('m','p','g','v') ) ) )
                 {
                     i_pts_dts = 0x03;
                     if ( !i_header_size ) i_header_size = 0xa;
