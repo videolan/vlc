@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.78 2001/03/22 01:23:03 stef Exp $
+ * $Id: video_parser.c,v 1.79 2001/04/25 10:22:33 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -220,16 +220,8 @@ static int InitThread( vpar_thread_t *p_vpar )
     intf_DbgMsg("vpar debug: initializing video parser thread %p", p_vpar);
 
     p_vpar->p_config->decoder_config.pf_init_bit_stream( &p_vpar->bit_stream,
-        p_vpar->p_config->decoder_config.p_decoder_fifo );
-    p_vpar->bit_stream.pf_bitstream_callback = BitstreamCallback;
-    p_vpar->bit_stream.p_callback_arg = (void *)p_vpar;
-
-    /* InitBitstream has normally begun to read a PES packet, get its
-     * PTS/DTS */
-    if( !p_vpar->p_fifo->b_die )
-    {
-        BitstreamCallback( &p_vpar->bit_stream, 1 );
-    }
+        p_vpar->p_config->decoder_config.p_decoder_fifo, BitstreamCallback,
+        (void *)p_vpar );
 
     /* Initialize parsing data */
     p_vpar->sequence.p_forward = NULL;

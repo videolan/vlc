@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.36 2001/04/25 09:31:14 sam Exp $
+ * $Id: spu_decoder.c,v 1.37 2001/04/25 10:22:33 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -110,7 +110,7 @@ static int InitThread( spudec_thread_t *p_spudec )
 {
     p_spudec->p_config->decoder_config.pf_init_bit_stream(
             &p_spudec->bit_stream,
-            p_spudec->p_config->decoder_config.p_decoder_fifo );
+            p_spudec->p_config->decoder_config.p_decoder_fifo, NULL, NULL );
 
     /* Mark thread as running and return */
     return( 0 );

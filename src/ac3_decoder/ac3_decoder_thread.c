@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.28 2001/04/20 12:14:34 reno Exp $
+ * $Id: ac3_decoder_thread.c,v 1.29 2001/04/25 10:22:32 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -126,9 +126,8 @@ static int InitThread (ac3dec_thread_t * p_ac3dec_t)
 
     p_ac3dec_t->p_config->decoder_config.pf_init_bit_stream(
             &p_ac3dec_t->ac3_decoder.bit_stream,
-            p_ac3dec_t->p_config->decoder_config.p_decoder_fifo );
-    p_ac3dec_t->ac3_decoder.bit_stream.pf_bitstream_callback=BitstreamCallback;
-    p_ac3dec_t->ac3_decoder.bit_stream.p_callback_arg = (void *) p_ac3dec_t;
+            p_ac3dec_t->p_config->decoder_config.p_decoder_fifo,
+            BitstreamCallback, (void *) p_ac3dec_t );
 
     
     aout_fifo.i_type = AOUT_ADEC_STEREO_FIFO;
@@ -142,13 +141,6 @@ static int InitThread (ac3dec_thread_t * p_ac3dec_t)
     {
         return -1;
     }
-
-    /* InitBitstream has normally begun to read a PES packet, get its
-     * PTS/DTS */
-     if( !p_ac3dec_t->p_fifo->b_die )
-     {
-        BitstreamCallback( &p_ac3dec_t->ac3_decoder.bit_stream, 1 );
-     }
 
     intf_DbgMsg("ac3dec debug: ac3 decoder thread %p initialized", p_ac3dec_t);
     return 0;

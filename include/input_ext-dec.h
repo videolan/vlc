@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.28 2001/04/16 12:34:28 asmax Exp $
+ * $Id: input_ext-dec.h,v 1.29 2001/04/25 10:22:32 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -500,7 +500,10 @@ typedef struct decoder_config_s
     struct stream_ctrl_s *  p_stream_ctrl;
     struct decoder_fifo_s * p_decoder_fifo;
     void                 (* pf_init_bit_stream)( struct bit_stream_s *,
-                                                 struct decoder_fifo_s * );
+                                                 struct decoder_fifo_s *,
+                 void (* pf_bitstream_callback)( struct bit_stream_s *,
+                                                 boolean_t ),
+                                                 void * );
 } decoder_config_t;
 
 /*****************************************************************************

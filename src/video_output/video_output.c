@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.118 2001/04/25 09:31:14 sam Exp $
+ * $Id: video_output.c,v 1.119 2001/04/25 10:22:33 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -1616,6 +1616,9 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #endif
         i_data_size = (p_buffer->pi_area_end[i_area] - p_buffer->pi_area_begin[i_area] + 1) * p_vout->i_bytes_per_line;
         p_data = (u64*) (p_buffer->p_data + p_vout->i_bytes_per_line * p_buffer->pi_area_begin[i_area]);
+
+#if 0
+        /* Removed for performance --Meuuh */
         for( i_data_index = i_data_size / 256; i_data_index-- ; )
         {
             /* Clear 256 bytes block */
@@ -1639,6 +1642,7 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
             /* Clear remaining bytes */
             *p_data8++ = 0;
         }
+#endif
     }
 
     /*

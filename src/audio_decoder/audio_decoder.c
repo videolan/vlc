@@ -2,7 +2,7 @@
  * audio_decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_decoder.c,v 1.48 2001/04/06 09:15:47 sam Exp $
+ * $Id: audio_decoder.c,v 1.49 2001/04/25 10:22:32 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -133,7 +133,7 @@ static int InitThread (adec_thread_t * p_adec)
     intf_DbgMsg ("adec debug: initializing audio decoder thread %p", p_adec);
 
     p_adec->p_config->decoder_config.pf_init_bit_stream( &p_adec->bit_stream,
-        p_adec->p_config->decoder_config.p_decoder_fifo );
+        p_adec->p_config->decoder_config.p_decoder_fifo, NULL, NULL );
 
     aout_fifo.i_type = AOUT_ADEC_STEREO_FIFO;
     aout_fifo.i_channels = 2;

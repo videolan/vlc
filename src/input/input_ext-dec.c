@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-dec.c,v 1.12 2001/04/06 09:15:47 sam Exp $
+ * $Id: input_ext-dec.c,v 1.13 2001/04/25 10:22:33 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -44,12 +44,15 @@
 /*****************************************************************************
  * InitBitstream: initialize a bit_stream_t structure
  *****************************************************************************/
-void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo )
+void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo,
+                    void (* pf_bitstream_callback)( struct bit_stream_s *,
+                                                    boolean_t ),
+                    void * p_callback_arg )
 {
     p_bit_stream->p_decoder_fifo = p_fifo;
     p_bit_stream->pf_next_data_packet = NextDataPacket;
-    p_bit_stream->pf_bitstream_callback = NULL;
-    p_bit_stream->p_callback_arg = NULL;
+    p_bit_stream->pf_bitstream_callback = pf_bitstream_callback;
+    p_bit_stream->p_callback_arg = p_callback_arg;
 
     /* Get the first data packet. */
     vlc_mutex_lock( &p_fifo->data_lock );
@@ -68,6 +71,12 @@ void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo )
     p_bit_stream->fifo.buffer = 0;
     p_bit_stream->fifo.i_available = 0;
     vlc_mutex_unlock( &p_fifo->data_lock );
+
+    /* Call back the decoder. */
+    if( p_bit_stream->pf_bitstream_callback != NULL )
+    {
+        p_bit_stream->pf_bitstream_callback( p_bit_stream, 1 );
+    }
 
     if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
     {
