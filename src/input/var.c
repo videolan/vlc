@@ -281,8 +281,8 @@ void input_ControlVarNavigation( input_thread_t *p_input )
         if( p_input->title[i]->psz_name == NULL ||
             *p_input->title[i]->psz_name == '\0' )
         {
-            text.psz_string = malloc( strlen( _("Title %i") ) + 20 );
-            sprintf( text.psz_string, _("Title %i"), i );
+            asprintf( &text.psz_string, _("Title %i"),
+                      i + p_input->i_title_offset );
         }
         else
         {
@@ -304,8 +304,8 @@ void input_ControlVarNavigation( input_thread_t *p_input )
                 *p_input->title[i]->seekpoint[j]->psz_name == '\0' )
             {
                 /* Default value */
-                text2.psz_string = malloc( strlen( _("Chapter %i") ) + 20 );
-                sprintf( text2.psz_string, _("Chapter %i"), j );
+                asprintf( &text2.psz_string, _("Chapter %i"),
+                          j + p_input->i_seekpoint_offset );
             }
             else
             {
@@ -364,8 +364,8 @@ void input_ControlVarTitle( input_thread_t *p_input, int i_title )
             *t->seekpoint[i]->psz_name == '\0' )
         {
             /* Default value */
-            text.psz_string = malloc( strlen( _("Chapter %i") ) + 20 );
-            sprintf( text.psz_string, _("Chapter %i"), i );
+            asprintf( &text.psz_string, _("Chapter %i"),
+                      i + p_input->i_seekpoint_offset );
         }
         else
         {

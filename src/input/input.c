@@ -53,8 +53,8 @@ static void       ControlReduce( input_thread_t * );
 static vlc_bool_t Control( input_thread_t *, int, vlc_value_t );
 
 
-static void UpdateFromAccess( input_thread_t * );
-static void UpdateFromDemux( input_thread_t * );
+static int  UpdateFromAccess( input_thread_t * );
+static int  UpdateFromDemux( input_thread_t * );
 
 static void UpdateItemLength( input_thread_t *, int64_t i_length );
 
@@ -62,6 +62,7 @@ static void ParseOption( input_thread_t *p_input, const char *psz_option );
 
 static void DecodeUrl  ( char * );
 static void MRLSplit( input_thread_t *, char *, char **, char **, char ** );
+static void MRLSections( input_thread_t *, char *, int *, int *, int *, int *);
 
 static input_source_t *InputSourceNew( input_thread_t *);
 static int  InputSourceInit( input_thread_t *, input_source_t *,
@@ -123,6 +124,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->i_stop  = 0;
     p_input->i_title = 0;
     p_input->title   = NULL;
+    p_input->i_title_offset = p_input->i_seekpoint_offset = 0;
     p_input->i_state = INIT_S;
     p_input->i_rate  = INPUT_RATE_DEFAULT;
     p_input->i_bookmark = 0;
@@ -132,7 +134,6 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->b_out_pace_control = VLC_FALSE;
     p_input->i_pts_delay = 0;
 
-
     /* Init Input fields */
     p_input->input.p_item = p_item;
     p_input->input.p_access = NULL;
@@ -141,6 +142,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->input.b_title_demux = VLC_FALSE;
     p_input->input.i_title  = 0;
     p_input->input.title    = NULL;
+    p_input->input.i_title_offset = p_input->input.i_seekpoint_offset = 0;
     p_input->input.b_can_pace_control = VLC_TRUE;
     p_input->input.b_eof = VLC_FALSE;
     p_input->input.i_cr_average = 0;
@@ -344,18 +346,19 @@ static int Run( input_thread_t *p_input )
                 if( p_input->input.b_title_demux &&
                     p_input->input.p_demux->info.i_update )
                 {
-                    UpdateFromDemux( p_input );
+                    i_ret = UpdateFromDemux( p_input );
                     b_force_update = VLC_TRUE;
                 }
                 else if( !p_input->input.b_title_demux &&
                           p_input->input.p_access &&
                           p_input->input.p_access->info.i_update )
                 {
-                    UpdateFromAccess( p_input );
+                    i_ret = UpdateFromAccess( p_input );
                     b_force_update = VLC_TRUE;
                 }
             }
-            else if( i_ret == 0 )    /* EOF */
+
+            if( i_ret == 0 )    /* EOF */
             {
                 vlc_value_t repeat;
 
@@ -377,9 +380,21 @@ static int Run( input_thread_t *p_input )
                         var_Set( p_input, "input-repeat", repeat );
                     }
 
-                    /* Seek to title 0 position 0(start) */
-                    val.i_int = 0;
-                    input_ControlPush( p_input, INPUT_CONTROL_SET_TITLE, &val );
+                    /* Seek to start title/seekpoint */
+                    val.i_int = p_input->input.i_title_start -
+                        p_input->input.i_title_offset;
+                    if( val.i_int < 0 || val.i_int >= p_input->input.i_title )
+                        val.i_int = 0;
+                    input_ControlPush( p_input,
+                                       INPUT_CONTROL_SET_TITLE, &val );
+
+                    val.i_int = p_input->input.i_seekpoint_start -
+                        p_input->input.i_seekpoint_offset;
+                    if( val.i_int > 0 /* TODO: check upper boundary */ )
+                        input_ControlPush( p_input,
+                                           INPUT_CONTROL_SET_SEEKPOINT, &val );
+
+                    /* Seek to start position */
                     if( p_input->i_start > 0 )
                     {
                         val.i_time = p_input->i_start;
@@ -421,8 +436,7 @@ static int Run( input_thread_t *p_input )
         }
         vlc_mutex_unlock( &p_input->lock_control );
 
-        if( b_force_update ||
-            i_intf_update < mdate() )
+        if( b_force_update || i_intf_update < mdate() )
         {
             vlc_value_t val;
             double f_pos;
@@ -529,6 +543,8 @@ static int Init( input_thread_t * p_input )
     /* Create global title (from master) */
     p_input->i_title = p_input->input.i_title;
     p_input->title   = p_input->input.title;
+    p_input->i_title_offset = p_input->input.i_title_offset;
+    p_input->i_seekpoint_offset = p_input->input.i_seekpoint_offset;
     if( p_input->i_title > 0 )
     {
         /* Setup variables */
@@ -547,8 +563,7 @@ static int Init( input_thread_t * p_input )
     /* If the desynchronisation requested by the user is < 0, we need to
      * cache more data. */
     var_Get( p_input, "audio-desync", &val );
-    if( val.i_int < 0 )
-        p_input->i_pts_delay -= (val.i_int * 1000);
+    if( val.i_int < 0 ) p_input->i_pts_delay -= (val.i_int * 1000);
 
     /* Load master infos */
     /* Init length */
@@ -559,6 +574,17 @@ static int Init( input_thread_t * p_input )
 
         UpdateItemLength( p_input, val.i_time );
     }
+
+    /* Start title/chapter */
+    val.i_int = p_input->input.i_title_start -
+        p_input->input.i_title_offset;
+    if( val.i_int > 0 && val.i_int < p_input->input.i_title )
+        input_ControlPush( p_input, INPUT_CONTROL_SET_TITLE, &val );
+    val.i_int = p_input->input.i_seekpoint_start -
+        p_input->input.i_seekpoint_offset;
+    if( val.i_int > 0 /* TODO: check upper boundary */ )
+        input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
+
     /* Start time*/
     /* Set start time */
     p_input->i_start = (int64_t)var_GetInteger( p_input, "start-time" ) *
@@ -1344,7 +1370,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 /*****************************************************************************
  * UpdateFromDemux:
  *****************************************************************************/
-static void UpdateFromDemux( input_thread_t *p_input )
+static int UpdateFromDemux( input_thread_t *p_input )
 {
     demux_t *p_demux = p_input->input.p_demux;
     vlc_value_t v;
@@ -1366,12 +1392,38 @@ static void UpdateFromDemux( input_thread_t *p_input )
         p_demux->info.i_update &= ~INPUT_UPDATE_SEEKPOINT;
     }
     p_demux->info.i_update &= ~INPUT_UPDATE_SIZE;
+
+    /* Hmmm only works with master input */
+    if( p_input->input.p_demux == p_demux )
+    {
+        int i_title_end = p_input->input.i_title_end -
+            p_input->input.i_title_offset;
+        int i_seekpoint_end = p_input->input.i_seekpoint_end -
+            p_input->input.i_seekpoint_offset;
+
+        if( i_title_end >= 0 && i_seekpoint_end >=0 )
+        {
+            if( p_demux->info.i_title > i_title_end ||
+                ( p_demux->info.i_title == i_title_end &&
+                  p_demux->info.i_seekpoint > i_seekpoint_end ) ) return 0;
+        }
+        else if( i_seekpoint_end >=0 )
+        {
+            if( p_demux->info.i_seekpoint > i_seekpoint_end ) return 0;
+        }
+        else if( i_title_end >= 0 )
+        {
+            if( p_demux->info.i_title > i_title_end ) return 0;
+        }
+    }
+
+    return 1;
 }
 
 /*****************************************************************************
  * UpdateFromAccess:
  *****************************************************************************/
-static void UpdateFromAccess( input_thread_t *p_input )
+static int UpdateFromAccess( input_thread_t *p_input )
 {
     access_t *p_access = p_input->input.p_access;
     vlc_value_t v;
@@ -1395,6 +1447,32 @@ static void UpdateFromAccess( input_thread_t *p_input )
         p_access->info.i_update &= ~INPUT_UPDATE_SEEKPOINT;
     }
     p_access->info.i_update &= ~INPUT_UPDATE_SIZE;
+
+    /* Hmmm only works with master input */
+    if( p_input->input.p_access == p_access )
+    {
+        int i_title_end = p_input->input.i_title_end -
+            p_input->input.i_title_offset;
+        int i_seekpoint_end = p_input->input.i_seekpoint_end -
+            p_input->input.i_seekpoint_offset;
+
+        if( i_title_end >= 0 && i_seekpoint_end >=0 )
+        {
+            if( p_access->info.i_title > i_title_end ||
+                ( p_access->info.i_title == i_title_end &&
+                  p_access->info.i_seekpoint > i_seekpoint_end ) ) return 0;
+        }
+        else if( i_seekpoint_end >=0 )
+        {
+            if( p_access->info.i_seekpoint > i_seekpoint_end ) return 0;
+        }
+        else if( i_title_end >= 0 )
+        {
+            if( p_access->info.i_title > i_title_end ) return 0;
+        }
+    }
+
+    return 1;
 }
 
 /*****************************************************************************
@@ -1452,6 +1530,10 @@ static int InputSourceInit( input_thread_t *p_input,
     msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
              psz_mrl, psz_access, psz_demux, psz_path );
 
+    /* Find optional titles and seekpoints */
+    MRLSections( p_input, psz_path, &in->i_title_start, &in->i_title_end,
+                 &in->i_seekpoint_start, &in->i_seekpoint_end );
+
     if( psz_forced_demux && *psz_forced_demux )
         psz_demux = psz_forced_demux;
 
@@ -1472,9 +1554,9 @@ static int InputSourceInit( input_thread_t *p_input,
         p_input->i_pts_delay = __MAX( p_input->i_pts_delay, i_pts_delay );
 
         in->b_title_demux = VLC_TRUE;
-        if( demux2_Control( in->p_demux,
-                            DEMUX_GET_TITLE_INFO,
-                            &in->title, &in->i_title ) )
+        if( demux2_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
+                            &in->title, &in->i_title,
+                            &in->i_title_offset, &in->i_seekpoint_offset ) )
         {
             in->i_title = 0;
             in->title   = NULL;
@@ -1537,9 +1619,10 @@ static int InputSourceInit( input_thread_t *p_input,
         p_input->i_pts_delay = __MAX( p_input->i_pts_delay, i_pts_delay );
 
         in->b_title_demux = VLC_FALSE;
-        if( access2_Control( in->p_access,
-                             ACCESS_GET_TITLE_INFO,
-                             &in->title, &in->i_title ) )
+        if( access2_Control( in->p_access, ACCESS_GET_TITLE_INFO,
+                             &in->title, &in->i_title,
+                             &in->i_title_offset, &in->i_seekpoint_offset ) )
+
         {
             in->i_title = 0;
             in->title   = NULL;
@@ -1578,7 +1661,8 @@ static int InputSourceInit( input_thread_t *p_input,
         if( in->i_title <= 0 )
         {
             if( demux2_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
-                                &in->title, &in->i_title ) )
+                                &in->title, &in->i_title,
+                                &in->i_title_offset, &in->i_seekpoint_offset ))
             {
                 in->i_title = 0;
                 in->title   = NULL;
@@ -1871,6 +1955,10 @@ static void ParseOption( input_thread_t *p_input, const char *psz_option )
     return;
 }
 
+/*****************************************************************************
+ * MRLSplit: parse the access, demux and url part of the
+ *           Media Resource Locator.
+ *****************************************************************************/
 static void MRLSplit( input_thread_t *p_input, char *psz_dup,
                       char **ppsz_access, char **ppsz_demux, char **ppsz_path )
 {
@@ -1927,4 +2015,57 @@ static void MRLSplit( input_thread_t *p_input, char *psz_dup,
         *ppsz_path = "";
     else
         *ppsz_path = psz_path;
+}
+
+/*****************************************************************************
+ * MRLSections: parse title and seekpoint info from the Media Resource Locator.
+ *
+ * Syntax:
+ * [url][@[title-start][,chapter-start][-[title-end][,chapter-end]]]
+ *****************************************************************************/
+static void MRLSections( input_thread_t *p_input, char *psz_source,
+                         int *pi_title_start, int *pi_title_end,
+                         int *pi_chapter_start, int *pi_chapter_end )
+{
+    char *psz, *psz_end, *psz_next;
+
+    *pi_title_start = *pi_title_end = -1;
+    *pi_chapter_start = *pi_chapter_end = -1;
+
+    /* Start by parsing titles and chapters */
+    if( !psz_source || !( psz = strrchr( psz_source, '@' ) ) ) return;
+
+    *psz++ = 0;
+
+    /* Separate start and end */
+    if( ( psz_end = strchr( psz, '-' ) ) ) *psz_end++ = 0;
+
+    /* Look for the start title */
+    *pi_title_start = strtol( psz, &psz_next, 0 );
+    if( !*pi_title_start && psz == psz_next ) *pi_title_start = -1;
+    *pi_title_end = *pi_title_start;
+    psz = psz_next;
+
+    /* Look for the start chapter */
+    if( *psz ) psz++;
+    *pi_chapter_start = strtol( psz, &psz_next, 0 );
+    if( !*pi_chapter_start && psz == psz_next ) *pi_chapter_start = -1;
+    *pi_chapter_end = *pi_chapter_start;
+
+    if( psz_end )
+    {
+        /* Look for the end title */
+        *pi_title_end = strtol( psz_end, &psz_next, 0 );
+        if( !*pi_title_end && psz_end == psz_next ) *pi_title_end = -1;
+        psz_end = psz_next;
+
+        /* Look for the end chapter */
+        if( *psz_end ) psz_end++;
+        *pi_chapter_end = strtol( psz_end, &psz_next, 0 );
+        if( !*pi_chapter_end && psz_end == psz_next ) *pi_chapter_end = -1;
+    }
+
+    msg_Dbg( p_input, "source=`%s' title=%d/%d seekpoint=%d/%d",
+             psz_source, *pi_title_start, *pi_chapter_start,
+             *pi_title_end, *pi_chapter_end );
 }

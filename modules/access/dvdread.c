@@ -54,6 +54,10 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define ANGLE_TEXT N_("DVD angle")
+#define ANGLE_LONGTEXT N_( \
+    "Allows you to select the default DVD angle." )
+
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for DVDread streams. " \
@@ -84,13 +88,15 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("DVDRead Input") );
+    add_integer( "dvdread-angle", 1, NULL, ANGLE_TEXT,
+        ANGLE_LONGTEXT, VLC_FALSE );
     add_integer( "dvdread-caching", DEFAULT_PTS_DELAY / 1000, NULL,
         CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     add_string( "dvdread-css-method", NULL, NULL, CSSMETHOD_TEXT,
                 CSSMETHOD_LONGTEXT, VLC_TRUE );
         change_string_list( psz_css_list, psz_css_list_text, 0 );
     set_capability( "access_demux", 0 );
-    //add_shortcut( "dvd" );
+    add_shortcut( "dvd" );
     add_shortcut( "dvdread" );
     add_shortcut( "dvdsimple" );
     set_callbacks( Open, Close );
@@ -150,13 +156,11 @@ struct demux_sys_t
     uint32_t clut[16];
 };
 
-static char *ParseCL( vlc_object_t *, char *, vlc_bool_t, int *, int *, int *);
-
 static int Control   ( demux_t *, int, va_list );
 static int Demux     ( demux_t * );
 static int DemuxBlock( demux_t *, uint8_t *, int );
 
-static void DemuxTitles( demux_t *, int *, int *, int * );
+static void DemuxTitles( demux_t *, int * );
 static void ESNew( demux_t *, int, int );
 
 static int  DvdReadSetArea  ( demux_t *, int, int, int );
@@ -171,18 +175,30 @@ static int Open( vlc_object_t *p_this )
 {
     demux_t      *p_demux = (demux_t*)p_this;
     demux_sys_t  *p_sys;
-    int          i_title, i_chapter, i_angle;
     char         *psz_name;
     char         *psz_dvdcss_env;
     dvd_reader_t *p_dvdread;
     ifo_handle_t *p_vmg_file;
+    vlc_value_t  val;
 
-    psz_name = ParseCL( VLC_OBJECT(p_demux), p_demux->psz_path, VLC_TRUE,
-                        &i_title, &i_chapter, &i_angle );
-    if( !psz_name )
+    if( !p_demux->psz_path || !*p_demux->psz_path )
     {
-        return VLC_EGENERIC;
+        /* Only when selected */
+        if( !p_this->b_force ) return VLC_EGENERIC;
+
+        psz_name = var_CreateGetString( p_this, "dvd" );
+        if( !psz_name || !*psz_name )
+        {
+            if( psz_name ) free( psz_name );
+            return VLC_EGENERIC;
+        }
     }
+    else psz_name = strdup( p_demux->psz_path );
+
+#ifdef WIN32
+    if( psz_name[0] && psz_name[1] == ':' &&
+        psz_name[2] == '\\' && psz_name[3] == '\0' ) psz_name[2] = '\0';
+#endif
 
     /* Override environment variable DVDCSS_METHOD with config option
      * (FIXME: this creates a small memory leak) */
@@ -193,7 +209,6 @@ static int Open( vlc_object_t *p_this )
 
         psz_env = malloc( strlen("DVDCSS_METHOD=") +
                           strlen( psz_dvdcss_env ) + 1 );
-
         if( !psz_env )
         {
             free( psz_dvdcss_env );
@@ -239,11 +254,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_vts_file = NULL;
 
     p_sys->i_title = p_sys->i_chapter = -1;
-    p_sys->i_angle = i_angle;
 
-    DemuxTitles( p_demux, &i_title, &i_chapter, &i_angle );
+    var_Create( p_demux, "dvdread-angle", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "dvdread-angle", &val );
+    p_sys->i_angle = val.i_int > 0 ? val.i_int : 1;
 
-    DvdReadSetArea( p_demux, i_title, i_chapter, i_angle );
+    DemuxTitles( p_demux, &p_sys->i_angle );
+    DvdReadSetArea( p_demux, 0, 0, p_sys->i_angle );
 
     /* Update default_pts to a suitable value for dvdread access */
     var_Create( p_demux, "dvdread-caching",
@@ -350,6 +367,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_TITLE_INFO:
             ppp_title = (input_title_t***)va_arg( args, input_title_t*** );
             pi_int    = (int*)va_arg( args, int* );
+            *((int*)va_arg( args, int* )) = 1; /* Title offset */
+            *((int*)va_arg( args, int* )) = 1; /* Chapter offset */
 
             /* Duplicate title infos */
             *pi_int = p_sys->i_titles;
@@ -433,14 +452,18 @@ static int Demux( demux_t *p_demux )
         /* End of title */
         if( p_sys->i_next_vobu > p_sys->i_title_end_block )
         {
-            if( p_sys->i_title + 1 >= p_sys->i_titles ) return 0; /* EOF */
+            if( p_sys->i_title + 1 >= p_sys->i_titles )
+            {
+                return 0; /* EOF */
+            }
 
             DvdReadSetArea( p_demux, p_sys->i_title + 1, 0, -1 );
         }
 
         if( p_sys->i_pack_len >= 1024 )
         {
-            msg_Err( p_demux, "i_pack_len >= 1024. This shouldn't happen!" );
+            msg_Err( p_demux, "i_pack_len >= 1024 (%i). "
+                     "This shouldn't happen!", p_sys->i_pack_len );
             return 0; /* EOF */
         }
 
@@ -454,7 +477,10 @@ static int Demux( demux_t *p_demux )
 
     if( p_sys->i_cur_block > p_sys->i_title_end_block )
     {
-        if( p_sys->i_title + 1 >= p_sys->i_titles ) return 0; /* EOF */
+        if( p_sys->i_title + 1 >= p_sys->i_titles )
+        {
+            return 0; /* EOF */
+        }
 
         DvdReadSetArea( p_demux, p_sys->i_title + 1, 0, -1 );
     }
@@ -901,7 +927,7 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
      * Chapter selection
      */
 
-    if( i_chapter >= 0 && i_chapter <= p_sys->i_chapters )
+    if( i_chapter >= 0 && i_chapter < p_sys->i_chapters )
     {
         pgc_id = p_vts->vts_ptt_srpt->title[
                      p_sys->i_ttn - 1].ptt[i_chapter].pgcn;
@@ -1052,6 +1078,7 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
      * care about.
      */
     p_sys->i_cur_block = p_sys->dsi_pack.dsi_gi.nv_pck_lbn;
+    p_sys->i_pack_len = p_sys->dsi_pack.dsi_gi.vobu_ea;
 
     /*
      * If we're not at the end of this cell, we can determine the next
@@ -1060,7 +1087,12 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
      * avoiding the doubled scenes in The Matrix, and makes our life
      * really happy.
      */
-    if( p_sys->dsi_pack.vobu_sri.next_vobu != SRI_END_OF_CELL )
+
+    p_sys->i_next_vobu = p_sys->i_cur_block +
+        ( p_sys->dsi_pack.vobu_sri.next_vobu & 0x7fffffff );
+
+    if( p_sys->dsi_pack.vobu_sri.next_vobu != SRI_END_OF_CELL
+        && p_sys->i_angle > 1 )
     {
         switch( ( p_sys->dsi_pack.sml_pbi.category & 0xf000 ) >> 12 )
         {
@@ -1076,7 +1108,6 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
             {
                 p_sys->i_next_vobu = p_sys->i_cur_block +
                     p_sys->dsi_pack.dsi_gi.vobu_ea + 1;
-                p_sys->i_pack_len = p_sys->dsi_pack.dsi_gi.vobu_ea;
             }
             break;
         case 0x5:
@@ -1100,16 +1131,14 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
         default:
             p_sys->i_next_vobu = p_sys->i_cur_block +
                 ( p_sys->dsi_pack.vobu_sri.next_vobu & 0x7fffffff );
-            p_sys->i_pack_len = p_sys->dsi_pack.dsi_gi.vobu_ea;
             break;
         }
     }
-    else
+    else if( p_sys->dsi_pack.vobu_sri.next_vobu == SRI_END_OF_CELL )
     {
         p_sys->i_cur_cell = p_sys->i_next_cell;
         DvdReadFindCell( p_demux );
 
-        p_sys->i_pack_len = p_sys->dsi_pack.dsi_gi.vobu_ea;
         p_sys->i_next_vobu =
             p_sys->p_cur_pgc->cell_playback[p_sys->i_cur_cell].first_sector;
     }
@@ -1187,8 +1216,7 @@ static void DvdReadFindCell( demux_t *p_demux )
 /*****************************************************************************
  * DemuxTitles: get the titles/chapters structure
  *****************************************************************************/
-static void DemuxTitles( demux_t *p_demux,
-                         int *pi_title, int *pi_chapter, int *pi_angle )
+static void DemuxTitles( demux_t *p_demux, int *pi_angle )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     input_title_t *t;
@@ -1211,97 +1239,15 @@ static void DemuxTitles( demux_t *p_demux,
         msg_Dbg( p_demux, "title %d has %d chapters", i, i_chapters );
 
         t = vlc_input_title_New();
-        t->psz_name = malloc( strlen( _("Title %i") ) + 20 );
-        sprintf( t->psz_name, _("Title %i"), i + 1 );
 
         for( j = 0; j < __MAX( i_chapters, 1 ); j++ )
         {
             s = vlc_seekpoint_New();
-            s->psz_name = malloc( strlen( _("Chapter %i") ) + 20 );
-            sprintf( s->psz_name, _("Chapter %i"), j + 1 );
             TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
         }
 
         TAB_APPEND( p_sys->i_titles, p_sys->titles, t );
     }
 
-    /* Set forced title/chapter/angle */
-    *pi_title = (*pi_title >= 0 && *pi_title < i_titles) ? *pi_title : 0;
-    *pi_chapter = (*pi_chapter >= 0 && *pi_chapter <
-        tt_srpt->title[*pi_title].nr_of_ptts) ? *pi_chapter : 0;
-
 #undef tt_srpt
-}
-
-/*****************************************************************************
- * ParseCL: parse command line. Titles, chapters and angles start from 1.
- *****************************************************************************/
-static char *ParseCL( vlc_object_t *p_this, char *psz_name, vlc_bool_t b_force,
-                      int *i_title, int *i_chapter, int *i_angle )
-{
-    char *psz_parser, *psz_source, *psz_next;
-
-    psz_source = strdup( psz_name );
-    if( psz_source == NULL ) return NULL;
-
-    *i_title = 1;
-    *i_chapter = 1;
-    *i_angle = 1;
-
-    /* Start with the end, because you could have :
-     * dvdnav:/Volumes/my@toto/VIDEO_TS@1,1
-     * (yes, this is kludgy). */
-    for( psz_parser = psz_source + strlen(psz_source) - 1;
-         psz_parser >= psz_source && *psz_parser != '@';
-         psz_parser-- );
-
-    if( psz_parser >= psz_source && *psz_parser == '@' )
-    {
-        /* Found options */
-        *psz_parser = '\0';
-        ++psz_parser;
-
-        *i_title = (int)strtol( psz_parser, &psz_next, 10 );
-        if( *psz_next )
-        {
-            psz_parser = psz_next + 1;
-            *i_chapter = (int)strtol( psz_parser, &psz_next, 10 );
-            if( *psz_next )
-            {
-                *i_angle = (int)strtol( psz_next + 1, NULL, 10 );
-            }
-        }
-    }
-
-    *i_title   = *i_title > 0 ? *i_title : 1;
-    *i_chapter = *i_chapter > 0 ? *i_chapter : 1;
-    *i_angle   = *i_angle > 0 ? *i_angle : 1;
-
-    if( !*psz_source )
-    {
-        free( psz_source );
-        if( !b_force )
-        {
-            return NULL;
-        }
-        psz_source = config_GetPsz( p_this, "dvd" );
-        if( !psz_source ) return NULL;
-    }
-
-#ifdef WIN32
-    if( psz_source[0] && psz_source[1] == ':' &&
-        psz_source[2] == '\\' && psz_source[3] == '\0' )
-    {
-        psz_source[2] = '\0';
-    }
-#endif
-
-    msg_Dbg( p_this, "dvdroot=%s title=%d chapter=%d angle=%d",
-             psz_source, *i_title, *i_chapter, *i_angle );
-
-    /* Get back to a 0-based offset */
-    (*i_title)--;
-    (*i_chapter)--;
-
-    return psz_source;
 }

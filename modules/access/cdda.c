@@ -72,9 +72,6 @@ struct access_sys_t
     int           i_titles;
     input_title_t *title[99];         /* No more that 99 track in a cd-audio */
 
-    int i_title_start;
-    int i_title_end;
-
     /* Current position */
     int         i_sector;                                  /* Current Sector */
     int *       p_sectors;                                  /* Track sectors */
@@ -90,54 +87,38 @@ static int      Control( access_t *, int, va_list );
 
 /*****************************************************************************
  * Open: open cdda
- * MRL syntax: [dev_path][@[title-start][-[title-end]]]
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
 
-    char *psz_dup, *psz;
-    int  i, i_title_start = -1, i_title_end = -1;
     vcddev_t *vcddev;
+    char *psz_name;
+    int  i;
 
-    /* Command line: [dev_path][@[title-start][-[title-end]]] */
-    psz_dup = p_access->psz_path? strdup( p_access->psz_path ) : 0;
-    if( psz_dup && ( psz = strchr( psz_dup, '@' ) ) )
+    if( !p_access->psz_path || !*p_access->psz_path )
     {
-        *psz++ = 0;
-        i_title_start = i_title_end = strtol( psz, NULL, 0 );
-
-        if( ( psz = strchr( psz, '-' ) ) )
-        {
-            *psz++;
-            i_title_end = strtol( psz, NULL, 0 );
-        }
-    }
-
-    if( !psz_dup || !*psz_dup )
-    {
-        if( psz_dup ) free( psz_dup );
-
         /* Only when selected */
-        if( !p_access->b_force ) return VLC_EGENERIC;
+        if( !p_this->b_force ) return VLC_EGENERIC;
 
-        psz_dup = var_CreateGetString( p_access, "cd-audio" );
-        if( !psz_dup || !*psz_dup )
+        psz_name = var_CreateGetString( p_this, "cd-audio" );
+        if( !psz_name || !*psz_name )
         {
-            if( psz_dup ) free( psz_dup );
+            if( psz_name ) free( psz_name );
             return VLC_EGENERIC;
         }
     }
+    else psz_name = strdup( p_access->psz_path );
 
     /* Open CDDA */
-    if( (vcddev = ioctl_Open( VLC_OBJECT(p_access), psz_dup )) == NULL )
+    if( (vcddev = ioctl_Open( VLC_OBJECT(p_access), psz_name )) == NULL )
     {
-        msg_Warn( p_access, "could not open %s", psz_dup );
-        free( psz_dup );
+        msg_Warn( p_access, "could not open %s", psz_name );
+        free( psz_name );
         return VLC_EGENERIC;
     }
-    free( psz_dup );
+    free( psz_name );
 
     /* Set up p_access */
     p_access->pf_read = NULL;
@@ -184,17 +165,8 @@ static int Open( vlc_object_t *p_this )
         t->i_length = I64C(1000000) * t->i_size / 44100 / 4;
     }
 
-    /* Starting title and sector */
-    if( i_title_start < 1 || i_title_start > p_sys->i_titles )
-        p_sys->i_title_start = 1;
-    else p_sys->i_title_start = i_title_start;
-    if( i_title_end < 1 || i_title_end > p_sys->i_titles )
-        p_sys->i_title_end = -1;
-    else p_sys->i_title_end = i_title_end;
-
-    p_sys->i_sector = p_sys->p_sectors[p_sys->i_title_start-1];
-    p_access->info.i_title = p_sys->i_title_start-1;
-    p_access->info.i_size = p_sys->title[p_sys->i_title_start-1]->i_size;
+    p_sys->i_sector = p_sys->p_sectors[0];
+    p_access->info.i_size = p_sys->title[0]->i_size;
 
     /* Build a WAV header for the output data */
     memset( &p_sys->waveheader, 0, sizeof(WAVEHEADER) );
@@ -266,9 +238,7 @@ static block_t *Block( access_t *p_access )
     /* Check end of title */
     while( p_sys->i_sector >= p_sys->p_sectors[p_access->info.i_title + 1] )
     {
-        if( p_access->info.i_title + 1 >= p_sys->i_titles ||
-            ( p_sys->i_title_end > 0 &&
-              p_access->info.i_title + 1 >= p_sys->i_title_end ) )
+        if( p_access->info.i_title + 1 >= p_sys->i_titles )
         {
             p_access->info.b_eof = VLC_TRUE;
             return NULL;
@@ -371,6 +341,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_GET_TITLE_INFO:
             ppp_title = (input_title_t***)va_arg( args, input_title_t*** );
             pi_int    = (int*)va_arg( args, int* );
+	    *((int*)va_arg( args, int* )) = 1; /* Title offset */
 
             /* Duplicate title infos */
             *pi_int = p_sys->i_titles;
@@ -394,10 +365,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
                 /* Next sector to read */
                 p_sys->i_sector = p_sys->p_sectors[i];
-
-                /* User tries to access another title so better reset
-                 * the end title */
-                p_sys->i_title_end = -1;
             }
             break;
 

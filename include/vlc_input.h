@@ -201,6 +201,14 @@ typedef struct
     int          i_title;
     input_title_t **title;
 
+    int i_title_offset;
+    int i_seekpoint_offset;
+
+    int i_title_start;
+    int i_title_end;
+    int i_seekpoint_start;
+    int i_seekpoint_end;
+
     /* Properties */
     vlc_bool_t b_can_pace_control;
     vlc_bool_t b_can_pause;
@@ -252,6 +260,9 @@ struct input_thread_t
     /* Title infos FIXME multi-input (not easy) ? */
     int          i_title;
     input_title_t **title;
+
+    int i_title_offset;
+    int i_seekpoint_offset;
 
     /* User bookmarks FIXME won't be easy with multiples input */
     int         i_bookmark;
