@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.21 2003/08/27 08:44:28 garf Exp $
+ * $Id: vlcshell.cpp,v 1.22 2003/09/20 13:52:23 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -99,20 +99,19 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event );
 
 HINSTANCE g_hDllInstance = NULL;
 
-BOOL WINAPI
-DllMain( HINSTANCE  hinstDLL,                   // handle of DLL module
-                    DWORD  fdwReason,       // reason for calling function
-                    LPVOID  lpvReserved)
+BOOL WINAPI DllMain( HINSTANCE hinstDLL, /* handle of DLL module */
+                     DWORD fdwReason,    /* reason for calling the function */
+                     LPVOID lpvReserved )
 {
-    switch (fdwReason)
+    switch( fdwReason )
     {
-        case DLL_PROCESS_ATTACH:
-            g_hDllInstance = hinstDLL;
-            break;
-        case DLL_THREAD_ATTACH:
-        case DLL_PROCESS_DETACH:
-        case DLL_THREAD_DETACH:
-            break;
+    case DLL_PROCESS_ATTACH:
+        g_hDllInstance = hinstDLL;
+        break;
+    case DLL_THREAD_ATTACH:
+    case DLL_PROCESS_DETACH:
+    case DLL_THREAD_DETACH:
+        break;
     }
     return TRUE;
 }

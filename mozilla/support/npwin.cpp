@@ -35,12 +35,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef _NPAPI_H_
+#include "nscore.h"
 #include "npapi.h"
-#endif
-#ifndef _NPUPP_H_
 #include "npupp.h"
-#endif
 
 //\\// DEFINE
 #define NP_EXPORT
@@ -131,7 +128,7 @@ extern "C" NPError
 #else
 NPError WINAPI NP_EXPORT 
 #endif
-NP_Initialize(NPNetscapeFuncs* pFuncs)
+NP_Initialize(NPNetscapeFuncs* pFuncs, NPPluginFuncs*)
 {
     // trap a NULL ptr 
     if(pFuncs == NULL)

@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.74 2003/09/09 12:54:19 jpsaman Exp $
+dnl $Id: configure.ac,v 1.75 2003/09/20 13:52:23 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -3050,7 +3050,7 @@ dnl
 mozilla=false
 AC_ARG_ENABLE(mozilla,
   [  --enable-mozilla        build a vlc-based Mozilla plugin (default disabled)])
-if test "${enable_mozilla}" = "yes"
+if test "${enable_mozilla}" = "yes" -a "${SYS}" != "mingw32"
 then
   AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
   if test "${MOZILLA_CONFIG}" = "no"
@@ -3068,12 +3068,36 @@ then
     dnl Workaround for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=150490
     AX_ADD_CPPFLAGS([mozilla],[[`${MOZILLA_CONFIG} --cflags plugin xpcom java | sed 's,-I\([^ ]*\)/mozilla/\([^ ]*\),-I\1/\2 -I\1/mozilla/\2,g' | xargs`]])
     AX_ADD_LDFLAGS([mozilla],[`${MOZILLA_CONFIG} --libs plugin xpcom`])
-    dnl Not necessarily in ${PATH}
-    if test -z "${XPIDL}" -o ! -x "${XPIDL}"
-    then
-      XPIDL="/usr/lib/mozilla/xpidl"
-    fi
   fi
+
+dnl special case for mingw32
+elif test "${enable_mozilla}" = "yes"
+then
+  AC_ARG_WITH(mozilla-sdk-path,
+    [    --with-mozilla-sdk-path=PATH path to win32 mozilla sdk], [
+    AC_MSG_CHECKING(for mozilla-config.h in ${with_mozilla_sdk_path})
+    real_mozilla_sdk="`cd ${with_mozilla_sdk_path} 2>/dev/null && pwd`"
+    if test -z "${real_mozilla_sdk}"; then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot cd to ${with_mozilla_sdk_path}])
+    fi
+    if test -f "${real_mozilla_sdk}/mozilla-config.h"; then
+      AC_MSG_RESULT(${real_mozilla_sdk}/mozilla-config.h)
+      mozilla=:
+      AX_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I{real_mozilla_sdk}/plugin/include -I{real_mozilla_sdk}/java/include])
+      AX_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -lnspr4 -lplds4 -lplc4 -lembedstring -lxpcomglue])
+    else
+      dnl  The given path is incorrect
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${real_mozilla_sdk}/mozilla-config.h])
+    fi
+  ])
+fi
+
+dnl Not necessarily in ${PATH}
+if test -z "${XPIDL}" -o ! -x "${XPIDL}"; then
+  XPIDL="/usr/lib/mozilla/xpidl"
 fi
 AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
