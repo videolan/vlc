@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.7 2003/06/24 00:33:39 fenrir Exp $
+ * $Id: mkv.cpp,v 1.8 2003/06/24 06:07:14 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -537,6 +537,8 @@ static int Activate( vlc_object_t * p_this )
     int             i_spu_channel, i_audio_channel;
 
     EbmlElement     *el = NULL, *el1 = NULL, *el2 = NULL, *el3 = NULL, *el4 = NULL;
+
+    input_info_category_t *p_cat;
 
     /* Initialize access plug-in structures. */
     if( p_input->i_mtu == 0 )
@@ -1486,6 +1488,70 @@ static int Activate( vlc_object_t * p_this )
         msg_Warn( p_input, "cannot find/select audio track" );
     }
 
+    /* add informations */
+    p_cat = input_InfoCategory( p_input, "Matroska" );
+    if( p_sys->f_duration > 1000.1 )
+    {
+        int64_t i_sec = (int64_t)p_sys->f_duration / 1000;
+        int h,m,s;
+
+        h = i_sec / 3600;
+        m = ( i_sec / 60 ) % 60;
+        s = i_sec % 60;
+
+        input_AddInfo( p_cat, _("Duration"), "%d:%2.2d:%2.2d" , h, m, s );
+    }
+    input_AddInfo( p_cat, _("Number of streams"), "%d" , p_sys->i_track );
+
+    for( i_track = 0; i_track < p_sys->i_track; i_track++ )
+    {
+        char psz_cat[strlen( "Stream " ) + 10];
+#define tk  p_sys->track[i_track]
+
+        sprintf( psz_cat, "Stream %d", i_track );
+        p_cat = input_InfoCategory( p_input, psz_cat);
+        switch( tk.i_cat )
+        {
+            case AUDIO_ES:
+                input_AddInfo( p_cat, _("Type"), _("Audio") );
+                input_AddInfo( p_cat, _("Codec"), "%.4s (%s)", (char*)&tk.i_codec, tk.psz_codec );
+                if( tk.i_channels > 0 )
+                {
+                    input_AddInfo( p_cat, _("Channels"), "%d", tk.i_channels );
+                }
+                if( tk.i_samplerate > 0 )
+                {
+                    input_AddInfo( p_cat, _("Sample Rate"), "%d", tk.i_samplerate );
+                }
+                if( tk.i_bitspersample )
+                {
+                    input_AddInfo( p_cat, _("Bits Per Sample"), "%d", tk.i_bitspersample );
+                }
+                break;
+            case VIDEO_ES:
+                input_AddInfo( p_cat, _("Type"), _("Video") );
+                input_AddInfo( p_cat, _("Codec"), "%.4s (%s)", (char*)&tk.i_codec, tk.psz_codec );
+                if( tk.i_width > 0 && tk.i_height )
+                {
+                    input_AddInfo( p_cat, _("Resolution"), "%dx%d", tk.i_width, tk.i_height );
+                }
+                if( tk.i_display_width > 0 && tk.i_display_height )
+                {
+                    input_AddInfo( p_cat, _("Display Resolution"), "%dx%d", tk.i_display_width, tk.i_display_height );
+                }
+                if( tk.f_fps > 0.1 )
+                {
+                    input_AddInfo( p_cat, _("Frame Per Second"), "%.3f", tk.f_fps );
+                }
+                break;
+            case SPU_ES:
+                input_AddInfo( p_cat, _("Type"), _("Subtitle") );
+                input_AddInfo( p_cat, _("Codec"), "%s", tk.psz_codec );
+                break;
+        }
+
+#undef  tk
+    }
     return VLC_SUCCESS;
 
 error:
@@ -1700,6 +1766,11 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
     if( tk.p_es->p_decoder_fifo == NULL )
     {
         tk.b_inited = VLC_FALSE;
+        return;
+    }
+
+    if( tk.i_cat == AUDIO_ES && p_input->stream.control.b_mute )
+    {
         return;
     }
 
