@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.12 2003/06/24 23:00:32 fenrir Exp $
+ * $Id: mkv.cpp,v 1.13 2003/06/25 09:13:03 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -434,7 +434,7 @@ static int Activate( vlc_object_t * p_this )
 
                     msg_Dbg( p_input, "|   |   + Title=%s", p_sys->psz_title );
                 }
-#ifdef HAVE_TIME_H
+#ifdef HAVE_GMTIME_R
                 else if( EbmlId( *el2 ) == KaxDateUTC::ClassInfos.GlobalId )
                 {
                     KaxDateUTC &date = *(KaxDateUTC*)el2;

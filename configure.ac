@@ -273,7 +273,7 @@ CPPFLAGS_save="${CPPFLAGS_save} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcd
 dnl Check for system libs needed
 need_libc=false
 
-AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2 if_nametoindex atoll getenv putenv setenv)
+AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2 if_nametoindex atoll getenv putenv setenv gmtime_r)
 
 dnl Check for usual libc functions
 AC_CHECK_FUNCS(strdup strndup atof lseek)
@@ -2483,7 +2483,6 @@ if test "${enable_basic_skins}" = "yes"; then
   fi
 
   PLUGINS="${PLUGINS} basic_skins"
-  CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -DBASIC_SKINS"
 fi
 
 dnl
