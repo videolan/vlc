@@ -156,7 +156,7 @@ typedef struct subpicture_s
 
 /* Subpicture type */
 #define EMPTY_SUBPICTURE        0    /* subtitle slot is empty and available */
-#define RLE_SUBPICTURE          100                  /* RLE encoded subtitle */
+#define DVD_SUBPICTURE          100                   /* DVD subpicture unit */
 #define TEXT_SUBPICTURE         200                      /* single line text */
 
 /* Subpicture status */

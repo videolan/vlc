@@ -47,6 +47,7 @@ typedef struct spudec_thread_s
      */
     unsigned int        total_bits_read;
     /* ... */
+    vout_thread_t *     p_vout;          /* needed to create the spu objects */
 
 } spudec_thread_t;
 

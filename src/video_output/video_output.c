@@ -406,6 +406,9 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
         case TEXT_SUBPICTURE:                             /* text subpicture */
             p_free_subpic->p_data = malloc( i_size + 1 );
             break;
+        case DVD_SUBPICTURE:                          /* DVD subpicture unit */
+            p_free_subpic->p_data = malloc( i_size );
+            break;
 #ifdef DEBUG
         default:
             intf_DbgMsg("error: unknown subpicture type %d\n", i_type );
@@ -415,7 +418,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
         }
 
         if( p_free_subpic->p_data != NULL )
-        {                    /* Copy subpicture informations, set some default values */
+        {           /* Copy subpicture informations, set some default values */
             p_free_subpic->i_type                      = i_type;
             p_free_subpic->i_status                    = RESERVED_SUBPICTURE;
             p_free_subpic->i_size                      = i_size;

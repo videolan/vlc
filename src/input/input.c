@@ -1000,9 +1000,6 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
             if( !p_last_pes )
                 p_pes->b_data_loss = 1;
 
-            /* Tell the Demux we haven't yet parsed this PES */
-            p_pes->b_already_parsed = 0;
-
             /* Read the b_random_access flag status and then reinit it */
             p_pes->b_random_access = p_es_descriptor->b_random;
             p_es_descriptor->b_random = 0;

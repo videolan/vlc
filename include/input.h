@@ -76,7 +76,6 @@ typedef struct pes_packet_s
 
     /* Demultiplexer environment */
     boolean_t               b_discard_payload;  /* is the packet messed up ? */
-    boolean_t               b_already_parsed;     /* was it already parsed ? */
     byte_t *                p_pes_header;       /* pointer to the PES header */
     byte_t *                p_pes_header_save;           /* temporary buffer */
 
