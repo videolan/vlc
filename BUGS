@@ -1,4 +1,4 @@
-List of known vlc bugs $Id: BUGS,v 1.9 2002/03/20 23:00:16 gbazin Exp $
+List of known vlc bugs $Id: BUGS,v 1.10 2002/05/04 03:36:19 lool Exp $
 
    Please try to keep this file up to date. Also, grep for FIXME in the
 source files for more and more bugs to fix.
@@ -63,6 +63,10 @@ Gtk interface:
 
   * Playing like a madman with the `Playlist' button makes the interface
   crash.
+
+  * No text in the status bar
+
+  * No window title on some machines, correct window title on another
 
 
 Misc:
