@@ -2,7 +2,7 @@
  * network.h: interface to communicate with network plug-ins
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: network.h,v 1.3 2002/07/20 18:01:41 sam Exp $
+ * $Id: network.h,v 1.4 2003/07/31 23:44:49 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -34,6 +34,8 @@ struct network_socket_t
 
     char * psz_server_addr;
     int i_server_port;
+
+    int i_ttl;
 
     /* Return values */
     int i_handle;

@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.20 2003/07/23 01:28:54 gbazin Exp $
+ * $Id: sap.c,v 1.21 2003/07/31 23:44:49 fenrir Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -225,6 +225,7 @@ static void Run( intf_thread_t *p_intf )
         socket_desc.i_bind_port       = HELLO_PORT;
         socket_desc.psz_server_addr   = "";
         socket_desc.i_server_port     = 0;
+        socket_desc.i_ttl             = 0;
         p_intf->p_private = (void*) &socket_desc;
 
         psz_network = "ipv4"; 
@@ -257,6 +258,7 @@ static void Run( intf_thread_t *p_intf )
         socket_desc.i_bind_port       = HELLO_PORT;
         socket_desc.psz_server_addr   = "";
         socket_desc.i_server_port     = 0;
+        socket_desc.i_ttl             = 0;
         p_intf->p_private = (void*) &socket_desc;
 
         psz_network = "ipv6"; 

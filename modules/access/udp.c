@@ -2,7 +2,7 @@
  * udp.c: raw UDP & RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.20 2003/07/23 07:37:34 jpsaman Exp $
+ * $Id: udp.c,v 1.21 2003/07/31 23:44:49 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
@@ -261,6 +261,7 @@ static int Open( vlc_object_t *p_this )
     socket_desc.i_bind_port = i_bind_port;
     socket_desc.psz_server_addr = psz_server_addr;
     socket_desc.i_server_port = i_server_port;
+    socket_desc.i_ttl           = 0;
 
     /* Find an appropriate network module */
     p_input->p_private = (void*) &socket_desc;

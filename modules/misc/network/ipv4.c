@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.19 2003/06/15 01:23:31 massiot Exp $
+ * $Id: ipv4.c,v 1.20 2003/07/31 23:44:49 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -347,7 +347,11 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         if( IN_MULTICAST( ntohl(inet_addr(psz_server_addr) ) ) )
         {
             /* set the time-to-live */
-            int ttl = config_GetInt( p_this, "ttl" );
+            int ttl = p_socket->i_ttl;
+            if( ttl < 1 )
+            {
+                ttl = config_GetInt( p_this, "ttl" );
+            }
             if( ttl < 1 ) ttl = 1;
 
             if( setsockopt( i_handle, IPPROTO_IP, IP_MULTICAST_TTL,

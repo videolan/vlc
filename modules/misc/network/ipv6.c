@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.13 2003/06/15 01:23:31 massiot Exp $
+ * $Id: ipv6.c,v 1.14 2003/07/31 23:44:49 fenrir Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -367,7 +367,11 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 
     if( *psz_server_addr )
     {
-        int ttl = config_GetInt( p_this, "ttl" );
+        int ttl = p_socket->i_ttl;
+        if( ttl < 1 )
+        {
+            ttl = config_GetInt( p_this, "ttl" );
+        }
         if( ttl < 1 ) ttl = 1;
 
         /* Build socket for remote connection */

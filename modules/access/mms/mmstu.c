@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmstu.c,v 1.5 2003/07/16 15:32:41 sam Exp $
+ * $Id: mmstu.c,v 1.6 2003/07/31 23:44:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -449,6 +449,7 @@ static int MMSOpen( input_thread_t  *p_input,
     socket_desc.i_server_port   = p_url->i_port;
     socket_desc.psz_bind_addr   = "";
     socket_desc.i_bind_port     = 0;
+    socket_desc.i_ttl           = 0;
     p_input->p_private = (void*)&socket_desc;
     if( !( p_network = module_Need( p_input, "network", psz_network ) ) )
     {
@@ -490,6 +491,7 @@ static int MMSOpen( input_thread_t  *p_input,
         socket_desc.i_server_port   = 0;
         socket_desc.psz_bind_addr   = p_sys->psz_bind_addr;
         socket_desc.i_bind_port     = 7000; //p_url->i_bind_port; FIXME
+        socket_desc.i_ttl           = 0;
         p_input->p_private = (void*)&socket_desc;
         if( !( p_network = module_Need( p_input, "network", psz_network ) ) )
         {

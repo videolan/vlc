@@ -2,7 +2,7 @@
  * mmsh.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmsh.c,v 1.3 2003/05/08 19:06:45 titer Exp $
+ * $Id: mmsh.c,v 1.4 2003/07/31 23:44:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -711,6 +711,7 @@ static input_socket_t * NetOpenTCP( input_thread_t *p_input, url_t *p_url )
     socket_desc.i_server_port   = p_url->i_port;
     socket_desc.psz_bind_addr   = "";
     socket_desc.i_bind_port     = 0;
+    socket_desc.i_ttl           = 0;
     p_input->p_private = (void*)&socket_desc;
     if( !( p_network = module_Need( p_input, "network", psz_network ) ) )
     {

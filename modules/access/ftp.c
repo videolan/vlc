@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ftp.c,v 1.19 2003/05/15 22:27:36 massiot Exp $
+ * $Id: ftp.c,v 1.20 2003/07/31 23:44:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -200,6 +200,7 @@ static int Open( vlc_object_t *p_this )
     socket_desc.i_server_port   = p_url->i_server_port;
     socket_desc.psz_bind_addr   = "";
     socket_desc.i_bind_port     = 0;
+    socket_desc.i_ttl           = 0;
     p_input->p_private = (void*)&socket_desc;
     if( !( p_network = module_Need( p_input, "network", psz_network ) ) )
     {
@@ -644,6 +645,7 @@ static int  ftp_StartStream( input_thread_t *p_input, off_t i_start )
     socket_desc.i_server_port   = i_port;
     socket_desc.psz_bind_addr   = "";
     socket_desc.i_bind_port     = 0;
+    socket_desc.i_ttl           = 0;
     p_input->p_private = (void*)&socket_desc;
     if( !( p_network = module_Need( p_input, "network", "" ) ) )
     {

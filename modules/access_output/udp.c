@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.10 2003/06/19 18:45:06 gbazin Exp $
+ * $Id: udp.c,v 1.11 2003/07/31 23:44:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -127,6 +127,8 @@ static int Open( vlc_object_t *p_this )
     module_t            *p_network;
     network_socket_t    socket_desc;
 
+    char                *val;
+
     if( !( p_sys = p_access->p_sys =
                 malloc( sizeof( sout_access_out_sys_t ) ) ) )
     {
@@ -192,6 +194,11 @@ static int Open( vlc_object_t *p_this )
     socket_desc.i_server_port   = i_dst_port;
     socket_desc.psz_bind_addr   = "";
     socket_desc.i_bind_port     = 0;
+    socket_desc.i_ttl           = 0;
+    if( ( val = sout_cfg_find_value( p_access->p_cfg, "ttl" ) ) )
+    {
+        socket_desc.i_ttl = atoi( val );
+    }
     p_sys->p_thread->p_private = (void*)&socket_desc;
     if( !( p_network = module_Need( p_sys->p_thread,
                                     "network", "" ) ) )

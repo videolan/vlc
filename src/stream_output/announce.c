@@ -211,6 +211,7 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout, char * psz_url_arg,
         socket_desc.psz_server_addr   = SAP_IPV4_ADDR;
         socket_desc.i_server_port     = SAP_PORT;
         socket_desc.i_handle          = 0;
+        socket_desc.i_ttl             = 0;
 
         /* Call the network module */
         p_sout->p_private = (void*) &socket_desc;
@@ -250,6 +251,7 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout, char * psz_url_arg,
         socket_desc.psz_server_addr = sap_ipv6_addr;
         socket_desc.i_server_port   = SAP_PORT;
         socket_desc.i_handle        = 0;
+        socket_desc.i_ttl           = 0;
 
         /* Call the network module */
         p_sout->p_private = (void *) &socket_desc;
