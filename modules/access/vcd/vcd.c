@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.13 2002/12/31 01:54:36 massiot Exp $
+ * $Id: vcd.c,v 1.14 2003/02/12 16:58:11 jobi Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -235,7 +235,7 @@ static int VCDOpen( vlc_object_t *p_this )
                            * (off_t)VCD_DATA_SIZE;
 
         /* Number of chapters */
-        area[i]->i_part_nb = 0;   /* will be the entry points */
+        area[i]->i_part_nb = 1;   /* will be the entry points */
         area[i]->i_part = 1;
 
         /* i_plugin_data is used to store which entry point is the first
@@ -249,7 +249,7 @@ static int VCDOpen( vlc_object_t *p_this )
     p_vcd->b_valid_ep = 1;
     if( VCDEntryPoints( p_input ) < 0 )
     {
-        msg_Warn( p_input, "could read entry points, will not use them" );
+        msg_Warn( p_input, "could not read entry points, will not use them" );
         p_vcd->b_valid_ep = 0;
     }
 
@@ -522,7 +522,7 @@ static int VCDEntryPoints( input_thread_t * p_input )
 
     p_vcd->i_entries_nb = 0;
 
-#define i_track entries.entry[i].i_track
+#define i_track BCD_TO_BIN( entries.entry[i].i_track )
     for( i = 0 ; i < i_nb ; i++ )
     {
         if( i_track <= p_input->stream.i_area_nb )
