@@ -635,6 +635,7 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
         wxT("DIV2"),
         wxT("DIV3"),
         wxT("H263"),
+        wxT("h264"),
         wxT("I263"),
         wxT("WMV1"),
         wxT("WMV2"),
@@ -675,7 +676,7 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
     video_transc_checkbox =
         new wxCheckBox( panel, VideoTranscEnable_Event, wxU(_("Video codec")));
     video_codec_combo =
-        new wxComboBox( panel, VideoTranscCodec_Event, wxT(""),
+        new wxComboBox( panel, VideoTranscCodec_Event, wxvcodecs_array[2],
                         wxPoint(20,25), wxDefaultSize,
                         WXSIZEOF(wxvcodecs_array),
                         wxvcodecs_array, wxCB_READONLY );
@@ -740,7 +741,7 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
     audio_transc_checkbox =
         new wxCheckBox( panel, AudioTranscEnable_Event, wxU(_("Audio codec")));
     audio_codec_combo =
-        new wxComboBox( panel, AudioTranscCodec_Event, wxT(""),
+        new wxComboBox( panel, AudioTranscCodec_Event, wxacodecs_array[0],
                         wxPoint(10,25), wxDefaultSize,
                         WXSIZEOF(wxacodecs_array),
                         wxacodecs_array, wxCB_READONLY );
@@ -759,7 +760,7 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
     wxStaticText *channels_label =
         new wxStaticText( panel, -1, wxU(_("Channels")));
     audio_channels_combo =
-        new wxComboBox( panel, AudioTranscChans_Event, wxT(""),
+        new wxComboBox( panel, AudioTranscChans_Event, achannels_array[1],
                         wxPoint(10,25), wxDefaultSize,
                         WXSIZEOF(achannels_array), achannels_array );
     audio_channels_combo->SetSelection(1);
