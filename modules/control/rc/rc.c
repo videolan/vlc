@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.16 2002/12/07 23:50:30 massiot Exp $
+ * $Id: rc.c,v 1.17 2002/12/14 19:34:06 gbazin Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -735,9 +735,8 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
     {
         /* Retrieve all registered ***. */
         vlc_value_t val;
-        int i, i_vals;
-        vlc_value_t * p_vals;
-        const char * psz_value;
+        int i;
+        char * psz_value;
 
         if ( var_Get( (vlc_object_t *)p_aout, psz_variable, &val ) < 0 )
         {
@@ -755,14 +754,12 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
         }
 
         printf( "+----[ %s ]\n", psz_name );
-        i_vals = ((vlc_value_t *)val.p_address)[0].i_int;
-        p_vals = &((vlc_value_t *)val.p_address)[1]; /* Starts at index 1 */
-        for ( i = 0; i < i_vals; i++ )
+        for ( i = 0; i < val.p_list->i_count; i++ )
         {
-            if ( !strcmp( psz_value, p_vals[i].psz_string ) )
-                printf( "| %s *\n", p_vals[i].psz_string );
+            if ( !strcmp( psz_value, val.p_list->p_values[i].psz_string ) )
+                printf( "| %s *\n", val.p_list->p_values[i].psz_string );
             else
-                printf( "| %s\n", p_vals[i].psz_string );
+                printf( "| %s\n", val.p_list->p_values[i].psz_string );
         }
         var_Change( (vlc_object_t *)p_aout, psz_variable, VLC_VAR_FREELIST,
                     &val );

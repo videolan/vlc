@@ -2,7 +2,7 @@
  * test4.c : Miscellaneous stress tests module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: test4.c,v 1.5 2002/12/07 15:25:26 gbazin Exp $
+ * $Id: test4.c,v 1.6 2002/12/14 19:34:06 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -82,8 +82,7 @@ static int Foo( vlc_object_t *p_this, char const *psz_cmd,
                 vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vlc_value_t val;
-    int i, i_vals;
-    vlc_value_t *p_vals;
+    int i;
 
     var_Create( p_this, "honk", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
 
@@ -113,11 +112,9 @@ static int Foo( vlc_object_t *p_this, char const *psz_cmd,
     var_Get( p_this, "honk", &val ); printf( "value: %s\n", val.psz_string );
 
     var_Change( p_this, "honk", VLC_VAR_GETLIST, &val );
-    i_vals = ((vlc_value_t*)val.p_address)[0].i_int;
-    p_vals = &((vlc_value_t*)val.p_address)[1];
-    for( i = 0 ; i < i_vals ; i++ )
+    for( i = 0 ; i < val.p_list->i_count ; i++ )
     {
-        printf( "value %i: %s\n", i, p_vals[i].psz_string );
+        printf( "value %i: %s\n", i, val.p_list->p_values[i].psz_string );
     }
     var_Change( p_this, "honk", VLC_VAR_FREELIST, &val );
 
@@ -307,6 +304,7 @@ static int Stress( vlc_object_t *p_this, char const *psz_cmd,
     {
         int id = (int) (MAXOBJ * i_level * 1.0 * rand() / (RAND_MAX));
         vlc_object_get( p_this, pp_objects[id]->i_object_id );
+        vlc_object_release( p_this );
     }
 
     printf( " - destroying the objects (LIFO)\n" );

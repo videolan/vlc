@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.32 2002/12/13 01:56:30 gbazin Exp $
+ * $Id: objects.c,v 1.33 2002/12/14 19:34:06 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -60,6 +60,8 @@ static void           SetAttachment ( vlc_object_t *, vlc_bool_t );
 static vlc_list_t     NewList       ( int );
 static void           ListReplace   ( vlc_list_t *, vlc_object_t *, int );
 static void           ListAppend    ( vlc_list_t *, vlc_object_t * );
+static int            CountChildren ( vlc_object_t *, int );
+static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
 
 /*****************************************************************************
  * Local structure lock
@@ -351,6 +353,7 @@ void * __vlc_object_get( vlc_object_t *p_this, int i_id )
                 if( pp_objects[i_middle+1]->i_object_id == i_id )
                 {
                     vlc_mutex_unlock( &structure_lock );
+                    pp_objects[i_middle+1]->i_refcount++;
                     return pp_objects[i_middle+1];
                 }
                 break;
@@ -359,6 +362,7 @@ void * __vlc_object_get( vlc_object_t *p_this, int i_id )
         else
         {
             vlc_mutex_unlock( &structure_lock );
+            pp_objects[i_middle]->i_refcount++;
             return pp_objects[i_middle];
         }
 
@@ -490,15 +494,15 @@ void __vlc_object_detach( vlc_object_t *p_this )
 vlc_list_t __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 {
     vlc_list_t list;
+    vlc_object_t **pp_current, **pp_end;
+    int i_count = 0, i_index = 0;
 
     vlc_mutex_lock( &structure_lock );
 
     /* Look for the objects */
-    if( (i_mode & 0x000f) == FIND_ANYWHERE )
+    switch( i_mode & 0x000f )
     {
-        vlc_object_t **pp_current, **pp_end;
-        int i_count = 0, i_index = 0;
-
+    case FIND_ANYWHERE:
         pp_current = p_this->p_libvlc->pp_objects;
         pp_end = pp_current + p_this->p_libvlc->i_objects;
 
@@ -523,11 +527,28 @@ vlc_list_t __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
                 if( i_index < i_count ) i_index++;
             }
         }
-    }
-    else
-    {
+    break;
+
+    case FIND_CHILD:
+        i_count = CountChildren( p_this, i_type );
+        list = NewList( i_count );
+
+        /* Check allocation was successful */
+        if( list.i_count != i_count )
+        {
+            msg_Err( p_this, "list allocation failed!" );
+            list.i_count = 0;
+            break;
+        }
+
+        list.i_count = 0;
+        ListChildren( &list, p_this, i_type );
+        break;
+
+    default:
         msg_Err( p_this, "unimplemented!" );
         list = NewList( 0 );
+        break;
     }
 
     vlc_mutex_unlock( &structure_lock );
@@ -570,6 +591,11 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
         DumpStructure( p_object, 0, psz_foo );
 
         vlc_mutex_unlock( &structure_lock );
+
+        if( *newval.psz_string )
+        {
+            vlc_object_release( p_this );
+	}
     }
     else if( *psz_cmd == 'l' )
     {
@@ -914,4 +940,48 @@ static void ListAppend( vlc_list_t *p_list, vlc_object_t *p_object )
     p_list->i_count++;
 
     return;
+}
+
+static int CountChildren( vlc_object_t *p_this, int i_type )
+{
+    vlc_object_t *p_tmp;
+    int i, i_count = 0;
+
+    for( i = 0; i < p_this->i_children; i++ )
+    {
+        p_tmp = p_this->pp_children[i];
+
+        if( p_tmp->i_object_type == i_type )
+        {
+            i_count++;
+        }
+
+        if( p_tmp->i_children )
+        {
+            i_count += CountChildren( p_tmp, i_type );
+        }
+    }
+
+    return i_count;
+}
+
+static void ListChildren( vlc_list_t *p_list, vlc_object_t *p_this, int i_type )
+{
+    vlc_object_t *p_tmp;
+    int i;
+
+    for( i = 0; i < p_this->i_children; i++ )
+    {
+        p_tmp = p_this->pp_children[i];
+
+        if( p_tmp->i_object_type == i_type )
+        {
+            ListReplace( p_list, p_tmp, p_list->i_count++ );
+        }
+
+        if( p_tmp->i_children )
+        {
+            ListChildren( p_list, p_tmp, i_type );
+        }
+    }
 }

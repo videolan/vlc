@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.9 2002/12/08 23:38:02 massiot Exp $
+ * $Id: intf.m,v 1.10 2002/12/14 19:34:06 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -839,8 +839,6 @@ static void Run( intf_thread_t *p_intf )
     int i, i_nb_items;
     NSMenu * o_menu = [o_mi submenu];
     vlc_value_t val;
-    int i_vals;
-    vlc_value_t * p_vals;
     char * psz_value;
 
     /* remove previous items */
@@ -863,18 +861,15 @@ static void Run( intf_thread_t *p_intf )
         return;
     }
 
-    i_vals = ((vlc_value_t *)val.p_address)[0].i_int;
-    p_vals = &((vlc_value_t *)val.p_address)[1]; /* Starts at index 1 */
-
     /* make (un)sensitive */
-    [o_mi setEnabled: (i_vals > 0)];
+    [o_mi setEnabled: (val.p_list->i_count > 0)];
 
-    for ( i = 0; i < i_vals; i++ )
+    for ( i = 0; i < val.p_list->i_count; i++ )
     {
         NSMenuItem * o_lmi;
         NSString * o_title;
 
-        o_title = [NSString stringWithCString: p_vals[i].psz_string];
+        o_title = [NSString stringWithCString: val.p_list->p_values[i].psz_string];
         o_lmi = [o_menu addItemWithTitle: o_title
                  action: pf_callback keyEquivalent: @""];
         /* FIXME: this isn't 64-bit clean ! */
@@ -883,7 +878,7 @@ static void Run( intf_thread_t *p_intf )
             [NSValue valueWithPointer: p_object]];
         [o_lmi setTarget: o_controls];
 
-        if ( !strcmp( psz_value, p_vals[i].psz_string ) )
+        if ( !strcmp( psz_value, val.p_list->p_values[i].psz_string ) )
             [o_lmi setState: NSOnState];
     }
 

@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.10 2002/12/13 01:56:29 gbazin Exp $
+ * $Id: variables.h,v 1.11 2002/12/14 19:34:07 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -51,8 +51,7 @@ struct variable_t
 
     /* If the variable is to be chosen in a list */
     int          i_default;
-    int          i_choices;
-    vlc_value_t *pp_choices;
+    vlc_list_t   choices;
 
     /* Set to TRUE if the variable is in a callback */
     vlc_bool_t   b_incallback;

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.51 2002/12/13 01:56:30 gbazin Exp $
+ * $Id: libvlc.c,v 1.52 2002/12/14 19:34:06 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -255,6 +255,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     if( p_help_module == NULL )
     {
         //module_EndBank( p_vlc );
+        if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
     p_help_module->psz_object_name = "help";
@@ -268,6 +269,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
         //module_EndBank( p_vlc );
+        if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
 
@@ -298,6 +300,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
         //module_EndBank( p_vlc );
+        if( i_object ) vlc_object_release( p_vlc );
         return VLC_EEXIT;
     }
 
@@ -345,6 +348,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     if( b_exit )
     {
         //module_EndBank( p_vlc );
+        if( i_object ) vlc_object_release( p_vlc );
         return VLC_EEXIT;
     }
 
@@ -367,6 +371,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         getchar();
 #endif
         //module_EndBank( p_vlc );
+        if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
 
@@ -462,6 +467,9 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         config_PutInt( p_vlc, "network-channel", VLC_FALSE );
     }
 
+    msg_Err( p_vlc, "SIZEOF: %i", sizeof(vlc_list_t) );
+    msg_Err( p_vlc, "SIZEOF: %i", sizeof(vlc_value_t) );
+
     /*
      * Initialize playlist and get commandline files
      */
@@ -474,6 +482,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
             module_Unneed( p_vlc, p_vlc->p_memcpy_module );
         }
         //module_EndBank( p_vlc );
+        if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
 
@@ -482,6 +491,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
      */
     GetFilenames( p_vlc, i_argc, ppsz_argv );
 
+    if( i_object ) vlc_object_release( p_vlc );
     return VLC_SUCCESS;
 }
 
@@ -528,6 +538,7 @@ int VLC_AddIntf( int i_object, char const *psz_module, vlc_bool_t b_block )
     if( p_intf == NULL )
     {
         msg_Err( p_vlc, "interface initialization failed" );
+        if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
 
@@ -538,9 +549,11 @@ int VLC_AddIntf( int i_object, char const *psz_module, vlc_bool_t b_block )
     {
         vlc_object_detach( p_intf );
         intf_Destroy( p_intf );
+        if( i_object ) vlc_object_release( p_vlc );
         return i_err;
     }
 
+    if( i_object ) vlc_object_release( p_vlc );
     return VLC_SUCCESS;
 }
 
@@ -604,6 +617,7 @@ int VLC_Destroy( int i_object )
     /* Stop thread system: last one out please shut the door! */
     vlc_threads_end( &libvlc );
 
+    if( i_object ) vlc_object_release( p_vlc );
     return VLC_SUCCESS;
 }
 
@@ -626,6 +640,7 @@ int VLC_Die( int i_object )
 
     p_vlc->b_die = VLC_TRUE;
 
+    if( i_object ) vlc_object_release( p_vlc );
     return VLC_SUCCESS;
 }
 
@@ -657,6 +672,7 @@ int VLC_AddTarget( int i_object, char const *psz_target, int i_mode, int i_pos )
 
         if( p_playlist == NULL )
         {
+            if( i_object ) vlc_object_release( p_vlc );
             return VLC_EGENERIC;
         }
 
@@ -667,6 +683,7 @@ int VLC_AddTarget( int i_object, char const *psz_target, int i_mode, int i_pos )
 
     vlc_object_release( p_playlist );
 
+    if( i_object ) vlc_object_release( p_vlc );
     return i_err;
 }
 
@@ -678,6 +695,7 @@ int VLC_AddTarget( int i_object, char const *psz_target, int i_mode, int i_pos )
 int VLC_Set( int i_object, char const *psz_var, vlc_value_t value )
 {
     vlc_t *p_vlc;
+    int i_ret;
 
     p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
@@ -712,11 +730,15 @@ int VLC_Set( int i_object, char const *psz_var, vlc_value_t value )
                     config_PutPsz( p_vlc, psz_newvar, value.psz_string );
                     break;
             }
+            if( i_object ) vlc_object_release( p_vlc );
             return VLC_SUCCESS;
         }
     }
 
-    return var_Set( p_vlc, psz_var, value );
+    i_ret = var_Set( p_vlc, psz_var, value );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return i_ret;
 }
 
 /*****************************************************************************
@@ -727,6 +749,7 @@ int VLC_Set( int i_object, char const *psz_var, vlc_value_t value )
 int VLC_Get( int i_object, char const *psz_var, vlc_value_t *p_value )
 {
     vlc_t *p_vlc;
+    int i_ret;
 
     p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
@@ -735,7 +758,10 @@ int VLC_Get( int i_object, char const *psz_var, vlc_value_t *p_value )
         return VLC_ENOOBJ;
     }
 
-    return var_Get( p_vlc, psz_var, p_value );
+    i_ret = var_Get( p_vlc, psz_var, p_value );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return i_ret;
 }
 
 /* FIXME: temporary hacks */
@@ -769,6 +795,7 @@ int VLC_Play( int i_object )
 
     if( !p_playlist )
     {
+        if( i_object ) vlc_object_release( p_vlc );
         return VLC_ENOOBJ;
     }
 
@@ -785,6 +812,7 @@ int VLC_Play( int i_object )
 
     vlc_object_release( p_playlist );
 
+    if( i_object ) vlc_object_release( p_vlc );
     return VLC_SUCCESS;
 }
 
@@ -853,6 +881,7 @@ int VLC_Stop( int i_object )
         aout_Delete( p_aout );
     }
 
+    if( i_object ) vlc_object_release( p_vlc );
     return VLC_SUCCESS;
 }
 
@@ -875,12 +904,14 @@ int VLC_Pause( int i_object )
 
     if( !p_input )
     {
+        if( i_object ) vlc_object_release( p_vlc );
         return VLC_ENOOBJ;
     }
 
     input_SetStatus( p_input, INPUT_STATUS_PAUSE );
     vlc_object_release( p_input );
 
+    if( i_object ) vlc_object_release( p_vlc );
     return VLC_SUCCESS;
 }
 
@@ -903,12 +934,14 @@ int VLC_FullScreen( int i_object )
 
     if( !p_vout )
     {
+        if( i_object ) vlc_object_release( p_vlc );
         return VLC_ENOOBJ;
     }
 
     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
     vlc_object_release( p_vout );
 
+    if( i_object ) vlc_object_release( p_vlc );
     return VLC_SUCCESS;
 }
 

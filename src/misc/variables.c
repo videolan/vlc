@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.17 2002/12/10 18:22:01 gbazin Exp $
+ * $Id: variables.c,v 1.18 2002/12/14 19:34:06 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -132,8 +132,8 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     p_var->i_usage = 1;
 
     p_var->i_default = -1;
-    p_var->i_choices = 0;
-    p_var->pp_choices = NULL;
+    p_var->choices.i_count = 0;
+    p_var->choices.p_values = NULL;
 
     p_var->b_incallback = VLC_FALSE;
     p_var->i_entries = 0;
@@ -220,13 +220,13 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
     p_var->pf_free( &p_var->val );
 
     /* Free choice list if needed */
-    if( p_var->pp_choices )
+    if( p_var->choices.i_count )
     {
-        for( i = 0 ; i < p_var->i_choices ; i++ )
+        for( i = 0 ; i < p_var->choices.i_count ; i++ )
         {
-            p_var->pf_free( &p_var->pp_choices[i] );
+            p_var->pf_free( &p_var->choices.p_values[i] );
         }
-        free( p_var->pp_choices );
+        free( p_var->choices.p_values );
     }
 
     /* Free callbacks if needed */
@@ -309,12 +309,11 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             p_var->pf_dup( &p_var->step );
             CheckValue( p_var, &p_var->val );
             break;
-
         case VLC_VAR_ADDCHOICE:
             /* FIXME: the list is sorted, dude. Use something cleverer. */
-            for( i = p_var->i_choices ; i-- ; )
+            for( i = p_var->choices.i_count ; i-- ; )
             {
-                if( p_var->pf_cmp( p_var->pp_choices[i], *p_val ) < 0 )
+                if( p_var->pf_cmp( p_var->choices.p_values[i], *p_val ) < 0 )
                 {
                     break;
                 }
@@ -328,22 +327,23 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
                 p_var->i_default++;
             }
 
-            INSERT_ELEM( p_var->pp_choices, p_var->i_choices, i, *p_val );
-            p_var->pf_dup( &p_var->pp_choices[i] );
+            INSERT_ELEM( p_var->choices.p_values, p_var->choices.i_count,
+                         i, *p_val );
+            p_var->pf_dup( &p_var->choices.p_values[i] );
 
             CheckValue( p_var, &p_var->val );
             break;
         case VLC_VAR_DELCHOICE:
             /* FIXME: the list is sorted, dude. Use something cleverer. */
-            for( i = 0 ; i < p_var->i_choices ; i++ )
+            for( i = 0 ; i < p_var->choices.i_count ; i++ )
             {
-                if( p_var->pf_cmp( p_var->pp_choices[i], *p_val ) == 0 )
+                if( p_var->pf_cmp( p_var->choices.p_values[i], *p_val ) == 0 )
                 {
                     break;
                 }
             }
 
-            if( i == p_var->i_choices )
+            if( i == p_var->choices.i_count )
             {
                 /* Not found */
                 vlc_mutex_unlock( &p_this->var_lock );
@@ -359,22 +359,22 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
                 p_var->i_default = -1;
             }
 
-            p_var->pf_free( &p_var->pp_choices[i] );
-            REMOVE_ELEM( p_var->pp_choices, p_var->i_choices, i );
+            p_var->pf_free( &p_var->choices.p_values[i] );
+            REMOVE_ELEM( p_var->choices.p_values, p_var->choices.i_count, i );
 
             CheckValue( p_var, &p_var->val );
             break;
         case VLC_VAR_SETDEFAULT:
             /* FIXME: the list is sorted, dude. Use something cleverer. */
-            for( i = 0 ; i < p_var->i_choices ; i++ )
+            for( i = 0 ; i < p_var->choices.i_count ; i++ )
             {
-                if( p_var->pf_cmp( p_var->pp_choices[i], *p_val ) == 0 )
+                if( p_var->pf_cmp( p_var->choices.p_values[i], *p_val ) == 0 )
                 {
                     break;
                 }
             }
 
-            if( i == p_var->i_choices )
+            if( i == p_var->choices.i_count )
             {
                 /* Not found */
                 break;
@@ -385,21 +385,23 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             break;
 
         case VLC_VAR_GETLIST:
-            p_val->p_address = malloc( (1 + p_var->i_choices)
-                                        * sizeof(vlc_value_t) );
-            ((vlc_value_t*)p_val->p_address)[0].i_int = p_var->i_choices;
-            for( i = 0 ; i < p_var->i_choices ; i++ )
+            p_val->p_list = malloc( sizeof(vlc_list_t) );
+            p_val->p_list->p_values = malloc( p_var->choices.i_count
+                                              * sizeof(vlc_value_t) );
+            p_val->p_list->i_count = p_var->choices.i_count;
+            for( i = 0 ; i < p_var->choices.i_count ; i++ )
             {
-                ((vlc_value_t*)p_val->p_address)[i+1] = p_var->pp_choices[i];
-                p_var->pf_dup( &((vlc_value_t*)p_val->p_address)[i+1] );
+                p_val->p_list->p_values[i] = p_var->choices.p_values[i];
+                p_var->pf_dup( &p_val->p_list->p_values[i] );
             }
             break;
         case VLC_VAR_FREELIST:
-            for( i = ((vlc_value_t*)p_val->p_address)[0].i_int ; i-- ; )
+            for( i = p_val->p_list->i_count ; i-- ; )
             {
-                p_var->pf_free( &((vlc_value_t*)p_val->p_address)[i+1] );
+                p_var->pf_free( &p_val->p_list->p_values[i] );
             }
-            free( p_val->p_address );
+            free( p_val->p_list->p_values );
+	    free( p_val->p_list );
             break;
 
         default:
@@ -836,14 +838,14 @@ static int LookupInner( variable_t *p_vars, int i_count, uint32_t i_hash )
 static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
 {
     /* Check that our variable is in the list */
-    if( p_var->i_type & VLC_VAR_HASCHOICE && p_var->i_choices )
+    if( p_var->i_type & VLC_VAR_HASCHOICE && p_var->choices.i_count )
     {
         int i;
 
         /* FIXME: the list is sorted, dude. Use something cleverer. */
-        for( i = p_var->i_choices ; i-- ; )
+        for( i = p_var->choices.i_count ; i-- ; )
         {
-            if( p_var->pf_cmp( *p_val, p_var->pp_choices[i] ) == 0 )
+            if( p_var->pf_cmp( *p_val, p_var->choices.p_values[i] ) == 0 )
             {
                 break;
             }
@@ -854,8 +856,8 @@ static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
         {
             /* Free the old variable, get the new one, dup it */
             p_var->pf_free( p_val );
-            *p_val = p_var->pp_choices[p_var->i_default >= 0
-                                        ? p_var->i_default : 0 ];
+            *p_val = p_var->choices.p_values[p_var->i_default >= 0
+                                          ? p_var->i_default : 0 ];
             p_var->pf_dup( p_val );
         }
     }
@@ -907,4 +909,3 @@ static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
             break;
     }
 }
-
