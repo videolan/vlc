@@ -168,7 +168,7 @@
         width       CDATA   "0"
         help        CDATA   ""
     >
-<!ELEMENT Playlist (Slider)>
+<!ELEMENT Playlist (Slider)?>
     <!ATTLIST Playlist
         id          CDATA   #REQUIRED
         visible     CDATA   "true"
