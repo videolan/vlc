@@ -2,7 +2,7 @@
  * prefs.m: MacOS X module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.38 2004/01/30 12:44:21 hartman Exp $
+ * $Id: prefs.m,v 1.39 2004/02/02 08:50:41 titer Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *	    Derk-Jan Hartman <hartman at videolan.org>
@@ -37,6 +37,43 @@
 #define GENERAL_ID 1242
 #define MODULE_ID 1243
 #define CAPABILITY_ID 1244
+
+/*****************************************************************************
+ * GetCapabilityHelp: Display the help for one capability.
+ *****************************************************************************/
+static char * GetCapabilityHelp( char *psz_capability, int i_type)
+{
+    if( psz_capability == NULL) return "";
+
+    if( !strcasecmp(psz_capability,"access") )
+        return i_type == 1 ? ACCESS_TITLE : ACCESS_HELP;
+    if( !strcasecmp(psz_capability,"audio filter") )
+        return i_type == 1 ? AUDIO_FILTER_TITLE : AUDIO_FILTER_HELP;
+    if( !strcasecmp(psz_capability,"audio output") )
+        return i_type == 1 ? AOUT_TITLE : AOUT_HELP;
+    if( !strcasecmp(psz_capability,"audio encoder") )
+        return i_type == 1 ? AOUT_ENC_TITLE : AOUT_ENC_HELP;
+    if( !strcasecmp(psz_capability,"chroma") )
+        return i_type == 1 ? CHROMA_TITLE : CHROMA_HELP;
+    if( !strcasecmp(psz_capability,"decoder") )
+        return i_type == 1 ? DECODER_TITLE : DECODER_HELP;
+    if( !strcasecmp(psz_capability,"demux") )
+        return i_type == 1 ? DEMUX_TITLE : DEMUX_HELP;
+    if( !strcasecmp(psz_capability,"interface") )
+        return i_type == 1 ? INTERFACE_TITLE : INTERFACE_HELP;
+    if( !strcasecmp(psz_capability,"sout access") )
+        return i_type == 1 ? SOUT_TITLE : SOUT_HELP;
+    if( !strcasecmp(psz_capability,"subtitle demux") )
+        return i_type == 1 ? SUBTITLE_DEMUX_TITLE : SUBTITLE_DEMUX_HELP;
+    if( !strcasecmp(psz_capability,"text renderer") )
+        return i_type == 1 ? TEXT_TITLE : TEXT_HELP;
+    if( !strcasecmp(psz_capability,"video output") )
+        return i_type == 1 ? VOUT__TITLE : VOUT_HELP;
+    if( !strcasecmp(psz_capability,"video filter") )
+        return i_type == 1 ? VIDEO_FILTER_TITLE : VIDEO_FILTER_HELP;
+
+    return " ";
+}
 
 /*****************************************************************************
  * VLCPrefs implementation

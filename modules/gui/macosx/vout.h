@@ -2,7 +2,7 @@
  * vout.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.h,v 1.20 2004/01/29 02:01:49 titer Exp $
+ * $Id: vout.h,v 1.21 2004/02/02 08:50:41 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -58,12 +58,16 @@
  *****************************************************************************/
 @interface VLCGLView : NSOpenGLView
 {
-    int           i_init_done;
-    unsigned long i_texture;
+    vout_thread_t * p_vout;
+    int             b_init_done;
+    unsigned long   i_cur_texture;
+    float           f_x;
+    float           f_y;
 }
 
-- (void) initTexture;
-- (void) reloadTexture: (uint8_t *) buffer;
+- (id) initWithFrame: (NSRect) frame vout: (vout_thread_t*) p_vout;
+- (void) initTextures;
+- (void) reloadTexture: (picture_t *) p_pic;
 
 @end
 

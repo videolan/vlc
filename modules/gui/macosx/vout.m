@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.75 2004/01/29 02:01:49 titer Exp $
+ * $Id: vout.m,v 1.76 2004/02/02 08:50:41 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -337,9 +337,9 @@ static int vout_Init( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->i_opengl )
     {
-        /* Do this now instead of initWithFrame because we need a
-           first buffer for the glTexImage2D call */
-        [p_vout->p_sys->o_glview initTexture];
+        [p_vout->p_sys->o_glview lockFocus];
+        [p_vout->p_sys->o_glview initTextures];
+        [p_vout->p_sys->o_glview unlockFocus];
     }
 
     return( 0 );
@@ -476,8 +476,13 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     }
     else
     {
-        /* Update the texture with our new picture */
-        [p_vout->p_sys->o_glview reloadTexture: p_pic->p->p_pixels];
+        if( [p_vout->p_sys->o_glview lockFocusIfCanDraw] )
+        {
+            [p_vout->p_sys->o_glview reloadTexture: p_pic];
+            [p_vout->p_sys->o_glview drawRect:
+                [p_vout->p_sys->o_glview bounds]];
+            [p_vout->p_sys->o_glview unlockFocus];
+        }
     }
 }
 
@@ -1264,13 +1269,16 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 @implementation VLCGLView
 
 
-- (id) initWithFrame: (NSRect) frame
+- (id) initWithFrame: (NSRect) frame vout: (vout_thread_t*) _p_vout
 {
+    p_vout = _p_vout;
+    
     NSOpenGLPixelFormatAttribute attribs[] =
     {
         NSOpenGLPFAAccelerated,
         NSOpenGLPFANoRecovery,
         NSOpenGLPFADoubleBuffer,
+        NSOpenGLPFAWindow,
         0
     };
 
@@ -1288,31 +1296,116 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     [[self openGLContext] makeCurrentContext];
     [[self openGLContext] update];
 
-    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-    glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
     glClearColor( 0.0, 0.0, 0.0, 0.0 );
 
-    i_init_done = 0;
+    b_init_done = 0;
 
     return self;
 }
 
 - (void) reshape
 {
-    [[self openGLContext] update];
+    [[self openGLContext] makeCurrentContext];
+
     NSRect bounds = [self bounds];
+
     glViewport( 0, 0, (GLint) bounds.size.width,
                 (GLint) bounds.size.height );
+
+    /* Quad size is set in order to preserve the aspect ratio */
+    if( bounds.size.height * p_vout->output.i_aspect <
+        bounds.size.width * VOUT_ASPECT_FACTOR )
+    {
+        f_x = bounds.size.height * p_vout->render.i_aspect /
+            VOUT_ASPECT_FACTOR / bounds.size.width;
+        f_y = 1.0;
+    }
+    else
+    {
+        f_x = 1.0;
+        f_y = bounds.size.width * VOUT_ASPECT_FACTOR /
+            p_vout->render.i_aspect / bounds.size.height;
+    }
 }
 
-- (void) initTexture
+- (void) initTextures
 {
-    vout_thread_t * p_vout;
-    id o_window = [self window];
-    p_vout = (vout_thread_t *)[o_window getVout];
+    int    i;
+    GLuint pi_textures[QT_MAX_DIRECTBUFFERS];
 
-    [self lockFocus];
+    [[self openGLContext] makeCurrentContext];
 
+    /* Create textures */
+    glGenTextures( QT_MAX_DIRECTBUFFERS, pi_textures );
+
+    for( i = 0; i < I_OUTPUTPICTURES; i++ )
+    {
+        glEnable( GL_TEXTURE_RECTANGLE_EXT );
+        glEnable( GL_UNPACK_CLIENT_STORAGE_APPLE );
+        glEnable( GL_APPLE_texture_range );
+
+        glBindTexture( GL_TEXTURE_RECTANGLE_EXT, pi_textures[i] );
+
+#if 0
+        FIXME: the lines below are supposed to avoid a memcpy and get
+        a noticeable performance boost, but they are annoying side
+        effects at the moment -- titer
+
+        /* Use AGP texturing */
+        glTextureRangeAPPLE( GL_TEXTURE_RECTANGLE_EXT, 0, NULL );
+        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+                GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_SHARED_APPLE );
+#endif
+
+        /* Tell the driver not to make a copy of the texture but to use
+           our buffer */
+        glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
+
+        /* Linear interpolation */
+        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+                GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+                GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+        /* I have no idea what this exactly does, but it seems to be
+           necessary for scaling */
+        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+                GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE );
+        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+                GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
+
+        glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGBA,
+                p_vout->output.i_width, p_vout->output.i_height, 0,
+                GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
+                PP_OUTPUTPICTURE[i]->p_data );
+
+        PP_OUTPUTPICTURE[i]->p_sys = malloc( sizeof( GLuint ) );
+        *((GLuint*) PP_OUTPUTPICTURE[i]->p_sys) = pi_textures[i];
+    }
+
+    b_init_done = 1;
+}
+
+- (void) reloadTexture: (picture_t *) p_pic
+{
+    i_cur_texture = *((GLuint*) p_pic->p_sys);
+    
+    [[self openGLContext] makeCurrentContext];
+
+    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_cur_texture );
+
+    /* glTexSubImage2D is faster than glTexImage2D
+       http://developer.apple.com/samplecode/Sample_Code/Graphics_3D/
+       TextureRange/MainOpenGLView.m.htm */
+    glTexSubImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, 0, 0,
+            p_vout->output.i_width, p_vout->output.i_height,
+            GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
+            p_pic->p_data );
+}
+
+- (void) drawRect: (NSRect) rect
+{
     [[self openGLContext] makeCurrentContext];
 
     /* Swap buffers only during the vertical retrace of the monitor.
@@ -1321,113 +1414,31 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     long params[] = { 1 };
     CGLSetParameter( CGLGetCurrentContext(), kCGLCPSwapInterval,
                      params );
-
-    /* Create the texture */
-    glGenTextures( 1, &i_texture );
-    glEnable( GL_TEXTURE_RECTANGLE_EXT );
-    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
-
-    /* Turn on AGP transferts */
-    glTexParameterf( GL_TEXTURE_RECTANGLE_EXT,
-                     GL_TEXTURE_PRIORITY, 0.0 );
-
-    /* Use AGP texturing */
-    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-            GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_CACHED_APPLE );
-
-    /* Tell the driver not to make a copy of the texture but to use
-       our buffer */
-    glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
-
-    /* Linear interpolation */
-    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-            GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-            GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
-    /* I have no idea what this exactly does, but it seems to be
-       necessary for scaling */
-    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-            GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE );
-    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-            GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
-
-    glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGBA,
-            p_vout->output.i_width, p_vout->output.i_height, 0,
-            GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
-            PP_OUTPUTPICTURE[0]->p_data );
-
-    i_init_done = 1;
     
-    [self unlockFocus];
-}
-
-- (void) reloadTexture: (uint8_t *) buffer
-{
-    vout_thread_t * p_vout;
-    id o_window = [self window];
-    p_vout = (vout_thread_t *)[o_window getVout];
-    
-    [self lockFocus];
-
-    [[self openGLContext] makeCurrentContext];
-    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
-
-    /* glTexSubImage2D is usually faster than glTexImage2D */
-    glTexSubImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, 0, 0,
-            p_vout->output.i_width, p_vout->output.i_height,
-            GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
-            buffer );
-    [self drawRect: [self bounds]];
-
-    [self unlockFocus];
-}
-
-- (void) drawRect: (NSRect) rect
-{
-    vout_thread_t * p_vout;
-    id o_window = [self window];
-    p_vout = (vout_thread_t *)[o_window getVout];
-
     /* Black background */
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    if( !i_init_done )
+    if( !b_init_done )
+    {
+        [[self openGLContext] flushBuffer];
         return;
-
-    /* Draw a quad with our texture on it. Quad size is set in order
-       to preserve the aspect ratio */
-    NSRect bounds = [self bounds];
-    float  f_x, f_y;
-    if( bounds.size.height * p_vout->output.i_aspect <
-        bounds.size.width * VOUT_ASPECT_FACTOR )
-    {
-        f_x = bounds.size.height * p_vout->output.i_aspect /
-            VOUT_ASPECT_FACTOR / bounds.size.width;
-        f_y = 1.0;
-    }
-    else
-    {
-        f_x = 1.0;
-        f_y = bounds.size.width * VOUT_ASPECT_FACTOR /
-            p_vout->output.i_aspect / bounds.size.height;
     }
 
-    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
+    /* Draw a quad with our texture on it */
+    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_cur_texture );
     glBegin( GL_QUADS );
         /* Top left */
-        glTexCoord2f( 0.0f, 0.0f );
+        glTexCoord2f( 0.0, 0.0 );
         glVertex2f( - f_x, f_y );
         /* Bottom left */
-        glTexCoord2f( 0.0f, (float) p_vout->output.i_height );
+        glTexCoord2f( 0.0, (float) p_vout->output.i_height );
         glVertex2f( - f_x, - f_y );
         /* Bottom right */
         glTexCoord2f( (float) p_vout->output.i_width,
                       (float) p_vout->output.i_height );
         glVertex2f( f_x, - f_y );
         /* Top right */
-        glTexCoord2f( (float) p_vout->output.i_width, 0.0f );
+        glTexCoord2f( (float) p_vout->output.i_width, 0.0 );
         glVertex2f( f_x, f_y );
     glEnd();
 
@@ -1552,7 +1563,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     else
     {
 #define o_glview p_vout->p_sys->o_glview
-        o_glview = [[VLCGLView alloc] initWithFrame: p_vout->p_sys->s_rect];
+        o_glview = [[VLCGLView alloc] initWithFrame: p_vout->p_sys->s_rect vout: p_vout];
         [p_vout->p_sys->o_window setContentView: o_glview];
         [o_glview autorelease];
 #undef o_glview
