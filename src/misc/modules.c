@@ -1029,6 +1029,7 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
     }
 
     DupModule( p_module );
+    p_module->psz_filename = strdup( p_module->psz_filename );
 
     /* Everything worked fine ! The module is ready to be added to the list. */
     p_module->b_builtin = VLC_FALSE;
@@ -1056,7 +1057,6 @@ static void DupModule( module_t *p_module )
      * module is unloaded. */
     p_module->psz_object_name = strdup( p_module->psz_object_name );
     p_module->psz_capability = strdup( p_module->psz_capability );
-    p_module->psz_filename = strdup( p_module->psz_filename );
     p_module->psz_shortname = strdup( p_module->psz_shortname );
     p_module->psz_longname = strdup( p_module->psz_longname );
 
@@ -1093,7 +1093,6 @@ static void UndupModule( module_t *p_module )
 
     free( p_module->psz_object_name );
     free( p_module->psz_capability );
-    free( p_module->psz_filename );
     free( p_module->psz_shortname );
     free( p_module->psz_longname );
 
@@ -1165,6 +1164,7 @@ static int DeleteModule( module_t * p_module )
             CloseModule( p_module->handle );
         }
         UndupModule( p_module );
+        free( p_module->psz_filename );
     }
 #endif
 
