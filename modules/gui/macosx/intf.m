@@ -271,7 +271,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (id)init 
 {
-    if (_o_sharedMainInstance) {
+    if( _o_sharedMainInstance) {
         [self dealloc];
     } else {
         _o_sharedMainInstance = [super init];
@@ -1082,7 +1082,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)playStatusUpdated:(int)i_status
 {
-    if( i_status )
+    if( i_status != PAUSE_S )
     {
         [o_btn_play setImage: o_img_pause];
         [o_btn_play setAlternateImage: o_img_pause_pressed];

@@ -1149,14 +1149,15 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (BOOL)canBecomeKeyWindow
 {
-    return( YES );
+    return YES;
 }
-/*
+
+/* Sometimes crashes VLC....
 - (BOOL)performKeyEquivalent:(NSEvent *)o_event
 {
-    return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event];
-}
-*/
+        return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event];
+}*/
+
 - (void)keyDown:(NSEvent *)o_event
 {
     unichar key = 0;
@@ -1189,13 +1190,9 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         }
         else if ( key == ' ' )
         {
-             playlist_t *p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
-                                                     FIND_ANYWHERE );
-             if ( p_playlist != NULL )
-             {
-                 playlist_Pause( p_playlist );
-                 vlc_object_release( p_playlist);
-             }
+            vlc_value_t val;
+            val.i_int = config_GetInt( p_vout, "key-play-pause" );
+            var_Set( p_vout->p_vlc, "key-pressed", val );
         }
         else
         {
@@ -1212,8 +1209,15 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 - (void)updateTitle
 {
     NSMutableString * o_title;
-    playlist_t * p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t * p_playlist;
+    
+    if( p_vout == NULL )
+    {
+        return;
+    }
+    
+    p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
+                                                FIND_ANYWHERE );
     
     if( p_playlist == NULL )
     {

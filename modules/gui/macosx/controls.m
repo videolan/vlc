@@ -44,120 +44,73 @@
 - (IBAction)play:(id)sender
 {
     vlc_value_t val;
-    playlist_t * p_playlist;
     intf_thread_t * p_intf = VLCIntf;
-    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                       FIND_ANYWHERE );
-
-    val.i_int = PLAYING_S;
-    if( p_input )
-    {
-        var_Get( p_input, "state", &val );
-    }
-    if( p_input && val.i_int != PAUSE_S )
-    {
-        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Pause" ) );
-        val.i_int = PAUSE_S;
-        var_Set( p_input, "state", val );
-    }
-    else
-    {
-        p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                         FIND_ANYWHERE );
-        if( p_playlist )
+    if( p_playlist )
+    {
+        vlc_mutex_lock( &p_playlist->object_lock );
+        if( p_playlist->i_size <= 0 )
         {
-            vlc_mutex_lock( &p_playlist->object_lock );
-            if( p_playlist->i_size )
-            {
-                vlc_mutex_unlock( &p_playlist->object_lock );
-                vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Play" ) );
-                playlist_Play( p_playlist );
-                vlc_object_release( p_playlist );
-            }
-            else
-            {
-                vlc_mutex_unlock( &p_playlist->object_lock );
-                vlc_object_release( p_playlist );
-                [o_open openFileGeneric: nil];
-            }
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            vlc_object_release( p_playlist );
+            [o_open openFileGeneric: nil];
         }
+        else
+        {
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            vlc_object_release( p_playlist );
+        }
+
     }
-    if( p_input ) vlc_object_release( p_input );
+    val.i_int = config_GetInt( p_intf, "key-play-pause" );
+    var_Set( p_intf->p_vlc, "key-pressed", val );
 }
 
 - (IBAction)stop:(id)sender
 {
+    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( p_playlist != NULL )
-    {
-        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Stop" ) );
-        playlist_Stop( p_playlist );
-        vlc_object_release( p_playlist );
-    }
+    val.i_int = config_GetInt( p_intf, "key-stop" );
+    var_Set( p_intf->p_vlc, "key-pressed", val );
 }
 
 - (IBAction)faster:(id)sender
 {
+    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                       FIND_ANYWHERE );
-    if( p_input != NULL )
-    {
-        vlc_value_t val; val.b_bool = VLC_TRUE;
-
-        var_Set( p_input, "rate-faster", val );
-        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Faster" ) );
-        vlc_object_release( p_input );
-    }
+    val.i_int = config_GetInt( p_intf, "key-faster" );
+    var_Set( p_intf->p_vlc, "key-pressed", val );
 }
 
 - (IBAction)slower:(id)sender
 {
+    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                       FIND_ANYWHERE );
-    if( p_input != NULL )
-    {
-        vlc_value_t val; val.b_bool = VLC_TRUE;
-
-        var_Set( p_input, "rate-slower", val );
-        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Slower" ) );
-        vlc_object_release( p_input );
-    }
+    val.i_int = config_GetInt( p_intf, "key-slower" );
+    var_Set( p_intf->p_vlc, "key-pressed", val );
 }
 
 - (IBAction)prev:(id)sender
 {
+    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( p_playlist )
-    {
-        playlist_Prev( p_playlist );
-        vlc_object_release( p_playlist );
-        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Previous" ) );
-    }
+    val.i_int = config_GetInt( p_intf, "key-prev" );
+    var_Set( p_intf->p_vlc, "key-pressed", val );
 }
 
 - (IBAction)next:(id)sender
 {
+    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( p_playlist )
-    {
-        playlist_Next( p_playlist );
-        vlc_object_release( p_playlist );
-        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Next" ) );
-    }
+    val.i_int = config_GetInt( p_intf, "key-next" );
+    var_Set( p_intf->p_vlc, "key-pressed", val );
 }
 
 - (IBAction)random:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
     vlc_value_t val;
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -184,8 +137,8 @@
 
 - (IBAction)repeat:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
     vlc_value_t val;
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -216,8 +169,8 @@
 
 - (IBAction)loop:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
     vlc_value_t val;
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -248,71 +201,45 @@
 
 - (IBAction)forward:(id)sender
 {
+    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                       FIND_ANYWHERE );
-    if( p_input != NULL )
-    {
-        vlc_value_t time;
-        time.i_time = 10 * 1000000;
-        var_Set( p_input, "time-offset", time );
-        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Jump +10 Seconds" ) );
-        vlc_object_release( p_input );
-    }
+    val.i_int = config_GetInt( p_intf, "key-jump+10sec" );
+    var_Set( p_intf->p_vlc, "key-pressed", val );
 }
 
 - (IBAction)backward:(id)sender
 {
+    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                       FIND_ANYWHERE );
-    if( p_input != NULL )
-    {
-        vlc_value_t time;
-        time.i_time = -10 * 1000000;
-        var_Set( p_input, "time-offset", time );
-        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Jump -10 Seconds" ) );
-        vlc_object_release( p_input );
-    }
+    val.i_int = config_GetInt( p_intf, "key-jump-10sec" );
+    var_Set( p_intf->p_vlc, "key-pressed", val );
 }
 
 
 - (IBAction)volumeUp:(id)sender
 {
+    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-
-    if( p_intf->p_sys->b_mute )
-    {
-        [self mute: nil];
-    }
-
-    aout_VolumeUp( p_intf, 1, NULL );
-
+    val.i_int = config_GetInt( p_intf, "key-vol-up" );
+    var_Set( p_intf->p_vlc, "key-pressed", val );
     [self updateVolumeSlider];
 }
 
 - (IBAction)volumeDown:(id)sender
 {
+    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-
-    if( p_intf->p_sys->b_mute )
-    {
-        [self mute: nil];
-    }
-    
-    aout_VolumeDown( p_intf, 1, NULL );
-
+    val.i_int = config_GetInt( p_intf, "key-vol-down" );
+    var_Set( p_intf->p_vlc, "key-pressed", val );
     [self updateVolumeSlider];
 }
 
 - (IBAction)mute:(id)sender
 {
+    vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    audio_volume_t i_volume;
-
-    aout_VolumeMute( p_intf, &i_volume );
-    p_intf->p_sys->b_mute = ( i_volume == 0 );
-
+    val.i_int = config_GetInt( p_intf, "key-vol-mute" );
+    var_Set( p_intf->p_vlc, "key-pressed", val );
     [self updateVolumeSlider];
 }
 
@@ -332,9 +259,6 @@
     aout_VolumeGet( p_intf, &i_volume );
 
     [o_volumeslider setFloatValue: (float)(i_volume / AOUT_VOLUME_STEP)];
-
-    vout_OSDMessage( p_intf, DEFAULT_CHAN, "Vol %d%%", 
-		     i_volume*200/AOUT_VOLUME_MAX );
 }
 
 - (IBAction)windowAction:(id)sender
@@ -343,7 +267,7 @@
     NSString *o_title = [sender title];
     NSArray *o_windows = [NSApp orderedWindows];
     NSEnumerator *o_enumerator = [o_windows objectEnumerator];
-    vout_thread_t   *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT,
+    vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT,
                                               FIND_ANYWHERE );
 
     if( p_vout != NULL )
@@ -670,13 +594,14 @@
     else if( [[o_mi title] isEqualToString: _NS("Step Forward")] ||
              [[o_mi title] isEqualToString: _NS("Step Backward")] )
     {
+        bEnabled = FALSE;
         if( p_playlist != NULL && p_input != NULL )
         {
-            bEnabled = TRUE; /* FIXME p_input seekable */
-        }
-        else
-        {
-            bEnabled = FALSE;
+            var_Get( p_input, "seekable", &val);
+            if( val.b_bool )
+            {
+                bEnabled = TRUE;
+            }
         }
     }
     else if( [[o_mi title] isEqualToString: _NS("Mute")] ) 

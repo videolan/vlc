@@ -27,6 +27,7 @@
 #include <vlc/intf.h>
 #include <vlc/vout.h>
 #include <vlc/aout.h>
+#include <vlc/input.h>
 
 #include <Cocoa/Cocoa.h>
 
