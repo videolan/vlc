@@ -216,7 +216,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
     *p_pic++ = p_lookup[                                                      \
         (((*p_y + dither12[i_real_y]) >> 4) << 7)                             \
         + ((*p_u + dither22[i_real_y])   >> 5) * 9                            \
-        + ((*p_v + dither22[i_real_y])   >> 5) ];                             \
+        + ((*p_v + dither22[i_real_y])   >> 5) ];                             \
     b_jump_uv += *p_offset;                                                   \
     p_y += *p_offset;                                                         \
     p_u += *p_offset   & b_jump_uv;                                           \
@@ -313,13 +313,6 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
  * and 4 Bpp.
  *****************************************************************************/
 #define SCALE_HEIGHT( CHROMA, BPP )                                           \
-    /* If line is odd, rewind 4:2:0 U and V samples */                        \
-    if( ((CHROMA == 420) || (CHROMA == 422)) && !(i_y & 0x1) )                \
-    {                                                                         \
-        p_u -= i_chroma_width;                                                \
-        p_v -= i_chroma_width;                                                \
-    }                                                                         \
-                                                                              \
     /*                                                                        \
      * Handle vertical scaling. The current line can be copied or next one    \
      * can be ignored.                                                        \
@@ -327,23 +320,69 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
     switch( i_vertical_scaling )                                              \
     {                                                                         \
     case -1:                             /* vertical scaling factor is < 1 */ \
-        while( (i_scale_count -= i_pic_height) >= 0 )                         \
+        if( i_y & 0x1 )                                                       \
         {                                                                     \
-            /* Height reduction: skip next source line */                     \
-            p_y += i_width;                                                   \
-            i_y++;                                                            \
-            if( (CHROMA == 420) || (CHROMA == 422) )                          \
+            while( (i_scale_count -= i_pic_height) >= 0 )                     \
             {                                                                 \
-                if( i_y & 0x1 )                                               \
+            /* Height reduction: skip next source line */                     \
+                p_y += i_width;                                               \
+                if( (CHROMA == 420) || (CHROMA == 422) )                      \
+                {                                                             \
+                    if( (i_scale_count -= i_pic_height) >= 0 )                \
+                    {                                                         \
+                        p_y += i_width;                                       \
+                        i_y+=2;                                               \
+                        p_u += i_chroma_width;                                \
+                        p_v += i_chroma_width;                                \
+                        continue;                                             \
+                    }                                                         \
+                    else                                                      \
+                    {                                                         \
+                        i_y++;                                                \
+                        break;                                                \
+                    }                                                         \
+                }                                                             \
+                else if( CHROMA == 444 )                                      \
+                {                                                             \
+                    i_y++;                                                    \
+                    p_u += i_width;                                           \
+                    p_v += i_width;                                           \
+                }                                                             \
+            }                                                                 \
+        }                                                                     \
+        else                                                                  \
+        {                                                                     \
+            if( CHROMA == 420 || CHROMA == 422 )                              \
+            {                                                                 \
+                p_u -= i_chroma_width;                                        \
+                p_v -= i_chroma_width;                                        \
+            }                                                                 \
+            while( (i_scale_count -= i_pic_height) >= 0 )                     \
+            {                                                                 \
+            /* Height reduction: skip next source line */                     \
+                p_y += i_width;                                               \
+                if( (CHROMA == 420) || (CHROMA == 422) )                      \
                 {                                                             \
                     p_u += i_chroma_width;                                    \
                     p_v += i_chroma_width;                                    \
+                    if( (i_scale_count -= i_pic_height) >= 0 )                \
+                    {                                                         \
+                        p_y += i_width;                                       \
+                        i_y+=2;                                               \
+                        continue;                                             \
+                    }                                                         \
+                    else                                                      \
+                    {                                                         \
+                        i_y++;                                                \
+                        break;                                                \
+                    }                                                         \
                 }                                                             \
-            }                                                                 \
-            else if( CHROMA == 444 )                                          \
-            {                                                                 \
-                p_u += i_width;                                               \
-                p_v += i_width;                                               \
+                else if( CHROMA == 444 )                                      \
+                {                                                             \
+                    i_y++;                                                    \
+                    p_u += i_width;                                           \
+                    p_v += i_width;                                           \
+                }                                                             \
             }                                                                 \
         }                                                                     \
         i_scale_count += i_height;                                            \
@@ -352,7 +391,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
         while( (i_scale_count -= i_height) > 0 )                              \
         {                                                                     \
             /* Height increment: copy previous picture line */                \
-            for( i_x = i_pic_width / 16; i_x--; )                             \
+            for( i_x = i_pic_width >> 4; i_x--; )                             \
             {                                                                 \
                 *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );           \
                 *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );           \
