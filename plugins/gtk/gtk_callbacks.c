@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.42 2002/06/04 00:11:12 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.43 2002/06/04 20:33:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -100,10 +100,11 @@ gboolean GtkFullscreen( GtkWidget       *widget,
                         GdkEventButton  *event,
                         gpointer         user_data)
 {
-    intf_thread_t * p_intf =  GetIntf( GTK_WIDGET(widget), "intf_window" );
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
     vout_thread_t *p_vout;
 
-    p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_CHILD );
+    p_vout = vlc_object_find( p_intf->p_sys->p_input,
+                              VLC_OBJECT_VOUT, FIND_CHILD );
 
     if( p_vout )
     {

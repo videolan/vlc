@@ -2,7 +2,7 @@
  * gnome_callbacks.c : GNOME-specific callbacks.
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002 VideoLAN
- * $Id: gnome_callbacks.c,v 1.10 2002/06/01 12:31:59 sam Exp $
+ * $Id: gnome_callbacks.c,v 1.11 2002/06/04 20:33:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -249,7 +249,7 @@ void
 GnomePopupPreferencesActivate          (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-    GtkPreferencesActivate( menuitem, "intf_window" );
+    GtkPreferencesActivate( menuitem, "intf_popup" );
 }
 
 

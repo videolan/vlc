@@ -1022,6 +1022,7 @@
     <signal>
       <name>activate</name>
       <handler>GnomePopupPlayActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:16:58 GMT</last_modification_time>
     </signal>
     <label>Play</label>
@@ -1035,6 +1036,7 @@
     <signal>
       <name>activate</name>
       <handler>GnomePopupPauseActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:17:31 GMT</last_modification_time>
     </signal>
     <label>Pause</label>
@@ -1048,6 +1050,7 @@
     <signal>
       <name>activate</name>
       <handler>GnomePopupStopActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:18:10 GMT</last_modification_time>
     </signal>
     <label>Stop</label>
@@ -1062,6 +1065,7 @@
     <signal>
       <name>activate</name>
       <handler>GnomePopupBackActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:18:21 GMT</last_modification_time>
     </signal>
     <label>Back</label>
@@ -1075,6 +1079,7 @@
     <signal>
       <name>activate</name>
       <handler>GnomePopupSlowActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:18:29 GMT</last_modification_time>
     </signal>
     <label>Slow</label>
@@ -1088,6 +1093,7 @@
     <signal>
       <name>activate</name>
       <handler>GnomePopupFastActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:18:37 GMT</last_modification_time>
     </signal>
     <label>Fast</label>
@@ -1107,6 +1113,7 @@
     <signal>
       <name>activate</name>
       <handler>GnomePopupWindowToggleActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:18:51 GMT</last_modification_time>
     </signal>
     <label>Toggle _Interface</label>
@@ -1120,6 +1127,7 @@
     <signal>
       <name>activate</name>
       <handler>GnomePopupFullscreenActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:19:07 GMT</last_modification_time>
     </signal>
     <label>_Fullscreen</label>
@@ -1138,6 +1146,7 @@
     <signal>
       <name>activate</name>
       <handler>GnomePopupNextActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:19:18 GMT</last_modification_time>
     </signal>
     <label>Next</label>
@@ -1150,6 +1159,7 @@
     <signal>
       <name>activate</name>
       <handler>GnomePopupPrevActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:19:26 GMT</last_modification_time>
     </signal>
     <label>Prev</label>
@@ -1163,6 +1173,7 @@
     <signal>
       <name>activate</name>
       <handler>GnomePopupJumpActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:34:46 GMT</last_modification_time>
     </signal>
     <label>_Jump...</label>
@@ -1231,6 +1242,7 @@
 	<signal>
 	  <name>activate</name>
 	  <handler>GnomePopupFileOpenActivate</handler>
+	  <data>&quot;intf_popup&quot;</data>
 	  <last_modification_time>Sat, 19 May 2001 16:20:08 GMT</last_modification_time>
 	</signal>
 	<label>_Open File...</label>
@@ -1245,6 +1257,7 @@
 	<signal>
 	  <name>activate</name>
 	  <handler>GnomePopupDiscOpenActivate</handler>
+	  <data>&quot;intf_popup&quot;</data>
 	  <last_modification_time>Sat, 19 May 2001 16:20:44 GMT</last_modification_time>
 	</signal>
 	<label>Open _Disc...</label>
@@ -1259,6 +1272,7 @@
 	<signal>
 	  <name>activate</name>
 	  <handler>GnomePopupNetworkOpenActivate</handler>
+	  <data>&quot;intf_popup&quot;</data>
 	  <last_modification_time>Sat, 19 May 2001 16:20:54 GMT</last_modification_time>
 	</signal>
 	<label>_Network Stream...</label>
@@ -1278,6 +1292,7 @@
 	<signal>
 	  <name>activate</name>
 	  <handler>GnomePopupAboutActivate</handler>
+	  <data>&quot;intf_popup&quot;</data>
 	  <last_modification_time>Sat, 19 May 2001 16:21:02 GMT</last_modification_time>
 	</signal>
 	<stock_item>GNOMEUIINFO_MENU_ABOUT_ITEM</stock_item>
@@ -1291,6 +1306,7 @@
     <signal>
       <name>activate</name>
       <handler>GnomePopupPlaylistActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:21:14 GMT</last_modification_time>
     </signal>
     <label>Playlist...</label>
@@ -1303,6 +1319,7 @@
     <signal>
       <name>activate</name>
       <handler>GnomePopupPreferencesActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:21:25 GMT</last_modification_time>
     </signal>
     <stock_item>GNOMEUIINFO_MENU_PREFERENCES_ITEM</stock_item>
@@ -1320,6 +1337,7 @@
     <signal>
       <name>activate</name>
       <handler>GnomePopupExitActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:21:45 GMT</last_modification_time>
     </signal>
     <stock_item>GNOMEUIINFO_MENU_EXIT_ITEM</stock_item>
