@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.41 2003/07/31 23:44:49 fenrir Exp $
+ * $Id: http.c,v 1.42 2003/08/01 09:45:34 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -401,53 +401,59 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
  * Encode a string in base64
  * Code borrowed from Rafael Steil
  *****************************************************************************/
-
-
-
 void encodeblock( unsigned char in[3], unsigned char out[4], int len )
 {
-    static const char cb64[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    static const char cb64[]
+        = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     out[0] = cb64[ in[0] >> 2 ];
     out[1] = cb64[ ((in[0] & 0x03) << 4) | ((in[1] & 0xf0) >> 4) ];
     out[2] = (unsigned char) (len > 1 ? cb64[ ((in[1] & 0x0f) << 2) | ((in[2] & 0xc0) >> 6) ] : '=');
     out[3] = (unsigned char) (len > 2 ? cb64[ in[2] & 0x3f ] : '=');
 }
 
-char *str_base64_encode(char *str, input_thread_t *p_input )
+char *str_base64_encode(char *psz_str, input_thread_t *p_input )
 {
     unsigned char in[3], out[4];
-    unsigned int i, len, blocksout = 0, linesize = strlen(str);
-	char *tmp = str;
-	char *result = (char *)malloc((linesize + 3 - linesize % 3) * 4 / 3 + 1);
-	
-	if (!result)
-        msg_Err( p_input, "out of memory" );		
-	while (*tmp) {
+    unsigned int i, len, blocksout = 0, linesize = strlen(psz_str);
+    char *psz_tmp = psz_str;
+    char *psz_result = (char *)malloc( linesize / 3 * 4 + 5 );
+
+    if( !psz_result )
+    {
+        msg_Err( p_input, "out of memory" );
+        return NULL;
+    }
+
+    while( *psz_tmp )
+    {
         len = 0;
-		
-        for( i = 0; i < 3; i++ ) {
-            in[i] = (unsigned char)(*tmp);
-			
-            if (*tmp)
+
+        for( i = 0; i < 3; i++ )
+        {
+            in[i] = (unsigned char)*psz_tmp;
+
+            if (*psz_tmp)
                 len++;
             else
                 in[i] = 0;
-			
-			tmp++;
-        }
-		
-        if( len ) {
-            encodeblock( in, out, len);
-			
-            for( i = 0; i < 4; i++ ) 
-                result[blocksout++] = out[i];
-        }		
-    }
-	
-	result[blocksout] = '\0';
-	return result;
-}
 
+            psz_tmp++;
+        }
+
+        if( len )
+        {
+            encodeblock( in, out, len );
+
+            for( i = 0; i < 4; i++ )
+            {
+                psz_result[blocksout++] = out[i];
+            }
+        }
+    }
+
+    psz_result[blocksout] = '\0';
+    return psz_result;
+}
 
 /*****************************************************************************
  * Open: parse URL and open the remote file at the beginning
@@ -478,7 +484,7 @@ static int Open( vlc_object_t *p_this )
     p_access_data->psz_name = psz_name;
     p_access_data->psz_network = "";
     memset(p_access_data->psz_auth_string, 0, MAX_QUERY_SIZE);
-    
+
     var_Create( p_input, "ipv4", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_input, "ipv4", &val );
     if( val.i_int )
@@ -609,17 +615,17 @@ static int Open( vlc_object_t *p_this )
         var_Create( p_input, "http-pwd", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
         var_Get( p_input, "http-pwd", &val );
         psz_pwd = val.psz_string;
-    } 
+    }
 
     if (psz_user != NULL)
     {
-        msg_Dbg( p_input, "Authentificating, user=%s, password=%s", 
-                                            psz_user, psz_pwd );
         char psz_user_pwd[MAX_QUERY_SIZE];
+        msg_Dbg( p_input, "authenticating, user=%s, password=%s",
+                                           psz_user, psz_pwd );
         snprintf( psz_user_pwd, MAX_QUERY_SIZE, "%s:%s", psz_user, psz_pwd );
-        snprintf( p_access_data->psz_auth_string, MAX_QUERY_SIZE, 
-                "Authorization: Basic %s\r\n", 
-                str_base64_encode( psz_user_pwd, p_input ) );
+        snprintf( p_access_data->psz_auth_string, MAX_QUERY_SIZE,
+                  "Authorization: Basic %s\r\n",
+                  str_base64_encode( psz_user_pwd, p_input ) );
     }
 
     /* Check proxy config variable */
