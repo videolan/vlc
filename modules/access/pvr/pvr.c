@@ -2,7 +2,7 @@
  * pvr.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pvr.c,v 1.2 2003/06/07 03:45:38 titer Exp $
+ * $Id: pvr.c,v 1.3 2003/06/23 17:01:36 bigben Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -137,9 +137,9 @@ static int Open( vlc_object_t * p_this )
     {
         for( ;; )
         {
-            if( !strncmp( psz_parser, "device=", strlen( "device" ) ) )
+            if( !strncmp( psz_parser, "device=", strlen( "device=" ) ) )
             {
-                p_sys->i_device = strtol( psz_parser + strlen( "device" ),
+                p_sys->i_device = strtol( psz_parser + strlen( "device=" ),
                                           &psz_parser, 0 );
             }
             else if( !strncmp( psz_parser, "frequency=",
@@ -147,6 +147,41 @@ static int Open( vlc_object_t * p_this )
             {
                 p_sys->i_frequency =
                     strtol( psz_parser + strlen( "frequency=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "framerate=",
+                               strlen( "framerate=" ) ) )
+            {
+                p_sys->i_framerate =
+                    strtol( psz_parser + strlen( "framerate=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "width=",
+                               strlen( "width=" ) ) )
+            {
+                p_sys->i_width =
+                    strtol( psz_parser + strlen( "width=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "height=",
+                               strlen( "height=" ) ) )
+            {
+                p_sys->i_height =
+                    strtol( psz_parser + strlen( "height=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "bitrate=",
+                               strlen( "bitrate=" ) ) )
+            {
+                p_sys->i_bitrate =
+                    strtol( psz_parser + strlen( "bitrate=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "maxbitrate=",
+                               strlen( "maxbitrate=" ) ) )
+            {
+                p_sys->i_bitrate_peak =
+                    strtol( psz_parser + strlen( "maxbitrate=" ),
                             &psz_parser, 0 );
             }
             if( *psz_parser )
@@ -159,7 +194,7 @@ static int Open( vlc_object_t * p_this )
     free( psz_tofree );
 
     msg_Dbg( p_input, "device: /dev/video%d, standard: %x, size: %dx%d, "
-             "framerate: %d, frequency: %d, bitrate: %d/%d",
+             "frequency: %d, framerate: %d, bitrate: %d/%d",
              p_sys->i_device, p_sys->i_standard, p_sys->i_width,
              p_sys->i_height, p_sys->i_frequency, p_sys->i_framerate,
              p_sys->i_bitrate, p_sys->i_bitrate_peak );
