@@ -229,11 +229,11 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
         {
             /* TODO: support for streams other than 4:2:0 */
             /* create the overlay if necessary */
-            if( !p_vout->p_sys->p_overlay )
+            if( p_vout->p_sys->p_overlay == NULL )
             {
                 p_vout->p_sys->p_overlay = SDL_CreateYUVOverlay( 
                                              p_vout->p_rendered_pic->i_width, 
-                                             p_vout->p_rendered_pic->i_height, 
+                                             p_vout->p_rendered_pic->i_height,
                                              SDL_YV12_OVERLAY, 
                                              p_vout->p_sys->p_display
                                            );
@@ -258,12 +258,12 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
                    p_vout->p_rendered_pic->p_u,
                    p_vout->p_sys->p_overlay->h *
                    p_vout->p_sys->p_overlay->pitches[2] / 2);
-       
+
             disp.w = (&p_vout->p_buffer[p_vout->i_buffer_index])->i_pic_width;
             disp.h = (&p_vout->p_buffer[p_vout->i_buffer_index])->i_pic_height;
             disp.x = (p_vout->i_width - disp.w)/2;
             disp.y = (p_vout->i_height - disp.h)/2;
- 
+
             SDL_DisplayYUVOverlay( p_vout->p_sys->p_overlay , &disp );
             SDL_UnlockYUVOverlay(p_vout->p_sys->p_overlay);
         }
@@ -296,7 +296,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         p_vout->p_sys->p_display = SDL_SetVideoMode(p_vout->i_width, 
             p_vout->i_height, 
             0, 
-            SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF );
+            SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_RESIZABLE );
         SDL_ShowCursor( 1 );
     }
 	
@@ -305,6 +305,11 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         intf_ErrMsg( "error: can't open DISPLAY default display" );
         return( 1 );
     }
+    intf_DbgMsg( "sdl display size : %dx%d - pitch : %d",
+                 p_vout->p_sys->p_display->w,
+                 p_vout->p_sys->p_display->h,
+                 p_vout->p_sys->p_display->pitch);
+
     SDL_WM_SetCaption( VOUT_TITLE , VOUT_TITLE );
     SDL_EventState(SDL_KEYUP , SDL_IGNORE);	/* ignore keys up */
 

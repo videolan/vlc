@@ -75,6 +75,7 @@ typedef struct vout_sys_s
 
 /* local prototype */
 void    intf_SDL_Keymap( intf_thread_t * p_intf );
+void intf_SDL_Resize( intf_thread_t * p_intf, int width, int height );
 void intf_SDL_Fullscreen(intf_thread_t * p_intf);
 void intf_SDL_YUVSwitch(intf_thread_t * p_intf);
   
@@ -157,6 +158,8 @@ void intf_SDLManage( intf_thread_t *p_intf )
         i_key = event.key.keysym.sym;                          /* forward it */
 
         switch (event.type) {
+            case SDL_VIDEORESIZE:                      /* Resizing of window */
+                intf_SDL_Resize( p_intf, event.resize.w, event.resize.h );
             case SDL_KEYDOWN:                         /* if a key is pressed */
                 switch(i_key) {
                                                     /* switch to fullscreen  */
@@ -185,16 +188,30 @@ void intf_SDLManage( intf_thread_t *p_intf )
     }
 }
 
+void intf_SDL_Resize( intf_thread_t * p_intf, int width, int height )
+{
+    intf_Msg( "Video display resized (%dx%d)", width, height ); 
+    vlc_mutex_lock( &p_intf->p_vout->change_lock );
+    p_intf->p_vout->i_width = width/* & 0xffffffe*/;
+    p_intf->p_vout->i_height = height;
+    p_intf->p_vout->p_sys->b_reopen_display = 1;
+    p_intf->p_vout->i_changes |= VOUT_YUV_CHANGE;
+    vlc_mutex_unlock( &p_intf->p_vout->change_lock );
+}
+
 void intf_SDL_YUVSwitch(intf_thread_t * p_intf)
 {
+    vlc_mutex_lock( &p_intf->p_vout->change_lock );
     p_intf->p_vout->b_need_render = 1 - p_intf->p_vout->b_need_render;
     intf_DbgMsg( "need render now : '%d'",p_intf->p_vout->b_need_render); 
-
+    vlc_mutex_unlock( &p_intf->p_vout->change_lock );
 }
 void intf_SDL_Fullscreen(intf_thread_t * p_intf)
 {
+    vlc_mutex_lock( &p_intf->p_vout->change_lock );
     p_intf->p_vout->p_sys->b_fullscreen = 1-p_intf->p_vout->p_sys->b_fullscreen;
     p_intf->p_vout->p_sys->b_reopen_display = 1;
+    vlc_mutex_unlock( &p_intf->p_vout->change_lock );
 } 
     
 
@@ -202,7 +219,7 @@ void intf_SDL_Fullscreen(intf_thread_t * p_intf)
 
 void intf_SDL_Keymap(intf_thread_t * p_intf )
 {
-    //p_intf->p_intf_getKey = intf_getKey; 
+    /* p_intf->p_intf_getKey = intf_getKey; */
     intf_AssignKey(p_intf, SDLK_q,      INTF_KEY_QUIT, 0);
     intf_AssignKey(p_intf, SDLK_ESCAPE, INTF_KEY_QUIT, 0);
     /* intf_AssignKey(p_intf,3,'Q'); */
