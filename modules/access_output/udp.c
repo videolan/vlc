@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.24 2004/03/05 00:14:19 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -269,6 +269,10 @@ static int Open( vlc_object_t *p_this )
     msg_Info( p_access, "Open: addr:`%s' port:`%d'", psz_dst_addr, i_dst_port);
 
     free( psz_dst_addr );
+
+    /* update p_sout->i_out_pace_nocontrol */
+    p_access->p_sout->i_out_pace_nocontrol++;
+
     return VLC_SUCCESS;
 }
 
@@ -301,13 +305,10 @@ static void Close( vlc_object_t * p_this )
         sout_BufferDelete( p_access->p_sout, p_sys->p_buffer );
     }
 
-#if defined( UNDER_CE )
-    CloseHandle( (HANDLE)p_sys->p_thread->i_handle );
-#elif defined( WIN32 )
-    closesocket( p_sys->p_thread->i_handle );
-#else
-    close( p_sys->p_thread->i_handle );
-#endif
+    net_Close( p_sys->p_thread->i_handle );
+
+    /* update p_sout->i_out_pace_nocontrol */
+    p_access->p_sout->i_out_pace_nocontrol--;
 
     free( p_sys );
     msg_Info( p_access, "Close" );

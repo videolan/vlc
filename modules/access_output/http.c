@@ -2,7 +2,7 @@
  * http.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: http.c,v 1.12 2004/03/03 13:25:53 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -239,6 +239,10 @@ static int Open( vlc_object_t *p_this )
     p_access->pf_write       = Write;
     p_access->pf_seek        = Seek;
 
+
+    /* update p_sout->i_out_pace_nocontrol */
+    p_access->p_sout->i_out_pace_nocontrol++;
+
     return VLC_SUCCESS;
 }
 
@@ -249,6 +253,9 @@ static void Close( vlc_object_t * p_this )
 {
     sout_access_out_t       *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t   *p_sys = p_access->p_sys;
+
+    /* update p_sout->i_out_pace_nocontrol */
+    p_access->p_sout->i_out_pace_nocontrol--;
 
     httpd_StreamDelete( p_sys->p_httpd_stream );
     httpd_HostDelete( p_sys->p_httpd_host );
