@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.9 2002/01/05 02:22:03 sam Exp $
+ * $Id: vout_pictures.c,v 1.10 2002/01/12 01:25:57 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -134,10 +134,11 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
     {
         p_pic = PP_RENDERPICTURE[ i_pic ];
 
-        /* If the picture we found is a memory buffer, and we might have
-         * enough room later for a direct buffer, skip it. If no other
-         * pictures are found, the video decoder will try again later. */
-        if( p_vout->b_direct && ( p_vout->output.i_pictures > 3 )
+        /* If the picture we found is a memory buffer, and we have enough
+         * pictures in the stack, and we might have enough room later for
+         * a direct buffer, skip it. If no other pictures are found, the
+         * video decoder will try again later. */
+        if( p_vout->b_direct && ( p_vout->output.i_pictures > 5 )
              && ( p_pic->i_type != DIRECT_PICTURE ) )
         {
             break;

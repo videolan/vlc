@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.79 2002/01/07 02:12:29 sam Exp $
+ * $Id: vout_sdl.c,v 1.80 2002/01/12 01:25:57 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -49,7 +49,7 @@
 #include "stream_control.h"                 /* needed by input_ext-intf.h... */
 #include "input_ext-intf.h"
 
-#define SDL_MAX_DIRECTBUFFERS 5
+#define SDL_MAX_DIRECTBUFFERS 10
 #define SDL_DEFAULT_BPP 16
 
 /*****************************************************************************

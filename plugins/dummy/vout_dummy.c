@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.16 2002/01/05 03:49:18 sam Exp $
+ * $Id: vout_dummy.c,v 1.17 2002/01/12 01:25:57 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -35,7 +35,7 @@
 
 #define DUMMY_WIDTH 16
 #define DUMMY_HEIGHT 16
-#define DUMMY_MAX_DIRECTBUFFERS 5
+#define DUMMY_MAX_DIRECTBUFFERS 10
 
 /*****************************************************************************
  * vout_sys_t: dummy video output method descriptor

@@ -3,7 +3,7 @@ Section: graphics
 Priority: optional
 Maintainer: Samuel Hocevar <sam@zoy.org>
 Build-Depends: debhelper (>=2.2.0),
-               xlibs-dev,
+               xlibs-dev, xlibs-pic
                libgnome-dev,
                libggi2-dev,
                libglide2-dev [i386],

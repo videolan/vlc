@@ -2,7 +2,7 @@
  * i420_rgb8.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb8.c,v 1.1 2002/01/04 14:01:34 sam Exp $
+ * $Id: i420_rgb8.c,v 1.2 2002/01/12 01:25:57 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -76,6 +76,7 @@ void _M( I420_RGB8 )( vout_thread_t *p_vout, picture_t *p_source,
                &b_hscale, &i_vscale, p_offset_start );
 
     /* FIXME */
+#warning "Please ignore the following warnings, I already know about them"
     intf_ErrMsg( "vout error: I420_RGB8 unimplemented, "
                  "please harass sam@zoy.org" );
 }

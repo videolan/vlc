@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.11 2002/01/07 02:12:29 sam Exp $
+ * $Id: ggi.c,v 1.12 2002/01/12 01:25:57 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -55,7 +55,6 @@ static void vout_Display   ( vout_thread_t *, picture_t * );
 
 static int  OpenDisplay    ( vout_thread_t * );
 static void CloseDisplay   ( vout_thread_t * );
-static int  NewPicture     ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
  * Building configuration tree
@@ -91,7 +90,7 @@ typedef struct vout_sys_s
     int                 i_bits_per_pixel;
 
     /* Buffer information */
-    ggi_directbuffer *  p_buffer[2];                              /* buffers */
+    ggi_directbuffer *  pp_buffer[2];                             /* buffers */
     int                 i_index;
 
     boolean_t           b_must_acquire;   /* must be acquired before writing */
@@ -162,6 +161,8 @@ int vout_Init( vout_thread_t *p_vout )
     int i_index;
     picture_t *p_pic;
 
+    I_OUTPUTPICTURES = 0;
+
     p_vout->output.i_width  = p_vout->p_sys->mode.visible.x;
     p_vout->output.i_height = p_vout->p_sys->mode.visible.y;
     p_vout->output.i_aspect = p_vout->p_sys->mode.visible.x
@@ -182,43 +183,64 @@ int vout_Init( vout_thread_t *p_vout )
             p_vout->output.i_chroma = FOURCC_BI_BITFIELDS; break;
         default:
             intf_ErrMsg( "vout error: unknown screen depth" );
-            return( 0 );
+            return 0;
     }
 
-    I_OUTPUTPICTURES = 0;
+    p_pic = NULL;
 
-    /* Try to initialize up to 1 direct buffers */
-    while( I_OUTPUTPICTURES < 1 )
+    /* Find an empty picture slot */
+    for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
     {
-        p_pic = NULL;
-
-        /* Find an empty picture slot */
-        for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
+        if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
         {
-            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
-            {
-                p_pic = p_vout->p_picture + i_index;
-                break;
-            }
-        }
-
-        /* Allocate the picture */
-        if( p_pic == NULL || NewPicture( p_vout, p_pic ) )
-        {
+            p_pic = p_vout->p_picture + i_index;
             break;
         }
-
-        p_pic->i_status = DESTROYED_PICTURE;
-        p_pic->i_type   = DIRECT_PICTURE;
-
-        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
-
-        I_OUTPUTPICTURES++;
     }
 
-    return( 0 );
-#if 0
-#define p_b p_vout->p_sys->p_buffer
+    if( p_pic == NULL )
+    {
+        return 0;
+    }
+
+#define p_b p_vout->p_sys->pp_buffer
+    /* We know the chroma, allocate a buffer which will be used
+     * directly by the decoder */
+    p_vout->p_sys->i_index = 0;
+    p_pic->p->p_pixels = p_b[ 0 ]->write;
+    p_pic->p->i_pixel_bytes = p_b[ 0 ]->buffer.plb.pixelformat->size / 8;
+    p_pic->p->i_lines = p_vout->p_sys->mode.visible.y;
+
+    if( p_b[ 0 ]->buffer.plb.pixelformat->size / 8
+         * p_vout->p_sys->mode.visible.x
+        != p_b[ 0 ]->buffer.plb.stride )
+    {
+        p_pic->p->b_margin = 1;
+        p_pic->p->b_hidden = 1;
+        p_pic->p->i_pitch = p_b[ 0 ]->buffer.plb.stride;
+        p_pic->p->i_visible_bytes = p_b[ 0 ]->buffer.plb.pixelformat->size
+                                     / 8 * p_vout->p_sys->mode.visible.x;
+    }
+    else
+    {
+        p_pic->p->b_margin = 0;
+        p_pic->p->i_pitch = p_b[ 0 ]->buffer.plb.stride;
+    }
+
+    /* Only useful for bits_per_pixel != 8 */
+    p_pic->p->i_red_mask =   p_b[ 0 ]->buffer.plb.pixelformat->red_mask;
+    p_pic->p->i_green_mask = p_b[ 0 ]->buffer.plb.pixelformat->green_mask;
+    p_pic->p->i_blue_mask =  p_b[ 0 ]->buffer.plb.pixelformat->blue_mask;
+
+    p_pic->i_planes = 1;
+
+    p_pic->i_status = DESTROYED_PICTURE;
+    p_pic->i_type   = DIRECT_PICTURE;
+
+    PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
+
+    I_OUTPUTPICTURES++;
+
     /* Acquire first buffer */
     if( p_vout->p_sys->b_must_acquire )
     {
@@ -235,7 +257,6 @@ int vout_Init( vout_thread_t *p_vout )
 
     return( 0 );
 #undef p_b
-#endif
 }
 
 /*****************************************************************************
@@ -245,11 +266,11 @@ int vout_Init( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_End( vout_thread_t *p_vout )
 {
-#define p_b p_vout->p_sys->p_buffer
+#define p_b p_vout->p_sys->pp_buffer
     /* Release buffer */
     if( p_vout->p_sys->b_must_acquire )
     {
-        ggiResourceRelease( p_b[ 0 ]->resource );
+        ggiResourceRelease( p_b[ p_vout->p_sys->i_index ]->resource );
     }
 #undef p_b
 }
@@ -336,23 +357,28 @@ void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-#define p_b p_vout->p_sys->p_buffer
+#define p_b p_vout->p_sys->pp_buffer
+    p_pic->p->p_pixels = p_b[ p_vout->p_sys->i_index ]->write;
+
     /* Change display frame */
     if( p_vout->p_sys->b_must_acquire )
     {
-        ggiResourceRelease( p_b[ 0 ]->resource );
+        ggiResourceRelease( p_b[ p_vout->p_sys->i_index ]->resource );
     }
     ggiSetDisplayFrame( p_vout->p_sys->p_display,
-                        p_b[ 0 ]->frame );
+                        p_b[ p_vout->p_sys->i_index ]->frame );
 
     /* Swap buffers and change write frame */
+    p_vout->p_sys->i_index ^= 1;
+    p_pic->p->p_pixels = p_b[ p_vout->p_sys->i_index ]->write;
+
     if( p_vout->p_sys->b_must_acquire )
     {
-        ggiResourceAcquire( p_b[ 0 ]->resource,
+        ggiResourceAcquire( p_b[ p_vout->p_sys->i_index ]->resource,
                             GGI_ACTYPE_WRITE );
     }
     ggiSetWriteFrame( p_vout->p_sys->p_display,
-                      p_b[ 0 ]->frame );
+                      p_b[ p_vout->p_sys->i_index ]->frame );
 
     /* Flush the output so that it actually displays */
     ggiFlush( p_vout->p_sys->p_display );
@@ -369,7 +395,7 @@ void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static int OpenDisplay( vout_thread_t *p_vout )
 {
-#define p_b p_vout->p_sys->p_buffer
+#define p_b p_vout->p_sys->pp_buffer
     ggi_color   col_fg;                                  /* foreground color */
     ggi_color   col_bg;                                  /* background color */
     int         i_index;                               /* all purposes index */
@@ -425,7 +451,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     for( i_index = 0; i_index < 2; i_index++ )
     {
         /* Get buffer address */
-        p_vout->p_sys->p_buffer[ i_index ] =
+        p_vout->p_sys->pp_buffer[ i_index ] =
             (ggi_directbuffer *)ggiDBGetBuffer( p_vout->p_sys->p_display,
                                                 i_index );
         if( p_b[ i_index ] == NULL )
@@ -506,46 +532,5 @@ static void CloseDisplay( vout_thread_t *p_vout )
 
     /* Exit library */
     ggiExit();
-}
-
-/*****************************************************************************
- * NewPicture: allocate a picture
- *****************************************************************************
- * Returns 0 on success, -1 otherwise
- *****************************************************************************/
-static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-#define p_b p_vout->p_sys->p_buffer
-    /* We know the chroma, allocate a buffer which will be used
-     * directly by the decoder */
-    p_pic->p->p_pixels = p_b[ 0 ]->write;
-    p_pic->p->i_pixel_bytes = p_b[ 0 ]->buffer.plb.pixelformat->size / 8;
-    p_pic->p->i_lines = p_vout->p_sys->mode.visible.y;
-
-    if( p_b[ 0 ]->buffer.plb.pixelformat->size / 8
-         * p_vout->p_sys->mode.visible.x
-        != p_b[ 0 ]->buffer.plb.stride )
-    {
-        p_pic->p->b_margin = 1;
-        p_pic->p->b_hidden = 1;
-        p_pic->p->i_pitch = p_b[ 0 ]->buffer.plb.stride;
-        p_pic->p->i_visible_bytes = p_b[ 0 ]->buffer.plb.pixelformat->size / 8
-                                     * p_vout->p_sys->mode.visible.x;
-    }
-    else
-    {
-        p_pic->p->b_margin = 0;
-        p_pic->p->i_pitch = p_b[ 0 ]->buffer.plb.stride;
-    }
-
-    /* Only useful for bits_per_pixel != 8 */
-    p_pic->p->i_red_mask =   p_b[ 0 ]->buffer.plb.pixelformat->red_mask;
-    p_pic->p->i_green_mask = p_b[ 0 ]->buffer.plb.pixelformat->green_mask;
-    p_pic->p->i_blue_mask =  p_b[ 0 ]->buffer.plb.pixelformat->blue_mask;
-
-    p_pic->i_planes = 1;
-
-    return 0;
-#undef p_b
 }
 

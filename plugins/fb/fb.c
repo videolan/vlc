@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.11 2002/01/06 00:07:37 sam Exp $
+ * $Id: fb.c,v 1.12 2002/01/12 01:25:57 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -60,7 +60,6 @@ static void vout_End       ( vout_thread_t * );
 
 static int  OpenDisplay    ( vout_thread_t * );
 static void CloseDisplay   ( vout_thread_t * );
-static int  NewPicture     ( vout_thread_t *, picture_t * );
 static void SwitchDisplay  ( int i_signal );
 static void TextMode       ( int i_tty );
 static void GfxMode        ( int i_tty );
@@ -292,7 +291,7 @@ static int vout_Init( vout_thread_t *p_vout )
             p_vout->output.i_chroma = FOURCC_BI_BITFIELDS; break;
         default:
             intf_ErrMsg( "vout error: unknown screen depth" );
-            return( 0 );
+            return 0;
     }
 
     p_vout->output.i_width = p_vout->p_sys->i_width;
@@ -305,34 +304,63 @@ static int vout_Init( vout_thread_t *p_vout )
     /* Clear the screen */
     memset( p_vout->p_sys->p_video, 0, p_vout->p_sys->i_page_size );
 
-    /* Try to initialize up to 1 direct buffers */
-    while( I_OUTPUTPICTURES < 1 )
+    /* Try to initialize 1 direct buffer */
+    p_pic = NULL;
+
+    /* Find an empty picture slot */
+    for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
     {
-        p_pic = NULL;
-
-        /* Find an empty picture slot */
-        for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
+        if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
         {
-            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
-            {
-                p_pic = p_vout->p_picture + i_index;
-                break;
-            }
-        }
-
-        /* Allocate the picture */
-        if( p_pic == NULL || NewPicture( p_vout, p_pic ) )
-        {
+            p_pic = p_vout->p_picture + i_index;
             break;
         }
-
-        p_pic->i_status = DESTROYED_PICTURE;
-        p_pic->i_type   = DIRECT_PICTURE;
-
-        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
-
-        I_OUTPUTPICTURES++;
     }
+
+    /* Allocate the picture */
+    if( p_pic == NULL )
+    {
+        return 0;
+    }
+
+    /* We know the chroma, allocate a buffer which will be used
+     * directly by the decoder */
+    p_pic->p->p_pixels = p_vout->p_sys->p_video;
+    p_pic->p->i_pixel_bytes = p_vout->p_sys->i_bytes_per_pixel;
+    p_pic->p->i_lines = p_vout->p_sys->var_info.yres;
+
+    if( p_vout->p_sys->var_info.xres_virtual )
+    {
+        p_pic->p->b_margin = 1;
+        p_pic->p->b_hidden = 1;
+        p_pic->p->i_pitch = p_vout->p_sys->var_info.xres_virtual
+                             * p_vout->p_sys->i_bytes_per_pixel;
+        p_pic->p->i_visible_bytes = p_vout->p_sys->var_info.xres
+                                     * p_vout->p_sys->i_bytes_per_pixel;
+    }
+    else
+    {
+        p_pic->p->b_margin = 0;
+        p_pic->p->i_pitch = p_vout->p_sys->var_info.xres
+                             * p_vout->p_sys->i_bytes_per_pixel;
+    }
+
+    /* Only useful for p_vout->p_sys->var_info.bits_per_pixel != 8 */
+    p_pic->p->i_red_mask = ( (1 << p_vout->p_sys->var_info.red.length) - 1 )
+                             << p_vout->p_sys->var_info.red.offset;
+    p_pic->p->i_green_mask = ( (1 << p_vout->p_sys->var_info.green.length) - 1 )
+                               << p_vout->p_sys->var_info.green.offset;
+    p_pic->p->i_blue_mask = ( (1 << p_vout->p_sys->var_info.blue.length) - 1 )
+                              << p_vout->p_sys->var_info.blue.offset;
+
+    p_pic->i_planes = 1;
+
+    p_pic->i_status = DESTROYED_PICTURE;
+    p_pic->i_type   = DIRECT_PICTURE;
+
+    PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
+
+    I_OUTPUTPICTURES++;
 
     return( 0 );
 }
@@ -645,48 +673,6 @@ static void CloseDisplay( vout_thread_t *p_vout )
 
     /* Close fb */
     close( p_vout->p_sys->i_fd );
-}
-
-/*****************************************************************************
- * NewPicture: allocate a picture
- *****************************************************************************
- * Returns 0 on success, -1 otherwise
- *****************************************************************************/
-static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    /* We know the chroma, allocate a buffer which will be used
-     * directly by the decoder */
-    p_pic->p->p_pixels = p_vout->p_sys->p_video;
-    p_pic->p->i_pixel_bytes = p_vout->p_sys->i_bytes_per_pixel;
-    p_pic->p->i_lines = p_vout->p_sys->var_info.yres;
-
-    if( p_vout->p_sys->var_info.xres_virtual )
-    {
-        p_pic->p->b_margin = 1;
-        p_pic->p->b_hidden = 1;
-        p_pic->p->i_pitch = p_vout->p_sys->var_info.xres_virtual
-                             * p_vout->p_sys->i_bytes_per_pixel;
-        p_pic->p->i_visible_bytes = p_vout->p_sys->var_info.xres
-                                     * p_vout->p_sys->i_bytes_per_pixel;
-    }
-    else
-    {
-        p_pic->p->b_margin = 0;
-        p_pic->p->i_pitch = p_vout->p_sys->var_info.xres
-                             * p_vout->p_sys->i_bytes_per_pixel;
-    }
-
-    /* Only useful for p_vout->p_sys->var_info.bits_per_pixel != 8 */
-    p_pic->p->i_red_mask = ( (1 << p_vout->p_sys->var_info.red.length) - 1 )
-                             << p_vout->p_sys->var_info.red.offset;
-    p_pic->p->i_green_mask = ( (1 << p_vout->p_sys->var_info.green.length) - 1 )
-                               << p_vout->p_sys->var_info.green.offset;
-    p_pic->p->i_blue_mask = ( (1 << p_vout->p_sys->var_info.blue.length) - 1 )
-                              << p_vout->p_sys->var_info.blue.offset;
-
-    p_pic->i_planes = 1;
-
-    return 0;
 }
 
 /*****************************************************************************

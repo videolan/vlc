@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.10 2002/01/10 04:11:25 sam Exp $
+ * $Id: xcommon.c,v 1.11 2002/01/12 01:25:57 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -212,7 +212,7 @@ typedef struct mwmhints_s
  * Chroma defines
  *****************************************************************************/
 #ifdef MODULE_NAME_IS_xvideo
-#   define MAX_DIRECTBUFFERS 5
+#   define MAX_DIRECTBUFFERS 10
 #else
 #   define MAX_DIRECTBUFFERS 2
 #endif
@@ -611,15 +611,17 @@ static int vout_Manage( vout_thread_t *p_vout )
            == True )
     {
         /* ConfigureNotify event: prepare  */
-        if( (xevent.type == ConfigureNotify)
-          && ((xevent.xconfigure.width != p_vout->p_sys->i_width)
-             || (xevent.xconfigure.height != p_vout->p_sys->i_height)) )
+        if( xevent.type == ConfigureNotify )
         {
-            /* Update dimensions */
-            b_resized = 1;
-            p_vout->i_changes |= VOUT_SIZE_CHANGE;
-            p_vout->p_sys->i_width = xevent.xconfigure.width;
-            p_vout->p_sys->i_height = xevent.xconfigure.height;
+            if( (xevent.xconfigure.width != p_vout->p_sys->i_width)
+                 || (xevent.xconfigure.height != p_vout->p_sys->i_height) )
+            {
+                /* Update dimensions */
+                b_resized = 1;
+                p_vout->i_changes |= VOUT_SIZE_CHANGE;
+                p_vout->p_sys->i_width = xevent.xconfigure.width;
+                p_vout->p_sys->i_height = xevent.xconfigure.height;
+            }
         }
         /* MapNotify event: change window status and disable screen saver */
         else if( xevent.type == MapNotify)
@@ -765,6 +767,11 @@ static int vout_Manage( vout_thread_t *p_vout )
             {
                 ToggleCursor( p_vout ); 
             }
+        }
+        /* Reparent move -- XXX: why are we getting this ? */
+        else if( xevent.type == ReparentNotify )
+        {
+            ;
         }
         /* Other event */
         else
@@ -1344,6 +1351,33 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
                 p_pic->p->b_margin = 1;
                 p_pic->p->b_hidden = 1;
                 p_pic->p->i_visible_bytes = 2 * p_pic->p_sys->p_image->width;
+            }
+
+            p_pic->p->i_red_mask   = p_pic->p_sys->p_image->red_mask;
+            p_pic->p->i_green_mask = p_pic->p_sys->p_image->green_mask;
+            p_pic->p->i_blue_mask  = p_pic->p_sys->p_image->blue_mask;
+
+            p_pic->i_planes = 1;
+
+            break;
+
+        case FOURCC_BI_BITFIELDS:
+
+            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
+                                  + p_pic->p_sys->p_image->xoffset;
+            p_pic->p->i_lines = p_pic->p_sys->p_image->height;
+            p_pic->p->i_pitch = p_pic->p_sys->p_image->bytes_per_line;
+            p_pic->p->i_pixel_bytes = p_pic->p_sys->p_image->depth;
+
+            if( p_pic->p->i_pitch == 4 * p_pic->p_sys->p_image->width )
+            {
+                p_pic->p->b_margin = 0;
+            }
+            else
+            {
+                p_pic->p->b_margin = 1;
+                p_pic->p->b_hidden = 1;
+                p_pic->p->i_visible_bytes = 4 * p_pic->p_sys->p_image->width;
             }
 
             p_pic->p->i_red_mask   = p_pic->p_sys->p_image->red_mask;

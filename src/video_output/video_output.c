@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.155 2002/01/07 02:12:30 sam Exp $
+ * $Id: video_output.c,v 1.156 2002/01/12 01:25:57 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -332,7 +332,8 @@ static int InitThread( vout_thread_t *p_vout )
 
         if( p_vout->chroma.p_module == NULL )
         {
-            intf_ErrMsg( "vout error: no suitable chroma module" );
+            intf_ErrMsg( "vout error: no chroma module for %4.4s to %4.4s",
+                         &p_vout->render.i_chroma, &p_vout->output.i_chroma );
             p_vout->pf_end( p_vout );
             vlc_mutex_unlock( &p_vout->change_lock );
             return( 1 );
@@ -352,10 +353,19 @@ static int InitThread( vout_thread_t *p_vout )
             return( 1 );
         }
 
-        intf_WarnMsg( 2, "vout info: indirect render, mapping "
-                         "render pictures %i-%i to system pictures %i-%i",
-                         I_OUTPUTPICTURES - 1, VOUT_MAX_PICTURES - 2,
-                         I_OUTPUTPICTURES, VOUT_MAX_PICTURES - 1 );
+        if( I_OUTPUTPICTURES < VOUT_MAX_PICTURES )
+        {
+            intf_WarnMsg( 2, "vout info: indirect render, mapping "
+                             "render pictures %i-%i to system pictures %i-%i",
+                             I_OUTPUTPICTURES - 1, VOUT_MAX_PICTURES - 2,
+                             I_OUTPUTPICTURES, VOUT_MAX_PICTURES - 1 );
+        }
+        else
+        {
+            intf_WarnMsg( 2, "vout info: indirect render, no system "
+                             "pictures needed, we have %i directbuffers",
+                             I_OUTPUTPICTURES );
+        }
 
         /* Append render buffers after the direct buffers */
         for( i = I_OUTPUTPICTURES; i < VOUT_MAX_PICTURES; i++ )
