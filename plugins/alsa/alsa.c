@@ -25,7 +25,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/asoundlib.h>				      /* for alsa :) */
+#include <sys/asoundlib.h>                                    /* for alsa :) */
 #include <fcntl.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 // #include <unistd.h>                                            /* close() */

@@ -259,7 +259,7 @@ int vout_X11Manage( vout_thread_t *p_vout )
 
         /* Tell the video output thread that it will need to rebuild YUV
          * tables. This is needed since conversion buffer size may have
-	 * changed */
+         * changed */
         p_vout->i_changes |= VOUT_YUV_CHANGE;
         intf_Msg("Video display resized (%dx%d)", p_vout->i_width, p_vout->i_height);
     }
@@ -412,7 +412,7 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
          * formats. */
         p_xpixmap_format = XListPixmapFormats( p_vout->p_sys->p_display, &i_count );
 
-	
+
         /* Under XFree4.0, the list contains pixmap formats available through 
          * all video depths ; so we have to check against current depth. */
         p_vout->i_bytes_per_pixel = 0;

@@ -31,8 +31,8 @@ public:
     // standard window member
     virtual bool    QuitRequested();
     virtual void    MessageReceived(BMessage *message);
-	
-	// this is the hook controling direct screen connection
+
+    // this is the hook controling direct screen connection
     virtual void    DirectConnected(direct_buffer_info *info);
 
     int32           i_bytes_per_pixel;

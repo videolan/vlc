@@ -100,7 +100,8 @@ intf_thread_t* intf_Create( void )
     p_intf = malloc( sizeof( intf_thread_t ) );
     if( !p_intf )
     {
-        intf_ErrMsg("error: %s", strerror( ENOMEM ) );
+        intf_ErrMsg( "intf error: cannot create interface thread (%s)",
+                     strerror( ENOMEM ) );
         return( NULL );
     }
 
@@ -127,7 +128,7 @@ intf_thread_t* intf_Create( void )
     if( i_best_score == 0 )
     {
         free( p_intf );
-        intf_ErrMsg( "error: no suitable plugin to create interface" );
+        intf_ErrMsg( "intf error: no suitable plugin" );
         return( NULL );
     }
 
@@ -153,13 +154,13 @@ intf_thread_t* intf_Create( void )
     p_intf->p_console = intf_ConsoleCreate();
     if( p_intf->p_console == NULL )
     {
-        intf_ErrMsg("error: can't create control console");
+        intf_ErrMsg( "intf error: cannot create control console" );
         free( p_intf );
         return( NULL );
     }
     if( p_intf->p_sys_create( p_intf ) )
     {
-        intf_ErrMsg("error: can't create interface");
+        intf_ErrMsg("intf error: cannot create interface");
         intf_ConsoleDestroy( p_intf->p_console );
         free( p_intf );
         return( NULL );
@@ -188,7 +189,7 @@ void intf_Run( intf_thread_t *p_intf )
         if( (p_input_config =
               (input_config_t *)malloc( sizeof(input_config_t) )) == NULL )
         {
-            intf_ErrMsg("Out of memory");
+            intf_ErrMsg( "intf error: cannot create input_config_t" );
         }
         else
         {
@@ -206,7 +207,7 @@ void intf_Run( intf_thread_t *p_intf )
         if( (p_input_config =
               (input_config_t *)malloc( sizeof(input_config_t) )) == NULL )
         {
-            intf_ErrMsg("Out of memory");
+            intf_ErrMsg( "intf error: cannot create input_config_t" );
         }
         else
         {
@@ -222,7 +223,7 @@ void intf_Run( intf_thread_t *p_intf )
      * the script could be executed but failed */
     else if( intf_ExecScript( main_GetPszVariable( INTF_INIT_SCRIPT_VAR, INTF_INIT_SCRIPT_DEFAULT ) ) > 0 )
     {
-        intf_ErrMsg("warning: error(s) during startup script");
+        intf_ErrMsg( "intf error: errors occured during startup script" );
     }
 
     /* Main loop */
@@ -562,7 +563,8 @@ static int LoadChannels( intf_thread_t *p_intf, char *psz_filename )
     p_file = fopen( psz_filename, "r" );
     if( p_file == NULL )
     {
-        intf_ErrMsg("error: can't open %s (%s)", psz_filename, strerror(errno));
+        intf_ErrMsg( "intf error: cannot open %s (%s)",
+                     psz_filename, strerror(errno) );
         return( 1 );
     }
 
@@ -580,7 +582,8 @@ static int LoadChannels( intf_thread_t *p_intf, char *psz_filename )
         p_intf->p_channel = malloc( sizeof( intf_channel_t ) * i_index );
         if( p_intf->p_channel == NULL )
         {
-            intf_ErrMsg("error: %s", strerror(ENOMEM));
+            intf_ErrMsg( "intf error: cannot create intf_channel_t (%s)",
+                         strerror(ENOMEM) );
             fclose( p_file );
             return( 1 );
         }
@@ -689,7 +692,8 @@ static int ParseChannel( intf_channel_t *p_channel, char *psz_str )
                     p_channel->psz_description = malloc( i_field_length + 1 );
                     if( p_channel->psz_description == NULL )
                     {
-                        intf_ErrMsg("error: %s", strerror( ENOMEM ));
+                        intf_ErrMsg( "intf error: cannot create channel "
+                                     "description (%s)", strerror( ENOMEM ) );
                         i_field = -1;
                     }
                     else
@@ -712,7 +716,8 @@ static int ParseChannel( intf_channel_t *p_channel, char *psz_str )
                     p_channel->psz_input_source = malloc( i_field_length + 1 );
                     if( p_channel->psz_input_source == NULL )
                     {
-                        intf_ErrMsg("error: %s", strerror( ENOMEM ));
+                        intf_ErrMsg( "intf error: cannot create input "
+                                     "source (%s)", strerror( ENOMEM ) );
                         i_field = -1;
                     }
                     else

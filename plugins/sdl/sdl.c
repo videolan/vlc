@@ -99,7 +99,7 @@ plugin_info_t * GetConfig( void )
 #else
     p_info->yuv_GetPlugin = NULL;
 #endif
-	    
+  
     
     /* if the SDL libraries are there, assume we can enter the
      * initialization part at least, even if we fail afterwards */

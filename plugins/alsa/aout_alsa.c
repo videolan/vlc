@@ -63,7 +63,7 @@ typedef struct alsa_card_s
 
 typedef struct aout_sys_s
 {
-	snd_pcm_t         * p_alsa_handle;
+    snd_pcm_t         * p_alsa_handle;
     alsa_device_t       s_alsa_device;
     alsa_card_t         s_alsa_card;
     snd_pcm_channel_params_t s_alsa_channel_params;

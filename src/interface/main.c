@@ -392,14 +392,15 @@ void main_PutPszVariable( char *psz_name, char *psz_value )
     psz_env = malloc( strlen(psz_name) + strlen(psz_value) + 2 );
     if( psz_env == NULL )
     {
-        intf_ErrMsg( "error: %s", strerror(ENOMEM) );
+        intf_ErrMsg( "intf error: cannot create psz_env (%s)",
+                     strerror(ENOMEM) );
     }
     else
     {
         sprintf( psz_env, "%s=%s", psz_name, psz_value );
         if( putenv( psz_env ) )
         {
-            intf_ErrMsg( "error: %s", strerror(errno) );
+            intf_ErrMsg( "intf error: cannot putenv (%s)", strerror(errno) );
         }
     }
 }
@@ -437,9 +438,6 @@ static void SetDefaultConfiguration( void )
     p_main->b_audio  = 1;
     p_main->b_video  = 1;
     p_main->b_vlans  = 0;
-
-    /* This is |_|lt1m4t3 |<l|_|d63 */
-    main_PutIntVariable( INPUT_DVD_SUBTITLE_VAR, -1 );
 }
 
 /*****************************************************************************
@@ -757,7 +755,7 @@ static void FatalSignalHandler( int i_signal )
     signal( SIGQUIT, SIG_IGN );
 
     /* Acknowledge the signal received */
-    intf_ErrMsgImm("intf: signal %d received, exiting", i_signal );
+    intf_ErrMsgImm("intf error: signal %d received, exiting", i_signal );
 
     /* Try to terminate everything - this is done by requesting the end of the
      * interface thread */

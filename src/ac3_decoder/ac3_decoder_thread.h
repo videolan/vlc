@@ -2,7 +2,7 @@
  * ac3_decoder_thread.h : ac3 decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.h,v 1.2 2000/12/21 13:25:50 massiot Exp $
+ * $Id: ac3_decoder_thread.h,v 1.3 2001/01/05 14:45:47 sam Exp $
  *
  * Authors:
  * Michel Kaempf <maxx@via.ecp.fr>
@@ -37,7 +37,7 @@ typedef struct ac3dec_thread_s
      */
     decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
     data_packet_t *     p_data;
-    int             	sync_ptr;          /* sync ptr from ac3 magic header */
+    int                 sync_ptr;          /* sync ptr from ac3 magic header */
     adec_config_t *     p_config;
 
     /*

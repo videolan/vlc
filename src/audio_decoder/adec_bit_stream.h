@@ -24,8 +24,8 @@ static __inline__ u8 GetByte (adec_bit_stream_t * p_bit_stream)
 {
     /* Are there some bytes left in the current buffer ? */
     if (p_bit_stream->byte_stream.p_byte >= p_bit_stream->byte_stream.p_end) {
-	/* no, switch to next buffer */
-	adec_byte_stream_next (&p_bit_stream->byte_stream);
+        /* no, switch to next buffer */
+        adec_byte_stream_next (&p_bit_stream->byte_stream);
     }
 
     p_bit_stream->total_bytes_read++;
@@ -37,7 +37,7 @@ static __inline__ void NeedBits (adec_bit_stream_t * p_bit_stream, int i_bits)
 {
     while (p_bit_stream->i_available < i_bits) {
         p_bit_stream->buffer |=
-	    ((u32)GetByte (p_bit_stream)) << (24 - p_bit_stream->i_available);
+            ((u32)GetByte (p_bit_stream)) << (24 - p_bit_stream->i_available);
         p_bit_stream->i_available += 8;
     }
 }

@@ -26,9 +26,9 @@
 typedef struct audiodec_s audiodec_t;
 
 typedef struct adec_sync_info_s {
-    int sample_rate;	/* sample rate in Hz */
-    int frame_size;	/* frame size in bytes */
-    int bit_rate;	/* nominal bit rate in kbps */
+    int sample_rate;    /* sample rate in Hz */
+    int frame_size;     /* frame size in bytes */
+    int bit_rate;       /* nominal bit rate in kbps */
 } adec_sync_info_t;
 
 typedef struct adec_byte_stream_s {
@@ -72,13 +72,13 @@ struct audiodec_s {
      */
 
     /* The bit stream structure handles the PES stream at the bit level */
-    adec_bit_stream_t	bit_stream;
+    adec_bit_stream_t   bit_stream;
 
     /*
      * Decoder properties
      */
-    u32			header;
-    int			frame_size;
+    u32                 header;
+    int                 frame_size;
     adec_bank_t         bank_0;
     adec_bank_t         bank_1;
 };

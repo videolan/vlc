@@ -121,7 +121,7 @@ int intf_ExecCommand( char *psz_cmd )
     {
     case INTF_FATAL_ERROR:                                    /* fatal error */
         /* Print message and terminates the interface thread */
-        intf_ErrMsg( "fatal error in command `%s'", psz_argv[0] );
+        intf_ErrMsg( "intf error: fatal error in command `%s'", psz_argv[0] );
         p_main->p_intf->b_die = 1;
         break;
 
@@ -129,9 +129,8 @@ int intf_ExecCommand( char *psz_cmd )
         /* Print message, flush messages queue and exit. Note that this
          * error should be very rare since it does not even try to cancel
          * other threads... */
-        intf_ErrMsg( "critical error in command `%s', "
-                     "please report this error !", psz_argv[0] );
-        intf_FlushMsg();
+        intf_ErrMsgImm( "intf error: critical error in command `%s', "
+                        "please report this error !", psz_argv[0] );
         exit( INTF_CRITICAL_ERROR );
         break;
 
@@ -203,7 +202,7 @@ int intf_ExecScript( char *psz_filename )
     }
     if( !feof( p_file ) )
     {
-        intf_ErrMsg("error: %s: %s", psz_vlcrc, strerror(errno));
+        intf_ErrMsg( "intf error: %s: %s", psz_vlcrc, strerror(errno));
         return( -1 );
     }
 
@@ -500,7 +499,8 @@ static int ConvertArgument( intf_arg_t *p_arg, int i_flags, char *psz_str )
 #ifdef DEBUG
     else                                    /* error: missing type specifier */
     {
-        intf_ErrMsg("error: missing type specifier for `%s' (0x%x)", psz_str, i_flags);
+        intf_ErrMsg( "intf error: missing type specifier for `%s' (0x%x)",
+                     psz_str, i_flags );
         return( 1 );
     }
 #endif

@@ -26,9 +26,9 @@
 typedef struct ac3dec_s ac3dec_t;
 
 typedef struct ac3_sync_info_s {
-    int sample_rate;	/* sample rate in Hz */
-    int frame_size;	/* frame size in bytes */
-    int bit_rate;	/* nominal bit rate in kbps */
+    int sample_rate;    /* sample rate in Hz */
+    int frame_size;     /* frame size in bytes */
+    int bit_rate;       /* nominal bit rate in kbps */
 } ac3_sync_info_t;
 
 typedef struct ac3_byte_stream_s {
@@ -335,40 +335,44 @@ typedef struct audblk_s {
  * approximate a 1/6 octave scale.
  */
 
-typedef struct stream_coeffs_s {
+typedef struct stream_coeffs_s
+{
     float fbw[5][256];
     float lfe[256];
 } stream_coeffs_t;
 
-typedef struct stream_samples_s {
+typedef struct stream_samples_s
+{
     float channel[6][256];
 } stream_samples_t;
 
-typedef struct ac3_bit_stream_s {
+typedef struct ac3_bit_stream_s
+{
     u32 buffer;
     int i_available;
     ac3_byte_stream_t byte_stream;
 
-    unsigned int total_bits_read;	/* temporary */
+    unsigned int total_bits_read; /* temporary */
 } ac3_bit_stream_t;
 
-struct ac3dec_s {
+struct ac3dec_s
+{
     /*
      * Input properties
      */
 
     /* The bit stream structure handles the PES stream at the bit level */
-    ac3_bit_stream_t	bit_stream;
+    ac3_bit_stream_t    bit_stream;
 
     /*
      * Decoder properties
      */
-    syncinfo_t		syncinfo;
-    bsi_t		bsi;
-    audblk_t		audblk;
+    syncinfo_t          syncinfo;
+    bsi_t               bsi;
+    audblk_t            audblk;
 
-    stream_coeffs_t	coeffs;
-    stream_samples_t	samples;
+    stream_coeffs_t     coeffs;
+    stream_samples_t    samples;
 };
 
 /**** ac3 decoder inline functions ****/

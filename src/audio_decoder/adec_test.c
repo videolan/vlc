@@ -51,7 +51,9 @@ int main (void)
 
     memset (&decoder, 0, sizeof (decoder));
     if (adec_init (&decoder))
-	return 1;
+    {
+        return 1;
+    }
 
     stream = adec_byte_stream (&decoder);
     stream->p_byte = NULL;
@@ -60,17 +62,24 @@ int main (void)
 
     framenum = 0;
 
-    while (1) {
-	int i;
+    while (1)
+    {
+        int i;
 
-	if (adec_sync_frame (&decoder, &sync_info))
-	    return 1;
-	if (adec_decode_frame (&decoder, buffer))
-	    return 1;
+        if (adec_sync_frame (&decoder, &sync_info))
+        {
+            return 1;
+        }
+        if (adec_decode_frame (&decoder, buffer))
+        {
+            return 1;
+        }
 
 #if 1
-	for (i = 0; i < (2*1152); i++)
-	    fprintf ( stderr, "%04X\n",(u16)buffer[i] );
+        for (i = 0; i < (2*1152); i++)
+        {
+            fprintf ( stderr, "%04X\n",(u16)buffer[i] );
+        }
 #endif
     }
 
@@ -86,11 +95,14 @@ void adec_byte_stream_next (adec_byte_stream_t * p_byte_stream)
 
     fd = p_byte_stream->info;
     size = fread (buffer, 1, 1024, fd);
-    if (size) {
-	p_byte_stream->p_byte = buffer;
-	p_byte_stream->p_end = buffer + size;
-    } else {	/* end of stream, read dummy zeroes */
-	p_byte_stream->p_byte = &dummy;
-	p_byte_stream->p_end = &dummy + 1;
+    if (size)
+    {
+        p_byte_stream->p_byte = buffer;
+        p_byte_stream->p_end = buffer + size;
+    }
+    else
+    {   /* end of stream, read dummy zeroes */
+        p_byte_stream->p_byte = &dummy;
+        p_byte_stream->p_end = &dummy + 1;
     }
 }

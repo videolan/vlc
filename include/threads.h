@@ -212,7 +212,7 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
 
-    // check the arguments and whether it's already been initialized
+    /* check the arguments and whether it's already been initialized */
     if( p_mutex == NULL ) return B_BAD_VALUE;
     if( p_mutex->init == 9999 )
     {

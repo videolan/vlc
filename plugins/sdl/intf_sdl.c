@@ -28,7 +28,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SDL/SDL.h>	        		       /* for all the SDL stuff	     */
+#include <SDL/SDL.h>                                /* for all the SDL stuff */
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                          /* for input.h */
 
@@ -58,7 +58,7 @@ typedef struct intf_sys_s
 {
     /* SDL system information */
     SDL_Surface * p_display;
-    boolean_t b_Fullscreen;	
+    boolean_t b_Fullscreen;
 } intf_sys_t;
 
 typedef struct vout_sys_s
@@ -76,7 +76,7 @@ typedef struct vout_sys_s
 
 
 /* local prototype */
-void    intf_SDL_Keymap( intf_thread_t * p_intf );
+void intf_SDL_Keymap( intf_thread_t * p_intf );
 void intf_SDL_Resize( intf_thread_t * p_intf, int width, int height );
 void intf_SDL_Fullscreen(intf_thread_t * p_intf);
 void intf_SDL_YUVSwitch(intf_thread_t * p_intf);

@@ -21,16 +21,16 @@
  *****************************************************************************/
 
 /* Exponent strategy constants */
-#define EXP_REUSE	(0)
-#define EXP_D15		(1)
-#define EXP_D25		(2)
-#define EXP_D45		(3)
+#define EXP_REUSE       (0)
+#define EXP_D15         (1)
+#define EXP_D25         (2)
+#define EXP_D45         (3)
 
 /* Delta bit allocation constants */
-#define DELTA_BIT_REUSE		(0)
-#define DELTA_BIT_NEW		(1)
-#define DELTA_BIT_NONE		(2)
-#define DELTA_BIT_RESERVED	(3)
+#define DELTA_BIT_REUSE         (0)
+#define DELTA_BIT_NEW           (1)
+#define DELTA_BIT_NONE          (2)
+#define DELTA_BIT_RESERVED      (3)
 
 /* ac3_bit_allocate.c */
 void bit_allocate (ac3dec_t *);

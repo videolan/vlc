@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.64 2000/12/22 13:04:44 sam Exp $
+ * $Id: input.c,v 1.65 2001/01/05 14:45:47 sam Exp $
  *
  * Authors: 
  *
@@ -80,7 +80,8 @@ input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
     p_input = (input_thread_t *)malloc( sizeof(input_thread_t) );
     if( p_input == NULL )
     {
-        intf_ErrMsg("error: %s", strerror(errno));
+        intf_ErrMsg( "input error: can't allocate input thread (%s)",
+                     strerror(errno) );
         free( p_config );
         return( NULL );
     }
@@ -112,7 +113,8 @@ input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
     if( vlc_thread_create( &p_input->thread_id, "input", (void *) RunThread,
                            (void *) p_input ) )
     {
-        intf_ErrMsg("error: %s", strerror(errno) );
+        intf_ErrMsg( "input error: can't create input thread (%s)",
+                     strerror(errno) );
         free( p_input );
         free( p_config );
         return( NULL );
@@ -245,7 +247,7 @@ static void InitThread( input_thread_t * p_input )
     case INPUT_METHOD_VLAN_BCAST:                     /* vlan network method */
 /*        if( !p_main->b_vlans )
         {
-            intf_ErrMsg("error: vlans are not activated");
+            intf_ErrMsg("input error: vlans are not activated");
             free( p_input );
             return( NULL );
         } */ /* la-lala */
@@ -257,7 +259,8 @@ static void InitThread( input_thread_t * p_input )
         break;
 #ifdef DEBUG
     default:
-        intf_ErrMsg("Unknow input method");
+        intf_ErrMsg( "input error: unknow method 0x%.4x",
+                     p_input->p_config->i_method );
         free( p_input->p_config );
         p_input->b_error = 1;
         break;
@@ -344,63 +347,49 @@ static void FileOpen( input_thread_t * p_input )
 
 #define p_config    p_input->p_config
 
-    if( !strncmp( p_config->p_source, "-", 1 ) )
+    if( stat( p_config->p_source, &stat_info ) == (-1) )
     {
-        /* stdin */
-        p_input->i_handle = 0;
-        
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_input->stream.b_pace_control = 1;
+        intf_ErrMsg( "input error: cannot stat() file %s (%s)",
+                     p_config->p_source, strerror(errno));
+        p_input->b_error = 1;
+        return;
+    }
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    /* If we are here we can control the pace... */
+    p_input->stream.b_pace_control = 1;
+
+    if( S_ISREG(stat_info.st_mode) || S_ISCHR(stat_info.st_mode)
+         || S_ISBLK(stat_info.st_mode) )
+    {
+        p_input->stream.b_seekable = 1;
+        p_input->stream.i_size = stat_info.st_size;
+    }
+    else if( S_ISFIFO(stat_info.st_mode) || S_ISSOCK(stat_info.st_mode) )
+    {
         p_input->stream.b_seekable = 0;
         p_input->stream.i_size = 0;
-        p_input->stream.i_tell = 0;
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
     else
     {
-        if( stat( p_config->p_source, &stat_info ) == (-1) )
-        {
-            intf_ErrMsg("Cannot stat() file %s (%s)", p_config->p_source,
-                        strerror(errno));
-            p_input->b_error = 1;
-            return;
-        }
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-
-        /* If we are here we can control the pace... */
-        p_input->stream.b_pace_control = 1;
-
-        if( S_ISREG(stat_info.st_mode) || S_ISCHR(stat_info.st_mode)
-             || S_ISBLK(stat_info.st_mode) )
-        {
-            p_input->stream.b_seekable = 1;
-            p_input->stream.i_size = stat_info.st_size;
-        }
-        else if( S_ISFIFO(stat_info.st_mode) || S_ISSOCK(stat_info.st_mode) )
-        {
-            p_input->stream.b_seekable = 0;
-            p_input->stream.i_size = 0;
-        }
-        else
-        {
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-            intf_ErrMsg("Unknown file type");
-            p_input->b_error = 1;
-            return;
-        }
-
-        p_input->stream.i_tell = 0;
         vlc_mutex_unlock( &p_input->stream.stream_lock );
+        intf_ErrMsg( "input error: unknown file type for %s",
+                     p_config->p_source );
+        p_input->b_error = 1;
+        return;
+    }
 
-        intf_Msg( "Opening file %s", p_config->p_source );
-        if( (p_input->i_handle = open( p_config->p_source,
-                                       /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
-        {
-            intf_ErrMsg("Cannot open file (%s)", strerror(errno));
-            p_input->b_error = 1;
-            return;
-        }
+    p_input->stream.i_tell = 0;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    intf_Msg( "Opening file %s", p_config->p_source );
+    if( (p_input->i_handle = open( p_config->p_source,
+                                   /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
+    {
+        intf_ErrMsg( "input error: cannot open file %s", strerror(errno) );
+        p_input->b_error = 1;
+        return;
     }
 
 #undef p_config
