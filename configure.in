@@ -108,7 +108,7 @@ AC_CHECK_FUNCS(swab)
 AC_CHECK_FUNCS([memalign valloc])
 
 AC_CHECK_FUNCS(sigrelse)
-AC_CHECK_FUNCS(getpwuid_r getpwuid)
+AC_CHECK_FUNCS(getpwuid)
 
 dnl Check for getopt
 NEED_GETOPT=0

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.165 2002/03/19 00:30:44 sam Exp $
+ * $Id: main.c,v 1.166 2002/03/21 07:11:57 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -401,8 +401,6 @@ vout_bank_t   *p_vout_bank;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  GetConfigurationFromCmdLine ( int *pi_argc, char *ppsz_argv[],
-                                          boolean_t b_ignore_errors );
 static int  GetFilenames                ( int i_argc, char *ppsz_argv[] );
 static void Usage                       ( const char *psz_module_name );
 static void ListModules                 ( void );
@@ -529,7 +527,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_module_bank->first = &help_module;
     /* end hack */
 
-    if( GetConfigurationFromCmdLine( &i_argc, ppsz_argv, 1 ) )
+    if( config_LoadCmdLine( &i_argc, ppsz_argv, 1 ) )
     {
         intf_MsgDestroy();
         return( errno );
@@ -559,7 +557,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 
     /*
      * Load the builtins and plugins into the module_bank.
-     * We have to do it before GetConfiguration() because this also gets the
+     * We have to do it before config_Load*() because this also gets the
      * list of configuration options exported by each plugin and loads their
      * default values.
      */
@@ -604,13 +602,21 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
      * Override default configuration with config file settings
      */
     vlc_mutex_init( &p_main->config_lock );
+    p_main->psz_homedir = config_GetHomeDir();
     config_LoadConfigFile( NULL );
 
     /*
      * Override configuration with command line settings
      */
-    if( GetConfigurationFromCmdLine( &i_argc, ppsz_argv, 0 ) )
+    if( config_LoadCmdLine( &i_argc, ppsz_argv, 0 ) )
     {
+#ifdef WIN32
+        ShowConsole();
+        /* Pause the console because it's destroyed when we exit */
+        intf_Msg( "The command line options couldn't be loaded, check that "
+                  "they are valid.\nPress the RETURN key to continue..." );
+        getchar();
+#endif
         intf_MsgDestroy();
         return( errno );
     }
@@ -798,188 +804,6 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 
 
 /* following functions are local */
-
-/*****************************************************************************
- * GetConfigurationFromCmdLine: parse command line
- *****************************************************************************
- * Parse command line for configuration. If the inline help is requested, the
- * function Usage() is called and the function returns -1 (causing main() to
- * exit).
- * Now that the module_bank has been initialized, we can dynamically
- * generate the longopts structure used by getops. We have to do it this way
- * because we don't know (and don't want to know) in advance the configuration
- * options used (ie. exported) by each module.
- *****************************************************************************/
-static int GetConfigurationFromCmdLine( int *pi_argc, char *ppsz_argv[],
-                                        boolean_t b_ignore_errors )
-{
-    int i_cmd, i, i_index, i_longopts_size;
-    module_t *p_module;
-    struct option *p_longopts;
-
-    /* Short options */
-    const char *psz_shortopts = "hHvlp:";
-
-    /* Set default configuration and copy arguments */
-    p_main->i_argc    = *pi_argc;
-    p_main->ppsz_argv = ppsz_argv;
-
-    p_main->p_channel = NULL;
-
-#ifdef SYS_DARWIN
-    /* When vlc.app is run by double clicking in Mac OS X, the 2nd arg
-     * is the PSN - process serial number (a unique PID-ish thingie)
-     * still ok for real Darwin & when run from command line */
-    if ( (*pi_argc > 1) && (strncmp( ppsz_argv[ 1 ] , "-psn" , 4 ) == 0) )
-                                        /* for example -psn_0_9306113 */
-    {
-        /* GDMF!... I can't do this or else the MacOSX window server will
-         * not pick up the PSN and not register the app and we crash...
-         * hence the following kludge otherwise we'll get confused w/ argv[1]
-         * being an input file name */
-#if 0
-        ppsz_argv[ 1 ] = NULL;
-#endif
-        *pi_argc = *pi_argc - 1;
-        pi_argc--;
-        return( 0 );
-    }
-#endif
-
-
-    /*
-     * Generate the longopts structure used by getopt_long
-     */
-    i_longopts_size = 0;
-    for( p_module = p_module_bank->first;
-         p_module != NULL ;
-         p_module = p_module->next )
-    {
-        /* count the number of exported configuration options (to allocate
-         * longopts). */
-        i_longopts_size += p_module->i_config_items;
-    }
-
-    p_longopts = (struct option *)malloc( sizeof(struct option)
-                                          * (i_longopts_size + 1) );
-    if( p_longopts == NULL )
-    {
-        intf_ErrMsg( "GetConfigurationFromCmdLine error: "
-                     "can't allocate p_longopts" );
-        return( -1 );
-    }
-
-    /* Fill the longopts structure */
-    i_index = 0;
-    for( p_module = p_module_bank->first ;
-         p_module != NULL ;
-         p_module = p_module->next )
-    {
-        for( i = 0; i < p_module->i_config_lines; i++ )
-        {
-            if( p_module->p_config[i].i_type & MODULE_CONFIG_HINT )
-                /* ignore hints */
-                continue;
-            p_longopts[i_index].name = p_module->p_config[i].psz_name;
-            p_longopts[i_index].has_arg =
-                (p_module->p_config[i].i_type == MODULE_CONFIG_ITEM_BOOL)?
-                                               no_argument : required_argument;
-            p_longopts[i_index].flag = 0;
-            p_longopts[i_index].val = 0;
-            i_index++;
-        }
-    }
-    /* Close the longopts structure */
-    memset( &p_longopts[i_index], 0, sizeof(struct option) );
-
-
-    /*
-     * Parse the command line options
-     */
-    opterr = 0;
-    optind = 1;
-    while( ( i_cmd = getopt_long( *pi_argc, ppsz_argv, psz_shortopts,
-                                  p_longopts, &i_index ) ) != EOF )
-    {
-
-        if( i_cmd == 0 )
-        {
-            /* A long option has been recognized */
-
-            module_config_t *p_conf;
-
-            /* Store the configuration option */
-            p_conf = config_FindConfig( p_longopts[i_index].name );
-
-            switch( p_conf->i_type )
-            {
-            case MODULE_CONFIG_ITEM_STRING:
-            case MODULE_CONFIG_ITEM_FILE:
-            case MODULE_CONFIG_ITEM_PLUGIN:
-                config_PutPszVariable( p_longopts[i_index].name, optarg );
-                break;
-            case MODULE_CONFIG_ITEM_INTEGER:
-                config_PutIntVariable( p_longopts[i_index].name, atoi(optarg));
-                break;
-            case MODULE_CONFIG_ITEM_BOOL:
-                config_PutIntVariable( p_longopts[i_index].name, 1 );
-                break;
-            }
-
-            continue;
-        }
-
-        /* short options handled here for now */
-        switch( i_cmd )
-        {
-
-        /* General/common options */
-        case 'h':                                              /* -h, --help */
-            config_PutIntVariable( "help", 1 );
-            break;
-        case 'H':                                          /* -H, --longhelp */
-            config_PutIntVariable( "longhelp", 1 );
-            break;
-        case 'l':                                              /* -l, --list */
-            config_PutIntVariable( "list", 1 );
-            break;
-        case 'p':                                            /* -p, --plugin */
-            config_PutPszVariable( "plugin", optarg );
-            break;
-        case 'v':                                           /* -v, --verbose */
-            p_main->i_warning_level++;
-            break;
-
-        /* Internal error: unknown option */
-        case '?':
-        default:
-
-            if( !b_ignore_errors )
-            {
-                intf_ErrMsg( "intf error: unknown option `%s'",
-                             ppsz_argv[optind-1] );
-                intf_Msg( "Try `%s --help' for more information.\n",
-                          p_main->psz_arg0 );
-
-#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-                intf_Msg( "\nPress the RETURN key to continue..." );
-                getchar();
-#endif
-                free( p_longopts );
-                return( EINVAL );
-            }
-        }
-
-    }
-
-    if( p_main->i_warning_level < 0 )
-    {
-        p_main->i_warning_level = 0;
-    }
-
-    free( p_longopts );
-    return( 0 );
-}
 
 /*****************************************************************************
  * GetFilenames: parse command line options which are not flags
@@ -1170,11 +994,13 @@ static void Version( void )
 #ifdef WIN32
     ShowConsole();
 #endif
+
     intf_Msg( VERSION_MESSAGE
-        "This program comes with NO WARRANTY, to the extent permitted by law.\n"
-        "You may redistribute it under the terms of the GNU General Public License;\n"
-        "see the file named COPYING for details.\n"
+        "This program comes with NO WARRANTY, to the extent permitted by "
+        "law.\nYou may redistribute it under the terms of the GNU General "
+        "Public License;\nsee the file named COPYING for details.\n"
         "Written by the VideoLAN team at Ecole Centrale, Paris." );
+
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
         intf_Msg( "\nPress the RETURN key to continue..." );
         getchar();

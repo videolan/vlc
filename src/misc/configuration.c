@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.7 2002/03/19 14:00:50 sam Exp $
+ * $Id: configuration.c,v 1.8 2002/03/21 07:11:57 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -28,17 +28,20 @@
 
 #include <videolan/vlc.h>
 
-#if defined(HAVE_GETPWUID) || defined(HAVE_GETPWUID_R)
+#ifdef HAVE_GETOPT_LONG
+#   ifdef HAVE_GETOPT_H
+#       include <getopt.h>                                       /* getopt() */
+#   endif
+#else
+#   include "GNUgetopt/getopt.h"
+#endif
+
+#if defined(HAVE_GETPWUID)
 #include <pwd.h>                                               /* getpwuid() */
 #endif
 
 #include <sys/stat.h>
 #include <sys/types.h>
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static char *GetHomeDir( void );
 
 /*****************************************************************************
  * config_GetIntVariable: get the value of an int variable
@@ -280,10 +283,10 @@ int config_LoadConfigFile( const char *psz_module_name )
     /* Acquire config file lock */
     vlc_mutex_lock( &p_main->config_lock );
 
-    psz_homedir = GetHomeDir();
+    psz_homedir = p_main->psz_homedir;
     if( !psz_homedir )
     {
-        intf_ErrMsg( "config error: GetHomeDir failed" );
+        intf_ErrMsg( "config error: p_main->psz_homedir is null" );
         vlc_mutex_unlock( &p_main->config_lock );
         return -1;
     }
@@ -292,12 +295,10 @@ int config_LoadConfigFile( const char *psz_module_name )
     if( !psz_filename )
     {
         intf_ErrMsg( "config error: couldn't malloc psz_filename" );
-        free( psz_homedir );
         vlc_mutex_unlock( &p_main->config_lock );
         return -1;
     }
     sprintf( psz_filename, "%s/" CONFIG_DIR "/" CONFIG_FILE, psz_homedir );
-    free( psz_homedir );
 
     intf_WarnMsg( 5, "config: opening config file %s", psz_filename );
 
@@ -444,10 +445,10 @@ int config_SaveConfigFile( const char *psz_module_name )
     /* Acquire config file lock */
     vlc_mutex_lock( &p_main->config_lock );
 
-    psz_homedir = GetHomeDir();
+    psz_homedir = p_main->psz_homedir;
     if( !psz_homedir )
     {
-        intf_ErrMsg( "config error: GetHomeDir failed" );
+        intf_ErrMsg( "config error: p_main->psz_homedir is null" );
         vlc_mutex_unlock( &p_main->config_lock );
         return -1;
     }
@@ -456,12 +457,10 @@ int config_SaveConfigFile( const char *psz_module_name )
     if( !psz_filename )
     {
         intf_ErrMsg( "config error: couldn't malloc psz_filename" );
-        free( psz_homedir );
         vlc_mutex_unlock( &p_main->config_lock );
         return -1;
     }
     sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
-    free( psz_homedir );
 #ifndef WIN32
     mkdir( psz_filename, 0755 );
 #else
@@ -628,51 +627,219 @@ int config_SaveConfigFile( const char *psz_module_name )
     return 0;
 }
 
-/* Following functions are local. */
+/*****************************************************************************
+ * config_LoadCmdLine: parse command line
+ *****************************************************************************
+ * Parse command line for configuration options.
+ * Now that the module_bank has been initialized, we can dynamically
+ * generate the longopts structure used by getops. We have to do it this way
+ * because we don't know (and don't want to know) in advance the configuration
+ * options used (ie. exported) by each module.
+ *****************************************************************************/
+int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
+			boolean_t b_ignore_errors )
+{
+    int i_cmd, i, i_index, i_longopts_size;
+    module_t *p_module;
+    struct option *p_longopts;
+
+    /* Short options */
+    const char *psz_shortopts = "hHvlp:";
+
+    /* Set default configuration and copy arguments */
+    p_main->i_argc    = *pi_argc;
+    p_main->ppsz_argv = ppsz_argv;
+
+    p_main->p_channel = NULL;
+
+#ifdef SYS_DARWIN
+    /* When vlc.app is run by double clicking in Mac OS X, the 2nd arg
+     * is the PSN - process serial number (a unique PID-ish thingie)
+     * still ok for real Darwin & when run from command line */
+    if ( (*pi_argc > 1) && (strncmp( ppsz_argv[ 1 ] , "-psn" , 4 ) == 0) )
+                                        /* for example -psn_0_9306113 */
+    {
+        /* GDMF!... I can't do this or else the MacOSX window server will
+         * not pick up the PSN and not register the app and we crash...
+         * hence the following kludge otherwise we'll get confused w/ argv[1]
+         * being an input file name */
+#if 0
+        ppsz_argv[ 1 ] = NULL;
+#endif
+        *pi_argc = *pi_argc - 1;
+        pi_argc--;
+        return( 0 );
+    }
+#endif
+
+
+    /*
+     * Generate the longopts structure used by getopt_long
+     */
+    i_longopts_size = 0;
+    for( p_module = p_module_bank->first;
+         p_module != NULL ;
+         p_module = p_module->next )
+    {
+        /* count the number of exported configuration options (to allocate
+         * longopts). */
+        i_longopts_size += p_module->i_config_items;
+    }
+
+    p_longopts = (struct option *)malloc( sizeof(struct option)
+                                          * (i_longopts_size + 1) );
+    if( p_longopts == NULL )
+    {
+        intf_ErrMsg( "config error: couldn't allocate p_longopts" );
+        return( -1 );
+    }
+
+    /* Fill the longopts structure */
+    i_index = 0;
+    for( p_module = p_module_bank->first ;
+         p_module != NULL ;
+         p_module = p_module->next )
+    {
+        for( i = 0; i < p_module->i_config_lines; i++ )
+        {
+            if( p_module->p_config[i].i_type & MODULE_CONFIG_HINT )
+                /* ignore hints */
+                continue;
+            p_longopts[i_index].name = p_module->p_config[i].psz_name;
+            p_longopts[i_index].has_arg =
+                (p_module->p_config[i].i_type == MODULE_CONFIG_ITEM_BOOL)?
+                                               no_argument : required_argument;
+            p_longopts[i_index].flag = 0;
+            p_longopts[i_index].val = 0;
+            i_index++;
+        }
+    }
+    /* Close the longopts structure */
+    memset( &p_longopts[i_index], 0, sizeof(struct option) );
+
+
+    /*
+     * Parse the command line options
+     */
+    opterr = 0;
+    optind = 1;
+    while( ( i_cmd = getopt_long( *pi_argc, ppsz_argv, psz_shortopts,
+                                  p_longopts, &i_index ) ) != EOF )
+    {
+
+        if( i_cmd == 0 )
+        {
+            /* A long option has been recognized */
+
+            module_config_t *p_conf;
+
+            /* Store the configuration option */
+            p_conf = config_FindConfig( p_longopts[i_index].name );
+
+            switch( p_conf->i_type )
+            {
+            case MODULE_CONFIG_ITEM_STRING:
+            case MODULE_CONFIG_ITEM_FILE:
+            case MODULE_CONFIG_ITEM_PLUGIN:
+                config_PutPszVariable( p_longopts[i_index].name, optarg );
+                break;
+            case MODULE_CONFIG_ITEM_INTEGER:
+                config_PutIntVariable( p_longopts[i_index].name, atoi(optarg));
+                break;
+            case MODULE_CONFIG_ITEM_BOOL:
+                config_PutIntVariable( p_longopts[i_index].name, 1 );
+                break;
+            }
+
+            continue;
+        }
+
+        /* short options handled here for now */
+        switch( i_cmd )
+        {
+
+        /* General/common options */
+        case 'h':                                              /* -h, --help */
+            config_PutIntVariable( "help", 1 );
+            break;
+        case 'H':                                          /* -H, --longhelp */
+            config_PutIntVariable( "longhelp", 1 );
+            break;
+        case 'l':                                              /* -l, --list */
+            config_PutIntVariable( "list", 1 );
+            break;
+        case 'p':                                            /* -p, --plugin */
+            config_PutPszVariable( "plugin", optarg );
+            break;
+        case 'v':                                           /* -v, --verbose */
+            p_main->i_warning_level++;
+            break;
+
+        /* Internal error: unknown option */
+        case '?':
+        default:
+
+            if( !b_ignore_errors )
+            {
+                intf_ErrMsg( "config error: unknown option `%s'",
+                             ppsz_argv[optind-1] );
+                intf_Msg( "Try `%s --help' for more information.\n",
+                          p_main->psz_arg0 );
+
+                free( p_longopts );
+                return( -1 );
+            }
+        }
+
+    }
+
+    if( p_main->i_warning_level < 0 )
+    {
+        p_main->i_warning_level = 0;
+    }
+
+    free( p_longopts );
+    return( 0 );
+}
 
 /*****************************************************************************
- * GetHomeDir: find the user's home directory.
+ * config_GetHomeDir: find the user's home directory.
  *****************************************************************************
  * This function will try by different ways to find the user's home path.
+ * Note that this function is not reentrant, it should be called only once
+ * at the beginning of main where the result will be stored for later use.
  *****************************************************************************/
-static char *GetHomeDir( void )
+char *config_GetHomeDir( void )
 {
     char *p_tmp, *p_homedir = NULL;
 
-#if defined(HAVE_GETPWUID_R) || defined(HAVE_GETPWUID)
+#if defined(HAVE_GETPWUID)
     struct passwd *p_pw = NULL;
 #endif
 
 #if defined(HAVE_GETPWUID)
     if( ( p_pw = getpwuid( getuid() ) ) == NULL )
-#elif defined(HAVE_GETPWUID_R)
-    int ret;
-    struct passwd pwd;
-    char *p_buffer = NULL;
-    int bufsize = 128;
-
-    p_buffer = (char *)malloc( bufsize );
-
-    if( ( ret = getpwuid_r( getuid(), &pwd, p_buffer, bufsize, &p_pw ) ) < 0 )
 #endif
     {
         if( ( p_tmp = getenv( "HOME" ) ) == NULL )
         {
+            if( ( p_tmp = getenv( "TMP" ) ) == NULL )
+            {
+                p_homedir = strdup( "/tmp" );
+	    }
+            else p_homedir = strdup( p_tmp );
+
             intf_ErrMsg( "config error: unable to get home directory, "
-                         "using /tmp instead" );
-            p_homedir = strdup( "/tmp" );
+                         "using %s instead", p_homedir );
+
         }
         else p_homedir = strdup( p_tmp );
     }
-#if defined(HAVE_GETPWUID_R) || defined(HAVE_GETPWUID)
+#if defined(HAVE_GETPWUID)
     else
     {
-        if( p_pw ) p_homedir = strdup( p_pw->pw_dir );
+        p_homedir = strdup( p_pw->pw_dir );
     }
-#endif
-
-#if !defined(HAVE_GETPWUID) && defined(HAVE_GETPWUID_R)
-    if( p_buffer ) free( p_buffer );
 #endif
 
     return p_homedir;

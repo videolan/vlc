@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: main.h,v 1.32 2002/03/16 01:40:58 gbazin Exp $
+ * $Id: main.h,v 1.33 2002/03/21 07:11:57 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -39,6 +39,7 @@ typedef struct main_s
     int                    i_argc;           /* command line arguments count */
     char **                ppsz_argv;              /* command line arguments */
     char *                 psz_arg0;         /* program name (whithout path) */
+    char *                 psz_homedir;             /* user's home directory */
 
     u32                    i_cpu_capabilities;             /* CPU extensions */
     int                    i_warning_level;        /* warning messages level */
