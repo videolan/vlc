@@ -28,11 +28,6 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
-#include <mach/mach_init.h>
-#include <mach/task_policy.h>
-#include <mach/thread_act.h>
-#include <mach/thread_policy.h>
-#include <sys/sysctl.h>
 
 #include <videolan/vlc.h>
 

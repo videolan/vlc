@@ -2,7 +2,7 @@
  * aout_macosx.c : CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.m,v 1.3 2002/05/19 23:51:37 massiot Exp $
+ * $Id: aout_macosx.m,v 1.4 2002/05/20 10:44:18 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -26,11 +26,6 @@
  * Preamble
  *****************************************************************************/
 #include <string.h>
-#include <mach/mach_init.h>
-#include <mach/task_policy.h>
-#include <mach/thread_act.h>
-#include <mach/thread_policy.h>
-#include <sys/sysctl.h>
 
 #include <videolan/vlc.h>
 
