@@ -2,7 +2,7 @@
  * caca.c: Color ASCII Art video output plugin using libcaca
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: caca.c,v 1.6 2004/01/08 19:22:10 sam Exp $
+ * $Id: caca.c,v 1.7 2004/01/12 16:16:41 gbazin Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *
@@ -75,6 +75,62 @@ struct vout_sys_t
 static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
+#if defined( WIN32 ) && !defined( UNDER_CE )
+    if( AllocConsole() )
+    {
+        CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
+        SMALL_RECT rect;
+        COORD coord;
+
+        HANDLE hstdout =
+            CreateConsoleScreenBuffer( GENERIC_READ | GENERIC_WRITE,
+                                       FILE_SHARE_READ | FILE_SHARE_WRITE,
+                                       NULL, CONSOLE_TEXTMODE_BUFFER, NULL );
+        if( !hstdout || hstdout == INVALID_HANDLE_VALUE )
+        {
+            msg_Err( p_vout, "cannot create screen buffer" );
+            FreeConsole();
+            return VLC_EGENERIC;
+        }
+
+        if( !SetConsoleActiveScreenBuffer( hstdout) ) 
+        {
+            msg_Err( p_vout, "cannot set active screen buffer" );
+            FreeConsole();
+            return VLC_EGENERIC;
+        }
+
+        coord = GetLargestConsoleWindowSize( hstdout );
+        msg_Dbg( p_vout, "SetConsoleWindowInfo: %ix%i", coord.X, coord.Y ); 
+
+        /* Force size for now */
+        coord.X = 100;
+        coord.Y = 40;
+
+        if( !SetConsoleScreenBufferSize( hstdout, coord ) )
+            msg_Warn( p_vout, "SetConsoleScreenBufferSize %i %i",
+                      coord.X, coord.Y ); 
+
+        /* Get the current screen buffer size and window position. */
+        if( GetConsoleScreenBufferInfo( hstdout, &csbiInfo ) )
+        {
+            rect.Top = 0; rect.Left = 0;
+            rect.Right = csbiInfo.dwMaximumWindowSize.X - 1;
+            rect.Bottom = csbiInfo.dwMaximumWindowSize.Y - 1;
+            if( !SetConsoleWindowInfo( hstdout, TRUE, &rect ) )
+                msg_Dbg( p_vout, "SetConsoleWindowInfo failed: %ix%i",
+                         rect.Right, rect.Bottom );
+        }
+    }
+    else
+    {
+        msg_Err( p_vout, "cannot create console" );
+        return VLC_EGENERIC;
+    }
+
+    SetConsoleTitle( VOUT_TITLE " - Colour AsCii Art (caca)" );
+#endif
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -185,6 +241,11 @@ static void Destroy( vlc_object_t *p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
     caca_end();
+
+#if defined( WIN32 ) && !defined( UNDER_CE )
+    FreeConsole();
+#endif
+
     free( p_vout->p_sys );
 }
 
