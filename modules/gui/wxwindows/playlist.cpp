@@ -331,7 +331,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     for( int i = 0; i< WXSIZEOF( icons ) ; i++ )
     {
-       p_images->Add( wxBitmap( wxBitmap(icons[i]).ConvertToImage().Rescale(16,16) ) );
+//       p_images->Add( wxBitmap( wxBitmap(icons[i]).ConvertToImage().Rescale(16,16) ) );
+         p_images->Add( wxIcon( icons[i] ));
     }
 
     treectrl->AssignImageList( p_images );
