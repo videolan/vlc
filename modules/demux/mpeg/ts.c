@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.10 2002/12/06 16:34:07 sam Exp $
+ * $Id: ts.c,v 1.11 2002/12/18 16:27:56 fenrir Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -684,6 +684,18 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                             p_new_es->i_stream_id = 0xBD;
                             p_new_es->i_cat = SPU_ES;
                             break;
+
+                        case 0x10:
+                            p_new_es->i_fourcc = VLC_FOURCC('m','p','4','v');
+                            p_new_es->i_stream_id = 0xfa;   // ???
+                            p_new_es->i_cat = VIDEO_ES;
+                            break;
+                        case 0x11:
+                            p_new_es->i_fourcc = VLC_FOURCC('m','p','4','a');
+                            p_new_es->i_stream_id = 0xfa;   // ???
+                            p_new_es->i_cat = AUDIO_ES;
+                            break;
+
                         default :
                             p_new_es->i_fourcc = 0;
                             p_new_es->i_cat = UNKNOWN_ES;
@@ -950,6 +962,12 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                     p_new_es->i_cat = AUDIO_ES;
                     p_new_es->i_stream_id = 0xBD;
                     break;
+
+                case 0xfa:
+                    p_new_es->i_fourcc = VLC_FOURCC('m','p','4','v');
+                    p_new_es->i_cat = VIDEO_ES;
+                    break;
+
                 default:
                     p_new_es->i_fourcc = 0;
                     p_new_es->i_cat = UNKNOWN_ES;
