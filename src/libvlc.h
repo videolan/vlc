@@ -892,11 +892,12 @@ vlc_module_begin();
 #ifndef SYS_DARWIN
     add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, VLC_TRUE );
 #endif
-
     add_bool( "video-on-top", 0, NULL, VIDEO_ON_TOP_TEXT,
               VIDEO_ON_TOP_LONGTEXT, VLC_FALSE );
     add_string( "aspect-ratio", "", NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_TRUE );
+    add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,
+                   SNAP_PATH_LONGTEXT, VLC_FALSE );
 
     set_subcategory( SUBCAT_VIDEO_VOUT );
     add_module( "vout", "video output", NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT,
@@ -906,8 +907,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     add_module_list_cat( "filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
                 FILTER_TEXT, FILTER_LONGTEXT, VLC_FALSE );
-    add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,
-                   SNAP_PATH_LONGTEXT, VLC_TRUE );
+
 #if 0
     add_string( "pixel-ratio", "1", NULL, PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT );
 #endif
