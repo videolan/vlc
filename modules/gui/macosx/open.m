@@ -486,16 +486,16 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
                 [NSString stringWithFormat: _NS("No %@s found"), o_type]] )
             o_device = @"";
         if ( b_menus )
-            o_mrl_string = [NSString stringWithFormat: @"dvdplay://%@",
+            o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
                             o_device]; 
         else
-            o_mrl_string = [NSString stringWithFormat: @"dvdold://%@@%i,%i",
+            o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i,%i",
                             o_device, i_title, i_chapter]; 
     }
     else /* VIDEO_TS folder */
     {
         if ( b_menus )
-            o_mrl_string = [NSString stringWithFormat: @"dvdplay://%@",
+            o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
                             o_videots]; 
         else
             o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i,%i",
