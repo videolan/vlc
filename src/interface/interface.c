@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.104 2003/06/24 13:33:49 sam Exp $
+ * $Id: interface.c,v 1.105 2003/06/26 12:19:59 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -39,7 +39,7 @@
 
 #include "vlc_interface.h"
 
-#include "video.h"
+#include "vlc_video.h"
 #include "video_output.h"
 
 /*****************************************************************************

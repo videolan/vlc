@@ -1,10 +1,10 @@
 /*****************************************************************************
- * video.h: common video definitions
+ * vlc_video.h: common video definitions
  * This header is required by all modules which have to handle pictures. It
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.63 2003/06/09 00:33:34 massiot Exp $
+ * $Id: vlc_video.h,v 1.1 2003/06/26 12:19:59 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *

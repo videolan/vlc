@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.226 2003/06/24 22:26:01 asmax Exp $
+ * $Id: video_output.c,v 1.227 2003/06/26 12:19:59 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -35,7 +35,7 @@
 #   include <sys/times.h>
 #endif
 
-#include "video.h"
+#include "vlc_video.h"
 #include "video_output.h"
 #include <vlc/input.h>                 /* for input_thread_t and i_pts_delay */
 

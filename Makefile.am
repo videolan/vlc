@@ -194,7 +194,6 @@ HEADERS_include = \
 	include/stream_output.h \
 	include/announce.h \
 	include/variables.h \
-	include/video.h \
 	include/video_output.h \
 	include/vlc_common.h \
 	include/vlc_config.h \
@@ -205,6 +204,7 @@ HEADERS_include = \
 	include/vlc_playlist.h \
 	include/vlc_threads.h \
 	include/vlc_threads_funcs.h \
+	include/vlc_video.h \
 	include/vout_synchro.h \
 	include/win32_specific.h \
 	include/osd.h \

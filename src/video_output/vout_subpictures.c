@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.19 2003/01/30 12:38:13 gbazin Exp $
+ * $Id: vout_subpictures.c,v 1.20 2003/06/26 12:19:59 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -31,7 +31,7 @@
 
 #include <vlc/vlc.h>
 
-#include "video.h"
+#include "vlc_video.h"
 #include "video_output.h"
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * vout.h: video output header for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vout.h,v 1.1 2002/06/01 12:31:58 sam Exp $
+ * $Id: vout.h,v 1.2 2003/06/26 12:19:59 sam Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ extern "C" {
 /*****************************************************************************
  * Required internal headers
  *****************************************************************************/
-#include "video.h"
+#include "vlc_video.h"
 #include "video_output.h"
 
 # ifdef __cplusplus

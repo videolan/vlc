@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.90 2003/06/24 13:33:49 sam Exp $
+ * $Id: libvlc.c,v 1.91 2003/06/26 12:19:59 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -73,7 +73,7 @@
 
 #include "audio_output.h"
 
-#include "video.h"
+#include "vlc_video.h"
 #include "video_output.h"
 
 #include "libvlc.h"

@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.40 2003/06/09 00:33:34 massiot Exp $
+ * $Id: vout_pictures.c,v 1.41 2003/06/26 12:19:59 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -31,7 +31,7 @@
 
 #include <vlc/vlc.h>
 
-#include "video.h"
+#include "vlc_video.h"
 #include "video_output.h"
 
 #include "vout_pictures.h"
