@@ -1,0 +1,1 @@
+SOURCES_rc = modules/control/rc/rc.c

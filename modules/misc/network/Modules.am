@@ -1,0 +1,2 @@
+SOURCES_ipv4 = modules/misc/network/ipv4.c
+SOURCES_ipv6 = modules/misc/network/ipv6.c

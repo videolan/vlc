@@ -1,0 +1,7 @@
+SOURCES_mp4 = \
+	modules/demux/mp4/mp4.c \
+	modules/demux/mp4/libmp4.c
+
+noinst_HEADERS += \
+	modules/demux/mp4/mp4.h \
+	modules/demux/mp4/libmp4.h

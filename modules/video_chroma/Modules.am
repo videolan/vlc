@@ -1,0 +1,23 @@
+SOURCES_i420_rgb = \
+	modules/video_chroma/i420_rgb.c \
+	modules/video_chroma/i420_rgb8.c \
+	modules/video_chroma/i420_rgb16.c
+SOURCES_i420_rgb_mmx = \
+	modules/video_chroma/i420_rgb.c \
+	modules/video_chroma/i420_rgb16.c
+
+SOURCES_i420_yuy2 = modules/video_chroma/i420_yuy2.c
+SOURCES_i420_yuy2_mmx = modules/video_chroma/i420_yuy2.c
+
+SOURCES_i422_yuy2 = modules/video_chroma/i422_yuy2.c
+SOURCES_i422_yuy2_mmx = modules/video_chroma/i422_yuy2.c
+
+SOURCES_i420_ymga = modules/video_chroma/i420_ymga.c
+SOURCES_i420_ymga_mmx = modules/video_chroma/i420_ymga.c
+
+noinst_HEADERS += \
+	modules/video_chroma/i420_rgb.h \
+	modules/video_chroma/i420_rgb_c.h \
+	modules/video_chroma/i420_rgb_mmx.h \
+	modules/video_chroma/i420_yuy2.h \
+	modules/video_chroma/i422_yuy2.h

@@ -1,0 +1,6 @@
+SOURCES_dvdread = \
+	modules/access/dvdread/dvdread.c \
+	modules/access/dvdread/input.c
+
+noinst_HEADERS += \
+	modules/access/dvdread/input.h

@@ -1,0 +1,3 @@
+SOURCES_null = modules/misc/null.c
+SOURCES_gtk_main = modules/misc/gtk_main.c
+SOURCES_gnome_main = modules/misc/gtk_main.c

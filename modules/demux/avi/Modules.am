@@ -1,0 +1,7 @@
+SOURCES_avi = \
+	modules/demux/avi/avi.c \
+	modules/demux/avi/libioRIFF.c
+
+noinst_HEADERS += \
+	modules/demux/avi/avi.h \
+	modules/demux/avi/libioRIFF.h

@@ -1,0 +1,8 @@
+SOURCES_directx = \
+	modules/video_output/directx/directx.c \
+	modules/video_output/directx/vout.c \
+	modules/video_output/directx/events.c \
+	modules/video_output/directx/aout.c
+
+noinst_HEADERS += \
+	modules/video_output/directx/vout.h

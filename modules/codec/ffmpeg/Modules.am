@@ -1,0 +1,4 @@
+SOURCES_ffmpeg = modules/codec/ffmpeg/ffmpeg.c
+
+noinst_HEADERS += modules/codec/ffmpeg/ffmpeg.h
+

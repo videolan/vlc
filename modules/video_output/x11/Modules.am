@@ -1,0 +1,9 @@
+SOURCES_x11 = \
+	modules/video_output/x11/x11.c \
+	modules/video_output/x11/xcommon.c
+SOURCES_xvideo = \
+	modules/video_output/x11/xvideo.c \
+	modules/video_output/x11/xcommon.c
+
+noinst_HEADERS += \
+	modules/video_output/x11/xcommon.h

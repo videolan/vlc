@@ -1,0 +1,10 @@
+SOURCES_dummy = \
+	modules/misc/dummy/dummy.c \
+	modules/misc/dummy/aout.c \
+	modules/misc/dummy/vout.c \
+	modules/misc/dummy/interface.c \
+	modules/misc/dummy/input.c \
+	modules/misc/dummy/decoder.c
+
+noinst_HEADERS += \
+	modules/misc/dummy/dummy.h

@@ -1,0 +1,42 @@
+COMMON_gtk = \
+	modules/gui/gtk/display.c \
+	modules/gui/gtk/open.c \
+	modules/gui/gtk/control.c \
+	modules/gui/gtk/menu.c \
+	modules/gui/gtk/playlist.c \
+	modules/gui/gtk/modules.c \
+	modules/gui/gtk/preferences.c \
+	modules/gui/gtk/gtk_callbacks.c
+
+SOURCES_gtk = \
+	modules/gui/gtk/gtk.c \
+	modules/gui/gtk/gtk_interface.c \
+	modules/gui/gtk/gtk_support.c \
+	$(COMMON_gtk)
+
+SOURCES_gnome = \
+	modules/gui/gtk/gnome.c \
+	modules/gui/gtk/gnome_interface.c \
+	modules/gui/gtk/gnome_support.c \
+	$(COMMON_gtk)
+
+noinst_HEADERS += \
+	modules/gui/gtk/common.h \
+	modules/gui/gtk/control.h \
+	modules/gui/gtk/gnome_callbacks.h \
+	modules/gui/gtk/gnome_interface.h \
+	modules/gui/gtk/gnome_support.h \
+	modules/gui/gtk/gtk_callbacks.h \
+	modules/gui/gtk/display.h \
+	modules/gui/gtk/menu.h \
+	modules/gui/gtk/modules.h \
+	modules/gui/gtk/open.h \
+	modules/gui/gtk/gtk_interface.h \
+	modules/gui/gtk/playlist.h \
+	modules/gui/gtk/preferences.h \
+	modules/gui/gtk/gtk_support.h
+
+EXTRA_DIST += \
+	modules/gui/gtk/gtk.glade \
+	modules/gui/gtk/gnome.glade \
+	modules/gui/gtk/gnome_callbacks.c

@@ -1,0 +1,3 @@
+SOURCES_cinepak = modules/codec/cinepak/cinepak.c
+
+noinst_HEADERS += modules/codec/cinepak/cinepak.h

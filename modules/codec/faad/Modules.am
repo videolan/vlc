@@ -1,0 +1,3 @@
+SOURCES_faad = modules/codec/faad/decoder.c
+
+noinst_HEADERS += modules/codec/faad/decoder.h

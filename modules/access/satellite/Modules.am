@@ -1,0 +1,7 @@
+SOURCES_satellite = \
+	modules/access/satellite/satellite.c \
+	modules/access/satellite/access.c \
+	modules/access/satellite/dvb.c
+
+noinst_HEADERS += \
+	modules/access/satellite/dvb.h

@@ -1,0 +1,7 @@
+SOURCES_alsa = modules/audio_output/alsa.c
+SOURCES_arts = modules/audio_output/arts.c
+SOURCES_esd = modules/audio_output/esd.c
+SOURCES_aout_file = modules/audio_output/file.c
+SOURCES_oss = modules/audio_output/oss.c
+SOURCES_aout_sdl = modules/audio_output/sdl.c
+SOURCES_waveout = modules/audio_output/waveout.c

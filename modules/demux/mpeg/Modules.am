@@ -1,0 +1,8 @@
+SOURCES_mpeg_system = modules/demux/mpeg/system.c
+SOURCES_es = modules/demux/mpeg/es.c
+SOURCES_ps = modules/demux/mpeg/ps.c
+SOURCES_ts = modules/demux/mpeg/ts.c
+SOURCES_ts_dvbpsi = modules/demux/mpeg/ts.c
+SOURCES_audio = modules/demux/mpeg/audio.c
+
+noinst_HEADERS += modules/demux/mpeg/system.h

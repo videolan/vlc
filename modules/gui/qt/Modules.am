@@ -1,0 +1,13 @@
+SOURCES_qt = \
+	modules/gui/qt/qt.cpp \
+	modules/gui/qt/intf.cpp
+
+nodist_SOURCES_qt = \
+	modules/gui/qt/intf.moc.cpp
+
+noinst_HEADERS += \
+	modules/gui/qt/intf.h
+
+modules/gui/qt/intf.moc.cpp: modules/gui/qt/intf.h
+	$(MOC) $< -o $@
+

@@ -1,0 +1,7 @@
+SOURCES_spudec = \
+	modules/codec/spudec/spudec.c \
+	modules/codec/spudec/parse.c \
+	modules/codec/spudec/render.c
+
+noinst_HEADERS += \
+	modules/codec/spudec/spudec.h

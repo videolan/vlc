@@ -1,0 +1,19 @@
+SOURCES_dvd = \
+	modules/access/dvd/dvd.c \
+	modules/access/dvd/access.c \
+	modules/access/dvd/demux.c \
+	modules/access/dvd/seek.c \
+	modules/access/dvd/es.c \
+	modules/access/dvd/ifo.c \
+	modules/access/dvd/udf.c \
+	modules/access/dvd/summary.c
+
+noinst_HEADERS += \
+	modules/access/dvd/dvdcss.h \
+	modules/access/dvd/es.h \
+	modules/access/dvd/dvd.h \
+	modules/access/dvd/ifo.h \
+	modules/access/dvd/seek.h \
+	modules/access/dvd/summary.h \
+	modules/access/dvd/udf.h
+

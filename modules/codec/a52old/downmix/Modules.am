@@ -1,0 +1,13 @@
+SOURCES_downmix = \
+	modules/codec/a52old/downmix/downmix.c \
+	modules/codec/a52old/downmix/downmix_c.c
+SOURCES_downmixsse = \
+	modules/codec/a52old/downmix/downmix.c \
+	modules/codec/a52old/downmix/downmix_sse.c
+SOURCES_downmix3dn = \
+	modules/codec/a52old/downmix/downmix.c \
+	modules/codec/a52old/downmix/downmix_3dn.c
+
+noinst_HEADERS += \
+	modules/codec/a52old/downmix/downmix_common.h
+

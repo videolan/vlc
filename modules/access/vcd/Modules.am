@@ -1,0 +1,7 @@
+SOURCES_vcd = \
+	modules/access/vcd/vcd.c \
+	modules/access/vcd/cdrom.c
+
+noinst_HEADERS += \
+	modules/access/vcd/vcd.h \
+	modules/access/vcd/cdrom.h

@@ -1,0 +1,3 @@
+SOURCES_trivial_mixer = modules/audio_mixer/trivial.c
+SOURCES_float32_mixer = modules/audio_mixer/float32.c
+SOURCES_spdif_mixer = modules/audio_mixer/spdif.c

@@ -1,0 +1,52 @@
+#
+# Borland C++ project
+# This module is only available as a plugin. Don't try to fiddle with it!
+#
+
+EXTRA_DIST += $(BORLAND_win32)
+
+# We have private rules! We do whatever we want! Don't mess with us!
+SOURCES_win32 = PRIVATE
+
+modules/gui/win32/libwin32_plugin$(LIBEXT): $(BORLAND_win32)
+	cd modules/gui/win32/ && \
+	rm -f win32.mak && \
+	$(BCBUILDER)/Bin/bpr2mak win32.bpr -s | sed -e 's@^LIBPATH = .*@&;$$(RELEASELIBPATH)@' -e 's@^USERDEFINES = .*@& -DMODULE_NAME=win32@' > win32.mak && \
+	$(BCBUILDER)/Bin/make -f win32.mak -b
+
+BORLAND_win32 = \
+	modules/gui/win32/win32.bpr \
+	modules/gui/win32/win32.bpf \
+	\
+	modules/gui/win32/about.cpp \
+	modules/gui/win32/control.cpp \
+	modules/gui/win32/disc.cpp \
+	modules/gui/win32/mainframe.cpp \
+	modules/gui/win32/menu.cpp \
+	modules/gui/win32/messages.cpp \
+	modules/gui/win32/network.cpp \
+	modules/gui/win32/playlist.cpp \
+	modules/gui/win32/preferences.cpp \
+	modules/gui/win32/win32.cpp \
+	modules/gui/win32/misc.cpp \
+	\
+	modules/gui/win32/about.dfm \
+	modules/gui/win32/disc.dfm \
+	modules/gui/win32/mainframe.dfm \
+	modules/gui/win32/messages.dfm \
+	modules/gui/win32/network.dfm \
+	modules/gui/win32/playlist.dfm \
+	modules/gui/win32/preferences.dfm \
+	\
+	modules/gui/win32/about.h \
+	modules/gui/win32/control.h \
+	modules/gui/win32/disc.h \
+	modules/gui/win32/mainframe.h \
+	modules/gui/win32/menu.h \
+	modules/gui/win32/messages.h \
+	modules/gui/win32/network.h \
+	modules/gui/win32/playlist.h \
+	modules/gui/win32/preferences.h \
+	modules/gui/win32/win32_common.h \
+	modules/gui/win32/misc.h
+

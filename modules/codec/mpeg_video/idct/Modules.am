@@ -1,0 +1,13 @@
+SOURCES_idct = modules/codec/mpeg_video/idct/idct.c
+SOURCES_idctclassic = modules/codec/mpeg_video/idct/idctclassic.c
+SOURCES_idctmmx = modules/codec/mpeg_video/idct/idctmmx.c
+SOURCES_idctmmxext = modules/codec/mpeg_video/idct/idctmmxext.c
+SOURCES_idctaltivec = modules/codec/mpeg_video/idct/idctaltivec.c
+
+noinst_HEADERS += \
+	modules/codec/mpeg_video/idct/block_c.h \
+	modules/codec/mpeg_video/idct/block_mmx.h \
+	modules/codec/mpeg_video/idct/idct.h \
+	modules/codec/mpeg_video/idct/idct_decl.h \
+	modules/codec/mpeg_video/idct/idct_sparse.h
+

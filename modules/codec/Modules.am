@@ -1,0 +1,2 @@
+SOURCES_a52 = modules/codec/a52.c
+SOURCES_lpcm = modules/codec/lpcm.c

@@ -1,0 +1,16 @@
+SOURCES_dvdplay = \
+	modules/access/dvdplay/dvd.c \
+	modules/access/dvdplay/access.c \
+	modules/access/dvdplay/demux.c \
+	modules/access/dvdplay/intf.c \
+	modules/access/dvdplay/es.c \
+	modules/access/dvdplay/tools.c
+
+noinst_HEADERS += \
+	modules/access/dvdplay/access.h \
+	modules/access/dvdplay/demux.h \
+	modules/access/dvdplay/dvd.h \
+	modules/access/dvdplay/es.h \
+	modules/access/dvdplay/intf.h \
+	modules/access/dvdplay/tools.h
+

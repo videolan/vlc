@@ -1,0 +1,8 @@
+SOURCES_memcpy = modules/misc/memcpy/memcpy.c
+SOURCES_memcpymmx = modules/misc/memcpy/memcpy.c
+SOURCES_memcpymmxext = modules/misc/memcpy/memcpy.c
+SOURCES_memcpy3dn = modules/misc/memcpy/memcpy.c
+SOURCES_memcpyaltivec = modules/misc/memcpy/memcpyaltivec.c
+
+noinst_HEADERS += modules/misc/memcpy/fastmemcpy.h
+

@@ -1,0 +1,10 @@
+SOURCES_float32tos16 = modules/audio_filter/converter/float32tos16.c
+SOURCES_float32tos8 = modules/audio_filter/converter/float32tos8.c
+SOURCES_float32tou16 = modules/audio_filter/converter/float32tou16.c
+SOURCES_float32tou8 = modules/audio_filter/converter/float32tou8.c
+SOURCES_a52tospdif = modules/audio_filter/converter/a52tospdif.c
+SOURCES_a52tofloat32 = modules/audio_filter/converter/a52tofloat32.c
+SOURCES_fixed32tos16 = modules/audio_filter/converter/fixed32tos16.c
+SOURCES_fixed32tofloat32 = modules/audio_filter/converter/fixed32tofloat32.c
+SOURCES_s16tofloat32 = modules/audio_filter/converter/s16tofloat32.c
+SOURCES_s16tofloat32swab = modules/audio_filter/converter/s16tofloat32swab.c

@@ -1,0 +1,13 @@
+SOURCES_familiar = \
+	modules/gui/familiar/familiar.c \
+	modules/gui/familiar/interface.c \
+	modules/gui/familiar/support.c \
+	modules/gui/familiar/callbacks.c
+
+noinst_HEADERS += \
+	modules/gui/familiar/callbacks.h \
+	modules/gui/familiar/familiar.h \
+	modules/gui/familiar/interface.h \
+	modules/gui/familiar/support.h
+
+EXTRA_DIST += modules/gui/familiar/familiar.glade

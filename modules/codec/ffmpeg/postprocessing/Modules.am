@@ -1,0 +1,16 @@
+SOURCES_postprocessing_c = \
+	modules/codec/ffmpeg/postprocessing/postprocessing.c \
+	modules/codec/ffmpeg/postprocessing/postprocessing_c.c
+
+SOURCES_postprocessing_mmx = \
+	modules/codec/ffmpeg/postprocessing/postprocessing.c \
+	modules/codec/ffmpeg/postprocessing/postprocessing_mmx.c
+
+SOURCES_postprocessing_mmxext = \
+	modules/codec/ffmpeg/postprocessing/postprocessing.c \
+	modules/codec/ffmpeg/postprocessing/postprocessing_mmxext.c
+
+noinst_HEADERS += \
+	modules/codec/ffmpeg/postprocessing/postprocessing.h \
+	modules/codec/ffmpeg/postprocessing/postprocessing_common.h
+

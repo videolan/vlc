@@ -1,0 +1,1 @@
+SOURCES_scope = modules/visualization/scope/scope.c
