@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.16 2003/11/24 20:45:23 gbazin Exp $
+ * $Id: dshow.cpp,v 1.17 2003/11/26 21:54:00 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -218,7 +218,7 @@ static int AccessOpen( vlc_object_t *p_this )
 
     /* Get/parse options and open device(s) */
     string vdevname, adevname;
-    int i_width = 0, i_height = 0, i_chroma = VLC_FOURCC('I','4','2','0');
+    int i_width = 0, i_height = 0, i_chroma = 0;
 
     var_Create( p_input, "dshow-vdev", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     var_Get( p_input, "dshow-vdev", &val );
@@ -777,6 +777,7 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
     IEnumPins *p_enumpins;
     IPin *p_output_pin;
     IEnumMediaTypes *p_enummt;
+    int i_orig_chroma = i_chroma;
 
     AM_MEDIA_TYPE media_type;
     media_type.majortype = GUID_NULL;
@@ -832,7 +833,9 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
                              (char *)&i_fourcc, i_current_width,
                              i_current_height );
 
-                    if( (!i_chroma || i_fourcc == i_chroma) &&
+                    if( (!i_chroma || i_fourcc == i_chroma ||
+                         (!i_orig_chroma &&
+                          i_fourcc == VLC_FOURCC('I','4','2','0')) ) &&
                         (!i_width || i_width == i_current_width) &&
                         (!i_height || i_height == i_current_height) )
                     {
