@@ -46,6 +46,8 @@ vlc_module_begin();
     set_description( _("CVD subtitle decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( VCDSubOpen, VCDSubClose );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_SCODEC );
 
     add_integer ( MODULE_STRING "-debug", 0, NULL,
                   DEBUG_TEXT, DEBUG_LONGTEXT, VLC_TRUE );

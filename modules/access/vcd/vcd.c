@@ -46,6 +46,8 @@ vlc_module_begin();
     set_description( _("VCD input") );
     set_capability( "access2", 60 );
     set_callbacks( Open, Close );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACCESS );
 
     add_usage_hint( N_("[vcd:][device][@[title][,[chapter]]]") );
     add_integer( "vcd-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,

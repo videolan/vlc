@@ -50,6 +50,8 @@ static block_t *Encode  ( encoder_t *, subpicture_t * );
 vlc_module_begin();
     set_description( _("DVB subtitles decoder") );
     set_capability( "decoder", 50 );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_SCODEC );
     set_callbacks( Open, Close );
 
 #   define ENC_CFG_PREFIX "sout-dvbsub-"

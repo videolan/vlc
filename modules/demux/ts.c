@@ -85,6 +85,9 @@ static void Close ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("ISO 13818-1 MPEG Transport Stream input - new" ) );
+    set_name ( _("MPEG-TS") );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_DEMUX );
 
     add_string( "ts-extra-pmt", NULL, NULL, PMT_TEXT, PMT_LONGTEXT, VLC_TRUE );
     add_bool( "ts-es-id-pid", 0, NULL, PID_TEXT, PID_LONGTEXT, VLC_TRUE );

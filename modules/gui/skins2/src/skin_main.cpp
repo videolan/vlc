@@ -340,6 +340,8 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
     " correctly.")
 
 vlc_module_begin();
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_GENERAL );
     add_string( "skins2-last", "", NULL, SKINS2_LAST, SKINS2_LAST_LONG,
                 VLC_TRUE );
     add_string( "skins2-config", "", NULL, SKINS2_CONFIG, SKINS2_CONFIG_LONG,

@@ -71,6 +71,8 @@ vlc_module_begin();
     set_description( _("Mac OS X interface, sound and video") );
     set_capability( "interface", 100 );
     set_callbacks( E_(OpenIntf), E_(CloseIntf) );
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_GENERAL );
     add_submodule();
         set_capability( "video output", 100 );
         set_callbacks( E_(OpenVideoQT), E_(CloseVideoQT) );

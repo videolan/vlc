@@ -74,6 +74,8 @@ static void tarkin_CopyPicture( decoder_t *, picture_t *, uint8_t *, int );
 vlc_module_begin();
     set_description( _("Tarkin decoder module") );
     set_capability( "decoder", 100 );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_VCODEC );
     set_callbacks( OpenDecoder, CloseDecoder );
     add_shortcut( "tarkin" );
 vlc_module_end();

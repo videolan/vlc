@@ -152,6 +152,8 @@ static void __msg_rtci( intf_thread_t *p_intf, const char *psz_fmt, ... )
 
 vlc_module_begin();
     set_description( _("Real time control interface") );
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_CONTROL );
     add_bool( "rtci-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
 #ifdef HAVE_ISATTY
     add_bool( "rtci-fake-tty", 0, NULL, TTY_TEXT, TTY_LONGTEXT, VLC_TRUE );

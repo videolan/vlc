@@ -90,6 +90,8 @@ vlc_module_begin();
     set_description( _("A/52 parser") );
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, CloseDecoder );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACODEC );
 
     add_submodule();
     set_description( _("A/52 audio packetizer") );

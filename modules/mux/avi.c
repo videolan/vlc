@@ -42,6 +42,8 @@ static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("AVI muxer") );
+    set_category( CAT_SOUT );
+    set_subcategory( SUBCAT_SOUT_MUX );
     set_capability( "sout mux", 5 );
     add_shortcut( "avi" );
     set_callbacks( Open, Close );

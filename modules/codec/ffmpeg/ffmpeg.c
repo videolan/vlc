@@ -77,6 +77,8 @@ static char *enc_hq_list_text[] = { N_("rd"), N_("bits"), N_("simple") };
  *****************************************************************************/
 vlc_module_begin();
 
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_SCODEC );
     /* decoder main module */
 #if defined(MODULE_NAME_is_ffmpegaltivec) \
      || (defined(CAN_COMPILE_ALTIVEC) && !defined(NO_ALTIVEC_IN_FFMPEG))
@@ -87,6 +89,7 @@ vlc_module_begin();
     set_description( _("ffmpeg audio/video decoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
     set_capability( "decoder", 70 );
 #endif
+    set_section( N_("Decoding") , NULL );
     set_callbacks( OpenDecoder, CloseDecoder );
 
     add_bool( "ffmpeg-dr", 1, NULL, DR_TEXT, DR_TEXT, VLC_TRUE );
@@ -118,6 +121,7 @@ vlc_module_begin();
 
     /* encoder submodule */
     add_submodule();
+    set_section( N_("Encoding") , NULL );
     set_description( _("ffmpeg audio/video encoder") );
     set_capability( "encoder", 100 );
     set_callbacks( E_(OpenEncoder), E_(CloseEncoder) );

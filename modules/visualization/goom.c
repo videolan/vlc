@@ -68,7 +68,9 @@ static void Close        ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Goom effect") );
-    set_capability( "audio filter", 0 );
+    set_category( CAT_AUDIO );
+    set_subcategory( SUBCAT_AUDIO_VISUAL );
+    set_capability( "visualization", 0 );
     add_integer( "goom-width", 320, NULL,
                  WIDTH_TEXT, RES_LONGTEXT, VLC_FALSE );
     add_integer( "goom-height", 240, NULL,

@@ -353,7 +353,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
         /* continue the parent's filter chain */
         char *psz_end;
 
-        psz_end = strchr( ((vout_thread_t *)p_parent)->psz_filter_chain, ':' );
+        psz_end = strchr( ((vout_thread_t *)p_parent)->psz_filter_chain, ',' );
         if( psz_end && *(psz_end+1) )
             p_vout->psz_filter_chain = strdup( psz_end+1 );
         else p_vout->psz_filter_chain = NULL;
@@ -372,7 +372,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
          * colons */
         char *psz_end;
 
-        psz_end = strchr( p_vout->psz_filter_chain, ':' );
+        psz_end = strchr( p_vout->psz_filter_chain, ',' );
         if( psz_end )
             psz_plugin = strndup( p_vout->psz_filter_chain,
                                   psz_end - p_vout->psz_filter_chain );

@@ -99,7 +99,7 @@ HEADERS_include = \
 	include/vlc_es.h \
 	include/vlc_es_out.h \
 	include/vlc_filter.h \
-	include/vlc_help.h \
+	include/vlc_config_cat.h \
 	include/vlc_httpd.h \
 	include/vlc_tls.h \
 	include/vlc_input.h \

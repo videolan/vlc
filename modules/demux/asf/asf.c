@@ -46,6 +46,8 @@ static int  Open  ( vlc_object_t * );
 static void Close ( vlc_object_t * );
 
 vlc_module_begin();
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_DEMUX );
     set_description( _("ASF v1.0 demuxer") );
     set_capability( "demux2", 200 );
     set_callbacks( Open, Close );

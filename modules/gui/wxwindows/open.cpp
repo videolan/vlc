@@ -37,6 +37,8 @@
 
 #include <vlc/intf.h>
 
+#include <vector>
+
 #include "wxwindows.h"
 #include "preferences_widgets.h"
 

@@ -66,6 +66,8 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_description( _("File stream output") );
     set_capability( "sout access", 50 );
+    set_category( CAT_SOUT );
+    set_subcategory( SUBCAT_SOUT_ACO );
     add_shortcut( "file" );
     add_shortcut( "stream" );
     add_bool( SOUT_CFG_PREFIX "append", 0, NULL, APPEND_TEXT,APPEND_LONGTEXT,

@@ -87,6 +87,8 @@ struct filter_sys_t
     "listening room.")
 
 vlc_module_begin();
+    set_category( CAT_AUDIO );
+    set_subcategory( SUBCAT_AUDIO_MISC );
     set_description( _("DTS Coherent Acoustics audio decoder") );
     add_bool( "dts-dynrng", 1, NULL, DYNRNG_TEXT, DYNRNG_LONGTEXT, VLC_FALSE );
     set_capability( "audio filter", 100 );

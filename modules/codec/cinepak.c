@@ -37,6 +37,8 @@ static void CloseDecoder( vlc_object_t * );
 vlc_module_begin();
     set_description( _("Cinepak video decoder") );
     set_capability( "decoder", 100 );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_VCODEC );
     set_callbacks( OpenDecoder, CloseDecoder );
 vlc_module_end();
 

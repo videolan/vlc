@@ -61,6 +61,8 @@ static void FreeString( subpicture_t * );
 #define TEMPLATE_LONGTEXT N_( "Location of a file holding a SVG template for automatic string conversion" )
 
 vlc_module_begin();
+ set_category( CAT_VIDEO );
+ set_subcategory( SUBCAT_VIDEO_TEXT );
  set_capability( "text renderer", 100 );
  add_shortcut( "svg" );
  add_string( "svg-template-file", "", NULL, TEMPLATE_TEXT, TEMPLATE_LONGTEXT, VLC_TRUE );

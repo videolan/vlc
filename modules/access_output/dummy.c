@@ -39,6 +39,8 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_description( _("Dummy stream output") );
     set_capability( "sout access", 0 );
+    set_category( CAT_SOUT );
+    set_subcategory( SUBCAT_SOUT_ACO );
     add_shortcut( "dummy" );
     set_callbacks( Open, Close );
 vlc_module_end();

@@ -107,6 +107,8 @@ static mtime_t BufferDuration( aout_instance_t * p_aout );
 vlc_module_begin();
     set_description( _("Linux OSS audio output") );
 
+    set_category( CAT_AUDIO );
+    set_subcategory( SUBCAT_AUDIO_AOUT );
     add_file( "dspdev", "/dev/dsp", aout_FindAndRestart,
               N_("OSS DSP device"), NULL, VLC_FALSE );
     add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT, VLC_TRUE );

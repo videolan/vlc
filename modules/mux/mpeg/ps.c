@@ -53,6 +53,9 @@ static void    Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("PS muxer") );
+    set_name( "MPEG-PS" );
+    set_category( CAT_SOUT );
+    set_subcategory( SUBCAT_SOUT_MUX );
     set_capability( "sout mux", 50 );
     add_shortcut( "ps" );
     add_shortcut( "mpeg1" );

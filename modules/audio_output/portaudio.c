@@ -109,6 +109,8 @@ static int PAOpenStream( aout_instance_t * );
 
 vlc_module_begin();
     set_description( N_("PORTAUDIO audio output") );
+    set_category( CAT_AUDIO );
+    set_subcategory( SUBCAT_AUDIO_AOUT );
     add_integer( "portaudio-device", 0, NULL,
                  DEVICE_TEXT, DEVICE_LONGTEXT, VLC_FALSE );
     set_capability( "audio output", 0 );

@@ -87,6 +87,8 @@ vlc_module_begin();
     set_description( _("RTP stream output") );
     set_capability( "sout stream", 0 );
     add_shortcut( "rtp" );
+    set_category( CAT_SOUT );
+    set_subcategory( SUBCAT_SOUT_STREAM );
 
     add_string( SOUT_CFG_PREFIX "dst", "", NULL, DST_TEXT,
                 DST_LONGTEXT, VLC_TRUE );

@@ -46,7 +46,7 @@ static void Close        ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("GaLaktos visualization plugin") );
-    set_capability( "audio filter", 0 );
+    set_capability( "visualization", 0 );
     set_callbacks( Open, Close );
     add_shortcut( "galaktos" );
 vlc_module_end();

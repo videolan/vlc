@@ -148,6 +148,8 @@ vlc_module_begin();
 #else
     set_capability( "decoder", 100 );
 #endif
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACODEC );
     set_callbacks( OpenDecoder, CloseDecoder );
 
     add_submodule();

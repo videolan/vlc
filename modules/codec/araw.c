@@ -40,6 +40,8 @@ vlc_module_begin();
     /* audio decoder module */
     set_description( _("Raw/Log Audio decoder") );
     set_capability( "decoder", 100 );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACODEC );
     set_callbacks( DecoderOpen, DecoderClose );
 
     /* audio encoder submodule */

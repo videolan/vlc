@@ -65,6 +65,8 @@ static char *ppsz_sub_type[] =
 vlc_module_begin();
     set_description( _("Text subtitles demux") );
     set_capability( "demux2", 0 );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_DEMUX );
     add_float( "sub-fps", 0.0, NULL,
                N_("Frames per second"),
                SUB_FPS_LONGTEXT, VLC_TRUE );

@@ -91,6 +91,8 @@ static void ReadDir        ( intf_thread_t * );
 vlc_module_begin();
     set_description( _("ncurses interface") );
     set_capability( "interface", 10 );
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_GENERAL );
     set_callbacks( Open, Close );
     add_shortcut( "curses" );
     add_directory( "browse-dir", NULL, NULL, BROWSE_TEXT, BROWSE_LONGTEXT, VLC_FALSE );

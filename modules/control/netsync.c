@@ -88,6 +88,8 @@ static mtime_t GetClockRef( intf_thread_t *, mtime_t );
 
 vlc_module_begin();
     set_description( _("Network synchronisation") );
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_CONTROL );
 
     add_bool( "netsync-master", 0, NULL,
               NETSYNC_TEXT, NETSYNC_LONGTEXT, VLC_TRUE );

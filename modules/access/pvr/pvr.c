@@ -88,6 +88,8 @@ static char *psz_bitrates_list_text[] = { N_("vbr"), N_("cbr") };
 vlc_module_begin();
     set_shortname( _("PVR") );
     set_description( _("MPEG Encoding cards input (with ivtv drivers)") );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACCESS );
     set_capability( "access2", 0 );
     add_shortcut( "pvr" );
 

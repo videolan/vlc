@@ -53,6 +53,8 @@ static int  transrate_video_process( sout_stream_t *, sout_stream_id_t *, block_
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    set_category( CAT_SOUT );
+    set_subcategory( SUBCAT_SOUT_STREAM );
     set_description( _("MPEG2 video transrating stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "transrate" );

@@ -38,6 +38,8 @@ int Export_Old    ( vlc_object_t *p_intf );
  *****************************************************************************/
 vlc_module_begin();
 
+    set_category( CAT_PLAYLIST );
+    set_subcategory( SUBCAT_PLAYLIST_EXPORT );
     add_submodule();
         set_description( _("M3U playlist exporter") );
         add_shortcut( "export-m3u" );

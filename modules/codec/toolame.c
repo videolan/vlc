@@ -63,6 +63,8 @@ vlc_module_begin();
     set_description( _("libtoolame audio encoder") );
     set_capability( "encoder", 50 );
     set_callbacks( OpenEncoder, CloseEncoder );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACODEC );
 
     add_float( ENC_CFG_PREFIX "quality", 0.0, NULL, ENC_QUALITY_TEXT,
                ENC_QUALITY_LONGTEXT, VLC_FALSE );

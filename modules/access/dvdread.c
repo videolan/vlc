@@ -87,7 +87,10 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("DVDRead Input") );
+    set_name( _("DVD without menus") );
+    set_description( _("DVDRead Input (DVD without menu support)") );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "dvdread-angle", 1, NULL, ANGLE_TEXT,
         ANGLE_LONGTEXT, VLC_FALSE );
     add_integer( "dvdread-caching", DEFAULT_PTS_DELAY / 1000, NULL,

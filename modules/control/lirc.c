@@ -62,6 +62,8 @@ static void Run     ( intf_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_CONTROL );
     set_description( _("Infrared remote control interface") );
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );

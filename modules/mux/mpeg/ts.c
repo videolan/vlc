@@ -127,6 +127,9 @@ static void    Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("TS muxer (libdvbpsi)") );
+    set_name( "MPEG-TS");
+    set_category( CAT_SOUT );
+    set_subcategory( SUBCAT_SOUT_MUX );
     set_capability( "sout mux", 120 );
     add_shortcut( "ts" );
 

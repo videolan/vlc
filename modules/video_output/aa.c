@@ -52,6 +52,8 @@ static void SetPalette     ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t *
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_VOUT );
     set_description( _("ASCII-art video output") );
     set_capability( "video output", 10 );
     add_shortcut( "aalib" );

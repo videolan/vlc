@@ -52,8 +52,11 @@ static void    Close( vlc_object_t * );
     "used for the connection.")
 
 vlc_module_begin();
+    set_name( "FTP" );
     set_description( _("FTP input") );
     set_capability( "access2", 0 );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "ftp-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     add_string( "ftp-user", "anonymous", NULL, USER_TEXT, USER_LONGTEXT,

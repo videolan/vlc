@@ -60,6 +60,8 @@ vlc_module_begin();
     set_description( _("GnuTLS TLS encryption layer") );
     set_capability( "tls", 1 );
     set_callbacks( Open, Close );
+    set_category( CAT_ADVANCED );
+    set_subcategory( SUBCAT_ADVANCED_MISC );
 
     add_integer( "dh-bits", DH_BITS, NULL, DH_BITS_TEXT,
                  DH_BITS_LONGTEXT, VLC_TRUE );

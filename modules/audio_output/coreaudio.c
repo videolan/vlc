@@ -222,6 +222,8 @@ static OSStatus StreamListener   ( AudioStreamID inStream,
 vlc_module_begin();
     set_description( _("CoreAudio output") );
     set_capability( "audio output", 100 );
+    set_category( CAT_AUDIO );
+    set_subcategory( SUBCAT_AUDIO_AOUT );
     set_callbacks( Open, Close );
     add_integer( "coreaudio-dev", -1, NULL, ADEV_TEXT, ADEV_LONGTEXT, VLC_FALSE ); 
 vlc_module_end();

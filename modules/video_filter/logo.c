@@ -84,6 +84,8 @@ static char *ppsz_pos_descriptions[] =
 vlc_module_begin();
     set_description( _("Logo video filter") );
     set_capability( "video filter", 0 );
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_VFILTER );
     add_shortcut( "logo" );
     set_callbacks( Create, Destroy );
 

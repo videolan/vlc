@@ -103,6 +103,8 @@
 
 vlc_module_begin();
     set_description( _("SAP interface") );
+    set_category( CAT_PLAYLIST );
+    set_subcategory( SUBCAT_PLAYLIST_SD );
 
     add_string( "sap-addr", NULL, NULL,
                 SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, VLC_TRUE );

@@ -111,6 +111,8 @@ static void Deactivate( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Kasenna MediaBase metademux") );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_DEMUX );
     set_capability( "demux2", 170 );
     set_callbacks( Activate, Deactivate );
     add_shortcut( "sgimb" );

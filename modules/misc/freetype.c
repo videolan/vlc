@@ -91,6 +91,8 @@ static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
 
 vlc_module_begin();
     set_description( _("freetype2 font renderer") );
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_TEXT );
 
     add_file( "freetype-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT,
               VLC_FALSE );

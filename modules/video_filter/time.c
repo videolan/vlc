@@ -64,6 +64,8 @@ struct filter_sys_t
  *****************************************************************************/
 vlc_module_begin();
     set_capability( "sub filter", 0 );
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_SUBPIC );
     set_callbacks( CreateFilter, DestroyFilter );
     add_string( "time-format", "%Y-%m-%d   %H:%M:%S", NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
     add_integer( "time-x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );

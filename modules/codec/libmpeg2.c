@@ -90,6 +90,8 @@ static picture_t *GetNewPicture( decoder_t *, uint8_t ** );
 vlc_module_begin();
     set_description( _("MPEG I/II video decoder (using libmpeg2)") );
     set_capability( "decoder", 150 );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_VCODEC );
     set_callbacks( OpenDecoder, CloseDecoder );
     add_shortcut( "libmpeg2" );
 vlc_module_end();

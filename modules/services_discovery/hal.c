@@ -61,6 +61,8 @@
 
 vlc_module_begin();
     set_description( _("HAL device detection") );
+    set_category( CAT_PLAYLIST );
+    set_subcategory( SUBCAT_PLAYLIST_SD );
 
     set_capability( "services_discovery", 0 );
     set_callbacks( Open, Close );

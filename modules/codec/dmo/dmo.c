@@ -100,6 +100,8 @@ vlc_module_begin();
     add_shortcut( "dmo" );
     set_capability( "decoder", 1 );
     set_callbacks( DecoderOpen, DecoderClose );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_SCODEC );
 
 #   define ENC_CFG_PREFIX "sout-dmo-"
     add_submodule();

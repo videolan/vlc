@@ -2,7 +2,7 @@
  * u8tofloat32.c : converter from unsigned 8 bits integer to float32.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: u8tofloat32.c,v 1.4 2003/10/25 00:49:13 sam Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -43,6 +43,8 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    set_category( CAT_AUDIO );
+    set_subcategory( SUBCAT_AUDIO_MISC );
     set_description( _("audio filter for u8->float32 conversion") );
     set_capability( "audio filter", 1 );
     set_callbacks( Create, NULL );

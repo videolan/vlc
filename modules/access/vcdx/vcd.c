@@ -94,6 +94,8 @@ vlc_module_begin();
     set_callbacks( E_(Open), E_(Close) );
     add_shortcut( "vcd" );
     add_shortcut( "vcdx" );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACCESS );
 
     /* Configuration options */
     add_integer ( MODULE_STRING "-debug", 0, E_(DebugCallback),

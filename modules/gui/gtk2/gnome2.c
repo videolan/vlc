@@ -2,7 +2,7 @@
  * gnome2.c : GNOME 2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gnome2.c,v 1.3 2004/03/03 20:39:52 gbazin Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,6 +52,8 @@ static int  Manage       ( intf_thread_t * );
 vlc_module_begin();
     int i = getenv( "DISPLAY" ) == NULL ? 15 : 95;
     set_description( _("Gtk2 interface") );
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_GENERAL );
     set_capability( "interface", i );
     set_callbacks( Open, Close );
     set_program( "gvlc" );

@@ -35,6 +35,8 @@
  *****************************************************************************/
 vlc_module_begin();
     add_shortcut( "playlist" );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_DEMUX );
 
     set_description( _("Old playlist open") );
     add_shortcut( "old-open" );
@@ -42,16 +44,21 @@ vlc_module_begin();
     set_callbacks( Import_Old , NULL );
 
     add_submodule();
-    set_description( _("M3U playlist import") );
-    add_shortcut( "m3u-open" );
-    set_capability( "demux2" , 10 );
-    set_callbacks( Import_M3U , Close_M3U );
-
+        set_description( _("Native playlist import") );
+        add_shortcut( "playlist" );
+        add_shortcut( "native-open" );
+        set_capability( "demux2" , 10 );
+        set_callbacks( Import_Native , Close_Native );
     add_submodule();
-    set_description( _("PLS playlist import") );
-    add_shortcut( "pls-open" );
-    set_capability( "demux2" , 10 );
-    set_callbacks( Import_PLS , Close_PLS );
+        set_description( _("M3U playlist import") );
+        add_shortcut( "m3u-open" );
+        set_capability( "demux2" , 10 );
+        set_callbacks( Import_M3U , Close_M3U );
+    add_submodule();
+        set_description( _("PLS playlist import") );
+        add_shortcut( "pls-open" );
+        set_capability( "demux2" , 10 );
+        set_callbacks( Import_PLS , Close_PLS );
 vlc_module_end();
 
 

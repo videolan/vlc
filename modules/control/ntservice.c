@@ -59,6 +59,8 @@ static void Close   ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Windows Service interface") );
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_CONTROL );
     add_bool( "ntservice-install", 0, NULL,
               INSTALL_TEXT, INSTALL_LONGTEXT, VLC_TRUE );
     add_bool( "ntservice-uninstall", 0, NULL,

@@ -2,7 +2,7 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.19 2004/01/25 18:20:12 bigben Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -40,6 +40,8 @@ static aout_buffer_t *DecodeBlock( decoder_t *, block_t ** );
 vlc_module_begin();
     set_description( _("ADPCM audio decoder") );
     set_capability( "decoder", 50 );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACODEC );
     set_callbacks( OpenDecoder, CloseDecoder );
 vlc_module_end();
 

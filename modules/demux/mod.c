@@ -47,6 +47,8 @@ static void Close  ( vlc_object_t * );
 vlc_module_begin();
     set_description( _("MOD demuxer (libmodplug)" ) );
     set_capability( "demux2", 10 );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_DEMUX );
 
     add_bool( "mod-noisereduction", VLC_TRUE, NULL, N_("Noise reduction"), N_("Noise reduction"), VLC_FALSE );
 

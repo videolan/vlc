@@ -45,6 +45,8 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 vlc_module_begin();
     set_description( _("audio filter for simple channel mixing") );
     set_capability( "audio filter", 10 );
+    set_category( CAT_AUDIO );
+    set_subcategory( SUBCAT_AUDIO_MISC );
     set_callbacks( Create, NULL );
 vlc_module_end();
 

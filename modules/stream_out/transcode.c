@@ -134,6 +134,8 @@ vlc_module_begin();
     set_capability( "sout stream", 50 );
     add_shortcut( "transcode" );
     set_callbacks( Open, Close );
+    set_category( CAT_SOUT );
+    set_subcategory( SUBCAT_SOUT_STREAM );
 
     add_string( SOUT_CFG_PREFIX "venc", NULL, NULL, VENC_TEXT,
                 VENC_LONGTEXT, VLC_FALSE );

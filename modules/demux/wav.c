@@ -40,6 +40,8 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("WAV demuxer") );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_DEMUX );
     set_capability( "demux2", 142 );
     set_callbacks( Open, Close );
 vlc_module_end();

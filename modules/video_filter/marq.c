@@ -78,6 +78,8 @@ struct filter_sys_t
 vlc_module_begin();
     set_capability( "sub filter", 0 );
     set_callbacks( CreateFilter, DestroyFilter );
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_SUBPIC );
     add_string( "marq-marquee", "Marquee", NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
     add_integer( "marq-x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
     add_integer( "marq-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );

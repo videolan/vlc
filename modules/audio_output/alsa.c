@@ -97,6 +97,8 @@ static void ALSAFill     ( aout_instance_t * );
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("ALSA audio output") );
+    set_category( CAT_AUDIO );
+    set_subcategory( SUBCAT_AUDIO_AOUT );
     add_string( "alsadev", DEFAULT_ALSA_DEVICE, aout_FindAndRestart,
                 N_("ALSA Device Name"), NULL, VLC_FALSE );
     set_capability( "audio output", 150 );

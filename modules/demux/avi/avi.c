@@ -50,6 +50,8 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_description( _("AVI demuxer") );
     set_capability( "demux2", 212 );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_DEMUX );
 
     add_bool( "avi-interleaved", 0, NULL,
               INTERLEAVE_TEXT, INTERLEAVE_LONGTEXT, VLC_TRUE );

@@ -100,6 +100,7 @@
         p_module->b_reentrant = VLC_TRUE;                                     \
         p_module->psz_object_name = MODULE_STRING;                            \
         p_module->psz_shortname = MODULE_STRING;                              \
+        p_module->psz_name = NULL;                                            \
         p_module->psz_longname = MODULE_STRING;                               \
         p_module->pp_shortcuts[ 0 ] = MODULE_STRING;                          \
         p_module->i_cpu = 0;                                                  \
@@ -161,6 +162,9 @@
 
 #define set_shortname( desc )                                                 \
     p_submodule->psz_shortname = desc
+
+#define set_name( desc )                                                      \
+    p_submodule->psz_name = desc
 
 #define set_description( desc )                                               \
     p_submodule->psz_longname = desc

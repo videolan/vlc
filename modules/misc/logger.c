@@ -98,6 +98,8 @@ static char *mode_list_text[] = { N_("Text"), "HTML" };
 #define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are \"text\" (default) and \"html\".")
 
 vlc_module_begin();
+    set_category( CAT_ADVANCED );
+    set_subcategory( SUBCAT_ADVANCED_MISC );
     set_description( _("File logging interface") );
 
     add_file( "logfile", NULL, NULL, N_("Log filename"), N_("Specify the log filename."), VLC_FALSE );

@@ -234,6 +234,8 @@ typedef struct module_config_t module_config_t;
 typedef struct module_symbols_t module_symbols_t;
 typedef struct module_cache_t module_cache_t;
 
+typedef struct config_category_t config_category_t;
+
 /* Interface */
 typedef struct intf_thread_t intf_thread_t;
 typedef struct intf_sys_t intf_sys_t;

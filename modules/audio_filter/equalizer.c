@@ -64,6 +64,9 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_description( _("Equalizer 10 bands") );
     set_capability( "audio filter", 0 );
+    set_category( CAT_AUDIO );
+    set_subcategory( SUBCAT_AUDIO_AFILTER );
+
     add_string( "equalizer-preset", "flat", NULL, PRESET_TEXT,
                 PRESET_LONGTEXT, VLC_TRUE );
         change_string_list( preset_list, preset_list_text, 0 );

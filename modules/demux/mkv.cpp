@@ -95,9 +95,12 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
+    set_name( _("Matroska") );
     set_description( _("Matroska stream demuxer" ) );
     set_capability( "demux2", 50 );
     set_callbacks( Open, Close );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_DEMUX );
 
     add_bool( "mkv-seek-percent", 1, NULL,
             N_("Seek based on percent not time"),

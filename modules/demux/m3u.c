@@ -63,6 +63,8 @@ static int  Control   ( demux_t *, int, va_list );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_DEMUX );
     set_description( _("Playlist metademux") );
     set_capability( "demux2", 5 );
     set_callbacks( Activate, Deactivate );

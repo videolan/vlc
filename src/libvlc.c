@@ -245,6 +245,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     char *       p_tmp;
     char *       psz_modules;
     char *       psz_parser;
+    char *       psz_control;
     char *       psz_language;
     vlc_bool_t   b_exit = VLC_FALSE;
     vlc_t *      p_vlc = vlc_current_object( i_object );
@@ -657,6 +658,20 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
      * Load background interfaces
      */
     psz_modules = config_GetPsz( p_vlc, "extraintf" );
+    psz_control = config_GetPsz( p_vlc, "control" );
+
+    if( psz_modules && *psz_modules && psz_control && *psz_control )
+    {
+        psz_modules = (char *)realloc( psz_modules, strlen( psz_modules ) +
+                                                    strlen( psz_control ) + 1 );
+        sprintf( psz_modules, "%s,%s", psz_modules, psz_control );
+    }
+    else if( psz_control && *psz_control )
+    {
+        if( psz_modules ) free( psz_modules );
+        psz_modules = strdup( psz_control );
+    }
+
     psz_parser = psz_modules;
     while ( psz_parser && *psz_parser )
     {

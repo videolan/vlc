@@ -61,6 +61,10 @@ static char *ppsz_language_text[] =
     "interface. Use a comma separated list of interface modules. (common " \
     "values are logger, gestures, sap, rc, http or screensaver)")
 
+#define CONTROL_TEXT N_("Control interfaces")
+#define CONTROL_LONGTEXT N_( \
+    "This option allows you to select control interfaces. " )
+
 #define VERBOSE_TEXT N_("Verbosity (0,1,2)")
 #define VERBOSE_LONGTEXT N_( \
     "This options sets the verbosity level (0=only errors and " \
@@ -149,7 +153,12 @@ static char *ppsz_language_text[] =
 #define AUDIO_FILTER_TEXT N_("Audio filters")
 #define AUDIO_FILTER_LONGTEXT N_( \
     "This allows you to add audio post processing filters, to modify " \
-    "the sound, or audio visualization modules (spectrum analyzer, etc.).")
+    "the sound" )
+
+#define AUDIO_VISUAL_TEXT N_("Audio visualizations ")
+#define AUDIO_VISUAL_LONGTEXT N_( \
+    "This allows you to add visualization modules " \
+    "(spectrum analyzer, etc.).")
 
 #define AUDIO_CHANNEL_MIXER N_("Channel mixer")
 #define AUDIO_CHANNEL_MIXER_LONGTEXT N_( \
@@ -808,35 +817,14 @@ static char *ppsz_align_descriptions[] =
  *             N_(text), N_(longtext) );
  * add_integer( option_name, i_value, p_callback, N_(text), N_(longtext),
                 b_advanced_option );
- * add_bool( option_name, b_value, p_callback, N_(text), N_(longtext), 
+ * add_bool( option_name, b_value, p_callback, N_(text), N_(longtext),
              b_advanced_option );
  */
 
 vlc_module_begin();
-    /* Interface options */
-    add_category_hint( N_("Interface"), INTF_CAT_LONGTEXT , VLC_FALSE );
-    add_module( "intf", "interface", NULL, NULL, INTF_TEXT,
-                INTF_LONGTEXT, VLC_FALSE );
-        change_short('I');
-    add_string( "extraintf", NULL, NULL, EXTRAINTF_TEXT,
-                     EXTRAINTF_LONGTEXT, VLC_FALSE );
-    add_integer( "verbose", 0, NULL, VERBOSE_TEXT, VERBOSE_LONGTEXT,
-                 VLC_FALSE );
-        change_short('v');
-    add_bool( "quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_TRUE );
-        change_short('q');
-    add_string( "language", "auto", NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
-                VLC_FALSE );
-        change_string_list( ppsz_language, ppsz_language_text, 0 );
-    add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
-    add_bool( "advanced", 0, NULL, ADVANCED_TEXT,
-                            ADVANCED_LONGTEXT, VLC_FALSE );
-
     /* Audio options */
-    add_category_hint( N_("Audio"), AOUT_CAT_LONGTEXT , VLC_FALSE );
-    add_module( "aout", "audio output", NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT,
-                VLC_TRUE );
-        change_short('A');
+    set_category( CAT_AUDIO );
+    set_subcategory( SUBCAT_AUDIO_GENERAL );
     add_bool( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, VLC_FALSE );
     add_integer_with_range( "volume", AOUT_VOLUME_DEFAULT, AOUT_VOLUME_MIN,
                             AOUT_VOLUME_MAX, NULL, VOLUME_TEXT,
@@ -853,16 +841,24 @@ vlc_module_begin();
     add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
     add_integer( "audio-desync", 0, NULL, DESYNC_TEXT,
                  DESYNC_LONGTEXT, VLC_TRUE );
-    add_string( "audio-filter", 0, NULL,AUDIO_FILTER_TEXT,
-                AUDIO_FILTER_LONGTEXT, VLC_FALSE );
+    set_subcategory( SUBCAT_AUDIO_AOUT );
+    add_module( "aout", "audio output", NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT,
+                VLC_TRUE );
+    set_subcategory( SUBCAT_AUDIO_AFILTER );
+    add_module_list_cat( "audio-filter", SUBCAT_AUDIO_AFILTER, 0,
+                         NULL, AUDIO_FILTER_TEXT,
+                         AUDIO_FILTER_LONGTEXT, VLC_FALSE );
+    set_subcategory( SUBCAT_AUDIO_VISUAL );
+    add_string( "audio-visual", 0, NULL,AUDIO_VISUAL_TEXT,
+                AUDIO_VISUAL_LONGTEXT, VLC_FALSE );
+    set_subcategory( SUBCAT_AUDIO_MISC );
     add_module( "audio-channel-mixer", "audio filter", NULL, NULL,
                 AUDIO_CHANNEL_MIXER, AUDIO_CHANNEL_MIXER_LONGTEXT, VLC_FALSE );
+        change_short('A');
 
     /* Video options */
-    add_category_hint( N_("Video"), VOUT_CAT_LONGTEXT , VLC_FALSE );
-    add_module( "vout", "video output", NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT,
-                VLC_TRUE );
-        change_short('V');
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_GENERAL );
     add_bool( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT, VLC_TRUE );
     add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
     add_integer( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
@@ -886,19 +882,29 @@ vlc_module_begin();
 
     add_bool( "video-on-top", 0, NULL, VIDEO_ON_TOP_TEXT,
               VIDEO_ON_TOP_LONGTEXT, VLC_FALSE );
-    add_bool( "video-deco", 1, NULL, VIDEO_DECO_TEXT,
-              VIDEO_DECO_LONGTEXT, VLC_TRUE );
-    add_module( "filter", "video filter", NULL, NULL,
-                FILTER_TEXT, FILTER_LONGTEXT, VLC_FALSE );
     add_string( "aspect-ratio", "", NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_TRUE );
+
+    set_subcategory( SUBCAT_VIDEO_VOUT );
+    add_module( "vout", "video output", NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT,
+                VLC_TRUE );
+        change_short('V');
+
+    set_subcategory( SUBCAT_VIDEO_VFILTER );
+    add_bool( "video-deco", 0, NULL, VIDEO_DECO_TEXT,
+              VIDEO_DECO_LONGTEXT, VLC_TRUE );
+    add_module_list_cat( "filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
+                FILTER_TEXT, FILTER_LONGTEXT, VLC_FALSE );
 #if 0
     add_string( "pixel-ratio", "1", NULL, PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT );
 #endif
 
     /* Subpictures options */
-    add_category_hint( N_("Subpictures"), SUB_CAT_LONGTEXT , VLC_FALSE );
+    set_subcategory( SUBCAT_VIDEO_SUBPIC );
+    set_section( N_("On Screen Display") , NULL );
     add_bool( "osd", 1, NULL, OSD_TEXT, OSD_LONGTEXT, VLC_FALSE );
+
+    set_section( N_("Subtitles") , NULL );
     add_bool( "sub-autodetect-file", VLC_TRUE, NULL,
                  SUB_AUTO_TEXT, SUB_AUTO_LONGTEXT, VLC_FALSE );
     add_integer( "sub-autodetect-fuzzy", 3, NULL,
@@ -914,11 +920,21 @@ vlc_module_begin();
               SUB_FILE_LONGTEXT, VLC_TRUE );
     add_integer( "spumargin", -1, NULL, SPUMARGIN_TEXT,
                  SPUMARGIN_LONGTEXT, VLC_TRUE );
+
+    set_section( N_( "Overlays" ) , NULL );
     add_module( "sub-filter", "sub filter", NULL, NULL,
                 SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, VLC_TRUE );
 
+    set_subcategory( SUBCAT_VIDEO_TEXT );
+
     /* Input options */
-    add_category_hint( N_("Input"), INPUT_CAT_LONGTEXT , VLC_FALSE );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACCESS );
+    set_subcategory( SUBCAT_INPUT_DEMUX );
+    set_subcategory( SUBCAT_INPUT_VCODEC );
+    set_subcategory( SUBCAT_INPUT_ACODEC );
+    set_subcategory( SUBCAT_INPUT_SCODEC );
+    set_subcategory( SUBCAT_INPUT_ADVANCED );
     add_integer( "cr-average", 40, NULL, CR_AVERAGE_TEXT,
                  CR_AVERAGE_LONGTEXT, VLC_FALSE );
     add_integer( "server-port", 1234, NULL,
@@ -947,6 +963,8 @@ vlc_module_begin();
     add_string( "bookmarks", NULL, NULL,
                  BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, VLC_TRUE );
 
+    set_section( N_( "Default devices") , NULL )
+
     add_file( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT,
               VLC_FALSE );
     add_file( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT,
@@ -959,6 +977,7 @@ vlc_module_begin();
     add_bool( "ipv4", 0, NULL, IPV4_TEXT, IPV4_LONGTEXT, VLC_FALSE );
         change_short('4');
 
+    set_section( N_( "Socks proxy") , NULL )
     add_string( "socks", NULL, NULL,
                  SOCKS_SERVER_TEXT, SOCKS_SERVER_LONGTEXT, VLC_TRUE );
     add_string( "socks-user", NULL, NULL,
@@ -967,6 +986,7 @@ vlc_module_begin();
                  SOCKS_PASS_TEXT, SOCKS_PASS_LONGTEXT, VLC_TRUE );
 
 
+    set_section( N_("Metadata" ) , NULL )
     add_string( "meta-title", NULL, NULL, META_TITLE_TEXT,
                 META_TITLE_LONGTEXT, VLC_TRUE );
     add_string( "meta-author", NULL, NULL, META_AUTHOR_TEXT,
@@ -993,7 +1013,10 @@ vlc_module_begin();
 
 
     /* Stream output options */
+    set_category( CAT_SOUT );
+    set_subcategory( SUBCAT_SOUT_GENERAL );
     add_category_hint( N_("Stream output"), SOUT_CAT_LONGTEXT , VLC_TRUE );
+
     add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT, VLC_TRUE );
     add_bool( "sout-display", VLC_FALSE, NULL, SOUT_DISPLAY_TEXT,
                                 SOUT_DISPLAY_LONGTEXT, VLC_TRUE );
@@ -1005,22 +1028,29 @@ vlc_module_begin();
                                 SOUT_AUDIO_LONGTEXT, VLC_TRUE );
     add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT,
                                 SOUT_VIDEO_LONGTEXT, VLC_TRUE );
-
-    add_module( "packetizer", "packetizer", NULL, NULL,
-                PACKETIZER_TEXT, PACKETIZER_LONGTEXT, VLC_TRUE );
-    add_module( "mux", "sout mux", NULL, NULL, MUX_TEXT,
-                                MUX_LONGTEXT, VLC_TRUE );
-    add_module( "access_output", "sout access", NULL, NULL,
-                ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, VLC_TRUE );
     add_integer( "ttl", 1, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
 
+    set_subcategory( SUBCAT_SOUT_STREAM );
+    set_subcategory( SUBCAT_SOUT_MUX );
+    add_module( "mux", "sout mux", NULL, NULL, MUX_TEXT,
+                                MUX_LONGTEXT, VLC_TRUE );
+    set_subcategory( SUBCAT_SOUT_ACO );
+    add_module( "access_output", "sout access", NULL, NULL,
+                ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, VLC_TRUE );
+    set_subcategory( SUBCAT_SOUT_PACKETIZER );
+    add_module( "packetizer", "packetizer", NULL, NULL,
+                PACKETIZER_TEXT, PACKETIZER_LONGTEXT, VLC_TRUE );
+
+    set_subcategory( SUBCAT_SOUT_SAP );
     add_bool( "sap-flow-control", VLC_FALSE, NULL, ANN_SAPCTRL_TEXT,
                                ANN_SAPCTRL_LONGTEXT, VLC_TRUE );
     add_integer( "sap-interval", 5, NULL, ANN_SAPINTV_TEXT,
                                ANN_SAPINTV_LONGTEXT, VLC_TRUE );
+    set_subcategory( SUBCAT_SOUT_VOD );
 
     /* CPU options */
-    add_category_hint( N_("CPU"), CPU_CAT_LONGTEXT, VLC_TRUE );
+    set_category( CAT_ADVANCED );
+    set_subcategory( SUBCAT_ADVANCED_CPU );
 #if defined( __i386__ )
     add_bool( "mmx", 1, NULL, MMX_TEXT, MMX_LONGTEXT, VLC_TRUE );
     add_bool( "3dn", 1, NULL, THREE_DN_TEXT, THREE_DN_LONGTEXT, VLC_TRUE );
@@ -1031,22 +1061,8 @@ vlc_module_begin();
 #if defined( __powerpc__ ) || defined( SYS_DARWIN )
     add_bool( "altivec", 1, NULL, ALTIVEC_TEXT, ALTIVEC_LONGTEXT, VLC_TRUE );
 #endif
-
-    /* Playlist options */
-    add_category_hint( N_("Playlist"), PLAYLIST_CAT_LONGTEXT , VLC_FALSE );
-    add_string( "services-discovery", 0, NULL,
-                SD_TEXT, SD_LONGTEXT, VLC_FALSE );
-        change_short('S');
-    add_bool( "random", 0, NULL, RANDOM_TEXT, RANDOM_LONGTEXT, VLC_FALSE );
-        change_short('Z');
-    add_bool( "loop", 0, NULL, LOOP_TEXT, LOOP_LONGTEXT, VLC_FALSE );
-        change_short('L');
-    add_bool( "repeat", 0, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_TRUE );
-        change_short('R');
-    add_bool( "play-and-stop", 0, NULL, PAS_TEXT, PAS_LONGTEXT, VLC_TRUE );
-
     /* Misc options */
-    add_category_hint( N_("Miscellaneous"), MISC_CAT_LONGTEXT, VLC_TRUE );
+    set_subcategory( SUBCAT_ADVANCED_MISC );
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT,
                 MEMCPY_LONGTEXT, VLC_TRUE );
     add_module( "access", "access", NULL, NULL, ACCESS_TEXT,
@@ -1088,7 +1104,56 @@ vlc_module_begin();
                   WIN9X_CV_LONGTEXT, VLC_TRUE );
 #endif
 
+    /* Playlist options */
+    set_category( CAT_PLAYLIST );
+    set_subcategory( SUBCAT_PLAYLIST_GENERAL );
+    add_category_hint( N_("Playlist"), PLAYLIST_CAT_LONGTEXT , VLC_FALSE );
+    add_bool( "random", 0, NULL, RANDOM_TEXT, RANDOM_LONGTEXT, VLC_FALSE );
+        change_short('Z');
+    add_bool( "loop", 0, NULL, LOOP_TEXT, LOOP_LONGTEXT, VLC_FALSE );
+        change_short('L');
+    add_bool( "repeat", 0, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_TRUE );
+        change_short('R');
+    add_bool( "play-and-stop", 0, NULL, PAS_TEXT, PAS_LONGTEXT, VLC_TRUE );
+
+    set_subcategory( SUBCAT_PLAYLIST_SD );
+    add_module_list_cat( "services-discovery", SUBCAT_PLAYLIST_SD, NULL,
+                          NULL, SD_TEXT, SD_LONGTEXT, VLC_FALSE );
+        change_short('S');
+
+    /* Interface options */
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_GENERAL );
+
+    set_section ( N_("Interface module" ), NULL );
+    add_module( "intf", "interface", NULL, NULL, INTF_TEXT,
+                INTF_LONGTEXT, VLC_FALSE );
+        change_short('I');
+
+    set_section ( N_("Extra interface modules" ),  NULL );
+    add_module_list_cat( "extraintf", SUBCAT_INTERFACE_GENERAL,
+                         NULL, NULL, EXTRAINTF_TEXT,
+                         EXTRAINTF_LONGTEXT, VLC_FALSE );
+
+    set_section ( N_("Miscellaneous"), NULL );
+    add_integer( "verbose", 0, NULL, VERBOSE_TEXT, VERBOSE_LONGTEXT,
+                 VLC_FALSE );
+        change_short('v');
+    add_bool( "quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_TRUE );
+        change_short('q');
+    add_string( "language", "auto", NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
+                VLC_FALSE );
+        change_string_list( ppsz_language, ppsz_language_text, 0 );
+    add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
+    add_bool( "advanced", 0, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT,
+                    VLC_FALSE );
+
+    set_subcategory( SUBCAT_INTERFACE_CONTROL );
+    add_module_list_cat( "control", SUBCAT_INTERFACE_CONTROL, NULL, NULL,
+                         CONTROL_TEXT, CONTROL_LONGTEXT, VLC_FALSE );
+
     /* Hotkey options*/
+    set_subcategory( SUBCAT_INTERFACE_HOTKEYS );
     add_category_hint( N_("Hot keys"), HOTKEY_CAT_LONGTEXT , VLC_FALSE );
 
 #if defined(SYS_DARWIN)

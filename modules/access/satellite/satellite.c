@@ -70,6 +70,8 @@ void E_(Close)   ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Satellite input") );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACCESS );
 
     add_integer( "dvb-dmx", 0, NULL, DEMUX_TEXT, DEMUX_LONGTEXT, VLC_FALSE );
     add_integer( "dvb-tuner", 0, NULL, TUNER_TEXT, TUNER_LONGTEXT, VLC_FALSE );

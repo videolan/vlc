@@ -44,6 +44,8 @@ vlc_module_begin();
     set_description( _("QNX RTOS video and audio output") );
     set_capability( "video output", 100 );
     set_callbacks( E_(OpenVideo), E_(CloseVideo) );
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_GENERAL );
     add_submodule();
         set_capability( "audio output", 100 );
         set_callbacks( E_(OpenAudio), E_(CloseAudio) );

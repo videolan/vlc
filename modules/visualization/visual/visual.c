@@ -72,13 +72,17 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("visualizer filter") );
+    set_category( CAT_AUDIO );
+    set_subcategory( SUBCAT_AUDIO_VISUAL );
+    set_description( _("Visualizer filter") );
+    set_section( N_( "General") , NULL );
     add_string("effect-list", "spectrum", NULL,
             ELIST_TEXT, ELIST_LONGTEXT, VLC_TRUE );
     add_integer("effect-width",VOUT_WIDTH,NULL,
              WIDTH_TEXT, WIDTH_LONGTEXT, VLC_FALSE );
     add_integer("effect-height" , VOUT_HEIGHT , NULL,
              HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_FALSE );
+    set_section( N_("Spectrum analyser") , NULL );
     add_integer("visual-nbbands", 80, NULL,
              NBBANDS_TEXT, NBBANDS_LONGTEXT, VLC_FALSE );
     add_integer("visual-separ", 1, NULL,
@@ -87,9 +91,10 @@ vlc_module_begin();
              AMP_TEXT, AMP_LONGTEXT, VLC_FALSE );
     add_bool("visual-peaks", VLC_TRUE, NULL,
              PEAKS_TEXT, PEAKS_LONGTEXT, VLC_FALSE );
+    set_section( N_( "Random effect") , NULL );
     add_integer("visual-stars", 200, NULL,
              STARS_TEXT, STARS_LONGTEXT, VLC_FALSE );
-    set_capability( "audio filter", 0 );
+    set_capability( "visualization", 0 );
     set_callbacks( Open, Close );
     add_shortcut( "visualizer");
 vlc_module_end();

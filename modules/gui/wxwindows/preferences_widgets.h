@@ -21,6 +21,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#include <vector>
+
 class ConfigControl: public wxPanel
 {
 public:
@@ -81,6 +83,28 @@ public:
 private:
     wxComboBox *combo;
 };
+
+struct moduleCheckBox {
+    wxCheckBox *checkbox;
+    char *psz_module;
+};
+
+class ModuleListCatConfigControl: public ConfigControl
+{
+public:
+    ModuleListCatConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
+    ~ModuleListCatConfigControl();
+    virtual wxString GetPszValue();
+private:
+    std::vector<moduleCheckBox *> pp_checkboxes;
+
+    void OnUpdate( wxCommandEvent& );
+    
+    wxTextCtrl *text;
+    DECLARE_EVENT_TABLE()
+};
+
+;
 
 class StringConfigControl: public ConfigControl
 {
@@ -189,4 +213,11 @@ private:
     wxCheckBox *checkbox;
 
     DECLARE_EVENT_TABLE()
+};
+
+class SectionConfigControl: public ConfigControl
+{
+public:
+    SectionConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
+    ~SectionConfigControl();
 };

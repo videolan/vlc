@@ -65,6 +65,8 @@ static char *mode_list_text[] = { N_("Wave"), N_("Ripple") };
 vlc_module_begin();
     set_description( _("Distort video filter") );
     set_capability( "video filter", 0 );
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_string( "distort-mode", "wave", NULL, MODE_TEXT, MODE_LONGTEXT,
                 VLC_FALSE );

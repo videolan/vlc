@@ -48,6 +48,8 @@ vlc_module_begin();
     set_description( _("JPEG camera demuxer") );
     set_capability( "demux2", 5 );
     set_callbacks( Open, Close );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_DEMUX );
     add_float( "mjpeg-fps", 0.0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_FALSE );
 vlc_module_end();
 

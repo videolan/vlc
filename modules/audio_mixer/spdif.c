@@ -42,6 +42,8 @@ static void DoWork    ( aout_instance_t *, aout_buffer_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    set_category( CAT_AUDIO );
+    set_subcategory( SUBCAT_AUDIO_MISC );
     set_description( _("Dummy S/PDIF audio mixer") );
     set_capability( "audio mixer", 1 );
     set_callbacks( Create, NULL );

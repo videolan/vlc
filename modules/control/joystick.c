@@ -158,6 +158,8 @@ static void Run       ( intf_thread_t *p_intf );
 #define MAP_LONGTEXT N_( "Allows you to remap the actions." )
 
 vlc_module_begin();
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_CONTROL );
     add_integer( "motion-threshold", DEFAULT_THRESHOLD, NULL,
                      THRESHOLD_TEXT, THRESHOLD_LONGTEXT, VLC_TRUE );
     add_string( "joystick-device", DEFAULT_DEVICE, NULL,

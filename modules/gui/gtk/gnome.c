@@ -75,6 +75,8 @@ vlc_module_begin();
     int i = getenv( "DISPLAY" ) == NULL ? 15 : 100;
 #endif
     set_description( _("GNOME interface") );
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_GENERAL );
 
     add_bool( "gnome-tooltips", 1, E_(GtkHideTooltips),
               TOOLTIPS_TEXT, TOOLTIPS_LONGTEXT, VLC_FALSE );

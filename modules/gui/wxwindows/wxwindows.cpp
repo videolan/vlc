@@ -97,6 +97,8 @@ vlc_module_begin();
     int i_score = getenv( "DISPLAY" ) == NULL ? 15 : 150;
 #endif
     set_description( (char *) _("wxWindows interface module") );
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_GENERAL );
     set_capability( "interface", i_score );
     set_callbacks( Open, Close );
     add_shortcut( "wxwindows" );

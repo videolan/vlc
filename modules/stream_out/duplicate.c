@@ -41,6 +41,8 @@ vlc_module_begin();
     set_capability( "sout stream", 50 );
     add_shortcut( "duplicate" );
     add_shortcut( "dup" );
+    set_category( CAT_SOUT );
+    set_subcategory( SUBCAT_SOUT_STREAM );
     set_callbacks( Open, Close );
 vlc_module_end();
 

@@ -682,6 +682,8 @@ static void Run          ( intf_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+set_category( CAT_INTERFACE );
+set_subcategory( SUBCAT_INTERFACE_CONTROL );
 add_category_hint( N_( "Corba control" ), NULL, VLC_FALSE );
 
 set_description( _( "corba control module" ) );

@@ -101,6 +101,8 @@ vlc_module_begin();
     set_description( _("h264 video encoder using x264 library"));
     set_capability( "encoder", 200 );
     set_callbacks( Open, Close );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_VCODEC );
 
     add_integer( SOUT_CFG_PREFIX "qp", 0, NULL, QP_TEXT, QP_LONGTEXT,
                  VLC_FALSE );
