@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.52 2003/10/19 12:20:00 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.53 2003/12/03 13:52:36 anil Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -376,7 +376,7 @@ int SkinManage( intf_thread_t *p_intf )
                 p_intf->p_sys->p_theme->EvtBank->Get( "time" ), (long)Value );
 
             // Text char * for updating text controls
-            char *text = new char[OFFSETTOTIME_MAX_SIZE];
+            char *text = new char[MSTRTIME_MAX_SIZE];
 
             // Create end time text
             input_OffsetToTime( p_intf->p_sys->p_input, &text[1],
