@@ -62,6 +62,9 @@ static int  SendEvents( vlc_object_t *, char const *,
 #define ACTIVE_LONGTEXT N_("Comma separated list of active windows, " \
     "defaults to all")
 
+#define ASPECT_TEXT N_("Element aspect ratio")
+#define ASPECT_LONGTEXT N_("The aspect ratio of the individual displays building the display wall")
+
 vlc_module_begin();
     set_description( _("wall video filter") );
     set_shortname( N_("Image wall" ));
@@ -72,6 +75,7 @@ vlc_module_begin();
     add_integer( "wall-cols", 3, NULL, COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
     add_integer( "wall-rows", 3, NULL, ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
     add_string( "wall-active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT, VLC_FALSE );
+    add_string( "wall-element-aspect", "4:3", NULL, ASPECT_TEXT, ASPECT_LONGTEXT, VLC_FALSE );
 
     add_shortcut( "wall" );
     set_callbacks( Create, Destroy );
@@ -231,6 +235,25 @@ static int Init( vout_thread_t *p_vout )
     unsigned int w1,h1,w2,h2;
     int i_xpos, i_ypos;
     int i_vstart_rounded = 0, i_hstart_rounded = 0;
+    char *psz_aspect;
+
+    psz_aspect = config_GetPsz( p_vout, "wall-element-aspect" );
+    if( psz_aspect && *psz_aspect )
+    {
+        char *psz_parser = strchr( psz_aspect, ':' );
+        if( psz_parser )
+        {
+            *psz_parser++ = '\0';
+            i_aspect = atoi( psz_aspect ) * VOUT_ASPECT_FACTOR
+                / atoi( psz_parser );
+        }
+        else
+        {
+            msg_Warn( p_vout, "invalid aspect ratio specification" );
+        }
+        free( psz_aspect );
+    }
+    
 
     i_xpos = var_CreateGetInteger( p_vout, "video-x" );
     i_ypos = var_CreateGetInteger( p_vout, "video-y" );
