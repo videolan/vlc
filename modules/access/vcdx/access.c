@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.5 2003/11/26 01:28:52 rocky Exp $
+ * $Id: access.c,v 1.6 2003/12/02 04:22:10 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -86,24 +86,6 @@ static vcdinfo_obj_t *vcd_Open   ( vlc_object_t *p_this, const char *psz_dev );
 
 static input_thread_t *p_vcd_input = NULL;
 
-int
-E_(DebugCallback)   ( vlc_object_t *p_this, const char *psz_name,
-		      vlc_value_t oldval, vlc_value_t val, void *p_data )
-{
-  thread_vcd_data_t *p_vcd;
-
-  if (NULL == p_vcd_input) return VLC_EGENERIC;
-  
-  p_vcd = (thread_vcd_data_t *)p_vcd_input->p_access_data;
-
-  if (p_vcd->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
-    msg_Dbg( p_vcd_input, "Old debug (x%0x) %d, new debug (x%0x) %d", 
-             p_vcd->i_debug, p_vcd->i_debug, val.i_int, val.i_int);
-  }
-  p_vcd->i_debug = val.i_int;
-  return VLC_SUCCESS;
-}
-
 /* process messages that originate from libcdio. */
 static void
 cdio_log_handler (cdio_log_level_t level, const char message[])
@@ -154,178 +136,6 @@ vcd_log_handler (vcd_log_level_t level, const char message[])
             level);
   }
   return;
-}
-
-/*
- * Data reading functions
- */
-
-/*****************************************************************************
-  Open: open VCD.
-  read in meta-information about VCD: the number of tracks, segments, 
-  entries, size and starting information. Then set up state variables so
-  that we read/seek starting at the location specified.
-
-  On success we return VLC_SUCCESS, on memory exhausted VLC_ENOMEM, 
-  and VLC_EGENERIC for some other error.
- *****************************************************************************/
-int 
-E_(Open) ( vlc_object_t *p_this )
-{
-    input_thread_t *        p_input = (input_thread_t *)p_this;
-    thread_vcd_data_t *     p_vcd;
-    char *                  psz_source;
-    vcdinfo_itemid_t        itemid;
-    bool                    b_play_ok;
-    
-    p_input->pf_read        = VCDRead;
-    p_input->pf_seek        = VCDSeek;
-    p_input->pf_set_area    = VCDSetArea;
-    p_input->pf_set_program = VCDSetProgram;
-
-    p_vcd = malloc( sizeof(thread_vcd_data_t) );
-
-    if( p_vcd == NULL )
-    {
-        LOG_ERR ("out of memory" );
-        return VLC_ENOMEM;
-    }
-
-    p_input->p_access_data = (void *)p_vcd;
-    p_vcd->i_debug         = config_GetInt( p_this, MODULE_STRING "-debug" );
-    psz_source             = VCDParse( p_input, &itemid );
-
-    if ( NULL == psz_source ) 
-    {
-      free( p_vcd );
-      return( VLC_EGENERIC );
-    }
-
-    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "%s", psz_source );
-
-    p_vcd->p_segments = NULL;
-    p_vcd->p_entries  = NULL;
-    
-    /* set up input  */
-    p_input->i_mtu = VCD_DATA_ONCE;
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-
-    /* If we are here we can control the pace... */
-    p_input->stream.b_pace_control = 1;
-
-    p_input->stream.b_seekable = 1;
-    p_input->stream.p_selected_area->i_size = 0;
-    p_input->stream.p_selected_area->i_tell = 0;
-
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    if( !(p_vcd->vcd = vcd_Open( p_this, psz_source )) )
-    {
-        msg_Warn( p_input, "could not open %s", psz_source );
-        free( psz_source );
-        free( p_vcd );
-        return VLC_EGENERIC;
-    }
-
-    /* Get track information. */
-    p_vcd->num_tracks = ioctl_GetTracksMap( VLC_OBJECT(p_input),
-                                            vcdinfo_get_cd_image(p_vcd->vcd), 
-                                            &p_vcd->p_sectors );
-    free( psz_source );
-    if( p_vcd->num_tracks < 0 )
-        LOG_ERR ("unable to count tracks" );
-    else if( p_vcd->num_tracks <= 1 )
-        LOG_ERR ("no movie tracks found" );
-    if( p_vcd->num_tracks <= 1)
-    {
-        vcdinfo_close( p_vcd->vcd );
-        free( p_vcd );
-        return VLC_EGENERIC;
-    }
-
-    /* Set stream and area data */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-
-    /* Initialize ES structures */
-    input_InitStream( p_input, sizeof( stream_ps_data_t ) );
-
-    /* disc input method */
-    p_input->stream.i_method = INPUT_METHOD_VCD;
-
-    p_input->stream.i_area_nb = 1;
-    
-
-    /* Initialize segment information. */
-    VCDSegments( p_input );
-    
-    /* Initialize track area information. */
-    VCDTracks( p_input );
-    
-    if( VCDEntryPoints( p_input ) < 0 )
-    {
-        msg_Warn( p_input, "could not read entry points, will not use them" );
-        p_vcd->b_valid_ep = false;
-    }
-
-    if( VCDLIDs( p_input ) < 0 )
-    {
-        msg_Warn( p_input, "could not read entry LIDs" );
-    }
-
-    b_play_ok = (VLC_SUCCESS == VCDPlay( p_input, itemid ));
-    
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    if ( ! b_play_ok ) {
-      vcdinfo_close( p_vcd->vcd );
-      free( p_vcd );
-      return VLC_EGENERIC;
-    }
-
-    if( !p_input->psz_demux || !*p_input->psz_demux )
-    {
-#if FIXED
-      p_input->psz_demux = "vcdx";
-#else
-      p_input->psz_demux = "ps";
-#endif
-    }
-
-    p_vcd->p_intf = intf_Create( p_input, "vcdx" );
-    p_vcd->p_intf->b_block = VLC_FALSE;
-    intf_RunThread( p_vcd->p_intf );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Close: closes VCD releasing allocated memory.
- *****************************************************************************/
-void 
-E_(Close) ( vlc_object_t *p_this )
-{
-    input_thread_t *   p_input = (input_thread_t *)p_this;
-    thread_vcd_data_t *p_vcd = (thread_vcd_data_t *)p_input->p_access_data;
-
-    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "VCDClose" );
-    vcdinfo_close( p_vcd->vcd );
-
-    free( p_vcd->p_entries );
-    free( p_vcd->p_segments );
-
-    /* For reasons that are a mystery to me we don't have to deal with
-       stopping, and destroying the p_vcd->p_intf thread. And if we do
-       it causes problems upstream.
-     */
-    if( p_vcd->p_intf != NULL )
-    {
-	p_vcd->p_intf = NULL;
-    }
-
-    free( p_vcd );
-    p_input->p_access_data = NULL;
-    p_vcd_input = NULL;
 }
 
 /*****************************************************************************
@@ -1130,4 +940,230 @@ VCDUpdateVar( input_thread_t *p_input, int i_num, int i_action,
     dbg_print( INPUT_DBG_PBC, "%s %d", label, i_num );
   }
   var_Change( p_input, varname, i_action, &val, NULL );
+}
+
+
+#define meta_info_add_str(title, str) \
+  if ( str ) {								\
+    dbg_print( INPUT_DBG_META, "field: %s: %s\n", title, str);	\
+    input_AddInfo( p_cat, _(title), "%s", str );			\
+  }
+
+#define meta_info_add_num(title, num) \
+  dbg_print( INPUT_DBG_META, "field %s: %d\n", title, num);		\
+  input_AddInfo( p_cat, _(title), "%d", num );				\
+
+static void InformationCreate( input_thread_t *p_input  )
+{
+  thread_vcd_data_t *p_vcd = (thread_vcd_data_t *) p_input->p_access_data;
+  input_info_category_t *p_cat;
+  
+  p_cat = input_InfoCategory( p_input, "General" );
+
+  meta_info_add_str( "VCD Format", vcdinfo_get_format_version_str(p_vcd->vcd));
+  meta_info_add_str( "Album",      vcdinfo_get_album_id(p_vcd->vcd));
+  meta_info_add_str( "Application",vcdinfo_get_application_id(p_vcd->vcd));
+  meta_info_add_str( "Preparer",   vcdinfo_get_preparer_id(p_vcd->vcd));
+  meta_info_add_num( "Vol #",      vcdinfo_get_volume_num(p_vcd->vcd));
+  meta_info_add_num( "Vol max #",  vcdinfo_get_volume_count(p_vcd->vcd));
+  meta_info_add_str( "Volume Set", vcdinfo_get_volumeset_id(p_vcd->vcd));
+  meta_info_add_str( "Volume",     vcdinfo_get_volume_id(p_vcd->vcd));
+  meta_info_add_str( "Publisher",  vcdinfo_get_publisher_id(p_vcd->vcd));
+  meta_info_add_str( "System Id",  vcdinfo_get_system_id(p_vcd->vcd));
+  meta_info_add_num( "LIDs",       vcdinfo_get_num_LIDs(p_vcd->vcd));
+  meta_info_add_num( "Entries",    vcdinfo_get_num_entries(p_vcd->vcd));
+  meta_info_add_num( "Segments",   vcdinfo_get_num_segments(p_vcd->vcd));
+  meta_info_add_num( "Tracks",     vcdinfo_get_num_tracks(p_vcd->vcd));
+
+}
+
+/*****************************************************************************
+ * Public routines.
+ *****************************************************************************/
+int
+E_(DebugCallback)   ( vlc_object_t *p_this, const char *psz_name,
+		      vlc_value_t oldval, vlc_value_t val, void *p_data )
+{
+  thread_vcd_data_t *p_vcd;
+
+  if (NULL == p_vcd_input) return VLC_EGENERIC;
+  
+  p_vcd = (thread_vcd_data_t *)p_vcd_input->p_access_data;
+
+  if (p_vcd->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
+    msg_Dbg( p_vcd_input, "Old debug (x%0x) %d, new debug (x%0x) %d", 
+             p_vcd->i_debug, p_vcd->i_debug, val.i_int, val.i_int);
+  }
+  p_vcd->i_debug = val.i_int;
+  return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+  Open: open VCD.
+  read in meta-information about VCD: the number of tracks, segments, 
+  entries, size and starting information. Then set up state variables so
+  that we read/seek starting at the location specified.
+
+  On success we return VLC_SUCCESS, on memory exhausted VLC_ENOMEM, 
+  and VLC_EGENERIC for some other error.
+ *****************************************************************************/
+int 
+E_(Open) ( vlc_object_t *p_this )
+{
+    input_thread_t *        p_input = (input_thread_t *)p_this;
+    thread_vcd_data_t *     p_vcd;
+    char *                  psz_source;
+    vcdinfo_itemid_t        itemid;
+    bool                    b_play_ok;
+    
+    p_input->pf_read        = VCDRead;
+    p_input->pf_seek        = VCDSeek;
+    p_input->pf_set_area    = VCDSetArea;
+    p_input->pf_set_program = VCDSetProgram;
+
+    p_vcd = malloc( sizeof(thread_vcd_data_t) );
+
+    if( p_vcd == NULL )
+    {
+        LOG_ERR ("out of memory" );
+        return VLC_ENOMEM;
+    }
+
+    p_input->p_access_data = (void *)p_vcd;
+    p_vcd->i_debug         = config_GetInt( p_this, MODULE_STRING "-debug" );
+    psz_source             = VCDParse( p_input, &itemid );
+
+    if ( NULL == psz_source ) 
+    {
+      free( p_vcd );
+      return( VLC_EGENERIC );
+    }
+
+    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "%s", psz_source );
+
+    p_vcd->p_segments = NULL;
+    p_vcd->p_entries  = NULL;
+    
+    /* set up input  */
+    p_input->i_mtu = VCD_DATA_ONCE;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    /* If we are here we can control the pace... */
+    p_input->stream.b_pace_control = 1;
+
+    p_input->stream.b_seekable = 1;
+    p_input->stream.p_selected_area->i_size = 0;
+    p_input->stream.p_selected_area->i_tell = 0;
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    if( !(p_vcd->vcd = vcd_Open( p_this, psz_source )) )
+    {
+        msg_Warn( p_input, "could not open %s", psz_source );
+        free( psz_source );
+        free( p_vcd );
+        return VLC_EGENERIC;
+    }
+
+    /* Get track information. */
+    p_vcd->num_tracks = ioctl_GetTracksMap( VLC_OBJECT(p_input),
+                                            vcdinfo_get_cd_image(p_vcd->vcd), 
+                                            &p_vcd->p_sectors );
+    free( psz_source );
+    if( p_vcd->num_tracks < 0 )
+        LOG_ERR ("unable to count tracks" );
+    else if( p_vcd->num_tracks <= 1 )
+        LOG_ERR ("no movie tracks found" );
+    if( p_vcd->num_tracks <= 1)
+    {
+        vcdinfo_close( p_vcd->vcd );
+        free( p_vcd );
+        return VLC_EGENERIC;
+    }
+
+    /* Set stream and area data */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    /* Initialize ES structures */
+    input_InitStream( p_input, sizeof( stream_ps_data_t ) );
+
+    /* disc input method */
+    p_input->stream.i_method = INPUT_METHOD_VCD;
+
+    p_input->stream.i_area_nb = 1;
+    
+
+    /* Initialize segment information. */
+    VCDSegments( p_input );
+    
+    /* Initialize track area information. */
+    VCDTracks( p_input );
+    
+    if( VCDEntryPoints( p_input ) < 0 )
+    {
+        msg_Warn( p_input, "could not read entry points, will not use them" );
+        p_vcd->b_valid_ep = false;
+    }
+
+    if( VCDLIDs( p_input ) < 0 )
+    {
+        msg_Warn( p_input, "could not read entry LIDs" );
+    }
+
+    b_play_ok = (VLC_SUCCESS == VCDPlay( p_input, itemid ));
+    
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    if ( ! b_play_ok ) {
+      vcdinfo_close( p_vcd->vcd );
+      free( p_vcd );
+      return VLC_EGENERIC;
+    }
+
+    if( !p_input->psz_demux || !*p_input->psz_demux )
+    {
+#if FIXED
+      p_input->psz_demux = "vcdx";
+#else
+      p_input->psz_demux = "ps";
+#endif
+    }
+
+    p_vcd->p_intf = intf_Create( p_input, "vcdx" );
+    p_vcd->p_intf->b_block = VLC_FALSE;
+    intf_RunThread( p_vcd->p_intf );
+
+    InformationCreate( p_input );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Close: closes VCD releasing allocated memory.
+ *****************************************************************************/
+void 
+E_(Close) ( vlc_object_t *p_this )
+{
+    input_thread_t *   p_input = (input_thread_t *)p_this;
+    thread_vcd_data_t *p_vcd = (thread_vcd_data_t *)p_input->p_access_data;
+
+    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "VCDClose" );
+    vcdinfo_close( p_vcd->vcd );
+
+    free( p_vcd->p_entries );
+    free( p_vcd->p_segments );
+
+    /* For reasons that are a mystery to me we don't have to deal with
+       stopping, and destroying the p_vcd->p_intf thread. And if we do
+       it causes problems upstream.
+     */
+    if( p_vcd->p_intf != NULL )
+    {
+	p_vcd->p_intf = NULL;
+    }
+
+    free( p_vcd );
+    p_input->p_access_data = NULL;
+    p_vcd_input = NULL;
 }
