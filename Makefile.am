@@ -374,10 +374,10 @@ endif
 # Install the modules and the symlinks
 install-exec-local:
 	for i in "" `$(srcdir)/vlc-config --target plugin` ; do if test -n "$$i" ; then \
-	  $(INSTALL) -m 755 "$$i$(LIBEXT)" "$(DESTDIR)$(libdir)/vlc/`echo $$i | cut -f2 -d/`/" ; \
+	  $(INSTALL) -m 755 "$$i$(LIBEXT)" "$(DESTDIR)$(libdir)/vlc/`echo $$i | cut -f2 -d/`" ; \
 	fi ; done
 	for i in "" `$(srcdir)/vlc-config --target builtin` `$(srcdir)/vlc-config --target builtin pic` ; do if test -n "$$i" ; then \
-	  $(INSTALL) -m 644 "$$i" "$(DESTDIR)$(libdir)/vlc/" ; \
+	  $(INSTALL) -m 644 "$$i" "$(DESTDIR)$(libdir)/vlc" ; \
 	fi ; done
 	for i in "" $(ALIASES) ; do if test -n "$$i" ; then \
 	  rm -f "$(DESTDIR)$(bindir)/$$i" && \
@@ -396,8 +396,8 @@ VLC.app: vlc plugins
 	$(INSTALL) vlc $(srcdir)/VLC.app/Contents/MacOS/VLC
 	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/modules
 	for i in "" `$(srcdir)/vlc-config --target plugin` ; do \
-	  if test -n "$$i" ; then $(INSTALL) $(srcdir)/$$i$(LIBEXT) \
-	    $(srcdir)/VLC.app/Contents/MacOS/modules/ ; \
+	  if test -n "$$i" ; then $(INSTALL) "$(srcdir)/$$i$(LIBEXT)" \
+	    "$(srcdir)/VLC.app/Contents/MacOS/modules" ; \
 	  fi ; done
 	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/share
 	$(INSTALL) -m 644 $(srcdir)/share/*.psf $(srcdir)/share/*.rle \
