@@ -64,9 +64,15 @@ class SkinParser: public XMLParser
         virtual void handleEndElement( const string &rName );
 
         /// Helper functions
-        bool ConvertBoolean( const char *value ) const;
-        int ConvertColor( const char *transcolor ) const;
-        string ConvertFileName( const char *fileName ) const;
+        //@{
+        bool convertBoolean( const char *value ) const;
+        int convertColor( const char *transcolor ) const;
+        string convertFileName( const char *fileName ) const;
+        /// Transform to int, and check that it is in the given range (if not,
+        /// the closest range boundary will be used)
+        int convertInRange( const char *value, int minValue, int maxValue,
+                            const string &rAttribute ) const;
+        //@}
 
         /// Generate a new id
         const string generateId() const;

@@ -223,16 +223,24 @@ static void Run( intf_thread_t *p_intf )
 //---------------------------------------------------------------------------
 // Module descriptor
 //---------------------------------------------------------------------------
-#define DEFAULT_SKIN        N_("Last skin used")
-#define DEFAULT_SKIN_LONG   N_("Select the path to the last skin used.")
-#define SKIN_CONFIG         N_("Config of last used skin")
-#define SKIN_CONFIG_LONG    N_("Config of last used skin.")
+#define SKINS2_LAST      N_("Last skin used")
+#define SKINS2_LAST_LONG N_("Select the path to the last skin used.")
+#define SKINS2_CONFIG      N_("Config of last used skin")
+#define SKINS2_CONFIG_LONG N_("Config of last used skin.")
+#define SKINS2_TRANSPARENCY      N_("Enable transparency effects")
+#define SKINS2_TRANSPARENCY_LONG N_("You can disable all transparency effects" \
+    " if you want. This is mainly useful when moving windows does not behave" \
+    " correctly.")
 
 vlc_module_begin();
-    add_string( "skins2-last", "", NULL, DEFAULT_SKIN, DEFAULT_SKIN_LONG,
+    add_string( "skins2-last", "", NULL, SKINS2_LAST, SKINS2_LAST_LONG,
                 VLC_TRUE );
-    add_string( "skins2-config", "", NULL, SKIN_CONFIG, SKIN_CONFIG_LONG,
+    add_string( "skins2-config", "", NULL, SKINS2_CONFIG, SKINS2_CONFIG_LONG,
                 VLC_TRUE );
+#ifdef WIN32
+    add_bool( "skins2-transparency", VLC_TRUE, NULL, SKINS2_TRANSPARENCY,
+              SKINS2_TRANSPARENCY_LONG, VLC_FALSE );
+#endif
     set_description( _("Skinnable Interface") );
     set_capability( "interface", 30 );
     set_callbacks( Open, Close );

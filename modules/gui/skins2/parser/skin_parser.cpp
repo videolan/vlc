@@ -88,15 +88,15 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
     else if( rName == "Bitmap" )
     {
         const BuilderData::Bitmap bitmap( attr["id"] ,
-                ConvertFileName( attr["file"] ),
-                ConvertColor( attr["alphacolor"] ) );
+                convertFileName( attr["file"] ),
+                convertColor( attr["alphacolor"] ) );
         m_data.m_listBitmap.push_back( bitmap );
     }
 
     else if( rName == "BitmapFont" )
     {
         const BuilderData::BitmapFont font( attr["id"],
-                ConvertFileName( attr["file"] ),
+                convertFileName( attr["file"] ),
                 attr["type"] );
         m_data.m_listBitmapFont.push_back( font );
     }
@@ -128,7 +128,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
     else if( rName == "Font" )
     {
         const BuilderData::Font fontData( attr["id"],
-                ConvertFileName( attr["file"] ),
+                convertFileName( attr["file"] ),
                 atoi( attr["size"] ) );
         m_data.m_listFont.push_back( fontData );
     }
@@ -170,11 +170,11 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["visible"],
                 atoi( attr["width"]), atoi( attr["height"] ),
                 attr["lefttop"], attr["rightbottom"],
-                attr["font"], attr["var"], ConvertColor( attr["fgcolor"] ),
-                ConvertColor( attr["playcolor"] ),
-                ConvertColor( attr["bgcolor1"] ),
-                ConvertColor( attr["bgcolor2"] ),
-                ConvertColor( attr["selcolor"] ), attr["help"],
+                attr["font"], attr["var"], convertColor( attr["fgcolor"] ),
+                convertColor( attr["playcolor"] ),
+                convertColor( attr["bgcolor1"] ),
+                convertColor( attr["bgcolor2"] ),
+                convertColor( attr["selcolor"] ), attr["help"],
                 m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
         m_data.m_listList.push_back( listData );
@@ -219,7 +219,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
                 attr["visible"], attr["font"],
                 attr["text"], atoi( attr["width"] ),
-                ConvertColor( attr["color"] ), attr["help"], m_curLayer,
+                convertColor( attr["color"] ), attr["help"], m_curLayer,
                 m_curWindowId, m_curLayoutId );
         m_curLayer++;
         m_data.m_listText.push_back( textData );
@@ -236,14 +236,16 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
             return;
         }
         const BuilderData::Theme theme( attr["tooltipfont"],
-                atoi( attr["magnet"] ), atoi( attr["alpha"] ),
-                atoi( attr["movealpha"] ), atoi( attr["fadetime"] ) );
+                atoi( attr["magnet"] ),
+                convertInRange( attr["alpha"], 1, 255, "alpha" ),
+                convertInRange( attr["movealpha"], 1, 255, "movealpha" ),
+                atoi( attr["fadetime"] ) );
         m_data.m_listTheme.push_back( theme );
     }
 
     else if( rName == "ThemeInfo" )
     {
-        msg_Warn( getIntf(), "skin: %s  author: %s", attr["name"],
+        msg_Info( getIntf(), "skin: %s  author: %s", attr["name"],
                   attr["author"] );
     }
 
@@ -264,9 +266,9 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         m_curWindowId = uniqueId( attr["id"] );
         const BuilderData::Window window( m_curWindowId,
                 atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
-                ConvertBoolean( attr["visible"] ),
-                ConvertBoolean( attr["dragdrop"] ),
-                ConvertBoolean( attr["playondrop"] ) );
+                convertBoolean( attr["visible"] ),
+                convertBoolean( attr["dragdrop"] ),
+                convertBoolean( attr["playondrop"] ) );
         m_data.m_listWindow.push_back( window );
     }
 }
@@ -289,13 +291,13 @@ void SkinParser::handleEndElement( const string &rName )
 }
 
 
-bool SkinParser::ConvertBoolean( const char *value ) const
+bool SkinParser::convertBoolean( const char *value ) const
 {
     return strcmp( value, "true" ) == 0;
 }
 
 
-int SkinParser::ConvertColor( const char *transcolor ) const
+int SkinParser::convertColor( const char *transcolor ) const
 {
     unsigned long iRed, iGreen, iBlue;
     iRed = iGreen = iBlue = 0;
@@ -303,10 +305,38 @@ int SkinParser::ConvertColor( const char *transcolor ) const
     return ( iRed << 16 | iGreen << 8 | iBlue );
 }
 
-string SkinParser::ConvertFileName( const char *fileName ) const
+
+string SkinParser::convertFileName( const char *fileName ) const
 {
     return m_path + string( fileName );
 }
+
+
+int SkinParser::convertInRange( const char *value, int minValue, int maxValue,
+                                const string &rAttribute ) const
+{
+    int intValue = atoi( value );
+
+    if( intValue < minValue )
+    {
+        msg_Warn( getIntf(), "Value of \"%s\" attribute (%i) is out of the "
+                  "expected range [%i, %i], using %i instead",
+                  rAttribute.c_str(), intValue, minValue, maxValue, minValue );
+        return minValue;
+    }
+    else if( intValue > maxValue )
+    {
+        msg_Warn( getIntf(), "Value of \"%s\" attribute (%i) is out of the "
+                  "expected range [%i, %i], using %i instead",
+                  rAttribute.c_str(), intValue, minValue, maxValue, maxValue );
+        return maxValue;
+    }
+    else
+    {
+        return intValue;
+    }
+}
+
 
 const string SkinParser::generateId() const
 {

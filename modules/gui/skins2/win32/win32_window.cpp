@@ -41,7 +41,7 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                           HINSTANCE hInst, HWND hParentWindow,
                           bool dragDrop, bool playOnDrop,
                           Win32Window *pParentWindow ):
-    OSWindow( pIntf ), m_dragDrop( dragDrop )
+    OSWindow( pIntf ), m_dragDrop( dragDrop ), m_isLayered( false )
 {
     // Create the window
     if( pParentWindow )
@@ -65,11 +65,6 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         msg_Err( getIntf(), "CreateWindow failed" );
         return;
     }
-
-    // We do it this way otherwise CreateWindowEx will fail if WS_EX_LAYERED
-    // is not supported
-//     SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
-//                       GetWindowLong( m_hWnd, GWL_EXSTYLE ) | WS_EX_LAYERED );
 
     // Store a pointer to the GenericWindow in a map
     Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
@@ -138,37 +133,49 @@ void Win32Window::raise() const
 
 void Win32Window::setOpacity( uint8_t value ) const
 {
-#if 0
     Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
 
     if( value == 255 )
     {
         // If the window is opaque, we remove the WS_EX_LAYERED attribute
-        // which slows resizing for nothing
-        SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
-            GetWindowLong( m_hWnd, GWL_EXSTYLE ) & !WS_EX_LAYERED );
-        SetWindowPos( m_hWnd, HWND_TOP, 0, 0, 0, 0,
-            SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED );
+        // which slows down resizing for nothing
+        if( m_isLayered )
+        {
+            SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
+                GetWindowLong( m_hWnd, GWL_EXSTYLE ) & ~WS_EX_LAYERED );
+
+            // Redraw the window, otherwise we may end up with a grey rectangle
+            // for some strange reason
+            RedrawWindow(m_hWnd, NULL, NULL,
+                RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+
+            m_isLayered = false;
+        }
     }
     else
     {
         if( pFactory->SetLayeredWindowAttributes )
         {
-            // (Re)Add the WS_EX_LAYERED attribute.
-            // Resizing will be very slow, now :)
-            SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
-                GetWindowLong( m_hWnd, GWL_EXSTYLE ) | WS_EX_LAYERED );
-            SetWindowPos( m_hWnd, HWND_TOP, 0, 0, 0, 0,
-                SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED );
+            if( ! m_isLayered )
+            {
+                // (Re)Add the WS_EX_LAYERED attribute.
+                // Resizing will be very slow, now :)
+                SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
+                    GetWindowLong( m_hWnd, GWL_EXSTYLE ) | WS_EX_LAYERED );
+
+                // Redraw the window, otherwise we may end up with a grey
+                // rectangle for some strange reason
+                RedrawWindow(m_hWnd, NULL, NULL,
+                    RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+
+                m_isLayered = true;
+            }
 
             // Change the opacity
             pFactory->SetLayeredWindowAttributes(
                 m_hWnd, 0, value, LWA_ALPHA|LWA_COLORKEY );
         }
     }
-
-   UpdateWindow( m_hWnd );
-#endif
 }
 
 

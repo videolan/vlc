@@ -69,6 +69,8 @@ class Win32Window: public OSWindow
         bool m_dragDrop;
         /// Drop target
         LPDROPTARGET m_pDropTarget;
+        /// Indicates whether the window is layered
+        mutable bool m_isLayered;
 };
 
 

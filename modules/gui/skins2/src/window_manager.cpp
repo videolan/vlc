@@ -65,11 +65,22 @@ void WindowManager::startMove( TopWindow &rWindow )
     m_movingWindows.clear();
     buildDependSet( m_movingWindows, &rWindow );
 
-    // Change the opacity of the moving windows
-    WinSet_t::const_iterator it;
-    for( it = m_movingWindows.begin(); it != m_movingWindows.end(); it++ )
+    if( config_GetInt( getIntf(), "skins2-transparency" ) )
     {
-        (*it)->setOpacity( m_moveAlpha );
+        // Change the opacity of the moving windows
+        WinSet_t::const_iterator it;
+        for( it = m_movingWindows.begin(); it != m_movingWindows.end(); it++ )
+        {
+            (*it)->setOpacity( m_moveAlpha );
+        }
+
+        // FIXME: We need to refresh the windows, because if 2 windows overlap
+        // and one of them becomes transparent, the other one is not refreshed
+        // automatically. I don't know why... -- Ipkiss
+        for( it = m_allWindows.begin(); it != m_allWindows.end(); it++ )
+        {
+            (*it)->refresh( 0, 0, (*it)->getWidth(), (*it)->getHeight() );
+        }
     }
 }
 
@@ -79,11 +90,14 @@ void WindowManager::stopMove()
     WinSet_t::const_iterator itWin1, itWin2;
     AncList_t::const_iterator itAnc1, itAnc2;
 
-    // Restore the opacity of the moving windows
-    WinSet_t::const_iterator it;
-    for( it = m_movingWindows.begin(); it != m_movingWindows.end(); it++ )
+    if( config_GetInt( getIntf(), "skins2-transparency" ) )
     {
-        (*it)->setOpacity( m_alpha );
+        // Restore the opacity of the moving windows
+        WinSet_t::const_iterator it;
+        for( it = m_movingWindows.begin(); it != m_movingWindows.end(); it++ )
+        {
+            (*it)->setOpacity( m_alpha );
+        }
     }
 
     // Delete the dependencies
