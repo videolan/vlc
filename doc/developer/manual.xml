@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
-<!DOCTYPE book PUBLIC "-//Norman Walsh//DTD DocBk XML V3.1.3//EN" "docbookx.dtd"
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "/sw/share/xml/dtd/docbookx/4.1.2/docbookx.dtd"
 [
     <!ENTITY glossary SYSTEM "glossary.xml">
     <!ENTITY overview SYSTEM "overview.xml">
@@ -57,7 +57,7 @@
       <orgname> VideoLAN project </orgname>
     </affiliation>
   </collab>
-  <pubdate> $Id: manual.xml,v 1.2 2001/11/13 12:09:17 henri Exp $ </pubdate>
+  <pubdate> $Id: manual.xml,v 1.3 2002/08/29 23:53:22 massiot Exp $ </pubdate>
   <copyright> <year> 2001 </year>
               <holder> Christophe Massiot, for IDEALX S.A.S. </holder>
   </copyright>

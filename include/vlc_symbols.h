@@ -34,7 +34,7 @@ struct module_symbols_t
     int (* __vlc_cond_init_inner) ( vlc_object_t *, vlc_cond_t * ) ;
     int (* __vlc_mutex_destroy_inner) ( char *, int, vlc_mutex_t * ) ;
     int (* __vlc_mutex_init_inner) ( vlc_object_t *, vlc_mutex_t * ) ;
-    int (* __vlc_thread_create_inner) ( vlc_object_t *, char *, int, char *, void * ( * ) ( void * ), vlc_bool_t ) ;
+    int (* __vlc_thread_create_inner) ( vlc_object_t *, char *, int, char *, void * ( * ) ( void * ), int, vlc_bool_t ) ;
     int (* __vlc_threads_end_inner) ( vlc_object_t * ) ;
     int (* __vlc_threads_init_inner) ( vlc_object_t * ) ;
     int (* input_AccessInit_inner) ( input_thread_t * ) ;

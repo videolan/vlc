@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.98 2002/08/04 20:04:11 sam Exp $
+ * $Id: interface.c,v 1.99 2002/08/29 23:53:22 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -103,7 +103,8 @@ vlc_error_t intf_RunThread( intf_thread_t *p_intf )
     if( p_intf->b_block )
     {
         /* Run a manager thread, launch the interface, kill the manager */
-        if( vlc_thread_create( p_intf, "manager", Manager, 0 ) )
+        if( vlc_thread_create( p_intf, "manager", Manager,
+                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
         {
             msg_Err( p_intf, "cannot spawn manager thread" );
             return VLC_EGENERIC;
@@ -118,7 +119,8 @@ vlc_error_t intf_RunThread( intf_thread_t *p_intf )
     else
     {
         /* Run the interface in a separate thread */
-        if( vlc_thread_create( p_intf, "interface", p_intf->pf_run, 0 ) )
+        if( vlc_thread_create( p_intf, "interface", p_intf->pf_run,
+                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
         {
             msg_Err( p_intf, "cannot spawn interface thread" );
             return VLC_EGENERIC;

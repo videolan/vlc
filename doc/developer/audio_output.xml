@@ -1,5 +1,45 @@
 <chapter> <title> The audio output layer </title>
 
+  <sect1> <title> Audio output overview </title>
+
+    <para>
+This chapter documents the audio output layer known under the "audio output 3" codename. It has first been released with VLC version 0.5.0. Previous versions use an antic API, which is no longer documented nor supported. You definitely should write new code only for aout3 and later.
+    </para>
+
+    <para>
+The audio output's main purpose is to take sound samples from one or several decoders (called "input streams" in this chapter), to mix them and write them to an output device (called "output stream"). During this process, transformations may be needed or asked by the user, and they will be performed by audio filters.
+    </para>
+
+    <para>
+(insert here a schematic of the data flow in aout3)
+    </para>
+
+    <sect2> <title> Typical runcourse </title>
+
+      <para>
+The input spawns a new decoder audio decoder, say for instance an A/52 decoder. The A/52 decoder parses the sync info for format information, and creates a new aout "input stream" whith aout_InputNew().
+      </para>
+
+    </sect2>
+
+  </sect1>
+  
+  <sect1> <title> API for the decoders </title>
+  
+  </sect1>
+  
+  <sect1> <title> API for the output module </title>
+  
+  </sect1>
+  
+  <sect1> <title> Writing an audio filter </title>
+  
+  </sect1>
+  
+  <sect1> <title> Writing an audio mixer </title>
+  
+  </sect1>
+
   <sect1> <title> Data exchanges between a decoder and the audio output
   </title>
 

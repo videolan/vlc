@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: decoder.c,v 1.3 2002/08/08 00:35:11 sam Exp $
+ * $Id: decoder.c,v 1.4 2002/08/29 23:53:22 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -71,7 +71,8 @@ vdec_thread_t * vdec_CreateThread( vdec_pool_t * p_pool )
     p_vdec->p_pool = p_pool;
 
     /* Spawn the video decoder thread */
-    if( vlc_thread_create( p_vdec, "video decoder", RunThread, 0 ) )
+    if( vlc_thread_create( p_vdec, "video decoder", RunThread,
+                           VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
     {
         msg_Err( p_vdec, "cannot spawn video decoder thread" );
         vlc_object_destroy( p_vdec );

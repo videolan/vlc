@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.19 2002/08/25 16:55:55 sam Exp $
+ * $Id: oss.c,v 1.20 2002/08/29 23:53:22 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -131,7 +131,8 @@ static int Open( vlc_object_t *p_this )
 
     /* Create OSS thread and wait for its readiness. */
     p_sys->b_initialized = VLC_FALSE;
-    if( vlc_thread_create( p_aout, "aout", OSSThread, VLC_FALSE ) )
+    if( vlc_thread_create( p_aout, "aout", OSSThread,
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
     {
         msg_Err( p_aout, "cannot create OSS thread (%s)", strerror(errno) );
         close( p_sys->i_fd );

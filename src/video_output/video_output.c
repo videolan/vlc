@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.190 2002/08/12 09:34:15 sam Exp $
+ * $Id: video_output.c,v 1.191 2002/08/29 23:53:22 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -202,7 +202,8 @@ vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
 
     vlc_object_attach( p_vout, p_parent );
 
-    if( vlc_thread_create( p_vout, "video output", RunThread, 0 ) )
+    if( vlc_thread_create( p_vout, "video output", RunThread,
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
     {
         msg_Err( p_vout, "%s", strerror(ENOMEM) );
         module_Unneed( p_vout, p_vout->p_module );

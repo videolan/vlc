@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.24 2002/08/26 23:36:20 sam Exp $
+ * $Id: vlc_common.h,v 1.25 2002/08/29 23:53:22 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -493,6 +493,7 @@ typedef __int64 off_t;
 #include "vlc_symbols.h"
 #include "os_specific.h"
 #include "vlc_messages.h"
+#include "vlc_threads_funcs.h"
 #include "mtime.h"
 #include "modules.h"
 #include "main.h"

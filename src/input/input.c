@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.211 2002/08/16 12:31:04 sam Exp $
+ * $Id: input.c,v 1.212 2002/08/29 23:53:22 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -158,7 +158,8 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     vlc_object_attach( p_input, p_parent );
 
     /* Create thread and wait for its readiness. */
-    if( vlc_thread_create( p_input, "input", RunThread, VLC_TRUE ) )
+    if( vlc_thread_create( p_input, "input", RunThread,
+                           VLC_THREAD_PRIORITY_INPUT, VLC_TRUE ) )
     {
         msg_Err( p_input, "cannot create input thread (%s)", strerror(errno) );
         free( p_input );

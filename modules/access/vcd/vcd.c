@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.4 2002/08/08 22:28:22 sam Exp $
+ * $Id: vcd.c,v 1.5 2002/08/29 23:53:22 massiot Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -44,12 +44,6 @@
 
 #if defined( WIN32 )
 #   include <io.h>                                                 /* read() */
-#else
-#   include <sys/uio.h>                                      /* struct iovec */
-#endif
-
-#if defined( WIN32 )
-#   include "input_iovec.h"
 #endif
 
 #include "vcd.h"

@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.12 2002/08/25 19:27:20 sam Exp $
+ * $Id: playlist.c,v 1.13 2002/08/29 23:53:22 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -67,7 +67,8 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     p_playlist->i_size = 0;
     p_playlist->pp_items = NULL;
 
-    if( vlc_thread_create( p_playlist, "playlist", RunThread, VLC_TRUE ) )
+    if( vlc_thread_create( p_playlist, "playlist", RunThread,
+                           VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
     {
         msg_Err( p_playlist, "cannot spawn playlist thread" );
         vlc_object_destroy( p_playlist );

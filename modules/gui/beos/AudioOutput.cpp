@@ -2,7 +2,7 @@
  * aout.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.5 2002/08/23 14:16:23 tcastley Exp $
+ * $Id: AudioOutput.cpp,v 1.6 2002/08/29 23:53:22 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -105,9 +105,10 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
         return -1;
     }
 
-    if( vlc_thread_create( p_aout, "aout", BeOSThread, VLC_FALSE) )
+    if( vlc_thread_create( p_aout, "aout", BeOSThread,
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
     {
-        msg_Err( p_aout, "cannot create OSS thread " );
+        msg_Err( p_aout, "cannot create aout thread" );
         delete p_sys->p_sound;
         free( p_sys->p_format );
         free( p_sys );
@@ -279,3 +280,4 @@ static int BeOSThread( aout_instance_t * p_aout )
     return 0;
 
 }
+

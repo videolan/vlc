@@ -101,7 +101,8 @@ static int Open( vlc_object_t *p_this )
 
     /* Create aRts thread and wait for its readiness. */
     p_sys->b_initialized = VLC_FALSE;
-    if( vlc_thread_create( p_aout, "aout", aRtsThread, VLC_FALSE ) )
+    if( vlc_thread_create( p_aout, "aout", aRtsThread,
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
     {
         msg_Err( p_aout, "cannot create aRts thread (%s)", strerror(errno) );
         free( p_sys );

@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.8 2002/08/25 09:39:59 sam Exp $
+ * $Id: alsa.c,v 1.9 2002/08/29 23:53:22 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -115,7 +115,8 @@ static int Open( vlc_object_t *p_this )
 
     /* Create ALSA thread and wait for its readiness. */
     p_sys->b_initialized = VLC_FALSE;
-    if( vlc_thread_create( p_aout, "aout", ALSAThread, VLC_FALSE ) )
+    if( vlc_thread_create( p_aout, "aout", ALSAThread,
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
     {
         msg_Err( p_aout, "cannot create ALSA thread (%s)", strerror(errno) );
         free( p_sys );

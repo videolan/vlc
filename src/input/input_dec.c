@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.45 2002/08/12 22:12:51 massiot Exp $
+ * $Id: input_dec.c,v 1.46 2002/08/29 23:53:22 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -46,6 +46,7 @@ decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
                                    es_descriptor_t * p_es )
 {
     decoder_fifo_t *p_fifo;
+    int i_priority;
 
     /* Create the decoder configuration structure */
     p_fifo = CreateDecoderFifo( p_input, p_es );
@@ -67,8 +68,18 @@ decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
         return NULL;
     }
 
+    if ( p_es->i_cat == AUDIO_ES )
+    {
+        i_priority = VLC_THREAD_PRIORITY_AUDIO;
+    }
+    else
+    {
+        i_priority = VLC_THREAD_PRIORITY_LOW;
+    }
+
     /* Spawn the decoder thread */
-    if( vlc_thread_create( p_fifo, "decoder", p_fifo->pf_run, 0 ) )
+    if( vlc_thread_create( p_fifo, "decoder", p_fifo->pf_run,
+                           i_priority, VLC_FALSE ) )
     {
         msg_Err( p_fifo, "cannot spawn decoder thread \"%s\"",
                          p_fifo->p_module->psz_object_name );

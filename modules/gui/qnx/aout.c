@@ -104,7 +104,8 @@ int E_(OpenAudio)( vlc_object_t *p_this )
 
     /* Create audio thread and wait for its readiness. */
     p_aout->output.p_sys->b_initialized = VLC_FALSE;
-    if( vlc_thread_create( p_aout, "aout", QNXaoutThread, VLC_FALSE ) )
+    if( vlc_thread_create( p_aout, "aout", QNXaoutThread,
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
     {
         msg_Err( p_aout, "cannot create QNX audio thread (%s)", strerror(errno) );
         E_(CloseAudio)( p_this );

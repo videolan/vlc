@@ -2,7 +2,7 @@
  * aout.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout.c,v 1.7 2002/08/25 09:40:00 sam Exp $
+ * $Id: aout.c,v 1.8 2002/08/29 23:53:22 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -175,7 +175,7 @@ int E_(OpenAudio) ( vlc_object_t *p_this )
     msg_Dbg( p_aout, "creating DirectSoundThread" );
     if( vlc_thread_create( p_aout->output.p_sys->p_notif,
                            "DirectSound Notification Thread",
-                           DirectSoundThread, 1 ) )
+                           DirectSoundThread, VLC_THREAD_PRIORITY_OUTPUT, 1 ) )
     {
         msg_Err( p_aout, "cannot create DirectSoundThread" );
         goto error;

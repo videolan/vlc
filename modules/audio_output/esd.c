@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.10 2002/08/25 09:39:59 sam Exp $
+ * $Id: esd.c,v 1.11 2002/08/29 23:53:22 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -91,7 +91,8 @@ static int Open( vlc_object_t *p_this )
 
     /* Create ESD thread and wait for its readiness. */
     p_sys->b_initialized = VLC_FALSE;
-    if( vlc_thread_create( p_aout, "aout", ESDThread, VLC_FALSE ) )
+    if( vlc_thread_create( p_aout, "aout", ESDThread,
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
     {
         msg_Err( p_aout, "cannot create ESD thread (%s)", strerror(errno) );
         free( p_sys );

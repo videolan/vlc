@@ -2,7 +2,7 @@
  * gtk_main.c : Gtk+ wrapper for gtk_main
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: gtk_main.c,v 1.4 2002/08/21 17:31:58 sam Exp $
+ * $Id: gtk_main.c,v 1.5 2002/08/29 23:53:22 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -98,7 +98,8 @@ static int Open( vlc_object_t *p_this )
 
     /* Launch the gtk_main() thread. It will not return until it has
      * called gdk_threads_enter(), which ensures us thread safety. */
-    if( vlc_thread_create( p_gtk_main, "gtk_main", GtkMain, VLC_TRUE ) )
+    if( vlc_thread_create( p_gtk_main, "gtk_main", GtkMain,
+                           VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
     {
         vlc_object_destroy( p_gtk_main );
         i_refcount--;
