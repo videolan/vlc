@@ -68,8 +68,8 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
 
     // We do it this way otherwise CreateWindowEx will fail if WS_EX_LAYERED
     // is not supported
-    SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
-                      GetWindowLong( m_hWnd, GWL_EXSTYLE ) | WS_EX_LAYERED );
+//     SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
+//                       GetWindowLong( m_hWnd, GWL_EXSTYLE ) | WS_EX_LAYERED );
 
     // Store a pointer to the GenericWindow in a map
     Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
@@ -138,6 +138,7 @@ void Win32Window::raise() const
 
 void Win32Window::setOpacity( uint8_t value ) const
 {
+#if 0
     Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
 
     if( value == 255 )
@@ -167,6 +168,7 @@ void Win32Window::setOpacity( uint8_t value ) const
     }
 
    UpdateWindow( m_hWnd );
+#endif
 }
 
 
