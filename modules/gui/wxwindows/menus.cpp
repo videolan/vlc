@@ -253,8 +253,10 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
                                                 FIND_PARENT );
     if( p_object != NULL )
     {
+#if defined(WIN32)
         ppsz_varnames[i] = "intf-switch";
         pi_objects[i++] = p_object->i_object_id;
+#endif
         ppsz_varnames[i] = "intf-add";
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "intf-skins";
@@ -496,8 +498,10 @@ wxMenu *SettingsMenu( intf_thread_t *_p_intf, wxWindow *p_parent,
                                                 FIND_PARENT );
     if( p_object != NULL )
     {
+#if defined(WIN32)
         ppsz_varnames[i] = "intf-switch";
         pi_objects[i++] = p_object->i_object_id;
+#endif
         ppsz_varnames[i] = "intf-add";
         pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );
