@@ -50,6 +50,7 @@ EXTRA_DIST = \
 	gui/ncurses/Modules.am \
 	gui/qnx/Modules.am \
 	gui/qt/Modules.am \
+	gui/skins/Modules.am \
 	gui/win32/Modules.am \
 	gui/wxwindows/Modules.am \
 	misc/Modules.am \

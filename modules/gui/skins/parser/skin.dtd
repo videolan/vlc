@@ -1,0 +1,192 @@
+<!--
+ *****************************************************************************
+ * skin.dtd: DTD for the VLC skins
+ *****************************************************************************
+ * Copyright (C) 2003 VideoLAN
+ * $Id: skin.dtd,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ *
+ * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
+ *          Emmanuel Puig    <karibu@via.ecp.fr>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111,
+ * USA.
+ *****************************************************************************
+-->
+
+
+<!ELEMENT Theme (ThemeInfo,(Bitmap|Font|Window|Event)*)>
+    <!ATTLIST Theme
+        magnet      CDATA   "9"
+        log         CDATA   "false"
+    >
+
+<!-- main elements -->
+<!ELEMENT Bitmap EMPTY>
+    <!ATTLIST Bitmap
+        id          CDATA   #REQUIRED
+        file        CDATA   #REQUIRED
+        alphacolor  CDATA   #REQUIRED
+    >
+<!ELEMENT Event EMPTY>
+    <!ATTLIST Event
+        id          CDATA   #REQUIRED
+        event       CDATA   #REQUIRED
+        key         CDATA   "none"
+    >
+<!ELEMENT Font EMPTY>
+    <!ATTLIST Font
+        id          CDATA   "default"
+        font        CDATA   "arial"
+        size        CDATA   "12"
+        color       CDATA   "#000000"
+        weight      CDATA   "400"
+        italic      CDATA   "false"
+        underline   CDATA   "false"
+    >
+<!ELEMENT ThemeInfo EMPTY>
+    <!ATTLIST ThemeInfo
+        name        CDATA   #IMPLIED
+        author      CDATA   #IMPLIED
+        email       CDATA   #IMPLIED
+        webpage     CDATA   #IMPLIED
+    >
+<!ELEMENT Window (ControlGroup)>
+    <!ATTLIST Window
+        id          CDATA   #REQUIRED
+        visible     CDATA   "true"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        fadetime    CDATA   "500"
+        alpha       CDATA   "255"
+        movealpha   CDATA   "255"
+        dragdrop    CDATA   "true"
+    >
+
+<!ELEMENT ControlGroup (ControlGroup|ImageControl|ButtonControl|PlayListControl|
+                        SliderControl|TextControl|CheckBoxControl|
+                        RectangleControl|Anchor)+>
+    <!ATTLIST ControlGroup
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+    >
+
+<!-- Anchors -->
+<!ELEMENT Anchor EMPTY>
+    <!ATTLIST Anchor
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        priority    CDATA   #REQUIRED
+        range       CDATA   "10"
+    >
+
+<!-- Controls -->
+<!ELEMENT ImageControl EMPTY>
+    <!ATTLIST ImageControl
+        id          CDATA   "none"
+        visible     CDATA   "true"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        image       CDATA   #REQUIRED
+        onclick     CDATA   "none"
+        help        CDATA   "\0"
+    >
+<!ELEMENT RectangleControl EMPTY>
+    <!ATTLIST RectangleControl
+        id          CDATA   "none"
+        visible     CDATA   "true"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        w           CDATA   "50"
+        h           CDATA   "50"
+        color       CDATA   "#C0C0C0"
+        onclick     CDATA   "none"
+        help        CDATA   "\0"
+    >
+<!ELEMENT ButtonControl EMPTY>
+    <!ATTLIST ButtonControl
+        id          CDATA   "none"
+        visible     CDATA   "true"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        up          CDATA   #REQUIRED
+        down        CDATA   #REQUIRED
+        disabled    CDATA   "none"
+        onclick     CDATA   "none"
+        tooltiptext CDATA   "none"
+        help        CDATA   "\0"
+    >
+<!ELEMENT CheckBoxControl EMPTY>
+    <!ATTLIST CheckBoxControl
+        id           CDATA   "none"
+        visible      CDATA   "true"
+        x            CDATA   "\0"
+        y            CDATA   "\0"
+        img1         CDATA   #REQUIRED
+        clickimg1    CDATA   "none"
+        img2         CDATA   #REQUIRED
+        clickimg2    CDATA   "none"
+        disabled1    CDATA   "none"
+        disabled2    CDATA   "none"
+        onclick1     CDATA   "none"
+        onclick2     CDATA   "none"
+        tooltiptext1 CDATA   "none"
+        tooltiptext2 CDATA   "none"
+        help         CDATA   "\0"
+    >
+<!ELEMENT SliderControl EMPTY>
+    <!ATTLIST SliderControl
+        id          CDATA   "none"
+        visible     CDATA   "true"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        type        CDATA   "time"
+        up          CDATA   #REQUIRED
+        down        CDATA   #REQUIRED
+        abs         CDATA   #REQUIRED
+        ord         CDATA   #REQUIRED
+        tooltiptext CDATA   "none"
+        help        CDATA   "\0"
+    >
+<!ELEMENT TextControl EMPTY>
+    <!ATTLIST TextControl
+        id          CDATA   "none"
+        visible     CDATA   "true"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        text        CDATA   ""
+        font        CDATA   #REQUIRED
+        align       CDATA   "left"
+        width       CDATA   "\0"
+        display     CDATA   "none"
+        scroll      CDATA   "true"
+        scrollspace CDATA   "20"
+        help        CDATA   "\0"
+    >
+<!ELEMENT PlayListControl SliderControl>
+    <!ATTLIST PlayListControl
+        id          CDATA   "none"
+        visible     CDATA   "true"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        width       CDATA   "200"
+        infowidth   CDATA   "50"
+        font        CDATA   #REQUIRED
+        playfont    CDATA   "none"
+        selcolor    CDATA   "#0000FF"
+        abs         CDATA   #REQUIRED
+        ord         CDATA   #REQUIRED
+        help        CDATA   "\0"
+        longfilename CDATA   "false"
+    >

@@ -1,0 +1,142 @@
+<!-- vim: set filetype=xml : -->
+<!--
+ *****************************************************************************
+ * skin.act: FleXML actions file
+ *****************************************************************************
+ * Copyright (C) 2003 VideoLAN
+ * $Id: skin.act,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ *
+ * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
+ *          Emmanuel Puig    <karibu@via.ecp.fr>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111,
+ * USA.
+ *****************************************************************************
+-->
+
+<!DOCTYPE actions SYSTEM "flexml-act.dtd">
+<actions>
+    <top>
+        <![CDATA[
+            #include "wrappers.h"
+        ]]>
+    </top>
+    <start tag="Bitmap">
+        <![CDATA[
+            AddBitmap( {id}, {file}, {alphacolor} );
+        ]]>
+    </start>
+    <start tag="Event">
+        <![CDATA[
+            AddEvent( {id}, {event}, {key} );
+        ]]>
+    </start>
+    <start tag="Font">
+        <![CDATA[
+            AddFont( {id}, {font}, {size}, {color}, {weight}, {italic},
+                     {underline} );
+        ]]>
+    </start>
+    <start tag="ThemeInfo">
+        <![CDATA[
+            AddThemeInfo( {name}, {author}, {email}, {webpage} );
+        ]]>
+    </start>
+    <start tag="Window">
+        <![CDATA[
+            StartWindow( {id}, {x}, {y}, {visible}, {fadetime}, {alpha},
+                         {movealpha}, {dragdrop} );
+        ]]>
+    </start>
+    <end tag="Window">
+        <![CDATA[
+            EndWindow();
+        ]]>
+    </end>
+    <start tag="ControlGroup">
+        <![CDATA[
+            StartControlGroup( {x}, {y} );
+        ]]>
+    </start>
+    <end tag="ControlGroup">
+        <![CDATA[
+            EndControlGroup();
+        ]]>
+    </end>
+    <start tag="Anchor">
+        <![CDATA[
+            AddAnchor( {x}, {y}, {range}, {priority} );
+        ]]>
+    </start>
+    <start tag="ImageControl">
+        <![CDATA[
+            AddImage( {id}, {visible}, {x}, {y}, {image}, {onclick}, {help} );
+        ]]>
+    </start>
+    <start tag="RectangleControl">
+        <![CDATA[
+            AddRectangle( {id}, {visible}, {x}, {y}, {w}, {h}, {color},
+                          {onclick}, {help} );
+        ]]>
+    </start>
+    <start tag="ButtonControl">
+        <![CDATA[
+            AddButton( {id}, {visible}, {x}, {y}, {up}, {down}, {disabled},
+                       {onclick}, {tooltiptext}, {help} );
+        ]]>
+    </start>
+    <start tag="CheckBoxControl">
+        <![CDATA[
+            AddCheckBox( {id}, {visible}, {x}, {y}, {img1}, {img2}, {clickimg1},
+                         {clickimg2}, {disabled1}, {disabled2}, {onclick1},
+                         {onclick2}, {tooltiptext1}, {tooltiptext2}, {help} );
+        ]]>
+    </start>
+    <start tag="SliderControl">
+        <![CDATA[
+            AddSlider( {id}, {visible}, {x}, {y}, {type}, {up}, {down}, {abs},
+                       {ord}, {tooltiptext}, {help} );
+        ]]>
+    </start>
+    <start tag="TextControl">
+        <![CDATA[
+            AddText( {id}, {visible}, {x}, {y}, {text}, {font}, {align},
+                     {width}, {display}, {scroll}, {scrollspace},
+                     {help} );
+        ]]>
+    </start>
+    <start tag="PlayListControl">
+        <![CDATA[
+            AddPlayList( {id}, {visible}, {x}, {y}, {width}, {infowidth},
+                         {font}, {playfont}, {selcolor}, {abs}, {ord},
+                         {longfilename}, {help} );
+        ]]>
+    </start>
+    <end tag="PlayListControl">
+        <![CDATA[
+            AddPlayListEnd();
+        ]]>
+    </end>
+    <start tag="Theme">
+        <![CDATA[
+            StartTheme( {log}, {magnet} );
+        ]]>
+    </start>
+    <end tag="Theme">
+        <![CDATA[
+            EndTheme();
+        ]]>
+    </end>
+</actions>
