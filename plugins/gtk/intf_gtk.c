@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.18 2001/05/15 01:01:44 stef Exp $
+ * $Id: intf_gtk.c,v 1.19 2001/05/15 14:49:48 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -198,7 +198,7 @@ static void intf_Run( intf_thread_t *p_intf )
     /* Create some useful widgets that will certainly be used */
     p_intf->p_sys->p_window = create_intf_window( );
     p_intf->p_sys->p_popup = create_intf_popup( );
-    p_intf->p_sys->p_playlist = create_intf_playlist( );
+    p_intf->p_sys->p_playlist = create_intf_playlist();
     
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
@@ -211,7 +211,7 @@ static void intf_Run( intf_thread_t *p_intf )
 
     /* Accept file drops on the playlist window */
     gtk_drag_dest_set( GTK_WIDGET( lookup_widget( p_intf->p_sys->p_playlist,
-                                                  "playlist_clist") ),
+                                   "playlist_clist") ),
                        GTK_DEST_DEFAULT_ALL, target_table,
                        1, GDK_ACTION_COPY );
 
@@ -251,7 +251,7 @@ static void intf_Run( intf_thread_t *p_intf )
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_popup),
                          "p_intf", p_intf );
 
-    gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_playlist),
+    gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_playlist ),
                          "p_intf", p_intf );
 
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_adj),
@@ -316,13 +316,13 @@ static gint GtkManage( gpointer p_data )
 
     if( p_intf->p_input != NULL && !p_intf->b_die )
     {
+        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
+
         /* New input or stream map change */
         if( p_intf->p_input->stream.b_changed )
         {
             GtkModeManage( p_intf );
         }
-
-        GtkSetupMenu( p_intf );
 
         /* Manage the slider */
         if( p_intf->p_input->stream.b_seekable )
@@ -346,14 +346,20 @@ static gint GtkManage( gpointer p_data )
             else if( p_intf->p_sys->b_slider_free )
             {
                 off_t i_seek = ( newvalue * p_area->i_size ) / 100;
-    
+
+                /* release the lock to be able to seek */
+                vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
                 input_Seek( p_intf->p_input, i_seek );
+                vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
     
                 /* Update the old value */
                 p_intf->p_sys->f_adj_oldvalue = newvalue;
             }
 #undef p_area
         }
+        GtkSetupMenu( p_intf );
+
+        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
     }
     else if( !p_intf->b_die )
     {
@@ -386,6 +392,7 @@ static gint GtkManage( gpointer p_data )
  *****************************************************************************
  * This function displays the current date related to the position in
  * the stream. It is called whenever the slider changes its value.
+ * The lock has to be taken before you call the function.
  *****************************************************************************/
 void GtkDisplayDate( GtkAdjustment *p_adj )
 {
@@ -398,20 +405,19 @@ void GtkDisplayDate( GtkAdjustment *p_adj )
 #define p_area p_intf->p_input->stream.p_selected_area
         char psz_time[ OFFSETTOTIME_MAX_SIZE ];
 
-        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
-
         gtk_frame_set_label( GTK_FRAME( p_intf->p_sys->p_slider_frame ),
                             input_OffsetToTime( p_intf->p_input, psz_time,
                                    ( p_area->i_size * p_adj->value ) / 100 ) );
-
-        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
 #undef p_area
      }
 }
 
 
 /*****************************************************************************
- * GtkModeManage
+ * GtkModeManage: actualise the aspect of the interface whenever the input
+ *                changes.
+ *****************************************************************************
+ * The lock has to be taken before you call the function.
  *****************************************************************************/
 static gint GtkModeManage( intf_thread_t * p_intf )
 {
@@ -497,10 +503,26 @@ static gint GtkModeManage( intf_thread_t * p_intf )
     }
     else
     {
+        /* default mode */
         p_label = gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_window ),
                         "label_status" );
         gtk_label_set_text( GTK_LABEL( p_label ), "" );
         gtk_widget_show( GTK_WIDGET( p_file_box ) );
+
+        /* unsensitize menus */
+        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_title"), FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_chapter"),
+                                  FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_angle"), FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_audio"), FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_subpictures"),
+                                  FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_navigation"),
+                                  FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_angle"), FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_audio"), FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_subpictures"),
+                                  FALSE );
     }
 
     /* set control items */

@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.17 2001/05/15 01:01:44 stef Exp $
+ * $Id: gtk_callbacks.c,v 1.18 2001/05/15 14:49:48 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -66,10 +66,9 @@
  * Main interface callbacks
  */
 
-gboolean
-GtkExit                                (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
+gboolean GtkExit( GtkWidget       *widget,
+                  GdkEventButton  *event,
+                  gpointer         user_data )
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
 
@@ -80,10 +79,9 @@ GtkExit                                (GtkWidget       *widget,
     return TRUE;
 }
 
-gboolean
-GtkWindowDelete                        (GtkWidget       *widget,
-                                        GdkEvent        *event,
-                                        gpointer         user_data)
+gboolean GtkWindowDelete( GtkWidget       *widget,
+                          GdkEvent        *event,
+                          gpointer         user_data )
 {
     GtkExit( GTK_WIDGET( widget ), NULL, user_data );
 
@@ -91,10 +89,9 @@ GtkWindowDelete                        (GtkWidget       *widget,
 }
 
 
-gboolean
-GtkWindowToggle                        (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
+gboolean GtkWindowToggle( GtkWidget       *widget,
+                          GdkEventButton  *event,
+                          gpointer         user_data )
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
     
@@ -111,36 +108,38 @@ GtkWindowToggle                        (GtkWidget       *widget,
     return TRUE;
 }
 
-gboolean
-GtkFullscreen                          (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
+gboolean GtkFullscreen( GtkWidget       *widget,
+                        GdkEventButton  *event,
+                        gpointer         user_data)
 {
     if( p_vout_bank->i_count )
     {
         vlc_mutex_lock( &p_vout_bank->pp_vout[0]->change_lock );
-        if( p_vout_bank->pp_vout[0]->b_fullscreen ==
-                !GTK_CHECK_MENU_ITEM( widget )->active )
-            p_vout_bank->pp_vout[0]->i_changes |= VOUT_FULLSCREEN_CHANGE;
-        vlc_mutex_unlock( &p_vout_bank->pp_vout[0]->change_lock );
-    }
 
-    return TRUE;
+        p_vout_bank->pp_vout[0]->i_changes |= VOUT_FULLSCREEN_CHANGE;
+
+        vlc_mutex_unlock( &p_vout_bank->pp_vout[0]->change_lock );
+
+        return TRUE;
+    }
+    else
+    {
+        return FALSE;
+    }
 }
 
-void
-GtkWindowDrag                          (GtkWidget       *widget,
-                                        GdkDragContext  *drag_context,
-                                        gint             x,
-                                        gint             y,
-                                        GtkSelectionData *data,
-                                        guint            info,
-                                        guint            time,
-                                        gpointer         user_data)
+void GtkWindowDrag( GtkWidget       *widget,
+                    GdkDragContext  *drag_context,
+                    gint             x,
+                    gint             y,
+                    GtkSelectionData *data,
+                    guint            info,
+                    guint            time,
+                    gpointer         user_data)
 {
     intf_thread_t * p_intf =  GetIntf( GTK_WIDGET(widget), "intf_window" );
     int end = p_main->p_playlist->i_size;
-    GtkDropDataReceived( p_intf, data, info, PLAYLIST_END);
+    GtkDropDataReceived( p_intf, data, info, PLAYLIST_END );
 
     if( p_intf->p_input != NULL )
     {
@@ -149,15 +148,16 @@ GtkWindowDrag                          (GtkWidget       *widget,
     }
      
     intf_PlaylistJumpto( p_main->p_playlist, end-1 );
-    p_main->p_playlist->b_stopped = 0;
 }
 
 
+/****************************************************************************
+ * Slider management
+ ****************************************************************************/
 
-gboolean
-GtkSliderRelease                       (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
+gboolean GtkSliderRelease( GtkWidget       *widget,
+                           GdkEventButton  *event,
+                           gpointer         user_data )
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), "intf_window" );
 
@@ -169,10 +169,9 @@ GtkSliderRelease                       (GtkWidget       *widget,
 }
 
 
-gboolean
-GtkSliderPress                         (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
+gboolean GtkSliderPress( GtkWidget       *widget,
+                         GdkEventButton  *event,
+                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), "intf_window" );
 
@@ -184,9 +183,11 @@ GtkSliderPress                         (GtkWidget       *widget,
 }
 
 
-void
-GtkTitlePrev                           (GtkButton       *button,
-                                        gpointer         user_data)
+/****************************************************************************
+ * DVD specific items
+ ****************************************************************************/
+
+void GtkTitlePrev( GtkButton * button, gpointer user_data )
 {
     intf_thread_t * p_intf;
     input_area_t *  p_area;
@@ -208,15 +209,13 @@ GtkTitlePrev                           (GtkButton       *button,
 }
 
 
-void
-GtkTitleNext                           (GtkButton       *button,
-                                        gpointer         user_data)
+void GtkTitleNext( GtkButton * button, gpointer user_data )
 {
     intf_thread_t * p_intf;
     input_area_t *  p_area;
     int             i_id;
 
-    p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
+    p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
     i_id = p_intf->p_input->stream.p_selected_area->i_id + 1;
 
     if( i_id < p_intf->p_input->stream.i_area_nb )
@@ -232,9 +231,7 @@ GtkTitleNext                           (GtkButton       *button,
 }
 
 
-void
-GtkChapterPrev                         (GtkButton       *button,
-                                        gpointer         user_data)
+void GtkChapterPrev( GtkButton * button, gpointer user_data )
 {
     intf_thread_t * p_intf;
     input_area_t *  p_area;
@@ -254,9 +251,7 @@ GtkChapterPrev                         (GtkButton       *button,
 }
 
 
-void
-GtkChapterNext                         (GtkButton       *button,
-                                        gpointer         user_data)
+void GtkChapterNext( GtkButton * button, gpointer user_data )
 {
     intf_thread_t * p_intf;
     input_area_t *  p_area;
@@ -378,94 +373,42 @@ GtkJumpCancel                          (GtkButton       *button,
 }
 
 
-void
-GtkFileOpenActivate                    (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    GtkFileOpenShow( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
-
-void
-GtkDiscOpenActivate                    (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    GtkDiscOpenShow( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
-
-void
-GtkNetworkOpenActivate                 (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    GtkNetworkOpenShow( GTK_WIDGET( menuitem ), NULL, user_data );
-
-}
-
-
-void
-GtkExitActivate                        (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
+/****************************************************************************
+ * Callbacks for menuitems
+ ****************************************************************************/
+void GtkExitActivate( GtkMenuItem * menuitem, gpointer user_data )
 {
     GtkExit( GTK_WIDGET( menuitem ), NULL, user_data );
 }
 
 
-void
-GtkWindowToggleActivate                (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    GtkWindowToggle( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
-
-void
-GtkFullscreenActivate                  (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
+void GtkFullscreenActivate( GtkMenuItem * menuitem, gpointer user_data )
 {
     GtkFullscreen( GTK_WIDGET( menuitem ), NULL, user_data );
 }
 
 
-void
-GtkPlaylistActivate                    (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
+void GtkWindowToggleActivate( GtkMenuItem * menuitem, gpointer user_data )
 {
-    GtkPlaylistShow( GTK_WIDGET( menuitem ), NULL, user_data );
+    GtkWindowToggle( GTK_WIDGET( menuitem ), NULL, user_data );
 }
 
 
-void
-GtkModulesActivate                     (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-GtkPreferencesActivate                 (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    GtkPreferencesShow( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
-
-void
-GtkAboutActivate                       (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
+void GtkAboutActivate( GtkMenuItem * menuitem, gpointer user_data )
 {
     GtkAboutShow( GTK_WIDGET( menuitem ), NULL, user_data );
 }
 
 
-
-void
-GtkJumpActivate                        (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
+void GtkJumpActivate( GtkMenuItem * menuitem, gpointer user_data )
 {
     GtkJumpShow( GTK_WIDGET( menuitem ), NULL, user_data );
 }
 
+void
+GtkPlaylistDestroy                     (GtkObject       *object,
+                                        gpointer         user_data)
+{
 
+}
 

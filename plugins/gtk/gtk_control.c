@@ -2,7 +2,7 @@
  * gtk_control.c : functions to handle stream control buttons.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_control.c,v 1.1 2001/05/15 01:01:44 stef Exp $
+ * $Id: gtk_control.c,v 1.2 2001/05/15 14:49:48 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -83,12 +83,12 @@ gboolean GtkControlStop( GtkWidget       *widget,
         p_intf->p_input->b_eof = 1;
 
         /* update playlist */
-//        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
 
         p_main->p_playlist->i_index--;
         p_main->p_playlist->b_stopped = 1;
 
-//        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
 
     }
 
@@ -109,23 +109,28 @@ gboolean GtkControlPlay( GtkWidget       *widget,
     }
     else
     {
-//        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
 
         if( p_main->p_playlist->b_stopped )
         {
             if( p_main->p_playlist->i_size )
             {
+                vlc_mutex_unlock( &p_main->p_playlist->change_lock );
                 intf_PlaylistJumpto( p_main->p_playlist,
                                      p_main->p_playlist->i_index );
-                p_main->p_playlist->b_stopped = 0;
             }
             else
             {
+                vlc_mutex_unlock( &p_main->p_playlist->change_lock );
                 GtkFileOpenShow( widget, event, user_data );
             }
         }
+        else
+        {
 
-//        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+            vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+        }
+
     }
 
     return TRUE;
@@ -141,7 +146,10 @@ gboolean GtkControlPause( GtkWidget       *widget,
     if( p_intf->p_input != NULL )
     {
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PAUSE );
+
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
         p_main->p_playlist->b_stopped = 0;
+        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
     }
 
     return TRUE;
@@ -157,7 +165,10 @@ gboolean GtkControlSlow( GtkWidget       *widget,
     if( p_intf->p_input != NULL )
     {
         input_SetStatus( p_intf->p_input, INPUT_STATUS_SLOWER );
+
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
         p_main->p_playlist->b_stopped = 0;
+        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
     }
 
     return TRUE;
@@ -173,7 +184,10 @@ gboolean GtkControlFast( GtkWidget       *widget,
     if( p_intf->p_input != NULL )
     {
         input_SetStatus( p_intf->p_input, INPUT_STATUS_FASTER );
+
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
         p_main->p_playlist->b_stopped = 0;
+        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
     }
 
     return TRUE;

@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.1 2001/05/15 01:01:44 stef Exp $
+ * $Id: gtk_menu.c,v 1.2 2001/05/15 14:49:48 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -347,11 +347,14 @@ static gint GtkRadioMenu( intf_thread_t * p_intf,
     /* link the new menu to the title menu item */
     gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_root ), p_menu );
 
-    /* toggle currently selected chapter */
+    /* toggle currently selected chapter
+     * We have to release the lock since input_ToggleES needs it */
     if( p_item_selected != NULL )
     {
+        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
         gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item_selected ),
                                         TRUE );
+        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
     }
 
     /* be sure that menu is sensitive, if there are several items */
@@ -427,7 +430,6 @@ static gint GtkLanguageMenus( gpointer          p_data,
     gtk_widget_show( p_separator );
     gtk_menu_append( GTK_MENU( p_menu ), p_separator );
 
-    vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
     p_item_active = NULL;
     i_item = 0;
 
@@ -466,17 +468,19 @@ static gint GtkLanguageMenus( gpointer          p_data,
         }
     }
 
-    vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
 
     /* link the new menu to the menubar item */
     gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_root ), p_menu );
 
     /* acitvation will call signals so we can only do it
-     * when submenu is attached to menu - to get intf_window */
+     * when submenu is attached to menu - to get intf_window 
+     * We have to release the lock since input_ToggleES needs it */
     if( p_item_active != NULL )
     {
+        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
         gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item_active ),
                                         TRUE );
+        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
     }
 
     /* be sure that menu is sensitive if non empty */
@@ -487,6 +491,7 @@ static gint GtkLanguageMenus( gpointer          p_data,
 
     return TRUE;
 }
+
 #if 1
 /*****************************************************************************
  * GtkTitleMenu: sets menus for titles and chapters selection
@@ -708,10 +713,14 @@ static gint GtkTitleMenu( gpointer       p_data,
     /* link the new menu to the menubar item */
     gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_navigation ), p_title_menu );
 
+    /* Default selected chapter
+     * We have to release the lock since input_ToggleES needs it */
     if( p_item_active != NULL )
     {
+        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
         gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item_active ),
                                         TRUE );
+        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
     }
 #if 0
     if( p_intf->p_input->stream.i_area_nb > 1 )
@@ -724,6 +733,7 @@ static gint GtkTitleMenu( gpointer       p_data,
     return TRUE;
 }
 #endif
+
 /*****************************************************************************
  * GtkSetupMenu: function that generates title/chapter/audio/subpic
  * menus with help from preceding functions
@@ -736,7 +746,9 @@ gint GtkSetupMenu( intf_thread_t * p_intf )
     GtkWidget *         p_popup_menu;
     gint                i;
 
-    p_intf->p_sys->b_chapter_update |= p_intf->p_sys->b_title_update;
+    p_intf->p_sys->b_chapter_update |= p_intf->p_sys->b_title_update |
+        ( p_intf->p_sys->i_part !=
+            p_intf->p_input->stream.p_selected_area->i_part );
     p_intf->p_sys->b_angle_update |= p_intf->p_sys->b_title_update;
     p_intf->p_sys->b_audio_update |= p_intf->p_sys->b_title_update;
     p_intf->p_sys->b_spu_update |= p_intf->p_sys->b_title_update;
@@ -863,22 +875,6 @@ gint GtkSetupMenu( intf_thread_t * p_intf )
                             GtkPopupSubtitleToggle );
 
         p_intf->p_sys->b_spu_update = 0;
-    }
-
-    /* handle fullscreen check items */
-    if( p_vout_bank->i_count )
-    {
-        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                          p_intf->p_sys->p_window ), "menubar_fullscreen" ) );
-    
-        p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                     p_intf->p_sys->p_popup ), "popup_fullscreen" ) );
-
-        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_menubar_menu ),
-                                        p_vout_bank->pp_vout[0]->b_fullscreen );
-        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_popup_menu ),
-                                        p_vout_bank->pp_vout[0]->b_fullscreen );
-
     }
 
     return TRUE;

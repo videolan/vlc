@@ -942,7 +942,7 @@
       <name>activate</name>
       <handler>GtkPlayActivate</handler>
       <data>&quot;intf_popup&quot;</data>
-      <last_modification_time>Mon, 14 May 2001 21:30:37 GMT</last_modification_time>
+      <last_modification_time>Tue, 15 May 2001 13:53:43 GMT</last_modification_time>
     </signal>
     <label>_Play</label>
     <right_justify>False</right_justify>
@@ -956,7 +956,7 @@
       <name>activate</name>
       <handler>GtkPauseActivate</handler>
       <data>&quot;intf_popup&quot;</data>
-      <last_modification_time>Mon, 14 May 2001 21:30:47 GMT</last_modification_time>
+      <last_modification_time>Tue, 15 May 2001 13:53:37 GMT</last_modification_time>
     </signal>
     <label>Pause</label>
     <right_justify>False</right_justify>
@@ -970,7 +970,7 @@
       <name>activate</name>
       <handler>GtKStopActivate</handler>
       <data>&quot;intf_popup&quot;</data>
-      <last_modification_time>Mon, 14 May 2001 21:31:03 GMT</last_modification_time>
+      <last_modification_time>Tue, 15 May 2001 13:53:29 GMT</last_modification_time>
     </signal>
     <label>Stop</label>
     <right_justify>False</right_justify>
@@ -984,7 +984,7 @@
       <name>activate</name>
       <handler>GtkBackActivate</handler>
       <data>&quot;intf_popup&quot;</data>
-      <last_modification_time>Mon, 14 May 2001 21:31:13 GMT</last_modification_time>
+      <last_modification_time>Tue, 15 May 2001 13:53:21 GMT</last_modification_time>
     </signal>
     <label>Back</label>
     <right_justify>False</right_justify>
@@ -998,7 +998,7 @@
       <name>activate</name>
       <handler>GtkSlowActivate</handler>
       <data>&quot;intf_popup&quot;</data>
-      <last_modification_time>Mon, 14 May 2001 21:31:22 GMT</last_modification_time>
+      <last_modification_time>Tue, 15 May 2001 13:53:15 GMT</last_modification_time>
     </signal>
     <label>Slow</label>
     <right_justify>False</right_justify>
@@ -1012,7 +1012,7 @@
       <name>activate</name>
       <handler>GtkFastActivate</handler>
       <data>&quot;intf_popup&quot;</data>
-      <last_modification_time>Mon, 14 May 2001 21:31:33 GMT</last_modification_time>
+      <last_modification_time>Tue, 15 May 2001 13:53:07 GMT</last_modification_time>
     </signal>
     <label>Fast</label>
     <right_justify>False</right_justify>
@@ -1025,31 +1025,29 @@
   </widget>
 
   <widget>
-    <class>GtkCheckMenuItem</class>
+    <class>GtkMenuItem</class>
     <name>popup_interface_toggle</name>
     <signal>
       <name>activate</name>
       <handler>GtkWindowToggleActivate</handler>
       <data>&quot;intf_popup&quot;</data>
-      <last_modification_time>Mon, 14 May 2001 21:32:18 GMT</last_modification_time>
+      <last_modification_time>Tue, 15 May 2001 13:53:00 GMT</last_modification_time>
     </signal>
     <label>Toggle _Interface</label>
-    <active>True</active>
-    <always_show_toggle>True</always_show_toggle>
+    <right_justify>False</right_justify>
   </widget>
 
   <widget>
-    <class>GtkCheckMenuItem</class>
+    <class>GtkMenuItem</class>
     <name>popup_fullscreen</name>
     <signal>
       <name>activate</name>
       <handler>GtkFullscreenActivate</handler>
       <data>&quot;intf_popup&quot;</data>
-      <last_modification_time>Mon, 14 May 2001 21:32:30 GMT</last_modification_time>
+      <last_modification_time>Tue, 15 May 2001 13:52:38 GMT</last_modification_time>
     </signal>
     <label>_Fullscreen</label>
-    <active>False</active>
-    <always_show_toggle>True</always_show_toggle>
+    <right_justify>False</right_justify>
   </widget>
 
   <widget>
@@ -1065,7 +1063,7 @@
       <name>activate</name>
       <handler>GtkNextActivate</handler>
       <data>&quot;intf_popup&quot;</data>
-      <last_modification_time>Mon, 14 May 2001 21:33:12 GMT</last_modification_time>
+      <last_modification_time>Tue, 15 May 2001 13:52:31 GMT</last_modification_time>
     </signal>
     <label>Next</label>
     <right_justify>False</right_justify>
@@ -1078,7 +1076,7 @@
       <name>activate</name>
       <handler>GtkPrevActivate</handler>
       <data>&quot;intf_popup&quot;</data>
-      <last_modification_time>Mon, 14 May 2001 21:33:25 GMT</last_modification_time>
+      <last_modification_time>Tue, 15 May 2001 13:52:23 GMT</last_modification_time>
     </signal>
     <label>Prev</label>
     <right_justify>False</right_justify>
@@ -1091,7 +1089,7 @@
       <name>activate</name>
       <handler>GtkJumpActivate</handler>
       <data>&quot;intf_popup&quot;</data>
-      <last_modification_time>Mon, 14 May 2001 21:33:37 GMT</last_modification_time>
+      <last_modification_time>Tue, 15 May 2001 13:52:13 GMT</last_modification_time>
     </signal>
     <label>_Jump...</label>
     <right_justify>False</right_justify>
@@ -1209,7 +1207,7 @@
       <name>activate</name>
       <handler>GtkPlaylistActivate</handler>
       <data>&quot;intf_popup&quot;</data>
-      <last_modification_time>Mon, 14 May 2001 21:35:07 GMT</last_modification_time>
+      <last_modification_time>Tue, 15 May 2001 13:51:55 GMT</last_modification_time>
     </signal>
     <label>Playlist...</label>
     <right_justify>False</right_justify>
@@ -1222,7 +1220,7 @@
       <name>activate</name>
       <handler>GtkPreferencesActivate</handler>
       <data>&quot;intf_popup&quot;</data>
-      <last_modification_time>Mon, 14 May 2001 21:35:18 GMT</last_modification_time>
+      <last_modification_time>Tue, 15 May 2001 13:51:46 GMT</last_modification_time>
     </signal>
     <label>_Preferences...</label>
     <right_justify>False</right_justify>
@@ -1241,7 +1239,7 @@
       <name>activate</name>
       <handler>GtkExitActivate</handler>
       <data>&quot;intf_popup&quot;</data>
-      <last_modification_time>Mon, 14 May 2001 21:35:31 GMT</last_modification_time>
+      <last_modification_time>Tue, 15 May 2001 13:52:03 GMT</last_modification_time>
     </signal>
     <label>E_xit</label>
     <right_justify>False</right_justify>
@@ -2298,7 +2296,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>jump_seconde_label</name>
+	  <name>jump_second_label</name>
 	  <label>s.</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -2316,7 +2314,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
 
 	<widget>
 	  <class>GtkSpinButton</class>
-	  <name>jump_seconde_spinbutton</name>
+	  <name>jump_second_spinbutton</name>
 	  <can_focus>True</can_focus>
 	  <climb_rate>1</climb_rate>
 	  <digits>0</digits>
@@ -2429,6 +2427,16 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
 <widget>
   <class>GtkDialog</class>
   <name>intf_playlist</name>
+  <signal>
+    <name>destroy</name>
+    <handler>gtk_widget_hide</handler>
+    <last_modification_time>Tue, 15 May 2001 14:20:39 GMT</last_modification_time>
+  </signal>
+  <signal>
+    <name>delete_event</name>
+    <handler>gtk_widget_hide</handler>
+    <last_modification_time>Tue, 15 May 2001 14:20:22 GMT</last_modification_time>
+  </signal>
   <title>Playlist</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>

@@ -2,7 +2,7 @@
  * gtk_menu.h: prototypes for menu functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_menu.h,v 1.1 2001/05/15 01:01:44 stef Exp $
+ * $Id: gtk_menu.h,v 1.2 2001/05/15 14:49:48 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -21,18 +21,3 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-#if 0
-void GtkMenubarAudioToggle      ( GtkCheckMenuItem *, gpointer );
-void GtkPopupAudioToggle        ( GtkCheckMenuItem *, gpointer );
-void GtkMenubarSubtitleToggle   ( GtkCheckMenuItem *, gpointer );
-void GtkPopupSubtitleToggle     ( GtkCheckMenuItem *, gpointer );
-void GtkMenubarTitleToggle      ( GtkCheckMenuItem *, gpointer );
-void GtkPopupTitleToggle        ( GtkCheckMenuItem *, gpointer );
-void GtkMenubarChapterToggle    ( GtkCheckMenuItem *, gpointer );
-void GtkPopupChapterToggle      ( GtkCheckMenuItem *, gpointer );
-void GtkMenubarAngleToggle      ( GtkCheckMenuItem *, gpointer );
-void GtkPopupAngleToggle        ( GtkCheckMenuItem *, gpointer );
-#endif
-
-

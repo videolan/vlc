@@ -958,7 +958,7 @@ create_intf_popup (void)
   gtk_container_add (GTK_CONTAINER (intf_popup), separator6);
   gtk_widget_set_sensitive (separator6, FALSE);
 
-  popup_interface_toggle = gtk_check_menu_item_new_with_label ("");
+  popup_interface_toggle = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_interface_toggle)->child),
                                    _("Toggle _Interface"));
   gtk_widget_add_accelerator (popup_interface_toggle, "activate_item", intf_popup_accels,
@@ -968,10 +968,8 @@ create_intf_popup (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (popup_interface_toggle);
   gtk_container_add (GTK_CONTAINER (intf_popup), popup_interface_toggle);
-  gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (popup_interface_toggle), TRUE);
-  gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (popup_interface_toggle), TRUE);
 
-  popup_fullscreen = gtk_check_menu_item_new_with_label ("");
+  popup_fullscreen = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_fullscreen)->child),
                                    _("_Fullscreen"));
   gtk_widget_add_accelerator (popup_fullscreen, "activate_item", intf_popup_accels,
@@ -981,7 +979,6 @@ create_intf_popup (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (popup_fullscreen);
   gtk_container_add (GTK_CONTAINER (intf_popup), popup_fullscreen);
-  gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (popup_fullscreen), TRUE);
 
   separator5 = gtk_menu_item_new ();
   gtk_widget_ref (separator5);
@@ -1803,9 +1800,9 @@ create_intf_jump (void)
   GtkWidget *dialog_vbox3;
   GtkWidget *jump_frame;
   GtkWidget *hbox13;
-  GtkWidget *jump_seconde_label;
-  GtkObject *jump_seconde_spinbutton_adj;
-  GtkWidget *jump_seconde_spinbutton;
+  GtkWidget *jump_second_label;
+  GtkObject *jump_second_spinbutton_adj;
+  GtkWidget *jump_second_spinbutton;
   GtkWidget *jump_minute_label;
   GtkObject *jump_minute_spinbutton_adj;
   GtkWidget *jump_minute_spinbutton;
@@ -1841,20 +1838,20 @@ create_intf_jump (void)
   gtk_widget_show (hbox13);
   gtk_container_add (GTK_CONTAINER (jump_frame), hbox13);
 
-  jump_seconde_label = gtk_label_new (_("s."));
-  gtk_widget_ref (jump_seconde_label);
-  gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_seconde_label", jump_seconde_label,
+  jump_second_label = gtk_label_new (_("s."));
+  gtk_widget_ref (jump_second_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_second_label", jump_second_label,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (jump_seconde_label);
-  gtk_box_pack_end (GTK_BOX (hbox13), jump_seconde_label, FALSE, FALSE, 5);
+  gtk_widget_show (jump_second_label);
+  gtk_box_pack_end (GTK_BOX (hbox13), jump_second_label, FALSE, FALSE, 5);
 
-  jump_seconde_spinbutton_adj = gtk_adjustment_new (0, 0, 60, 1, 10, 10);
-  jump_seconde_spinbutton = gtk_spin_button_new (GTK_ADJUSTMENT (jump_seconde_spinbutton_adj), 1, 0);
-  gtk_widget_ref (jump_seconde_spinbutton);
-  gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_seconde_spinbutton", jump_seconde_spinbutton,
+  jump_second_spinbutton_adj = gtk_adjustment_new (0, 0, 60, 1, 10, 10);
+  jump_second_spinbutton = gtk_spin_button_new (GTK_ADJUSTMENT (jump_second_spinbutton_adj), 1, 0);
+  gtk_widget_ref (jump_second_spinbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_second_spinbutton", jump_second_spinbutton,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (jump_seconde_spinbutton);
-  gtk_box_pack_end (GTK_BOX (hbox13), jump_seconde_spinbutton, FALSE, TRUE, 0);
+  gtk_widget_show (jump_second_spinbutton);
+  gtk_box_pack_end (GTK_BOX (hbox13), jump_second_spinbutton, FALSE, TRUE, 0);
 
   jump_minute_label = gtk_label_new (_("m:"));
   gtk_widget_ref (jump_minute_label);
@@ -2136,6 +2133,12 @@ create_intf_playlist (void)
   gtk_widget_show (playlist_cancel_button);
   gtk_box_pack_start (GTK_BOX (dialog_action_area3), playlist_cancel_button, TRUE, TRUE, 0);
 
+  gtk_signal_connect (GTK_OBJECT (intf_playlist), "destroy",
+                      GTK_SIGNAL_FUNC (gtk_widget_hide),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (intf_playlist), "delete_event",
+                      GTK_SIGNAL_FUNC (gtk_widget_hide),
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (playlist_add_disc), "activate",
                       GTK_SIGNAL_FUNC (GtkDiscOpenActivate),
                       "intf_playlist");

@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.12 2001/05/15 01:01:44 stef Exp $
+ * $Id: gtk_playlist.c,v 1.13 2001/05/15 14:49:48 stef Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -74,9 +74,22 @@ gboolean GtkPlaylistShow( GtkWidget       *widget,
 
     if( !GTK_IS_WIDGET( p_intf->p_sys->p_playlist ) )
     {
+        /* The data types we are allowed to receive */
+        static GtkTargetEntry target_table[] =
+        {
+            { "text/uri-list", 0, DROP_ACCEPT_TEXT_URI_LIST },
+            { "text/plain", 0, DROP_ACCEPT_TEXT_PLAIN }
+        };
+
         p_intf->p_sys->p_playlist = create_intf_playlist();
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_playlist ),
                              "p_intf", p_intf );
+
+        /* Accept file drops on the playlist window */
+        gtk_drag_dest_set( GTK_WIDGET( lookup_widget( p_intf->p_sys->p_playlist,
+                                       "playlist_clist") ),
+                           GTK_DEST_DEFAULT_ALL, target_table,
+                           1, GDK_ACTION_COPY );
     }
 
     if( GTK_WIDGET_VISIBLE( p_intf->p_sys->p_playlist ) )
@@ -147,6 +160,12 @@ gboolean GtkPlaylistNext( GtkWidget       *widget,
 /****************************************************************************
  * Menu callbacks for playlist functions
  ****************************************************************************/
+void GtkPlaylistActivate( GtkMenuItem * menuitem, gpointer user_data )
+{
+    GtkPlaylistShow( GTK_WIDGET( menuitem ), NULL, user_data );
+}
+
+
 void GtkNextActivate( GtkMenuItem * menuitem, gpointer user_data )
 {
     GtkPlaylistNext( GTK_WIDGET( menuitem ), NULL, user_data );
@@ -294,12 +313,7 @@ gboolean GtkPlaylistEvent( GtkWidget * widget,
                 p_intf->p_input->b_eof = 1;
             }
 
-//            vlc_mutex_lock( &p_main->p_playlist->change_lock );
-
             intf_PlaylistJumpto( p_main->p_playlist, i_row - 1 );
-            p_main->p_playlist->b_stopped = 0;
-
-//            vlc_mutex_unlock( &p_main->p_playlist->change_lock );
         }
         return TRUE;
     }
@@ -339,12 +353,7 @@ void GtkPlaylistDragData( GtkWidget       *widget,
         GtkDropDataReceived( p_intf, data, info, PLAYLIST_END );
     }
 
-//    vlc_mutex_lock( &p_main->p_playlist->change_lock );
-
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
-    p_main->p_playlist->b_stopped = 0;
-
-//    vlc_mutex_unlock( &p_main->p_playlist->change_lock );
 }
 
 
@@ -500,8 +509,6 @@ void GtkDropDataReceived( intf_thread_t * p_intf,
         
         /* unlock the interface */
         vlc_mutex_unlock( &p_intf->change_lock );
-
-        p_main->p_playlist->b_stopped = 0;
     }
 }
 
@@ -658,28 +665,35 @@ void GtkPlayListManage( intf_thread_t * p_intf )
     playlist_t *    p_playlist = p_main->p_playlist ;
     GtkCList *      p_clist;
 
-    p_clist = GTK_CLIST( gtk_object_get_data( GTK_OBJECT(
-                   p_intf->p_sys->p_playlist ), "playlist_clist" ) );
-
-    if( p_intf->p_sys->i_playing != p_playlist->i_index )
+    if( GTK_IS_WIDGET( p_intf->p_sys->p_playlist ) )
     {
-        GdkColor color;
-
-        color.red = 0xffff;
-        color.blue = 0;
-        color.green = 0;
-
-        gtk_clist_set_background( p_clist, p_playlist->i_index, &color );
-
-        if( p_intf->p_sys->i_playing != -1 )
+        p_clist = GTK_CLIST( gtk_object_get_data( GTK_OBJECT(
+                       p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+    
+        vlc_mutex_lock( &p_playlist->change_lock );
+    
+        if( p_intf->p_sys->i_playing != p_playlist->i_index )
         {
+            GdkColor color;
+    
             color.red = 0xffff;
-            color.blue = 0xffff;
-            color.green = 0xffff;
-            gtk_clist_set_background( p_clist, p_intf->p_sys->i_playing,
-                                      &color);
+            color.blue = 0;
+            color.green = 0;
+    
+            gtk_clist_set_background( p_clist, p_playlist->i_index, &color );
+    
+            if( p_intf->p_sys->i_playing != -1 )
+            {
+                color.red = 0xffff;
+                color.blue = 0xffff;
+                color.green = 0xffff;
+                gtk_clist_set_background( p_clist, p_intf->p_sys->i_playing,
+                                          &color);
+            }
+            p_intf->p_sys->i_playing = p_playlist->i_index;
         }
-        p_intf->p_sys->i_playing = p_playlist->i_index;
+    
+        vlc_mutex_unlock( &p_playlist->change_lock );
     }
 }
 

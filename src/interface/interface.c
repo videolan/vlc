@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: interface.c,v 1.78 2001/05/15 01:01:44 stef Exp $
+ * $Id: interface.c,v 1.79 2001/05/15 14:49:48 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -154,6 +154,8 @@ static void intf_Manage( intf_thread_t *p_intf )
     /* If no stream is being played, try to find one */
     if( p_intf->p_input == NULL && !p_intf->b_die )
     {
+//        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+
         if( !p_main->p_playlist->b_stopped )
         {
             /* Select the next playlist item */
@@ -167,6 +169,9 @@ static void intf_Manage( intf_thread_t *p_intf )
             else
             {
                 p_main->p_playlist->b_stopped = 0;
+                p_main->p_playlist->i_mode = PLAYLIST_FORWARD + 
+                    main_GetIntVariable( PLAYLIST_LOOP_VAR,
+                                         PLAYLIST_LOOP_DEFAULT );
                 p_intf->p_input =
                     input_CreateThread( &p_main->p_playlist->current, NULL );
             }
@@ -186,6 +191,8 @@ static void intf_Manage( intf_thread_t *p_intf )
                 p_vout_bank->i_count--;
             }
         }
+
+//        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
     }
 }
 

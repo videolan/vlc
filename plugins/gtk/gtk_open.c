@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.1 2001/05/15 01:01:44 stef Exp $
+ * $Id: gtk_open.c,v 1.2 2001/05/15 14:49:48 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -61,32 +61,9 @@
  *****************************************************************************
  * The following callbacks are related to the file requester.
  *****************************************************************************/
-#if 0
-void GtkFileOpenShow( GtkMenuItem * menuitem, gpointer user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), (char*)user_data );
-
-    /* If we have never used the file selector, open it */
-    if( !GTK_IS_WIDGET( p_intf->p_sys->p_fileopen ) )
-    {
-        p_intf->p_sys->p_fileopen = create_intf_fileopen();
-        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_fileopen ),
-                             "p_intf", p_intf );
-
-        gtk_file_selection_set_filename( GTK_FILE_SELECTION(
-            p_intf->p_sys->p_fileopen ),
-            main_GetPszVariable( INTF_PATH_VAR, INTF_PATH_DEFAULT ) );
-    }
-
-    gtk_widget_show( p_intf->p_sys->p_fileopen );
-    gdk_window_raise( p_intf->p_sys->p_fileopen->window );
-}
-#else
-
-gboolean
-GtkFileOpenShow                        (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
+gboolean GtkFileOpenShow( GtkWidget       *widget,
+                          GdkEventButton  *event,
+                          gpointer         user_data )
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
 
@@ -105,12 +82,11 @@ GtkFileOpenShow                        (GtkWidget       *widget,
     gtk_widget_show( p_intf->p_sys->p_fileopen );
     gdk_window_raise( p_intf->p_sys->p_fileopen->window );
 
-    return FALSE;
+    return TRUE;
 }
 
 
-#endif
-void GtkFileOpenCancel( GtkButton * button, gpointer user_data)
+void GtkFileOpenCancel( GtkButton * button, gpointer user_data )
 {
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
@@ -145,7 +121,6 @@ void GtkFileOpenOk( GtkButton * button, gpointer user_data )
     }
 
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
-    p_main->p_playlist->b_stopped = 0;
 }
 
 /*****************************************************************************
@@ -153,26 +128,9 @@ void GtkFileOpenOk( GtkButton * button, gpointer user_data )
  *****************************************************************************
  * The following callbacks are related to the disc manager.
  *****************************************************************************/
-#if 0
-void GtkDiscOpenShow( GtkMenuItem * menuitem, gpointer user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), (char*)user_data );
-
-    if( !GTK_IS_WIDGET( p_intf->p_sys->p_disc ) )
-    {
-        p_intf->p_sys->p_disc = create_intf_disc();
-        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_disc ),
-                             "p_intf", p_intf );
-    }
-
-    gtk_widget_show( p_intf->p_sys->p_disc );
-    gdk_window_raise( p_intf->p_sys->p_disc->window );
-}
-#else
-gboolean
-GtkDiscOpenShow                        (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
+gboolean GtkDiscOpenShow( GtkWidget       *widget,
+                          GdkEventButton  *event,
+                          gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
 
@@ -186,10 +144,10 @@ GtkDiscOpenShow                        (GtkWidget       *widget,
     gtk_widget_show( p_intf->p_sys->p_disc );
     gdk_window_raise( p_intf->p_sys->p_disc->window );
 
-    return FALSE;
+    return TRUE;
 }
 
-#endif
+
 void GtkDiscOpenDvd( GtkToggleButton * togglebutton, gpointer user_data )
 {
     if( togglebutton->active )
@@ -201,7 +159,7 @@ void GtkDiscOpenDvd( GtkToggleButton * togglebutton, gpointer user_data )
     }
 }
 
-void GtkDiscOpenVcd( GtkToggleButton *togglebutton, gpointer user_data )
+void GtkDiscOpenVcd( GtkToggleButton * togglebutton, gpointer user_data )
 {
     if( togglebutton->active )
     {
@@ -276,45 +234,24 @@ void GtkDiscOpenOk( GtkButton * button, gpointer user_data )
         p_intf->p_input->b_eof = 1;
     }
 
-//    vlc_mutex_lock( &p_main->p_playlist->change_lock );
-
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
-    p_main->p_playlist->b_stopped = 0;
-
-//    vlc_mutex_unlock( &p_main->p_playlist->change_lock );
 }
 
-void GtkDiscOpenCancel( GtkButton * button, gpointer user_data)
+
+void GtkDiscOpenCancel( GtkButton * button, gpointer user_data )
 {
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
+
 
 /*****************************************************************************
  * Network stream callbacks
  *****************************************************************************
  * The following callbacks are related to the network stream manager.
  *****************************************************************************/
-#if 0
-void GtkNetworkOpenShow( GtkMenuItem * menuitem, gpointer user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), (char*)user_data );
-
-    if( !GTK_IS_WIDGET( p_intf->p_sys->p_network ) )
-    {
-        p_intf->p_sys->p_disc = create_intf_network();
-        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_network ),
-                             "p_intf", p_intf );
-    }
-
-    gtk_widget_show( p_intf->p_sys->p_network );
-    gdk_window_raise( p_intf->p_sys->p_network->window );
-}
-#else
-
-gboolean
-GtkNetworkOpenShow                     (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
+gboolean GtkNetworkOpenShow( GtkWidget       *widget,
+                             GdkEventButton  *event,
+                             gpointer         user_data )
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
 
@@ -328,12 +265,9 @@ GtkNetworkOpenShow                     (GtkWidget       *widget,
     gtk_widget_show( p_intf->p_sys->p_network );
     gdk_window_raise( p_intf->p_sys->p_network->window );
 
-    return FALSE;
+    return TRUE;
 }
 
-
-
-#endif
 
 void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
 {
@@ -428,12 +362,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
         p_intf->p_input->b_eof = 1;
     }
 
-//    vlc_mutex_lock( &p_main->p_playlist->change_lock );
-
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
-    p_main->p_playlist->b_stopped = 0;
-
-//    vlc_mutex_unlock( &p_main->p_playlist->change_lock );
 }
 
 void GtkNetworkOpenCancel( GtkButton * button, gpointer user_data)
@@ -459,4 +388,25 @@ void GtkNetworkOpenBroadcast( GtkToggleButton * togglebutton,
 }
 
 
+
+/****************************************************************************
+ * Callbacks for menuitem
+ ****************************************************************************/
+void GtkFileOpenActivate( GtkMenuItem * menuitem, gpointer user_data )
+{
+    GtkFileOpenShow( GTK_WIDGET( menuitem ), NULL, user_data );
+}
+
+
+void GtkDiscOpenActivate( GtkMenuItem * menuitem, gpointer user_data )
+{
+    GtkDiscOpenShow( GTK_WIDGET( menuitem ), NULL, user_data );
+}
+
+
+void GtkNetworkOpenActivate( GtkMenuItem * menuitem, gpointer user_data )
+{
+    GtkNetworkOpenShow( GTK_WIDGET( menuitem ), NULL, user_data );
+
+}
 

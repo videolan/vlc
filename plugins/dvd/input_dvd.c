@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.58 2001/05/15 01:01:44 stef Exp $
+ * $Id: input_dvd.c,v 1.59 2001/05/15 14:49:47 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -1043,7 +1043,7 @@ static int DVDRead( input_thread_t * p_input,
         p_input->stream.p_selected_area->i_tell = i_off -
                                     p_input->stream.p_selected_area->i_start;
         p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
-
+intf_WarnMsg( 2, "chapter %d", p_dvd->i_chapter);
         /* the synchro has to be reinitialized when we change cell */
         p_input->stream.pp_programs[0]->i_synchro_state = SYNCHRO_REINIT;
 

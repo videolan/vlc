@@ -2,7 +2,7 @@
  * gtk_modules.h: prototypes for modules functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_modules.h,v 1.1 2001/05/15 01:01:44 stef Exp $
+ * $Id: gtk_modules.h,v 1.2 2001/05/15 14:49:48 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -22,8 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-gboolean GtkModulesShow( GtkWidget       *widget,
-                         GdkEventButton  *event,
-                         gpointer         user_data);
-void GtkModulesCancel  ( GtkButton * button, gpointer user_data );
-
+gboolean GtkModulesShow    ( GtkWidget *, GdkEventButton *, gpointer );
+void     GtkModulesCancel  ( GtkButton * button, gpointer );
+void     GtkModulesActivate( GtkMenuItem * menuitem, gpointer );
