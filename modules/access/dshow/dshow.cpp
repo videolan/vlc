@@ -60,6 +60,8 @@ static int ConfigDevicesCallback( vlc_object_t *, char const *,
 static void ShowPropertyPage( IUnknown * );
 static void ShowDeviceProperties( vlc_object_t *, ICaptureGraphBuilder2 *, 
                                   IBaseFilter *, vlc_bool_t );
+static void ShowTunerProperties( vlc_object_t *, ICaptureGraphBuilder2 *, 
+                                 IBaseFilter *, vlc_bool_t );
 
 /*****************************************************************************
  * Module descriptor
@@ -96,6 +98,9 @@ static char *ppsz_adev_text[] = { N_("Default"), N_("None") };
 #define CONFIG_LONGTEXT N_( \
     "Show the properties dialog of the selected device before starting the " \
     "stream.")
+#define TUNER_TEXT N_("Tuner properties")
+#define TUNER_LONGTEXT N_( \
+    "Show the tuner properties [channel selection] page." )
 
 static int  CommonOpen ( vlc_object_t *, access_sys_t *, vlc_bool_t );
 static void CommonClose( vlc_object_t *, access_sys_t * );
@@ -128,6 +133,9 @@ vlc_module_begin();
                 VLC_TRUE );
 
     add_bool( "dshow-config", VLC_FALSE, NULL, CONFIG_TEXT, CONFIG_LONGTEXT,
+              VLC_FALSE );
+
+    add_bool( "dshow-tuner", VLC_FALSE, NULL, TUNER_TEXT, TUNER_LONGTEXT,
               VLC_FALSE );
 
     add_shortcut( "dshow" );
@@ -237,7 +245,8 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     int i_width = 0, i_height = 0, i_chroma = 0;
     vlc_bool_t b_audio = VLC_TRUE;
 
-    var_Create( p_this, "dshow-config", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, "dshow-config", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_this, "dshow-tuner", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     var_Create( p_this, "dshow-vdev", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_this, "dshow-vdev", &val );
@@ -371,7 +380,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     ** Show properties pages from other filters in graph
     */
     var_Get( p_this, "dshow-config", &val );
-    if( val.i_int )
+    if( val.b_bool )
     {
         for( i = p_sys->i_crossbar_route_depth-1; i >= 0 ; --i )
         {
@@ -877,12 +886,19 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
          * the proper parameters. */
         vlc_value_t val;
         var_Get( p_this, "dshow-config", &val );
-        if( val.i_int )
+        if( val.b_bool )
         {
             ShowDeviceProperties( p_this, p_sys->p_capture_graph_builder2,
                                   p_device_filter, b_audio );
         }
-        
+
+        var_Get( p_this, "dshow-tuner", &val );
+        if( val.b_bool )
+        {
+            ShowTunerProperties( p_this, p_sys->p_capture_graph_builder2,
+                                 p_device_filter, b_audio );
+        }
+
         dshow_stream.mt =
             p_capture_filter->CustomGetPin()->CustomGetMediaType();
 
@@ -1647,11 +1663,19 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
             ShowPropertyPage(p_SC);
             p_SC->Release();
         }
+    }
+}
 
-        /*
-         * TV Tuner
-         */
+static void ShowTunerProperties( vlc_object_t *p_this,
+                                 ICaptureGraphBuilder2 *p_capture_graph,
+                                 IBaseFilter *p_device_filter,
+                                 vlc_bool_t b_audio )
+{
+    HRESULT hr;
+    msg_Dbg( p_this, "Configuring Tuner Properties" );
 
+    if( p_capture_graph && !b_audio )
+    {
         IAMTVTuner *p_TV;
         hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                              &MEDIATYPE_Interleaved,
