@@ -105,6 +105,18 @@ typedef struct vpar_thread_s
 #define SEQUENCE_END_CODE       0x1B7
 #define GROUP_START_CODE        0x1B8
 
+/* extension start code IDs */
+
+#define SEQUENCE_EXTENSION_ID                    1
+#define SEQUENCE_DISPLAY_EXTENSION_ID            2
+#define QUANT_MATRIX_EXTENSION_ID                3
+#define COPYRIGHT_EXTENSION_ID                   4
+#define SEQUENCE_SCALABLE_EXTENSION_ID           5
+#define PICTURE_DISPLAY_EXTENSION_ID             7
+#define PICTURE_CODING_EXTENSION_ID              8
+#define PICTURE_SPATIAL_SCALABLE_EXTENSION_ID    9
+#define PICTURE_TEMPORAL_SCALABLE_EXTENSION_ID  10
+
 /*******************************************************************************
  * Prototypes
  *******************************************************************************/

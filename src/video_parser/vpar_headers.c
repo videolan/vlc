@@ -383,7 +383,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
  *****************************************************************************/
 static void GroupHeader( vpar_thread_t * p_vpar )
 {
-    /* Nothing to do, we don't care */
+    /* Nothing to do, we don't care. */
     DumpBits( &p_vpar->bit_stream, 27 );
     ExtensionAndUserData( p_vpar );
 }
@@ -467,9 +467,57 @@ static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
  *****************************************************************************/
 static void ExtensionAndUserData( vpar_thread_t * p_vpar )
 {
-    /* Nothing to do, we don't care. */
-    DumpBits( &p_vpar->bit_stream, 27 );
-    ExtensionAndUserData( p_vpar );
+    while( !p_vpar->b_die )
+    {
+        NextStartCode( p_vpar );
+        switch( ShowBits( &p_vpar->bit_stream, 32 ) )
+        {
+        case EXTENSION_START_CODE:
+            DumpBits32( &p_vpar->bit_stream );
+            switch( GetBits( &p_vpar->bit_stream, 4 ) )
+            {
+            case SEQUENCE_DISPLAY_EXTENSION_ID:
+                SequenceDisplayExtension( p_vpar );
+                break;
+            case QUANT_MATRIX_EXTENSION_ID:
+                QuantMatrixExtension( p_vpar );
+                break;
+            case SEQUENCE_SCALABLE_EXTENSION_ID:
+                SequenceScalableExtension( p_vpar );
+                break;
+            case PICTURE_DISPLAY_EXTENSION_ID:
+                PictureDisplayExtension( p_vpar );
+                break;
+            case PICTURE_SPATIAL_SCALABLE_EXTENSION_ID:
+                PictureSpatialScalableExtension( p_vpar );
+                break;
+            case PICTURE_TEMPORAL_SCALABLE_EXTENSION_ID:
+                PictureTemporalScalableExtension( p_vpar );
+                break;
+            case COPYRIGHT_EXTENSION_ID:
+                CopyrightExtension( p_vpar );
+                break;
+            default:
+            }
+            break;
+
+        case USER_DATA_START_CODE:
+            DumpBits32( &p_vpar->bit_stream );
+            /* Wait for the next start code */
+            break;
+
+        default:
+            return;
+        }
+    }
+}
+
+/*****************************************************************************
+ * SequenceDisplayExtension : Parse the sequence_display_extension structure
+ *****************************************************************************/
+static void SequenceDisplayExtension( vpar_thread_t * p_vpar )
+{
+
 }
 
 /*****************************************************************************
