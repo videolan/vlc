@@ -2,7 +2,7 @@
  * i420_rgb8.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb8.c,v 1.3 2002/03/17 17:00:38 sam Exp $
+ * $Id: i420_rgb8.c,v 1.4 2002/03/19 00:30:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -56,7 +56,6 @@ void _M( I420_RGB8 )( vout_thread_t *p_vout, picture_t *p_src,
     int         i_x, i_y;                 /* horizontal and vertical indexes */
     int         i_real_y;                                           /* y % 4 */
     int         i_right_margin;
-    int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
     int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
 
@@ -110,8 +109,8 @@ void _M( I420_RGB8 )( vout_thread_t *p_vout, picture_t *p_src,
  * SetOffset: build offset array for conversion functions
  *****************************************************************************
  * This function will build an offset array used in later conversion functions.
- * It will also set horizontal and vertical scaling indicators. If b_double
- * is set, the p_offset structure has interleaved Y and U/V offsets.
+ * It will also set horizontal and vertical scaling indicators. The p_offset
+ * structure has interleaved Y and U/V offsets.
  *****************************************************************************/
 static void SetOffset( int i_width, int i_height, int i_pic_width,
                        int i_pic_height, boolean_t *pb_hscale,

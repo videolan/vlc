@@ -286,9 +286,10 @@ void KInterface::slotOpenDisk()
         source += ':';
         source += fDiskDialog->device();
 
-        // Select title and chapter
-        config_PutIntVariable( INPUT_TITLE_VAR, fDiskDialog->title() );
-        config_PutIntVariable( INPUT_CHAPTER_VAR, fDiskDialog->chapter() );
+        source += '@';
+        source += fDiskDialog->title();
+        source += ',';
+        source += fDiskDialog->chapter();
 
         // add it to playlist
         intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, source.latin1() );

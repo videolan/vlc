@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.164 2002/03/16 01:40:58 gbazin Exp $
+ * $Id: main.c,v 1.165 2002/03/19 00:30:44 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -226,7 +226,7 @@
 #define IPV6_TEXT "force IPv6"
 #define IPV6_LONGTEXT NULL
 
-#define IPV4_TEXT "force IPv6"
+#define IPV4_TEXT "force IPv4"
 #define IPV4_LONGTEXT NULL
 
 #define ADEC_MPEG_TEXT "choose MPEG audio decoder"

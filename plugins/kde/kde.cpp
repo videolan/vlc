@@ -2,7 +2,7 @@
  * kde.cpp : KDE plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: kde.cpp,v 1.9 2002/03/17 17:00:38 sam Exp $
+ * $Id: kde.cpp,v 1.10 2002/03/19 00:30:44 sam Exp $
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001
  *
@@ -94,7 +94,6 @@ class KThread
         ~KThread();
 
         // These methods get exported to the core
-        static int     probe   ( probedata_t *p_data );
         static int     open    ( intf_thread_t *p_intf );
         static void    close   ( intf_thread_t *p_intf );
         static void    run     ( intf_thread_t *p_intf );
@@ -105,7 +104,6 @@ class KThread
  *****************************************************************************/
 static void intf_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = KThread::probe;
     p_function_list->functions.intf.pf_open  = KThread::open;
     p_function_list->functions.intf.pf_close = KThread::close;
     p_function_list->functions.intf.pf_run   = KThread::run;
@@ -168,17 +166,6 @@ KThread::~KThread()
 
     delete p_intf->p_sys->p_app;
     delete p_intf->p_sys->p_about;
-}
-
-/*****************************************************************************
- * KThread::probe: probe the interface and return a score
- *****************************************************************************
- * This function tries to initialize KDE and returns a score to the
- * plugin manager so that it can select the best plugin.
- *****************************************************************************/
-int KThread::probe(probedata_t *p_data )
-{
-    return ( 80 );
 }
 
 /*****************************************************************************

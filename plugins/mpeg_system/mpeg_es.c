@@ -2,7 +2,7 @@
  * mpeg_es.c : Elementary Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_es.c,v 1.6 2002/03/18 19:14:52 sam Exp $
+ * $Id: mpeg_es.c,v 1.7 2002/03/19 00:30:44 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -113,7 +113,7 @@ static int ESInit( input_thread_t * p_input )
 
     if( *p_peek || *(p_peek + 1) || *(p_peek + 2) != 1 )
     {
-        if( *p_input->psz_demux && strncmp( !p_input->psz_demux, "es", 3 ) )
+        if( *p_input->psz_demux && !strncmp( p_input->psz_demux, "es", 3 ) )
         {
             /* User forced */
             intf_ErrMsg( "input error: this doesn't look like an MPEG ES stream, continuing" );
@@ -126,7 +126,7 @@ static int ESInit( input_thread_t * p_input )
     }
     else if( *(p_peek + 3) > 0xb9 )
     {
-        if( *p_input->psz_demux && strncmp( !p_input->psz_demux, "es", 3 ) )
+        if( *p_input->psz_demux && !strncmp( p_input->psz_demux, "es", 3 ) )
         {
             /* User forced */
             intf_ErrMsg( "input error: this seems to be a system stream (PS plug-in ?), but continuing" );

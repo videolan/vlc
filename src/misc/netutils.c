@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.60 2002/03/11 07:23:10 gbazin Exp $
+ * $Id: netutils.c,v 1.61 2002/03/19 00:30:44 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -197,7 +197,7 @@ int network_ChannelJoin( int i_channel )
 
     /* Prepare the network_socket_t structure */
     socket_desc.i_type = NETWORK_UDP;
-    socket_desc.psz_bind_addr = NULL;
+    socket_desc.psz_bind_addr = "";
     socket_desc.i_bind_port = 4321;
     socket_desc.psz_server_addr = psz_vlcs;
     socket_desc.i_server_port = i_port;

@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.6 2002/03/15 04:41:54 sam Exp $
+ * $Id: ipv4.c,v 1.7 2002/03/19 00:30:44 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -43,6 +43,9 @@
 #ifdef WIN32
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
+#   ifndef IN_MULTICAST
+#       define IN_MULTICAST(a) IN_CLASSD(a)
+#   endif
 #elif !defined( SYS_BEOS ) && !defined( SYS_NTO )
 #   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>
@@ -213,20 +216,15 @@ static int OpenUDP( network_socket_t * p_socket )
                          " instead of 0x%x", i_opt, 0x80000 );
     }
     
-/* Under Win32 and for the multicast, we bind on INADDR_ANY, so let's call BuildAddr with NULL instead of psz_bind_addr */
     
     /* Build the local socket */
 
 #ifdef WIN32
-    
-#ifndef IN_MULTICAST
-#   define IN_MULTICAST(a)         IN_CLASSD(a)
-#endif
-
+    /* Under Win32 and for the multicast, we bind on INADDR_ANY,
+     * so let's call BuildAddr with "" instead of psz_bind_addr */
     psz_bind_win32 = psz_bind_addr ;
     
-/* Check if this is a multicast socket */
-
+    /* Check if this is a multicast socket */
     if (IN_MULTICAST( ntohl( inet_addr(psz_bind_addr) ) ) )
     {
         psz_bind_win32 = "";

@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.7 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: deinterlace.c,v 1.8 2002/03/19 00:30:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -350,30 +350,14 @@ static void vout_Render ( vout_thread_t *p_vout, picture_t *p_pic )
                     break;
 
                 case DEINTERLACE_MODE_BLEND:
-                    if( i_plane != Y_PLANE )
-                    {
-                        for( ; p_out < p_out_end ; )
-                        {
-                            FAST_MEMCPY( p_out, p_in,
-                                         p_pic->p[i_plane].i_pitch );
-
-                            p_out += p_pic->p[i_plane].i_pitch;
-
-                            FAST_MEMCPY( p_out, p_in,
-                                         p_pic->p[i_plane].i_pitch );
-
-                            p_out += p_pic->p[i_plane].i_pitch;
-                            p_in += 2 * p_pic->p[i_plane].i_pitch;
-                        }
-                        break;
-                    }
-
                     if( i_field == 0 )
                     {
                         FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
                         p_in += 2 * p_pic->p[i_plane].i_pitch;
                         p_out += p_pic->p[i_plane].i_pitch;
                     }
+
+                    p_out_end -= p_outpic->p[i_plane].i_pitch;
 
                     for( ; p_out < p_out_end ; )
                     {
@@ -388,6 +372,15 @@ static void vout_Render ( vout_thread_t *p_vout, picture_t *p_pic )
                         p_in += 2 * p_pic->p[i_plane].i_pitch;
                         p_out += p_pic->p[i_plane].i_pitch;
                     }
+
+#if 0
+                    if( i_field == 0 )
+                    {
+                        p_in -= 2 * p_pic->p[i_plane].i_pitch;
+                        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                    }
+#endif
+
                     break;
                 }
                 break;
