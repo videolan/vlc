@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.9 2002/11/25 19:12:34 fenrir Exp $
+ * $Id: mms.c,v 1.10 2002/12/02 21:13:25 jlj Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -754,7 +754,7 @@ static int MMSOpen( input_thread_t  *p_input,
             socklen_t i_namelen = sizeof( struct sockaddr_in );
 
             if( getsockname( p_access->socket_tcp.i_handle, 
-                             (struct sockaddr_in*)&name, &i_namelen ) < 0 )
+                             (struct sockaddr*)&name, &i_namelen ) < 0 )
             {
 
                 msg_Err( p_input, "for udp you have to provide bind address (mms://<server_addr>@<bind_addr/<path> (FIXME)" );

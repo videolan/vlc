@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.8 2002/11/06 21:48:24 gbazin Exp $
+ * $Id: spudec.c,v 1.9 2002/12/02 21:13:25 jlj Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -126,7 +126,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
         }
         else
         {
-            p_font = subtitler_LoadFont( p_spudec->p_vout, psz_font );
+            p_font = E_(subtitler_LoadFont)( p_spudec->p_vout, psz_font );
             if ( p_font == NULL )
             {
                 msg_Err( p_fifo, "unable to load font: %s", psz_font );
@@ -140,7 +140,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
             E_(ParseText)( p_spudec, p_font );
         }
 
-        if( p_font ) subtitler_UnloadFont( p_spudec->p_vout, p_font );
+        if( p_font ) E_(subtitler_UnloadFont)( p_spudec->p_vout, p_font );
 
     }
     else

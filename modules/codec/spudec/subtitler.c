@@ -80,7 +80,7 @@ static void      DestroySPU      ( subpicture_t * );
  *     to end:
  *     1 byte : 0xff
  *****************************************************************************/
-subtitler_font_t* subtitler_LoadFont( vout_thread_t * p_vout,
+subtitler_font_t* E_(subtitler_LoadFont)( vout_thread_t * p_vout,
                                       const char * psz_name )
 {
     subtitler_font_t * p_font;
@@ -154,7 +154,7 @@ subtitler_font_t* subtitler_LoadFont( vout_thread_t * p_vout,
         {
             msg_Err( p_vout, "unexpected end of font file '%s'", psz_name );
             close( i_file );
-            subtitler_UnloadFont( p_vout, p_font );
+            E_(subtitler_UnloadFont)( p_vout, p_font );
             return( NULL );
         }
         i_char = pi_buffer[0];
@@ -170,7 +170,7 @@ subtitler_font_t* subtitler_LoadFont( vout_thread_t * p_vout,
         {
             msg_Err( p_vout, "unexpected end of font file '%s'", psz_name );
             close( i_file );
-            subtitler_UnloadFont( p_vout, p_font );
+            E_(subtitler_UnloadFont)( p_vout, p_font );
             return( NULL );
         }
         p_font->i_width[ i_char ] = pi_buffer[0];
@@ -185,7 +185,7 @@ subtitler_font_t* subtitler_LoadFont( vout_thread_t * p_vout,
         {
             msg_Err( p_vout, "out of memory" );
             close( i_file );
-            subtitler_UnloadFont( p_vout, p_font );
+            E_(subtitler_UnloadFont)( p_vout, p_font );
             return NULL;
         }
         for( i_line=0; i_line < p_font->i_height; i_line ++ )
@@ -200,7 +200,7 @@ subtitler_font_t* subtitler_LoadFont( vout_thread_t * p_vout,
             if( read( i_file, pi_buffer, 1 ) != 1)
             {
                 msg_Err( p_vout, "unexpected end of font file '%s'", psz_name);
-                subtitler_UnloadFont( p_vout, p_font );
+                E_(subtitler_UnloadFont)( p_vout, p_font );
                 close( i_file );
                 return( NULL );
             }
@@ -213,7 +213,7 @@ subtitler_font_t* subtitler_LoadFont( vout_thread_t * p_vout,
             if( read( i_file, pi_buffer, i_length*2 ) != i_length*2)
             {
                 msg_Err( p_vout, "unexpected end of font file '%s'", psz_name);
-                subtitler_UnloadFont( p_vout, p_font );
+                E_(subtitler_UnloadFont)( p_vout, p_font );
                 close( i_file );
                 return( NULL );
             }
@@ -223,7 +223,7 @@ subtitler_font_t* subtitler_LoadFont( vout_thread_t * p_vout,
             {
                 msg_Err( p_vout, "out of memory" );
                 close( i_file );
-                subtitler_UnloadFont( p_vout, p_font );
+                E_(subtitler_UnloadFont)( p_vout, p_font );
                 return NULL;
             }
             for( i = 0; i < i_length; i++ )
@@ -248,7 +248,8 @@ subtitler_font_t* subtitler_LoadFont( vout_thread_t * p_vout,
 /*****************************************************************************
  * subtitler_UnloadFont: unload a run-length encoded font file from memory
  *****************************************************************************/
-void subtitler_UnloadFont( vout_thread_t * p_vout, subtitler_font_t * p_font )
+void E_(subtitler_UnloadFont)( vout_thread_t * p_vout, 
+                               subtitler_font_t * p_font )
 {
     int i_char;
     int i_line;
