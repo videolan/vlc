@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.32 2002/04/23 14:16:20 sam Exp $
+ * $Id: input_dec.c,v 1.33 2002/05/12 01:39:36 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -91,6 +91,8 @@ vlc_thread_t input_RunDecoder( input_thread_t * p_input,
         return( 0 );
     }
 
+    p_input->stream.b_changed = 1;
+
     return thread_id;
 }
 
@@ -131,6 +133,8 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
 
     /* Tell the input there is no more decoder */
     p_es->p_decoder_fifo = NULL;
+
+    p_input->stream.b_changed = 1;
 }
 
 /*****************************************************************************

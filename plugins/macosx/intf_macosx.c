@@ -2,7 +2,7 @@
  * intf_macosx.c: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_macosx.c,v 1.13 2002/05/06 22:59:46 massiot Exp $
+ * $Id: intf_macosx.c,v 1.14 2002/05/12 01:39:36 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -68,6 +68,8 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
     p_intf->p_sys->o_port = [[NSPort port] retain];
     p_intf->p_sys->b_mute = 0;
+    p_intf->p_sys->i_part = 0;
+    p_intf->p_sys->b_disabled_menus = 0;
 
     [[NSApplication sharedApplication] autorelease];
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];

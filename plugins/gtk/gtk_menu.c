@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.24 2002/04/19 13:56:11 sam Exp $
+ * $Id: gtk_menu.c,v 1.25 2002/05/12 01:39:36 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -502,9 +502,6 @@ static gint GtkLanguageMenus( gpointer          p_data,
     gint                i_item;
     gint                i;
 
-    
-
-    /* cast */
     p_intf = (intf_thread_t *)p_data;
 
     /* temporary hack to avoid blank menu when an open menu is removed */

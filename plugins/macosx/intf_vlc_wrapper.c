@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.c,v 1.13 2002/05/09 16:15:15 jlj Exp $
+ * $Id: intf_vlc_wrapper.c,v 1.14 2002/05/12 01:39:36 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -86,7 +86,6 @@ static Intf_VLCWrapper *o_intf = nil;
         return( 1 );
     }
 
-#if 0
     if( p_input_bank->pp_input[0] != NULL )
     {
         vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
@@ -104,11 +103,10 @@ static Intf_VLCWrapper *o_intf = nil;
 
         vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
     }
-    else
+    else if ( !p_main->p_intf->p_sys->b_disabled_menus )
     {
         [self setupMenus];
     }
-#endif
 
     return( 0 );
 }
@@ -490,32 +488,377 @@ static Intf_VLCWrapper *o_intf = nil;
     config_PutIntVariable( "channel_port", i_port ); 
 }
 
+- (void)toggleProgram:(id)sender
+{
+    NSMenuItem * o_item = (NSMenuItem *)sender;
+    input_thread_t * p_input = p_input_bank->pp_input[0];
+
+    if( [o_item state] == NSOffState )
+    {
+        u16 i_program_id = [o_item tag];
+
+        input_ChangeProgram( p_input, i_program_id );
+
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        [self setupMenus];
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        input_SetStatus( p_input, INPUT_STATUS_PLAY );
+    }
+}
+
+- (void)toggleTitle:(id)sender
+{
+    NSMenuItem * o_item = (NSMenuItem *)sender;
+    input_thread_t * p_input = p_input_bank->pp_input[0];
+
+    if( [o_item state] == NSOffState )
+    {
+        int i_title = [o_item tag];
+
+        input_ChangeArea( p_input,
+                          p_input->stream.pp_areas[i_title] );
+
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        [self setupMenus];
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        input_SetStatus( p_input, INPUT_STATUS_PLAY );
+    }
+}
+
+- (void)toggleChapter:(id)sender
+{
+    NSMenuItem * o_item = (NSMenuItem *)sender;
+    input_thread_t * p_input = p_input_bank->pp_input[0];
+
+    if( [o_item state] == NSOffState )
+    {
+        int i_chapter = [o_item tag];
+
+        p_input->stream.p_selected_area->i_part = i_chapter;
+        input_ChangeArea( p_input,
+                          p_input->stream.p_selected_area );
+
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        [self setupMenus];
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        input_SetStatus( p_input, INPUT_STATUS_PLAY );
+    }
+}
+
+- (void)toggleLanguage:(id)sender
+{
+    NSMenuItem * o_item = (NSMenuItem *)sender;
+    input_thread_t * p_input = p_input_bank->pp_input[0];
+
+    int i_es = [o_item tag];
+
+    input_ToggleES( p_input, p_input->stream.pp_es[i_es],
+                    [o_item state] == NSOffState );
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    [self setupMenus];
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    input_SetStatus( p_input, INPUT_STATUS_PLAY );
+}
+
+- (void)toggleSubtitle:(id)sender
+{
+    NSMenuItem * o_item = (NSMenuItem *)sender;
+    input_thread_t * p_input = p_input_bank->pp_input[0];
+
+    int i_es = [o_item tag];
+
+    input_ToggleES( p_input, p_input->stream.pp_es[i_es],
+                    [o_item state] == NSOffState );
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    [self setupMenus];
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    input_SetStatus( p_input, INPUT_STATUS_PLAY );
+}
+
 - (void)setupMenus
 {
-#if 0 
     NSMenu *o_main_menu;
     NSMenuItem *o_controls_item;
-    NSMenuItem *o_program_item;
+    NSMenuItem *o_program_item, *o_title_item, *o_chapter_item, *o_language_item,
+               *o_subtitle_item;
+    input_thread_t * p_input = p_input_bank->pp_input[0];
 
     o_main_menu  = [NSApp mainMenu];
     o_controls_item  = [o_main_menu itemWithTitle: @"Controls"];
     o_program_item = [[o_controls_item submenu] itemWithTitle: @"Program"]; 
+    o_title_item = [[o_controls_item submenu] itemWithTitle: @"Title"]; 
+    o_chapter_item = [[o_controls_item submenu] itemWithTitle: @"Chapter"]; 
+    o_language_item = [[o_controls_item submenu] itemWithTitle: @"Language"]; 
+    o_subtitle_item = [[o_controls_item submenu] itemWithTitle: @"Subtitles"]; 
 
-    if( p_input_bank->pp_input[0] == NULL )
+    if( p_input == NULL )
     {
-        NSMenu * o_program = [o_program_item submenu];
-//        [o_program_item setEnabled:0];
-//        [o_program removeItemAtIndex:0];
-        [o_program addItemWithTitle: @"Toto" action: nil keyEquivalent: @""];
+        [o_program_item setEnabled:0];
+        [o_title_item setEnabled:0];
+        [o_chapter_item setEnabled:0];
+        [o_language_item setEnabled:0];
+        [o_subtitle_item setEnabled:0];
     }
     else
     {
-        NSMenu * o_program = [o_program_item submenu];
-//        [o_program_item setEnabled:1];
-//        [o_program removeItemAtIndex:0];
-        [o_program addItemWithTitle: @"Toto" action: nil keyEquivalent: @""];
+        NSMenu *o_program, *o_title, *o_chapter, *o_language, *o_subtitle;
+        SEL pf_toggle_program, pf_toggle_title, pf_toggle_chapter,
+            pf_toggle_language, pf_toggle_subtitle;
+
+        int i, i_nb_items;
+        pgrm_descriptor_t * p_pgrm;
+
+        /* ----- PROGRAMS ----- */
+        if( p_input->stream.i_pgrm_number < 2 )
+        {
+            [o_program_item setEnabled:0];
+        }
+        else
+        {
+            [o_program_item setEnabled:1];
+            o_program = [o_program_item submenu];
+            pf_toggle_program = @selector(toggleProgram:);
+    
+            /* Remove previous program menu */
+            i_nb_items = [o_program numberOfItems];
+            for( i = 0; i < i_nb_items; i++ )
+            {
+                [o_program removeItemAtIndex:0];
+            }
+    
+            if( p_input->stream.p_new_program )
+            {
+                p_pgrm = p_input->stream.p_new_program;
+            }
+            else
+            {
+                p_pgrm = p_input->stream.p_selected_program;
+            }
+    
+            /* Create program menu */
+            for( i = 0 ; i < p_input->stream.i_pgrm_number ; i++ )
+            {
+                char psz_title[ 256 ];
+                NSString * o_menu_title;
+                NSMenuItem * o_item;
+    
+                snprintf( psz_title, sizeof(psz_title), "id %d",
+                    p_input->stream.pp_programs[i]->i_number );
+                psz_title[sizeof(psz_title) - 1] = '\0';
+    
+                o_menu_title = [NSString stringWithCString: psz_title];
+    
+                o_item = [o_program addItemWithTitle: o_menu_title
+                        action: pf_toggle_program keyEquivalent: @""];
+                [o_item setTarget: self];
+                [o_item setTag: p_input->stream.pp_programs[i]->i_number];
+                if( p_pgrm == p_input->stream.pp_programs[i] )
+                {
+                    [o_item setState: 1];
+                }
+            }
+        }
+
+        /* ----- TITLES ----- */
+        if( p_input->stream.i_area_nb < 2 )
+        {
+            [o_title_item setEnabled:0];
+        }
+        else
+        {
+            [o_title_item setEnabled:1];
+            o_title = [o_title_item submenu];
+            pf_toggle_title = @selector(toggleTitle:);
+    
+            /* Remove previous title menu */
+            i_nb_items = [o_title numberOfItems];
+            for( i = 0; i < i_nb_items; i++ )
+            {
+                [o_title removeItemAtIndex:0];
+            }
+    
+            /* Create title menu */
+            for( i = 1 ; i < p_input->stream.i_area_nb ; i++ )
+            {
+                char psz_title[ 256 ];
+                NSString * o_menu_title;
+                NSMenuItem * o_item;
+    
+                snprintf( psz_title, sizeof(psz_title), "Title %d (%d)", i,
+                    p_input->stream.pp_areas[i]->i_part_nb );
+                psz_title[sizeof(psz_title) - 1] = '\0';
+    
+                o_menu_title = [NSString stringWithCString: psz_title];
+    
+                o_item = [o_title addItemWithTitle: o_menu_title
+                        action: pf_toggle_title keyEquivalent: @""];
+                [o_item setTag: i];
+                [o_item setTarget: self];
+                if( ( p_input->stream.pp_areas[i] ==
+                    p_input->stream.p_selected_area ) )
+                {
+                    [o_item setState: 1];
+                }
+            }
+        }
+
+        /* ----- CHAPTERS ----- */
+        if( p_input->stream.p_selected_area->i_part_nb < 2 )
+        {
+            [o_chapter_item setEnabled:0];
+        }
+        else
+        {
+            [o_chapter_item setEnabled:1];
+            o_chapter = [o_chapter_item submenu];
+            pf_toggle_chapter = @selector(toggleChapter:);
+    
+            /* Remove previous chapter menu */
+            i_nb_items = [o_chapter numberOfItems];
+            for( i = 0; i < i_nb_items; i++ )
+            {
+                [o_chapter removeItemAtIndex:0];
+            }
+    
+            /* Create chapter menu */
+            for( i = 0 ; i < p_input->stream.p_selected_area->i_part_nb ; i++ )
+            {
+                char psz_title[ 256 ];
+                NSString * o_menu_title;
+                NSMenuItem * o_item;
+    
+                snprintf( psz_title, sizeof(psz_title), "Chapter %d", i + 1 );
+                psz_title[sizeof(psz_title) - 1] = '\0';
+    
+                o_menu_title = [NSString stringWithCString: psz_title];
+    
+                o_item = [o_chapter addItemWithTitle: o_menu_title
+                        action: pf_toggle_chapter keyEquivalent: @""];
+                [o_item setTag: i];
+                [o_item setTarget: self];
+                if( ( p_input->stream.p_selected_area->i_part == i + 1 ) )
+                {
+                    [o_item setState: 1];
+                }
+            }
+        }
+        p_main->p_intf->p_sys->i_part = p_input->stream.p_selected_area->i_part;
+
+        /* ----- LANGUAGES & SUBTITLES ----- */
+        o_language = [o_language_item submenu];
+        o_subtitle = [o_subtitle_item submenu];
+        pf_toggle_language = @selector(toggleLanguage:);
+        pf_toggle_subtitle = @selector(toggleSubtitle:);
+
+        /* Remove previous language menu */
+        i_nb_items = [o_language numberOfItems];
+        for( i = 0; i < i_nb_items; i++ )
+        {
+            [o_language removeItemAtIndex:0];
+        }
+
+        /* Remove previous subtitle menu */
+        i_nb_items = [o_subtitle numberOfItems];
+        for( i = 0; i < i_nb_items; i++ )
+        {
+            [o_subtitle removeItemAtIndex:0];
+        }
+
+        /* Create language & subtitles menus */
+        for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
+        {
+            es_descriptor_t * p_es = p_input->stream.pp_es[i];
+            if( p_es->p_pgrm != NULL
+                 && p_es->p_pgrm != p_input->stream.p_selected_program )
+            {
+                continue;
+            }
+
+            if( p_es->i_cat == AUDIO_ES )
+            {
+                NSString * o_menu_title;
+                NSMenuItem * o_item;
+
+                if( *p_es->psz_desc )
+                {
+                    o_menu_title = [NSString stringWithCString: p_es->psz_desc];
+                }
+                else
+                {
+                    char psz_title[ 256 ];
+                    snprintf( psz_title, sizeof(psz_title), "Language 0x%x",
+                              p_es->i_id );
+                    psz_title[sizeof(psz_title) - 1] = '\0';
+    
+                    o_menu_title = [NSString stringWithCString: psz_title];
+                }
+    
+                o_item = [o_language addItemWithTitle: o_menu_title
+                        action: pf_toggle_language keyEquivalent: @""];
+                [o_item setTag: i];
+                [o_item setTarget: self];
+                if( p_es->p_decoder_fifo != NULL )
+                {
+                    [o_item setState: 1];
+                }
+            }
+            else if( p_es->i_cat == SPU_ES )
+            {
+                NSString * o_menu_title;
+                NSMenuItem * o_item;
+
+                if( *p_es->psz_desc )
+                {
+                    o_menu_title = [NSString stringWithCString: p_es->psz_desc];
+                }
+                else
+                {
+                    char psz_title[ 256 ];
+                    snprintf( psz_title, sizeof(psz_title), "Subtitle 0x%x",
+                              p_es->i_id );
+                    psz_title[sizeof(psz_title) - 1] = '\0';
+    
+                    o_menu_title = [NSString stringWithCString: psz_title];
+                }
+    
+                o_item = [o_subtitle addItemWithTitle: o_menu_title
+                        action: pf_toggle_subtitle keyEquivalent: @""];
+                [o_item setTag: i];
+                [o_item setTarget: self];
+                if( p_es->p_decoder_fifo != NULL )
+                {
+                    [o_item setState: 1];
+                }
+            }
+        }
+
+        if( [o_language numberOfItems] )
+        {
+            [o_language_item setEnabled: 1];
+        }
+        else
+        {
+            [o_language_item setEnabled: 0];
+        }
+        if( [o_subtitle numberOfItems] )
+        {
+            [o_subtitle_item setEnabled: 1];
+        }
+        else
+        {
+            [o_subtitle_item setEnabled: 0];
+        }
+        p_input->stream.b_changed = 0;
     }
-#endif
+
+    p_main->p_intf->p_sys->b_disabled_menus = 1;
 }
 
 @end
