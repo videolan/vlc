@@ -48,7 +48,11 @@
 #define THREAD_COND_TIMEOUT             5
 
 /* The configuration file and directory */
+#ifdef SYS_BEOS
+#define CONFIG_DIR                      "config/settings"
+#else
 #define CONFIG_DIR                      ".videolan"
+#endif
 #define CONFIG_FILE                     "vlcrc"
 
 /*****************************************************************************
