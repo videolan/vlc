@@ -111,12 +111,23 @@ struct video_format_t
  */
 struct subs_format_t
 {
+    /* the character encoding of the text of the subtitle.
+     * all gettext recognized shorts can be used */
     char *psz_encoding;
+
+
+    int  i_x_origin; /**< x coordinate of the subtitle. 0 = left */
+    int  i_y_origin; /**< y coordinate of the subtitle. 0 = top */
 
     struct
     {
-        /* FIXME */
+        /*  */
         uint32_t palette[16+1];
+
+        /* the width of the original movie the spu was extracted from */
+        int	i_original_frame_width;
+        /* the height of the original movie the spu was extracted from */
+        int	i_original_frame_height;
     } spu;
 
     struct
