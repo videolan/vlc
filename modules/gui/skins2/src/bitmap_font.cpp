@@ -55,7 +55,7 @@ BitmapFont::BitmapFont( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
         }
         m_table[(size_t)'"'].m_xPos = 26 * m_width;
         m_table[(size_t)'@'].m_xPos = 27 * m_width;
-        m_table[(size_t)' '].m_xPos = 28 * m_width;
+        m_table[(size_t)' '].m_xPos = 29 * m_width;
         for( int i = 0; i <= 9; i++ )
         {
             m_table['0'+i].m_xPos = i * m_width;
