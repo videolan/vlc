@@ -2,7 +2,7 @@
  * avi.h : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.h,v 1.5 2002/10/27 15:37:16 fenrir Exp $
+ * $Id: avi.h,v 1.6 2002/11/06 14:44:30 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -23,31 +23,31 @@
 
 typedef struct avi_packet_s
 {
-    u32     i_fourcc;
-    off_t   i_pos;
-    u32     i_size;
-    u32     i_type;     // only for AVIFOURCC_LIST
+    vlc_fourcc_t i_fourcc;
+    off_t        i_pos;
+    uint32_t     i_size;
+    vlc_fourcc_t i_type;     // only for AVIFOURCC_LIST
     
-    u8      i_peek[8];  //first 8 bytes
+    uint8_t  i_peek[8];  //first 8 bytes
 
-    int     i_stream;
-    int     i_cat;
+    int      i_stream;
+    int      i_cat;
 } avi_packet_t;
 
 
 typedef struct AVIIndexEntry_s
 {
-    u32 i_id;
-    u32 i_flags;
-    u32 i_pos;
-    u32 i_length;
-    u32 i_lengthtotal;
+    vlc_fourcc_t i_id;
+    uint32_t     i_flags;
+    uint32_t     i_pos;
+    uint32_t     i_length;
+    uint32_t     i_lengthtotal;
 
 } AVIIndexEntry_t;
 
 typedef struct avi_stream_s
 {
-    int i_activated;
+    vlc_bool_t      b_activated;
 
     int i_cat;           /* AUDIO_ES, VIDEO_ES */
     vlc_fourcc_t    i_fourcc;
@@ -74,13 +74,13 @@ struct demux_sys_t
     mtime_t i_length;
     mtime_t i_pcr; 
 
-    int     b_seekable;
+    vlc_bool_t  b_seekable;
     avi_chunk_t ck_root;
     
     off_t   i_movi_begin;
     off_t   i_movi_lastchunk_pos; /* XXX position of last valid chunk */
     
-    /* number of stream and informations*/
+    /* number of streams and information */
     int i_streams;
     avi_stream_t  **pp_info; 
 

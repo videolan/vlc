@@ -2,7 +2,7 @@
  * libavi.h : LibAVI library 
  ******************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.h,v 1.3 2002/11/05 23:48:46 gbazin Exp $
+ * $Id: libavi.h,v 1.4 2002/11/06 14:44:30 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -159,9 +159,9 @@
 
 
 #define AVI_CHUNK_COMMON            \
-    u32     i_chunk_fourcc;         \
-    u64     i_chunk_size;           \
-    u64     i_chunk_pos;            \
+    vlc_fourcc_t i_chunk_fourcc;    \
+    uint64_t i_chunk_size;          \
+    uint64_t i_chunk_pos;           \
     union  avi_chunk_u *p_next;    \
     union  avi_chunk_u *p_father;  \
     union  avi_chunk_u *p_first;   \
@@ -172,9 +172,9 @@
 typedef struct idx1_entry_s
 {
     vlc_fourcc_t i_fourcc;
-    u32 i_flags;
-    u32 i_pos;
-    u32 i_length;
+    uint32_t i_flags;
+    uint32_t i_pos;
+    uint32_t i_length;
 
 } idx1_entry_t;
 typedef struct avi_chunk_common_s
@@ -185,7 +185,7 @@ typedef struct avi_chunk_common_s
 typedef struct avi_chunk_list_s
 {
     AVI_CHUNK_COMMON
-    u32 i_type;
+    vlc_fourcc_t i_type;
 } avi_chunk_list_t;
 
 typedef struct avi_chunk_idx1_s
@@ -200,38 +200,38 @@ typedef struct avi_chunk_idx1_s
 typedef struct avi_chunk_avih_s
 {
     AVI_CHUNK_COMMON
-    u32 i_microsecperframe;
-    u32 i_maxbytespersec;
-    u32 i_reserved1; /* dwPaddingGranularity;    pad to multiples of this
-                         size; normally 2K */
-    u32 i_flags;
-    u32 i_totalframes;
-    u32 i_initialframes;
-    u32 i_streams;
-    u32 i_suggestedbuffersize;
-    u32 i_width;
-    u32 i_height;
-    u32 i_scale;
-    u32 i_rate;
-    u32 i_start;
-    u32 i_length;
+    uint32_t i_microsecperframe;
+    uint32_t i_maxbytespersec;
+    uint32_t i_reserved1; /* dwPaddingGranularity;    pad to multiples of this
+                             size; normally 2K */
+    uint32_t i_flags;
+    uint32_t i_totalframes;
+    uint32_t i_initialframes;
+    uint32_t i_streams;
+    uint32_t i_suggestedbuffersize;
+    uint32_t i_width;
+    uint32_t i_height;
+    uint32_t i_scale;
+    uint32_t i_rate;
+    uint32_t i_start;
+    uint32_t i_length;
 } avi_chunk_avih_t;
 
 typedef struct avi_chunk_strh_s
 {
     AVI_CHUNK_COMMON
-    u32 i_type;
-    u32 i_handler;
-    u32 i_flags;
-    u32 i_reserved1;    /* wPriority wLanguage */
-    u32 i_initialframes;
-    u32 i_scale;
-    u32 i_rate;
-    u32 i_start;
-    u32 i_length;       /* In units above... */
-    u32 i_suggestedbuffersize;
-    u32 i_quality;
-    u32 i_samplesize;
+    vlc_fourcc_t i_type;
+    uint32_t i_handler;
+    uint32_t i_flags;
+    uint32_t i_reserved1;    /* wPriority wLanguage */
+    uint32_t i_initialframes;
+    uint32_t i_scale;
+    uint32_t i_rate;
+    uint32_t i_start;
+    uint32_t i_length;       /* In units above... */
+    uint32_t i_suggestedbuffersize;
+    uint32_t i_quality;
+    uint32_t i_samplesize;
 } avi_chunk_strh_t;
 
 typedef struct avi_chunk_strf_auds_s
@@ -239,14 +239,14 @@ typedef struct avi_chunk_strf_auds_s
     AVI_CHUNK_COMMON
     void *p_wfx;    //  waveformatex_t loaded from file
 
-    u16 i_formattag;        // + 0x00
-    u16 i_channels;         // + 0x02
-    u32 i_samplespersec;    // + 0x04
-    u32 i_avgbytespersec;   // + 0x08
-    u16 i_blockalign;       // + 0x0c
-    u16 i_bitspersample;    // + 0x0e
-    u16 i_size; /* the extra size in bytes */
-    u8  *p_data;
+    uint16_t i_formattag;        // + 0x00
+    uint16_t i_channels;         // + 0x02
+    uint32_t i_samplespersec;    // + 0x04
+    uint32_t i_avgbytespersec;   // + 0x08
+    uint16_t i_blockalign;       // + 0x0c
+    uint16_t i_bitspersample;    // + 0x0e
+    uint16_t i_size; /* the extra size in bytes */
+    uint8_t  *p_data;
 } avi_chunk_strf_auds_t;
 
 typedef struct avi_chunk_strf_vids_s
@@ -264,7 +264,7 @@ typedef union avi_chunk_strf_u
 typedef struct avi_chunk_strd_s
 {
     AVI_CHUNK_COMMON
-    u8  *p_data;
+    uint8_t  *p_data;
 } avi_chunk_strd_t;
 
 typedef struct avi_chunk_STRING_s
@@ -292,17 +292,17 @@ typedef union avi_chunk_u
 int     AVI_TestFile( input_thread_t *p_input );
 
 /****************************************************************************
- * Stream(input) acces function
+ * Stream(input) access functions
  ****************************************************************************/
 off_t   AVI_TellAbsolute( input_thread_t *p_input );
 int     AVI_SeekAbsolute( input_thread_t *p_input, off_t i_pos);
-int     AVI_ReadData( input_thread_t *p_input, u8 *p_buff, int i_size );
+int     AVI_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size );
 int     AVI_SkipBytes( input_thread_t *p_input, int i_count );
 
 int     _AVI_ChunkRead( input_thread_t *p_input,
                         avi_chunk_t *p_chk,
                         avi_chunk_t *p_father,
-                        int b_seekable );
+                        vlc_bool_t b_seekable );
 void    _AVI_ChunkFree( input_thread_t *p_input,
                          avi_chunk_t *p_chk );
 int     _AVI_ChunkGoto( input_thread_t *p_input,
@@ -310,12 +310,12 @@ int     _AVI_ChunkGoto( input_thread_t *p_input,
 void    _AVI_ChunkDumpDebug( input_thread_t *p_input,
                              avi_chunk_t  *p_chk );
 
-int     _AVI_ChunkCount( avi_chunk_t *p_chk, u32 i_fourcc );
-avi_chunk_t *_AVI_ChunkFind( avi_chunk_t *p_chk, u32 i_fourcc, int i_number );
+int     _AVI_ChunkCount( avi_chunk_t *, vlc_fourcc_t );
+avi_chunk_t *_AVI_ChunkFind( avi_chunk_t *, vlc_fourcc_t, int );
 
 int     AVI_ChunkReadRoot( input_thread_t *p_input,
                            avi_chunk_t *p_root,
-                           int b_seekable );
+                           vlc_bool_t b_seekable );
 void    AVI_ChunkFreeRoot( input_thread_t *p_input,
                            avi_chunk_t  *p_chk );
 #define AVI_ChunkRead( p_input, p_chk, p_father, b_seekable ) \
