@@ -1,8 +1,8 @@
-
+# ***************************************************************************
 # src/packages.mak : Archive locations
 # ***************************************************************************
 # Copyright (C) 2003, 2004 VideoLAN
-# $Id: packages.mak,v 1.18 2004/03/02 22:55:34 massiot Exp $
+# $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
@@ -59,7 +59,7 @@ THEORA_VERSION=1.0alpha2
 THEORA_URL=http://www.theora.org/files/libtheora-$(THEORA_VERSION).tar.gz
 FLAC_VERSION=1.1.0
 FLAC_URL=$(SF)/flac/flac-$(FLAC_VERSION).tar.gz
-SPEEX_VERSION=1.0.2
+SPEEX_VERSION=1.1.4
 SPEEX_URL=http://www.speex.org/download/speex-$(SPEEX_VERSION).tar.gz
 FAAD2_VERSION=2.0
 FAAD2_URL=$(VIDEOLAN)/faad2-$(FAAD2_VERSION).tar.bz2
