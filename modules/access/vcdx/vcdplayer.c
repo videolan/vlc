@@ -111,7 +111,7 @@ vcdplayer_update_entry( access_t * p_access, uint16_t ofs,
    return VLC_TRUE if the caller should return.
 */
 vcdplayer_read_status_t 
-vcdplayer_non_pbc_nav ( access_t * p_access )
+vcdplayer_non_pbc_nav ( access_t *p_access )
 {
   vcdplayer_t *p_vcd= (vcdplayer_t *)p_access->p_sys;
 
@@ -154,7 +154,7 @@ vcdplayer_non_pbc_nav ( access_t * p_access )
   return READ_BLOCK;
 }
 
-#if FINISHED
+#if 1
 /*!
   Set reading to play an entire track.
 */
@@ -249,6 +249,87 @@ _vcdplayer_set_segment(access_t * p_access, unsigned int num)
     dbg_print(INPUT_DBG_LSN, "LSN: %u\n", p_vcd->i_lsn);
   }
 }
+
+/* Play entry. */
+/* Play a single item. */
+static void
+vcdplayer_play_single_item( access_t * p_access, vcdinfo_itemid_t itemid)
+{
+  vcdplayer_t   *p_vcd = (vcdplayer_t *)p_access->p_sys;
+  vcdinfo_obj_t *p_obj = p_vcd->vcd;
+
+  dbg_print(INPUT_DBG_CALL, "called itemid.num: %d, itemid.type: %d\n", 
+            itemid.num, itemid.type);
+
+  p_vcd->in_still = 0;
+
+  switch (itemid.type) {
+  case VCDINFO_ITEM_TYPE_SEGMENT: 
+    {
+      vcdinfo_video_segment_type_t segtype 
+        = vcdinfo_get_video_type(p_obj, itemid.num);
+      segnum_t num_segs = vcdinfo_get_num_segments(p_obj);
+
+      dbg_print(INPUT_DBG_PBC, "%s (%d), itemid.num: %d\n", 
+                vcdinfo_video_type2str(p_obj, itemid.num), 
+                (int) segtype, itemid.num);
+
+      if (itemid.num >= num_segs) return;
+      _vcdplayer_set_segment(p_access, itemid.num);
+      
+      switch (segtype)
+        {
+        case VCDINFO_FILES_VIDEO_NTSC_STILL:
+        case VCDINFO_FILES_VIDEO_NTSC_STILL2:
+        case VCDINFO_FILES_VIDEO_PAL_STILL:
+        case VCDINFO_FILES_VIDEO_PAL_STILL2:
+          p_vcd->in_still = -5;
+          break;
+        default:
+          p_vcd->in_still = 0;
+        }
+      
+      break;
+    }
+    
+  case VCDINFO_ITEM_TYPE_TRACK:
+    dbg_print(INPUT_DBG_PBC, "track %d\n", itemid.num);
+    if (itemid.num < 1 || itemid.num > p_vcd->i_tracks) return;
+    _vcdplayer_set_track(p_access, itemid.num);
+    break;
+    
+  case VCDINFO_ITEM_TYPE_ENTRY: 
+    {
+      unsigned int num_entries = vcdinfo_get_num_entries(p_obj);
+      dbg_print(INPUT_DBG_PBC, "entry %d\n", itemid.num);
+      if (itemid.num >= num_entries) return;
+      _vcdplayer_set_entry(p_access, itemid.num);
+      break;
+    }
+    
+  case VCDINFO_ITEM_TYPE_LID:
+    LOG_ERR("%s\n", _("Should have converted p_vcd above"));
+    break;
+
+  case VCDINFO_ITEM_TYPE_NOTFOUND:
+    dbg_print(INPUT_DBG_PBC, "play nothing\n");
+    p_vcd->i_lsn = p_vcd->end_lsn;
+    return;
+
+  default:
+    LOG_ERR("item type %d not implemented.\n", itemid.type);
+    return;
+  }
+  
+  p_vcd->play_item = itemid;
+
+  /* Some players like xine, have a fifo queue of audio and video buffers
+     that need to be flushed when playing a new selection. */
+  /*  if (p_vcd->flush_buffers)
+      p_vcd->flush_buffers(); */
+
+}
+
 #endif /* FINISHED */
 
 /* 
@@ -256,6 +337,8 @@ _vcdplayer_set_segment(access_t * p_access, unsigned int num)
    input: p_vcd->i_lsn, p_vcd->play_item
    changed: p_vcd->origin_lsn, p_vcd->end_lsn
 */
+
+/* FIXME: add parameters lsn, i_track, p_itemid and set accordingly. */
 void 
 vcdplayer_set_origin(access_t *p_access)
 {
@@ -266,6 +349,47 @@ vcdplayer_set_origin(access_t *p_access)
   p_vcd->origin_lsn = p_vcd->i_lsn;
 
   dbg_print((INPUT_DBG_CALL|INPUT_DBG_LSN), "end LSN: %u\n", p_vcd->end_lsn);
+}
+
+/*
+  Get the next play-item in the list given in the LIDs. Note play-item
+  here refers to list of play-items for a single LID It shouldn't be
+  confused with a user's list of favorite things to play or the 
+  "next" field of a LID which moves us to a different LID.
+ */
+static bool
+_vcdplayer_inc_play_item(access_t *p_access)
+{
+  vcdplayer_t *p_vcd = (vcdplayer_t *)p_access->p_sys;
+  int noi;
+
+  dbg_print(INPUT_DBG_CALL, "called pli: %d\n", p_vcd->pdi);
+
+  if ( NULL == p_vcd || NULL == p_vcd->pxd.pld  ) return false;
+
+  noi = vcdinf_pld_get_noi(p_vcd->pxd.pld);
+  
+  if ( noi <= 0 ) return false;
+  
+  /* Handle delays like autowait or wait here? */
+
+  p_vcd->pdi++;
+
+  if ( p_vcd->pdi < 0 || p_vcd->pdi >= noi ) return false;
+
+  else {
+    uint16_t trans_itemid_num=vcdinf_pld_get_play_item(p_vcd->pxd.pld, 
+                                                       p_vcd->pdi);
+    vcdinfo_itemid_t trans_itemid;
+
+    if (VCDINFO_INVALID_ITEMID == trans_itemid_num) return false;
+    
+    vcdinfo_classify_itemid(trans_itemid_num, &trans_itemid);
+    dbg_print(INPUT_DBG_PBC, "  play-item[%d]: %s\n",
+              p_vcd->pdi, vcdinfo_pin2str (trans_itemid_num));
+    vcdplayer_play_single_item(p_access, trans_itemid);
+    return true;
+  }
 }
 
 /* Handles PBC navigation when reaching the end of a play item. */
@@ -450,7 +574,7 @@ vcdplayer_play_default( access_t * p_access )
 {
   vcdplayer_t *p_vcd= (vcdplayer_t *)p_access->p_sys;
 
-  vcdinfo_itemid_t   itemid;
+  vcdinfo_itemid_t itemid;
 
   if (!p_vcd) {
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_PBC), 

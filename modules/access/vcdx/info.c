@@ -71,7 +71,7 @@ VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl )
   char *psz_cat;
   track_t i_track;
 
-  psz_cat = _("General");
+  psz_cat = _("Disc");
 
   addstr( _("VCD Format"),  vcdinfo_get_format_version_str(p_vcd->vcd) );
   addstr( _("Album"),       vcdinfo_get_album_id(p_vcd->vcd));

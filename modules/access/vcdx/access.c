@@ -863,11 +863,12 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
 		  "chapter", _("Segment"),  "Setting entry/segment");
     /* The last title entry is the for segments (when segments exist
        and they must here. The segment seekpoints are stored after
-       the entry seepoints. 
+       the entry seekpoints and (zeroed) lid seekpoints. 
     */
     p_access->info.i_title     = p_vcd->i_titles - 1;
     p_access->info.i_size      = 150 * M2F2_SECTOR_SIZE;
-    p_access->info.i_seekpoint = p_vcd->i_entries + p_itemid->num;
+    p_access->info.i_seekpoint = p_vcd->i_entries 
+                               + p_vcd->i_lids + p_itemid->num;
 
   }
 
@@ -1303,22 +1304,38 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
         case ACCESS_SET_SEEKPOINT:
         {
             input_title_t *t = p_vcd->p_title[p_access->info.i_title];
-            i = (int)va_arg( args, int );
+            unsigned int i = (unsigned int)va_arg( args, unsigned int );
 
 	    dbg_print( INPUT_DBG_EVENT, "set seekpoint %d", i );
             if( t->i_seekpoint > 0 )
             {
 		track_t i_track = p_access->info.i_title+1;
-
+		lsn_t lsn;
+		
 		/* FIXME! For now we are assuming titles are only 
 		 tracks and that track == title+1 and we the play
 		 item is entries (not tracks or lids).
 		 We need to generalize all of this.
 		*/
 
-		p_vcd->play_item.num  = i;
-		p_vcd->play_item.type = VCDINFO_ITEM_TYPE_ENTRY;
-
+		if (i < p_vcd->i_entries) 
+		{
+		    p_vcd->play_item.num  = i;
+		    p_vcd->play_item.type = VCDINFO_ITEM_TYPE_ENTRY;
+		    lsn = vcdinfo_get_entry_lba(p_vcd->vcd, i);
+		} else if ( i < p_vcd->i_entries + p_vcd->i_lids ) 
+		{
+		    p_vcd->play_item.num  = i = i - p_vcd->i_entries;
+		    p_vcd->play_item.type = VCDINFO_ITEM_TYPE_LID;
+		    lsn = 0;
+		} else 
+		{
+		    p_vcd->play_item.num  = i = i - p_vcd->i_entries 
+		      - p_vcd->i_lids;
+		    p_vcd->play_item.type = VCDINFO_ITEM_TYPE_SEGMENT;
+		    lsn = vcdinfo_get_seg_lsn(p_vcd->vcd, i);
+		}
+		
 		VCDSetOrigin( p_access, 
 			      vcdinfo_get_entry_lba(p_vcd->vcd, i),
 			      i_track, &(p_vcd->play_item) );
