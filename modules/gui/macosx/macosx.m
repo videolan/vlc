@@ -59,7 +59,7 @@ void E_(CloseVideo)   ( vlc_object_t * );
         "of the movie when resizing the video, stretch the video " \
         "to fill the entire window." )
 
-#define MACOSX_VOUT_TEXT N_("Force a video rendering mode.")
+#define MACOSX_VOUT_TEXT N_("video rendering mode")
 #define MACOSX_VOUT_LONGTEXT N_("The default method is OpenGL " \
         "for Quartz Extreme machines and Quartz for the others.")
 
