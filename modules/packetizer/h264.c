@@ -2,7 +2,7 @@
  * h264.c: h264/avc video packetizer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c 7338 2004-04-13 10:52:29Z gbazin $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -267,6 +267,7 @@ static void nal_get_decoded( uint8_t **pp_ret, int *pi_ret, uint8_t *src, int i_
             *dst++ = 0x00;
 
             src += 3;
+            continue;
         }
         *dst++ = *src++;
     }
