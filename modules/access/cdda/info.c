@@ -395,8 +395,12 @@ cdda_data_t *p_cdda, char *psz_cdtext)
 {
   /* We either don't have CD-Text info, or we do but we prefer to get CDDB
      which means CDDB has been enabled and we were able to retrieve the info.*/
+#ifdef HAVE_LIBCDDB
   return !psz_cdtext || 
     (!p_cdda->b_cdtext_prefer && p_cdda->b_cddb_enabled && p_cdda->cddb.disc);
+#else
+  return false;
+#endif
 }
 
 
@@ -545,13 +549,13 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
 #else
             case 'a':
 	        if (p_cdda->p_cdtext[0] 
-		    && p_cdda->p_cdtext->field[CDTEXT_PERFORMER]
-		    psz = p_cdda->p_cdtext->field[CDTEXT_PERFORMER]);
+		    && p_cdda->p_cdtext[0]->field[CDTEXT_PERFORMER])
+		    psz = p_cdda->p_cdtext[0]->field[CDTEXT_PERFORMER];
                 goto format_str;
             case 'A':
 	        if (p_cdda->p_cdtext[0] 
-		    && p_cdda->p_cdtext->field[CDTEXT_TITLE]
-		    psz = p_cdda->p_cdtext->field[CDTEXT_TITLE]);
+		    && p_cdda->p_cdtext[0]->field[CDTEXT_TITLE])
+		    psz = p_cdda->p_cdtext[0]->field[CDTEXT_TITLE];
                 goto format_str;
             case 'G':
 	        if (p_cdda->p_cdtext[0] 
