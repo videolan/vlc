@@ -62,21 +62,14 @@
     vout_thread_t   * p_vout;
     int               i_effect;
     unsigned long     pi_textures[2];
-    int               i_curTexture;
     float             f_x;
     float             f_y;
     int               initDone;
-    int               isFullScreen;
-    NSOpenGLContext * fullScreenContext;
-    NSOpenGLContext * currentContext;
 }
 
 - (id) initWithFrame: (NSRect) frame vout: (vout_thread_t*) p_vout;
 - (void) initTextures;
 - (void) reloadTexture: (int) index;
-- (void) goFullScreen;
-- (void) exitFullScreen;
-- (void) cleanUp;
 
 @end
 

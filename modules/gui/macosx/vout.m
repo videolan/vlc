@@ -431,10 +431,6 @@ static void vout_End( vout_thread_t *p_vout )
     {
         QTDestroySequence( p_vout );
     }
-    else
-    {
-        [p_vout->p_sys->o_glview cleanUp];
-    }
 
     /* Free the direct buffers we allocated */
     for( i_index = I_OUTPUTPICTURES; i_index; )
@@ -662,35 +658,10 @@ static int CoDestroyWindow( vout_thread_t *p_vout )
  *****************************************************************************/
 static int CoToggleFullscreen( vout_thread_t *p_vout )
 {
-
-    vlc_value_t val;
-    intf_thread_t * p_intf;
-
-    if( p_vout->p_sys->i_opengl )
+    if( !p_vout->p_sys->i_opengl )
     {
-        p_vout->b_fullscreen = !p_vout->b_fullscreen;
-        if( p_vout->b_fullscreen )
-        {
-            [p_vout->p_sys->o_glview goFullScreen];
-        }
-        else
-        {
-            [p_vout->p_sys->o_glview exitFullScreen];
-        }
-        /*This makes this function dependant of the presence of a macosx 
-        interface. We do not check if this interface exists, since it has 
-        already been done before.*/
-
-        p_intf = [NSApp getIntf];
-
-        val.b_bool = VLC_TRUE;
-        var_Create(p_intf,"intf-change",VLC_VAR_BOOL);
-        var_Set(p_intf, "intf-change",val);
-
-        return 0;
+        QTDestroySequence( p_vout );
     }
-    
-    QTDestroySequence( p_vout );
 
     if( CoDestroyWindow( p_vout ) )
     {
@@ -706,14 +677,26 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    SetPort( p_vout->p_sys->p_qdport );
-    QTScaleMatrix( p_vout );
-
-    if( QTCreateSequence( p_vout ) )
+    if( p_vout->p_sys->i_opengl )
     {
-        msg_Err( p_vout, "unable to create sequence" );
-        return( 1 ); 
-    } 
+        [p_vout->p_sys->o_glview lockFocus];
+        [p_vout->p_sys->o_glview initTextures];
+        [p_vout->p_sys->o_glview reshape];
+        [p_vout->p_sys->o_glview drawRect:
+            [p_vout->p_sys->o_glview bounds]];
+        [p_vout->p_sys->o_glview unlockFocus];
+    }
+    else
+    {
+        SetPort( p_vout->p_sys->p_qdport );
+        QTScaleMatrix( p_vout );
+
+        if( QTCreateSequence( p_vout ) )
+        {
+            msg_Err( p_vout, "unable to create sequence" );
+            return( 1 ); 
+        } 
+    }
 
     return( 0 );
 }
@@ -1417,7 +1400,6 @@ CATCH_MOUSE_EVENTS
     {
         NSOpenGLPFAAccelerated,
         NSOpenGLPFANoRecovery,
-        NSOpenGLPFADoubleBuffer,
         NSOpenGLPFAColorSize, 24,
         NSOpenGLPFAAlphaSize, 8,
         NSOpenGLPFADepthSize, 24,
@@ -1435,10 +1417,10 @@ CATCH_MOUSE_EVENTS
     }
 
     self = [super initWithFrame:frame pixelFormat: fmt];
+    [fmt release];
 
-    currentContext = [self openGLContext];
-    [currentContext makeCurrentContext];
-    [currentContext update];
+    [[self openGLContext] makeCurrentContext];
+    [[self openGLContext] update];
 
     /* Black background */
     glClearColor( 0.0, 0.0, 0.0, 0.0 );
@@ -1485,7 +1467,6 @@ CATCH_MOUSE_EVENTS
     pi_textures[0] = 0;
     pi_textures[1] = 0;
     initDone       = 0;
-    isFullScreen   = 0;
 
     return self;
 }
@@ -1497,7 +1478,7 @@ CATCH_MOUSE_EVENTS
         return;
     }
     
-    [currentContext makeCurrentContext];
+    [[self openGLContext] makeCurrentContext];
 
     NSRect bounds = [self bounds];
     glViewport( 0, 0, (GLint) bounds.size.width,
@@ -1527,31 +1508,31 @@ CATCH_MOUSE_EVENTS
 - (void) initTextures
 {
     int i;
-    [currentContext makeCurrentContext];
+    [[self openGLContext] makeCurrentContext];
 
     /* Free previous texture if any */
     if( initDone )
     {
         glDeleteTextures( 2, pi_textures );
     }
-    
-    /* Create textures */
-    glGenTextures( 2, pi_textures );
 
     glEnable( GL_TEXTURE_RECTANGLE_EXT );
     glEnable( GL_UNPACK_CLIENT_STORAGE_APPLE );
 
+    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+    glPixelStorei( GL_UNPACK_ROW_LENGTH, p_vout->output.i_width );
+
+    /* Tell the driver not to make a copy of the texture but to use
+       our buffer */
+    glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
+
+    /* Create textures */
+    glGenTextures( 2, pi_textures );
+
     for( i = 0; i < 2; i++ )
     {
         glBindTexture( GL_TEXTURE_RECTANGLE_EXT, pi_textures[i] );
-
-        /* Use VRAM texturing */
-        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-                GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_CACHED_APPLE );
-
-        /* Tell the driver not to make a copy of the texture but to use
-           our buffer */
-        glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
+        glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 
         /* Linear interpolation */
         glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
@@ -1559,19 +1540,22 @@ CATCH_MOUSE_EVENTS
         glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
                 GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-        /* I have no idea what this exactly does, but it seems to be
-           necessary for scaling */
+        /* Use VRAM texturing */
         glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-                GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-                GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
+                GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_CACHED_APPLE );
 
-        glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGBA,
+        glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGB8,
                 p_vout->output.i_width, p_vout->output.i_height, 0,
                 GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
                 p_vout->p_sys->p_data[i] );
     }
+
+    /* Swap buffers only during the vertical retrace of the monitor.
+       http://developer.apple.com/documentation/GraphicsImaging/
+       Conceptual/OpenGL/chap5/chapter_5_section_44.html */
+    long params[] = { 1 };
+    CGLSetParameter( CGLGetCurrentContext(), kCGLCPSwapInterval,
+                     params );
 
     initDone = 1;
 }
@@ -1583,9 +1567,10 @@ CATCH_MOUSE_EVENTS
         return;
     }
     
-    [currentContext makeCurrentContext];
+    [[self openGLContext] makeCurrentContext];
 
     glBindTexture( GL_TEXTURE_RECTANGLE_EXT, pi_textures[index] );
+    glPixelStorei( GL_UNPACK_ROW_LENGTH, p_vout->output.i_width );
 
     /* glTexSubImage2D is faster than glTexImage2D
        http://developer.apple.com/samplecode/Sample_Code/Graphics_3D/
@@ -1594,116 +1579,6 @@ CATCH_MOUSE_EVENTS
             p_vout->output.i_width, p_vout->output.i_height,
             GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
             p_vout->p_sys->p_data[index] );
-}
-
-- (void)goFullScreen
-{
-    /* Create the new pixel format */
-    NSOpenGLPixelFormatAttribute attribs[] =
-    {
-        NSOpenGLPFAAccelerated,
-        NSOpenGLPFANoRecovery,
-        NSOpenGLPFADoubleBuffer,
-        NSOpenGLPFAColorSize, 24,
-        NSOpenGLPFAAlphaSize, 8,
-        NSOpenGLPFADepthSize, 24,
-        NSOpenGLPFAFullScreen,
-        NSOpenGLPFAScreenMask,
-        /* TODO multi monitor support */
-        CGDisplayIDToOpenGLDisplayMask( kCGDirectMainDisplay ),
-        0
-    };
-    NSOpenGLPixelFormat * fmt = [[NSOpenGLPixelFormat alloc]
-        initWithAttributes: attribs];
-    if( !fmt )
-    {
-        msg_Warn( p_vout, "Cannot create NSOpenGLPixelFormat" );
-        return;
-    }
-
-    /* Create the new OpenGL context */
-    /* TODO have the shared context working so we don't have to
-       re-init textures */
-    fullScreenContext = [[NSOpenGLContext alloc]
-        initWithFormat: fmt shareContext: nil];
-    if( !fullScreenContext )
-    {
-        msg_Warn( p_vout, "Failed to create new NSOpenGLContext" );
-        return;
-    }
-    currentContext = fullScreenContext;
-
-    /* Capture display, switch to fullscreen */
-    /* XXX we should capture only the display the user wants the
-       picture on */
-    if( CGCaptureAllDisplays() != CGDisplayNoErr )
-    {
-        msg_Warn( p_vout, "CGCaptureAllDisplays() failed" );
-        return;
-    }
-    [fullScreenContext setFullScreen];
-    [fullScreenContext makeCurrentContext];
-
-    /* Ratio */
-    unsigned width    = CGDisplayPixelsWide( kCGDirectMainDisplay );
-    unsigned height   = CGDisplayPixelsHigh( kCGDirectMainDisplay );
-    int      stretch  = config_GetInt( p_vout, "macosx-stretch" );
-    int      fill     = config_GetInt( p_vout, "macosx-fill" );
-    int      bigRatio = ( height * p_vout->output.i_aspect <
-                          width * VOUT_ASPECT_FACTOR );
-    if( stretch )
-    {
-        f_x = 1.0;
-        f_y = 1.0;
-    }
-    else if( ( bigRatio && !fill ) || ( !bigRatio && fill ) )
-    {
-        f_x = (float) height * p_vout->output.i_aspect /
-                  width / VOUT_ASPECT_FACTOR;
-        f_y = 1.0;
-    }
-    else
-    {
-        f_x = 1.0;
-        f_y = (float) width * VOUT_ASPECT_FACTOR /
-                  p_vout->output.i_aspect / height;
-    }
-
-    /* Update viewport, re-init textures */
-    glViewport( 0, 0, width, height );
-    [self initTextures];
-
-    /* Redraw the last picture */
-    [self setNeedsDisplay: YES];
-
-    isFullScreen = 1;
-}
-
-- (void)exitFullScreen
-{
-    /* Free current OpenGL context */
-    [NSOpenGLContext clearCurrentContext];
-    [fullScreenContext clearDrawable];
-    [fullScreenContext release];
-    CGReleaseAllDisplays();
-
-    currentContext = [self openGLContext];
-    [self initTextures];
-    [self reshape];
-
-    /* Redraw the last picture */
-    [self setNeedsDisplay: YES];
-
-    isFullScreen = 0;
-}
-
-- (void) cleanUp
-{
-    if( isFullScreen )
-    {
-        [self exitFullScreen];
-    }
-    initDone = 0;
 }
 
 - (void) drawQuad
@@ -1798,21 +1673,14 @@ CATCH_MOUSE_EVENTS
 
 - (void) drawRect: (NSRect) rect
 {
-    [currentContext makeCurrentContext];
+    [[self openGLContext] makeCurrentContext];
 
-    /* Swap buffers only during the vertical retrace of the monitor.
-       http://developer.apple.com/documentation/GraphicsImaging/
-       Conceptual/OpenGL/chap5/chapter_5_section_44.html */
-    long params[] = { 1 };
-    CGLSetParameter( CGLGetCurrentContext(), kCGLCPSwapInterval,
-                     params );
-    
     /* Black background */
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     if( !initDone )
     {
-        [currentContext flushBuffer];
+        glFlush();
         return;
     }
 
@@ -1830,8 +1698,8 @@ CATCH_MOUSE_EVENTS
         [self drawQuad];
     }
 
-    /* Wait for the job to be done */
-    [currentContext flushBuffer];
+    /* Draw */
+    glFlush();
 }
 
 CATCH_MOUSE_EVENTS
@@ -1846,12 +1714,7 @@ CATCH_MOUSE_EVENTS
     ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
     b_inside = [self mouse: ml inRect: s_rect];
 
-    if( isFullScreen )
-    {
-        /* TODO */
-        /* Grmbl, mouseDown events aren't sent in fullscreen mode */
-    }
-    else if( b_inside )
+    if( b_inside )
     {
         vlc_value_t val;
         int i_width, i_height, i_x, i_y;
@@ -1923,7 +1786,7 @@ CATCH_MOUSE_EVENTS
         }
     } 
 
-    if( p_vout->b_fullscreen && !p_vout->p_sys->i_opengl )
+    if( p_vout->b_fullscreen )
     {
         NSRect screen_rect = [o_screen frame];
         screen_rect.origin.x = screen_rect.origin.y = 0;
@@ -1949,12 +1812,9 @@ CATCH_MOUSE_EVENTS
                                    NSClosableWindowMask |
                                    NSResizableWindowMask;
         
-        if( !p_vout->p_sys->i_opengl )
-        {
-            if ( p_vout->p_sys->p_fullscreen_state != NULL )
-                EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
-            p_vout->p_sys->p_fullscreen_state = NULL;
-        }
+        if ( p_vout->p_sys->p_fullscreen_state != NULL )
+            EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
+        p_vout->p_sys->p_fullscreen_state = NULL;
 
         [p_vout->p_sys->o_window 
             initWithContentRect: p_vout->p_sys->s_rect
