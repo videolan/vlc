@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.38 2003/11/15 22:42:16 hartman Exp $
+ * $Id: playlist.m,v 1.39 2003/11/16 11:21:48 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -140,6 +140,9 @@
     [o_mi_selectall setTitle: _NS("Select All")];
     [[o_tc_name headerCell] setStringValue:_NS("Name")];
     [[o_tc_author headerCell] setStringValue:_NS("Author")];
+    [o_random_ckb setTitle: _NS("Random")];
+    [o_loop_ckb setTitle: _NS("Repeat All")];
+    [o_repeat_ckb setTitle: _NS("Repeat One")];
 }
 
 - (BOOL)tableView:(NSTableView *)o_tv 
