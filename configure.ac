@@ -3110,6 +3110,7 @@ AC_ARG_ENABLE(portaudio,
   [if test "${enable_portaudio}" = "yes"
    then
      VLC_ADD_PLUGINS([portaudio])
+     VLC_ADD_CXXFLAGS([portaudio],[])
      if test "${SYS}" = "mingw32"; then
         VLC_ADD_LDFLAGS([portaudio],[-lportaudio -lwinmm -lole32])
      else
