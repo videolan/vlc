@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.22 2004/01/25 17:41:30 murray Exp $
+ * $Id: copy.c,v 1.23 2004/01/25 17:58:30 murray Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -38,7 +38,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("Copy Packetizer") );
+    set_description( _("Copy packetizer") );
     set_capability( "packetizer", 1 );
     set_callbacks( Open, Close );
 vlc_module_end();

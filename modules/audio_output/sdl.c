@@ -2,7 +2,7 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.25 2004/01/25 17:32:29 murray Exp $
+ * $Id: sdl.c,v 1.26 2004/01/25 17:58:29 murray Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Sam Hocevar <sam@zoy.org>
@@ -65,7 +65,7 @@ static void SDLCallback ( void *, byte_t *, int );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Simple DirectMedia Layer Audio Output") );
+    set_description( _("Simple DirectMedia Layer audio output") );
     set_capability( "audio output", 40 );
     add_shortcut( "sdl" );
     set_callbacks( Open, Close );

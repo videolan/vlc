@@ -2,7 +2,7 @@
  * mpeg4audio.c: parse and packetize an MPEG 4 audio stream
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4audio.c,v 1.15 2004/01/25 17:41:30 murray Exp $
+ * $Id: mpeg4audio.c,v 1.16 2004/01/25 17:58:30 murray Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -113,7 +113,7 @@ static int ADTSSyncInfo( decoder_t *, const byte_t * p_buf,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("MPEG4 Audio Packetizer") );
+    set_description( _("MPEG4 audio packetizer") );
     set_capability( "packetizer", 50 );
     set_callbacks( OpenPacketizer, ClosePacketizer );
 vlc_module_end();
