@@ -2,7 +2,7 @@
  * display.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: display.c,v 1.4 2003/05/05 22:23:40 gbazin Exp $
+ * $Id: display.c,v 1.5 2003/06/09 07:16:42 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -233,7 +233,8 @@ static int     Del      ( sout_stream_t *p_stream, sout_stream_id_t *id )
     return VLC_SUCCESS;
 }
 
-static int     Send     ( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *p_buffer )
+static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
+                 sout_buffer_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -250,15 +251,18 @@ static int     Send     ( sout_stream_t *p_stream, sout_stream_id_t *id, sout_bu
                 msg_Err( p_stream, "cannot allocate new PES" );
                 return VLC_EGENERIC;
             }
-            if( !( p_data = input_NewPacket( p_sys->p_input->p_method_data, p_buffer->i_size ) ) )
+            if( !( p_data = input_NewPacket( p_sys->p_input->p_method_data,
+                                             p_buffer->i_size ) ) )
             {
                 msg_Err( p_stream, "cannot allocate new data_packet" );
                 return VLC_EGENERIC;
             }
             p_data->p_payload_end = p_data->p_payload_start + p_buffer->i_size;
 
-            p_pes->i_dts = p_buffer->i_dts + p_sys->i_delay;
-            p_pes->i_pts = p_buffer->i_pts + p_sys->i_delay;
+            p_pes->i_dts = p_buffer->i_dts < 0 ? 0 :
+                           p_buffer->i_dts + p_sys->i_delay;
+            p_pes->i_pts = p_buffer->i_pts < 0 ? 0 :
+                           p_buffer->i_pts + p_sys->i_delay;
             p_pes->p_first = p_pes->p_last = p_data;
             p_pes->i_nb_data = 1;
             p_pes->i_pes_size = p_buffer->i_size;

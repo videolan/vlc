@@ -2,7 +2,7 @@
  * pes.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pes.c,v 1.5 2003/03/03 14:21:08 gbazin Exp $
+ * $Id: pes.c,v 1.6 2003/06/09 07:16:41 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -77,7 +77,8 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts, int i
                 int     i_pts_dts;
                 int     i_extra = 0;
 
-                /* *** for PES_PRIVATE_STREAM_1 there is an extra header after the pes hdr *** */
+                /* For PES_PRIVATE_STREAM_1 there is an extra header after the
+                   pes header */
                 if( i_stream_id == PES_PRIVATE_STREAM_1 )
                 {
                     i_extra = 1;
@@ -87,15 +88,20 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts, int i
                     }
                 }
 
-                if( i_dts >= 0 )
+                if( i_pts >= 0 && i_dts >= 0 )
                 {
                     bits_write( &bits, 16, i_es_size + i_extra+ 13 );
                     i_pts_dts = 0x03;
                 }
-                else
+                else if( i_pts >= 0 )
                 {
                     bits_write( &bits, 16, i_es_size  + i_extra + 8 );
                     i_pts_dts = 0x02;
+                }
+                else
+                {
+                    bits_write( &bits, 16, i_es_size  + i_extra + 3 );
+                    i_pts_dts = 0x00;
                 }
 
                 bits_write( &bits, 2, 0x02 ); // mpeg2 id
@@ -112,24 +118,30 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts, int i
                 bits_write( &bits, 1, 0x00 ); // additional copy info flag
                 bits_write( &bits, 1, 0x00 ); // pes crc flag
                 bits_write( &bits, 1, 0x00 ); // pes extention flags
-                if( i_pts_dts & 0x01 )
+                if( i_pts_dts == 0x03 )
                 {
                     bits_write( &bits, 8, 0x0a ); // header size -> pts and dts
                 }
-                else
+                else if( i_pts_dts == 0x02 )
                 {
                     bits_write( &bits, 8, 0x05 ); // header size -> pts
                 }
+                else
+                {
+                    bits_write( &bits, 8, 0x00 ); // header size -> 0
+                }
 
                 /* write pts */
-                bits_write( &bits, 4, i_pts_dts ); // '0010' or '0011'
-                bits_write( &bits, 3, i_pts >> 30 );
-                bits_write( &bits, 1, 0x01 ); // marker
-                bits_write( &bits, 15, i_pts >> 15 );
-                bits_write( &bits, 1, 0x01 ); // marker
-                bits_write( &bits, 15, i_pts );
-                bits_write( &bits, 1, 0x01 ); // marker
-
+                if( i_pts_dts & 0x02 )
+                {
+                    bits_write( &bits, 4, i_pts_dts ); // '0010' or '0011'
+                    bits_write( &bits, 3, i_pts >> 30 );
+                    bits_write( &bits, 1, 0x01 ); // marker
+                    bits_write( &bits, 15, i_pts >> 15 );
+                    bits_write( &bits, 1, 0x01 ); // marker
+                    bits_write( &bits, 15, i_pts );
+                    bits_write( &bits, 1, 0x01 ); // marker
+                }
                 /* write i_dts */
                 if( i_pts_dts & 0x01 )
                 {
