@@ -176,8 +176,6 @@ static const char *ppsz_sout_options[] = {
     NULL
 };
 
-#define SOUT_BUFFER_FLAGS_PRIVATE_PCR  ( 1 << BLOCK_FLAG_PRIVATE_SHIFT )
-#define SOUT_BUFFER_FLAGS_PRIVATE_CSA  ( 2 << BLOCK_FLAG_PRIVATE_SHIFT )
 typedef struct
 {
     int     i_depth;
@@ -1258,7 +1256,7 @@ static int Mux( sout_mux_t *p_mux )
             if( p_sys->csa != NULL &&
                  (p_input->p_fmt->i_cat != AUDIO_ES || p_sys->b_crypt_audio) )
             {
-                p_ts->i_flags |= SOUT_BUFFER_FLAGS_PRIVATE_CSA;
+                p_ts->i_flags |= BLOCK_FLAG_SCRAMBLED;
             }
             i_packet_pos++;
 
@@ -1376,12 +1374,12 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
         p_ts->i_dts    = i_new_dts;
         p_ts->i_length = i_pcr_length / i_packet_count;
 
-        if( p_ts->i_flags & SOUT_BUFFER_FLAGS_PRIVATE_PCR )
+        if( p_ts->i_flags & BLOCK_FLAG_CLOCK )
         {
             /* msg_Dbg( p_mux, "pcr=%lld ms", p_ts->i_dts / 1000 ); */
             TSSetPCR( p_ts, p_ts->i_dts - p_sys->i_dts_delay );
         }
-        if( p_ts->i_flags & SOUT_BUFFER_FLAGS_PRIVATE_CSA )
+        if( p_ts->i_flags & BLOCK_FLAG_SCRAMBLED )
         {
             csa_Encrypt( p_sys->csa, p_ts->p_buffer, 0 );
         }
@@ -1437,7 +1435,7 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
         {
             int     i_stuffing = i_payload_max - i_payload;
 
-            p_ts->i_flags |= SOUT_BUFFER_FLAGS_PRIVATE_PCR;
+            p_ts->i_flags |= BLOCK_FLAG_CLOCK;
 
             p_ts->p_buffer[4] = 7 + i_stuffing;
             p_ts->p_buffer[5] = 0x10;   /* flags */

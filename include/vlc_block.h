@@ -60,8 +60,14 @@ typedef struct block_sys_t block_sys_t;
 #define BLOCK_FLAG_HEADER        0x0020
 /** This is the last block of the frame */
 #define BLOCK_FLAG_END_OF_FRAME  0x0040
-/** No keyframes present */
+/** This is not a key frame for bitrate shaping */
 #define BLOCK_FLAG_NO_KEYFRAME   0x0080
+/** This is the last block of the GOP */
+#define BLOCK_FLAG_END_OF_GOP    0x0100
+/** This block contains a clock reference */
+#define BLOCK_FLAG_CLOCK         0x0200
+/** This block is scrambled */
+#define BLOCK_FLAG_SCRAMBLED     0x0400
 
 #define BLOCK_FLAG_PRIVATE_MASK  0xffff0000
 #define BLOCK_FLAG_PRIVATE_SHIFT 16

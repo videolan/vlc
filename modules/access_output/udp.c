@@ -382,6 +382,8 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
             p_sys->p_buffer->i_buffer += i_write;
             p_buffer->p_buffer += i_write;
             p_buffer->i_buffer -= i_write;
+            if ( p_buffer->i_flags & BLOCK_FLAG_CLOCK )
+                p_sys->p_buffer->i_flags |= BLOCK_FLAG_CLOCK;
 
             if( p_sys->p_buffer->i_buffer == p_sys->i_mtu || i_packets > 1 )
             {
@@ -491,7 +493,7 @@ static void ThreadWrite( vlc_object_t *p_this )
                 i_dropped_packets++;
                 continue;
             }
-            else if( i_date - i_date_last < 0 )
+            else if( i_date - i_date_last < -15000 )
             {
                 if( !i_dropped_packets )
                     msg_Dbg( p_thread, "mmh, packets in the past ("I64Fd")"
@@ -519,7 +521,7 @@ static void ThreadWrite( vlc_object_t *p_this )
         }
 
         i_to_send--;
-        if ( !i_to_send )
+        if ( !i_to_send || (p_pk->i_flags & BLOCK_FLAG_CLOCK) )
         {
             mwait( i_date );
             i_to_send = p_thread->i_group;
@@ -532,7 +534,7 @@ static void ThreadWrite( vlc_object_t *p_this )
             i_dropped_packets = 0;
         }
 
-#if 0
+#if 1
         i_sent = mdate();
         if ( i_sent > i_date + 20000 )
         {
