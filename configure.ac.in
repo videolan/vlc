@@ -1375,8 +1375,8 @@ then
     [    --with-mad=PATH       path to libmad],[],[])
   if test "x${with_mad}" != "xno" -a "x${with_mad}" != "x"
   then
-    CPPFLAGS_mad="${CPPFLAGS_mpgatofixed32} -I${with_mad}/include"
-    LDFLAGS_mad="${LDFLAGS_mpgatofixed32} -L${with_mad}/lib"
+    CPPFLAGS_mpgatofixed32="${CPPFLAGS_mpgatofixed32} -I${with_mad}/include"
+    LDFLAGS_mpgatofixed32="${LDFLAGS_mpgatofixed32} -L${with_mad}/lib"
   fi
 
   AC_ARG_WITH(mad-tree,
@@ -1395,8 +1395,8 @@ then
     if test -f ${real_mad_tree}/libmad/mad.h
     then
       AC_MSG_RESULT(yes)
-      CPPFLAGS_mad="${CPPFLAGS_mpgatofixed32} -I${real_mad_tree}/libmad"
-      LDFLAGS_mad="${LDFLAGS_mpgatofixed32} -L${real_mad_tree}/libmad/.libs"
+      CPPFLAGS_mpgatofixed32="${CPPFLAGS_mpgatofixed32} -I${real_mad_tree}/libmad"
+      LDFLAGS_mpgatofixed32="${LDFLAGS_mpgatofixed32} -L${real_mad_tree}/libmad/.libs"
       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_mpgatofixed32}"
       AC_CHECK_LIB(mad, mad_bit_init, [
         BUILTINS="${BUILTINS} mpgatofixed32"
