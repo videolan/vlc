@@ -10,7 +10,3 @@ SOURCES_cdda = \
         vcd/cdrom.h \
         vcd/cdrom_internals.h \
         $(NULL)
-SOURCES_cddax = \
-        cddax.c \
-        vcdx/cdrom.c \
-        vcdx/cdrom.h
