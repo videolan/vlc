@@ -456,7 +456,16 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
           add_format_str_info(t->ext_data);
       } else goto not_special;
       break;
-#endif
+    case 's':
+      if (p_cdda->b_cddb_enabled) {
+        char psz_buffer[MSTRTIME_MAX_SIZE];
+        mtime_t i_duration = (p_cdda->lsn[i_track+1] - p_cdda->lsn[i_track]) 
+          / CDIO_CD_FRAMES_PER_SEC;
+        add_format_str_info(secstotimestr( psz_buffer, i_duration ) );
+      } else 
+	goto not_special;
+      break;
+#endif /*HAVE_LIBCDDB*/
 
     case 'M':
       add_format_str_info(mrl);
@@ -468,15 +477,6 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
 
     case 'n':
       add_format_num_info(p_cdda->i_tracks, "%d");
-      break;
-
-    case 's':
-      if (p_cdda->b_cddb_enabled) {
-        char psz_buffer[MSTRTIME_MAX_SIZE];
-        mtime_t i_duration = (p_cdda->lsn[i_track+1] - p_cdda->lsn[i_track]) 
-          / CDIO_CD_FRAMES_PER_SEC;
-        add_format_str_info(secstotimestr( psz_buffer, i_duration ) );
-      } else goto not_special;
       break;
 
     case 'T':
