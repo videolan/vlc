@@ -153,7 +153,7 @@ char * TestPlugin ( plugin_id_t *p_plugin_id, char * psz_name )
         
         psz_program_path = beos_GetProgramPath();
         psz_plugin = malloc( strlen(psz_plugin_path[i_count]) +
-                             strlen(psz_program_path) + i_length + 5 );
+                             strlen(psz_program_path) + i_length + 6 );
         sprintf( psz_plugin, "%s/%s/%s.so", psz_program_path,
                  psz_plugin_path[i_count], psz_name );        
 
