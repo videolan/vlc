@@ -1865,21 +1865,6 @@ then
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot find ${real_libmpeg2_tree}/libmpeg2/.libs/libmpeg2.a, make sure you compiled libmpeg2 in ${with_libmpeg2_tree}])
     fi
-  elif test "x${with_libmpeg2_prefix}" != "x"
-  then
-    # check for cross-compiling
-    AC_ARG_WITH(libmpeg2-prefix,
-      [    --with-libmpeg2-prefix=PATH path to installed libmpeg2 (needed for cross-compiling),
-                                 e.g use as:
-                                 --with-libmpeg2-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
-    if test "x${with_libmpeg2_prefix}" != "xno" -a "x${with_libmpeg2_prefix}" != "x"
-    then
-      AC_MSG_CHECKING(for libmpeg2.a in ${with_libmpeg2_prefix})
-      AC_MSG_RESULT(${with_libmpeg2_prefix}/lib/libmpeg2.a)
-      PLUGINS="${PLUGINS} libmpeg2"
-      LDFLAGS_libmpeg2="${LDFLAGS_libmpeg2} -L${with_libmpeg2_prefix}/lib -lmpeg2"
-      CFLAGS_libmpeg2="${CFLAGS_libmpeg2} -I${with_libmpeg2_prefix}/include"
-    fi
   else
     AC_CHECK_HEADERS(mpeg2dec/mpeg2.h, [
       AC_MSG_CHECKING(for libmpeg2 version >= 0.3.2)
