@@ -7,7 +7,7 @@
 %define cvs     	1
 %if %{cvs}
 %define	cvsrel		1
-%define cvsdate 	20030120
+%define cvsdate 	20030127
 %define release		0.%{cvsdate}.%{cvsrel}mdk
 %define cvs_name 	%{name}-snapshot-%cvsdate
 %else
@@ -769,6 +769,7 @@ rm -fr %buildroot
 %_libdir/vlc/demux/libasf_plugin.so
 %_libdir/vlc/demux/libaudio_plugin.so
 %_libdir/vlc/demux/libavi_plugin.so
+%_libdir/vlc/demux/liba52sys_plugin.so
 %_libdir/vlc/demux/libdemuxdump_plugin.so
 %_libdir/vlc/demux/libdemuxsub_plugin.so
 %_libdir/vlc/demux/libes_plugin.so
@@ -834,6 +835,7 @@ rm -fr %buildroot
 
 %dir %_libdir/vlc/video_output
 %_libdir/vlc/video_output/libfb_plugin.so
+%_libdir/vlc/video_output/libvout_encoder_plugin.so
 %_libdir/vlc/video_output/libx11_plugin.so
 %_libdir/vlc/video_output/libxvideo_plugin.so
 
