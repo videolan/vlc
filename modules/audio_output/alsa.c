@@ -198,6 +198,21 @@ static void Probe( aout_instance_t * p_aout,
             --i_channels;
         }
 
+        /* Special case for mono on stereo only boards */
+        i_channels = aout_FormatNbChannels( &p_aout->output.output );        
+        var_Change( p_aout, "audio-device", VLC_VAR_CHOICESCOUNT, &val, NULL );
+        if( val.i_int <= 0 && i_channels == 1 )
+        {
+            if ( !snd_pcm_hw_params_test_channels( p_sys->p_snd_pcm, p_hw, 2 ))
+            {
+                val.i_int = AOUT_VAR_STEREO;
+                text.psz_string = N_("Stereo");
+                var_Change( p_aout, "audio-device",
+                            VLC_VAR_ADDCHOICE, &val, &text );
+                var_Set( p_aout, "audio-device", val );
+            }
+        }
+        
         /* Close the previously opened device */
         snd_pcm_close( p_sys->p_snd_pcm );
     }
