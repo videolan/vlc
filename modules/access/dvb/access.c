@@ -192,7 +192,8 @@ static int Control( access_t *, int, va_list );
 #define SATELLITE_READ_ONCE 3
 #define TS_PACKET_SIZE 188
 
-static void FilterUnset( access_t *, int i_start, int i_max );
+static void FilterUnset( access_t *, int i_max );
+static void FilterUnsetPID( access_t *, int i_pid );
 static void FilterSet( access_t *, int i_pid, int i_type );
 
 static void VarInit( access_t * );
@@ -283,7 +284,7 @@ static void Close( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
-    FilterUnset( p_access, 0, p_sys->b_budget_mode ? 1 : MAX_DEMUX );
+    FilterUnset( p_access, p_sys->b_budget_mode ? 1 : MAX_DEMUX );
 
     E_(DVRClose)( p_access );
     E_(FrontendClose)( p_access );
@@ -386,7 +387,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
                 if( b_bool )
                     FilterSet( p_access, i_int, OTHER_TYPE );
                 else
-                    FilterUnset( p_access, i_int, i_int+1 );
+                    FilterUnsetPID( p_access, i_int );
             }
             break;
 
@@ -411,6 +412,9 @@ static void FilterSet( access_t *p_access, int i_pid, int i_type )
     {
         if( !p_sys->p_demux_handles[i].i_type )
             break;
+
+        if( p_sys->p_demux_handles[i].i_pid == i_pid )
+            return; /* Already set */
     }
 
     if( i >= MAX_DEMUX )
@@ -429,14 +433,30 @@ static void FilterSet( access_t *p_access, int i_pid, int i_type )
     p_sys->p_demux_handles[i].i_pid = i_pid;
 }
 
-static void FilterUnset( access_t *p_access, int i_start, int i_max )
+static void FilterUnset( access_t *p_access, int i_max )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i;
 
-    for( i = i_start; i < i_max; i++ )
+    for( i = 0; i < i_max; i++ )
     {
         if( p_sys->p_demux_handles[i].i_type )
+        {
+            E_(DMXUnsetFilter)( p_access, p_sys->p_demux_handles[i].i_handle );
+            p_sys->p_demux_handles[i].i_type = 0;
+        }
+    }
+}
+
+static void FilterUnsetPID( access_t *p_access, int i_pid )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    int i;
+
+    for( i = 0; i < MAX_DEMUX; i++ )
+    {
+        if( p_sys->p_demux_handles[i].i_type &&
+            p_sys->p_demux_handles[i].i_pid == i_pid )
         {
             E_(DMXUnsetFilter)( p_access, p_sys->p_demux_handles[i].i_handle );
             p_sys->p_demux_handles[i].i_type = 0;
