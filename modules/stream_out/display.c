@@ -136,13 +136,12 @@ static void Close( vlc_object_t * p_this )
     p_stream->p_sout->i_out_pace_nocontrol--;
 
     vlc_object_release( p_sys->p_input );
-
     free( p_sys );
 }
 
 struct sout_stream_id_t
 {
-    es_descriptor_t *p_es;
+    decoder_t *p_dec;
 };
 
 static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
@@ -158,19 +157,11 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     id = malloc( sizeof( sout_stream_id_t ) );
 
-    id->p_es = malloc( sizeof( es_descriptor_t ) );
-    memset( id->p_es, 0, sizeof( es_descriptor_t ) );
-    id->p_es->i_cat         = p_fmt->i_cat;
-    id->p_es->i_fourcc      = p_fmt->i_codec;
-    id->p_es->b_force_decoder = VLC_TRUE;
-    es_format_Copy( &id->p_es->fmt, p_fmt );
-
-    id->p_es->p_dec = input_RunDecoder( p_sys->p_input, id->p_es );
-    if( id->p_es->p_dec == NULL )
+    id->p_dec = input_DecoderNew( p_sys->p_input, p_fmt, VLC_TRUE );
+    if( id->p_dec == NULL )
     {
         msg_Err( p_stream, "cannot create decoder for fcc=`%4.4s'",
                  (char*)&p_fmt->i_codec );
-        free( id->p_es );
         free( id );
         return NULL;
     }
@@ -180,13 +171,8 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    input_EndDecoder( p_sys->p_input, id->p_es );
-
-    free( id->p_es );
+    input_DecoderDelete( id->p_dec );
     free( id );
-
     return VLC_SUCCESS;
 }
 
@@ -201,7 +187,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
         p_buffer->p_next = NULL;
 
-        if( id->p_es->p_dec && p_buffer->i_buffer > 0 )
+        if( id->p_dec && p_buffer->i_buffer > 0 )
         {
             if( p_buffer->i_dts <= 0 )
                 p_buffer->i_dts= 0;
@@ -213,7 +199,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             else
                 p_buffer->i_pts += p_sys->i_delay;
 
-            input_DecodeBlock( id->p_es->p_dec, p_buffer );
+            input_DecoderDecode( id->p_dec, p_buffer );
         }
 
         p_buffer = p_next;

@@ -1177,8 +1177,8 @@ then
   VLC_ADD_PLUGINS([packetizer_copy])
 
   VLC_ADD_PLUGINS([stream_out_dummy stream_out_standard stream_out_es stream_out_rtp])
-  VLC_ADD_PLUGINS([stream_out_duplicate stream_out_gather])
-#  VLC_ADD_PLUGINS([stream_out_transrate stream_out_display])
+  VLC_ADD_PLUGINS([stream_out_duplicate stream_out_gather stream_out_display])
+#  VLC_ADD_PLUGINS([stream_out_transrate])
 
   dnl Ogg and vorbis are handled in their respective section
 fi
