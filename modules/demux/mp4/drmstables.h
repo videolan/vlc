@@ -1,8 +1,8 @@
 /*****************************************************************************
- * drmstables.h : DRMS tables
+ * drmstables.h : AES/Rijndael block cipher and miscellaneous tables
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: drmstables.h,v 1.1 2004/01/05 12:37:52 jlj Exp $
+ * $Id: drmstables.h,v 1.2 2004/01/16 18:26:57 sam Exp $
  *
  * Author: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -21,13 +21,23 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-static uint32_t p_drms_tab1[ 10 ] =
+#define AES_ROR( x, n ) (((x) << (32-(n))) | ((x) >> (n)))
+
+#define AES_XOR_ROR( p_table, p_tmp ) \
+    ( p_table[ (p_tmp[ t > 2 ? t - 3 : t + 1 ] >> 24) & 0xFF ] \
+     ^ AES_ROR( p_table[ (p_tmp[ t > 1 ? t - 2 : t + 2 ] >> 16) & 0xFF ], 8 ) \
+     ^ AES_ROR( p_table[ (p_tmp[ t > 0 ? t - 1 : t + 3 ] >> 8) & 0xFF ], 16 ) \
+     ^ AES_ROR( p_table[ p_tmp[ t ] & 0xFF ], 24 ) )
+
+#define AES_KEY_COUNT 10
+
+static uint32_t p_aes_table[ AES_KEY_COUNT ] =
 {
     0x00000001, 0x00000002, 0x00000004, 0x00000008, 0x00000010, 0x00000020,
     0x00000040, 0x00000080, 0x0000001B, 0x00000036
 };
 
-static uint32_t p_drms_tab2[ 256 ] =
+static uint32_t p_aes_encrypt[ 256 ] =
 {
     0x63000000, 0x7C000000, 0x77000000, 0x7B000000, 0xF2000000, 0x6B000000,
     0x6F000000, 0xC5000000, 0x30000000, 0x01000000, 0x67000000, 0x2B000000,
@@ -74,7 +84,7 @@ static uint32_t p_drms_tab2[ 256 ] =
     0xB0000000, 0x54000000, 0xBB000000, 0x16000000
 };
 
-static uint32_t p_drms_tab3[ 256 ] =
+static uint32_t p_aes_itable[ 256 ] =
 {
     0x5150A7F4, 0x7E536541, 0x1AC3A417, 0x3A965E27, 0x3BCB6BAB, 0x1FF1459D,
     0xACAB58FA, 0x4B9303E3, 0x2055FA30, 0xADF66D76, 0x889176CC, 0xF5254C02,
@@ -121,7 +131,7 @@ static uint32_t p_drms_tab3[ 256 ] =
     0x7B6184CB, 0xD570B632, 0x48745C6C, 0xD04257B8
 };
 
-static uint32_t p_drms_tab4[ 256 ] =
+static uint32_t p_aes_decrypt[ 256 ] =
 {
     0x52000000, 0x09000000, 0x6A000000, 0xD5000000, 0x30000000, 0x36000000,
     0xA5000000, 0x38000000, 0xBF000000, 0x40000000, 0xA3000000, 0x9E000000,
@@ -168,36 +178,7 @@ static uint32_t p_drms_tab4[ 256 ] =
     0x55000000, 0x21000000, 0x0C000000, 0x7D000000
 };
 
-static int32_t p_drms_tab_taos[ 64 ] =
-{
-    -0x28955B88, -0x173848AA, +0x242070DB, -0x3E423112, -0x0A83F051,
-    +0x4787C62A, -0x57CFB9ED, -0x02B96AFF, +0x698098D8, -0x74BB0851,
-    -0x0000A44F, -0x76A32842, +0x6B901122, -0x02678E6D, -0x5986BC72,
-    +0x49B40821, -0x09E1DA9E, -0x3FBF4CC0, +0x265E5A51, -0x16493856,
-    -0x29D0EFA3, +0x02441453, -0x275E197F, -0x182C0438, +0x21E1CDE6,
-    -0x3CC8F82A, -0x0B2AF279, +0x455A14ED, -0x561C16FB, -0x03105C08,
-    +0x676F02D9, -0x72D5B376, -0x0005C6BE, -0x788E097F, +0x6D9D6122,
-    -0x021AC7F4, -0x5B4115BC, +0x4BDECFA9, -0x0944B4A0, -0x41404390,
-    +0x289B7EC6, -0x155ED806, -0x2B10CF7B, +0x04881D05, -0x262B2FC7,
-    -0x1924661B, +0x1FA27CF8, -0x3B53A99B, -0x0BD6DDBC, +0x432AFF97,
-    -0x546BDC59, -0x036C5FC7, +0x655B59C3, -0x70F3336E, -0x00100B83,
-    -0x7A7BA22F, +0x6FA87E4F, -0x01D31920, -0x5CFEBCEC, +0x4E0811A1,
-    -0x08AC817E, -0x42C50DCB, +0x2AD7D2BB, -0x14792C6F
-};
-
-static uint8_t p_drms_tab_tend[ 64 ] =
-{
-    0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
-
-static uint16_t p_drms_tab_xor[ 16 ][ 16 ] =
+static uint16_t p_shuffle_xor[ 16 ][ 16 ] =
 {
     {
         0x00D1, 0x0315, 0x1A32, 0x19EC, 0x1BBB, 0x1D6F, 0x14FE, 0x0E9E,
@@ -280,7 +261,7 @@ static uint16_t p_drms_tab_xor[ 16 ][ 16 ] =
     }
 };
 
-static uint16_t p_drms_tab_sub[ 16 ][ 16 ] =
+static uint16_t p_shuffle_sub[ 16 ][ 16 ] =
 {
     {
         0x067A, 0x0C7D, 0x0B4F, 0x127D, 0x0BD6, 0x04AC, 0x16E0, 0x1730,
@@ -363,7 +344,7 @@ static uint16_t p_drms_tab_sub[ 16 ][ 16 ] =
     }
 };
 
-static uint16_t p_drms_tab_add[ 16 ][ 16 ] =
+static uint16_t p_shuffle_add[ 16 ][ 16 ] =
 {
     {
         0x0706, 0x175A, 0x0DEF, 0x1E72, 0x0297, 0x1B0E, 0x1D5A, 0x15B8,

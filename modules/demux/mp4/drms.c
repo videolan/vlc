@@ -1,10 +1,11 @@
 /*****************************************************************************
- * drms.c : DRMS
+ * drms.c: DRMS
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: drms.c,v 1.4 2004/01/09 17:29:17 jlj Exp $
+ * $Id: drms.c,v 1.5 2004/01/16 18:26:57 sam Exp $
  *
- * Author: Jon Lech Johansen <jon-vl@nanocrew.net>
+ * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
+ *          Sam Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,21 +25,28 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #ifdef WIN32
-#include <io.h>
+#   include <io.h>
 #else
-#include <stdio.h>
+#   include <stdio.h>
 #endif
 
 #include <vlc/vlc.h>
 
 #ifdef HAVE_ERRNO_H
-#include <errno.h>
+#   include <errno.h>
 #endif
 
 #ifdef WIN32
-#include <tchar.h>
-#include <shlobj.h>
-#include <windows.h>
+#   include <tchar.h>
+#   include <shlobj.h>
+#   include <windows.h>
+#endif
+
+#ifdef HAVE_SYS_STAT_H
+   #include <sys/stat.h>
+#endif
+#ifdef HAVE_SYS_TYPES_H
+   #include <sys/types.h>
 #endif
 
 #include "drms.h"
@@ -46,557 +54,983 @@
 
 #include "libmp4.h"
 
-#define TAOS_INIT( tmp, i ) \
-    memset( tmp, 0, sizeof(tmp) ); \
-    tmp[ i + 0 ] = 0x67452301; \
-    tmp[ i + 1 ] = 0xEFCDAB89; \
-    tmp[ i + 2 ] = 0x98BADCFE; \
-    tmp[ i + 3 ] = 0x10325476;
+/*****************************************************************************
+ * aes_s: AES keys structure
+ *****************************************************************************
+ * This structure stores a set of keys usable for encryption and decryption
+ * with the AES/Rijndael algorithm.
+ *****************************************************************************/
+struct aes_s
+{
+    uint32_t pp_enc_keys[ AES_KEY_COUNT + 1 ][ 4 ];
+    uint32_t pp_dec_keys[ AES_KEY_COUNT + 1 ][ 4 ];
+};
 
-#define ROR( x, n ) (((x) << (32-(n))) | ((x) >> (n)))
+/*****************************************************************************
+ * md5_s: MD5 message structure
+ *****************************************************************************
+ * This structure stores the static information needed to compute an MD5
+ * hash. It has an extra data buffer to allow non-aligned writes.
+ *****************************************************************************/
+struct md5_s
+{
+    uint64_t i_bits;      /* Total written bits */
+    uint32_t p_digest[4]; /* The MD5 digest */
+    uint32_t p_data[16];  /* Buffer to cache non-aligned writes */
+};
 
-static void init_ctx( uint32_t *p_ctx, uint32_t *p_input )
+/*****************************************************************************
+ * shuffle_s: shuffle structure
+ *****************************************************************************
+ * This structure stores the static information needed to shuffle data using
+ * a custom algorithm.
+ *****************************************************************************/
+struct shuffle_s
+{
+    uint32_t p_commands[ 20 ];
+    uint32_t p_bordel[ 16 ];
+};
+
+/*****************************************************************************
+ * drms_s: DRMS structure
+ *****************************************************************************
+ * This structure stores the static information needed to decrypt DRMS data.
+ *****************************************************************************/
+struct drms_s
+{
+    uint32_t i_user;
+    uint32_t i_key;
+    uint8_t *p_iviv;
+    uint8_t *p_name;
+    uint32_t i_name_len;
+
+    uint32_t p_key[ 4 ];
+    struct aes_s aes;
+
+    char    *psz_homedir;
+};
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static void InitAES       ( struct aes_s *, uint32_t * );
+static void DecryptAES    ( struct aes_s *, uint32_t *, const uint32_t * );
+
+static void InitMD5       ( struct md5_s * );
+static void AddMD5        ( struct md5_s *, const uint8_t *, uint32_t );
+static void AddNativeMD5  ( struct md5_s *, uint32_t *, uint32_t );
+static void EndMD5        ( struct md5_s * );
+static void Digest        ( struct md5_s *, const uint32_t * );
+
+static void InitShuffle   ( struct shuffle_s *, uint32_t * );
+static void DoShuffle     ( struct shuffle_s *, uint8_t *, uint32_t );
+static void Bordelize     ( uint32_t *, uint32_t );
+
+static int GetSystemKey   ( uint32_t * );
+static int WriteUserKey   ( void *, uint32_t * );
+static int ReadUserKey    ( void *, uint32_t * );
+static int GetUserKey     ( void *, uint32_t * );
+
+static int GetSCIData     ( uint32_t **, uint32_t * );
+static int HashSystemInfo ( struct md5_s * );
+
+/*****************************************************************************
+ * BlockXOR: XOR two 128 bit blocks
+ *****************************************************************************/
+static inline void BlockXOR( uint32_t *p_dest, uint32_t *p_s1, uint32_t *p_s2 )
 {
     uint32_t i;
-    uint32_t p_tmp[ 6 ];
 
-    p_ctx[ 0 ] = sizeof(*p_input);
-
-    memset( &p_ctx[ 1 + 4 ], 0, sizeof(*p_input) * 4 );
-    memcpy( &p_ctx[ 1 + 0 ], p_input, sizeof(*p_input) * 4 );
-
-    p_tmp[ 0 ] = p_ctx[ 1 + 3 ];
-
-    for( i = 0; i < sizeof(p_drms_tab1)/sizeof(p_drms_tab1[ 0 ]); i++ )
+    for( i = 0; i < 4; i++ )
     {
-        p_tmp[ 0 ] = ROR( p_tmp[ 0 ], 8 );
-
-        p_tmp[ 5 ] = p_drms_tab2[ (p_tmp[ 0 ] >> 24) & 0xFF ]
-                   ^ ROR( p_drms_tab2[ (p_tmp[ 0 ] >> 16) & 0xFF ], 8 )
-                   ^ ROR( p_drms_tab2[ (p_tmp[ 0 ] >> 8) & 0xFF ], 16 )
-                   ^ ROR( p_drms_tab2[ p_tmp[ 0 ] & 0xFF ], 24 )
-                   ^ p_drms_tab1[ i ]
-                   ^ p_ctx[ 1 + ((i + 1) * 4) - 4 ];
-
-        p_ctx[ 1 + ((i + 1) * 4) + 0 ] = p_tmp[ 5 ];
-        p_tmp[ 5 ] ^= p_ctx[ 1 + ((i + 1) * 4) - 3 ];
-        p_ctx[ 1 + ((i + 1) * 4) + 1 ] = p_tmp[ 5 ];
-        p_tmp[ 5 ] ^= p_ctx[ 1 + ((i + 1) * 4) - 2 ];
-        p_ctx[ 1 + ((i + 1) * 4) + 2 ] = p_tmp[ 5 ];
-        p_tmp[ 5 ] ^= p_ctx[ 1 + ((i + 1) * 4) - 1 ];
-        p_ctx[ 1 + ((i + 1) * 4) + 3 ] = p_tmp[ 5 ];
-
-        p_tmp[ 0 ] = p_tmp[ 5 ];
-    }
-
-    memcpy( &p_ctx[ 1 + 64 ], &p_ctx[ 1 ], sizeof(*p_ctx) * 4 );
-
-    for( i = 4; i < sizeof(p_drms_tab1); i++ )
-    {
-        p_tmp[ 2 ] = p_ctx[ 1 + 4 + (i - 4) ];
-
-        p_tmp[ 0 ] = (((p_tmp[ 2 ] >> 7) & 0x01010101) * 27)
-                   ^ ((p_tmp[ 2 ] & 0xFF7F7F7F) << 1);
-        p_tmp[ 1 ] = (((p_tmp[ 0 ] >> 7) & 0x01010101) * 27)
-                   ^ ((p_tmp[ 0 ] & 0xFF7F7F7F) << 1);
-        p_tmp[ 4 ] = (((p_tmp[ 1 ] >> 7) & 0x01010101) * 27)
-                   ^ ((p_tmp[ 1 ] & 0xFF7F7F7F) << 1);
-
-        p_tmp[ 2 ] ^= p_tmp[ 4 ];
-
-        p_tmp[ 3 ] = ROR( p_tmp[ 1 ] ^ p_tmp[ 2 ], 16 )
-                   ^ ROR( p_tmp[ 0 ] ^ p_tmp[ 2 ], 8 )
-                   ^ ROR( p_tmp[ 2 ], 24 );
-
-        p_ctx[ 1 + 4 + 64 + (i - 4) ] = p_tmp[ 3 ] ^ p_tmp[ 4 ]
-                                      ^ p_tmp[ 1 ] ^ p_tmp[ 0 ];
+        p_dest[ i ] = p_s1[ i ] ^ p_s2[ i ];
     }
 }
 
-static void ctx_xor( uint32_t *p_ctx, uint32_t *p_in, uint32_t *p_out,
-                     uint32_t p_table1[ 256 ], uint32_t p_table2[ 256 ] )
+/*****************************************************************************
+ * drms_alloc: allocate a DRMS structure
+ *****************************************************************************/
+void *drms_alloc( char *psz_homedir )
 {
-    uint32_t i, x, y;
-    uint32_t p_tmp1[ 4 ];
-    uint32_t p_tmp2[ 4 ];
+    struct drms_s *p_drms;
 
-    i = p_ctx[ 0 ] * 4;
+    p_drms = malloc( sizeof(struct drms_s) );
 
-    p_tmp1[ 0 ] = p_ctx[ 1 + i + 24 ] ^ p_in[ 0 ];
-    p_tmp1[ 1 ] = p_ctx[ 1 + i + 25 ] ^ p_in[ 1 ];
-    p_tmp1[ 2 ] = p_ctx[ 1 + i + 26 ] ^ p_in[ 2 ];
-    p_tmp1[ 3 ] = p_ctx[ 1 + i + 27 ] ^ p_in[ 3 ];
-
-    i += 84;
-
-#define XOR_ROR( p_table, p_tmp, i_ctx ) \
-    p_table[ (p_tmp[ y > 2 ? y - 3 : y + 1 ] >> 24) & 0xFF ] \
-    ^ ROR( p_table[ (p_tmp[ y > 1 ? y - 2 : y + 2 ] >> 16) & 0xFF ], 8 ) \
-    ^ ROR( p_table[ (p_tmp[ y > 0 ? y - 1 : y + 3 ] >> 8) & 0xFF ], 16 ) \
-    ^ ROR( p_table[ p_tmp[ y ] & 0xFF ], 24 ) \
-    ^ p_ctx[ i_ctx ]
-
-    for( x = 0; x < 1; x++ )
+    if( p_drms == NULL )
     {
-        memcpy( p_tmp2, p_tmp1, sizeof(p_tmp1) );
-
-        for( y = 0; y < 4; y++ )
-        {
-            p_tmp1[ y ] = XOR_ROR( p_table1, p_tmp2, 1 + i - x + y );
-        }
+        return NULL;
     }
 
-    for( ; x < 9; x++ )
+    memset( p_drms, 0, sizeof(struct drms_s) );
+
+    p_drms->psz_homedir = malloc( PATH_MAX );
+    if( p_drms->psz_homedir != NULL )
     {
-        memcpy( p_tmp2, p_tmp1, sizeof(p_tmp1) );
-
-        for( y = 0; y < 4; y++ )
-        {
-            p_tmp1[ y ] = XOR_ROR( p_table1, p_tmp2,
-                                   1 + i - x - ((x * 3) - y) );
-        }
-    }
-
-    for( y = 0; y < 4; y++ )
-    {
-        p_out[ y ] = XOR_ROR( p_table2, p_tmp1,
-                              1 + i - x - ((x * 3) - y) );
-    }
-
-#undef XOR_ROR
-}
-
-static void taos( uint32_t *p_buffer, uint32_t *p_input )
-{
-    uint32_t i;
-    uint32_t x = 0;
-    uint32_t p_tmp1[ 4 ];
-    uint32_t p_tmp2[ 4 ];
-
-    memcpy( p_tmp1, p_buffer, sizeof(p_tmp1) );
-
-    p_tmp2[ 0 ] = ((~p_tmp1[ 1 ] & p_tmp1[ 3 ])
-                |   (p_tmp1[ 2 ] & p_tmp1[ 1 ])) + p_input[ x ];
-    p_tmp1[ 0 ] = p_tmp2[ 0 ] + p_tmp1[ 0 ] + p_drms_tab_taos[ x++ ];
-
-    for( i = 0; i < 4; i++ )
-    {
-        p_tmp2[ 0 ] = ((p_tmp1[ 0 ] >> 0x19)
-                    |  (p_tmp1[ 0 ] << 0x7)) + p_tmp1[ 1 ];
-        p_tmp2[ 1 ] = ((~p_tmp2[ 0 ] & p_tmp1[ 2 ])
-                    |   (p_tmp1[ 1 ] & p_tmp2[ 0 ])) + p_input[ x ];
-        p_tmp2[ 1 ] += p_tmp1[ 3 ] + p_drms_tab_taos[ x++ ];
-
-        p_tmp1[ 3 ] = ((p_tmp2[ 1 ] >> 0x14)
-                    |  (p_tmp2[ 1 ] << 0xC)) + p_tmp2[ 0 ];
-        p_tmp2[ 1 ] = ((~p_tmp1[ 3 ] & p_tmp1[ 1 ])
-                    |   (p_tmp1[ 3 ] & p_tmp2[ 0 ])) + p_input[ x ];
-        p_tmp2[ 1 ] += p_tmp1[ 2 ] + p_drms_tab_taos[ x++ ];
-
-        p_tmp1[ 2 ] = ((p_tmp2[ 1 ] >> 0xF)
-                    |  (p_tmp2[ 1 ] << 0x11)) + p_tmp1[ 3 ];
-        p_tmp2[ 1 ] = ((~p_tmp1[ 2 ] & p_tmp2[ 0 ])
-                    |   (p_tmp1[ 3 ] & p_tmp1[ 2 ])) + p_input[ x ];
-        p_tmp2[ 2 ] = p_tmp2[ 1 ] + p_tmp1[ 1 ] + p_drms_tab_taos[ x++ ];
-
-        p_tmp1[ 1 ] = ((p_tmp2[ 2 ] << 0x16)
-                    |  (p_tmp2[ 2 ] >> 0xA)) + p_tmp1[ 2 ];
-        if( i == 3 )
-        {
-            p_tmp2[ 1 ] = ((~p_tmp1[ 3 ] & p_tmp1[ 2 ])
-                        |   (p_tmp1[ 3 ] & p_tmp1[ 1 ])) + p_input[ 1 ];
-        }
-        else
-        {
-            p_tmp2[ 1 ] = ((~p_tmp1[ 1 ] & p_tmp1[ 3 ])
-                        |   (p_tmp1[ 2 ] & p_tmp1[ 1 ])) + p_input[ x ];
-        }
-        p_tmp1[ 0 ] = p_tmp2[ 0 ] + p_tmp2[ 1 ] + p_drms_tab_taos[ x++ ];
-    }
-
-    for( i = 0; i < 4; i++ )
-    {
-        uint8_t p_table[ 4 ][ 4 ] =
-        {
-            {  6, 11,  0,  5 },
-            { 10, 15,  4,  9 },
-            { 14,  3,  8, 13 },
-            {  2,  7, 12,  5 }
-        };
-
-        p_tmp2[ 0 ] = ((p_tmp1[ 0 ] >> 0x1B)
-                    |  (p_tmp1[ 0 ] << 0x5)) + p_tmp1[ 1 ];
-        p_tmp2[ 1 ] = ((~p_tmp1[ 2 ] & p_tmp1[ 1 ])
-                    |   (p_tmp1[ 2 ] & p_tmp2[ 0 ]))
-                    +   p_input[ p_table[ i ][ 0 ] ];
-        p_tmp2[ 1 ] += p_tmp1[ 3 ] + p_drms_tab_taos[ x++ ];
-
-        p_tmp1[ 3 ] = ((p_tmp2[ 1 ] >> 0x17)
-                    |  (p_tmp2[ 1 ] << 0x9)) + p_tmp2[ 0 ];
-        p_tmp2[ 1 ] = ((~p_tmp1[ 1 ] & p_tmp2[ 0 ])
-                    |   (p_tmp1[ 3 ] & p_tmp1[ 1 ]))
-                    +   p_input[ p_table[ i ][ 1 ] ];
-        p_tmp2[ 1 ] += p_tmp1[ 2 ] + p_drms_tab_taos[ x++ ];
-
-        p_tmp1[ 2 ] = ((p_tmp2[ 1 ] >> 0x12)
-                    |  (p_tmp2[ 1 ] << 0xE)) + p_tmp1[ 3 ];
-        p_tmp2[ 1 ] = ((~p_tmp2[ 0 ] & p_tmp1[ 3 ])
-                    |   (p_tmp1[ 2 ] & p_tmp2[ 0 ]))
-                    +   p_input[ p_table[ i ][ 2 ] ];
-        p_tmp2[ 1 ] += p_tmp1[ 1 ] + p_drms_tab_taos[ x++ ];
-
-        p_tmp1[ 1 ] = ((p_tmp2[ 1 ] << 0x14)
-                    |  (p_tmp2[ 1 ] >> 0xC)) + p_tmp1[ 2 ];
-        if( i == 3 )
-        {
-            p_tmp2[ 1 ] = (p_tmp1[ 3 ] ^ p_tmp1[ 2 ] ^ p_tmp1[ 1 ])
-                        + p_input[ p_table[ i ][ 3 ] ];
-        }
-        else
-        {
-            p_tmp2[ 1 ] = ((~p_tmp1[ 3 ] & p_tmp1[ 2 ])
-                        |   (p_tmp1[ 3 ] & p_tmp1[ 1 ]))
-                        +   p_input[ p_table[ i ][ 3 ] ];
-        }
-        p_tmp1[ 0 ] = p_tmp2[ 0 ] + p_tmp2[ 1 ] + p_drms_tab_taos[ x++ ];
-    }
-
-    for( i = 0; i < 4; i++ )
-    {
-        uint8_t p_table[ 4 ][ 4 ] =
-        {
-            {  8, 11, 14,  1 },
-            {  4,  7, 10, 13 },
-            {  0,  3,  6,  9 },
-            { 12, 15,  2,  0 }
-        };
-
-        p_tmp2[ 0 ] = ((p_tmp1[ 0 ] >> 0x1C)
-                    |  (p_tmp1[ 0 ] << 0x4)) + p_tmp1[ 1 ];
-        p_tmp2[ 1 ] = (p_tmp1[ 2 ] ^ p_tmp1[ 1 ] ^ p_tmp2[ 0 ])
-                    + p_input[ p_table[ i ][ 0 ] ];
-        p_tmp2[ 1 ] += p_tmp1[ 3 ] + p_drms_tab_taos[ x++ ];
-
-        p_tmp1[ 3 ] = ((p_tmp2[ 1 ] >> 0x15)
-                    |  (p_tmp2[ 1 ] << 0xB)) + p_tmp2[ 0 ];
-        p_tmp2[ 1 ] = (p_tmp1[ 3 ] ^ p_tmp1[ 1 ] ^ p_tmp2[ 0 ])
-                    + p_input[ p_table[ i ][ 1 ] ];
-        p_tmp2[ 1 ] += p_tmp1[ 2 ] + p_drms_tab_taos[ x++ ];
-
-        p_tmp1[ 2 ] = ((p_tmp2[ 1 ] >> 0x10)
-                    |  (p_tmp2[ 1 ] << 0x10)) + p_tmp1[ 3 ];
-        p_tmp2[ 1 ] = (p_tmp1[ 3 ] ^ p_tmp1[ 2 ] ^ p_tmp2[ 0 ])
-                    + p_input[ p_table[ i ][ 2 ] ];
-        p_tmp2[ 1 ] += p_tmp1[ 1 ] + p_drms_tab_taos[ x++ ];
-
-        p_tmp1[ 1 ] = ((p_tmp2[ 1 ] << 0x17)
-                    |  (p_tmp2[ 1 ] >> 0x9)) + p_tmp1[ 2 ];
-        if( i == 3 )
-        {
-            p_tmp2[ 1 ] = ((~p_tmp1[ 3 ] | p_tmp1[ 1 ]) ^ p_tmp1[ 2 ])
-                        +   p_input[ p_table[ i ][ 3 ] ];
-        }
-        else
-        {
-            p_tmp2[ 1 ] = (p_tmp1[ 3 ] ^ p_tmp1[ 2 ] ^ p_tmp1[ 1 ])
-                        + p_input[ p_table[ i ][ 3 ] ];
-        }
-        p_tmp1[ 0 ] = p_tmp2[ 0 ] + p_tmp2[ 1 ] + p_drms_tab_taos[ x++ ];
-    }
-
-    for( i = 0; i < 4; i++ )
-    {
-        uint8_t p_table[ 4 ][ 4 ] =
-        {
-            {  7, 14,  5, 12 },
-            {  3, 10,  1,  8 },
-            { 15,  6, 13,  4 },
-            { 11,  2,  9,  0 }
-        };
-
-        p_tmp2[ 0 ] = ((p_tmp1[ 0 ] >> 0x1A)
-                    |  (p_tmp1[ 0 ] << 0x6)) + p_tmp1[ 1 ];
-        p_tmp2[ 1 ] = ((~p_tmp1[ 2 ] | p_tmp2[ 0 ]) ^ p_tmp1[ 1 ])
-                    +   p_input[ p_table[ i ][ 0 ] ];
-        p_tmp2[ 1 ] += p_tmp1[ 3 ] + p_drms_tab_taos[ x++ ];
-
-        p_tmp1[ 3 ] = ((p_tmp2[ 1 ] >> 0x16)
-                    |  (p_tmp2[ 1 ] << 0xA)) + p_tmp2[ 0 ];
-        p_tmp2[ 1 ] = ((~p_tmp1[ 1 ] | p_tmp1[ 3 ]) ^ p_tmp2[ 0 ])
-                    +   p_input[ p_table[ i ][ 1 ] ];
-        p_tmp2[ 1 ] += p_tmp1[ 2 ] + p_drms_tab_taos[ x++ ];
-
-        p_tmp1[ 2 ] = ((p_tmp2[ 1 ] >> 0x11)
-                    |  (p_tmp2[ 1 ] << 0xF)) + p_tmp1[ 3 ];
-        p_tmp2[ 1 ] = ((~p_tmp2[ 0 ] | p_tmp1[ 2 ]) ^ p_tmp1[ 3 ])
-                    +   p_input[ p_table[ i ][ 2 ] ];
-        p_tmp2[ 1 ] += p_tmp1[ 1 ] + p_drms_tab_taos[ x++ ];
-
-        p_tmp1[ 1 ] = ((p_tmp2[ 1 ] << 0x15)
-                    |  (p_tmp2[ 1 ] >> 0xB)) + p_tmp1[ 2 ];
-
-        if( i < 3 )
-        {
-            p_tmp2[ 1 ] = ((~p_tmp1[ 3 ] | p_tmp1[ 1 ]) ^ p_tmp1[ 2 ])
-                        +   p_input[ p_table[ i ][ 3 ] ];
-            p_tmp1[ 0 ] = p_tmp2[ 0 ] + p_tmp2[ 1 ] + p_drms_tab_taos[ x++ ];
-        }
-    }
-
-    p_buffer[ 0 ] += p_tmp2[ 0 ];
-    p_buffer[ 1 ] += p_tmp1[ 1 ];
-    p_buffer[ 2 ] += p_tmp1[ 2 ];
-    p_buffer[ 3 ] += p_tmp1[ 3 ];
-}
-
-static void taos_add1( uint32_t *p_buffer,
-                       uint8_t *p_in, uint32_t i_len )
-{
-    uint32_t i;
-    uint32_t x, y;
-    uint32_t p_tmp[ 16 ];
-    uint32_t i_offset = 0;
-
-    x = p_buffer[ 6 ] & 63;
-    y = 64 - x;
-
-    p_buffer[ 6 ] += i_len;
-
-    if( i_len < y )
-    {
-        memcpy( &((uint8_t *)p_buffer)[ 48 + x ], p_in, i_len );
+        strncpy( p_drms->psz_homedir, psz_homedir, PATH_MAX );
+        p_drms->psz_homedir[ PATH_MAX - 1 ] = '\0';
     }
     else
     {
-        if( x )
-        {
-            memcpy( &((uint8_t *)p_buffer)[ 48 + x ], p_in, y );
-            taos( &p_buffer[ 8 ], &p_buffer[ 12 ] );
-            i_offset = y;
-            i_len -= y;
-        }
-
-        if( i_len >= 64 )
-        {
-            for( i = 0; i < i_len / 64; i++ )
-            {
-                memcpy( p_tmp, &p_in[ i_offset ], sizeof(p_tmp) );
-                taos( &p_buffer[ 8 ], p_tmp );
-                i_offset += 64;
-                i_len -= 64;
-            }
-        }
-
-        if( i_len )
-        {
-            memcpy( &p_buffer[ 12 ], &p_in[ i_offset ], i_len );
-        }
+        free( (void *)p_drms );
+        p_drms = NULL;
     }
+
+    return (void *)p_drms;
 }
 
-static void taos_end1( uint32_t *p_buffer, uint32_t *p_out )
+/*****************************************************************************
+ * drms_free: free a previously allocated DRMS structure
+ *****************************************************************************/
+void drms_free( void *_p_drms )
 {
-    uint32_t x, y;
+    struct drms_s *p_drms = (struct drms_s *)_p_drms;
 
-    x = p_buffer[ 6 ] & 63;
-    y = 63 - x;
-
-    ((uint8_t *)p_buffer)[ 48 + x++ ] = 128;
-
-    if( y < 8 )
+    if( p_drms->p_name != NULL )
     {
-        memset( &((uint8_t *)p_buffer)[ 48 + x ], 0, y );
-        taos( &p_buffer[ 8 ], &p_buffer[ 12 ] );
-        y = 64;
-        x = 0;
+        free( (void *)p_drms->p_name );
     }
 
-    memset( &((uint8_t *)p_buffer)[ 48 + x ], 0, y );
-
-    p_buffer[ 26 ] = p_buffer[ 6 ] * 8;
-    p_buffer[ 27 ] = p_buffer[ 6 ] >> 29;
-    taos( &p_buffer[ 8 ], &p_buffer[ 12 ] );
-
-    memcpy( p_out, &p_buffer[ 8 ], sizeof(*p_out) * 4 );
-}
-
-static void taos_add2( uint32_t *p_buffer, uint8_t *p_in, uint32_t i_len )
-{
-    uint32_t i, x;
-    uint32_t p_tmp[ 16 ];
-
-    x = (p_buffer[ 0 ] / 8) & 63;
-    i = p_buffer[ 0 ] + i_len * 8;
-
-    if( i < p_buffer[ 0 ] )
+    if( p_drms->p_iviv != NULL )
     {
-        p_buffer[ 1 ] += 1;
+        free( (void *)p_drms->p_iviv );
     }
 
-    p_buffer[ 0 ] = i;
-    p_buffer[ 1 ] += i_len >> 29;
-
-    for( i = 0; i < i_len; i++ )
+    if( p_drms->psz_homedir != NULL )
     {
-        ((uint8_t *)p_buffer)[ 24 + x++ ] = p_in[ i ];
-
-        if( x != 64 )
-            continue;
-
-        memcpy( p_tmp, &p_buffer[ 6 ], sizeof(p_tmp) );
-        taos( &p_buffer[ 2 ], p_tmp );
+        free( (void *)p_drms->psz_homedir );
     }
+
+    free( p_drms );
 }
 
-static void taos_add2e( uint32_t *p_buffer, uint32_t *p_in, uint32_t i_len )
+/*****************************************************************************
+ * drms_decrypt: unscramble a chunk of data
+ *****************************************************************************/
+void drms_decrypt( void *_p_drms, uint32_t *p_buffer, uint32_t i_bytes )
 {
-    uint32_t i, x, y;
-    uint32_t p_tmp[ 32 ];
+    struct drms_s *p_drms = (struct drms_s *)_p_drms;
+    uint32_t p_key[ 4 ];
+    uint32_t i_blocks, i;
 
-    if( i_len )
+    /* AES is a block cypher, round down the byte count */
+    i_blocks = i_bytes / 16;
+    i_bytes = i_blocks * 16;
+
+    /* Initialise the key */
+    memcpy( p_key, p_drms->p_key, 4 * sizeof(uint32_t) );
+
+    /* Unscramble */
+    for( i = i_blocks; i--; )
     {
-        for( x = i_len; x; x -= y )
-        {
-            y = x > 32 ? 32 : x;
+        uint32_t  p_tmp[ 4 ];
 
-            for( i = 0; i < y; i++ )
-            {
-                p_tmp[ i ] = U32_AT(&p_in[ i ]);
-            }
-        }
+        DecryptAES( &p_drms->aes, p_tmp, p_buffer );
+        BlockXOR( p_tmp, p_key, p_tmp );
+
+        /* Use the previous scrambled data as the key for next block */
+        memcpy( p_key, p_buffer, 4 * sizeof(uint32_t) );
+
+        /* Copy unscrambled data back to the buffer */
+        memcpy( p_buffer, p_tmp, 4 * sizeof(uint32_t) );
+
+        p_buffer += 4;
     }
-
-    taos_add2( p_buffer, (uint8_t *)p_tmp, i_len * sizeof(p_tmp[ 0 ]) );
 }
 
-static void taos_end2( uint32_t *p_buffer )
+/*****************************************************************************
+ * drms_init: initialise a DRMS structure
+ *****************************************************************************/
+int drms_init( void *_p_drms, uint32_t i_type,
+               uint8_t *p_info, uint32_t i_len )
 {
-    uint32_t x;
-    uint32_t p_tmp[ 16 ];
-
-    p_tmp[ 14 ] = p_buffer[ 0 ];
-    p_tmp[ 15 ] = p_buffer[ 1 ];
-
-    x = (p_buffer[ 0 ] / 8) & 63;
-
-    taos_add2( p_buffer, p_drms_tab_tend, 56 - x );
-    memcpy( p_tmp, &p_buffer[ 6 ], 56 );
-    taos( &p_buffer[ 2 ], p_tmp );
-    memcpy( &p_buffer[ 22 ], &p_buffer[ 2 ], sizeof(*p_buffer) * 4 );
-}
-
-static void taos_add3( uint32_t *p_buffer, uint8_t *p_key, uint32_t i_len )
-{
-    uint32_t x, y;
-    uint32_t i = 0;
-
-    x = (p_buffer[ 4 ] / 8) & 63;
-    p_buffer[ 4 ] += i_len * 8;
-
-    if( p_buffer[ 4 ] < i_len * 8 )
-        p_buffer[ 5 ] += 1;
-
-    p_buffer[ 5 ] += i_len >> 29;
-
-    y = 64 - x;
-
-    if( i_len >= y )
-    {
-        memcpy( &((uint8_t *)p_buffer)[ 24 + x ], p_key, y );
-        taos( p_buffer, &p_buffer[ 6 ] );
-
-        i = y;
-        y += 63;
-
-        if( y < i_len )
-        {
-            for( ; y < i_len; y += 64, i += 64 )
-            {
-                taos( p_buffer, (uint32_t *)&p_key[y - 63] );
-            }
-        }
-        else
-        {
-            x = 0;
-        }
-    }
-
-    memcpy( &((uint8_t *)p_buffer)[ 24 + x ], &p_key[ i ], i_len - i );
-}
-
-static int taos_osi( uint32_t *p_buffer )
-{
+    struct drms_s *p_drms = (struct drms_s *)_p_drms;
     int i_ret = 0;
 
-#ifdef WIN32
-    HKEY i_key;
-    uint32_t i;
-    DWORD i_size;
-    DWORD i_serial;
-    LPBYTE p_reg_buf;
-
-    static LPCTSTR p_reg_keys[ 3 ][ 2 ] =
+    switch( i_type )
     {
+        case FOURCC_user:
         {
-            _T("HARDWARE\\DESCRIPTION\\System"),
-            _T("SystemBiosVersion")
-        },
-
-        {
-            _T("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0"),
-            _T("ProcessorNameString")
-        },
-
-        {
-            _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion"),
-            _T("ProductId")
-        }
-    };
-
-    taos_add1( p_buffer, "cache-control", 13 );
-    taos_add1( p_buffer, "Ethernet", 8 );
-
-    GetVolumeInformation( _T("C:\\"), NULL, 0, &i_serial,
-                          NULL, NULL, NULL, 0 );
-    taos_add1( p_buffer, (uint8_t *)&i_serial, 4 );
-
-    for( i = 0; i < sizeof(p_reg_keys)/sizeof(p_reg_keys[ 0 ]); i++ )
-    {
-        if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, p_reg_keys[ i ][ 0 ],
-                          0, KEY_READ, &i_key ) == ERROR_SUCCESS )
-        {
-            if( RegQueryValueEx( i_key, p_reg_keys[ i ][ 1 ],
-                                 NULL, NULL, NULL,
-                                 &i_size ) == ERROR_SUCCESS )
+            if( i_len < sizeof(p_drms->i_user) )
             {
-                p_reg_buf = malloc( i_size );
-
-                if( p_reg_buf != NULL )
-                {
-                    if( RegQueryValueEx( i_key, p_reg_keys[ i ][ 1 ],
-                                         NULL, NULL, p_reg_buf,
-                                         &i_size ) == ERROR_SUCCESS )
-                    {
-                        taos_add1( p_buffer, (uint8_t *)p_reg_buf,
-                                   i_size );
-                    }
-
-                    free( p_reg_buf );
-                }
+                i_ret = -1;
+                break;
             }
 
-            RegCloseKey( i_key );
+            p_drms->i_user = U32_AT( p_info );
+        }
+        break;
+
+        case FOURCC_key:
+        {
+            if( i_len < sizeof(p_drms->i_key) )
+            {
+                i_ret = -1;
+                break;
+            }
+
+            p_drms->i_key = U32_AT( p_info );
+        }
+        break;
+
+        case FOURCC_iviv:
+        {
+            if( i_len < sizeof(p_drms->p_key) )
+            {
+                i_ret = -1;
+                break;
+            }
+
+            p_drms->p_iviv = malloc( sizeof(p_drms->p_key) );
+            if( p_drms->p_iviv == NULL )
+            {
+                i_ret = -1;
+                break;
+            }
+
+            memcpy( p_drms->p_iviv, p_info, sizeof(p_drms->p_key) );
+        }
+        break;
+
+        case FOURCC_name:
+        {
+            p_drms->i_name_len = strlen( p_info );
+
+            p_drms->p_name = malloc( p_drms->i_name_len );
+            if( p_drms->p_name == NULL )
+            {
+                i_ret = -1;
+                break;
+            }
+
+            memcpy( p_drms->p_name, p_info, p_drms->i_name_len );
+        }
+        break;
+
+        case FOURCC_priv:
+        {
+            uint32_t p_priv[ 64 ];
+            struct md5_s md5;
+
+            if( i_len < 64 )
+            {
+                i_ret = -1;
+                break;
+            }
+
+            InitMD5( &md5 );
+            AddMD5( &md5, p_drms->p_name, p_drms->i_name_len );
+            AddMD5( &md5, p_drms->p_iviv, sizeof(p_drms->p_key) );
+            EndMD5( &md5 );
+
+            if( GetUserKey( p_drms, p_drms->p_key ) )
+            {
+                i_ret = -1;
+                break;
+            }
+
+            InitAES( &p_drms->aes, p_drms->p_key );
+
+            memcpy( p_priv, p_info, 64 );
+            memcpy( p_drms->p_key, md5.p_digest, sizeof(p_drms->p_key) );
+            drms_decrypt( p_drms, p_priv, sizeof(p_priv) );
+
+            InitAES( &p_drms->aes, p_priv + 6 );
+            memcpy( p_drms->p_key, p_priv + 12, sizeof(p_drms->p_key) );
+
+            free( (void *)p_drms->psz_homedir );
+            p_drms->psz_homedir = NULL;
+            free( (void *)p_drms->p_name );
+            p_drms->p_name = NULL;
+            free( (void *)p_drms->p_iviv );
+            p_drms->p_iviv = NULL;
+        }
+        break;
+    }
+
+    return i_ret;
+}
+
+/* The following functions are local */
+
+/*****************************************************************************
+ * InitAES: initialise AES/Rijndael encryption/decryption tables
+ *****************************************************************************
+ * The Advanced Encryption Standard (AES) is described in RFC 3268
+ *****************************************************************************/
+static void InitAES( struct aes_s *p_aes, uint32_t *p_key )
+{
+    uint32_t i, t, i_key, i_tmp;
+
+    memset( p_aes->pp_enc_keys[1], 0, 4 * sizeof(uint32_t) );
+    memcpy( p_aes->pp_enc_keys[0], p_key, 4 * sizeof(uint32_t) );
+
+    /* Generate the key tables */
+    i_tmp = p_aes->pp_enc_keys[ 0 ][ 3 ];
+
+    for( i_key = 0; i_key < AES_KEY_COUNT; i_key++ )
+    {
+        uint32_t j;
+
+        i_tmp = AES_ROR( i_tmp, 8 );
+
+        j = p_aes_table[ i_key ];
+
+        j ^= p_aes_encrypt[ (i_tmp >> 24) & 0xFF ]
+              ^ AES_ROR( p_aes_encrypt[ (i_tmp >> 16) & 0xFF ], 8 )
+              ^ AES_ROR( p_aes_encrypt[ (i_tmp >> 8) & 0xFF ], 16 )
+              ^ AES_ROR( p_aes_encrypt[ i_tmp & 0xFF ], 24 );
+
+        j ^= p_aes->pp_enc_keys[ i_key ][ 0 ];
+        p_aes->pp_enc_keys[ i_key + 1 ][ 0 ] = j;
+        j ^= p_aes->pp_enc_keys[ i_key ][ 1 ];
+        p_aes->pp_enc_keys[ i_key + 1 ][ 1 ] = j;
+        j ^= p_aes->pp_enc_keys[ i_key ][ 2 ];
+        p_aes->pp_enc_keys[ i_key + 1 ][ 2 ] = j;
+        j ^= p_aes->pp_enc_keys[ i_key ][ 3 ];
+        p_aes->pp_enc_keys[ i_key + 1 ][ 3 ] = j;
+
+        i_tmp = j;
+    }
+
+    memcpy( p_aes->pp_dec_keys[ 0 ],
+            p_aes->pp_enc_keys[ 0 ], 4 * sizeof(uint32_t) );
+
+    for( i = 1; i < AES_KEY_COUNT; i++ )
+    {
+        for( t = 0; t < 4; t++ )
+        {
+            uint32_t j, k, l, m, n;
+
+            j = p_aes->pp_enc_keys[ i ][ t ];
+
+            k = (((j >> 7) & 0x01010101) * 27) ^ ((j & 0xFF7F7F7F) << 1);
+            l = (((k >> 7) & 0x01010101) * 27) ^ ((k & 0xFF7F7F7F) << 1);
+            m = (((l >> 7) & 0x01010101) * 27) ^ ((l & 0xFF7F7F7F) << 1);
+
+            j ^= m;
+
+            n = AES_ROR( l ^ j, 16 ) ^ AES_ROR( k ^ j, 8 ) ^ AES_ROR( j, 24 );
+
+            p_aes->pp_dec_keys[ i ][ t ] = k ^ l ^ m ^ n;
+        }
+    }
+}
+
+/*****************************************************************************
+ * DecryptAES: decrypt an AES/Rijndael 128 bit block
+ *****************************************************************************/
+static void DecryptAES( struct aes_s *p_aes,
+                        uint32_t *p_dest, const uint32_t *p_src )
+{
+    uint32_t p_wtxt[ 4 ]; /* Working cyphertext */
+    uint32_t p_tmp[ 4 ];
+    uint32_t round, t;
+
+    for( t = 0; t < 4; t++ )
+    {
+        /* FIXME: are there any endianness issues here? */
+        p_wtxt[ t ] = p_src[ t ] ^ p_aes->pp_enc_keys[ AES_KEY_COUNT ][ t ];
+    }
+
+    /* Rounds 0 - 8 */
+    for( round = 0; round < (AES_KEY_COUNT - 1); round++ )
+    {
+        for( t = 0; t < 4; t++ )
+        {
+            p_tmp[ t ] = AES_XOR_ROR( p_aes_itable, p_wtxt );
+        }
+
+        for( t = 0; t < 4; t++ )
+        {
+            p_wtxt[ t ] = p_tmp[ t ]
+                    ^ p_aes->pp_dec_keys[ (AES_KEY_COUNT - 1) - round ][ t ];
         }
     }
 
-#else
-    i_ret = -1;
-#endif
-
-    return( i_ret );
+    /* Final round (9) */
+    for( t = 0; t < 4; t++ )
+    {
+        p_dest[ t ] = AES_XOR_ROR( p_aes_decrypt, p_wtxt );
+        p_dest[ t ] ^= p_aes->pp_dec_keys[ (AES_KEY_COUNT - 1) - round ][ t ];
+    }
 }
 
-static int get_sci_data( uint32_t **pp_sci, uint32_t *p_sci_size )
+/*****************************************************************************
+ * InitMD5: initialise an MD5 message
+ *****************************************************************************
+ * The MD5 message-digest algorithm is described in RFC 1321
+ *****************************************************************************/
+static void InitMD5( struct md5_s *p_md5 )
+{
+    p_md5->p_digest[ 0 ] = 0x67452301;
+    p_md5->p_digest[ 1 ] = 0xEFCDAB89;
+    p_md5->p_digest[ 2 ] = 0x98BADCFE;
+    p_md5->p_digest[ 3 ] = 0x10325476;
+
+    memset( p_md5->p_data, 0, 16 * sizeof(uint32_t) );
+    p_md5->i_bits = 0;
+}
+
+/*****************************************************************************
+ * AddMD5: add i_len bytes to an MD5 message
+ *****************************************************************************/
+static void AddMD5( struct md5_s *p_md5, const uint8_t *p_src, uint32_t i_len )
+{
+    uint32_t i_current; /* Current bytes in the spare buffer */
+    uint32_t i_offset = 0;
+
+    i_current = (p_md5->i_bits / 8) & 63;
+
+    p_md5->i_bits += 8 * i_len;
+
+    /* If we can complete our spare buffer to 64 bytes, do it and add the
+     * resulting buffer to the MD5 message */
+    if( i_len >= (64 - i_current) )
+    {
+        memcpy( ((uint8_t *)p_md5->p_data) + i_current, p_src,
+                (64 - i_current) );
+        Digest( p_md5, p_md5->p_data );
+
+        i_offset += (64 - i_current);
+        i_len -= (64 - i_current);
+        i_current = 0;
+    }
+
+    /* Add as many entire 64 bytes blocks as we can to the MD5 message */
+    while( i_len >= 64 )
+    {
+        uint32_t p_tmp[ 16 ];
+        memcpy( p_tmp, p_src + i_offset, 16 * sizeof(uint32_t) );
+        Digest( p_md5, p_tmp );
+        i_offset += 64;
+        i_len -= 64;
+    }
+
+    /* Copy our remaining data to the message's spare buffer */
+    memcpy( ((uint8_t *)p_md5->p_data) + i_current, p_src + i_offset, i_len );
+}
+
+/*****************************************************************************
+ * AddNativeMD5: add i_len big-endian uin32_t to an MD5 message
+ *****************************************************************************
+ * FIXME: I don't really understand what this is supposed to do, especially
+ * with big values of i_len ...
+ *****************************************************************************/
+static void AddNativeMD5( struct md5_s *p_md5, uint32_t *p_src, uint32_t i_len )
+{
+    uint32_t i, x, y;
+    /* XXX: it's 32, not 16! */
+    uint32_t p_tmp[ 32 ];
+
+    /* Convert big endian p_src to native-endian p_tmp */
+    for( x = i_len; x; x -= y )
+    {
+        /* XXX: this looks weird! */
+        y = x > 32 ? 32 : x;
+
+        for( i = 0; i < y; i++ )
+        {
+            p_tmp[ i ] = U32_AT(p_src + i);
+        }
+    }
+
+    AddMD5( p_md5, (uint8_t *)p_tmp, i_len * sizeof(uint32_t) );
+}
+
+/*****************************************************************************
+ * EndMD5: finish an MD5 message
+ *****************************************************************************
+ * This function adds adequate padding to the end of the message, and appends
+ * the bit count so that we end at a block boundary.
+ *****************************************************************************/
+static void EndMD5( struct md5_s *p_md5 )
+{
+    uint32_t i_current;
+
+    i_current = (p_md5->i_bits / 8) & 63;
+
+    /* Append 0x80 to our buffer. No boundary check because the temporary
+     * buffer cannot be full, otherwise AddMD5 would have emptied it. */
+    ((uint8_t *)p_md5->p_data)[ i_current++ ] = 0x80;
+
+    /* If less than 8 bytes are available at the end of the block, complete
+     * this 64 bytes block with zeros and add it to the message. We'll add
+     * our length at the end of the next block. */
+    if( i_current > 56 )
+    {
+        memset( ((uint8_t *)p_md5->p_data) + i_current, 0, (64 - i_current) );
+        Digest( p_md5, p_md5->p_data );
+        i_current = 0;
+    }
+
+    /* Fill the unused space in our last block with zeroes and put the
+     * message length at the end. */
+    memset( ((uint8_t *)p_md5->p_data) + i_current, 0, (56 - i_current) );
+    p_md5->p_data[ 14 ] = p_md5->i_bits & 0xffffffff;
+    p_md5->p_data[ 15 ] = (p_md5->i_bits >> 32);
+
+    Digest( p_md5, p_md5->p_data );
+}
+
+#define F1( x, y, z ) ((z) ^ ((x) & ((y) ^ (z))))
+#define F2( x, y, z ) F1((z), (x), (y))
+#define F3( x, y, z ) ((x) ^ (y) ^ (z))
+#define F4( x, y, z ) ((y) ^ ((x) | ~(z)))
+
+#define MD5_DO( f, w, x, y, z, data, s ) \
+    ( w += f(x, y, z) + data,  w = w<<s | w>>(32-s),  w += x )
+
+/*****************************************************************************
+ * Digest: update the MD5 digest with 64 bytes of data
+ *****************************************************************************/
+static void Digest( struct md5_s *p_md5, const uint32_t *p_input )
+{
+    uint32_t a, b, c, d;
+
+    a = p_md5->p_digest[ 0 ];
+    b = p_md5->p_digest[ 1 ];
+    c = p_md5->p_digest[ 2 ];
+    d = p_md5->p_digest[ 3 ];
+
+    MD5_DO( F1, a, b, c, d, p_input[  0 ] + 0xd76aa478,  7 );
+    MD5_DO( F1, d, a, b, c, p_input[  1 ] + 0xe8c7b756, 12 );
+    MD5_DO( F1, c, d, a, b, p_input[  2 ] + 0x242070db, 17 );
+    MD5_DO( F1, b, c, d, a, p_input[  3 ] + 0xc1bdceee, 22 );
+    MD5_DO( F1, a, b, c, d, p_input[  4 ] + 0xf57c0faf,  7 );
+    MD5_DO( F1, d, a, b, c, p_input[  5 ] + 0x4787c62a, 12 );
+    MD5_DO( F1, c, d, a, b, p_input[  6 ] + 0xa8304613, 17 );
+    MD5_DO( F1, b, c, d, a, p_input[  7 ] + 0xfd469501, 22 );
+    MD5_DO( F1, a, b, c, d, p_input[  8 ] + 0x698098d8,  7 );
+    MD5_DO( F1, d, a, b, c, p_input[  9 ] + 0x8b44f7af, 12 );
+    MD5_DO( F1, c, d, a, b, p_input[ 10 ] + 0xffff5bb1, 17 );
+    MD5_DO( F1, b, c, d, a, p_input[ 11 ] + 0x895cd7be, 22 );
+    MD5_DO( F1, a, b, c, d, p_input[ 12 ] + 0x6b901122,  7 );
+    MD5_DO( F1, d, a, b, c, p_input[ 13 ] + 0xfd987193, 12 );
+    MD5_DO( F1, c, d, a, b, p_input[ 14 ] + 0xa679438e, 17 );
+    MD5_DO( F1, b, c, d, a, p_input[ 15 ] + 0x49b40821, 22 );
+
+    MD5_DO( F2, a, b, c, d, p_input[  1 ] + 0xf61e2562,  5 );
+    MD5_DO( F2, d, a, b, c, p_input[  6 ] + 0xc040b340,  9 );
+    MD5_DO( F2, c, d, a, b, p_input[ 11 ] + 0x265e5a51, 14 );
+    MD5_DO( F2, b, c, d, a, p_input[  0 ] + 0xe9b6c7aa, 20 );
+    MD5_DO( F2, a, b, c, d, p_input[  5 ] + 0xd62f105d,  5 );
+    MD5_DO( F2, d, a, b, c, p_input[ 10 ] + 0x02441453,  9 );
+    MD5_DO( F2, c, d, a, b, p_input[ 15 ] + 0xd8a1e681, 14 );
+    MD5_DO( F2, b, c, d, a, p_input[  4 ] + 0xe7d3fbc8, 20 );
+    MD5_DO( F2, a, b, c, d, p_input[  9 ] + 0x21e1cde6,  5 );
+    MD5_DO( F2, d, a, b, c, p_input[ 14 ] + 0xc33707d6,  9 );
+    MD5_DO( F2, c, d, a, b, p_input[  3 ] + 0xf4d50d87, 14 );
+    MD5_DO( F2, b, c, d, a, p_input[  8 ] + 0x455a14ed, 20 );
+    MD5_DO( F2, a, b, c, d, p_input[ 13 ] + 0xa9e3e905,  5 );
+    MD5_DO( F2, d, a, b, c, p_input[  2 ] + 0xfcefa3f8,  9 );
+    MD5_DO( F2, c, d, a, b, p_input[  7 ] + 0x676f02d9, 14 );
+    MD5_DO( F2, b, c, d, a, p_input[ 12 ] + 0x8d2a4c8a, 20 );
+
+    MD5_DO( F3, a, b, c, d, p_input[  5 ] + 0xfffa3942,  4 );
+    MD5_DO( F3, d, a, b, c, p_input[  8 ] + 0x8771f681, 11 );
+    MD5_DO( F3, c, d, a, b, p_input[ 11 ] + 0x6d9d6122, 16 );
+    MD5_DO( F3, b, c, d, a, p_input[ 14 ] + 0xfde5380c, 23 );
+    MD5_DO( F3, a, b, c, d, p_input[  1 ] + 0xa4beea44,  4 );
+    MD5_DO( F3, d, a, b, c, p_input[  4 ] + 0x4bdecfa9, 11 );
+    MD5_DO( F3, c, d, a, b, p_input[  7 ] + 0xf6bb4b60, 16 );
+    MD5_DO( F3, b, c, d, a, p_input[ 10 ] + 0xbebfbc70, 23 );
+    MD5_DO( F3, a, b, c, d, p_input[ 13 ] + 0x289b7ec6,  4 );
+    MD5_DO( F3, d, a, b, c, p_input[  0 ] + 0xeaa127fa, 11 );
+    MD5_DO( F3, c, d, a, b, p_input[  3 ] + 0xd4ef3085, 16 );
+    MD5_DO( F3, b, c, d, a, p_input[  6 ] + 0x04881d05, 23 );
+    MD5_DO( F3, a, b, c, d, p_input[  9 ] + 0xd9d4d039,  4 );
+    MD5_DO( F3, d, a, b, c, p_input[ 12 ] + 0xe6db99e5, 11 );
+    MD5_DO( F3, c, d, a, b, p_input[ 15 ] + 0x1fa27cf8, 16 );
+    MD5_DO( F3, b, c, d, a, p_input[  2 ] + 0xc4ac5665, 23 );
+
+    MD5_DO( F4, a, b, c, d, p_input[  0 ] + 0xf4292244,  6 );
+    MD5_DO( F4, d, a, b, c, p_input[  7 ] + 0x432aff97, 10 );
+    MD5_DO( F4, c, d, a, b, p_input[ 14 ] + 0xab9423a7, 15 );
+    MD5_DO( F4, b, c, d, a, p_input[  5 ] + 0xfc93a039, 21 );
+    MD5_DO( F4, a, b, c, d, p_input[ 12 ] + 0x655b59c3,  6 );
+    MD5_DO( F4, d, a, b, c, p_input[  3 ] + 0x8f0ccc92, 10 );
+    MD5_DO( F4, c, d, a, b, p_input[ 10 ] + 0xffeff47d, 15 );
+    MD5_DO( F4, b, c, d, a, p_input[  1 ] + 0x85845dd1, 21 );
+    MD5_DO( F4, a, b, c, d, p_input[  8 ] + 0x6fa87e4f,  6 );
+    MD5_DO( F4, d, a, b, c, p_input[ 15 ] + 0xfe2ce6e0, 10 );
+    MD5_DO( F4, c, d, a, b, p_input[  6 ] + 0xa3014314, 15 );
+    MD5_DO( F4, b, c, d, a, p_input[ 13 ] + 0x4e0811a1, 21 );
+    MD5_DO( F4, a, b, c, d, p_input[  4 ] + 0xf7537e82,  6 );
+    MD5_DO( F4, d, a, b, c, p_input[ 11 ] + 0xbd3af235, 10 );
+    MD5_DO( F4, c, d, a, b, p_input[  2 ] + 0x2ad7d2bb, 15 );
+    MD5_DO( F4, b, c, d, a, p_input[  9 ] + 0xeb86d391, 21 );
+
+    p_md5->p_digest[ 0 ] += a;
+    p_md5->p_digest[ 1 ] += b;
+    p_md5->p_digest[ 2 ] += c;
+    p_md5->p_digest[ 3 ] += d;
+}
+
+/*****************************************************************************
+ * InitShuffle: initialise a shuffle structure
+ *****************************************************************************
+ * This function initialises tables in the p_shuffle structure that will be
+ * used later by DoShuffle. The only external parameter is p_sys_key.
+ *****************************************************************************/
+static void InitShuffle( struct shuffle_s *p_shuffle, uint32_t *p_sys_key )
+{
+    uint32_t p_native_key[ 4 ];
+    uint32_t i, i_seed = 0x5476212A; /* *!vT */
+
+    /* Store the system key in native endianness */
+    for( i = 0; i < 4; i++ )
+    {
+        p_native_key[ i ] = U32_AT(p_sys_key + i);
+    }
+
+    /* Fill p_commands using the native key and our seed */
+    for( i = 0; i < 20; i++ )
+    {
+        struct md5_s md5;
+        int32_t i_hash;
+
+        InitMD5( &md5 );
+        AddNativeMD5( &md5, p_native_key, 4 );
+        AddNativeMD5( &md5, &i_seed, 1 );
+        EndMD5( &md5 );
+
+        i_seed++;
+
+        i_hash = ((int32_t)U32_AT(md5.p_digest)) % 1024;
+
+        p_shuffle->p_commands[ i ] = i_hash < 0 ? i_hash * -1 : i_hash;
+    }
+
+    /* Fill p_bordel with completely meaningless initial values.
+     * FIXME: check endianness issues. */
+    p_shuffle->p_bordel[  0 ] = p_native_key[ 0 ];
+    p_shuffle->p_bordel[  1 ] = 0x68723876; /* v8rh */
+    p_shuffle->p_bordel[  2 ] = 0x41617376; /* vsaA */
+    p_shuffle->p_bordel[  3 ] = 0x4D4B4F76; /* voKM */
+
+    p_shuffle->p_bordel[  4 ] = p_native_key[ 1 ];
+    p_shuffle->p_bordel[  5 ] = 0x48556646; /* FfUH */
+    p_shuffle->p_bordel[  6 ] = 0x38393725; /* %798 */
+    p_shuffle->p_bordel[  7 ] = 0x2E3B5B3D; /* =[;. */
+
+    p_shuffle->p_bordel[  8 ] = p_native_key[ 2 ];
+    p_shuffle->p_bordel[  9 ] = 0x37363866; /* f867 */
+    p_shuffle->p_bordel[ 10 ] = 0x30383637; /* 7680 */
+    p_shuffle->p_bordel[ 11 ] = 0x34333661; /* a634 */
+
+    p_shuffle->p_bordel[ 12 ] = p_native_key[ 3 ];
+    p_shuffle->p_bordel[ 13 ] = 0x37386162; /* ba87 */
+    p_shuffle->p_bordel[ 14 ] = 0x494F6E66; /* fnOI */
+    p_shuffle->p_bordel[ 15 ] = 0x2A282966; /* f)(* */
+}
+
+/*****************************************************************************
+ * DoShuffle: shuffle i_len bytes of a buffer
+ *****************************************************************************
+ * This is so ugly and uses so many MD5 checksums that it is most certainly
+ * one-way, though why it needs to be so complicated is beyond me.
+ *****************************************************************************/
+static void DoShuffle( struct shuffle_s *p_shuffle,
+                       uint8_t *p_buffer, uint32_t i_len )
+{
+    struct md5_s md5;
+    uint32_t i;
+
+    /* Randomize p_bordel and compute its MD5 checksum */
+    for( i = 0; i < 20; i++ )
+    {
+        if( p_shuffle->p_commands[ i ] )
+        {
+            Bordelize( p_shuffle->p_bordel, p_shuffle->p_commands[ i ] );
+        }
+    }
+
+    InitMD5( &md5 );
+    AddNativeMD5( &md5, p_shuffle->p_bordel, 16 );
+    EndMD5( &md5 );
+
+    /* There are only 16 bytes in an MD5 hash */
+    if( i_len > 16 )
+    {
+        i_len = 16;
+    }
+
+    /* XOR our buffer with the computed checksum */
+    for( i = 0; i < i_len; i++ )
+    {
+        p_buffer[ i ] ^= ((uint8_t *)&md5.p_digest)[ i ];
+    }
+}
+
+/*****************************************************************************
+ * Bordelize: helper for DoShuffle
+ *****************************************************************************
+ * Using the MD5 hash of a string is probably not one-way enough. This
+ * function randomises p_bordel depending on the value of i_command to make
+ * things even more messy in p_bordel.
+ *****************************************************************************/
+static void Bordelize( uint32_t *p_bordel, uint32_t i_command )
+{
+    uint32_t i, x;
+
+    i = (i_command / 16) & 15;
+    x = (~(i_command & 15)) & 15;
+
+    if( (i_command & 768) == 768 )
+    {
+        x = (~i) & 15;
+        i = i_command & 15;
+
+        p_bordel[ i ] = p_bordel[ ((16 - x) & 15) ] + p_bordel[ (15 - x) ];
+    }
+    else if( (i_command & 512) == 512 )
+    {
+        p_bordel[ i ] ^= p_shuffle_xor[ 15 - i ][ x ];
+    }
+    else if( (i_command & 256) == 256 )
+    {
+        p_bordel[ i ] -= p_shuffle_sub[ 15 - i ][ x ];
+    }
+    else
+    {
+        p_bordel[ i ] += p_shuffle_add[ 15 - i ][ x ];
+    }
+}
+
+/*****************************************************************************
+ * GetSystemKey: get the system key
+ *****************************************************************************
+ * Compute the system key from various system information, see HashSystemInfo.
+ *****************************************************************************/
+static int GetSystemKey( uint32_t *p_sys_key )
+{
+    struct md5_s md5;
+    uint32_t p_tmp_key[ 4 ];
+
+    InitMD5( &md5 );
+    if( HashSystemInfo( &md5 ) )
+    {
+        return -1;
+    }
+    EndMD5( &md5 );
+
+    /* Write our digest to p_tmp_key */
+    memcpy( p_tmp_key, md5.p_digest, 4 * sizeof(uint32_t) );
+
+    InitMD5( &md5 );
+    AddMD5( &md5, "YuaFlafu", 8 );
+    AddMD5( &md5, (uint8_t *)p_tmp_key, 6 );
+    AddMD5( &md5, (uint8_t *)p_tmp_key, 6 );
+    AddMD5( &md5, (uint8_t *)p_tmp_key, 6 );
+    AddMD5( &md5, "zPif98ga", 8 );
+    EndMD5( &md5 );
+
+    memcpy( p_sys_key, md5.p_digest, 4 * sizeof(uint32_t) );
+
+    return 0;
+}
+
+#ifdef WIN32
+#   define DRMS_DIRNAME "drms"
+#else
+#   define DRMS_DIRNAME ".drms"
+#endif
+
+/*****************************************************************************
+ * WriteUserKey: write the user key to hard disk
+ *****************************************************************************
+ * Write the user key to the hard disk so that it can be reused later or used
+ * on operating systems other than Win32.
+ *****************************************************************************/
+static int WriteUserKey( void *_p_drms, uint32_t *p_user_key )
+{
+    struct drms_s *p_drms = (struct drms_s *)_p_drms;
+    FILE *file;
+    int i_ret = -1;
+    char psz_path[ PATH_MAX ];
+
+    snprintf( psz_path, PATH_MAX - 1,
+              "%s/" DRMS_DIRNAME, p_drms->psz_homedir );
+
+#if defined( HAVE_ERRNO_H )
+#   if defined( WIN32 )
+    if( !mkdir( psz_path ) || errno == EEXIST )
+#   else
+    if( !mkdir( psz_path, 0755 ) || errno == EEXIST )
+#   endif
+#else
+    if( !mkdir( psz_path ) )
+#endif
+    {
+        snprintf( psz_path, PATH_MAX - 1, "%s/" DRMS_DIRNAME "/%08X.%03d",
+                  p_drms->psz_homedir, p_drms->i_user, p_drms->i_key );
+
+        file = fopen( psz_path, "w" );
+        if( file != NULL )
+        {
+            i_ret = fwrite( p_user_key, sizeof(uint32_t),
+                            4, file ) == 4 ? 0 : -1;
+            fclose( file );
+        }
+    }
+
+    return i_ret;
+}
+
+/*****************************************************************************
+ * ReadUserKey: read the user key from hard disk
+ *****************************************************************************
+ * Retrieve the user key from the hard disk if available.
+ *****************************************************************************/
+static int ReadUserKey( void *_p_drms, uint32_t *p_user_key )
+{
+    struct drms_s *p_drms = (struct drms_s *)_p_drms;
+    FILE *file;
+    int i_ret = -1;
+    char psz_path[ PATH_MAX ];
+
+    snprintf( psz_path, PATH_MAX - 1,
+              "%s/" DRMS_DIRNAME "/%08X.%03d", p_drms->psz_homedir,
+              p_drms->i_user, p_drms->i_key );
+
+    file = fopen( psz_path, "r" );
+    if( file != NULL )
+    {
+        i_ret = fread( p_user_key, sizeof(uint32_t),
+                       4, file ) == 4 ? 0 : -1;
+        fclose( file );
+    }
+
+    return i_ret;
+}
+
+/*****************************************************************************
+ * GetUserKey: get the user key
+ *****************************************************************************
+ * Retrieve the user key from the hard disk if available, otherwise generate
+ * it from the system key. If the key could be successfully generated, write
+ * it to the hard disk for future use.
+ *****************************************************************************/
+static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
+{
+    struct drms_s *p_drms = (struct drms_s *)_p_drms;
+    struct aes_s aes;
+    struct shuffle_s shuffle;
+    uint32_t i, y;
+    uint32_t *p_tmp;
+    uint32_t *p_cur_key;
+    uint32_t p_sys_key[ 4 ];
+    uint32_t i_sci_size;
+    uint32_t *pp_sci[ 2 ];
+    int i_ret = -1;
+
+    uint32_t p_sci_key[ 4 ] =
+    {
+        0x6e66556d, /* nfUm */
+        0x6e676f70, /* ngop */
+        0x67666461, /* gfda */
+        0x33373866  /* 378f */
+    };
+
+    if( !ReadUserKey( p_drms, p_user_key ) )
+    {
+        return 0;
+    }
+
+    if( GetSystemKey( p_sys_key ) )
+    {
+        return -1;
+    }
+
+    if( GetSCIData( pp_sci + 0, &i_sci_size ) )
+    {
+        return -1;
+    }
+
+    p_tmp = pp_sci[ 0 ];
+    pp_sci[ 1 ] = (uint32_t *)(((uint8_t *)pp_sci[ 0 ]) + i_sci_size);
+    i_sci_size -= sizeof(*pp_sci[ 0 ]);
+
+    InitAES( &aes, p_sys_key );
+
+    for( i = 0, p_cur_key = p_sci_key;
+         i < i_sci_size / sizeof(p_drms->p_key); i++ )
+    {
+        y = i * sizeof(*pp_sci[ 0 ]);
+
+        DecryptAES( &aes, pp_sci[ 1 ] + y + 1, pp_sci[ 0 ] + y + 1 );
+        BlockXOR( pp_sci[ 1 ] + y + 1, p_cur_key, pp_sci[ 1 ] + y + 1 );
+
+        p_cur_key = pp_sci[ 0 ] + y + 1;
+    }
+
+    /* Shuffle pp_sci[ 1 ] using a custom routine */
+    InitShuffle( &shuffle, p_sys_key );
+
+    for( i = 0; i < i_sci_size / sizeof(p_drms->p_key); i++ )
+    {
+        y = i * sizeof(*pp_sci[ 1 ]);
+
+        DoShuffle( &shuffle, (uint8_t *)(pp_sci[ 1 ] + y + 1),
+                   sizeof(p_drms->p_key) );
+    }
+
+    y = 0;
+    i = U32_AT( &pp_sci[ 1 ][ 5 ] );
+    i_sci_size -= 21 * sizeof(*pp_sci[ 1 ]);
+    pp_sci[ 1 ] += 22;
+    pp_sci[ 0 ] = NULL;
+
+    while( i_sci_size > 0 && i > 0 )
+    {
+        if( pp_sci[ 0 ] == NULL )
+        {
+            i_sci_size -= 18 * sizeof(*pp_sci[ 1 ]);
+            if( i_sci_size <= 0 )
+            {
+                break;
+            }
+
+            pp_sci[ 0 ] = pp_sci[ 1 ];
+            y = U32_AT( &pp_sci[ 1 ][ 17 ] );
+            pp_sci[ 1 ] += 18;
+        }
+
+        if( !y )
+        {
+            i--;
+            pp_sci[ 0 ] = NULL;
+            continue;
+        }
+
+        if( U32_AT( &pp_sci[ 0 ][ 0 ] ) == p_drms->i_user &&
+            ( i_sci_size >=
+              (sizeof(p_drms->p_key) + sizeof(pp_sci[ 1 ][ 0 ]) ) ) &&
+            ( ( U32_AT( &pp_sci[ 1 ][ 0 ] ) == p_drms->i_key ) ||
+              ( !p_drms->i_key ) || ( pp_sci[ 1 ] == (pp_sci[ 0 ] + 18) ) ) )
+        {
+            memcpy( p_user_key, &pp_sci[ 1 ][ 1 ], sizeof(p_drms->p_key) );
+            WriteUserKey( p_drms, p_user_key );
+            i_ret = 0;
+            break;
+        }
+
+        y--;
+        pp_sci[ 1 ] += 5;
+        i_sci_size -= 5 * sizeof(*pp_sci[ 1 ]);
+    }
+
+    free( (void *)p_tmp );
+
+    return i_ret;
+}
+
+/*****************************************************************************
+ * GetSCIData: get SCI data from "SC Info.sidb"
+ *****************************************************************************
+ * Read SCI data from "\Apple Computer\iTunes\SC Info\SC Info.sidb"
+ *****************************************************************************/
+static int GetSCIData( uint32_t **pp_sci, uint32_t *p_sci_size )
 {
     int i_ret = -1;
 
@@ -665,551 +1099,87 @@ static int get_sci_data( uint32_t **pp_sci, uint32_t *p_sci_size )
     }
 #endif
 
-    return( i_ret );
+    return i_ret;
 }
 
-static void acei_taxs( uint32_t *p_acei, uint32_t i_val )
-{
-    uint32_t i, x;
-
-    i = (i_val / 16) & 15;
-    x = (~(i_val & 15)) & 15;
-
-    if( (i_val & 768) == 768 )
-    {
-        x = (~i) & 15;
-        i = i_val & 15;
-
-        p_acei[ 25 + i ] = p_acei[ 25 + ((16 - x) & 15) ]
-                         + p_acei[ 25 + (15 - x) ];
-    }
-    else if( (i_val & 512) == 512 )
-    {
-        p_acei[ 25 + i ] ^= p_drms_tab_xor[ 15 - i ][ x ];
-    }
-    else if( (i_val & 256) == 256 )
-    {
-        p_acei[ 25 + i ] -= p_drms_tab_sub[ 15 - i ][ x ];
-    }
-    else
-    {
-        p_acei[ 25 + i ] += p_drms_tab_add[ 15 - i ][ x ];
-    }
-}
-
-static void acei( uint32_t *p_acei, uint8_t *p_buffer, uint32_t i_len )
-{
-    uint32_t i, x;
-    uint32_t p_tmp[ 26 ];
-
-    for( i = 5; i < 25; i++ )
-    {
-        if( p_acei[ i ] )
-        {
-            acei_taxs( p_acei, p_acei[ i ] );
-        }
-    }
-
-    TAOS_INIT( p_tmp, 2 );
-    taos_add2e( p_tmp, &p_acei[ 25 ], sizeof(*p_acei) * 4 );
-    taos_end2( p_tmp );
-
-    x = i_len < 16 ? i_len : 16;
-
-    if( x > 0 )
-    {
-        for( i = 0; i < x; i++ )
-        {
-            p_buffer[ i ] ^= ((uint8_t *)&p_tmp)[ 88 + i ];
-        }
-    }
-}
-
-static uint32_t ttov_calc( uint32_t *p_acei )
-{
-    int32_t i_val;
-    uint32_t p_tmp[ 26 ];
-
-    TAOS_INIT( p_tmp, 2 );
-    taos_add2e( p_tmp, &p_acei[ 0 ], 4 );
-    taos_add2e( p_tmp, &p_acei[ 4 ], 1 );
-    taos_end2( p_tmp );
-
-    p_acei[ 4 ]++;
-
-    i_val = ((int32_t)U32_AT(&p_tmp[ 22 ])) % 1024;
-
-    return( i_val < 0 ? i_val * -1 : i_val );
-}
-
-static void acei_init( uint32_t *p_acei, uint32_t *p_sys_key )
-{
-    uint32_t i;
-
-    for( i = 0; i < 4; i++ )
-    {
-        p_acei[ i ] = U32_AT(&p_sys_key[ i ]);
-    }
-
-    p_acei[ 4 ] = 0x5476212A;
-
-    for( i = 5; i < 25; i++ )
-    {
-        p_acei[ i ] = ttov_calc( p_acei );
-    }
-
-    p_acei[ 25 + 0 ] = p_acei[ 0 ];
-    p_acei[ 25 + 1 ] = 0x68723876;
-    p_acei[ 25 + 2 ] = 0x41617376;
-    p_acei[ 25 + 3 ] = 0x4D4B4F76;
-
-    p_acei[ 25 + 4 ] = p_acei[ 1 ];
-    p_acei[ 25 + 5 ] = 0x48556646;
-    p_acei[ 25 + 6 ] = 0x38393725;
-    p_acei[ 25 + 7 ] = 0x2E3B5B3D;
-
-    p_acei[ 25 + 8 ] = p_acei[ 2 ];
-    p_acei[ 25 + 9 ] = 0x37363866;
-    p_acei[ 25 + 10 ] = 0x30383637;
-    p_acei[ 25 + 11 ] = 0x34333661;
-
-    p_acei[ 25 + 12 ] = p_acei[ 3 ];
-    p_acei[ 25 + 13 ] = 0x37386162;
-    p_acei[ 25 + 14 ] = 0x494F6E66;
-    p_acei[ 25 + 15 ] = 0x2A282966;
-}
-
-static inline void block_xor( uint32_t *p_in, uint32_t *p_key,
-                              uint32_t *p_out )
-{
-    uint32_t i;
-
-    for( i = 0; i < 4; i++ )
-    {
-        p_out[ i ] = p_key[ i ] ^ p_in[ i ];
-    }
-}
-
-static int get_sys_key( uint32_t *p_sys_key )
-{
-    uint32_t p_tmp[ 128 ];
-    uint32_t p_tmp_key[ 4 ];
-
-    TAOS_INIT( p_tmp, 8 );
-    if( taos_osi( p_tmp ) )
-    {
-        return( -1 );
-    }
-    taos_end1( p_tmp, p_tmp_key );
-
-    TAOS_INIT( p_tmp, 2 );
-    taos_add2( p_tmp, "YuaFlafu", 8 );
-    taos_add2( p_tmp, (uint8_t *)p_tmp_key, 6 );
-    taos_add2( p_tmp, (uint8_t *)p_tmp_key, 6 );
-    taos_add2( p_tmp, (uint8_t *)p_tmp_key, 6 );
-    taos_add2( p_tmp, "zPif98ga", 8 );
-    taos_end2( p_tmp );
-
-    memcpy( p_sys_key, &p_tmp[ 2 ], sizeof(*p_sys_key) * 4 );
-
-    return( 0 );
-}
-
-struct drms_s
-{
-    uint32_t i_user;
-    uint32_t i_key;
-    uint8_t *p_iviv;
-    uint8_t *p_name;
-    uint32_t i_name_len;
-
-    uint32_t *p_tmp;
-    uint32_t i_tmp_len;
-
-    uint32_t p_key[ 4 ];
-    uint32_t p_ctx[ 128 ];
-
-    char    *psz_homedir;
-};
-
-#define P_DRMS ((struct drms_s *)p_drms)
-
-static int rw_user_key( void *p_drms, uint32_t i_rw, uint32_t *p_user_key )
-{
-    FILE *file;
-    int i_ret = -1;
-    char sz_path[ PATH_MAX ];
-
-#define DRMS_PI_DIRNAME "drms"
-#ifdef WIN32
-#define DRMS_DIRNAME DRMS_PI_DIRNAME
-#else
-#define DRMS_DIRNAME "." DRMS_PI_DIRNAME
-#endif
-
-    if( i_rw )
-    {
-        snprintf( sz_path, (sizeof(sz_path)/sizeof(sz_path[ 0 ])) - 1,
-                  "%s/" DRMS_DIRNAME "/%08X.%03d", P_DRMS->psz_homedir,
-                  P_DRMS->i_user, P_DRMS->i_key );
-
-        file = fopen( sz_path, "r" );
-        if( file != NULL )
-        {
-            i_ret = fread( p_user_key, sizeof(*p_user_key),
-                           4, file ) == 4 ? 0 : -1;
-            fclose( file );
-        }
-    }
-    else
-    {
-        snprintf( sz_path, (sizeof(sz_path)/sizeof(sz_path[ 0 ])) - 1,
-                  "%s/" DRMS_DIRNAME, P_DRMS->psz_homedir );
-
-#if defined( HAVE_ERRNO_H )
-#   if defined( WIN32 )
-        if( !mkdir( sz_path ) || errno == EEXIST )
-#   else
-        if( !mkdir( sz_path, 0755 ) || errno == EEXIST )
-#   endif
-#else
-        if( !mkdir( sz_path ) )
-#endif
-        {
-            snprintf( sz_path, (sizeof(sz_path)/sizeof(sz_path[ 0 ])) - 1,
-                      "%s/" DRMS_DIRNAME "/%08X.%03d", P_DRMS->psz_homedir,
-                      P_DRMS->i_user, P_DRMS->i_key );
-
-            file = fopen( sz_path, "w" );
-            if( file != NULL )
-            {
-                i_ret = fwrite( p_user_key, sizeof(*p_user_key),
-                                4, file ) == 4 ? 0 : -1;
-                fclose( file );
-            }
-        }
-    }
-
-    return( i_ret );
-}
-
-static int get_user_key( void *p_drms, uint32_t *p_user_key )
-{
-    uint32_t i, y;
-    uint32_t *p_tmp;
-    uint32_t *p_cur_key;
-    uint32_t p_acei[ 41 ];
-    uint32_t p_ctx[ 128 ];
-    uint32_t p_sys_key[ 4 ];
-    uint32_t i_sci_size;
-    uint32_t *p_sci[ 2 ];
-    int i_ret = -1;
-
-    uint32_t p_sci_key[ 4 ] =
-    {
-        0x6E66556D, 0x6E676F70, 0x67666461, 0x33373866
-    };
-
-    if( !rw_user_key( p_drms, 1, p_user_key ) )
-    {
-        return( 0 );
-    }
-
-    if( get_sys_key( p_sys_key ) )
-    {
-        return( -1 );
-    }
-
-
-    if( get_sci_data( &p_sci[ 0 ], &i_sci_size ) )
-    {
-        return( -1 );
-    }
-
-    p_tmp = p_sci[ 0 ];
-    p_sci[ 1 ] = (uint32_t *)(((uint8_t *)p_sci[ 0 ]) + i_sci_size);
-    i_sci_size -= sizeof(*p_sci[ 0 ]);
-
-    init_ctx( p_ctx, p_sys_key );
-
-    for( i = 0, p_cur_key = p_sci_key;
-         i < i_sci_size / sizeof(P_DRMS->p_key); i++ )
-    {
-        y = i * sizeof(*p_sci[ 0 ]);
-
-        ctx_xor( p_ctx, p_sci[ 0 ] + y + 1, p_sci[ 1 ] + y + 1,
-                 p_drms_tab3, p_drms_tab4 );
-        block_xor( p_sci[ 1 ] + y + 1, p_cur_key, p_sci[ 1 ] + y + 1 );
-
-        p_cur_key = p_sci[ 0 ] + y + 1;
-    }
-
-    acei_init( p_acei, p_sys_key );
-
-    for( i = 0; i < i_sci_size / sizeof(P_DRMS->p_key); i++ )
-    {
-        y = i * sizeof(*p_sci[ 1 ]);
-
-        acei( p_acei, (uint8_t *)(p_sci[ 1 ] + y + 1),
-              sizeof(P_DRMS->p_key) );
-    }
-
-    y = 0;
-    i = U32_AT( &p_sci[ 1 ][ 5 ] );
-    i_sci_size -= 21 * sizeof(*p_sci[ 1 ]);
-    p_sci[ 1 ] += 22;
-    p_sci[ 0 ] = NULL;
-
-    while( i_sci_size > 0 && i > 0 )
-    {
-        if( p_sci[ 0 ] == NULL )
-        {
-            i_sci_size -= 18 * sizeof(*p_sci[ 1 ]);
-            if( i_sci_size <= 0 )
-            {
-                break;
-            }
-
-            p_sci[ 0 ] = p_sci[ 1 ];
-            y = U32_AT( &p_sci[ 1 ][ 17 ] );
-            p_sci[ 1 ] += 18;
-        }
-
-        if( !y )
-        {
-            i--;
-            p_sci[ 0 ] = NULL;
-            continue;
-        }
-
-        if( U32_AT( &p_sci[ 0 ][ 0 ] ) == P_DRMS->i_user &&
-            ( i_sci_size >=
-              (sizeof(P_DRMS->p_key) + sizeof(p_sci[ 1 ][ 0 ]) ) ) &&
-            ( ( U32_AT( &p_sci[ 1 ][ 0 ] ) == P_DRMS->i_key ) ||
-              ( !P_DRMS->i_key ) || ( p_sci[ 1 ] == (p_sci[ 0 ] + 18) ) ) )
-        {
-            memcpy( p_user_key, &p_sci[ 1 ][ 1 ], sizeof(P_DRMS->p_key) );
-            rw_user_key( p_drms, 0, p_user_key );
-            i_ret = 0;
-            break;
-        }
-
-        y--;
-        p_sci[ 1 ] += 5;
-        i_sci_size -= 5 * sizeof(*p_sci[ 1 ]);
-    }
-
-    free( (void *)p_tmp );
-
-    return( i_ret );
-}
-
-
-void *drms_alloc( char *psz_homedir )
-{
-    struct drms_s *p_drms;
-
-    p_drms = malloc( sizeof(struct drms_s) );
-
-    if( p_drms != NULL )
-    {
-        memset( p_drms, 0, sizeof(struct drms_s) );
-
-        p_drms->i_tmp_len = 1024;
-        p_drms->p_tmp = malloc( p_drms->i_tmp_len );
-        if( p_drms->p_tmp == NULL )
-        {
-            free( (void *)p_drms );
-            p_drms = NULL;
-        }
-
-        p_drms->psz_homedir = malloc( PATH_MAX );
-        if( p_drms->psz_homedir != NULL )
-        {
-            strncpy( p_drms->psz_homedir, psz_homedir, PATH_MAX );
-            p_drms->psz_homedir[ PATH_MAX - 1 ] = '\0';
-        }
-        else
-        {
-            free( (void *)p_drms->p_tmp );
-            free( (void *)p_drms );
-            p_drms = NULL;
-        }
-    }
-
-    return( (void *)p_drms );
-}
-
-void drms_free( void *p_drms )
-{
-    if( P_DRMS->p_name != NULL )
-    {
-        free( (void *)P_DRMS->p_name );
-    }
-
-    if( P_DRMS->p_iviv != NULL )
-    {
-        free( (void *)P_DRMS->p_iviv );
-    }
-
-    if( P_DRMS->psz_homedir != NULL )
-    {
-        free( (void *)P_DRMS->psz_homedir );
-    }
-
-    if( P_DRMS->p_tmp != NULL )
-    {
-        free( (void *)P_DRMS->p_tmp );
-    }
-
-    free( p_drms );
-}
-
-void drms_decrypt( void *p_drms, uint32_t *p_buffer, uint32_t i_len )
-{
-    uint32_t i, x, y;
-    uint32_t *p_cur_key = P_DRMS->p_key;
-
-    x = (i_len / sizeof(P_DRMS->p_key)) * sizeof(P_DRMS->p_key);
-
-    if( P_DRMS->i_tmp_len < x )
-    {
-        free( (void *)P_DRMS->p_tmp );
-
-        P_DRMS->i_tmp_len = x;
-        P_DRMS->p_tmp = malloc( P_DRMS->i_tmp_len );
-    }
-
-    if( P_DRMS->p_tmp != NULL )
-    {
-        memcpy( P_DRMS->p_tmp, p_buffer, x );
-
-        for( i = 0, x /= sizeof(P_DRMS->p_key); i < x; i++ )
-        {
-            y = i * sizeof(*p_buffer);
-
-            ctx_xor( P_DRMS->p_ctx, P_DRMS->p_tmp + y, p_buffer + y,
-                     p_drms_tab3, p_drms_tab4 );
-            block_xor( p_buffer + y, p_cur_key, p_buffer + y );
-
-            p_cur_key = P_DRMS->p_tmp + y;
-        }
-    }
-}
-
-int drms_init( void *p_drms, uint32_t i_type,
-               uint8_t *p_info, uint32_t i_len )
+/*****************************************************************************
+ * HashSystemInfo: add system information to an MD5 hash
+ *****************************************************************************
+ * This function adds the C: hard drive serial number, BIOS version, CPU type
+ * and Windows version to an MD5 hash.
+ *****************************************************************************/
+static int HashSystemInfo( struct md5_s *p_md5 )
 {
     int i_ret = 0;
 
-    switch( i_type )
+#ifdef WIN32
+    HKEY i_key;
+    uint32_t i;
+    DWORD i_size;
+    DWORD i_serial;
+    LPBYTE p_reg_buf;
+
+    static LPCTSTR p_reg_keys[ 3 ][ 2 ] =
     {
-        case FOURCC_user:
         {
-            if( i_len < sizeof(P_DRMS->i_user) )
-            {
-                i_ret = -1;
-                break;
-            }
+            _T("HARDWARE\\DESCRIPTION\\System"),
+            _T("SystemBiosVersion")
+        },
 
-            P_DRMS->i_user = U32_AT( p_info );
-        }
-        break;
-
-        case FOURCC_key:
         {
-            if( i_len < sizeof(P_DRMS->i_key) )
-            {
-                i_ret = -1;
-                break;
-            }
+            _T("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0"),
+            _T("ProcessorNameString")
+        },
 
-            P_DRMS->i_key = U32_AT( p_info );
-        }
-        break;
-
-        case FOURCC_iviv:
         {
-            if( i_len < sizeof(P_DRMS->p_key) )
-            {
-                i_ret = -1;
-                break;
-            }
-
-            P_DRMS->p_iviv = malloc( sizeof(P_DRMS->p_key) );
-            if( P_DRMS->p_iviv == NULL )
-            {
-                i_ret = -1;
-                break;
-            }
-
-            memcpy( P_DRMS->p_iviv, p_info, sizeof(P_DRMS->p_key) );
+            _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion"),
+            _T("ProductId")
         }
-        break;
+    };
 
-        case FOURCC_name:
+    AddMD5( p_md5, "cache-control", 13 );
+    AddMD5( p_md5, "Ethernet", 8 );
+
+    GetVolumeInformation( _T("C:\\"), NULL, 0, &i_serial,
+                          NULL, NULL, NULL, 0 );
+    AddMD5( p_md5, (uint8_t *)&i_serial, 4 );
+
+    for( i = 0; i < sizeof(p_reg_keys)/sizeof(p_reg_keys[ 0 ]); i++ )
+    {
+        if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, p_reg_keys[ i ][ 0 ],
+                          0, KEY_READ, &i_key ) != ERROR_SUCCESS )
         {
-            P_DRMS->i_name_len = strlen( p_info );
-
-            P_DRMS->p_name = malloc( P_DRMS->i_name_len );
-            if( P_DRMS->p_name == NULL )
-            {
-                i_ret = -1;
-                break;
-            }
-
-            memcpy( P_DRMS->p_name, p_info, P_DRMS->i_name_len );
+            continue;
         }
-        break;
 
-        case FOURCC_priv:
+        if( RegQueryValueEx( i_key, p_reg_keys[ i ][ 1 ],
+                             NULL, NULL, NULL, &i_size ) != ERROR_SUCCESS )
         {
-            uint32_t i;
-            uint32_t p_priv[ 64 ];
-            uint32_t p_tmp[ 128 ];
-
-            if( i_len < 64 )
-            {
-                i_ret = -1;
-                break;
-            }
-
-            TAOS_INIT( p_tmp, 0 );
-            taos_add3( p_tmp, P_DRMS->p_name, P_DRMS->i_name_len );
-            taos_add3( p_tmp, P_DRMS->p_iviv, sizeof(P_DRMS->p_key) );
-            memcpy( p_priv, &p_tmp[ 4 ], sizeof(p_priv[ 0 ]) * 2 );
-            i = (p_tmp[ 4 ] / 8) & 63;
-            i = i >= 56 ? 120 - i : 56 - i;
-            taos_add3( p_tmp, p_drms_tab_tend, i );
-            taos_add3( p_tmp, (uint8_t *)p_priv, sizeof(p_priv[ 0 ]) * 2 );
-
-            if( get_user_key( p_drms, P_DRMS->p_key ) )
-            {
-                i_ret = -1;
-                break;
-            }
-
-            init_ctx( P_DRMS->p_ctx, P_DRMS->p_key );
-
-            memcpy( p_priv, p_info, 64 );
-            memcpy( P_DRMS->p_key, p_tmp, sizeof(P_DRMS->p_key) );
-            drms_decrypt( p_drms, p_priv, sizeof(p_priv) );
-
-            init_ctx( P_DRMS->p_ctx, &p_priv[ 6 ] );
-            memcpy( P_DRMS->p_key, &p_priv[ 12 ], sizeof(P_DRMS->p_key) );
-
-            free( (void *)P_DRMS->psz_homedir );
-            P_DRMS->psz_homedir = NULL;
-            free( (void *)P_DRMS->p_name );
-            P_DRMS->p_name = NULL;
-            free( (void *)P_DRMS->p_iviv );
-            P_DRMS->p_iviv = NULL;
+            RegCloseKey( i_key );
+            continue;
         }
-        break;
+
+        p_reg_buf = malloc( i_size );
+
+        if( p_reg_buf != NULL )
+        {
+            if( RegQueryValueEx( i_key, p_reg_keys[ i ][ 1 ],
+                                 NULL, NULL, p_reg_buf,
+                                 &i_size ) == ERROR_SUCCESS )
+            {
+                AddMD5( p_md5, (uint8_t *)p_reg_buf, i_size );
+            }
+
+            free( p_reg_buf );
+        }
+
+        RegCloseKey( i_key );
     }
 
-    return( i_ret );
-}
+#else
+    i_ret = -1;
+#endif
 
-#undef P_DRMS
+    return i_ret;
+}
 
