@@ -104,6 +104,7 @@ typedef struct
     uint16_t     i_tag;     /* for audio */
     vlc_fourcc_t i_fourcc;  /* for video */
     char         *psz_name; /* codec name */
+    int          i_blockalign; /* for audio only */
 
     int          i_sequence;
 
@@ -340,7 +341,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case AUDIO_ES:
         {
             int i_blockalign = p_input->p_fmt->audio.i_blockalign;
-            int i_bitspersample = 0;
+            int i_bitspersample = p_input->p_fmt->audio.i_bitspersample;
             int i_extra = 0;
 
             switch( p_input->p_fmt->i_codec )
@@ -413,6 +414,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             bo_addle_u32( &bo, p_input->p_fmt->audio.i_rate );
             bo_addle_u32( &bo, p_input->p_fmt->i_bitrate / 8 );
             bo_addle_u16( &bo, i_blockalign );
+            tk->i_blockalign = i_blockalign;
             bo_addle_u16( &bo, i_bitspersample );
             if( p_input->p_fmt->i_extra > 0 )
             {
@@ -747,6 +749,8 @@ static const guid_t asf_object_stream_type_video =
 {0xbc19efc0, 0x5B4D, 0x11CF, {0xA8, 0xFD, 0x00, 0x80, 0x5F, 0x5C, 0x44, 0x2B}};
 static const guid_t asf_guid_audio_conceal_none =
 {0x20FB5700, 0x5B55, 0x11CF, {0xA8, 0xFD, 0x00, 0x80, 0x5F, 0x5C, 0x44, 0x2B}};
+static const guid_t asf_guid_audio_conceal_spread =
+{0xBFC3CD50, 0x618F, 0x11CF, {0x8B, 0xB2, 0x00, 0xAA, 0x00, 0xB4, 0xE2, 0x20}};
 static const guid_t asf_guid_video_conceal_none =
 {0x20FB5700, 0x5B55, 0x11CF, {0xA8, 0xFD, 0x00, 0x80, 0x5F, 0x5C, 0x44, 0x2B}};
 static const guid_t asf_guid_reserved_1 =
@@ -780,7 +784,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     asf_track_t    *tk;
     mtime_t i_duration = 0;
-    int i_size, i;
+    int i_size, i_header_ext_size, i;
     int i_ci_size, i_cm_size = 0, i_cd_size = 0;
     block_t *out;
     bo_t bo;
@@ -794,7 +798,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     }
 
     /* calculate header size */
-    i_size = 30 + 104 + 46;
+    i_size = 30 + 104;
     i_ci_size = 44;
     for( i = 0; i < p_sys->i_track; i++ )
     {
@@ -803,6 +807,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
         if( p_sys->track[i].i_cat == AUDIO_ES )
         {
             i_ci_size += 4;
+            i_size += 8; /* Error correction data field */
         }
         else if( p_sys->track[i].i_cat == VIDEO_ES )
         {
@@ -831,7 +836,8 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
         }
     }
 
-    i_size += i_ci_size + i_cd_size + i_cm_size;
+    i_header_ext_size = i_cm_size ? i_cm_size + 46 : 0;
+    i_size += i_ci_size + i_cd_size + i_header_ext_size ;
 
     if( p_sys->b_asf_http )
     {
@@ -866,17 +872,20 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     bo_addle_u64( &bo, i_duration * 10 );   /* play duration (100ns) */
     bo_addle_u64( &bo, i_duration * 10 );   /* send duration (100ns) */
     bo_addle_u64( &bo, p_sys->i_preroll_time ); /* preroll duration (ms) */
-    bo_addle_u32( &bo, b_broadcast ? 0x01 : 0x00);      /* flags */
+    bo_addle_u32( &bo, b_broadcast ? 0x01 : 0x02 /* seekable */ ); /* flags */
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size min */
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size max */
     bo_addle_u32( &bo, p_sys->i_bitrate );      /* maxbitrate */
 
     /* header extention */
-    bo_add_guid ( &bo, &asf_object_header_extention_guid );
-    bo_addle_u64( &bo, 46 + i_cm_size );
-    bo_add_guid ( &bo, &asf_guid_reserved_1 );
-    bo_addle_u16( &bo, 6 );
-    bo_addle_u32( &bo, 0 + i_cm_size );
+    if( i_header_ext_size )
+    {
+        bo_add_guid ( &bo, &asf_object_header_extention_guid );
+        bo_addle_u64( &bo, i_header_ext_size );
+        bo_add_guid ( &bo, &asf_guid_reserved_1 );
+        bo_addle_u16( &bo, 6 );
+        bo_addle_u32( &bo, i_header_ext_size - 46 );
+    }
 
     /* metadata object (part of header extension) */
     if( i_cm_size )
@@ -939,11 +948,16 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
         tk = &p_sys->track[i];
 
         bo_add_guid ( &bo, &asf_object_stream_properties_guid );
-        bo_addle_u64( &bo, 78 + tk->i_extra );
+
+        if( tk->i_cat == AUDIO_ES ) /* Error correction data field */
+            bo_addle_u64( &bo, 78 + tk->i_extra + 8 );
+        else
+            bo_addle_u64( &bo, 78 + tk->i_extra );
+
         if( tk->i_cat == AUDIO_ES )
         {
             bo_add_guid( &bo, &asf_object_stream_type_audio );
-            bo_add_guid( &bo, &asf_guid_audio_conceal_none );
+            bo_add_guid( &bo, &asf_guid_audio_conceal_spread );
         }
         else if( tk->i_cat == VIDEO_ES )
         {
@@ -952,10 +966,23 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
         }
         bo_addle_u64( &bo, 0 );         /* time offset */
         bo_addle_u32( &bo, tk->i_extra );
-        bo_addle_u32( &bo, 0 );         /* 0 */
+        if( tk->i_cat == AUDIO_ES )
+            bo_addle_u32( &bo, 8 );         /* correction data length */
+        else
+            bo_addle_u32( &bo, 0 );         /* correction data length */
         bo_addle_u16( &bo, tk->i_id );  /* stream number */
         bo_addle_u32( &bo, 0 );
         bo_add_mem  ( &bo, tk->p_extra, tk->i_extra );
+
+        /* Error correction data field */
+        if( tk->i_cat == AUDIO_ES )
+        {
+            bo_add_u8( &bo, 0x1 ); /* span */
+            bo_addle_u16( &bo, tk->i_blockalign );  /* virtual packet length */
+            bo_addle_u16( &bo, tk->i_blockalign );  /* virtual chunck length */
+            bo_addle_u16( &bo, 1 );  /* silence length */
+            bo_add_u8( &bo, 0x0 ); /* data */
+        }
     }
 
     /* Codec Infos */
