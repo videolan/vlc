@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.23 2003/07/23 01:13:47 gbazin Exp $
+ * $Id: callbacks.c,v 1.24 2003/07/31 20:47:09 reno Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -105,12 +105,12 @@ void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
     {
         if (p_intf->p_sys->b_autoplayfile)
         {
- 	    playlist_Add( p_playlist, (char*)psz_url, 0, 0,
+ 	        playlist_Add( p_playlist, (char*)psz_url, 0, 0,
                           PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
         }
         else
         {
-            playlist_Add( p_playlist, (char*)psz_url,
+            playlist_Add( p_playlist, (char*)psz_url, 0, 0,
                           PLAYLIST_APPEND, PLAYLIST_END );
         }
         vlc_object_release(  p_playlist );
