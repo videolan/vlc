@@ -174,6 +174,54 @@ Package=<4>
 
 ###############################################################################
 
+Project: "plugin_s16tofloat32"=.\plugin_s16tofloat32.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_s16tofloat32swab"=.\plugin_s16tofloat32swab.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_s8tofloat32"=.\plugin_s8tofloat32.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_u8tofloat32"=.\plugin_u8tofloat32.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "plugin_ugly_resampler"=.\plugin_ugly_resampler.dsp - Package Owner=<4>
 
 Package=<5>
@@ -246,55 +294,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_clone"=.\plugin_clone.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "plugin_wall"=.\plugin_wall.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "plugin_transform"=.\plugin_transform.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "plugin_distort"=.\plugin_distort.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "plugin_invert"=.\plugin_invert.dsp - Package Owner=<4>
+Project: "plugin_rawvideo"=.\plugin_rawvideo.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -355,18 +355,6 @@ Package=<4>
 ###############################################################################
 
 Project: "plugin_memcpy"=.\plugin_memcpy.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "plugin_motionblur"=.\plugin_motionblur.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -582,6 +570,30 @@ Package=<4>
 
 ###############################################################################
 
+Project: "plugin_hotkeys"=.\plugin_hotkeys.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_logger"=.\plugin_logger.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "plugin_vout_directx"=.\plugin_vout_directx.dsp - Package Owner=<4>
 
 Package=<5>
@@ -595,18 +607,6 @@ Package=<4>
 ###############################################################################
 
 Project: "plugin_wingdi"=.\plugin_wingdi.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "plugin_skins"=.\plugin_skins.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
