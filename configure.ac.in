@@ -214,12 +214,19 @@ dnl The -DSYS_FOO flag
 CPPFLAGS_save="${CPPFLAGS_save} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcdefghijklmnopqrstuvwxyz.' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'`"; CPPFLAGS="${CPPFLAGS_save}"
 
 dnl Check for system libs needed
-AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2 atoll)
+need_libc=false
 
-dnl Check for strndup
-need_strndup=false
-AC_CHECK_FUNCS(strndup,,[need_strndup=:])
-AM_CONDITIONAL(BUILD_STRNDUP, ${need_strndup})
+AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2 atoll getenv putenv setenv)
+
+dnl Check for usual libc functions
+AC_CHECK_FUNCS(strdup,,[need_libc=:])
+AC_CHECK_FUNCS(strndup,,[need_libc=:])
+AC_CHECK_FUNCS(atof,,[need_libc=:])
+AC_CHECK_FUNCS(lseek,,[need_libc=:])
+AC_CHECK_FUNCS(strcasecmp,,[AC_CHECK_FUNCS(stricmp,,[need_libc=:])])
+AC_CHECK_FUNCS(strncasecmp,,[AC_CHECK_FUNCS(strnicmp,,[need_libc=:])])
+
+AM_CONDITIONAL(BUILD_LIBC, ${need_libc})
 
 AC_CHECK_FUNC(connect,,[
   AC_CHECK_LIB(socket,connect,

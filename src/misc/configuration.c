@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.43 2002/11/10 18:04:23 sam Exp $
+ * $Id: configuration.c,v 1.44 2002/11/10 23:41:53 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -520,7 +520,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 
         /* The config file is organized in sections, one per module. Look for
          * the interesting section ( a section is of the form [foo] ) */
-        rewind( file );
+        fseek( file, 0L, SEEK_SET );
         while( fgets( line, 1024, file ) )
         {
             if( (line[0] == '[')
@@ -687,7 +687,17 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     }
     sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
 
-#ifdef HAVE_ERRNO_H
+#if defined( UNDER_CE )
+    {
+        wchar_t psz_new[ MAX_PATH ];
+        MultiByteToWideChar( CP_ACP, 0, psz_filename, -1, psz_new, MAX_PATH );
+        if( CreateDirectory( psz_new, NULL ) )
+        {
+            msg_Err( p_this, "could not create %s", psz_filename );
+        }
+    }
+
+#elif defined( HAVE_ERRNO_H )
 #   if defined( WIN32 )
     if( mkdir( psz_filename ) && errno != EEXIST )
 #   else
@@ -719,9 +729,9 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     else
     {
         /* look for file size */
-        fseek( file, 0, SEEK_END );
+        fseek( file, 0L, SEEK_END );
         i_sizebuf = ftell( file );
-        rewind( file );
+        fseek( file, 0L, SEEK_SET );
     }
 
     p_bigbuffer = p_index = malloc( i_sizebuf+1 );

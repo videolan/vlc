@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.35 2002/11/08 10:26:52 gbazin Exp $
+ * $Id: vlc_common.h,v 1.36 2002/11/10 23:41:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -467,9 +467,39 @@ static inline uint64_t U64_AT( void * _p )
 
 #endif
 
-/* strndup (defined in src/misc/extras.c) */
+/* strdup/strndup (defined in src/extras/libc.c) */
+#ifndef HAVE_STRDUP
+    char * strdup( const char *s );
+#endif
 #ifndef HAVE_STRNDUP
-char * strndup( const char *s, size_t n );
+    char * strndup( const char *s, size_t n );
+#endif
+
+/* atof (defined in src/extras/libc.c) */
+#ifndef HAVE_ATOF
+    double atof( const char *nptr );
+#endif
+
+/* getenv - always returns NULL */
+#ifndef HAVE_GETENV
+    char *getenv( const char *name );
+#endif
+
+/* strncasecmp/strcasecmp (defined in src/extras/libc.c) */
+#ifndef HAVE_STRCASECMP
+#   ifdef HAVE_STRICMP
+#       define strcasecmp stricmp
+#   else
+        int strcasecmp( const char *s1, const char *s2 );
+#   endif
+#endif
+
+#ifndef HAVE_STRNCASECMP
+#   ifdef HAVE_STRNICMP
+#       define strncasecmp strnicmp
+#   else
+        int strncasecmp( const char *s1, const char *s2, size_t n );
+#   endif
 #endif
 
 /* Format type specifiers for 64 bits numbers */
@@ -501,8 +531,6 @@ char * strndup( const char *s, size_t n );
 #   if defined( _MSC_VER ) || !defined( __MINGW32__ )
 #       define __attribute__(x)
 #       define __inline__      __inline
-#       define strncasecmp     strnicmp
-#       define strcasecmp      stricmp
 #       define S_IFBLK         0x3000  /* Block */
 #       define S_ISBLK(m)      (0)
 #       define S_ISCHR(m)      (0)
@@ -547,6 +575,11 @@ typedef __int64 off_t;
 #       define vsnprintf _vsnprintf
 #   endif
 
+#endif
+
+/* lseek (defined in src/extras/libc.c) */
+#ifndef HAVE_ATOF
+    off_t lseek( int fildes, off_t offset, int whence );
 #endif
 
 /*****************************************************************************

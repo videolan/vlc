@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.20 2002/11/10 18:04:23 sam Exp $
+ * $Id: input_ext-plugins.c,v 1.21 2002/11/10 23:41:53 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -669,7 +669,12 @@ void __input_FDClose( vlc_object_t * p_this )
     msg_Info( p_input, "closing `%s/%s://%s'", 
               p_input->psz_access, p_input->psz_demux, p_input->psz_name );
  
+#ifdef UNDER_CE
+    CloseHandle( (HANDLE)p_access_data->i_handle );
+#else
     close( p_access_data->i_handle );
+#endif
+
     free( p_access_data );
 }
 
@@ -684,7 +689,9 @@ void __input_FDNetworkClose( vlc_object_t * p_this )
     msg_Info( p_input, "closing network `%s/%s://%s'", 
               p_input->psz_access, p_input->psz_demux, p_input->psz_name );
  
-#if defined( WIN32 ) && !defined( UNDER_CE )
+#ifdef UNDER_CE
+    CloseHandle( (HANDLE)p_access_data->i_handle );
+#elif defined( WIN32 )
     closesocket( p_access_data->i_handle );
 #else
     close( p_access_data->i_handle );
@@ -699,16 +706,25 @@ void __input_FDNetworkClose( vlc_object_t * p_this )
 ssize_t input_FDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 {
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
+    ssize_t i_ret;
  
-    ssize_t i_ret = read( p_access_data->i_handle, p_buffer, i_len );
+#ifdef UNDER_CE
+    if( !ReadFile( (HANDLE)p_access_data->i_handle, p_buffer, i_len,
+                   (LPWORD)&i_ret, NULL ) )
+    {
+        i_ret = -1;
+    }
+#else
+    i_ret = read( p_access_data->i_handle, p_buffer, i_len );
+#endif
  
     if( i_ret < 0 )
     {
-#ifdef HAVE_ERRNO_H
+#   ifdef HAVE_ERRNO_H
         msg_Err( p_input, "read failed (%s)", strerror(errno) );
-#else
+#   else
         msg_Err( p_input, "read failed" );
-#endif
+#   endif
     }
  
     return i_ret;

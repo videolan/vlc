@@ -236,7 +236,7 @@ SOURCE="..\src\extras\getopt1.c"
 !ENDIF
 # End Source File
 # Begin Source File
-SOURCE="..\src\extras\strndup.c"
+SOURCE="..\src\extras\libc.c"
 # ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
 # PROP Intermediate_Dir "Release\extras"
@@ -440,7 +440,7 @@ SOURCE="..\src\misc\iso_lang.c"
 !ENDIF
 # End Source File
 # Begin Source File
-SOURCE="..\src\misc\iso-639.def"
+SOURCE="..\src\misc\iso-639_def.h"
 # ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
 # PROP Intermediate_Dir "Release\misc"

@@ -288,7 +288,7 @@ show-vlc-sources: FORCE
 	@echo X: $(vlc_SOURCES)
 
 show-libvlc-sources: FORCE
-	@echo X: $(SOURCES_libvlc_common) $(SOURCES_libvlc_win32) $(SOURCES_libvlc_dirent) $(SOURCES_libvlc_getopt) $(SOURCES_libvlc_strndup)
+	@echo X: $(SOURCES_libvlc_common) $(SOURCES_libvlc_win32) $(SOURCES_libvlc_dirent) $(SOURCES_libvlc_getopt) $(SOURCES_libvlc_libc)
 
 show-libvlc-headers: FORCE
 	@echo X: $(HEADERS_include) $(HEADERS_include_built)
@@ -327,8 +327,8 @@ endif
 if BUILD_GETOPT
 OPT_SOURCES_libvlc_getopt = $(SOURCES_libvlc_getopt)
 endif
-if BUILD_STRNDUP
-OPT_SOURCES_libvlc_strndup = $(SOURCES_libvlc_strndup)
+if BUILD_LIBC
+OPT_SOURCES_libvlc_libc = $(SOURCES_libvlc_libc)
 endif
 if BUILD_MOZILLA
 LIBRARIES_libvlc_pic = lib/libvlc_pic.a
@@ -340,7 +340,7 @@ EXTRA_DIST += \
 	$(SOURCES_libvlc_win32) \
 	$(SOURCES_libvlc_dirent) \
 	$(SOURCES_libvlc_getopt) \
-	$(SOURCES_libvlc_strndup) \
+	$(SOURCES_libvlc_libc) \
 	$(NULL)
 
 SOURCES_libvlc_beos = \
@@ -366,8 +366,8 @@ SOURCES_libvlc_getopt = \
 	src/extras/getopt1.c \
 	$(NULL)
 
-SOURCES_libvlc_strndup = \
-	src/extras/strndup.c
+SOURCES_libvlc_libc = \
+	src/extras/libc.c
 	$(NULL)
 
 SOURCES_libvlc_common = \
@@ -419,7 +419,7 @@ SOURCES_libvlc = \
 	$(OPT_SOURCES_libvlc_win32) \
 	$(OPT_SOURCES_libvlc_dirent) \
 	$(OPT_SOURCES_libvlc_getopt) \
-	$(OPT_SOURCES_libvlc_strndup) \
+	$(OPT_SOURCES_libvlc_libc) \
 	$(NULL)
 
 ###############################################################################

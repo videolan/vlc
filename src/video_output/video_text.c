@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.38 2002/11/10 18:04:24 sam Exp $
+ * $Id: video_text.c,v 1.39 2002/11/10 23:41:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -277,19 +277,23 @@ vout_font_t *vout_LoadFont( vout_thread_t *p_vout, const char *psz_name )
     }
 
     /* Read magic number */
+#ifndef UNDER_CE /* FIXME */
     if( read( i_file, pi_buffer, 2 ) != 2 )
     {
         msg_Err( p_vout, "unexpected end of file in '%s'", psz_name );
         close( i_file );
         return( NULL );
     }
+#endif
 
     /* Allocate font descriptor */
     p_font = malloc( sizeof( vout_font_t ) );
     if( p_font == NULL )
     {
         msg_Err( p_vout, "out of memory" );
+#ifndef UNDER_CE /* FIXME */
         close( i_file );
+#endif
         return( NULL );
     }
 
@@ -303,6 +307,7 @@ vout_font_t *vout_LoadFont( vout_thread_t *p_vout, const char *psz_name )
          */
 
         /* Read font header - two bytes indicate the font properties */
+#ifndef UNDER_CE /* FIXME */
         if( read( i_file, pi_buffer, 2 ) != 2)
         {
             msg_Err( p_vout, "unexpected end of file in '%s'", psz_name );
@@ -310,6 +315,7 @@ vout_font_t *vout_LoadFont( vout_thread_t *p_vout, const char *psz_name )
             close( i_file );
             return( NULL );
         }
+#endif
 
         /* Copy font properties */
         p_font->i_type =                VOUT_FIXED_FONT;
@@ -327,11 +333,14 @@ vout_font_t *vout_LoadFont( vout_thread_t *p_vout, const char *psz_name )
         {
             msg_Err( p_vout, "out of memory" );
             free( p_font );
+#ifndef UNDER_CE /* FIXME */
             close( i_file );
+#endif
             return( NULL );
         }
 
         /* Copy raw data */
+#ifndef UNDER_CE /* FIXME */
         if( read( i_file, p_font->p_data, 256 * pi_buffer[1] ) != 256 * pi_buffer[1] )
         {
             msg_Err( p_vout, "unexpected end of file in '%s'", psz_name );
@@ -340,6 +349,7 @@ vout_font_t *vout_LoadFont( vout_thread_t *p_vout, const char *psz_name )
             close( i_file );
             return( NULL );
         }
+#endif
 
         /* Compute border masks - remember that masks have the same matrix as
          * characters, so an empty character border is required to have a
@@ -362,7 +372,9 @@ vout_font_t *vout_LoadFont( vout_thread_t *p_vout, const char *psz_name )
     default:
         msg_Err( p_vout, "file '%s' has an unknown format", psz_name );
         free( p_font );
+#ifndef UNDER_CE /* FIXME */
         close( i_file );
+#endif
         return( NULL );
         break;
     }

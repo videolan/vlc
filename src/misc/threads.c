@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.24 2002/11/10 18:04:24 sam Exp $
+ * $Id: threads.c,v 1.25 2002/11/10 23:41:53 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -77,6 +77,7 @@ int __vlc_threads_init( vlc_object_t *p_this )
      * hope nothing wrong happens. */
 #if defined( PTH_INIT_IN_PTH_H )
 #elif defined( ST_INIT_IN_ST_H )
+#elif defined( UNDER_CE )
 #elif defined( WIN32 )
     HINSTANCE hInstLib;
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
@@ -556,10 +557,16 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
         unsigned threadID;
         /* When using the MSVCRT C library you have to use the _beginthreadex
          * function instead of CreateThread, otherwise you'll end up with
-	 * memory leaks and the signal functions not working */
+         * memory leaks and the signal functions not working (see Microsoft
+         * Knowledge Base, article 104641) */
         p_this->thread_id =
+#if defined( UNDER_CE )
+                (HANDLE)CreateThread( NULL, 0, (PTHREAD_START) func, 
+                                      (void *)p_this, 0, &threadID );
+#else
                 (HANDLE)_beginthreadex( NULL, 0, (PTHREAD_START) func, 
                                         (void *)p_this, 0, &threadID );
+#endif
     }
 
     if ( p_this->thread_id && i_priority )
@@ -628,8 +635,13 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
     }
     else
     {
+#ifdef HAVE_STRERROR
         msg_Err( p_this, "%s thread could not be created at %s:%d (%s)",
                          psz_name, psz_file, i_line, strerror(i_ret) );
+#else
+        msg_Err( p_this, "%s thread could not be created at %s:%d",
+                         psz_name, psz_file, i_line );
+#endif
         vlc_mutex_unlock( &p_this->object_lock );
     }
 
@@ -677,8 +689,13 @@ void __vlc_thread_join( vlc_object_t *p_this, char * psz_file, int i_line )
 
     if( i_ret )
     {
+#ifdef HAVE_STRERROR
         msg_Err( p_this, "thread_join(%d) failed at %s:%d (%s)",
                          p_this->thread_id, psz_file, i_line, strerror(i_ret) );
+#else
+        msg_Err( p_this, "thread_join(%d) failed at %s:%d",
+                         p_this->thread_id, psz_file, i_line );
+#endif
     }
     else
     {

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.45 2002/11/10 18:04:23 sam Exp $
+ * $Id: libvlc.c,v 1.46 2002/11/10 23:41:53 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1265,10 +1265,12 @@ static void Version( void )
 #ifdef WIN32 /*  */
 static void ShowConsole( void )
 {
+#   ifndef UNDER_CE
     AllocConsole();
     freopen( "CONOUT$", "w", stdout );
     freopen( "CONOUT$", "w", stderr );
     freopen( "CONIN$", "r", stdin );
+#   endif
     return;
 }
 #endif

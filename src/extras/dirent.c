@@ -9,9 +9,9 @@
  * Significantly revised and rewinddir, seekdir and telldir added by Colin
  * Peters <colin@fu.is.saga-u.ac.jp>
  *	
- * $Revision: 1.3 $
+ * $Revision: 1.4 $
  * $Author: sam $
- * $Date: 2002/11/10 18:04:23 $
+ * $Date: 2002/11/10 23:41:53 $
  *
  */
 
@@ -89,12 +89,13 @@ opendir (const CHAR *szPath)
 #if defined( UNDER_CE )
   if (szPath[0] == '\\' || szPath[0] == '/')
     {
-      snprintf (szFullPath, MAX_PATH, "%s", szPath);
+      sprintf (szFullPath, MAX_PATH, "%s", szPath);
       szFullPath[0] = '\\';
     }
   else
     {
-      snprintf (szFullPath, MAX_PATH, "\\%s", szPath );
+      /* FIXME: if I wasn't lazy, I'dcheck for overflows here. */
+      sprintf (szFullPath, MAX_PATH, "\\%s", szPath );
     }
 #else
   _fullpath (szFullPath, szPath, MAX_PATH);
