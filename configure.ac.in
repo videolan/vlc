@@ -947,7 +947,7 @@ dnl
 dnl  libdvbpsi ts demux
 dnl
 AC_ARG_ENABLE(dvbpsi,
-[  --enable-dvbpsi         dvbpsi ts demux module (default disabled)])
+[  --enable-dvbpsi         dvbpsi ts demux module (default enabled)])
 if test "x${enable_dvbpsi}" != "xno"
 then
   AC_ARG_WITH(dvbpsi,
@@ -2079,10 +2079,10 @@ then
     fi
     CXXFLAGS_wxwindows="${CXXFLAGS_wxwindows} `${WX_CONFIG} --cflags`"
     LDFLAGS_wxwindows="${LDFLAGS_wxwindows} `${WX_CONFIG} --libs`"
-    # now look for the wx.h header
+    # now look for the wxprec.h header
     CPPFLAGS="${save_CPPFLAGS} ${CXXFLAGS_wxwindows}"
     ac_cv_wx_headers=yes
-    AC_CHECK_HEADERS(wx/wx.h, , [
+    AC_CHECK_HEADERS(wx/wxprec.h, , [
       ac_cv_wx_headers=no
       echo "Cannot find wxWindows development headers."
     ])
