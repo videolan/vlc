@@ -246,14 +246,39 @@ enum mad_flow libmad_output( void *p_data, struct mad_header const *p_header,
 /*****************************************************************************
  * libmad_error: this function is called when an error occurs during decoding
  *****************************************************************************/
-enum mad_flow libmad_error( void *data, struct mad_stream *p_libmad_stream,
+enum mad_flow libmad_error( void *p_data, struct mad_stream *p_libmad_stream,
                             struct mad_frame *p_libmad_frame )
 {
-    mad_adec_thread_t *p_dec = (mad_adec_thread_t *) data;
-    enum mad_flow result = MAD_FLOW_CONTINUE;
+    mad_adec_thread_t *p_dec = (mad_adec_thread_t *) p_data;
+    enum mad_flow result;
+    struct mad_pcm *p_pcm;
 
     switch (p_libmad_stream->error)
     {             
+
+    case MAD_ERROR_BADDATAPTR:        /* bad main_data_begin pointer */
+        msg_Warn( p_dec->p_fifo, "lost synchronization" );
+
+        if( p_dec->output_format.i_rate &&
+            p_dec->output_format.i_physical_channels )
+        {
+            p_pcm = malloc( sizeof(struct mad_pcm) );
+            memset( p_pcm, 0, sizeof(struct mad_pcm) );
+            p_pcm->length = 32 * MAD_NSBSAMPLES( &p_libmad_frame->header );
+            p_pcm->channels = ( p_dec->output_format.i_physical_channels ==
+                                AOUT_CHAN_CENTER ) ? 1 : 2;
+            p_pcm->samplerate = p_dec->output_format.i_rate;
+            libmad_output( p_data, NULL, p_pcm );
+            free( p_pcm );
+        }
+        result = MAD_FLOW_CONTINUE;
+        break;
+
+    default:
+        result = MAD_FLOW_CONTINUE;
+        break;
+
+#if 0
     case MAD_ERROR_BUFLEN:                /* input buffer too small (or EOF) */
         msg_Err( p_dec->p_fifo, "input buffer too small (or EOF)" );
         result = MAD_FLOW_CONTINUE;
@@ -268,7 +293,6 @@ enum mad_flow libmad_error( void *data, struct mad_stream *p_libmad_stream,
         break;
     case MAD_ERROR_LOSTSYNC:            /* lost synchronization */
         msg_Err( p_dec->p_fifo, "lost synchronization" );
-        mad_stream_sync(p_libmad_stream);
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADLAYER:            /* reserved header layer value */
@@ -317,7 +341,7 @@ enum mad_flow libmad_error( void *data, struct mad_stream *p_libmad_stream,
         break;
     case MAD_ERROR_BADDATAPTR:        /* bad main_data_begin pointer */
         msg_Err( p_dec->p_fifo, "bad main_data_begin pointer" );
-        result = MAD_FLOW_STOP;
+        result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADPART3LEN:     /* bad audio data length */
         msg_Err( p_dec->p_fifo, "bad audio data length" );
@@ -339,10 +363,10 @@ enum mad_flow libmad_error( void *data, struct mad_stream *p_libmad_stream,
         msg_Err( p_dec->p_fifo, "unknown error occured stopping decoder" );
         result = MAD_FLOW_STOP;
         break;
+#endif
     }
     
     return (MAD_RECOVERABLE(p_libmad_stream->error)? result: MAD_FLOW_STOP);
-    //return (MAD_FLOW_CONTINUE);
 }
 
 /*****************************************************************************

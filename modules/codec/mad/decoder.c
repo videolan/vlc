@@ -154,7 +154,7 @@ static int InitThread( mad_adec_thread_t * p_dec )
                       NULL,           /* header_func */
                       NULL,                /* filter */
                       libmad_output,  /* output_func */
-                      NULL,                 /* error */
+                      libmad_error,         /* error */
                       NULL );             /* message */
 
     mad_decoder_options( &p_dec->libmad_decoder, MAD_OPTION_IGNORECRC );
