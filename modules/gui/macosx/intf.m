@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.89 2003/06/09 00:33:34 massiot Exp $
+ * $Id: intf.m,v 1.90 2003/06/17 14:43:22 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -395,8 +395,8 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     [o_mi_floatontop setTitle: _NS("Float On Top")];
     [o_mi_videotrack setTitle: _NS("Video track")];
     [o_mu_videotrack setTitle: _NS("Video track")];
-    [o_mi_screen setTitle: _NS("Screen")];
-    [o_mu_screen setTitle: _NS("Screen")];
+    [o_mi_screen setTitle: _NS("Video device")];
+    [o_mu_screen setTitle: _NS("Video device")];
     [o_mi_subtitle setTitle: _NS("Subtitles track")];
     [o_mu_subtitle setTitle: _NS("Subtitles track")];
     [o_mi_deinterlace setTitle: _NS("Deinterlace")];

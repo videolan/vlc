@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.7 2003/06/15 22:32:06 hartman Exp $
+ * $Id: quicktime.c,v 1.8 2003/06/17 14:43:21 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -263,10 +263,10 @@ static int OpenDecoder( vlc_object_t *p_this )
     switch( p_fifo->i_fourcc )
     {
         case VLC_FOURCC('S','V','Q','3'): /* Sorenson v3 */
-        case VLC_FOURCC('S','V','Q','1'): /* Sorenson v1 */
+    /*    case VLC_FOURCC('S','V','Q','1'):  Sorenson v1 
         case VLC_FOURCC('Z','y','G','o'):
         case VLC_FOURCC('V','P','3','1'):
-        case VLC_FOURCC('3','I','V','1'):
+        case VLC_FOURCC('3','I','V','1'): */
         case VLC_FOURCC('r','l','e',' '): /* QuickTime animation (RLE) */
         case VLC_FOURCC('r','p','z','a'): /* QuickTime Apple Video */
         case VLC_FOURCC('a','z','p','r'): /* QuickTime animation (RLE) */
