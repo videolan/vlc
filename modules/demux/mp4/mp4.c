@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.51 2004/01/13 01:44:49 fenrir Exp $
+ * $Id: mp4.c,v 1.52 2004/01/13 01:54:54 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,6 +28,7 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc_playlist.h>
+#include "iso_lang.h"
 
 #include "libmp4.h"
 #include "mp4.h"
@@ -70,6 +71,8 @@ static int  MP4_TrackSeek   ( input_thread_t *, track_data_mp4_t *, mtime_t );
 static uint64_t MP4_GetTrackPos    ( track_data_mp4_t * );
 static int      MP4_TrackSampleSize( track_data_mp4_t * );
 static int      MP4_TrackNextSample( input_thread_t *, track_data_mp4_t * );
+
+static char *LanguageGetName( const char *psz_code );
 
 #define FREE( p ) \
     if( p ) { free( p ); (p) = NULL;}
@@ -1344,7 +1347,7 @@ static void MP4_TrackCreate( input_thread_t *p_input,
     /* Set language */
     if( strcmp( language, "```" ) && strcmp( language, "und" ) )
     {
-        p_track->fmt.psz_language = strdup( language );
+        p_track->fmt.psz_language = LanguageGetName( language );
     }
 
     /* fxi i_timescale for AUDIO_ES with i_qt_version == 0 */
@@ -1679,4 +1682,26 @@ static int  MP4_TrackNextSample( input_thread_t     *p_input,
     return( VLC_SUCCESS );
 }
 
+
+static char *LanguageGetName( const char *psz_code )
+{
+    const iso639_lang_t *pl;
+
+    pl = GetLang_2B( psz_code );
+    if( !strcmp( pl->psz_iso639_1, "??" ) )
+    {
+        pl = GetLang_2T( psz_code );
+    }
+
+    if( !strcmp( pl->psz_iso639_1, "??" ) )
+    {
+       return strdup( psz_code );
+    }
+
+    if( *pl->psz_native_name )
+    {
+        return strdup( pl->psz_native_name );
+    }
+    return strdup( pl->psz_eng_name );
+}
 
