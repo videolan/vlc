@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.14 2003/07/26 18:54:20 titer Exp $
+ * $Id: freetype.c,v 1.15 2003/07/31 17:03:46 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -44,6 +44,8 @@
 #define DEFAULT_FONT ""
 #endif
 
+typedef struct line_desc_t line_desc_t;
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -59,8 +61,10 @@ static void RenderYUY2( vout_thread_t *, picture_t *,
 static int  AddText   ( vout_thread_t *, byte_t *, text_style_t *, int,
                         int, int, mtime_t, mtime_t );
 static int  GetUnicodeCharFromUTF8( byte_t ** );
+static int  CountUtf8Characters( byte_t * );
 static void FreeString( subpicture_t * );
-
+static line_desc_t *NewLine( byte_t * );
+    
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -91,10 +95,18 @@ struct subpicture_sys_t
     int            i_flags;
     /** The string associated with this subpicture */
     byte_t        *psz_text;
+    line_desc_t   *p_lines;
+};
+
+struct line_desc_t
+{
     /** NULL-terminated list of glyphs making the string */
-    FT_BitmapGlyph      *pp_glyphs;
+    FT_BitmapGlyph *pp_glyphs;
     /** list of relative positions for the glyphs */
-    FT_Vector     *p_glyph_pos;
+    FT_Vector      *p_glyph_pos;
+    int             i_height;
+    int             i_width;
+    line_desc_t    *p_next;
 };
 
 /*****************************************************************************
@@ -279,43 +291,44 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
     subpicture_sys_t *p_string = p_subpic->p_sys;
     int i_plane, x, y, pen_x, pen_y;
     unsigned int i;
+    line_desc_t *p_line;
 
-    for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
+    for( p_line = p_subpic->p_sys->p_lines; p_line != NULL; p_line = p_line->p_next )
     {
-        uint8_t *p_in;
-        int i_pitch = p_pic->p[i_plane].i_pitch;
-
-        p_in = p_pic->p[i_plane].p_pixels;
-
-        if ( i_plane == 0 )
+        for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
         {
-            if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
-            {
-                pen_y = p_pic->p[i_plane].i_lines - p_string->i_height -
-                    p_string->i_y_margin;
-            }
-            else
-            {
-                pen_y = p_string->i_y_margin;
-            }
-            pen_y += p_vout->p_text_renderer_data->p_face->size->metrics.height / 100;
-            if ( p_string->i_flags & OSD_ALIGN_RIGHT )
-            {
-                pen_x = i_pitch - p_string->i_width
-                    - p_string->i_x_margin;
-            }
-            else
-            {
-                pen_x = p_string->i_x_margin;
-            }
+            uint8_t *p_in;
+            int i_pitch = p_pic->p[ i_plane ].i_pitch;
 
-            for( i = 0; p_string->pp_glyphs[i] != NULL; i++ )
+            p_in = p_pic->p[ i_plane ].p_pixels;
+
+            if ( i_plane == 0 )
             {
-                if( p_string->pp_glyphs[i] )
+                if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
                 {
-                    FT_BitmapGlyph p_glyph = p_string->pp_glyphs[ i ];
+                    pen_y = p_pic->p[ i_plane ].i_lines - p_string->i_height -
+                        p_string->i_y_margin;
+                }
+                else
+                {
+                    pen_y = p_string->i_y_margin;
+                }
+                pen_y += p_vout->p_text_renderer_data->p_face->size->metrics.ascender >> 6;
+                if ( p_string->i_flags & OSD_ALIGN_RIGHT )
+                {
+                    pen_x = i_pitch - p_line->i_width
+                        - p_string->i_x_margin;
+                }
+                else
+                {
+                    pen_x = p_string->i_x_margin;
+                }
+
+                for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
+                {
+                    FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
 #define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ x + y * p_glyph->bitmap.width ] ]
-#define pixel p_in[ ( p_string->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pitch+x + pen_x + p_string->p_glyph_pos[ i ].x + p_glyph->left ]
+#define pixel p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pitch+x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ]
                     for(y = 0; y < p_glyph->bitmap.rows; y++ )
                     {
                         for( x = 0; x < p_glyph->bitmap.width; x++ )
@@ -328,36 +341,33 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                     }
                 }
             }
-        }
-        else
-        {
-            if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
-            {
-                pen_y = p_pic->p[i_plane].i_lines - ( p_string->i_height>>1) -
-                    (p_string->i_y_margin>>1);
-            }
             else
             {
-                pen_y = p_string->i_y_margin >> 1;
-            }
-            pen_y += p_vout->p_text_renderer_data->p_face->size->metrics.height / 200;
-            if ( p_string->i_flags & OSD_ALIGN_RIGHT )
-            {
-                pen_x = i_pitch - ( p_string->i_width >> 1 )
-                    - ( p_string->i_x_margin >> 1 );
-            }
-            else
-            {
-                pen_x = p_string->i_x_margin >> 1;
-            }
-
-            for( i = 0; p_string->pp_glyphs[i] != NULL; i++ )
-            {
-                if( p_string->pp_glyphs[i] )
+                if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
                 {
-                    FT_BitmapGlyph p_glyph = p_string->pp_glyphs[ i ];
+                    pen_y = p_pic->p[i_plane].i_lines - ( p_string->i_height>>1) -
+                        (p_string->i_y_margin>>1);
+                }
+                else
+                {
+                    pen_y = p_string->i_y_margin >> 1;
+                }
+                pen_y += p_vout->p_text_renderer_data->p_face->size->metrics.ascender >> 7;
+                if ( p_string->i_flags & OSD_ALIGN_RIGHT )
+                {
+                    pen_x = i_pitch - ( p_line->i_width >> 1 )
+                        - ( p_string->i_x_margin >> 1 );
+                }
+                else
+                {
+                    pen_x = p_string->i_x_margin >> 1;
+                }
+
+                for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
+                {
+                    FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
 #define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ ( x + y * p_glyph->bitmap.width ) ] ]
-#define pixel p_in[ ( (p_string->p_glyph_pos[ i ].y>>1) + pen_y + (y>>1) -  ( p_glyph->top >> 1 ) ) * i_pitch + ( x >> 1 ) + pen_x + ( p_string->p_glyph_pos[ i ].x >> 1 ) + ( p_glyph->left >>1) ]
+#define pixel p_in[ ( ( p_line->p_glyph_pos[ i ].y >> 1 ) + pen_y + ( y >> 1 ) -  ( p_glyph->top >> 1 ) ) * i_pitch + ( x >> 1 ) + pen_x + ( p_line->p_glyph_pos[ i ].x >> 1 ) + ( p_glyph->left >>1) ]
                     for( y = 0; y < p_glyph->bitmap.rows; y+=2 )
                     {
                         for( x = 0; x < p_glyph->bitmap.width; x+=2 )
@@ -381,47 +391,48 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_subpic )
 {
     subpicture_sys_t *p_string = p_subpic->p_sys;
-    int x, y, pen_x, pen_y;
+    int i_plane, x, y, pen_x, pen_y;
     unsigned int i;
+    line_desc_t *p_line;
 
-    uint8_t *p_in;
-    int i_pitch = p_pic->p[0].i_pitch;
-
-    p_in = p_pic->p->p_pixels;
-
-    if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
+    for( p_line = p_subpic->p_sys->p_lines; p_line != NULL; p_line = p_line->p_next )
     {
-        pen_y = p_pic->p->i_lines - p_string->i_height -
-                p_string->i_y_margin;
-    }
-    else
-    {
-        pen_y = p_string->i_y_margin;
-    }
-    pen_y += p_vout->p_text_renderer_data->p_face->size->metrics.height / 100;
-    if ( p_string->i_flags & OSD_ALIGN_RIGHT )
-    {
-        pen_x = i_pitch - p_string->i_width - p_string->i_x_margin;
-    }
-    else
-    {
-        pen_x = p_string->i_x_margin;
-    }
-
-    /* TODO : set U & V bytes */
-    for( i = 0; p_string->pp_glyphs[i] != NULL; i++ )
-    {
-        if( p_string->pp_glyphs[i] )
+        uint8_t *p_in;
+        int i_pitch = p_pic->p[ i_plane ].i_pitch;
+        
+        p_in = p_pic->p[ i_plane ].p_pixels;
+        
+        if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
         {
-            FT_BitmapGlyph p_glyph = p_string->pp_glyphs[ i ];
+            pen_y = p_pic->p[ i_plane ].i_lines - p_string->i_height -
+                p_string->i_y_margin;
+        }
+        else
+        {
+            pen_y = p_string->i_y_margin;
+        }
+        pen_y += p_vout->p_text_renderer_data->p_face->size->metrics.ascender >> 6;
+        if ( p_string->i_flags & OSD_ALIGN_RIGHT )
+        {
+            pen_x = i_pitch - p_line->i_width
+                - p_string->i_x_margin;
+        }
+        else
+        {
+            pen_x = p_string->i_x_margin;
+        }
+        
+        for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
+        {
+            FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
 #define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ x + y * p_glyph->bitmap.width ] ]
-#define pixel p_in[ ( p_string->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pitch + 2 * ( x + pen_x + p_string->p_glyph_pos[ i ].x + p_glyph->left ) ]
-            for( y = 0; y < p_glyph->bitmap.rows; y++ )
+#define pixel p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pitch + 2 * ( x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ) ]
+            for(y = 0; y < p_glyph->bitmap.rows; y++ )
             {
                 for( x = 0; x < p_glyph->bitmap.width; x++ )
                 {
                     pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 ) +
-                            ( 255 * alpha >> 8 );
+                        ( 255 * alpha >> 8 );
 #undef alpha
 #undef pixel
                 }
@@ -444,6 +455,8 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
     subpicture_sys_t *p_string;
     int i, i_pen_y, i_pen_x, i_error, i_glyph_index, i_previous, i_char;
     subpicture_t *p_subpic;
+    line_desc_t  *p_line,  *p_next;
+    
     FT_BBox line;
     FT_BBox glyph_size;
     FT_Vector result;
@@ -455,7 +468,6 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
     line.xMax = 0;
     line.yMin = 0;
     line.yMax = 0;
-
     /* Create and initialize a subpicture */
     p_subpic = vout_CreateSubPicture( p_vout, MEMORY_SUBPICTURE );
     if ( p_subpic == NULL )
@@ -488,23 +500,16 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
     p_string->i_y_margin = i_vmargin;
 
     p_string->psz_text = strdup( psz_string );
-    p_string->pp_glyphs = malloc( sizeof(FT_GlyphSlot)
-                                  * ( strlen( p_string->psz_text ) + 1 ) );
-    if( p_string->pp_glyphs == NULL )
-    {
-        msg_Err( p_vout, "Out of memory" );
-        return VLC_ENOMEM;
-    }
-    p_string->p_glyph_pos = malloc( sizeof( FT_Vector )
-                                  * strlen( p_string->psz_text ) );
-    if( p_string->p_glyph_pos == NULL )
-    {
-        msg_Err( p_vout, "Out of memory" );
-        return VLC_ENOMEM;
-    }
 
     /* Calculate relative glyph positions and a bounding box for the
      * entire string */
+    p_line = NewLine( psz_string );
+    if( p_line == NULL )
+    {
+        msg_Err( p_vout, "Out of memory" );
+        return VLC_ENOMEM;
+    }
+    p_string->p_lines = p_line;
     i_pen_x = 0;
     i_pen_y = 0;
     i_previous = 0;
@@ -520,14 +525,27 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
         }
         if ( i_char == '\n' )
         {
-            i_pen_x = 0;
+            p_next = NewLine( psz_string );
+            if( p_next == NULL )
+            {
+                msg_Err( p_vout, "Out of memory" );
+                return VLC_ENOMEM;
+            }
+            p_line->p_next = p_next;
+            p_line->i_width = line.xMax;
+            p_line->i_height = face->size->metrics.height >> 6;
+            p_line->pp_glyphs[ i ] = NULL;
+            p_line = p_next;
             result.x = __MAX( result.x, line.xMax );
-            result.y += face->size->metrics.height / 100;
+            result.y += face->size->metrics.height >> 6;
+            i_pen_x = 0;
             line.xMin = 0;
             line.xMax = 0;
             line.yMin = 0;
             line.yMax = 0;
-            i_pen_y += face->size->metrics.height / 100;
+            i_pen_y += face->size->metrics.height >> 6;
+            msg_Dbg( p_vout, "Creating new line, i is %d", i );
+            i = 0;
             continue;
         }
         i_glyph_index = FT_Get_Char_Index( face, i_char );
@@ -540,8 +558,8 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
             i_pen_x += delta.x >> 6;
 
         }
-        p_string->p_glyph_pos[ i ].x = i_pen_x;
-        p_string->p_glyph_pos[ i ].y = i_pen_y;
+        p_line->p_glyph_pos[ i ].x = i_pen_x;
+        p_line->p_glyph_pos[ i ].y = i_pen_y;
         i_error = FT_Load_Glyph( face, i_glyph_index, FT_LOAD_DEFAULT );
         if ( i_error )
         {
@@ -555,15 +573,13 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
             return VLC_EGENERIC;
         }
         FT_Glyph_Get_CBox( tmp_glyph, ft_glyph_bbox_pixels, &glyph_size );
-        i_error = FT_Glyph_To_Bitmap( &tmp_glyph,
-                                      ft_render_mode_normal,
-                                      NULL,
-                                      1 );
+        i_error = FT_Glyph_To_Bitmap( &tmp_glyph, ft_render_mode_normal,
+                                      NULL, 1 );
         if ( i_error ) continue;
-        p_string->pp_glyphs[ i ] = (FT_BitmapGlyph)tmp_glyph;
+        p_line->pp_glyphs[ i ] = (FT_BitmapGlyph)tmp_glyph;
 
         /* Do rest */
-        line.xMax = p_string->p_glyph_pos[i].x + glyph_size.xMax - glyph_size.xMin;
+        line.xMax = p_line->p_glyph_pos[i].x + glyph_size.xMax - glyph_size.xMin;
         line.yMax = __MAX( line.yMax, glyph_size.yMax );
         line.yMin = __MIN( line.yMin, glyph_size.yMin );
 
@@ -571,7 +587,9 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
         i_pen_x += glyph->advance.x >> 6;
         i++;
     }
-    p_string->pp_glyphs[i] = NULL;
+    p_line->i_width = line.xMax;
+    p_line->i_height = face->size->metrics.height >> 6;
+    p_line->pp_glyphs[ i ] = NULL;
     result.x = __MAX( result.x, line.xMax );
     result.y += line.yMax - line.yMin;
     p_string->i_height = result.y;
@@ -589,13 +607,20 @@ static void FreeString( subpicture_t *p_subpic )
 {
     unsigned int i;
     subpicture_sys_t *p_string = p_subpic->p_sys;
-    for ( i = 0; p_string->pp_glyphs[ i ] != NULL; i++ )
+    line_desc_t *p_line, *p_next;
+    for( p_line = p_string->p_lines; p_line != NULL; p_line = p_next )
     {
-        FT_Done_Glyph( (FT_Glyph)p_string->pp_glyphs[ i ] );
+        p_next = p_line->p_next;
+        for( i = 0; p_line->pp_glyphs[ i ] != NULL; i++ )
+        {
+            FT_Done_Glyph( (FT_Glyph)p_line->pp_glyphs[ i ] );
+        }
+        free( p_line->pp_glyphs );
+        free( p_line->p_glyph_pos );
+        free( p_line );
     }
+            
     free( p_string->psz_text );
-    free( p_string->p_glyph_pos );
-    free( p_string->pp_glyphs );
     free( p_string );
 }
 
@@ -641,4 +666,47 @@ static int GetUnicodeCharFromUTF8( byte_t **ppsz_utf8_string )
     }
     (*ppsz_utf8_string)++;
     return i_char;
+}
+
+static int CountUtf8Characters( byte_t *psz_string )
+{
+    int i, i_num;
+    i = 0;
+    i_num = 0;
+    while( psz_string[ i ] != 0 && psz_string[ i ] != 10 )
+    {
+        if( psz_string[ i ] != 13 && psz_string[ i ] <  0x80 )
+        {
+            i_num++;
+        }
+        i++;
+    }
+    printf( "number of characters in line is %d\n", i_num );
+    return i_num;
+}
+
+static line_desc_t *NewLine( byte_t *psz_string )
+{
+    line_desc_t *p_line;
+    p_line = malloc( sizeof(line_desc_t) );
+    if( !p_line )
+    {
+        return NULL;
+    }
+    p_line->i_height = 0;
+    p_line->i_width = 0;
+    p_line->p_next = NULL;
+    p_line->pp_glyphs = malloc( sizeof(FT_BitmapGlyph)
+                                * ( CountUtf8Characters( psz_string ) + 1 ) );
+    if( p_line->pp_glyphs == NULL )
+    {
+        return NULL;
+    }
+    p_line->p_glyph_pos = malloc( sizeof( FT_Vector )
+                                  * CountUtf8Characters( psz_string ) );
+    if( p_line->p_glyph_pos == NULL )
+    {
+        return NULL;
+    }
+    return p_line;
 }
