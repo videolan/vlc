@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.12 2002/08/19 23:07:30 sam Exp $
+ * $Id: oss.c,v 1.13 2002/08/20 22:11:49 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -171,6 +171,7 @@ static int SetFormat( aout_instance_t *p_aout )
     /* Set the output format */
     if ( p_aout->output.output.i_format == AOUT_FMT_SPDIF )
     {
+        i_format = AOUT_FMT_SPDIF;
         p_aout->output.i_nb_samples = A52_FRAME_NB;
         p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->output.output.i_frame_length = A52_FRAME_NB;
