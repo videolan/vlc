@@ -2,7 +2,7 @@
  * libasf.c : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.1 2002/10/20 17:22:33 fenrir Exp $
+ * $Id: libasf.c,v 1.2 2002/10/21 09:18:37 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -892,7 +892,7 @@ void ASF_FreeObjectRoot( input_thread_t *p_input,
     
 }
 
-int  ASF_CountObject( asf_object_t *p_obj, const guid_t *p_guid )
+int  __ASF_CountObject( asf_object_t *p_obj, const guid_t *p_guid )
 {
     int i_count;
     asf_object_t *p_child;
@@ -915,7 +915,7 @@ int  ASF_CountObject( asf_object_t *p_obj, const guid_t *p_guid )
     return( i_count );
 }
 
-asf_object_t *ASF_FindObject( asf_object_t *p_obj, const guid_t *p_guid, int i_number )
+void *__ASF_FindObject( asf_object_t *p_obj, const guid_t *p_guid, int i_number )
 {
     asf_object_t *p_child;
 

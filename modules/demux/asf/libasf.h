@@ -2,7 +2,7 @@
  * libasf.h : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.h,v 1.1 2002/10/20 17:22:33 fenrir Exp $
+ * $Id: libasf.h,v 1.2 2002/10/21 09:18:37 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -440,8 +440,10 @@ int  ASF_ReadObjectRoot( input_thread_t *p_input,
                          int b_seekable );
 void ASF_FreeObjectRoot( input_thread_t *p_input,
                          asf_object_root_t *p_root );
+#define ASF_CountObject( a, b ) __ASF_CountObject( (asf_object_t*)(a), b )
+int  __ASF_CountObject( asf_object_t *p_obj, const guid_t *p_guid );
 
-int  ASF_CountObject( asf_object_t *p_obj, const guid_t *p_guid );
-asf_object_t *ASF_FindObject( asf_object_t *p_obj, const guid_t *p_guid, int i_number );
+#define ASF_FindObject( a, b, c )  __ASF_FindObject( (asf_object_t*)(a), b, c )
+void *__ASF_FindObject( asf_object_t *p_obj, const guid_t *p_guid, int i_number );
 
 

@@ -1043,6 +1043,16 @@ then
 fi
 
 dnl
+dnl  ASF demux plugin
+dnl
+AC_ARG_ENABLE(asf,
+  [  --enable-asf            ASF demux module (default enabled)])
+if test "x${enable_asf}" != "xno"
+then
+  PLUGINS="${PLUGINS} asf"
+fi
+
+dnl
 dnl  AAC demux plugin
 dnl
 AC_ARG_ENABLE(aac,

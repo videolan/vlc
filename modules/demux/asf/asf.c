@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.1 2002/10/20 17:22:33 fenrir Exp $
+ * $Id: asf.c,v 1.2 2002/10/21 09:18:37 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -83,7 +83,7 @@ static int Activate( vlc_object_t * p_this )
     p_input->pf_demux = Demux;
 
     /* a little test to see if it could be a asf stream */
-    if( input_Peek( p_input, &p_peek, 16 ) < 8 )
+    if( input_Peek( p_input, &p_peek, 16 ) < 16 )
     {
         msg_Warn( p_input, "ASF v1.0 plugin discarded (cannot peek)" );
         return( -1 );
@@ -103,8 +103,6 @@ static int Activate( vlc_object_t * p_this )
         return( -1 );
     }
     memset( p_demux, 0, sizeof( demux_sys_t ) );
-    p_input->p_demux_data = p_demux;
-       
 
     /* Now load all object ( except raw data ) */
     if( !ASF_ReadObjectRoot( p_input, &p_demux->root, p_input->stream.b_seekable ) )
@@ -122,7 +120,7 @@ static int Activate( vlc_object_t * p_this )
         return( -1 );
     }
    
-    if( !( p_demux->p_fp = ASF_FindObject( (asf_object_t*)p_demux->root.p_hdr,
+    if( !( p_demux->p_fp = ASF_FindObject( p_demux->root.p_hdr,
                                     &asf_object_file_properties_guid, 0 ) ) )
     {
         ASF_FreeObjectRoot( p_input, &p_demux->root );
@@ -139,7 +137,7 @@ static int Activate( vlc_object_t * p_this )
         return( -1 );
     }
     
-    p_demux->i_streams = ASF_CountObject( (asf_object_t*)p_demux->root.p_hdr, 
+    p_demux->i_streams = ASF_CountObject( p_demux->root.p_hdr, 
                                           &asf_object_stream_properties_guid );
     if( !p_demux->i_streams )
     {
@@ -176,12 +174,13 @@ static int Activate( vlc_object_t * p_this )
         asf_stream_t    *p_stream;
         asf_object_stream_properties_t *p_sp;
         
-        p_sp = (asf_object_stream_properties_t*)
-                    ASF_FindObject( (asf_object_t*)p_demux->root.p_hdr,
-                                    &asf_object_stream_properties_guid,
-                                    i_stream );
+        p_sp = ASF_FindObject( p_demux->root.p_hdr,
+                               &asf_object_stream_properties_guid,
+                               i_stream );
 
-        p_stream = p_demux->stream[p_sp->i_stream_number] = malloc( sizeof( asf_stream_t ) );
+        p_stream = 
+            p_demux->stream[p_sp->i_stream_number] = 
+                malloc( sizeof( asf_stream_t ) );
         memset( p_stream, 0, sizeof( asf_stream_t ) );
         p_stream->p_sp = p_sp;
 
@@ -218,6 +217,10 @@ static int Activate( vlc_object_t * p_this )
                     p_sp->i_stream_number );
             switch( i_codec )
             {
+                case( 0x01 ):
+                    p_stream->p_es->i_fourcc = 
+                        VLC_FOURCC( 'a', 'r', 'a', 'w' );
+                    break;
                 case( 0x50 ):
                 case( 0x55 ):
                     p_stream->p_es->i_fourcc = 
@@ -276,7 +279,6 @@ static int Activate( vlc_object_t * p_this )
     p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    // go to first packet
     p_demux->i_data_begin = p_demux->root.p_data->i_object_pos + 50;
     if( p_demux->root.p_data->i_object_size != 0 )
     { // local file
@@ -287,6 +289,9 @@ static int Activate( vlc_object_t * p_this )
     { // live/broacast
         p_demux->i_data_end = -1;
     }
+
+
+    // go to first packet
     ASF_SeekAbsolute( p_input, p_demux->i_data_begin );
     return( 0 );
 }
@@ -295,7 +300,7 @@ static int Activate( vlc_object_t * p_this )
  * Demux: read packet and send them to decoders 
  *****************************************************************************/
 #define GETVALUE2b( bits, var, def ) \
-    switch( bits ) \
+    switch( (bits)&0x03 ) \
     { \
         case 1: var = p_peek[i_skip]; i_skip++; break; \
         case 2: var = GetWLE( p_peek + i_skip );  i_skip+= 2; break; \
@@ -313,8 +318,9 @@ static int Demux( input_thread_t *p_input )
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
         off_t i_offset;
+        
         i_offset = ASF_TellAbsolute( p_input ) - p_demux->i_data_begin;
-
+        
         if( i_offset  < 0 )
         {
             i_offset = 0;
@@ -324,7 +330,7 @@ static int Demux( input_thread_t *p_input )
         ASF_SeekAbsolute( p_input, p_demux->i_data_begin + i_offset );
 
         p_demux->i_time = 0;
-        for( i = 0; i < 127 ; i++ )
+        for( i = 0; i < 128 ; i++ )
         {
 #define p_stream p_demux->stream[i]
             if( p_stream )
@@ -343,9 +349,6 @@ static int Demux( input_thread_t *p_input )
 
     /* update pcr XXX in mpeg scale so in 90000 unit/s */
     p_demux->i_pcr = p_demux->i_time * 9 / 100;
-    
-//    /* we will read 100ms for each stream so */
-//    p_demux->i_time += 100 * 1000;
 
     for( i = 0; i < 10; i++ ) // parse 10 packets
     {
@@ -409,9 +412,9 @@ static int Demux( input_thread_t *p_input )
         b_packet_multiple_payload = i_packet_flags&0x01;
 
         /* read some value */
-        GETVALUE2b( ( i_packet_flags >> 5 )&0x3, i_packet_length, i_data_packet_min );
-        GETVALUE2b( ( i_packet_flags >> 1 )&0x3, i_packet_sequence, 0 );
-        GETVALUE2b( ( i_packet_flags >> 3 )&0x3, i_packet_padding_length, 0 );
+        GETVALUE2b( i_packet_flags >> 5, i_packet_length, i_data_packet_min );
+        GETVALUE2b( i_packet_flags >> 1, i_packet_sequence, 0 );
+        GETVALUE2b( i_packet_flags >> 3, i_packet_padding_length, 0 );
 
         i_packet_send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
         i_packet_duration  = GetWLE( p_peek + i_skip ); i_skip += 2;
@@ -449,9 +452,9 @@ static int Demux( input_thread_t *p_input )
             i_stream_number = p_peek[i_skip] & 0x7f; 
             i_skip++;
             
-            GETVALUE2b( ( i_packet_property >> 4 )&0x03, i_media_object_number, 0 );
-            GETVALUE2b( ( i_packet_property >> 2 )&0x03, i_tmp, 0 );
-            GETVALUE2b( i_packet_property&0x03, i_replicated_data_length, 0 );
+            GETVALUE2b( i_packet_property >> 4, i_media_object_number, 0 );
+            GETVALUE2b( i_packet_property >> 2, i_tmp, 0 );
+            GETVALUE2b( i_packet_property, i_replicated_data_length, 0 );
             
             if( i_replicated_data_length > 1 ) // should be at least 8 bytes
             {
@@ -490,6 +493,7 @@ static int Demux( input_thread_t *p_input )
                 i_payload_data_length = i_packet_length - i_packet_padding_length - i_skip;
             }
             
+#if 0
              msg_Dbg( p_input, 
                       "payload(%d/%d) stream_number:%d media_object_number:%d media_object_offset:%d replicated_data_length:%d payload_data_length %d",
                       i_payload + 1, 
@@ -499,7 +503,7 @@ static int Demux( input_thread_t *p_input )
                       i_media_object_offset, 
                       i_replicated_data_length, 
                       i_payload_data_length );
-           
+#endif
 
             if( !( p_stream = p_demux->stream[i_stream_number] ) )
             {
@@ -515,7 +519,10 @@ static int Demux( input_thread_t *p_input )
             }
 
 
-            for( i_payload_data_pos = 0; i_payload_data_pos < i_payload_data_length; i_payload_data_pos += i_sub_payload_data_length )
+            for( i_payload_data_pos = 0; 
+                 i_payload_data_pos < i_payload_data_length && 
+                        i_packet_size_left > 0; 
+                 i_payload_data_pos += i_sub_payload_data_length )
             {
                 data_packet_t  *p_data;
                 int i_read;
@@ -530,10 +537,9 @@ static int Demux( input_thread_t *p_input )
                     i_sub_payload_data_length = i_payload_data_length;
                 }
 
-
-                if( p_stream->p_pes && i_media_object_offset == 0 ) // I don't use i_media_object_number, sould I ?
-                {
-                    // send complete packet to decoder
+                /* FIXME I don't use i_media_object_number, sould I ? */
+                if( p_stream->p_pes && i_media_object_offset == 0 )                 {
+                    /* send complete packet to decoder */
                     if( p_stream->p_pes->i_pes_size > 0 )
                     {
                         input_DecodePES( p_stream->p_es->p_decoder_fifo, p_stream->p_pes );
@@ -543,7 +549,6 @@ static int Demux( input_thread_t *p_input )
 
                 if( !p_stream->p_pes )  // add a new PES
                 {
-                    mtime_t i_date;
                     p_stream->i_time = ( (mtime_t)i_pts + i_payload * (mtime_t)i_pts_delta );
                     
                     p_stream->p_pes = input_NewPES( p_input->p_method_data );
@@ -581,35 +586,26 @@ static int Demux( input_thread_t *p_input )
                 p_stream->p_pes->i_nb_data++;
 
                 i_skip = 0;
-                if( i_packet_size_left <= 0 )
+                if( i_packet_size_left > 0 )
                 {
-                    break;
+                    if( input_Peek( p_input, &p_peek, i_packet_size_left ) < i_packet_size_left )
+                    {
+                        // EOF ?
+                        msg_Warn( p_input, "cannot peek, EOF ?" );
+                        return( 0 );
+                    }
                 }
-                if( input_Peek( p_input, &p_peek, i_packet_size_left ) < i_packet_size_left )
-                {
-                    // EOF ?
-                    msg_Err( p_input, "cannot peek, EOF ?" );
-                    return( 0 );
-                }
-
-
-            }
-            if( i_packet_size_left <= 0 )
-            {
-                break;
             }
         }
         
-loop_ok:
         if( i_packet_size_left > 0 )
         {
             if( !ASF_SkipBytes( p_input, i_packet_size_left ) )
             {
-                msg_Err( p_input, "cannot skip data, EOF ?" );
+                msg_Warn( p_input, "cannot skip data, EOF ?" );
                 return( 0 );
             }
         }
-
 
         continue;
 
@@ -622,11 +618,10 @@ loop_error_recovery:
         }
         ASF_SkipBytes( p_input, i_data_packet_min );
 
-        continue;
     }   // loop over packet
     
     p_demux->i_time = 0;
-    for( i = 0; i < 127 ; i++ )
+    for( i = 0; i < 128 ; i++ )
     {
 #define p_stream p_demux->stream[i]
         if( p_stream && p_stream->p_es && p_stream->p_es->p_decoder_fifo )
@@ -649,9 +644,23 @@ static void Deactivate( vlc_object_t * p_this )
    
     input_thread_t *  p_input = (input_thread_t *)p_this;
     demux_sys_t *p_demux = p_input->p_demux_data;
+    int i_stream;
     
     msg_Dbg( p_input, "Freeing all memory" );
     ASF_FreeObjectRoot( p_input, &p_demux->root );
+    for( i_stream = 0; i_stream < 128; i_stream++ )
+    {
+#define p_stream p_demux->stream[i_stream]
+        if( p_stream )
+        {
+            if( p_stream->p_pes )
+            {
+                input_DeletePES( p_input->p_method_data, p_stream->p_pes );
+            }
+            free( p_stream );
+        }
+#undef p_stream
+    }
     
 #undef FREE
 }

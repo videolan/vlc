@@ -32,6 +32,7 @@ EXTRA_DIST = \
 	demux/Modules.am \
 	demux/aac/Modules.am \
 	demux/avi/Modules.am \
+	demux/asf/Modules.am \
 	demux/mp4/Modules.am \
 	demux/mpeg/Modules.am \
 	demux/util/Modules.am \
