@@ -2,7 +2,7 @@
  * i420_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.c,v 1.6 2004/01/26 16:54:56 titer Exp $
+ * $Id: i420_yuy2.c,v 1.7 2004/01/27 03:22:03 titer Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -165,18 +165,11 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
+#if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
     const int i_source_margin = p_source->p->i_pitch
                                  - p_source->p->i_visible_pitch;
     const int i_dest_margin = p_dest->p->i_pitch
                                - p_dest->p->i_visible_pitch;
-
-#if defined (MODULE_NAME_IS_i420_yuy2_altivec)
-    vector unsigned char u_vec;
-    vector unsigned char v_vec;
-    vector unsigned char uv_vec;
-    vector unsigned char y_vec;
-    int high = 1;
-#endif
 
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
@@ -186,29 +179,6 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
         p_y1 = p_y2;
         p_y2 += p_source->p[Y_PLANE].i_pitch;
 
-#if defined (MODULE_NAME_IS_i420_yuy2_altivec)
-        /* FIXME Thats only works for sizes multiple of 16 */
-        for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
-        {
-            if( high )
-            {
-                u_vec = vec_ld( 0, p_u ); p_u += 16;
-                v_vec = vec_ld( 0, p_v ); p_v += 16;
-                uv_vec = vec_mergeh( u_vec, v_vec );
-            }
-            else
-            {
-                uv_vec = vec_mergel( u_vec, v_vec );
-            }
-            y_vec = vec_ld( 0, p_y1 ); p_y1 += 16;
-            vec_st( vec_mergeh( y_vec, uv_vec ), 0, p_line1 ); p_line1 += 16;
-            vec_st( vec_mergel( y_vec, uv_vec ), 0, p_line1 ); p_line1 += 16;
-            y_vec = vec_ld( 0, p_y2 ); p_y2 += 16;
-            vec_st( vec_mergeh( y_vec, uv_vec ), 0, p_line2 ); p_line2 += 16;
-            vec_st( vec_mergel( y_vec, uv_vec ), 0, p_line2 ); p_line2 += 16;
-            high = !high;
-        }
-#else
         for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
         {
 #if defined (MODULE_NAME_IS_i420_yuy2)
@@ -220,13 +190,86 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
             MMX_CALL( MMX_YUV420_YUYV );
 #endif
         }
-#endif
 
         p_y1 += i_source_margin;
         p_y2 += i_source_margin;
         p_line1 += i_dest_margin;
         p_line2 += i_dest_margin;
     }
+#else
+#define VEC_NEXT_LINES( ) \
+    p_line1  = p_line2; \
+    p_line2 += p_dest->p->i_pitch; \
+    p_y1     = p_y2; \
+    p_y2    += p_source->p[Y_PLANE].i_pitch;
+
+#define VEC_LOAD_UV( ) \
+    u_vec = vec_ld( 0, p_u ); p_u += 16; \
+    v_vec = vec_ld( 0, p_v ); p_v += 16;
+
+#define VEC_MERGE( a ) \
+    uv_vec = a( u_vec, v_vec ); \
+    y_vec = vec_ld( 0, p_y1 ); p_y1 += 16; \
+    vec_st( vec_mergeh( y_vec, uv_vec ), 0, p_line1 ); p_line1 += 16; \
+    vec_st( vec_mergel( y_vec, uv_vec ), 0, p_line1 ); p_line1 += 16; \
+    y_vec = vec_ld( 0, p_y2 ); p_y2 += 16; \
+    vec_st( vec_mergeh( y_vec, uv_vec ), 0, p_line2 ); p_line2 += 16; \
+    vec_st( vec_mergel( y_vec, uv_vec ), 0, p_line2 ); p_line2 += 16;
+
+    vector unsigned char u_vec;
+    vector unsigned char v_vec;
+    vector unsigned char uv_vec;
+    vector unsigned char y_vec;
+
+    if( !( p_vout->render.i_width % 32 ) )
+    {
+        /* Width is a multiple of 32, we take 2 lines at a time */
+        for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
+        {
+            VEC_NEXT_LINES( );
+            for( i_x = p_vout->render.i_width / 32 ; i_x-- ; )
+            {
+                VEC_LOAD_UV( );
+                VEC_MERGE( vec_mergeh );
+                VEC_MERGE( vec_mergel );
+            }
+        }
+    }
+    else
+    {
+        /* Width is only a multiple of 16, we take 4 lines at a time */
+        for( i_y = p_vout->render.i_height / 4 ; i_y-- ; )
+        {
+            /* Line 1 and 2, pixels 0 to ( width - 16 ) */
+            VEC_NEXT_LINES( );
+            for( i_x = p_vout->render.i_width / 32 ; i_x-- ; )
+            {
+                VEC_LOAD_UV( );
+                VEC_MERGE( vec_mergeh );
+                VEC_MERGE( vec_mergel );
+            }
+
+            /* Line 1 and 2, pixels ( width - 16 ) to ( width ) */
+            VEC_LOAD_UV( );
+            VEC_MERGE( vec_mergeh );
+
+            /* Line 3 and 4, pixels 0 to 16 */
+            VEC_NEXT_LINES( );
+            VEC_MERGE( vec_mergel );
+
+            /* Line 3 and 4, pixels 16 to ( width ) */
+            for( i_x = p_vout->render.i_width / 32 ; i_x-- ; )
+            {
+                VEC_LOAD_UV( );
+                VEC_MERGE( vec_mergeh );
+                VEC_MERGE( vec_mergel );
+            }
+        }
+    }
+#undef VEC_NEXT_LINES
+#undef VEC_LOAD_UV
+#undef VEC_MERGE
+#endif
 }
 
 /*****************************************************************************
