@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.10 2003/11/26 22:12:48 gbazin Exp $
+ * $Id: encoder.c,v 1.11 2003/11/28 10:36:58 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -40,6 +40,7 @@
 #include "ffmpeg.h"
 
 #define AVCODEC_MAX_VIDEO_FRAME_SIZE (3*1024*1024)
+#define HURRY_UP_GUARD (200000)
 
 /*****************************************************************************
  * Local prototypes
@@ -190,6 +191,19 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
         /* Ffmpeg does handle the conversion itself */
         //p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
+
+        if ( p_enc->b_strict_rc )
+        {
+            p_context->rc_max_rate = p_enc->fmt_out.i_bitrate;
+            p_context->rc_buffer_size = p_context->bit_rate / 2;
+            p_context->rc_buffer_aggressivity = 1000.0; /* FIXME */
+        }
+
+        if ( p_enc->b_pre_me )
+        {
+            p_context->pre_me = 1;
+            p_context->me_pre_cmp = FF_CMP_CHROMA;
+        }
     }
     else if( p_enc->fmt_in.i_cat == AUDIO_ES )
     {
@@ -283,6 +297,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     encoder_sys_t *p_sys = p_enc->p_sys;
     AVFrame frame;
     int i_out, i_plane;
+    vlc_bool_t b_hurry_up;
 
     for( i_plane = 0; i_plane < p_pict->i_planes; i_plane++ )
     {
@@ -294,15 +309,39 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     if( p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', 'g', 'v' ) ||
         p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '1', 'v' ) ||
         p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '2', 'v' ) )
+    {
         frame.pts = p_pict->date;
+#if LIBAVCODEC_BUILD >= 4673
+        if ( frame.pts && mdate() + HURRY_UP_GUARD > frame.pts
+              && p_enc->b_hurry_up )
+        {
+            msg_Dbg( p_enc, "hurry up mode" );
+            p_sys->p_context->mb_decision = FF_MB_DECISION_SIMPLE;
+            b_hurry_up = 1;
+        }
+#endif
+    }
     else
+    {
         frame.pts = 0;
+    }
 
     /* Let ffmpeg select the frame type */
     frame.pict_type = 0;
+    frame.interlaced_frame = !p_pict->b_progressive;
+    frame.repeat_pict = p_pict->i_nb_fields;
+    frame.top_field_first = p_pict->b_top_field_first;
 
     i_out = avcodec_encode_video( p_sys->p_context, p_sys->p_buffer_out,
                                   AVCODEC_MAX_VIDEO_FRAME_SIZE, &frame );
+
+#if LIBAVCODEC_BUILD >= 4673
+    if ( b_hurry_up )
+    {
+        p_sys->p_context->mb_decision = p_enc->i_hq;
+    }
+#endif
+
     if( i_out > 0 )
     {
         block_t *p_block = block_New( p_enc, i_out );
