@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_playlist.h,v 1.19 2004/01/05 12:59:43 zorglub Exp $
+ * $Id: vlc_playlist.h,v 1.20 2004/01/06 04:57:34 rocky Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -65,7 +65,7 @@ struct playlist_item_t
     char *     psz_name;       /**< text describing this item */
     char *     psz_uri;        /**< mrl of this item */
     mtime_t    i_duration;     /**< A hint about the duration of this
-                                * item, in miliseconds*/
+                                * item, in milliseconds*/
     int i_categories;          /**< Number of info categories */
     item_info_category_t **pp_categories;
                                /**< Pointer to the first info category */
@@ -154,6 +154,7 @@ VLC_EXPORT( void, playlist_Command, ( playlist_t *, playlist_command_t, int ) );
 
 /* Item functions */
 VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char *, int, int ) );
+VLC_EXPORT( int,  playlist_AddWDuration, ( playlist_t *, const char *, const char *, int, int, mtime_t ) );
 /* For internal use. Do not use this one anymore */
 VLC_EXPORT( int,  playlist_AddItem, ( playlist_t *, playlist_item_t *, int, int ) );
 VLC_EXPORT( int,  playlist_Delete, ( playlist_t *, int ) );

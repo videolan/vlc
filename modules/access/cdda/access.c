@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.20 2004/01/05 13:07:02 zorglub Exp $
+ * $Id: access.c,v 1.21 2004/01/06 04:57:34 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -640,8 +640,8 @@ CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda,
                        int i_pos)
 {
   mtime_t i_duration =
-    (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1])
-    / CDIO_CD_FRAMES_PER_SEC;
+    ((p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1])
+     / CDIO_CD_FRAMES_PER_SEC) * 1000000;
   char *p_author;
   char *p_title;
   char *config_varname = MODULE_STRING "-title-format";
@@ -660,10 +660,9 @@ CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda,
                           psz_mrl, i_track);
 
   dbg_print( INPUT_DBG_META, "mrl: %s, title: %s, duration, %ld, pos %d",
-             psz_mrl, p_title, (long int) i_duration, i_pos );
-  playlist_Add( p_playlist, psz_mrl, p_title, playlist_operation, i_pos );
-
-  /* XXX Set the duration ! */
+             psz_mrl, p_title, (long int) i_duration / 1000000 , i_pos );
+  playlist_AddWDuration( p_playlist, psz_mrl, p_title, playlist_operation, 
+			 i_pos, i_duration );
 
   p_author =
     CDDAFormatStr( p_input, p_cdda,

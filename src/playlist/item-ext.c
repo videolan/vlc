@@ -2,7 +2,7 @@
  * item-ext.c : Exported playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: item-ext.c,v 1.2 2004/01/05 14:42:14 zorglub Exp $
+ * $Id: item-ext.c,v 1.3 2004/01/06 04:57:34 rocky Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -41,10 +41,12 @@
  * \param i_pos the position in the playlist where to add. If this is
  *        PLAYLIST_END the item will be added at the end of the playlist
  *        regardless of it's size
+ * \param i_duration length of the item in milliseconds.
  * \return the position of the new item
 */
-int playlist_Add( playlist_t *p_playlist, const char * psz_uri,
-                     const char *psz_name, int i_mode, int i_pos )
+int playlist_AddWDuration( playlist_t *p_playlist, const char * psz_uri,
+			   const char *psz_name, int i_mode, int i_pos,
+			   mtime_t i_duration )
 {
     playlist_item_t * p_item;
 
@@ -71,7 +73,7 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_uri,
     p_item->b_autodeletion = VLC_FALSE;
     p_item->b_enabled = VLC_TRUE;
     p_item->i_group = PLAYLIST_TYPE_MANUAL;
-    p_item->i_duration = -1;
+    p_item->i_duration = i_duration;
 
     p_item->pp_categories = NULL;
     p_item->i_categories = 0;
@@ -79,6 +81,25 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_uri,
     playlist_CreateItemCategory( p_item, _("General") );
     playlist_CreateItemCategory( p_item, _("Options") );
     return playlist_AddItem( p_playlist, p_item, i_mode, i_pos );
+}
+
+/**
+ * Add a MRL into the playlist.
+ *
+ * \param p_playlist the playlist to add into
+ * \param psz_uri the mrl to add to the playlist
+ * \param psz_name a text giving a name or description of this item
+ * \param i_mode the mode used when adding
+ * \param i_pos the position in the playlist where to add. If this is
+ *        PLAYLIST_END the item will be added at the end of the playlist
+ *        regardless of it's size
+ * \return the position of the new item
+*/
+int playlist_Add( playlist_t *p_playlist, const char * psz_uri,
+                     const char *psz_name, int i_mode, int i_pos )
+{
+  return playlist_AddWDuration ( p_playlist, psz_uri, psz_name, i_mode, i_pos, 
+				 -1 );
 }
 
 /**
