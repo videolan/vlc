@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.4 2001/10/21 06:05:30 tcastley Exp $
+ * $Id: InterfaceWindow.cpp,v 1.5 2001/10/29 11:07:09 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -33,6 +33,7 @@
 #include <malloc.h>
 #include <scsi.h>
 #include <scsiprobe_driver.h>
+#include <fs_info.h>
 
 /* VLC headers */
 extern "C"
@@ -84,6 +85,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
     BMenu *mFile;
     BMenu *mAudio;
     CDMenu *cd_menu;
+    BMenu *mNavigation;
     
     /* Add the file Menu */
     BMenuItem *mItem;
@@ -111,6 +113,19 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
     menu_bar->ResizeToPreferred();
     mAudio->AddItem( new LanguageMenu( "Language", AUDIO_ES, p_intf ) );
     mAudio->AddItem( new LanguageMenu( "Subtitles", SPU_ES, p_intf ) );
+
+    /* Add the Navigation menu */
+    menu_bar->AddItem( mNavigation = new BMenu( "Navigation" ) );
+    menu_bar->ResizeToPreferred();
+    mNavigation->AddItem( new BMenuItem( "Prev Title",
+                                        new BMessage(PREV_TITLE)) );
+    mNavigation->AddItem( new BMenuItem( "Next Title",
+                                        new BMessage(NEXT_TITLE)) );
+    mNavigation->AddItem( new BMenuItem( "Prev Chapter",
+                                        new BMessage(PREV_CHAPTER)) );
+    mNavigation->AddItem( new BMenuItem( "Next Chapter",
+                                        new BMessage(NEXT_CHAPTER)) );
+                                        
 
     ResizeTo(260,50 + menu_bar->Bounds().IntegerHeight()+1);
     controlRect = Bounds();
@@ -403,7 +418,65 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             }
         }
         break;
+    case PREV_TITLE:
+        {
+            input_area_t *  p_area;
+            int             i_id;
 
+            i_id = p_intf->p_input->stream.p_selected_area->i_id - 1;
+
+            /* Disallow area 0 since it is used for video_ts.vob */
+            if( i_id < 0 )
+            {
+                p_area = p_intf->p_input->stream.pp_areas[i_id];
+                input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
+                input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+            }
+            break;
+        }
+    case NEXT_TITLE:
+        {
+            input_area_t *  p_area;
+            int             i_id;
+
+            i_id = p_intf->p_input->stream.p_selected_area->i_id + 1;
+
+            if( i_id < p_intf->p_input->stream.i_area_nb )
+            {
+                p_area = p_intf->p_input->stream.pp_areas[i_id];
+                input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
+                input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+            }
+        }
+        break;
+    case PREV_CHAPTER:
+        {
+            input_area_t *  p_area;
+
+            p_area = p_intf->p_input->stream.p_selected_area;
+
+            if( p_area->i_part > 0 )
+            {
+                p_area->i_part--;
+                input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
+                input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+            }
+        }
+        break;
+    case NEXT_CHAPTER:
+        {
+            input_area_t *  p_area;
+
+            p_area = p_intf->p_input->stream.p_selected_area;
+
+            if( p_area->i_part > 0 )
+            {
+                p_area->i_part++;
+                input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
+                input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+            }
+        }
+        break;
     case B_REFS_RECEIVED:
     case B_SIMPLE_DATA:
         {
@@ -504,90 +577,50 @@ void CDMenu::AttachedToWindow(void)
  *****************************************************************************/
 int CDMenu::GetCD( const char *directory )
 {
-    int i_dev;
-    BDirectory dir;
-    dir.SetTo( directory );
+	BVolumeRoster *volRoster;
+	BVolume       *vol;
+	BDirectory    *dir;
+	int           status;
+	int           mounted;   
+	char          name[B_FILE_NAME_LENGTH]; 
+    fs_info       info;
+	dev_t         dev;
+	
+	volRoster = new BVolumeRoster();
+	vol = new BVolume();
+	dir = new BDirectory();
+	status = volRoster->GetNextVolume(vol);
+	status = vol->GetRootDirectory(dir);
+	while (status ==  B_NO_ERROR)
+	{
+	    mounted = vol->GetName(name);	
+	    if ((mounted == B_OK) && /* Disk is currently Mounted */
+	        (vol->IsReadOnly()) && /* Disk is a readonly medium */
+	        (vol->IsPersistent()) ) /* not a volitile device */
+	    {
+	        dev = vol->Device();
+            fs_stat_dev(dev, &info);
+            BMessage *msg;
+            msg = new BMessage( OPEN_DVD );
+            intf_Msg(name);
+            intf_Msg(info.device_name);
+            msg->AddString( "device", info.device_name );
+            BMenuItem *menu_item;
+            menu_item = new BMenuItem( name, msg );
+            AddItem( menu_item );
+ 	    }
+ 	    vol->Unset();
+	    status = volRoster->GetNextVolume(vol);
+	}
+	
 
-    if( dir.InitCheck() != B_NO_ERROR )
-    {
-        return B_ERROR;
-    }
-
-    dir.Rewind();
-    BEntry entry;
-
-    while( dir.GetNextEntry(&entry) >= 0 )
-    {
-        const char *name;
-        entry_ref e;
-        BPath path;
-
-        if( entry.GetPath(&path) != B_NO_ERROR )
-        {
-            continue;
-        }
-
-        name = path.Path();
-
-        if( entry.GetRef(&e) != B_NO_ERROR )
-        {
-            continue;
-        }
-
-        if( entry.IsDirectory() )
-        {
-            if( strcmp(e.name, "floppy") == 0 )
-            {
-                continue; // ignore floppy (it is not silent)
-            }
-
-            i_dev = GetCD( name );
-
-            if( i_dev >= 0 )
-            {
-                return i_dev;
-            }
-        }
-        else
-        {
-            device_geometry g;
-            status_t m;
-
-            if( strcmp(e.name, "raw") != 0 )
-            {
-                continue; // ignore partitions
-            }
-
-            i_dev = open( name, O_RDONLY );
-
-            if( i_dev < 0 )
-            {
-                continue;
-            }
-
-            if( ioctl(i_dev, B_GET_GEOMETRY, &g, sizeof(g)) >= 0 )
-            {
-                if( g.device_type == B_CD ) //ensure the drive is a CD-ROM
-                {
-                    if( ioctl(i_dev, B_GET_MEDIA_STATUS, &m, sizeof(m)) >= 0 )
-                    {
-                        if( m == B_NO_ERROR ) //ensure media is present
-                        {
-                            BMessage *msg;
-                            msg = new BMessage( OPEN_DVD );
-                            msg->AddString( "device", name );
-                            BMenuItem *menu_item;
-                            menu_item = new BMenuItem( name, msg );
-                            AddItem( menu_item );
-                            continue;
-                        }
-                    }
-                }
-            }
-            close( i_dev );
-        }
-    }
-    return B_ERROR;
+/* The Old way.
+      int i_dev;
+      device_geometry g;
+      status_t m;
+      if( ioctl(i_dev, B_GET_GEOMETRY, &g, sizeof(g)) >= 0 )
+      if( g.device_type == B_CD ) //ensure the drive is a CD-ROM
+*/
 }
 
 /*****************************************************************************
