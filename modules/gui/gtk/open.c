@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.c,v 1.16 2003/12/12 03:01:13 rocky Exp $
+ * $Id: open.c,v 1.17 2003/12/12 18:34:30 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -257,13 +257,13 @@ static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
 			     config_GetInt( p_intf, "vcdx-PBC"  )
 			     ? 'P' : 'E', i );
 	
-    }
 #else
         g_string_append( p_target, "vcd://" );
-	g_string_sprintfa( p_target, "@%d",
-			   gtk_spin_button_get_value_as_int(
+        g_string_sprintfa( p_target, "@%d",
+                           gtk_spin_button_get_value_as_int(
                            GTK_SPIN_BUTTON( lookup_widget(
-			   GTK_WIDGET(button), "disc_title" ) ) ) );
+                           GTK_WIDGET(button), "disc_title" ) ) ) );
+    }
 #endif
 
     else if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
