@@ -35,7 +35,6 @@
 #include "vout.h"
 #include "prefs.h"
 #include "playlist.h"
-#include "info.h"
 #include "controls.h"
 
 /*****************************************************************************

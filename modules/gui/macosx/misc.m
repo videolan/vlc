@@ -1,7 +1,7 @@
 /*****************************************************************************
  * misc.m: code not specific to vlc
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
+ * Copyright (C) 2003-2004 VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -267,3 +267,4 @@ void _drawFrameInRect(NSRect frameRect)
 }
 
 @end
+
