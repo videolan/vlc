@@ -609,8 +609,7 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
             wxU(_("&Undock Ext. GUI") ) );
         if( b_undock ) p_settings_menu->Check( Undock_Event, TRUE );
 #endif
-        p_settings_menu->AppendCheckItem( Bookmarks_Event,
-            wxU(_("&Bookmarks...") ) );
+        p_settings_menu->Append( Bookmarks_Event, wxU(_("&Bookmarks...") ) );
         p_settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")) );
     }
 
