@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.11 2002/12/18 16:27:56 fenrir Exp $
+ * $Id: ts.c,v 1.12 2003/01/07 15:12:48 jobi Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -145,7 +145,8 @@ static int Activate( vlc_object_t * p_this )
 
     if( *p_peek != TS_SYNC_CODE )
     {
-        if( *p_input->psz_demux && !strncmp( p_input->psz_demux, "ts", 3 ) )
+        if( *p_input->psz_demux && ( !strncmp( p_input->psz_demux, "ts", 3 )
+                         || !strncmp( p_input->psz_demux, "ts_dvbpsi", 10 ) ) )
         {
             /* User forced */
             msg_Err( p_input, "this does not look like a TS stream, continuing" );
@@ -743,7 +744,7 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
 
 #elif defined MODULE_NAME_IS_ts_dvbpsi
 /*
- * PSI Decoding using libdvbcss
+ * PSI Decoding using libdvbpsi
  */
 
 /*****************************************************************************
