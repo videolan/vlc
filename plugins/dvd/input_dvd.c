@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.3 2001/02/08 08:08:03 stef Exp $
+ * $Id: input_dvd.c,v 1.4 2001/02/08 11:22:41 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -177,6 +177,7 @@ static void DVDInit( input_thread_t * p_input )
     IfoRead( &(p_method->ifo) );
     intf_Msg( "Ifo: Initialized" );
 
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     /* CSS authentication and keys */
     if( ( p_method->b_encrypted = DVDCheckCSS( p_input ) ) )
     {
@@ -200,6 +201,7 @@ static void DVDInit( input_thread_t * p_input )
         CSSGetKeys( &(p_method->css) );
         intf_Msg( "CSS: Initialized" );
     }
+#endif
 
     /* FIXME: Kludge beginning of vts_01_1.vob */
     i_start = p_method->ifo.p_vts[0].i_pos +
@@ -425,6 +427,7 @@ static int DVDRead( input_thread_t * p_input,
     /* Reads from DVD */
     readv( p_input->i_handle, p_vec, p_method->i_read_once );
 
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     if( p_method->b_encrypted )
     {
         for( i=0 ; i<p_method->i_read_once ; i++ )
@@ -435,6 +438,7 @@ static int DVDRead( input_thread_t * p_input,
             ((u8*)(p_vec[i].iov_base))[0x14] &= 0x8F;
         }
     }
+#endif
 
     /* Update netlist indexes */
     input_NetlistMviovec( p_netlist, p_method->i_read_once );
