@@ -2,7 +2,7 @@
  * asf.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: asf.c,v 1.1 2003/08/24 16:38:38 fenrir Exp $
+ * $Id: asf.c,v 1.2 2003/08/24 22:20:43 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -77,6 +77,8 @@ struct sout_mux_sys_t
     int             i_packet_size;
     int64_t         i_packet_count;
     mtime_t         i_dts_first;
+    mtime_t         i_dts_last;
+    int64_t         i_bitrate;
 
     int             i_track;
     asf_track_t     track[128];
@@ -128,9 +130,11 @@ static int Open( vlc_object_t *p_this )
 
     p_mux->p_sys = p_sys = malloc( sizeof( sout_mux_sys_t ) );
     p_sys->pk = NULL;
-    p_sys->i_pk_used = 0;
-    p_sys->i_pk_frame = 0;
-    p_sys->i_dts_first = -1;
+    p_sys->i_pk_used    = 0;
+    p_sys->i_pk_frame   = 0;
+    p_sys->i_dts_first  = -1;
+    p_sys->i_dts_last   = 0;
+    p_sys->i_bitrate    = 0;
 
     p_sys->b_write_header = VLC_TRUE;
     p_sys->i_track = 1;
@@ -271,8 +275,19 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             bo_addle_u16( &bo, i_blockalign );
             bo_addle_u16( &bo, i_bitspersample );
             bo_addle_u16( &bo, p_input->p_fmt->i_extra_data );
-            bo_add_mem  ( &bo, p_input->p_fmt->p_extra_data,
-                          p_input->p_fmt->i_extra_data );
+            if( p_input->p_fmt->i_extra_data > 0 )
+            {
+                bo_add_mem  ( &bo, p_input->p_fmt->p_extra_data,
+                              p_input->p_fmt->i_extra_data );
+            }
+            if( p_input->p_fmt->i_bitrate > 24000 )
+            {
+                p_sys->i_bitrate += p_input->p_fmt->i_bitrate;
+            }
+            else
+            {
+                p_sys->i_bitrate += 512000;
+            }
             break;
         }
         case VIDEO_ES:
@@ -309,8 +324,13 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             bo_addle_u32( &bo, 0 );
             bo_addle_u32( &bo, 0 );
             bo_addle_u32( &bo, 0 );
-            bo_add_mem  ( &bo, p_input->p_fmt->p_extra_data,
-                          p_input->p_fmt->i_extra_data );
+            if( p_input->p_fmt->i_extra_data > 0 )
+            {
+                bo_add_mem  ( &bo, p_input->p_fmt->p_extra_data,
+                              p_input->p_fmt->i_extra_data );
+            }
+
+            p_sys->i_bitrate += 2000000;
             break;
         }
         default:
@@ -366,6 +386,10 @@ static int Mux      ( sout_mux_t *p_mux )
         if( p_sys->i_dts_first < 0 )
         {
             p_sys->i_dts_first = i_dts;
+        }
+        if( p_sys->i_dts_last < i_dts )
+        {
+            p_sys->i_dts_last = i_dts;
         }
 
         p_input = p_mux->pp_inputs[i_stream];
@@ -571,10 +595,20 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     asf_track_t    *tk;
 
+    mtime_t        i_duration = 0;
     int i_size;
     sout_buffer_t *out;
     bo_t          bo;
     int           i;
+
+    if( p_sys->i_dts_first > 0 )
+    {
+        i_duration = p_sys->i_dts_last - p_sys->i_dts_first;
+        if( i_duration < 0 )
+        {
+            i_duration = 0;
+        }
+    }
 
     /* calculate header size */
     i_size = 30 + 104 + 46;
@@ -600,15 +634,15 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
     bo_add_guid ( &bo, &p_sys->fid );
     bo_addle_u64( &bo, i_size + p_sys->i_packet_count *
                                 p_sys->i_packet_size ); /* file size */
-    bo_addle_u64( &bo, 0 );             /* creation date */
+    bo_addle_u64( &bo, 0 );                 /* creation date */
     bo_addle_u64( &bo, p_sys->i_packet_count );
-    bo_addle_u64( &bo, 0 ) ;            /* play duration */
-    bo_addle_u64( &bo, 0 );             /* send duration */
-    bo_addle_u64( &bo, 10000 );         /* preroll duration */
+    bo_addle_u64( &bo, i_duration * 10 );   /* play duration (100ns) */
+    bo_addle_u64( &bo, i_duration * 10 );   /* send duration (100ns) */
+    bo_addle_u64( &bo, 10000 );             /* preroll duration (ms) */
     bo_addle_u32( &bo, b_broadcast ? 0x01 : 0x00);      /* flags */
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size min */
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size max */
-    bo_addle_u32( &bo, 0 );             /* maxbitrate */
+    bo_addle_u32( &bo, p_sys->i_bitrate );      /* maxbitrate */
 
     /* header extention */
     bo_add_guid ( &bo, &asf_object_header_extention_guid );
@@ -729,6 +763,5 @@ static sout_buffer_t *asf_packet_create( sout_mux_t *p_mux,
 
     return first;
 }
-
 
 
