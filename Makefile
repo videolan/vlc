@@ -40,14 +40,24 @@ CCFLAGS += -D_REENTRANT
 CCFLAGS += -D_GNU_SOURCE
 
 # Optimizations : don't compile debug versions with them
-CCFLAGS += -O3
-CCFLAGS += -ffast-math -funroll-loops -fno-function-cse -fargument-noalias-global
+CCFLAGS += -O6
+CCFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
 #CCFLAGS += -fomit-frame-pointer -s
-#CCFLAGS += -malign-double
-#CCFLAGS += -march=pentiumpro
-#CCFLAGS += -march=pentium
-#CCFLAGS += -mcpu=604e -mmultiple -mhard-float -mstring
 #LCFLAGS += -s
+
+# Platform-specific optimizations
+# Optimizations for x86 familiy :
+CCFLAGS += -malign-double
+CCFLAGS += -march=pentiumpro
+#CCFLAGS += -march=pentium
+
+# MMX support :
+CFLAGS += -DHAVE_MMX
+assembly_obj =                video_decoder_ref/idctmmx.o \
+			video_decoder_ref/yuv12-rgb16.o
+
+#Optimizations for PowerPC :
+#CCFLAGS += -mcpu=604e -mmultiple -mhard-float -mstring
 
 #
 # C compiler flags: dependancies
@@ -194,7 +204,7 @@ FORCE:
 # Real targets
 #
 vlc: $(OBJ)
-	$(CC) $(LCFLAGS) $(CFLAGS) -o $@ $(OBJ)
+	$(CC) $(LCFLAGS) $(CFLAGS) -o $@ $(OBJ) $(assembly_obj)
 
 Documentation/cflow: $(sources)
 	cflow $(FCFLAGS) $(CFLAGS) $(sources) | $(FFILTER) > $@
