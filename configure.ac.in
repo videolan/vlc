@@ -125,8 +125,6 @@ case "x${target_os}" in
         # add ws2_32 for closesocket, select, recv
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"
         CPPFLAGS="${CPPFLAGS_save}"
-        CXXFLAGS_save="${CXXFLAGS_save} -fvtable-thunks";
-        CXXFLAGS="${CXXFLAGS_save}"
         LDFLAGS_vlc="${LDFLAGS_vlc} -lws2_32 -lnetapi32 -mwindows"
         LDFLAGS_ipv4="${LDFLAGS_ipv4} -lws2_32"
         LDFLAGS_ipv6="${LDFLAGS_ipv6} -lws2_32"
@@ -192,17 +190,37 @@ then
         CFLAGS_mingw32_special="-fnative-struct"
     fi
 
-    CFLAGS_save="${CFLAGS_save} ${CFLAGS_mingw32_special}"; CFLAGS="${CFLAGS_save}"
+    CFLAGS_save="${CFLAGS_save} ${CFLAGS_mingw32_special}";
+    CXXFLAGS_save="${CXXFLAGS_save} ${CFLAGS_mingw32_special}";
+    CFLAGS="${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
+fi
+
+dnl Check for fvtable-thunks support for mingw32
+if test x$SYS = xmingw32
+then
+AC_LANG_PUSH(C++)
+    AC_CACHE_CHECK([if \$CXX accepts -fvtable-thunks],
+        [ac_cv_cxx_fvtable_thunks],
+        [CXXFLAGS="${CXXFLAGS_save} -Wall -Werror -fvtable-thunks"
+         AC_TRY_COMPILE([],,ac_cv_cxx_fvtable_thunks=yes,
+                        ac_cv_cxx_fvtable_thunks=no)])
+    if test x"$ac_cv_cxx_fvtable_thunks" = x"yes"; then
+        CXXFLAGS_mingw32_special="-fvtable-thunks"
+    fi
+
+    CXXFLAGS_save="${CXXFLAGS_save} ${CXXFLAGS_mingw32_special}"
+    CXXFLAGS="${CXXFLAGS_save}"
+AC_LANG_POP(C++)
 fi
 
 dnl Flags for plugin compilation
 case "x${SYS}" in
   xmingw32|xcygwin)
     CFLAGS_pics="${CFLAGS_pics} ${CFLAGS_mingw32_special}"
-    CXXFLAGS_pics="${CXXFLAGS_pics} ${CFLAGS_mingw32_special}"
+    CXXFLAGS_pics="${CXXFLAGS_pics} ${CFLAGS_mingw32_special} ${CXXFLAGS_mingw32_special}"
     OBJCFLAGS_pics="${OBJCFLAGS_pics} ${CFLAGS_mingw32_special}"
     CFLAGS_plugins="${CFLAGS_plugins} ${CFLAGS_mingw32_special}"
-    CXXFLAGS_plugins="${CXXFLAGS_plugins} ${CFLAGS_mingw32_special}"
+    CXXFLAGS_plugins="${CXXFLAGS_plugins} ${CFLAGS_mingw32_special} ${CXXFLAGS_mingw32_special}"
     OBJCFLAGS_plugins="${OBJCFLAGS_plugins} ${CFLAGS_mingw32_special}"
     ;;
   x*)
@@ -2482,7 +2500,9 @@ AC_SUBST(LDFLAGS)
 
 AC_SUBST(CFLAGS_vlc)
 AC_SUBST(CFLAGS_pics)
+AC_SUBST(CXXFLAGS_pics)
 AC_SUBST(CFLAGS_plugins)
+AC_SUBST(CXXFLAGS_plugins)
 AC_SUBST(CFLAGS_builtins)
 AC_SUBST(CPPFLAGS_mozilla)
 

@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.2 2002/11/20 14:24:00 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.3 2002/11/20 15:58:15 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -36,8 +36,8 @@
 #undef _
 
 #ifdef WIN32                                                 /* mingw32 hack */
-#undef Yield()
-#undef CreateDialog()
+#undef Yield
+#undef CreateDialog
 #endif
 
 #include <wx/wxprec.h>
