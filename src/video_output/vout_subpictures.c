@@ -67,8 +67,6 @@ void vout_InitSPU( vout_thread_t *p_vout )
         p_vout->i_crop_width = p_vout->i_crop_height = 0;
     p_vout->b_force_alpha = VLC_FALSE;
     p_vout->b_force_crop = VLC_FALSE;
-
-    vout_AttachSPU( p_vout, VLC_TRUE );
 }
 
 /**
@@ -108,7 +106,7 @@ void vout_DestroySPU( vout_thread_t *p_vout )
         vlc_object_destroy( p_vout->p_text );
     }
 
-    vout_AttachSPU( p_vout, VLC_FALSE );
+    vout_AttachSPU( p_vout, VLC_OBJECT(p_vout), VLC_FALSE );
 }
 
 /**
@@ -117,11 +115,12 @@ void vout_DestroySPU( vout_thread_t *p_vout )
  * \param p_vout the vout in which to destroy the subpicture unit
  * \param b_attach to select attach or detach
  */
-void vout_AttachSPU( vout_thread_t *p_vout, vlc_bool_t b_attach )
+void vout_AttachSPU( vout_thread_t *p_vout, vlc_object_t *p_this,
+                     vlc_bool_t b_attach )
 {
     vlc_object_t *p_input;
 
-    p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
     if( !p_input ) return;
 
     if( b_attach )

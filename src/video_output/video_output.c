@@ -99,7 +99,7 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
 
             if( p_playlist )
             {
-                vout_AttachSPU( p_vout, VLC_FALSE );
+                vout_AttachSPU( p_vout, p_this, VLC_FALSE );
                 vlc_object_detach( p_vout );
                 vlc_object_attach( p_vout, p_playlist );
 
@@ -194,8 +194,8 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
         {
             /* This video output is cool! Hijack it. */
             vlc_object_detach( p_vout );
+            vout_AttachSPU( p_vout, p_this, VLC_TRUE );
             vlc_object_attach( p_vout, p_this );
-            vout_AttachSPU( p_vout, VLC_TRUE );
             vlc_object_release( p_vout );
         }
     }
@@ -304,6 +304,10 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     var_Create( p_vout, "mouse-moved", VLC_VAR_BOOL );
     var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
 
+    /* Initialize subpicture unit */
+    vout_InitSPU( p_vout );
+    vout_AttachSPU( p_vout, p_parent, VLC_TRUE );
+
     /* Attach the new object now so we can use var inheritance below */
     vlc_object_attach( p_vout, p_parent );
 
@@ -407,9 +411,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
         vlc_object_destroy( p_vout );
         return NULL;
     }
-
-    /* Initialize subpicture unit */
-    vout_InitSPU( p_vout );
 
     /* Create a few object variables for interface interaction */
     var_Create( p_vout, "deinterlace", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
