@@ -1631,7 +1631,6 @@ static void CacheLoad( vlc_object_t *p_this )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
                   "(language changed)" );
-        msg_Warn( p_this, "lang: %s, %s", p_cachelang, p_lang );
         fclose( file );
         return;
     }
