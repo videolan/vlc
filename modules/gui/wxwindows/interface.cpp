@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: interface.cpp,v 1.81 2003/12/31 10:30:44 zorglub Exp $
+ * $Id: interface.cpp,v 1.82 2004/01/03 10:55:07 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -170,7 +170,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU( Extra_Event, Interface::OnExtra)
     EVT_CHECKBOX( Adjust_Event, Interface::OnEnableAdjust)
 
-    EVT_COMBOBOX( Ratio_Event, Interface::OnRatio)
+    EVT_TEXT( Ratio_Event, Interface::OnRatio)
     EVT_CHECKBOX( Visual_Event, Interface::OnEnableVisual)
 
 #if defined( __WXMSW__ ) || defined( __WXMAC__ )
@@ -554,7 +554,6 @@ void Interface::CreateOurExtraPanel()
 
     extra_sizer->Add(adjust_sizer,1,wxBOTTOM,5);
 
-#if 0
     /* Create sizer to surround the other controls */
     wxBoxSizer *other_sizer = new wxBoxSizer( wxVERTICAL );
 
@@ -588,6 +587,7 @@ void Interface::CreateOurExtraPanel()
     video_sizer->Add( ratio_sizer  , 0 , wxALL , 0 );
     video_sizer->Layout();
 
+#if 0
     wxBoxSizer *visual_sizer = new wxBoxSizer( wxHORIZONTAL );
 
     wxCheckBox *visual_checkbox = new wxCheckBox( extra_frame, Visual_Event,
@@ -606,12 +606,12 @@ void Interface::CreateOurExtraPanel()
     audio_sizer->Add( visual_sizer, 0, wxALL, 0);
     audio_sizer->Layout();
 
-    other_sizer->Add( video_sizer, 0, wxALL | wxEXPAND , 0);
     other_sizer->Add( audio_sizer , 0 , wxALL | wxEXPAND , 0 );
+#endif
+    other_sizer->Add( video_sizer, 0, wxALL | wxEXPAND , 0);
     other_sizer->Layout();
 
     extra_sizer->Add(other_sizer,0,wxBOTTOM,5);
-#endif
 
     extra_frame->SetSizer( extra_sizer );
 
