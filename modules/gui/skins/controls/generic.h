@@ -2,7 +2,7 @@
  * generic.h: Generic control, parent of the others
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic.h,v 1.4 2003/04/28 12:25:34 asmax Exp $
+ * $Id: generic.h,v 1.5 2003/05/31 23:23:59 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -46,15 +46,23 @@ class GenericControl               // This is the generic control class
 {
     protected:
         SkinWindow * ParentWindow;
+        intf_thread_t *p_intf;
         bool     Visible;
         string   ID;
         string   Help;
-        intf_thread_t *p_intf;
+        int Left;               // Left offset of the control
+        int Top;                // Top offset of the control
+        int Width;              // Width of the control
+        int Height;             // Height of the control
+        int State;              // Used to special state of the control
+                                // (for button, sets whether down or up)
+        Bitmap **Img;           // Array of bitmap used to draw control
 
     private:
     public:
         // Constructor
-        GenericControl( string id, bool visible, string help, SkinWindow *Parent );
+        GenericControl( string id, bool visible, string help,
+                        SkinWindow *Parent );
 
         // Destructor
         virtual ~GenericControl();
@@ -87,19 +95,19 @@ class GenericControl               // This is the generic control class
 
         // Create a region from a bitmap with transcolor as empty region
         SkinRegion *CreateRegionFromBmp( Bitmap *bmp, int MoveX, int MoveY );
-        int Left;               // Left offset of the control
-        int Top;                // Top offset of the control
-        int Width;              // Width of the control
-        int Height;             // Height of the control
-        int State;              // Used to special state of the control
-                                // (for button, sets whether down or up)
-        Bitmap **Img;           // Array of bitmap used to draw control
 
         // Enabling control
         virtual void Enable( Event *event, bool enabled );
 
-        // Found if ID matches
-        bool IsID( string id );
+        // Self explanatory
+        bool IsVisible()    { return Visible; }
+
+        // Getters
+        string GetId()      { return ID; }
+        int GetLeft()       { return Left; }
+        int GetTop()        { return Top; }
+        int GetWidth()      { return Width; }
+        int GetHeight()     { return Height; }
 };
 //---------------------------------------------------------------------------
 

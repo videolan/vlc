@@ -2,7 +2,7 @@
  * playlist.h: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.h,v 1.5 2003/04/28 12:25:34 asmax Exp $
+ * $Id: playlist.h,v 1.6 2003/05/31 23:23:59 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -47,8 +47,8 @@ class ControlPlayList : public GenericControl
 {
     private:
         Event      *UpdateEvent;
-        SkinFont       *TextFont;
-        SkinFont       *PlayFont;
+        SkinFont   *TextFont;
+        SkinFont   *PlayFont;
         string      FontName;
         string      PlayFontName;
         bool        Enabled;

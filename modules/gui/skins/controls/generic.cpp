@@ -2,7 +2,7 @@
  * generic.cpp: Generic control, parent of the others
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic.cpp,v 1.6 2003/04/28 12:25:34 asmax Exp $
+ * $Id: generic.cpp,v 1.7 2003/05/31 23:23:59 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -102,18 +102,6 @@ bool GenericControl::GenericProcessEvent( Event *evt )
             return ProcessEvent( evt );
     }
 
-}
-//---------------------------------------------------------------------------
-bool GenericControl::IsID( string id )
-{
-    if( ID == "none" || ID != id )
-    {
-        return false;
-    }
-    else
-    {
-        return true;
-    }
 }
 //---------------------------------------------------------------------------
 void GenericControl::Init()

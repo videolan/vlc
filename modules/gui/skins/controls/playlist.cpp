@@ -2,7 +2,7 @@
  * playlist.cpp: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.10 2003/04/28 12:25:34 asmax Exp $
+ * $Id: playlist.cpp,v 1.11 2003/05/31 23:23:59 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -170,10 +170,10 @@ void ControlPlayList::Init()
     delete[] y;
 
     // Get size of control
-    Left   = Slider->Left;
-    Top    = Slider->Top;
-    Width  = Slider->Left + Slider->Width;
-    Height = Slider->Top  + Slider->Height;
+    Left   = Slider->GetLeft();
+    Top    = Slider->GetTop();
+    Width  = Slider->GetLeft() + Slider->GetWidth();
+    Height = Slider->GetTop()  + Slider->GetHeight();
     if( TextLeft < Left )
         Left = TextLeft;
     if( TextTop  < Top  )

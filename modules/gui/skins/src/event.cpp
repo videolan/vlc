@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.15 2003/05/05 16:29:57 gbazin Exp $
+ * $Id: event.cpp,v 1.16 2003/05/31 23:23:59 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -176,7 +176,7 @@ unsigned int Event::GetMessageType( string Desc )
     else if( Desc == "VLC_NET_ADDUDP" )
         return VLC_NET_ADDUDP;
 
-    // Window event
+    // Window events
     else if( Desc == "WINDOW_MOVE" )
         return WINDOW_MOVE;
     else if( Desc == "WINDOW_OPEN" )
@@ -190,7 +190,7 @@ unsigned int Event::GetMessageType( string Desc )
     else if( Desc == "WINDOW_FADE" )
         return WINDOW_FADE;
 
-    // Control event
+    // Control events
     else if( Desc == "CTRL_ENABLED" )
         return CTRL_ENABLED;
     else if( Desc == "CTRL_VISIBLE" )
@@ -203,7 +203,7 @@ unsigned int Event::GetMessageType( string Desc )
         return CTRL_SET_SLIDER;
 
 
-    // Control event by ID
+    // Control events by ID
     else if( Desc == "CTRL_ID_VISIBLE" )
         return CTRL_ID_VISIBLE;
     else if( Desc == "CTRL_ID_ENABLED" )
@@ -347,7 +347,7 @@ GenericControl * Event::FindControl( string id )
     {
         for( i = 0; i < (*win)->ControlList.size(); i++ )
         {
-            if( (*win)->ControlList[i]->IsID( id ) )
+            if( (*win)->ControlList[i]->GetId() == id )
                 return (*win)->ControlList[i];
         }
     }

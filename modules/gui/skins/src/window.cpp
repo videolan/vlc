@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.24 2003/05/26 02:09:27 gbazin Exp $
+ * $Id: window.cpp,v 1.25 2003/05/31 23:23:59 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -294,8 +294,8 @@ void SkinWindow::RefreshImage( int x, int y, int w, int h )
 //    Graphics *Buffer = (Graphics *)new OSGraphics( w, h, this );
 
     // Draw every control
-        for( i = 0; i < ControlList.size(); i++ )
-            ControlList[i]->Draw( x, y, w, h, Buffer );
+    for( i = 0; i < ControlList.size(); i++ )
+        ControlList[i]->Draw( x, y, w, h, Buffer );
 
     // Copy buffer in Image
     Image->CopyFrom( x, y, w, h, Buffer, 0, 0, SRC_COPY );
@@ -317,7 +317,6 @@ void SkinWindow::Refresh( int x, int y, int w, int h )
 
     // And copy buffer to window
     RefreshFromImage( x, y, w, h );
-
 }
 //---------------------------------------------------------------------------
 void SkinWindow::RefreshAll()
@@ -327,16 +326,17 @@ void SkinWindow::RefreshAll()
 //---------------------------------------------------------------------------
 void SkinWindow::MouseDown( int x, int y, int button )
 {
-
     // Checking event in controls
-    for( int i = ControlList.size() - 1; i >= 0 ; i-- )
+    for( int i = ControlList.size() - 1; i >= 0; i-- )
     {
-        if( ControlList[i]->MouseDown( x, y, button ) )
+        if( ControlList[i]->IsVisible() &&
+            ControlList[i]->MouseDown( x, y, button ) )
         {
-            return;
+            msg_Dbg( p_intf, "Mouse down (ID=%s)",
+                     ControlList[i]->GetId().c_str() );
+            break;
         }
     }
-
 }
 //---------------------------------------------------------------------------
 void SkinWindow::MouseMove( int x, int y, int button  )
@@ -350,20 +350,22 @@ void SkinWindow::MouseMove( int x, int y, int button  )
     }
 
     // Checking event in controls
-    for( i = ControlList.size() - 1; i >= 0 ; i-- )
+    for( i = ControlList.size() - 1; i >= 0; i-- )
     {
-        ControlList[i]->MouseMove( x, y, button );
+        if( ControlList[i]->IsVisible() &&
+            ControlList[i]->MouseMove( x, y, button ) )
+        {
+            break;
+        }
     }
 
     // Checking help text
-    for( i = ControlList.size() - 1; i >= 0 ; i-- )
+    for( i = ControlList.size() - 1; i >= 0; i-- )
     {
-        if( ControlList[i]->MouseOver( x, y ) )
+        if( ControlList[i]->IsVisible() && ControlList[i]->MouseOver( x, y ) )
         {
-            if( ControlList[i]->SendNewHelpText() )
-            {
-                break;
-            }
+            ControlList[i]->SendNewHelpText();
+            break;
         }
     }
 
@@ -375,10 +377,13 @@ void SkinWindow::MouseMove( int x, int y, int button  )
     }
 
     // Checking for change in Tool Tip
-    for( i = ControlList.size() - 1; i >= 0 ; i-- )
+    for( i = ControlList.size() - 1; i >= 0; i-- )
     {
-        if( ControlList[i]->ToolTipTest( x, y ) )
+        if( ControlList[i]->IsVisible() &&
+            ControlList[i]->ToolTipTest( x, y ) )
+        {
             break;
+        }
     }
 
     // If no change, delete tooltip text
@@ -403,11 +408,14 @@ void SkinWindow::MouseUp( int x, int y, int button )
     }
 
     // Checking event in controls
-    for( i = ControlList.size() - 1; i >= 0 ; i-- )
+    for( i = ControlList.size() - 1; i >= 0; i-- )
     {
-        if( ControlList[i]->MouseUp( x, y, button ) )
+        if( ControlList[i]->IsVisible() &&
+            ControlList[i]->MouseUp( x, y, button ) )
         {
-            return;
+            msg_Dbg( p_intf, "Mouse up (ID=%s)",
+                     ControlList[i]->GetId().c_str() );
+            break;
         }
     }
 }
@@ -417,21 +425,26 @@ void SkinWindow::MouseDblClick( int x, int y, int button )
     int i;
 
     // Checking event in controls
-    for( i = ControlList.size() - 1; i >= 0 ; i-- )
+    for( i = ControlList.size() - 1; i >= 0; i-- )
     {
-        if( ControlList[i]->MouseDblClick( x, y, button ) )
-            return;
+        if( ControlList[i]->IsVisible() &&
+            ControlList[i]->MouseDblClick( x, y, button ) )
+        {
+            msg_Dbg( p_intf, "Double click (ID=%s)",
+                     ControlList[i]->GetId().c_str() );
+        }
     }
 }
 //---------------------------------------------------------------------------
 void SkinWindow::MouseScroll( int x, int y, int direction )
 {
     // Checking event in controls
-    for( int i = ControlList.size() - 1; i >= 0 ; i-- )
+    for( int i = ControlList.size() - 1; i >= 0; i-- )
     {
-        if( ControlList[i]->MouseScroll( x, y, direction ) )
+        if( ControlList[i]->IsVisible() &&
+            ControlList[i]->MouseScroll( x, y, direction ) )
         {
-            return;
+            break;
         }
     }
 }
@@ -462,10 +475,10 @@ void SkinWindow::ReSize()
     {
 #define min(a,b) ((a)<(b))?(a):(b)
 #define max(a,b) ((a)>(b))?(a):(b)
-        w    = max( w,    ControlList[i]->Left + ControlList[i]->Width );
-        h    = max( h,    ControlList[i]->Top + ControlList[i]->Height );
-        MinX = min( MinX, ControlList[i]->Left );
-        MinY = min( MinY, ControlList[i]->Top );
+        w = max( w, ControlList[i]->GetLeft() + ControlList[i]->GetWidth() );
+        h = max( h, ControlList[i]->GetTop() + ControlList[i]->GetHeight() );
+        MinX = min( MinX, ControlList[i]->GetLeft() );
+        MinY = min( MinY, ControlList[i]->GetTop() );
 #undef max
 #undef min
     }

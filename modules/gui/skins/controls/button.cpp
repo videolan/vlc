@@ -2,7 +2,7 @@
  * button.cpp: Button control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: button.cpp,v 1.13 2003/05/26 02:09:27 gbazin Exp $
+ * $Id: button.cpp,v 1.14 2003/05/31 23:23:59 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -52,7 +52,7 @@ ControlButton::ControlButton(
     // General
     Left            = x;
     Top             = y;
-    State           = 1;                   // 1 = up - 0 = down
+    State           = 1;                   // 1=up, 0=down
     Selected        = false;
     Enabled         = true;
     CursorIn        = false;
@@ -135,6 +135,9 @@ void ControlButton::Draw( int x, int y, int w, int h, Graphics *dest )
 bool ControlButton::MouseUp( int x, int y, int button )
 {
     // If hit in the button
+    // XXX: we suppose here that the expected behaviour is to have the MouseUp
+    // event above the "up" image, and not above the "down" one. This can give
+    // strange results when the "up" and "down" images have different sizes...
     if( Img[1]->Hit( x - Left, y - Top ) )
     {
         if( !Enabled )
@@ -180,7 +183,6 @@ bool ControlButton::MouseMove( int x, int y, int button )
     if( !Enabled )
         return false;
 
-
     if( MouseOver( x, y ) && !CursorIn )
     {
         if( button == 1 && Selected )
@@ -197,9 +199,8 @@ bool ControlButton::MouseMove( int x, int y, int button )
         CursorIn = true;
         return true;
     }
-    else if( !MouseOver( x, y ) & CursorIn )
+    else if( !MouseOver( x, y ) && CursorIn )
     {
-
         if( button == 1 && Selected )
         {
             State = 1;
