@@ -2,7 +2,6 @@ vlc (0.5.3-1) unstable; urgency=low
 
   * New upstream release.
   * Fixed a clock skew issue in debian/rules.
-  * We now remove spurious woody build files in the clean rule.
 
  -- Samuel Hocevar <sam@zoy.org>  Tue,  8 Apr 2003 15:20:20 +0100
 

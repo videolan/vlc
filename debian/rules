@@ -126,9 +126,6 @@ clean:
 	# Remove spurious autotools stuff
 	rm -f config.log confdefs.h
 
-	# Remove spurious Debian files
-	rm -f debian/changelog.woody debian/control.woody debian/rules.woody
-
 	-$(MAKE) distclean
 
 	dh_clean
