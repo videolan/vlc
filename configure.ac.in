@@ -122,7 +122,7 @@ case "x${target_os}" in
         # add ws2_32 for closesocket, select, recv
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"
         CPPFLAGS="${CPPFLAGS_save}"
-        LDFLAGS_vlc="${LDFLAGS_vlc} -lws2_32 -lnetapi32 -mwindows"
+        LDFLAGS_vlc="${LDFLAGS_vlc} -lws2_32 -lnetapi32 -lmmsystem -mwindows"
         LDFLAGS_ipv4="${LDFLAGS_ipv4} -lws2_32"
         LDFLAGS_ipv6="${LDFLAGS_ipv6} -lws2_32"
         LDFLAGS_access_http="${LDFLAGS_access_http} -lws2_32"

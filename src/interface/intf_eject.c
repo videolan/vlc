@@ -2,12 +2,12 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.18 2002/11/13 20:51:05 sam Exp $
+ * $Id: intf_eject.c,v 1.19 2003/03/21 17:14:56 gbazin Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
  *         Jon Lech Johansen <jon-vl@nanocrew.net> for Darwin
- *         Xavier Marchesini <xav@alarue.net> for Win32
+ *         Gildas Bazin <gbazin@netcourrier.com> for Win32
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,30 +68,8 @@
 #endif
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
-#   include <windows.h>
-#   include <stdio.h>
-#   include <winioctl.h>
-#   include <ctype.h>
-#   include <tchar.h>
-
-/* define the structures to eject under Win95/98/Me */
-
-#if !defined (VWIN32_DIOC_DOS_IOCTL)
-#define VWIN32_DIOC_DOS_IOCTL      1
-
-typedef struct _DIOC_REGISTERS {
-    DWORD reg_EBX;
-    DWORD reg_EDX;
-    DWORD reg_ECX;
-    DWORD reg_EAX;
-    DWORD reg_EDI;
-    DWORD reg_ESI;
-    DWORD reg_Flags;
-} DIOC_REGISTERS, *PDIOC_REGISTERS;
-#endif    /* VWIN32_DIOC_DOS_IOCTL */
-
+#   include <mmsystem.h>
 #endif
-
 
 /*****************************************************************************
  * Local prototypes
@@ -159,64 +137,29 @@ int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
     return i_ret;
 
 #elif defined(WIN32)
-    HANDLE h_drive ;
-    TCHAR  psz_drive_id[8] ;
-    DWORD  dw_access_flags = GENERIC_READ ;
-    DWORD  dw_result ;
-    LPTSTR psz_volume_format = TEXT("\\\\.\\%s") ;
-    BYTE   by_drive ;
-    DIOC_REGISTERS regs = {0} ;
-    
-    /* Win2K ejection code */
-    if ( GetVersion() < 0x80000000 )
+    MCI_OPEN_PARMS op;
+    MCI_STATUS_PARMS st;
+    DWORD i_flags;
+    char psz_drive[4];
+
+    memset( &op, 0, sizeof(MCI_OPEN_PARMS) );
+    op.lpstrDeviceType = (LPCSTR)MCI_DEVTYPE_CD_AUDIO;
+
+    strcpy( psz_drive, "X:" );
+    psz_drive[0] = psz_device[0];
+    op.lpstrElementName = psz_drive;
+
+    /* Set the flags for the device type */
+    i_flags = MCI_OPEN_TYPE | MCI_OPEN_TYPE_ID |
+              MCI_OPEN_ELEMENT | MCI_OPEN_SHAREABLE;
+
+    if( !mciSendCommand( 0, MCI_OPEN, i_flags, (unsigned long)&op ) ) 
     {
-        wsprintf(psz_drive_id, psz_volume_format, psz_device) ;
-         
-        msg_Dbg( p_this, "ejecting drive %s", psz_drive_id );
-        
-        /* Create the file handle */ 
-        h_drive = CreateFile(  psz_drive_id, 
-                               dw_access_flags, 
-                               FILE_SHARE_READ | FILE_SHARE_WRITE,
-                               NULL,
-                               OPEN_EXISTING,
-                               0,
-                               NULL );
-
-        if (h_drive == INVALID_HANDLE_VALUE )
-        {
-            msg_Err( p_this, "could not create handle for device %s",
-                             psz_device );
-        }
-
-        i_ret = DeviceIoControl ( h_drive, 
-                                 IOCTL_STORAGE_EJECT_MEDIA,
-                                 NULL, 0,
-                                 NULL, 0, 
-                                 &dw_result, 
-                                 NULL);
-        return (i_ret) ;
-    }
-    else        /* Win95/98/ME */
-    {
-        /* Create the handle to VWIN32 */
-        h_drive = CreateFile ("\\\\.\\vwin32", 0, 0, NULL, 0,
-                              FILE_FLAG_DELETE_ON_CLOSE, NULL ) ;
-        
-        /* Convert logical disk name to DOS-like disk name */
-        by_drive = (toupper (*psz_device) - 'A') + 1;
-
-        /* Let's eject now : Int 21H function 440DH minor code 49h*/
-        regs.reg_EAX = 0x440D ;                        
-        regs.reg_EBX = by_drive ;
-        regs.reg_ECX = MAKEWORD(0x49 , 0x08) ;        // minor code
-
-        i_ret = DeviceIoControl (h_drive, VWIN32_DIOC_DOS_IOCTL,
-                                 &regs, sizeof(regs), &regs, sizeof(regs),
-                                 &dw_result, 0) ;
-
-        CloseHandle (h_drive) ;
-        return (i_ret) ;
+        st.dwItem = MCI_STATUS_READY;
+	/* Eject disc */
+        mciSendCommand( op.wDeviceID, MCI_SET, MCI_SET_DOOR_OPEN, 0 );
+	/* Release access to the device */
+	mciSendCommand( op.wDeviceID, MCI_CLOSE, MCI_WAIT, 0 );
     }
 
 #else   /* WIN32 */
