@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: araw.c,v 1.25 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: araw.c,v 1.26 2003/12/16 16:51:10 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -365,7 +365,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             for( i = 0; i < p_out->i_nb_bytes / 2; i++ )
             {
                 *s++ = p_sys->p_logtos16[*p_block->p_buffer++];
-                p_block->i_buffer++;
+                p_block->i_buffer--;
             }
         }
         else
