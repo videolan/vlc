@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.m,v 1.4 2002/05/19 17:27:39 massiot Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.5 2002/05/19 19:16:40 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -286,8 +286,11 @@ static Intf_VLCWrapper *o_intf = nil;
         o_devices = GetEjectableMediaOfClass(kIOCDMediaClass);
     }
 
-    psz_device = [[o_devices objectAtIndex:0] cString];
-    intf_Eject( psz_device );
+    if ( o_devices != nil && [o_devices count] )
+    { 
+        psz_device = [[o_devices objectAtIndex:0] cString];
+        intf_Eject( psz_device );
+    }
 }
 
 /* playback info */
