@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.46 2001/05/31 01:37:08 sam Exp $
+ * $Id: spu_decoder.c,v 1.47 2001/06/02 01:09:03 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -412,6 +412,7 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                 case SPU_CMD_FORCE_DISPLAY:
 
                     /* 00 (force displaying) */
+                    p_spu->i_start = p_spudec->i_pts + ( i_date * 11000 );
                     b_force_display = 1;
  
                     break;

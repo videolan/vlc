@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.36 2001/05/31 01:37:08 sam Exp $
+ * $Id: netutils.c,v 1.37 2001/06/02 01:09:03 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -262,7 +262,7 @@ int network_ChannelJoin( int i_channel )
     struct timeval      answer_delay;
     int                 i_nbanswer;
     char                i_answer;
-    fd_set              fd;
+    fd_set              fds;
     unsigned int        i_rc;
     char *              psz_channel_server;
 
@@ -369,9 +369,9 @@ int network_ChannelJoin( int i_channel )
      */
     answer_delay.tv_sec  = 5;
     answer_delay.tv_usec = 0;
-    FD_ZERO( &fd );
-    FD_SET( i_socket, &fd );
-    i_nbanswer = select( i_socket + 1, &fd, NULL, NULL, &answer_delay );
+    FD_ZERO( &fds );
+    FD_SET( i_socket, &fds );
+    i_nbanswer = select( i_socket + 1, &fds, NULL, NULL, &answer_delay );
 
     switch( i_nbanswer )
     {

@@ -11,7 +11,7 @@
 # 
 # All possible plugin directories, needed for make clean
 #
-PLUGINS_DIR :=	alsa beos darwin dsp dummy \
+PLUGINS_DIR :=	alsa beos darwin directx dsp dummy \
 		dvd esd fb ggi glide gtk \
 		downmix idct imdct \
 		macosx mga \
@@ -22,8 +22,9 @@ PLUGINS_DIR :=	alsa beos darwin dsp dummy \
 #
 # All possible plugin objects
 #
-PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin dsp/dsp dummy/dummy \
-		dvd/dvd esd/esd fb/fb ggi/ggi glide/glide gtk/gnome gtk/gtk \
+PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin directx/directx \
+		dsp/dsp dummy/dummy dvd/dvd esd/esd fb/fb ggi/ggi \
+		glide/glide gtk/gnome gtk/gtk \
 		downmix/downmix downmix/downmixsse downmix/downmix3dn \
 		idct/idct idct/idctclassic idct/idctmmx idct/idctmmxext \
 		imdct/imdct imdct/imdct3dn imdct/imdctsse \
@@ -133,7 +134,7 @@ endif
 #
 # Generated header
 #
-H_OBJ =		include/modules_builtin.h
+H_OBJ =		src/misc/modules_builtin.h
 
 #
 # Other lists of files
@@ -176,6 +177,7 @@ distclean: clean
 	rm -f **/*.o **/*~ *.log
 	rm -f Makefile.opts
 	rm -f include/defs.h include/config.h include/modules_builtin.h
+	rm -f src/misc/modules_builtin.h
 	rm -f config*status config*cache config*log
 	rm -f gmon.out core build-stamp
 	rm -Rf .dep

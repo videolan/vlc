@@ -68,13 +68,13 @@ CFLAGS="${CFLAGS} -I/usr/local/include"
 dnl Check for pthreads - borrowed from XMMS
 PTHREAD_LIBS=error
 AC_CHECK_LIB(pthread,pthread_attr_init,PTHREAD_LIBS="-lpthread")
-if test "x$PTHREAD_LIBS" = xerror; then
+if test "x${PTHREAD_LIBS}" = xerror; then
   AC_CHECK_LIB(pthreads,pthread_attr_init,PTHREAD_LIBS="-lpthreads")
 fi
-if test "x$PTHREAD_LIBS" = xerror; then
+if test "x${PTHREAD_LIBS}" = xerror; then
   AC_CHECK_LIB(c_r,pthread_attr_init,PTHREAD_LIBS="-lc_r")
 fi
-if test "x$PTHREAD_LIBS" = xerror; then
+if test "x${PTHREAD_LIBS}" = xerror; then
   PTHREAD_LIBS=""
   AC_CHECK_FUNC(pthread_attr_init)
 fi
@@ -396,6 +396,30 @@ AC_ARG_WITH(sdl,
     fi
 
 dnl
+dnl  Windows DirectX module
+dnl
+AC_ARG_WITH(directx,
+  [  --with-directx[=name]   Windows DirectX support (default enabled)],
+  [ if test "x$withval" != "xno";
+    then
+      PLUGINS="${PLUGINS} directx";
+      if test "x$withval" != "xyes";
+      then
+        LIB_DIRECTX="${LIB_DIRECTX} -L"$withval"/lib -lddraw -ldsound"
+        INCLUDE="${INCLUDE} -I"$withval"/include"
+      else
+        AC_CHECK_HEADERS(directx.h, , [echo "Cannot find DirectX headers !"; exit])
+        LIB_DIRECTX="${LIB_DIRECTX} -L/usr/lib -lddraw -ldsound"
+      fi
+    fi ])
+    if test "x$withval" = "x";
+    then
+      AC_CHECK_HEADERS(directx.h,
+      [PLUGINS="${PLUGINS} directx"
+       LIB_DIRECTX="${LIB_DIRECTX} -L/usr/lib -lddraw -ldsound"])
+    fi
+
+dnl
 dnl  Glide module
 dnl
 AC_ARG_WITH(glide,
@@ -562,6 +586,7 @@ AC_SUBST(LIB_NCURSES)
 AC_SUBST(LIB_QT)
 AC_SUBST(LIB_TS)
 AC_SUBST(LIB_SDL)
+AC_SUBST(LIB_DIRECTX)
 AC_SUBST(LIB_X11)
 AC_SUBST(LIB_XVIDEO)
 AC_SUBST(LIB_YUV)

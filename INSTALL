@@ -23,6 +23,13 @@ If you intend to debug stuff, you may want to disable optimizations:
       --enable-mga --enable-gtk --enable-qt --enable-xvideo --enable-alsa \
       --enable-debug
 
+It is also possible to cross-compile for the Win32 platform using mingw32:
+
+   make distclean && CC=i586-mingw32msvc-gcc CFLAGS=-I/usr/i586-mingw32msvc \
+     RANLIB=i586-mingw32msvc-ranlib ./configure --host=i386-mingw32msvc \
+     --target=i386-mingw32msvc --build=i386-linux --disable-dsp \
+     --disable-gtk --disable-x11 --disable-xvideo
+
 
 Building VideoLAN
 =================

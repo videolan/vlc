@@ -2,7 +2,7 @@
  * input_ts.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ts.h,v 1.6 2001/05/31 01:37:08 sam Exp $
+ * $Id: input_ts.h,v 1.7 2001/06/02 01:09:03 sam Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *
@@ -29,6 +29,6 @@
 typedef struct thread_ts_data_s { 
     
     // FILE *                  stream;
-    fd_set s_fdset;
+    fd_set fds;
     
 } thread_ts_data_t;

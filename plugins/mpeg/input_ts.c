@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.24 2001/05/31 03:57:54 sam Exp $
+ * $Id: input_ts.c,v 1.25 2001/06/02 01:09:03 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -143,13 +143,13 @@ static int TSProbe( probedata_t * p_data )
         psz_name += 5;
     }
 
-    if( ( strlen(psz_name) > 3 ) && 
+    if( ( strlen(psz_name) > 3 ) &&
                     !strncasecmp( psz_name+strlen(psz_name)-3, ".ts", 3) )
     {
         /* If it is a ".ts" file it's probably a TS file ... */
         return( 900 );
     }
-    
+
     i_handle = open( psz_name, 0 );
     if( i_handle == -1 )
     {
@@ -182,16 +182,16 @@ static void TSInit( input_thread_t * p_input )
 
     p_input->p_plugin_data = (void *)p_method;
     p_input->p_method_data = NULL;
- 
-    
+
+
     /* Initialize netlist */
-    if( input_NetlistInit( p_input, NB_DATA, NB_PES, TS_PACKET_SIZE, 
+    if( input_NetlistInit( p_input, NB_DATA, NB_PES, TS_PACKET_SIZE,
                 INPUT_READ_ONCE ) )
     {
         intf_ErrMsg( "TS input : Could not initialize netlist" );
         return;
     }
-   
+
     /* Initialize the stream */
     input_InitStream( p_input, sizeof( stream_ts_data_t ) );
 
@@ -204,7 +204,7 @@ static void TSInit( input_thread_t * p_input )
     p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;
     p_stream_data->i_pat_version = PAT_UNINITIALIZED ;
 
-    /* We'll have to catch the PAT in order to continue 
+    /* We'll have to catch the PAT in order to continue
      * Then the input will catch the PMT and then the others ES
      * The PAT es is indepedent of any program. */
     p_pat_es = input_AddES( p_input, NULL,
@@ -214,7 +214,7 @@ static void TSInit( input_thread_t * p_input )
     p_demux_data->i_psi_type = PSI_IS_PAT;
     p_demux_data->p_psi_section = malloc(sizeof(psi_section_t));
     p_demux_data->p_psi_section->b_is_complete = 1;
-    
+
 }
 
 /*****************************************************************************
@@ -247,7 +247,7 @@ void TSFakeOpen( input_thread_t * p_input )
 static void TSEnd( input_thread_t * p_input )
 {
     es_descriptor_t     * p_pat_es;
-    
+
     p_pat_es = input_FindES( p_input, 0x00 );
 
     if( p_pat_es != NULL )
@@ -269,54 +269,53 @@ static int TSRead( input_thread_t * p_input,
     int             i_data;
     struct iovec  * p_iovec;
     struct timeval  s_wait;
-    
+
 
     /* Get iovecs */
     p_iovec = input_NetlistGetiovec( p_input->p_method_data );
-    
+
     if ( p_iovec == NULL )
     {
         return( -1 ); /* empty netlist */
-    } 
+    }
 
     /* Init */
     p_method = ( thread_ts_data_t * )p_input->p_plugin_data;
-   
-    /* Initialize file descriptor set */
-    FD_ZERO( &(p_method->s_fdset) );
-    FD_SET( p_input->i_handle, &(p_method->s_fdset) );
 
-    
+    /* Initialize file descriptor set */
+    FD_ZERO( &(p_method->fds) );
+    FD_SET( p_input->i_handle, &(p_method->fds) );
+
     /* We'll wait 0.5 second if nothing happens */
     s_wait.tv_sec = 0;
     s_wait.tv_usec = 500000;
-    
+
     /* Reset pointer table */
     memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
-    
+
     /* Fill if some data is available */
-    i_data = select( p_input->i_handle + 1, &(p_method->s_fdset), NULL, NULL, 
+    i_data = select( p_input->i_handle + 1, &(p_method->fds), NULL, NULL,
                      &s_wait);
-    
+
     if( i_data == -1 )
     {
         intf_ErrMsg( "input error: TS select error (%s)", strerror(errno) );
         return( -1 );
     }
-    
+
     if( i_data )
     {
         i_read = readv( p_input->i_handle, p_iovec, INPUT_READ_ONCE );
-        
+
         if( i_read == -1 )
         {
             intf_ErrMsg( "input error: TS readv error" );
             return( -1 );
         }
-    
-        input_NetlistMviovec( p_input->p_method_data, 
+
+        input_NetlistMviovec( p_input->p_method_data,
                 (int)(i_read/TS_PACKET_SIZE) , pp_packets );
-    
+
         /* check correct TS header */
         for( i_loop=0; i_loop * TS_PACKET_SIZE < i_read; i_loop++ )
         {
