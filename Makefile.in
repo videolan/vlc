@@ -354,6 +354,9 @@ PLUGIN_IDCTMMX =	plugins/idct/idctmmx.o \
 			plugins/idct/idct_common.o \
 			plugins/idct/idctmmx_asm.o
 
+PLUGIN_IDCTMMXEXT =	plugins/idct/idctmmxext.o \
+			plugins/idct/idct_mmxext.o
+
 PLUGIN_ALSA =	plugins/alsa/alsa.o \
 		plugins/alsa/aout_alsa.o
 
@@ -368,7 +371,9 @@ STD_PLUGIN_OBJ =$(PLUGIN_BEOS) \
 		$(PLUGIN_YUV) \
 		$(PLUGIN_YUVMMX) \
 		$(PLUGIN_IDCT) \
+		$(PLUGIN_IDCTCLASSIC) \
 		$(PLUGIN_IDCTMMX) \
+		$(PLUGIN_IDCTMMXEXT) \
 		$(PLUGIN_SDL) \
 		$(PLUGIN_ALSA) \
 		$(PLUGIN_NULL)
@@ -568,6 +573,9 @@ lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC)
 
 lib/idctmmx.so: $(PLUGIN_IDCTMMX)
 	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+
+lib/idctmmxext.so: $(PLUGIN_IDCTMMXEXT)
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
 lib/null.so: $(PLUGIN_NULL)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
@@ -588,6 +596,9 @@ lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
 
 lib/idctmmx.so: $(PLUGIN_IDCTMMX)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
+
+lib/idctmmxext.so: $(PLUGIN_IDCTMMXEXT)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
 endif
 
