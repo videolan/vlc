@@ -2,7 +2,7 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Samuel Hocevar <sam@zoy.org>
-Build-Depends: debhelper (>=2.2.0), xlibs-dev, libgnome-dev, libggi2-dev, libglide3-dev [i386], libesd0-dev, libsdl1.2-dev, libqt-dev, libasound2-dev
+Build-Depends: debhelper (>=2.2.0), xlibs-dev, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev, libqt-dev, libasound2-dev
 Standards-Version: 3.0.1
 
 Package: vlc
