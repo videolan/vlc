@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.20 2003/05/05 16:09:40 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.21 2003/05/05 16:29:57 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -593,8 +593,6 @@ void VlcProc::ChangeVolume( unsigned int msg, long param )
 //---------------------------------------------------------------------------
 void VlcProc::AddNetworkUDP( int port )
 {
-    config_PutInt( p_intf, "network-channel", VLC_FALSE );
-
     // Build source name
     char *s_port = new char[5];
     sprintf( s_port, "%i", port );
@@ -608,33 +606,6 @@ void VlcProc::AddNetworkUDP( int port )
     p_intf->p_sys->p_theme->EvtBank->Get( "playlist_refresh" )
         ->PostSynchroMessage();
     InterfaceRefresh();
-}
-//---------------------------------------------------------------------------
-void VlcProc::AddNetworkChannelServer( char *server )
-{
-    char *name = new char[MAX_PARAM_SIZE];
-    int  port = 0;
-
-    // Scan the server address
-    int scan = sscanf( server, "%[^:]:%i", name, &port );
-
-    if( scan != 2)
-    {
-        msg_Err( p_intf, "Invalid channel server: %s", server );
-        delete[] name;
-        return;
-    }
-
-    config_PutInt( p_intf, "network-channel", VLC_TRUE );
-    config_PutPsz( p_intf, "channel-server", name );
-    config_PutInt( p_intf, "channel-port", port );
-
-    if( p_intf->p_vlc->p_channel == NULL )
-    {
-        network_ChannelCreate( p_intf );
-    }
-
-    delete[] name;
 }
 //---------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.14 2003/05/05 16:09:40 gbazin Exp $
+ * $Id: event.cpp,v 1.15 2003/05/05 16:29:57 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -239,9 +239,6 @@ void Event::CreateEvent()
     char *para1 = new char[MAX_PARAM_SIZE];
     char *para2 = new char[MAX_PARAM_SIZE];
     char *para3 = new char[MAX_PARAM_SIZE];
-
-    // Buffer to create strings
-    char *buf;
 
     // Scan the event
     int scan = sscanf( EventDesc.c_str(),
