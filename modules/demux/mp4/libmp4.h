@@ -110,6 +110,7 @@
 #define FOURCC_ulaw VLC_FOURCC( 'u', 'l', 'a', 'w' )
 #define FOURCC_Qclp VLC_FOURCC( 'Q', 'c', 'l', 'p' )
 #define FOURCC_samr VLC_FOURCC( 's', 'a', 'm', 'r' )
+#define FOURCC_sawb VLC_FOURCC( 's', 'a', 'w', 'b' )
 #define FOURCC_OggS VLC_FOURCC( 'O', 'g', 'g', 'S' )
 
 #define FOURCC_zlib VLC_FOURCC( 'z', 'l', 'i', 'b' )

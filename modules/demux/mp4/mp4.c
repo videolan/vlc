@@ -1986,8 +1986,7 @@ static uint64_t MP4_TrackGetPos( mp4_track_t *p_track )
     return( i_pos );
 }
 
-static int  MP4_TrackNextSample( demux_t     *p_demux,
-                                 mp4_track_t   *p_track )
+static int  MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track )
 {
 
     if( p_track->fmt.i_cat == AUDIO_ES &&
@@ -1997,7 +1996,11 @@ static int  MP4_TrackNextSample( demux_t     *p_demux,
 
         p_soun = p_track->p_sample->data.p_sample_soun;
 
-        if( p_soun->i_qt_version == 1 )
+        if( p_track->i_sample_size != 1 )
+        {
+            p_track->i_sample += 1;
+        }
+        else if( p_soun->i_qt_version == 1 )
         {
             /* chunk by chunk */
             p_track->i_sample =

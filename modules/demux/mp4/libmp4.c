@@ -2142,6 +2142,7 @@ static struct
     { FOURCC_MAC6,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
     { FOURCC_Qclp,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
     { FOURCC_samr,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_sawb,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
     { FOURCC_OggS,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
 
     { FOURCC_vide,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
