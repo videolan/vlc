@@ -76,7 +76,7 @@ from MSYS (just rename or remove c:\msys\1.0\mingw\bin\make.exe).
 
 http://www.mingw.org/download.shtml
 http://prdownloads.sf.net/mingw/MSYS-1.0.9.exe
-http://prdownloads.sf.net/mingw/MinGW-3.0.0-rc3.exe
+http://prdownloads.sf.net/mingw/MinGW-3.1.0-1.exe
 http://prdownloads.sf.net/mingw/msysDTK-1.0.1.exe
 
 Getting the additional libraries
