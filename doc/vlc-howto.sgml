@@ -3,7 +3,7 @@
 <titlepag>
  <title>VLC HOWTO</title>
  <author>by the Videolan Team<tt><htmlurl url="mailto:videolan-faq@videlan.org" name="videolan-faq@videlan.org"></tt></author>
- <date>v0.0.3, 21 apr 2001</date>
+ <date>v0.0.4, 12 may 2001</date>
 
  <abstract>
   This document describes how to use the vlc (VideoLAN client) to read DVDs and mpeg files and DVDs.
@@ -62,20 +62,21 @@
   </p>
 
   <p>
-   In this HOWTO, we consider you already have a little knowledge about Linux, and you 
-   know how to use a DVD. If not, good howtos can be found on the Linux Documentation
-   Projet.
+   In this HOWTO, we consider you already have a little knowledge about
+   Linux, and you know how to use a DVD. If not, good howtos can be
+   found on the Linux Documentation Projet.
   </p>
  </sect1>
-  
- <sect1>
-  <heading>Legal</heading>
-  <p>
-   Copyright (©) 2001 by the VideoLAN project. This document may be distributed only
-   subject to the terms and conditions set forth in 
-   <htmlurl url="http://metalab.unc.edu/LDP/LDP-COPYRIGHT.html" name="the LDP license">.
-  </p>
- </sect1>
+
+ <sect1> 
+  <heading>Legal</heading> 
+  <p> 
+   Copyright (©) 2001 by the VideoLAN project. This document may be
+   distributed only subject to the terms and conditions set forth in
+   <htmlurl url="http://metalab.unc.edu/LDP/LDP-COPYRIGHT.html" 
+   name="the LDP license">.
+  </p> 
+ </sect1> 
 </sect>
 
 <sect>
@@ -95,8 +96,8 @@
   <sect2>
    <heading>Which package to chose ?</heading>
    <p>
-    There are different packages because vlc has "plugins" which provide features 
-    but also enlarge the executable and require external libs. 
+    There are different packages because vlc has "plugins" which provide 
+    features but also enlarge the executable and require external libs. 
    </p>
    <p>
     SDL is a lib which allows you to have an accelerated video output.
@@ -107,7 +108,8 @@
     the esd-aware vlc.
    </p>
    <p>
-    Generally, when you don't know what a module name is, you don't need/use it :-)
+    Generally, when you don't know what a module name is, you don't 
+    need/use it :-)
    </p>
   </sect2>
   
@@ -202,8 +204,44 @@
     <verb>
      vlc dvd:/dev/dvd
     </verb>
-   On BeOS, the dvd device looks like "/dev/disk/ide/atapi/1/slave/0/raw"
    </sect2>  
+   <sect2>
+    <heading>What is this DVD device you keep talking about</heading>
+    <p>
+     This is a file which is "linked" somehow to your dvd device.
+    </p>
+    <sect3>
+     <heading>Linux users</heading>
+     <p>
+      Usually, you dvd device is /dev/hd? (if you have an ide drive).
+      For instance, if you DVD player is master on the second IDE device,
+      it will be /dev/hdc.
+     </p>
+     <p>
+      It is very useful to create a symlink to this file, called /dev/dvd. 
+      To do this, as root, type (if your dvd device is /dev/hdc for example) :
+      <verb>
+       ln -s /dev/hdc /dev/dvd
+      </verb>
+      Also make sure you have read AND write permission to the device 
+      (otherwise dvd decryption won't work).
+     </p>
+    </sect3>
+    <sect3>
+     <heading>BeOS users</heading>
+     <p>
+       Under BeOS, the dvd device looks like 
+       "/dev/disk/ide/atapi/1/slave/0/raw" for example, if your dvd device is 
+       slave on your first (not sure) ide device.
+     </p>
+    </sect3>
+    <sect3>
+     <heading>Other OS</heading>
+     <p>
+     To do ...
+     </p>
+    </sect3>
+   </sect2>
  </sect1>
  
  <sect1>

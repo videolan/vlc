@@ -3,6 +3,7 @@
 #===================#
 
 HEAD
+  * Ported alsa interface for alsa 0.9beta
   * Fixed a deadlock in spudec.
   * Added SPU cropping.
   * Gnome interface segfault fix.
