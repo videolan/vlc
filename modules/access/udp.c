@@ -2,7 +2,7 @@
  * udp.c: raw UDP & RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.19 2003/03/30 18:14:35 gbazin Exp $
+ * $Id: udp.c,v 1.20 2003/07/23 07:37:34 jpsaman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
@@ -396,7 +396,7 @@ static ssize_t RTPRead( input_thread_t * p_input, byte_t * p_buffer,
      * We first assume that RTP header size is the classic RTP_HEADER_LEN. */
     ssize_t i_ret = Read( p_input, p_tmp_buffer, p_input->i_mtu );
 
-    if ( !i_ret ) return 0;
+    if ( i_ret < 0 ) return 0;
 
     /* Parse the header and make some verifications.
      * See RFC 1889 & RFC 2250. */
@@ -445,7 +445,7 @@ static ssize_t RTPChoose( input_thread_t * p_input, byte_t * p_buffer,
      * We first assume that RTP header size is the classic RTP_HEADER_LEN. */
     ssize_t i_ret = Read( p_input, p_tmp_buffer, p_input->i_mtu );
 
-    if ( !i_ret ) return 0;
+    if ( i_ret < 0 ) return 0;
     
     /* Check that it's not TS. */
     if ( p_tmp_buffer[0] == 0x47 )
