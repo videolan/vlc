@@ -1,8 +1,6 @@
 /*****************************************************************************
- * video_yuv.c: MMX YUV transformation functions
- * Provides functions to perform the YUV conversion. The functions provided here
- * are a complete and portable C implementation, and may be replaced in certain
- * case by optimized functions.
+ * video_yuvmmx.c: MMX YUV transformation functions
+ * Provides functions to perform the YUV conversion.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
@@ -38,20 +36,62 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
+#include "tests.h"
+
+#include "modules.h"
+
 #include "video.h"
 #include "video_output.h"
-#include "video_yuv.h"
+
+#include "video_common.h"
 
 #include "intf_msg.h"
 
+static int     yuv_Probe      ( probedata_t *p_data );
+static int     yuv_Init       ( vout_thread_t *p_vout );
+static int     yuv_Reset      ( vout_thread_t *p_vout );
+static void    yuv_End        ( vout_thread_t *p_vout );
+
+static void    SetYUV         ( vout_thread_t *p_vout );
+
 /*****************************************************************************
- * vout_InitYUV: allocate and initialize translations tables
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+void yuv_getfunctions( function_list_t * p_function_list )
+{
+    p_function_list->pf_probe = yuv_Probe;
+    p_function_list->functions.yuv.pf_init = yuv_Init;
+    p_function_list->functions.yuv.pf_reset = yuv_Reset;
+    p_function_list->functions.yuv.pf_end = yuv_End;
+}
+
+/*****************************************************************************
+ * yuv_Probe: tests probe the audio device and return a score
+ *****************************************************************************
+ * This function tries to open the DSP and returns a score to the plugin
+ * manager so that it can choose the most appropriate one.
+ *****************************************************************************/
+static int yuv_Probe( probedata_t *p_data )
+{
+    /* Test for MMX support in the CPU */
+    if( TestCPU() & CPU_CAPABILITY_MMX )
+    {
+        return( 100 );
+    }
+    else
+    {
+        return( 0 );
+    }
+}
+
+/*****************************************************************************
+ * yuv_Init: allocate and initialize translations tables
  *****************************************************************************
  * This function will allocate memory to store translation tables, depending
  * of the screen depth.
  *****************************************************************************/
-int yuv_MMXInit( vout_thread_t *p_vout )
+static int yuv_Init( vout_thread_t *p_vout )
 {
     size_t      tables_size;                        /* tables size, in bytes */
 
@@ -97,39 +137,33 @@ int yuv_MMXInit( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * yuv_MMXEnd: destroy translations tables
+ * yuv_End: destroy translations tables
  *****************************************************************************
- * Free memory allocated by yuv_MMXCreate.
+ * Free memory allocated by yuv_CCreate.
  *****************************************************************************/
-void yuv_MMXEnd( vout_thread_t *p_vout )
+static void yuv_End( vout_thread_t *p_vout )
 {
-    if( p_vout->i_bytes_per_pixel == 1 )
-    {
-        free( p_vout->yuv.p_base );
-    }
-
+    free( p_vout->yuv.p_base );
     free( p_vout->yuv.p_buffer );
     free( p_vout->yuv.p_offset );
 }
 
 /*****************************************************************************
- * yuv_MMXReset: re-initialize translations tables
+ * yuv_Reset: re-initialize translations tables
  *****************************************************************************
  * This function will initialize the tables allocated by vout_CreateTables and
  * set functions pointers.
  *****************************************************************************/
-int yuv_MMXReset( vout_thread_t *p_vout )
+static int yuv_Reset( vout_thread_t *p_vout )
 {
-    yuv_MMXEnd( p_vout );
-    return( yuv_MMXInit( p_vout ) );
+    yuv_End( p_vout );
+    return( yuv_Init( p_vout ) );
 }
-
-/* following functions are local */
 
 /*****************************************************************************
  * SetYUV: compute tables and set function pointers
-+ *****************************************************************************/
-void SetYUV( vout_thread_t *p_vout )
+ *****************************************************************************/
+static void SetYUV( vout_thread_t *p_vout )
 {
     int         i_index;                                  /* index in tables */
 
@@ -340,11 +374,12 @@ void SetYUV( vout_thread_t *p_vout )
  * SetOffset: build offset array for conversion functions
  *****************************************************************************
  * This function will build an offset array used in later conversion functions.
- * It will also set horizontal and vertical scaling indicators.
+ * It will also set horizontal and vertical scaling indicators. If b_double
+ * is set, the p_offset structure has interleaved Y and U/V offsets.
  *****************************************************************************/
 void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height,
-                boolean_t *pb_h_scaling, int *pi_v_scaling, int *p_offset,
-                boolean_t b_double )
+                boolean_t *pb_h_scaling, int *pi_v_scaling,
+                int *p_offset, boolean_t b_double )
 {
     int i_x;                                    /* x position in destination */
     int i_scale_count;                                     /* modulo counter */

@@ -85,6 +85,13 @@ typedef struct function_list_s
                                          int i_idontcare );
         } idct;
 
+        struct
+        {
+            int  ( * pf_init )         ( struct vout_thread_s * p_vout );
+            int  ( * pf_reset )        ( struct vout_thread_s * p_vout );
+            void ( * pf_end )          ( struct vout_thread_s * p_vout );
+        } yuv;
+
     } functions;
 
 } function_list_t;

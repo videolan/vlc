@@ -1,10 +1,9 @@
 /*****************************************************************************
- * idctmmx.c : MMX IDCT module
+ * yuvmmx.c : Accelerated MMX YUV module for vlc
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmx.c,v 1.3 2001/01/16 02:16:38 sam Exp $
+ * Copyright (C) 2000 VideoLAN
  *
- * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
+ * Authors:
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,49 +20,36 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME idctmmx
+#define MODULE_NAME yuvmmx
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include "defs.h"
 
-#include <stdlib.h>
+#include <stdlib.h>                                      /* malloc(), free() */
 
 #include "config.h"
-#include "common.h"
+#include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
-#include "tests.h"                                              /* TestCPU() */
 
 #include "video.h"
 #include "video_output.h"
 
-#include "video_decoder.h"
-
 #include "modules.h"
 #include "modules_inner.h"
 
-#include "idct.h"
-
 /*****************************************************************************
- * Local prototypes.
+ * Local and extern prototypes.
  *****************************************************************************/
-static void idct_getfunctions( function_list_t * p_function_list );
-
-static int  idct_Probe      ( probedata_t *p_data );
-static void vdec_InitIDCT   ( vdec_thread_t * p_vdec);
-       void vdec_SparseIDCT ( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                              int i_sparse_pos);
-       void vdec_IDCT       ( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                              int i_idontcare );
-
+extern void yuv_getfunctions( function_list_t * p_function_list );
 
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for MMX IDCT module" )
+ADD_WINDOW( "Configuration for MMX YUV module" )
     ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_END
 
@@ -78,11 +64,11 @@ MODULE_CONFIG_END
 int InitModule( module_t * p_module )
 {
     p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "MMX IDCT module";
+    p_module->psz_longname = "MMX YUV module";
     p_module->psz_version = VERSION;
 
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_IDCT;
+                                | MODULE_CAPABILITY_YUV;
 
     return( 0 );
 }
@@ -103,7 +89,7 @@ int ActivateModule( module_t * p_module )
         return( -1 );
     }
 
-    idct_getfunctions( &p_module->p_functions->idct );
+    yuv_getfunctions( &p_module->p_functions->yuv );
 
     p_module->p_config = p_config;
 
@@ -122,52 +108,5 @@ int DeactivateModule( module_t * p_module )
     free( p_module->p_functions );
 
     return( 0 );
-}
-
-/* Following functions are local */
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void idct_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->pf_probe = idct_Probe;
-    p_function_list->functions.idct.pf_init = vdec_InitIDCT;
-    p_function_list->functions.idct.pf_sparse_idct = vdec_SparseIDCT;
-    p_function_list->functions.idct.pf_idct = vdec_IDCT;
-}
-
-/*****************************************************************************
- * idct_Probe: return a preference score
- *****************************************************************************/
-static int idct_Probe( probedata_t *p_data )
-{
-    if( TestCPU() & CPU_CAPABILITY_MMX )
-    {
-        return( 100 );
-    }
-    else
-    {
-        return( 0 );
-    }
-}
-
-/*****************************************************************************
- * vdec_InitIDCT : initialize datas for vdec_SparceIDCT
- *****************************************************************************/
-static void vdec_InitIDCT (vdec_thread_t * p_vdec)
-{
-    int i;
-
-    dctelem_t * p_pre = p_vdec->p_pre_idct;
-    memset( p_pre, 0, 64*64*sizeof(dctelem_t) );
-
-    for( i=0 ; i < 64 ; i++ )
-    {
-        p_pre[i*64+i] = 1 << SPARSE_SCALE_FACTOR;
-        vdec_IDCT( p_vdec, &p_pre[i*64], 0) ;
-    }
-    return;
 }
 

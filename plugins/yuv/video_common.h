@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video_yuv.h: YUV transformation functions
+ * video_common.h: YUV transformation functions
  * Provides functions to perform the YUV conversion. The functions provided here
  * are a complete and portable C implementation, and may be replaced in certain
  * case by optimized functions.
@@ -64,14 +64,12 @@ int i_matrix_coefficients
 #define YUV_ARGS_32BPP   YUV_ARGS( u32 )
 
 /*****************************************************************************
- * Local prototypes
+ * Extern prototypes
  *****************************************************************************/
-void SetGammaTable        ( int *pi_table, double f_gamma );
-void SetYUV               ( vout_thread_t *p_vout );
-void SetOffset            ( int i_width, int i_height, int i_pic_width,
-                            int i_pic_height, boolean_t *pb_h_scaling,
-                            int *pi_v_scaling, int *p_offset,
-                            boolean_t b_double );
+
+void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height,
+                boolean_t *pb_h_scaling, int *pi_v_scaling,
+                int *p_offset, boolean_t b_double );
 
 void ConvertY4Gray8       ( YUV_ARGS_8BPP );
 void ConvertYUV420RGB8    ( YUV_ARGS_8BPP );

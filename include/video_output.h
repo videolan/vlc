@@ -49,6 +49,10 @@ typedef void (vout_yuv_convert_t)( p_vout_thread_t p_vout, void *p_pic,
  *****************************************************************************
  * These tables are used by conversion and scaling functions.
  *****************************************************************************/
+typedef int  (yuv_init_t)           ( p_vout_thread_t p_vout );
+typedef int  (yuv_reset_t)          ( p_vout_thread_t p_vout );
+typedef void (yuv_end_t)            ( p_vout_thread_t p_vout );
+
 typedef struct vout_yuv_s
 {
     /* conversion functions */
@@ -71,6 +75,13 @@ typedef struct vout_yuv_s
     /* Temporary conversion buffer and offset array */
     void *              p_buffer;                       /* conversion buffer */
     int *               p_offset;                            /* offset array */
+
+    /* Plugin used and shortcuts to access its capabilities */
+    struct module_s *   p_module;
+    yuv_init_t *        pf_init;                    /* initialize YUV tables */
+    yuv_reset_t *       pf_reset;                        /* reset YUV tables */
+    yuv_end_t *         pf_end;                           /* free YUV tables */
+
 } vout_yuv_t;
 
 /*****************************************************************************
@@ -112,10 +123,6 @@ typedef void (vout_sys_display_t)   ( p_vout_thread_t p_vout );
 
 typedef void (vout_set_palette_t)   ( p_vout_thread_t p_vout, u16 *red,
                                       u16 *green, u16 *blue, u16 *transp );
-
-typedef int  (yuv_sys_init_t)       ( p_vout_thread_t p_vout );
-typedef int  (yuv_sys_reset_t)      ( p_vout_thread_t p_vout );
-typedef void (yuv_sys_end_t)        ( p_vout_thread_t p_vout );
 
 typedef struct vout_thread_s
 {
@@ -167,10 +174,6 @@ typedef struct vout_thread_s
     vout_sys_display_t *    p_sys_display;         /* display rendered image */
 
     vout_set_palette_t *    p_set_palette;               /* set 8bpp palette */
-
-    yuv_sys_init_t *        p_yuv_init;             /* initialize YUV tables */
-    yuv_sys_reset_t *       p_yuv_reset;                 /* reset YUV tables */
-    yuv_sys_end_t *         p_yuv_end;                    /* free YUV tables */
 
     /* Pictures and rendering properties */
     boolean_t           b_grayscale;           /* color or grayscale display */

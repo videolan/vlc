@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video_yuv_macros_truecolor.h: YUV transformation macros for truecolor
+ * transforms_common.h: YUV transformation macros for truecolor
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *

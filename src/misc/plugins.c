@@ -104,10 +104,6 @@ void bank_Init( plugin_bank_t * p_bank )
     SEEK_PLUGIN( "ggi" );
     SEEK_PLUGIN( "sdl" );
    
-    /* Video calculus */
-    SEEK_PLUGIN( "yuvmmx" );
-    SEEK_PLUGIN( "yuv" );
-
     /* Dummy plugin */
     SEEK_PLUGIN( "dummy" );
 

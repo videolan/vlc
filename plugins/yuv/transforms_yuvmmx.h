@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video_yuv_asm.h: MMX YUV transformation assembly
+ * transforms_yuvmmx.h: MMX YUV transformation assembly
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *

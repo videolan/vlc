@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video_yuv_macros_8bpp.h: YUV transformation macros for 8bpp
+ * transforms_yuv.h: C specific YUV transformation macros
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *

@@ -40,7 +40,6 @@
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
-#include "tests.h"
 
 #include "interface.h"
 

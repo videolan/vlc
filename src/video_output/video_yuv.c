@@ -36,7 +36,8 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
+#include "modules.h"
+
 #include "video.h"
 #include "video_output.h"
 #include "video_yuv.h"
@@ -53,43 +54,23 @@
  *****************************************************************************/
 int vout_InitYUV( vout_thread_t *p_vout )
 {
-    typedef void ( yuv_getplugin_t ) ( vout_thread_t * p_vout );
-    
-    int          i_index;
-    int          i_best_index = 0, i_best_score = 0;
+    /* Choose the best module */
+    p_vout->yuv.p_module = module_Need( p_main->p_module_bank,
+                                        MODULE_CAPABILITY_YUV, NULL );
 
-    /* Get a suitable YUV plugin */
-    for( i_index = 0 ; i_index < p_main->p_bank->i_plugin_count ; i_index++ )
+    if( p_vout->yuv.p_module == NULL )
     {
-        /* If there's a plugin in p_info ... */
-        if( p_main->p_bank->p_info[ i_index ] != NULL )
-        {
-            /* ... and if this plugin provides the functions we want ... */
-            if( p_main->p_bank->p_info[ i_index ]->yuv_GetPlugin != NULL )
-            {
-                /* ... and if this plugin has a good score ... */
-                if(  p_main->p_bank->p_info[ i_index ]->i_score > i_best_score )
-                {
-                    /* ... then take it */
-                    i_best_score = p_main->p_bank->p_info[ i_index ]->i_score;
-                    i_best_index = i_index;
-                }
-            }
-        }
+        intf_ErrMsg( "vout error: no suitable yuv module" );
+	return( -1 );
     }
 
-    if( i_best_score == 0 )
-    {
-        /* this should NEVER happen ! */
-        free( p_vout );
-        return( 12 ); 
-    }
+#define yuv_functions p_vout->yuv.p_module->p_functions->yuv.functions.yuv
+    p_vout->yuv.pf_init       = yuv_functions.pf_init;
+    p_vout->yuv.pf_reset      = yuv_functions.pf_reset;
+    p_vout->yuv.pf_end        = yuv_functions.pf_end;
+#undef yuv_functions
 
-    /* Get the plugin functions */
-    ( ( yuv_getplugin_t * ) p_main->p_bank->p_info[ i_best_index ]->yuv_GetPlugin)( p_vout );
- 
-    
-    return p_vout->p_yuv_init( p_vout );
+    return( p_vout->yuv.pf_init( p_vout ) );
 }
 
 /*****************************************************************************
@@ -100,8 +81,8 @@ int vout_InitYUV( vout_thread_t *p_vout )
  *****************************************************************************/
 int vout_ResetYUV( vout_thread_t *p_vout )
 {
-    p_vout->p_yuv_end( p_vout );
-    return( p_vout->p_yuv_init( p_vout ) );
+    p_vout->yuv.pf_end( p_vout );
+    return( p_vout->yuv.pf_init( p_vout ) );
 }
 
 /*****************************************************************************
@@ -111,6 +92,7 @@ int vout_ResetYUV( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_EndYUV( vout_thread_t *p_vout )
 {
-    p_vout->p_yuv_end( p_vout );
+    p_vout->yuv.pf_end( p_vout );
+    module_Unneed( p_main->p_module_bank, p_vout->yuv.p_module );
 }
 

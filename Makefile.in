@@ -277,7 +277,7 @@ endif
 # 
 ifneq (,$(findstring 86,$(ARCH)))
 ifneq (,$(findstring mmx,$(ARCH)))
-ASM_OBJ =		src/video_output/video_yuv_mmx.o
+ASM_OBJ =		
 STD_PLUGIN_ASM = 	plugins/idct/idctmmx_asm.o
 endif
 endif
@@ -338,19 +338,11 @@ PLUGIN_X11=	plugins/x11/x11.o \
 
 PLUGIN_YUV =	plugins/yuv/yuv.o \
 		plugins/yuv/video_yuv.o \
-		plugins/yuv/video_yuv8.o \
-		plugins/yuv/video_yuv15.o \
-		plugins/yuv/video_yuv16.o \
-		plugins/yuv/video_yuv24.o \
-		plugins/yuv/video_yuv32.o
+		plugins/yuv/transforms_yuv.o
 
-PLUGIN_YUVMMX = plugins/yuvmmx/yuvmmx.o \
-		plugins/yuvmmx/video_yuv.o \
-		plugins/yuvmmx/video_yuv8.o \
-		plugins/yuvmmx/video_yuv15.o \
-		plugins/yuvmmx/video_yuv16.o \
-		plugins/yuvmmx/video_yuv24.o \
-		plugins/yuvmmx/video_yuv32.o
+PLUGIN_YUVMMX =	plugins/yuv/yuvmmx.o \
+		plugins/yuv/video_yuvmmx.o \
+		plugins/yuv/transforms_yuvmmx.o
 
 PLUGIN_IDCT =	plugins/idct/idct.o \
 		plugins/idct/idct_common.o
@@ -408,6 +400,7 @@ all: vlc @ALIASES@ plugins
 
 clean:
 	rm -f $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ)
+	rm -f plugins/*/*.o src/*/*.o
 	rm -f vlc @ALIASES@ lib/*.so
 
 distclean: clean
@@ -533,12 +526,6 @@ lib/dsp.so: $(PLUGIN_DSP)
 lib/alsa.so: $(PLUGIN_ALSA)
 	$(CC) $(PCFLAGS) -shared -o $@ $^ -lasound
 
-lib/null.so: $(PLUGIN_NULL)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
-
-lib/dummy.so: $(PLUGIN_DUMMY)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
-
 lib/fb.so: $(PLUGIN_FB)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
 
@@ -561,6 +548,12 @@ lib/sdl.so: $(PLUGIN_SDL)
 	$(CC) $(PCFLAGS) -shared -o $@ $^ $(LIB_SDL)
 
 ifeq ($(SYS),beos)
+lib/null.so: $(PLUGIN_NULL)
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+
+lib/dummy.so: $(PLUGIN_DUMMY)
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+
 lib/idct.so: $(PLUGIN_IDCT)
 	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 
@@ -576,6 +569,12 @@ lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC)
 lib/idctmmx.so: $(PLUGIN_IDCTMMX)
 	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
+lib/null.so: $(PLUGIN_NULL)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
+
+lib/dummy.so: $(PLUGIN_DUMMY)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
+
 lib/yuv.so: $(PLUGIN_YUV)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
 

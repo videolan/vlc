@@ -43,7 +43,7 @@
 #include "debug.h"
 #include "threads.h"
 #include "mtime.h"
-#include "tests.h"                                              /* TestMMX() */
+#include "tests.h"                                              /* TestCPU() */
 #include "plugins.h"
 #include "modules.h"
 #include "playlist.h"
@@ -165,9 +165,6 @@ static void Version                 ( void );
 static void InitSignalHandler       ( void );
 static void SimpleSignalHandler     ( int i_signal );
 static void FatalSignalHandler      ( int i_signal );
-#ifdef HAVE_MMX
-       int  TestMMX                 ( void );
-#endif
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads
@@ -196,7 +193,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
      * Test if our code is likely to run on this CPU 
      */
 #ifdef HAVE_MMX
-    if( !TestMMX() )
+    if( !( TestCPU() & CPU_CAPABILITY_MMX ) )
     {
         fprintf( stderr, "Sorry, this program needs an MMX processor. "
                          "Please run the non-MMX version.\n" );
@@ -214,11 +211,6 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
                  strerror(errno) );
         return( errno );
     }
-
-    /*
-     * Set signal handling policy up for all the threads that will be created
-     */
-    InitSignalHandler();                 /* prepare signals for interception */
 
     /*
      * Read configuration
@@ -283,39 +275,46 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 #endif
 
     /*
-     * Open audio device and start aout thread
-     */
-    if( p_main->b_audio )
-    {
-        p_main->p_aout = aout_CreateThread( NULL );
-        if( p_main->p_aout == NULL )
-        {
-            /* On error during audio initialization, switch off audio */
-            intf_ErrMsg( "aout error: audio initialization failed, audio is deactivated" );
-            p_main->b_audio = 0;
-        }
-    }
-
-    /*
      * Run interface
      */
     p_main->p_intf = intf_Create();
+
     if( p_main->p_intf != NULL )
     {
+        /*
+         * Set signal handling policy for all threads
+         */
+        InitSignalHandler();
+
+        /*
+         * Open audio device and start aout thread
+         */
+        if( p_main->b_audio )
+        {
+            p_main->p_aout = aout_CreateThread( NULL );
+            if( p_main->p_aout == NULL )
+            {
+                /* On error during audio initialization, switch off audio */
+                intf_ErrMsg( "aout error: audio initialization failed,"
+                             " audio is deactivated" );
+                p_main->b_audio = 0;
+            }
+        }
+
         /*
          * This is the main loop
          */
         intf_Run( p_main->p_intf );
 
         intf_Destroy( p_main->p_intf );
-    }
 
-    /*
-     * Close audio device
-     */
-    if( p_main->b_audio )
-    {
-        aout_DestroyThread( p_main->p_aout, NULL );
+        /*
+         * Close audio device
+         */
+        if( p_main->b_audio )
+        {
+            aout_DestroyThread( p_main->p_aout, NULL );
+        }
     }
 
     /*

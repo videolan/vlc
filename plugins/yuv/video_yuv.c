@@ -38,20 +38,54 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
+#include "modules.h"
+
 #include "video.h"
 #include "video_output.h"
-#include "video_yuv.h"
+
+#include "video_common.h"
 
 #include "intf_msg.h"
 
+static int     yuv_Probe      ( probedata_t *p_data );
+static int     yuv_Init       ( vout_thread_t *p_vout );
+static int     yuv_Reset      ( vout_thread_t *p_vout );
+static void    yuv_End        ( vout_thread_t *p_vout );
+
+static void    SetGammaTable  ( int *pi_table, double f_gamma );
+static void    SetYUV         ( vout_thread_t *p_vout );
+
 /*****************************************************************************
- * vout_InitYUV: allocate and initialize translations tables
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+void yuv_getfunctions( function_list_t * p_function_list )
+{
+    p_function_list->pf_probe = yuv_Probe;
+    p_function_list->functions.yuv.pf_init = yuv_Init;
+    p_function_list->functions.yuv.pf_reset = yuv_Reset;
+    p_function_list->functions.yuv.pf_end = yuv_End;
+}
+
+/*****************************************************************************
+ * yuv_Probe: tests probe the audio device and return a score
+ *****************************************************************************
+ * This function tries to open the DSP and returns a score to the plugin
+ * manager so that it can choose the most appropriate one.
+ *****************************************************************************/
+static int yuv_Probe( probedata_t *p_data )
+{
+    /* This module always works */
+    return( 100 );
+}
+
+/*****************************************************************************
+ * yuv_Init: allocate and initialize translations tables
  *****************************************************************************
  * This function will allocate memory to store translation tables, depending
  * of the screen depth.
  *****************************************************************************/
-int yuv_CInit( vout_thread_t *p_vout )
+static int yuv_Init( vout_thread_t *p_vout )
 {
     size_t      tables_size;                        /* tables size, in bytes */
 
@@ -109,11 +143,11 @@ int yuv_CInit( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * yuv_CEnd: destroy translations tables
+ * yuv_End: destroy translations tables
  *****************************************************************************
  * Free memory allocated by yuv_CCreate.
  *****************************************************************************/
-void yuv_CEnd( vout_thread_t *p_vout )
+static void yuv_End( vout_thread_t *p_vout )
 {
     free( p_vout->yuv.p_base );
     free( p_vout->yuv.p_buffer );
@@ -121,25 +155,23 @@ void yuv_CEnd( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * yuv_CReset: re-initialize translations tables
+ * yuv_Reset: re-initialize translations tables
  *****************************************************************************
  * This function will initialize the tables allocated by vout_CreateTables and
  * set functions pointers.
  *****************************************************************************/
-int yuv_CReset( vout_thread_t *p_vout )
+static int yuv_Reset( vout_thread_t *p_vout )
 {
-    yuv_CEnd( p_vout );
-    return( yuv_CInit( p_vout ) );
+    yuv_End( p_vout );
+    return( yuv_Init( p_vout ) );
 }
-
-/* following functions are local */
 
 /*****************************************************************************
  * SetGammaTable: return intensity table transformed by gamma curve.
  *****************************************************************************
  * pi_table is a table of 256 entries from 0 to 255.
  *****************************************************************************/
-void SetGammaTable( int *pi_table, double f_gamma )
+static void SetGammaTable( int *pi_table, double f_gamma )
 {
     int         i_y;                                       /* base intensity */
 
@@ -155,8 +187,8 @@ void SetGammaTable( int *pi_table, double f_gamma )
 
 /*****************************************************************************
  * SetYUV: compute tables and set function pointers
-+ *****************************************************************************/
-void SetYUV( vout_thread_t *p_vout )
+ *****************************************************************************/
+static void SetYUV( vout_thread_t *p_vout )
 {
     int         pi_gamma[256];                                /* gamma table */
     int         i_index;                                  /* index in tables */
@@ -459,8 +491,8 @@ void SetYUV( vout_thread_t *p_vout )
  * is set, the p_offset structure has interleaved Y and U/V offsets.
  *****************************************************************************/
 void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height,
-                boolean_t *pb_h_scaling, int *pi_v_scaling, int *p_offset,
-                boolean_t b_double )
+                boolean_t *pb_h_scaling, int *pi_v_scaling,
+                int *p_offset, boolean_t b_double )
 {
     int i_x;                                    /* x position in destination */
     int i_scale_count;                                     /* modulo counter */

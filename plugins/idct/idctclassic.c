@@ -2,7 +2,7 @@
  * idctclassic.c : Classic IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctclassic.c,v 1.2 2001/01/15 06:18:23 sam Exp $
+ * $Id: idctclassic.c,v 1.3 2001/01/16 02:16:38 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -143,7 +143,7 @@ static void idct_getfunctions( function_list_t * p_function_list )
 static int idct_Probe( probedata_t *p_data )
 {
     /* This plugin always works */
-    return( 50 );
+    return( 100 );
 }
 
 /*****************************************************************************
