@@ -29,7 +29,7 @@ default:
 $(dependancies): .dep/%.d: %.c
 	@test -d .dep/$(dir $*) || mkdir -p .dep/$(dir $*)
 	#@echo "generating dependancies for $*.c"
-	@$(SHELL) -ec '$(CC) $(DCFLAGS) $(CFLAGS) $(DEFINE) $< \
+	@$(SHELL) -ec '$(CC) $(DCFLAGS) $(CFLAGS) $(DEFINE) 2>/dev/null $< \
 	| sed '\''s/$(subst .,\.,$(notdir $*))\.o[ :]*/$(subst /,\/,$*).o \
 	.dep\/$(subst /,\/,$*).d : /g'\'' > $@; \
 	[ -s $@ ] || rm -f $@'

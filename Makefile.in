@@ -269,25 +269,14 @@ endif
 ifneq (,$(findstring 86,$(ARCH)))
 ifneq (,$(findstring mmx,$(ARCH)))
 ASM_OBJ =		
-STD_PLUGIN_ASM = 	
 endif
 endif
 
 #
 # Plugins
 #
-PLUGIN_NULL =	plugins/null/null.o
-
-PLUGIN_PS =	plugins/mpeg/ps.o \
-		plugins/mpeg/input_ps.o
-
-PLUGIN_TS =	plugins/mpeg/ts.o \
-		plugins/mpeg/input_ts.o
-
-PLUGIN_DVD =	plugins/dvd/dvd.o \
-		plugins/dvd/input_dvd.o \
-		plugins/dvd/dvd_ifo.o \
-	        plugins/dvd/dvd_css.o
+PLUGIN_ALSA =	plugins/alsa/alsa.o \
+		plugins/alsa/aout_alsa.o
 
 PLUGIN_BEOS =	plugins/beos/beos.o \
 		plugins/beos/aout_beos.o \
@@ -302,6 +291,11 @@ PLUGIN_DUMMY =	plugins/dummy/dummy.o \
 		plugins/dummy/intf_dummy.o \
 		plugins/dummy/vout_dummy.o
 
+PLUGIN_DVD =	plugins/dvd/dvd.o \
+		plugins/dvd/input_dvd.o \
+		plugins/dvd/dvd_ifo.o \
+	        plugins/dvd/dvd_css.o
+
 PLUGIN_ESD =	plugins/esd/esd.o \
 		plugins/esd/aout_esd.o
 
@@ -313,10 +307,6 @@ PLUGIN_GGI =	plugins/ggi/ggi.o \
 		plugins/ggi/intf_ggi.o \
 		plugins/ggi/vout_ggi.o
 
-PLUGIN_SDL =	plugins/sdl/sdl.o \
-		plugins/sdl/vout_sdl.o \
-		plugins/sdl/aout_sdl.o 
-
 PLUGIN_GLIDE =	plugins/glide/glide.o \
 		plugins/glide/intf_glide.o \
 		plugins/glide/vout_glide.o
@@ -326,33 +316,6 @@ PLUGIN_GNOME =	plugins/gnome/gnome.o \
 		plugins/gnome/gnome_callbacks.o \
 		plugins/gnome/gnome_interface.o \
 		plugins/gnome/gnome_support.o
-
-PLUGIN_MGA =	plugins/mga/mga.o \
-		plugins/mga/intf_mga.o \
-		plugins/mga/vout_mga.o
-
-PLUGIN_X11=	plugins/x11/x11.o \
-		plugins/x11/vout_x11.o
-
-PLUGIN_YUV =	plugins/yuv/yuv.o \
-		plugins/yuv/video_yuv.o \
-		plugins/yuv/transforms_yuv.o
-
-PLUGIN_YUVMMX =	plugins/yuv/yuvmmx.o \
-		plugins/yuv/video_yuvmmx.o \
-		plugins/yuv/transforms_yuvmmx.o
-
-PLUGIN_MOTION =	plugins/motion/motion.o \
-		plugins/motion/vdec_motion_common.o \
-		plugins/motion/vdec_motion_inner.o
-
-PLUGIN_MOTIONMMX =	plugins/motion/motionmmx.o \
-			plugins/motion/vdec_motion_common.o \
-			plugins/motion/vdec_motion_inner_mmx.o
-
-PLUGIN_MOTIONMMXEXT =	plugins/motion/motionmmxext.o \
-			plugins/motion/vdec_motion_common.o \
-			plugins/motion/vdec_motion_inner_mmxext.o
 
 PLUGIN_IDCT =	plugins/idct/idct.o \
 		plugins/idct/idct_common.o
@@ -366,42 +329,86 @@ PLUGIN_IDCTMMX =	plugins/idct/idctmmx.o \
 PLUGIN_IDCTMMXEXT =	plugins/idct/idctmmxext.o \
 			plugins/idct/idct_common.o
 
-PLUGIN_ALSA =	plugins/alsa/alsa.o \
-		plugins/alsa/aout_alsa.o
+PLUGIN_MGA =	plugins/mga/mga.o \
+		plugins/mga/intf_mga.o \
+		plugins/mga/vout_mga.o
 
-STD_PLUGIN_OBJ =$(PLUGIN_BEOS) \
+PLUGIN_MOTION =	plugins/motion/motion.o \
+		plugins/motion/vdec_motion_common.o \
+		plugins/motion/vdec_motion_inner.o
+
+PLUGIN_MOTIONMMX =	plugins/motion/motionmmx.o \
+			plugins/motion/vdec_motion_common.o \
+			plugins/motion/vdec_motion_inner_mmx.o
+
+PLUGIN_MOTIONMMXEXT =	plugins/motion/motionmmxext.o \
+			plugins/motion/vdec_motion_common.o \
+			plugins/motion/vdec_motion_inner_mmxext.o
+
+PLUGIN_NULL =	plugins/null/null.o
+
+PLUGIN_PS =	plugins/mpeg/ps.o \
+		plugins/mpeg/input_ps.o
+
+PLUGIN_SDL =	plugins/sdl/sdl.o \
+		plugins/sdl/vout_sdl.o \
+		plugins/sdl/aout_sdl.o 
+
+PLUGIN_TS =	plugins/mpeg/ts.o \
+		plugins/mpeg/input_ts.o
+
+PLUGIN_X11=	plugins/x11/x11.o \
+		plugins/x11/vout_x11.o
+
+PLUGIN_YUV =	plugins/yuv/yuv.o \
+		plugins/yuv/video_yuv.o \
+		plugins/yuv/transforms_yuv.o
+
+PLUGIN_YUVMMX =	plugins/yuv/yuvmmx.o \
+		plugins/yuv/video_yuvmmx.o \
+		plugins/yuv/transforms_yuvmmx.o
+
+STD_PLUGIN_OBJ = \
+		$(PLUGIN_ALSA) \
+		$(PLUGIN_BEOS) \
 		$(PLUGIN_DSP) \
 		$(PLUGIN_DUMMY) \
+		$(PLUGIN_DVD) \
 		$(PLUGIN_ESD) \
 		$(PLUGIN_FB) \
 		$(PLUGIN_GGI) \
-		$(PLUGIN_MGA) \
-		$(PLUGIN_X11) \
-		$(PLUGIN_YUV) \
-		$(PLUGIN_YUVMMX) \
-		$(PLUGIN_MOTION) \
-		$(PLUGIN_MOTIONMMX) \
-		$(PLUGIN_MOTIONMMXEXT) \
 		$(PLUGIN_IDCT) \
 		$(PLUGIN_IDCTCLASSIC) \
 		$(PLUGIN_IDCTMMX) \
 		$(PLUGIN_IDCTMMXEXT) \
+		$(PLUGIN_MGA) \
+		$(PLUGIN_MOTION) \
+		$(PLUGIN_MOTIONMMX) \
+		$(PLUGIN_MOTIONMMXEXT) \
+		$(PLUGIN_NULL) \
+		$(PLUGIN_PS) \
 		$(PLUGIN_SDL) \
-		$(PLUGIN_ALSA) \
-		$(PLUGIN_NULL)
+		$(PLUGIN_TS) \
+		$(PLUGIN_X11) \
+		$(PLUGIN_YUV) \
+		$(PLUGIN_YUVMMX)
+
+NONSTD_PLUGIN_OBJ = \
+		$(PLUGIN_GLIDE) \
+		$(PLUGIN_GNOME)
 
 # list duplicates
 STD_PLUGIN_COMMON =	plugins/idct/idct_common.o \
 			plugins/motion/vdec_motion_common.o
 
 # filter out duplicates from the plugin object lists
-STD_PLUGIN_OBJ :=	$(filter-out $(STD_PLUGIN_COMMON) $(STD_PLUGIN_ASM), \
+STD_PLUGIN_OBJ :=	$(filter-out $(STD_PLUGIN_COMMON), \
 				 $(STD_PLUGIN_OBJ)) $(STD_PLUGIN_COMMON)
 
 #
 # Other lists of files
 #
-objects := $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ) $(STD_PLUGIN_ASM)
+objects := $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ) $(NONSTD_PLUGIN_OBJ)
 dependancies := $(objects:%.o=.dep/%.d)
 
 # All symbols must be exported
@@ -541,15 +548,13 @@ $(STD_PLUGIN_OBJ): %.o: .dep/%.d
 $(STD_PLUGIN_OBJ): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
 
-$(STD_PLUGIN_ASM): %.o: Makefile.dep
-$(STD_PLUGIN_ASM): %.o: %.S
-	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
-
 $(PLUGIN_GNOME): %.o: Makefile.dep
+$(PLUGIN_GNOME): %.o: .dep/%.d
 $(PLUGIN_GNOME): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) `gnome-config --cflags gnomeui` -c -o $@ $<
 
 $(PLUGIN_GLIDE): %.o: Makefile.dep
+$(PLUGIN_GLIDE): %.o: .dep/%.d
 $(PLUGIN_GLIDE): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/glide -c -o $@ $<
 
