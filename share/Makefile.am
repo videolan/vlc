@@ -1,20 +1,28 @@
-EXTRA_DIST = \
-	$(DIST_rsrc) $(DIST_fonts)
+NULL =
+
+EXTRA_DIST = $(DIST_rsrc) $(DIST_fonts)
 
 pkgdatadir = $(datadir)/vlc
 
 dist_pkgdata_DATA = \
-	$(DIST_familiar) $(DIST_icons16) $(DIST_icons32) $(DIST_icons48)
+	$(DIST_familiar) \
+	$(DIST_icons16) \
+	$(DIST_icons32) \
+	$(DIST_icons48) \
+	$(NULL)
 
 DIST_fonts = \
 	default8x16.psf \
-	default8x9.psf
+	default8x9.psf \
+	font-eutopiabold36.rle \
+	$(NULL)
 
 DIST_rsrc = \
 	vlc.icns \
 	vlc_beos.rsrc \
 	vlc_win32_rc.rc \
-	vlc-icons.xcf
+	vlc-icons.xcf \
+	$(NULL)
 
 DIST_familiar = \
 	familiar-forwardb16x16.xpm \
@@ -23,7 +31,8 @@ DIST_familiar = \
 	familiar-playb16x16.xpm \
 	familiar-preferencesb16x16.xpm \
 	familiar-rewindb16x16.xpm \
-	familiar-stopb16x16.xpm
+	familiar-stopb16x16.xpm \
+	$(NULL)
 
 DIST_icons16 = \
 	gnome-vlc16x16.png \
@@ -31,7 +40,8 @@ DIST_icons16 = \
 	kvlc16x16.png \
 	qvlc16x16.png \
 	vlc16x16.png \
-	vlc16x16.xpm
+	vlc16x16.xpm \
+	$(NULL)
 
 DIST_icons32 = \
 	gnome-vlc32x32.png \
@@ -43,7 +53,8 @@ DIST_icons32 = \
 	qvlc32x32.png \
 	qvlc32x32.xpm \
 	vlc32x32.png \
-	vlc32x32.xpm
+	vlc32x32.xpm \
+	$(NULL)
 
 DIST_icons48 = \
 	gnome-vlc48x48.png \
@@ -52,5 +63,6 @@ DIST_icons48 = \
 	kvlc48x48.png \
 	qvlc48x48.png \
 	vlc48x48.ico \
-	vlc48x48.png
+	vlc48x48.png \
+	$(NULL)
 
