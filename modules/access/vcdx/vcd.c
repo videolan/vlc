@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: vcd.c,v 1.7 2003/11/23 14:34:19 rocky Exp $
+ * $Id: vcd.c,v 1.8 2003/11/23 17:18:00 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
@@ -52,15 +52,18 @@ int  E_(DebugCallback) ( vlc_object_t *p_this, const char *psz_name,
 #define DEBUG_TEXT N_("set debug mask for additional debugging.")
 #define DEBUG_LONGTEXT N_( \
     "This integer when viewed in binary is a debugging mask\n" \
-    "MRL             1\n" \
-    "external call   2\n" \
-    "all calls       4\n" \
-    "LSN             8\n" \
-    "PBC      (10)  16\n" \
-    "libcdio  (20)  32\n" \
-    "seeks    (40)  64\n" \
-    "still    (80) 128\n" \
-    "vcdinfo (100) 256\n" )
+    "meta info         1\n" \
+    "event info        2\n" \
+    "MRL               4\n" \
+    "external call     8\n" \
+    "all calls (10)   16\n" \
+    "LSN       (20)   32\n" \
+    "PBC       (40)   64\n" \
+    "libcdio   (80)  128\n" \
+    "seek-set (100)  256\n" \
+    "seek-cur (200)  512\n" \
+    "still    (400) 1024\n" \
+    "vcdinfo  (800) 2048\n" )
 
 #define DEV_TEXT N_("Video device name")
 #define DEV_LONGTEXT N_( \
@@ -94,8 +97,6 @@ vlc_module_begin();
 	      "If VCD is authored with playback control, use it. "
 	      "Otherwise we play by tracks.", 
 	      VLC_TRUE );
-
-
 
 #ifdef FIXED
     add_submodule();
