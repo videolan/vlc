@@ -1,0 +1,53 @@
+#!/bin/sh
+make distclean
+./bootstrap
+CC=mipsel-linux-gcc CXX=mipsel-linux-g++ AR=mipsel-linux-ar LD=mipsel-linux-ld RANLIB=mipsel-linux-ranlib STRIP=mipsel-linux-strip \
+ ./configure --host=mipsel --enable-release --enable-static --disable-shared --enable-plugins \
+  --prefix=/home/jpsaman/src/roku-dev/usr \
+  --disable-sdl \
+  --enable-mad --with-mad-tree=/home/jpsaman/src/libmad-0.15.0b \
+  --enable-libmpeg2 --with-libmpeg2-tree=/home/jpsaman/src/mpeg2dec-0.4.0 \
+  --enable-dvbpsi --with-dvbpsi-tree=/home/jpsaman/src/libdvbpsi3-0.1.4 \
+  --disable-vcd --disable-vcdx --disable-cdda --disable-cddax --disable-libcdio --disable-libcddb \
+  --disable-dvd --disable-dvdread --disable-dvdnav --disable-dvdplay \
+  --disable-dshow --disable-directx --disable-wingdi --disable-waveout \
+  --disable-macosx --disable-coreaudio --disable-quicktime \
+  --disable-qnx \
+  --disable-ncurses \
+  --disable-corba \
+  --disable-mozilla \
+  --disable-mga \
+  --disable-svgalib --disable-ggi --disable-glide \
+  --disable-aa --disable-caca \
+  --disable-qte --disable-qt_video \
+  --disable-livedotcom \
+  --disable-v4l \
+  --disable-pvr \
+  --disable-satellite --disable-dvb \
+  --disable-slp \
+  --disable-speex \
+  --disable-ffmpeg \
+  --disable-ogg --disable-vorbis --disable-tremor --disable-tarkin --disable-theora \
+  --disable-mod \
+  --disable-mkv \
+  --disable-a52 \
+  --disable-dts \
+  --disable-faad \
+  --disable-flac \
+  --disable-lirc --disable-joystick \
+  --disable-x11 --disable-xvideo --disable-xosd \
+  --disable-gtk --disable-gnome --disable-esd \
+  --disable-wxwindows \
+  --disable-kde --disable-arts \
+  --disable-pda --disable-opie \
+  --disable-cmml \
+  --disable-skins --disable-skins2 \
+  --disable-fribidi --disable-freetype \
+  --disable-sout \
+  --enable-oss --disable-alsa \
+  --enable-visual --disable-goom \
+  --enable-hd1000a --enable-hd1000v \
+  CFLAGS="-I/home/jpsaman/src/roku-dev/usr/include -I/home/jpsaman/src/roku-dev/usr/local/include/roku" \
+  CXXFLAGS="-I/usr/tools/roku/include " \
+  LDFLAGS="-L/usr/tools/roku/mipsel-linux/lib -L/home/jpsaman/src/roku-dev/lib -L/home/jpsaman/src/roku/usr/lib -L/home/jpsaman/src/roku-dev/usr/local/lib" && \
+  make
