@@ -23,6 +23,7 @@
 
 static const GUID IID_IUnknown = {0x00000000, 0x0000, 0x0000, {0xc0,0x00, 0x00,0x00,0x00,0x00,0x00,0x46}};
 static const GUID IID_IClassFactory = {0x00000001, 0x0000, 0x0000, {0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46}};
+static const GUID IID_IWMCodecPrivateData = {0x73f0be8e, 0x57f7, 0x4f01, {0xaa, 0x66, 0x9f, 0x57, 0x34, 0xc, 0xfe, 0xe}};
 static const GUID IID_IMediaObject = {0xd8ad0f58, 0x5494, 0x4102, {0x97, 0xc5, 0xec, 0x79, 0x8e, 0x59, 0xbc, 0xf4}};
 static const GUID IID_IMediaBuffer = {0x59eff8b9, 0x938c, 0x4a26, {0x82, 0xf2, 0x95, 0xcb, 0x84, 0xcd, 0xc8, 0x37}};
 static const GUID MEDIATYPE_Video = {0x73646976, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
@@ -40,6 +41,7 @@ static const GUID MEDIASUBTYPE_RGB565 = {0xe436eb7b, 0x524f, 0x11ce, {0x9f, 0x53
 #define IClassFactory IClassFactoryHack
 typedef struct _IUnknown IUnknown;
 typedef struct _IClassFactory IClassFactory;
+typedef struct _IWMCodecPrivateData IWMCodecPrivateData;
 typedef struct _IEnumDMO IEnumDMO;
 typedef struct _IMediaBuffer IMediaBuffer;
 typedef struct _IMediaObject IMediaObject;
@@ -132,6 +134,26 @@ typedef struct IClassFactory_vt
 struct _IClassFactory { IClassFactory_vt* vt; };
 
 /*
+ * IWMCodecPrivateData interface
+ */
+typedef struct IWMCodecPrivateData_vt
+{
+    long (STDCALL *QueryInterface)(IUnknown *This, const GUID* riid,
+                                   void **ppvObject);
+    long (STDCALL *AddRef)(IUnknown *This) ;
+    long (STDCALL *Release)(IUnknown *This) ;
+
+        
+    long (STDCALL *SetPartialOutputType)(IWMCodecPrivateData * This,
+                                         DMO_MEDIA_TYPE *pmt);
+
+    long (STDCALL *GetPrivateData )(IWMCodecPrivateData * This,
+                                    uint8_t *pbData, uint32_t *pcbData);
+} IWMCodecPrivateData_vt;
+
+struct _IWMCodecPrivateData { IWMCodecPrivateData_vt* vt; };
+
+/*
  * IEnumDMO interface
  */
 typedef struct IEnumDMO_vt
@@ -167,7 +189,7 @@ typedef struct IMediaBuffer_vt
     long (STDCALL *SetLength)(IMediaBuffer* This, uint32_t cbLength);
     long (STDCALL *GetMaxLength)(IMediaBuffer* This, uint32_t *pcbMaxLength);
     long (STDCALL *GetBufferAndLength)(IMediaBuffer* This,
-                                       char** ppBuffer, uint32_t* pcbLength);
+                                       char **ppBuffer, uint32_t *pcbLength);
 
 } IMediaBuffer_vt;
 struct _IMediaBuffer { IMediaBuffer_vt* vt; };

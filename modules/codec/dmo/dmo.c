@@ -21,7 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define DMO_DEBUG 1
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -48,6 +47,8 @@
 
 #include "codecs.h"
 #include "dmo.h"
+
+//#define DMO_DEBUG 1
 
 #ifdef LOADER
 /* Not Needed */
@@ -1003,6 +1004,8 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     vih.rcSource.bottom = p_enc->fmt_in.video.i_height;
     vih.rcTarget = vih.rcSource;
 
+    vih.AvgTimePerFrame = I64C(10000000) / 25; //FIXME
+
     dmo_type.majortype = MEDIATYPE_Video;
     //dmo_type.subtype = MEDIASUBTYPE_RGB24;
     dmo_type.subtype = MEDIASUBTYPE_I420;
@@ -1052,7 +1055,61 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     ((VIDEOINFOHEADER *)dmo_type.pbFormat)->dwBitRate =
         p_enc->fmt_out.i_bitrate;
 
+    /* Get the private data for the codec */
+    while( 1 )
+    {
+        IWMCodecPrivateData *p_privdata;
+        VIDEOINFOHEADER *p_vih;
+        uint8_t *p_data = 0;
+        uint32_t i_data = 0, i_vih;
+
+        i_err = p_dmo->vt->QueryInterface( (IUnknown *)p_dmo,
+                                           &IID_IWMCodecPrivateData,
+                                           (void **)&p_privdata );
+        if( i_err ) break;
+
+        i_err = p_privdata->vt->SetPartialOutputType( p_privdata, &dmo_type );
+        if( i_err )
+        {
+            msg_Err( p_enc, "SetPartialOutputType() failed" );
+            p_privdata->vt->Release( (IUnknown *)p_privdata );
+            break;
+        }
+
+        i_err = p_privdata->vt->GetPrivateData( p_privdata, NULL, &i_data );
+        if( i_err )
+        {
+            msg_Err( p_enc, "GetPrivateData() failed" );
+            p_privdata->vt->Release( (IUnknown *)p_privdata );
+            break;
+        }
+
+        p_data = malloc( i_data );
+        i_err = p_privdata->vt->GetPrivateData( p_privdata, p_data, &i_data );
+
+        /* Update the media type with the private data */
+        i_vih = dmo_type.cbFormat + i_data;
+        p_vih = CoTaskMemAlloc( i_vih );
+        memcpy( p_vih, dmo_type.pbFormat, dmo_type.cbFormat );
+        memcpy( ((uint8_t *)p_vih) + dmo_type.cbFormat, p_data, i_data );
+        DMOFreeMediaType( &dmo_type );
+        dmo_type.pbFormat = p_vih;
+        dmo_type.cbFormat = i_vih;
+
+        msg_Dbg( p_enc, "found extra data: %i", i_data );
+        p_enc->fmt_out.i_extra = i_data;
+        p_enc->fmt_out.p_extra = p_data;
+        break;
+    }
+
     i_err = p_dmo->vt->SetOutputType( p_dmo, 0, &dmo_type, 0 );
+
+    p_vih = (VIDEOINFOHEADER *)dmo_type.pbFormat;
+    p_enc->fmt_out.video.i_width = p_enc->fmt_in.video.i_width;
+    p_enc->fmt_out.video.i_height = p_enc->fmt_in.video.i_height;
+    p_enc->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR *
+      p_enc->fmt_out.video.i_width / p_enc->fmt_out.video.i_height;
+
     DMOFreeMediaType( &dmo_type );
     if( i_err )
     {
@@ -1324,22 +1381,31 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
     if( p_enc->fmt_out.i_cat == VIDEO_ES )
     {
         /* Get picture data */
+        int i_plane, i_line, i_width, i_src_stride;
         picture_t *p_pic = (picture_t *)p_data;
+        uint8_t *p_dst;
+
         int i_buffer = p_enc->fmt_in.video.i_width *
             p_enc->fmt_in.video.i_height *
             p_enc->fmt_in.video.i_bits_per_pixel / 8;
 
-            msg_Err( p_enc, "EncOpen bpp: %i, size: %i",
-                     p_enc->fmt_in.video.i_bits_per_pixel, i_buffer );
-
         p_block_in = block_New( p_enc, i_buffer );
-        // FIXME: Copy stride by stride;
-#if 0
-        memcpy( p_block_in->p_buffer, p_pic->p->p_pixels,
-                p_block_in->i_buffer );
-#else
-        memset( p_block_in->p_buffer, 0, p_block_in->i_buffer );
-#endif
+
+        /* Copy picture stride by stride */
+        p_dst = p_block_in->p_buffer;
+        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+        {
+            uint8_t *p_src = p_pic->p[i_plane].p_pixels;
+            i_width = p_pic->p[i_plane].i_visible_pitch;
+            i_src_stride = p_pic->p[i_plane].i_pitch;
+
+            for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
+            {
+                p_enc->p_vlc->pf_memcpy( p_dst, p_src, i_width );
+                p_dst += i_width;
+                p_src += i_src_stride;
+            }
+        }
 
         i_pts = p_pic->date;
     }
@@ -1408,6 +1474,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
 #endif
 
             p_out->vt->Release( (IUnknown *)p_out );
+            block_Release( p_block_out );
             return p_chain;
         }
 
@@ -1417,6 +1484,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
             msg_Dbg( p_enc, "ProcessOutput(): no output (i_buffer_out == 0)" );
 #endif
             p_out->vt->Release( (IUnknown *)p_out );
+            block_Release( p_block_out );
             return p_chain;
         }
 
