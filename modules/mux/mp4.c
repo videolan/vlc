@@ -60,6 +60,7 @@ vlc_module_begin();
     set_capability( "sout mux", 5 );
     add_shortcut( "mp4" );
     add_shortcut( "mov" );
+    add_shortcut( "3gp" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -128,6 +129,7 @@ typedef struct
 struct sout_mux_sys_t
 {
     vlc_bool_t b_mov;
+    vlc_bool_t b_3gp;
     vlc_bool_t b_64_ext;
     vlc_bool_t b_fast_start;
 
@@ -200,6 +202,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->pp_streams   = NULL;
     p_sys->i_mdat_pos   = 0;
     p_sys->b_mov        = p_mux->psz_mux && !strcmp( p_mux->psz_mux, "mov" );
+    p_sys->b_3gp        = p_mux->psz_mux && !strcmp( p_mux->psz_mux, "3gp" );
     p_sys->i_dts_start  = 0;
 
 
@@ -207,9 +210,11 @@ static int Open( vlc_object_t *p_this )
     {
         /* Now add ftyp header */
         box = box_new( "ftyp" );
-        bo_add_fourcc( box, "isom" );
+        if( p_sys->b_3gp ) bo_add_fourcc( box, "3gp4" );
+        else bo_add_fourcc( box, "isom" );
         bo_add_32be  ( box, 0 );
-        bo_add_fourcc( box, "mp41" );
+        if( p_sys->b_3gp ) bo_add_fourcc( box, "3gp4" );
+        else bo_add_fourcc( box, "mp41" );
         box_fix( box );
 
         p_sys->i_pos += box->i_buffer;
