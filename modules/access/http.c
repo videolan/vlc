@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.38 2003/07/23 01:13:47 gbazin Exp $
+ * $Id: http.c,v 1.39 2003/07/31 18:25:12 bigben Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -86,6 +86,8 @@ vlc_module_begin();
     add_category_hint( N_("http"), NULL, VLC_FALSE );
     add_string( "http-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT, VLC_FALSE );
     add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+    add_string( "http-user", NULL, NULL, "HTTP user name", "HTTP user name for Basic Authentification", VLC_FALSE );
+    add_string( "http-pwd", NULL , NULL, "HTTP password", "HTTP password for Basic Authentification", VLC_FALSE );
     set_description( _("HTTP input") );
     set_capability( "access", 0 );
     add_shortcut( "http" );
@@ -108,6 +110,7 @@ typedef struct _input_socket_s
     char *              psz_network;
     network_socket_t    socket_desc;
     char                psz_buffer[MAX_QUERY_SIZE];
+    char                psz_auth_string[MAX_QUERY_SIZE];
     char *              psz_name;
 } _input_socket_t;
 
@@ -146,15 +149,19 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
          snprintf( psz_buffer, MAX_QUERY_SIZE,
                    "%s"
                    "Range: bytes="I64Fd"-\r\n"
-                   HTTP_USERAGENT HTTP_END,
-                   p_access_data->psz_buffer, i_tell );
+                   HTTP_USERAGENT
+                   "%s"
+                   HTTP_END,
+                   p_access_data->psz_buffer, i_tell, p_access_data->psz_auth_string );
     }
     else
     {
          snprintf( psz_buffer, MAX_QUERY_SIZE,
                    "%s"
-                   HTTP_USERAGENT HTTP_END,
-                   p_access_data->psz_buffer );
+                   HTTP_USERAGENT
+                   "%s"
+                   HTTP_END,
+                   p_access_data->psz_buffer, p_access_data->psz_auth_string );
     }
     psz_buffer[MAX_QUERY_SIZE - 1] = '\0';
 
@@ -391,6 +398,58 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 }
 
 /*****************************************************************************
+ * Encode a string in base64
+ * Code borrowed from Rafael Steil
+ *****************************************************************************/
+
+
+
+void encodeblock( unsigned char in[3], unsigned char out[4], int len )
+{
+    static const char cb64[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    out[0] = cb64[ in[0] >> 2 ];
+    out[1] = cb64[ ((in[0] & 0x03) << 4) | ((in[1] & 0xf0) >> 4) ];
+    out[2] = (unsigned char) (len > 1 ? cb64[ ((in[1] & 0x0f) << 2) | ((in[2] & 0xc0) >> 6) ] : '=');
+    out[3] = (unsigned char) (len > 2 ? cb64[ in[2] & 0x3f ] : '=');
+}
+
+char *str_base64_encode(char *str, input_thread_t *p_input )
+{
+    unsigned char in[3], out[4];
+    unsigned int i, len, blocksout = 0, linesize = strlen(str);
+	char *tmp = str;
+	char *result = (char *)malloc((linesize + 3 - linesize % 3) * 4 / 3 + 1);
+	
+	if (!result)
+        msg_Err( p_input, "out of memory" );		
+	while (*tmp) {
+        len = 0;
+		
+        for( i = 0; i < 3; i++ ) {
+            in[i] = (unsigned char)(*tmp);
+			
+            if (*tmp)
+                len++;
+            else
+                in[i] = 0;
+			
+			tmp++;
+        }
+		
+        if( len ) {
+            encodeblock( in, out, len);
+			
+            for( i = 0; i < 4; i++ ) 
+                result[blocksout++] = out[i];
+        }		
+    }
+	
+	result[blocksout] = '\0';
+	return result;
+}
+
+
+/*****************************************************************************
  * Open: parse URL and open the remote file at the beginning
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
@@ -398,11 +457,12 @@ static int Open( vlc_object_t *p_this )
     input_thread_t *    p_input = (input_thread_t *)p_this;
     _input_socket_t *   p_access_data;
     char *              psz_name = strdup(p_input->psz_name);
-    char *              psz_parser = psz_name;
+    char *              psz_parser = psz_name, * psz_auth_parser;
     char *              psz_server_addr = "";
     char *              psz_server_port = "";
     char *              psz_path = "";
     char *              psz_proxy, *psz_proxy_orig;
+    char *              psz_user = NULL, *psz_pwd = NULL;
     int                 i_server_port = 0;
 
     p_access_data = malloc( sizeof(_input_socket_t) );
@@ -416,6 +476,7 @@ static int Open( vlc_object_t *p_this )
 
     p_access_data->psz_name = psz_name;
     p_access_data->psz_network = "";
+    memset(p_access_data->psz_auth_string, 0, MAX_QUERY_SIZE);
     if( config_GetInt( p_input, "ipv4" ) )
     {
         p_access_data->psz_network = "ipv4";
@@ -438,11 +499,39 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Parse psz_name syntax :
-     * //<hostname>[:<port>][/<path>] */
+     * //[user:password]@<hostname>[:<port>][/<path>] */
+
+
     while( *psz_parser == '/' )
     {
         psz_parser++;
     }
+    psz_auth_parser = psz_parser;
+
+    while ( *psz_auth_parser != '@' && *psz_auth_parser != '\0' )
+    {
+        psz_auth_parser++;
+    }
+    if ( *psz_auth_parser == '@' )
+    {
+        psz_user = psz_parser;
+        while ( *psz_parser != ':' && psz_parser < psz_auth_parser )
+        {
+            psz_parser++;
+        }
+        if ( psz_parser != psz_auth_parser )
+        {
+            *psz_parser = '\0';
+            psz_pwd = psz_parser + 1;
+        }
+        else
+        {
+            psz_pwd = "";
+        }
+        *psz_auth_parser = '\0';
+        psz_parser = psz_auth_parser + 1;
+    }
+
     psz_server_addr = psz_parser;
 
     while( *psz_parser && *psz_parser != ':' && *psz_parser != '/' )
@@ -501,6 +590,25 @@ static int Open( vlc_object_t *p_this )
         free( p_input->p_access_data );
         free( psz_name );
         return VLC_EGENERIC;
+    }
+
+    /* Handle autehtification */
+
+    if ( psz_user == NULL )
+    {
+        psz_user = config_GetPsz( p_input, "http-user" );
+        psz_pwd = config_GetPsz( p_input, "http-pwd" );
+    } 
+
+    if (psz_user != NULL)
+    {
+        msg_Dbg( p_input, "Authentificating, user=%s, password=%s", 
+                                            psz_user, psz_pwd );
+        char psz_user_pwd[MAX_QUERY_SIZE];
+        snprintf( psz_user_pwd, MAX_QUERY_SIZE, "%s:%s", psz_user, psz_pwd );
+        snprintf( p_access_data->psz_auth_string, MAX_QUERY_SIZE, 
+                "Authorization: Basic %s\r\n", 
+                str_base64_encode( psz_user_pwd, p_input ) );
     }
 
     /* Check proxy config variable */
