@@ -240,7 +240,7 @@
 #define VOUT_OUTMEM_SLEEP               ((mtime_t)(0.020*CLOCK_FREQ))
 
 /* The default video output window title */
-#define VOUT_TITLE                      "VideoLAN Client " VERSION
+#define VOUT_TITLE                      "VLC"
 
 /*****************************************************************************
  * Video parser configuration
