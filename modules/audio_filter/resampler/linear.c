@@ -31,6 +31,8 @@
 #include <vlc/vlc.h>
 #include "audio_output.h"
 #include "aout_internal.h"
+#include "vlc_filter.h"
+#include "vlc_block.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -40,10 +42,14 @@ static void Close     ( vlc_object_t * );
 static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                         aout_buffer_t * );
 
+static int  OpenFilter ( vlc_object_t * );
+static void CloseFilter( vlc_object_t * );
+static block_t *Resample( filter_t *, block_t * );
+
 /*****************************************************************************
  * Local structures
  *****************************************************************************/
-struct aout_filter_sys_t
+struct filter_sys_t
 {
     int32_t *p_prev_sample;       /* this filter introduces a 1 sample delay */
 
@@ -61,6 +67,11 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_MISC );
     set_capability( "audio filter", 5 );
     set_callbacks( Create, Close );
+
+    add_submodule();
+    set_description( _("audio filter for linear interpolation resampling") );
+    set_capability( "audio filter2", 5 );
+    set_callbacks( OpenFilter, CloseFilter );
 vlc_module_end();
 
 /*****************************************************************************
@@ -69,6 +80,8 @@ vlc_module_end();
 static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
+    struct filter_sys_t * p_sys;
+    
     if ( p_filter->input.i_rate == p_filter->output.i_rate
           || p_filter->input.i_format != p_filter->output.i_format
           || p_filter->input.i_physical_channels
@@ -81,15 +94,16 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the module's structure */
-    p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );
-    if( p_filter->p_sys == NULL )
+    p_sys = malloc( sizeof(filter_sys_t) );
+    p_filter->p_sys = (struct aout_filter_sys_t *)p_sys;
+    if( p_sys == NULL )
     {
         msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
     }
-    p_filter->p_sys->p_prev_sample = malloc(
+    p_sys->p_prev_sample = malloc(
         aout_FormatNbChannels( &p_filter->input ) * sizeof(int32_t) );
-    if( p_filter->p_sys->p_prev_sample == NULL )
+    if( p_sys->p_prev_sample == NULL )
     {
         msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
@@ -110,8 +124,10 @@ static int Create( vlc_object_t *p_this )
 static void Close( vlc_object_t * p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
-    free( p_filter->p_sys->p_prev_sample );
-    free( p_filter->p_sys );
+    filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
+    
+    free( p_sys->p_prev_sample );
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -120,8 +136,9 @@ static void Close( vlc_object_t * p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
+    filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
     float *p_in_orig, *p_in, *p_out = (float *)p_out_buf->p_buffer;
-    float *p_prev_sample = (float *)p_filter->p_sys->p_prev_sample;
+    float *p_prev_sample = (float *)p_sys->p_prev_sample;
 
     int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
     int i_in_nb = p_in_buf->i_nb_samples;
@@ -160,33 +177,33 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     if( !p_filter->b_continuity )
     {
         p_filter->b_continuity = VLC_TRUE;
-        p_filter->p_sys->i_remainder = 0;
-        aout_DateInit( &p_filter->p_sys->end_date, p_filter->output.i_rate );
+        p_sys->i_remainder = 0;
+        aout_DateInit( &p_sys->end_date, p_filter->output.i_rate );
     }
     else
     {
-        while( p_filter->p_sys->i_remainder < p_filter->output.i_rate )
+        while( p_sys->i_remainder < p_filter->output.i_rate )
         {
             for( i_chan = i_nb_channels ; i_chan ; )
             {
                 i_chan--;
                 p_out[i_chan] = p_prev_sample[i_chan];
                 p_out[i_chan] += ( (p_prev_sample[i_chan] - p_in[i_chan])
-                                   * p_filter->p_sys->i_remainder
+                                   * p_sys->i_remainder
                                    / p_filter->output.i_rate );
             }
             p_out += i_nb_channels;
               i_out++;
 
-            p_filter->p_sys->i_remainder += p_filter->input.i_rate;
+            p_sys->i_remainder += p_filter->input.i_rate;
         }
-        p_filter->p_sys->i_remainder -= p_filter->output.i_rate;
+        p_sys->i_remainder -= p_filter->output.i_rate;
     }
 
     /* Take care of the current input samples (minus last one) */
     for( i_in = 0; i_in < i_in_nb - 1; i_in++ )
     {
-        while( p_filter->p_sys->i_remainder < p_filter->output.i_rate )
+        while( p_sys->i_remainder < p_filter->output.i_rate )
         {
             for( i_chan = i_nb_channels ; i_chan ; )
             {
@@ -194,16 +211,16 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                 p_out[i_chan] = p_in[i_chan];
                 p_out[i_chan] += ( (p_in[i_chan] -
                     p_in[i_chan + i_nb_channels])
-                    * p_filter->p_sys->i_remainder / p_filter->output.i_rate );
+                    * p_sys->i_remainder / p_filter->output.i_rate );
             }
             p_out += i_nb_channels;
               i_out++;
 
-            p_filter->p_sys->i_remainder += p_filter->input.i_rate;
+            p_sys->i_remainder += p_filter->input.i_rate;
         }
 
         p_in += i_nb_channels;
-        p_filter->p_sys->i_remainder -= p_filter->output.i_rate;
+        p_sys->i_remainder -= p_filter->output.i_rate;
     }
 
     /* Backup the last input sample for next time */
@@ -217,12 +234,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->start_date = p_in_buf->start_date;
 
     if( p_in_buf->start_date !=
-        aout_DateGet( &p_filter->p_sys->end_date ) )
+        aout_DateGet( &p_sys->end_date ) )
     {
-        aout_DateSet( &p_filter->p_sys->end_date, p_in_buf->start_date );
+        aout_DateSet( &p_sys->end_date, p_in_buf->start_date );
     }
 
-    p_out_buf->end_date = aout_DateIncrement( &p_filter->p_sys->end_date,
+    p_out_buf->end_date = aout_DateIncrement( &p_sys->end_date,
                                               p_out_buf->i_nb_samples );
 
     p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
@@ -232,4 +249,120 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     free( p_in_orig );
 #endif
 
+}
+
+/*****************************************************************************
+ * OpenFilter:
+ *****************************************************************************/
+static int OpenFilter( vlc_object_t *p_this )
+{
+    filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys;
+    int i_out_rate  = p_filter->fmt_out.audio.i_rate;
+
+    if( p_filter->fmt_in.audio.i_rate == p_filter->fmt_out.audio.i_rate ||
+        p_filter->fmt_in.i_codec != VLC_FOURCC('f','l','3','2') )
+    {
+        return VLC_EGENERIC;
+    }
+    
+    /* Allocate the memory needed to store the module's structure */
+    p_filter->p_sys = p_sys = malloc( sizeof(struct filter_sys_t) );
+    if( p_sys == NULL )
+    {
+        msg_Err( p_filter, "out of memory" );
+        return VLC_ENOMEM;
+    }
+
+    p_sys->p_prev_sample = malloc(
+        p_filter->fmt_in.audio.i_channels * sizeof(int32_t) );
+    if( p_sys->p_prev_sample == NULL )
+    {
+        msg_Err( p_filter, "out of memory" );
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+
+    p_filter->pf_audio_filter = Resample;
+
+    msg_Dbg( p_this, "%4.4s/%iKHz/%i->%4.4s/%iKHz/%i",
+             (char *)&p_filter->fmt_in.i_codec,
+             p_filter->fmt_in.audio.i_rate,
+             p_filter->fmt_in.audio.i_channels,
+             (char *)&p_filter->fmt_out.i_codec,
+             p_filter->fmt_out.audio.i_rate,
+             p_filter->fmt_out.audio.i_channels);
+
+    p_filter->fmt_out = p_filter->fmt_in;
+    p_filter->fmt_out.audio.i_rate = i_out_rate;
+
+    return 0;
+}
+
+/*****************************************************************************
+ * CloseFilter : deallocate data structures
+ *****************************************************************************/
+static void CloseFilter( vlc_object_t *p_this )
+{
+    filter_t *p_filter = (filter_t *)p_this;
+    free( p_filter->p_sys->p_prev_sample );
+    free( p_filter->p_sys );
+}
+
+/*****************************************************************************
+ * Resample
+ *****************************************************************************/
+static block_t *Resample( filter_t *p_filter, block_t *p_block )
+{
+    aout_filter_t aout_filter;
+    aout_buffer_t in_buf, out_buf;
+    block_t *p_out;
+    int i_out_size;
+    int i_bytes_per_frame;
+
+    if( !p_block || !p_block->i_samples )
+    {
+        if( p_block ) p_block->pf_release( p_block );
+        return NULL;
+    }
+    
+    i_bytes_per_frame = p_filter->fmt_out.audio.i_channels *
+                  p_filter->fmt_out.audio.i_bitspersample / 8;
+    
+    i_out_size = i_bytes_per_frame * ( 1 + (p_block->i_samples * 
+        p_filter->fmt_out.audio.i_rate / p_filter->fmt_in.audio.i_rate));
+
+    p_out = p_filter->pf_audio_buffer_new( p_filter, i_out_size );
+    if( !p_out )
+    {
+        msg_Warn( p_filter, "can't get output buffer" );
+        p_block->pf_release( p_block );
+        return NULL;
+    }
+
+    p_out->i_samples = i_out_size / i_bytes_per_frame;
+    p_out->i_dts = p_block->i_dts;
+    p_out->i_pts = p_block->i_pts;
+    p_out->i_length = p_block->i_length;
+
+    aout_filter.p_sys = (struct aout_filter_sys_t *)p_filter->p_sys;
+    aout_filter.input = p_filter->fmt_in.audio;
+    aout_filter.output = p_filter->fmt_out.audio;
+    aout_filter.b_continuity = VLC_FALSE;
+
+    in_buf.p_buffer = p_block->p_buffer;
+    in_buf.i_nb_bytes = p_block->i_buffer;
+    in_buf.i_nb_samples = p_block->i_samples;
+    out_buf.p_buffer = p_out->p_buffer;
+    out_buf.i_nb_bytes = p_out->i_buffer;
+    out_buf.i_nb_samples = p_out->i_samples;
+
+    DoWork( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf );
+
+    p_block->pf_release( p_block );
+    
+    p_out->i_buffer = out_buf.i_nb_bytes;
+    p_out->i_samples = out_buf.i_nb_samples;
+
+    return p_out;
 }
