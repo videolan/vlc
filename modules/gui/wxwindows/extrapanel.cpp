@@ -604,15 +604,24 @@ void ExtraPanel::OnEqRestore( wxCommandEvent &event )
                                  VLC_OBJECT_AOUT, FIND_ANYWHERE);
     if( p_aout == NULL )
     {
-        config_PutFloat( p_intf, "equalizer-preamp", 0.0 );
+        vlc_value_t val;
+        vlc_bool_t b_previous = eq_chkbox->IsChecked();
+        val.f_float = 12.0;
+        IntfPreampCallback( NULL, NULL, val,val, this );
+        config_PutFloat( p_intf, "equalizer-preamp", 12.0 );
+        val.psz_string = strdup( "0 0 0 0 0 0 0 0 0 0" );
+        IntfBandsCallback( NULL, NULL, val,val, this );
         config_PutPsz( p_intf, "equalizer-bands",
-                        "0 0 0 0 0 0 0 0 0 0");
+                                "0 0 0 0 0 0 0 0 0 0");
+        config_PutPsz( p_intf, "equalizer-preset","flat" );
+        eq_chkbox->SetValue( b_previous );
     }
     else
     {
         var_SetFloat( p_aout, "equalizer-preamp", 0.0 );
         var_SetString( p_aout, "equalizer-bands",
-                        "0 0 0 0 0 0 0 0 0 0");
+                                "0 0 0 0 0 0 0 0 0 0");
+        var_SetString( p_aout , "equalizer-preset" , "flat" );
         vlc_object_release( p_aout );
     }
 }
@@ -900,8 +909,8 @@ void ExtraPanel::OnFiltersInfo(wxCommandEvent& event)
     wxMessageBox( wxU( _("Select the video effects filters to apply. "
                   "You must restart the stream for these settings to "
                   "take effect.\n"
-                  "To configure the filters, go to the Preferences, enable "
-                  "the advanced options, and go to to Modules/Video Filters. "
+                  "To configure the filters, go to the Preferences, "
+                  "and go to Modules/Video Filters. "
                   "You can then configure each filter.\n"
                   "If you want fine control over the filters ( to choose "
                   "the order in which they are applied ), you need to enter "
@@ -993,7 +1002,6 @@ static void ChangeVFiltersString( intf_thread_t *p_intf,
          }
     }
     /* Vout is not kept, so put that in the config */
-    //fprintf(stderr,"\nNow : %s",psz_string );
     config_PutPsz( p_intf, "filter", psz_string );
     free( psz_string );
 }
@@ -1051,7 +1059,6 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
              return;
          }
     }
-    fprintf(stderr,"\nSETTING %s\n",psz_string );
 
     if( p_aout == NULL )
     {
