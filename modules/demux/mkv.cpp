@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.1 2003/06/22 07:39:39 fenrir Exp $
+ * $Id: mkv.cpp,v 1.2 2003/06/22 12:27:16 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -80,6 +80,10 @@ static int  Demux     ( input_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    add_category_hint( N_("mkv-demuxer"), NULL, VLC_TRUE );
+        add_bool( "mkv-index", 0, NULL,
+                  N_("Create index if no cues found"),
+                  N_("Create index if no cues found"), VLC_TRUE );
     set_description( _("mka/mkv stream demuxer" ) );
     set_capability( "demux", 50 );
     set_callbacks( Activate, Deactivate );
@@ -214,7 +218,7 @@ class EbmlParser
 
     EbmlStream  *m_es;
     int         mi_level;
-    EbmlElement *m_el[5];
+    EbmlElement *m_el[6];
 
     EbmlElement *m_got;
 
@@ -231,7 +235,7 @@ EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start )
     m_got = NULL;
     m_el[0] = el_start;
 
-    for( i = 1; i < 5; i++ )
+    for( i = 1; i < 6; i++ )
     {
         m_el[i] = NULL;
     }
@@ -354,8 +358,9 @@ static vlc_fourcc_t __GetFOURCC( uint8_t *p )
     return VLC_FOURCC( p[0], p[1], p[2], p[3] );
 }
 
+
 /*****************************************************************************
- * Definitions of structures and functions used by this plugins
+ * definitions of structures and functions used by this plugins
  *****************************************************************************/
 typedef struct
 {
@@ -396,26 +401,46 @@ typedef struct
 
 } mkv_track_t;
 
+typedef struct
+{
+    int     i_track;
+    int     i_block_number;
+
+    int64_t i_position;
+    int64_t i_time;
+
+    vlc_bool_t b_key;
+} mkv_index_t;
+
 struct demux_sys_t
 {
     vlc_stream_io_callback  *in;
     EbmlStream              *es;
     EbmlParser              *ep;
 
-    KaxSegment              *segment;
-    KaxCluster              *cluster;
+    /* time scale */
+    uint64_t                i_timescale;
 
-    uint64_t                tc_scale;
+    /* duration of the segment */
     float                   f_duration;
 
+    /* all tracks */
     int                     i_track;
     mkv_track_t             *track;
 
-    mtime_t                 i_pcr;
+    /* from seekhead */
+    int64_t                 i_cues_position;
+    int64_t                 i_chapters_position;
 
-    mtime_t                 i_last_pts;
+    /* current data */
+    KaxSegment              *segment;
+    KaxCluster              *cluster;
 
-    uint64_t                i_cluster_tc;
+    mtime_t                 i_pts;
+
+    int                     i_index;
+    int                     i_index_max;
+    mkv_index_t             *index;
 };
 
 #define MKVD_TIMECODESCALE 1000000
@@ -464,10 +489,6 @@ static int Activate( vlc_object_t * p_this )
         msg_Err( p_input, "can only read matroska over seekable file yet" );
         return VLC_EGENERIC;
     }
-    /* FIXME FIXME FIXME */
-    p_input->stream.b_seekable = VLC_FALSE;
-    /* FIXME FIXME FIXME */
-
 
     p_input->p_demux_data = p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
     memset( p_sys, 0, sizeof( demux_sys_t ) );
@@ -475,11 +496,16 @@ static int Activate( vlc_object_t * p_this )
     p_sys->in = new vlc_stream_io_callback( p_input );
     p_sys->es = new EbmlStream( *p_sys->in );
     p_sys->f_duration   = -1;
-    p_sys->tc_scale     = MKVD_TIMECODESCALE;
+    p_sys->i_timescale     = MKVD_TIMECODESCALE;
     p_sys->i_track      = 0;
     p_sys->track        = (mkv_track_t*)malloc( sizeof( mkv_track_t ) );
-    p_sys->i_pcr        = 0;
-    p_sys->i_last_pts   = 0;
+    p_sys->i_pts   = 0;
+    p_sys->i_cues_position = -1;
+    p_sys->i_chapters_position = -1;
+
+    p_sys->i_index      = 0;
+    p_sys->i_index_max  = 1024;
+    p_sys->index        = (mkv_index_t*)malloc( sizeof( mkv_index_t ) * p_sys->i_index_max );
 
     if( p_sys->es == NULL )
     {
@@ -527,9 +553,9 @@ static int Activate( vlc_object_t * p_this )
                     KaxTimecodeScale &tcs = *(KaxTimecodeScale*)el2;
 
                     tcs.ReadData( p_sys->es->I_O() );
-                    p_sys->tc_scale = uint64(tcs);
+                    p_sys->i_timescale = uint64(tcs);
 
-                    msg_Dbg( p_input, "|   |   + TimecodeScale=%lld", p_sys->tc_scale );
+                    msg_Dbg( p_input, "|   |   + TimecodeScale=%lld", p_sys->i_timescale );
                 }
                 else if( EbmlId( *el2 ) == KaxDuration::ClassInfos.GlobalId )
                 {
@@ -809,6 +835,61 @@ static int Activate( vlc_object_t * p_this )
         else if( EbmlId( *el1 ) == KaxSeekHead::ClassInfos.GlobalId )
         {
             msg_Dbg( p_input, "|   + Seek head" );
+            p_sys->ep->Down();
+            while( ( el = p_sys->ep->Get() ) != NULL )
+            {
+                if( EbmlId( *el ) == KaxSeek::ClassInfos.GlobalId )
+                {
+                    EbmlId id = EbmlVoid::ClassInfos.GlobalId;
+                    int64_t i_pos = -1;
+
+                    //msg_Dbg( p_input, "|   |   + Seek" );
+                    p_sys->ep->Down();
+                    while( ( el = p_sys->ep->Get() ) != NULL )
+                    {
+                        if( EbmlId( *el ) == KaxSeekID::ClassInfos.GlobalId )
+                        {
+                            KaxSeekID &sid = *(KaxSeekID*)el;
+
+                            sid.ReadData( p_sys->es->I_O() );
+
+                            id = EbmlId( sid.GetBuffer(), sid.GetSize() );
+                        }
+                        else  if( EbmlId( *el ) == KaxSeekPosition::ClassInfos.GlobalId )
+                        {
+                            KaxSeekPosition &spos = *(KaxSeekPosition*)el;
+
+                            spos.ReadData( p_sys->es->I_O() );
+
+                            i_pos = uint64( spos );
+                        }
+                        else
+                        {
+                            msg_Dbg( p_input, "|   |   |   + Unknow (%s)", typeid(*el).name() );
+                        }
+                    }
+                    p_sys->ep->Up();
+
+                    if( i_pos >= 0 )
+                    {
+                        if( id == KaxCues::ClassInfos.GlobalId )
+                        {
+                            msg_Dbg( p_input, "|   |   |   = cues at %lld", i_pos );
+                            p_sys->i_cues_position = p_sys->segment->GetGlobalPosition( i_pos );
+                        }
+                        else if( id == KaxChapters::ClassInfos.GlobalId )
+                        {
+                            msg_Dbg( p_input, "|   |   |   = chapters at %lld", i_pos );
+                            p_sys->i_chapters_position = p_sys->segment->GetGlobalPosition( i_pos );
+                        }
+                    }
+                }
+                else
+                {
+                    msg_Dbg( p_input, "|   |   + Unknow (%s)", typeid(*el).name() );
+                }
+            }
+            p_sys->ep->Up();
         }
         else if( EbmlId( *el1 ) == KaxCues::ClassInfos.GlobalId )
         {
@@ -847,6 +928,150 @@ static int Activate( vlc_object_t * p_this )
         goto error;
     }
 
+    if( p_sys->i_chapters_position >= 0 )
+    {
+        msg_Warn( p_input, "chapters unsupported" );
+    }
+
+#if 0
+    if( p_sys->i_cues_position == -1 && config_GetInt( p_input, "mkv-index" ) != 0 )
+    {
+        int64_t i_sav_position = p_sys->in->getFilePointer();
+        EbmlParser *ep;
+
+        /* parse to find cues gathering info on all clusters */
+        msg_Dbg( p_input, "no cues referenced, looking for one" );
+
+        /* ugly but like easier */
+        p_sys->in->setFilePointer( p_sys->cluster->GetElementPosition(), seek_beginning );
+
+        ep = new EbmlParser( p_sys->es, p_sys->segment );
+        while( ( el = ep->Get() ) != NULL )
+        {
+            if( EbmlId( *el ) == KaxCluster::ClassInfos.GlobalId )
+            {
+                int64_t i_pos = el->GetElementPosition();
+
+                msg_Dbg( p_input, "found a cluster at %lld", i_pos );
+            }
+            else if( EbmlId( *el ) == KaxCues::ClassInfos.GlobalId )
+            {
+                msg_Dbg( p_input, "found a Cues !" );
+            }
+        }
+        delete ep;
+        msg_Dbg( p_input, "lookind done." );
+
+        p_sys->in->setFilePointer( i_sav_position, seek_beginning );
+    }
+#endif
+
+    /* *** Load the cue if found *** */
+    if( p_sys->i_cues_position >= 0 )
+    {
+        int64_t i_sav_position = p_sys->in->getFilePointer();
+        EbmlParser *ep;
+        EbmlElement *cues;
+
+        msg_Dbg( p_input, "loading cues" );
+        p_sys->in->setFilePointer( p_sys->i_cues_position, seek_beginning );
+        cues = p_sys->es->FindNextID( KaxCues::ClassInfos, 0xFFFFFFFFL);
+
+        ep = new EbmlParser( p_sys->es, cues );
+        while( ( el = ep->Get() ) != NULL )
+        {
+            if( EbmlId( *el ) == KaxCuePoint::ClassInfos.GlobalId )
+            {
+#define idx p_sys->index[p_sys->i_index]
+
+                idx.i_track       = -1;
+                idx.i_block_number= -1;
+                idx.i_position    = -1;
+                idx.i_time        = -1;
+                idx.b_key         = VLC_TRUE;
+
+                ep->Down();
+                while( ( el = ep->Get() ) != NULL )
+                {
+                    if( EbmlId( *el ) == KaxCueTime::ClassInfos.GlobalId )
+                    {
+                        KaxCueTime &ctime = *(KaxCueTime*)el;
+
+                        ctime.ReadData( p_sys->es->I_O() );
+
+                        idx.i_time = uint64( ctime ) * (mtime_t)1000000000 / p_sys->i_timescale;
+                    }
+                    else if( EbmlId( *el ) == KaxCueTrackPositions::ClassInfos.GlobalId )
+                    {
+                        ep->Down();
+                        while( ( el = ep->Get() ) != NULL )
+                        {
+                            if( EbmlId( *el ) == KaxCueTrack::ClassInfos.GlobalId )
+                            {
+                                KaxCueTrack &ctrack = *(KaxCueTrack*)el;
+
+                                ctrack.ReadData( p_sys->es->I_O() );
+                                idx.i_track = uint16( ctrack );
+                            }
+                            else if( EbmlId( *el ) == KaxCueClusterPosition::ClassInfos.GlobalId )
+                            {
+                                KaxCueClusterPosition &ccpos = *(KaxCueClusterPosition*)el;
+
+                                ccpos.ReadData( p_sys->es->I_O() );
+                                idx.i_position = p_sys->segment->GetGlobalPosition( uint64( ccpos ) );
+                            }
+                            else if( EbmlId( *el ) == KaxCueBlockNumber::ClassInfos.GlobalId )
+                            {
+                                KaxCueBlockNumber &cbnum = *(KaxCueBlockNumber*)el;
+
+                                cbnum.ReadData( p_sys->es->I_O() );
+                                idx.i_block_number = uint32( cbnum );
+                            }
+                            else
+                            {
+                                msg_Dbg( p_input, "         * Unknow (%s)", typeid(*el).name() );
+                            }
+                        }
+                        ep->Up();
+                    }
+                    else
+                    {
+                        msg_Dbg( p_input, "     * Unknow (%s)", typeid(*el).name() );
+                    }
+                }
+                ep->Up();
+
+                msg_Dbg( p_input, " * added time=%lld pos=%lld track=%d bnum=%d",
+                         idx.i_time, idx.i_position, idx.i_track, idx.i_block_number );
+
+                p_sys->i_index++;
+                if( p_sys->i_index >= p_sys->i_index_max )
+                {
+                    p_sys->i_index_max += 1024;
+                    p_sys->index = (mkv_index_t*)realloc( p_sys->index, sizeof( mkv_index_t ) * p_sys->i_index_max );
+                }
+#undef idx
+            }
+            else
+            {
+                msg_Dbg( p_input, " * Unknow (%s)", typeid(*el).name() );
+            }
+        }
+        delete ep;
+        delete cues;
+
+        msg_Dbg( p_input, "loading cues done." );
+        p_sys->in->setFilePointer( i_sav_position, seek_beginning );
+    }
+
+    if( p_sys->i_index <= 0 )
+    {
+        /* FIXME FIXME FIXME */
+        msg_Warn( p_input, "no cues found -> unseekable stream for now FIXME" );
+        p_input->stream.b_seekable = VLC_FALSE;
+        /* FIXME FIXME FIXME */
+    }
+
     /* Create one program */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( input_InitStream( p_input, 0 ) == -1)
@@ -862,7 +1087,15 @@ static int Activate( vlc_object_t * p_this )
         goto error;
     }
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-    p_input->stream.i_mux_rate = 0;
+    if( p_sys->f_duration > 1001.0 )
+    {
+        mtime_t i_duration = (mtime_t)( p_sys->f_duration / 1000.0 );
+        p_input->stream.i_mux_rate = p_input->stream.p_selected_area->i_size / 50 / i_duration;
+    }
+    else
+    {
+        p_input->stream.i_mux_rate = 0;
+    }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     /* add all es */
@@ -883,7 +1116,7 @@ static int Activate( vlc_object_t * p_this )
                                tk.psz_language, 0 );
         if( !strcmp( tk.psz_codec, "V_MS/VFW/FOURCC" ) )
         {
-            if( tk.i_extra_data < sizeof( BITMAPINFOHEADER ) )
+            if( tk.i_extra_data < (int)sizeof( BITMAPINFOHEADER ) )
             {
                 msg_Err( p_input, "missing/invalid BITMAPINFOHEADER" );
                 tk.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
@@ -938,7 +1171,7 @@ static int Activate( vlc_object_t * p_this )
         }
         else if( !strcmp( tk.psz_codec, "A_MS/ACM" ) )
         {
-            if( tk.i_extra_data < sizeof( WAVEFORMATEX ) )
+            if( tk.i_extra_data < (int)sizeof( WAVEFORMATEX ) )
             {
                 msg_Err( p_input, "missing/invalid WAVEFORMATEX" );
                 tk.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
@@ -947,13 +1180,13 @@ static int Activate( vlc_object_t * p_this )
             {
                 WAVEFORMATEX *p_wf = (WAVEFORMATEX*)tk.p_extra_data;
 
-                p_wf->wFormatTag        = GetWLE( p_wf->wFormatTag );
-                p_wf->nChannels         = GetWLE( p_wf->nChannels );
-                p_wf->nSamplesPerSec    = GetDWLE( p_wf->nSamplesPerSec );
-                p_wf->nAvgBytesPerSec   = GetDWLE( p_wf->nAvgBytesPerSec );
-                p_wf->nBlockAlign       = GetWLE( p_wf->nBlockAlign );
-                p_wf->wBitsPerSample    = GetWLE( p_wf->wBitsPerSample );
-                p_wf->cbSize            = GetWLE( p_wf->cbSize );
+                p_wf->wFormatTag        = GetWLE( &p_wf->wFormatTag );
+                p_wf->nChannels         = GetWLE( &p_wf->nChannels );
+                p_wf->nSamplesPerSec    = GetDWLE( &p_wf->nSamplesPerSec );
+                p_wf->nAvgBytesPerSec   = GetDWLE( &p_wf->nAvgBytesPerSec );
+                p_wf->nBlockAlign       = GetWLE( &p_wf->nBlockAlign );
+                p_wf->wBitsPerSample    = GetWLE( &p_wf->wBitsPerSample );
+                p_wf->cbSize            = GetWLE( &p_wf->cbSize );
 
                 switch( p_wf->wFormatTag )
                 {
@@ -1210,6 +1443,41 @@ static void Deactivate( vlc_object_t *p_this )
     free( p_sys );
 }
 
+static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
+{
+    demux_sys_t    *p_sys   = p_input->p_demux_data;
+
+    int i_index;
+
+    msg_Dbg( p_input, "seek request to %lld (%d%%)", i_date, i_percent );
+
+    for( i_index = 0; i_index < p_sys->i_index; i_index++ )
+    {
+        if( p_sys->index[i_index].i_time >= i_date )
+        {
+            break;
+        }
+    }
+
+    if( i_index > 0 )
+    {
+        i_index--;
+    }
+
+    msg_Dbg( p_input, "seek got %lld (%d%%)",
+             p_sys->index[i_index].i_time, (int)(100 * p_sys->index[i_index].i_position /p_input->stream.p_selected_area->i_size ) );
+
+    delete p_sys->ep;
+
+    p_sys->in->setFilePointer( p_sys->index[i_index].i_position, seek_beginning );
+
+    p_sys->ep = new EbmlParser( p_sys->es, p_sys->segment );
+
+//    p_sys->cluster = p_sys->es->FindNextElement( p_sys->segment->Generic().Context,
+//                                                 i_ulev, 0xFFFFFFFFL, true, 1);
+
+}
+
 /*****************************************************************************
  * Demux: reads and demuxes data packets
  *****************************************************************************
@@ -1218,7 +1486,7 @@ static void Deactivate( vlc_object_t *p_this )
 static int Demux( input_thread_t * p_input )
 {
     demux_sys_t    *p_sys   = p_input->p_demux_data;
-    mtime_t        i_start_pts = p_sys->i_last_pts;
+    mtime_t        i_start_pts = p_sys->i_pts;
     KaxBlock *block = NULL;
     int64_t i_block_duration = -1;
     int64_t i_block_ref1 = 0;
@@ -1226,7 +1494,20 @@ static int Demux( input_thread_t * p_input )
 
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
-        msg_Err( p_input, "DO NO SEEK YET" );
+        mtime_t i_duration = (mtime_t)( p_sys->f_duration / 1000 );
+        mtime_t i_date;
+        int i_percent;
+
+        i_date = (mtime_t)1000000 *
+                 (mtime_t)i_duration*
+                 (mtime_t)p_sys->in->getFilePointer() /
+                 (mtime_t)p_input->stream.p_selected_area->i_size;
+
+        i_percent = 100 * p_sys->in->getFilePointer() /
+                        p_input->stream.p_selected_area->i_size;
+
+        Seek( p_input, i_date, i_percent);
+        i_start_pts = -1;
     }
 
     for( ;; )
@@ -1251,13 +1532,13 @@ static int Demux( input_thread_t * p_input )
                 }
             }
 
-            p_sys->i_last_pts = block->GlobalTimecode() * (mtime_t) 1000 / p_sys->tc_scale;
+            p_sys->i_pts = block->GlobalTimecode() * (mtime_t) 1000 / p_sys->i_timescale;
 
-            if( p_sys->i_last_pts > 0 )
+            if( p_sys->i_pts > 0 )
             {
                 input_ClockManageRef( p_input,
                                       p_input->stream.p_selected_program,
-                                      p_sys->i_last_pts * 9 / 100 );
+                                      p_sys->i_pts * 9 / 100 );
             }
 
             if( i_track >= p_sys->i_track )
@@ -1267,7 +1548,7 @@ static int Demux( input_thread_t * p_input )
             else if( tk.p_es->p_decoder_fifo != NULL )
             {
                 pes_packet_t  *p_pes;
-                int i;
+                unsigned int i;
 
                 if( ( p_pes = input_NewPES( p_input->p_method_data ) ) != NULL )
                 {
@@ -1275,7 +1556,7 @@ static int Demux( input_thread_t * p_input )
 
                     i_pts = input_ClockGetTS( p_input,
                                               p_input->stream.p_selected_program,
-                                              p_sys->i_last_pts * 9 / 100 );
+                                              p_sys->i_pts * 9 / 100 );
 
                     p_pes->i_pts = i_pts;
                     p_pes->i_dts = i_pts;
@@ -1285,7 +1566,7 @@ static int Demux( input_thread_t * p_input )
                         if( i_block_duration > 0 )
                         {
                             /* FIXME not sure about that */
-                            p_pes->i_dts += i_block_duration * 1000;// * (mtime_t) 1000 / p_sys->tc_scale;
+                            p_pes->i_dts += i_block_duration * 1000;// * (mtime_t) 1000 / p_sys->i_timescale;
                         }
                         else
                         {
@@ -1359,7 +1640,11 @@ static int Demux( input_thread_t * p_input )
             delete block;
             block = NULL;
 
-            if( p_sys->i_last_pts > i_start_pts + (mtime_t)100000)
+            if( i_start_pts == -1 )
+            {
+                i_start_pts = p_sys->i_pts;
+            }
+            else if( p_sys->i_pts > i_start_pts + (mtime_t)100000)
             {
                 return 1;
             }
@@ -1401,8 +1686,7 @@ static int Demux( input_thread_t * p_input )
                 KaxClusterTimecode &ctc = *(KaxClusterTimecode*)el;
 
                 ctc.ReadData( p_sys->es->I_O() );
-                p_sys->i_cluster_tc = uint64( ctc );
-                p_sys->cluster->InitTimecode( p_sys->i_cluster_tc, p_sys->tc_scale );
+                p_sys->cluster->InitTimecode( uint64( ctc ), p_sys->i_timescale );
             }
             else if( EbmlId( *el ) == KaxBlockGroup::ClassInfos.GlobalId )
             {
