@@ -7,7 +7,7 @@
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -397,7 +397,11 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #if defined( WIN32 ) || defined( UNDER_CE )
 #   define WIN32_LEAN_AND_MEAN
 #   include <windows.h>
-#   define IS_WINNT ( GetVersion() < 0x80000000 )
+#   if defined( UNDER_CE )
+#      define IS_WINNT 0
+#   else
+#      define IS_WINNT ( GetVersion() < 0x80000000 )
+#   endif
 #endif
 
 #include "vlc_threads.h"

@@ -68,6 +68,8 @@ struct libvlc_t
     vlc_bool_t             b_fast_mutex;
     int                    i_win9x_cv;
     char *                 psz_vlcpath;
+#elif defined( UNDER_CE )
+    char *                 psz_vlcpath;
 #endif
 };
 
