@@ -61,7 +61,7 @@
 static int  decoder_Probe  ( probedata_t * );
 static int  decoder_Run    ( decoder_config_t * );
 static int  InitThread     ( mad_adec_thread_t * p_mad_adec );
-static void EndThread      ( mad_adec_thread_t * p_mad_adec );
+static void mad_adec_EndThread      ( mad_adec_thread_t * p_mad_adec );
 
 /*****************************************************************************
  * Capabilities
@@ -155,7 +155,7 @@ static int decoder_Run ( decoder_config_t * p_config )
 	{
 	  intf_ErrMsg( "mad_adec error: libmad decoder returns abnormally");
           DecoderError( p_mad_adec->p_fifo );
-	  EndThread(p_mad_adec);
+	  mad_adec_EndThread(p_mad_adec);
       	  return( -1 );
 	}
     }
@@ -167,7 +167,7 @@ static int decoder_Run ( decoder_config_t * p_config )
     }
 
     /* End of the ac3 decoder thread */
-    EndThread (p_mad_adec);
+    mad_adec_EndThread (p_mad_adec);
 
     return( 0 );
 }
