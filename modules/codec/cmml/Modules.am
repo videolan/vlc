@@ -1,0 +1,11 @@
+SOURCES_cmml = \
+	browser_open.c browser_open.h \
+	cmml.c \
+	history.c history.h \
+	intf.c \
+	xarray.c xarray.h \
+	xlist.c xlist.h \
+	xstrcat.h \
+	xtag.c xtag.h \
+	xurl.c xurl.h
+

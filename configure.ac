@@ -2346,6 +2346,16 @@ AX_ADD_LDFLAGS([subsdec],[${LIBICONV}])
 AX_ADD_CPPFLAGS([subsdec],[${INCICONV}])
 AX_ADD_PLUGINS([subsdec])
 
+dnl
+dnl  CMML plugin
+dnl
+AC_ARG_ENABLE(cmml,
+  [  --enable-cmml           CMML support (default enabled)])
+if test "${enable_cmml}" != "no"
+then
+  AX_ADD_PLUGINS([cmml])
+fi
+
 
 dnl
 dnl  Video Filters
@@ -3776,6 +3786,7 @@ AC_CONFIG_FILES([
   modules/audio_mixer/Makefile
   modules/audio_output/Makefile
   modules/codec/Makefile
+  modules/codec/cmml/Makefile
   modules/codec/ffmpeg/Makefile
   modules/codec/ffmpeg/postprocessing/Makefile
   modules/codec/ogt/Makefile

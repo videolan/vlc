@@ -1,5 +1,5 @@
 List of vlc plugins (221)
-$Id: LIST,v 1.19 2004/01/05 13:07:02 zorglub Exp $
+$Id$
 
  * a52: A/52 basic parser/packetizer
 
@@ -70,6 +70,8 @@ $Id: LIST,v 1.19 2004/01/05 13:07:02 zorglub Exp $
  * cinepak: Cinepack video decoder
 
  * clone: Clone video filter
+ 
+ * cmml: Continuous Media Markup Language annotations/hyperlinks decoder
 
  * corba: CORBA control module
 
