@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.9 2003/03/16 16:07:21 fenrir Exp $
+ * $Id: sub.c,v 1.10 2003/03/16 23:35:39 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -351,8 +351,11 @@ static int  sub_open ( subtitle_demux_t *p_sub,
                 }
                 break;
             }
-            else if( !strcmp( s,
-                              "Dialogue: Marked" ) )
+            else if( strstr( s, "This is a Sub Station Alpha v4 script" ) )
+            {
+                i_sub_type = SUB_TYPE_SSA2_4; // I hop this will work
+            }
+            else if( !strncmp( s, "Dialogue: Marked", 16  ) )
             {
                 i_sub_type = SUB_TYPE_SSA2_4; // could be wrong
                 break;
