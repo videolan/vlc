@@ -83,6 +83,9 @@ static void Close ( vlc_object_t * );
 #define SILENT_TEXT N_("Silent mode")
 #define SILENT_LONGTEXT N_("do not complain on encrypted PES")
 
+#define CAPMT_SYSID_TEXT N_("CAPMT System ID")
+#define CAPMT_SYSID_LONGTEXT N_("only forward descriptors from this SysID to the CAM")
+
 vlc_module_begin();
     set_description( _("ISO 13818-1 MPEG Transport Stream input - new" ) );
     set_shortname ( _("MPEG-TS") );
@@ -96,6 +99,8 @@ vlc_module_begin();
                  MTUOUT_LONGTEXT, VLC_TRUE );
     add_string( "ts-csa-ck", NULL, NULL, CSA_TEXT, CSA_LONGTEXT, VLC_TRUE );
     add_bool( "ts-silent", 0, NULL, SILENT_TEXT, SILENT_LONGTEXT, VLC_TRUE );
+    add_integer( "ts-capmt-sysid", 0, NULL, CAPMT_SYSID_TEXT,
+                 CAPMT_SYSID_LONGTEXT, VLC_TRUE );
 
     set_capability( "demux2", 10 );
     set_callbacks( Open, Close );
@@ -270,6 +275,7 @@ struct demux_sys_t
     vlc_bool_t  b_es_id_pid;
     csa_t       *csa;
     vlc_bool_t  b_silent;
+    uint16_t    i_capmt_sysid;
 
     vlc_bool_t  b_udp_out;
     int         fd; /* udp socket */
@@ -571,6 +577,10 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_demux, "ts-silent", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "ts-silent", &val );
     p_sys->b_silent = val.b_bool;
+
+    var_Create( p_demux, "ts-capmt-sysid", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "ts-capmt-sysid", &val );
+    p_sys->i_capmt_sysid = val.i_int;
 
     return VLC_SUCCESS;
 }
@@ -2033,8 +2043,11 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         }
         else if( p_dr->i_tag == 0x9 )
         {
-            msg_Dbg( p_demux, " * descriptor : CA (0x9)" );
-            i_cad_length += p_dr->i_length + 2;
+            uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
+                                | p_dr->p_data[1];
+            msg_Dbg( p_demux, " * descriptor : CA (0x9) SysID 0x%x", i_sysid );
+            if ( !p_sys->i_capmt_sysid || p_sys->i_capmt_sysid == i_sysid )
+                i_cad_length += p_dr->i_length + 2;
         }
         else
         {
@@ -2049,7 +2062,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
         prg->p_capmt[0] = p_pmt->i_program_number >> 8;
         prg->p_capmt[1] = p_pmt->i_program_number & 0xff;
-        prg->p_capmt[2] = (p_pmt->i_version << 1) | 0x1;
+        prg->p_capmt[2] = ((p_pmt->i_version & 0x1f) << 1) | 0x1;
         prg->p_capmt[3] = (i_cad_length + 1) >> 8;
         prg->p_capmt[4] = (i_cad_length + 1) & 0xff;
         prg->p_capmt[5] = 0x1; /* ok_descrambling */
@@ -2059,10 +2072,15 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         {
             if( p_dr->i_tag == 0x9 )
             {
-                prg->p_capmt[i] = 0x9;
-                prg->p_capmt[i+1] = p_dr->i_length;
-                memcpy( &prg->p_capmt[i+2], p_dr->p_data, p_dr->i_length );
-                i += p_dr->i_length + 2;
+                uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
+                                    | p_dr->p_data[1];
+                if ( !p_sys->i_capmt_sysid || p_sys->i_capmt_sysid == i_sysid )
+                {
+                    prg->p_capmt[i] = 0x9;
+                    prg->p_capmt[i+1] = p_dr->i_length;
+                    memcpy( &prg->p_capmt[i+2], p_dr->p_data, p_dr->i_length );
+                    i += p_dr->i_length + 2;
+                }
             }
         }
     }
@@ -2449,8 +2467,12 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         {
             if( p_dr->i_tag == 0x9 )
             {
-                msg_Dbg( p_demux, "   * descriptor : CA (0x9)" );
-                i_cad_length += p_dr->i_length + 2;
+                uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
+                                    | p_dr->p_data[1];
+                msg_Dbg( p_demux, "   * descriptor : CA (0x9) SysID 0x%x",
+                         i_sysid );
+                if ( !p_sys->i_capmt_sysid || p_sys->i_capmt_sysid == i_sysid )
+                    i_cad_length += p_dr->i_length + 2;
             }
             else
             {
@@ -2468,7 +2490,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
                 prg->p_capmt[0] = p_pmt->i_program_number >> 8;
                 prg->p_capmt[1] = p_pmt->i_program_number & 0xff;
-                prg->p_capmt[2] = (p_pmt->i_version << 1) | 0x1;
+                prg->p_capmt[2] = ((p_pmt->i_version & 0x1f) << 1) | 0x1;
                 prg->p_capmt[3] = 0; /* cad length */
                 prg->p_capmt[4] = 0;
 
@@ -2494,10 +2516,16 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             {
                 if( p_dr->i_tag == 0x9 )
                 {
-                    prg->p_capmt[i] = 0x9;
-                    prg->p_capmt[i+1] = p_dr->i_length;
-                    memcpy( &prg->p_capmt[i+2], p_dr->p_data, p_dr->i_length );
-                    i += p_dr->i_length + 2;
+                    uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
+                                        | p_dr->p_data[1];
+                    if ( !p_sys->i_capmt_sysid
+                           || p_sys->i_capmt_sysid == i_sysid )
+                    {
+                        prg->p_capmt[i] = 0x9;
+                        prg->p_capmt[i+1] = p_dr->i_length;
+                        memcpy( &prg->p_capmt[i+2], p_dr->p_data, p_dr->i_length );
+                        i += p_dr->i_length + 2;
+                    }
                 }
             }
         }
@@ -2697,7 +2725,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                 /* Now select PID at access level */
                 if( p_sys->b_dvb_control )
                 {
-                    if( p_sys->i_dvb_program <= 0 || p_sys->i_dvb_program == p_program->i_number )
+                    if( DVBProgramIsSelected( p_demux, p_program->i_number ) )
                     {
                         if( p_sys->i_dvb_program == 0 )
                             p_sys->i_dvb_program = p_program->i_number;

@@ -54,7 +54,7 @@ typedef struct
     void *p_sys;
 } en50221_session_t;
 
-#define MAX_DEMUX 48
+#define MAX_DEMUX 256
 #define MAX_CI_SLOTS 16
 #define MAX_SESSIONS 32
 
@@ -71,7 +71,7 @@ struct access_sys_t
     vlc_bool_t pb_active_slot[MAX_CI_SLOTS];
     vlc_bool_t pb_tc_has_data[MAX_CI_SLOTS];
     en50221_session_t p_sessions[MAX_SESSIONS];
-    mtime_t i_ca_timeout, i_ca_next_event;
+    mtime_t i_ca_timeout, i_ca_next_event, i_ca_next_pmt;
     uint8_t **pp_capmts;
     int i_nb_capmts;
 };

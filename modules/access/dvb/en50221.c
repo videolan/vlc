@@ -685,7 +685,7 @@ static void ApplicationInformationHandle( access_t * p_access, int i_session_id,
         uint8_t *d = APDUGetLength( p_apdu, &l );
 
         if ( l < 4 ) break;
-        p_apdu[l + 3] = '\0';
+        p_apdu[l + 4] = '\0';
 
         i_type = *d++;
         i_manufacturer = ((int)d[0] << 8) | d[1];
@@ -744,8 +744,7 @@ static void ConditionalAccessHandle( access_t * p_access, int i_session_id,
                 SPDUSend( p_access, i_session_id, p_sys->pp_capmts[i],
                           i_size + (p - p_sys->pp_capmts[i]) );
             }
-
-            p_sys->i_ca_timeout = 100000;
+            p_sys->i_ca_next_pmt = 0;
         }
         break;
     }
@@ -956,7 +955,7 @@ static int InitSlot( access_t * p_access, int i_slot )
     }
     if ( p_sys->pb_active_slot[i_slot] )
     {
-        p_sys->i_ca_timeout = 1000;
+        p_sys->i_ca_timeout = 100000;
         return VLC_SUCCESS;
     }
 
@@ -1074,6 +1073,30 @@ int E_(en50221_Poll)( access_t * p_access )
         }
     }
 
+    if ( p_sys->i_ca_next_pmt && p_sys->i_ca_next_pmt <= mdate() )
+    {
+        for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+        {
+            int i;
+
+            if ( p_sys->p_sessions[i_session_id - 1].i_resource_id
+                  != RI_CONDITIONAL_ACCESS_SUPPORT )
+                continue;
+
+            msg_Dbg( p_access, "sending CAPMT on session %d", i_session_id );
+            for ( i = 0; i < p_sys->i_nb_capmts; i++ )
+            {
+                int i_size;
+                uint8_t *p;
+                p = GetLength( &p_sys->pp_capmts[i][3], &i_size );
+                SPDUSend( p_access, i_session_id, p_sys->pp_capmts[i],
+                          i_size + (p - p_sys->pp_capmts[i]) );
+            }
+        }
+
+        p_sys->i_ca_next_pmt = 0;
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -1085,28 +1108,6 @@ int E_(en50221_SetCAPMT)( access_t * p_access, uint8_t **pp_capmts,
                           int i_nb_capmts )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    int i_session_id;
-
-    for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
-    {
-        int i;
-
-        if ( p_sys->p_sessions[i_session_id - 1].i_resource_id
-              != RI_CONDITIONAL_ACCESS_SUPPORT )
-            continue;
-
-        msg_Dbg( p_access, "sending CAPMT on session %d", i_session_id );
-        for ( i = 0; i < i_nb_capmts; i++ )
-        {
-            int i_size;
-            uint8_t *p;
-            p = GetLength( &pp_capmts[i][3], &i_size );
-            SPDUSend( p_access, i_session_id, pp_capmts[i],
-                      i_size + (p - pp_capmts[i]) );
-        }
-
-        p_sys->i_ca_timeout = 100000;
-    }
 
     if ( p_sys->i_nb_capmts )
     {
@@ -1119,6 +1120,7 @@ int E_(en50221_SetCAPMT)( access_t * p_access, uint8_t **pp_capmts,
     }
     p_sys->pp_capmts = pp_capmts;
     p_sys->i_nb_capmts = i_nb_capmts;
+    p_sys->i_ca_next_pmt = mdate() + 1000000;
 
     return VLC_SUCCESS;
 }
