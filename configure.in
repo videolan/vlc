@@ -374,6 +374,7 @@ AC_CACHE_CHECK([if \$CC groks Altivec C extensions],
 if test x"$ac_cv_c_altivec" != x"no"; then
   AC_DEFINE(HAVE_C_ALTIVEC, 1, Define if your compiler groks C altivec extensions.)
   CFLAGS_ALTIVEC="$CFLAGS_ALTIVEC $ac_cv_c_altivec"
+  ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
 
 AC_CACHE_CHECK([if linker needs -framework vecLib],
