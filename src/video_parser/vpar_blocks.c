@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.77 2001/02/19 19:08:59 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.78 2001/02/23 14:07:25 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -1769,7 +1769,7 @@ if( p_vpar->picture.b_error )                                           \
     /* Mark this block as skipped (better than green blocks), and       \
      * go to the next slice. */                                         \
     (*pi_mb_address)--;                                                 \
-    vpar_DestroyMacroblock( &p_vpar->vfifo, p_mb );                     \
+    vpar_FreeMacroblock( &p_vpar->vfifo, p_mb );                     \
     return;                                                             \
 }
 
@@ -1972,7 +1972,7 @@ static __inline__ void ParseMacroblock(
         /* Mark this block as skipped (better than green blocks), and go
          * to the next slice. */
         (*pi_mb_address)--;
-        vpar_DestroyMacroblock( &p_vpar->vfifo, p_mb );
+        vpar_FreeMacroblock( &p_vpar->vfifo, p_mb );
     }
 }
 

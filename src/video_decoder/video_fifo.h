@@ -2,7 +2,7 @@
  * video_fifo.h : FIFO for the pool of video_decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_fifo.h,v 1.3 2000/12/23 03:10:59 sam Exp $
+ * $Id: video_fifo.h,v 1.4 2001/02/23 14:07:25 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -244,6 +244,25 @@ static __inline__ void vpar_DestroyMacroblock( video_fifo_t * p_fifo,
 #endif
 }
 
+/*****************************************************************************
+ * vpar_FreeMacroblock : destroy a macroblock in case of error, without
+ * updating the macroblock counters
+ *****************************************************************************/
+static __inline__ void vpar_FreeMacroblock( video_fifo_t * p_fifo,
+                                            macroblock_t * p_mb )
+{
+#ifdef VDEC_SMP
+    /* Release the macroblock_t structure */
+#define P_buffer p_fifo->p_vpar->vbuffer
+    vlc_mutex_lock( &P_buffer.lock );
+    P_buffer.pp_mb_free[ ++P_buffer.i_index ] = p_mb;
+    vlc_mutex_unlock( &P_buffer.lock );
+#undef P_buffer
+
+#else
+    ;
+#endif
+}
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
