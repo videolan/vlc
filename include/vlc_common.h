@@ -2,7 +2,7 @@
  * common.h: common definitions
  * Collection of useful common types and macros definitions
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
+ * Copyright (C) 1998-2004 VideoLAN
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
@@ -751,6 +751,20 @@ static inline void _SetQWLE( uint8_t *p, uint64_t i_qw )
 #   endif
 #elif !defined(__PLUGIN__)
 #   define vlc_strncasecmp NULL
+#endif
+
+#ifndef HAVE_STRCASESTR
+#   ifdef HAVE_STRISTR
+#       define strcasestr stristr
+#       if !defined(__PLUGIN__)
+#           define vlc_strcasestr NULL
+#       endif
+#   elif !defined(__PLUGIN__)
+#       define strcasestr vlc_strcasestr
+        VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
+#   endif
+#elif !defined(__PLUGIN__)
+#   define vlc_strcasestr NULL
 #endif
 
 /* Format type specifiers for 64 bits numbers */
