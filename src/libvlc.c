@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.88 2003/05/25 17:27:13 massiot Exp $
+ * $Id: libvlc.c,v 1.89 2003/06/21 21:59:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -81,8 +81,9 @@
 /*****************************************************************************
  * The evil global variable. We handle it with care, don't worry.
  *****************************************************************************/
-static libvlc_t libvlc;
-static vlc_t *  p_static_vlc;
+static libvlc_t   libvlc;
+static libvlc_t * p_libvlc;
+static vlc_t *    p_static_vlc;
 
 /*****************************************************************************
  * Local prototypes
@@ -130,9 +131,12 @@ int VLC_Create( void )
     vlc_t * p_vlc = NULL;
     vlc_value_t lockval;
 
+    /* &libvlc never changes, so we can safely call this multiple times. */
+    p_libvlc = &libvlc;
+
     /* vlc_threads_init *must* be the first internal call! No other call is
      * allowed before the thread system has been initialized. */
-    i_ret = vlc_threads_init( &libvlc );
+    i_ret = vlc_threads_init( p_libvlc );
     if( i_ret < 0 )
     {
         return i_ret;
@@ -140,8 +144,8 @@ int VLC_Create( void )
 
     /* Now that the thread system is initialized, we don't have much, but
      * at least we have var_Create */
-    var_Create( &libvlc, "libvlc", VLC_VAR_MUTEX );
-    var_Get( &libvlc, "libvlc", &lockval );
+    var_Create( p_libvlc, "libvlc", VLC_VAR_MUTEX );
+    var_Get( p_libvlc, "libvlc", &lockval );
     vlc_mutex_lock( lockval.p_address );
     if( !libvlc.b_ready )
     {
@@ -161,11 +165,11 @@ int VLC_Create( void )
 #endif
 
         /* Initialize message queue */
-        msg_Create( &libvlc );
+        msg_Create( p_libvlc );
 
         /* Announce who we are */
-        msg_Dbg( &libvlc, COPYRIGHT_MESSAGE );
-        msg_Dbg( &libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
+        msg_Dbg( p_libvlc, COPYRIGHT_MESSAGE );
+        msg_Dbg( p_libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
 
         /* The module bank will be initialized later */
         libvlc.p_module_bank = NULL;
@@ -173,10 +177,10 @@ int VLC_Create( void )
         libvlc.b_ready = VLC_TRUE;
     }
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( &libvlc, "libvlc" );
+    var_Destroy( p_libvlc, "libvlc" );
 
     /* Allocate a vlc object */
-    p_vlc = vlc_object_create( &libvlc, VLC_OBJECT_VLC );
+    p_vlc = vlc_object_create( p_libvlc, VLC_OBJECT_VLC );
     if( p_vlc == NULL )
     {
         return VLC_EGENERIC;
@@ -192,7 +196,7 @@ int VLC_Create( void )
 #endif
 
     /* Store our newly allocated structure in the global list */
-    vlc_object_attach( p_vlc, &libvlc );
+    vlc_object_attach( p_vlc, p_libvlc );
 
     /* Store data for the non-reentrant API */
     p_static_vlc = p_vlc;
@@ -222,7 +226,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     playlist_t  *p_playlist;
     vlc_value_t  lockval;
 
-    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
 
     if( !p_vlc )
     {
@@ -261,16 +265,16 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
      * main module. We need to do this at this stage to be able to display
      * a short help if required by the user. (short help == main module
      * options) */
-    var_Create( &libvlc, "libvlc", VLC_VAR_MUTEX );
-    var_Get( &libvlc, "libvlc", &lockval );
+    var_Create( p_libvlc, "libvlc", VLC_VAR_MUTEX );
+    var_Get( p_libvlc, "libvlc", &lockval );
     vlc_mutex_lock( lockval.p_address );
     if( libvlc.p_module_bank == NULL )
     {
-        module_InitBank( &libvlc );
-        module_LoadMain( &libvlc );
+        module_InitBank( p_libvlc );
+        module_LoadMain( p_libvlc );
     }
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( &libvlc, "libvlc" );
+    var_Destroy( p_libvlc, "libvlc" );
 
     /* Hack: insert the help module here */
     p_help_module = vlc_object_create( p_vlc, VLC_OBJECT_MODULE );
@@ -353,8 +357,8 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 #endif
 
         module_EndBank( p_vlc );
-        module_InitBank( &libvlc );
-        module_LoadMain( &libvlc );
+        module_InitBank( p_libvlc );
+        module_LoadMain( p_libvlc );
         config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE );
     }
     if( psz_language ) free( psz_language );
@@ -366,8 +370,8 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
      * list of configuration options exported by each module and loads their
      * default values.
      */
-    module_LoadBuiltins( &libvlc );
-    module_LoadPlugins( &libvlc );
+    module_LoadBuiltins( p_libvlc );
+    module_LoadPlugins( p_libvlc );
     msg_Dbg( p_vlc, "module bank initialized, found %i modules",
                     libvlc.p_module_bank->i_children );
 
@@ -583,7 +587,7 @@ int VLC_AddIntf( int i_object, char const *psz_module, vlc_bool_t b_block )
     intf_thread_t *p_intf;
     vlc_t *p_vlc;
 
-    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
 
     if( !p_vlc )
     {
@@ -625,7 +629,7 @@ int VLC_Destroy( int i_object )
 {
     vlc_t *p_vlc;
 
-    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
 
     if( !p_vlc )
     {
@@ -671,7 +675,7 @@ int VLC_Destroy( int i_object )
     vlc_object_destroy( p_vlc );
 
     /* Stop thread system: last one out please shut the door! */
-    vlc_threads_end( &libvlc );
+    vlc_threads_end( p_libvlc );
 
     return VLC_SUCCESS;
 }
@@ -686,7 +690,7 @@ int VLC_Die( int i_object )
 {
     vlc_t *p_vlc;
 
-    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
 
     if( !p_vlc )
     {
@@ -711,7 +715,7 @@ int VLC_AddTarget( int i_object, char const *psz_target, int i_mode, int i_pos )
     playlist_t *p_playlist;
     vlc_t *p_vlc;
 
-    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
 
     if( !p_vlc )
     {
@@ -752,7 +756,7 @@ int VLC_Set( int i_object, char const *psz_var, vlc_value_t value )
     vlc_t *p_vlc;
     int i_ret;
 
-    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
 
     if( !p_vlc )
     {
@@ -806,7 +810,7 @@ int VLC_Get( int i_object, char const *psz_var, vlc_value_t *p_value )
     vlc_t *p_vlc;
     int i_ret;
 
-    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
 
     if( !p_vlc )
     {
@@ -829,7 +833,7 @@ int VLC_Play( int i_object )
     playlist_t * p_playlist;
     vlc_t *p_vlc;
 
-    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
 
     /* Check that the handle is valid */
     if( !p_vlc )
@@ -873,7 +877,7 @@ int VLC_Stop( int i_object )
     aout_instance_t * p_aout;
     vlc_t *p_vlc;
 
-    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
 
     /* Check that the handle is valid */
     if( !p_vlc )
@@ -939,7 +943,7 @@ int VLC_Pause( int i_object )
     input_thread_t *p_input;
     vlc_t *p_vlc;
 
-    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
 
     if( !p_vlc )
     {
@@ -969,7 +973,7 @@ int VLC_FullScreen( int i_object )
     vout_thread_t *p_vout;
     vlc_t *p_vlc;
 
-    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
 
     if( !p_vlc )
     {
