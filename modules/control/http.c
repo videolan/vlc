@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.14 2003/07/12 00:56:18 fenrir Exp $
+ * $Id: http.c,v 1.15 2003/07/14 16:10:20 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -943,7 +943,7 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
 
     /* convert all / to native separator */
 #if defined( WIN32 )
-    while( p = strchr( psz_dir, '/' ) )
+    while( (p = strchr( psz_dir, '/' )) )
     {
         *p = '\\';
     }
@@ -1079,8 +1079,13 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
         mvar_AppendNewVar( f, "size", tmp );
 
         /* FIXME memory leak FIXME */
+#ifdef HAVE_CTIME_R
         ctime_r( &stat_info.st_mtime, tmp );
         mvar_AppendNewVar( f, "date", tmp );
+#else
+        mvar_AppendNewVar( f, "date", ctime( &stat_info.st_mtime ) );
+#endif
+
 #else
         mvar_AppendNewVar( f, "type", "unknown" );
         mvar_AppendNewVar( f, "size", "unknown" );
