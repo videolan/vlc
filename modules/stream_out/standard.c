@@ -2,7 +2,7 @@
  * standard.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.11 2003/08/13 21:15:42 gbazin Exp $
+ * $Id: standard.c,v 1.12 2003/08/14 20:02:55 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -30,7 +30,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/sout.h>
-#include <announce.h>
+#include "announce.h"
 
 #define DEFAULT_IPV6_SCOPE "8"
 

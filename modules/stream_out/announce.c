@@ -66,7 +66,6 @@
  *               and the one which is after.
  *               NULL is returned if delim is not found
  ****************************************************************************/
-
 static char * split( char *psz_in, char *psz_out1, char *psz_out2, char delim)
 {
     unsigned int i_count = 0; /* pos in input string */
@@ -129,9 +128,11 @@ static char * split( char *psz_in, char *psz_out1, char *psz_out2, char delim)
 /*****************************************************************************
  * sout_SAPNew: Creates a SAP Session
  *****************************************************************************/
-sap_session_t * sout_SAPNew ( sout_instance_t *p_sout, char * psz_url_arg,
-                              char * psz_name_arg, int ip_version,
-                              char * psz_v6_scope )
+sap_session_t * sout_SAPNew ( sout_instance_t *p_sout,
+                                     char * psz_url_arg,
+                                     char * psz_name_arg,
+                                     int ip_version,
+                                     char * psz_v6_scope )
 {
     sap_session_t       *p_sap; /* The SAP structure */
     module_t            *p_network; /* Network module */
@@ -400,7 +401,7 @@ void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_sap )
 /*****************************************************************************
  * sout_SLPBuildName: Builds a service name according to SLP standard
  *****************************************************************************/
-char * sout_SLPBuildName(char *psz_url,char *psz_name)
+static char * sout_SLPBuildName(char *psz_url,char *psz_name)
 {
     char *psz_service;
     unsigned int i_size;
@@ -424,7 +425,7 @@ char * sout_SLPBuildName(char *psz_url,char *psz_name)
  * sout_SLPReport: Reporting function. Unused at the moment but needed
  *****************************************************************************/
 #ifdef HAVE_SLP_H
-void sout_SLPReport(SLPHandle slp_handle,SLPError slp_error,void* cookie)
+static void sout_SLPReport(SLPHandle slp_handle,SLPError slp_error,void* cookie)
 {
 }  
 #endif

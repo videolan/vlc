@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.58 2003/08/13 23:26:55 gbazin Exp $
+dnl $Id: configure.ac,v 1.59 2003/08/14 20:02:55 zorglub Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -2836,7 +2836,7 @@ then
     then
       AX_ADD_PLUGINS([slp])
       AX_ADD_LDFLAGS([slp],[-lslp])
-      AX_ADD_LDFLAGS([vlc],[-lslp])
+      AX_ADD_LDFLAGS([stream_out_standard],[-lslp])
     fi
   else
     AC_MSG_CHECKING(for slp headers in ${with_slp})
@@ -2846,7 +2846,7 @@ then
       AC_MSG_RESULT(yes)
       AX_ADD_PLUGINS([slp])
       AX_ADD_LDFLAGS([slp],[-L${with_slp} -lslp])
-      AX_ADD_LDFLAGS([vlc],[-L${with_slp} -lslp])
+      AX_ADD_LDFLAGS([stream_out_standard],[-L${with_slp} -lslp])
       AX_ADD_CPPFLAGS([slp],[-I${with_slp}])
       AC_DEFINE(HAVE_SLP_H)
     else
