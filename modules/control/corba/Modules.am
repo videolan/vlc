@@ -5,11 +5,14 @@ SOURCES_corba = corba.c mediacontrol-core.c mediacontrol-plugin.c
 nodist_SOURCES_corba = \
 	MediaControl-common.c \
 	MediaControl-skels.c \
+	MediaControl-stubs.c \
 	MediaControl.h \
 	$(NULL)
 
+GENERATEDFILES = MediaControl-common.c MediaControl-skels.c MediaControl.h
+
 EXTRA_DIST += $(CORBAIDLFILE)
-BUILT_SOURCES += $(GENERATEDFILES) $(IMODULEFILE)
+BUILT_SOURCES += $(GENERATEDFILES)
 
 if ENABLE_CORBA
 
@@ -21,29 +24,26 @@ corbaidl_DATA = $(CORBAIDLFILE)
 ## orbittypelibdir = $(libdir)/orbit-2.0
 orbittypelibdir = $(libdir)/advene
 orbittypelib_DATA = MediaControl.so
+orbittypelib_CFLAGS=`$(VLC_CONFIG) --cflags plugin corba`
+orbittypelib_LIBS=`$(VLC_CONFIG) --libs plugin corba`
 
 ORBIT_IDL=$(shell pkg-config --variable=orbit_idl ORBit-2.0)
 
-GENERATEDFILES = MediaControl-common.c MediaControl-skels.c MediaControl.h
-IMODULEFILE = $(IMODULEFILE)
-
 ## MediaControl.so rules
-MediaControl.so: MediaControl-imodule.c
-	$(CC) -fPIC -o MediaControl-imodule.o -c $< $(CORBA_CFLAGS)
-	$(CC) -shared -o $@ MediaControl-imodule.o $(CORBA_LIBS)
+MediaControl-imodule.o: MediaControl-imodule.c
+	$(CC) -fPIC -o $@ -c $< $(orbittypelib_CFLAGS)
 
-$(GENERATEDFILES): $(CORBAIDLFILE)
-	$(ORBIT_IDL) $<
+MediaControl.so: MediaControl-imodule.o
+	$(CC) -shared -o $@ $< $(orbittypelib_LIBS)
 
 ## We have to invoke 2 times $(ORBIT_IDL), else the --imodule
 ## invocation builds MediaControl-common.c without some
 ## glue code that is needed.
-$(IMODULEFILE): $(CORBAIDLFILE)
+$(GENERATEDFILES): $(CORBAIDLFILE)
 	$(ORBIT_IDL) --imodule $<
 	$(ORBIT_IDL) $<
 
 clean:
 	$(RM) -f $(GENERATEDFILES)
-	$(RM) -f $(IMODULEFILE)
 
 endif
