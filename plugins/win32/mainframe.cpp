@@ -326,12 +326,12 @@ void __fastcall TMainFrameDlg::ToolButtonEjectClick( TObject *Sender )
     }
 
     /* If there's a stream playing, we aren't allowed to eject ! */
-//    if( p_input_bank->pp_input[0] == NULL )
-//    {
+    if( p_input_bank->pp_input[0] == NULL )
+    {
         intf_WarnMsg( 4, "intf: ejecting %s", Device.c_str() );
 
         intf_Eject( Device.c_str() );
-//    }
+    }
 }
 //--------------------------------------------------------------------------
 
@@ -628,7 +628,7 @@ void __fastcall TMainFrameDlg::ModeManage()
                 break;
         }
 
-        i_Height = StatusBar->Height + ActiveGB->Height + ToolBar->Height + 47;
+        i_Height = StatusBar->Height + ActiveGB->Height + ToolBar->Height + 54;
 
         /* initialize and show slider for seekable streams */
         if( p_input_bank->pp_input[0]->stream.b_seekable )
@@ -660,13 +660,13 @@ void __fastcall TMainFrameDlg::ModeManage()
         {
             GroupBoxNetwork->Visible = true;
             LabelChannel->Visible = true;
-            i_Height += GroupBoxNetwork->Height;
+            i_Height += GroupBoxNetwork->Height + 7;
         }
         else
         {
             /* add space between tolbar and statusbar when
              * nothing is displayed; isn't it nicer ? :) */ 
-            i_Height += 18;
+            i_Height += 17;
 
             /* unsensitize menus */
             MenuProgram->Enabled = false;
@@ -686,7 +686,7 @@ void __fastcall TMainFrameDlg::ModeManage()
     /* set control items */
     ToolButtonBack->Enabled = false;
     ToolButtonStop->Enabled = true;
-    ToolButtonEject->Enabled = b_control;
+    ToolButtonEject->Enabled = !b_control;
     ToolButtonPause->Enabled = b_control;
     ToolButtonSlow->Enabled = b_control;
     ToolButtonFast->Enabled = b_control;

@@ -61,8 +61,8 @@ void __fastcall TMessagesDlg::FormShow( TObject *Sender )
 void __fastcall TMessagesDlg::UpdateLog()
 {
     intf_subscription_t *p_sub = p_intfGlobal->p_sys->p_sub;
-    int                 i_start;
-    int                 i_stop;
+    int                 i_start, i_stop, i_del, i_count;
+    int                 i_max_lines;
 
     vlc_mutex_lock( p_sub->p_lock );
     i_stop = *p_sub->pi_stop;
@@ -88,7 +88,22 @@ void __fastcall TMessagesDlg::UpdateLog()
                 break;
             }
 
-            RichEditMessages->Lines->Add( p_sub->p_msg[i_start].psz_msg );
+            /* Limit log size */
+            i_count = RichEditMessages->Lines->Count;
+            i_max_lines = config_GetIntVariable( "intfwin-max-lines" );
+            if( i_max_lines > 0 )
+            {
+                for( i_del = 0; i_del <= i_count - i_max_lines; i_del++ )
+                {
+                    RichEditMessages->Lines->Delete( 0 );
+                }
+            }
+
+            /* Add message */
+            if( i_max_lines )
+            {
+                RichEditMessages->Lines->Add( p_sub->p_msg[i_start].psz_msg );
+            }
         }
 
         vlc_mutex_lock( p_sub->p_lock );
