@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.7 2002/10/27 15:37:16 fenrir Exp $
+ * $Id: avi.c,v 1.8 2002/10/28 01:51:37 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -788,6 +788,8 @@ static int AVIInit( vlc_object_t * p_this )
     p_avi->i_pcr  = 0;
     p_avi->b_seekable = ( ( p_input->stream.b_seekable )
                         &&( p_input->stream.i_method == INPUT_METHOD_FILE ) );
+    p_avi->i_movi_lastchunk_pos = 0;
+
     /* *** for unseekable stream, automaticaly use AVIDemux_interleaved *** */
     if( !p_avi->b_seekable || config_GetInt( p_input, "avi-interleaved" ) )
     {
@@ -1073,7 +1075,6 @@ static int AVIInit( vlc_object_t * p_this )
     AVI_SkipBytes( p_input, 12 ); // enter in p_movi
 
     p_avi->i_movi_begin = p_movi->i_chunk_pos;
-    p_avi->i_movi_lastchunk_pos = 0;
     return( 0 );
 }
 
@@ -1249,11 +1250,7 @@ static int AVI_SetStreamChunk( input_thread_t    *p_input,
     p_stream->i_idxposc = i_ck;
     p_stream->i_idxposb = 0;
 
-    if(  i_ck < p_stream->i_idxnb )
-    {
-        return( 1 );
-    }
-    else
+    if(  i_ck >= p_stream->i_idxnb )
     {
         p_stream->i_idxposc = p_stream->i_idxnb - 1;
         do
@@ -1265,9 +1262,9 @@ static int AVI_SetStreamChunk( input_thread_t    *p_input,
             }
 
         } while( p_stream->i_idxposc < i_ck );
-
-        return( 1 );
     }
+
+    return( 1 );
 }
 
 
@@ -1676,21 +1673,18 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
 
             if( toread[i].i_posf > 0 )
             {
-                i_stream = i;
-                if( i_pos == -1 )
+                if( i_pos == -1 || i_pos > toread[i_stream].i_posf )
                 {
-                    i_pos = toread[i_stream].i_posf;
-                }
-                else
-                {
-                    i_pos = __MIN( i_pos, toread[i_stream].i_posf );
+                    i_stream = i;
+                    i_pos = toread[i].i_posf;
                 }
             }
         }
 
         if( b_done )
         {
-            return( b_stream ? 1 : 0 );
+//            return( b_stream ? 1 : 0 );
+            return( 1 );
         }
         
         if( i_pos == -1 )
